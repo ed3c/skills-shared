@@ -36,7 +36,7 @@ description: |
 > §Output Contract 的設計理由)；antigravity 兩個 cross-reference 目標(
 > `repo-wiki-converge`／
 > `repo-fullstack-debugger`)中，前者已有本地 port，後者仍無本地基座 →
-> [`modules/retarget-map.md`](modules/retarget-map.md)。
+> `.skill-bindings/repo-agent-native/retarget-map.md`。
 > know-why(破盒推論五步／OPBE／Evidence Level
 > 分級細節) →
 > [`modules/extraction-methodology.md`](modules/extraction-methodology.md)
@@ -333,5 +333,5 @@ S-1 章節去接線——那是協調 session 的工作；本檔只確保接線�
 -
 [modules/specs-as-code-prompt.md](modules/specs-as-code-prompt.md)
 — ready-to-paste 提示詞。
-- [modules/retarget-map.md](modules/retarget-map.md) —
+- `.skill-bindings/repo-agent-native/retarget-map.md` —
 antigravity→skill-bettor 逐機制映射與誠實帳本。

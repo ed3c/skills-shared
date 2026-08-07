@@ -3,7 +3,7 @@
 > 屬 [`loop-harness-review-handoff`](../SKILL.md) skill。SKILL.md 6 步程序的第 ③ 步引用本檔。
 > **用法**:交接時把下列**已知維度**逐項放進 reviewer 的審計任務,再帶 §逼未知 的 completeness-critic 提問。維度可複用、可依 session-adjustment([handoff-know-why §4](handoff-know-why.md))刪去已答項。
 > 每維度指向的設計 SSOT 只**指針**(漂移時以真檔為準):[`harness-spec.md`](../../loop-harness-standard/modules/harness-spec.md)、[`evals-design-method.md`](../../loop-harness-standard/modules/evals-design-method.md)、`ARCHITECTURE.md`、pilot `families/pinescript-audit/`、引擎 `loop_wiki/engine.sh`。
-> **與 antigravity 原版的差異(誠實記)**:原版八項裡有兩項對 skill-bettor 不適用,已**移除,不佯裝存在**——見下方「④/⑤ 已移除」。移除理由承 [`loop-harness-standard/modules/retarget-map.md`](../../loop-harness-standard/modules/retarget-map.md) 第 1 行、[`harness-wiki/modules/retarget-map.md`](../../harness-wiki/modules/retarget-map.md) 第 2 行——不是本檔重新做的判斷,是同一個架構事實(skill-bettor 恆單 host,無 root `AGENTS.md`)的第三次引用。
+> **與 antigravity 原版的差異(誠實記)**:原版八項裡有兩項對 skill-bettor 不適用,已**移除,不佯裝存在**——見下方「④/⑤ 已移除」。移除理由承 `.skill-bindings/loop-harness-review-handoff/retarget-map.md` 第 1 行、`.skill-bindings/loop-harness-review-handoff/retarget-map.md` 第 2 行——不是本檔重新做的判斷,是同一個架構事實(skill-bettor 恆單 host,無 root `AGENTS.md`)的第三次引用。
 
 ## 已知審計維度(known dimensions;逐項掃)
 
@@ -28,11 +28,11 @@ skill-bettor 現存**兩種**scripts↔fixtures 配對形態,結構不同:
 
 ### ④ 已移除 — AGENTS.md／CLAUDE.md 差異
 skill-bettor 恆為 Claude Code 單 host,**沒有 root `AGENTS.md`**——`ARCHITECTURE.md` §2 目錄圖明寫「⚠️ 暫不建 root AGENTS.md——『dual-runnable 才雙檔』」,§11「為何不」重申。這項審計維度在 antigravity 問的是「雙份常駐上下文檔案是否最優」,skill-bettor 沒有第二份可比較,問題本身不成立,不是簡化掉一個困難問題。
-錨:`ARCHITECTURE.md` §2／§11、[`loop-harness-standard/modules/retarget-map.md`](../../loop-harness-standard/modules/retarget-map.md) 第 1 行。
+錨:`ARCHITECTURE.md` §2／§11、`.skill-bindings/loop-harness-review-handoff/retarget-map.md` 第 1 行。
 
 ### ⑤ 已移除 — N×M(host×driver)覆蓋
 skill-bettor 不存在雙 host 翻面(不會有「開這個 repo 的 CLI 換家族」的情境),driver 只在小迴圈側單軸二選一(`claude -p`／`agy`)——[`harness-spec.md` §3](../../loop-harness-standard/modules/harness-spec.md) 已明寫此差異。**提醒**:`ARCHITECTURE.md` §6「N×M 政策」仍殘留「格 3/4(Gemini host)僅設計未證」的措辭,那是**假設性占位**(只有真的要接 Antigravity CLI host 才會啟用),不是本 repo 現存的雙 host 事實——reviewer 讀到 §6 別誤讀成「skill-bettor 其實有 N×M 矩陣需要審」。
-錨:`ARCHITECTURE.md` §6、[`loop-harness-standard/modules/retarget-map.md`](../../loop-harness-standard/modules/retarget-map.md) 第 1 行、[`harness-wiki/modules/retarget-map.md`](../../harness-wiki/modules/retarget-map.md) 第 2 行。
+錨:`ARCHITECTURE.md` §6、`.skill-bindings/loop-harness-review-handoff/retarget-map.md` 第 1 行、`.skill-bindings/loop-harness-review-handoff/retarget-map.md` 第 2 行。
 
 ### ⑥ 效益疊加 vs 冗餘
 對每個主要實作(八大基座本身、`engine.sh` 的 iterate/stop-loss/snapshot/trajectory、`_template` 骨架、family `evals/runner.py` G1-G5 閘、holdout 一次性、fresh-subagent 判官隔離(鐵律 2)、cache 五不變量(`harness-spec.md` §5)、tier-dispatch(`ARCHITECTURE.md` §5)、prune 保護(G5)、token 口徑鐵律(§7-6)、祈使任務綁 target 鐵律(§7-7)):具體效益是**疊加(compound)還是重疊/冗餘**?**依價值排序 + 點名可砍的儀式性/冗餘/過度工程**(反膨脹,別客氣)。

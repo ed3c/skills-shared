@@ -33,7 +33,7 @@ description: |
 > (antigravity 原版是 Google Antigravity CLI 平台的「已查證真相表」,
 > 那是錯平台的事實,不可搬進 Claude-Code-only 的 skill-bettor,
 > 已換成本地空白模板+本次移植時順手查證的 Claude Code Skill 規範種子)。
-> 逐條映射見 [modules/retarget-map.md](modules/retarget-map.md)。
+> 逐條映射見 `.skill-bindings/external-verify/retarget-map.md`。
 
 ## When to Use
 - claim 涉及「該讀哪個檔／預設哪個模型／哪個版本支援 X／設計規範是什麼」。
@@ -105,5 +105,5 @@ E --> F[附來源]
   (skill-bettor 尚未累積自己的驗證項,
   故以空白模板+本次移植順手查證的 Claude Code Skill 規範種子起步;
   結構與復用紀律見該檔)。
-- [modules/retarget-map.md](modules/retarget-map.md) —
+- `.skill-bindings/external-verify/retarget-map.md` —
   antigravity → skill-bettor 逐機制映射與誠實帳本。

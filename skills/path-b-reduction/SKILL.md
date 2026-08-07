@@ -19,7 +19,7 @@ description: |
 > **Lineage**:移植自 antigravity `.agents/skills/path-b-reduction/`
 > (其本身 port 自 northstar `path-b-semantic-reduction-engine.md`)。
 > 方法論本身跨平台通用,無需 retarget 核心程序;
-> 逐項調整見 [modules/retarget-map.md](modules/retarget-map.md)。
+> 逐項調整見 `.skill-bindings/path-b-reduction/retarget-map.md`。
 
 ## When to Use
 - 評估/吹捧某架構、演算法、概念(「微服務」「優化」「模組化」「效率提升」)。
@@ -94,4 +94,4 @@ C --> D[約分消去]
   — 四步驟完整定義 + 執行指令模板(原始 Path B prompt)
 - [modules/know-why.md](modules/know-why.md)
   — 核心哲學 + 語義流風格約束(4 條)+ Path A/B 軸消歧 + 借形案例
-- [modules/retarget-map.md](modules/retarget-map.md) — antigravity → skill-bettor 逐項調整與誠實帳本
+- `.skill-bindings/path-b-reduction/retarget-map.md` — antigravity → skill-bettor 逐項調整與誠實帳本

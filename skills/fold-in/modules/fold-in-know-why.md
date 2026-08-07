@@ -2,7 +2,7 @@
 
 > 屬 [`fold-in`](../SKILL.md) skill。SKILL.md 有確定性程序＋不變量;本檔 = 為何這樣、durable-home
 > taxonomy 設計理由、boundary-aware 通則。逐機制 antigravity → skill-bettor retarget 映射表在
-> [modules/retarget-map.md](retarget-map.md)(含 upstream northstar lineage 引註,不重抄)。
+> `.skill-bindings/fold-in/retarget-map.md`(含 upstream northstar lineage 引註,不重抄)。
 > 查證方法 → [`external-verify`](../../external-verify/SKILL.md)。
 
 ## 1. 為何 fold,不造新(Slop #2 / anti-inflation)
@@ -96,7 +96,7 @@ antigravity `fold-in` 本身是 port 自 northstar `/fold-in`(Claude Code 斜線
 `.claude/commands/fold-in.md`,DDR-205 Layer A/B、Slop #2、PG-103/155/156)。那一手的完整
 northstar→antigravity 逐機制映射表記在 antigravity 自己的
 `.agents/skills/fold-in/modules/fold-in-know-why.md` §5——那是**第三手參照**,本檔不重抄它,只在
-[modules/retarget-map.md](retarget-map.md)引註為 upstream lineage。本檔與 retarget-map.md 只負責
+`.skill-bindings/fold-in/retarget-map.md`引註為 upstream lineage。本檔與 retarget-map.md 只負責
 **antigravity → skill-bettor** 這一手的映射,新鮮寫出、不假設讀者看過 northstar 那份。
 
 ## 6. 為何 fold-in 要 boundary-aware(掌握系統邊界)＋ 技術等價物判斷通則

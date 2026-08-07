@@ -2,7 +2,7 @@
 
 > 屬 [`path-b-reduction`](../SKILL.md) skill。SKILL.md 有確定性程序的 4 步骨架;本檔是各步**完整定義 +
 > 原始 prompt 模板**(移植自 antigravity 版,拿掉其 northstar 專屬落地細節,見
-> [retarget-map.md](retarget-map.md))。
+> `.skill-bindings/path-b-reduction/retarget-map.md`)。
 
 ## 四步驟完整定義
 

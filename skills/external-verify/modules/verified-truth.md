@@ -7,7 +7,7 @@
 > **與 antigravity 原版的差異(誠實現況)**:antigravity 原版這份表的每一列都是 **Google Antigravity
 > CLI 平台**的事實(`AGENTS.md` canonical 檔名、`.agents/skills/` 目錄、`~/.gemini/...` 三層 scope、
 > `GEMINI.md` 存在性)——那是**錯平台的事實**,skill-bettor 是 Claude-Code-only 專案,逐字複製視同灌入
-> 假鐵錨,故整份不搬(見 [modules/retarget-map.md](retarget-map.md))。本檔改為 skill-bettor 自己的
+> 假鐵錨,故整份不搬(見 `.skill-bindings/external-verify/retarget-map.md`)。本檔改為 skill-bettor 自己的
 > 表,目前只有下方這批**移植當下(2026-07-11)順手用 WebFetch 對官方文件真查證過**的 Claude Code
 > Skill 規範事實;其餘留白——等 skill-bettor 未來真的碰到 post-cutoff/不可錨 claim、真的跑過
 > SKILL.md 的 6 步 runbook,才 append 新列,不預先杜撰更多列撐場面。

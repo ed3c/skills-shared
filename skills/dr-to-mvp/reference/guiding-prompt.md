@@ -1,6 +1,6 @@
 # 引導提示詞：研究問題 → 可信基底 → prototype → 八大基座畢業 MVP（skill-bettor 版）
 
-> **這是 [`dr-to-mvp`](../SKILL.md) 的 Layer B reference**（可貼 playbook）。SKILL.md＝脊椎路由表＋不變量;本檔＝逐階段 prompt 骨架＋閘＋▣停點。漂移時以各 owner skill 的真檔為準;移植命門見 [modules/retarget-map.md](../modules/retarget-map.md)。
+> **這是 [`dr-to-mvp`](../SKILL.md) 的 Layer B reference**（可貼 playbook）。SKILL.md＝脊椎路由表＋不變量;本檔＝逐階段 prompt 骨架＋閘＋▣停點。漂移時以各 owner skill 的真檔為準;移植命門見 `.skill-bindings/dr-to-mvp/retarget-map.md`。
 > **這是什麼**：把「一個研究問題／一批 DR 語料」一路引導到「一個畢業的家族資產（`families/<f>/`）」的**冷啟動編排提示詞**。可貼可跑。
 > **紀律**：pointer-rich,**不複述** SSOT（漂移時以被指的真檔為準）。每階段標 **LIVE ✓（本地真跑過）** vs **設計 only（未證,Path B 不宣稱成立）**。
 > **SSOT 來源**：`proposals/README.md`（Phase R schema＋生命週期）、`.claude/skills/dr-research-loop/`（DR 執行）、`.claude/skills/loop-harness-standard/modules/harness-spec.md`（八大基座）。
@@ -125,7 +125,7 @@ DR／proposal 是「填外部知識缺口」的一步,產物＝**待驗敘事、
 **▣ SURFACE（終點,必停）**：畢業＝人 LAND-DECISION admit。admit 後 **families 型 homing**：MVP 現住 gitignored `prototype/`＝孤本,
 　搬進 `families/<f>/shared/runtime/<mvp>/`（隨家族 checked-in,訂閱者 git pull 即得可跑模組）;搬運排除 `.git`/`venv`/快取,
 　跨模組絕對路徑改 `__file__` 相對定位;畢業後 metrics 回填 `FAMILY.yaml`（雙軌:機械 success_rate ∧ 語意 semantic_pass_rate）。
-> **know-why：families 型 homing 的接縫**。實例 `families/agent-harness/`（`0e9ea32`）:evals-gate `src/ingest.py` 的 `DEFAULT_ENVELOPE_SCHEMA_PATH` 從 prototype 絕對路徑改為 `__file__` 相對（指同層 `../harness-core/contract/envelope.schema.json`）——搬完 verify 必綠是硬不變量。**硬體/真機類 e2e 無設備標 `deferred(needs-hardware)` 不卡 homing**（編排邏輯 hermetic 全驗即可 merge;真機閉合待設備）。本 repo homing 只用 families 型（living-skills 家族 repo 的唯一適用型;antigravity 另有 remote／reference-impl 型,單 repo 場景不適用,見 [modules/retarget-map.md](../modules/retarget-map.md) §2）。families 型完整帳 → `families/agent-harness/changelog/2026-07-12.md`。
+> **know-why：families 型 homing 的接縫**。實例 `families/agent-harness/`（`0e9ea32`）:evals-gate `src/ingest.py` 的 `DEFAULT_ENVELOPE_SCHEMA_PATH` 從 prototype 絕對路徑改為 `__file__` 相對（指同層 `../harness-core/contract/envelope.schema.json`）——搬完 verify 必綠是硬不變量。**硬體/真機類 e2e 無設備標 `deferred(needs-hardware)` 不卡 homing**（編排邏輯 hermetic 全驗即可 merge;真機閉合待設備）。本 repo homing 只用 families 型（living-skills 家族 repo 的唯一適用型;antigravity 另有 remote／reference-impl 型,單 repo 場景不適用,見 `.skill-bindings/dr-to-mvp/retarget-map.md` §2）。families 型完整帳 → `families/agent-harness/changelog/2026-07-12.md`。
 
 ---
 

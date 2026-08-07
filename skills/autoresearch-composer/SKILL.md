@@ -43,7 +43,7 @@ description: |
 >
 > **結構**：本檔 = Gate + 路由表 + Contract block + 不變量；
 > port 的命門與誠實帳本 →
-> [modules/retarget-map.md](modules/retarget-map.md)。
+> `.skill-bindings/autoresearch-composer/retarget-map.md`。
 >
 > **與 families/ 的邊界（重要）**：
 > 本 skill 是 `.claude/skills/` 層的**流程/路由 meta-skill**

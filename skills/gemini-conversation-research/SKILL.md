@@ -18,13 +18,13 @@ description: |
 >   那條是 YouTube 影片 → 卡片盒 → DR，本條是**既有 Gemini 對話 URL / 主動 Q&A** → 分析 → 缺口 → DR。
 > **結構**: SKILL.md = 11 階段架構 + 每階段編排 know-how（1-2 行 + 指針）；逐階段 how-to / checkpoint / 子代理模板在 `modules/`。
 > **SSOT / 活基座分級（本地可跑 vs 外部引擎，這是本 port「非 husk」的鐵錨）**:
->   - DR 投遞 + 抽取引擎 = `automate.js` 的 `runDrOnce`(256) + `ui.js` 的 `runGeminiDeepResearch`(906) / `runGeminiDeepResearchAttempt`(924) + `data.js` 的 `extractReportHtmlInBrowser`(24) / `htmlToMarkdown`(17)（cc-20260712 核實：舊引註「automate.js:1364/1383/2287/43」是 state.js／data.js／ui.js 拆分前的殘留行號，automate.js 現僅 290 行、純調度層——已修正）。**gcr 不重造 DR monitor+retry**（northstar 曾重造 = 滯後複製，實證間歇卡；見 [retarget-map §DR-reuse](modules/retarget-map.md)）。
+>   - DR 投遞 + 抽取引擎 = `automate.js` 的 `runDrOnce`(256) + `ui.js` 的 `runGeminiDeepResearch`(906) / `runGeminiDeepResearchAttempt`(924) + `data.js` 的 `extractReportHtmlInBrowser`(24) / `htmlToMarkdown`(17)（cc-20260712 核實：舊引註「automate.js:1364/1383/2287/43」是 state.js／data.js／ui.js 拆分前的殘留行號，automate.js 現僅 290 行、純調度層——已修正）。**gcr 不重造 DR monitor+retry**（northstar 曾重造 = 滯後複製，實證間歇卡；見 `.skill-bindings/gemini-conversation-research/retarget-map.md`）。
 >   - DR 報告 → 保真 Markdown：extension Chrome 用 repo-root browser adapter；獨立 CDP extractor 仍是 `gemini-deep-research-extract`（skill-bettor 未隨本次複製，CDP 路徑缺它時標 `external_engine_required`）。
 >   - 反幻覺 / 外部查證 = [external-verify](../external-verify/SKILL.md)（S2 DR prompt 硬化 + 事後逐 claim 查證）。
 >   - Path B 精煉 = [path-b-reduction](../path-b-reduction/SKILL.md)。
 >   - skill-bettor 本地新增可跑 seed = [guided-conversation-observation](modules/guided-conversation-observation.md) + [production-guidance-hardening](modules/production-guidance-hardening.md) + file-only `scripts/run_guided_conversation.py`/Bun technical equivalent + `loop_wiki/evolve-unknown-discovery-plan-truth/templates/gemini-conversation-research/` golden cases/evals/ROUTES contract。
 >   漂移時以本地 port map 的分級為準；外部 DR/browser/KG 行為以 antigravity 原始引擎程式碼為權威。
-> **retarget 誠實帳本**（northstar → antigravity 拿掉了什麼、為何不是簡化）→ [modules/retarget-map.md](modules/retarget-map.md)。
+> **retarget 誠實帳本**（northstar → antigravity 拿掉了什麼、為何不是簡化）→ `.skill-bindings/gemini-conversation-research/retarget-map.md`。
 >   ⚠ **別把 northstar 原檔的 KG 入庫（`kg_fast_write`）/ `dr-governance-router` / Bug Scar #NNN 編號 / `gemini-aup-guard.sh` hook / `execution/scripts/*.sh` wrapper 搬回來**——antigravity 無此基座 = 死 husk（見 [fold-in](../fold-in/SKILL.md) 反模式）。
 
 ## When to Use
@@ -50,7 +50,7 @@ Mode B:  主題+上下文 → [S-1 載入] → [S0-ALT Q&A] → (併入 S1…)
 ```
 
 ## 🛡 改任一階段 / prompt 前先讀全景（防誤改 SSOT）
-改任一 S-stage 或任一 prompt 前，先在 [modules/loop-panorama-ssot.md](modules/loop-panorama-ssot.md) 對照：①該物歸屬哪段（別改錯地方）②會不會斷閉環 gate/loop-back ③prompt 改 canonical 原檔、禁散補 / 禁簡化。**sibling 全景**（不同管線同紀律的 worked-example）= [dr-research-loop/modules/loop-panorama-ssot.md](../dr-research-loop/modules/loop-panorama-ssot.md)——改 gcr 別去改它，反之亦然。
+改任一 S-stage 或任一 prompt 前，先在 `.skill-bindings/gemini-conversation-research/loop-panorama-ssot.md` 對照：①該物歸屬哪段（別改錯地方）②會不會斷閉環 gate/loop-back ③prompt 改 canonical 原檔、禁散補 / 禁簡化。**sibling 全景**（不同管線同紀律的 worked-example）= `.skill-bindings/gemini-conversation-research/loop-panorama-ssot.md`——改 gcr 別去改它，反之亦然。
 
 ## AUP 內容隔離（antigravity 是**架構性天生安全**，非靠 hook）
 外部對話原文（21K+）**永不進主會話 context**。antigravity 的隔離是**架構決定的**（file-based：瀏覽器抽取直接寫檔、任何 LLM 分析走子代理），**不是** northstar 的 `gemini-aup-guard.sh` marker hook——**本 repo 無此 hook，也不需要**（northstar 靠 hook 補救；antigravity 天生 file-based 就無此暴露面）。三條規則：
@@ -208,10 +208,10 @@ ownership。
 - [modules/first-principles-probe.md](modules/first-principles-probe.md) — 追問怎麼鑽到底（引用-鑽入 + 反向自陳 + first-principles 約分，抗放水；S1.5 + Mode B R2-4）
 - [modules/guided-conversation-observation.md](modules/guided-conversation-observation.md) — Gemini contextual suggestion buttons / 自動提示問答 / 缺失資訊與 Domain term 修復的 state graph 程序
 - [modules/production-guidance-hardening.md](modules/production-guidance-hardening.md) — GCR 對話進入小迴圈/計畫包/prototype/final repo 的 ROUTES contract、agy Gemini 3.6 Flash High replay 規則、末端神經感知與 promotion gate
-- [modules/skill-bettor-port-map.md](modules/skill-bettor-port-map.md) — 本次從 antigravity 複製後的本地/外部/歷史來源路徑分級，防止目錄引用假本地化
-- [modules/loop-panorama-ssot.md](modules/loop-panorama-ssot.md) — 閉環全景 + 迴圈判斷邏輯 + prompt 錨點（**改階段/prompt 前先讀**）
-- [modules/retarget-map.md](modules/retarget-map.md) — northstar → antigravity retarget 映射 + 誠實拿掉了什麼
+- `.skill-bindings/gemini-conversation-research/skill-bettor-port-map.md` — 本次從 antigravity 複製後的本地/外部/歷史來源路徑分級，防止目錄引用假本地化
+- `.skill-bindings/gemini-conversation-research/loop-panorama-ssot.md` — 閉環全景 + 迴圈判斷邏輯 + prompt 錨點（**改階段/prompt 前先讀**）
+- `.skill-bindings/gemini-conversation-research/retarget-map.md` — northstar → antigravity retarget 映射 + 誠實拿掉了什麼
 - [modules/downstream-landing.md](modules/downstream-landing.md) — **S9 後**下游落地驗證方法論（D1 DR 落地驗證→D2 架構設計→D3 gap 收斂→D4 prototype；多模型分工 + 確定性錨 + recipe-not-engine）
 
 ---
-*port 自 northstar `.claude/skills/gemini-conversation-research/` v3.7.0（skill.md + 12 modules + 5 PG + playbook + evals，~2168 行）。**retarget 非原樣搬**：DR 引擎接 `automate.js`、反幻覺接 `external-verify`、Path B 接 `path-b-reduction`；KG 入庫 / dr-governance / Bug Scar 編號 / aup-guard hook / execution 腳本 **拿掉（無基座）**。完整帳本 → [modules/retarget-map.md](modules/retarget-map.md)。*
+*port 自 northstar `.claude/skills/gemini-conversation-research/` v3.7.0（skill.md + 12 modules + 5 PG + playbook + evals，~2168 行）。**retarget 非原樣搬**：DR 引擎接 `automate.js`、反幻覺接 `external-verify`、Path B 接 `path-b-reduction`；KG 入庫 / dr-governance / Bug Scar 編號 / aup-guard hook / execution 腳本 **拿掉（無基座）**。完整帳本 → `.skill-bindings/gemini-conversation-research/retarget-map.md`。*

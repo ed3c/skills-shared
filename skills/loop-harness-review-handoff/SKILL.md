@@ -178,7 +178,7 @@ description: |
 - **交接是方法論類 fold 的近親——反-husk 錨＝指向的 SSOT 是真檔案**:
   入口 curation 列的每個路徑必真存在。
   本次移植逐路徑以 `test -e`／`ls` 驗證過
-  (見 [modules/retarget-map.md](modules/retarget-map.md)),
+  (見 `.skill-bindings/loop-harness-review-handoff/retarget-map.md`),
   別指 phantom——尤其別把 antigravity 的
   `docs/plans/2026-07-09-loop-harness-panorama/`、
   `loop_wiki/design_governance`、`loop_wiki/agy_demo`
@@ -210,6 +210,6 @@ description: |
   — 泛化自 antigravity worked instance 的可複用交接提示詞骨架
   (ROLE／紀律／入口 curation／審計任務 A-D／輸出格式＋佔位),
   retarget 為 skill-bettor 詞彙(families/evals/loop_wiki)。
-- [modules/retarget-map.md](modules/retarget-map.md)
+- `.skill-bindings/loop-harness-review-handoff/retarget-map.md`
   — antigravity → skill-bettor 逐機制映射與誠實帳本,
   含每個入口路徑的 `test -e` 驗證紀錄。

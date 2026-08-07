@@ -23,7 +23,7 @@ description: |
 > 就 port」),但**用前必走 §實例化契約,禁直接引用上游路徑跑**(上游 fixtures/sealed 是 antigravity
 > 的證成軌跡,不是本 repo 的證據)。
 > **Lineage**:antigravity truth-verify-loop(承 kb-ingest judge-loop 收斂原語);逐機制取捨帳=
-> [modules/retarget-map.md](modules/retarget-map.md)。
+> `.skill-bindings/truth-verify-loop/retarget-map.md`。
 
 ## When to Use
 - 一份文章/概念集/重大 proposal 的 claims 需要**可計分**的多 tier 驗證(不只 findings,要 vs sealed
@@ -113,7 +113,7 @@ graph LR
   發現漂移回改本檔指針(不改方法論)。
 
 ## Modules
-- [modules/retarget-map.md](modules/retarget-map.md)
+- `.skill-bindings/truth-verify-loop/retarget-map.md`
   — antigravity → skill-bettor 逐機制取捨帳
   (搬了什麼/不搬什麼+why/本地新增)。
 - 上游 know-why(六 run 實測課/E 主成分/tier 三明治/兩結構洞)=

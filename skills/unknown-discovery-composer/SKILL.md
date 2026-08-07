@@ -367,5 +367,5 @@ Use this catalog as candidate routing language. It is not proof of equivalence.
 ## Modules
 - [modules/domain-lexicon.md](modules/domain-lexicon.md) — local domain terms, route idioms, and information-preservation rules. Read when old notes or route packets use terms that are not self-explanatory in the main state graph.
 - [modules/semantic-loss-ledger.md](modules/semantic-loss-ledger.md) — verification ledger for the 2026-07-22 rewrite. Read when auditing where every old U0-U3 semantic unit is preserved.
-- [modules/legacy-skill-2026-07-22.md](modules/legacy-skill-2026-07-22.md) — verbatim pre-rewrite `SKILL.md` preservation artifact. Read only for audit or recovery; current execution uses this `SKILL.md`.
-- [modules/retarget-map.md](modules/retarget-map.md) — antigravity to skill-bettor retarget ledger, missing local mechanisms, and historical mapping. Read only when route target truth or lineage affects the current decision.
+- `.skill-bindings/unknown-discovery-composer/legacy-skill-2026-07-22.md` — verbatim pre-rewrite `SKILL.md` preservation artifact. Read only for audit or recovery; current execution uses this `SKILL.md`.
+- `.skill-bindings/unknown-discovery-composer/retarget-map.md` — antigravity to skill-bettor retarget ledger, missing local mechanisms, and historical mapping. Read only when route target truth or lineage affects the current decision.

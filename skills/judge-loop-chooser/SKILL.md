@@ -24,7 +24,7 @@ description: |
 > [grounding-and-independence.md](modules/grounding-and-independence.md) 解釋三態 grounding 與
 > T0-T3 為何正交;
 > [intent-drift-review.md](modules/intent-drift-review.md) 是 zero-access reviewer payload;
-> [retarget-map.md](modules/retarget-map.md) 是 antigravity → skill-bettor 誠實帳本。
+> `.skill-bindings/judge-loop-chooser/retarget-map.md` 是 antigravity → skill-bettor 誠實帳本。
 >
 > **SSOT 活基座**:grounding 的真錨仍是家族 `evals/runner.py`、`evals/judge.py`、`evals/cases/`、
 > `evals/holdout/`、`selftest.sh` good/hollow 正控與 ARCHITECTURE.md §4 Verify 三層;
@@ -321,7 +321,7 @@ route_notes: <short residuals, no verdict laundering>
   T0-T3 獨立性階梯的 know-why;當你要解釋為何 T0 可能 hollow、為何 Opus 不等於跨家族時讀。
 - [modules/intent-drift-review.md](modules/intent-drift-review.md) — T1 zero-access reviewer payload;
   D1/D3/D5 意圖漂移 packet 需要 reviewer prompt 時讀。
-- [modules/retarget-map.md](modules/retarget-map.md) — antigravity → skill-bettor 的 port 帳本;
+- `.skill-bindings/judge-loop-chooser/retarget-map.md` — antigravity → skill-bettor 的 port 帳本;
   只有要改 deliverable registry 或追 lineage 時讀。
-- [modules/legacy-skill-2026-07-22.md](modules/legacy-skill-2026-07-22.md) — HEAD 版 SKILL.md 保真快照;
+- `.skill-bindings/judge-loop-chooser/legacy-skill-2026-07-22.md` — HEAD 版 SKILL.md 保真快照;
   只作 semantic-loss audit source,不要當 active workflow 執行。

@@ -2,7 +2,7 @@
 
 > 屬 [`dr-to-mvp`](../SKILL.md)。本檔是 2026-07 state graph 重構的資訊保全帳。
 > Source baseline = `git show 9600c79:.claude/skills/dr-to-mvp/SKILL.md`。
-> 原文級保全 = [legacy-skill-2026-07-22.md](legacy-skill-2026-07-22.md)。
+> 原文級保全 = `.skill-bindings/dr-to-mvp/legacy-skill-2026-07-22.md`。
 > Verdict：未發現需要保留卻無 durable home 的舊語意；主路由降噪後，非主路由資訊已分流到本 skill 的 `reference/` 或 `modules/`，或明確指向 owner skill。舊版 domain wording 逐字保存在 legacy snapshot，不能只靠本 ledger 摘要復原。
 
 ## Legend
@@ -30,7 +30,7 @@
 | D3 `origin_question` / Half-Bridge | `ACTIVE_IN_SKILL` + `PRESERVED_IN_MODULE` | `SKILL.md` V0/G0; `modules/domain-terms-and-intake.md` §2 | Domain term defined and gate retains failure edge。 |
 | Phase G KU/UK/UU routing | `ACTIVE_IN_SKILL` + `PRESERVED_IN_MODULE` | `SKILL.md` G1; `modules/domain-terms-and-intake.md` §2 | Terms expanded in canonical table。 |
 | ANSWER→fresh judge→absorb order | `ACTIVE_IN_SKILL` | `SKILL.md` G1/V1 + Gotchas; `reference/guiding-prompt.md` Phase G | Absorb-before-judge remains stop condition。 |
-| Antigravity D4 failure file path | `LEGACY_ARCHIVED` | [legacy-skill-2026-07-22.md](legacy-skill-2026-07-22.md); lesson retained in `SKILL.md` Gotchas | External path is not local SSOT, but exact old wording remains recoverable。 |
+| Antigravity D4 failure file path | `LEGACY_ARCHIVED` | `.skill-bindings/dr-to-mvp/legacy-skill-2026-07-22.md`; lesson retained in `SKILL.md` Gotchas | External path is not local SSOT, but exact old wording remains recoverable。 |
 | Phase M `DESIGN-SCORE.md`, `_template`, `engine.sh`, dispatches | `ACTIVE_IN_SKILL` | `SKILL.md` G2/V2; `reference/guiding-prompt.md` Phase M | Main has output artifact and validators。 |
 | dual-score AND graduation | `ACTIVE_IN_SKILL` | `SKILL.md` V2 + Invariants; `reference/guiding-prompt.md` Phase M | Design + implementation gates explicit。 |
 | families-type homing destination | `ACTIVE_IN_SKILL` + `PRESERVED_IN_MODULE` | `SKILL.md` G3/V3; `modules/retarget-map.md`; `modules/domain-terms-and-intake.md` | Destination and non-applicable homing types preserved。 |
@@ -38,12 +38,12 @@
 | family runtime must not cite `proposals/` | `ACTIVE_IN_SKILL` | `SKILL.md` G3/V3 + Gotchas; `reference/guiding-prompt.md` §0 | Illegal back-reference remains explicit。 |
 | `families/agent-harness` live anchor and metrics | `PRESERVED_IN_MODULE` | `reference/guiding-prompt.md` §2; `modules/retarget-map.md`; `SKILL.md` References | Main only points to worked instance; detail retained elsewhere。 |
 | eval harness design-only status | `PRESERVED_IN_MODULE` | `reference/guiding-prompt.md` §2 | Not a routing edge; kept in honesty ledger。 |
-| antigravity 2×2 host matrix removed | `LEGACY_ARCHIVED` + `PRESERVED_IN_MODULE` | [legacy-skill-2026-07-22.md](legacy-skill-2026-07-22.md); `modules/retarget-map.md`; `reference/guiding-prompt.md` §2 | Not applicable to Claude-Code-only repo, but original host wording remains recoverable。 |
+| antigravity 2×2 host matrix removed | `LEGACY_ARCHIVED` + `PRESERVED_IN_MODULE` | `.skill-bindings/dr-to-mvp/legacy-skill-2026-07-22.md`; `modules/retarget-map.md`; `reference/guiding-prompt.md` §2 | Not applicable to Claude-Code-only repo, but original host wording remains recoverable。 |
 | live browser DR `:9333` occupancy | `CANONICAL_OWNER_WITH_LEGACY_COPY` + `ACTIVE_IN_SKILL` | `SKILL.md` Gotchas; `reference/guiding-prompt.md`; `modules/retarget-map.md`; legacy snapshot | Owner is `dr-research-loop`; main keeps conditional warning。 |
 | S0/S1 保真語料 intake | `PRESERVED_IN_MODULE` | `modules/domain-terms-and-intake.md` §3; `SKILL.md` M1 pointer | Recovered after initial state refactor。 |
 | post-cutoff 實體雙向警戒 | `PRESERVED_IN_MODULE` | `modules/domain-terms-and-intake.md` §3 | Recovered as Mode B intake discipline。 |
 | Domain terms such as Path B, SURFACE, LAND-DECISION | `PRESERVED_IN_MODULE` + `ACTIVE_IN_SKILL` | `modules/domain-terms-and-intake.md` §2; `SKILL.md` Output Contract | First-use expansion rule added。 |
-| Trigger terms `SYNTHESIS` / MVP-builder wording | `LEGACY_ARCHIVED` + `PRESERVED_IN_MODULE` | [legacy-skill-2026-07-22.md](legacy-skill-2026-07-22.md); `modules/domain-terms-and-intake.md` can host glossary deltas if needed | Current terms are `verified base` and Phase M/G2; old trigger wording remains recoverable。 |
+| Trigger terms `SYNTHESIS` / MVP-builder wording | `LEGACY_ARCHIVED` + `PRESERVED_IN_MODULE` | `.skill-bindings/dr-to-mvp/legacy-skill-2026-07-22.md`; `modules/domain-terms-and-intake.md` can host glossary deltas if needed | Current terms are `verified base` and Phase M/G2; old trigger wording remains recoverable。 |
 | Anti-husk pointer-only discipline | `ACTIVE_IN_SKILL` | `SKILL.md` Invariants; `modules/retarget-map.md`; this ledger | Owner SSOT rule retained and audited。 |
 
 ## Result

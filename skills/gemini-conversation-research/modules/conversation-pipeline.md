@@ -1,7 +1,7 @@
 # Module: 對話研究管線 S0-S9 逐階段 how-to（Mode A 主線）
 
 > 屬 [`gemini-conversation-research`](../SKILL.md) §S0..§S9。各階段的完整步驟、checkpoint、硬數據 schema、子代理 dispatch 模板。
-> Mode B 入口（S-1 + S0-ALT）→ [mode-b-contextqa.md](mode-b-contextqa.md)；追問構造 → [first-principles-probe.md](first-principles-probe.md)；閉環全景/gate → [loop-panorama-ssot.md](loop-panorama-ssot.md)；retarget 帳本 → [retarget-map.md](retarget-map.md)。
+> Mode B 入口（S-1 + S0-ALT）→ [mode-b-contextqa.md](mode-b-contextqa.md)；追問構造 → [first-principles-probe.md](first-principles-probe.md)；閉環全景/gate → `.skill-bindings/gemini-conversation-research/loop-panorama-ssot.md`；retarget 帳本 → `.skill-bindings/gemini-conversation-research/retarget-map.md`。
 > **活基座**：DR 引擎 = 外部 `automate.js`（`runDrOnce`/`runGeminiDeepResearch*`/`extractReportHtmlInBrowser`/`htmlToMarkdown`）；DR 抽取 = 外部 `gemini-deep-research-extract`（skill-bettor 未安裝時標 `external_engine_required`）；反幻覺 = [external-verify](../../external-verify/SKILL.md)。
 
 ---
@@ -9,7 +9,7 @@
 ## AUP 內容隔離（跨 S0/S1/S3/S7/S9 共用，P0）
 
 **根因**: 21K+ 外部對話原文一次進入主 agent context = 資料外洩面（northstar 稱 Data Exfiltration）。
-**antigravity 設計**: **架構性 file-based 天生安全**——瀏覽器抽取直接寫檔、任何 LLM 分析走子代理。**不需要 northstar 的 `gemini-aup-guard.sh` hook + marker**（本 repo 無此 hook；為何「自主只因無 guard、架構決定 autonomy 非權限」→ [retarget-map §4](retarget-map.md)）。
+**antigravity 設計**: **架構性 file-based 天生安全**——瀏覽器抽取直接寫檔、任何 LLM 分析走子代理。**不需要 northstar 的 `gemini-aup-guard.sh` hook + marker**（本 repo 無此 hook；為何「自主只因無 guard、架構決定 autonomy 非權限」→ `.skill-bindings/gemini-conversation-research/retarget-map.md`）。
 
 ```
 主會話 context（安全）：              子代理 context（隔離）：
@@ -208,7 +208,7 @@ Research Topic: <主題>
 
 ## S6: FEEDBACK — 反饋閉環（**輕量版；治理路由拿掉**）
 
-> northstar 的 transcript-harvest / isolation-validator / 下游 concept-landing·dr-governance-router **拿掉**（antigravity 無基座，見 [retarget-map §2](retarget-map.md)）。保留的是 **feedback 三角紀律**。
+> northstar 的 transcript-harvest / isolation-validator / 下游 concept-landing·dr-governance-router **拿掉**（antigravity 無基座，見 `.skill-bindings/gemini-conversation-research/retarget-map.md`）。保留的是 **feedback 三角紀律**。
 
 **步驟**:
 1. 寫 `outcome`（聚合 S0-S4 硬數據；記進 harvest 檔或 `AGENTS.md` Resolved）。
@@ -269,7 +269,7 @@ ssot_verification: { dr_ssot_is_complete_copy, bibliography_sync, conversation_f
 
 ## S9: INGEST — 全知識點結構化落地（子代理隔離；**入 antigravity KG**）
 
-> northstar S9 是「純 Node.js kg-ingest.ts → rag-local KG 邊」。**antigravity 無 rag-local**——但**有自己的 KG**（`indexing/` GraphStore + `.cache/kg/graph.json`）。**KG 等價層已補**（cc-20260703）：新增 `Conversation` 源節點型別（`conv:gemini:<id>`，三重映射登記 models.py + CONTEXT.md + 設計 §1）+ `indexing/ingest_conversation.py`——**鏡像 `concepts.ingest_concepts_for_video`**，把對話概念走**同一個 `extract_concepts` 引擎** → `Conversation ─DISCUSSES→ Concept`。概念與既有 Video/RepoDoc 概念**跨源 join**（同 canonical concept id 自動合流）。詳 [retarget-map §KG-sink](retarget-map.md)。
+> northstar S9 是「純 Node.js kg-ingest.ts → rag-local KG 邊」。**antigravity 無 rag-local**——但**有自己的 KG**（`indexing/` GraphStore + `.cache/kg/graph.json`）。**KG 等價層已補**（cc-20260703）：新增 `Conversation` 源節點型別（`conv:gemini:<id>`，三重映射登記 models.py + CONTEXT.md + 設計 §1）+ `indexing/ingest_conversation.py`——**鏡像 `concepts.ingest_concepts_for_video`**，把對話概念走**同一個 `extract_concepts` 引擎** → `Conversation ─DISCUSSES→ Concept`。概念與既有 Video/RepoDoc 概念**跨源 join**（同 canonical concept id 自動合流）。詳 `.skill-bindings/gemini-conversation-research/retarget-map.md`。
 
 **前置**: S8 收斂（或 S7 gap_list 為空）。
 **⚠ Context Isolation（P0）**: S9 讀全部 DR 報告 / 對話提取概念 → 委派子代理（子代理回**扁平概念名清單** `<slug>-concepts.txt` + 結構化 `<slug>-analysis.yaml`，不回原文）。
@@ -282,7 +282,7 @@ python3 -m indexing.ingest_conversation --id <convId> --title <t> --url <u> \
 ```
 **🔴 grounding 紀律（順序：verify-before-exclude，非 suspect-then-exclude）**: DR/對話盤點的疑點 named 實體 → **先 SURFACE + external-verify（web-grounded primary source），只永久排除 CONFIRMED-fake**。**別在『疑』就排除**——⚠ **cutoff-bound 子代理（如 S1 Anthropic subagent）對 post-cutoff 真實體會 false-positive**：本對話 6 個「疑 post-cutoff 杜撰」的實體（ATIF/Harbor/AgentHER/AgentWorkforce/ASSERT-KTH/reproducible-trajectories）external-verify 後 **6/6 全查實為真**（見 `<slug>-hallucination-audit.yaml`）。訓練 cutoff 判不了 cutoff 後事實——這對「疑真」與「疑假」同時成立（PG-163 雙向）。**存在性 VERIFIED ≠ 細節/perf/framing 也對**（PG-GCR-004：如 AgentHER 論文 perf 數字未證、AgentWorkforce 是平台非 dataset）——存在與細節分開判。
 **Checkpoint**: `conv 節點寫入` + `DISCUSSES 邊數 = grounded 概念數`。
-**Library 升格（真實 repo）**: 對話提及且 external-verify 過的**真 repo** → `Library` 節點 + `Conversation ─MENTIONS→ Library`（`ingest_conversation(..., libraries=[{raw_name, repo_url, license}])`；raw_name 傳 `org/repo` 消歧 → JOINS 既有 lib）。spec/format/研究組非單一 repo 者留 Concept。見 [retarget-map §KG-sink](retarget-map.md)。
+**Library 升格（真實 repo）**: 對話提及且 external-verify 過的**真 repo** → `Library` 節點 + `Conversation ─MENTIONS→ Library`（`ingest_conversation(..., libraries=[{raw_name, repo_url, license}])`；raw_name 傳 `org/repo` 消歧 → JOINS 既有 lib）。spec/format/研究組非單一 repo 者留 Concept。見 `.skill-bindings/gemini-conversation-research/retarget-map.md`。
 **硬數據**: `s9_ingest: {conv_node_id, concepts_grounded, concepts_excluded_hallucination, concepts_reused_existing(跨源join), libraries_mentioned, kg_nodes_delta, kg_edges_delta}`
 > **LIVE ✓（cc-20260703, RIP）**: `conv:gemini:2f75cc431e794606`（「LLM 吞噬 Harness」對話）全流程真跑：S0 抽取（turns_html 9 turns）→ S1 子代理分析（7 維度/50 概念/5 DR 候選）→ S9 ingest（初 45 grounded，5 疑幻覺暫排除）→ **S 級 hallucination-audit（external-verify 6 實體，6/6 VERIFIED，`<slug>-hallucination-audit.yaml`）→ 撤銷排除補回 50 概念全入庫 → 4 真 repo 升格 Library + MENTIONS**（lib:harbor JOINS 既有影片 lib、enrich repo_url）。跨源 join：10 concept + Harbor lib（影片軸↔對話軸）。KG 最終 10645 nodes / 16665 edges。29 unit tests + schema_ssot + isolation 綠。
 

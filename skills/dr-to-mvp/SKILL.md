@@ -31,10 +31,10 @@ description: |
 > + `loop_wiki/engine.sh`。
 >
 > **Layer B**：可貼 playbook 在 [reference/guiding-prompt.md](reference/guiding-prompt.md)；
-> 移植誠實帳在 [modules/retarget-map.md](modules/retarget-map.md)；Domain 詞與語料 intake
+> 移植誠實帳在 `.skill-bindings/dr-to-mvp/retarget-map.md`；Domain 詞與語料 intake
 > 紀律在 [modules/domain-terms-and-intake.md](modules/domain-terms-and-intake.md)；資訊保全帳在
 > [modules/semantic-loss-ledger.md](modules/semantic-loss-ledger.md)；重構前原文快照在
-> [modules/legacy-skill-2026-07-22.md](modules/legacy-skill-2026-07-22.md)。它們按需讀，不是冷啟動
+> `.skill-bindings/dr-to-mvp/legacy-skill-2026-07-22.md`。它們按需讀，不是冷啟動
 > 主路由；遇到疑似 domain 詞遺失或舊語意漂移時，先回 legacy snapshot 對照，不靠摘要猜。
 
 ## When to Use
@@ -330,8 +330,8 @@ Failure edge：
 
 ## References
 - [reference/guiding-prompt.md](reference/guiding-prompt.md) — Layer B可貼 playbook與輸出格式。
-- [modules/retarget-map.md](modules/retarget-map.md) — antigravity 到 skill-bettor 的移植誠實帳。
+- `.skill-bindings/dr-to-mvp/retarget-map.md` — antigravity 到 skill-bettor 的移植誠實帳。
 - [modules/domain-terms-and-intake.md](modules/domain-terms-and-intake.md) — Domain 詞、Mode B 語料 intake、被降權資訊索引。
 - [modules/semantic-loss-ledger.md](modules/semantic-loss-ledger.md) — state graph 重構資訊保全帳。
-- [modules/legacy-skill-2026-07-22.md](modules/legacy-skill-2026-07-22.md) — 重構前 `SKILL.md` 原文快照，用於語意流失審計與 domain wording 復原。
+- `.skill-bindings/dr-to-mvp/legacy-skill-2026-07-22.md` — 重構前 `SKILL.md` 原文快照，用於語意流失審計與 domain wording 復原。
 - `families/agent-harness/` — 本地 worked instance：兩個已 homed runtime 與 changelog 錨。

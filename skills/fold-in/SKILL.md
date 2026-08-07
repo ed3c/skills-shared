@@ -27,7 +27,7 @@ description: |
 > **結構**:SKILL.md = 確定性程序 + 不變量;
 > 為何這樣分層、antigravity lineage、完整 retarget 映射表在
 > [modules/fold-in-know-why.md](modules/fold-in-know-why.md) 與
-> [modules/retarget-map.md](modules/retarget-map.md)。
+> `.skill-bindings/fold-in/retarget-map.md`。
 > **SSOT**:吸收的 durable home **依範疇+受眾分路
 > (2026-07-12 起六路;2026-07-19 增「計劃執行進度」成七路)**
 > (見不變量 1、確定性程序 §1 決策樹)——單一家族的
@@ -44,7 +44,7 @@ description: |
 > (本身承 northstar `/fold-in`,DDR-205 Layer A/B)。
 > antigravity 的 `antigravity-harness-wiki`／root `AGENTS.md`「Resolved」／
 > `antigravity-skill-authoring` 機制已 retarget 成 skill-bettor 對應物
-> (映射表在 [modules/retarget-map.md](modules/retarget-map.md)),
+> (映射表在 `.skill-bindings/fold-in/retarget-map.md`),
 > **非原樣搬**(原樣搬 = 引用不存在基座的 husk)。
 
 ## When to Use
@@ -332,5 +332,5 @@ graph LR
   boundary-aware
   (為何 owner 候選＝讀 harness-wiki、fold-in 為何是最大漂移源)
   ＋技術等價物判斷通則。
-- [modules/retarget-map.md](modules/retarget-map.md) —
+- `.skill-bindings/fold-in/retarget-map.md` —
   antigravity → skill-bettor 逐機制映射與誠實帳本。

@@ -26,7 +26,7 @@ description: |
 > **Lineage**:遷移自 antigravity `.agents/skills/dr-research-loop/` 的**運行模式**
 > (研究對象從 YouTube 影片 retarget 為 skill 變現情報;
 > driver 從瀏覽器自動化 retarget 為 agy/claude/subagent)——
-> 逐機制映射與拿掉了什麼見 [modules/retarget-map.md](modules/retarget-map.md)。
+> 逐機制映射與拿掉了什麼見 `.skill-bindings/dr-research-loop/retarget-map.md`。
 
 ## When to Use
 - 跑一題 DR 研究批次
@@ -157,7 +157,7 @@ loop_wiki/engine.sh dr-<topic> --target /abs/path/proposals/YYYY-MM-DD-<topic>.m
   平坦化重構後實際在 `data.js:97`——引用上游時勿搬舊指針。
 
 ## Modules
-- [modules/retarget-map.md](modules/retarget-map.md) —
+- `.skill-bindings/dr-research-loop/retarget-map.md` —
   antigravity dr-research-loop → skill-bettor 逐機制映射與誠實帳本
   (搬了什麼/換了什麼/拿掉什麼與為何不是簡化)。
 - [modules/three-pool-pipeline.md](modules/three-pool-pipeline.md) —
