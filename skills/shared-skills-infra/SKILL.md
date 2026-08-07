@@ -31,24 +31,60 @@ description: |
 於是那個 repo 的經驗再也回不到共用面，而共用面的修正也到不了它。
 五個 repo 現況實測：同名多份 26 個，其中 24 個內容分岔、只有 2 個相同。
 
+## 與絕對路徑解耦
+
+版控的 `registry.json` **只存裁決，不存任何機器路徑**；路徑全在 `sites.local.json`
+（gitignored）或旗標。所以這個 checkout 放在哪個目錄都能用，clone 到別台機器也一樣。
+
+| 事實 | 住哪 | 進 git？ |
+|---|---|---|
+| 誰是共用、誰是 repo 自有、為什麼 | `registry.json` | ✅ |
+| user 層兩個 surface 在哪、要治理哪些專案、哪些專案的 Claude 側要轉發樁 | `sites.local.json` | ❌ |
+| canonical 在哪 | 由 `__file__` 推導 | — |
+
 ## 指令
 
 ```bash
 INFRA=~/.agents/skills/shared-skills-infra/scripts/shared_skills.py
+python3 $INFRA install --project <repo> [--project …] [--claude-forwarder <repo-name>]
 python3 $INFRA check     # T0：已登記的裁決有沒有被違反（零網路）
-python3 $INFRA report    # 決策佇列：同名多份、尚未裁決的清單＋內容 hash
-python3 $INFRA link <name>                       # 補上某共用 skill 的 user 層 symlink
-python3 $INFRA adopt <name> --from <path> --why "…"   # 把某 repo 的副本收編成共用（搬不刪）
+python3 $INFRA report    # 決策佇列：同名多份、尚未裁決、以及延後裁決的清單＋內容 hash
+python3 $INFRA link <name>
+python3 $INFRA adopt <name> --from <path> --why "…" [--defer <repo>] [--dry-run]
 ```
 
-`check` exit 0 乾淨｜1 有裁決被違反｜`report` exit 3 有待裁項（**待裁不是失敗**）。
+`check` exit 0 乾淨｜1 有裁決被違反；`report` exit 3 有待裁項（**待裁不是失敗**）。
 
-## 新 repo 怎麼接上
+## clone 下來怎麼接線
 
-不需要接。共用 skills 住 user 層（`~/.agents/skills/` 與 `~/.claude/skills/`），
-**所有專案自動看得到，包含未來新增的**。新 repo 要做的只有一件事：
-把它登記進 `registry.json` 的 `subscribers`，讓 `report`／`check` 掃得到它，
-從此它若偷放同名副本會被抓出來。
+```bash
+git clone <private-repo> ~/.agents/skills-shared
+python3 ~/.agents/skills-shared/skills/shared-skills-infra/scripts/shared_skills.py \
+  install --project ~/proj-a --project ~/proj-b --claude-forwarder proj-b
+```
+
+`install` 做三件事：把路徑寫進 `sites.local.json`、把每個共用 skill 連上 user 層兩個 surface
+與各專案、最後跑一次 `check`。**冪等**，換機器或搬動 checkout 後重跑即復原
+（symlink 存的是路徑，搬完舊連結會先以 `WRONG-TARGET` 報錯而不是靜默指錯地方）。
+
+新專案只要 `install --project <新 repo>`。共用 skills 其實在 user 層就已對所有專案可見；
+專案層那份 symlink 是給**該 repo 自己的閘與文件用路徑引用**的，不是給發現用的。
+
+### 兩種專案側形態（用參數選，不自動猜）
+
+| 形態 | 產生什麼 | 給誰 |
+|---|---|---|
+| 預設 | `<repo>/.claude/skills/<name>` symlink | 大多數 repo |
+| `--claude-forwarder <repo>` | 帶 `disable-model-invocation` 與 `$ARGUMENTS` 的轉發樁 | 家規要求樁內容的 repo（實例：ix-agy 的 `check_skill_forwarders.py`） |
+
+專案側一律用**絕對路徑**指向 canonical：相對的 `.claude → ../../.agents` 一跳，
+在 fork 過的 repo 會解析到它自己的本地副本而不是 canonical——連結會靜默指錯東西。
+
+## 延後裁決（`deferred_in`）
+
+收編某個 skill 時，若某些 repo 的版本**不在這次裁決範圍內**，用 `--defer <repo>`：
+它們的副本原地保留、登記進 `deferred_in`，`check` 不當違規、`report` 持續列為待辦。
+掃掉它們＝替人裁決；不記錄＝讓閘對一個沒人回答的問題長紅。兩者都不誠實。
 
 ## 這個閘刻意不進 CI
 
