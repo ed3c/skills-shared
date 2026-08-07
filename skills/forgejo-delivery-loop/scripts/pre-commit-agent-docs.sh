@@ -20,6 +20,16 @@ set -eu
 ROOT=$(git rev-parse --show-toplevel)
 GATE="$(dirname "$0")/agent_docs.py"
 
+# Scoped to the commit that could actually cause the drift. An unscoped ride
+# makes yesterday's drift block today's unrelated commit -- ts-skill-bettor
+# deleted its whole pre-commit on 2026-08-05 over exactly that, and the hook it
+# deleted had already argued the point in its own header without applying it to
+# itself. A commit that stages no governed doc cannot move these bytes, so
+# there is nothing here for it to answer for.
+if ! git diff --cached --name-only | grep -qE '^(CLAUDE|AGENTS)\.md$'; then
+  exit 0
+fi
+
 set +e
 python3 "$GATE" check --key "$(basename "$ROOT")" --target-dir "$ROOT" --staged
 RC=$?
