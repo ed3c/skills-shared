@@ -45,11 +45,11 @@ description: |
 > 已泛化好的可複用骨架填空——那才是本地實際可套用的範本。
 >
 > **設計 SSOT(交接指向的權威,只指針不抄)**:
-> [`ARCHITECTURE.md`](../../../ARCHITECTURE.md)(設計意圖)
+> `../../../ARCHITECTURE.md`(設計意圖)
 > → [`loop-harness-standard`](../loop-harness-standard/SKILL.md)
 > ＋`modules/harness-spec.md`
 > ／`modules/evals-design-method.md`(八大基座設計規範)
-> → [`harness-wiki`](../harness-wiki/SKILL.md)
+> → `harness-wiki`（../harness-wiki/SKILL.md）
 > (本地多迴圈全景,誠實現況＝只 2 列組件卡)
 > → canonical 範例 `loop_demo/claude_agy`(本地唯一範例,無 `agy/` 對照版)
 > → pilot 證據 `families/pinescript-audit/{evals/,changelog/2026-07-11.md,FAMILY.yaml}`
@@ -88,7 +88,7 @@ description: |
    裁決型 → Opus;
    **agy 永不當判官**(Gemini only;
    skill-bettor 的權威錨＝
-   [`ARCHITECTURE.md` §5 tier-dispatch](../../../ARCHITECTURE.md)
+   `../../../ARCHITECTURE.md`
    「DR/跨家族複核」行＝agy「只產 findings 不 verdict」
    ＋§5 硬約束①「判官硬地板永不 Haiku/永不 agy verdict」)。
    **fresh-session＝評審隔離**——同家族 reviewer

@@ -19,7 +19,7 @@
 
 ### 為何三態,不二元(命門)
 ```
-[推論](無真 impl) ─── candidate(真 impl,覆蓋未掙) ─── technical_equivalent(完整覆蓋,已判讀)
+`推論（無真 impl）` ─── candidate(真 impl,覆蓋未掙) ─── technical_equivalent(完整覆蓋,已判讀)
 ```
 - **technical_equivalent**:判決約分到「判讀一個真實 planted-defect fixture 的**完整**
   selftest good/hollow 覆蓋結果」。skill-bettor 合格錨 ＝ `evals/cases/<skill>/<case>/fixtures/*.pine`

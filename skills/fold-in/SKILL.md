@@ -31,11 +31,11 @@ description: |
 > **SSOT**:吸收的 durable home **依範疇+受眾分路
 > (2026-07-12 起六路;2026-07-19 增「計劃執行進度」成七路)**
 > (見不變量 1、確定性程序 §1 決策樹)——單一家族的
-> 行為/eval 教訓進該家族 [`changelog/`](../../../families/pinescript-audit/changelog/);
+> 行為/eval 教訓進該家族 `changelog/`（../../../families/pinescript-audit/changelog/）;
 > 跨家族 harness 工程教訓進 [`loop-harness-standard`](../loop-harness-standard/SKILL.md)
 > 自己的 Gotchas/modules;
-> 迴圈拓撲(資料流/收斂閘/不變量)事實進 [`harness-wiki`](../harness-wiki/SKILL.md) 組件卡;
-> repo 級跨切面決策進 [`ARCHITECTURE.md`](../../../ARCHITECTURE.md) §10/§11。
+> 迴圈拓撲(資料流/收斂閘/不變量)事實進 `harness-wiki`（../harness-wiki/SKILL.md） 組件卡;
+> repo 級跨切面決策進 `../../../ARCHITECTURE.md` §10/§11。
 > **skill-bettor 沒有 antigravity 那種集中式頂層「Resolved」帳本**
 > (沒有 root `AGENTS.md`)——確定性邏輯的權威依範疇在該家族
 > `evals/runner.py`(或 judge.py／掃描腳本)或 `loop_wiki/engine.sh`。
@@ -61,7 +61,7 @@ description: |
 - ❌ Claude Code 平台通用 skill 格式細節 →
   Claude Code 內建 `write-a-skill`(本 skill 的 actuator)。
 - ❌ skill-bettor 家規本身(兩類 skill 分界、slim+modules、stateful workflow 契約、語意真相/低壓縮產物契約、
-  frontmatter/checklist/名片同步) → [skill-authoring](../skill-authoring/SKILL.md)。
+  frontmatter/checklist/名片同步) → `skill-authoring（../skill-authoring/SKILL.md）`。
 - ❌ 建/驅動一條新演化 op 沙盒、選 driver、分層 verify 的工程規範 →
   [loop-harness-standard](../loop-harness-standard/SKILL.md)。
 - ❌ 查證外部 claim → [external-verify](../external-verify/SKILL.md)
@@ -78,7 +78,7 @@ description: |
 ## 不變量(違反即停)
 1. **先選 owner,預設 fold 不造新**
    (Slop #2 / anti-inflation——判準是「有沒有未覆蓋的真 niche」,不是字面禁令)。
-   owner 候選＝**讀 [`harness-wiki`](../harness-wiki/SKILL.md) 組件卡當活系統邊界**
+   owner 候選＝**讀 `harness-wiki`（../harness-wiki/SKILL.md） 組件卡當活系統邊界**
    (別憑記憶的「N 條迴圈」硬數字——會隨新迴圈落地 additive 增長,
    以組件卡現況為準,2026-07-19 起 3 列;
    規模小不代表沒有「結構性看不見新迴圈」的風險)。
@@ -113,7 +113,7 @@ description: |
    **別**只記在對話或隨手筆記等它留 —— 對話是 ephemeral,不畢業 = 經驗蒸發。
 6. **跨迴圈 fold 必回同步 `harness-wiki` 組件卡**:
    若 fold 動到某迴圈的**收斂閘／資料流歸屬／不變量／SSOT 指針**,
-   fold 完必回頭核並更新 [`harness-wiki`](../harness-wiki/SKILL.md)
+   fold 完必回頭核並更新 `harness-wiki`（../harness-wiki/SKILL.md）
    的組件卡＋不變量清單(**只改指針,永不抄內容**)
    —— 否則全景圖靜默漂成 husk(正是它要防的雙圖漂移;
    而 fold-in 是最主要的變異操作＝最大漂移源)。
@@ -137,7 +137,7 @@ graph LR
   E --> F[actuate/verify]
 ```
 
-1. **定 owner**:讀 [`harness-wiki`](../harness-wiki/SKILL.md) 組件卡
+1. **定 owner**:讀 `harness-wiki`（../harness-wiki/SKILL.md） 組件卡
    (活系統邊界的迴圈清單,以現況為準、別假設已窮盡)
    ＋ `ARCHITECTURE.md` 的 domain,
    依範疇選最貼近的 owner(完整決策樹在 module,四路摘要如下):
@@ -176,7 +176,7 @@ graph LR
    - **skill 設計家規變動**
      (兩類 skill 分界、流程/路由類 state graph 契約、skill 本文與產物的語意真相/低壓縮契約、
      description/frontmatter 規範、slim+modules 取捨、名片/SSOT 同步規則)
-     → [skill-authoring](../skill-authoring/SKILL.md) 的 checklist/Gotchas
+     → `skill-authoring（../skill-authoring/SKILL.md）` 的 checklist/Gotchas
      ＋必要時 `modules/authoring-clauses.md`(why)。
      若只是某一支 workflow skill 的專屬程序或輸出格式改良,回該 skill 自己;
      抽象成所有 skill 都該遵守的規範時,才進 skill-authoring。

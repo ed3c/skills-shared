@@ -81,7 +81,7 @@ graph LR
 4. fixtures 四件套(`articles/mutated/mut-config/_sealed`)+dev/holdout 切割**本地重生**(上游的
    sealed 是它的考卷,不搬);盲性拓撲先於 run 落檔。
 5. `selftest.sh` good/hollow 正控綠(checker 活著)→ 才准真跑;判定式(門檻+停機)先於 run 落檔。
-6. 落地(首次端到端真跑)後:回 [harness-wiki](../harness-wiki/SKILL.md) 組件卡 additive 登記一列
+6. 落地(首次端到端真跑)後:回 `harness-wiki（../harness-wiki/SKILL.md）` 組件卡 additive 登記一列
    ——**先落地才登記**(其 Gotcha 明訓),本檔落地前不登。
 
 ## 不變量(承上游 7 條,retarget 後;改任一階段時不准被簡化)

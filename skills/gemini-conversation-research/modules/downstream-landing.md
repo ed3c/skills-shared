@@ -29,21 +29,21 @@ S1-S9 把對話萃取、缺口送 DR、報告存檔。但 **DR 報告是「平�
 
 ### D3 — 可行度 gap 收斂（地圖≠疆域）
 用 [unknown-discovery-composer](../../unknown-discovery-composer/SKILL.md) 四象限（KK/KU/UK/UU）盤點「設計本身的可行度」未知，路由：
-- **KU（可讀源收斂）→ [repo-wiki-converge](../../repo-wiki-converge/SKILL.md)（L1 理解 wiki）→ [repo-agent-native](../../repo-agent-native/SKILL.md)（L2 source-anchored 不變量）**。深研真實**參考實作**常**反證 DR 中心論點**（實測：最大真實 AI 剪輯 agent 繞過 DR 主張的交換格式路、直接 render）——這是最高價值的 gap 揭露。階梯 SSOT → [`kb-ingest/mastery-ladder.md`](../../../../kb-ingest/mastery-ladder.md)。
+- **KU（可讀源收斂）→ [repo-wiki-converge](../../repo-wiki-converge/SKILL.md)（L1 理解 wiki）→ [repo-agent-native](../../repo-agent-native/SKILL.md)（L2 source-anchored 不變量）**。深研真實**參考實作**常**反證 DR 中心論點**（實測：最大真實 AI 剪輯 agent 繞過 DR 主張的交換格式路、直接 render）——這是最高價值的 gap 揭露。階梯 SSOT → `../../../../kb-ingest/mastery-ladder.md`。
 - **UK（做出來才知）→ prototype（見 D4）**；**UU → 盲點 pass**。
 - 產物判準 tier → [judge-loop-chooser](../../judge-loop-chooser/SKILL.md)。
 
 ### D4 — prototype 端到端驗證（推導 → 實測）
 UK/可行度 gap 中「非讀碼可答、要做出來才知」者，跑 **驗證型 prototype** 把 claim 從「推導」升「實測」。程序：
 - **一鍵建工作區**：`bash kb-ingest/setup-prototype.sh <plan_name> <repo_name> [pip_pkgs...]` → `prototype/<plan>/<repo>/`（gitignored，對稱 `/repo/`；venv 直接 call interpreter、relocatable）。
-- **紀律**（[prototype](../../../../.claude/skills/prototype) 全局 skill）：最小 scope（只答一個 UK,skip polish）、標記 PROTOTYPE、一命令跑、每步 surface state、**混入該擋的壞 case** 實測防護真起作用（實測：驗證中介層真攔 out<in / 超範圍 / 媒體不存在）。
+- **紀律**（`prototype（../../../../.claude/skills/prototype）` 全局 skill）：最小 scope（只答一個 UK,skip polish）、標記 PROTOTYPE、一命令跑、每步 surface state、**混入該擋的壞 case** 實測防護真起作用（實測：驗證中介層真攔 out<in / 超範圍 / 媒體不存在）。
 - **實測揭露 nuance**：claim 從概念變硬矩陣（實測：EDL 對多軌非 silently-lossy 而是 loud raise；格式選擇 load-bearing）。
 - **誠實留白**：明寫「本 prototype **未**證什麼」（真 app import？LLM 步是否模擬？邊緣 case 留 G5）。
 - **封存 ANSWER**：`NOTES.md` 記問題+裁決，absorb 回 SYNTHESIS；artifact **留存作驗證錨**（gitignored＋獨立 git，venv 不入庫）——不是拋棄式，是驗證過的技術實作等價物，刪了「已實測關閉」就失去可重驗鐵錨（2026-07-20 修正，know-why → dr-to-mvp `reference/guiding-prompt.md` §0）。**永不升格 src/**。
 
 ## DR→skill 落地程序（D2 已驗架構 → checker-backed skill 的可複用步驟序列）
 
-> D2 產出的是「架構設計」，本節是把它**落成一個有守門測試的 skill** 的步驟序列（actuate 委派 [skill-authoring](../../skill-authoring/SKILL.md)，**非在此重造 skill 規範**）。錨＝cc-20260711 真跑產物 `ios-realdevice-automation`（絕對路徑 `/Users/neon/ix-agy/.agents/skills/ios-realdevice-automation/`，`tests/run-all.sh` 全綠）。
+> D2 產出的是「架構設計」，本節是把它**落成一個有守門測試的 skill** 的步驟序列（actuate 委派 `skill-authoring（../../skill-authoring/SKILL.md）`，**非在此重造 skill 規範**）。錨＝cc-20260711 真跑產物 `ios-realdevice-automation`（絕對路徑 `/Users/neon/ix-agy/.agents/skills/ios-realdevice-automation/`，`tests/run-all.sh` 全綠）。
 
 1. **S0 EXTRACT**：DR/對話 URL → 保真 md（metadata-only 進主 context，原文走檔案隔離）。
 2. **S1 ANALYZE（子代理）**：抽 `named_entities`（每個具名 repo/工具/版本＝機械查證清單）/ `feasibility_claims` / `tech_equivalents` / `implied_architecture`。

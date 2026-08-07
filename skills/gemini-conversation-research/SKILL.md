@@ -36,7 +36,7 @@ description: |
 - ❌ YouTube 影片 → 卡片盒 → DR 全量管線 → [dr-research-loop](../dr-research-loop/SKILL.md)（不同上游、不同閉環）。
 - ❌ 只要把一份**已生成**的 DR 報告經 CDP 抽成保真 md → `gemini-deep-research-extract`；extension Chrome 則使用 repo-root bounded adapter，不需要該外部 skill。
 - ❌ 可讀 repo 的 codebase 掌握用 DR 當主幹（漏斗倒置）——源碼 = SSOT，DR 只補外部缺口。
-- ❌ 造新 skill / 改 skill 規範 → [skill-authoring](../skill-authoring/SKILL.md)。
+- ❌ 造新 skill / 改 skill 規範 → `skill-authoring（../skill-authoring/SKILL.md）`。
 
 ## 核心原理 + 雙模式
 Gemini 對話是高密度認知結晶。本 skill 把隱性知識結構化，**只把缺口送 DR**，其餘直接存檔。

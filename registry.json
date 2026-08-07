@@ -1,7 +1,7 @@
 {
   "schema": "shared-skills-registry/v2",
   "_ssot": "Rulings only -- no machine paths and no scan output. Paths live in the gitignored sites.local.json so any clone works in any directory; frozen hashes are never stored because a hash that disagrees with reality is worse than no record at all.",
-  "_rule": "A skill is either shared infrastructure (exactly one copy, here, reached from every project through the user-level surfaces) or repo-owned (differentiated on purpose, living in that repo's big loop). Nothing is both. A repo holding its own copy of a shared name shadows the shared one silently -- that is what `check` exists to catch.",
+  "_rule": "A skill is either shared infrastructure (exactly one copy, here, reached from every project through the user-level surfaces) or repo-owned (differentiated on purpose, living in that repo's big loop). Nothing is both. A repo holding its own copy of a shared name shadows the shared one silently -- that is what `check` exists to catch. A third state exists as of 2026-08-07: a name can be deliberately repo-owned in several repos at once. That is not shadowing -- nothing shared is being hidden -- so `check` must not report it as drift.",
   "canonical_root": "skills",
   "shared": [
     {
@@ -17,145 +17,125 @@
     {
       "name": "autoresearch-composer",
       "admitted": "2026-08-07",
-      "why": "Core-three consensus 3/3 on 2026-08-07 (bettor-arena/skill-bettor/ts-skill-bettor). Method/host infrastructure with no repo-specific content. antigravity and ix-agy hold diverged variants that this ruling did not cover, so they are left in place and recorded as deferred rather than swept.",
-      "deferred_in": [
-        "antigravity",
-        "ix-agy"
-      ]
+      "why": "Core-three consensus 3/3 on 2026-08-07 (bettor-arena/skill-bettor/ts-skill-bettor). Method/host infrastructure with no repo-specific content. The ix-agy and antigravity variants were merged into this body on 2026-08-07 rather than left deferred; their host-bound halves moved to each repo's .skill-bindings. Their local copies still need removing by hand -- the host gate blocks deletions -- until then they shadow this body."
     },
     {
       "name": "dr-research-loop",
       "admitted": "2026-08-07",
-      "why": "Core-three consensus 3/3 on 2026-08-07 (bettor-arena/skill-bettor/ts-skill-bettor). Method/host infrastructure with no repo-specific content. antigravity and ix-agy hold diverged variants that this ruling did not cover, so they are left in place and recorded as deferred rather than swept.",
-      "deferred_in": [
-        "antigravity",
-        "ix-agy"
-      ]
+      "why": "Core-three consensus 3/3 on 2026-08-07 (bettor-arena/skill-bettor/ts-skill-bettor). Method/host infrastructure with no repo-specific content. The ix-agy and antigravity variants were merged into this body on 2026-08-07 rather than left deferred; their host-bound halves moved to each repo's .skill-bindings. Their local copies still need removing by hand -- the host gate blocks deletions -- until then they shadow this body."
     },
     {
       "name": "dr-to-mvp",
       "admitted": "2026-08-07",
-      "why": "Core-three consensus 3/3 on 2026-08-07 (bettor-arena/skill-bettor/ts-skill-bettor). Method/host infrastructure with no repo-specific content. antigravity and ix-agy hold diverged variants that this ruling did not cover, so they are left in place and recorded as deferred rather than swept.",
-      "deferred_in": [
-        "antigravity",
-        "ix-agy"
-      ]
+      "why": "Core-three consensus 3/3 on 2026-08-07 (bettor-arena/skill-bettor/ts-skill-bettor). Method/host infrastructure with no repo-specific content. The ix-agy and antigravity variants were merged into this body on 2026-08-07 rather than left deferred; their host-bound halves moved to each repo's .skill-bindings. Their local copies still need removing by hand -- the host gate blocks deletions -- until then they shadow this body."
     },
     {
       "name": "judge-loop-chooser",
       "admitted": "2026-08-07",
-      "why": "Core-three consensus 3/3 on 2026-08-07 (bettor-arena/skill-bettor/ts-skill-bettor). Method/host infrastructure with no repo-specific content. antigravity and ix-agy hold diverged variants that this ruling did not cover, so they are left in place and recorded as deferred rather than swept.",
-      "deferred_in": [
-        "antigravity",
-        "ix-agy"
-      ]
+      "why": "Core-three consensus 3/3 on 2026-08-07 (bettor-arena/skill-bettor/ts-skill-bettor). Method/host infrastructure with no repo-specific content. The ix-agy and antigravity variants were merged into this body on 2026-08-07 rather than left deferred; their host-bound halves moved to each repo's .skill-bindings. Their local copies still need removing by hand -- the host gate blocks deletions -- until then they shadow this body."
     },
     {
       "name": "loop-harness-review-handoff",
       "admitted": "2026-08-07",
-      "why": "Core-three consensus 3/3 on 2026-08-07 (bettor-arena/skill-bettor/ts-skill-bettor). Method/host infrastructure with no repo-specific content. antigravity and ix-agy hold diverged variants that this ruling did not cover, so they are left in place and recorded as deferred rather than swept.",
-      "deferred_in": [
-        "antigravity",
-        "ix-agy"
-      ]
+      "why": "Core-three consensus 3/3 on 2026-08-07 (bettor-arena/skill-bettor/ts-skill-bettor). Method/host infrastructure with no repo-specific content. The ix-agy and antigravity variants were merged into this body on 2026-08-07 rather than left deferred; their host-bound halves moved to each repo's .skill-bindings. Their local copies still need removing by hand -- the host gate blocks deletions -- until then they shadow this body."
     },
     {
       "name": "path-b-reduction",
       "admitted": "2026-08-07",
-      "why": "Core-three consensus 3/3 on 2026-08-07 (bettor-arena/skill-bettor/ts-skill-bettor). Method/host infrastructure with no repo-specific content. antigravity and ix-agy hold diverged variants that this ruling did not cover, so they are left in place and recorded as deferred rather than swept.",
-      "deferred_in": [
-        "antigravity",
-        "ix-agy"
-      ]
+      "why": "Core-three consensus 3/3 on 2026-08-07 (bettor-arena/skill-bettor/ts-skill-bettor). Method/host infrastructure with no repo-specific content. The ix-agy and antigravity variants were merged into this body on 2026-08-07 rather than left deferred; their host-bound halves moved to each repo's .skill-bindings. Their local copies still need removing by hand -- the host gate blocks deletions -- until then they shadow this body."
     },
     {
       "name": "forgejo-loop-ops",
       "admitted": "2026-08-07",
-      "why": "Core-three consensus 2/2 on 2026-08-07 (bettor-arena/skill-bettor/ts-skill-bettor). Method/host infrastructure with no repo-specific content. antigravity and ix-agy hold diverged variants that this ruling did not cover, so they are left in place and recorded as deferred rather than swept.",
-      "deferred_in": [
-        "antigravity",
-        "ix-agy"
-      ]
+      "why": "Core-three consensus 2/2 on 2026-08-07 (bettor-arena/skill-bettor/ts-skill-bettor). Method/host infrastructure with no repo-specific content. The ix-agy and antigravity variants were merged into this body on 2026-08-07 rather than left deferred; their host-bound halves moved to each repo's .skill-bindings. Their local copies still need removing by hand -- the host gate blocks deletions -- until then they shadow this body."
     },
     {
       "name": "external-verify",
       "admitted": "2026-08-07",
-      "why": "Core-three consensus 2/3 on 2026-08-07 (bettor-arena/skill-bettor/ts-skill-bettor). Method/host infrastructure with no repo-specific content. antigravity and ix-agy hold diverged variants that this ruling did not cover, so they are left in place and recorded as deferred rather than swept.",
-      "deferred_in": [
-        "antigravity",
-        "ix-agy"
-      ]
+      "why": "Core-three consensus 2/3 on 2026-08-07 (bettor-arena/skill-bettor/ts-skill-bettor). Method/host infrastructure with no repo-specific content. The ix-agy and antigravity variants were merged into this body on 2026-08-07 rather than left deferred; their host-bound halves moved to each repo's .skill-bindings. Their local copies still need removing by hand -- the host gate blocks deletions -- until then they shadow this body."
     },
     {
       "name": "fold-in",
       "admitted": "2026-08-07",
-      "why": "Core-three consensus 2/3 on 2026-08-07 (bettor-arena/skill-bettor/ts-skill-bettor). Method/host infrastructure with no repo-specific content. antigravity and ix-agy hold diverged variants that this ruling did not cover, so they are left in place and recorded as deferred rather than swept.",
-      "deferred_in": [
-        "antigravity",
-        "ix-agy"
-      ]
+      "why": "Core-three consensus 2/3 on 2026-08-07 (bettor-arena/skill-bettor/ts-skill-bettor). Method/host infrastructure with no repo-specific content. The ix-agy and antigravity variants were merged into this body on 2026-08-07 rather than left deferred; their host-bound halves moved to each repo's .skill-bindings. Their local copies still need removing by hand -- the host gate blocks deletions -- until then they shadow this body."
     },
     {
       "name": "gemini-conversation-research",
       "admitted": "2026-08-07",
-      "why": "Core-three consensus 2/3 on 2026-08-07 (bettor-arena/skill-bettor/ts-skill-bettor). Method/host infrastructure with no repo-specific content. antigravity and ix-agy hold diverged variants that this ruling did not cover, so they are left in place and recorded as deferred rather than swept.",
-      "deferred_in": [
-        "antigravity",
-        "ix-agy"
-      ]
+      "why": "Core-three consensus 2/3 on 2026-08-07 (bettor-arena/skill-bettor/ts-skill-bettor). Method/host infrastructure with no repo-specific content. The ix-agy and antigravity variants were merged into this body on 2026-08-07 rather than left deferred; their host-bound halves moved to each repo's .skill-bindings. Their local copies still need removing by hand -- the host gate blocks deletions -- until then they shadow this body."
     },
     {
       "name": "html-for-decisions",
       "admitted": "2026-08-07",
-      "why": "Core-three consensus 2/3 on 2026-08-07 (bettor-arena/skill-bettor/ts-skill-bettor). Method/host infrastructure with no repo-specific content. antigravity and ix-agy hold diverged variants that this ruling did not cover, so they are left in place and recorded as deferred rather than swept.",
-      "deferred_in": [
-        "antigravity",
-        "ix-agy"
-      ]
+      "why": "Core-three consensus 2/3 on 2026-08-07 (bettor-arena/skill-bettor/ts-skill-bettor). Method/host infrastructure with no repo-specific content. The ix-agy and antigravity variants were merged into this body on 2026-08-07 rather than left deferred; their host-bound halves moved to each repo's .skill-bindings. Their local copies still need removing by hand -- the host gate blocks deletions -- until then they shadow this body."
     },
     {
       "name": "repo-agent-native",
       "admitted": "2026-08-07",
-      "why": "Core-three consensus 2/3 on 2026-08-07 (bettor-arena/skill-bettor/ts-skill-bettor). Method/host infrastructure with no repo-specific content. antigravity and ix-agy hold diverged variants that this ruling did not cover, so they are left in place and recorded as deferred rather than swept.",
-      "deferred_in": [
-        "antigravity",
-        "ix-agy"
-      ]
+      "why": "Core-three consensus 2/3 on 2026-08-07 (bettor-arena/skill-bettor/ts-skill-bettor). Method/host infrastructure with no repo-specific content. The ix-agy and antigravity variants were merged into this body on 2026-08-07 rather than left deferred; their host-bound halves moved to each repo's .skill-bindings. Their local copies still need removing by hand -- the host gate blocks deletions -- until then they shadow this body."
     },
     {
       "name": "sdlc-plan-composer",
       "admitted": "2026-08-07",
-      "why": "Core-three consensus 2/3 on 2026-08-07 (bettor-arena/skill-bettor/ts-skill-bettor). Method/host infrastructure with no repo-specific content. antigravity and ix-agy hold diverged variants that this ruling did not cover, so they are left in place and recorded as deferred rather than swept.",
-      "deferred_in": [
-        "antigravity",
-        "ix-agy"
-      ]
+      "why": "Core-three consensus 2/3 on 2026-08-07 (bettor-arena/skill-bettor/ts-skill-bettor). Method/host infrastructure with no repo-specific content. The ix-agy and antigravity variants were merged into this body on 2026-08-07 rather than left deferred; their host-bound halves moved to each repo's .skill-bindings. Their local copies still need removing by hand -- the host gate blocks deletions -- until then they shadow this body."
     },
     {
       "name": "truth-verify-loop",
       "admitted": "2026-08-07",
-      "why": "Core-three consensus 2/3 on 2026-08-07 (bettor-arena/skill-bettor/ts-skill-bettor). Method/host infrastructure with no repo-specific content. antigravity and ix-agy hold diverged variants that this ruling did not cover, so they are left in place and recorded as deferred rather than swept.",
-      "deferred_in": [
-        "antigravity",
-        "ix-agy"
-      ]
+      "why": "Core-three consensus 2/3 on 2026-08-07 (bettor-arena/skill-bettor/ts-skill-bettor). Method/host infrastructure with no repo-specific content. The ix-agy and antigravity variants were merged into this body on 2026-08-07 rather than left deferred; their host-bound halves moved to each repo's .skill-bindings. Their local copies still need removing by hand -- the host gate blocks deletions -- until then they shadow this body."
     },
     {
       "name": "unknown-discovery-composer",
       "admitted": "2026-08-07",
-      "why": "Core-three consensus 2/3 on 2026-08-07 (bettor-arena/skill-bettor/ts-skill-bettor). Method/host infrastructure with no repo-specific content. antigravity and ix-agy hold diverged variants that this ruling did not cover, so they are left in place and recorded as deferred rather than swept.",
-      "deferred_in": [
-        "antigravity",
-        "ix-agy"
-      ]
+      "why": "Core-three consensus 2/3 on 2026-08-07 (bettor-arena/skill-bettor/ts-skill-bettor). Method/host infrastructure with no repo-specific content. The ix-agy and antigravity variants were merged into this body on 2026-08-07 rather than left deferred; their host-bound halves moved to each repo's .skill-bindings. Their local copies still need removing by hand -- the host gate blocks deletions -- until then they shadow this body."
     },
     {
       "name": "gitlab-delivery-loop",
       "admitted": "2026-08-07",
       "why": "Same reason as its GitHub sibling: merge authority is host infrastructure, not repo policy -- the same four-layer stack and the same two hosts gate every repo. Kept as a separate name rather than a --host flag on github-delivery-loop because the two forges must not be interchangeable at run time; the split is enforced by disjoint schemas, disjoint identity fields and a cross-forge refusal test, not by documentation."
+    },
+    {
+      "name": "knowledge-continuity",
+      "admitted": "2026-08-07",
+      "why": "Only ix-agy had it, and nothing in it is about ix-agy. A skill that one repo happens to have written is not thereby repo-owned."
+    },
+    {
+      "name": "repo-fullstack-debugger",
+      "admitted": "2026-08-07",
+      "why": "Two repos, two lines of difference. The antigravity copy was the superset -- it carried the note on when to hand off to a different model family instead."
+    },
+    {
+      "name": "forgejo-delivery-loop",
+      "admitted": "2026-08-07",
+      "why": "bettor-arena holds the mechanism; the ts-skill-bettor copy says so itself in its own header, which makes it a binding, not a second body. Kept separate from the GitHub and GitLab siblings by the earlier ruling: the forges must not be interchangeable at run time."
+    },
+    {
+      "name": "loop-harness-standard",
+      "admitted": "2026-08-07",
+      "why": "Five copies. skill-bettor's is the evolved one (bettor-arena and ts-skill-bettor hold verbatim older copies of it), so it is the body; ix-agy's architecture SSOT module and antigravity's reference implementation fold in, minus the vendored venv."
+    },
+    {
+      "name": "repo-wiki-converge",
+      "admitted": "2026-08-07",
+      "why": "Four copies. ix-agy's module had four operational fixes the others never learned -- monorepo git detection, judge timeout, and the zero-page hole where a mechanical checker passed because there was no code to fail. Exactly the rediscovery this repo exists to stop."
     }
   ],
   "repo_owned": [
+    {
+      "name": "harness-wiki",
+      "repo": "each",
+      "why": "It is a map of one repo's loops. Three repos held it and every single file differed, because the thing it describes differs. Sharing it would leave a body that is all skeleton and a binding that is all content."
+    },
+    {
+      "name": "product-ops",
+      "repo": "each",
+      "why": "Same as harness-wiki: an operating runbook for one repo's own factory."
+    },
+    {
+      "name": "skill-authoring",
+      "repo": "each",
+      "why": "House rules, which are the part each repo is entitled to differ on. The generic half already lives in the built-in write-a-skill."
+    },
     {
       "name": "ios-agent-autopilot",
       "repo": "ix-agy",

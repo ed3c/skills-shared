@@ -102,7 +102,7 @@ northstar→antigravity 逐機制映射表記在 antigravity 自己的
 ## 6. 為何 fold-in 要 boundary-aware(掌握系統邊界)＋ 技術等價物判斷通則
 
 fold-in 早期世界觀是「把經驗塞進一組**扁平的 N 個 skill**」。但 skill-bettor 的知識演化 harness 已經
-是**小迴圈組件的組合**(見 [`harness-wiki`](../../harness-wiki/SKILL.md)):演化 op 迴圈、DR proposal
+是**小迴圈組件的組合**(見 `harness-wiki`（../../harness-wiki/SKILL.md）):演化 op 迴圈、DR proposal
 迴圈,各自閉合、各有獨立收斂閘,未來會 additive 增列。這對 fold-in 有兩個硬後果:
 
 1. **系統邊界是活的,不是硬數字**。harness-wiki 現在誠實地只列 2 條迴圈——但「只有 2 條」本身會

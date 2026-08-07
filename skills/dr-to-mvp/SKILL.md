@@ -43,7 +43,7 @@ description: |
 - 要判斷目前材料該走 Phase R、Phase G、Phase M，還是應轉交其他 owner skill。
 
 ## Not For
-- 既有家族的每日演化、publish、輪替 → [product-ops](../product-ops/SKILL.md)。
+- 既有家族的每日演化、publish、輪替 → `product-ops（../product-ops/SKILL.md）`。
 - 只跑一題 proposal 或 DR 迴圈 → [dr-research-loop](../dr-research-loop/SKILL.md)。
 - 只建或修改小迴圈八大基座 → [loop-harness-standard](../loop-harness-standard/SKILL.md)。
 - 只選驗證標準與獨立性 tier → [judge-loop-chooser](../judge-loop-chooser/SKILL.md)。

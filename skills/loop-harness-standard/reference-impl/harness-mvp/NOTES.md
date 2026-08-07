@@ -1,0 +1,1 @@
+# NOTES — 2026-07-19-ai-engineer-dr / harness-mvp\nSee PROMPT.md (goal) / PLAN.md (state).\n

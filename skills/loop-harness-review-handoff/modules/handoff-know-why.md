@@ -16,9 +16,9 @@
 
 | reviewer | 適用 | 為何 | 錨 |
 |---|---|---|---|
-| **Fable 5** | 設計/高推理架構評審(效益疊加審計、逼出未想到的優化、廣角架構問題) | 高推理 tier 才抓得到跨基座的疊加 vs 冗餘、才逼得出「哪維度沒被審」的 completeness gap;低 tier 抓不到隱蔽 Goodhart/結構性冗餘 | [`ARCHITECTURE.md` §5 tier-dispatch](../../../../ARCHITECTURE.md)「大迴圈編排/計劃」行＋硬約束③「tier 匹配推理需求」 |
-| **Opus** | 裁決型(判 HOLD/PASS、對 finding 下定論、當畢業 semantic 判官) | Opus-tier 隔離判官抓得到機械層＋Sonnet-author 皆未抓的 Goodhart | [`ARCHITECTURE.md` §5](../../../../ARCHITECTURE.md)「裁決/畢業判官/llm_judge」行＋[`evals-design-method.md`「tier 邊界重申」](../../loop-harness-standard/modules/evals-design-method.md)。**誠實記**:skill-bettor 目前**沒有**類似 antigravity design-governance slice-1 那種「Opus 判官真的逮到過 Goodhart」的本地活證——這條 rationale 目前是**繼承的設計原則**,尚無本地 worked case,需要時可從 `families/pinescript-audit` 的畢業段(尚未真跑,見 `ARCHITECTURE.md` §7 鐵律 2「holdout 只跑一次」目前仍是 0 次)產出第一個 |
-| **agy 不當判官** | ——(排除) | agy＝Gemini,skill-bettor 定位為「DR/跨家族複核」,**只產 findings 不 verdict**;判官/裁決角色永遠是 Opus(fresh subagent)或人,agy 不是評審角色 | [`ARCHITECTURE.md` §5](../../../../ARCHITECTURE.md)「DR/跨家族複核」行＋§5 硬約束①「判官硬地板永不 Haiku/永不 agy verdict」 |
+| **Fable 5** | 設計/高推理架構評審(效益疊加審計、逼出未想到的優化、廣角架構問題) | 高推理 tier 才抓得到跨基座的疊加 vs 冗餘、才逼得出「哪維度沒被審」的 completeness gap;低 tier 抓不到隱蔽 Goodhart/結構性冗餘 | `../../../../ARCHITECTURE.md`「大迴圈編排/計劃」行＋硬約束③「tier 匹配推理需求」 |
+| **Opus** | 裁決型(判 HOLD/PASS、對 finding 下定論、當畢業 semantic 判官) | Opus-tier 隔離判官抓得到機械層＋Sonnet-author 皆未抓的 Goodhart | `../../../../ARCHITECTURE.md`「裁決/畢業判官/llm_judge」行＋[`evals-design-method.md`「tier 邊界重申」](../../loop-harness-standard/modules/evals-design-method.md)。**誠實記**:skill-bettor 目前**沒有**類似 antigravity design-governance slice-1 那種「Opus 判官真的逮到過 Goodhart」的本地活證——這條 rationale 目前是**繼承的設計原則**,尚無本地 worked case,需要時可從 `families/pinescript-audit` 的畢業段(尚未真跑,見 `ARCHITECTURE.md` §7 鐵律 2「holdout 只跑一次」目前仍是 0 次)產出第一個 |
+| **agy 不當判官** | ——(排除) | agy＝Gemini,skill-bettor 定位為「DR/跨家族複核」,**只產 findings 不 verdict**;判官/裁決角色永遠是 Opus(fresh subagent)或人,agy 不是評審角色 | `../../../../ARCHITECTURE.md`「DR/跨家族複核」行＋§5 硬約束①「判官硬地板永不 Haiku/永不 agy verdict」 |
 
 **tier 匹配推理需求的通則**:Opus 做純機械＝浪費、Haiku 裁決＝抓不到 Goodhart。交接評審屬**高推理**任務(架構疊加分析＋逼未知)→ Fable 5 或 Opus,不下放低 tier。
 

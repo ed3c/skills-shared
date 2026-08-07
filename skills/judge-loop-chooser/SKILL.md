@@ -106,7 +106,7 @@ description: |
   [loop-harness-standard](../loop-harness-standard/SKILL.md)。
 - 查證單一外部 claim 的真假 → 走 [external-verify](../external-verify/SKILL.md)。
 - 判「該不該新建 skill」或通用 skill 寫法 → 先走 [fold-in](../fold-in/SKILL.md),家規看
-  [skill-authoring](../skill-authoring/SKILL.md)。
+  `skill-authoring（../skill-authoring/SKILL.md）`。
 - 5-axis 技術選型 fit-to-plan → 本 repo 無 OSS 堆疊選型基座,已在 retarget-map 誠實退休。
 
 ## State Graph(不可壓成 prompt)
