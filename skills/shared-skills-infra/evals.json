@@ -1,0 +1,63 @@
+{
+  "skill_name": "shared-skills-infra",
+  "version": "1.1.0",
+  "_meta": {
+    "coverage_metric": "planted shadowing copy, stale symlink, stale binding, malformed binding, and every state `bind` refuses to write",
+    "purpose": "Prove that the governance gate fails on shadowing without network access, that a binding's states -- absent, current, stale, broken -- stay apart all the way to the exit code, and that no state the gate cannot look at reads as a clean one.",
+    "claim_discipline": "Every line under `covers` names an assertion that exists in tests/verify.sh and dies to a mutation of the guard it describes. A claim with no case behind it is worse than no claim."
+  },
+  "runnable": [
+    {
+      "id": "SHARED-1",
+      "checker_script": "scripts/shared_skills.py",
+      "test_verify": "tests/verify.sh",
+      "good_fixture": "synthetic world: one shared skill, both user surfaces symlinked, subscriber repo pointing at canonical",
+      "hollow_fixture": "same world with a real copy of the shared name planted in the subscriber's .claude/skills, and later with the checkout moved so the symlinks are stale",
+      "covers": [
+        "a project copy of a shared name is SHADOWED, because both hosts prefer it silently",
+        "a pointer at project level is a pointer, not a shadow",
+        "an unruled duplicate exits 3 from report, never 1",
+        "adopt sweeps every rival entry and moves it to a backup, never deletes",
+        "a moved checkout fails WRONG-TARGET instead of resolving somewhere else"
+      ],
+      "expected": "good PASS; shadowing and stale symlinks exit 1 naming the file; unruled exits 3"
+    },
+    {
+      "id": "SHARED-2",
+      "checker_script": "scripts/shared_skills.py",
+      "test_verify": "tests/verify.sh",
+      "good_fixture": "a binding written by `bind` whose body_version still matches the shared body's hash, carrying a retarget ledger line under the frontmatter",
+      "hollow_fixture": "① the body gains a file so body_version no longer matches; ② binding.md missing body_version; ③ binding.md declaring another skill's name and another retarget's upstream; ④ a slot directory holding no binding.md; ⑤ all four fields present under a `---` block that never closes",
+      "covers": [
+        "a matching body_version passes and reports as current",
+        "a body that moved makes every binding pinned to it SURFACE and exit 3, not FAIL",
+        "a missing field is FAIL, because a broken record is not the same as owed work",
+        "a binding copied from another skill's slot is FAIL, not stale",
+        "no slot at all is neither FAIL nor SURFACE: absence is counted, never reported as a fault",
+        "restamping keeps upstream and the prose ledger below the frontmatter (a planted ledger line must survive the restamp)",
+        "a frontmatter block that never closes is diagnosed as unclosed, not as four missing fields that are all present",
+        "`install` ends with the gate and returns its code, 3 included -- asserted with a stale binding in place"
+      ],
+      "expected": "good PASS exit 0; stale exits 3 with SURFACE on stdout and nothing on stderr; malformed exits 1 with FAIL BINDING-INCOMPLETE naming the actual cause; absent exits 0; install exits 3 while a binding is stale"
+    },
+    {
+      "id": "SHARED-3",
+      "checker_script": "scripts/shared_skills.py",
+      "test_verify": "tests/verify.sh",
+      "good_fixture": "a governed, on-disk, non-deferred repo whose slot holds only a legacy snapshot -- `bind` writes the binding.md and the gate passes",
+      "hollow_fixture": "an ungoverned repo; the same repo smuggled in with `--project` on the bind command itself; a first binding with no --upstream; a repo that is not on disk; a repo where the skill is `deferred_in`; a slot whose binding.md is already BINDING-INCOMPLETE; a governed repo moved off disk; a slot naming a skill nobody registered",
+      "covers": [
+        "an ungoverned repo is refused and no slot is left behind: `check` never walks there, so the record would be unverifiable",
+        "a first binding without --upstream is refused: a retarget that does not say what from is not a record",
+        "a repo that is not on disk is refused instead of conjured out of a typo by mkdir -p",
+        "`bind` has no --project flag of its own, so the governed-repo refusal cannot be walked around by declaring the target governed on the same command (argparse exits 2)",
+        "a repo where the skill is deferred is refused, and its pre-existing record is left byte-for-byte: `check` deliberately never reads a deferred repo's bindings",
+        "a record `check` calls broken is refused, not restamped into a pass carrying the foreign upstream it was copied with",
+        "a slot holding only a legacy snapshot is still bindable: the refusal is about a record that reads false, not about extra files",
+        "a governed repo that is not on disk is surfaced and counted (PROJECTS … unreachable), never dropped from the tally in silence",
+        "a slot naming a skill the registry does not know is surfaced as ORPHAN-BINDING and exits 3, instead of never being opened again"
+      ],
+      "expected": "every refusal exits 1 with a sentence naming what to do next and writes nothing; the --project bypass exits 2; an unreachable project and an orphan slot each exit 3 with SURFACE on stdout and nothing on stderr"
+    }
+  ]
+}

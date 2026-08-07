@@ -18,8 +18,12 @@ never in the versioned registry. Clone anywhere, run `install`, done.
   check    zero-network gate: no shared skill is shadowed or unlinked (T0)
   link     materialize a shared skill's user-level symlinks (idempotent)
   adopt    move a project's copy in and register it as shared (moves, never deletes)
+  bind     record that a repo retargeted a shared body, pinned to that body
 
-Exit codes: 0 clean, 1 a rule is violated, 3 nothing ruled yet / nothing to do.
+Exit codes: 0 clean, 1 a rule is violated, 3 nothing ruled yet / nothing to do
+-- which is where a stale binding lands: it is owed work, not a broken thing.
+`install` ends with `check` and returns its code verbatim, 3 included: wiring
+that reports success while the gate would not is the silent state again.
 """
 
 from __future__ import annotations
@@ -40,6 +44,12 @@ SITES = REPO / "sites.local.json"
 DEFAULT_CODEX_SURFACE = Path.home() / ".agents" / "skills"
 DEFAULT_CLAUDE_SURFACE = Path.home() / ".claude" / "skills"
 NOTHING_TO_DO = 3
+# A binding is a directory, not a file, because a retarget produces several
+# records at once: the retarget ledger, the legacy snapshot it replaced, that
+# repo's own panorama. Only `binding.md` is contractual; the rest is free.
+BINDING_DIR = ".skill-bindings"
+BINDING_FILE = "binding.md"
+BINDING_FIELDS = ("skill", "upstream", "retargeted_at", "body_version")
 
 
 class SharedSkillsError(RuntimeError):
@@ -176,12 +186,113 @@ def canonical_path(registry: dict[str, Any], name: str) -> Path:
 
 
 # --------------------------------------------------------------------------
+# bindings: which shared body a repo retargeted, and whether that body moved
+# --------------------------------------------------------------------------
+
+
+def parse_frontmatter(text: str) -> tuple[dict[str, str], str, str | None]:
+    """Split a `--- key: value --- rest` document. Stdlib only, so no YAML: the
+    four fields are flat strings and a real parser would be a dependency bought
+    for nothing.
+
+    The third element is None for a well-formed block, else a sentence naming
+    what is wrong with the block itself. Without it a caller can only report the
+    fields it failed to see, so a file carrying all four fields under an unclosed
+    `---` gets diagnosed as missing all four -- a verdict nobody can act on,
+    because every field it names is sitting right there.
+    """
+    lines = text.splitlines(keepends=True)
+    if not lines or lines[0].strip() != "---":
+        return {}, text, "has no `---` frontmatter block at the top"
+    fields: dict[str, str] = {}
+    for index, line in enumerate(lines[1:], start=1):
+        if line.strip() == "---":
+            return fields, "".join(lines[index + 1:]), None
+        key, separator, value = line.partition(":")
+        if separator:
+            fields[key.strip()] = value.strip()
+    return {}, text, "opens a `---` frontmatter block that never closes"
+
+
+def binding_state(project: Path, name: str, body_version: str) -> tuple[str, str]:
+    """Classify one repo's binding for one shared skill: (state, detail).
+
+    The three states have to stay apart all the way to the exit code. Absence
+    means this repo never retargeted and uses the shared body's generic form --
+    a legitimate resting state, so calling it broken would leave most repos
+    permanently red. Stale means the body moved since the retarget: owed work,
+    surfaced, not failed. Incomplete means the record itself no longer says what
+    it was pinned to, and no amount of re-running fixes that.
+    """
+    slot = project / BINDING_DIR / name
+    if not slot.is_dir():
+        return "absent", ""
+    binding = slot / BINDING_FILE
+    if not binding.is_file():
+        return "incomplete", f"{slot} has no {BINDING_FILE}"
+    try:
+        text = binding.read_text(encoding="utf-8")
+    except OSError as error:
+        return "incomplete", f"{binding} is unreadable: {error}"
+    fields, _, malformed = parse_frontmatter(text)
+    if malformed:
+        return "incomplete", (
+            f"{binding} {malformed} -- the four fields have to sit inside a closed block "
+            f"for anything to read them"
+        )
+    missing = [field for field in BINDING_FIELDS if not fields.get(field)]
+    if missing:
+        return "incomplete", f"{binding} lacks {', '.join(missing)}"
+    if fields["skill"] != name:
+        # Bindings get copied between repos, and a copy that keeps the original
+        # `skill:` is exactly how a record becomes false in place: the slot says
+        # one thing, the record another, and the hash it pins belongs to neither.
+        return "incomplete", (
+            f"{binding} declares skill: {fields['skill']} while sitting in the slot for {name}"
+        )
+    if fields["body_version"] != body_version:
+        return "stale", (
+            f"{binding} pins body_version {fields['body_version']}, body is now {body_version}"
+        )
+    return "current", ""
+
+
+def orphan_bindings(registry: dict[str, Any], projects: list[Path]) -> list[str]:
+    """Binding slots naming a skill this registry does not know.
+
+    `check` walks the registry, so a slot whose name was renamed out of it -- or
+    dropped from it -- is never opened again. Every subscriber's ledger for that
+    name goes quiet at once, and the last thing anybody saw was a PASS.
+    """
+    known = {item["name"] for item in registry["shared"]}
+    orphans: list[str] = []
+    for project in projects:
+        root = project / BINDING_DIR
+        if not root.is_dir():
+            continue
+        for slot in sorted(root.iterdir()):
+            if slot.name.startswith(".") or not slot.is_dir() or slot.name in known:
+                continue
+            orphans.append(
+                f"ORPHAN-BINDING {slot}: no shared skill named {slot.name} is registered -- "
+                f"rename the slot to the name it is bound to now, or move it aside"
+            )
+    return orphans
+
+
+# --------------------------------------------------------------------------
 # verbs
 # --------------------------------------------------------------------------
 
 
 def install(registry: dict[str, Any], sites: Sites) -> int:
-    """Wire a fresh clone to this machine, then link every shared skill."""
+    """Wire a fresh clone to this machine, then link every shared skill.
+
+    Ends with `check` and returns its code unchanged, 3 included -- a stale
+    binding or an uncloned project makes the wiring incomplete, and an `install`
+    that reported 0 over a gate saying otherwise would be the silent state this
+    tool exists to end.
+    """
     sites.save()
     print(f"WIRED   {sites.path}")
     print(f"        codex surface : {sites.codex_surface}")
@@ -243,9 +354,26 @@ def report(registry: dict[str, Any], sites: Sites) -> int:
 
 
 def check(registry: dict[str, Any], sites: Sites) -> int:
-    """T0 gate. Fails only on ruled violations, never on unruled duplicates."""
+    """T0 gate. Fails only on ruled violations, never on unruled duplicates, and
+    never on a binding that merely fell behind: that one is surfaced instead."""
     failures: list[str] = []
+    surfaced: list[str] = []
+    # "incomplete" is counted but not printed in the tally: it already shows up
+    # as a FAIL line, and a broken record is not a population to keep score of.
+    tally = {"current": 0, "stale": 0, "absent": 0, "incomplete": 0}
     found = scan(sites)
+    # A governed repo that is not on disk cannot be asked the binding question at
+    # all, so its bindings leave the tally. Dropping it quietly would make "I
+    # could not look" read exactly like "I looked and it was clean" -- and
+    # `install` prints `(not on disk yet)`, so this is a state sites files really
+    # reach, not a hypothetical.
+    reachable = [project for project in sites.projects if project.is_dir()]
+    unreachable = [project for project in sites.projects if not project.is_dir()]
+    for project in unreachable:
+        surfaced.append(
+            f"UNREACHABLE-PROJECT {project}: governed but not on disk, so none of its bindings "
+            f"were read -- clone it there, or drop it from {sites.path}"
+        )
     for item in registry["shared"]:
         name = item["name"]
         canonical = canonical_path(registry, name)
@@ -266,10 +394,41 @@ def check(registry: dict[str, Any], sites: Sites) -> int:
                 f"SHADOWED {name}: {label} keeps its own copy -- project skills win over "
                 f"user skills, so that copy silently replaces the shared one"
             )
+        body_version = digest(canonical)
+        for project in reachable:
+            # A deferred repo still runs its own copy, so there is no shared body
+            # for a binding there to pin: checking one would judge a question the
+            # ruling deliberately left open. `bind` refuses to write one for the
+            # same reason -- see the refusal there.
+            if project.name in deferred:
+                continue
+            state, detail = binding_state(project, name, body_version)
+            tally[state] += 1
+            if state == "incomplete":
+                failures.append(f"BINDING-INCOMPLETE {name}: {detail}")
+            elif state == "stale":
+                surfaced.append(
+                    f"BINDING-STALE {name}: {detail} -- re-retarget, then "
+                    f"`bind {name} --repo {project}`"
+                )
+    surfaced.extend(orphan_bindings(registry, reachable))
+    for failure in failures:
+        print(f"FAIL {failure}", file=sys.stderr)
+    for line in surfaced:
+        print(f"SURFACE {line}")
+    # Printed on every path, because absence is a state and a state nobody counts
+    # is indistinguishable from a state nobody checked.
+    print(
+        f"BINDINGS {tally['current']} current, {tally['stale']} stale, "
+        f"{tally['absent']} not retargeted"
+    )
+    # The population that tally was computed over, for the same reason: a number
+    # is only readable next to the size of the set it was counted from.
+    print(f"PROJECTS {len(reachable)} on disk, {len(unreachable)} unreachable")
     if failures:
-        for failure in failures:
-            print(f"FAIL {failure}", file=sys.stderr)
         return 1
+    if surfaced:
+        return NOTHING_TO_DO
     print(f"PASS shared skills hold ({len(registry['shared'])} registered)")
     return 0
 
@@ -440,6 +599,118 @@ def adopt(
     return link(registry, sites, name)
 
 
+BINDING_TEMPLATE = """---
+skill: {name}
+upstream: {upstream}
+retargeted_at: {today}
+body_version: {body_version}
+---
+"""
+
+BINDING_PROSE = """
+# {name} — 本 repo 的 binding
+
+共用 body 是通用形態；只在本 repo 為真的東西住這裡：retarget 取捨帳、
+指向本 repo 私有文件的指針、被取代的舊版快照。
+判準：原封不動搬到另一個 repo，它還為真嗎？為真＝body。
+
+`body_version` 釘的是 retarget 當下的共用 body 內容 hash。body 一動，
+`check` 就把本檔列成 BINDING-STALE——那是「該重新 retarget」的清單，
+不是壞掉。對齊完跑 `bind` 重釘。
+"""
+
+
+def bind(
+    registry: dict[str, Any],
+    sites: Sites,
+    name: str,
+    repo: Path,
+    upstream: str | None,
+) -> int:
+    """Record that this repo retargeted a shared body, pinned to that body.
+
+    Restamping keeps everything below the frontmatter untouched: that prose is
+    the retarget ledger, which is the one thing a binding exists to hold. A tool
+    that rewrote the whole file would destroy the record while claiming to
+    maintain it.
+
+    It refuses rather than papers over: a repo `check` never walks, a repo whose
+    copy of this skill was deferred, and an existing record `check` already calls
+    broken. Every one of those would end with a record on disk that no gate ever
+    confirms -- which is the exact state this whole mechanism exists to end.
+    """
+    entry = next((item for item in registry["shared"] if item["name"] == name), None)
+    if entry is None:
+        raise SharedSkillsError(
+            f"{name} is not registered as shared -- only a shared body gets bindings"
+        )
+    canonical = canonical_path(registry, name)
+    if not canonical.is_dir():
+        raise SharedSkillsError(f"not in the shared repo: {canonical}")
+    repo = repo.expanduser().resolve()
+    if not repo.is_dir():
+        # mkdir(parents=True) below would otherwise conjure the repo itself out
+        # of a typo, and a binding in a repo that does not exist is unfindable.
+        raise SharedSkillsError(f"no such repo on this machine: {repo}")
+    governed = {project.expanduser().resolve() for project in sites.projects}
+    if repo not in governed:
+        # `check` only walks the wired projects, so a binding anywhere else is a
+        # record nothing ever verifies -- the silent state this gate exists to end.
+        raise SharedSkillsError(
+            f"{repo} is not a governed project -- add it with `install --project` first"
+        )
+    if repo.name in set(entry.get("deferred_in", [])):
+        # `check` deliberately never reads a deferred repo's bindings: it runs its
+        # own copy, so there is no shared body for a record there to pin. Writing
+        # one anyway produces precisely the unverified record the refusal above
+        # exists to prevent -- the same hole, entered from the other side.
+        raise SharedSkillsError(
+            f"{name} is deferred in {repo.name}, which runs its own copy -- there is no shared "
+            f"body to pin there; settle the defer (`adopt` it, or drop `deferred_in`) first"
+        )
+
+    binding = repo / BINDING_DIR / name / BINDING_FILE
+    fields: dict[str, str] = {}
+    prose = BINDING_PROSE.format(name=name)
+    if binding.is_file():
+        # Restamping a record `check` calls broken would clear that FAIL without
+        # anyone reading the file, and inherit an `upstream` line that may belong
+        # to whichever repo the record was copied from. A false provenance that
+        # passes is worse than a failure that stops you.
+        existing_state, existing_detail = binding_state(repo, name, digest(canonical))
+        if existing_state == "incomplete":
+            raise SharedSkillsError(
+                f"{binding} is broken, not merely stale: {existing_detail} -- `bind` restamps a "
+                f"record, it never repairs one; fix the file by hand, or move it aside and bind "
+                f"again with --upstream to start a fresh record"
+            )
+        fields, prose, _ = parse_frontmatter(binding.read_text(encoding="utf-8"))
+    upstream = upstream or fields.get("upstream")
+    if not upstream:
+        raise SharedSkillsError(
+            "a new binding needs --upstream: which upstream this repo retargeted from"
+        )
+    body_version = digest(canonical)
+    binding.parent.mkdir(parents=True, exist_ok=True)
+    binding.write_text(
+        BINDING_TEMPLATE.format(
+            name=name,
+            upstream=upstream,
+            today=date.today().isoformat(),
+            body_version=body_version,
+        )
+        + prose,
+        encoding="utf-8",
+    )
+    # Assert the state the message is about to claim: a stamp that does not read
+    # back as current would be a green line over a binding `check` still surfaces.
+    state, detail = binding_state(repo, name, body_version)
+    if state != "current":
+        raise SharedSkillsError(f"binding did not take ({state}): {detail or binding}")
+    print(f"BOUND   {binding} -> body_version {body_version}")
+    return 0
+
+
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
@@ -473,6 +744,20 @@ def _parser() -> argparse.ArgumentParser:
         "--backup-dir", type=Path,
         default=Path(os.environ.get("TMPDIR", "/tmp")) / "shared-skills-superseded",
     )
+    # `bind` deliberately gets no --project/--surface flags. `Sites` lets a
+    # --project flag replace the governed set outright, so accepting one here
+    # would let the writer declare its own target governed and walk straight
+    # through the refusal in `bind`. The governed set a write trusts has to be
+    # the persisted one `check` will later walk, not one invented per command.
+    bind_parser = commands.add_parser("bind", help="pin a repo's binding to the body")
+    bind_parser.add_argument("name")
+    bind_parser.add_argument("--sites", type=Path, default=SITES, help="machine paths file")
+    bind_parser.add_argument(
+        "--repo", required=True, type=Path, help="the governed repo that retargeted",
+    )
+    bind_parser.add_argument(
+        "--upstream", help="what this repo retargeted from; remembered on restamp",
+    )
     return parser
 
 
@@ -489,6 +774,8 @@ def main(argv: list[str] | None = None) -> int:
             return check(registry, sites)
         if args.command == "link":
             return link(registry, sites, args.name)
+        if args.command == "bind":
+            return bind(registry, sites, args.name, args.repo, args.upstream)
         return adopt(
             registry, sites, args.name, args.source, args.why,
             args.backup_dir, args.dry_run, args.defer,

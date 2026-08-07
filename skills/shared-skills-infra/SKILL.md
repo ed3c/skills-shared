@@ -51,9 +51,61 @@ python3 $INFRA check     # T0：已登記的裁決有沒有被違反（零網路
 python3 $INFRA report    # 決策佇列：同名多份、尚未裁決、以及延後裁決的清單＋內容 hash
 python3 $INFRA link <name>
 python3 $INFRA adopt <name> --from <path> --why "…" [--defer <repo>] [--dry-run]
+python3 $INFRA bind <name> --repo <repo> [--upstream <來源>]   # 釘／重釘 binding
 ```
 
-`check` exit 0 乾淨｜1 有裁決被違反；`report` exit 3 有待裁項（**待裁不是失敗**）。
+`check` exit 0 乾淨｜1 有裁決被違反｜3 有欠帳（binding 過期、治理中的 repo 不在磁碟上、
+槽位名已不在登記表）——**欠帳＝欠一次動作，不是壞掉**；`report` exit 3 有待裁項（**待裁不是失敗**）。
+`install` 結尾就是跑一次 `check` 並原封回傳它的碼（含 3）：接線說 0、閘說 3，就是這個閘要終結的無聲狀態。
+
+## binding：body 通用、binding 綁宿主
+
+判準一句話：**原封不動搬到另一個 repo，它還為真嗎？不為真就是 binding。**
+槽位＝`<repo>/.skill-bindings/<name>/`——目錄，因為一次 retarget 產生多份記錄（取捨帳、
+舊版快照、該 repo 的全景圖）。其中 `binding.md` 是契約，四欄缺一不可：
+
+```yaml
+skill: <name>            # 與槽位同名；不同名＝這份記錄是從別處抄來的，已就地失真
+upstream: <來源>          # 從哪個上游 retarget 過來
+retargeted_at: <日期>
+body_version: <retarget 當下共用 body 的內容 hash>   # 由 bind 蓋章，不手算
+```
+
+三態在輸出與 exit code 都長得不一樣——混在一起就是「每次踩到才發現」的成因：
+
+| 狀態 | 判準 | 出口 |
+|---|---|---|
+| 未 retarget | 槽位不存在 | 計入 `BINDINGS … not retargeted`，exit 0。**缺席不是壞掉**：用共用 body 的通用形態 |
+| 已 retarget | `body_version` == 現行 body hash | 計入 `BINDINGS … current`，exit 0 |
+| binding 過期 | `body_version` ≠ 現行 body hash | `SURFACE BINDING-STALE`，exit 3 |
+| 記錄本身壞了 | 缺 `binding.md`／缺欄位／`skill:` 與槽位不符／frontmatter 區塊沒收尾 | `FAIL BINDING-INCOMPLETE`，exit 1 |
+
+還有兩種「看不到」，它們一律計數＋surface，絕不併進上面任何一格——沉默地消失就跟「全部乾淨」
+長得一模一樣：
+
+| 狀態 | 判準 | 出口 |
+|---|---|---|
+| 治理中但不在磁碟 | `sites.local.json` 有這個 repo，機器上沒有 | `SURFACE UNREACHABLE-PROJECT`＋`PROJECTS … unreachable`，exit 3 |
+| 槽位名已不在登記表 | `.skill-bindings/<name>/` 的 `<name>` 未登記為共用 | `SURFACE ORPHAN-BINDING`，exit 3（改名／除籍會一次讓五個 repo 的帳本靜音） |
+
+`body_version` 是「不想反覆返工」的機制答案：body 一動，`check` 立刻列出**所有**過期
+binding——返工從「每次踩到才發現」變成有清單的一次性動作。對齊完跑 `bind` 重釘即可：
+`upstream` 會被記得，frontmatter 以下的散文原封不動保留（那才是 retarget 帳本本體）。
+
+`bind` 寧可拒絕也不抹平——每一種被拒的情形，寫下去的都是「沒有任何閘會再看一眼」的記錄：
+
+| 拒絕 | 為什麼 |
+|---|---|
+| repo 不在 `sites.local.json` 的 `projects` | `check` 不會去別處看 |
+| repo 在 `deferred_in` | 它跑自己那份副本，沒有共用 body 可釘；`check` 也刻意不讀它的 binding |
+| repo 不在磁碟上 | 槽位的 `mkdir -p` 會把打錯的路徑變成一個 repo |
+| 首次 binding 沒給 `--upstream` | 記了 retarget 卻沒記從哪來 |
+| 既有記錄已是 `BINDING-INCOMPLETE` | `bind` 只重釘、不修：就地改寫會把 FAIL 變成 PASS，並繼承那份外來記錄的 `upstream`——**假的來歷通過閘，比失敗更糟** |
+
+`bind` 刻意**沒有** `--project` 旗標：旗標會整組取代已治理集合，等於讓寫入方自己宣告目標「已治理」
+再一步跨過上面第一條。它信任的治理集合，必須就是 `check` 之後會走的那一個。
+槽位裡只有舊版快照、沒有 `binding.md`，仍然可以 `bind`（bindings 本來就多檔）——拒絕的是**讀起來是假的**記錄，
+不是「檔案不只一份」。
 
 ## clone 下來怎麼接線
 
