@@ -51,9 +51,27 @@ python3 $INFRA check     # T0：已登記的裁決有沒有被違反（零網路
 python3 $INFRA report    # 決策佇列：同名多份、尚未裁決、以及延後裁決的清單＋內容 hash
 python3 $INFRA link <name>
 python3 $INFRA adopt <name> --from <path> --why "…" [--defer <repo>] [--dry-run]
+python3 $INFRA merge <name> --from <path> --from <path> [--from …] [--dry-run]
 ```
 
 `check` exit 0 乾淨｜1 有裁決被違反；`report` exit 3 有待裁項（**待裁不是失敗**）。
+
+## 收編前先聯集（`merge`）
+
+多份分岔要合成一份時，**規則是聯集，不是投票**。只有一份版本擁有的檔案無條件保留——
+第一次收斂用內容 hash 多數決，整個模組因此消失；而那個「多數」還是假的：三份裡有兩份
+是同一血統的批次匯入。聯集不會被算錯的票數騙。
+
+| 情況 | 行為 | exit |
+|---|---|---|
+| 只有一份版本有這個檔 | 一律進聯集。工具回頭重數一次來源，少一個就 `DROPPED` | 0 |
+| 各版位元組相同 | 取一份 | 0 |
+| 同名而內容異 | 印雙方大小／hash／路徑＋逐段 diff，**不自動選**，等人 accept／override | 3 |
+| 真的掉了檔案 | 半成品留在 `.<name>.merging`，canonical 不動 | 1 |
+
+**目的地本身也算一份版本**：canonical 已有的同名檔只會被 diff，不會被覆寫。被取代的
+canonical 一律搬進 `--backup-dir`（預設 `$TMPDIR/shared-skills-superseded`），不刪。
+只有一份來源、目的地又還不存在＝那是 `adopt`（它還會登記），不是 `merge`。
 
 ## clone 下來怎麼接線
 

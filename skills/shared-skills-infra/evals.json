@@ -1,0 +1,42 @@
+{
+  "skill_name": "shared-skills-infra",
+  "version": "1.1.0",
+  "_meta": {
+    "coverage_metric": "planted shadowing copy, stale symlink target and planted union-shrinking merger detection",
+    "purpose": "Prove that shadowing fails loudly, that an unruled duplicate is not a failure, and that a union merge cannot drop a file only one version carries -- all without network access."
+  },
+  "runnable": [
+    {
+      "id": "INFRA-1",
+      "checker_script": "scripts/shared_skills.py",
+      "test_verify": "tests/verify.sh",
+      "good_fixture": "a synthetic shared repo wired to its own surfaces and one subscriber, linked by `install`",
+      "hollow_fixture": "the same world with a real copy of a shared name planted in the subscriber's .claude surface, and later with the checkout moved so every symlink is stale",
+      "covers": [
+        "a project copy of a shared name is SHADOWED, because both hosts prefer it silently",
+        "a symlink or single-SKILL.md forwarder is a pointer, not a shadow",
+        "an unruled duplicate exits 3 rather than failing the gate",
+        "adopt sweeps every rival entry to a backup and never deletes",
+        "a moved checkout fails WRONG-TARGET instead of resolving somewhere else"
+      ],
+      "expected": "good PASS shared skills hold; hollow SHADOWED/WRONG-TARGET exit 1; unruled exit 3"
+    },
+    {
+      "id": "INFRA-2",
+      "checker_script": "scripts/shared_skills.py",
+      "test_verify": "tests/verify.sh",
+      "good_fixture": "three versions of one skill, each carrying a file the other two lack, plus a canonical destination holding a fourth",
+      "hollow_fixture": "a copy of the script patched to walk only the first version, so every file the others alone carry is dropped",
+      "covers": [
+        "a file only one version carries is in the union, whichever version has it",
+        "a dropped file exits 1 and the shrunken union is never promoted over canonical",
+        "the destination counts as a version of itself, so canonical is diffed and never overwritten",
+        "bytes that disagree produce both sizes and a hunk-by-hunk diff, and nothing is auto-selected",
+        "an unresolved disagreement exits 3, which is not the exit a dropped file gets",
+        "binary disagreement is named as such instead of rendered as an unreadable diff",
+        "the superseded destination is moved to a backup, never deleted"
+      ],
+      "expected": "good UNION with every solo file present; hollow DROPPED exit 1; conflicts exit 3 with the report"
+    }
+  ]
+}

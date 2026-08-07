@@ -18,6 +18,7 @@ never in the versioned registry. Clone anywhere, run `install`, done.
   check    zero-network gate: no shared skill is shadowed or unlinked (T0)
   link     materialize a shared skill's user-level symlinks (idempotent)
   adopt    move a project's copy in and register it as shared (moves, never deletes)
+  merge    fold every version of one skill into canonical as a union, not a vote
 
 Exit codes: 0 clean, 1 a rule is violated, 3 nothing ruled yet / nothing to do.
 """
@@ -25,6 +26,7 @@ Exit codes: 0 clean, 1 a rule is violated, 3 nothing ruled yet / nothing to do.
 from __future__ import annotations
 
 import argparse
+import difflib
 import hashlib
 import json
 import os
@@ -39,6 +41,10 @@ REGISTRY = REPO / "registry.json"
 SITES = REPO / "sites.local.json"
 DEFAULT_CODEX_SURFACE = Path.home() / ".agents" / "skills"
 DEFAULT_CLAUDE_SURFACE = Path.home() / ".claude" / "skills"
+# Superseded content is moved here rather than removed, so `adopt` and `merge`
+# have to agree on where it lands or a recovery would go looking in one of two
+# places with no way to know which.
+DEFAULT_BACKUP = Path(os.environ.get("TMPDIR", "/tmp")) / "shared-skills-superseded"
 NOTHING_TO_DO = 3
 
 
@@ -148,6 +154,10 @@ def digest(path: Path) -> str:
         except OSError:
             sha.update(b"<unreadable>")
     return sha.hexdigest()[:8]
+
+
+def file_digest(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()[:8]
 
 
 def is_pointer(entry: Path) -> bool:
@@ -440,6 +450,246 @@ def adopt(
     return link(registry, sites, name)
 
 
+# --------------------------------------------------------------------------
+# union merge: the one verb that must never choose
+# --------------------------------------------------------------------------
+
+Version = tuple[str, Path]
+
+
+def _source_label(index: int) -> str:
+    """A, B, C ... so a two-sided diff can be named the way a human reads one."""
+    return chr(ord("A") + index) if index < 26 else f"S{index + 1}"
+
+
+def _resolve_sources(paths: list[Path], destination: Path) -> list[Version]:
+    """Label every distinct version, with the destination always among them.
+
+    Two `--from` paths that resolve to the same directory are one version, not
+    two: a surface symlink aimed at another source is the same lineage seen
+    twice, and counting one lineage twice is exactly what made the first
+    convergence attempt believe it had a majority. The destination joins the
+    list even when nobody passed it, because a file it already holds has to be
+    compared against the incoming ones -- otherwise a same-named file from
+    somewhere else would overwrite it with no diff and no ruling.
+    """
+    versions: list[Version] = []
+    seen: set[Path] = set()
+    for path in paths:
+        resolved = path.expanduser().resolve()
+        if not resolved.is_dir():
+            raise SharedSkillsError(f"source is not a directory: {path}")
+        if resolved in seen:
+            continue
+        seen.add(resolved)
+        versions.append((_source_label(len(versions)), resolved))
+    if destination.is_dir() and destination.resolve() not in seen:
+        versions.append((_source_label(len(versions)), destination.resolve()))
+    if len(versions) < 2:
+        raise SharedSkillsError(
+            "merge needs two distinct versions to fold together; a lone version going "
+            "somewhere nothing exists yet is `adopt`, which also registers it"
+        )
+    return versions
+
+
+def _inventory(sources: list[Version]) -> dict[str, list[Version]]:
+    """Every relative path any version carries, with the versions carrying it."""
+    inventory: dict[str, list[Version]] = {}
+    for label, root in sources:
+        for file in content_files(root):
+            inventory.setdefault(file.relative_to(root).as_posix(), []).append((label, file))
+    return inventory
+
+
+def _classify(
+    inventory: dict[str, list[Version]]
+) -> tuple[dict[str, Version], dict[str, list[Version]]]:
+    """Split into what the union takes and what only a human can settle.
+
+    Agreement is decided by bytes, never by how many versions hold the file: one
+    version holding a file is enough to keep it, and a file three versions agree
+    on is the same single file. Counting would reintroduce the vote.
+    """
+    take: dict[str, Version] = {}
+    conflicts: dict[str, list[Version]] = {}
+    for relpath, versions in sorted(inventory.items()):
+        if len({file_digest(file) for _, file in versions}) == 1:
+            take[relpath] = versions[0]
+        else:
+            conflicts[relpath] = versions
+    return take, conflicts
+
+
+def _diff_lines(left: Version, right: Version, relpath: str) -> list[str]:
+    """A hunk-by-hunk diff of two versions of one file, or an honest refusal.
+
+    Binary content has no readable diff, and printing a decoded approximation of
+    it would let someone rule on a file they never actually saw.
+    """
+    try:
+        before = left[1].read_text(encoding="utf-8").splitlines(keepends=True)
+        after = right[1].read_text(encoding="utf-8").splitlines(keepends=True)
+    except UnicodeDecodeError:
+        return [f"      (binary content: {left[0]} and {right[0]} differ, no readable diff)"]
+    hunks = difflib.unified_diff(
+        before, after,
+        fromfile=f"{left[0]} {relpath}", tofile=f"{right[0]} {relpath}",
+    )
+    return [f"      {line.rstrip(chr(10))}" for line in hunks]
+
+
+def _conflict_report(relpath: str, versions: list[Version]) -> list[str]:
+    """Name both sides with their size, digest and path, then show the diff."""
+    lines = [f"CONFLICT {relpath} ({len(versions)} versions disagree)"]
+    for label, file in versions:
+        lines.append(
+            f"      {label}  {file.stat().st_size:>8d} bytes  {file_digest(file)}  {file}"
+        )
+    for right in versions[1:]:
+        lines.extend(_diff_lines(versions[0], right, relpath))
+    return lines
+
+
+def _verify_union(built: Path, roots: list[Version], reported: set[str]) -> list[str]:
+    """Recount from the source trees, never from the merge plan.
+
+    The one guarantee this verb sells -- a file that only one version carries
+    survives -- has to be checked against a fresh walk of the versions. A check
+    written against the plan would agree with a planner that never saw the file
+    at all, so the union could shrink and still report success, which is the
+    exact failure that lost a module to the majority vote.
+    """
+    counted: dict[str, list[Version]] = {}
+    for label, root in roots:
+        for file in content_files(root):
+            counted.setdefault(file.relative_to(root).as_posix(), []).append((label, file))
+    failures: list[str] = []
+    for relpath, versions in sorted(counted.items()):
+        target = built / relpath
+        if len({file_digest(file) for _, file in versions}) > 1:
+            if relpath not in reported:
+                failures.append(
+                    f"UNREPORTED {relpath}: versions disagree but no ruling was surfaced"
+                )
+            continue
+        held_by = ", ".join(label for label, _ in versions)
+        if not target.is_file():
+            failures.append(f"DROPPED {relpath}: held by {held_by} but missing from {built}")
+        elif target.read_bytes() != versions[0][1].read_bytes():
+            failures.append(f"ALTERED {relpath}: does not match the bytes {held_by} carry")
+    return failures
+
+
+def _unused_path(candidate: Path) -> Path:
+    """Two merges on one day are two records; the second must not land on the first."""
+    attempt, suffix = candidate, 2
+    while attempt.exists():
+        attempt = candidate.with_name(f"{candidate.name}-{suffix}")
+        suffix += 1
+    return attempt
+
+
+def merge(
+    registry: dict[str, Any],
+    name: str,
+    sources: list[Path],
+    backup_root: Path,
+    dry_run: bool,
+) -> int:
+    """Fold every version of one skill into canonical as a union, not a vote.
+
+    The rule: a file only one version carries survives, unconditionally. The
+    first convergence attempt picked a winner by content hash and lost whole
+    modules that way -- and its majority was an illusion, because two of the
+    three versions were batch imports of a single lineage. A union cannot be
+    fooled by a miscounted vote, so this verb refuses to be a chooser at all.
+
+    Files whose bytes disagree are never resolved here: the report names both
+    sides and stops with `nothing ruled yet`, because deciding between two
+    authored paragraphs is a human's call and a tool that guessed would be the
+    same mistake wearing a different rule. Versions may be partial trees -- a
+    superseded backup is a legitimate one -- so no version needs a SKILL.md.
+    """
+    destination = canonical_path(registry, name)
+    versions = _resolve_sources(sources, destination)
+    inventory = _inventory(versions)
+    take, conflicts = _classify(inventory)
+    solo = sum(1 for holders in inventory.values() if len(holders) == 1)
+
+    if dry_run:
+        print(f"DRY-RUN merge {name} -> {destination}")
+        for label, root in versions:
+            print(f"        {label}  {root}  ({len(content_files(root))} files)")
+        print(f"        take   {len(take)} files, {solo} of them held by one version only")
+        print(f"        rule   {len(conflicts)} files need a human ruling")
+        for relpath, holders in conflicts.items():
+            for line in _conflict_report(relpath, holders):
+                print(line)
+        return NOTHING_TO_DO if conflicts else 0
+
+    # The union is built beside the destination and only moved into place once
+    # it verifies. Building in place would leave a half-merged canonical behind
+    # on failure, and since nothing here is ever deleted, that wreckage would be
+    # indistinguishable from a finished merge to everything downstream.
+    staging = destination.parent / f".{name}.merging"
+    if staging.exists():
+        raise SharedSkillsError(f"an earlier merge left {staging} behind; move it aside and retry")
+    # Created up front rather than on the first copy, because a merge where every
+    # single file needs a human ruling takes nothing at all, and the promote step
+    # would then be moving a directory that was never made.
+    staging.mkdir(parents=True, exist_ok=True)
+
+    added: list[str] = []
+    for relpath, (label, chosen) in take.items():
+        target = staging / relpath
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(chosen, target)
+        if not (destination / relpath).is_file():
+            added.append(f"ADDED   {relpath:52s} <- {label}")
+    for relpath in conflicts:
+        standing = destination / relpath
+        if not standing.is_file():
+            continue        # no incumbent to carry, and picking a side is not ours
+        # Carrying the destination's own bytes forward is the status quo, not a
+        # ruling: leaving it out would delete an unresolved file by omission.
+        target = staging / relpath
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(standing, target)
+
+    failures = _verify_union(staging, versions, set(conflicts))
+    if failures:
+        for failure in failures:
+            print(f"FAIL {failure}", file=sys.stderr)
+        print(
+            f"FAIL merge {name} is incomplete and was not promoted: {destination} is untouched "
+            f"and the partial union is at {staging}",
+            file=sys.stderr,
+        )
+        return 1
+
+    if destination.is_dir():
+        snapshot = _unused_path(backup_root / name / f"pre-merge-{date.today().isoformat()}")
+        snapshot.parent.mkdir(parents=True, exist_ok=True)
+        shutil.move(str(destination), str(snapshot))
+        print(f"SUPERSEDED {destination} -> {snapshot}")
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    shutil.move(str(staging), str(destination))
+    for line in added:
+        print(line)
+    print(
+        f"UNION   {destination}: {len(content_files(destination))} files from "
+        f"{len(versions)} versions, {solo} of them held by one version only"
+    )
+    for relpath, holders in conflicts.items():
+        for line in _conflict_report(relpath, holders):
+            print(line)
+    if conflicts:
+        print(f"UNRESOLVED {len(conflicts)} files need a human ruling; none was auto-selected")
+        return NOTHING_TO_DO
+    return 0
+
+
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
@@ -469,10 +719,20 @@ def _parser() -> argparse.ArgumentParser:
         "--defer", action="append", default=[],
         help="repeatable repo name whose copy stays put and is recorded as unruled",
     )
-    adopt_parser.add_argument(
-        "--backup-dir", type=Path,
-        default=Path(os.environ.get("TMPDIR", "/tmp")) / "shared-skills-superseded",
+    adopt_parser.add_argument("--backup-dir", type=Path, default=DEFAULT_BACKUP)
+    # merge takes no surface flags on purpose: it folds directories named on the
+    # command line into this checkout and never touches a machine's wiring, so
+    # asking it for a sites file would imply a coupling it does not have.
+    merge_parser = commands.add_parser(
+        "merge", help="union every version of a skill; never drops a file"
     )
+    merge_parser.add_argument("name")
+    merge_parser.add_argument(
+        "--from", dest="sources", action="append", required=True, type=Path,
+        help="repeatable; a directory holding one version of this skill",
+    )
+    merge_parser.add_argument("--dry-run", action="store_true")
+    merge_parser.add_argument("--backup-dir", type=Path, default=DEFAULT_BACKUP)
     return parser
 
 
@@ -480,6 +740,8 @@ def main(argv: list[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     try:
         registry = load_registry()
+        if args.command == "merge":
+            return merge(registry, args.name, args.sources, args.backup_dir, args.dry_run)
         sites = Sites(args.sites, args)
         if args.command == "install":
             return install(registry, sites)
