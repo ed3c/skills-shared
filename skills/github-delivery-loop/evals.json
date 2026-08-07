@@ -1,0 +1,64 @@
+{
+  "skill_name": "github-delivery-loop",
+  "version": "1.2.0",
+  "_meta": {
+    "coverage_metric": "planted hollow-receipt, unsafe merge-rule target and forged/stale merge-admit detection",
+    "purpose": "Prove that delivery receipts, repo-scoped Codex merge rules and the merge-authority preflight all fail closed without network access."
+  },
+  "runnable": [
+    {
+      "id": "DELIVERY-1",
+      "checker_script": "scripts/github_delivery.py",
+      "test_verify": "tests/check-receipt/verify.sh",
+      "good_fixture": "tests/check-receipt/fixtures/good",
+      "hollow_fixture": "tests/check-receipt/fixtures/hollow",
+      "covers": [
+        "complete receipt",
+        "missing artifact is failure rather than skip"
+      ],
+      "expected": "good PASS and hollow UNMATERIALIZED FAIL"
+    },
+    {
+      "id": "DELIVERY-2",
+      "checker_script": "scripts/install-codex-merge-rule.sh",
+      "test_verify": "tests/install-codex-merge-rule/verify.sh",
+      "good_fixture": "tests/install-codex-merge-rule/fixtures/good",
+      "hollow_fixture": "tests/install-codex-merge-rule/fixtures/hollow",
+      "covers": [
+        "repository-scoped prefix rule",
+        "existing rule backup",
+        "unsafe repository rejection",
+        "PreToolUse and human-gate boundary warning"
+      ],
+      "expected": "good repo installs and checks allow; hollow target fails before Codex execution"
+    },
+    {
+      "id": "DELIVERY-3",
+      "checker_script": "scripts/merge_gate.py",
+      "test_verify": "tests/merge-gate/verify.sh",
+      "good_fixture": "tests/merge-gate/fixtures/good",
+      "hollow_fixture": "tests/merge-gate/fixtures/hollow",
+      "covers": [
+        "merge-admit label applied by a non-owner is refused",
+        "admit that predates the head commit is stale, not valid",
+        "nothing admitted exits 3, distinct from a layer refusing with 1",
+        "a PreToolUse hook that exits 2 refuses the run on the active host only"
+      ],
+      "expected": "good PREFLIGHT GREEN; hollow blocked at L1; empty exits 3; blocking hook exits 1"
+    },
+    {
+      "id": "DELIVERY-4",
+      "checker_script": "scripts/link-canonical.sh",
+      "test_verify": "tests/link-canonical/verify.sh",
+      "good_fixture": "identical copy of the canonical skill in a scratch repo",
+      "hollow_fixture": "same copy with a local edit appended to SKILL.md",
+      "covers": [
+        "diverged copy is refused and left untouched, never moved aside",
+        "old copy is moved to a backup, never deleted",
+        "re-running on an already-linked target is an idempotent success",
+        "linking the canonical directory to itself is refused"
+      ],
+      "expected": "good converts and stays readable through the link; hollow exits non-zero naming the divergence"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "schema": "github-delivery-registry/v1",
+  "repo_root": ".",
+  "lines": [
+    {
+      "id": "portable-loop",
+      "github_repo": "example/infrastructure",
+      "artifact_path": "artifact-that-does-not-exist",
+      "receipt_path": "receipt.json",
+      "publication_path": "publication.json"
+    }
+  ]
+}

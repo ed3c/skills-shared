@@ -1,0 +1,15 @@
+{
+  "schema": "github-delivery-receipt/v1",
+  "line": "portable-loop",
+  "github_repo": "example/infrastructure",
+  "prd_issue_url": "https://github.com/example/infrastructure/issues/1",
+  "issue_urls": [
+    "https://github.com/example/infrastructure/issues/2"
+  ],
+  "pr_urls": [
+    "https://github.com/example/infrastructure/pull/3"
+  ],
+  "project_url": "https://github.com/users/example/projects/4",
+  "source_commit": "0123456789abcdef0123456789abcdef01234567",
+  "synced_at": "2026-08-06T00:00:00Z"
+}

@@ -1,0 +1,19 @@
+{
+  "schema": "github-publication-attestation/v1",
+  "line": "portable-loop",
+  "github_repo": "example/infrastructure",
+  "remote_url": "https://github.com/example/infrastructure",
+  "visibility": "PRIVATE",
+  "commit": "abcdef0123456789abcdef0123456789abcdef01",
+  "export_source_commit": "0123456789abcdef0123456789abcdef01234567",
+  "export_tree_sha": "fedcba9876543210fedcba9876543210fedcba98",
+  "file_count": 24,
+  "history_root": true,
+  "license_spdx": null,
+  "public_ready": false,
+  "blockers": [
+    "license-missing",
+    "human-visibility-gate"
+  ],
+  "verified_at": "2026-08-06T00:00:01Z"
+}

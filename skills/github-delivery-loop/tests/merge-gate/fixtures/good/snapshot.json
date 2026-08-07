@@ -1,0 +1,17 @@
+{
+  "repo": "example/infrastructure",
+  "owner": "example",
+  "pulls": [
+    {
+      "number": 7,
+      "url": "https://github.com/example/infrastructure/pull/7",
+      "title": "land the admitted slice",
+      "isDraft": false,
+      "headRefOid": "1111111111111111111111111111111111111111",
+      "head_committed_at": "2026-08-07T01:00:00Z",
+      "mergeable": "MERGEABLE",
+      "mergeStateStatus": "CLEAN",
+      "admit": {"actor": "example", "at": "2026-08-07T02:00:00Z"}
+    }
+  ]
+}

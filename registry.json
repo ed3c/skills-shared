@@ -1,0 +1,52 @@
+{
+  "schema": "shared-skills-registry/v1",
+  "_ssot": "Decisions only. Never freeze scan results here -- `shared_skills.py report` recomputes them, so a stale hash in this file can never disagree with reality.",
+  "_rule": "A skill is either shared infrastructure (exactly one copy, here, reachable from every project through the user-level surfaces) or repo-owned (differentiated on purpose, lives in that repo's big loop). Nothing is both. A repo holding its own copy of a shared name shadows the shared one silently -- that is what `check` exists to catch.",
+  "canonical_root": "skills",
+  "surfaces": {
+    "_note": "Canonical is the .agents/ side, matching this machine's dominant convention and Codex's own repo skill discovery path. The .claude/ side links into it relatively, as the other 42 user-level entries already do.",
+    "codex_user": "/Users/neon/.agents/skills",
+    "claude_user": "/Users/neon/.claude/skills"
+  },
+  "subscribers": [
+    "/Users/neon/ix-agy",
+    "/Users/neon/bettor-arena",
+    "/Users/neon/skill-bettor",
+    "/Users/neon/ts-skill-bettor",
+    "/Users/neon/antigravity"
+  ],
+  "shared": [
+    {
+      "name": "github-delivery-loop",
+      "admitted": "2026-08-07",
+      "why": "Merge authority is host infrastructure, not repo policy: the same four-layer stack and the same two hosts gate every repo. It was already diverged into two versions (skill-bettor v0.1 vs ix-agy v1.1) and that divergence is exactly what made the same blockers recur."
+    }
+  ],
+  "repo_owned": [
+    {
+      "name": "ios-agent-autopilot",
+      "repo": "/Users/neon/ix-agy",
+      "why": "Device automation is genuinely ix-agy-specific; no other repo has the hardware surface."
+    },
+    {
+      "name": "ios-realdevice-automation",
+      "repo": "/Users/neon/ix-agy",
+      "why": "Same as ios-agent-autopilot."
+    },
+    {
+      "name": "ios-simulator-automation",
+      "repo": "/Users/neon/ix-agy",
+      "why": "Same as ios-agent-autopilot."
+    },
+    {
+      "name": "ios-testflight-ship",
+      "repo": "/Users/neon/ix-agy",
+      "why": "Same as ios-agent-autopilot."
+    },
+    {
+      "name": "subproject-ixsecurity-e2e",
+      "repo": "/Users/neon/ix-agy",
+      "why": "Named after an ix-agy subproject; not portable by construction."
+    }
+  ]
+}
