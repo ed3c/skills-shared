@@ -15,11 +15,15 @@ never in the versioned registry. Clone anywhere, run `install`, done.
 
   install  wire this checkout to a machine: surfaces + projects, then link
   report   classify every skill name across the wired projects -- decision queue
-  check    zero-network gate: no shared skill is shadowed or unlinked (T0)
+  check    zero-network gate: no shared skill is shadowed, unlinked, or -- once
+           its body has been migrated -- bound to one repo (T0)
   link     materialize a shared skill's user-level symlinks (idempotent)
   adopt    move a project's copy in and register it as shared (moves, never deletes)
 
-Exit codes: 0 clean, 1 a rule is violated, 3 nothing ruled yet / nothing to do.
+Exit codes: 0 clean, 1 a ruling is violated, 3 nothing ruled yet / nothing to
+do, 4 the input cannot be judged at all. Four codes rather than three because
+"I could not tell" and "I checked, and it is fine" must never be the same
+answer -- and neither may collapse into "somebody still has to rule on this".
 """
 
 from __future__ import annotations
@@ -28,11 +32,12 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import shutil
 import sys
 from datetime import date
 from pathlib import Path
-from typing import Any
+from typing import Any, NamedTuple
 
 REPO = Path(__file__).resolve().parents[3]
 REGISTRY = REPO / "registry.json"
@@ -40,6 +45,9 @@ SITES = REPO / "sites.local.json"
 DEFAULT_CODEX_SURFACE = Path.home() / ".agents" / "skills"
 DEFAULT_CLAUDE_SURFACE = Path.home() / ".claude" / "skills"
 NOTHING_TO_DO = 3
+# Not 2: argparse spends 2 on usage errors, and "you typed the command wrong"
+# is a different fact from "I read your registry and refuse to judge it".
+CANNOT_EVALUATE = 4
 
 
 class SharedSkillsError(RuntimeError):
@@ -61,6 +69,20 @@ def load_registry() -> dict[str, Any]:
     for field in ("canonical_root", "shared", "repo_owned"):
         if field not in data:
             raise SharedSkillsError(f"registry lacks '{field}'")
+    for field in ("shared", "repo_owned"):
+        entries = data[field]
+        if not isinstance(entries, list):
+            raise SharedSkillsError(f"registry '{field}' must be a list of entries")
+        for position, item in enumerate(entries):
+            # Every verb dereferences the name, so an entry without one cannot
+            # be reported against, deferred or skipped -- it can only crash. A
+            # sentence saying which entry and what to write beats a KeyError
+            # traceback that names neither.
+            if not isinstance(item, dict) or not isinstance(item.get("name"), str) or not item["name"]:
+                raise SharedSkillsError(
+                    f"registry '{field}'[{position}] has no usable name -- give it "
+                    f'"name": "<skill-directory>" before anything can be said about it'
+                )
     return data
 
 
@@ -176,12 +198,174 @@ def canonical_path(registry: dict[str, Any], name: str) -> Path:
 
 
 # --------------------------------------------------------------------------
+# body neutrality: what survives being copied into the next repo
+# --------------------------------------------------------------------------
+
+# The five repos this checkout serves, plus the two absolute-path forms. A
+# shared body that names one of them is binding wearing body's clothes: copied
+# verbatim into the next repo the sentence becomes false in place, and nothing
+# reports it, because prose has no gate of its own -- which is how fourteen
+# retarget maps ended up all claiming one repo's lineage while serving five.
+# This tuple is the gate's whole jurisdiction, so tests/verify.sh pins it
+# literally: widening or narrowing it moves the migration's recorded baseline,
+# and that is a ruling somebody makes, never a diff that slips through.
+BINDING_REPOS = ("ts-skill-bettor", "skill-bettor", "bettor-arena", "antigravity", "ix-agy")
+BINDING_PATHS = ("~/", "/Users/")
+SCOPES = ("shared", "private")
+# Keys a shared entry may carry. Anything else is a typo, and a typo is worse
+# than an unknown value: `body_netural: true` reads as an absent ruling, so a
+# body somebody already migrated would sit in the queue forever with nobody
+# able to see why.
+SHARED_ENTRY_KEYS = frozenset({"name", "admitted", "why", "scope", "body_neutral", "deferred_in"})
+
+
+def binding_pattern(tokens: tuple[str, ...]) -> re.Pattern[str]:
+    """One pattern over the tokens, longest first.
+
+    Alternation is first-match-wins at each scan position, so a token that
+    prefixes another *at that same position* silently shadows it: with `bettor`
+    in the set, `bettor-arena` gets reported as `bettor` and whoever works the
+    queue is sent to a repo that is not the one bound. Sorting by length makes
+    that impossible for any token set -- which is why the order the tuples above
+    are written in carries no meaning and must not be relied on. Equal-length
+    ties break alphabetically rather than by input order: two tokens of the same
+    length cannot shadow each other, but leaving the tie to the caller would
+    leave one pattern per way of writing the tuple, and "order is inert" would
+    become a claim nobody can check.
+    """
+    longest_first = sorted(tokens, key=lambda token: (-len(token), token))
+    return re.compile("|".join(re.escape(token) for token in longest_first))
+
+
+BINDING = binding_pattern(BINDING_REPOS + BINDING_PATHS)
+
+
+class BodyHit(NamedTuple):
+    """One body line that only stays true in one repo, and what makes it so."""
+
+    file: str                   # relative to this checkout, so it is quotable anywhere
+    line: int
+    tokens: tuple[str, ...]     # every distinct binding token on that line, leftmost first
+
+
+def scope_of(item: dict[str, Any]) -> str:
+    """Shared unless ruled private.
+
+    A private skill is bound to its owner by construction -- neutralising it
+    would be ritual, not portability -- so the rule that forbids repo names
+    applies to shared bodies only. Whether the value is one this tool knows is
+    `entry_refusals`' question, asked before this is read.
+    """
+    return item.get("scope", "shared")
+
+
+def entry_refusals(item: dict[str, Any]) -> list[str]:
+    """Everything about one shared entry that makes it unjudgeable, as sentences.
+
+    Returned instead of raised, on purpose. Raising from inside `check`'s loop
+    threw away every violation the loop had already found, so one misspelt
+    value in an unrelated entry could hide a genuine shadowing copy -- the gate
+    would print a single configuration complaint and exit, and the two real
+    failures behind it were never printed at all.
+    """
+    name = item["name"]
+    problems: list[str] = []
+    unknown = sorted(set(item) - SHARED_ENTRY_KEYS)
+    if unknown:
+        problems.append(
+            f"{name}: unrecognised registry key(s) {', '.join(repr(k) for k in unknown)} -- "
+            f"fix the spelling or delete them; a shared entry carries only "
+            f"{', '.join(sorted(SHARED_ENTRY_KEYS))}"
+        )
+    scope = item.get("scope", "shared")
+    if scope not in SCOPES:
+        # Guessing would silently exempt a shared body from the one rule that
+        # keeps it shared, so an unrecognised value is refused, not defaulted.
+        problems.append(
+            f"{name}: unknown scope {scope!r} -- set it to one of {', '.join(SCOPES)}, or "
+            f"drop the key to take the default 'shared'"
+        )
+    if "body_neutral" in item and not isinstance(item["body_neutral"], bool):
+        problems.append(
+            f"{name}: body_neutral is {item['body_neutral']!r} -- it is a ruling, so write "
+            f"true (migrated, enforce it) or false (not migrated, queue it), not a string"
+        )
+    return problems
+
+
+def body_hits(skill: Path) -> list[BodyHit]:
+    """Every Markdown line of a skill body that names a repo or an absolute path.
+
+    Markdown only, on purpose: the migration's recorded baseline is counted
+    over prose bodies, so widening the file set here would silently move the
+    number the burn-down is measured against. Sorted, so the same tree always
+    produces the same report -- a baseline that shuffles is not a baseline.
+    """
+    hits: list[BodyHit] = []
+    for file in sorted(skill.rglob("*.md")):
+        try:
+            text = file.read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError) as error:
+            # A body nobody can read cannot be shown to be neutral, and
+            # counting it clean is how a gate degrades into decoration. The
+            # caller turns this into a refusal, not a violation: nothing here
+            # is proven broken, it is proven unjudgeable.
+            raise SharedSkillsError(
+                f"unreadable body: {file}: {error} -- re-save it as UTF-8 or move it out of "
+                f"the skill; a body nobody can read cannot be shown to be neutral"
+            ) from error
+        for number, line in enumerate(text.splitlines(), start=1):
+            tokens = tuple(dict.fromkeys(BINDING.findall(line)))
+            if tokens:
+                hits.append(BodyHit(os.path.relpath(file, REPO), number, tokens))
+    return hits
+
+
+def _print_queue(queue: list[tuple[str, list[BodyHit]]]) -> None:
+    """Print the not-yet-migrated bodies as a measurement, not as an alarm.
+
+    A line can bind through both a repo name and an absolute path, so the two
+    subtotals overlap by design: each is the count grep gives for that rule on
+    its own, which is what makes the baseline in the issue reproducible.
+    """
+    hits = [hit for _, skill_hits in queue for hit in skill_hits]
+
+    def tally(rule: tuple[str, ...]) -> str:
+        matched = [hit for hit in hits if any(token in rule for token in hit.tokens)]
+        return f"{len(matched)} lines/{len({hit.file for hit in matched})} files"
+
+    print(
+        f"SURFACE BODY-NOT-NEUTRAL {len(hits)} lines in {len({h.file for h in hits})} files "
+        f"still bind the shared body to one repo "
+        f"(repo names {tally(BINDING_REPOS)}, absolute paths {tally(BINDING_PATHS)})"
+    )
+    for name, skill_hits in queue:
+        first = skill_hits[0]
+        print(
+            f"        {name:34s} {len(skill_hits)} lines in "
+            f"{len({h.file for h in skill_hits})} files  first: {first.file}:{first.line}"
+        )
+    print(
+        '        Nobody has ruled these yet, so they are the migration queue, not a '
+        'violation: a body enters the gate when its entry gains "body_neutral": true.'
+    )
+
+
+# --------------------------------------------------------------------------
 # verbs
 # --------------------------------------------------------------------------
 
 
 def install(registry: dict[str, Any], sites: Sites) -> int:
-    """Wire a fresh clone to this machine, then link every shared skill."""
+    """Wire a fresh clone to this machine, then link every shared skill.
+
+    Exits on install's own question -- is this machine wired? -- not on the
+    migration's. `install` always writes the sites file and always links, so it
+    never has nothing to do; inheriting `check`'s exit 3 would make the first
+    documented step of a fresh clone look like a failure and stop every
+    `set -e` caller on a queue that belongs to somebody else. A violation or a
+    refusal still comes straight through: those say the wiring did not take.
+    """
     sites.save()
     print(f"WIRED   {sites.path}")
     print(f"        codex surface : {sites.codex_surface}")
@@ -191,7 +375,8 @@ def install(registry: dict[str, Any], sites: Sites) -> int:
         print(f"        project       : {project}{marker}")
     for item in registry["shared"]:
         link(registry, sites, item["name"], quiet=True)
-    return check(registry, sites)
+    status = check(registry, sites)
+    return 0 if status == NOTHING_TO_DO else status
 
 
 def report(registry: dict[str, Any], sites: Sites) -> int:
@@ -243,8 +428,17 @@ def report(registry: dict[str, Any], sites: Sites) -> int:
 
 
 def check(registry: dict[str, Any], sites: Sites) -> int:
-    """T0 gate. Fails only on ruled violations, never on unruled duplicates."""
+    """T0 gate. Fails only on ruled violations, never on unruled duplicates.
+
+    Three states are kept apart in the output and in the exit code: a ruling
+    that is violated (1), a ruling nobody has made yet (3), and an entry that
+    cannot be judged at all (4). Every one of them is accumulated rather than
+    thrown, so no single bad entry can decide what the rest of the tree is
+    allowed to report.
+    """
     failures: list[str] = []
+    refusals: list[str] = []
+    queue: list[tuple[str, list[BodyHit]]] = []
     found = scan(sites)
     for item in registry["shared"]:
         name = item["name"]
@@ -266,11 +460,59 @@ def check(registry: dict[str, Any], sites: Sites) -> int:
                 f"SHADOWED {name}: {label} keeps its own copy -- project skills win over "
                 f"user skills, so that copy silently replaces the shared one"
             )
+        # Asked after the symlink facts, which hold regardless of how the entry
+        # is spelled: a malformed entry must not be able to hide even its own
+        # shadowing, let alone anybody else's.
+        problems = entry_refusals(item)
+        if problems:
+            refusals.extend(problems)
+            continue
+        if scope_of(item) == "private":
+            continue
+        try:
+            hits = body_hits(canonical)
+        except SharedSkillsError as error:
+            refusals.append(str(error))
+            continue
+        if not hits:
+            continue
+        if item.get("body_neutral"):
+            failures.extend(
+                f"BODY-NOT-NEUTRAL {name}: {hit.file}:{hit.line} names "
+                f"{', '.join(f'`{token}`' for token in hit.tokens)} -- copied verbatim into "
+                f"another repo this line stops being true, so it belongs in that repo's "
+                f"binding, not in the shared body"
+                for hit in hits
+            )
+        else:
+            # Enforcement is opt-in per skill because most bodies have not been
+            # migrated yet: switching the rule on everywhere at once would make
+            # the gate red for work nobody has started, and a gate that is
+            # always red stops being read at all.
+            queue.append((name, hits))
+    if queue:
+        _print_queue(queue)
+    for failure in failures:
+        print(f"FAIL {failure}", file=sys.stderr)
+    for refusal in refusals:
+        # A word of its own, because "FAIL" would file an unanswerable question
+        # under the same heading as an answered one.
+        print(f"REFUSE {refusal}", file=sys.stderr)
     if failures:
-        for failure in failures:
-            print(f"FAIL {failure}", file=sys.stderr)
         return 1
-    print(f"PASS shared skills hold ({len(registry['shared'])} registered)")
+    if refusals:
+        # Above the queue and below a violation: nothing here is proven broken,
+        # but part of the tree was never judged, and a caller reading only the
+        # exit code must not be told it came back clean.
+        return CANNOT_EVALUATE
+    held = f"PASS shared skills hold ({len(registry['shared'])} registered)"
+    if queue:
+        # Not zero: an unmigrated body is an open question, and reporting it as
+        # clean would hide the queue from every caller that only reads the exit
+        # code. Not one either: nothing here is broken.
+        print(f"{held}; {len(queue)} bodies queued for neutralization")
+        return NOTHING_TO_DO
+    print(held)
     return 0
 
 
@@ -494,8 +736,12 @@ def main(argv: list[str] | None = None) -> int:
             args.backup_dir, args.dry_run, args.defer,
         )
     except SharedSkillsError as error:
-        print(f"FAIL {error}", file=sys.stderr)
-        return 1
+        # Every one of these means the same thing: the invariant could not be
+        # established from what was handed in. That is a refusal, not a verdict
+        # -- reporting it as 1 would claim a rule was checked and broken, and
+        # reporting it as 3 would claim somebody merely has yet to decide.
+        print(f"REFUSE {error}", file=sys.stderr)
+        return CANNOT_EVALUATE
 
 
 if __name__ == "__main__":

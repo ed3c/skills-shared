@@ -53,7 +53,37 @@ python3 $INFRA link <name>
 python3 $INFRA adopt <name> --from <path> --why "…" [--defer <repo>] [--dry-run]
 ```
 
-`check` exit 0 乾淨｜1 有裁決被違反；`report` exit 3 有待裁項（**待裁不是失敗**）。
+`check` exit 0 乾淨｜1 有裁決被違反｜3 有 body 尚未遷移的佇列｜4 **判不動**（registry 欄位
+不認得、body 讀不出來）；`report` exit 3 有待裁項（**待裁不是失敗**）。四個碼而不是三個：
+「我查了，沒問題」「我查了，違規」「還沒人裁」「我判不動」是四件事，任兩件塌成同一個數字，
+呼叫端就再也分不出來。`install` 只回答自己的問題（線接好了沒）——接好就 0，別人的遷移佇列
+開著也是 0；只有違規或判不動才非零，否則 clone 後第一道指令會讓每個 `set -e` 腳本停在那裡。
+
+## body／binding：一條可 grep 的判準
+
+> 原封不動搬到另一個 repo，它還為真嗎？不為真就是 binding。
+
+`check` 把這條判準做成機械閘：**scope 為 shared 的 skill body（`*.md`）不得出現具體 repo 名或
+絕對路徑**，命中即指名檔案與行號。token 清單的 SSOT 在
+[`scripts/shared_skills.py`](scripts/shared_skills.py)（`BINDING_REPOS`／`BINDING_PATHS`），
+本檔不複製——複製出來的規則遲早跟閘不一致。那份清單就是本閘的管轄範圍，所以
+`tests/verify.sh` 逐字釘死它：加一個或少一個 token 都會無聲移動遷移基線，那是人要裁的事，
+不是可以夾帶進 diff 的事。命中回報一律用**完整的 repo 名**：pattern 依 token 長度由長到短
+組裝，所以短 token 不可能把包含它的長 repo 名遮掉（遮掉會把人指向不是那一個的 repo），
+也因此 tuple 的書寫順序不帶任何意義、不得被依賴。
+
+| registry 欄位 | 預設 | 意義 |
+|---|---|---|
+| `scope` | `shared` | `private` 的 skill 本來就綁定其 owner，要求它中性化是無意義儀式——不適用本閘 |
+| `body_neutral` | 缺席 | 缺席或 `false`＝**尚未遷移**，列進 SURFACE 佇列；`true`＝已遷移，納入強制 |
+
+強制**逐 skill 開啟**是刻意的：現況多數 body 還沒遷移，一次全開會讓閘第一天就長紅，
+而長紅的閘沒有人讀。所以佇列走 exit 3（**尚未有人裁決**）、違規走 exit 1（**有裁決被違反**），
+兩者在輸出與退出碼上都長得不一樣。兩個欄位都**照裁決來讀，不猜**：`scope` 填了不認得的值、
+`body_neutral` 不是布林值、或 key 拼錯（`body_netural`），一律 REFUSE 走 exit 4——猜「預設
+shared」會讓一個 shared body 靜默豁免於唯一約束它的規則，而把拼錯的 key 讀成「缺席」，會讓一個
+已經下過的裁決永遠卡在佇列裡，沒有人看得出為什麼。REFUSE 是**逐條累加**的，不中斷本次巡檢：
+一個 entry 打錯字曾經會讓同一次 `check` 已經找到的違規全部不印出來。
 
 ## clone 下來怎麼接線
 

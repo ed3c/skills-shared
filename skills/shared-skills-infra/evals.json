@@ -1,0 +1,62 @@
+{
+  "skill_name": "shared-skills-infra",
+  "version": "1.1.0",
+  "_meta": {
+    "coverage_metric": "planted shadowing copy, stale symlink, repo-bound shared body, and unjudgeable registry entry detection",
+    "purpose": "Prove the shared-skills invariant fails closed with no network and no access to this machine's real skill tree; that a state nobody has ruled on yet never reports as a broken one; and that a state nobody can judge reports as neither.",
+    "fixtures": "Synthetic world built inside tests/verify.sh: its own shared repo, its own user surfaces, its own subscriber repos. Fixtures are sections of that world rather than directories, because every case here is about how several trees relate, not about one file's contents. Two properties no fixture tree can express -- the gate's jurisdiction and its independence from filesystem ordering -- are asserted against the module itself in §7b3.",
+    "claims_are_tested": "Every line in a `covers` list names the section that would fail if the guard behind it were deleted. A claim with no such section does not belong here."
+  },
+  "runnable": [
+    {
+      "id": "SHARED-1",
+      "checker_script": "scripts/shared_skills.py",
+      "test_verify": "tests/verify.sh",
+      "good_fixture": "tests/verify.sh §4 demo-skill reached through symlinks on every surface",
+      "hollow_fixture": "tests/verify.sh §3 demo-skill with a rival copy planted in repoA/.claude/skills",
+      "covers": [
+        "a registered shared skill with no user-level symlink fails as NOT-A-SYMLINK (§1)",
+        "a subscriber's own copy of a shared name fails as SHADOWED; a symlink is a pointer, not a shadow (§3, §4)",
+        "an unruled duplicate exits 3 from report and never turns check red (§5)",
+        "adopt sweeps every rival entry to a backup and never deletes one (§5b, §5c)",
+        "moving the checkout fails loudly as WRONG-TARGET instead of resolving elsewhere (§6)"
+      ],
+      "expected": "good PASS shared skills hold; hollow FAIL naming the surface that shadows"
+    },
+    {
+      "id": "SHARED-2",
+      "checker_script": "scripts/shared_skills.py",
+      "test_verify": "tests/verify.sh",
+      "good_fixture": "tests/verify.sh §7a neutral-skill: a method-only body under enforcement (body_neutral: true)",
+      "hollow_fixture": "tests/verify.sh §7c bound-skill: the same shape under the same enforcement, naming a repo on lines 4 and 7 and an absolute path on line 6",
+      "covers": [
+        "an enforced body that names a repo or an absolute path fails at exit 1, naming file and line for every offending line and no others (§7c)",
+        "a private-scope skill naming its own owner does not trigger the rule at all (§7a, §7b)",
+        "an unmigrated body is a queue entry at exit 3, not a failure at exit 1 (§7b)",
+        "the two subtotals are counted per rule and overlap where one line binds both ways, which is what makes the issue's baseline reproducible by grep (§7b: 5 repo-name lines + 3 path lines over 6 total)",
+        "the queue's counts are reproducible: same tree, byte-identical report (§7b)",
+        "the report is ordered by a sort and not by the order the filesystem returns files, asserted by feeding body_hits a reversed directory listing (§7b3)",
+        "a hit is filed under the whole repo name it matched: the pattern is built longest-token-first, so a prefix token cannot shadow a longer one and the order the tuples are written in carries no meaning (§7b3)",
+        "the enforced token set is exactly issue #4's ruling, pinned literally, because widening it moves the recorded migration baseline (§7b3)"
+      ],
+      "expected": "good PASS shared skills hold; queued SURFACE BODY-NOT-NEUTRAL at exit 3; hollow FAIL BODY-NOT-NEUTRAL naming skills/bound-skill/SKILL.md:4"
+    },
+    {
+      "id": "SHARED-3",
+      "checker_script": "scripts/shared_skills.py",
+      "test_verify": "tests/verify.sh",
+      "good_fixture": "tests/verify.sh §7f bound-skill with an explicit \"body_neutral\": false -- a ruling that says 'not yet', which must read exactly like the queue and exit 3",
+      "hollow_fixture": "tests/verify.sh §7g/§7g2/§7h/§7i registry entries nobody can judge: a misspelt key, a quoted boolean, a body that will not decode, an entry with no name",
+      "covers": [
+        "an unrecognised scope is refused rather than defaulted to shared, at exit 4 -- its own code, because check legitimately answers 3 and 'your registry is broken' must not arrive as 'somebody still has to rule' (§7d)",
+        "a misspelt registry key is refused, not read as an absent ruling that would strand a migrated body in the queue forever (§7g)",
+        "body_neutral must be a boolean: false queues, a quoted \"true\" is refused instead of switching enforcement on for a body nobody ruled on (§7f, §7g2)",
+        "a body that cannot be decoded is refused at exit 4 with a sentence naming the next move, never counted as neutral (§7h)",
+        "an entry with no name is refused at exit 4 with a sentence, not a KeyError traceback (§7i)",
+        "refusals accumulate instead of raising: one malformed entry never deletes the violations the same run already found, and a real violation still outranks a refusal in the exit code (§7e)",
+        "install exits on its own question -- 0 with somebody else's migration queue open, 1 when the wiring it just performed does not hold (§8)"
+      ],
+      "expected": "not-yet ruling exits 3 like the queue; every unjudgeable entry exits 4 with REFUSE naming what to do; install exits 0 with a queue and 1 with a shadow"
+    }
+  ]
+}

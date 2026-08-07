@@ -139,4 +139,393 @@ python3 "${moved_script}" check --sites "${sites}" | grep -q "PASS shared skills
 # alias, not a difference in where the link points.
 test "$(realpath "${world}/surfaces/codex/demo-skill")" = "$(realpath "${moved}/skills/demo-skill")"
 
+# 7. body-not-neutral: the shared body is only shared if it survives being
+#    copied verbatim into another repo. A paragraph that names one repo, or a
+#    home-anchored path, is binding wearing body's clothes -- it becomes false
+#    in place the moment a second repo reads it. Enforcement is per skill on
+#    purpose: today's tree is mostly unmigrated, and a gate that is red on day
+#    one is a gate that gets switched off.
+shared="${moved}"                  # section 6 left the live clone here
+script="${moved_script}"           # `run` resolves both at call time
+
+mkdir -p "${shared}/skills/neutral-skill/modules" \
+         "${shared}/skills/private-skill" \
+         "${shared}/skills/queued-skill/modules" \
+         "${shared}/skills/queued-home-skill" \
+         "${shared}/skills/bound-skill" \
+         "${shared}/skills/broken-skill"
+
+printf -- '---\nname: neutral-skill\n---\nMethod and contract only; every path arrives by flag.\n' \
+  > "${shared}/skills/neutral-skill/SKILL.md"
+printf -- '# method\n\nAsk of each line: copied into another repo, is it still true?\n' \
+  > "${shared}/skills/neutral-skill/modules/method.md"
+
+printf -- '---\nname: private-skill\n---\nOwned by ix-agy; the device surface lives under ~/Library.\n' \
+  > "${shared}/skills/private-skill/SKILL.md"
+
+# three offending lines over two files, every one of them a repo name alone
+printf -- '---\nname: queued-skill\n---\nUpstream is the antigravity skill of the same name.\nRetargeting into ix-agy changes the paths.\n' \
+  > "${shared}/skills/queued-skill/SKILL.md"
+printf -- '# retarget\n\nSource: bettor-arena\n' \
+  > "${shared}/skills/queued-skill/modules/retarget-map.md"
+
+# three more lines in one file, mixing the two rules on purpose: line 4 leads
+# with a repo name and ends with an absolute path, line 5 the other way round, 6
+# is a path alone. The subtotals below only come out right if every token on a
+# line is counted under its own rule; counting one token per line, or hardcoding
+# the path subtotal, lands on numbers this file names and would reject.
+printf -- '---\nname: queued-home-skill\n---\nThe antigravity operator installs it under ~/.agents/skills.\n~/.claude/skills mirrors whatever ix-agy publishes.\n~/Library holds the device cache and binds nothing else.\n' \
+  > "${shared}/skills/queued-home-skill/SKILL.md"
+
+# lines 4, 6 and 7 offend; line 5 does not, so the gate has to name three
+printf -- '---\nname: bound-skill\n---\nThe pipeline standard here follows skill-bettor.\nA sentence that binds nothing.\nInstalled under ~/.agents/skills.\nThe same holds in ts-skill-bettor.\n' \
+  > "${shared}/skills/bound-skill/SKILL.md"
+
+# a body that cannot be decoded at all: not neutral, not bound -- unjudgeable
+printf -- '---\nname: broken-skill\n---\nbinding? \xff\xfe nobody can tell\n' \
+  > "${shared}/skills/broken-skill/SKILL.md"
+
+write_registry() { cat > "${shared}/registry.json"; }
+for fixture in neutral-skill private-skill queued-skill queued-home-skill \
+               bound-skill broken-skill; do
+  run link "${fixture}" > /dev/null
+done
+
+# 7a. good fixture: a neutral body under enforcement passes, and a private
+#     skill naming its own owner is not the rule's business at all.
+write_registry <<'JSON'
+{
+  "schema": "shared-skills-registry/v2",
+  "canonical_root": "skills",
+  "shared": [
+    {"name": "demo-skill", "admitted": "2026-08-07", "why": "fixture"},
+    {"name": "neutral-skill", "admitted": "2026-08-07", "why": "fixture", "body_neutral": true},
+    {"name": "private-skill", "admitted": "2026-08-07", "why": "fixture",
+     "scope": "private", "body_neutral": true}
+  ],
+  "repo_owned": []
+}
+JSON
+run check > "${world}/7a.out"
+grep -q "PASS shared skills hold" "${world}/7a.out"
+! grep -q "BODY-NOT-NEUTRAL" "${world}/7a.out"
+
+# 7b. unmigrated: the same offending body is a queue entry, not a violation.
+#     Absence of a ruling must not read as breakage, so it exits 3 like every
+#     other unruled state here and names its own count.
+write_registry <<'JSON'
+{
+  "schema": "shared-skills-registry/v2",
+  "canonical_root": "skills",
+  "shared": [
+    {"name": "demo-skill", "admitted": "2026-08-07", "why": "fixture"},
+    {"name": "neutral-skill", "admitted": "2026-08-07", "why": "fixture", "body_neutral": true},
+    {"name": "private-skill", "admitted": "2026-08-07", "why": "fixture",
+     "scope": "private", "body_neutral": true},
+    {"name": "queued-skill", "admitted": "2026-08-07", "why": "fixture"},
+    {"name": "queued-home-skill", "admitted": "2026-08-07", "why": "fixture"}
+  ],
+  "repo_owned": []
+}
+JSON
+set +e
+run check > "${world}/7b.out" 2> "${world}/7b.err"
+queue_status=$?
+set -e
+test "${queue_status}" -eq 3                    # queued != violated
+grep -q "PASS shared skills hold" "${world}/7b.out"
+! grep -qE "^(FAIL|REFUSE)" "${world}/7b.err"
+grep -q "SURFACE BODY-NOT-NEUTRAL 6 lines in 3 files" "${world}/7b.out"
+grep -qE "queued-skill +3 lines in 2 files" "${world}/7b.out"
+grep -qE "queued-home-skill +3 lines in 1 files" "${world}/7b.out"
+# the two subtotals are what makes the issue's baseline reproducible, and they
+# overlap by design: 5 + 3 > 6 because two lines bind through both rules at
+# once. Each has to be the count grep would give for that rule on its own.
+grep -q "repo names 5 lines/3 files, absolute paths 3 lines/1 files" "${world}/7b.out"
+! grep -q "private-skill" "${world}/7b.out"     # private scope never enters the queue
+! grep -q "neutral-skill" "${world}/7b.out"
+
+# the count is the migration's baseline, so it has to be a measurement and not
+# a mood: same tree, byte-identical report.
+set +e
+run check > "${world}/7b2.out" 2>/dev/null
+set -e
+diff "${world}/7b.out" "${world}/7b2.out"
+
+# 7b3. Two guards no fixture tree can express, so they are asserted directly
+#      against the module: the gate's jurisdiction, and the fact that the report
+#      is ordered by a sort rather than by whatever order the filesystem hands
+#      files back. Running the same tree twice cannot see the second one -- one
+#      filesystem returns one order -- so the probe supplies the disorder.
+cat > "${world}/probe.py" <<'PY'
+import importlib.util
+import sys
+from pathlib import Path
+
+script = Path(sys.argv[1])
+spec = importlib.util.spec_from_file_location("shared_skills_under_test", script)
+module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(module)
+failures = []
+
+# The token set is issue #4's ruling, pinned literally: it decides which bodies
+# the gate can ever speak about, and widening or narrowing it silently moves the
+# recorded migration baseline underneath everyone reading the burn-down.
+expected = {"skill-bettor", "ts-skill-bettor", "bettor-arena", "antigravity",
+            "ix-agy", "~/", "/Users/"}
+actual = set(module.BINDING_REPOS) | set(module.BINDING_PATHS)
+if actual != expected:
+    failures.append(f"binding tokens drifted: {sorted(actual)} != {sorted(expected)}")
+
+# A hit must be filed under the whole repo name it matched. Alternation is
+# first-match-wins at each position, so a token that prefixes another there
+# would shadow it and send whoever works the queue to the wrong repo.
+shadowed = module.binding_pattern(("bettor", "bettor-arena")).findall("uses bettor-arena today")
+if shadowed != ["bettor-arena"]:
+    failures.append(f"a prefix token shadowed the whole repo name: {shadowed}")
+
+# ...and the property is structural, not an ordering somebody has to preserve:
+# every way of writing the tuples has to compile to the same pattern, or the
+# comment saying the order is inert is a claim nobody can check.
+if module.binding_pattern(tuple(sorted(actual))).pattern != module.BINDING.pattern:
+    failures.append("the pattern depends on the order its tokens are written in")
+
+real_rglob = Path.rglob
+Path.rglob = lambda self, pattern: reversed(list(real_rglob(self, pattern)))
+try:
+    order = [(hit.file, hit.line) for hit in module.body_hits(module.REPO / "skills" / "queued-skill")]
+finally:
+    Path.rglob = real_rglob
+if len(order) < 2 or order != sorted(order):
+    failures.append(f"body_hits reports in filesystem order, not sorted: {order}")
+
+for line in failures:
+    print(f"FAIL probe: {line}", file=sys.stderr)
+sys.exit(1 if failures else 0)
+PY
+python3 "${world}/probe.py" "${script}"
+
+# 7c. hollow fixture: the same content under enforcement fails, naming every
+#     offending line and nothing else.
+write_registry <<'JSON'
+{
+  "schema": "shared-skills-registry/v2",
+  "canonical_root": "skills",
+  "shared": [
+    {"name": "demo-skill", "admitted": "2026-08-07", "why": "fixture"},
+    {"name": "neutral-skill", "admitted": "2026-08-07", "why": "fixture", "body_neutral": true},
+    {"name": "private-skill", "admitted": "2026-08-07", "why": "fixture",
+     "scope": "private", "body_neutral": true},
+    {"name": "queued-skill", "admitted": "2026-08-07", "why": "fixture"},
+    {"name": "queued-home-skill", "admitted": "2026-08-07", "why": "fixture"},
+    {"name": "bound-skill", "admitted": "2026-08-07", "why": "fixture", "body_neutral": true}
+  ],
+  "repo_owned": []
+}
+JSON
+set +e
+run check >"${world}/7c.out" 2>"${world}/7c.err"
+bound_status=$?
+set -e
+test "${bound_status}" -eq 1                    # a violated ruling, and nothing else
+grep -q "FAIL BODY-NOT-NEUTRAL bound-skill: skills/bound-skill/SKILL.md:4" "${world}/7c.err"
+grep -q "skills/bound-skill/SKILL.md:6" "${world}/7c.err"
+grep -q "skills/bound-skill/SKILL.md:7" "${world}/7c.err"
+test "$(grep -c "FAIL BODY-NOT-NEUTRAL" "${world}/7c.err")" -eq 3
+grep -q "ts-skill-bettor" "${world}/7c.err"     # filed under the whole repo name it found
+grep -q "queued-skill" "${world}/7c.out"        # an unruled skill stays a queue entry
+
+# 7d. an unrecognised scope is a configuration error, not a default: guessing
+#     would silently exempt a shared body from the only rule that binds it.
+#     It gets its own exit code because `check` now legitimately answers 3 --
+#     "16 bodies await migration" and "your registry is broken so I judged
+#     nothing" must not arrive at a caller as the same number.
+write_registry <<'JSON'
+{
+  "schema": "shared-skills-registry/v2",
+  "canonical_root": "skills",
+  "shared": [
+    {"name": "demo-skill", "admitted": "2026-08-07", "why": "fixture", "scope": "public"}
+  ],
+  "repo_owned": []
+}
+JSON
+set +e
+run check >"${world}/7d.out" 2>"${world}/7d.err"
+scope_status=$?
+set -e
+test "${scope_status}" -eq 4                    # refused != violated, refused != unruled
+grep -q "^REFUSE demo-skill: unknown scope 'public'" "${world}/7d.err"
+! grep -q "^FAIL" "${world}/7d.err"
+
+# 7e. a refusal must not eat the verdicts already reached. Both refusal paths
+#     used to raise out of the accumulating loop, so a typo -- or one body that
+#     would not decode -- deleted every real violation found before it: the gate
+#     printed a single complaint and the broken symlink behind it was never
+#     named. All three findings have to survive each other, in one run.
+mv "${world}/surfaces/codex/demo-skill" "${world}/surfaces/codex/demo-skill.aside"
+write_registry <<'JSON'
+{
+  "schema": "shared-skills-registry/v2",
+  "canonical_root": "skills",
+  "shared": [
+    {"name": "demo-skill", "admitted": "2026-08-07", "why": "fixture"},
+    {"name": "bound-skill", "admitted": "2026-08-07", "why": "fixture", "scope": "publik"},
+    {"name": "broken-skill", "admitted": "2026-08-07", "why": "fixture"}
+  ],
+  "repo_owned": []
+}
+JSON
+set +e
+run check >"${world}/7e.out" 2>"${world}/7e.err"
+mixed_status=$?
+set -e
+test "${mixed_status}" -eq 1                    # a real violation outranks a refusal
+grep -q "FAIL NOT-A-SYMLINK demo-skill" "${world}/7e.err"
+grep -q "REFUSE bound-skill: unknown scope 'publik'" "${world}/7e.err"
+grep -q "REFUSE unreadable body: .*broken-skill" "${world}/7e.err"
+mv "${world}/surfaces/codex/demo-skill.aside" "${world}/surfaces/codex/demo-skill"
+
+# 7f. `body_neutral` is a ruling, so it is read as strictly as `scope` is.
+#     false means "not migrated" -- the same queue absence means -- and a
+#     misspelt key is refused rather than read as absence, or a body somebody
+#     already migrated would sit in the queue forever with nobody able to see
+#     why the gate never looked at it.
+write_registry <<'JSON'
+{
+  "schema": "shared-skills-registry/v2",
+  "canonical_root": "skills",
+  "shared": [
+    {"name": "demo-skill", "admitted": "2026-08-07", "why": "fixture"},
+    {"name": "bound-skill", "admitted": "2026-08-07", "why": "fixture", "body_neutral": false}
+  ],
+  "repo_owned": []
+}
+JSON
+set +e
+run check >"${world}/7f.out" 2>"${world}/7f.err"
+false_status=$?
+set -e
+test "${false_status}" -eq 3                    # explicit "not yet" == queue, not enforcement
+grep -qE "bound-skill +3 lines in 1 files" "${world}/7f.out"
+! grep -qE "^(FAIL|REFUSE)" "${world}/7f.err"
+
+write_registry <<'JSON'
+{
+  "schema": "shared-skills-registry/v2",
+  "canonical_root": "skills",
+  "shared": [
+    {"name": "demo-skill", "admitted": "2026-08-07", "why": "fixture"},
+    {"name": "bound-skill", "admitted": "2026-08-07", "why": "fixture", "body_netural": true}
+  ],
+  "repo_owned": []
+}
+JSON
+set +e
+run check >"${world}/7g.out" 2>"${world}/7g.err"
+typo_status=$?
+set -e
+test "${typo_status}" -eq 4
+grep -q "REFUSE bound-skill: unrecognised registry key(s) 'body_netural'" "${world}/7g.err"
+
+# a quoted "true" is the other half of the same mistake, and the dangerous
+# half: every non-empty string is truthy, so it would switch enforcement on for
+# a body nobody ruled on -- the exact inversion the per-skill opt-in prevents.
+write_registry <<'JSON'
+{
+  "schema": "shared-skills-registry/v2",
+  "canonical_root": "skills",
+  "shared": [
+    {"name": "demo-skill", "admitted": "2026-08-07", "why": "fixture"},
+    {"name": "bound-skill", "admitted": "2026-08-07", "why": "fixture", "body_neutral": "true"}
+  ],
+  "repo_owned": []
+}
+JSON
+set +e
+run check >"${world}/7g2.out" 2>"${world}/7g2.err"
+string_status=$?
+set -e
+test "${string_status}" -eq 4
+grep -q "REFUSE bound-skill: body_neutral is 'true'" "${world}/7g2.err"
+! grep -q "BODY-NOT-NEUTRAL bound-skill" "${world}/7g2.err"
+
+# 7h. a body nobody can decode is unjudgeable, not clean and not broken: it
+#     exits 4 and says what to do about it. Counting it neutral is exactly how
+#     a gate decays into decoration.
+write_registry <<'JSON'
+{
+  "schema": "shared-skills-registry/v2",
+  "canonical_root": "skills",
+  "shared": [
+    {"name": "demo-skill", "admitted": "2026-08-07", "why": "fixture"},
+    {"name": "broken-skill", "admitted": "2026-08-07", "why": "fixture"}
+  ],
+  "repo_owned": []
+}
+JSON
+set +e
+run check >"${world}/7h.out" 2>"${world}/7h.err"
+unreadable_status=$?
+set -e
+test "${unreadable_status}" -eq 4
+grep -q "REFUSE unreadable body: .*skills/broken-skill/SKILL.md" "${world}/7h.err"
+grep -q "re-save it as UTF-8" "${world}/7h.err"   # a sentence naming the next move
+! grep -q "SURFACE" "${world}/7h.out"             # never quietly counted as neutral
+
+# 7i. an entry with no name can only crash: every verb dereferences it. The
+#     top-level handler answers 4 for the same reason -- the invariant could not
+#     be established from the input, which is neither a verdict nor a to-do.
+write_registry <<'JSON'
+{
+  "schema": "shared-skills-registry/v2",
+  "canonical_root": "skills",
+  "shared": [{"admitted": "2026-08-07", "why": "somebody deleted the name"}],
+  "repo_owned": []
+}
+JSON
+set +e
+run check >"${world}/7i.out" 2>"${world}/7i.err"
+nameless_status=$?
+set -e
+test "${nameless_status}" -eq 4
+grep -q "REFUSE registry 'shared'\[0\] has no usable name" "${world}/7i.err"
+! grep -q "Traceback" "${world}/7i.err"
+
+# 8. install answers its own question. A fresh clone's first documented command
+#    must not exit non-zero because somebody else's migration queue is open --
+#    every `set -e` caller would stop there -- and it must still fail when the
+#    wiring it just performed does not hold.
+write_registry <<'JSON'
+{
+  "schema": "shared-skills-registry/v2",
+  "canonical_root": "skills",
+  "shared": [
+    {"name": "demo-skill", "admitted": "2026-08-07", "why": "fixture"},
+    {"name": "queued-skill", "admitted": "2026-08-07", "why": "fixture"}
+  ],
+  "repo_owned": []
+}
+JSON
+set +e
+run install > "${world}/8.out" 2>"${world}/8.err"
+install_status=$?
+set -e
+test "${install_status}" -eq 0                  # wired and linked, queue and all
+grep -q "^WIRED" "${world}/8.out"
+grep -q "SURFACE BODY-NOT-NEUTRAL" "${world}/8.out"   # reported, just not install's verdict
+
+mv "${world}/repoA/.claude/skills/demo-skill" "${world}/repoA/.claude/skills/demo-skill.aside"
+mkdir -p "${world}/repoA/.claude/skills/demo-skill"
+printf -- '---\nname: demo-skill\n---\nlocal fork\n' \
+  > "${world}/repoA/.claude/skills/demo-skill/SKILL.md"
+printf 'second file so it is a copy, not a forwarder\n' \
+  > "${world}/repoA/.claude/skills/demo-skill/notes.md"
+set +e
+run install > "${world}/8b.out" 2>"${world}/8b.err"
+shadow_status=$?
+set -e
+test "${shadow_status}" -eq 1                   # a violation still comes straight through
+grep -q "SHADOWED demo-skill" "${world}/8b.err"
+
 echo "PASS shared-skills gate"
