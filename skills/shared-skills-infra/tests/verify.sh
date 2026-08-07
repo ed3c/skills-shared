@@ -144,7 +144,20 @@ test -d "${adoptee}"        # dry-run moved nothing
 run adopt adopt-me --from "${adoptee}" --why fixture \
   --backup-dir "${world}/swept" > "${world}/5c.out"
 grep -q "^SWEPT" "${world}/5c.out"
-test ! -e "${adoptee}" && test ! -e "${rival}"
+# One statement each, never `test A && test B`: bash exempts the left operand of
+# a && list from set -e and from the ERR trap, so the first half could fail and
+# the suite would walk straight past it. It did -- the chain here asserted that
+# both paths were *absent*, which has never been true, because adopt sweeps the
+# rival and `link` then immediately re-points both project surfaces at
+# canonical. A dead assertion cannot report that it is also a wrong one. What
+# actually has to hold is that no real copy survives at either path: a pointer
+# is not a shadow, a directory full of bytes is.
+for swept_entry in "${adoptee}" "${rival}"; do
+  if test ! -L "${swept_entry}"; then
+    echo "FAIL: ${swept_entry} is not a symlink -- adopt left a real copy standing" >&2
+    exit 1
+  fi
+done
 test -f "${shared}/skills/adopt-me/SKILL.md"
 test -f "${world}/swept/adopt-me/repoA_.claude/SKILL.md"   # swept, not deleted
 test -L "${world}/surfaces/codex/adopt-me"                 # user surface untouched by sweep
@@ -347,7 +360,13 @@ attempt "${world}/8f.out" "${world}/8f.err" python3 "${script}" merge typeclash 
 test "${last_status}" -eq 1
 grep -q "^FAIL versions disagree about what 'modules' is" "${world}/8f.err"
 grep -q "rename one side" "${world}/8f.err"             # says what to do next
-! grep -q "Traceback" "${world}/8f.err"                 # a sentence, not a stack
+# `! grep -q ...` cannot turn this suite red: bash exempts a !-inverted command
+# from both set -e and the ERR trap, so the assertion that the refusal is a
+# sentence rather than a stack trace was decorative for as long as it stood.
+if grep -q "Traceback" "${world}/8f.err"; then
+  echo "FAIL: the type-clash refusal was a stack trace, not a sentence" >&2
+  exit 1
+fi
 test ! -e "${shared}/skills/.typeclash.merging"         # no wreckage
 test ! -e "${shared}/skills/typeclash"
 # and the refusal is repeatable: the first attempt must not poison the name
@@ -383,6 +402,43 @@ python3 "${script}" merge emptydir --from "${world}/e1" --from "${world}/e2" \
 grep -q "^NOTE .*emptydir/ is an empty directory in A" "${world}/8h.out"
 test -f "${shared}/skills/emptydir/SKILL.md"
 test ! -e "${shared}/skills/emptydir/emptydir"
+
+# 8i. a version whose subtree hangs off a DIRECTORY SYMLINK. The file walk starts
+#     at the version root and does not descend one; the empty-directory notice
+#     starts its walk AT the link and does. Two walkers, one tree, opposite
+#     answers -- and the loser was silence: every file under the link vanished
+#     under exit 0 with no NOTE, no CONFLICT and no FAIL, which refutes the one
+#     guarantee this verb sells. Refuse instead of following the link, because
+#     following it is itself a ruling (carry the link, or copy its target?).
+mkdir -p "${world}/s1" "${world}/s2" "${world}/s-target"
+printf -- '---\nname: symdir\n---\nsame\n' > "${world}/s1/SKILL.md"
+printf -- '---\nname: symdir\n---\nsame\n' > "${world}/s2/SKILL.md"
+printf 'only reachable through the directory symlink\n' > "${world}/s-target/port-map.md"
+ln -s "${world}/s-target" "${world}/s1/modules"
+attempt "${world}/8i.out" "${world}/8i.err" python3 "${script}" merge symdir \
+  --from "${world}/s1" --from "${world}/s2" --backup-dir "${world}/superseded"
+test "${last_status}" -eq 1                    # a dropped subtree is broken, not pending
+grep -q "reaches 'modules' through a directory symlink" "${world}/8i.err"
+grep -q "cp -RL" "${world}/8i.err"             # says what to do next
+if grep -q "Traceback" "${world}/8i.err"; then
+  echo "FAIL: the directory-symlink refusal was a stack trace, not a sentence" >&2
+  exit 1
+fi
+test ! -e "${shared}/skills/symdir"            # nothing published
+test ! -e "${shared}/skills/.symdir.merging"   # and no wreckage to block the retry
+
+# 8j. the recount must catch it too. Every count in the recount is content_files'
+#     own answer, so a defect in the enumeration layer is invisible to a recount
+#     built on it -- which is why the symlink audit uses os.walk instead and runs
+#     a second time inside the recount, over the paths argv named. Neuter the
+#     planner's refusal and the merge still has to fail rather than promote a
+#     union that quietly lost a subtree.
+blind="$(mutant blind_symlinks 's/^    _refuse_symlinked_dirs(versions)$/    pass/')"
+attempt "${world}/8j.out" "${world}/8j.err" python3 "${blind}" merge symdir-blind \
+  --from "${world}/s1" --from "${world}/s2" --backup-dir "${world}/superseded"
+test "${last_status}" -eq 1
+grep -q "^FAIL UNWALKED modules" "${world}/8j.err"
+test ! -e "${shared}/skills/symdir-blind"      # the blind union was never promoted
 
 # 9. relocatable: the checkout carries no absolute path of its own, so moving it
 #    anywhere and re-running install re-wires it. Symlinks store paths, so the

@@ -541,6 +541,58 @@ def _refuse_type_clash(inventory: dict[str, list[Version]]) -> None:
             )
 
 
+def _symlinked_dirs(root: Path) -> list[Path]:
+    """Every directory symlink inside a version, named without following one.
+
+    Deliberately `os.walk`, never `rglob`: rglob's refusal to descend a
+    directory symlink is the exact behaviour being audited here, so auditing it
+    with itself would reproduce the blind spot instead of finding it. os.walk
+    lists a symlinked directory in `dirnames` (is_dir follows the link) while
+    followlinks=False stops it from descending -- which is precisely "name it,
+    do not enter it". __pycache__ is pruned so the two walkers agree on scope:
+    the union never carries it, so a link to one loses nothing.
+    """
+    found: list[Path] = []
+    for parent, dirnames, _ in os.walk(root, followlinks=False):
+        dirnames[:] = [name for name in dirnames if name != "__pycache__"]
+        for name in sorted(dirnames):
+            entry = Path(parent) / name
+            if entry.is_symlink():
+                found.append(entry)
+    return found
+
+
+def _refuse_symlinked_dirs(sources: list[Version]) -> None:
+    """Refuse a version whose subtree hangs off a directory symlink.
+
+    The union walk starts at the version root and does not descend one, so
+    every file under the link is absent from the union -- while
+    `_uncarried_dirs` starts its walk AT the link, does descend, finds the
+    directory full and therefore says nothing. Two walkers disagreeing about
+    one tree, and the disagreement was silent: the subtree vanished under exit
+    0 with no NOTE, no CONFLICT and no FAIL. That is the shape of loss this
+    verb exists to prevent, reached through the one thing it never inspected.
+
+    Refusing is the ruling, rather than following the link, because following
+    it is itself a ruling this verb has no standing to make. Carrying the link
+    would write a machine-specific path into a versioned canonical that every
+    project reaches by symlink -- the one thing this checkout refuses to
+    version. Carrying the target's files would quietly turn a link into a copy,
+    so the next merge of the same pair would find the copy and the link's target
+    standing as two versions that now have to be diffed. Name it, write nothing,
+    and say which edit unblocks it.
+    """
+    for label, root in sources:
+        for entry in _symlinked_dirs(root):
+            raise SharedSkillsError(
+                f"{label} reaches '{entry.relative_to(root).as_posix()}' through a directory "
+                f"symlink -> {os.readlink(entry)}, and the union walk does not descend one, so "
+                f"every file under it would be dropped without a word. Nothing was written -- "
+                f"replace the link with a real directory in that version (`cp -RL`), or pass a "
+                f"version that already holds those files directly, then merge again"
+            )
+
+
 def _uncarried_dirs(sources: list[Version]) -> list[str]:
     """Name every directory the union will not carry, because it holds no file.
 
@@ -629,6 +681,7 @@ def _verify_union(
     """
     counted: dict[str, list[Version]] = {}
     seen: set[Path] = set()
+    failures: list[str] = []
     for path in [*sources, destination]:
         resolved = path.expanduser().resolve()
         if resolved in seen:
@@ -643,9 +696,18 @@ def _verify_union(
             )
         seen.add(resolved)
         label = _source_label(len(seen) - 1)
+        # Audited here as well as before the copy, and with a walker that is not
+        # content_files: every count below is content_files' own answer, so a
+        # defect in the enumeration layer is invisible to a recount built on it.
+        # A tree this walk cannot reach is not a small union, it is a wrong one.
+        for entry in _symlinked_dirs(resolved):
+            failures.append(
+                f"UNWALKED {entry.relative_to(resolved).as_posix()}: {label} reaches it through "
+                f"a directory symlink, which the file walk does not descend, so whatever it "
+                f"holds is absent from the union and no count here would have missed it"
+            )
         for file in content_files(resolved):
             counted.setdefault(file.relative_to(resolved).as_posix(), []).append((label, file))
-    failures: list[str] = []
     for relpath, versions in sorted(counted.items()):
         target = built / relpath
         if len({file_digest(file) for _, file in versions}) > 1:
@@ -694,6 +756,7 @@ def merge(
     """
     destination = canonical_path(registry, name)
     versions = _resolve_sources(sources, destination)
+    _refuse_symlinked_dirs(versions)
     inventory = _inventory(versions)
     _refuse_type_clash(inventory)
     take, conflicts = _classify(inventory)

@@ -1,8 +1,8 @@
 {
   "skill_name": "shared-skills-infra",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "_meta": {
-    "coverage_metric": "planted shadowing copy, stale symlink target, and five planted merge defects: a union-shrinking walk, a lost --from, a swallowed disagreement, corrupted bytes, and a backup collision",
+    "coverage_metric": "planted shadowing copy, stale symlink target, and six planted merge defects: a union-shrinking walk, a lost --from, a swallowed disagreement, corrupted bytes, a backup collision, and a blinded directory-symlink audit",
     "purpose": "Prove that shadowing fails loudly, that an unruled duplicate is not a failure, and that a union merge cannot drop, overwrite, auto-select or silently corrupt a file -- all without network access.",
     "asserted_by": "Every covers entry carries the literal string that must appear in tests/verify.sh, and the suite fails if one is missing. It is an anti-drift anchor, not a semantic proof: it guarantees a claim cannot outlive the case that backs it, while the proof that each case is load-bearing is the planted defect it is built around."
   },
@@ -42,7 +42,7 @@
       "checker_script": "scripts/shared_skills.py",
       "test_verify": "tests/verify.sh",
       "good_fixture": "three versions of one skill, each carrying a file the other two lack, plus a canonical destination holding a fourth",
-      "hollow_fixture": "four patched copies of the script: one that walks only the first version, one that loses the last --from while parsing it, one that files a disagreement as agreement, and one that writes bytes no version carries",
+      "hollow_fixture": "five patched copies of the script: one that walks only the first version, one that loses the last --from while parsing it, one that files a disagreement as agreement, one that writes bytes no version carries, and one whose directory-symlink audit is neutered so only the recount can catch it",
       "covers": [
         {
           "claim": "a file only one version carries is in the union, whichever version has it",
@@ -111,6 +111,14 @@
         {
           "claim": "a directory no version fills with a file is reported as not carried, instead of disappearing under exit 0",
           "asserted_by": "is an empty directory in A"
+        },
+        {
+          "claim": "a subtree reached through a directory symlink is refused before anything is written, rather than dropped under exit 0 because the file walk will not descend a link the empty-directory notice does",
+          "asserted_by": "grep -q \"reaches 'modules' through a directory symlink\""
+        },
+        {
+          "claim": "that refusal is audited by a walker the recount does not share, so neutering it in the planner still fails the merge instead of publishing a union that lost a subtree",
+          "asserted_by": "grep -q \"^FAIL UNWALKED modules\""
         }
       ],
       "expected": "good UNION with every solo file present; each planted defect DROPPED/UNREPORTED/ALTERED exit 1 with canonical untouched; conflicts exit 3 with the report; nothing to fold exit 3"
