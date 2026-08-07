@@ -8,7 +8,7 @@ description: |
   wiki 敘述修訂、解決方案文件審視、把縮寫落地。
   何時用：一份給人看的決策／規格／計畫文件寫完後，或被人反映「看不懂為什麼」時。
   NOT for：程式碼審查（用 code-review）；把經驗折回既有結構（用 fold-in）；
-  造新 skill 的規範（用 antigravity-skill-authoring）；產 HTML 交付包（用 html-for-decisions）。
+  造新 skill 的規範（用該 repo 自己的 skill-authoring 或內建 write-a-skill）；產 HTML 交付包（用 html-for-decisions）。
   四條機械規則在 scripts/，人判斷的部分在本檔 §4。
 ---
 

@@ -16,7 +16,7 @@ description: |
 > **非** Layer A/B 抽象軸
 > (見 [fold-in](../fold-in/SKILL.md) 的 SKILL.md/modules 分層用法)
 > ——詳 [modules/know-why.md](modules/know-why.md)。
-> **Lineage**:移植自 antigravity `.agents/skills/path-b-reduction/`
+> **Lineage**:移植鏈帳本在各 repo 的 `.skill-bindings/path-b-reduction/`;上游
 > (其本身 port 自 northstar `path-b-semantic-reduction-engine.md`)。
 > 方法論本身跨平台通用,無需 retarget 核心程序;
 > 逐項調整見 `.skill-bindings/path-b-reduction/retarget-map.md`。

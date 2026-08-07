@@ -11,7 +11,7 @@ description: |
 
 # Skill: loop-harness-standard — 大小迴圈成對八大基座設計標準
 
-> **Role**:skill-bettor 大小迴圈的基座標準——
+> **Role**:大小迴圈的基座標準——
 > 建 macro control plane 或一條 `loop_wiki/evolve-<family>-<op>/` 沙盒、選 driver、
 > 分層 verify、把單體 skill 轉沙盒化。
 > 改基座、加 hook、升驗證器前先對照本圖組件與不變量。

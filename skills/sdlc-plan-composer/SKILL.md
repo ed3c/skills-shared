@@ -1,7 +1,7 @@
 ---
 name: sdlc-plan-composer
 description: |
-  Stateful SDLC plan composer for multi-stage planning work in skill-bettor. Use when a task must be planned before execution and the plan needs explicit routing through intent alignment, brownfield invariant extraction, vertical slicing, interface design, execution actor selection, and validation contracts. This skill is a recipe-not-engine workflow，it writes decision-complete plan artifacts, route ledgers, and handoff contracts; it does not implement code, auto-run delegated skills, or invent replacement logic for existing atomic skills. It routes to repo-agent-native, unknown-discovery-composer, to-prd, to-issues, design-an-interface, code-review, judge-loop-chooser, autoresearch-composer, tdd, diagnose, handoff, Codex, agy, Opus fresh judges, and mechanical scripts according to explicit semantic gates.
+  Stateful SDLC plan composer for multi-stage planning work. Use when a task must be planned before execution and the plan needs explicit routing through intent alignment, brownfield invariant extraction, vertical slicing, interface design, execution actor selection, and validation contracts. This skill is a recipe-not-engine workflow，it writes decision-complete plan artifacts, route ledgers, and handoff contracts; it does not implement code, auto-run delegated skills, or invent replacement logic for existing atomic skills. It routes to repo-agent-native, unknown-discovery-composer, to-prd, to-issues, design-an-interface, code-review, judge-loop-chooser, autoresearch-composer, tdd, diagnose, handoff, Codex, agy, Opus fresh judges, and mechanical scripts according to explicit semantic gates.
 ---
 # sdlc-plan-composer
 ## Role

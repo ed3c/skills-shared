@@ -7,7 +7,7 @@ description: |
   passive-context 混雜／效益疊加／Goodhart 逃逸＋fold-back／驗證器經濟學)。
   findings-only、每 claim 帶確定性錨、admit 永遠是人。fresh-session＝評審隔離(同家族靠新 session
   零上下文達獨立、跨家族天然)。
-  何時用:要把 skill-bettor 的一次演化小迴圈架構 review/audit/優化派給獨立新 session reviewer 時。
+  何時用:要把一次演化小迴圈架構 review/audit/優化派給獨立新 session reviewer 時。
   觸發詞:交接架構評審、reviewer handoff、fresh-session 獨立審計、八大基座 review、
   loop-harness 優化交接、審計維度 checklist、loop-harness-review-handoff。
   NOT for:跑迴圈本身(直接用 loop_wiki/engine.sh,無專屬 skill 包裝)、選驗證標準＋獨立性 tier
@@ -22,7 +22,7 @@ description: |
 > 派給獨立 **fresh-session reviewer**
 > (Fable 5＝設計/高推理架構評審／Opus＝裁決;
 > agy 不當判官[Gemini only])
-> 獨立審計與優化 skill-bettor 演化小迴圈的八大基座。
+> 獨立審計與優化演化小迴圈的八大基座。
 > 輸出 **findings-only**,**admit＝人**。
 >
 > **結構**:SKILL.md ＝ 6 步確定性程序＋5 條不變量＋Gotchas;

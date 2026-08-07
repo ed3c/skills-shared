@@ -6,7 +6,7 @@ description: |
   從源碼提三類不變量（Message／State／API Contract）＋負向不變量（確認不存在的假設），並以「破盒推論」從未
   索引的 outgoing call 推導隱含依賴（未索引服務／共享狀態耦合／靜默失敗鏈／逾時鏈）。每個事實帶 Evidence
   Level（A／A-／B+／B／C／D）＋source_ref（檔案路徑＋行號），無錨的散文不寫進計劃。輸出落
-  docs/plans/<date>-<topic>/invariants/<slug>/<page>.md——skill-bettor 雖有本地 `indexing/` lane，但本 workflow
+  docs/plans/<date>-<topic>/invariants/<slug>/<page>.md——即使 repo 有本地 indexing lane，本 workflow
   不以 KG／ChromaDB／`rag-local` 當 sink，檔案本身即產物。是 sdlc-plan-composer 的 S-1 brownfield
   前置的自動抽取 delegate，取代其手動盤點程序。
   附帶 Codebase Design Mastery／Specs-as-Code 選配深層（8 條 implicit-design probe＋evaluator-first，
@@ -14,28 +14,17 @@ description: |
   觸發詞：不變量抽取、source-anchored、Evidence Level、破盒推論、implicit dependency、brownfield 前置
   盤點、repo-agent-native、codebase mastery、specs-as-code。
   NOT for：產 repo 理解 wiki(用本地 repo-wiki-converge)；診斷反覆失敗的黑盒
-  (skill-bettor 無 repo-fullstack-debugger，退回內建 diagnose／diagnosing-bugs)；外部框架／版本能力
+  (repo 若無 repo-fullstack-debugger，退回內建 diagnose／diagnosing-bugs)；外部框架／版本能力
   claim 查證(用本地 external-verify)。
 ---
 
-# repo-agent-native（skill-bettor）
+# repo-agent-native
 
-> **這是 antigravity `repo-agent-native` 的 skill-bettor retarget，不是原樣搬**
-> （antigravity 版本身已是
-> northstar `repo-agent-native` 的 retarget——這是 northstar→
-> antigravity→skill-bettor 這條鏈的**第三環**，
-> 上一環帳本見 antigravity
-> `.agents/skills/repo-agent-native/modules/retarget-map.md`
-> ，本檔不重抄，只承
-> antigravity→skill-bettor 這一段）。
-> 命門＝抽取核心(9 階段／三類不變量／破盒推論／Evidence Level／
-> source_ref 鐵律)一對一映；antigravity 專屬 sink 層(KG 入庫
-> `indexing.ingest_repodoc_cli`／RepoDoc／
-> ChromaDB)**不接入本 workflow**，改寫純 markdown 落
-> `docs/plans/<date>-<topic>/`(本 repo 現有 `indexing/` lane，但本 skill 無 KG sink 契約，見下方
-> §Output Contract 的設計理由)；antigravity 兩個 cross-reference 目標(
-> `repo-wiki-converge`／
-> `repo-fullstack-debugger`)中，前者已有本地 port，後者仍無本地基座 →
+> **命門＝抽取核心**(9 階段／三類不變量／破盒推論／Evidence Level／source_ref 鐵律)。
+> **無 KG sink**：不接 `indexing.ingest_repodoc_cli`／RepoDoc／ChromaDB 那類入庫層，改寫純
+> markdown 落 `docs/plans/<date>-<topic>/`——即使 repo 有自己的 indexing lane 也一樣，理由見下方
+> §Output Contract。
+> 各 repo 的移植鏈帳本（哪些 cross-reference 目標在本地有基座、哪些沒有）在
 > `.skill-bindings/repo-agent-native/retarget-map.md`。
 > know-why(破盒推論五步／OPBE／Evidence Level
 > 分級細節) →

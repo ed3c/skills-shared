@@ -9,10 +9,10 @@ description: |
   NOT for：一般本地 bug(用 diagnose／systematic-debugging)、源碼靜態已可 A 級解析(用 repo-agent-native)、跑管線本體(用 dr-research-loop)。
 ---
 
-> **這是 northstar `repo-fullstack-debugger` 的 antigravity retarget，不是原樣搬。** 命門＝L0-L4 trace-driven 診斷紀律一對一映(且回到它的原生 domain——本 skill 源自 Autobrowse／site-debugger 瀏覽器代理研究)；北極星專屬基座(L1 Self-Mutation Mode M0-M5／`skill_optimizer.py`／`hallucination_audit.py`／ixsecurity-e2e 協作者／PG-RFD 編號)**無基座已拿掉並記錄** → `modules/retarget-map.md`。L2 雙象限 know-why → [`modules/l2-quadrants.md`](modules/l2-quadrants.md)。
+> **這不是上游 `repo-fullstack-debugger` 的原樣搬。** 命門＝L0-L4 trace-driven 診斷紀律一對一映(且回到它的原生 domain——本 skill 源自 Autobrowse／site-debugger 瀏覽器代理研究)；北極星專屬基座(L1 Self-Mutation Mode M0-M5／`skill_optimizer.py`／`hallucination_audit.py`／ixsecurity-e2e 協作者／PG-RFD 編號)**無基座已拿掉並記錄** → `modules/retarget-map.md`。L2 雙象限 know-why → [`modules/l2-quadrants.md`](modules/l2-quadrants.md)。
 > **Diagnoser 本質**：它**不**自己跑瀏覽器／repo 執行——它接管協作者的**失敗** run，從 trace 診斷，交回一份修好的 playbook。Harness 不動，改的是 playbook 配置。
 
-# repo-fullstack-debugger(antigravity)
+# repo-fullstack-debugger
 
 ## When to Use
 **只有在**一個更便宜、更確定性的協作者已經試過且卡住之後才動用：

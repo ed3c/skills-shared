@@ -3,7 +3,7 @@ name: dr-research-loop
 description: |
   DR proposal 迴圈 owner——把一題「skill 變現情報」研究(市場/ROI/授權雙軌/巨頭訊號/頭部創作者/
   平台規範/技術實作等價物)跑成 proposals/YYYY-MM-DD-<topic>.md 並走完 T0 四閘+人 admit 時使用。
-  運行模式承 antigravity dr-research-loop(研究漏斗:主研→覆蓋稽核→gap fan-out),驗證骨架承
+  運行模式＝研究漏斗(主研→覆蓋稽核→gap fan-out),驗證骨架承
   本 repo 八大基座(loop_wiki/_template_dr+engine.sh)。
   觸發詞:DR 批次、deep research 選題、proposal 迴圈、變現情報、skill 市場研究、dr-research-loop。
   NOT for:選驗證標準/獨立性 tier(judge-loop-chooser);查證單一外部 claim(external-verify);
@@ -23,7 +23,7 @@ description: |
 > - schema SSOT=root `proposals/README.md`
 > - 題庫=`proposals/QUEUE.md`
 >
-> **Lineage**:遷移自 antigravity `.agents/skills/dr-research-loop/` 的**運行模式**
+> **Lineage**:上游帳本在各 repo 的 `.skill-bindings/dr-research-loop/`。承的是**運行模式**
 > (研究對象從 YouTube 影片 retarget 為 skill 變現情報;
 > driver 從瀏覽器自動化 retarget 為 agy/claude/subagent)——
 > 逐機制映射與拿掉了什麼見 `.skill-bindings/dr-research-loop/retarget-map.md`。

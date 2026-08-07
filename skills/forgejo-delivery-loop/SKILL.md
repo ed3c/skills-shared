@@ -16,10 +16,9 @@ description: |
 # forgejo-delivery-loop — 小迴圈產出 ↔ Forgejo 追蹤面的物理閉環
 
 > 完整前因後果、機制圖、重靶帳與維護方式 → [modules/delivery-mechanism.md](modules/delivery-mechanism.md)
-> (低壓縮全資訊版;本檔只放操作面)。移植自 skill-bettor 的 `github-delivery-loop`,**整條重靶
+> (低壓縮全資訊版;本檔只放操作面)。移植自 `github-delivery-loop`,**整條重靶
 > 本地 Forgejo,零雲端 GitHub**(人裁 2026-08-06);逐機制對照見該模組 §7。
-> 首個活實例＝本 repo 的遷移線:PRD `neon/bettor-arena#2`＋slice issues #3–#27＋
-> milestone「bettor-arena migration (PRD #2)」。
+> 各 repo 的線、PRD 與 milestone 登記在它自己的 `.skill-bindings/forgejo-delivery-loop/registry.json`。
 
 ## 四層原生儀表板(Forgejo 端的追蹤形狀)
 

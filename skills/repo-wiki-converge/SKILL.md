@@ -14,7 +14,7 @@ description: |
 
 # Skill: repo-wiki-converge — 任意 repo → Opus 級 wiki（Opus 判官 × Gemini 作者 judge-loop）
 
-> **Role**: 對一個**可讀的 repo**，用「便宜 Gemini 作者 + Opus 判官」迴圈產出 Opus 級理解 wiki 並進 skill-bettor KB / RepoDoc lane。
+> **Role**: 對一個**可讀的 repo**，用「便宜 Gemini 作者 + Opus 判官」迴圈產出 Opus 級理解 wiki 並進 KB / RepoDoc lane。
 >   Gemini 海量讀碼/寫頁/照缺口精修（免費、由人起火），Opus 對 ground truth 逐 claim 驗證、定完成標準、
 >   認證收斂。**收斂 = Opus 判官認證，不是作者自己說了算。**
 > **結構**: SKILL.md = 一鍵收斂流程（確定性步驟）+ 不變量 + Gotchas；agy／Opus／openwiki 執行 know-why、

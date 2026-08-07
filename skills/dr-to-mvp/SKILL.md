@@ -2,7 +2,7 @@
 name: dr-to-mvp
 description: |
   把「研究問題／DR 語料／已驗基底」冷啟動成全新 families/<f> 畢業 MVP 時使用。這是
-  skill-bettor 的 stateful workflow 脊椎：先 match 意圖與輸入狀態，再生成可信基底、gap
+  冷啟動用的 stateful workflow 脊椎：先 match 意圖與輸入狀態，再生成可信基底、gap
   收斂、MVP 小迴圈、畢業 homing；每段都有 conditional edge、grounding 標籤、actor、
   validator、SURFACE 人閘。NOT for：既有家族日常演化(product-ops)、只跑 DR proposal
   (dr-research-loop)、只建小迴圈(loop-harness-standard)、只選判官(judge-loop-chooser)。

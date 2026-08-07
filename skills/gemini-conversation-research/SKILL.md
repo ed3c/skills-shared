@@ -4,14 +4,16 @@ description: |
   研究 Gemini 對話（不是 YouTube 影片）時使用 — 給定一個 Gemini/AI Studio 對話 URL 或一個研究主題，
   把對話的隱性知識結構化、只把真缺口送 Deep Research、迭代到知識點全覆蓋。11 階段 rigid pipeline
   （S0 抽取 → S1 脈絡分析 → S1.5 同對話追問 → S2 分診 → S3 DR → S4 存檔 → S7 覆蓋比對 → S8 multi-DR → S9 落地）
-  ＋ 雙模式（Mode A URL 抽取 / Mode B 主動 Context-QA）。DR 投遞與抽取複用 antigravity 既有引擎，不重造。
+  ＋ 雙模式（Mode A URL 抽取 / Mode B 主動 Context-QA）。DR 投遞與抽取複用既有外部引擎，不重造。
   觸發詞：研究這個 Gemini 對話、分析 Gemini 對話脈絡、用 Gemini 研究某主題、Gemini DR、對話知識全覆蓋、
   exhaustive extraction、對話知識萃取。
 ---
 
-# Skill: Gemini 對話研究管線（skill-bettor 版；port 自 antigravity `gemini-conversation-research`）
+# Skill: Gemini 對話研究管線
 
-> **skill-bettor port note (2026-07-23)**: 本 skill 複製自 `/Users/neon/antigravity/.agents/skills/gemini-conversation-research`。在 skill-bettor 內，`/Users/neon/antigravity` 是來源證據與外部執行經驗，不是隱含本地基座。能在 skill-bettor 內 production 化的部分必須落到 `.claude/skills/`、`loop_wiki/evolve-unknown-discovery-plan-truth/templates/gemini-conversation-research/`、golden cases、validator、plan-package gates。任何仍依賴 antigravity browser/KG/DR engine 的步驟都必須標 `external_engine_required`，禁止宣稱本 repo 已可直接執行。
+> **外部引擎誠實標記**: DR 投遞與抽取靠一個外部瀏覽器／DR 引擎，那不是本 skill 自帶的基座。任何仍
+> 依賴它的步驟都必須標 `external_engine_required`，**禁止宣稱本 repo 已可直接執行**。引擎在哪、
+> 本 repo production 化到哪一步，記在該 repo 的 `.skill-bindings/gemini-conversation-research/`。
 
 > **Role**: 把一個 Gemini 對話（高密度認知結晶：主題脈絡 / 認知遞進 / Q&A 邏輯 / 結論框架 / 知識缺口）結構化，
 >   **只把缺口送 DR**、其餘直接存檔，迭代到知識點全覆蓋。與 [dr-research-loop](../dr-research-loop/SKILL.md) **正交**——
@@ -19,11 +21,11 @@ description: |
 > **結構**: SKILL.md = 11 階段架構 + 每階段編排 know-how（1-2 行 + 指針）；逐階段 how-to / checkpoint / 子代理模板在 `modules/`。
 > **SSOT / 活基座分級（本地可跑 vs 外部引擎，這是本 port「非 husk」的鐵錨）**:
 >   - DR 投遞 + 抽取引擎 = `automate.js` 的 `runDrOnce`(256) + `ui.js` 的 `runGeminiDeepResearch`(906) / `runGeminiDeepResearchAttempt`(924) + `data.js` 的 `extractReportHtmlInBrowser`(24) / `htmlToMarkdown`(17)（cc-20260712 核實：舊引註「automate.js:1364/1383/2287/43」是 state.js／data.js／ui.js 拆分前的殘留行號，automate.js 現僅 290 行、純調度層——已修正）。**gcr 不重造 DR monitor+retry**（northstar 曾重造 = 滯後複製，實證間歇卡；見 `.skill-bindings/gemini-conversation-research/retarget-map.md`）。
->   - DR 報告 → 保真 Markdown：extension Chrome 用 repo-root browser adapter；獨立 CDP extractor 仍是 `gemini-deep-research-extract`（skill-bettor 未隨本次複製，CDP 路徑缺它時標 `external_engine_required`）。
+>   - DR 報告 → 保真 Markdown：extension Chrome 用 repo-root browser adapter；獨立 CDP extractor 仍是 `gemini-deep-research-extract`（不隨本 skill 走，CDP 路徑缺它時標 `external_engine_required`）。
 >   - 反幻覺 / 外部查證 = [external-verify](../external-verify/SKILL.md)（S2 DR prompt 硬化 + 事後逐 claim 查證）。
 >   - Path B 精煉 = [path-b-reduction](../path-b-reduction/SKILL.md)。
 >   - skill-bettor 本地新增可跑 seed = [guided-conversation-observation](modules/guided-conversation-observation.md) + [production-guidance-hardening](modules/production-guidance-hardening.md) + file-only `scripts/run_guided_conversation.py`/Bun technical equivalent + `loop_wiki/evolve-unknown-discovery-plan-truth/templates/gemini-conversation-research/` golden cases/evals/ROUTES contract。
->   漂移時以本地 port map 的分級為準；外部 DR/browser/KG 行為以 antigravity 原始引擎程式碼為權威。
+>   漂移時以該 repo binding 內 port map 的分級為準；外部 DR/browser/KG 行為以原始引擎程式碼為權威。
 > **retarget 誠實帳本**（northstar → antigravity 拿掉了什麼、為何不是簡化）→ `.skill-bindings/gemini-conversation-research/retarget-map.md`。
 >   ⚠ **別把 northstar 原檔的 KG 入庫（`kg_fast_write`）/ `dr-governance-router` / Bug Scar #NNN 編號 / `gemini-aup-guard.sh` hook / `execution/scripts/*.sh` wrapper 搬回來**——antigravity 無此基座 = 死 husk（見 [fold-in](../fold-in/SKILL.md) 反模式）。
 

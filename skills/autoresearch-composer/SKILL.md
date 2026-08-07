@@ -10,9 +10,7 @@ description: |
   垂直切片，是 `sdlc-plan-composer` S5「該 task 是優化迴圈」分支的委派目標。帶讓位優先級規則——
   debug/security/TDD/設計辯論等已有原生治理 skill 的需求讓位給原生，只有真正的指標迭代迴圈才路由外部
   slash 命令。本身不執行迴圈，只把迭代紀律與命令路由編進計劃。
-  port 自 northstar `autoresearch-composer` v0.3.0（經 antigravity 2026-07-17 同日 retarget 版本，
-  非直接抄 northstar 原檔）；逐機制 retarget 帳本 → modules/retarget-map.md。這是 `sdlc-plan-composer`
-  §5 開放問題（見其 modules/retarget-map.md §5）2026-07-11 標記的「潛在重新評估點」的落地。
+  逐機制 retarget 帳本與上游沿革在各 repo 的 `.skill-bindings/autoresearch-composer/`。
 ---
 
 # autoresearch-composer

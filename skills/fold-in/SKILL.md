@@ -2,10 +2,10 @@
 name: fold-in
 description: |
   把一段已完成的工作經驗(某家族 evals/runner.py 修法、loop_wiki/engine.sh 偵測邏輯、agy quota 等操作
-  鐵律、某迴圈拓撲事實變動)fold 進 skill-bettor 既有結構——而非為每段經驗造新 skill 時使用。
+  鐵律、某迴圈拓撲事實變動)fold 進 repo 的既有結構——而非為每段經驗造新 skill 時使用。
   怎麼選 owner、Layer A(SKILL.md 事實＋程序)/ Layer B(modules/ 或 references/ know-why)分層、
   防回退錨依範疇+受眾落哪一路 durable home(七路 taxonomy 含迴圈 owner、producer anti/ 與
-  計劃進度閘同位回填,skill-bettor 無集中式 Resolved 帳本)、
+  計劃進度閘同位回填;是否有集中式 Resolved 帳本依 repo 而定)、
   確定性邏輯的 husk 防護。選 owner 前先讀 harness-wiki 組件卡當活系統邊界(別憑硬數字,以組件卡現況為準);
   跨迴圈 fold 完回同步 harness-wiki 組件卡＋不變量(只指針不抄,fold-in 是最大漂移源)。
   actuator 委派 Claude Code 內建 write-a-skill。完整 know-why 在 modules/fold-in-know-why.md。
@@ -16,7 +16,7 @@ description: |
 
 # Skill: fold-in — 把經驗吸收進既有結構(非造新 skill)
 
-> **Role**:把一段**已完成**的工作經驗 fold 進 skill-bettor 的既有結構,
+> **Role**:把一段**已完成**的工作經驗 fold 進 repo 的既有結構,
 > 而非造新 skill。
 > 預設不造新 —— actuator 是 Claude Code 內建 `write-a-skill`
 > (經 Skill 工具喚出,位於 `~/.claude/skills/write-a-skill/`,
@@ -25,7 +25,7 @@ description: |
 > Antigravity `.agents/skills/` 的格式——frontmatter 慣例不同,
 > 判「新建 vs fold」的理由本身跨平台通用,只有這個委派指針隨平台換)。
 > **結構**:SKILL.md = 確定性程序 + 不變量;
-> 為何這樣分層、antigravity lineage、完整 retarget 映射表在
+> 為何這樣分層、lineage、完整 retarget 映射表在
 > [modules/fold-in-know-why.md](modules/fold-in-know-why.md) 與
 > `.skill-bindings/fold-in/retarget-map.md`。
 > **SSOT**:吸收的 durable home **依範疇+受眾分路

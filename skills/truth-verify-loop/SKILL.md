@@ -2,10 +2,10 @@
 name: truth-verify-loop
 description: |
   真相驗證量測迴圈——對文章/概念/重大 claim 集跑「抽取 claims→分批多 tier worker 驗證→跨家族
-  聚合→Opus fresh 判官→純腳本計分→落帳」的閉環方法論+本地實例化契約。2026-07-17 自 antigravity
+  聚合→Opus fresh 判官→純腳本計分→落帳」的閉環方法論+本地實例化契約。2026-07-17 自上游
   port(人裁 Q7,計劃包 2026-07-17-agent-native-sdlc-panorama);四角色分工中 agy「查詢真相」的
-  迴圈化形態。**本地引擎尚未實例化**——引擎/合約/工具鏈的上游 SSOT=antigravity `truth-verify/`
-  (同機唯讀指針),首次真跑時按本檔實例化契約建 `loop_wiki/tv-<topic>/` 沙盒,先 selftest 後真跑。
+  迴圈化形態。**引擎不隨本 skill 走**——上游引擎位置記在該 repo 的 binding,首次真跑時按本檔
+  實例化契約建 `loop_wiki/tv-<topic>/` 沙盒,先 selftest 後真跑。
   觸發詞:truth-verify、真相驗證迴圈、claims 逐字驗證、多 tier 事實查核、跨家族聚合驗證。
   NOT for:驗證標準/獨立性 tier 的選擇(judge-loop-chooser);單一外部 claim 查證不必開迴圈
   (external-verify);claim 約分落帳紀律(path-b-reduction);skill 變現情報批次(dr-research-loop)。
@@ -16,14 +16,10 @@ description: |
 > **Role**:把「查詢真相」從單點查證升級為可量測閉環:claims 抽取→worker 驗證(多 tier+跨家族)→
 > 聚合→判官→**純腳本計分 vs sealed 真值**→落帳。本檔=方法論+防誤改不變量+首次實例化工序;
 > **永不抄上游內容**(抄=會漂的第二份)。
-> **上游 SSOT(同機唯讀指針,2026-07-17)**:引擎=`/Users/neon/antigravity/truth-verify/t0/*.{sh,py}`;
-> 合約=`.../truth-verify/contracts/`(+`contracts/dispatch/` 逐字模板);帳本範例=`.../truth-verify/
-> {hypotheses.md,loop-ledger.md}`;原版地圖=`/Users/neon/antigravity/.agents/skills/truth-verify-loop/`。
-> **誠實態**:skill-bettor 側零 run 歷史、引擎未實例化——本檔先於引擎存在是刻意的(人裁 Q7「現在
-> 就 port」),但**用前必走 §實例化契約,禁直接引用上游路徑跑**(上游 fixtures/sealed 是 antigravity
-> 的證成軌跡,不是本 repo 的證據)。
-> **Lineage**:antigravity truth-verify-loop(承 kb-ingest judge-loop 收斂原語);逐機制取捨帳=
-> `.skill-bindings/truth-verify-loop/retarget-map.md`。
+> **誠實態**:本檔先於引擎存在。**用前必走 §實例化契約,禁直接引用上游路徑跑**——上游的
+> fixtures/sealed 是它自己的證成軌跡,不是你這個 repo 的證據。
+> **上游引擎位置、本 repo 的 run 歷史與逐機制取捨帳**在該 repo 的
+> `.skill-bindings/truth-verify-loop/`（路徑是本機事實,不寫死在共用 body）。
 
 ## When to Use
 - 一份文章/概念集/重大 proposal 的 claims 需要**可計分**的多 tier 驗證(不只 findings,要 vs sealed
@@ -116,6 +112,7 @@ graph LR
 - `.skill-bindings/truth-verify-loop/retarget-map.md`
   — antigravity → skill-bettor 逐機制取捨帳
   (搬了什麼/不搬什麼+why/本地新增)。
-- 上游 know-why(六 run 實測課/E 主成分/tier 三明治/兩結構洞)=
-  `/Users/neon/antigravity/.agents/skills/truth-verify-loop/modules/measurement-methodology.md`
-  (指針不抄;那是上游的證成軌跡)。
+- [modules/measurement-methodology.md](modules/measurement-methodology.md)
+  — 六 run 實測課/E 主成分/tier 三明治/兩結構洞。
+  2026-08-07 收編：這份 know-why 原本只以指針存在，實體在上游；共用化時把它併進來，
+  因為方法論本身跨 repo 為真，只有 run 數字屬於跑它的那個 repo。

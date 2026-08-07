@@ -15,12 +15,11 @@ description: |
 > **結構**: SKILL.md = 確定性程序 + pointer;
 > 已查證真相快照在 [modules/verified-truth.md](modules/verified-truth.md)。
 > **與 path-b-reduction 的關係(已知缺口,誠實標記)**:
-> antigravity 原版稱本 skill 是 `path-b-reduction`
+> 上游原版稱本 skill 是 `path-b-reduction`
 > (把每個 claim 約分到它的確定性鐵錨——exit-code／test／
 > external-verified primary source——阻止認知卸載的方法論)
 > 步驟一「尋找物理鐵錨」的執行化。
-> `path-b-reduction` 本身**尚未移植進 skill-bettor**
-> (antigravity-external,不在本批次移植項目內),
+> `path-b-reduction` 是獨立的姊妹 skill,
 > 本檔不假裝該 skill 本地存在、也不留死連結。
 > 單獨來看本檔仍可成立:上游方法論做的事就是
 > 「把每個 claim 拆到最小可查證單位,再逐一查證」,
