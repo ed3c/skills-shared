@@ -46,24 +46,16 @@ class SharedSkillsError(RuntimeError):
     """Raised when the shared-skills invariant cannot be established."""
 
 
-# The dead-assertion linter ships beside this file and `check` runs it, because
-# every gate in this repo is only as strong as the `verify.sh` proving it. It is
-# imported, not shelled out to, so a missing file is an ImportError here rather
-# than a silent no-op inside a subprocess.
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-try:
-    from check_dead_assertions import sweep as sweep_dead_assertions
-except ImportError as error:              # fail closed: no linter, no green gate
-    # Copied into a plain string first: Python unbinds the `as` name when the
-    # except block ends, so referring to it from the closure below raises
-    # NameError -- a stack trace where the contract promises a sentence.
-    _import_error = str(error)
-
-    def sweep_dead_assertions(root: Path) -> tuple[list[Path], list[Any]]:
-        raise SharedSkillsError(
-            f"check_dead_assertions.py must sit beside {Path(__file__).name} "
-            f"for `check` to run the dead-assertion sweep: {_import_error}"
-        )
+# The dead-assertion linter deliberately does NOT run from here. It shipped
+# wired into `check`, which made a missing or broken linter stop every other
+# gate from running at all -- one tool's absence taking out the governance check,
+# the shadowing check and the symlink check with it. A gate whose blast radius is
+# every other gate costs more than the class of bug it catches.
+#
+# Run it on its own instead:
+#     python3 scripts/check_dead_assertions.py --root <repo>
+# It is worth running, and it found real dead assertions the day it was written.
+# It just should not be able to take the rest down with it.
 
 
 # --------------------------------------------------------------------------
@@ -287,23 +279,11 @@ def check(registry: dict[str, Any], sites: Sites) -> int:
                 f"user skills, so that copy silently replaces the shared one"
             )
 
-    # A dead assertion is an unguarded gate wearing a green badge, so it fails
-    # `check` for the same reason a shadowed skill does: the invariant is not
-    # actually being enforced, only claimed.
-    swept, dead = sweep_dead_assertions(REPO)
-    # `render` already leads with the rule name (DEAD-NEGATION, DEAD-AND-CHAIN,
-    # ...), so no extra label is added: two prefixes on one line read as two
-    # findings.
-    failures.extend(finding.render(REPO) for finding in dead)
-
     if failures:
         for failure in failures:
             print(f"FAIL {failure}", file=sys.stderr)
         return 1
     print(f"PASS shared skills hold ({len(registry['shared'])} registered)")
-    # Printed even when zero: a sweep that matched no file is an absent check,
-    # not a passing one, and the number is the only way to tell them apart.
-    print(f"     dead-assertion sweep clean ({len(swept)} shell test file(s))")
     return 0
 
 

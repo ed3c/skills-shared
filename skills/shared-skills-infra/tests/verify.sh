@@ -16,8 +16,8 @@ mkdir -p "${shared}/skills/shared-skills-infra/scripts" \
          "${world}/surfaces/codex" "${world}/surfaces/claude" \
          "${world}/repoA/.agents/skills" "${world}/repoA/.claude/skills"
 cp "${real_script}" "${script}"
-# `check` imports the dead-assertion linter and refuses to run without it, so
-# the synthetic world needs both files, not just the entry point.
+# The linter is copied in because this file exercises it directly, not
+# because `check` needs it: `check` no longer runs it.
 cp "$(dirname "${real_script}")/check_dead_assertions.py" \
    "${shared}/skills/shared-skills-infra/scripts/"
 printf -- '---\nname: demo-skill\n---\nbody\n' > "${shared}/skills/demo-skill/SKILL.md"
@@ -165,7 +165,6 @@ lint
 grep -q "PASS no dead assertions" "${world}/lint.out"
 # the count is asserted, not just the word PASS: a glob that matched no file
 # would also print PASS, and an absent sweep must not read as a clean one
-run check | grep -q "dead-assertion sweep clean (1 shell test file(s))"
 
 # a glob that matched nothing must exit 3, not 0. An absent sweep and a clean
 # sweep have to look different, or pointing the linter at the wrong root reads
@@ -191,11 +190,12 @@ if lint; then
 fi
 grep -q "DEAD-NEGATION tests/swept/verify.sh:3" "${world}/lint.err"
 grep -q 'write: if grep -q "Traceback"' "${world}/lint.err"   # names the correct form
-if run check >"${world}/5d.out" 2>"${world}/5d.err"; then
-  echo "FAIL: check went green with a dead assertion in the tree" >&2
-  exit 1
-fi
-grep -q "^FAIL DEAD-NEGATION tests/swept/verify.sh:3" "${world}/5d.err"
+# `check` deliberately stays green with a dead assertion in the tree: the linter
+# is its own tool, not a precondition of the governance gate. Wiring it in meant
+# a missing or broken linter also took out the shadowing check and the symlink
+# check -- a blast radius larger than the class of bug being caught. The sweep's
+# own refusal is asserted three lines up, where it belongs.
+run check | grep -q "PASS shared skills hold"
 
 # hollow (2): `test A && test B` -- only B is under set -e
 cat > "${fixture}" <<'HOLLOW2'
@@ -268,22 +268,9 @@ lint
 grep -q "PASS no dead assertions" "${world}/lint.out"
 run check | grep -q "PASS shared skills hold"
 
-# the sweep fails closed: `check` without its linter is not a green gate
-mv "${linter}" "${world}/linter.hidden"
-if run check >"${world}/5d.nolint.out" 2>"${world}/5d.nolint.err"; then
-  echo "FAIL: check went green with no dead-assertion linter beside it" >&2
-  exit 1
-fi
-grep -q "^FAIL check_dead_assertions.py must sit beside" "${world}/5d.nolint.err"
-if grep -q "Traceback" "${world}/5d.nolint.err"; then
-  echo "FAIL: the fail-closed path printed a stack, not a sentence" >&2
-  exit 1
-fi
-mv "${world}/linter.hidden" "${linter}"
 
 # fixtures done; the world must be clean before section 6 relocates it
 mv "${shared}/tests" "${world}/fixture-attic"
-run check | grep -q "dead-assertion sweep clean (0 shell test file(s))"
 
 # 6. relocatable: the checkout carries no absolute path of its own, so moving it
 #    anywhere and re-running install re-wires it. Symlinks store paths, so the
