@@ -537,7 +537,8 @@ def build_outputs(
     repository = snapshot.get("repository")
     if not isinstance(repository, dict):
         raise SyncError("snapshot repository must be an object")
-    expected_repo = line["github_repo"]
+    # Identity is pinned by repository id, not by name: an id survives a rename,
+    # a name does not. The old name comparison is gone rather than kept dormant.
     expected_repository_id = line.get("github_repository_id")
     if not isinstance(expected_repository_id, str) or not expected_repository_id:
         raise SyncError("registry line must pin github_repository_id")

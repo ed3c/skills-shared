@@ -148,8 +148,12 @@ def _svg_chart(usage_calls):
     W, H, PL, PB, PT = 880, 240, 64, 26, 14
     n = len(usage_calls)
     ymax = max(max(c["ctx"] for c in usage_calls), 1)
-    xs = lambda i: PL + (W - PL - 10) * (i / max(n - 1, 1))
-    ys = lambda v: PT + (H - PT - PB) * (1 - v / ymax)
+
+    def xs(i):
+        return PL + (W - PL - 10) * (i / max(n - 1, 1))
+
+    def ys(v):
+        return PT + (H - PT - PB) * (1 - v / ymax)
 
     def poly(key, color, label):
         pts = " ".join(

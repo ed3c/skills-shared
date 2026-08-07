@@ -151,7 +151,7 @@ def main():
     est_nodes = (
         (0 if conv_id in existing else 1)
         + len(new_concepts)
-        + sum(1 for _, l, s in lib_rows if s == "NEW")
+        + sum(1 for _, _lib, s in lib_rows if s == "NEW")
     )
     est_edges = len(concepts) + len(lib_rows)
     print(f"\n估計 node delta ≈ +{est_nodes}   edge delta ≈ +{est_edges}")

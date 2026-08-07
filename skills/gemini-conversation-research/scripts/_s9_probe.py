@@ -1,4 +1,5 @@
-import json, os
+import json
+import os
 
 EXTERNAL_ANTIGRAVITY_ROOT = os.environ.get(
     "GCR_EXTERNAL_ANTIGRAVITY_ROOT", "/Users/neon/antigravity"
