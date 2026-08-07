@@ -22,7 +22,9 @@ def test_sc1_envelope_enters_ledger_gates_emit_exit_code(tmp_path):
             "result_snapshot": "VERIFY: PASS",
             "budget": {"tokens_used": 1, "usd": 0.0},
         },
-        l3_config=L3Config(max_iterations=3, max_tokens=10, duplicate_threshold=3, duplicate_window=8),
+        l3_config=L3Config(
+            max_iterations=3, max_tokens=10, duplicate_threshold=3, duplicate_window=8
+        ),
         git_commit_sha="abc123",
     )
 
@@ -57,7 +59,9 @@ def test_sc1_l4_blocks_nonzero_exit_without_handled_handoff():
 
 
 def test_sc1_l3_budget_wins_over_duplicate_when_both_hit():
-    config = L3Config(max_iterations=5, max_tokens=2, duplicate_threshold=2, duplicate_window=8)
+    config = L3Config(
+        max_iterations=5, max_tokens=2, duplicate_threshold=2, duplicate_window=8
+    )
     state = L3State()
     record = make_envelope(
         id="dup-budget",
@@ -65,7 +69,12 @@ def test_sc1_l3_budget_wins_over_duplicate_when_both_hit():
         loop_layer="L0",
         task_ref={"packet_id": "SC1", "priority": "high", "passes": False},
         event={"kind": "tool_result", "tool": "poll", "args": {"id": 1}},
-        exec={"command": "poll", "exit_code": 0, "result_snapshot": "same", "error_snapshot": None},
+        exec={
+            "command": "poll",
+            "exit_code": 0,
+            "result_snapshot": "same",
+            "error_snapshot": None,
+        },
         budget={"tokens_used": 2, "usd": 0.0},
     )
 
@@ -74,7 +83,9 @@ def test_sc1_l3_budget_wins_over_duplicate_when_both_hit():
 
 
 def test_sc1_l3_interleaved_duplicate_uses_per_signature_window():
-    config = L3Config(max_iterations=10, duplicate_threshold=2, duplicate_window=3, max_interleaving=3)
+    config = L3Config(
+        max_iterations=10, duplicate_threshold=2, duplicate_window=3, max_interleaving=3
+    )
     state = L3State()
     decisions = []
 
@@ -85,7 +96,12 @@ def test_sc1_l3_interleaved_duplicate_uses_per_signature_window():
             loop_layer="L0",
             task_ref={"packet_id": "SC1", "priority": "high", "passes": False},
             event={"kind": "tool_result", "tool": "poll", "args": {"slot": result}},
-            exec={"command": "poll", "exit_code": 0, "result_snapshot": "same", "error_snapshot": None},
+            exec={
+                "command": "poll",
+                "exit_code": 0,
+                "result_snapshot": "same",
+                "error_snapshot": None,
+            },
         )
         decisions.append(l3_after_record(state, config, record))
 
@@ -110,7 +126,12 @@ def test_sc1_ledger_append_uses_one_os_write_for_complete_line(tmp_path, monkeyp
         loop_layer="L0",
         task_ref={"packet_id": "SC1", "priority": "high", "passes": False},
         event={"kind": "tool_result"},
-        exec={"command": "noop", "exit_code": 0, "result_snapshot": "ok", "error_snapshot": None},
+        exec={
+            "command": "noop",
+            "exit_code": 0,
+            "result_snapshot": "ok",
+            "error_snapshot": None,
+        },
     )
 
     ledger.append(record)
@@ -128,7 +149,12 @@ def test_sc1_envelope_rejects_schema_drift():
         loop_layer="L0",
         task_ref={"packet_id": "SC1", "priority": "high", "passes": False},
         event={"kind": "tool_result"},
-        exec={"command": "noop", "exit_code": 0, "result_snapshot": "ok", "error_snapshot": None},
+        exec={
+            "command": "noop",
+            "exit_code": 0,
+            "result_snapshot": "ok",
+            "error_snapshot": None,
+        },
     )
     record["extra"] = "not in ssot"
 

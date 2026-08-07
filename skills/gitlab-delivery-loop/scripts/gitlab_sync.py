@@ -42,7 +42,9 @@ HOST_RE = re.compile(r"[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?(?::[0-9]{1,5})?
 # GitLab projects live under nested groups, so a path has two *or more*
 # segments. Assuming a single slash is the most common way a GitHub-shaped
 # assumption silently breaks on GitLab.
-PROJECT_RE = re.compile(r"[A-Za-z0-9_.][A-Za-z0-9_.-]*(?:/[A-Za-z0-9_.][A-Za-z0-9_.-]*)+")
+PROJECT_RE = re.compile(
+    r"[A-Za-z0-9_.][A-Za-z0-9_.-]*(?:/[A-Za-z0-9_.][A-Za-z0-9_.-]*)+"
+)
 
 
 class SyncError(ValueError):
@@ -101,7 +103,9 @@ def _seconds(start: Any, end: Any, field: str) -> int | None:
     if start is None or end is None:
         return None
     delta = int(
-        (_parse_time(end, f"{field}.end") - _parse_time(start, f"{field}.start")).total_seconds()
+        (
+            _parse_time(end, f"{field}.end") - _parse_time(start, f"{field}.start")
+        ).total_seconds()
     )
     if delta < 0:
         raise SyncError(f"{field} cannot be negative")
@@ -284,21 +288,27 @@ def derive_metrics(
         # GitLab issue state is "opened"/"closed" (not "open"/"OPEN"): a state
         # comparison copied from the GitHub skill silently matches nothing.
         "closed_without_merge": sum(
-            item["issue_state"] == "closed" and item["accepted_mr"] is None for item in slices
+            item["issue_state"] == "closed" and item["accepted_mr"] is None
+            for item in slices
         ),
         "total_slices": len(slices),
         "throughput_7d": sum(
             0 <= (now - item).total_seconds() <= seven_days for item in accepted_times
         ),
         "throughput_28d": sum(
-            0 <= (now - item).total_seconds() <= twenty_eight_days for item in accepted_times
+            0 <= (now - item).total_seconds() <= twenty_eight_days
+            for item in accepted_times
         ),
         "wip": sum(
-            item["issue_state"] == "opened" and item["started_mr"] is not None for item in slices
+            item["issue_state"] == "opened" and item["started_mr"] is not None
+            for item in slices
         ),
     }
     percentiles = {
-        field: {"p50": _nearest_rank(values(field), 0.50), "p85": _nearest_rank(values(field), 0.85)}
+        field: {
+            "p50": _nearest_rank(values(field), 0.50),
+            "p85": _nearest_rank(values(field), 0.85),
+        }
         for field in (
             "lead_seconds",
             "queue_seconds",
@@ -394,15 +404,21 @@ def fetch_gitlab_snapshot(host: str, project: str, board_url: str) -> dict[str, 
         paginate=True,
     )
 
-    raw_issues = _glab_json(host, f"projects/{encoded}/issues?state=all&per_page=100", paginate=True)
+    raw_issues = _glab_json(
+        host, f"projects/{encoded}/issues?state=all&per_page=100", paginate=True
+    )
     issues: list[dict[str, Any]] = []
     for issue in raw_issues:
         iid = issue["iid"]
         label_events = _glab_json(
-            host, f"projects/{encoded}/issues/{iid}/resource_label_events?per_page=100", True
+            host,
+            f"projects/{encoded}/issues/{iid}/resource_label_events?per_page=100",
+            True,
         )
         state_events = _glab_json(
-            host, f"projects/{encoded}/issues/{iid}/resource_state_events?per_page=100", True
+            host,
+            f"projects/{encoded}/issues/{iid}/resource_state_events?per_page=100",
+            True,
         )
         issues.append(
             {
@@ -451,14 +467,17 @@ def fetch_gitlab_snapshot(host: str, project: str, board_url: str) -> dict[str, 
         )
 
     boards = _glab_json(host, f"projects/{encoded}/boards?per_page=100", paginate=True)
-    board = resolve_board(host, meta.get("path_with_namespace") or project,
-                          board_url, boards, issues)
+    board = resolve_board(
+        host, meta.get("path_with_namespace") or project, board_url, boards, issues
+    )
 
     license_value = meta.get("license") or {}
     namespace = meta.get("namespace") or {}
     return {
         "board": board,
-        "fetched_at": datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z"),
+        "fetched_at": datetime.now(timezone.utc)
+        .isoformat(timespec="seconds")
+        .replace("+00:00", "Z"),
         "forge": FORGE,
         "host": host,
         "issues": issues,
@@ -522,7 +541,9 @@ def resolve_board(
     )
 
 
-def _board_counts(board: dict[str, Any], issues: list[dict[str, Any]]) -> dict[str, int]:
+def _board_counts(
+    board: dict[str, Any], issues: list[dict[str, Any]]
+) -> dict[str, int]:
     counts: dict[str, int] = {}
     lists = board.get("lists")
     if not isinstance(lists, list):
@@ -563,7 +584,15 @@ def remote_head_tree(export_repo: Path, head_sha: str) -> tuple[str | None, str 
     if not (export_repo / ".git").exists() and not (export_repo / "HEAD").exists():
         return None, f"export repo is not a git repository: {export_repo}"
     done = subprocess.run(
-        ["git", "-C", str(export_repo), "rev-parse", "--verify", "--quiet", f"{head_sha}^{{tree}}"],
+        [
+            "git",
+            "-C",
+            str(export_repo),
+            "rev-parse",
+            "--verify",
+            "--quiet",
+            f"{head_sha}^{{tree}}",
+        ],
         capture_output=True,
         text=True,
     )
@@ -581,7 +610,9 @@ def remote_head_tree(export_repo: Path, head_sha: str) -> tuple[str | None, str 
 
 
 def _json_bytes(value: object) -> bytes:
-    return (json.dumps(value, indent=2, sort_keys=True, ensure_ascii=False) + "\n").encode()
+    return (
+        json.dumps(value, indent=2, sort_keys=True, ensure_ascii=False) + "\n"
+    ).encode()
 
 
 def render_dashboard(
@@ -653,7 +684,9 @@ def render_dashboard(
                 issue_state=item["issue_state"],
                 started=f"!{item['started_mr']}" if item["started_mr"] else "—",
                 accepted=f"!{item['accepted_mr']}" if item["accepted_mr"] else "—",
-                lead=item["lead_seconds"] if item["lead_seconds"] is not None else "UNKNOWN",
+                lead=item["lead_seconds"]
+                if item["lead_seconds"] is not None
+                else "UNKNOWN",
                 blocked=item["blocked_seconds"],
             )
         )
@@ -687,7 +720,9 @@ def build_outputs(
     if snapshot.get("schema") != SNAPSHOT_SCHEMA:
         raise SyncError(f"snapshot schema must be {SNAPSHOT_SCHEMA}")
     if snapshot.get("forge") != FORGE:
-        raise SyncError(f"snapshot forge must be {FORGE!r}, got {snapshot.get('forge')!r}")
+        raise SyncError(
+            f"snapshot forge must be {FORGE!r}, got {snapshot.get('forge')!r}"
+        )
     project = snapshot.get("project")
     if not isinstance(project, dict):
         raise SyncError("snapshot project must be an object")
@@ -702,7 +737,11 @@ def build_outputs(
     # Identity is the numeric project id, which survives renames and transfers.
     # The path is only a transferable alias.
     expected_id = line.get("gitlab_project_id")
-    if not isinstance(expected_id, int) or isinstance(expected_id, bool) or expected_id < 1:
+    if (
+        not isinstance(expected_id, int)
+        or isinstance(expected_id, bool)
+        or expected_id < 1
+    ):
         raise SyncError("registry line must pin gitlab_project_id (a positive integer)")
     if project.get("id") != expected_id:
         raise SyncError(
@@ -726,7 +765,8 @@ def build_outputs(
     prd_candidates = [
         issue
         for issue in issues
-        if isinstance(issue, dict) and str(issue.get("title", "")).upper().startswith("PRD")
+        if isinstance(issue, dict)
+        and str(issue.get("title", "")).upper().startswith("PRD")
     ]
     if len(prd_candidates) != 1:
         raise SyncError("snapshot must contain exactly one PRD-titled issue")
@@ -772,10 +812,16 @@ def build_outputs(
     )
 
     open_slices = [
-        issue for issue in issues if issue is not prd and str(issue.get("state", "")) == "opened"
+        issue
+        for issue in issues
+        if issue is not prd and str(issue.get("state", "")) == "opened"
     ]
-    open_mrs = [item for item in merge_requests if str(item.get("state", "")) == "opened"]
-    remote_tree, tree_error = remote_head_tree(export_repo, str(project.get("head_sha") or ""))
+    open_mrs = [
+        item for item in merge_requests if str(item.get("state", "")) == "opened"
+    ]
+    remote_tree, tree_error = remote_head_tree(
+        export_repo, str(project.get("head_sha") or "")
+    )
 
     blockers: list[str] = []
     if project.get("license_key") != "mit":

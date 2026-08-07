@@ -26,10 +26,35 @@ DIAGRAM_MARKS = "│─┼┌┐└┘├┤┬┴▼▲►◄→←↑↓◇★
 # arrows; diagrams are written as ```text or with no tag at all.
 CODE_LANGS = frozenset(
     {
-        "bash", "sh", "shell", "zsh", "console",
-        "swift", "js", "javascript", "ts", "typescript", "json", "jsonc",
-        "python", "py", "sql", "go", "kotlin", "java", "objc", "c", "cpp",
-        "yaml", "yml", "toml", "xml", "html", "css", "diff", "mermaid",
+        "bash",
+        "sh",
+        "shell",
+        "zsh",
+        "console",
+        "swift",
+        "js",
+        "javascript",
+        "ts",
+        "typescript",
+        "json",
+        "jsonc",
+        "python",
+        "py",
+        "sql",
+        "go",
+        "kotlin",
+        "java",
+        "objc",
+        "c",
+        "cpp",
+        "yaml",
+        "yml",
+        "toml",
+        "xml",
+        "html",
+        "css",
+        "diff",
+        "mermaid",
     }
 )
 
@@ -89,8 +114,10 @@ def symbol_definitions(text: str) -> list[tuple[str, str, int]]:
             # 也是這個文件族最大量的定義來源。同樣只認開頭那一個代號。
             item = re.sub(r"^[-*+]\s+", "", stripped).lstrip("* ")
             names = SYMBOL.findall(item[:40])
-            if names and item.startswith(names[0]) and not RANGE_AFTER.match(
-                item[len(names[0]):]
+            if (
+                names
+                and item.startswith(names[0])
+                and not RANGE_AFTER.match(item[len(names[0]) :])
             ):
                 gloss = re.sub(r"^\S+\s*(?:\[[A-Z]\])?\s*\*{0,2}", "", item)
                 found.append((names[0], gloss[:120], RANK_BULLET))
@@ -100,8 +127,10 @@ def symbol_definitions(text: str) -> list[tuple[str, str, int]]:
             # 把讀者送到錯的地方，比沒有索引更糟。
             title = stripped.lstrip("# ").strip()
             names = SYMBOL.findall(title)
-            if names and title.startswith(names[0]) and not RANGE_AFTER.match(
-                title[len(names[0]):]
+            if (
+                names
+                and title.startswith(names[0])
+                and not RANGE_AFTER.match(title[len(names[0]) :])
             ):
                 found.append((names[0], title[:120], RANK_HEADING))
     return found
@@ -177,8 +206,6 @@ class Figure:
     caption: str
     width: int
     height: int
-
-
 
 
 def sha256_bytes(data: bytes) -> str:
@@ -286,7 +313,7 @@ def render_figure(anchor: str, number: int, caption: str, code_lines: list[str])
     return (
         f'<figure class="diagram" id="{anchor}">'
         f'<figcaption><span class="fig-no">圖 {number}</span>'
-        f"<span class=\"fig-cap\">{html.escape(caption)}</span>"
+        f'<span class="fig-cap">{html.escape(caption)}</span>'
         f'<span class="fig-dim">{width}×{len(code_lines)}</span>'
         '<button type="button" class="fig-fit" onclick="fitFigure(this)">'
         "縮放以完整顯示</button></figcaption>"
@@ -294,8 +321,13 @@ def render_figure(anchor: str, number: int, caption: str, code_lines: list[str])
     )
 
 
-def markdown_to_html(text: str, fig_prefix: str = "fig", symbols: dict[str, Symbol] | None = None,
-    symbols_anchored: set[str] | None = None, doc_index: int = 0) -> tuple[str, list[Figure]]:
+def markdown_to_html(
+    text: str,
+    fig_prefix: str = "fig",
+    symbols: dict[str, Symbol] | None = None,
+    symbols_anchored: set[str] | None = None,
+    doc_index: int = 0,
+) -> tuple[str, list[Figure]]:
     """Render the Markdown subset used by plan documents.
 
     Returns the HTML and every diagram found, so the page can index them.
@@ -320,6 +352,7 @@ def markdown_to_html(text: str, fig_prefix: str = "fig", symbols: dict[str, Symb
         # 同一份文件裡同階的定義可能不只一處（例如兩張表都以 G-04 開頭）。
         # 只認第一處，否則會產生重複 id，而瀏覽器只會跳到其中一個。
         return name not in anchored
+
     if frontmatter:
         output.append(
             '<details class="frontmatter"><summary>文件 metadata</summary><pre>'
@@ -365,7 +398,9 @@ def markdown_to_html(text: str, fig_prefix: str = "fig", symbols: dict[str, Symb
                     )
                 else:
                     css_class = (
-                        f' class="language-{html.escape(code_lang)}"' if code_lang else ""
+                        f' class="language-{html.escape(code_lang)}"'
+                        if code_lang
+                        else ""
                     )
                     output.append(
                         f"<pre><code{css_class}>"
@@ -427,8 +462,10 @@ def markdown_to_html(text: str, fig_prefix: str = "fig", symbols: dict[str, Symb
             close_paragraph()
             close_list()
             headers = table_cells(line)
-            output.append("<div class=\"table-wrap\"><table><thead><tr>")
-            output.extend(f"<th>{inline_markup(cell, symbols)}</th>" for cell in headers)
+            output.append('<div class="table-wrap"><table><thead><tr>')
+            output.extend(
+                f"<th>{inline_markup(cell, symbols)}</th>" for cell in headers
+            )
             output.append("</tr></thead><tbody>")
             index += 2
             while index < len(lines) and lines[index].strip().startswith("|"):
@@ -444,8 +481,11 @@ def markdown_to_html(text: str, fig_prefix: str = "fig", symbols: dict[str, Symb
                             for name in SYMBOL.findall(cell.strip("*` "))
                             if name in symbols
                         ]
-                        if (defined and len(cell.strip("*` ")) <= len(defined[0]) + 24
-                                and owns(defined[0], RANK_ROW)):
+                        if (
+                            defined
+                            and len(cell.strip("*` ")) <= len(defined[0]) + 24
+                            and owns(defined[0], RANK_ROW)
+                        ):
                             anchor = f' id="sym-{html.escape(symbol_id(defined[0]))}"'
                             anchored.add(defined[0])
                     output.append(f"<td{anchor}>{inline_markup(cell, symbols)}</td>")
@@ -466,7 +506,9 @@ def markdown_to_html(text: str, fig_prefix: str = "fig", symbols: dict[str, Symb
                     break
                 quote_lines.append(next_quote.group(1))
                 index += 1
-            output.append(f"<blockquote>{inline_markup(' '.join(quote_lines), symbols)}</blockquote>")
+            output.append(
+                f"<blockquote>{inline_markup(' '.join(quote_lines), symbols)}</blockquote>"
+            )
             continue
 
         unordered = re.match(r"^[-*+]\s+(.+)$", stripped)
@@ -484,7 +526,11 @@ def markdown_to_html(text: str, fig_prefix: str = "fig", symbols: dict[str, Symb
             if symbols:
                 head = item[:40]
                 named = [n for n in SYMBOL.findall(head) if n in symbols]
-                if named and head.lstrip("* ").startswith(named[0]) and owns(named[0], RANK_BULLET):
+                if (
+                    named
+                    and head.lstrip("* ").startswith(named[0])
+                    and owns(named[0], RANK_BULLET)
+                ):
                     anchor = f' id="sym-{html.escape(symbol_id(named[0]))}"'
                     anchored.add(named[0])
             output.append(f"<li{anchor}>{inline_markup(item, symbols)}</li>")
@@ -497,7 +543,9 @@ def markdown_to_html(text: str, fig_prefix: str = "fig", symbols: dict[str, Symb
     close_paragraph()
     close_list()
     if in_code:
-        output.append(f"<pre><code>{html.escape(chr(10).join(code_lines))}</code></pre>")
+        output.append(
+            f"<pre><code>{html.escape(chr(10).join(code_lines))}</code></pre>"
+        )
     return "\n".join(output), figures
 
 
@@ -544,7 +592,9 @@ def load_documents(config_path: Path, config: dict[str, Any]) -> list[SourceDocu
     return documents
 
 
-def render_quiz(quiz: list[dict[str, Any]], symbols: dict[str, Symbol] | None = None) -> str:
+def render_quiz(
+    quiz: list[dict[str, Any]], symbols: dict[str, Symbol] | None = None
+) -> str:
     """Render the quiz, and the per-question teaching shown after a wrong answer.
 
     A quiz that only says "wrong" teaches nothing — the reader is left where they
@@ -564,7 +614,7 @@ def render_quiz(quiz: list[dict[str, Any]], symbols: dict[str, Symbol] | None = 
         answers[name] = answer
         blocks.append(
             f'<fieldset id="qf{index}"><legend>{index}. '
-            f'{inline_markup(str(item["question"]), symbols)}</legend>'
+            f"{inline_markup(str(item['question']), symbols)}</legend>"
         )
         for option_index, option in enumerate(options):
             blocks.append(
@@ -578,7 +628,9 @@ def render_quiz(quiz: list[dict[str, Any]], symbols: dict[str, Symbol] | None = 
             f'<p class="qa-ans"><b>正確答案：</b>{inline_markup(str(options[answer]), symbols)}</p>',
         ]
         if item.get("why"):
-            parts.append(f'<p class="qa-why">{inline_markup(str(item["why"]), symbols)}</p>')
+            parts.append(
+                f'<p class="qa-why">{inline_markup(str(item["why"]), symbols)}</p>'
+            )
         refs = item.get("refs") or []
         if refs:
             chips = "".join(
@@ -766,7 +818,9 @@ SYMBOL_FAMILIES = (
 )
 
 
-def render_symbol_index(symbols: dict[str, Symbol], anchored: set[str] | None = None) -> str:
+def render_symbol_index(
+    symbols: dict[str, Symbol], anchored: set[str] | None = None
+) -> str:
     """Render a clickable index of every identifier the family defines.
 
     Why a page needs this: the documents cross-reference each other with short
@@ -815,7 +869,7 @@ def render_symbol_index(symbols: dict[str, Symbol], anchored: set[str] | None = 
         rows = "".join(cells)
         blocks.append(
             f'<details class="sym-family" open><summary><b>{html.escape(prefix)}-</b>'
-            f"　{inline_markup(description)}　<span class=\"fig-dim\">{len(items)} 個</span></summary>"
+            f'　{inline_markup(description)}　<span class="fig-dim">{len(items)} 個</span></summary>'
             '<div class="table-wrap"><table><thead><tr><th>代號</th><th>它是什麼</th>'
             f"<th>定義在</th></tr></thead><tbody>{rows}</tbody></table></div></details>"
         )
@@ -825,7 +879,7 @@ def render_symbol_index(symbols: dict[str, Symbol], anchored: set[str] | None = 
         "<p><strong>你不需要記得任何一個代號。</strong>本文件族用短代號互相引用，"
         "而內文裡每個代號都是連結——點下去會跳到它的定義；這裡的每一列也會連回定義所在的文件。"
         "兩個方向都能走，所以讀到一半遇到不認得的代號，隨時可以查了再回來。</p>"
-        "<p class=\"doc-meta\">滑鼠停在內文的代號上會顯示它是什麼，不必離開當下段落。</p>"
+        '<p class="doc-meta">滑鼠停在內文的代號上會顯示它是什麼，不必離開當下段落。</p>'
         '<p><input type="search" id="sym-filter" placeholder="輸入代號或關鍵字過濾…" '
         'oninput="filterSymbols(this.value)" aria-label="過濾符號索引"></p>'
         f'<div id="sym-groups">{"".join(blocks)}</div></section>'
@@ -844,7 +898,7 @@ def render_atlas(figure_index: list[tuple[SourceDocument, int, list[Figure]]]) -
         links = "".join(
             f'<a class="fig-link" href="#{figure.anchor}">'
             f'<span class="fig-no">圖 {figure.number}</span>'
-            f"<span class=\"fig-cap\">{html.escape(figure.caption)}</span>"
+            f'<span class="fig-cap">{html.escape(figure.caption)}</span>'
             f'<span class="fig-dim">{figure.width}×{figure.height}</span></a>'
             for figure in figures
         )
@@ -1034,7 +1088,9 @@ def render_full_html(config: dict[str, Any], documents: list[SourceDocument]) ->
     title = html.escape(str(config["title"]))
     snapshot = html.escape(str(config["snapshot"]))
     decision = html.escape(str(config.get("decision", "未提供裁決摘要")))
-    summaries = "".join(f"<li>{html.escape(str(item))}</li>" for item in config.get("summary", []))
+    summaries = "".join(
+        f"<li>{html.escape(str(item))}</li>" for item in config.get("summary", [])
+    )
     nav = "".join(
         f'<a href="#doc-{index:02d}">{index:02d}. {html.escape(doc.label)}</a>'
         for index, doc in enumerate(documents, start=1)
@@ -1055,8 +1111,11 @@ def render_full_html(config: dict[str, Any], documents: list[SourceDocument]) ->
     undiagrammed: list[str] = []
     for index, document in enumerate(documents, start=1):
         rendered, figures = markdown_to_html(
-            document.text, fig_prefix=f"fig{index:02d}", symbols=symbols,
-            symbols_anchored=anchored, doc_index=index,
+            document.text,
+            fig_prefix=f"fig{index:02d}",
+            symbols=symbols,
+            symbols_anchored=anchored,
+            doc_index=index,
         )
         if not figures:
             undiagrammed.append(document.display_path)
@@ -1119,7 +1178,7 @@ onclick="switchView('view-quiz')">理解 quiz <span class="tab-n">{len(config["q
 <p><input type="search" id="doc-filter" placeholder="過濾文件名稱或角色…"
 oninput="filterDocs(this.value)" aria-label="過濾文件"></p>
 <div class="docpicks" role="tablist">{docpick}</div></section>
-{''.join(document_html)}
+{"".join(document_html)}
 </div>
 <div class="view" id="view-atlas" hidden>{atlas_html}</div>
 <div class="view" id="view-symbols" hidden>{symbol_html}</div>
@@ -1139,12 +1198,14 @@ def render_email_html(config: dict[str, Any], documents: list[SourceDocument]) -
         "</tr>"
         for doc in documents
     )
-    summaries = "".join(f"<li>{html.escape(str(item))}</li>" for item in config.get("summary", []))
+    summaries = "".join(
+        f"<li>{html.escape(str(item))}</li>" for item in config.get("summary", [])
+    )
     return f"""<!doctype html><html lang="zh-Hant"><body style="font-family:-apple-system,Segoe UI,sans-serif;
-color:#18212f;line-height:1.55"><h1>{html.escape(str(config['title']))}</h1>
-<p><strong>快照 {html.escape(str(config['snapshot']))}</strong></p>
+color:#18212f;line-height:1.55"><h1>{html.escape(str(config["title"]))}</h1>
+<p><strong>快照 {html.escape(str(config["snapshot"]))}</strong></p>
 <p style="padding:12px;background:#fff7ed;border-left:4px solid #b45309">
-{html.escape(str(config.get('decision', '未提供裁決摘要')))}</p><ul>{summaries}</ul>
+{html.escape(str(config.get("decision", "未提供裁決摘要")))}</p><ul>{summaries}</ul>
 <p><strong>完整內容：</strong>請開啟隨信 HTML；原始 Markdown 與 checksum 在 ZIP。</p>
 <table style="border-collapse:collapse"><tr><th style="padding:6px;border:1px solid #d8e0ea">文件</th>
 <th style="padding:6px;border:1px solid #d8e0ea">角色</th></tr>{rows}</table>
@@ -1191,7 +1252,9 @@ def build_zip(
     members: list[tuple[str, bytes]] = [(html_name, html_bytes)]
     members.append(("bundle-config.json", config_path.read_bytes()))
     for document in documents:
-        members.append((f"sources/{document.archive_name}", document.text.encode("utf-8")))
+        members.append(
+            (f"sources/{document.archive_name}", document.text.encode("utf-8"))
+        )
     members.extend(extras or [])
     manifest = "".join(f"{sha256_bytes(data)}  {name}\n" for name, data in members)
     members.append(("MANIFEST.sha256", manifest.encode("utf-8")))
@@ -1222,7 +1285,12 @@ def build_eml(
     stamp = datetime.strptime(snapshot, "%Y-%m-%d").replace(tzinfo=timezone.utc)
     message["Date"] = format_datetime(stamp)
     message["Message-ID"] = f"<{basename}.{snapshot}@bundle.invalid>"
-    plain_lines = [str(config["title"]), f"快照 {config['snapshot']}", "", str(config.get("decision", ""))]
+    plain_lines = [
+        str(config["title"]),
+        f"快照 {config['snapshot']}",
+        "",
+        str(config.get("decision", "")),
+    ]
     plain_lines.extend(f"- {item}" for item in config.get("summary", []))
     plain_lines.append("\n完整 HTML 與 Markdown ZIP 已附上。")
     message.set_content("\n".join(plain_lines))
@@ -1291,7 +1359,10 @@ def generate(config_path: Path) -> list[Path]:
         f"{sha256_bytes(path.read_bytes())}  {path.name}\n" for path in outer_entries
     )
     manifest_path.write_text(
-        "# distributable files\n" + outer_manifest + "\n# ZIP internal manifest\n" + internal_manifest,
+        "# distributable files\n"
+        + outer_manifest
+        + "\n# ZIP internal manifest\n"
+        + internal_manifest,
         encoding="utf-8",
     )
     return [html_path, zip_path, eml_path, manifest_path]

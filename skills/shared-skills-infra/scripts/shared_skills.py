@@ -80,7 +80,9 @@ class Sites:
             try:
                 stored = json.loads(path.read_text(encoding="utf-8"))
             except (OSError, json.JSONDecodeError) as error:
-                raise SharedSkillsError(f"unreadable sites file: {path}: {error}") from error
+                raise SharedSkillsError(
+                    f"unreadable sites file: {path}: {error}"
+                ) from error
         self.codex_surface = Path(
             getattr(args, "codex_surface", None)
             or stored.get("codex_surface")
@@ -91,19 +93,23 @@ class Sites:
             or stored.get("claude_surface")
             or DEFAULT_CLAUDE_SURFACE
         ).expanduser()
-        raw_projects = list(getattr(args, "project", None) or stored.get("projects") or [])
+        raw_projects = list(
+            getattr(args, "project", None) or stored.get("projects") or []
+        )
         self.projects = [Path(p).expanduser() for p in raw_projects]
         # Some repos require the Claude surface to be a forwarder stub rather
         # than a symlink (their own gate checks the stub's contents). Which repos
         # those are is a per-machine fact, so it is configured, never guessed.
         self.claude_forwarder = set(
-            getattr(args, "claude_forwarder", None) or stored.get("claude_forwarder_projects") or []
+            getattr(args, "claude_forwarder", None)
+            or stored.get("claude_forwarder_projects")
+            or []
         )
 
     def as_dict(self) -> dict[str, Any]:
         return {
             "_note": "Machine-specific paths only; gitignored on purpose. The versioned "
-                     "registry must stay free of absolute paths so any clone works anywhere.",
+            "registry must stay free of absolute paths so any clone works anywhere.",
             "codex_surface": str(self.codex_surface),
             "claude_surface": str(self.claude_surface),
             "projects": [str(p) for p in self.projects],
@@ -112,7 +118,8 @@ class Sites:
 
     def save(self) -> None:
         self.path.write_text(
-            json.dumps(self.as_dict(), ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+            json.dumps(self.as_dict(), ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
         )
 
     def surfaces(self) -> dict[str, Path]:
@@ -134,7 +141,8 @@ class Sites:
 
 def content_files(path: Path) -> list[Path]:
     return sorted(
-        p for p in path.rglob("*")
+        p
+        for p in path.rglob("*")
         if p.is_file() and "__pycache__" not in p.parts and not p.name.endswith(".pyc")
     )
 
@@ -226,7 +234,9 @@ def report(registry: dict[str, Any], sites: Sites) -> int:
         print(f"\n### 待人裁：同名多份、尚未登記 ({len(unruled)})")
         for name, places in unruled:
             hashes = set(places.values())
-            verdict = "內容相同→純重複" if len(hashes) == 1 else f"分岔 {len(hashes)} 版"
+            verdict = (
+                "內容相同→純重複" if len(hashes) == 1 else f"分岔 {len(hashes)} 版"
+            )
             print(f"  {name:34s} {len(places)} 份, {verdict}")
             for label, value in sorted(places.items()):
                 print(f"      {label:26s} {value}")
@@ -272,11 +282,13 @@ def check(registry: dict[str, Any], sites: Sites) -> int:
             if not surface.is_symlink():
                 failures.append(f"NOT-A-SYMLINK {name}: {surface} -- run `link {name}`")
             elif surface.resolve() != canonical.resolve():
-                failures.append(f"WRONG-TARGET {name}: {surface} -> {surface.resolve()}")
+                failures.append(
+                    f"WRONG-TARGET {name}: {surface} -> {surface.resolve()}"
+                )
         deferred = set(item.get("deferred_in", []))
         for label in sorted(found.get(name, {})):
             if label.split("/")[0] in deferred:
-                continue        # recorded as unruled; `report` still surfaces it
+                continue  # recorded as unruled; `report` still surfaces it
             failures.append(
                 f"SHADOWED {name}: {label} keeps its own copy -- project skills win over "
                 f"user skills, so that copy silently replaces the shared one"
@@ -309,8 +321,10 @@ def _point(surface: Path, target: Path, canonical: Path, strict: bool) -> bool:
         surface.unlink()
     elif surface.exists():
         if strict:
-            raise SharedSkillsError(f"{surface} exists and is not a symlink -- use `adopt`")
-        return False        # a real copy here is a shadow/defer question, not link's job
+            raise SharedSkillsError(
+                f"{surface} exists and is not a symlink -- use `adopt`"
+            )
+        return False  # a real copy here is a shadow/defer question, not link's job
     surface.parent.mkdir(parents=True, exist_ok=True)
     surface.symlink_to(target)
     if surface.resolve() != canonical.resolve():
@@ -339,9 +353,9 @@ def _write_forwarder(surface: Path, name: str) -> bool:
     if surface.is_symlink():
         surface.unlink()
     elif surface.is_dir() and not (surface / "SKILL.md").is_file():
-        return False        # a real copy: a shadow/defer question, not link's job
+        return False  # a real copy: a shadow/defer question, not link's job
     elif surface.is_dir() and len(content_files(surface)) > 1:
-        return False        # more than a stub lives here; leave it for `adopt`
+        return False  # more than a stub lives here; leave it for `adopt`
     surface.mkdir(parents=True, exist_ok=True)
     (surface / "SKILL.md").write_text(FORWARDER.format(name=name), encoding="utf-8")
     return True
@@ -366,15 +380,21 @@ def link(registry: dict[str, Any], sites: Sites, name: str, quiet: bool = False)
     targets: list[tuple[Path, Path, bool]] = [
         (codex_root / name, canonical, True),
         # relative, matching the form the other user-level Claude entries use
-        (claude_root / name, Path(os.path.relpath(codex_root / name, claude_root)), True),
+        (
+            claude_root / name,
+            Path(os.path.relpath(codex_root / name, claude_root)),
+            True,
+        ),
     ]
     deferred = set(
-        next((i for i in registry["shared"] if i["name"] == name), {}).get("deferred_in", [])
+        next((i for i in registry["shared"] if i["name"] == name), {}).get(
+            "deferred_in", []
+        )
     )
     linked_forwarders: list[Path] = []
     for project in sites.projects:
         if not project.is_dir() or project.name in deferred:
-            continue        # a deferred repo's own version stands until ruled
+            continue  # a deferred repo's own version stands until ruled
         # Absolute on both project surfaces on purpose: a relative
         # .claude -> ../../.agents hop resolves to whatever that repo keeps
         # under .agents, which for a diverged repo is its local copy, not
@@ -460,12 +480,19 @@ def adopt(
         shutil.move(str(path), str(destination))
         print(f"SWEPT   {label:24s} {path} -> {destination}")
 
-    entry: dict[str, Any] = {"name": name, "admitted": date.today().isoformat(), "why": why}
+    entry: dict[str, Any] = {
+        "name": name,
+        "admitted": date.today().isoformat(),
+        "why": why,
+    }
     if defer:
         entry["deferred_in"] = sorted(defer)
     registry["shared"].append(entry)
     save_registry(registry)
-    print(f"REGISTERED {name}" + (f" (deferred in {', '.join(sorted(defer))})" if defer else ""))
+    print(
+        f"REGISTERED {name}"
+        + (f" (deferred in {', '.join(sorted(defer))})" if defer else "")
+    )
     return link(registry, sites, name)
 
 
@@ -476,30 +503,44 @@ def _parser() -> argparse.ArgumentParser:
     def with_paths(sub: argparse.ArgumentParser) -> argparse.ArgumentParser:
         sub.add_argument("--codex-surface", help="default ~/.agents/skills")
         sub.add_argument("--claude-surface", help="default ~/.claude/skills")
-        sub.add_argument("--project", action="append", help="repeatable; a repo to govern")
         sub.add_argument(
-            "--claude-forwarder", action="append",
+            "--project", action="append", help="repeatable; a repo to govern"
+        )
+        sub.add_argument(
+            "--claude-forwarder",
+            action="append",
             help="repeatable repo name whose .claude surface needs a stub, not a symlink",
         )
         sub.add_argument("--sites", type=Path, default=SITES, help="machine paths file")
         return sub
 
-    with_paths(commands.add_parser("install", help="wire this clone to a machine and link"))
-    with_paths(commands.add_parser("report", help="classify every skill name; decision queue"))
+    with_paths(
+        commands.add_parser("install", help="wire this clone to a machine and link")
+    )
+    with_paths(
+        commands.add_parser("report", help="classify every skill name; decision queue")
+    )
     with_paths(commands.add_parser("check", help="zero-network gate over the rulings"))
-    link_parser = with_paths(commands.add_parser("link", help="materialize a skill's symlinks"))
+    link_parser = with_paths(
+        commands.add_parser("link", help="materialize a skill's symlinks")
+    )
     link_parser.add_argument("name")
-    adopt_parser = with_paths(commands.add_parser("adopt", help="move a copy in and register"))
+    adopt_parser = with_paths(
+        commands.add_parser("adopt", help="move a copy in and register")
+    )
     adopt_parser.add_argument("name")
     adopt_parser.add_argument("--from", dest="source", required=True, type=Path)
     adopt_parser.add_argument("--why", required=True)
     adopt_parser.add_argument("--dry-run", action="store_true")
     adopt_parser.add_argument(
-        "--defer", action="append", default=[],
+        "--defer",
+        action="append",
+        default=[],
         help="repeatable repo name whose copy stays put and is recorded as unruled",
     )
     adopt_parser.add_argument(
-        "--backup-dir", type=Path,
+        "--backup-dir",
+        type=Path,
         default=Path(os.environ.get("TMPDIR", "/tmp")) / "shared-skills-superseded",
     )
     return parser
@@ -519,8 +560,14 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "link":
             return link(registry, sites, args.name)
         return adopt(
-            registry, sites, args.name, args.source, args.why,
-            args.backup_dir, args.dry_run, args.defer,
+            registry,
+            sites,
+            args.name,
+            args.source,
+            args.why,
+            args.backup_dir,
+            args.dry_run,
+            args.defer,
         )
     except SharedSkillsError as error:
         print(f"FAIL {error}", file=sys.stderr)

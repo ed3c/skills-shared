@@ -56,7 +56,9 @@ def _relative(raw: Any, field: str) -> Path:
     return Path(*value.parts)
 
 
-def _gitlab_url(value: Any, field: str, host: str, project: str, kind: str) -> str | None:
+def _gitlab_url(
+    value: Any, field: str, host: str, project: str, kind: str
+) -> str | None:
     """Validate a GitLab web URL for this exact host and project path.
 
     GitLab puts a `/-/` separator between the project path and the resource,
@@ -98,13 +100,23 @@ def _validate_line(line: dict[str, Any], repo_root: Path) -> list[str]:
     if not isinstance(host, str) or HOST_RE.fullmatch(host) is None:
         return [f"{line_id}: invalid gitlab_host"]
     if not isinstance(project, str) or PROJECT_RE.fullmatch(project) is None:
-        return [f"{line_id}: gitlab_project must be a namespaced path (group[/subgroup]/project)"]
-    if not isinstance(project_id, int) or isinstance(project_id, bool) or project_id < 1:
+        return [
+            f"{line_id}: gitlab_project must be a namespaced path (group[/subgroup]/project)"
+        ]
+    if (
+        not isinstance(project_id, int)
+        or isinstance(project_id, bool)
+        or project_id < 1
+    ):
         return [f"{line_id}: gitlab_project_id must be a positive integer"]
 
     try:
-        artifact = repo_root / _relative(line.get("artifact_path"), f"{line_id}.artifact_path")
-        receipt_path = repo_root / _relative(line.get("receipt_path"), f"{line_id}.receipt_path")
+        artifact = repo_root / _relative(
+            line.get("artifact_path"), f"{line_id}.artifact_path"
+        )
+        receipt_path = repo_root / _relative(
+            line.get("receipt_path"), f"{line_id}.receipt_path"
+        )
         publication_path = repo_root / _relative(
             line.get("publication_path"), f"{line_id}.publication_path"
         )
@@ -127,7 +139,10 @@ def _validate_line(line: dict[str, Any], repo_root: Path) -> list[str]:
     if receipt.get("gitlab_host") != host:
         failures.append(f"{line_id}: receipt gitlab_host mismatch")
     receipt_project = receipt.get("gitlab_project")
-    if not isinstance(receipt_project, str) or PROJECT_RE.fullmatch(receipt_project) is None:
+    if (
+        not isinstance(receipt_project, str)
+        or PROJECT_RE.fullmatch(receipt_project) is None
+    ):
         failures.append(f"{line_id}: invalid receipt gitlab_project")
         receipt_project = project
     if receipt.get("gitlab_project_id") != project_id:
@@ -150,10 +165,14 @@ def _validate_line(line: dict[str, Any], repo_root: Path) -> list[str]:
             failures.append(f"{line_id}: {field} must be a list")
             continue
         for index, value in enumerate(values):
-            url_error = _gitlab_url(value, f"{field}[{index}]", host, receipt_project, kind)
+            url_error = _gitlab_url(
+                value, f"{field}[{index}]", host, receipt_project, kind
+            )
             if url_error:
                 failures.append(f"{line_id}: {url_error}")
-    url_error = _gitlab_url(receipt.get("board_url"), "board_url", host, receipt_project, "board")
+    url_error = _gitlab_url(
+        receipt.get("board_url"), "board_url", host, receipt_project, "board"
+    )
     if url_error:
         failures.append(f"{line_id}: {url_error}")
 
@@ -168,7 +187,9 @@ def _validate_line(line: dict[str, Any], repo_root: Path) -> list[str]:
         return failures
 
     if publication.get("schema") != PUBLICATION_SCHEMA:
-        failures.append(f"{line_id}: invalid publication schema (want {PUBLICATION_SCHEMA})")
+        failures.append(
+            f"{line_id}: invalid publication schema (want {PUBLICATION_SCHEMA})"
+        )
     if publication.get("line") != line_id:
         failures.append(f"{line_id}: publication line mismatch")
     if publication.get("gitlab_host") != host:
@@ -183,19 +204,28 @@ def _validate_line(line: dict[str, Any], repo_root: Path) -> list[str]:
     # folding it into either is how a repo visible to every signed-in user on the
     # instance gets attested as private.
     if publication.get("visibility") not in {"private", "internal", "public"}:
-        failures.append(f"{line_id}: publication visibility must be private, internal or public")
+        failures.append(
+            f"{line_id}: publication visibility must be private, internal or public"
+        )
     for field in ("commit", "export_source_commit", "export_tree_sha"):
         if SHA_RE.fullmatch(str(publication.get(field, ""))) is None:
             failures.append(f"{line_id}: publication {field} must be a full SHA")
     remote_tree = publication.get("remote_head_tree_sha")
     if remote_tree is not None and SHA_RE.fullmatch(str(remote_tree)) is None:
-        failures.append(f"{line_id}: publication remote_head_tree_sha must be a full SHA or null")
-    if not isinstance(publication.get("file_count"), int) or publication["file_count"] < 1:
+        failures.append(
+            f"{line_id}: publication remote_head_tree_sha must be a full SHA or null"
+        )
+    if (
+        not isinstance(publication.get("file_count"), int)
+        or publication["file_count"] < 1
+    ):
         failures.append(f"{line_id}: publication file_count must be positive")
     if publication.get("history_root") is not True:
         failures.append(f"{line_id}: publication history_root must be true")
     try:
-        datetime.fromisoformat(str(publication.get("verified_at", "")).replace("Z", "+00:00"))
+        datetime.fromisoformat(
+            str(publication.get("verified_at", "")).replace("Z", "+00:00")
+        )
     except ValueError:
         failures.append(f"{line_id}: publication verified_at must be ISO-8601")
     blockers = publication.get("blockers")
@@ -275,7 +305,9 @@ def _sync_line(registry_path: Path, line_id: str) -> tuple[dict[str, Any], Path]
     lines = registry.get("lines")
     if not isinstance(lines, list):
         raise DeliveryError("registry lines must be a list")
-    matching = [line for line in lines if isinstance(line, dict) and line.get("id") == line_id]
+    matching = [
+        line for line in lines if isinstance(line, dict) and line.get("id") == line_id
+    ]
     if len(matching) != 1:
         raise DeliveryError(f"registry line must exist exactly once: {line_id}")
     repo_root_raw = registry.get("repo_root")
@@ -310,8 +342,12 @@ def sync(
             )
             board_url = current_receipt.get("board_url")
             if not isinstance(board_url, str):
-                raise DeliveryError("existing receipt must provide board_url for live sync")
-            snapshot = fetch_gitlab_snapshot(line["gitlab_host"], line["gitlab_project"], board_url)
+                raise DeliveryError(
+                    "existing receipt must provide board_url for live sync"
+                )
+            snapshot = fetch_gitlab_snapshot(
+                line["gitlab_host"], line["gitlab_project"], board_url
+            )
         else:
             raise DeliveryError("sync requires exactly one of --snapshot or --gitlab")
         receipt, publication, metrics, dashboard = build_outputs(
@@ -322,7 +358,9 @@ def sync(
             export_repo=(export_repo or repo_root).resolve(),
         )
         receipt_path = repo_root / _relative(line["receipt_path"], "receipt_path")
-        publication_path = repo_root / _relative(line["publication_path"], "publication_path")
+        publication_path = repo_root / _relative(
+            line["publication_path"], "publication_path"
+        )
         write_outputs(
             {
                 receipt_path: _json_bytes(receipt),
@@ -343,7 +381,9 @@ def sync(
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
-    check_parser = commands.add_parser("check", help="run the zero-network receipt gate")
+    check_parser = commands.add_parser(
+        "check", help="run the zero-network receipt gate"
+    )
     check_parser.add_argument("--registry", required=True, type=Path)
     sync_parser = commands.add_parser(
         "sync", help="synchronize GitLab live state or replay a saved snapshot"

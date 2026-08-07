@@ -45,7 +45,9 @@ DEFAULT_HOST = "gitlab.com"
 # already merge, so requiring Maintainer would admit anyone who can merge anyway.
 OWNER_ACCESS_LEVEL = 50
 HOST_RE = re.compile(r"[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?(?::[0-9]{1,5})?")
-PROJECT_RE = re.compile(r"[A-Za-z0-9_.][A-Za-z0-9_.-]*(?:/[A-Za-z0-9_.][A-Za-z0-9_.-]*)+")
+PROJECT_RE = re.compile(
+    r"[A-Za-z0-9_.][A-Za-z0-9_.-]*(?:/[A-Za-z0-9_.][A-Za-z0-9_.-]*)+"
+)
 SHA_RE = re.compile(r"[0-9a-f]{40}")
 NOT_READY = 3
 
@@ -128,9 +130,10 @@ def fetch_snapshot(host: str, project: str) -> dict[str, Any]:
         )
         admit = None
         for event in events:
-            if event.get("action") == "add" and (event.get("label") or {}).get(
-                "name"
-            ) == ADMIT_LABEL:
+            if (
+                event.get("action") == "add"
+                and (event.get("label") or {}).get("name") == ADMIT_LABEL
+            ):
                 actor = (event.get("user") or {}).get("username")
                 admit = {
                     "actor": actor,
@@ -172,7 +175,9 @@ def _access_level(host: str, encoded: str, username: str | None) -> int | None:
     if not username:
         return None
     members = _glab_json(
-        host, f"projects/{encoded}/members/all?query={quote(username, safe='')}&per_page=100", []
+        host,
+        f"projects/{encoded}/members/all?query={quote(username, safe='')}&per_page=100",
+        [],
     )
     for member in members:
         if member.get("username") == username:
@@ -210,9 +215,12 @@ def check_admit(merge_request: dict[str, Any], snapshot: dict[str, Any]) -> str 
     actor = admit["actor"]
     level = admit.get("access_level")
     personal_owner = (
-        snapshot.get("namespace_kind") == "user" and snapshot.get("namespace_path") == actor
+        snapshot.get("namespace_kind") == "user"
+        and snapshot.get("namespace_path") == actor
     )
-    if not personal_owner and (not isinstance(level, int) or level < OWNER_ACCESS_LEVEL):
+    if not personal_owner and (
+        not isinstance(level, int) or level < OWNER_ACCESS_LEVEL
+    ):
         return (
             f"`{ADMIT_LABEL}` applied by {actor} with access_level={level} -- "
             f"an Owner ({OWNER_ACCESS_LEVEL}) must admit"
@@ -284,7 +292,9 @@ def _codex_hook_commands() -> list[str]:
     return _hook_commands([Path.home() / ".codex" / "hooks.json"])
 
 
-def _run_pretooluse(commands: list[str], merge_cmd: list[str]) -> tuple[str, str] | None:
+def _run_pretooluse(
+    commands: list[str], merge_cmd: list[str]
+) -> tuple[str, str] | None:
     """Return a refusal, or None when no hook blocks the real merge command."""
     if not commands:
         return None
@@ -345,8 +355,13 @@ def _codex_config() -> tuple[str, dict[str, Any]]:
     user = _load_toml(user_path) if user_path.is_file() else {}
     project = _load_toml(project_path) if project_path else {}
     merged: dict[str, Any] = {**user, **project}
-    merged["permissions"] = {**user.get("permissions", {}), **project.get("permissions", {})}
-    sources = [str(p) for p in (project_path, user_path if user_path.is_file() else None) if p]
+    merged["permissions"] = {
+        **user.get("permissions", {}),
+        **project.get("permissions", {}),
+    }
+    sources = [
+        str(p) for p in (project_path, user_path if user_path.is_file() else None) if p
+    ]
     return (" over ".join(sources) or "no .codex/config.toml found"), merged
 
 
@@ -388,7 +403,10 @@ def probe_codex(host: str, project: str, merge_cmd: list[str]) -> tuple[str, str
     if not rule_files:
         return "BLOCK", f"no execpolicy rule files in {rules_dir} -- {installer_hint}"
     if shutil.which("codex") is None:
-        return "UNKNOWN", f"codex not on PATH; {len(rule_files)} rule file(s) unverified"
+        return (
+            "UNKNOWN",
+            f"codex not on PATH; {len(rule_files)} rule file(s) unverified",
+        )
     rule_args: list[str] = []
     for rule_file in rule_files:
         rule_args += ["--rules", str(rule_file)]
@@ -422,7 +440,11 @@ def check_gitlab(merge_request: dict[str, Any], allow_unstable: bool) -> str | N
     if status == LANDABLE:
         return None
     if status in UNSTABLE:
-        return None if allow_unstable else f"detailed_merge_status={status} (pass --allow-unstable)"
+        return (
+            None
+            if allow_unstable
+            else f"detailed_merge_status={status} (pass --allow-unstable)"
+        )
     if status in NOT_COMPUTED:
         return f"detailed_merge_status={status} -- GitLab has not finished computing; retry"
     return f"detailed_merge_status={status}: {STATUS_FIX.get(str(status), 'not mergeable')}"
@@ -452,8 +474,17 @@ def merge_command(host: str, project: str, iid: int, sha: str) -> list[str]:
     fails unless the source branch still points at the admitted commit.
     """
     return [
-        "glab", "mr", "merge", "-R", repo_ref(host, project), str(iid),
-        "--squash", "--sha", sha, "--auto-merge=false", "--yes",
+        "glab",
+        "mr",
+        "merge",
+        "-R",
+        repo_ref(host, project),
+        str(iid),
+        "--squash",
+        "--sha",
+        sha,
+        "--auto-merge=false",
+        "--yes",
     ]
 
 
@@ -480,16 +511,25 @@ def bootstrap(host: str, project: str, rules_dir: Path, allow_unstable: bool) ->
     user-level and already applies to every project without per-project work.
     """
     reference = repo_ref(host, project)
-    raw = _glab(["label", "list", "-R", reference, "-F", "json", "--per-page", "100"]).strip()
+    raw = _glab(
+        ["label", "list", "-R", reference, "-F", "json", "--per-page", "100"]
+    ).strip()
     labels = json.loads(raw) if raw else []
     if any(label.get("name") == ADMIT_LABEL for label in labels):
         print(f"OK      label `{ADMIT_LABEL}` already exists in {project}")
     else:
         _glab(
             [
-                "label", "create", "-R", reference, "--name", ADMIT_LABEL,
-                "--color", "#0E8A16",
-                "--description", "owner admits this MR for agent landing",
+                "label",
+                "create",
+                "-R",
+                reference,
+                "--name",
+                ADMIT_LABEL,
+                "--color",
+                "#0E8A16",
+                "--description",
+                "owner admits this MR for agent landing",
             ]
         )
         print(f"CREATED label `{ADMIT_LABEL}` in {project}")
@@ -504,14 +544,22 @@ def bootstrap(host: str, project: str, rules_dir: Path, allow_unstable: bool) ->
         installer = Path(__file__).resolve().parent / "install-codex-merge-rule.sh"
         done = subprocess.run(
             [
-                "bash", str(installer), "--host", host, "--project", project,
-                "--rules-dir", str(rules_dir),
+                "bash",
+                str(installer),
+                "--host",
+                host,
+                "--project",
+                project,
+                "--rules-dir",
+                str(rules_dir),
             ],
             capture_output=True,
             text=True,
         )
         if done.returncode != 0:
-            raise GateError(f"install-codex-merge-rule.sh failed: {done.stderr.strip()}")
+            raise GateError(
+                f"install-codex-merge-rule.sh failed: {done.stderr.strip()}"
+            )
         print(f"CREATED execpolicy rule: {rule} (restart Codex to load it)")
 
     print(f"--- preflight {host}/{project} ---")
@@ -521,9 +569,13 @@ def bootstrap(host: str, project: str, rules_dir: Path, allow_unstable: bool) ->
 def preflight(
     host: str, project: str, snapshot_path: Path | None, allow_unstable: bool
 ) -> int:
-    snapshot = load_snapshot(snapshot_path) if snapshot_path else fetch_snapshot(host, project)
+    snapshot = (
+        load_snapshot(snapshot_path) if snapshot_path else fetch_snapshot(host, project)
+    )
     if snapshot["project"] != project:
-        raise GateError(f"snapshot project {snapshot['project']} != --project {project}")
+        raise GateError(
+            f"snapshot project {snapshot['project']} != --project {project}"
+        )
     if snapshot["host"] != host:
         raise GateError(f"snapshot host {snapshot['host']} != --host {host}")
     merge_requests = snapshot["merge_requests"]
@@ -536,10 +588,15 @@ def preflight(
         layer = "L1 HUMAN-ADMIT" if admit_reason else "L3 GITLAB"
         if reason:
             blocked += 1
-            print(f"BLOCK !{merge_request['iid']} {head} [{layer}] {reason}", file=sys.stderr)
+            print(
+                f"BLOCK !{merge_request['iid']} {head} [{layer}] {reason}",
+                file=sys.stderr,
+            )
         else:
             ready.append(merge_request)
-            print(f"READY !{merge_request['iid']} {head} {merge_request.get('title', '')[:60]}")
+            print(
+                f"READY !{merge_request['iid']} {head} {merge_request.get('title', '')[:60]}"
+            )
 
     # The host probe runs even with nothing admitted: knowing which layer will
     # refuse is worth most *before* the work starts, not after.
@@ -553,21 +610,30 @@ def preflight(
     ):
         marker = "<-- active" if name == active else ""
         stream = sys.stderr if verdict == "BLOCK" and name == active else sys.stdout
-        print(f"L2 HOST-POLICY {name}: {verdict} -- {detail} {marker}".rstrip(), file=stream)
+        print(
+            f"L2 HOST-POLICY {name}: {verdict} -- {detail} {marker}".rstrip(),
+            file=stream,
+        )
         if verdict == "BLOCK" and name == active:
             host_blocked = True
 
     if host_blocked:
-        print(f"REFUSED by L2 HOST-POLICY on {active}; nothing merged.", file=sys.stderr)
+        print(
+            f"REFUSED by L2 HOST-POLICY on {active}; nothing merged.", file=sys.stderr
+        )
         return 1
     if blocked:
         print(f"REFUSED: {blocked} admitted MR(s) failed L1/L3.", file=sys.stderr)
         return 1
     if not ready:
-        print(f"NO-ADMIT {host}/{project}: no open MR carries the `{ADMIT_LABEL}` label.")
+        print(
+            f"NO-ADMIT {host}/{project}: no open MR carries the `{ADMIT_LABEL}` label."
+        )
         print(f"  human admit = apply `{ADMIT_LABEL}` on GitLab (works from a phone).")
         return NOT_READY
-    print(f"PREFLIGHT GREEN: {len(ready)} MR(s) landable on {host}/{project} via {active}")
+    print(
+        f"PREFLIGHT GREEN: {len(ready)} MR(s) landable on {host}/{project} via {active}"
+    )
     return 0
 
 
@@ -578,20 +644,26 @@ def land(host: str, project: str, allow_unstable: bool, dry_run: bool) -> int:
         snapshot = fetch_snapshot(host, project)
         pending = [
             merge_request
-            for merge_request in sorted(snapshot["merge_requests"], key=lambda item: item["iid"])
+            for merge_request in sorted(
+                snapshot["merge_requests"], key=lambda item: item["iid"]
+            )
             if check_admit(merge_request, snapshot) is None
             and check_gitlab(merge_request, allow_unstable) is None
         ]
         if not pending:
             break
         merge_request = pending[0]
-        command = merge_command(host, project, merge_request["iid"], merge_request["sha"])
+        command = merge_command(
+            host, project, merge_request["iid"], merge_request["sha"]
+        )
         if dry_run:
             print(f"DRY-RUN {' '.join(command)}")
             return 0
         done = subprocess.run(command, capture_output=True, text=True)
         if done.returncode != 0:
-            print(f"FAIL !{merge_request['iid']}: {done.stderr.strip()}", file=sys.stderr)
+            print(
+                f"FAIL !{merge_request['iid']}: {done.stderr.strip()}", file=sys.stderr
+            )
             print(f"LANDED={landed} before the failure.", file=sys.stderr)
             return 1
         landed += 1
@@ -616,14 +688,18 @@ def _parser() -> argparse.ArgumentParser:
             "--project",
             help="GROUP[/SUBGROUP]/PROJECT; defaults to the current directory's remote",
         )
-        sub.add_argument("--host", default=None, help=f"GitLab host (default {DEFAULT_HOST})")
+        sub.add_argument(
+            "--host", default=None, help=f"GitLab host (default {DEFAULT_HOST})"
+        )
         sub.add_argument("--allow-unstable", action="store_true")
         if name == "preflight":
             sub.add_argument("--snapshot", type=Path, help="offline replay; no network")
         elif name == "land":
             sub.add_argument("--dry-run", action="store_true")
         else:
-            sub.add_argument("--rules-dir", type=Path, default=Path.home() / ".codex" / "rules")
+            sub.add_argument(
+                "--rules-dir", type=Path, default=Path.home() / ".codex" / "rules"
+            )
     return parser
 
 
@@ -639,7 +715,8 @@ def main(argv: list[str] | None = None) -> int:
             return 64
         if PROJECT_RE.fullmatch(project) is None:
             print(
-                f"FAIL --project must be GROUP[/SUBGROUP]/PROJECT: {project}", file=sys.stderr
+                f"FAIL --project must be GROUP[/SUBGROUP]/PROJECT: {project}",
+                file=sys.stderr,
             )
             return 64
         if args.command == "preflight":

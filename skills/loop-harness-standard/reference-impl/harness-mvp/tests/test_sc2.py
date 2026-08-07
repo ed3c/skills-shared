@@ -46,9 +46,17 @@ def test_sc2_event_stream_order_stays_complete_across_retry_and_next_step(tmp_pa
     records = ledger.read_all()
 
     assert exit_code == 0
-    assert [record["event"]["kind"] for record in records] == ["tool_error", "tool_result", "tool_result"]
+    assert [record["event"]["kind"] for record in records] == [
+        "tool_error",
+        "tool_result",
+        "tool_result",
+    ]
     assert [record["event"]["args"]["attempt"] for record in records] == [1, 2, 1]
-    assert [record["parentId"] for record in records] == [None, records[0]["id"], "retry-ok"]
+    assert [record["parentId"] for record in records] == [
+        None,
+        records[0]["id"],
+        "retry-ok",
+    ]
 
 
 def test_sc2_executor_exception_retries_then_succeeds(tmp_path):
@@ -111,7 +119,15 @@ def test_sc2_retry_exhaustion_writes_failure_envelope_and_blocks_in_l4(tmp_path)
 def test_sc2_l0_module_stays_pure_without_planning_or_orchestration_symbols():
     params = tuple(inspect.signature(loop_module.run_loop).parameters)
 
-    assert params == ("task_packet", "steps", "ledger", "executor", "l3_config", "parent_id", "git_commit_sha")
+    assert params == (
+        "task_packet",
+        "steps",
+        "ledger",
+        "executor",
+        "l3_config",
+        "parent_id",
+        "git_commit_sha",
+    )
     assert not hasattr(loop_module, "plan")
     assert not hasattr(loop_module, "planner")
     assert not hasattr(loop_module, "subagent")

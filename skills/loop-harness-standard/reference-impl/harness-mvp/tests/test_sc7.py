@@ -28,7 +28,9 @@ def _record(record_id: str, *, result_snapshot: object = "ok") -> dict[str, obje
     )
 
 
-def test_sc7_multiple_records_each_append_in_one_write_with_newline(tmp_path, monkeypatch):
+def test_sc7_multiple_records_each_append_in_one_write_with_newline(
+    tmp_path, monkeypatch
+):
     calls: list[bytes] = []
     real_write = __import__("os").write
 
@@ -73,7 +75,10 @@ def test_sc7_long_record_still_appends_as_single_write(tmp_path, monkeypatch):
 
     monkeypatch.setattr(ledger_module.os, "write", spy_write)
     ledger = Ledger(tmp_path / "ledger.jsonl")
-    record = _record("long-record", result_snapshot={"uri": "file:///tmp/" + "x" * 8000, "sha256": "deadbeef"})
+    record = _record(
+        "long-record",
+        result_snapshot={"uri": "file:///tmp/" + "x" * 8000, "sha256": "deadbeef"},
+    )
 
     ledger.append(record)
 

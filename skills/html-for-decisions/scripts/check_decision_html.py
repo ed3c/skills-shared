@@ -97,7 +97,10 @@ def main(argv: list[str]) -> int:
     if len(argv) == 2 and argv[1] == "--selftest":
         return selftest()
     if len(argv) != 2:
-        print("usage: check_decision_html.py <decision.html> | --selftest", file=sys.stderr)
+        print(
+            "usage: check_decision_html.py <decision.html> | --selftest",
+            file=sys.stderr,
+        )
         return 1
     target = Path(argv[1])
     if not target.is_file():

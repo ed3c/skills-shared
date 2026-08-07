@@ -46,9 +46,15 @@ def run_loop(
                     "command": step.get("tool"),
                     "exit_code": 1,
                     "result_snapshot": None,
-                    "error_snapshot": {"type": type(exc).__name__, "message": str(exc), "attempt": attempt},
+                    "error_snapshot": {
+                        "type": type(exc).__name__,
+                        "message": str(exc),
+                        "attempt": attempt,
+                    },
                     "event_kind": "tool_error",
-                    "handoff": {"next_action": "handled"} if attempt < attempts else None,
+                    "handoff": {"next_action": "handled"}
+                    if attempt < attempts
+                    else None,
                 }
 
             record = _make_record(
@@ -79,7 +85,13 @@ def run_loop(
 
 
 def _resolve_max_attempts(task_packet: dict[str, Any], step: dict[str, Any]) -> int:
-    raw = step.get("max_attempts", step.get("maxAttempts", task_packet.get("max_attempts", task_packet.get("maxAttempts", 1))))
+    raw = step.get(
+        "max_attempts",
+        step.get(
+            "maxAttempts",
+            task_packet.get("max_attempts", task_packet.get("maxAttempts", 1)),
+        ),
+    )
     attempts = int(raw)
     if attempts < 1:
         raise ValueError("max_attempts must be >= 1")
@@ -128,5 +140,8 @@ def _make_record(
         },
         handoff=result.get("handoff"),
         budget=cumulative_budget,
-        freshness={"git_commit_sha": git_commit_sha, "fact_stale": bool(result.get("fact_stale", False))},
+        freshness={
+            "git_commit_sha": git_commit_sha,
+            "fact_stale": bool(result.get("fact_stale", False)),
+        },
     )

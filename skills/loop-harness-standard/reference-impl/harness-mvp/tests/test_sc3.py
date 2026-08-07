@@ -38,7 +38,11 @@ def test_sc3_nine_field_round_trip_preserves_pointer_snapshots(tmp_path):
     ledger = Ledger(tmp_path / "ledger.jsonl")
     record = _record(
         "root",
-        result_snapshot={"uri": "file:///tmp/result.json", "sha256": "deadbeef", "preview": "trimmed"},
+        result_snapshot={
+            "uri": "file:///tmp/result.json",
+            "sha256": "deadbeef",
+            "preview": "trimmed",
+        },
         error_snapshot={"hash": "beadfeed", "preview": "stderr tail"},
     )
 

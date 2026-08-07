@@ -17,19 +17,26 @@ EXIT: 0 成功 · 1 用法/檔案錯 · 2 selftest FAIL
 
 可攜性: 本檔零宿主專屬路徑/假設（selftest 走合成 fixture，非讀外部檔），任一 repo 原樣可用。
 """
+
 import html as html_mod
 import json
 import sys
 from pathlib import Path
 
 # 與 skill 家族同源的視覺 tokens（已過 dataviz validator 的狀態色）
-C_ADOPT, C_BORROW, C_PENDING, C_RECORD, C_HUSK = "#1A7A4A", "#1D6FA8", "#B45309", "#7A5CB8", "#B3382C"
+C_ADOPT, C_BORROW, C_PENDING, C_RECORD, C_HUSK = (
+    "#1A7A4A",
+    "#1D6FA8",
+    "#B45309",
+    "#7A5CB8",
+    "#B3382C",
+)
 ACCENT, INK, INK2, HAIR, GROUND = "#175E75", "#1B2530", "#56677A", "#D9E0E6", "#F1F3F5"
 
 
 def parse_session(lines):
     """JSONL 行 → trace dict。逐 assistant 訊息以 message.id 去重（串流分片防重計）。"""
-    calls = {}          # id → call dict（保留最後一次出現）
+    calls = {}  # id → call dict（保留最後一次出現）
     order = []
     tool_counts = {}
     human_turns = 0
@@ -53,14 +60,16 @@ def parse_session(lines):
         content = m.get("content")
         if t == "user":
             blocks = content if isinstance(content, list) else []
-            has_tool_result = any(isinstance(b, dict) and b.get("type") == "tool_result" for b in blocks)
+            has_tool_result = any(
+                isinstance(b, dict) and b.get("type") == "tool_result" for b in blocks
+            )
             if not has_tool_result and (isinstance(content, str) or blocks):
                 human_turns += 1
         elif t == "assistant":
             mid = m.get("id") or f"noid-{len(order)}"
             u = m.get("usage") or {}
             tools, text_chars, think_chars = [], 0, 0
-            for b in (content if isinstance(content, list) else []):
+            for b in content if isinstance(content, list) else []:
                 if not isinstance(b, dict):
                     continue
                 bt = b.get("type")
@@ -79,7 +88,9 @@ def parse_session(lines):
                 "cache_create": u.get("cache_creation_input_tokens", 0),
                 "eph_5m": cc.get("ephemeral_5m_input_tokens", 0),
                 "eph_1h": cc.get("ephemeral_1h_input_tokens", 0),
-                "tools": tools, "text_chars": text_chars, "think_chars": think_chars,
+                "tools": tools,
+                "text_chars": text_chars,
+                "think_chars": think_chars,
                 "has_usage": bool(u),
             }
             if mid not in calls:
@@ -103,12 +114,18 @@ def parse_session(lines):
     total_in = sum(c["in"] for c in usage_calls)
     denom = total_read + total_create + total_in
     return {
-        "calls": seq, "usage_calls": usage_calls, "tool_counts": tool_counts,
-        "human_turns": human_turns, "record_types": record_types,
-        "first_ts": first_ts, "last_ts": last_ts,
+        "calls": seq,
+        "usage_calls": usage_calls,
+        "tool_counts": tool_counts,
+        "human_turns": human_turns,
+        "record_types": record_types,
+        "first_ts": first_ts,
+        "last_ts": last_ts,
         "totals": {
             "out": sum(c["out"] for c in usage_calls),
-            "read": total_read, "create": total_create, "in": total_in,
+            "read": total_read,
+            "create": total_create,
+            "in": total_in,
             "eph_5m": sum(c["eph_5m"] for c in usage_calls),
             "eph_1h": sum(c["eph_1h"] for c in usage_calls),
             "tool_calls": sum(tool_counts.values()),
@@ -133,52 +150,69 @@ def _svg_chart(usage_calls):
     ymax = max(max(c["ctx"] for c in usage_calls), 1)
     xs = lambda i: PL + (W - PL - 10) * (i / max(n - 1, 1))
     ys = lambda v: PT + (H - PT - PB) * (1 - v / ymax)
+
     def poly(key, color, label):
-        pts = " ".join(f"{xs(i):.1f},{ys(c[key]):.1f}" for i, c in enumerate(usage_calls))
+        pts = " ".join(
+            f"{xs(i):.1f},{ys(c[key]):.1f}" for i, c in enumerate(usage_calls)
+        )
         dots = "".join(
             f'<circle cx="{xs(i):.1f}" cy="{ys(c[key]):.1f}" r="2.4" fill="{color}">'
             f"<title>call {i + 1} · {label} {_fmt(c[key])}</title></circle>"
             for i, c in enumerate(usage_calls)
         )
         end = usage_calls[-1][key]
-        return (f'<polyline points="{pts}" fill="none" stroke="{color}" stroke-width="2"/>{dots}'
-                f'<text x="{W-6}" y="{ys(end)-6:.1f}" text-anchor="end" font-size="11" fill="{INK}">{label} {_fmt(end)}</text>')
+        return (
+            f'<polyline points="{pts}" fill="none" stroke="{color}" stroke-width="2"/>{dots}'
+            f'<text x="{W - 6}" y="{ys(end) - 6:.1f}" text-anchor="end" font-size="11" fill="{INK}">{label} {_fmt(end)}</text>'
+        )
+
     grid = "".join(
-        f'<line x1="{PL}" y1="{ys(ymax*f):.1f}" x2="{W-10}" y2="{ys(ymax*f):.1f}" stroke="{HAIR}" stroke-width="1"/>'
-        f'<text x="{PL-6}" y="{ys(ymax*f)+4:.1f}" text-anchor="end" font-size="10" fill="{INK2}">{_fmt(int(ymax*f))}</text>'
+        f'<line x1="{PL}" y1="{ys(ymax * f):.1f}" x2="{W - 10}" y2="{ys(ymax * f):.1f}" stroke="{HAIR}" stroke-width="1"/>'
+        f'<text x="{PL - 6}" y="{ys(ymax * f) + 4:.1f}" text-anchor="end" font-size="10" fill="{INK2}">{_fmt(int(ymax * f))}</text>'
         for f in (0.25, 0.5, 0.75, 1.0)
     )
-    return (f'<svg viewBox="0 0 {W} {H}" role="img" aria-label="context 規模與 cache_read 曲線" '
-            f'style="width:100%;height:auto">{grid}'
-            f'{poly("ctx", C_ADOPT, "context")}{poly("cache_read", C_BORROW, "cache_read")}</svg>'
-            f'<div class="legend"><span style="color:{C_ADOPT}">● context（in+read+create）</span>'
-            f'<span style="color:{C_BORROW}">● cache_read</span></div>')
+    return (
+        f'<svg viewBox="0 0 {W} {H}" role="img" aria-label="context 規模與 cache_read 曲線" '
+        f'style="width:100%;height:auto">{grid}'
+        f"{poly('ctx', C_ADOPT, 'context')}{poly('cache_read', C_BORROW, 'cache_read')}</svg>"
+        f'<div class="legend"><span style="color:{C_ADOPT}">● context（in+read+create）</span>'
+        f'<span style="color:{C_BORROW}">● cache_read</span></div>'
+    )
 
 
 def render_html(trace, source_name):
     t = trace["totals"]
     date = (trace["last_ts"] or "")[:10] or "unknown-date"
-    hit_pct = f"{trace['cache_hit_ratio']*100:.1f}%"
+    hit_pct = f"{trace['cache_hit_ratio'] * 100:.1f}%"
     noq = len(trace["usage_calls"])
     oracle_ok = trace["oracle_turns"] == noq and noq > 0
-    oracle_chip = (f'<span class="chip ok">cache oracle PASS（{trace["oracle_turns"]}/{noq} calls cache_read&gt;0）</span>'
-                   if oracle_ok else
-                   f'<span class="chip warn">cache oracle {trace["oracle_turns"]}/{noq} calls cache_read&gt;0</span>')
-    miss_html = ("".join(
-        f'<tr><td class="id">call {m["idx"]+1}</td><td>{_fmt(m["prev"])} → {_fmt(m["cur"])}</td>'
-        f"<td>cache_read 驟降 &gt;50%——疑 prefix miss（git 狀態變動/prefix 不穩/超 TTL）</td></tr>"
-        for m in trace["misses"]) or '<tr><td colspan="3">無驟降事件</td></tr>')
+    oracle_chip = (
+        f'<span class="chip ok">cache oracle PASS（{trace["oracle_turns"]}/{noq} calls cache_read&gt;0）</span>'
+        if oracle_ok
+        else f'<span class="chip warn">cache oracle {trace["oracle_turns"]}/{noq} calls cache_read&gt;0</span>'
+    )
+    miss_html = (
+        "".join(
+            f'<tr><td class="id">call {m["idx"] + 1}</td><td>{_fmt(m["prev"])} → {_fmt(m["cur"])}</td>'
+            f"<td>cache_read 驟降 &gt;50%——疑 prefix miss（git 狀態變動/prefix 不穩/超 TTL）</td></tr>"
+            for m in trace["misses"]
+        )
+        or '<tr><td colspan="3">無驟降事件</td></tr>'
+    )
     tools_sorted = sorted(trace["tool_counts"].items(), key=lambda kv: -kv[1])
     tmax = max([v for _, v in tools_sorted] or [1])
     tool_rows = "".join(
         f'<div class="trow"><span class="tname">{html_mod.escape(k)}</span>'
-        f'<span class="tbar"><span style="width:{v/tmax*100:.0f}%"></span></span>'
-        f'<span class="tnum">{v}</span></div>' for k, v in tools_sorted)
+        f'<span class="tbar"><span style="width:{v / tmax * 100:.0f}%"></span></span>'
+        f'<span class="tnum">{v}</span></div>'
+        for k, v in tools_sorted
+    )
     rows = "".join(
-        f'<tr><td class="id">{i+1}</td><td class="id">{(c["ts"] or "")[11:19]}</td>'
-        f'<td>{_fmt(c["cache_read"])}</td><td>{_fmt(c["cache_create"])}</td>'
-        f'<td>{_fmt(c["out"])}</td><td>{html_mod.escape(", ".join(c["tools"]) or "—")}</td></tr>'
-        for i, c in enumerate(trace["usage_calls"]))
+        f'<tr><td class="id">{i + 1}</td><td class="id">{(c["ts"] or "")[11:19]}</td>'
+        f"<td>{_fmt(c['cache_read'])}</td><td>{_fmt(c['cache_create'])}</td>"
+        f"<td>{_fmt(c['out'])}</td><td>{html_mod.escape(', '.join(c['tools']) or '—')}</td></tr>"
+        for i, c in enumerate(trace["usage_calls"])
+    )
     return f"""<title>上下文觀測 · {html_mod.escape(source_name)}</title>
 <style>
  body{{background:{GROUND};color:{INK};font-family:"PingFang TC","Noto Sans TC",system-ui,sans-serif;
@@ -250,30 +284,76 @@ def render_html(trace, source_name):
 
 def selftest():
     fixture = [
-        json.dumps({"type": "user", "timestamp": "2026-07-09T10:00:00Z",
-                    "message": {"role": "user", "content": "hi"}}),
-        json.dumps({"type": "assistant", "timestamp": "2026-07-09T10:00:05Z",
-                    "message": {"id": "m1", "role": "assistant",
-                                "content": [{"type": "tool_use", "name": "Bash", "input": {}},
-                                            {"type": "text", "text": "ok"}],
-                                "usage": {"input_tokens": 2, "output_tokens": 100,
-                                          "cache_read_input_tokens": 50_000,
-                                          "cache_creation_input_tokens": 1_000,
-                                          "cache_creation": {"ephemeral_5m_input_tokens": 0,
-                                                             "ephemeral_1h_input_tokens": 1_000}}}}),
-        json.dumps({"type": "assistant", "timestamp": "2026-07-09T10:01:00Z",
-                    "message": {"id": "m2", "role": "assistant", "content": [{"type": "text", "text": "x"}],
-                                "usage": {"input_tokens": 2, "output_tokens": 30,
-                                          "cache_read_input_tokens": 900,
-                                          "cache_creation_input_tokens": 60_000,
-                                          "cache_creation": {"ephemeral_5m_input_tokens": 60_000,
-                                                             "ephemeral_1h_input_tokens": 0}}}}),
-        json.dumps({"type": "assistant", "timestamp": "2026-07-09T10:01:00Z",
-                    "message": {"id": "m2", "role": "assistant", "content": [],
-                                "usage": {"input_tokens": 2, "output_tokens": 30,
-                                          "cache_read_input_tokens": 900,
-                                          "cache_creation_input_tokens": 60_000,
-                                          "cache_creation": {}}}}),  # 同 id 重複 → 去重
+        json.dumps(
+            {
+                "type": "user",
+                "timestamp": "2026-07-09T10:00:00Z",
+                "message": {"role": "user", "content": "hi"},
+            }
+        ),
+        json.dumps(
+            {
+                "type": "assistant",
+                "timestamp": "2026-07-09T10:00:05Z",
+                "message": {
+                    "id": "m1",
+                    "role": "assistant",
+                    "content": [
+                        {"type": "tool_use", "name": "Bash", "input": {}},
+                        {"type": "text", "text": "ok"},
+                    ],
+                    "usage": {
+                        "input_tokens": 2,
+                        "output_tokens": 100,
+                        "cache_read_input_tokens": 50_000,
+                        "cache_creation_input_tokens": 1_000,
+                        "cache_creation": {
+                            "ephemeral_5m_input_tokens": 0,
+                            "ephemeral_1h_input_tokens": 1_000,
+                        },
+                    },
+                },
+            }
+        ),
+        json.dumps(
+            {
+                "type": "assistant",
+                "timestamp": "2026-07-09T10:01:00Z",
+                "message": {
+                    "id": "m2",
+                    "role": "assistant",
+                    "content": [{"type": "text", "text": "x"}],
+                    "usage": {
+                        "input_tokens": 2,
+                        "output_tokens": 30,
+                        "cache_read_input_tokens": 900,
+                        "cache_creation_input_tokens": 60_000,
+                        "cache_creation": {
+                            "ephemeral_5m_input_tokens": 60_000,
+                            "ephemeral_1h_input_tokens": 0,
+                        },
+                    },
+                },
+            }
+        ),
+        json.dumps(
+            {
+                "type": "assistant",
+                "timestamp": "2026-07-09T10:01:00Z",
+                "message": {
+                    "id": "m2",
+                    "role": "assistant",
+                    "content": [],
+                    "usage": {
+                        "input_tokens": 2,
+                        "output_tokens": 30,
+                        "cache_read_input_tokens": 900,
+                        "cache_creation_input_tokens": 60_000,
+                        "cache_creation": {},
+                    },
+                },
+            }
+        ),  # 同 id 重複 → 去重
     ]
     tr = parse_session(fixture)
     checks = {
@@ -307,12 +387,18 @@ def main(argv):
     if not src.is_file():
         print(f"ERROR: 檔案不存在 {src}", file=sys.stderr)
         return 1
-    out = Path(argv[argv.index("-o") + 1]) if "-o" in argv else src.with_suffix(".trace.html")
+    out = (
+        Path(argv[argv.index("-o") + 1])
+        if "-o" in argv
+        else src.with_suffix(".trace.html")
+    )
     trace = parse_session(src.read_text(encoding="utf-8").splitlines())
     out.write_text(render_html(trace, src.stem[:12]), encoding="utf-8")
     t = trace["totals"]
-    print(f"OK {out} · {len(trace['usage_calls'])} calls · out {_fmt(t['out'])} tok · "
-          f"cache 命中 {trace['cache_hit_ratio']*100:.1f}% · 驟降 {len(trace['misses'])} 起")
+    print(
+        f"OK {out} · {len(trace['usage_calls'])} calls · out {_fmt(t['out'])} tok · "
+        f"cache 命中 {trace['cache_hit_ratio'] * 100:.1f}% · 驟降 {len(trace['misses'])} 起"
+    )
     return 0
 
 

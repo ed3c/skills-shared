@@ -80,7 +80,9 @@ def validate_envelope(record: dict[str, Any]) -> None:
         raise EnvelopeError("id must be a non-empty string")
     if record["parentId"] is not None and not isinstance(record["parentId"], str):
         raise EnvelopeError("parentId must be a string or None")
-    if not isinstance(record["loop_layer"], str) or not record["loop_layer"].startswith("L"):
+    if not isinstance(record["loop_layer"], str) or not record["loop_layer"].startswith(
+        "L"
+    ):
         raise EnvelopeError("loop_layer must be an L0-L7 style string")
 
     _require_dict(record, "task_ref")
@@ -147,15 +149,21 @@ def _require_keys(record: dict[str, Any], field: str, keys: tuple[str, ...]) -> 
 
 def _validate_snapshot(field: str, value: Any) -> None:
     try:
-        payload = json.dumps(value, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        payload = json.dumps(value, sort_keys=True, separators=(",", ":")).encode(
+            "utf-8"
+        )
     except TypeError as exc:
         raise EnvelopeError(f"{field} must be JSON-serializable") from exc
 
     if len(payload) > MAX_INLINE_SNAPSHOT_BYTES and not _is_pointer_snapshot(value):
-        raise EnvelopeError(f"{field} too large for ledger; store URI/hash pointer instead")
+        raise EnvelopeError(
+            f"{field} too large for ledger; store URI/hash pointer instead"
+        )
 
 
 def _is_pointer_snapshot(value: Any) -> bool:
     if not isinstance(value, dict):
         return False
-    return any(isinstance(value.get(key), str) and value.get(key) for key in POINTER_KEYS)
+    return any(
+        isinstance(value.get(key), str) and value.get(key) for key in POINTER_KEYS
+    )

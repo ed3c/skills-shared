@@ -17,9 +17,7 @@ from urllib.parse import urlparse
 SNAPSHOT_SCHEMA = "github-delivery-snapshot/v1"
 METRICS_SCHEMA = "github-delivery-metrics/v1"
 BLOCKED_LABELS = {"blocked", "blocked-dependency"}
-REFERENCE_RE = re.compile(
-    r"(?im)\b(closes|fixes|resolves|part\s+of)\s+#([1-9][0-9]*)"
-)
+REFERENCE_RE = re.compile(r"(?im)\b(closes|fixes|resolves|part\s+of)\s+#([1-9][0-9]*)")
 
 
 class SyncError(ValueError):
@@ -43,8 +41,7 @@ def _seconds(start: Any, end: Any, field: str) -> int | None:
         return None
     delta = int(
         (
-            _parse_time(end, f"{field}.end")
-            - _parse_time(start, f"{field}.start")
+            _parse_time(end, f"{field}.end") - _parse_time(start, f"{field}.start")
         ).total_seconds()
     )
     if delta < 0:
@@ -124,7 +121,9 @@ def derive_metrics(
         raise SyncError("snapshot issues and pulls must be lists")
     by_issue = {item.get("number"): item for item in issues if isinstance(item, dict)}
     prd_number = _issue_number(prd_issue_url)
-    slice_numbers = [_issue_number(url) for url in issue_urls if _issue_number(url) != prd_number]
+    slice_numbers = [
+        _issue_number(url) for url in issue_urls if _issue_number(url) != prd_number
+    ]
 
     pull_refs: list[tuple[dict[str, Any], set[int], set[int]]] = []
     for pull in pulls:
@@ -154,11 +153,14 @@ def derive_metrics(
         blocked = _blocked_seconds(issue, str(fetched_at))
         events = issue.get("events", [])
         reopened = any(
-            isinstance(event, dict) and event.get("event") == "reopened" for event in events
+            isinstance(event, dict) and event.get("event") == "reopened"
+            for event in events
         )
         reopened_count += int(reopened)
         if merge is not None:
-            merged_at = _parse_time(merge.get("merged_at"), f"PR #{merge.get('number')}.merged_at")
+            merged_at = _parse_time(
+                merge.get("merged_at"), f"PR #{merge.get('number')}.merged_at"
+            )
             accepted_times.append(merged_at)
             reviews = merge.get("reviews", [])
             if isinstance(reviews, list):
@@ -221,17 +223,20 @@ def derive_metrics(
         "accepted_slices": accepted_count,
         "blocked_slices": sum(item["currently_blocked"] for item in slices),
         "closed_without_merge": sum(
-            item["issue_state"] == "CLOSED" and item["accepted_pr"] is None for item in slices
+            item["issue_state"] == "CLOSED" and item["accepted_pr"] is None
+            for item in slices
         ),
         "total_slices": len(slices),
         "throughput_7d": sum(
             0 <= (now - item).total_seconds() <= seven_days for item in accepted_times
         ),
         "throughput_28d": sum(
-            0 <= (now - item).total_seconds() <= twenty_eight_days for item in accepted_times
+            0 <= (now - item).total_seconds() <= twenty_eight_days
+            for item in accepted_times
         ),
         "wip": sum(
-            item["issue_state"] == "OPEN" and item["started_pr"] is not None for item in slices
+            item["issue_state"] == "OPEN" and item["started_pr"] is not None
+            for item in slices
         ),
     }
     percentiles = {
@@ -252,7 +257,9 @@ def derive_metrics(
         "percentiles": percentiles,
         "quality": {
             "first_pass_rate": (
-                sum(first_pass_values) / len(first_pass_values) if first_pass_values else None
+                sum(first_pass_values) / len(first_pass_values)
+                if first_pass_values
+                else None
             ),
             "redaction_leakage_rate": None,
             "reopen_rate": reopened_count / len(slices) if slices else None,
@@ -264,9 +271,7 @@ def derive_metrics(
 
 
 def _gh_json(args: list[str]) -> Any:
-    result = subprocess.run(
-        ["gh", *args], check=False, capture_output=True, text=True
-    )
+    result = subprocess.run(["gh", *args], check=False, capture_output=True, text=True)
     if result.returncode != 0:
         detail = result.stderr.strip() or result.stdout.strip() or "gh command failed"
         raise SyncError(detail)
@@ -286,7 +291,9 @@ def fetch_github_snapshot(repository: str, project_url: str) -> dict[str, Any]:
     head_sha = head.get("sha")
     tree_sha = head.get("commit", {}).get("tree", {}).get("sha")
     tree = _gh_json(["api", f"repos/{repository}/git/trees/{tree_sha}?recursive=1"])
-    commits = _gh_json(["api", f"repos/{repository}/commits?sha={default_branch}&per_page=100"])
+    commits = _gh_json(
+        ["api", f"repos/{repository}/commits?sha={default_branch}&per_page=100"]
+    )
     raw_issues = _gh_json(["api", f"repos/{repository}/issues?state=all&per_page=100"])
     raw_pulls = _gh_json(["api", f"repos/{repository}/pulls?state=all&per_page=100"])
 
@@ -295,7 +302,9 @@ def fetch_github_snapshot(repository: str, project_url: str) -> dict[str, Any]:
         if "pull_request" in issue:
             continue
         number = issue["number"]
-        events = _gh_json(["api", f"repos/{repository}/issues/{number}/events?per_page=100"])
+        events = _gh_json(
+            ["api", f"repos/{repository}/issues/{number}/events?per_page=100"]
+        )
         issues.append(
             {
                 "closed_at": issue.get("closed_at"),
@@ -319,7 +328,9 @@ def fetch_github_snapshot(repository: str, project_url: str) -> dict[str, Any]:
     pulls: list[dict[str, Any]] = []
     for pull in raw_pulls:
         number = pull["number"]
-        reviews = _gh_json(["api", f"repos/{repository}/pulls/{number}/reviews?per_page=100"])
+        reviews = _gh_json(
+            ["api", f"repos/{repository}/pulls/{number}/reviews?per_page=100"]
+        )
         pulls.append(
             {
                 "body": pull.get("body") or "",
@@ -335,7 +346,9 @@ def fetch_github_snapshot(repository: str, project_url: str) -> dict[str, Any]:
                     }
                     for review in reviews
                 ],
-                "state": "MERGED" if pull.get("merged_at") else str(pull.get("state", "")).upper(),
+                "state": "MERGED"
+                if pull.get("merged_at")
+                else str(pull.get("state", "")).upper(),
                 "title": pull.get("title"),
             }
         )
@@ -345,15 +358,31 @@ def fetch_github_snapshot(repository: str, project_url: str) -> dict[str, Any]:
     project: dict[str, Any] = {"url": project_url, "title": "", "status_counts": {}}
     if len(parts) == 4 and parts[0] in {"users", "orgs"} and parts[2] == "projects":
         owner, number = parts[1], parts[3]
-        view = _gh_json(["project", "view", number, "--owner", owner, "--format", "json"])
+        view = _gh_json(
+            ["project", "view", number, "--owner", owner, "--format", "json"]
+        )
         items = _gh_json(
-            ["project", "item-list", number, "--owner", owner, "--format", "json", "--limit", "100"]
+            [
+                "project",
+                "item-list",
+                number,
+                "--owner",
+                owner,
+                "--format",
+                "json",
+                "--limit",
+                "100",
+            ]
         )
         counts: dict[str, int] = {}
         for item in items.get("items", []):
             status = item.get("status") or "No Status"
             counts[status] = counts.get(status, 0) + 1
-        project = {"url": project_url, "title": view.get("title", ""), "status_counts": counts}
+        project = {
+            "url": project_url,
+            "title": view.get("title", ""),
+            "status_counts": counts,
+        }
 
     license_value = repo.get("license") or {}
     return {
@@ -367,7 +396,9 @@ def fetch_github_snapshot(repository: str, project_url: str) -> dict[str, Any]:
         "pulls": pulls,
         "repository": {
             "default_branch": default_branch,
-            "file_count": sum(item.get("type") == "blob" for item in tree.get("tree", [])),
+            "file_count": sum(
+                item.get("type") == "blob" for item in tree.get("tree", [])
+            ),
             "full_name": repo.get("full_name"),
             "id": repo.get("node_id"),
             "head_sha": head_sha,
@@ -382,7 +413,9 @@ def fetch_github_snapshot(repository: str, project_url: str) -> dict[str, Any]:
 
 
 def _json_bytes(value: object) -> bytes:
-    return (json.dumps(value, indent=2, sort_keys=True, ensure_ascii=False) + "\n").encode()
+    return (
+        json.dumps(value, indent=2, sort_keys=True, ensure_ascii=False) + "\n"
+    ).encode()
 
 
 def render_dashboard(
@@ -404,12 +437,9 @@ def render_dashboard(
         "## Truth boundary",
         "",
         "```text",
-        "┌───────────────┐    ┌──────────────┐    "
-        "┌────────────────────────┐",
-        "│ GitHub events │ ─→ │ metrics.json │ ─→ "
-        "│ Markdown decision view │",
-        "└───────────────┘    └──────────────┘    "
-        "└────────────────────────┘",
+        "┌───────────────┐    ┌──────────────┐    ┌────────────────────────┐",
+        "│ GitHub events │ ─→ │ metrics.json │ ─→ │ Markdown decision view │",
+        "└───────────────┘    └──────────────┘    └────────────────────────┘",
         "         │",
         "         ├─→ GitHub Project (status projection only)",
         "         └─→ publication attestation ─→ human visibility gate",
@@ -462,7 +492,9 @@ def render_dashboard(
                 issue_state=item["issue_state"],
                 started=item["started_pr"] or "—",
                 accepted=item["accepted_pr"] or "—",
-                lead=item["lead_seconds"] if item["lead_seconds"] is not None else "UNKNOWN",
+                lead=item["lead_seconds"]
+                if item["lead_seconds"] is not None
+                else "UNKNOWN",
                 blocked=item["blocked_seconds"],
             )
         )
@@ -576,7 +608,9 @@ def build_outputs(
         for issue in issues
         if issue is not prd and str(issue.get("state", "")).upper() == "OPEN"
     ]
-    open_pulls = [pull for pull in pulls if str(pull.get("state", "")).upper() == "OPEN"]
+    open_pulls = [
+        pull for pull in pulls if str(pull.get("state", "")).upper() == "OPEN"
+    ]
     blockers: list[str] = []
     if repository.get("license_spdx") != "MIT":
         blockers.append("license-missing")

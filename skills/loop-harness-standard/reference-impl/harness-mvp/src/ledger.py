@@ -38,13 +38,14 @@ class Ledger:
         with self.path.open("r", encoding="utf-8") as file:
             for line_number, line in enumerate(file, start=1):
                 if not line.endswith("\n"):
-                    raise ValueError(f"ledger line {line_number} is not newline-terminated")
+                    raise ValueError(
+                        f"ledger line {line_number} is not newline-terminated"
+                    )
                 record = json.loads(line)
                 validate_envelope(record)
                 self._validate_dag(records, record)
                 records.append(record)
         return records
-
 
     def read_lineage(self, record_id: str) -> list[dict[str, Any]]:
         records = self.read_all()
@@ -81,7 +82,9 @@ class Ledger:
 
         return state, previous_id
 
-    def _validate_dag(self, existing: list[dict[str, Any]], record: dict[str, Any]) -> None:
+    def _validate_dag(
+        self, existing: list[dict[str, Any]], record: dict[str, Any]
+    ) -> None:
         seen_ids = {item["id"] for item in existing}
         if record["id"] in seen_ids:
             raise ValueError(f"duplicate record id: {record['id']}")

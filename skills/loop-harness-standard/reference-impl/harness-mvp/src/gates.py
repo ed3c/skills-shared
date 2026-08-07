@@ -53,7 +53,9 @@ def l3_preflight(state: L3State, config: L3Config) -> GateDecision:
     return GateDecision(True, 0)
 
 
-def l3_after_record(state: L3State, config: L3Config, record: dict[str, Any]) -> GateDecision:
+def l3_after_record(
+    state: L3State, config: L3Config, record: dict[str, Any]
+) -> GateDecision:
     signature = _apply_record_state(state, config, record)
     budget_hit = _budget_exceeded(state, config)
     dup_hit = _duplicate_hit(state, config, signature)
@@ -111,7 +113,9 @@ def _is_proxy_warning(record: dict[str, Any]) -> bool:
     return record["event"].get("kind") in {"judge_warning", "proxy_warning"}
 
 
-def _apply_record_state(state: L3State, config: L3Config, record: dict[str, Any]) -> str:
+def _apply_record_state(
+    state: L3State, config: L3Config, record: dict[str, Any]
+) -> str:
     state.iterations += 1
     state.total_tokens = int(record["budget"]["tokens_used"])
     state.total_usd = float(record["budget"]["usd"])

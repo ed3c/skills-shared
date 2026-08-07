@@ -69,7 +69,9 @@ def _gh_json(args: list[str], empty: Any) -> Any:
     try:
         return json.loads(raw)
     except json.JSONDecodeError as error:
-        raise GateError(f"gh {' '.join(args)} returned non-JSON: {raw[:120]}") from error
+        raise GateError(
+            f"gh {' '.join(args)} returned non-JSON: {raw[:120]}"
+        ) from error
 
 
 # --------------------------------------------------------------------------
@@ -85,21 +87,36 @@ def fetch_snapshot(repository: str) -> dict[str, Any]:
     fields = "number,url,title,isDraft,headRefOid,mergeable,mergeStateStatus"
     pulls = _gh_json(
         [
-            "pr", "list", "--repo", repository, "--state", "open",
-            "--label", ADMIT_LABEL, "--json", fields,
+            "pr",
+            "list",
+            "--repo",
+            repository,
+            "--state",
+            "open",
+            "--label",
+            ADMIT_LABEL,
+            "--json",
+            fields,
         ],
         [],
     )
     for pull in pulls:
         head = pull["headRefOid"]
         pull["head_committed_at"] = _gh_json(
-            ["api", f"repos/{repository}/commits/{head}", "--jq", "{d:.commit.committer.date}"],
+            [
+                "api",
+                f"repos/{repository}/commits/{head}",
+                "--jq",
+                "{d:.commit.committer.date}",
+            ],
             {},
         ).get("d")
         pull["admit"] = _gh_json(
             [
-                "api", f"repos/{repository}/issues/{pull['number']}/events",
-                "--paginate", "--jq",
+                "api",
+                f"repos/{repository}/issues/{pull['number']}/events",
+                "--paginate",
+                "--jq",
                 f'[.[]|select(.event=="labeled" and .label.name=="{ADMIT_LABEL}")]'
                 "|last|{actor:.actor.login,at:.created_at}",
             ],
@@ -130,7 +147,9 @@ def check_admit(pull: dict[str, Any], owner: str) -> str | None:
     if not isinstance(admit, dict) or not admit.get("actor"):
         return f"no `{ADMIT_LABEL}` label event -- nobody admitted this PR"
     if admit["actor"] != owner:
-        return f"`{ADMIT_LABEL}` applied by {admit['actor']}, not repository owner {owner}"
+        return (
+            f"`{ADMIT_LABEL}` applied by {admit['actor']}, not repository owner {owner}"
+        )
     try:
         admitted_at = _iso(admit["at"])
         head_at = _iso(pull["head_committed_at"])
@@ -198,7 +217,9 @@ def _codex_hook_commands() -> list[str]:
     return _hook_commands([Path.home() / ".codex" / "hooks.json"])
 
 
-def _run_pretooluse(commands: list[str], merge_cmd: list[str]) -> tuple[str, str] | None:
+def _run_pretooluse(
+    commands: list[str], merge_cmd: list[str]
+) -> tuple[str, str] | None:
     """Return a refusal, or None when no hook blocks the real merge command."""
     if not commands:
         return None
@@ -259,8 +280,13 @@ def _codex_config() -> tuple[str, dict[str, Any]]:
     user = _load_toml(user_path) if user_path.is_file() else {}
     project = _load_toml(project_path) if project_path else {}
     merged: dict[str, Any] = {**user, **project}
-    merged["permissions"] = {**user.get("permissions", {}), **project.get("permissions", {})}
-    sources = [str(p) for p in (project_path, user_path if user_path.is_file() else None) if p]
+    merged["permissions"] = {
+        **user.get("permissions", {}),
+        **project.get("permissions", {}),
+    }
+    sources = [
+        str(p) for p in (project_path, user_path if user_path.is_file() else None) if p
+    ]
     return (" over ".join(sources) or "no .codex/config.toml found"), merged
 
 
@@ -289,7 +315,7 @@ def probe_codex(repository: str, merge_cmd: list[str]) -> tuple[str, str]:
         # `git push` fail inside the sandbox before merge is even reachable.
         return "BLOCK", (
             f"{where}: default_permissions={profile!r} -- built-in presets disable "
-            "network; define a profile extending \":workspace\" with "
+            'network; define a profile extending ":workspace" with '
             "[permissions.<name>.network] enabled = true"
         )
     # Evaluate the whole rules directory, the way Codex loads it. Deriving the
@@ -304,7 +330,10 @@ def probe_codex(repository: str, merge_cmd: list[str]) -> tuple[str, str]:
     if not rule_files:
         return "BLOCK", f"no execpolicy rule files in {rules_dir} -- {installer_hint}"
     if shutil.which("codex") is None:
-        return "UNKNOWN", f"codex not on PATH; {len(rule_files)} rule file(s) unverified"
+        return (
+            "UNKNOWN",
+            f"codex not on PATH; {len(rule_files)} rule file(s) unverified",
+        )
     rule_args: list[str] = []
     for rule_file in rule_files:
         rule_args += ["--rules", str(rule_file)]
@@ -352,7 +381,9 @@ def check_github(pull: dict[str, Any], allow_unstable: bool) -> str | None:
 
 def detect_repository() -> str:
     """Resolve OWNER/REPO from the current directory's git remote."""
-    value = _gh(["repo", "view", "--json", "nameWithOwner", "--jq", ".nameWithOwner"]).strip()
+    value = _gh(
+        ["repo", "view", "--json", "nameWithOwner", "--jq", ".nameWithOwner"]
+    ).strip()
     if REPO_RE.fullmatch(value) is None:
         raise GateError(f"could not resolve a GitHub repository from {os.getcwd()}")
     return value
@@ -366,15 +397,23 @@ def bootstrap(repository: str, rules_dir: Path, allow_unstable: bool) -> int:
     user-level and already applies to every project without per-repo work.
     """
     labels = _gh_json(
-        ["label", "list", "-R", repository, "--search", ADMIT_LABEL, "--json", "name"], []
+        ["label", "list", "-R", repository, "--search", ADMIT_LABEL, "--json", "name"],
+        [],
     )
     if any(label.get("name") == ADMIT_LABEL for label in labels):
         print(f"OK      label `{ADMIT_LABEL}` already exists in {repository}")
     else:
         _gh(
             [
-                "label", "create", ADMIT_LABEL, "-R", repository, "-c", "0E8A16",
-                "-d", "owner admits this PR for agent landing",
+                "label",
+                "create",
+                ADMIT_LABEL,
+                "-R",
+                repository,
+                "-c",
+                "0E8A16",
+                "-d",
+                "owner admits this PR for agent landing",
             ]
         )
         print(f"CREATED label `{ADMIT_LABEL}` in {repository}")
@@ -387,12 +426,21 @@ def bootstrap(repository: str, rules_dir: Path, allow_unstable: bool) -> int:
     else:
         installer = Path(__file__).resolve().parent / "install-codex-merge-rule.sh"
         done = subprocess.run(
-            ["bash", str(installer), "--repo", repository, "--rules-dir", str(rules_dir)],
+            [
+                "bash",
+                str(installer),
+                "--repo",
+                repository,
+                "--rules-dir",
+                str(rules_dir),
+            ],
             capture_output=True,
             text=True,
         )
         if done.returncode != 0:
-            raise GateError(f"install-codex-merge-rule.sh failed: {done.stderr.strip()}")
+            raise GateError(
+                f"install-codex-merge-rule.sh failed: {done.stderr.strip()}"
+            )
         print(f"CREATED execpolicy rule: {rule} (restart Codex to load it)")
 
     print(f"--- preflight {repository} ---")
@@ -401,13 +449,22 @@ def bootstrap(repository: str, rules_dir: Path, allow_unstable: bool) -> int:
 
 def merge_command(repository: str, number: int, head: str) -> list[str]:
     return [
-        "gh", "pr", "merge", "--repo", repository, str(number),
-        "--squash", "--match-head-commit", head,
+        "gh",
+        "pr",
+        "merge",
+        "--repo",
+        repository,
+        str(number),
+        "--squash",
+        "--match-head-commit",
+        head,
     ]
 
 
 def preflight(repository: str, snapshot_path: Path | None, allow_unstable: bool) -> int:
-    snapshot = load_snapshot(snapshot_path) if snapshot_path else fetch_snapshot(repository)
+    snapshot = (
+        load_snapshot(snapshot_path) if snapshot_path else fetch_snapshot(repository)
+    )
     if snapshot["repo"] != repository:
         raise GateError(f"snapshot repo {snapshot['repo']} != --repo {repository}")
     pulls = snapshot["pulls"]
@@ -437,7 +494,10 @@ def preflight(repository: str, snapshot_path: Path | None, allow_unstable: bool)
     ):
         marker = "<-- active" if name == host else ""
         stream = sys.stderr if verdict == "BLOCK" and name == host else sys.stdout
-        print(f"L2 HOST-POLICY {name}: {verdict} -- {detail} {marker}".rstrip(), file=stream)
+        print(
+            f"L2 HOST-POLICY {name}: {verdict} -- {detail} {marker}".rstrip(),
+            file=stream,
+        )
         if verdict == "BLOCK" and name == host:
             host_blocked = True
 
@@ -493,17 +553,24 @@ def _parser() -> argparse.ArgumentParser:
     for name, helptext in (
         ("preflight", "probe every merge-authority layer without merging"),
         ("land", "merge the admitted PRs, pinned to their admitted head SHA"),
-        ("bootstrap", "make one repository ready (label + execpolicy rule); idempotent"),
+        (
+            "bootstrap",
+            "make one repository ready (label + execpolicy rule); idempotent",
+        ),
     ):
         sub = commands.add_parser(name, help=helptext)
-        sub.add_argument("--repo", help="OWNER/REPO; defaults to the current directory's remote")
+        sub.add_argument(
+            "--repo", help="OWNER/REPO; defaults to the current directory's remote"
+        )
         sub.add_argument("--allow-unstable", action="store_true")
         if name == "preflight":
             sub.add_argument("--snapshot", type=Path, help="offline replay; no network")
         elif name == "land":
             sub.add_argument("--dry-run", action="store_true")
         else:
-            sub.add_argument("--rules-dir", type=Path, default=Path.home() / ".codex" / "rules")
+            sub.add_argument(
+                "--rules-dir", type=Path, default=Path.home() / ".codex" / "rules"
+            )
     return parser
 
 
@@ -512,7 +579,9 @@ def main(argv: list[str] | None = None) -> int:
     try:
         repository = args.repo or detect_repository()
         if REPO_RE.fullmatch(repository) is None:
-            print(f"FAIL --repo must be OWNER/REPOSITORY: {repository}", file=sys.stderr)
+            print(
+                f"FAIL --repo must be OWNER/REPOSITORY: {repository}", file=sys.stderr
+            )
             return 64
         if args.command == "preflight":
             return preflight(repository, args.snapshot, args.allow_unstable)

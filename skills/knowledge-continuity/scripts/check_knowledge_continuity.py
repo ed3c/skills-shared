@@ -29,18 +29,33 @@ from pathlib import Path
 # "§7" / "NEG-101" / "08-05" identify something, but only to someone who already
 # knows what that something is.
 SHORTHAND = re.compile(
-    r"§\s*\d+"                          # § 7
-    r"|\b[A-Z]{2,6}-\d{2,4}\b"          # NEG-101, INV-OOBE-011, AK-32
+    r"§\s*\d+"  # § 7
+    r"|\b[A-Z]{2,6}-\d{2,4}\b"  # NEG-101, INV-OOBE-011, AK-32
     r"|(?<!\d{4}-)\b\d{2}-\d{2}\b(?!\d)"  # 08-05（但 2026-08-06 是日期，不是代號）
 )
 # Standard names that merely LOOK like document codes. `SHA-256` is an algorithm,
 # not a cross-reference, and demanding a filename beside it is noise. Found by
 # running this checker on a sibling skill's own SKILL.md.
-WELL_KNOWN = frozenset({
-    "SHA-1", "SHA-256", "SHA-512", "MD-5", "UTF-8", "UTF-16", "ISO-8601",
-    "RFC-822", "RFC-2822", "RFC-5322", "AES-128", "AES-256", "HTTP-2",
-    "BASE-64", "P-256", "K-256",
-})
+WELL_KNOWN = frozenset(
+    {
+        "SHA-1",
+        "SHA-256",
+        "SHA-512",
+        "MD-5",
+        "UTF-8",
+        "UTF-16",
+        "ISO-8601",
+        "RFC-822",
+        "RFC-2822",
+        "RFC-5322",
+        "AES-128",
+        "AES-256",
+        "HTTP-2",
+        "BASE-64",
+        "P-256",
+        "K-256",
+    }
+)
 # A reference is grounded when the same paragraph also names a real artefact.
 ARTEFACT = re.compile(r"[\w./-]+\.(?:md|py|sh|json|swift|js|kt|java|yaml|yml)\b")
 # Phrases that explicitly hand the reader off to somewhere else.
@@ -56,9 +71,9 @@ SECTION_HANDOFF = re.compile(r"(?:見|詳見|參見)\s*§\s*\d")
 # Something a reader can open and check: a code anchor, or a pointer to an
 # evidence block that contains one.
 TERMINAL_EVIDENCE = re.compile(
-    r"[\w./-]+\.(?:js|swift|kt|java|py|sh|go|sql)\s*:\s*\d+"   # file.js:380
-    r"|附錄\s*[A-Z]\s*的?\s*\*{0,2}E-\d+"                        # 附錄 A 的 E-5
-    r"|\bE-\d+\b"                                               # E-5
+    r"[\w./-]+\.(?:js|swift|kt|java|py|sh|go|sql)\s*:\s*\d+"  # file.js:380
+    r"|附錄\s*[A-Z]\s*的?\s*\*{0,2}E-\d+"  # 附錄 A 的 E-5
+    r"|\bE-\d+\b"  # E-5
 )
 
 # Content inside 「」 or backticks is being SHOWN, not USED. A document that
@@ -389,16 +404,22 @@ def selftest() -> int:
         bad.write_text(
             "# 標題\n\n"
             "## 1. 開頭\n\n"
-            "這段照 §7 的裁決辦，NEG-101 也適用。\n\n"     # KC-01
+            "這段照 §7 的裁決辦，NEG-101 也適用。\n\n"  # KC-01
             "## 2. 內容\n\n"
-            "詳見 §9 的說明。\n\n"                          # KC-02（§9 不存在）
-            "去重後約 14 列，另有約 10 條。\n\n"            # KC-03
-            "狀態模型沿用 §5，不在此複製。\n\n"            # KC-04
-            "現況這個刪除失敗時完全無聲（詳見 §2）。\n",   # KC-05（兩跳）
+            "詳見 §9 的說明。\n\n"  # KC-02（§9 不存在）
+            "去重後約 14 列，另有約 10 條。\n\n"  # KC-03
+            "狀態模型沿用 §5，不在此複製。\n\n"  # KC-04
+            "現況這個刪除失敗時完全無聲（詳見 §2）。\n",  # KC-05（兩跳）
             encoding="utf-8",
         )
         rules = {r.rule_id: r for r in evaluate(bad)}
-        for rid, want in (("KC-01", 1), ("KC-02", 1), ("KC-03", 1), ("KC-04", 1), ("KC-05", 1)):
+        for rid, want in (
+            ("KC-01", 1),
+            ("KC-02", 1),
+            ("KC-03", 1),
+            ("KC-04", 1),
+            ("KC-05", 1),
+        ):
             got = len(rules[rid].findings)
             print(f"  negative {rid}: 期望 >= {want}，實得 {got}")
             if got < want:
@@ -508,8 +529,12 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("target", nargs="?", type=Path)
     parser.add_argument("--selftest", action="store_true")
-    parser.add_argument("--quiet", action="store_true", help="omit the why-explanations")
-    parser.add_argument("--rejected", action="store_true", help="show rules deliberately not shipped")
+    parser.add_argument(
+        "--quiet", action="store_true", help="omit the why-explanations"
+    )
+    parser.add_argument(
+        "--rejected", action="store_true", help="show rules deliberately not shipped"
+    )
     args = parser.parse_args(argv)
 
     if args.rejected:

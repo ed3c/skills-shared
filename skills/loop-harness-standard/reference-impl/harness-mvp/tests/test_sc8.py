@@ -21,7 +21,9 @@ def _record(
         exec={
             "command": "judge",
             "exit_code": exit_code,
-            "result_snapshot": {"verdict": "warn" if event_kind == "judge_warning" else "pass"},
+            "result_snapshot": {
+                "verdict": "warn" if event_kind == "judge_warning" else "pass"
+            },
             "error_snapshot": error_snapshot,
         },
         handoff={"current_diff": current_diff, "next_action": next_action},

@@ -72,11 +72,17 @@ def _validate_line(line: dict[str, Any], repo_root: Path) -> list[str]:
         return ["registry line has no id"]
     if not isinstance(repository, str) or REPO_RE.fullmatch(repository) is None:
         return [f"{line_id}: invalid github_repo"]
-    if repository_id is not None and (not isinstance(repository_id, str) or not repository_id):
+    if repository_id is not None and (
+        not isinstance(repository_id, str) or not repository_id
+    ):
         return [f"{line_id}: invalid github_repository_id"]
     try:
-        artifact = repo_root / _relative(line.get("artifact_path"), f"{line_id}.artifact_path")
-        receipt_path = repo_root / _relative(line.get("receipt_path"), f"{line_id}.receipt_path")
+        artifact = repo_root / _relative(
+            line.get("artifact_path"), f"{line_id}.artifact_path"
+        )
+        receipt_path = repo_root / _relative(
+            line.get("receipt_path"), f"{line_id}.receipt_path"
+        )
         publication_path = repo_root / _relative(
             line.get("publication_path"), f"{line_id}.publication_path"
         )
@@ -96,12 +102,18 @@ def _validate_line(line: dict[str, Any], repo_root: Path) -> list[str]:
     if receipt.get("line") != line_id:
         failures.append(f"{line_id}: line mismatch")
     receipt_repository = receipt.get("github_repo")
-    if not isinstance(receipt_repository, str) or REPO_RE.fullmatch(receipt_repository) is None:
+    if (
+        not isinstance(receipt_repository, str)
+        or REPO_RE.fullmatch(receipt_repository) is None
+    ):
         failures.append(f"{line_id}: invalid receipt github_repo")
         receipt_repository = repository
     if repository_id is None and receipt_repository != repository:
         failures.append(f"{line_id}: github_repo mismatch")
-    if repository_id is not None and receipt.get("github_repository_id") != repository_id:
+    if (
+        repository_id is not None
+        and receipt.get("github_repository_id") != repository_id
+    ):
         failures.append(f"{line_id}: github_repository_id mismatch")
     if COMMIT_RE.fullmatch(str(receipt.get("source_commit", ""))) is None:
         failures.append(f"{line_id}: source_commit must be a full 40-character SHA")
@@ -121,10 +133,14 @@ def _validate_line(line: dict[str, Any], repo_root: Path) -> list[str]:
             failures.append(f"{line_id}: {field} must be a list")
             continue
         for index, value in enumerate(values):
-            url_error = _github_url(value, f"{field}[{index}]", receipt_repository, kind)
+            url_error = _github_url(
+                value, f"{field}[{index}]", receipt_repository, kind
+            )
             if url_error:
                 failures.append(f"{line_id}: {url_error}")
-    url_error = _github_url(receipt.get("project_url"), "project_url", repository, "project")
+    url_error = _github_url(
+        receipt.get("project_url"), "project_url", repository, "project"
+    )
     if url_error:
         failures.append(f"{line_id}: {url_error}")
 
@@ -143,7 +159,10 @@ def _validate_line(line: dict[str, Any], repo_root: Path) -> list[str]:
     publication_repository = publication.get("github_repo")
     if publication_repository != receipt_repository:
         failures.append(f"{line_id}: publication github_repo mismatch")
-    if repository_id is not None and publication.get("github_repository_id") != repository_id:
+    if (
+        repository_id is not None
+        and publication.get("github_repository_id") != repository_id
+    ):
         failures.append(f"{line_id}: publication github_repository_id mismatch")
     if publication.get("remote_url") != f"https://github.com/{receipt_repository}":
         failures.append(f"{line_id}: publication remote_url mismatch")
@@ -152,12 +171,17 @@ def _validate_line(line: dict[str, Any], repo_root: Path) -> list[str]:
     for field in ("commit", "export_source_commit", "export_tree_sha"):
         if COMMIT_RE.fullmatch(str(publication.get(field, ""))) is None:
             failures.append(f"{line_id}: publication {field} must be a full SHA")
-    if not isinstance(publication.get("file_count"), int) or publication["file_count"] < 1:
+    if (
+        not isinstance(publication.get("file_count"), int)
+        or publication["file_count"] < 1
+    ):
         failures.append(f"{line_id}: publication file_count must be positive")
     if publication.get("history_root") is not True:
         failures.append(f"{line_id}: publication history_root must be true")
     try:
-        datetime.fromisoformat(str(publication.get("verified_at", "")).replace("Z", "+00:00"))
+        datetime.fromisoformat(
+            str(publication.get("verified_at", "")).replace("Z", "+00:00")
+        )
     except ValueError:
         failures.append(f"{line_id}: publication verified_at must be ISO-8601")
     blockers = publication.get("blockers")
@@ -172,7 +196,8 @@ def _validate_line(line: dict[str, Any], repo_root: Path) -> list[str]:
     elif publication.get("public_ready") not in {True, False}:
         failures.append(f"{line_id}: publication public_ready must be boolean")
     if publication.get("public_ready") is True and (
-        publication.get("visibility") != "PUBLIC" or publication.get("license_spdx") != "MIT"
+        publication.get("visibility") != "PUBLIC"
+        or publication.get("license_spdx") != "MIT"
     ):
         failures.append(
             f"{line_id}: public_ready requires PUBLIC visibility and MIT license"
@@ -228,7 +253,9 @@ def _sync_line(registry_path: Path, line_id: str) -> tuple[dict[str, Any], Path]
     lines = registry.get("lines")
     if not isinstance(lines, list):
         raise DeliveryError("registry lines must be a list")
-    matching = [line for line in lines if isinstance(line, dict) and line.get("id") == line_id]
+    matching = [
+        line for line in lines if isinstance(line, dict) and line.get("id") == line_id
+    ]
     if len(matching) != 1:
         raise DeliveryError(f"registry line must exist exactly once: {line_id}")
     repo_root_raw = registry.get("repo_root")
@@ -262,7 +289,9 @@ def sync(
             )
             project_url = current_receipt.get("project_url")
             if not isinstance(project_url, str):
-                raise DeliveryError("existing receipt must provide project_url for live sync")
+                raise DeliveryError(
+                    "existing receipt must provide project_url for live sync"
+                )
             snapshot = fetch_github_snapshot(line["github_repo"], project_url)
         else:
             raise DeliveryError("sync requires exactly one of --snapshot or --github")
@@ -274,7 +303,9 @@ def sync(
             repo_root=repo_root,
         )
         receipt_path = repo_root / _relative(line["receipt_path"], "receipt_path")
-        publication_path = repo_root / _relative(line["publication_path"], "publication_path")
+        publication_path = repo_root / _relative(
+            line["publication_path"], "publication_path"
+        )
         write_outputs(
             {
                 receipt_path: _json_bytes(receipt),
@@ -293,7 +324,9 @@ def sync(
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
-    check_parser = commands.add_parser("check", help="run the zero-network receipt gate")
+    check_parser = commands.add_parser(
+        "check", help="run the zero-network receipt gate"
+    )
     check_parser.add_argument("--registry", required=True, type=Path)
     sync_parser = commands.add_parser(
         "sync", help="synchronize GitHub live state or replay a saved snapshot"

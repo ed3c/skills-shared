@@ -14,7 +14,9 @@ def _executor_from(results):
 
 def test_sc4_resume_rebuilds_from_jsonl_and_finishes(tmp_path):
     ledger = Ledger(tmp_path / "ledger.jsonl")
-    config = L3Config(max_iterations=5, duplicate_threshold=3, duplicate_window=4, max_tokens=10)
+    config = L3Config(
+        max_iterations=5, duplicate_threshold=3, duplicate_window=4, max_tokens=10
+    )
     steps = [{"tool": "poll", "args": {"slot": slot}} for slot in ("A", "B", "C")]
 
     first_exit = run_loop(
@@ -23,8 +25,20 @@ def test_sc4_resume_rebuilds_from_jsonl_and_finishes(tmp_path):
         ledger=ledger,
         executor=_executor_from(
             [
-                {"id": "r-1", "command": "poll", "exit_code": 0, "result_snapshot": "a", "budget": {"tokens_used": 2, "usd": 0.1}},
-                {"id": "r-2", "command": "poll", "exit_code": 0, "result_snapshot": "b", "budget": {"tokens_used": 3, "usd": 0.2}},
+                {
+                    "id": "r-1",
+                    "command": "poll",
+                    "exit_code": 0,
+                    "result_snapshot": "a",
+                    "budget": {"tokens_used": 2, "usd": 0.1},
+                },
+                {
+                    "id": "r-2",
+                    "command": "poll",
+                    "exit_code": 0,
+                    "result_snapshot": "b",
+                    "budget": {"tokens_used": 3, "usd": 0.2},
+                },
             ]
         ),
         l3_config=config,
@@ -36,7 +50,13 @@ def test_sc4_resume_rebuilds_from_jsonl_and_finishes(tmp_path):
         ledger=ledger,
         executor=_executor_from(
             [
-                {"id": "r-3", "command": "poll", "exit_code": 0, "result_snapshot": "c", "budget": {"tokens_used": 1, "usd": 0.05}},
+                {
+                    "id": "r-3",
+                    "command": "poll",
+                    "exit_code": 0,
+                    "result_snapshot": "c",
+                    "budget": {"tokens_used": 1, "usd": 0.05},
+                },
             ]
         ),
         l3_config=config,
@@ -52,7 +72,9 @@ def test_sc4_resume_rebuilds_from_jsonl_and_finishes(tmp_path):
 
 def test_sc4_rebuilt_duplicate_window_kills_on_combined_threshold(tmp_path):
     ledger = Ledger(tmp_path / "ledger.jsonl")
-    config = L3Config(max_iterations=6, duplicate_threshold=2, duplicate_window=3, max_interleaving=3)
+    config = L3Config(
+        max_iterations=6, duplicate_threshold=2, duplicate_window=3, max_interleaving=3
+    )
     steps = [{"tool": "poll", "args": {"slot": slot}} for slot in ("A", "B", "C", "A")]
 
     run_loop(
@@ -61,9 +83,27 @@ def test_sc4_rebuilt_duplicate_window_kills_on_combined_threshold(tmp_path):
         ledger=ledger,
         executor=_executor_from(
             [
-                {"id": "r-1", "command": "poll", "exit_code": 0, "result_snapshot": "same", "budget": {"tokens_used": 1, "usd": 0.0}},
-                {"id": "r-2", "command": "poll", "exit_code": 0, "result_snapshot": "same", "budget": {"tokens_used": 1, "usd": 0.0}},
-                {"id": "r-3", "command": "poll", "exit_code": 0, "result_snapshot": "same", "budget": {"tokens_used": 1, "usd": 0.0}},
+                {
+                    "id": "r-1",
+                    "command": "poll",
+                    "exit_code": 0,
+                    "result_snapshot": "same",
+                    "budget": {"tokens_used": 1, "usd": 0.0},
+                },
+                {
+                    "id": "r-2",
+                    "command": "poll",
+                    "exit_code": 0,
+                    "result_snapshot": "same",
+                    "budget": {"tokens_used": 1, "usd": 0.0},
+                },
+                {
+                    "id": "r-3",
+                    "command": "poll",
+                    "exit_code": 0,
+                    "result_snapshot": "same",
+                    "budget": {"tokens_used": 1, "usd": 0.0},
+                },
             ]
         ),
         l3_config=config,
@@ -75,7 +115,13 @@ def test_sc4_rebuilt_duplicate_window_kills_on_combined_threshold(tmp_path):
         ledger=ledger,
         executor=_executor_from(
             [
-                {"id": "r-4", "command": "poll", "exit_code": 0, "result_snapshot": "same", "budget": {"tokens_used": 1, "usd": 0.0}},
+                {
+                    "id": "r-4",
+                    "command": "poll",
+                    "exit_code": 0,
+                    "result_snapshot": "same",
+                    "budget": {"tokens_used": 1, "usd": 0.0},
+                },
             ]
         ),
         l3_config=config,
@@ -86,7 +132,9 @@ def test_sc4_rebuilt_duplicate_window_kills_on_combined_threshold(tmp_path):
 
 def test_sc4_resume_keeps_cumulative_budget_instead_of_resetting(tmp_path):
     ledger = Ledger(tmp_path / "ledger.jsonl")
-    config = L3Config(max_iterations=5, duplicate_threshold=3, duplicate_window=4, max_tokens=4)
+    config = L3Config(
+        max_iterations=5, duplicate_threshold=3, duplicate_window=4, max_tokens=4
+    )
 
     run_loop(
         task_packet={"packet_id": "SC4", "priority": "high"},
@@ -94,7 +142,13 @@ def test_sc4_resume_keeps_cumulative_budget_instead_of_resetting(tmp_path):
         ledger=ledger,
         executor=_executor_from(
             [
-                {"id": "r-1", "command": "poll", "exit_code": 0, "result_snapshot": "a", "budget": {"tokens_used": 3, "usd": 0.1}},
+                {
+                    "id": "r-1",
+                    "command": "poll",
+                    "exit_code": 0,
+                    "result_snapshot": "a",
+                    "budget": {"tokens_used": 3, "usd": 0.1},
+                },
             ]
         ),
         l3_config=config,
@@ -106,7 +160,13 @@ def test_sc4_resume_keeps_cumulative_budget_instead_of_resetting(tmp_path):
         ledger=ledger,
         executor=_executor_from(
             [
-                {"id": "r-2", "command": "poll", "exit_code": 0, "result_snapshot": "b", "budget": {"tokens_used": 1, "usd": 0.1}},
+                {
+                    "id": "r-2",
+                    "command": "poll",
+                    "exit_code": 0,
+                    "result_snapshot": "b",
+                    "budget": {"tokens_used": 1, "usd": 0.1},
+                },
             ]
         ),
         l3_config=config,
@@ -128,8 +188,20 @@ def test_sc4_parent_chain_can_be_rebuilt_after_resume(tmp_path):
         ledger=ledger,
         executor=_executor_from(
             [
-                {"id": "r-1", "command": "poll", "exit_code": 0, "result_snapshot": "a", "budget": {"tokens_used": 1, "usd": 0.0}},
-                {"id": "r-2", "command": "poll", "exit_code": 0, "result_snapshot": "b", "budget": {"tokens_used": 1, "usd": 0.0}},
+                {
+                    "id": "r-1",
+                    "command": "poll",
+                    "exit_code": 0,
+                    "result_snapshot": "a",
+                    "budget": {"tokens_used": 1, "usd": 0.0},
+                },
+                {
+                    "id": "r-2",
+                    "command": "poll",
+                    "exit_code": 0,
+                    "result_snapshot": "b",
+                    "budget": {"tokens_used": 1, "usd": 0.0},
+                },
             ]
         ),
         l3_config=config,
@@ -140,7 +212,13 @@ def test_sc4_parent_chain_can_be_rebuilt_after_resume(tmp_path):
         ledger=ledger,
         executor=_executor_from(
             [
-                {"id": "r-3", "command": "poll", "exit_code": 0, "result_snapshot": "c", "budget": {"tokens_used": 1, "usd": 0.0}},
+                {
+                    "id": "r-3",
+                    "command": "poll",
+                    "exit_code": 0,
+                    "result_snapshot": "c",
+                    "budget": {"tokens_used": 1, "usd": 0.0},
+                },
             ]
         ),
         l3_config=config,
@@ -160,8 +238,20 @@ def test_sc4_resume_accepts_replayed_thresholds_and_returns_pending_stop(tmp_pat
         ledger=ledger,
         executor=_executor_from(
             [
-                {"id": "r-1", "command": "poll", "exit_code": 0, "result_snapshot": "same", "budget": {"tokens_used": 1, "usd": 0.0}},
-                {"id": "r-2", "command": "poll", "exit_code": 0, "result_snapshot": "same", "budget": {"tokens_used": 1, "usd": 0.0}},
+                {
+                    "id": "r-1",
+                    "command": "poll",
+                    "exit_code": 0,
+                    "result_snapshot": "same",
+                    "budget": {"tokens_used": 1, "usd": 0.0},
+                },
+                {
+                    "id": "r-2",
+                    "command": "poll",
+                    "exit_code": 0,
+                    "result_snapshot": "same",
+                    "budget": {"tokens_used": 1, "usd": 0.0},
+                },
             ]
         ),
         l3_config=L3Config(max_iterations=5, duplicate_threshold=3, duplicate_window=4),
@@ -173,7 +263,13 @@ def test_sc4_resume_accepts_replayed_thresholds_and_returns_pending_stop(tmp_pat
         ledger=ledger,
         executor=_executor_from(
             [
-                {"id": "r-3", "command": "poll", "exit_code": 0, "result_snapshot": "c", "budget": {"tokens_used": 1, "usd": 0.0}},
+                {
+                    "id": "r-3",
+                    "command": "poll",
+                    "exit_code": 0,
+                    "result_snapshot": "c",
+                    "budget": {"tokens_used": 1, "usd": 0.0},
+                },
             ]
         ),
         l3_config=L3Config(max_iterations=5, duplicate_threshold=2, duplicate_window=4),
