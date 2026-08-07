@@ -1,10 +1,6 @@
-<!-- 新專案骨架。由 forgejo-delivery-loop 管理；納管後 SSOT = agent-docs/<repo>/。
-     寫法判準與可跑的自檢 → agent-docs/_template/claude-md-template.md
-     `<...>` 是必填佔位符：留著它比留空好，留空與「已填完」在讀者眼中同形。 -->
+# CLAUDE.md — ix-agy 編排層（Claude host 面）
 
-# CLAUDE.md — `<repo>` 編排層（Claude host 面）
-
-<!-- 由 forgejo-delivery-loop 集中管理。SSOT = agent-docs/<repo>/.claude/CLAUDE.md。
+<!-- 由 forgejo-delivery-loop 集中管理。SSOT = agent-docs/ix-agy/.claude/CLAUDE.md。
      直接改 repo 內這份會被 `agent_docs.py check` 判 DRIFT；改 SSOT 再 apply。 -->
 
 > **三軸分工，各 host 看它該看的那一面**。這是刻意的選擇性擺放，不是資訊遺失：
@@ -95,23 +91,40 @@ stop-loss 在哪一步觸發。三個答不出來就還不到開的時候。
 
 ### Code Style Conventions
 
-`<各語言的慣例：型別、行長、docstring 風格、測試命名>`
+#### Python
+- Type hints for all public functions; PEP 8, line length 100
+- Docstrings: Google style
+- Test naming: `test_<function>_<scenario>`
+
+#### Shell Scripts
+- Use `set -euo pipefail` at start
+- Quote all variables: `"$var"`
+- Use absolute paths (no `cd` commands)
+
+#### Markdown
+- Chinese preferred for documentation
+- Use YAML frontmatter for agents
+- Anchor points format: `ANCHOR-XXX-NNN`
 
 ### Operation Boundaries
 
 #### Never
-- `<絕不可做的事，逐條列；不可改的目錄要指名>`
+- Modify `.env` or credentials files
+- Force push to main branch
+- Delete `.git` directory
+- Modify system files outside project
+- Modify files under '/Users/neon/TrueMe_iOS' (Must remain 100% pristine under all circumstances)
+- 絕對不能修改後端服務（`ixsecurity/auth52-service` 等 Go 代碼），後端應保持 100% pristine。
 
-
-> 其餘操作邊界（Allowed Operations／Confirmation Required 細則）→ [<SSOT 模組>/operation-boundaries.md](../<SSOT 模組>/operation-boundaries.md)
+> 其餘操作邊界（Allowed Operations／Confirmation Required 細則）→ [.agents/modules/operation-boundaries.md](../.agents/modules/operation-boundaries.md)
 
 **這些是硬約束，不是取捨**：需要改時是先解除邊界，不是繞過。
 
 ### SSOT 指針紀律
 
 - 本檔與 `AGENTS.md` 都**只放指針，不存副本**。MCP／Skills／Problem Graph 的結構規範 SSOT 在
-  `<SSOT 模組>/harness-config.md`；操作邊界細則在 `<SSOT 模組>/operation-boundaries.md`；
-  主權分層在 `<SSOT 模組>/sovereignty.md`。
+  `.agents/modules/harness-config.md`；操作邊界細則在 `.agents/modules/operation-boundaries.md`；
+  主權分層在 `.agents/modules/sovereignty.md`。
 - **提示詞單一真源**：嚴禁拷貝／複製 prompt，會造成雙圖漂移。需要複用就指過去。
 - **嚴禁簡化已實裝的閉環架構**（`antigravity-harness-wiki` 的 Anti-Simplification Gate）。
 - **Claude skill forwarders 零邏輯**：`.claude/skills/<name>/SKILL.md` 只指向同名 canonical skill，

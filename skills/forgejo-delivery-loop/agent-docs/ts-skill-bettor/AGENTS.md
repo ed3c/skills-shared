@@ -51,3 +51,23 @@
 > 此原則的 Claude-tier 派生同載於全局 `~/.claude/CLAUDE.md` 工程偏好段(跨項目通用);
 > 本檔為 skill-bettor 專屬 SSOT 的落點。判等價的 tier 詞彙(technical_equivalent/
 > candidate/[推論])定義=`.claude/skills/judge-loop-chooser/`。
+
+---
+
+## 工程法則的實證歸屬 (Rule → Evidence Routing)
+
+全局 `~/.claude/CLAUDE.md` 的工程法則不直接指向迴圈目錄——法則層綁死在某個 repo 的
+目錄結構上，迴圈改名即斷。**本節是那一跳的落點**：法則指到這裡，這裡指到擁有實證的 Harness。
+
+骨架、各節硬性要求與零網路註冊檢查 → `ix-agy/.agents/modules/agents-md-template.md`
+
+| 法則主題 | 實證 Harness |
+|---|---|
+| _待填：本 repo 擁有哪一條法則的實證_ | _待填：Harness 路徑 ＋ 該處的可觸發內容摘要（訊號→動作→為何有效）_ |
+
+<!-- 自動偵測到的 Harness（5 個），填表時逐個確認是否擁有法則實證： -->
+<!--   loop_demo/claude_agy -->
+<!--   loop_wiki/_template -->
+<!--   loop_wiki/_template_dr -->
+<!--   loop_wiki/clc -->
+<!--   loop_wiki/evolve-unknown-discovery-plan-truth -->
