@@ -52,6 +52,15 @@ class SharedSkillsError(RuntimeError):
     """Raised when the shared-skills invariant cannot be established."""
 
 
+class NothingToDo(SharedSkillsError):
+    """Raised when the request was well formed but there was nothing to do.
+
+    Kept distinct from its parent because collapsing the two makes a tool that
+    found nothing indistinguishable from a tool that refused, and a caller that
+    cannot tell those apart has to guess whether a red run means broken or empty.
+    """
+
+
 # --------------------------------------------------------------------------
 # configuration: rulings are versioned, paths are not
 # --------------------------------------------------------------------------
@@ -486,9 +495,12 @@ def _resolve_sources(paths: list[Path], destination: Path) -> list[Version]:
     if destination.is_dir() and destination.resolve() not in seen:
         versions.append((_source_label(len(versions)), destination.resolve()))
     if len(versions) < 2:
-        raise SharedSkillsError(
-            "merge needs two distinct versions to fold together; a lone version going "
-            "somewhere nothing exists yet is `adopt`, which also registers it"
+        lone = versions[0][1] if versions else destination
+        raise NothingToDo(
+            f"nothing to fold: every path names the same single version ({lone}), and "
+            f"folding one version into itself changes nothing. A lone version going "
+            f"somewhere nothing exists yet is `adopt <name> --from <path> --why ...`, "
+            f"which also registers it; to merge, pass a second, genuinely different version"
         )
     return versions
 
@@ -500,6 +512,56 @@ def _inventory(sources: list[Version]) -> dict[str, list[Version]]:
         for file in content_files(root):
             inventory.setdefault(file.relative_to(root).as_posix(), []).append((label, file))
     return inventory
+
+
+def _refuse_type_clash(inventory: dict[str, list[Version]]) -> None:
+    """Refuse a union that would need one name to be a file and a directory at once.
+
+    A fork that turned `modules` into `modules/` is exactly the divergence this
+    verb exists to fold, but no directory tree can hold both spellings, and
+    discovering that halfway through the copy raised a bare FileExistsError and
+    left a half-built staging directory behind -- which then blocked every retry
+    of that name until a human moved it aside. Say it before anything is
+    written, and name the rename that unblocks it.
+    """
+    held = set(inventory)
+    for relpath in sorted(held):
+        parts = relpath.split("/")
+        for depth in range(1, len(parts)):
+            prefix = "/".join(parts[:depth])
+            if prefix not in held:
+                continue
+            as_file = ", ".join(label for label, _ in inventory[prefix])
+            as_dir = ", ".join(label for label, _ in inventory[relpath])
+            raise SharedSkillsError(
+                f"versions disagree about what '{prefix}' is: {as_file} keep it as a file, "
+                f"{as_dir} keep '{relpath}' inside it as a directory. No union can hold both "
+                f"and nothing was written -- rename one side in its own version (say to "
+                f"'{prefix}.md'), then merge again"
+            )
+
+
+def _uncarried_dirs(sources: list[Version]) -> list[str]:
+    """Name every directory the union will not carry, because it holds no file.
+
+    The union is over files: git cannot record an empty directory, so promoting
+    one would promise canonical something the next clone silently drops. A
+    version's directory vanishing under exit 0 is the shape of loss this verb
+    exists to prevent, so it is reported even though it is not a failure.
+    """
+    notices: list[str] = []
+    for label, root in sources:
+        for entry in sorted(root.rglob("*")):
+            if not entry.is_dir() or "__pycache__" in entry.parts:
+                continue
+            if content_files(entry):
+                continue
+            notices.append(
+                f"NOTE    {entry.relative_to(root).as_posix()}/ is an empty directory in "
+                f"{label}; the union is over files, so it is not carried (git cannot "
+                f"record an empty directory either)"
+            )
+    return notices
 
 
 def _classify(
@@ -551,19 +613,38 @@ def _conflict_report(relpath: str, versions: list[Version]) -> list[str]:
     return lines
 
 
-def _verify_union(built: Path, roots: list[Version], reported: set[str]) -> list[str]:
-    """Recount from the source trees, never from the merge plan.
+def _verify_union(
+    built: Path, sources: list[Path], destination: Path, reported: set[str]
+) -> list[str]:
+    """Recount from what the caller named, never from the merge plan.
 
     The one guarantee this verb sells -- a file that only one version carries
-    survives -- has to be checked against a fresh walk of the versions. A check
-    written against the plan would agree with a planner that never saw the file
-    at all, so the union could shrink and still report success, which is the
-    exact failure that lost a module to the majority vote.
+    survives -- has to be checked against a fresh walk, resolved here rather
+    than handed over by the planner. Taking the planner's already-parsed version
+    list would make this blind to every defect in the parse itself: a planner
+    that dropped a `--from` before it ever looked at it would be checked against
+    the shortened list it invented, so the union could shrink and still report
+    success. That is the exact failure that lost a module to the majority vote,
+    so the recount starts from argv and resolves the paths a second time.
     """
     counted: dict[str, list[Version]] = {}
-    for label, root in roots:
-        for file in content_files(root):
-            counted.setdefault(file.relative_to(root).as_posix(), []).append((label, file))
+    seen: set[Path] = set()
+    for path in [*sources, destination]:
+        resolved = path.expanduser().resolve()
+        if resolved in seen:
+            continue
+        if not resolved.is_dir():
+            if resolved == destination.resolve():
+                continue        # no incumbent canonical: it carries nothing to recount
+            raise SharedSkillsError(
+                f"cannot verify the union: {path} is no longer a directory, so what it "
+                f"carried can no longer be counted; the staged union is at {built} -- "
+                f"restore the source and merge again"
+            )
+        seen.add(resolved)
+        label = _source_label(len(seen) - 1)
+        for file in content_files(resolved):
+            counted.setdefault(file.relative_to(resolved).as_posix(), []).append((label, file))
     failures: list[str] = []
     for relpath, versions in sorted(counted.items()):
         target = built / relpath
@@ -614,8 +695,10 @@ def merge(
     destination = canonical_path(registry, name)
     versions = _resolve_sources(sources, destination)
     inventory = _inventory(versions)
+    _refuse_type_clash(inventory)
     take, conflicts = _classify(inventory)
     solo = sum(1 for holders in inventory.values() if len(holders) == 1)
+    notices = _uncarried_dirs(versions)
 
     if dry_run:
         print(f"DRY-RUN merge {name} -> {destination}")
@@ -623,10 +706,30 @@ def merge(
             print(f"        {label}  {root}  ({len(content_files(root))} files)")
         print(f"        take   {len(take)} files, {solo} of them held by one version only")
         print(f"        rule   {len(conflicts)} files need a human ruling")
+        for notice in notices:
+            print(notice)
         for relpath, holders in conflicts.items():
             for line in _conflict_report(relpath, holders):
                 print(line)
         return NOTHING_TO_DO if conflicts else 0
+
+    # A union with nothing in it is not a union. Promoting one would create a
+    # skill directory that exists and holds no file, which downstream reads as a
+    # finished merge, and it would do that while every single file was still
+    # waiting on a human. Report and stop before anything is built, so no
+    # staging directory is left to block the retry that follows the ruling.
+    carried = [relpath for relpath in conflicts if (destination / relpath).is_file()]
+    if not take and not carried:
+        for notice in notices:
+            print(notice)
+        for relpath, holders in conflicts.items():
+            for line in _conflict_report(relpath, holders):
+                print(line)
+        print(
+            f"UNRESOLVED {len(conflicts)} files need a human ruling; none was auto-selected, "
+            f"so the union would be empty and {destination} was left untouched"
+        )
+        return NOTHING_TO_DO
 
     # The union is built beside the destination and only moved into place once
     # it verifies. Building in place would leave a half-merged canonical behind
@@ -635,10 +738,9 @@ def merge(
     staging = destination.parent / f".{name}.merging"
     if staging.exists():
         raise SharedSkillsError(f"an earlier merge left {staging} behind; move it aside and retry")
-    # Created up front rather than on the first copy, because a merge where every
-    # single file needs a human ruling takes nothing at all, and the promote step
-    # would then be moving a directory that was never made.
-    staging.mkdir(parents=True, exist_ok=True)
+    # No explicit mkdir: every path that reaches here copies at least one file,
+    # and each copy makes its own parents. The one case that took nothing at all
+    # returned above, precisely so that an empty directory can never be built.
 
     added: list[str] = []
     for relpath, (label, chosen) in take.items():
@@ -657,7 +759,7 @@ def merge(
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(standing, target)
 
-    failures = _verify_union(staging, versions, set(conflicts))
+    failures = _verify_union(staging, sources, destination, set(conflicts))
     if failures:
         for failure in failures:
             print(f"FAIL {failure}", file=sys.stderr)
@@ -677,6 +779,8 @@ def merge(
     shutil.move(str(staging), str(destination))
     for line in added:
         print(line)
+    for notice in notices:
+        print(notice)
     print(
         f"UNION   {destination}: {len(content_files(destination))} files from "
         f"{len(versions)} versions, {solo} of them held by one version only"
@@ -755,6 +859,12 @@ def main(argv: list[str] | None = None) -> int:
             registry, sites, args.name, args.source, args.why,
             args.backup_dir, args.dry_run, args.defer,
         )
+    except NothingToDo as error:
+        # Deliberately not FAIL/1: there was nothing to act on, and a caller that
+        # sees the refusal code for an empty request will go looking for a broken
+        # rule that does not exist. Must be caught before its parent class.
+        print(f"NOTHING {error}", file=sys.stderr)
+        return NOTHING_TO_DO
     except SharedSkillsError as error:
         print(f"FAIL {error}", file=sys.stderr)
         return 1

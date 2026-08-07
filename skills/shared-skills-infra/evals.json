@@ -1,9 +1,10 @@
 {
   "skill_name": "shared-skills-infra",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "_meta": {
-    "coverage_metric": "planted shadowing copy, stale symlink target and planted union-shrinking merger detection",
-    "purpose": "Prove that shadowing fails loudly, that an unruled duplicate is not a failure, and that a union merge cannot drop a file only one version carries -- all without network access."
+    "coverage_metric": "planted shadowing copy, stale symlink target, and five planted merge defects: a union-shrinking walk, a lost --from, a swallowed disagreement, corrupted bytes, and a backup collision",
+    "purpose": "Prove that shadowing fails loudly, that an unruled duplicate is not a failure, and that a union merge cannot drop, overwrite, auto-select or silently corrupt a file -- all without network access.",
+    "asserted_by": "Every covers entry carries the literal string that must appear in tests/verify.sh, and the suite fails if one is missing. It is an anti-drift anchor, not a semantic proof: it guarantees a claim cannot outlive the case that backs it, while the proof that each case is load-bearing is the planted defect it is built around."
   },
   "runnable": [
     {
@@ -13,11 +14,26 @@
       "good_fixture": "a synthetic shared repo wired to its own surfaces and one subscriber, linked by `install`",
       "hollow_fixture": "the same world with a real copy of a shared name planted in the subscriber's .claude surface, and later with the checkout moved so every symlink is stale",
       "covers": [
-        "a project copy of a shared name is SHADOWED, because both hosts prefer it silently",
-        "a symlink or single-SKILL.md forwarder is a pointer, not a shadow",
-        "an unruled duplicate exits 3 rather than failing the gate",
-        "adopt sweeps every rival entry to a backup and never deletes",
-        "a moved checkout fails WRONG-TARGET instead of resolving somewhere else"
+        {
+          "claim": "a project copy of a shared name is SHADOWED, because both hosts prefer it silently",
+          "asserted_by": "SHADOWED demo-skill: repoA/.claude"
+        },
+        {
+          "claim": "a symlink or single-SKILL.md forwarder is a pointer, not a shadow",
+          "asserted_by": "ln -s \"${shared}/skills/demo-skill\" \"${world}/repoA/.claude/skills/demo-skill\""
+        },
+        {
+          "claim": "an unruled duplicate exits 3 rather than failing the gate",
+          "asserted_by": "unruled != violation"
+        },
+        {
+          "claim": "adopt sweeps every rival entry to a backup and never deletes",
+          "asserted_by": "test -f \"${world}/swept/adopt-me/repoA_.claude/SKILL.md\""
+        },
+        {
+          "claim": "a moved checkout fails WRONG-TARGET instead of resolving somewhere else",
+          "asserted_by": "WRONG-TARGET demo-skill"
+        }
       ],
       "expected": "good PASS shared skills hold; hollow SHADOWED/WRONG-TARGET exit 1; unruled exit 3"
     },
@@ -26,17 +42,78 @@
       "checker_script": "scripts/shared_skills.py",
       "test_verify": "tests/verify.sh",
       "good_fixture": "three versions of one skill, each carrying a file the other two lack, plus a canonical destination holding a fourth",
-      "hollow_fixture": "a copy of the script patched to walk only the first version, so every file the others alone carry is dropped",
+      "hollow_fixture": "four patched copies of the script: one that walks only the first version, one that loses the last --from while parsing it, one that files a disagreement as agreement, and one that writes bytes no version carries",
       "covers": [
-        "a file only one version carries is in the union, whichever version has it",
-        "a dropped file exits 1 and the shrunken union is never promoted over canonical",
-        "the destination counts as a version of itself, so canonical is diffed and never overwritten",
-        "bytes that disagree produce both sizes and a hunk-by-hunk diff, and nothing is auto-selected",
-        "an unresolved disagreement exits 3, which is not the exit a dropped file gets",
-        "binary disagreement is named as such instead of rendered as an unreadable diff",
-        "the superseded destination is moved to a backup, never deleted"
+        {
+          "claim": "a file only one version carries is in the union, whichever version has it",
+          "asserted_by": "test -f \"${shared}/skills/merge-me/modules/port-map.md\""
+        },
+        {
+          "claim": "a dropped file makes the tool itself exit 1, including when the loss happened while parsing --from, because the recount starts from the command line and not from the plan",
+          "asserted_by": "grep -q \"DROPPED notes.md: held by C\" \"${world}/8e.err\""
+        },
+        {
+          "claim": "a shrunken union is never promoted over an existing canonical, which stays byte-for-byte and is not swept aside either",
+          "asserted_by": "test \"$(fingerprint \"${shared}/skills/merge-me\")\" = \"${incumbent}\""
+        },
+        {
+          "claim": "the destination counts as a version of itself, so canonical is diffed and never overwritten",
+          "asserted_by": "grep -q \"canonical wrote a line of its own\""
+        },
+        {
+          "claim": "a conflict report prints each side's real byte count, not the word bytes twice",
+          "asserted_by": "test \"${c1_size}\" -ne \"${c2_size}\""
+        },
+        {
+          "claim": "bytes that disagree are diffed hunk by hunk and nothing is auto-selected",
+          "asserted_by": "test ! -e \"${shared}/skills/merge-conflict/SKILL.md\""
+        },
+        {
+          "claim": "a disagreement filed as agreement is caught as UNREPORTED, so a silent auto-selection cannot pass",
+          "asserted_by": "grep -q \"UNREPORTED SKILL.md\""
+        },
+        {
+          "claim": "a union that keeps every path but writes other bytes is caught as ALTERED",
+          "asserted_by": "grep -q \"^FAIL ALTERED \""
+        },
+        {
+          "claim": "an unresolved disagreement exits 3, which is not the exit a dropped file gets",
+          "asserted_by": "test \"${conflict_status}\" -ne 1"
+        },
+        {
+          "claim": "binary disagreement is named as such instead of rendered as an unreadable diff",
+          "asserted_by": "grep -q \"binary content\""
+        },
+        {
+          "claim": "the superseded destination is moved to a backup, never deleted",
+          "asserted_by": "# moved, not deleted"
+        },
+        {
+          "claim": "a second merge of one name on one day gets its own backup record instead of nesting inside the first",
+          "asserted_by": "test -f \"${snapshot}/SKILL.md\""
+        },
+        {
+          "claim": "two paths that resolve to one lineage are one version, and having nothing to fold exits 3 with the name of the verb that does apply",
+          "asserted_by": "grep -q \"nothing to fold\""
+        },
+        {
+          "claim": "a source that is not a directory exits 1, which is not the exit an empty request gets",
+          "asserted_by": "grep -q \"source is not a directory\""
+        },
+        {
+          "claim": "one name held as a file by one version and as a directory by another is refused in a sentence before anything is written, leaving no staging directory to block the retry",
+          "asserted_by": "test ! -e \"${shared}/skills/.typeclash.merging\""
+        },
+        {
+          "claim": "when every file needs a ruling and no canonical exists, nothing is created rather than an empty skill directory",
+          "asserted_by": "test ! -e \"${shared}/skills/allconflict\""
+        },
+        {
+          "claim": "a directory no version fills with a file is reported as not carried, instead of disappearing under exit 0",
+          "asserted_by": "is an empty directory in A"
+        }
       ],
-      "expected": "good UNION with every solo file present; hollow DROPPED exit 1; conflicts exit 3 with the report"
+      "expected": "good UNION with every solo file present; each planted defect DROPPED/UNREPORTED/ALTERED exit 1 with canonical untouched; conflicts exit 3 with the report; nothing to fold exit 3"
     }
   ]
 }

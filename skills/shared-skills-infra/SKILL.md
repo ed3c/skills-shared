@@ -54,7 +54,9 @@ python3 $INFRA adopt <name> --from <path> --why "…" [--defer <repo>] [--dry-ru
 python3 $INFRA merge <name> --from <path> --from <path> [--from …] [--dry-run]
 ```
 
-`check` exit 0 乾淨｜1 有裁決被違反；`report` exit 3 有待裁項（**待裁不是失敗**）。
+exit 0 乾淨｜**1 有裁決被違反／工具拒絕**｜**3 待人裁或無事可做**（`report` 有待裁項、
+`merge` 有衝突或根本沒東西可折）。1 與 3 永遠不可互換：把「沒東西可做」印成 1，
+看的人會去找一條不存在的違規。
 
 ## 收編前先聯集（`merge`）
 
@@ -64,14 +66,29 @@ python3 $INFRA merge <name> --from <path> --from <path> [--from …] [--dry-run]
 
 | 情況 | 行為 | exit |
 |---|---|---|
-| 只有一份版本有這個檔 | 一律進聯集。工具回頭重數一次來源，少一個就 `DROPPED` | 0 |
+| 只有一份版本有這個檔 | 一律進聯集。工具**從命令列**重數一次來源，少一個就 `DROPPED` | 0 |
 | 各版位元組相同 | 取一份 | 0 |
-| 同名而內容異 | 印雙方大小／hash／路徑＋逐段 diff，**不自動選**，等人 accept／override | 3 |
-| 真的掉了檔案 | 半成品留在 `.<name>.merging`，canonical 不動 | 1 |
+| 同名而內容異 | 印雙方**實際位元組數**／hash／路徑＋逐段 diff，**不自動選**，等人 accept／override | 3 |
+| 全部檔案都要人裁、canonical 又還不存在 | 什麼都不建（空目錄＝一場看起來已完成的合併） | 3 |
+| 兩個 `--from` 指到同一血統／只剩一份版本 | 沒東西可折。訊息指向 `adopt` | 3 |
+| 同名一邊是檔、一邊是目錄 | **動工前**就拒絕並說要改名哪一邊，不留 `.merging` 殘骸 | 1 |
+| `--from` 指的路徑不是目錄 | 這是壞掉的請求，不是空的請求 | 1 |
+| 真的掉了檔案／位元組被改 | 半成品留在 `.<name>.merging`，canonical 不動 | 1 |
+
+exit 3 **不是唯讀**：沒衝突的那部分照樣物化進 canonical，衝突檔保留 canonical 既有位元組
+（漏掉它＝用省略的方式刪掉一個沒人裁的檔）。唯一什麼都不建的 exit 3 是上表第四列。
+
+**重數從命令列開始，不從計劃開始**：驗證會把每個 `--from` 重新解析一次。若改用規劃器已經
+解析好的清單，一個「解析時就掉了一個 `--from`」的缺陷會拿它自己捏造的清單來對帳——聯集縮水
+卻回報成功，正是當初弄丟模組的那個形狀。
 
 **目的地本身也算一份版本**：canonical 已有的同名檔只會被 diff，不會被覆寫。被取代的
-canonical 一律搬進 `--backup-dir`（預設 `$TMPDIR/shared-skills-superseded`），不刪。
+canonical 一律搬進 `--backup-dir`（預設 `$TMPDIR/shared-skills-superseded`），不刪；
+同一天第二次合併另立紀錄，不會蓋在第一份上。
 只有一份來源、目的地又還不存在＝那是 `adopt`（它還會登記），不是 `merge`。
+
+**聯集的單位是檔案**：沒有任何檔案的空目錄不會被帶進 canonical（git 本來就記不住空目錄），
+但會印一行 `NOTE` 點名它——讓它消失在 exit 0 底下，就是這個動詞存在要防的那種悄悄變少。
 
 ## clone 下來怎麼接線
 
