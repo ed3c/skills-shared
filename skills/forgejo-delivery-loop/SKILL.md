@@ -131,11 +131,27 @@ python3 $S check                 # T0,零網路;OK/DRIFT/ABSENT/UNMANAGED/UNREGI
 python3 $S apply --to-targets    # 方向必須顯式,永不由 mtime 推斷
 ```
 
+各 repo 的 `.githooks/pre-commit` 只放六行轉發,呼叫 `scripts/pre-commit-agent-docs.sh`
+(邏輯單份;只在 commit 真的 stage 了受管文件時才跑,免得舊漂移擋住無關工作)。
+
 真源=`agent-docs/<repo 目錄名>/`,repo 內那份是投影;新專案骨架=`agent-docs/_template/`。
 兩個 host 各讀哪些檔、優先序、以及 Codex 32 KiB **靜默截斷** vs Claude 200 行**遵循度衰減**
 的差別(官方 URL 錨定)→ [agent-docs/HOST-SURFACES.md](agent-docs/HOST-SURFACES.md)。
 納管範圍與缺席登記紀律 → [agent-docs/README.md](agent-docs/README.md)。
 `settings.json`／`config.toml` **不鏡像**(強制層 ＋ 憑證面),只在 HOST-SURFACES §2 記形狀。
+
+## 索引紀律(本檔對自己的樹的宣稱)
+
+本檔列出的 `modules/`／`scripts/` 就是一份索引,而索引會**單向失效**:死連結點下去才知道,
+**漏列的檔案永遠不會有人知道**——短的清單與完整的清單長得一模一樣。首次真跑時,三支
+delivery-loop **各藏著一支沒被自己 SKILL.md 提過的 sync 類腳本**,同型錯誤三處齊發。
+
+```bash
+bash <本skill>/tests/run-all.sh        # 含 index 雙向檢查與本 skill 的兩支 selftest
+```
+
+規則不靠人記得,靠 `tests/index/verify.sh`;它先跑 checker 自己的 `--selftest`,
+再驗本檔——checker 不能證明自己會紅之前,它對本檔的綠燈不算數。
 
 ## 本 skill 自身的維護
 

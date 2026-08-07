@@ -54,6 +54,23 @@ python3 $INFRA adopt <name> --from <path> --why "…" [--defer <repo>] [--dry-ru
 ```
 
 `check` exit 0 乾淨｜1 有裁決被違反；`report` exit 3 有待裁項（**待裁不是失敗**）。
+正控＝`tests/verify.sh`（全合成世界，不碰這台機器真實 skill 樹，零網路）。
+
+### `scripts/check_index.py` — 索引對它宣稱的那棵樹，兩個方向都要驗
+
+一份索引會**單向失效**：死連結點下去才知道，**漏列的檔案永遠沒人會知道**——
+短的清單與完整的清單長得一模一樣。散文裡的數字更沒有變紅的辦法：本 repo 的 README
+曾寫「共用 17 個」而 registry 是 22，沒人打錯字，只是抄了沒量。
+
+```bash
+CHK=~/.agents/skills/shared-skills-infra/scripts/check_index.py
+python3 $CHK --selftest                                   # 先證它會紅
+python3 $CHK <doc> [--root <dir>] [--covers <dir> …]      # exit 0 乾淨｜1 索引與樹不符
+```
+
+`--covers` 逐目錄要求「每個檔案都在文件裡被指名」（散文提到也算，不必是連結）；
+文件不必索引自己。三支 delivery-loop 用它守自己的 SKILL.md，各自
+`tests/index/verify.sh`；首次真跑就在三支裡各抓到一支從沒被提過的 sync 類腳本。
 
 ## clone 下來怎麼接線
 

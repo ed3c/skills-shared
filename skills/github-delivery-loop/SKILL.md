@@ -99,6 +99,17 @@ preflight 三個都驗——少驗一個平面就會把「還會被擋」報成�
   `codex -C <existing-worktree-path>` 啟動；不存在 `EnterWorktree`、`codex worktree` 或 `codex -w`。
 - Claude Code：只使用當前 carrier 真正提供的 worktree 能力；沒有隔離欄位就 fail closed。
 
+## 索引紀律（本檔對自己的樹的宣稱）
+
+本檔列出的 `modules/`／`scripts/` 就是一份索引，而索引**單向失效**：死連結點下去才知道，
+**漏列的檔案永遠沒人會知道**——短的清單與完整的清單長得一模一樣。首次真跑時，三支
+delivery-loop **各藏著一支從沒被自己 SKILL.md 提過的 sync 類腳本**；本 skill 那支是
+`scripts/delivery_sync.py`（GitHub snapshot 攝取、flow metrics 與決策儀表板投影）。
+同型缺陷三處齊發，正是「發現一個先掃同類全部實例」的形狀。
+
+規則不靠人記得，靠 `tests/index/verify.sh`（`tests/run-all.sh` 自動探索）：它先跑 checker
+自己的 `--selftest`，再驗本檔——**checker 不能證明自己會紅之前，它對本檔的綠燈不算數**。
+
 ## 硬閘
 
 - artifact 不存在是 `UNMATERIALIZED` 失敗，不是 SKIP。
