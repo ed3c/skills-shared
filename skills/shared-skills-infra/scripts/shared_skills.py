@@ -242,6 +242,21 @@ def report(registry: dict[str, Any], sites: Sites) -> int:
     return 1 if violations else NOTHING_TO_DO
 
 
+def unregistered_skills(registry: dict[str, Any]) -> list[str]:
+    """Canonical directories that no registry entry accounts for."""
+    root = REPO / registry["canonical_root"]
+    if not root.is_dir():
+        return [f"MISSING-CANONICAL-ROOT: {root}"]
+    ruled = {item["name"] for item in registry["shared"]}
+    return [
+        f"UNREGISTERED {entry.name}: lives in {root} and is reachable from every "
+        f"project, but no registry entry rules on it -- register it (even as "
+        f"unresolved) or move it out"
+        for entry in sorted(root.iterdir())
+        if entry.is_dir() and not entry.name.startswith(".") and entry.name not in ruled
+    ]
+
+
 def check(registry: dict[str, Any], sites: Sites) -> int:
     """T0 gate. Fails only on ruled violations, never on unruled duplicates."""
     failures: list[str] = []
@@ -266,6 +281,20 @@ def check(registry: dict[str, Any], sites: Sites) -> int:
                 f"SHADOWED {name}: {label} keeps its own copy -- project skills win over "
                 f"user skills, so that copy silently replaces the shared one"
             )
+
+    # The loop above only ever asks "is each registered skill in order?", so a
+    # directory nobody registered can sit in canonical, get linked into every
+    # project through the user surfaces, and the gate still reports PASS. That
+    # happened on 2026-08-07 with gitlab-delivery-loop (issue #13): 36 files,
+    # untracked, unregistered, live on both hosts, gate green. Ask the question
+    # the other way round too.
+    #
+    # FAIL rather than SURFACE on purpose: SURFACE means "somebody should rule on
+    # this", but an unregistered skill in canonical is already in effect
+    # everywhere, which is a different urgency. Registering it -- even as an
+    # explicitly unresolved entry -- is the way to quiet this, not silence.
+    failures.extend(unregistered_skills(registry))
+
     if failures:
         for failure in failures:
             print(f"FAIL {failure}", file=sys.stderr)

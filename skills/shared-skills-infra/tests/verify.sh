@@ -17,12 +17,19 @@ mkdir -p "${shared}/skills/shared-skills-infra/scripts" \
          "${world}/repoA/.agents/skills" "${world}/repoA/.claude/skills"
 cp "${real_script}" "${script}"
 printf -- '---\nname: demo-skill\n---\nbody\n' > "${shared}/skills/demo-skill/SKILL.md"
+# the tool is itself a registered skill, so its fixture needs the same shape
+printf -- '---\nname: shared-skills-infra\n---\nbody\n' \
+  > "${shared}/skills/shared-skills-infra/SKILL.md"
 
 cat > "${shared}/registry.json" <<'JSON'
 {
   "schema": "shared-skills-registry/v2",
   "canonical_root": "skills",
-  "shared": [{"name": "demo-skill", "admitted": "2026-08-07", "why": "fixture"}],
+  "shared": [
+    {"name": "demo-skill", "admitted": "2026-08-07", "why": "fixture"},
+    {"name": "shared-skills-infra", "admitted": "2026-08-07",
+     "why": "the tool itself sits in canonical, so it needs an entry like anything else"}
+  ],
   "repo_owned": []
 }
 JSON
@@ -121,6 +128,32 @@ test -f "${moved_probe:-${shared}}/skills/adopt-me/SKILL.md"
 test -f "${world}/swept/adopt-me/repoA_.claude/SKILL.md"   # swept, not deleted
 test -L "${world}/surfaces/codex/adopt-me"                 # user surface untouched by sweep
 run check | grep -q "PASS shared skills hold"
+
+# 5d. A directory nobody registered can sit in canonical and be reachable from
+#     every project while the gate reports PASS -- that is how gitlab-delivery-loop
+#     went live unruled on 2026-08-07 (#13). The gate has to ask the question in
+#     both directions, not only "is each registered skill in order?".
+run check | grep -q "PASS shared skills hold"          # clean before
+mkdir -p "${shared}/skills/snuck-in"
+printf -- '---\nname: snuck-in\n---\nnobody ruled on me\n' \
+  > "${shared}/skills/snuck-in/SKILL.md"
+if run check >"${world}/5d.out" 2>"${world}/5d.err"; then
+  echo "FAIL: an unregistered canonical skill passed the gate" >&2
+  exit 1
+fi
+grep -q "UNREGISTERED snuck-in" "${world}/5d.err"
+# a file, and a dotted directory, are not skills and must not be reported
+printf 'loose\n' > "${shared}/skills/stray-note.md"
+mkdir -p "${shared}/skills/.cache"
+run check 2>"${world}/5d2.err" || true
+grep -q "UNREGISTERED snuck-in" "${world}/5d2.err"
+if grep -qE "UNREGISTERED (stray-note|\.cache)" "${world}/5d2.err"; then
+  echo "FAIL: a loose file or dotted directory was reported as a skill" >&2
+  exit 1
+fi
+mv "${shared}/skills/snuck-in" "${world}/snuck-in-parked"      # moved, not deleted
+mv "${shared}/skills/stray-note.md" "${world}/stray-note.md"
+run check | grep -q "PASS shared skills hold"          # clean again
 
 # 6. relocatable: the checkout carries no absolute path of its own, so moving it
 #    anywhere and re-running install re-wires it. Symlinks store paths, so the
