@@ -148,6 +148,11 @@
         "antigravity",
         "ix-agy"
       ]
+    },
+    {
+      "name": "gitlab-delivery-loop",
+      "admitted": "2026-08-07",
+      "why": "Same reason as its GitHub sibling: merge authority is host infrastructure, not repo policy -- the same four-layer stack and the same two hosts gate every repo. Kept as a separate name rather than a --host flag on github-delivery-loop because the two forges must not be interchangeable at run time; the split is enforced by disjoint schemas, disjoint identity fields and a cross-forge refusal test, not by documentation."
     }
   ],
   "repo_owned": [
