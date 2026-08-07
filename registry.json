@@ -17,6 +17,11 @@
   ],
   "shared": [
     {
+      "name": "shared-skills-infra",
+      "admitted": "2026-08-07",
+      "why": "The governance tool has to sit under its own rule, or the one skill that can detect shadowing is the one nothing checks."
+    },
+    {
       "name": "github-delivery-loop",
       "admitted": "2026-08-07",
       "why": "Merge authority is host infrastructure, not repo policy: the same four-layer stack and the same two hosts gate every repo. It was already diverged into two versions (skill-bettor v0.1 vs ix-agy v1.1) and that divergence is exactly what made the same blockers recur."
