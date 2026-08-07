@@ -111,7 +111,8 @@ This repository is tightly coupled with and orchestrates the following workspace
 |---|---|
 | 多態型別要驗生產端／綠燈值多少看抵達／觀察對象與待證對象要同源／要記得的事綁到共用出口／量測工具的綠燈也是宣稱 | [invariant-reach-graph](loop_wiki/invariant-reach-graph/.agents/skills/invariant-reach-graph/SKILL.md) — 方法論在 `modules/`，逐案實證在 `domain/`，兩者由該 SKILL.md 串連且不得合併 |
 | OOBE／REOOBE 金鑰素材覆寫的 Android domain 事實 | [android_e2e_loop soft-key-vault-overwrite](loop_wiki/subproject-ixsecurity-e2e/android_e2e_loop/.agents/skills/android-e2e-loop/modules/soft-key-vault-overwrite.md) |
-| 送進一次性資源前先驗素材形狀／搜不到不等於不存在 | [android_e2e_loop email-voip-registration-ceremony §11](loop_wiki/subproject-ixsecurity-e2e/android_e2e_loop/.agents/skills/android-e2e-loop/modules/email-voip-registration-ceremony.md) — driver 是 `ixsecurity-samples/scripts/activate-r2-account.py`（`--selftest`／`--dry-run`） |
+| 送進一次性資源前先驗素材形狀／搜不到不等於不存在 | [android_e2e_loop email-voip-registration-ceremony §11](loop_wiki/subproject-ixsecurity-e2e/android_e2e_loop/.agents/skills/android-e2e-loop/modules/email-voip-registration-ceremony.md) |
+| 自動化操作與測試腳本住在它驗證的那個 Harness 內 | [android_e2e_loop/scripts/](loop_wiki/subproject-ixsecurity-e2e/android_e2e_loop/scripts/) — OOBE 真機驅動四支（`activate-r2-account.py`／`capture-r2token.sh`／`realdevice-oobe-drive.sh`／`realdevice-force-oobe-drive.sh`），2026-08-08 自 `ixsecurity-samples/scripts/` 遷入；`.r2tokens.env` 由 `**/.r2tokens.env` 擋在版控外 |
 
 ## Resolved Issues & Gotchas
 > 已依 fold-in doctrine (B) 全遷至 owner modules（00:F-13/F-17 SSOT 收斂，2026-07-10）；索引與無主教訓全文 → [.agents/modules/resolved-ledger.md](.agents/modules/resolved-ledger.md)
