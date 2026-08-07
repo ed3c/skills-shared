@@ -59,6 +59,19 @@ def _gh(args: list[str]) -> str:
     return done.stdout
 
 
+def _gh_json(args: list[str], empty: Any) -> Any:
+    """`gh` prints nothing at all for some empty result sets -- a repo with no
+    labels, an issue with no matching events. Empty output is absence, not a
+    parse error, so it gets an explicit exit instead of a traceback."""
+    raw = _gh(args).strip()
+    if not raw:
+        return empty
+    try:
+        return json.loads(raw)
+    except json.JSONDecodeError as error:
+        raise GateError(f"gh {' '.join(args)} returned non-JSON: {raw[:120]}") from error
+
+
 # --------------------------------------------------------------------------
 # snapshot: one shape for live GitHub and for offline replay in tests
 # --------------------------------------------------------------------------
@@ -66,33 +79,32 @@ def _gh(args: list[str]) -> str:
 
 def fetch_snapshot(repository: str) -> dict[str, Any]:
     """Read the live admitted-PR set. Never called by tests; they use --snapshot."""
-    owner = json.loads(_gh(["api", f"repos/{repository}", "--jq", "{login:.owner.login}"]))
+    owner = _gh_json(["api", f"repos/{repository}", "--jq", "{login:.owner.login}"], {})
+    if not owner.get("login"):
+        raise GateError(f"could not read the owner of {repository}")
     fields = "number,url,title,isDraft,headRefOid,mergeable,mergeStateStatus"
-    pulls = json.loads(
-        _gh(
-            [
-                "pr", "list", "--repo", repository, "--state", "open",
-                "--label", ADMIT_LABEL, "--json", fields,
-            ]
-        )
+    pulls = _gh_json(
+        [
+            "pr", "list", "--repo", repository, "--state", "open",
+            "--label", ADMIT_LABEL, "--json", fields,
+        ],
+        [],
     )
     for pull in pulls:
         head = pull["headRefOid"]
-        pull["head_committed_at"] = json.loads(
-            _gh(["api", f"repos/{repository}/commits/{head}", "--jq", "{d:.commit.committer.date}"])
-        )["d"]
-        events = json.loads(
-            _gh(
-                [
-                    "api", f"repos/{repository}/issues/{pull['number']}/events",
-                    "--paginate", "--jq",
-                    f'[.[]|select(.event=="labeled" and .label.name=="{ADMIT_LABEL}")]'
-                    "|last|{actor:.actor.login,at:.created_at}",
-                ]
-            )
-            or "null"
+        pull["head_committed_at"] = _gh_json(
+            ["api", f"repos/{repository}/commits/{head}", "--jq", "{d:.commit.committer.date}"],
+            {},
+        ).get("d")
+        pull["admit"] = _gh_json(
+            [
+                "api", f"repos/{repository}/issues/{pull['number']}/events",
+                "--paginate", "--jq",
+                f'[.[]|select(.event=="labeled" and .label.name=="{ADMIT_LABEL}")]'
+                "|last|{actor:.actor.login,at:.created_at}",
+            ],
+            None,
         )
-        pull["admit"] = events
     return {"repo": repository, "owner": owner["login"], "pulls": pulls}
 
 
@@ -353,8 +365,8 @@ def bootstrap(repository: str, rules_dir: Path, allow_unstable: bool) -> int:
     itself, both hosts' PreToolUse blacklists, the Codex sandbox profile -- is
     user-level and already applies to every project without per-repo work.
     """
-    labels = json.loads(
-        _gh(["label", "list", "-R", repository, "--search", ADMIT_LABEL, "--json", "name"])
+    labels = _gh_json(
+        ["label", "list", "-R", repository, "--search", ADMIT_LABEL, "--json", "name"], []
     )
     if any(label.get("name") == ADMIT_LABEL for label in labels):
         print(f"OK      label `{ADMIT_LABEL}` already exists in {repository}")
