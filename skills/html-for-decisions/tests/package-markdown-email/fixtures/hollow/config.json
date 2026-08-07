@@ -1,0 +1,8 @@
+{
+  "title": "缺來源",
+  "snapshot": "2026-08-06",
+  "basename": "hollow",
+  "output_dir": "output",
+  "documents": [{"path": "missing.md", "label": "Missing", "role": "source"}],
+  "quiz": [{"question": "Q", "options": ["A"], "answer": 0}]
+}

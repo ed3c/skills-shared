@@ -3,31 +3,29 @@
 > 屬 [`html-for-decisions`](../SKILL.md)。本檔＝交給執行 LLM（主 session／subagent／headless）的
 > **生成契約**：讓不同家族/op 依同一 schema 物理邊界產出同構的 HTML 決策面。骨架與不變量收斂、
 > 內容忠於各自的 md SSOT。
-> 設計註記：本任務目標是**形式收斂**，故以真實範例（antigravity 歷史案例，見
-> [reference/antigravity-example-decision-dashboard.html](../reference/antigravity-example-decision-dashboard.html)）
-> 當 schema 物理邊界是刻意選擇——約束「形」、不約束「內容」。
+> 設計註記：本任務目標是**形式收斂**，故以一份真實產出的頁面當 schema 物理邊界是刻意選擇——
+> 約束「形」、不約束「內容」。骨架範例屬各 repo 自己的歷史，住在該 repo 的
+> `.skill-bindings/html-for-decisions/`；沒有現成骨架時，依下方 schema 從零寫也成立。
 
 ---
 
 ## 提示詞本體（以下整段交給執行 LLM；`{{...}}`＝調用者代入）
 
-你要為一個家族/演化 op 產出**單檔自包含 HTML 決策面**，給人在 LAND-DECISION 節點（見
-`ARCHITECTURE.md` §8 人閘清單）做裁決用。
+你要為一個決策節點產出**單檔自包含 HTML 決策面**，給人在 LAND-DECISION 節點做裁決用。哪些節點
+算人閘，由宿主 repo 自己的架構文件定義。
 
 **輸入**：
-- md SSOT 所在目錄：`{{SOURCE_DIR}}`（依人閘類型而定：家族 `evals/results`＋`baselines`、沙盒
-  `PLAN.md`、`evals/candidates`↔`evals/holdout`、家族 `changelog/`……判定表、人閘、張力都在裡面）
+- md SSOT 所在目錄：`{{SOURCE_DIR}}`（依人閘類型而定；判定表、人閘、張力都在裡面）
 - 快照日期：`{{SNAPSHOT_DATE}}`（YYYY-MM-DD；**不得**自行取系統時間）
 - 輸出路徑：`{{OUTPUT_PATH}}`
-- 骨架範例：`.claude/skills/html-for-decisions/reference/antigravity-example-decision-dashboard.html`
-  （antigravity 歷史案例，只取其 `<style>` 與 DOM 骨架，內容一字不留——banner 已標明非
-  skill-bettor 案例）
+- 骨架範例（選用）：`{{SKELETON_PATH}}`——若宿主 repo 的 `.skill-bindings/html-for-decisions/`
+  有既有頁面，只取其 `<style>` 與 DOM 骨架，內容一字不留；沒有就依 schema 從零寫。
 
 **角色鐵律（違反即產物無效）**：
 1. 你是**投影者不是判定者**：只萃取 md SSOT 已有的判定/裁決/張力，**禁發明、禁改寫結論、禁把
    預判寫成定案**。每個狀態 chip 的依據必須能在 md 裡指到出處。
 2. **骨架複用、資料全換**：從骨架範例取 `<style>` 全段與各 section 的 DOM 結構；範例中
-   antigravity 自己的判定資料**一字不留**。
+   來源頁面自己的判定資料**一字不留**。
 3. **自包含**：零外部請求（無 CDN/遠端字型/圖片）；CJK 用系統字型堆疊（骨架已含，勿改）。
 4. 頁面必含（checker 機械驗）：`<title>`（≤20 字家族/op 代號式標題）、「**本頁為投影非 SSOT**」
    宣告、`快照 {{SNAPSHOT_DATE}}`、quiz 閘（見 S9）。
@@ -63,18 +61,17 @@
    列槽清單再寫 HTML，缺料的槽標 N/A＋原因）。
 2. 複用骨架，逐 section 填入；S4 的 bar 寬度用 `flex:<count>`。
 3. 寫出 `{{OUTPUT_PATH}}`（單檔）。
-4. 自驗：`python3 .claude/skills/html-for-decisions/scripts/check_decision_html.py
-   {{OUTPUT_PATH}}`——exit 0 才算完成；exit 2 按 FAIL 項修復重跑，**禁降級宣稱完成**。
+4. 自驗：`python3 <本skill>/scripts/check_decision_html.py {{OUTPUT_PATH}}`——exit 0 才算完成；
+   exit 2 按 FAIL 項修復重跑，**禁降級宣稱完成**。
 5. 回報：一句話（產出路徑＋checker 結果＋哪些槽 N/A）。**不要**在回報裡複述頁面內容。
 
 ---
 
 ## 調用備註（不進執行 LLM 的 prompt）
-- driver tier：本 prompt 為 Stage-2 形（規則＋槽位＋範例錨）——因目標是**形式收斂**，Sonnet 級
-  執行即可（skill-bettor tier-dispatch 對應「演化 author」層，見 `ARCHITECTURE.md` §5）；Opus
-  執行時同樣守槽位，不因能力高就自由發揮版式。
+- driver tier：本 prompt 為 Stage-2 形（規則＋槽位＋範例錨）——因目標是**形式收斂**，中階模型
+  執行即可；高階模型執行時同樣守槽位，不因能力高就自由發揮版式。
 - 更新（vN 重生）：同一 prompt、同一 `{{OUTPUT_PATH}}` 覆蓋，`{{SNAPSHOT_DATE}}` 換新＋meta 行標
   vN 與變更觸發事件（人閘裁決/判定表變動）。
 - schema 演化：改槽位＝改本檔（schema 版本遞增）＋同步 checker 可機械驗的子集；骨架範例僅在
-  schema 變更後由真實案例替換——skill-bettor 一旦有自己的第一份真實 worked instance，應考慮以其
-  替換 antigravity 的骨架範例，禁憑空造模板。
+  schema 變更後由真實案例替換——各 repo 一旦有自己的第一份真實 worked instance，應以其替換沿用
+  自別處的骨架範例，禁憑空造模板。

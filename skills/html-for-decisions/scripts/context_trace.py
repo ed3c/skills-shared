@@ -15,8 +15,7 @@ WHY: html-for-decisions 的決策面捕捉語義流（LLM 從 md 萃取判定）
 
 EXIT: 0 成功 · 1 用法/檔案錯 · 2 selftest FAIL
 
-retarget 記事: 本檔零 antigravity 專屬路徑/假設（selftest 走合成 fixture，非讀外部檔），
-移植到 skill-bettor 僅原樣複製，見 modules/retarget-map.md。
+可攜性: 本檔零宿主專屬路徑/假設（selftest 走合成 fixture，非讀外部檔），任一 repo 原樣可用。
 """
 import html as html_mod
 import json
