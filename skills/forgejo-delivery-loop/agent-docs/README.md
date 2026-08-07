@@ -58,6 +58,22 @@ python3 $S apply --to-targets       # 寫下去；跑完自動重跑 check
 3. 把 repo 路徑加進 `sites.local.json` 的 `projects[]`（機器路徑只住那裡）。
 4. `python3 $S apply --to-targets` → `python3 $S check`。
 
+## 誰掛了 pre-commit，誰沒有（缺席要有名字）
+
+閘由各 repo 的 `.githooks/pre-commit` 呼叫 `scripts/pre-commit-agent-docs.sh`，六行轉發，
+只在 commit 真的 stage 了 `CLAUDE.md`／`AGENTS.md` 時才跑。
+
+| repo | 狀態 | 理由 |
+|---|---|---|
+| bettor-arena | 已掛並 commit | — |
+| ix-agy | 已掛並 commit（同時首次設 `core.hooksPath`） | 原本無任何 hook |
+| skill-bettor | **不掛**（2026-08-08 人裁） | `.githooks/pre-commit` 在它的 `PROTECTED_CONTROL_FILES`（`scripts/validate_molecular_commit_message.py`）內，改它要交 GCR molecular lineage：11 個必填欄＋verification envelope＋canonical plan-package／small-loop／final-repo 路徑。一次 hook 安裝沒有那條血緣，硬編就是假 lineage |
+| ts-skill-bettor | **不掛**（2026-08-08 人裁） | 同一份保護名單（TS 版），**再加**一條更硬的：該 repo 2026-08-05 `2478647` 刻意刪掉自己的 `pre-commit`，理由是「無路徑作用域的 hook 讓一個面的關切擋住所有 commit」，且其 header 已論證「a mutable or missing checkout must not decide whether this independent repository can commit」 |
+
+**不要因為「四個 repo 應該一致」就把後兩個補上**——那是裁決，不是漏掉。
+兩者的漂移仍被全掃 `check` 抓得到（本輪就抓到 skill-bettor 的 `AGENTS.md`），只是不在 commit 當下擋。
+差別是時機不是覆蓋率：**沒有 commit 閘的 repo，靠的是有人記得跑 `check`**——那正是這個閘想取代的東西，所以這兩格是已知的、有名字的弱點，不是均勻的保護。
+
 ## 不在管理範圍（刻意，理由在 manifest 的 `unmanaged_by_design`）
 
 `settings.json`／`config.toml` 兩個 host、兩個層級都不鏡像：它們是**強制層**不是 context，
