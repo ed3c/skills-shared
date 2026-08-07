@@ -119,6 +119,24 @@ bun run <本skill>/scripts/route.ts --selftest      # 改 router 或 cases 後�
 降級與 outbox 恢復程序 → [modules/forgejo-operations.md](modules/forgejo-operations.md)。
 完整契約與舊經驗取捨 → [references/contracts.md](references/contracts.md)。
 
+## 受管的 agent 文件(CLAUDE.md／AGENTS.md)
+
+追蹤面管「交付物在不在」,這一節管「每個 repo 與 host 讀進去的指令文件是不是同一份」。
+同型缺陷:文件分岔不會有任何機制吭聲——兩份都是合法 markdown、都被各自 host 完整載入。
+
+```bash
+S=<本skill>/scripts/agent_docs.py
+python3 $S selftest              # 先證閘會紅
+python3 $S check                 # T0,零網路;OK/DRIFT/ABSENT/UNMANAGED/UNREGISTERED 五態不塌陷
+python3 $S apply --to-targets    # 方向必須顯式,永不由 mtime 推斷
+```
+
+真源=`agent-docs/<repo 目錄名>/`,repo 內那份是投影;新專案骨架=`agent-docs/_template/`。
+兩個 host 各讀哪些檔、優先序、以及 Codex 32 KiB **靜默截斷** vs Claude 200 行**遵循度衰減**
+的差別(官方 URL 錨定)→ [agent-docs/HOST-SURFACES.md](agent-docs/HOST-SURFACES.md)。
+納管範圍與缺席登記紀律 → [agent-docs/README.md](agent-docs/README.md)。
+`settings.json`／`config.toml` **不鏡像**(強制層 ＋ 憑證面),只在 HOST-SURFACES §2 記形狀。
+
 ## 本 skill 自身的維護
 
 演化走小迴圈紀律:改本 skill 的程序前先開 op 沙盒迭代(loop-harness-standard),

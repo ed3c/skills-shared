@@ -1,0 +1,70 @@
+{
+  "schema": "agent-docs/v1",
+  "_ssot": "此目錄是每個 target 的 CLAUDE.md／AGENTS.md 的唯一真源；repo 內那份是投影。方向永遠是 agent-docs → target，check 只判位元相等。與 registry.json 同紀律：不存機器路徑（repo 由 sites.local.json 的 projects[] 以目錄名對上），不存凍結 hash（與現實不符的 hash 比沒有紀錄更糟）。",
+  "_why_here": "ts-skill-bettor 的 CLAUDE.md／AGENTS.md 已對 skill-bettor 分岔（tier-dispatch 的大迴圈編排角色不同；AGENTS.md 還留著已裁決搬走的八條設計規範）。分岔沒有任何機制會叫出來，因為兩份都各自語法正確、各自被 host 讀進去。check 就是那個會紅的出口。",
+  "_absence_rule": "缺席必須登記。未登記的 CLAUDE.md／AGENTS.md 出現在 managed target 裡＝FAIL（新檔悄悄長出來與被管理長得不一樣）；登記過的 absent 則印成 ABSENT 而非漏抄。",
+
+  "budgets": {
+    "_anchor": "https://code.claude.com/docs/en/memory · https://learn.chatgpt.com/docs/agent-configuration/agents-md.md",
+    "claude_md_soft_lines": 200,
+    "claude_md_note": "官方：CLAUDE.md 一律整份載入，不截斷；但超過約 200 行後遵循度下降。故為 SURFACE 不是 FAIL。",
+    "codex_project_doc_max_bytes": 32768,
+    "codex_note": "官方：Codex 合併 ~/.codex 到 cwd 的 AGENTS.md，總量到 project_doc_max_bytes（預設 32 KiB）就停止加入——尾端靜默消失。單一檔案就吃掉整個預算＝FAIL。"
+  },
+
+  "targets": [
+    {
+      "key": "ix-agy",
+      "scope": "repo",
+      "managed": true,
+      "files": ["AGENTS.md"],
+      "absent": {
+        "CLAUDE.md": "ix-agy root 無 CLAUDE.md，Claude 面靠 .claude/skills/<name>/SKILL.md forwarder 與全局 ~/.claude/CLAUDE.md 供給。這是登記過的拓撲選擇，不是漏抄。"
+      }
+    },
+    {
+      "key": "skill-bettor",
+      "scope": "repo",
+      "managed": true,
+      "files": ["CLAUDE.md", "AGENTS.md"]
+    },
+    {
+      "key": "ts-skill-bettor",
+      "scope": "repo",
+      "managed": true,
+      "files": ["CLAUDE.md", "AGENTS.md"],
+      "_note": "納管時與 skill-bettor 已分岔。首次匯入採現況逐位元收編（baseline 為真而非為齊），差異該不該收斂是人裁，不由 apply 代決。"
+    },
+    {
+      "key": "bettor-arena",
+      "scope": "repo",
+      "managed": true,
+      "files": ["CLAUDE.md", "AGENTS.md"],
+      "_note": "2026-08-08 補納管（原登記為顯式非目標）。同樣現況逐位元收編：這兩份是全 repo 最薄的一組（各 ~10 行、規則原文只住 ARCHITECTURE.md），納管是為了讓它保持薄——變胖會在 check 的預算欄先被看見。"
+    },
+    {
+      "key": "_global/claude",
+      "scope": "global",
+      "home": "claude",
+      "managed": true,
+      "files": ["CLAUDE.md"],
+      "_note": "~/.claude/CLAUDE.md＝法則層（跨項目通用的判準與校準門檻）。"
+    },
+    {
+      "key": "_global/codex",
+      "scope": "global",
+      "home": "codex",
+      "managed": true,
+      "files": ["AGENTS.md"],
+      "_note": "~/.codex/AGENTS.md＝Codex 家族的法則層；官方順序上它排在所有專案 AGENTS.md 之前，是整條 32 KiB 預算的第一位消費者。"
+    }
+  ],
+
+  "unmanaged_by_design": {
+    "~/.claude/settings.json": "含機器狀態與授權面；且 settings 是強制層，內容錯的代價與文件錯不同級。此處只管文件、不鏡像設定；設定的權威形狀寫在 HOST-SURFACES.md。",
+    "~/.claude/settings.local.json": "機器本地，gitignore 慣例（同 sites.local.json）。",
+    "~/.codex/config.toml": "mode 600、含 provider／憑證面。集中鏡像它等於把秘密複製到第二個位置。",
+    "<repo>/.claude/settings.json": "repo 自有的強制層，逐 repo 差異是真差異不是漂移。",
+    "<repo>/.codex/config.toml": "同上；且官方註明 project 層在 untrusted 專案會整層被忽略，鏡像它會產生假的安全感。"
+  }
+}
