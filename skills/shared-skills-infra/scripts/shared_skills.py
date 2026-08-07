@@ -395,16 +395,24 @@ def link(registry: dict[str, Any], sites: Sites, name: str, quiet: bool = False)
     for project in sites.projects:
         if not project.is_dir() or project.name in deferred:
             continue  # a deferred repo's own version stands until ruled
-        # Absolute on both project surfaces on purpose: a relative
-        # .claude -> ../../.agents hop resolves to whatever that repo keeps
-        # under .agents, which for a diverged repo is its local copy, not
-        # canonical -- the link would silently point at the wrong thing.
+        # .agents first, then .claude through it: repos state their topology as
+        # "the content home is .agents/skills and .claude only defers to it", and
+        # at least one enforces that with a gate, which an absolute link into the
+        # shared checkout trips. The hop cannot land on a diverged local copy
+        # silently -- _point asserts every surface resolves to canonical and
+        # raises when it does not -- so relative here costs no safety.
         targets.append((project / ".agents" / "skills" / name, canonical, False))
         if project.name in sites.claude_forwarder:
             if _write_forwarder(project / ".claude" / "skills" / name, name):
                 linked_forwarders.append(project / ".claude" / "skills" / name)
         else:
-            targets.append((project / ".claude" / "skills" / name, canonical, False))
+            targets.append(
+                (
+                    project / ".claude" / "skills" / name,
+                    Path("..") / ".." / ".agents" / "skills" / name,
+                    False,
+                )
+            )
     linked = len(linked_forwarders)
     for surface in linked_forwarders:
         if not quiet:

@@ -1,0 +1,227 @@
+{
+  "schema_version": "dual-loop-eight-base@0.1.0",
+  "base_order": [
+    "B1-rules-context",
+    "B2-settings-authorization",
+    "B3-lifecycle-observation",
+    "B4-route-discovery",
+    "B5-specialization",
+    "B6-independent-verification",
+    "B7-goal-contract",
+    "B8-state-ledger"
+  ],
+  "layers": {
+    "macro": [
+      {
+        "base_id": "B1-rules-context",
+        "interface": "Cross-host engineering rules and passive repository context",
+        "responsibility": "Load stable repo rules before orchestration begins.",
+        "forbidden": "Do not copy small-loop domain truth into the repository entry contract.",
+        "owners": ["AGENTS.md", "CLAUDE.md", "ARCHITECTURE.md"],
+        "test_owner": "scripts/check_skill_conformance.py",
+        "test_contract": {
+          "positive": "Canonical entry files resolve and remain readable.",
+          "negative": "Missing or malformed governance entry fails the owning conformance gate.",
+          "evidence": "Mechanical exit code and named file diagnostics."
+        }
+      },
+      {
+        "base_id": "B2-settings-authorization",
+        "interface": "Repository automation authorization policy",
+        "responsibility": "Apply least-privilege commit-time policy through the repository hook.",
+        "forbidden": "Do not hide authorization in per-loop host settings or bypass hooks.",
+        "owners": [".githooks/pre-commit"],
+        "test_owner": "scripts/check_all_skills.py",
+        "test_contract": {
+          "positive": "Allowed local mechanical gates execute through the declared layer.",
+          "negative": "Unregistered or failing gates block the commit layer.",
+          "evidence": "Layer report and hook exit code."
+        }
+      },
+      {
+        "base_id": "B3-lifecycle-observation",
+        "interface": "Repository lifecycle hooks and observable transitions",
+        "responsibility": "Observe commit, message, and push transitions without granting LAND.",
+        "forbidden": "Do not treat hook success as semantic graduation.",
+        "owners": [".githooks/commit-msg", ".githooks/pre-push"],
+        "test_owner": "scripts/check_all_skills.py",
+        "test_contract": {
+          "positive": "Registered hook checks report their physical result.",
+          "negative": "Broken selftests or protected-history violations fail closed.",
+          "evidence": "Hook output, meta-gate output, and Git status."
+        }
+      },
+      {
+        "base_id": "B4-route-discovery",
+        "interface": "Capability discovery without concrete plan selection",
+        "responsibility": "Expose available Skills, actors, validators, and route capabilities.",
+        "forbidden": "Do not store the active operational DAG in a capability catalog.",
+        "owners": [".claude/skills/unknown-discovery-composer/SKILL.md", "loop_wiki/evolve-unknown-discovery-plan-truth/ROUTES.md"],
+        "test_owner": "scripts/test_route_authority.py",
+        "test_contract": {
+          "positive": "Selected capabilities resolve to digest-pinned catalog entries.",
+          "negative": "Unknown routes, selection prose, or digest drift are rejected.",
+          "evidence": "Route-authority public-seam test output."
+        }
+      },
+      {
+        "base_id": "B5-specialization",
+        "interface": "Plan composition and independent judgment specialization",
+        "responsibility": "Select narrow Skills and judges for each plan node.",
+        "forbidden": "Do not inject every Skill into every node or let a judge self-LAND.",
+        "owners": [".claude/skills/sdlc-plan-composer/SKILL.md", ".claude/skills/judge-loop-chooser/SKILL.md"],
+        "test_owner": "scripts/test_sdlc_plan_package.py",
+        "test_contract": {
+          "positive": "A typed plan binds one actor, validator, context set, and bounded edge per node.",
+          "negative": "Actor soup, unbounded review, or missing fixed context fails.",
+          "evidence": "Plan-package validator diagnostics."
+        }
+      },
+      {
+        "base_id": "B6-independent-verification",
+        "interface": "Layered mechanical and adversarial verification",
+        "responsibility": "Run repo-wide gates and validate plans independently of implementing actors.",
+        "forbidden": "Do not let the writer manufacture its own receipt or semantic verdict.",
+        "owners": ["scripts/check_all_skills.py", "scripts/check_sdlc_plan_package.py"],
+        "test_owner": "scripts/check_all_skills.py",
+        "test_contract": {
+          "positive": "Registered gates and their selftests execute at the declared layer.",
+          "negative": "Placebo selftests, forged receipts, and stale packages fail.",
+          "evidence": "L1/meta/push/full reports plus separate findings receipts."
+        }
+      },
+      {
+        "base_id": "B7-goal-contract",
+        "interface": "Versioned intent, requirements, acceptance, and stop conditions",
+        "responsibility": "Freeze why, scope, success criteria, and repair budget before execution.",
+        "forbidden": "Do not rewrite the plan merely to fit observed output.",
+        "owners": ["docs/plans"],
+        "test_owner": "scripts/test_sdlc_plan_package.py",
+        "test_contract": {
+          "positive": "A plan package has intent, context, topology, lock, and bounded acceptance.",
+          "negative": "Missing context, cycles, writer collisions, or unbounded repair fail.",
+          "evidence": "Package digest and validator result."
+        }
+      },
+      {
+        "base_id": "B8-state-ledger",
+        "interface": "Operational DAG, evolution history, and receipt state",
+        "responsibility": "Persist generation, supersession, node state, probes, and Human boundaries.",
+        "forbidden": "Do not use chat memory or a Markdown status view as runtime state.",
+        "owners": ["docs/plans/2026-07-30-p10-outcome-consumer/execution-topology.json", "docs/plans/2026-07-30-p10-outcome-consumer/evolution-ledger.json"],
+        "test_owner": "scripts/test_execute_sdlc_plan.py",
+        "test_contract": {
+          "positive": "A current generation replays through digest-bound node receipts.",
+          "negative": "Stale HEAD, wrong generation, dangling evidence, or self-admit fails.",
+          "evidence": "Execution receipt and evolution-ledger validation."
+        }
+      }
+    ],
+    "small": [
+      {
+        "base_id": "B1-rules-context",
+        "interface": "Loop-local passive context and driver entry",
+        "responsibility": "Load common loop rules and explicit non-Claude entry pointers.",
+        "forbidden": "Do not maintain two independent governance SSOTs.",
+        "owners": ["loop_wiki/_template/CLAUDE.md", "loop_wiki/_template/AGENTS.md"],
+        "test_owner": "scripts/test_dual_loop_eight_base.py",
+        "test_contract": {
+          "positive": "Both entry files exist and point to the same target and route contracts.",
+          "negative": "A missing entry or duplicate governance owner fails the manifest gate.",
+          "evidence": "Dual-loop manifest validator diagnostics."
+        }
+      },
+      {
+        "base_id": "B2-settings-authorization",
+        "interface": "Single-dispatch driver and explicit permission surface",
+        "responsibility": "Dispatch a selected driver with explicit target, feedback, and noninteractive input.",
+        "forbidden": "Do not place iteration logic or hidden host authorization in the loop.",
+        "owners": ["loop_wiki/_template/run.sh"],
+        "test_owner": "scripts/check_driver_feedback_parity.sh",
+        "test_contract": {
+          "positive": "Every supported driver receives the same target and feedback contract.",
+          "negative": "Dropped feedback, interactive stdin, or unknown driver fails.",
+          "evidence": "Black-box driver parity output."
+        }
+      },
+      {
+        "base_id": "B3-lifecycle-observation",
+        "interface": "Loop-local logs, anti-pattern history, and engine observations",
+        "responsibility": "Keep runtime observations and failure history local to the sandbox.",
+        "forbidden": "Do not use global mutable state or silently discard failed trajectories.",
+        "owners": ["loop_wiki/_template/logs", "loop_wiki/_template/anti"],
+        "test_owner": "loop_wiki/engine_selftest.sh",
+        "test_contract": {
+          "positive": "Engine transitions emit progress and trajectory observations.",
+          "negative": "No-progress, no-change, and exhausted runs surface distinct failures.",
+          "evidence": "Engine result line, exit code, trajectory, and anti entry."
+        }
+      },
+      {
+        "base_id": "B4-route-discovery",
+        "interface": "Loop-local capability and exchange route catalog",
+        "responsibility": "Expose domain actors, Skills, validators, packet kinds, and fallback edges.",
+        "forbidden": "Do not command sibling loops or store a concrete plan DAG here.",
+        "owners": ["loop_wiki/_template/ROUTES.md"],
+        "test_owner": "scripts/test_dual_loop_eight_base.py",
+        "test_contract": {
+          "positive": "The template contains an explicit capability-versus-selection boundary.",
+          "negative": "Missing route owner or hidden free-form workflow state fails.",
+          "evidence": "Dual-loop manifest and instantiated route validator output."
+        }
+      },
+      {
+        "base_id": "B5-specialization",
+        "interface": "Typed exchange seam for domain-local adapters",
+        "responsibility": "Carry fixed, iteration, and emergent context through validated packets.",
+        "forbidden": "Do not pass hidden chat state or let a domain adapter take orchestration authority.",
+        "owners": ["loop_wiki/_template/modules/exchange-formats.md"],
+        "test_owner": "scripts/test_dual_loop_eight_base.py",
+        "test_contract": {
+          "positive": "An instantiated loop names a typed packet schema and validator.",
+          "negative": "Unsafe paths, missing identity, or undeclared context fail closed.",
+          "evidence": "Packet schema validation and trigger/fallback tests."
+        }
+      },
+      {
+        "base_id": "B6-independent-verification",
+        "interface": "Loop-local verifier and anti-placebo selftest",
+        "responsibility": "Measure the target with true exit codes and discriminate good from hollow fixtures.",
+        "forbidden": "Do not let the writer edit the checker or infer success from prose.",
+        "owners": ["loop_wiki/_template/verify.sh", "loop_wiki/_template/selftest.sh"],
+        "test_owner": "loop_wiki/_template/selftest.sh",
+        "test_contract": {
+          "positive": "Good fixtures pass and real target commands return the declared exit.",
+          "negative": "Hollow and planted-defect fixtures fail with diagnostic output.",
+          "evidence": "Verifier output, PROGRESS, and selftest discrimination result."
+        }
+      },
+      {
+        "base_id": "B7-goal-contract",
+        "interface": "Loop target, guard metric, success criteria, and stop-loss",
+        "responsibility": "Freeze the operation contract before a driver runs.",
+        "forbidden": "Do not change the scoring rule after seeing the result.",
+        "owners": ["loop_wiki/_template/PROMPT.md"],
+        "test_owner": "loop_wiki/engine_selftest.sh",
+        "test_contract": {
+          "positive": "The engine receives a concrete target and predeclared success criteria.",
+          "negative": "Missing target, malformed contract, or checker mutation fails.",
+          "evidence": "Preflight result and immutable target contract."
+        }
+      },
+      {
+        "base_id": "B8-state-ledger",
+        "interface": "Loop status, verifier assignment, iteration history, and Human edge",
+        "responsibility": "Persist bounded progress and surface stop-loss without self-admission.",
+        "forbidden": "Do not hide state in the conversation or mark done from a driver result.",
+        "owners": ["loop_wiki/_template/PLAN.md"],
+        "test_owner": "loop_wiki/engine_selftest.sh",
+        "test_contract": {
+          "positive": "Each iteration records driver, exit, progress, and next edge.",
+          "negative": "No-progress or exhausted budget surfaces to Human instead of looping forever.",
+          "evidence": "PLAN trajectory and engine terminal result."
+        }
+      }
+    ]
+  }
+}

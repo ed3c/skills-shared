@@ -1,0 +1,14 @@
+{
+  "title": "缺圖負控",
+  "snapshot": "2026-08-06",
+  "basename": "no-diagram",
+  "output_dir": "output",
+  "decision": "每份來源都必須帶資料流圖。",
+  "summary": ["這個 fixture 應該被 renderer 擋下。"],
+  "documents": [
+    {"path": "c.md", "label": "C 文件", "role": "缺圖"}
+  ],
+  "quiz": [
+    {"question": "沒有 receipt 時 Deployed 是？", "options": ["UNKNOWN", "VERIFIED"], "answer": 0}
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "skill_name": "knowledge-continuity",
+  "version": "1.0.0",
+  "_meta": {
+    "coverage_metric": "planted-break detection rate (per-rule; a break counts only when the hollow fixture exercises that one rule and the good fixture proves the rule does not misfire)",
+    "uncovered_by_design": [
+      "圖是否從輸入節點開始 — 真實缺陷，但沒有可靠的文字訊號能與『第一行是標題』區分，留給人讀",
+      "解釋本身是否足夠 — 規則只檢查引用的形狀，不檢查說明的品質",
+      "未裁決的事被畫成已裁決 — 需要理解語意，且矛盾常常跨檔案，逐檔檢查抓不到",
+      "圖例是否存在 — 符號表缺席時機械層仍可能全綠（實測發生過）",
+      "跳轉是否落在原始來源 — 屬於 html-for-decisions 的渲染層，不在本 skill 範圍"
+    ],
+    "purpose": "Catch the mechanical knowledge breaks that force a reader to supply information the document withheld."
+  },
+  "runnable": [
+    {
+      "id": "KC-1",
+      "checker_script": "scripts/check_knowledge_continuity.py",
+      "test_verify": "tests/check-knowledge-continuity/verify.sh",
+      "good_fixture": "tests/check-knowledge-continuity/fixtures/good/doc.md",
+      "hollow_fixture": "tests/check-knowledge-continuity/fixtures/hollow/doc.md",
+      "covers": ["KC-01 外部記憶式引用", "KC-02 章節錯引", "KC-03 約數",
+                 "KC-04 知識外包", "KC-05 兩跳才到證據"],
+      "expected": "good 全綠；hollow 上五條規則各自轉紅（不是只有總數轉紅）；hollow 的 exit code 非零"
+    },
+    {
+      "id": "KC-2",
+      "checker_script": "scripts/check_knowledge_continuity.py",
+      "test_verify": "tests/check-knowledge-continuity/verify.sh",
+      "good_fixture": "in-process temp fixture（--selftest）",
+      "hollow_fixture": "in-process temp fixture（--selftest）",
+      "covers": ["本文自定義的代號不得誤報", "圖與程式碼區塊內的標籤不得誤報",
+                 "引號內的示範反例不得誤報", "ISO 日期不得被當成文件代號"],
+      "expected": "--selftest 全過；本地定義的 ID、本文章節號、被展示的反例與日期一律不算斷點"
+    }
+  ],
+  "field_evidence": {
+    "note": "規則不是憑空設計的，每條都在真實文件上驗證過命中率",
+    "measured_2026_08_06": {
+      "05-final-solution-revised-plan.md（已針對連續性修過）": 0,
+      "00-invariants.md": 8,
+      "04-guard-mechanisms-and-hook-gates.md": 8,
+      "02-code-verified-comparison-and-golden-flow.md": 4,
+      "01-prd.md": 1,
+      "03-trueme-current-state-ssot.md": 1,
+      "2026-08-05-...-implementation-plan.md": 1,
+      "README.md": 0
+    },
+    "interpretation": "唯一針對連續性重寫過的文件是唯一 0 斷點的文件；這是規則在量對東西的證據，不是巧合。"
+  }
+}

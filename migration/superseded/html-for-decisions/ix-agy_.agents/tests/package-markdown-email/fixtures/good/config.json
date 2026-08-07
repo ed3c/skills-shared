@@ -1,0 +1,48 @@
+{
+  "title": "測試決策包",
+  "snapshot": "2026-08-06",
+  "basename": "test-bundle",
+  "output_dir": "output",
+  "decision": "Release-reachable 不等於 Deployed。",
+  "summary": [
+    "兩份文件必須完整入包。"
+  ],
+  "documents": [
+    {
+      "path": "a.md",
+      "label": "A 文件",
+      "role": "入口"
+    },
+    {
+      "path": "b.md",
+      "label": "B 文件",
+      "role": "證據"
+    },
+    {
+      "path": "c.md",
+      "label": "C 摘要",
+      "role": "索引"
+    },
+    {
+      "path": "d.md",
+      "label": "D 原始定義",
+      "role": "來源"
+    }
+  ],
+  "quiz": [
+    {
+      "question": "沒有 receipt 時 Deployed 是？",
+      "options": [
+        "UNKNOWN",
+        "VERIFIED"
+      ],
+      "answer": 0
+    }
+  ],
+  "extras": [
+    {
+      "path": "tool.py",
+      "as": "tools/tool.py"
+    }
+  ]
+}

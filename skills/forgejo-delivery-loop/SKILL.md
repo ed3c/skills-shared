@@ -8,9 +8,14 @@ description: |
   merge 後 milestone 進度自動推進;漂移/新發現 → 開新 issue 回圈。三種提示的放置鐵律:
   fixed/iteration/emergent 走 exchange packet 既有欄位,湧現提示落 packets 與 openwiki backlog,
   禁入 development-standards.md 等規範模組。
-  觸發詞:交付進度、delivery 收據、issue 驅動實作、切線、forgejo-delivery-loop。
+  也含**操作層**:本機 Forgejo 的登入、唯讀預檢、typed request、idempotency marker、確定性 router、
+  fail-closed 與降級 outbox 恢復(2026-08-07 併入原 forgejo-loop-ops)。優先接管使用者已開啟且已登入的
+  Chrome;登入缺失時可用既有 Git credential helper 在記憶體內補登入,但不得輸出或落盤秘密。
+  觸發詞:交付進度、delivery 收據、issue 驅動實作、切線、Forgejo 登入、唯讀預檢、
+  forgejo-delivery-loop。
   NOT for:日常晨檢與發佈輪替(product-ops);迴圈拓撲記錄(harness-wiki);建新迴圈工程規範
-  (loop-harness-standard);單純 code diff 審(code-review);Forgejo 登入/唯讀預檢(forgejo-loop-ops)。
+  (loop-harness-standard);單純 code diff 審(code-review);GitHub／GitLab／外部 Forgejo
+  (github-delivery-loop／gitlab-delivery-loop);任意改 remote、force push、跳過 gate、主樹切分支。
 ---
 
 # forgejo-delivery-loop — 小迴圈產出 ↔ Forgejo 追蹤面的物理閉環
@@ -90,6 +95,25 @@ credential helper 在記憶體內取憑證,**秘密不落盤不輸出**(本 repo
   **openwiki 原生 backlog**;**禁寫入規範模組**——規範只收「已被人 admit 的穩定規則」,
   湧現內容先進 packet／issue／backlog 沉澱,經 fold-in 判 durable home 後才可能升格。
   本 repo 的工廠測試有 grep 負控守這條界。
+
+## 操作層(怎麼安全地動 Forgejo)
+
+追蹤面說「該動哪一條線」，操作層說「怎麼動而不留下半套狀態」。兩者 2026-08-07 合併成一支
+（原 `forgejo-loop-ops`）——它們本來就是同一條迴圈的兩層，拆成兩個名字只是讓「先跑哪一支」
+變成每次都要重新想的問題。
+
+任何 mutation 之前先跑確定性 router，採用它輸出的 `actor`／`mode`／`mutation_allowed`，
+**不要在模型裡另寫一套平行路由規則**：
+
+```bash
+bun run <本skill>/scripts/route.ts --input <route-input.json>
+bun run <本skill>/scripts/route.ts --selftest      # 改 router 或 cases 後必跑
+```
+
+八條不變量（只認 localhost:3000、憑證只留記憶體、Forgejo 不是真相來源、每個外部 mutation 下沉成
+一個小迴圈、repo 寫入交給 repo-local operator、缺 admission 即 fail closed……）、M0/G0/V0 狀態圖、
+降級與 outbox 恢復程序 → [modules/forgejo-operations.md](modules/forgejo-operations.md)。
+完整契約與舊經驗取捨 → [references/contracts.md](references/contracts.md)。
 
 ## 本 skill 自身的維護
 

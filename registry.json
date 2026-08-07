@@ -45,11 +45,6 @@
       "why": "Core-three consensus 3/3 on 2026-08-07 (bettor-arena/skill-bettor/ts-skill-bettor). Method/host infrastructure with no repo-specific content. The ix-agy and antigravity variants were merged into this body on 2026-08-07 rather than left deferred; their host-bound halves moved to each repo's .skill-bindings. Their local copies still need removing by hand -- the host gate blocks deletions -- until then they shadow this body."
     },
     {
-      "name": "forgejo-loop-ops",
-      "admitted": "2026-08-07",
-      "why": "Core-three consensus 2/2 on 2026-08-07 (bettor-arena/skill-bettor/ts-skill-bettor). Method/host infrastructure with no repo-specific content. The ix-agy and antigravity variants were merged into this body on 2026-08-07 rather than left deferred; their host-bound halves moved to each repo's .skill-bindings. Their local copies still need removing by hand -- the host gate blocks deletions -- until then they shadow this body."
-    },
-    {
       "name": "external-verify",
       "admitted": "2026-08-07",
       "why": "Core-three consensus 2/3 on 2026-08-07 (bettor-arena/skill-bettor/ts-skill-bettor). Method/host infrastructure with no repo-specific content. The ix-agy and antigravity variants were merged into this body on 2026-08-07 rather than left deferred; their host-bound halves moved to each repo's .skill-bindings. Their local copies still need removing by hand -- the host gate blocks deletions -- until then they shadow this body."
@@ -107,7 +102,10 @@
     {
       "name": "forgejo-delivery-loop",
       "admitted": "2026-08-07",
-      "why": "bettor-arena holds the mechanism; the ts-skill-bettor copy says so itself in its own header, which makes it a binding, not a second body. Kept separate from the GitHub and GitLab siblings by the earlier ruling: the forges must not be interchangeable at run time."
+      "why": "bettor-arena holds the mechanism; the ts-skill-bettor copy says so itself in its own header, which makes it a binding, not a second body. Kept separate from the GitHub and GitLab siblings by the earlier ruling: the forges must not be interchangeable at run time. 2026-08-07: absorbed forgejo-loop-ops, which was the operations half of the same loop -- one skill said which line to work, the other how to move it without leaving half-applied state, and splitting them made 'which one first' a question you had to answer every time. Its router, cases and contracts moved in whole; the selftest still runs 19/19.",
+      "absorbed": [
+        "forgejo-loop-ops"
+      ]
     },
     {
       "name": "loop-harness-standard",
