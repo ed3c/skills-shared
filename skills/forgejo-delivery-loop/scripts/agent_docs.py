@@ -37,6 +37,7 @@ import argparse
 import difflib
 import json
 import shutil
+import subprocess
 import sys
 from pathlib import Path
 from typing import Any
@@ -78,8 +79,15 @@ def load_sites(path: Path) -> dict[str, Any]:
         raise AgentDocsError(f"unreadable sites file: {path}: {error}") from error
 
 
-def target_dir(target: dict[str, Any], sites: dict[str, Any]) -> Path:
-    """Where this target's live copy sits. Raises rather than guessing."""
+def target_dir(target: dict[str, Any], sites: dict[str, Any]) -> Path | None:
+    """Where this target's live copy sits, or None when this machine cannot say.
+
+    None is not an error here. A hook running in one repo must not die because
+    some other checkout is absent from sites.local.json (which is gitignored, so
+    a fresh clone has none); the caller decides. Asking about one key with
+    --key does raise, because "I cannot resolve the thing you named" is an
+    answer of a different kind from "that repo is fine".
+    """
     key = target["key"]
     if target.get("scope") == "global":
         home = target.get("home")
@@ -93,10 +101,23 @@ def target_dir(target: dict[str, Any], sites: dict[str, Any]) -> Path:
         candidate = Path(project).expanduser()
         if candidate.name == key:
             return candidate
-    raise AgentDocsError(
-        f"{key}: no entry in {DEFAULT_SITES.name} projects[] has that directory name -- "
-        f"add the path there (machine paths never live in the manifest)"
+    return None
+
+
+def projection_bytes(live: Path, name: str, staged: bool) -> bytes | None:
+    """The bytes the host would load, or None when the file is not there.
+
+    With --staged the answer comes from the git index, not the worktree: a
+    pre-commit gate has to judge the bytes being committed, or a partially
+    staged edit (`git add -p`) sails through a worktree that happens to match.
+    Same rule the repo's own fast-quality hook already follows.
+    """
+    if not staged:
+        return live.joinpath(name).read_bytes() if live.joinpath(name).is_file() else None
+    result = subprocess.run(
+        ["git", "-C", str(live), "show", f":{name}"], capture_output=True
     )
+    return result.stdout if result.returncode == 0 else None
 
 
 # ---------------------------------------------------------------- the gate
@@ -122,62 +143,88 @@ def budget_notes(name: str, blob: bytes, budgets: dict[str, Any]) -> tuple[list[
     return fatal, surfaced
 
 
-def check(root: Path, sites: dict[str, Any], quiet: bool = False) -> int:
+def check(
+    root: Path,
+    sites: dict[str, Any],
+    quiet: bool = False,
+    key: str | None = None,
+    staged: bool = False,
+    target_dir_override: Path | None = None,
+) -> int:
     manifest = load_manifest(root)
     budgets = manifest.get("budgets", {})
     failures: list[str] = []
     surfaced: list[str] = []
     ok = 0
+    unresolved = 0
 
-    for target in manifest["targets"]:
-        key = target["key"]
+    targets = manifest["targets"]
+    if key is not None:
+        targets = [t for t in targets if t["key"] == key]
+        if not targets:
+            raise AgentDocsError(f"no target keyed {key!r} in the manifest")
+
+    for target in targets:
+        key_ = target["key"]
         if not target.get("managed", False):
             if not quiet:
-                print(f"UNMANAGED  {key}: {target.get('why', 'no reason recorded')}")
+                print(f"UNMANAGED  {key_}: {target.get('why', 'no reason recorded')}")
             continue
-        live = target_dir(target, sites)
-        source_dir = root / key
+        live = target_dir_override or target_dir(target, sites)
+        if live is None:
+            note = (
+                f"{key_}: not in {DEFAULT_SITES.name} projects[] on this machine, so nothing "
+                f"was compared -- this is not a pass"
+            )
+            if key is not None:
+                raise AgentDocsError(note)
+            print(f"SKIP-UNRESOLVED {note}", file=sys.stderr)
+            unresolved += 1
+            continue
+        source_dir = root / key_
         managed_names = set(target.get("files", []))
         absences = target.get("absent", {})
 
         for name in target.get("files", []):
             source = source_dir / name
-            projection = live / name
             if not source.is_file():
-                failures.append(f"NO-SOURCE   {key}/{name}: {source} is not on disk")
+                failures.append(f"NO-SOURCE   {key_}/{name}: {source} is not on disk")
                 continue
-            if not projection.is_file():
+            live_blob = projection_bytes(live, name, staged)
+            if live_blob is None:
+                where = "the git index" if staged else str(live / name)
                 failures.append(
-                    f"MISSING     {key}/{name}: managed but absent at {projection} -- "
+                    f"MISSING     {key_}/{name}: managed but absent in {where} -- "
                     f"either `apply --to-targets` or register it under absent{{}}"
                 )
                 continue
             blob = source.read_bytes()
-            if blob != projection.read_bytes():
-                failures.append(f"DRIFT       {key}/{name}: {projection} differs from source")
+            if blob != live_blob:
+                where = "staged bytes" if staged else str(live / name)
+                failures.append(f"DRIFT       {key_}/{name}: {where} differs from source")
                 continue
             hard, soft = budget_notes(name, blob, budgets)
-            failures.extend(f"{note} [{key}/{name}]" for note in hard)
-            surfaced.extend(f"{note} [{key}/{name}]" for note in soft)
+            failures.extend(f"{note} [{key_}/{name}]" for note in hard)
+            surfaced.extend(f"{note} [{key_}/{name}]" for note in soft)
             if not hard:
                 ok += 1
                 if not quiet:
-                    print(f"OK          {key}/{name}")
+                    print(f"OK          {key_}/{name}")
 
         for name, why in absences.items():
-            if (live / name).is_file():
+            if projection_bytes(live, name, staged) is not None:
                 failures.append(
-                    f"UNEXPECTED  {key}/{name}: registered absent but present at {live / name}"
+                    f"UNEXPECTED  {key_}/{name}: registered absent but present at {live / name}"
                 )
             elif not quiet:
-                print(f"ABSENT      {key}/{name}: {why}")
+                print(f"ABSENT      {key_}/{name}: {why}")
 
         for name in GOVERNED_NAMES:
             if name in managed_names or name in absences:
                 continue
-            if (live / name).is_file():
+            if projection_bytes(live, name, staged) is not None:
                 failures.append(
-                    f"UNREGISTERED {key}/{name}: {live / name} is loaded by the host but no "
+                    f"UNREGISTERED {key_}/{name}: {live / name} is loaded by the host but no "
                     f"manifest entry rules on it -- register it (managed or absent)"
                 )
 
@@ -187,7 +234,8 @@ def check(root: Path, sites: dict[str, Any], quiet: bool = False) -> int:
         for failure in failures:
             print(f"FAIL {failure}", file=sys.stderr)
         return 1
-    print(f"PASS agent docs hold ({ok} managed files identical)")
+    skipped = f"; {unresolved} target(s) unresolved on this machine, NOT checked" if unresolved else ""
+    print(f"PASS agent docs hold ({ok} managed files identical{skipped})")
     return 0
 
 
@@ -198,6 +246,8 @@ def diff(root: Path, sites: dict[str, Any]) -> int:
         if not target.get("managed", False):
             continue
         live = target_dir(target, sites)
+        if live is None:
+            continue
         for name in target.get("files", []):
             source, projection = root / target["key"] / name, live / name
             if not source.is_file() or not projection.is_file():
@@ -223,6 +273,9 @@ def apply(root: Path, sites: dict[str, Any], to_targets: bool, dry_run: bool) ->
         if not target.get("managed", False):
             continue
         live = target_dir(target, sites)
+        if live is None:
+            print(f"SKIP-UNRESOLVED {target['key']}: not on this machine", file=sys.stderr)
+            continue
         for name in target.get("files", []):
             source, projection = root / target["key"] / name, live / name
             src, dst = (source, projection) if to_targets else (projection, source)
@@ -250,6 +303,8 @@ def adopt(root: Path, sites: dict[str, Any], key: str) -> int:
     if target is None:
         raise AgentDocsError(f"no target keyed {key!r} in the manifest")
     live = target_dir(target, sites)
+    if live is None:
+        raise AgentDocsError(f"{key}: not in {DEFAULT_SITES.name} projects[] on this machine")
     (root / key).mkdir(parents=True, exist_ok=True)
     for name in target.get("files", []):
         projection = live / name
@@ -324,12 +379,49 @@ def selftest() -> int:
 
         write("x" * 40000)
         expect("AGENTS.md over the codex budget fails", 1)
+        write("# demo\n")
+
+        # --key: the flag a hook runs behind. An unresolvable key must be FATAL,
+        # because "I could not look" answering the same as "it is fine" is the
+        # whole failure this file exists to stop.
+        if check(root, sites, quiet=True, key="demo") != 0:
+            failures.append("--key on a clean target should pass")
+        try:
+            check(root, {"projects": []}, quiet=True, key="demo")
+            failures.append("--key with no resolvable path should raise, not pass")
+        except AgentDocsError:
+            pass
+        try:
+            check(root, sites, quiet=True, key="nope")
+            failures.append("--key naming a target that does not exist should raise")
+        except AgentDocsError:
+            pass
+        if check(root, {"projects": []}, quiet=True) != 0:
+            failures.append("a full sweep must survive an unresolvable target, naming it")
+
+        # --staged: judge the bytes being committed. A worktree that matches
+        # while the index does not is exactly what `git add -p` produces.
+        git = ["git", "-C", str(repo)]
+        subprocess.run([*git, "init", "-q"], check=True, capture_output=True)
+        subprocess.run([*git, "add", "AGENTS.md"], check=True, capture_output=True)
+        if check(root, sites, quiet=True, key="demo", staged=True) != 0:
+            failures.append("--staged on a clean index should pass")
+        (repo / "AGENTS.md").write_text("# staged drift\n", encoding="utf-8")
+        subprocess.run([*git, "add", "AGENTS.md"], check=True, capture_output=True)
+        (repo / "AGENTS.md").write_text("# demo\n", encoding="utf-8")
+        if check(root, sites, quiet=True, key="demo") != 0:
+            failures.append("worktree matches, so the non-staged check should pass here")
+        if check(root, sites, quiet=True, key="demo", staged=True) != 1:
+            failures.append("--staged must catch drift the worktree hides")
 
     if failures:
         for failure in failures:
             print(f"SELFTEST-FAIL {failure}", file=sys.stderr)
         return 1
-    print("PASS selftest: gate goes red on drift, absence, surprise, unruled and truncation")
+    print(
+        "PASS selftest: red on drift, absence, surprise, unruled, truncation, an unresolvable "
+        "--key, and staged drift a clean worktree hides"
+    )
     return 0
 
 
@@ -341,7 +433,21 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--root", type=Path, default=DEFAULT_ROOT, help="agent-docs directory")
     parser.add_argument("--sites", type=Path, default=DEFAULT_SITES, help="machine paths file")
     commands = parser.add_subparsers(dest="command", required=True)
-    commands.add_parser("check", help="zero-network gate (T0)")
+    check_parser = commands.add_parser("check", help="zero-network gate (T0)")
+    check_parser.add_argument(
+        "--key", help="check only this target; an unresolvable key is FATAL, never a pass"
+    )
+    check_parser.add_argument(
+        "--staged",
+        action="store_true",
+        help="compare the git index blobs, not the worktree -- what a commit would land",
+    )
+    check_parser.add_argument(
+        "--target-dir",
+        type=Path,
+        help="where the keyed target lives, bypassing sites.local.json (for hooks, which "
+        "already know their own root); requires --key",
+    )
     commands.add_parser("diff", help="unified diff for every drifted file")
     apply_parser = commands.add_parser("apply", help="copy one direction, explicitly")
     direction = apply_parser.add_mutually_exclusive_group(required=True)
@@ -358,7 +464,15 @@ def main(argv: list[str] | None = None) -> int:
             return selftest()
         sites = load_sites(args.sites)
         if args.command == "check":
-            return check(args.root, sites)
+            if args.target_dir and not args.key:
+                raise AgentDocsError("--target-dir names one target's home; pass --key with it")
+            return check(
+                args.root,
+                sites,
+                key=args.key,
+                staged=args.staged,
+                target_dir_override=args.target_dir,
+            )
         if args.command == "diff":
             return diff(args.root, sites)
         if args.command == "import":
