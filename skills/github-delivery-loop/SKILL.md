@@ -18,6 +18,8 @@ description: |
 
 完整 schema、狀態流與速度定義見 [modules/delivery-mechanism.md](modules/delivery-mechanism.md)。
 各 host 的權限真相、確切修法與官方出處見 [modules/host-permissions.md](modules/host-permissions.md)。
+**commit 角色（用哪個身分 commit、agent 怎麼署名、何時才准 commit）的完整設定見
+[modules/commit-role.md](modules/commit-role.md)——開工前先跑它 §6 的 `git var GIT_AUTHOR_IDENT` 檢查。**
 
 ## 可攜性（canonical 單一家）
 

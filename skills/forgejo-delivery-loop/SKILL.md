@@ -24,6 +24,10 @@ description: |
 > (低壓縮全資訊版;本檔只放操作面)。移植自 `github-delivery-loop`,**整條重靶
 > 本地 Forgejo,零雲端 GitHub**(人裁 2026-08-06);逐機制對照見該模組 §7。
 > 各 repo 的線、PRD 與 milestone 登記在它自己的 `.skill-bindings/forgejo-delivery-loop/registry.json`。
+> **commit 角色(用哪個身分 commit、agent 怎麼署名、何時才准 commit)的完整設定 →
+> [modules/commit-role.md](modules/commit-role.md)**;開工前先跑它 §6 的
+> `git var GIT_AUTHOR_IDENT` 檢查——本機 Forgejo 線的正解是 `neon <neon@noreply.localhost>`,
+> 吃到全域 gmail 就是設定錯。
 
 ## 四層原生儀表板(Forgejo 端的追蹤形狀)
 

@@ -21,6 +21,8 @@ description: |
 各 host 的權限真相、確切修法與官方出處見 [modules/host-permissions.md](modules/host-permissions.md)。
 **與 GitHub 版的分界與五處實測平台差異見 [modules/github-vs-gitlab.md](modules/github-vs-gitlab.md)——
 動手前先讀它**，照抄 GitHub 版的假設會靜默失敗。
+**commit 角色（用哪個身分 commit、agent 怎麼署名、何時才准 commit）的完整設定見
+[modules/commit-role.md](modules/commit-role.md)——開工前先跑它 §6 的 `git var GIT_AUTHOR_IDENT` 檢查。**
 
 ## 與 github-delivery-loop 不混用
 
