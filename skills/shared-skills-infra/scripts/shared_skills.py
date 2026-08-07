@@ -259,6 +259,45 @@ def scope_of(item: dict[str, Any]) -> str:
     return item.get("scope", "shared")
 
 
+def deferred_problem(item: dict[str, Any]) -> str | None:
+    """Why this entry's `deferred_in` cannot be read as a ruling, if it cannot.
+
+    Type-checked rather than coerced, because every wrong shape fails in its own
+    silent way and one of them fails in the gate's own direction: `set()` of a
+    dict yields its keys and of a string its characters, so
+    `"deferred_in": {"antigravity": true}` reads as a deferral nobody wrote and
+    exempts that repo from the shadowing check -- the single thing this tool
+    exists to catch. An int or a null merely stops the scan mid-loop with
+    `not iterable`, naming neither the entry nor the key. One sentence replaces
+    both outcomes.
+    """
+    if "deferred_in" not in item:
+        return None
+    value = item["deferred_in"]
+    if isinstance(value, list) and all(isinstance(repo, str) and repo for repo in value):
+        return None
+    return (
+        f"{item['name']}: deferred_in is {value!r} -- write a list of repo directory "
+        f'names, e.g. ["antigravity"]; every other shape either stops the scan or gets '
+        f"iterated into repo names nobody wrote, which exempts them from the shadowing "
+        f"check without saying so"
+    )
+
+
+def deferred_repos(item: dict[str, Any]) -> set[str]:
+    """The repos this entry defers judgement in -- empty unless it truly says so.
+
+    Suppressing a shadowing report is the strongest thing an entry can ask for,
+    so it is granted only against a well-formed list and never guessed at.
+    Degrading an unreadable value to "nothing is deferred" errs toward naming
+    the copy rather than hiding it, and `deferred_problem` says why in the same
+    pass, so refusing to guess here costs no information.
+    """
+    if deferred_problem(item) is not None:
+        return set()
+    return set(item.get("deferred_in", []))
+
+
 def entry_refusals(item: dict[str, Any]) -> list[str]:
     """Everything about one shared entry that makes it unjudgeable, as sentences.
 
@@ -290,6 +329,9 @@ def entry_refusals(item: dict[str, Any]) -> list[str]:
             f"{name}: body_neutral is {item['body_neutral']!r} -- it is a ruling, so write "
             f"true (migrated, enforce it) or false (not migrated, queue it), not a string"
         )
+    deferred = deferred_problem(item)
+    if deferred:
+        problems.append(deferred)
     return problems
 
 
@@ -384,7 +426,7 @@ def report(registry: dict[str, Any], sites: Sites) -> int:
     owned = {item["name"] for item in registry["repo_owned"]}
     found = scan(sites)
 
-    deferred_by = {i["name"]: set(i.get("deferred_in", [])) for i in registry["shared"]}
+    deferred_by = {i["name"]: deferred_repos(i) for i in registry["shared"]}
     violations, unruled, deferred = [], [], []
     for name, places in sorted(found.items()):
         # `scan` never walks this repo, so any hit on a shared name is a copy
@@ -442,6 +484,17 @@ def check(registry: dict[str, Any], sites: Sites) -> int:
     found = scan(sites)
     for item in registry["shared"]:
         name = item["name"]
+        # Read the entry's spelling first but act on it last. Everything below
+        # is established from the tree rather than from how the entry is
+        # written, so all of it still holds for a malformed entry -- and it has
+        # to be reported, because one of the fields being validated here
+        # (`deferred_in`) is the field that suppresses shadowing reports. An
+        # entry able to garble that field and skip its own validation could
+        # silence the one finding this gate exists for. Accumulated, never
+        # thrown: a private entry reaches the same validation as a shared one,
+        # and no entry decides what the rest of the tree may report.
+        problems = entry_refusals(item)
+        refusals.extend(problems)
         canonical = canonical_path(registry, name)
         if not canonical.is_dir():
             failures.append(f"MISSING-CANONICAL {name}: {canonical}")
@@ -452,7 +505,7 @@ def check(registry: dict[str, Any], sites: Sites) -> int:
                 failures.append(f"NOT-A-SYMLINK {name}: {surface} -- run `link {name}`")
             elif surface.resolve() != canonical.resolve():
                 failures.append(f"WRONG-TARGET {name}: {surface} -> {surface.resolve()}")
-        deferred = set(item.get("deferred_in", []))
+        deferred = deferred_repos(item)
         for label in sorted(found.get(name, {})):
             if label.split("/")[0] in deferred:
                 continue        # recorded as unruled; `report` still surfaces it
@@ -460,12 +513,11 @@ def check(registry: dict[str, Any], sites: Sites) -> int:
                 f"SHADOWED {name}: {label} keeps its own copy -- project skills win over "
                 f"user skills, so that copy silently replaces the shared one"
             )
-        # Asked after the symlink facts, which hold regardless of how the entry
-        # is spelled: a malformed entry must not be able to hide even its own
-        # shadowing, let alone anybody else's.
-        problems = entry_refusals(item)
         if problems:
-            refusals.extend(problems)
+            # Only the body rule stops here, and only because it needs rulings
+            # this entry does not carry: whether the scope exempts it, and
+            # whether anybody switched enforcement on. The findings above needed
+            # no ruling at all, which is why they were taken first.
             continue
         if scope_of(item) == "private":
             continue
@@ -572,6 +624,14 @@ def link(registry: dict[str, Any], sites: Sites, name: str, quiet: bool = False)
     canonical = canonical_path(registry, name)
     if not canonical.is_dir():
         raise SharedSkillsError(f"not in the shared repo: {canonical}")
+    entry = next((i for i in registry["shared"] if i["name"] == name), {})
+    problem = deferred_problem(entry)
+    if problem:
+        # `check` accumulates this one and reads on, because reading is free.
+        # `link` writes: it puts a symlink into every project the ruling does not
+        # defer, so a defer list it cannot read is a ruling it must not act on.
+        # Asked before the first mkdir, so a refusal leaves the tree as found.
+        raise SharedSkillsError(f"{problem} -- refusing to link against a defer list I cannot read")
     codex_root, claude_root = sites.codex_surface, sites.claude_surface
     codex_root.mkdir(parents=True, exist_ok=True)
     claude_root.mkdir(parents=True, exist_ok=True)
@@ -581,9 +641,7 @@ def link(registry: dict[str, Any], sites: Sites, name: str, quiet: bool = False)
         # relative, matching the form the other user-level Claude entries use
         (claude_root / name, Path(os.path.relpath(codex_root / name, claude_root)), True),
     ]
-    deferred = set(
-        next((i for i in registry["shared"] if i["name"] == name), {}).get("deferred_in", [])
-    )
+    deferred = deferred_repos(entry)
     linked_forwarders: list[Path] = []
     for project in sites.projects:
         if not project.is_dir() or project.name in deferred:

@@ -492,6 +492,108 @@ test "${nameless_status}" -eq 4
 grep -q "REFUSE registry 'shared'\[0\] has no usable name" "${world}/7i.err"
 ! grep -q "Traceback" "${world}/7i.err"
 
+# 7j. A broken registry must not be answerable as "just some pending work".
+#     `deferred_in` was the one ruling nothing type-checked, and it is the
+#     ruling that suppresses shadowing reports, so a dict there read as a
+#     deferral nobody wrote: the gate exempted that repo, found nothing left to
+#     fail on, and reported the open migration queue -- exit 3, "PASS shared
+#     skills hold". The exact code is asserted, not merely non-zero: 3 is what
+#     an untouched queue answers, and "your registry is broken" arriving at a
+#     caller as that same number is the whole defect.
+write_registry <<'JSON'
+{
+  "schema": "shared-skills-registry/v2",
+  "canonical_root": "skills",
+  "shared": [
+    {"name": "demo-skill", "admitted": "2026-08-07", "why": "fixture"},
+    {"name": "queued-skill", "admitted": "2026-08-07", "why": "fixture"},
+    {"name": "bound-skill", "admitted": "2026-08-07", "why": "fixture",
+     "deferred_in": {"repoA": true}}
+  ],
+  "repo_owned": []
+}
+JSON
+set +e
+run check >"${world}/7j.out" 2>"${world}/7j.err"
+broken_defer_status=$?
+set -e
+test "${broken_defer_status}" -eq 4             # refused, and distinct from the queue's 3
+grep -q "REFUSE bound-skill: deferred_in is {'repoA': True}" "${world}/7j.err"
+! grep -q "PASS shared skills hold" "${world}/7j.out"
+grep -q "SURFACE BODY-NOT-NEUTRAL" "${world}/7j.out"    # the queue is still reported...
+grep -qE "queued-skill +3 lines in 2 files" "${world}/7j.out"   # ...just not as the verdict
+
+# 7k. ...and the same broken entry must not hide its own shadowing. The defer
+#     list decides which copies go unreported, so an unreadable one is read as
+#     deferring nothing: the copy gets named, and the entry gets refused, in one
+#     run. Both problems on that one entry surface too -- a registry that stops
+#     being reported after its first complaint sends whoever fixes it back for
+#     another round per typo.
+mv "${world}/repoA/.claude/skills/demo-skill" "${world}/repoA/.claude/skills/demo-skill.aside"
+mkdir -p "${world}/repoA/.claude/skills/demo-skill"
+printf -- '---\nname: demo-skill\n---\nlocal fork\n' \
+  > "${world}/repoA/.claude/skills/demo-skill/SKILL.md"
+printf 'second file so it is a copy, not a forwarder\n' \
+  > "${world}/repoA/.claude/skills/demo-skill/notes.md"
+write_registry <<'JSON'
+{
+  "schema": "shared-skills-registry/v2",
+  "canonical_root": "skills",
+  "shared": [
+    {"name": "demo-skill", "admitted": "2026-08-07", "why": "fixture",
+     "scope": "publik", "deferred_in": {"repoA": true}}
+  ],
+  "repo_owned": []
+}
+JSON
+set +e
+run check >"${world}/7k.out" 2>"${world}/7k.err"
+hidden_shadow_status=$?
+set -e
+test "${hidden_shadow_status}" -eq 1            # a violation outranks a refusal, still
+grep -q "FAIL SHADOWED demo-skill: repoA/.claude" "${world}/7k.err"
+grep -q "REFUSE demo-skill: deferred_in is" "${world}/7k.err"
+grep -q "REFUSE demo-skill: unknown scope 'publik'" "${world}/7k.err"
+mv "${world}/repoA/.claude/skills/demo-skill" "${world}/7k-shadow-copy"
+mv "${world}/repoA/.claude/skills/demo-skill.aside" "${world}/repoA/.claude/skills/demo-skill"
+
+# 7l. A shape `set()` cannot iterate used to end the run in a bare TypeError
+#     traceback naming neither the entry nor the key -- and it exited 1, which
+#     is the code for a ruling this tool checked and found violated. Private
+#     scope is asserted alongside because the crash happened before any scope
+#     was consulted: an exemption from the body rule must not become an
+#     exemption from being well-formed.
+write_registry <<'JSON'
+{
+  "schema": "shared-skills-registry/v2",
+  "canonical_root": "skills",
+  "shared": [
+    {"name": "demo-skill", "admitted": "2026-08-07", "why": "fixture"},
+    {"name": "private-skill", "admitted": "2026-08-07", "why": "fixture",
+     "scope": "private", "body_neutral": true, "deferred_in": 7}
+  ],
+  "repo_owned": []
+}
+JSON
+set +e
+run check >"${world}/7l.out" 2>"${world}/7l.err"
+untyped_status=$?
+set -e
+test "${untyped_status}" -eq 4                  # unjudgeable, not "violated"
+grep -q "REFUSE private-skill: deferred_in is 7" "${world}/7l.err"
+grep -q "list of repo directory names" "${world}/7l.err"   # a sentence naming the next move
+! grep -q "Traceback" "${world}/7l.err"
+
+# `link` writes into every project the ruling does not defer, so it refuses a
+# defer list it cannot read rather than acting on a guess.
+set +e
+run link private-skill >"${world}/7l2.out" 2>"${world}/7l2.err"
+link_status=$?
+set -e
+test "${link_status}" -eq 4
+grep -q "refusing to link against a defer list I cannot read" "${world}/7l2.err"
+! grep -q "Traceback" "${world}/7l2.err"
+
 # 8. install answers its own question. A fresh clone's first documented command
 #    must not exit non-zero because somebody else's migration queue is open --
 #    every `set -e` caller would stop there -- and it must still fail when the
