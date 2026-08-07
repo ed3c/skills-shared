@@ -1,0 +1,21 @@
+{
+  "blockers": [],
+  "commit": "7421938510697ee84fd15fdca8800c19da4ea247",
+  "export_source_commit": "8112f672e3c8458b3e5a03df9a0816a04b04afcf",
+  "export_tree_sha": "a6a016c4e3f16196f6790bc2e547c16edd5b02bb",
+  "file_count": 12,
+  "forge": "gitlab",
+  "gitlab_host": "gitlab.com",
+  "gitlab_project": "example/infrastructure/portable-loop",
+  "gitlab_project_id": 34675721,
+  "history_root": true,
+  "license_key": "mit",
+  "line": "portable-loop",
+  "public_ready": true,
+  "remote_head_tree_error": null,
+  "remote_head_tree_sha": "a6a016c4e3f16196f6790bc2e547c16edd5b02bb",
+  "remote_url": "https://gitlab.com/example/infrastructure/portable-loop",
+  "schema": "gitlab-publication-attestation/v1",
+  "verified_at": "2026-08-07T00:00:00Z",
+  "visibility": "public"
+}

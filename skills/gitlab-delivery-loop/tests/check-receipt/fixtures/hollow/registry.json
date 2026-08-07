@@ -1,0 +1,15 @@
+{
+  "schema": "gitlab-delivery-registry/v1",
+  "repo_root": ".",
+  "lines": [
+    {
+      "id": "portable-loop",
+      "gitlab_host": "gitlab.com",
+      "gitlab_project": "example/infrastructure/portable-loop",
+      "gitlab_project_id": 34675721,
+      "artifact_path": "artifact",
+      "receipt_path": "receipt.json",
+      "publication_path": "publication.json"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "schema": "github-delivery-registry/v1",
+  "repo_root": ".",
+  "lines": [
+    {
+      "id": "portable-loop",
+      "github_repo": "example/infrastructure",
+      "github_repository_id": "R_kgDOExample",
+      "artifact_path": "artifact",
+      "receipt_path": "receipt.json",
+      "publication_path": "publication.json"
+    }
+  ]
+}

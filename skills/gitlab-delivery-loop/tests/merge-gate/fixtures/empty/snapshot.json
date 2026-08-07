@@ -1,0 +1,9 @@
+{
+  "forge": "gitlab",
+  "host": "gitlab.com",
+  "project": "example/infrastructure",
+  "project_id": 42,
+  "namespace_kind": "group",
+  "namespace_path": "example",
+  "merge_requests": []
+}

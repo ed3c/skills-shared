@@ -1,0 +1,25 @@
+{
+  "forge": "gitlab",
+  "host": "gitlab.com",
+  "project": "solo-owner/portable-loop",
+  "project_id": 43,
+  "namespace_kind": "user",
+  "namespace_path": "solo-owner",
+  "merge_requests": [
+    {
+      "admit": {
+        "actor": "solo-owner",
+        "at": "2026-08-01T11:00:00Z",
+        "access_level": null
+      },
+      "detailed_merge_status": "mergeable",
+      "draft": false,
+      "has_conflicts": false,
+      "head_committed_at": "2026-08-01T10:00:00Z",
+      "iid": 3,
+      "sha": "4444444444444444444444444444444444444444",
+      "title": "slice: personal namespace, no members entry",
+      "web_url": "https://gitlab.com/solo-owner/portable-loop/-/merge_requests/3"
+    }
+  ]
+}

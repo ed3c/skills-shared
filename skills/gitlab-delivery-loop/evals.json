@@ -1,0 +1,89 @@
+{
+  "skill_name": "gitlab-delivery-loop",
+  "version": "1.0.0",
+  "_meta": {
+    "coverage_metric": "planted hollow receipt, cross-forge state, forged/stale merge-admit and unbound export tree detection",
+    "purpose": "Prove that GitLab delivery receipts, the merge-authority preflight and the GitHub/GitLab separation all fail closed without network access.",
+    "mutation_checked": "2026-08-07: thirteen injected defects each turned the suite red -- auto-merge default dropped, Owner access level lowered, admit staleness ignored, not-computed status folded into refusal, cross-forge field guard disabled, cross-forge snapshot guard disabled, export tree drift accepted, blocked-interval start disabled, `Part of` treated as closing, UNMATERIALIZED gate disabled, /-/work_items/ alias removed, execpolicy prefix widened, rule filename moved into the github- namespace.",
+    "found_by_mutation": "Two of those started green and were real gaps: the `Part of` fixture happened to reference only the PRD, so nothing changed when the keyword was widened; and one mutation never applied. Both the fixture and the mutation were fixed rather than the finding waved off.",
+    "found_by_live_dry_run": "The live fetch dry-run against a real 3-segment project showed an unresolvable board URL falling back to a nameless placeholder -- a green receipt pointing at a board nobody has. resolve_board() now exits explicitly and is covered offline."
+  },
+  "runnable": [
+    {
+      "id": "GL-DELIVERY-1",
+      "checker_script": "scripts/gitlab_delivery.py",
+      "test_verify": "tests/check-receipt/verify.sh",
+      "good_fixture": "tests/check-receipt/fixtures/good",
+      "hollow_fixture": "tests/check-receipt/fixtures/hollow",
+      "covers": [
+        "complete receipt with /-/ URLs and the /-/work_items/ issue alias",
+        "missing artifact is failure rather than skip",
+        "a single-slash project path is refused: GitLab nests groups"
+      ],
+      "expected": "good PASS and hollow UNMATERIALIZED FAIL"
+    },
+    {
+      "id": "GL-DELIVERY-2",
+      "checker_script": "scripts/gitlab_delivery.py",
+      "test_verify": "tests/cross-forge/verify.sh",
+      "good_fixture": "tests/check-receipt/fixtures/good",
+      "hollow_fixture": "tests/cross-forge/fixtures",
+      "covers": [
+        "a github-delivery-registry schema is refused, naming the other skill",
+        "a github_repo field beside valid gitlab_* keys is refused, not ignored",
+        "a github.com URL inside a GitLab receipt is refused",
+        "a GitHub merge-gate snapshot cannot replay through the GitLab gate"
+      ],
+      "expected": "every cross-forge fixture exits non-zero and names the cause"
+    },
+    {
+      "id": "GL-DELIVERY-3",
+      "checker_script": "scripts/gitlab_merge_gate.py",
+      "test_verify": "tests/merge-gate/verify.sh",
+      "good_fixture": "tests/merge-gate/fixtures/good",
+      "hollow_fixture": "tests/merge-gate/fixtures/hollow",
+      "covers": [
+        "merge-admit applied by a Developer (access_level 30) is refused",
+        "a personal namespace owner is admitted without a members entry",
+        "admit that predates the head commit is stale, not valid",
+        "ci_still_running is a policy choice; unchecked is a retry; they read differently",
+        "nothing admitted exits 3, distinct from a layer refusing with 1",
+        "a PreToolUse hook that exits 2 refuses the run on the active host only",
+        "the built merge command always carries --auto-merge=false and --sha"
+      ],
+      "expected": "good PREFLIGHT GREEN; hollow blocked at L1; empty exits 3; blocking hook exits 1"
+    },
+    {
+      "id": "GL-DELIVERY-4",
+      "checker_script": "scripts/gitlab_sync.py",
+      "test_verify": "tests/sync-replay/verify.sh",
+      "good_fixture": "tests/sync-replay/fixtures/snapshot.json against a scratch git export",
+      "hollow_fixture": "same snapshot with a mismatched export tree and an unknown remote head",
+      "covers": [
+        "metrics derive from label/state events, not restated registry values",
+        "Closes #N accepts a slice; Part of #N starts one without accepting it",
+        "first_pass_rate is an explicit absence with a reason, never zero",
+        "export-tree-drift and remote-head-unverifiable are separate blockers",
+        "an unresolvable board URL exits instead of becoming a nameless placeholder",
+        "what sync writes survives the zero-network check gate it feeds"
+      ],
+      "expected": "aligned export yields no blockers and passes check; drift, unknown head and unresolvable board each name their own cause"
+    },
+    {
+      "id": "GL-DELIVERY-5",
+      "checker_script": "scripts/install-codex-merge-rule.sh",
+      "test_verify": "tests/install-codex-merge-rule/verify.sh",
+      "good_fixture": "tests/install-codex-merge-rule/fixtures/good",
+      "hollow_fixture": "tests/install-codex-merge-rule/fixtures/hollow",
+      "covers": [
+        "project-scoped and host-scoped prefix rule",
+        "narrowness measured by negative controls: other project, other host, reordered argv, glab repo delete, glab mr close, and gh pr merge all refused",
+        "positive control uses the exact argv land builds, not a shorter form",
+        "rule never lands in the github-merge-* namespace",
+        "existing rule is backed up, never lost",
+        "unnamespaced project, path traversal, bad host and relative rules-dir refused before anything is written"
+      ],
+      "expected": "good project installs and execpolicy allows only the pinned shape; hollow targets exit 64 with nothing written"
+    }
+  ]
+}

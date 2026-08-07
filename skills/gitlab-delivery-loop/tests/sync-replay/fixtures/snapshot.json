@@ -1,0 +1,116 @@
+{
+  "board": {
+    "url": "https://gitlab.com/example/infrastructure/portable-loop/-/boards/1",
+    "name": "Development",
+    "list_counts": {
+      "blocked": 0
+    }
+  },
+  "fetched_at": "2026-08-07T00:00:00Z",
+  "forge": "gitlab",
+  "host": "gitlab.com",
+  "issues": [
+    {
+      "closed_at": "2026-08-05T00:00:00Z",
+      "created_at": "2026-08-01T00:00:00Z",
+      "iid": 1,
+      "label_events": [],
+      "labels": [],
+      "state": "closed",
+      "state_events": [],
+      "title": "PRD: portable loop"
+    },
+    {
+      "closed_at": "2026-08-03T00:00:00Z",
+      "created_at": "2026-08-01T00:00:00Z",
+      "iid": 2,
+      "label_events": [],
+      "labels": [],
+      "state": "closed",
+      "state_events": [],
+      "title": "slice: bind receipts to the board"
+    },
+    {
+      "closed_at": "2026-08-04T00:00:00Z",
+      "created_at": "2026-08-01T00:00:00Z",
+      "iid": 3,
+      "label_events": [
+        {
+          "action": "add",
+          "created_at": "2026-08-01T01:00:00Z",
+          "label": "blocked"
+        },
+        {
+          "action": "remove",
+          "created_at": "2026-08-01T03:00:00Z",
+          "label": "blocked"
+        }
+      ],
+      "labels": [],
+      "state": "closed",
+      "state_events": [
+        {
+          "created_at": "2026-08-02T00:00:00Z",
+          "state": "reopened"
+        }
+      ],
+      "title": "slice: blocked for two hours, then reopened"
+    },
+    {
+      "closed_at": "2026-08-06T00:00:00Z",
+      "created_at": "2026-08-01T00:00:00Z",
+      "iid": 6,
+      "label_events": [],
+      "labels": [],
+      "state": "closed",
+      "state_events": [],
+      "title": "slice: worked on, closed, never merged"
+    }
+  ],
+  "merge_requests": [
+    {
+      "closed_at": null,
+      "created_at": "2026-08-01T06:00:00Z",
+      "description": "Closes #2",
+      "iid": 4,
+      "merged_at": "2026-08-03T00:00:00Z",
+      "ready_at": "2026-08-01T06:00:00Z",
+      "state": "merged",
+      "title": "bind receipts to the board"
+    },
+    {
+      "closed_at": null,
+      "created_at": "2026-08-02T06:00:00Z",
+      "description": "Resolves #3\n\nPart of #1",
+      "iid": 5,
+      "merged_at": "2026-08-04T00:00:00Z",
+      "ready_at": "2026-08-02T06:00:00Z",
+      "state": "merged",
+      "title": "unblock the dependency"
+    },
+    {
+      "closed_at": null,
+      "created_at": "2026-08-05T06:00:00Z",
+      "description": "Part of #6",
+      "iid": 7,
+      "merged_at": "2026-08-05T12:00:00Z",
+      "ready_at": "2026-08-05T06:00:00Z",
+      "state": "merged",
+      "title": "groundwork only; does not close the slice"
+    }
+  ],
+  "project": {
+    "default_branch": "main",
+    "file_count": 3,
+    "head_sha": "REPLACED_HEAD_SHA",
+    "history_root": true,
+    "id": 34675721,
+    "license_key": "mit",
+    "namespace_kind": "group",
+    "namespace_path": "example/infrastructure",
+    "path_with_namespace": "example/infrastructure/portable-loop",
+    "visibility": "public",
+    "web_url": "https://gitlab.com/example/infrastructure/portable-loop"
+  },
+  "schema": "gitlab-delivery-snapshot/v1"
+}

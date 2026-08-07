@@ -1,0 +1,19 @@
+{
+  "board_url": "https://gitlab.com/example/infrastructure/portable-loop/-/boards/4071638",
+  "forge": "gitlab",
+  "gitlab_host": "gitlab.com",
+  "gitlab_project": "example/infrastructure/portable-loop",
+  "gitlab_project_id": 34675721,
+  "issue_urls": [
+    "https://gitlab.com/example/infrastructure/portable-loop/-/issues/2",
+    "https://gitlab.com/example/infrastructure/portable-loop/-/work_items/3"
+  ],
+  "line": "portable-loop",
+  "mr_urls": [
+    "https://gitlab.com/example/infrastructure/portable-loop/-/merge_requests/4"
+  ],
+  "prd_issue_url": "https://gitlab.com/example/infrastructure/portable-loop/-/issues/1",
+  "schema": "gitlab-delivery-receipt/v1",
+  "source_commit": "8112f672e3c8458b3e5a03df9a0816a04b04afcf",
+  "synced_at": "2026-08-07T00:00:00Z"
+}

@@ -1,0 +1,40 @@
+{
+  "forge": "gitlab",
+  "host": "gitlab.com",
+  "project": "example/infrastructure",
+  "project_id": 42,
+  "namespace_kind": "group",
+  "namespace_path": "example",
+  "merge_requests": [
+    {
+      "admit": {
+        "actor": "developer-user",
+        "at": "2026-08-01T11:00:00Z",
+        "access_level": 30
+      },
+      "detailed_merge_status": "mergeable",
+      "draft": false,
+      "has_conflicts": false,
+      "head_committed_at": "2026-08-01T10:00:00Z",
+      "iid": 8,
+      "sha": "2222222222222222222222222222222222222222",
+      "title": "slice: admitted by a Developer, not an Owner",
+      "web_url": "https://gitlab.com/example/infrastructure/-/merge_requests/8"
+    },
+    {
+      "admit": {
+        "actor": "owner-user",
+        "at": "2026-08-01T09:00:00Z",
+        "access_level": 50
+      },
+      "detailed_merge_status": "mergeable",
+      "draft": false,
+      "has_conflicts": false,
+      "head_committed_at": "2026-08-01T12:00:00Z",
+      "iid": 9,
+      "sha": "3333333333333333333333333333333333333333",
+      "title": "slice: new commits pushed after the label",
+      "web_url": "https://gitlab.com/example/infrastructure/-/merge_requests/9"
+    }
+  ]
+}

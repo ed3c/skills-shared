@@ -1,0 +1,40 @@
+{
+  "forge": "gitlab",
+  "host": "gitlab.com",
+  "project": "example/infrastructure",
+  "project_id": 42,
+  "namespace_kind": "group",
+  "namespace_path": "example",
+  "merge_requests": [
+    {
+      "admit": {
+        "actor": "owner-user",
+        "at": "2026-08-01T11:00:00Z",
+        "access_level": 50
+      },
+      "detailed_merge_status": "ci_still_running",
+      "draft": false,
+      "has_conflicts": false,
+      "head_committed_at": "2026-08-01T10:00:00Z",
+      "iid": 11,
+      "sha": "5555555555555555555555555555555555555555",
+      "title": "slice: pipeline still running",
+      "web_url": "https://gitlab.com/example/infrastructure/-/merge_requests/11"
+    },
+    {
+      "admit": {
+        "actor": "owner-user",
+        "at": "2026-08-01T11:00:00Z",
+        "access_level": 50
+      },
+      "detailed_merge_status": "unchecked",
+      "draft": false,
+      "has_conflicts": false,
+      "head_committed_at": "2026-08-01T10:00:00Z",
+      "iid": 12,
+      "sha": "6666666666666666666666666666666666666666",
+      "title": "slice: mergeability not computed yet",
+      "web_url": "https://gitlab.com/example/infrastructure/-/merge_requests/12"
+    }
+  ]
+}
