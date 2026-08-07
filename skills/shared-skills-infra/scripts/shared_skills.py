@@ -214,22 +214,17 @@ def parse_frontmatter(text: str) -> tuple[dict[str, str], str, str | None]:
     return {}, text, "opens a `---` frontmatter block that never closes"
 
 
-def binding_state(project: Path, name: str, body_version: str) -> tuple[str, str]:
-    """Classify one repo's binding for one shared skill: (state, detail).
+def binding_record_state(binding: Path, name: str, body_version: str) -> tuple[str, str]:
+    """Classify one binding *file*: (state, detail). Never returns "absent" --
+    the file was named, so it either reads as a record or it does not.
 
-    The three states have to stay apart all the way to the exit code. Absence
-    means this repo never retargeted and uses the shared body's generic form --
-    a legitimate resting state, so calling it broken would leave most repos
-    permanently red. Stale means the body moved since the retarget: owed work,
-    surfaced, not failed. Incomplete means the record itself no longer says what
-    it was pinned to, and no amount of re-running fixes that.
+    Split out from `binding_state` so a candidate record can be judged before it
+    becomes the record: `bind` validates what it staged through this same
+    function, rather than through a second copy of the rules that could drift
+    from the one the gate actually runs.
     """
-    slot = project / BINDING_DIR / name
-    if not slot.is_dir():
-        return "absent", ""
-    binding = slot / BINDING_FILE
     if not binding.is_file():
-        return "incomplete", f"{slot} has no {BINDING_FILE}"
+        return "incomplete", f"{binding.parent} has no {BINDING_FILE}"
     try:
         text = binding.read_text(encoding="utf-8")
     except OSError as error:
@@ -255,6 +250,22 @@ def binding_state(project: Path, name: str, body_version: str) -> tuple[str, str
             f"{binding} pins body_version {fields['body_version']}, body is now {body_version}"
         )
     return "current", ""
+
+
+def binding_state(project: Path, name: str, body_version: str) -> tuple[str, str]:
+    """Classify one repo's binding for one shared skill: (state, detail).
+
+    The three states have to stay apart all the way to the exit code. Absence
+    means this repo never retargeted and uses the shared body's generic form --
+    a legitimate resting state, so calling it broken would leave most repos
+    permanently red. Stale means the body moved since the retarget: owed work,
+    surfaced, not failed. Incomplete means the record itself no longer says what
+    it was pinned to, and no amount of re-running fixes that.
+    """
+    slot = project / BINDING_DIR / name
+    if not slot.is_dir():
+        return "absent", ""
+    return binding_record_state(slot / BINDING_FILE, name, body_version)
 
 
 def orphan_bindings(registry: dict[str, Any], projects: list[Path]) -> list[str]:
@@ -639,6 +650,17 @@ def bind(
     broken. Every one of those would end with a record on disk that no gate ever
     confirms -- which is the exact state this whole mechanism exists to end.
     """
+    if sites.path.expanduser().resolve() != SITES.resolve():
+        # The governed set lives in the sites file, so choosing the file chooses
+        # the set: `--sites my-own.json` listing the target repo is the `--project`
+        # bypass one step further out, and dropping the `--project` flag alone
+        # leaves it wide open. A write may only trust the file the gate reads with
+        # no arguments, because that is the set `check` will actually walk.
+        raise SharedSkillsError(
+            f"{sites.path} is not the sites file `check` reads ({SITES}) -- the governed set a "
+            f"write trusts has to be the one the gate later walks, or the binding is a record "
+            f"nothing verifies; wire the repo in with `install --project <repo>` and bind again"
+        )
     entry = next((item for item in registry["shared"] if item["name"] == name), None)
     if entry is None:
         raise SharedSkillsError(
@@ -692,7 +714,15 @@ def bind(
         )
     body_version = digest(canonical)
     binding.parent.mkdir(parents=True, exist_ok=True)
-    binding.write_text(
+    # Stage, judge the bytes that actually landed, then swap in one atomic step.
+    # Writing binding.md first and asserting afterwards means every refusal has
+    # already destroyed the record it refused to write: an `upstream` carrying a
+    # `---` line closes the frontmatter early, so the file loses two fields and
+    # the assertion fires over a ledger that is already gone. A record this tool
+    # declines to write must not exist on disk in any form -- including a staged
+    # one, which would sit in the slot as a second record no gate ever reads.
+    staged = binding.with_name(f".{BINDING_FILE}.staged")
+    staged.write_text(
         BINDING_TEMPLATE.format(
             name=name,
             upstream=upstream,
@@ -702,8 +732,18 @@ def bind(
         + prose,
         encoding="utf-8",
     )
-    # Assert the state the message is about to claim: a stamp that does not read
-    # back as current would be a green line over a binding `check` still surfaces.
+    state, detail = binding_record_state(staged, name, body_version)
+    if state != "current":
+        staged.unlink()
+        raise SharedSkillsError(
+            f"refusing to write a binding that would not read back as current ({state}): "
+            f"{detail} -- the frontmatter is flat `key: value` lines, so a field carrying a "
+            f"newline or a `---` ends the block early; {binding} is untouched"
+        )
+    os.replace(staged, binding)
+    # Assert the state the message is about to claim, now from the real path: a
+    # stamp that does not read back as current would be a green line over a
+    # binding `check` still surfaces.
     state, detail = binding_state(repo, name, body_version)
     if state != "current":
         raise SharedSkillsError(f"binding did not take ({state}): {detail or binding}")
@@ -749,9 +789,14 @@ def _parser() -> argparse.ArgumentParser:
     # would let the writer declare its own target governed and walk straight
     # through the refusal in `bind`. The governed set a write trusts has to be
     # the persisted one `check` will later walk, not one invented per command.
+    # --sites survives only because the tests need a synthetic world; it is the
+    # same door one step further out, so `bind` refuses any path but the default.
     bind_parser = commands.add_parser("bind", help="pin a repo's binding to the body")
     bind_parser.add_argument("name")
-    bind_parser.add_argument("--sites", type=Path, default=SITES, help="machine paths file")
+    bind_parser.add_argument(
+        "--sites", type=Path, default=SITES,
+        help=f"must be {SITES}: the governed set a write trusts is the one `check` reads",
+    )
     bind_parser.add_argument(
         "--repo", required=True, type=Path, help="the governed repo that retargeted",
     )

@@ -34,7 +34,10 @@ if grep -q "${world}" "${shared}/registry.json"; then
   exit 1
 fi
 
-sites="${world}/sites.local.json"
+# Where a real deployment keeps it: inside the checkout, gitignored. `bind` only
+# trusts the sites file `check` reads by default, which is this path derived from
+# the script's own location -- so the synthetic world has to put it there too.
+sites="${shared}/sites.local.json"
 run() { python3 "${script}" "$1" --sites "${sites}" "${@:2}"; }
 paths=(--codex-surface "${world}/surfaces/codex"
        --claude-surface "${world}/surfaces/claude"
@@ -142,6 +145,25 @@ grep -q "BINDINGS 1 current, 0 stale, 1 not retargeted" "${world}/6-good.out"
 # that rewrites the file instead of restamping it stops being invisible.
 printf '\nLEDGER: 本 repo retarget 當下的三個取捨。\n' >> "${binding}"
 run check | grep -q "PASS shared skills hold"     # extra prose must not disturb the gate
+
+# 6a2. a refused bind must leave no write behind. `--upstream` carrying a line
+#      that closes the frontmatter early produces a record missing two fields;
+#      if the file is written before that is asserted, the refusal still destroys
+#      the ledger it declined to stamp. Rejected means untouched, byte for byte.
+cp "${binding}" "${world}/6a2-before.md"
+set +e
+run bind demo-skill --repo "${world}/repoA" --upstream $'x\n---' \
+  >/dev/null 2>"${world}/6a2.err"
+malformed_bind_status=$?
+set -e
+test "${malformed_bind_status}" -eq 1
+if ! cmp -s "${world}/6a2-before.md" "${binding}"; then
+  echo "FAIL: a refused bind overwrote the binding it refused to write" >&2
+  exit 1
+fi
+# nor may a staging copy survive as a second, unread record in the slot
+test "$(find "${binding_dir}" -type f | wc -l)" -eq 1
+run check | grep -q "PASS shared skills hold"
 
 # 6b. the body moves -> every binding pinned to the old body is stale. This is
 #     the whole point of `body_version`: rework becomes one listed batch instead
@@ -308,6 +330,27 @@ test "${bypass_status}" -eq 2                 # argparse usage error, not a sile
 grep -q -- "--project" "${world}/6-bypass.err"
 test ! -e "${world}/ungoverned/.skill-bindings"
 
+# 6g3. --sites is the same door, one step further out: the governed set lives in
+#      that file, so a hand-written one naming the target grants a governance the
+#      machine's own gate never reads. Closing --project alone leaves this open,
+#      so `bind` accepts only the sites file `check` reads by default.
+cat > "${world}/hand-written-sites.json" <<JSON
+{"codex_surface": "${world}/surfaces/codex",
+ "claude_surface": "${world}/surfaces/claude",
+ "projects": ["${world}/ungoverned"]}
+JSON
+set +e
+python3 "${script}" bind demo-skill --sites "${world}/hand-written-sites.json" \
+  --repo "${world}/ungoverned" --upstream demo-skill@fixture \
+  >/dev/null 2>"${world}/6-sites-bypass.err"
+sites_bypass_status=$?
+set -e
+if test "${sites_bypass_status}" -ne 1 || test -e "${world}/ungoverned/.skill-bindings"; then
+  echo "FAIL: a hand-written sites file granted a governance no gate reads" >&2
+  exit 1
+fi
+grep -q "is not the sites file" "${world}/6-sites-bypass.err"
+
 # 6h. a governed repo that is not on disk yet is a legitimate sites entry, so the
 #     slot's mkdir -p would happily invent the repo from a typo. Refuse instead.
 #     Registering it has to go through the sites file now, which is the point:
@@ -394,13 +437,16 @@ run check | grep -q "PASS shared skills hold"
 moved="${world}/moved-clone"
 mv "${shared}" "${moved}"
 moved_script="${moved}/skills/shared-skills-infra/scripts/shared_skills.py"
-if python3 "${moved_script}" check --sites "${sites}" >"${world}/7.out" 2>"${world}/7.err"; then
+# the sites file lives in the checkout, so it moved too; naming the old path here
+# would silently fall back to this machine's real surfaces.
+moved_sites="${moved}/sites.local.json"
+if python3 "${moved_script}" check --sites "${moved_sites}" >"${world}/7.out" 2>"${world}/7.err"; then
   echo "FAIL: stale symlinks to the old checkout passed the gate" >&2
   exit 1
 fi
 grep -q "WRONG-TARGET demo-skill" "${world}/7.err"
-python3 "${moved_script}" install --sites "${sites}" > /dev/null
-python3 "${moved_script}" check --sites "${sites}" | grep -q "PASS shared skills hold"
+python3 "${moved_script}" install --sites "${moved_sites}" > /dev/null
+python3 "${moved_script}" check --sites "${moved_sites}" | grep -q "PASS shared skills hold"
 # realpath both sides: macOS resolves /var to /private/var, which is a path
 # alias, not a difference in where the link points.
 test "$(realpath "${world}/surfaces/codex/demo-skill")" = "$(realpath "${moved}/skills/demo-skill")"

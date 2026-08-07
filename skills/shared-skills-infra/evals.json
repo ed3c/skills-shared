@@ -1,6 +1,6 @@
 {
   "skill_name": "shared-skills-infra",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "_meta": {
     "coverage_metric": "planted shadowing copy, stale symlink, stale binding, malformed binding, and every state `bind` refuses to write",
     "purpose": "Prove that the governance gate fails on shadowing without network access, that a binding's states -- absent, current, stale, broken -- stay apart all the way to the exit code, and that no state the gate cannot look at reads as a clean one.",
@@ -45,19 +45,21 @@
       "checker_script": "scripts/shared_skills.py",
       "test_verify": "tests/verify.sh",
       "good_fixture": "a governed, on-disk, non-deferred repo whose slot holds only a legacy snapshot -- `bind` writes the binding.md and the gate passes",
-      "hollow_fixture": "an ungoverned repo; the same repo smuggled in with `--project` on the bind command itself; a first binding with no --upstream; a repo that is not on disk; a repo where the skill is `deferred_in`; a slot whose binding.md is already BINDING-INCOMPLETE; a governed repo moved off disk; a slot naming a skill nobody registered",
+      "hollow_fixture": "an ungoverned repo; the same repo smuggled in with `--project` on the bind command itself, and again with a hand-written `--sites` file naming it; a first binding with no --upstream; a repo that is not on disk; a repo where the skill is `deferred_in`; a slot whose binding.md is already BINDING-INCOMPLETE; an `--upstream` carrying a newline and `---`, which stamps a record two fields short; a governed repo moved off disk; a slot naming a skill nobody registered",
       "covers": [
         "an ungoverned repo is refused and no slot is left behind: `check` never walks there, so the record would be unverifiable",
         "a first binding without --upstream is refused: a retarget that does not say what from is not a record",
         "a repo that is not on disk is refused instead of conjured out of a typo by mkdir -p",
         "`bind` has no --project flag of its own, so the governed-repo refusal cannot be walked around by declaring the target governed on the same command (argparse exits 2)",
+        "`bind` refuses any --sites but the one `check` reads by default, because the governed set lives in that file: a hand-written one naming the target is the --project bypass one step further out",
+        "a refused bind leaves binding.md byte-for-byte and no staging file in the slot: the record is validated where it was staged and swapped in atomically, so a refusal cannot destroy the ledger it declined to stamp",
         "a repo where the skill is deferred is refused, and its pre-existing record is left byte-for-byte: `check` deliberately never reads a deferred repo's bindings",
         "a record `check` calls broken is refused, not restamped into a pass carrying the foreign upstream it was copied with",
         "a slot holding only a legacy snapshot is still bindable: the refusal is about a record that reads false, not about extra files",
         "a governed repo that is not on disk is surfaced and counted (PROJECTS … unreachable), never dropped from the tally in silence",
         "a slot naming a skill the registry does not know is surfaced as ORPHAN-BINDING and exits 3, instead of never being opened again"
       ],
-      "expected": "every refusal exits 1 with a sentence naming what to do next and writes nothing; the --project bypass exits 2; an unreachable project and an orphan slot each exit 3 with SURFACE on stdout and nothing on stderr"
+      "expected": "every refusal exits 1 with a sentence naming what to do next and writes nothing -- not even the record it was in the middle of stamping; the --project bypass exits 2; an unreachable project and an orphan slot each exit 3 with SURFACE on stdout and nothing on stderr"
     }
   ]
 }
