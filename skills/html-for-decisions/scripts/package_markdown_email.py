@@ -18,6 +18,13 @@ from pathlib import Path
 from typing import Any
 
 from check_redaction import scan as redaction_scan
+from code_graph import (
+    CodeGraphAsset,
+    code_graph_css,
+    code_graph_script,
+    load_code_graph,
+    render_code_graph_section,
+)
 
 # Box-drawing, arrow, and gate glyphs used by the plan documents' ASCII diagrams.
 # A fenced block carrying enough of these is a diagram, not a shell transcript.
@@ -1083,7 +1090,11 @@ def figure_script() -> str:
     )
 
 
-def render_full_html(config: dict[str, Any], documents: list[SourceDocument]) -> str:
+def render_full_html(
+    config: dict[str, Any],
+    documents: list[SourceDocument],
+    code_graph: CodeGraphAsset | None = None,
+) -> str:
     """Render a self-contained full report containing every source document."""
     title = html.escape(str(config["title"]))
     snapshot = html.escape(str(config["snapshot"]))
@@ -1138,9 +1149,19 @@ def render_full_html(config: dict[str, Any], documents: list[SourceDocument]) ->
     # 必須在文件全部渲染完之後才建索引——`anchored` 這時才知道哪些代號
     # 在內文拿到了落點，剩下的才由索引列自己當落點。
     symbol_html = render_symbol_index(symbols, anchored)
+    graph_css = code_graph_css() if code_graph else ""
+    graph_tab = (
+        '<button type="button" class="tab" role="tab" data-view="view-codegraph" '
+        'aria-selected="false" onclick="switchView(\'view-codegraph\')">'
+        f"{html.escape(code_graph.label)}</button>"
+        if code_graph
+        else ""
+    )
+    graph_view = render_code_graph_section(code_graph) if code_graph else ""
+    graph_js = code_graph_script(code_graph) if code_graph else ""
     return f"""<!doctype html>
 <html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport"
-content="width=device-width,initial-scale=1"><title>{title}</title><style>{page_css()}</style></head>
+content="width=device-width,initial-scale=1"><title>{title}</title><style>{page_css()}{graph_css}</style></head>
 <body><header><p>OOBE／REOOBE evidence package</p><h1>{title}</h1>
 <p>本頁為投影非 SSOT · 快照 {snapshot} · 完整來源與 checksum 隨 ZIP 交付</p></header>
 <div id="navpad" hidden>
@@ -1153,6 +1174,7 @@ title="回到剛才返回前的位置（Alt+→）">下一步 →<span class="fw
 <nav class="tabs" role="tablist">
 <button type="button" class="tab" role="tab" data-view="view-overview" aria-selected="true"
 onclick="switchView('view-overview')">概覽</button>
+{graph_tab}
 <button type="button" class="tab" role="tab" data-view="view-docs" aria-selected="false"
 onclick="switchView('view-docs')">文件 <span class="tab-n">{len(documents)}</span></button>
 <button type="button" class="tab" role="tab" data-view="view-atlas" aria-selected="false"
@@ -1172,6 +1194,7 @@ onclick="switchView('view-quiz')">理解 quiz <span class="tab-n">{len(config["q
 <section class="card"><h2>全部相關文件</h2>
 <p class="doc-meta">點任一份會切到「文件」分頁並開啟該份。</p><nav>{nav}</nav></section>
 </div>
+{graph_view}
 <div class="view" id="view-docs" hidden>
 <section class="card"><h2>選一份文件</h2>
 <p class="doc-meta">一次顯示一份，避免九份串成一條長捲軸。內文的代號連結會自動切到對應文件。</p>
@@ -1186,7 +1209,7 @@ oninput="filterDocs(this.value)" aria-label="過濾文件"></p>
 <section class="document" id="quiz"><h2>理解 quiz</h2>{quiz_html}</section>
 </div>
 <footer>重生來源：bundle config + Markdown SSOT。本頁為投影非 SSOT；裁決變更先回寫 Markdown。</footer>
-</main>{view_script()}{figure_script()}</body></html>"""
+</main>{view_script()}{figure_script()}{graph_js}</body></html>"""
 
 
 def render_email_html(config: dict[str, Any], documents: list[SourceDocument]) -> str:
@@ -1322,20 +1345,37 @@ def generate(config_path: Path) -> list[Path]:
     config_path = config_path.resolve()
     config = load_config(config_path)
     documents = load_documents(config_path, config)
+    code_graph = load_code_graph(config_path, config)
+    extras = load_extras(config_path, config)
     # Cheap pre-flight before anything is written: the redaction gate exists, so
     # run it on every declared source instead of hoping someone remembers to.
-    leaks = redaction_scan([document.path for document in documents] + [config_path])
+    redaction_sources = [document.path for document in documents] + [config_path]
+    redaction_sources.extend(
+        (config_path.parent / str(item["path"])).resolve()
+        for item in config.get("extras", [])
+    )
+    if code_graph:
+        redaction_sources.append(code_graph.path)
+    leaks = redaction_scan(redaction_sources)
     if leaks:
         raise ValueError("redaction gate failed: " + "; ".join(leaks))
+    graph_members = code_graph.archive_members() if code_graph else []
+    archive_names = [name for name, _ in extras + graph_members]
+    duplicates = sorted({name for name in archive_names if archive_names.count(name) > 1})
+    if duplicates:
+        raise ValueError(f"duplicate extras/code_graph archive paths: {duplicates}")
     output_dir = (config_path.parent / str(config["output_dir"])).resolve()
-    output_dir.mkdir(parents=True, exist_ok=True)
     basename = safe_basename(str(config["basename"]))
     html_path = output_dir / f"{basename}.html"
     zip_path = output_dir / f"{basename}.zip"
     eml_path = output_dir / f"{basename}.eml"
     manifest_path = output_dir / f"{basename}.MANIFEST.sha256"
 
-    full_html = render_full_html(config, documents).encode("utf-8")
+    full_html = render_full_html(config, documents, code_graph).encode("utf-8")
+    output_dir.mkdir(parents=True, exist_ok=True)
+    if code_graph and code_graph.report_path:
+        code_graph.report_path.parent.mkdir(parents=True, exist_ok=True)
+        code_graph.report_path.write_bytes(code_graph.report_bytes)
     html_path.write_bytes(full_html)
     internal_manifest = build_zip(
         zip_path,
@@ -1344,7 +1384,7 @@ def generate(config_path: Path) -> list[Path]:
         config_path,
         documents,
         str(config["snapshot"]),
-        load_extras(config_path, config),
+        extras + graph_members,
     )
     build_eml(
         eml_path,
@@ -1365,7 +1405,10 @@ def generate(config_path: Path) -> list[Path]:
         + internal_manifest,
         encoding="utf-8",
     )
-    return [html_path, zip_path, eml_path, manifest_path]
+    outputs = [html_path, zip_path, eml_path, manifest_path]
+    if code_graph and code_graph.report_path:
+        outputs.append(code_graph.report_path)
+    return outputs
 
 
 def main(argv: list[str] | None = None) -> int:

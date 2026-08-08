@@ -36,6 +36,8 @@ required = {
     "sources/04-d.md",
     # extras：文件叫人執行的工具必須隨包附上，否則讀者能讀到主張卻無法重新推導。
     "tools/tool.py",
+    "code-graph/graph.json",
+    "code-graph/graph.verification.json",
     "MANIFEST.sha256",
 }
 assert required <= names, sorted(required - names)
@@ -55,6 +57,24 @@ assert rendered.count('<figure class="diagram"') == 4, "every source must yield 
 assert 'id="atlas"' in rendered and "圖錄" in rendered
 assert 'id="fig01-01"' in rendered and 'href="#fig01-01"' in rendered
 assert "function fitFigure" in rendered
+
+# ── 原生 Code Graph：config → 可操作分頁 → graph/report 自動入包 ─────────
+assert 'data-view="view-codegraph"' in rendered
+assert 'id="view-codegraph"' in rendered
+assert 'id="ctg-data" type="application/json"' in rendered
+assert "Fixture Code Review Graph" in rendered
+assert "Critical only" in rendered and "Directory &amp; symbol tree" in rendered
+assert "src/client.py" in rendered, "source anchor must be reviewable in-page"
+report_path = manifest_path.parent / "test-bundle.graph-verification.json"
+report = __import__("json").loads(report_path.read_text(encoding="utf-8"))
+assert report["ok"] is True, report
+assert report["counts"] == {
+    "critical_edges": 3,
+    "edges": 3,
+    "evidence": 2,
+    "invariants": 1,
+    "nodes": 4,
+}, report
 
 # ── 分頁：九份文件不能串成一條長捲軸 ────────────────────────────────────
 assert 'id="view-docs"' in rendered and 'class="tab"' in rendered
@@ -87,6 +107,26 @@ assert owner == "04", f"Commit 1 應落在原始定義 doc-04，實得 doc-{owne
 seg = rendered[pos:pos + 400]
 assert "〜" not in seg.split("</h")[0], "錨點落在範圍標題上"
 PY
+
+# Graph validation is a public CLI boundary: dangling endpoints and evidence-less
+# critical edges must fail before a distributable is written.
+bad_out="$(python3 "$renderer" "$tmp_dir/case/bad-config.json" 2>&1 || true)"
+if ! grep -q "node evidence_ids must be an array" <<<"$bad_out"; then
+  echo "malformed evidence_ids did not produce a diagnostic validation error: $bad_out" >&2
+  exit 1
+fi
+if ! grep -q "edge source/target missing" <<<"$bad_out"; then
+  echo "dangling graph edge was not rejected: $bad_out" >&2
+  exit 1
+fi
+if ! grep -q "critical edge has no evidence" <<<"$bad_out"; then
+  echo "evidence-less critical edge was not rejected: $bad_out" >&2
+  exit 1
+fi
+if [ -e "$tmp_dir/case/bad-output/bad-graph-bundle.html" ]; then
+  echo "rejected graph must not leave partial output behind" >&2
+  exit 1
+fi
 
 if python3 "$renderer" "$test_dir/fixtures/hollow/config.json"; then
   echo "hollow fixture unexpectedly passed" >&2

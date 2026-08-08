@@ -1,0 +1,144 @@
+{
+  "schema_version": "1.1.0",
+  "title": "Fixture Code Review Graph",
+  "scope": {
+    "mode": "test",
+    "business_boundary": "client input → API payload → store",
+    "exclusions": ["No deployment receipt"]
+  },
+  "snapshot": {
+    "sha": "fixture-sha"
+  },
+  "nodes": [
+    {
+      "id": "client:input",
+      "kind": "variable",
+      "label": "clientInput",
+      "critical": true,
+      "reach": ["STATIC"],
+      "evidence_ids": ["ev-source"],
+      "location": {
+        "repo": "fixture-client",
+        "sha": "fixture-sha",
+        "path": "src/client.py",
+        "start_line": 10,
+        "end_line": 12
+      },
+      "metadata": {
+        "visual_stage": 0,
+        "snippet": "10 │ client_input = read_value()"
+      }
+    },
+    {
+      "id": "api:payload",
+      "kind": "payload_field",
+      "label": "payload.value",
+      "critical": true,
+      "reach": ["STATIC", "SANDBOX"],
+      "evidence_ids": ["ev-test"],
+      "location": {
+        "repo": "fixture-api",
+        "sha": "fixture-sha",
+        "path": "src/api.py",
+        "start_line": 20,
+        "end_line": 22
+      },
+      "metadata": {
+        "visual_stage": 1,
+        "snippet": "20 │ payload['value'] = client_input"
+      }
+    },
+    {
+      "id": "store:value",
+      "kind": "authoritative_store",
+      "label": "stored value",
+      "critical": true,
+      "reach": ["STATIC"],
+      "evidence_ids": ["ev-source"],
+      "location": null,
+      "metadata": {
+        "visual_stage": 2,
+        "snippet": "virtual authoritative store"
+      }
+    },
+    {
+      "id": "invariant:INV-1",
+      "kind": "business_invariant",
+      "label": "INV-1",
+      "critical": true,
+      "reach": [],
+      "evidence_ids": [],
+      "location": null,
+      "metadata": {
+        "visual_stage": 3,
+        "description": "The reviewed value reaches the authoritative store."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge:payload",
+      "kind": "DATA_FLOW",
+      "source": "client:input",
+      "target": "api:payload",
+      "critical": true,
+      "reach": ["STATIC"],
+      "evidence_ids": ["ev-source"]
+    },
+    {
+      "id": "edge:write",
+      "kind": "WRITES_TO",
+      "source": "api:payload",
+      "target": "store:value",
+      "critical": true,
+      "reach": ["SANDBOX"],
+      "evidence_ids": ["ev-test"]
+    },
+    {
+      "id": "edge:affects-invariant",
+      "kind": "AFFECTS_INVARIANT",
+      "source": "store:value",
+      "target": "invariant:INV-1",
+      "critical": true,
+      "reach": [],
+      "evidence_ids": []
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-source",
+      "reach": "STATIC",
+      "method": "SOURCE_REVIEW",
+      "status": "observed",
+      "summary": "Source-anchored data flow",
+      "source": "fixture-client@fixture-sha:src/client.py:10-12",
+      "authority": "exact-source",
+      "environment_class": "source"
+    },
+    {
+      "id": "ev-test",
+      "reach": "SANDBOX",
+      "method": "UNIT_TEST",
+      "status": "passed",
+      "summary": "Payload write test passed",
+      "source": "fixture test 1/1",
+      "authority": "local-execution",
+      "environment_class": "sandbox"
+    }
+  ],
+  "invariants": [
+    {
+      "id": "INV-1",
+      "statement": "The reviewed value reaches the authoritative store.",
+      "current_status": "SUPPORTED",
+      "reason": "STATIC source and SANDBOX test agree."
+    }
+  ],
+  "diagnostics": [
+    {
+      "code": "DEPLOYMENT_UNKNOWN",
+      "severity": "warning",
+      "summary": "No deployment receipt was supplied."
+    }
+  ]
+}
