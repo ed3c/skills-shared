@@ -134,6 +134,62 @@ if grep -q "built-in presets disable network" "${scratch}/layered.out"; then
 fi
 grep -q "no execpolicy rule" "${scratch}/layered.out"   # reached the next sub-gate
 
+# 4d. A hook that cannot RUN is not a hook that refused. Both exit 2 -- an
+#     interpreter that cannot open its script uses the same code as the blocking
+#     contract -- so this was reported as `BLOCK` and preflight refused on a
+#     policy decision nobody had made. Two guards, and the first is the fix:
+#     CLAUDE_PROJECT_DIR must reach the hook, and a command referencing anything
+#     the probe cannot resolve must exit UNEVALUABLE (4), never 1.
+projdir_home="${scratch}/home-projdir"
+mkdir -p "${projdir_home}/.claude/hooks"
+# Refuses only the merge command, and only when it can read its own file --
+# i.e. a realistic blacklist hook, not one that refuses everything.
+printf '%s\n' '#!/usr/bin/env bash' 'payload="$(cat)"' \
+  'case "${payload}" in *"pr merge"*) echo "BLOCKED: fixture blacklist" >&2; exit 2;; esac' \
+  'exit 0' > "${projdir_home}/.claude/hooks/guard.sh"
+chmod 755 "${projdir_home}/.claude/hooks/guard.sh"
+cat > "${projdir_home}/.claude/settings.json" <<JSON
+{"hooks":{"PreToolUse":[{"matcher":"*","hooks":[
+  {"type":"command","command":"bash \"\${CLAUDE_PROJECT_DIR}/.claude/hooks/guard.sh\""}]}]}}
+JSON
+
+# 4d-i: CLAUDE_PROJECT_DIR is deliberately NOT in the environment. The probe has
+#       to supply it the way Claude Code does, or the hook cannot find its own
+#       file. Setting it here instead would make this case pass with the fix
+#       removed -- which is what the first version did, caught by planting.
+set +e
+(cd "${projdir_home}" && env -u CODEX_SANDBOX -u CLAUDE_PROJECT_DIR CLAUDECODE=1 \
+  HOME="${projdir_home}" python3 "${gate}" preflight --repo "${repo}" \
+  --snapshot "${test_dir}/fixtures/good/snapshot.json") \
+  >"${scratch}/projdir.out" 2>"${scratch}/projdir.err"
+projdir_status=$?
+set -e
+test "${projdir_status}" -eq 1
+grep -q "L2 HOST-POLICY claude-code: BLOCK.*fixture blacklist" "${scratch}/projdir.err"
+
+# 4d-ii: strip the variable from the environment AND from git discovery. The
+#        gate is now un-evaluable, and that must NOT wear a refusal's exit code.
+novar_home="${scratch}/home-novar"
+cp -R "${projdir_home}" "${novar_home}"
+cat > "${novar_home}/.claude/settings.json" <<JSON
+{"hooks":{"PreToolUse":[{"matcher":"*","hooks":[
+  {"type":"command","command":"bash \"\${NO_SUCH_HOOK_ROOT}/guard.sh\""}]}]}}
+JSON
+set +e
+(cd "${novar_home}" && env -u CODEX_SANDBOX -u NO_SUCH_HOOK_ROOT CLAUDECODE=1 \
+  HOME="${novar_home}" python3 "${gate}" preflight --repo "${repo}" \
+  --snapshot "${test_dir}/fixtures/good/snapshot.json") \
+  >"${scratch}/novar.out" 2>"${scratch}/novar.err"
+novar_status=$?
+set -e
+test "${novar_status}" -eq 4
+grep -q "L2 HOST-POLICY claude-code: ERROR" "${scratch}/novar.err"
+grep -q "UNEVALUABLE L2 HOST-POLICY" "${scratch}/novar.err"
+if grep -q "REFUSED by L2" "${scratch}/novar.err"; then
+  echo "FAIL: an un-evaluable gate was reported as a refusal" >&2
+  exit 1
+fi
+
 # 5. same hook, inactive host: reported but not blocking (shell is active)
 (cd "${neutral}" && run "${clean_home}" python3 "${gate}" preflight --repo "${repo}" \
   --snapshot "${test_dir}/fixtures/good/snapshot.json") > "${scratch}/inactive.out"

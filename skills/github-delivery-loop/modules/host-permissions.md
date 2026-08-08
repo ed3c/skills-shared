@@ -13,6 +13,7 @@
 | Claude Code | PreToolUse hook 黑名單命中 `gh pr merge` → exit 2 | L2 |
 | Codex CLI | sandbox permission profile 沒開 network，`gh`／`git push` 根本出不去 | L2（更早，連命令都沒送出） |
 | 純 shell / CI | 沒有 L2；卡在 GitHub token 或 branch rule | L3 |
+| ChatGPT Desktop（Codex Connector） | **沒有任何一層在擋**——權限全開，走 PR 是產品的工作流選擇 | 不在堆疊內（見 §7） |
 
 修完 Claude 那條，換到 Codex 又斷；修完 Codex，換台機器又斷。**根因不是任何一條規則寫錯，
 而是「哪一層會拒絕」是在執行期才被發現的**——跑了一小時、開好 PR，才吃到 exit 2。
@@ -89,6 +90,12 @@
 `skill-bettor/.codex/config.toml` 原本 `default_permissions = "skill-bettor-git"` extends `:workspace`
 並補了 `.git` write，但**沒有 network 區塊** → Codex 在此 repo 連 `git push` 都出不去。
 `ix-agy/.codex/config.toml` 原本連 profile 都沒有，吃內建預設，同樣無網路。
+
+> **2026-08-09 複量：上段所述的斷網狀態已不存在。** `~/.codex/config.toml` 現在頂層
+> `default_permissions = "agent-default"`，該 profile `extends = ":workspace"`、補了 `.git` write，
+> 並有 `[permissions.agent-default.network] enabled = true`。三個平面當日全綠：PreToolUse hook
+> 對 `git push`／`gh pr create` 皆放行、network 已開、execpolicy 掃到 5 個 rule 檔並 allow。
+> 保留上段是因為它是**這條規則為何存在**的病例；但把它讀成現況會讓人去修一個已經修好的東西。
 
 修法就是補上（profile 名稱用該 repo 自己的；沒有 profile 就先建一個 `extends = ":workspace"`
 並在頂層設 `default_permissions`，注意頂層 key 必須寫在任何 table header 之前）：
@@ -257,7 +264,117 @@ python3 ~/.claude/skills/github-delivery-loop/scripts/merge_gate.py bootstrap
 | 0 | 至少一張 PR 可落地，且四層皆放行 |
 | 1 | 有一層**拒絕**（stderr 指名是哪一層、哪張 PR、確切修法） |
 | 3 | **沒有任何 PR 被 admit**——缺席，不是拒絕 |
+| 4 | 某一層**判不出來**——無能，不是拒絕（2026-08-09 新增） |
 
 把 3 併進 1 會讓「還沒人核可」在自動化裡讀起來像「被擋住了」，於是有人去改權限修一個
 不存在的權限問題。這是「每個缺席都給明確出口」在本 skill 的落點，
 由 `tests/merge-gate/verify.sh` 第 3 案守著。
+
+### 4 是後來才長出來的：崩潰的 hook 冒充了拒絕的 hook（2026-08-09）
+
+preflight 報 `L2 HOST-POLICY claude-code: BLOCK`，理由是
+`python3 "$CLAUDE_PROJECT_DIR/.claude/hooks/rm_guard.py": can't open file '/.claude/hooks/rm_guard.py'`。
+**沒有任何政策做過這個決定**——Claude Code 每次呼叫 hook 都會設 `CLAUDE_PROJECT_DIR`，而 preflight
+合成 payload 時沒設，路徑塌成 `/`；**直譯器開不了檔也是 exit 2，與阻斷契約同碼**。
+一個變因驗證：設了該變數就從 BLOCK 變 ALLOW（exit 3，沒有 PR 被 admit）。
+
+修法兩半，第二半才是這一列存在的理由：
+
+1. `_hook_env()` 補上 `CLAUDE_PROJECT_DIR`（取 git root，否則 cwd）——這修掉這個實例。
+2. 執行**之前**先驗 hook 命令引用的變數是否都可解析，不可解析就回 `ERROR` → exit 4——這修掉這一類。
+
+**一條想過但錯的判別法**：拿良性命令去探，若也被拒就判定 hook 壞了。錯在
+**deny-by-default 是合法設定**（真的 `auto-approve.sh` 尾端就是不匹配白名單即 exit 2），
+所以「它拒絕了無害的東西」不帶任何關於壞掉的資訊。未解析變數帶，而且不必執行就判得出來。
+
+回歸守衛＝第 4d 案，兩臂：4d-i 的環境**刻意不含** `CLAUDE_PROJECT_DIR`，逼探測器自己供給；
+4d-ii 用一個引用未定義變數的 hook，要求 exit 4 且輸出**不得出現** `REFUSED`。
+
+**第一版的 4d-i 是裝飾案例**——它自己在環境裡設了 `CLAUDE_PROJECT_DIR`，把修法拿掉照樣綠。
+是植入缺陷抓到的：plant A（拿掉變數檢查）紅、plant B（拿掉變數供給）**綠**。
+一個不會因為修法消失而變紅的案例，佔著一個看起來被覆蓋的位置，比沒有更糟。
+
+## 7. ChatGPT Desktop / Codex Connector — 權限全開，卻仍然只出 PR
+
+編號放在最後而不是插進 §1–§3，是為了不讓既有的 `§2`／`§4` 交叉引用整片位移。
+它在 §0 表格裡有一列，那才是發現點。
+
+### 官方語意
+
+- [on-behalf-of-a-user](https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/authenticating-with-a-github-app-on-behalf-of-a-user)：
+  user-to-server token 的有效權限是**交集**——「The app can only access resources that the user has
+  access to」∧「The app can only access resources that it has permission to access」。
+- [permissions-required-for-github-apps](https://docs.github.com/en/rest/authentication/permissions-required-for-github-apps)：
+  推 commit／建 ref 要 **Contents: write**；開 PR 要 **Pull requests: write**。**兩個獨立權限**，
+  一給一不給就會長成「能開 PR、不能推 code」。
+- [第三方 GitHub 整合](https://learn.chatgpt.com/docs/third-party/github)：Codex「can push a fix back
+  to the branch **when it has permission to do so**」——它推的是 branch，然後開 PR。
+
+### 本機實況（2026-08-09 查證）
+
+App 授權頁（`https://github.com/settings/installations` → ChatGPT Codex Connector，openai 開發）：
+
+```
+✓ Read access to checks, commit statuses, and metadata
+✓ Read and write access to actions, code, issues, pull requests, and workflows
+Repository access: All repositories(含 current AND FUTURE;public repo 為唯讀)
+```
+
+`code` 是 **Contents** 權限的 UI 標籤（同列的 actions／issues／pull requests／workflows 分別對應
+Actions／Issues／Pull requests／Workflows）。**這一格是標籤對映的推論,不是 API 讀到的欄位**——
+`gh api user/installations` 需要 App 授權的 user token,`gh` 持有的 OAuth token 讀不到,所以
+installation 權限只能從那一頁人眼讀。
+
+交集的三側同時量過,全滿：
+
+| 側 | 量法 | 結果 |
+|---|---|---|
+| 使用者 | `gh api user/repos` | 7 個私有庫全部 `push=true admin=true`;token scope 含 `repo` |
+| App | 授權頁 | `code` = Read and write |
+| 服務端閘 | `gh api repos/<r>/rulesets` | 403「Upgrade to GitHub Pro or make this repository public」——free plan 的 private repo **根本沒有 branch protection 可言** |
+
+**沒有任何一格是關著的。**
+
+### 修法：沒有可修的權限
+
+擋在**產品層**,不在 GitHub。改 App 權限、改帳號權限、開 Pro 買 ruleset 都不會讓它改成直接推——
+它做得到,只是不做。要直接推就換 host：**Codex CLI**（§2,三平面已綠）。
+
+同一個帳號下的物理證據,證明 CLI 那條路真的會寫：
+
+```
+ed3c/ix-agy-private  PR #29  merged
+  head.ref   codex/code-truth-graph-softkey-v1.1
+  50 files, +4924
+  committer  neon <neon@noreply.localhost>   ← 本機 git 身分,不經 App
+  user.login ed3c (type=User)                ← 不是 Bot
+```
+
+### 事故紀錄：把「最自然的解釋」當成量測（2026-08-09）
+
+看到「能開 PR、不能直接改」時,我推論 `Contents: Read` ＋ `Pull requests: write`——因為在
+GitHub 的權限模型裡,那是**唯一能一次解釋兩個現象的組合**,而且它與官方那兩個獨立權限的語意
+完全吻合。看起來很對。**它是錯的。**
+
+推翻它的不是更多推理,是那一頁截圖。
+
+兩個教訓,第二個比第一個貴：
+
+1. **權限模型裡最自然的解釋,不等於真的。** 一個假說能解釋全部已知現象,只說明它沒被現有觀察
+   否證,不說明它為真。要否證它只需要一格真值,而那一格當時**讀得到,只是要換一個抵達**（人眼開
+   授權頁),不是讀不到。**在還有便宜真值可取時就開始推論,是把可否證的事做成不可否證的。**
+2. **能力與行為要分開量。** 「它沒做過 X」不能證明「它不能做 X」。中途我掃了 7 個私有庫找 Codex
+   寫入痕跡,只找到 PR #29——而那筆的 committer 是本機身分、actor 是 User 不是 Bot,**它屬於 CLI
+   不屬於 App**。差點拿它去證 App 有寫入權;那會是用 A 的觀察證 B,兩者不同源。
+   零筆 Bot 寫入的正確讀法是**「這個 App 在此帳號沒寫過」,不是「這個 App 不能寫」**。
+
+### 可重播的量法
+
+```bash
+gh api user/repos --paginate -q '.[] | select(.private==true) | "\(.full_name) push=\(.permissions.push)"'
+gh api repos/<owner>/<repo>/rulesets           # 403 = 該 plan 無服務端閘,不是設定錯
+# App 的 installation 權限:API 讀不到,開 https://github.com/settings/installations 人眼確認
+```
+
+`user/installations` 回 403「You must authenticate with an access token authorized to a GitHub App」
+是**能力缺席,不是權限被拒**——別去修一個不存在的權限問題（同 §6 的三分原則）。

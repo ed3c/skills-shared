@@ -19,7 +19,9 @@ Usage:
   merge_gate.py preflight --repo OWNER/REPO [--snapshot FILE] [--allow-unstable]
   merge_gate.py land --repo OWNER/REPO [--dry-run] [--allow-unstable]
 
-Exit codes: 0 ready, 1 a layer refuses, 3 nothing admitted (absence != refusal).
+Exit codes: 0 ready, 1 a layer refuses, 3 nothing admitted (absence != refusal),
+4 a gate could not be evaluated (inability != refusal -- the repair is to the
+hook configuration or to this probe, never to a permission).
 """
 
 from __future__ import annotations
@@ -40,6 +42,12 @@ REPO_RE = re.compile(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+")
 SHA_RE = re.compile(r"[0-9a-f]{40}")
 LANDABLE_STATES = {"CLEAN", "HAS_HOOKS"}
 NOT_READY = 3
+# A gate that could not be evaluated is neither a pass nor a refusal. It sat
+# under exit 1 until a hook referencing an unset variable crashed with exit 2 --
+# the blocking contract -- and preflight reported a policy refusal that no
+# policy had made. Same three-way discipline as NOT_READY: absence, inability
+# and refusal each get their own exit, because each has a different repair.
+UNEVALUABLE = 4
 
 
 class GateError(RuntimeError):
@@ -217,12 +225,57 @@ def _codex_hook_commands() -> list[str]:
     return _hook_commands([Path.home() / ".codex" / "hooks.json"])
 
 
+_SHELL_VAR = re.compile(r"\$\{?([A-Za-z_][A-Za-z0-9_]*)\}?")
+
+
+def _repo_root_or_cwd() -> Path:
+    done = subprocess.run(
+        ["git", "rev-parse", "--show-toplevel"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    top = done.stdout.strip()
+    return Path(top) if done.returncode == 0 and top else Path.cwd()
+
+
+def _hook_env() -> dict[str, str]:
+    """The environment a host really gives its hooks, not this process's.
+
+    Claude Code sets CLAUDE_PROJECT_DIR on every hook invocation, and hook
+    commands are written against it. Probing without it made a repo-relative
+    hook resolve to `/`; python exited 2 on the missing file, and exit 2 IS the
+    blocking contract -- so a hook that CRASHED was reported as a hook that
+    REFUSED, and preflight died on a policy decision nobody had made.
+    """
+    env = os.environ.copy()
+    env.setdefault("CLAUDE_PROJECT_DIR", str(_repo_root_or_cwd()))
+    return env
+
+
+def _unresolvable_vars(command: str, env: dict[str, str]) -> list[str]:
+    """Variables the hook command needs that this probe cannot supply.
+
+    Checked BEFORE running, because afterwards the two are indistinguishable: an
+    interpreter that cannot open its script exits 2, and so does a hook that
+    deliberately refuses.
+
+    The tempting discriminator -- probe with a benign command and call it broken
+    if that is refused too -- is wrong. Deny-by-default hooks are legitimate and
+    common (the tail of a real auto-approve.sh refuses anything not allowlisted),
+    so "it refused something harmless" carries no information about breakage.
+    An unset variable does, and it is decidable without running anything.
+    """
+    return sorted({name for name in _SHELL_VAR.findall(command) if name not in env})
+
+
 def _run_pretooluse(
     commands: list[str], merge_cmd: list[str]
 ) -> tuple[str, str] | None:
-    """Return a refusal, or None when no hook blocks the real merge command."""
+    """Return a refusal or an un-evaluable gate, or None when nothing blocks."""
     if not commands:
         return None
+    env = _hook_env()
     payload = json.dumps(
         {
             "session_id": "merge-gate-preflight",
@@ -233,8 +286,19 @@ def _run_pretooluse(
         }
     )
     for command in commands:
+        missing = _unresolvable_vars(command, env)
+        if missing:
+            return "ERROR", (
+                f"{command}: references {', '.join('$' + m for m in missing)}, "
+                "unset here -- this gate could NOT be evaluated, which is not the "
+                "same as it refusing"
+            )
         done = subprocess.run(
-            ["bash", "-c", command], input=payload, capture_output=True, text=True
+            ["bash", "-c", command],
+            input=payload,
+            capture_output=True,
+            text=True,
+            env=env,
         )
         if done.returncode == 2:
             reason = (done.stderr or done.stdout).strip().splitlines()
@@ -488,19 +552,32 @@ def preflight(repository: str, snapshot_path: Path | None, allow_unstable: bool)
     probe_cmd = merge_command(repository, sample["number"], sample["headRefOid"])
     host = active_host()
     host_blocked = False
+    host_unevaluable = False
     for name, (verdict, detail) in (
         ("claude-code", probe_claude_code(probe_cmd)),
         ("codex", probe_codex(repository, probe_cmd)),
     ):
         marker = "<-- active" if name == host else ""
-        stream = sys.stderr if verdict == "BLOCK" and name == host else sys.stdout
+        loud = verdict in ("BLOCK", "ERROR") and name == host
         print(
             f"L2 HOST-POLICY {name}: {verdict} -- {detail} {marker}".rstrip(),
-            file=stream,
+            file=sys.stderr if loud else sys.stdout,
         )
-        if verdict == "BLOCK" and name == host:
+        if name == host and verdict == "BLOCK":
             host_blocked = True
+        if name == host and verdict == "ERROR":
+            host_unevaluable = True
 
+    # Un-evaluable is its own exit, for the same reason NO-ADMIT is: folding it
+    # into "refused" sends someone to widen a permission that was never narrow.
+    # The repair here is to the PROBE or the hook config, not to any policy.
+    if host_unevaluable:
+        print(
+            f"UNEVALUABLE L2 HOST-POLICY on {host}; nothing merged and nothing "
+            "refused -- fix the hook configuration, not a permission.",
+            file=sys.stderr,
+        )
+        return UNEVALUABLE
     if host_blocked:
         print(f"REFUSED by L2 HOST-POLICY on {host}; nothing merged.", file=sys.stderr)
         return 1
