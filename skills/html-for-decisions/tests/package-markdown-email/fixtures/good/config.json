@@ -3,6 +3,7 @@
   "snapshot": "2026-08-06",
   "basename": "test-bundle",
   "output_dir": "output",
+  "default_view": "codegraph",
   "decision": "Release-reachable 不等於 Deployed。",
   "summary": [
     "兩份文件必須完整入包。"

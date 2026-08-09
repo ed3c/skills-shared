@@ -53,7 +53,8 @@ description: |
 17. **導覽狀態要可逆**：跳轉前記下（分頁、文件、捲動位置），提供上一步／下一步。已經在畫面內的目標**只標示不跳**，也不吃返回歷史——跳到自己身上會讓返回鍵「回到原地」。標示保留到讀者點別處才消失。
 18. **附帶工具要隨包出貨**：文件叫人執行的東西必須用 `extras` 放進 ZIP。只給指令不給檔案，讀者能讀到主張卻無法重新推導——而「可重新推導」正是這套的立足點。
 19. **決策文件要能導出 MVP**：完整方案必須附一節回答「明天要做哪一步」，逐項過四道閘門並列出被刷掉的候選與原因。方法見 [modules/mvp-extraction.md](modules/mvp-extraction.md)。只列入選的，讀者無法判斷有沒有漏掉更好的。
-20. **Code Graph 是一級輸入但不是第二 SSOT**：config 可用 `code_graph` 原生加入 node／edge／evidence review index；renderer 必須先驗 ID 閉合、edge 端點、evidence 引用與 critical evidence closure，才可產生任何交付物。`AFFECTS_INVARIANT` 可沿 source node evidence 形成結構閉合，其餘 critical edge 必須直接掛 evidence。Graph 只能索引 Markdown 已有的裁決與證據，不能自行改寫 invariant 狀態；完整契約見 [modules/code-graph-schema.md](modules/code-graph-schema.md)。
+20. **Code Graph 是一級輸入但不是第二 SSOT**：config 可用 `code_graph` 原生加入 node／edge／evidence review index，並以 `default_view: "codegraph"` 將它設為首頁；renderer 必須先驗 ID 閉合、edge 端點、evidence 引用與 critical evidence closure，才可產生任何交付物。`AFFECTS_INVARIANT` 可沿 source node evidence 形成結構閉合，其餘 critical edge 必須直接掛 evidence。Graph 只能索引 Markdown 已有的裁決與證據，不能自行改寫 invariant 狀態；完整契約見 [modules/code-graph-schema.md](modules/code-graph-schema.md)。
+21. **Reach-aware graph 必須分開導航、抵達與狀態**：桌面第一閱讀面固定是 `250px / fluid / 340px` 的 directory tree／graph／node-edge evidence 三欄；目錄樹只用中性導航色。edge 線型／粗細只表達 STATIC／SANDBOX／PROD，edge 顏色只表達 UNKNOWN／survived／refuted；不得用同一個色彩同時暗示兩個維度。node 光暈只表 reach 集合大小，agent overlay 是檢索範圍預測子，不是 evidence。`invariant_events` 必須以 append-only 時間軸刷出歷史 edge 狀態，不能只顯示當下結論。
 
 ## 確定性程序
 
@@ -95,6 +96,7 @@ flowchart LR
   "snapshot": "2026-08-06",
   "basename": "decision-bundle",
   "output_dir": "deliverables",
+  "default_view": "codegraph",
   "subject": "郵件主旨",
   "decision": "已裁決或待裁決的一句話",
   "summary": ["只來自 SSOT 的摘要"],
@@ -126,7 +128,7 @@ flowchart LR
 - HTML 必含圖錄（`id="atlas"`）與符號索引（`id="symbol-index"`），且每份文件的圖數 > 0。
 - 錨點 id 不得重複、內部連結不得懸空；代號跳轉必須落在原始定義而非摘要列。
 - 來源不變時重跑兩次，四個產物必須 byte-identical；改一個字後 hash 必須全動。以上都在 `tests/package-markdown-email/verify.sh` 裡。
-- 有 `code_graph` 時，HTML 必含 `view-codegraph`／`ctg-data`；ZIP 必含原始 graph 與 renderer 產生的 verification report。dangling endpoint、重複 ID、未知 evidence ID、未形成直接或 `AFFECTS_INVARIANT` 結構閉合的 critical edge 都必須 fail closed 且不得留下 HTML。
+- 有 `code_graph` 時，HTML 必含 `view-codegraph`／`ctg-data`、三欄 `250px / fluid / 340px` workspace、右側 `Node / edge evidence`、Agent overlay、Critical slice 與 Refutation history slider。點 node／edge 先更新右側 evidence；完整深讀再由明確按鈕開獨立 Code Review modal，guided path 的上下步控制必須留在 modal 內可操作。ZIP 必含原始 graph 與 renderer 產生的 verification report。dangling endpoint、重複 ID、未知 evidence ID、未形成直接或 `AFFECTS_INVARIANT` 結構閉合的 critical edge 都必須 fail closed 且不得留下 HTML。
 - **每條新斷言都要先看它會叫**：暫時把對應的實作退回舊行為，確認測試轉紅，再改回來。第一次就過的斷言可能根本沒測到目標——本 skill 就發生過一次：範圍標題的 fixture 寫成 `## 2. Commit 1〜2`，有數字前綴所以根本沒進到那條規則。
 
 ## Gotchas

@@ -63,8 +63,39 @@ assert 'data-view="view-codegraph"' in rendered
 assert 'id="view-codegraph"' in rendered
 assert 'id="ctg-data" type="application/json"' in rendered
 assert "Fixture Code Review Graph" in rendered
-assert "Critical only" in rendered and "Directory &amp; symbol tree" in rendered
+assert "Critical slice only" in rendered and "Directory &amp; symbol tree" in rendered
 assert "src/client.py" in rendered, "source anchor must be reviewable in-page"
+# Reach-aware graph 的第一閱讀面必須與 reference demo 同構：左側導航、中央圖、
+# 右側 node/edge evidence。完整 review dialog 仍保留給深讀，但不能取代主畫面的
+# 抵達證據欄，否則人無法一眼比較 edge reach 與當下 invariant state。
+assert "grid-template-columns:250px minmax(500px,1fr) 340px" in rendered
+assert 'id="ctg-inline-detail"' in rendered
+assert "Node / edge evidence" in rendered
+assert "Agent overlay" in rendered and "Critical slice only" in rendered
+assert 'id="ctg-time"' in rendered and "Refutation history" in rendered
+assert ".ctg-edge.static" in rendered
+assert ".ctg-edge.survived" in rendered and ".ctg-edge.refuted" in rendered
+# 深讀仍有 roomy、keyboard-accessible review window。
+assert '<dialog id="ctg-review-dialog"' in rendered
+assert 'class="ctg-review-shell"' in rendered
+assert "function openReview" in rendered and "function closeReview" in rendered
+# Guided-path controls must live inside the modal too. Controls only behind a
+# modal look present in static HTML but are not operable in a real browser.
+assert 'id="ctg-review-path"' in rendered
+assert 'id="ctg-review-path-prev"' in rendered
+assert 'id="ctg-review-path-next"' in rendered
+assert "function syncReviewPath" in rendered
+assert "觀察（source says）" in rendered and "推論（review inference）" in rendered
+assert "能證明" in rendered and "不能證明" in rendered
+assert "抵達狀態" in rendered and "下一個獨立抵達" in rendered
+assert "MISSING_IN_IOS" in rendered and "comparison_status" in rendered
+assert "Decision Queue" in rendered and "DEC-1" in rendered
+assert "Invariant timeline" in rendered and "Source review" in rendered
+# Code Graph 可成為 bundle 的中心入口，而不是每次先落到摘要頁。
+assert 'data-default-view="view-codegraph"' in rendered
+# Workspace 在桌面沿用 reference demo 250／fluid／340 三欄，窄畫面再單欄。
+assert "width:min(1120px,calc(100vw - 32px))" in rendered
+assert "max-height:calc(100dvh - 32px)" in rendered
 report_path = manifest_path.parent / "test-bundle.graph-verification.json"
 report = __import__("json").loads(report_path.read_text(encoding="utf-8"))
 assert report["ok"] is True, report

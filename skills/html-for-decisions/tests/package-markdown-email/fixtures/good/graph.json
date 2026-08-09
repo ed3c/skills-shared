@@ -26,7 +26,24 @@
       },
       "metadata": {
         "visual_stage": 0,
-        "snippet": "10 │ client_input = read_value()"
+        "snippet": "10 │ client_input = read_value()",
+        "comparison_status": "MISSING_IN_IOS",
+        "review": {
+          "summary": "Typed input prevents an unreviewed value from crossing the boundary.",
+          "observation": "The source reads a value before constructing the API payload.",
+          "inference": "This is STATIC reach only; execution is not established.",
+          "proves": ["The symbol and assignment exist at the checked SHA."],
+          "does_not_prove": ["The branch ran in production."],
+          "risks": ["A caller outside this path may bypass the value object."],
+          "recommendation": "Add an independent sandbox receipt.",
+          "counterpart": "api:payload"
+        },
+        "reach_assessment": {
+          "state": "ASSERTED",
+          "settled": false,
+          "independent_reaches": ["STATIC"],
+          "next_reach": "SANDBOX"
+        }
       }
     },
     {
@@ -139,6 +156,24 @@
       "code": "DEPLOYMENT_UNKNOWN",
       "severity": "warning",
       "summary": "No deployment receipt was supplied."
+    }
+  ],
+  "decision_queue": [
+    {
+      "id": "DEC-1",
+      "question": "Should a different value be accepted?",
+      "owner": "Security",
+      "default": "Reject until adjudicated",
+      "status": "OPEN"
+    }
+  ],
+  "invariant_events": [
+    {
+      "invariant_id": "INV-1",
+      "state": "ASSERTED",
+      "reach": "STATIC",
+      "at": "T0",
+      "basis": "Source review"
     }
   ]
 }
