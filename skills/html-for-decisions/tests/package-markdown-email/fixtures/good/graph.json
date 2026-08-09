@@ -169,11 +169,32 @@
   ],
   "invariant_events": [
     {
+      "event_id": "EVT-1",
       "invariant_id": "INV-1",
       "state": "ASSERTED",
+      "prior_state": "UNKNOWN",
+      "next_state": "ASSERTED",
       "reach": "STATIC",
       "at": "T0",
-      "basis": "Source review"
+      "basis": "Source review",
+      "graph_delta": {
+        "added_edges": ["edge:payload"],
+        "invalidated_edges": []
+      }
+    },
+    {
+      "event_id": "EVT-2",
+      "invariant_id": "INV-1",
+      "state": "REFUTED",
+      "prior_state": "ASSERTED",
+      "next_state": "REFUTED",
+      "reach": "SANDBOX",
+      "at": "T1",
+      "basis": "Runtime counterexample",
+      "graph_delta": {
+        "added_edges": [],
+        "invalidated_edges": ["edge:payload"]
+      }
     }
   ]
 }

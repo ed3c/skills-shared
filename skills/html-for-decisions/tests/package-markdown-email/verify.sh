@@ -91,6 +91,7 @@ assert "抵達狀態" in rendered and "下一個獨立抵達" in rendered
 assert "MISSING_IN_IOS" in rendered and "comparison_status" in rendered
 assert "Decision Queue" in rendered and "DEC-1" in rendered
 assert "Invariant timeline" in rendered and "Source review" in rendered
+assert "function edgeStateAt" in rendered and "graph_delta" in rendered
 # Code Graph 可成為 bundle 的中心入口，而不是每次先落到摘要頁。
 assert 'data-default-view="view-codegraph"' in rendered
 # Workspace 在桌面沿用 reference demo 250／fluid／340 三欄，窄畫面再單欄。
@@ -152,6 +153,18 @@ if ! grep -q "edge source/target missing" <<<"$bad_out"; then
 fi
 if ! grep -q "critical edge has no evidence" <<<"$bad_out"; then
   echo "evidence-less critical edge was not rejected: $bad_out" >&2
+  exit 1
+fi
+if ! grep -q "event graph_delta edge missing" <<<"$bad_out"; then
+  echo "event delta with an unknown edge was not rejected: $bad_out" >&2
+  exit 1
+fi
+if ! grep -q "invariant event order broken" <<<"$bad_out"; then
+  echo "out-of-order invariant history was not rejected: $bad_out" >&2
+  exit 1
+fi
+if ! grep -q "invariant event state chain broken" <<<"$bad_out"; then
+  echo "broken invariant state chain was not rejected: $bad_out" >&2
   exit 1
 fi
 if [ -e "$tmp_dir/case/bad-output/bad-graph-bundle.html" ]; then

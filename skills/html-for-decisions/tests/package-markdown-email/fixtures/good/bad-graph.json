@@ -24,5 +24,38 @@
       "evidence_ids": []
     }
   ],
-  "evidence": []
+  "evidence": [],
+  "invariants": [
+    {"id": "INV-BROKEN", "statement": "Broken event fixture"}
+  ],
+  "invariant_events": [
+    {
+      "event_id": "EVT-BROKEN",
+      "invariant_id": "INV-BROKEN",
+      "state": "REFUTED",
+      "prior_state": "UNKNOWN",
+      "next_state": "REFUTED",
+      "reach": "SANDBOX",
+      "at": "T2",
+      "basis": "Negative control",
+      "graph_delta": {
+        "added_edges": ["edge:missing-event"],
+        "invalidated_edges": []
+      }
+    },
+    {
+      "event_id": "EVT-BROKEN-CHAIN",
+      "invariant_id": "INV-BROKEN",
+      "state": "REFUTED",
+      "prior_state": "NOT_ASSERTED",
+      "next_state": "REFUTED",
+      "reach": "PROD",
+      "at": "T1",
+      "basis": "Out-of-order negative control",
+      "graph_delta": {
+        "added_edges": [],
+        "invalidated_edges": ["edge:broken"]
+      }
+    }
+  ]
 }

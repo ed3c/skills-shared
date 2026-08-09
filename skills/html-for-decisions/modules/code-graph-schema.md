@@ -126,7 +126,8 @@ invariant」表成結構邊，而不把它冒充新的觀測證據。renderer �
 - `decision_queue[]`：`id`／`question`／`owner`／`default`／`status`，把未裁決項目顯示在 graph
   狀態區；它仍須來自 Markdown SSOT；
 - `review_paths[]`：`id`／`label`／`node_ids[]`，提供不依賴工作記憶的 guided traversal；
-- `invariant_events[]`：`invariant_id`／`state` 或 `prior_state`＋`next_state`／`reach`／`at`／`basis`／可選 `note` 與 `graph_delta.{added_edges,invalidated_edges}`。事件只 append、不覆寫；全域 slider 用它重建 edge revision，node review 則顯示該 invariant 的局部時間線；
+- `invariant_events[]`：`invariant_id`／`state` 或 `prior_state`＋`next_state`／`reach`／`at`／`basis`／必填 `graph_delta.{added_edges,invalidated_edges}`，另可帶 `note`。同一 invariant 的事件時間與 state chain 必須單調且閉合，delta 只能引用已存在的 edge。事件只 append、不覆寫；全域 slider 用它重建可見 edge revision，node review 則顯示該 invariant 的局部時間線；
+- `view.primary_node_ids[]`（可選）：把大型 evidence graph 的指定節點投影成第一閱讀面；每個 primary node 都必須存在且具有 `view.positions`。filter、時間軸與 review 仍直接操作這些 canonical nodes，不得另造 project-only canvas。
 - `communities`、`closure`、`build_report`、`manifest` 等 producer extension。
 
 ## Layout 與互動
