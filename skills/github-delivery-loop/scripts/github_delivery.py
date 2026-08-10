@@ -281,12 +281,15 @@ def sync(
     """Synchronize one delivery line from a replayable or live GitHub snapshot."""
     try:
         line, repo_root = _sync_line(registry_path, line_id)
+        current_receipt = _load_json(
+            repo_root / _relative(line["receipt_path"], "receipt_path")
+        )
+        expected_prd_issue_url = current_receipt.get("prd_issue_url")
+        if not isinstance(expected_prd_issue_url, str):
+            raise DeliveryError("existing receipt must pin prd_issue_url")
         if snapshot_path is not None:
             snapshot = _load_json(snapshot_path.resolve())
         elif use_github:
-            current_receipt = _load_json(
-                repo_root / _relative(line["receipt_path"], "receipt_path")
-            )
             project_url = current_receipt.get("project_url")
             if not isinstance(project_url, str):
                 raise DeliveryError(
@@ -301,6 +304,7 @@ def sync(
             export_source_commit=export_source_commit,
             export_tree_sha=export_tree_sha,
             repo_root=repo_root,
+            expected_prd_issue_url=expected_prd_issue_url,
         )
         receipt_path = repo_root / _relative(line["receipt_path"], "receipt_path")
         publication_path = repo_root / _relative(

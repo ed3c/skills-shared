@@ -71,7 +71,7 @@ commit 內 mode，讓 mode 漂移在能被 attest 之前就失敗。
 Merge 不是單一「有／無權限」位元，而是由多層獨立閘串接；任一層拒絕就不得宣稱已放行：
 
 ```text
-human merge decision
+L1 authority (human admit OR explicit personal-owner policy)
         ↓
 Codex execpolicy prefix rule
         ↓
@@ -82,11 +82,14 @@ GitHub authentication + branch / repository rules
 merge API
 ```
 
-1. **人類 gate**：owner 明確指定 repository 與 PR 才構成 merge 授權。永久 command allow 不是人類
-   landing decision，也不能把未授權 merge 變成已授權。
+1. **Authority gate**：預設是 owner 對指定 PR 的 fresh label；只有使用者明確 opt-in 時，才可改成
+   personal-owner policy。後者以 authenticated viewer 與 repository owner 的 immutable user ID 每次重驗，
+   讓同一人擁有的未來 repo 自動納入、collaborator／organization repo 排除。永久 command allow 本身
+   兩種模式下都不構成 landing decision。
 2. **Codex execpolicy**：user-level `prefix_rule` 只決定某個 argv prefix 能否離開 sandbox 執行。
-   規則必須釘到 `gh pr merge --repo OWNER/REPOSITORY`，不可放寬成 `gh` 或 `gh pr`；參數順序
-   是 prefix contract 的一部分。寫入 active `rules/` 後必須重啟 Codex，並用
+   human-admit 規則釘到 `gh pr merge --repo OWNER/REPOSITORY`；owner-auto 規則釘到 canonical
+   `merge_gate.py land --repo` wrapper，絕不放行 generic `gh api graphql`。參數順序是 prefix contract
+   的一部分。寫入 active `rules/` 後必須重啟 Codex，並用
    `codex execpolicy check` 驗證結果。
 3. **PreToolUse hooks**：hook 與 execpolicy 是不同 policy plane。即使 execpolicy 顯示 `allow`，hook
    仍可拒絕相同 shell command，甚至拒絕 connector merge tool。最嚴格決策勝出；不得用換 API、
@@ -102,8 +105,8 @@ bash <repo>/.agents/skills/github-delivery-loop/scripts/install-codex-merge-rule
   --rules-dir /Users/neon/.codex/rules
 ```
 
-安裝器會備份同名規則、原子替換、跑 `codex execpolicy check`，並明示它不能覆蓋 hook 或人類
-gate。這個邊界來自實測：user rule 已成功載入後，active PreToolUse blacklist 仍先於 shell 與
+安裝器會備份同名規則、原子替換、跑 `codex execpolicy check`，並明示它不能覆蓋 hook、runtime
+identity gate 或 GitHub gate。這個邊界來自實測：user rule 已成功載入後，active PreToolUse blacklist 仍先於 shell 與
 GitHub connector merge 執行，證明兩層不可混稱。
 
 Codex rules 的檔案位置、restart requirement、prefix token matching 與「最嚴格決策勝出」語義，

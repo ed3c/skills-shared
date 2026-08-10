@@ -45,6 +45,77 @@ set -e
 test "${empty_status}" -eq 3
 grep -q "NO-ADMIT ${repo}" "${scratch}/empty.out"
 
+# 3b. Explicit owner-auto policy replaces only the per-PR label. Repository
+# identity is bound to immutable owner/viewer IDs, personal User type, exact
+# canonical name, and admin permission. This includes future repos owned by the
+# same user while rejecting collaborators and organization repositories.
+owner_policy="${test_dir}/fixtures/owner-auto/policy.json"
+run "${clean_home}" python3 "${gate}" preflight --repo "${repo}" \
+  --policy "${owner_policy}" \
+  --snapshot "${test_dir}/fixtures/owner-auto/good.json" \
+  > "${scratch}/owner-good.out"
+grep -q "READY #7" "${scratch}/owner-good.out"
+grep -q "PREFLIGHT GREEN: 1 PR" "${scratch}/owner-good.out"
+
+sed 's/"CLEAN"/"UNSTABLE"/' \
+  "${test_dir}/fixtures/owner-auto/good.json" > "${scratch}/owner-unstable.json"
+set +e
+run "${clean_home}" python3 "${gate}" preflight --repo "${repo}" \
+  --allow-unstable --policy "${owner_policy}" \
+  --snapshot "${scratch}/owner-unstable.json" \
+  >"${scratch}/owner-unstable.out" 2>"${scratch}/owner-unstable.err"
+owner_unstable_status=$?
+set -e
+test "${owner_unstable_status}" -eq 1
+grep -q "L3 GITHUB.*mergeStateStatus=UNSTABLE" "${scratch}/owner-unstable.err"
+
+set +e
+run "${clean_home}" python3 "${gate}" preflight \
+  --repo "someone-else/infrastructure" --policy "${owner_policy}" \
+  --snapshot "${test_dir}/fixtures/owner-auto/foreign.json" \
+  >"${scratch}/foreign.out" 2>"${scratch}/foreign.err"
+foreign_status=$?
+run "${clean_home}" python3 "${gate}" preflight --repo "${repo}" \
+  --policy "${owner_policy}" \
+  --snapshot "${test_dir}/fixtures/owner-auto/organization.json" \
+  >"${scratch}/organization.out" 2>"${scratch}/organization.err"
+organization_status=$?
+set -e
+test "${foreign_status}" -eq 1
+test "${organization_status}" -eq 1
+grep -q "L1 OWNER-IDENTITY.*does not match configured owner" "${scratch}/foreign.err"
+grep -q "L1 OWNER-IDENTITY.*not personal User" "${scratch}/organization.err"
+
+# 3c. Owner-auto lands through GraphQL while pinning expectedHeadOid and
+# exposing no admin bypass. authorEmail is intentionally omitted: GitHub
+# rejects caller overrides when web-based Git privacy controls the address.
+python3 - "${gate}" "${owner_policy}" > "${scratch}/command.out" <<'PY'
+import importlib.util
+import sys
+from pathlib import Path
+
+gate_path = Path(sys.argv[1])
+spec = importlib.util.spec_from_file_location("merge_gate", gate_path)
+module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(module)
+policy, _ = module.load_policy(Path(sys.argv[2]))
+pull = {
+    "id": "PR_owner_auto_7",
+    "number": 7,
+    "headRefOid": "1" * 40,
+}
+print(" ".join(module.merge_command("example/infrastructure", pull, policy)))
+PY
+grep -q "expectedHeadOid=1111111111111111111111111111111111111111" "${scratch}/command.out"
+if grep -q "authorEmail" "${scratch}/command.out"; then
+  echo "FAIL: owner-auto merge overrides GitHub web commit email settings" >&2
+  exit 1
+fi
+if grep -q -- "--admin" "${scratch}/command.out"; then
+  echo "FAIL: owner-auto merge grew an admin bypass" >&2
+  exit 1
+fi
+
 # 4. host policy: a PreToolUse hook that exits 2 must refuse the whole run,
 #    and only when that host is the active one.
 blocked_home="${scratch}/home-blocked"

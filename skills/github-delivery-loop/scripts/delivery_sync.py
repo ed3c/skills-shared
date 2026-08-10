@@ -530,6 +530,7 @@ def build_outputs(
     export_source_commit: str,
     export_tree_sha: str,
     repo_root: Path,
+    expected_prd_issue_url: str | None = None,
 ) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], str]:
     """Validate one snapshot and build all synchronized output values in memory."""
     if snapshot.get("schema") != SNAPSHOT_SCHEMA:
@@ -561,14 +562,30 @@ def build_outputs(
         raise SyncError("snapshot issues must be a non-empty list")
     if not isinstance(pulls, list):
         raise SyncError("snapshot pulls must be a list")
-    prd_candidates = [
-        issue
-        for issue in issues
-        if isinstance(issue, dict)
-        and str(issue.get("title", "")).upper().startswith("PRD")
-    ]
-    if len(prd_candidates) != 1:
-        raise SyncError("snapshot must contain exactly one PRD-titled issue")
+    if expected_prd_issue_url is not None:
+        expected_prd_number = _issue_number(expected_prd_issue_url)
+        prd_candidates = [
+            issue
+            for issue in issues
+            if isinstance(issue, dict) and issue.get("number") == expected_prd_number
+        ]
+        if len(prd_candidates) != 1:
+            raise SyncError(
+                f"snapshot missing receipt-pinned PRD issue #{expected_prd_number}"
+            )
+        if not str(prd_candidates[0].get("title", "")).upper().startswith("PRD"):
+            raise SyncError(
+                f"receipt-pinned issue #{expected_prd_number} is no longer PRD-titled"
+            )
+    else:
+        prd_candidates = [
+            issue
+            for issue in issues
+            if isinstance(issue, dict)
+            and str(issue.get("title", "")).upper().startswith("PRD")
+        ]
+        if len(prd_candidates) != 1:
+            raise SyncError("snapshot must contain exactly one PRD-titled issue")
     prd = prd_candidates[0]
     base_url = f"https://github.com/{canonical_repo}"
     issue_urls = [

@@ -8,7 +8,8 @@ description: |
   「merge 權限被擋／換個 host 又被擋」的診斷與根治。
   觸發詞：看板進度、delivery 收據、issue 驅動實作、worktree 切線、merge 被擋、
   merge 權限、preflight、merge-admit、github-delivery-loop。
-  不負責取代 TDD、code review 或人類 merge/public gate。
+  人類 admit 是預設；也支援使用者明確配置的 personal-owner 自動放行，但不取代 TDD、code review、
+  GitHub required checks 或 public gate。
 ---
 
 # GitHub Delivery Loop
@@ -44,12 +45,11 @@ canonical 住 `~/.claude/skills/github-delivery-loop/`；各 repo 的 `.claude/s
    40 字元 export source commit，以及 `public_export.py verify` 回報的 `tree_sha`；測試與重播
    改用 `--snapshot <json>`，不得在測試中打網路。
 5. 每張 issue 在隔離 worktree 走 TDD → review → PR，PR body 使用 `Closes #N`。
-6. Merge 走下節的 admit → preflight → land；漂移或新發現另開 issue，不塞進正在進行的 slice。
+6. Merge 走下節的 authority → preflight → land；漂移或新發現另開 issue，不塞進正在進行的 slice。
 
 ## 新專案套用（一句，冪等）
 
-全域的部分（skill 本體、兩個 host 的 PreToolUse 黑名單、Codex sandbox profile）一次設好就
-對所有專案生效；真正 per-repo 的只有 `merge-admit` label 與 execpolicy 窄規則。在新 repo 裡跑：
+預設 human-admit 模式中，真正 per-repo 的只有 `merge-admit` label 與 execpolicy 窄規則。在新 repo 裡跑：
 
 ```bash
 python3 ~/.claude/skills/github-delivery-loop/scripts/merge_gate.py bootstrap
@@ -58,9 +58,19 @@ python3 ~/.claude/skills/github-delivery-loop/scripts/merge_gate.py bootstrap
 `--repo` 省略時從 cwd 的 git remote 推。已存在就印 `OK` 不重建，最後接一次 preflight 印出四層現況。
 全域／per-repo 的完整分界表 → [modules/host-permissions.md §4](modules/host-permissions.md)。
 
-## Merge authority（人 admit → agent 執行）
+若使用者明確要求「我個人擁有的現在與未來 repo 自動放行」，一次配置 immutable GitHub User 身分：
 
-merge 不是一個「有／無權限」位元，是四層獨立閘：L1 人 admit、L2 host shell policy、
+```bash
+python3 ~/.claude/skills/github-delivery-loop/scripts/merge_gate.py configure-owner --owner LOGIN
+```
+
+之後不用逐 PR label，也不用逐 repo bootstrap。每次 preflight／land 都即時要求：authenticated viewer、
+repository owner 的 login＋numeric ID 同時等於 policy、owner type 是 `User`、且有 admin。**只是 collaborator、
+organization member／owner，甚至在他人 repo 有 admin 都拒絕**。login 改名、repo redirect 或 policy 損壞也 fail closed。
+
+## Merge authority（預設人 admit；明確 opt-in 才 owner-auto）
+
+merge 不是一個「有／無權限」位元，是四層獨立閘：L1 authority、L2 host shell policy、
 L3 GitHub、L4 merge 本身。任一層拒絕就不得宣稱已放行。堆疊語意見
 [delivery-mechanism.md § Merge authority stack](modules/delivery-mechanism.md#merge-authority-stack)。
 
@@ -68,8 +78,9 @@ L3 GitHub、L4 merge 本身。任一層拒絕就不得宣稱已放行。堆疊�
 PreToolUse hook × sandbox network profile × execpolicy，三者互不相干，任一擋住就是擋住。
 preflight 三個都驗——少驗一個平面就會把「還會被擋」報成綠燈（見 host-permissions.md §2 漏報事故）。
 
-1. **人 admit**：repo owner 在 GitHub 對可落地的 PR 貼 `merge-admit` label（UI／手機，可批次）。
-   這是唯一構成 landing decision 的事實；永久 command allow 不是。
+1. **L1 authority（二選一）**：預設是 repo owner 在 GitHub 對可落地 PR 貼 `merge-admit` label；
+   owner-auto 只有在上述 policy 存在時啟用，用 immutable owner/viewer identity 取代逐 PR label。
+   它不接受「有 admin」作為 ownership 的替代證據。
 2. **preflight**（開工前就跑，不要等到 PR 開好）——它把合成的 PreToolUse payload 餵進實際設定的
    hook、呼叫 `codex execpolicy check`、讀 `.codex/config.toml` 的 network 授權，**真跑每個 host
    自己的閘，不推論**；非 active host 只報告不阻擋：
@@ -82,8 +93,10 @@ preflight 三個都驗——少驗一個平面就會把「還會被擋」報成�
    （**缺席，不是拒絕**——別去修一個不存在的權限問題）｜`4` 某一層**判不出來**
    （**無能，不是拒絕**——修的是 hook 設定或這支探測器，永遠不是修權限）。
 
-3. **land**：綠了才落地。每張 PR 落地前重取快照，並帶 `--match-head-commit` 釘住被 admit 的 SHA；
-   base 隨每次 merge 移動後自動重算下一張。
+3. **land**：綠了才落地。每張 PR 落地前重取快照並釘住 HEAD；human-admit 使用
+   `--match-head-commit`，owner-auto 用 GraphQL `expectedHeadOid`，語意相同。owner-auto 不覆寫
+   commit email（交給 GitHub 帳號的 web Git privacy 設定），不使用 `--admin`，也忽略 `--allow-unstable` 的放寬；
+   base 移動後自動重算下一張。
 
    ```bash
    python3 ~/.claude/skills/github-delivery-loop/scripts/merge_gate.py land --repo OWNER/REPO [--dry-run]
@@ -120,8 +133,8 @@ delivery-loop **各藏著一支從沒被自己 SKILL.md 提過的 sync 類腳本
 - 本地 `check` 與 `preflight --snapshot` 零網路；GitHub 活狀態由 `sync --github` 與
   `preflight`（無 `--snapshot`）負責，兩種證據不得混稱。
 - repository identity 釘 immutable GitHub node ID；owner/name 只作可轉移別名，redirect 不得冒充身份證據。
-- `merge-admit` 只有 **repo owner 施加、且晚於 head commit** 才算數；貼完標籤又推新 commit
-  自動失效（`admit-stale`）。merge 一律帶 `--match-head-commit`，HEAD 漂移即失敗。
+- human-admit 的 `merge-admit` 只有 **repo owner 施加、且晚於 head commit** 才算數；owner-auto 則每次
+  重驗 immutable viewer／personal owner。兩種模式都 pin HEAD，漂移即失敗。
 - Codex user rule 只處理 sandbox execpolicy，不能覆蓋 repository PreToolUse hook、GitHub branch rule
   或人類 gate；若下游層拒絕，必須停下報告衝突。
 - 不以 LOC、commit 數或個人排名衡量速度。

@@ -175,7 +175,8 @@ prefix rule 只比對**前綴**，而 `--admin` 出現在 PR 編號之後、位�
 
 守 `--admin` 的三道實際防線，缺一不可：
 1. Claude Code 的 `BASH_BLACKLIST` 保留 `"gh pr merge.*--admin"`（本檔 §1 的補丁刻意只黑這個形式）；
-2. `merge_gate.py` 的 `merge_command()` 從不產生 `--admin`，也沒有任何旗標可以要求它產生；
+2. `merge_gate.py` 的 human-admit command 從不產生 `--admin`；owner-auto GraphQL mutation 也沒有
+   bypass 欄位，只有 `expectedHeadOid` 與 `SQUASH`，email 交給 GitHub 帳號的 web Git 設定；
 3. GitHub 端：`--admin` 只有在 repo 真的設了 branch protection 時才有東西可繞——今天兩個 repo
    都沒設，所以風險為零；**一旦哪天加了 ruleset，第 1 條就從冗餘變成必要**。
 
@@ -218,6 +219,23 @@ prefix rule 只比對**前綴**，而 `--admin` 出現在 PR 編號之後、位�
 而不是聊天記錄裡的一句話。它不宣稱能防住一個蓄意偽造的代理（有 shell 就有 token），
 它防的是「代理自作主張 merge」與「admit 後內容悄悄改變」。
 
+### 明確 opt-in：personal-owner 自動放行
+
+當使用者明確要求不再逐 PR admit，可用 `merge_gate.py configure-owner --owner LOGIN` 建立 user-level
+policy。這不是把 `gh pr merge`／`gh api graphql` 全域放行；Codex rule 只允許精確的
+`python3 <canonical>/merge_gate.py land --repo ...` wrapper，真正的 L1 在 wrapper 內每次向 GitHub 重驗：
+
+1. authenticated viewer 的 login＋numeric user ID 等於 policy；
+2. repository owner 的 login＋numeric ID 也相等，且 owner type 必須是 personal `User`；
+3. canonical `owner/repo` 沒有 redirect，viewer 仍有 admin；
+4. PR 非 draft、mergeable、required checks／branch rules 可落地，且 `expectedHeadOid` 等於剛驗過的 HEAD。
+
+所以「未來 repo」不靠預先列白名單：只要日後 repo 仍由同一個 personal GitHub User 擁有就通過；
+collaborator、organization member／owner、以及他人 repo 的 admin 都拒絕。login rename、token 換人、repo
+transfer、policy 壞掉都 fail closed。GraphQL merge 只送 `expectedHeadOid` 與 `SQUASH`；不送
+`authorEmail`，因為 GitHub 的 web-based Git email／privacy 設定才是該欄位的權威，隱私模式下
+API 會拒絕 caller override。schema 能力以 `gh api graphql` introspection 現查，不拿記憶當規格。
+
 ## 4. 全域 vs per-repo（新專案要做什麼）
 
 把每一塊放在它能放的最高層，per-repo 只留真正無法全域的兩件：
@@ -229,18 +247,20 @@ prefix rule 只比對**前綴**，而 `--admin` 出現在 PR 編號之後、位�
 | Claude Code PreToolUse 黑名單 | `~/.claude/hooks/auto-approve.sh` | **全域**，一次改完 |
 | Codex PreToolUse 黑名單 | `~/.codex/hooks/auto-approve.sh` | **全域**，一次改完（與上一列是同一行規則的鏡像） |
 | Codex sandbox（network＋`.git` write） | `~/.codex/config.toml` 的 `default_permissions` ＋ profile | **全域**；個別 repo 要不同就用自己的 `.codex/config.toml` 覆蓋（project 層贏 user 層） |
-| `merge-admit` label | GitHub repository | **per-repo**（server 端物件，無法全域） |
-| execpolicy 窄規則 | `~/.codex/rules/github-merge-<owner>-<repo>.rules` | **per-repo**（prefix rule 必須寫死 `--repo owner/name`；要全域就得放寬成任意 repo，等於放棄窄化） |
+| `merge-admit` label | GitHub repository | human-admit 才需要，**per-repo** |
+| human-admit execpolicy 窄規則 | `~/.codex/rules/github-merge-<owner>-<repo>.rules` | **per-repo**，寫死 `--repo owner/name` |
+| owner-auto identity policy | `~/.config/github-delivery-loop/merge-policy.json` | 明確 opt-in，**per-user**；綁 login＋numeric ID＋personal User |
+| owner-auto wrapper rule | `~/.codex/rules/github-merge-owner-<login>.rules` | **per-user**；只允許 canonical gate wrapper，不允許 generic GraphQL |
 | Codex project trust | `~/.codex/config.toml` 的 `[projects."<path>"]` | **per-path**；首次在該目錄跑 Codex 時由它自己詢問並寫入 |
 
-所以新專案只需要一句（`--repo` 省略時從 cwd 的 git remote 推）：
+所以 human-admit 的新專案只需要一句（`--repo` 省略時從 cwd 的 git remote 推）：
 
 ```bash
 python3 ~/.claude/skills/github-delivery-loop/scripts/merge_gate.py bootstrap
 ```
 
 冪等：label 與 rule 已存在就印 `OK` 不重建，最後接一次 preflight 把四層現況印出來。
-它**只做那兩件 per-repo 的事**——全域那五列不歸它管，改動全域＝治理事件，由人執行。
+owner-auto 則只需一次 `configure-owner`；同一 personal owner 的現在與未來 repo 都不需要再 bootstrap。
 
 ## 5. 不可逆操作：把「刪」改寫成「搬」
 
