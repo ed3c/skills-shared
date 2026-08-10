@@ -10,7 +10,8 @@ description: |
   禁入 development-standards.md 等規範模組。
   也含**操作層**:本機 Forgejo 的登入、唯讀預檢、typed request、idempotency marker、確定性 router、
   fail-closed 與降級 outbox 恢復(2026-08-07 併入原 forgejo-loop-ops)。優先接管使用者已開啟且已登入的
-  Chrome;登入缺失時可用既有 Git credential helper 在記憶體內補登入,但不得輸出或落盤秘密。
+  Chrome;登入缺失時只用既有 Git credential helper 在記憶體內補登入。首次憑證由 runtime-env 的
+  localhost-only Keychain broker 遷入;本 skill 不解析 dotenv,不得輸出或落盤秘密。
   觸發詞:交付進度、delivery 收據、issue 驅動實作、切線、Forgejo 登入、唯讀預檢、
   forgejo-delivery-loop。
   NOT for:日常晨檢與發佈輪替(product-ops);迴圈拓撲記錄(harness-wiki);建新迴圈工程規範
@@ -89,6 +90,8 @@ for issue in <該線 open issues>:
 
 merge 永遠人 admit;本 skill 只推進到 PR 開好、findings 齊備。Forgejo API 呼叫一律透過既有
 credential helper 在記憶體內取憑證,**秘密不落盤不輸出**(本 repo `check_credential_hygiene.py` 守)。
+若 helper 尚未建立,由 host operator 在 `/Users/neon/runtime-env` 執行
+`./runtime-env local-env migrate-forgejo-keychain`;本 skill 不讀 `runtime-env/.env`,也不實作第二套密碼儲存。
 
 ## 三種提示的放置鐵律
 
