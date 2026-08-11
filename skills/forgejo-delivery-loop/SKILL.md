@@ -9,7 +9,7 @@ description: |
   fixed/iteration/emergent 走 exchange packet 既有欄位,湧現提示落 packets 與 openwiki backlog,
   禁入 development-standards.md 等規範模組。
   也含**操作層**:本機 Forgejo 的登入、唯讀預檢、typed request、idempotency marker、確定性 router、
-  fail-closed 與降級 outbox 恢復(2026-08-07 併入原 forgejo-loop-ops)。優先接管使用者已開啟且已登入的
+  fail-closed 與降級 outbox 恢復。優先接管使用者已開啟且已登入的
   Chrome;登入缺失時只用既有 Git credential helper 在記憶體內補登入。首次憑證由 runtime-env 的
   localhost-only Keychain broker 遷入;本 skill 不解析 dotenv,不得輸出或落盤秘密。
   觸發詞:交付進度、delivery 收據、issue 驅動實作、切線、Forgejo 登入、唯讀預檢、
