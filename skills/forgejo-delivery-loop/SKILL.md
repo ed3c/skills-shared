@@ -115,7 +115,23 @@ credential helper 在記憶體內取憑證,**秘密不落盤不輸出**(本 repo
 ```bash
 bun run <本skill>/scripts/route.ts --input <route-input.json>
 bun run <本skill>/scripts/route.ts --selftest      # 改 router 或 cases 後必跑
+python3 <本skill>/scripts/issue_state.py validate --request <request.json>
+python3 <本skill>/scripts/issue_state.py validate-source-live --request <request.json>
+python3 <本skill>/scripts/issue_state.py capture-pre-live \
+  --request <request.json> > <pre-observation.json>
+python3 <本skill>/scripts/issue_state.py verify-live \
+  --request <request.json> --pre-observation <pre-observation.json>
 ```
+
+issue 終態 mutation 必須先通過 `contracts/forgejo-terminal-issue-state-request.v2.schema.json`
+對應的語義驗證，再以 `contracts/forgejo-issue-state-observation.v1.schema.json` 回讀；只有
+`contracts/forgejo-issue-state-readback-receipt.v1.schema.json` 形狀的輸出才算完成。JSON Schema
+負責可攜形狀，`scripts/issue_state.py` 額外以 authenticated `gh`／Forgejo API read 驗證 GitHub
+source closure、mutation 前 expected state 與 mutation 後 desired state，並守 repository／number／
+source URL marker／request digest 一致，並要求 authenticated timeline 的唯一 close event 在 pre-read
+後五分鐘內發生。三者缺一即 fail closed；單純自填 observation JSON 不能產生 verified receipt。
+`admission` 是對既有 user 指令的 out-of-band operator attestation，不是密碼學 provenance；不得由
+agent 推斷或由 issue 內容取代。可驗證的 outcome evidence 是 authenticated source／state／timeline read。
 
 八條不變量（只認 localhost:3000、憑證只留記憶體、Forgejo 不是真相來源、每個外部 mutation 下沉成
 一個小迴圈、repo 寫入交給 repo-local operator、缺 admission 即 fail closed……）、M0/G0/V0 狀態圖、
@@ -145,7 +161,7 @@ python3 $S apply --to-targets    # 方向必須顯式,永不由 mtime 推斷
 
 ## 索引紀律(本檔對自己的樹的宣稱)
 
-本檔列出的 `modules/`／`scripts/` 就是一份索引,而索引會**單向失效**:死連結點下去才知道,
+本檔列出的 `modules/`／`scripts/`／`contracts/` 就是一份索引,而索引會**單向失效**:死連結點下去才知道,
 **漏列的檔案永遠不會有人知道**——短的清單與完整的清單長得一模一樣。首次真跑時,三支
 delivery-loop **各藏著一支沒被自己 SKILL.md 提過的 sync 類腳本**,同型錯誤三處齊發。
 
