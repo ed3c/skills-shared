@@ -1,0 +1,176 @@
+name: Skill Eval Physical - skill-up
+
+on:
+  workflow_dispatch:
+    inputs:
+      case_id:
+        description: Public skill-eval/v1 case ID
+        required: true
+        default: autoresearch-metric-loop-plan
+      engine:
+        description: skill-up engine
+        required: true
+        default: codex
+      provider:
+        description: model provider
+        required: true
+        default: openai
+      model:
+        description: exact model identifier
+        required: true
+      base_url:
+        description: optional public model endpoint
+        required: false
+        default: ''
+      current_sha:
+        description: exact 40-char skills-shared commit used as current-skill baseline
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: skill-eval-physical-skill-up-${{ github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  physical:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        seed: [1, 2, 3]
+        variant: [current_skill, candidate_skill]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # pinned v5 commit
+        with:
+          python-version: '3.12'
+
+      - name: Validate immutable inputs and materialize skill snapshot
+        id: materialize
+        env:
+          CURRENT_SHA: ${{ inputs.current_sha }}
+          VARIANT: ${{ matrix.variant }}
+        run: |
+          set -euo pipefail
+          case "$CURRENT_SHA" in
+            [0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]) ;;
+            *) echo "current_sha must be exact lowercase 40-char SHA" >&2; exit 2 ;;
+          esac
+          git cat-file -e "$CURRENT_SHA^{commit}"
+          candidate_sha="$(git rev-parse HEAD)"
+          root="$RUNNER_TEMP/runtime/${VARIANT}/skills/autoresearch-composer"
+          mkdir -p "$root"
+          if [ "$VARIANT" = current_skill ]; then
+            git archive "$CURRENT_SHA" skills/autoresearch-composer | tar -x -C "$RUNNER_TEMP/runtime/${VARIANT}"
+            skill_sha="$CURRENT_SHA"
+          else
+            cp -R skills/autoresearch-composer/. "$root/"
+            skill_sha="$candidate_sha"
+          fi
+          echo "skill_root=$root" >> "$GITHUB_OUTPUT"
+          echo "skill_sha=$skill_sha" >> "$GITHUB_OUTPUT"
+
+      - name: Export executor-neutral and skill-up inputs
+        env:
+          CASE_ID: ${{ inputs.case_id }}
+          ENGINE: ${{ inputs.engine }}
+          PROVIDER: ${{ inputs.provider }}
+          MODEL: ${{ inputs.model }}
+          VARIANT: ${{ matrix.variant }}
+          SEED: ${{ matrix.seed }}
+          SKILL_ROOT: ${{ steps.materialize.outputs.skill_root }}
+          SKILL_SHA: ${{ steps.materialize.outputs.skill_sha }}
+        run: |
+          set -euo pipefail
+          out="$RUNNER_TEMP/runtime/${VARIANT}/manifest-seed-${SEED}.json"
+          python3 scripts/export_skill_eval_runtime.py \
+            --case "$CASE_ID" \
+            --condition "$VARIANT" \
+            --skill-sha "$SKILL_SHA" \
+            --engine "$ENGINE" \
+            --provider "$PROVIDER" \
+            --model "$MODEL" \
+            --skill-root "$SKILL_ROOT" \
+            --out "$out"
+          python3 -m json.tool "$out" >/dev/null
+
+      - name: Copy runtime root into workspace for Docker action
+        env:
+          VARIANT: ${{ matrix.variant }}
+        run: |
+          set -euo pipefail
+          rm -rf ".physical-runtime/${VARIANT}"
+          mkdir -p ".physical-runtime/${VARIANT}"
+          cp -R "$RUNNER_TEMP/runtime/${VARIANT}/." ".physical-runtime/${VARIANT}/"
+
+      - name: Execute pinned skill-up physical run
+        id: skillup
+        continue-on-error: true
+        uses: alibaba/skill-up@425e3f5a0c23e80f2c7933785d54c53ffe01b40c
+        with:
+          engine: ${{ inputs.engine }}
+          model: ${{ inputs.model }}
+          provider: ${{ inputs.provider }}
+          api-key: ${{ secrets.SKILL_EVAL_API_KEY }}
+          base-url: ${{ inputs.base_url }}
+          skill-target: .physical-runtime/${{ matrix.variant }}/skills/autoresearch-composer/.runtime-eval/eval.yaml
+          parallelism: '1'
+
+      - name: Record immutable attempt identity
+        if: always()
+        env:
+          CASE_ID: ${{ inputs.case_id }}
+          ENGINE: ${{ inputs.engine }}
+          PROVIDER: ${{ inputs.provider }}
+          MODEL: ${{ inputs.model }}
+          VARIANT: ${{ matrix.variant }}
+          SEED: ${{ matrix.seed }}
+          OUTCOME: ${{ steps.skillup.outcome }}
+          SKILL_SHA: ${{ steps.materialize.outputs.skill_sha }}
+          REPORT_DIR: ${{ steps.skillup.outputs.report-dir }}
+        run: |
+          python3 - <<'PY'
+          import json, os, pathlib
+          root = pathlib.Path('.physical-runtime') / os.environ['VARIANT'] / 'attempt'
+          root.mkdir(parents=True, exist_ok=True)
+          value = {
+              'schema_version': 'skill-eval-physical-attempt/v1',
+              'case_id': os.environ['CASE_ID'],
+              'condition': os.environ['VARIANT'],
+              'seed': int(os.environ['SEED']),
+              'skill_sha': os.environ['SKILL_SHA'],
+              'eval_suite_sha': os.environ['GITHUB_SHA'],
+              'harness': 'skill-up',
+              'harness_sha': '425e3f5a0c23e80f2c7933785d54c53ffe01b40c',
+              'engine': os.environ['ENGINE'],
+              'provider': os.environ['PROVIDER'],
+              'model': os.environ['MODEL'],
+              'fresh_workspace': True,
+              'max_retries': 0,
+              'action_outcome': os.environ['OUTCOME'],
+              'report_dir': os.environ.get('REPORT_DIR', ''),
+              'promotion_authority': False,
+          }
+          (root / 'attempt.json').write_text(json.dumps(value, indent=2, sort_keys=True) + '\n')
+          PY
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: skill-up-${{ matrix.variant }}-seed-${{ matrix.seed }}-${{ github.run_attempt }}
+          path: .physical-runtime/${{ matrix.variant }}
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Fail if physical execution failed
+        if: always()
+        env:
+          OUTCOME: ${{ steps.skillup.outcome }}
+        run: |
+          test "$OUTCOME" = success
