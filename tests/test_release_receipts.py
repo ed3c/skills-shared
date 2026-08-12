@@ -173,12 +173,22 @@ class ReleaseReceiptTests(unittest.TestCase):
 
     def test_eval_suite_sha_must_be_exact_lowercase_commit_sha(self) -> None:
         self.release["eval_suite_sha"] = "B" * 40
-        with self.assertRaisesRegex(ValueError, "eval_suite_sha"):
+        with self.assertRaisesRegex(ValueError, "40-char"):
+            self.validate()
+
+    def test_short_eval_suite_sha_is_rejected(self) -> None:
+        self.release["eval_suite_sha"] = "b" * 12
+        with self.assertRaisesRegex(ValueError, "40-char"):
             self.validate()
 
     def test_rollback_sha_must_be_exact_lowercase_commit_sha(self) -> None:
         self.release["rollback_sha"] = "not-a-sha"
-        with self.assertRaisesRegex(ValueError, "rollback_sha"):
+        with self.assertRaisesRegex(ValueError, "40-char"):
+            self.validate()
+
+    def test_short_rollback_sha_is_rejected(self) -> None:
+        self.release["rollback_sha"] = "c" * 12
+        with self.assertRaisesRegex(ValueError, "40-char"):
             self.validate()
 
     def test_generalization_gap_cannot_be_negative(self) -> None:
@@ -199,7 +209,7 @@ class ReleaseReceiptTests(unittest.TestCase):
 
     def test_unknown_release_fields_fail_closed(self) -> None:
         self.release["overall_score"] = 0.99
-        with self.assertRaisesRegex(ValueError, "unexpected fields"):
+        with self.assertRaisesRegex(ValueError, "unsupported fields"):
             self.validate()
 
 
