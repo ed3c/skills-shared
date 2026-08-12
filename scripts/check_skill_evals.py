@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """Validate skill eval contracts and claim coverage using only the stdlib.
 
-This gate intentionally checks the failure modes called out in issue #16:
-empty runnable sets, fabricated claim links, duplicate case IDs, missing
-verifiers, and anchors/fixtures that do not resolve to real files.
+Public dev/gold cases live under evals/cases. Sealed holdout metadata lives under
+evals/holdout and must contain only an opaque sealed_ref plus content hash, never
+the actual prompt. This gate intentionally checks issue #16-style fabricated
+coverage as well as holdout leakage.
 """
-
 from __future__ import annotations
 
 import json
@@ -13,7 +13,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-CASES_ROOT = ROOT / "evals" / "cases"
+CASE_ROOTS = [ROOT / "evals" / "cases", ROOT / "evals" / "holdout"]
 COVERAGE = ROOT / "evals" / "coverage.json"
 
 
@@ -45,9 +45,7 @@ def validate_case(path: Path) -> tuple[str, str, set[str]]:
     case = load_object(path)
     if case.get("schema_version") != "skill-eval/v1":
         raise EvalError(f"{path.relative_to(ROOT)}: unsupported schema_version")
-
-    case_id = case.get("id")
-    skill = case.get("skill")
+    case_id, skill = case.get("id"), case.get("skill")
     if not isinstance(case_id, str) or not case_id.strip():
         raise EvalError(f"{path.relative_to(ROOT)}: id must be a non-empty string")
     if not isinstance(skill, str) or not skill.strip():
@@ -55,17 +53,34 @@ def validate_case(path: Path) -> tuple[str, str, set[str]]:
 
     claims = set(nonempty_strings(case.get("claims"), field="claims", path=path))
     conditions = nonempty_strings(case.get("conditions"), field="conditions", path=path)
-    if "candidate_skill" not in conditions:
-        raise EvalError(f"{path.relative_to(ROOT)}: conditions must include candidate_skill")
-    if len(conditions) < 2:
-        raise EvalError(f"{path.relative_to(ROOT)}: at least two conditions are required")
+    if "candidate_skill" not in conditions or len(conditions) < 2:
+        raise EvalError(f"{path.relative_to(ROOT)}: candidate_skill plus at least one comparison is required")
 
     task = case.get("task")
     if not isinstance(task, dict):
         raise EvalError(f"{path.relative_to(ROOT)}: task must be an object")
+    split = case.get("split")
+    under_holdout = (ROOT / "evals" / "holdout") in path.parents
     prompt = task.get("prompt")
-    if not isinstance(prompt, str) or len(prompt.strip()) < 10:
-        raise EvalError(f"{path.relative_to(ROOT)}: task.prompt is too short")
+    sealed_ref = task.get("sealed_ref")
+    content_hash = task.get("content_sha256")
+    if split == "holdout":
+        if not under_holdout:
+            raise EvalError(f"{path.relative_to(ROOT)}: holdout case must live under evals/holdout")
+        if prompt is not None:
+            raise EvalError(f"{path.relative_to(ROOT)}: sealed holdout must not contain prompt text")
+        if not isinstance(sealed_ref, str) or len(sealed_ref.strip()) < 8:
+            raise EvalError(f"{path.relative_to(ROOT)}: sealed holdout requires opaque task.sealed_ref")
+        if not isinstance(content_hash, str) or len(content_hash) != 64 or any(c not in '0123456789abcdef' for c in content_hash):
+            raise EvalError(f"{path.relative_to(ROOT)}: sealed holdout requires lowercase sha256 content hash")
+    else:
+        if under_holdout:
+            raise EvalError(f"{path.relative_to(ROOT)}: only split=holdout may live under evals/holdout")
+        if not isinstance(prompt, str) or len(prompt.strip()) < 10:
+            raise EvalError(f"{path.relative_to(ROOT)}: task.prompt is too short")
+        if sealed_ref is not None or content_hash is not None:
+            raise EvalError(f"{path.relative_to(ROOT)}: public case must not masquerade as sealed holdout")
+
     fixture = task.get("fixture")
     if fixture is not None:
         if not isinstance(fixture, str) or not fixture.strip():
@@ -84,47 +99,33 @@ def validate_case(path: Path) -> tuple[str, str, set[str]]:
     verifier_type = verifier.get("type")
     if verifier_type not in {"rule", "script", "artifact", "agent_judge", "composite"}:
         raise EvalError(f"{path.relative_to(ROOT)}: unsupported verifier.type")
-    assertions = nonempty_strings(
-        verifier.get("outcome_assertions"), field="verifier.outcome_assertions", path=path
-    )
+    nonempty_strings(verifier.get("outcome_assertions"), field="verifier.outcome_assertions", path=path)
     if verifier_type == "agent_judge":
-        raise EvalError(
-            f"{path.relative_to(ROOT)}: agent_judge cannot be the sole verifier for a hard-gate case"
-        )
+        raise EvalError(f"{path.relative_to(ROOT)}: agent_judge cannot be the sole hard-gate verifier")
     if verifier_type == "script":
         command = verifier.get("command")
         if not isinstance(command, str) or not command.strip():
             raise EvalError(f"{path.relative_to(ROOT)}: script verifier requires command")
-        parts = command.split()
-        script_refs = [p for p in parts if p.endswith((".py", ".sh"))]
-        if not script_refs:
-            raise EvalError(f"{path.relative_to(ROOT)}: script verifier command has no script path")
-        script_path = ROOT / script_refs[-1]
-        if not script_path.is_file():
-            raise EvalError(
-                f"{path.relative_to(ROOT)}: verifier script does not exist: {script_refs[-1]}"
-            )
-    if not assertions:
-        raise EvalError(f"{path.relative_to(ROOT)}: verifier has no outcome assertions")
-
+        script_refs = [p for p in command.split() if p.endswith((".py", ".sh"))]
+        if not script_refs or not (ROOT / script_refs[-1]).is_file():
+            raise EvalError(f"{path.relative_to(ROOT)}: verifier script does not resolve")
     return case_id, skill, claims
 
 
 def main() -> int:
-    errors: list[str] = []
-    cases: dict[str, tuple[str, set[str], Path]] = {}
-
-    case_paths = sorted(CASES_ROOT.rglob("*.json")) if CASES_ROOT.exists() else []
+    errors, cases = [], {}
+    case_paths = []
+    for root in CASE_ROOTS:
+        if root.exists():
+            case_paths.extend(root.rglob("*.json"))
+    case_paths = sorted(case_paths)
     if not case_paths:
-        errors.append("evals/cases: no runnable eval cases found")
-
+        errors.append("evals: no runnable eval cases found")
     for path in case_paths:
         try:
             case_id, skill, claims = validate_case(path)
             if case_id in cases:
-                errors.append(
-                    f"duplicate case id {case_id}: {cases[case_id][2].relative_to(ROOT)} and {path.relative_to(ROOT)}"
-                )
+                errors.append(f"duplicate case id {case_id}: {cases[case_id][2].relative_to(ROOT)} and {path.relative_to(ROOT)}")
             else:
                 cases[case_id] = (skill, claims, path)
         except EvalError as exc:
@@ -132,65 +133,42 @@ def main() -> int:
 
     try:
         coverage = load_object(COVERAGE)
-        if coverage.get("schema_version") != "skill-eval-coverage/v1":
-            errors.append("evals/coverage.json: unsupported schema_version")
         claim_map = coverage.get("claims")
-        if not isinstance(claim_map, dict) or not claim_map:
-            errors.append("evals/coverage.json: claims must be a non-empty object")
+        if coverage.get("schema_version") != "skill-eval-coverage/v1" or not isinstance(claim_map, dict) or not claim_map:
+            errors.append("evals/coverage.json: invalid or empty coverage registry")
             claim_map = {}
     except EvalError as exc:
-        errors.append(str(exc))
-        claim_map = {}
+        errors.append(str(exc)); claim_map = {}
 
-    covered_case_ids: set[str] = set()
+    covered_case_ids = set()
     for claim_key, spec in claim_map.items():
-        if not isinstance(claim_key, str) or ":" not in claim_key:
-            errors.append(f"evals/coverage.json: malformed claim key {claim_key!r}")
-            continue
+        if not isinstance(claim_key, str) or ":" not in claim_key or not isinstance(spec, dict):
+            errors.append(f"evals/coverage.json: malformed claim entry {claim_key!r}"); continue
         skill, claim = claim_key.split(":", 1)
-        if not isinstance(spec, dict):
-            errors.append(f"evals/coverage.json: {claim_key} must map to an object")
-            continue
         try:
             linked = nonempty_strings(spec.get("cases"), field=f"claims.{claim_key}.cases", path=COVERAGE)
         except EvalError as exc:
-            errors.append(str(exc))
-            continue
-
+            errors.append(str(exc)); continue
         for case_id in linked:
             case = cases.get(case_id)
             if case is None:
-                errors.append(f"evals/coverage.json: {claim_key} references missing case {case_id}")
-                continue
+                errors.append(f"evals/coverage.json: {claim_key} references missing case {case_id}"); continue
             case_skill, case_claims, _ = case
             if case_skill != skill:
-                errors.append(
-                    f"evals/coverage.json: {claim_key} points to {case_id} owned by skill {case_skill}"
-                )
+                errors.append(f"evals/coverage.json: {claim_key} points to {case_id} owned by {case_skill}")
             if claim not in case_claims:
-                errors.append(
-                    f"evals/coverage.json: fabricated coverage: {case_id} does not assert claim {claim}"
-                )
+                errors.append(f"evals/coverage.json: fabricated coverage: {case_id} does not assert {claim}")
             covered_case_ids.add(case_id)
-
     for case_id, (skill, claims, path) in cases.items():
         for claim in claims:
-            key = f"{skill}:{claim}"
-            if key not in claim_map:
-                errors.append(
-                    f"{path.relative_to(ROOT)}: claim {claim} has no coverage registry entry ({key})"
-                )
+            if f"{skill}:{claim}" not in claim_map:
+                errors.append(f"{path.relative_to(ROOT)}: claim {claim} has no coverage registry entry")
         if case_id not in covered_case_ids:
             errors.append(f"{path.relative_to(ROOT)}: runnable case is not referenced by coverage registry")
-
     if errors:
-        for error in errors:
-            print(f"FAIL {error}", file=sys.stderr)
+        for error in errors: print(f"FAIL {error}", file=sys.stderr)
         return 1
-
     print(f"PASS skill eval coverage: {len(cases)} cases, {len(claim_map)} claims")
     return 0
 
-
-if __name__ == "__main__":
-    raise SystemExit(main())
+if __name__ == "__main__": raise SystemExit(main())
