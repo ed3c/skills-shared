@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Normalize executor-specific results into skill-eval-run/v1.
 
-This adapter intentionally owns only translation. Promotion authority stays in
-the Arena/control plane. Supported MVP inputs: `generic` and `skill-up`-shaped
-JSON. Both require exact case/condition/model/harness identity from the caller.
+Translation never grants promotion authority. Sampling identity is explicit:
+callers must provide either a controlled model seed or a repetition index; a
+harness without seed control must never fabricate one.
 """
 from __future__ import annotations
 
@@ -11,7 +11,6 @@ import argparse
 import hashlib
 import json
 import sys
-import uuid
 from pathlib import Path
 
 
@@ -48,9 +47,6 @@ def normalize_generic(raw: dict) -> dict:
 
 
 def normalize_skill_up(raw: dict) -> dict:
-    # skill-up result/report fields vary by judge and engine. Keep this adapter
-    # deliberately conservative: only stable scalar fields are normalized;
-    # executor-native JSON is retained separately in the evidence bundle.
     result = raw.get("result", raw)
     if not isinstance(result, dict):
         raise ValueError("skill-up result must be an object")
@@ -73,6 +69,20 @@ def normalize_skill_up(raw: dict) -> dict:
     }
 
 
+def sampling_from_args(args) -> dict:
+    if args.seed is not None and args.repetition is not None:
+        raise ValueError("provide exactly one of --seed or --repetition")
+    if args.seed is None and args.repetition is None:
+        raise ValueError("provide exactly one of --seed or --repetition")
+    if args.seed is not None:
+        if args.seed < 0:
+            raise ValueError("seed must be >= 0")
+        return {"kind": "controlled_seed", "index": 1, "seed": args.seed}
+    if args.repetition < 1:
+        raise ValueError("repetition must be >= 1")
+    return {"kind": "repetition", "index": args.repetition, "seed": None}
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--adapter", choices=["generic", "skill-up"], required=True)
@@ -88,7 +98,8 @@ def main() -> int:
     parser.add_argument("--runtime", required=True)
     parser.add_argument("--network-policy", required=True)
     parser.add_argument("--fresh-workspace", action="store_true")
-    parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument("--seed", type=int)
+    parser.add_argument("--repetition", type=int)
     parser.add_argument("--should-invoke", action="store_true")
     parser.add_argument("--output", required=True)
     args = parser.parse_args()
@@ -98,9 +109,11 @@ def main() -> int:
         normalized = normalize_generic(raw) if args.adapter == "generic" else normalize_skill_up(raw)
         if args.condition != "no_skill" and not args.skill_sha:
             raise ValueError("skill_sha is required except for no_skill runs")
+        sampling = sampling_from_args(args)
+        sampling_identity = f"{sampling['kind']}:{sampling['seed'] if sampling['kind'] == 'controlled_seed' else sampling['index']}"
         identity = "|".join([
             args.case_id, args.condition, args.skill_sha or "none", args.model_provider,
-            args.model_name, args.harness_name, args.harness_version, args.runtime, str(args.seed),
+            args.model_name, args.harness_name, args.harness_version, args.runtime, sampling_identity,
         ])
         run_id = hashlib.sha256(identity.encode()).hexdigest()[:24]
         trace = {
@@ -116,7 +129,7 @@ def main() -> int:
                 "fresh_workspace": args.fresh_workspace,
                 "network_policy": args.network_policy,
             },
-            "seed": args.seed,
+            "sampling": sampling,
             "outcome": {
                 "passed": normalized["passed"],
                 "verifier": normalized["verifier"],
