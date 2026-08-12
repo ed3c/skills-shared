@@ -1,0 +1,9 @@
+{
+  "repository": "ed3c/disposable-skill-eval",
+  "pull_request": 1,
+  "expected_head_sha": "0123456789abcdef",
+  "author_identity_source": "remote-preflight-calibration",
+  "remote_author_identity_proven": false,
+  "merge_mutation_attempted": false,
+  "decision": "BLOCKED"
+}

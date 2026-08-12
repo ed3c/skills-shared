@@ -10,6 +10,7 @@ on:
       - 'evals/**'
       - 'mutations/**'
       - 'scripts/check_skill_evals.py'
+      - 'scripts/check_verifier_calibrations.py'
       - 'scripts/check_mutation_lineage.py'
       - 'scripts/check_capability_unlocks.py'
       - 'scripts/summarize_skill_eval_matrix.py'
@@ -19,6 +20,7 @@ on:
       - 'scripts/verify_collected_runtime.py'
       - 'scripts/build_verified_run.py'
       - 'tests/test_skill_eval_gate.py'
+      - 'tests/test_verifier_calibrations.py'
       - 'tests/test_autoresearch_eval_v1.py'
       - 'tests/test_cross_harness_contract.py'
       - 'tests/test_cross_harness_gap.py'
@@ -60,8 +62,12 @@ jobs:
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: '3.12'
-      - name: Validate eval coverage and sealed holdouts
+      - name: Validate eval coverage, implementation targets, and sealed holdouts
         run: python3 scripts/check_skill_evals.py
+      - name: Calibrate deterministic gold-replay verifiers
+        run: |
+          python3 scripts/check_verifier_calibrations.py
+          python3 -m unittest tests/test_verifier_calibrations.py -v
       - name: Validate mutation lineage
         run: python3 scripts/check_mutation_lineage.py
       - name: Validate capability unlock registry
@@ -81,27 +87,11 @@ jobs:
           python3 -m unittest tests/test_build_verified_run.py -v
       - name: Compile runtime and adapter scripts
         run: python3 -m compileall -q scripts evals/adapters evals/verifiers tests
-      - name: Validate authority and executor JSON contracts
+      - name: Validate authority, executor, and eval JSON contracts
         run: |
           python3 -m json.tool evals/runtime/executors/arena.json >/dev/null
           python3 -m json.tool evals/runtime/executors/skill-up.json >/dev/null
+          python3 -m json.tool evals/schema/skill-eval-contract.schema.json >/dev/null
           python3 -m json.tool evals/schema/verifier-receipt.schema.json >/dev/null
           python3 -m json.tool evals/schema/evidence-bundle.schema.json >/dev/null
           python3 -m json.tool evals/schema/run-trace.schema.json >/dev/null
-      - name: Exercise gold replay verifier safe-block path
-        run: |
-          tmp="$(mktemp -d)"
-          mkdir -p "$tmp/evidence"
-          cat > "$tmp/evidence/preflight.json" <<'JSON'
-          {
-            "repository": "ed3c/disposable-skill-eval",
-            "pull_request": 1,
-            "expected_head_sha": "0123456789abcdef",
-            "viewer_id": "fixture-viewer",
-            "author_identity_source": "remote-preflight-fixture",
-            "remote_author_identity_proven": false,
-            "merge_mutation_attempted": false,
-            "decision": "BLOCKED"
-          }
-          JSON
-          (cd "$tmp" && python3 "$GITHUB_WORKSPACE/evals/verifiers/verify_issue_25_contract.py")
