@@ -2,11 +2,16 @@ from __future__ import annotations
 
 import hashlib
 import json
+import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
 
 from scripts.check_mutation_promotions import check
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+SCRIPT = REPO_ROOT / "scripts" / "check_mutation_promotions.py"
 
 
 class MutationPromotionTests(unittest.TestCase):
@@ -130,6 +135,17 @@ class MutationPromotionTests(unittest.TestCase):
         count, errors = check(self.root)
         self.assertEqual(count, 1)
         self.assertEqual(errors, [])
+
+    def test_direct_cli_entrypoint_imports_cleanly(self) -> None:
+        result = subprocess.run(
+            [sys.executable, str(SCRIPT)],
+            cwd=REPO_ROOT,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("PASS mutation promotion registry", result.stdout)
 
     def test_lost_candidate_cannot_be_promoted(self) -> None:
         self.record["status"] = "lost"
