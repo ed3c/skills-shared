@@ -15,6 +15,10 @@ SCHEMA = "github-ci-policy/v1"
 SHA_RE = re.compile(r"[0-9a-f]{40}")
 REPOSITORY_RE = re.compile(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+")
 KEY_RE = re.compile(r"^(?P<indent>\s*)(?P<key>[A-Za-z0-9_-]+):(?P<value>.*)$")
+PULL_REQUEST_TYPES = {
+    "draft-first": {"ready_for_review"},
+    "universal": {"opened", "synchronize", "reopened"},
+}
 
 
 class PolicyError(ValueError):
@@ -58,6 +62,11 @@ def load_policy(path: Path) -> dict[str, Any]:
         isinstance(part, str) and part for part in verification
     ):
         raise PolicyError("local_verification must be a non-empty argv array")
+    pull_request_mode = value.get("pull_request_mode", "draft-first")
+    if not isinstance(pull_request_mode, str) or pull_request_mode not in PULL_REQUEST_TYPES:
+        allowed = ", ".join(sorted(PULL_REQUEST_TYPES))
+        raise PolicyError(f"pull_request_mode must be one of: {allowed}")
+    value["pull_request_mode"] = pull_request_mode
     return value
 
 
@@ -139,8 +148,17 @@ def evaluate_workflow(policy: dict[str, Any], workflow_text: str) -> list[str]:
 
     pull_lines = _section(on_lines, "pull_request", 2)
     pull_types = set(_list_values(pull_lines, "types", 4))
-    if pull_types != {"ready_for_review"}:
-        raise PolicyError("pull_request.types must contain only ready_for_review")
+    pull_request_mode = policy.get("pull_request_mode", "draft-first")
+    if not isinstance(pull_request_mode, str):
+        raise PolicyError("pull_request_mode must be a string")
+    required_pull_types = PULL_REQUEST_TYPES.get(pull_request_mode)
+    if required_pull_types is None:
+        raise PolicyError(f"unsupported pull_request_mode: {pull_request_mode}")
+    if pull_types != required_pull_types:
+        expected = ", ".join(sorted(required_pull_types))
+        raise PolicyError(
+            f"pull_request.types for {pull_request_mode} must contain exactly: {expected}"
+        )
 
     push_lines = _section(on_lines, "push", 2)
     branches = _list_values(push_lines, "branches", 4)
@@ -176,6 +194,7 @@ def evaluate_workflow(policy: dict[str, Any], workflow_text: str) -> list[str]:
     return [
         f"repository={policy['repository']}",
         f"workflow={policy['workflow']}",
+        f"pull_request_mode={pull_request_mode}",
         f"required_jobs={','.join(policy['required_jobs'])}",
     ]
 

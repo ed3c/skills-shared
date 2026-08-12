@@ -4,6 +4,7 @@
   "private": true,
   "default_branch": "main",
   "workflow": ".github/workflows/verify.yml",
+  "pull_request_mode": "draft-first",
   "required_jobs": ["verify"],
   "local_verification": ["/usr/bin/true"]
 }

@@ -3,12 +3,14 @@ from __future__ import annotations
 import importlib.util
 import json
 import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
 
 
 SKILL = Path(__file__).resolve().parents[2]
+PUBLISH_SCRIPT = SKILL / "scripts" / "ci_publish.py"
 
 
 def load(name: str):
@@ -49,8 +51,14 @@ jobs:
 """
 
 
-def policy() -> dict:
-    return {
+UNIVERSAL_WORKFLOW = WORKFLOW.replace(
+    "types: [ready_for_review]",
+    "types: [opened, synchronize, reopened]",
+)
+
+
+def policy(pull_request_mode: str | None = "draft-first") -> dict:
+    value = {
         "schema": "github-ci-policy/v1",
         "repository": "ed3c/example",
         "private": True,
@@ -59,6 +67,9 @@ def policy() -> dict:
         "required_jobs": ["verify"],
         "local_verification": ["/usr/bin/true"],
     }
+    if pull_request_mode is not None:
+        value["pull_request_mode"] = pull_request_mode
+    return value
 
 
 class WorkflowPolicyTests(unittest.TestCase):
@@ -73,6 +84,56 @@ class WorkflowPolicyTests(unittest.TestCase):
         with self.assertRaisesRegex(POLICY.PolicyError, "missing types"):
             POLICY.evaluate_workflow(policy(), hollow)
 
+    def test_universal_pull_request_mode_accepts_exact_event_set(self) -> None:
+        details = POLICY.evaluate_workflow(policy("universal"), UNIVERSAL_WORKFLOW)
+        self.assertIn("pull_request_mode=universal", details)
+
+    def test_draft_first_mode_rejects_universal_event_set(self) -> None:
+        with self.assertRaisesRegex(POLICY.PolicyError, "draft-first"):
+            POLICY.evaluate_workflow(policy(), UNIVERSAL_WORKFLOW)
+
+    def test_universal_mode_rejects_missing_event(self) -> None:
+        hollow = UNIVERSAL_WORKFLOW.replace("synchronize, ", "")
+        with self.assertRaisesRegex(POLICY.PolicyError, "universal"):
+            POLICY.evaluate_workflow(policy("universal"), hollow)
+
+    def test_universal_mode_rejects_extra_event(self) -> None:
+        hollow = UNIVERSAL_WORKFLOW.replace(
+            "reopened]", "reopened, ready_for_review]"
+        )
+        with self.assertRaisesRegex(POLICY.PolicyError, "universal"):
+            POLICY.evaluate_workflow(policy("universal"), hollow)
+
+    def test_unknown_pull_request_mode_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "policy.json"
+            path.write_text(json.dumps(policy("every-event")), encoding="utf-8")
+            with self.assertRaisesRegex(POLICY.PolicyError, "pull_request_mode"):
+                POLICY.load_policy(path)
+
+    def test_non_string_pull_request_mode_is_rejected_as_policy_error(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "policy.json"
+            value = policy()
+            value["pull_request_mode"] = ["universal"]
+            path.write_text(json.dumps(value), encoding="utf-8")
+            with self.assertRaisesRegex(POLICY.PolicyError, "pull_request_mode"):
+                POLICY.load_policy(path)
+
+    def test_evaluator_rejects_non_string_pull_request_mode_as_policy_error(self) -> None:
+        malformed = policy()
+        malformed["pull_request_mode"] = ["universal"]
+
+        with self.assertRaisesRegex(POLICY.PolicyError, "pull_request_mode"):
+            POLICY.evaluate_workflow(malformed, WORKFLOW)
+
+    def test_legacy_policy_defaults_to_draft_first(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "policy.json"
+            path.write_text(json.dumps(policy(None)), encoding="utf-8")
+            loaded = POLICY.load_policy(path)
+        self.assertEqual(loaded["pull_request_mode"], "draft-first")
+
     def test_tagged_action_is_rejected(self) -> None:
         hollow = WORKFLOW.replace(
             "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
@@ -80,6 +141,164 @@ class WorkflowPolicyTests(unittest.TestCase):
         )
         with self.assertRaisesRegex(POLICY.PolicyError, "immutable SHAs"):
             POLICY.evaluate_workflow(policy(), hollow)
+
+
+class PublicationCommandTests(unittest.TestCase):
+    def render_publication(
+        self,
+        pull_request_mode: str,
+        *,
+        intent: str = "repair",
+        pull_request_is_open: bool = True,
+        pull_request_head_ref: str = "agent/example",
+        target_branch: str = "agent/example",
+    ) -> subprocess.CompletedProcess[str]:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "repo"
+            root.mkdir()
+            subprocess.run(["git", "init", "-q", root], check=True)
+            subprocess.run(
+                [
+                    "git",
+                    "-C",
+                    root,
+                    "remote",
+                    "add",
+                    "github",
+                    "git@github.com:ed3c/example.git",
+                ],
+                check=True,
+            )
+            workflow = WORKFLOW if pull_request_mode == "draft-first" else UNIVERSAL_WORKFLOW
+            workflow_path = root / ".github" / "workflows" / "verify.yml"
+            workflow_path.parent.mkdir(parents=True)
+            workflow_path.write_text(workflow, encoding="utf-8")
+            policy_path = root / ".github-delivery" / "ci-policy.json"
+            policy_path.parent.mkdir()
+            policy_path.write_text(
+                json.dumps(policy(pull_request_mode)), encoding="utf-8"
+            )
+            (root / "README.md").write_text("fixture\n", encoding="utf-8")
+            subprocess.run(["git", "-C", root, "add", "."], check=True)
+            subprocess.run(
+                [
+                    "git",
+                    "-C",
+                    root,
+                    "-c",
+                    "user.name=Test",
+                    "-c",
+                    "user.email=test@example.invalid",
+                    "commit",
+                    "-qm",
+                    "fixture",
+                ],
+                check=True,
+            )
+            head = subprocess.run(
+                ["git", "-C", root, "rev-parse", "HEAD"],
+                check=True,
+                capture_output=True,
+                text=True,
+            ).stdout.strip()
+            verification = {
+                "head_sha": head,
+                "status": "passed",
+                "completed_at": "2026-08-12T06:01:00Z",
+            }
+            receipt = {
+                "schema": "github-local-verification/v1",
+                "repository": "ed3c/example",
+                **verification,
+                "argv": ["/usr/bin/true"],
+            }
+            receipt_path = root / ".git" / "github-delivery" / "local-verification.json"
+            receipt_path.parent.mkdir()
+            receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
+            snapshot = {
+                "schema": "github-ci-publish-snapshot/v1",
+                "repository": "ed3c/example",
+                "repository_owner": "ed3c",
+                "private": True,
+                "intent": intent,
+                "local_head": head,
+                "local_verification": verification,
+                "pull_request": {
+                    "number": 7,
+                    "is_draft": intent == "ready-for-review",
+                    "is_open": pull_request_is_open,
+                    "head_ref": pull_request_head_ref,
+                    "remote_head": "a" * 40,
+                },
+                "actionable_feedback": (
+                    {
+                        "actionable": True,
+                        "head_sha": "a" * 40,
+                        "observed_at": "2026-08-12T06:00:00Z",
+                    }
+                    if intent == "repair"
+                    else None
+                ),
+                "billing_blocker": None,
+                "recovery": None,
+            }
+            snapshot_path = Path(directory) / "snapshot.json"
+            snapshot_path.write_text(json.dumps(snapshot), encoding="utf-8")
+            return subprocess.run(
+                [
+                    sys.executable,
+                    str(PUBLISH_SCRIPT),
+                    "publish",
+                    "--repo-root",
+                    str(root),
+                    "--snapshot",
+                    str(snapshot_path),
+                    "--remote",
+                    "github",
+                    "--branch",
+                    target_branch,
+                ],
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+
+    def test_draft_first_repair_dispatches_verifier(self) -> None:
+        completed = self.render_publication("draft-first")
+
+        self.assertEqual(completed.returncode, 0, completed.stderr)
+        self.assertIn("gh workflow run", completed.stdout)
+
+    def test_universal_repair_relies_on_synchronize_without_duplicate_dispatch(self) -> None:
+        completed = self.render_publication("universal")
+
+        self.assertEqual(completed.returncode, 0, completed.stderr)
+        self.assertIn("git push github", completed.stdout)
+        self.assertNotIn("gh workflow run", completed.stdout)
+
+    def test_universal_repair_requires_an_open_pull_request(self) -> None:
+        completed = self.render_publication("universal", pull_request_is_open=False)
+
+        self.assertNotEqual(completed.returncode, 0)
+        self.assertIn("open pull request", completed.stderr)
+
+    def test_universal_repair_requires_the_exact_pull_request_head_ref(self) -> None:
+        completed = self.render_publication(
+            "universal",
+            pull_request_head_ref="agent/expected",
+            target_branch="agent/wrong",
+        )
+
+        self.assertNotEqual(completed.returncode, 0)
+        self.assertIn("head ref", completed.stderr)
+
+    def test_universal_ready_publication_does_not_dispatch_a_second_run(self) -> None:
+        completed = self.render_publication("universal", intent="ready-for-review")
+
+        self.assertEqual(completed.returncode, 0, completed.stderr)
+        self.assertIn("git push github", completed.stdout)
+        self.assertIn("gh pr ready", completed.stdout)
+        self.assertNotIn("gh workflow run", completed.stdout)
 
 
 class PublicationGuardTests(unittest.TestCase):
