@@ -83,11 +83,25 @@ class CrossHarnessContractTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             tmp = Path(tmp)
             run = tmp / "run.json"
-            receipt = tmp / "receipt.txt"
+            receipt = tmp / "receipt.json"
             artifact = tmp / "artifact.txt"
             bundle = tmp / "bundle.json"
-            run.write_text(json.dumps({"run_id": "run-12345678", "case_id": "case-001", "skill_sha": "abcdef0"}), encoding="utf-8")
-            receipt.write_text("PASS\n", encoding="utf-8")
+            run_value = {"run_id": "run-12345678", "case_id": "case-001", "skill_sha": "abcdef0"}
+            run.write_text(json.dumps(run_value), encoding="utf-8")
+            receipt.write_text(json.dumps({
+                "schema_version": "skill-eval-verifier-receipt/v1",
+                "run_id": run_value["run_id"],
+                "case_id": run_value["case_id"],
+                "authority": "deterministic",
+                "verifier": {
+                    "kind": "script",
+                    "implementation_sha256": hashlib.sha256(b"verify.py").hexdigest(),
+                },
+                "passed": True,
+                "input_digest": hashlib.sha256(b"fixture-input").hexdigest(),
+                "replay_command": "python3 verify.py",
+                "notes": None,
+            }), encoding="utf-8")
             artifact.write_text("immutable result\n", encoding="utf-8")
             proc = subprocess.run([
                 "python3", str(BUNDLER), "--run-trace", str(run), "--verifier-receipt", str(receipt),
@@ -99,6 +113,8 @@ class CrossHarnessContractTests(unittest.TestCase):
             expected = hashlib.sha256(artifact.read_bytes()).hexdigest()
             self.assertEqual(value["artifact_hashes"][str(artifact)], expected)
             self.assertTrue(value["replay"]["offline_capable"])
+            self.assertTrue(value["promotion_eligible"])
+            self.assertEqual(value["verifier_receipt_sha256"], hashlib.sha256(receipt.read_bytes()).hexdigest())
 
 
 if __name__ == "__main__":
