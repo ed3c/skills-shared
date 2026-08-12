@@ -12,6 +12,8 @@ on:
       - 'scripts/summarize_cross_harness_gap.py'
       - 'scripts/export_skill_eval_runtime.py'
       - 'scripts/collect_skill_up_executor_evidence.py'
+      - 'scripts/verify_collected_runtime.py'
+      - 'scripts/build_verified_run.py'
       - 'tests/test_skill_eval_gate.py'
       - 'tests/test_autoresearch_eval_v1.py'
       - 'tests/test_cross_harness_contract.py'
@@ -21,30 +23,18 @@ on:
       - 'tests/test_runtime_export.py'
       - 'tests/test_skill_up_executor_evidence.py'
       - 'tests/test_verifier_authority.py'
+      - 'tests/test_verify_collected_runtime.py'
+      - 'tests/test_build_verified_run.py'
       - '.github/workflows/skill-eval-contract.yml'
       - '.github/workflows/skill-eval-physical-skill-up.yml'
   push:
-    branches:
-      - main
+    branches: [main]
     paths:
       - 'evals/**'
       - 'mutations/**'
-      - 'scripts/check_skill_evals.py'
-      - 'scripts/check_mutation_lineage.py'
-      - 'scripts/check_capability_unlocks.py'
-      - 'scripts/summarize_skill_eval_matrix.py'
-      - 'scripts/summarize_cross_harness_gap.py'
-      - 'scripts/export_skill_eval_runtime.py'
-      - 'scripts/collect_skill_up_executor_evidence.py'
-      - 'tests/test_skill_eval_gate.py'
-      - 'tests/test_autoresearch_eval_v1.py'
-      - 'tests/test_cross_harness_contract.py'
-      - 'tests/test_cross_harness_gap.py'
-      - 'tests/test_mutation_lineage.py'
-      - 'tests/test_capability_unlocks.py'
-      - 'tests/test_runtime_export.py'
-      - 'tests/test_skill_up_executor_evidence.py'
-      - 'tests/test_verifier_authority.py'
+      - 'scripts/**'
+      - 'tests/**'
+      - '.github/workflows/skill-eval-contract.yml'
 
 permissions:
   contents: read
@@ -63,30 +53,28 @@ jobs:
         run: python3 scripts/check_mutation_lineage.py
       - name: Validate capability unlock registry
         run: python3 scripts/check_capability_unlocks.py
-      - name: Run mutation-style gate tests
-        run: python3 -m unittest tests/test_skill_eval_gate.py -v
-      - name: Run autoresearch outcome eval tests
-        run: python3 -m unittest tests/test_autoresearch_eval_v1.py -v
-      - name: Run cross-harness contract tests
-        run: python3 -m unittest tests/test_cross_harness_contract.py -v
-      - name: Run cross-harness gap tests
-        run: python3 -m unittest tests/test_cross_harness_gap.py -v
-      - name: Run mutation lineage tests
-        run: python3 -m unittest tests/test_mutation_lineage.py -v
-      - name: Run capability unlock threshold and evidence-resolution tests
-        run: python3 -m unittest tests/test_capability_unlocks.py -v
-      - name: Run runtime export tests
-        run: python3 -m unittest tests/test_runtime_export.py -v
-      - name: Run skill-up executor evidence boundary tests
-        run: python3 -m unittest tests/test_skill_up_executor_evidence.py -v
-      - name: Run verifier authority tests
-        run: python3 -m unittest tests/test_verifier_authority.py -v
+      - name: Run eval contract suites
+        run: |
+          python3 -m unittest tests/test_skill_eval_gate.py -v
+          python3 -m unittest tests/test_autoresearch_eval_v1.py -v
+          python3 -m unittest tests/test_cross_harness_contract.py -v
+          python3 -m unittest tests/test_cross_harness_gap.py -v
+          python3 -m unittest tests/test_mutation_lineage.py -v
+          python3 -m unittest tests/test_capability_unlocks.py -v
+          python3 -m unittest tests/test_runtime_export.py -v
+          python3 -m unittest tests/test_skill_up_executor_evidence.py -v
+          python3 -m unittest tests/test_verifier_authority.py -v
+          python3 -m unittest tests/test_verify_collected_runtime.py -v
+          python3 -m unittest tests/test_build_verified_run.py -v
+      - name: Compile runtime and adapter scripts
+        run: python3 -m compileall -q scripts evals/adapters evals/verifiers tests
       - name: Validate authority and executor JSON contracts
         run: |
           python3 -m json.tool evals/runtime/executors/arena.json >/dev/null
           python3 -m json.tool evals/runtime/executors/skill-up.json >/dev/null
           python3 -m json.tool evals/schema/verifier-receipt.schema.json >/dev/null
           python3 -m json.tool evals/schema/evidence-bundle.schema.json >/dev/null
+          python3 -m json.tool evals/schema/run-trace.schema.json >/dev/null
       - name: Exercise gold replay verifier safe-block path
         run: |
           tmp="$(mktemp -d)"
