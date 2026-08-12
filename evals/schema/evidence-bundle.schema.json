@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ed3c/skills-shared/evals/schema/evidence-bundle.schema.json",
+  "title": "skill-eval-evidence-bundle/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "run_id", "case_id", "skill_sha", "eval_suite_sha", "run_trace", "verifier_receipt", "artifact_hashes"],
+  "properties": {
+    "schema_version": {"const": "skill-eval-evidence/v1"},
+    "run_id": {"type": "string", "minLength": 8},
+    "case_id": {"type": "string", "minLength": 3},
+    "skill_sha": {"type": ["string", "null"], "pattern": "^[0-9a-f]{7,64}$"},
+    "eval_suite_sha": {"type": "string", "pattern": "^[0-9a-f]{7,64}$"},
+    "run_trace": {"type": "string", "minLength": 1},
+    "verifier_receipt": {"type": "string", "minLength": 1},
+    "artifact_hashes": {
+      "type": "object",
+      "additionalProperties": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+    },
+    "executor_raw_result": {"type": ["string", "null"]},
+    "replay": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "offline_capable": {"type": "boolean"},
+        "command": {"type": ["string", "null"]},
+        "notes": {"type": ["string", "null"]}
+      }
+    }
+  }
+}
