@@ -4,7 +4,9 @@ description: |
   把大小迴圈的本地產物綁到 GitHub PRD issue、slice issues、PR 與 Project，並以零網路
   delivery receipt 閘阻止「產物缺席卻顯示成功」；merge 由四層授權堆疊守門，開工前以
   merge_gate.py preflight 用每個 host 自己的閘真跑一次，把「哪一層會拒絕」從執行期提前到
-  開工前。適用於交付追蹤、迭代速度量測、worktree 切線、小迴圈 handoff、以及
+  開工前；private repo 的 CI publication 另以本地驗證收據、三種 publication intent 與帳務
+  circuit breaker 守門，避免每個微小 commit 都燒一個 Actions job-minute。適用於交付追蹤、
+  迭代速度量測、worktree 切線、小迴圈 handoff、GitHub Actions 使用/浪費、以及
   「merge 權限被擋／換個 host 又被擋」的診斷與根治。
   觸發詞：看板進度、delivery 收據、issue 驅動實作、worktree 切線、merge 被擋、
   merge 權限、preflight、merge-admit、github-delivery-loop。
@@ -44,8 +46,26 @@ canonical 住 `~/.claude/skills/github-delivery-loop/`；各 repo 的 `.claude/s
 4. 需要 GitHub 活狀態與速度快照時執行 `sync --github`，明確提供 line、metrics、dashboard、
    40 字元 export source commit，以及 `public_export.py verify` 回報的 `tree_sha`；測試與重播
    改用 `--snapshot <json>`，不得在測試中打網路。
-5. 每張 issue 在隔離 worktree 走 TDD → review → PR，PR body 使用 `Closes #N`。
+5. 每張 issue 在隔離 worktree 走 TDD → review；**本地 commit 可以高頻，remote push 不可以**。
+   private repo 每次 push 前必跑下節的 CI publication gate；PR body 使用 `Closes #N`。
 6. Merge 走下節的 authority → preflight → land；漂移或新發現另開 issue，不塞進正在進行的 slice。
+
+## Private-repo CI publication gate
+
+完整 snapshot schema、三種合法 publication intent、帳務熔斷與 workflow 觸發建議見
+[modules/ci-publication.md](modules/ci-publication.md)。零網路判定入口：
+
+```bash
+python3 ~/.claude/skills/github-delivery-loop/scripts/ci_publish_gate.py evaluate \
+  --snapshot /tmp/github-ci-publish.json
+```
+
+只有輸出 `ALLOW initial-pr|ready-for-review|repair` 才能 push。`checkpoint`、驗證不是 exact HEAD、
+remote 已是同一 SHA、同一 feedback 已發佈，或 account billing no-runner circuit 未被 owner 的較新
+recovery receipt 關閉，都必須停止；禁止以 rerun、no-op commit 或改 intent 拼字繞過。
+
+這個 gate 不執行 push，也不把本地 receipt 冒充 GitHub check。它只回答「現在是否值得消耗一次
+遠端 CI publication」；真正 merge 仍須 latest SHA 的可信 GitHub check 與下節四層閘。
 
 ## 新專案套用（一句，冪等）
 
@@ -136,6 +156,8 @@ delivery-loop **各藏著一支從沒被自己 SKILL.md 提過的 sync 類腳本
   `export-tree-drift` blocker，file count 與 orphan history 相符不足以證明推上去的就是驗過的樹。
 - 本地 `check` 與 `preflight --snapshot` 零網路；GitHub 活狀態由 `sync --github` 與
   `preflight`（無 `--snapshot`）負責，兩種證據不得混稱。
+- `ci_publish_gate.py evaluate` 同樣零網路；snapshot 的 GitHub/owner recovery 活證據必須由外部
+  sync 或人工附上可查 URL，shape 通過不等於帳務已恢復。
 - repository identity 釘 immutable GitHub node ID；owner/name 只作可轉移別名，redirect 不得冒充身份證據。
 - human-admit 的 `merge-admit` 只有 **repo owner 施加、且晚於 head commit** 才算數；owner-auto 則每次
   重驗 immutable viewer／personal owner。兩種模式都 pin HEAD，漂移即失敗。
