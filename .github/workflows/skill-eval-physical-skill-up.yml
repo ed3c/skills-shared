@@ -25,27 +25,45 @@ on:
       current_sha:
         description: exact 40-char skills-shared commit used as current-skill baseline
         required: true
+      evidence_tier:
+        description: smoke = 1 repetition and non-promotable; promotion = reviewed 3-repetition matrix
+        required: true
+        type: choice
+        options:
+          - smoke
+          - promotion
+        default: smoke
+      promotion_confirmation:
+        description: promotion only - select RUN_PROMOTION_6_JOBS after reviewing model/provider budget
+        required: true
+        type: choice
+        options:
+          - NOT_AUTHORIZED
+          - RUN_PROMOTION_6_JOBS
+        default: NOT_AUTHORIZED
 
 permissions:
   contents: read
 
 concurrency:
-  group: skill-eval-physical-skill-up-${{ github.run_id }}
-  cancel-in-progress: false
+  group: skill-eval-physical-${{ inputs.case_id }}-${{ inputs.current_sha }}-${{ inputs.evidence_tier }}
+  cancel-in-progress: true
 
 jobs:
   physical:
+    if: ${{ inputs.evidence_tier == 'smoke' || inputs.promotion_confirmation == 'RUN_PROMOTION_6_JOBS' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: ${{ inputs.evidence_tier == 'promotion' && 90 || 30 }}
     strategy:
       fail-fast: false
       matrix:
-        repetition: [1, 2, 3]
+        repetition: ${{ fromJSON(inputs.evidence_tier == 'promotion' && '[1,2,3]' || '[1]') }}
         variant: [current_skill, candidate_skill]
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           fetch-depth: 0
+          persist-credentials: false
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # pinned v5 commit
         with:
           python-version: '3.12'
@@ -55,10 +73,16 @@ jobs:
         env:
           CURRENT_SHA: ${{ inputs.current_sha }}
           VARIANT: ${{ matrix.variant }}
+          EVIDENCE_TIER: ${{ inputs.evidence_tier }}
+          PROMOTION_CONFIRMATION: ${{ inputs.promotion_confirmation }}
         run: |
           set -euo pipefail
           [[ "$CURRENT_SHA" =~ ^[0-9a-f]{40}$ ]] || { echo "current_sha must be exact lowercase 40-char SHA" >&2; exit 2; }
           git cat-file -e "$CURRENT_SHA^{commit}"
+          if [ "$EVIDENCE_TIER" = promotion ] && [ "$PROMOTION_CONFIRMATION" != RUN_PROMOTION_6_JOBS ]; then
+            echo "promotion tier requires exact RUN_PROMOTION_6_JOBS confirmation" >&2
+            exit 2
+          fi
           candidate_sha="$(git rev-parse HEAD)"
           root="$RUNNER_TEMP/runtime/${VARIANT}/skills/autoresearch-composer"
           mkdir -p "$root"
@@ -108,7 +132,7 @@ jobs:
           skill-target: .physical-runtime/${{ matrix.variant }}/skills/autoresearch-composer/.runtime-eval/eval.yaml
           parallelism: '1'
 
-      - name: Record immutable attempt identity
+      - name: Record immutable attempt identity and cost tier
         if: always()
         env:
           CASE_ID: ${{ inputs.case_id }}
@@ -118,22 +142,32 @@ jobs:
           EXIT_CODE: ${{ steps.skillup.outputs.exit-code }}
           SKILL_SHA: ${{ steps.materialize.outputs.skill_sha }}
           REPORT_DIR: ${{ steps.skillup.outputs.report-dir }}
+          EVIDENCE_TIER: ${{ inputs.evidence_tier }}
         run: |
           python3 - <<'PY'
           import json, os, pathlib
-          root = pathlib.Path('.physical-runtime') / os.environ['VARIANT'] / 'attempt'; root.mkdir(parents=True, exist_ok=True)
+          root = pathlib.Path('.physical-runtime') / os.environ['VARIANT'] / 'attempt'
+          root.mkdir(parents=True, exist_ok=True)
           raw_exit = os.environ.get('EXIT_CODE', '')
           value = {
             'schema_version':'skill-eval-physical-attempt/v1','case_id':os.environ['CASE_ID'],'condition':os.environ['VARIANT'],
             'sampling':{'kind':'repetition','index':int(os.environ['REPETITION']),'seed':None},
-            'skill_sha':os.environ['SKILL_SHA'],'eval_suite_sha':os.environ['GITHUB_SHA'],
+            'skill_sha':os.environ.get('SKILL_SHA',''),'eval_suite_sha':os.environ['GITHUB_SHA'],
             'harness':'skill-up','harness_sha':'425e3f5a0c23e80f2c7933785d54c53ffe01b40c',
             'engine':'${{ inputs.engine }}','provider':'${{ inputs.provider }}','model':'${{ inputs.model }}',
-            'fresh_workspace':True,'max_retries':0,'action_outcome':os.environ['OUTCOME'],
+            'fresh_workspace':True,'max_retries':0,'action_outcome':os.environ.get('OUTCOME',''),
             'executor_exit_code': int(raw_exit) if raw_exit.lstrip('-').isdigit() else None,
             'report_dir':os.environ.get('REPORT_DIR',''),'seed_controlled':False,'promotion_authority':False,
           }
           (root/'attempt.json').write_text(json.dumps(value,indent=2,sort_keys=True)+'\n')
+          tier = {
+            'schema_version':'skill-eval-cost-tier/v1',
+            'tier':os.environ['EVIDENCE_TIER'],
+            'repetition':int(os.environ['REPETITION']),
+            'promotion_eligible':os.environ['EVIDENCE_TIER'] == 'promotion',
+            'expected_repetitions':3 if os.environ['EVIDENCE_TIER'] == 'promotion' else 1,
+          }
+          (root/'cost-tier.json').write_text(json.dumps(tier,indent=2,sort_keys=True)+'\n')
           PY
 
       - name: Normalize report even when benchmark baseline fails
@@ -185,19 +219,46 @@ jobs:
             --output "$attempt/evidence-bundle.json"
           exit "$verify_rc"
 
+      - name: Remove promotion bundle from smoke runs
+        if: always() && inputs.evidence_tier == 'smoke'
+        env:
+          VARIANT: ${{ matrix.variant }}
+        run: |
+          set -euo pipefail
+          attempt=".physical-runtime/${VARIANT}/attempt"
+          rm -f "$attempt/evidence-bundle.json"
+          python3 - "$attempt/cost-tier.json" <<'PY'
+          import json, pathlib, sys
+          path = pathlib.Path(sys.argv[1])
+          value = json.loads(path.read_text())
+          assert value['tier'] == 'smoke'
+          assert value['promotion_eligible'] is False
+          assert value['expected_repetitions'] == 1
+          PY
+
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:
-          name: skill-up-${{ matrix.variant }}-repetition-${{ matrix.repetition }}-${{ github.run_attempt }}
+          name: skill-up-${{ inputs.evidence_tier }}-${{ matrix.variant }}-repetition-${{ matrix.repetition }}-${{ github.run_attempt }}
           path: .physical-runtime/${{ matrix.variant }}
           if-no-files-found: error
-          retention-days: 14
+          retention-days: ${{ inputs.evidence_tier == 'promotion' && 14 || 3 }}
 
       - name: Enforce deterministic admission after evidence upload
         if: always()
         env:
           NORMALIZE_OUTCOME: ${{ steps.normalize.outcome || 'skipped' }}
           VERIFY_OUTCOME: ${{ steps.deterministic.outcome || 'skipped' }}
+          EVIDENCE_TIER: ${{ inputs.evidence_tier }}
+          VARIANT: ${{ matrix.variant }}
         run: |
+          set -euo pipefail
           test "$NORMALIZE_OUTCOME" = success
           test "$VERIFY_OUTCOME" = success
+          attempt=".physical-runtime/${VARIANT}/attempt"
+          if [ "$EVIDENCE_TIER" = promotion ]; then
+            test -f "$attempt/evidence-bundle.json"
+          else
+            test ! -e "$attempt/evidence-bundle.json"
+            python3 -c 'import json,sys; x=json.load(open(sys.argv[1])); assert x["promotion_eligible"] is False and x["expected_repetitions"] == 1' "$attempt/cost-tier.json"
+          fi
