@@ -1,0 +1,14 @@
+{
+  "commands": [
+    {
+      "argv": ["python3", "-m", "py_compile", "fixture.py"],
+      "cwd": ".",
+      "id": "syntax",
+      "max_output_bytes": 4096,
+      "timeout_seconds": 10
+    }
+  ],
+  "inherit_env": ["PATH"],
+  "repository_id": 1326262274,
+  "schema": "github-delivery-local-verification-contract/v1"
+}

@@ -19,8 +19,8 @@ description: |
 
 完整 schema、狀態流與速度定義見 [modules/delivery-mechanism.md](modules/delivery-mechanism.md)。
 各 host 的權限真相、確切修法與官方出處見 [modules/host-permissions.md](modules/host-permissions.md)。
-私有庫 GitHub Actions 的 publication boundary、billing circuit 與 workflow pattern 見
-[modules/github-actions-cost-control.md](modules/github-actions-cost-control.md)。
+私有庫 GitHub Actions 的 publication boundary、billing circuit、evidence producers 與 workflow
+pattern 見 [modules/github-actions-cost-control.md](modules/github-actions-cost-control.md)。
 
 ## 可攜性（canonical 單一家）
 
@@ -45,10 +45,12 @@ canonical 住 `~/.claude/skills/github-delivery-loop/`；各 repo 的 `.claude/s
    40 字元 export source commit，以及 `public_export.py verify` 回報的 `tree_sha`；測試與重播
    改用 `--snapshot <json>`，不得在測試中打網路。
 5. 每張 issue 在隔離 worktree 走 TDD → review；本地 commit/rebase 不等於 GitHub CI publication。
-6. push 前用 `ci_publish_gate.py evaluate` 驗 exact HEAD、local receipt、PR/feedback snapshot 與 billing
+6. 先由 consumer-owned fixed-command contract 產生 exact-HEAD local verification receipt；再由 trusted
+   sync lane 產生 GitHub PR/check/billing snapshot。
+7. push 前用 `ci_publish_gate.py evaluate` 驗 exact HEAD、local receipt、PR/feedback snapshot 與 billing
    circuit。只允許 `initial-pr`、`ready-for-review`、`batched-repair` 三種 publication；初次 PR 一律
    draft，禁止把每個 local checkpoint 推成一個 private Actions run。
-7. PR body 使用 `Closes #N`；Merge 走下節的 admit → preflight → land。漂移或新發現另開 issue，
+8. PR body 使用 `Closes #N`；Merge 走下節的 admit → preflight → land。漂移或新發現另開 issue，
    不塞進正在進行的 slice。
 
 ## Private GitHub Actions publication gate
@@ -68,12 +70,47 @@ python3 ~/.claude/skills/github-delivery-loop/scripts/ci_publish_gate.py evaluat
 
 GitHub 回報 payment/spending-limit 導致 runner 未啟動時，狀態是 `billing-open`。它不是 test FAIL；
 也不能靠再次 push 探測。只有 repo owner 撰寫、時間晚於 blocker 的 recovery receipt 才能允許下一次
-publication attempt。完整 schema、三種 intent 和 private workflow 範本見 cost-control 模組。
+publication attempt。
+
+## Publication evidence producers
+
+Publication gate 不接受 Agent 手寫的「PASS」JSON。兩份輸入各有獨立 producer：
+
+```bash
+# Consumer repository owns this fixed-command contract.
+python3 ~/.claude/skills/github-delivery-loop/scripts/local_verification.py verify \
+  --repo-root /absolute/path/to/repo \
+  --contract /path/to/local-verification.contract.json \
+  --repository-id <GITHUB_REPOSITORY_ID> \
+  --receipt /path/to/local-verification.receipt.json \
+  --evidence /path/to/local-verification.evidence.json
+
+# Zero-network replay for audit/tests.
+python3 ~/.claude/skills/github-delivery-loop/scripts/github_actions_snapshot.py replay \
+  --observation /path/to/github-observation.json \
+  --check-name <STABLE_CHECK_NAME> \
+  --output /path/to/github-state.snapshot.json
+
+# Trusted network lane only; uses fixed `gh api` calls and never mutates GitHub.
+python3 ~/.claude/skills/github-delivery-loop/scripts/github_actions_snapshot.py capture \
+  --repository OWNER/REPO \
+  --branch <HEAD_BRANCH> \
+  --check-name <STABLE_CHECK_NAME> \
+  --observation-output /path/to/github-observation.json \
+  --output /path/to/github-state.snapshot.json
+```
+
+`local_verification.py` requires a clean exact Git commit, argv arrays（不經 shell）、safe inherited environment
+allowlist、timeout 與 output budget。`github_actions_snapshot.py` requires one private repository、zero or one
+open PR、exact PR head 與 exact stable check name。多 PR、stale check、public repo、unknown state 都 fail
+closed。Known payment/spending annotation 產生 `billing-open` 且 `latest_check=null`，不得冒充 repository test
+FAIL 或 PASS。
 
 ## 新專案套用（一句，冪等）
 
 全域的部分（skill 本體、兩個 host 的 PreToolUse 黑名單、Codex sandbox profile）一次設好就
-對所有專案生效；真正 per-repo 的只有 `merge-admit` label 與 execpolicy 窄規則。在新 repo 裡跑：
+對所有專案生效；真正 per-repo 的只有 `merge-admit` label、execpolicy 窄規則、local verification
+contract 與 stable check identity。在新 repo 裡跑：
 
 ```bash
 python3 ~/.claude/skills/github-delivery-loop/scripts/merge_gate.py bootstrap
@@ -129,10 +166,12 @@ preflight 三個都驗——少驗一個平面就會把「還會被擋」報成�
 - receipt/publication attestation 缺席、身份漂移、假 URL 或短 SHA 都失敗。
 - publication attestation 必須把 `export_tree_sha` 釘回遠端 head 的 tree；不相等就是
   `export-tree-drift` blocker，file count 與 orphan history 相符不足以證明推上去的就是驗過的樹。
-- 本地 `check`、`preflight --snapshot` 與 `ci_publish_gate.py evaluate` 零網路；GitHub 活狀態由
-  `sync --github` 與 `preflight`（無 `--snapshot`）負責，兩種證據不得混稱。
-- repository identity 釘 immutable GitHub node ID；owner/name 只作可轉移別名，redirect 不得冒充身份證據。
-- local verification receipt 必須釘 exact local HEAD；舊 SHA 的 success 不能授權新 SHA publication。
+- 本地 `check`、`preflight --snapshot`、evidence producer replay 與 `ci_publish_gate.py evaluate`
+  零網路；GitHub 活狀態只由 trusted capture/sync lane 負責，兩種證據不得混稱。
+- repository identity 釘 immutable GitHub numeric ID；owner/name 只作可轉移別名，redirect 不得冒充身份證據。
+- local verification receipt 必須釘 exact clean local HEAD；舊 SHA 的 success 不能授權新 SHA publication。
+- local command contract 不接受 shell strings、任意 inherited env、absolute host paths 或 unbounded commands。
+- GitHub snapshot 的多 PR、stale check、unknown state 與 malformed annotation 都 fail closed。
 - draft checkpoint push、同一 feedback 的第二次 repair push、billing-open 時的 rerun/no-op commit 都失敗。
 - `merge-admit` 只有 **repo owner 施加、且晚於 head commit** 才算數；貼完標籤又推新 commit
   自動失效（`admit-stale`）。merge 一律帶 `--match-head-commit`，HEAD 漂移即失敗。
