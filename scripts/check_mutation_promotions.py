@@ -6,7 +6,10 @@ import json
 import sys
 from pathlib import Path
 
-from scripts.check_mutation_lineage import validate
+try:  # `python -m unittest` / package import
+    from scripts.check_mutation_lineage import validate
+except ModuleNotFoundError:  # `python3 scripts/check_mutation_promotions.py`
+    from check_mutation_lineage import validate
 
 ROOT = Path(__file__).resolve().parents[1]
 REGISTRY = ROOT / "mutations" / "promotions.json"
