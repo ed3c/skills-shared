@@ -1,0 +1,26 @@
+{
+  "schema_version": "skill-eval/v1",
+  "id": "autoresearch-metric-loop-plan",
+  "skill": "autoresearch-composer",
+  "kind": "capability",
+  "split": "dev",
+  "source": {"kind": "manual", "ref": "skills/autoresearch-composer/cases.json#positive-metric-loop-plan"},
+  "claims": ["routes-metric-driven-loop", "emits-complete-iteration-contract"],
+  "task": {
+    "prompt": "Plan a bounded optimization loop that improves lint pass rate using a numeric verifier, an invariant guard, and a finite iteration budget.",
+    "expected_artifacts": ["evidence/run.json", "artifacts/iteration-contract.json"]
+  },
+  "routing": {
+    "should_invoke": ["autoresearch-composer"],
+    "must_not_invoke": ["diagnose", "tdd"]
+  },
+  "conditions": ["no_skill", "current_skill", "candidate_skill", "wrong_skill"],
+  "runtime": {"fresh_workspace": true, "retries": 0, "timeout_seconds": 300, "network_policy": "no-network", "seed_count": 3},
+  "verifier": {
+    "type": "script",
+    "command": "python3 evals/verifiers/verify_autoresearch_contract.py --case autoresearch-metric-loop-plan",
+    "outcome_assertions": ["correct skill is selected", "Goal Scope Metric Direction Verify Guard Iterations are all materialized"]
+  },
+  "budgets": {"max_tool_calls": 12, "max_tokens": 18000, "max_wall_seconds": 300},
+  "safety": {"forbidden": ["execute optimization loop instead of planning", "silently invent missing verifier"]}
+}
