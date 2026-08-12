@@ -11,7 +11,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 RELEASES = ROOT / "evals" / "releases.json"
 UNLOCKS = ROOT / "evals" / "capability-unlocks.json"
-HEX_SHA = re.compile(r"^[0-9a-f]{7,64}$")
 EXACT_SHA = re.compile(r"^[0-9a-f]{40}$")
 NAME = re.compile(r"^[a-z0-9][a-z0-9-]*$")
 
@@ -145,10 +144,10 @@ def validate_release(release: dict, unlocks: dict[str, dict], root: Path) -> Non
         raise ValueError("release skill must be a lowercase skill slug")
     if not isinstance(release.get("skill_sha"), str) or not EXACT_SHA.fullmatch(release["skill_sha"]):
         raise ValueError("release skill_sha must be an exact 40-char lowercase commit SHA")
-    if not isinstance(release.get("eval_suite_sha"), str) or not HEX_SHA.fullmatch(release["eval_suite_sha"]):
-        raise ValueError("release eval_suite_sha must be immutable lowercase hex")
-    if not isinstance(release.get("rollback_sha"), str) or not HEX_SHA.fullmatch(release["rollback_sha"]):
-        raise ValueError("release rollback_sha must be immutable lowercase hex")
+    if not isinstance(release.get("eval_suite_sha"), str) or not EXACT_SHA.fullmatch(release["eval_suite_sha"]):
+        raise ValueError("release eval_suite_sha must be an exact 40-char lowercase commit SHA")
+    if not isinstance(release.get("rollback_sha"), str) or not EXACT_SHA.fullmatch(release["rollback_sha"]):
+        raise ValueError("release rollback_sha must be an exact 40-char lowercase commit SHA")
     if release.get("rollback_sha") == release.get("skill_sha"):
         raise ValueError("rollback_sha must differ from promoted skill_sha")
 
