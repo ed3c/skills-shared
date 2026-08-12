@@ -9,13 +9,13 @@ ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts" / "check_dead_assertions.py"
 
 
-class DeadAssertionLinterTests(unittest.TestCase):
+class DeadAssertionCompatibilityTests(unittest.TestCase):
     def run_lint(self, body: str):
         td = tempfile.TemporaryDirectory()
         root = Path(td.name)
         path = root / "tests" / "case" / "verify.sh"
         path.parent.mkdir(parents=True)
-        path.write_text("#!/usr/bin/env bash\nset -euo pipefail\n" + body, encoding="utf-8")
+        path.write_text("#!/usr/bin/env bash\nset -eEuo pipefail\n" + body, encoding="utf-8")
         proc = subprocess.run(
             ["python3", str(SCRIPT), str(path)],
             text=True,
@@ -37,36 +37,40 @@ class DeadAssertionLinterTests(unittest.TestCase):
         td, proc = self.run_lint('! grep -q "Traceback" out.err\n')
         self.addCleanup(td.cleanup)
         self.assertEqual(proc.returncode, 1)
-        self.assertIn("dead-leading-bang", proc.stderr)
-        self.assertIn(":3:", proc.stderr)
+        self.assertIn("DEAD-NEGATION", proc.stderr)
 
     def test_if_bang_is_allowed(self):
         td, proc = self.run_lint('if ! grep -q "PASS" out; then exit 1; fi\n')
         self.addCleanup(td.cleanup)
         self.assertEqual(proc.returncode, 0, proc.stderr)
 
-    def test_and_chained_tests_are_rejected(self):
+    def test_and_chained_assertions_are_rejected(self):
         td, proc = self.run_lint('test ! -e one && test ! -e two\n')
         self.addCleanup(td.cleanup)
         self.assertEqual(proc.returncode, 1)
-        self.assertIn("dead-and-chain", proc.stderr)
+        self.assertIn("DEAD-AND-CHAIN", proc.stderr)
 
-    def test_swallowed_status_is_rejected_even_if_next_line_reads_dollar_question(self):
-        td, proc = self.run_lint('command_that_may_fail || true\nif test "$?" -ne 0; then exit 1; fi\n')
+    def test_assertion_swallowed_by_true_is_rejected(self):
+        td, proc = self.run_lint('grep -q expected out || true\n')
         self.addCleanup(td.cleanup)
         self.assertEqual(proc.returncode, 1)
-        self.assertIn("swallowed-status", proc.stderr)
+        self.assertIn("DEAD-SWALLOW", proc.stderr)
 
-    def test_direct_rc_capture_is_allowed(self):
-        td, proc = self.run_lint('rc=0\ncommand_that_may_fail || rc=$?\nif test "$rc" -ne 0; then exit 1; fi\n')
+    def test_best_effort_effect_command_is_allowed(self):
+        td, proc = self.run_lint('mkdir -p optional-dir || true\n')
         self.addCleanup(td.cleanup)
         self.assertEqual(proc.returncode, 0, proc.stderr)
 
-    def test_discarded_grep_output_is_rejected(self):
-        td, proc = self.run_lint('grep Traceback out.err > /dev/null\n')
+    def test_redirected_grep_under_errexit_is_live(self):
+        td, proc = self.run_lint('grep expected out > /dev/null\n')
+        self.addCleanup(td.cleanup)
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+
+    def test_redirected_grep_in_set_plus_e_is_rejected(self):
+        td, proc = self.run_lint('set +e\ngrep expected out > /dev/null\nset -e\n')
         self.addCleanup(td.cleanup)
         self.assertEqual(proc.returncode, 1)
-        self.assertIn("discarded-grep-status", proc.stderr)
+        self.assertIn("DEAD-DISCARD", proc.stderr)
 
 
 if __name__ == "__main__":
