@@ -1,0 +1,34 @@
+{
+  "schema": "skills-shared-ci-publication-profile/v1",
+  "repository": {
+    "full_name": "ed3c/skills-shared",
+    "repository_id": 1326262274,
+    "private": true
+  },
+  "stable_check_name": "contract",
+  "verification_contract": ".github-delivery/ci-publication/local-verification.contract.json",
+  "runtime_root": ".github-delivery/ci-publication/runtime",
+  "entrypoints": {
+    "local_verification": "skills/github-delivery-loop/scripts/local_verification.py",
+    "github_snapshot": "skills/github-delivery-loop/scripts/github_actions_snapshot.py",
+    "publication_gate": "skills/github-delivery-loop/scripts/ci_publish_admitted.py"
+  },
+  "publication_intents": [
+    "initial-pr",
+    "ready-for-review",
+    "batched-repair"
+  ],
+  "billing_circuit": {
+    "open_state": "billing-open",
+    "decision": "BLOCK",
+    "probe_by_push": false,
+    "recovery_owner": "ed3c"
+  },
+  "evidence": {
+    "local_receipt_schema": "github-delivery-local-verification/v1",
+    "local_evidence_schema": "github-delivery-local-verification-evidence/v1",
+    "github_snapshot_schema": "github-actions-publish-snapshot/v1",
+    "sidecar_gate_binding": "IMPLEMENTED",
+    "hosted_exact_head": "NOT_EXERCISED"
+  }
+}
