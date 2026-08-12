@@ -57,7 +57,7 @@ def validate_case_refs(skill: str, ids: object, index: dict[str, dict], *, role:
             raise ValueError(f"{role} case {case_id} belongs to {case.get('skill')}, not {skill}")
         if case.get("split") == "holdout":
             raise ValueError(
-                f"mutation optimizer case must not reference sealed holdout: {case_id}; "
+                f"{role} must not reference sealed holdout: {case_id}; "
                 "holdout outcomes belong only to post-selection promotion/unlock evaluation"
             )
 
