@@ -25,7 +25,7 @@ def is_target(path: Path) -> bool:
     return path.name == "run-all.sh" and "tests" in parts
 
 
-def lint_line(path: Path, number: int, line: str, next_code: str | None) -> list[str]:
+def lint_line(path: Path, number: int, line: str) -> list[str]:
     stripped = line.strip()
     if not stripped or stripped.startswith("#"):
         return []
@@ -44,14 +44,10 @@ def lint_line(path: Path, number: int, line: str, next_code: str | None) -> list
             "split assertions onto separate lines or use an explicit `if`"
         )
     if OR_TRUE.search(line):
-        # `|| true` is allowed only when the next executable line explicitly
-        # inspects `$?`, PIPESTATUS, or a captured rc variable. This keeps the
-        # rule conservative and machine-checkable.
-        inspected = bool(next_code and re.search(r"(?:\$\?|PIPESTATUS|\brc\b|\bstatus\b|\bexit_code\b)", next_code))
-        if not inspected:
-            findings.append(
-                f"{path}:{number}: swallowed-status: `|| true` discards the command result without an adjacent status assertion"
-            )
+        findings.append(
+            f"{path}:{number}: swallowed-status: `|| true`/`|| :` replaces the command status; "
+            "capture it directly with `|| rc=$?` and assert rc explicitly"
+        )
     if GREP_DEVNULL.match(line):
         findings.append(
             f"{path}:{number}: discarded-grep-status: use `grep -q ...` inside an explicit assertion instead of redirecting unused output"
@@ -59,26 +55,14 @@ def lint_line(path: Path, number: int, line: str, next_code: str | None) -> list
     return findings
 
 
-def executable_lines(lines: list[str]) -> list[str | None]:
-    result: list[str | None] = [None] * len(lines)
-    next_seen: str | None = None
-    for index in range(len(lines) - 1, -1, -1):
-        result[index] = next_seen
-        candidate = lines[index].strip()
-        if candidate and not candidate.startswith("#"):
-            next_seen = candidate
-    return result
-
-
 def lint_file(path: Path) -> list[str]:
     try:
         lines = path.read_text(encoding="utf-8").splitlines()
     except (OSError, UnicodeDecodeError) as exc:
         return [f"{path}: unreadable: {exc}"]
-    next_lines = executable_lines(lines)
     findings: list[str] = []
     for index, line in enumerate(lines):
-        findings.extend(lint_line(path, index + 1, line, next_lines[index]))
+        findings.extend(lint_line(path, index + 1, line))
     return findings
 
 
