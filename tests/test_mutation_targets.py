@@ -100,9 +100,11 @@ class MutationTargetVisibilityTests(unittest.TestCase):
         self.assert_fails_with("mutation receipt non_target_case_ids references missing eval case")
 
     def test_duplicate_eval_case_ids_fail_closed(self) -> None:
-        self.write_case("target-case", "demo-skill", "gold-replay", holdout=True)
-        with self.assertRaisesRegex(ValueError, "duplicate eval case id"):
-            check(self.root)
+        self.write_case("target-case", "demo-skill", "holdout", holdout=True)
+        count, errors = check(self.root)
+        self.assertEqual(count, 0)
+        self.assertTrue(errors)
+        self.assertIn("duplicate eval case id", "\n".join(errors))
 
 
 if __name__ == "__main__":
