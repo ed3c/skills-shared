@@ -89,6 +89,19 @@ receipt = module.verify_live(
     timeline_reader=closure_timeline,
 )
 assert receipt["status"] == "verified"
+stable_post_identity = {
+    "status": "captured",
+    "schema_version": "forgejo-issue-state-observation@v1",
+    "request_sha256": receipt["request_sha256"],
+    "phase": "post",
+    "producer": receipt["producer"],
+    "forge_url": request["forge_url"],
+    "repository": receipt["repository"],
+    "issue_number": receipt["issue_number"],
+    "state": receipt["state"],
+    "idempotency_marker": receipt["idempotency_marker"],
+}
+assert receipt["post_observation_sha256"] == module._digest(stable_post_identity)
 json.dump(pre, open(sys.argv[3], "w", encoding="utf-8"))
 json.dump(receipt, open(sys.argv[4], "w", encoding="utf-8"))
 

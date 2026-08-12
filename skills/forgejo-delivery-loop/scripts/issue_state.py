@@ -419,6 +419,10 @@ def verify_live(
     post = _capture_live(
         request, "post", str(validated["desired_state"]), issue_reader
     )
+    stable_post_identity = {
+        field: field_value for field, field_value in post.items()
+        if field != "observed_at"
+    }
     source = _object(request["source_receipt"], "source_receipt")
     return {
         "status": "verified",
@@ -427,7 +431,7 @@ def verify_live(
         "request_sha256": validated["request_sha256"],
         "source_observation_sha256": source_observation["source_observation_sha256"],
         "pre_observation_sha256": _digest(pre),
-        "post_observation_sha256": _digest(post),
+        "post_observation_sha256": _digest(stable_post_identity),
         "closure_created_at": closure_created_at,
         "closure_actor": closure_actor,
         "repository": request["repository"],
