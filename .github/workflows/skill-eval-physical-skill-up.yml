@@ -95,7 +95,7 @@ jobs:
           mkdir -p ".physical-runtime/${VARIANT}"
           cp -R "$RUNNER_TEMP/runtime/${VARIANT}/." ".physical-runtime/${VARIANT}/"
 
-      - name: Execute pinned skill-up physical run
+      - name: Execute pinned skill-up benchmark
         id: skillup
         continue-on-error: true
         uses: alibaba/skill-up@425e3f5a0c23e80f2c7933785d54c53ffe01b40c
@@ -115,27 +115,30 @@ jobs:
           VARIANT: ${{ matrix.variant }}
           REPETITION: ${{ matrix.repetition }}
           OUTCOME: ${{ steps.skillup.outcome }}
+          EXIT_CODE: ${{ steps.skillup.outputs.exit-code }}
           SKILL_SHA: ${{ steps.materialize.outputs.skill_sha }}
           REPORT_DIR: ${{ steps.skillup.outputs.report-dir }}
         run: |
           python3 - <<'PY'
           import json, os, pathlib
           root = pathlib.Path('.physical-runtime') / os.environ['VARIANT'] / 'attempt'; root.mkdir(parents=True, exist_ok=True)
+          raw_exit = os.environ.get('EXIT_CODE', '')
           value = {
             'schema_version':'skill-eval-physical-attempt/v1','case_id':os.environ['CASE_ID'],'condition':os.environ['VARIANT'],
             'sampling':{'kind':'repetition','index':int(os.environ['REPETITION']),'seed':None},
             'skill_sha':os.environ['SKILL_SHA'],'eval_suite_sha':os.environ['GITHUB_SHA'],
             'harness':'skill-up','harness_sha':'425e3f5a0c23e80f2c7933785d54c53ffe01b40c',
             'engine':'${{ inputs.engine }}','provider':'${{ inputs.provider }}','model':'${{ inputs.model }}',
-            'fresh_workspace':True,'max_retries':0,'action_outcome':os.environ['OUTCOME'],'report_dir':os.environ.get('REPORT_DIR',''),
-            'seed_controlled':False,'promotion_authority':False,
+            'fresh_workspace':True,'max_retries':0,'action_outcome':os.environ['OUTCOME'],
+            'executor_exit_code': int(raw_exit) if raw_exit.lstrip('-').isdigit() else None,
+            'report_dir':os.environ.get('REPORT_DIR',''),'seed_controlled':False,'promotion_authority':False,
           }
           (root/'attempt.json').write_text(json.dumps(value,indent=2,sort_keys=True)+'\n')
           PY
 
-      - name: Normalize executor fact source and preserve no-skill denominator
+      - name: Normalize report even when benchmark baseline fails
         id: normalize
-        if: steps.skillup.outcome == 'success'
+        if: always()
         continue-on-error: true
         env:
           CASE_ID: ${{ inputs.case_id }}
@@ -146,6 +149,7 @@ jobs:
         run: |
           set -euo pipefail
           test -n "$REPORT_DIR"
+          test -f "$REPORT_DIR/report.json"
           attempt=".physical-runtime/${VARIANT}/attempt"
           python3 scripts/collect_skill_up_executor_evidence.py --report-dir "$REPORT_DIR" --case-id "$CASE_ID" --condition "$VARIANT" \
             --skill-sha "$SKILL_SHA" --eval-suite-sha "$GITHUB_SHA" --skill autoresearch-composer \
@@ -153,7 +157,7 @@ jobs:
             --output "$attempt/executor-evidence.json" --baseline-output "$attempt/no-skill-executor-evidence.json"
           cp "$REPORT_DIR/report.json" "$attempt/skill-up-report.json"
 
-      - name: Replay repository deterministic verifier over collected workspace
+      - name: Replay repository deterministic verifier over with-skill artifacts
         id: deterministic
         if: steps.normalize.outcome == 'success'
         continue-on-error: true
@@ -189,13 +193,11 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
-      - name: Enforce physical and deterministic outcomes after evidence upload
+      - name: Enforce deterministic admission after evidence upload
         if: always()
         env:
-          EXECUTOR_OUTCOME: ${{ steps.skillup.outcome }}
           NORMALIZE_OUTCOME: ${{ steps.normalize.outcome || 'skipped' }}
           VERIFY_OUTCOME: ${{ steps.deterministic.outcome || 'skipped' }}
         run: |
-          test "$EXECUTOR_OUTCOME" = success
           test "$NORMALIZE_OUTCOME" = success
           test "$VERIFY_OUTCOME" = success
