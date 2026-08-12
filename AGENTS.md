@@ -14,8 +14,10 @@ Before changing this repository, read in order:
 6. [`docs/AGENT_INTEGRATION_STATE.md`](docs/AGENT_INTEGRATION_STATE.md) — current Skill Eval/Evolution handoff.
 7. [`docs/SKILL_EVAL_ROADMAP.md`](docs/SKILL_EVAL_ROADMAP.md) — target phases; target is not current state.
 8. [`registry.json`](registry.json) and [`skills/README.md`](skills/README.md).
-9. The target Skill's nearest `README.md`, then `SKILL.md`, `references/`, `modules/`, `scripts/`, `tests/`, and `evals.json` as applicable.
+9. The target Skill's nearest `README.md`, then `SKILL.md`, `references/`, `modules/`, `scripts/`, `tests/`, and `evals.json`/`cases.json` as applicable.
 10. The exact issue, PR base/head, eval contract, and evidence subject.
+
+For GitHub delivery, read [`skills/github-delivery-loop/README.md`](skills/github-delivery-loop/README.md). For local Forgejo delivery, read [`skills/forgejo-delivery-loop/README.md`](skills/forgejo-delivery-loop/README.md). For Git Town/Stacked PR work, read [`skills/git-town-stacked-pr-worker/README.md`](skills/git-town-stacked-pr-worker/README.md).
 
 A missing route, issue, implementation target, parent, eval, or evidence subject is `ABSENT`. Do not reconstruct it from chat history, branch names, another repository, or source prose.
 
@@ -54,13 +56,13 @@ modules/
   = domain instances, worked examples, provider/repository-specific interpretations
     loaded only when their trigger matches
 
-scripts/ + tests/ + evals.json
+scripts/ + tests/ + evals.json or cases.json
   = deterministic mechanisms and falsifiable controls
 ```
 
 Do not put consumer branch names, repository paths, credentials, product topology, or live provider state into a shared `SKILL.md`. Do not make a domain module mandatory passive context for unrelated tasks. If an example becomes a universal law, promote the law into `SKILL.md` through an eval-first governance change; keep the example in `modules/`.
 
-The canonical routing example is under [`skills/knowledge-continuity/`](skills/knowledge-continuity/README.md).
+The canonical routing example is under [`skills/knowledge-continuity/`](skills/knowledge-continuity/README.md). `forgejo-delivery-loop` demonstrates the complementary pattern: generic contracts in `references/`, operational/domain details in `modules/`, deterministic route logic in `scripts/`, and consumer-specific line/repository state in `.skill-bindings/`.
 
 ## Authority layers
 
@@ -71,7 +73,7 @@ The canonical routing example is under [`skills/knowledge-continuity/`](skills/k
 | `references/` | reusable generic contracts and templates |
 | `modules/` | on-demand domain instances and examples |
 | directory `README.md` | local ownership, state-machine explanation, routes |
-| `evals.json` / `evals/` | machine-readable eval inventory and case contracts |
+| `evals.json` / `cases.json` / `evals/` | machine-readable eval inventory and case contracts |
 | deterministic verifier | hard-gate outcome for its declared subject |
 | `scripts/` | executable transitions |
 | `tests/` | positive, hollow, mutation, and integration controls |
@@ -121,16 +123,15 @@ SKIPPED_BY_POLICY
 
 A job that never received a runner is `NOT_EXERCISED`; a job deliberately not requested by policy is `SKIPPED_BY_POLICY`. Source prose, diagrams, package presence, license labels, old SHAs, another environment, and green documentation checks cannot create runtime `PASS`.
 
-## GitHub delivery and Stacked PRs
+## GitHub, Forgejo, and Stacked PR delivery
 
-Local commit, remote publication, GitHub Actions, review, merge, and release are separate state machines. Use [`skills/github-delivery-loop/README.md`](skills/github-delivery-loop/README.md) for publication/merge evidence and [`skills/git-town-stacked-pr-worker/README.md`](skills/git-town-stacked-pr-worker/README.md) for branch/worktree synchronization.
+Local commit, remote publication, CI/Actions, review, merge, and release are separate state machines.
 
-- One Worker owns one branch and isolated worktree.
-- Independent path-disjoint work is sibling work.
-- A child exists only when it consumes unmerged parent bytes.
-- Terminal implementation leaves stay small; shared index/convergence work is a separate leaf.
-- Unattended synchronization is bounded, non-interactive, no-push, and no-auto-resolve.
-- Semantic conflict, merge, promotion, and rollback remain Human/trusted-operator boundaries.
+- [`github-delivery-loop`](skills/github-delivery-loop/README.md) owns GitHub issue/PR/check/publication and merge-preflight boundaries.
+- [`forgejo-delivery-loop`](skills/forgejo-delivery-loop/README.md) owns localhost Forgejo routing, line/receipt binding, deterministic outbox/recovery, and API-safe operation boundaries.
+- [`git-town-stacked-pr-worker`](skills/git-town-stacked-pr-worker/README.md) owns the portable branch/worktree/sync method.
+
+One Worker owns one branch and isolated worktree. Independent path-disjoint work is sibling work. A child exists only when it consumes unmerged parent bytes. Terminal implementation leaves stay small; shared index/convergence work is a separate leaf. Unattended synchronization is bounded, non-interactive, no-push, and no-auto-resolve. Semantic conflict, merge, promotion, and rollback remain Human/trusted-operator boundaries.
 
 ## Source-document boundary
 
