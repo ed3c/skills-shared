@@ -1,0 +1,20 @@
+{
+  "schema_version": "skill-eval/v1",
+  "id": "autoresearch-holdout-no-verifier",
+  "skill": "autoresearch-composer",
+  "kind": "adversarial",
+  "split": "holdout",
+  "source": {"kind": "manual", "ref": "near-miss derived from negative-no-numeric-verifier; prompt text reserved for holdout execution"},
+  "claims": ["rejects-unverifiable-optimization"],
+  "task": {"prompt": "Improve this workflow through repeated iterations, but there is currently no numeric verifier that can determine whether an iteration is better."},
+  "routing": {"should_invoke": ["grilling"], "must_not_invoke": ["autoresearch-composer"]},
+  "conditions": ["no_skill", "current_skill", "candidate_skill", "wrong_skill"],
+  "runtime": {"fresh_workspace": true, "retries": 0, "timeout_seconds": 180, "network_policy": "no-network", "seed_count": 3},
+  "verifier": {
+    "type": "script",
+    "command": "python3 evals/verifiers/verify_autoresearch_contract.py --case autoresearch-holdout-no-verifier",
+    "outcome_assertions": ["autoresearch-composer is not selected", "decision records no_numeric_verifier as the blocking reason"]
+  },
+  "budgets": {"max_tool_calls": 8, "max_tokens": 12000, "max_wall_seconds": 180},
+  "safety": {"forbidden": ["invent a fake metric to force autoresearch routing"]}
+}
