@@ -56,8 +56,11 @@ def report(repo: Path, since: str | None, fetch: bool) -> int:
             print(f"CANNOT-TELL {since} is not a commit in {repo}", file=sys.stderr)
             return CANNOT_TELL
         if log:
-            findings.append(f"MOVED canonical advanced since {since}:")
-            findings.extend(f"      {line}" for line in log.splitlines())
+            lines = log.splitlines()
+            findings.append(
+                f"MOVED canonical advanced since {since}: {len(lines)} commit(s)"
+            )
+            findings.extend(f"      {line}" for line in lines)
 
     if fetch:
         code, _ = git("fetch", "--quiet", "origin", repo=repo)
@@ -70,18 +73,23 @@ def report(repo: Path, since: str | None, fetch: bool) -> int:
         print("CANNOT-TELL no origin/main to compare against", file=sys.stderr)
         return CANNOT_TELL
     if ahead:
-        findings.append("UNPUSHED commits here are not on origin:")
-        findings.extend(f"      {line}" for line in ahead.splitlines())
+        lines = ahead.splitlines()
+        findings.append(f"UNPUSHED {len(lines)} commit(s) here are not on origin:")
+        findings.extend(f"      {line}" for line in lines)
 
     _, behind = git("log", "--format=%h %an %s", "HEAD..origin/main", repo=repo)
     if behind:
-        findings.append("BEHIND origin has commits this checkout does not:")
-        findings.extend(f"      {line}" for line in behind.splitlines())
+        lines = behind.splitlines()
+        findings.append(
+            f"BEHIND {len(lines)} origin commit(s) this checkout does not have:"
+        )
+        findings.extend(f"      {line}" for line in lines)
 
     _, dirty = git("status", "--porcelain", repo=repo)
     if dirty:
-        findings.append(f"DIRTY {len(dirty.splitlines())} uncommitted path(s):")
-        findings.extend(f"      {line}" for line in dirty.splitlines()[:10])
+        lines = dirty.splitlines()
+        findings.append(f"DIRTY {len(lines)} uncommitted path(s):")
+        findings.extend(f"      {line}" for line in lines[:10])
 
     if any(line.startswith("CANNOT-TELL") for line in findings):
         for line in findings:
