@@ -12,6 +12,8 @@ on:
       - 'scripts/check_skill_evals.py'
       - 'scripts/check_verifier_calibrations.py'
       - 'scripts/check_mutation_lineage.py'
+      - 'scripts/check_mutation_targets.py'
+      - 'scripts/check_mutation_promotions.py'
       - 'scripts/check_capability_unlocks.py'
       - 'scripts/check_release_receipts.py'
       - 'scripts/render_scorecard_index.py'
@@ -27,6 +29,8 @@ on:
       - 'tests/test_cross_harness_contract.py'
       - 'tests/test_cross_harness_gap.py'
       - 'tests/test_mutation_lineage.py'
+      - 'tests/test_mutation_targets.py'
+      - 'tests/test_mutation_promotions.py'
       - 'tests/test_capability_unlocks.py'
       - 'tests/test_release_receipts.py'
       - 'tests/test_scorecard_index.py'
@@ -90,6 +94,8 @@ jobs:
           python3 -m unittest tests/test_cross_harness_contract.py -v
           python3 -m unittest tests/test_cross_harness_gap.py -v
           python3 -m unittest tests/test_mutation_lineage.py -v
+          python3 -m unittest tests/test_mutation_targets.py -v
+          python3 -m unittest tests/test_mutation_promotions.py -v
           python3 -m unittest tests/test_capability_unlocks.py -v
           python3 -m unittest tests/test_release_receipts.py -v
           python3 -m unittest tests/test_scorecard_index.py -v
