@@ -18,6 +18,7 @@ on:
       - 'tests/test_capability_unlocks.py'
       - 'tests/test_runtime_export.py'
       - 'tests/test_skill_up_executor_evidence.py'
+      - 'tests/test_verifier_authority.py'
       - '.github/workflows/skill-eval-contract.yml'
       - '.github/workflows/skill-eval-physical-skill-up.yml'
   push:
@@ -39,6 +40,7 @@ on:
       - 'tests/test_capability_unlocks.py'
       - 'tests/test_runtime_export.py'
       - 'tests/test_skill_up_executor_evidence.py'
+      - 'tests/test_verifier_authority.py'
 
 permissions:
   contents: read
@@ -65,16 +67,20 @@ jobs:
         run: python3 -m unittest tests/test_cross_harness_contract.py -v
       - name: Run mutation lineage tests
         run: python3 -m unittest tests/test_mutation_lineage.py -v
-      - name: Run capability unlock threshold tests
+      - name: Run capability unlock threshold and evidence-resolution tests
         run: python3 -m unittest tests/test_capability_unlocks.py -v
       - name: Run runtime export tests
         run: python3 -m unittest tests/test_runtime_export.py -v
       - name: Run skill-up executor evidence boundary tests
         run: python3 -m unittest tests/test_skill_up_executor_evidence.py -v
-      - name: Validate executor authority documents
+      - name: Run verifier authority tests
+        run: python3 -m unittest tests/test_verifier_authority.py -v
+      - name: Validate authority and executor JSON contracts
         run: |
           python3 -m json.tool evals/runtime/executors/arena.json >/dev/null
           python3 -m json.tool evals/runtime/executors/skill-up.json >/dev/null
+          python3 -m json.tool evals/schema/verifier-receipt.schema.json >/dev/null
+          python3 -m json.tool evals/schema/evidence-bundle.schema.json >/dev/null
       - name: Exercise gold replay verifier safe-block path
         run: |
           tmp="$(mktemp -d)"
