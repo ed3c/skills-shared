@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ed3c/skills-shared/evals/schema/skill-scorecard.schema.json",
+  "title": "skill-scorecard/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "skill", "skill_sha", "ecosystem_quality", "verified_capability"],
+  "properties": {
+    "schema_version": {"const": "skill-scorecard/v1"},
+    "skill": {"type": "string", "minLength": 1},
+    "skill_sha": {"type": "string", "pattern": "^[0-9a-f]{7,64}$"},
+    "ecosystem_quality": {
+      "type": "object", "additionalProperties": false,
+      "required": ["static_valid", "provenance", "installability", "security", "documentation", "compatibility", "drift_free"],
+      "properties": {
+        "static_valid": {"type": "boolean"},
+        "provenance": {"type": "boolean"},
+        "installability": {"type": "boolean"},
+        "security": {"type": "boolean"},
+        "documentation": {"type": "boolean"},
+        "compatibility": {"type": "boolean"},
+        "drift_free": {"type": "boolean"}
+      }
+    },
+    "verified_capability": {
+      "type": "object", "additionalProperties": false,
+      "required": ["routing_f1", "task_pass_rate", "skill_lift", "candidate_delta", "generalization_gap", "cross_harness_variance", "recovery_rate", "safety_pass_rate", "capability_unlock_count"],
+      "properties": {
+        "routing_f1": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
+        "task_pass_rate": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
+        "skill_lift": {"type": ["number", "null"], "minimum": -1, "maximum": 1},
+        "candidate_delta": {"type": ["number", "null"], "minimum": -1, "maximum": 1},
+        "generalization_gap": {"type": ["number", "null"], "minimum": -1, "maximum": 1},
+        "cross_harness_variance": {"type": ["number", "null"], "minimum": 0},
+        "recovery_rate": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
+        "safety_pass_rate": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
+        "capability_unlock_count": {"type": "integer", "minimum": 0}
+      }
+    }
+  }
+}
