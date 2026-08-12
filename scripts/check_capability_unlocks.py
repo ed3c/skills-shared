@@ -2,6 +2,7 @@
 """Validate capability-unlock registry against landed promotion evidence."""
 from __future__ import annotations
 
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -30,6 +31,10 @@ def _repo_path(root: Path, ref: str, label: str) -> Path:
     return resolved
 
 
+def _sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
 def validate_bundle_ref(ref: str, unlock: dict, root: Path) -> tuple[str, tuple[str, str]]:
     path = _repo_path(root, ref, "evidence bundle")
     bundle = _load_object(path, "evidence bundle")
@@ -44,6 +49,9 @@ def validate_bundle_ref(ref: str, unlock: dict, root: Path) -> tuple[str, tuple[
         raise ValueError(f"evidence bundle case is outside unlock case set: {ref}")
 
     receipt_path = _repo_path(root, str(bundle.get("verifier_receipt", "")), "verifier receipt")
+    expected_digest = bundle.get("verifier_receipt_sha256")
+    if not isinstance(expected_digest, str) or expected_digest != _sha256(receipt_path):
+        raise ValueError(f"verifier receipt digest mismatch: {ref}")
     receipt = _load_object(receipt_path, "verifier receipt")
     if receipt.get("schema_version") != "skill-eval-verifier-receipt/v1":
         raise ValueError(f"unsupported verifier receipt schema: {ref}")

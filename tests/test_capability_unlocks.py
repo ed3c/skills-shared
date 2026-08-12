@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import tempfile
 import unittest
@@ -74,28 +75,64 @@ class CapabilityUnlockTests(unittest.TestCase):
             "schema_version": "skill-eval-evidence/v1", "run_id": run_id,
             "case_id": case_id, "skill_sha": skill_sha, "promotion_eligible": True,
             "verifier_receipt": str(receipt_path.relative_to(root)),
+            "verifier_receipt_sha256": hashlib.sha256(receipt_path.read_bytes()).hexdigest(),
             "run_trace": str(run_path.relative_to(root)),
         }))
         return str(bundle_path.relative_to(root))
+
+    def _full_refs(self, root: Path, **overrides):
+        refs = []
+        for i in range(6):
+            refs.append(self._land_bundle(
+                root,
+                case_id=f"holdout-{i}",
+                model="model-a" if i < 3 else "model-b",
+                harness="codex" if i < 3 else "claude-code",
+                **overrides,
+            ))
+        return refs
 
     def test_llm_judge_bundle_cannot_unlock(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
             value = self.good()
-            refs = []
-            for i in range(6):
-                refs.append(self._land_bundle(root, case_id=f"holdout-{i}", model="model-a" if i < 3 else "model-b", harness="codex" if i < 3 else "claude-code", authority="llm_judge" if i == 0 else "deterministic"))
+            refs = self._full_refs(root)
+            first = root / refs[0]
+            bundle = json.loads(first.read_text())
+            receipt_path = root / bundle["verifier_receipt"]
+            receipt = json.loads(receipt_path.read_text())
+            receipt["authority"] = "llm_judge"
+            receipt_path.write_text(json.dumps(receipt))
+            bundle["verifier_receipt_sha256"] = hashlib.sha256(receipt_path.read_bytes()).hexdigest()
+            first.write_text(json.dumps(bundle))
             value["evidence_bundles"] = refs
             with self.assertRaisesRegex(ValueError, "deterministic verifier authority"):
+                validate_unlock(value, root)
+
+    def test_tampered_verifier_receipt_digest_cannot_unlock(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            value = self.good()
+            refs = self._full_refs(root)
+            first = root / refs[0]
+            bundle = json.loads(first.read_text())
+            receipt_path = root / bundle["verifier_receipt"]
+            receipt = json.loads(receipt_path.read_text())
+            receipt["passed"] = False
+            receipt_path.write_text(json.dumps(receipt))
+            value["evidence_bundles"] = refs
+            with self.assertRaisesRegex(ValueError, "digest mismatch"):
                 validate_unlock(value, root)
 
     def test_wrong_skill_sha_bundle_cannot_unlock(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
             value = self.good()
-            refs = []
-            for i in range(6):
-                refs.append(self._land_bundle(root, case_id=f"holdout-{i}", model="model-a" if i < 3 else "model-b", harness="codex" if i < 3 else "claude-code", skill_sha=("b" * 40 if i == 0 else None)))
+            refs = self._full_refs(root)
+            first = root / refs[0]
+            bundle = json.loads(first.read_text())
+            bundle["skill_sha"] = "b" * 40
+            first.write_text(json.dumps(bundle))
             value["evidence_bundles"] = refs
             with self.assertRaisesRegex(ValueError, "skill_sha mismatch"):
                 validate_unlock(value, root)
@@ -104,10 +141,7 @@ class CapabilityUnlockTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
             value = self.good()
-            refs = []
-            for i in range(6):
-                refs.append(self._land_bundle(root, case_id=f"holdout-{i}", model="model-a" if i < 3 else "model-b", harness="codex" if i < 3 else "claude-code"))
-            value["evidence_bundles"] = refs
+            value["evidence_bundles"] = self._full_refs(root)
             validate_unlock(value, root)
 
 
