@@ -1,0 +1,23 @@
+{
+  "schema": "skills-shared-ci-publication-evals/v1",
+  "subject": ".github-delivery/ci-publication/profile.json",
+  "runnable": [
+    {
+      "id": "CI-PUBLISH-PROFILE-1",
+      "entrypoint": ".github-delivery/ci-publication/tests/verify.sh",
+      "positive": "repository identity, stable check, fixed command contract, entrypoints, intents, billing stop rule and evidence boundary are complete",
+      "negative_controls": [
+        "wrong repository ID",
+        "mutable check name",
+        "fourth publication intent",
+        "push-based billing probe",
+        "fake sidecar PASS",
+        "secret-bearing environment name",
+        "shell command string",
+        "machine-local cwd",
+        "empty command set"
+      ],
+      "expected": "real profile PASS; each planted mutation turns RED before evidence production or publication"
+    }
+  ]
+}
