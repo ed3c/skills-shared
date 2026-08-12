@@ -4,7 +4,7 @@
   "title": "skill-eval-evidence-bundle/v1",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "run_id", "case_id", "skill_sha", "eval_suite_sha", "run_trace", "verifier_receipt", "artifact_hashes"],
+  "required": ["schema_version", "run_id", "case_id", "skill_sha", "eval_suite_sha", "run_trace", "verifier_receipt", "verifier_receipt_sha256", "promotion_eligible", "artifact_hashes"],
   "properties": {
     "schema_version": {"const": "skill-eval-evidence/v1"},
     "run_id": {"type": "string", "minLength": 8},
@@ -13,6 +13,8 @@
     "eval_suite_sha": {"type": "string", "pattern": "^[0-9a-f]{7,64}$"},
     "run_trace": {"type": "string", "minLength": 1},
     "verifier_receipt": {"type": "string", "minLength": 1},
+    "verifier_receipt_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "promotion_eligible": {"type": "boolean"},
     "artifact_hashes": {
       "type": "object",
       "additionalProperties": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
