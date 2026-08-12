@@ -17,6 +17,10 @@ git -C "${world}/canonical" -c user.name=t -c user.email=t@t.invalid \
   commit -q --allow-empty -m "base"
 git -C "${world}/canonical" branch -M main
 git -C "${world}/canonical" push -q -u origin main
+# Make the bare remote deterministic across Git versions/defaultBranch settings.
+# Without this, a later clone can keep looking for refs/heads/master even though
+# the fixture deliberately renamed the canonical branch to main.
+git --git-dir="${world}/remote.git" symbolic-ref HEAD refs/heads/main
 
 run() { python3 "${drift}" --repo "${world}/canonical" "$@"; }
 
