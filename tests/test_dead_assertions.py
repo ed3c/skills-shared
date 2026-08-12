@@ -51,14 +51,14 @@ class DeadAssertionLinterTests(unittest.TestCase):
         self.assertEqual(proc.returncode, 1)
         self.assertIn("dead-and-chain", proc.stderr)
 
-    def test_swallowed_status_without_assertion_is_rejected(self):
-        td, proc = self.run_lint('command_that_may_fail || true\necho continued\n')
+    def test_swallowed_status_is_rejected_even_if_next_line_reads_dollar_question(self):
+        td, proc = self.run_lint('command_that_may_fail || true\nif test "$?" -ne 0; then exit 1; fi\n')
         self.addCleanup(td.cleanup)
         self.assertEqual(proc.returncode, 1)
         self.assertIn("swallowed-status", proc.stderr)
 
-    def test_swallowed_status_with_adjacent_rc_check_is_allowed(self):
-        td, proc = self.run_lint('command_that_may_fail || true\nif test "$?" -ne 0; then exit 1; fi\n')
+    def test_direct_rc_capture_is_allowed(self):
+        td, proc = self.run_lint('rc=0\ncommand_that_may_fail || rc=$?\nif test "$rc" -ne 0; then exit 1; fi\n')
         self.addCleanup(td.cleanup)
         self.assertEqual(proc.returncode, 0, proc.stderr)
 
