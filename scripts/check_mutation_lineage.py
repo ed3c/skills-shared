@@ -16,6 +16,7 @@ CLASSES = {"trigger", "routing", "knowledge", "tool-contract", "verification", "
 STATUSES = {"proposed", "running", "won", "lost", "tie", "reverted"}
 TERMINAL = {"won", "lost", "tie", "reverted"}
 METRICS = {"task_pass_rate", "routing_f1", "recovery_rate", "safety_pass_rate", "capability_unlock_count"}
+ARMS = ("parent", "candidate", "no_skill")
 
 
 def nonempty_list(value, name):
@@ -93,8 +94,10 @@ def _bundle_observation(ref: str, record: dict, receipt: dict, root: Path) -> tu
         arm = "parent"
     elif skill_sha == record["candidate_sha"]:
         arm = "candidate"
+    elif skill_sha is None:
+        arm = "no_skill"
     else:
-        raise ValueError(f"mutation evidence belongs to neither parent nor candidate: {ref}")
+        raise ValueError(f"mutation evidence belongs to neither parent, candidate, nor no-skill baseline: {ref}")
     return str(case_id), arm, passed
 
 
@@ -139,12 +142,17 @@ def evaluate_receipt(record: dict, root: Path) -> tuple[float, float]:
         observations[(case_id, arm)].append(passed)
 
     for case_id in [*targets, *non_targets]:
-        parent = observations[(case_id, "parent")]
-        candidate = observations[(case_id, "candidate")]
-        if not parent or not candidate:
-            raise ValueError(f"mutation evidence lacks paired parent/candidate observations for {case_id}")
-        if len(parent) != len(candidate):
-            raise ValueError(f"mutation evidence denominator mismatch for {case_id}: parent={len(parent)} candidate={len(candidate)}")
+        counts = {arm: len(observations[(case_id, arm)]) for arm in ARMS}
+        if any(count == 0 for count in counts.values()):
+            raise ValueError(
+                f"mutation evidence lacks paired current/candidate/no-skill observations for {case_id}: "
+                + ", ".join(f"{arm}={counts[arm]}" for arm in ARMS)
+            )
+        if len(set(counts.values())) != 1:
+            raise ValueError(
+                f"mutation evidence denominator mismatch for {case_id}: "
+                + ", ".join(f"{arm}={counts[arm]}" for arm in ARMS)
+            )
 
     parent_target = _macro_rate(observations, targets, "parent")
     candidate_target = _macro_rate(observations, targets, "candidate")
@@ -152,6 +160,12 @@ def evaluate_receipt(record: dict, root: Path) -> tuple[float, float]:
     parent_non_target = _macro_rate(observations, non_targets, "parent")
     candidate_non_target = _macro_rate(observations, non_targets, "candidate")
     regression = max(0.0, parent_non_target - candidate_non_target)
+
+    # No-skill is deliberately not part of the win formula. It is an experiment
+    # baseline that must be observed with the same cases/repetitions so future
+    # analysis can distinguish skill lift from task/model drift.
+    _macro_rate(observations, targets, "no_skill")
+    _macro_rate(observations, non_targets, "no_skill")
     return target_delta, regression
 
 
