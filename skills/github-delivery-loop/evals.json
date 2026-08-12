@@ -1,9 +1,9 @@
 {
   "skill_name": "github-delivery-loop",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "_meta": {
-    "coverage_metric": "planted hollow-receipt, unsafe merge-rule target and forged/stale merge-admit detection",
-    "purpose": "Prove that delivery receipts, repo-scoped Codex merge rules and the merge-authority preflight all fail closed without network access."
+    "coverage_metric": "planted hollow-receipt, unsafe merge-rule target, forged/stale merge-admit, canonical-link divergence, and wasteful CI publication detection",
+    "purpose": "Prove that delivery receipts, repo-scoped Codex merge rules, merge-authority preflight, canonical linking, and private-Actions publication all fail closed without network access."
   },
   "runnable": [
     {
@@ -59,6 +59,22 @@
         "linking the canonical directory to itself is refused"
       ],
       "expected": "good converts and stays readable through the link; hollow exits non-zero naming the divergence"
+    },
+    {
+      "id": "DELIVERY-5",
+      "checker_script": "scripts/ci_publish_gate.py",
+      "test_verify": "tests/ci-publish-gate/verify.sh",
+      "good_fixture": "tests/ci-publish-gate/fixtures/good",
+      "hollow_fixture": "tests/ci-publish-gate/fixtures/hollow",
+      "covers": [
+        "local commit cadence is independent from remote CI publication cadence",
+        "exact local HEAD requires a passing local verification receipt",
+        "only initial draft PR, ready-for-review, and one batched repair are admitted",
+        "older-SHA CI success and repeated feedback fail closed",
+        "billing or spending-limit no-runner evidence opens a circuit breaker",
+        "only a later owner-authored recovery receipt can admit another attempt"
+      ],
+      "expected": "good initial publication ALLOW; hollow billing snapshot BLOCK; stale HEAD, repeated feedback, and stale recovery remain red"
     }
   ]
 }
