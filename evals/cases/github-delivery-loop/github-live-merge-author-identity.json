@@ -14,6 +14,13 @@
       "anchor": "def fetch_snapshot("
     }
   ],
+  "calibration": {
+    "positive_fixture": "evals/calibration/github-delivery-loop/issue-25/positive-safe-block",
+    "negative_fixtures": [
+      "evals/calibration/github-delivery-loop/issue-25/negative-unproven-mutation",
+      "evals/calibration/github-delivery-loop/issue-25/negative-protected-repo"
+    ]
+  },
   "claims": [
     "detects-invalid-remote-author-identity",
     "uses-live-equivalent-preflight",

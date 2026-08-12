@@ -34,6 +34,18 @@
         }
       }
     },
+    "calibration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["positive_fixture", "negative_fixtures"],
+      "properties": {
+        "positive_fixture": {"type": "string", "minLength": 1},
+        "negative_fixtures": {
+          "type": "array", "minItems": 1, "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    },
     "claims": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"}},
     "task": {
       "type": "object",
