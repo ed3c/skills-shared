@@ -144,11 +144,24 @@ def publish(
     target_branch = branch or _git(repo_root, "branch", "--show-current")
     if not target_branch or BRANCH_RE.fullmatch(target_branch) is None or ".." in target_branch:
         raise PublicationError("branch is empty or unsafe")
+    intent = snapshot["intent"]
+    pull = snapshot.get("pull_request")
+    if policy["pull_request_mode"] == "universal" and intent != "initial-pr":
+        if not isinstance(pull, dict) or pull.get("is_open") is not True:
+            raise PublicationError("universal publication requires an open pull request")
+        pull_head_ref = pull.get("head_ref")
+        if (
+            not isinstance(pull_head_ref, str)
+            or BRANCH_RE.fullmatch(pull_head_ref) is None
+            or ".." in pull_head_ref
+            or pull_head_ref != target_branch
+        ):
+            raise PublicationError(
+                "universal publication target must match the exact pull request head ref"
+            )
     refspec = f"{head}:refs/heads/{target_branch}"
     commands = [["git", "push", remote, refspec]]
 
-    intent = snapshot["intent"]
-    pull = snapshot.get("pull_request")
     if intent == "ready-for-review":
         commands.append(
             ["gh", "pr", "ready", str(pull["number"]), "--repo", policy["repository"]]

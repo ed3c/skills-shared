@@ -72,15 +72,16 @@ The evaluator is deliberately pure; enforcement is layered around it:
 2. `ci_workflow_policy.py check` requires one explicit PR cost profile: the
    backwards-compatible `draft-first` profile rejects draft `synchronize` and
    `reopened`; the opt-in `universal` profile requires every opened, synchronized,
-   reopened, and ready-for-review PR head. Both reject push outside the default
+   and reopened PR head. Both reject push outside the default
    branch, missing dispatch/concurrency, and mutable action tags.
 3. `ci_publish.py verify` executes the configured verifier and writes an
    exact-HEAD receipt under the git directory, outside the committed tree.
 4. `ci_publish.py publish` rechecks policy, receipt, snapshot, GitHub remote
    identity and the full-SHA refspec before one push. Ready publications then
    mark the PR ready. Draft-first repairs explicitly dispatch the verifier;
-   universal repairs rely on the required `synchronize` event and do not create
-   a duplicate manual run for the same SHA.
+   universal publications also require an open PR and an exact match between the
+   target branch and snapshot PR head ref. Universal repairs rely on the required
+   `synchronize` event and do not create a duplicate manual run for the same SHA.
 5. `ci_publish_guard.py`, registered by `install-ci-publish-guard.py`, blocks a
    raw GitHub `git push` from enrolled repositories on Agent PreToolUse
    surfaces. It leaves an explicit Forgejo remote available.
@@ -105,14 +106,17 @@ The supported profiles are deliberately closed:
 
 - `draft-first` requires exactly `ready_for_review`. Reopened and repair
   publications dispatch the workflow explicitly against the admitted SHA.
-- `universal` requires exactly `opened`, `synchronize`, `reopened`, and
-  `ready_for_review`. It verifies every normal PR head transition, including
-  drafts, and therefore consumes more hosted Actions quota.
+- `universal` requires exactly `opened`, `synchronize`, and `reopened`. These
+  events cover creation, head changes, and restoration of an open PR. It excludes
+  `ready_for_review` because that transition does not change the head and would
+  duplicate the preceding `synchronize` run during a managed ready publication.
+  Universal mode still consumes more hosted Actions quota than draft-first mode.
 
 In both profiles:
 
 - `push` is limited to the default branch;
-- `workflow_dispatch` runs the final check after one admitted repair batch;
+- `workflow_dispatch` remains available for explicit runs; draft-first repairs
+  use it, while universal repairs rely on the required `synchronize` event;
 - workflow-level `concurrency` groups by PR/ref and cancels stale PR runs;
 - third-party actions use immutable commit SHAs and permissions remain least
   privilege;
@@ -146,6 +150,8 @@ success status as a substitute for executing the verifier.
   "pull_request": {
     "number": 42,
     "is_draft": true,
+    "is_open": true,
+    "head_ref": "agent/example",
     "remote_head": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
   },
   "actionable_feedback": null,

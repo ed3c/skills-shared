@@ -17,7 +17,7 @@ REPOSITORY_RE = re.compile(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+")
 KEY_RE = re.compile(r"^(?P<indent>\s*)(?P<key>[A-Za-z0-9_-]+):(?P<value>.*)$")
 PULL_REQUEST_TYPES = {
     "draft-first": {"ready_for_review"},
-    "universal": {"opened", "synchronize", "reopened", "ready_for_review"},
+    "universal": {"opened", "synchronize", "reopened"},
 }
 
 
@@ -149,6 +149,8 @@ def evaluate_workflow(policy: dict[str, Any], workflow_text: str) -> list[str]:
     pull_lines = _section(on_lines, "pull_request", 2)
     pull_types = set(_list_values(pull_lines, "types", 4))
     pull_request_mode = policy.get("pull_request_mode", "draft-first")
+    if not isinstance(pull_request_mode, str):
+        raise PolicyError("pull_request_mode must be a string")
     required_pull_types = PULL_REQUEST_TYPES.get(pull_request_mode)
     if required_pull_types is None:
         raise PolicyError(f"unsupported pull_request_mode: {pull_request_mode}")

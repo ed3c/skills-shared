@@ -53,7 +53,7 @@ jobs:
 
 UNIVERSAL_WORKFLOW = WORKFLOW.replace(
     "types: [ready_for_review]",
-    "types: [opened, synchronize, reopened, ready_for_review]",
+    "types: [opened, synchronize, reopened]",
 )
 
 
@@ -99,7 +99,7 @@ class WorkflowPolicyTests(unittest.TestCase):
 
     def test_universal_mode_rejects_extra_event(self) -> None:
         hollow = UNIVERSAL_WORKFLOW.replace(
-            "ready_for_review]", "ready_for_review, converted_to_draft]"
+            "reopened]", "reopened, ready_for_review]"
         )
         with self.assertRaisesRegex(POLICY.PolicyError, "universal"):
             POLICY.evaluate_workflow(policy("universal"), hollow)
@@ -120,6 +120,13 @@ class WorkflowPolicyTests(unittest.TestCase):
             with self.assertRaisesRegex(POLICY.PolicyError, "pull_request_mode"):
                 POLICY.load_policy(path)
 
+    def test_evaluator_rejects_non_string_pull_request_mode_as_policy_error(self) -> None:
+        malformed = policy()
+        malformed["pull_request_mode"] = ["universal"]
+
+        with self.assertRaisesRegex(POLICY.PolicyError, "pull_request_mode"):
+            POLICY.evaluate_workflow(malformed, WORKFLOW)
+
     def test_legacy_policy_defaults_to_draft_first(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "policy.json"
@@ -137,7 +144,15 @@ class WorkflowPolicyTests(unittest.TestCase):
 
 
 class PublicationCommandTests(unittest.TestCase):
-    def render_repair(self, pull_request_mode: str) -> subprocess.CompletedProcess[str]:
+    def render_publication(
+        self,
+        pull_request_mode: str,
+        *,
+        intent: str = "repair",
+        pull_request_is_open: bool = True,
+        pull_request_head_ref: str = "agent/example",
+        target_branch: str = "agent/example",
+    ) -> subprocess.CompletedProcess[str]:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory) / "repo"
             root.mkdir()
@@ -205,19 +220,25 @@ class PublicationCommandTests(unittest.TestCase):
                 "repository": "ed3c/example",
                 "repository_owner": "ed3c",
                 "private": True,
-                "intent": "repair",
+                "intent": intent,
                 "local_head": head,
                 "local_verification": verification,
                 "pull_request": {
                     "number": 7,
-                    "is_draft": False,
+                    "is_draft": intent == "ready-for-review",
+                    "is_open": pull_request_is_open,
+                    "head_ref": pull_request_head_ref,
                     "remote_head": "a" * 40,
                 },
-                "actionable_feedback": {
-                    "actionable": True,
-                    "head_sha": "a" * 40,
-                    "observed_at": "2026-08-12T06:00:00Z",
-                },
+                "actionable_feedback": (
+                    {
+                        "actionable": True,
+                        "head_sha": "a" * 40,
+                        "observed_at": "2026-08-12T06:00:00Z",
+                    }
+                    if intent == "repair"
+                    else None
+                ),
                 "billing_blocker": None,
                 "recovery": None,
             }
@@ -235,7 +256,7 @@ class PublicationCommandTests(unittest.TestCase):
                     "--remote",
                     "github",
                     "--branch",
-                    "agent/example",
+                    target_branch,
                 ],
                 check=False,
                 capture_output=True,
@@ -243,16 +264,40 @@ class PublicationCommandTests(unittest.TestCase):
             )
 
     def test_draft_first_repair_dispatches_verifier(self) -> None:
-        completed = self.render_repair("draft-first")
+        completed = self.render_publication("draft-first")
 
         self.assertEqual(completed.returncode, 0, completed.stderr)
         self.assertIn("gh workflow run", completed.stdout)
 
     def test_universal_repair_relies_on_synchronize_without_duplicate_dispatch(self) -> None:
-        completed = self.render_repair("universal")
+        completed = self.render_publication("universal")
 
         self.assertEqual(completed.returncode, 0, completed.stderr)
         self.assertIn("git push github", completed.stdout)
+        self.assertNotIn("gh workflow run", completed.stdout)
+
+    def test_universal_repair_requires_an_open_pull_request(self) -> None:
+        completed = self.render_publication("universal", pull_request_is_open=False)
+
+        self.assertNotEqual(completed.returncode, 0)
+        self.assertIn("open pull request", completed.stderr)
+
+    def test_universal_repair_requires_the_exact_pull_request_head_ref(self) -> None:
+        completed = self.render_publication(
+            "universal",
+            pull_request_head_ref="agent/expected",
+            target_branch="agent/wrong",
+        )
+
+        self.assertNotEqual(completed.returncode, 0)
+        self.assertIn("head ref", completed.stderr)
+
+    def test_universal_ready_publication_does_not_dispatch_a_second_run(self) -> None:
+        completed = self.render_publication("universal", intent="ready-for-review")
+
+        self.assertEqual(completed.returncode, 0, completed.stderr)
+        self.assertIn("git push github", completed.stdout)
+        self.assertIn("gh pr ready", completed.stdout)
         self.assertNotIn("gh workflow run", completed.stdout)
 
 
