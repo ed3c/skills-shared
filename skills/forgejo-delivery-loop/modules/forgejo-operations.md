@@ -24,6 +24,9 @@ bun run <本skill>/scripts/route.ts --input <route-input.json>
 3. 登入頁確實出現時，先查現有 Chrome 是否已有 session。
    若仍未登入，才可用 `git credential fill` 取得 `localhost:3000` 憑證並直接填入表單。
    憑證只留在記憶體；禁止回顯、寫檔、寫 receipt、貼進 issue 或 commit。
+   若 helper 缺憑證，停止登入操作並由 host operator 執行
+   `/Users/neon/runtime-env/runtime-env local-env migrate-forgejo-keychain`。該 broker 擁有
+   dotenv → macOS Keychain 的唯一遷移責任；本 skill 禁止 source、解析或複製 `.env`。
 4. Forgejo 是工作狀態與下一步投影，不是真相來源。
    Git commit、source lineage、typed receipt 與 schema readback 才是證據 SSOT。
 5. 大迴圈只排程、限流與投影。每個外部 mutation 必須下沉成一個小迴圈。

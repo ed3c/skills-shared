@@ -3,6 +3,7 @@
   "snapshot": "2026-08-06",
   "basename": "test-bundle",
   "output_dir": "output",
+  "default_view": "codegraph",
   "decision": "Release-reachable 不等於 Deployed。",
   "summary": [
     "兩份文件必須完整入包。"
@@ -29,6 +30,13 @@
       "role": "來源"
     }
   ],
+  "code_graph": {
+    "path": "graph.json",
+    "label": "Code Review Graph",
+    "as": "code-graph/graph.json",
+    "verification_report": "output/test-bundle.graph-verification.json",
+    "verification_as": "code-graph/graph.verification.json"
+  },
   "quiz": [
     {
       "question": "沒有 receipt 時 Deployed 是？",

@@ -1,0 +1,19 @@
+{
+  "repo": "someone-else/infrastructure",
+  "canonical_repo": "someone-else/infrastructure",
+  "owner": {"login": "someone-else", "id": 99, "type": "User"},
+  "viewer": {"login": "example", "id": 42, "type": "User"},
+  "permissions": {"admin": true},
+  "pulls": [
+    {
+      "id": "PR_foreign_8",
+      "number": 8,
+      "url": "https://github.com/someone-else/infrastructure/pull/8",
+      "title": "admin collaborator is not owner",
+      "isDraft": false,
+      "headRefOid": "2222222222222222222222222222222222222222",
+      "mergeable": "MERGEABLE",
+      "mergeStateStatus": "CLEAN"
+    }
+  ]
+}

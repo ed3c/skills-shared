@@ -1,0 +1,15 @@
+{
+  "title": "破損 graph 決策包",
+  "snapshot": "2026-08-06",
+  "basename": "bad-graph-bundle",
+  "output_dir": "bad-output",
+  "documents": [
+    {"path": "a.md", "label": "A 文件", "role": "入口"}
+  ],
+  "code_graph": {
+    "path": "bad-graph.json"
+  },
+  "quiz": [
+    {"question": "graph 必須閉合嗎？", "options": ["是", "否"], "answer": 0}
+  ]
+}

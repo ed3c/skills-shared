@@ -18,7 +18,7 @@
 | Forgejo 帳號 | login `neon`，id `1`，`is_admin: false` | `curl -s http://localhost:3000/api/v1/users/neon` |
 | 帳號 email | `neon@noreply.localhost` | 同上（`email` 欄位；此端點免認證） |
 | push 通道 | HTTP（remote 為 `http://localhost:3000/neon/<repo>.git`） | `git -C <repo> remote -v` |
-| 憑證 | `credential.helper=store`，`~/.git-credentials` 內有 `localhost%3a3000` 一筆 | `git config --global credential.helper` |
+| 憑證 | localhost URL 級 helper chain 為空 reset ＋ `osxkeychain`；不再以 `~/.git-credentials` 保存該密碼 | `git config --global --get-all credential.http://localhost:3000.helper`；值只應依序為空與 `osxkeychain` |
 | 簽章 | 未啟用（無 `commit.gpgsign`、無 `user.signingkey`） | `git config --global --get-regexp 'gpgsign\|signingkey'`（無輸出＝未啟用） |
 
 **`neon@noreply.localhost` 不是隨便取的**：Forgejo 的 `NO_REPLY_ADDRESS` 預設 `noreply.localhost`，
@@ -26,10 +26,12 @@
 的位址（除非另有已驗證的次要 email——那需要登入後查 `/api/v1/user/emails`，本檔未查證，
 **「未查證」不等於「不存在」**）。
 
-**憑證落盤這件事要講清楚，不要靠沉默掩蓋**：`credential.helper=store` 表示 `localhost:3000` 的憑證
-**已經以明文存在 `~/.git-credentials`**。skill 的「秘密只留記憶體」不變量約束的是**本 skill 的行為**
-（不輸出、不新增落盤、不寫進 log 或 commit），它並沒有、也無法撤銷這個既存的存量。要收斂的話是
-把 helper 換成 `osxkeychain` 並清掉那一行——那是人的決定，不由 agent 代辦。
+**歷史缺陷已收斂，但不可把它改寫成從未發生**：localhost 密碼曾由全域
+`credential.helper=store` 明文落在 `~/.git-credentials`。現在由 runtime-env 的
+`forgejo-local-password` 模組與 `local-env migrate-forgejo-keychain` broker 負責一次性遷移：先在
+Keychain store/get，比對 URL 級 helper，刪除並回讀確認明文 entry，最後才清空 private dotenv 的
+`FORGEJO_PASSWORD`。本 skill 的正常路徑只呼叫 `git credential fill`；它不讀 dotenv 或 Keychain
+資料庫，也不把秘密寫入 log、receipt 或 commit。
 
 ---
 

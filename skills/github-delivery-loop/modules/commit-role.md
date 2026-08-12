@@ -88,9 +88,10 @@ git -C <repo> config user.email 30064024+ed3c@users.noreply.github.com
 GitHub 的硬規則是**作者不能 approve 自己的 PR**。所以「用 PR review 當人閘」在單人帳號下
 物理上做不到，除非引入第二個身分（GitHub App／machine account）——那是額外基建。
 
-**本 skill 的模型不走那條路**：人閘是 repo owner 貼 `merge-admit` label（見
+**本 skill 的預設模型不走那條路**：人閘是 repo owner 貼 `merge-admit` label（見
 [host-permissions.md](host-permissions.md) 與 SKILL.md 的四層堆疊），label 由 owner 施加、
-且必須晚於 head commit。因此：
+且必須晚於 head commit。若使用者明確 opt-in personal-owner auto，L1 改由 immutable owner/viewer
+identity policy 承擔，不代表需要第二身分。因此：
 
 - **不需要**為了「有人 review」而替 agent 開第二個 git 身分。
 - **需要**第二身分的唯一情境是：這條線改用 required approvals 當人閘。那時第二身分是**帳號層**的
@@ -131,8 +132,8 @@ git -C <repo> var GIT_AUTHOR_IDENT
      HEAD 漂移、commit 落錯分支。隔離一律走 worktree（surface 規則見 SKILL.md）。
    - commit 不能編譯的程式碼。
    - 用 agent 自造的 git 身分 commit（§4）。
-6. **與 merge 閘的接合**：commit 與 push 是本 skill 可以自主做的；**merge 不是**。
-   push 完到 PR 開好、findings 齊備為止，接手的是 §5 的 admit → preflight → land。
+6. **與 merge 閘的接合**：commit 與 push 是本 skill 可以自主做的；merge 仍必須通過 authority。
+   push 完到 PR 開好、findings 齊備為止，接手的是 §5 的 authority → preflight → land。
 
 ---
 
