@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "forgejo-terminal-issue-state-request@v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "forge_url", "repository", "issue_number", "action",
+    "expected_state", "desired_state", "idempotency_marker", "source_receipt",
+    "admission", "maturity_effect"
+  ],
+  "properties": {
+    "schema_version": {"const": "forgejo-terminal-issue-state-request@v2"},
+    "forge_url": {"enum": ["http://localhost:3000", "http://127.0.0.1:3000"]},
+    "repository": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+    "issue_number": {"type": "integer", "minimum": 1},
+    "action": {"const": "set-state"},
+    "expected_state": {"const": "open"},
+    "desired_state": {"const": "closed"},
+    "idempotency_marker": {"type": "string", "format": "uri", "maxLength": 256},
+    "source_receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "issue_url", "issue_state", "pull_request_url", "merge_sha"],
+      "properties": {
+        "kind": {"const": "github-issue-closure"},
+        "issue_url": {"type": "string", "format": "uri"},
+        "issue_state": {"const": "closed"},
+        "pull_request_url": {"type": "string", "format": "uri"},
+        "merge_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+      }
+    },
+    "admission": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "authority", "reason"],
+      "properties": {
+        "status": {"const": "admitted"},
+        "authority": {"const": "user"},
+        "reason": {"type": "string", "minLength": 1, "maxLength": 500}
+      }
+    },
+    "maturity_effect": {"const": "tracking-only-no-maturity-change"}
+  }
+}

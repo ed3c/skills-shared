@@ -73,10 +73,14 @@ flowchart LR
 1. 唯讀確認 Forgejo version、目前 auth、精確 repository full name、Git remote 與 branch。
    repository 不存在時不得把 issue 404 當暫時錯誤重試；先投影一個獨立的
    `repository-bootstrap` 小迴圈，建立後回讀 owner／name／visibility，再交 repo-local operator 配 remote。
-2. issue 類操作先產生並驗證 `forgejo-terminal-issue-request@v1`。
-   現有入口是 `runtime/forgejo/project-terminal-issue-request.ts`；
-   schema 驗證入口是 `runtime/contracts/validate-packet.ts`。
-3. 在 mutation 前搜尋完整 idempotency marker。
+2. issue 終態操作先產生 `forgejo-terminal-issue-state-request@v2`，再執行：
+   `python3 <本skill>/scripts/issue_state.py validate --request <request.json>` 與
+   `validate-source-live`。
+   它只接受 loopback Forgejo、明確 user admission、完整 GitHub source closure lineage，且
+   authenticated GitHub read 必須證明 issue closed、PR merged、merge SHA 與 `Closes #N` 關係；
+   expected/desired 必須確實形成狀態轉移。缺任一欄位或語義不符就停止。
+3. mutation 前以 `capture-pre-live` 從 authenticated Forgejo API 讀回 expected state，並在 issue
+   body 搜尋完整 source URL idempotency marker。
    找到便回用既有 issue，不得建立第二張。
 4. 若 route 指向 `repo-terminal-operator`，只交付 typed terminal packet；
    operator 完成 focused CQ／production-use 與分子 commit 後再回本流程。
@@ -86,7 +90,11 @@ flowchart LR
 ### V0 — Validate and advance
 
 每次操作完成都重新讀取目標物，至少核對 repository、issue／PR number、marker、head／merge SHA
-與 HTTP/UI 狀態。任何不一致回 `failed`，保留原始錯誤因果與下一個修復 prompt。
+與 HTTP/UI 狀態。issue 終態以 `forgejo-issue-state-observation@v1` 保存 mutation 前的 authenticated
+API observation，再執行：`python3 <本skill>/scripts/issue_state.py verify-live --request
+<request.json> --pre-observation <pre-observation.json>`。此命令自行重新讀取 Forgejo 後態；呼叫者
+不能傳入自填 post observation，且必須從 authenticated timeline 找到 pre-read 後五分鐘內唯一的
+close event。任何不一致回 `failed`，保留原始錯誤因果與下一個修復 prompt。
 
 - 小迴圈 PASS：回傳單一 terminal receipt、Forgejo URL／number 與下一個合法 mode。
 - 大迴圈 PASS：只更新 queue projection；一次最多十個 open gaps、每個 repo 最多一個
@@ -107,6 +115,7 @@ Forgejo 不健康時只在使用者已授權服務恢復的範圍內做最多三
 ```bash
 bun run <本skill>/scripts/route.ts --selftest
 bun test tests/forgejo/forgejo-delivery-route.test.ts
+bash <本skill>/tests/issue-state/verify.sh
 ```
 
 完整契約與舊經驗取捨見 [references/contracts.md](references/contracts.md)。
