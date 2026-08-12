@@ -9,12 +9,15 @@ on:
       - 'scripts/check_mutation_lineage.py'
       - 'scripts/check_capability_unlocks.py'
       - 'scripts/summarize_skill_eval_matrix.py'
+      - 'scripts/export_skill_eval_runtime.py'
       - 'tests/test_skill_eval_gate.py'
       - 'tests/test_autoresearch_eval_v1.py'
       - 'tests/test_cross_harness_contract.py'
       - 'tests/test_mutation_lineage.py'
       - 'tests/test_capability_unlocks.py'
+      - 'tests/test_runtime_export.py'
       - '.github/workflows/skill-eval-contract.yml'
+      - '.github/workflows/skill-eval-physical-skill-up.yml'
   push:
     branches:
       - main
@@ -25,11 +28,13 @@ on:
       - 'scripts/check_mutation_lineage.py'
       - 'scripts/check_capability_unlocks.py'
       - 'scripts/summarize_skill_eval_matrix.py'
+      - 'scripts/export_skill_eval_runtime.py'
       - 'tests/test_skill_eval_gate.py'
       - 'tests/test_autoresearch_eval_v1.py'
       - 'tests/test_cross_harness_contract.py'
       - 'tests/test_mutation_lineage.py'
       - 'tests/test_capability_unlocks.py'
+      - 'tests/test_runtime_export.py'
 
 permissions:
   contents: read
@@ -58,6 +63,12 @@ jobs:
         run: python3 -m unittest tests/test_mutation_lineage.py -v
       - name: Run capability unlock threshold tests
         run: python3 -m unittest tests/test_capability_unlocks.py -v
+      - name: Run runtime export tests
+        run: python3 -m unittest tests/test_runtime_export.py -v
+      - name: Validate executor authority documents
+        run: |
+          python3 -m json.tool evals/runtime/executors/arena.json >/dev/null
+          python3 -m json.tool evals/runtime/executors/skill-up.json >/dev/null
       - name: Exercise gold replay verifier safe-block path
         run: |
           tmp="$(mktemp -d)"
