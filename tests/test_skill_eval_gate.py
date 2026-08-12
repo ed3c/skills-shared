@@ -20,10 +20,22 @@ class SkillEvalGateTests(unittest.TestCase):
         (self.root / "evals" / "cases" / "demo").mkdir(parents=True)
         (self.root / "evals" / "fixtures").mkdir(parents=True)
         (self.root / "evals" / "verifiers").mkdir(parents=True)
+        (self.root / "skills" / "demo-skill").mkdir(parents=True)
+        (self.root / "skills" / "other-skill").mkdir(parents=True)
         shutil.copy2(SOURCE_GATE, self.root / "scripts" / "check_skill_evals.py")
         (self.root / "evals" / "fixtures" / "input.txt").write_text("fixture\n", encoding="utf-8")
         (self.root / "evals" / "verifiers" / "verify.py").write_text(
             "raise SystemExit(0)\n", encoding="utf-8"
+        )
+        (self.root / "skills" / "demo-skill" / "runtime.py").write_text(
+            "# legacy_anchor exists only in a comment\n\n"
+            "def live_contract() -> bool:\n"
+            "    return True\n",
+            encoding="utf-8",
+        )
+        (self.root / "skills" / "other-skill" / "runtime.py").write_text(
+            "def foreign_contract() -> bool:\n    return True\n",
+            encoding="utf-8",
         )
         self.write_good_case()
         self.write_good_coverage()
@@ -69,6 +81,16 @@ class SkillEvalGateTests(unittest.TestCase):
         }
         self.coverage_path.write_text(json.dumps(coverage), encoding="utf-8")
 
+    def make_real_incident(self, *, path="skills/demo-skill/runtime.py", anchor="def live_contract(") -> None:
+        self.mutate_case(
+            lambda case: case.update(
+                {
+                    "source": {"kind": "github_issue", "ref": "demo/repo#1"},
+                    "implementation_targets": [{"path": path, "anchor": anchor}],
+                }
+            )
+        )
+
     def run_gate(self) -> subprocess.CompletedProcess[str]:
         return subprocess.run(
             ["python3", str(self.root / "scripts" / "check_skill_evals.py")],
@@ -92,6 +114,64 @@ class SkillEvalGateTests(unittest.TestCase):
         result = self.run_gate()
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("PASS skill eval coverage", result.stdout)
+
+    def test_real_incident_with_live_target_passes(self) -> None:
+        self.make_real_incident()
+        result = self.run_gate()
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_real_incident_requires_implementation_targets(self) -> None:
+        self.mutate_case(
+            lambda case: case.update(
+                {"source": {"kind": "github_issue", "ref": "demo/repo#1"}}
+            )
+        )
+        result = self.run_gate()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("requires implementation_targets", result.stderr)
+
+    def test_missing_implementation_target_fails(self) -> None:
+        self.make_real_incident(path="skills/demo-skill/missing.py")
+        result = self.run_gate()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("stale implementation target does not exist", result.stderr)
+
+    def test_implementation_target_escape_fails(self) -> None:
+        self.make_real_incident(path="../outside.py")
+        result = self.run_gate()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("escapes repository", result.stderr)
+
+    def test_wrong_skill_target_fails(self) -> None:
+        self.make_real_incident(
+            path="skills/other-skill/runtime.py", anchor="def foreign_contract("
+        )
+        result = self.run_gate()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("must stay under skills/demo-skill/", result.stderr)
+
+    def test_comment_only_anchor_fails(self) -> None:
+        self.make_real_incident(anchor="legacy_anchor")
+        result = self.run_gate()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("not found on a non-comment line", result.stderr)
+
+    def test_trivial_anchor_fails(self) -> None:
+        self.make_real_incident(anchor="###")
+        result = self.run_gate()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("anchor must be a meaningful token", result.stderr)
+
+    def test_duplicate_implementation_target_fails(self) -> None:
+        self.make_real_incident()
+        self.mutate_case(
+            lambda case: case["implementation_targets"].append(
+                dict(case["implementation_targets"][0])
+            )
+        )
+        result = self.run_gate()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("duplicate implementation target", result.stderr)
 
     def test_empty_runnable_set_fails(self) -> None:
         self.case_path.unlink()
