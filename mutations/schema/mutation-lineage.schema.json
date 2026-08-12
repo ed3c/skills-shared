@@ -24,7 +24,7 @@
     },
     "regression_budget": {"type": "number", "minimum": 0},
     "status": {"enum": ["proposed", "running", "won", "lost", "tie", "reverted"]},
-    "evidence_bundle": {"type": ["string", "null"]},
+    "evaluation_receipt": {"type": ["string", "null"]},
     "rollback_sha": {"type": "string", "pattern": "^[0-9a-f]{7,64}$"}
   }
 }
