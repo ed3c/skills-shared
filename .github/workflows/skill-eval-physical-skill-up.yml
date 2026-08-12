@@ -59,7 +59,7 @@ jobs:
         run: |
           set -euo pipefail
           case "$CURRENT_SHA" in
-            [0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]) ;;
+            [0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]) ;;
             *) echo "current_sha must be exact lowercase 40-char SHA" >&2; exit 2 ;;
           esac
           git cat-file -e "$CURRENT_SHA^{commit}"
@@ -185,9 +185,11 @@ jobs:
             --provider "$PROVIDER" \
             --model "$MODEL" \
             --seed "$SEED" \
-            --output ".physical-runtime/${VARIANT}/attempt/executor-evidence.json"
+            --output ".physical-runtime/${VARIANT}/attempt/executor-evidence.json" \
+            --baseline-output ".physical-runtime/${VARIANT}/attempt/no-skill-executor-evidence.json"
           cp "$REPORT_DIR/report.json" ".physical-runtime/${VARIANT}/attempt/skill-up-report.json"
           python3 -m json.tool ".physical-runtime/${VARIANT}/attempt/executor-evidence.json" >/dev/null
+          python3 -m json.tool ".physical-runtime/${VARIANT}/attempt/no-skill-executor-evidence.json" >/dev/null
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
