@@ -11,6 +11,8 @@ on:
       - 'mutations/**'
       - 'scripts/check_skill_evals.py'
       - 'scripts/check_mutation_lineage.py'
+      - 'scripts/check_mutation_targets.py'
+      - 'scripts/check_mutation_promotions.py'
       - 'scripts/check_capability_unlocks.py'
       - 'scripts/check_release_receipts.py'
       - 'scripts/render_scorecard_index.py'
@@ -25,6 +27,8 @@ on:
       - 'tests/test_cross_harness_contract.py'
       - 'tests/test_cross_harness_gap.py'
       - 'tests/test_mutation_lineage.py'
+      - 'tests/test_mutation_targets.py'
+      - 'tests/test_mutation_promotions.py'
       - 'tests/test_capability_unlocks.py'
       - 'tests/test_release_receipts.py'
       - 'tests/test_scorecard_index.py'
@@ -68,6 +72,10 @@ jobs:
         run: python3 scripts/check_skill_evals.py
       - name: Validate mutation lineage
         run: python3 scripts/check_mutation_lineage.py
+      - name: Validate mutation target visibility
+        run: python3 scripts/check_mutation_targets.py
+      - name: Validate mutation promotion admission
+        run: python3 scripts/check_mutation_promotions.py
       - name: Validate capability unlock registry
         run: python3 scripts/check_capability_unlocks.py
       - name: Validate verified capability releases
@@ -81,6 +89,8 @@ jobs:
           python3 -m unittest tests/test_cross_harness_contract.py -v
           python3 -m unittest tests/test_cross_harness_gap.py -v
           python3 -m unittest tests/test_mutation_lineage.py -v
+          python3 -m unittest tests/test_mutation_targets.py -v
+          python3 -m unittest tests/test_mutation_promotions.py -v
           python3 -m unittest tests/test_capability_unlocks.py -v
           python3 -m unittest tests/test_release_receipts.py -v
           python3 -m unittest tests/test_scorecard_index.py -v
@@ -91,7 +101,7 @@ jobs:
           python3 -m unittest tests/test_build_verified_run.py -v
       - name: Compile runtime and adapter scripts
         run: python3 -m compileall -q scripts evals/adapters evals/verifiers tests
-      - name: Validate authority, release, and scorecard JSON contracts
+      - name: Validate JSON contracts
         run: |
           python3 -m json.tool evals/runtime/executors/arena.json >/dev/null
           python3 -m json.tool evals/runtime/executors/skill-up.json >/dev/null
@@ -102,6 +112,10 @@ jobs:
           python3 -m json.tool evals/schema/skill-scorecard.schema.json >/dev/null
           python3 -m json.tool evals/releases.json >/dev/null
           python3 -m json.tool evals/scorecards/index.json >/dev/null
+          python3 -m json.tool mutations/schema/mutation-lineage.schema.json >/dev/null
+          python3 -m json.tool mutations/schema/mutation-eval.schema.json >/dev/null
+          python3 -m json.tool mutations/schema/mutation-promotion-registry.schema.json >/dev/null
+          python3 -m json.tool mutations/promotions.json >/dev/null
       - name: Exercise gold replay verifier safe-block path
         run: |
           tmp="$(mktemp -d)"
