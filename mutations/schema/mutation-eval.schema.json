@@ -25,11 +25,12 @@
       "items": {"type": "string", "minLength": 3}
     },
     "non_target_case_ids": {
-      "type": "array", "uniqueItems": true,
+      "type": "array", "minItems": 1, "uniqueItems": true,
       "items": {"type": "string", "minLength": 3}
     },
     "evidence_bundles": {
-      "type": "array", "minItems": 2, "uniqueItems": true,
+      "description": "For every target and non-target case, carries paired current(parent), candidate, and no-skill observations with equal repetition counts.",
+      "type": "array", "minItems": 6, "uniqueItems": true,
       "items": {"type": "string", "minLength": 1}
     }
   }
