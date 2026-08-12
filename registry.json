@@ -116,6 +116,11 @@
       "name": "repo-wiki-converge",
       "admitted": "2026-08-07",
       "why": "Four copies. ix-agy's module had four operational fixes the others never learned -- monorepo git detection, judge timeout, and the zero-page hole where a mechanical checker passed because there was no code to fail. Exactly the rediscovery this repo exists to stop."
+    },
+    {
+      "name": "git-town-stacked-pr-worker",
+      "admitted": "2026-08-12",
+      "why": "Stack hierarchy, isolated Worker worktrees, eval-first task packets, bounded unattended synchronization, evidence states and Human Admit boundaries are cross-repository Git infrastructure. Repository-specific configuration, Bash wrappers, paths, issues, remotes and receipts remain consumer-owned bindings rather than duplicate canonical prompt bodies."
     }
   ],
   "repo_owned": [
