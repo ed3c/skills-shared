@@ -85,7 +85,8 @@ merge API
 1. **Authority gate**：預設是 owner 對指定 PR 的 fresh label；只有使用者明確 opt-in 時，才可改成
    personal-owner policy。後者以 authenticated viewer 與 repository owner 的 immutable user ID 每次重驗，
    讓同一人擁有的未來 repo 自動納入、collaborator／organization repo 排除。永久 command allow 本身
-   兩種模式下都不構成 landing decision。
+   兩種模式下都不構成 landing decision。單張 slice 以 `--pr N` 同時釘住 preflight 與 land 的集合；
+   省略它才是明確選擇全量已授權 PR。
 2. **Codex execpolicy**：user-level `prefix_rule` 只決定某個 argv prefix 能否離開 sandbox 執行。
    human-admit 規則釘到 `gh pr merge --repo OWNER/REPOSITORY`；owner-auto 規則釘到 canonical
    `merge_gate.py land --repo` wrapper，絕不放行 generic `gh api graphql`。參數順序是 prefix contract
@@ -95,7 +96,8 @@ merge API
    仍可拒絕相同 shell command，甚至拒絕 connector merge tool。最嚴格決策勝出；不得用換 API、
    command obfuscation 或停用 hook 逃逸，應回報命中的 policy 與所需 owner 變更。
 4. **GitHub gate**：最後仍受 token/repository 權限、branch protection、required checks、HEAD 漂移
-   與 mergeability 約束。merge 前釘 expected HEAD；每次 base 更新後重新查下一張 PR。
+   與 mergeability 約束。merge 前釘 expected HEAD；`--pr N` 直接讀取並只合併該 PR，一次成功後停止；
+   全量模式才在每次 base 更新後重新查下一張 PR。
 
 安裝窄規則的可重播入口：
 

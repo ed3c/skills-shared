@@ -86,8 +86,12 @@ preflight 三個都驗——少驗一個平面就會把「還會被擋」報成�
    自己的閘，不推論**；非 active host 只報告不阻擋：
 
    ```bash
-   python3 ~/.claude/skills/github-delivery-loop/scripts/merge_gate.py preflight --repo OWNER/REPO
+   python3 ~/.claude/skills/github-delivery-loop/scripts/merge_gate.py preflight --repo OWNER/REPO [--pr N]
    ```
+
+   一條 delivery line 只交付一張 PR 時，`preflight` 與下方 `land` **兩邊都要帶同一個
+   `--pr N`**。live 模式直接讀該 PR，snapshot 模式要求該號碼恰好出現一次；缺席、重覆或非正整數
+   都 fail closed。省略 `--pr` 是刻意選擇「評估所有已授權 open PR」，不是單張交付的安全預設。
 
    `exit 0` 可落地｜`1` 有一層拒絕（stderr 指名層、PR 與確切修法）｜`3` 沒有任何 PR 被 admit
    （**缺席，不是拒絕**——別去修一個不存在的權限問題）｜`4` 某一層**判不出來**
@@ -96,10 +100,10 @@ preflight 三個都驗——少驗一個平面就會把「還會被擋」報成�
 3. **land**：綠了才落地。每張 PR 落地前重取快照並釘住 HEAD；human-admit 使用
    `--match-head-commit`，owner-auto 用 GraphQL `expectedHeadOid`，語意相同。owner-auto 不覆寫
    commit email（交給 GitHub 帳號的 web Git privacy 設定），不使用 `--admin`，也忽略 `--allow-unstable` 的放寬；
-   base 移動後自動重算下一張。
+   全量模式會在 base 移動後自動重算下一張；`--pr N` 模式成功合併一次就停止，不掃描其他 PR。
 
    ```bash
-   python3 ~/.claude/skills/github-delivery-loop/scripts/merge_gate.py land --repo OWNER/REPO [--dry-run]
+   python3 ~/.claude/skills/github-delivery-loop/scripts/merge_gate.py land --repo OWNER/REPO [--pr N] [--dry-run]
    ```
 
 4. 任一層拒絕 → **停下並回報命中的 policy 與 owner 需要的變更**；禁止改用混淆命令、換 API

@@ -17,8 +17,8 @@ Layers:
   L4 MERGE         performed by `land`, with --match-head-commit.
 
 Usage:
-  merge_gate.py preflight --repo OWNER/REPO [--snapshot FILE] [--allow-unstable]
-  merge_gate.py land --repo OWNER/REPO [--dry-run] [--allow-unstable]
+  merge_gate.py preflight --repo OWNER/REPO [--pr N] [--snapshot FILE] [--allow-unstable]
+  merge_gate.py land --repo OWNER/REPO [--pr N] [--dry-run] [--allow-unstable]
   merge_gate.py configure-owner --owner LOGIN
 
 Exit codes: 0 ready, 1 a layer refuses, 3 nothing authorized (absence != refusal),
@@ -63,6 +63,16 @@ MERGE_MUTATION = """mutation($pullRequestId:ID!,$expectedHeadOid:GitObjectID!){
 
 class GateError(RuntimeError):
     """Raised when merge authority cannot be established."""
+
+
+def positive_pull_number(value: str) -> int:
+    try:
+        number = int(value)
+    except ValueError as error:
+        raise argparse.ArgumentTypeError("--pr must be a positive integer") from error
+    if number < 1:
+        raise argparse.ArgumentTypeError("--pr must be a positive integer")
+    return number
 
 
 def _iso(value: str) -> datetime:
@@ -138,7 +148,9 @@ def load_policy(path: Path | None) -> tuple[dict[str, Any] | None, Path | None]:
 
 
 def fetch_snapshot(
-    repository: str, policy: dict[str, Any] | None = None
+    repository: str,
+    policy: dict[str, Any] | None = None,
+    pull_number: int | None = None,
 ) -> dict[str, Any]:
     """Read live repository identity and the PR set for the active authority mode."""
     repo = _gh_json(
@@ -153,22 +165,36 @@ def fetch_snapshot(
     if not repo.get("owner", {}).get("login"):
         raise GateError(f"could not read the owner of {repository}")
     viewer = _gh_json(["api", "user", "--jq", "{login:.login,id:.id,type:.type}"], {})
-    fields = "id,number,url,title,isDraft,headRefOid,mergeable,mergeStateStatus"
-    pull_args = [
-        "pr",
-        "list",
-        "--repo",
-        repository,
-        "--state",
-        "open",
-    ]
-    if policy is None:
-        pull_args += ["--label", ADMIT_LABEL]
-    pull_args += ["--json", fields]
-    pulls = _gh_json(
-        pull_args,
-        [],
-    )
+    fields = "id,number,url,title,state,isDraft,headRefOid,mergeable,mergeStateStatus"
+    if pull_number is not None:
+        pull = _gh_json(
+            [
+                "pr",
+                "view",
+                str(pull_number),
+                "--repo",
+                repository,
+                "--json",
+                fields,
+            ],
+            {},
+        )
+        if not pull:
+            raise GateError(f"could not read PR #{pull_number} in {repository}")
+        pulls = [pull]
+    else:
+        pull_args = [
+            "pr",
+            "list",
+            "--repo",
+            repository,
+            "--state",
+            "open",
+        ]
+        if policy is None:
+            pull_args += ["--label", ADMIT_LABEL]
+        pull_args += ["--json", fields]
+        pulls = _gh_json(pull_args, [])
     for pull in pulls:
         head = pull["headRefOid"]
         pull["head_committed_at"] = _gh_json(
@@ -212,6 +238,21 @@ def load_snapshot(path: Path) -> dict[str, Any]:
         if field not in value:
             raise GateError(f"snapshot lacks '{field}': {path}")
     return value
+
+
+def select_pulls(
+    pulls: list[dict[str, Any]], pull_number: int | None
+) -> list[dict[str, Any]]:
+    """Return the explicitly requested PR, or preserve the all-PR scope."""
+    if pull_number is None:
+        return pulls
+    selected = [pull for pull in pulls if pull.get("number") == pull_number]
+    if len(selected) != 1:
+        raise GateError(
+            f"PR #{pull_number} must appear exactly once in the active snapshot; "
+            f"found {len(selected)}"
+        )
+    return selected
 
 
 # --------------------------------------------------------------------------
@@ -532,6 +573,8 @@ def probe_codex(repository: str, merge_cmd: list[str]) -> tuple[str, str]:
 
 
 def check_github(pull: dict[str, Any], allow_unstable: bool) -> str | None:
+    if "state" in pull and pull.get("state") != "OPEN":
+        return f"state={pull.get('state')} -- PR is not open"
     if pull.get("isDraft"):
         return "PR is a draft -- mark it ready for review first"
     if not SHA_RE.fullmatch(str(pull.get("headRefOid", ""))):
@@ -664,7 +707,7 @@ def bootstrap(
         _install_owner_rule(policy, rules_dir)
         print("SKIP    merge-admit label: owner-auto policy is active")
         print(f"--- preflight {repository} ---")
-        return preflight(repository, None, allow_unstable, policy, policy_path)
+        return preflight(repository, None, allow_unstable, policy, policy_path, None)
 
     labels = _gh_json(
         ["label", "list", "-R", repository, "--search", ADMIT_LABEL, "--json", "name"],
@@ -714,7 +757,7 @@ def bootstrap(
         print(f"CREATED execpolicy rule: {rule} (restart Codex to load it)")
 
     print(f"--- preflight {repository} ---")
-    return preflight(repository, None, allow_unstable, None, None)
+    return preflight(repository, None, allow_unstable, None, None, None)
 
 
 def merge_command(
@@ -755,6 +798,7 @@ def probe_command(
     pull: dict[str, Any],
     policy: dict[str, Any] | None,
     policy_path: Path | None,
+    pull_number: int | None,
 ) -> list[str]:
     if policy is None:
         return merge_command(repository, pull, None)
@@ -767,6 +811,8 @@ def probe_command(
     ]
     if policy_path is not None and policy_path != default_policy_path():
         command += ["--policy", str(policy_path)]
+    if pull_number is not None:
+        command += ["--pr", str(pull_number)]
     return command
 
 
@@ -776,15 +822,16 @@ def preflight(
     allow_unstable: bool,
     policy: dict[str, Any] | None,
     policy_path: Path | None,
+    pull_number: int | None,
 ) -> int:
     snapshot = (
         load_snapshot(snapshot_path)
         if snapshot_path
-        else fetch_snapshot(repository, policy)
+        else fetch_snapshot(repository, policy, pull_number)
     )
     if snapshot["repo"] != repository:
         raise GateError(f"snapshot repo {snapshot['repo']} != --repo {repository}")
-    pulls = snapshot["pulls"]
+    pulls = select_pulls(snapshot["pulls"], pull_number)
     ready: list[dict[str, Any]] = []
     blocked = 0
     owner_reason = check_owner_policy(snapshot, policy) if policy else None
@@ -814,7 +861,7 @@ def preflight(
     # The host probe runs even with nothing admitted: knowing which layer will
     # refuse is worth most *before* the work starts, not after.
     sample = (ready or pulls or [{"number": 1, "headRefOid": "0" * 40}])[0]
-    probe_cmd = probe_command(repository, sample, policy, policy_path)
+    probe_cmd = probe_command(repository, sample, policy, policy_path, pull_number)
     host = active_host()
     host_blocked = False
     host_unevaluable = False
@@ -869,11 +916,12 @@ def land(
     allow_unstable: bool,
     dry_run: bool,
     policy: dict[str, Any] | None,
+    pull_number: int | None,
 ) -> int:
-    """Merge every admitted PR, re-checking each one against a fresh snapshot."""
+    """Merge the requested PR, or every admitted PR when no scope is given."""
     landed = 0
     while True:
-        snapshot = fetch_snapshot(repository, policy)
+        snapshot = fetch_snapshot(repository, policy, pull_number)
         owner_reason = check_owner_policy(snapshot, policy) if policy else None
         if owner_reason:
             print(
@@ -881,9 +929,32 @@ def land(
                 file=sys.stderr,
             )
             return 1
+        pulls = select_pulls(snapshot["pulls"], pull_number)
+        if pull_number is not None:
+            pull = pulls[0]
+            admit_reason = owner_reason
+            if policy is None:
+                admit_reason = check_admit(pull, owner_login(snapshot))
+            reason = admit_reason or check_github(
+                pull, allow_unstable and policy is None
+            )
+            if reason:
+                layer = (
+                    "L1 OWNER-IDENTITY"
+                    if policy is not None and admit_reason
+                    else "L1 HUMAN-ADMIT"
+                    if admit_reason
+                    else "L3 GITHUB"
+                )
+                print(
+                    f"BLOCK #{pull_number} {str(pull.get('headRefOid', ''))[:7]} "
+                    f"[{layer}] {reason}",
+                    file=sys.stderr,
+                )
+                return 1
         pending = [
             pull
-            for pull in sorted(snapshot["pulls"], key=lambda item: item["number"])
+            for pull in sorted(pulls, key=lambda item: item["number"])
             if (policy is not None or check_admit(pull, owner_login(snapshot)) is None)
             and check_github(pull, allow_unstable and policy is None) is None
         ]
@@ -901,6 +972,8 @@ def land(
             return 1
         landed += 1
         print(f"LANDED #{pull['number']} {pull['headRefOid'][:7]}")
+        if pull_number is not None:
+            break
     if landed == 0:
         marker = "NO-LANDABLE-PR" if policy is not None else "NO-ADMIT"
         print(f"{marker} {repository}: nothing was landable.")
@@ -932,8 +1005,16 @@ def _parser() -> argparse.ArgumentParser:
         sub.add_argument("--allow-unstable", action="store_true")
         if name == "preflight":
             sub.add_argument("--snapshot", type=Path, help="offline replay; no network")
+            sub.add_argument(
+                "--pr",
+                type=positive_pull_number,
+                help="evaluate only this pull request",
+            )
         elif name == "land":
             sub.add_argument("--dry-run", action="store_true")
+            sub.add_argument(
+                "--pr", type=positive_pull_number, help="merge only this pull request"
+            )
         else:
             sub.add_argument(
                 "--rules-dir", type=Path, default=Path.home() / ".codex" / "rules"
@@ -969,6 +1050,7 @@ def main(argv: list[str] | None = None) -> int:
                 args.allow_unstable,
                 policy,
                 policy_path,
+                args.pr,
             )
         if args.command == "bootstrap":
             return bootstrap(
@@ -978,7 +1060,7 @@ def main(argv: list[str] | None = None) -> int:
                 policy,
                 policy_path,
             )
-        return land(repository, args.allow_unstable, args.dry_run, policy)
+        return land(repository, args.allow_unstable, args.dry_run, policy, args.pr)
     except GateError as error:
         print(f"FAIL {error}", file=sys.stderr)
         return 1

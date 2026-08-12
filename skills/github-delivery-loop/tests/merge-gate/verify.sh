@@ -57,6 +57,126 @@ run "${clean_home}" python3 "${gate}" preflight --repo "${repo}" \
 grep -q "READY #7" "${scratch}/owner-good.out"
 grep -q "PREFLIGHT GREEN: 1 PR" "${scratch}/owner-good.out"
 
+# 3b-i. A requested PR is the complete evaluation scope. A failure in another
+# open PR must not block it, and another ready PR must not become landable by
+# accident.
+run "${clean_home}" python3 "${gate}" preflight --repo "${repo}" --pr 31 \
+  --policy "${owner_policy}" \
+  --snapshot "${test_dir}/fixtures/owner-auto/multiple.json" \
+  > "${scratch}/owner-scoped.out"
+grep -q "READY #31" "${scratch}/owner-scoped.out"
+grep -q "PREFLIGHT GREEN: 1 PR" "${scratch}/owner-scoped.out"
+if grep -Eq "#(2|6)([^0-9]|$)" "${scratch}/owner-scoped.out"; then
+  echo "FAIL: scoped preflight evaluated an unrelated PR" >&2
+  exit 1
+fi
+
+set +e
+run "${clean_home}" python3 "${gate}" preflight --repo "${repo}" --pr 404 \
+  --policy "${owner_policy}" \
+  --snapshot "${test_dir}/fixtures/owner-auto/multiple.json" \
+  >"${scratch}/owner-missing.out" 2>"${scratch}/owner-missing.err"
+owner_missing_status=$?
+run "${clean_home}" python3 "${gate}" preflight --repo "${repo}" --pr 0 \
+  --policy "${owner_policy}" \
+  --snapshot "${test_dir}/fixtures/owner-auto/multiple.json" \
+  >"${scratch}/owner-zero.out" 2>"${scratch}/owner-zero.err"
+owner_zero_status=$?
+set -e
+test "${owner_missing_status}" -eq 1
+grep -q "PR #404 must appear exactly once.*found 0" "${scratch}/owner-missing.err"
+test "${owner_zero_status}" -eq 2
+grep -q -- "--pr must be a positive integer" "${scratch}/owner-zero.err"
+
+# 3b-ii. Live scoped preflight reads the selected PR directly; it must not list
+# every open PR and then filter locally.
+fake_bin="${scratch}/fake-bin"
+mkdir -p "${fake_bin}"
+apply_log="${scratch}/fake-gh.log"
+cat > "${fake_bin}/gh" <<'SH'
+#!/usr/bin/env bash
+set -euo pipefail
+echo "$*" >> "${GH_LOG}"
+case "$*" in
+  "api repos/example/infrastructure --jq "*)
+    echo '{"full_name":"example/infrastructure","node_id":"R_example","owner":{"login":"example","id":42,"type":"User"},"permissions":{"admin":true}}'
+    ;;
+  "api user --jq "*)
+    echo '{"login":"example","id":42,"type":"User"}'
+    ;;
+  "pr view 31 --repo example/infrastructure --json "*)
+    echo '{"id":"PR_owner_auto_31","number":31,"url":"https://github.com/example/infrastructure/pull/31","title":"selected live PR","state":"OPEN","isDraft":false,"headRefOid":"3131313131313131313131313131313131313131","mergeable":"MERGEABLE","mergeStateStatus":"CLEAN"}'
+    ;;
+  "pr view 6 --repo example/infrastructure --json "*)
+    echo '{"id":"PR_owner_auto_6","number":6,"url":"https://github.com/example/infrastructure/pull/6","title":"selected failing PR","state":"OPEN","isDraft":false,"headRefOid":"6666666666666666666666666666666666666666","mergeable":"MERGEABLE","mergeStateStatus":"UNSTABLE"}'
+    ;;
+  "api repos/example/infrastructure/commits/3131313131313131313131313131313131313131 --jq "*)
+    echo '{"d":"2026-08-12T01:00:00Z"}'
+    ;;
+  "api repos/example/infrastructure/commits/6666666666666666666666666666666666666666 --jq "*)
+    echo '{"d":"2026-08-12T01:00:00Z"}'
+    ;;
+  "api graphql -f query=mutation"*)
+    echo '{"data":{"mergePullRequest":{"pullRequest":{"number":31,"merged":true}}}}'
+    ;;
+  *)
+    echo "unexpected gh call: $*" >&2
+    exit 70
+    ;;
+esac
+SH
+chmod 755 "${fake_bin}/gh"
+GH_LOG="${apply_log}" PATH="${fake_bin}:${PATH}" run "${clean_home}" \
+  python3 "${gate}" preflight --repo "${repo}" --pr 31 \
+  --policy "${owner_policy}" > "${scratch}/owner-live-scoped.out"
+grep -q "READY #31" "${scratch}/owner-live-scoped.out"
+grep -q "pr view 31 --repo ${repo}" "${apply_log}"
+if grep -q "pr list" "${apply_log}"; then
+  echo "FAIL: live scoped preflight listed unrelated PRs" >&2
+  exit 1
+fi
+
+: > "${apply_log}"
+GH_LOG="${apply_log}" PATH="${fake_bin}:${PATH}" run "${clean_home}" \
+  python3 "${gate}" land --repo "${repo}" --pr 31 \
+  --policy "${owner_policy}" > "${scratch}/owner-live-land.out"
+grep -q "LANDED #31 3131313" "${scratch}/owner-live-land.out"
+grep -q "LANDED=1" "${scratch}/owner-live-land.out"
+test "$(grep -c "api graphql" "${apply_log}")" -eq 1
+grep -q "pullRequestId=PR_owner_auto_31" "${apply_log}"
+if grep -Eq "pr list|pullRequestId=PR_owner_auto_2" "${apply_log}"; then
+  echo "FAIL: scoped land touched an unrelated PR" >&2
+  exit 1
+fi
+
+: > "${apply_log}"
+GH_LOG="${apply_log}" PATH="${fake_bin}:${PATH}" run "${clean_home}" \
+  python3 "${gate}" land --repo "${repo}" --pr 31 --dry-run \
+  --policy "${owner_policy}" > "${scratch}/owner-live-dry-run.out"
+grep -q "pullRequestId=PR_owner_auto_31" "${scratch}/owner-live-dry-run.out"
+grep -q "expectedHeadOid=3131313131313131313131313131313131313131" \
+  "${scratch}/owner-live-dry-run.out"
+if grep -Eq "pr list|pullRequestId=PR_owner_auto_2" "${apply_log}"; then
+  echo "FAIL: scoped dry-run touched an unrelated PR" >&2
+  exit 1
+fi
+
+: > "${apply_log}"
+set +e
+GH_LOG="${apply_log}" PATH="${fake_bin}:${PATH}" run "${clean_home}" \
+  python3 "${gate}" land --repo "${repo}" --pr 6 \
+  --policy "${owner_policy}" \
+  >"${scratch}/owner-live-blocked.out" 2>"${scratch}/owner-live-blocked.err"
+owner_land_blocked_status=$?
+set -e
+test "${owner_land_blocked_status}" -eq 1
+grep -q "BLOCK #6 .*L3 GITHUB.*mergeStateStatus=UNSTABLE" \
+  "${scratch}/owner-live-blocked.err"
+if grep -q "api graphql" "${apply_log}"; then
+  echo "FAIL: scoped land attempted a merge after L3 refusal" >&2
+  exit 1
+fi
+
 sed 's/"CLEAN"/"UNSTABLE"/' \
   "${test_dir}/fixtures/owner-auto/good.json" > "${scratch}/owner-unstable.json"
 set +e

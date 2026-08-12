@@ -228,7 +228,8 @@ policy。這不是把 `gh pr merge`／`gh api graphql` 全域放行；Codex rule
 1. authenticated viewer 的 login＋numeric user ID 等於 policy；
 2. repository owner 的 login＋numeric ID 也相等，且 owner type 必須是 personal `User`；
 3. canonical `owner/repo` 沒有 redirect，viewer 仍有 admin；
-4. PR 非 draft、mergeable、required checks／branch rules 可落地，且 `expectedHeadOid` 等於剛驗過的 HEAD。
+4. PR 非 draft、mergeable、required checks／branch rules 可落地，且 `expectedHeadOid` 等於剛驗過的 HEAD；
+5. 單張交付的 `preflight --pr N` 與 `land --pr N` 使用同一個範圍，成功一次即停止，不掃描其他 open PR。
 
 所以「未來 repo」不靠預先列白名單：只要日後 repo 仍由同一個 personal GitHub User 擁有就通過；
 collaborator、organization member／owner、以及他人 repo 的 admin 都拒絕。login rename、token 換人、repo
