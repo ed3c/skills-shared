@@ -8,6 +8,12 @@
     "kind": "github_issue",
     "ref": "skills-shared#25"
   },
+  "implementation_targets": [
+    {
+      "path": "skills/github-delivery-loop/scripts/merge_gate.py",
+      "anchor": "def fetch_snapshot("
+    }
+  ],
   "claims": [
     "detects-invalid-remote-author-identity",
     "uses-live-equivalent-preflight",
