@@ -96,8 +96,11 @@ def validate_record(root: Path, record: dict, index: dict[str, dict]) -> None:
 
 
 def check(root: Path) -> tuple[int, list[str]]:
-    index = case_index(root)
     errors: list[str] = []
+    try:
+        index = case_index(root)
+    except (OSError, json.JSONDecodeError, ValueError) as exc:
+        return 0, [f"eval index: {exc}"]
     count = 0
     mutations = root / "mutations"
     for path in sorted(mutations.rglob("*.jsonl")) if mutations.is_dir() else []:
@@ -118,8 +121,7 @@ def check(root: Path) -> tuple[int, list[str]]:
 
 
 def main() -> int:
-    root = ROOT
-    count, errors = check(root)
+    count, errors = check(ROOT)
     if errors:
         for error in errors:
             print(f"FAIL {error}", file=sys.stderr)
