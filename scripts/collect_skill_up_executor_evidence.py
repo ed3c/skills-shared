@@ -1,0 +1,106 @@
+#!/usr/bin/env python3
+"""Normalize pinned skill-up report.json into non-promotable executor evidence.
+
+This collector intentionally does NOT emit skill-eval-evidence/v1. skill-up's
+agent_judge is executor evidence, not deterministic promotion authority.
+"""
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import sys
+from pathlib import Path
+
+HARNESS_SHA = "425e3f5a0c23e80f2c7933785d54c53ffe01b40c"
+
+
+def load(path: Path):
+    value = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(value, dict):
+        raise ValueError(f"{path} must contain a JSON object")
+    return value
+
+
+def sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def exact_sha(value: str, name: str) -> str:
+    if len(value) != 40 or any(c not in "0123456789abcdef" for c in value):
+        raise ValueError(f"{name} must be an exact lowercase 40-char commit SHA")
+    return value
+
+
+def main() -> int:
+    p = argparse.ArgumentParser()
+    p.add_argument("--report-dir", required=True)
+    p.add_argument("--case-id", required=True)
+    p.add_argument("--condition", required=True, choices=["current_skill", "candidate_skill"])
+    p.add_argument("--skill-sha", required=True)
+    p.add_argument("--eval-suite-sha", required=True)
+    p.add_argument("--skill", required=True)
+    p.add_argument("--engine", required=True)
+    p.add_argument("--provider", required=True)
+    p.add_argument("--model", required=True)
+    p.add_argument("--seed", type=int, required=True)
+    p.add_argument("--output", required=True)
+    args = p.parse_args()
+
+    try:
+        exact_sha(args.skill_sha, "skill_sha")
+        exact_sha(args.eval_suite_sha, "eval_suite_sha")
+        report = Path(args.report_dir) / "report.json"
+        if not report.is_file():
+            raise ValueError(f"missing pinned skill-up fact source: {report}")
+        raw = load(report)
+        results = raw.get("case_results")
+        if not isinstance(results, list):
+            raise ValueError("skill-up report case_results must be an array")
+        matches = [r for r in results if isinstance(r, dict) and r.get("case_id") == args.case_id and r.get("configuration") == "with_skill"]
+        if len(matches) != 1:
+            raise ValueError(f"expected exactly one with_skill result for {args.case_id}, got {len(matches)}")
+        result = matches[0]
+        status = str(result.get("status", "")).lower()
+        if status not in {"pass", "fail", "error", "skip", "skipped"}:
+            raise ValueError(f"unrecognized skill-up status: {status!r}")
+        run_identity = "|".join([args.case_id, args.condition, args.skill_sha, args.provider, args.model, args.engine, HARNESS_SHA, str(args.seed)])
+        run_id = hashlib.sha256(run_identity.encode()).hexdigest()[:24]
+        value = {
+            "schema_version": "skill-eval-executor-evidence/v1",
+            "run_id": run_id,
+            "case_id": args.case_id,
+            "condition": args.condition,
+            "skill": args.skill,
+            "skill_sha": args.skill_sha,
+            "eval_suite_sha": args.eval_suite_sha,
+            "seed": args.seed,
+            "model": {"provider": args.provider, "name": args.model},
+            "harness": {"name": "skill-up", "version": HARNESS_SHA, "engine": args.engine},
+            "outcome": {
+                "passed": status == "pass",
+                "status": status,
+                "verifier": "skill-up/agent_judge",
+                "duration_ms": int(result.get("duration_ms", 0) or 0),
+                "input_tokens": int(result.get("input_tokens", 0) or 0),
+                "output_tokens": int(result.get("output_tokens", 0) or 0),
+            },
+            "raw_report": {"path": str(report), "sha256": sha256(report)},
+            "promotion": {
+                "eligible": False,
+                "reason": "executor agent_judge is not deterministic promotion authority",
+                "required_next_receipt": "skill-eval-verifier-receipt/v1",
+            },
+        }
+        out = Path(args.output)
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        print(run_id)
+        return 0
+    except (OSError, json.JSONDecodeError, TypeError, ValueError) as exc:
+        print(f"FAIL: {exc}", file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
