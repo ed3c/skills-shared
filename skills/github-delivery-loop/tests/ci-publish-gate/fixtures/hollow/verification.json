@@ -1,0 +1,11 @@
+{
+  "schema": "github-delivery-local-verification/v1",
+  "repository_id": 1326262274,
+  "head_sha": "__HEAD__",
+  "status": "PASS",
+  "verified_at": "2026-08-12T05:00:00Z",
+  "evidence_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "commands": [
+    "bash skills/github-delivery-loop/tests/run-all.sh"
+  ]
+}

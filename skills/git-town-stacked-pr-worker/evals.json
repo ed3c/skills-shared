@@ -1,0 +1,26 @@
+{
+  "skill_name": "git-town-stacked-pr-worker",
+  "version": "1.1.0",
+  "_meta": {
+    "coverage_metric": "publication-policy composition, exact-head subject separation, no-push background invariant, and billing-circuit fail-closed controls",
+    "purpose": "Prove that Git Town Worker guidance cannot bypass the canonical github-delivery-loop publication boundary or collapse local sync, publication, trusted CI, and Human Admit into one green state."
+  },
+  "runnable": [
+    {
+      "id": "GTSP-PUBLISH-1",
+      "checker_script": "scripts/check_publication_boundary.py",
+      "test_verify": "tests/publication-boundary/verify.sh",
+      "good_fixture": "canonical Skill files",
+      "hollow_fixture": "selftest mutations removing no-push, billing-open, one intent, one evidence lane, or the policy composition link",
+      "covers": [
+        "SYSTEM_PROMPT plus PUBLICATION_POLICY composition is mandatory for GitHub publication",
+        "repository profile names the canonical github-delivery-loop gate and exact schemas",
+        "background synchronization remains no-push",
+        "only initial-pr, ready-for-review and batched-repair are admitted",
+        "billing-open blocks publication until owner recovery",
+        "local sync, local verification, publication, trusted check and Human Admit remain separate lanes"
+      ],
+      "expected": "canonical files PASS; each planted hollow mutation exits non-zero with a stable contract error"
+    }
+  ]
+}
