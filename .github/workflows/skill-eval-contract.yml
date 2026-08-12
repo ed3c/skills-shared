@@ -5,7 +5,9 @@ on:
     paths:
       - 'evals/**'
       - 'scripts/check_skill_evals.py'
+      - 'scripts/summarize_skill_eval_matrix.py'
       - 'tests/test_skill_eval_gate.py'
+      - 'tests/test_autoresearch_eval_v1.py'
       - '.github/workflows/skill-eval-contract.yml'
   push:
     branches:
@@ -13,7 +15,9 @@ on:
     paths:
       - 'evals/**'
       - 'scripts/check_skill_evals.py'
+      - 'scripts/summarize_skill_eval_matrix.py'
       - 'tests/test_skill_eval_gate.py'
+      - 'tests/test_autoresearch_eval_v1.py'
 
 permissions:
   contents: read
@@ -30,6 +34,8 @@ jobs:
         run: python3 scripts/check_skill_evals.py
       - name: Run mutation-style gate tests
         run: python3 -m unittest tests/test_skill_eval_gate.py -v
+      - name: Run autoresearch outcome eval tests
+        run: python3 -m unittest tests/test_autoresearch_eval_v1.py -v
       - name: Exercise gold replay verifier safe-block path
         run: |
           tmp="$(mktemp -d)"
