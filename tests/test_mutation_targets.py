@@ -80,19 +80,18 @@ class MutationTargetVisibilityTests(unittest.TestCase):
 
     def test_optimizer_cannot_target_sealed_holdout(self) -> None:
         self.write_record(["sealed-case"])
-        self.assert_fails_with("must not be sealed holdout")
+        self.assert_fails_with("must not reference sealed holdout")
 
     def test_terminal_receipt_target_cannot_be_holdout(self) -> None:
         receipt = self.write_receipt(targets=["sealed-case"], controls=["control-case"])
         self.write_record(["target-case"], receipt=receipt)
         self.assert_fails_with("mutation receipt target_case_ids")
 
-    def test_holdout_may_be_non_target_control(self) -> None:
+    def test_terminal_control_cannot_expose_holdout_feedback(self) -> None:
         receipt = self.write_receipt(targets=["target-case"], controls=["sealed-case"])
         self.write_record(["target-case"], receipt=receipt)
-        count, errors = check(self.root)
-        self.assertEqual(count, 1)
-        self.assertEqual(errors, [])
+        self.assert_fails_with("mutation receipt non_target_case_ids")
+        self.assert_fails_with("post-selection promotion/unlock")
 
     def test_terminal_control_must_exist_and_match_skill(self) -> None:
         receipt = self.write_receipt(targets=["target-case"], controls=["missing-control"])
