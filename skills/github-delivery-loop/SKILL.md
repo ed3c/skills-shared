@@ -47,7 +47,8 @@ canonical 住 `~/.claude/skills/github-delivery-loop/`；各 repo 的 `.claude/s
    40 字元 export source commit，以及 `public_export.py verify` 回報的 `tree_sha`；測試與重播
    改用 `--snapshot <json>`，不得在測試中打網路。
 5. 每張 issue 在隔離 worktree 走 TDD → review；**本地 commit 可以高頻，remote push 不可以**。
-   private repo 每次 push 前必跑下節的 CI publication gate；PR body 使用 `Closes #N`。
+   private repo 先以 `scripts/ci_publish.py verify` 產生 exact-HEAD 收據，再由同一腳本的
+   `publish` 子命令走唯一 GitHub 發佈路徑；PR body 使用 `Closes #N`。
 6. Merge 走下節的 authority → preflight → land；漂移或新發現另開 issue，不塞進正在進行的 slice。
 
 ## Private-repo CI publication gate
@@ -60,12 +61,35 @@ python3 ~/.claude/skills/github-delivery-loop/scripts/ci_publish_gate.py evaluat
   --snapshot /tmp/github-ci-publish.json
 ```
 
-只有輸出 `ALLOW initial-pr|ready-for-review|repair` 才能 push。`checkpoint`、驗證不是 exact HEAD、
+這支 `scripts/ci_publish_gate.py` 只有輸出 `ALLOW initial-pr|ready-for-review|repair` 才進下一層。
+`checkpoint`、驗證不是 exact HEAD、
 remote 已是同一 SHA、同一 feedback 已發佈，或 account billing no-runner circuit 未被 owner 的較新
 recovery receipt 關閉，都必須停止；禁止以 rerun、no-op commit 或改 intent 拼字繞過。
 
-這個 gate 不執行 push，也不把本地 receipt 冒充 GitHub check。它只回答「現在是否值得消耗一次
-遠端 CI publication」；真正 merge 仍須 latest SHA 的可信 GitHub check 與下節四層閘。
+`scripts/ci_publish.py` 是受管 private repo 的唯一網路發佈入口：`verify` 先跑
+`.github-delivery/ci-policy.json` 指定的本地 argv 並把 receipt 放進 git-dir；`publish` 再重驗
+workflow policy、git HEAD、receipt、snapshot 與 GitHub remote identity，最後以完整 SHA refspec push。
+`ready-for-review` 會接著執行 `gh pr ready`；`repair` 會 dispatch policy 指定的 workflow。
+省略 `--execute` 必為 dry-run。
+
+```bash
+python3 ~/.claude/skills/github-delivery-loop/scripts/ci_workflow_policy.py check \
+  --repo-root /absolute/repo
+python3 ~/.claude/skills/github-delivery-loop/scripts/ci_publish.py verify \
+  --repo-root /absolute/repo
+python3 ~/.claude/skills/github-delivery-loop/scripts/ci_publish.py publish \
+  --repo-root /absolute/repo --snapshot /tmp/github-ci-publish.json \
+  --remote github --execute
+```
+
+`scripts/ci_publish_guard.py` 是兩個 host 共用的 PreToolUse guard：只有 repo 已登記
+`.github-delivery/ci-policy.json` 且目標 remote 是 GitHub 時，才阻擋原始 `git push`；同 repo 的
+Forgejo remote 不受影響。以 `scripts/install-ci-publish-guard.py` 安裝，預設 dry-run、`--apply`
+才原子寫入 Codex/Claude hook 設定並保留一次備份。它攔的是 Agent tool surface，不是假裝能攔人類
+terminal 或第三方 bot。
+
+evaluator 本身不執行 push，也不把本地 receipt 冒充 GitHub check。真正 merge 仍須 latest SHA 的
+可信 GitHub check 與下節四層閘。
 
 ## 新專案套用（一句，冪等）
 
@@ -158,6 +182,10 @@ delivery-loop **各藏著一支從沒被自己 SKILL.md 提過的 sync 類腳本
   `preflight`（無 `--snapshot`）負責，兩種證據不得混稱。
 - `ci_publish_gate.py evaluate` 同樣零網路；snapshot 的 GitHub/owner recovery 活證據必須由外部
   sync 或人工附上可查 URL，shape 通過不等於帳務已恢復。
+- `ci_workflow_policy.py check` 是 repo 密封閘：PR 只准 `ready_for_review`、push 只准 default
+  branch、必須有 manual dispatch/concurrency，且 action 一律釘完整 SHA；少一項就不得 enroll。
+- `ci_publish_guard.py` 只對已 enroll repo 的 GitHub push fail closed；它明確保留 Forgejo push，
+  不把雙 remote repo 的 canonical 免費路徑一起封死。
 - repository identity 釘 immutable GitHub node ID；owner/name 只作可轉移別名，redirect 不得冒充身份證據。
 - human-admit 的 `merge-admit` 只有 **repo owner 施加、且晚於 head commit** 才算數；owner-auto 則每次
   重驗 immutable viewer／personal owner。兩種模式都 pin HEAD，漂移即失敗。

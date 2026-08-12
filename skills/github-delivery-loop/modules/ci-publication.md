@@ -63,6 +63,28 @@ GitHub documents that private-repository hosted runners consume included quota,
 and usage can be blocked after quota exhaustion without a valid payment method or
 by budgets. See [GitHub Actions billing](https://docs.github.com/en/billing/concepts/product-billing/github-actions).
 
+## Enforced publication path
+
+The evaluator is deliberately pure; enforcement is layered around it:
+
+1. `.github-delivery/ci-policy.json` enrolls one private repository, names the
+   workflow and stable required jobs, and defines the local verifier argv.
+2. `ci_workflow_policy.py check` refuses workflows that run on draft
+   `synchronize` or `reopened`, push outside the default branch, omit dispatch/concurrency,
+   or reference mutable action tags.
+3. `ci_publish.py verify` executes the configured verifier and writes an
+   exact-HEAD receipt under the git directory, outside the committed tree.
+4. `ci_publish.py publish` rechecks policy, receipt, snapshot, GitHub remote
+   identity and the full-SHA refspec before one push. Ready publications then
+   mark the PR ready; repair publications explicitly dispatch the verifier.
+5. `ci_publish_guard.py`, registered by `install-ci-publish-guard.py`, blocks a
+   raw GitHub `git push` from enrolled repositories on Agent PreToolUse
+   surfaces. It leaves an explicit Forgejo remote available.
+
+The host guard cannot intercept a human terminal, a third-party bot, or a
+repository that has not enrolled. Do not describe that boundary as universal
+GitHub enforcement.
+
 ## Workflow shape for private repositories
 
 The workflow should preserve a trusted final check while avoiding automatic work
@@ -82,11 +104,10 @@ before the next push arrives, so nothing remains to cancel. GitHub's official
 [workflow syntax](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#concurrency)
 documents cancellation behavior.
 
-For a draft-first repository, one safe shape is to create the workflow run on PR
-events but guard the billed job so it runs only for an opened non-draft PR,
-`ready_for_review`, or `reopened`. After an admitted repair publication, dispatch
-the workflow explicitly against that exact branch/SHA. Never use a manually
-published success status as a substitute for executing the verifier.
+For a draft-first repository, the sealed shape runs the billed PR workflow only
+on `ready_for_review`. Reopened and repair publications dispatch the workflow
+explicitly against that exact branch/SHA. Never use a manually published success
+status as a substitute for executing the verifier.
 
 ## Snapshot example
 
