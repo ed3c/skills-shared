@@ -205,7 +205,7 @@ grep -q "BLOCK #8 .*L1 HUMAN-ADMIT.*not repository owner" \
   "${scratch}/human-live-blocked.err"
 test "${owner_land_missing_status}" -eq 1
 grep -q "could not read PR #404" "${scratch}/owner-live-missing.err"
-if grep -Eq "api graphql|gh pr merge" "${apply_log}"; then
+if grep -Eq "api graphql|(^| )pr merge " "${apply_log}"; then
   echo "FAIL: scoped land attempted a merge after L1 refusal or missing target" >&2
   exit 1
 fi
