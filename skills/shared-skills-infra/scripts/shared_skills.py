@@ -46,6 +46,18 @@ class SharedSkillsError(RuntimeError):
     """Raised when the shared-skills invariant cannot be established."""
 
 
+# The dead-assertion linter deliberately does NOT run from here. It shipped
+# wired into `check`, which made a missing or broken linter stop every other
+# gate from running at all -- one tool's absence taking out the governance check,
+# the shadowing check and the symlink check with it. A gate whose blast radius is
+# every other gate costs more than the class of bug it catches.
+#
+# Run it on its own instead:
+#     python3 scripts/check_dead_assertions.py --root <repo>
+# It is worth running, and it found real dead assertions the day it was written.
+# It just should not be able to take the rest down with it.
+
+
 # --------------------------------------------------------------------------
 # configuration: rulings are versioned, paths are not
 # --------------------------------------------------------------------------
@@ -294,6 +306,8 @@ def check(registry: dict[str, Any], sites: Sites) -> int:
                 f"user skills, so that copy silently replaces the shared one"
             )
 
+
+
     # The loop above only ever asks "is each registered skill in order?", so a
     # directory nobody registered can sit in canonical, get linked into every
     # project through the user surfaces, and the gate still reports PASS. That
@@ -306,7 +320,6 @@ def check(registry: dict[str, Any], sites: Sites) -> int:
     # everywhere, which is a different urgency. Registering it -- even as an
     # explicitly unresolved entry -- is the way to quiet this, not silence.
     failures.extend(unregistered_skills(registry))
-
     if failures:
         for failure in failures:
             print(f"FAIL {failure}", file=sys.stderr)

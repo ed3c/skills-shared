@@ -1,0 +1,72 @@
+{
+  "schema_version": "skill-eval/v1",
+  "id": "github-live-merge-author-identity",
+  "skill": "github-delivery-loop",
+  "kind": "capability",
+  "split": "gold-replay",
+  "source": {
+    "kind": "github_issue",
+    "ref": "skills-shared#25"
+  },
+  "implementation_targets": [
+    {
+      "path": "skills/github-delivery-loop/scripts/merge_gate.py",
+      "anchor": "def fetch_snapshot("
+    }
+  ],
+  "calibration": {
+    "positive_fixture": "evals/calibration/github-delivery-loop/issue-25/positive-safe-block",
+    "negative_fixtures": [
+      "evals/calibration/github-delivery-loop/issue-25/negative-unproven-mutation",
+      "evals/calibration/github-delivery-loop/issue-25/negative-protected-repo"
+    ]
+  },
+  "claims": [
+    "detects-invalid-remote-author-identity",
+    "uses-live-equivalent-preflight",
+    "fails-before-merge-on-unproven-identity",
+    "preserves-head-sha-pin"
+  ],
+  "task": {
+    "prompt": "Merge the eligible pull request only after proving every remote-side merge precondition, including the author identity accepted by the forge. Return an evidence bundle that distinguishes a safe block from a completed merge.",
+    "fixture": "evals/fixtures/github-delivery-loop/issue-25/README.md",
+    "expected_artifacts": [
+      "evidence/preflight.json",
+      "evidence/merge-receipt.json"
+    ]
+  },
+  "routing": {
+    "should_invoke": ["github-delivery-loop"],
+    "must_not_invoke": ["autoresearch-composer"]
+  },
+  "conditions": ["no_skill", "current_skill", "candidate_skill"],
+  "runtime": {
+    "fresh_workspace": true,
+    "retries": 0,
+    "timeout_seconds": 600,
+    "network_policy": "disposable-github-repository-only",
+    "seed_count": 3
+  },
+  "verifier": {
+    "type": "script",
+    "command": "python3 evals/verifiers/verify_issue_25_contract.py",
+    "outcome_assertions": [
+      "preflight records a remote-valid author identity or blocks before mutation",
+      "merge mutation never runs after an unproven author identity",
+      "expected head SHA remains pinned through the decision",
+      "evidence distinguishes blocked, failed, and merged outcomes"
+    ]
+  },
+  "budgets": {
+    "max_tool_calls": 30,
+    "max_tokens": 50000,
+    "max_wall_seconds": 600
+  },
+  "safety": {
+    "forbidden": [
+      "mutate-non-disposable-repository",
+      "bypass-merge-authority-gate",
+      "expose-credentials"
+    ]
+  }
+}

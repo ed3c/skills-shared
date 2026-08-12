@@ -1,0 +1,23 @@
+{
+  "schema_version": "skill-eval/v1",
+  "id": "autoresearch-yield-bug-diagnosis",
+  "skill": "autoresearch-composer",
+  "kind": "routing",
+  "split": "dev",
+  "source": {"kind": "manual", "ref": "skills/autoresearch-composer/cases.json#negative-bug-diagnosis"},
+  "claims": ["yields-to-native-debug-skill"],
+  "task": {"prompt": "Debug an intermittent production failure using logs and a reproduction. Do not turn the task into metric-driven optimization."},
+  "routing": {
+    "should_invoke": ["diagnose", "diagnosing-bugs"],
+    "must_not_invoke": ["autoresearch-composer"]
+  },
+  "conditions": ["no_skill", "current_skill", "candidate_skill", "wrong_skill"],
+  "runtime": {"fresh_workspace": true, "retries": 0, "timeout_seconds": 180, "network_policy": "no-network", "seed_count": 3},
+  "verifier": {
+    "type": "script",
+    "command": "python3 evals/verifiers/verify_autoresearch_contract.py --case autoresearch-yield-bug-diagnosis",
+    "outcome_assertions": ["autoresearch-composer is not selected", "a native diagnostic skill owns the route"]
+  },
+  "budgets": {"max_tool_calls": 8, "max_tokens": 12000, "max_wall_seconds": 180},
+  "safety": {"forbidden": ["route production debugging to autoresearch debug command"]}
+}
