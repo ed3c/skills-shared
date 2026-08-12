@@ -12,12 +12,15 @@ on:
       - 'scripts/check_skill_evals.py'
       - 'scripts/check_mutation_lineage.py'
       - 'scripts/check_capability_unlocks.py'
+      - 'scripts/check_dead_assertions.py'
       - 'scripts/summarize_skill_eval_matrix.py'
       - 'scripts/summarize_cross_harness_gap.py'
       - 'scripts/export_skill_eval_runtime.py'
       - 'scripts/collect_skill_up_executor_evidence.py'
       - 'scripts/verify_collected_runtime.py'
       - 'scripts/build_verified_run.py'
+      - 'skills/shared-skills-infra/scripts/check_dead_assertions.py'
+      - 'skills/shared-skills-infra/tests/**'
       - 'tests/test_skill_eval_gate.py'
       - 'tests/test_autoresearch_eval_v1.py'
       - 'tests/test_cross_harness_contract.py'
@@ -29,6 +32,8 @@ on:
       - 'tests/test_verifier_authority.py'
       - 'tests/test_verify_collected_runtime.py'
       - 'tests/test_build_verified_run.py'
+      - 'tests/test_dead_assertions.py'
+      - 'tests/test_dead_assertion_mutations.py'
       - '.github/workflows/skill-eval-contract.yml'
       - '.github/workflows/skill-eval-physical-skill-up.yml'
   push:
@@ -37,6 +42,8 @@ on:
       - 'evals/**'
       - 'mutations/**'
       - 'scripts/**'
+      - 'skills/shared-skills-infra/scripts/check_dead_assertions.py'
+      - 'skills/shared-skills-infra/tests/**'
       - 'tests/**'
       - '.github/workflows/skill-eval-contract.yml'
   workflow_dispatch:
@@ -66,6 +73,11 @@ jobs:
         run: python3 scripts/check_mutation_lineage.py
       - name: Validate capability unlock registry
         run: python3 scripts/check_capability_unlocks.py
+      - name: Validate shell assertion gates
+        run: |
+          python3 scripts/check_dead_assertions.py
+          python3 -m unittest tests/test_dead_assertions.py -v
+          python3 -m unittest tests/test_dead_assertion_mutations.py -v
       - name: Run eval contract suites
         run: |
           python3 -m unittest tests/test_skill_eval_gate.py -v
@@ -80,7 +92,7 @@ jobs:
           python3 -m unittest tests/test_verify_collected_runtime.py -v
           python3 -m unittest tests/test_build_verified_run.py -v
       - name: Compile runtime and adapter scripts
-        run: python3 -m compileall -q scripts evals/adapters evals/verifiers tests
+        run: python3 -m compileall -q scripts evals/adapters evals/verifiers tests skills/shared-skills-infra/scripts
       - name: Validate authority and executor JSON contracts
         run: |
           python3 -m json.tool evals/runtime/executors/arena.json >/dev/null
