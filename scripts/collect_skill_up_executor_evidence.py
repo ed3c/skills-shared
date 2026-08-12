@@ -2,9 +2,9 @@
 """Normalize pinned skill-up report.json into non-promotable executor evidence.
 
 This collector intentionally does NOT emit skill-eval-evidence/v1. skill-up's
-agent_judge is executor evidence, not deterministic promotion authority. When
-requested, the benchmark's without_skill arm is preserved as a separate
-no_skill denominator record.
+agent_judge is executor evidence, not deterministic promotion authority. The
+pinned skill-up CLI exposes iteration sampling but no model-seed control, so a
+repetition index is recorded explicitly and model seed is never fabricated.
 """
 from __future__ import annotations
 
@@ -48,7 +48,7 @@ def select_result(results: list, case_id: str, configuration: str) -> dict:
 def build_value(args, report: Path, result: dict, condition: str, skill_sha: str | None) -> dict:
     status = str(result.get("status", "")).lower()
     identity_skill = skill_sha or "none"
-    run_identity = "|".join([args.case_id, condition, identity_skill, args.provider, args.model, args.engine, HARNESS_SHA, str(args.seed)])
+    run_identity = "|".join([args.case_id, condition, identity_skill, args.provider, args.model, args.engine, HARNESS_SHA, f"repetition:{args.repetition}"])
     run_id = hashlib.sha256(run_identity.encode()).hexdigest()[:24]
     return {
         "schema_version": "skill-eval-executor-evidence/v1",
@@ -58,7 +58,11 @@ def build_value(args, report: Path, result: dict, condition: str, skill_sha: str
         "skill": args.skill,
         "skill_sha": skill_sha,
         "eval_suite_sha": args.eval_suite_sha,
-        "seed": args.seed,
+        "sampling": {
+            "repetition_index": args.repetition,
+            "seed_controlled": False,
+            "model_seed": None,
+        },
         "model": {"provider": args.provider, "name": args.model},
         "harness": {"name": "skill-up", "version": HARNESS_SHA, "engine": args.engine},
         "outcome": {
@@ -95,12 +99,14 @@ def main() -> int:
     p.add_argument("--engine", required=True)
     p.add_argument("--provider", required=True)
     p.add_argument("--model", required=True)
-    p.add_argument("--seed", type=int, required=True)
+    p.add_argument("--repetition", type=int, required=True)
     p.add_argument("--output", required=True)
     p.add_argument("--baseline-output")
     args = p.parse_args()
 
     try:
+        if args.repetition < 1:
+            raise ValueError("repetition must be >= 1")
         exact_sha(args.skill_sha, "skill_sha")
         exact_sha(args.eval_suite_sha, "eval_suite_sha")
         report = Path(args.report_dir) / "report.json"
