@@ -2,7 +2,9 @@
 """Compute stack-specific pass rates and cross-harness generalization gaps.
 
 Accepts JSONL rows in skill-eval-run/v1 or skill-eval-executor-evidence/v1 shape.
-The tool never promotes evidence; it only compares explicit observed outcomes.
+Pairing uses an actual controlled seed when present; executor evidence that cannot
+control model seed must expose an explicit repetition index instead. The tool
+never promotes evidence; it only compares explicit observed outcomes.
 """
 from __future__ import annotations
 
@@ -15,13 +17,35 @@ from pathlib import Path
 VALID_SCHEMAS = {"skill-eval-run/v1", "skill-eval-executor-evidence/v1"}
 
 
+def sampling_identity(row: dict, schema: str) -> tuple[str, int]:
+    if schema == "skill-eval-run/v1":
+        seed = row.get("seed")
+        if not isinstance(seed, int):
+            raise ValueError("skill-eval-run/v1 seed must be integer")
+        return ("seed", seed)
+    sampling = row.get("sampling")
+    if not isinstance(sampling, dict):
+        raise ValueError("executor evidence must include sampling metadata")
+    if sampling.get("seed_controlled") is True:
+        seed = sampling.get("model_seed")
+        if not isinstance(seed, int):
+            raise ValueError("controlled executor seed must be integer")
+        return ("seed", seed)
+    if sampling.get("model_seed") is not None:
+        raise ValueError("uncontrolled executor must not claim a model_seed")
+    repetition = sampling.get("repetition_index")
+    if not isinstance(repetition, int) or repetition < 1:
+        raise ValueError("uncontrolled executor requires repetition_index >= 1")
+    return ("repetition", repetition)
+
+
 def parse_row(row: dict) -> dict:
     schema = row.get("schema_version")
     if schema not in VALID_SCHEMAS:
         raise ValueError(f"unsupported schema: {schema!r}")
     case_id = row.get("case_id")
     condition = row.get("condition")
-    seed = row.get("seed")
+    sample = sampling_identity(row, schema)
     model = row.get("model")
     harness = row.get("harness")
     outcome = row.get("outcome")
@@ -29,8 +53,6 @@ def parse_row(row: dict) -> dict:
         raise ValueError("case_id must be non-empty string")
     if not isinstance(condition, str) or not condition:
         raise ValueError("condition must be non-empty string")
-    if not isinstance(seed, int):
-        raise ValueError("seed must be integer")
     if not isinstance(model, dict) or not isinstance(model.get("name"), str):
         raise ValueError("model.name must be string")
     if not isinstance(harness, dict) or not isinstance(harness.get("name"), str):
@@ -40,7 +62,7 @@ def parse_row(row: dict) -> dict:
     return {
         "case_id": case_id,
         "condition": condition,
-        "seed": seed,
+        "sample": sample,
         "passed": outcome["passed"],
         "stack": (model["name"], harness["name"]),
     }
@@ -49,11 +71,11 @@ def parse_row(row: dict) -> dict:
 def summarize(rows: list[dict]) -> dict:
     parsed = [parse_row(r) for r in rows]
     by_stack_condition: dict[tuple[tuple[str, str], str], list[bool]] = defaultdict(list)
-    paired: dict[tuple[str, str, int], dict[tuple[str, str], bool]] = defaultdict(dict)
+    paired: dict[tuple[str, str, tuple[str, int]], dict[tuple[str, str], bool]] = defaultdict(dict)
     for row in parsed:
         key = (row["stack"], row["condition"])
         by_stack_condition[key].append(row["passed"])
-        pair_key = (row["case_id"], row["condition"], row["seed"])
+        pair_key = (row["case_id"], row["condition"], row["sample"])
         if row["stack"] in paired[pair_key]:
             raise ValueError(f"duplicate stack observation for identity {pair_key}: {row['stack']}")
         paired[pair_key][row["stack"]] = row["passed"]
