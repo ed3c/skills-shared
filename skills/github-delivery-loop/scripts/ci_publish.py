@@ -153,7 +153,7 @@ def publish(
         commands.append(
             ["gh", "pr", "ready", str(pull["number"]), "--repo", policy["repository"]]
         )
-    elif intent == "repair":
+    elif intent == "repair" and policy["pull_request_mode"] == "draft-first":
         commands.append(
             [
                 "gh",

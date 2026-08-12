@@ -78,7 +78,9 @@ The evaluator is deliberately pure; enforcement is layered around it:
    exact-HEAD receipt under the git directory, outside the committed tree.
 4. `ci_publish.py publish` rechecks policy, receipt, snapshot, GitHub remote
    identity and the full-SHA refspec before one push. Ready publications then
-   mark the PR ready; repair publications explicitly dispatch the verifier.
+   mark the PR ready. Draft-first repairs explicitly dispatch the verifier;
+   universal repairs rely on the required `synchronize` event and do not create
+   a duplicate manual run for the same SHA.
 5. `ci_publish_guard.py`, registered by `install-ci-publish-guard.py`, blocks a
    raw GitHub `git push` from enrolled repositories on Agent PreToolUse
    surfaces. It leaves an explicit Forgejo remote available.

@@ -3,12 +3,14 @@ from __future__ import annotations
 import importlib.util
 import json
 import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
 
 
 SKILL = Path(__file__).resolve().parents[2]
+PUBLISH_SCRIPT = SKILL / "scripts" / "ci_publish.py"
 
 
 def load(name: str):
@@ -132,6 +134,126 @@ class WorkflowPolicyTests(unittest.TestCase):
         )
         with self.assertRaisesRegex(POLICY.PolicyError, "immutable SHAs"):
             POLICY.evaluate_workflow(policy(), hollow)
+
+
+class PublicationCommandTests(unittest.TestCase):
+    def render_repair(self, pull_request_mode: str) -> subprocess.CompletedProcess[str]:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "repo"
+            root.mkdir()
+            subprocess.run(["git", "init", "-q", root], check=True)
+            subprocess.run(
+                [
+                    "git",
+                    "-C",
+                    root,
+                    "remote",
+                    "add",
+                    "github",
+                    "git@github.com:ed3c/example.git",
+                ],
+                check=True,
+            )
+            workflow = WORKFLOW if pull_request_mode == "draft-first" else UNIVERSAL_WORKFLOW
+            workflow_path = root / ".github" / "workflows" / "verify.yml"
+            workflow_path.parent.mkdir(parents=True)
+            workflow_path.write_text(workflow, encoding="utf-8")
+            policy_path = root / ".github-delivery" / "ci-policy.json"
+            policy_path.parent.mkdir()
+            policy_path.write_text(
+                json.dumps(policy(pull_request_mode)), encoding="utf-8"
+            )
+            (root / "README.md").write_text("fixture\n", encoding="utf-8")
+            subprocess.run(["git", "-C", root, "add", "."], check=True)
+            subprocess.run(
+                [
+                    "git",
+                    "-C",
+                    root,
+                    "-c",
+                    "user.name=Test",
+                    "-c",
+                    "user.email=test@example.invalid",
+                    "commit",
+                    "-qm",
+                    "fixture",
+                ],
+                check=True,
+            )
+            head = subprocess.run(
+                ["git", "-C", root, "rev-parse", "HEAD"],
+                check=True,
+                capture_output=True,
+                text=True,
+            ).stdout.strip()
+            verification = {
+                "head_sha": head,
+                "status": "passed",
+                "completed_at": "2026-08-12T06:01:00Z",
+            }
+            receipt = {
+                "schema": "github-local-verification/v1",
+                "repository": "ed3c/example",
+                **verification,
+                "argv": ["/usr/bin/true"],
+            }
+            receipt_path = root / ".git" / "github-delivery" / "local-verification.json"
+            receipt_path.parent.mkdir()
+            receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
+            snapshot = {
+                "schema": "github-ci-publish-snapshot/v1",
+                "repository": "ed3c/example",
+                "repository_owner": "ed3c",
+                "private": True,
+                "intent": "repair",
+                "local_head": head,
+                "local_verification": verification,
+                "pull_request": {
+                    "number": 7,
+                    "is_draft": False,
+                    "remote_head": "a" * 40,
+                },
+                "actionable_feedback": {
+                    "actionable": True,
+                    "head_sha": "a" * 40,
+                    "observed_at": "2026-08-12T06:00:00Z",
+                },
+                "billing_blocker": None,
+                "recovery": None,
+            }
+            snapshot_path = Path(directory) / "snapshot.json"
+            snapshot_path.write_text(json.dumps(snapshot), encoding="utf-8")
+            return subprocess.run(
+                [
+                    sys.executable,
+                    str(PUBLISH_SCRIPT),
+                    "publish",
+                    "--repo-root",
+                    str(root),
+                    "--snapshot",
+                    str(snapshot_path),
+                    "--remote",
+                    "github",
+                    "--branch",
+                    "agent/example",
+                ],
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+
+    def test_draft_first_repair_dispatches_verifier(self) -> None:
+        completed = self.render_repair("draft-first")
+
+        self.assertEqual(completed.returncode, 0, completed.stderr)
+        self.assertIn("gh workflow run", completed.stdout)
+
+    def test_universal_repair_relies_on_synchronize_without_duplicate_dispatch(self) -> None:
+        completed = self.render_repair("universal")
+
+        self.assertEqual(completed.returncode, 0, completed.stderr)
+        self.assertIn("git push github", completed.stdout)
+        self.assertNotIn("gh workflow run", completed.stdout)
 
 
 class PublicationGuardTests(unittest.TestCase):
