@@ -1,0 +1,28 @@
+{
+  "schema": "github-delivery-local-verification-contract/v1",
+  "repository_id": 1326262274,
+  "inherit_env": ["PATH", "HOME", "TMPDIR"],
+  "commands": [
+    {
+      "id": "github-delivery-loop-tests",
+      "argv": ["bash", "skills/github-delivery-loop/tests/run-all.sh"],
+      "cwd": ".",
+      "timeout_seconds": 300,
+      "max_output_bytes": 524288
+    },
+    {
+      "id": "github-delivery-evals-json",
+      "argv": ["python3", "-m", "json.tool", "skills/github-delivery-loop/evals.json"],
+      "cwd": ".",
+      "timeout_seconds": 30,
+      "max_output_bytes": 65536
+    },
+    {
+      "id": "shared-registry-json",
+      "argv": ["python3", "-m", "json.tool", "registry.json"],
+      "cwd": ".",
+      "timeout_seconds": 30,
+      "max_output_bytes": 131072
+    }
+  ]
+}

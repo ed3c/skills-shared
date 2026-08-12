@@ -1,0 +1,25 @@
+{
+  "schema": "skills-shared-ci-publication-evals/v1",
+  "subject": ".github-delivery/ci-publication/profile.json",
+  "runnable": [
+    {
+      "id": "CI-PUBLISH-PROFILE-2",
+      "entrypoint": ".github-delivery/ci-publication/tests/verify.sh",
+      "positive": "repository identity, stable check, strict sidecar-bound gate, fixed command contract, intents, billing stop rule and evidence boundaries are complete",
+      "negative_controls": [
+        "wrong repository ID",
+        "dynamic check name",
+        "compact-only publication gate",
+        "fourth publication intent",
+        "push-based billing probe",
+        "sidecar binding downgrade",
+        "fake hosted PASS",
+        "secret-bearing environment name",
+        "shell command string",
+        "machine-local cwd",
+        "empty command set"
+      ],
+      "expected": "admitted profile PASS; every planted downgrade turns RED before evidence production or publication"
+    }
+  ]
+}
