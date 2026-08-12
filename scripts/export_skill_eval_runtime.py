@@ -12,6 +12,23 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+HARNESS_SHA = "425e3f5a0c23e80f2c7933785d54c53ffe01b40c"
+
+# Explicit physical protocols are intentionally case-scoped. A deterministic
+# verifier may require more structure than the human-facing prompt exposes; we
+# do not infer that hidden contract from prose at runtime.
+RUNTIME_PROTOCOLS = {
+    "autoresearch-metric-loop-plan": {
+        "collect_artifacts": ["evidence/run.json", "artifacts/iteration-contract.json"],
+        "prompt_suffix": """
+
+Runtime evidence protocol (required for this evaluation):
+- Do not only describe the plan in chat. Materialize `artifacts/iteration-contract.json` as a JSON object with non-empty keys: Goal, Scope, Metric, Direction, Verify, Guard, Iterations.
+- Materialize `evidence/run.json` as JSON with: case_id=`autoresearch-metric-loop-plan`, decision=`invoke`, selected_skill=`autoresearch-composer`, and plan_artifact=`artifacts/iteration-contract.json`.
+- These files are machine-verified after the agent exits. Do not claim success unless both files exist and match the requested contract.
+""".strip(),
+    }
+}
 
 
 def load(path: Path) -> dict:
@@ -41,7 +58,10 @@ def public_case(case_id: str) -> tuple[Path, dict]:
 
 
 def skill_up_config(case: dict, engine: str, provider: str, model: str) -> tuple[dict, dict]:
-    prompt = case["task"]["prompt"]
+    protocol = RUNTIME_PROTOCOLS.get(case["id"])
+    if protocol is None:
+        raise SystemExit(f"case {case['id']!r} has no reviewed physical runtime protocol")
+    prompt = case["task"]["prompt"].rstrip() + "\n\n" + protocol["prompt_suffix"]
     assertions = case["verifier"]["outcome_assertions"]
     eval_config = {
         "schema_version": "v1alpha1",
@@ -50,7 +70,11 @@ def skill_up_config(case: dict, engine: str, provider: str, model: str) -> tuple
         "engine": {"name": engine, "model": {"provider": provider, "name": model}},
         "cases": {
             "files": [f".runtime-eval/cases/{case['id']}.yaml"],
-            "defaults": {"timeout_seconds": case.get("runtime", {}).get("timeout_seconds", 300), "max_turns": 12},
+            "defaults": {
+                "timeout_seconds": case.get("runtime", {}).get("timeout_seconds", 300),
+                "max_turns": 12,
+                "collect_artifacts": protocol["collect_artifacts"],
+            },
             "parallelism": 1,
             "retry_policy": {"max_retries": 0, "retry_on": []}
         },
@@ -100,13 +124,18 @@ def main() -> int:
         "condition": args.condition,
         "skill_sha": args.skill_sha,
         "executor": "skill-up",
-        "executor_sha": "425e3f5a0c23e80f2c7933785d54c53ffe01b40c",
+        "executor_sha": HARNESS_SHA,
         "engine": args.engine,
         "provider": args.provider,
         "model": args.model,
         "fresh_workspace": bool(case.get("runtime", {}).get("fresh_workspace", False)),
         "max_retries": 0,
-        "seed_count": int(case.get("runtime", {}).get("seed_count", 1)),
+        "sampling": {
+            "required_repetitions": int(case.get("runtime", {}).get("seed_count", 1)),
+            "seed_controlled": False,
+            "reason": "pinned skill-up CLI exposes iteration sampling but no model-seed flag",
+        },
+        "deterministic_artifacts": RUNTIME_PROTOCOLS[case["id"]]["collect_artifacts"],
         "promotion_authority": False,
         "skill_target": str((runtime_dir / "eval.yaml").relative_to(ROOT)) if runtime_dir.is_relative_to(ROOT) else str(runtime_dir / "eval.yaml")
     }
