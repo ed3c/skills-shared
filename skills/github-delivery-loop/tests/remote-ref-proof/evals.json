@@ -1,0 +1,21 @@
+{
+  "schema": "github-delivery-remote-ref-proof-evals/v1",
+  "subject": "skills/github-delivery-loop/scripts/github_actions_snapshot_strict.py",
+  "runnable": [
+    {
+      "id": "DELIVERY-9",
+      "entrypoint": "skills/github-delivery-loop/tests/remote-ref-proof/verify.sh",
+      "positive": "remote ref absent plus PR absent is the only initial-publication boundary; one ref plus one same-head PR is trusted",
+      "negative_controls": [
+        "remote branch exists without PR",
+        "PR exists without selected branch ref",
+        "PR head differs from branch ref",
+        "multiple PR identity",
+        "malformed remote object ID",
+        "unsafe or traversal-like branch name",
+        "stale check and public repository inherited controls"
+      ],
+      "expected": "only exact remote-ref/PR agreement produces a snapshot; ambiguous or previously published branch state turns red"
+    }
+  ]
+}
