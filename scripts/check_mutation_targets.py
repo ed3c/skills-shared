@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate that mutation optimization targets are real, same-skill, visible eval cases."""
+"""Validate that mutation optimization cases are real, same-skill, and optimizer-visible."""
 from __future__ import annotations
 
 import json
@@ -44,7 +44,7 @@ def case_index(root: Path) -> dict[str, dict]:
     return index
 
 
-def validate_case_refs(skill: str, ids: object, index: dict[str, dict], *, role: str, forbid_holdout: bool) -> None:
+def validate_case_refs(skill: str, ids: object, index: dict[str, dict], *, role: str) -> None:
     if not isinstance(ids, list) or not ids or len(ids) != len(set(ids)):
         raise ValueError(f"{role} must be a non-empty unique case-id array")
     for case_id in ids:
@@ -55,8 +55,11 @@ def validate_case_refs(skill: str, ids: object, index: dict[str, dict], *, role:
             raise ValueError(f"{role} references missing eval case: {case_id}")
         if case.get("skill") != skill:
             raise ValueError(f"{role} case {case_id} belongs to {case.get('skill')}, not {skill}")
-        if forbid_holdout and case.get("split") == "holdout":
-            raise ValueError(f"optimizer target case must not be sealed holdout: {case_id}")
+        if case.get("split") == "holdout":
+            raise ValueError(
+                f"mutation optimizer case must not reference sealed holdout: {case_id}; "
+                "holdout outcomes belong only to post-selection promotion/unlock evaluation"
+            )
 
 
 def validate_record(root: Path, record: dict, index: dict[str, dict]) -> None:
@@ -69,7 +72,6 @@ def validate_record(root: Path, record: dict, index: dict[str, dict]) -> None:
         effect.get("case_ids"),
         index,
         role="expected_effect.case_ids",
-        forbid_holdout=True,
     )
     receipt_ref = record.get("evaluation_receipt")
     if not receipt_ref:
@@ -84,14 +86,12 @@ def validate_record(root: Path, record: dict, index: dict[str, dict]) -> None:
         receipt.get("target_case_ids"),
         index,
         role="mutation receipt target_case_ids",
-        forbid_holdout=True,
     )
     validate_case_refs(
         skill,
         receipt.get("non_target_case_ids"),
         index,
         role="mutation receipt non_target_case_ids",
-        forbid_holdout=False,
     )
 
 
