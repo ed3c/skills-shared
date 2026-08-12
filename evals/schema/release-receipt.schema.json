@@ -4,15 +4,55 @@
   "title": "skill-release-receipt/v1",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "skill", "skill_sha", "eval_suite_sha", "model_harness_matrix", "evidence_bundles", "rollback_sha", "human_admit"],
+  "required": [
+    "schema_version",
+    "id",
+    "skill",
+    "skill_sha",
+    "eval_suite_sha",
+    "capability_unlock_id",
+    "model_harness_matrix",
+    "evidence_bundles",
+    "rollback_sha",
+    "rollback_artifact",
+    "rollback_sha256",
+    "scorecard",
+    "human_admit"
+  ],
   "properties": {
     "schema_version": {"const": "skill-release-receipt/v1"},
-    "skill": {"type": "string", "minLength": 1},
-    "skill_sha": {"type": "string", "pattern": "^[0-9a-f]{7,64}$"},
+    "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]{2,127}$"},
+    "skill": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+    "skill_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
     "eval_suite_sha": {"type": "string", "pattern": "^[0-9a-f]{7,64}$"},
-    "model_harness_matrix": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "object", "additionalProperties": false, "required": ["model", "harness", "environment"], "properties": {"model": {"type": "string", "minLength": 1}, "harness": {"type": "string", "minLength": 1}, "environment": {"type": "string", "minLength": 1}}}},
-    "evidence_bundles": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "capability_unlock_id": {"type": "string", "minLength": 3},
+    "model_harness_matrix": {
+      "type": "array", "minItems": 2, "uniqueItems": true,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["model", "harness", "environment"],
+        "properties": {
+          "model": {"type": "string", "minLength": 1},
+          "harness": {"type": "string", "minLength": 1},
+          "environment": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "evidence_bundles": {
+      "type": "array", "minItems": 1, "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
     "rollback_sha": {"type": "string", "pattern": "^[0-9a-f]{7,64}$"},
-    "human_admit": {"type": "object", "additionalProperties": false, "required": ["actor", "admitted_at"], "properties": {"actor": {"type": "string", "minLength": 1}, "admitted_at": {"type": "string", "minLength": 10}}}
+    "rollback_artifact": {"type": "string", "minLength": 1},
+    "rollback_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "scorecard": {"type": "string", "minLength": 1},
+    "human_admit": {
+      "type": "object", "additionalProperties": false,
+      "required": ["actor", "admitted_at"],
+      "properties": {
+        "actor": {"type": "string", "minLength": 1},
+        "admitted_at": {"type": "string", "minLength": 10}
+      }
+    }
   }
 }
