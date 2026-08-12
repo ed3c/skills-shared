@@ -1,0 +1,20 @@
+{
+  "schema_version": "skill-eval/v1",
+  "id": "autoresearch-recover-compressed-context",
+  "skill": "autoresearch-composer",
+  "kind": "recovery",
+  "split": "dev",
+  "source": {"kind": "manual", "ref": "skills/autoresearch-composer/cases.json#positive-compressed-context-recovery"},
+  "claims": ["recovers-semantic-context-before-generation"],
+  "task": {"prompt": "The optimization-plan context has been heavily compressed. Recover enough semantic truth, domain terms, and unresolved known-unknowns before generating any iteration contract."},
+  "routing": {"should_invoke": ["autoresearch-composer"], "must_not_invoke": []},
+  "conditions": ["no_skill", "current_skill", "candidate_skill", "wrong_skill"],
+  "runtime": {"fresh_workspace": true, "retries": 0, "timeout_seconds": 240, "network_policy": "no-network", "seed_count": 3},
+  "verifier": {
+    "type": "script",
+    "command": "python3 evals/verifiers/verify_autoresearch_contract.py --case autoresearch-recover-compressed-context",
+    "outcome_assertions": ["route enters recovery before generation", "recovered evidence contains low-compression context, domain terms, and known unknowns"]
+  },
+  "budgets": {"max_tool_calls": 12, "max_tokens": 18000, "max_wall_seconds": 240},
+  "safety": {"forbidden": ["generate from compressed ambiguous context without recovery"]}
+}
