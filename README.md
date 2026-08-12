@@ -1,212 +1,261 @@
-# skills-shared — 跨 repo 共用的基礎設施 skills
+# skills-shared — canonical cross-repository Skills
 
-所有 Claude Code 與 Codex CLI 專案共用的 skill 本體住在這裡，**一個名稱只有一份**。
-治理規則、指令與 why 全在 [`skills/shared-skills-infra/SKILL.md`](skills/shared-skills-infra/SKILL.md)；裁決帳在 [`registry.json`](registry.json)。
+`skills-shared` is the **Instruction / Method Plane** shared by Claude Code and Codex CLI projects. A shared Skill name has one canonical body and one Git history. Classification authority is [`registry.json`](registry.json); portable behavior lives in each `SKILL.md`.
 
-> **Agent entrypoint:** 修改 eval、mutation、runtime、release、CI 或 promotion 前，先讀 [`docs/AGENT_INTEGRATION_STATE.md`](docs/AGENT_INTEGRATION_STATE.md)，再讀 [`docs/SKILL_EVAL_ROADMAP.md`](docs/SKILL_EVAL_ROADMAP.md)。前者記錄「現在真的整合到哪裡」，後者記錄目標 Phase。
+> **Agent entry:** read [`AGENTS.md`](AGENTS.md), [`CONTEXT.md`](CONTEXT.md), [`ARCHITECTURE.md`](ARCHITECTURE.md), and [`docs/INDEX.md`](docs/INDEX.md). Current Skill Eval/Evolution truth is in [`docs/AGENT_INTEGRATION_STATE.md`](docs/AGENT_INTEGRATION_STATE.md); target phases are in [`docs/SKILL_EVAL_ROADMAP.md`](docs/SKILL_EVAL_ROADMAP.md).
 
-## Repository topology → State Machine ownership
+## Four-repository role
+
+```text
+skills-shared
+  procedural Skills, generic method contracts, Skill eval/evolution truth
+        |
+        v
+runtime-env
+  secret-free variable/module/profile/workload/policy closure
+        |
+        v
+bettor-arena
+  module composition, proof/control/mutation, Context Capsules,
+  stateless MCP, project bootstrap, origin/external-release acceptance
+        |
+        v
+agent-shield-monorepo
+  domain product modules, provider adapters, and product canaries
+```
+
+The arrows represent immutable releases, requirements, bindings, locks, and receipts—not mutable sibling imports. Local symlinks are development projections, not release identity. See [`docs/integration/CROSS_REPO_INTEGRATION.md`](docs/integration/CROSS_REPO_INTEGRATION.md).
+
+## Document routing
+
+All four repositories use compatible route names:
+
+```text
+README.md
+AGENTS.md
+CLAUDE.md
+CONTEXT.md
+ARCHITECTURE.md
+docs/INDEX.md
+docs/architecture/DOCUMENT_ROUTING.md
+docs/architecture/STATE_MACHINES.md
+docs/integration/CROSS_REPO_INTEGRATION.md
+docs/traceability/TRACEABILITY_INDEX.md
+<governed-directory>/README.md
+```
+
+The route is:
+
+```text
+task
+→ root procedure/current/stable context
+→ docs index
+→ nearest directory README
+→ machine authority
+→ current evidence and traceability
+```
+
+Each hop leaves a local summary before linking away. Markdown is navigation, not a second registry, schema, verifier, receipt, or merge authority.
+
+## Skill anatomy
+
+```text
+skills/<name>/
+├── README.md          navigation, ownership, state-machine and data-flow map
+├── SKILL.md           procedural generalization: workflow, method, laws, stop conditions
+├── references/        reusable host-neutral contracts/templates
+├── modules/           domain instances loaded only when their trigger matches
+├── scripts/           executable mechanisms
+├── tests/             positive, hollow, mutation and integration controls
+├── evals.json         eval inventory when used
+└── cases.json         deterministic routing/case inventory when used
+```
+
+The separation is load-bearing:
+
+- `SKILL.md` remains portable and procedural.
+- `references/` remains reusable and domain-neutral.
+- `modules/` carries detailed Forgejo, repository, provider, or product instances and is loaded on demand.
+- Consumer branch names, paths, credentials, runtime sessions, and live receipts remain in consumer bindings and environments.
+
+Worked patterns:
+
+- [`knowledge-continuity`](skills/knowledge-continuity/README.md) — procedural continuity loop + generic routing reference + on-demand four-repository example.
+- [`forgejo-delivery-loop`](skills/forgejo-delivery-loop/README.md) — procedural delivery law + generic contracts + Forgejo domain modules + deterministic Bun router + consumer registry binding.
+- [`github-delivery-loop`](skills/github-delivery-loop/README.md) — GitHub delivery, Actions publication, and merge-preflight state machines.
+- [`git-town-stacked-pr-worker`](skills/git-town-stacked-pr-worker/README.md) — portable molecular branch/worktree/sync method.
+
+## Repository topology → state-machine ownership
 
 ```text
 skills-shared/
-├── skills/                         # CANONICAL ARTIFACT state
-│   └── shared-skills-infra/        # distribution/drift governance state machine
-├── registry.json                   # canonical/deferred admission ledger
-│
-├── evals/                          # EVALUATION state machine
-│   ├── cases/                      # public dev + gold replay contracts
-│   ├── holdout/                    # sealed post-selection contracts; optimizer不可讀 outcome
-│   ├── fixtures/                   # replay + verifier calibration inputs
-│   ├── verifiers/                  # deterministic outcome authority
-│   ├── runtime/                    # executor/model/harness/environment identity
-│   ├── adapters/                   # external harness -> canonical evidence normalization
-│   ├── capability-unlocks.json     # held-out cross-harness capability state
-│   ├── releases.json               # Phase 5 release registry（PR #76 stack）
-│   └── scorecards/                 # Ecosystem Quality / Verified Capability 分離
-│
-├── mutations/                      # EVOLUTION state machine
-│   ├── lineage*.jsonl              # hypothesis -> candidate -> evidence -> terminal state
-│   ├── schema/                     # mutation/eval/promotion contracts
-│   └── promotions.json             # only recomputed winners may enter
-│
-├── scripts/                        # deterministic control-plane transitions
-├── tests/                          # regression + mutation-kill proofs
-├── .github/workflows/              # CI orchestration; not semantic authority by itself
-└── docs/
-    ├── AGENT_INTEGRATION_STATE.md   # live handoff / current integration truth
-    └── SKILL_EVAL_ROADMAP.md        # Phase 1–5 target architecture
+├── registry.json                   shared/repo-owned admission ledger
+├── skills/                         canonical Skill artifact and method state
+├── evals/
+│   ├── cases/                      public dev + gold-replay contracts
+│   ├── holdout/                    sealed post-selection contracts
+│   ├── fixtures/                   replay + verifier calibration inputs
+│   ├── verifiers/                  deterministic outcome authority
+│   ├── runtime/                    executor/model/harness/environment identity
+│   ├── adapters/                   external harness normalization
+│   ├── capability-unlocks.json     verified held-out capability state
+│   ├── releases.json               admitted release registry
+│   └── scorecards/                 ecosystem quality and verified capability
+├── mutations/                      hypothesis/candidate/evidence/promotion lineage
+├── scripts/                        deterministic control-plane transitions
+├── tests/                          regression and mutation-kill proofs
+├── .github/workflows/              orchestration, not semantic authority by itself
+└── docs/                            routing, current handoff, roadmap and traceability
 ```
 
-### Integrated State Machine
+## Integrated Skill state machine
 
 ```text
-CANONICALIZED
-    |
-    v
-CLAIM_REGISTERED
-    |
-    v
-CASE_BOUND -------------------- stale implementation target --> BLOCKED
-    |
-    v
-VERIFIER_CALIBRATED ----------- insensitive verifier ---------> BLOCKED
-    |
-    v
-EXECUTABLE
-    |
-    v
-EVIDENCE_COLLECTED
-    |
-    +--> MUTATION_EVALUATED ---- lost/tie/reverted -----------> PRESERVED
-    |          |
-    |          `-- won + recomputed evidence --> PROMOTION_ELIGIBLE
-    |
-    `--> post-selection sealed holdout
-                    |
-                    v
-             CAPABILITY_UNLOCKED
-                    |
-                    v
-              RELEASE_ADMITTED
-                    |
-                    v
-             CANONICAL_RELEASED
-                    |
-                    `-- regression/drift --> ROLLBACK / NEW MUTATION
+DISCOVERED
+→ CANONICALIZED
+→ CLAIM_REGISTERED
+→ CASE_BOUND
+→ VERIFIER_CALIBRATED
+→ EXECUTABLE
+→ EVIDENCE_COLLECTED
+→ MUTATION_EVALUATED
+    ├── lost / tie / reverted → PRESERVED
+    └── won + recomputed evidence → PROMOTION_ELIGIBLE
+→ sealed post-selection holdout
+→ CAPABILITY_UNLOCKED
+→ RELEASE_ADMITTED
+→ CANONICAL_RELEASED
+    └── regression / drift → ROLLBACK or new mutation
 ```
 
-Authority separation is intentional: canonical distribution does not prove capability; an LLM judge does not create hard-gate truth; mutation search does not see holdout outcomes; documentation/popularity cannot compensate for failed capability gates; release requires real evidence plus human admit.
+Authority separation is intentional: canonical distribution does not prove capability; an LLM judge does not create hard-gate truth; adaptive mutation cannot read holdout outcomes; ecosystem quality cannot compensate for failed capability gates; release requires deterministic multi-stack evidence, rollback material, and Human Admit.
 
-## Data flow
+## Evidence data flow
 
 ```text
-skills/<name>/SKILL.md + implementation
-       |
-       +--> registry.json + shared-skills-infra --> canonical projection/drift evidence
-       |
-       `--> evals/cases + sealed evals/holdout
-                    |
-                    +--> live implementation-target gate
-                    +--> verifier calibration gate
-                    v
-             runtime / harness adapters
-                    |
-                    v
-                run trace
-                    |
-                    +--> deterministic verifier receipt
-                    v
-               evidence bundle
-                    |
-           +--------+---------+
-           |                  |
-           v                  v
- mutation dev/control     sealed holdout
- evaluation               post-selection
-           |                  |
-           v                  v
- mutation lineage       capability unlock
-           |                  |
-           v                  v
- promotion registry ---> release receipt
-                              |
-                              +--> separate scorecards
-                              +--> rollback artifact
-                              `--> human admit -> canonical release
+SKILL.md + implementation
+        ├── registry/shared-skills-infra → canonical projection and drift evidence
+        └── cases + sealed holdout
+                    ↓
+        implementation-target validation + verifier calibration
+                    ↓
+        runtime / harness adapters
+                    ↓
+        canonical run trace
+                    ↓
+        deterministic verifier receipt
+                    ↓
+        content-bound evidence bundle
+             ┌──────┴──────┐
+             ↓             ↓
+       mutation lane   sealed holdout lane
+             ↓             ↓
+       lineage and     capability unlock
+       promotion            ↓
+             └────────→ release receipt
+                           ├── separated scorecards
+                           ├── rollback artifact
+                           └── Human Admit
 ```
 
-## Current integration status — 2026-08-12
+## Current implementation state — 2026-08-12
 
-### Landed on `main`
+Landed mechanisms include:
 
-- **PR #77** — isolated `Shared Skills Infra` GitHub-hosted CI; also fixed portability/dead-assertion defects exposed by hosted execution.
-- **PR #75** — canonical-drift assertion quality: multi-member fixtures plus three real first-only mutants killed by CI.
-- **PR #72** — real-incident evals are bound to live implementation targets/anchors so stale benchmarks fail closed.
-- Phase 1–3 foundation already present: eval contracts, sealed holdout metadata, run/evidence schemas, cross-harness adapters/runtime work, verifier-authority controls, mutation-lineage foundation.
+- implementation-target binding for real-incident evals (#72);
+- verifier positive/hollow calibration (#73);
+- evidence-driven mutation admission and holdout isolation (#74);
+- canonical-drift mutation proof (#75);
+- verified capability release receipts, scorecard separation, and rollback contract (#76);
+- isolated Shared Skills Infra CI (#77);
+- private GitHub Actions publication gating and billing circuit behavior (issue #43 and the landed implementation line).
 
-### Active molecular stack
+The Phase 4/5 contract Stack is no longer active: #73, #74, and #76 are merged. The only current open PR at this snapshot is the document-routing sibling [`#85`](https://github.com/ed3c/skills-shared/pull/85); exact open-head identity remains GitHub metadata, not embedded prose.
+
+The capability/release registries remain intentionally empty:
 
 ```text
-main
- |
- +-- #73 agent/verifier-calibration-v1
- |      verifier positive+hollow calibration; logical child of landed #72
- |
- +-- #74 agent/mutation-admission-v1
- |      Phase 4: paired current/candidate/no-skill evidence,
- |      holdout isolation, promotion admission
- |       |
- |       +-- #76 agent/verified-capability-release-v1
- |              Phase 5: capability release receipt, immutable identities,
- |              rollback artifact, separate scorecards, human admit
+evals/capability-unlocks.json  unlocks = []
+evals/releases.json            releases = []
 ```
 
-**Landing order:** `#73 -> #74 -> #76`. Because parent PRs may be squash-merged, a child branch must be genuinely rebased/reconstructed onto the new parent/main tree before its old green CI is trusted again.
+Therefore:
 
-### Other terminal stacks / hardening branches
+```text
+release hard-gate mechanism     IMPLEMENTED
+first physical capability unlock NOT_EXERCISED / absent
+first canonical capability release NOT_EXERCISED / absent
+```
 
-These are separate molecular workstreams and should not be flattened into the Phase 4/5 stack without checking their base and authority boundary:
+Real post-selection evidence still requires deterministic verification across at least two real model/harness stacks before Human Admit.
 
-- `codex/git-town-ci-publication-policy` — Git Town/publication cadence policy surface.
-- `codex/github-actions-evidence-producers-v2` and `codex/github-actions-remote-ref-proof` (#71 Draft) — exact remote/ref evidence and publication preconditions.
-- `codex/skill-eval-cost-tiers` (#69 Draft) — physical eval smoke vs promotion cost tiers.
-- `agent/dead-assertion-single-source-v2` (#68 Draft) — canonical dead-assertion gate consolidation.
+## Git Town / molecular PR model
 
-Use PR metadata as truth for current base/head relationships; branch names above are an index, not permission to merge.
+Git Town is optional tooling; GitHub PR base/head metadata is publication truth.
 
-## Git Town / Stack PR operating model
+```text
+independent path-disjoint work
+→ sibling branches
 
-The repository has Git Town-oriented publication branches, but **do not assume Git Town is installed in every execution environment**. If available locally, use it to keep molecular branches synchronized; otherwise preserve the same parent graph with normal Git/GitHub operations.
+unmerged contract/data dependency
+→ true child branch
+
+smallest reviewable behavior + tests/evidence
+→ terminal leaf
+
+stable merged siblings + shared index/cold-start audit
+→ convergence leaf
+```
+
+The current four-repository documentation set is four independent siblings:
+
+```text
+skills-shared#85
+runtime-env#30
+agent-shield-monorepo#78
+bettor-arena#37
+```
+
+After all four merge, `bettor-arena#38` owns exact merged commit/tree indexing and fresh Claude/Codex cold-start convergence. Do not create that branch early.
+
+## Local canonical projection
+
+The repository stores no machine-specific path in versioned contracts. Install/projection discovers the checkout from the running script and writes local path state only to ignored/host-owned surfaces.
 
 ```bash
-# optional when git-town is installed
-git town sync
-git town hack <terminal-state-branch>
-# implement exactly one authority/state transition
-git town propose
-git town sync --stack
+python3 skills/shared-skills-infra/scripts/shared_skills.py install \
+  --project /path/to/project-a --project /path/to/project-b
+
+python3 skills/shared-skills-infra/scripts/shared_skills.py check
+python3 skills/shared-skills-infra/scripts/shared_skills.py report
+bash skills/shared-skills-infra/tests/verify.sh
 ```
 
-Stack rules:
+A project-local shared-name copy is shadowing unless `registry.json` classifies the name as repo-owned.
 
-1. One terminal state transition or authority boundary per PR when practical.
-2. Child PR base must be its real parent branch until the parent lands.
-3. After a squash merge, reconstruct/rebase the child onto the new main/parent; do not treat old ancestry as proof.
-4. Child workflows must be a **superset** of required parent gates; a child may not silently remove parent validation.
-5. A CI job that is `skipped` is not execution evidence.
-6. Physical capability claims require real runtime evidence; mocks/fixtures prove contracts, not capability unlocks.
+## Evidence states
 
-## Clone 到任何目錄都能用
-
-版控內容**沒有任何機器路徑**：`registry.json` 只存裁決，路徑全在 gitignored 的 `sites.local.json` 或旗標，canonical 位置由 `__file__` 推導。
-
-```bash
-git clone <this-repo> ~/.agents/skills-shared
-python3 ~/.agents/skills-shared/skills/shared-skills-infra/scripts/shared_skills.py \
-  install --project ~/proj-a --project ~/proj-b --claude-forwarder proj-b
+```text
+PASS
+FAIL
+ABSENT
+NOT_IMPLEMENTED
+NOT_EXERCISED
+SKIPPED_BY_POLICY
 ```
 
-`install` 寫路徑 → 連 user 層與各專案 → 跑 `check`。冪等；換機器或搬 checkout 後重跑即復原。
+A workflow skipped by trigger policy is not execution evidence. A job that never receives a runner is not repository-test FAIL or PASS. Source prose, diagrams, package presence, an old SHA, or another environment cannot create current capability truth.
 
-```bash
-INFRA=~/.agents/skills/shared-skills-infra/scripts/shared_skills.py
-python3 $INFRA check ; python3 $INFRA report
-bash ~/.agents/skills-shared/skills/shared-skills-infra/tests/verify.sh
-```
+## Source-proposal boundary
+
+The attached architecture document proposes E2B/Firecracker, local/cloud synchronization, mobile, wallet, security, licensing, cost, latency, and repair. These are candidate domain/provider inputs—not current shared-method or runtime facts. Independent verification, implementation, evals, canaries, receipts, and Human Admit are required.
 
 ## Agent continuation checklist
 
-接手的 Agent 不應從「下一個看起來能寫的 feature」開始，而應：
-
-1. 讀 `docs/AGENT_INTEGRATION_STATE.md` 與 roadmap。
-2. 查 current `main`、open PR base/head、CI 是否真的執行。
-3. 找出自己負責的 State Machine transition 與上游/下游 authority。
-4. 先修 stack ancestry，再改 implementation。
-5. 執行該 failure domain 的 CI；不能用其他 workflow 的綠燈替代。
-6. 更新 README + integration state，讓下一個 Agent 不必從聊天紀錄重建現況。
-
-## 現況與待辦
-
-Canonical shared-skill migration 仍由 `registry.json` 與 `shared_skills.py report` 動態重算；不要把舊的掃描數字當成永久事實。
-
-Skill Eval 主線下一個收斂點是 **#73 -> #74 -> #76**。完成 contract landing 後，真正尚未被 contract 取代的關鍵工作是 physical execution：以至少兩個真實 model/harness stacks 對 post-selection sealed holdout 產生 deterministic evidence，才能建立第一個 `Capability Unlock`。詳細需求與禁止事項見 [`docs/AGENT_INTEGRATION_STATE.md`](docs/AGENT_INTEGRATION_STATE.md)。
+1. Read root routes and [`docs/AGENT_INTEGRATION_STATE.md`](docs/AGENT_INTEGRATION_STATE.md).
+2. Inspect current `main`, exact open PR base/head, and whether owning workflows executed.
+3. Identify the state-machine transition and authority boundary.
+4. Select procedural core, optional references, and domain modules explicitly.
+5. Preserve holdout, verifier, optimizer, release, and Human authorities.
+6. Run the owning positive and hollow/mutation controls.
+7. Update the nearest README, current handoff, and traceability when topology changes.
