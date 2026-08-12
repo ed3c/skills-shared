@@ -1,0 +1,49 @@
+name: Skill Eval Contract
+
+on:
+  pull_request:
+    paths:
+      - 'evals/**'
+      - 'scripts/check_skill_evals.py'
+      - 'tests/test_skill_eval_gate.py'
+      - '.github/workflows/skill-eval-contract.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'evals/**'
+      - 'scripts/check_skill_evals.py'
+      - 'tests/test_skill_eval_gate.py'
+
+permissions:
+  contents: read
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate eval coverage
+        run: python3 scripts/check_skill_evals.py
+      - name: Run mutation-style gate tests
+        run: python3 -m unittest tests/test_skill_eval_gate.py -v
+      - name: Exercise gold replay verifier safe-block path
+        run: |
+          tmp="$(mktemp -d)"
+          mkdir -p "$tmp/evidence"
+          cat > "$tmp/evidence/preflight.json" <<'JSON'
+          {
+            "repository": "ed3c/disposable-skill-eval",
+            "pull_request": 1,
+            "expected_head_sha": "0123456789abcdef",
+            "viewer_id": "fixture-viewer",
+            "author_identity_source": "remote-preflight-fixture",
+            "remote_author_identity_proven": false,
+            "merge_mutation_attempted": false,
+            "decision": "BLOCKED"
+          }
+          JSON
+          (cd "$tmp" && python3 "$GITHUB_WORKSPACE/evals/verifiers/verify_issue_25_contract.py")
