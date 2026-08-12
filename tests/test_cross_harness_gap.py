@@ -17,6 +17,18 @@ def row(case_id: str, condition: str, seed: int, passed: bool, model: str, harne
     }
 
 
+def repetition_row(case_id: str, condition: str, repetition: int, passed: bool, model: str, harness: str):
+    return {
+        "schema_version": "skill-eval-executor-evidence/v1",
+        "case_id": case_id,
+        "condition": condition,
+        "sampling": {"repetition_index": repetition, "seed_controlled": False, "model_seed": None},
+        "model": {"name": model},
+        "harness": {"name": harness},
+        "outcome": {"passed": passed},
+    }
+
+
 class CrossHarnessGapTests(unittest.TestCase):
     def test_gap_and_pairwise_disagreement(self):
         rows = [
@@ -44,11 +56,21 @@ class CrossHarnessGapTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "duplicate"):
             summarize(rows)
 
-    def test_executor_evidence_shape_is_supported_without_promotion(self):
-        value = row("a", "candidate_skill", 1, True, "m", "skill-up")
-        value["schema_version"] = "skill-eval-executor-evidence/v1"
-        result = summarize([value])
-        self.assertEqual(result["stack_count"], 1)
+    def test_executor_repetitions_pair_without_fabricating_seed(self):
+        rows = [
+            repetition_row("a", "candidate_skill", 1, True, "m", "arena"),
+            repetition_row("a", "candidate_skill", 1, False, "m", "skill-up"),
+        ]
+        result = summarize(rows)
+        self.assertEqual(result["stack_count"], 2)
+        self.assertEqual(result["paired_agreement"]["shared_identities"], 1)
+        self.assertEqual(result["paired_agreement"]["disagreement_rate"], 1.0)
+
+    def test_uncontrolled_executor_cannot_claim_model_seed(self):
+        value = repetition_row("a", "candidate_skill", 1, True, "m", "skill-up")
+        value["sampling"]["model_seed"] = 7
+        with self.assertRaisesRegex(ValueError, "must not claim"):
+            summarize([value])
 
 
 if __name__ == "__main__":
