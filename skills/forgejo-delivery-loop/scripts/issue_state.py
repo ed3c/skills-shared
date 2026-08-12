@@ -234,10 +234,15 @@ def validate_source_live(
         "merge_sha": source["merge_sha"],
         "observed_at": observed_at,
     }
+    stable_source_identity = {
+        field: field_value
+        for field, field_value in observation.items()
+        if field != "observed_at"
+    }
     return {
         "status": "source-verified",
         "request_sha256": validated["request_sha256"],
-        "source_observation_sha256": _digest(observation),
+        "source_observation_sha256": _digest(stable_source_identity),
         **observation,
     }
 

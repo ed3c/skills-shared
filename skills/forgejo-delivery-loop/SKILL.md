@@ -132,6 +132,8 @@ source URL marker／request digest 一致，並要求 authenticated timeline 的
 後五分鐘內發生。三者缺一即 fail closed；單純自填 observation JSON 不能產生 verified receipt。
 `admission` 是對既有 user 指令的 out-of-band operator attestation，不是密碼學 provenance；不得由
 agent 推斷或由 issue 內容取代。可驗證的 outcome evidence 是 authenticated source／state／timeline read。
+Source identity digest 排除查詢當下的 `observed_at`，因此同一組 GitHub URL／state／merge SHA 可離線
+重算；時間仍保留在 observation，但不讓時鐘噪音改變 evidence identity。
 
 八條不變量（只認 localhost:3000、憑證只留記憶體、Forgejo 不是真相來源、每個外部 mutation 下沉成
 一個小迴圈、repo 寫入交給 repo-local operator、缺 admission 即 fail closed……）、M0/G0/V0 狀態圖、

@@ -128,7 +128,17 @@ except ValueError:
 else:
     raise AssertionError("wrong live post-state accepted")
 
-assert module.validate_source_live(request, source_reader)["status"] == "source-verified"
+source_result = module.validate_source_live(request, source_reader)
+assert source_result["status"] == "source-verified"
+stable_source_identity = {
+    field: value for field, value in source_result.items()
+    if field not in {
+        "status", "request_sha256", "source_observation_sha256", "observed_at"
+    }
+}
+assert source_result["source_observation_sha256"] == module._digest(
+    stable_source_identity
+)
 
 def rejected_source(label, issue_patch=None, pull_patch=None):
     def reader(command, name):
