@@ -1,0 +1,32 @@
+{
+  "schema_version": "skill-eval-coverage/v1",
+  "claims": {
+    "github-delivery-loop:detects-invalid-remote-author-identity": {
+      "cases": ["github-live-merge-author-identity"]
+    },
+    "github-delivery-loop:uses-live-equivalent-preflight": {
+      "cases": ["github-live-merge-author-identity"]
+    },
+    "github-delivery-loop:fails-before-merge-on-unproven-identity": {
+      "cases": ["github-live-merge-author-identity"]
+    },
+    "github-delivery-loop:preserves-head-sha-pin": {
+      "cases": ["github-live-merge-author-identity"]
+    },
+    "autoresearch-composer:routes-metric-driven-loop": {
+      "cases": ["autoresearch-metric-loop-plan"]
+    },
+    "autoresearch-composer:emits-complete-iteration-contract": {
+      "cases": ["autoresearch-metric-loop-plan"]
+    },
+    "autoresearch-composer:yields-to-native-debug-skill": {
+      "cases": ["autoresearch-yield-bug-diagnosis"]
+    },
+    "autoresearch-composer:recovers-semantic-context-before-generation": {
+      "cases": ["autoresearch-recover-compressed-context"]
+    },
+    "autoresearch-composer:rejects-unverifiable-optimization": {
+      "cases": ["autoresearch-holdout-no-verifier"]
+    }
+  }
+}

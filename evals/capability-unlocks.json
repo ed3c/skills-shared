@@ -1,0 +1,5 @@
+{
+  "schema_version": "capability-unlock-registry/v1",
+  "unlocks": [],
+  "policy": "Do not add an unlock until at least six held-out cases show no-skill <= 1/6, current-skill <= 1/6, candidate >= 4/6 across at least two distinct model/harness stacks with deterministic outcome verification."
+}
