@@ -160,6 +160,35 @@ jobs:
           (root / 'attempt.json').write_text(json.dumps(value, indent=2, sort_keys=True) + '\n')
           PY
 
+      - name: Normalize skill-up fact source into executor evidence
+        if: steps.skillup.outcome == 'success'
+        env:
+          CASE_ID: ${{ inputs.case_id }}
+          ENGINE: ${{ inputs.engine }}
+          PROVIDER: ${{ inputs.provider }}
+          MODEL: ${{ inputs.model }}
+          VARIANT: ${{ matrix.variant }}
+          SEED: ${{ matrix.seed }}
+          SKILL_SHA: ${{ steps.materialize.outputs.skill_sha }}
+          REPORT_DIR: ${{ steps.skillup.outputs.report-dir }}
+        run: |
+          set -euo pipefail
+          test -n "$REPORT_DIR"
+          python3 scripts/collect_skill_up_executor_evidence.py \
+            --report-dir "$REPORT_DIR" \
+            --case-id "$CASE_ID" \
+            --condition "$VARIANT" \
+            --skill-sha "$SKILL_SHA" \
+            --eval-suite-sha "$GITHUB_SHA" \
+            --skill autoresearch-composer \
+            --engine "$ENGINE" \
+            --provider "$PROVIDER" \
+            --model "$MODEL" \
+            --seed "$SEED" \
+            --output ".physical-runtime/${VARIANT}/attempt/executor-evidence.json"
+          cp "$REPORT_DIR/report.json" ".physical-runtime/${VARIANT}/attempt/skill-up-report.json"
+          python3 -m json.tool ".physical-runtime/${VARIANT}/attempt/executor-evidence.json" >/dev/null
+
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:
