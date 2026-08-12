@@ -24,7 +24,7 @@
     "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]{2,127}$"},
     "skill": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
     "skill_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
-    "eval_suite_sha": {"type": "string", "pattern": "^[0-9a-f]{7,64}$"},
+    "eval_suite_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
     "capability_unlock_id": {"type": "string", "minLength": 3},
     "model_harness_matrix": {
       "type": "array", "minItems": 2, "uniqueItems": true,
@@ -42,7 +42,7 @@
       "type": "array", "minItems": 1, "uniqueItems": true,
       "items": {"type": "string", "minLength": 1}
     },
-    "rollback_sha": {"type": "string", "pattern": "^[0-9a-f]{7,64}$"},
+    "rollback_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
     "rollback_artifact": {"type": "string", "minLength": 1},
     "rollback_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
     "scorecard": {"type": "string", "minLength": 1},
