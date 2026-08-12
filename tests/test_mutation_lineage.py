@@ -31,7 +31,7 @@ class MutationLineageTests(unittest.TestCase):
             "rollback_sha": "abcdef0123456789",
         }
 
-    def write_evidence(self, root: Path, *, case_id: str, skill_sha: str, passed: bool, name: str) -> str:
+    def write_evidence(self, root: Path, *, case_id: str, skill_sha: str | None, passed: bool, name: str) -> str:
         run_id = f"run-{name}-12345678"
         runs = root / "evidence" / "runs"
         receipts = root / "evidence" / "receipts"
@@ -86,16 +86,37 @@ class MutationLineageTests(unittest.TestCase):
         )
         return bundle.relative_to(root).as_posix()
 
-    def winning_receipt(self, root: Path, value: dict, *, regress=False, extra_candidate=False, foreign=False) -> str:
+    def winning_receipt(
+        self,
+        root: Path,
+        value: dict,
+        *,
+        regress: bool = False,
+        extra_candidate: bool = False,
+        extra_no_skill: bool = False,
+        omit_no_skill: bool = False,
+        foreign: bool = False,
+    ) -> str:
         refs = [
             self.write_evidence(root, case_id="target-case", skill_sha=value["parent_sha"], passed=False, name="target-parent"),
             self.write_evidence(root, case_id="target-case", skill_sha=value["candidate_sha"], passed=True, name="target-candidate"),
             self.write_evidence(root, case_id="control-case", skill_sha=value["parent_sha"], passed=True, name="control-parent"),
             self.write_evidence(root, case_id="control-case", skill_sha=value["candidate_sha"], passed=not regress, name="control-candidate"),
         ]
+        if not omit_no_skill:
+            refs.extend(
+                [
+                    self.write_evidence(root, case_id="target-case", skill_sha=None, passed=False, name="target-no-skill"),
+                    self.write_evidence(root, case_id="control-case", skill_sha=None, passed=False, name="control-no-skill"),
+                ]
+            )
         if extra_candidate:
             refs.append(
                 self.write_evidence(root, case_id="target-case", skill_sha=value["candidate_sha"], passed=True, name="target-candidate-extra")
+            )
+        if extra_no_skill:
+            refs.append(
+                self.write_evidence(root, case_id="target-case", skill_sha=None, passed=False, name="target-no-skill-extra")
             )
         if foreign:
             refs[1] = self.write_evidence(root, case_id="target-case", skill_sha="9999999abcdef000", passed=True, name="target-foreign")
@@ -139,7 +160,7 @@ class MutationLineageTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "evaluation_receipt"):
             validate(value)
 
-    def test_won_is_recomputed_from_paired_evidence(self):
+    def test_won_is_recomputed_from_three_arm_evidence(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
             value = self.good()
@@ -156,12 +177,30 @@ class MutationLineageTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "fails admission"):
                 validate(value, root)
 
-    def test_won_rejects_unpaired_denominator(self):
+    def test_terminal_requires_no_skill_baseline(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            value = self.good()
+            value["status"] = "won"
+            value["evaluation_receipt"] = self.winning_receipt(root, value, omit_no_skill=True)
+            with self.assertRaisesRegex(ValueError, "current/candidate/no-skill"):
+                validate(value, root)
+
+    def test_won_rejects_candidate_denominator_cherry_pick(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
             value = self.good()
             value["status"] = "won"
             value["evaluation_receipt"] = self.winning_receipt(root, value, extra_candidate=True)
+            with self.assertRaisesRegex(ValueError, "denominator mismatch"):
+                validate(value, root)
+
+    def test_won_rejects_no_skill_denominator_drift(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            value = self.good()
+            value["status"] = "won"
+            value["evaluation_receipt"] = self.winning_receipt(root, value, extra_no_skill=True)
             with self.assertRaisesRegex(ValueError, "denominator mismatch"):
                 validate(value, root)
 
@@ -171,7 +210,7 @@ class MutationLineageTests(unittest.TestCase):
             value = self.good()
             value["status"] = "won"
             value["evaluation_receipt"] = self.winning_receipt(root, value, foreign=True)
-            with self.assertRaisesRegex(ValueError, "neither parent nor candidate"):
+            with self.assertRaisesRegex(ValueError, "neither parent, candidate, nor no-skill"):
                 validate(value, root)
 
     def test_lost_cannot_hide_winning_evidence(self):
