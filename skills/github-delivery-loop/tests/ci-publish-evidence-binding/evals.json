@@ -1,0 +1,22 @@
+{
+  "schema": "github-delivery-ci-publish-evidence-binding-evals/v1",
+  "subject": "skills/github-delivery-loop/scripts/ci_publish_bound_gate.py",
+  "runnable": [
+    {
+      "id": "DELIVERY-8",
+      "entrypoint": "skills/github-delivery-loop/tests/ci-publish-evidence-binding/verify.sh",
+      "positive": "producer receipt and detailed sidecar for the same clean exact HEAD/tree authorize the existing initial-pr policy",
+      "negative_controls": [
+        "missing evidence sidecar",
+        "changed sidecar byte",
+        "forged compact evidence digest",
+        "wrong repository, HEAD, or tree",
+        "FAIL, timeout, nonzero, spawn-error, or truncated command evidence",
+        "duplicate/reordered command IDs",
+        "machine-local paths",
+        "malformed stream digests"
+      ],
+      "expected": "only the subject-bound producer pair can reach policy ALLOW; every mismatch fails before an operation is returned"
+    }
+  ]
+}
