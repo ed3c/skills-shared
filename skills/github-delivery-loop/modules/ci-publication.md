@@ -69,9 +69,11 @@ The evaluator is deliberately pure; enforcement is layered around it:
 
 1. `.github-delivery/ci-policy.json` enrolls one private repository, names the
    workflow and stable required jobs, and defines the local verifier argv.
-2. `ci_workflow_policy.py check` refuses workflows that run on draft
-   `synchronize` or `reopened`, push outside the default branch, omit dispatch/concurrency,
-   or reference mutable action tags.
+2. `ci_workflow_policy.py check` requires one explicit PR cost profile: the
+   backwards-compatible `draft-first` profile rejects draft `synchronize` and
+   `reopened`; the opt-in `universal` profile requires every opened, synchronized,
+   reopened, and ready-for-review PR head. Both reject push outside the default
+   branch, missing dispatch/concurrency, and mutable action tags.
 3. `ci_publish.py verify` executes the configured verifier and writes an
    exact-HEAD receipt under the git directory, outside the committed tree.
 4. `ci_publish.py publish` rechecks policy, receipt, snapshot, GitHub remote
@@ -87,11 +89,26 @@ GitHub enforcement.
 
 ## Workflow shape for private repositories
 
-The workflow should preserve a trusted final check while avoiding automatic work
-for every draft synchronization:
+The workflow must preserve a trusted final check. Select the PR cost profile in
+`.github-delivery/ci-policy.json`; omitting `pull_request_mode` remains
+`draft-first` for compatibility:
 
-- `pull_request` handles ready-for-review/open-ready transitions, not every draft
-  `synchronize` event;
+```json
+{
+  "pull_request_mode": "draft-first"
+}
+```
+
+The supported profiles are deliberately closed:
+
+- `draft-first` requires exactly `ready_for_review`. Reopened and repair
+  publications dispatch the workflow explicitly against the admitted SHA.
+- `universal` requires exactly `opened`, `synchronize`, `reopened`, and
+  `ready_for_review`. It verifies every normal PR head transition, including
+  drafts, and therefore consumes more hosted Actions quota.
+
+In both profiles:
+
 - `push` is limited to the default branch;
 - `workflow_dispatch` runs the final check after one admitted repair batch;
 - workflow-level `concurrency` groups by PR/ref and cancels stale PR runs;
@@ -104,10 +121,10 @@ before the next push arrives, so nothing remains to cancel. GitHub's official
 [workflow syntax](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#concurrency)
 documents cancellation behavior.
 
-For a draft-first repository, the sealed shape runs the billed PR workflow only
-on `ready_for_review`. Reopened and repair publications dispatch the workflow
-explicitly against that exact branch/SHA. Never use a manually published success
-status as a substitute for executing the verifier.
+Selecting `universal` changes scheduling, not billing recovery or release
+authority. An open billing circuit still blocks publication; a queued, skipped,
+or no-runner check still is not verification. Never use a manually published
+success status as a substitute for executing the verifier.
 
 ## Snapshot example
 

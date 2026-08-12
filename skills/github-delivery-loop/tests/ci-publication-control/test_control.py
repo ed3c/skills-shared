@@ -49,8 +49,14 @@ jobs:
 """
 
 
-def policy() -> dict:
-    return {
+UNIVERSAL_WORKFLOW = WORKFLOW.replace(
+    "types: [ready_for_review]",
+    "types: [opened, synchronize, reopened, ready_for_review]",
+)
+
+
+def policy(pull_request_mode: str | None = "draft-first") -> dict:
+    value = {
         "schema": "github-ci-policy/v1",
         "repository": "ed3c/example",
         "private": True,
@@ -59,6 +65,9 @@ def policy() -> dict:
         "required_jobs": ["verify"],
         "local_verification": ["/usr/bin/true"],
     }
+    if pull_request_mode is not None:
+        value["pull_request_mode"] = pull_request_mode
+    return value
 
 
 class WorkflowPolicyTests(unittest.TestCase):
@@ -72,6 +81,49 @@ class WorkflowPolicyTests(unittest.TestCase):
         )
         with self.assertRaisesRegex(POLICY.PolicyError, "missing types"):
             POLICY.evaluate_workflow(policy(), hollow)
+
+    def test_universal_pull_request_mode_accepts_exact_event_set(self) -> None:
+        details = POLICY.evaluate_workflow(policy("universal"), UNIVERSAL_WORKFLOW)
+        self.assertIn("pull_request_mode=universal", details)
+
+    def test_draft_first_mode_rejects_universal_event_set(self) -> None:
+        with self.assertRaisesRegex(POLICY.PolicyError, "draft-first"):
+            POLICY.evaluate_workflow(policy(), UNIVERSAL_WORKFLOW)
+
+    def test_universal_mode_rejects_missing_event(self) -> None:
+        hollow = UNIVERSAL_WORKFLOW.replace("synchronize, ", "")
+        with self.assertRaisesRegex(POLICY.PolicyError, "universal"):
+            POLICY.evaluate_workflow(policy("universal"), hollow)
+
+    def test_universal_mode_rejects_extra_event(self) -> None:
+        hollow = UNIVERSAL_WORKFLOW.replace(
+            "ready_for_review]", "ready_for_review, converted_to_draft]"
+        )
+        with self.assertRaisesRegex(POLICY.PolicyError, "universal"):
+            POLICY.evaluate_workflow(policy("universal"), hollow)
+
+    def test_unknown_pull_request_mode_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "policy.json"
+            path.write_text(json.dumps(policy("every-event")), encoding="utf-8")
+            with self.assertRaisesRegex(POLICY.PolicyError, "pull_request_mode"):
+                POLICY.load_policy(path)
+
+    def test_non_string_pull_request_mode_is_rejected_as_policy_error(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "policy.json"
+            value = policy()
+            value["pull_request_mode"] = ["universal"]
+            path.write_text(json.dumps(value), encoding="utf-8")
+            with self.assertRaisesRegex(POLICY.PolicyError, "pull_request_mode"):
+                POLICY.load_policy(path)
+
+    def test_legacy_policy_defaults_to_draft_first(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "policy.json"
+            path.write_text(json.dumps(policy(None)), encoding="utf-8")
+            loaded = POLICY.load_policy(path)
+        self.assertEqual(loaded["pull_request_mode"], "draft-first")
 
     def test_tagged_action_is_rejected(self) -> None:
         hollow = WORKFLOW.replace(

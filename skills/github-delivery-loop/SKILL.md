@@ -182,8 +182,10 @@ delivery-loop **各藏著一支從沒被自己 SKILL.md 提過的 sync 類腳本
   `preflight`（無 `--snapshot`）負責，兩種證據不得混稱。
 - `ci_publish_gate.py evaluate` 同樣零網路；snapshot 的 GitHub/owner recovery 活證據必須由外部
   sync 或人工附上可查 URL，shape 通過不等於帳務已恢復。
-- `ci_workflow_policy.py check` 是 repo 密封閘：PR 只准 `ready_for_review`、push 只准 default
-  branch、必須有 manual dispatch/concurrency，且 action 一律釘完整 SHA；少一項就不得 enroll。
+- `ci_workflow_policy.py check` 是 repo 密封閘：`pull_request_mode` 缺省／`draft-first` 時 PR 只准
+  `ready_for_review`；只有 repo 明確選 `universal` 才精確准
+  `opened,synchronize,reopened,ready_for_review`。push 只准 default branch、必須有 manual
+  dispatch/concurrency，且 action 一律釘完整 SHA；少一項就不得 enroll。
 - `ci_publish_guard.py` 只對已 enroll repo 的 GitHub push fail closed；它明確保留 Forgejo push，
   不把雙 remote repo 的 canonical 免費路徑一起封死。
 - repository identity 釘 immutable GitHub node ID；owner/name 只作可轉移別名，redirect 不得冒充身份證據。
