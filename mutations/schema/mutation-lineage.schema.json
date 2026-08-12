@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ed3c/skills-shared/mutations/schema/mutation-lineage.schema.json",
+  "title": "skill-mutation-lineage/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "skill", "parent_sha", "candidate_sha", "hypothesis", "mutation_class", "target_failures", "changed_sections", "expected_effect", "regression_budget", "status", "rollback_sha"],
+  "properties": {
+    "schema_version": {"const": "skill-mutation/v1"},
+    "skill": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+    "parent_sha": {"type": "string", "pattern": "^[0-9a-f]{7,64}$"},
+    "candidate_sha": {"type": "string", "pattern": "^[0-9a-f]{7,64}$"},
+    "hypothesis": {"type": "string", "minLength": 10},
+    "mutation_class": {"enum": ["trigger", "routing", "knowledge", "tool-contract", "verification", "recovery", "context-management", "example", "negative-instruction"]},
+    "target_failures": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "changed_sections": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "expected_effect": {
+      "type": "object", "additionalProperties": false, "required": ["metric", "minimum_delta", "case_ids"],
+      "properties": {
+        "metric": {"enum": ["task_pass_rate", "routing_f1", "recovery_rate", "safety_pass_rate", "capability_unlock_count"]},
+        "minimum_delta": {"type": "number"},
+        "case_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 3}}
+      }
+    },
+    "regression_budget": {"type": "number", "minimum": 0},
+    "status": {"enum": ["proposed", "running", "won", "lost", "tie", "reverted"]},
+    "evidence_bundle": {"type": ["string", "null"]},
+    "rollback_sha": {"type": "string", "pattern": "^[0-9a-f]{7,64}$"}
+  }
+}

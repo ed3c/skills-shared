@@ -4,9 +4,12 @@
   "skill": "autoresearch-composer",
   "kind": "adversarial",
   "split": "holdout",
-  "source": {"kind": "manual", "ref": "near-miss derived from negative-no-numeric-verifier; prompt text reserved for holdout execution"},
+  "source": {"kind": "manual", "ref": "sealed holdout corpus: autoresearch near-miss/no-verifier"},
   "claims": ["rejects-unverifiable-optimization"],
-  "task": {"prompt": "Improve this workflow through repeated iterations, but there is currently no numeric verifier that can determine whether an iteration is better."},
+  "task": {
+    "sealed_ref": "holdout://autoresearch-composer/no-verifier/v1",
+    "content_sha256": "5b627af2f8bba75752094ee235c11bdd68bf30a6315fc99d627e9b47a0c77a1c"
+  },
   "routing": {"should_invoke": ["grilling"], "must_not_invoke": ["autoresearch-composer"]},
   "conditions": ["no_skill", "current_skill", "candidate_skill", "wrong_skill"],
   "runtime": {"fresh_workspace": true, "retries": 0, "timeout_seconds": 180, "network_policy": "no-network", "seed_count": 3},
