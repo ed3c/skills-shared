@@ -110,11 +110,22 @@ case "$*" in
   "pr view 6 --repo example/infrastructure --json "*)
     echo '{"id":"PR_owner_auto_6","number":6,"url":"https://github.com/example/infrastructure/pull/6","title":"selected failing PR","state":"OPEN","isDraft":false,"headRefOid":"6666666666666666666666666666666666666666","mergeable":"MERGEABLE","mergeStateStatus":"UNSTABLE"}'
     ;;
+  "pr view 8 --repo example/infrastructure --json "*)
+    echo '{"id":"PR_human_admit_8","number":8,"url":"https://github.com/example/infrastructure/pull/8","title":"selected PR admitted by non-owner","state":"OPEN","isDraft":false,"headRefOid":"8888888888888888888888888888888888888888","mergeable":"MERGEABLE","mergeStateStatus":"CLEAN"}'
+    ;;
+  "pr view 404 --repo example/infrastructure --json "*)
+    ;;
   "api repos/example/infrastructure/commits/3131313131313131313131313131313131313131 --jq "*)
     echo '{"d":"2026-08-12T01:00:00Z"}'
     ;;
   "api repos/example/infrastructure/commits/6666666666666666666666666666666666666666 --jq "*)
     echo '{"d":"2026-08-12T01:00:00Z"}'
+    ;;
+  "api repos/example/infrastructure/commits/8888888888888888888888888888888888888888 --jq "*)
+    echo '{"d":"2026-08-12T01:00:00Z"}'
+    ;;
+  "api repos/example/infrastructure/issues/8/events --paginate --jq "*)
+    echo '{"actor":"delivery-bot","at":"2026-08-12T02:00:00Z"}'
     ;;
   "api graphql -f query=mutation"*)
     echo '{"data":{"mergePullRequest":{"pullRequest":{"number":31,"merged":true}}}}'
@@ -174,6 +185,28 @@ grep -q "BLOCK #6 .*L3 GITHUB.*mergeStateStatus=UNSTABLE" \
   "${scratch}/owner-live-blocked.err"
 if grep -q "api graphql" "${apply_log}"; then
   echo "FAIL: scoped land attempted a merge after L3 refusal" >&2
+  exit 1
+fi
+
+: > "${apply_log}"
+set +e
+GH_LOG="${apply_log}" PATH="${fake_bin}:${PATH}" run "${clean_home}" \
+  python3 "${gate}" land --repo "${repo}" --pr 8 \
+  >"${scratch}/human-live-blocked.out" 2>"${scratch}/human-live-blocked.err"
+human_land_blocked_status=$?
+GH_LOG="${apply_log}" PATH="${fake_bin}:${PATH}" run "${clean_home}" \
+  python3 "${gate}" land --repo "${repo}" --pr 404 \
+  --policy "${owner_policy}" \
+  >"${scratch}/owner-live-missing.out" 2>"${scratch}/owner-live-missing.err"
+owner_land_missing_status=$?
+set -e
+test "${human_land_blocked_status}" -eq 1
+grep -q "BLOCK #8 .*L1 HUMAN-ADMIT.*not repository owner" \
+  "${scratch}/human-live-blocked.err"
+test "${owner_land_missing_status}" -eq 1
+grep -q "could not read PR #404" "${scratch}/owner-live-missing.err"
+if grep -Eq "api graphql|gh pr merge" "${apply_log}"; then
+  echo "FAIL: scoped land attempted a merge after L1 refusal or missing target" >&2
   exit 1
 fi
 

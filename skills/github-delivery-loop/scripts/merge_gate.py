@@ -952,12 +952,17 @@ def land(
                     file=sys.stderr,
                 )
                 return 1
-        pending = [
-            pull
-            for pull in sorted(pulls, key=lambda item: item["number"])
-            if (policy is not None or check_admit(pull, owner_login(snapshot)) is None)
-            and check_github(pull, allow_unstable and policy is None) is None
-        ]
+            pending = [pull]
+        else:
+            pending = [
+                pull
+                for pull in sorted(pulls, key=lambda item: item["number"])
+                if (
+                    policy is not None
+                    or check_admit(pull, owner_login(snapshot)) is None
+                )
+                and check_github(pull, allow_unstable and policy is None) is None
+            ]
         if not pending:
             break
         pull = pending[0]
