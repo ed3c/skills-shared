@@ -1,0 +1,37 @@
+{
+  "schema_version": "repo-agent-native-evals/v1",
+  "skill_name": "repo-agent-native",
+  "version": "2.0.0",
+  "deterministic": [
+    {
+      "id": "RAN-STRUCTURE",
+      "command": "python3 skills/repo-agent-native/scripts/check_repo_agent_native.py skills/repo-agent-native",
+      "selftest": "python3 skills/repo-agent-native/scripts/check_repo_agent_native.py --selftest",
+      "expected": "candidate structure passes; planted frontmatter, portability, module, link, and eval-closure mutations fail"
+    },
+    {
+      "id": "RAN-OUTPUT-VERIFIER",
+      "command": "python3 evals/verifiers/verify_repo_agent_native_output.py --selftest",
+      "expected": "positive output passes all cases; unsupported claims, missing fallback, memory override, and graph-without-readback outputs fail"
+    }
+  ],
+  "behavior_cases": [
+    "evals/cases/repo-agent-native/source-anchored-invariants.json",
+    "evals/cases/repo-agent-native/degraded-provider-fallback.json",
+    "evals/cases/repo-agent-native/memory-conflict.json",
+    "evals/cases/repo-agent-native/graph-impact-readback.json"
+  ],
+  "verifier": "evals/verifiers/verify_repo_agent_native_output.py",
+  "comparison_conditions": [
+    "no_skill",
+    "current_skill",
+    "candidate_skill",
+    "wrong_skill"
+  ],
+  "physical_execution": {
+    "fresh_workspace": true,
+    "retries": 0,
+    "minimum_seeds": 3,
+    "state_until_receipts_exist": "NOT_EXERCISED"
+  }
+}

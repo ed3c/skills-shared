@@ -1,0 +1,51 @@
+name: repo-agent-native Contract
+
+on:
+  pull_request:
+    types:
+      - ready_for_review
+      - reopened
+      - synchronize
+    paths:
+      - 'skills/repo-agent-native/**'
+      - 'evals/cases/repo-agent-native/**'
+      - 'evals/fixtures/repo-agent-native/**'
+      - 'evals/verifiers/verify_repo_agent_native_output.py'
+      - 'evals/coverage.json'
+      - '.github/workflows/repo-agent-native.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'skills/repo-agent-native/**'
+      - 'evals/cases/repo-agent-native/**'
+      - 'evals/fixtures/repo-agent-native/**'
+      - 'evals/verifiers/verify_repo_agent_native_output.py'
+      - 'evals/coverage.json'
+      - '.github/workflows/repo-agent-native.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: repo-agent-native-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  contract:
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.12'
+      - name: Validate portable Skill structure and planted negatives
+        run: sh skills/repo-agent-native/tests/verify.sh
+      - name: Validate repository-wide eval coverage
+        run: python3 scripts/check_skill_evals.py
+      - name: Compile deterministic verifiers
+        run: python3 -m compileall -q skills/repo-agent-native/scripts evals/verifiers
