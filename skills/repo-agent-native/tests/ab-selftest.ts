@@ -3,7 +3,7 @@ import { cpSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { fixtureRepo, runAbCli } from "../scripts/run-ab.ts";
+import { fixtureRepo, instructionDigest, runAbCli } from "../scripts/run-ab.ts";
 import { runScoreCli, scoreOutput } from "../scripts/score-ab-output.ts";
 import { compareAb } from "../scripts/compare-ab.ts";
 
@@ -126,6 +126,9 @@ try {
   mkdirSync(deterministicA);
   mkdirSync(deterministicB);
   expect(fixtureRepo(deterministicA) === fixtureRepo(deterministicB), "A/B fixture commit is not deterministic");
+  positive += 1;
+
+  expect(instructionDigest(resolve(SKILL_ROOT, "../knowledge-continuity")).length === 64, "optional Skill directories were treated as mandatory");
   positive += 1;
 
   const baseReceipt = {

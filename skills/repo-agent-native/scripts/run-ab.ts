@@ -106,14 +106,15 @@ function packageDigest(root: string): string {
   return digest.digest("hex");
 }
 
-function instructionDigest(root: string): string {
-  const paths = [
-    resolve(root, "SKILL.md"),
-    resolve(root, "agents/openai.yaml"),
-    resolve(root, "evals/fixtures/invariant-report.schema.json"),
-  ];
+export function instructionDigest(root: string): string {
+  const paths = [resolve(root, "SKILL.md")];
+  for (const optionalPath of ["agents/openai.yaml", "evals/fixtures/invariant-report.schema.json"]) {
+    const path = resolve(root, optionalPath);
+    if (existsSync(path)) paths.push(path);
+  }
   for (const directoryName of ["references", "modules"]) {
     const directory = resolve(root, directoryName);
+    if (!existsSync(directory)) continue;
     for (const entry of readdirSync(directory, { withFileTypes: true })) {
       if (entry.isFile() && entry.name.endsWith(".md")) paths.push(resolve(directory, entry.name));
     }
