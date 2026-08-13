@@ -43,6 +43,7 @@
   },
   "planned_runners": {
     "offline_bun": "IMPLEMENTED",
+    "owning_contract_ci": "NOT_IMPLEMENTED",
     "claude_code": "NOT_EXERCISED",
     "codex_cli": "NOT_EXERCISED"
   },
@@ -65,5 +66,10 @@
     "old-receipt-new-commit",
     "machine-local-skill-binding",
     "mutable-main-execution-identity"
-  ]
+  ],
+  "routing_evidence_boundary": {
+    "fixture_contract": "IMPLEMENTED",
+    "semantic_model_routing": "NOT_EXERCISED",
+    "phase3_issue": 95
+  }
 }
