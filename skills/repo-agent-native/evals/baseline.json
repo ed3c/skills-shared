@@ -1,0 +1,13 @@
+{
+  "schema": "skills-shared/skill-baseline/v1",
+  "skill": "repo-agent-native",
+  "repository": "ed3c/skills-shared",
+  "commit": "d277e56870c0cc18455c9dd5e572a43ca08b444b",
+  "path": "skills/repo-agent-native/SKILL.md",
+  "blob_sha1": "8ec121bab2159353a257848d7292250eb78a1e76",
+  "bytes": 20488,
+  "line_count": null,
+  "line_count_state": "NOT_EXERCISED",
+  "capture_policy": "The exact Git blob is the baseline. Do not copy or edit it in place for blind evaluation.",
+  "candidate": null
+}

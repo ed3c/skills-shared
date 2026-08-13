@@ -1,0 +1,46 @@
+{
+  "schema": "skills-shared/skill-trigger-cases/v1",
+  "skill": "repo-agent-native",
+  "cases": [
+    {
+      "id": "TRIGGER-01",
+      "prompt": "Before changing this brownfield retry service, extract the source-anchored business invariants, negative assumptions, and hidden dependency paths.",
+      "expected": "TRIGGER"
+    },
+    {
+      "id": "TRIGGER-02",
+      "prompt": "Map the public interface, state transitions, side effects, named failures, and implicit dependencies of this existing subsystem with file and line evidence.",
+      "expected": "TRIGGER"
+    },
+    {
+      "id": "TRIGGER-03",
+      "prompt": "Run codebase mastery and specs-as-code analysis for this monorepo before the architecture migration.",
+      "expected": "TRIGGER_WITH_MODULE"
+    },
+    {
+      "id": "NO-TRIGGER-01",
+      "prompt": "Rename this TypeScript variable and run the unit tests.",
+      "expected": "NO_TRIGGER"
+    },
+    {
+      "id": "NO-TRIGGER-02",
+      "prompt": "Verify the latest license and version of an external framework.",
+      "expected": "NO_TRIGGER_EXTERNAL_VERIFY"
+    },
+    {
+      "id": "NO-TRIGGER-03",
+      "prompt": "Debug a production-only timeout using logs and traces; source code alone has not reproduced it.",
+      "expected": "NO_TRIGGER_RUNTIME_DEBUG"
+    },
+    {
+      "id": "NO-TRIGGER-04",
+      "prompt": "Generate a high-level repository wiki for onboarding.",
+      "expected": "NO_TRIGGER_WIKI"
+    },
+    {
+      "id": "NO-TRIGGER-05",
+      "prompt": "What coding style does this developer prefer across sessions?",
+      "expected": "NO_TRIGGER_MEMORY_ONLY"
+    }
+  ]
+}
