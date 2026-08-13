@@ -1,0 +1,46 @@
+{
+  "schema": "repo-agent-native/fixture-ground-truth/v1",
+  "required_invariants": [
+    {
+      "id": "GT-01",
+      "class": "api-contract",
+      "claim_contains": ["RetryResult", "success", "failure", "attempts"],
+      "source": "src/retry-policy.ts"
+    },
+    {
+      "id": "GT-02",
+      "class": "state",
+      "claim_contains": ["maximum", "3", "attempts"],
+      "source": "src/retry-policy.ts"
+    },
+    {
+      "id": "GT-03",
+      "class": "effect",
+      "claim_contains": ["sleep", "25", "between"],
+      "source": "src/retry-policy.ts"
+    },
+    {
+      "id": "GT-04",
+      "class": "implicit-dependency",
+      "claim_contains": ["loadAccount", "recordRetryFailure", "best-effort"],
+      "source": "src/api-client.ts"
+    }
+  ],
+  "negative_invariants": [
+    {
+      "id": "GT-N01",
+      "claim_contains": ["metrics failure", "does not replace", "domain result"],
+      "source": "src/api-client.ts"
+    },
+    {
+      "id": "GT-N02",
+      "claim_contains": ["no exponential backoff"],
+      "bounded_scope": ["src/retry-policy.ts"]
+    }
+  ],
+  "forbidden_claims": [
+    "jitter is implemented",
+    "metrics are guaranteed",
+    "the transport retries internally"
+  ]
+}
