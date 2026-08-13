@@ -3,6 +3,7 @@ name: repo-agent-native Contract
 on:
   pull_request:
     types:
+      - opened
       - ready_for_review
       - reopened
       - synchronize
@@ -12,6 +13,7 @@ on:
       - 'evals/fixtures/repo-agent-native/**'
       - 'evals/verifiers/verify_repo_agent_native_output.py'
       - 'evals/coverage.json'
+      - 'scripts/compare_repo_agent_native_contract.py'
       - '.github/workflows/repo-agent-native.yml'
   push:
     branches: [main]
@@ -21,6 +23,7 @@ on:
       - 'evals/fixtures/repo-agent-native/**'
       - 'evals/verifiers/verify_repo_agent_native_output.py'
       - 'evals/coverage.json'
+      - 'scripts/compare_repo_agent_native_contract.py'
       - '.github/workflows/repo-agent-native.yml'
   workflow_dispatch:
 
@@ -40,12 +43,21 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           persist-credentials: false
+          fetch-depth: 0
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
           python-version: '3.12'
       - name: Validate portable Skill structure and planted negatives
         run: sh skills/repo-agent-native/tests/verify.sh
+      - name: Compare baseline and candidate static contracts
+        run: |
+          python3 scripts/compare_repo_agent_native_contract.py \
+            --output /tmp/repo-agent-native-static-ab.json
+          cat /tmp/repo-agent-native-static-ab.json
       - name: Validate repository-wide eval coverage
         run: python3 scripts/check_skill_evals.py
       - name: Compile deterministic verifiers
-        run: python3 -m compileall -q skills/repo-agent-native/scripts evals/verifiers
+        run: python3 -m compileall -q \
+          skills/repo-agent-native/scripts \
+          evals/verifiers \
+          scripts/compare_repo_agent_native_contract.py
