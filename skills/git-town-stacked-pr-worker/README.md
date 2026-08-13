@@ -214,9 +214,42 @@ The historical Skill Eval implementation line was reviewed as:
 
 The terminal leaf for the Actions-cadence consumer change was #46. The reusable publication policy was issue #43 / PR #44, developed as a separate policy line and then consumed by the workflow stack.
 
-Issue #78 is an independent documentation leaf based on current `main`; it is not forced under the runtime stack because it consumes only merged bytes. A later automated documentation checker is a separate child.
+Issue #78 was an earlier independent documentation leaf based on the then-current `main`; it was not forced under the runtime stack because it consumed only merged bytes. A later automated documentation checker remains a separate child.
 
 See [`../github-delivery-loop/modules/traceability-index.md`](../github-delivery-loop/modules/traceability-index.md).
+
+## Four-repository documentation sibling set
+
+The current shared document-routing work is deliberately **not** a serial Stack:
+
+```text
+parent contract: ed3c/bettor-arena#35
+
+main in each repository
+├── skills-shared#85             procedural/domain routing method
+├── runtime-env#30               runtime-contract route binding
+├── agent-shield-monorepo#78     product/reference-consumer route binding
+└── bettor-arena#37              integration/acceptance route binding
+
+all four merged
+└── bettor-arena#38              exact merged index + Claude/Codex cold-start convergence
+```
+
+Why these are siblings:
+
+- each writes only documentation in its own repository;
+- none consumes another sibling's unmerged bytes;
+- each can be reviewed and merged independently;
+- serializing them would create artificial ancestry and stale-green churn.
+
+Why `bettor-arena#38` is a child/convergence leaf:
+
+- it requires the exact merged commit/tree of all four siblings;
+- it owns cross-repository link/role assertion comparison;
+- it owns the fresh cold-start Agent audit;
+- its branch must not be created before those inputs exist.
+
+Exact candidate heads and current evidence states are recorded in [`../../docs/traceability/TRACEABILITY_INDEX.md`](../../docs/traceability/TRACEABILITY_INDEX.md). PR metadata remains the publication authority.
 
 ## Publication policy
 

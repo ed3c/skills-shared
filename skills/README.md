@@ -2,76 +2,77 @@
 
 This directory contains canonical shared Skill bodies and deliberately repo-owned examples recorded by [`../registry.json`](../registry.json). The registry is the classification authority; directory presence alone does not decide whether a Skill is shared.
 
-## Shape of a Skill
+## Procedural core and domain-instance separation
 
-A small Skill may contain only:
-
-```text
-skills/<name>/
-└── SKILL.md
-```
-
-A complex executable Skill should use:
+Every non-trivial Skill follows this ownership model:
 
 ```text
 skills/<name>/
-├── README.md          navigation, directory ownership, state-machine map
-├── SKILL.md           portable Agent behavior authority
-├── evals.json         machine-readable eval inventory
-├── modules/           explanatory mechanisms and decision records
-├── scripts/           executable public/private mechanisms
-└── tests/             good, hollow, mutation, and integration controls
+├── README.md          navigation, ownership, state-machine map
+├── SKILL.md           procedural generalization: workflow, method, laws
+├── references/        reusable host-neutral contracts/templates
+├── modules/           domain instances/examples loaded on demand
+├── scripts/           executable mechanisms
+├── tests/             positive, hollow, mutation, integration controls
+├── evals.json         machine-readable eval inventory when used
+└── cases.json         deterministic routing/case inventory when used
 ```
 
-`README.md` is required when a Skill has multiple state machines, executable scripts, or a non-trivial test tree. It must not duplicate an API or schema that already has a machine-readable owner.
+A small Skill may contain only `SKILL.md`. When a Skill grows domain examples or executable surfaces, add the nearest READMEs and keep the layers separate.
+
+### `SKILL.md`
+
+Owns the generalized procedure and stop conditions. It must not contain consumer branch names, local paths, credentials, live provider state, or product-specific topology.
+
+### `references/`
+
+Owns reusable generic contracts, templates, schema explanations, and assertion vocabulary. References may be selected by the procedure but remain domain-neutral.
+
+### `modules/`
+
+Owns worked examples and domain/repository/provider interpretations. A module is loaded only when its trigger matches. A module cannot silently become global passive context or override the core procedure.
+
+### `scripts/`, `tests/`, `evals.json`, `cases.json`
+
+Own deterministic behavior and falsifiable evidence. Markdown navigation cannot substitute for these authorities.
+
+## Common document routes
+
+Complex Skills and consumer repositories use the same route semantics defined in [`../docs/architecture/DOCUMENT_ROUTING.md`](../docs/architecture/DOCUMENT_ROUTING.md): root entry, Agent procedure, context, architecture, docs index, nearest README, machine authority, and traceability/evidence.
 
 ## Reading a complex Skill
 
-1. `README.md` — purpose, state machines, data flows, current evidence boundary.
-2. `SKILL.md` — rules that an Agent must follow.
-3. `modules/README.md` — mechanism documents and which state machine each owns.
-4. `scripts/README.md` — inputs, outputs, exit semantics, network and mutation boundaries.
-5. `tests/README.md` and `evals.json` — positive and negative controls.
-6. Exact issue/PR — one admitted change and its Human Admit boundary.
+1. `README.md` — purpose, state machines, data flows, evidence boundary.
+2. `SKILL.md` — portable procedure.
+3. `references/README.md` — generic contracts.
+4. `modules/README.md` — on-demand domain examples.
+5. `scripts/README.md` — I/O, exits, network and mutation boundaries.
+6. `tests/README.md` and `evals.json`/`cases.json` — positive and negative controls.
+7. Exact issue/PR — one admitted change and Human boundary.
 
 ## Cross-Skill composition
-
-Shared Skills compose through explicit references and consumer bindings, not private imports between Skill directories.
 
 ```text
 shared Skill body
 → registry classification
 → user-scope projection or immutable bundle
 → consumer requirements/binding
-→ consumer-owned runtime configuration
+→ runtime contract binding
+→ bettor composition/acceptance
 → consumer receipt
 ```
 
-A Skill may reference another Skill's method, but the consumer repository decides whether both are selected. Shared Skills do not create consumer branches, remotes, secrets, or live runtime state.
+Shared Skills may reference another method, but consumer selection remains explicit. Shared bodies do not create consumer branches, remotes, secrets, or live runtime state.
 
-## Delivery pair
-
-Two Skills form the Git delivery pair:
+## Delivery methods
 
 | Skill | Owns | Does not own |
 |---|---|---|
-| [`github-delivery-loop`](github-delivery-loop/README.md) | artifact/receipt binding, GitHub state snapshot, Actions publication admission, merge preflight | implementation correctness, Git Town branch graph, Human merge decision |
-| [`git-town-stacked-pr-worker`](git-town-stacked-pr-worker/README.md) | portable branch/worktree/sync method and Worker prompt | consumer `.git-town.toml`, branch names, CI, push authority, merge/promotion |
-
-The consumer repository joins them:
-
-```text
-issue + path lease + evals
-→ Git Town isolated Worker
-→ local implementation and verification
-→ github-delivery publication gate
-→ reviewed PR
-→ Human Admit
-```
+| [`github-delivery-loop`](github-delivery-loop/README.md) | artifact/receipt binding, GitHub observation, Actions publication, merge preflight | implementation correctness, Git Town graph, Human merge |
+| [`forgejo-delivery-loop`](forgejo-delivery-loop/README.md) | localhost Forgejo routing, line/receipt binding, deterministic outbox/recovery, safe operation boundaries | consumer registry values, credentials, arbitrary remote changes, Human merge |
+| [`git-town-stacked-pr-worker`](git-town-stacked-pr-worker/README.md) | portable branch/worktree/sync method | consumer config, branches, CI, push/merge/promotion |
 
 ## Evidence boundary
-
-Use exact evidence states:
 
 ```text
 PASS
@@ -82,13 +83,14 @@ NOT_EXERCISED
 SKIPPED_BY_POLICY
 ```
 
-Documentation may describe a target mechanism. It cannot promote a package, host tool, external service, browser session, provider, or model run to `PASS`.
+Documentation can describe a target mechanism. It cannot promote a host tool, service, browser/device session, provider, model run, or release to `PASS`.
 
 ## Change rules
 
 - Update `registry.json` when classification changes.
-- Update the nearest README when a new governed directory or state machine appears.
-- Define evals before implementation.
+- Update the nearest README when a governed directory or state machine appears.
+- Define evals/cases before implementation.
+- Keep procedural core and domain instances decoupled.
 - Preserve one writer per branch and disjoint path leases for parallel Workers.
-- Keep machine paths, credentials, browser/device sessions, and live receipts out of shared bodies.
+- Keep machine paths, credentials, sessions, and live receipts out of shared bodies.
 - Do not create empty directories only to match a planned architecture.
