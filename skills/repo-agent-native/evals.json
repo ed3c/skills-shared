@@ -13,6 +13,11 @@
       "id": "RAN-OUTPUT-VERIFIER",
       "command": "python3 evals/verifiers/verify_repo_agent_native_output.py --selftest",
       "expected": "positive output passes all cases; unsupported claims, missing fallback, memory override, and graph-without-readback outputs fail"
+    },
+    {
+      "id": "RAN-STATIC-AB",
+      "command": "python3 scripts/compare_repo_agent_native_contract.py",
+      "expected": "candidate reduces consumer leakage and SKILL.md context while adding portable metadata, executable assertions, and four behavior cases; physical model-output state remains NOT_EXERCISED"
     }
   ],
   "behavior_cases": [
