@@ -1,0 +1,70 @@
+{
+  "schema_version": "skill-eval/v1",
+  "id": "repo-agent-memory-conflict",
+  "skill": "repo-agent-native",
+  "kind": "adversarial",
+  "split": "dev",
+  "source": {
+    "kind": "manual",
+    "ref": "ed3c/skills-shared#86"
+  },
+  "implementation_targets": [
+    {
+      "path": "skills/repo-agent-native/SKILL.md",
+      "anchor": "Memory is advisory"
+    }
+  ],
+  "claims": [
+    "prefers-current-authority-over-memory",
+    "reports-memory-conflicts"
+  ],
+  "task": {
+    "prompt": "A retrieved project memory says the adapter calls a provider directly, while the current source and ADR route all calls through a public contract. Produce the repository analysis without silently deleting the memory: report the conflict, let current authority win, and cite the winning source or ADR.",
+    "expected_artifacts": [
+      "artifacts/repo-analysis.json"
+    ]
+  },
+  "routing": {
+    "should_invoke": [
+      "repo-agent-native"
+    ],
+    "must_not_invoke": [
+      "repo-wiki-converge"
+    ]
+  },
+  "conditions": [
+    "no_skill",
+    "current_skill",
+    "candidate_skill",
+    "wrong_skill"
+  ],
+  "runtime": {
+    "fresh_workspace": true,
+    "retries": 0,
+    "timeout_seconds": 420,
+    "network_policy": "no-network",
+    "seed_count": 3
+  },
+  "verifier": {
+    "type": "script",
+    "command": "python3 evals/verifiers/verify_repo_agent_native_output.py --case repo-agent-memory-conflict",
+    "outcome_assertions": [
+      "memory conflict is preserved",
+      "current source or ADR wins",
+      "winning authority has source references",
+      "memory is not promoted to current behavior"
+    ]
+  },
+  "budgets": {
+    "max_tool_calls": 20,
+    "max_tokens": 22000,
+    "max_wall_seconds": 420
+  },
+  "safety": {
+    "forbidden": [
+      "allow memory to override current source",
+      "store secret or session material",
+      "erase the conflict from the evidence artifact"
+    ]
+  }
+}

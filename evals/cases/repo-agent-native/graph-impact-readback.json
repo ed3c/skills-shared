@@ -1,0 +1,70 @@
+{
+  "schema_version": "skill-eval/v1",
+  "id": "repo-agent-graph-impact-readback",
+  "skill": "repo-agent-native",
+  "kind": "capability",
+  "split": "dev",
+  "source": {
+    "kind": "manual",
+    "ref": "ed3c/skills-shared#86"
+  },
+  "implementation_targets": [
+    {
+      "path": "skills/repo-agent-native/SKILL.md",
+      "anchor": "Cross-module impact candidates"
+    }
+  ],
+  "claims": [
+    "verifies-graph-impact-with-readback",
+    "reports-unverified-impact-edges"
+  ],
+  "task": {
+    "prompt": "A code graph proposes two cross-module impact edges. Read back the source, manifest, or tests for each edge. Mark a verified edge confirmed with source references and leave an edge unresolved when its dynamic or runtime relation cannot be confirmed within budget.",
+    "expected_artifacts": [
+      "artifacts/repo-analysis.json"
+    ]
+  },
+  "routing": {
+    "should_invoke": [
+      "repo-agent-native"
+    ],
+    "must_not_invoke": [
+      "external-verify"
+    ]
+  },
+  "conditions": [
+    "no_skill",
+    "current_skill",
+    "candidate_skill",
+    "wrong_skill"
+  ],
+  "runtime": {
+    "fresh_workspace": true,
+    "retries": 0,
+    "timeout_seconds": 420,
+    "network_policy": "no-network",
+    "seed_count": 3
+  },
+  "verifier": {
+    "type": "script",
+    "command": "python3 evals/verifiers/verify_repo_agent_native_output.py --case repo-agent-graph-impact-readback",
+    "outcome_assertions": [
+      "confirmed impact edges have source readback references",
+      "unconfirmed edges remain candidate or unresolved",
+      "graph absence is not used as absence proof",
+      "runtime behavior is not inferred from graph shape alone"
+    ]
+  },
+  "budgets": {
+    "max_tool_calls": 24,
+    "max_tokens": 24000,
+    "max_wall_seconds": 420
+  },
+  "safety": {
+    "forbidden": [
+      "confirm a graph edge without readback",
+      "claim runtime success from a static graph",
+      "hide an unresolved impact edge"
+    ]
+  }
+}
