@@ -111,7 +111,7 @@ description: |
   - 只有當需求是 autoresearch **唯一**獨有的
     「有界 metric-driven keep/discard 迴圈 + Guard」時
     才路由外部 slash 命令。
-- ❌ **取代 `to-prd`+`implement`**：
+- ❌ **取代 `to-spec`+`implement`**：
   那是通用計劃骨架；
   本 skill 在其之上疊加迭代迴圈契約。
 - ❌ **決定一個迭代需求該不該存在**：
@@ -214,7 +214,7 @@ description: |
 |---|---|---|---|
 | `/autoresearch`（核心） | 對某指標 modify→verify→keep/discard | 25 | ✅ **獨有**——repo 無一級對應，路由 |
 | `/autoresearch:evals` | 分析迭代結果（趨勢/高原/回歸） | N/A | ✅ **獨有**——迴圈後分析，路由；注意勿與 `families/*/evals/` 的量測管線混淆（那是量測「某個 skill 好不好」，這是量測「某次迭代迴圈的結果」，正交） |
-| `/autoresearch:improve` | 研究 ICP 挑戰 → 發現改進 → 生 PRD | 15 | ✅ 配 `to-prd`（PRD 落地走 mattpocock 全局 to-prd） |
+| `/autoresearch:improve` | 研究 ICP 挑戰 → 發現改進 → 生 PRD | 15 | ✅ 配 `to-spec`（PRD 落地走 mattpocock 全局 to-spec） |
 | `/autoresearch:scenario` | 跨 12 維度生邊界案例 | 20 | ✅ 大量邊界生成屬迭代型，路由；但測試設計諮詢用 `tdd`；若目的是給某 `families/*` 補 eval 案例，優先用該 family 自己的 `evals/` 慣例（`cases/`/`holdout`/`candidates`），不繞道 autoresearch |
 | `/autoresearch:learn` | 掃 codebase → 生文檔 → 驗證 → 修迴圈 | 10 | ⚠️ 文檔生成讓位 `improve-codebase-architecture`（mattpocock 全局 skill）；純迭代驗證迴圈才路由 |
 | `/autoresearch:ship` | 8 階段 ship（checklist→dry-run→deploy→verify） | N/A | **無讓位對象**——skill-bettor 無 devops-hub/部署管線治理層（本專案是 living-skills 資產工場，非要 ship 的部署型服務）；誠實留白，需要時直接路由，不硬造假讓位 |
