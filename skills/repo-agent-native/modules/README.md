@@ -54,14 +54,17 @@ NO_FALLBACK
 
 | File | Role | Phase 2 state |
 |---|---|---|
-| `extraction-methodology.md` | stable cross-domain method | existing; candidate to move to `references/` only if portability evals justify it |
-| `codebase-mastery-methodology.md` | optional deep analysis mode | existing; retain behind explicit trigger |
-| `specs-as-code-prompt.md` | optional output/prompt instance | existing; do not preload |
-| `grepai.md` | semantic candidate-discovery provider module | IMPLEMENTED in PR #93 |
-| `serena.md` | symbol/reference/diagnostic provider module | IMPLEMENTED in PR #93 |
-| `code-graph-rag.md` | graph/data-flow candidate provider module | IMPLEMENTED in PR #93 |
-| `mem0.md` | episodic/project-context provider module | IMPLEMENTED in PR #93 |
-| `bettor-arena.md` | consumer binding example | NOT_IMPLEMENTED here; consumer-specific values remain in Bettor |
+| `extraction-methodology.md` | stable cross-domain inference method | retained as an on-demand method module |
+| `codebase-mastery-methodology.md` | optional deep analysis mode | retained behind its explicit trigger |
+| `specs-as-code-prompt.md` | optional output template | retained on demand; grants no execution authority |
+| `grepai.md` | semantic candidate provider contract | implemented; read-only and source-readback gated |
+| `serena.md` | symbol/reference provider contract | implemented; provider health and readback gated |
+| `code-graph-rag.md` | graph candidate provider contract | implemented; experimental read-only lane |
+| `mem0.md` | episodic memory provider contract | implemented; optional projection, never source truth |
+| `canonical-terms.md` | refactor terminology preservation | audit-only |
+| `semantic-loss-ledger.md` | immutable baseline-to-current mapping | audit-only |
+
+Consumer-specific paths, provider endpoints, namespaces, credentials, mutable health, and live receipts remain in the consumer repository. There is deliberately no consumer-named module here.
 
 Provider modules being present does not activate or install their providers. Their current evidence is structural/procedural only until provider-specific evals run.
 

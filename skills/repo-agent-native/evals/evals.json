@@ -1,9 +1,10 @@
 {
   "schema": "skills-shared/skill-ab-eval/v1",
   "skill": "repo-agent-native",
-  "version": "2.0.0-contract",
-  "issue": 89,
-  "state": "CONTRACT_ADMITTED",
+  "version": "2.0.0-core",
+  "issue": 92,
+  "parent_issue": 89,
+  "state": "CORE_IMPLEMENTED",
   "baseline": "baseline.json",
   "trigger_cases": "fixtures/trigger-cases.json",
   "scenario_cases": "fixtures/scenarios.json",
@@ -41,10 +42,15 @@
     "median_instruction_context_cost_delta_max": -0.01
   },
   "planned_runners": {
-    "offline_bun": "NOT_IMPLEMENTED",
+    "offline_bun": "IMPLEMENTED",
     "claude_code": "NOT_EXERCISED",
     "codex_cli": "NOT_EXERCISED"
   },
+  "commands": [
+    "bun scripts/validate-skill.ts --skill-root <path> --json <receipt>",
+    "bun scripts/assert-output.ts --repo <repo> --report <report.json> --receipt <receipt.json>",
+    "bun tests/selftest.ts"
+  ],
   "negative_controls": [
     "stale-grepai-index",
     "serena-wrong-project",
