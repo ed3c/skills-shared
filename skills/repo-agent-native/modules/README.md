@@ -50,20 +50,35 @@ SECRET_OR_SESSION_EXPOSURE
 NO_FALLBACK
 ```
 
-## Current files and intended classification
+## Current files and classification
 
-| File | Current role | Migration decision |
+| File | Role | Phase 2 state |
 |---|---|---|
-| `extraction-methodology.md` | stable cross-domain method | candidate to move to `references/` in the portable-core child PR |
-| `codebase-mastery-methodology.md` | optional deep analysis mode | retain as an explicit domain/mode module with trigger |
-| `specs-as-code-prompt.md` | optional output/prompt instance | retain as an explicit module or template; do not preload |
-| `grepai.md` | planned provider module | child PR |
-| `serena.md` | planned provider module | child PR |
-| `code-graph-rag.md` | planned provider module | child PR |
-| `mem0.md` | planned provider module | child PR |
-| `bettor-arena.md` | planned consumer binding example | consumer-specific values remain in Bettor, not here |
+| `extraction-methodology.md` | stable cross-domain method | existing; candidate to move to `references/` only if portability evals justify it |
+| `codebase-mastery-methodology.md` | optional deep analysis mode | existing; retain behind explicit trigger |
+| `specs-as-code-prompt.md` | optional output/prompt instance | existing; do not preload |
+| `grepai.md` | semantic candidate-discovery provider module | IMPLEMENTED in PR #93 |
+| `serena.md` | symbol/reference/diagnostic provider module | IMPLEMENTED in PR #93 |
+| `code-graph-rag.md` | graph/data-flow candidate provider module | IMPLEMENTED in PR #93 |
+| `mem0.md` | episodic/project-context provider module | IMPLEMENTED in PR #93 |
+| `bettor-arena.md` | consumer binding example | NOT_IMPLEMENTED here; consumer-specific values remain in Bettor |
 
-No planned file is created empty in this contract PR.
+Provider modules being present does not activate or install their providers. Their current evidence is structural/procedural only until provider-specific evals run.
+
+## Provider-module data flow
+
+```text
+core capability request
+→ module trigger match
+→ provider/project identity
+→ health/freshness/scope check
+→ bounded query
+→ candidate output
+→ current source read-back
+→ accept at admitted evidence level / downgrade / fallback
+```
+
+The fallback path must return to deterministic repository-owned mechanisms; provider absence cannot become PASS by itself.
 
 ## Decoupling laws
 
