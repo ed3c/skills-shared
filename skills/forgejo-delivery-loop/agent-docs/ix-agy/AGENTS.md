@@ -82,6 +82,7 @@
 - **B1 rules/context 三件**：`AGENTS.md`（本檔，路由層）＋[`.claude/CLAUDE.md`](.claude/CLAUDE.md)（編排層）＋`ARCHITECTURE.md`。
   三件缺一件，該職責就只能靠記憶補。
 - **Config Path**: `.agents/mcp.json` — B4
+- **Runtime Contract Path**: `.runtime-env/` — B2/B5; one desired-state file per workload plus generated secret-free bindings. Host dotenv, signing keys, browser profiles, and provider sessions never enter this repository.
 - **Skills Path**: `.agents/skills/` — B4
 - **Claude Skill Forwarders**: `.claude/skills/<name>/SKILL.md`（零邏輯，只指向同名 canonical skill）；
   `.claude/commands/delivery.md` 僅保留 `/delivery` 相容別名。 — B4
