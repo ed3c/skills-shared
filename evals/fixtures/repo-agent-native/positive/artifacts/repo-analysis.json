@@ -1,0 +1,95 @@
+{
+  "schema_version": "repo-agent-native-output/v2",
+  "selected_skill": "repo-agent-native",
+  "subject": {
+    "root": ".",
+    "commit": "0123456789abcdef0123456789abcdef01234567"
+  },
+  "routes": [
+    {"path": "AGENTS.md", "state": "PASS"},
+    {"path": "CONTEXT.md", "state": "PASS"}
+  ],
+  "invariants": [
+    {
+      "id": "INV-API-001",
+      "claim": "The public adapter delegates through the declared interface.",
+      "status": "confirmed",
+      "evidence_level": "A",
+      "source_refs": ["src/adapter.ts:10-28"]
+    },
+    {
+      "id": "INV-STATE-002",
+      "claim": "A semantic result nominates a candidate but does not confirm behavior.",
+      "status": "candidate",
+      "evidence_level": "B+",
+      "source_refs": []
+    }
+  ],
+  "negative_invariants": [
+    {
+      "id": "NEG-001",
+      "claim": "No generic shell entrypoint is exposed in the admitted module scope.",
+      "search_boundary": "src/, module manifest, and public contract; generated and vendor paths excluded",
+      "evidence_level": "A-"
+    }
+  ],
+  "implicit_dependencies": [
+    {
+      "id": "IMPL-001",
+      "known_facts": ["The adapter reads a generated lock."],
+      "inference": "The lock must be regenerated before the adapter is exercised.",
+      "evidence_level": "C",
+      "resolution": "UNRESOLVED"
+    }
+  ],
+  "impact_edges": [
+    {
+      "from": "src/adapter.ts",
+      "to": "src/public-contract.ts",
+      "status": "confirmed",
+      "origin": "symbol-index",
+      "source_refs": ["src/adapter.ts:10-28", "src/public-contract.ts:1-16"]
+    },
+    {
+      "from": "src/adapter.ts",
+      "to": "runtime-provider",
+      "status": "unresolved",
+      "origin": "graph-candidate",
+      "source_refs": []
+    }
+  ],
+  "provider_observations": [
+    {
+      "capability": "exact-source-read",
+      "state": "PASS",
+      "evidence_ceiling": "A",
+      "fallback": ""
+    },
+    {
+      "capability": "semantic-retrieval",
+      "state": "ABSENT",
+      "evidence_ceiling": "B+",
+      "fallback": "Use exact search and direct source read."
+    }
+  ],
+  "memory_conflicts": [
+    {
+      "memory": "A prior session claimed the adapter calls the provider directly.",
+      "current_authority": "Current source routes through the public contract.",
+      "resolution": "current_authority_wins",
+      "source_refs": ["src/adapter.ts:10-28"]
+    }
+  ],
+  "unresolved": [
+    {"question": "Does the external provider enforce the declared timeout?", "state": "NOT_EXERCISED"}
+  ],
+  "assertions": {
+    "structure": "PASS",
+    "source_reference_coverage": "PASS",
+    "runtime_behavior": "NOT_EXERCISED"
+  },
+  "handoff": {
+    "human_admit": "Required before durable architecture or release promotion.",
+    "rollback_subject": "0123456789abcdef0123456789abcdef01234567"
+  }
+}

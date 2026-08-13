@@ -27,6 +27,30 @@
     },
     "autoresearch-composer:rejects-unverifiable-optimization": {
       "cases": ["autoresearch-holdout-no-verifier"]
+    },
+    "repo-agent-native:anchors-source-claims": {
+      "cases": ["repo-agent-source-anchored-invariants"]
+    },
+    "repo-agent-native:records-bounded-negative-invariants": {
+      "cases": ["repo-agent-source-anchored-invariants"]
+    },
+    "repo-agent-native:degrades-without-optional-providers": {
+      "cases": ["repo-agent-degraded-provider-fallback"]
+    },
+    "repo-agent-native:preserves-provider-evidence-ceilings": {
+      "cases": ["repo-agent-degraded-provider-fallback"]
+    },
+    "repo-agent-native:prefers-current-authority-over-memory": {
+      "cases": ["repo-agent-memory-conflict"]
+    },
+    "repo-agent-native:reports-memory-conflicts": {
+      "cases": ["repo-agent-memory-conflict"]
+    },
+    "repo-agent-native:verifies-graph-impact-with-readback": {
+      "cases": ["repo-agent-graph-impact-readback"]
+    },
+    "repo-agent-native:reports-unverified-impact-edges": {
+      "cases": ["repo-agent-graph-impact-readback"]
     }
   }
 }

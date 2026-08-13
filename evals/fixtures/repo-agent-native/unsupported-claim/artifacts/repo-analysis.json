@@ -1,0 +1,24 @@
+{
+  "schema_version": "repo-agent-native-output/v2",
+  "selected_skill": "repo-agent-native",
+  "subject": {"root": ".", "commit": "0123456789abcdef0123456789abcdef01234567"},
+  "routes": [],
+  "invariants": [
+    {
+      "id": "INV-001",
+      "claim": "An unread semantic candidate is factual.",
+      "status": "confirmed",
+      "evidence_level": "B+",
+      "source_refs": []
+    }
+  ],
+  "negative_invariants": [
+    {"id": "NEG-001", "claim": "bounded negative", "search_boundary": "src/"}
+  ],
+  "impact_edges": [],
+  "provider_observations": [],
+  "memory_conflicts": [],
+  "unresolved": [],
+  "assertions": {},
+  "handoff": {"human_admit": "required", "rollback_subject": "0123456789abcdef"}
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": "repo-agent-native-output/v2",
+  "selected_skill": "repo-agent-native",
+  "subject": {"root": ".", "commit": "0123456789abcdef0123456789abcdef01234567"},
+  "routes": [],
+  "invariants": [
+    {"id": "INV-001", "claim": "source fact", "status": "confirmed", "evidence_level": "A", "source_refs": ["src/a.ts:1-4"]}
+  ],
+  "negative_invariants": [],
+  "impact_edges": [],
+  "provider_observations": [
+    {"capability": "semantic-retrieval", "state": "ABSENT", "evidence_ceiling": "B+", "fallback": ""}
+  ],
+  "memory_conflicts": [],
+  "unresolved": [],
+  "assertions": {},
+  "handoff": {"human_admit": "required", "rollback_subject": "0123456789abcdef"}
+}
