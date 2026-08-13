@@ -57,7 +57,4 @@ jobs:
       - name: Validate repository-wide eval coverage
         run: python3 scripts/check_skill_evals.py
       - name: Compile deterministic verifiers
-        run: python3 -m compileall -q \
-          skills/repo-agent-native/scripts \
-          evals/verifiers \
-          scripts/compare_repo_agent_native_contract.py
+        run: python3 -m compileall -q skills/repo-agent-native/scripts evals/verifiers scripts/compare_repo_agent_native_contract.py
