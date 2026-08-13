@@ -41,6 +41,7 @@
     "all_hard_gates": true,
     "critical_regressions_allowed": 0,
     "weighted_quality_delta_min": 0.01,
+    "control_quality_delta_min": 0.01,
     "median_instruction_context_cost_delta_max": -0.01
   },
   "planned_runners": {

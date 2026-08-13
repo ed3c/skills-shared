@@ -27,6 +27,7 @@ const BASELINE_COMMIT = "d277e56870c0cc18455c9dd5e572a43ca08b444b";
 const MAX_REPETITIONS = 3;
 const MAX_CARRIER_OUTPUT_BYTES = 4 * 1024 * 1024;
 const CARRIER_TIMEOUT_MS = 5 * 60 * 1000;
+const CLAUDE_MAX_BUDGET_USD = "1.50";
 
 class UsageError extends Error {}
 
@@ -196,9 +197,7 @@ function promptFor(carrier: Carrier, condition: Condition, scenario: JsonObject,
       : "";
   return `${invocation}Analyze only the current repository fixture. ${String(scenario.prompt)}\n\n` +
     `The exact Git subject is ${head}. Read current source under src/. Do not edit files, use network access, or invoke optional providers. ` +
-    "Return only the requested repo-agent-native/invariant-report/v2 JSON. Use repository='eval/retry-service', observed_commit exactly as given, observed_tree=null, scope=['src'], and task equal to the scenario id. " +
-    "Every facts/negative_invariants/implicit_dependencies record must contain id, claim, evidence_level, repository-relative source_refs with exact 1-based line ranges, and verification including source-read. " +
-    "Every negative invariant must also contain non-empty search_boundary and counterexample_sought. Keep routes, tools, open_questions, and named_exclusions as arrays. Use state PASS only when at least one source-anchored record is present.";
+    `Return only JSON matching the host-supplied schema. Use repository='eval/retry-service', observed_commit exactly as given, observed_tree=null, scope=['src'], and task='${String(scenario.id)}'.`;
 }
 
 function claudeSchema(path: string): string {
@@ -300,7 +299,7 @@ async function runOne(options: Options, repetition: number, scenario: JsonObject
       argv = [
         "claude", "-p", "--no-session-persistence", "--setting-sources", "project", "--strict-mcp-config", "--mcp-config", '{"mcpServers":{}}',
         "--permission-mode", "dontAsk", "--tools", "Read,Grep,Glob,Bash", "--allowedTools", "Read,Grep,Glob,Bash(git rev-parse *)",
-        "--max-budget-usd", "1.00", "--output-format", "json", "--json-schema", claudeSchema(schemaPath), prompt,
+        "--max-budget-usd", CLAUDE_MAX_BUDGET_USD, "--output-format", "json", "--json-schema", claudeSchema(schemaPath), prompt,
       ];
       if (options.condition === "no_skill") argv.splice(2, 0, "--safe-mode");
     }
@@ -360,6 +359,12 @@ async function runOne(options: Options, repetition: number, scenario: JsonObject
         parse_error: parseError,
       },
       operational: operational(options.carrier, result.stdout),
+      limits: {
+        timeout_ms: CARRIER_TIMEOUT_MS,
+        max_output_bytes: MAX_CARRIER_OUTPUT_BYTES,
+        max_budget_usd: options.carrier === "claude" ? Number(CLAUDE_MAX_BUDGET_USD) : null,
+        retries: 0,
+      },
       score: score ? { hard_gate: score.hard_gate, weighted_quality: score.weighted_quality } : null,
       state: result.exit === 0 && !result.timedOut && parseError === null && score?.hard_gate === "PASS" ? "PASS" : "FAIL",
     };

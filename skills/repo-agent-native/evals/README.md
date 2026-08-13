@@ -26,9 +26,11 @@ BASELINE PINNED
 
 ## Admission rule
 
-All hard gates must pass, no critical case may regress, weighted quality must improve, and median instruction/context cost must decrease. Missing carrier runs remain `NOT_EXERCISED`.
+All hard gates must pass, no critical case may regress, weighted quality must improve over `current_skill`, `no_skill`, and `wrong_skill` by their preregistered deltas, and median instruction/context cost must decrease. Missing carrier runs remain `NOT_EXERCISED`.
 
 The current quality metric is intentionally bounded. `anchored_nonforbidden_precision_proxy` proves that emitted records are source-anchored and do not contain a planted forbidden claim; it is not exhaustive fact precision. Ground-truth records use reviewed concept-alias groups so semantically equivalent phrasing can match without an LLM judge. Changing cases, aliases, or weights after seeing candidate output requires a new evaluator digest and both arms must be rescored.
+
+The shared task prompt may specify subject identity and the host-supplied output schema, but it must not restate the Skill's record rules, evidence semantics, or assertion procedure. Otherwise `no_skill` and `wrong_skill` receive the treatment and cease to be controls.
 
 Each physical run must preserve:
 

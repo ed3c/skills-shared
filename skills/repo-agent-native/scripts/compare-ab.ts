@@ -96,12 +96,19 @@ export function compareAb(receipts: Record<string, JsonObject>, evals: JsonObjec
   const currentQuality = optionalScore(current)?.weighted_quality ?? null;
   const admission = object(evals.admission, "evals.admission");
   const qualityMinimum = Number(admission.weighted_quality_delta_min);
+  const controlMinimum = Number(admission.control_quality_delta_min);
   const contextMaximum = Number(admission.median_instruction_context_cost_delta_max);
   const candidateBytes = numberAt(candidate, ["skill", "entrypoint_bytes"], "candidate entrypoint bytes");
   const currentBytes = numberAt(current, ["skill", "entrypoint_bytes"], "current entrypoint bytes");
   const qualityDelta = candidateQuality === null || currentQuality === null ? null : candidateQuality - currentQuality;
   const contextDelta = candidateBytes / currentBytes - 1;
   if (qualityDelta !== null && qualityDelta < qualityMinimum) failures.push(`quality delta ${qualityDelta.toFixed(6)} is below ${qualityMinimum}`);
+  for (const name of ["no_skill", "wrong_skill"] as const) {
+    const controlQuality = optionalScore(receipts[name])?.weighted_quality ?? null;
+    if (candidateQuality !== null && controlQuality !== null && candidateQuality - controlQuality < controlMinimum) {
+      failures.push(`candidate minus ${name} quality ${(candidateQuality - controlQuality).toFixed(6)} is below ${controlMinimum}`);
+    }
+  }
   if (contextDelta > contextMaximum) failures.push(`entrypoint context delta ${contextDelta.toFixed(6)} exceeds ${contextMaximum}`);
   if (stringAt(candidate, ["skill", "instruction_digest"], "candidate instruction digest") === stringAt(current, ["skill", "instruction_digest"], "current instruction digest")) {
     failures.push("candidate and current instruction digests are identical");
@@ -121,6 +128,7 @@ export function compareAb(receipts: Record<string, JsonObject>, evals: JsonObjec
       no_skill: optionalScore(receipts.no_skill)?.weighted_quality ?? null,
       wrong_skill: optionalScore(receipts.wrong_skill)?.weighted_quality ?? null,
       candidate_minus_current: qualityDelta === null ? null : Number(qualityDelta.toFixed(6)),
+      control_delta_min: controlMinimum,
     },
     entrypoint_context_proxy: {
       candidate_bytes: candidateBytes,
