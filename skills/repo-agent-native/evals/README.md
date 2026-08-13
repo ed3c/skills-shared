@@ -22,10 +22,28 @@ BASELINE PINNED
 - Claude Code and Codex CLI runs verify host routing and actual Skill behavior.
 - One host cannot proxy the other.
 - Documentation and a green parser cannot proxy model/task quality.
+- Live carrier receipts belong to the consumer/PR evidence plane. This shared package owns the runner, schemas, cases, weights, and offline controls; it does not persist mutable sessions or live provider state.
 
 ## Admission rule
 
 All hard gates must pass, no critical case may regress, weighted quality must improve, and median instruction/context cost must decrease. Missing carrier runs remain `NOT_EXERCISED`.
+
+The current quality metric is intentionally bounded. `anchored_nonforbidden_precision_proxy` proves that emitted records are source-anchored and do not contain a planted forbidden claim; it is not exhaustive fact precision. Ground-truth records use reviewed concept-alias groups so semantically equivalent phrasing can match without an LLM judge. Changing cases, aliases, or weights after seeing candidate output requires a new evaluator digest and both arms must be rescored.
+
+Each physical run must preserve:
+
+```text
+same deterministic fixture commit
+condition-specific Skill package and instruction digests
+raw stdout/stderr digests
+replayable subject.bundle
+schema, ground-truth, weight, and scorer digests
+carrier version, duration, usage, and cost when exposed
+hard-gate and weighted score
+isolation limitations
+```
+
+The runner permits one to three repetitions. Where a carrier exposes a seed, use at least three distinct admitted seeds. Where it does not, repetitions remain stochastic samples and must not be described as seeded reproducibility.
 
 ## Change contract
 

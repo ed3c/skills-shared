@@ -1,10 +1,11 @@
 {
   "schema": "skills-shared/skill-ab-eval/v1",
   "skill": "repo-agent-native",
-  "version": "2.0.0-core",
-  "issue": 92,
+  "version": "2.1.0-ab-runner",
+  "issue": 95,
   "parent_issue": 89,
-  "state": "CORE_IMPLEMENTED",
+  "depends_on_issue": 92,
+  "state": "AB_RUNNER_IMPLEMENTED",
   "baseline": "baseline.json",
   "trigger_cases": "fixtures/trigger-cases.json",
   "scenario_cases": "fixtures/scenarios.json",
@@ -20,7 +21,7 @@
     "bounded-explicit-script-io"
   ],
   "metrics": {
-    "fact_precision": 0.20,
+    "anchored_nonforbidden_precision_proxy": 0.20,
     "required_invariant_recall": 0.18,
     "negative_invariant_recall": 0.15,
     "implicit_dependency_recall": 0.15,
@@ -43,13 +44,16 @@
   },
   "planned_runners": {
     "offline_bun": "IMPLEMENTED",
-    "claude_code": "NOT_EXERCISED",
-    "codex_cli": "NOT_EXERCISED"
+    "claude_code": "RUNNER_IMPLEMENTED",
+    "codex_cli": "RUNNER_IMPLEMENTED"
   },
   "commands": [
     "bun scripts/validate-skill.ts --skill-root <path> --json <receipt>",
     "bun scripts/assert-output.ts --repo <repo> --report <report.json> --receipt <receipt.json>",
-    "bun tests/selftest.ts"
+    "bun tests/selftest.ts",
+    "bun tests/ab-selftest.ts",
+    "bun scripts/run-ab.ts --carrier <codex|claude> --condition <condition> --case <case> --output <fresh-dir> --execute",
+    "bun scripts/compare-ab.ts --candidate <receipt> --current <receipt> --no-skill <receipt> --wrong-skill <receipt> --evals evals/evals.json --output <comparison>"
   ],
   "negative_controls": [
     "stale-grepai-index",

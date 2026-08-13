@@ -30,3 +30,38 @@ The command is read-only except for the requested receipt. It passes an argument
 ```
 
 The JSON receipt is execution evidence for its recorded commit, Skill/report digest, and implemented assertions. It is not live truth about carrier loading, provider health, index freshness, pull-request state, or Human Admit.
+
+## `score-ab-output.ts`
+
+Input: a replayable exact-subject repository, one structured report, reviewed ground truth, and the fixed weights in `evals/evals.json`. It first applies `assert-output.ts`, then scores concept-alias matches, negative-invariant recall, implicit-dependency recall, source anchors, named fallback, and forbidden claims. The so-called precision field is deliberately named `anchored_nonforbidden_precision_proxy`: without exhaustive fact-level labels it is not statistical fact precision.
+
+```bash
+bun scripts/score-ab-output.ts --repo <repo> --report <report.json> \
+  --expected evals/fixtures/retry-service/expected.json \
+  --evals evals/evals.json --output <score.json>
+```
+
+## `run-ab.ts`
+
+The runner creates a fresh deterministic Git fixture for each condition, installs exactly one package projection after committing the subject, invokes Claude Code or Codex CLI with an argument vector, and records raw output digests, a replayable `subject.bundle`, evaluator digests, the installed package digest, and an instruction-only digest. The four conditions are `no_skill`, `current_skill`, `candidate_skill`, and `wrong_skill`.
+
+```bash
+bun scripts/run-ab.ts --carrier <codex|claude> --condition <condition> \
+  --case <case> --output <fresh-dir> [--repetitions 1-3] [--execute]
+```
+
+Without `--execute`, it writes `NOT_EXERCISED`; it never silently contacts a carrier. Output directories are append-once per run ID. Claude calls use project-only settings, an empty strict MCP set, no session persistence, a one-dollar limit, and safe mode for the `no_skill` control. Codex calls use ephemeral read-only execution, but current Codex user-level Skill isolation is not proven; receipts must retain that limitation.
+
+Model output remains untrusted until deterministic scoring succeeds. One carrier cannot proxy another, and a schema/CLI rejection is a carrier failure rather than a Skill-quality score.
+
+## `compare-ab.ts`
+
+The comparator consumes four physical receipts and fails unless their carrier, scenario, exact fixture, replay bundle, and evaluator digests match. It applies the reviewed minimum quality delta and the `SKILL.md` byte-size context proxy from `evals/evals.json`.
+
+```bash
+bun scripts/compare-ab.ts --candidate <receipt.json> --current <receipt.json> \
+  --no-skill <receipt.json> --wrong-skill <receipt.json> \
+  --evals evals/evals.json --output <comparison.json>
+```
+
+Exit `0` is a bounded comparison PASS, not release admission. The receipt names one carrier and one scenario; missing carrier/scenario/repetition evidence stays missing.

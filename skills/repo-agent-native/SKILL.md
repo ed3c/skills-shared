@@ -289,6 +289,7 @@ Run the bundled assertions when changing this Skill. Commands use explicit input
 bun scripts/validate-skill.ts --skill-root . --json <skill-receipt.json>
 bun scripts/assert-output.ts --repo <repo> --report <report.json> --receipt <output-receipt.json>
 bun tests/selftest.ts
+bun tests/ab-selftest.ts
 ```
 
 When invoked from another working directory, use the host-provided Skill directory variable or resolve the script relative to the loaded `SKILL.md`; do not assume a machine-local absolute path.

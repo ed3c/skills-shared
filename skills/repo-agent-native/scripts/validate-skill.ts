@@ -283,7 +283,15 @@ export function validateSkill(skillRootInput: string): { failures: Failure[]; sk
   ];
   for (const [pattern, label] of portableLeaks) if (pattern.test(text)) fail(failures, "NON_PORTABLE_BODY", label);
 
-  for (const path of ["scripts/validate-skill.ts", "scripts/assert-output.ts", "tests/selftest.ts"]) {
+  for (const path of [
+    "scripts/validate-skill.ts",
+    "scripts/assert-output.ts",
+    "scripts/score-ab-output.ts",
+    "scripts/compare-ab.ts",
+    "scripts/run-ab.ts",
+    "tests/selftest.ts",
+    "tests/ab-selftest.ts",
+  ]) {
     if (!existsSync(resolve(realRoot, path))) fail(failures, "EXECUTABLE_ASSERTION_ABSENT", path);
   }
   for (const documentPath of activeMarkdownFiles(realRoot)) {
