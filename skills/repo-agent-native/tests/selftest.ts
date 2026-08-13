@@ -114,9 +114,9 @@ try {
 
   const oversized = skillMutation("oversized", (root) => {
     const path = resolve(root, "SKILL.md");
-    writeFileSync(path, `${readFileSync(path, "utf8")}\n${Array.from({ length: 190 }, (_, index) => `padding ${index}`).join("\n")}\n`);
+    writeFileSync(path, `${readFileSync(path, "utf8")}\n${Array.from({ length: 221 }, (_, index) => `padding ${index}`).join("\n")}\n`);
   });
-  expectFailureIds(validateSkill(oversized), ["SKILL_LINE_BUDGET"], "line budget");
+  expectFailureIds(validateSkill(oversized), ["SKILL_CORE_BUDGET"], "core line budget");
 
   const brokenLink = skillMutation("broken-link", (root) => {
     const path = resolve(root, "SKILL.md");
@@ -130,6 +130,12 @@ try {
     writeFileSync(path, `${readFileSync(path, "utf8")}\nUse ${plantedPath}.\n`);
   });
   expectFailureIds(validateSkill(absolutePath), ["NON_PORTABLE_BODY"], "absolute path");
+
+  const providerInCore = skillMutation("provider-in-core", (root) => {
+    const path = resolve(root, "SKILL.md");
+    writeFileSync(path, `${readFileSync(path, "utf8")}\nUse Serena for symbol lookup.\n`);
+  });
+  expectFailureIds(validateSkill(providerInCore), ["DOMAIN_INSTANCE_IN_CORE"], "provider instance in portable core");
 
   const missingModule = skillMutation("missing-module", (root) => rmSync(resolve(root, "modules/mem0.md")));
   expectFailureIds(validateSkill(missingModule), ["MODULE_CONTRACT_INCOMPLETE"], "missing provider module");

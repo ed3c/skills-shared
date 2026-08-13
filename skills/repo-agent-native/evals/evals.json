@@ -11,7 +11,8 @@
   "scenario_cases": "fixtures/scenarios.json",
   "hard_gates": [
     "frontmatter-open-standard",
-    "skill-under-500-lines",
+    "portable-core-at-most-220-lines",
+    "provider-instance-outside-portable-core",
     "source-ref-present-and-valid",
     "candidate-tool-not-promoted-to-source-truth",
     "optional-tool-fallback",

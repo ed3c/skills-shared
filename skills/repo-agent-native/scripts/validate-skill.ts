@@ -270,7 +270,9 @@ export function validateSkill(skillRootInput: string): { failures: Failure[]; sk
   if (fields.has("allowed-tools") && !fields.get("allowed-tools")) {
     fail(failures, "FRONTMATTER_ALLOWED_TOOLS", "allowed-tools must be a non-empty space-separated string when present");
   }
-  if (text.split(/\r?\n/).length >= 500) fail(failures, "SKILL_LINE_BUDGET", "SKILL.md must contain fewer than 500 lines");
+  if (text.split(/\r?\n/).length > 220) {
+    fail(failures, "SKILL_CORE_BUDGET", "portable SKILL.md core must contain at most 220 lines; route details to references, modules, scripts, or evals");
+  }
 
   for (const heading of REQUIRED_HEADINGS) {
     if (!text.includes(`## ${heading}`)) fail(failures, "MISSING_CORE_SECTION", heading);
@@ -282,6 +284,9 @@ export function validateSkill(skillRootInput: string): { failures: Failure[]; sk
     [/\b(?:api[_-]?key|password|access[_-]?token)\s*[:=]\s*["'][^"']+["']/i, "secret-shaped value"],
   ];
   for (const [pattern, label] of portableLeaks) if (pattern.test(text)) fail(failures, "NON_PORTABLE_BODY", label);
+  if (/\b(?:grepai|serena|code-graph-rag|mem0)\b/i.test(text)) {
+    fail(failures, "DOMAIN_INSTANCE_IN_CORE", "provider instances belong in trigger-selected modules, not the portable core");
+  }
 
   for (const path of [
     "scripts/validate-skill.ts",
