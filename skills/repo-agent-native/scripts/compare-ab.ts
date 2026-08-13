@@ -36,6 +36,13 @@ function stringAt(root: JsonObject, path: string[], label: string): string {
   return value;
 }
 
+function optionalScore(receipt: JsonObject): { hard_gate: string; weighted_quality: number } | null {
+  if (typeof receipt.score !== "object" || receipt.score === null || Array.isArray(receipt.score)) return null;
+  const score = receipt.score as JsonObject;
+  if (typeof score.hard_gate !== "string" || typeof score.weighted_quality !== "number" || !Number.isFinite(score.weighted_quality)) return null;
+  return { hard_gate: score.hard_gate, weighted_quality: score.weighted_quality };
+}
+
 function stable(value: unknown): string {
   if (Array.isArray(value)) return `[${value.map(stable).join(",")}]`;
   if (typeof value === "object" && value !== null) {
@@ -69,8 +76,10 @@ export function compareAb(receipts: Record<string, JsonObject>, evals: JsonObjec
   const named = ["candidate", "current", "no_skill", "wrong_skill"] as const;
   for (const name of named) {
     const receipt = receipts[name];
+    const score = optionalScore(receipt);
     if (receipt.state !== "PASS") failures.push(`${name}: receipt state is not PASS`);
-    if (stringAt(receipt, ["score", "hard_gate"], `${name}.score.hard_gate`) !== "PASS") failures.push(`${name}: hard gate is not PASS`);
+    if (!score) failures.push(`${name}: evaluable score is absent`);
+    else if (score.hard_gate !== "PASS") failures.push(`${name}: hard gate is not PASS`);
   }
   const candidate = receipts.candidate;
   const current = receipts.current;
@@ -83,16 +92,16 @@ export function compareAb(receipts: Record<string, JsonObject>, evals: JsonObjec
     if (stable(candidate.evaluator) !== stable(other.evaluator)) failures.push(`${name}: evaluator digest set differs from candidate`);
     if (stable(candidate.subject_bundle) !== stable(other.subject_bundle)) failures.push(`${name}: subject bundle differs from candidate`);
   }
-  const candidateQuality = numberAt(candidate, ["score", "weighted_quality"], "candidate quality");
-  const currentQuality = numberAt(current, ["score", "weighted_quality"], "current quality");
+  const candidateQuality = optionalScore(candidate)?.weighted_quality ?? null;
+  const currentQuality = optionalScore(current)?.weighted_quality ?? null;
   const admission = object(evals.admission, "evals.admission");
   const qualityMinimum = Number(admission.weighted_quality_delta_min);
   const contextMaximum = Number(admission.median_instruction_context_cost_delta_max);
   const candidateBytes = numberAt(candidate, ["skill", "entrypoint_bytes"], "candidate entrypoint bytes");
   const currentBytes = numberAt(current, ["skill", "entrypoint_bytes"], "current entrypoint bytes");
-  const qualityDelta = candidateQuality - currentQuality;
+  const qualityDelta = candidateQuality === null || currentQuality === null ? null : candidateQuality - currentQuality;
   const contextDelta = candidateBytes / currentBytes - 1;
-  if (qualityDelta < qualityMinimum) failures.push(`quality delta ${qualityDelta.toFixed(6)} is below ${qualityMinimum}`);
+  if (qualityDelta !== null && qualityDelta < qualityMinimum) failures.push(`quality delta ${qualityDelta.toFixed(6)} is below ${qualityMinimum}`);
   if (contextDelta > contextMaximum) failures.push(`entrypoint context delta ${contextDelta.toFixed(6)} exceeds ${contextMaximum}`);
   if (stringAt(candidate, ["skill", "instruction_digest"], "candidate instruction digest") === stringAt(current, ["skill", "instruction_digest"], "current instruction digest")) {
     failures.push("candidate and current instruction digests are identical");
@@ -109,9 +118,9 @@ export function compareAb(receipts: Record<string, JsonObject>, evals: JsonObjec
     quality: {
       candidate: candidateQuality,
       current: currentQuality,
-      no_skill: numberAt(receipts.no_skill, ["score", "weighted_quality"], "no_skill quality"),
-      wrong_skill: numberAt(receipts.wrong_skill, ["score", "weighted_quality"], "wrong_skill quality"),
-      candidate_minus_current: Number(qualityDelta.toFixed(6)),
+      no_skill: optionalScore(receipts.no_skill)?.weighted_quality ?? null,
+      wrong_skill: optionalScore(receipts.wrong_skill)?.weighted_quality ?? null,
+      candidate_minus_current: qualityDelta === null ? null : Number(qualityDelta.toFixed(6)),
     },
     entrypoint_context_proxy: {
       candidate_bytes: candidateBytes,

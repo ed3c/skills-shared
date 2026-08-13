@@ -159,6 +159,15 @@ try {
   expect(comparison.state === "PASS" && regressed.state === "FAIL", "quality/context regression mutation survived");
   mutations += 1;
 
+  const carrierFailed = compareAb({
+    candidate: { ...baseReceipt, score: { hard_gate: "PASS", weighted_quality: 0.9 }, skill: { name: "repo-agent-native", instruction_digest: "candidate", entrypoint_bytes: 80 } },
+    current: { ...baseReceipt, state: "FAIL", score: null },
+    no_skill: { ...baseReceipt, skill: { name: null, instruction_digest: null, entrypoint_bytes: null } },
+    wrong_skill: { ...baseReceipt, skill: { name: "knowledge-continuity", instruction_digest: "wrong", entrypoint_bytes: 90 } },
+  }, evals);
+  expect(carrierFailed.state === "FAIL" && (carrierFailed.failures as string[]).some((failure) => failure.includes("evaluable score is absent")), "carrier-failure comparison did not fail closed");
+  mutations += 1;
+
   console.log(`AB SELFTEST GREEN positive=${positive} mutations=${mutations}`);
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });
