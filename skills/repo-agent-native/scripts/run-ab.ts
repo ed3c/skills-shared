@@ -212,9 +212,9 @@ function carrierVersion(carrier: Carrier): string {
   return result.stdout.toString().trim();
 }
 
-async function spawnCarrier(argv: string[], cwd: string): Promise<{ exit: number | null; timedOut: boolean; stdout: Buffer; stderr: Buffer; durationMs: number }> {
+async function spawnCarrier(argv: string[], cwd: string, env?: Record<string, string | undefined>): Promise<{ exit: number | null; timedOut: boolean; stdout: Buffer; stderr: Buffer; durationMs: number }> {
   const started = performance.now();
-  const process = Bun.spawn(argv, { cwd, stdin: "ignore", stdout: "pipe", stderr: "pipe" });
+  const process = Bun.spawn(argv, { cwd, env, stdin: "ignore", stdout: "pipe", stderr: "pipe" });
   let timedOut = false;
   const timer = setTimeout(() => {
     timedOut = true;
@@ -290,7 +290,19 @@ async function runOne(options: Options, repetition: number, scenario: JsonObject
     const evalsPath = resolve(SKILL_ROOT, "evals/evals.json");
     const reportPath = resolve(runRoot, "report.json");
     let argv: string[];
+    let carrierEnv: Record<string, string | undefined> | undefined;
     if (options.carrier === "codex") {
+      const realHome = process.env.HOME;
+      const realCodexHome = process.env.CODEX_HOME ?? (realHome ? resolve(realHome, ".codex") : null);
+      if (!realCodexHome || !existsSync(resolve(realCodexHome, "auth.json"))) {
+        throw new UsageError("Codex auth source is absent; cannot build an isolated auth-only CODEX_HOME");
+      }
+      const isolatedHome = resolve(temp, "home");
+      const isolatedCodexHome = resolve(temp, "codex-home");
+      mkdirSync(isolatedHome);
+      mkdirSync(isolatedCodexHome);
+      cpSync(resolve(realCodexHome, "auth.json"), resolve(isolatedCodexHome, "auth.json"));
+      carrierEnv = { ...process.env, HOME: isolatedHome, CODEX_HOME: isolatedCodexHome };
       argv = [
         "codex", "exec", "--ignore-user-config", "--ephemeral", "--sandbox", "read-only", "--color", "never",
         "--json", "--output-schema", schemaPath, "--output-last-message", reportPath, "-C", fixture, prompt,
@@ -303,7 +315,7 @@ async function runOne(options: Options, repetition: number, scenario: JsonObject
       ];
       if (options.condition === "no_skill") argv.splice(2, 0, "--safe-mode");
     }
-    const result = await spawnCarrier(argv, fixture);
+    const result = await spawnCarrier(argv, fixture, carrierEnv);
     writeFileSync(resolve(runRoot, "carrier.stdout"), result.stdout);
     writeFileSync(resolve(runRoot, "carrier.stderr"), result.stderr);
     let reportValue: unknown = null;
@@ -334,7 +346,8 @@ async function runOne(options: Options, repetition: number, scenario: JsonObject
         settings_sources: options.carrier === "claude" ? ["project"] : [],
         strict_empty_mcp: options.carrier === "claude",
         no_skill_safe_mode: options.carrier === "claude" && options.condition === "no_skill",
-        user_level_skill_discovery_proven_absent: options.carrier === "claude" && options.condition === "no_skill",
+        codex_home_mode: options.carrier === "codex" ? "temporary-auth-only" : null,
+        user_level_skill_discovery_proven_absent: options.carrier === "codex" || (options.carrier === "claude" && options.condition === "no_skill"),
       },
       scenario: options.caseId,
       repetition,

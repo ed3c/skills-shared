@@ -37,6 +37,7 @@ Each physical run must preserve:
 ```text
 same deterministic fixture commit
 condition-specific Skill package and instruction digests
+carrier home isolation mode and proof that user-level Skill discovery is absent
 raw stdout/stderr digests
 replayable subject.bundle
 schema, ground-truth, weight, and scorer digests
