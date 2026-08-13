@@ -70,6 +70,14 @@ try {
   };
   const expected = JSON.parse(await Bun.file(resolve(SKILL_ROOT, "evals/fixtures/retry-service/expected.json")).text());
   const evals = JSON.parse(await Bun.file(resolve(SKILL_ROOT, "evals/evals.json")).text());
+  const outputSchema = JSON.parse(await Bun.file(resolve(SKILL_ROOT, "evals/fixtures/invariant-report.schema.json")).text()) as JsonObject;
+  const schemaDefs = outputSchema.$defs as JsonObject;
+  const factSchema = schemaDefs.fact as JsonObject;
+  const factProperties = factSchema.properties as JsonObject;
+  const verificationSchema = factProperties.verification as JsonObject;
+  const verificationItems = verificationSchema.items as JsonObject;
+  expect(Array.isArray(verificationItems.enum) && verificationItems.enum.includes("source-read"), "output schema does not expose the hard verification vocabulary");
+  positive += 1;
   const score = scoreOutput(fixture, report, expected, evals.metrics);
   expect(score.hard_gate === "PASS", `positive hard gate failed: ${JSON.stringify(score.hard_failures)}`);
   for (const [name, value] of Object.entries(score.metrics as JsonObject)) {

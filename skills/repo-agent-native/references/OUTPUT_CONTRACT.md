@@ -57,6 +57,8 @@ The consumer may choose another repository-local path in the task packet. The Sk
 
 The executable assertion may extend the schema after the implementation PR, but it must preserve the semantic fields above or version the contract.
 
+`verification` uses a closed vocabulary: `source-read`, `document-read`, `manifest-read`, `test-executed`, `runtime-observed`, and `inference`. Every `A`/`A-` source claim or candidate-provider promotion must contain the exact token `source-read`. Put descriptive detail in the claim or tool observation; do not invent synonymous tokens that force a hard assertion to guess.
+
 ## Markdown shape
 
 ```text
