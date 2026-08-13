@@ -124,6 +124,12 @@ try {
   });
   expectFailureIds(validateSkill(brokenLink), ["BROKEN_RELATIVE_REFERENCE"], "broken reference");
 
+  const missingQuestionCoverage = skillMutation("missing-question-coverage", (root) => {
+    const path = resolve(root, "SKILL.md");
+    writeFileSync(path, readFileSync(path, "utf8").replace("Satisfy the caller's question before expanding breadth", "Explore broadly before answering"));
+  });
+  expectFailureIds(validateSkill(missingQuestionCoverage), ["QUESTION_COVERAGE_GATE_ABSENT"], "question coverage gate");
+
   const absolutePath = skillMutation("absolute-path", (root) => {
     const path = resolve(root, "SKILL.md");
     const plantedPath = ["", "Users", "example", "private", "tool"].join("/");

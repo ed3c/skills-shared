@@ -277,6 +277,9 @@ export function validateSkill(skillRootInput: string): { failures: Failure[]; sk
   for (const heading of REQUIRED_HEADINGS) {
     if (!text.includes(`## ${heading}`)) fail(failures, "MISSING_CORE_SECTION", heading);
   }
+  if (!text.includes("Satisfy the caller's question before expanding breadth")) {
+    fail(failures, "QUESTION_COVERAGE_GATE_ABSENT", "portable core must prioritize requested claim coverage before ancillary breadth");
+  }
   const portableLeaks: Array<[RegExp, string]> = [
     [/(?:\/Users\/|\/home\/|[A-Za-z]:\\)/, "machine-local absolute path"],
     [/^\s*!`/m, "Claude dynamic shell injection"],

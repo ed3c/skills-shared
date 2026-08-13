@@ -36,7 +36,8 @@ Produce a subject-bound analysis containing confirmed claims with source referen
 4. Absence requires a declared search boundary and counterexample sought.
 5. Keep declaration, mechanism, observed execution, attribution, and Human Admit distinct.
 6. Record capability identity, health/freshness, evidence ceiling, and deterministic fallback; never substitute silently.
-7. The Agent may propose analysis, edits, and evidence; it may not self-admit durable law, permission widening, publication, or merge.
+7. Satisfy the caller's question before expanding breadth: every requested claim class, counterexample, and dependency gets a supported record or a named unresolved state.
+8. The Agent may propose analysis, edits, and evidence; it may not self-admit durable law, permission widening, publication, or merge.
 
 ## State machine
 
@@ -81,13 +82,14 @@ Stop states are data, not prose: `SUBJECT_ABSENT`, `SUBJECT_IDENTITY_MUTABLE`, `
 ## S5 — Infer
 
 - Load [extraction-methodology.md](modules/extraction-methodology.md) only for implicit dependencies, optional-parameter branch exhaustion, failure chains, or bounded negative claims.
+- Build a question-coverage ledger first; prioritize requested contracts and their direct counterexamples over unrelated risks or generic architecture observations.
 - Keep known facts and inferred prerequisites in separate fields; inference never silently becomes a confirmed invariant.
 - Verify impact edges through current source, interfaces, manifests, tests, or subject-bound execution; otherwise emit `IMPACT_EDGE_UNVERIFIED`.
 - Load deeper analysis/output modules only when their explicit trigger matches.
 
 ## S6 — Write
 
-- Emit one claim per stable ID with evidence level, source references, verification, and unresolved state.
+- Emit the smallest claim set that covers the question, one claim per stable ID with evidence level, source references, verification, and unresolved state.
 - Preserve subject, scope, routes, exclusions, provider observations, and fallback in the artifact.
 - Empty factual output is not success: return the candidate ledger plus a named stop state.
 - Never hard-code a consumer directory, branch, issue, provider endpoint, credential, session, or mutable receipt.
