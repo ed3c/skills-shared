@@ -1,0 +1,6 @@
+interface:
+  display_name: "Repository Native Analysis"
+  short_description: "Extract source-anchored repository invariants"
+  default_prompt: "Analyze the requested repository scope with source-bound evidence, explicit provider fallbacks, and deterministic assertions."
+policy:
+  allow_implicit_invocation: true
