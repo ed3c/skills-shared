@@ -325,6 +325,28 @@
         "--selftest"
       ],
       "note": "#16: the post-condition that refuses when a pre-existing file changed. Normal input cannot reach it, so it was a check that ran and could not fail until the selftest planted a plan violating the rule plan itself enforces."
+    },
+    {
+      "id": "body-neutrality-no-new-debt",
+      "file": "scripts/check_body_neutrality.py",
+      "anchor": "        if has > allowed:",
+      "verify": [
+        "python3",
+        "scripts/check_body_neutrality.py",
+        "--selftest"
+      ],
+      "note": "#1: without this the ratchet has no pawl. A shared body that names a host repository is binding wearing a body's clothes, and it reaches four other repositories as if it were true there."
+    },
+    {
+      "id": "body-neutrality-no-stale-allowance",
+      "file": "scripts/check_body_neutrality.py",
+      "anchor": "        elif has < allowed:",
+      "verify": [
+        "python3",
+        "scripts/check_body_neutrality.py",
+        "--selftest"
+      ],
+      "note": "#1: an allowance nobody spends stops describing the debt and becomes a permanent exemption, which is how every ratchet quietly stops ratcheting."
     }
   ]
 }

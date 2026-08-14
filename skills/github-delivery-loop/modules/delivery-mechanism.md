@@ -99,7 +99,7 @@ merge API
 ```bash
 bash <repo>/.agents/skills/github-delivery-loop/scripts/install-codex-merge-rule.sh \
   --repo OWNER/REPOSITORY \
-  --rules-dir /Users/neon/.codex/rules
+  --rules-dir <CODEX_HOME>/rules
 ```
 
 安裝器會備份同名規則、原子替換、跑 `codex execpolicy check`，並明示它不能覆蓋 hook 或人類
