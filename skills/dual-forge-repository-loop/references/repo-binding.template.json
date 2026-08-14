@@ -1,0 +1,15 @@
+{
+  "schema_version": "dual-forge-repository-loop/v1",
+  "repository": {"name": "owner/repo", "default_branch": "main"},
+  "authority": {"implementation": "local-forgejo", "publication": "github", "actions": "github-actions"},
+  "github": {"repository_full_name": "owner/repo", "remote_name": "github", "observed_main_sha": "1111111111111111111111111111111111111111"},
+  "forgejo": {"repository": "owner/repo", "remote_name": "forgejo", "observed_main_sha": "2222222222222222222222222222222222222222"},
+  "local": {"main_branch": "main", "local_main_sha": "3333333333333333333333333333333333333333", "worktree_root": ".worktrees"},
+  "issue_namespaces": {"forgejo": "forgejo#", "github": "github#"},
+  "issue_links": [{"forgejo_issue": "forgejo#12", "github_issue": "github#34"}],
+  "history": ["GITHUB_BOUND", "LOCAL_SYNCED", "FORGEJO_ISSUES_BOUND", "WORKTREES_VERIFIED", "FORGEJO_PRS_MERGED", "LOCAL_MAIN_MERGED", "GITHUB_RECONCILED", "GITHUB_ACTIONS_VERIFIED", "GITHUB_PUBLICATION_READY"],
+  "reconciliation": {"remote_main_checked": false, "open_prs_enumerated": false, "affected_issues_enumerated": false, "conflicts_routed": false, "issue_states_routed": false, "candidate_contains_observed_github_main": false, "candidate_contains_local_main": false},
+  "publication": {"candidate_sha": "4444444444444444444444444444444444444444", "allowed": false},
+  "actions": {"state": "NOT_EXERCISED", "head_sha": "4444444444444444444444444444444444444444", "run_id": null},
+  "evidence": {"github_ingress": "NOT_EXERCISED", "forgejo_runtime": "NOT_EXERCISED", "local_worktrees": "NOT_EXERCISED", "local_main_merge": "NOT_EXERCISED", "github_reconciliation": "NOT_EXERCISED", "github_actions": "NOT_EXERCISED", "final_merge": "HUMAN_ADMIT_REQUIRED"}
+}
