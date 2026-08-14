@@ -27,6 +27,15 @@
     },
     "autoresearch-composer:rejects-unverifiable-optimization": {
       "cases": ["autoresearch-holdout-no-verifier"]
+    },
+    "repo-agent-native:recovers-source-anchored-contracts": {
+      "cases": ["repo-agent-native-retry-source-contract"]
+    },
+    "repo-agent-native:preserves-bounded-negative-claims": {
+      "cases": ["repo-agent-native-retry-source-contract"]
+    },
+    "repo-agent-native:separates-candidate-tools-from-source-truth": {
+      "cases": ["repo-agent-native-retry-source-contract"]
     }
   }
 }
