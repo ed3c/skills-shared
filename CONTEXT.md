@@ -28,10 +28,11 @@ The canonical same-name routes and assertions are defined in [`docs/architecture
 ## Current candidate leaf
 
 Issue `#128` owns the independent terminal leaf for
-`spatial-loop-systems-engineering`. The candidate adds a portable pre-implementation
+`spatial-loop-systems-engineering`; Draft PR `#136` is its publication subject.
+The candidate adds a portable pre-implementation
 system contract, a copyable System / Spec Prompt, a trigger-loaded Linux isolation
 module, a deterministic contract checker, positive/hollow/mutation controls, and
-an actual Skill Suites CI arrival.
+a declared, executable Skill Suites CI arrival.
 
 This leaf does not implement or certify a sandbox. Live root, KVM, cgroup,
 seccomp, hardware-performance, chaos, exploit, and sandbox-escape execution

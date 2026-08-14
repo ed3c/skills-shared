@@ -16,6 +16,11 @@ checker proved separate from what a model suggested.
 | Profile admission controls | [`scripts/check_profile_admission.py`](scripts/check_profile_admission.py) |
 | Deterministic evaluators | [`scripts/lint_deterministic.py`](scripts/lint_deterministic.py) |
 | Calibrated-heuristic admission | [`scripts/check_heuristic_calibration.py`](scripts/check_heuristic_calibration.py) |
+| Source-node preservation | [`scripts/check_document_preservation.py`](scripts/check_document_preservation.py) |
+| Privacy class to lane routing | [`scripts/check_privacy_routing.py`](scripts/check_privacy_routing.py) |
+| Structured XML formats | [`modules/format-structured-xml.md`](modules/format-structured-xml.md) |
+| Plain and extracted text | [`modules/format-extracted-text.md`](modules/format-extracted-text.md) |
+| Privacy routing | [`modules/privacy-routing.md`](modules/privacy-routing.md) |
 | Controls and expected outcomes | [`evals.json`](evals.json), [`tests/`](tests/) |
 
 ## What is implemented

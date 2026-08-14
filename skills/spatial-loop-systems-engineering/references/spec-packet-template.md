@@ -120,7 +120,10 @@ Rationale:
 
 There is no Agent-declared production-ready state.
 
-## Minimal JSON shape
+## Field skeleton (intentionally invalid until populated)
+
+This skeleton is a field map, not a passing fixture. It must fail the checker
+until every required array, reference, oracle, and gate field is populated.
 
 ```json
 {

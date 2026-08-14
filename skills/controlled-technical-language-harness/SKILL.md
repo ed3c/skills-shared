@@ -79,15 +79,36 @@ fall back to a default standard.
 Available profiles live in [`modules/`](modules/). Load exactly the one the
 document class and the caller's named standard select.
 
+## Document format
+
+The caller declares the format; it is never sniffed from content, because a
+module that decides its own applicability has no failure state. Structured XML
+declared over prose, or prose declared over XML, is refused rather than guessed
+at — see [`modules/format-structured-xml.md`](modules/format-structured-xml.md)
+and [`modules/format-extracted-text.md`](modules/format-extracted-text.md).
+
+Parser output stays a **candidate** until source-node readback succeeds. An
+output can be well-formed, read better than the original, and still have dropped
+a warning or reordered two steps; `scripts/check_document_preservation.py`
+refuses it.
+
 ## Privacy lanes
 
 ```text
-LOCAL_ONLY        deterministic checks only, no text leaves the process
-BOUNDED_EXTERNAL  named provider, named field set, recorded in the receipt
+LOCAL_ONLY         no text leaves the process
+PRIVATE_ENDPOINT   named admitted provider inside the trust boundary
+EXTERNAL_APPROVED  named admitted provider outside it
 ```
 
 The lane is decided before any evaluator runs, and the decision is recorded.
 An undecided lane is `PRIVACY_LANE_UNDECIDED`, not an implicit `LOCAL_ONLY`.
+
+`RESTRICTED` always routes `LOCAL_ONLY` with network disabled. `CONFIDENTIAL`
+reaches an external lane only with a human approval bound to the same document
+digest. Provider *health* and privacy *admission* are separate states, and an
+admitted provider that is unhealthy blocks rather than falling back to a lane the
+document was never admitted to — see
+[`modules/privacy-routing.md`](modules/privacy-routing.md).
 
 ## Bounded repair
 
@@ -146,6 +167,11 @@ an evaluator that errored is not an evaluator that passed
 deterministic word budgets           IMPLEMENTED
 deterministic forbidden tokens       IMPLEMENTED
 exact source-span digests            IMPLEMENTED
+source-node preservation             IMPLEMENTED
+privacy class to lane routing        IMPLEMENTED
+real S1000D / DITA schema validation NOT_EXERCISED
+PDF extraction itself                NOT_EXERCISED — the caller supplies text
+live provider or endpoint            NOT_EXERCISED
 typed contracts and receipts         IMPLEMENTED
 profile source-identity discipline   IMPLEMENTED
 heuristic admission and composition  IMPLEMENTED

@@ -43,12 +43,23 @@ The four implementation branches were siblings because each edited only its repo
 
 IBC 02 and IBC 03 merged with **no workflow run at their head commits at all**. That is an absence of evidence, not a pass, and it is recorded here rather than smoothed over. Its consequences and the repairs that followed are in [`../AGENT_INTEGRATION_STATE.md`](../AGENT_INTEGRATION_STATE.md).
 
+## Spatial-loop systems engineering leaf
+
+| Source | Issue | PR publication subject | Stack class | Publication state | Owning controls |
+|---|---|---|---|---|---|
+| User-supplied system-engineering proposal | `#128` | `#136` | independent terminal leaf | Open Draft; read exact live state from GitHub | local `tests/run-all.sh` PASS; GitHub jobs remain policy-gated while Draft |
+
+The leaf binds the generalized method to `spatial-loop-system-contract/v1`, its deterministic checker, positive/hollow/mutation controls, the trigger-loaded Linux isolation module, and the Skill Suites arrival. The exact open-PR head and workflow state are read from GitHub rather than self-embedded here.
+
+Live root, KVM, cgroup, seccomp, network-namespace, hardware-performance, chaos, exploit, and sandbox-escape execution remain `NOT_EXERCISED`. Destructive privileged testing, security acceptance, production promotion, permission widening, merge, and rollback remain Human/trusted-operator boundaries.
+
 ## Method lineage
 
 - `knowledge-continuity` supplies the rule that every hop leaves an in-place summary and evidence is not hidden behind unexplained redirects.
 - `github-delivery-loop` supplies issue/PR/receipt and publication-state separation.
 - `forgejo-delivery-loop` supplies local authoring, deterministic routing/outbox/recovery, and receipt separation.
 - `git-town-stacked-pr-worker` supplies sibling/true-child/terminal/convergence branch semantics and Human boundaries.
+- `spatial-loop-systems-engineering` supplies exact-subject state-space, capability, invariant, teardown, performance, and implementation-gate contracts for substrate-bound work.
 
 ## Evidence boundary
 
