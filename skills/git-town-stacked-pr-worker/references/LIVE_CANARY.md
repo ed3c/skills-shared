@@ -7,9 +7,10 @@ This lane exercises the exact admitted Git Town release inside disposable local 
 Pinned release:
 
 ```text
-Git Town                 22.9.0
-Linux amd64 Debian SHA   452348948542cfbd6ac56d1bd333c9c477850dcb4ab5bf0b0cb6c729c03a00ac
-checksums.txt SHA        57386accd845f524b41e025e3f4f70b0aaa7823464d8166e0316cae3f4994ef9
+Git Town                 24.0.0
+Linux amd64 Debian asset git-town_linux_intel_64.deb
+Linux amd64 Debian SHA   1535999a402e08c721538473808429eeb71beb929ef51a1438ba007434951dd7
+checksums.txt SHA        7532377166cb59dc01c74f86e3a71c54ba9567a461313a5d203a1ea99c571b24
 direct license marker    MIT License
 legal acceptance         HUMAN_ADMIT_REQUIRED
 ```
