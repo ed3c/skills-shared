@@ -42,48 +42,224 @@
     "subject": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["repository", "commit_sha", "tree_sha", "branch", "pull_request"],
+      "required": [
+        "repository",
+        "commit_sha",
+        "tree_sha",
+        "branch",
+        "pull_request"
+      ],
       "properties": {
         "repository": {
           "type": "string",
           "pattern": "^[A-Za-z0-9._-]+/[A-Za-z0-9._-]+$"
         },
-        "commit_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
-        "tree_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
-        "branch": {"type": ["string", "null"]},
-        "pull_request": {"type": ["integer", "null"], "minimum": 1}
+        "commit_sha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "tree_sha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "branch": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "pull_request": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        }
       }
     },
     "from_state": {
-      "enum": ["HYPOTHESIS", "CANDIDATE", "PROPOSED", "VERIFIED", "ADMITTED", "CANONICAL"]
+      "enum": [
+        "HYPOTHESIS",
+        "CANDIDATE",
+        "PROPOSED",
+        "VERIFIED",
+        "ADMITTED",
+        "CANONICAL"
+      ]
     },
     "to_state": {
-      "enum": ["CANDIDATE", "PROPOSED", "VERIFIED", "ADMITTED", "CANONICAL", "SUPERSEDED", "REVOKED"]
+      "enum": [
+        "CANDIDATE",
+        "PROPOSED",
+        "VERIFIED",
+        "ADMITTED",
+        "CANONICAL",
+        "SUPERSEDED",
+        "REVOKED"
+      ]
     },
     "evaluator_receipts": {
       "type": "array",
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["evaluator_id", "subject_commit_sha", "status", "output_digest"],
+        "required": [
+          "evaluator_id",
+          "evaluator_version",
+          "evaluator_artifact_digest",
+          "subject_commit_sha",
+          "subject_tree_sha",
+          "status",
+          "output_digest",
+          "receipt_ref",
+          "receipt_digest",
+          "execution_origin"
+        ],
         "properties": {
-          "evaluator_id": {"type": "string", "minLength": 1},
-          "subject_commit_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
-          "status": {"enum": ["PASS", "FAIL", "ERROR", "SKIPPED", "ABSENT"]},
-          "output_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+          "evaluator_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evaluator_version": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d+\\.\\d+$"
+          },
+          "evaluator_artifact_digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "subject_commit_sha": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{40}$"
+          },
+          "subject_tree_sha": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{40}$"
+          },
+          "status": {
+            "enum": [
+              "PASS",
+              "FAIL",
+              "ERROR",
+              "SKIPPED",
+              "ABSENT"
+            ]
+          },
+          "output_digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "receipt_ref": {
+            "type": "string",
+            "minLength": 1
+          },
+          "receipt_digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "execution_origin": {
+            "enum": [
+              "OWNING_WORKFLOW",
+              "LOCAL_VERIFIED",
+              "EXTERNAL_ATTESTED"
+            ]
+          }
         }
       }
     },
     "merge_subject": {
       "anyOf": [
-        {"type": "null"},
+        {
+          "type": "null"
+        },
         {
           "type": "object",
           "additionalProperties": false,
-          "required": ["merge_commit_sha", "admitted_by"],
+          "required": [
+            "repository",
+            "merge_commit_sha",
+            "merge_tree_sha",
+            "candidate_head_sha",
+            "candidate_tree_sha",
+            "admitted_by",
+            "forge_readback"
+          ],
           "properties": {
-            "merge_commit_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
-            "admitted_by": {"type": "string", "minLength": 1}
+            "repository": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._-]+/[A-Za-z0-9._-]+$"
+            },
+            "merge_commit_sha": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            },
+            "merge_tree_sha": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            },
+            "candidate_head_sha": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            },
+            "candidate_tree_sha": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            },
+            "admitted_by": {
+              "type": "string",
+              "minLength": 1
+            },
+            "forge_readback": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "source",
+                "observed_at_commit_sha",
+                "readback_digest"
+              ],
+              "properties": {
+                "source": {
+                  "enum": [
+                    "GITHUB_API",
+                    "GITLAB_API",
+                    "FORGEJO_API"
+                  ]
+                },
+                "observed_at_commit_sha": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{40}$"
+                },
+                "readback_digest": {
+                  "type": "string",
+                  "pattern": "^sha256:[0-9a-f]{64}$"
+                }
+              }
+            },
+            "release_artifact": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "artifact_id",
+                    "artifact_digest"
+                  ],
+                  "properties": {
+                    "artifact_id": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "artifact_digest": {
+                      "type": "string",
+                      "pattern": "^sha256:[0-9a-f]{64}$"
+                    }
+                  }
+                }
+              ]
+            }
           }
         }
       ]
@@ -93,47 +269,132 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["destination_id", "scope", "mode"],
+        "required": [
+          "destination_id",
+          "scope",
+          "mode"
+        ],
         "properties": {
-          "destination_id": {"type": "string", "minLength": 1},
-          "scope": {"enum": ["MODULE", "PROJECT", "ROOT_GLOBAL"]},
-          "mode": {"enum": ["APPEND", "SUPERSEDE"]}
+          "destination_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "scope": {
+            "enum": [
+              "MODULE",
+              "PROJECT",
+              "ROOT_GLOBAL"
+            ]
+          },
+          "mode": {
+            "enum": [
+              "APPEND",
+              "SUPERSEDE"
+            ]
+          }
         }
       }
     },
     "approval": {
       "anyOf": [
-        {"type": "null"},
+        {
+          "type": "null"
+        },
         {
           "type": "object",
           "additionalProperties": false,
-          "required": ["approver_identity", "approver_kind", "approval_subject_commit_sha", "approval_receipt_digest"],
+          "required": [
+            "approver_identity",
+            "approver_kind",
+            "approval_subject_commit_sha",
+            "approval_receipt_digest",
+            "generated_by_agent",
+            "review_ref",
+            "readback_source"
+          ],
           "properties": {
-            "approver_identity": {"type": "string", "minLength": 1},
-            "approver_kind": {"enum": ["HUMAN", "AGENT", "AUTOMATION"]},
-            "approval_subject_commit_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
-            "approval_receipt_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+            "approver_identity": {
+              "type": "string",
+              "minLength": 1
+            },
+            "approver_kind": {
+              "enum": [
+                "HUMAN",
+                "AGENT",
+                "AUTOMATION"
+              ]
+            },
+            "approval_subject_commit_sha": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            },
+            "approval_receipt_digest": {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            },
+            "generated_by_agent": {
+              "type": "boolean"
+            },
+            "review_ref": {
+              "type": "string",
+              "minLength": 1
+            },
+            "readback_source": {
+              "enum": [
+                "GITHUB_API",
+                "GITLAB_API",
+                "FORGEJO_API",
+                "HUMAN_SIGNED_RECEIPT"
+              ]
+            }
           }
         }
       ]
     },
     "supersedes": {
       "anyOf": [
-        {"type": "null"},
+        {
+          "type": "null"
+        },
         {
           "type": "object",
           "additionalProperties": false,
-          "required": ["receipt_id", "receipt_digest"],
+          "required": [
+            "receipt_id",
+            "receipt_digest",
+            "predecessor_state",
+            "predecessor_subject_commit_sha"
+          ],
           "properties": {
-            "receipt_id": {"type": "string", "pattern": "^IPR-[A-Z0-9][A-Z0-9-]{2,63}$"},
-            "receipt_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+            "receipt_id": {
+              "type": "string",
+              "pattern": "^IPR-[A-Z0-9][A-Z0-9-]{2,63}$"
+            },
+            "receipt_digest": {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            },
+            "predecessor_state": {
+              "enum": [
+                "PROPOSED",
+                "VERIFIED",
+                "ADMITTED",
+                "CANONICAL"
+              ]
+            },
+            "predecessor_subject_commit_sha": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            }
           }
         }
       ]
     },
     "caller_flags": {
       "type": "array",
-      "items": {"type": "string"}
+      "items": {
+        "type": "string"
+      }
     }
   }
 }

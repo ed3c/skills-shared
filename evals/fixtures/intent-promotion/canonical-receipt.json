@@ -3,31 +3,50 @@
     "approval_receipt_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
     "approval_subject_commit_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
     "approver_identity": "ed3c",
-    "approver_kind": "HUMAN"
+    "approver_kind": "HUMAN",
+    "generated_by_agent": false,
+    "readback_source": "GITHUB_API",
+    "review_ref": "https://github.com/ed3c/skills-shared/pull/134#pullrequestreview-1"
   },
   "caller_flags": [],
-  "contract_digest": "sha256:ac39274948265e53382f943115b71a36ad878f445178df9440015314c0af428a",
+  "contract_digest": "sha256:5f414faf3d0106ee3a063578fca894eefc6a022816ef61ca34f9f5863b1c530a",
   "contract_id": "skills-shared-intent-promotion",
   "evaluator_receipts": [
     {
+      "evaluator_artifact_digest": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
       "evaluator_id": "skill-eval-contract",
+      "evaluator_version": "1.0.0",
+      "execution_origin": "OWNING_WORKFLOW",
       "output_digest": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "receipt_digest": "sha256:7777777777777777777777777777777777777777777777777777777777777777",
+      "receipt_ref": "workflow-run:31794307867",
       "status": "PASS",
-      "subject_commit_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      "subject_commit_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "subject_tree_sha": "cccccccccccccccccccccccccccccccccccccccc"
     }
   ],
   "from_state": "ADMITTED",
   "intent_id": "MI-CTL-EVIDENCE",
   "merge_subject": {
     "admitted_by": "ed3c",
-    "merge_commit_sha": "ffffffffffffffffffffffffffffffffffffffff"
+    "candidate_head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "candidate_tree_sha": "cccccccccccccccccccccccccccccccccccccccc",
+    "forge_readback": {
+      "observed_at_commit_sha": "ffffffffffffffffffffffffffffffffffffffff",
+      "readback_digest": "sha256:6666666666666666666666666666666666666666666666666666666666666666",
+      "source": "GITHUB_API"
+    },
+    "merge_commit_sha": "ffffffffffffffffffffffffffffffffffffffff",
+    "merge_tree_sha": "8888888888888888888888888888888888888888",
+    "release_artifact": null,
+    "repository": "ed3c/skills-shared"
   },
   "receipt_id": "IPR-FIXTURE-CANONICAL",
   "schema_version": "intent-promotion-receipt/v1",
   "subject": {
-    "branch": "ctl/04-intent-promotion",
+    "branch": "ctl/04b-intent-promotion-authority",
     "commit_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-    "pull_request": 120,
+    "pull_request": 134,
     "repository": "ed3c/skills-shared",
     "tree_sha": "cccccccccccccccccccccccccccccccccccccccc"
   },

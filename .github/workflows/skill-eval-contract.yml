@@ -105,8 +105,12 @@ jobs:
       - name: Validate intent-promotion lifecycle and writeback gate
         run: |
           python3 scripts/check_intent_promotions.py contract evals/fixtures/intent-promotion/valid-contract.json
-          python3 scripts/check_intent_promotions.py receipt evals/fixtures/intent-promotion/valid-receipt.json --contract evals/fixtures/intent-promotion/valid-contract.json
-          python3 scripts/check_intent_promotions.py receipt evals/fixtures/intent-promotion/canonical-receipt.json --contract evals/fixtures/intent-promotion/valid-contract.json
+          for receipt in valid canonical supersede; do
+            python3 scripts/check_intent_promotions.py receipt \
+              "evals/fixtures/intent-promotion/${receipt}-receipt.json" \
+              --contract evals/fixtures/intent-promotion/valid-contract.json \
+              --ledger evals/fixtures/intent-promotion/ledger.json
+          done
           python3 scripts/check_intent_promotions.py selftest
           python3 -m unittest tests/test_intent_promotions.py -v
       - name: Calibrate deterministic gold-replay verifiers
@@ -162,6 +166,8 @@ jobs:
           python3 -m json.tool evals/fixtures/intent-promotion/valid-contract.json >/dev/null
           python3 -m json.tool evals/fixtures/intent-promotion/valid-receipt.json >/dev/null
           python3 -m json.tool evals/fixtures/intent-promotion/canonical-receipt.json >/dev/null
+          python3 -m json.tool evals/fixtures/intent-promotion/supersede-receipt.json >/dev/null
+          python3 -m json.tool evals/fixtures/intent-promotion/ledger.json >/dev/null
           python3 -m json.tool evals/schema/diagnostic-reflection-receipt.schema.json >/dev/null
           python3 -m json.tool evals/schema/controlled-language-request.schema.json >/dev/null
           python3 -m json.tool evals/schema/controlled-language-violation.schema.json >/dev/null
