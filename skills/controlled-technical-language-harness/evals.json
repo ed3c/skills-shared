@@ -1,9 +1,9 @@
 {
   "skill_name": "controlled-technical-language-harness",
-  "version": "1.2.0",
+  "version": "1.3.0-hardening",
   "_meta": {
-    "coverage_metric": "profile source-identity honesty, edition immutability, Human-owned terminology and compliance boundaries, ruleset binding, profile optionality, and uncommitted official bytes; deterministic tokenization and word budgets; calibrated-heuristic admission and composition; source-node preservation for structured XML; extraction-quality declaration; privacy class to execution lane routing",
-    "purpose": "Prove that a proposal-derived controlled-language profile cannot present itself as an official standard edition, cannot bind a ruleset it does not have, cannot become a mandatory core dependency, and cannot relax the deterministic, privacy, or Human Admit boundaries."
+    "coverage_metric": "profile source-identity honesty, edition immutability, Human-owned terminology and compliance boundaries, ruleset binding, profile optionality, and uncommitted official bytes; deterministic tokenization and word budgets; calibrated-heuristic admission and composition; source-node preservation for structured XML; extraction-quality declaration; privacy class to execution lane routing; exact profile/termbase/source/candidate evidence binding; corpus-recomputed calibration",
+    "purpose": "Prove that a proposal-derived controlled-language profile cannot present itself as an official standard edition, cannot bind a ruleset it does not have, cannot become a mandatory core dependency, cannot relax deterministic, privacy, or Human Admit boundaries, and cannot use primitive mechanism success as a proxy for exact profile-conformance evidence."
   },
   "runnable": [
     {
@@ -87,11 +87,30 @@
         "durable receipts carry no token, session, key or machine path, and a fallback must be declared"
       ],
       "expected": "every class routable at its ceiling; 16 planted routing defects refused"
+    },
+    {
+      "id": "CTL-EXACT-EVIDENCE-1",
+      "checker_script": "scripts/check_exact_evidence.py",
+      "test_verify": "tests/exact-evidence/verify.sh",
+      "good_fixture": "selftest-generated exact profile/rules/policy/termbase/source/candidate and gold/prediction artifacts",
+      "hollow_fixture": "stale policy identity, wrong TN/TV POS, boundary-label disagreement, mutable model identity, malformed JSON, and exact CLI exit controls",
+      "covers": [
+        "deterministic evidence binds exact profile, ruleset, policy, termbase, source, candidate, and segment identities",
+        "document class selects a declared word budget and candidate segments cover all non-whitespace bytes without overlap",
+        "TN/TV use binds an admitted term, exact surface, and allowed part of speech",
+        "protected XML nodes preserve presence, tag, text, and relative order",
+        "heuristic metrics are recomputed from exact gold and prediction artifacts",
+        "fixture label replay reports the real classifier as NOT_IMPLEMENTED",
+        "calibrated heuristic evidence remains ADVISORY_ONLY and cannot promote deterministic truth"
+      ],
+      "expected": "exact-binding selftest, compile, and usage-boundary controls PASS; planted identity and boundary mutations turn red"
     }
   ],
   "evidence_boundary": {
     "profile_admission_controls": "IMPLEMENTED",
     "deterministic_rule_evaluation": "IMPLEMENTED",
+    "exact_profile_evidence_binding": "IMPLEMENTED",
+    "corpus_recomputed_calibration": "IMPLEMENTED",
     "official_ASD_STE100_ruleset": "NOT_EXERCISED",
     "semantic_rewrite_quality": "NOT_IMPLEMENTED",
     "compliance_claim": "REQUIRED",
