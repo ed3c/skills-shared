@@ -66,6 +66,8 @@ step "delivery shape comparison controls"
 python3 scripts/measure_delivery_shape.py selftest
 
 step "guard controls"
+python3 scripts/check_body_neutrality.py --selftest
+python3 scripts/check_body_neutrality.py
 python3 scripts/check_ci_publication_profile.py --selftest
 python3 scripts/check_ci_publication_profile.py
 python3 scripts/skill_eval_plane_selftest.py
