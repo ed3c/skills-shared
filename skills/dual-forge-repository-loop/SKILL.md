@@ -5,7 +5,7 @@ description: |
 license: MIT
 compatibility: Any Agent Skills-compatible coding agent. GitHub-connected hosts may perform GitHub operations; local Forgejo/worktree operations require a consumer runtime that actually has that local capability.
 metadata:
-  version: "1.0.0"
+  version: "1.1.0"
   procedure: "dual-forge-repository-loop/v1"
 ---
 
@@ -23,6 +23,23 @@ Local/Forgejo plane
 
 Neither plane proves the other. Every transition across the boundary binds exact commit SHA and ancestry.
 
+## Mandatory runtime identity preflight
+
+Before any repository mutation, load [`references/runtime-identity-contract.md`](references/runtime-identity-contract.md) and classify the current execution runtime as exactly one of:
+
+```text
+CHATGPT_GITHUB_CONNECTOR
+GITHUB_ACTIONS
+CLAUDE_CODE_LOCAL
+CODEX_CLI_LOCAL
+CHATGPT_DESKTOP_WORKTREE
+UNKNOWN
+```
+
+Runtime identity is based on observed capabilities/provenance, not model family. `CHATGPT_GITHUB_CONNECTOR` is not `GITHUB_ACTIONS`; connector access cannot prove a local checkout, shell, worktree, or Forgejo. `GITHUB_ACTIONS` cannot inherit developer-worktree or local-Forgejo authority. Local Claude Code/Codex CLI/Desktop worktree claims require an observed checkout/path/remotes/HEAD. `UNKNOWN` fails closed for irreversible delivery actions.
+
+If runtime changes, rebind environment-specific evidence before continuing.
+
 ## Composition
 
 This Skill orchestrates, but does not duplicate:
@@ -35,7 +52,8 @@ This Skill orchestrates, but does not duplicate:
 ## Owned state machine
 
 ```text
-GITHUB_BOUND
+RUNTIME_BOUND
+→ GITHUB_BOUND
 → LOCAL_SYNCED
 → FORGEJO_ISSUES_BOUND
 → WORKTREES_VERIFIED
@@ -59,20 +77,25 @@ A state transition is invalid unless the exact subject SHA and the receipts requ
 
 ## Hard laws
 
-1. **Dual-authority law** — local/Forgejo is implementation authority; GitHub is remote publication and Actions authority. Do not collapse them into one forge identity.
-2. **Single object-graph law** — both remotes must refer to the same repository lineage. Cross-plane movement is expressed through commit ancestry, never file copying as an implicit merge.
-3. **Local-main-first law** — issue implementation merges through verified Forgejo PRs into local main before GitHub publication reconciliation begins.
-4. **Remote-drift law** — before any GitHub push/PR update, fetch/rebind current GitHub main. If it moved, reconcile it into the publication candidate without force overwrite.
-5. **Open-PR law** — enumerate open GitHub PRs that target or overlap the changed paths. A conflicting PR remains an explicit blocker until rebased/retargeted/resolved under its own ownership rules.
-6. **Issue-namespace law** — `forgejo#N` and `github#N` are different identities even when N matches. Link them with an explicit receipt; never infer equivalence.
-7. **Exact-head Actions law** — GitHub Actions evidence is valid only when `actions.head_sha == publication.candidate_sha`.
-8. **Reconciliation-before-publication law** — publication is blocked until remote-main drift, affected open PRs, and affected GitHub issues are enumerated and resolved/routed.
-9. **No-force law** — no `git push --force`, force ref update, silent history rewrite, or overwrite of concurrent GitHub work.
-10. **No-secret law** — credentials/tokens/browser sessions remain host-owned and may not enter repository bindings or receipts.
-11. **Three-failure law** — three qualifying failures against the same target invoke the fresh-diagnosis escalation from `spatial-loop-systems-engineering`; no fourth blind patch.
-12. **Human-authority law** — test success does not create permission to merge protected GitHub/Forgejo PRs, widen permissions, or promote production state.
+1. **Runtime-identity law** — bind execution provenance/capabilities before mutation. Never infer Actions/local/Forgejo capability from model name or connector presence.
+2. **Dual-authority law** — local/Forgejo is implementation authority; GitHub is remote publication and Actions authority. Do not collapse them into one forge identity.
+3. **Single object-graph law** — both remotes must refer to the same repository lineage. Cross-plane movement is expressed through commit ancestry, never file copying as an implicit merge.
+4. **Local-main-first law** — issue implementation merges through verified Forgejo PRs into local main before GitHub publication reconciliation begins.
+5. **Remote-drift law** — before any GitHub push/PR update, fetch/rebind current GitHub main. If it moved, reconcile it into the publication candidate without force overwrite.
+6. **Open-PR law** — enumerate open GitHub PRs that target or overlap the changed paths. A conflicting PR remains an explicit blocker until rebased/retargeted/resolved under its own ownership rules.
+7. **Issue-namespace law** — `forgejo#N` and `github#N` are different identities even when N matches. Link them with an explicit receipt; never infer equivalence.
+8. **Exact-head Actions law** — GitHub Actions evidence is valid only when `actions.head_sha == publication.candidate_sha`.
+9. **Reconciliation-before-publication law** — publication is blocked until remote-main drift, affected open PRs, and affected GitHub issues are enumerated and resolved/routed.
+10. **No-force law** — no `git push --force`, force ref update, silent history rewrite, or overwrite of concurrent GitHub work.
+11. **No-secret law** — credentials/tokens/browser sessions remain host-owned and may not enter repository bindings or receipts.
+12. **Three-failure law** — three qualifying failures against the same target invoke the fresh-diagnosis escalation from `spatial-loop-systems-engineering`; no fourth blind patch.
+13. **Human-authority law** — test success does not create permission to merge protected GitHub/Forgejo PRs, widen permissions, or promote production state.
 
 ## Procedure
+
+### 0. Runtime binding
+
+Classify the current runtime using the canonical runtime contract. Record working-directory, local git, connector, Actions, Forgejo, branch, HEAD, and writer-lease evidence. If a required capability is absent, route or hand off instead of pretending it exists.
 
 ### 1. GitHub ingress
 
