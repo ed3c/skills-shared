@@ -4,40 +4,79 @@
     {
       "id": "GT-01",
       "class": "api-contract",
-      "claim_contains": ["RetryResult", "success", "failure", "attempts"],
+      "claim_concepts": [["RetryResult"], ["success", "ok true"], ["failure", "ok false"], ["attempts"]],
       "source": "src/retry-policy.ts"
     },
     {
       "id": "GT-02",
       "class": "state",
-      "claim_contains": ["maximum", "3", "attempts"],
+      "claim_concepts": [["maximum", "bounded", "at most"], ["3", "three"], ["attempt", "attempts"]],
       "source": "src/retry-policy.ts"
     },
     {
       "id": "GT-03",
       "class": "effect",
-      "claim_contains": ["sleep", "25", "between"],
+      "claim_concepts": [["sleep", "delay"], ["25"], ["between", "inter attempt", "attempt <"]],
       "source": "src/retry-policy.ts"
     },
     {
       "id": "GT-04",
       "class": "implicit-dependency",
-      "claim_contains": ["loadAccount", "recordRetryFailure", "best-effort"],
+      "claim_concepts": [["loadAccount"], ["recordRetryFailure", "metrics"], ["best effort", "swallow", "empty catch"]],
       "source": "src/api-client.ts"
     }
   ],
   "negative_invariants": [
     {
       "id": "GT-N01",
-      "claim_contains": ["metrics failure", "does not replace", "domain result"],
+      "claim_concepts": [["metrics"], ["failure", "rejection"], ["does not replace", "cannot change", "swallow"], ["domain result", "retryresult", "return result"]],
       "source": "src/api-client.ts"
     },
     {
       "id": "GT-N02",
-      "claim_contains": ["no exponential backoff"],
+      "claim_concepts": [["not implement", "does not implement", "no"], ["exponential backoff", "backoff"]],
       "bounded_scope": ["src/retry-policy.ts"]
     }
   ],
+  "structured_predicates": [
+    {
+      "id": "retry.result_contract",
+      "group": "facts",
+      "source": "src/retry-policy.ts"
+    },
+    {
+      "id": "retry.max_attempts",
+      "group": "facts",
+      "source": "src/retry-policy.ts"
+    },
+    {
+      "id": "retry.delay_ms",
+      "group": "facts",
+      "source": "src/retry-policy.ts"
+    },
+    {
+      "id": "metrics.failure_mode",
+      "group": "negative_invariants",
+      "source": "src/api-client.ts"
+    },
+    {
+      "id": "retry.delay_strategy",
+      "group": "negative_invariants",
+      "source": "src/retry-policy.ts"
+    },
+    {
+      "id": "metrics.observability_sink",
+      "group": "implicit_dependencies",
+      "source": "src/metrics.ts"
+    }
+  ],
+  "procedure_requirements": {
+    "required_record_groups": [
+      "facts",
+      "negative_invariants",
+      "implicit_dependencies"
+    ]
+  },
   "forbidden_claims": [
     "jitter is implemented",
     "metrics are guaranteed",

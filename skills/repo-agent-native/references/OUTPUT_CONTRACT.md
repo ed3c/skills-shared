@@ -33,6 +33,11 @@ The consumer may choose another repository-local path in the task packet. The Sk
       "id": "INV-001",
       "class": "api-contract",
       "claim": "One precise claim",
+      "predicate": {
+        "id": "domain.contract-name",
+        "operator": "equals",
+        "value": "independently-observable-scalar"
+      },
       "evidence_level": "A",
       "source_refs": [
         {
@@ -55,7 +60,9 @@ The consumer may choose another repository-local path in the task packet. The Sk
 }
 ```
 
-The executable assertion may extend the schema after the implementation PR, but it must preserve the semantic fields above or version the contract.
+`predicate` is the machine comparison surface. Its ID is preregistered by the fixture contract, its value is a scalar, and its source is independently re-observed from the exact Git subject. `claim` remains human-readable explanation; wording or concept aliases cannot satisfy the predicate.
+
+`verification` uses a closed vocabulary: `source-read`, `document-read`, `manifest-read`, `test-executed`, `runtime-observed`, and `inference`. Every `A`/`A-` source claim or candidate-provider promotion must contain the exact token `source-read`. Put descriptive detail in the claim or tool observation; do not invent synonymous tokens that force a hard assertion to guess.
 
 ## Markdown shape
 
@@ -79,6 +86,7 @@ Each invariant contains claim, fact class, evidence level, and source refs. Avoi
 - subject repository/scope is non-empty.
 - accepted state uses the common evidence vocabulary.
 - every accepted fact has at least one repository-relative source ref.
+- every scored record has one unique, preregistered structured predicate whose value and declared source match independent source observation.
 - line numbers are positive and ordered.
 - referenced files exist in the exact source subject.
 - ranges are inside the file.
@@ -87,6 +95,18 @@ Each invariant contains claim, fact class, evidence level, and source refs. Avoi
 - `D` hypotheses appear only in `open_questions`.
 - no absolute host path, secret-shaped value, browser/device session, mutable credential, or raw memory record is present.
 - named exclusions and unexercised lanes remain visible.
+
+## Procedure receipt
+
+The scorer emits evidence in three non-interchangeable lanes:
+
+```text
+verifier_observed       subject/source/absence checks executed by deterministic code
+artifact_asserted       required output groups exist in the produced artifact
+model_reported_advisory routes/tools/fallback prose reported by the model
+```
+
+Only the first two participate in the bounded procedure contract. `model_reported_advisory` and lexical alias matching have `admission_effect: none`; neither proves that a tool ran nor that the portable procedure generalized.
 
 ## Exit semantics
 

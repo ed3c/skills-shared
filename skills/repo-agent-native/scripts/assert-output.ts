@@ -105,7 +105,16 @@ function checkRecords(repo: string, report: JsonObject, failures: Failure[]): vo
         continue;
       }
       const label = `${group}[${index}]`;
-      if (!string(record.id) || !string(record.claim)) failures.push({ id: "REPORT_FIELD_INVALID", detail: `${label} requires id and claim` });
+      if (!string(record.id) || !string(record.class) || !string(record.claim)) failures.push({ id: "REPORT_FIELD_INVALID", detail: `${label} requires id, class, and claim` });
+      if (typeof record.predicate !== "object" || record.predicate === null || Array.isArray(record.predicate)) {
+        failures.push({ id: "STRUCTURED_PREDICATE_INVALID", detail: `${label} requires a predicate object` });
+      } else {
+        const predicate = record.predicate as JsonObject;
+        const valueType = predicate.value === null ? "null" : typeof predicate.value;
+        if (!string(predicate.id) || predicate.operator !== "equals" || !["string", "number", "boolean", "null"].includes(valueType)) {
+          failures.push({ id: "STRUCTURED_PREDICATE_INVALID", detail: `${label} predicate requires id, equals operator, and a scalar value` });
+        }
+      }
       if (record.evidence_level === "D") failures.push({ id: "UNSUPPORTED_CLAIM", detail: `${label} accepts evidence level D` });
       validateSourceRefs(repo, record, label, failures);
       const verification = Array.isArray(record.verification) ? record.verification.filter(string) : [];

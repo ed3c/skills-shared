@@ -22,9 +22,13 @@ current candidate ledger
 
 ### Three-pass invariant scan
 
+Before scanning, turn the caller's nouns and requested claim classes into a coverage ledger. Each row must end as a supported record or a named unresolved state. Do not spend the output budget on ancillary risks while a requested negative invariant or implicit dependency has no row.
+
 1. **Interface pass** — inputs, outputs, public names, effects, exits, compatibility, and error shape.
 2. **State pass** — transitions, persistence, ordering, idempotency, concurrency, timeout, cleanup, and rollback.
 3. **Counterexample pass** — tests, forbidden paths, guard branches, missing inputs, stale data, and conditions that turn a claim red.
+
+For each caller-relevant constant, guard, or catch boundary, test the meaningful alternative it excludes. When current source excludes that alternative inside a declared boundary, emit the bounded negative claim instead of only repeating the positive mechanism. For each swallowed or best-effort outgoing effect, record both the direct behavior and the dependency/observability consequence when the question requests implicit dependencies.
 
 Classify records as:
 

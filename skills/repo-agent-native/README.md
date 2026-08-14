@@ -1,6 +1,6 @@
 # repo-agent-native
 
-`repo-agent-native` extracts source-anchored business invariants and implicit dependencies from an existing codebase before a brownfield change. The canonical `SKILL.md` is now a portable procedural core; optional retrieval products and domain modes remain trigger-selected modules rather than hidden prerequisites.
+`repo-agent-native` extracts source-anchored business invariants and implicit dependencies from an existing codebase before a brownfield change. The canonical `SKILL.md` is a portable procedural core; optional retrieval products and domain modes remain trigger-selected modules rather than hidden prerequisites.
 
 ## Document authority
 
@@ -16,10 +16,11 @@
 | Phase-2 semantic migration map | `references/PORTABLE_CORE_MIGRATION.md` |
 | Phase-2 owning CI admission contract | `references/CI_ADMISSION.md` |
 | Phase-2 owning workflow | `../../.github/workflows/repo-agent-native-contract.yml` |
+| Phase-3 A/B method and evidence boundary | `references/A_B_TESTING.md` |
 | Domain/tool instance triggers | `modules/README.md` and the selected module only |
-| A/B cases and admission rule | `evals/evals.json` |
-| Executable structural and output assertions | `scripts/validate-skill.ts` and `scripts/assert-output.ts` |
-| Positive, mutation, and exit-code controls | `tests/selftest.ts` |
+| A/B cases, weights, and admission rule | `evals/evals.json` and `evals/README.md` |
+| Executable structural, output, source-predicate, and A/B assertions | `scripts/` |
+| Positive, mutation, exit-code, and A/B controls | `tests/selftest.ts` and `tests/ab-selftest.ts` |
 | Merge, provider activation, legal admission | Human Admit |
 
 Markdown explains the contract. It does not replace source code, schemas, executable assertions, receipts, or the exact issue/PR acceptance subject.
@@ -82,10 +83,8 @@ modules/
   optional tool/domain instances selected by explicit trigger
 
 scripts/
-  deterministic Phase-2 structural/output assertions; no network by default
+  deterministic assertions and bounded A/B runner; no network by default
 ```
-
-Blind paired A/B execution is a Phase-3 concern tracked by issue #95; it is not implemented by the Phase-2 scripts merely because the cases and metrics are declared.
 
 A module may specialize terminology, tool health checks, query shapes, or domain output. It may not override source-code authority, widen permissions/effects, store consumer paths or secrets, or promote memory/search/graph results directly to facts.
 
@@ -112,7 +111,7 @@ NOT_EXERCISED
 SKIPPED_BY_POLICY
 ```
 
-A tool being installed, a graph being queryable, or a memory being returned is not proof that a code fact is current. Every output fact needs at least one valid `source_ref`; claims about runtime behavior require the appropriate control/receipt.
+A tool being installed, a graph being queryable, or a memory being returned is not proof that a code fact is current. Every output fact needs at least one valid `source_ref`; claims about runtime behavior require the appropriate control or receipt.
 
 ## Executable checks
 
@@ -122,53 +121,64 @@ Run from this Skill directory:
 bun scripts/validate-skill.ts --skill-root . --json <skill-receipt.json>
 bun scripts/assert-output.ts --repo <repo> --report <report.json> --receipt <output-receipt.json>
 bun tests/selftest.ts
+bun tests/ab-selftest.ts
+bun scripts/run-ab.ts --carrier <codex|claude> --condition <condition> \
+  --case <case> --output <fresh-dir> [--repetitions 1-3] [--execute]
 ```
 
-The first two commands write subject-bound JSON receipts; the selftest uses disposable local fixtures and writes no durable evidence. Exit `0` means the declared subject passed, `2` means an evaluated hard assertion failed, `64` means usage or required input was invalid/absent, and `70` means the checker itself failed. See `scripts/README.md` and `tests/README.md` for the full boundary.
+The structural and output commands write subject-bound JSON receipts. The selftests use disposable local fixtures and write no durable evidence. Exit `0` means the declared subject passed, `2` means an evaluated hard assertion failed, `64` means usage or required input was invalid or absent, and `70` means the checker itself failed.
 
-A receipt proves only what was executed against its recorded subject. It does not prove a provider is currently running, an index is current, a carrier loaded the Skill, a pull request is mergeable, or a Human admitted promotion. Those live states require separate observations.
+The A/B admission score is computed from independently re-observed structured predicates and a bounded procedure contract. Lexical aliases are diagnostic only. `no_skill` installs no Skill and receives no optional-provider or procedural knowledge beyond the common task, subject, and schema adapter.
 
-## Migration stack
+A receipt proves only what was executed against its recorded subject. It does not prove a provider is currently running, an index is current, a carrier loaded the Skill, a pull request is mergeable, or a Human admitted promotion.
 
-1. **Contract and eval admission** — admitted by PR #91. Added navigation, compatibility, evidence/output contracts, baseline identity, and fixtures.
-2. **Portable core and assertions** — current PR #93 / issue #92. Rewrites `SKILL.md`; adds Bun + TypeScript validation/selftests; moves provider details behind triggers.
-3. **Tool adapters and blind A/B** — issue #95. Adds bounded provider adapters and exact old-vs-new benchmark receipts.
-4. **Bettor consumer migration/canaries** — immutable selected bundle/relative projections and separate Claude/Codex consumer receipts.
-5. **Canonical release admission** — issue #88 after Phase 3 and consumer evidence, with rollback identity and Human Admit.
+## Stack and exact-subject binding
+
+```text
+main
+→ #91 contract/eval admission                  MERGED
+→ #93 portable core + owning exact-head CI     PARENT
+→ #96 replayable A/B evidence                  CURRENT CHILD
+→ Bettor consumer canaries
+→ #88 canonical release admission
+→ Human Admit
+```
+
+The current child was mechanically replayed on parent commit `12615a0efd9a763e2272c81c379453b740ee5757`. The previous child head remains available at rollback branch `rollback/repo-agent-native-v2-ab-cdcf8b5`.
+
+Parent run `31776452443` executed `Repo Agent Native Contract` successfully at exact parent head `12615a0efd9a763e2272c81c379453b740ee5757`. This parent receipt proves the Phase-2 structural and output contract only. It does not prove the Phase-3 child, physical model A/B, provider behavior, consumer integration, or release admission.
+
+Any parent-head, child-head, evaluator, fixture, or scorer change invalidates older child evidence. Re-run all owning checks against the new exact subject before admission.
 
 ## Current evidence
 
 ```text
 pre-refactor SKILL.md baseline       PRESENT with immutable commit/blob identity
 contract/eval documentation          IMPLEMENTED on merged PR #91
-portable-core rewrite                IMPLEMENTED on PR #93 branch
-deterministic Bun assertions         IMPLEMENTED on PR #93 branch
-positive/mutation controls           IMPLEMENTED on PR #93 branch
-module-routing fixture contract      IMPLEMENTED on PR #93 branch
-owning repo-agent-native CI workflow IMPLEMENTED on PR #93 branch
-exact-head Bun CI execution          NOT_EXERCISED until the owning job completes
-semantic model routing               NOT_EXERCISED; Phase 3 #95
-blind A/B model runs                 NOT_EXERCISED; Phase 3 #95
-Claude Code live carrier             NOT_EXERCISED
-Codex CLI live carrier               NOT_EXERCISED
+portable-core rewrite                IMPLEMENTED on parent PR #93
+Phase-2 owning workflow              IMPLEMENTED on parent PR #93
+Phase-2 exact-parent contract run    PASS at 12615a0e / run 31776452443
+deterministic Bun assertions         IMPLEMENTED
+positive/mutation controls           IMPLEMENTED
+blind A/B runner and scorer          IMPLEMENTED on child PR #96
+structured source predicates         IMPLEMENTED for the retry fixture
+offline source-mutation sensitivity  IMPLEMENTED for attempts/delay/sink
+child exact-head hosted checks        NOT_EXERCISED after parent replay
+Claude Code physical carrier         NOT_EXERCISED by current evaluator
+Codex CLI physical carrier           NOT_EXERCISED by current evaluator
+cross-harness generalization matrix  NOT_EXERCISED
 Bettor portable binding/canaries     NOT_IMPLEMENTED in this phase
 canonical v2 release                 NOT_ADMITTED; final issue #88
 ```
 
-Workflow presence proves only `IMPLEMENTED`. Exact-head contract evidence becomes `PASS` only when `repo-agent-native-contract.yml` executes the candidate head successfully.
+## Migration phases
+
+1. **Contract and eval admission** — merged PR #91.
+2. **Portable core and assertions** — parent PR #93 / issue #92.
+3. **Tool adapters and blind A/B** — child PR #96 / issue #95.
+4. **Bettor consumer migration and canaries** — immutable selected bundle and separate Claude/Codex receipts.
+5. **Canonical release admission** — issue #88 after Phase 3 and consumer evidence, with rollback identity and Human Admit.
 
 ## Change contract
 
-A procedural change requires trigger/non-trigger coverage, source-anchor assertions, optional-tool fallback controls, hard-gate compatibility, A/B comparison, affected consumers, rollback identity, and Human Admit. A tool/domain module change requires a unique trigger, explicit assumptions, bounded context, positive and ambiguity/staleness/contradiction controls, and proof that the portable core still works without it.
-
-## Traceability
-
-```text
-#89 PRD
-→ #91 contract/eval admission             MERGED
-→ #92 / #93 portable core + assertions    ACTIVE
-→ #95 bounded adapters + blind paired A/B
-→ Bettor Claude/Codex consumer canaries
-→ #88 canonical release admission
-→ Human Admit
-```
+A procedural change requires trigger and non-trigger coverage, source-anchor assertions, optional-tool fallback controls, hard-gate compatibility, A/B comparison, affected consumers, rollback identity, and Human Admit. A tool or domain module change requires a unique trigger, explicit assumptions, bounded context, positive and ambiguity/staleness/contradiction controls, and proof that the portable core still works without it.

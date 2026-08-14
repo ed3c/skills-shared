@@ -1,32 +1,57 @@
 {
   "schema": "skills-shared/skill-ab-eval/v1",
   "skill": "repo-agent-native",
-  "version": "2.0.0-core",
-  "issue": 92,
+  "version": "2.1.1-parent-rebound",
+  "issue": 95,
   "parent_issue": 89,
-  "state": "CORE_IMPLEMENTED",
+  "depends_on_issue": 92,
+  "state": "CANONICAL_ADAPTER_IMPLEMENTED_PARENT_CONTRACT_PASS_PHYSICAL_NOT_EXERCISED",
+  "parent_contract": {
+    "branch": "feat/repo-agent-native-v2-core",
+    "commit": "12615a0efd9a763e2272c81c379453b740ee5757",
+    "workflow": "Repo Agent Native Contract",
+    "workflow_run_id": 31776452443,
+    "state": "PASS",
+    "evidence_scope": "Phase-2 portable structure, deterministic output assertions, module-routing controls"
+  },
+  "rollback_subject": {
+    "branch": "rollback/repo-agent-native-v2-ab-cdcf8b5",
+    "commit": "cdcf8b59fbd32de07a199333be32ad4665092639"
+  },
+  "measurement_authority": {
+    "behavior_and_generalization": "../../../docs/SKILL_EVAL_ROADMAP.md",
+    "canonical_run_trace": "../../../evals/schema/run-trace.schema.json",
+    "canonical_scorecard": "../../../evals/schema/skill-scorecard.schema.json",
+    "local_scope": "repo-agent-native fixture predicates and receipts only",
+    "universal_total_score": "PROHIBITED"
+  },
   "baseline": "baseline.json",
   "trigger_cases": "fixtures/trigger-cases.json",
   "scenario_cases": "fixtures/scenarios.json",
   "hard_gates": [
     "frontmatter-open-standard",
-    "skill-under-500-lines",
+    "portable-core-at-most-220-lines",
+    "provider-instance-outside-portable-core",
     "source-ref-present-and-valid",
     "candidate-tool-not-promoted-to-source-truth",
     "optional-tool-fallback",
     "evidence-states-distinct",
     "no-machine-path-secret-session-live-receipt",
     "module-cannot-override-core",
-    "bounded-explicit-script-io"
+    "bounded-explicit-script-io",
+    "exact-parent-subject-bound",
+    "stale-parent-evidence-rejected"
   ],
-  "metrics": {
-    "fact_precision": 0.20,
-    "required_invariant_recall": 0.18,
-    "negative_invariant_recall": 0.15,
-    "implicit_dependency_recall": 0.15,
-    "source_anchor_validity": 0.12,
-    "tool_fallback_correctness": 0.10,
-    "unsupported_claim_penalty": -0.10
+  "admission_metrics": {
+    "structured_predicate_recall": 0.75,
+    "procedure_contract_coverage": 0.25
+  },
+  "lexical_advisory_metrics": {
+    "lexical_nonforbidden_coverage_proxy": 0.25,
+    "lexical_required_recall": 0.25,
+    "lexical_negative_recall": 0.20,
+    "lexical_dependency_recall": 0.20,
+    "lexical_forbidden_claim_count": -0.10
   },
   "operational_metrics": [
     "input_tokens",
@@ -38,20 +63,43 @@
   "admission": {
     "all_hard_gates": true,
     "critical_regressions_allowed": 0,
-    "weighted_quality_delta_min": 0.01,
+    "admission_quality_delta_min": 0.01,
+    "control_quality_delta_min": 0.01,
     "median_instruction_context_cost_delta_max": -0.01
+  },
+  "generalization_admission": {
+    "minimum_repetitions_per_condition": 3,
+    "minimum_real_harnesses": 2,
+    "required_conditions": [
+      "no_skill",
+      "current_skill",
+      "candidate_skill",
+      "wrong_skill"
+    ],
+    "required_perturbation_classes": [
+      "source-mutation",
+      "provider-degradation",
+      "memory-conflict",
+      "cross-module-impact"
+    ],
+    "lexical_advisory_can_promote": false,
+    "offline_source_mutation_sensitivity": "IMPLEMENTED",
+    "physical_suite_state": "NOT_EXERCISED"
   },
   "planned_runners": {
     "offline_bun": "IMPLEMENTED",
-    "owning_contract_ci": "IMPLEMENTED",
-    "exact_head_contract_execution": "NOT_EXERCISED",
-    "claude_code": "NOT_EXERCISED",
-    "codex_cli": "NOT_EXERCISED"
+    "parent_owning_contract_ci": "PASS",
+    "child_exact_head_hosted_checks": "NOT_EXERCISED",
+    "claude_code": "RUNNER_IMPLEMENTED",
+    "codex_cli": "RUNNER_IMPLEMENTED"
   },
   "commands": [
     "bun scripts/validate-skill.ts --skill-root <path> --json <receipt>",
     "bun scripts/assert-output.ts --repo <repo> --report <report.json> --receipt <receipt.json>",
-    "bun tests/selftest.ts"
+    "bun tests/selftest.ts",
+    "bun tests/ab-selftest.ts",
+    "bun scripts/run-ab.ts --carrier <codex|claude> --model <model> --condition <condition> --case <case> --output <fresh-dir> --execute",
+    "bun scripts/compare-ab.ts --candidate <receipt> --current <receipt> --no-skill <receipt> --wrong-skill <receipt> --evals evals/evals.json --output <comparison>"
   ],
   "negative_controls": [
     "stale-grepai-index",
@@ -66,11 +114,8 @@
     "fact-without-source-ref",
     "old-receipt-new-commit",
     "machine-local-skill-binding",
-    "mutable-main-execution-identity"
-  ],
-  "routing_evidence_boundary": {
-    "fixture_contract": "IMPLEMENTED",
-    "semantic_model_routing": "NOT_EXERCISED",
-    "phase3_issue": 95
-  }
+    "mutable-main-execution-identity",
+    "child-behind-declared-parent",
+    "parent-head-changed-after-child-receipt"
+  ]
 }
