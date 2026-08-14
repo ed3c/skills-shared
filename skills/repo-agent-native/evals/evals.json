@@ -5,7 +5,7 @@
   "issue": 95,
   "parent_issue": 89,
   "depends_on_issue": 92,
-  "state": "AB_RUNNER_IMPLEMENTED",
+  "state": "CANONICAL_ADAPTER_IMPLEMENTED_PHYSICAL_NOT_EXERCISED",
   "measurement_authority": {
     "behavior_and_generalization": "../../../docs/SKILL_EVAL_ROADMAP.md",
     "canonical_run_trace": "../../../evals/schema/run-trace.schema.json",
@@ -72,7 +72,7 @@
     "bun scripts/assert-output.ts --repo <repo> --report <report.json> --receipt <receipt.json>",
     "bun tests/selftest.ts",
     "bun tests/ab-selftest.ts",
-    "bun scripts/run-ab.ts --carrier <codex|claude> --condition <condition> --case <case> --output <fresh-dir> --execute",
+    "bun scripts/run-ab.ts --carrier <codex|claude> --model <model> --condition <condition> --case <case> --output <fresh-dir> --execute",
     "bun scripts/compare-ab.ts --candidate <receipt> --current <receipt> --no-skill <receipt> --wrong-skill <receipt> --evals evals/evals.json --output <comparison>"
   ],
   "negative_controls": [

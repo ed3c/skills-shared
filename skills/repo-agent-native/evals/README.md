@@ -69,7 +69,7 @@ artifact_asserted       required record groups present in the artifact
 model_reported_advisory routes/tools/fallback claimed by output prose
 ```
 
-Only the first two enter the local bounded procedure contract. Full procedural generalization requires at least three repetitions per condition, at least two real harnesses, and held-out perturbations spanning source mutation, provider degradation, memory conflict, and cross-module impact. The canonical cross-harness run identity and aggregation live at the repository-level Skill eval framework; this Skill-local scorer emits compatible evidence and must not become a competing global ranking authority.
+Only the first two enter the local bounded procedure contract. Full procedural generalization requires at least three repetitions per condition, at least two real harnesses, and held-out perturbations spanning source mutation, provider degradation, memory conflict, and cross-module impact. The canonical cross-harness run identity and aggregation live at the repository-level Skill eval framework. Root adapters re-run this package's task-specific observer from the replay bundle, normalize results into `skill-eval-run/v1`, and enforce the complete 24-cell matrix. This Skill-local scorer must not become a competing global ranking authority.
 
 Each physical run must preserve:
 

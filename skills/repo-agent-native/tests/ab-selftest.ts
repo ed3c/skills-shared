@@ -237,6 +237,7 @@ try {
   const dryRoot = resolve(tempRoot, "dry-run");
   expect(await runAbCli([
     "--carrier", "codex",
+    "--model", "test-model",
     "--condition", "candidate_skill",
     "--case", "AB-RETRY-01",
     "--output", dryRoot,

@@ -48,11 +48,11 @@ The procedure receipt distinguishes deterministic verifier observations, artifac
 The runner creates a fresh deterministic Git fixture for each condition, installs exactly one package projection after committing the subject, invokes Claude Code or Codex CLI with an argument vector, and records raw output digests, a replayable `subject.bundle`, evaluator digests, the installed package digest, and an instruction-only digest. The four conditions are `no_skill`, `current_skill`, `candidate_skill`, and `wrong_skill`.
 
 ```bash
-bun scripts/run-ab.ts --carrier <codex|claude> --condition <condition> \
+bun scripts/run-ab.ts --carrier <codex|claude> --model <model> --condition <condition> \
   --case <case> --output <fresh-dir> [--repetitions 1-3] [--execute]
 ```
 
-Without `--execute`, it writes `NOT_EXERCISED`; it never silently contacts a carrier. Output directories are append-once per run ID. Claude calls use project-only settings, an empty strict MCP set, no session persistence, a one-dollar limit, and safe mode for the `no_skill` control. Codex calls use ephemeral read-only execution, but current Codex user-level Skill isolation is not proven; receipts must retain that limitation.
+Without `--execute`, it writes `NOT_EXERCISED`; it never silently contacts a carrier. Output directories are append-once per run ID. The model is explicit rather than inherited from mutable user configuration. Claude emits stream JSON so local tool calls and token usage can be observed; Codex emits JSONL for the same reason. Missing telemetry makes canonical normalization fail closed.
 
 Model output remains untrusted until deterministic scoring succeeds. One carrier cannot proxy another, and a schema/CLI rejection is a carrier failure rather than a Skill-quality score.
 
@@ -67,5 +67,7 @@ bun scripts/compare-ab.ts --candidate <receipt.json> --current <receipt.json> \
 ```
 
 Exit `0` is a bounded comparison PASS, not release admission. The receipt names one carrier and one scenario; missing carrier/scenario/repetition evidence stays missing.
+
+Repository-level normalization, deterministic replay, 24-cell aggregation, canonical run traces, verifier receipts, and evidence bundles are owned by `../../../evals/`, not this portable package. Use `evals/verifiers/verify_repo_agent_native_output.py`, `evals/adapters/normalize_repo_agent_native.py`, and `evals/adapters/summarize_repo_agent_native_matrix.py` from a skills-shared checkout. These root mechanisms are deliberately not portable-package dependencies.
 
 `no_skill` means no Skill package is installed. It does **not** mean the carrier automatically knows the procedure, invokes grepai/Serena/Code-Graph-RAG/mem0, or receives expected answers. All four conditions receive the same task, exact subject identity, and output-schema adapter so they remain deterministically evaluable. Optional providers are explicitly forbidden in this fixture; their integration requires separate degradation and freshness cases.

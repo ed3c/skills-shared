@@ -33,6 +33,7 @@ class UsageError extends Error {}
 
 type Options = {
   carrier: Carrier;
+  model: string;
   condition: Condition;
   caseId: string;
   output: string;
@@ -232,8 +233,14 @@ async function spawnCarrier(argv: string[], cwd: string, env?: Record<string, st
   return { exit, timedOut, stdout, stderr, durationMs: Math.round(performance.now() - started) };
 }
 
+function claudeEvents(stdout: Buffer): JsonObject[] {
+  return stdout.toString("utf8").split("\n").filter(Boolean).map((line) => object(JSON.parse(line), "Claude event"));
+}
+
 function extractClaudeReport(stdout: Buffer): unknown {
-  const wrapper = object(JSON.parse(stdout.toString("utf8")), "Claude output");
+  const events = claudeEvents(stdout);
+  const wrapper = events.findLast((event) => event.type === "result") ?? events.at(-1);
+  if (!wrapper) throw new UsageError("Claude output has no result event");
   if (wrapper.structured_output !== undefined) return wrapper.structured_output;
   if (typeof wrapper.result === "string") return JSON.parse(wrapper.result);
   throw new UsageError("Claude output has no structured_output/result JSON");
@@ -242,28 +249,50 @@ function extractClaudeReport(stdout: Buffer): unknown {
 function operational(carrier: Carrier, stdout: Buffer): JsonObject {
   if (carrier === "claude") {
     try {
-      const wrapper = object(JSON.parse(stdout.toString("utf8")), "Claude output");
+      const events = claudeEvents(stdout);
+      const wrapper = events.findLast((event) => event.type === "result") ?? {};
+      let toolCalls = 0;
+      for (const event of events) {
+        if (event.type !== "assistant") continue;
+        const message = typeof event.message === "object" && event.message !== null ? event.message as JsonObject : {};
+        const content = Array.isArray(message.content) ? message.content : [];
+        toolCalls += content.filter((block) => typeof block === "object" && block !== null && (block as JsonObject).type === "tool_use").length;
+      }
+      const usage = typeof wrapper.usage === "object" && wrapper.usage !== null ? wrapper.usage as JsonObject : {};
       return {
         duration_ms: wrapper.duration_ms ?? null,
         duration_api_ms: wrapper.duration_api_ms ?? null,
         num_turns: wrapper.num_turns ?? null,
         total_cost_usd: wrapper.total_cost_usd ?? null,
-        usage: wrapper.usage ?? null,
+        usage,
+        tool_calls: toolCalls,
+        input_tokens: usage.input_tokens ?? null,
+        output_tokens: usage.output_tokens ?? null,
       };
     } catch {
       return {};
     }
   }
-  let usage: unknown = null;
+  let usage: JsonObject = {};
+  let toolCalls = 0;
   for (const line of stdout.toString("utf8").split("\n")) {
     try {
       const event = object(JSON.parse(line), "Codex event");
-      if (event.type === "turn.completed" && typeof event.usage === "object") usage = event.usage;
+      if (event.type === "turn.completed" && typeof event.usage === "object" && event.usage !== null) usage = event.usage as JsonObject;
+      if (event.type === "item.completed" && typeof event.item === "object" && event.item !== null) {
+        const kind = String((event.item as JsonObject).type ?? "");
+        if (["command_execution", "mcp_tool_call", "file_change", "web_search"].includes(kind)) toolCalls += 1;
+      }
     } catch {
       continue;
     }
   }
-  return { usage };
+  return {
+    usage,
+    tool_calls: toolCalls,
+    input_tokens: usage.input_tokens ?? null,
+    output_tokens: usage.output_tokens ?? null,
+  };
 }
 
 async function runOne(options: Options, repetition: number, scenario: JsonObject, outputRoot: string, version: string): Promise<JsonObject> {
@@ -304,14 +333,14 @@ async function runOne(options: Options, repetition: number, scenario: JsonObject
       cpSync(resolve(realCodexHome, "auth.json"), resolve(isolatedCodexHome, "auth.json"));
       carrierEnv = { ...process.env, HOME: isolatedHome, CODEX_HOME: isolatedCodexHome };
       argv = [
-        "codex", "exec", "--ignore-user-config", "--ephemeral", "--sandbox", "read-only", "--color", "never",
+        "codex", "exec", "--ignore-user-config", "--ephemeral", "--model", options.model, "--sandbox", "read-only", "--color", "never",
         "--json", "--output-schema", schemaPath, "--output-last-message", reportPath, "-C", fixture, prompt,
       ];
     } else {
       argv = [
         "claude", "-p", "--no-session-persistence", "--setting-sources", "project", "--strict-mcp-config", "--mcp-config", '{"mcpServers":{}}',
         "--permission-mode", "dontAsk", "--tools", "Read,Grep,Glob,Bash", "--allowedTools", "Read,Grep,Glob,Bash(git rev-parse *)",
-        "--max-budget-usd", CLAUDE_MAX_BUDGET_USD, "--output-format", "json", "--json-schema", claudeSchema(schemaPath), prompt,
+        "--max-budget-usd", CLAUDE_MAX_BUDGET_USD, "--model", options.model, "--output-format", "stream-json", "--verbose", "--json-schema", claudeSchema(schemaPath), prompt,
       ];
       if (options.condition === "no_skill") argv.splice(2, 0, "--safe-mode");
     }
@@ -341,6 +370,7 @@ async function runOne(options: Options, repetition: number, scenario: JsonObject
       schema: "repo-agent-native/ab-run-receipt/v1",
       run_id: runId,
       carrier: { id: options.carrier, version },
+      model: { provider: options.carrier === "codex" ? "openai" : "anthropic", name: options.model },
       condition: options.condition,
       carrier_isolation: {
         settings_sources: options.carrier === "claude" ? ["project"] : [],
@@ -408,12 +438,13 @@ function parseArgs(args: string[]): Options {
     if (key === "--carrier" && (value === "codex" || value === "claude")) options.carrier = value;
     else if (key === "--condition" && ["no_skill", "current_skill", "candidate_skill", "wrong_skill"].includes(value)) options.condition = value as Condition;
     else if (key === "--case") options.caseId = value;
+    else if (key === "--model") options.model = value;
     else if (key === "--output") options.output = value;
     else if (key === "--repetitions") options.repetitions = Number(value);
     else throw new UsageError(`unknown or invalid argument: ${key} ${value}`);
   }
-  if (!options.carrier || !options.condition || !options.caseId || !options.output) {
-    throw new UsageError("usage: run-ab.ts --carrier <codex|claude> --condition <condition> --case <id> --output <dir> [--repetitions 1-3] [--execute]");
+  if (!options.carrier || !options.model || !options.condition || !options.caseId || !options.output) {
+    throw new UsageError("usage: run-ab.ts --carrier <codex|claude> --model <model> --condition <condition> --case <id> --output <dir> [--repetitions 1-3] [--execute]");
   }
   if (!Number.isInteger(options.repetitions) || options.repetitions! < 1 || options.repetitions! > MAX_REPETITIONS) {
     throw new UsageError(`repetitions must be 1-${MAX_REPETITIONS}`);
@@ -433,6 +464,7 @@ export async function runAbCli(args: string[]): Promise<number> {
         schema: "repo-agent-native/ab-dry-run/v1",
         state: "NOT_EXERCISED",
         carrier: { id: options.carrier, version },
+        model: { provider: options.carrier === "codex" ? "openai" : "anthropic", name: options.model },
         condition: options.condition,
         scenario: options.caseId,
         repetitions: options.repetitions,
@@ -449,6 +481,7 @@ export async function runAbCli(args: string[]): Promise<number> {
     writeJson(resolve(outputRoot, "summary.json"), {
       schema: "repo-agent-native/ab-run-summary/v1",
       carrier: { id: options.carrier, version },
+      model: { provider: options.carrier === "codex" ? "openai" : "anthropic", name: options.model },
       condition: options.condition,
       scenario: options.caseId,
       repetitions: options.repetitions,

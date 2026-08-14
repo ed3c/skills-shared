@@ -1,0 +1,36 @@
+{
+  "schema_version": "skill-eval/v1",
+  "id": "repo-agent-native-retry-source-contract",
+  "skill": "repo-agent-native",
+  "kind": "capability",
+  "split": "dev",
+  "source": {"kind": "manual", "ref": "skills/repo-agent-native/evals/fixtures/scenarios.json#AB-RETRY-01"},
+  "implementation_targets": [
+    {"path": "skills/repo-agent-native/SKILL.md", "anchor": "S0 SCOPE"},
+    {"path": "skills/repo-agent-native/scripts/score-ab-output.ts", "anchor": "structuredAssessment"}
+  ],
+  "claims": [
+    "recovers-source-anchored-contracts",
+    "preserves-bounded-negative-claims",
+    "separates-candidate-tools-from-source-truth"
+  ],
+  "task": {
+    "prompt": "Extract source-anchored retry contracts, bounded negative invariants, implicit dependencies, and tool fallback evidence from the fixture.",
+    "fixture": "skills/repo-agent-native/evals/fixtures/retry-service",
+    "expected_artifacts": ["report.json", "receipt.json", "subject.bundle"]
+  },
+  "routing": {"should_invoke": ["repo-agent-native"], "must_not_invoke": ["knowledge-continuity"]},
+  "conditions": ["no_skill", "current_skill", "candidate_skill", "wrong_skill"],
+  "runtime": {"fresh_workspace": true, "retries": 0, "timeout_seconds": 300, "network_policy": "deny", "seed_count": 3},
+  "verifier": {
+    "type": "script",
+    "command": "python3 evals/verifiers/verify_repo_agent_native_output.py",
+    "outcome_assertions": [
+      "receipt and replay bundle identify the same exact Git subject",
+      "independent scorer re-observes structured predicates from source",
+      "lexical aliases cannot promote a failed hard assertion"
+    ]
+  },
+  "budgets": {"max_tool_calls": 24, "max_tokens": 30000, "max_wall_seconds": 300},
+  "safety": {"forbidden": ["network access", "repository edit", "model-reported PASS replacing deterministic verification"]}
+}
