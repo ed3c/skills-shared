@@ -91,6 +91,13 @@ def run_selftest(source_root: Path) -> int:
         root, manifest_path = build(source_root, Path(raw))
         try:
             receipt = evaluate(root, manifest_path)
+        except RuntimeError as error:
+            # The authority checker refuses to run without its validator, on
+            # purpose. Say which it is, rather than emitting a traceback that
+            # reads like a defect in the composition.
+            print(f"SELFTEST RED: a required gate is unavailable: {error}",
+                  file=sys.stderr)
+            return 70
         except (Refused, Unusable, GateUnavailable) as error:
             print(f"SELFTEST RED: canonical composition refused: {error}", file=sys.stderr)
             return 2
