@@ -1,0 +1,231 @@
+{
+  "_meta": {
+    "kind": "OBSERVATION",
+    "not_an_experiment": "These are real merged pull requests from one day of work on this repository. The tasks differ between them, so they are not two arms of anything and `compare` would be wrong to run on them. Recorded because the shape numbers are real and the experiment's fixture pair is not yet built."
+  },
+  "arm_id": "observational-2026-08-14",
+  "review_units": [
+    {
+      "added": 1334,
+      "changed_files": 9,
+      "deleted": 2,
+      "id": "PR-104",
+      "kind": "leaf",
+      "merged": true,
+      "paths": [
+        "pr-104"
+      ]
+    },
+    {
+      "added": 1052,
+      "changed_files": 8,
+      "deleted": 4,
+      "id": "PR-105",
+      "kind": "leaf",
+      "merged": true,
+      "paths": [
+        "pr-105"
+      ]
+    },
+    {
+      "added": 269,
+      "changed_files": 3,
+      "deleted": 0,
+      "id": "PR-106",
+      "kind": "leaf",
+      "merged": true,
+      "paths": [
+        "pr-106"
+      ]
+    },
+    {
+      "added": 477,
+      "changed_files": 11,
+      "deleted": 3,
+      "id": "PR-111",
+      "kind": "leaf",
+      "merged": true,
+      "paths": [
+        "pr-111"
+      ]
+    },
+    {
+      "added": 1759,
+      "changed_files": 12,
+      "deleted": 4,
+      "id": "PR-107",
+      "kind": "leaf",
+      "merged": true,
+      "paths": [
+        "pr-107"
+      ]
+    },
+    {
+      "added": 2597,
+      "changed_files": 20,
+      "deleted": 1,
+      "id": "PR-117",
+      "kind": "leaf",
+      "merged": true,
+      "paths": [
+        "pr-117"
+      ]
+    },
+    {
+      "added": 883,
+      "changed_files": 11,
+      "deleted": 0,
+      "id": "PR-126",
+      "kind": "leaf",
+      "merged": true,
+      "paths": [
+        "pr-126"
+      ]
+    },
+    {
+      "added": 778,
+      "changed_files": 9,
+      "deleted": 10,
+      "id": "PR-127",
+      "kind": "leaf",
+      "merged": true,
+      "paths": [
+        "pr-127"
+      ]
+    },
+    {
+      "added": 1221,
+      "changed_files": 9,
+      "deleted": 0,
+      "id": "PR-130",
+      "kind": "leaf",
+      "merged": true,
+      "paths": [
+        "pr-130"
+      ]
+    },
+    {
+      "added": 920,
+      "changed_files": 9,
+      "deleted": 5,
+      "id": "PR-131",
+      "kind": "leaf",
+      "merged": true,
+      "paths": [
+        "pr-131"
+      ]
+    },
+    {
+      "added": 2447,
+      "changed_files": 24,
+      "deleted": 737,
+      "id": "PR-93",
+      "kind": "leaf",
+      "merged": true,
+      "paths": [
+        "pr-93"
+      ]
+    },
+    {
+      "added": 2371,
+      "changed_files": 24,
+      "deleted": 348,
+      "id": "PR-96",
+      "kind": "leaf",
+      "merged": true,
+      "paths": [
+        "pr-96"
+      ]
+    },
+    {
+      "added": 29,
+      "changed_files": 1,
+      "deleted": 1,
+      "id": "PR-110",
+      "kind": "leaf",
+      "merged": true,
+      "paths": [
+        "pr-110"
+      ]
+    },
+    {
+      "added": 76,
+      "changed_files": 4,
+      "deleted": 22,
+      "id": "PR-112",
+      "kind": "leaf",
+      "merged": true,
+      "paths": [
+        "pr-112"
+      ]
+    },
+    {
+      "added": 147,
+      "changed_files": 2,
+      "deleted": 0,
+      "id": "PR-113",
+      "kind": "leaf",
+      "merged": true,
+      "paths": [
+        "pr-113"
+      ]
+    },
+    {
+      "added": 378,
+      "changed_files": 4,
+      "deleted": 2,
+      "id": "PR-145",
+      "kind": "leaf",
+      "merged": true,
+      "paths": [
+        "pr-145"
+      ]
+    },
+    {
+      "added": 43,
+      "changed_files": 3,
+      "deleted": 0,
+      "id": "PR-148",
+      "kind": "leaf",
+      "merged": true,
+      "paths": [
+        "pr-148"
+      ]
+    },
+    {
+      "added": 614,
+      "changed_files": 5,
+      "deleted": 0,
+      "id": "PR-149",
+      "kind": "leaf",
+      "merged": true,
+      "paths": [
+        "pr-149"
+      ]
+    },
+    {
+      "added": 709,
+      "changed_files": 10,
+      "deleted": 5,
+      "id": "PR-152",
+      "kind": "leaf",
+      "merged": true,
+      "paths": [
+        "pr-152"
+      ]
+    },
+    {
+      "added": 580,
+      "changed_files": 7,
+      "deleted": 2,
+      "id": "PR-155",
+      "kind": "leaf",
+      "merged": true,
+      "paths": [
+        "pr-155"
+      ]
+    }
+  ],
+  "schema_version": "delivery-shape-measurement/v1",
+  "shape": "mixed"
+}

@@ -58,6 +58,9 @@ python3 scripts/check_controlled_language_contracts.py bundle \
   --violation evals/fixtures/controlled-language/valid-violation.json \
   --receipt evals/fixtures/controlled-language/valid-receipt.json
 
+step "delivery shape comparison controls"
+python3 scripts/measure_delivery_shape.py selftest
+
 step "guard controls"
 python3 scripts/check_guard_controls.py --repo-root . --selftest
 python3 scripts/check_guard_controls.py --repo-root .
