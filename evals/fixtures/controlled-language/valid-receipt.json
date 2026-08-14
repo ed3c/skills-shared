@@ -64,7 +64,7 @@
       "evidence_class": "HUMAN",
       "status": "PASS",
       "input_digest": "sha256:85b0f2f9237523a7f059f951cd4045883069d86349e78b50ac01c50180de5d7e",
-      "output_digest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+      "output_digest": "sha256:4444444444444444444444444444444444444444444444444444444444444",
       "exit_code": null,
       "calibration_ref": null,
       "human_receipt_ref": "fixture://human-review/ctl-fixture-001"
@@ -72,9 +72,12 @@
   ],
   "violations": {
     "open_count": 0,
+    "repaired_count": 1,
     "blocked_count": 0,
     "waived_count": 0,
-    "violation_ids": []
+    "violation_ids": [
+      "V-FIXTURE-WORD-LIMIT"
+    ]
   },
   "repair_history": [],
   "diagnostic_reflection_receipts": [],
