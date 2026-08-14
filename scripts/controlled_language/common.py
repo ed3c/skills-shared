@@ -4,7 +4,7 @@ import hashlib
 import json
 import re
 import sys
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any
 
 EVIDENCE = {"DETERMINISTIC", "CALIBRATED_HEURISTIC", "SEMANTIC", "HUMAN"}
@@ -38,6 +38,15 @@ def is_digest(value: Any) -> bool:
 
 def has_text(value: Any) -> bool:
     return isinstance(value, str) and bool(value.strip())
+
+
+def is_portable_path(value: Any) -> bool:
+    if not has_text(value):
+        return False
+    if value.startswith(("/", "~")) or "\\" in value or re.match(r"^[A-Za-z]:", value):
+        return False
+    parts = PurePosixPath(value).parts
+    return bool(parts) and ".." not in parts and "." not in parts
 
 
 def reasoning_fields(value: Any, path: str = "$") -> list[str]:

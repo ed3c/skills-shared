@@ -72,9 +72,12 @@
   ],
   "violations": {
     "open_count": 0,
+    "repaired_count": 1,
     "blocked_count": 0,
     "waived_count": 0,
-    "violation_ids": []
+    "violation_ids": [
+      "V-FIXTURE-WORD-LIMIT"
+    ]
   },
   "repair_history": [],
   "diagnostic_reflection_receipts": [],
