@@ -102,6 +102,45 @@ module and project destinations reachable from `VERIFIED`.
     A `chain_of_thought`, `reasoning`, `scratchpad`, `private_notes` or
     `thinking` field anywhere in a contract or receipt is refused.
 
+## External authority readback
+
+The semantic gate above closes every substitution a receipt can make about
+itself. One remains that a receipt cannot close alone:
+
+```text
+the receipt says an evaluator receipt exists, with this digest
+the receipt embeds forge readback fields
+the receipt labels an approval Human and names a readback source
+→ and the semantic checker believed all of it
+```
+
+Those fields are caller-supplied. A caller who can write `receipt_digest` can
+write any value into it. `scripts/check_intent_promotion_authority.py` requires
+the referenced bytes to be present and to hash to what the receipt claimed, so
+the digest stops being a label and starts being a check, and requires each
+evidence artifact's contents to agree field-by-field with the receipt that cited
+it.
+
+It also **executes** the committed schemas with a pinned Draft 2020-12
+validator. They were previously parsed with `json.tool`, which proves they are
+JSON — not that anything validates against them. `additionalProperties: false`,
+conditional branches and required nested fields were never deciding gates. A
+schema nobody runs is the same shape of defect as a test nobody runs, and the
+checker exits 70 rather than skipping validation if the validator is absent:
+falling back to "skip" would make the strictest gate the one most likely to be
+silently off.
+
+```bash
+python3 scripts/check_intent_promotion_authority.py \
+  --bundle evals/fixtures/intent-promotion/authority/bundle.json
+python3 scripts/check_intent_promotion_authority.py --selftest
+```
+
+What stays outside: whether the forge really said this, whether the merge really
+happened, and whether a human really approved. Those are external authority.
+This layer proves the bundle is internally consistent with bytes that exist,
+which is a smaller claim, stated as such.
+
 ## Running the gate
 
 ```bash
@@ -125,6 +164,10 @@ more dangerous direction — it looks like the gate is working.
 ```text
 lifecycle and receipt mechanics       IMPLEMENTED
 contract/receipt digest binding       IMPLEMENTED
+external evidence byte readback       IMPLEMENTED
+Draft 2020-12 deciding validation     IMPLEMENTED
+external provider authenticity        NOT_EXERCISED
+actual merge or release occurrence    NOT_EXERCISED
 memory provider integration           NOT_EXERCISED
 CONTEXT.md mutation                   NOT_EXERCISED
 production memory migration           NOT_EXERCISED

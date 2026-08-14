@@ -1,0 +1,75 @@
+name: Intent Promotion Authority
+
+# Separate from Skill Eval Contract because this job needs a JSON Schema
+# validator the other jobs do not, and because the gate it runs must fail when
+# that validator is absent rather than quietly skipping the strictest check.
+
+on:
+  pull_request:
+    types:
+      - opened
+      - ready_for_review
+      - reopened
+      - synchronize
+    paths:
+      - 'evals/schema/intent-promotion-*.schema.json'
+      - 'evals/fixtures/intent-promotion/**'
+      - 'scripts/check_intent_promotion_authority.py'
+      - 'scripts/intent_promotion_authority_selftest.py'
+      - 'tests/test_intent_promotion_authority.py'
+      - '.github/workflows/intent-promotion-authority.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'evals/schema/intent-promotion-*.schema.json'
+      - 'evals/fixtures/intent-promotion/**'
+      - 'scripts/check_intent_promotion_authority.py'
+      - 'scripts/intent_promotion_authority_selftest.py'
+      - 'tests/test_intent_promotion_authority.py'
+      - '.github/workflows/intent-promotion-authority.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: intent-promotion-authority-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  authority:
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.12'
+      - name: Install the pinned Draft 2020-12 validator
+        run: python3 -m pip install --disable-pip-version-check 'jsonschema==4.26.0'
+      - name: Prove the validator is present and the checker refuses to run without it
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -c "import jsonschema; print('jsonschema', jsonschema.__version__)"
+          # The committed schemas must be executable as Draft 2020-12 schemas,
+          # not merely parseable as JSON.
+          python3 - <<'PY'
+          import json, pathlib
+          from jsonschema import Draft202012Validator
+          for path in sorted(pathlib.Path("evals/schema").glob("intent-promotion-*.schema.json")):
+              Draft202012Validator.check_schema(json.loads(path.read_text(encoding="utf-8")))
+              print("schema executable:", path.name)
+          PY
+      - name: Admit the committed authority bundle
+        run: |
+          python3 scripts/check_intent_promotion_authority.py \
+            --bundle evals/fixtures/intent-promotion/authority/bundle.json >/dev/null
+      - name: Refuse every planted authority defect
+        run: python3 scripts/check_intent_promotion_authority.py --selftest
+      - name: Run the authority contract tests
+        run: python3 -m unittest tests/test_intent_promotion_authority.py -v
