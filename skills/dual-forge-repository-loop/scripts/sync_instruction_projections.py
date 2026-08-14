@@ -15,6 +15,11 @@ END = "<!-- END SKILLS-SHARED INSTRUCTION PROJECTION -->"
 BINDING_REL = Path(".skill-bindings/instruction-projection.json")
 GLOBAL_RECEIPT_NAME = ".skills-shared-projection-receipt.json"
 SHA40 = re.compile(r"^[0-9a-f]{40}$")
+REPOSITORY_FORBIDDEN_PATTERNS = (
+    re.compile(r"(?<![A-Za-z0-9_.-])~/"),
+    re.compile(r"/Users/"),
+    re.compile(r"/home/"),
+)
 
 
 def sha256_bytes(data: bytes) -> str:
@@ -56,7 +61,9 @@ def replace_block(text: str, block: str) -> str:
 
 def render(module: dict, module_sha: str, canonical_commit: str, role: str) -> str:
     role_text = module["projection_roles"][role]
-    runtime_lines = "\n".join(f"{i}. {x}" for i, x in enumerate(module["runtime_order"], 1))
+    runtime_lines = "\n".join(
+        f"{i}. {x}" for i, x in enumerate(module["runtime_order"], 1)
+    )
     law_lines = "\n".join(f"- {x}" for x in module["hard_laws"])
     return f"""{BEGIN}
 ## Shared runtime / delivery projection
@@ -77,6 +84,16 @@ Do not edit this managed block manually. Update it from the canonical `skills-sh
 {END}"""
 
 
+def validate_repository_projection(label: str, text: str) -> None:
+    for pattern in REPOSITORY_FORBIDDEN_PATTERNS:
+        match = pattern.search(text)
+        if match:
+            raise ValueError(
+                f"{label} contains host home locator {match.group(0)!r}; "
+                "repository projections must use logical host-owned identities"
+            )
+
+
 def ensure_file(path: Path, initial_header: str) -> str:
     if path.exists():
         return path.read_text(encoding="utf-8")
@@ -91,7 +108,10 @@ def canonical_commit_arg(args, module_path: Path) -> str:
     inferred = git_commit(module_path.parents[3])
     if inferred:
         return inferred
-    raise ValueError("canonical commit is required when it cannot be inferred from a skills-shared checkout")
+    raise ValueError(
+        "canonical commit is required when it cannot be inferred from a "
+        "skills-shared checkout"
+    )
 
 
 def binding_payload(commit: str, module_sha: str, agents: str, claude: str) -> dict:
@@ -100,7 +120,10 @@ def binding_payload(commit: str, module_sha: str, agents: str, claude: str) -> d
         "canonical": {
             "repository": "ed3c/skills-shared",
             "commit": commit,
-            "module": "skills/dual-forge-repository-loop/references/instruction-projection.json",
+            "module": (
+                "skills/dual-forge-repository-loop/references/"
+                "instruction-projection.json"
+            ),
             "module_sha256": module_sha,
         },
         "repository_projection": {
@@ -109,7 +132,7 @@ def binding_payload(commit: str, module_sha: str, agents: str, claude: str) -> d
         },
         "global_claude": {
             "state": "NOT_EXERCISED",
-            "receipt": "host-owned ~/.claude/.skills-shared-projection-receipt.json",
+            "receipt": "host-owned:global-claude-projection-receipt",
         },
     }
 
@@ -119,11 +142,19 @@ def sync_repo(args, module: dict, module_sha: str, commit: str) -> int:
     agents_path = root / "AGENTS.md"
     claude_path = root / "CLAUDE.md"
     agents_original = ensure_file(agents_path, "# Repository Agent Instructions")
-    claude_original = ensure_file(claude_path, "# Claude repository adapter\n\nRead `AGENTS.md` before making repository changes.")
-    agents_next = replace_block(agents_original, render(module, module_sha, commit, "AGENTS.md"))
-    claude_next = replace_block(claude_original, render(module, module_sha, commit, "CLAUDE.md"))
+    claude_original = ensure_file(
+        claude_path,
+        "# Claude repository adapter\n\nRead `AGENTS.md` before making repository changes.",
+    )
+    agents_block = render(module, module_sha, commit, "AGENTS.md")
+    claude_block = render(module, module_sha, commit, "CLAUDE.md")
+    validate_repository_projection("AGENTS.md managed block", agents_block)
+    validate_repository_projection("CLAUDE.md managed block", claude_block)
+    agents_next = replace_block(agents_original, agents_block)
+    claude_next = replace_block(claude_original, claude_block)
     binding = binding_payload(commit, module_sha, agents_next, claude_next)
     binding_text = json.dumps(binding, indent=2, sort_keys=True) + "\n"
+    validate_repository_projection("repository projection binding", binding_text)
     binding_path = root / BINDING_REL
 
     if args.mode == "check":
@@ -154,7 +185,9 @@ def sync_repo(args, module: dict, module_sha: str, commit: str) -> int:
 def sync_global(args, module: dict, module_sha: str, commit: str) -> int:
     path = Path(args.global_claude).expanduser().resolve()
     original = ensure_file(path, "# Global Claude host instructions")
-    next_text = replace_block(original, render(module, module_sha, commit, "GLOBAL_CLAUDE.md"))
+    next_text = replace_block(
+        original, render(module, module_sha, commit, "GLOBAL_CLAUDE.md")
+    )
     receipt_path = path.parent / GLOBAL_RECEIPT_NAME
     receipt = {
         "schema_version": "instruction-projection-global-receipt/v1",
@@ -186,16 +219,16 @@ def sync_global(args, module: dict, module_sha: str, commit: str) -> int:
 
 
 def parse_args(argv: list[str]):
-    p = argparse.ArgumentParser()
-    p.add_argument("--module", required=True)
-    p.add_argument("--canonical-commit")
-    p.add_argument("--mode", choices=("write", "check"), default="check")
-    p.add_argument("--repo-root")
-    p.add_argument("--global-claude", default="~/.claude/CLAUDE.md")
-    p.add_argument("--include-global", action="store_true")
-    args = p.parse_args(argv)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--module", required=True)
+    parser.add_argument("--canonical-commit")
+    parser.add_argument("--mode", choices=("write", "check"), default="check")
+    parser.add_argument("--repo-root")
+    parser.add_argument("--global-claude", default="~/.claude/CLAUDE.md")
+    parser.add_argument("--include-global", action="store_true")
+    args = parser.parse_args(argv)
     if not args.repo_root and not args.include_global:
-        p.error("provide --repo-root and/or --include-global")
+        parser.error("provide --repo-root and/or --include-global")
     return args
 
 
