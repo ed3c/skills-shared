@@ -347,6 +347,28 @@
         "--selftest"
       ],
       "note": "#1: an allowance nobody spends stops describing the debt and becomes a permanent exemption, which is how every ratchet quietly stops ratcheting."
+    },
+    {
+      "id": "binding-stale-surfaces",
+      "file": "scripts/check_binding_stale.py",
+      "anchor": "    if actual == fields[\"body_version\"]:",
+      "verify": [
+        "python3",
+        "scripts/check_binding_stale.py",
+        "--selftest"
+      ],
+      "note": "#1/#5: body_version is the whole mechanism. Without the comparison, a fix to the shared body reaches every host as a silent no-op and is rediscovered there later, one repository at a time."
+    },
+    {
+      "id": "binding-slot-name-agreement",
+      "file": "scripts/check_binding_stale.py",
+      "anchor": "    if fields[\"skill\"] != name:",
+      "verify": [
+        "python3",
+        "scripts/check_binding_stale.py",
+        "--selftest"
+      ],
+      "note": "#1/#5: a slot and its contract disagreeing about what is bound means every later check is about the wrong skill."
     }
   ]
 }
