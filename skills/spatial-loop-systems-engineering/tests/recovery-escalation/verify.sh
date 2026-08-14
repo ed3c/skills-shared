@@ -16,13 +16,18 @@ require_literal() {
   }
 }
 
-require_literal "$skill" "Three-failure escalation law"
-require_literal "$skill" "qualifying failed attempt"
-require_literal "$skill" "GitHub Actions or"
+# The universal entrypoint owns the escalation trigger and mandatory delegation.
+# Forge/provider/Desktop implementation details remain decoupled in the recovery
+# contract/overlay below rather than being duplicated in SKILL.md.
+require_literal "$skill" "After three consecutive qualifying failures"
+require_literal "$skill" "do not make a fourth blind patch"
+require_literal "$skill" "references/three-failure-escalation.md"
 require_literal "$skill" "forgejo-delivery-loop"
-require_literal "$skill" "new ChatGPT Desktop question/session"
-require_literal "$skill" "new isolated worktree/branch"
+require_literal "$skill" "github-delivery-loop"
+require_literal "$skill" "new isolated worktree"
 
+# The dedicated recovery contract remains authoritative for the complete hard
+# laws and routing semantics.
 require_literal "$contract" "After **three consecutive qualifying failures**"
 require_literal "$contract" "A fourth speculative patch in the same repair context is"
 require_literal "$contract" "FRESH_DIAGNOSIS_HANDOFF_REQUIRED"
@@ -47,4 +52,4 @@ if grep -Fq "automatic merge to main" "$overlay"; then
   exit 2
 fi
 
-echo "RECOVERY ESCALATION GREEN: three-failure, forge routing, fresh diagnosis, worktree, verification, and merge boundaries are present"
+echo "RECOVERY ESCALATION GREEN: universal trigger delegates to the decoupled recovery contract; forge routing, fresh diagnosis, worktree, verification, and merge boundaries are present"
