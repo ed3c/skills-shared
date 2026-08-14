@@ -788,6 +788,24 @@ def selftest() -> None:
     refuse("stale-local-verification", base, verification, head,
            lambda receipt, evidence: receipt.__setitem__("head_sha", "0" * 40))
 
+    # The receipt side. Only the stale-HEAD rule had a control; the rest were
+    # checks that ran and could not fail, including the one #49 names by name:
+    # a FAIL receipt must not be consumed as PASS. Changing the receipt does not
+    # touch the evidence digests, so each of these is caught by its own rule.
+    def set_receipt(field: str, value: Any):
+        return lambda receipt, evidence: receipt.__setitem__(field, value)
+
+    refuse("fail-receipt-consumed-as-pass", base, verification, head,
+           set_receipt("status", "FAIL"))
+    refuse("receipt-wrong-repository", base, verification, head,
+           set_receipt("repository_id", 999))
+    refuse("receipt-wrong-schema", base, verification, head,
+           set_receipt("schema", "github-delivery-local-verification/v0"))
+    refuse("receipt-no-commands", base, verification, head,
+           set_receipt("commands", []))
+    refuse("receipt-malformed-evidence-digest", base, verification, head,
+           set_receipt("evidence_sha256", "not-a-digest"))
+
     # The receipt says PASS; these decide whether the bytes it names say the
     # same thing. Every one of them authorized publication before the gate read
     # the sidecar at all.
@@ -1000,7 +1018,7 @@ def selftest() -> None:
         recovery,
     )
     print("SELFTEST GREEN: GitHub Actions publication gate "
-        "(10 policy cases, 23 evidence-binding controls)")
+        "(10 policy cases, 28 receipt- and evidence-binding controls)")
 
 
 def main(argv: list[str] | None = None) -> int:
