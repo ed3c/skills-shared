@@ -38,6 +38,45 @@
       "bounded_scope": ["src/retry-policy.ts"]
     }
   ],
+  "structured_predicates": [
+    {
+      "id": "retry.result_contract",
+      "group": "facts",
+      "source": "src/retry-policy.ts"
+    },
+    {
+      "id": "retry.max_attempts",
+      "group": "facts",
+      "source": "src/retry-policy.ts"
+    },
+    {
+      "id": "retry.delay_ms",
+      "group": "facts",
+      "source": "src/retry-policy.ts"
+    },
+    {
+      "id": "metrics.failure_mode",
+      "group": "negative_invariants",
+      "source": "src/api-client.ts"
+    },
+    {
+      "id": "retry.delay_strategy",
+      "group": "negative_invariants",
+      "source": "src/retry-policy.ts"
+    },
+    {
+      "id": "metrics.observability_sink",
+      "group": "implicit_dependencies",
+      "source": "src/metrics.ts"
+    }
+  ],
+  "procedure_requirements": {
+    "required_record_groups": [
+      "facts",
+      "negative_invariants",
+      "implicit_dependencies"
+    ]
+  },
   "forbidden_claims": [
     "jitter is implemented",
     "metrics are guaranteed",

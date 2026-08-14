@@ -36,11 +36,12 @@ function stringAt(root: JsonObject, path: string[], label: string): string {
   return value;
 }
 
-function optionalScore(receipt: JsonObject): { hard_gate: string; weighted_quality: number } | null {
+function optionalScore(receipt: JsonObject): { hard_gate: string; procedure_hard_gate: string; admission_quality: number } | null {
   if (typeof receipt.score !== "object" || receipt.score === null || Array.isArray(receipt.score)) return null;
   const score = receipt.score as JsonObject;
-  if (typeof score.hard_gate !== "string" || typeof score.weighted_quality !== "number" || !Number.isFinite(score.weighted_quality)) return null;
-  return { hard_gate: score.hard_gate, weighted_quality: score.weighted_quality };
+  if (typeof score.hard_gate !== "string" || typeof score.procedure_hard_gate !== "string"
+    || typeof score.admission_quality !== "number" || !Number.isFinite(score.admission_quality)) return null;
+  return { hard_gate: score.hard_gate, procedure_hard_gate: score.procedure_hard_gate, admission_quality: score.admission_quality };
 }
 
 function stable(value: unknown): string {
@@ -80,6 +81,7 @@ export function compareAb(receipts: Record<string, JsonObject>, evals: JsonObjec
     if (receipt.state !== "PASS") failures.push(`${name}: receipt state is not PASS`);
     if (!score) failures.push(`${name}: evaluable score is absent`);
     else if (score.hard_gate !== "PASS") failures.push(`${name}: hard gate is not PASS`);
+    else if (score.procedure_hard_gate !== "PASS") failures.push(`${name}: procedure hard gate is not PASS`);
   }
   const candidate = receipts.candidate;
   const current = receipts.current;
@@ -92,10 +94,10 @@ export function compareAb(receipts: Record<string, JsonObject>, evals: JsonObjec
     if (stable(candidate.evaluator) !== stable(other.evaluator)) failures.push(`${name}: evaluator digest set differs from candidate`);
     if (stable(candidate.subject_bundle) !== stable(other.subject_bundle)) failures.push(`${name}: subject bundle differs from candidate`);
   }
-  const candidateQuality = optionalScore(candidate)?.weighted_quality ?? null;
-  const currentQuality = optionalScore(current)?.weighted_quality ?? null;
+  const candidateQuality = optionalScore(candidate)?.admission_quality ?? null;
+  const currentQuality = optionalScore(current)?.admission_quality ?? null;
   const admission = object(evals.admission, "evals.admission");
-  const qualityMinimum = Number(admission.weighted_quality_delta_min);
+  const qualityMinimum = Number(admission.admission_quality_delta_min);
   const controlMinimum = Number(admission.control_quality_delta_min);
   const contextMaximum = Number(admission.median_instruction_context_cost_delta_max);
   const candidateBytes = numberAt(candidate, ["skill", "entrypoint_bytes"], "candidate entrypoint bytes");
@@ -104,7 +106,7 @@ export function compareAb(receipts: Record<string, JsonObject>, evals: JsonObjec
   const contextDelta = candidateBytes / currentBytes - 1;
   if (qualityDelta !== null && qualityDelta < qualityMinimum) failures.push(`quality delta ${qualityDelta.toFixed(6)} is below ${qualityMinimum}`);
   for (const name of ["no_skill", "wrong_skill"] as const) {
-    const controlQuality = optionalScore(receipts[name])?.weighted_quality ?? null;
+    const controlQuality = optionalScore(receipts[name])?.admission_quality ?? null;
     if (candidateQuality !== null && controlQuality !== null && candidateQuality - controlQuality < controlMinimum) {
       failures.push(`candidate minus ${name} quality ${(candidateQuality - controlQuality).toFixed(6)} is below ${controlMinimum}`);
     }
@@ -125,8 +127,8 @@ export function compareAb(receipts: Record<string, JsonObject>, evals: JsonObjec
     quality: {
       candidate: candidateQuality,
       current: currentQuality,
-      no_skill: optionalScore(receipts.no_skill)?.weighted_quality ?? null,
-      wrong_skill: optionalScore(receipts.wrong_skill)?.weighted_quality ?? null,
+      no_skill: optionalScore(receipts.no_skill)?.admission_quality ?? null,
+      wrong_skill: optionalScore(receipts.wrong_skill)?.admission_quality ?? null,
       candidate_minus_current: qualityDelta === null ? null : Number(qualityDelta.toFixed(6)),
       control_delta_min: controlMinimum,
     },
@@ -138,7 +140,8 @@ export function compareAb(receipts: Record<string, JsonObject>, evals: JsonObjec
     limitations: [
       "One run per condition is a stochastic sample when the carrier exposes no seed.",
       "Entrypoint bytes are a deterministic progressive-disclosure context proxy, not observed model input tokens.",
-      "Anchored non-forbidden precision is a bounded proxy, not exhaustive semantic fact precision.",
+      "Structured predicates cover only the preregistered fixture claims; they are not exhaustive repository fact precision.",
+      "Lexical alias matching is advisory and cannot alter admission or rescue a failed hard assertion.",
     ],
   };
 }

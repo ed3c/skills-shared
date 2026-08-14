@@ -37,14 +37,36 @@
         "end_line": {"type": "integer", "minimum": 1}
       }
     },
+    "predicate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "operator", "value"],
+      "properties": {
+        "id": {
+          "enum": [
+            "retry.result_contract",
+            "retry.max_attempts",
+            "retry.delay_ms",
+            "retry.delay_strategy",
+            "metrics.failure_mode",
+            "metrics.observability_sink"
+          ]
+        },
+        "operator": {"const": "equals"},
+        "value": {
+          "type": ["string", "number", "integer", "boolean", "null"]
+        }
+      }
+    },
     "fact": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "class", "claim", "evidence_level", "source_refs", "verification"],
+      "required": ["id", "class", "claim", "predicate", "evidence_level", "source_refs", "verification"],
       "properties": {
         "id": {"type": "string", "minLength": 1},
         "class": {"type": "string", "minLength": 1},
         "claim": {"type": "string", "minLength": 1},
+        "predicate": {"$ref": "#/$defs/predicate"},
         "evidence_level": {"type": "string", "minLength": 1},
         "source_refs": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/source_ref"}},
         "verification": {"type": "array", "minItems": 1, "items": {"enum": ["source-read", "document-read", "manifest-read", "test-executed", "runtime-observed", "inference"]}}
@@ -53,11 +75,12 @@
     "negative": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "class", "claim", "evidence_level", "source_refs", "verification", "search_boundary", "counterexample_sought"],
+      "required": ["id", "class", "claim", "predicate", "evidence_level", "source_refs", "verification", "search_boundary", "counterexample_sought"],
       "properties": {
         "id": {"type": "string", "minLength": 1},
         "class": {"type": "string", "minLength": 1},
         "claim": {"type": "string", "minLength": 1},
+        "predicate": {"$ref": "#/$defs/predicate"},
         "evidence_level": {"type": "string", "minLength": 1},
         "source_refs": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/source_ref"}},
         "verification": {"type": "array", "minItems": 1, "items": {"enum": ["source-read", "document-read", "manifest-read", "test-executed", "runtime-observed", "inference"]}},
@@ -68,11 +91,12 @@
     "dependency": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "class", "claim", "evidence_level", "source_refs", "verification"],
+      "required": ["id", "class", "claim", "predicate", "evidence_level", "source_refs", "verification"],
       "properties": {
         "id": {"type": "string", "minLength": 1},
         "class": {"type": "string", "minLength": 1},
         "claim": {"type": "string", "minLength": 1},
+        "predicate": {"$ref": "#/$defs/predicate"},
         "evidence_level": {"type": "string", "minLength": 1},
         "source_refs": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/source_ref"}},
         "verification": {"type": "array", "minItems": 1, "items": {"enum": ["source-read", "document-read", "manifest-read", "test-executed", "runtime-observed", "inference"]}}

@@ -33,13 +33,15 @@ The JSON receipt is execution evidence for its recorded commit, Skill/report dig
 
 ## `score-ab-output.ts`
 
-Input: a replayable exact-subject repository, one structured report, reviewed ground truth, and the fixed weights in `evals/evals.json`. It first applies `assert-output.ts`, then scores concept-alias matches, negative-invariant recall, implicit-dependency recall, source anchors, named fallback, and forbidden claims. The so-called precision field is deliberately named `anchored_nonforbidden_precision_proxy`: without exhaustive fact-level labels it is not statistical fact precision.
+Input: a replayable exact-subject repository, one structured report, reviewed ground truth, and the fixed contract in `evals/evals.json`. It first applies `assert-output.ts`, then asks `evaluate-retry-predicates.ts` to re-observe preregistered typed predicates from `HEAD:path`. Admission uses structured-predicate recall plus bounded procedure-contract coverage. Concept aliases, forbidden phrases, and fallback wording are emitted only under `lexical_advisory` with `admission_effect: none`.
 
 ```bash
 bun scripts/score-ab-output.ts --repo <repo> --report <report.json> \
   --expected evals/fixtures/retry-service/expected.json \
   --evals evals/evals.json --output <score.json>
 ```
+
+The procedure receipt distinguishes deterministic verifier observations, artifact-presence assertions, and model-reported advisory claims. It does not infer that a route or optional provider ran from the model's prose. The retry evaluator is deliberately fixture-specific; a new task family must preregister its own independent observer instead of extending a universal keyword scorer.
 
 ## `run-ab.ts`
 
@@ -56,7 +58,7 @@ Model output remains untrusted until deterministic scoring succeeds. One carrier
 
 ## `compare-ab.ts`
 
-The comparator consumes four physical receipts and fails unless their carrier, scenario, exact fixture, replay bundle, and evaluator digests match. It applies the reviewed minimum quality delta and the `SKILL.md` byte-size context proxy from `evals/evals.json`.
+The comparator consumes four physical receipts and fails unless their carrier, scenario, exact fixture commit, replay bundle, and complete evaluator digest set match. Only the installed instruction package differs by condition. It applies the reviewed minimum admission-quality delta and the `SKILL.md` byte-size context proxy from `evals/evals.json`; lexical advisory values are not read by the comparator.
 
 ```bash
 bun scripts/compare-ab.ts --candidate <receipt.json> --current <receipt.json> \
@@ -65,3 +67,5 @@ bun scripts/compare-ab.ts --candidate <receipt.json> --current <receipt.json> \
 ```
 
 Exit `0` is a bounded comparison PASS, not release admission. The receipt names one carrier and one scenario; missing carrier/scenario/repetition evidence stays missing.
+
+`no_skill` means no Skill package is installed. It does **not** mean the carrier automatically knows the procedure, invokes grepai/Serena/Code-Graph-RAG/mem0, or receives expected answers. All four conditions receive the same task, exact subject identity, and output-schema adapter so they remain deterministically evaluable. Optional providers are explicitly forbidden in this fixture; their integration requires separate degradation and freshness cases.

@@ -18,4 +18,8 @@ Positive controls cover the canonical Skill package, the admitted routing-case i
 bun tests/ab-selftest.ts
 ```
 
-Positive controls cover a fully matched report, the scoring CLI, a dry run that remains `NOT_EXERCISED`, and byte-identical fixture commits across fresh repositories. Mutations cover a forbidden claim, a missing source anchor, and mem0 evidence promoted without source read-back. A green result proves the mechanism and those mutations only; physical carrier evidence stays outside this shared repository.
+Positive controls cover a source-matched structured report, a separated procedure receipt, the scoring CLI, a dry run that remains `NOT_EXERCISED`, and byte-identical fixture commits across fresh repositories. Mutations cover a forbidden phrase, missing source anchor, mem0 evidence promoted without read-back, wrong predicate value, missing required artifact group, and evaluator/subject mismatch.
+
+Source-mutation sensitivity changes three independent semantics in fresh committed subjects: maximum attempts, fixed versus exponential delay, and absent versus present observability sink. For each mutation, the stale report must fail and the correspondingly adapted structured predicate must pass. Lexical wording is held out of admission, and a high alias score cannot rescue a lower structured/procedure score.
+
+A green result proves only this offline mechanism and its planted mutations. It does not prove carrier-loaded Skill behavior, cross-task procedural generalization, provider integration, or candidate superiority; those require the repeated physical matrix in `../evals/README.md`.

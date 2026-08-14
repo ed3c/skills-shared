@@ -6,6 +6,13 @@
   "parent_issue": 89,
   "depends_on_issue": 92,
   "state": "AB_RUNNER_IMPLEMENTED",
+  "measurement_authority": {
+    "behavior_and_generalization": "../../../docs/SKILL_EVAL_ROADMAP.md",
+    "canonical_run_trace": "../../../evals/schema/run-trace.schema.json",
+    "canonical_scorecard": "../../../evals/schema/skill-scorecard.schema.json",
+    "local_scope": "repo-agent-native fixture predicates and receipts only",
+    "universal_total_score": "PROHIBITED"
+  },
   "baseline": "baseline.json",
   "trigger_cases": "fixtures/trigger-cases.json",
   "scenario_cases": "fixtures/scenarios.json",
@@ -21,14 +28,16 @@
     "module-cannot-override-core",
     "bounded-explicit-script-io"
   ],
-  "metrics": {
-    "anchored_nonforbidden_precision_proxy": 0.20,
-    "required_invariant_recall": 0.18,
-    "negative_invariant_recall": 0.15,
-    "implicit_dependency_recall": 0.15,
-    "source_anchor_validity": 0.12,
-    "tool_fallback_correctness": 0.10,
-    "unsupported_claim_penalty": -0.10
+  "admission_metrics": {
+    "structured_predicate_recall": 0.75,
+    "procedure_contract_coverage": 0.25
+  },
+  "lexical_advisory_metrics": {
+    "lexical_nonforbidden_coverage_proxy": 0.25,
+    "lexical_required_recall": 0.25,
+    "lexical_negative_recall": 0.20,
+    "lexical_dependency_recall": 0.20,
+    "lexical_forbidden_claim_count": -0.10
   },
   "operational_metrics": [
     "input_tokens",
@@ -40,9 +49,18 @@
   "admission": {
     "all_hard_gates": true,
     "critical_regressions_allowed": 0,
-    "weighted_quality_delta_min": 0.01,
+    "admission_quality_delta_min": 0.01,
     "control_quality_delta_min": 0.01,
     "median_instruction_context_cost_delta_max": -0.01
+  },
+  "generalization_admission": {
+    "minimum_repetitions_per_condition": 3,
+    "minimum_real_harnesses": 2,
+    "required_conditions": ["no_skill", "current_skill", "candidate_skill", "wrong_skill"],
+    "required_perturbation_classes": ["source-mutation", "provider-degradation", "memory-conflict", "cross-module-impact"],
+    "lexical_advisory_can_promote": false,
+    "offline_source_mutation_sensitivity": "IMPLEMENTED",
+    "physical_suite_state": "NOT_EXERCISED"
   },
   "planned_runners": {
     "offline_bun": "IMPLEMENTED",

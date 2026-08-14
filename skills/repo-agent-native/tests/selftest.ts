@@ -71,9 +71,9 @@ function makeRepo(root: string): { head: string; report: JsonObject; sourceDiges
       subject: { repository: "selftest/retry", observed_commit: head, observed_tree: null, scope: ["src"], task: "retry contract" },
       routes: ["README absent and recorded"],
       tools: [{ lane: "tier-0", state: "PASS" }],
-      facts: [{ id: "INV-001", claim: "Retries reject limits above three", evidence_level: "A", source_refs: [sourceRef], verification: ["source-read"] }],
-      negative_invariants: [{ id: "NEG-001", claim: "The source does not silently clamp a limit above three", evidence_level: "A", source_refs: [sourceRef], verification: ["source-read"], search_boundary: ["src"], counterexample_sought: "a clamp before the throw" }],
-      implicit_dependencies: [{ id: "DEP-001", claim: "Callers must keep the retry limit at three or below", evidence_level: "C", source_refs: [sourceRef], verification: ["source-read"] }],
+      facts: [{ id: "INV-001", class: "state", claim: "Retries reject limits above three", predicate: { id: "retry.limit_guard", operator: "equals", value: 3 }, evidence_level: "A", source_refs: [sourceRef], verification: ["source-read"] }],
+      negative_invariants: [{ id: "NEG-001", class: "negative-state", claim: "The source does not silently clamp a limit above three", predicate: { id: "retry.clamp_mode", operator: "equals", value: "absent" }, evidence_level: "A", source_refs: [sourceRef], verification: ["source-read"], search_boundary: ["src"], counterexample_sought: "a clamp before the throw" }],
+      implicit_dependencies: [{ id: "DEP-001", class: "caller-precondition", claim: "Callers must keep the retry limit at three or below", predicate: { id: "retry.caller_precondition", operator: "equals", value: "limit<=3" }, evidence_level: "C", source_refs: [sourceRef], verification: ["source-read"] }],
       open_questions: [],
       named_exclusions: ["runtime timing"],
       state: "PASS",
@@ -101,7 +101,7 @@ try {
 
   const invalidMetadata = skillMutation("invalid-metadata", (root) => {
     const path = resolve(root, "SKILL.md");
-    writeFileSync(path, readFileSync(path, "utf8").replace('version: "2.0.0"', "version: 2"));
+    writeFileSync(path, readFileSync(path, "utf8").replace('version: "2.1.0"', "version: 2"));
   });
   let metadataRejected = false;
   try {

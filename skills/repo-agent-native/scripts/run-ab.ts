@@ -333,7 +333,7 @@ async function runOne(options: Options, repetition: number, scenario: JsonObject
         fixture,
         reportValue,
         readJson(expectedPath, "ground truth"),
-        evals.metrics,
+        evals,
       );
       writeJson(resolve(runRoot, "score.json"), score);
     }
@@ -362,6 +362,7 @@ async function runOne(options: Options, repetition: number, scenario: JsonObject
         ground_truth_sha256: sha256(readFileSync(expectedPath)),
         eval_config_sha256: sha256(readFileSync(evalsPath)),
         scorer_sha256: sha256(readFileSync(resolve(SCRIPT_ROOT, "score-ab-output.ts"))),
+        predicate_evaluator_sha256: sha256(readFileSync(resolve(SCRIPT_ROOT, "evaluate-retry-predicates.ts"))),
       },
       execution: {
         exit: result.exit,
@@ -378,7 +379,13 @@ async function runOne(options: Options, repetition: number, scenario: JsonObject
         max_budget_usd: options.carrier === "claude" ? Number(CLAUDE_MAX_BUDGET_USD) : null,
         retries: 0,
       },
-      score: score ? { hard_gate: score.hard_gate, weighted_quality: score.weighted_quality } : null,
+      score: score ? {
+        hard_gate: score.hard_gate,
+        procedure_hard_gate: score.procedure_hard_gate,
+        admission_quality: score.admission_quality,
+        lexical_advisory: score.lexical_advisory,
+        structured_predicates: score.structured_predicates,
+      } : null,
       state: result.exit === 0 && !result.timedOut && parseError === null && score?.hard_gate === "PASS" ? "PASS" : "FAIL",
     };
     writeJson(resolve(runRoot, "receipt.json"), receipt);

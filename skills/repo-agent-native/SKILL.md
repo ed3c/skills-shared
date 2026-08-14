@@ -4,7 +4,7 @@ description: Extract source-anchored repository invariants, negative assumptions
 license: MIT
 compatibility: Codex CLI, Claude Code, and Agent Skills-compatible coding agents with repository read/search access; optional capabilities may accelerate retrieval but are never evidence authorities.
 metadata:
-  version: "2.0.0"
+  version: "2.1.0"
   procedure: "source-anchored-repository-analysis"
 ---
 
@@ -97,7 +97,9 @@ Stop states are data, not prose: `SUBJECT_ABSENT`, `SUBJECT_IDENTITY_MUTABLE`, `
 ## S7 — Assert
 
 - The host executes code; the Skill describes how. Use explicit executable/arguments, bounded inputs/effects, timeout, and subject-bound receipts—never raw model-generated shell strings.
-- Treat deterministic structure/source/test assertions as hard only for their declared subject. Keep qualitative review advisory unless independently calibrated.
+- Express evaluable claims as stable predicate identity, operator, scalar value, and source reference. The independent evaluator re-observes that predicate from the exact Git subject; answer wording and alias matches cannot satisfy it.
+- Separate evidence origins in the procedure receipt: `verifier_observed`, `artifact_asserted`, and `model_reported_advisory`. A model saying it routed, read back, or used a fallback is never execution proof.
+- Treat deterministic structure/source/test assertions as hard only for their declared subject. Keep lexical and qualitative review advisory unless independently calibrated; advisory signals cannot promote or rescue a failed hard gate.
 - Follow [scripts/README.md](scripts/README.md) and [OUTPUT_CONTRACT.md](references/OUTPUT_CONTRACT.md); preserve exit `0` accepted, `2` assertion failure, `64` invalid/absent input, and `70` mechanism error.
 - On failure, repair and rerun the same assertion at most three times. Preserve errors, then stop and question the abstraction.
 
@@ -105,7 +107,7 @@ Stop states are data, not prose: `SUBJECT_ABSENT`, `SUBJECT_IDENTITY_MUTABLE`, `
 
 Report exact subject/scope, routes, claims and levels, absence boundaries, unresolved inferences/edges, capabilities and fallbacks, executed commands/exits/receipts, artifact identities, remaining evidence states, Human Admit, and rollback subject.
 
-Do not claim model-output superiority from structure or one successful sample. Physical comparisons follow the preregistered contract in [evals/README.md](evals/README.md) and require hard-gate non-regression plus aggregate improvement.
+Do not claim model-output superiority from structure, alias recall, offline mutations, or one successful sample. Physical comparisons follow the preregistered contract in [evals/README.md](evals/README.md) and require hard-gate non-regression, source-mutation sensitivity, repeated no/current/candidate/wrong conditions, and cross-harness aggregate improvement.
 
 ## Module law
 

@@ -294,6 +294,7 @@ export function validateSkill(skillRootInput: string): { failures: Failure[]; sk
   for (const path of [
     "scripts/validate-skill.ts",
     "scripts/assert-output.ts",
+    "scripts/evaluate-retry-predicates.ts",
     "scripts/score-ab-output.ts",
     "scripts/compare-ab.ts",
     "scripts/run-ab.ts",

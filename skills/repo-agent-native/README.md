@@ -15,7 +15,7 @@
 | Optional tool selection and fallback | `references/TOOL_ROUTING.md` |
 | Domain/tool instance triggers | `modules/README.md` and the selected module only |
 | A/B cases, weights, and admission rule | `evals/evals.json` and `evals/README.md` |
-| Executable structural, output, and A/B assertions | `scripts/validate-skill.ts`, `scripts/assert-output.ts`, `scripts/score-ab-output.ts`, and `scripts/run-ab.ts` |
+| Executable structural, output, source-predicate, and A/B assertions | `scripts/validate-skill.ts`, `scripts/assert-output.ts`, `scripts/evaluate-retry-predicates.ts`, `scripts/score-ab-output.ts`, and `scripts/run-ab.ts` |
 | Positive, mutation, exit-code, and A/B mechanism controls | `tests/selftest.ts` and `tests/ab-selftest.ts` |
 | Merge, provider activation, legal admission | Human Admit |
 
@@ -124,6 +124,8 @@ bun scripts/run-ab.ts --carrier <codex|claude> --condition <condition> \
 
 The first two commands write subject-bound JSON receipts; the selftest uses disposable local fixtures and writes no durable evidence. Exit `0` means the declared subject passed, `2` means an evaluated hard assertion failed, `64` means usage or required input was invalid/absent, and `70` means the checker itself failed. See `scripts/README.md` and `tests/README.md` for the full boundary.
 
+The A/B admission score is computed from independently re-observed structured predicates and a bounded procedure contract. Lexical aliases are diagnostic only. `no_skill` installs no Skill and receives no optional-provider or procedural knowledge beyond the common task/subject/schema adapter; it cannot be treated as if grepai, Serena, Code-Graph-RAG, or mem0 ran automatically.
+
 A receipt proves only what was executed against its recorded subject. It does not prove a provider is currently running, an index is current, a carrier loaded the Skill, a pull request is mergeable, or a Human admitted promotion. Those live states require separate observations.
 
 ## Migration stack
@@ -144,8 +146,11 @@ portable-core rewrite                IMPLEMENTED on this feature branch
 deterministic Bun assertions         IMPLEMENTED on this feature branch
 positive/mutation controls           IMPLEMENTED on this feature branch
 blind A/B runner and scorer          IMPLEMENTED on this feature branch
+structured source-predicate observer IMPLEMENTED for the retry fixture
+offline source-mutation sensitivity  IMPLEMENTED for attempts/delay/sink
 Claude Code live carrier             NOT_EXERCISED by repository source; publish receipts separately
 Codex CLI live carrier               NOT_EXERCISED by repository source; publish receipts separately
+cross-harness generalization matrix  NOT_EXERCISED
 Bettor portable binding              NOT_IMPLEMENTED in this phase
 ```
 
