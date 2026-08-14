@@ -183,6 +183,27 @@
         "scripts/skill_eval_plane_selftest.py"
       ],
       "note": "#16 n13: an empty runnable array declares no coverage, which must not read as complete coverage."
+    },
+    {
+      "id": "worker-publication-markers",
+      "file": "skills/git-town-stacked-pr-worker/scripts/check_publication_boundary.py",
+      "anchor": "        raise ContractError(f\"{relative}: missing markers: {missing}\")",
+      "verify": [
+        "python3",
+        "skills/git-town-stacked-pr-worker/scripts/check_publication_boundary.py",
+        "--selftest"
+      ],
+      "note": "#47: require_markers is what enforces every stated blocking condition in the Worker's instruction surface. Without it the laws stay in the prose and nothing notices when one is deleted."
+    },
+    {
+      "id": "ctl-profile-official-standard",
+      "file": "skills/controlled-technical-language-harness/scripts/check_profile_admission.py",
+      "anchor": "    if pack[\"source\"][\"classification\"] != \"OFFICIAL_STANDARD\":",
+      "verify": [
+        "bash",
+        "skills/controlled-technical-language-harness/tests/profile-admission/verify.sh"
+      ],
+      "note": "#47 sweep: a proposal-derived profile must not be admitted as the official standard. Registered to prove this selftest can go red at all, after the same class of hollow mutation was found in check_publication_boundary.py."
     }
   ]
 }

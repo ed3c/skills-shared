@@ -101,6 +101,14 @@ def check_skill(root: Path) -> None:
             "ready-for-review",
             "batched-repair",
             "billing-open",
+            # These four shared one line with `billing-open`, so deleting the
+            # line was caught -- but deleting only these was not. Four of the
+            # five blocking conditions #47 names had no control at all; the
+            # guard looked like it worked because of the fifth.
+            "stale local verification",
+            "old-SHA checks",
+            "repeated feedback",
+            "ambiguous PR identity",
             "Background synchronization may never invoke `git town sync --push`",
             "local sync, local verification, publication decision, remote publication",
         ),
@@ -141,6 +149,8 @@ def check_policy(root: Path) -> None:
             "git town sync --push",
             "snapshot state is:\n\n```text\nbilling-open",
             "owner-authored recovery receipt",
+            "exact-HEAD local verification receipt",
+            "a planted stale-head or billing-open case fails closed",
             "cancel-in-progress: true",
             "SKIPPED_BY_POLICY",
             "local sync",
@@ -175,6 +185,7 @@ def check_profile_fragment(root: Path) -> None:
             "draft_checkpoint_push: denied",
             "feedback_reuse: denied",
             "exact_head_required: true",
+            "a receipt for an older SHA is stale.",
             "draft_pr_runner_policy: no-runner",
             "obsolete_head_policy: cancel-in-progress",
             "mode: fail-closed",
@@ -231,6 +242,7 @@ def check_adoption_fragment(root: Path) -> None:
             "PUBLICATION_POLICY.md",
             "draft PR is visible without a runner-backed trusted job",
             "ready-for-review causes one exact-head trusted run",
+            "a stale receipt/check and repeated feedback block",
             "billing-open",
             "merge and promotion remain Human Admit",
         ),
@@ -351,12 +363,30 @@ def validate(root: Path) -> None:
 
 
 def copy_contract(source: Path, target: Path) -> None:
-    for relative in REQUIRED_FILES | {
-        "scripts/check_publication_boundary.py",
-        "tests/publication-boundary/verify.sh",
-    }:
+    """Copy everything validate() reads, including what evals.json points at.
+
+    Anything left behind makes the fixture fail before a mutation is even
+    applied, and expect_red then reports every mutation as killed while killing
+    none of them.
+    """
+    extra = {"scripts/check_publication_boundary.py", "tests/publication-boundary/verify.sh"}
+    try:
+        document = json.loads((source / "evals.json").read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        document = {}
+    for case in document.get("runnable", []):
+        if not isinstance(case, dict):
+            continue
+        for field in ("checker_script", "test_verify", "intent_contract",
+                      "good_fixture", "hollow_fixture"):
+            value = case.get(field)
+            if isinstance(value, str):
+                extra.add(value)
+    for relative in REQUIRED_FILES | extra:
         src = source / relative
-        if src.is_file():
+        if src.is_dir():
+            shutil.copytree(src, target / relative, dirs_exist_ok=True)
+        elif src.is_file():
             dst = target / relative
             dst.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(src, dst)
@@ -366,6 +396,19 @@ def expect_red(name: str, root: Path, mutate) -> None:
     with tempfile.TemporaryDirectory(prefix=f"gtsp-{name}.") as temp:
         fixture = Path(temp) / "skill"
         copy_contract(root, fixture)
+        # The baseline has to be green or the mutation proves nothing. This
+        # selftest reported "5 mutations killed" for its whole life while
+        # killing none: copy_contract left out a script evals.json names, so
+        # every fixture was already red and every mutation "passed" for a reason
+        # that had nothing to do with the guard under test. A red baseline is a
+        # broken fixture, which is a different finding from a live guard.
+        try:
+            validate(fixture)
+        except ContractError as error:
+            raise ContractError(
+                f"selftest fixture is red before mutation {name!r}, so the "
+                f"mutation would prove nothing: {error}"
+            ) from error
         mutate(fixture)
         try:
             validate(fixture)
@@ -419,6 +462,55 @@ def selftest(root: Path) -> None:
             "| combined green state |",
         ),
     )
+    # The stale-receipt law, in each of the two files that compose the Worker's
+    # instruction surface and in the two that consumers read. Deleting the whole
+    # SKILL.md line was already caught, but only because `billing-open` sat on
+    # it; these four conditions had no control of their own.
+    expect_red(
+        "drop-stale-receipt-law",
+        root,
+        lambda fixture: replace_once(
+            fixture / "SKILL.md",
+            "stale local verification, old-SHA checks, repeated feedback, or ambiguous PR identity",
+            "other conditions",
+        ),
+    )
+    expect_red(
+        "drop-exact-head-receipt",
+        root,
+        lambda fixture: replace_once(
+            fixture / "PUBLICATION_POLICY.md",
+            "exact-HEAD local verification receipt",
+            "local verification receipt",
+        ),
+    )
+    expect_red(
+        "drop-stale-head-control",
+        root,
+        lambda fixture: replace_once(
+            fixture / "PUBLICATION_POLICY.md",
+            "a planted stale-head or billing-open case fails closed",
+            "a planted billing-open case fails closed",
+        ),
+    )
+    expect_red(
+        "drop-older-sha-definition",
+        root,
+        lambda fixture: replace_once(
+            fixture / "references/GITHUB_ACTIONS_PUBLICATION_PROFILE.template.md",
+            "a receipt for an older SHA is stale.",
+            "receipt freshness is advisory.",
+        ),
+    )
+    expect_red(
+        "drop-adoption-stale-check",
+        root,
+        lambda fixture: replace_once(
+            fixture / "references/GITHUB_ACTIONS_PUBLICATION_ADOPTION.md",
+            "a stale receipt/check and repeated feedback block",
+            "repeated feedback blocks",
+        ),
+    )
     expect_red(
         "drop-policy-composition",
         root,
@@ -428,7 +520,7 @@ def selftest(root: Path) -> None:
             "Compose the target Agent instruction surface from the base prompt only",
         ),
     )
-    print("SELFTEST GREEN: Git Town / GitHub Actions publication boundary (5 mutations killed)")
+    print("SELFTEST GREEN: Git Town / GitHub Actions publication boundary (10 mutations killed)")
 
 
 def main(argv: list[str] | None = None) -> int:
