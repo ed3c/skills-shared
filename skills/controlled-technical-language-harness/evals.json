@@ -1,8 +1,8 @@
 {
   "skill_name": "controlled-technical-language-harness",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "_meta": {
-    "coverage_metric": "profile source-identity honesty, edition immutability, Human-owned terminology and compliance boundaries, ruleset binding, profile optionality, and uncommitted official bytes; deterministic tokenization and word budgets; calibrated-heuristic admission and composition",
+    "coverage_metric": "profile source-identity honesty, edition immutability, Human-owned terminology and compliance boundaries, ruleset binding, profile optionality, and uncommitted official bytes; deterministic tokenization and word budgets; calibrated-heuristic admission and composition; source-node preservation for structured XML; extraction-quality declaration; privacy class to execution lane routing",
     "purpose": "Prove that a proposal-derived controlled-language profile cannot present itself as an official standard edition, cannot bind a ruleset it does not have, cannot become a mandatory core dependency, and cannot relax the deterministic, privacy, or Human Admit boundaries."
   },
   "runnable": [
@@ -55,6 +55,38 @@
         "a heuristic PASS cannot hide a deterministic FAIL, and an errored evaluator is not a passing one"
       ],
       "expected": "selftest green; all 14 planted admission and composition defects refused"
+    },
+    {
+      "id": "CTL-DOCUMENT-1",
+      "checker_script": "scripts/check_document_preservation.py",
+      "test_verify": "tests/document-privacy/verify.sh",
+      "good_fixture": "an S1000D-like and a DITA-like fixture, plus a faithful rewrite that changes prose inside preserved nodes",
+      "hollow_fixture": "outputs that are well-formed XML but drop a warning or caution, reorder steps while keeping the same text, drop an identifier or cross-reference, remove a step, or are malformed; format declarations that trigger on the wrong content; extractions with undeclared or contradictory quality",
+      "covers": [
+        "a dropped safety node is refused even when the output is well-formed",
+        "reordered steps with unchanged text are reported separately from removal",
+        "identifiers and cross-reference targets survive a rewrite",
+        "a structured-XML module cannot trigger on plain text and a text module cannot trigger on XML",
+        "extraction quality must be declared, and PARTIAL or GARBLED blocks semantic PASS",
+        "a structure reported as unrecovered contradicts a COMPLETE extraction"
+      ],
+      "expected": "faithful rewrites preserved; 19 planted preservation, trigger and extraction defects refused; CLI exits 2 on a lossy rewrite and 64 on an absent file"
+    },
+    {
+      "id": "CTL-PRIVACY-1",
+      "checker_script": "scripts/check_privacy_routing.py",
+      "test_verify": "tests/document-privacy/verify.sh",
+      "good_fixture": "every privacy class routed at its own ceiling, including CONFIDENTIAL external with a matching human approval",
+      "hollow_fixture": "RESTRICTED routed off-box or with network enabled, INTERNAL sent externally, CONFIDENTIAL external without approval or approved by an agent or for a different subject, a provider healthy but unadmitted, a provider admitted but unhealthy, secrets or machine paths in a durable receipt, an undeclared fallback",
+      "covers": [
+        "RESTRICTED always routes LOCAL_ONLY with network disabled",
+        "a class may be processed more privately than its ceiling but never less",
+        "CONFIDENTIAL external processing needs a human approval bound to the same document digest",
+        "provider health and privacy admission are separate states and neither substitutes for the other",
+        "an admitted but unhealthy provider blocks rather than falling back to an unadmitted lane",
+        "durable receipts carry no token, session, key or machine path, and a fallback must be declared"
+      ],
+      "expected": "every class routable at its ceiling; 16 planted routing defects refused"
     }
   ],
   "evidence_boundary": {
@@ -64,6 +96,11 @@
     "semantic_rewrite_quality": "NOT_IMPLEMENTED",
     "compliance_claim": "REQUIRED",
     "heuristic_admission_boundary": "IMPLEMENTED",
-    "heuristic_implementations": "NOT_IMPLEMENTED"
+    "heuristic_implementations": "NOT_IMPLEMENTED",
+    "source_node_preservation": "IMPLEMENTED",
+    "privacy_routing_contract": "IMPLEMENTED",
+    "real_s1000d_or_dita_schema_validation": "NOT_EXERCISED",
+    "pdf_extraction_itself": "NOT_EXERCISED",
+    "live_provider_or_endpoint": "NOT_EXERCISED"
   }
 }
