@@ -28,6 +28,7 @@ on:
       - 'scripts/build_verified_run.py'
       - 'scripts/check_intent_bound_constraints.py'
       - 'scripts/check_intent_promotions.py'
+      - 'migration/**'
       - 'scripts/check_controlled_language_contracts.py'
       - 'scripts/controlled_language/**'
       - 'skills/shared-skills-infra/scripts/check_dead_assertions.py'
@@ -104,6 +105,16 @@ jobs:
             --violation evals/fixtures/controlled-language/valid-violation.json \
             --receipt evals/fixtures/controlled-language/valid-receipt.json
           python3 -m unittest tests/test_controlled_language_contracts.py -v
+      - name: Run migration tooling selftests
+        shell: bash
+        run: |
+          set -euo pipefail
+          # These live outside skills/, so check_suite_ci_coverage.py cannot see
+          # them. Without this step they have no CI arrival at all.
+          for tool in migration/*.py; do
+            printf -- '--- %s\n' "${tool}"
+            python3 "${tool}" --selftest
+          done
       - name: Validate intent-promotion lifecycle and writeback gate
         run: |
           python3 scripts/check_intent_promotions.py contract evals/fixtures/intent-promotion/valid-contract.json
