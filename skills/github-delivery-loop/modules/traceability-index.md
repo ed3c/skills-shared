@@ -38,6 +38,7 @@ A missing link is named explicitly. Similar content or a later branch does not s
 | `DEC-DELIVERY-05` | GitHub live capture and zero-network policy evaluation are separate producers. | `github_actions_snapshot.py`, `ci_publish_gate.py` |
 | `DEC-DELIVERY-06` | Git Town synchronizes branch hierarchy; it does not own push, merge, promotion, or semantic conflict repair. | [`../../git-town-stacked-pr-worker/README.md`](../../git-town-stacked-pr-worker/README.md) |
 | `DEC-DELIVERY-07` | Independent path-disjoint work uses sibling branches; only true byte dependencies form a stack. | Git Town README and task packets |
+| `DEC-DELIVERY-09` | An absent open pull request does not prove an absent remote branch; the initial boundary requires an independently observed `refs/heads/<exact>`. | `github_actions_snapshot.py --strict`, issue #70 |
 | `DEC-DELIVERY-08` | Documentation explains state and ownership but cannot become a second API or evidence authority. | [`../README.md`](../README.md), issues #78 and PR #80 |
 
 ## 4. Canonical publication-policy line
@@ -48,7 +49,7 @@ A missing link is named explicitly. Similar content or a later branch does not s
 | Policy PR | [#44](https://github.com/ed3c/skills-shared/pull/44) | merged to `main` | `DELIVERY-5`, focused local selftests, evidence-producer tests |
 | Main mechanism | [`../scripts/ci_publish_gate.py`](../scripts/ci_publish_gate.py) | present | exact policy input validation and stable ALLOW/BLOCK reasons |
 | Local producer | [`../scripts/local_verification.py`](../scripts/local_verification.py) | present | fixed argv, exact clean HEAD, bounded output, safe environment |
-| GitHub producer | [`../scripts/github_actions_snapshot.py`](../scripts/github_actions_snapshot.py) | present | capture/replay, one PR, exact check identity, billing annotation classification |
+| GitHub producer | [`../scripts/github_actions_snapshot.py`](../scripts/github_actions_snapshot.py) | present | capture/replay, one PR, exact check identity, billing annotation classification, independently observed branch ref under `--strict` |
 | Method document | [`github-actions-cost-control.md`](github-actions-cost-control.md) | present | workflow pattern and evidence boundary |
 | Current live billing state | external | `NOT_EXERCISED` in repository docs | requires fresh trusted snapshot |
 | GitHub/Forgejo equivalence | external | `NOT_EXERCISED` | requires exact commit/tree/release equivalence receipt |

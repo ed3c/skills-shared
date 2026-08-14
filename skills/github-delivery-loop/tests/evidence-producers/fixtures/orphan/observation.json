@@ -1,0 +1,21 @@
+{
+  "branch": {
+    "head_sha": null,
+    "name": "feature"
+  },
+  "branch_ref": {
+    "object_sha": "2222222222222222222222222222222222222222",
+    "observed": true,
+    "queried_ref": "refs/heads/feature"
+  },
+  "captured_at": "2026-08-12T05:02:00Z",
+  "check_runs": [],
+  "pull_requests": [],
+  "repository": {
+    "full_name": "ed3c/skills-shared",
+    "owner_login": "ed3c",
+    "private": true,
+    "repository_id": 1326262274
+  },
+  "schema": "github-actions-publish-observation/v1"
+}

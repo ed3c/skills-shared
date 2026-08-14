@@ -88,6 +88,42 @@ if python3 "${snapshot}" replay \
 fi
 grep -q "stale head" "${scratch}/stale.err"
 
+# The strict lane. Without an independently observed ref these two
+# observations are byte-identical apart from a field nothing reads, which is
+# the defect #70 names: an absent pull request is not an absent branch.
+python3 "${snapshot}" replay \
+  --observation "${fixtures}/initial/observation.json" \
+  --check-name contract --strict \
+  --output "${scratch}/initial-snapshot.json"
+python3 - "${scratch}/initial-snapshot.json" <<'PYEOF'
+import json, pathlib, sys
+value = json.loads(pathlib.Path(sys.argv[1]).read_text())
+assert value["initial_boundary"] == "trusted-initial", value["initial_boundary"]
+assert value["pull_request"]["state"] == "absent"
+PYEOF
+
+if python3 "${snapshot}" replay \
+  --observation "${fixtures}/orphan/observation.json" \
+  --check-name contract --strict \
+  --output "${scratch}/orphan-snapshot.json" \
+  >"${scratch}/orphan.out" 2>"${scratch}/orphan.err"; then
+  echo "FAIL: an orphaned remote branch passed as an initial publication" >&2
+  exit 1
+fi
+grep -q "remote branch exists without an open pull request" "${scratch}/orphan.err"
+
+# Lenient mode still replays it, but says so rather than claiming an initial
+# boundary it cannot support.
+python3 "${snapshot}" replay \
+  --observation "${fixtures}/orphan/observation.json" \
+  --check-name contract \
+  --output "${scratch}/orphan-lenient.json"
+python3 - "${scratch}/orphan-lenient.json" <<'PYEOF'
+import json, pathlib, sys
+value = json.loads(pathlib.Path(sys.argv[1]).read_text())
+assert value["initial_boundary"] == "branch-present-without-pr", value["initial_boundary"]
+PYEOF
+
 python3 "${local_verify}" --selftest
 python3 "${snapshot}" --selftest
 

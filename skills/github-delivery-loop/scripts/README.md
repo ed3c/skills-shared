@@ -10,7 +10,7 @@ This directory contains the executable mechanisms for delivery evidence, GitHub 
 | [`delivery_sync.py`](delivery_sync.py) | sync public/compatibility adapter | depends on mode | delegates | normalized sync result |
 | [`delivery_sync_impl.py`](delivery_sync_impl.py) | delivery derivation implementation | snapshot or trusted GitHub lane | writes bounded outputs | receipt, publication attestation, metrics, dashboard |
 | [`local_verification.py`](local_verification.py) | exact-HEAD local verification | none | receipt/evidence output only | `github-delivery-local-verification/v1` |
-| [`github_actions_snapshot.py`](github_actions_snapshot.py) | GitHub observation capture/replay | capture: read-only GitHub; replay: none | observation/snapshot files only | normalized PR/check/billing snapshot |
+| [`github_actions_snapshot.py`](github_actions_snapshot.py) | GitHub observation capture/replay | capture: read-only GitHub; replay: none | observation/snapshot files only | normalized PR/check/billing snapshot plus an `initial_boundary` that `--strict` refuses to guess |
 | [`ci_publish_gate.py`](ci_publish_gate.py) | CI publication admission | none | none | one ALLOW operation or stable BLOCK reason |
 | [`merge_gate.py`](merge_gate.py) | merge authority preflight/landing | preflight/land: GitHub and host policy planes | land may request merge after Human Admit | preflight result or merge result |
 | [`reference_causality.py`](reference_causality.py) | reference/evidence causality | none | none | causal validation result |
