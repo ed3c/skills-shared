@@ -1,133 +1,227 @@
-# Intent Promotion
+# Intent Promotion: Subject-Bound Design Intent and Durable Writeback
 
-> Status: lifecycle and receipt mechanics only. Nothing here connects to a
-> memory provider, mutates `CONTEXT.md`, approves a business rule, establishes
-> merge truth, or performs a production writeback.
+## Status
 
-Extends the Intent-Bound Constraint control plane
-([`evals/schema/intent-bound-constraint.schema.json`](../../evals/schema/intent-bound-constraint.schema.json)).
-It does not introduce a second meta-evaluator authority.
-
-## The substitutions this prevents
-
-Each of these looks like evidence of the next state, and is not:
+This document defines the portable governance contract implemented by:
 
 ```text
-a PR was opened            → so the intent is durable
-CI went green              → so the intent is verified
-a flag was passed          → so a human approved
-prose says the same thing  → so the old record can be replaced
+evals/schema/intent-promotion-contract.schema.json
+evals/schema/intent-promotion-receipt.schema.json
+scripts/check_intent_promotions.py
+tests/test_intent_promotions.py
 ```
 
-The first three infer authority from an event that never carried it. The fourth
-replaces history with resemblance. A well-formed receipt can assert any of them,
-which is why the gate is separate from the schema.
+The source PDF proposes that an intent can move from a working hypothesis through
+local checks, PR/CI review, and permanent `CONTEXT.md` or memory writeback. This
+repository retains that lifecycle idea, but separates events from authority.
+
+```text
+PR opened             != durable intent
+CI green              != owning exact-head evidence
+caller flag           != Human approval
+semantic similarity   != permission to overwrite history
+```
+
+The PDF remains `SOURCE_PROPOSAL`. This contract does not perform a memory write,
+edit `CONTEXT.md`, approve a business rule, or establish official compliance.
 
 ## Lifecycle
 
 ```text
 HYPOTHESIS
-→ CANDIDATE
-→ PROPOSED
-→ VERIFIED
-→ ADMITTED
-→ CANONICAL
-→ SUPERSEDED | REVOKED
+  -> CANDIDATE
+  -> PROPOSED
+  -> VERIFIED
+  -> ADMITTED
+  -> CANONICAL
+
+ADMITTED | CANONICAL
+  -> SUPERSEDED | REVOKED
 ```
 
-| State | What it takes to enter | What it may write |
+| Target state | Required evidence | Durable writeback |
 |---|---|---|
-| `HYPOTHESIS` | nothing | nothing durable |
-| `CANDIDATE` | nothing | nothing durable |
-| `PROPOSED` | an exact branch or PR subject | nothing durable |
-| `VERIFIED` | owning evaluator receipts at the **exact head** | nothing durable |
-| `ADMITTED` | an admitted merge or release subject binding this candidate | module and project scope |
-| `CANONICAL` | human approval bound to that commit | root/global scope |
-| `SUPERSEDED` | a named supersession target | nothing |
-| `REVOKED` | human approval | nothing |
+| `CANDIDATE` | local evaluator on the exact candidate | forbidden |
+| `PROPOSED` | local evaluator plus exact PR head | forbidden |
+| `VERIFIED` | local plus registered owning CI on the exact head | forbidden |
+| `ADMITTED` | exact PR, owning CI, and admitted merge/release subject | declared module/project destinations only |
+| `CANONICAL` | admitted subject plus exact Human approval | declared root/global destinations when explicitly authorized |
+| `SUPERSEDED` | admitted subject and append-only supersession lineage | history only; never current projection |
+| `REVOKED` | admitted subject, Human approval, and reason | history only; never current projection |
 
-`HYPOTHESIS` and `CANDIDATE` are the only non-authoritative states, and the
-contract may not widen that set — widening it is how a guess reaches durable
-memory.
+`VERIFIED` is evidence about a candidate. It is not permission to mutate durable
+memory. The minimum durable state is `ADMITTED`.
 
-**Durable projection begins at `ADMITTED`, for every scope.** `VERIFIED` means
-the evidence held at one commit; it does not mean the change survived review and
-landed. The contract schema's `minimum_state` enum is `ADMITTED | CANONICAL`, so
-authorising a durable write at PR-open or CI-green is unexpressible rather than
-merely refused — an earlier version guarded only `ROOT_GLOBAL`, which left
-module and project destinations reachable from `VERIFIED`.
+## Exact identity
 
-## Laws
+The contract binds:
 
-1. **Evidence is bound to a commit, not to a pipeline.** An evaluator receipt
-   whose `subject_commit_sha` or `subject_tree_sha` differs from the promoted
-   subject is refused. An old receipt does not carry forward, however green it
-   was.
-2. **"Owning" is an identity, not a label.** Naming an evaluator and writing
-   `status: PASS` is something any caller can do. An admitted run must also
-   carry the evaluator's pinned version, its artifact digest, its own receipt
-   reference and digest, and an execution origin — none of which can be produced
-   without the evaluator and its receipt existing. Duplicate evaluator ids are
-   refused, because a repeated run can pad a receipt with the appearance of
-   independent coverage.
-3. **A merge subject must bind the candidate it admitted.** A non-null
-   `merge_subject` proved nothing; a syntactically valid random SHA satisfied it.
-   It must now name the same repository, the same candidate head and tree as the
-   promoted subject, and a forge readback observed at the merge commit it is
-   offered as evidence for. A release artifact is a distinct object from a
-   commit, and reusing the commit identity as its digest is refused.
-4. **A flag requests approval; it cannot be one.** A caller flag naming
-   `override` or `approve` with no human approval receipt is refused.
-5. **An agent cannot manufacture the approval that authorises it.** The
-   approver kind must be `HUMAN`, the approval must name the same commit being
-   promoted, and it must carry `generated_by_agent: false`, a review reference,
-   and a trusted readback source. An agent can write `approver_kind: HUMAN`; it
-   cannot honestly write `generated_by_agent: false`, which turns the
-   substitution from an omission into a stated lie.
-6. **Root/global destinations are reachable only from `CANONICAL`**, and must
-   be declared `human_owned`.
-7. **Writeback is append-only, and lineage needs a ledger.** A `SUPERSEDE`
-   writeback must name the receipt it replaces, and that predecessor must exist
-   in the append-only ledger, still be current, and match on digest, state,
-   subject and intent. Without a ledger, `supersedes` is a claim about a
-   predecessor nothing can confirm ever existed — an unverifiable lineage claim
-   is not lineage. Similarity is never lineage.
-8. **A terminal intent projects nothing, and is not current.** A `SUPERSEDED`
-   or `REVOKED` receipt carrying a writeback is refused, and so is one still
-   marked `current` in the ledger.
-9. **Rules and evidence move together.** The receipt binds the contract's byte
-   digest, so a receipt issued under different rules than the ones being applied
-   is refused rather than silently re-interpreted.
-10. **Free-form private reasoning is never persisted**, at any nesting depth.
-    A `chain_of_thought`, `reasoning`, `scratchpad`, `private_notes` or
-    `thinking` field anywhere in a contract or receipt is refused.
-
-## Running the gate
-
-```bash
-python3 scripts/check_intent_promotions.py contract <contract.json>
-python3 scripts/check_intent_promotions.py receipt <receipt.json> \
-  --contract <contract.json> --ledger <ledger.json>
-python3 scripts/check_intent_promotions.py selftest
+```text
+repository + contract commit + contract tree
+Intent-Bound contract path + Git blob SHA
+evaluator id + version + implementation path + implementation digest
+candidate commit + tree + PR head
+admitted merge/release identity
+Human approval subject and allowed actions
+writeback content digest + locator + authority subject
+supersession receipt lineage
 ```
 
-`selftest` plants 50 defects — one per law above, plus each control named in
-the owning issues — and requires every one to be refused, so a law that stops
-biting is reported rather than assumed.
+A parent, candidate, evaluator, bound Intent-Bound contract, or contract-byte
+change invalidates older receipts.
 
-Exit codes separate two events that look alike: `2` is a promotion that was
-evaluated and refused, `64` is an input that could not be evaluated at all.
-Collapsing them makes a mistyped path read as a policy failure, which is the
-more dangerous direction — it looks like the gate is working.
+## Evaluator authority
+
+The contract owns an evaluator registry. A receipt cannot invent an evaluator
+name or reuse another green workflow.
+
+```text
+LOCAL
+  deterministic candidate evidence
+
+OWNING_CI
+  exact-head hosted execution for this contract
+
+EXTERNAL
+  separately admitted observation; never implied by LOCAL or OWNING_CI
+```
+
+The gate requires exact equality for evaluator version, implementation path,
+implementation digest, authority, and `owning` state. Every evaluator receipt
+must bind the promoted candidate commit.
+
+## PR and admission boundary
+
+An exact PR subject includes:
+
+```text
+repository
+PR number
+head SHA
+base ref
+state
+observation digest
+```
+
+An admitted subject includes:
+
+```text
+MERGE_COMMIT | RELEASE_ARTIFACT
+repository
+source head SHA
+admitted identity
+ADMITTED status
+receipt digest
+```
+
+`ADMITTED` is refused when the admitted subject came from a different candidate
+head. A merge-shaped object with no source-head binding cannot authorize
+writeback.
+
+## Writeback policy
+
+Destinations declare:
+
+```text
+destination id
+scope
+TRANSIENT | DURABLE
+allowed states
+locator prefix
+Human-owned flag
+```
+
+Each writeback declares:
+
+```text
+locator
+content digest
+APPEND | SUPERSEDE | REVOKE
+authority subject
+current_projection
+```
+
+Rules:
+
+1. A transient writeback binds the candidate commit.
+2. A durable writeback binds the admitted merge/release identity.
+3. Durable writeback starts at `ADMITTED`.
+4. Root/global writeback requires `CANONICAL`.
+5. A Human-owned destination requires an approval action
+   `WRITE:<destination-id>`.
+6. `SUPERSEDE` requires exact prior receipt lineage.
+7. Terminal transitions may append history only.
+8. A terminal history record sets `current_projection: false`.
+9. Similarity is discovery evidence only. Similarity never authorizes update or
+   deletion.
+
+## Human Admit
+
+A caller may request approval. A caller cannot create approval.
+
+```text
+--allow-root-override
+--approve
+approve=true
+```
+
+These values are non-authoritative inputs. A valid Human approval receipt binds:
+
+```text
+Human identity
+approval state ADMITTED
+exact admitted subject
+allowed actions
+receipt digest
+```
+
+An Agent or automation-generated approval is rejected. Approval for a different
+commit or admitted identity is rejected.
+
+## Stable exits
+
+```text
+0   admitted subject passed
+2   readable subject violated contract or policy
+64  usage, missing file, invalid UTF-8, or malformed JSON
+70  evaluator implementation failed
+```
+
+This distinction prevents an absent input from being reported as a policy
+failure and prevents a checker crash from being reported as a document failure.
+
+## Controls
+
+The selftest and unit tests cover at least:
+
+- PR-open to durable-memory false promotion;
+- foreign green workflow replacing owning CI;
+- stale evaluator version/digest or old candidate SHA;
+- stale PR head;
+- admitted subject from another head;
+- durable locator outside its declared scope;
+- root write with only a caller flag;
+- Agent-created approval;
+- approval for another admitted subject;
+- similarity-style overwrite without lineage;
+- terminal intent retained as current projection;
+- changed contract bytes;
+- changed Intent-Bound contract identity;
+- private reasoning persistence;
+- exit-code collapse between refusal and unusable input.
 
 ## Evidence boundary
 
 ```text
-lifecycle and receipt mechanics       IMPLEMENTED
-contract/receipt digest binding       IMPLEMENTED
-memory provider integration           NOT_EXERCISED
-CONTEXT.md mutation                   NOT_EXERCISED
-production memory migration           NOT_EXERCISED
-business-rule approval                HUMAN_ADMIT_REQUIRED
-root/global invariant admission       HUMAN_ADMIT_REQUIRED
+lifecycle/schema mechanism            IMPLEMENTED
+cross-file semantic gate              IMPLEMENTED
+exact evaluator registry              IMPLEMENTED
+exact PR/admitted-subject binding      IMPLEMENTED
+durable writeback gate                IMPLEMENTED
+Human approval shape                  IMPLEMENTED
+actual mem0 write                     NOT_IMPLEMENTED
+actual CONTEXT.md mutation            NOT_IMPLEMENTED
+production writeback                  NOT_EXERCISED
+business-rule semantic admission      HUMAN_ADMIT_REQUIRED
+merge/release promotion               HUMAN_ADMIT_REQUIRED
 ```

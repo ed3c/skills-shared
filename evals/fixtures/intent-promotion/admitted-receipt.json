@@ -42,18 +42,8 @@
   ],
   "evidence_fresh": true,
   "final_status": "PASS",
-  "from_state": "ADMITTED",
-  "human_approval": {
-    "allowed_actions": [
-      "PROMOTE_CANONICAL",
-      "WRITE:root-context"
-    ],
-    "approval_state": "ADMITTED",
-    "approval_subject": "ffffffffffffffffffffffffffffffffffffffff",
-    "approver_identity": "ed3c",
-    "approver_kind": "HUMAN",
-    "receipt_digest": "sha256:6666666666666666666666666666666666666666666666666666666666666666"
-  },
+  "from_state": "VERIFIED",
+  "human_approval": null,
   "intent_bound_contract_identity": {
     "contract_id": "controlled-language-foundation",
     "contract_version": "1.0.0",
@@ -65,8 +55,15 @@
     "superseded_by": null,
     "supersedes": []
   },
-  "pr_subject": null,
-  "receipt_id": "IPR-FIXTURE-CANONICAL",
+  "pr_subject": {
+    "base_ref": "main",
+    "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "number": 120,
+    "observation_digest": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+    "repository": "ed3c/skills-shared",
+    "state": "MERGED"
+  },
+  "receipt_id": "IPR-FIXTURE-ADMITTED",
   "schema_version": "intent-promotion-receipt/v1",
   "subject": {
     "branch": "ctl/04-intent-promotion",
@@ -75,17 +72,17 @@
     "repository": "ed3c/skills-shared",
     "tree_sha": "cccccccccccccccccccccccccccccccccccccccc"
   },
-  "to_state": "CANONICAL",
+  "to_state": "ADMITTED",
   "writebacks": [
     {
       "authority_subject": "ffffffffffffffffffffffffffffffffffffffff",
-      "content_digest": "sha256:7777777777777777777777777777777777777777777777777777777777777777",
+      "content_digest": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
       "current_projection": true,
-      "destination_id": "root-context",
+      "destination_id": "module-context",
       "durability": "DURABLE",
-      "locator": "CONTEXT.md#controlled-language",
+      "locator": "skills/controlled-technical-language-harness/references/INTENT.md",
       "mode": "APPEND",
-      "scope": "ROOT_GLOBAL"
+      "scope": "MODULE"
     }
   ]
 }

@@ -1,54 +1,81 @@
 {
-  "approval": null,
+  "admitted_subject": null,
   "caller_flags": [],
-  "contract_digest": "sha256:5f414faf3d0106ee3a063578fca894eefc6a022816ef61ca34f9f5863b1c530a",
-  "contract_id": "skills-shared-intent-promotion",
+  "contract_identity": {
+    "contract_digest": "sha256:71990f5218f140ed8a9b2aa76debffdbd7b47a8c665e7c73b0fee2cccf579df4",
+    "contract_id": "skills-shared-intent-promotion",
+    "contract_version": "1.1.0"
+  },
+  "decision": "PROMOTE",
   "evaluator_receipts": [
     {
-      "evaluator_artifact_digest": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
-      "evaluator_id": "skill-eval-contract",
-      "evaluator_version": "1.0.0",
-      "execution_origin": "OWNING_WORKFLOW",
+      "authority": "LOCAL",
+      "evaluator_id": "local-intent-promotion-gate",
+      "implementation_digest": "sha256:63acc5a41565153f617eb79d64fc02f565da9a0fd6b631d0b67231c51a4a7fb9",
+      "implementation_path": "scripts/check_intent_promotions.py",
       "output_digest": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
-      "receipt_digest": "sha256:7777777777777777777777777777777777777777777777777777777777777777",
-      "receipt_ref": "workflow-run:31794307867",
+      "owning": false,
+      "receipt_digest": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
       "status": "PASS",
       "subject_commit_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-      "subject_tree_sha": "cccccccccccccccccccccccccccccccccccccccc"
+      "version": "1.1.0"
+    },
+    {
+      "authority": "OWNING_CI",
+      "evaluator_id": "skill-eval-contract",
+      "implementation_digest": "sha256:63acc5a41565153f617eb79d64fc02f565da9a0fd6b631d0b67231c51a4a7fb9",
+      "implementation_path": "scripts/check_intent_promotions.py",
+      "output_digest": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "owning": true,
+      "receipt_digest": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "status": "PASS",
+      "subject_commit_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "version": "1.1.0"
     }
   ],
-  "from_state": "VERIFIED",
-  "intent_id": "MI-CTL-EVIDENCE",
-  "merge_subject": {
-    "admitted_by": "ed3c",
-    "candidate_head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-    "candidate_tree_sha": "cccccccccccccccccccccccccccccccccccccccc",
-    "forge_readback": {
-      "observed_at_commit_sha": "ffffffffffffffffffffffffffffffffffffffff",
-      "readback_digest": "sha256:6666666666666666666666666666666666666666666666666666666666666666",
-      "source": "GITHUB_API"
-    },
-    "merge_commit_sha": "ffffffffffffffffffffffffffffffffffffffff",
-    "merge_tree_sha": "8888888888888888888888888888888888888888",
-    "release_artifact": null,
-    "repository": "ed3c/skills-shared"
+  "evidence_fresh": true,
+  "final_status": "PASS",
+  "from_state": "PROPOSED",
+  "human_approval": null,
+  "intent_bound_contract_identity": {
+    "contract_id": "controlled-language-foundation",
+    "contract_version": "1.0.0",
+    "git_blob_sha": "ae549d53e45c6b855862eb41d7fd241551986e4c"
   },
-  "receipt_id": "IPR-FIXTURE-001",
+  "intent_id": "MI-CTL-EVIDENCE",
+  "lineage": {
+    "revocation_reason": null,
+    "superseded_by": null,
+    "supersedes": []
+  },
+  "pr_subject": {
+    "base_ref": "main",
+    "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "number": 120,
+    "observation_digest": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+    "repository": "ed3c/skills-shared",
+    "state": "OPEN"
+  },
+  "receipt_id": "IPR-FIXTURE-VERIFIED",
   "schema_version": "intent-promotion-receipt/v1",
   "subject": {
-    "branch": "ctl/04b-intent-promotion-authority",
+    "branch": "ctl/04-intent-promotion",
     "commit_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-    "pull_request": 134,
+    "pull_request": 120,
     "repository": "ed3c/skills-shared",
     "tree_sha": "cccccccccccccccccccccccccccccccccccccccc"
   },
-  "supersedes": null,
-  "to_state": "ADMITTED",
+  "to_state": "VERIFIED",
   "writebacks": [
     {
-      "destination_id": "module-notes",
+      "authority_subject": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "content_digest": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+      "current_projection": true,
+      "destination_id": "evidence-index",
+      "durability": "TRANSIENT",
+      "locator": "evidence:intent:MI-CTL-EVIDENCE",
       "mode": "APPEND",
-      "scope": "MODULE"
+      "scope": "EVIDENCE"
     }
   ]
 }

@@ -2,19 +2,22 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/ed3c/skills-shared/evals/schema/intent-promotion-contract.schema.json",
   "title": "Intent Promotion Contract",
-  "description": "Declares which lifecycle states may write which durable destinations, and who owns each admission. It extends the Intent-Bound Constraint control plane; it does not create a second meta-evaluator authority.",
+  "description": "Controls lifecycle promotion and durable writeback without treating PR, CI, flags, or semantic similarity as authority.",
   "type": "object",
   "additionalProperties": false,
   "required": [
-    "approval_policy",
+    "schema_version",
     "contract_id",
     "contract_version",
-    "lifecycle",
-    "private_reasoning_persistence",
-    "schema_version",
     "subject_identity",
+    "intent_bound_contract",
+    "lifecycle",
+    "evaluator_registry",
+    "writeback_policy",
+    "approval_policy",
     "supersession_policy",
-    "writeback_policy"
+    "completion_policy",
+    "private_reasoning_persistence"
   ],
   "properties": {
     "schema_version": {
@@ -22,18 +25,19 @@
     },
     "contract_id": {
       "type": "string",
-      "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"
+      "pattern": "^[a-z0-9][a-z0-9-]{2,127}$"
     },
     "contract_version": {
       "type": "string",
-      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
     },
     "subject_identity": {
       "type": "object",
       "additionalProperties": false,
       "required": [
         "repository",
-        "commit_sha"
+        "commit_sha",
+        "tree_sha"
       ],
       "properties": {
         "repository": {
@@ -41,6 +45,43 @@
           "pattern": "^[A-Za-z0-9._-]+/[A-Za-z0-9._-]+$"
         },
         "commit_sha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "tree_sha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        }
+      }
+    },
+    "intent_bound_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository",
+        "path",
+        "contract_id",
+        "contract_version",
+        "git_blob_sha"
+      ],
+      "properties": {
+        "repository": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9._-]+/[A-Za-z0-9._-]+$"
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "contract_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "contract_version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+        },
+        "git_blob_sha": {
           "type": "string",
           "pattern": "^[0-9a-f]{40}$"
         }
@@ -52,13 +93,13 @@
       "required": [
         "states",
         "transitions",
-        "non_authoritative_states",
+        "non_durable_states",
         "terminal_states"
       ],
       "properties": {
         "states": {
           "type": "array",
-          "minItems": 7,
+          "minItems": 8,
           "uniqueItems": true,
           "items": {
             "enum": [
@@ -73,9 +114,33 @@
             ]
           }
         },
+        "non_durable_states": {
+          "type": "array",
+          "minItems": 4,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "HYPOTHESIS",
+              "CANDIDATE",
+              "PROPOSED",
+              "VERIFIED"
+            ]
+          }
+        },
+        "terminal_states": {
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "SUPERSEDED",
+              "REVOKED"
+            ]
+          }
+        },
         "transitions": {
           "type": "array",
-          "minItems": 1,
+          "minItems": 9,
           "items": {
             "type": "object",
             "additionalProperties": false,
@@ -86,43 +151,102 @@
             ],
             "properties": {
               "from": {
-                "type": "string",
-                "minLength": 1
+                "enum": [
+                  "HYPOTHESIS",
+                  "CANDIDATE",
+                  "PROPOSED",
+                  "VERIFIED",
+                  "ADMITTED",
+                  "CANONICAL"
+                ]
               },
               "to": {
-                "type": "string",
-                "minLength": 1
+                "enum": [
+                  "CANDIDATE",
+                  "PROPOSED",
+                  "VERIFIED",
+                  "ADMITTED",
+                  "CANONICAL",
+                  "SUPERSEDED",
+                  "REVOKED"
+                ]
               },
               "requires": {
                 "type": "array",
                 "uniqueItems": true,
                 "items": {
                   "enum": [
-                    "EXACT_SUBJECT",
-                    "OWNING_EVALUATOR_RECEIPT",
-                    "ADMITTED_MERGE_SUBJECT",
+                    "LOCAL_EVALUATOR_RECEIPT",
+                    "EXACT_PR_SUBJECT",
+                    "OWNING_EXACT_HEAD_RECEIPT",
+                    "ADMITTED_SUBJECT",
                     "HUMAN_APPROVAL",
-                    "SUPERSESSION_TARGET"
+                    "SUPERSESSION_TARGET",
+                    "REVOCATION_REASON"
                   ]
                 }
               }
             }
           }
-        },
-        "non_authoritative_states": {
-          "type": "array",
-          "minItems": 2,
-          "uniqueItems": true,
-          "items": {
-            "type": "string"
-          }
-        },
-        "terminal_states": {
-          "type": "array",
-          "minItems": 2,
-          "uniqueItems": true,
-          "items": {
-            "type": "string"
+        }
+      }
+    },
+    "evaluator_registry": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "evaluator_id",
+          "version",
+          "implementation_digest",
+          "implementation_path",
+          "authority",
+          "owning",
+          "required_for_states"
+        ],
+        "properties": {
+          "evaluator_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version": {
+            "type": "string",
+            "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+          },
+          "implementation_digest": {
+            "type": "string",
+            "pattern": "^(sha256:[0-9a-f]{64}|git-sha1:[0-9a-f]{40})$"
+          },
+          "authority": {
+            "enum": [
+              "LOCAL",
+              "OWNING_CI",
+              "EXTERNAL"
+            ]
+          },
+          "owning": {
+            "type": "boolean"
+          },
+          "required_for_states": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "enum": [
+                "CANDIDATE",
+                "PROPOSED",
+                "VERIFIED",
+                "ADMITTED",
+                "CANONICAL",
+                "SUPERSEDED",
+                "REVOKED"
+              ]
+            }
+          },
+          "implementation_path": {
+            "type": "string",
+            "minLength": 1
           }
         }
       }
@@ -132,8 +256,9 @@
       "additionalProperties": false,
       "required": [
         "append_only",
-        "declared_destinations",
-        "similarity_overwrite_allowed"
+        "similarity_overwrite_allowed",
+        "durable_writeback_min_state",
+        "declared_destinations"
       ],
       "properties": {
         "append_only": {
@@ -141,6 +266,9 @@
         },
         "similarity_overwrite_allowed": {
           "const": false
+        },
+        "durable_writeback_min_state": {
+          "const": "ADMITTED"
         },
         "declared_destinations": {
           "type": "array",
@@ -151,7 +279,9 @@
             "required": [
               "destination_id",
               "scope",
-              "minimum_state",
+              "durability",
+              "allowed_states",
+              "locator_prefix",
               "human_owned"
             ],
             "properties": {
@@ -161,16 +291,42 @@
               },
               "scope": {
                 "enum": [
+                  "SESSION",
+                  "SCRATCHPAD",
+                  "PR_METADATA",
+                  "EVIDENCE",
                   "MODULE",
                   "PROJECT",
-                  "ROOT_GLOBAL"
+                  "ROOT_GLOBAL",
+                  "HISTORY"
                 ]
               },
-              "minimum_state": {
+              "durability": {
                 "enum": [
-                  "ADMITTED",
-                  "CANONICAL"
+                  "TRANSIENT",
+                  "DURABLE"
                 ]
+              },
+              "allowed_states": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "enum": [
+                    "HYPOTHESIS",
+                    "CANDIDATE",
+                    "PROPOSED",
+                    "VERIFIED",
+                    "ADMITTED",
+                    "CANONICAL",
+                    "SUPERSEDED",
+                    "REVOKED"
+                  ]
+                }
+              },
+              "locator_prefix": {
+                "type": "string",
+                "minLength": 1
               },
               "human_owned": {
                 "type": "boolean"
@@ -185,24 +341,26 @@
       "additionalProperties": false,
       "required": [
         "agent_may_create_approval",
+        "automation_may_create_approval",
         "caller_flag_may_request",
         "caller_flag_may_grant",
-        "required_approver_identity"
+        "root_global_requires_human"
       ],
       "properties": {
         "agent_may_create_approval": {
           "const": false
         },
+        "automation_may_create_approval": {
+          "const": false
+        },
         "caller_flag_may_request": {
-          "type": "boolean"
+          "const": true
         },
         "caller_flag_may_grant": {
           "const": false
         },
-        "required_approver_identity": {
-          "enum": [
-            "HUMAN_IDENTITY_REQUIRED"
-          ]
+        "root_global_requires_human": {
+          "const": true
         }
       }
     },
@@ -210,24 +368,55 @@
       "type": "object",
       "additionalProperties": false,
       "required": [
+        "append_only_history",
         "replacement_requires_supersedes",
-        "revoked_projection_allowed",
-        "ledger_ref",
-        "append_only_ledger"
+        "similarity_match_is_authority",
+        "terminal_projection_must_be_false"
       ],
       "properties": {
+        "append_only_history": {
+          "const": true
+        },
         "replacement_requires_supersedes": {
           "const": true
         },
-        "revoked_projection_allowed": {
+        "similarity_match_is_authority": {
           "const": false
         },
-        "ledger_ref": {
-          "type": "string",
-          "minLength": 1
-        },
-        "append_only_ledger": {
+        "terminal_projection_must_be_false": {
           "const": true
+        }
+      }
+    },
+    "completion_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stale_evidence_blocks",
+        "evaluator_change_invalidates",
+        "pr_open_is_non_authoritative",
+        "ci_green_without_owning_receipt_is_non_authoritative",
+        "deterministic_failure_vetoes_advisory",
+        "private_chain_of_thought"
+      ],
+      "properties": {
+        "stale_evidence_blocks": {
+          "const": true
+        },
+        "evaluator_change_invalidates": {
+          "const": true
+        },
+        "pr_open_is_non_authoritative": {
+          "const": true
+        },
+        "ci_green_without_owning_receipt_is_non_authoritative": {
+          "const": true
+        },
+        "deterministic_failure_vetoes_advisory": {
+          "const": true
+        },
+        "private_chain_of_thought": {
+          "const": "FORBIDDEN"
         }
       }
     },

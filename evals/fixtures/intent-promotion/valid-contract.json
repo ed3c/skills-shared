@@ -1,16 +1,64 @@
 {
   "approval_policy": {
     "agent_may_create_approval": false,
+    "automation_may_create_approval": false,
     "caller_flag_may_grant": false,
     "caller_flag_may_request": true,
-    "required_approver_identity": "HUMAN_IDENTITY_REQUIRED"
+    "root_global_requires_human": true
+  },
+  "completion_policy": {
+    "ci_green_without_owning_receipt_is_non_authoritative": true,
+    "deterministic_failure_vetoes_advisory": true,
+    "evaluator_change_invalidates": true,
+    "pr_open_is_non_authoritative": true,
+    "private_chain_of_thought": "FORBIDDEN",
+    "stale_evidence_blocks": true
   },
   "contract_id": "skills-shared-intent-promotion",
   "contract_version": "1.1.0",
+  "evaluator_registry": [
+    {
+      "authority": "LOCAL",
+      "evaluator_id": "local-intent-promotion-gate",
+      "implementation_digest": "sha256:63acc5a41565153f617eb79d64fc02f565da9a0fd6b631d0b67231c51a4a7fb9",
+      "implementation_path": "scripts/check_intent_promotions.py",
+      "owning": false,
+      "required_for_states": [
+        "CANDIDATE",
+        "PROPOSED",
+        "VERIFIED",
+        "ADMITTED",
+        "CANONICAL"
+      ],
+      "version": "1.1.0"
+    },
+    {
+      "authority": "OWNING_CI",
+      "evaluator_id": "skill-eval-contract",
+      "implementation_digest": "sha256:63acc5a41565153f617eb79d64fc02f565da9a0fd6b631d0b67231c51a4a7fb9",
+      "implementation_path": "scripts/check_intent_promotions.py",
+      "owning": true,
+      "required_for_states": [
+        "VERIFIED",
+        "ADMITTED",
+        "CANONICAL"
+      ],
+      "version": "1.1.0"
+    }
+  ],
+  "intent_bound_contract": {
+    "contract_id": "controlled-language-foundation",
+    "contract_version": "1.0.0",
+    "git_blob_sha": "ae549d53e45c6b855862eb41d7fd241551986e4c",
+    "path": "evals/fixtures/controlled-language/intent-contract.json",
+    "repository": "ed3c/skills-shared"
+  },
   "lifecycle": {
-    "non_authoritative_states": [
+    "non_durable_states": [
       "HYPOTHESIS",
-      "CANDIDATE"
+      "CANDIDATE",
+      "PROPOSED",
+      "VERIFIED"
     ],
     "states": [
       "HYPOTHESIS",
@@ -29,45 +77,52 @@
     "transitions": [
       {
         "from": "HYPOTHESIS",
-        "requires": [],
+        "requires": [
+          "LOCAL_EVALUATOR_RECEIPT"
+        ],
         "to": "CANDIDATE"
       },
       {
         "from": "CANDIDATE",
         "requires": [
-          "EXACT_SUBJECT"
+          "EXACT_PR_SUBJECT",
+          "LOCAL_EVALUATOR_RECEIPT"
         ],
         "to": "PROPOSED"
       },
       {
         "from": "PROPOSED",
         "requires": [
-          "EXACT_SUBJECT",
-          "OWNING_EVALUATOR_RECEIPT"
+          "EXACT_PR_SUBJECT",
+          "LOCAL_EVALUATOR_RECEIPT",
+          "OWNING_EXACT_HEAD_RECEIPT"
         ],
         "to": "VERIFIED"
       },
       {
         "from": "VERIFIED",
         "requires": [
-          "EXACT_SUBJECT",
-          "OWNING_EVALUATOR_RECEIPT",
-          "ADMITTED_MERGE_SUBJECT"
+          "ADMITTED_SUBJECT",
+          "EXACT_PR_SUBJECT",
+          "LOCAL_EVALUATOR_RECEIPT",
+          "OWNING_EXACT_HEAD_RECEIPT"
         ],
         "to": "ADMITTED"
       },
       {
         "from": "ADMITTED",
         "requires": [
-          "EXACT_SUBJECT",
-          "ADMITTED_MERGE_SUBJECT",
-          "HUMAN_APPROVAL"
+          "ADMITTED_SUBJECT",
+          "HUMAN_APPROVAL",
+          "LOCAL_EVALUATOR_RECEIPT",
+          "OWNING_EXACT_HEAD_RECEIPT"
         ],
         "to": "CANONICAL"
       },
       {
-        "from": "CANONICAL",
+        "from": "ADMITTED",
         "requires": [
+          "ADMITTED_SUBJECT",
           "SUPERSESSION_TARGET"
         ],
         "to": "SUPERSEDED"
@@ -75,7 +130,26 @@
       {
         "from": "CANONICAL",
         "requires": [
-          "HUMAN_APPROVAL"
+          "ADMITTED_SUBJECT",
+          "SUPERSESSION_TARGET"
+        ],
+        "to": "SUPERSEDED"
+      },
+      {
+        "from": "ADMITTED",
+        "requires": [
+          "ADMITTED_SUBJECT",
+          "HUMAN_APPROVAL",
+          "REVOCATION_REASON"
+        ],
+        "to": "REVOKED"
+      },
+      {
+        "from": "CANONICAL",
+        "requires": [
+          "ADMITTED_SUBJECT",
+          "HUMAN_APPROVAL",
+          "REVOCATION_REASON"
         ],
         "to": "REVOKED"
       }
@@ -84,37 +158,94 @@
   "private_reasoning_persistence": "FORBIDDEN",
   "schema_version": "intent-promotion-contract/v1",
   "subject_identity": {
-    "commit_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-    "repository": "ed3c/skills-shared"
+    "commit_sha": "edfa2922856a457167b56d32a73d679577718492",
+    "repository": "ed3c/skills-shared",
+    "tree_sha": "299516fd0f175473cb14c14e7915ce31b8571b85"
   },
   "supersession_policy": {
-    "append_only_ledger": true,
-    "ledger_ref": "evals/fixtures/intent-promotion/ledger.json",
+    "append_only_history": true,
     "replacement_requires_supersedes": true,
-    "revoked_projection_allowed": false
+    "similarity_match_is_authority": false,
+    "terminal_projection_must_be_false": true
   },
   "writeback_policy": {
     "append_only": true,
     "declared_destinations": [
       {
-        "destination_id": "module-notes",
+        "allowed_states": [
+          "CANDIDATE"
+        ],
+        "destination_id": "session-scratch",
+        "durability": "TRANSIENT",
         "human_owned": false,
-        "minimum_state": "ADMITTED",
+        "locator_prefix": "scratch:intent:",
+        "scope": "SCRATCHPAD"
+      },
+      {
+        "allowed_states": [
+          "PROPOSED"
+        ],
+        "destination_id": "pr-metadata",
+        "durability": "TRANSIENT",
+        "human_owned": false,
+        "locator_prefix": "github:ed3c/skills-shared#",
+        "scope": "PR_METADATA"
+      },
+      {
+        "allowed_states": [
+          "VERIFIED"
+        ],
+        "destination_id": "evidence-index",
+        "durability": "TRANSIENT",
+        "human_owned": false,
+        "locator_prefix": "evidence:intent:",
+        "scope": "EVIDENCE"
+      },
+      {
+        "allowed_states": [
+          "ADMITTED",
+          "CANONICAL"
+        ],
+        "destination_id": "module-context",
+        "durability": "DURABLE",
+        "human_owned": false,
+        "locator_prefix": "skills/controlled-technical-language-harness/",
         "scope": "MODULE"
       },
       {
-        "destination_id": "project-context",
+        "allowed_states": [
+          "ADMITTED",
+          "CANONICAL"
+        ],
+        "destination_id": "project-memory",
+        "durability": "DURABLE",
         "human_owned": false,
-        "minimum_state": "ADMITTED",
+        "locator_prefix": "project:skills-shared:ctl:",
         "scope": "PROJECT"
       },
       {
+        "allowed_states": [
+          "CANONICAL"
+        ],
         "destination_id": "root-context",
+        "durability": "DURABLE",
         "human_owned": true,
-        "minimum_state": "CANONICAL",
+        "locator_prefix": "CONTEXT.md#",
         "scope": "ROOT_GLOBAL"
+      },
+      {
+        "allowed_states": [
+          "SUPERSEDED",
+          "REVOKED"
+        ],
+        "destination_id": "intent-history",
+        "durability": "DURABLE",
+        "human_owned": false,
+        "locator_prefix": "docs/intent-history/",
+        "scope": "HISTORY"
       }
     ],
+    "durable_writeback_min_state": "ADMITTED",
     "similarity_overwrite_allowed": false
   }
 }
