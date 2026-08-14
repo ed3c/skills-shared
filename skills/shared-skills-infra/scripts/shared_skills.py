@@ -29,6 +29,7 @@ import hashlib
 import json
 import os
 import shutil
+import subprocess
 import sys
 from datetime import date
 from pathlib import Path
@@ -320,12 +321,59 @@ def check(registry: dict[str, Any], sites: Sites) -> int:
     # everywhere, which is a different urgency. Registering it -- even as an
     # explicitly unresolved entry -- is the way to quiet this, not silence.
     failures.extend(unregistered_skills(registry))
+
+    # #1's two rulings, as gates rather than as prose. They live beside this
+    # file because a module may not resolve upward into the repository root;
+    # `scripts/` keeps thin forwarders for CI callers.
+    #
+    # They are folded in with different weights on purpose. A shared body naming
+    # a host repository is binding wearing a body's clothes and reaches four
+    # other repositories as if it were true there, so it FAILS. A binding pinned
+    # to an older body is "time to re-retarget", not "something is wrong", so it
+    # SURFACES -- collapsing the two would teach whoever sees them to ignore
+    # both.
+    neutrality, surfaced = _body_and_binding(Path(__file__).resolve().parents[3])
+    failures.extend(neutrality)
+
     if failures:
         for failure in failures:
             print(f"FAIL {failure}", file=sys.stderr)
         return 1
+    for line in surfaced:
+        print(f"SURFACE {line}")
     print(f"PASS shared skills hold ({len(registry['shared'])} registered)")
     return 0
+
+
+def _body_and_binding(repo_root: Path) -> tuple[list[str], list[str]]:
+    """Run both #1 gates and split their outcomes by weight.
+
+    Each is invoked as its own process rather than imported, so a crash in one
+    cannot take `check` down with it and each keeps its own exit-code
+    vocabulary. An exit this function does not recognise is a failure: a gate
+    that could not run has not reported that everything is fine.
+    """
+    here = Path(__file__).resolve().parent
+    failures: list[str] = []
+    surfaced: list[str] = []
+    for name, weight in (("check_body_neutrality.py", "fail"),
+                         ("check_binding_stale.py", "surface")):
+        gate = here / name
+        if not gate.is_file():
+            failures.append(f"MISSING-GATE {name}: {gate}")
+            continue
+        done = subprocess.run(
+            [sys.executable, str(gate), "--repo-root", str(repo_root)],
+            capture_output=True, text=True, check=False,
+        )
+        detail = (done.stderr.strip() or done.stdout.strip()).splitlines()
+        if done.returncode == 0:
+            continue
+        if weight == "surface" and done.returncode == 3:
+            surfaced.extend(detail)
+            continue
+        failures.extend(detail or [f"{name} exited {done.returncode}"])
+    return failures, surfaced
 
 
 def _point(surface: Path, target: Path, canonical: Path, strict: bool) -> bool:
