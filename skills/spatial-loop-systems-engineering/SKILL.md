@@ -9,12 +9,14 @@ description: |
   Produces an exact-subject system contract: trust realms, boundaries, flows,
   state machine, hard invariants, capability probes, collision matrix,
   reconciliation loops, performance budgets, verification oracles, and a
-  fail-closed implementation gate. Do not use for ordinary CRUD work, as a
-  security certification, or as a substitute for privileged/hardware evidence.
+  fail-closed implementation gate. After three qualifying failures on the same
+  target, stops blind repair and escalates through an issue packet, fresh
+  diagnosis, and a new isolated worktree. Do not use for ordinary CRUD work, as
+  a security certification, or as a substitute for privileged/hardware evidence.
 license: MIT
 compatibility: Any Agent Skills-compatible coding agent with repository read/write access. Privileged or hardware execution is optional, but its absence blocks the corresponding claim.
 metadata:
-  version: "1.0.0"
+  version: "1.1.0"
   procedure: "spatial-loop-system-contract"
 ---
 
@@ -73,7 +75,14 @@ CLASSIFY
                                 → RECONCILE
                                 → VERIFY
                                     ├── converged → HANDOFF
-                                    └── bounded retry or fail-closed stop
+                                    ├── qualifying FAIL #1/#2 → bounded retry
+                                    └── qualifying FAIL #3 → ESCALATION_REQUIRED
+                                            → ISSUE_PACKET_BOUND
+                                            → FRESH_DIAGNOSIS
+                                            → ISOLATED_WORKTREE
+                                            → REPAIR
+                                            → VERIFY
+                                            → forge-native PR / Human merge boundary
 ```
 
 Probe code, verifier code, and disposable experiments may be written before the
@@ -101,7 +110,7 @@ Before core implementation, produce and bind:
 10. **Teardown symmetry ledger** — every lifecycle-owned allocation has normal
     release, crash release, and leak oracle.
 11. **Reconciliation loops** — observed state, desired state, diff, actuator,
-    convergence condition, and stop condition.
+    convergence condition, stop condition, and failure-attempt counter.
 12. **Verification plan** — positive, hollow/negative, mutation, privileged,
     hardware, chaos, fuzz, security, and performance lanes as applicable.
 13. **Implementation gate** — one of `BLOCKED`, `READY_FOR_PROTOTYPE`, or
@@ -111,6 +120,9 @@ Before core implementation, produce and bind:
 Use [`references/spec-packet-template.md`](references/spec-packet-template.md)
 for the human-readable packet and
 `spatial-loop-system-contract/v1` for the machine-checkable contract.
+Use [`references/three-failure-escalation.md`](references/three-failure-escalation.md)
+when the same invariant or acceptance target fails three qualifying repair
+attempts.
 
 ## Procedure
 
@@ -276,12 +288,48 @@ Observe exact state
 → Reconcile one bounded change
 → Re-run the owning oracle
 → preserve the failure trajectory
-→ converge or stop
+→ converge, escalate, or stop
 ```
 
+A **qualifying failed attempt** is a repair against the same invariant or
+acceptance target where the implementation/configuration subject changed and the
+owning oracle actually executed and returned subject-bound `FAIL`. `ABSENT`,
+`NOT_EXERCISED`, and `SKIPPED_BY_POLICY` do not count as failed repairs.
+
+After three consecutive qualifying failures, do not make a fourth speculative
+patch in the same context. Enter the recovery contract in
+[`references/three-failure-escalation.md`](references/three-failure-escalation.md):
+
+```text
+three FAIL trajectories
+→ forge issue + exact failure packet
+→ fresh diagnosis context
+→ root-cause hypothesis + falsifying probe
+→ new isolated worktree/branch
+→ smallest repair
+→ owning oracle + negative control
+→ PASS
+→ commit
+→ forge-native PR
+→ existing Human/trusted-operator merge policy
+→ main
+```
+
+For a normal consumer with an admitted local Forgejo binding, issue and PR
+tracking route through `forgejo-delivery-loop`. For GitHub Actions or
+GitHub-hosted CI incidents, use GitHub as the incident/publication authority and
+compose `github-delivery-loop`; exact GitHub workflow/run/job/head evidence must
+not be replaced by a Forgejo mirror.
+
+The intended operator path may open a new ChatGPT Desktop question/session for
+fresh diagnosis. A runtime that cannot launch ChatGPT Desktop must stop at a
+fresh-diagnosis handoff with the exact issue packet; it must not claim that a
+fresh session ran.
+
 Do not repair a failing system by weakening the invariant, deleting the
-negative control, expanding privilege, hiding an error, or replacing physical
-execution with model judgment.
+negative control, expanding privilege, hiding an error, resetting the attempt
+counter by renaming the same failure, or replacing physical execution with model
+judgment.
 
 ## Hard laws
 
@@ -302,6 +350,10 @@ execution with model judgment.
 10. **Human authority law** — threat-model acceptance, security sign-off,
     production promotion, permission widening, destructive testing, and
     rollback remain Human/trusted-operator decisions.
+11. **Three-failure escalation law** — three qualifying failures against the
+    same invariant/acceptance target force issue-bound fresh diagnosis and a new
+    isolated worktree before another repair attempt. Commit/PR eligibility
+    requires the owning oracle and required negative control to pass.
 
 ## Composition boundary
 
@@ -311,8 +363,12 @@ logic. Compose explicitly when needed:
 - `unknown-discovery-composer` — widen discovery for poorly understood surfaces;
 - `truth-verify-loop` — verify mutable external claims and primary sources;
 - `loop-harness-standard` — build an executable bounded iteration Harness;
-- `github-delivery-loop` / `git-town-stacked-pr-worker` — publish and review the
-  resulting implementation without changing its technical truth.
+- `forgejo-delivery-loop` — normal local Forgejo incident/PR routing after an
+  escalation when the consumer has an admitted Forgejo binding;
+- `github-delivery-loop` — GitHub Actions/GitHub-hosted CI incident and
+  publication authority;
+- `git-town-stacked-pr-worker` — new isolated worktree/branch and bounded branch
+  graph synchronization when admitted by the consumer.
 
 No composition is implicit, and no downstream Skill may promote
 `NOT_EXERCISED` to `PASS`.
@@ -323,9 +379,11 @@ No composition is implicit, and no downstream Skill may promote
 portable procedure and copyable prompt        IMPLEMENTED
 machine-checkable contract closure            IMPLEMENTED
 positive/hollow/mutation controls             IMPLEMENTED
+three-failure escalation contract             IMPLEMENTED
 Linux isolation domain guidance               IMPLEMENTED
 live root/KVM/cgroup/seccomp execution         NOT_EXERCISED
 hardware-specific performance                 NOT_EXERCISED
 chaos, exploit, and sandbox-escape testing    NOT_EXERCISED
+fresh ChatGPT Desktop session execution        HOST_OPERATOR_BOUND
 security acceptance and production promotion  HUMAN_ADMIT_REQUIRED
 ```
