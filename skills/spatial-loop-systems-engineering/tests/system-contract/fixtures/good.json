@@ -1,0 +1,356 @@
+{
+  "schema": "spatial-loop-system-contract/v1",
+  "subject": {
+    "id": "bounded-worker-prototype",
+    "revision": "design-001",
+    "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "objective": {
+    "statement": "Design a bounded worker lifecycle whose owned resources are observable and reclaimable.",
+    "non_goals": [
+      "Claim production isolation.",
+      "Claim measured performance."
+    ],
+    "risk_class": "HIGH"
+  },
+  "assumptions": [
+    {
+      "id": "A-CGROUP",
+      "statement": "The target host exposes a delegated unified cgroup hierarchy.",
+      "owner": "runtime integrator",
+      "falsifier": "Run the target-host cgroup controller and delegation probe.",
+      "required": true,
+      "state": "NOT_EXERCISED",
+      "evidence": []
+    }
+  ],
+  "unknowns": [
+    {
+      "id": "U-DELEGATION",
+      "statement": "Controller delegation on the target host has not been observed.",
+      "discovery_method": "Execute the target-host capability probe under the intended service identity.",
+      "impact": "Blocks privileged implementation while allowing design and pure-logic scaffolding.",
+      "state": "NOT_EXERCISED",
+      "evidence": []
+    }
+  ],
+  "realms": [
+    {
+      "id": "HOST",
+      "trust": "trusted control realm",
+      "authority": "owns admission, resource boundaries, observation, and cleanup",
+      "entry_conditions": [
+        "request passes admission policy"
+      ],
+      "exit_conditions": [
+        "all owned resources are absent and a terminal receipt exists"
+      ]
+    },
+    {
+      "id": "WORKER",
+      "trust": "untrusted execution realm",
+      "authority": "may consume only explicitly assigned resources",
+      "entry_conditions": [
+        "resource boundary receipt exists"
+      ],
+      "exit_conditions": [
+        "payload has stopped and no descendant remains"
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "id": "B-HOST-WORKER",
+      "from": "HOST",
+      "to": "WORKER",
+      "mechanism": "supervisor-owned process and resource boundary selected by the domain implementation",
+      "enforcement_owner": "supervisor",
+      "blast_radius": "one admitted worker allocation",
+      "failure_behavior": "close admission and enter reconciliation"
+    }
+  ],
+  "flows": [
+    {
+      "id": "F-CONTROL",
+      "from": "HOST",
+      "to": "WORKER",
+      "payload": "one lifecycle command with transferred execution ownership",
+      "transport": "bounded control channel",
+      "ordering": "single-writer monotonic lifecycle order",
+      "backpressure": "one in-flight command; producer blocks or rejects",
+      "failure_semantics": "partial delivery is rejected and reconciliation observes the last committed state"
+    }
+  ],
+  "states": {
+    "nodes": [
+      "INIT",
+      "BOUND",
+      "RUNNING",
+      "DRAINING",
+      "RECONCILING",
+      "TERMINATED"
+    ],
+    "initial": "INIT",
+    "terminal": [
+      "TERMINATED"
+    ],
+    "transitions": [
+      {
+        "id": "T-ALLOCATE",
+        "from": "INIT",
+        "to": "BOUND",
+        "trigger": "resource allocation admitted",
+        "preconditions": [
+          "no owned worker resource exists"
+        ],
+        "postconditions": [
+          "one resource boundary exists and is observable"
+        ],
+        "evidence": [
+          "allocation receipt"
+        ]
+      },
+      {
+        "id": "T-START",
+        "from": "BOUND",
+        "to": "RUNNING",
+        "trigger": "worker start barrier released",
+        "preconditions": [
+          "resource boundary is attached"
+        ],
+        "postconditions": [
+          "worker is observable inside the boundary"
+        ],
+        "evidence": [
+          "start receipt"
+        ]
+      },
+      {
+        "id": "T-DRAIN",
+        "from": "RUNNING",
+        "to": "DRAINING",
+        "trigger": "normal completion or cancellation",
+        "preconditions": [
+          "admission is closed"
+        ],
+        "postconditions": [
+          "no new work is accepted"
+        ],
+        "evidence": [
+          "drain receipt"
+        ]
+      },
+      {
+        "id": "T-RELEASE",
+        "from": "DRAINING",
+        "to": "TERMINATED",
+        "trigger": "normal cleanup completes",
+        "preconditions": [
+          "worker and descendants are stopped"
+        ],
+        "postconditions": [
+          "owned resource count is zero"
+        ],
+        "evidence": [
+          "normal teardown receipt"
+        ]
+      },
+      {
+        "id": "T-CRASH",
+        "from": "RUNNING",
+        "to": "RECONCILING",
+        "trigger": "worker or supervisor failure is observed",
+        "preconditions": [
+          "failure identity is captured"
+        ],
+        "postconditions": [
+          "cleanup actuator owns the resource boundary"
+        ],
+        "evidence": [
+          "failure observation"
+        ]
+      },
+      {
+        "id": "T-REAP",
+        "from": "RECONCILING",
+        "to": "TERMINATED",
+        "trigger": "crash cleanup converges",
+        "preconditions": [
+          "admission remains closed"
+        ],
+        "postconditions": [
+          "owned resource count is zero"
+        ],
+        "evidence": [
+          "crash teardown receipt"
+        ]
+      }
+    ]
+  },
+  "invariants": [
+    {
+      "id": "I-BOUND-BEFORE-RUN",
+      "statement": "A worker cannot enter RUNNING before its resource boundary is attached.",
+      "scope": "HOST to WORKER lifecycle",
+      "owner": "supervisor",
+      "enforcement": "start barrier is released only after boundary attachment",
+      "oracle": {
+        "type": "RUNTIME_PROBE",
+        "procedure": "Observe the state transition receipt and resource membership before T-START.",
+        "pass_condition": "Every RUNNING observation has an earlier matching boundary-attachment receipt."
+      },
+      "failure_state": "BOUNDARY_ORDER_VIOLATION"
+    },
+    {
+      "id": "I-ZERO-OWNED-AT-TERMINAL",
+      "statement": "TERMINATED implies zero lifecycle-owned resources.",
+      "scope": "worker allocation",
+      "owner": "cleanup reconciler",
+      "enforcement": "T-RELEASE and T-REAP require a zero-resource observation",
+      "oracle": {
+        "type": "RUNTIME_PROBE",
+        "procedure": "Enumerate the allocation's owned resources after terminal state.",
+        "pass_condition": "The enumeration is empty and remains empty across one observation interval."
+      },
+      "failure_state": "RESOURCE_LEAK"
+    }
+  ],
+  "capabilities": [
+    {
+      "id": "C-CGROUP",
+      "statement": "The intended service identity can create, configure, observe, and remove the required cgroup boundary.",
+      "required": true,
+      "probe": {
+        "type": "COMMAND",
+        "procedure": "Run a bounded create-configure-attach-observe-remove probe on the target host.",
+        "pass_condition": "Every operation succeeds and the test cgroup is absent after cleanup."
+      },
+      "state": "NOT_EXERCISED",
+      "evidence": [],
+      "consequence_if_absent": "Only design and non-privileged prototype work may proceed."
+    }
+  ],
+  "resources": [
+    {
+      "id": "R-BOUNDARY",
+      "realm": "HOST",
+      "kind": "worker resource-boundary allocation",
+      "limit_value": 1,
+      "unit": "allocation",
+      "enforcement": "admission ledger and substrate resource controller",
+      "observation": "supervisor resource inventory",
+      "exceed_action": "reject the second allocation and record RESOURCE_LIMIT",
+      "lifecycle_owned": true
+    }
+  ],
+  "failures": [
+    {
+      "id": "X-SUPERVISOR-DEATH",
+      "fault": "supervisor stops after allocation but before normal release",
+      "collision_window": "after T-ALLOCATE and before T-RELEASE",
+      "detection": "external watchdog observes control-plane loss and owned resource presence",
+      "containment": "admission remains closed for the allocation",
+      "reconciliation": "take cleanup ownership, stop descendants, wait empty, remove, verify",
+      "oracle": {
+        "type": "RUNTIME_PROBE",
+        "procedure": "Inject supervisor termination at each lifecycle barrier and inspect owned resources.",
+        "pass_condition": "Every run reaches TERMINATED with zero owned resources."
+      }
+    }
+  ],
+  "teardown": [
+    {
+      "resource": "R-BOUNDARY",
+      "acquire_transition": "T-ALLOCATE",
+      "release_transition": "T-RELEASE",
+      "crash_transitions": [
+        "T-CRASH",
+        "T-REAP"
+      ],
+      "leak_oracle": {
+        "type": "RUNTIME_PROBE",
+        "procedure": "Enumerate all resources tagged with the allocation identity.",
+        "pass_condition": "No tagged resource exists after normal or crash teardown."
+      }
+    }
+  ],
+  "reconciliation_loops": [
+    {
+      "id": "L-CLEANUP",
+      "observes": [
+        "lifecycle state",
+        "owned resource inventory",
+        "admission state"
+      ],
+      "desired_state": "TERMINATED with zero owned resources and closed admission",
+      "diff": "Compare observed state and inventory with the desired terminal tuple.",
+      "actuator": "stop descendants, wait for empty state, remove owned resources, verify absence",
+      "convergence": "terminal tuple is observed twice without new owned resources",
+      "stop_condition": "three bounded attempts, no progress, or a Human-owned destructive boundary"
+    }
+  ],
+  "performance_budgets": [],
+  "verification": [
+    {
+      "id": "V-CONTRACT",
+      "required": true,
+      "lane": "STATIC",
+      "preconditions": [
+        "the exact JSON contract is available"
+      ],
+      "stimulus": "run the deterministic contract checker",
+      "oracle": {
+        "type": "COMMAND",
+        "procedure": "Execute check_system_contract.py against the exact fixture.",
+        "pass_condition": "The checker exits 0 and reports the expected subject and gate."
+      },
+      "negative_control": "remove one invariant oracle and require exit 2",
+      "status": "PASS",
+      "evidence": [
+        "fixture://system-contract-positive-control"
+      ]
+    },
+    {
+      "id": "V-PRIVILEGED",
+      "required": true,
+      "lane": "PRIVILEGED",
+      "preconditions": [
+        "target-host capability C-CGROUP is PASS"
+      ],
+      "stimulus": "exercise one full create-run-crash-cleanup lifecycle",
+      "oracle": {
+        "type": "RUNTIME_PROBE",
+        "procedure": "Observe resource membership, state transitions, and post-run inventory.",
+        "pass_condition": "The lifecycle reaches TERMINATED with zero owned resources."
+      },
+      "negative_control": "skip crash cleanup and require the leak oracle to fail",
+      "status": "NOT_EXERCISED",
+      "evidence": []
+    }
+  ],
+  "implementation_gate": {
+    "status": "READY_FOR_PROTOTYPE",
+    "claim_level": "PROTOTYPE_ONLY",
+    "blocking_unknowns": [
+      "U-DELEGATION"
+    ],
+    "allowed_actions": [
+      "write capability probes",
+      "write verifier scaffolding",
+      "implement pure state-machine logic"
+    ],
+    "forbidden_claims": [
+      "production-ready",
+      "secure isolation",
+      "measured performance"
+    ],
+    "rationale": "The contract is closed, but the required privileged substrate capability has not been exercised."
+  },
+  "human_admit": [
+    "destructive privileged testing",
+    "security acceptance",
+    "production promotion",
+    "permission widening",
+    "rollback"
+  ]
+}

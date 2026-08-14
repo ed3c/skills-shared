@@ -64,6 +64,11 @@ shared Skill body
 
 Shared Skills may reference another method, but consumer selection remains explicit. Shared bodies do not create consumer branches, remotes, secrets, or live runtime state.
 
+## Worked method patterns
+
+- [`knowledge-continuity`](knowledge-continuity/README.md) — procedural continuity loop, generic routing reference, and on-demand cross-repository example.
+- [`spatial-loop-systems-engineering`](spatial-loop-systems-engineering/README.md) — pre-implementation state-space, hard-invariant, substrate-capability, teardown, and verification contract for kernel/hardware-bound work.
+
 ## Delivery methods
 
 | Skill | Owns | Does not own |

@@ -121,6 +121,11 @@
       "name": "git-town-stacked-pr-worker",
       "admitted": "2026-08-12",
       "why": "Stack hierarchy, isolated Worker worktrees, eval-first task packets, bounded unattended synchronization, evidence states and Human Admit boundaries are cross-repository Git infrastructure. Repository-specific configuration, Bash wrappers, paths, issues, remotes and receipts remain consumer-owned bindings rather than duplicate canonical prompt bodies."
+    },
+    {
+      "name": "spatial-loop-systems-engineering",
+      "admitted": "2026-08-14",
+      "why": "Kernel-, hardware-, privilege-, concurrency-, resource-, and teardown-bound system design is a portable cross-repository method. The shared body owns exact-subject state-space contracts, hard-invariant and capability gates, collision/reconciliation logic, and falsifiable verification structure; consumer kernels, hardware, privileges, threat models, paths, and live receipts remain environment-owned."
     }
   ],
   "repo_owned": [
