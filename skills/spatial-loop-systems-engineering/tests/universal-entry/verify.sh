@@ -15,7 +15,7 @@ require() {
   }
 }
 
-require "$skill" "pre-implementation constraint discovery compiler"
+require "$skill" "constraint discovery compiler plus Shadow Architecture control loop"
 require "$skill" "Level A — Local deterministic change"
 require "$skill" "Level B — Stateful application system"
 require "$skill" "Level C — Distributed / concurrent / agentic system"
@@ -26,7 +26,7 @@ require "$skill" "HOW WE CAN KNOW IT REMAINS TRUE"
 require "$skill" "Domain modules extend the core method. They never replace it"
 require "$skill" "A. **Intent Digest**"
 require "$skill" "K. **Implementation Gate**"
-require "$skill" "L. **Implementation Plan**"
+require "$skill" "L. **Implementation Plan / Implemented Delta**"
 require "$skill" "reduce the reachable invalid state space"
 
 require "$prompt" "Universal Constraint-First System Prompt"
@@ -44,8 +44,7 @@ require "$modules" "Domain Module"
 require "$modules" "bypass universal compiler"
 require "$modules" "linux-isolation-runtime.md"
 
-# Negative control: prove the verifier rejects the specific regression that
-# motivated this refactor: C/D work being downgraded to ordinary Level A work.
+# Negative control: C/D work may not be downgraded to ordinary Level A work.
 tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
 cp "$skill" "$tmp/SKILL.md"
@@ -82,4 +81,4 @@ if grep -Fq "A domain module may extend the core method; it may not replace or w
   exit 2
 fi
 
-echo "UNIVERSAL ENTRY GREEN: constraint-first topology, A-D anti-degradation, and domain decoupling are present"
+echo "UNIVERSAL ENTRY GREEN: universal compiler remains intact under monitor-first Shadow Architecture control"
