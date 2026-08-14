@@ -1,0 +1,35 @@
+{
+  "skill_name": "controlled-technical-language-harness",
+  "version": "1.0.0",
+  "_meta": {
+    "coverage_metric": "profile source-identity honesty, edition immutability, Human-owned terminology and compliance boundaries, ruleset binding, profile optionality, and uncommitted official bytes",
+    "purpose": "Prove that a proposal-derived controlled-language profile cannot present itself as an official standard edition, cannot bind a ruleset it does not have, cannot become a mandatory core dependency, and cannot relax the deterministic, privacy, or Human Admit boundaries."
+  },
+  "runnable": [
+    {
+      "id": "CTL-PROFILE-1",
+      "checker_script": "scripts/check_profile_admission.py",
+      "test_verify": "tests/profile-admission/verify.sh",
+      "good_fixture": "evals/standard-pack-ste.json plus evals/ste-proposal-derived.rules.json",
+      "hollow_fixture": "selftest mutations promoting the proposal to an official edition, making the edition mutable, relaxing terminology or compliance admit, drifting the ruleset, removing the profile-absent state, dropping a trigger boundary, widening privacy, or committing standard bytes",
+      "covers": [
+        "a SOURCE_PROPOSAL pack cannot name an official standard designation in its edition, display name, pack id, or authority",
+        "an edition must name one immutable revision",
+        "an OFFICIAL_STANDARD pack needs a resolvable locator and a decided license classification",
+        "VENDORED content requires an admitted redistribution grant",
+        "technical name and verb admission stay Human-owned and compliance stays HUMAN_ADMIT_REQUIRED",
+        "ruleset_digest binds the ruleset actually present, and its provenance matches the pack",
+        "the core keeps a PROFILE_ABSENT state and every profile module states its trigger boundary",
+        "no standard or vocabulary artifact is committed without an admitted grant"
+      ],
+      "expected": "canonical pack admitted; each of the 15 planted mutations refused with a distinct reason"
+    }
+  ],
+  "evidence_boundary": {
+    "profile_admission_controls": "IMPLEMENTED",
+    "deterministic_rule_evaluation": "NOT_IMPLEMENTED",
+    "official_ASD_STE100_ruleset": "NOT_EXERCISED",
+    "semantic_rewrite_quality": "NOT_IMPLEMENTED",
+    "compliance_claim": "REQUIRED"
+  }
+}

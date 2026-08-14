@@ -1,0 +1,29 @@
+{
+  "schema_version": "controlled-language-standard-pack-reference/v1",
+  "pack_id": "ste-proposal-derived",
+  "display_name": "Simplified Technical English (proposal-derived approximation)",
+  "profile_type": "CONTROLLED_LANGUAGE",
+  "edition": "0.1-proposal-derived",
+  "source": {
+    "classification": "SOURCE_PROPOSAL",
+    "authority": "user-supplied architecture proposal",
+    "locator": "google-drive:1vqFNBQmCwh9xgziZxlO0oYk6fZQg9rQ_",
+    "artifact_digest": "sha256:d919a887f9bc8acda76ad6350276059e4c4f71a739f048a47626c686d7175578"
+  },
+  "content_mode": "REFERENCE_ONLY",
+  "license_policy": {
+    "classification": "UNKNOWN",
+    "redistribution_allowed": false,
+    "human_legal_review": "REQUIRED",
+    "approval_receipt_ref": null,
+    "approval_receipt_digest": null
+  },
+  "ruleset_digest": "sha256:b1f2b7e22293c241e2c429876808d9ec942f6a60cc2719826af568095161db89",
+  "approved_vocabulary_ref": null,
+  "technical_terminology_policy": {
+    "project_termbase_required": true,
+    "technical_name_human_admit": true,
+    "technical_verb_human_admit": true
+  },
+  "compliance_claim_policy": "HUMAN_ADMIT_REQUIRED"
+}
