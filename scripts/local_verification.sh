@@ -58,6 +58,14 @@ python3 scripts/check_controlled_language_contracts.py bundle \
   --violation evals/fixtures/controlled-language/valid-violation.json \
   --receipt evals/fixtures/controlled-language/valid-receipt.json
 
+step "migration tooling selftests"
+# These live outside skills/, so check_suite_ci_coverage.py does not see them
+# and no workflow named them. A selftest with no arrival is the #122 shape.
+for tool in migration/*.py; do
+  printf -- '--- %s\n' "${tool}"
+  python3 "${tool}" --selftest
+done
+
 step "repository test suites"
 for suite in skills/*/tests/run-all.sh; do
   printf -- '--- %s\n' "${suite}"
