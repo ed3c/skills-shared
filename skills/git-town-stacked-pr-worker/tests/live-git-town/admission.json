@@ -1,0 +1,23 @@
+{
+  "schema_version": "git-town-artifact-admission/v1",
+  "tool": "git-town",
+  "version": "22.9.0",
+  "release_url": "https://github.com/git-town/git-town/releases/tag/v22.9.0",
+  "asset": {
+    "name": "git-town_linux_amd64.deb",
+    "url": "https://github.com/git-town/git-town/releases/download/v22.9.0/git-town_linux_amd64.deb",
+    "sha256": "452348948542cfbd6ac56d1bd333c9c477850dcb4ab5bf0b0cb6c729c03a00ac"
+  },
+  "checksums": {
+    "url": "https://github.com/git-town/git-town/releases/download/v22.9.0/checksums.txt",
+    "sha256": "57386accd845f524b41e025e3f4f70b0aaa7823464d8166e0316cae3f4994ef9"
+  },
+  "license": {
+    "url": "https://raw.githubusercontent.com/git-town/git-town/v22.9.0/LICENSE",
+    "expected_marker": "MIT License",
+    "organization_acceptance": "HUMAN_ADMIT_REQUIRED"
+  },
+  "platform": "linux",
+  "architecture": "amd64",
+  "network_publication": "FORBIDDEN"
+}
