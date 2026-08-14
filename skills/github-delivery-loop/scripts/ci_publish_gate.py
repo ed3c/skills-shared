@@ -16,6 +16,7 @@ Exit codes:
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import subprocess
@@ -137,6 +138,29 @@ def optional_time(value: Any, label: str) -> datetime | None:
     if value is None:
         return None
     return parse_time(value, label)
+
+
+def canonical(value: Any) -> bytes:
+    """The producer's canonical form. Any other encoding computes a different
+    digest and would reject every honest receipt."""
+    return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()
+
+
+def digest_of(value: Any) -> str:
+    return hashlib.sha256(canonical(value)).hexdigest()
+
+
+def git_tree(repo_root: Path) -> str:
+    result = subprocess.run(
+        ["git", "-C", str(repo_root), "rev-parse", "HEAD^{tree}"],
+        text=True,
+        capture_output=True,
+    )
+    if result.returncode != 0:
+        raise InputError(
+            f"cannot resolve local Git tree at {repo_root}: {result.stderr.strip()}"
+        )
+    return require_sha(result.stdout.strip(), "local Git tree")
 
 
 def git_head(repo_root: Path) -> str:
@@ -332,6 +356,147 @@ def validate_verification(
     return value
 
 
+EVIDENCE_SCHEMA = "github-delivery-local-verification-evidence/v1"
+
+COMMAND_FIELDS = {
+    "id", "argv", "cwd", "timeout_seconds", "max_output_bytes", "started_at",
+    "duration_ms", "exit", "timed_out", "spawn_error", "stdout_bytes",
+    "stderr_bytes", "stdout_sha256", "stderr_sha256", "stdout_truncated",
+    "stderr_truncated",
+}
+
+
+def require_relative(value: Any, label: str) -> str:
+    """A repository-relative path, never one that names this machine.
+
+    An absolute path in a receipt is either a machine-local path that will not
+    exist for the next reader, or an escape from the subject the receipt claims
+    to describe. Both make the evidence unverifiable rather than merely untidy.
+    """
+    text = require_string(value, label)
+    if text.startswith("/") or text.startswith("~") or ":\\" in text:
+        raise InputError(f"{label} must be repository-relative, not {text!r}")
+    if ".." in Path(text).parts:
+        raise InputError(f"{label} must not traverse out of the repository: {text!r}")
+    return text
+
+
+def validate_command_evidence(value: Any, index: int) -> str:
+    label = f"evidence.commands[{index}]"
+    if not isinstance(value, dict):
+        raise InputError(f"{label} must be an object")
+    exact_fields(value, COMMAND_FIELDS, label)
+    command_id = require_string(value["id"], f"{label}.id")
+    argv = value["argv"]
+    if (
+        not isinstance(argv, list)
+        or not argv
+        or any(not isinstance(item, str) or not item.strip() for item in argv)
+    ):
+        raise InputError(f"{label}.argv must be a non-empty array of arguments")
+    # An argv that is one string is a shell string, which is the thing the
+    # producer's fixed-command contract exists to forbid.
+    if len(argv) == 1 and any(ch in argv[0] for ch in ";|&$`\n"):
+        raise InputError(f"{label}.argv looks like a shell string, not an argument vector")
+    require_relative(value["cwd"], f"{label}.cwd")
+    for field in ("timeout_seconds", "max_output_bytes", "duration_ms",
+                  "stdout_bytes", "stderr_bytes"):
+        number = value[field]
+        if not isinstance(number, int) or isinstance(number, bool) or number < 0:
+            raise InputError(f"{label}.{field} must be a non-negative integer")
+    parse_time(value["started_at"], f"{label}.started_at")
+    for field in ("timed_out", "stdout_truncated", "stderr_truncated"):
+        if not isinstance(value[field], bool):
+            raise InputError(f"{label}.{field} must be a boolean")
+    require_digest(value["stdout_sha256"], f"{label}.stdout_sha256")
+    require_digest(value["stderr_sha256"], f"{label}.stderr_sha256")
+
+    # A receipt says PASS; these say whether anything actually ran to completion.
+    if value["spawn_error"] is not None:
+        raise InputError(f"{label} never started: {value['spawn_error']}")
+    if value["timed_out"]:
+        raise InputError(f"{label} timed out, so its result is not a result")
+    if value["stdout_truncated"] or value["stderr_truncated"]:
+        raise InputError(
+            f"{label} output was truncated, so its digests describe a prefix and "
+            "cannot be compared against anything"
+        )
+    if value["exit"] != 0:
+        raise InputError(f"{label} exited {value['exit']!r}")
+    return command_id
+
+
+def validate_verification_evidence(
+    evidence: dict[str, Any],
+    receipt: dict[str, Any],
+    repository_id: int,
+    actual_head: str,
+    actual_tree: str,
+) -> dict[str, Any]:
+    """Read the bytes the receipt's digest names.
+
+    The compact receipt carries `evidence_sha256`, and until this existed the
+    gate checked that the field looked like a digest and never read what it
+    pointed at. A digest nobody recomputes is a claim, not a binding: any
+    detailed evidence at all -- a failing run, a different repository, a
+    different commit -- authorized publication as long as the compact receipt
+    said PASS.
+    """
+    if not isinstance(evidence, dict):
+        raise InputError("verification evidence root must be an object")
+    exact_fields(
+        evidence,
+        {
+            "schema", "repository_id", "head_sha", "tree_sha", "contract_sha256",
+            "verified_at", "clean_subject", "commands", "status", "content_sha256",
+        },
+        "verification evidence",
+    )
+    if evidence["schema"] != EVIDENCE_SCHEMA:
+        raise InputError(f"evidence.schema must be {EVIDENCE_SCHEMA}")
+    if evidence["repository_id"] != repository_id:
+        raise InputError("evidence repository identity does not match snapshot")
+    if require_sha(evidence["head_sha"], "evidence.head_sha") != actual_head:
+        raise InputError("evidence is stale for the local Git HEAD")
+    if require_sha(evidence["tree_sha"], "evidence.tree_sha") != actual_tree:
+        raise InputError("evidence describes a different tree than the local HEAD")
+    require_digest(evidence["contract_sha256"], "evidence.contract_sha256")
+    parse_time(evidence["verified_at"], "evidence.verified_at")
+    if evidence["clean_subject"] is not True:
+        raise InputError("evidence was produced from a dirty subject")
+    if evidence["status"] != "PASS":
+        raise InputError("evidence status must be PASS")
+    if evidence["verified_at"] != receipt["verified_at"]:
+        raise InputError("evidence and receipt describe different verification runs")
+
+    commands = evidence["commands"]
+    if not isinstance(commands, list) or not commands:
+        raise InputError("evidence.commands must record every executed command")
+    ids = [validate_command_evidence(item, index) for index, item in enumerate(commands)]
+    if len(set(ids)) != len(ids):
+        raise InputError("evidence.commands repeats a command id")
+    # Ordered, not merely equal as sets: the receipt lists what the contract ran
+    # in the order it ran, and a reordering is a different execution.
+    if ids != receipt["commands"]:
+        raise InputError(
+            f"evidence commands do not match the receipt in order: "
+            f"evidence={ids} receipt={receipt['commands']}"
+        )
+
+    # Two digests, computed the way the producer computes them. `content_sha256`
+    # covers the evidence without itself; the receipt's `evidence_sha256` covers
+    # the evidence including it. Checking one and not the other leaves the other
+    # free to disagree.
+    body = {key: value for key, value in evidence.items() if key != "content_sha256"}
+    if digest_of(body) != evidence["content_sha256"]:
+        raise InputError("evidence content digest does not match its own bytes")
+    if digest_of(evidence) != receipt["evidence_sha256"]:
+        raise InputError(
+            "the receipt's evidence_sha256 does not name these evidence bytes"
+        )
+    return evidence
+
+
 def validate_recovery(
     value: dict[str, Any], snapshot: dict[str, Any]
 ) -> dict[str, Any]:
@@ -375,8 +540,10 @@ def block(reason: str, intent: str, head: str, detail: str | None = None) -> Dec
 def evaluate(
     snapshot: dict[str, Any],
     verification: dict[str, Any],
+    evidence: dict[str, Any],
     intent: str,
     actual_head: str,
+    actual_tree: str,
     recovery: dict[str, Any] | None,
 ) -> Decision:
     if intent not in INTENTS:
@@ -384,6 +551,9 @@ def evaluate(
     validate_snapshot(snapshot)
     repository = snapshot["repository"]
     validate_verification(verification, repository["repository_id"], actual_head)
+    validate_verification_evidence(
+        evidence, verification, repository["repository_id"], actual_head, actual_tree
+    )
     actions = snapshot["actions"]
     pr = snapshot["pull_request"]
 
@@ -494,16 +664,69 @@ def fixture_snapshot(head: str) -> dict[str, Any]:
     }
 
 
-def fixture_verification(head: str) -> dict[str, Any]:
+FIXTURE_TREE = "e" * 40
+
+
+def fixture_command(command_id: str) -> dict[str, Any]:
     return {
+        "id": command_id,
+        "argv": ["bash", "skills/github-delivery-loop/tests/run-all.sh"],
+        "cwd": ".",
+        "timeout_seconds": 600,
+        "max_output_bytes": 1048576,
+        "started_at": "2026-08-12T05:00:00Z",
+        "duration_ms": 1200,
+        "exit": 0,
+        "timed_out": False,
+        "spawn_error": None,
+        "stdout_bytes": 12,
+        "stderr_bytes": 0,
+        "stdout_sha256": "b" * 64,
+        "stderr_sha256": "c" * 64,
+        "stdout_truncated": False,
+        "stderr_truncated": False,
+    }
+
+
+def fixture_pair(head: str, tree: str) -> tuple[dict[str, Any], dict[str, Any]]:
+    """A receipt and the evidence its digest names, built the way the producer
+    builds them: `content_sha256` over the body, `evidence_sha256` over the
+    whole. Hand-written digests would make every negative control pass for the
+    wrong reason."""
+    command_id = "bash skills/github-delivery-loop/tests/run-all.sh"
+    evidence = {
+        "schema": EVIDENCE_SCHEMA,
+        "repository_id": 1326262274,
+        "head_sha": head,
+        "tree_sha": tree,
+        "contract_sha256": "d" * 64,
+        "verified_at": "2026-08-12T05:00:00Z",
+        "clean_subject": True,
+        "commands": [fixture_command(command_id)],
+        "status": "PASS",
+    }
+    evidence["content_sha256"] = digest_of(evidence)
+    receipt = {
         "schema": VERIFICATION_SCHEMA,
         "repository_id": 1326262274,
         "head_sha": head,
         "status": "PASS",
         "verified_at": "2026-08-12T05:00:00Z",
-        "evidence_sha256": "a" * 64,
-        "commands": ["bash skills/github-delivery-loop/tests/run-all.sh"],
+        "evidence_sha256": digest_of(evidence),
+        "commands": [command_id],
     }
+    return receipt, evidence
+
+
+def reseal(receipt: dict[str, Any], evidence: dict[str, Any]) -> None:
+    """Re-derive both digests after a mutation.
+
+    Without this a mutation is caught by the digest check rather than by the
+    rule under test, and every negative control would pass while proving
+    nothing about the rule it names."""
+    body = {key: value for key, value in evidence.items() if key != "content_sha256"}
+    evidence["content_sha256"] = digest_of(body)
+    receipt["evidence_sha256"] = digest_of(evidence)
 
 
 def expect(
@@ -511,12 +734,15 @@ def expect(
     expected_decision: str,
     expected_reason: str,
     snapshot: dict[str, Any],
-    verification: dict[str, Any],
+    pair: tuple[dict[str, Any], dict[str, Any]],
     intent: str,
     head: str,
     recovery: dict[str, Any] | None = None,
 ) -> None:
-    result = evaluate(snapshot, verification, intent, head, recovery)
+    receipt, evidence = pair
+    result = evaluate(
+        snapshot, receipt, evidence, intent, head, FIXTURE_TREE, recovery
+    )
     if result.decision != expected_decision or result.reason != expected_reason:
         raise InputError(
             f"selftest {name}: got {result.decision}/{result.reason}, "
@@ -524,11 +750,31 @@ def expect(
         )
 
 
+def refuse(name: str, snapshot: dict[str, Any],
+           pair: tuple[dict[str, Any], dict[str, Any]], head: str,
+           mutate, *, reseal_after: bool = False) -> None:
+    """Plant one defect and require the gate to refuse it.
+
+    `reseal_after` re-derives both digests, so a mutation is caught by the rule
+    it names rather than by the digest check standing in front of every rule.
+    """
+    receipt = json.loads(json.dumps(pair[0]))
+    evidence = json.loads(json.dumps(pair[1]))
+    mutate(receipt, evidence)
+    if reseal_after:
+        reseal(receipt, evidence)
+    try:
+        evaluate(snapshot, receipt, evidence, "initial-pr", head, FIXTURE_TREE, None)
+    except InputError:
+        return
+    raise InputError(f"selftest {name} unexpectedly passed")
+
+
 def selftest() -> None:
     head = "1" * 40
     new_head = "2" * 40
     base = fixture_snapshot(head)
-    verification = fixture_verification(head)
+    verification = fixture_pair(head, FIXTURE_TREE)
     expect(
         "initial",
         "ALLOW",
@@ -539,14 +785,93 @@ def selftest() -> None:
         head,
     )
 
-    stale = json.loads(json.dumps(verification))
-    stale["head_sha"] = "0" * 40
-    try:
-        evaluate(base, stale, "initial-pr", head, None)
-    except InputError:
-        pass
-    else:
-        raise InputError("selftest stale-local-verification unexpectedly passed")
+    refuse("stale-local-verification", base, verification, head,
+           lambda receipt, evidence: receipt.__setitem__("head_sha", "0" * 40))
+
+    # The receipt says PASS; these decide whether the bytes it names say the
+    # same thing. Every one of them authorized publication before the gate read
+    # the sidecar at all.
+    def set_evidence(field: str, value: Any):
+        return lambda receipt, evidence: evidence.__setitem__(field, value)
+
+    def set_command(field: str, value: Any):
+        return lambda receipt, evidence: evidence["commands"][0].__setitem__(field, value)
+
+    sealed = {"reseal_after": True}
+    refuse("evidence-wrong-repository", base, verification, head,
+           set_evidence("repository_id", 999), **sealed)
+    refuse("evidence-stale-head", base, verification, head,
+           set_evidence("head_sha", "0" * 40), **sealed)
+    refuse("evidence-other-tree", base, verification, head,
+           set_evidence("tree_sha", "f" * 40), **sealed)
+    refuse("evidence-dirty-subject", base, verification, head,
+           set_evidence("clean_subject", False), **sealed)
+    refuse("evidence-not-pass", base, verification, head,
+           set_evidence("status", "FAIL"), **sealed)
+    refuse("evidence-different-run", base, verification, head,
+           set_evidence("verified_at", "2026-08-12T06:00:00Z"), **sealed)
+    refuse("evidence-no-commands", base, verification, head,
+           set_evidence("commands", []), **sealed)
+
+    refuse("command-nonzero-exit", base, verification, head,
+           set_command("exit", 1), **sealed)
+    refuse("command-timed-out", base, verification, head,
+           set_command("timed_out", True), **sealed)
+    refuse("command-stdout-truncated", base, verification, head,
+           set_command("stdout_truncated", True), **sealed)
+    refuse("command-stderr-truncated", base, verification, head,
+           set_command("stderr_truncated", True), **sealed)
+    refuse("command-spawn-error", base, verification, head,
+           set_command("spawn_error", "No such file or directory"), **sealed)
+    refuse("command-absolute-cwd", base, verification, head,
+           set_command("cwd", "/Users/someone/checkout"), **sealed)
+    refuse("command-escaping-cwd", base, verification, head,
+           set_command("cwd", "../elsewhere"), **sealed)
+    refuse("command-shell-string", base, verification, head,
+           set_command("argv", ["bash tests/run-all.sh | tee log"]), **sealed)
+    refuse("command-malformed-stream-hash", base, verification, head,
+           set_command("stdout_sha256", "not-a-digest"), **sealed)
+    refuse("command-negative-duration", base, verification, head,
+           set_command("duration_ms", -1), **sealed)
+
+    def duplicate_ids(receipt, evidence):
+        evidence["commands"].append(json.loads(json.dumps(evidence["commands"][0])))
+        receipt["commands"].append(receipt["commands"][0])
+
+    refuse("duplicate-command-ids", base, verification, head, duplicate_ids, **sealed)
+
+    def reordered(receipt, evidence):
+        second = json.loads(json.dumps(evidence["commands"][0]))
+        second["id"] = "second command"
+        evidence["commands"].append(second)
+        receipt["commands"] = [second["id"], receipt["commands"][0]]
+
+    refuse("reordered-command-ids", base, verification, head, reordered, **sealed)
+
+    # The two digests, each on its own. Checking one and not the other leaves
+    # the other free to disagree, which is the compact-only path this closes.
+    def stale_content_digest(receipt, evidence):
+        # Change the body and leave `content_sha256` describing the old bytes,
+        # then re-derive only the receipt's digest. A first attempt simply
+        # corrupted `content_sha256`, and that was caught by the receipt digest
+        # check standing in front of it -- the control passed while proving
+        # nothing about the check it named.
+        evidence["contract_sha256"] = "9" * 64
+        receipt["evidence_sha256"] = digest_of(evidence)
+
+    refuse("content-digest-disagrees", base, verification, head, stale_content_digest)
+    refuse("receipt-names-other-bytes", base, verification, head,
+           lambda receipt, evidence: receipt.__setitem__("evidence_sha256", "0" * 64))
+
+    # The old compact-only path: a receipt that is internally perfect paired
+    # with evidence from a different verification run.
+    def foreign_evidence(receipt, evidence):
+        other = fixture_pair("3" * 40, FIXTURE_TREE)[1]
+        evidence.clear()
+        evidence.update(other)
+
+    refuse("compact-receipt-with-foreign-evidence", base, verification, head,
+           foreign_evidence)
 
     draft = json.loads(json.dumps(base))
     draft["pull_request"].update(
@@ -586,7 +911,7 @@ def selftest() -> None:
         "observed_at": "2026-08-12T05:02:00Z",
         "consumed_by_sha": None,
     }
-    new_verification = fixture_verification(new_head)
+    new_verification = fixture_pair(new_head, FIXTURE_TREE)
     expect(
         "review-repair",
         "ALLOW",
@@ -674,7 +999,8 @@ def selftest() -> None:
         head,
         recovery,
     )
-    print("SELFTEST GREEN: GitHub Actions publication gate (10 policy cases)")
+    print("SELFTEST GREEN: GitHub Actions publication gate "
+        "(10 policy cases, 23 evidence-binding controls)")
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -684,6 +1010,7 @@ def main(argv: list[str] | None = None) -> int:
     evaluate_parser = subparsers.add_parser("evaluate")
     evaluate_parser.add_argument("--snapshot", type=Path, required=True)
     evaluate_parser.add_argument("--verification", type=Path, required=True)
+    evaluate_parser.add_argument("--verification-evidence", type=Path, required=True)
     evaluate_parser.add_argument("--recovery", type=Path)
     evaluate_parser.add_argument("--repo-root", type=Path, default=Path.cwd())
     evaluate_parser.add_argument("--intent", choices=sorted(INTENTS), required=True)
@@ -706,17 +1033,22 @@ def main(argv: list[str] | None = None) -> int:
     try:
         snapshot = load_object(args.snapshot, "publish snapshot")
         verification = load_object(args.verification, "local verification receipt")
+        evidence = load_object(args.verification_evidence, "local verification evidence")
         recovery = (
             load_object(args.recovery, "billing recovery receipt")
             if args.recovery is not None
             else None
         )
-        actual_head = git_head(args.repo_root.resolve())
+        repo_root = args.repo_root.resolve()
+        actual_head = git_head(repo_root)
+        actual_tree = git_tree(repo_root)
         decision = evaluate(
             snapshot,
             verification,
+            evidence,
             args.intent,
             actual_head,
+            actual_tree,
             recovery,
         )
         emit(decision, args.json)

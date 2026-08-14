@@ -74,9 +74,10 @@
         "only initial draft PR, ready-for-review, and one batched repair are admitted",
         "older-SHA CI success and repeated feedback fail closed",
         "billing or spending-limit no-runner evidence opens a circuit breaker",
-        "only a later owner-authored recovery receipt can admit another attempt"
+        "only a later owner-authored recovery receipt can admit another attempt",
+        "a compact receipt cannot authorize publication unless the evidence its digest names is read and recomputed"
       ],
-      "expected": "good initial publication ALLOW; hollow billing snapshot BLOCK; stale HEAD, repeated feedback, and stale recovery remain red"
+      "expected": "good initial publication ALLOW; hollow billing snapshot BLOCK; stale HEAD, repeated feedback, and stale recovery remain red; a perfect receipt paired with evidence from another run exits 64"
     },
     {
       "id": "DELIVERY-6",

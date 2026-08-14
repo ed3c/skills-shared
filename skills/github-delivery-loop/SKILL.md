@@ -47,7 +47,7 @@ canonical 住 `~/.claude/skills/github-delivery-loop/`；各 repo 的 `.claude/s
 5. 每張 issue 在隔離 worktree 走 TDD → review；本地 commit/rebase 不等於 GitHub CI publication。
 6. 先由 consumer-owned fixed-command contract 產生 exact-HEAD local verification receipt；再由 trusted
    sync lane 產生 GitHub PR/check/billing snapshot。
-7. push 前用 `ci_publish_gate.py evaluate` 驗 exact HEAD、local receipt、PR/feedback snapshot 與 billing
+7. push 前用 `ci_publish_gate.py evaluate` 驗 exact HEAD、local receipt **與它的 digest 指名的 evidence 側車**、PR/feedback snapshot 與 billing
    circuit。只允許 `initial-pr`、`ready-for-review`、`batched-repair` 三種 publication；初次 PR 一律
    draft，禁止把每個 local checkpoint 推成一個 private Actions run。
 8. PR body 使用 `Closes #N`；Merge 走下節的 admit → preflight → land。漂移或新發現另開 issue，
@@ -60,6 +60,7 @@ python3 ~/.claude/skills/github-delivery-loop/scripts/ci_publish_gate.py evaluat
   --repo-root /absolute/path/to/repo \
   --snapshot /path/to/github-state.snapshot.json \
   --verification /path/to/local-verification.receipt.json \
+  --verification-evidence /path/to/local-verification.evidence.json \
   --intent ready-for-review \
   --json
 ```

@@ -150,6 +150,7 @@ python3 skills/github-delivery-loop/scripts/ci_publish_gate.py evaluate \
   --repo-root /absolute/path/to/repo \
   --snapshot /path/to/github-state.snapshot.json \
   --verification /path/to/local-verification.receipt.json \
+  --verification-evidence /path/to/local-verification.evidence.json \
   --intent initial-pr \
   --json
 ```
