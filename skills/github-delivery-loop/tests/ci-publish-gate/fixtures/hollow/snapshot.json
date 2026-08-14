@@ -14,6 +14,7 @@
     "last_published_at": null,
     "feedback": null
   },
+  "initial_boundary": "trusted-initial",
   "actions": {
     "circuit": "billing-open",
     "observed_at": "2026-08-12T05:03:00Z",
