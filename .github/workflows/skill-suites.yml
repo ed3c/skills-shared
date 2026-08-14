@@ -15,6 +15,7 @@ on:
       - reopened
       - synchronize
     paths:
+      - 'skills/controlled-technical-language-harness/**'
       - 'skills/github-delivery-loop/**'
       - 'skills/gitlab-delivery-loop/**'
       - 'skills/html-for-decisions/**'
@@ -25,6 +26,7 @@ on:
   push:
     branches: [main]
     paths:
+      - 'skills/controlled-technical-language-harness/**'
       - 'skills/github-delivery-loop/**'
       - 'skills/gitlab-delivery-loop/**'
       - 'skills/html-for-decisions/**'
@@ -67,6 +69,7 @@ jobs:
       fail-fast: false
       matrix:
         skill:
+          - controlled-technical-language-harness
           - github-delivery-loop
           - gitlab-delivery-loop
           - html-for-decisions
