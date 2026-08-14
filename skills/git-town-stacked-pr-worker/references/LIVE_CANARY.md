@@ -17,6 +17,16 @@ legal acceptance         HUMAN_ADMIT_REQUIRED
 
 The workflow downloads public release artifacts only. It does not receive repository write credentials.
 
+## Local probe
+
+`run_canary.py --executable <path-to-git-town>` runs every behavioural canary
+against a git-town binary that is already present, so canary changes can be
+verified without spending a CI run per attempt. The receipt then records
+`artifact_admission: NOT_EXERCISED` and carries no digests, and the evaluator
+rejects any receipt that claims `NOT_EXERCISED` while still presenting them. A
+local probe is therefore never substitutable for the workflow's
+download-and-verify lane.
+
 ## Positive canary
 
 ```text
@@ -46,9 +56,15 @@ child changes same shared line
 → sync
 → non-zero exit
 → unmerged path
-→ suspended rebase state
+→ suspended Git operation
+→ Git Town reports a suspended command
 → unchanged remote refs
 ```
+
+Git Town 24 syncs by merging, so the suspended operation is `MERGE_HEAD`, not a
+rebase directory. The canary accepts any of the in-progress states a configured
+sync strategy can leave, and separately asserts Git Town's own terminal report
+rather than inferring suspension from Git's internals alone.
 
 The test command log rejects automatic:
 
@@ -73,7 +89,8 @@ The Harness removes the disposable directory after assertions. It does not seman
 - post-sync ancestry;
 - protected `main`;
 - no-push remote immutability;
-- conflict fail-closed state;
+- conflict fail-closed state, including Git Town's own suspended-command report;
+- whether the artifact-admission lane was exercised or explicitly absent;
 - Human-owned legal and merge boundaries.
 
 ## Evidence boundary

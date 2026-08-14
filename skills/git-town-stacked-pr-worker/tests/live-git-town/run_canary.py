@@ -132,16 +132,12 @@ class Canary:
         )
 
     def configure(self, repo: Path) -> None:
-        self.town(
-            repo,
-            "config",
-            "setup",
-            "--main-branch",
-            "main",
-            "--hosting-platform",
-            "none",
-            "--non-interactive",
-        )
+        # Git Town's only non-interactive configuration surface is its own Git
+        # config keys; `git-town init` is interactive and there is no
+        # `config setup` subcommand. Forge type stays unset on purpose: the
+        # fixture remote is a local bare path with no forge, and every value
+        # this canary could name is rejected as an unknown forge type.
+        git(repo, "config", "git-town.main-branch", "main")
 
     def positive(self, root: Path) -> dict[str, Any]:
         remote, repo = init_fixture(root, "positive")
@@ -157,7 +153,7 @@ class Canary:
         git(repo, "add", "parent.txt")
         git(repo, "commit", "-m", "parent v1")
 
-        self.town(repo, "hack", "child")
+        self.town(repo, "append", "child")
         (repo / "child.txt").write_text("child\n", encoding="utf-8")
         git(repo, "add", "child.txt")
         git(repo, "commit", "-m", "child")
@@ -235,7 +231,7 @@ class Canary:
         git(repo, "add", "parent-anchor.txt")
         git(repo, "commit", "-m", "parent anchor")
 
-        self.town(repo, "hack", "child")
+        self.town(repo, "append", "child")
         (repo / "shared.txt").write_text("child\n", encoding="utf-8")
         git(repo, "add", "shared.txt")
         git(repo, "commit", "-m", "child edits shared line")
@@ -265,13 +261,22 @@ class Canary:
         remote_after = ref_digest(remote, bare=True)
         unmerged = bool(git(worker, "diff", "--name-only", "--diff-filter=U").stdout.strip())
 
+        # Which of these Git states exists depends on the configured sync
+        # strategy: Git Town 24 merges by default and leaves MERGE_HEAD, while a
+        # rebase strategy leaves a rebase directory. Assert that the operation is
+        # suspended, not that it was suspended by one particular mechanism.
         suspended = False
-        for state in ("rebase-merge", "rebase-apply"):
+        for state in ("rebase-merge", "rebase-apply", "MERGE_HEAD", "CHERRY_PICK_HEAD"):
             raw = git(worker, "rev-parse", "--git-path", state).stdout.strip()
             path = Path(raw)
             if not path.is_absolute():
                 path = worker / path
-            suspended = suspended or path.is_dir()
+            suspended = suspended or path.exists()
+
+        # Git Town's own terminal state, rather than an inference from Git's
+        # internals: it must still be holding a failed command awaiting a human.
+        status_output = self.town(worker, "status", check=False).stdout
+        town_suspended = "hit a problem" in status_output
 
         prohibited = {"continue", "skip", "undo", "ship"}
         automatic_recovery = any(
@@ -281,7 +286,8 @@ class Canary:
         return {
             "sync_exit": sync.returncode,
             "unmerged_paths_present": unmerged,
-            "suspended_rebase_present": suspended,
+            "suspended_operation_present": suspended,
+            "git_town_reports_suspended": town_suspended,
             "remote_refs_unchanged": remote_before == remote_after,
             "main_unchanged": git(worker, "rev-parse", "main").stdout.strip() == main_before,
             "automatic_semantic_recovery_attempted": automatic_recovery,
@@ -299,12 +305,27 @@ def validate_receipt(receipt: dict[str, Any], admission: dict[str, Any]) -> list
             "invalid receipt schema")
     require(receipt.get("tool_version") == admission["version"],
             "tool version differs from admission")
-    require(receipt.get("asset_sha256") == admission["asset"]["sha256"],
-            "asset digest differs from admission")
-    require(receipt.get("checksums_sha256") == admission["checksums"]["sha256"],
-            "checksums digest differs from admission")
-    require(receipt.get("license_marker") == admission["license"]["expected_marker"],
-            "license marker was not observed")
+
+    # The artifact-admission lane is either fully exercised or explicitly absent.
+    # A local probe run against a pre-present binary keeps every behavioural
+    # canary below but must never present itself as download-and-verify evidence.
+    admission_state = receipt.get("artifact_admission")
+    require(admission_state in {"EXERCISED", "NOT_EXERCISED"},
+            f"unknown artifact admission state: {admission_state!r}")
+    if admission_state == "EXERCISED":
+        require(receipt.get("asset_sha256") == admission["asset"]["sha256"],
+                "asset digest differs from admission")
+        require(receipt.get("checksums_sha256") == admission["checksums"]["sha256"],
+                "checksums digest differs from admission")
+        require(receipt.get("license_marker") == admission["license"]["expected_marker"],
+                "license marker was not observed")
+    else:
+        require(
+            receipt.get("asset_sha256") is None
+            and receipt.get("checksums_sha256") is None
+            and receipt.get("license_sha256") is None,
+            "artifact admission is NOT_EXERCISED but the receipt carries digests",
+        )
     require(receipt.get("legal_acceptance") == "HUMAN_ADMIT_REQUIRED",
             "legal acceptance did not remain Human-owned")
 
@@ -329,8 +350,10 @@ def validate_receipt(receipt: dict[str, Any], admission: dict[str, Any]) -> list
     require(conflict["sync_exit"] != 0, "planted conflict did not fail")
     require(conflict["unmerged_paths_present"] is True,
             "planted conflict did not preserve unmerged paths")
-    require(conflict["suspended_rebase_present"] is True,
-            "planted conflict did not preserve suspended rebase state")
+    require(conflict["suspended_operation_present"] is True,
+            "planted conflict did not preserve a suspended Git operation")
+    require(conflict["git_town_reports_suspended"] is True,
+            "Git Town did not report a suspended command awaiting a human")
     require(conflict["remote_refs_unchanged"] is True,
             "conflict sync changed remote refs")
     require(conflict["main_unchanged"] is True, "conflict sync changed main")
@@ -349,6 +372,18 @@ def main() -> int:
     parser.add_argument("--admission", required=True, type=Path)
     parser.add_argument("--subject", required=True)
     parser.add_argument("--receipt", required=True, type=Path)
+    parser.add_argument(
+        "--executable",
+        type=Path,
+        default=None,
+        help=(
+            "run the canaries against an already-present git-town binary of the "
+            "admitted version. Artifact admission is then NOT_EXERCISED, so the "
+            "receipt cannot stand in for the workflow's download-and-verify lane. "
+            "This is the cheap local surface for changing canary behaviour without "
+            "spending a CI run per attempt."
+        ),
+    )
     args = parser.parse_args()
 
     if SHA40.fullmatch(args.subject) is None:
@@ -358,40 +393,21 @@ def main() -> int:
 
     with tempfile.TemporaryDirectory(prefix="git-town-live-canary-") as tmp_raw:
         tmp = Path(tmp_raw)
-        downloads = tmp / "downloads"
-        downloads.mkdir()
-        asset = downloads / admission["asset"]["name"]
-        checksums = downloads / "checksums.txt"
-        license_file = downloads / "LICENSE"
-        download(admission["asset"]["url"], asset)
-        download(admission["checksums"]["url"], checksums)
-        download(admission["license"]["url"], license_file)
+        if args.executable is not None:
+            artifact_admission = "NOT_EXERCISED"
+            asset_digest = checksums_digest = license_digest = None
+            git_town = args.executable.resolve()
+            if not os.access(git_town, os.X_OK):
+                raise RuntimeError(f"not an executable: {git_town}")
+        else:
+            artifact_admission = "EXERCISED"
+            (
+                git_town,
+                asset_digest,
+                checksums_digest,
+                license_digest,
+            ) = admit_artifact(tmp, admission)
 
-        if sha256(asset) != admission["asset"]["sha256"]:
-            raise RuntimeError("release asset checksum mismatch")
-        if sha256(checksums) != admission["checksums"]["sha256"]:
-            raise RuntimeError("checksums.txt checksum mismatch")
-        checksum_entries = {}
-        for line in checksums.read_text(encoding="utf-8").splitlines():
-            fields = line.split()
-            if len(fields) >= 2:
-                checksum_entries[fields[-1].lstrip("*")] = fields[0]
-        if checksum_entries.get(admission["asset"]["name"]) != admission["asset"]["sha256"]:
-            raise RuntimeError("checksums.txt does not bind the selected asset")
-        license_text = license_file.read_text(encoding="utf-8")
-        if admission["license"]["expected_marker"] not in license_text:
-            raise RuntimeError("expected direct license marker is absent")
-
-        extract = tmp / "extract"
-        run(["dpkg-deb", "-x", str(asset), str(extract)])
-        candidates = [
-            path
-            for path in extract.rglob("git-town")
-            if path.is_file() and os.access(path, os.X_OK)
-        ]
-        if len(candidates) != 1:
-            raise RuntimeError(f"expected one executable, found {len(candidates)}")
-        git_town = candidates[0]
         version_output = run([str(git_town), "--version"]).stdout
         match = VERSION.search(version_output)
         if match is None or match.group(0) != admission["version"]:
@@ -413,9 +429,10 @@ def main() -> int:
             "schema_version": "git-town-live-canary-receipt/v1",
             "subject_sha": args.subject,
             "tool_version": admission["version"],
-            "asset_sha256": sha256(asset),
-            "checksums_sha256": sha256(checksums),
-            "license_sha256": sha256(license_file),
+            "artifact_admission": artifact_admission,
+            "asset_sha256": asset_digest,
+            "checksums_sha256": checksums_digest,
+            "license_sha256": license_digest,
             "license_marker": admission["license"]["expected_marker"],
             "legal_acceptance": admission["license"]["organization_acceptance"],
             "observed_sync_flags": flags,
@@ -440,6 +457,47 @@ def main() -> int:
 
     print(f"PASS Git Town {admission['version']} disposable live canaries")
     return 0
+
+
+def admit_artifact(
+    tmp: Path,
+    admission: dict[str, Any],
+) -> tuple[Path, str, str, str]:
+    """Download, verify and unpack the admitted release; return it and its digests."""
+    downloads = tmp / "downloads"
+    downloads.mkdir()
+    asset = downloads / admission["asset"]["name"]
+    checksums = downloads / "checksums.txt"
+    license_file = downloads / "LICENSE"
+    download(admission["asset"]["url"], asset)
+    download(admission["checksums"]["url"], checksums)
+    download(admission["license"]["url"], license_file)
+
+    if sha256(asset) != admission["asset"]["sha256"]:
+        raise RuntimeError("release asset checksum mismatch")
+    if sha256(checksums) != admission["checksums"]["sha256"]:
+        raise RuntimeError("checksums.txt checksum mismatch")
+    checksum_entries = {}
+    for line in checksums.read_text(encoding="utf-8").splitlines():
+        fields = line.split()
+        if len(fields) >= 2:
+            checksum_entries[fields[-1].lstrip("*")] = fields[0]
+    if checksum_entries.get(admission["asset"]["name"]) != admission["asset"]["sha256"]:
+        raise RuntimeError("checksums.txt does not bind the selected asset")
+    license_text = license_file.read_text(encoding="utf-8")
+    if admission["license"]["expected_marker"] not in license_text:
+        raise RuntimeError("expected direct license marker is absent")
+
+    extract = tmp / "extract"
+    run(["dpkg-deb", "-x", str(asset), str(extract)])
+    candidates = [
+        path
+        for path in extract.rglob("git-town")
+        if path.is_file() and os.access(path, os.X_OK)
+    ]
+    if len(candidates) != 1:
+        raise RuntimeError(f"expected one executable, found {len(candidates)}")
+    return candidates[0], sha256(asset), sha256(checksums), sha256(license_file)
 
 
 if __name__ == "__main__":
