@@ -1,0 +1,68 @@
+name: Repo Agent Native Contract
+
+on:
+  pull_request:
+    types:
+      - ready_for_review
+      - reopened
+      - synchronize
+    paths:
+      - 'skills/repo-agent-native/**'
+      - '.github/workflows/repo-agent-native-contract.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'skills/repo-agent-native/**'
+      - '.github/workflows/repo-agent-native-contract.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: repo-agent-native-contract-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  contract:
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6
+        with:
+          bun-version: '1.2.19'
+      - name: Bind the run to the exact candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_SHA" = "$(git rev-parse HEAD)"
+          printf 'head=%s\n' "$(git rev-parse HEAD)"
+          printf 'tree=%s\n' "$(git rev-parse 'HEAD^{tree}')"
+          printf 'bun=%s\n' "$(bun --version)"
+      - name: Exercise portable-core positive and mutation controls
+        run: bun skills/repo-agent-native/tests/selftest.ts
+      - name: Validate the canonical Skill structure
+        shell: bash
+        run: |
+          set -euo pipefail
+          receipt="$(mktemp)"
+          bun skills/repo-agent-native/scripts/validate-skill.ts \
+            --skill-root skills/repo-agent-native \
+            --json "$receipt"
+          python3 -m json.tool "$receipt" >/dev/null
+      - name: Validate declarative fixture syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          for fixture in \
+            skills/repo-agent-native/evals/evals.json \
+            skills/repo-agent-native/evals/fixtures/module-routing-cases.json \
+            skills/repo-agent-native/evals/fixtures/scenarios.json \
+            skills/repo-agent-native/evals/fixtures/trigger-cases.json
+          do
+            python3 -m json.tool "$fixture" >/dev/null
+          done

@@ -60,15 +60,16 @@ Portable scripts must:
 - avoid secret/session values and owner-checkout dependency borrowing;
 - be re-runnable on a fresh clone or immutable bundle.
 
-Planned exit contract:
+Bundled-script exit contract:
 
 ```text
 0   assertion passed
 2   subject was evaluated and failed a domain assertion
 64  usage, schema, required input, or evidence subject is absent/invalid
 70  internal mechanism error
-124 timeout
 ```
+
+An outer host runner may use its own timeout state or exit, but it must not rewrite that non-execution as a bundled assertion `PASS`.
 
 ## Assertion layers
 
