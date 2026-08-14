@@ -15,7 +15,6 @@ from exact_evidence_core import (
 )
 from exact_evidence_calibration import evaluate_calibration
 
-
 def selftest() -> int:
     failures: list[str] = []
     with tempfile.TemporaryDirectory() as tmp:
@@ -53,6 +52,23 @@ def selftest() -> int:
         except InputError: pass
         mutated=copy.deepcopy(case); mutated["technical_terms_used"][0]["part_of_speech"]="VERB"
         if evaluate_deterministic(root,mutated,raw)["status"]!="FAIL": failures.append("wrong POS survived")
+        mutated=copy.deepcopy(case); mutated["candidate"]["segments"][0]["end"]-=1
+        covered=mutated["candidate"]["content"][:mutated["candidate"]["segments"][0]["end"]]
+        mutated["candidate"]["segments"][0]["text_digest"]=digest(covered.encode())
+        if evaluate_deterministic(root,mutated,raw)["status"]!="FAIL": failures.append("uncovered candidate bytes survived")
+
+        xml_source='<procedure><warning id="w1">Hot steam can burn you.</warning><step id="s1">Remove the cap.</step></procedure>'
+        xml_case={"schema_version":DET_SCHEMA,"profile_pack":ref("pack.json"),"ruleset":ref("rules.json"),"policy":ref("policy.json"),
+                  "termbase_references":[ref("term.json")],"subject":{"content":xml_source,"artifact_digest":digest(xml_source.encode())},
+                  "candidate":{"content":xml_source,"artifact_digest":digest(xml_source.encode())},"document_class":"S1000D_XML",
+                  "technical_terms_used":[],"xml_preservation":{"id_attribute":"id","protected_nodes":[
+                    {"id":"w1","tag":"warning","text_digest":digest(b"Hot steam can burn you.")},
+                    {"id":"s1","tag":"step","text_digest":digest(b"Remove the cap.")} ]}}
+        xml_raw=(json.dumps(xml_case,sort_keys=True)+"\n").encode()
+        if evaluate_deterministic(root,xml_case,xml_raw)["status"]!="PASS": failures.append("canonical XML preservation failed")
+        bad_xml=copy.deepcopy(xml_case); bad_xml["candidate"]["content"]='<procedure><step id="s1">Remove the cap.</step></procedure>'
+        bad_xml["candidate"]["artifact_digest"]=digest(bad_xml["candidate"]["content"].encode())
+        if evaluate_deterministic(root,bad_xml,xml_raw)["status"]!="FAIL": failures.append("removed protected XML node survived")
 
     heuristics=["IMPERATIVE","PASSIVE","MULTI_ACTION","NOUN_CLUSTER_GT3","AMBIGUOUS_PRONOUN","MEANING_PRESERVED"]
     cases=[]
@@ -79,6 +95,12 @@ def selftest() -> int:
         failures.append("boundary misclassification survived")
     bad=copy.deepcopy(predictions); bad["evaluator_identity"]["model_identity"]="latest"
     try: evaluate_calibration(policy,policy_raw,gold,gold_raw,bad,pred_raw); failures.append("mutable model survived")
+    except InputError: pass
+    bad=copy.deepcopy(predictions); bad["corpus_identity"]["artifact_digest"]="sha256:"+"0"*64
+    try: evaluate_calibration(policy,policy_raw,gold,gold_raw,bad,pred_raw); failures.append("stale gold identity survived")
+    except InputError: pass
+    bad=copy.deepcopy(predictions); bad["predictions"].pop()
+    try: evaluate_calibration(policy,policy_raw,gold,gold_raw,bad,pred_raw); failures.append("incomplete prediction set survived")
     except InputError: pass
     if failures:
         for item in failures: print(f"SELFTEST RED: {item}",file=sys.stderr)
