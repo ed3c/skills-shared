@@ -32,6 +32,8 @@ on:
       - 'scripts/check_commit_roles.py'
       - 'scripts/check_guard_controls.py'
       - 'scripts/measure_delivery_shape.py'
+      - 'scripts/check_executor_authority.py'
+      - 'evals/runtime/executors/**'
       - 'scripts/delivery_shape_selftest.py'
       - 'evals/fixtures/delivery-shape/**'
       - 'scripts/guard_control_selftest.py'
@@ -128,6 +130,10 @@ jobs:
             --violation evals/fixtures/controlled-language/valid-violation.json \
             --receipt evals/fixtures/controlled-language/valid-receipt.json
           python3 -m unittest tests/test_controlled_language_contracts.py -v
+      - name: Bound what an execution adapter may claim
+        run: |
+          python3 scripts/check_executor_authority.py --repo-root .
+          python3 scripts/check_executor_authority.py --repo-root . --selftest
       - name: Refuse an unfair delivery-shape comparison
         run: |
           python3 scripts/measure_delivery_shape.py selftest
@@ -211,6 +217,7 @@ jobs:
           python3 -m json.tool evals/schema/evidence-bundle.schema.json >/dev/null
           python3 -m json.tool evals/schema/run-trace.schema.json >/dev/null
           python3 -m json.tool evals/schema/intent-bound-constraint.schema.json >/dev/null
+          python3 -m json.tool evals/schema/skill-eval-executor-authority.schema.json >/dev/null
           python3 -m json.tool evals/schema/intent-promotion-contract.schema.json >/dev/null
           python3 -m json.tool evals/schema/intent-promotion-receipt.schema.json >/dev/null
           python3 -m json.tool evals/fixtures/intent-promotion/valid-contract.json >/dev/null

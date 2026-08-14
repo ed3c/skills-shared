@@ -118,6 +118,19 @@
         "tests.test_commit_roles.GateTests"
       ],
       "note": "Without this the exception list becomes a way to skip any commit, including ones that could simply carry the trailers."
+    },
+    {
+      "id": "executor-promotion-authority",
+      "file": "scripts/check_executor_authority.py",
+      "anchor": "    if not isinstance(field, dict) or field.get(\"const\") is not False:",
+      "verify": [
+        "python3",
+        "scripts/check_executor_authority.py",
+        "--repo-root",
+        ".",
+        "--selftest"
+      ],
+      "note": "#29 requires that no execution adapter owns promotion authority. The guard lives in the schema's const, so this protects the schema from being weakened back to a per-adapter boolean. An earlier Python re-check of the same thing was reported as uncontrolled by this very gate, correctly."
     }
   ]
 }
