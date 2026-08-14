@@ -204,6 +204,50 @@
         "skills/controlled-technical-language-harness/tests/profile-admission/verify.sh"
       ],
       "note": "#47 sweep: a proposal-derived profile must not be admitted as the official standard. Registered to prove this selftest can go red at all, after the same class of hollow mutation was found in check_publication_boundary.py."
+    },
+    {
+      "id": "gate-evidence-receipt-binding",
+      "file": "skills/github-delivery-loop/scripts/ci_publish_gate.py",
+      "anchor": "    if digest_of(evidence) != receipt[\"evidence_sha256\"]:",
+      "verify": [
+        "python3",
+        "skills/github-delivery-loop/scripts/ci_publish_gate.py",
+        "--selftest"
+      ],
+      "note": "#53: without this the receipt's evidence_sha256 is a claim nobody recomputes, and any detailed evidence at all authorizes publication as long as the compact receipt says PASS."
+    },
+    {
+      "id": "gate-evidence-content-digest",
+      "file": "skills/github-delivery-loop/scripts/ci_publish_gate.py",
+      "anchor": "    if digest_of(body) != evidence[\"content_sha256\"]:",
+      "verify": [
+        "python3",
+        "skills/github-delivery-loop/scripts/ci_publish_gate.py",
+        "--selftest"
+      ],
+      "note": "#53: the sidecar's self-digest. Checking only the receipt's digest leaves this one free to disagree with the bytes it covers."
+    },
+    {
+      "id": "gate-evidence-command-outcome",
+      "file": "skills/github-delivery-loop/scripts/ci_publish_gate.py",
+      "anchor": "    if value[\"exit\"] != 0:",
+      "verify": [
+        "python3",
+        "skills/github-delivery-loop/scripts/ci_publish_gate.py",
+        "--selftest"
+      ],
+      "note": "#53: a receipt says PASS; the per-command evidence says whether anything actually ran to completion. A failing command inside a PASS receipt was previously invisible."
+    },
+    {
+      "id": "gate-evidence-command-order",
+      "file": "skills/github-delivery-loop/scripts/ci_publish_gate.py",
+      "anchor": "    if ids != receipt[\"commands\"]:",
+      "verify": [
+        "python3",
+        "skills/github-delivery-loop/scripts/ci_publish_gate.py",
+        "--selftest"
+      ],
+      "note": "#53: the receipt lists what the contract ran, in order. A reordering is a different execution, and set equality would accept it."
     }
   ]
 }
