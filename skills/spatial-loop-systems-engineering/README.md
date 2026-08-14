@@ -1,38 +1,84 @@
 # spatial-loop-systems-engineering
 
-A portable method for turning kernel-, hardware-, concurrency-, resource-, and
-lifecycle-dependent work into a falsifiable system contract before core code is
-written.
+A portable **Constraint-First Spatial Systems Engineering** method that converts incomplete prompts, PDFs, PRDs, diagrams, repository requests, and architecture proposals into a falsifiable executable specification before substantive implementation.
 
-The Skill uses spatial language to preserve whole-system reasoning, but every
-metaphor must resolve to a concrete owner, mechanism, transition, budget, probe,
-oracle, or receipt.
+The Skill is no longer substrate-only. It classifies work from Level A local deterministic changes through Level D substrate-sensitive systems, then applies the minimum safe amount of constraint discovery. Level B/C/D work receives full invariant/failure analysis; Level C/D may never silently degrade into ordinary feature-generation behavior.
+
+## Canonical flow
+
+```text
+┌──────────────────────────────────────────────┐
+│ Universal Constraint-First System Prompt    │
+│ how to reason; when direct implementation   │
+│ is forbidden                                │
+└──────────────────────┬───────────────────────┘
+                       ↓
+┌──────────────────────────────────────────────┐
+│ User Prompt / PDF / PRD / Diagram / Repo    │
+│ what the user wants                         │
+└──────────────────────┬───────────────────────┘
+                       ↓
+              Constraint Compiler
+                       ↓
+      ┌────────────────┼────────────────┐
+      ↓                ↓                ↓
+ Domain module     Unknown probes    Hard laws
+      └────────────────┼────────────────┘
+                       ↓
+                Executable Spec
+                       ↓
+                Implementation
+                       ↓
+                 Harness / Evals
+```
+
+The core transformation is:
+
+```text
+WHAT THE USER WANTS
+→ WHAT MUST ALWAYS REMAIN TRUE
+→ HOW WE CAN KNOW IT REMAINS TRUE
+
+Intent
+→ Boundary
+→ State
+→ Invariant
+→ Failure
+→ Oracle
+→ Evidence
+→ Implementation
+```
 
 ## Document authority
 
 | Question | Route |
 |---|---|
-| Procedure, state machine, gates, and evidence laws | [`SKILL.md`](SKILL.md) |
-| Base copyable System / Spec Prompt | [`references/system-prompt.md`](references/system-prompt.md) |
+| Universal compiler, complexity classes, hard laws, required outputs, gate, anti-drift | [`SKILL.md`](SKILL.md) |
+| Copyable universal System / Spec Prompt | [`references/system-prompt.md`](references/system-prompt.md) |
 | Repeated-failure System Prompt overlay | [`references/system-prompt-recovery-overlay.md`](references/system-prompt-recovery-overlay.md) |
 | Three-failure issue/fresh-diagnosis/worktree contract | [`references/three-failure-escalation.md`](references/three-failure-escalation.md) |
 | Human-readable and JSON spec packet | [`references/spec-packet-template.md`](references/spec-packet-template.md) |
-| Linux namespace/cgroup/seccomp/microVM instance | [`modules/linux-isolation-runtime.md`](modules/linux-isolation-runtime.md) |
-| Deterministic contract checker | [`scripts/check_system_contract.py`](scripts/check_system_contract.py) |
-| Positive, hollow, mutation, and recovery-routing controls | [`evals.json`](evals.json), [`tests/`](tests/) |
+| Triggered domain expansion policy | [`modules/README.md`](modules/README.md) |
+| Linux namespace/cgroup/seccomp/microVM specialization | [`modules/linux-isolation-runtime.md`](modules/linux-isolation-runtime.md) |
+| Deterministic system-contract checker | [`scripts/check_system_contract.py`](scripts/check_system_contract.py) |
+| Positive, hollow, mutation, recovery, and entrypoint controls | [`evals.json`](evals.json), [`tests/`](tests/) |
 
 ## Owned state and data flow
 
 ```text
-task + exact subject + environment
+source intent / candidate architecture
         ↓
-realm / boundary / flow map
+claim classification + complexity A/B/C/D
         ↓
-state machine + hard invariants + resource envelope
+realm / authority / ownership / flow map
         ↓
-capability probes + collision matrix + teardown symmetry
+state machines + Golden Invariants
         ↓
-verification oracles + performance contract
+unknown register + probes + failure matrix
+        ↓
+resource envelope + reconciliation loops
+        ↓
+verification plan + evidence ladder
         ↓
 spatial-loop-system-contract/v1
         ↓
@@ -41,42 +87,47 @@ deterministic closure check
    ↓                         ↓
 BLOCKED / PROTOTYPE      READY_FOR_IMPLEMENTATION
    ↓                         ↓
-bounded handoff          implementation reconciliation loop
+probe/spec/handoff       smallest falsifiable implementation
+                              ↓
+                         Harness / Evals
                               │
                               ├── PASS → handoff
-                              ├── FAIL #1/#2 → bounded retry
+                              ├── FAIL #1/#2 → bounded repair
                               └── qualifying FAIL #3
                                       ↓
-                              ESCALATION_REQUIRED
-                                      ↓
-                              forge issue + failure packet
+                              issue + exact failure packet
                                       ↓
                               fresh diagnosis context
                                       ↓
-                              new isolated worktree/branch
+                              new isolated worktree
                                       ↓
-                              repair → owning oracle + negative control
-                                      ↓ PASS
-                              commit → forge-native PR
+                              repair + owning oracle + negative control
                                       ↓
-                              existing Human/trusted-operator merge policy
+                              forge-native delivery / Human merge boundary
 ```
 
-Normal repositories with an admitted local Forgejo binding route the escalation
-issue and PR through `forgejo-delivery-loop`. GitHub Actions and GitHub-hosted CI
-incidents stay on GitHub so workflow/run/job/head evidence remains authoritative
-and publication uses `github-delivery-loop`. `git-town-stacked-pr-worker` owns
-the portable isolated-worktree/branch method when the consumer admits Git Town.
+## Domain decoupling
 
-The intended desktop recovery workflow opens a new ChatGPT Desktop
-question/session after the issue packet exists. That is a host/operator step; a
-runtime that cannot launch the desktop session must emit a fresh-diagnosis
-handoff instead of claiming it ran.
+The universal method stays in `SKILL.md`. Domain-specific knowledge stays in `modules/` and is loaded only when triggered.
 
-`loop-harness-standard` owns generic execution-loop scaffolding.
-`truth-verify-loop` owns mutable external-claim verification. This Skill owns
-the system-state-space contract that decides what may be implemented and what
-may be claimed.
+```text
+Universal compiler
+    ├── hard-law families
+    ├── unknown discovery
+    ├── evidence/gate semantics
+    └── required output contract
+             +
+Triggered domain module
+    ├── domain realms
+    ├── hidden assumptions
+    ├── specialized failure vectors
+    ├── capability probes
+    └── domain-specific oracles
+             ↓
+       Executable Spec
+```
+
+A domain module may extend the core method; it may not replace it, downgrade complexity, redefine evidence states, or bypass the implementation gate.
 
 ## Directory map
 
@@ -100,6 +151,8 @@ skills/spatial-loop-systems-engineering/
 └── tests/
     ├── README.md
     ├── run-all.sh
+    ├── universal-entry/
+    │   └── verify.sh
     ├── recovery-escalation/
     │   └── verify.sh
     └── system-contract/
@@ -110,22 +163,21 @@ skills/spatial-loop-systems-engineering/
 ## Evidence boundary
 
 ```text
-contract structure and gate consistency       IMPLEMENTED
-vague-performance refusal                     IMPLEMENTED
-required-capability gate                       IMPLEMENTED
-teardown/reference closure                     IMPLEMENTED
-three-failure escalation routing               IMPLEMENTED
-fresh ChatGPT Desktop session execution        HOST_OPERATOR_BOUND
-physical Linux isolation behavior              NOT_EXERCISED
-real hardware performance                      NOT_EXERCISED
-security or production-readiness claim         HUMAN_ADMIT_REQUIRED
+universal Constraint-First entry method           IMPLEMENTED
+A/B/C/D complexity and anti-degradation law       IMPLEMENTED
+domain-extension/decoupling contract              IMPLEMENTED
+machine contract structure and gate consistency    IMPLEMENTED
+vague-performance refusal                          IMPLEMENTED
+required-capability gate                           IMPLEMENTED
+teardown/reference closure                         IMPLEMENTED
+three-failure escalation routing                   IMPLEMENTED
+fresh ChatGPT Desktop session execution            HOST_OPERATOR_BOUND
+physical Linux isolation behavior                  NOT_EXERCISED
+real hardware performance                          NOT_EXERCISED
+security or production acceptance                  HUMAN_ADMIT_REQUIRED
 ```
 
-The deterministic checker proves that the contract is structurally closed and
-internally consistent. The recovery routing control proves that the mandatory
-three-failure/fresh-context/worktree/forge boundaries are present. Neither can
-prove that a referenced runtime receipt is truthful, that a desktop session ran,
-that the kernel behaves as assumed, or that the system is secure.
+The deterministic checker proves structural closure and internal gate consistency. It does not prove that a referenced runtime receipt is truthful or that a designed system is safe.
 
 ## Run the controls
 
@@ -133,7 +185,4 @@ that the kernel behaves as assumed, or that the system is secure.
 bash skills/spatial-loop-systems-engineering/tests/run-all.sh
 ```
 
-A green suite means the good contract is admitted, planted defects are refused,
-and the recovery-routing contract is present. It does not mean a sandbox,
-hypervisor, kernel, hardware target, Forgejo mutation, GitHub Actions run, or
-ChatGPT Desktop session was executed.
+A green suite means the universal entry laws, good contract, planted defects, and recovery routing controls agree with the repository bytes. It does not mean an external provider, kernel, hardware target, Forgejo mutation, GitHub Actions publication, or Desktop session was physically exercised.
