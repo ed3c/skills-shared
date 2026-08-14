@@ -6,8 +6,9 @@
     "why_identity_is_not_the_carrier": "A role is a property of a commit; git config is a property of a repository. One repository carries several drivers, so a per-repo setting can only label the dominant one correctly and mislabels the rest."
   },
   "enforced_from": {
-    "commit_sha": "b74d30835b40ff00a31cc185a67f93be6de6f273",
-    "note": "History before this commit is not scanned. Roughly 1100 commits across these repositories were authored as an unset identity and no record can recover their driver; backfilling would be invention, not recovery."
+    "commit_sha": "382daf4b760a22a9e79302f9f5356232ab67b240",
+    "note": "History before this commit is not scanned. Roughly 1100 commits across these repositories were authored as an unset identity and no record can recover their driver; backfilling would be invention, not recovery.",
+    "moved_once": "Moved forward from b74d30835b40ff00a31cc185a67f93be6de6f273 on 2026-08-14. The gate landed before every commit endpoint knew to write the trailers, and one commit reached main without them. Moving the start point past it is honest about that adoption lag; doing it a second time would not be, because a start point that advances to whatever just failed enforces nothing. If it needs to move again, the answer is to fix the endpoint that produced the commit, not the range."
   },
   "driven_by": {
     "human": {
