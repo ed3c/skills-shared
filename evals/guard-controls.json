@@ -425,6 +425,16 @@
         "skills/shared-skills-infra/tests/verify.sh"
       ],
       "note": "#1: the two rulings are gates only if `check` runs them. Wired-but-never-exercised leaves a host-bound body and a stale binding indistinguishable from a clean tree."
+    },
+    {
+      "id": "workflow-policy-required-jobs",
+      "file": "skills/github-delivery-loop/scripts/ci_workflow_policy.py",
+      "anchor": "    missing_jobs = sorted(set(policy[\"required_jobs\"]) - job_names)",
+      "verify": [
+        "bash",
+        "skills/github-delivery-loop/tests/ci-workflow-policy/verify.sh"
+      ],
+      "note": "#82 landed .github-delivery/ci-policy.json with nothing in this tree able to read it. Without the workflow comparison the policy can name any job and stay green, and the drift only appears as a publication that paid for a runner and learned nothing."
     }
   ]
 }

@@ -12,6 +12,7 @@ This directory contains the executable mechanisms for delivery evidence, GitHub 
 | [`local_verification.py`](local_verification.py) | exact-HEAD local verification | none | receipt/evidence output only | `github-delivery-local-verification/v1` |
 | [`github_actions_snapshot.py`](github_actions_snapshot.py) | GitHub observation capture/replay | capture: read-only GitHub; replay: none | observation/snapshot files only | normalized PR/check/billing snapshot plus an `initial_boundary` that `--strict` refuses to guess |
 | [`ci_publish_gate.py`](ci_publish_gate.py) | CI publication admission | none | none | one ALLOW operation or stable BLOCK reason |
+| [`ci_workflow_policy.py`](ci_workflow_policy.py) | repository seal on the publication workflow | none | `.github-delivery/ci-policy.json` and the workflow it names | ALLOW with the sealed identity, or one BLOCK reason |
 | [`merge_gate.py`](merge_gate.py) | merge authority preflight/landing | preflight/land: GitHub and host policy planes | land may request merge after Human Admit | preflight result or merge result |
 | [`reference_causality.py`](reference_causality.py) | reference/evidence causality | none | none | causal validation result |
 | [`link-canonical.sh`](link-canonical.sh) | canonical Skill projection | none | optional backup + symlink | linked target or divergence refusal |
