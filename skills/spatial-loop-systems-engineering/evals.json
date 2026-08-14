@@ -1,11 +1,28 @@
 {
   "skill_name": "spatial-loop-systems-engineering",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "_meta": {
-    "coverage_metric": "exact-subject binding, realm/boundary/flow closure, state and invariant references, required-capability gating, teardown symmetry, performance measurement closure, evidence-state separation, and repeated-failure recovery routing",
-    "purpose": "Prove that an expert-sounding systems specification cannot advance to implementation while substrate capabilities, invariant oracles, lifecycle cleanup, state references, performance evidence, or bounded-recovery requirements remain hollow."
+    "coverage_metric": "universal Constraint-First entry topology, A/B/C/D complexity classification, anti-degradation, source-claim separation, domain decoupling, exact-subject binding, realm/boundary/flow closure, state and invariant references, required-capability gating, teardown symmetry, performance measurement closure, evidence-state separation, and repeated-failure recovery routing",
+    "purpose": "Prove that an incomplete software prompt or architecture cannot skip constraint discovery into plausible implementation, that Level C/D work cannot silently degrade into Level A behavior, that domain modules extend rather than replace the universal compiler, and that structurally hollow system contracts or repeated blind repairs are refused."
   },
   "runnable": [
+    {
+      "id": "SLS-UNIVERSAL-ENTRY-1",
+      "checker_script": "tests/universal-entry/verify.sh",
+      "test_verify": "tests/universal-entry/verify.sh",
+      "good_fixture": "SKILL.md, references/system-prompt.md, and modules/README.md",
+      "hollow_fixture": "remove the Level C/D anti-degradation law or allow a domain module to replace/bypass the universal constraint compiler",
+      "covers": [
+        "the entrypoint is a pre-implementation constraint discovery compiler rather than a substrate-only implementation recipe",
+        "the canonical topology is Universal System Prompt to source intent to Constraint Compiler to domain/unknown/hard-law expansion to Executable Spec to Implementation to Harness/Evals",
+        "Level A/B/C/D complexity classes are explicit",
+        "Level C/D work cannot silently degrade into Level A implementation behavior",
+        "the universal transformation is intent to boundary to state to invariant to failure to oracle to evidence to implementation",
+        "required pre-implementation output includes Intent Digest through Implementation Gate before Implementation Plan",
+        "domain modules extend the core method and may not replace or bypass it"
+      ],
+      "expected": "canonical universal entry admitted; planted anti-degradation and domain-replacement regressions are distinguishable"
+    },
     {
       "id": "SLS-SYSTEM-CONTRACT-1",
       "checker_script": "scripts/check_system_contract.py",
@@ -44,6 +61,9 @@
     }
   ],
   "evidence_boundary": {
+    "universal_constraint_first_entry": "IMPLEMENTED",
+    "complexity_anti_degradation_control": "IMPLEMENTED",
+    "domain_decoupling_contract": "IMPLEMENTED",
     "portable_system_prompt": "IMPLEMENTED",
     "system_contract_checker": "IMPLEMENTED",
     "positive_hollow_mutation_controls": "IMPLEMENTED",

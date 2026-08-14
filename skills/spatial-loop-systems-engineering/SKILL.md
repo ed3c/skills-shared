@@ -1,389 +1,481 @@
 ---
 name: spatial-loop-systems-engineering
 description: |
-  Design or modify systems whose correctness depends on OS/kernel behavior,
-  hardware, privilege, concurrency, resource ceilings, failure domains, or
-  teardown. Use before implementing sandboxes, runtimes, schedulers, storage
-  engines, network data planes, compilers, embedded/GPU systems, lock-free
-  components, low-latency paths, or other substrate-bound software.
-  Produces an exact-subject system contract: trust realms, boundaries, flows,
-  state machine, hard invariants, capability probes, collision matrix,
-  reconciliation loops, performance budgets, verification oracles, and a
-  fail-closed implementation gate. After three qualifying failures on the same
-  target, stops blind repair and escalates through an issue packet, fresh
-  diagnosis, and a new isolated worktree. Do not use for ordinary CRUD work, as
-  a security certification, or as a substitute for privileged/hardware evidence.
+  Pre-implementation Constraint-First Spatial Systems Engineering for software
+  tasks whose correctness depends on state, authority, lifecycle, concurrency,
+  resources, failure, external reality, or substrate behavior. Transform an
+  incomplete prompt, PDF, PRD, diagram, codebase request, or architecture
+  proposal into boundaries, state machines, hard invariants, unknown probes,
+  failure models, verification oracles, evidence requirements, and an explicit
+  implementation gate before substantive code. Use a shortened path for local
+  deterministic Level A work and the full protocol for Level B/C/D work. Domain
+  modules extend the universal method and never replace it. After three
+  qualifying failures on one target, stop blind repair and escalate through an
+  issue packet, fresh diagnosis, and a new isolated worktree.
 license: MIT
-compatibility: Any Agent Skills-compatible coding agent with repository read/write access. Privileged or hardware execution is optional, but its absence blocks the corresponding claim.
+compatibility: Any Agent Skills-compatible coding agent with repository read/write access. Physical claims require matching runtime/substrate evidence.
 metadata:
-  version: "1.1.0"
-  procedure: "spatial-loop-system-contract"
+  version: "2.0.0"
+  procedure: "constraint-first-spatial-system-contract"
 ---
 
-# spatial-loop-systems-engineering
+# Constraint-First Spatial Systems Engineering
 
-Treat a system as a reachable state space constrained by authority, resources,
-time, and evidence. The spatial metaphor is useful only when every term maps to
-an artifact that can be inspected or tested.
+## Role
+
+Operate as a Principal Systems Engineer and **pre-implementation constraint discovery compiler**.
+
+The first responsibility is not to generate code. Transform incomplete user prompts, PDFs, PRDs, diagrams, codebase requests, or technical proposals into an explicit model of:
+
+- system and authority boundaries;
+- state and resource ownership;
+- lifecycle and concurrency rules;
+- hard invariants and consistency semantics;
+- failure domains and environmental assumptions;
+- unknown-unknown discovery probes;
+- verification requirements and evidence needed before implementation claims are allowed.
+
+Treat source material as **intent and candidate architecture**, not proven system truth. Do not inherit architectural assumptions merely because they appear in the source.
+
+## Canonical entry topology
 
 ```text
-realm                 → trust/authority/resource domain
-boundary surface      → enforcement mechanism and blast radius
-flow vector           → data, event, resource, or ownership transfer
-invariant manifold    → allowed states plus a falsifiable oracle
-escape vector         → failure or attack path crossing a boundary
-attractor             → declared healthy terminal state
-reconciliation loop   → Observe → Diff → Reconcile → Verify
+┌──────────────────────────────────────────────┐
+│ Universal Constraint-First System Prompt    │
+│ how to reason; when direct implementation   │
+│ is forbidden                                │
+└──────────────────────┬───────────────────────┘
+                       ↓
+┌──────────────────────────────────────────────┐
+│ User Prompt / PDF / PRD / Diagram / Repo    │
+│ what the user wants                         │
+└──────────────────────┬───────────────────────┘
+                       ↓
+              Constraint Compiler
+                       ↓
+      ┌────────────────┼────────────────┐
+      ↓                ↓                ↓
+ Domain module     Unknown probes    Hard laws
+      └────────────────┼────────────────┘
+                       ↓
+                Executable Spec
+                       ↓
+                Implementation
+                       ↓
+                 Harness / Evals
 ```
 
-Do not call prose a proof. Do not call a diagram an isolation mechanism. Do not
-call an unexecuted test a pass.
-
-## Trigger boundary
-
-Use this Skill when one or more of these conditions are true:
-
-- behavior depends on kernel, hypervisor, firmware, device, filesystem, network,
-  memory-model, ABI, FFI, signal, or scheduler semantics;
-- correctness depends on global lifecycle, concurrency, ordering, ownership, or
-  cleanup invariants;
-- tests require root, KVM, special hardware, kernel modules, network topology,
-  fault injection, load generation, or destructive execution;
-- the request includes claims such as safe, isolated, lock-free, zero-copy,
-  zero-leak, microsecond, high-throughput, deterministic, or production-grade.
-
-Do not use it as extra ceremony for a normal application feature. Do not use it
-to certify security, production readiness, or legal compliance.
-
-## Owned state machine
+The governing transformation is:
 
 ```text
-CLASSIFY
-→ BIND_SUBJECT
-→ MAP_REALMS
-→ DECLARE_INVARIANTS
-→ BIND_CAPABILITIES
-→ MAP_COLLISIONS
-→ DESIGN_ORACLES
-→ IMPLEMENTATION_GATE
-    ├── BLOCKED                 → HANDOFF
-    ├── READY_FOR_PROTOTYPE     → SAFE_SCAFFOLD → VERIFY → HANDOFF
-    └── READY_FOR_IMPLEMENTATION
-                                → IMPLEMENT
-                                → OBSERVE
-                                → DIFF
-                                → RECONCILE
-                                → VERIFY
-                                    ├── converged → HANDOFF
-                                    ├── qualifying FAIL #1/#2 → bounded retry
-                                    └── qualifying FAIL #3 → ESCALATION_REQUIRED
-                                            → ISSUE_PACKET_BOUND
-                                            → FRESH_DIAGNOSIS
-                                            → ISOLATED_WORKTREE
-                                            → REPAIR
-                                            → VERIFY
-                                            → forge-native PR / Human merge boundary
+WHAT THE USER WANTS
+→ WHAT MUST ALWAYS REMAIN TRUE
+→ HOW WE CAN KNOW IT REMAINS TRUE
+
+Intent
+→ Boundary
+→ State
+→ Invariant
+→ Failure
+→ Oracle
+→ Evidence
+→ Implementation
 ```
 
-Probe code, verifier code, and disposable experiments may be written before the
-gate. Core implementation may not.
+Never invert this order without explicitly stating why.
 
-## Required artifacts
+## Core mental model
 
-Before core implementation, produce and bind:
-
-1. **Exact subject** — repository/path or artifact, revision, and digest.
-2. **Objective and non-goals** — including risk class and forbidden claims.
-3. **Realm map** — trust, authority, entry/exit conditions, and blast radius.
-4. **Boundary and flow map** — enforcement owner, transport, ordering,
-   backpressure, ownership transfer, and failure semantics.
-5. **Finite-state lifecycle** — valid and illegal transitions, terminal states,
-   cancellation, crash, restart, and recovery.
-6. **Hard invariant ledger** — every invariant has scope, owner, enforcement,
-   oracle, and named failure state.
-7. **Substrate capability matrix** — every required capability has a probe,
-   evidence state, and exact receipt subject.
-8. **Resource envelope** — numeric or finite ceilings, enforcement, observation,
-   exceed action, and lifecycle owner.
-9. **Failure/collision matrix** — fault, race window, detection, containment,
-   reconciliation, and oracle.
-10. **Teardown symmetry ledger** — every lifecycle-owned allocation has normal
-    release, crash release, and leak oracle.
-11. **Reconciliation loops** — observed state, desired state, diff, actuator,
-    convergence condition, stop condition, and failure-attempt counter.
-12. **Verification plan** — positive, hollow/negative, mutation, privileged,
-    hardware, chaos, fuzz, security, and performance lanes as applicable.
-13. **Implementation gate** — one of `BLOCKED`, `READY_FOR_PROTOTYPE`, or
-    `READY_FOR_IMPLEMENTATION`. There is no Agent-declared
-    `READY_FOR_PRODUCTION`.
-
-Use [`references/spec-packet-template.md`](references/spec-packet-template.md)
-for the human-readable packet and
-`spatial-loop-system-contract/v1` for the machine-checkable contract.
-Use [`references/three-failure-escalation.md`](references/three-failure-escalation.md)
-when the same invariant or acceptance target fails three qualifying repair
-attempts.
-
-## Procedure
-
-### 1. Classify the substrate
-
-Name the system class and the physical surfaces that can falsify it. Separate:
+Reason about software as a bounded dynamic system, not a feature sequence:
 
 ```text
-language/runtime semantics
-OS/kernel semantics
-hypervisor/firmware/device semantics
-network/storage topology
-concurrency and memory model
-security authority
-performance environment
+State Space
++ Resource Space
++ Authority Space
++ Time
++ Concurrency
++ Failure
++ External Reality
 ```
 
-Load a domain module only when its trigger matches. Linux isolation work loads
-[`modules/linux-isolation-runtime.md`](modules/linux-isolation-runtime.md).
+Every component exists inside these spaces. Every interaction crosses a boundary. Every boundary introduces assumptions. Every assumption requires proof, measurement, runtime verification, explicit acceptance, or a declared unknown.
 
-### 2. Bind claims, assumptions, and unknowns
+The objective is to reduce the reachable invalid state space.
 
-Keep these distinct:
+## Source material is not authority
 
-- **claim** — what the system promises;
-- **assumption** — a dependency with a named owner and falsifier;
-- **unknown** — a gap with a discovery method and impact;
-- **evidence** — an observation bound to the exact subject and environment.
-
-Unknown unknowns cannot be written into a specification in advance. Reduce
-their surface through primary-source review, source inspection, capability
-probes, minimal experiments, incident/postmortem review, differential tests,
-fuzzing, and chaos. Discovery work changes `ABSENT` or `NOT_EXERCISED`; it does
-not manufacture `PASS`.
-
-### 3. Map space before behavior
-
-For each realm, answer:
+Classify every significant source statement as exactly one of:
 
 ```text
-Who has authority here?
-What resources exist here?
-How does anything enter or leave?
-Which mechanism enforces the boundary?
-What is the maximum blast radius when enforcement fails?
+REQUIREMENT
+DESIGN_PROPOSAL
+ASSUMPTION
+OBSERVATION
+MEASURED_FACT
+EXTERNAL_CLAIM
+UNKNOWN
 ```
 
-For each flow, answer:
+Do not silently transform:
 
 ```text
-Who owns the payload before and after transfer?
-What ordering and backpressure exist?
-What happens on partial delivery, duplication, cancellation, or peer death?
+proposal → requirement
+claim → fact
+diagram → implementation
+library presence → capability
+successful request → semantic correctness
+test absence → PASS
 ```
 
-### 4. Declare invariants before core code
+For mutable external claims, compose `truth-verify-loop` or another admitted primary-source verification path.
 
-An invariant without an oracle is a wish. Use this form:
+## Phase 0 — Complexity classification
+
+Classify before design work:
+
+### Level A — Local deterministic change
+
+Examples: pure utility, isolated parser, local transformation, simple CRUD with no material distributed invariant. A shortened protocol is allowed, but source claims and evidence state remain explicit.
+
+### Level B — Stateful application system
+
+Examples: backend service, database, queue, cache, authentication, payment flow, background job. Full invariant and failure analysis is required.
+
+### Level C — Distributed / concurrent / agentic system
+
+Examples: workflows, event processing, multi-agent systems, distributed state, retries, external side effects, eventual consistency. The full protocol is mandatory.
+
+### Level D — Substrate-sensitive system
+
+Examples: kernels, virtualization, networking, databases, compilers, runtimes, embedded systems, GPUs, low-latency systems, browser/device automation. The full protocol plus physical capability verification is mandatory.
+
+**A Level C/D task may never silently degrade into Level A implementation behavior.**
+
+## Phase 1 — Spatial topology
+
+Map realms before selecting implementation details. A realm has distinct trust, authority, state ownership, resource ownership, failure boundary, and lifecycle.
+
+For every realm record:
 
 ```text
-ID:
-Statement:
-Scope:
+Realm:
 Owner:
-Enforcement:
-Oracle:
-Named failure state:
+Trusted inputs:
+Untrusted inputs:
+State owned:
+Resources owned:
+Authority held:
+Entry conditions:
+Exit conditions:
+Failure blast radius:
 ```
 
-Concurrency invariants additionally require an ownership model, synchronization
-or message-passing rule, cancellation semantics, and a race/deadlock oracle.
-A lock list is not a lock-order proof.
-
-### 5. Close the capability matrix
-
-Never assume root, `/dev/kvm`, cgroup delegation, a kernel feature, a device,
-network reachability, clock properties, filesystem behavior, or load generator.
-Probe each required capability.
+For every crossing ask:
 
 ```text
-required + PASS            may support READY_FOR_IMPLEMENTATION
-required + NOT_EXERCISED   may support only READY_FOR_PROTOTYPE
-required + ABSENT/FAIL     blocks dependent implementation claims
+What crosses?
+Who authorizes it?
+Who owns it afterward?
+Can it be duplicated, reordered, delayed, lost, or replayed?
+Can it partially succeed?
+How is failure observed?
 ```
 
-A capability reported by package presence, documentation, or another machine is
-not current-runtime evidence.
-
-### 6. Design failure and teardown first
-
-Enumerate signal races, cancellation, partial initialization, partial writes,
-descriptor exhaustion, memory pressure, process/thread death, stale identity,
-timeout, retry amplification, corrupt input, clock discontinuity, and peer
-partition where relevant.
-
-Every acquisition must have:
+Spatial language is operational only when it maps to inspectable artifacts:
 
 ```text
-normal release
-initialization-failure release
-cancellation release
-crash/restart reconciliation
-idempotent repeat behavior
-leak oracle
+realm                 = trust/authority/resource domain
+boundary surface      = enforcement mechanism + owner + blast radius
+flow vector           = data/event/resource/ownership transfer
+invariant manifold    = allowed states + enforcement + falsifier
+escape vector         = failure/attack path crossing a boundary
+attractor             = observable healthy terminal state
+reconciliation loop   = Observe → Diff → Reconcile → Verify
 ```
 
-RAII or `Drop` is an implementation technique, not proof that asynchronous
-termination or kernel-owned resources were reclaimed.
+## Phase 2 — State machines before components
 
-### 7. Bind performance to a measurement contract
+For each stateful subsystem define explicit states, transitions, terminal states, and illegal transitions. Do not accept vague `created → running → finished` lifecycles.
 
-Words such as fast, low-latency, high-throughput, zero-copy, zero-overhead,
-microsecond, millisecond, and instant require:
+For every transition specify:
 
 ```text
-metric and unit
-target percentile
-load model and concurrency
-cold/warm definition
-hardware/firmware/OS/kernel/runtime identity
-configuration digest
-measurement method and repetitions
-error bars or variance
+trigger
+precondition
+state owner
+atomicity boundary
+side effects
+timeout
+retry semantics
+illegal transitions
+recovery action
+evidence
 ```
 
-Vendor numbers and local anecdotes are hypotheses until reproduced on the exact
-subject. Prefer the simplest data path that meets the measured budget; do not
-default to zero-copy or lock-free designs when their ownership and pinning costs
-are unproven.
+If the state machine cannot be described clearly, core implementation is premature.
 
-### 8. Build oracles before core implementation
+## Phase 3 — Predict hard invariants
 
-Each required verification lane must name preconditions, stimulus, oracle,
-negative control, status, and evidence. A verifier that cannot detect a planted
-defect is not an authority.
+Systematically derive these invariant families before bugs reveal them:
 
-Mocks may validate pure logic. They cannot prove kernel isolation, hardware
-behavior, exploit resistance, cleanup after `SIGKILL`, or tail latency.
+1. **Identity** — request, tenant, artifact, receipt, retry, model/config identity.
+2. **Ownership** — one mutation owner, one lifecycle owner, exclusive lease semantics.
+3. **Authorization** — authentication is not authorization; privileged transitions need explicit authority.
+4. **Ordering** — declare what must happen before what.
+5. **Atomicity** — identify transaction boundaries and observable partial commits.
+6. **Idempotency** — retries cannot duplicate irreversible effects.
+7. **Concurrency** — serialization rule, lock/channel/actor ordering, lease expiry, race/deadlock oracle.
+8. **Resource** — bound memory, disk, queues, connections, threads/tasks, tokens/context, retries, logs, temporary files, subprocesses, tabs, GPU memory, and any other potentially growing quantity.
+9. **Lifecycle** — every create/open/allocate/spawn/subscribe/mount/lock/lease/begin has destroy/close/free/reap/unsubscribe/unmount/unlock/release/abort behavior for normal, crash, timeout, restart, and partial initialization paths.
+10. **Consistency** — name the model: strong, monotonic reads, read-your-writes, eventual, causal, or another explicit model.
+11. **Security** — ambient authority, confused deputy, cross-tenant access, secret propagation, privilege escalation, unsafe deserialization, injection, sandbox escape, SSRF, replay, TOCTOU.
+12. **Observability** — distinguish success, failure, timeout, not attempted, unknown, partial success, and policy skip.
+13. **Performance** — replace `fast`, `low latency`, `high throughput`, `scalable`, and `real time` with metric, percentile, load, concurrency, payload, environment, warm/cold state, duration, repetitions, variance, and failure budget.
 
-### 9. Apply the implementation gate
+Every Golden Invariant receives an ID `INV-###` and must define statement, owner, enforcement mechanism, failure mode, oracle, and required evidence level.
 
-Validate the contract:
+## Phase 4 — Unknown-unknown discovery
+
+Maintain an explicit Unknown Register:
+
+```text
+KNOWN
+ASSUMED
+UNKNOWN_BOUNDED
+UNKNOWN_BLOCKING
+```
+
+For each blocking unknown design the cheapest falsifiable probe: source inspection, primary-source verification, capability probe, minimal experiment, runtime trace, benchmark, fault injection, packet capture, profiling, property test, load test, contract test, or security review.
+
+Use:
+
+```text
+Unknown → Probe → Observation → Updated model
+```
+
+Do not compensate for missing knowledge by writing more implementation code.
+
+## Phase 5 — Failure and collision matrix
+
+Evaluate collisions across time, concurrency, resource pressure, process lifecycle, network, storage, dependency, authorization, schema evolution, deployment, and operator action.
+
+At minimum consider where relevant:
+
+```text
+dependency unavailable/slow
+timeout after unknown completion
+duplicate request/event
+out-of-order event
+stale read
+partial write
+worker/process/host crash
+OOM / disk full / connection exhaustion / queue saturation
+clock skew
+schema/version mismatch
+credential expiry / permission revocation
+cancellation race / shutdown race
+```
+
+For every failure define detection, containment, recovery, retry rule, compensation, terminal state, and observable evidence.
+
+## Phase 6 — Reconciliation loops
+
+Prefer systems that converge:
+
+```text
+Observe
+→ Compare desired vs observed state
+→ Diff
+→ Reconcile
+→ Verify
+```
+
+Every loop defines desired state, observed state, authority, retry budget, backoff, idempotency, progress measure, no-progress detection, terminal success, and terminal failure. Unbounded loops are forbidden. `Retry until success` is not a recovery strategy.
+
+## Phase 7 — Verification architecture
+
+Every hard invariant creates a proof obligation:
+
+```text
+Invariant
+→ Enforcement Mechanism
+→ Observer
+→ Oracle
+→ Failure Injection
+→ Expected Observation
+→ Evidence
+```
+
+A verifier must be able to detect a planted defect. HTTP 200 does not prove business correctness. A mock does not prove an external runtime. Code review does not prove performance. A benchmark on another machine does not prove this deployment.
+
+## Phase 8 — Evidence ladder
+
+Keep these levels separate:
+
+```text
+L0 SOURCE_CLAIM
+L1 STATIC_REASONING
+L2 DETERMINISTIC_UNIT_PROOF
+L3 LOCAL_INTEGRATION_EVIDENCE
+L4 REAL_SUBSTRATE_EVIDENCE
+L5 ADVERSARIAL_OR_CHAOS_EVIDENCE
+L6 PRODUCTION_OBSERVATION
+```
+
+Use exact evidence states:
+
+```text
+PASS
+FAIL
+ABSENT
+NOT_IMPLEMENTED
+NOT_EXERCISED
+SKIPPED_BY_POLICY
+HUMAN_ADMIT_REQUIRED
+```
+
+Absence is never PASS. Evidence never promotes itself across subject, revision, environment, or ladder level.
+
+## Phase 9 — Implementation gate
+
+Return exactly one pre-implementation gate:
+
+### BLOCKED
+
+Use when a required architectural fact is unknown, target environment is unbound, a critical invariant lacks enforcement or oracle, lifecycle ownership is incomplete, required physical capability is unavailable, or unresolved security assumptions remain.
+
+Allowed work: probe, experiment, contract, state machine, test harness, interface, spike, and documentation.
+
+### READY_FOR_PROTOTYPE
+
+Use when architecture can be explored but important runtime claims remain unverified. Explicitly list claims the prototype cannot establish.
+
+### READY_FOR_IMPLEMENTATION
+
+Use only when important realms are mapped; state ownership is explicit; blocking unknowns are closed; hard invariants have enforcement; lifecycle is symmetric; failure recovery is defined; required capabilities are available; and verification paths exist.
+
+There is no Agent-owned `PRODUCTION_ACCEPTANCE`. Security, compliance, financial, destructive, irreversible, production-promotion, permission-widening, and rollback acceptance remain Human/organizational authority boundaries.
+
+The existing machine contract remains `spatial-loop-system-contract/v1` and is checked with:
 
 ```bash
 python3 skills/spatial-loop-systems-engineering/scripts/check_system_contract.py \
   check path/to/system-contract.json
 ```
 
-- `exit 0`: contract shape and gate consistency are valid.
-- `exit 2`: a declared contract is hollow or internally inconsistent.
-- `exit 64`: subject/file/JSON is absent or unreadable.
+Exit `0` validates structural closure/gate consistency; `2` rejects hollow or contradictory contracts; `64` means input/subject is absent or invalid. The checker does not prove referenced evidence is truthful.
 
-The checker validates closure and contradictions. It does not prove that an
-evidence URI is truthful or that the designed system is safe.
+## Technology selection comes after constraints
 
-### 10. Implement through bounded reconciliation
-
-After the gate:
+Do not begin with framework selection. First establish constraints. For each candidate technology ask:
 
 ```text
-Observe exact state
-→ Diff against invariant and desired state
-→ Reconcile one bounded change
-→ Re-run the owning oracle
-→ preserve the failure trajectory
-→ converge, escalate, or stop
+Which invariants does it enforce for us?
+Which remain ours?
+What failure modes does it introduce?
+What operational burden does it create?
+What evidence is required to trust it?
+What lock-in or migration boundary does it create?
 ```
 
-A **qualifying failed attempt** is a repair against the same invariant or
-acceptance target where the implementation/configuration subject changed and the
-owning oracle actually executed and returned subject-bound `FAIL`. `ABSENT`,
-`NOT_EXERCISED`, and `SKIPPED_BY_POLICY` do not count as failed repairs.
+Prefer mature primitives when they remove difficult invariant ownership. Do not rebuild a solved substrate merely because code generation makes it look cheap.
 
-After three consecutive qualifying failures, do not make a fourth speculative
-patch in the same context. Enter the recovery contract in
-[`references/three-failure-escalation.md`](references/three-failure-escalation.md):
+## Domain expansion boundary
+
+Load domain-specific analysis only when triggered. The canonical routing table is [`modules/README.md`](modules/README.md).
+
+Examples include Web/API, database, distributed systems, Agentic AI, mobile, browser automation, data pipelines, ML, security, systems/kernel, high performance, and financial/payment systems.
+
+**Domain modules extend the core method. They never replace it, bypass complexity classification, redefine evidence states, or weaken the implementation gate.**
+
+The existing Linux isolation guidance remains decoupled at [`modules/linux-isolation-runtime.md`](modules/linux-isolation-runtime.md).
+
+## Required output before substantive implementation
+
+Produce these sections in order:
+
+A. **Intent Digest** — what the user is actually trying to achieve.
+B. **Source Claim Classification** — requirements, proposals, assumptions, observations/facts, external claims, unknowns.
+C. **Complexity Class** — A/B/C/D and why.
+D. **Spatial Topology** — realms, trust boundaries, authority, ownership, flows.
+E. **State Machines** — states, transitions, terminal and illegal states.
+F. **Golden Invariants** — `INV-###`, statement, owner, enforcement, failure mode, oracle, evidence level.
+G. **Resource Envelope** — finite limits/backpressure/exceed behavior.
+H. **Failure / Collision Matrix** — prioritize highest-risk combinations.
+I. **Unknown Register** — classification and falsifiable probes.
+J. **Verification Plan** — invariants mapped to falsifiable tests.
+K. **Implementation Gate** — exactly one of `BLOCKED | READY_FOR_PROTOTYPE | READY_FOR_IMPLEMENTATION`.
+L. **Implementation Plan** — only after the preceding sections are complete.
+
+Use [`references/spec-packet-template.md`](references/spec-packet-template.md) and the machine contract for persisted artifacts.
+
+## Anti-drift protocol during implementation
+
+Before modifying a subsystem reload its state machine, invariants, ownership rules, resource limits, failure semantics, and verification oracle.
+
+After every meaningful implementation step ask:
 
 ```text
-three FAIL trajectories
-→ forge issue + exact failure packet
-→ fresh diagnosis context
-→ root-cause hypothesis + falsifying probe
-→ new isolated worktree/branch
-→ smallest repair
-→ owning oracle + negative control
-→ PASS
-→ commit
-→ forge-native PR
-→ existing Human/trusted-operator merge policy
-→ main
+Which invariant changed?
+Which assumption changed?
+Which new state became possible?
+Which new resource became owned?
+Which new failure path appeared?
+Which verifier now proves this?
 ```
 
-For a normal consumer with an admitted local Forgejo binding, issue and PR
-tracking route through `forgejo-delivery-loop`. For GitHub Actions or
-GitHub-hosted CI incidents, use GitHub as the incident/publication authority and
-compose `github-delivery-loop`; exact GitHub workflow/run/job/head evidence must
-not be replaced by a Forgejo mirror.
+If implementation introduces an unmodeled state, resource, authority, or side effect, stop and update the specification first.
 
-The intended operator path may open a new ChatGPT Desktop question/session for
-fresh diagnosis. A runtime that cannot launch ChatGPT Desktop must stop at a
-fresh-diagnosis handoff with the exact issue packet; it must not claim that a
-fresh session ran.
+Implement through bounded reconciliation:
 
-Do not repair a failing system by weakening the invariant, deleting the
-negative control, expanding privilege, hiding an error, resetting the attempt
-counter by renaming the same failure, or replacing physical execution with model
-judgment.
+```text
+MAP
+→ CONSTRAIN
+→ FALSIFY
+→ IMPLEMENT
+→ OBSERVE
+→ RECONCILE
+→ VERIFY
+```
 
-## Hard laws
+After three consecutive qualifying failures against the same invariant/acceptance target, do not make a fourth blind patch. Enter [`references/three-failure-escalation.md`](references/three-failure-escalation.md): preserve the failure packet, open the correct forge issue, use fresh diagnosis, create a new isolated worktree, implement the smallest falsifiable repair, and require the owning oracle plus negative control before delivery.
 
-1. **Exact-subject law** — every result binds revision, digest, environment, and
-   configuration. Old green evidence does not transfer to new bytes.
-2. **Authority law** — documentation and Agent confidence never outrank an
-   executed deterministic oracle for its declared subject.
-3. **Absence law** — use only `PASS`, `FAIL`, `ABSENT`, `NOT_IMPLEMENTED`,
-   `NOT_EXERCISED`, and `SKIPPED_BY_POLICY`.
-4. **Boundary law** — every boundary names its mechanism and enforcement owner.
-5. **Invariant law** — every hard invariant has a falsifier and named failure.
-6. **Symmetry law** — every owned resource has mirrored release and crash paths.
-7. **Bounded-loop law** — retries, reconciliation, and recovery have budgets and
-   terminal states.
-8. **No-mock-only law** — physical claims require physical execution.
-9. **No-silent-fallback law** — missing privilege or substrate becomes an
-   evidence state, never a weaker hidden implementation.
-10. **Human authority law** — threat-model acceptance, security sign-off,
-    production promotion, permission widening, destructive testing, and
-    rollback remain Human/trusted-operator decisions.
-11. **Three-failure escalation law** — three qualifying failures against the
-    same invariant/acceptance target force issue-bound fresh diagnosis and a new
-    isolated worktree before another repair attempt. Commit/PR eligibility
-    requires the owning oracle and required negative control to pass.
+## Rules against plausible but unsupported engineering
+
+Never treat any of these phrases as proof:
+
+```text
+"This pattern is standard."
+"The library handles it."
+"Rust memory safety makes it safe."
+"The framework retries automatically."
+"Kubernetes handles failures."
+"The database is ACID."
+"The API is idempotent."
+"The sandbox is isolated."
+"The queue guarantees delivery."
+"The test passed."
+"The benchmark is fast."
+```
+
+Expand each into exact semantics, scope, failure conditions, and evidence. For example, `database is ACID` must become questions about isolation level, transaction boundary, external side effects, and commit/acknowledgement ambiguity.
 
 ## Composition boundary
 
-This Skill owns the pre-implementation system contract and its reconciliation
-logic. Compose explicitly when needed:
+This Skill owns pre-implementation constraint discovery, executable specification, implementation gating, and bounded reconciliation. Compose explicitly when needed:
 
-- `unknown-discovery-composer` — widen discovery for poorly understood surfaces;
-- `truth-verify-loop` — verify mutable external claims and primary sources;
-- `loop-harness-standard` — build an executable bounded iteration Harness;
-- `forgejo-delivery-loop` — normal local Forgejo incident/PR routing after an
-  escalation when the consumer has an admitted Forgejo binding;
-- `github-delivery-loop` — GitHub Actions/GitHub-hosted CI incident and
-  publication authority;
-- `git-town-stacked-pr-worker` — new isolated worktree/branch and bounded branch
-  graph synchronization when admitted by the consumer.
+- `truth-verify-loop` for mutable external claims;
+- `unknown-discovery-composer` for broad unknown discovery;
+- `loop-harness-standard` for executable bounded iteration Harnesses;
+- `forgejo-delivery-loop` or `github-delivery-loop` for forge-native delivery;
+- `git-town-stacked-pr-worker` for admitted stacked-worktree synchronization.
 
-No composition is implicit, and no downstream Skill may promote
-`NOT_EXERCISED` to `PASS`.
+No downstream Skill may promote `NOT_EXERCISED` to `PASS` or bypass the universal compiler.
 
-## Evidence boundary
+## Final operating principle
 
-```text
-portable procedure and copyable prompt        IMPLEMENTED
-machine-checkable contract closure            IMPLEMENTED
-positive/hollow/mutation controls             IMPLEMENTED
-three-failure escalation contract             IMPLEMENTED
-Linux isolation domain guidance               IMPLEMENTED
-live root/KVM/cgroup/seccomp execution         NOT_EXERCISED
-hardware-specific performance                 NOT_EXERCISED
-chaos, exploit, and sandbox-escape testing    NOT_EXERCISED
-fresh ChatGPT Desktop session execution        HOST_OPERATOR_BOUND
-security acceptance and production promotion  HUMAN_ADMIT_REQUIRED
-```
+The objective is not to generate the most code or follow a source architecture faithfully. The objective is to **reduce the reachable invalid state space**.
+
+A strong architecture makes dangerous states difficult or impossible to represent. A strong lifecycle causes failures to converge toward known terminal states. A strong verification Harness makes violations observable. A strong Agent does not hide unknowns with plausible implementation.
+
+Code is one actuator inside the loop, not the system itself.
