@@ -12,7 +12,10 @@
       "test_verify": "tests/check-receipt/verify.sh",
       "good_fixture": "tests/check-receipt/fixtures/good",
       "hollow_fixture": "tests/check-receipt/fixtures/hollow",
-      "covers": ["complete receipt", "missing artifact is failure rather than skip"],
+      "covers": [
+        "complete receipt",
+        "missing artifact is failure rather than skip"
+      ],
       "expected": "good PASS and hollow UNMATERIALIZED FAIL"
     },
     {
@@ -21,7 +24,12 @@
       "test_verify": "tests/install-codex-merge-rule/verify.sh",
       "good_fixture": "tests/install-codex-merge-rule/fixtures/good",
       "hollow_fixture": "tests/install-codex-merge-rule/fixtures/hollow",
-      "covers": ["repository-scoped prefix rule", "existing rule backup", "unsafe repository rejection", "PreToolUse and human-gate boundary warning"],
+      "covers": [
+        "repository-scoped prefix rule",
+        "existing rule backup",
+        "unsafe repository rejection",
+        "PreToolUse and human-gate boundary warning"
+      ],
       "expected": "good repo installs and checks allow; hollow target fails before Codex execution"
     },
     {
@@ -30,16 +38,28 @@
       "test_verify": "tests/merge-gate/verify.sh",
       "good_fixture": "tests/merge-gate/fixtures/good",
       "hollow_fixture": "tests/merge-gate/fixtures/hollow",
-      "covers": ["merge-admit label applied by a non-owner is refused", "admit that predates the head commit is stale, not valid", "nothing admitted exits 3, distinct from a layer refusing with 1", "a PreToolUse hook that exits 2 refuses the run on the active host only"],
+      "covers": [
+        "merge-admit label applied by a non-owner is refused",
+        "admit that predates the head commit is stale, not valid",
+        "nothing admitted exits 3, distinct from a layer refusing with 1",
+        "a PreToolUse hook that exits 2 refuses the run on the active host only"
+      ],
       "expected": "good PREFLIGHT GREEN; hollow blocked at L1; empty exits 3; blocking hook exits 1"
     },
     {
       "id": "DELIVERY-4",
       "checker_script": "scripts/link-canonical.sh",
       "test_verify": "tests/link-canonical/verify.sh",
-      "good_fixture": "identical copy of the canonical skill in a scratch repo",
-      "hollow_fixture": "same copy with a local edit appended to SKILL.md",
-      "covers": ["diverged copy is refused and left untouched, never moved aside", "old copy is moved to a backup, never deleted", "re-running on an already-linked target is an idempotent success", "linking the canonical directory to itself is refused"],
+      "good_fixture": null,
+      "good_evidence": "identical copy of the canonical skill in a scratch repo",
+      "hollow_fixture": null,
+      "hollow_mutations": "same copy with a local edit appended to SKILL.md",
+      "covers": [
+        "diverged copy is refused and left untouched, never moved aside",
+        "old copy is moved to a backup, never deleted",
+        "re-running on an already-linked target is an idempotent success",
+        "linking the canonical directory to itself is refused"
+      ],
       "expected": "good converts and stays readable through the link; hollow exits non-zero naming the divergence"
     },
     {
@@ -48,7 +68,14 @@
       "test_verify": "tests/ci-publish-gate/verify.sh",
       "good_fixture": "tests/ci-publish-gate/fixtures/good",
       "hollow_fixture": "tests/ci-publish-gate/fixtures/hollow",
-      "covers": ["local commit cadence is independent from remote CI publication cadence", "exact local HEAD requires a passing local verification receipt", "only initial draft PR, ready-for-review, and one batched repair are admitted", "older-SHA CI success and repeated feedback fail closed", "billing or spending-limit no-runner evidence opens a circuit breaker", "only a later owner-authored recovery receipt can admit another attempt"],
+      "covers": [
+        "local commit cadence is independent from remote CI publication cadence",
+        "exact local HEAD requires a passing local verification receipt",
+        "only initial draft PR, ready-for-review, and one batched repair are admitted",
+        "older-SHA CI success and repeated feedback fail closed",
+        "billing or spending-limit no-runner evidence opens a circuit breaker",
+        "only a later owner-authored recovery receipt can admit another attempt"
+      ],
       "expected": "good initial publication ALLOW; hollow billing snapshot BLOCK; stale HEAD, repeated feedback, and stale recovery remain red"
     },
     {
@@ -56,8 +83,16 @@
       "checker_script": "scripts/local_verification.py",
       "test_verify": "tests/evidence-producers/verify.sh",
       "good_fixture": "tests/evidence-producers/fixtures/local",
-      "hollow_fixture": "dirty worktree, repository identity mismatch, shell string, unsafe inherited env, timeout, nonzero exit, or output overflow",
-      "covers": ["clean exact local HEAD and tree are recorded", "commands are fixed argv arrays executed without a shell", "environment inheritance is a safe-name allowlist", "timeout and output budgets are enforced", "receipt digest binds detailed command evidence", "FAIL evidence cannot be consumed as PASS"],
+      "hollow_fixture": null,
+      "hollow_mutations": "dirty worktree, repository identity mismatch, shell string, unsafe inherited env, timeout, nonzero exit, or output overflow",
+      "covers": [
+        "clean exact local HEAD and tree are recorded",
+        "commands are fixed argv arrays executed without a shell",
+        "environment inheritance is a safe-name allowlist",
+        "timeout and output budgets are enforced",
+        "receipt digest binds detailed command evidence",
+        "FAIL evidence cannot be consumed as PASS"
+      ],
       "expected": "clean fixed-command contract emits PASS; dirty, stale, unsafe, timed-out, overflowing, or nonzero subjects turn red"
     },
     {
@@ -66,7 +101,14 @@
       "test_verify": "tests/evidence-producers/verify.sh",
       "good_fixture": "tests/evidence-producers/fixtures/good",
       "hollow_fixture": "tests/evidence-producers/fixtures/stale",
-      "covers": ["private repository identity and one PR are bound", "stable check is selected by exact name and exact head", "actionable CI failure becomes one feedback identity", "known payment or spending annotation becomes billing-open with no test conclusion", "replay is zero-network", "multiple PRs, public repositories, stale checks, incomplete checks, and malformed annotations fail closed"],
+      "covers": [
+        "private repository identity and one PR are bound",
+        "stable check is selected by exact name and exact head",
+        "actionable CI failure becomes one feedback identity",
+        "known payment or spending annotation becomes billing-open with no test conclusion",
+        "replay is zero-network",
+        "multiple PRs, public repositories, stale checks, incomplete checks, and malformed annotations fail closed"
+      ],
       "expected": "good observation produces a trusted snapshot; billing remains a circuit state; stale or ambiguous observations turn red"
     }
   ]

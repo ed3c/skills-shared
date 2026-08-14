@@ -30,6 +30,8 @@ on:
       - 'scripts/check_intent_promotions.py'
       - 'migration/**'
       - 'scripts/check_commit_roles.py'
+      - 'scripts/check_skill_eval_plane.py'
+      - 'scripts/skill_eval_plane_selftest.py'
       - 'scripts/check_guard_controls.py'
       - 'scripts/measure_delivery_shape.py'
       - 'scripts/check_executor_authority.py'
@@ -141,6 +143,8 @@ jobs:
             evals/fixtures/delivery-shape/observation-2026-08-14.json >/dev/null
       - name: Prove every declared guard is caught by a control
         run: |
+          python3 scripts/skill_eval_plane_selftest.py
+          python3 scripts/check_skill_eval_plane.py
           python3 scripts/check_guard_controls.py --repo-root . --selftest
           python3 -m unittest tests/test_guard_controls.py -v
           python3 scripts/check_guard_controls.py --repo-root .

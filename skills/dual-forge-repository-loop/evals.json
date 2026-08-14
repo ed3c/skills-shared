@@ -11,7 +11,8 @@
       "checker_script": "scripts/check_dual_forge_contract.py",
       "test_verify": "tests/dual-forge-contract/verify.sh",
       "good_fixture": "tests/dual-forge-contract/fixtures/good.json",
-      "hollow_fixture": "mutations collapsing remote or issue namespaces, swapping local-main/reconciliation order, skipping PR/conflict reconciliation, binding Actions to a stale head, or leaving local/Actions evidence unexercised while publication is allowed",
+      "hollow_fixture": null,
+      "hollow_mutations": "mutations collapsing remote or issue namespaces, swapping local-main/reconciliation order, skipping PR/conflict reconciliation, binding Actions to a stale head, or leaving local/Actions evidence unexercised while publication is allowed",
       "covers": [
         "GitHub, Forgejo, and GitHub Actions authority planes remain distinct",
         "Forgejo/GitHub issue identifiers remain explicitly namespaced",
