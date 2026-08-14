@@ -158,7 +158,7 @@ SKILL.md + implementation
                            └── Human Admit
 ```
 
-## Current implementation state — 2026-08-12
+## Current implementation state — 2026-08-14
 
 Landed mechanisms include:
 
@@ -168,9 +168,14 @@ Landed mechanisms include:
 - canonical-drift mutation proof (#75);
 - verified capability release receipts, scorecard separation, and rollback contract (#76);
 - isolated Shared Skills Infra CI (#77);
-- private GitHub Actions publication gating and billing circuit behavior (issue #43 and the landed implementation line).
+- private GitHub Actions publication gating and billing circuit behavior (issue #43 and the landed implementation line);
+- Intent-Bound Constraint contract, closure evaluator, and adapters for the Git Town, knowledge-continuity, and Forgejo delivery methods (#104, #105, #106, #111);
+- a pinned live Git Town canary that exercises the real binary, linked-worktree sync, and semantic conflict fail-closed behavior (#107);
+- a CI arrival for every skill that ships a test suite, gated so a new suite cannot land without one (#112, #113).
 
-The Phase 4/5 contract Stack is no longer active: #73, #74, and #76 are merged. The only current open PR at this snapshot is the document-routing sibling [`#85`](https://github.com/ed3c/skills-shared/pull/85); exact open-head identity remains GitHub metadata, not embedded prose.
+The Phase 4/5 contract Stack is no longer active: #73, #74, and #76 are merged. The four-repository documentation stack has also fully landed, including its convergence owner. There is no open PR at this snapshot; exact open-head identity, when one exists, remains GitHub metadata, not embedded prose.
+
+The Intent-Bound stack merged with a real gap worth carrying forward: two of its five leaves (#105, #106) landed with **no workflow run at their head commits at all**, which let two broken verifiers reach `main` unreported. Absence of a check is not a pass. The convergence report in [`docs/AGENT_INTEGRATION_STATE.md`](docs/AGENT_INTEGRATION_STATE.md) records what that cost and what now prevents it.
 
 The capability/release registries remain intentionally empty:
 
@@ -207,16 +212,17 @@ stable merged siblings + shared index/cold-start audit
 → convergence leaf
 ```
 
-The current four-repository documentation set is four independent siblings:
+The four-repository documentation set was four independent siblings, and all four have merged:
 
 ```text
-skills-shared#85
-runtime-env#30
-agent-shield-monorepo#78
-bettor-arena#37
+skills-shared#85            MERGED
+runtime-env#30              MERGED
+agent-shield-monorepo#78    MERGED
+bettor-arena#37             MERGED
+bettor-arena#38             CLOSED (convergence owner)
 ```
 
-After all four merge, `bettor-arena#38` owns exact merged commit/tree indexing and fresh Claude/Codex cold-start convergence. Do not create that branch early.
+Exact merged commits are recorded in [`docs/traceability/TRACEABILITY_INDEX.md`](docs/traceability/TRACEABILITY_INDEX.md). The parent contract issue `bettor-arena#35` is still open and is the only live item on that plane.
 
 ## Local canonical projection
 

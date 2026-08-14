@@ -26,6 +26,10 @@
 - [`../skills/README.md`](../skills/README.md) — Skill directory contract.
 - [`../skills/github-delivery-loop/README.md`](../skills/github-delivery-loop/README.md) — GitHub delivery state machines.
 - [`../skills/git-town-stacked-pr-worker/README.md`](../skills/git-town-stacked-pr-worker/README.md) — Stack PR method.
+- [`../skills/forgejo-delivery-loop/README.md`](../skills/forgejo-delivery-loop/README.md) — local Forgejo delivery routing and receipts.
+- [`../skills/repo-agent-native/README.md`](../skills/repo-agent-native/README.md) — source-anchored invariant extraction and its A/B evidence boundary.
 - [`../skills/knowledge-continuity/README.md`](../skills/knowledge-continuity/README.md) — continuity and routing method example.
 
 The nearest directory README is the local ownership route. Machine contracts remain authoritative over prose.
+
+An index fails in one direction only: a dead link is found the moment someone follows it, while an omission looks exactly like completeness. At the 2026-08-14 cold-start audit, 6 of 23 skills ship a `README.md` and all 6 are routed above; the other 17 have no nearest-README route to omit yet. Adding one without adding its route here recreates the omission.
