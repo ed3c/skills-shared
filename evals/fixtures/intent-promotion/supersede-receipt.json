@@ -17,23 +17,10 @@
       "subject_tree_sha": "cccccccccccccccccccccccccccccccccccccccc"
     }
   ],
-  "from_state": "VERIFIED",
+  "from_state": "CANONICAL",
   "intent_id": "MI-CTL-EVIDENCE",
-  "merge_subject": {
-    "admitted_by": "ed3c",
-    "candidate_head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-    "candidate_tree_sha": "cccccccccccccccccccccccccccccccccccccccc",
-    "forge_readback": {
-      "observed_at_commit_sha": "ffffffffffffffffffffffffffffffffffffffff",
-      "readback_digest": "sha256:6666666666666666666666666666666666666666666666666666666666666666",
-      "source": "GITHUB_API"
-    },
-    "merge_commit_sha": "ffffffffffffffffffffffffffffffffffffffff",
-    "merge_tree_sha": "8888888888888888888888888888888888888888",
-    "release_artifact": null,
-    "repository": "ed3c/skills-shared"
-  },
-  "receipt_id": "IPR-FIXTURE-001",
+  "merge_subject": null,
+  "receipt_id": "IPR-FIXTURE-SUPERSEDE",
   "schema_version": "intent-promotion-receipt/v1",
   "subject": {
     "branch": "ctl/04b-intent-promotion-authority",
@@ -42,13 +29,12 @@
     "repository": "ed3c/skills-shared",
     "tree_sha": "cccccccccccccccccccccccccccccccccccccccc"
   },
-  "supersedes": null,
-  "to_state": "ADMITTED",
-  "writebacks": [
-    {
-      "destination_id": "module-notes",
-      "mode": "APPEND",
-      "scope": "MODULE"
-    }
-  ]
+  "supersedes": {
+    "predecessor_state": "CANONICAL",
+    "predecessor_subject_commit_sha": "3333333333333333333333333333333333333333",
+    "receipt_digest": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
+    "receipt_id": "IPR-FIXTURE-PRIOR"
+  },
+  "to_state": "SUPERSEDED",
+  "writebacks": []
 }

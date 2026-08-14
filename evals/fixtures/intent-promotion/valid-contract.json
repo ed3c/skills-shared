@@ -6,7 +6,7 @@
     "required_approver_identity": "HUMAN_IDENTITY_REQUIRED"
   },
   "contract_id": "skills-shared-intent-promotion",
-  "contract_version": "1.0.0",
+  "contract_version": "1.1.0",
   "lifecycle": {
     "non_authoritative_states": [
       "HYPOTHESIS",
@@ -88,6 +88,8 @@
     "repository": "ed3c/skills-shared"
   },
   "supersession_policy": {
+    "append_only_ledger": true,
+    "ledger_ref": "evals/fixtures/intent-promotion/ledger.json",
     "replacement_requires_supersedes": true,
     "revoked_projection_allowed": false
   },
@@ -97,7 +99,7 @@
       {
         "destination_id": "module-notes",
         "human_owned": false,
-        "minimum_state": "VERIFIED",
+        "minimum_state": "ADMITTED",
         "scope": "MODULE"
       },
       {

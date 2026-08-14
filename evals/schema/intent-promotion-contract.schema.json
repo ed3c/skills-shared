@@ -6,14 +6,15 @@
   "type": "object",
   "additionalProperties": false,
   "required": [
-    "schema_version",
+    "approval_policy",
     "contract_id",
     "contract_version",
-    "subject_identity",
     "lifecycle",
-    "writeback_policy",
-    "approval_policy",
-    "supersession_policy"
+    "private_reasoning_persistence",
+    "schema_version",
+    "subject_identity",
+    "supersession_policy",
+    "writeback_policy"
   ],
   "properties": {
     "schema_version": {
@@ -30,7 +31,10 @@
     "subject_identity": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["repository", "commit_sha"],
+      "required": [
+        "repository",
+        "commit_sha"
+      ],
       "properties": {
         "repository": {
           "type": "string",
@@ -45,7 +49,12 @@
     "lifecycle": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["states", "transitions", "non_authoritative_states", "terminal_states"],
+      "required": [
+        "states",
+        "transitions",
+        "non_authoritative_states",
+        "terminal_states"
+      ],
       "properties": {
         "states": {
           "type": "array",
@@ -70,10 +79,20 @@
           "items": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["from", "to", "requires"],
+            "required": [
+              "from",
+              "to",
+              "requires"
+            ],
             "properties": {
-              "from": {"type": "string", "minLength": 1},
-              "to": {"type": "string", "minLength": 1},
+              "from": {
+                "type": "string",
+                "minLength": 1
+              },
+              "to": {
+                "type": "string",
+                "minLength": 1
+              },
               "requires": {
                 "type": "array",
                 "uniqueItems": true,
@@ -94,39 +113,68 @@
           "type": "array",
           "minItems": 2,
           "uniqueItems": true,
-          "items": {"type": "string"}
+          "items": {
+            "type": "string"
+          }
         },
         "terminal_states": {
           "type": "array",
           "minItems": 2,
           "uniqueItems": true,
-          "items": {"type": "string"}
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
     "writeback_policy": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["append_only", "declared_destinations", "similarity_overwrite_allowed"],
+      "required": [
+        "append_only",
+        "declared_destinations",
+        "similarity_overwrite_allowed"
+      ],
       "properties": {
-        "append_only": {"const": true},
-        "similarity_overwrite_allowed": {"const": false},
+        "append_only": {
+          "const": true
+        },
+        "similarity_overwrite_allowed": {
+          "const": false
+        },
         "declared_destinations": {
           "type": "array",
           "minItems": 1,
           "items": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["destination_id", "scope", "minimum_state", "human_owned"],
+            "required": [
+              "destination_id",
+              "scope",
+              "minimum_state",
+              "human_owned"
+            ],
             "properties": {
-              "destination_id": {"type": "string", "minLength": 1},
+              "destination_id": {
+                "type": "string",
+                "minLength": 1
+              },
               "scope": {
-                "enum": ["MODULE", "PROJECT", "ROOT_GLOBAL"]
+                "enum": [
+                  "MODULE",
+                  "PROJECT",
+                  "ROOT_GLOBAL"
+                ]
               },
               "minimum_state": {
-                "enum": ["PROPOSED", "VERIFIED", "ADMITTED", "CANONICAL"]
+                "enum": [
+                  "ADMITTED",
+                  "CANONICAL"
+                ]
               },
-              "human_owned": {"type": "boolean"}
+              "human_owned": {
+                "type": "boolean"
+              }
             }
           }
         }
@@ -135,23 +183,52 @@
     "approval_policy": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["agent_may_create_approval", "caller_flag_may_request", "caller_flag_may_grant", "required_approver_identity"],
+      "required": [
+        "agent_may_create_approval",
+        "caller_flag_may_request",
+        "caller_flag_may_grant",
+        "required_approver_identity"
+      ],
       "properties": {
-        "agent_may_create_approval": {"const": false},
-        "caller_flag_may_request": {"type": "boolean"},
-        "caller_flag_may_grant": {"const": false},
+        "agent_may_create_approval": {
+          "const": false
+        },
+        "caller_flag_may_request": {
+          "type": "boolean"
+        },
+        "caller_flag_may_grant": {
+          "const": false
+        },
         "required_approver_identity": {
-          "enum": ["HUMAN_IDENTITY_REQUIRED"]
+          "enum": [
+            "HUMAN_IDENTITY_REQUIRED"
+          ]
         }
       }
     },
     "supersession_policy": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["replacement_requires_supersedes", "revoked_projection_allowed"],
+      "required": [
+        "replacement_requires_supersedes",
+        "revoked_projection_allowed",
+        "ledger_ref",
+        "append_only_ledger"
+      ],
       "properties": {
-        "replacement_requires_supersedes": {"const": true},
-        "revoked_projection_allowed": {"const": false}
+        "replacement_requires_supersedes": {
+          "const": true
+        },
+        "revoked_projection_allowed": {
+          "const": false
+        },
+        "ledger_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "append_only_ledger": {
+          "const": true
+        }
       }
     },
     "private_reasoning_persistence": {
