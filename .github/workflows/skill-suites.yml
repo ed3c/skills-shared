@@ -16,6 +16,7 @@ on:
       - synchronize
     paths:
       - 'skills/controlled-technical-language-harness/**'
+      - 'skills/dual-forge-repository-loop/**'
       - 'skills/github-delivery-loop/**'
       - 'skills/gitlab-delivery-loop/**'
       - 'skills/html-for-decisions/**'
@@ -28,6 +29,7 @@ on:
     branches: [main]
     paths:
       - 'skills/controlled-technical-language-harness/**'
+      - 'skills/dual-forge-repository-loop/**'
       - 'skills/github-delivery-loop/**'
       - 'skills/gitlab-delivery-loop/**'
       - 'skills/html-for-decisions/**'
@@ -72,6 +74,7 @@ jobs:
       matrix:
         skill:
           - controlled-technical-language-harness
+          - dual-forge-repository-loop
           - github-delivery-loop
           - gitlab-delivery-loop
           - html-for-decisions
