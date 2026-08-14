@@ -1,9 +1,9 @@
 {
   "skill_name": "spatial-loop-systems-engineering",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "_meta": {
-    "coverage_metric": "exact-subject binding, realm/boundary/flow closure, state and invariant references, required-capability gating, teardown symmetry, performance measurement closure, and evidence-state separation",
-    "purpose": "Prove that an expert-sounding systems specification cannot advance to implementation while substrate capabilities, invariant oracles, lifecycle cleanup, state references, or performance evidence remain hollow."
+    "coverage_metric": "exact-subject binding, realm/boundary/flow closure, state and invariant references, required-capability gating, teardown symmetry, performance measurement closure, evidence-state separation, and repeated-failure recovery routing",
+    "purpose": "Prove that an expert-sounding systems specification cannot advance to implementation while substrate capabilities, invariant oracles, lifecycle cleanup, state references, performance evidence, or bounded-recovery requirements remain hollow."
   },
   "runnable": [
     {
@@ -23,13 +23,35 @@
         "a missing contract file is an input error rather than a failed system"
       ],
       "expected": "canonical prototype contract admitted; each planted hollow or contradictory mutation refused with a stable reason"
+    },
+    {
+      "id": "SLS-RECOVERY-ESCALATION-1",
+      "checker_script": "tests/recovery-escalation/verify.sh",
+      "test_verify": "tests/recovery-escalation/verify.sh",
+      "good_fixture": "SKILL.md plus references/three-failure-escalation.md and references/system-prompt-recovery-overlay.md",
+      "hollow_fixture": "removing the qualifying-failure definition, allowing a fourth blind patch, removing Forgejo/GitHub routing, reusing the stale diagnosis context, removing the isolated-worktree requirement, allowing commit before the owning oracle passes, or silently granting merge authority",
+      "covers": [
+        "three consecutive qualifying failures against the same invariant or acceptance target force escalation rather than a fourth blind patch",
+        "the issue packet preserves exact subject, oracle, three failure trajectories, falsified hypotheses, unknowns, and rollback context",
+        "normal repositories with an admitted local Forgejo binding route issue and PR work through Forgejo",
+        "GitHub Actions and GitHub-hosted CI incidents remain on GitHub with exact workflow/run/job/head evidence",
+        "fresh diagnosis uses a new context and ChatGPT Desktop is a host/operator handoff when the runtime cannot launch it",
+        "the repair starts in a new isolated worktree/branch with one writer",
+        "commit and PR eligibility require the owning oracle and required negative control to pass",
+        "merge to main remains governed by the repository's existing Human or separately admitted trusted-operator policy"
+      ],
+      "expected": "recovery contract contains all mandatory stop, routing, fresh-context, worktree, verification, publication, and merge-authority boundaries"
     }
   ],
   "evidence_boundary": {
     "portable_system_prompt": "IMPLEMENTED",
     "system_contract_checker": "IMPLEMENTED",
     "positive_hollow_mutation_controls": "IMPLEMENTED",
+    "three_failure_escalation_contract": "IMPLEMENTED",
     "linux_isolation_module": "IMPLEMENTED",
+    "fresh_chatgpt_desktop_execution": "NOT_EXERCISED",
+    "live_forgejo_recovery_mutation": "NOT_EXERCISED",
+    "live_github_actions_recovery": "NOT_EXERCISED",
     "live_privileged_runtime": "NOT_EXERCISED",
     "kernel_security_validation": "NOT_EXERCISED",
     "hardware_performance_measurement": "NOT_EXERCISED",
