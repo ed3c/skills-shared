@@ -1,9 +1,9 @@
 {
   "skill_name": "git-town-stacked-pr-worker",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "_meta": {
-    "coverage_metric": "publication-policy composition, exact-head subject separation, no-push background invariant, and billing-circuit fail-closed controls",
-    "purpose": "Prove that Git Town Worker guidance cannot bypass the canonical github-delivery-loop publication boundary or collapse local sync, publication, trusted CI, and Human Admit into one green state."
+    "coverage_metric": "publication-policy composition, exact-head subject separation, Intent-Bound Stack graph closure, no-push background invariant, and billing-circuit fail-closed controls",
+    "purpose": "Prove that the Git Town Worker cannot invent branch dependencies, reuse stale child evidence, overlap active sibling path leases, create convergence early, bypass the canonical github-delivery-loop publication boundary, or collapse local sync, publication, trusted CI, and Human Admit into one green state."
   },
   "runnable": [
     {
@@ -21,6 +21,33 @@
         "local sync, local verification, publication, trusted check and Human Admit remain separate lanes"
       ],
       "expected": "canonical files PASS; each planted hollow mutation exits non-zero with a stable contract error"
+    },
+    {
+      "id": "GTSP-STACK-1",
+      "checker_script": "scripts/check_stack_contract.py",
+      "test_verify": "tests/stack-contract/verify.sh",
+      "good_fixture": "tests/stack-contract/fixtures/valid-stack.json",
+      "hollow_fixture": "wrong PR base, stale parent, wrong merge base, old receipt, prose-only fake child, missing parent dependency, sibling edge, path overlap, early convergence, ancestry cycle, or missing Human-owned operation",
+      "intent_contract": "tests/stack-contract/fixtures/intent-contract.json",
+      "covers": [
+        "GTSP-04 branch ancestry equals the declared proof dependency graph",
+        "GTSP-06 active sibling path leases remain disjoint",
+        "GTSP-13 merge base and observed parent equal the exact declared parent head",
+        "GTSP-14 parent or head movement invalidates old child evidence",
+        "GTSP-18 receipts bind the exact branch head",
+        "child branches consume a declared contract or byte path instead of prose-only scheduling preference",
+        "convergence remains NOT_CREATED until all prerequisites are ADMITTED",
+        "semantic conflict, merge or ship, permission widening, promotion, and destructive rollback remain Human-owned"
+      ],
+      "expected": "canonical fixture and Intent-Bound contract PASS; every planted graph, freshness, lease, convergence, or Human-boundary mutation exits non-zero"
     }
-  ]
+  ],
+  "evidence_boundary": {
+    "offline_stack_graph_mechanism": "IMPLEMENTED",
+    "live_git_town_binary": "NOT_EXERCISED",
+    "real_worktree_sync": "NOT_EXERCISED",
+    "semantic_conflict_canary": "NOT_EXERCISED",
+    "remote_publication": "NOT_EXERCISED",
+    "human_admit": "REQUIRED"
+  }
 }
