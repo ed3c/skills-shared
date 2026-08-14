@@ -58,19 +58,28 @@ canonical 住 `~/.claude/skills/github-delivery-loop/`；各 repo 的 `.claude/s
 
 ```bash
 python3 ~/.claude/skills/github-delivery-loop/scripts/ci_publish_gate.py evaluate \
-  --snapshot /tmp/github-ci-publish.json
+  --repo-root /absolute/repo \
+  --snapshot /tmp/github-actions-publish.json \
+  --verification /absolute/repo/.git/github-delivery/local-verification.json \
+  --evidence /absolute/repo/.git/github-delivery/local-verification-evidence.json \
+  --verification-contract /absolute/repo/.github-delivery/local-verification-contract.json \
+  --intent initial-pr --json
 ```
 
-這支 `scripts/ci_publish_gate.py` 只有輸出 `ALLOW initial-pr|ready-for-review|repair` 才進下一層。
-`checkpoint`、驗證不是 exact HEAD、
-remote 已是同一 SHA、同一 feedback 已發佈，或 account billing no-runner circuit 未被 owner 的較新
+這支 `scripts/ci_publish_gate.py` 只承認 `initial-pr`、`ready-for-review`、`batched-repair`
+三種 intent，且只有 decision=`ALLOW` 才進下一層。
+`checkpoint`、驗證不是 exact HEAD、需要新 head 的 intent 卻沒有新 SHA、同一 feedback 已發佈，
+或 account billing no-runner circuit 未被 owner 的較新
 recovery receipt 關閉，都必須停止；禁止以 rerun、no-op commit 或改 intent 拼字繞過。
 
 `scripts/ci_publish.py` 是受管 private repo 的唯一網路發佈入口：`verify` 先跑
-`.github-delivery/ci-policy.json` 指定的本地 argv 並把 receipt 放進 git-dir；`publish` 再重驗
+`.github-delivery/ci-policy.json` 指向唯一的本地驗證 contract，由 `local_verification.py` 執行固定
+argv 並把 receipt/evidence 放進 git-dir；`publish` 再重驗
 workflow policy、git HEAD、receipt、snapshot 與 GitHub remote identity，最後以完整 SHA refspec push。
-`ready-for-review` 會接著執行 `gh pr ready`；`draft-first` repair 會 dispatch policy 指定的
-workflow，`universal` repair 則由已驗證 PR head ref 的 `synchronize` 事件執行，禁止同 SHA 再 dispatch。
+`initial-pr` 同一 admission 會建立 draft PR；`ready-for-review` 在 head 已相同時只執行
+`gh pr ready`，否則先推 final batch 再轉 ready；
+`draft-first` batched repair 會 dispatch policy 指定的 workflow，`universal` batched repair 則由
+snapshot 釘住的 PR head ref 之 `synchronize` 事件執行，禁止同 SHA 再 dispatch。
 省略 `--execute` 必為 dry-run。
 
 ```bash
@@ -79,8 +88,9 @@ python3 ~/.claude/skills/github-delivery-loop/scripts/ci_workflow_policy.py chec
 python3 ~/.claude/skills/github-delivery-loop/scripts/ci_publish.py verify \
   --repo-root /absolute/repo
 python3 ~/.claude/skills/github-delivery-loop/scripts/ci_publish.py publish \
-  --repo-root /absolute/repo --snapshot /tmp/github-ci-publish.json \
-  --remote github --execute
+  --repo-root /absolute/repo --snapshot /tmp/github-actions-publish.json \
+  --intent initial-pr --remote github --branch agent/feature \
+  --pr-title 'Feature' --pr-body 'Closes #N' --execute
 ```
 
 `scripts/ci_publish_guard.py` 是兩個 host 共用的 PreToolUse guard：只有 repo 已登記
@@ -169,6 +179,24 @@ preflight 三個都驗——少驗一個平面就會把「還會被擋」報成�
 delivery-loop **各藏著一支從沒被自己 SKILL.md 提過的 sync 類腳本**；本 skill 那支是
 `scripts/delivery_sync.py`（GitHub snapshot 攝取、flow metrics 與決策儀表板投影）。
 同型缺陷三處齊發，正是「發現一個先掃同類全部實例」的形狀。
+
+完整 machine-support 索引如下；入口說明分別在
+[modules/README.md](modules/README.md) 與 [scripts/README.md](scripts/README.md)：
+
+- modules： [ci-publication](modules/ci-publication.md)、
+  [commit-role](modules/commit-role.md)、
+  [delivery-mechanism](modules/delivery-mechanism.md)、
+  [github-actions-cost-control](modules/github-actions-cost-control.md)、
+  [host-permissions](modules/host-permissions.md)、
+  [state-machines](modules/state-machines.md)、
+  [traceability-index](modules/traceability-index.md)。
+- scripts： `scripts/ci_publish.py`、`scripts/ci_publish_gate.py`、
+  `scripts/ci_publish_guard.py`、`scripts/ci_workflow_policy.py`、
+  `scripts/delivery_sync.py`、`scripts/delivery_sync_impl.py`、
+  `scripts/github_actions_snapshot.py`、`scripts/github_delivery.py`、
+  `scripts/install-ci-publish-guard.py`、`scripts/install-codex-merge-rule.sh`、
+  `scripts/link-canonical.sh`、`scripts/local_verification.py`、
+  `scripts/merge_gate.py`、`scripts/reference_causality.py`。
 
 規則不靠人記得，靠 `tests/index/verify.sh`（`tests/run-all.sh` 自動探索）：它先跑 checker
 自己的 `--selftest`，再驗本檔——**checker 不能證明自己會紅之前，它對本檔的綠燈不算數**。

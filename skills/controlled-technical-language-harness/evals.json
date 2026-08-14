@@ -1,0 +1,165 @@
+{
+  "skill_name": "controlled-technical-language-harness",
+  "version": "1.4.0",
+  "_meta": {
+    "coverage_metric": "profile source-identity honesty, edition immutability, Human-owned terminology and compliance boundaries, ruleset binding, profile optionality, and uncommitted official bytes; deterministic tokenization and word budgets; calibrated-heuristic admission and composition; source-node preservation for structured XML; extraction-quality declaration; privacy class to execution lane routing; exact profile/termbase/source/candidate evidence binding; corpus-recomputed calibration; integrated A/B experiment validity and outcome gates; authority-bound A/B composition",
+    "purpose": "Prove that a proposal-derived controlled-language profile cannot present itself as an official standard edition, cannot bind a ruleset it does not have, cannot become a mandatory core dependency, cannot relax deterministic, privacy, or Human Admit boundaries, and cannot use primitive mechanism success as a proxy for exact profile-conformance evidence."
+  },
+  "runnable": [
+    {
+      "id": "CTL-PROFILE-1",
+      "checker_script": "scripts/check_profile_admission.py",
+      "test_verify": "tests/profile-admission/verify.sh",
+      "good_fixture": "evals/standard-pack-ste.json plus evals/ste-proposal-derived.rules.json",
+      "hollow_fixture": "selftest mutations promoting the proposal to an official edition, making the edition mutable, relaxing terminology or compliance admit, drifting the ruleset, removing the profile-absent state, dropping a trigger boundary, widening privacy, or committing standard bytes",
+      "covers": [
+        "a SOURCE_PROPOSAL pack cannot name an official standard designation in its edition, display name, pack id, or authority",
+        "an edition must name one immutable revision",
+        "an OFFICIAL_STANDARD pack needs a resolvable locator and a decided license classification",
+        "VENDORED content requires an admitted redistribution grant",
+        "technical name and verb admission stay Human-owned and compliance stays HUMAN_ADMIT_REQUIRED",
+        "ruleset_digest binds the ruleset actually present, and its provenance matches the pack",
+        "the core keeps a PROFILE_ABSENT state and every profile module states its trigger boundary",
+        "no standard or vocabulary artifact is committed without an admitted grant"
+      ],
+      "expected": "canonical pack admitted; each of the 15 planted mutations refused with a distinct reason"
+    },
+    {
+      "id": "CTL-DETERMINISTIC-1",
+      "checker_script": "scripts/lint_deterministic.py",
+      "test_verify": "tests/deterministic-linter/verify.sh",
+      "good_fixture": "inline sentences exercising each stated tokenization rule",
+      "hollow_fixture": "mutations that split hyphenated compounds, count punctuation as words, digest a re-rendering instead of the exact substring, stop collapsing admitted multiword terms, or end a sentence on an abbreviation",
+      "covers": [
+        "a hyphenated compound, a quoted span, and an admitted multiword term each count as one word",
+        "punctuation-only tokens are not words and internal punctuation is kept",
+        "an abbreviation's period does not end a sentence",
+        "a source span digest binds the exact substring of the exact subject",
+        "an over-budget sentence is an ERROR and an in-budget one is silent",
+        "the CLI exits 2 on an over-budget document and 64 on an absent subject, so a checker error is not read as a document failure"
+      ],
+      "expected": "selftest green; each planted tokenization or span defect turns it red"
+    },
+    {
+      "id": "CTL-HEURISTIC-1",
+      "checker_script": "scripts/check_heuristic_calibration.py",
+      "test_verify": "tests/heuristic-boundary/verify.sh",
+      "good_fixture": "a calibration receipt with a pinned implementation, a measured corpus, both error rates, and a ceiling",
+      "hollow_fixture": "mutations making the implementation version mutable, emptying the corpus, exercising zero cases, omitting one error direction, exceeding the ceiling, self-admitting the threshold, or letting a heuristic conclude or override",
+      "covers": [
+        "a heuristic needs a pinned implementation identity and digest, not a mutable version",
+        "an empty corpus or zero exercised cases is an absent measurement, not a calibrated one",
+        "both false-positive and false-negative rates are required",
+        "measured error may not exceed the declared ceiling and the threshold is Human-admitted",
+        "a heuristic cannot produce a final PASS on its own",
+        "a heuristic PASS cannot hide a deterministic FAIL, and an errored evaluator is not a passing one"
+      ],
+      "expected": "selftest green; all 14 planted admission and composition defects refused"
+    },
+    {
+      "id": "CTL-DOCUMENT-1",
+      "checker_script": "scripts/check_document_preservation.py",
+      "test_verify": "tests/document-privacy/verify.sh",
+      "good_fixture": "an S1000D-like and a DITA-like fixture, plus a faithful rewrite that changes prose inside preserved nodes",
+      "hollow_fixture": "outputs that are well-formed XML but drop a warning or caution, reorder steps while keeping the same text, drop an identifier or cross-reference, remove a step, or are malformed; format declarations that trigger on the wrong content; extractions with undeclared or contradictory quality",
+      "covers": [
+        "a dropped safety node is refused even when the output is well-formed",
+        "reordered steps with unchanged text are reported separately from removal",
+        "identifiers and cross-reference targets survive a rewrite",
+        "a structured-XML module cannot trigger on plain text and a text module cannot trigger on XML",
+        "extraction quality must be declared, and PARTIAL or GARBLED blocks semantic PASS",
+        "a structure reported as unrecovered contradicts a COMPLETE extraction"
+      ],
+      "expected": "faithful rewrites preserved; 19 planted preservation, trigger and extraction defects refused; CLI exits 2 on a lossy rewrite and 64 on an absent file"
+    },
+    {
+      "id": "CTL-PRIVACY-1",
+      "checker_script": "scripts/check_privacy_routing.py",
+      "test_verify": "tests/document-privacy/verify.sh",
+      "good_fixture": "every privacy class routed at its own ceiling, including CONFIDENTIAL external with a matching human approval",
+      "hollow_fixture": "RESTRICTED routed off-box or with network enabled, INTERNAL sent externally, CONFIDENTIAL external without approval or approved by an agent or for a different subject, a provider healthy but unadmitted, a provider admitted but unhealthy, secrets or machine paths in a durable receipt, an undeclared fallback",
+      "covers": [
+        "RESTRICTED always routes LOCAL_ONLY with network disabled",
+        "a class may be processed more privately than its ceiling but never less",
+        "CONFIDENTIAL external processing needs a human approval bound to the same document digest",
+        "provider health and privacy admission are separate states and neither substitutes for the other",
+        "an admitted but unhealthy provider blocks rather than falling back to an unadmitted lane",
+        "durable receipts carry no token, session, key or machine path, and a fallback must be declared"
+      ],
+      "expected": "every class routable at its ceiling; 16 planted routing defects refused"
+    },
+    {
+      "id": "CTL-EXACT-EVIDENCE-1",
+      "checker_script": "scripts/check_exact_evidence.py",
+      "test_verify": "tests/exact-evidence/verify.sh",
+      "good_fixture": "selftest-generated exact profile/rules/policy/termbase/source/candidate and gold/prediction artifacts",
+      "hollow_fixture": "stale policy identity, wrong TN/TV POS, boundary-label disagreement, mutable model identity, malformed JSON, and exact CLI exit controls",
+      "covers": [
+        "deterministic evidence binds exact profile, ruleset, policy, termbase, source, candidate, and segment identities",
+        "document class selects a declared word budget and candidate segments cover all non-whitespace bytes without overlap",
+        "TN/TV use binds an admitted term, exact surface, and allowed part of speech",
+        "protected XML nodes preserve presence, tag, text, and relative order",
+        "heuristic metrics are recomputed from exact gold and prediction artifacts",
+        "fixture label replay reports the real classifier as NOT_IMPLEMENTED",
+        "calibrated heuristic evidence remains ADVISORY_ONLY and cannot promote deterministic truth"
+      ],
+      "expected": "exact-binding selftest, compile, and usage-boundary controls PASS; planted identity and boundary mutations turn red"
+    },
+    {
+      "id": "CTL-AB-1",
+      "checker_script": "scripts/score_ab.py",
+      "test_verify": "tests/ab-canary/verify.sh",
+      "good_fixture": "tests/ab-canary/fixtures/good-run.json covering all eight declared conditions",
+      "hollow_fixture": "tests/ab-canary/fixtures/unfair-run.json plus 26 selftest mutations: a different evaluator or budget or seed per arm, a baseline given the candidate's content, a dropped condition or case, a shrinking denominator, a per-arm identity change, a planted-defect arm passing anyway, a final PASS over a deterministic failure or lost warning or lost step order or invalid span, restricted text sent externally, agent-fabricated human review, generalization claimed from one run, and a compliance claim for a proposal-derived profile",
+      "covers": [
+        "all eight declared conditions must be present, because the arm most likely to be dropped is the one that failed",
+        "every arm shares one evaluator set, budget, seed and subject identity, or it is not a comparison",
+        "a baseline that received the candidate's skill content is the candidate",
+        "every arm reports the same case set, so the rates share a denominator",
+        "a planted-defect arm that passes means the Harness missed what the arm exists to plant",
+        "a deterministic failure, lost warning, lost step order or invalid span cannot be covered by a final PASS",
+        "generalization needs more than one physical run, and no compliance claim is available to a proposal-derived profile",
+        "an invalid experiment emits no metric, and an unreadable bundle exits 64 rather than 2"
+      ],
+      "expected": "canonical bundle scored; 26 planted defects refused; the unfair bundle exits 2 naming the invalidity and emitting no metric"
+    },
+    {
+      "id": "CTL-AB-AUTHORITY-1",
+      "checker_script": "scripts/score_ab_authority.py",
+      "test_verify": "tests/ab-authority/verify.sh",
+      "good_fixture": "a manifest binding the A/B run, the scorer, the authority checker and the authority bundle, with the A/B evaluator identity aligned to the external evidence",
+      "hollow_fixture": "18 selftest mutations: manifest digest drift on each of the four artifacts, a missing or extra or escaping or absolute reference, an absent referenced file, ADMITTED/CANONICAL/CERTIFIED claims, an evaluator identity that exists only as caller-authored JSON, a wrong version or artifact digest, no declared identity at all, and external evidence reporting a non-PASS status",
+      "covers": [
+        "an A/B result does not inherit the authority layer by ancestry; the bytes are bound explicitly",
+        "the authority gate runs first and a failure there stops the run before the scorer executes",
+        "every A/B evaluator identity must match external evidence on id, version and artifact digest together",
+        "an offline fixture comparison may claim VERIFIED and nothing stronger",
+        "generalization, physical runs and compliance cannot ride along on an offline composition",
+        "a gate that could not run exits 70, distinct from a gate that refused (2) and from unreadable input (64)"
+      ],
+      "expected": "canonical composition admitted with the gate order recorded; 18 planted defects refused"
+    }
+  ],
+  "evidence_boundary": {
+    "profile_admission_controls": "IMPLEMENTED",
+    "deterministic_rule_evaluation": "IMPLEMENTED",
+    "exact_profile_evidence_binding": "IMPLEMENTED",
+    "corpus_recomputed_calibration": "IMPLEMENTED",
+    "official_ASD_STE100_ruleset": "NOT_EXERCISED",
+    "semantic_rewrite_quality": "NOT_IMPLEMENTED",
+    "compliance_claim": "REQUIRED",
+    "heuristic_admission_boundary": "IMPLEMENTED",
+    "heuristic_implementations": "NOT_IMPLEMENTED",
+    "source_node_preservation": "IMPLEMENTED",
+    "privacy_routing_contract": "IMPLEMENTED",
+    "real_s1000d_or_dita_schema_validation": "NOT_EXERCISED",
+    "pdf_extraction_itself": "NOT_EXERCISED",
+    "live_provider_or_endpoint": "NOT_EXERCISED",
+    "ab_experiment_validity_gate": "IMPLEMENTED",
+    "offline_fixture_mechanism_sensitivity": "IMPLEMENTED",
+    "physical_model_or_harness_runs": "NOT_EXERCISED",
+    "official_asd_ste100_compliance": "NOT_EXERCISED",
+    "authority_bound_ab_composition": "IMPLEMENTED",
+    "semantic_generalization": "NOT_EXERCISED"
+  }
+}

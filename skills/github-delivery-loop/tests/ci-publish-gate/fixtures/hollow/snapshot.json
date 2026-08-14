@@ -1,0 +1,25 @@
+{
+  "schema": "github-actions-publish-snapshot/v3",
+  "repository": {
+    "full_name": "ed3c/skills-shared",
+    "repository_id": 1326262274,
+    "owner_login": "ed3c",
+    "private": true
+  },
+  "branch": {"name": "feature", "head_sha": null},
+  "pull_request": {
+    "number": null,
+    "state": "absent",
+    "head_sha": null,
+    "last_published_sha": null,
+    "last_published_at": null,
+    "feedback": null
+  },
+  "actions": {
+    "circuit": "billing-open",
+    "observed_at": "2026-08-12T05:03:00Z",
+    "blocker": "billing-or-spending-limit",
+    "latest_check": null
+  },
+  "captured_at": "__CAPTURED_AT__"
+}

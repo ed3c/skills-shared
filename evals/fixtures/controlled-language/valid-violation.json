@@ -1,0 +1,20 @@
+{
+  "schema_version": "controlled-language-violation/v1",
+  "violation_id": "V-FIXTURE-WORD-LIMIT",
+  "request_id": "ctl-fixture-procedural-001",
+  "constraint_id": "C-CTL-WORD-LIMIT",
+  "intent_id": "MI-CTL-EVIDENCE",
+  "evidence_class": "DETERMINISTIC",
+  "severity": "INFO",
+  "source_span": {
+    "artifact_digest": "sha256:85b0f2f9237523a7f059f951cd4045883069d86349e78b50ac01c50180de5d7e",
+    "locator": "inline:ctl-fixture-procedural-001",
+    "start": 0,
+    "end": 45,
+    "found_text_digest": "sha256:85b0f2f9237523a7f059f951cd4045883069d86349e78b50ac01c50180de5d7e"
+  },
+  "message": "Fixture violation object used to validate the typed violation contract.",
+  "candidate_rewrite": "Turn the bleed valve to release the pressure.",
+  "status": "REPAIRED",
+  "waiver": null
+}

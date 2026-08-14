@@ -1,0 +1,38 @@
+{
+  "schema_version": "diagnostic-reflection-receipt/v1",
+  "run_id": "fixture-run-001",
+  "subject_identity": {
+    "repository": "ed3c/skills-shared",
+    "commit_sha": "0123456789abcdef0123456789abcdef01234567"
+  },
+  "contract_identity": {
+    "contract_id": "knowledge-continuity-pilot",
+    "contract_version": "1.0.0",
+    "contract_sha256": "04414d3e91e8a68ef516abccc445e7fd3dd700204b2a4bf720ab5bb412b49c6e"
+  },
+  "evaluator_identity": {
+    "id": "continuity-route-checker",
+    "version": "1.0.0"
+  },
+  "failed_constraint_id": "C-KC-UNIQUE",
+  "intent_at_risk": [
+    "MI-KC-CANONICAL"
+  ],
+  "observation_summary": "Two canonical targets were found for one governed route.",
+  "evidence_refs": [
+    "fixture://continuity/duplicate-canonical"
+  ],
+  "diagnosis_code": "DUPLICATE_CANONICAL_SOURCE",
+  "repair_hypothesis": "Remove the stale projection authority and regenerate the projection.",
+  "selected_repair": "REGENERATE_PROJECTION",
+  "expected_delta": {
+    "metric": "continuity_violation_count",
+    "before": 1,
+    "target": 0,
+    "direction": "decrease"
+  },
+  "retry_index": 0,
+  "actual_delta": null,
+  "decision": "REPAIR",
+  "stop_reason": null
+}

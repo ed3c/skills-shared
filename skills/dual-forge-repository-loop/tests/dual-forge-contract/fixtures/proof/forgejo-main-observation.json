@@ -1,0 +1,11 @@
+{
+  "schema": "dual-forge-ref-observation/v1",
+  "authority": "forgejo-api",
+  "repository": "neon/example",
+  "repository_id": 456,
+  "default_branch": "main",
+  "ref": "refs/heads/main",
+  "sha": "4cb614454eeb07e81ac1718746e2e99d3c3287d1",
+  "captured_at": "2026-08-14T09:59:51Z",
+  "transport": {"path": "proof/forgejo-main-transport.json", "sha256": "3e758937a0c4aec672b9525593f96d8ca52bab029a97f3d9722449dac47c0bd7"}
+}

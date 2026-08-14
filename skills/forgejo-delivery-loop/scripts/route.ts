@@ -154,6 +154,20 @@ function smallRoute(input: RouteInput): Route {
       "With explicit recovery authority, try at most three bounded restarts with canaries; otherwise append the operation to the idempotent outbox and block merge, release and admission.",
     );
   }
+  if (input.operation === "merge") {
+    // SKILL.md: merge 永遠人 admit -- this loop advances to an open, reviewed
+    // pull request and stops. request_state "admitted" means the typed request
+    // was admitted, never that a human admitted the merge, so merge must be
+    // taken out before the shared execute-* tail below, which grants mutation
+    // on exactly that signal.
+    return result(
+      "main-session",
+      "forgejo/merge-human-admit-required",
+      false,
+      "forgejo/human-admit",
+      "Report the pull request identity and its mergeable state, then stop. Merge is Human-owned and is never executed by this loop, whatever the typed request's admission state.",
+    );
+  }
   if (input.operation === "repository-bootstrap") {
     if (input.request_state !== "admitted") {
       return result(

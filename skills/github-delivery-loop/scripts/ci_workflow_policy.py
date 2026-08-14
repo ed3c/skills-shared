@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Any
 
 
-SCHEMA = "github-ci-policy/v1"
+SCHEMA = "github-ci-policy/v2"
 SHA_RE = re.compile(r"[0-9a-f]{40}")
 REPOSITORY_RE = re.compile(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+")
 KEY_RE = re.compile(r"^(?P<indent>\s*)(?P<key>[A-Za-z0-9_-]+):(?P<value>.*)$")
@@ -57,11 +57,14 @@ def load_policy(path: Path) -> dict[str, Any]:
         isinstance(job, str) and job for job in jobs
     ):
         raise PolicyError("required_jobs must be a non-empty string array")
-    verification = value.get("local_verification")
-    if not isinstance(verification, list) or not verification or not all(
-        isinstance(part, str) and part for part in verification
-    ):
-        raise PolicyError("local_verification must be a non-empty argv array")
+    verification_contract = value.get("local_verification_contract")
+    if not isinstance(verification_contract, str) or not verification_contract:
+        raise PolicyError("local_verification_contract must be a non-empty path")
+    verification_path = Path(verification_contract)
+    if verification_path.is_absolute() or ".." in verification_path.parts:
+        raise PolicyError(
+            "local_verification_contract must be a safe repository-relative path"
+        )
     pull_request_mode = value.get("pull_request_mode", "draft-first")
     if not isinstance(pull_request_mode, str) or pull_request_mode not in PULL_REQUEST_TYPES:
         allowed = ", ".join(sorted(PULL_REQUEST_TYPES))
@@ -211,6 +214,13 @@ def check(repo_root: Path, policy_path: Path) -> list[str]:
         workflow_text = workflow_path.read_text(encoding="utf-8")
     except OSError as error:
         raise PolicyError(f"unreadable workflow: {error}") from error
+    contract_path = (root / policy["local_verification_contract"]).resolve()
+    try:
+        contract_path.relative_to(root)
+    except ValueError as error:
+        raise PolicyError("local verification contract resolves outside repository") from error
+    if not contract_path.is_file():
+        raise PolicyError("local verification contract is missing")
     return evaluate_workflow(policy, workflow_text)
 
 

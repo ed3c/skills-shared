@@ -1,0 +1,8 @@
+{
+  "schema": "github-actions-publish-snapshot/v3",
+  "repository": {"full_name": "ed3c/example", "repository_id": 123, "owner_login": "ed3c", "private": true},
+  "branch": {"name": "agent/integration", "head_sha": "997b637730f967af63f435d8f28fe6677a209574"},
+  "pull_request": {"number": 42, "state": "ready", "head_sha": "997b637730f967af63f435d8f28fe6677a209574", "last_published_sha": "997b637730f967af63f435d8f28fe6677a209574", "last_published_at": "2026-08-14T10:01:00Z", "feedback": null},
+  "actions": {"circuit": "closed", "observed_at": null, "blocker": null, "latest_check": {"head_sha": "997b637730f967af63f435d8f28fe6677a209574", "conclusion": "success", "completed_at": "2026-08-14T10:04:00Z"}},
+  "captured_at": "2026-08-14T10:05:00Z"
+}

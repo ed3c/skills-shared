@@ -1,0 +1,8 @@
+{
+  "schema": "github-actions-publish-observation/v1",
+  "repository": {"full_name": "ed3c/example", "repository_id": 123, "owner_login": "ed3c", "private": true},
+  "branch": {"name": "agent/integration", "head_sha": "997b637730f967af63f435d8f28fe6677a209574"},
+  "pull_requests": [{"number": 42, "draft": false, "head_sha": "997b637730f967af63f435d8f28fe6677a209574", "updated_at": "2026-08-14T10:01:00Z"}],
+  "check_runs": [{"id": 9001, "name": "contract", "head_sha": "997b637730f967af63f435d8f28fe6677a209574", "status": "completed", "conclusion": "success", "completed_at": "2026-08-14T10:04:00Z", "annotations": []}],
+  "captured_at": "2026-08-14T10:05:00Z"
+}

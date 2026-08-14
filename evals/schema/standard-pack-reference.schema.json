@@ -1,0 +1,181 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ed3c/skills-shared/evals/schema/standard-pack-reference.schema.json",
+  "title": "Controlled Language Standard Pack Reference",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "pack_id",
+    "display_name",
+    "profile_type",
+    "edition",
+    "source",
+    "content_mode",
+    "license_policy",
+    "ruleset_digest",
+    "technical_terminology_policy",
+    "compliance_claim_policy"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "controlled-language-standard-pack-reference/v1"
+    },
+    "pack_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"
+    },
+    "display_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "profile_type": {
+      "enum": [
+        "CONTROLLED_LANGUAGE",
+        "PROJECT_STYLE",
+        "REGULATORY_PROFILE"
+      ]
+    },
+    "edition": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "classification",
+        "authority",
+        "locator",
+        "artifact_digest"
+      ],
+      "properties": {
+        "classification": {
+          "enum": [
+            "SOURCE_PROPOSAL",
+            "OFFICIAL_STANDARD",
+            "PROJECT_POLICY",
+            "FIXTURE"
+          ]
+        },
+        "authority": {
+          "type": "string",
+          "minLength": 1
+        },
+        "locator": {
+          "type": "string",
+          "minLength": 1
+        },
+        "artifact_digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        }
+      }
+    },
+    "content_mode": {
+      "enum": [
+        "REFERENCE_ONLY",
+        "RUNTIME_INJECTED",
+        "VENDORED"
+      ]
+    },
+    "license_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "classification",
+        "redistribution_allowed",
+        "human_legal_review"
+      ],
+      "properties": {
+        "classification": {
+          "enum": [
+            "PUBLIC",
+            "RESTRICTED",
+            "PROPRIETARY",
+            "UNKNOWN"
+          ]
+        },
+        "redistribution_allowed": {
+          "type": "boolean"
+        },
+        "human_legal_review": {
+          "enum": [
+            "NOT_REQUIRED",
+            "REQUIRED",
+            "ADMITTED"
+          ]
+        },
+        "approval_receipt_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "approval_receipt_digest": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "ruleset_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "approved_vocabulary_ref": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "locator",
+            "artifact_digest"
+          ],
+          "properties": {
+            "locator": {
+              "type": "string",
+              "minLength": 1
+            },
+            "artifact_digest": {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            }
+          }
+        }
+      ]
+    },
+    "technical_terminology_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "project_termbase_required",
+        "technical_name_human_admit",
+        "technical_verb_human_admit"
+      ],
+      "properties": {
+        "project_termbase_required": {
+          "type": "boolean"
+        },
+        "technical_name_human_admit": {
+          "const": true
+        },
+        "technical_verb_human_admit": {
+          "const": true
+        }
+      }
+    },
+    "compliance_claim_policy": {
+      "const": "HUMAN_ADMIT_REQUIRED"
+    }
+  }
+}

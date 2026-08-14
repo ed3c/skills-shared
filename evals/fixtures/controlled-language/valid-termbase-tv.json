@@ -1,0 +1,29 @@
+{
+  "schema_version": "controlled-language-termbase-entry/v1",
+  "term_id": "TERM-SAFETY-WIRE",
+  "project_scope": "fixture-aircraft-maintenance",
+  "term": "safety-wire",
+  "term_type": "TECHNICAL_VERB",
+  "allowed_parts_of_speech": [
+    "VERB"
+  ],
+  "definition": "A fixture maintenance action that secures hardware with safety wire.",
+  "source_refs": [
+    {
+      "artifact_digest": "sha256:d919a887f9bc8acda76ad6350276059e4c4f71a739f048a47626c686d7175578",
+      "locator": "source-proposal:technical-verb-example",
+      "evidence_class": "HUMAN"
+    }
+  ],
+  "decision_state": "ADMITTED",
+  "approved_for_use": true,
+  "append_only": true,
+  "replacement_assessment": "NO_APPROVED_GENERAL_VERB",
+  "human_review": {
+    "state": "ADMITTED",
+    "approval_receipt_ref": "fixture://human-admit/TERM-SAFETY-WIRE",
+    "approval_receipt_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "supersedes": [],
+  "superseded_by": null
+}

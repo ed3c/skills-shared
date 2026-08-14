@@ -1,0 +1,15 @@
+{
+  "authority": "local-git",
+  "capture": {"argv": [["git", "-C", "<repo-root>", "rev-parse", "--show-toplevel"], ["git", "-C", "<repo-root>", "remote", "get-url", "--push", "--all", "github"], ["git", "-C", "<repo-root>", "remote", "get-url", "--push", "--all", "forgejo"], ["git", "-C", "<repo-root>", "rev-parse", "--verify", "refs/heads/main"], ["git", "-C", "<repo-root>", "cat-file", "-t", "572aa3d2f0d50771cf2ab856f59a9b5923fed1f2"]], "exit_codes": [0, 0, 0, 0, 0], "stdout": [".", "ed3c/example", "neon/example", "572aa3d2f0d50771cf2ab856f59a9b5923fed1f2", "commit"], "stdout_sha256": ["cdb4ee2aea69cc6a83331bbe96dc2caa9a299d21329efb0336fc02a82e1839a8", "2b7c73f682d5f3154ac0db3e5251757de33db0f2bae09b0fc25f1daa7e4425a1", "9044efa7e709b2297a6783da7160f261a9df9d22c8af245befa9afe7100b0a51", "70a8ac07a07c1621550189ad6d7a833a4c5994e5054309e75868f2b7774cfeda", "9505cacb7c710ed17125fcc6cb3669e8ddca6c8cd8af6a31f6b3cd64604c3098"]},
+  "captured_at": "2026-08-14T09:59:52Z",
+  "default_branch": "main",
+  "producer": "capture_origin_ref.py",
+  "ref": "refs/heads/main",
+  "remote_bindings": {"forgejo_remote": "forgejo", "forgejo_repository": "neon/example", "github_remote": "github", "github_repository": "ed3c/example"},
+  "repository": "ed3c/example",
+  "repository_id": null,
+  "schema": "dual-forge-ref-transport/v1",
+  "sha": "572aa3d2f0d50771cf2ab856f59a9b5923fed1f2",
+  "source": "git-rev-parse",
+  "source_identity": "refs/heads/main"
+}

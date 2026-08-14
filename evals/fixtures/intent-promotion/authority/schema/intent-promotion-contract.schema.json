@@ -1,0 +1,238 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ed3c/skills-shared/evals/schema/intent-promotion-contract.schema.json",
+  "title": "Intent Promotion Contract",
+  "description": "Declares which lifecycle states may write which durable destinations, and who owns each admission. It extends the Intent-Bound Constraint control plane; it does not create a second meta-evaluator authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "approval_policy",
+    "contract_id",
+    "contract_version",
+    "lifecycle",
+    "private_reasoning_persistence",
+    "schema_version",
+    "subject_identity",
+    "supersession_policy",
+    "writeback_policy"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "intent-promotion-contract/v1"
+    },
+    "contract_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"
+    },
+    "contract_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "subject_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository",
+        "commit_sha"
+      ],
+      "properties": {
+        "repository": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9._-]+/[A-Za-z0-9._-]+$"
+        },
+        "commit_sha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        }
+      }
+    },
+    "lifecycle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "states",
+        "transitions",
+        "non_authoritative_states",
+        "terminal_states"
+      ],
+      "properties": {
+        "states": {
+          "type": "array",
+          "minItems": 7,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "HYPOTHESIS",
+              "CANDIDATE",
+              "PROPOSED",
+              "VERIFIED",
+              "ADMITTED",
+              "CANONICAL",
+              "SUPERSEDED",
+              "REVOKED"
+            ]
+          }
+        },
+        "transitions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "from",
+              "to",
+              "requires"
+            ],
+            "properties": {
+              "from": {
+                "type": "string",
+                "minLength": 1
+              },
+              "to": {
+                "type": "string",
+                "minLength": 1
+              },
+              "requires": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": {
+                  "enum": [
+                    "EXACT_SUBJECT",
+                    "OWNING_EVALUATOR_RECEIPT",
+                    "ADMITTED_MERGE_SUBJECT",
+                    "HUMAN_APPROVAL",
+                    "SUPERSESSION_TARGET"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "non_authoritative_states": {
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "terminal_states": {
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "writeback_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "append_only",
+        "declared_destinations",
+        "similarity_overwrite_allowed"
+      ],
+      "properties": {
+        "append_only": {
+          "const": true
+        },
+        "similarity_overwrite_allowed": {
+          "const": false
+        },
+        "declared_destinations": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "destination_id",
+              "scope",
+              "minimum_state",
+              "human_owned"
+            ],
+            "properties": {
+              "destination_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "scope": {
+                "enum": [
+                  "MODULE",
+                  "PROJECT",
+                  "ROOT_GLOBAL"
+                ]
+              },
+              "minimum_state": {
+                "enum": [
+                  "ADMITTED",
+                  "CANONICAL"
+                ]
+              },
+              "human_owned": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      }
+    },
+    "approval_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "agent_may_create_approval",
+        "caller_flag_may_request",
+        "caller_flag_may_grant",
+        "required_approver_identity"
+      ],
+      "properties": {
+        "agent_may_create_approval": {
+          "const": false
+        },
+        "caller_flag_may_request": {
+          "type": "boolean"
+        },
+        "caller_flag_may_grant": {
+          "const": false
+        },
+        "required_approver_identity": {
+          "enum": [
+            "HUMAN_IDENTITY_REQUIRED"
+          ]
+        }
+      }
+    },
+    "supersession_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "replacement_requires_supersedes",
+        "revoked_projection_allowed",
+        "ledger_ref",
+        "append_only_ledger"
+      ],
+      "properties": {
+        "replacement_requires_supersedes": {
+          "const": true
+        },
+        "revoked_projection_allowed": {
+          "const": false
+        },
+        "ledger_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "append_only_ledger": {
+          "const": true
+        }
+      }
+    },
+    "private_reasoning_persistence": {
+      "const": "FORBIDDEN"
+    }
+  }
+}

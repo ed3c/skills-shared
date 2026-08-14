@@ -1,0 +1,194 @@
+{
+  "schema_version": "git-town-intent-stack/v1",
+  "repository": "ed3c/skills-shared",
+  "main_branch": "main",
+  "subject_identity": {
+    "commit_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "human_owned_operations": [
+    "semantic_conflict_resolution",
+    "merge_or_ship",
+    "permission_widening",
+    "release_promotion",
+    "destructive_rollback"
+  ],
+  "branches": [
+    {
+      "id": "STACK-FOUNDATION",
+      "branch": "ibc/01-contract-schema",
+      "pr_number": 104,
+      "stack_class": "foundation",
+      "parent_branch": "main",
+      "pr_base": "main",
+      "head_sha": "1111111111111111111111111111111111111111",
+      "declared_parent_head_sha": "0000000000000000000000000000000000000000",
+      "observed_parent_head_sha": "0000000000000000000000000000000000000000",
+      "merge_base_sha": "0000000000000000000000000000000000000000",
+      "ahead_by": 1,
+      "behind_by": 0,
+      "consumes_contracts": [],
+      "provides_contracts": [
+        "intent-bound-constraint/v1"
+      ],
+      "dependency_reason": null,
+      "depends_on_branches": [],
+      "allowed_paths": [
+        "evals/schema",
+        "scripts/check_intent_bound_constraints.py"
+      ],
+      "excluded_paths": [
+        "skills"
+      ],
+      "evidence_subject_sha": "1111111111111111111111111111111111111111",
+      "state": "ACTIVE",
+      "consumes_paths": []
+    },
+    {
+      "id": "STACK-GIT-TOWN",
+      "branch": "ibc/02-git-town-stack-binding",
+      "pr_number": 105,
+      "stack_class": "child",
+      "parent_branch": "ibc/01-contract-schema",
+      "pr_base": "ibc/01-contract-schema",
+      "head_sha": "2222222222222222222222222222222222222222",
+      "declared_parent_head_sha": "1111111111111111111111111111111111111111",
+      "observed_parent_head_sha": "1111111111111111111111111111111111111111",
+      "merge_base_sha": "1111111111111111111111111111111111111111",
+      "ahead_by": 1,
+      "behind_by": 0,
+      "consumes_contracts": [
+        "intent-bound-constraint/v1"
+      ],
+      "provides_contracts": [
+        "git-town-intent-stack/v1"
+      ],
+      "dependency_reason": "Consumes the unmerged Intent-Bound Constraint schema.",
+      "depends_on_branches": [
+        "ibc/01-contract-schema"
+      ],
+      "allowed_paths": [
+        "skills/git-town-stacked-pr-worker"
+      ],
+      "excluded_paths": [
+        "skills/knowledge-continuity",
+        "skills/forgejo-delivery-loop"
+      ],
+      "evidence_subject_sha": "2222222222222222222222222222222222222222",
+      "state": "ACTIVE",
+      "consumes_paths": []
+    },
+    {
+      "id": "STACK-KNOWLEDGE",
+      "branch": "ibc/03-knowledge-continuity-adapter",
+      "pr_number": 106,
+      "stack_class": "sibling",
+      "parent_branch": "ibc/01-contract-schema",
+      "pr_base": "ibc/01-contract-schema",
+      "head_sha": "3333333333333333333333333333333333333333",
+      "declared_parent_head_sha": "1111111111111111111111111111111111111111",
+      "observed_parent_head_sha": "1111111111111111111111111111111111111111",
+      "merge_base_sha": "1111111111111111111111111111111111111111",
+      "ahead_by": 1,
+      "behind_by": 0,
+      "consumes_contracts": [
+        "intent-bound-constraint/v1"
+      ],
+      "provides_contracts": [
+        "knowledge-continuity-intents/v1"
+      ],
+      "dependency_reason": "Consumes the foundation contract but not sibling bytes.",
+      "depends_on_branches": [
+        "ibc/01-contract-schema"
+      ],
+      "allowed_paths": [
+        "skills/knowledge-continuity"
+      ],
+      "excluded_paths": [
+        "skills/git-town-stacked-pr-worker"
+      ],
+      "evidence_subject_sha": "3333333333333333333333333333333333333333",
+      "state": "ACTIVE",
+      "consumes_paths": []
+    },
+    {
+      "id": "STACK-FORGEJO",
+      "branch": "ibc/04-forgejo-delivery-adapter",
+      "pr_number": 107,
+      "stack_class": "sibling",
+      "parent_branch": "ibc/01-contract-schema",
+      "pr_base": "ibc/01-contract-schema",
+      "head_sha": "4444444444444444444444444444444444444444",
+      "declared_parent_head_sha": "1111111111111111111111111111111111111111",
+      "observed_parent_head_sha": "1111111111111111111111111111111111111111",
+      "merge_base_sha": "1111111111111111111111111111111111111111",
+      "ahead_by": 1,
+      "behind_by": 0,
+      "consumes_contracts": [
+        "intent-bound-constraint/v1"
+      ],
+      "provides_contracts": [
+        "forgejo-delivery-intents/v1"
+      ],
+      "dependency_reason": "Consumes the foundation contract but not sibling bytes.",
+      "depends_on_branches": [
+        "ibc/01-contract-schema"
+      ],
+      "allowed_paths": [
+        "skills/forgejo-delivery-loop"
+      ],
+      "excluded_paths": [
+        "skills/git-town-stacked-pr-worker"
+      ],
+      "evidence_subject_sha": "4444444444444444444444444444444444444444",
+      "state": "ACTIVE",
+      "consumes_paths": []
+    },
+    {
+      "id": "STACK-LIVE",
+      "branch": "ibc/05-live-stack-canary-ci",
+      "pr_number": 108,
+      "stack_class": "child",
+      "parent_branch": "ibc/02-git-town-stack-binding",
+      "pr_base": "ibc/02-git-town-stack-binding",
+      "head_sha": "5555555555555555555555555555555555555555",
+      "declared_parent_head_sha": "2222222222222222222222222222222222222222",
+      "observed_parent_head_sha": "2222222222222222222222222222222222222222",
+      "merge_base_sha": "2222222222222222222222222222222222222222",
+      "ahead_by": 1,
+      "behind_by": 0,
+      "consumes_contracts": [
+        "git-town-intent-stack/v1"
+      ],
+      "provides_contracts": [
+        "git-town-live-canary/v1"
+      ],
+      "dependency_reason": "Consumes the stack evaluator and fixture contract.",
+      "depends_on_branches": [
+        "ibc/02-git-town-stack-binding"
+      ],
+      "allowed_paths": [
+        ".github/workflows/git-town-stacked-pr-worker.yml",
+        "skills/git-town-stacked-pr-worker/tests/live-git-town"
+      ],
+      "excluded_paths": [
+        "skills/knowledge-continuity",
+        "skills/forgejo-delivery-loop"
+      ],
+      "evidence_subject_sha": "5555555555555555555555555555555555555555",
+      "state": "BLOCKED",
+      "consumes_paths": []
+    }
+  ],
+  "convergence_plan": {
+    "owner_issue": 103,
+    "branch": "ibc/06-convergence",
+    "state": "NOT_CREATED",
+    "prerequisites": [
+      "ibc/01-contract-schema",
+      "ibc/02-git-town-stack-binding",
+      "ibc/03-knowledge-continuity-adapter",
+      "ibc/04-forgejo-delivery-adapter",
+      "ibc/05-live-stack-canary-ci"
+    ]
+  }
+}

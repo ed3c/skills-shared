@@ -1,0 +1,203 @@
+{
+  "schema_version": "intent-bound-constraint/v1",
+  "contract_id": "knowledge-continuity-intents",
+  "contract_version": "1.0.0",
+  "subject_identity": {
+    "repository": "ed3c/skills-shared",
+    "commit_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "module_policy": {
+    "may_add_constraints": true,
+    "may_tighten_constraints": true,
+    "may_weaken_constraints": false,
+    "may_widen_effects": false,
+    "may_bypass_human_admit": false,
+    "ambiguity_action": "BLOCK"
+  },
+  "completion_policy": {
+    "deterministic_failure_vetoes_advisory": true,
+    "stale_evidence_blocks": true,
+    "no_improvement_action": "STOP",
+    "ambiguity_action": "BLOCK",
+    "private_chain_of_thought": "FORBIDDEN"
+  },
+  "meta_intents": [
+    {
+      "id": "MI-KC-CANONICAL",
+      "statement": "Preserve one accepted canonical authority for each governed claim.",
+      "protected_property": "canonical-authority",
+      "priority": "repository-invariant",
+      "scope": ["governed claims", "canonical routes"],
+      "forbidden_outcomes": ["duplicate authority", "silent authority selection"],
+      "proof_obligations": ["PO-KC-CANONICAL"],
+      "completion_criteria": ["an exact authority receipt or Human causal review accepts one source"],
+      "human_owned_boundaries": ["canonical ownership override"]
+    },
+    {
+      "id": "MI-KC-FRESHNESS",
+      "statement": "Bind each derived route and projection to the current canonical subject.",
+      "protected_property": "projection-freshness",
+      "priority": "repository-invariant",
+      "scope": ["derived routes", "projections"],
+      "forbidden_outcomes": ["old-SHA continuity pass", "stale projection"],
+      "proof_obligations": ["PO-KC-FRESHNESS"],
+      "completion_criteria": ["subject-bound external receipt matches the current canonical identity"],
+      "human_owned_boundaries": ["freshness exception"]
+    },
+    {
+      "id": "MI-KC-TRACE",
+      "statement": "Leave an in-place summary and a direct evidence route at every governed hop.",
+      "protected_property": "route-traceability",
+      "priority": "domain-invariant",
+      "scope": ["document routes", "section references"],
+      "forbidden_outcomes": ["external-memory-only reference", "two-hop evidence route"],
+      "proof_obligations": ["PO-KC-TRACE"],
+      "completion_criteria": ["KC-01, KC-02, and KC-05 controls pass"],
+      "human_owned_boundaries": []
+    },
+    {
+      "id": "MI-KC-AMBIGUITY",
+      "statement": "Block unresolved authority ambiguity.",
+      "protected_property": "ambiguity-fail-closed",
+      "priority": "repository-invariant",
+      "scope": ["conflicting routes", "cross-file claims"],
+      "forbidden_outcomes": ["silent route choice", "ambiguous PASS"],
+      "proof_obligations": ["PO-KC-AMBIGUITY"],
+      "completion_criteria": ["ambiguity is resolved by Human causal review or remains blocked"],
+      "human_owned_boundaries": ["semantic authority decision"]
+    },
+    {
+      "id": "MI-KC-EVIDENCE",
+      "statement": "Keep document presence separate from executable or subject-bound evidence.",
+      "protected_property": "evidence-non-collapse",
+      "priority": "repository-invariant",
+      "scope": ["continuity acceptance", "evidence references"],
+      "forbidden_outcomes": ["documentation-only false PASS", "knowledge outsourcing"],
+      "proof_obligations": ["PO-KC-EVIDENCE"],
+      "completion_criteria": ["KC-04 control passes and higher evidence lanes remain explicit"],
+      "human_owned_boundaries": ["accept semantic evidence sufficiency"]
+    }
+  ],
+  "constraints": [
+    {
+      "id": "C-KC-CANONICAL",
+      "protects_intents": ["MI-KC-CANONICAL"],
+      "discharges_obligations": ["PO-KC-CANONICAL"],
+      "subject": "canonical authority decision",
+      "trigger": "before continuity acceptance",
+      "invariant": "One accepted authority exists and unresolved duplicates do not pass.",
+      "severity": "hard",
+      "evidence_class": "external",
+      "evaluator": {
+        "id": "knowledge-continuity-human-causal-review",
+        "version": "1.0.0",
+        "kind": "external_observation",
+        "authority": "repository authority receipt or Human causal review"
+      },
+      "repairability": "human_owned",
+      "retry_budget": 0,
+      "allowed_repairs": [],
+      "forbidden_repair_codes": ["WEAKEN_CONSTRAINT", "EDIT_EVALUATOR_FOR_PASS", "DELETE_CONTROL", "WIDEN_EFFECTS", "BYPASS_HUMAN_ADMIT"],
+      "expected_delta_metric": null,
+      "negative_controls": ["two competing canonical sources"],
+      "mutation_controls": ["review accepts duplicate authority without decision"]
+    },
+    {
+      "id": "C-KC-FRESHNESS",
+      "protects_intents": ["MI-KC-FRESHNESS"],
+      "discharges_obligations": ["PO-KC-FRESHNESS"],
+      "subject": "derived route or projection subject identity",
+      "trigger": "after canonical or parent subject changes",
+      "invariant": "The external continuity receipt binds the current canonical subject.",
+      "severity": "hard",
+      "evidence_class": "external",
+      "evaluator": {
+        "id": "knowledge-continuity-subject-receipt",
+        "version": "1.0.0",
+        "kind": "external_observation",
+        "authority": "exact-subject continuity receipt"
+      },
+      "repairability": "repairable",
+      "retry_budget": 2,
+      "allowed_repairs": ["REGENERATE_DERIVED_ROUTE", "REFRESH_SUBJECT_RECEIPT"],
+      "forbidden_repair_codes": ["WEAKEN_CONSTRAINT", "EDIT_EVALUATOR_FOR_PASS", "DELETE_CONTROL", "WIDEN_EFFECTS", "BYPASS_HUMAN_ADMIT"],
+      "expected_delta_metric": "stale_projection_count",
+      "negative_controls": ["old canonical digest in projection receipt"],
+      "mutation_controls": ["receipt verifier ignores subject mismatch"]
+    },
+    {
+      "id": "C-KC-TRACE",
+      "protects_intents": ["MI-KC-TRACE"],
+      "discharges_obligations": ["PO-KC-TRACE"],
+      "subject": "selected technical document",
+      "trigger": "after document change and before handoff",
+      "invariant": "The existing mechanical checker reports no KC-01, KC-02, or KC-05 break.",
+      "severity": "hard",
+      "evidence_class": "deterministic",
+      "evaluator": {
+        "id": "knowledge-continuity-checker",
+        "version": "1.0.0",
+        "kind": "command",
+        "argv": ["python3", "scripts/check_knowledge_continuity.py", "<document>", "--quiet"],
+        "success_exit_codes": [0],
+        "timeout_seconds": 30
+      },
+      "repairability": "repairable",
+      "retry_budget": 3,
+      "allowed_repairs": ["ADD_LOCAL_SUMMARY", "REPAIR_DIRECT_ROUTE", "CORRECT_SECTION_REFERENCE"],
+      "forbidden_repair_codes": ["WEAKEN_CONSTRAINT", "EDIT_EVALUATOR_FOR_PASS", "DELETE_CONTROL", "WIDEN_EFFECTS", "BYPASS_HUMAN_ADMIT"],
+      "expected_delta_metric": "mechanical_break_count",
+      "negative_controls": ["hollow fixture with KC-01, KC-02, and KC-05 breaks"],
+      "mutation_controls": ["checker suppresses one planted rule"]
+    },
+    {
+      "id": "C-KC-AMBIGUITY",
+      "protects_intents": ["MI-KC-AMBIGUITY"],
+      "discharges_obligations": ["PO-KC-AMBIGUITY"],
+      "subject": "conflicting route or authority claim",
+      "trigger": "when more than one authority remains plausible",
+      "invariant": "An unresolved semantic ambiguity cannot produce PASS.",
+      "severity": "hard",
+      "evidence_class": "external",
+      "evaluator": {
+        "id": "knowledge-continuity-ambiguity-review",
+        "version": "1.0.0",
+        "kind": "external_observation",
+        "authority": "Human causal review"
+      },
+      "repairability": "human_owned",
+      "retry_budget": 0,
+      "allowed_repairs": [],
+      "forbidden_repair_codes": ["WEAKEN_CONSTRAINT", "EDIT_EVALUATOR_FOR_PASS", "DELETE_CONTROL", "WIDEN_EFFECTS", "BYPASS_HUMAN_ADMIT"],
+      "expected_delta_metric": null,
+      "negative_controls": ["two contradictory routes marked accepted"],
+      "mutation_controls": ["review silently chooses the first route"]
+    },
+    {
+      "id": "C-KC-EVIDENCE",
+      "protects_intents": ["MI-KC-EVIDENCE"],
+      "discharges_obligations": ["PO-KC-EVIDENCE"],
+      "subject": "continuity evidence route",
+      "trigger": "before declaring continuity accepted",
+      "invariant": "Knowledge outsourcing is absent and unexercised evidence lanes remain explicit.",
+      "severity": "hard",
+      "evidence_class": "deterministic",
+      "evaluator": {
+        "id": "knowledge-continuity-checker",
+        "version": "1.0.0",
+        "kind": "command",
+        "argv": ["python3", "scripts/check_knowledge_continuity.py", "<document>", "--quiet"],
+        "success_exit_codes": [0],
+        "timeout_seconds": 30
+      },
+      "repairability": "repairable",
+      "retry_budget": 2,
+      "allowed_repairs": ["ADD_IN_PLACE_EXPLANATION", "BIND_DIRECT_EVIDENCE_REFERENCE"],
+      "forbidden_repair_codes": ["WEAKEN_CONSTRAINT", "EDIT_EVALUATOR_FOR_PASS", "DELETE_CONTROL", "WIDEN_EFFECTS", "BYPASS_HUMAN_ADMIT"],
+      "expected_delta_metric": "knowledge_outsourcing_break_count",
+      "negative_controls": ["hollow fixture with KC-04 knowledge outsourcing"],
+      "mutation_controls": ["checker accepts an explanation that exists only elsewhere"]
+    }
+  ],
+  "diagnostic_reflection_schema": "evals/schema/diagnostic-reflection-receipt.schema.json"
+}

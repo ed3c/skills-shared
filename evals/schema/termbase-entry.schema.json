@@ -1,0 +1,165 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ed3c/skills-shared/evals/schema/termbase-entry.schema.json",
+  "title": "Controlled Language Termbase Entry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "term_id",
+    "project_scope",
+    "term",
+    "term_type",
+    "allowed_parts_of_speech",
+    "definition",
+    "source_refs",
+    "decision_state",
+    "approved_for_use",
+    "append_only",
+    "replacement_assessment",
+    "human_review",
+    "supersedes",
+    "superseded_by"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "controlled-language-termbase-entry/v1"
+    },
+    "term_id": {
+      "type": "string",
+      "pattern": "^TERM-[A-Z0-9][A-Z0-9-]{2,63}$"
+    },
+    "project_scope": {
+      "type": "string",
+      "minLength": 1
+    },
+    "term": {
+      "type": "string",
+      "minLength": 1
+    },
+    "term_type": {
+      "enum": [
+        "TECHNICAL_NAME",
+        "TECHNICAL_VERB"
+      ]
+    },
+    "allowed_parts_of_speech": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "NOUN",
+          "PROPN",
+          "VERB"
+        ]
+      }
+    },
+    "definition": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_refs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "artifact_digest",
+          "locator",
+          "evidence_class"
+        ],
+        "properties": {
+          "artifact_digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "locator": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evidence_class": {
+            "enum": [
+              "DETERMINISTIC",
+              "SEMANTIC",
+              "HUMAN"
+            ]
+          }
+        }
+      }
+    },
+    "decision_state": {
+      "enum": [
+        "CANDIDATE",
+        "VERIFIED",
+        "ADMITTED",
+        "SUPERSEDED",
+        "REVOKED"
+      ]
+    },
+    "approved_for_use": {
+      "type": "boolean"
+    },
+    "append_only": {
+      "const": true
+    },
+    "replacement_assessment": {
+      "enum": [
+        "NOT_APPLICABLE",
+        "NOT_EVALUATED",
+        "NO_APPROVED_GENERAL_VERB",
+        "REPLACEMENT_AVAILABLE"
+      ]
+    },
+    "human_review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "approval_receipt_ref",
+        "approval_receipt_digest"
+      ],
+      "properties": {
+        "state": {
+          "enum": [
+            "NOT_REQUESTED",
+            "REQUIRED",
+            "ADMITTED",
+            "REJECTED"
+          ]
+        },
+        "approval_receipt_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "approval_receipt_digest": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "supersedes": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "superseded_by": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}

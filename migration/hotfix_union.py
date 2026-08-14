@@ -124,6 +124,18 @@ def selftest() -> int:
         orphan.mkdir(parents=True)
         (orphan / "SKILL.md").write_text("no target\n")
 
+        # Two sources offering the same missing file. Without a control here a
+        # "first source wins" rule and a "last source wins" rule behave
+        # identically on every fixture whose group size is one, which is what
+        # #16 calls out: the guard is real and nothing can observe it failing.
+        first = backup / "dup" / "aaa_source"
+        second = backup / "dup" / "zzz_source"
+        (first / "modules").mkdir(parents=True)
+        (second / "modules").mkdir(parents=True)
+        (first / "modules" / "contested.md").write_text("from the first source\n")
+        (second / "modules" / "contested.md").write_text("from the second source\n")
+        (shared / "dup").mkdir(parents=True)
+
         if run(backup, shared, {"skipme"}, apply=True) != 0:
             print("FAIL: run reported a changed pre-existing file", file=sys.stderr)
             return 2
@@ -142,6 +154,18 @@ def selftest() -> int:
         if not filecmp.cmp(source / "modules" / "only-here.md",
                            shared / "demo" / "modules" / "only-here.md", shallow=False):
             print("FAIL: restored file is not byte-identical", file=sys.stderr)
+            return 2
+        contested = shared / "dup" / "modules" / "contested.md"
+        if not contested.is_file():
+            print("FAIL: contested file was not restored at all", file=sys.stderr)
+            return 2
+        if contested.read_text() != "from the first source\n":
+            print("FAIL: a later source overwrote the first one's restore",
+                  file=sys.stderr)
+            return 2
+        if not filecmp.cmp(first / "modules" / "contested.md", contested, shallow=False):
+            print("FAIL: contested restore is not byte-identical to the first source",
+                  file=sys.stderr)
             return 2
     print("SELFTEST GREEN")
     return 0

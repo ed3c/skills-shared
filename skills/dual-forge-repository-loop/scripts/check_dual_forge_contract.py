@@ -1,0 +1,729 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import hashlib
+import importlib.util
+import json
+import re
+import subprocess
+import sys
+import tempfile
+from datetime import datetime
+from pathlib import Path
+from urllib.parse import quote
+
+SHA40 = re.compile(r"^[0-9a-f]{40}$")
+REPOSITORY = re.compile(r"^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$")
+BRANCH = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._/-]*$")
+EVIDENCE = {"PASS", "FAIL", "ABSENT", "NOT_IMPLEMENTED", "NOT_EXERCISED", "SKIPPED_BY_POLICY", "HUMAN_ADMIT_REQUIRED"}
+EXPECTED_HISTORY = [
+    "GITHUB_BOUND",
+    "LOCAL_SYNCED",
+    "FORGEJO_ISSUES_BOUND",
+    "WORKTREES_VERIFIED",
+    "FORGEJO_PRS_MERGED",
+    "LOCAL_MAIN_MERGED",
+    "GITHUB_RECONCILED",
+    "GITHUB_ACTIONS_VERIFIED",
+    "GITHUB_PUBLICATION_READY",
+]
+REQUIRED_PUBLICATION_EVIDENCE = [
+    "github_ingress",
+    "forgejo_runtime",
+    "local_worktrees",
+    "local_main_merge",
+    "github_reconciliation",
+    "github_actions",
+]
+PR_CLASSIFICATIONS = {
+    "UNAFFECTED",
+    "CLEANLY_REBASEABLE",
+    "SUPERSEDED_BY_LOCAL_MAIN",
+}
+PR_TERMINAL_ROUTES = {
+    "UNAFFECTED": {"NO_ACTION"},
+    "CLEANLY_REBASEABLE": {"REBASED_OR_MERGED"},
+    "SUPERSEDED_BY_LOCAL_MAIN": {"CLOSED_OR_RETARGETED"},
+}
+ISSUE_TERMINAL_ROUTES = {
+    "CLOSED",
+    "IMPLEMENTED",
+    "SUPERSEDED",
+    "ROUTED_SEPARATE_ISSUE",
+    "OWNER_HANDOFF_NONBLOCKING",
+}
+DECISION_MANIFEST_SCHEMA = "github-actions-publish-decision-manifest/v1"
+MAX_GIT_PROOF_BYTES = 64 * 1024 * 1024
+
+
+def fail(msg: str) -> int:
+    print(f"FAIL {msg}", file=sys.stderr)
+    return 2
+
+
+def obj(v, name: str):
+    if not isinstance(v, dict):
+        raise ValueError(f"{name} must be an object")
+    return v
+
+
+def sha(v, name: str):
+    if not isinstance(v, str) or not SHA40.fullmatch(v):
+        raise ValueError(f"{name} must be a lowercase 40-hex commit SHA")
+    return v
+
+
+def canonical(value) -> bytes:
+    return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()
+
+
+def timestamp(value, label: str) -> datetime:
+    if not isinstance(value, str):
+        raise ValueError(f"{label} must be ISO-8601")
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise ValueError(f"{label} must be ISO-8601") from exc
+    if parsed.tzinfo is None:
+        raise ValueError(f"{label} must include a timezone")
+    return parsed
+
+
+def load_module(name: str, path: Path):
+    spec = importlib.util.spec_from_file_location(name, path)
+    if spec is None or spec.loader is None:
+        raise ValueError(f"cannot load canonical verifier {path}")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+def load_bound_bytes(root: Path, value, label: str) -> bytes:
+    binding = obj(value, label)
+    if set(binding) != {"path", "sha256"}:
+        raise ValueError(f"{label} must contain path and sha256 only")
+    relative = binding["path"]
+    expected = binding["sha256"]
+    if not isinstance(relative, str) or not relative or Path(relative).is_absolute() or ".." in Path(relative).parts:
+        raise ValueError(f"{label}.path must be safe and receipt-relative")
+    if not isinstance(expected, str) or re.fullmatch(r"[0-9a-f]{64}", expected) is None:
+        raise ValueError(f"{label}.sha256 must be a lowercase SHA-256")
+    target = (root / relative).resolve()
+    try:
+        target.relative_to(root.resolve())
+    except ValueError as exc:
+        raise ValueError(f"{label}.path escapes the receipt directory") from exc
+    try:
+        payload = target.read_bytes()
+    except OSError as exc:
+        raise ValueError(f"{label} is unreadable: {exc}") from exc
+    if hashlib.sha256(payload).hexdigest() != expected:
+        raise ValueError(f"{label} content digest mismatch")
+    return payload
+
+
+def load_bound(root: Path, value, label: str):
+    payload = load_bound_bytes(root, value, label)
+    try:
+        body = json.loads(payload)
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"{label} is not valid JSON: {exc}") from exc
+    return obj(body, label)
+
+
+def git(repo: Path, *args: str, payload: bytes | None = None) -> str:
+    result = subprocess.run(
+        ["git", f"--git-dir={repo}", *args],
+        input=payload,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=False,
+        timeout=15,
+    )
+    if result.returncode != 0:
+        detail = (result.stderr or result.stdout).decode(errors="replace").strip()
+        raise ValueError(f"git {' '.join(args)} failed: {detail}")
+    return result.stdout.decode().strip()
+
+
+def verify_pr_inventory(value, label: str) -> None:
+    if not isinstance(value, list):
+        raise ValueError(f"reconciliation {label} must be an inventory array")
+    for index, item_value in enumerate(value):
+        item = obj(item_value, f"reconciliation {label}[{index}]")
+        if set(item) != {"number", "head_sha", "classification", "terminal_route", "receipt"}:
+            raise ValueError(f"reconciliation {label}[{index}] fields drifted")
+        number = item["number"]
+        if not isinstance(number, int) or isinstance(number, bool) or number <= 0:
+            raise ValueError(f"reconciliation {label}[{index}] number is invalid")
+        sha(item["head_sha"], f"reconciliation {label}[{index}].head_sha")
+        classification = item["classification"]
+        if classification not in PR_CLASSIFICATIONS:
+            raise ValueError(f"reconciliation {label}[{index}] remains blocking or unclassified")
+        if item["terminal_route"] not in PR_TERMINAL_ROUTES[classification]:
+            raise ValueError(f"reconciliation {label}[{index}] lacks a compatible terminal route")
+        if not isinstance(item["receipt"], str) or not item["receipt"]:
+            raise ValueError(f"reconciliation {label}[{index}] lacks a receipt identity")
+
+
+def verify_issue_inventory(value) -> None:
+    if not isinstance(value, list):
+        raise ValueError("reconciliation affected_issues must be an inventory array")
+    for index, item_value in enumerate(value):
+        item = obj(item_value, f"reconciliation affected_issues[{index}]")
+        if set(item) != {"forge", "number", "terminal_route", "receipt"}:
+            raise ValueError(f"reconciliation affected_issues[{index}] fields drifted")
+        if item["forge"] not in {"github", "forgejo"}:
+            raise ValueError(f"reconciliation affected_issues[{index}] forge is invalid")
+        number = item["number"]
+        if not isinstance(number, int) or isinstance(number, bool) or number <= 0:
+            raise ValueError(f"reconciliation affected_issues[{index}] number is invalid")
+        if item["terminal_route"] not in ISSUE_TERMINAL_ROUTES:
+            raise ValueError(f"reconciliation affected_issues[{index}] is not terminally routed")
+        if not isinstance(item["receipt"], str) or not item["receipt"]:
+            raise ValueError(f"reconciliation affected_issues[{index}] lacks a receipt identity")
+
+
+def verify_git_ancestry(
+    receipt_path: Path,
+    binding,
+    github_main: str,
+    forgejo_main: str,
+    local_main: str,
+    candidate: str,
+) -> str:
+    stream = load_bound_bytes(receipt_path.parent, binding, "publication git proof")
+    if not stream or len(stream) > MAX_GIT_PROOF_BYTES:
+        raise ValueError("publication git proof must be a non-empty bounded fast-import stream")
+    with tempfile.TemporaryDirectory(prefix="dual-forge-proof.") as directory:
+        repository = Path(directory) / "objects.git"
+        init = subprocess.run(
+            ["git", "init", "-q", "--bare", str(repository)],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+            timeout=15,
+        )
+        if init.returncode != 0:
+            raise ValueError("cannot initialize disposable Git proof repository")
+        git(repository, "fast-import", "--quiet", payload=stream)
+        refs = {
+            "refs/heads/github-main": github_main,
+            "refs/heads/forgejo-main": forgejo_main,
+            "refs/heads/local-main": local_main,
+            "refs/heads/candidate": candidate,
+        }
+        actual_refs = set(
+            git(repository, "for-each-ref", "--format=%(refname)", "refs/heads").splitlines()
+        )
+        if actual_refs != set(refs):
+            raise ValueError("publication git proof must expose exactly four admitted refs")
+        for ref, expected in refs.items():
+            if git(repository, "rev-parse", ref) != expected:
+                raise ValueError(f"publication git proof ref mismatch: {ref}")
+        git(repository, "fsck", "--strict", "--no-reflogs")
+        for ancestor in (github_main, forgejo_main, local_main):
+            probe = subprocess.run(
+                ["git", f"--git-dir={repository}", "merge-base", "--is-ancestor", ancestor, candidate],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                check=False,
+                timeout=15,
+            )
+            if probe.returncode != 0:
+                raise ValueError(f"publication candidate does not contain admitted baseline {ancestor}")
+        return sha(git(repository, "rev-parse", f"{candidate}^{{tree}}"), "candidate tree")
+
+
+def verify_canonical_publication(
+    receipt_path: Path,
+    publication,
+    actions,
+    observation_bindings,
+    reconciliation_binding,
+    github_main: str,
+    forgejo_main: str,
+    local_main: str,
+    candidate: str,
+    actual_tree: str,
+    repository: str,
+    default_branch: str,
+    forgejo_repository: str,
+    github_remote: str,
+    forgejo_remote: str,
+) -> None:
+    root = receipt_path.parent
+    bundle = obj(publication.get("decision_bundle"), "publication.decision_bundle")
+    required = {
+        "manifest", "policy", "snapshot", "verification", "evidence", "contract", "recovery",
+    }
+    if set(bundle) != required:
+        raise ValueError("publication.decision_bundle fields drifted")
+    manifest = load_bound(root, bundle["manifest"], "publication decision manifest")
+    if set(manifest) != {
+        "schema", "evaluated_at", "required_check_name", "decision", "inputs",
+    }:
+        raise ValueError("publication decision manifest fields drifted")
+    if manifest["schema"] != DECISION_MANIFEST_SCHEMA:
+        raise ValueError("publication decision manifest schema is unsupported")
+    evaluated_at = timestamp(manifest["evaluated_at"], "publication evaluated_at")
+
+    observations = obj(observation_bindings, "observations")
+    if set(observations) != {"github_main", "forgejo_main", "local_main"}:
+        raise ValueError("origin observation bindings drifted")
+    expected_origins = {
+        "github_main": (
+            "github-api", "gh-api", repository, github_main,
+            f"repos/{repository}/git/ref/heads/{quote(default_branch, safe='')}",
+        ),
+        "forgejo_main": (
+            "forgejo-api", "forgejo-api-authenticated-read", forgejo_repository, forgejo_main,
+            "repos/" + "/".join(quote(part, safe="") for part in forgejo_repository.split("/", 1))
+            + f"/branches/{quote(default_branch, safe='')}",
+        ),
+        "local_main": (
+            "local-git", "git-rev-parse", repository, local_main,
+            f"refs/heads/{default_branch}",
+        ),
+    }
+    captured: list[datetime] = []
+    github_repository_id: int | None = None
+    for name, (authority, source, expected_repository, expected_sha, source_identity) in expected_origins.items():
+        observation = load_bound(root, observations[name], f"{name} observation")
+        if set(observation) != {
+            "schema", "authority", "repository", "default_branch", "ref",
+            "sha", "captured_at", "repository_id", "transport",
+        }:
+            raise ValueError(f"{name} observation fields drifted")
+        if observation["schema"] != "dual-forge-ref-observation/v1":
+            raise ValueError(f"{name} observation schema is unsupported")
+        if observation["authority"] != authority:
+            raise ValueError(f"{name} observation authority mismatch")
+        if observation["repository"] != expected_repository:
+            raise ValueError(f"{name} observation repository mismatch")
+        if observation["default_branch"] != default_branch:
+            raise ValueError(f"{name} observation default branch mismatch")
+        if observation["ref"] != f"refs/heads/{default_branch}":
+            raise ValueError(f"{name} observation is not the bound default branch ref")
+        if observation["sha"] != expected_sha:
+            raise ValueError(f"{name} observation SHA mismatch")
+        transport = load_bound(root, observation["transport"], f"{name} transport")
+        if set(transport) != {
+            "schema", "producer", "source", "source_identity", "authority",
+            "repository", "default_branch", "ref", "sha", "captured_at",
+            "remote_bindings", "repository_id", "capture",
+        }:
+            raise ValueError(f"{name} transport fields drifted")
+        if transport["schema"] != "dual-forge-ref-transport/v1":
+            raise ValueError(f"{name} transport schema is unsupported")
+        if transport["producer"] != "capture_origin_ref.py" or transport["source"] != source:
+            raise ValueError(f"{name} transport lacks its canonical capture producer")
+        if transport["source_identity"] != source_identity:
+            raise ValueError(f"{name} transport source identity mismatch")
+        if name == "local_main":
+            if transport["remote_bindings"] != {
+                "github_remote": github_remote,
+                "github_repository": repository,
+                "forgejo_remote": forgejo_remote,
+                "forgejo_repository": forgejo_repository,
+            }:
+                raise ValueError("local transport remote bindings mismatch")
+        elif transport["remote_bindings"] is not None:
+            raise ValueError(f"{name} remote bindings must be null")
+        for field in ("authority", "repository", "default_branch", "ref", "sha", "captured_at"):
+            if transport[field] != observation[field]:
+                raise ValueError(f"{name} transport/observation {field} mismatch")
+        if transport["repository_id"] != observation["repository_id"]:
+            raise ValueError(f"{name} transport/observation repository ID mismatch")
+        capture = obj(transport["capture"], f"{name} capture")
+        if set(capture) != {"argv", "exit_codes", "stdout", "stdout_sha256"}:
+            raise ValueError(f"{name} capture fields drifted")
+        argv, exits, stdout, stdout_digests = (
+            capture["argv"], capture["exit_codes"], capture["stdout"], capture["stdout_sha256"]
+        )
+        if not all(isinstance(value, list) for value in (argv, exits, stdout, stdout_digests)):
+            raise ValueError(f"{name} capture arrays are malformed")
+        if not argv or not (len(argv) == len(exits) == len(stdout) == len(stdout_digests)):
+            raise ValueError(f"{name} capture arrays differ in length")
+        if exits != [0] * len(argv):
+            raise ValueError(f"{name} capture includes a failed command")
+        if any(
+            not isinstance(value, str)
+            or hashlib.sha256(value.encode()).hexdigest() != digest
+            for value, digest in zip(stdout, stdout_digests)
+        ):
+            raise ValueError(f"{name} capture stdout digest mismatch")
+        if name == "github_main":
+            expected_argv = [
+                ["gh", "api", f"repos/{repository}"],
+                ["gh", "api", source_identity],
+            ]
+            try:
+                repo_response, ref_response = json.loads(stdout[0]), json.loads(stdout[1])
+            except (IndexError, json.JSONDecodeError) as exc:
+                raise ValueError("GitHub capture stdout is not replayable JSON") from exc
+            repository_id = repo_response.get("id") if isinstance(repo_response, dict) else None
+            ref_object = ref_response.get("object") if isinstance(ref_response, dict) else None
+            if (
+                argv != expected_argv
+                or not isinstance(repo_response, dict)
+                or repo_response.get("full_name") != repository
+                or repo_response.get("default_branch") != default_branch
+                or not isinstance(repository_id, int)
+                or isinstance(repository_id, bool)
+                or repository_id <= 0
+                or not isinstance(ref_object, dict)
+                or ref_object.get("sha") != expected_sha
+                or observation["repository_id"] != repository_id
+            ):
+                raise ValueError("GitHub provider capture does not derive the observation")
+            github_repository_id = repository_id
+        elif name == "forgejo_main":
+            root_endpoint = source_identity.rsplit("/branches/", 1)[0]
+            expected_argv = [
+                ["forgejo-api-authenticated-read", f"/api/v1/{root_endpoint}"],
+                ["forgejo-api-authenticated-read", f"/api/v1/{source_identity}"],
+            ]
+            try:
+                repo_response, branch_response = json.loads(stdout[0]), json.loads(stdout[1])
+            except (IndexError, json.JSONDecodeError) as exc:
+                raise ValueError("Forgejo capture stdout is not replayable JSON") from exc
+            repository_id = repo_response.get("id") if isinstance(repo_response, dict) else None
+            commit = branch_response.get("commit") if isinstance(branch_response, dict) else None
+            if (
+                argv != expected_argv
+                or not isinstance(repo_response, dict)
+                or repo_response.get("full_name") != forgejo_repository
+                or repo_response.get("default_branch") != default_branch
+                or not isinstance(repository_id, int)
+                or isinstance(repository_id, bool)
+                or repository_id <= 0
+                or not isinstance(commit, dict)
+                or commit.get("id") != expected_sha
+                or observation["repository_id"] != repository_id
+            ):
+                raise ValueError("Forgejo provider capture does not derive the observation")
+        else:
+            expected_argv = [
+                ["git", "-C", "<repo-root>", "rev-parse", "--show-toplevel"],
+                [
+                    "git", "-C", "<repo-root>", "remote", "get-url",
+                    "--push", "--all", github_remote,
+                ],
+                [
+                    "git", "-C", "<repo-root>", "remote", "get-url",
+                    "--push", "--all", forgejo_remote,
+                ],
+                ["git", "-C", "<repo-root>", "rev-parse", "--verify", f"refs/heads/{default_branch}"],
+                ["git", "-C", "<repo-root>", "cat-file", "-t", expected_sha],
+            ]
+            if (
+                argv != expected_argv
+                or stdout != [".", repository, forgejo_repository, expected_sha, "commit"]
+                or observation["repository_id"] is not None
+            ):
+                raise ValueError("local Git capture does not derive the remote-bound observation")
+        stamp = timestamp(observation["captured_at"], f"{name} captured_at")
+        age = (evaluated_at - stamp).total_seconds()
+        if age < -30 or age > 300:
+            raise ValueError(f"{name} observation is stale or from the future")
+        captured.append(stamp)
+
+    reconciliation = load_bound(root, reconciliation_binding, "reconciliation observation")
+    if set(reconciliation) != {
+        "schema", "repository", "candidate_sha", "github_main_sha",
+        "forgejo_main_sha", "local_main_sha", "captured_at",
+        "github_open_prs", "forgejo_open_prs", "affected_issues",
+        "unresolved_conflicts",
+    }:
+        raise ValueError("reconciliation observation fields drifted")
+    if reconciliation["schema"] != "dual-forge-reconciliation-observation/v1":
+        raise ValueError("reconciliation observation schema is unsupported")
+    expected_reconciliation = {
+        "repository": repository,
+        "candidate_sha": candidate,
+        "github_main_sha": github_main,
+        "forgejo_main_sha": forgejo_main,
+        "local_main_sha": local_main,
+    }
+    for field, expected in expected_reconciliation.items():
+        if reconciliation[field] != expected:
+            raise ValueError(f"reconciliation {field} mismatch")
+    verify_pr_inventory(reconciliation["github_open_prs"], "github_open_prs")
+    verify_pr_inventory(reconciliation["forgejo_open_prs"], "forgejo_open_prs")
+    verify_issue_inventory(reconciliation["affected_issues"])
+    if not isinstance(reconciliation["unresolved_conflicts"], list):
+        raise ValueError("reconciliation unresolved_conflicts must be an inventory array")
+    if reconciliation["unresolved_conflicts"]:
+        raise ValueError("reconciliation still contains unresolved conflicts")
+    reconciled_at = timestamp(reconciliation["captured_at"], "reconciliation captured_at")
+    if reconciled_at < max(captured) or reconciled_at > evaluated_at:
+        raise ValueError("reconciliation time does not close the origin observations")
+    decision = obj(manifest["decision"], "publication decision")
+    required_check_name = manifest["required_check_name"]
+    if not isinstance(required_check_name, str) or not required_check_name:
+        raise ValueError("publication manifest requires a stable check name")
+    intent = decision.get("intent")
+    if intent not in {"initial-pr", "ready-for-review", "batched-repair"}:
+        raise ValueError("publication decision intent is unsupported")
+    snapshot = load_bound(root, bundle["snapshot"], "publication snapshot")
+    policy = load_bound(root, bundle["policy"], "publication policy")
+    verification = load_bound(root, bundle["verification"], "publication verification")
+    evidence = load_bound(root, bundle["evidence"], "publication evidence")
+    contract = load_bound(root, bundle["contract"], "publication contract")
+    recovery_binding = bundle["recovery"]
+    recovery = (
+        None
+        if recovery_binding is None
+        else load_bound(root, recovery_binding, "publication recovery")
+    )
+    inputs = obj(manifest["inputs"], "publication decision inputs")
+    if set(inputs) != {
+        "snapshot_sha256", "verification_sha256", "evidence_sha256",
+        "contract_sha256", "policy_sha256", "recovery_sha256",
+    }:
+        raise ValueError("publication decision input digests drifted")
+    expected_inputs = {
+        "snapshot_sha256": bundle["snapshot"]["sha256"],
+        "policy_sha256": bundle["policy"]["sha256"],
+        "verification_sha256": bundle["verification"]["sha256"],
+        "evidence_sha256": bundle["evidence"]["sha256"],
+        "contract_sha256": bundle["contract"]["sha256"],
+        "recovery_sha256": (
+            None if recovery_binding is None else recovery_binding["sha256"]
+        ),
+    }
+    if inputs != expected_inputs:
+        raise ValueError("publication decision manifest is not bound to its exact inputs")
+
+    scripts = Path(__file__).resolve().parents[2] / "github-delivery-loop" / "scripts"
+    policy_authority = load_module(
+        "dual_forge_ci_workflow_policy", scripts / "ci_workflow_policy.py"
+    )
+    try:
+        canonical_policy = policy_authority.load_policy(
+            root / bundle["policy"]["path"]
+        )
+    except policy_authority.PolicyError as exc:
+        raise ValueError(f"publication policy is invalid: {exc}") from exc
+    if canonical_policy != policy:
+        raise ValueError("publication policy normalization drifted")
+    if canonical_policy.get("repository") != repository:
+        raise ValueError("publication policy repository mismatch")
+    if canonical_policy.get("default_branch") != default_branch:
+        raise ValueError("publication policy default branch mismatch")
+    if canonical_policy.get("required_jobs") != [required_check_name]:
+        raise ValueError("manifest check name is not the sole required policy job")
+    gate = load_module("dual_forge_ci_publish_gate", scripts / "ci_publish_gate.py")
+    result = gate.evaluate(
+        snapshot, verification, evidence, contract, intent, candidate,
+        actual_tree, recovery, evaluated_at,
+    )
+    if result.as_json() != decision:
+        raise ValueError("publication decision does not reproduce from canonical inputs")
+    if result.decision != "ALLOW" or result.head_sha != candidate:
+        raise ValueError("canonical publication decision did not ALLOW the candidate")
+    if snapshot.get("repository", {}).get("full_name") != repository:
+        raise ValueError("publication decision repository mismatch")
+    if snapshot.get("repository", {}).get("repository_id") != github_repository_id:
+        raise ValueError("GitHub origin and publication repository numeric IDs differ")
+
+    proof = obj(actions.get("proof"), "actions.proof")
+    if set(proof) != {"check_name", "observation", "snapshot"}:
+        raise ValueError("actions.proof fields drifted")
+    check_name = proof["check_name"]
+    if check_name != required_check_name:
+        raise ValueError("actions proof check name differs from publication policy")
+    observation = load_bound(root, proof["observation"], "actions observation")
+    actions_snapshot = load_bound(root, proof["snapshot"], "actions snapshot")
+    producer = load_module("dual_forge_github_actions_snapshot", scripts / "github_actions_snapshot.py")
+    if producer.build(observation, check_name) != actions_snapshot:
+        raise ValueError("actions snapshot does not reproduce from canonical observation")
+    if actions_snapshot.get("repository", {}).get("full_name") != repository:
+        raise ValueError("actions proof repository mismatch")
+    if actions_snapshot.get("repository", {}).get("repository_id") != snapshot.get("repository", {}).get("repository_id"):
+        raise ValueError("prepublication and Actions repository identities differ")
+    pull = obj(actions_snapshot.get("pull_request"), "actions snapshot pull_request")
+    branch = obj(actions_snapshot.get("branch"), "actions snapshot branch")
+    pre_branch = obj(snapshot.get("branch"), "publication snapshot branch")
+    pre_pull = obj(snapshot.get("pull_request"), "publication snapshot pull_request")
+    if branch.get("name") != pre_branch.get("name"):
+        raise ValueError("prepublication and Actions branch subjects differ")
+    if not isinstance(pull.get("number"), int) or isinstance(pull.get("number"), bool):
+        raise ValueError("actions proof lacks a concrete pull request subject")
+    if intent == "initial-pr":
+        if pre_pull.get("number") is not None or pull.get("state") != "draft":
+            raise ValueError("initial publication did not create the admitted draft PR")
+    else:
+        if pull.get("number") != pre_pull.get("number"):
+            raise ValueError("prepublication and Actions pull request subjects differ")
+        if pull.get("state") != "ready":
+            raise ValueError("publication transition did not leave the admitted PR ready")
+    latest = obj(actions_snapshot.get("actions", {}).get("latest_check"), "actions latest_check")
+    if pull.get("head_sha") != candidate or branch.get("head_sha") != candidate:
+        raise ValueError("actions proof is stale for the publication candidate")
+    if latest.get("head_sha") != candidate or latest.get("conclusion") != "success":
+        raise ValueError("actions proof lacks exact-head successful check execution")
+    completed_at = timestamp(
+        producer.timestamp(latest.get("completed_at"), "actions latest_check completed_at"),
+        "actions latest_check completed_at",
+    )
+    if completed_at < evaluated_at:
+        raise ValueError("actions required check predates the publication decision")
+    captured_at = timestamp(
+        producer.timestamp(actions_snapshot.get("captured_at"), "actions captured_at"),
+        "actions captured_at",
+    )
+    capture_delay = (captured_at - evaluated_at).total_seconds()
+    if capture_delay < 0:
+        raise ValueError("actions proof predates the publication decision")
+    if capture_delay > 300:
+        raise ValueError("actions proof is outside the five-minute publication window")
+    published_at = timestamp(
+        producer.timestamp(
+            pull.get("last_published_at"), "actions pull request published_at"
+        ),
+        "actions pull request published_at",
+    )
+    if published_at < evaluated_at:
+        raise ValueError("actions pull request subject predates the publication decision")
+    if completed_at > captured_at:
+        raise ValueError("actions required check completes after its capture")
+    if published_at > captured_at:
+        raise ValueError("actions pull request publication occurs after its capture")
+
+
+def main(argv: list[str]) -> int:
+    if len(argv) != 2:
+        print("usage: check_dual_forge_contract.py RECEIPT.json", file=sys.stderr)
+        return 64
+    path = Path(argv[1])
+    if not path.is_file():
+        print(f"INPUT_ERROR missing receipt: {path}", file=sys.stderr)
+        return 64
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+        obj(data, "root")
+    except (OSError, json.JSONDecodeError, ValueError) as exc:
+        print(f"INPUT_ERROR {exc}", file=sys.stderr)
+        return 64
+
+    try:
+        if data.get("schema_version") != "dual-forge-repository-loop/v2":
+            raise ValueError("unsupported schema_version")
+
+        repository_binding = obj(data.get("repository"), "repository")
+        if set(repository_binding) != {"name", "default_branch"}:
+            raise ValueError("repository binding fields drifted")
+        repository = repository_binding.get("name")
+        default_branch = repository_binding.get("default_branch")
+        if not isinstance(repository, str) or REPOSITORY.fullmatch(repository) is None:
+            raise ValueError("repository.name must be an exact OWNER/REPOSITORY identity")
+        if (
+            not isinstance(default_branch, str)
+            or BRANCH.fullmatch(default_branch) is None
+            or ".." in default_branch
+        ):
+            raise ValueError("repository.default_branch is empty or unsafe")
+
+        authority = obj(data.get("authority"), "authority")
+        if authority != {"implementation": "local-forgejo", "publication": "github", "actions": "github-actions"}:
+            raise ValueError("authority planes must remain local-forgejo/github/github-actions")
+
+        github = obj(data.get("github"), "github")
+        forgejo = obj(data.get("forgejo"), "forgejo")
+        local = obj(data.get("local"), "local")
+        if set(github) != {"repository_full_name", "remote_name", "observed_main_sha"}:
+            raise ValueError("github binding fields drifted")
+        if set(forgejo) != {"repository", "remote_name", "observed_main_sha"}:
+            raise ValueError("forgejo binding fields drifted")
+        if set(local) != {"main_branch", "local_main_sha", "worktree_root"}:
+            raise ValueError("local binding fields drifted")
+        if github.get("repository_full_name") != repository:
+            raise ValueError("GitHub repository identity differs from repository binding")
+        if not isinstance(forgejo.get("repository"), str) or REPOSITORY.fullmatch(forgejo["repository"]) is None:
+            raise ValueError("Forgejo repository must be an exact OWNER/REPOSITORY identity")
+        if local.get("main_branch") != default_branch:
+            raise ValueError("local main branch differs from repository default branch")
+        if github.get("remote_name") == forgejo.get("remote_name"):
+            raise ValueError("GitHub and Forgejo remote names must be distinct")
+        for remote in (github.get("remote_name"), forgejo.get("remote_name")):
+            if not isinstance(remote, str) or not remote.strip() or "@" in remote or "://" in remote:
+                raise ValueError("bindings contain remote names only; credential-bearing/URL values are forbidden")
+
+        sha(github.get("observed_main_sha"), "github.observed_main_sha")
+        sha(forgejo.get("observed_main_sha"), "forgejo.observed_main_sha")
+        sha(local.get("local_main_sha"), "local.local_main_sha")
+
+        ns = obj(data.get("issue_namespaces"), "issue_namespaces")
+        fp, gp = ns.get("forgejo"), ns.get("github")
+        if not isinstance(fp, str) or not isinstance(gp, str) or not fp or not gp or fp == gp:
+            raise ValueError("Forgejo and GitHub issue namespaces must be non-empty and distinct")
+        links = data.get("issue_links", [])
+        if not isinstance(links, list):
+            raise ValueError("issue_links must be an array")
+        for i, link in enumerate(links):
+            link = obj(link, f"issue_links[{i}]")
+            fref, gref = link.get("forgejo_issue"), link.get("github_issue")
+            if not isinstance(fref, str) or not fref.startswith(fp):
+                raise ValueError(f"issue_links[{i}].forgejo_issue must use {fp!r}")
+            if not isinstance(gref, str) or not gref.startswith(gp):
+                raise ValueError(f"issue_links[{i}].github_issue must use {gp!r}")
+            if fref == gref:
+                raise ValueError("cross-forge issue identities cannot collapse")
+
+        history = data.get("history")
+        if not isinstance(history, list) or any(not isinstance(x, str) for x in history):
+            raise ValueError("history must be an array of state names")
+        if EXPECTED_HISTORY[: len(history)] != history:
+            raise ValueError("delivery history must preserve local-main-first and reconciliation-before-publication order")
+
+        pub = obj(data.get("publication"), "publication")
+        candidate = sha(pub.get("candidate_sha"), "publication.candidate_sha")
+        if set(pub) != {"candidate_sha", "git_proof", "decision_bundle"}:
+            raise ValueError("publication fields drifted")
+
+        actions = obj(data.get("actions"), "actions")
+
+        evidence = obj(data.get("evidence"), "evidence")
+        if set(evidence) != set(REQUIRED_PUBLICATION_EVIDENCE) | {"final_merge"}:
+            raise ValueError("evidence lane inventory drifted")
+        for key, value in evidence.items():
+            if value not in EVIDENCE:
+                raise ValueError(f"evidence.{key} has invalid state {value!r}")
+
+        if history and history[-1] == "GITHUB_PUBLICATION_READY":
+            unproved = [k for k in REQUIRED_PUBLICATION_EVIDENCE if evidence.get(k) != "PASS"]
+            if unproved:
+                raise ValueError("publication allowed with unproved runtime lanes: " + ", ".join(unproved))
+            if evidence.get("github_actions") != "PASS":
+                raise ValueError("publication allowed without GitHub Actions PASS")
+            if evidence.get("final_merge") != "HUMAN_ADMIT_REQUIRED":
+                raise ValueError("publication-ready receipt cannot self-authorize final merge")
+            actual_tree = verify_git_ancestry(
+                path.resolve(), pub["git_proof"],
+                github["observed_main_sha"], forgejo["observed_main_sha"],
+                local["local_main_sha"], candidate,
+            )
+            verify_canonical_publication(
+                path.resolve(), pub, actions, data.get("observations"),
+                data.get("reconciliation"), github["observed_main_sha"],
+                forgejo["observed_main_sha"], local["local_main_sha"],
+                candidate, actual_tree,
+                repository, default_branch, forgejo["repository"],
+                github["remote_name"], forgejo["remote_name"],
+            )
+        else:
+            print("NOT_EXERCISED dual-forge contract is only a partial state prefix")
+            return 3
+
+    except ValueError as exc:
+        return fail(str(exc))
+
+    print("PASS dual-forge contract structurally closed")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main(sys.argv))

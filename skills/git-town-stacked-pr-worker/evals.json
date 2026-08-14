@@ -1,0 +1,73 @@
+{
+  "skill_name": "git-town-stacked-pr-worker",
+  "version": "1.3.0",
+  "_meta": {
+    "coverage_metric": "publication-policy composition, exact-head subject separation, Intent-Bound Stack graph closure, no-push background invariant, and billing-circuit fail-closed controls; checked-in repository profile key admission and Human-owned Worker surface",
+    "purpose": "Prove that the Git Town Worker cannot invent branch dependencies, reuse stale child evidence, overlap active sibling path leases, create convergence early, bypass the canonical github-delivery-loop publication boundary, or collapse local sync, publication, trusted CI, and Human Admit into one green state."
+  },
+  "runnable": [
+    {
+      "id": "GTSP-PUBLISH-1",
+      "checker_script": "scripts/check_publication_boundary.py",
+      "test_verify": "tests/publication-boundary/verify.sh",
+      "good_fixture": "canonical Skill files",
+      "hollow_fixture": "selftest mutations removing no-push, billing-open, one intent, one evidence lane, or the policy composition link",
+      "covers": [
+        "SYSTEM_PROMPT plus PUBLICATION_POLICY composition is mandatory for GitHub publication",
+        "repository profile names the canonical github-delivery-loop gate and exact schemas",
+        "background synchronization remains no-push",
+        "only initial-pr, ready-for-review and batched-repair are admitted",
+        "billing-open blocks publication until owner recovery",
+        "local sync, local verification, publication, trusted check and Human Admit remain separate lanes"
+      ],
+      "expected": "canonical files PASS; each planted hollow mutation exits non-zero with a stable contract error"
+    },
+    {
+      "id": "GTSP-STACK-1",
+      "checker_script": "scripts/check_stack_contract.py",
+      "test_verify": "tests/stack-contract/verify.sh",
+      "good_fixture": "tests/stack-contract/fixtures/valid-stack.json",
+      "hollow_fixture": "wrong PR base, stale parent, wrong merge base, old receipt, prose-only fake child, missing parent dependency, sibling edge, path overlap, early convergence, ancestry cycle, or missing Human-owned operation",
+      "intent_contract": "tests/stack-contract/fixtures/intent-contract.json",
+      "covers": [
+        "GTSP-04 branch ancestry equals the declared proof dependency graph",
+        "GTSP-06 active sibling path leases remain disjoint",
+        "GTSP-13 merge base and observed parent equal the exact declared parent head",
+        "GTSP-14 parent or head movement invalidates old child evidence",
+        "GTSP-18 receipts bind the exact branch head",
+        "child branches consume a declared contract or byte path instead of prose-only scheduling preference",
+        "convergence remains NOT_CREATED until all prerequisites are ADMITTED",
+        "semantic conflict, merge or ship, permission widening, promotion, and destructive rollback remain Human-owned"
+      ],
+      "expected": "canonical fixture and Intent-Bound contract PASS; every planted graph, freshness, lease, convergence, or Human-boundary mutation exits non-zero"
+    },
+    {
+      "id": "GTSP-PROFILE-1",
+      "checker_script": "scripts/check_repository_profile.py",
+      "test_verify": "tests/repository-profile/verify.sh",
+      "good_fixture": ".git-town.toml plus references/REPOSITORY_PROFILE.md",
+      "hollow_fixture": "a misspelled key that git-town silently ignores, an unknown section, a mutable trunk selector, a trunk disagreeing with the default branch, perennials omitted or repeating the trunk, auto-resolve or push-branches or tags left enabled, an absent profile or reference, a reference missing a required section, and a Worker surface exposing ship or force push",
+      "covers": [
+        "every key must be one observed taking effect against the admitted 24.0.0 binary, because an unrecognised key is ignored and reads as a setting in force",
+        "the trunk must name one immutable branch equal to the repository default branch",
+        "perennials must be declared, and an empty list is a declaration distinct from omission",
+        "auto-resolve, push-branches and tags must each be off, overriding Git Town's on-by-default",
+        "the profile reference must declare lease roots, publication gate state, and what the profile does not enforce",
+        "git-town ship and force push must not appear in an executable position in the Worker"
+      ],
+      "expected": "canonical profile validated; 16 planted defects refused; absent repository root exits 64"
+    }
+  ],
+  "evidence_boundary": {
+    "offline_stack_graph_mechanism": "IMPLEMENTED",
+    "live_git_town_binary": "EXERCISED",
+    "real_worktree_sync": "EXERCISED",
+    "semantic_conflict_canary": "EXERCISED",
+    "remote_publication": "NOT_EXERCISED",
+    "human_admit": "REQUIRED",
+    "checked_in_repository_profile": "IMPLEMENTED",
+    "profile_keys_observed_at_24_0_0": "EXERCISED",
+    "this_repository_real_branch_graph": "NOT_EXERCISED",
+    "worker_execution_against_this_profile": "NOT_EXERCISED"
+  }
+}

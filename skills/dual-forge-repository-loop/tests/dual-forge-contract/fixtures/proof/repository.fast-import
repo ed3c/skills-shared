@@ -1,0 +1,56 @@
+blob
+mark :1
+data <<BLOB
+github
+BLOB
+commit refs/heads/github-main
+mark :2
+committer Fixture <fixture@example.invalid> 1700000000 +0000
+data <<COMMIT
+github main
+COMMIT
+M 100644 :1 github.txt
+
+blob
+mark :3
+data <<BLOB
+forgejo
+BLOB
+commit refs/heads/forgejo-main
+mark :4
+committer Fixture <fixture@example.invalid> 1700000001 +0000
+data <<COMMIT
+forgejo main
+COMMIT
+from :2
+M 100644 :3 forgejo.txt
+
+blob
+mark :5
+data <<BLOB
+local
+BLOB
+commit refs/heads/local-main
+mark :6
+committer Fixture <fixture@example.invalid> 1700000002 +0000
+data <<COMMIT
+local main
+COMMIT
+from :4
+M 100644 :5 local.txt
+
+blob
+mark :7
+data <<BLOB
+candidate
+BLOB
+commit refs/heads/candidate
+mark :8
+committer Fixture <fixture@example.invalid> 1700000003 +0000
+data <<COMMIT
+publication candidate
+COMMIT
+from :6
+M 100644 :7 candidate.txt
+
+done

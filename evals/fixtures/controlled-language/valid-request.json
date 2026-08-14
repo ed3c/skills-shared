@@ -1,0 +1,62 @@
+{
+  "schema_version": "controlled-language-request/v1",
+  "request_id": "ctl-fixture-procedural-001",
+  "subject_identity": {
+    "artifact_digest": "sha256:85b0f2f9237523a7f059f951cd4045883069d86349e78b50ac01c50180de5d7e",
+    "locator": "inline:ctl-fixture-procedural-001"
+  },
+  "input": {
+    "mode": "INLINE",
+    "text": "Turn the bleed valve to release the pressure.",
+    "content_digest": "sha256:85b0f2f9237523a7f059f951cd4045883069d86349e78b50ac01c50180de5d7e"
+  },
+  "document_class": "PROCEDURAL",
+  "operation": "AUDIT_AND_REWRITE",
+  "profile_reference": {
+    "path": "evals/fixtures/controlled-language/valid-standard-pack.json",
+    "pack_id": "fixture-controlled-technical-language",
+    "edition": "0.1-fixture",
+    "artifact_digest": "sha256:0d1cb3027d1f91a2c0a6c419c56b305355557e94c0bfeadc7a95eb13e6837ba7"
+  },
+  "termbase_references": [
+    {
+      "path": "evals/fixtures/controlled-language/valid-termbase-tn.json",
+      "term_id": "TERM-BLEED-VALVE",
+      "artifact_digest": "sha256:da14777871c92399b49928c54dd9b9b0cae212ca758fec634a388b0a74cdcfb6"
+    },
+    {
+      "path": "evals/fixtures/controlled-language/valid-termbase-tv.json",
+      "term_id": "TERM-SAFETY-WIRE",
+      "artifact_digest": "sha256:d0c5ef8cc5e3325b874473e12e124b604f87cf00aa8034e0adfcc5a6325ab257"
+    }
+  ],
+  "privacy": {
+    "classification": "PUBLIC",
+    "execution_lane": "LOCAL_ONLY",
+    "allow_network": false,
+    "human_external_processing_approval": "NOT_REQUIRED"
+  },
+  "requested_evidence_classes": [
+    "DETERMINISTIC",
+    "CALIBRATED_HEURISTIC",
+    "SEMANTIC",
+    "HUMAN"
+  ],
+  "repair_policy": {
+    "max_attempts": 2,
+    "allowed_repair_codes": [
+      "SPLIT_ACTION",
+      "REPLACE_UNAPPROVED_WORD",
+      "CLARIFY_REFERENCE",
+      "REWRITE_NOUN_CLUSTER"
+    ],
+    "no_improvement_action": "STOP"
+  },
+  "completion_policy": {
+    "deterministic_failure_vetoes_advisory": true,
+    "stale_evidence_blocks": true,
+    "safety_text_requires_human_review": true,
+    "official_compliance_requires_human_admit": true,
+    "private_chain_of_thought": "FORBIDDEN"
+  }
+}

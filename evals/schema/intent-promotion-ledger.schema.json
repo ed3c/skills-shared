@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ed3c/skills-shared/evals/schema/intent-promotion-ledger.schema.json",
+  "title": "Intent Promotion Ledger",
+  "description": "Append-only record of promotion receipts. The semantic gate reads it to confirm a supersession target exists, is current, and matches; this schema is what makes an entry's shape decidable rather than assumed.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["entries"],
+  "properties": {
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "receipt_id",
+          "receipt_digest",
+          "intent_id",
+          "state",
+          "subject_commit_sha",
+          "current"
+        ],
+        "properties": {
+          "receipt_id": {
+            "type": "string",
+            "pattern": "^IPR-[A-Z0-9][A-Z0-9-]{2,63}$"
+          },
+          "receipt_digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "intent_id": {
+            "type": "string",
+            "pattern": "^MI-[A-Z0-9][A-Z0-9-]{2,127}$"
+          },
+          "state": {
+            "enum": ["PROPOSED", "VERIFIED", "ADMITTED", "CANONICAL", "SUPERSEDED", "REVOKED"]
+          },
+          "subject_commit_sha": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{40}$"
+          },
+          "current": {"type": "boolean"}
+        }
+      }
+    }
+  }
+}

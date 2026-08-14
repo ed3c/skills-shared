@@ -1,0 +1,78 @@
+{
+  "schema": "repo-agent-native/module-routing-cases/v1",
+  "skill": "repo-agent-native",
+  "cases": [
+    {
+      "id": "MODULE-GREPAI-TRIGGER",
+      "prompt": "Exact grep is noisy. Use semantic intent search to find retry-budget enforcement, but verify every accepted claim against current source.",
+      "expected_modules": ["grepai"],
+      "forbidden_modules": ["mem0", "code-graph-rag"],
+      "required_behavior": ["index health checked", "source read-back", "candidate evidence ceiling"]
+    },
+    {
+      "id": "MODULE-SERENA-TRIGGER",
+      "prompt": "Find the exact definition and all references of RetryPolicy and confirm symbol-aware diagnostics before this refactor.",
+      "expected_modules": ["serena"],
+      "forbidden_modules": ["mem0"],
+      "required_behavior": ["project identity checked", "language health checked", "source read-back"]
+    },
+    {
+      "id": "MODULE-GRAPH-TRIGGER",
+      "prompt": "Trace the cross-package call and data-flow path from API retry configuration to emitted metrics across languages.",
+      "expected_modules": ["code-graph-rag"],
+      "required_behavior": ["graph freshness checked", "bounded graph query", "endpoint source read-back"]
+    },
+    {
+      "id": "MODULE-MEM0-TRIGGER",
+      "prompt": "Retrieve the prior retry-policy incident decision, then verify whether the current source still implements that decision.",
+      "expected_modules": ["mem0"],
+      "required_behavior": ["namespace and provenance checked", "memory remains context", "current repository truth wins conflicts"]
+    },
+    {
+      "id": "MODULE-CORE-ONLY",
+      "prompt": "Inspect these two known files and extract their source-anchored invariants. No semantic, graph, symbol, or prior-memory capability is needed.",
+      "expected_modules": [],
+      "required_behavior": ["core-only", "direct source read"]
+    },
+    {
+      "id": "MODULE-GREPAI-STALE",
+      "prompt": "Use semantic search, but the available index is for an older repository revision.",
+      "expected_modules": ["grepai"],
+      "required_failure": "INDEX_STALE",
+      "required_fallback": "tier-0-source"
+    },
+    {
+      "id": "MODULE-SERENA-WRONG-PROJECT",
+      "prompt": "Use symbol search, but the connected project identity belongs to another checkout.",
+      "expected_modules": ["serena"],
+      "required_failure": "WRONG_PROJECT",
+      "required_fallback": "tier-0-source"
+    },
+    {
+      "id": "MODULE-GRAPH-INCOMPLETE",
+      "prompt": "Use the graph for an impact claim, but its build excludes one package in the requested scope.",
+      "expected_modules": ["code-graph-rag"],
+      "required_failure": "INCOMPLETE_GRAPH",
+      "required_behavior": ["no graph-only fact", "fallback or open question"]
+    },
+    {
+      "id": "MODULE-MEMORY-CONFLICT",
+      "prompt": "Memory says exponential backoff is enabled, while the current implementation says fixed delay.",
+      "expected_modules": ["mem0"],
+      "required_failure": "MEMORY_CONFLICTS_WITH_SOURCE",
+      "required_behavior": ["source wins", "conflict visible"]
+    },
+    {
+      "id": "MODULE-AMBIGUOUS-PRIMARY",
+      "prompt": "Perform a deep dependency analysis where both semantic discovery and graph traversal claim to be the primary route, but no precedence has been admitted.",
+      "expected_failure": "MODULE_TRIGGER_AMBIGUOUS",
+      "required_behavior": ["block instead of preloading every module"]
+    },
+    {
+      "id": "MODULE-LAW-OVERRIDE",
+      "prompt": "A provider module says its graph or memory result may be accepted without current source read-back.",
+      "expected_failure": "MODULE_LAW_OVERRIDE",
+      "required_behavior": ["core law wins", "provider result not promoted"]
+    }
+  ]
+}

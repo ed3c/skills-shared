@@ -72,6 +72,18 @@ python3 $CHK <doc> [--root <dir>] [--covers <dir> …]      # exit 0 乾淨｜1 
 文件不必索引自己。三支 delivery-loop 用它守自己的 SKILL.md，各自
 `tests/index/verify.sh`；首次真跑就在三支裡各抓到一支從沒被提過的 sync 類腳本。
 
+`check`同時掃全 repo 的 `tests/**/verify.sh` 與 `tests/run-all.sh`，抓「物理上不可能失敗」
+的死斷言（`! cmd` 在語句位置、`test A && test B`、`|| true` 吞掉斷言、狀態被丟棄的 `grep`）。
+每個閘只有一份 verify.sh 當正對照，死斷言＝沒人守的閘卻掛著綠燈。單獨跑：
+
+```bash
+python3 ~/.agents/skills-shared/skills/shared-skills-infra/scripts/check_dead_assertions.py
+# exit 0 乾淨｜1 有死斷言（指名檔案行號＋正確寫法）｜3 一個測試檔都沒掃到（缺席不算通過）
+```
+
+`if`／`while`／`until` **條件位置**的 `!` 是合法且有效的，一律豁免——沒有這條豁免，
+linter 自己就是噪音源而被關掉，比沒有它更糟。
+
 ## clone 下來怎麼接線
 
 ```bash
