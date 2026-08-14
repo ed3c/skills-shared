@@ -1,0 +1,38 @@
+{
+  "skill_name": "dual-forge-repository-loop",
+  "version": "1.0.0",
+  "_meta": {
+    "coverage_metric": "dual-forge authority separation, local-main-first ordering, issue namespace separation, GitHub reconciliation closure, exact-head Actions evidence, and publication evidence gating",
+    "purpose": "Prove that local/Forgejo implementation success cannot be published to GitHub while remote drift, open PR conflict routing, affected issue routing, or exact-head Actions evidence remains unresolved."
+  },
+  "runnable": [
+    {
+      "id": "DFR-CONTRACT-1",
+      "checker_script": "scripts/check_dual_forge_contract.py",
+      "test_verify": "tests/dual-forge-contract/verify.sh",
+      "good_fixture": "tests/dual-forge-contract/fixtures/good.json",
+      "hollow_fixture": "mutations collapsing remote or issue namespaces, swapping local-main/reconciliation order, skipping PR/conflict reconciliation, binding Actions to a stale head, or leaving local/Actions evidence unexercised while publication is allowed",
+      "covers": [
+        "GitHub, Forgejo, and GitHub Actions authority planes remain distinct",
+        "Forgejo/GitHub issue identifiers remain explicitly namespaced",
+        "local-main integration precedes GitHub reconciliation and publication",
+        "current GitHub main, relevant open PRs, affected issues, and conflict routing close before publication",
+        "publication candidate proves it contains observed GitHub main and admitted local main",
+        "GitHub Actions PASS is bound to the exact publication candidate SHA",
+        "local Forgejo/worktree/main/reconciliation evidence must be PASS before publication is allowed",
+        "absent receipt input remains distinct from a failed delivery contract"
+      ],
+      "expected": "positive receipt admitted; nine planted authority/order/evidence defects refused; absent input exits 64"
+    }
+  ],
+  "evidence_boundary": {
+    "portable_orchestration_contract": "IMPLEMENTED",
+    "deterministic_publication_gate": "IMPLEMENTED",
+    "positive_mutation_controls": "IMPLEMENTED",
+    "chatgpt_private_github_ingress": "NOT_EXERCISED",
+    "local_forgejo_mutation": "NOT_EXERCISED",
+    "consumer_worktree_execution": "NOT_EXERCISED",
+    "consumer_github_actions": "NOT_EXERCISED",
+    "final_merge": "HUMAN_ADMIT_REQUIRED"
+  }
+}
