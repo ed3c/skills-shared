@@ -46,11 +46,25 @@ HOST_REPOSITORIES = (
 )
 # `ts-skill-bettor` contains `skill-bettor`, so a line naming the first must not
 # be counted twice. One alternation, longest first, one match per line.
+# `~/` is not one thing. `~/.codex/config.toml` is where the Codex CLI reads its
+# configuration on every machine and in every repository, so by the PRD's own
+# test -- move it unchanged to another repository; is it still true? -- it is
+# body, not binding. `~/proj-a/notes.md` is a path in somebody's checkout and
+# fails that test.
+#
+# Measured before deciding: of 84 `~/` hits in the shared body, 83 pointed at
+# `~/.claude`, `~/.codex`, `~/.agents` or `~/.gemini`, and exactly one at a
+# project directory. Counting the 83 made the number describe something other
+# than what the rule is about, and a debt figure that is mostly noise stops
+# being read.
+#
+# The criterion, not a list of tools: a dot-directory under `~/` is a tool's own
+# configuration; anything else under `~/` is a path in a project.
 PATTERN = re.compile(
     "|".join(re.escape(name) for name in sorted(HOST_REPOSITORIES, key=len, reverse=True))
     + r"|/Users/[A-Za-z0-9._-]+/"
     + r"|/home/[A-Za-z0-9._-]+/"
-    + r"|~/\S"
+    + r"|~/(?!\.)\S"
 )
 
 
@@ -246,12 +260,31 @@ def selftest() -> int:
                   file=sys.stderr)
             return 2
 
-        # An absolute host path is binding for the same reason a repository name is.
+        # A machine-local absolute path is binding for the same reason a
+        # repository name is.
         problems = run(build(root / "hostpath",
-                             {"demo/SKILL.md": "# D\n\nEdit ~/.claude/settings.json.\n"},
+                             {"demo/SKILL.md": "# D\n\nEdit /Users/someone/notes.md.\n"},
                              {}))
         if not problems:
-            print("FAIL: a host path was accepted in shared body", file=sys.stderr)
+            print("FAIL: a machine path was accepted in shared body", file=sys.stderr)
+            return 2
+
+        # A tool's own configuration directory is true in any repository.
+        problems = run(build(root / "toolconfig",
+                             {"demo/SKILL.md": "# D\n\nEdit ~/.codex/config.toml.\n"},
+                             {}))
+        if problems:
+            print(f"FAIL: a tool config path was counted as binding: {problems}",
+                  file=sys.stderr)
+            return 2
+
+        # A project directory under ~/ is not.
+        problems = run(build(root / "homeproject",
+                             {"demo/SKILL.md": "# D\n\nOpen ~/proj-a/README.md.\n"},
+                             {}))
+        if not problems:
+            print("FAIL: a home project path was accepted in shared body",
+                  file=sys.stderr)
             return 2
 
         # Two offenders, because a fixture whose group size is one cannot tell
