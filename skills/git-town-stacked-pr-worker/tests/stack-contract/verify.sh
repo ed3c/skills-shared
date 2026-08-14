@@ -9,7 +9,11 @@ python3 "${repo_root}/scripts/check_intent_bound_constraints.py" \
   contract "${test_dir}/fixtures/intent-contract.json"
 python3 "${skill_dir}/scripts/check_stack_contract.py" \
   "${test_dir}/fixtures/valid-stack.json"
-python3 -m unittest "${test_dir}/test_stack_contract.py" -v
+# Run the file, not `-m unittest <path>`: unittest resolves its arguments as
+# dotted module names, so an absolute path became an empty module name and this
+# line raised ValueError on every Python it was ever run under. The module has
+# its own unittest.main() entry point.
+python3 "${test_dir}/test_stack_contract.py" -v
 python3 -m py_compile \
   "${skill_dir}/scripts/check_stack_contract.py" \
   "${test_dir}/test_stack_contract.py"

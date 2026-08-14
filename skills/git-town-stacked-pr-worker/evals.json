@@ -44,9 +44,9 @@
   ],
   "evidence_boundary": {
     "offline_stack_graph_mechanism": "IMPLEMENTED",
-    "live_git_town_binary": "NOT_EXERCISED",
-    "real_worktree_sync": "NOT_EXERCISED",
-    "semantic_conflict_canary": "NOT_EXERCISED",
+    "live_git_town_binary": "EXERCISED",
+    "real_worktree_sync": "EXERCISED",
+    "semantic_conflict_canary": "EXERCISED",
     "remote_publication": "NOT_EXERCISED",
     "human_admit": "REQUIRED"
   }
