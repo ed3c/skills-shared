@@ -265,17 +265,33 @@ def check_report_fragment(root: Path) -> None:
 def check_evals_json(root: Path) -> None:
     relative = "evals.json"
     value = load_json(root, relative)
-    if set(value) != {"skill_name", "version", "_meta", "runnable"}:
+    if set(value) != {"skill_name", "version", "_meta", "runnable", "evidence_boundary"}:
         raise ContractError(f"{relative}: top-level fields drifted")
     if value["skill_name"] != "git-town-stacked-pr-worker":
         raise ContractError(f"{relative}: wrong skill_name")
-    if value["version"] != "1.1.0":
-        raise ContractError(f"{relative}: expected version 1.1.0")
+    if value["version"] != "1.2.0":
+        raise ContractError(f"{relative}: expected version 1.2.0")
+
+    boundary = value["evidence_boundary"]
+    if not isinstance(boundary, dict) or not boundary:
+        raise ContractError(f"{relative}: evidence_boundary must be a non-empty object")
+    # Admitting the field is not enough: an evidence boundary whose values were
+    # free text would let any lane be quietly relabelled into a pass.
+    states = {"IMPLEMENTED", "EXERCISED", "NOT_IMPLEMENTED", "NOT_EXERCISED", "REQUIRED"}
+    for lane, state in sorted(boundary.items()):
+        if state not in states:
+            raise ContractError(
+                f"{relative}: evidence_boundary[{lane!r}] is {state!r}, not one of {sorted(states)}"
+            )
+    if boundary.get("remote_publication") != "NOT_EXERCISED":
+        raise ContractError(f"{relative}: remote publication must remain NOT_EXERCISED")
+    if boundary.get("human_admit") != "REQUIRED":
+        raise ContractError(f"{relative}: human admit must remain REQUIRED")
+
     runnable = value["runnable"]
-    if not isinstance(runnable, list) or len(runnable) != 1:
-        raise ContractError(f"{relative}: exactly one focused runnable eval is required")
-    entry = runnable[0]
-    required = {
+    if not isinstance(runnable, list) or len(runnable) != 2:
+        raise ContractError(f"{relative}: exactly two focused runnable evals are required")
+    base_required = {
         "id",
         "checker_script",
         "test_verify",
@@ -284,17 +300,33 @@ def check_evals_json(root: Path) -> None:
         "covers",
         "expected",
     }
-    if not isinstance(entry, dict) or set(entry) != required:
-        raise ContractError(f"{relative}: runnable fields drifted")
-    if entry["id"] != "GTSP-PUBLISH-1":
-        raise ContractError(f"{relative}: focused eval id drifted")
-    for path_field in ("checker_script", "test_verify"):
-        path = entry[path_field]
-        if not isinstance(path, str) or not (root / path).is_file():
-            raise ContractError(f"{relative}: missing {path_field}: {path!r}")
-    covers = entry["covers"]
-    if not isinstance(covers, list) or len(covers) < 6:
-        raise ContractError(f"{relative}: covers must name all load-bearing behaviors")
+    # Per-eval field sets, so a new optional field cannot be introduced on an
+    # eval that was never admitted to carry it.
+    allowed_by_id = {
+        "GTSP-PUBLISH-1": base_required,
+        "GTSP-STACK-1": base_required | {"intent_contract"},
+    }
+    if [item.get("id") if isinstance(item, dict) else None for item in runnable] != [
+        "GTSP-PUBLISH-1",
+        "GTSP-STACK-1",
+    ]:
+        raise ContractError(f"{relative}: focused eval ids or their order drifted")
+    for entry in runnable:
+        eval_id = entry["id"]
+        if set(entry) != allowed_by_id[eval_id]:
+            raise ContractError(f"{relative}: {eval_id} runnable fields drifted")
+        path_fields = ["checker_script", "test_verify"]
+        if "intent_contract" in entry:
+            path_fields.append("intent_contract")
+        for path_field in path_fields:
+            path = entry[path_field]
+            if not isinstance(path, str) or not (root / path).is_file():
+                raise ContractError(f"{relative}: {eval_id} missing {path_field}: {path!r}")
+        covers = entry["covers"]
+        if not isinstance(covers, list) or len(covers) < 6:
+            raise ContractError(
+                f"{relative}: {eval_id} covers must name all load-bearing behaviors"
+            )
 
 
 def validate(root: Path) -> None:
