@@ -97,6 +97,15 @@ jobs:
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: '3.12'
+      - name: Install the parsers the gates refuse to work without
+        # Three gates here execute a document rather than pattern-matching it:
+        # the suite-arrival gate parses workflows, and the authority layer runs
+        # the committed schemas as Draft 2020-12 validators. Each fails closed
+        # when its parser is absent, so the job must supply them rather than
+        # letting the strictest checks be the ones that silently do not run.
+        run: |
+          python3 -m pip install --disable-pip-version-check \
+            'PyYAML==6.0.3' 'jsonschema==4.26.0'
       - name: Validate eval coverage, implementation targets, and sealed holdouts
         run: python3 scripts/check_skill_evals.py
       - name: Validate Intent-Bound Constraint closure and receipts
