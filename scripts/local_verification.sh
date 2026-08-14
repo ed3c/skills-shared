@@ -58,6 +58,10 @@ python3 scripts/check_controlled_language_contracts.py bundle \
   --violation evals/fixtures/controlled-language/valid-violation.json \
   --receipt evals/fixtures/controlled-language/valid-receipt.json
 
+step "guard controls"
+python3 scripts/check_guard_controls.py --repo-root . --selftest
+python3 scripts/check_guard_controls.py --repo-root .
+
 step "commit role classification"
 python3 scripts/check_commit_roles.py --repo-root .
 

@@ -30,6 +30,10 @@ on:
       - 'scripts/check_intent_promotions.py'
       - 'migration/**'
       - 'scripts/check_commit_roles.py'
+      - 'scripts/check_guard_controls.py'
+      - 'scripts/guard_control_selftest.py'
+      - 'evals/guard-controls.json'
+      - 'tests/test_guard_controls.py'
       - 'evals/commit-roles.json'
       - 'tests/test_commit_roles.py'
       - 'scripts/check_controlled_language_contracts.py'
@@ -112,6 +116,11 @@ jobs:
             --violation evals/fixtures/controlled-language/valid-violation.json \
             --receipt evals/fixtures/controlled-language/valid-receipt.json
           python3 -m unittest tests/test_controlled_language_contracts.py -v
+      - name: Prove every declared guard is caught by a control
+        run: |
+          python3 scripts/check_guard_controls.py --repo-root . --selftest
+          python3 -m unittest tests/test_guard_controls.py -v
+          python3 scripts/check_guard_controls.py --repo-root .
       - name: Classify commit drivers since the enforced start point
         run: |
           python3 scripts/check_commit_roles.py --repo-root .

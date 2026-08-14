@@ -1,0 +1,100 @@
+{
+  "schema": "guard-control-manifest/v1",
+  "_meta": {
+    "purpose": "Each entry names one load-bearing guard and the verify that must go red when it is removed. This is the executable form of #122 shape D: an assertion that runs but cannot fail is indistinguishable from one that works.",
+    "why_not_every_guard": "A guard whose removal is caught by three other checks adds a slow run and no signal. These are the ones where a silent failure would let a false claim through: identity binding, evidence readback, publication cadence, and the classification gates.",
+    "verify_must_be_self_contained": "A verify command runs inside an isolated copy that carries no .git. A command needing repository history reports as unreachable, which is a true statement about the isolated run and a useless one about the guard, so entries point at the self-contained subset instead."
+  },
+  "timeout_seconds": 300,
+  "guards": [
+    {
+      "id": "suite-ci-arrival",
+      "file": "scripts/check_suite_ci_coverage.py",
+      "anchor": "                if f\"skills/{skill}/{entrypoint}\" in command:",
+      "verify": [
+        "python3",
+        "scripts/check_suite_ci_coverage.py"
+      ],
+      "note": "Without this, a skill named only in a paths filter reads as covered. That is exactly how #105 landed two never-executed verifiers."
+    },
+    {
+      "id": "commit-role-machine-address",
+      "file": "scripts/check_commit_roles.py",
+      "anchor": "            if match is None:",
+      "verify": [
+        "python3",
+        "-m",
+        "unittest",
+        "tests.test_commit_roles.GateTests"
+      ],
+      "note": "A machine role wearing a real address counts machine work toward a person's contribution graph."
+    },
+    {
+      "id": "commit-role-forge-exemption",
+      "file": "scripts/check_commit_roles.py",
+      "anchor": "    if forge_role is not None and record[\"author_email\"] != record[\"committer_email\"]:",
+      "verify": [
+        "python3",
+        "-m",
+        "unittest",
+        "tests.test_commit_roles.GateTests"
+      ],
+      "note": "The exemption must apply to forge-created commits only, not to any commit wearing a forge address."
+    },
+    {
+      "id": "intent-promotion-evaluator-subject",
+      "file": "scripts/check_intent_promotions.py",
+      "anchor": "            if run[\"subject_commit_sha\"] != subject[\"commit_sha\"]:",
+      "verify": [
+        "python3",
+        "scripts/check_intent_promotions.py",
+        "selftest"
+      ],
+      "note": "An old receipt carried forward to a new commit is the substitution the lifecycle exists to block."
+    },
+    {
+      "id": "intent-promotion-agent-approval",
+      "file": "scripts/check_intent_promotions.py",
+      "anchor": "        if approval.get(\"generated_by_agent\") is not False:",
+      "verify": [
+        "python3",
+        "scripts/check_intent_promotions.py",
+        "selftest"
+      ],
+      "note": "An agent can write approver_kind HUMAN; it cannot honestly write generated_by_agent false."
+    },
+    {
+      "id": "authority-digest-binding",
+      "file": "scripts/check_intent_promotion_authority.py",
+      "anchor": "    if actual != declared[\"artifact_digest\"]:",
+      "verify": [
+        "python3",
+        "scripts/check_intent_promotion_authority.py",
+        "--selftest"
+      ],
+      "note": "The whole authority layer rests on this: a digest a caller writes is a label until something hashes the file. It shipped uncontrolled once."
+    },
+    {
+      "id": "authority-schema-execution",
+      "file": "scripts/check_intent_promotion_authority.py",
+      "anchor": "    validate_against(receipt_schema, receipt, \"receipt\")",
+      "verify": [
+        "python3",
+        "scripts/check_intent_promotion_authority.py",
+        "--selftest"
+      ],
+      "note": "A committed schema that is only parsed is not a gate."
+    },
+    {
+      "id": "union-first-source-wins",
+      "file": "migration/hotfix_union.py",
+      "anchor": "                if any(r[3] == destination for r in restores):",
+      "verify": [
+        "python3",
+        "migration/hotfix_union.py",
+        "--selftest"
+      ],
+      "note": "Every fixture had a group size of one, so first-wins and last-wins behaved identically until #148."
+    }
+  ]
+}
