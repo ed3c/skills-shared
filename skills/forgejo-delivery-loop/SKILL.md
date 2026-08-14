@@ -86,6 +86,11 @@ for issue in <該線 open issues>:
 merge 永遠人 admit;本 skill 只推進到 PR 開好、findings 齊備。Forgejo API 呼叫一律透過既有
 credential helper 在記憶體內取憑證,**秘密不落盤不輸出**(本 repo `check_credential_hygiene.py` 守)。
 
+這句話由 `scripts/route.ts` 的 merge 路由與 `tests/merge-authority/` 的窮舉掃描守住,不靠人記得:
+任何 operation=merge 的輸入一律 `mutation_allowed: false`,`request_state: "admitted"` 指的是
+**typed request 被 admit**,從來不是人 admit 了 merge。intent 對應與這條界線的完整說明見
+[`references/INTENT_BOUND_CONSTRAINTS.md`](references/INTENT_BOUND_CONSTRAINTS.md)。
+
 ## 三種提示的放置鐵律
 
 - **固定提示**(規範,改動=治理事件)→ 規範模組(如 `modules/development-standards.md`)。
