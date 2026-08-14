@@ -68,11 +68,13 @@ Shared Skills may reference another method, but consumer selection remains expli
 
 - [`knowledge-continuity`](knowledge-continuity/README.md) — procedural continuity loop, generic routing reference, and on-demand cross-repository example.
 - [`spatial-loop-systems-engineering`](spatial-loop-systems-engineering/README.md) — pre-implementation state-space, hard-invariant, substrate-capability, teardown, and verification contract for kernel/hardware-bound work.
+- [`dual-forge-repository-loop`](dual-forge-repository-loop/README.md) — GitHub ingress/Actions plus local Forgejo worktree implementation, local-main-first integration, GitHub conflict/issue reconciliation, and exact-head publication.
 
 ## Delivery methods
 
 | Skill | Owns | Does not own |
 |---|---|---|
+| [`dual-forge-repository-loop`](dual-forge-repository-loop/README.md) | cross-forge state machine, local-main-first ordering, SHA/ancestry receipts, GitHub reconciliation gate | forge-specific mechanics, credentials, semantic merge authority |
 | [`github-delivery-loop`](github-delivery-loop/README.md) | artifact/receipt binding, GitHub observation, Actions publication, merge preflight | implementation correctness, Git Town graph, Human merge |
 | [`forgejo-delivery-loop`](forgejo-delivery-loop/README.md) | localhost Forgejo routing, line/receipt binding, deterministic outbox/recovery, safe operation boundaries | consumer registry values, credentials, arbitrary remote changes, Human merge |
 | [`git-town-stacked-pr-worker`](git-town-stacked-pr-worker/README.md) | portable branch/worktree/sync method | consumer config, branches, CI, push/merge/promotion |
