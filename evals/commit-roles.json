@@ -1,0 +1,68 @@
+{
+  "schema": "commit-role-vocabulary/v1",
+  "_meta": {
+    "purpose": "Machine-readable value domain for the Driven-By and Driven-On commit trailers, shared by the gate and by humans, so the vocabulary cannot drift between prose and enforcement.",
+    "why_two_dimensions": "Mechanism and host are orthogonal: agent-macro runs on Claude Code or Codex CLI, and the two hosts have entirely different gates. Folding them into one field is a combinatorial explosion.",
+    "why_identity_is_not_the_carrier": "A role is a property of a commit; git config is a property of a repository. One repository carries several drivers, so a per-repo setting can only label the dominant one correctly and mislabels the rest."
+  },
+  "enforced_from": {
+    "commit_sha": "b74d30835b40ff00a31cc185a67f93be6de6f273",
+    "note": "History before this commit is not scanned. Roughly 1100 commits across these repositories were authored as an unset identity and no record can recover their driver; backfilling would be invention, not recovery."
+  },
+  "driven_by": {
+    "human": {
+      "meaning": "A person acting directly, in a terminal or a forge web UI.",
+      "machine": false
+    },
+    "agent-macro": {
+      "meaning": "Main-loop agent delivery.",
+      "machine": true
+    },
+    "agent-subagent": {
+      "meaning": "A workflow or Task subagent.",
+      "machine": true
+    },
+    "loop-iterate": {
+      "meaning": "Small-loop automated iteration, such as an engine.sh driver.",
+      "machine": true
+    },
+    "forge-github": {
+      "meaning": "A GitHub-side action: gh, a PR merge, a label.",
+      "machine": true
+    },
+    "forge-gitlab": {
+      "meaning": "A GitLab-side action: glab, an MR.",
+      "machine": true
+    },
+    "forge-forgejo": {
+      "meaning": "A Forgejo-side action.",
+      "machine": true
+    }
+  },
+  "forge_values_stay_separate": "github, gitlab and forgejo are deliberately three values rather than one forge-*. This repository already treats github-delivery-loop, gitlab-delivery-loop and forgejo-delivery-loop as sister skills that must not be mixed; their APIs, permission models and merge-authority stacks differ. Collapsing them here would be the one place where the vocabulary contradicts the skill boundary, and 'some forge' does not answer which mechanism acted.",
+  "driven_on": {
+    "claude-code": "Claude Code, any surface.",
+    "codex-cli": "Codex CLI.",
+    "codex-app": "Codex App or IDE.",
+    "shell": "A plain shell with no agent harness.",
+    "ci": "A CI runner."
+  },
+  "identity_rules": {
+    "machine_author_email_pattern": "^(?P<role>[a-z][a-z0-9-]*)@(?P<host>[a-z][a-z0-9-]*)\\.invalid$",
+    "machine_author_email_note": "RFC 2606 reserves .invalid and it can never be delivered to, so the address is visibly synthetic. A real address on a machine commit counts machine work toward a person's contribution graph.",
+    "human_may_use_a_real_address": true,
+    "forge_committer_addresses": [
+      "noreply@github.com",
+      "noreply@gitlab.com",
+      "noreply@forgejo.org"
+    ],
+    "forge_committer_note": "A squash merge rewrites the committer to the forge while preserving the author. That is the decision-versus-execution split git already models, so a forge committer is accepted on any role rather than treated as drift.",
+    "unset_identities": [
+      "t@t.t",
+      "t@x",
+      "you@example.com",
+      "root@localhost"
+    ],
+    "unset_identity_note": "These are defaults nobody chose. They are refused by name rather than by heuristic, so the refusal cannot be argued with."
+  }
+}

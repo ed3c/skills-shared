@@ -29,6 +29,9 @@ on:
       - 'scripts/check_intent_bound_constraints.py'
       - 'scripts/check_intent_promotions.py'
       - 'migration/**'
+      - 'scripts/check_commit_roles.py'
+      - 'evals/commit-roles.json'
+      - 'tests/test_commit_roles.py'
       - 'scripts/check_controlled_language_contracts.py'
       - 'scripts/controlled_language/**'
       - 'skills/shared-skills-infra/scripts/check_dead_assertions.py'
@@ -105,6 +108,10 @@ jobs:
             --violation evals/fixtures/controlled-language/valid-violation.json \
             --receipt evals/fixtures/controlled-language/valid-receipt.json
           python3 -m unittest tests/test_controlled_language_contracts.py -v
+      - name: Classify commit drivers since the enforced start point
+        run: |
+          python3 scripts/check_commit_roles.py --repo-root .
+          python3 -m unittest tests/test_commit_roles.py -v
       - name: Run migration tooling selftests
         shell: bash
         run: |
