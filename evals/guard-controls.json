@@ -153,6 +153,36 @@
         "--selftest"
       ],
       "note": "The observed ref must agree with the pull request head, or the observation describes a different branch state than the one being published."
+    },
+    {
+      "id": "eval-plane-claim-attached",
+      "file": "scripts/check_skill_eval_plane.py",
+      "anchor": "    if checker.name in body or checker.stem in body:",
+      "verify": [
+        "python3",
+        "scripts/skill_eval_plane_selftest.py"
+      ],
+      "note": "#16: without this an eval can claim a checker the test never runs, and a claim plane that covers nothing looks the same as one that covers everything."
+    },
+    {
+      "id": "eval-plane-fixture-not-polymorphic",
+      "file": "scripts/check_skill_eval_plane.py",
+      "anchor": "        if prose_field in case:",
+      "verify": [
+        "python3",
+        "scripts/skill_eval_plane_selftest.py"
+      ],
+      "note": "#16: a fixture field carrying both a path and prose makes a mistyped path indistinguishable from a description."
+    },
+    {
+      "id": "eval-plane-nonempty-runnable",
+      "file": "scripts/check_skill_eval_plane.py",
+      "anchor": "    if not isinstance(runnable, list) or not runnable:",
+      "verify": [
+        "python3",
+        "scripts/skill_eval_plane_selftest.py"
+      ],
+      "note": "#16 n13: an empty runnable array declares no coverage, which must not read as complete coverage."
     }
   ]
 }

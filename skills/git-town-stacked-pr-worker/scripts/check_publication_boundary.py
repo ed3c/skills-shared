@@ -302,10 +302,15 @@ def check_evals_json(root: Path) -> None:
     }
     # Per-eval field sets, so a new optional field cannot be introduced on an
     # eval that was never admitted to carry it.
+    # A null fixture carries its description in a field of its own, so the exact
+    # set differs per eval by which side is a path and which is prose. Still an
+    # exact set: a union across all three would let a prose field appear on an
+    # eval whose fixture is a real path, which is the polymorphism the plane gate
+    # removed.
     allowed_by_id = {
-        "GTSP-PUBLISH-1": base_required,
-        "GTSP-STACK-1": base_required | {"intent_contract"},
-        "GTSP-PROFILE-1": base_required,
+        "GTSP-PUBLISH-1": base_required | {"good_evidence", "hollow_mutations"},
+        "GTSP-STACK-1": base_required | {"intent_contract", "hollow_mutations"},
+        "GTSP-PROFILE-1": base_required | {"good_evidence", "hollow_mutations"},
     }
     if [item.get("id") if isinstance(item, dict) else None for item in runnable] != [
         "GTSP-PUBLISH-1",

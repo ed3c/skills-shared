@@ -57,8 +57,10 @@
       "id": "GL-DELIVERY-4",
       "checker_script": "scripts/gitlab_sync.py",
       "test_verify": "tests/sync-replay/verify.sh",
-      "good_fixture": "tests/sync-replay/fixtures/snapshot.json against a scratch git export",
-      "hollow_fixture": "same snapshot with a mismatched export tree and an unknown remote head",
+      "good_fixture": null,
+      "good_evidence": "tests/sync-replay/fixtures/snapshot.json against a scratch git export",
+      "hollow_fixture": null,
+      "hollow_mutations": "same snapshot with a mismatched export tree and an unknown remote head",
       "covers": [
         "metrics derive from label/state events, not restated registry values",
         "Closes #N accepts a slice; Part of #N starts one without accepting it",
