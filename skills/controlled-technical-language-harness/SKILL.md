@@ -112,12 +112,44 @@ absent lanes. Validate with:
 python3 scripts/check_controlled_language_contracts.py receipt <receipt.json>
 ```
 
+## Evaluator lanes
+
+Two lanes, and the difference between them is not how reliable they are.
+
+```text
+DETERMINISTIC          the result follows from written rules and the exact
+                       input, with no inference
+                       scripts/lint_deterministic.py
+
+CALIBRATED_HEURISTIC   the result is a guess, however consistent
+                       scripts/check_heuristic_calibration.py
+```
+
+A pinned parser is perfectly repeatable and still guesses. Repeatability is not
+correctness — a model that is wrong the same way every time is exactly as
+wrong — so a pinned implementation does not promote its output into the
+deterministic lane.
+
+A heuristic is admitted only with a pinned implementation identity and digest,
+the corpus it was measured against, **both** error rates, and a ceiling it may
+not exceed. Even fully admitted:
+
+```text
+a heuristic cannot produce a final PASS on its own
+a heuristic cannot overturn a deterministic failure
+an evaluator that errored is not an evaluator that passed
+```
+
 ## Evidence boundary
 
 ```text
-deterministic rule evaluation        IMPLEMENTED
+deterministic word budgets           IMPLEMENTED
+deterministic forbidden tokens       IMPLEMENTED
+exact source-span digests            IMPLEMENTED
 typed contracts and receipts         IMPLEMENTED
 profile source-identity discipline   IMPLEMENTED
+heuristic admission and composition  IMPLEMENTED
+mood, voice, noun-cluster detection  NOT_IMPLEMENTED — heuristic lane, uncalibrated
 official ASD-STE100 rule set         NOT_EXERCISED — see modules/profile-ste.md
 semantic rewrite quality             NOT_IMPLEMENTED as a deterministic check
 compliance / certification claim     HUMAN_ADMIT_REQUIRED

@@ -18,7 +18,7 @@
     "approval_receipt_ref": null,
     "approval_receipt_digest": null
   },
-  "ruleset_digest": "sha256:b1f2b7e22293c241e2c429876808d9ec942f6a60cc2719826af568095161db89",
+  "ruleset_digest": "sha256:69aecdf43eacd3b4429d63d4ebff42e4cf3be445313717b3ab98bbe964cba0ef",
   "approved_vocabulary_ref": null,
   "technical_terminology_policy": {
     "project_termbase_required": true,

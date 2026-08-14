@@ -13,7 +13,9 @@ checker proved separate from what a model suggested.
 | Contract foundation and its source proposal | [`../../docs/architecture/CONTROLLED_TECHNICAL_LANGUAGE_HARNESS.md`](../../docs/architecture/CONTROLLED_TECHNICAL_LANGUAGE_HARNESS.md) |
 | Profile admission rules | [`references/PROFILE_ADMISSION.md`](references/PROFILE_ADMISSION.md) |
 | The Simplified Technical English profile | [`modules/profile-ste.md`](modules/profile-ste.md) |
-| Executable admission controls | [`scripts/check_profile_admission.py`](scripts/check_profile_admission.py) |
+| Profile admission controls | [`scripts/check_profile_admission.py`](scripts/check_profile_admission.py) |
+| Deterministic evaluators | [`scripts/lint_deterministic.py`](scripts/lint_deterministic.py) |
+| Calibrated-heuristic admission | [`scripts/check_heuristic_calibration.py`](scripts/check_heuristic_calibration.py) |
 | Controls and expected outcomes | [`evals.json`](evals.json), [`tests/`](tests/) |
 
 ## What is implemented
@@ -21,11 +23,19 @@ checker proved separate from what a model suggested.
 ```text
 profile admission controls        IMPLEMENTED
 typed contracts and receipts      IMPLEMENTED (landed with the foundation)
-deterministic rule evaluation     NOT_IMPLEMENTED — owned by CTL 03
+deterministic word budgets        IMPLEMENTED
+deterministic forbidden tokens    IMPLEMENTED
+heuristic admission boundary      IMPLEMENTED
+heuristic implementations         NOT_IMPLEMENTED — mood, voice, noun clusters
 official ASD-STE100 rule set      NOT_EXERCISED — the specification is not held here
 semantic rewrite quality          NOT_IMPLEMENTED as a deterministic check
 compliance / certification        HUMAN_ADMIT_REQUIRED
 ```
+
+The two evaluator lanes are separated by what kind of claim they make, not by
+how reliable they are. A pinned parser is repeatable and still guesses, so it
+stays in the heuristic lane — where it cannot conclude a run or overturn a
+deterministic failure however good its numbers are.
 
 The shipped profile is proposal-derived and says so. It approximates Simplified
 Technical English; it is not ASD-STE100, and the admission controls refuse any
