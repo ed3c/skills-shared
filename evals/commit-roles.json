@@ -56,13 +56,18 @@
       "noreply@gitlab.com",
       "noreply@forgejo.org"
     ],
-    "forge_committer_note": "A squash merge rewrites the committer to the forge while preserving the author. That is the decision-versus-execution split git already models, so a forge committer is accepted on any role rather than treated as drift.",
+    "forge_committer_note": "A forge-created commit carries its own driver in its committer address: a squash merge is performed by the forge, not by whoever wrote the branch. Such a commit is classified as the matching forge-* role and is not required to carry trailers, because the forge will never write them. Requiring them would make every merge a violation and the gate would be turned off within a day.",
     "unset_identities": [
       "t@t.t",
       "t@x",
       "you@example.com",
       "root@localhost"
     ],
-    "unset_identity_note": "These are defaults nobody chose. They are refused by name rather than by heuristic, so the refusal cannot be argued with."
+    "unset_identity_note": "These are defaults nobody chose. They are refused by name rather than by heuristic, so the refusal cannot be argued with.",
+    "forge_committer_roles": {
+      "noreply@github.com": "forge-github",
+      "noreply@gitlab.com": "forge-gitlab",
+      "noreply@forgejo.org": "forge-forgejo"
+    }
   }
 }

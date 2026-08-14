@@ -115,6 +115,20 @@ def check_commit(record: dict[str, str], vocabulary: dict[str, Any]) -> list[str
                 f"nothing recorded who drove this commit"
             )
 
+    # A forge-created commit carries its driver in its committer address. A
+    # squash merge is performed by the forge, not by whoever wrote the branch,
+    # and the forge will never add a trailer. Requiring one would make every
+    # merge a violation, and a gate that fails on every merge gets switched off.
+    forge_roles = {k.lower(): v for k, v in rules.get("forge_committer_roles", {}).items()}
+    forge_role = forge_roles.get(record["committer_email"].lower())
+    if forge_role is not None and record["author_email"] != record["committer_email"]:
+        if forge_role not in vocabulary["driven_by"]:
+            problems.append(
+                f"{short}: committer {record['committer_email']!r} maps to role "
+                f"{forge_role!r}, which is not in the vocabulary"
+            )
+        return problems
+
     by = found.get("Driven-By") or []
     on = found.get("Driven-On") or []
 

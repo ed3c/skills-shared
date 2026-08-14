@@ -19,6 +19,8 @@ checker proved separate from what a model suggested.
 | Source-node preservation | [`scripts/check_document_preservation.py`](scripts/check_document_preservation.py) |
 | Privacy class to lane routing | [`scripts/check_privacy_routing.py`](scripts/check_privacy_routing.py) |
 | Integrated A/B experiment gate | [`scripts/score_ab.py`](scripts/score_ab.py) |
+| Authority-bound A/B composition | [`scripts/score_ab_authority.py`](scripts/score_ab_authority.py) |
+| Why the composition exists | [`references/A_B_AUTHORITY.md`](references/A_B_AUTHORITY.md) |
 | Structured XML formats | [`modules/format-structured-xml.md`](modules/format-structured-xml.md) |
 | Plain and extracted text | [`modules/format-extracted-text.md`](modules/format-extracted-text.md) |
 | Privacy routing | [`modules/privacy-routing.md`](modules/privacy-routing.md) |
