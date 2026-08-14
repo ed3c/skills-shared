@@ -25,6 +25,8 @@ on:
       - 'scripts/verify_collected_runtime.py'
       - 'scripts/build_verified_run.py'
       - 'scripts/check_intent_bound_constraints.py'
+      - 'scripts/check_controlled_language_contracts.py'
+      - 'scripts/controlled_language/**'
       - 'skills/shared-skills-infra/scripts/check_dead_assertions.py'
       - 'skills/shared-skills-infra/tests/**'
       - 'tests/test_skill_eval_gate.py'
@@ -46,6 +48,7 @@ on:
       - 'tests/test_dead_assertions.py'
       - 'tests/test_dead_assertion_mutations.py'
       - 'tests/test_intent_bound_constraints.py'
+      - 'tests/test_controlled_language_contracts.py'
       - '.github/workflows/skill-eval-contract.yml'
   push:
     branches: [main]
@@ -85,6 +88,18 @@ jobs:
           python3 scripts/check_intent_bound_constraints.py contract evals/fixtures/intent-bound-constraint/valid-contract.json
           python3 scripts/check_intent_bound_constraints.py receipt evals/fixtures/intent-bound-constraint/valid-receipt.json --contract evals/fixtures/intent-bound-constraint/valid-contract.json
           python3 -m unittest tests/test_intent_bound_constraints.py -v
+      - name: Validate controlled-language contract foundation
+        run: |
+          python3 scripts/check_intent_bound_constraints.py contract evals/fixtures/controlled-language/intent-contract.json
+          python3 scripts/check_controlled_language_contracts.py bundle \
+            --request evals/fixtures/controlled-language/valid-request.json \
+            --standard-pack evals/fixtures/controlled-language/valid-standard-pack.json \
+            --termbase \
+              evals/fixtures/controlled-language/valid-termbase-tn.json \
+              evals/fixtures/controlled-language/valid-termbase-tv.json \
+            --violation evals/fixtures/controlled-language/valid-violation.json \
+            --receipt evals/fixtures/controlled-language/valid-receipt.json
+          python3 -m unittest tests/test_controlled_language_contracts.py -v
       - name: Calibrate deterministic gold-replay verifiers
         run: |
           python3 scripts/check_verifier_calibrations.py
@@ -124,7 +139,7 @@ jobs:
           python3 -m unittest tests/test_build_verified_run.py -v
       - name: Compile runtime and adapter scripts
         run: python3 -m compileall -q scripts evals/adapters evals/verifiers tests skills/shared-skills-infra/scripts
-      - name: Validate authority, executor, eval, mutation, release, scorecard, and intent JSON contracts
+      - name: Validate authority, executor, eval, mutation, release, scorecard, intent, and controlled-language JSON contracts
         run: |
           python3 -m json.tool evals/runtime/executors/arena.json >/dev/null
           python3 -m json.tool evals/runtime/executors/skill-up.json >/dev/null
@@ -134,8 +149,20 @@ jobs:
           python3 -m json.tool evals/schema/run-trace.schema.json >/dev/null
           python3 -m json.tool evals/schema/intent-bound-constraint.schema.json >/dev/null
           python3 -m json.tool evals/schema/diagnostic-reflection-receipt.schema.json >/dev/null
+          python3 -m json.tool evals/schema/controlled-language-request.schema.json >/dev/null
+          python3 -m json.tool evals/schema/controlled-language-violation.schema.json >/dev/null
+          python3 -m json.tool evals/schema/controlled-language-receipt.schema.json >/dev/null
+          python3 -m json.tool evals/schema/standard-pack-reference.schema.json >/dev/null
+          python3 -m json.tool evals/schema/termbase-entry.schema.json >/dev/null
           python3 -m json.tool evals/fixtures/intent-bound-constraint/valid-contract.json >/dev/null
           python3 -m json.tool evals/fixtures/intent-bound-constraint/valid-receipt.json >/dev/null
+          python3 -m json.tool evals/fixtures/controlled-language/intent-contract.json >/dev/null
+          python3 -m json.tool evals/fixtures/controlled-language/valid-request.json >/dev/null
+          python3 -m json.tool evals/fixtures/controlled-language/valid-standard-pack.json >/dev/null
+          python3 -m json.tool evals/fixtures/controlled-language/valid-termbase-tn.json >/dev/null
+          python3 -m json.tool evals/fixtures/controlled-language/valid-termbase-tv.json >/dev/null
+          python3 -m json.tool evals/fixtures/controlled-language/valid-violation.json >/dev/null
+          python3 -m json.tool evals/fixtures/controlled-language/valid-receipt.json >/dev/null
           python3 -m json.tool mutations/promotions.json >/dev/null
           python3 -m json.tool mutations/schema/mutation-eval.schema.json >/dev/null
           python3 -m json.tool mutations/schema/mutation-lineage.schema.json >/dev/null

@@ -1,0 +1,29 @@
+{
+  "schema_version": "controlled-language-termbase-entry/v1",
+  "term_id": "TERM-BLEED-VALVE",
+  "project_scope": "fixture-aircraft-maintenance",
+  "term": "bleed valve",
+  "term_type": "TECHNICAL_NAME",
+  "allowed_parts_of_speech": [
+    "NOUN"
+  ],
+  "definition": "A fixture valve name used to release pressure in the example procedure.",
+  "source_refs": [
+    {
+      "artifact_digest": "sha256:d919a887f9bc8acda76ad6350276059e4c4f71a739f048a47626c686d7175578",
+      "locator": "source-proposal:example-procedure",
+      "evidence_class": "HUMAN"
+    }
+  ],
+  "decision_state": "ADMITTED",
+  "approved_for_use": true,
+  "append_only": true,
+  "replacement_assessment": "NOT_APPLICABLE",
+  "human_review": {
+    "state": "ADMITTED",
+    "approval_receipt_ref": "fixture://human-admit/TERM-BLEED-VALVE",
+    "approval_receipt_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "supersedes": [],
+  "superseded_by": null
+}

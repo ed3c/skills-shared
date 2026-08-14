@@ -1,0 +1,279 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ed3c/skills-shared/evals/schema/controlled-language-request.schema.json",
+  "title": "Controlled Language Request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "request_id",
+    "subject_identity",
+    "input",
+    "document_class",
+    "operation",
+    "profile_reference",
+    "termbase_references",
+    "privacy",
+    "requested_evidence_classes",
+    "repair_policy",
+    "completion_policy"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "controlled-language-request/v1"
+    },
+    "request_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"
+    },
+    "subject_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifact_digest",
+        "locator"
+      ],
+      "properties": {
+        "artifact_digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "locator": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "input": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "text",
+            "content_digest"
+          ],
+          "properties": {
+            "mode": {
+              "const": "INLINE"
+            },
+            "text": {
+              "type": "string",
+              "minLength": 1
+            },
+            "content_digest": {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "source_ref",
+            "content_digest"
+          ],
+          "properties": {
+            "mode": {
+              "const": "SOURCE_REF"
+            },
+            "source_ref": {
+              "type": "string",
+              "minLength": 1
+            },
+            "content_digest": {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            }
+          }
+        }
+      ]
+    },
+    "document_class": {
+      "enum": [
+        "PROCEDURAL",
+        "DESCRIPTIVE",
+        "WARNING",
+        "CAUTION",
+        "AGENT_PLAN",
+        "S1000D_XML",
+        "DITA_XML"
+      ]
+    },
+    "operation": {
+      "enum": [
+        "AUDIT",
+        "REWRITE_CANDIDATE",
+        "AUDIT_AND_REWRITE"
+      ]
+    },
+    "profile_reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "pack_id",
+        "edition",
+        "artifact_digest"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pack_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "edition": {
+          "type": "string",
+          "minLength": 1
+        },
+        "artifact_digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        }
+      }
+    },
+    "termbase_references": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "term_id",
+          "artifact_digest"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "term_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "artifact_digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          }
+        }
+      }
+    },
+    "privacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "classification",
+        "execution_lane",
+        "allow_network",
+        "human_external_processing_approval"
+      ],
+      "properties": {
+        "classification": {
+          "enum": [
+            "PUBLIC",
+            "INTERNAL",
+            "CONFIDENTIAL",
+            "RESTRICTED"
+          ]
+        },
+        "execution_lane": {
+          "enum": [
+            "LOCAL_ONLY",
+            "PRIVATE_ENDPOINT",
+            "EXTERNAL_APPROVED"
+          ]
+        },
+        "allow_network": {
+          "type": "boolean"
+        },
+        "human_external_processing_approval": {
+          "enum": [
+            "NOT_REQUIRED",
+            "REQUIRED",
+            "ADMITTED"
+          ]
+        }
+      }
+    },
+    "requested_evidence_classes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "DETERMINISTIC",
+          "CALIBRATED_HEURISTIC",
+          "SEMANTIC",
+          "HUMAN"
+        ]
+      }
+    },
+    "repair_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "max_attempts",
+        "allowed_repair_codes",
+        "no_improvement_action"
+      ],
+      "properties": {
+        "max_attempts": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "allowed_repair_codes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "SPLIT_ACTION",
+              "REPLACE_UNAPPROVED_WORD",
+              "CLARIFY_REFERENCE",
+              "REWRITE_NOUN_CLUSTER",
+              "PRESERVE_WARNING_ORDER"
+            ]
+          }
+        },
+        "no_improvement_action": {
+          "const": "STOP"
+        }
+      }
+    },
+    "completion_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "deterministic_failure_vetoes_advisory",
+        "stale_evidence_blocks",
+        "safety_text_requires_human_review",
+        "official_compliance_requires_human_admit",
+        "private_chain_of_thought"
+      ],
+      "properties": {
+        "deterministic_failure_vetoes_advisory": {
+          "const": true
+        },
+        "stale_evidence_blocks": {
+          "const": true
+        },
+        "safety_text_requires_human_review": {
+          "const": true
+        },
+        "official_compliance_requires_human_admit": {
+          "const": true
+        },
+        "private_chain_of_thought": {
+          "const": "FORBIDDEN"
+        }
+      }
+    }
+  }
+}
