@@ -259,6 +259,39 @@
         "--selftest"
       ],
       "note": "#49: a FAIL receipt must not be consumed as PASS. This check ran and could not fail until the control existed."
+    },
+    {
+      "id": "publication-profile-check-identity",
+      "file": "scripts/check_ci_publication_profile.py",
+      "anchor": "    if not re.search(rf\"^  {re.escape(check_name)}:\\s*$\", text, re.MULTILINE):",
+      "verify": [
+        "python3",
+        "scripts/check_ci_publication_profile.py",
+        "--selftest"
+      ],
+      "note": "#54: a stable check name is stable only if a job answers to it. A name resolving to nothing produces no check run, and an absent check run reads as an absent blocker."
+    },
+    {
+      "id": "publication-profile-billing-stop",
+      "file": "scripts/check_ci_publication_profile.py",
+      "anchor": "    if billing[\"on_blocked\"] not in BILLING_ACTIONS:",
+      "verify": [
+        "python3",
+        "scripts/check_ci_publication_profile.py",
+        "--selftest"
+      ],
+      "note": "#54: rerunning or continuing while the billing circuit is open pays for no observation."
+    },
+    {
+      "id": "publication-profile-no-live-evidence",
+      "file": "scripts/check_ci_publication_profile.py",
+      "anchor": "            if f'\"{schema}\"' in text:",
+      "verify": [
+        "python3",
+        "scripts/check_ci_publication_profile.py",
+        "--selftest"
+      ],
+      "note": "#54: a committed receipt or snapshot describes a commit that is no longer HEAD, and a stale receipt that looks current is worse than none."
     }
   ]
 }

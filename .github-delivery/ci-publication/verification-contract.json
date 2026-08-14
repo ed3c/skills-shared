@@ -1,0 +1,42 @@
+{
+  "schema": "github-delivery-local-verification-contract/v1",
+  "repository_id": 1326262274,
+  "inherit_env": [
+    "HOME",
+    "LANG",
+    "PATH",
+    "TMPDIR"
+  ],
+  "commands": [
+    {
+      "id": "local-verification",
+      "argv": [
+        "bash",
+        "scripts/local_verification.sh"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 1800,
+      "max_output_bytes": 4194304
+    },
+    {
+      "id": "delivery-loop-suite",
+      "argv": [
+        "bash",
+        "skills/github-delivery-loop/tests/run-all.sh"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 900,
+      "max_output_bytes": 2097152
+    },
+    {
+      "id": "registry-and-eval-json",
+      "argv": [
+        "python3",
+        "scripts/check_skill_eval_plane.py"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 120,
+      "max_output_bytes": 262144
+    }
+  ]
+}
