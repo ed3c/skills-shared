@@ -25,6 +25,7 @@ on:
       - 'scripts/verify_collected_runtime.py'
       - 'scripts/build_verified_run.py'
       - 'scripts/check_intent_bound_constraints.py'
+      - 'scripts/check_intent_promotions.py'
       - 'scripts/check_controlled_language_contracts.py'
       - 'scripts/controlled_language/**'
       - 'skills/shared-skills-infra/scripts/check_dead_assertions.py'
@@ -48,6 +49,7 @@ on:
       - 'tests/test_dead_assertions.py'
       - 'tests/test_dead_assertion_mutations.py'
       - 'tests/test_intent_bound_constraints.py'
+      - 'tests/test_intent_promotions.py'
       - 'tests/test_controlled_language_contracts.py'
       - '.github/workflows/skill-eval-contract.yml'
   push:
@@ -100,6 +102,13 @@ jobs:
             --violation evals/fixtures/controlled-language/valid-violation.json \
             --receipt evals/fixtures/controlled-language/valid-receipt.json
           python3 -m unittest tests/test_controlled_language_contracts.py -v
+      - name: Validate intent-promotion lifecycle and writeback gate
+        run: |
+          python3 scripts/check_intent_promotions.py contract evals/fixtures/intent-promotion/valid-contract.json
+          python3 scripts/check_intent_promotions.py receipt evals/fixtures/intent-promotion/valid-receipt.json --contract evals/fixtures/intent-promotion/valid-contract.json
+          python3 scripts/check_intent_promotions.py receipt evals/fixtures/intent-promotion/canonical-receipt.json --contract evals/fixtures/intent-promotion/valid-contract.json
+          python3 scripts/check_intent_promotions.py selftest
+          python3 -m unittest tests/test_intent_promotions.py -v
       - name: Calibrate deterministic gold-replay verifiers
         run: |
           python3 scripts/check_verifier_calibrations.py
@@ -148,6 +157,11 @@ jobs:
           python3 -m json.tool evals/schema/evidence-bundle.schema.json >/dev/null
           python3 -m json.tool evals/schema/run-trace.schema.json >/dev/null
           python3 -m json.tool evals/schema/intent-bound-constraint.schema.json >/dev/null
+          python3 -m json.tool evals/schema/intent-promotion-contract.schema.json >/dev/null
+          python3 -m json.tool evals/schema/intent-promotion-receipt.schema.json >/dev/null
+          python3 -m json.tool evals/fixtures/intent-promotion/valid-contract.json >/dev/null
+          python3 -m json.tool evals/fixtures/intent-promotion/valid-receipt.json >/dev/null
+          python3 -m json.tool evals/fixtures/intent-promotion/canonical-receipt.json >/dev/null
           python3 -m json.tool evals/schema/diagnostic-reflection-receipt.schema.json >/dev/null
           python3 -m json.tool evals/schema/controlled-language-request.schema.json >/dev/null
           python3 -m json.tool evals/schema/controlled-language-violation.schema.json >/dev/null

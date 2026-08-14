@@ -1,0 +1,43 @@
+{
+  "approval": {
+    "approval_receipt_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+    "approval_subject_commit_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "approver_identity": "ed3c",
+    "approver_kind": "HUMAN"
+  },
+  "caller_flags": [],
+  "contract_digest": "sha256:ac39274948265e53382f943115b71a36ad878f445178df9440015314c0af428a",
+  "contract_id": "skills-shared-intent-promotion",
+  "evaluator_receipts": [
+    {
+      "evaluator_id": "skill-eval-contract",
+      "output_digest": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "status": "PASS",
+      "subject_commit_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    }
+  ],
+  "from_state": "ADMITTED",
+  "intent_id": "MI-CTL-EVIDENCE",
+  "merge_subject": {
+    "admitted_by": "ed3c",
+    "merge_commit_sha": "ffffffffffffffffffffffffffffffffffffffff"
+  },
+  "receipt_id": "IPR-FIXTURE-CANONICAL",
+  "schema_version": "intent-promotion-receipt/v1",
+  "subject": {
+    "branch": "ctl/04-intent-promotion",
+    "commit_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "pull_request": 120,
+    "repository": "ed3c/skills-shared",
+    "tree_sha": "cccccccccccccccccccccccccccccccccccccccc"
+  },
+  "supersedes": null,
+  "to_state": "CANONICAL",
+  "writebacks": [
+    {
+      "destination_id": "root-context",
+      "mode": "APPEND",
+      "scope": "ROOT_GLOBAL"
+    }
+  ]
+}

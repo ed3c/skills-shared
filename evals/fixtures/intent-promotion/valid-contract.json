@@ -1,0 +1,118 @@
+{
+  "approval_policy": {
+    "agent_may_create_approval": false,
+    "caller_flag_may_grant": false,
+    "caller_flag_may_request": true,
+    "required_approver_identity": "HUMAN_IDENTITY_REQUIRED"
+  },
+  "contract_id": "skills-shared-intent-promotion",
+  "contract_version": "1.0.0",
+  "lifecycle": {
+    "non_authoritative_states": [
+      "HYPOTHESIS",
+      "CANDIDATE"
+    ],
+    "states": [
+      "HYPOTHESIS",
+      "CANDIDATE",
+      "PROPOSED",
+      "VERIFIED",
+      "ADMITTED",
+      "CANONICAL",
+      "SUPERSEDED",
+      "REVOKED"
+    ],
+    "terminal_states": [
+      "SUPERSEDED",
+      "REVOKED"
+    ],
+    "transitions": [
+      {
+        "from": "HYPOTHESIS",
+        "requires": [],
+        "to": "CANDIDATE"
+      },
+      {
+        "from": "CANDIDATE",
+        "requires": [
+          "EXACT_SUBJECT"
+        ],
+        "to": "PROPOSED"
+      },
+      {
+        "from": "PROPOSED",
+        "requires": [
+          "EXACT_SUBJECT",
+          "OWNING_EVALUATOR_RECEIPT"
+        ],
+        "to": "VERIFIED"
+      },
+      {
+        "from": "VERIFIED",
+        "requires": [
+          "EXACT_SUBJECT",
+          "OWNING_EVALUATOR_RECEIPT",
+          "ADMITTED_MERGE_SUBJECT"
+        ],
+        "to": "ADMITTED"
+      },
+      {
+        "from": "ADMITTED",
+        "requires": [
+          "EXACT_SUBJECT",
+          "ADMITTED_MERGE_SUBJECT",
+          "HUMAN_APPROVAL"
+        ],
+        "to": "CANONICAL"
+      },
+      {
+        "from": "CANONICAL",
+        "requires": [
+          "SUPERSESSION_TARGET"
+        ],
+        "to": "SUPERSEDED"
+      },
+      {
+        "from": "CANONICAL",
+        "requires": [
+          "HUMAN_APPROVAL"
+        ],
+        "to": "REVOKED"
+      }
+    ]
+  },
+  "private_reasoning_persistence": "FORBIDDEN",
+  "schema_version": "intent-promotion-contract/v1",
+  "subject_identity": {
+    "commit_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "repository": "ed3c/skills-shared"
+  },
+  "supersession_policy": {
+    "replacement_requires_supersedes": true,
+    "revoked_projection_allowed": false
+  },
+  "writeback_policy": {
+    "append_only": true,
+    "declared_destinations": [
+      {
+        "destination_id": "module-notes",
+        "human_owned": false,
+        "minimum_state": "VERIFIED",
+        "scope": "MODULE"
+      },
+      {
+        "destination_id": "project-context",
+        "human_owned": false,
+        "minimum_state": "ADMITTED",
+        "scope": "PROJECT"
+      },
+      {
+        "destination_id": "root-context",
+        "human_owned": true,
+        "minimum_state": "CANONICAL",
+        "scope": "ROOT_GLOBAL"
+      }
+    ],
+    "similarity_overwrite_allowed": false
+  }
+}
