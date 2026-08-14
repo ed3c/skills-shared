@@ -187,6 +187,36 @@ class GateTests(unittest.TestCase):
             _, problems = self.run_gate(repo)
             self.assertTrue(any("one driver" in p for p in problems), problems)
 
+    def test_a_forge_created_commit_needs_no_trailer(self) -> None:
+        """A squash merge is performed by the forge, which never writes one.
+
+        Found the hard way: the gate's own first real run went red on the merge
+        commit of the PR that introduced it.
+        """
+        with tempfile.TemporaryDirectory() as raw:
+            repo = RepoFixture(Path(raw))
+            (repo.path / "m.txt").write_text("m\n")
+            git(repo.path, "add", "-A")
+            git(repo.path, "commit", "-qm", "Squashed a branch (#149)", env={
+                "GIT_AUTHOR_NAME": "ed3c", "GIT_AUTHOR_EMAIL": "ga874199@gmail.com",
+                "GIT_COMMITTER_NAME": "GitHub", "GIT_COMMITTER_EMAIL": "noreply@github.com",
+            })
+            _, problems = self.run_gate(repo)
+            self.assertEqual(problems, [])
+
+    def test_a_forge_committer_on_a_self_authored_commit_still_needs_trailers(self) -> None:
+        """The exemption is for forge-created commits, not for a forge address."""
+        with tempfile.TemporaryDirectory() as raw:
+            repo = RepoFixture(Path(raw))
+            (repo.path / "n.txt").write_text("n\n")
+            git(repo.path, "add", "-A")
+            git(repo.path, "commit", "-qm", "no trailers here", env={
+                "GIT_AUTHOR_NAME": "GitHub", "GIT_AUTHOR_EMAIL": "noreply@github.com",
+                "GIT_COMMITTER_NAME": "GitHub", "GIT_COMMITTER_EMAIL": "noreply@github.com",
+            })
+            _, problems = self.run_gate(repo)
+            self.assertTrue(any("no Driven-By" in p for p in problems), problems)
+
     def test_history_before_the_start_point_is_not_scanned(self) -> None:
         """The honest cost #19 records: old commits cannot be recovered."""
         with tempfile.TemporaryDirectory() as raw:
