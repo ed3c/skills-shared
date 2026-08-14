@@ -322,6 +322,14 @@ def selftest() -> None:
     refuse("tracked-generated-path",
            lambda root, p, c: p.__setitem__("generated_paths", ["evals/receipt.json"]),
            "neither under .git/ nor ignored")
+    # The offender second, behind a legitimate entry. With every fixture holding
+    # one path, "check each generated path" and "check the first one" are the
+    # same program -- the shape #16 reports as making a real guard
+    # unfalsifiable.
+    refuse("tracked-generated-path-behind-a-good-one",
+           lambda root, p, c: p.__setitem__(
+               "generated_paths", [".git/github-delivery/ok.json", "evals/receipt.json"]),
+           "neither under .git/ nor ignored")
     refuse("absent-contract",
            lambda root, p, c: p.__setitem__("verification_contract", "nowhere.json"),
            "verification contract is absent")
