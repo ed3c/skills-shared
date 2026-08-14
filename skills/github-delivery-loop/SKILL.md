@@ -44,8 +44,9 @@ canonical 住 `~/.claude/skills/github-delivery-loop/`；各 repo 的 `.claude/s
 3. 從任何 CWD 執行：
    `python3 ~/.claude/skills/github-delivery-loop/scripts/github_delivery.py check --registry <repo>/.github-delivery/registry.json`。
 4. 需要 GitHub 活狀態與速度快照時執行 `sync --github`，明確提供 line、metrics、dashboard、
-   40 字元 export source commit，以及 `public_export.py verify` 回報的 `tree_sha`；測試與重播
-   改用 `--snapshot <json>`，不得在測試中打網路。
+   40 字元 export source commit，以及該 commit 的 tree sha（artifact 就是 repo 本身時即
+   `git rev-parse <export-source-commit>^{tree}`）；測試與重播改用 `--snapshot <json>`，
+   不得在測試中打網路。
 5. 每張 issue 在隔離 worktree 走 TDD → review；**本地 commit 可以高頻，remote push 不可以**。
    private repo 先以 `scripts/ci_publish.py verify` 產生 exact-HEAD 收據，再由同一腳本的
    `publish` 子命令走唯一 GitHub 發佈路徑；PR body 使用 `Closes #N`。

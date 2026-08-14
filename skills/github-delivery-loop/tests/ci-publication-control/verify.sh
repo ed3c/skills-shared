@@ -6,7 +6,7 @@ skill_dir="$(realpath "${test_dir}/../..")"
 scratch="$(mktemp -d)"
 trap 'rm -rf "$scratch"' EXIT
 
-python3 -m unittest "$test_dir/test_control.py" -v
+python3 "$test_dir/test_control.py" -v
 
 mkdir -p "$scratch/repo/.github/workflows" "$scratch/repo/.github-delivery"
 git -C "$scratch/repo" init -q

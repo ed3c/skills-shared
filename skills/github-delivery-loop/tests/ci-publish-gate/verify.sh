@@ -25,6 +25,6 @@ if python3 "$gate" evaluate --snapshot "$test_dir/fixtures/block-billing.json" \
 fi
 grep -Fx 'BLOCK billing-circuit-open' "$scratch/billing.err"
 
-python3 -m unittest "$test_dir/test_gate.py" -v
+python3 "$test_dir/test_gate.py" -v
 
 echo 'PASS[ci-publish-gate]: positive path allowed; checkpoint and billing hollows blocked'
