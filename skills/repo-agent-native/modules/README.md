@@ -50,20 +50,38 @@ SECRET_OR_SESSION_EXPOSURE
 NO_FALLBACK
 ```
 
-## Current files and intended classification
+## Current files and classification
 
-| File | Current role | Migration decision |
+| File | Role | Phase 2 state |
 |---|---|---|
-| `extraction-methodology.md` | stable cross-domain method | candidate to move to `references/` in the portable-core child PR |
-| `codebase-mastery-methodology.md` | optional deep analysis mode | retain as an explicit domain/mode module with trigger |
-| `specs-as-code-prompt.md` | optional output/prompt instance | retain as an explicit module or template; do not preload |
-| `grepai.md` | planned provider module | child PR |
-| `serena.md` | planned provider module | child PR |
-| `code-graph-rag.md` | planned provider module | child PR |
-| `mem0.md` | planned provider module | child PR |
-| `bettor-arena.md` | planned consumer binding example | consumer-specific values remain in Bettor, not here |
+| `extraction-methodology.md` | stable cross-domain inference method | retained as an on-demand method module |
+| `codebase-mastery-methodology.md` | optional deep analysis mode | retained behind its explicit trigger |
+| `specs-as-code-prompt.md` | optional output template | retained on demand; grants no execution authority |
+| `grepai.md` | semantic candidate provider contract | implemented; read-only and source-readback gated |
+| `serena.md` | symbol/reference provider contract | implemented; provider health and readback gated |
+| `code-graph-rag.md` | graph candidate provider contract | implemented; experimental read-only lane |
+| `mem0.md` | episodic memory provider contract | implemented; optional projection, never source truth |
+| `canonical-terms.md` | refactor terminology preservation | audit-only |
+| `semantic-loss-ledger.md` | immutable baseline-to-current mapping | audit-only |
 
-No planned file is created empty in this contract PR.
+Consumer-specific paths, provider endpoints, namespaces, credentials, mutable health, and live receipts remain in the consumer repository. There is deliberately no consumer-named module here.
+
+Provider modules being present does not activate or install their providers. Their current evidence is structural/procedural only until provider-specific evals run.
+
+## Provider-module data flow
+
+```text
+core capability request
+→ module trigger match
+→ provider/project identity
+→ health/freshness/scope check
+→ bounded query
+→ candidate output
+→ current source read-back
+→ accept at admitted evidence level / downgrade / fallback
+```
+
+The fallback path must return to deterministic repository-owned mechanisms; provider absence cannot become PASS by itself.
 
 ## Decoupling laws
 
