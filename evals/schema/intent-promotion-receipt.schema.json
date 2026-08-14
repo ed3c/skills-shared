@@ -1,0 +1,139 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ed3c/skills-shared/evals/schema/intent-promotion-receipt.schema.json",
+  "title": "Intent Promotion Receipt",
+  "description": "Evidence for one lifecycle transition of one intent. Every field that could be inferred instead of observed is required here, so an absent arrival cannot read as a completed one.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "receipt_id",
+    "intent_id",
+    "contract_id",
+    "contract_digest",
+    "subject",
+    "from_state",
+    "to_state",
+    "evaluator_receipts",
+    "writebacks",
+    "approval",
+    "supersedes"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "intent-promotion-receipt/v1"
+    },
+    "receipt_id": {
+      "type": "string",
+      "pattern": "^IPR-[A-Z0-9][A-Z0-9-]{2,63}$"
+    },
+    "intent_id": {
+      "type": "string",
+      "pattern": "^MI-[A-Z0-9][A-Z0-9-]{2,127}$"
+    },
+    "contract_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "contract_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "commit_sha", "tree_sha", "branch", "pull_request"],
+      "properties": {
+        "repository": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9._-]+/[A-Za-z0-9._-]+$"
+        },
+        "commit_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "tree_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "branch": {"type": ["string", "null"]},
+        "pull_request": {"type": ["integer", "null"], "minimum": 1}
+      }
+    },
+    "from_state": {
+      "enum": ["HYPOTHESIS", "CANDIDATE", "PROPOSED", "VERIFIED", "ADMITTED", "CANONICAL"]
+    },
+    "to_state": {
+      "enum": ["CANDIDATE", "PROPOSED", "VERIFIED", "ADMITTED", "CANONICAL", "SUPERSEDED", "REVOKED"]
+    },
+    "evaluator_receipts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["evaluator_id", "subject_commit_sha", "status", "output_digest"],
+        "properties": {
+          "evaluator_id": {"type": "string", "minLength": 1},
+          "subject_commit_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+          "status": {"enum": ["PASS", "FAIL", "ERROR", "SKIPPED", "ABSENT"]},
+          "output_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+        }
+      }
+    },
+    "merge_subject": {
+      "anyOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["merge_commit_sha", "admitted_by"],
+          "properties": {
+            "merge_commit_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+            "admitted_by": {"type": "string", "minLength": 1}
+          }
+        }
+      ]
+    },
+    "writebacks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["destination_id", "scope", "mode"],
+        "properties": {
+          "destination_id": {"type": "string", "minLength": 1},
+          "scope": {"enum": ["MODULE", "PROJECT", "ROOT_GLOBAL"]},
+          "mode": {"enum": ["APPEND", "SUPERSEDE"]}
+        }
+      }
+    },
+    "approval": {
+      "anyOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["approver_identity", "approver_kind", "approval_subject_commit_sha", "approval_receipt_digest"],
+          "properties": {
+            "approver_identity": {"type": "string", "minLength": 1},
+            "approver_kind": {"enum": ["HUMAN", "AGENT", "AUTOMATION"]},
+            "approval_subject_commit_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+            "approval_receipt_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+          }
+        }
+      ]
+    },
+    "supersedes": {
+      "anyOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["receipt_id", "receipt_digest"],
+          "properties": {
+            "receipt_id": {"type": "string", "pattern": "^IPR-[A-Z0-9][A-Z0-9-]{2,63}$"},
+            "receipt_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+          }
+        }
+      ]
+    },
+    "caller_flags": {
+      "type": "array",
+      "items": {"type": "string"}
+    }
+  }
+}
