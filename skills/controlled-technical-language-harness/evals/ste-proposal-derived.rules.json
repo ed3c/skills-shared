@@ -47,6 +47,7 @@
       "implemented_by": null
     }
   ],
-  "implementation_state": "DECLARED_NOT_IMPLEMENTED",
-  "implementation_owner": "CTL 03 deterministic linter"
+  "implementation_state": "PARTIALLY_IMPLEMENTED",
+  "implementation_owner": "CTL 03 deterministic linter",
+  "implementation_notes": "STE-P-02 and STE-P-03 word budgets are implemented deterministically in scripts/lint_deterministic.py. STE-P-04 and STE-P-07 are heuristic and remain unimplemented; they may only be admitted through scripts/check_heuristic_calibration.py, which forbids a heuristic from concluding a run. STE-P-01, STE-P-05 and STE-P-06 need a bound termbase and document class that the request contract supplies at runtime."
 }

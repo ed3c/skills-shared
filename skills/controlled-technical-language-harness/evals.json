@@ -1,8 +1,8 @@
 {
   "skill_name": "controlled-technical-language-harness",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "_meta": {
-    "coverage_metric": "profile source-identity honesty, edition immutability, Human-owned terminology and compliance boundaries, ruleset binding, profile optionality, and uncommitted official bytes",
+    "coverage_metric": "profile source-identity honesty, edition immutability, Human-owned terminology and compliance boundaries, ruleset binding, profile optionality, and uncommitted official bytes; deterministic tokenization and word budgets; calibrated-heuristic admission and composition",
     "purpose": "Prove that a proposal-derived controlled-language profile cannot present itself as an official standard edition, cannot bind a ruleset it does not have, cannot become a mandatory core dependency, and cannot relax the deterministic, privacy, or Human Admit boundaries."
   },
   "runnable": [
@@ -23,13 +23,47 @@
         "no standard or vocabulary artifact is committed without an admitted grant"
       ],
       "expected": "canonical pack admitted; each of the 15 planted mutations refused with a distinct reason"
+    },
+    {
+      "id": "CTL-DETERMINISTIC-1",
+      "checker_script": "scripts/lint_deterministic.py",
+      "test_verify": "tests/deterministic-linter/verify.sh",
+      "good_fixture": "inline sentences exercising each stated tokenization rule",
+      "hollow_fixture": "mutations that split hyphenated compounds, count punctuation as words, digest a re-rendering instead of the exact substring, stop collapsing admitted multiword terms, or end a sentence on an abbreviation",
+      "covers": [
+        "a hyphenated compound, a quoted span, and an admitted multiword term each count as one word",
+        "punctuation-only tokens are not words and internal punctuation is kept",
+        "an abbreviation's period does not end a sentence",
+        "a source span digest binds the exact substring of the exact subject",
+        "an over-budget sentence is an ERROR and an in-budget one is silent",
+        "the CLI exits 2 on an over-budget document and 64 on an absent subject, so a checker error is not read as a document failure"
+      ],
+      "expected": "selftest green; each planted tokenization or span defect turns it red"
+    },
+    {
+      "id": "CTL-HEURISTIC-1",
+      "checker_script": "scripts/check_heuristic_calibration.py",
+      "test_verify": "tests/heuristic-boundary/verify.sh",
+      "good_fixture": "a calibration receipt with a pinned implementation, a measured corpus, both error rates, and a ceiling",
+      "hollow_fixture": "mutations making the implementation version mutable, emptying the corpus, exercising zero cases, omitting one error direction, exceeding the ceiling, self-admitting the threshold, or letting a heuristic conclude or override",
+      "covers": [
+        "a heuristic needs a pinned implementation identity and digest, not a mutable version",
+        "an empty corpus or zero exercised cases is an absent measurement, not a calibrated one",
+        "both false-positive and false-negative rates are required",
+        "measured error may not exceed the declared ceiling and the threshold is Human-admitted",
+        "a heuristic cannot produce a final PASS on its own",
+        "a heuristic PASS cannot hide a deterministic FAIL, and an errored evaluator is not a passing one"
+      ],
+      "expected": "selftest green; all 14 planted admission and composition defects refused"
     }
   ],
   "evidence_boundary": {
     "profile_admission_controls": "IMPLEMENTED",
-    "deterministic_rule_evaluation": "NOT_IMPLEMENTED",
+    "deterministic_rule_evaluation": "IMPLEMENTED",
     "official_ASD_STE100_ruleset": "NOT_EXERCISED",
     "semantic_rewrite_quality": "NOT_IMPLEMENTED",
-    "compliance_claim": "REQUIRED"
+    "compliance_claim": "REQUIRED",
+    "heuristic_admission_boundary": "IMPLEMENTED",
+    "heuristic_implementations": "NOT_IMPLEMENTED"
   }
 }
