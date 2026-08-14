@@ -58,6 +58,9 @@ python3 scripts/check_controlled_language_contracts.py bundle \
   --violation evals/fixtures/controlled-language/valid-violation.json \
   --receipt evals/fixtures/controlled-language/valid-receipt.json
 
+step "commit role classification"
+python3 scripts/check_commit_roles.py --repo-root .
+
 step "migration tooling selftests"
 # These live outside skills/, so check_suite_ci_coverage.py does not see them
 # and no workflow named them. A selftest with no arrival is the #122 shape.
