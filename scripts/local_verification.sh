@@ -58,6 +58,10 @@ python3 scripts/check_controlled_language_contracts.py bundle \
   --violation evals/fixtures/controlled-language/valid-violation.json \
   --receipt evals/fixtures/controlled-language/valid-receipt.json
 
+step "executor authority bounds"
+python3 scripts/check_executor_authority.py --repo-root .
+python3 scripts/check_executor_authority.py --repo-root . --selftest
+
 step "delivery shape comparison controls"
 python3 scripts/measure_delivery_shape.py selftest
 

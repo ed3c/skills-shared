@@ -17,8 +17,10 @@
     "offline-replay-available"
   ],
   "forbidden_claims": [
-    "physical-llm-runtime-qualified",
     "cross-harness-capability-proven",
+    "physical-llm-runtime-qualified",
+    "promotion-admitted",
     "ranking-claim-allowed"
-  ]
+  ],
+  "promotion_authority": false
 }
