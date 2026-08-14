@@ -1,11 +1,11 @@
 name: Skill Suites
 
-# These four skills each ship a tests/run-all.sh that no workflow ran. A suite
-# with no CI arrival cannot report a regression: #83 (a selftest that had been
-# red on main) and #105 (two verifiers that had never executed at all) both
-# landed through exactly that gap. Each skill that owns a suite gets an arrival
-# here; skills with their own dedicated workflow keep it and stay out of this
-# matrix.
+# These skills each ship a tests/run-all.sh that must have a real CI arrival.
+# A suite with no CI arrival cannot report a regression: #83 (a selftest that
+# had been red on main) and #105 (two verifiers that had never executed at all)
+# both landed through exactly that gap. Each skill that owns a suite gets an
+# arrival here; skills with their own dedicated workflow keep it and stay out
+# of this matrix.
 
 on:
   pull_request:
@@ -20,6 +20,7 @@ on:
       - 'skills/gitlab-delivery-loop/**'
       - 'skills/html-for-decisions/**'
       - 'skills/knowledge-continuity/**'
+      - 'skills/spatial-loop-systems-engineering/**'
       - 'scripts/check_intent_bound_constraints.py'
       - 'scripts/check_suite_ci_coverage.py'
       - '.github/workflows/skill-suites.yml'
@@ -31,6 +32,7 @@ on:
       - 'skills/gitlab-delivery-loop/**'
       - 'skills/html-for-decisions/**'
       - 'skills/knowledge-continuity/**'
+      - 'skills/spatial-loop-systems-engineering/**'
       - 'scripts/check_intent_bound_constraints.py'
       - 'scripts/check_suite_ci_coverage.py'
       - '.github/workflows/skill-suites.yml'
@@ -74,6 +76,7 @@ jobs:
           - gitlab-delivery-loop
           - html-for-decisions
           - knowledge-continuity
+          - spatial-loop-systems-engineering
     name: ${{ matrix.skill }}
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2

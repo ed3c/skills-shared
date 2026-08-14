@@ -1,0 +1,38 @@
+{
+  "skill_name": "spatial-loop-systems-engineering",
+  "version": "1.0.0",
+  "_meta": {
+    "coverage_metric": "exact-subject binding, realm/boundary/flow closure, state and invariant references, required-capability gating, teardown symmetry, performance measurement closure, and evidence-state separation",
+    "purpose": "Prove that an expert-sounding systems specification cannot advance to implementation while substrate capabilities, invariant oracles, lifecycle cleanup, state references, or performance evidence remain hollow."
+  },
+  "runnable": [
+    {
+      "id": "SLS-SYSTEM-CONTRACT-1",
+      "checker_script": "scripts/check_system_contract.py",
+      "test_verify": "tests/system-contract/verify.sh",
+      "good_fixture": "tests/system-contract/fixtures/good.json",
+      "hollow_fixture": "runtime mutations that remove an invariant oracle or teardown ledger, advance an unexercised capability to READY_FOR_IMPLEMENTATION, add a vague low-latency claim, make PASS evidence-free, or introduce dangling state/transition references",
+      "covers": [
+        "the exact subject has a revision and lowercase SHA-256 digest",
+        "realms, boundaries, flows, states, resources, and teardown references close",
+        "every hard invariant has an enforcement owner, executable or planned oracle, and named failure state",
+        "required capability and assumption states gate READY_FOR_IMPLEMENTATION",
+        "every lifecycle-owned resource has normal and crash teardown plus a leak oracle",
+        "performance claims require metric, target, percentile, load model, environment identity, measurement method, and repetitions",
+        "PASS and FAIL require evidence while absence and non-execution remain distinct",
+        "a missing contract file is an input error rather than a failed system"
+      ],
+      "expected": "canonical prototype contract admitted; each planted hollow or contradictory mutation refused with a stable reason"
+    }
+  ],
+  "evidence_boundary": {
+    "portable_system_prompt": "IMPLEMENTED",
+    "system_contract_checker": "IMPLEMENTED",
+    "positive_hollow_mutation_controls": "IMPLEMENTED",
+    "linux_isolation_module": "IMPLEMENTED",
+    "live_privileged_runtime": "NOT_EXERCISED",
+    "kernel_security_validation": "NOT_EXERCISED",
+    "hardware_performance_measurement": "NOT_EXERCISED",
+    "production_security_acceptance": "HUMAN_ADMIT_REQUIRED"
+  }
+}

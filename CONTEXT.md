@@ -25,6 +25,21 @@ The arrows describe contract consumption, not mutable checkout imports. Local sy
 
 The canonical same-name routes and assertions are defined in [`docs/architecture/DOCUMENT_ROUTING.md`](docs/architecture/DOCUMENT_ROUTING.md). Repository-specific bindings belong in each repository's same-name documents and nearest directory READMEs.
 
+## Current candidate leaf
+
+Issue `#128` owns the independent terminal leaf for
+`spatial-loop-systems-engineering`; Draft PR `#136` is its publication subject.
+The candidate adds a portable pre-implementation
+system contract, a copyable System / Spec Prompt, a trigger-loaded Linux isolation
+module, a deterministic contract checker, positive/hollow/mutation controls, and
+a declared, executable Skill Suites CI arrival.
+
+This leaf does not implement or certify a sandbox. Live root, KVM, cgroup,
+seccomp, hardware-performance, chaos, exploit, and sandbox-escape execution
+remain `NOT_EXERCISED`; security acceptance, production promotion, permission
+widening, merge, and rollback remain Human/trusted-operator boundaries. Exact
+branch, PR head, and workflow state are read from GitHub metadata.
+
 ## Current evidence boundary
 
 - Procedural/domain documentation separation: documented in this branch.
