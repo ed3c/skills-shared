@@ -292,6 +292,17 @@
         "--selftest"
       ],
       "note": "#54: a committed receipt or snapshot describes a commit that is no longer HEAD, and a stale receipt that looks current is worse than none."
+    },
+    {
+      "id": "gate-initial-boundary",
+      "file": "skills/github-delivery-loop/scripts/ci_publish_gate.py",
+      "anchor": "        if boundary is None:",
+      "verify": [
+        "python3",
+        "skills/github-delivery-loop/scripts/ci_publish_gate.py",
+        "--selftest"
+      ],
+      "note": "#54/#70: an absent pull request is not an absent branch. Without this the producer's independently observed ref is a field nobody reads, and a repeated or orphaned remote branch authorizes a second initial publication."
     }
   ]
 }

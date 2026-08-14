@@ -83,4 +83,23 @@ set -e
   echo "compact-only path expected exit 64, got $foreign_rc" >&2; exit 1; }
 grep -q 'evidence_sha256 does not name these evidence bytes' "$scratch/foreign.err"
 
+# #70's boundary at the CLI. A snapshot with no independently observed branch
+# ref cannot authorize an initial publication, because an absent pull request is
+# not an absent branch.
+python3 "$test_dir/drop_boundary.py" "$scratch/good-snapshot.json" "$scratch/unproven-snapshot.json"
+
+set +e
+python3 "$checker" evaluate \
+  --repo-root "$scratch" \
+  --snapshot "$scratch/unproven-snapshot.json" \
+  --verification "$scratch/good-verification.json" \
+  --verification-evidence "$scratch/good-evidence.json" \
+  --intent initial-pr \
+  --json > "$scratch/unproven.out" 2>&1
+unproven_rc=$?
+set -e
+[ "$unproven_rc" -eq 2 ] || {
+  echo "unproven boundary expected exit 2, got $unproven_rc" >&2; exit 1; }
+grep -q '"reason": "initial-boundary-unproven"' "$scratch/unproven.out"
+
 echo "PASS ci-publish-gate evidence binding"

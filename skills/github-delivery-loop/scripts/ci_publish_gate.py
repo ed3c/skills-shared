@@ -305,14 +305,25 @@ def validate_actions(value: Any) -> dict[str, Any]:
     return value
 
 
+INITIAL_BOUNDARIES = {
+    "trusted-initial", "branch-present-without-pr", "not-initial", "unproven",
+}
+
+
 def validate_snapshot(value: dict[str, Any]) -> dict[str, Any]:
-    exact_fields(
-        value,
-        {"schema", "repository", "pull_request", "actions"},
-        "snapshot",
-    )
+    # `initial_boundary` is optional so an observation captured before the
+    # producer emitted it still replays. The gate's own requirement is stated
+    # where the intent is decided, not here: only `initial-pr` depends on it.
+    known = {"schema", "repository", "pull_request", "actions"}
+    exact_fields({k: v for k, v in value.items() if k != "initial_boundary"},
+                 known, "snapshot")
     if value["schema"] != SNAPSHOT_SCHEMA:
         raise InputError(f"snapshot.schema must be {SNAPSHOT_SCHEMA}")
+    boundary = value.get("initial_boundary")
+    if boundary is not None and boundary not in INITIAL_BOUNDARIES:
+        raise InputError(
+            f"snapshot.initial_boundary must be one of {sorted(INITIAL_BOUNDARIES)}"
+        )
     validate_repository(value["repository"])
     validate_pull_request(value["pull_request"])
     validate_actions(value["actions"])
@@ -570,6 +581,17 @@ def evaluate(
     if intent == "initial-pr":
         if pr["state"] != "absent":
             return block("initial-pr-already-exists", intent, actual_head)
+        # An absent pull request is not an absent branch. Without an
+        # independently observed ref, a repeated or orphaned remote branch is
+        # byte-identical to a genuinely unpublished one, and this is the only
+        # intent where that difference decides anything.
+        boundary = snapshot.get("initial_boundary")
+        if boundary is None:
+            return block("initial-boundary-unproven", intent, actual_head,
+                         "snapshot carries no independently observed branch ref")
+        if boundary != "trusted-initial":
+            return block("initial-boundary-refused", intent, actual_head,
+                         f"initial_boundary is {boundary}")
         return Decision(
             "ALLOW",
             "allow-initial-pr",
@@ -655,6 +677,7 @@ def fixture_snapshot(head: str) -> dict[str, Any]:
             "last_published_at": None,
             "feedback": None,
         },
+        "initial_boundary": "trusted-initial",
         "actions": {
             "circuit": "closed",
             "observed_at": None,
@@ -784,6 +807,22 @@ def selftest() -> None:
         "initial-pr",
         head,
     )
+
+    # #70's boundary, now load-bearing at the gate rather than a field the
+    # producer emits and nobody reads. The first real end-to-end run refused
+    # every honest snapshot because the gate's exact-field check had never seen
+    # it -- producer and gate had drifted with no test running both.
+    def drop_boundary(snapshot: dict[str, Any]) -> dict[str, Any]:
+        without = json.loads(json.dumps(snapshot))
+        without.pop("initial_boundary", None)
+        return without
+
+    expect("initial-boundary-unproven", "BLOCK", "initial-boundary-unproven",
+           drop_boundary(base), verification, "initial-pr", head)
+    orphan = json.loads(json.dumps(base))
+    orphan["initial_boundary"] = "branch-present-without-pr"
+    expect("initial-boundary-refused", "BLOCK", "initial-boundary-refused",
+           orphan, verification, "initial-pr", head)
 
     refuse("stale-local-verification", base, verification, head,
            lambda receipt, evidence: receipt.__setitem__("head_sha", "0" * 40))
