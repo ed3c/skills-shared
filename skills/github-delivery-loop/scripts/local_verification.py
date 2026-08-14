@@ -121,13 +121,18 @@ def atomic(path:Path,v:dict[str,Any])->None:
     with tempfile.NamedTemporaryFile("w",encoding="utf-8",dir=path.parent,prefix=f".{path.name}.",delete=False) as h:h.write(payload);tmp=Path(h.name)
     tmp.replace(path)
 def build(root:Path,contract:dict[str,Any],repo_id:int)->tuple[dict[str,Any],dict[str,Any],int]:
+    # Normalize here, not at each call site: run_command compares an already
+    # resolved cwd against this root, so an unresolved root makes every
+    # containment check fail on any path reached through a symlink (/tmp on
+    # macOS) or given relatively. Callers must not have to remember.
+    root=root.resolve()
     cfg=validate_contract(contract,repo_id);head,tree=subject(root);stamp=now();results=[run_command(root,c,environment(cfg["inherit_env"])) for c in cfg["commands"]]
     status="PASS" if all(r["exit"]==0 and not r["timed_out"] and r["spawn_error"] is None and not r["stdout_truncated"] and not r["stderr_truncated"] for r in results) else "FAIL"
     evidence={"schema":EVIDENCE_SCHEMA,"repository_id":repo_id,"head_sha":head,"tree_sha":tree,"contract_sha256":sha(canonical(cfg)),"verified_at":stamp,"clean_subject":True,"commands":results,"status":status};evidence["content_sha256"]=sha(canonical(evidence));digest=sha(canonical(evidence))
     receipt={"schema":RECEIPT_SCHEMA,"repository_id":repo_id,"head_sha":head,"status":status,"verified_at":stamp,"evidence_sha256":digest,"commands":[c["id"] for c in cfg["commands"]]}
     return receipt,evidence,0 if status=="PASS" else 2
 def verify(root:Path,contract:Path,repo_id:int,receipt:Path,evidence:Path)->int:
-    r,e,code=build(root.resolve(),load(contract,"verification contract"),repo_id);atomic(evidence.resolve(),e);atomic(receipt.resolve(),r);print(f"{r['status']} local-verification head={r['head_sha']} evidence={r['evidence_sha256'][:12]}");return code
+    r,e,code=build(root,load(contract,"verification contract"),repo_id);atomic(evidence.resolve(),e);atomic(receipt.resolve(),r);print(f"{r['status']} local-verification head={r['head_sha']} evidence={r['evidence_sha256'][:12]}");return code
 
 def fixture(argv:list[str])->dict[str,Any]:return {"schema":CONTRACT_SCHEMA,"repository_id":1326262274,"inherit_env":["PATH"],"commands":[{"id":"fixture","argv":argv,"cwd":".","timeout_seconds":2,"max_output_bytes":4096}]}
 def selftest()->None:
@@ -150,6 +155,29 @@ def selftest()->None:
         try:validate_contract(fixture(["python3","-c","pass"]),999)
         except VerificationError:pass
         else:raise VerificationError("identity mismatch passed")
+        # A root reached relatively must verify identically. Guards the shape of
+        # the containment check itself, not just this fixture's absolute path.
+        cwd0=Path.cwd()
+        try:
+            os.chdir(root.parent)
+            if build(Path("repo"),fixture(["python3","-c","print('ok')"]),1326262274)[2]!=0:raise VerificationError("relative root failed")
+        finally:os.chdir(cwd0)
+        # ...and normalizing the root must not stop a real escape being refused.
+        # Two independent guards, so two controls: norm_cwd rejects an escaping
+        # string, and run_command rejects a path that only escapes once
+        # resolved. A literal ".." exercises the first and would pass with the
+        # second deleted, so the symlink case is what pins containment.
+        lit=fixture(["python3","-c","pass"]);lit["commands"][0]["cwd"]=".."
+        try:build(root,lit,1326262274)
+        except VerificationError:pass
+        else:raise VerificationError("literal cwd escape passed")
+        # Committed, or the escape would be refused as a dirty subject and this
+        # control would pass without ever reaching the containment check.
+        (root/"out").symlink_to(root.parent);subprocess.run(["git","-C",str(root),"add","out"],check=True);subprocess.run(["git","-C",str(root),"commit","-qm","out"],check=True)
+        esc=fixture(["python3","-c","pass"]);esc["commands"][0]["cwd"]="out"
+        try:build(root,esc,1326262274)
+        except VerificationError:pass
+        else:raise VerificationError("symlink cwd escape passed")
     print("SELFTEST GREEN: exact-HEAD local verification")
 def main(argv:list[str]|None=None)->int:
     p=argparse.ArgumentParser();p.add_argument("--selftest",action="store_true");s=p.add_subparsers(dest="cmd");v=s.add_parser("verify");v.add_argument("--repo-root",type=Path,required=True);v.add_argument("--contract",type=Path,required=True);v.add_argument("--repository-id",type=int,required=True);v.add_argument("--receipt",type=Path,required=True);v.add_argument("--evidence",type=Path,required=True);a=p.parse_args(argv)
