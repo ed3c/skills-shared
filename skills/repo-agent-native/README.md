@@ -15,6 +15,7 @@
 | Optional tool selection and fallback | `references/TOOL_ROUTING.md` |
 | Phase-2 semantic migration map | `references/PORTABLE_CORE_MIGRATION.md` |
 | Phase-2 owning CI admission contract | `references/CI_ADMISSION.md` |
+| Phase-2 owning workflow | `../../.github/workflows/repo-agent-native-contract.yml` |
 | Domain/tool instance triggers | `modules/README.md` and the selected module only |
 | A/B cases and admission rule | `evals/evals.json` |
 | Executable structural and output assertions | `scripts/validate-skill.ts` and `scripts/assert-output.ts` |
@@ -144,8 +145,8 @@ portable-core rewrite                IMPLEMENTED on PR #93 branch
 deterministic Bun assertions         IMPLEMENTED on PR #93 branch
 positive/mutation controls           IMPLEMENTED on PR #93 branch
 module-routing fixture contract      IMPLEMENTED on PR #93 branch
-owning repo-agent-native CI workflow NOT_IMPLEMENTED
-exact-head Bun CI execution          NOT_EXERCISED
+owning repo-agent-native CI workflow IMPLEMENTED on PR #93 branch
+exact-head Bun CI execution          NOT_EXERCISED until the owning job completes
 semantic model routing               NOT_EXERCISED; Phase 3 #95
 blind A/B model runs                 NOT_EXERCISED; Phase 3 #95
 Claude Code live carrier             NOT_EXERCISED
@@ -154,7 +155,7 @@ Bettor portable binding/canaries     NOT_IMPLEMENTED in this phase
 canonical v2 release                 NOT_ADMITTED; final issue #88
 ```
 
-The absence of an owning CI workflow is not a test PASS or FAIL; it is `NOT_IMPLEMENTED`. See `references/CI_ADMISSION.md` for the exact required admission workflow.
+Workflow presence proves only `IMPLEMENTED`. Exact-head contract evidence becomes `PASS` only when `repo-agent-native-contract.yml` executes the candidate head successfully.
 
 ## Change contract
 
