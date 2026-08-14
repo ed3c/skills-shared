@@ -102,6 +102,41 @@ def selftest() -> int:
     bad=copy.deepcopy(predictions); bad["predictions"].pop()
     try: evaluate_calibration(policy,policy_raw,gold,gold_raw,bad,pred_raw); failures.append("incomplete prediction set survived")
     except InputError: pass
+
+    # The four guards below had no control at all: removing any of them left
+    # this selftest green, so the aggregate ceilings and the class-coverage
+    # requirement #129 names were assertions nothing could observe failing.
+    target=heuristics[0]
+    thin_gold=copy.deepcopy(gold)
+    for item in thin_gold["cases"]:
+        if item["case_id"]==target+"-p2": item["labels"][target]=False
+    thin_raw=(json.dumps(thin_gold,sort_keys=True)+"\n").encode()
+    thin_policy=copy.deepcopy(policy); thin_policy["gold_corpus_identity"]["artifact_digest"]=digest(thin_raw)
+    thin_policy_raw=(json.dumps(thin_policy,sort_keys=True)+"\n").encode()
+    thin_pred=copy.deepcopy(predictions); thin_pred["corpus_identity"]["artifact_digest"]=digest(thin_raw)
+    thin_pred["predictions"]=copy.deepcopy(thin_gold["cases"])
+    thin_pred_raw=(json.dumps(thin_pred,sort_keys=True)+"\n").encode()
+    if evaluate_calibration(thin_policy,thin_policy_raw,thin_gold,thin_raw,thin_pred,thin_pred_raw)["status"]!="FAIL":
+        failures.append("class-unbalanced corpus survived")
+
+    bad=copy.deepcopy(predictions); bad["predictions"]=[
+        dict(item, labels=dict(item["labels"], **({target: True} if item["case_id"]==target+"-n1" else {})))
+        for item in bad["predictions"]]
+    if evaluate_calibration(policy,policy_raw,gold,gold_raw,bad,(json.dumps(bad,sort_keys=True)+"\n").encode())["status"]!="FAIL":
+        failures.append("false-positive rate above ceiling survived")
+
+    bad=copy.deepcopy(predictions); bad["predictions"]=[
+        dict(item, labels=dict(item["labels"], **({target: False} if item["case_id"]==target+"-p2" else {})))
+        for item in bad["predictions"]]
+    if evaluate_calibration(policy,policy_raw,gold,gold_raw,bad,(json.dumps(bad,sort_keys=True)+"\n").encode())["status"]!="FAIL":
+        failures.append("false-negative rate above ceiling survived")
+
+    bad_policy=copy.deepcopy(policy); bad_policy["minimum_cases_per_heuristic"]=1
+    try:
+        evaluate_calibration(bad_policy,(json.dumps(bad_policy,sort_keys=True)+"\n").encode(),
+                             gold,gold_raw,predictions,pred_raw)
+        failures.append("minimum_cases_per_heuristic below two survived")
+    except InputError: pass
     if failures:
         for item in failures: print(f"SELFTEST RED: {item}",file=sys.stderr)
         return 2
