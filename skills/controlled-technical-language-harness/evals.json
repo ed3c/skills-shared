@@ -1,8 +1,8 @@
 {
   "skill_name": "controlled-technical-language-harness",
-  "version": "1.3.0-hardening",
+  "version": "1.3.0",
   "_meta": {
-    "coverage_metric": "profile source-identity honesty, edition immutability, Human-owned terminology and compliance boundaries, ruleset binding, profile optionality, and uncommitted official bytes; deterministic tokenization and word budgets; calibrated-heuristic admission and composition; source-node preservation for structured XML; extraction-quality declaration; privacy class to execution lane routing; exact profile/termbase/source/candidate evidence binding; corpus-recomputed calibration",
+    "coverage_metric": "profile source-identity honesty, edition immutability, Human-owned terminology and compliance boundaries, ruleset binding, profile optionality, and uncommitted official bytes; deterministic tokenization and word budgets; calibrated-heuristic admission and composition; source-node preservation for structured XML; extraction-quality declaration; privacy class to execution lane routing; exact profile/termbase/source/candidate evidence binding; corpus-recomputed calibration; integrated A/B experiment validity and outcome gates",
     "purpose": "Prove that a proposal-derived controlled-language profile cannot present itself as an official standard edition, cannot bind a ruleset it does not have, cannot become a mandatory core dependency, cannot relax deterministic, privacy, or Human Admit boundaries, and cannot use primitive mechanism success as a proxy for exact profile-conformance evidence."
   },
   "runnable": [
@@ -104,6 +104,24 @@
         "calibrated heuristic evidence remains ADVISORY_ONLY and cannot promote deterministic truth"
       ],
       "expected": "exact-binding selftest, compile, and usage-boundary controls PASS; planted identity and boundary mutations turn red"
+    },
+    {
+      "id": "CTL-AB-1",
+      "checker_script": "scripts/score_ab.py",
+      "test_verify": "tests/ab-canary/verify.sh",
+      "good_fixture": "tests/ab-canary/fixtures/good-run.json covering all eight declared conditions",
+      "hollow_fixture": "tests/ab-canary/fixtures/unfair-run.json plus 26 selftest mutations: a different evaluator or budget or seed per arm, a baseline given the candidate's content, a dropped condition or case, a shrinking denominator, a per-arm identity change, a planted-defect arm passing anyway, a final PASS over a deterministic failure or lost warning or lost step order or invalid span, restricted text sent externally, agent-fabricated human review, generalization claimed from one run, and a compliance claim for a proposal-derived profile",
+      "covers": [
+        "all eight declared conditions must be present, because the arm most likely to be dropped is the one that failed",
+        "every arm shares one evaluator set, budget, seed and subject identity, or it is not a comparison",
+        "a baseline that received the candidate's skill content is the candidate",
+        "every arm reports the same case set, so the rates share a denominator",
+        "a planted-defect arm that passes means the Harness missed what the arm exists to plant",
+        "a deterministic failure, lost warning, lost step order or invalid span cannot be covered by a final PASS",
+        "generalization needs more than one physical run, and no compliance claim is available to a proposal-derived profile",
+        "an invalid experiment emits no metric, and an unreadable bundle exits 64 rather than 2"
+      ],
+      "expected": "canonical bundle scored; 26 planted defects refused; the unfair bundle exits 2 naming the invalidity and emitting no metric"
     }
   ],
   "evidence_boundary": {
@@ -120,6 +138,10 @@
     "privacy_routing_contract": "IMPLEMENTED",
     "real_s1000d_or_dita_schema_validation": "NOT_EXERCISED",
     "pdf_extraction_itself": "NOT_EXERCISED",
-    "live_provider_or_endpoint": "NOT_EXERCISED"
+    "live_provider_or_endpoint": "NOT_EXERCISED",
+    "ab_experiment_validity_gate": "IMPLEMENTED",
+    "offline_fixture_mechanism_sensitivity": "IMPLEMENTED",
+    "physical_model_or_harness_runs": "NOT_EXERCISED",
+    "official_asd_ste100_compliance": "NOT_EXERCISED"
   }
 }

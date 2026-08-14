@@ -161,6 +161,24 @@ a heuristic cannot overturn a deterministic failure
 an evaluator that errored is not an evaluator that passed
 ```
 
+## Measuring the assembled Harness
+
+An A/B comparison of this Harness is scored by
+[`scripts/score_ab.py`](scripts/score_ab.py), and most of what that script does
+is refuse invalid experiments rather than compute metrics. An unfair comparison
+produces the same shape of numbers as a fair one and reads better:
+
+```text
+a different evaluator per arm       the candidate is graded more kindly
+a larger budget for one arm         the candidate had more attempts
+the baseline given skill content    both arms are the candidate
+failed conditions dropped           the denominator flatters the rate
+a semantic PASS over a hard failure a deterministic breach disappears
+```
+
+No metric is emitted for a bundle that fails validity. A number computed from an
+invalid experiment is worse than no number, because it looks like evidence.
+
 ## Evidence boundary
 
 ```text
@@ -169,6 +187,8 @@ deterministic forbidden tokens       IMPLEMENTED
 exact source-span digests            IMPLEMENTED
 source-node preservation             IMPLEMENTED
 privacy class to lane routing        IMPLEMENTED
+A/B experiment validity gate         IMPLEMENTED
+physical model or harness runs       NOT_EXERCISED
 real S1000D / DITA schema validation NOT_EXERCISED
 PDF extraction itself                NOT_EXERCISED — the caller supplies text
 live provider or endpoint            NOT_EXERCISED
