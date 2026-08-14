@@ -19,6 +19,14 @@ EXPECTED_HISTORY = [
     "GITHUB_ACTIONS_VERIFIED",
     "GITHUB_PUBLICATION_READY",
 ]
+REQUIRED_PUBLICATION_EVIDENCE = [
+    "github_ingress",
+    "forgejo_runtime",
+    "local_worktrees",
+    "local_main_merge",
+    "github_reconciliation",
+    "github_actions",
+]
 
 
 def fail(msg: str) -> int:
@@ -72,13 +80,16 @@ def main(argv: list[str]) -> int:
 
         sha(github.get("observed_main_sha"), "github.observed_main_sha")
         sha(forgejo.get("observed_main_sha"), "forgejo.observed_main_sha")
-        local_main = sha(local.get("local_main_sha"), "local.local_main_sha")
+        sha(local.get("local_main_sha"), "local.local_main_sha")
 
         ns = obj(data.get("issue_namespaces"), "issue_namespaces")
         fp, gp = ns.get("forgejo"), ns.get("github")
         if not isinstance(fp, str) or not isinstance(gp, str) or not fp or not gp or fp == gp:
             raise ValueError("Forgejo and GitHub issue namespaces must be non-empty and distinct")
-        for i, link in enumerate(data.get("issue_links", [])):
+        links = data.get("issue_links", [])
+        if not isinstance(links, list):
+            raise ValueError("issue_links must be an array")
+        for i, link in enumerate(links):
             link = obj(link, f"issue_links[{i}]")
             fref, gref = link.get("forgejo_issue"), link.get("github_issue")
             if not isinstance(fref, str) or not fref.startswith(fp):
@@ -116,6 +127,8 @@ def main(argv: list[str]) -> int:
         if state not in EVIDENCE:
             raise ValueError("actions.state is not an admitted evidence state")
         head = sha(actions.get("head_sha"), "actions.head_sha")
+        if state == "PASS" and not isinstance(actions.get("run_id"), str):
+            raise ValueError("GitHub Actions PASS requires run_id")
 
         evidence = obj(data.get("evidence"), "evidence")
         for key, value in evidence.items():
@@ -126,13 +139,13 @@ def main(argv: list[str]) -> int:
             missing = [k for k in required_rec if rec.get(k) is not True]
             if missing:
                 raise ValueError("publication allowed before reconciliation closed: " + ", ".join(missing))
-            if state != "PASS":
+            unproved = [k for k in REQUIRED_PUBLICATION_EVIDENCE if evidence.get(k) != "PASS"]
+            if unproved:
+                raise ValueError("publication allowed with unproved runtime lanes: " + ", ".join(unproved))
+            if state != "PASS" or evidence.get("github_actions") != "PASS":
                 raise ValueError("publication allowed without GitHub Actions PASS")
             if head != candidate:
                 raise ValueError("GitHub Actions receipt is stale: head_sha != publication candidate")
-            if local_main == github.get("observed_main_sha"):
-                # Equality is legal, but the two authority refs still need explicit ancestry booleans above.
-                pass
 
     except ValueError as exc:
         return fail(str(exc))
