@@ -31,6 +31,7 @@ on:
       - 'migration/**'
       - 'scripts/check_commit_roles.py'
       - 'scripts/check_binding_stale.py'
+      - 'skills/shared-skills-infra/**'
       - '.skill-bindings/**'
       - 'scripts/check_body_neutrality.py'
       - 'evals/body-neutrality.json'
