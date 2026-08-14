@@ -248,6 +248,17 @@
         "--selftest"
       ],
       "note": "#53: the receipt lists what the contract ran, in order. A reordering is a different execution, and set equality would accept it."
+    },
+    {
+      "id": "gate-receipt-status-pass",
+      "file": "skills/github-delivery-loop/scripts/ci_publish_gate.py",
+      "anchor": "    if value[\"status\"] != \"PASS\":",
+      "verify": [
+        "python3",
+        "skills/github-delivery-loop/scripts/ci_publish_gate.py",
+        "--selftest"
+      ],
+      "note": "#49: a FAIL receipt must not be consumed as PASS. This check ran and could not fail until the control existed."
     }
   ]
 }
