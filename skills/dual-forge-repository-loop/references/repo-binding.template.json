@@ -1,0 +1,72 @@
+{
+  "schema_version": "dual-forge-repository-loop/v1",
+  "repository": {
+    "name": "owner/repo",
+    "default_branch": "main"
+  },
+  "authority": {
+    "implementation": "local-forgejo",
+    "publication": "github",
+    "actions": "github-actions"
+  },
+  "github": {
+    "repository_full_name": "owner/repo",
+    "remote_name": "github",
+    "observed_main_sha": "1111111111111111111111111111111111111111"
+  },
+  "forgejo": {
+    "repository": "owner/repo",
+    "remote_name": "forgejo",
+    "observed_main_sha": "2222222222222222222222222222222222222222"
+  },
+  "local": {
+    "main_branch": "main",
+    "local_main_sha": "3333333333333333333333333333333333333333",
+    "worktree_root": ".worktrees"
+  },
+  "issue_namespaces": {
+    "forgejo": "forgejo#",
+    "github": "github#"
+  },
+  "issue_links": [
+    {
+      "forgejo_issue": "forgejo#12",
+      "github_issue": "github#34"
+    }
+  ],
+  "history": [
+    "GITHUB_BOUND",
+    "LOCAL_SYNCED",
+    "FORGEJO_ISSUES_BOUND",
+    "WORKTREES_VERIFIED",
+    "FORGEJO_PRS_MERGED",
+    "LOCAL_MAIN_MERGED",
+    "GITHUB_RECONCILED",
+    "GITHUB_ACTIONS_VERIFIED",
+    "GITHUB_PUBLICATION_READY"
+  ],
+  "reconciliation": {
+    "remote_main_checked": true,
+    "open_prs_enumerated": true,
+    "affected_issues_enumerated": true,
+    "conflicts_routed": true,
+    "issue_states_routed": true,
+    "candidate_contains_observed_github_main": true,
+    "candidate_contains_local_main": true
+  },
+  "publication": {
+    "candidate_sha": "4444444444444444444444444444444444444444",
+    "allowed": true
+  },
+  "actions": {
+    "state": "PASS",
+    "head_sha": "4444444444444444444444444444444444444444",
+    "run_id": "example-run-1"
+  },
+  "evidence": {
+    "forgejo_runtime": "NOT_EXERCISED",
+    "local_worktrees": "NOT_EXERCISED",
+    "github_actions": "PASS",
+    "final_merge": "HUMAN_ADMIT_REQUIRED"
+  }
+}
