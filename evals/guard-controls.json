@@ -303,6 +303,28 @@
         "--selftest"
       ],
       "note": "#54/#70: an absent pull request is not an absent branch. Without this the producer's independently observed ref is a field nobody reads, and a repeated or orphaned remote branch authorizes a second initial publication."
+    },
+    {
+      "id": "union-restored-count-truthful",
+      "file": "migration/hotfix_union.py",
+      "anchor": "    print(f\"\\nRESTORED={len(added)}  \u65e2\u6709\u6a94\u6848 {len(before)} \u500b\u9010\u4e00\u6bd4\u5c0d hash\uff0c\u5168\u90e8\u672a\u8b8a\")",
+      "verify": [
+        "python3",
+        "migration/hotfix_union.py",
+        "--selftest"
+      ],
+      "note": "#16 n8/n9: the numbers in the success line had nobody checking them. A count that lies and a count that tells the truth print the same shape."
+    },
+    {
+      "id": "union-changed-file-refusal",
+      "file": "migration/hotfix_union.py",
+      "anchor": "        return 1",
+      "verify": [
+        "python3",
+        "migration/hotfix_union.py",
+        "--selftest"
+      ],
+      "note": "#16: the post-condition that refuses when a pre-existing file changed. Normal input cannot reach it, so it was a check that ran and could not fail until the selftest planted a plan violating the rule plan itself enforces."
     }
   ]
 }
