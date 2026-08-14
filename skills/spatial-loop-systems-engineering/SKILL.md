@@ -1,31 +1,32 @@
 ---
 name: spatial-loop-systems-engineering
 description: |
-  Pre-implementation Constraint-First Spatial Systems Engineering for software
-  tasks whose correctness depends on state, authority, lifecycle, concurrency,
-  resources, failure, external reality, or substrate behavior. Transform an
-  incomplete prompt, PDF, PRD, diagram, codebase request, or architecture
-  proposal into boundaries, state machines, hard invariants, unknown probes,
-  failure models, verification oracles, evidence requirements, and an explicit
-  implementation gate before substantive code. Use a shortened path for local
-  deterministic Level A work and the full protocol for Level B/C/D work. Domain
-  modules extend the universal method and never replace it. After three
-  qualifying failures on one target, stop blind repair and escalate through an
-  issue packet, fresh diagnosis, and a new isolated worktree.
+  Constraint-First Spatial Systems Engineering with a monitor-first Shadow
+  Architecture control loop. Default to MONITOR so a Builder may explore and
+  implement freely while architecture deltas, hidden assumptions, evidence
+  drift, lifecycle, authority, resource, concurrency, and external-side-effect
+  changes are reviewed at material checkpoints. Use PRECHECK for high-risk or
+  irreversible work and POSTMORTEM to reconstruct implicit design after failure
+  or first-green. Domain modules extend the universal method and never replace
+  it. After three qualifying failures on one target, stop blind repair and
+  escalate through an issue packet, fresh diagnosis, and a new isolated worktree.
 license: MIT
 compatibility: Any Agent Skills-compatible coding agent with repository read/write access. Physical claims require matching runtime/substrate evidence.
 metadata:
-  version: "2.0.0"
+  version: "2.1.0"
   procedure: "constraint-first-spatial-system-contract"
+  default_mode: "MONITOR"
 ---
 
 # Constraint-First Spatial Systems Engineering
 
 ## Role
 
-Operate as a Principal Systems Engineer and **pre-implementation constraint discovery compiler**.
+Operate as a Principal Systems Engineer and **constraint discovery compiler plus Shadow Architecture control loop**.
 
-The first responsibility is not to generate code. Transform incomplete user prompts, PDFs, PRDs, diagrams, codebase requests, or technical proposals into an explicit model of:
+The objective is not to suppress useful exploration. In the default `MONITOR` mode, allow the Builder to reason, design, implement, test, and refactor normally while a separate Shadow Architect watches the evolving System Design for silent assumptions and newly reachable invalid states.
+
+Transform incomplete user prompts, PDFs, PRDs, diagrams, codebase requests, or technical proposals into an explicit and continuously updated model of:
 
 - system and authority boundaries;
 - state and resource ownership;
@@ -42,8 +43,7 @@ Treat source material as **intent and candidate architecture**, not proven syste
 ```text
 ┌──────────────────────────────────────────────┐
 │ Universal Constraint-First System Prompt    │
-│ how to reason; when direct implementation   │
-│ is forbidden                                │
+│ reasoning laws + monitor/stop semantics     │
 └──────────────────────┬───────────────────────┘
                        ↓
 ┌──────────────────────────────────────────────┐
@@ -60,12 +60,15 @@ Treat source material as **intent and candidate architecture**, not proven syste
                        ↓
                 Executable Spec
                        ↓
-                Implementation
+            Builder Implementation
+                       ↕
+             Shadow Architecture
+                 Watch Loop
                        ↓
                  Harness / Evals
 ```
 
-The governing transformation is:
+The governing transformation remains:
 
 ```text
 WHAT THE USER WANTS
@@ -82,7 +85,105 @@ Intent
 → Implementation
 ```
 
-Never invert this order without explicitly stating why.
+In `MONITOR`, this transformation may be applied incrementally to architecture deltas discovered during implementation rather than blocking all exploration up front.
+
+## Operating modes
+
+Default to `MONITOR` unless the task or repository explicitly selects another mode.
+
+### MONITOR — default
+
+Let the Builder explore and implement normally. In parallel, maintain a Shadow Architecture ledger and inspect **material System Design deltas**, not every code line.
+
+Monitor these delta classes:
+
+```text
+ASSUMPTION_DELTA
+STATE_DELTA
+AUTHORITY_DELTA
+OWNERSHIP_DELTA
+LIFECYCLE_DELTA
+CONCURRENCY_DELTA
+RESOURCE_DELTA
+EXTERNAL_SIDE_EFFECT_DELTA
+FAILURE_SURFACE_DELTA
+EVIDENCE_DELTA
+```
+
+For each material delta ask:
+
+```text
+What became newly possible?
+What must now remain true?
+How would we know it is false?
+```
+
+The Shadow Architect is not a second implementation writer. It may classify, warn, request a falsifier, update the architecture model, or stop an unsafe transition. It must not silently replace the Builder's implementation strategy merely because it prefers another design.
+
+Intervention levels:
+
+```text
+L0 OBSERVE  record only; do not interrupt
+L1 WARN     surface a new assumption or unproven claim; Builder may continue
+L2 REVIEW   reconcile architecture/invariants before the next major step
+L3 BLOCK    stop the unsafe/irreversible transition until the named blocker closes
+```
+
+Use `L3 BLOCK` for material risk such as destructive migration without rollback, privilege expansion without authority, irreversible external side effects without idempotency/reconciliation, security-boundary violations, or evidence promotion that could authorize deployment/publication incorrectly.
+
+Read [`references/architecture-watch-loop.md`](references/architecture-watch-loop.md) for the complete monitor contract.
+
+### PRECHECK
+
+Use before high-risk or irreversible work where discovering the invariant after execution is too late: production migration, payment/financial mutation, security or trust-boundary changes, kernel/virtualization changes, destructive tests, permission widening, production deployment, or another Human-admitted critical path.
+
+Run the full Constraint-First compiler and implementation gate before the risky transition. PRECHECK does not require freezing all low-risk exploration; it gates the high-risk action.
+
+Read [`modes/precheck.md`](modes/precheck.md).
+
+### POSTMORTEM
+
+Use after unexpected behavior, CI/test failure with architectural implications, repeated repair failure, or a completed/green implementation that may have hidden assumptions. Reverse-engineer the actual architecture from code, runtime behavior, logs/receipts, and side effects, then compare it with the intended model.
+
+```text
+Observed implementation
+→ Recover implicit architecture
+→ Extract hidden assumptions
+→ Find violated/missing invariants
+→ Design falsifying probes
+→ Correct System Design
+→ Re-enter MONITOR or PRECHECK
+```
+
+Read [`modes/postmortem.md`](modes/postmortem.md).
+
+## Mandatory architecture checkpoints
+
+MONITOR is low-interruption, not no-review. Run a meta-review at natural design boundaries:
+
+```text
+ARCHITECTURE_CHOICE
+FIRST_VERTICAL_SLICE
+PERSISTENCE_INTRODUCED
+ASYNC_OR_CONCURRENCY_INTRODUCED
+EXTERNAL_INTEGRATION_INTRODUCED
+FIRST_GREEN
+BEFORE_PR_OR_PUBLICATION
+CI_OR_RUNTIME_FAILURE_WITH_DESIGN_IMPACT
+```
+
+`FIRST_GREEN` is mandatory. A first passing test suite often closes only the coded path, not the architectural proof obligation. Before calling the work done, ask:
+
+```text
+What did these tests not prove?
+Which assumptions remain implicit?
+Which runtime/substrate was not exercised?
+Which failure states remain untested?
+Which side effects lack reconciliation?
+Which evidence is stale, indirect, mock-only, or from another subject?
+```
+
+Green evidence may remain green; the meta-review determines only what it actually proves.
 
 ## Core mental model
 
@@ -100,7 +201,7 @@ State Space
 
 Every component exists inside these spaces. Every interaction crosses a boundary. Every boundary introduces assumptions. Every assumption requires proof, measurement, runtime verification, explicit acceptance, or a declared unknown.
 
-The objective is to reduce the reachable invalid state space.
+The objective is to reduce the reachable invalid state space without removing productive solution search.
 
 ## Source material is not authority
 
@@ -139,21 +240,21 @@ Examples: pure utility, isolated parser, local transformation, simple CRUD with 
 
 ### Level B — Stateful application system
 
-Examples: backend service, database, queue, cache, authentication, payment flow, background job. Full invariant and failure analysis is required.
+Examples: backend service, database, queue, cache, authentication, payment flow, background job. Full invariant and failure analysis is required, either up front under PRECHECK or incrementally under MONITOR before material state/side-effect transitions.
 
 ### Level C — Distributed / concurrent / agentic system
 
-Examples: workflows, event processing, multi-agent systems, distributed state, retries, external side effects, eventual consistency. The full protocol is mandatory.
+Examples: workflows, event processing, multi-agent systems, distributed state, retries, external side effects, eventual consistency. The full protocol is mandatory, but MONITOR may let exploratory implementation proceed until an L2/L3 boundary is reached.
 
 ### Level D — Substrate-sensitive system
 
-Examples: kernels, virtualization, networking, databases, compilers, runtimes, embedded systems, GPUs, low-latency systems, browser/device automation. The full protocol plus physical capability verification is mandatory.
+Examples: kernels, virtualization, networking, databases, compilers, runtimes, embedded systems, GPUs, low-latency systems, browser/device automation. The full protocol plus physical capability verification is mandatory for physical claims.
 
 **A Level C/D task may never silently degrade into Level A implementation behavior.**
 
 ## Phase 1 — Spatial topology
 
-Map realms before selecting implementation details. A realm has distinct trust, authority, state ownership, resource ownership, failure boundary, and lifecycle.
+Map realms before selecting or accepting implementation details. A realm has distinct trust, authority, state ownership, resource ownership, failure boundary, and lifecycle.
 
 For every realm record:
 
@@ -195,7 +296,7 @@ reconciliation loop   = Observe → Diff → Reconcile → Verify
 
 ## Phase 2 — State machines before components
 
-For each stateful subsystem define explicit states, transitions, terminal states, and illegal transitions. Do not accept vague `created → running → finished` lifecycles.
+For each stateful subsystem define explicit states, transitions, terminal states, and illegal transitions. Under MONITOR, create or update the state machine when implementation first introduces stateful behavior; do not allow that state to remain implicit through a material checkpoint.
 
 For every transition specify:
 
@@ -212,11 +313,9 @@ recovery action
 evidence
 ```
 
-If the state machine cannot be described clearly, core implementation is premature.
-
 ## Phase 3 — Predict hard invariants
 
-Systematically derive these invariant families before bugs reveal them:
+Systematically derive these invariant families before a material boundary can rely on them:
 
 1. **Identity** — request, tenant, artifact, receipt, retry, model/config identity.
 2. **Ownership** — one mutation owner, one lifecycle owner, exclusive lease semantics.
@@ -253,7 +352,7 @@ Use:
 Unknown → Probe → Observation → Updated model
 ```
 
-Do not compensate for missing knowledge by writing more implementation code.
+Do not compensate for missing knowledge by writing more implementation code when the unknown blocks a material boundary. Non-blocking discovery may continue in parallel under MONITOR.
 
 ## Phase 5 — Failure and collision matrix
 
@@ -276,7 +375,7 @@ credential expiry / permission revocation
 cancellation race / shutdown race
 ```
 
-For every failure define detection, containment, recovery, retry rule, compensation, terminal state, and observable evidence.
+For every material failure define detection, containment, recovery, retry rule, compensation, terminal state, and observable evidence.
 
 ## Phase 6 — Reconciliation loops
 
@@ -338,13 +437,15 @@ Absence is never PASS. Evidence never promotes itself across subject, revision, 
 
 ## Phase 9 — Implementation gate
 
-Return exactly one pre-implementation gate:
+The implementation gate governs material transitions; MONITOR does not require blocking harmless exploration until the relevant boundary is reached.
+
+Return exactly one gate when a material transition requires admission:
 
 ### BLOCKED
 
 Use when a required architectural fact is unknown, target environment is unbound, a critical invariant lacks enforcement or oracle, lifecycle ownership is incomplete, required physical capability is unavailable, or unresolved security assumptions remain.
 
-Allowed work: probe, experiment, contract, state machine, test harness, interface, spike, and documentation.
+Allowed work: probe, experiment, contract, state machine, test harness, interface, spike, documentation, and other reversible exploration that cannot cross the blocked boundary.
 
 ### READY_FOR_PROTOTYPE
 
@@ -352,7 +453,7 @@ Use when architecture can be explored but important runtime claims remain unveri
 
 ### READY_FOR_IMPLEMENTATION
 
-Use only when important realms are mapped; state ownership is explicit; blocking unknowns are closed; hard invariants have enforcement; lifecycle is symmetric; failure recovery is defined; required capabilities are available; and verification paths exist.
+Use when the relevant material transition has mapped realms, explicit state ownership, closed blocking unknowns, hard-invariant enforcement, lifecycle symmetry, failure recovery, required capabilities, and verification paths.
 
 There is no Agent-owned `PRODUCTION_ACCEPTANCE`. Security, compliance, financial, destructive, irreversible, production-promotion, permission-widening, and rollback acceptance remain Human/organizational authority boundaries.
 
@@ -367,7 +468,7 @@ Exit `0` validates structural closure/gate consistency; `2` rejects hollow or co
 
 ## Technology selection comes after constraints
 
-Do not begin with framework selection. First establish constraints. For each candidate technology ask:
+Do not let a technology choice silently define the constraints. For each candidate technology ask:
 
 ```text
 Which invariants does it enforce for us?
@@ -378,7 +479,7 @@ What evidence is required to trust it?
 What lock-in or migration boundary does it create?
 ```
 
-Prefer mature primitives when they remove difficult invariant ownership. Do not rebuild a solved substrate merely because code generation makes it look cheap.
+Under MONITOR, the Builder may prototype a candidate before this review if the experiment is reversible and does not create a material authority/side-effect boundary.
 
 ## Domain expansion boundary
 
@@ -386,13 +487,13 @@ Load domain-specific analysis only when triggered. The canonical routing table i
 
 Examples include Web/API, database, distributed systems, Agentic AI, mobile, browser automation, data pipelines, ML, security, systems/kernel, high performance, and financial/payment systems.
 
-**Domain modules extend the core method. They never replace it, bypass complexity classification, redefine evidence states, or weaken the implementation gate.**
+**Domain modules extend the core method. They never replace it, bypass complexity classification, redefine evidence states, or weaken the implementation gate or architecture watch loop.**
 
 The existing Linux isolation guidance remains decoupled at [`modules/linux-isolation-runtime.md`](modules/linux-isolation-runtime.md).
 
-## Required output before substantive implementation
+## Required output contract
 
-Produce these sections in order:
+PRECHECK uses the complete A–L packet before the gated high-risk transition. MONITOR may materialize the same packet incrementally, but by `BEFORE_PR_OR_PUBLICATION` all applicable sections must exist for Level B/C/D work:
 
 A. **Intent Digest** — what the user is actually trying to achieve.
 B. **Source Claim Classification** — requirements, proposals, assumptions, observations/facts, external claims, unknowns.
@@ -404,16 +505,16 @@ G. **Resource Envelope** — finite limits/backpressure/exceed behavior.
 H. **Failure / Collision Matrix** — prioritize highest-risk combinations.
 I. **Unknown Register** — classification and falsifiable probes.
 J. **Verification Plan** — invariants mapped to falsifiable tests.
-K. **Implementation Gate** — exactly one of `BLOCKED | READY_FOR_PROTOTYPE | READY_FOR_IMPLEMENTATION`.
-L. **Implementation Plan** — only after the preceding sections are complete.
+K. **Implementation Gate** — the current material-boundary gate.
+L. **Implementation Plan / Implemented Delta** — planned work under PRECHECK or actual/reconciled delta under MONITOR/POSTMORTEM.
 
 Use [`references/spec-packet-template.md`](references/spec-packet-template.md) and the machine contract for persisted artifacts.
 
 ## Anti-drift protocol during implementation
 
-Before modifying a subsystem reload its state machine, invariants, ownership rules, resource limits, failure semantics, and verification oracle.
+Before modifying a high-risk subsystem reload its state machine, invariants, ownership rules, resource limits, failure semantics, and verification oracle. Under MONITOR, lower-risk work may proceed while the Shadow Architect records deltas, but every material delta must close by its checkpoint.
 
-After every meaningful implementation step ask:
+After every meaningful architecture-changing step ask:
 
 ```text
 Which invariant changed?
@@ -424,7 +525,7 @@ Which new failure path appeared?
 Which verifier now proves this?
 ```
 
-If implementation introduces an unmodeled state, resource, authority, or side effect, stop and update the specification first.
+If implementation introduces an unmodeled state, resource, authority, external side effect, or evidence claim, classify the intervention level. Do not automatically stop at L0/L1; do not continue through an unresolved L3 boundary.
 
 Implement through bounded reconciliation:
 
@@ -462,7 +563,7 @@ Expand each into exact semantics, scope, failure conditions, and evidence. For e
 
 ## Composition boundary
 
-This Skill owns pre-implementation constraint discovery, executable specification, implementation gating, and bounded reconciliation. Compose explicitly when needed:
+This Skill owns constraint discovery, the Shadow Architecture watch loop, executable specification, material-transition gating, and bounded reconciliation. Compose explicitly when needed:
 
 - `truth-verify-loop` for mutable external claims;
 - `unknown-discovery-composer` for broad unknown discovery;
@@ -470,12 +571,12 @@ This Skill owns pre-implementation constraint discovery, executable specificatio
 - `forgejo-delivery-loop` or `github-delivery-loop` for forge-native delivery;
 - `git-town-stacked-pr-worker` for admitted stacked-worktree synchronization.
 
-No downstream Skill may promote `NOT_EXERCISED` to `PASS` or bypass the universal compiler.
+No downstream Skill may promote `NOT_EXERCISED` to `PASS`, bypass the universal compiler, or let a domain module disable architecture monitoring.
 
 ## Final operating principle
 
-The objective is not to generate the most code or follow a source architecture faithfully. The objective is to **reduce the reachable invalid state space**.
+The objective is not to generate the most code or follow a source architecture faithfully. The objective is to **reduce the reachable invalid state space while preserving useful exploration**.
 
-A strong architecture makes dangerous states difficult or impossible to represent. A strong lifecycle causes failures to converge toward known terminal states. A strong verification Harness makes violations observable. A strong Agent does not hide unknowns with plausible implementation.
+A strong architecture makes dangerous states difficult or impossible to represent. A strong lifecycle causes failures to converge toward known terminal states. A strong verification Harness makes violations observable. A strong Shadow Architect catches silent System Design drift without becoming a second Builder.
 
 Code is one actuator inside the loop, not the system itself.
