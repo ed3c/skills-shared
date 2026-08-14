@@ -131,6 +131,28 @@
         "--selftest"
       ],
       "note": "#29 requires that no execution adapter owns promotion authority. The guard lives in the schema's const, so this protects the schema from being weakened back to a per-adapter boolean. An earlier Python re-check of the same thing was reported as uncontrolled by this very gate, correctly."
+    },
+    {
+      "id": "snapshot-branch-absence",
+      "file": "skills/github-delivery-loop/scripts/github_actions_snapshot.py",
+      "anchor": "            if v[\"branch_ref\"][\"observed\"]:",
+      "verify": [
+        "python3",
+        "skills/github-delivery-loop/scripts/github_actions_snapshot.py",
+        "--selftest"
+      ],
+      "note": "#70: an absent open PR does not prove the remote branch is absent. Without this a repeated or orphaned branch is byte-identical to a truly unpublished one, and a second initial-pr gets admitted."
+    },
+    {
+      "id": "snapshot-ref-pr-agreement",
+      "file": "skills/github-delivery-loop/scripts/github_actions_snapshot.py",
+      "anchor": "        if v[\"branch_ref\"][\"object_sha\"]!=p[\"head_sha\"]:",
+      "verify": [
+        "python3",
+        "skills/github-delivery-loop/scripts/github_actions_snapshot.py",
+        "--selftest"
+      ],
+      "note": "The observed ref must agree with the pull request head, or the observation describes a different branch state than the one being published."
     }
   ]
 }
