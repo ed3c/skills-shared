@@ -70,5 +70,16 @@
       "noreply@gitlab.com": "forge-gitlab",
       "noreply@forgejo.org": "forge-forgejo"
     }
+  },
+  "known_unclassified": {
+    "_meta": "Commits that reached main without trailers, listed one by one rather than excused by a rule. Each entry is a commit that is already published and cannot be rewritten. Listing them keeps the gate blocking for everything else, and the length of this list is the honest measure of how far adoption has to go: a rule that quietly widened instead would report nothing.",
+    "how_to_stop_adding_to_this": "Write the trailers at the endpoint that produces the commit. Every entry here is an endpoint that does not yet.",
+    "commits": [
+      {
+        "commit_sha": "6e5986922b8fa83898e0b407b32f2dc3a32662cd",
+        "subject": "chore: project canonical Claude adapter",
+        "reason": "authored directly, outside this loop, after the gate landed"
+      }
+    ]
   }
 }
