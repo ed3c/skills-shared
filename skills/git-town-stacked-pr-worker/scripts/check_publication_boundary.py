@@ -269,8 +269,8 @@ def check_evals_json(root: Path) -> None:
         raise ContractError(f"{relative}: top-level fields drifted")
     if value["skill_name"] != "git-town-stacked-pr-worker":
         raise ContractError(f"{relative}: wrong skill_name")
-    if value["version"] != "1.2.0":
-        raise ContractError(f"{relative}: expected version 1.2.0")
+    if value["version"] != "1.3.0":
+        raise ContractError(f"{relative}: expected version 1.3.0")
 
     boundary = value["evidence_boundary"]
     if not isinstance(boundary, dict) or not boundary:
@@ -289,8 +289,8 @@ def check_evals_json(root: Path) -> None:
         raise ContractError(f"{relative}: human admit must remain REQUIRED")
 
     runnable = value["runnable"]
-    if not isinstance(runnable, list) or len(runnable) != 2:
-        raise ContractError(f"{relative}: exactly two focused runnable evals are required")
+    if not isinstance(runnable, list) or len(runnable) != 3:
+        raise ContractError(f"{relative}: exactly three focused runnable evals are required")
     base_required = {
         "id",
         "checker_script",
@@ -305,10 +305,12 @@ def check_evals_json(root: Path) -> None:
     allowed_by_id = {
         "GTSP-PUBLISH-1": base_required,
         "GTSP-STACK-1": base_required | {"intent_contract"},
+        "GTSP-PROFILE-1": base_required,
     }
     if [item.get("id") if isinstance(item, dict) else None for item in runnable] != [
         "GTSP-PUBLISH-1",
         "GTSP-STACK-1",
+        "GTSP-PROFILE-1",
     ]:
         raise ContractError(f"{relative}: focused eval ids or their order drifted")
     for entry in runnable:
