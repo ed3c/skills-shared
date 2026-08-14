@@ -95,6 +95,29 @@
         "--selftest"
       ],
       "note": "Every fixture had a group size of one, so first-wins and last-wins behaved identically until #148."
+    },
+    {
+      "id": "delivery-shape-controlled-fields",
+      "file": "scripts/measure_delivery_shape.py",
+      "anchor": "        if len(set(values.values())) != 1:",
+      "verify": [
+        "python3",
+        "scripts/measure_delivery_shape.py",
+        "selftest"
+      ],
+      "note": "Without this, a comparison whose arms ran different evaluators or carriers reports a difference and attributes it to the branch graph."
+    },
+    {
+      "id": "commit-role-exception-bounded",
+      "file": "scripts/check_commit_roles.py",
+      "anchor": "        if found.get(\"Driven-By\") or found.get(\"Driven-On\"):",
+      "verify": [
+        "python3",
+        "-m",
+        "unittest",
+        "tests.test_commit_roles.GateTests"
+      ],
+      "note": "Without this the exception list becomes a way to skip any commit, including ones that could simply carry the trailers."
     }
   ]
 }

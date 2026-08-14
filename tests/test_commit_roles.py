@@ -11,6 +11,7 @@ would notice this file becoming decorative.
 """
 from __future__ import annotations
 
+import copy
 import importlib.util
 import json
 import re
@@ -215,6 +216,37 @@ class GateTests(unittest.TestCase):
                 "GIT_COMMITTER_NAME": "GitHub", "GIT_COMMITTER_EMAIL": "noreply@github.com",
             })
             _, problems = self.run_gate(repo)
+            self.assertTrue(any("no Driven-By" in p for p in problems), problems)
+
+    def test_a_listed_commit_is_exempt(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            repo = RepoFixture(Path(raw))
+            sha = repo.commit("chore: no trailers\n", name="ed3c",
+                              email="mcnum01@gmail.com", filename="x.txt")
+            vocabulary = copy.deepcopy(self.vocabulary)
+            vocabulary["known_unclassified"] = {"commits": [{"commit_sha": sha}]}
+            _, problems = self.run_gate(repo, vocabulary)
+            self.assertEqual(problems, [])
+
+    def test_listing_a_commit_that_has_trailers_is_refused(self) -> None:
+        """The list is for commits that cannot be fixed, not a way to skip one."""
+        with tempfile.TemporaryDirectory() as raw:
+            repo = RepoFixture(Path(raw))
+            sha = repo.commit(GOOD_MESSAGE, name="agent-macro",
+                              email="agent-macro@claude-code.invalid", filename="y.txt")
+            vocabulary = copy.deepcopy(self.vocabulary)
+            vocabulary["known_unclassified"] = {"commits": [{"commit_sha": sha}]}
+            _, problems = self.run_gate(repo, vocabulary)
+            self.assertTrue(any("does carry trailers" in p for p in problems), problems)
+
+    def test_an_unlisted_untrailed_commit_is_still_refused(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            repo = RepoFixture(Path(raw))
+            repo.commit("chore: no trailers\n", name="ed3c",
+                        email="mcnum01@gmail.com", filename="z.txt")
+            vocabulary = copy.deepcopy(self.vocabulary)
+            vocabulary["known_unclassified"] = {"commits": [{"commit_sha": "0" * 40}]}
+            _, problems = self.run_gate(repo, vocabulary)
             self.assertTrue(any("no Driven-By" in p for p in problems), problems)
 
     def test_history_before_the_start_point_is_not_scanned(self) -> None:

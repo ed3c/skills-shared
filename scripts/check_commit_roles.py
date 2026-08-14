@@ -106,6 +106,24 @@ def check_commit(record: dict[str, str], vocabulary: dict[str, Any]) -> list[str
     found = trailers(record["body"])
     rules = vocabulary["identity_rules"]
 
+    # Commits that reached main untrailed are listed one by one rather than
+    # excused by a rule. A widened rule would report nothing; a list reports its
+    # own length, which is the honest measure of how far adoption has to go.
+    # An entry is only honoured for a commit that genuinely lacks the trailers,
+    # so the list cannot be used to skip a commit that could simply be fixed.
+    listed = {
+        item["commit_sha"]
+        for item in (vocabulary.get("known_unclassified") or {}).get("commits", [])
+    }
+    if record["sha"] in listed:
+        if found.get("Driven-By") or found.get("Driven-On"):
+            return [
+                f"{short}: listed as unclassified but does carry trailers; the "
+                f"exception list is for commits that cannot be fixed, not for "
+                f"skipping ones that can"
+            ]
+        return []
+
     # Rule 4 first: an unset identity is refused whatever the trailers say,
     # because the trailers would be labelling a commit nobody claimed.
     for field in ("author_email", "committer_email"):
@@ -233,7 +251,9 @@ def main() -> int:
               f"in {rev_range}", file=sys.stderr)
         return 2
 
-    print(f"COMMIT ROLE GREEN: {total} commit(s) classified in {rev_range}")
+    listed = len((vocabulary.get("known_unclassified") or {}).get("commits", []))
+    suffix = f"; {listed} listed as unclassified" if listed else ""
+    print(f"COMMIT ROLE GREEN: {total} commit(s) classified in {rev_range}{suffix}")
     return 0
 
 
