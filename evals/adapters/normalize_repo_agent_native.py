@@ -7,7 +7,6 @@ must come from a content-bound deterministic verifier receipt.
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import sys
 from pathlib import Path
@@ -60,12 +59,9 @@ def main() -> int:
                 raise ValueError("no_skill installed a Skill")
         elif not isinstance(instruction_digest, str) or len(instruction_digest) != 64:
             raise ValueError("treated condition lacks a content digest")
-        identity = "|".join([
-            str(receipt.get("run_id")), str(receipt.get("fixture_commit")),
-            str(receipt.get("subject_bundle", {}).get("sha256")),
-            str(verifier.get("input_digest")),
-        ])
-        run_id = hashlib.sha256(identity.encode()).hexdigest()[:24]
+        run_id = receipt.get("run_id")
+        if not isinstance(run_id, str) or len(run_id) < 8:
+            raise ValueError("physical run_id is absent or invalid")
         passed = verifier.get("passed")
         if not isinstance(passed, bool):
             raise ValueError("verifier passed must be boolean")
