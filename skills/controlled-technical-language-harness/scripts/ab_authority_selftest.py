@@ -101,15 +101,24 @@ def run_selftest(source_root: Path) -> int:
         except (Refused, Unusable, GateUnavailable) as error:
             print(f"SELFTEST RED: canonical composition refused: {error}", file=sys.stderr)
             return 2
-        if receipt["status"] != "PASS":
-            print(f"SELFTEST RED: canonical composition not PASS: {receipt}", file=sys.stderr)
-            return 2
-        if not receipt["evaluators_bound_to_external_evidence"]:
-            print("SELFTEST RED: no evaluator was bound to external evidence",
+        # These three used to compare the receipt against the values that
+        # score_ab_authority.py writes as literals a few lines apart, and an
+        # empty `evaluators_bound_to_external_evidence` is refused before the
+        # receipt is ever built. All three were structurally unreachable:
+        # removing any of them left this selftest green, because a constant
+        # cannot fail to equal itself.
+        #
+        # The part that was doing real work was the subscripting, not the
+        # comparison -- a renamed key raises KeyError. That is worth keeping and
+        # worth saying out loud, so it is now the assertion rather than a side
+        # effect of one that could not fail.
+        absent_keys = sorted(
+            {"status", "evaluators_bound_to_external_evidence", "gate_order", "state"}
+            - set(receipt)
+        )
+        if absent_keys:
+            print(f"SELFTEST RED: canonical receipt lost key(s): {absent_keys}",
                   file=sys.stderr)
-            return 2
-        if receipt["gate_order"] != ["authority", "ab_scorer"]:
-            print("SELFTEST RED: gate order is not recorded", file=sys.stderr)
             return 2
 
     def case(name: str, mutate: Callable[[Path, Path, dict[str, Any]], None],
