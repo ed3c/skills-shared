@@ -265,6 +265,25 @@ def selftest() -> int:
             print("FAIL: a renamed module did not surface its binding", file=sys.stderr)
             return 2
 
+        # Two stale bindings. With one slot per fixture, "surface every binding
+        # left behind" and "surface the first one" are the same program, and the
+        # list this gate exists to produce would silently be a list of one.
+        root = base / "plural"
+        for skill in ("alpha", "beta"):
+            build(root, None, skill=skill)
+        pins = {skill: contract(root, skill) for skill in ("alpha", "beta")}
+        for skill in ("alpha", "beta"):
+            build(root, pins[skill], skill=skill, body="method, revised\n")
+        results, problems = state(root)
+        if problems:
+            print(f"FAIL: plural fixture reported problems: {problems}", file=sys.stderr)
+            return 2
+        stale = {name for name, (kind, _) in results.items() if kind == "stale"}
+        if stale != {"alpha", "beta"}:
+            print(f"FAIL: {len(stale)} of 2 stale bindings surfaced: {stale}",
+                  file=sys.stderr)
+            return 2
+
         for label, mutate, fragment in (
             ("missing-field", lambda f: f.pop("upstream"), "missing ['upstream']"),
             ("extra-field", lambda f: f.update({"note": "x"}), "undeclared field(s)"),

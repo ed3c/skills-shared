@@ -254,6 +254,21 @@ def selftest() -> int:
             print("FAIL: a host path was accepted in shared body", file=sys.stderr)
             return 2
 
+        # Two offenders, because a fixture whose group size is one cannot tell
+        # "report every file" apart from "report the first file". #16 names this
+        # as the shape that made a whole class of guards unfalsifiable, and both
+        # gates added for #1 had it until this case existed.
+        problems = run(build(root / "plural",
+                             {"demo/SKILL.md": bound, "other/SKILL.md": bound}, {}))
+        if len(problems) != 2:
+            print(f"FAIL: {len(problems)} of 2 offending files reported: {problems}",
+                  file=sys.stderr)
+            return 2
+        reported = {problem.split(":")[0] for problem in problems}
+        if reported != {"skills/demo/SKILL.md", "skills/other/SKILL.md"}:
+            print(f"FAIL: the wrong files were reported: {reported}", file=sys.stderr)
+            return 2
+
         # An archived copy is a record of what was superseded, not shared body.
         problems = run(build(root / "archive",
                              {"superseded/old/SKILL.md": bound}, {}))

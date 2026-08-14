@@ -369,6 +369,52 @@
         "--selftest"
       ],
       "note": "#1/#5: a slot and its contract disagreeing about what is bound means every later check is about the wrong skill."
+    },
+    {
+      "id": "guard-controls-checks-every-guard",
+      "file": "scripts/check_guard_controls.py",
+      "anchor": "        for guard in guards:",
+      "verify": [
+        "python3",
+        "scripts/check_guard_controls.py",
+        "--repo-root",
+        ".",
+        "--selftest"
+      ],
+      "note": "#16: the gate every other guard depends on could check only the first manifest entry and stay green. Its selftest called check_guard directly per shape, so main()'s loop -- the thing that decides whether the manifest was read in full -- was never exercised."
+    },
+    {
+      "id": "body-neutrality-reports-every-file",
+      "file": "scripts/check_body_neutrality.py",
+      "anchor": "    for name in sorted(set(actual) | set(owed)):",
+      "verify": [
+        "python3",
+        "scripts/check_body_neutrality.py",
+        "--selftest"
+      ],
+      "note": "#16: with one offender per fixture, 'report every file' and 'report the first file' are the same program."
+    },
+    {
+      "id": "binding-checks-every-slot",
+      "file": "scripts/check_binding_stale.py",
+      "anchor": "    for directory in sorted(p for p in slots.iterdir() if p.is_dir()):",
+      "verify": [
+        "python3",
+        "scripts/check_binding_stale.py",
+        "--selftest"
+      ],
+      "note": "#16: the list this gate exists to produce would silently be a list of one."
+    },
+    {
+      "id": "publication-profile-checks-every-path",
+      "file": "scripts/check_ci_publication_profile.py",
+      "anchor": "    for entry in paths:",
+      "verify": [
+        "python3",
+        "scripts/check_ci_publication_profile.py",
+        "--selftest"
+      ],
+      "note": "#16: a receipt path in second position was unreachable while every fixture held exactly one."
     }
   ]
 }
