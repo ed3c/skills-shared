@@ -1,0 +1,10 @@
+{
+  "evaluator_artifact_digest": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+  "evaluator_id": "skill-eval-contract",
+  "evaluator_version": "1.0.0",
+  "execution_origin": "OWNING_WORKFLOW",
+  "output_digest": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+  "status": "PASS",
+  "subject_commit_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "subject_tree_sha": "cccccccccccccccccccccccccccccccccccccccc"
+}

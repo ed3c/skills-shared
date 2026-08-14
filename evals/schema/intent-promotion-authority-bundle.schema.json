@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ed3c/skills-shared/evals/schema/intent-promotion-authority-bundle.schema.json",
+  "title": "Intent Promotion Authority Bundle",
+  "description": "Binds a promotion contract, receipt and optional ledger to the external evidence bytes their fields reference. Every path is resolved and hashed; a declared digest that no file produces is refused.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "bundle_schema",
+    "contract_schema",
+    "receipt_schema",
+    "contract",
+    "receipt",
+    "evidence"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "intent-promotion-authority-bundle/v1"
+    },
+    "bundle_schema": {"$ref": "#/$defs/artifact"},
+    "contract_schema": {"$ref": "#/$defs/artifact"},
+    "receipt_schema": {"$ref": "#/$defs/artifact"},
+    "ledger_schema": {"$ref": "#/$defs/artifact"},
+    "contract": {"$ref": "#/$defs/artifact"},
+    "receipt": {"$ref": "#/$defs/artifact"},
+    "ledger": {"$ref": "#/$defs/artifact"},
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evaluator_receipts"],
+      "properties": {
+        "evaluator_receipts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["receipt_ref", "path", "artifact_digest"],
+            "properties": {
+              "receipt_ref": {"type": "string", "minLength": 1},
+              "path": {"$ref": "#/$defs/relativePath"},
+              "artifact_digest": {"$ref": "#/$defs/digest"}
+            }
+          }
+        },
+        "forge_readback": {"$ref": "#/$defs/artifact"},
+        "approval_readback": {"$ref": "#/$defs/artifact"}
+      }
+    }
+  },
+  "$defs": {
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "relativePath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?!.*\\.\\.)[A-Za-z0-9._/-]+$"
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "artifact_digest"],
+      "properties": {
+        "path": {"$ref": "#/$defs/relativePath"},
+        "artifact_digest": {"$ref": "#/$defs/digest"}
+      }
+    }
+  }
+}

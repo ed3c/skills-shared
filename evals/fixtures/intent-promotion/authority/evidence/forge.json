@@ -1,0 +1,9 @@
+{
+  "candidate_head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "candidate_tree_sha": "cccccccccccccccccccccccccccccccccccccccc",
+  "merge_commit_sha": "ffffffffffffffffffffffffffffffffffffffff",
+  "merge_tree_sha": "8888888888888888888888888888888888888888",
+  "observed_at_commit_sha": "ffffffffffffffffffffffffffffffffffffffff",
+  "repository": "ed3c/skills-shared",
+  "source": "GITHUB_API"
+}

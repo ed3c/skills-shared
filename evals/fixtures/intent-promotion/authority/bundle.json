@@ -1,0 +1,44 @@
+{
+  "bundle_schema": {
+    "artifact_digest": "sha256:35a42ca96887f949e43261b131cdfc65a046116271ad1932b8ac7333c5782c01",
+    "path": "schema/intent-promotion-authority-bundle.schema.json"
+  },
+  "contract": {
+    "artifact_digest": "sha256:5f414faf3d0106ee3a063578fca894eefc6a022816ef61ca34f9f5863b1c530a",
+    "path": "contract.json"
+  },
+  "contract_schema": {
+    "artifact_digest": "sha256:18430195386518801121e3fcc9691eb933c66a1a4a50fe5c0a1e9c1684a73f56",
+    "path": "schema/intent-promotion-contract.schema.json"
+  },
+  "evidence": {
+    "evaluator_receipts": [
+      {
+        "artifact_digest": "sha256:d346dac1033f47e09f712db6e2c7b398b261e5ddcfd7c6fe8c1fe215fe786feb",
+        "path": "evidence/evaluator.json",
+        "receipt_ref": "workflow-run:31794307867"
+      }
+    ],
+    "forge_readback": {
+      "artifact_digest": "sha256:71a2321f7eb64868e1e624c0c63aa7901576631fef81ae76d668bc022a3e92c3",
+      "path": "evidence/forge.json"
+    }
+  },
+  "ledger": {
+    "artifact_digest": "sha256:5c45b7c3ae8b405b2c76d802c0244b088ff0264a040d36e30a3f03efaf9a9d13",
+    "path": "ledger.json"
+  },
+  "ledger_schema": {
+    "artifact_digest": "sha256:eea05e89f714a301ff805b6dd72678f4ffcd9992c54b50bf870a235f457e15ff",
+    "path": "schema/intent-promotion-ledger.schema.json"
+  },
+  "receipt": {
+    "artifact_digest": "sha256:977af36fcbf70cde1959738eba2e16d6d034c16bebccc09fdca32fa6aadc04de",
+    "path": "receipt.json"
+  },
+  "receipt_schema": {
+    "artifact_digest": "sha256:15cb8d7320c96122a74472ae46317226f33f304f670a13a36c273cb06b57ec79",
+    "path": "schema/intent-promotion-receipt.schema.json"
+  },
+  "schema_version": "intent-promotion-authority-bundle/v1"
+}
