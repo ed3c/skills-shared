@@ -136,11 +136,6 @@
       "name": "controlled-technical-language-harness",
       "admitted": "2026-08-15",
       "why": "It landed through CTL 01-06 without an entry, so it was reachable from every project with nothing having ruled on it -- which is the state the registry exists to make impossible. Controlled-language checking is host infrastructure by the same test as the delivery loops: the standard, the parser and the privacy classes are true anywhere, and only the termbase and document routes are consumer-owned."
-    },
-    {
-      "name": "repository-capability-audit",
-      "admitted": "2026-08-15",
-      "why": "Repository capability auditing is portable cross-repository infrastructure only when exact-subject binding, runtime identity, positive and negative controls, failure-evidence preservation, post-boundary packet verification, terminal states, first-green review, and explicit non-claims are enforced by executable ablation tests. Consumer repositories, vendor runtimes, credentials, devices, claim inventories, commands, and live receipts remain environment-owned."
     }
   ],
   "repo_owned": [
