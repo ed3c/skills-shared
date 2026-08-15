@@ -50,13 +50,31 @@ The checker requires:
 - a missing budget profile to degrade to one `SINGLE_BUILDER`;
 - all quantitative consumption to stay within limits;
 - every `MULTI_WORKER` admission predicate to be true;
-- unique task, attempt, branch, and worktree identities;
+- unique attempt, branch, and worktree identities; `task_id` names the logical
+  slice and repeats across retries of that slice;
 - an acyclic dependency graph with no unknown dependency;
-- disjoint writable paths, mutable-state ownership, and external-resource leases;
+- writable paths, mutable-state ownership, and external-resource leases to be
+  disjoint between writers that are **concurrently leased**; a released
+  predecessor may hand ownership to a successor that declares it as a
+  dependency, and a reuse ordered by nothing is refused as an unordered handoff;
+- path containment to be segment-aware, so `src/parser2` is a sibling of
+  `src/parser` rather than a child of it;
 - active tasks to hold active leases and terminal tasks to release them;
+- an `ACTIVE` lease to expire strictly after `evaluation_time`;
+- per logical task: at most one active attempt, at most one accepted
+  verified/integrated attempt, attempts within `repository.max_attempts_per_task`,
+  and every retry to name a terminal `parent_attempt_id` of the same slice —
+  stale and superseded attempts remain terminal evidence, not duplicate tasks;
 - every verified task to have one matching `worker-result/v1`;
 - result base, attempt, and owned paths to match the task packet;
-- verified positive evals and negative controls to be `PASS` with evidence;
+- every result head to appear in the admitted-subject set;
+- a verified result's `checkpoint_identity` to equal its task attempt's non-null
+  checkpoint digest;
+- verified positive evals and negative controls to be `PASS` with evidence, and
+  their IDs to equal the task's `required_evals` / `negative_controls` exactly —
+  a passing oracle that is not the owning oracle is refused;
+- closure-claiming delivery states (`LOCAL_VERIFIED` and every publication state)
+  to require one accepted attempt with one accepted result per logical task;
 - Worker and global budget ledgers to reconcile exactly;
 - in-process logical Shadow review to remain `NOT_EXERCISED` for independence;
 - L3 Shadow outcomes to be enforced and keep delivery `BLOCKED`;

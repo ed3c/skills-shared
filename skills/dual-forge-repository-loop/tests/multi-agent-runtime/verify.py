@@ -28,6 +28,20 @@ def run(document: dict) -> tuple[int, str, str]:
         return process.returncode, process.stdout, process.stderr
 
 
+def clone_attempt(
+    task: dict, attempt_id: str, parent: str | None, state: str, lease_status: str
+) -> dict:
+    """Another attempt at the same logical slice, with its own physical identity."""
+    clone = copy.deepcopy(task)
+    clone["attempt_id"] = attempt_id
+    clone["parent_attempt_id"] = parent
+    clone["state"] = state
+    clone["lease"]["status"] = lease_status
+    clone["branch"] = f"{task['branch']}-{attempt_id}"
+    clone["worktree_identity"] = f"{task['worktree_identity']}-{attempt_id}"
+    return clone
+
+
 def mutate(name: str, document: dict) -> None:
     if name == "admission-false":
         document["admission"]["independent_oracles"] = False
@@ -80,6 +94,67 @@ def mutate(name: str, document: dict) -> None:
         document["states"]["delivery_state"] = "MERGED"
     elif name == "unknown-runtime-published":
         document["runtime"]["identity"] = "UNKNOWN"
+    elif name == "expired-lease":
+        document["tasks"][0]["lease"]["expiry"] = "2020-01-01T00:00:00Z"
+    elif name == "unparsable-lease-expiry":
+        document["tasks"][0]["lease"]["expiry"] = "2026-08-15T12:00:00"
+    elif name == "invalid-evaluation-time":
+        document["evaluation_time"] = "2026-08-15 11:30:00"
+    elif name == "checkpoint-mismatch":
+        document["results"][0]["checkpoint_identity"] = "9" * 64
+    elif name == "foreign-eval":
+        document["results"][0]["positive_evals"][0]["id"] = "EVAL-SCHEDULER-001"
+    elif name == "foreign-negative-control":
+        document["results"][0]["negative_controls"][0]["id"] = "CONTROL-SCHEDULER-001"
+    elif name == "unadmitted-result-head":
+        document["results"][0]["head_subject_sha"] = "e" * 40
+    elif name == "publication-before-closure":
+        for task in document["tasks"]:
+            task["state"] = "RUNNING"
+        document["results"] = []
+        for key in ("tool_calls", "tokens", "wall_clock_seconds"):
+            document["budget"]["consumed"][key] = 0
+    elif name == "concurrent-attempts":
+        retry = clone_attempt(
+            document["tasks"][0], "worker-a-attempt-2", None, "RUNNING", "ACTIVE"
+        )
+        document["tasks"].append(retry)
+        document["budget"]["consumed"]["total_workers"] = 3
+        document["budget"]["consumed"]["active_workers"] = 3
+        document["budget"]["limits"]["active_workers"] = 3
+    elif name == "attempt-limit-exceeded":
+        base = document["tasks"][0]
+        parent = base["attempt_id"]
+        for index in range(2, 6):
+            attempt_id = f"worker-a-attempt-{index}"
+            document["tasks"].append(
+                clone_attempt(base, attempt_id, parent, "STALE_ATTEMPT", "RELEASED")
+            )
+            parent = attempt_id
+        document["budget"]["consumed"]["total_workers"] = 6
+    elif name == "multiple-accepted-attempts":
+        extra = clone_attempt(
+            document["tasks"][0], "worker-a-attempt-2", None, "INTEGRATED", "RELEASED"
+        )
+        document["tasks"].append(extra)
+        document["budget"]["consumed"]["total_workers"] = 3
+    elif name == "unknown-parent-attempt":
+        document["tasks"][0]["parent_attempt_id"] = "worker-a-attempt-absent"
+    elif name == "retry-over-live-attempt":
+        retry = clone_attempt(
+            document["tasks"][0], "worker-a-attempt-2", "worker-a-attempt-1", "STALE_ATTEMPT", "RELEASED"
+        )
+        document["tasks"].append(retry)
+        document["budget"]["consumed"]["total_workers"] = 3
+    elif name == "unordered-handoff":
+        # Same path claimed by two slices with no dependency edge ordering them,
+        # and not concurrently leased -- so it is neither a live collision nor a
+        # proven handoff.
+        document["tasks"][1]["lease"]["status"] = "RELEASED"
+        document["tasks"][1]["state"] = "INTEGRATED"
+        document["tasks"][1]["excluded_paths"] = ["README.md"]
+        document["tasks"][1]["allowed_paths"] = ["src/scheduler", "tests/scheduler", "src/parser"]
+        document["budget"]["consumed"]["active_workers"] = 1
     else:
         raise AssertionError(f"unknown mutation: {name}")
 
@@ -107,6 +182,50 @@ def main() -> int:
     if code != 0 or "topology=SINGLE_BUILDER" not in stdout or stderr:
         failures.append(f"positive fallback fixture: code={code} stdout={stdout!r} stderr={stderr!r}")
 
+    # Bounded retry lineage: two terminal attempts followed by one accepted attempt
+    # of the same logical slice is the shape v2.1 promises, and must be admitted
+    # rather than rejected as duplicate tasks.
+    retry = copy.deepcopy(good)
+    accepted = retry["tasks"][0]
+    first = clone_attempt(accepted, "worker-a-attempt-0", None, "FAILED_TERMINAL", "RELEASED")
+    second = clone_attempt(
+        accepted, "worker-a-attempt-0b", "worker-a-attempt-0", "SUPERSEDED", "RELEASED"
+    )
+    accepted["parent_attempt_id"] = "worker-a-attempt-0b"
+    retry["tasks"] = [first, second, accepted, retry["tasks"][1]]
+    retry["budget"]["consumed"]["total_workers"] = 4
+    code, stdout, stderr = run(retry)
+    if code != 0 or stderr:
+        failures.append(f"positive retry-lineage fixture: code={code} stderr={stderr!r}")
+
+    # Dependency-ordered handoff: a released predecessor may hand its path, mutable
+    # state and resource to a declared successor. Comparing all packets as if
+    # concurrent would forbid this valid sequential convergence.
+    handoff = copy.deepcopy(good)
+    handoff["tasks"][0]["lease"]["status"] = "RELEASED"
+    handoff["tasks"][0]["state"] = "INTEGRATED"
+    handoff["tasks"][1]["dependencies"] = ["worker-a"]
+    handoff["tasks"][1]["excluded_paths"] = ["README.md"]
+    handoff["tasks"][1]["allowed_paths"] = ["src/scheduler", "tests/scheduler", "src/parser"]
+    handoff["tasks"][1]["owned_mutable_state"] = ["scheduler-contract", "parser-contract"]
+    handoff["tasks"][1]["external_resource_leases"] = [
+        "fixture-set-scheduler",
+        "fixture-set-parser",
+    ]
+    handoff["budget"]["consumed"]["active_workers"] = 1
+    code, stdout, stderr = run(handoff)
+    if code != 0 or stderr:
+        failures.append(f"positive sequential-handoff fixture: code={code} stderr={stderr!r}")
+
+    # Path containment is segment-aware: src/parser2 is a sibling of src/parser,
+    # not a child of it, and must not be reported as a lease collision.
+    sibling = copy.deepcopy(good)
+    sibling["tasks"][1]["allowed_paths"] = ["src/parser2", "tests/scheduler"]
+    sibling["results"][1]["owned_paths"] = ["tests/scheduler"]
+    code, stdout, stderr = run(sibling)
+    if code != 0 or stderr:
+        failures.append(f"positive sibling-path fixture: code={code} stderr={stderr!r}")
+
     cases = [
         ("admission-false", 2, "parallelism-not-admitted"),
         ("path-overlap", 2, "path-lease-overlap"),
@@ -129,6 +248,20 @@ def main() -> int:
         ("resource-overlap", 2, "resource-lease-overlap"),
         ("merged-without-observation", 2, "merged-without-external-observation"),
         ("unknown-runtime-published", 2, "unknown-runtime-published"),
+        ("expired-lease", 2, "expired-active-lease"),
+        ("unparsable-lease-expiry", 64, "schema-invalid"),
+        ("invalid-evaluation-time", 64, "schema-invalid"),
+        ("checkpoint-mismatch", 2, "checkpoint-identity-mismatch"),
+        ("foreign-eval", 2, "eval-identity-mismatch"),
+        ("foreign-negative-control", 2, "eval-identity-mismatch"),
+        ("unadmitted-result-head", 2, "result-head-not-admitted"),
+        ("publication-before-closure", 2, "publication-before-closure"),
+        ("concurrent-attempts", 2, "concurrent-attempts"),
+        ("attempt-limit-exceeded", 2, "attempt-limit-exceeded"),
+        ("multiple-accepted-attempts", 2, "multiple-accepted-attempts"),
+        ("unknown-parent-attempt", 2, "unknown-parent-attempt"),
+        ("retry-over-live-attempt", 2, "retry-over-live-attempt"),
+        ("unordered-handoff", 2, "unordered-handoff"),
     ]
 
     for name, expected_code, marker in cases:
@@ -158,9 +291,11 @@ def main() -> int:
         return 1
 
     print(
-        "PASS multi-agent-runtime: positive multi-worker and single-builder fallback fixtures admitted; "
-        f"{len(cases)} planted topology, lease, budget, Shadow, evidence, result, "
-        "and merge-boundary defects refused; absent input stayed distinct"
+        "PASS multi-agent-runtime: multi-worker, single-builder fallback, bounded retry "
+        "lineage, dependency-ordered handoff, and sibling-path fixtures admitted; "
+        f"{len(cases)} planted topology, lease expiry, attempt-model, checkpoint, "
+        "eval-identity, subject-admission, closure, budget, Shadow, result, and "
+        "merge-boundary defects refused; absent input stayed distinct"
     )
     return 0
 
