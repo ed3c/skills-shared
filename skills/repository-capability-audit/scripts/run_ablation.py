@@ -19,12 +19,35 @@ def write_json(path: Path, value: Any) -> None:
     path.write_text(json.dumps(value, sort_keys=True, indent=2) + "\n", encoding="utf-8")
 
 
+# Receipts are digested and compared against a committed expectation, so anything
+# host-specific reaching the digest makes the eval unreproducible off the machine
+# that generated the expectation. sys.executable is an absolute versioned path, so
+# it is reduced to the interpreter name at the one boundary every probe crosses.
+def portable_argv(argv: list[str]) -> list[str]:
+    return ["python3", *argv[1:]]
+
+
+# Tool prose is not a stable observation: unittest's elapsed time changes per run
+# and its test-id format changes per interpreter version. The semantic fields
+# (exit_code, skip_observed, executed_checks, ...) carry the finding, so the digest
+# is taken over those and the raw prose stays in the receipt for diagnosis.
+DIGEST_VOLATILE = ("stdout", "stderr")
+
+
+def digest_payload(value: Any) -> Any:
+    if isinstance(value, dict):
+        return {k: digest_payload(v) for k, v in value.items() if k not in DIGEST_VOLATILE}
+    if isinstance(value, list):
+        return [digest_payload(v) for v in value]
+    return value
+
+
 def run(code: str, cwd: Path, env: dict[str, str] | None = None) -> dict[str, Any]:
     p = subprocess.run(
         [sys.executable, "-c", code], cwd=cwd, env=env,
         capture_output=True, text=True, check=False, timeout=20,
     )
-    return {"argv": [sys.executable, "-c", code], "exit_code": p.returncode,
+    return {"argv": portable_argv([sys.executable, "-c", code]), "exit_code": p.returncode,
             "stdout": p.stdout, "stderr": p.stderr}
 
 
@@ -45,7 +68,7 @@ def observations(out: Path) -> dict[str, dict[str, Any]]:
         encoding="utf-8")
     p = subprocess.run([sys.executable, "-m", "unittest", "discover", "-s", ".", "-v"],
                        cwd=d, capture_output=True, text=True, check=False)
-    obs["silent-skip"] = {"probe": {"argv": p.args, "exit_code": p.returncode,
+    obs["silent-skip"] = {"probe": {"argv": portable_argv(list(p.args)), "exit_code": p.returncode,
                            "stdout": p.stdout, "stderr": p.stderr},
                            "skip_observed": "skipped" in (p.stdout + p.stderr).lower(),
                            "required_checks": 1, "executed_checks": 0}
@@ -106,7 +129,7 @@ def observations(out: Path) -> dict[str, dict[str, Any]]:
                                    "evidence_complete": True, "claims_bounded": True}
 
     for case_id, value in obs.items():
-        value["observation_digest"] = digest(value)
+        value["observation_digest"] = digest(digest_payload(value))
         write_json(out / "observations" / f"{case_id}.json", value)
     return obs
 

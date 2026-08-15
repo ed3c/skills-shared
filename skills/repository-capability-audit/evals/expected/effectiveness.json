@@ -101,7 +101,7 @@
     "This suite does not measure whether a model recalls or follows skill text.",
     "Cross-model and cross-repository uplift needs repeated held-out physical runs."
   ],
-  "observation_receipt_digest": "08836e9b4cc2f21564d6f18b5e52c7ecaf983c0fe8176f92903ca2fc01e76f05",
+  "observation_receipt_digest": "dacd5eff06dc6febbfdaf10cd6d070d4dca25970af792678849750b178783c47",
   "observed_external_trace_digest": "97b4fe577bcd1b966c63f3d3a26c68cb2baddb982e3bd8e2ae65ac5911d6fbf6",
   "procedure_reduction_fraction": 0.48,
   "profiles": {
