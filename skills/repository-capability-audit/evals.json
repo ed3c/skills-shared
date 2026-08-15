@@ -1,0 +1,71 @@
+{
+  "skill_name": "repository-capability-audit",
+  "version": "1.1.0",
+  "_meta": {
+    "coverage_metric": "deterministic procedural necessity of the retained RCA rules, Agent A/B harness integrity, and held-out corpus separation",
+    "purpose": "Keep three claims apart that a single green run would otherwise merge: that each retained rule is necessary on committed fixtures, that the harness which would measure a live Agent is itself sound, and that the corpus such a measurement would run against is actually held out."
+  },
+  "runnable": [
+    {
+      "id": "RCA-ABLATION-1",
+      "checker_script": "scripts/run_ablation.py",
+      "test_verify": "tests/test_ablation.py",
+      "good_fixture": "evals/expected/effectiveness.json",
+      "hollow_fixture": null,
+      "hollow_mutations": "removing a retained rule without a deciding score delta, treating a supporting rule as field-supported, counting dependency fraction by tokens rather than semantic claims, and letting an unbounded runtime receipt stand",
+      "covers": [
+        "every retained rule has an ablation whose removal decides at least one case",
+        "the candidate profile outperforms no_skill without losing the full composition's outcome",
+        "dependency fraction is a semantic claim count, not a token count",
+        "the committed runtime receipt stays bounded",
+        "observation digests are reproducible across interpreters, so the expectation is not pinned to one machine"
+      ],
+      "expected": "the generated effectiveness report matches the committed expectation byte for byte on any interpreter; 13 retained rules each carry a deciding ablation and core_supported_fraction is 1.0"
+    },
+    {
+      "id": "RCA-AGENT-AB-1",
+      "checker_script": "scripts/score_agent_ab.py",
+      "test_verify": "tests/test_agent_ab.py",
+      "good_fixture": null,
+      "good_evidence": "a matched cell set whose receipts bind agent provider, family, model, version and harness, scored by an evaluator that is not the evaluated Agent",
+      "hollow_fixture": null,
+      "hollow_mutations": "an empty receipt set treated as an exercised experiment, a producer-owned evaluator, a tampered receipt, and a fixture agent's result read as prompt effectiveness",
+      "covers": [
+        "an empty receipt set is not exercised rather than trivially passing",
+        "a producer-owned evaluator is an invalid experiment",
+        "a tampered receipt invalidates the experiment rather than lowering a score",
+        "the fixture agent validates the harness and never prompt effectiveness"
+      ],
+      "expected": "the harness admits a matched, independently evaluated cell set and refuses empty, producer-owned, tampered and fixture-as-evidence shapes; live model uplift remains NOT_EXERCISED"
+    },
+    {
+      "id": "RCA-HOLDOUT-1",
+      "checker_script": "scripts/check_held_out_corpus.py",
+      "test_verify": "tests/test_held_out_corpus.py",
+      "good_fixture": null,
+      "good_evidence": "a corpus of at least three repositories that varies by language, build shape and capability boundary, none used to design the RCA fixtures, with sealed ground truth and an independent evaluator",
+      "hollow_fixture": null,
+      "hollow_mutations": "a tuning repository listed as held out, an unauthorized private repository, one repository listed three times, a corpus uniform in any declared dimension, a family naming an unlisted repository, required and forbidden evidence levels overlapping, a task digest equal to its ground truth, missing non-trigger or positive families, too few defect families, families sharing one ground truth, the evaluated Agent named as evaluator, and sealed material marked visible",
+      "covers": [
+        "no listed repository was used to design the RCA-001..013 fixtures",
+        "the corpus varies across every dimension it declares, and one repository listed three times is not a set",
+        "non-trigger and positive families are required, so the corpus measures declining to escalate as well as escalating",
+        "a task digest equal to its ground truth would show the Agent the answer",
+        "the evaluated Agent cannot be named as its own evaluator, and sealed material marked visible is not sealed",
+        "a passing corpus is admissible to run, never evidence that anything ran"
+      ],
+      "expected": "a separated corpus is admitted; 12 planted separation, variation, family-coverage and sealing defects are refused; schema-level refusals stay distinct from semantic ones and absent input from both"
+    }
+  ],
+  "evidence_boundary": {
+    "established": [
+      "deterministic necessity of the retained rules on committed fixtures",
+      "integrity of the harness and corpus contract that a live measurement would depend on"
+    ],
+    "not_established": [
+      "that any language model adopted the trimmed Skill",
+      "held-out uplift, cross-model generalization, or production correctness",
+      "that a held-out corpus exists yet -- the contract is checkable, the corpus is not written"
+    ]
+  }
+}
