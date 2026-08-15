@@ -1,0 +1,32 @@
+{
+  "schema": "skill-runtime-requirements/v1",
+  "skill_name": "dual-forge-repository-loop",
+  "required_capabilities": ["local-checkout", "deterministic-checker"],
+  "optional_capabilities": ["forge-api-access"],
+  "executables": [
+    {"name": "python3", "version_constraint": ">=3.9", "provenance": "SYSTEM_PACKAGE"},
+    {"name": "jsonschema", "version_constraint": "==4.26.0", "provenance": "LANGUAGE_PACKAGE"},
+    {"name": "git", "version_constraint": ">=2.30", "provenance": "SYSTEM_PACKAGE"}
+  ],
+  "supported_runtime_identities": [
+    "CLAUDE_CODE_LOCAL",
+    "CODEX_CLI_LOCAL",
+    "GITHUB_ACTIONS"
+  ],
+  "network_policy": {
+    "mode": "NONE",
+    "allowed_hosts": []
+  },
+  "filesystem": {
+    "needs_writable_worktree": false,
+    "writable_subpaths": []
+  },
+  "isolation": {
+    "requires_isolated_worktree": false,
+    "sandbox": "READ_ONLY"
+  },
+  "secret_variable_names": [],
+  "setup_entrypoints": [],
+  "probe_entrypoints": ["probe.jsonschema-available", "probe.python-version"],
+  "not_exercised_without_substrate": []
+}

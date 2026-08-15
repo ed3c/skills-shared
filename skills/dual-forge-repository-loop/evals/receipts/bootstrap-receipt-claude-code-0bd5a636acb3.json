@@ -1,0 +1,63 @@
+{
+  "bootstrap_states": [
+    "RUNTIME_BOUND",
+    "REPOSITORY_POLICY_BOUND",
+    "SKILL_REQUIREMENTS_DISCOVERED",
+    "MINIMAL_SKILL_SET_RESOLVED",
+    "CANONICAL_SKILL_SUBJECTS_BOUND",
+    "SKILL_SURFACES_AVAILABLE",
+    "SKILL_RUNTIME_REQUIREMENTS_BOUND",
+    "RUNTIME_ENV_CLOSURE_BOUND",
+    "ENVIRONMENT_PLAN_RENDERED",
+    "ENVIRONMENT_PREPARED",
+    "CAPABILITY_PROBES_PASS",
+    "TASK_EXECUTION_ADMITTED"
+  ],
+  "canonical": {
+    "commit_sha": "0bd5a636acb3ffb24fc2dd424700cc54a76ffa54",
+    "registry_digest": "d6569833696d5c91884a409fb90b8599dd3e5f97dc2c5abc8f6669329a21f99a",
+    "repository_id": "ed3c/skills-shared",
+    "visibility": "PRIVATE"
+  },
+  "consumer": {
+    "repository_id": "ed3c/skills-shared",
+    "subject_sha": "0bd5a636acb3ffb24fc2dd424700cc54a76ffa54",
+    "visibility": "PRIVATE"
+  },
+  "environment": {
+    "absent_secret_names": [],
+    "capability_probes": [],
+    "plan_digest": "ABSENT",
+    "required_secret_names": [],
+    "setup_entrypoints": [],
+    "state": "NOT_REQUIRED"
+  },
+  "rejected_candidates": [],
+  "resolver_version": "collect-prompt-receipt/1.0.0",
+  "runtime_identity": "CLAUDE_CODE_LOCAL",
+  "schema": "skill-resolution-receipt/v1",
+  "selected_skills": [
+    {
+      "access_mode": "PROJECT_CANONICAL_PROJECTION",
+      "blob_or_tree_identity": "path:skills/dual-forge-repository-loop",
+      "canonical_path": "skills/dual-forge-repository-loop",
+      "content_sha256": "c1774028cc6a3881e0cc6a69e8508caba7e2d683060e8ba8630306c0dec40772",
+      "name": "dual-forge-repository-loop",
+      "runtime_requirements_digest": "12299f58b992c07cb14d18c89623dd7638a5929ad2e1e60a23dd288f97a09e92",
+      "selection_reason": "EXPLICIT_TASK_BINDING",
+      "surface_readback_state": "VERIFIED",
+      "transitive_dependencies": [],
+      "trigger_evidence": "the task carries this Skill's System Prompt as the treatment"
+    }
+  ],
+  "shadowing_scan": {
+    "findings": [],
+    "state": "CLEAN",
+    "surfaces_scanned": [
+      "<HOME>/.claude/skills",
+      "<HOME>/.agents/skills",
+      "<HOME>/skills-shared/.claude/skills",
+      "<HOME>/skills-shared/.agents/skills"
+    ]
+  }
+}

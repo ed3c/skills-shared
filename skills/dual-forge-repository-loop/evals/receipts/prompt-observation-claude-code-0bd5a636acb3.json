@@ -1,0 +1,21 @@
+{
+  "carrier": "SYSTEM_PROMPT_FILE",
+  "carrier_detail": "--append-system-prompt-file",
+  "host": "claude-code",
+  "host_exit_code": 0,
+  "local_verifier": {
+    "exit_code": 0,
+    "stdout_sha256": "391ec974589836caababed9226f8ce162338a57d84de03c0a658d23d28aadeac",
+    "summary": "PASS multi-agent-runtime: multi-worker, single-builder fallback, bounded retry lineage, dependency-ordered handoff, and sibling-path fixtures admitted; 35 planted topology, lease expiry, attempt-model, checkpoint, eval-identity, subject-admission, closure, budget, Shadow, result, and merge-boundary defects refused; absent input stayed distinct"
+  },
+  "prompt_bytes": 36866,
+  "prompt_sha256": "c1774028cc6a3881e0cc6a69e8508caba7e2d683060e8ba8630306c0dec40772",
+  "reported_verifier_exit": 0,
+  "runtime": "CLAUDE_CODE_LOCAL",
+  "schema": "prompt-carrier-observation/v1",
+  "stderr": "",
+  "stdout": "0\n",
+  "subject_sha": "0bd5a636acb3ffb24fc2dd424700cc54a76ffa54",
+  "task": "Run exactly this command from the repository root and reply with only its exit code as a bare integer, nothing else: python3 skills/dual-forge-repository-loop/tests/multi-agent-runtime/verify.py",
+  "version": "2.1.221 (Claude Code)"
+}

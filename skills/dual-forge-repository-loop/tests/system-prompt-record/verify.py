@@ -193,6 +193,20 @@ def main() -> int:
                 f"got code={code} stdout={stdout!r} stderr={stderr!r}"
             )
 
+    # The committed live receipts must keep passing. They were produced by real
+    # hosts against an exact subject; if a later schema or rule change invalidates
+    # them, that is a decision to make deliberately, not to discover in a rerun.
+    committed = sorted((SKILL_ROOT / "evals" / "receipts").glob("prompt-receipt-*.json"))
+    if not committed:
+        failures.append("committed live prompt receipts are missing")
+    for path in committed:
+        process = subprocess.run(
+            [sys.executable, str(CHECKER), str(path), "--schema-root", str(SCHEMA_ROOT)],
+            text=True, capture_output=True, check=False,
+        )
+        if process.returncode != 0:
+            failures.append(f"committed receipt {path.name}: code={process.returncode} {process.stderr!r}")
+
     process = subprocess.run(
         [sys.executable, str(CHECKER), str(TEST_DIR / "fixtures" / "absent.json")],
         text=True,
