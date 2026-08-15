@@ -135,6 +135,7 @@ if python3 "${snapshot}" capture \
   --repository ed3c/example \
   --branch feature \
   --check-name contract \
+  --workflow .github/workflows/verify.yml \
   --gh "${scratch}/fake-gh" \
   --transport-output "${scratch}/actions-transport.json" \
   --output "${scratch}/captured-snapshot.json" \
@@ -174,6 +175,7 @@ transport = {
     "repository": "ed3c/example",
     "branch": "feature",
     "check_name": "contract",
+    "workflow": ".github/workflows/verify.yml",
     "captured_at": "2026-08-14T10:05:00Z",
     "captures": [{
         "argv": ["/tmp/fake-gh", "api", "repos/ed3c/example"],

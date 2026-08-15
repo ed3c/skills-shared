@@ -114,12 +114,18 @@ python3 skills/github-delivery-loop/scripts/github_actions_snapshot.py capture \
   --repository OWNER/REPO \
   --branch <HEAD_BRANCH> \
   --check-name <STABLE_JOB_CHECK_NAME> \
+  --workflow <POLICY_WORKFLOW_PATH> \
   --transport-output /path/to/github-transport.json \
   --observation-output /path/to/github-observation.json \
   --output /path/to/github-state.snapshot.json
 ```
 
-It uses fixed `gh api` argv only and performs no mutation. It resolves exact private repository identity, zero or one open PR, exact PR head, exact stable check name, conclusion and annotations.
+It uses fixed `gh api` argv only and performs no mutation. It resolves the
+policy workflow path to an exact provider workflow ID before selecting the
+stable check by workflow ID, name, and PR head. A same-name job in another
+workflow is not authority; a rerun of the same job in the owning workflow stays
+ambiguous and turns red. It also resolves exact private repository identity,
+zero or one open PR, conclusion, and annotations.
 
 需要把分支缺席當成 publication authority 時加 `--strict`；orphan remote branch 會轉紅，且
 snapshot 的 `initial_boundary` 只可能是 `trusted-initial`、`branch-present-without-pr`、

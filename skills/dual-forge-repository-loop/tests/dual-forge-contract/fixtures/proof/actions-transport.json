@@ -1,10 +1,11 @@
 {
-  "schema": "github-actions-publish-transport/v3",
+  "schema": "github-actions-publish-transport/v4",
   "producer": "github_actions_snapshot.py",
   "gh_executable": {"invoked_path": "/usr/bin/gh", "resolved_path": "/usr/bin/gh", "sha256": "3333333333333333333333333333333333333333333333333333333333333333", "version": "gh version 2.82.0 (fixture)"},
   "repository": "ed3c/example",
   "branch": "agent/integration",
   "check_name": "contract",
+  "workflow": ".github/workflows/skill-eval-contract.yml",
   "captured_at": "2026-08-14T10:05:00Z",
   "captures": [
     {
@@ -12,6 +13,14 @@
       "exit": 0,
       "stdout": "{\"id\":123,\"full_name\":\"ed3c/example\",\"owner\":{\"login\":\"ed3c\"},\"private\":true}",
       "stdout_sha256": "2a62f836c0a6d4f2363b91cf67a2d4469b626a7f6200b273e1c43effd0ed1d55",
+      "stderr": "",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": ["/usr/bin/gh", "api", "repos/ed3c/example/actions/workflows/.github%2Fworkflows%2Fskill-eval-contract.yml"],
+      "exit": 0,
+      "stdout": "{\"id\":6001,\"path\":\".github/workflows/skill-eval-contract.yml\"}",
+      "stdout_sha256": "ba09010f8bf2e11f9755b863cfebe3536af495da688f01039232da1fb15f7a38",
       "stderr": "",
       "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },

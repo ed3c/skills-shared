@@ -8,7 +8,7 @@ This directory proves that the shared delivery mechanisms can turn red. A green 
 |---|---|---|
 | [`check-receipt/`](check-receipt/) | delivery-line check | missing artifact is `UNMATERIALIZED`, not skip |
 | [`ci-publication-control/`](ci-publication-control/) | exact-HEAD publication wrapper and host guard | controlled wrapper reaches dry-run; direct GitHub push and dirty-tree verification turn red |
-| [`evidence-producers/`](evidence-producers/) | local verification and GitHub snapshot producers | exact HEAD, fixed argv, safe env, one PR, exact check, billing classification |
+| [`evidence-producers/`](evidence-producers/) | local verification and GitHub snapshot producers | exact HEAD, fixed argv, safe env, one PR, policy-workflow-bound exact check, billing classification |
 | [`ci-publish-gate/`](ci-publish-gate/) | Actions publication admission | only three intents; stale SHA, repeated draft, reused feedback and billing circuit block |
 | [`merge-gate/`](merge-gate/) | merge authority | owner identity, admit freshness, host policy, and no-admit absence remain separate |
 | [`ci-workflow-policy/`](ci-workflow-policy/) | repository seal on the publication workflow | a policy that names a workflow is checked against the workflow on disk, and a required job the workflow does not declare fails closed |

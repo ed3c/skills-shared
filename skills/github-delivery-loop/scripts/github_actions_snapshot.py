@@ -14,7 +14,7 @@ from typing import Any
 
 OBSERVATION_SCHEMA="github-actions-publish-observation/v2"
 SNAPSHOT_SCHEMA="github-actions-publish-snapshot/v4"
-TRANSPORT_SCHEMA="github-actions-publish-transport/v3"
+TRANSPORT_SCHEMA="github-actions-publish-transport/v4"
 SHA_RE=re.compile(r"^[0-9a-f]{40}$");REPO_RE=re.compile(r"^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$")
 SHA256_RE=re.compile(r"^[0-9a-f]{64}$")
 GH_CANDIDATES=("/opt/homebrew/bin/gh","/usr/local/bin/gh","/usr/bin/gh","/home/linuxbrew/.linuxbrew/bin/gh")
@@ -35,6 +35,11 @@ def load(path:Path,label:str)->dict[str,Any]:
 def text(v:Any,label:str)->str:
     if not isinstance(v,str) or not v.strip():raise SnapshotError(f"{label} must be non-empty string")
     return v
+def workflow_path(v:Any,label:str="workflow")->str:
+    value=text(v,label)
+    if not value.startswith(".github/workflows/") or ".." in value or "\n" in value:
+        raise SnapshotError(f"{label} must be a safe .github/workflows/ path")
+    return value
 def sha(v:Any,label:str)->str:
     s=text(v,label)
     if not SHA_RE.fullmatch(s):raise SnapshotError(f"{label} must be exact lowercase 40-character SHA")
@@ -179,7 +184,7 @@ def _capture_entry(gh_path:str,endpoint:str,timeout:int,paginated:bool=False)->d
     return {"argv":argv,"exit":r.returncode,"stdout":r.stdout,"stdout_sha256":hashlib.sha256(r.stdout.encode()).hexdigest(),"stderr":r.stderr,"stderr_sha256":hashlib.sha256(r.stderr.encode()).hexdigest()}
 
 def _validated_captures(raw:dict[str,Any])->list[dict[str,Any]]:
-    exact(raw,{"schema","producer","gh_executable","repository","branch","check_name","captured_at","captures"},"transport")
+    exact(raw,{"schema","producer","gh_executable","repository","branch","check_name","workflow","captured_at","captures"},"transport")
     if raw["schema"]!=TRANSPORT_SCHEMA or raw["producer"]!="github_actions_snapshot.py":raise SnapshotError("unsupported Actions transport producer")
     identity=raw["gh_executable"]
     if not isinstance(identity,dict):raise SnapshotError("transport gh_executable must be object")
@@ -188,7 +193,7 @@ def _validated_captures(raw:dict[str,Any])->list[dict[str,Any]]:
     if invoked not in GH_CANDIDATES or not resolved.startswith("/") or not SHA256_RE.fullmatch(text(identity["sha256"],"gh sha256")) or not text(identity["version"],"gh version").startswith("gh version "):raise SnapshotError("transport gh executable identity is not admitted")
     repo=text(raw["repository"],"transport.repository")
     if not REPO_RE.fullmatch(repo):raise SnapshotError("transport repository must be owner/name")
-    text(raw["branch"],"transport.branch");text(raw["check_name"],"transport.check_name");timestamp(raw["captured_at"],"transport.captured_at")
+    text(raw["branch"],"transport.branch");text(raw["check_name"],"transport.check_name");workflow_path(raw["workflow"],"transport.workflow");timestamp(raw["captured_at"],"transport.captured_at")
     entries=raw["captures"]
     if not isinstance(entries,list) or not entries:raise SnapshotError("transport captures must be non-empty array")
     for i,entry in enumerate(entries):
@@ -212,22 +217,35 @@ def _check_identity(raw:dict[str,Any],repo:str)->tuple[int,int,int,int]:
     if not isinstance(suite,dict) or not isinstance(suite.get("id"),int) or isinstance(suite.get("id"),bool) or suite["id"]<=0:raise SnapshotError("check run lacks check-suite identity")
     return int(match.group(1)),int(match.group(2)),app["id"],suite["id"]
 
+def _workflow_identity(raw:Any,expected_path:str)->int:
+    if not isinstance(raw,dict):raise SnapshotError("workflow response malformed")
+    workflow_id=raw.get("id")
+    if not isinstance(workflow_id,int) or isinstance(workflow_id,bool) or workflow_id<=0:raise SnapshotError("workflow response lacks a positive id")
+    if raw.get("path")!=expected_path:raise SnapshotError("workflow response path does not match policy")
+    return workflow_id
+
+def _for_workflow(checks:list[dict[str,Any]],workflow_id:int)->list[dict[str,Any]]:
+    return [value for value in checks if value["workflow_id"]==workflow_id]
+
 def observation_from_transport(raw:dict[str,Any])->dict[str,Any]:
-    entries=_validated_captures(raw);repo=raw["repository"];branch_name=raw["branch"];check_name=raw["check_name"];owner=repo.split('/',1)[0]
+    entries=_validated_captures(raw);repo=raw["repository"];branch_name=raw["branch"];check_name=raw["check_name"];workflow=raw["workflow"];owner=repo.split('/',1)[0]
     expected_repo=f"repos/{repo}"
     if entries[0]["argv"]!=[entries[0]["argv"][0],"api",expected_repo]:raise SnapshotError("transport repository argv mismatch")
     r=_json_stdout(entries[0],expected_repo)
     if not isinstance(r,dict):raise SnapshotError("repository response malformed")
     rv={"full_name":r.get("full_name"),"repository_id":r.get("id"),"owner_login":(r.get("owner") or {}).get("login"),"private":r.get("private")};repository(rv)
+    workflow_endpoint=f"repos/{repo}/actions/workflows/{quote(workflow,safe='')}"
+    if len(entries)<2 or entries[1]["argv"]!=[entries[1]["argv"][0],"api",workflow_endpoint]:raise SnapshotError("transport workflow argv mismatch")
+    workflow_id=_workflow_identity(_json_stdout(entries[1],workflow_endpoint),workflow)
     pulls_endpoint=f"repos/{repo}/pulls?state=open&head={owner}:{branch_name}&per_page=100"
-    if len(entries)<2 or entries[1]["argv"]!=[entries[1]["argv"][0],"api","--paginate","--slurp",pulls_endpoint]:raise SnapshotError("transport PR argv mismatch")
-    pages=_json_stdout(entries[1],pulls_endpoint)
+    if len(entries)<3 or entries[2]["argv"]!=[entries[2]["argv"][0],"api","--paginate","--slurp",pulls_endpoint]:raise SnapshotError("transport PR argv mismatch")
+    pages=_json_stdout(entries[2],pulls_endpoint)
     if not isinstance(pages,list) or any(not isinstance(page,list) for page in pages):raise SnapshotError("PR pagination response malformed")
     ps=[item for page in pages for item in page]
     if any(not isinstance(x,dict) for x in ps):raise SnapshotError("PR response malformed")
     pulls=[{"number":x.get("number"),"draft":x.get("draft"),"head_sha":(x.get("head") or {}).get("sha"),"updated_at":x.get("updated_at")} for x in ps]
     if len(pulls)>1:raise SnapshotError("branch has multiple open pull requests")
-    checks=[];head=None;branch_ref_value=None;index=2
+    checks=[];head=None;branch_ref_value=None;index=3
     if pulls:
         head=sha(pulls[0]["head_sha"],"live PR head");checks_endpoint=f"repos/{repo}/commits/{head}/check-runs?per_page=100"
         if len(entries)<=index or entries[index]["argv"]!=[entries[index]["argv"][0],"api","--paginate","--slurp",checks_endpoint]:raise SnapshotError("transport check-runs argv mismatch")
@@ -246,6 +264,7 @@ def observation_from_transport(raw:dict[str,Any])->dict[str,Any]:
             if not isinstance(annotation_pages,list) or any(not isinstance(page,list) for page in annotation_pages):raise SnapshotError("annotations pagination response malformed")
             anns=[item for page in annotation_pages for item in page]
             checks.append({"id":x.get("id"),"name":x.get("name"),"head_sha":x.get("head_sha"),"status":x.get("status"),"conclusion":x.get("conclusion"),"completed_at":x.get("completed_at"),"annotations":[{"message":a.get("message")} for a in anns if isinstance(a,dict)],"app_id":app_id,"app_slug":"github-actions","check_suite_id":suite_id,"workflow_run_id":run_id,"workflow_id":run["workflow_id"],"job_id":job_id})
+        checks=_for_workflow(checks,workflow_id)
     endpoint=f"repos/{repo}/git/ref/heads/{quote(branch_name,safe='')}"
     if len(entries)>index:
         if entries[index]["argv"]!=[entries[index]["argv"][0],"api",endpoint]:raise SnapshotError("transport branch-ref argv mismatch")
@@ -266,15 +285,17 @@ def observation_from_transport(raw:dict[str,Any])->dict[str,Any]:
     if branch_ref_value is not None:result["branch_ref"]=branch_ref_value
     return result
 
-def capture_transport(repo:str,branch_name:str,check_name:str,timeout:int)->dict[str,Any]:
+def capture_transport(repo:str,branch_name:str,check_name:str,workflow:str,timeout:int)->dict[str,Any]:
     if not REPO_RE.fullmatch(repo):raise CaptureError("repository must be owner/name")
     if not branch_name or branch_name.startswith('-') or '\n' in branch_name:raise CaptureError("unsafe branch")
-    gh_identity=_gh_identity(timeout);gh_path=gh_identity["resolved_path"];captures=[]
+    workflow=workflow_path(workflow);gh_identity=_gh_identity(timeout);gh_path=gh_identity["resolved_path"];captures=[]
     def call(endpoint:str,paginated:bool=False)->Any:
         entry=_capture_entry(gh_path,endpoint,timeout,paginated);captures.append(entry);return _json_stdout(entry,endpoint)
     r=call(f"repos/{repo}");owner=repo.split('/',1)[0]
     if not isinstance(r,dict):raise CaptureError("repository response malformed")
     rv={"full_name":r.get("full_name"),"repository_id":r.get("id"),"owner_login":(r.get("owner") or {}).get("login"),"private":r.get("private")};repository(rv)
+    workflow_endpoint=f"repos/{repo}/actions/workflows/{quote(workflow,safe='')}"
+    _workflow_identity(call(workflow_endpoint),workflow)
     pull_pages=call(f"repos/{repo}/pulls?state=open&head={owner}:{branch_name}&per_page=100",True)
     if not isinstance(pull_pages,list) or any(not isinstance(page,list) for page in pull_pages):raise SnapshotError("branch PR pagination is malformed")
     ps=[item for page in pull_pages for item in page]
@@ -289,10 +310,10 @@ def capture_transport(repo:str,branch_name:str,check_name:str,timeout:int)->dict
                     call(f"repos/{repo}/actions/runs/{run_id}")
                     call(f"repos/{repo}/check-runs/{x.get('id')}/annotations?per_page=100",True)
     captures.append(_capture_entry(gh_path,f"repos/{repo}/git/ref/heads/{quote(branch_name,safe='')}",timeout))
-    return {"schema":TRANSPORT_SCHEMA,"producer":"github_actions_snapshot.py","gh_executable":gh_identity,"repository":repo,"branch":branch_name,"check_name":check_name,"captured_at":datetime.now(timezone.utc).isoformat().replace("+00:00","Z"),"captures":captures}
+    return {"schema":TRANSPORT_SCHEMA,"producer":"github_actions_snapshot.py","gh_executable":gh_identity,"repository":repo,"branch":branch_name,"check_name":check_name,"workflow":workflow,"captured_at":datetime.now(timezone.utc).isoformat().replace("+00:00","Z"),"captures":captures}
 
-def capture(repo:str,branch_name:str,check_name:str,timeout:int)->dict[str,Any]:
-    return observation_from_transport(capture_transport(repo,branch_name,check_name,timeout))
+def capture(repo:str,branch_name:str,check_name:str,workflow:str,timeout:int)->dict[str,Any]:
+    return observation_from_transport(capture_transport(repo,branch_name,check_name,workflow,timeout))
 def fixture()->dict[str,Any]:
     h="1"*40
     return {"schema":OBSERVATION_SCHEMA,"repository":{"full_name":"ed3c/skills-shared","repository_id":1326262274,"owner_login":"ed3c","private":True},"branch":{"name":"feature","head_sha":h},"pull_requests":[{"number":42,"draft":False,"head_sha":h,"updated_at":"2026-08-12T05:00:00Z"}],"check_runs":[{"id":9001,"name":"contract","head_sha":h,"status":"completed","conclusion":"failure","completed_at":"2026-08-12T05:01:00Z","annotations":[{"message":"repository test failed"}],"app_id":15368,"app_slug":"github-actions","check_suite_id":8001,"workflow_run_id":7001,"workflow_id":6001,"job_id":5001}],"captured_at":"2026-08-12T05:02:00Z"}
@@ -319,6 +340,12 @@ def selftest()->None:
     else:raise SnapshotError("strict mode admitted an orphan branch")
     b=fixture();b["check_runs"][0]["annotations"]=[{"message":"The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"}]
     if build(b,"contract")["actions"]["circuit"]!="billing-open":raise SnapshotError("billing collapsed")
+    mixed=fixture();mixed["check_runs"].append(dict(mixed["check_runs"][0],id=9002,workflow_id=6002,job_id=5002))
+    mixed["check_runs"]=_for_workflow(mixed["check_runs"],6001)
+    if build(mixed,"contract")["pull_request"]["feedback"]["id"]!="check-run:9001":raise SnapshotError("workflow-bound check selection lost the required check")
+    try:_workflow_identity({"id":6001,"path":".github/workflows/other.yml"},".github/workflows/verify.yml")
+    except SnapshotError:pass
+    else:raise SnapshotError("a workflow response for another path was admitted")
     cases=[];m=fixture();m["pull_requests"].append(dict(m["pull_requests"][0],number=43));cases.append(m);p=fixture();p["repository"]["private"]=False;cases.append(p);s=fixture();s["check_runs"][0]["head_sha"]="2"*40;cases.append(s);a=fixture();a["check_runs"][0]["annotations"]=[{}];cases.append(a);i=fixture();i["check_runs"][0].update({"status":"in_progress","conclusion":None,"completed_at":None});cases.append(i);d=fixture();d["check_runs"].append(dict(d["check_runs"][0],id=9002,job_id=5002));cases.append(d);foreign=fixture();foreign["check_runs"][0]["app_slug"]="other";cases.append(foreign)
     for x in cases:
         try:build(x,"contract")
@@ -326,7 +353,7 @@ def selftest()->None:
         else:raise SnapshotError("negative observation passed")
     print("SELFTEST GREEN: trusted GitHub publication snapshots; branch absence proved independently")
 def main(argv:list[str]|None=None)->int:
-    p=argparse.ArgumentParser();p.add_argument("--selftest",action="store_true");subs=p.add_subparsers(dest="cmd");r=subs.add_parser("replay");r.add_argument("--observation",type=Path,required=True);r.add_argument("--check-name",required=True);r.add_argument("--output",type=Path,required=True);r.add_argument("--strict",action="store_true");t=subs.add_parser("replay-transport");t.add_argument("--transport",type=Path,required=True);t.add_argument("--observation-output",type=Path,required=True);t.add_argument("--output",type=Path,required=True);t.add_argument("--strict",action="store_true");c=subs.add_parser("capture");c.add_argument("--repository",required=True);c.add_argument("--branch",required=True);c.add_argument("--check-name",required=True);c.add_argument("--timeout-seconds",type=int,default=30);c.add_argument("--transport-output",type=Path,required=True);c.add_argument("--observation-output",type=Path);c.add_argument("--output",type=Path,required=True);c.add_argument("--strict",action="store_true");a=p.parse_args(argv)
+    p=argparse.ArgumentParser();p.add_argument("--selftest",action="store_true");subs=p.add_subparsers(dest="cmd");r=subs.add_parser("replay");r.add_argument("--observation",type=Path,required=True);r.add_argument("--check-name",required=True);r.add_argument("--output",type=Path,required=True);r.add_argument("--strict",action="store_true");t=subs.add_parser("replay-transport");t.add_argument("--transport",type=Path,required=True);t.add_argument("--observation-output",type=Path,required=True);t.add_argument("--output",type=Path,required=True);t.add_argument("--strict",action="store_true");c=subs.add_parser("capture");c.add_argument("--repository",required=True);c.add_argument("--branch",required=True);c.add_argument("--check-name",required=True);c.add_argument("--workflow",required=True);c.add_argument("--timeout-seconds",type=int,default=30);c.add_argument("--transport-output",type=Path,required=True);c.add_argument("--observation-output",type=Path);c.add_argument("--output",type=Path,required=True);c.add_argument("--strict",action="store_true");a=p.parse_args(argv)
     if a.selftest:
         try:selftest();return 0
         except Exception as e:print(f"SELFTEST RED: {e}",file=sys.stderr);return 1
@@ -336,7 +363,7 @@ def main(argv:list[str]|None=None)->int:
             raw=load(a.transport,"transport");o=observation_from_transport(raw);v=build(o,raw["check_name"],strict=a.strict);atomic(a.observation_output.resolve(),o);atomic(a.output.resolve(),v);print(f"WROTE {a.output.resolve()}");return 0
         if a.cmd=="capture":
             if a.timeout_seconds<1:raise CaptureError("timeout must be positive")
-            raw=capture_transport(a.repository,a.branch,a.check_name,a.timeout_seconds);o=observation_from_transport(raw);v=build(o,a.check_name,strict=a.strict)
+            raw=capture_transport(a.repository,a.branch,a.check_name,a.workflow,a.timeout_seconds);o=observation_from_transport(raw);v=build(o,a.check_name,strict=a.strict)
             atomic(a.transport_output.resolve(),raw)
             if a.observation_output:atomic(a.observation_output.resolve(),o)
             atomic(a.output.resolve(),v);print(f"WROTE {a.output.resolve()}");return 0

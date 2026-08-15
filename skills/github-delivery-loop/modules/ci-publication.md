@@ -83,7 +83,9 @@ The evaluator is deliberately pure; enforcement is layered around it:
    contract's fixed argv and writes exact-HEAD receipt plus detailed evidence
    under the git directory, outside the committed tree.
 4. `ci_publish.py publish` rechecks policy, receipt, snapshot, GitHub remote
-   identity, observed branch, and full-SHA refspec before one push. Initial
+   identity, observed branch, and full-SHA refspec before one push. Its live
+   capture resolves the policy's workflow path to the provider workflow ID, so
+   another workflow cannot collide by reusing the same job name. Initial
    publication creates a draft PR; ready publication marks it ready. Draft-first
    batched repairs explicitly dispatch the verifier;
    universal publications also require an open PR and an exact match between the
