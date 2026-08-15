@@ -133,6 +133,32 @@ python3 ~/.agents/skills-shared/skills/shared-skills-infra/scripts/check_skill_b
 正對照涵蓋四種該被admit的形狀（本機執行、connector 只推理、Actions pinned bundle、
 誠實記錄被擋的 lane），負對照 25 個。`tests/skill-bootstrap/verify.py`。
 
+### `scripts/check_skill_requirements.py` — 同一份契約的兩半：需求與綁定
+
+收據記的是**觀測**；這兩份記的是**宣告**。`skill-runtime-requirements/v1` 是某個 Skill
+抽象地需要什麼（能力、可執行檔與版本、網路政策、檔案系統與隔離、secret 的**名字**、
+固定 entrypoint ID、以及「沒有真實 substrate 就 NOT_EXERCISED 的宣稱」）；
+`consumer-skill-binding/v1` 是某個消費 repo 把這些抽象解析到確切 commit 與 host surface
+（即 `.skill-bindings/skills-shared.json`）。
+
+```bash
+python3 ~/.agents/skills-shared/skills/shared-skills-infra/scripts/check_skill_requirements.py DOC.json
+# 文件自己的 schema 欄位決定用哪份 schema；exit 0｜2 宣告了自己撐不起的東西｜64 不合｜70 缺 jsonschema
+```
+
+刀口分兩類。**可攜性**打在型別上：canonical commit 必須是 40-hex（`main` 這種會動的 ref
+拼不出來，否則綁定等於沒綁），surface 與 writable 路徑必須是 repo 相對且不含 `..`，
+executable 只能是工具名不能是絕對路徑，url 不接受 `file://`——這些一旦寫進去，
+binding 就只在某一台機器成立。**過度宣稱**打在語意上：空的 ALLOWLIST 是掛著寬鬆標籤的
+NONE；要 secret 或要 UNRESTRICTED 網路，就必須同時宣告哪些事沒有真實 substrate 就是
+NOT_EXERCISED——否則 fixture 全綠會被讀成完整支援。
+
+access mode 矩陣**與 bootstrap checker 共用同一份**（直接 import，不複製）：binding 允許
+一個該 runtime 根本觀測不到的 mode，跟收據宣稱它是同一個錯誤，只是提早發生在設定裡。
+
+正對照四個（含「離線 Skill 可以什麼都不宣告為未證」與「binding 可以沒有 runtime_env」——
+邊界是有條件的，不是普世的），負對照 23 個。`tests/skill-bootstrap/verify_requirements.py`。
+
 ## clone 下來怎麼接線
 
 ```bash

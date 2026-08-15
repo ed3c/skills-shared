@@ -1,0 +1,40 @@
+{
+  "schema": "consumer-skill-binding/v1",
+  "consumer_repository_id": "example/consumer",
+  "canonical": {
+    "repository_id": "example/skills-shared",
+    "url": "https://github.com/example/skills-shared",
+    "commit_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  },
+  "selected_skills": [
+    {
+      "name": "dual-forge-repository-loop",
+      "content_sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+      "runtime_requirements_digest": "3333333333333333333333333333333333333333333333333333333333333333"
+    },
+    {
+      "name": "shared-skills-infra",
+      "content_sha256": "4444444444444444444444444444444444444444444444444444444444444444"
+    }
+  ],
+  "routing": {
+    "surfaces": {
+      "claude": ".claude/skills",
+      "codex": ".agents/skills"
+    }
+  },
+  "runtime_env": {
+    "repository_id": "example/runtime-env",
+    "commit_sha": "cccccccccccccccccccccccccccccccccccccccc",
+    "binding_ids": ["runtime-env.binding.consumer"],
+    "profile_ids": ["runtime-env.profile.delivery"],
+    "workload_ids": ["runtime-env.workload.delivery-loop"],
+    "policy_ids": ["runtime-env.policy.no-ambient-secrets"]
+  },
+  "capability_probes": ["probe.git-available", "probe.forgejo-reachable"],
+  "allowed_access_modes": {
+    "CLAUDE_CODE_LOCAL": ["LOCAL_CANONICAL_USER_SURFACE", "PROJECT_CANONICAL_PROJECTION"],
+    "CODEX_CLI_LOCAL": ["LOCAL_CANONICAL_USER_SURFACE"],
+    "GITHUB_ACTIONS": ["GITHUB_ACTIONS_PINNED_BUNDLE"]
+  }
+}

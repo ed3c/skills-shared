@@ -509,4 +509,10 @@ grep -q "^PASS shared skills hold" "${world}/9.out"
 #     claim before it mutates a repository. Own synthetic fixtures, no world.
 python3 "${test_dir}/skill-bootstrap/verify.py"
 
+# 12. the two halves of the same contract: what a Skill abstractly needs, and
+#     where one consumer resolves it. Separate from 11 because a receipt is an
+#     observation while these are declarations -- a binding can pin the right
+#     commit and still describe a surface that does not exist on this machine.
+python3 "${test_dir}/skill-bootstrap/verify_requirements.py"
+
 echo "PASS shared-skills gate"

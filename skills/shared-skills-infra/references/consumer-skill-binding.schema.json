@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skills-shared.invalid/consumer-skill-binding/v1",
+  "title": "Consumer Skill Binding",
+  "description": "The thin checked-in file (.skill-bindings/skills-shared.json) by which a consumer repository pins which canonical Skills it consumes, at which exact commit, and through which access modes. It is the consumer's half of the bootstrap contract. It carries no secret values, no local absolute paths, no tokens, no browser sessions and no mutable branch references -- each of those either leaks or makes the binding unreproducible on another machine.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "consumer_repository_id",
+    "canonical",
+    "selected_skills",
+    "routing",
+    "capability_probes",
+    "allowed_access_modes"
+  ],
+  "properties": {
+    "schema": {"const": "consumer-skill-binding/v1"},
+    "consumer_repository_id": {"type": "string", "minLength": 3},
+    "canonical": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository_id", "url", "commit_sha"],
+      "properties": {
+        "repository_id": {"type": "string", "minLength": 3},
+        "url": {
+          "comment": "https or ssh remote. A file:// or bare local path pins this binding to one machine.",
+          "type": "string",
+          "pattern": "^(https://|git@)[^\\s]+$"
+        },
+        "commit_sha": {
+          "comment": "An exact commit. A branch name is a moving target, so `main` here would mean the binding pins nothing.",
+          "$ref": "#/$defs/git_sha"
+        }
+      }
+    },
+    "selected_skills": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "content_sha256"],
+        "properties": {
+          "name": {"type": "string", "minLength": 1},
+          "content_sha256": {"$ref": "#/$defs/sha256"},
+          "runtime_requirements_digest": {"$ref": "#/$defs/sha256"}
+        }
+      }
+    },
+    "routing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["surfaces"],
+      "properties": {
+        "surfaces": {
+          "comment": "Repository-relative surface directories. An absolute path would not survive a clone anywhere else.",
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": {"pattern": "^[a-z][a-z0-9-]*$"},
+          "additionalProperties": {"type": "string", "pattern": "^(?!/)(?!.*(^|/)\\.\\.(/|$)).+$"}
+        }
+      }
+    },
+    "runtime_env": {
+      "comment": "Optional. Where the abstract runtime-env identifiers a Skill declares are actually resolved. Exact commit for the same reason as the canonical one.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository_id", "commit_sha"],
+      "properties": {
+        "repository_id": {"type": "string", "minLength": 3},
+        "commit_sha": {"$ref": "#/$defs/git_sha"},
+        "binding_ids": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/entrypoint_id"}},
+        "profile_ids": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/entrypoint_id"}},
+        "workload_ids": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/entrypoint_id"}},
+        "policy_ids": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/entrypoint_id"}}
+      }
+    },
+    "capability_probes": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/entrypoint_id"}
+    },
+    "allowed_access_modes": {
+      "comment": "Per runtime identity. The bootstrap checker refuses a receipt whose access mode this runtime cannot observe; declaring one here that the runtime cannot reach is the same error made earlier, in configuration.",
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {"$ref": "#/$defs/runtime_identity"},
+      "additionalProperties": {
+        "type": "array",
+        "minItems": 1,
+        "uniqueItems": true,
+        "items": {"$ref": "#/$defs/access_mode"}
+      }
+    }
+  },
+  "$defs": {
+    "git_sha": {"type": "string", "pattern": "^[0-9a-f]{40}([0-9a-f]{24})?$"},
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "entrypoint_id": {"type": "string", "pattern": "^[a-z][a-z0-9]*([._-][a-z0-9]+)*$"},
+    "runtime_identity": {
+      "enum": [
+        "CHATGPT_GITHUB_CONNECTOR",
+        "GITHUB_ACTIONS",
+        "CLAUDE_CODE_LOCAL",
+        "CODEX_CLI_LOCAL",
+        "CHATGPT_DESKTOP_WORKTREE"
+      ]
+    },
+    "access_mode": {
+      "enum": [
+        "LOCAL_CANONICAL_USER_SURFACE",
+        "PROJECT_CANONICAL_PROJECTION",
+        "CONNECTOR_EXACT_COMMIT_READ_ONLY",
+        "GITHUB_ACTIONS_PINNED_BUNDLE",
+        "IMMUTABLE_RELEASE_BUNDLE"
+      ]
+    }
+  }
+}

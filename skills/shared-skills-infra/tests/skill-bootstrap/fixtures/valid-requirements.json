@@ -1,0 +1,38 @@
+{
+  "schema": "skill-runtime-requirements/v1",
+  "skill_name": "dual-forge-repository-loop",
+  "required_capabilities": ["local-checkout", "isolated-worktree", "deterministic-checker"],
+  "optional_capabilities": ["forge-api-access"],
+  "executables": [
+    {"name": "git", "version_constraint": ">=2.40", "provenance": "SYSTEM_PACKAGE"},
+    {"name": "python3", "version_constraint": ">=3.9", "provenance": "SYSTEM_PACKAGE"},
+    {"name": "jsonschema", "version_constraint": "==4.26.0", "provenance": "LANGUAGE_PACKAGE"}
+  ],
+  "supported_runtime_identities": ["CLAUDE_CODE_LOCAL", "CODEX_CLI_LOCAL", "GITHUB_ACTIONS"],
+  "network_policy": {
+    "mode": "ALLOWLIST",
+    "allowed_hosts": ["api.github.com", "localhost"]
+  },
+  "filesystem": {
+    "needs_writable_worktree": true,
+    "writable_subpaths": ["skills/dual-forge-repository-loop"]
+  },
+  "isolation": {
+    "requires_isolated_worktree": true,
+    "sandbox": "BOUNDED_WRITE"
+  },
+  "secret_variable_names": ["FORGEJO_TOKEN"],
+  "setup_entrypoints": ["runtime-env.workload.delivery-loop"],
+  "probe_entrypoints": ["probe.git-available", "probe.forgejo-reachable"],
+  "runtime_env": {
+    "modules": ["runtime-env.module.forge"],
+    "profiles": ["runtime-env.profile.delivery"],
+    "workloads": ["runtime-env.workload.delivery-loop"],
+    "policies": ["runtime-env.policy.no-ambient-secrets"]
+  },
+  "not_exercised_without_substrate": [
+    "that a live Forgejo instance accepted a typed request",
+    "that a real GitHub Actions run observed the exact head",
+    "that credential-dependent routing behaves as documented"
+  ]
+}

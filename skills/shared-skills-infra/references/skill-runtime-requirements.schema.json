@@ -1,0 +1,142 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skills-shared.invalid/skill-runtime-requirements/v1",
+  "title": "Skill Runtime Requirements",
+  "description": "What a Skill needs from an execution environment, stated abstractly and without secrets. This is the Skill's half of the bootstrap contract: it declares requirements, and a consumer binding maps them onto a concrete runtime. Concrete paths, credentials, provider accounts and live receipts are consumer-owned and cannot be spelled here.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "skill_name",
+    "required_capabilities",
+    "optional_capabilities",
+    "executables",
+    "supported_runtime_identities",
+    "network_policy",
+    "filesystem",
+    "isolation",
+    "secret_variable_names",
+    "setup_entrypoints",
+    "probe_entrypoints",
+    "not_exercised_without_substrate"
+  ],
+  "properties": {
+    "schema": {"const": "skill-runtime-requirements/v1"},
+    "skill_name": {"type": "string", "minLength": 1},
+    "required_capabilities": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/capability_id"}
+    },
+    "optional_capabilities": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/capability_id"}
+    },
+    "executables": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "version_constraint", "provenance"],
+        "properties": {
+          "name": {
+            "comment": "A tool name, not a path. An absolute path is a consumer binding, and one baked in here would be portable only by accident.",
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._+-]*$"
+          },
+          "version_constraint": {"type": "string", "minLength": 1},
+          "provenance": {"enum": ["SYSTEM_PACKAGE", "LANGUAGE_PACKAGE", "PINNED_RELEASE", "REPOSITORY_VENDORED", "UNSPECIFIED"]}
+        }
+      }
+    },
+    "supported_runtime_identities": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/runtime_identity"}
+    },
+    "network_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "allowed_hosts"],
+      "properties": {
+        "mode": {"enum": ["NONE", "ALLOWLIST", "UNRESTRICTED"]},
+        "allowed_hosts": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "filesystem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["needs_writable_worktree", "writable_subpaths"],
+      "properties": {
+        "needs_writable_worktree": {"type": "boolean"},
+        "writable_subpaths": {
+          "comment": "Repository-relative. A leading slash or a `..` segment names something outside the subject.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^(?!/)(?!.*(^|/)\\.\\.(/|$)).+$"}
+        }
+      }
+    },
+    "isolation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requires_isolated_worktree", "sandbox"],
+      "properties": {
+        "requires_isolated_worktree": {"type": "boolean"},
+        "sandbox": {"enum": ["NONE", "READ_ONLY", "BOUNDED_WRITE", "REQUIRED_STRICT"]}
+      }
+    },
+    "secret_variable_names": {
+      "comment": "Names only. There is no field for a value, and additionalProperties is false, so a manifest carrying one is schema-invalid.",
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/env_var_name"}
+    },
+    "setup_entrypoints": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/entrypoint_id"}
+    },
+    "probe_entrypoints": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/entrypoint_id"}
+    },
+    "runtime_env": {
+      "comment": "Optional and portable-only: module/profile/workload/policy identifiers, never a repository path or commit. Which runtime-env instance supplies them is a consumer binding decision.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "modules": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/entrypoint_id"}},
+        "profiles": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/entrypoint_id"}},
+        "workloads": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/entrypoint_id"}},
+        "policies": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/entrypoint_id"}}
+      }
+    },
+    "not_exercised_without_substrate": {
+      "comment": "Claims this Skill cannot support from fixtures alone. Declaring them is what keeps a green fixture run from reading as a proven capability.",
+      "type": "array",
+      "items": {"type": "string", "minLength": 1}
+    }
+  },
+  "$defs": {
+    "capability_id": {"type": "string", "pattern": "^[a-z][a-z0-9]*([._-][a-z0-9]+)*$"},
+    "entrypoint_id": {"type": "string", "pattern": "^[a-z][a-z0-9]*([._-][a-z0-9]+)*$"},
+    "env_var_name": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]*$"},
+    "runtime_identity": {
+      "enum": [
+        "CHATGPT_GITHUB_CONNECTOR",
+        "GITHUB_ACTIONS",
+        "CLAUDE_CODE_LOCAL",
+        "CODEX_CLI_LOCAL",
+        "CHATGPT_DESKTOP_WORKTREE"
+      ]
+    }
+  }
+}
