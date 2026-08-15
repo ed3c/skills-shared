@@ -1,0 +1,135 @@
+{
+  "artifacts": {
+    "committed_expected_report_sha256": "3f990c93b23892c398f811745949fdc93d0debbc65e785f0f53e8b55b551e3e3",
+    "effectiveness_report_sha256": "3f990c93b23892c398f811745949fdc93d0debbc65e785f0f53e8b55b551e3e3",
+    "observation_receipt_digest": "08836e9b4cc2f21564d6f18b5e52c7ecaf983c0fe8176f92903ca2fc01e76f05",
+    "observed_external_trace_digest": "97b4fe577bcd1b966c63f3d3a26c68cb2baddb982e3bd8e2ae65ac5911d6fbf6",
+    "physical_archive_bytes": 128,
+    "physical_archive_sha256": "cb060dc69c361e78cc6e3e304b51b63581532dcaaeecbd399de108bf493b0650"
+  },
+  "assertions": {
+    "all_retained_rules_have_deciding_delta": true,
+    "candidate_score": 1.0,
+    "core_checker_green": true,
+    "current_full_score": 1.0,
+    "expected_observation_receipts": 15,
+    "expected_report_diff_empty": true,
+    "generated_report_matches_committed_expected": true,
+    "no_skill_defect_recall": 0.076923,
+    "no_skill_false_pass_count": 12,
+    "no_skill_score": 0.305128,
+    "observation_receipts": 15,
+    "physical_archive_present": true,
+    "retained_rules": 13,
+    "runtime_supported_rules": 13,
+    "unittest_count": 4,
+    "unittest_passed": 4
+  },
+  "claims": {
+    "established": [
+      "deterministic procedural necessity for the 15 committed cases",
+      "13 of 13 retained core rules have a deciding ablation delta",
+      "generated effectiveness report matches the committed expected report",
+      "physical archive publication probe exists and is digest-addressed"
+    ],
+    "not_established": [
+      "GitHub-hosted suite execution",
+      "cross-model prompt recall, internalization, or compliance",
+      "held-out repository uplift",
+      "production correctness",
+      "causal isolation of overlapping dependency skills"
+    ]
+  },
+  "command": {
+    "argv": [
+      "timeout",
+      "90",
+      "bash",
+      "tests/run-all.sh"
+    ],
+    "cwd": "/mnt/data/rca-skill",
+    "exit_code": 0,
+    "stdout_stderr_log_sha256": "9fe1d991b474bcaf7968755f4840469bdf3936cc5b8d6eb04896b4d605ace87d",
+    "stdout_stderr_log_tail": "CORE GREEN: every SKILL.md rule has a deciding runtime delta; domain instances remain outside the core\ntest_candidate_outperforms_no_skill_without_losing_full_outcome (test_ablation.RepositoryCapabilityAuditAblationTests.test_candidate_outperforms_no_skill_without_losing_full_outcome) ... ok\ntest_dependency_fraction_is_semantic_claim_count_not_token_count (test_ablation.RepositoryCapabilityAuditAblationTests.test_dependency_fraction_is_semantic_claim_count_not_token_count) ... ok\ntest_every_retained_rule_has_a_deciding_ablation (test_ablation.RepositoryCapabilityAuditAblationTests.test_every_retained_rule_has_a_deciding_ablation) ... ok\ntest_real_runtime_receipt_is_bounded (test_ablation.RepositoryCapabilityAuditAblationTests.test_real_runtime_receipt_is_bounded) ... ok\n\n----------------------------------------------------------------------\nRan 4 tests in 16.047s\n\nOK\nREPOSITORY CAPABILITY AUDIT GREEN\n"
+  },
+  "executor": {
+    "bash": "GNU bash, version 5.2.37(1)-release (x86_64-pc-linux-gnu)",
+    "class": "openai-container-local-runtime",
+    "machine": "x86_64",
+    "python": "3.13.5",
+    "release": "6.18.35",
+    "system": "Linux"
+  },
+  "github_actions": {
+    "coverage_job_id": 95015187274,
+    "message": "The job was not started because an Actions budget is preventing further use.",
+    "repository_capability_audit_job_id": 95015187447,
+    "state": "BLOCKED_INFRASTRUCTURE",
+    "steps_observed": null,
+    "workflow_run_id": 31885962605
+  },
+  "observed_at": "2026-08-15T13:01:00.901482+00:00",
+  "receipt_sha256": "e9060cbe38f6fe9901b76a2a0c356c9c30d1b8312f38789e727625f51fad89c9",
+  "schema": "repository-capability-audit-local-runtime-receipt/v1",
+  "state": "PASS",
+  "subject": {
+    "branch": "agent/198-repository-capability-audit",
+    "commit": "1a4e26910ac679ae880b06250bf6c69e1355c6dc",
+    "execution_copy": "/mnt/data/rca-skill",
+    "repository": "ed3c/skills-shared",
+    "skill_blob_manifest": {
+      "LICENSE": {
+        "bytes": 1061,
+        "git_blob_sha1": "9e8805d824c201a416ecff0c1885f0c8f8cdfb6f",
+        "sha256": "a46b21fb81beb79dfa22daa9a964a368029b5c69cd745275a202fc4b26efe211"
+      },
+      "SKILL.md": {
+        "bytes": 8682,
+        "git_blob_sha1": "0cbced53d29090b1cd7cd875482a4658351f053b",
+        "sha256": "32aa3043b4a7c0b7e1dc829294c3555898997b2603185429600f1d232d568ba2"
+      },
+      "evals/contract.json": {
+        "bytes": 6369,
+        "git_blob_sha1": "a8163ef4625b96d9d36c350f5ebd98fc2eaa9764",
+        "sha256": "0704e202c0d45d7770421465a70380bb66d4cc6ba69487dc4071b6070322dc0f"
+      },
+      "evals/expected/effectiveness.json": {
+        "bytes": 5557,
+        "git_blob_sha1": "791c13b2f8d498eaeed617487455ab1efab24a2e",
+        "sha256": "3f990c93b23892c398f811745949fdc93d0debbc65e785f0f53e8b55b551e3e3"
+      },
+      "modules/domain-instances.md": {
+        "bytes": 3810,
+        "git_blob_sha1": "7b005573cc200f382a7d61f8a692f81552587ccf",
+        "sha256": "8a7ee5030d82be8757579995d622ef82c9880f522cd1b01d7a7458961e9d06ce"
+      },
+      "modules/source-contribution-map.md": {
+        "bytes": 1194,
+        "git_blob_sha1": "c66e12457159edb8dcbf78a65e9e9ff04ded291d",
+        "sha256": "5ba6835beb1fc95b5e330643cd8f6776c0c4999294d68441a8730c0e66e7b2d1"
+      },
+      "scripts/check_core.py": {
+        "bytes": 2684,
+        "git_blob_sha1": "696500b03aa5258e16876544dc1df84f7ed4dba5",
+        "sha256": "ba381a06e6dab9823c782778c0aaf605c46ebe72daab83446d1c63401f9c4255"
+      },
+      "scripts/run_ablation.py": {
+        "bytes": 13946,
+        "git_blob_sha1": "8831d805cb45a0cff4383958dd3390bfb65e2d81",
+        "sha256": "71258c3b5f3a3cef92c0d0078360b03441cd300d2a85d8ec877eb2b5518fb551"
+      },
+      "tests/run-all.sh": {
+        "bytes": 640,
+        "git_blob_sha1": "809054c854f6f3fb790bfc6c614cab4862c599c5",
+        "sha256": "b5150c7dc82ad1b19b921696eb4119b8538789432e9175a2fd7ef1b86e2f1c82"
+      },
+      "tests/test_ablation.py": {
+        "bytes": 2837,
+        "git_blob_sha1": "26fbcce34b3565a3e52577df9eacc748fe1af287",
+        "sha256": "5ca76f52946c956b48c26c079224d7bb5c459d8ccb93b8978c6ec42740ec991e"
+      }
+    },
+    "skill_path": "skills/repository-capability-audit",
+    "tree": "83119fa438b0774c48cf0d7c8ed4c70c7814d8df"
+  }
+}
