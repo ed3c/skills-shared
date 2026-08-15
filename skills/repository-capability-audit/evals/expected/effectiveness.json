@@ -1,0 +1,228 @@
+{
+  "ablations": {
+    "RCA-001": {
+      "affected_cases": [
+        "subject-drift"
+      ],
+      "effective": true,
+      "score_delta": -0.055128
+    },
+    "RCA-002": {
+      "affected_cases": [
+        "evidence-level-overclaim"
+      ],
+      "effective": true,
+      "score_delta": -0.055128
+    },
+    "RCA-003": {
+      "affected_cases": [
+        "silent-skip"
+      ],
+      "effective": true,
+      "score_delta": -0.055128
+    },
+    "RCA-004": {
+      "affected_cases": [
+        "runtime-alias"
+      ],
+      "effective": true,
+      "score_delta": -0.055128
+    },
+    "RCA-005": {
+      "affected_cases": [
+        "denial-without-positive-control"
+      ],
+      "effective": true,
+      "score_delta": -0.055128
+    },
+    "RCA-006": {
+      "affected_cases": [
+        "failure-evidence-loss"
+      ],
+      "effective": true,
+      "score_delta": -0.055128
+    },
+    "RCA-007": {
+      "affected_cases": [
+        "hidden-artifact-omission"
+      ],
+      "effective": true,
+      "score_delta": -0.055128
+    },
+    "RCA-008": {
+      "affected_cases": [
+        "mutable-external-ref"
+      ],
+      "effective": true,
+      "score_delta": -0.055128
+    },
+    "RCA-009": {
+      "affected_cases": [
+        "ambient-secret-leak"
+      ],
+      "effective": true,
+      "score_delta": -0.055128
+    },
+    "RCA-010": {
+      "affected_cases": [
+        "zero-access-gap"
+      ],
+      "effective": true,
+      "score_delta": -0.055128
+    },
+    "RCA-011": {
+      "affected_cases": [
+        "first-green-coverage-gap"
+      ],
+      "effective": true,
+      "score_delta": -0.055128
+    },
+    "RCA-012": {
+      "affected_cases": [
+        "stronger-claim-leak"
+      ],
+      "effective": true,
+      "score_delta": -0.055128
+    },
+    "RCA-013": {
+      "affected_cases": [
+        "text-only-non-trigger"
+      ],
+      "effective": true,
+      "score_delta": -0.033333
+    }
+  },
+  "core_supported_fraction": 1.0,
+  "evidence_class": "deterministic-procedure-ablation",
+  "full_unique_procedure_count": 25,
+  "limitations": [
+    "Committed deterministic fixtures prove necessity only for these cases.",
+    "One external trace covers one repository and one composed-agent run.",
+    "This suite does not measure whether a model recalls or follows skill text.",
+    "Cross-model and cross-repository uplift needs repeated held-out physical runs."
+  ],
+  "observation_receipt_digest": "08836e9b4cc2f21564d6f18b5e52c7ecaf983c0fe8176f92903ca2fc01e76f05",
+  "observed_external_trace_digest": "97b4fe577bcd1b966c63f3d3a26c68cb2baddb982e3bd8e2ae65ac5911d6fbf6",
+  "procedure_reduction_fraction": 0.48,
+  "profiles": {
+    "candidate_trimmed_skill": {
+      "metrics": {
+        "accuracy": 1.0,
+        "correct_cases": 15,
+        "defect_recall": 1.0,
+        "evidence_completeness": 1.0,
+        "false_pass_count": 0,
+        "healthy_true_pass": 1,
+        "score": 1.0,
+        "total_cases": 15,
+        "trigger_precision": 1.0
+      },
+      "name": "candidate_trimmed_skill",
+      "outcome_digest": "975a9d5af95f84aa96c90960025dfda11e4642700813327929ad228e076cbadb"
+    },
+    "current_full_composition": {
+      "metrics": {
+        "accuracy": 1.0,
+        "correct_cases": 15,
+        "defect_recall": 1.0,
+        "evidence_completeness": 1.0,
+        "false_pass_count": 0,
+        "healthy_true_pass": 1,
+        "score": 1.0,
+        "total_cases": 15,
+        "trigger_precision": 1.0
+      },
+      "name": "current_full_composition",
+      "outcome_digest": "975a9d5af95f84aa96c90960025dfda11e4642700813327929ad228e076cbadb"
+    },
+    "no_skill": {
+      "metrics": {
+        "accuracy": 0.133333,
+        "correct_cases": 2,
+        "defect_recall": 0.076923,
+        "evidence_completeness": 0.076923,
+        "false_pass_count": 12,
+        "healthy_true_pass": 1,
+        "score": 0.305128,
+        "total_cases": 15,
+        "trigger_precision": 0.933333
+      },
+      "name": "no_skill",
+      "outcome_digest": "77608f2def123576a2dc8ace03bf17cc2532f74b0774e96868d16fea9fa230e2"
+    }
+  },
+  "retained_rules": [
+    "RCA-001",
+    "RCA-002",
+    "RCA-003",
+    "RCA-004",
+    "RCA-005",
+    "RCA-006",
+    "RCA-007",
+    "RCA-008",
+    "RCA-009",
+    "RCA-010",
+    "RCA-011",
+    "RCA-012",
+    "RCA-013"
+  ],
+  "runtime_supported_rules": [
+    "RCA-001",
+    "RCA-002",
+    "RCA-003",
+    "RCA-004",
+    "RCA-005",
+    "RCA-006",
+    "RCA-007",
+    "RCA-008",
+    "RCA-009",
+    "RCA-010",
+    "RCA-011",
+    "RCA-012",
+    "RCA-013"
+  ],
+  "schema": "repository-capability-audit-effectiveness/v1",
+  "source_effectiveness": {
+    "controlled-technical-language-harness": {
+      "supported": 2,
+      "supported_fraction": 0.5,
+      "total": 4
+    },
+    "current-system-prompt": {
+      "supported": 13,
+      "supported_fraction": 0.8125,
+      "total": 16
+    },
+    "dependency_aggregate": {
+      "supported": 14,
+      "supported_fraction": 0.56,
+      "total": 25
+    },
+    "external-verify": {
+      "supported": 2,
+      "supported_fraction": 0.666667,
+      "total": 3
+    },
+    "github-delivery-loop": {
+      "supported": 3,
+      "supported_fraction": 0.6,
+      "total": 5
+    },
+    "judge-loop-chooser": {
+      "supported": 1,
+      "supported_fraction": 0.333333,
+      "total": 3
+    },
+    "knowledge-continuity": {
+      "supported": 1,
+      "supported_fraction": 0.333333,
+      "total": 3
+    },
+    "spatial-loop-systems-engineering": {
+      "supported": 5,
+      "supported_fraction": 0.714286,
+      "total": 7
+    }
+  },
+  "trimmed_unique_procedure_count": 13
+}

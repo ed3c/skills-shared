@@ -1,0 +1,91 @@
+{
+  "schema": "repository-capability-audit-eval-contract/v1",
+  "retained": [
+    {"id": "RCA-001", "name": "bind_exact_subject", "case_id": "subject-drift"},
+    {"id": "RCA-002", "name": "match_claim_to_evidence_level", "case_id": "evidence-level-overclaim"},
+    {"id": "RCA-003", "name": "preserve_absent_and_skipped_states", "case_id": "silent-skip"},
+    {"id": "RCA-004", "name": "bind_actual_runtime_identity", "case_id": "runtime-alias"},
+    {"id": "RCA-005", "name": "pair_negative_with_positive_control", "case_id": "denial-without-positive-control"},
+    {"id": "RCA-006", "name": "preserve_failure_path_evidence", "case_id": "failure-evidence-loss"},
+    {"id": "RCA-007", "name": "verify_after_trust_boundary", "case_id": "hidden-artifact-omission"},
+    {"id": "RCA-008", "name": "resolve_mutable_external_identity", "case_id": "mutable-external-ref"},
+    {"id": "RCA-009", "name": "minimize_and_test_credentials", "case_id": "ambient-secret-leak"},
+    {"id": "RCA-010", "name": "produce_zero_access_packet", "case_id": "zero-access-gap"},
+    {"id": "RCA-011", "name": "first_green_meta_review", "case_id": "first-green-coverage-gap"},
+    {"id": "RCA-012", "name": "publish_explicit_non_claims", "case_id": "stronger-claim-leak"},
+    {"id": "RCA-013", "name": "refuse_unnecessary_runtime_escalation", "case_id": "text-only-non-trigger"}
+  ],
+  "unproven_for_core": [
+    {"id": "UP-001", "name": "full_realm_topology", "source": "spatial-loop-systems-engineering"},
+    {"id": "UP-002", "name": "complete_invariant_family_enumeration", "source": "spatial-loop-systems-engineering"},
+    {"id": "UP-003", "name": "source_quote_locator", "source": "external-verify"},
+    {"id": "UP-004", "name": "higher_independence_tier_dispatch", "source": "judge-loop-chooser"},
+    {"id": "UP-005", "name": "cross_model_family_review", "source": "judge-loop-chooser"},
+    {"id": "UP-006", "name": "profile_and_termbase_binding", "source": "controlled-technical-language-harness"},
+    {"id": "UP-007", "name": "heuristic_calibration_lane", "source": "controlled-technical-language-harness"},
+    {"id": "UP-008", "name": "symbol_legend_and_section_navigation", "source": "knowledge-continuity"},
+    {"id": "UP-009", "name": "cross_document_narrative_continuity", "source": "knowledge-continuity"},
+    {"id": "UP-010", "name": "path_lease_and_stack_management", "source": "github-delivery-loop"},
+    {"id": "UP-011", "name": "merge_authority_and_billing_policy", "source": "github-delivery-loop"},
+    {"id": "UP-012", "name": "production_load_and_recovery", "source": "current-system-prompt"}
+  ],
+  "source_claims": {
+    "current-system-prompt": [
+      "RCA-001", "RCA-002", "RCA-003", "RCA-004", "RCA-005", "RCA-006", "RCA-007", "RCA-008", "RCA-009", "RCA-010", "RCA-011", "RCA-012", "RCA-013", "UP-012", "prompt-multicell-ranking", "prompt-public-witness"
+    ],
+    "spatial-loop-systems-engineering": ["RCA-001", "RCA-002", "RCA-004", "RCA-005", "RCA-011", "UP-001", "UP-002"],
+    "external-verify": ["RCA-008", "RCA-012", "UP-003"],
+    "judge-loop-chooser": ["RCA-010", "UP-004", "UP-005"],
+    "controlled-technical-language-harness": ["RCA-003", "RCA-006", "UP-006", "UP-007"],
+    "knowledge-continuity": ["RCA-010", "UP-008", "UP-009"],
+    "github-delivery-loop": ["RCA-001", "RCA-007", "RCA-011", "UP-010", "UP-011"]
+  },
+  "cases": [
+    {"id": "subject-drift", "kind": "defect", "required_rule": "RCA-001", "metric": "subject_continuity"},
+    {"id": "evidence-level-overclaim", "kind": "defect", "required_rule": "RCA-002", "metric": "claim_bounding"},
+    {"id": "silent-skip", "kind": "defect", "required_rule": "RCA-003", "metric": "false_pass"},
+    {"id": "runtime-alias", "kind": "defect", "required_rule": "RCA-004", "metric": "runtime_identity"},
+    {"id": "denial-without-positive-control", "kind": "defect", "required_rule": "RCA-005", "metric": "negative_control_validity"},
+    {"id": "failure-evidence-loss", "kind": "defect", "required_rule": "RCA-006", "metric": "failure_evidence"},
+    {"id": "hidden-artifact-omission", "kind": "defect", "required_rule": "RCA-007", "metric": "packet_completeness"},
+    {"id": "mutable-external-ref", "kind": "defect", "required_rule": "RCA-008", "metric": "external_identity"},
+    {"id": "ambient-secret-leak", "kind": "defect", "required_rule": "RCA-009", "metric": "credential_boundary"},
+    {"id": "zero-access-gap", "kind": "defect", "required_rule": "RCA-010", "metric": "review_packet"},
+    {"id": "first-green-coverage-gap", "kind": "defect", "required_rule": "RCA-011", "metric": "first_green_review"},
+    {"id": "stronger-claim-leak", "kind": "defect", "required_rule": "RCA-012", "metric": "non_claim_accuracy"},
+    {"id": "text-only-non-trigger", "kind": "non_trigger", "required_rule": "RCA-013", "metric": "trigger_precision"},
+    {"id": "obvious-runtime-failure", "kind": "defect", "required_rule": null, "metric": "basic_failure"},
+    {"id": "healthy-bounded-run", "kind": "healthy", "required_rule": null, "metric": "true_pass"}
+  ],
+  "observed_external_trace": {
+    "schema": "repository-capability-audit-observed-trace/v1",
+    "subject": {
+      "repository": "ed3c/Skill.md-native",
+      "commit": "a2307265c7077a2b17bf64af33c1ed714d18b3a0",
+      "tree": "18ee48d3c30902964d27a125e08aba7686870328"
+    },
+    "workflow": {
+      "run_id": 31879280449,
+      "job_id": 94999478892,
+      "artifact_id": 9245605166,
+      "artifact_digest": "sha256:9f4c4e7905c0a6ce6fd8de1d6aa31cb24c8c14df5d34f7c260552ab35891aaca"
+    },
+    "observed_result": {
+      "aggregate": "PASS_WITH_DECLARED_GAPS",
+      "required_pass": 16,
+      "required_total": 16,
+      "python_tests_passed": 126,
+      "python_tests_skipped": 0,
+      "manifest_files_verified": 180,
+      "manifest_files_total": 180
+    },
+    "material_defects_exposed": [
+      "runner transport and packaged entrypoint disagreed",
+      "integration tests used a stale kernel facade",
+      "the denial test admitted the origin it expected to deny",
+      "failure normalization discarded a trusted negative observation",
+      "the first successful publication omitted nested hidden evidence"
+    ],
+    "boundary": "This is one observed repository and one composed-agent trace. It supports the planted-procedure design but does not isolate model-family or individual-skill causal effects."
+  }
+}
