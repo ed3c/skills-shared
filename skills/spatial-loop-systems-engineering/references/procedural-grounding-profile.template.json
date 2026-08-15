@@ -1,0 +1,75 @@
+{
+  "profile_version": "procedural-grounding-profile/v1",
+  "enabled": true,
+  "activation": {
+    "on_skill_discovery": true,
+    "on_external_skill_use": true,
+    "on_novelty_or_divergence": true,
+    "on_first_green": true,
+    "before_commit": true,
+    "before_publication": true
+  },
+  "checkpoints": [
+    "SKILL_DISCOVERY",
+    "ARCHITECTURE_CHOICE",
+    "FIRST_VERTICAL_SLICE",
+    "NOVELTY_OR_DIVERGENCE",
+    "FIRST_GREEN",
+    "BEFORE_COMMIT",
+    "BEFORE_PUSH",
+    "BEFORE_PR_OR_PUBLICATION",
+    "CI_OR_RUNTIME_FAILURE_WITH_DESIGN_IMPACT"
+  ],
+  "atomization": {
+    "denominator": "SOURCE_MAPPED_PROCEDURE_ATOMS",
+    "require_excerpt_sha256": true,
+    "default_proof_mode": "HARNESS_REQUIRED",
+    "critical_default_proof_mode": "EXECUTION_REQUIRED"
+  },
+  "capsule_gate": {
+    "minimum_atom_fidelity": 0.85,
+    "minimum_checkpoint_relevance": 0.75,
+    "minimum_predicted_coverage_gain": 0.05,
+    "max_capsule_tokens": 1200,
+    "require_current_context_state_sha256": true,
+    "reject_authority_conflict": true,
+    "reject_duplicate": true,
+    "reject_raw_reasoning_trace": true,
+    "require_l5_downward_compilation": true
+  },
+  "fork_budget": {
+    "max_parallel_forks": 3,
+    "max_fork_depth": 5,
+    "max_fork_tokens": 12000,
+    "max_capsules": 4,
+    "max_no_progress_epochs": 2,
+    "forks_are_read_only": true,
+    "runtime_mutation": "DENY"
+  },
+  "proof_escalation": {
+    "publication_requires_critical_closure": true,
+    "negative_control_for_publication_oracles": true,
+    "preferred_enforcement_order": [
+      "EXISTING_HARNESS",
+      "DETERMINISTIC_ASSERTION",
+      "BOUNDED_RUNTIME_PROBE",
+      "TRACE_OR_EXTERNAL_OBSERVER",
+      "MODEL_JUDGE_FOR_NON_HARD_SCORING_ONLY"
+    ]
+  },
+  "comparative_eval": {
+    "conditions": [
+      "NO_SKILL",
+      "METADATA_ONLY",
+      "FULL_SKILL",
+      "FULL_SKILL_PLUS_GROUNDING"
+    ],
+    "require_same_task_runtime_model_bindings": true,
+    "claim_scope": "BEHAVIORAL_UPTAKE_ONLY"
+  },
+  "privacy": {
+    "raw_chain_of_thought_collected": false,
+    "capsules_are_structured_outputs": true,
+    "private_data_egress": "DENY"
+  }
+}
