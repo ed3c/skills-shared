@@ -149,10 +149,13 @@ CAPTURE_REQUESTED
     │ fixed read-only gh api calls
     ▼
 REPOSITORY_OBSERVED
+    │ resolve policy workflow path to exact provider workflow ID
+    ▼
+WORKFLOW_IDENTITY_OBSERVED
     │ resolve zero or one open PR for branch
     ▼
 PR_IDENTITY_OBSERVED
-    │ resolve exact stable check name and billing annotations
+    │ resolve exact workflow + stable check name + head and billing annotations
     ▼
 CHECK_STATE_OBSERVED
     │ write raw observation and normalized snapshot
@@ -174,6 +177,7 @@ SNAPSHOT_EMITTED
 ```text
 REPOSITORY_AMBIGUOUS
 PUBLIC_REPOSITORY_UNEXPECTED
+WORKFLOW_IDENTITY_DRIFT
 MULTIPLE_OPEN_PRS
 PR_HEAD_DRIFT
 CHECK_NAME_AMBIGUOUS
@@ -407,7 +411,10 @@ PREFLIGHT_GREEN
     ▼
 LANDING_REQUESTED_WITH_EXPECTED_HEAD
     ├── exact head merged ──────> MERGED
+    ├── request accepted/open ──> PENDING (exit 5; do not resubmit)
+    ├── existing auto/queue ────> PENDING (exit 5; do not resubmit)
     ├── head moved ─────────────> ADMIT_STALE
+    ├── closed without merge ───> MERGE_READBACK_FAILED
     ├── host policy denies ─────> HOST_POLICY_BLOCKED
     ├── GitHub rules deny ──────> GITHUB_BLOCKED
     └── no owner admit ─────────> NOT_ADMITTED
@@ -425,6 +432,7 @@ GitHub authentication
 GitHub branch/repository rules
 Required checks and mergeability
 Merge API exact-head result
+Provider readback of exact head, state, and mergedAt
 ```
 
 One green plane cannot override a red plane.

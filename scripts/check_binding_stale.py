@@ -20,7 +20,7 @@ CANONICAL = ROOT / "skills" / "shared-skills-infra" / "scripts" / "check_binding
 def main(argv: list[str] | None = None) -> int:
     args = list(sys.argv[1:] if argv is None else argv)
     if not CANONICAL.is_file():
-        print(f"FAIL canonical binding-stale gate missing: {{CANONICAL}}", file=sys.stderr)
+        print(f"FAIL canonical binding-stale gate missing: {CANONICAL}", file=sys.stderr)
         return 2
     return subprocess.run([sys.executable, str(CANONICAL), *args], check=False).returncode
 

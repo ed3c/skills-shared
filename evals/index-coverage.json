@@ -1,6 +1,6 @@
 {
-  "schema": "index-coverage/v1",
-  "_why": "A document that indexes its own directory is opting into completeness: if it omits a file, the reader has no way to know the list is short, because a short index and a complete one look identical. Coverage is declared here rather than detected, because detection mis-classifies -- traceability-index.md has an index heading and indexes decisions, not the files beside it, and pointing a directory check at it reports defects that are not there. Link resolution needs no manifest and runs over every document.",
+  "schema": "index-coverage/v2",
+  "_why": "A document that indexes its own directory is opting into completeness: if it omits a file, the reader has no way to know the list is short, because a short index and a complete one look identical. Coverage is declared here rather than detected, because detection mis-classifies -- traceability-index.md has an index heading and indexes decisions, not the files beside it, and pointing a directory check at it reports defects that are not there. Local link resolution runs over every other document. A governed projection whose relative links resolve only after materialization into its consumer tree is exempt only at an exact content digest; changing any byte invalidates the exemption.",
   "covers": [
     {
       "document": "skills/git-town-stacked-pr-worker/README.md",
@@ -17,6 +17,23 @@
     {
       "document": "skills/github-delivery-loop/tests/README.md",
       "directory": "skills/github-delivery-loop/tests"
+    }
+  ],
+  "external_link_contexts": [
+    {
+      "document": "skills/forgejo-delivery-loop/agent-docs/_template/AGENTS.md",
+      "content_sha256": "f38734188911da81a0e65c438231ca5eda49c95437d09f6ed62eb373da344e4a",
+      "reason": "Template links are resolved in the generated consumer repository, and placeholder targets deliberately do not exist in skills-shared."
+    },
+    {
+      "document": "skills/forgejo-delivery-loop/agent-docs/ix-agy/.claude/CLAUDE.md",
+      "content_sha256": "b247c5d3d187028c873bb75802667de50f83ab8ba6b876d2c854682b7896445e",
+      "reason": "Governed projection links resolve from the ix-agy checkout after materialization, not from the skills-shared source directory."
+    },
+    {
+      "document": "skills/forgejo-delivery-loop/agent-docs/ix-agy/AGENTS.md",
+      "content_sha256": "8a917e66d651b0cd56a97632f202f2e00994d93b01ae5fde4fabf53b1afebbc5",
+      "reason": "Governed projection links resolve from the ix-agy checkout after materialization, not from the skills-shared source directory."
     }
   ]
 }

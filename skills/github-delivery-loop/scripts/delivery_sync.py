@@ -7,12 +7,25 @@ from the ordinary GitHub snapshot, then delegates every other behavior unchanged
 from __future__ import annotations
 
 import copy
+import sys
+from pathlib import Path
 from typing import Any
+
+# This facade is intentionally loadable by absolute path from any caller CWD.
+# Python only adds the caller's import root to sys.path when importlib loads a
+# file directly, so bind this script's own directory before importing siblings.
+_SCRIPT_DIR = str(Path(__file__).resolve().parent)
+if _SCRIPT_DIR not in sys.path:
+    sys.path.insert(0, _SCRIPT_DIR)
 
 import delivery_sync_impl as _impl
 from reference_causality import classify_reference
 
 SyncError = _impl.SyncError
+SNAPSHOT_SCHEMA = _impl.SNAPSHOT_SCHEMA
+METRICS_SCHEMA = _impl.METRICS_SCHEMA
+BLOCKED_LABELS = _impl.BLOCKED_LABELS
+REFERENCE_RE = _impl.REFERENCE_RE
 _json_bytes = _impl._json_bytes
 fetch_github_snapshot = _impl.fetch_github_snapshot
 write_outputs = _impl.write_outputs
@@ -78,7 +91,15 @@ def derive_metrics(
     return metrics
 
 
-def build_outputs(*, line, snapshot, export_source_commit, export_tree_sha, repo_root):
+def build_outputs(
+    *,
+    line,
+    snapshot,
+    export_source_commit,
+    export_tree_sha,
+    repo_root,
+    expected_prd_issue_url=None,
+):
     # build_outputs lives in the preserved implementation and resolves its
     # module-global derive_metrics at runtime. Patch only for this call.
     previous = _impl.derive_metrics
@@ -90,6 +111,7 @@ def build_outputs(*, line, snapshot, export_source_commit, export_tree_sha, repo
             export_source_commit=export_source_commit,
             export_tree_sha=export_tree_sha,
             repo_root=repo_root,
+            expected_prd_issue_url=expected_prd_issue_url,
         )
     finally:
         _impl.derive_metrics = previous

@@ -212,6 +212,28 @@ def check_profile(repo_root: Path) -> tuple[int, int]:
     contract_rel = profile["verification_contract"]
     if not isinstance(contract_rel, str) or not contract_rel.strip():
         raise ProfileError("profile.verification_contract must name one fixed contract")
+    policy_path = repo_root / ".github-delivery/ci-policy.json"
+    policy = load_json(policy_path, "live CI publication policy")
+    if policy.get("repository") != repository.get("full_name"):
+        raise ProfileError(
+            "profile repository identity differs from live CI publication policy"
+        )
+    if policy.get("private") is not repository.get("private"):
+        raise ProfileError(
+            "profile private repository mode differs from live CI publication policy"
+        )
+    if policy.get("workflow") != check.get("workflow"):
+        raise ProfileError(
+            "profile workflow identity differs from live CI publication policy"
+        )
+    if policy.get("required_jobs") != [check.get("name")]:
+        raise ProfileError(
+            "profile required check identity differs from live CI publication policy"
+        )
+    if policy.get("local_verification_contract") != contract_rel:
+        raise ProfileError(
+            "profile verification contract differs from live CI publication policy"
+        )
     contract_path = repo_root / contract_rel
     if not contract_path.is_file():
         raise ProfileError(f"verification contract is absent: {contract_rel}")
@@ -237,6 +259,7 @@ def selftest() -> None:
 
     def build(root: Path, mutate=None) -> Path:
         (root / ".github-delivery/ci-publication").mkdir(parents=True, exist_ok=True)
+        (root / ".github-delivery").mkdir(parents=True, exist_ok=True)
         (root / ".github/workflows").mkdir(parents=True, exist_ok=True)
         (root / "skills/github-delivery-loop/scripts").mkdir(parents=True, exist_ok=True)
         (root / "scripts").mkdir(parents=True, exist_ok=True)
@@ -252,16 +275,22 @@ def selftest() -> None:
         profile = json.loads(
             (source / ".github-delivery/ci-publication/profile.json").read_text(encoding="utf-8")
         )
+        contract_rel = profile["verification_contract"]
         contract = json.loads(
-            (source / ".github-delivery/ci-publication/verification-contract.json")
-            .read_text(encoding="utf-8")
+            (source / contract_rel).read_text(encoding="utf-8")
+        )
+        (root / ".github-delivery/ci-policy.json").write_text(
+            (source / ".github-delivery/ci-policy.json").read_text(encoding="utf-8"),
+            encoding="utf-8",
         )
         if mutate is not None:
             mutate(root, profile, contract)
         (root / ".github-delivery/ci-publication/profile.json").write_text(
             json.dumps(profile, indent=2) + "\n", encoding="utf-8"
         )
-        (root / ".github-delivery/ci-publication/verification-contract.json").write_text(
+        contract_path = root / contract_rel
+        contract_path.parent.mkdir(parents=True, exist_ok=True)
+        contract_path.write_text(
             json.dumps(contract, indent=2) + "\n", encoding="utf-8"
         )
         return root
@@ -315,6 +344,25 @@ def selftest() -> None:
     refuse("contract-repository-drift",
            lambda root, p, c: c.__setitem__("repository_id", 42),
            "repository identity mismatch")
+    refuse("split-live-repository",
+           lambda root, p, c: p["repository"].__setitem__("full_name", "evil/other"),
+           "repository identity differs from live CI publication policy")
+
+    def mutate_policy(root: Path, field: str, value) -> None:
+        policy_path = root / ".github-delivery/ci-policy.json"
+        policy = json.loads(policy_path.read_text(encoding="utf-8"))
+        policy[field] = value
+        policy_path.write_text(json.dumps(policy) + "\n", encoding="utf-8")
+
+    refuse("split-live-private",
+           lambda root, p, c: mutate_policy(root, "private", False),
+           "private repository mode differs")
+    refuse("split-live-workflow",
+           lambda root, p, c: mutate_policy(root, "workflow", ".github/workflows/other.yml"),
+           "workflow identity differs")
+    refuse("split-live-check",
+           lambda root, p, c: mutate_policy(root, "required_jobs", ["other"]),
+           "required check identity differs")
     refuse("absolute-host-path",
            lambda root, p, c: c["commands"][0].__setitem__(
                "cwd", "/Users/someone/checkout"),
@@ -330,9 +378,19 @@ def selftest() -> None:
            lambda root, p, c: p.__setitem__(
                "generated_paths", [".git/github-delivery/ok.json", "evals/receipt.json"]),
            "neither under .git/ nor ignored")
-    refuse("absent-contract",
-           lambda root, p, c: p.__setitem__("verification_contract", "nowhere.json"),
+    def route_both_to_absent(root: Path, profile: dict, contract: dict) -> None:
+        profile["verification_contract"] = "nowhere.json"
+        policy_path = root / ".github-delivery/ci-policy.json"
+        policy = json.loads(policy_path.read_text(encoding="utf-8"))
+        policy["local_verification_contract"] = "nowhere.json"
+        policy_path.write_text(json.dumps(policy) + "\n", encoding="utf-8")
+
+    refuse("absent-contract", route_both_to_absent,
            "verification contract is absent")
+    refuse("split-live-contract-route",
+           lambda root, p, c: p.__setitem__(
+               "verification_contract", ".github-delivery/ci-publication/verification-contract.json"),
+           "differs from live CI publication policy")
 
     def commit_live_receipt(root: Path, profile: dict, contract: dict) -> None:
         (root / ".github-delivery/ci-publication/receipt.json").write_text(

@@ -7,7 +7,8 @@ This directory proves that the shared delivery mechanisms can turn red. A green 
 | Directory | Mechanism | Load-bearing assertion |
 |---|---|---|
 | [`check-receipt/`](check-receipt/) | delivery-line check | missing artifact is `UNMATERIALIZED`, not skip |
-| [`evidence-producers/`](evidence-producers/) | local verification and GitHub snapshot producers | exact HEAD, fixed argv, safe env, one PR, exact check, billing classification |
+| [`ci-publication-control/`](ci-publication-control/) | exact-HEAD publication wrapper and host guard | controlled wrapper reaches dry-run; direct GitHub push and dirty-tree verification turn red |
+| [`evidence-producers/`](evidence-producers/) | local verification and GitHub snapshot producers | exact HEAD, fixed argv, safe env, one PR, policy-workflow-bound exact check, billing classification |
 | [`ci-publish-gate/`](ci-publish-gate/) | Actions publication admission | only three intents; stale SHA, repeated draft, reused feedback and billing circuit block |
 | [`merge-gate/`](merge-gate/) | merge authority | owner identity, admit freshness, host policy, and no-admit absence remain separate |
 | [`ci-workflow-policy/`](ci-workflow-policy/) | repository seal on the publication workflow | a policy that names a workflow is checked against the workflow on disk, and a required job the workflow does not declare fails closed |
@@ -62,7 +63,7 @@ Reaches the actual public script path, file layout, and data contract used by co
 | `DELIVERY-3` | owner-admitted exact head and green preflight | forged owner, stale admit, blocking hook, no-admit absence |
 | `DELIVERY-4` | identical copy converts to canonical link | diverged copy and self-link refused |
 | `DELIVERY-5` | exact-HEAD local verification + admitted publication intent | stale receipt, repeated draft, old check SHA, consumed feedback, billing-open/stale recovery |
-| evidence producers | valid fixed command and trusted observation | shell strings, unsafe env, multiple PRs, ambiguous checks, malformed billing |
+| evidence producers | admitted absolute `gh` identity, one workflow/run/job/check identity, raw-transport-derived observation | `PATH`/CLI fake provider executable, rerun/ambiguous check, tampered transport, shell strings, unsafe env, multiple PRs, malformed billing |
 | reference causality | implementation-bound evidence | source citation or old evidence used as promotion proof |
 
 ## State semantics in tests

@@ -1,9 +1,9 @@
 {
-  "schema": "github-ci-policy/v1",
+  "schema": "github-ci-policy/v2",
   "repository": "ed3c/skills-shared",
   "private": true,
   "default_branch": "main",
   "workflow": ".github/workflows/skill-eval-contract.yml",
   "required_jobs": ["contract"],
-  "local_verification": ["bash", "scripts/local_verification.sh"]
+  "local_verification_contract": ".github-delivery/local-verification-contract.json"
 }

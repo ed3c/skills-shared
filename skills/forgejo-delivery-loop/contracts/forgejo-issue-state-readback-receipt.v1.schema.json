@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "forgejo-issue-state-readback-receipt@v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "status", "schema_version", "producer", "request_sha256",
+    "source_observation_sha256", "pre_observation_sha256",
+    "post_observation_sha256", "closure_created_at", "closure_actor", "repository",
+    "issue_number", "state", "idempotency_marker", "observed_at",
+    "source_merge_sha", "maturity_effect"
+  ],
+  "properties": {
+    "status": {"const": "verified"},
+    "schema_version": {"const": "forgejo-issue-state-readback-receipt@v1"},
+    "producer": {"const": "forgejo-api-authenticated-read"},
+    "request_sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "source_observation_sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "pre_observation_sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "post_observation_sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "closure_created_at": {"type": "string", "format": "date-time"},
+    "closure_actor": {"type": "string", "minLength": 1},
+    "repository": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+    "issue_number": {"type": "integer", "minimum": 1},
+    "state": {"enum": ["open", "closed"]},
+    "idempotency_marker": {"type": "string", "format": "uri", "maxLength": 256},
+    "observed_at": {"type": "string", "format": "date-time"},
+    "source_merge_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "maturity_effect": {"const": "tracking-only-no-maturity-change"}
+  }
+}

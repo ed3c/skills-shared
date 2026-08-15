@@ -1,5 +1,13 @@
 {
-  "schema": "body-neutrality/v1",
+  "schema": "body-neutrality/v2",
+  "ownership": {
+    "portable_body": {"default": true},
+    "repo_binding_source": {
+      "roots": ["skills/forgejo-delivery-loop/agent-docs"]
+    },
+    "generated_projection": {"roots": []},
+    "archive_evidence": {"parts": ["superseded"]}
+  },
   "owed": {
     "skills/autoresearch-composer/SKILL.md": 8,
     "skills/dr-research-loop/SKILL.md": 2,

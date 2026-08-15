@@ -32,7 +32,7 @@ The consumer profile must resolve:
 
 ```text
 CI_PUBLICATION_GATE=<PATH_OR_TYPED_ENTRYPOINT>
-CI_PUBLICATION_SNAPSHOT_SCHEMA=github-actions-publish-snapshot/v1
+CI_PUBLICATION_SNAPSHOT_SCHEMA=github-actions-publish-snapshot/v3
 CI_LOCAL_VERIFICATION_SCHEMA=github-delivery-local-verification/v1
 CI_ALLOWED_INTENTS=initial-pr,ready-for-review,batched-repair
 CI_DRAFT_PR_RUNNER_POLICY=no-runner

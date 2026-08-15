@@ -135,7 +135,7 @@
     {
       "id": "snapshot-branch-absence",
       "file": "skills/github-delivery-loop/scripts/github_actions_snapshot.py",
-      "anchor": "            if v[\"branch_ref\"][\"observed\"]:",
+      "anchor": "            if ref[\"observed\"]:",
       "verify": [
         "python3",
         "skills/github-delivery-loop/scripts/github_actions_snapshot.py",
@@ -146,7 +146,7 @@
     {
       "id": "snapshot-ref-pr-agreement",
       "file": "skills/github-delivery-loop/scripts/github_actions_snapshot.py",
-      "anchor": "        if v[\"branch_ref\"][\"object_sha\"]!=p[\"head_sha\"]:",
+      "anchor": "    if \"branch_ref\" in v and v[\"branch_ref\"][\"object_sha\"]!=p[\"head_sha\"]:",
       "verify": [
         "python3",
         "skills/github-delivery-loop/scripts/github_actions_snapshot.py",
@@ -208,7 +208,7 @@
     {
       "id": "gate-evidence-receipt-binding",
       "file": "skills/github-delivery-loop/scripts/ci_publish_gate.py",
-      "anchor": "    if digest_of(evidence) != receipt[\"evidence_sha256\"]:",
+      "anchor": "    if digest(value) != verification[\"evidence_sha256\"]:",
       "verify": [
         "python3",
         "skills/github-delivery-loop/scripts/ci_publish_gate.py",
@@ -219,7 +219,7 @@
     {
       "id": "gate-evidence-content-digest",
       "file": "skills/github-delivery-loop/scripts/ci_publish_gate.py",
-      "anchor": "    if digest_of(body) != evidence[\"content_sha256\"]:",
+      "anchor": "    if require_digest(content_sha, \"evidence.content_sha256\") != digest(content):",
       "verify": [
         "python3",
         "skills/github-delivery-loop/scripts/ci_publish_gate.py",
@@ -230,7 +230,7 @@
     {
       "id": "gate-evidence-command-outcome",
       "file": "skills/github-delivery-loop/scripts/ci_publish_gate.py",
-      "anchor": "    if value[\"exit\"] != 0:",
+      "anchor": "        if command[\"exit\"] != 0:",
       "verify": [
         "python3",
         "skills/github-delivery-loop/scripts/ci_publish_gate.py",
@@ -241,7 +241,7 @@
     {
       "id": "gate-evidence-command-order",
       "file": "skills/github-delivery-loop/scripts/ci_publish_gate.py",
-      "anchor": "    if ids != receipt[\"commands\"]:",
+      "anchor": "    if ids != verification[\"commands\"]:",
       "verify": [
         "python3",
         "skills/github-delivery-loop/scripts/ci_publish_gate.py",
@@ -296,7 +296,7 @@
     {
       "id": "gate-initial-boundary",
       "file": "skills/github-delivery-loop/scripts/ci_publish_gate.py",
-      "anchor": "        if boundary is None:",
+      "anchor": "        if boundary == \"unproven\":",
       "verify": [
         "python3",
         "skills/github-delivery-loop/scripts/ci_publish_gate.py",

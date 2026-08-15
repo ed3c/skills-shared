@@ -53,25 +53,30 @@ public readiness、blockers 與最後查驗時間。`check` 只驗本地 attesta
 ### Export tree binding
 
 「push 前驗證通過」若沒有把驗過的東西釘回推上去的東西，就是不可否證的宣稱：file count 相同、
-history root 為真的樹，內容仍可以完全不同。所以 `verify` 回傳它驗過那棵樹的 Git tree id，
+history root 為真的樹，內容仍可以完全不同。所以呼叫端必須交出它驗過那棵樹的 Git tree id，
 `sync` 以 `--export-tree-sha` 收下，並與遠端 default branch head 的 tree sha 比對：
 
 ```text
-public_export.py verify ──> tree_sha ──┐
-                                       ├─ 相等？──> 否 ──> blocker: export-tree-drift
-GitHub head commit ────────> tree_sha ─┘
+git rev-parse <export-source-commit>^{tree} ──> tree_sha ──┐
+                                                           ├─ 相等？──> 否 ──> blocker: export-tree-drift
+GitHub head commit ──────────────────────────> tree_sha ───┘
 ```
 
 tree id 由 blob 內容與檔案 mode 共同決定，所以位元組漂移與 executable bit 漂移都會改變它；
-比對只用 sync 既有的 head commit 查詢，不下載任何遠端 blob。`verify` 同時比對 staged mode 與
-commit 內 mode，讓 mode 漂移在能被 attest 之前就失敗。
+比對只用 sync 既有的 head commit 查詢，不下載任何遠端 blob。
+
+**本 skill 不隨附 export 驗證器**，`--export-tree-sha` 的來源是呼叫端的責任：artifact 就是 repo
+本身時用 `git rev-parse <export-source-commit>^{tree}`；artifact 是另外物化的匯出樹時，該匯出
+流程必須自己回報它驗過的 tree id。曾規劃但**尚未實作**的是「staged mode 對 commit 內 mode 的
+比對」，其目的是讓 executable bit 漂移在能被 attest 之前就失敗——在它存在之前，mode 漂移只會被
+上面的 tree sha 比對抓到，不要當成另一道獨立保證。
 
 ## Merge authority stack
 
 Merge 不是單一「有／無權限」位元，而是由多層獨立閘串接；任一層拒絕就不得宣稱已放行：
 
 ```text
-human merge decision
+L1 authority (human admit OR explicit personal-owner policy)
         ↓
 Codex execpolicy prefix rule
         ↓
@@ -82,17 +87,22 @@ GitHub authentication + branch / repository rules
 merge API
 ```
 
-1. **人類 gate**：owner 明確指定 repository 與 PR 才構成 merge 授權。永久 command allow 不是人類
-   landing decision，也不能把未授權 merge 變成已授權。
+1. **Authority gate**：預設是 owner 對指定 PR 的 fresh label；只有使用者明確 opt-in 時，才可改成
+   personal-owner policy。後者以 authenticated viewer 與 repository owner 的 immutable user ID 每次重驗，
+   讓同一人擁有的未來 repo 自動納入、collaborator／organization repo 排除。永久 command allow 本身
+   兩種模式下都不構成 landing decision。單張 slice 以 `--pr N` 同時釘住 preflight 與 land 的集合；
+   省略它才是明確選擇全量已授權 PR。
 2. **Codex execpolicy**：user-level `prefix_rule` 只決定某個 argv prefix 能否離開 sandbox 執行。
-   規則必須釘到 `gh pr merge --repo OWNER/REPOSITORY`，不可放寬成 `gh` 或 `gh pr`；參數順序
-   是 prefix contract 的一部分。寫入 active `rules/` 後必須重啟 Codex，並用
+   human-admit 規則釘到 `gh pr merge --repo OWNER/REPOSITORY`；owner-auto 規則釘到 canonical
+   `merge_gate.py land --repo` wrapper，絕不放行 generic `gh api graphql`。參數順序是 prefix contract
+   的一部分。寫入 active `rules/` 後必須重啟 Codex，並用
    `codex execpolicy check` 驗證結果。
 3. **PreToolUse hooks**：hook 與 execpolicy 是不同 policy plane。即使 execpolicy 顯示 `allow`，hook
    仍可拒絕相同 shell command，甚至拒絕 connector merge tool。最嚴格決策勝出；不得用換 API、
    command obfuscation 或停用 hook 逃逸，應回報命中的 policy 與所需 owner 變更。
 4. **GitHub gate**：最後仍受 token/repository 權限、branch protection、required checks、HEAD 漂移
-   與 mergeability 約束。merge 前釘 expected HEAD；每次 base 更新後重新查下一張 PR。
+   與 mergeability 約束。merge 前釘 expected HEAD；`--pr N` 直接讀取並只合併該 PR，一次成功後停止；
+   全量模式才在每次 base 更新後重新查下一張 PR。
 
 安裝窄規則的可重播入口：
 
@@ -102,8 +112,8 @@ bash <repo>/.agents/skills/github-delivery-loop/scripts/install-codex-merge-rule
   --rules-dir <CODEX_HOME>/rules
 ```
 
-安裝器會備份同名規則、原子替換、跑 `codex execpolicy check`，並明示它不能覆蓋 hook 或人類
-gate。這個邊界來自實測：user rule 已成功載入後，active PreToolUse blacklist 仍先於 shell 與
+安裝器會備份同名規則、原子替換、跑 `codex execpolicy check`，並明示它不能覆蓋 hook、runtime
+identity gate 或 GitHub gate。這個邊界來自實測：user rule 已成功載入後，active PreToolUse blacklist 仍先於 shell 與
 GitHub connector merge 執行，證明兩層不可混稱。
 
 Codex rules 的檔案位置、restart requirement、prefix token matching 與「最嚴格決策勝出」語義，

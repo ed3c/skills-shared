@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "forgejo-issue-state-observation@v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "status", "schema_version", "request_sha256", "phase", "producer",
+    "forge_url", "repository", "issue_number", "state",
+    "idempotency_marker", "observed_at"
+  ],
+  "properties": {
+    "status": {"const": "captured"},
+    "schema_version": {"const": "forgejo-issue-state-observation@v1"},
+    "request_sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "phase": {"enum": ["pre", "post"]},
+    "producer": {"const": "forgejo-api-authenticated-read"},
+    "forge_url": {"enum": ["http://localhost:3000", "http://127.0.0.1:3000"]},
+    "repository": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+    "issue_number": {"type": "integer", "minimum": 1},
+    "state": {"enum": ["open", "closed"]},
+    "idempotency_marker": {"type": "string", "format": "uri", "maxLength": 256},
+    "observed_at": {"type": "string", "format": "date-time"}
+  }
+}

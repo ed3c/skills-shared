@@ -12,6 +12,9 @@ route="${skill_dir}/scripts/route.ts"
 scratch="$(mktemp -d)"
 trap 'rm -rf "${scratch}"' EXIT
 
+python3 "${skill_dir}/scripts/agent_docs.py" selftest > /dev/null
+echo "  agent_docs: red on drift, absence, surprise, unruled, truncation, bad --key, staged drift"
+
 if ! command -v bun > /dev/null 2>&1; then
   echo "FAIL bun is required to run ${route##*/}; a selftest that cannot run has not passed" >&2
   exit 70

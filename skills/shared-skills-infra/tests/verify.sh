@@ -28,9 +28,54 @@ cp "$(dirname "${real_script}")/check_dead_assertions.py" \
 cp "$(dirname "${real_script}")/check_body_neutrality.py" \
    "$(dirname "${real_script}")/check_binding_stale.py" \
    "${shared}/skills/shared-skills-infra/scripts/"
+
+# Body neutrality judges portable procedure, not every Markdown byte stored
+# under a Skill. The ownership manifest must classify repository binding
+# sources explicitly; a generic excluded-directory constant is not evidence.
+typed="${world}/typed-ownership"
+typed_gate="${shared}/skills/shared-skills-infra/scripts/check_body_neutrality.py"
+mkdir -p "${typed}/evals" \
+         "${typed}/skills/demo" \
+         "${typed}/skills/forgejo-delivery-loop/agent-docs/example-repo"
+printf '%s\n' '# portable' 'This sentence is true in any repository.' \
+  > "${typed}/skills/demo/SKILL.md"
+printf '%s\n' '# binding source' 'Project: bettor-arena' \
+  > "${typed}/skills/forgejo-delivery-loop/agent-docs/example-repo/AGENTS.md"
+cat > "${typed}/evals/body-neutrality.json" <<'JSON'
+{
+  "schema": "body-neutrality/v2",
+  "ownership": {
+    "portable_body": {"default": true},
+    "repo_binding_source": {
+      "roots": ["skills/forgejo-delivery-loop/agent-docs"]
+    },
+    "generated_projection": {"roots": []},
+    "archive_evidence": {"parts": ["superseded"]}
+  },
+  "owed": {}
+}
+JSON
+if ! python3 "${typed_gate}" --repo-root "${typed}" \
+  >"${world}/typed.out" 2>"${world}/typed.err"; then
+  echo "FAIL: typed repo-binding ownership was not accepted" >&2
+  sed -n '1,80p' "${world}/typed.err" >&2
+  exit 1
+fi
+grep -q "repo_binding_source=1" "${world}/typed.out"
+
 mkdir -p "${shared}/evals"
-printf '{\n  "schema": "body-neutrality/v1",\n  "owed": {}\n}\n' \
-  > "${shared}/evals/body-neutrality.json"
+cat > "${shared}/evals/body-neutrality.json" <<'JSON'
+{
+  "schema": "body-neutrality/v2",
+  "ownership": {
+    "portable_body": {"default": true},
+    "repo_binding_source": {"roots": []},
+    "generated_projection": {"roots": []},
+    "archive_evidence": {"parts": ["superseded"]}
+  },
+  "owed": {}
+}
+JSON
 printf -- '---\nname: demo-skill\n---\nbody\n' > "${shared}/skills/demo-skill/SKILL.md"
 # the tool is itself a registered skill, so its fixture needs the same shape
 printf -- '---\nname: shared-skills-infra\n---\nbody\n' \

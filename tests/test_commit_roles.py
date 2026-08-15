@@ -249,6 +249,63 @@ class GateTests(unittest.TestCase):
             _, problems = self.run_gate(repo, vocabulary)
             self.assertTrue(any("no Driven-By" in p for p in problems), problems)
 
+    def test_exact_legacy_import_admits_only_its_frozen_bad_set(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            repo = RepoFixture(Path(raw))
+            imported = repo.commit(
+                "legacy without trailers\n",
+                name="ed3c",
+                email="mcnum01@gmail.com",
+                filename="legacy.txt",
+            )
+            payload = f"{imported}\n".encode("ascii")
+            vocabulary = copy.deepcopy(self.vocabulary)
+            vocabulary["legacy_imports"] = [{
+                "id": "fixture",
+                "tip_sha": imported,
+                "admitted_against_sha": repo.base,
+                "unclassified_commit_count": 1,
+                "unclassified_commits_sha256": __import__("hashlib").sha256(payload).hexdigest(),
+                "note": "fixture",
+            }]
+            admitted = self.checker.resolve_legacy_imports(repo.path, vocabulary)
+            _, problems = self.checker.evaluate(
+                repo.path, f"{repo.base}..HEAD", vocabulary, admitted
+            )
+            self.assertEqual(problems, [])
+
+            repo.commit(
+                "new untrailed commit\n",
+                name="ed3c",
+                email="mcnum01@gmail.com",
+                filename="new.txt",
+            )
+            _, problems = self.checker.evaluate(
+                repo.path, f"{repo.base}..HEAD", vocabulary, admitted
+            )
+            self.assertTrue(any("no Driven-By" in item for item in problems), problems)
+
+    def test_legacy_import_digest_drift_is_fatal(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            repo = RepoFixture(Path(raw))
+            imported = repo.commit(
+                "legacy without trailers\n",
+                name="ed3c",
+                email="mcnum01@gmail.com",
+                filename="legacy.txt",
+            )
+            vocabulary = copy.deepcopy(self.vocabulary)
+            vocabulary["legacy_imports"] = [{
+                "id": "fixture",
+                "tip_sha": imported,
+                "admitted_against_sha": repo.base,
+                "unclassified_commit_count": 1,
+                "unclassified_commits_sha256": "0" * 64,
+                "note": "fixture",
+            }]
+            with self.assertRaisesRegex(self.checker.Unusable, "digest drifted"):
+                self.checker.resolve_legacy_imports(repo.path, vocabulary)
+
     def test_history_before_the_start_point_is_not_scanned(self) -> None:
         """The honest cost #19 records: old commits cannot be recovered."""
         with tempfile.TemporaryDirectory() as raw:

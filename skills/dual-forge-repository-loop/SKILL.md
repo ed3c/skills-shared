@@ -5,8 +5,8 @@ description: |
 license: MIT
 compatibility: Any Agent Skills-compatible coding agent. GitHub-connected hosts may perform GitHub operations; local Forgejo/worktree operations require a consumer runtime that actually has that local capability.
 metadata:
-  version: "1.1.0"
-  procedure: "dual-forge-repository-loop/v1"
+  version: "1.2.0"
+  procedure: "dual-forge-repository-loop/v3"
 ---
 
 # dual-forge-repository-loop
@@ -90,6 +90,11 @@ A state transition is invalid unless the exact subject SHA and the receipts requ
 11. **No-secret law** — credentials/tokens/browser sessions remain host-owned and may not enter repository bindings or receipts.
 12. **Three-failure law** — three qualifying failures against the same target invoke the fresh-diagnosis escalation from `spatial-loop-systems-engineering`; no fourth blind patch.
 13. **Human-authority law** — test success does not create permission to merge protected GitHub/Forgejo PRs, widen permissions, or promote production state.
+
+GitHub and Forgejo repository owners may differ (for example
+`ed3c/skills-shared` and `neon/skills-shared`). Bind both exact
+`OWNER/REPOSITORY` identities and prove the local checkout has both admitted
+remotes; equality of owner names is not an integration invariant.
 
 ## Procedure
 
@@ -175,7 +180,7 @@ Re-observe GitHub immediately before publication:
 
 ```text
 current GitHub main SHA
-all open PRs targeting the same base
+all open PRs (with each PR's base recorded explicitly)
 changed-file overlap/conflict risk
 all open GitHub issues affected by the local-main changes
 current branch ancestry
@@ -226,10 +231,93 @@ GitHub merge remains governed by the target repository's policy.
 Use [`references/repo-binding.template.json`](references/repo-binding.template.json) as a starting point and validate a run receipt with:
 
 ```bash
+python3 skills/dual-forge-repository-loop/scripts/export_git_proof.py \
+  --repo-root /absolute/path/to/integration-worktree \
+  --github-main <observed-github-main-sha> \
+  --forgejo-main <observed-forgejo-main-sha> \
+  --local-main <admitted-local-main-sha> \
+  --candidate <publication-candidate-sha> \
+  --output /path/to/receipt/proof/repository.fast-import
+
 python3 skills/dual-forge-repository-loop/scripts/check_dual_forge_contract.py path/to/dual-forge-receipt.json
 ```
 
-The checker proves structural closure and publication ordering only. It cannot prove that Forgejo ran locally, that a conflict was semantically resolved, or that a GitHub Actions result is truthful beyond the supplied receipt.
+Before exporting the Git proof, produce each default-branch observation through
+`capture_origin_ref.py` with authority `github`, `forgejo`, or `local`. The
+producer uses `gh api`, authenticated allowlisted-loopback Forgejo API reads, or
+local `git rev-parse` respectively; it emits a secret-free transport record and
+a content-addressed observation. Hand-authored `authority` or transport strings
+are not accepted. The transport retains exact logical argv, exit codes, provider
+stdout plus per-output digest, and numeric GitHub/Forgejo repository identity;
+the local lane additionally proves both admitted remote names/repositories. The
+GitHub repository ID is cross-checked against the publication snapshot. Offline
+checking proves binding/replay of those bytes; a synthetic fixture still does not
+prove a live capture, so the live producer process remains the trusted provider lane.
+
+`capture_forgejo_delivery.py` binds the implementation issue, merged Forgejo
+PR, and local-main commit parents/tree. After the Desktop response, its
+`materialize` command derives a causal branch from the Desktop receipt digest,
+issue, and base SHA, then performs the only admitted `git worktree add`: a fresh
+path, `--lock`, and no force/reset flags. Delivery replay rejects the main tree,
+a pre-existing path/ref, an older creation timestamp, an unlocked or duplicated
+branch holder, and a worktree whose common Git directory differs from the target
+repository. Commit identity alone cannot prove repository ownership because a
+separate clone can contain the same objects. The checker separately requires the
+canonical exact-HEAD verification receipt, detailed command evidence, and the
+content-addressed argv contract for that local-main tree; a bare `PASS` label or
+command-name list is not verification. Delivery capture also replays the full
+issue body, every paginated issue comment, the merged PR body and `merged_at`.
+Publication-ready requires a provider-read `three-strike-recovery/v1` packet with
+exactly three ordered attempt subjects, errors/digests, timestamps, and evidence
+references. Its nested `chatgpt-desktop-submission/v1` receipt binds the full
+prompt/digest, ordered Submit/timeline/response timestamps, exact ChatGPT thread
+URL, provider comment-author identity, and fetched Forgejo screenshot attachment
+bytes/media/SHA-256. Marker prose, a digest without artifact bytes, or a populated-
+but-unsent Desktop composer remains `NOT_EXERCISED` and blocks publication-ready.
+`capture_reconciliation.py` captures complete paginated open-PR and open-issue
+inventories from both providers. Reconciliation classifications remain typed
+human/Agent decisions, but their keys must equal the captured provider inventory:
+an empty or selectively omitted list cannot pass. The GitHub publication PR is
+the unique candidate-bound `WIP=1` subject captured during reconciliation and
+its typed inventory route must be `PUBLICATION_SUBJECT/WIP_CAPTURED`; the later
+Actions observation must name the same PR.
+
+The immutable numeric Forgejo repository ID must agree across the default-ref
+origin capture, delivery capture, and reconciliation capture. Matching
+`owner/repository` text alone cannot join those three evidence subjects.
+
+`export_git_proof.py` is the only canonical Git proof producer. It refuses a
+candidate unless the object graph proves `forgejo_main -> local_main -> candidate`
+and also contains the observed GitHub main. It exports exactly
+`refs/heads/github-main`, `refs/heads/forgejo-main`,
+`refs/heads/local-main`, and `refs/heads/candidate`, and caps the replay stream
+at 64 MiB. The receipt binds the stream by SHA-256; the checker imports it into
+a disposable bare repository, runs strict object verification and
+`merge-base --is-ancestor`, then reads the candidate tree from the verified Git
+commit. Hand-authored ancestry booleans have no authority.
+
+The checker owns composition and ordering, not a second publication truth. At
+`GITHUB_PUBLICATION_READY` it must read content-addressed `github-delivery-loop`
+decision-manifest inputs (including canonical policy, required check identity,
+optional billing recovery, and evaluation time), reproduce the canonical
+decision, derive the Actions observation and snapshot from bound raw GitHub API
+transport captured through an admitted absolute `gh` path with recorded
+realpath/binary SHA-256/version (never inherited-`PATH` resolution), and require exactly one
+required-check execution with provider-derived workflow/run/job/check-suite/app
+identities. A caller-selected fake provider and an exact-head rerun are refused.
+The checker then requires
+an exact-candidate successful required check on the same branch/PR subject.
+Publication-ready also binds fresh GitHub/Forgejo/local main observations and an
+explicit PR/issue/conflict reconciliation inventory. These structured receipts
+do not make a synthetic fixture into live provider truth; live capture remains a
+separately exercised authority lane, and connector access alone is never proof
+that Forgejo or a local command ran.
+
+An empty or proper-prefix `history` is a draft binding only. The checker returns
+exit `3` with `NOT_EXERCISED`; it never prints `PASS` for a claimed intermediate
+state whose state-specific receipts have not reached the full publication-ready
+closure. Exit `0` is reserved for the exact `GITHUB_PUBLICATION_READY` history
+and all proof lanes above.
 
 ## Evidence states
 

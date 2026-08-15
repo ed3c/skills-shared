@@ -7,7 +7,7 @@
 | 大迴圈 | 本 skill 的操作層（`modules/forgejo-operations.md`） | 優先序、WIP、降級、下一個小迴圈提示 | 批次 mutation、repo 寫入、admission |
 | 小迴圈外部操作 | 本 skill 的操作層（`modules/forgejo-operations.md`） + existing Chrome | 單一 issue／PR／merge 的預檢、操作、回讀 | 改 source、跳 gate、複製私密語料 |
 | repo 末端實作 | output repo 的 `repo-terminal-operator` | terminal slice、CQ、production-use、commit | Forgejo／GitHub／cloud admission |
-| 中央契約 | `skills/repo-neural-perception` | schemas、capability policy、typed receipts | repo 專屬實作 |
+| 終態契約 | 本 skill 的 `contracts/`＋`scripts/issue_state.py` | request／observation／receipt 的形狀與跨欄語義 | UI 操作、admission 推斷 |
 
 ## 資料流
 
@@ -19,19 +19,21 @@ grill／DR／GCR decision
   -> one repo-local terminal operator
   -> focused CQ + production-use + molecular commit
   -> issue／PR／merge readback
-  -> neural preview／canonical receipt
+  -> canonical readback receipt
   -> human admission
   -> next-mode prompt
 ```
 
-## 既有契約
+## 正式契約
 
-- `skills/repo-neural-perception/schemas/forgejo-terminal-issue-request.v1.json`
-- `skills/repo-neural-perception/schemas/forgejo-api-observation.v1.json`
-- `skills/repo-neural-perception/schemas/admission-result.v1.json`
-- `data/forgejo/requests/`
-- `runtime/forgejo/`
-- `repo/agent-skills-repo/.agents/skills/repo-terminal-operator/`
+- `contracts/forgejo-terminal-issue-state-request.v2.schema.json`
+- `contracts/forgejo-issue-state-observation.v1.schema.json`
+- `contracts/forgejo-issue-state-readback-receipt.v1.schema.json`
+- `scripts/issue_state.py`
+
+這些契約與驗證器放在實際執行 mutation 的 skill 裡，避免索引指向不存在的中央 runtime。
+schema 守序列化邊界；驗證器守跨欄不變量，並直接執行 authenticated GitHub／Forgejo read。
+因此不能只做 JSON Schema 驗證或提交自填 observation 就執行 UI mutation／鑄造 verified receipt。
 
 ## 從 local_stack 經驗保留與拒絕的部分
 

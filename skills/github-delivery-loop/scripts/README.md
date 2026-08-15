@@ -10,9 +10,9 @@ This directory contains the executable mechanisms for delivery evidence, GitHub 
 | [`delivery_sync.py`](delivery_sync.py) | sync public/compatibility adapter | depends on mode | delegates | normalized sync result |
 | [`delivery_sync_impl.py`](delivery_sync_impl.py) | delivery derivation implementation | snapshot or trusted GitHub lane | writes bounded outputs | receipt, publication attestation, metrics, dashboard |
 | [`local_verification.py`](local_verification.py) | exact-HEAD local verification | none | receipt/evidence output only | `github-delivery-local-verification/v1` |
-| [`github_actions_snapshot.py`](github_actions_snapshot.py) | GitHub observation capture/replay | capture: read-only GitHub; replay: none | observation/snapshot files only | normalized PR/check/billing snapshot plus an `initial_boundary` that `--strict` refuses to guess |
+| [`github_actions_snapshot.py`](github_actions_snapshot.py) | GitHub raw transport capture/derivation/replay | capture: read-only GitHub; replay: none | transport/observation/snapshot files only | admitted absolute `gh` path/realpath/binary-digest/version plus raw argv/stdout/exit transport and `github-actions-publish-snapshot/v4`, binding the policy workflow path to one provider workflow/run/job/check identity and exact initial branch-ref absence |
 | [`ci_publish_gate.py`](ci_publish_gate.py) | CI publication admission | none | none | one ALLOW operation or stable BLOCK reason |
-| [`ci_workflow_policy.py`](ci_workflow_policy.py) | repository seal on the publication workflow | none | `.github-delivery/ci-policy.json` and the workflow it names | ALLOW with the sealed identity, or one BLOCK reason |
+| [`ci_publish.py`](ci_publish.py) | enforced publication wrapper | dry run: none; execute: GitHub capture/publication | git-dir receipts; execute may push/create/update PR | content-addressed `github-actions-publish-decision-manifest/v1`, rendered or executed operation |
 | [`merge_gate.py`](merge_gate.py) | merge authority preflight/landing | preflight/land: GitHub and host policy planes | land may request merge after Human Admit | preflight result or merge result |
 | [`reference_causality.py`](reference_causality.py) | reference/evidence causality | none | none | causal validation result |
 | [`link-canonical.sh`](link-canonical.sh) | canonical Skill projection | none | optional backup + symlink | linked target or divergence refusal |
@@ -25,13 +25,18 @@ consumer fixed command contract
 → local_verification.py
 → exact-HEAD local receipt
 
-trusted GitHub observation
-→ github_actions_snapshot.py capture/replay
+trusted GitHub raw transport
+→ github_actions_snapshot.py capture/replay-transport
+→ derived observation
 → normalized snapshot
 
 local receipt + snapshot + intent
 → ci_publish_gate.py
 → ALLOW one operation / BLOCK reason
+
+canonical policy + exact gate inputs + ALLOW operation
+→ ci_publish.py
+→ git-dir decision manifest binding raw input digests and required check name
 
 owner merge-admit + host/GitHub state
 → merge_gate.py preflight

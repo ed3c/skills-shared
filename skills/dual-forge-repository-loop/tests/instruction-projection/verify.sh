@@ -21,6 +21,10 @@ python3 "$script" --module "$module" --canonical-commit "$commit" --mode check -
 grep -q KEEP_ME "$repo/AGENTS.md"
 grep -q KEEP_CLAUDE_RULE "$repo/CLAUDE.md"
 grep -q KEEP_GLOBAL_RULE "$home/.claude/CLAUDE.md"
+grep -Fq 'codex app <workspace-path>' "$repo/AGENTS.md"
+grep -Fq 'deep-link composer text remains pending until the operator sends it' "$repo/AGENTS.md"
+grep -Fq 'installed GitHub plugin or connector' "$repo/AGENTS.md"
+grep -Fq 'cross-family models are reviewers rather than official truth authorities' "$repo/AGENTS.md"
 test -f "$repo/.skill-bindings/instruction-projection.json"
 test -f "$home/.claude/.skills-shared-projection-receipt.json"
 

@@ -1,0 +1,29 @@
+{
+  "schema": "github-delivery-local-verification-evidence/v1",
+  "repository_id": 123,
+  "head_sha": "997b637730f967af63f435d8f28fe6677a209574",
+  "tree_sha": "83647e9bf7056f8afcc718eb30af17079f363e04",
+  "contract_sha256": "969a012c2d487f59fefb5f893709e8001ba788d7cacb2db872073adee9f7e6af",
+  "verified_at": "2026-08-14T09:59:00Z",
+  "clean_subject": true,
+  "commands": [{
+    "id": "contract",
+    "argv": ["python3", "-c", "print('ok')"],
+    "cwd": ".",
+    "timeout_seconds": 10,
+    "max_output_bytes": 4096,
+    "started_at": "2026-08-14T09:58:59Z",
+    "duration_ms": 1,
+    "exit": 0,
+    "timed_out": false,
+    "spawn_error": null,
+    "stdout_bytes": 3,
+    "stderr_bytes": 0,
+    "stdout_sha256": "dc51b8c96c2d745dfc19e7dcf992b6c5904c8d08f3d5de1d7f3ebd978ff662c9",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_truncated": false,
+    "stderr_truncated": false
+  }],
+  "status": "PASS",
+  "content_sha256": "cf039aad69ff57388db4ecfadd1c1aa9af30c40de0fc8c9666fd5b49c5c3fb00"
+}

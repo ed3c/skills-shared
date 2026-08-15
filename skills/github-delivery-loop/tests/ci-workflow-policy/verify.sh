@@ -27,6 +27,8 @@ grep -q "repository=ed3c/skills-shared" "${work}/good.out"
 #    already malformed.
 mkdir -p "${work}/repo/.github/workflows" "${work}/repo/.github-delivery"
 cp "${repo_root}/.github-delivery/ci-policy.json" "${work}/repo/.github-delivery/ci-policy.json"
+cp "${repo_root}/.github-delivery/local-verification-contract.json" \
+   "${work}/repo/.github-delivery/local-verification-contract.json"
 cp "${repo_root}/.github/workflows/skill-eval-contract.yml" \
    "${work}/repo/.github/workflows/skill-eval-contract.yml"
 python3 "${checker}" check --repo-root "${work}/repo" | grep -q "^ALLOW"
@@ -78,8 +80,8 @@ refuse escaping-workflow "safe repository-relative path"
 mutate required_jobs '[]'
 refuse empty-required-jobs "required_jobs must be a non-empty string array"
 
-mutate local_verification '"bash scripts/local_verification.sh"'
-refuse shell-string-verification "local_verification must be a non-empty argv array"
+mutate local_verification_contract '"../../outside.json"'
+refuse escaping-verification-contract "local_verification_contract must be a safe repository-relative path"
 
 # 3. the seal is about the workflow on disk, not only about the policy's own
 #    shape. A required job the workflow does not declare must be refused, or the

@@ -54,6 +54,38 @@ python3 $INFRA adopt <name> --from <path> --why "…" [--defer <repo>] [--dry-ru
 ```
 
 `check` exit 0 乾淨｜1 有裁決被違反；`report` exit 3 有待裁項（**待裁不是失敗**）。
+正控＝`tests/verify.sh`（全合成世界，不碰這台機器真實 skill 樹，零網路）。
+
+### 內容 ownership 與 body-neutrality
+
+`evals/body-neutrality.json` v2 將受管 Markdown 明分四類：
+
+| 類別 | owner／判準 |
+|---|---|
+| `portable_body` | shared Skill 的通用程序；預設類別，接受 body-neutrality ratchet |
+| `repo_binding_source` | consumer-specific 投影真源；由其 projection manifest、byte equality、budget 與 UNREGISTERED 控制治理 |
+| `generated_projection` | consumer 端生成物；由 projection readback 治理，本 repo 目前不保存此類輸出 |
+| `archive_evidence` | 歷史／證據；不冒充現行程序，由其 receipt／fixture owner 治理 |
+
+未分類檔案一律落入 `portable_body`，不是默認豁免。非 body root 必須精確列入 manifest；整支 Skill
+不能被排除。執行入口為 `scripts/check_body_neutrality.py --selftest` 與 repo root 相容轉發器
+`scripts/check_body_neutrality.py`。
+
+### `scripts/check_index.py` — 索引對它宣稱的那棵樹，兩個方向都要驗
+
+一份索引會**單向失效**：死連結點下去才知道，**漏列的檔案永遠沒人會知道**——
+短的清單與完整的清單長得一模一樣。散文裡的數字更沒有變紅的辦法：本 repo 的 README
+曾寫「共用 17 個」而 registry 是 22，沒人打錯字，只是抄了沒量。
+
+```bash
+CHK=~/.agents/skills/shared-skills-infra/scripts/check_index.py
+python3 $CHK --selftest                                   # 先證它會紅
+python3 $CHK <doc> [--root <dir>] [--covers <dir> …]      # exit 0 乾淨｜1 索引與樹不符
+```
+
+`--covers` 逐目錄要求「每個檔案都在文件裡被指名」（散文提到也算，不必是連結）；
+文件不必索引自己。三支 delivery-loop 用它守自己的 SKILL.md，各自
+`tests/index/verify.sh`；首次真跑就在三支裡各抓到一支從沒被提過的 sync 類腳本。
 
 `check`同時掃全 repo 的 `tests/**/verify.sh` 與 `tests/run-all.sh`，抓「物理上不可能失敗」
 的死斷言（`! cmd` 在語句位置、`test A && test B`、`|| true` 吞掉斷言、狀態被丟棄的 `grep`）。

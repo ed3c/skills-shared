@@ -92,6 +92,35 @@ after the issue packet exists. The fresh session receives the issue packet and
 exact repository evidence, but it does not treat the previous repair
 conversation as authoritative context.
 
+OpenAI's documented `codex app <workspace-path>` command may open the Desktop
+workspace, and a `codex://threads/new?...` deep link may prefill the composer.
+Neither action sends the prompt. The operator must submit it before the state can
+leave `FRESH_DIAGNOSIS_HANDOFF_REQUIRED`.
+
+The submitted prompt must explicitly:
+
+- name the exact `owner/repo` and request the installed GitHub plugin/connector;
+- provide the three-attempt ledger, issue URL, exact base/head, relevant Git
+  history, failing oracle/logs, open PR stack, and non-target constraints;
+- ask the fresh session to research the repository and competing root causes,
+  not merely paraphrase the issue or PR body;
+- name the worktree branch and GitHub PR that may receive the proposed solution.
+
+A short issue/PR message or a prefilled-but-unsent composer is insufficient
+context and remains a handoff, not a completed diagnosis.
+
+Submission is complete only when a host/operator receipt confirms all of:
+
+```text
+Send / Submit was explicitly invoked
+the prompt appears in the conversation timeline, not the composer
+the assistant has started responding
+thread identity plus screenshot or equivalent UI observation is retained
+```
+
+If any observation is absent, the Desktop diagnosis lane remains
+`NOT_EXERCISED`; a populated input box must never be reported as dispatched.
+
 The fresh diagnosis must output, before code changes:
 
 ```text
@@ -107,6 +136,10 @@ non-target regression risks
 This is a host/operator transition. An Agent runtime that cannot launch ChatGPT
 Desktop must stop at `FRESH_DIAGNOSIS_HANDOFF_REQUIRED` and provide the exact
 packet to the operator; it must not pretend that a fresh desktop session ran.
+
+Codex-managed worktrees are created in Desktop after the Worktree chat prompt is
+submitted. CLI may use `codex -C <existing-worktree-path>` only after standard Git worktree path/HEAD verification. It must not invent `EnterWorktree`,
+`ExitWorktree`, `codex worktree`, or `codex -w`.
 
 ## Worktree law
 

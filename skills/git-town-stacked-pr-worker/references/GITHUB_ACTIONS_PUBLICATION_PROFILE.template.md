@@ -16,7 +16,7 @@ publication:
   gate:
     skill: github-delivery-loop
     entrypoint: <TYPED_ENTRYPOINT_TO_CI_PUBLISH_GATE>
-    snapshot_schema: github-actions-publish-snapshot/v1
+    snapshot_schema: github-actions-publish-snapshot/v3
     local_verification_schema: github-delivery-local-verification/v1
     decision_schema: github-actions-publish-decision/v1
     recovery_schema: github-actions-billing-recovery/v1

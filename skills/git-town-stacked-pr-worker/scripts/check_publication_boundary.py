@@ -140,7 +140,7 @@ def check_policy(root: Path) -> None:
         text,
         (
             "ci_publish_gate.py evaluate --intent <intent>",
-            "github-actions-publish-snapshot/v1",
+            "github-actions-publish-snapshot/v3",
             "github-delivery-local-verification/v1",
             "initial-pr",
             "ready-for-review",
@@ -178,7 +178,7 @@ def check_profile_fragment(root: Path) -> None:
         (
             "git-town-stacked-pr-worker/github-actions-publication-profile/v1",
             "skill: github-delivery-loop",
-            "github-actions-publish-snapshot/v1",
+            "github-actions-publish-snapshot/v3",
             "github-delivery-local-verification/v1",
             "github-actions-publish-decision/v1",
             "github-actions-billing-recovery/v1",

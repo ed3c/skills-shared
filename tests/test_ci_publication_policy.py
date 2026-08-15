@@ -21,7 +21,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 POLICY_PATH = ROOT / ".github-delivery" / "ci-policy.json"
-SKILL = Path.home() / ".claude" / "skills" / "github-delivery-loop" / "scripts"
+SKILL = ROOT / "skills" / "github-delivery-loop" / "scripts"
 
 
 def load_module(name: str):
@@ -30,6 +30,7 @@ def load_module(name: str):
         raise unittest.SkipTest(f"{name} is not available")
     module = importlib.util.module_from_spec(spec)
     sys.path.insert(0, str(SKILL))
+    sys.modules[name] = module
     spec.loader.exec_module(module)
     return module
 
@@ -44,19 +45,21 @@ def head_sha() -> str:
 class PolicyShapeTests(unittest.TestCase):
     def test_policy_exists_and_declares_this_repository(self) -> None:
         policy = json.loads(POLICY_PATH.read_text(encoding="utf-8"))
-        self.assertEqual(policy["schema"], "github-ci-policy/v1")
+        self.assertEqual(policy["schema"], "github-ci-policy/v2")
         self.assertEqual(policy["repository"], "ed3c/skills-shared")
         self.assertIs(policy["private"], True)
         self.assertEqual(policy["default_branch"], "main")
 
-    def test_declared_verification_argv_exists_and_is_executable(self) -> None:
-        """A verification command that is not there would fail only at publish."""
+    def test_declared_verification_contract_exists_and_matches_repository(self) -> None:
         policy = json.loads(POLICY_PATH.read_text(encoding="utf-8"))
-        argv = policy["local_verification"]
-        self.assertEqual(argv[0], "bash")
-        script = ROOT / argv[1]
-        self.assertTrue(script.is_file(), argv[1])
-        self.assertTrue(script.stat().st_mode & 0o111, f"{argv[1]} is not executable")
+        contract_path = ROOT / policy["local_verification_contract"]
+        contract = json.loads(contract_path.read_text(encoding="utf-8"))
+        self.assertEqual(
+            contract["schema"], "github-delivery-local-verification-contract/v1"
+        )
+        self.assertEqual(contract["repository_id"], 1326262274)
+        module = load_module("local_verification")
+        module.validate_contract(contract, 1326262274)
 
     def test_named_workflow_exists(self) -> None:
         policy = json.loads(POLICY_PATH.read_text(encoding="utf-8"))
@@ -97,127 +100,230 @@ class SealedWorkflowTests(unittest.TestCase):
 class GateDecisionTests(unittest.TestCase):
     """Exercise the gate on this repository's own identity, not a fixture."""
 
-    def snapshot(self, **overrides):
+    def subject(self, **overrides):
         now = datetime.now(UTC)
-        head = head_sha()
-        body = {
-            "schema": "github-ci-publish-snapshot/v1",
-            "repository": "ed3c/skills-shared",
-            "repository_owner": "ed3c",
-            "private": True,
-            "intent": "initial-pr",
-            "local_head": head,
-            "local_verification": {
-                "head_sha": head,
-                "status": "passed",
-                "completed_at": now.isoformat().replace("+00:00", "Z"),
+        import tempfile
+        with tempfile.TemporaryDirectory() as raw:
+            repo = Path(raw) / "repo"
+            repo.mkdir()
+            subprocess.run(["git", "init", "-q", str(repo)], check=True)
+            subprocess.run(["git", "-C", str(repo), "config", "user.name", "fixture"], check=True)
+            subprocess.run(["git", "-C", str(repo), "config", "user.email", "fixture@example.invalid"], check=True)
+            (repo / "subject.txt").write_text("subject\n", encoding="utf-8")
+            subprocess.run(["git", "-C", str(repo), "add", "subject.txt"], check=True)
+            subprocess.run(["git", "-C", str(repo), "commit", "-qm", "subject"], check=True)
+            contract = {
+                "schema": "github-delivery-local-verification-contract/v1",
+                "repository_id": 1326262274,
+                "inherit_env": ["PATH"],
+                "commands": [{
+                    "id": "repository-contract",
+                    "argv": ["python3", "-c", "print('ok')"],
+                    "cwd": ".",
+                    "timeout_seconds": 10,
+                    "max_output_bytes": 4096,
+                }],
+            }
+            local = load_module("local_verification")
+            verification, evidence, code = local.build(repo, contract, 1326262274)
+            self.assertEqual(code, 0)
+        head = verification["head_sha"]
+        tree = evidence["tree_sha"]
+        snapshot = {
+            "schema": "github-actions-publish-snapshot/v4",
+            "repository": {
+                "full_name": "ed3c/skills-shared",
+                "repository_id": 1326262274,
+                "owner_login": "ed3c",
+                "private": True,
             },
-            "pull_request": None,
+            "branch": {"name": "agent/fixture", "head_sha": None},
+            "initial_boundary": "trusted-initial",
+            "pull_request": {
+                "number": None,
+                "state": "absent",
+                "head_sha": None,
+                "last_published_sha": None,
+                "last_published_at": None,
+                "feedback": None,
+            },
+            "actions": {
+                "circuit": "closed",
+                "observed_at": None,
+                "blocker": None,
+                "latest_check": None,
+            },
+            "captured_at": now.isoformat().replace("+00:00", "Z"),
         }
-        body.update(overrides)
-        return body
+        snapshot.update(overrides.get("snapshot", {}))
+        if (
+            snapshot["pull_request"]["state"] != "absent"
+            and "initial_boundary" not in overrides.get("snapshot", {})
+        ):
+            snapshot["initial_boundary"] = "not-initial"
+        verification.update(overrides.get("verification", {}))
+        if "evidence" in overrides:
+            evidence.update(overrides["evidence"])
+        return snapshot, verification, evidence, contract, head, tree
+
+    @staticmethod
+    def decide(module, subject, intent="initial-pr", recovery=None):
+        snapshot, verification, evidence, contract, head, tree = subject
+        return module.evaluate(
+            snapshot, verification, evidence, contract, intent, head, tree, recovery
+        )
 
     def test_initial_publication_is_admitted(self) -> None:
         module = load_module("ci_publish_gate")
-        allowed, reason = module.evaluate(self.snapshot())
-        self.assertTrue(allowed, reason)
-        self.assertEqual(reason, "initial-pr")
+        decision = self.decide(module, self.subject())
+        self.assertEqual(decision.decision, "ALLOW")
+        self.assertEqual(decision.reason, "allow-initial-pr")
+
+    def test_initial_publication_requires_remote_branch_absence(self) -> None:
+        module = load_module("ci_publish_gate")
+        subject = self.subject(snapshot={
+            "branch": {"name": "agent/fixture", "head_sha": "1" * 40},
+            "initial_boundary": "branch-present-without-pr",
+        })
+        decision = self.decide(module, subject)
+        self.assertEqual(decision.reason, "initial-boundary-refused")
 
     def test_stale_verification_head_is_refused(self) -> None:
         module = load_module("ci_publish_gate")
-        snapshot = self.snapshot()
-        snapshot["local_verification"]["head_sha"] = "0" * 40
-        allowed, reason = module.evaluate(snapshot)
-        self.assertFalse(allowed)
-        self.assertEqual(reason, "verification-head-mismatch")
+        subject = self.subject(verification={"head_sha": "0" * 40})
+        with self.assertRaisesRegex(module.InputError, "stale"):
+            self.decide(module, subject)
 
     def test_failed_verification_is_refused(self) -> None:
         module = load_module("ci_publish_gate")
-        snapshot = self.snapshot()
-        snapshot["local_verification"]["status"] = "failed"
-        allowed, reason = module.evaluate(snapshot)
-        self.assertFalse(allowed)
-        self.assertEqual(reason, "local-verification-not-passed")
+        subject = self.subject(verification={"status": "FAIL"})
+        with self.assertRaisesRegex(module.InputError, "must be PASS"):
+            self.decide(module, subject)
+
+    def test_tampered_detailed_evidence_is_refused(self) -> None:
+        module = load_module("ci_publish_gate")
+        subject = self.subject(evidence={"status": "FAIL"})
+        with self.assertRaisesRegex(module.InputError, "clean PASS"):
+            self.decide(module, subject)
+
+    def test_resigned_command_drift_from_contract_is_refused(self) -> None:
+        module = load_module("ci_publish_gate")
+        subject = self.subject()
+        subject[2]["commands"][0]["argv"] = ["false"]
+        content = dict(subject[2])
+        content.pop("content_sha256")
+        subject[2]["content_sha256"] = module.digest(content)
+        subject[1]["evidence_sha256"] = module.digest(subject[2])
+        with self.assertRaisesRegex(module.InputError, "differs from contract"):
+            self.decide(module, subject)
+
+    def test_noncanonical_inherit_env_order_matches_producer_normalization(self) -> None:
+        module = load_module("ci_publish_gate")
+        subject = self.subject()
+        subject[3]["inherit_env"] = ["TZ", "PATH"]
+        normalized = module.LOCAL_VERIFICATION.validate_contract(subject[3], 1326262274)
+        subject[2]["contract_sha256"] = module.digest(normalized)
+        content = dict(subject[2])
+        content.pop("content_sha256")
+        subject[2]["content_sha256"] = module.digest(content)
+        subject[1]["evidence_sha256"] = module.digest(subject[2])
+        decision = self.decide(module, subject)
+        self.assertEqual(decision.decision, "ALLOW")
 
     def test_open_billing_circuit_is_refused(self) -> None:
         module = load_module("ci_publish_gate")
-        now = datetime.now(UTC)
-        snapshot = self.snapshot(billing_blocker={
-            "kind": "account-billing-no-runner",
-            "observed_at": now.isoformat().replace("+00:00", "Z"),
-        })
-        allowed, reason = module.evaluate(snapshot)
-        self.assertFalse(allowed)
-        self.assertEqual(reason, "billing-circuit-open")
+        now = datetime.now(UTC).isoformat().replace("+00:00", "Z")
+        subject = self.subject(snapshot={"actions": {
+            "circuit": "billing-open", "observed_at": now,
+            "blocker": "billing-or-spending-limit", "latest_check": None,
+        }})
+        decision = self.decide(module, subject)
+        self.assertEqual(decision.reason, "billing-circuit-open")
 
     def test_stale_billing_recovery_is_refused(self) -> None:
         """A recovery older than the blocker does not clear it."""
         module = load_module("ci_publish_gate")
         now = datetime.now(UTC)
-        snapshot = self.snapshot(
-            billing_blocker={
-                "kind": "account-billing-no-runner",
-                "observed_at": now.isoformat().replace("+00:00", "Z"),
-            },
-            recovery={
-                "author": "ed3c",
-                "status": "actions-restored",
-                "recovered_at": (now - timedelta(hours=1)).isoformat().replace("+00:00", "Z"),
-            },
-        )
-        allowed, reason = module.evaluate(snapshot)
-        self.assertFalse(allowed)
-        self.assertEqual(reason, "billing-recovery-stale")
+        observed = now.isoformat().replace("+00:00", "Z")
+        subject = self.subject(snapshot={"actions": {
+            "circuit": "billing-open", "observed_at": observed,
+            "blocker": "billing-or-spending-limit", "latest_check": None,
+        }})
+        recovery = {
+            "schema": "github-actions-billing-recovery/v1",
+            "repository_id": 1326262274,
+            "owner_login": "ed3c",
+            "blocker_observed_at": observed,
+            "recovered_at": (now - timedelta(hours=1)).isoformat().replace("+00:00", "Z"),
+            "note": "fixture",
+        }
+        decision = self.decide(module, subject, recovery=recovery)
+        self.assertEqual(decision.reason, "billing-recovery-invalid")
 
     def test_untrusted_billing_recovery_is_refused(self) -> None:
         module = load_module("ci_publish_gate")
         now = datetime.now(UTC)
-        snapshot = self.snapshot(
-            billing_blocker={
-                "kind": "account-billing-no-runner",
-                "observed_at": now.isoformat().replace("+00:00", "Z"),
-            },
-            recovery={
-                "author": "someone-else",
-                "status": "actions-restored",
-                "recovered_at": (now + timedelta(hours=1)).isoformat().replace("+00:00", "Z"),
-            },
-        )
-        allowed, reason = module.evaluate(snapshot)
-        self.assertFalse(allowed)
-        self.assertEqual(reason, "billing-recovery-untrusted")
+        observed = now.isoformat().replace("+00:00", "Z")
+        subject = self.subject(snapshot={"actions": {
+            "circuit": "billing-open", "observed_at": observed,
+            "blocker": "billing-or-spending-limit", "latest_check": None,
+        }})
+        recovery = {
+            "schema": "github-actions-billing-recovery/v1",
+            "repository_id": 1326262274,
+            "owner_login": "someone-else",
+            "blocker_observed_at": observed,
+            "recovered_at": (now + timedelta(hours=1)).isoformat().replace("+00:00", "Z"),
+            "note": "fixture",
+        }
+        decision = self.decide(module, subject, recovery=recovery)
+        self.assertEqual(decision.reason, "billing-recovery-invalid")
 
-    def test_republishing_an_unchanged_head_is_refused(self) -> None:
+    def test_ready_transition_on_unchanged_head_does_not_push(self) -> None:
         module = load_module("ci_publish_gate")
-        head = head_sha()
-        snapshot = self.snapshot(intent="ready-for-review", pull_request={
-            "number": 1, "remote_head": head, "is_draft": True,
+        base = self.subject()
+        head = base[4]
+        pull = {
+            "number": 1, "state": "draft", "head_sha": head,
+            "last_published_sha": head, "last_published_at": "2026-08-12T05:00:00Z",
+            "feedback": None,
+        }
+        subject = self.subject(snapshot={
+            "branch": {"name": "agent/fixture", "head_sha": head},
+            "pull_request": pull,
         })
-        allowed, reason = module.evaluate(snapshot)
-        self.assertFalse(allowed)
-        self.assertEqual(reason, "remote-head-already-current")
+        # Bind the pull to this subject's independently produced exact HEAD.
+        actual = subject[4]
+        subject[0]["branch"]["head_sha"] = actual
+        subject[0]["pull_request"]["head_sha"] = actual
+        subject[0]["pull_request"]["last_published_sha"] = actual
+        decision = self.decide(module, subject, intent="ready-for-review")
+        self.assertEqual(decision.operation, "ready-transition-only")
 
     def test_repeated_feedback_is_refused(self) -> None:
         module = load_module("ci_publish_gate")
-        now = datetime.now(UTC)
-        observed = (now - timedelta(minutes=10)).isoformat().replace("+00:00", "Z")
-        snapshot = self.snapshot(
-            intent="repair",
-            pull_request={"number": 1, "remote_head": "1" * 40, "is_draft": False},
-            actionable_feedback={
-                "actionable": True, "head_sha": "1" * 40, "observed_at": observed,
+        remote = "1" * 40
+        subject = self.subject(snapshot={
+            "branch": {"name": "agent/fixture", "head_sha": remote},
+            "pull_request": {
+                "number": 1, "state": "ready", "head_sha": remote,
+                "last_published_sha": remote,
+                "last_published_at": "2026-08-12T05:00:00Z",
+                "feedback": {
+                    "id": "review:1", "kind": "review", "head_sha": remote,
+                    "observed_at": "2026-08-12T05:01:00Z", "consumed_by_sha": None,
+                },
             },
-            last_publication={"intent": "repair", "feedback_observed_at": observed},
-        )
-        allowed, reason = module.evaluate(snapshot)
-        self.assertFalse(allowed)
-        self.assertEqual(reason, "feedback-already-published")
+        })
+        subject[0]["pull_request"]["feedback"]["consumed_by_sha"] = subject[4]
+        decision = self.decide(module, subject, intent="batched-repair")
+        self.assertEqual(decision.reason, "repair-feedback-already-consumed")
 
     def test_checkpoint_intent_is_not_a_publication_reason(self) -> None:
         module = load_module("ci_publish_gate")
-        allowed, reason = module.evaluate(self.snapshot(intent="checkpoint"))
-        self.assertFalse(allowed)
-        self.assertEqual(reason, "unsupported-intent:checkpoint")
+        subject = self.subject()
+        with self.assertRaisesRegex(module.InputError, "intent must be"):
+            self.decide(module, subject, intent="checkpoint")
 
 
 class PushGuardTests(unittest.TestCase):

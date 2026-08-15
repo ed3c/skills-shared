@@ -36,6 +36,8 @@ required = {
     "sources/04-d.md",
     # extras：文件叫人執行的工具必須隨包附上，否則讀者能讀到主張卻無法重新推導。
     "tools/tool.py",
+    "code-graph/graph.json",
+    "code-graph/graph.verification.json",
     "MANIFEST.sha256",
 }
 assert required <= names, sorted(required - names)
@@ -55,6 +57,87 @@ assert rendered.count('<figure class="diagram"') == 4, "every source must yield 
 assert 'id="atlas"' in rendered and "圖錄" in rendered
 assert 'id="fig01-01"' in rendered and 'href="#fig01-01"' in rendered
 assert "function fitFigure" in rendered
+
+# ── 原生 Code Graph：config → 可操作分頁 → graph/report 自動入包 ─────────
+assert 'data-view="view-codegraph"' in rendered
+assert 'id="view-codegraph"' in rendered
+assert 'id="ctg-data" type="application/json"' in rendered
+assert "Fixture Code Review Graph" in rendered
+assert "只顯示 critical slice" in rendered and "目錄與 symbol tree" in rendered
+assert "src/client.py" in rendered, "source anchor must be reviewable in-page"
+# Reach-aware graph 的第一閱讀面必須與 reference demo 同構：左側導航、中央圖、
+# 右側 node/edge evidence。完整 review dialog 仍保留給深讀，但不能取代主畫面的
+# 抵達證據欄，否則人無法一眼比較 edge reach 與當下 invariant state。
+assert "grid-template-columns:250px minmax(500px,1fr) 340px" in rendered
+assert 'id="ctg-inline-detail"' in rendered
+assert "節點／連線證據" in rendered
+assert "Agent overlay" in rendered and "只顯示 critical slice" in rendered
+assert 'id="ctg-time"' in rendered and "推翻歷史" in rendered
+assert ".ctg-edge.static" in rendered
+assert ".ctg-edge.survived" in rendered and ".ctg-edge.refuted" in rendered
+# 深讀仍有 roomy、keyboard-accessible review window。
+assert '<dialog id="ctg-review-dialog"' in rendered
+assert 'class="ctg-review-shell"' in rendered
+assert "function openReview" in rendered and "function closeReview" in rendered
+# Guided-path controls must live inside the modal too. Controls only behind a
+# modal look present in static HTML but are not operable in a real browser.
+assert 'id="ctg-review-path"' in rendered
+assert 'id="ctg-review-path-prev"' in rendered
+assert 'id="ctg-review-path-next"' in rendered
+assert "function syncReviewPath" in rendered
+assert "觀察（原始碼直接可見）" in rendered and "推論（Code Review）" in rendered
+assert "能證明" in rendered and "不能證明" in rendered
+assert "抵達狀態" in rendered and "下一個獨立抵達" in rendered
+assert "MISSING_IN_IOS" in rendered and "comparison_status" in rendered
+assert 'id="ctg-graph-views"' in rendered
+assert "Client 完整 Code Graph" in rendered and "Write Boundary 完整 Code Graph" in rendered
+assert "function selectGraphView" in rendered
+assert "function routeFor" in rendered and "routePath(route)" in rendered
+assert "ctg-diff-chip" in rendered and "difference_summary" in rendered
+assert 'id="ctg-category"' in rendered and "function categoryOf" in rendered
+assert "ctg-category-label" in rendered
+assert ".ctg-node.node-reach-static" in rendered
+assert ".ctg-node.node-reach-sandbox" in rendered
+assert ".ctg-node.node-reach-prod" in rendered
+assert "ctg-edge-hit" in rendered and "focusEdgeRoute" in rendered
+assert 'id="ctg-agent-files"' in rendered and "function importAgentSessions" in rendered
+assert "真相影響：NONE" in rendered
+assert "function pinNodeRoute" in rendered and "function clearPinnedFocus" in rendered
+assert "ctg-tier-frontend" in rendered and "ctg-tier-backend" in rendered
+assert "根因分析" in rendered and "root_cause_analysis" in rendered
+assert "問題調查" in rendered and "proof_chain" in rendered
+assert "自我推翻點" in rendered and "後續分析" in rendered
+assert "目錄與 symbol tree" in rendered and "節點／連線證據" in rendered
+for forbidden_ui in (
+    "Directory &amp; symbol tree",
+    "Node / edge evidence",
+    "Select a node or edge",
+    "Open full Code Review",
+    "Critical slice only",
+    "Decision Queue",
+    "Evidence by reach",
+    "Recommendation</h3>",
+    "Invariant timeline",
+):
+    assert forbidden_ui not in rendered, forbidden_ui
+assert "決策佇列" in rendered and "DEC-1" in rendered
+assert "業務不變量時間線" in rendered and "根因分析" in rendered
+assert "function edgeStateAt" in rendered and "graph_delta" in rendered
+# Code Graph 可成為 bundle 的中心入口，而不是每次先落到摘要頁。
+assert 'data-default-view="view-codegraph"' in rendered
+# Workspace 在桌面沿用 reference demo 250／fluid／340 三欄，窄畫面再單欄。
+assert "width:min(1120px,calc(100vw - 32px))" in rendered
+assert "max-height:calc(100dvh - 32px)" in rendered
+report_path = manifest_path.parent / "test-bundle.graph-verification.json"
+report = __import__("json").loads(report_path.read_text(encoding="utf-8"))
+assert report["ok"] is True, report
+assert report["counts"] == {
+    "critical_edges": 3,
+    "edges": 3,
+    "evidence": 2,
+    "invariants": 1,
+    "nodes": 4,
+}, report
 
 # ── 分頁：九份文件不能串成一條長捲軸 ────────────────────────────────────
 assert 'id="view-docs"' in rendered and 'class="tab"' in rendered
@@ -87,6 +170,38 @@ assert owner == "04", f"Commit 1 應落在原始定義 doc-04，實得 doc-{owne
 seg = rendered[pos:pos + 400]
 assert "〜" not in seg.split("</h")[0], "錨點落在範圍標題上"
 PY
+
+# Graph validation is a public CLI boundary: dangling endpoints and evidence-less
+# critical edges must fail before a distributable is written.
+bad_out="$(python3 "$renderer" "$tmp_dir/case/bad-config.json" 2>&1 || true)"
+if ! grep -q "node evidence_ids must be an array" <<<"$bad_out"; then
+  echo "malformed evidence_ids did not produce a diagnostic validation error: $bad_out" >&2
+  exit 1
+fi
+if ! grep -q "edge source/target missing" <<<"$bad_out"; then
+  echo "dangling graph edge was not rejected: $bad_out" >&2
+  exit 1
+fi
+if ! grep -q "critical edge has no evidence" <<<"$bad_out"; then
+  echo "evidence-less critical edge was not rejected: $bad_out" >&2
+  exit 1
+fi
+if ! grep -q "event graph_delta edge missing" <<<"$bad_out"; then
+  echo "event delta with an unknown edge was not rejected: $bad_out" >&2
+  exit 1
+fi
+if ! grep -q "invariant event order broken" <<<"$bad_out"; then
+  echo "out-of-order invariant history was not rejected: $bad_out" >&2
+  exit 1
+fi
+if ! grep -q "invariant event state chain broken" <<<"$bad_out"; then
+  echo "broken invariant state chain was not rejected: $bad_out" >&2
+  exit 1
+fi
+if [ -e "$tmp_dir/case/bad-output/bad-graph-bundle.html" ]; then
+  echo "rejected graph must not leave partial output behind" >&2
+  exit 1
+fi
 
 if python3 "$renderer" "$test_dir/fixtures/hollow/config.json"; then
   echo "hollow fixture unexpectedly passed" >&2

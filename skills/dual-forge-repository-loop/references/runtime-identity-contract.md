@@ -30,6 +30,13 @@ UNKNOWN
 - `GITHUB_ACTIONS` is a CI workspace, not a developer worktree and not local Forgejo authority.
 - `CLAUDE_CODE_LOCAL` and `CODEX_CLI_LOCAL` may claim local git/worktree execution only after the checkout/path/remotes are observed in that process.
 - `CHATGPT_DESKTOP_WORKTREE` requires an actually created Desktop worktree with bound path, branch, and HEAD. Opening the Desktop app or pre-filling a deep link is insufficient.
+- `codex app <workspace-path>` opens the Desktop surface; it does not submit the
+  composer or create worktree evidence. A deep-link prompt remains pending until
+  the operator sends it.
+- Codex-managed worktrees are Desktop-created. CLI may enter an already existing
+  standard Git worktree with `codex -C <existing-worktree-path>` after path/HEAD
+  verification; it must not invent `EnterWorktree`, `ExitWorktree`,
+  `codex worktree`, or `codex -w`.
 - Model family (`GPT`, `Claude`, `Gemini`, etc.) does not determine runtime identity.
 - Forge authority (`GitHub`, `Forgejo`) does not determine runtime identity.
 - `UNKNOWN` fails closed for irreversible delivery, merge, push, publication, or environment-specific claims.

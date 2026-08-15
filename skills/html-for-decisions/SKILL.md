@@ -53,6 +53,9 @@ description: |
 17. **導覽狀態要可逆**：跳轉前記下（分頁、文件、捲動位置），提供上一步／下一步。已經在畫面內的目標**只標示不跳**，也不吃返回歷史——跳到自己身上會讓返回鍵「回到原地」。標示保留到讀者點別處才消失。
 18. **附帶工具要隨包出貨**：文件叫人執行的東西必須用 `extras` 放進 ZIP。只給指令不給檔案，讀者能讀到主張卻無法重新推導——而「可重新推導」正是這套的立足點。
 19. **決策文件要能導出 MVP**：完整方案必須附一節回答「明天要做哪一步」，逐項過四道閘門並列出被刷掉的候選與原因。方法見 [modules/mvp-extraction.md](modules/mvp-extraction.md)。只列入選的，讀者無法判斷有沒有漏掉更好的。
+20. **Code Graph 是一級輸入但不是第二 SSOT**：config 可用 `code_graph` 原生加入 node／edge／evidence review index，並以 `default_view: "codegraph"` 將它設為首頁；renderer 必須先驗 ID 閉合、edge 端點、evidence 引用與 critical evidence closure，才可產生任何交付物。`AFFECTS_INVARIANT` 可沿 source node evidence 形成結構閉合，其餘 critical edge 必須直接掛 evidence。Graph 只能索引 Markdown 已有的裁決與證據，不能自行改寫 invariant 狀態；完整契約見 [modules/code-graph-schema.md](modules/code-graph-schema.md)。
+21. **Reach-aware graph 必須分開導航、分類、層級、抵達與狀態**：桌面第一閱讀面固定是 `250px / fluid / 340px` 的 directory tree／graph／node-edge evidence 三欄；目錄樹只用中性導航色。多個完整系統應以 `view.graph_views[]` 切換各自閉合的 canonical subgraph，不得退化成平台左右對照圖；差異只用 node／edge 的短標記提示，完整分析仍由同一 review detail 開啟。node 底色只表最高抵達層級 UNKNOWN／DOCUMENT／STATIC／SANDBOX／PROD；review role 用 `metadata.node_category` 與文字標籤，前端／後端／共享分析則用 `metadata.node_tier` 與形狀，兩者都不得搶用抵達色。逐節點 RCA 要分辨 root cause、contributing factor、control、evidence、invariant 與 coverage index，不能把每個 node 都宣稱成根因。edge 線型／粗細只表達 STATIC／SANDBOX／PROD，edge 顏色只表達 UNKNOWN／survived／refuted。密圖必須提供 connector hit-area 與 hover route focus；點 node／edge 後 focus 必須固定，hover 其他項目只暫時覆蓋並在離開時復原，只有點 SVG 空白或 reset 才取消。Agent overlay 是檢索範圍預測子，不是 evidence；local JSONL 匯入只留 browser memory，truth effect 固定 `NONE`。Code Graph chrome 使用繁體中文並保留英文專有名詞。`invariant_events` 必須以 append-only 時間軸刷出歷史 edge 狀態，不能只顯示當下結論。
+22. **問題調查不可壓扁成最終 RCA**：producer 提供 `metadata.investigation_case` 時，頁面必須保留逐步 `proof_chain`、自我推翻點、修正、下一個可證偽動作與後續分析節點。每一步分別標 reach 與 result，失敗不得被最終綠燈覆寫。`SETTLED` 只在案件明寫的 `truth_scope` 內成立；client 的 `PROD×2` 不得自動替 server boundary 或另一個只有 STATIC 的 client 背書。Agent overlay／follow-up traversal 的 truth effect 仍固定為 `NONE`。
 
 ## 確定性程序
 
@@ -70,7 +73,7 @@ flowchart LR
 
 1. 確認頁面服務的是裁決／交接，不是普通進度。不是人閘節點 → 出 Markdown，停。
 2. 找出所有 Markdown SSOT；用 config 顯式列出，禁止用 glob 偷帶不相關文件。**只投影不新增判定。**
-3. 把裁決摘要、文件角色與 quiz 寫進 config；內容必能指回 Markdown。「必」槽缺料顯式 N/A，禁靜默省略。
+3. 把裁決摘要、文件角色與 quiz 寫進 config；內容必能指回 Markdown。「必」槽缺料顯式 N/A，禁靜默省略。需要 code-review 級操作面時，以 `code_graph.path` 顯式加入結構化 index，不用專案 wrapper 注入 HTML。
 4. 執行：
 
    ```bash
@@ -94,19 +97,27 @@ flowchart LR
   "snapshot": "2026-08-06",
   "basename": "decision-bundle",
   "output_dir": "deliverables",
+  "default_view": "codegraph",
   "subject": "郵件主旨",
   "decision": "已裁決或待裁決的一句話",
   "summary": ["只來自 SSOT 的摘要"],
   "documents": [
     {"path": "README.md", "label": "入口", "role": "索引"}
   ],
+  "code_graph": {
+    "path": "code-graph/review-graph.json",
+    "label": "Code Review Graph",
+    "as": "code-graph/review-graph.json",
+    "verification_report": "code-graph/review-graph.verification.json",
+    "verification_as": "code-graph/review-graph.verification.json"
+  },
   "quiz": [
     {"question": "問題", "options": ["正確", "錯誤"], "answer": 0}
   ]
 }
 ```
 
-所有相對路徑都以 config 所在目錄解析。收件人欄位預設使用 `.invalid` placeholder，寄送前由人修改。
+`code_graph` 是可選欄位；省略時輸出與既有 bundle 完全相容。所有相對路徑都以 config 所在目錄解析。收件人欄位預設使用 `.invalid` placeholder，寄送前由人修改。
 
 ## 驗證閘
 
@@ -118,6 +129,7 @@ flowchart LR
 - HTML 必含圖錄（`id="atlas"`）與符號索引（`id="symbol-index"`），且每份文件的圖數 > 0。
 - 錨點 id 不得重複、內部連結不得懸空；代號跳轉必須落在原始定義而非摘要列。
 - 來源不變時重跑兩次，四個產物必須 byte-identical；改一個字後 hash 必須全動。以上都在 `tests/package-markdown-email/verify.sh` 裡。
+- 有 `code_graph` 時，HTML 必含 `view-codegraph`／`ctg-data`、三欄 `250px / fluid / 340px` workspace、右側「節點／連線證據」、Agent overlay、「只顯示 critical slice」與「推翻歷史」slider。點 node／edge 先更新右側 evidence 並固定相關路徑；只有點 SVG 空白或 reset 才取消。完整深讀再由「開啟完整 Code Review」按鈕開獨立 modal，guided path 的上下步控制必須留在 modal 內可操作。ZIP 必含原始 graph 與 renderer 產生的 verification report。dangling endpoint、重複 ID、未知 evidence ID、未形成直接或 `AFFECTS_INVARIANT` 結構閉合的 critical edge 都必須 fail closed 且不得留下 HTML。
 - **每條新斷言都要先看它會叫**：暫時把對應的實作退回舊行為，確認測試轉紅，再改回來。第一次就過的斷言可能根本沒測到目標——本 skill 就發生過一次：範圍標題的 fixture 寫成 `## 2. Commit 1〜2`，有數字前綴所以根本沒進到那條規則。
 
 ## Gotchas
@@ -137,9 +149,11 @@ flowchart LR
 
 - [modules/media-know-why.md](modules/media-know-why.md)：HTML 稅、email client 邊界與 md＝源的理由。
 - [modules/mvp-extraction.md](modules/mvp-extraction.md)：把「完整方案」轉成「明天就能開始的清單」的四道閘門與排序；含被刷掉候選也要列出的理由。
+- [modules/code-graph-schema.md](modules/code-graph-schema.md)：原生 `code_graph` config、v1 node／edge／evidence 契約、layout fallback 與真相邊界。
 - [prompts/decision-report.prompt.md](prompts/decision-report.prompt.md)：需要 LLM 編排決策摘要時的 schema；不得取代 Markdown SSOT。
 - [scripts/check_decision_html.py](scripts/check_decision_html.py)：自包含／投影／快照／quiz／title checker。
 - [scripts/package_markdown_email.py](scripts/package_markdown_email.py)：標準庫-only 的 HTML／ZIP／EML renderer。
+- [scripts/code_graph.py](scripts/code_graph.py)：標準庫-only 的 Code Graph loader、validator、verification report 與自包含互動 renderer。
 - [scripts/check_redaction.py](scripts/check_redaction.py)：阻擋**上游 skill 來源 repo 識別字**進入交付物。它比對的是一組固定 token，不是任意絕對路徑；目標 repo 自身的路徑與檔名是刻意保留的證據，不在擋的範圍。renderer 會在寫出任何檔案前先呼叫它。
 - worked instance 指針、宿主專屬致動器與移植帳本：見該 repo 的 `.skill-bindings/html-for-decisions/`。
 
@@ -156,4 +170,3 @@ code graph 那半分不出來——三個函式裡與 graph 無關的改動各�
 **人裁結果：保留本版**（2026-08-15，ruling A）。因此那邊的 `scripts/code_graph.py`、
 `modules/code-graph-schema.md` 與三個 graph fixture 不採用，不是待辦。要重開這個決定，需要的是
 比較兩版**外觀**，不是再比一次程式碼——程式碼已經比完，答案是「兩個設計」。
-

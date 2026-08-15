@@ -114,6 +114,7 @@ def run_command(root:Path,c:dict[str,Any],env:dict[str,str])->dict[str,Any]:
             except (ProcessLookupError,PermissionError):p.kill()
             code=p.wait()
     ta.join(2);tb.join(2)
+    p.stdout.close();p.stderr.close()
     if ta.is_alive() or tb.is_alive() or a.error or b.error:raise VerificationError(f"stream capture failed: {c['id']}")
     return {"id":c["id"],"argv":c["argv"],"cwd":c["cwd"],"timeout_seconds":c["timeout_seconds"],"max_output_bytes":c["max_output_bytes"],"started_at":started,"duration_ms":int((time.monotonic()-start)*1000),"exit":code,"timed_out":timed,"spawn_error":None,"stdout_bytes":a.total,"stderr_bytes":b.total,"stdout_sha256":a.digest.hexdigest(),"stderr_sha256":b.digest.hexdigest(),"stdout_truncated":a.total>c["max_output_bytes"],"stderr_truncated":b.total>c["max_output_bytes"]}
 def atomic(path:Path,v:dict[str,Any])->None:

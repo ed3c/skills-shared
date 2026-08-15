@@ -541,6 +541,46 @@ MAP
 
 After three consecutive qualifying failures against the same invariant/acceptance target, do not make a fourth blind patch. Enter [`references/three-failure-escalation.md`](references/three-failure-escalation.md): preserve the failure packet, open the correct forge issue, use fresh diagnosis, create a new isolated worktree, implement the smallest falsifiable repair, and require the owning oracle plus negative control before delivery.
 
+### Three-failure escalation law
+
+A **qualifying failed attempt** repairs the same invariant or acceptance target,
+changes the implementation/configuration subject, and then runs the owning
+oracle to a subject-bound `FAIL`. `ABSENT`, `NOT_EXERCISED`, and
+`SKIPPED_BY_POLICY` are not failed repairs.
+
+After three consecutive qualifying failures, do not make a fourth speculative
+patch in the same context. Follow the full recovery contract:
+
+```text
+three FAIL trajectories
+→ forge issue + exact failure packet
+→ fresh diagnosis context
+→ root-cause hypothesis + falsifying probe
+→ new isolated worktree/branch
+→ smallest repair
+→ owning oracle + negative control
+→ PASS
+→ commit
+→ forge-native PR
+→ existing Human/trusted-operator merge policy
+→ main
+```
+
+For a normal consumer with an admitted local Forgejo binding, route issue and PR
+tracking through `forgejo-delivery-loop`. For GitHub Actions or GitHub-hosted CI
+incidents, GitHub remains the incident/publication authority; exact
+workflow/run/job/head evidence cannot be replaced by a Forgejo mirror.
+
+Fresh diagnosis may use a **new ChatGPT Desktop question/session** with the full
+issue packet. Composer prefill is not dispatch: the UI receipt requirements in
+the recovery contract still apply. A runtime that cannot submit and observe the
+new session must report a handoff, not claim that fresh diagnosis ran.
+
+The repair begins in a **new isolated worktree/branch**. Do not weaken the
+invariant, remove a negative control, expand privilege, hide an error, rename the
+same failure to reset the counter, or substitute model judgment for physical
+execution.
+
 ## Rules against plausible but unsupported engineering
 
 Never treat any of these phrases as proof:

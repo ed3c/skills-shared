@@ -1,13 +1,13 @@
 {
   "skill_name": "html-for-decisions",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "_meta": {
     "coverage_metric": "planted-defect detection rate (per-invariant; a defect counts only when an isolating fixture in tests/*/fixtures/ exercises that one invariant alone)",
     "uncovered_by_design": [
       "check_decision_html: snapshot, title — format checks whose breakage is visible on first sight; not worth a fixture",
       "check_redaction: does not scan for arbitrary absolute paths, only the fixed upstream token list"
     ],
-    "purpose": "Guard self-contained HTML, per-source data-flow diagrams, portable email bundles, and redacted provenance."
+    "purpose": "Guard self-contained HTML, native Code Graph review indexes, per-source data-flow diagrams, portable email bundles, and redacted provenance."
   },
   "runnable": [
     {
@@ -92,6 +92,15 @@
         "文件引用的可執行工具必須隨包出貨"
       ],
       "expected": "ZIP 內含 tools/tool.py；extras 路徑不存在時中止而非靜默略過"
+    },
+    {
+      "id": "GRAPH-1",
+      "checker_script": "scripts/package_markdown_email.py",
+      "test_verify": "tests/package-markdown-email/verify.sh",
+      "good_fixture": "tests/package-markdown-email/fixtures/good/graph.json",
+      "hollow_fixture": "tests/package-markdown-email/fixtures/good/bad-graph.json",
+      "covers": ["native code_graph config", "interactive HTML tab", "graph/report ZIP delivery", "dangling endpoint rejection", "critical evidence requirement"],
+      "expected": "good graph emits a native Code Graph tab and deterministic verification report; broken graph fails before HTML exists"
     },
     {
       "id": "BUNDLE-2",

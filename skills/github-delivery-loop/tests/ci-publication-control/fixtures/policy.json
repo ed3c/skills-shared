@@ -1,0 +1,10 @@
+{
+  "schema": "github-ci-policy/v2",
+  "repository": "ed3c/example",
+  "private": true,
+  "default_branch": "main",
+  "workflow": ".github/workflows/verify.yml",
+  "pull_request_mode": "draft-first",
+  "required_jobs": ["verify"],
+  "local_verification_contract": ".github-delivery/local-verification-contract.json"
+}

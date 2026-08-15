@@ -84,6 +84,14 @@ after the issue packet exists. The fresh session receives the packet and exact
 repository evidence, but does not inherit the stale repair conversation as
 hidden authority.
 
+`codex app <workspace-path>` and `codex://threads/new?...` may open Desktop and
+prefill the composer, but they do not send the prompt. The state remains
+`FRESH_DIAGNOSIS_HANDOFF_REQUIRED` until the operator submits it. The prompt must
+name the exact `owner/repo`, explicitly request the installed GitHub
+plugin/connector, include issue ledger + exact base/head + relevant history +
+open PRs + failing oracle/logs, and name the branch/PR that may receive the
+solution. A short issue/PR message is not sufficient context.
+
 Before changing code, fresh diagnosis must produce:
 
 ```text
@@ -99,6 +107,16 @@ non-target regression risks
 If the current runtime cannot launch ChatGPT Desktop, return
 `FRESH_DIAGNOSIS_HANDOFF_REQUIRED` with the complete issue packet. Never claim
 that a desktop session ran when it did not.
+
+Desktop submission requires a UI receipt: Send/Submit invoked, the prompt
+visible in the conversation timeline rather than the composer, assistant
+response started, and thread identity plus screenshot/equivalent observation
+retained. If any element is missing, record `NOT_EXERCISED`; prefill alone is
+not dispatch.
+
+Desktop creates Codex-managed worktrees. CLI may use
+`codex -C <existing-worktree-path>` after standard Git worktree path/HEAD proof;
+never invent `EnterWorktree`, `ExitWorktree`, `codex worktree`, or `codex -w`.
 
 ## Worktree and publication law
 

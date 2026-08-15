@@ -91,6 +91,29 @@ Markdown must not become a second API, registry, schema, verifier, receipt, capa
 
 The full data flow is in [`docs/integration/CROSS_REPO_INTEGRATION.md`](docs/integration/CROSS_REPO_INTEGRATION.md). Mutable sibling checkouts and local symlinks are development conveniences, not release identities.
 
+## Codex Desktop handoff and external review
+
+- `codex app <workspace-path>` may open the installed ChatGPT desktop app and the
+  named workspace; it does not submit a prompt, create a chat turn, or prove a
+  worktree. See the official [CLI command](https://learn.chatgpt.com/docs/developer-commands?surface=cli#cli-codex-app).
+- A `codex://threads/new?...` or `codex://new?...` deep link may prefill composer
+  text, path, origin URL, and plugin context, but **does not send the prompt**.
+  The operator must submit it; until then fresh diagnosis is
+  `FRESH_DIAGNOSIS_HANDOFF_REQUIRED`, not PASS. See official
+  [deep links](https://learn.chatgpt.com/docs/reference/commands#deep-links).
+- Codex-managed worktrees are created by the ChatGPT desktop app after a Worktree
+  chat is selected and its prompt is submitted. Do not invent `EnterWorktree`,
+  `ExitWorktree`, `codex worktree`, or `codex -w`. Codex CLI may use
+  `codex -C <existing-worktree-path>` only after standard Git worktree path/HEAD
+  evidence is bound. See official [worktrees](https://learn.chatgpt.com/docs/environments/git-worktrees).
+- A three-failure Desktop packet must name the exact `owner/repo`, request the
+  installed GitHub plugin/connector explicitly, include the issue ledger, base/head,
+  relevant history, open PRs, failing oracle and logs, and name the PR/branch that
+  may receive the solution. A short issue/PR message is not sufficient context.
+- `external-verify` resolves external claims through primary sources first.
+  `agy`, Codex CLI, Claude Code, or another model may provide cross-family review,
+  but never becomes the official truth source by agreeing with a claim.
+
 ## Shared versus consumer-owned
 
 Shared here:

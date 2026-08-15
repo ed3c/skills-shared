@@ -1,0 +1,14 @@
+{
+  "schema": "github-delivery-local-verification-contract/v1",
+  "repository_id": 1326262274,
+  "inherit_env": ["PATH"],
+  "commands": [
+    {
+      "id": "repository-contract",
+      "argv": ["bash", "scripts/local_verification.sh"],
+      "cwd": ".",
+      "timeout_seconds": 1800,
+      "max_output_bytes": 1048576
+    }
+  ]
+}

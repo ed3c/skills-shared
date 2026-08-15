@@ -1,6 +1,6 @@
 {
   "branch": {
-    "head_sha": null,
+    "head_sha": "2222222222222222222222222222222222222222",
     "name": "feature"
   },
   "branch_ref": {
@@ -17,5 +17,5 @@
     "private": true,
     "repository_id": 1326262274
   },
-  "schema": "github-actions-publish-observation/v1"
+  "schema": "github-actions-publish-observation/v2"
 }

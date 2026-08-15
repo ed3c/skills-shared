@@ -50,6 +50,10 @@ repository merge policy / Human Admit
 - [`references/system-prompt.md`](references/system-prompt.md): project-level agent instruction.
 - [`references/repo-binding.template.json`](references/repo-binding.template.json): repo-owned binding/receipt shape.
 - [`scripts/check_dual_forge_contract.py`](scripts/check_dual_forge_contract.py): deterministic publication-order checker.
+- [`scripts/export_git_proof.py`](scripts/export_git_proof.py): canonical four-ref Git ancestry/tree proof producer.
+- [`scripts/capture_origin_ref.py`](scripts/capture_origin_ref.py): canonical GitHub API, authenticated loopback Forgejo API, and local Git default-ref observation producer.
+- [`scripts/capture_reconciliation.py`](scripts/capture_reconciliation.py): exhaustive paginated GitHub/Forgejo open-PR/open-issue raw transport and typed-inventory replay.
+- [`scripts/capture_forgejo_delivery.py`](scripts/capture_forgejo_delivery.py): causal fresh-worktree materialization, Forgejo issue/merged-PR plus local-main parent/tree receipt producer and replay.
 - [`evals.json`](evals.json), [`tests/`](tests/): positive and planted-negative controls.
 
 ## Evidence boundary
@@ -58,9 +62,19 @@ repository merge policy / Human Admit
 portable orchestration contract     IMPLEMENTED
 deterministic publication gate      IMPLEMENTED
 positive/mutation controls          IMPLEMENTED
+canonical Git proof export/replay   IMPLEMENTED
+raw provider transport replay       IMPLEMENTED
+Forgejo delivery receipt replay     IMPLEMENTED
+exact-local-main verification triple IMPLEMENTED
+full issue/comment + PR closure replay IMPLEMENTED
+structured Desktop receipt + screenshot-byte derivation IMPLEMENTED
 ChatGPT private-GitHub ingress       NOT_EXERCISED by this Skill's tests
 local Forgejo mutation              NOT_EXERCISED
 real consumer worktree integration  NOT_EXERCISED
 consumer GitHub Actions             NOT_EXERCISED
 final merge                         HUMAN_ADMIT_REQUIRED
 ```
+
+The machine checker treats an empty or partial history as a draft receipt:
+`NOT_EXERCISED`, exit `3`. Only the complete publication-ready history can
+return `PASS`; a legal state-name prefix is not evidence that its transitions ran.

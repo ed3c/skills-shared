@@ -36,7 +36,7 @@
 
 1. **判任務性質**:編排/作者/判官/機械/研究/人機對話(atomic skill → inventory 映射表)。
 2. **套四角色 → §5 選檔位與 effort**。
-3. **葉節點檢查**(SKILL.md §S4 葉節點約束):design-an-interface/code-review/
+3. **葉節點檢查**(SKILL.md §S4 葉節點約束):code-review/
    improve-codebase-architecture=委派即讓其自分治,外層不再包。
 4. **外部 CLI 檔位 → tracer 分層**:第一層=零額度名單探針(`agy models`/`codex --version`+config 讀取);
    第二層=最小真 dispatch 判活——**判活看輸出檔/session log,永不信 exit code 與模型自報**

@@ -1,0 +1,60 @@
+{
+  "schema": "github-actions-publish-transport/v4",
+  "producer": "github_actions_snapshot.py",
+  "gh_executable": {"invoked_path": "/usr/bin/gh", "resolved_path": "/usr/bin/gh", "sha256": "3333333333333333333333333333333333333333333333333333333333333333", "version": "gh version 2.82.0 (fixture)"},
+  "repository": "ed3c/example",
+  "branch": "agent/integration",
+  "check_name": "contract",
+  "workflow": ".github/workflows/skill-eval-contract.yml",
+  "captured_at": "2026-08-14T10:05:00Z",
+  "captures": [
+    {
+      "argv": ["/usr/bin/gh", "api", "repos/ed3c/example"],
+      "exit": 0,
+      "stdout": "{\"id\":123,\"full_name\":\"ed3c/example\",\"owner\":{\"login\":\"ed3c\"},\"private\":true}",
+      "stdout_sha256": "2a62f836c0a6d4f2363b91cf67a2d4469b626a7f6200b273e1c43effd0ed1d55",
+      "stderr": "",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": ["/usr/bin/gh", "api", "repos/ed3c/example/actions/workflows/.github%2Fworkflows%2Fskill-eval-contract.yml"],
+      "exit": 0,
+      "stdout": "{\"id\":6001,\"path\":\".github/workflows/skill-eval-contract.yml\"}",
+      "stdout_sha256": "ba09010f8bf2e11f9755b863cfebe3536af495da688f01039232da1fb15f7a38",
+      "stderr": "",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": ["/usr/bin/gh", "api", "--paginate", "--slurp", "repos/ed3c/example/pulls?state=open&head=ed3c:agent/integration&per_page=100"],
+      "exit": 0,
+      "stdout": "[[{\"number\":42,\"draft\":false,\"head\":{\"sha\":\"997b637730f967af63f435d8f28fe6677a209574\"},\"updated_at\":\"2026-08-14T10:01:00Z\"}]]",
+      "stdout_sha256": "27909e773a4a438d7c4d93888cecaaafb4d4b9b805544d98776c93bca5e0ee40",
+      "stderr": "",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": ["/usr/bin/gh", "api", "--paginate", "--slurp", "repos/ed3c/example/commits/997b637730f967af63f435d8f28fe6677a209574/check-runs?per_page=100"],
+      "exit": 0,
+      "stdout": "[{\"check_runs\":[{\"id\":9001,\"name\":\"contract\",\"head_sha\":\"997b637730f967af63f435d8f28fe6677a209574\",\"status\":\"completed\",\"conclusion\":\"success\",\"completed_at\":\"2026-08-14T10:04:00Z\",\"details_url\":\"https://github.com/ed3c/example/actions/runs/7001/job/5001\",\"app\":{\"id\":15368,\"slug\":\"github-actions\"},\"check_suite\":{\"id\":8001}}]}]",
+      "stdout_sha256": "e721976e96da1a25721b61815c57a672ec28bf900844fcc9d564e04f2eecdb73",
+      "stderr": "",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": ["/usr/bin/gh", "api", "repos/ed3c/example/actions/runs/7001"],
+      "exit": 0,
+      "stdout": "{\"id\":7001,\"workflow_id\":6001,\"head_sha\":\"997b637730f967af63f435d8f28fe6677a209574\"}",
+      "stdout_sha256": "87276c4e17c3902bb90f954cfef64b31f6ba0da192d143ab7e2d2d9cb0de1de3",
+      "stderr": "",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": ["/usr/bin/gh", "api", "--paginate", "--slurp", "repos/ed3c/example/check-runs/9001/annotations?per_page=100"],
+      "exit": 0,
+      "stdout": "[[]]",
+      "stdout_sha256": "cf1cbb66a638b4860a516671fb74850e6ccf787fe6c4c8d29e9c04efe880bd05",
+      "stderr": "",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

@@ -32,7 +32,7 @@ test -f "${rule_file}"
 grep -F 'pattern = ["gh", "pr", "merge", "--repo", "example/infrastructure"]' \
   "${rule_file}"
 grep -F 'decision = "allow"' "${rule_file}"
-grep -F 'This rule does not override repository PreToolUse hooks or human merge gates.' \
+grep -F 'This rule does not override PreToolUse hooks, runtime identity checks, or GitHub branch rules.' \
   "${installer_log}"
 
 printf '%s\n' 'previous rule' > "${rule_file}"
@@ -50,5 +50,25 @@ if bash "${installer}" \
   exit 1
 fi
 grep -F 'ERROR: --repo must be an exact OWNER/REPOSITORY name' "${invalid_log}"
+
+# Owner mode scopes execpolicy to the immutable-identity wrapper, not to a
+# generic `gh api graphql` prefix. The wrapper rejects collaborators/org repos
+# at runtime and therefore applies to present and future personal repositories.
+FAKE_CODEX_LOG="${fake_log}" bash "${installer}" \
+  --owner example \
+  --gate "${skill_dir}/scripts/merge_gate.py" \
+  --rules-dir "${rules_dir}" \
+  --codex-bin "${fake_codex}" > "${installer_log}"
+owner_rule="${rules_dir}/github-merge-owner-example.rules"
+test -f "${owner_rule}"
+grep -F "pattern = [\"python3\", \"${skill_dir}/scripts/merge_gate.py\", \"land\", \"--repo\"]" \
+  "${owner_rule}"
+grep -F 'justification = "Allow the identity-gated merge wrapper; runtime owner must be example",' \
+  "${owner_rule}"
+grep -F '"gh api graphql"' "${owner_rule}"
+if grep -Fq 'pattern = ["gh", "api", "graphql"]' "${owner_rule}"; then
+  echo "FAIL: owner mode allowed generic GraphQL" >&2
+  exit 1
+fi
 
 echo "PASS scoped merge rule installer"

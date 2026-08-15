@@ -1,0 +1,11 @@
+{
+  "schema": "dual-forge-ref-observation/v1",
+  "authority": "github-api",
+  "repository": "ed3c/example",
+  "repository_id": 123,
+  "default_branch": "main",
+  "ref": "refs/heads/main",
+  "sha": "93c33411137875108419c2abe4dbe8f4d84ad5d6",
+  "captured_at": "2026-08-14T09:59:50Z",
+  "transport": {"path": "proof/github-main-transport.json", "sha256": "7cd948ac93b37e1b7763cd0019ec443c92e004edcb67f8b365e9a018b3c9997f"}
+}

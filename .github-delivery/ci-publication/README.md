@@ -1,16 +1,19 @@
 # CI publication profile
 
 This repository publishes itself through `github-delivery-loop`, so it owns the
-same inputs any consumer owns. Two files, and nothing else:
+same inputs any consumer owns. This directory contains the profile plus a
+non-executable compatibility route; the executable contract has one canonical
+path in the parent directory:
 
 | file | owns |
 |---|---|
 | [`profile.json`](profile.json) | immutable repository id, stable check identity, the exact publication intents, the billing stop rule, and where receipts land |
-| [`verification-contract.json`](verification-contract.json) | the fixed argv-array local checks, each with an explicit time and output budget |
+| [`verification-contract.json`](verification-contract.json) | route-only pointer; never pass this file to a verifier |
+| [`../local-verification-contract.json`](../local-verification-contract.json) | the single executable argv-array contract used by both profile and live publish policy |
 
-`ci-policy.json` in the parent directory is a different concern: it seals the
-workflow triggers and names the command the publish path runs. This profile is
-what the *gate* reads. Neither restates the other.
+`ci-policy.json` in the parent directory seals workflow triggers and the live
+publish route. The profile checker requires their overlapping repository,
+workflow, check, and contract identities to agree exactly.
 
 ## Commands
 
@@ -20,22 +23,28 @@ HEAD required:
 ```bash
 python3 skills/github-delivery-loop/scripts/local_verification.py verify \
   --repo-root . \
-  --contract .github-delivery/ci-publication/verification-contract.json \
+  --contract .github-delivery/local-verification-contract.json \
   --repository-id 1326262274 \
   --receipt .git/github-delivery/local-verification.json \
   --evidence .git/github-delivery/local-verification-evidence.json
 ```
 
-Trusted GitHub snapshot. `capture` is the only step that touches the network;
-`replay` reads a captured observation and touches nothing:
+Provider-bound GitHub snapshot. `capture` is the only step that touches the
+network and it preserves the raw transport. `replay-transport` re-derives the
+observation and snapshot from that transport without network access. Plain
+`replay` accepts an already-derived observation and is only a local diagnostic;
+it is not provider provenance:
 
 ```bash
 python3 skills/github-delivery-loop/scripts/github_actions_snapshot.py capture \
-  --repo ed3c/skills-shared --branch <branch> --check-name contract --strict \
+  --repository ed3c/skills-shared --branch <branch> --check-name contract --strict \
+  --transport-output .git/github-delivery/github-state.transport.json \
+  --observation-output .git/github-delivery/github-state.observation.json \
   --output .git/github-delivery/github-state.snapshot.json
 
-python3 skills/github-delivery-loop/scripts/github_actions_snapshot.py replay \
-  --observation <observation.json> --check-name contract --strict \
+python3 skills/github-delivery-loop/scripts/github_actions_snapshot.py replay-transport \
+  --transport .git/github-delivery/github-state.transport.json --strict \
+  --observation-output .git/github-delivery/github-state.observation.json \
   --output .git/github-delivery/github-state.snapshot.json
 ```
 
@@ -46,7 +55,8 @@ python3 skills/github-delivery-loop/scripts/ci_publish_gate.py evaluate \
   --repo-root . \
   --snapshot .git/github-delivery/github-state.snapshot.json \
   --verification .git/github-delivery/local-verification.json \
-  --verification-evidence .git/github-delivery/local-verification-evidence.json \
+  --evidence .git/github-delivery/local-verification-evidence.json \
+  --verification-contract .github-delivery/local-verification-contract.json \
   --intent ready-for-review \
   --json
 ```

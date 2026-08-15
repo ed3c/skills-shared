@@ -1,0 +1,21 @@
+{
+  "schema": "github-actions-publish-decision-manifest/v1",
+  "evaluated_at": "2026-08-14T10:00:05Z",
+  "required_check_name": "contract",
+  "decision": {
+    "schema": "github-actions-publish-decision/v1",
+    "decision": "ALLOW",
+    "reason": "allow-ready-for-review",
+    "intent": "ready-for-review",
+    "head_sha": "997b637730f967af63f435d8f28fe6677a209574",
+    "operation": "ready-transition-only"
+  },
+  "inputs": {
+    "policy_sha256": "f30f1014895713a7c6930cd66954fdd466f542c0236ba303d0901ec8fac406cc",
+    "snapshot_sha256": "4eb04cb06f2eeadc0c188ad615ad7da3a3022276b46de49531f03d88cbe9db30",
+    "verification_sha256": "167df16304107d1620c8e8324d1434dba1dde7082dff05f1f5f3163362f9dce3",
+    "evidence_sha256": "5c604b8bdd692fc92ee0a79e87d79be0d634bb5cad0041929c73261d67caf28f",
+    "contract_sha256": "6f4ef576e6870b981c2bd42cb90a441fd11663b88b978402f42696b7cd8581d6",
+    "recovery_sha256": null
+  }
+}

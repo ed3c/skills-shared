@@ -26,6 +26,9 @@ zero-network ci_publish_gate.py
 | `ready-for-review` | the PR is still draft; all planned local commits have been batched | optionally one push, then one ready-for-review transition |
 | `batched-repair` | a ready PR has new actionable CI/review feedback bound to its exact remote head | one repair push containing the whole response batch |
 
+`initial-pr` 的「remote branch 不存在」必須來自 trusted capture 對 exact
+`refs/heads/<branch>` 的 raw API transport；只有 PR inventory 為空時，狀態仍是 `unproven`，不得出版。
+
 Everything else is a local checkpoint. Do not push after every commit, after every Agent turn, or merely to test whether billing recovered.
 
 ## Evidence-production pipeline
@@ -111,20 +114,34 @@ python3 skills/github-delivery-loop/scripts/github_actions_snapshot.py capture \
   --repository OWNER/REPO \
   --branch <HEAD_BRANCH> \
   --check-name <STABLE_JOB_CHECK_NAME> \
+  --workflow <POLICY_WORKFLOW_PATH> \
+  --transport-output /path/to/github-transport.json \
   --observation-output /path/to/github-observation.json \
   --output /path/to/github-state.snapshot.json
 ```
 
-It uses fixed `gh api` argv only and performs no mutation. It resolves exact private repository identity, zero or one open PR, exact PR head, exact stable check name, conclusion and annotations.
+It uses fixed `gh api` argv only and performs no mutation. It resolves the
+policy workflow path to an exact provider workflow ID before selecting the
+stable check by workflow ID, name, and PR head. A same-name job in another
+workflow is not authority; a rerun of the same job in the owning workflow stays
+ambiguous and turns red. It also resolves exact private repository identity,
+zero or one open PR, conclusion, and annotations.
 
-Replay is zero-network:
+需要把分支缺席當成 publication authority 時加 `--strict`；orphan remote branch 會轉紅，且
+snapshot 的 `initial_boundary` 只可能是 `trusted-initial`、`branch-present-without-pr`、
+`not-initial` 或 `unproven`。
+
+Proof replay starts from raw transport and is zero-network:
 
 ```bash
-python3 skills/github-delivery-loop/scripts/github_actions_snapshot.py replay \
-  --observation /path/to/github-observation.json \
-  --check-name <STABLE_JOB_CHECK_NAME> \
+python3 skills/github-delivery-loop/scripts/github_actions_snapshot.py replay-transport \
+  --transport /path/to/github-transport.json \
+  --observation-output /path/to/replayed-observation.json \
   --output /path/to/github-state.snapshot.json
 ```
+
+The legacy `replay --observation` interface remains useful for policy fixtures,
+but an observation authored without raw transport is not provider provenance.
 
 The producer fails closed on public repositories, multiple open PRs, stale-head checks, incomplete checks, malformed annotations and unknown API state. V1 derives actionable CI feedback only. Review feedback needs a separate explicit adapter; it is never guessed from general PR text.
 
@@ -150,7 +167,8 @@ python3 skills/github-delivery-loop/scripts/ci_publish_gate.py evaluate \
   --repo-root /absolute/path/to/repo \
   --snapshot /path/to/github-state.snapshot.json \
   --verification /path/to/local-verification.receipt.json \
-  --verification-evidence /path/to/local-verification.evidence.json \
+  --evidence /path/to/local-verification.evidence.json \
+  --verification-contract /path/to/local-verification.contract.json \
   --intent initial-pr \
   --json
 ```

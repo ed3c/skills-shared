@@ -1,7 +1,7 @@
 ---
 name: sdlc-plan-composer
 description: |
-  Stateful SDLC plan composer for multi-stage planning work. Use when a task must be planned before execution and the plan needs explicit routing through intent alignment, brownfield invariant extraction, vertical slicing, interface design, execution actor selection, and validation contracts. This skill is a recipe-not-engine workflow，it writes decision-complete plan artifacts, route ledgers, and handoff contracts; it does not implement code, auto-run delegated skills, or invent replacement logic for existing atomic skills. It routes to repo-agent-native, unknown-discovery-composer, to-prd, to-issues, design-an-interface, code-review, judge-loop-chooser, autoresearch-composer, tdd, diagnose, handoff, Codex, agy, Opus fresh judges, and mechanical scripts according to explicit semantic gates.
+  Stateful SDLC plan composer for multi-stage planning work. Use when a task must be planned before execution and the plan needs explicit routing through intent alignment, brownfield invariant extraction, vertical slicing, interface design, execution actor selection, and validation contracts. This skill is a recipe-not-engine workflow，it writes decision-complete plan artifacts, route ledgers, and handoff contracts; it does not implement code, auto-run delegated skills, or invent replacement logic for existing atomic skills. It routes to repo-agent-native, unknown-discovery-composer, to-spec, to-tickets, code-review, judge-loop-chooser, autoresearch-composer, tdd, diagnose, handoff, Codex, agy, Opus fresh judges, and mechanical scripts according to explicit semantic gates.
 ---
 # sdlc-plan-composer
 ## Role
@@ -17,9 +17,9 @@ This skill follows the truth discipline of `judge-loop-chooser`: every load-bear
 ## Not For
 - Do not use this skill to implement code. Execution goes to `implement`, `tdd`, `diagnose`, Codex, or the relevant harness after the plan exists.
 - Do not use this skill for a vague starting point. If success criteria, scope, or target are still foggy, route to `unknown-discovery-composer`.
-- Do not use this skill for a clear single-stage request. Route to `to-prd + implement`.
+- Do not use this skill for a clear single-stage request. Route to `to-spec + implement`.
 - Do not use this skill to judge a deliverable directly. Route validation strategy to `judge-loop-chooser` or code changes to `code-review`.
-- Do not rewrite delegated atomic skills inline. This composer routes and records contracts; it does not duplicate the logic of `repo-agent-native`, `design-an-interface`, `autoresearch-composer`, or `judge-loop-chooser`.
+- Do not rewrite delegated atomic skills inline. This composer routes and records contracts; it does not duplicate the logic of `repo-agent-native`, `autoresearch-composer`, or `judge-loop-chooser`.
 ## Invariants
 1. **Stateful, not one-shot**: Always proceed through Match -> Generate -> Validate nodes. A plan that jumps straight to final prose is incomplete.
 2. **Route before write**: Before writing slice content, record why the workflow is using this skill, which capabilities already exist, whether the work is brownfield, and which actor or validator is responsible.
@@ -37,14 +37,14 @@ This skill follows the truth discipline of `judge-loop-chooser`: every load-bear
 | This sounds like an existing skill, so I will reuse it. | Not enough. Read the actual skill or family contract or mark it `candidate` or `[推論]`. |
 | Brownfield is obvious from memory. | Not enough. Run `repo-agent-native` or record a source-linked fallback inventory. |
 | S1 is conversational, so I can infer intent. | If a missing answer would change architecture, ask the user or record `human_required`. |
-| S3 can be one sensible interface. | No. Interface changes require at least two distinct designs via `design-an-interface` or an explicit fallback comparison. |
+| S3 can be one sensible interface. | No. Interface changes require at least two distinct designs authored and compared explicitly in-session. |
 | Opus, Codex, and agy can all handle it. | Wrong abstraction. Choose by semantic role and record why. |
 | The judge passed it, so the plan is done. | A judge result is evidence. The plan must still expose grounding and human admit points. |
 ## State Graph
 ```mermaid
 flowchart TD
   M0["M0 classify_request"] -->|foggy; cannot plan| X0["handoff: unknown-discovery-composer"]
-  M0 -->|single-stage; clear; low-risk| X1["handoff: to-prd + implement"]
+  M0 -->|single-stage; clear; low-risk| X1["handoff: to-spec + implement"]
   M0 -->|multi-stage or high-risk SDLC planning| M1["M1 capability_match"]
   M1 -->|true equivalent exists| X2["delegate_existing_skill_or_stop"]
   M1 -->|load-bearing equivalence uncertain| M1B["M1B rebuild_compare_plan"]
@@ -113,7 +113,7 @@ Inputs:
 - Whether the user asked to plan before implementation.
 Decision Rule:
 - If success criteria, scope, target, or constraints are too unclear to make a plan, route to `unknown-discovery-composer`.
-- If the task is single-stage, clear, and low risk, route to `to-prd + implement`.
+- If the task is single-stage, clear, and low risk, route to `to-spec + implement`.
 - If the task is multi-stage, high-risk, brownfield, cross-family, harness-level, or explicitly plan-first, continue to M1.
 Semantic Grounding:
 - `technical_equivalent`: only when a concrete alternative workflow fully covers the request.
@@ -261,7 +261,7 @@ Inputs:
 - Intent artifacts.
 - Capability matrix.
 - Brownfield invariants.
-- `to-prd` and `to-issues` as generation aids.
+- `to-spec` and `to-tickets` as generation aids.
 Decision Rule:
 - Each slice must include goal, why now, patch boundary, dispatch plan placeholder, validation contract placeholder, known risks, human decisions, and completion evidence.
 - A vertical slice must connect the relevant data, logic, interface, and test or eval surface. Equivalent non-code slices must still have an artifact and validation surface.
@@ -290,9 +290,9 @@ Purpose: Prevent the model from choosing the first plausible interface without c
 Inputs:
 - Slices that change boundaries.
 - Existing interface contracts.
-- `design-an-interface`.
+- `codebase-design` for deep-module vocabulary; `prototype` when the uncertainty is taste, not structure.
 Decision Rule:
-- Delegate to `design-an-interface` when available.
+- Author the competing designs in this session. `design-an-interface` was removed upstream on 2026-08-06 with no successor, so there is no leaf skill to delegate to.
 - Require at least two meaningfully different abstractions, not two phrasings of the same design.
 - Write a decision record only if all sparse-decision conditions are true: hard to reverse, surprising without context, and based on a real tradeoff.
 Output:
@@ -318,7 +318,7 @@ Decision Rule:
 - **Codex**: Use for implementation, repair, reproduction, TDD driving, second implementation, and code-running engineering work. Codex self-report is not completion evidence. Verify file changes and run checks from the main session.
 - **agy**: Use for external research, cross-model fact findings, DR proposal generation, and broad truth checks. agy produces findings, not verdicts.
 - **Main session**: Owns the state graph, route ledger, user questions, integration of slice plans, and all LAND-DECISION handoffs.
-- **Leaf skills**: `design-an-interface`, `code-review`, and `improve-codebase-architecture` already own their internal subagent structure. Do not wrap them in another layer of subagent dispatch.
+- **Leaf skills**: `code-review` and `improve-codebase-architecture` already own their internal subagent structure. Do not wrap them in another layer of subagent dispatch.
 Output:
 - `Dispatch Plan` section in every `NN-<slice>.md`.
 - M4 row in `route-ledger.md`.
@@ -468,7 +468,7 @@ Historical lineage and backend gotchas are important, but they must not interrup
 ## Test Scenarios
 Use these as dry-run checks after editing or applying this skill:
 1. **Foggy request**: A user says make this better without target or success criteria. Expected route: M0 -> `unknown-discovery-composer`. No SDLC plan should be generated.
-2. **Clear single-stage request**: A user asks for one narrow code change with obvious validation. Expected route: M0 -> `to-prd + implement`. No S-1..S5 tax.
+2. **Clear single-stage request**: A user asks for one narrow code change with obvious validation. Expected route: M0 -> `to-spec + implement`. No S-1..S5 tax.
 3. **Brownfield family change**: A user asks to modify `families/<family>/skills/<sub>`. Expected route: M2 -> G-1 `repo-agent-native`; later stages cite invariants.
 4. **Possible existing equivalent**: A user asks for functionality that may already exist. Expected route: M1 marks real evidence; load-bearing uncertainty creates M1B compare slice.
 5. **Semantic judge needed**: A slice produces a DR proposal or holdout verdict. Expected route: M5 -> `judge-loop-chooser`; judge output is evidence, not auto-admit.

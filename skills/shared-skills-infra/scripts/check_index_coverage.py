@@ -19,7 +19,9 @@ directory added three commits earlier that its own index never named.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -49,20 +51,36 @@ def run_checker(document: Path, directory: Path | None, root: Path) -> tuple[int
     return done.returncode, (done.stderr.strip() or done.stdout.strip())
 
 
-def load_manifest(path: Path) -> list[dict[str, str]]:
+def load_manifest(path: Path) -> tuple[list[dict[str, str]], list[dict[str, str]]]:
     try:
         value = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as error:
         raise CoverageError(f"manifest unusable: {error}") from error
-    if value.get("schema") != "index-coverage/v1":
-        raise CoverageError("manifest.schema must be index-coverage/v1")
+    if value.get("schema") != "index-coverage/v2":
+        raise CoverageError("manifest.schema must be index-coverage/v2")
     entries = value.get("covers")
     if not isinstance(entries, list) or not entries:
         raise CoverageError("manifest.covers must be a non-empty array")
     for entry in entries:
         if not isinstance(entry, dict) or set(entry) != {"document", "directory"}:
             raise CoverageError(f"manifest entry must be document/directory: {entry!r}")
-    return entries
+    contexts = value.get("external_link_contexts")
+    if not isinstance(contexts, list):
+        raise CoverageError("manifest.external_link_contexts must be an array")
+    seen: set[str] = set()
+    for entry in contexts:
+        expected = {"document", "content_sha256", "reason"}
+        if not isinstance(entry, dict) or set(entry) != expected:
+            raise CoverageError(f"external link context fields drifted: {entry!r}")
+        document = entry["document"]
+        if not isinstance(document, str) or not document or document in seen:
+            raise CoverageError(f"external link context document invalid or duplicated: {document!r}")
+        seen.add(document)
+        if re.fullmatch(r"[0-9a-f]{64}", str(entry["content_sha256"])) is None:
+            raise CoverageError(f"external link context digest invalid: {document}")
+        if not isinstance(entry["reason"], str) or not entry["reason"].strip():
+            raise CoverageError(f"external link context reason missing: {document}")
+    return entries, contexts
 
 
 def selftest() -> int:
@@ -84,9 +102,18 @@ def selftest() -> int:
         (root / "skills" / "demo" / "a.md").write_text("# A\n", encoding="utf-8")
         index = root / "skills" / "demo" / "README.md"
         index.write_text("# Demo\n\n## Index\n\n- [`a.md`](a.md)\n", encoding="utf-8")
+        external = root / "projections" / "AGENTS.md"
+        external.parent.mkdir()
+        external.write_text("[consumer](.agents/missing.md)\n", encoding="utf-8")
+        external_digest = hashlib.sha256(external.read_bytes()).hexdigest()
         (root / "evals" / "index-coverage.json").write_text(json.dumps({
-            "schema": "index-coverage/v1",
+            "schema": "index-coverage/v2",
             "covers": [{"document": "skills/demo/README.md", "directory": "skills/demo"}],
+            "external_link_contexts": [{
+                "document": "projections/AGENTS.md",
+                "content_sha256": external_digest,
+                "reason": "fixture projection resolves in its consumer tree",
+            }],
         }), encoding="utf-8")
 
         def run(target: Path) -> int:
@@ -95,6 +122,14 @@ def selftest() -> int:
         if run(root) != 0:
             print("SELFTEST RED: a clean fixture was refused", file=sys.stderr)
             return 2
+
+        # A projection exemption is content-addressed. It may admit a different
+        # link root, but it may not become a permanent directory-wide blind spot.
+        external.write_text("[consumer](.agents/other-missing.md)\n", encoding="utf-8")
+        if run(root) == 0:
+            print("SELFTEST RED: a changed external projection reused a stale digest", file=sys.stderr)
+            return 2
+        external.write_text("[consumer](.agents/missing.md)\n", encoding="utf-8")
 
         # A file the index never names.
         (root / "skills" / "demo" / "b.md").write_text("# B\n", encoding="utf-8")
@@ -116,10 +151,25 @@ def selftest() -> int:
 def evaluate(root: Path) -> tuple[int, list[str], int, int]:
     """The one evaluation path. A second copy for the selftest would drift from
     the one CI runs, and then the selftest would be proving something else."""
-    entries = load_manifest(root / "evals" / "index-coverage.json")
+    entries, external_contexts = load_manifest(root / "evals" / "index-coverage.json")
     problems: list[str] = []
     scanned = documents(root)
+    external_by_document = {item["document"]: item for item in external_contexts}
+    scanned_rel = {str(item.relative_to(root)) for item in scanned}
+    for document in external_by_document:
+        if document not in scanned_rel:
+            problems.append(f"{document}: external link context declared but Markdown document is absent")
     for document in scanned:
+        relative = str(document.relative_to(root))
+        external = external_by_document.get(relative)
+        if external is not None:
+            digest = hashlib.sha256(document.read_bytes()).hexdigest()
+            if digest != external["content_sha256"]:
+                problems.append(
+                    f"{relative}: external link context digest drifted: "
+                    f"declared {external['content_sha256']}, measured {digest}"
+                )
+            continue
         code, detail = run_checker(document, None, root)
         if code:
             problems.append(f"{document.relative_to(root)}: {detail}")

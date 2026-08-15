@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib.util
 import json
 import re
 import subprocess
@@ -27,8 +28,24 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-SNAPSHOT_SCHEMA = "github-actions-publish-snapshot/v1"
+
+def _load_local_verification_module():
+    path = Path(__file__).resolve().with_name("local_verification.py")
+    spec = importlib.util.spec_from_file_location("ci_gate_local_verification", path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"cannot load local verification contract authority: {path}")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+LOCAL_VERIFICATION = _load_local_verification_module()
+
+SNAPSHOT_SCHEMA = "github-actions-publish-snapshot/v4"
 VERIFICATION_SCHEMA = "github-delivery-local-verification/v1"
+EVIDENCE_SCHEMA = "github-delivery-local-verification-evidence/v1"
+CONTRACT_SCHEMA = "github-delivery-local-verification-contract/v1"
 RECOVERY_SCHEMA = "github-actions-billing-recovery/v1"
 DECISION_SCHEMA = "github-actions-publish-decision/v1"
 INTENTS = {"initial-pr", "ready-for-review", "batched-repair"}
@@ -47,6 +64,8 @@ ACTIONABLE_CI_CONCLUSIONS = {"failure", "timed_out", "action_required"}
 SHA_RE = re.compile(r"^[0-9a-f]{40}$")
 DIGEST_RE = re.compile(r"^[0-9a-f]{64}$")
 REPO_RE = re.compile(r"^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$")
+MAX_SNAPSHOT_AGE_SECONDS = 300
+MAX_FUTURE_SKEW_SECONDS = 30
 
 
 class InputError(ValueError):
@@ -140,14 +159,17 @@ def optional_time(value: Any, label: str) -> datetime | None:
     return parse_time(value, label)
 
 
-def canonical(value: Any) -> bytes:
-    """The producer's canonical form. Any other encoding computes a different
-    digest and would reject every honest receipt."""
-    return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()
-
-
-def digest_of(value: Any) -> str:
-    return hashlib.sha256(canonical(value)).hexdigest()
+def git_head(repo_root: Path) -> str:
+    result = subprocess.run(
+        ["git", "-C", str(repo_root), "rev-parse", "HEAD"],
+        text=True,
+        capture_output=True,
+    )
+    if result.returncode != 0:
+        raise InputError(
+            f"cannot resolve local Git HEAD at {repo_root}: {result.stderr.strip()}"
+        )
+    return require_sha(result.stdout.strip(), "local Git HEAD")
 
 
 def git_tree(repo_root: Path) -> str:
@@ -163,17 +185,14 @@ def git_tree(repo_root: Path) -> str:
     return require_sha(result.stdout.strip(), "local Git tree")
 
 
-def git_head(repo_root: Path) -> str:
-    result = subprocess.run(
-        ["git", "-C", str(repo_root), "rev-parse", "HEAD"],
-        text=True,
-        capture_output=True,
-    )
-    if result.returncode != 0:
-        raise InputError(
-            f"cannot resolve local Git HEAD at {repo_root}: {result.stderr.strip()}"
-        )
-    return require_sha(result.stdout.strip(), "local Git HEAD")
+def canonical(value: Any) -> bytes:
+    return json.dumps(
+        value, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    ).encode("utf-8")
+
+
+def digest(value: Any) -> str:
+    return hashlib.sha256(canonical(value)).hexdigest()
 
 
 def validate_repository(value: Any) -> dict[str, Any]:
@@ -194,6 +213,17 @@ def validate_repository(value: Any) -> dict[str, Any]:
         raise InputError("repository owner does not match full_name")
     if value["private"] is not True:
         raise InputError("this gate is for private repositories and requires private=true")
+    return value
+
+
+def validate_branch(value: Any) -> dict[str, Any]:
+    if not isinstance(value, dict):
+        raise InputError("snapshot.branch must be an object")
+    exact_fields(value, {"name", "head_sha"}, "snapshot.branch")
+    name = require_string(value["name"], "branch.name")
+    if name.startswith("-") or "\n" in name or "\x00" in name or ".." in name:
+        raise InputError("branch.name is unsafe")
+    optional_sha(value["head_sha"], "branch.head_sha")
     return value
 
 
@@ -267,13 +297,21 @@ def validate_latest_check(value: Any) -> dict[str, Any] | None:
         raise InputError("actions.latest_check must be an object or null")
     exact_fields(
         value,
-        {"head_sha", "conclusion", "completed_at"},
+        {
+            "head_sha", "conclusion", "completed_at", "check_run_id",
+            "check_suite_id", "workflow_run_id", "workflow_id", "job_id", "app_id",
+        },
         "actions.latest_check",
     )
     require_sha(value["head_sha"], "latest_check.head_sha")
     if value["conclusion"] not in CHECK_CONCLUSIONS:
         raise InputError("latest_check.conclusion is unsupported")
     parse_time(value["completed_at"], "latest_check.completed_at")
+    for field in (
+        "check_run_id", "check_suite_id", "workflow_run_id", "workflow_id", "job_id", "app_id",
+    ):
+        if not isinstance(value[field], int) or isinstance(value[field], bool) or value[field] <= 0:
+            raise InputError(f"latest_check.{field} must be a positive integer")
     return value
 
 
@@ -305,27 +343,31 @@ def validate_actions(value: Any) -> dict[str, Any]:
     return value
 
 
-INITIAL_BOUNDARIES = {
-    "trusted-initial", "branch-present-without-pr", "not-initial", "unproven",
-}
-
-
 def validate_snapshot(value: dict[str, Any]) -> dict[str, Any]:
-    # `initial_boundary` is optional so an observation captured before the
-    # producer emitted it still replays. The gate's own requirement is stated
-    # where the intent is decided, not here: only `initial-pr` depends on it.
-    known = {"schema", "repository", "pull_request", "actions"}
-    exact_fields({k: v for k, v in value.items() if k != "initial_boundary"},
-                 known, "snapshot")
+    exact_fields(
+        value,
+        {"schema", "repository", "branch", "initial_boundary", "pull_request", "actions", "captured_at"},
+        "snapshot",
+    )
     if value["schema"] != SNAPSHOT_SCHEMA:
         raise InputError(f"snapshot.schema must be {SNAPSHOT_SCHEMA}")
-    boundary = value.get("initial_boundary")
-    if boundary is not None and boundary not in INITIAL_BOUNDARIES:
-        raise InputError(
-            f"snapshot.initial_boundary must be one of {sorted(INITIAL_BOUNDARIES)}"
-        )
     validate_repository(value["repository"])
-    validate_pull_request(value["pull_request"])
+    validate_branch(value["branch"])
+    pull_request = validate_pull_request(value["pull_request"])
+    boundary = value["initial_boundary"]
+    if boundary not in {"trusted-initial", "branch-present-without-pr", "not-initial", "unproven"}:
+        raise InputError("snapshot.initial_boundary is unsupported")
+    parse_time(value["captured_at"], "snapshot.captured_at")
+    if pull_request["state"] != "absent":
+        if value["branch"]["head_sha"] != pull_request["head_sha"]:
+            raise InputError("snapshot branch head must match the observed PR head")
+        if boundary != "not-initial":
+            raise InputError("an observed PR requires initial_boundary=not-initial")
+    elif boundary == "branch-present-without-pr":
+        if value["branch"]["head_sha"] is None:
+            raise InputError("branch-present boundary requires an observed branch head")
+    elif value["branch"]["head_sha"] is not None:
+        raise InputError("absent/unproven branch boundary may not carry a branch head")
     validate_actions(value["actions"])
     return value
 
@@ -367,145 +409,93 @@ def validate_verification(
     return value
 
 
-EVIDENCE_SCHEMA = "github-delivery-local-verification-evidence/v1"
-
-COMMAND_FIELDS = {
-    "id", "argv", "cwd", "timeout_seconds", "max_output_bytes", "started_at",
-    "duration_ms", "exit", "timed_out", "spawn_error", "stdout_bytes",
-    "stderr_bytes", "stdout_sha256", "stderr_sha256", "stdout_truncated",
-    "stderr_truncated",
-}
-
-
-def require_relative(value: Any, label: str) -> str:
-    """A repository-relative path, never one that names this machine.
-
-    An absolute path in a receipt is either a machine-local path that will not
-    exist for the next reader, or an escape from the subject the receipt claims
-    to describe. Both make the evidence unverifiable rather than merely untidy.
-    """
-    text = require_string(value, label)
-    if text.startswith("/") or text.startswith("~") or ":\\" in text:
-        raise InputError(f"{label} must be repository-relative, not {text!r}")
-    if ".." in Path(text).parts:
-        raise InputError(f"{label} must not traverse out of the repository: {text!r}")
-    return text
-
-
-def validate_command_evidence(value: Any, index: int) -> str:
-    label = f"evidence.commands[{index}]"
-    if not isinstance(value, dict):
-        raise InputError(f"{label} must be an object")
-    exact_fields(value, COMMAND_FIELDS, label)
-    command_id = require_string(value["id"], f"{label}.id")
-    argv = value["argv"]
-    if (
-        not isinstance(argv, list)
-        or not argv
-        or any(not isinstance(item, str) or not item.strip() for item in argv)
-    ):
-        raise InputError(f"{label}.argv must be a non-empty array of arguments")
-    # An argv that is one string is a shell string, which is the thing the
-    # producer's fixed-command contract exists to forbid.
-    if len(argv) == 1 and any(ch in argv[0] for ch in ";|&$`\n"):
-        raise InputError(f"{label}.argv looks like a shell string, not an argument vector")
-    require_relative(value["cwd"], f"{label}.cwd")
-    for field in ("timeout_seconds", "max_output_bytes", "duration_ms",
-                  "stdout_bytes", "stderr_bytes"):
-        number = value[field]
-        if not isinstance(number, int) or isinstance(number, bool) or number < 0:
-            raise InputError(f"{label}.{field} must be a non-negative integer")
-    parse_time(value["started_at"], f"{label}.started_at")
-    for field in ("timed_out", "stdout_truncated", "stderr_truncated"):
-        if not isinstance(value[field], bool):
-            raise InputError(f"{label}.{field} must be a boolean")
-    require_digest(value["stdout_sha256"], f"{label}.stdout_sha256")
-    require_digest(value["stderr_sha256"], f"{label}.stderr_sha256")
-
-    # A receipt says PASS; these say whether anything actually ran to completion.
-    if value["spawn_error"] is not None:
-        raise InputError(f"{label} never started: {value['spawn_error']}")
-    if value["timed_out"]:
-        raise InputError(f"{label} timed out, so its result is not a result")
-    if value["stdout_truncated"] or value["stderr_truncated"]:
-        raise InputError(
-            f"{label} output was truncated, so its digests describe a prefix and "
-            "cannot be compared against anything"
-        )
-    if value["exit"] != 0:
-        raise InputError(f"{label} exited {value['exit']!r}")
-    return command_id
-
-
-def validate_verification_evidence(
-    evidence: dict[str, Any],
-    receipt: dict[str, Any],
+def validate_evidence(
+    value: dict[str, Any],
+    verification: dict[str, Any],
+    contract: dict[str, Any],
     repository_id: int,
     actual_head: str,
     actual_tree: str,
 ) -> dict[str, Any]:
-    """Read the bytes the receipt's digest names.
-
-    The compact receipt carries `evidence_sha256`, and until this existed the
-    gate checked that the field looked like a digest and never read what it
-    pointed at. A digest nobody recomputes is a claim, not a binding: any
-    detailed evidence at all -- a failing run, a different repository, a
-    different commit -- authorized publication as long as the compact receipt
-    said PASS.
-    """
-    if not isinstance(evidence, dict):
-        raise InputError("verification evidence root must be an object")
     exact_fields(
-        evidence,
+        value,
         {
-            "schema", "repository_id", "head_sha", "tree_sha", "contract_sha256",
-            "verified_at", "clean_subject", "commands", "status", "content_sha256",
+            "schema", "repository_id", "head_sha", "tree_sha",
+            "contract_sha256", "verified_at", "clean_subject", "commands",
+            "status", "content_sha256",
         },
-        "verification evidence",
+        "local verification evidence",
     )
-    if evidence["schema"] != EVIDENCE_SCHEMA:
+    if value["schema"] != EVIDENCE_SCHEMA:
         raise InputError(f"evidence.schema must be {EVIDENCE_SCHEMA}")
-    if evidence["repository_id"] != repository_id:
+    if value["repository_id"] != repository_id:
         raise InputError("evidence repository identity does not match snapshot")
-    if require_sha(evidence["head_sha"], "evidence.head_sha") != actual_head:
+    if require_sha(value["head_sha"], "evidence.head_sha") != actual_head:
         raise InputError("evidence is stale for the local Git HEAD")
-    if require_sha(evidence["tree_sha"], "evidence.tree_sha") != actual_tree:
-        raise InputError("evidence describes a different tree than the local HEAD")
-    require_digest(evidence["contract_sha256"], "evidence.contract_sha256")
-    parse_time(evidence["verified_at"], "evidence.verified_at")
-    if evidence["clean_subject"] is not True:
-        raise InputError("evidence was produced from a dirty subject")
-    if evidence["status"] != "PASS":
-        raise InputError("evidence status must be PASS")
-    if evidence["verified_at"] != receipt["verified_at"]:
-        raise InputError("evidence and receipt describe different verification runs")
+    if require_sha(value["tree_sha"], "evidence.tree_sha") != actual_tree:
+        raise InputError("evidence tree does not match the local Git tree")
+    if value["status"] != "PASS" or value["clean_subject"] is not True:
+        raise InputError("evidence must prove a clean PASS subject")
+    if value["verified_at"] != verification["verified_at"]:
+        raise InputError("receipt and evidence verification timestamps differ")
+    parse_time(value["verified_at"], "evidence.verified_at")
+    content = dict(value)
+    content_sha = content.pop("content_sha256")
+    if require_digest(content_sha, "evidence.content_sha256") != digest(content):
+        raise InputError("evidence content digest mismatch")
+    if digest(value) != verification["evidence_sha256"]:
+        raise InputError("receipt evidence digest mismatch")
 
-    commands = evidence["commands"]
+    try:
+        normalized_contract = LOCAL_VERIFICATION.validate_contract(
+            contract, repository_id
+        )
+    except LOCAL_VERIFICATION.VerificationError as exc:
+        raise InputError(f"invalid local verification contract: {exc}") from exc
+    if digest(normalized_contract) != value["contract_sha256"]:
+        raise InputError("evidence contract digest mismatch")
+    commands = value["commands"]
+    contract_commands = normalized_contract["commands"]
     if not isinstance(commands, list) or not commands:
-        raise InputError("evidence.commands must record every executed command")
-    ids = [validate_command_evidence(item, index) for index, item in enumerate(commands)]
-    if len(set(ids)) != len(ids):
-        raise InputError("evidence.commands repeats a command id")
-    # Ordered, not merely equal as sets: the receipt lists what the contract ran
-    # in the order it ran, and a reordering is a different execution.
-    if ids != receipt["commands"]:
-        raise InputError(
-            f"evidence commands do not match the receipt in order: "
-            f"evidence={ids} receipt={receipt['commands']}"
+        raise InputError("evidence.commands must be a non-empty array")
+    if not isinstance(contract_commands, list) or len(contract_commands) != len(commands):
+        raise InputError("evidence commands do not match the verification contract")
+    required = {
+        "id", "argv", "cwd", "timeout_seconds", "max_output_bytes", "started_at",
+        "duration_ms", "exit", "timed_out", "spawn_error", "stdout_bytes",
+        "stderr_bytes", "stdout_sha256", "stderr_sha256", "stdout_truncated",
+        "stderr_truncated",
+    }
+    ids: list[str] = []
+    for index, command in enumerate(commands):
+        if not isinstance(command, dict):
+            raise InputError(f"evidence.commands[{index}] must be an object")
+        exact_fields(command, required, f"evidence.commands[{index}]")
+        if command["exit"] != 0:
+            raise InputError(f"evidence.commands[{index}] did not pass")
+        if (
+            command["timed_out"] is not False
+            or command["spawn_error"] is not None
+            or command["stdout_truncated"] is not False
+            or command["stderr_truncated"] is not False
+        ):
+            raise InputError(f"evidence.commands[{index}] did not pass")
+        contract_command = contract_commands[index]
+        if not isinstance(contract_command, dict):
+            raise InputError(f"contract.commands[{index}] must be an object")
+        contract_fields = {
+            "id", "argv", "cwd", "timeout_seconds", "max_output_bytes",
+        }
+        exact_fields(
+            contract_command, contract_fields, f"contract.commands[{index}]"
         )
-
-    # Two digests, computed the way the producer computes them. `content_sha256`
-    # covers the evidence without itself; the receipt's `evidence_sha256` covers
-    # the evidence including it. Checking one and not the other leaves the other
-    # free to disagree.
-    body = {key: value for key, value in evidence.items() if key != "content_sha256"}
-    if digest_of(body) != evidence["content_sha256"]:
-        raise InputError("evidence content digest does not match its own bytes")
-    if digest_of(evidence) != receipt["evidence_sha256"]:
-        raise InputError(
-            "the receipt's evidence_sha256 does not name these evidence bytes"
-        )
-    return evidence
+        executed_contract = {key: command[key] for key in contract_fields}
+        if executed_contract != contract_command:
+            raise InputError("evidence command order/identity differs from contract")
+        ids.append(command["id"])
+    if ids != verification["commands"]:
+        raise InputError("receipt command identities differ from detailed evidence")
+    return value
 
 
 def validate_recovery(
@@ -552,19 +542,33 @@ def evaluate(
     snapshot: dict[str, Any],
     verification: dict[str, Any],
     evidence: dict[str, Any],
+    contract: dict[str, Any],
     intent: str,
     actual_head: str,
     actual_tree: str,
     recovery: dict[str, Any] | None,
+    evaluated_at: datetime | None = None,
 ) -> Decision:
     if intent not in INTENTS:
         raise InputError(f"intent must be one of {sorted(INTENTS)}")
     validate_snapshot(snapshot)
     repository = snapshot["repository"]
     validate_verification(verification, repository["repository_id"], actual_head)
-    validate_verification_evidence(
-        evidence, verification, repository["repository_id"], actual_head, actual_tree
+    validate_evidence(
+        evidence,
+        verification,
+        contract,
+        repository["repository_id"],
+        actual_head,
+        actual_tree,
     )
+    captured_at = parse_time(snapshot["captured_at"], "snapshot.captured_at")
+    now = (evaluated_at or datetime.now(timezone.utc)).astimezone(timezone.utc)
+    age = (now - captured_at).total_seconds()
+    if age > MAX_SNAPSHOT_AGE_SECONDS:
+        return block("snapshot-stale", intent, actual_head)
+    if age < -MAX_FUTURE_SKEW_SECONDS:
+        return block("snapshot-from-future", intent, actual_head)
     actions = snapshot["actions"]
     pr = snapshot["pull_request"]
 
@@ -581,17 +585,21 @@ def evaluate(
     if intent == "initial-pr":
         if pr["state"] != "absent":
             return block("initial-pr-already-exists", intent, actual_head)
-        # An absent pull request is not an absent branch. Without an
-        # independently observed ref, a repeated or orphaned remote branch is
-        # byte-identical to a genuinely unpublished one, and this is the only
-        # intent where that difference decides anything.
-        boundary = snapshot.get("initial_boundary")
-        if boundary is None:
-            return block("initial-boundary-unproven", intent, actual_head,
-                         "snapshot carries no independently observed branch ref")
+        boundary = snapshot["initial_boundary"]
+        if boundary == "unproven":
+            return block(
+                "initial-boundary-unproven",
+                intent,
+                actual_head,
+                "snapshot lacks an independently observed remote branch ref",
+            )
         if boundary != "trusted-initial":
-            return block("initial-boundary-refused", intent, actual_head,
-                         f"initial_boundary is {boundary}")
+            return block(
+                "initial-boundary-refused",
+                intent,
+                actual_head,
+                f"initial_boundary is {boundary}",
+            )
         return Decision(
             "ALLOW",
             "allow-initial-pr",
@@ -669,6 +677,8 @@ def fixture_snapshot(head: str) -> dict[str, Any]:
             "owner_login": "ed3c",
             "private": True,
         },
+        "branch": {"name": "feature", "head_sha": None},
+        "initial_boundary": "trusted-initial",
         "pull_request": {
             "number": None,
             "state": "absent",
@@ -677,79 +687,57 @@ def fixture_snapshot(head: str) -> dict[str, Any]:
             "last_published_at": None,
             "feedback": None,
         },
-        "initial_boundary": "trusted-initial",
         "actions": {
             "circuit": "closed",
             "observed_at": None,
             "blocker": None,
             "latest_check": None,
         },
+        "captured_at": "2026-08-12T05:00:00Z",
     }
 
 
-FIXTURE_TREE = "e" * 40
-
-
-def fixture_command(command_id: str) -> dict[str, Any]:
-    return {
-        "id": command_id,
-        "argv": ["bash", "skills/github-delivery-loop/tests/run-all.sh"],
-        "cwd": ".",
-        "timeout_seconds": 600,
-        "max_output_bytes": 1048576,
-        "started_at": "2026-08-12T05:00:00Z",
-        "duration_ms": 1200,
-        "exit": 0,
-        "timed_out": False,
-        "spawn_error": None,
-        "stdout_bytes": 12,
-        "stderr_bytes": 0,
-        "stdout_sha256": "b" * 64,
-        "stderr_sha256": "c" * 64,
-        "stdout_truncated": False,
-        "stderr_truncated": False,
+def fixture_proof(head: str) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
+    contract = {
+        "schema": CONTRACT_SCHEMA,
+        "repository_id": 1326262274,
+        "inherit_env": ["PATH"],
+        "commands": [{
+            "id": "contract", "argv": ["python3", "-c", "pass"], "cwd": ".",
+            "timeout_seconds": 10, "max_output_bytes": 4096,
+        }],
     }
-
-
-def fixture_pair(head: str, tree: str) -> tuple[dict[str, Any], dict[str, Any]]:
-    """A receipt and the evidence its digest names, built the way the producer
-    builds them: `content_sha256` over the body, `evidence_sha256` over the
-    whole. Hand-written digests would make every negative control pass for the
-    wrong reason."""
-    command_id = "bash skills/github-delivery-loop/tests/run-all.sh"
     evidence = {
         "schema": EVIDENCE_SCHEMA,
         "repository_id": 1326262274,
         "head_sha": head,
-        "tree_sha": tree,
-        "contract_sha256": "d" * 64,
+        "tree_sha": "a" * 40,
+        "contract_sha256": digest(contract),
         "verified_at": "2026-08-12T05:00:00Z",
         "clean_subject": True,
-        "commands": [fixture_command(command_id)],
+        "commands": [{
+            "id": "contract", "argv": ["python3", "-c", "pass"], "cwd": ".",
+            "timeout_seconds": 10, "max_output_bytes": 4096,
+            "started_at": "2026-08-12T05:00:00Z", "duration_ms": 1,
+            "exit": 0, "timed_out": False, "spawn_error": None,
+            "stdout_bytes": 0, "stderr_bytes": 0,
+            "stdout_sha256": hashlib.sha256(b"").hexdigest(),
+            "stderr_sha256": hashlib.sha256(b"").hexdigest(),
+            "stdout_truncated": False, "stderr_truncated": False,
+        }],
         "status": "PASS",
     }
-    evidence["content_sha256"] = digest_of(evidence)
-    receipt = {
+    evidence["content_sha256"] = digest(evidence)
+    verification = {
         "schema": VERIFICATION_SCHEMA,
         "repository_id": 1326262274,
         "head_sha": head,
         "status": "PASS",
         "verified_at": "2026-08-12T05:00:00Z",
-        "evidence_sha256": digest_of(evidence),
-        "commands": [command_id],
+        "evidence_sha256": digest(evidence),
+        "commands": ["contract"],
     }
-    return receipt, evidence
-
-
-def reseal(receipt: dict[str, Any], evidence: dict[str, Any]) -> None:
-    """Re-derive both digests after a mutation.
-
-    Without this a mutation is caught by the digest check rather than by the
-    rule under test, and every negative control would pass while proving
-    nothing about the rule it names."""
-    body = {key: value for key, value in evidence.items() if key != "content_sha256"}
-    evidence["content_sha256"] = digest_of(body)
-    receipt["evidence_sha256"] = digest_of(evidence)
+    return verification, evidence, contract
 
 
 def expect(
@@ -757,14 +745,15 @@ def expect(
     expected_decision: str,
     expected_reason: str,
     snapshot: dict[str, Any],
-    pair: tuple[dict[str, Any], dict[str, Any]],
+    proof: tuple[dict[str, Any], dict[str, Any], dict[str, Any]],
     intent: str,
     head: str,
     recovery: dict[str, Any] | None = None,
 ) -> None:
-    receipt, evidence = pair
+    verification, evidence, contract = proof
     result = evaluate(
-        snapshot, receipt, evidence, intent, head, FIXTURE_TREE, recovery
+        snapshot, verification, evidence, contract, intent, head, "a" * 40,
+        recovery, datetime(2026, 8, 12, 5, 0, 5, tzinfo=timezone.utc),
     )
     if result.decision != expected_decision or result.reason != expected_reason:
         raise InputError(
@@ -773,21 +762,29 @@ def expect(
         )
 
 
-def refuse(name: str, snapshot: dict[str, Any],
-           pair: tuple[dict[str, Any], dict[str, Any]], head: str,
-           mutate, *, reseal_after: bool = False) -> None:
-    """Plant one defect and require the gate to refuse it.
-
-    `reseal_after` re-derives both digests, so a mutation is caught by the rule
-    it names rather than by the digest check standing in front of every rule.
-    """
-    receipt = json.loads(json.dumps(pair[0]))
-    evidence = json.loads(json.dumps(pair[1]))
-    mutate(receipt, evidence)
-    if reseal_after:
-        reseal(receipt, evidence)
+def refuse(
+    name: str,
+    snapshot: dict[str, Any],
+    proof: tuple[dict[str, Any], dict[str, Any], dict[str, Any]],
+    head: str,
+    mutate: Any,
+    *,
+    reseal: bool = False,
+) -> None:
+    """Plant one defect and require its named policy guard to refuse it."""
+    verification, evidence, contract = json.loads(json.dumps(proof))
+    mutate(verification, evidence, contract)
+    if reseal:
+        evidence_body = dict(evidence)
+        evidence_body.pop("content_sha256", None)
+        evidence["content_sha256"] = digest(evidence_body)
+        verification["evidence_sha256"] = digest(evidence)
     try:
-        evaluate(snapshot, receipt, evidence, "initial-pr", head, FIXTURE_TREE, None)
+        evaluate(
+            snapshot, verification, evidence, contract, "initial-pr", head,
+            "a" * 40, None,
+            datetime(2026, 8, 12, 5, 0, 5, tzinfo=timezone.utc),
+        )
     except InputError:
         return
     raise InputError(f"selftest {name} unexpectedly passed")
@@ -797,138 +794,94 @@ def selftest() -> None:
     head = "1" * 40
     new_head = "2" * 40
     base = fixture_snapshot(head)
-    verification = fixture_pair(head, FIXTURE_TREE)
+    proof = fixture_proof(head)
     expect(
         "initial",
         "ALLOW",
         "allow-initial-pr",
         base,
-        verification,
+        proof,
         "initial-pr",
         head,
     )
 
-    # #70's boundary, now load-bearing at the gate rather than a field the
-    # producer emits and nobody reads. The first real end-to-end run refused
-    # every honest snapshot because the gate's exact-field check had never seen
-    # it -- producer and gate had drifted with no test running both.
-    def drop_boundary(snapshot: dict[str, Any]) -> dict[str, Any]:
-        without = json.loads(json.dumps(snapshot))
-        without.pop("initial_boundary", None)
-        return without
-
-    expect("initial-boundary-unproven", "BLOCK", "initial-boundary-unproven",
-           drop_boundary(base), verification, "initial-pr", head)
+    unproven = json.loads(json.dumps(base))
+    unproven["initial_boundary"] = "unproven"
+    expect(
+        "initial-boundary-unproven",
+        "BLOCK",
+        "initial-boundary-unproven",
+        unproven,
+        proof,
+        "initial-pr",
+        head,
+    )
     orphan = json.loads(json.dumps(base))
+    orphan["branch"]["head_sha"] = "9" * 40
     orphan["initial_boundary"] = "branch-present-without-pr"
-    expect("initial-boundary-refused", "BLOCK", "initial-boundary-refused",
-           orphan, verification, "initial-pr", head)
+    expect(
+        "initial-boundary-refused",
+        "BLOCK",
+        "initial-boundary-refused",
+        orphan,
+        proof,
+        "initial-pr",
+        head,
+    )
 
-    refuse("stale-local-verification", base, verification, head,
-           lambda receipt, evidence: receipt.__setitem__("head_sha", "0" * 40))
+    stale, stale_evidence, stale_contract = fixture_proof(head)
+    stale["head_sha"] = "0" * 40
+    try:
+        evaluate(
+            base, stale, stale_evidence, stale_contract, "initial-pr", head,
+            "a" * 40, None,
+            datetime(2026, 8, 12, 5, 0, 5, tzinfo=timezone.utc),
+        )
+    except InputError:
+        pass
+    else:
+        raise InputError("selftest stale-local-verification unexpectedly passed")
 
-    # The receipt side. Only the stale-HEAD rule had a control; the rest were
-    # checks that ran and could not fail, including the one #49 names by name:
-    # a FAIL receipt must not be consumed as PASS. Changing the receipt does not
-    # touch the evidence digests, so each of these is caught by its own rule.
-    def set_receipt(field: str, value: Any):
-        return lambda receipt, evidence: receipt.__setitem__(field, value)
+    refuse(
+        "fail-receipt-consumed-as-pass", base, proof, head,
+        lambda verification, evidence, contract: verification.__setitem__("status", "FAIL"),
+    )
+    refuse(
+        "receipt-names-other-evidence", base, proof, head,
+        lambda verification, evidence, contract: verification.__setitem__("evidence_sha256", "0" * 64),
+    )
 
-    refuse("fail-receipt-consumed-as-pass", base, verification, head,
-           set_receipt("status", "FAIL"))
-    refuse("receipt-wrong-repository", base, verification, head,
-           set_receipt("repository_id", 999))
-    refuse("receipt-wrong-schema", base, verification, head,
-           set_receipt("schema", "github-delivery-local-verification/v0"))
-    refuse("receipt-no-commands", base, verification, head,
-           set_receipt("commands", []))
-    refuse("receipt-malformed-evidence-digest", base, verification, head,
-           set_receipt("evidence_sha256", "not-a-digest"))
+    def stale_content_digest(
+        verification: dict[str, Any],
+        evidence: dict[str, Any],
+        contract: dict[str, Any],
+    ) -> None:
+        verification["verified_at"] = "2026-08-12T05:00:01Z"
+        evidence["verified_at"] = verification["verified_at"]
+        verification["evidence_sha256"] = digest(evidence)
 
-    # The receipt says PASS; these decide whether the bytes it names say the
-    # same thing. Every one of them authorized publication before the gate read
-    # the sidecar at all.
-    def set_evidence(field: str, value: Any):
-        return lambda receipt, evidence: evidence.__setitem__(field, value)
+    refuse("evidence-content-digest-stale", base, proof, head, stale_content_digest)
+    refuse(
+        "command-nonzero-exit", base, proof, head,
+        lambda verification, evidence, contract: evidence["commands"][0].__setitem__("exit", 1),
+        reseal=True,
+    )
 
-    def set_command(field: str, value: Any):
-        return lambda receipt, evidence: evidence["commands"][0].__setitem__(field, value)
+    def reorder_commands(
+        verification: dict[str, Any],
+        evidence: dict[str, Any],
+        contract: dict[str, Any],
+    ) -> None:
+        second_contract = dict(contract["commands"][0])
+        second_contract.update({"id": "second", "argv": ["python3", "-c", "raise SystemExit(0)"]})
+        contract["commands"].append(second_contract)
+        second_evidence = dict(evidence["commands"][0])
+        second_evidence.update({"id": second_contract["id"], "argv": second_contract["argv"]})
+        evidence["commands"].append(second_evidence)
+        evidence["contract_sha256"] = digest(contract)
+        verification["commands"] = ["second", "contract"]
 
-    sealed = {"reseal_after": True}
-    refuse("evidence-wrong-repository", base, verification, head,
-           set_evidence("repository_id", 999), **sealed)
-    refuse("evidence-stale-head", base, verification, head,
-           set_evidence("head_sha", "0" * 40), **sealed)
-    refuse("evidence-other-tree", base, verification, head,
-           set_evidence("tree_sha", "f" * 40), **sealed)
-    refuse("evidence-dirty-subject", base, verification, head,
-           set_evidence("clean_subject", False), **sealed)
-    refuse("evidence-not-pass", base, verification, head,
-           set_evidence("status", "FAIL"), **sealed)
-    refuse("evidence-different-run", base, verification, head,
-           set_evidence("verified_at", "2026-08-12T06:00:00Z"), **sealed)
-    refuse("evidence-no-commands", base, verification, head,
-           set_evidence("commands", []), **sealed)
-
-    refuse("command-nonzero-exit", base, verification, head,
-           set_command("exit", 1), **sealed)
-    refuse("command-timed-out", base, verification, head,
-           set_command("timed_out", True), **sealed)
-    refuse("command-stdout-truncated", base, verification, head,
-           set_command("stdout_truncated", True), **sealed)
-    refuse("command-stderr-truncated", base, verification, head,
-           set_command("stderr_truncated", True), **sealed)
-    refuse("command-spawn-error", base, verification, head,
-           set_command("spawn_error", "No such file or directory"), **sealed)
-    refuse("command-absolute-cwd", base, verification, head,
-           set_command("cwd", "/Users/someone/checkout"), **sealed)
-    refuse("command-escaping-cwd", base, verification, head,
-           set_command("cwd", "../elsewhere"), **sealed)
-    refuse("command-shell-string", base, verification, head,
-           set_command("argv", ["bash tests/run-all.sh | tee log"]), **sealed)
-    refuse("command-malformed-stream-hash", base, verification, head,
-           set_command("stdout_sha256", "not-a-digest"), **sealed)
-    refuse("command-negative-duration", base, verification, head,
-           set_command("duration_ms", -1), **sealed)
-
-    def duplicate_ids(receipt, evidence):
-        evidence["commands"].append(json.loads(json.dumps(evidence["commands"][0])))
-        receipt["commands"].append(receipt["commands"][0])
-
-    refuse("duplicate-command-ids", base, verification, head, duplicate_ids, **sealed)
-
-    def reordered(receipt, evidence):
-        second = json.loads(json.dumps(evidence["commands"][0]))
-        second["id"] = "second command"
-        evidence["commands"].append(second)
-        receipt["commands"] = [second["id"], receipt["commands"][0]]
-
-    refuse("reordered-command-ids", base, verification, head, reordered, **sealed)
-
-    # The two digests, each on its own. Checking one and not the other leaves
-    # the other free to disagree, which is the compact-only path this closes.
-    def stale_content_digest(receipt, evidence):
-        # Change the body and leave `content_sha256` describing the old bytes,
-        # then re-derive only the receipt's digest. A first attempt simply
-        # corrupted `content_sha256`, and that was caught by the receipt digest
-        # check standing in front of it -- the control passed while proving
-        # nothing about the check it named.
-        evidence["contract_sha256"] = "9" * 64
-        receipt["evidence_sha256"] = digest_of(evidence)
-
-    refuse("content-digest-disagrees", base, verification, head, stale_content_digest)
-    refuse("receipt-names-other-bytes", base, verification, head,
-           lambda receipt, evidence: receipt.__setitem__("evidence_sha256", "0" * 64))
-
-    # The old compact-only path: a receipt that is internally perfect paired
-    # with evidence from a different verification run.
-    def foreign_evidence(receipt, evidence):
-        other = fixture_pair("3" * 40, FIXTURE_TREE)[1]
-        evidence.clear()
-        evidence.update(other)
-
-    refuse("compact-receipt-with-foreign-evidence", base, verification, head,
-           foreign_evidence)
+    refuse("receipt-command-order-differs", base, proof, head, reorder_commands, reseal=True)
 
     draft = json.loads(json.dumps(base))
     draft["pull_request"].update(
@@ -940,12 +893,14 @@ def selftest() -> None:
             "last_published_at": "2026-08-12T05:01:00Z",
         }
     )
+    draft["branch"]["head_sha"] = head
+    draft["initial_boundary"] = "not-initial"
     expect(
         "repeat-initial",
         "BLOCK",
         "initial-pr-already-exists",
         draft,
-        verification,
+        proof,
         "initial-pr",
         head,
     )
@@ -954,7 +909,7 @@ def selftest() -> None:
         "ALLOW",
         "allow-ready-for-review",
         draft,
-        verification,
+        proof,
         "ready-for-review",
         head,
     )
@@ -968,13 +923,13 @@ def selftest() -> None:
         "observed_at": "2026-08-12T05:02:00Z",
         "consumed_by_sha": None,
     }
-    new_verification = fixture_pair(new_head, FIXTURE_TREE)
+    new_proof = fixture_proof(new_head)
     expect(
         "review-repair",
         "ALLOW",
         "allow-batched-repair",
         ready,
-        new_verification,
+        new_proof,
         "batched-repair",
         new_head,
     )
@@ -986,7 +941,7 @@ def selftest() -> None:
         "BLOCK",
         "repair-feedback-already-consumed",
         consumed,
-        new_verification,
+        new_proof,
         "batched-repair",
         new_head,
     )
@@ -997,13 +952,19 @@ def selftest() -> None:
         "head_sha": "3" * 40,
         "conclusion": "failure",
         "completed_at": "2026-08-12T05:02:00Z",
+        "check_run_id": 9001,
+        "check_suite_id": 8001,
+        "workflow_run_id": 7001,
+        "workflow_id": 6001,
+        "job_id": 5001,
+        "app_id": 15368,
     }
     expect(
         "older-ci-head",
         "BLOCK",
         "repair-ci-check-stale",
         ci,
-        new_verification,
+        new_proof,
         "batched-repair",
         new_head,
     )
@@ -1020,7 +981,7 @@ def selftest() -> None:
         "BLOCK",
         "billing-circuit-open",
         billing,
-        verification,
+        proof,
         "initial-pr",
         head,
     )
@@ -1038,7 +999,7 @@ def selftest() -> None:
         "BLOCK",
         "billing-recovery-invalid",
         billing,
-        verification,
+        proof,
         "initial-pr",
         head,
         stale_recovery,
@@ -1051,13 +1012,12 @@ def selftest() -> None:
         "ALLOW",
         "allow-initial-pr",
         billing,
-        verification,
+        proof,
         "initial-pr",
         head,
         recovery,
     )
-    print("SELFTEST GREEN: GitHub Actions publication gate "
-        "(10 policy cases, 28 receipt- and evidence-binding controls)")
+    print("SELFTEST GREEN: GitHub Actions publication gate policy and mutation controls")
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -1067,7 +1027,8 @@ def main(argv: list[str] | None = None) -> int:
     evaluate_parser = subparsers.add_parser("evaluate")
     evaluate_parser.add_argument("--snapshot", type=Path, required=True)
     evaluate_parser.add_argument("--verification", type=Path, required=True)
-    evaluate_parser.add_argument("--verification-evidence", type=Path, required=True)
+    evaluate_parser.add_argument("--evidence", type=Path, required=True)
+    evaluate_parser.add_argument("--verification-contract", type=Path, required=True)
     evaluate_parser.add_argument("--recovery", type=Path)
     evaluate_parser.add_argument("--repo-root", type=Path, default=Path.cwd())
     evaluate_parser.add_argument("--intent", choices=sorted(INTENTS), required=True)
@@ -1090,19 +1051,20 @@ def main(argv: list[str] | None = None) -> int:
     try:
         snapshot = load_object(args.snapshot, "publish snapshot")
         verification = load_object(args.verification, "local verification receipt")
-        evidence = load_object(args.verification_evidence, "local verification evidence")
+        evidence = load_object(args.evidence, "local verification evidence")
+        contract = load_object(args.verification_contract, "local verification contract")
         recovery = (
             load_object(args.recovery, "billing recovery receipt")
             if args.recovery is not None
             else None
         )
-        repo_root = args.repo_root.resolve()
-        actual_head = git_head(repo_root)
-        actual_tree = git_tree(repo_root)
+        actual_head = git_head(args.repo_root.resolve())
+        actual_tree = git_tree(args.repo_root.resolve())
         decision = evaluate(
             snapshot,
             verification,
             evidence,
+            contract,
             args.intent,
             actual_head,
             actual_tree,

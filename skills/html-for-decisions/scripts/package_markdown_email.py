@@ -18,6 +18,13 @@ from pathlib import Path
 from typing import Any
 
 from check_redaction import scan as redaction_scan
+from code_graph import (
+    CodeGraphAsset,
+    code_graph_css,
+    code_graph_script,
+    load_code_graph,
+    render_code_graph_section,
+)
 
 # Box-drawing, arrow, and gate glyphs used by the plan documents' ASCII diagrams.
 # A fenced block carrying enough of these is a diagram, not a shell transcript.
@@ -690,14 +697,14 @@ def render_quiz(
 def page_css() -> str:
     """Return inline CSS shared by the full report."""
     return """
-:root{--ink:#18212f;--muted:#607086;--paper:#f4f7fb;--card:#fff;--line:#d8e0ea;
---blue:#1d6fa8;--green:#1a7a4a;--amber:#b45309;--red:#b3382c}
+:root{--ink:#152033;--muted:#627086;--paper:#f4f7fb;--card:#fff;--line:#d7e0ea;
+--nav:#0d223c;--blue:#176da5;--green:#18794e;--amber:#ad5c00;--red:#b1362e;--purple:#6552c7;--grey:#8795a8}
 *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);
-font:15px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans CJK TC",sans-serif}
-header{padding:42px max(24px,calc((100vw - 1120px)/2));background:#10253f;color:#fff}
-header h1{margin:.2em 0;font-size:clamp(28px,4vw,46px)}header p{max-width:900px}
-main{max-width:1120px;margin:auto;padding:28px 24px 80px}.notice{border-left:5px solid var(--amber);
-background:#fff7ed;padding:14px 18px;margin:18px 0}.grid{display:grid;
+font:14px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC",sans-serif}
+header{padding:34px max(18px,calc((100vw - 1380px)/2)) 28px;background:linear-gradient(135deg,#0c2139,#17486f);color:#fff}
+header h1{margin:.2em 0;font-size:clamp(27px,4vw,44px)}header p{max-width:980px;color:#d7e8f7}
+main{max-width:1380px;margin:auto;padding:22px 18px 70px}.notice{border-left:6px solid #e49a00;
+background:#fff3d8;color:#704800;padding:11px 16px;margin:18px 0;font-weight:800}.grid{display:grid;
 grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}.card,.document{background:var(--card);
 border:1px solid var(--line);border-radius:14px;padding:20px;box-shadow:0 5px 22px #18304d0d}
 .card strong{display:block;color:var(--blue)}nav a{display:block;color:var(--blue);text-decoration:none;
@@ -762,11 +769,11 @@ fieldset.wrong{border-color:var(--red);background:#fff5f4}
 .qa-code{border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-top:8px}
 .qa-code-h{background:#eef3f9;color:#44607d;font-size:12px;padding:5px 10px}
 .qa-code pre{margin:0;border-radius:0;font-size:12.5px}
-nav.tabs{position:sticky;top:0;z-index:20;display:flex;gap:4px;flex-wrap:wrap;
-background:#0b1c31;padding:0 max(24px,calc((100vw - 1120px)/2))}
+nav.tabs{position:sticky;top:0;z-index:30;display:flex;gap:0;flex-wrap:nowrap;overflow-x:auto;
+background:var(--nav);padding:0 max(18px,calc((100vw - 1380px)/2));box-shadow:0 3px 10px #07142530}
 .tab{background:transparent;color:#9fb6cf;border:0;border-bottom:3px solid transparent;
-border-radius:0;padding:13px 18px;font-weight:600;font-size:15px}
-.tab[aria-selected="true"]{color:#fff;border-bottom-color:#4da3e0;background:#12294510}
+border-radius:0;padding:13px 16px;font-weight:700;font-size:14px;white-space:nowrap}
+.tab[aria-selected="true"]{color:#fff;border-bottom-color:#5ab3e8;background:#ffffff0a}
 .tab-n{background:#1d3d5e;color:#cfe0f2;border-radius:999px;padding:1px 8px;font-size:12px;margin-left:6px}
 .docpicks{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px;margin-top:10px}
 .docpick{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;
@@ -932,6 +939,7 @@ def view_script() -> str:
         "v.hidden=(v.id!==id);});"
         "document.querySelectorAll('.tab').forEach(b=>{"
         "b.setAttribute('aria-selected',String(b.dataset.view===id));});"
+        "document.body.classList.toggle('ctg-active',id==='view-codegraph');"
         "if(push!==false){history.replaceState(null,'','#'+id);}"
         "window.scrollTo({top:0});buildToc();}"
         "function showDoc(n){document.querySelectorAll('article.document').forEach(a=>{"
@@ -1032,7 +1040,7 @@ def view_script() -> str:
         "const id=location.hash.slice(1);"
         "if(id&&id.startsWith('view-')){showView(id,false);}"
         "else if(id&&document.getElementById(id)){goAnchor(id,false);}"
-        "else{showView('view-overview',false);}});"
+        "else{showView(document.body.dataset.defaultView||'view-overview',false);}});"
         "window.addEventListener('scroll',syncFloat,{passive:true});"
         "window.addEventListener('resize',syncFloat);"
         "document.addEventListener('keydown',e=>{"
@@ -1083,7 +1091,11 @@ def figure_script() -> str:
     )
 
 
-def render_full_html(config: dict[str, Any], documents: list[SourceDocument]) -> str:
+def render_full_html(
+    config: dict[str, Any],
+    documents: list[SourceDocument],
+    code_graph: CodeGraphAsset | None = None,
+) -> str:
     """Render a self-contained full report containing every source document."""
     title = html.escape(str(config["title"]))
     snapshot = html.escape(str(config["snapshot"]))
@@ -1138,10 +1150,32 @@ def render_full_html(config: dict[str, Any], documents: list[SourceDocument]) ->
     # 必須在文件全部渲染完之後才建索引——`anchored` 這時才知道哪些代號
     # 在內文拿到了落點，剩下的才由索引列自己當落點。
     symbol_html = render_symbol_index(symbols, anchored)
+    graph_css = code_graph_css() if code_graph else ""
+    requested_default = str(config.get("default_view", "overview")).strip().lower()
+    default_view = (
+        "view-codegraph"
+        if code_graph and requested_default in {"codegraph", "code-graph", "view-codegraph"}
+        else "view-overview"
+    )
+    overview_hidden = " hidden" if default_view != "view-overview" else ""
+    graph_tab = (
+        '<button type="button" class="tab" role="tab" data-view="view-codegraph" '
+        f'aria-selected="{str(default_view == "view-codegraph").lower()}" '
+        'onclick="switchView(\'view-codegraph\')">'
+        f"{html.escape(code_graph.label)}</button>"
+        if code_graph
+        else ""
+    )
+    graph_view = (
+        render_code_graph_section(code_graph, hidden=default_view != "view-codegraph")
+        if code_graph
+        else ""
+    )
+    graph_js = code_graph_script(code_graph) if code_graph else ""
     return f"""<!doctype html>
 <html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport"
-content="width=device-width,initial-scale=1"><title>{title}</title><style>{page_css()}</style></head>
-<body><header><p>OOBE／REOOBE evidence package</p><h1>{title}</h1>
+content="width=device-width,initial-scale=1"><title>{title}</title><style>{page_css()}{graph_css}</style></head>
+<body data-default-view="{default_view}"><header><p>OOBE／REOOBE evidence package</p><h1>{title}</h1>
 <p>本頁為投影非 SSOT · 快照 {snapshot} · 完整來源與 checksum 隨 ZIP 交付</p></header>
 <div id="navpad" hidden>
 <button type="button" id="backbtn" onclick="goBack()"
@@ -1151,8 +1185,9 @@ title="回到剛才返回前的位置（Alt+→）">下一步 →<span class="fw
 </div>
 <aside class="toc" id="toc" hidden aria-label="本頁章節"></aside>
 <nav class="tabs" role="tablist">
-<button type="button" class="tab" role="tab" data-view="view-overview" aria-selected="true"
+<button type="button" class="tab" role="tab" data-view="view-overview" aria-selected="{str(default_view == 'view-overview').lower()}"
 onclick="switchView('view-overview')">概覽</button>
+{graph_tab}
 <button type="button" class="tab" role="tab" data-view="view-docs" aria-selected="false"
 onclick="switchView('view-docs')">文件 <span class="tab-n">{len(documents)}</span></button>
 <button type="button" class="tab" role="tab" data-view="view-atlas" aria-selected="false"
@@ -1163,7 +1198,7 @@ onclick="switchView('view-symbols')">符號索引</button>
 onclick="switchView('view-quiz')">理解 quiz <span class="tab-n">{len(config["quiz"])}</span></button>
 </nav>
 <main>
-<div class="view" id="view-overview">
+<div class="view" id="view-overview"{overview_hidden}>
 <section class="notice"><strong>已記錄裁決</strong><br>{decision}</section>
 <section class="grid"><div class="card"><strong>Release-reachable</strong>checked SHA 正常入口可達</div>
 <div class="card"><strong>Deployed</strong>沒有 receipt 一律 UNKNOWN</div>
@@ -1172,6 +1207,7 @@ onclick="switchView('view-quiz')">理解 quiz <span class="tab-n">{len(config["q
 <section class="card"><h2>全部相關文件</h2>
 <p class="doc-meta">點任一份會切到「文件」分頁並開啟該份。</p><nav>{nav}</nav></section>
 </div>
+{graph_view}
 <div class="view" id="view-docs" hidden>
 <section class="card"><h2>選一份文件</h2>
 <p class="doc-meta">一次顯示一份，避免九份串成一條長捲軸。內文的代號連結會自動切到對應文件。</p>
@@ -1186,7 +1222,7 @@ oninput="filterDocs(this.value)" aria-label="過濾文件"></p>
 <section class="document" id="quiz"><h2>理解 quiz</h2>{quiz_html}</section>
 </div>
 <footer>重生來源：bundle config + Markdown SSOT。本頁為投影非 SSOT；裁決變更先回寫 Markdown。</footer>
-</main>{view_script()}{figure_script()}</body></html>"""
+</main>{view_script()}{figure_script()}{graph_js}</body></html>"""
 
 
 def render_email_html(config: dict[str, Any], documents: list[SourceDocument]) -> str:
@@ -1322,20 +1358,37 @@ def generate(config_path: Path) -> list[Path]:
     config_path = config_path.resolve()
     config = load_config(config_path)
     documents = load_documents(config_path, config)
+    code_graph = load_code_graph(config_path, config)
+    extras = load_extras(config_path, config)
     # Cheap pre-flight before anything is written: the redaction gate exists, so
     # run it on every declared source instead of hoping someone remembers to.
-    leaks = redaction_scan([document.path for document in documents] + [config_path])
+    redaction_sources = [document.path for document in documents] + [config_path]
+    redaction_sources.extend(
+        (config_path.parent / str(item["path"])).resolve()
+        for item in config.get("extras", [])
+    )
+    if code_graph:
+        redaction_sources.append(code_graph.path)
+    leaks = redaction_scan(redaction_sources)
     if leaks:
         raise ValueError("redaction gate failed: " + "; ".join(leaks))
+    graph_members = code_graph.archive_members() if code_graph else []
+    archive_names = [name for name, _ in extras + graph_members]
+    duplicates = sorted({name for name in archive_names if archive_names.count(name) > 1})
+    if duplicates:
+        raise ValueError(f"duplicate extras/code_graph archive paths: {duplicates}")
     output_dir = (config_path.parent / str(config["output_dir"])).resolve()
-    output_dir.mkdir(parents=True, exist_ok=True)
     basename = safe_basename(str(config["basename"]))
     html_path = output_dir / f"{basename}.html"
     zip_path = output_dir / f"{basename}.zip"
     eml_path = output_dir / f"{basename}.eml"
     manifest_path = output_dir / f"{basename}.MANIFEST.sha256"
 
-    full_html = render_full_html(config, documents).encode("utf-8")
+    full_html = render_full_html(config, documents, code_graph).encode("utf-8")
+    output_dir.mkdir(parents=True, exist_ok=True)
+    if code_graph and code_graph.report_path:
+        code_graph.report_path.parent.mkdir(parents=True, exist_ok=True)
+        code_graph.report_path.write_bytes(code_graph.report_bytes)
     html_path.write_bytes(full_html)
     internal_manifest = build_zip(
         zip_path,
@@ -1344,7 +1397,7 @@ def generate(config_path: Path) -> list[Path]:
         config_path,
         documents,
         str(config["snapshot"]),
-        load_extras(config_path, config),
+        extras + graph_members,
     )
     build_eml(
         eml_path,
@@ -1365,7 +1418,10 @@ def generate(config_path: Path) -> list[Path]:
         + internal_manifest,
         encoding="utf-8",
     )
-    return [html_path, zip_path, eml_path, manifest_path]
+    outputs = [html_path, zip_path, eml_path, manifest_path]
+    if code_graph and code_graph.report_path:
+        outputs.append(code_graph.report_path)
+    return outputs
 
 
 def main(argv: list[str] | None = None) -> int:

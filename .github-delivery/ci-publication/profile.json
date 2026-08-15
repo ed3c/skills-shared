@@ -9,7 +9,7 @@
     "name": "contract",
     "workflow": ".github/workflows/skill-eval-contract.yml"
   },
-  "verification_contract": ".github-delivery/ci-publication/verification-contract.json",
+  "verification_contract": ".github-delivery/local-verification-contract.json",
   "intents": [
     "initial-pr",
     "ready-for-review",
@@ -23,6 +23,13 @@
   "generated_paths": [
     ".git/github-delivery/local-verification.json",
     ".git/github-delivery/local-verification-evidence.json",
-    ".git/github-delivery/github-state.snapshot.json"
+    ".git/github-delivery/github-state.transport.json",
+    ".git/github-delivery/github-state.observation.json",
+    ".git/github-delivery/github-state.snapshot.json",
+    ".git/github-delivery/live-transport.json",
+    ".git/github-delivery/live-observation.json",
+    ".git/github-delivery/live-snapshot.json",
+    ".git/github-delivery/publication-decision.json",
+    ".git/github-delivery/last-publication.json"
   ]
 }
