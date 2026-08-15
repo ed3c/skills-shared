@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import subprocess
 import sys
@@ -63,6 +64,43 @@ class RepositoryCapabilityAuditAblationTests(unittest.TestCase):
         self.assertEqual(receipt["observed_result"]["required_total"], 16)
         self.assertEqual(len(receipt["material_defects_exposed"]), 5)
         self.assertIn("does not isolate", receipt["boundary"])
+
+    def test_receipts_do_not_silently_claim_stale_repository_state(self):
+        # A receipt that names a repository file by digest is asserting something
+        # about this tree, not only about the run that produced it. When the file
+        # moves on, that assertion becomes false in place -- the receipt still reads
+        # as green and nothing recomputes it. Regenerating the receipt is not the
+        # fix either: it was produced on a different runtime, and this repository
+        # does not accept one host's evidence as another's. So a receipt whose claim
+        # no longer matches must say so explicitly.
+        receipts = sorted((ROOT / "evals" / "receipts").glob("*.json"))
+        self.assertTrue(receipts, "no runtime receipts found to check")
+        report = ROOT / "evals" / "expected" / "effectiveness.json"
+        current = hashlib.sha256(report.read_bytes()).hexdigest()
+
+        for path in receipts:
+            data = json.loads(path.read_text(encoding="utf-8"))
+            claimed = data.get("artifacts", {}).get("committed_expected_report_sha256")
+            if claimed is None or claimed == current:
+                continue
+            superseded = data.get("superseded")
+            self.assertIsNotNone(
+                superseded,
+                f"{path.name} claims committed_expected_report_sha256={claimed} but "
+                f"evals/expected/effectiveness.json is now {current}. Mark the receipt "
+                f"superseded (with the observed digest and a reason) or replay it on a "
+                f"qualifying runtime -- do not leave a false green claim in the tree.",
+            )
+            self.assertEqual(
+                superseded.get("observed_expected_report_sha256"),
+                claimed,
+                f"{path.name}: superseded block must record the digest the receipt "
+                f"actually observed, so the historical claim stays auditable",
+            )
+            self.assertTrue(
+                str(superseded.get("reason", "")).strip(),
+                f"{path.name}: superseded block needs a reason",
+            )
 
 
 if __name__ == "__main__":

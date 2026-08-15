@@ -131,5 +131,13 @@
     },
     "skill_path": "skills/repository-capability-audit",
     "tree": "83119fa438b0774c48cf0d7c8ed4c70c7814d8df"
+  },
+  "superseded": {
+    "observed_expected_report_sha256": "3f990c93b23892c398f811745949fdc93d0debbc65e785f0f53e8b55b551e3e3",
+    "observed_observation_receipt_digest": "08836e9b4cc2f21564d6f18b5e52c7ecaf983c0fe8176f92903ca2fc01e76f05",
+    "reason": "This run is an honest record of what openai-container-local-runtime observed on 2026-08-15, and its values are unchanged. It no longer describes the current tree. run_ablation.py hashed sys.executable (an absolute, version-qualified path) and unittest prose into observation_receipt_digest, so the digest recorded here was reproducible only on the machine that produced it -- the identical code on macOS/Python 3.14.6 yielded edba0eb35ca00ac40af508011f742f34b3ee1a63972dbe037c51a5a564e1ea68. Commit 2d3afb2 removed those host-specific inputs, which changed the digest, evals/expected/effectiveness.json, and the blob hashes recorded under subject.blobs for scripts/run_ablation.py and tests/test_ablation.py. Consequently assertions.expected_report_diff_empty and artifacts.committed_expected_report_sha256 are stale claims about this tree.",
+    "replay_requires": "A replay on a qualifying runtime of the same class (openai-container-local-runtime), not a substitute host. Cross-host equivalence is now expected to hold: after 2d3afb2, Python 3.9.6 and 3.14.6 at different install paths produce a byte-identical effectiveness.json (dacd5eff06dc6febbfdaf10cd6d070d4dca25970af792678849750b178783c47).",
+    "superseded_by_commit": "2d3afb21043ab9f611ab4e1bf09126bc3f3832b9",
+    "tracked_by_issue": 222
   }
 }
