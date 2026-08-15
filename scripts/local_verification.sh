@@ -66,6 +66,9 @@ step "delivery shape comparison controls"
 python3 scripts/measure_delivery_shape.py selftest
 
 step "guard controls"
+python3 skills/shared-skills-infra/scripts/check_index.py --selftest
+python3 skills/shared-skills-infra/scripts/check_index_coverage.py --selftest
+python3 skills/shared-skills-infra/scripts/check_index_coverage.py
 python3 scripts/check_binding_stale.py --selftest
 # Exit 3 is SURFACE, not failure: the body moved and some host has not caught
 # up. Collapsing it into failure would make routine drift indistinguishable from

@@ -30,6 +30,7 @@ on:
       - 'scripts/check_intent_promotions.py'
       - 'migration/**'
       - 'scripts/check_commit_roles.py'
+      - 'evals/index-coverage.json'
       - 'scripts/check_binding_stale.py'
       - 'skills/shared-skills-infra/**'
       - '.skill-bindings/**'
@@ -151,6 +152,9 @@ jobs:
             evals/fixtures/delivery-shape/observation-2026-08-14.json >/dev/null
       - name: Prove every declared guard is caught by a control
         run: |
+          python3 skills/shared-skills-infra/scripts/check_index.py --selftest
+          python3 skills/shared-skills-infra/scripts/check_index_coverage.py --selftest
+          python3 skills/shared-skills-infra/scripts/check_index_coverage.py
           python3 scripts/check_binding_stale.py --selftest
           python3 scripts/check_body_neutrality.py --selftest
           python3 scripts/check_body_neutrality.py

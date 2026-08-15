@@ -86,6 +86,21 @@
         "unnamespaced project, path traversal, bad host and relative rules-dir refused before anything is written"
       ],
       "expected": "good project installs and execpolicy allows only the pinned shape; hollow targets exit 64 with nothing written"
+    },
+    {
+      "id": "GL-DELIVERY-7",
+      "checker_script": "tests/index/verify.sh",
+      "test_verify": "tests/index/verify.sh",
+      "good_fixture": null,
+      "good_evidence": "this skill's own SKILL.md against its own modules/ and scripts/ directories",
+      "hollow_fixture": null,
+      "hollow_mutations": "a dead link appended to a copy of SKILL.md, and a file added to a copied modules/ that SKILL.md cannot name",
+      "covers": [
+        "a link that resolves to nothing is refused",
+        "a file the index never names is refused, which is the half that is otherwise invisible",
+        "the checker's own --selftest runs first, so its verdict here means something"
+      ],
+      "expected": "green on this skill's tree; on first run it found scripts/gitlab_sync.py, the sync script this SKILL.md never named"
     }
   ]
 }
