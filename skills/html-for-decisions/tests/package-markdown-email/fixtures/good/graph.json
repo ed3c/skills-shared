@@ -28,6 +28,7 @@
         "visual_stage": 0,
         "snippet": "10 │ client_input = read_value()",
         "comparison_status": "MISSING_IN_IOS",
+        "difference_summary": "iOS 缺少 typed input",
         "review": {
           "summary": "Typed input prevents an unreviewed value from crossing the boundary.",
           "observation": "The source reads a value before constructing the API payload.",
@@ -101,6 +102,11 @@
       "critical": true,
       "reach": ["STATIC"],
       "evidence_ids": ["ev-source"]
+      ,
+      "metadata": {
+        "comparison_status": "MISSING_IN_IOS",
+        "difference_summary": "iOS 未建立 typed data flow"
+      }
     },
     {
       "id": "edge:write",
@@ -167,6 +173,49 @@
       "status": "OPEN"
     }
   ],
+  "view": {
+    "default_graph_view": "client-flow",
+    "graph_views": [
+      {
+        "id": "client-flow",
+        "label": "Client 完整 Code Graph",
+        "description": "Client input 到 invariant 的完整路徑",
+        "node_ids": ["client:input", "api:payload", "store:value", "invariant:INV-1"],
+        "edge_ids": ["edge:payload", "edge:write", "edge:affects-invariant"],
+        "positions": {
+          "client:input": {"x": 40, "y": 60},
+          "api:payload": {"x": 280, "y": 60},
+          "store:value": {"x": 520, "y": 60},
+          "invariant:INV-1": {"x": 760, "y": 60}
+        },
+        "routes": {
+          "edge:payload": [{"x": 230, "y": 101}, {"x": 280, "y": 101}],
+          "edge:write": [{"x": 470, "y": 94}, {"x": 520, "y": 94}],
+          "edge:affects-invariant": [{"x": 710, "y": 94}, {"x": 760, "y": 94}]
+        },
+        "width": 1010,
+        "height": 260
+      },
+      {
+        "id": "write-boundary",
+        "label": "Write Boundary 完整 Code Graph",
+        "description": "API write 到 invariant 的完整路徑",
+        "node_ids": ["api:payload", "store:value", "invariant:INV-1"],
+        "edge_ids": ["edge:write", "edge:affects-invariant"],
+        "positions": {
+          "api:payload": {"x": 40, "y": 60},
+          "store:value": {"x": 280, "y": 60},
+          "invariant:INV-1": {"x": 520, "y": 60}
+        },
+        "routes": {
+          "edge:write": [{"x": 230, "y": 94}, {"x": 280, "y": 94}],
+          "edge:affects-invariant": [{"x": 470, "y": 94}, {"x": 520, "y": 94}]
+        },
+        "width": 770,
+        "height": 260
+      }
+    ]
+  },
   "invariant_events": [
     {
       "event_id": "EVT-1",

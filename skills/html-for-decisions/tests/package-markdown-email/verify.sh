@@ -63,16 +63,16 @@ assert 'data-view="view-codegraph"' in rendered
 assert 'id="view-codegraph"' in rendered
 assert 'id="ctg-data" type="application/json"' in rendered
 assert "Fixture Code Review Graph" in rendered
-assert "Critical slice only" in rendered and "Directory &amp; symbol tree" in rendered
+assert "只顯示 critical slice" in rendered and "目錄與 symbol tree" in rendered
 assert "src/client.py" in rendered, "source anchor must be reviewable in-page"
 # Reach-aware graph 的第一閱讀面必須與 reference demo 同構：左側導航、中央圖、
 # 右側 node/edge evidence。完整 review dialog 仍保留給深讀，但不能取代主畫面的
 # 抵達證據欄，否則人無法一眼比較 edge reach 與當下 invariant state。
 assert "grid-template-columns:250px minmax(500px,1fr) 340px" in rendered
 assert 'id="ctg-inline-detail"' in rendered
-assert "Node / edge evidence" in rendered
-assert "Agent overlay" in rendered and "Critical slice only" in rendered
-assert 'id="ctg-time"' in rendered and "Refutation history" in rendered
+assert "節點／連線證據" in rendered
+assert "Agent overlay" in rendered and "只顯示 critical slice" in rendered
+assert 'id="ctg-time"' in rendered and "推翻歷史" in rendered
 assert ".ctg-edge.static" in rendered
 assert ".ctg-edge.survived" in rendered and ".ctg-edge.refuted" in rendered
 # 深讀仍有 roomy、keyboard-accessible review window。
@@ -85,12 +85,43 @@ assert 'id="ctg-review-path"' in rendered
 assert 'id="ctg-review-path-prev"' in rendered
 assert 'id="ctg-review-path-next"' in rendered
 assert "function syncReviewPath" in rendered
-assert "觀察（source says）" in rendered and "推論（review inference）" in rendered
+assert "觀察（原始碼直接可見）" in rendered and "推論（Code Review）" in rendered
 assert "能證明" in rendered and "不能證明" in rendered
 assert "抵達狀態" in rendered and "下一個獨立抵達" in rendered
 assert "MISSING_IN_IOS" in rendered and "comparison_status" in rendered
-assert "Decision Queue" in rendered and "DEC-1" in rendered
-assert "Invariant timeline" in rendered and "Source review" in rendered
+assert 'id="ctg-graph-views"' in rendered
+assert "Client 完整 Code Graph" in rendered and "Write Boundary 完整 Code Graph" in rendered
+assert "function selectGraphView" in rendered
+assert "function routeFor" in rendered and "routePath(route)" in rendered
+assert "ctg-diff-chip" in rendered and "difference_summary" in rendered
+assert 'id="ctg-category"' in rendered and "function categoryOf" in rendered
+assert "ctg-category-label" in rendered
+assert ".ctg-node.node-reach-static" in rendered
+assert ".ctg-node.node-reach-sandbox" in rendered
+assert ".ctg-node.node-reach-prod" in rendered
+assert "ctg-edge-hit" in rendered and "focusEdgeRoute" in rendered
+assert 'id="ctg-agent-files"' in rendered and "function importAgentSessions" in rendered
+assert "真相影響：NONE" in rendered
+assert "function pinNodeRoute" in rendered and "function clearPinnedFocus" in rendered
+assert "ctg-tier-frontend" in rendered and "ctg-tier-backend" in rendered
+assert "根因分析" in rendered and "root_cause_analysis" in rendered
+assert "問題調查" in rendered and "proof_chain" in rendered
+assert "自我推翻點" in rendered and "後續分析" in rendered
+assert "目錄與 symbol tree" in rendered and "節點／連線證據" in rendered
+for forbidden_ui in (
+    "Directory &amp; symbol tree",
+    "Node / edge evidence",
+    "Select a node or edge",
+    "Open full Code Review",
+    "Critical slice only",
+    "Decision Queue",
+    "Evidence by reach",
+    "Recommendation</h3>",
+    "Invariant timeline",
+):
+    assert forbidden_ui not in rendered, forbidden_ui
+assert "決策佇列" in rendered and "DEC-1" in rendered
+assert "業務不變量時間線" in rendered and "根因分析" in rendered
 assert "function edgeStateAt" in rendered and "graph_delta" in rendered
 # Code Graph 可成為 bundle 的中心入口，而不是每次先落到摘要頁。
 assert 'data-default-view="view-codegraph"' in rendered

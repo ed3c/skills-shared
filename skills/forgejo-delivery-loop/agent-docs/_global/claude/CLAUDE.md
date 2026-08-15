@@ -111,4 +111,5 @@
 - 每次隔離必留下 host=`claude-code`、surface、worktree path、base SHA、head SHA、dirty-before/after receipt；不能只憑文字宣稱已隔離。
 - 這些命令只屬 Claude Code。Codex 的 App／IDE／CLI adapter 以 `~/.codex/AGENTS.md` 為準，不得把 `EnterWorktree` 或 `claude -w` 投射成 Codex 能力。
 - NEVER 在主 working tree 切 branch（`git checkout` / `git switch`）——共享 tree 會讓其他 session 的 HEAD 與檔案漂移，commit 落錯分支。
+- **共享 tree 上暫存區是公共狀態，別把自己的檔留在裡面**：被閘門拒絕的 commit **不會**回滾 `git add`，留下的暫存檔會被下一個 session 的 commit 整批帶走，連 why 一起錯配到不相干的訊息。判準＝多 session 同樹時 stage 與 commit 綁在同一條命令；一被拒絕，第一個動作是退出暫存而不是重試閘門。**退出暫存只擋得住當下那一次**，之後每一次失敗都重新開窗。
 - NEVER 用 `superpowers:using-git-worktrees` 包裝層或自製 `.session-worktrees/`（OS Polyfill）繞過原生機制。

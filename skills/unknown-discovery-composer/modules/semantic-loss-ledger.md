@@ -53,12 +53,12 @@ The old `SKILL.md` has full preservation coverage:
 | Interview Exploit prompt | `PRESERVED_IN_MODULE` + `LEGACY_ARCHIVED` | `domain-lexicon.md`; legacy archive | Available when KU interview routing needs the idiom. |
 | Reference-source pointing when vocabulary is missing | `PRESERVED_IN_MODULE` + `LEGACY_ARCHIVED` | `domain-lexicon.md`; legacy archive | Preserved as `指認參考源碼`. |
 | Design Reactor prompt | `PRESERVED_IN_MODULE` + `LEGACY_ARCHIVED` | `domain-lexicon.md`; legacy archive | Available when UK taste routing needs alternatives. |
-| `prototype` / `design-an-interface` for taste uncertainty | `ACTIVE_IN_SKILL` + `LEGACY_ARCHIVED` | `../SKILL.md` M1/catalog; legacy archive | Active route preserved. |
+| `prototype` for taste uncertainty (`design-an-interface` removed upstream 2026-08-06) | `ACTIVE_IN_SKILL` + `LEGACY_ARCHIVED` | `../SKILL.md` M1/catalog; legacy archive | Active route preserved. |
 | `improve-codebase-architecture` route | `ACTIVE_IN_SKILL` + `LEGACY_ARCHIVED` | `../SKILL.md` M1/catalog; legacy archive | Active route preserved. |
 | `repo-agent-native` for repo truth and no-KG detail | `ACTIVE_IN_SKILL` + `CANONICAL_OWNER_WITH_LEGACY_COPY` | `../SKILL.md`; legacy archive; `repo-agent-native` owner | Active route preserved; owner owns internals. |
 | `repo-wiki-converge` unavailable local machinery | `STALE_ACTIVE_ROUTE_PRESERVED` + `PRESERVED_IN_MODULE` + `LEGACY_ARCHIVED` | `domain-lexicon.md`; `retarget-map.md`; legacy archive | Not executable as local route; surfaced as gap. |
 | Claim truth verification vs token-efficiency measurement split | `ACTIVE_IN_SKILL` + `PRESERVED_IN_MODULE` + `LEGACY_ARCHIVED` | `../SKILL.md`; `domain-lexicon.md`; legacy archive | Current status refined: `truth-verify-loop` skill exists but local engine is not instantiated. |
-| U1 exit gate to `sdlc-plan-composer` or `to-prd + implement` | `ACTIVE_IN_SKILL` + `LEGACY_ARCHIVED` | `../SKILL.md` M0/H1/catalog; legacy archive | Active exit preserved. |
+| U1 exit gate to `sdlc-plan-composer` or `to-spec + implement` | `ACTIVE_IN_SKILL` + `LEGACY_ARCHIVED` | `../SKILL.md` M0/H1/catalog; legacy archive | Active exit preserved. |
 | Plan shape requirements: mutable decisions first, unknown-response clause | `CANONICAL_OWNER_WITH_LEGACY_COPY` | legacy archive; `sdlc-plan-composer` owner | Composer may surface as context; owner owns plan-shape contract. |
 | `implementation-notes.md` Deviations for minor drift | `ACTIVE_IN_SKILL` + `PRESERVED_IN_MODULE` + `LEGACY_ARCHIVED` | `../SKILL.md` M2; `domain-lexicon.md`; legacy archive | Active drift distinction preserved. |
 | Assertion-level refutation to execution-feedback | `ACTIVE_IN_SKILL` + `PRESERVED_IN_MODULE` + `LEGACY_ARCHIVED` | `../SKILL.md` M2; `domain-lexicon.md`; legacy archive | Active route preserved. |
@@ -66,13 +66,13 @@ The old `SKILL.md` has full preservation coverage:
 | Explicit skip when information value is zero | `PRESERVED_IN_MODULE` + `LEGACY_ARCHIVED` | `domain-lexicon.md`; legacy archive | Preserved as `顯式棄跑`; active route can invoke it by term. |
 | `diagnose` / `diagnosing-bugs` for hard bugs | `ACTIVE_IN_SKILL` + `LEGACY_ARCHIVED` | `../SKILL.md` M2/catalog; legacy archive | Active route preserved. |
 | `handoff` / `claude-handoff` plus missing fidelity-handoff caveat | `ACTIVE_IN_SKILL` + `PRESERVED_IN_MODULE` + `LEGACY_ARCHIVED` | `../SKILL.md`; `retarget-map.md`; legacy archive | Active route preserved; historical caveat preserved. |
-| U3 proposal/explanation to `to-prd`, prose to `writing-shape` / `edit-article` | `PRESERVED_IN_MODULE` + `LEGACY_ARCHIVED` | this ledger; legacy archive | Not in compact catalog; still preserved and recoverable when route packet identifies prose shaping. |
+| U3 proposal/explanation to `to-spec`, prose to `writing-shape` (`edit-article` removed upstream 2026-08-06) | `PRESERVED_IN_MODULE` + `LEGACY_ARCHIVED` | this ledger; legacy archive | Not in compact catalog; still preserved and recoverable when route packet identifies prose shaping. |
 | U3 quiz and `teach` learning-record shape | `ACTIVE_IN_SKILL` + `PRESERVED_IN_MODULE` + `LEGACY_ARCHIVED` | `../SKILL.md`; `domain-lexicon.md`; legacy archive | Active understanding route preserved. |
 | `HELD / REFUTED / UNOBSERVED` assertion review | `PRESERVED_IN_MODULE` + `LEGACY_ARCHIVED` | `domain-lexicon.md`; legacy archive | Preserved for post-implementation assertion review. |
-| `qa` for conversational leftover issue reporting | `PRESERVED_IN_MODULE` + `LEGACY_ARCHIVED` | this ledger; legacy archive | Preserved and recoverable; active packet can route to `qa` when issue filing is the unknown. |
+| conversational leftover issue reporting (was `qa`, removed upstream) | `PRESERVED_IN_MODULE` + `LEGACY_ARCHIVED` | this ledger; legacy archive | Preserved and recoverable; `qa` was removed upstream 2026-08-06; route issue filing to the repo's delivery-loop skill instead. |
 | Artifact verdict to `judge-loop-chooser`; code to `code-review` | `ACTIVE_IN_SKILL` + `LEGACY_ARCHIVED` | `../SKILL.md`; legacy archive | Active split preserved. |
 | Human understanding half vs artifact judgment half | `PRESERVED_IN_MODULE` + `LEGACY_ARCHIVED` | `domain-lexicon.md`; legacy archive | Preserved as domain term. |
-| Downstream boundaries for `sdlc-plan-composer`, `to-prd+implement`, `judge-loop-chooser`, `code-review` | `ACTIVE_IN_SKILL` + `CANONICAL_OWNER_WITH_LEGACY_COPY` | `../SKILL.md`; legacy archive; owner skills | Active boundary preserved without duplicating owner internals. |
+| Downstream boundaries for `sdlc-plan-composer`, `to-spec+implement`, `judge-loop-chooser`, `code-review` | `ACTIVE_IN_SKILL` + `CANONICAL_OWNER_WITH_LEGACY_COPY` | `../SKILL.md`; legacy archive; owner skills | Active boundary preserved without duplicating owner internals. |
 | Lineage from antigravity and no skill-conformance-hub governance | `PRESERVED_IN_MODULE` + `LEGACY_ARCHIVED` | `retarget-map.md`; legacy archive | Preserved as lineage, not active route logic. |
 
 ## Out Of Active Catalog But Preserved
@@ -81,8 +81,8 @@ These items are intentionally not in the compact active route catalog, but they 
 
 | Preserved item | How to recover into active route packet |
 |---|---|
-| Prose shaping after proposal or explanation | Use `to-prd`, `writing-shape`, or `edit-article` when the route packet identifies prose shaping as the next unknown. |
-| Conversational leftover issue filing | Use `qa` when post-implementation residue is issue reporting rather than understanding, code review, or artifact verdict. |
+| Prose shaping after proposal or explanation | Use `to-spec` or `writing-shape` when the route packet identifies prose shaping as the next unknown. |
+| Conversational leftover issue filing | Use the repo's delivery-loop skill (`forgejo-delivery-loop` / `github-delivery-loop` / `gitlab-delivery-loop`) when post-implementation residue is issue reporting rather than understanding, code review, or artifact verdict. |
 | Antigravity-specific deliverable examples such as DR report / Path-B / COMPLETENESS matrix | Keep as lineage examples unless the local `judge-loop-chooser` owner establishes a corresponding skill-bettor deliverable. |
 | Exact old U0-U3 linear graph | Use only as historical shape; current execution uses the state graph in `../SKILL.md`. |
 | Long frontmatter retarget story | Use `retarget-map.md` and the legacy archive for history; frontmatter stays invocation-focused. |

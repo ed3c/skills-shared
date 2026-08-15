@@ -19,7 +19,7 @@ This skill is the entry point when the task is not yet plan-ready. Its job is to
 The output is a **route packet in the chat**, not a file by default. The route packet must carry enough context for another agent to know what is being investigated, why that route was chosen, what evidence grounds it, who should act, who should validate, what the human must decide, and where to go if the route fails. If a packet depends on local terms such as `Blindspot Pass`, `保真語料 intake`, `顯式棄跑`, or `人理解閘`, read [modules/domain-lexicon.md](modules/domain-lexicon.md) and preserve the term meaning instead of paraphrasing it away.
 
 ## Not For
-- Do not use this skill when the task is already clear and single-stage. Route to `to-prd + implement`.
+- Do not use this skill when the task is already clear and single-stage. Route to `to-spec + implement`.
 - Do not use this skill when the task is clear but needs multi-stage SDLC planning. Route to `sdlc-plan-composer`.
 - Do not use this skill to implement code. Execution belongs to `implement`, `tdd`, `diagnose`, Codex, or a concrete downstream workflow.
 - Do not use this skill to judge a deliverable directly. Product or artifact judging goes to `judge-loop-chooser`; code review goes to `code-review`.
@@ -64,7 +64,7 @@ Choose one actor per route. Do not list actors as interchangeable options.
 
 ```mermaid
 flowchart TD
-  M0["M0 classify_fog"] -->|clear single-stage| X1["handoff: to-prd + implement"]
+  M0["M0 classify_fog"] -->|clear single-stage| X1["handoff: to-spec + implement"]
   M0 -->|clear multi-stage| X2["handoff: sdlc-plan-composer"]
   M0 -->|foggy or unknown-bearing| G0["G0 disclose_startpoint"]
   G0 --> V0["V0 startpoint_gate"]
@@ -149,7 +149,7 @@ Inputs:
 - Any explicit user statement that they do not know what to ask, cannot express taste, or want a blindspot pass.
 
 Decision rule:
-- If success criteria, scope, target, and constraints are clear enough for a single action, exit to `to-prd + implement`.
+- If success criteria, scope, target, and constraints are clear enough for a single action, exit to `to-spec + implement`.
 - If the task is clear but multi-stage, high-risk, brownfield, or plan-first, exit to `sdlc-plan-composer`.
 - If any load-bearing part is foggy, continue to G0.
 
@@ -216,7 +216,7 @@ Decision rule:
 - Route claim sets that need measurable multi-tier verification to `truth-verify-loop`, but mark the local engine as not yet instantiated unless its setup contract has been run.
 - Route unfamiliar code maps to `zoom-out` or `repo-agent-native`.
 - Route broad work that exceeds one session to `wayfinder`.
-- Route UK taste or interface uncertainty to `prototype` or `design-an-interface`.
+- Route UK taste or interface uncertainty to `prototype`, or author competing designs in-session with the `codebase-design` vocabulary.
 - Route architecture opportunity scanning to `improve-codebase-architecture`.
 - Route implementation drift caused by refuted plan assertions to `loop-harness-standard/modules/execution-feedback.md`.
 - Route hard bugs to `diagnose` or `diagnosing-bugs`.
@@ -304,7 +304,7 @@ Purpose: Preserve human LAND-DECISION.
 Ask the human to decide:
 - Which unknown to resolve first.
 - Whether to accept any residual uncertainty.
-- Whether the task is now ready for `sdlc-plan-composer`, `to-prd + implement`, implementation drift handling, or post-implementation review.
+- Whether the task is now ready for `sdlc-plan-composer`, `to-spec + implement`, implementation drift handling, or post-implementation review.
 
 Output:
 - A single next route, or a clear statement that the workflow stops here.
@@ -346,9 +346,9 @@ Use this catalog as candidate routing language. It is not proof of equivalence.
 | Huge fog spanning more than one session | `wayfinder` | `candidate` |
 | Scope unclear or decision would change architecture | `grilling` / `grill-me` / `grill-with-docs` | `candidate` |
 | Workflow-specific interview | `loop-me` | `candidate` |
-| Taste cannot be verbalized | `prototype` / `design-an-interface` | `candidate`; human validates taste |
+| Taste cannot be verbalized | `prototype` | `candidate`; human validates taste |
 | Architecture opportunity scan | `improve-codebase-architecture` | `candidate` |
-| Clear single-stage execution | `to-prd + implement` | `candidate` unless contracts are read |
+| Clear single-stage execution | `to-spec + implement` | `candidate` unless contracts are read |
 | Clear multi-stage SDLC planning | `sdlc-plan-composer` | `candidate` unless contract is read |
 | Assertion-level implementation drift | `loop-harness-standard/modules/execution-feedback.md` | `candidate` |
 | Hard bug | `diagnose` / `diagnosing-bugs` | `candidate` |

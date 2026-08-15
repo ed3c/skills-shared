@@ -79,6 +79,14 @@
       "unclassified_commit_count": 33,
       "unclassified_commits_sha256": "b66a3e798fe0dd88ad04e33390cea53b61e1cd1c1c1379273d721a562fc28a05",
       "note": "Exact frozen Forgejo-only non-merge history imported during dual-origin convergence. This does not move enforced_from and cannot admit any later commit."
+    },
+    {
+      "id": "canonical-local-main-before-dual-origin-convergence-2026-08-15",
+      "tip_sha": "00543da877734a923b85d9423dee609fabf79d9d",
+      "admitted_against_sha": "d53cb97da37e08bcd9cf93b2f08ae5d81972a6f0",
+      "unclassified_commit_count": 9,
+      "unclassified_commits_sha256": "fa3c746d55f62bc416faf018597a23469a7b7fed1a1a826b6b0f30dc7a51fe2f",
+      "note": "Exact frozen canonical-local-only non-merge tail imported during dual-origin convergence. This preserves published commit identities, does not move enforced_from, and cannot admit any later commit."
     }
   ],
   "known_unclassified": {

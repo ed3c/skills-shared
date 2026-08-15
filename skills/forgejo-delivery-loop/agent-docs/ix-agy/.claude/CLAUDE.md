@@ -29,7 +29,7 @@
 | 全局 CLAUDE.md 的段 | 該想起的 skill | 觸發情境 |
 |---|---|---|
 | **§1 入料** | `repo-agent-native`、`external-verify`、`knowledge-continuity` | 進一個沒讀過的 repo／遇到 post-cutoff 或無 URL 的官方 claim／文件讀者需靠記憶補 |
-| **§2 構形** | `codebase-design`、`design-an-interface`、`sdlc-plan-composer` | 要設計模組介面／多階段工作需先規劃再動手 |
+| **§2 構形** | `codebase-design`、`sdlc-plan-composer` | 要設計模組介面／多階段工作需先規劃再動手 |
 | **§3 閘門** | `tdd`、`github-delivery-loop`（及 gitlab／forgejo 姊妹）、`ios-testflight-ship` | 動手實作前／要把產物綁上追蹤面／要發佈 |
 | **§4 觀測** | `diagnosing-bugs`、`diagnose`、`repo-fullstack-debugger` | 執行後拿到失敗 trace；先判是一般 bug、硬 bug 還是反覆失敗的黑盒（判準見 §3） |
 | **§5 判定** | `judge-loop-chooser`、`truth-verify-loop`、`path-b-reduction`、`code-review` | 有 deliverable 要判／claim 集要逐字驗／出現平滑抽象敘事／有 diff 要審 |

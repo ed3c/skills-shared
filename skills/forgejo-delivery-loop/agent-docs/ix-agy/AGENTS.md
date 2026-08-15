@@ -82,6 +82,7 @@
 - **B1 rules/context 三件**：`AGENTS.md`（本檔，路由層）＋[`.claude/CLAUDE.md`](.claude/CLAUDE.md)（編排層）＋`ARCHITECTURE.md`。
   三件缺一件，該職責就只能靠記憶補。
 - **Config Path**: `.agents/mcp.json` — B4
+- **Runtime Contract Path**: `.runtime-env/` — B2/B5; one desired-state file per workload plus generated secret-free bindings. Host dotenv, signing keys, browser profiles, and provider sessions never enter this repository.
 - **Skills Path**: `.agents/skills/` — B4
 - **Claude Skill Forwarders**: `.claude/skills/<name>/SKILL.md`（零邏輯，只指向同名 canonical skill）；
   `.claude/commands/delivery.md` 僅保留 `/delivery` 相容別名。 — B4
@@ -94,13 +95,14 @@
 
 ## §2 Harness 註冊表 — 本 repo 的全部迴圈
 
-**七個，全部登記在此**。新建 Harness 未登記 = 沒有人找得到它，等同不存在。
+**八個，全部登記在此**。新建 Harness 未登記 = 沒有人找得到它，等同不存在。
 
 | Harness | 位置 (`loop_wiki/`) | 觸發詞 | 領域 |
 |---|---|---|---|
 | **invariant-reach-graph** | `invariant-reach-graph/` | `抵達方式`、`業務不變量真相`、`靜態綠燈但實際壞掉`、`invariant 被推翻`、`invariant-reach-graph` | 方法論：抵達分級／推翻歷史／靜默推論 |
 | **repo_wiki_converge** | `repo_wiki_converge/` | `wiki 收斂`、`Gemini 判官`、`Opus 收斂` | 任意 repo → Opus 級理解 wiki |
 | **android_e2e_loop** | `subproject-ixsecurity-e2e/android_e2e_loop/` | `android-e2e-loop` | Android OOBE／REOOBE／email-voip 儀式 |
+| **ios_trio_realdevice_loop** | `subproject-ixsecurity-e2e/ios_trio_realdevice_loop/` | `ios-trio-realdevice-loop`、`Trio 真機反覆測試` | Sample Code Trio 真機重裝、權限、OOBE／REOOBE／Secure Browser 證據判決 |
 | **d2_e2e_loop** | `subproject-ixsecurity-e2e/d2_e2e_loop/` | `d2-e2e-loop` | D2 模式端到端 |
 | **no_free_coffee_loop** | `subproject-ixsecurity-e2e/no_free_coffee_loop/` | `no-free-coffee-loop` | Agora room 場景 |
 | **apns_ecdsa_loop** | `subproject-ixsecurity-e2e/apns_ecdsa_loop/` | `apns-ecdsa-loop` | APNs／ECDSA |
@@ -109,7 +111,7 @@
 **分層觸發詞**：
 
 * **全域大迴圈 (Big Loop)**: `"run global composite loop"`, `"執行全域大迴圈"`, `"harness 全景"`, `"執行大迴圈"`
-* **特化沙盒小迴圈 (Small Loops)**: `"run subproject sandbox loop"`, `"執行子項目沙盒小迴圈"`, `"d2-e2e-loop"`, `"no-free-coffee-loop"`, `"apns-ecdsa-loop"`, `"android-e2e-loop"`, `"parity-check-loop"`
+* **特化沙盒小迴圈 (Small Loops)**: `"run subproject sandbox loop"`, `"執行子項目沙盒小迴圈"`, `"d2-e2e-loop"`, `"no-free-coffee-loop"`, `"apns-ecdsa-loop"`, `"android-e2e-loop"`, `"ios-trio-realdevice-loop"`, `"parity-check-loop"`
 * **方法論迴圈 (Methodology Loops)**: `"抵達方式"`, `"業務不變量真相"`, `"靜態綠燈但實際壞掉"`, `"invariant 被推翻"`, `"invariant-reach-graph"`
 
 ---

@@ -53,18 +53,23 @@ public readiness、blockers 與最後查驗時間。`check` 只驗本地 attesta
 ### Export tree binding
 
 「push 前驗證通過」若沒有把驗過的東西釘回推上去的東西，就是不可否證的宣稱：file count 相同、
-history root 為真的樹，內容仍可以完全不同。所以 `verify` 回傳它驗過那棵樹的 Git tree id，
+history root 為真的樹，內容仍可以完全不同。所以呼叫端必須交出它驗過那棵樹的 Git tree id，
 `sync` 以 `--export-tree-sha` 收下，並與遠端 default branch head 的 tree sha 比對：
 
 ```text
-public_export.py verify ──> tree_sha ──┐
-                                       ├─ 相等？──> 否 ──> blocker: export-tree-drift
-GitHub head commit ────────> tree_sha ─┘
+git rev-parse <export-source-commit>^{tree} ──> tree_sha ──┐
+                                                           ├─ 相等？──> 否 ──> blocker: export-tree-drift
+GitHub head commit ──────────────────────────> tree_sha ───┘
 ```
 
 tree id 由 blob 內容與檔案 mode 共同決定，所以位元組漂移與 executable bit 漂移都會改變它；
-比對只用 sync 既有的 head commit 查詢，不下載任何遠端 blob。`verify` 同時比對 staged mode 與
-commit 內 mode，讓 mode 漂移在能被 attest 之前就失敗。
+比對只用 sync 既有的 head commit 查詢，不下載任何遠端 blob。
+
+**本 skill 不隨附 export 驗證器**，`--export-tree-sha` 的來源是呼叫端的責任：artifact 就是 repo
+本身時用 `git rev-parse <export-source-commit>^{tree}`；artifact 是另外物化的匯出樹時，該匯出
+流程必須自己回報它驗過的 tree id。曾規劃但**尚未實作**的是「staged mode 對 commit 內 mode 的
+比對」，其目的是讓 executable bit 漂移在能被 attest 之前就失敗——在它存在之前，mode 漂移只會被
+上面的 tree sha 比對抓到，不要當成另一道獨立保證。
 
 ## Merge authority stack
 

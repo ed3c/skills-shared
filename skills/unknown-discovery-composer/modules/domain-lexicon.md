@@ -27,7 +27,7 @@ Loss rule: if a detail changes which skill is selected, which actor is allowed, 
 | `起跑點披露` | Before classifying unknowns, state the human current understanding, familiarity, assumptions, and collaboration expectation. | Required output of `G0 disclose_startpoint`. | If omitted, the model will likely invent generic defaults; return to `G0`. |
 | `盲點通行證 / Blindspot Pass` | A prompt pattern for unfamiliar code or domain areas where the user does not know what to ask. | Route UU to `zoom-out`, `repo-agent-native`, or source inspection with a blindspot-focused packet. | If blind spots are abstract and not tied to consequences, return to `G1`. |
 | `主動審查訪談 / Interview Exploit` | One-question-at-a-time interview focused on answers that would change architecture. | Route KU to `grilling`, `grill-me`, `grill-with-docs`, or `loop-me`. | If the question would not change route or architecture, do not ask; keep it as residue. |
-| `設計對比器 / Design Reactor` | Generate several meaningfully different design/interface directions so the human can react to tacit taste. | Route UK to `prototype` or `design-an-interface`; validator is human taste reaction. | If variants differ only cosmetically, return to route generation and demand distinct alternatives. |
+| `設計對比器 / Design Reactor` | Generate several meaningfully different design/interface directions so the human can react to tacit taste. | Route UK to `prototype`, or author competing designs in-session; validator is human taste reaction. | If variants differ only cosmetically, return to route generation and demand distinct alternatives. |
 | `指認參考源碼` | When the human lacks vocabulary but can point at examples, use referenced code, vendor modules, or websites as taste/contract evidence. | Route KU/UK to source inspection or prototype with `target evidence` set to the reference. | If the reference is not inspected, grounding remains `[推論]`. |
 | `保真語料 intake` | Faithful transcript and extracted knowledge are different layers: transcript preserves intent; extraction contains factual claims. | Route research-to-asset cold starts to `dr-to-mvp` Phase R; route named entities and numbers to `external-verify`. | If extracted claims are used as facts without verification, mark route invalid. |
 | `雙向警戒` | Training memory failing to recognize a post-cutoff entity does not prove it is false; both false-positive and false-negative confabulation are risks. | External named entities, dates, and numeric claims need primary-source verification. | If the model declares false from memory, route to `external-verify`. |
@@ -78,7 +78,7 @@ Create several materially different design directions for [target] so I can reac
 
 Packet requirements:
 - quadrant: UK;
-- actor: `leaf-skill:prototype` or `leaf-skill:design-an-interface`;
+- actor: `leaf-skill:prototype` or in-session competing-design authoring;
 - validator: human selects or rejects assumptions exposed by the variants;
 - failure edge: regenerate variants if differences are superficial.
 
