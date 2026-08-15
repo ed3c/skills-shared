@@ -158,6 +158,10 @@ def validate_metrics(metrics: Any, required: list[str]) -> dict[str, Any]:
         "negative_control_valid",
         "explicit_non_claim_accuracy",
         "trigger_correct",
+        # A host that does not report spend and a host that spent nothing both
+        # write cost_usd = 0. Without this flag the two are the same number, and
+        # a mean over mixed hosts silently reads unreported spend as free.
+        "cost_observed",
     }
     int_fields = {
         "material_defects_found",
@@ -182,6 +186,11 @@ def validate_metrics(metrics: Any, required: list[str]) -> dict[str, Any]:
         or metrics["cost_usd"] < 0
     ):
         raise CellError("metric cost_usd must be a non-negative number")
+    if not metrics["cost_observed"] and metrics["cost_usd"] != 0:
+        raise CellError(
+            "metric cost_usd must be 0 when cost_observed is false; an unobserved "
+            "cost cannot carry a figure"
+        )
     if metrics["material_defects_found"] > metrics["material_defects_total"]:
         raise CellError(
             "material_defects_found exceeds material_defects_total"

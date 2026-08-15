@@ -48,7 +48,8 @@
     "input_tokens",
     "output_tokens",
     "duration_ms",
-    "cost_usd"
+    "cost_usd",
+    "cost_observed"
   ],
   "quality_weights": {
     "task_success": 0.30,

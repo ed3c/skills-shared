@@ -349,10 +349,20 @@ def profile_metrics(
             statistics.fmean(value["duration_ms"] for value in metrics),
             3,
         ),
-        "mean_cost_usd": round(
-            statistics.fmean(float(value["cost_usd"]) for value in metrics),
-            9,
+        # Averaged over the cells that actually reported spend. A host that does
+        # not report cost writes 0, and folding those into the mean would report
+        # unreported spend as cheapness. Absent stays absent.
+        "mean_cost_usd": (
+            round(
+                statistics.fmean(
+                    float(value["cost_usd"]) for value in metrics if value["cost_observed"]
+                ),
+                9,
+            )
+            if any(value["cost_observed"] for value in metrics)
+            else None
         ),
+        "cost_observed_cells": sum(1 for value in metrics if value["cost_observed"]),
         "component_means": {
             name: round(
                 statistics.fmean(item[name] for item in components),

@@ -73,6 +73,7 @@ metrics = {
   'output_tokens': 40,
   'duration_ms': 10,
   'cost_usd': 0.0,
+  'cost_observed': False,
 }
 metrics_file.write_text(json.dumps(metrics, sort_keys=True) + '\\n')
 """,
@@ -264,6 +265,67 @@ metrics_file.write_text(json.dumps(metrics, sort_keys=True) + '\\n')
                 for item in report["validation_failures"]
             )
         )
+
+
+class UnobservedCostTests(unittest.TestCase):
+    """Codex CLI reports token usage but never a cost figure, while Claude Code
+    reports both. Before `cost_observed` existed, both a free run and an
+    unreported one wrote `cost_usd = 0`, so a mean across mixed hosts read
+    unreported spend as cheapness -- and cheapness is an acceptance input."""
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        sys.path.insert(0, str(ROOT / "scripts"))
+        from run_agent_cell import CellError, validate_metrics  # noqa: PLC0415
+
+        cls.error = CellError
+        cls.validate = staticmethod(validate_metrics)
+        contract = json.loads(
+            (ROOT / "evals" / "agent-effectiveness-contract.json").read_text(encoding="utf-8")
+        )
+        cls.required = contract["required_metrics"]
+
+    def metrics(self, **overrides) -> dict:
+        base = {
+            "task_success": True,
+            "material_defects_found": 1,
+            "material_defects_total": 2,
+            "false_pass_count": 0,
+            "false_pass_opportunities": 3,
+            "evidence_packet_complete": True,
+            "exact_subject_continuity": True,
+            "negative_control_valid": True,
+            "explicit_non_claim_accuracy": True,
+            "trigger_correct": True,
+            "tool_calls": 4,
+            "input_tokens": 100,
+            "output_tokens": 40,
+            "duration_ms": 10,
+            "cost_usd": 0.0,
+            "cost_observed": True,
+        }
+        base.update(overrides)
+        return base
+
+    def test_a_reported_cost_is_accepted(self):
+        self.validate(self.metrics(cost_usd=0.29, cost_observed=True), self.required)
+
+    def test_a_genuinely_free_run_is_accepted(self):
+        self.validate(self.metrics(cost_usd=0.0, cost_observed=True), self.required)
+
+    def test_an_unobserved_cost_is_accepted_as_zero(self):
+        self.validate(self.metrics(cost_usd=0.0, cost_observed=False), self.required)
+
+    def test_an_unobserved_cost_cannot_carry_a_figure(self):
+        with self.assertRaises(self.error):
+            self.validate(self.metrics(cost_usd=0.29, cost_observed=False), self.required)
+
+    def test_cost_observed_is_required_by_the_contract(self):
+        self.assertIn("cost_observed", self.required)
+        incomplete = self.metrics()
+        del incomplete["cost_observed"]
+        with self.assertRaises(self.error):
+            self.validate(incomplete, self.required)
 
 
 if __name__ == "__main__":
