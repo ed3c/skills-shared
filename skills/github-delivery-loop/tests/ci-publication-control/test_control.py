@@ -7,6 +7,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -26,6 +27,43 @@ def load(name: str):
 
 POLICY = load("ci_workflow_policy")
 GUARD = load("ci_publish_guard")
+
+
+class LiveCaptureSeamTests(unittest.TestCase):
+    def test_live_capture_uses_current_snapshot_signature(self) -> None:
+        scripts = str(SKILL / "scripts")
+        if scripts not in sys.path:
+            sys.path.insert(0, scripts)
+        publish = load("ci_publish")
+        transport = {"schema": "github-actions-provider-transport/v4"}
+        observation = {"schema": "github-actions-observation/v6"}
+        snapshot = {"schema": "github-actions-publish-snapshot/v4"}
+        with (
+            mock.patch.object(
+                publish.github_actions_snapshot,
+                "capture_transport",
+                return_value=transport,
+            ) as capture_transport,
+            mock.patch.object(
+                publish.github_actions_snapshot,
+                "observation_from_transport",
+                return_value=observation,
+            ) as derive,
+            mock.patch.object(
+                publish.github_actions_snapshot,
+                "build",
+                return_value=snapshot,
+            ) as build,
+        ):
+            actual_transport, actual_observation, actual_snapshot = publish._capture_live_state(
+                "ed3c/example", "agent/example", "verify"
+            )
+        capture_transport.assert_called_once_with("ed3c/example", "agent/example", "verify", 30)
+        derive.assert_called_once_with(transport)
+        build.assert_called_once_with(observation, "verify", strict=True)
+        self.assertIs(actual_transport, transport)
+        self.assertIs(actual_observation, observation)
+        self.assertIs(actual_snapshot, snapshot)
 
 
 WORKFLOW = """name: verify
@@ -267,6 +305,9 @@ class PublicationCommandTests(unittest.TestCase):
                     "name": pull_request_head_ref,
                     "head_sha": None if state == "absent" else remote_head,
                 },
+                "initial_boundary": (
+                    "trusted-initial" if state == "absent" else "not-initial"
+                ),
                 "pull_request": {
                     "number": None if state == "absent" else 7,
                     "state": state,

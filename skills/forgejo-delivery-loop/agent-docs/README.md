@@ -1,5 +1,9 @@
 # agent-docs — 每個 repo／host 的 CLAUDE.md 與 AGENTS.md 的集中真源
 
+本目錄在 `evals/body-neutrality.json` v2 中明列為 `repo_binding_source`：它保存 consumer-specific
+真源，不是 portable Skill body，也不是無治理豁免。內容由本目錄的 manifest、`agent_docs.py`
+byte equality、budget 與 `UNREGISTERED` 控制治理；投影到 consumer 後才是 `generated_projection`。
+
 ```
 agent-docs/
   manifest.json          誰被管、管哪幾檔、哪些缺席是登記過的、預算數字

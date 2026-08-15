@@ -7,7 +7,7 @@
   "local": {"main_branch": "main", "local_main_sha": "572aa3d2f0d50771cf2ab856f59a9b5923fed1f2", "worktree_root": ".worktrees"},
   "issue_namespaces": {"forgejo": "forgejo#", "github": "github#"},
   "issue_links": [{"forgejo_issue": "forgejo#12", "github_issue": "github#34"}],
-  "implementation": {"forgejo_delivery": {"path": "proof/forgejo-delivery.json", "sha256": "1682cb5d6add040721087bfe919e6257a512caa54111aa4aa8870d5c05b81e73"}},
+  "implementation": {"forgejo_delivery": {"path": "proof/forgejo-delivery.json", "sha256": "651dd9d63478652811a6dc57f9f7c950021176fa4d98bb996b0e855b989d4f83"}},
   "history": ["GITHUB_BOUND", "LOCAL_SYNCED", "FORGEJO_ISSUES_BOUND", "WORKTREES_VERIFIED", "FORGEJO_PRS_MERGED", "LOCAL_MAIN_MERGED", "GITHUB_RECONCILED", "GITHUB_ACTIONS_VERIFIED", "GITHUB_PUBLICATION_READY"],
   "observations": {
     "github_main": {"path": "proof/github-main-observation.json", "sha256": "500f28c0afbd14c64d3ac417ad7574d30ec77950360dd8f73db9fac104f780e4"},
@@ -19,9 +19,9 @@
     "candidate_sha": "997b637730f967af63f435d8f28fe6677a209574",
     "git_proof": {"path": "proof/repository.fast-import", "sha256": "de172b9fe4eb58c7ddd9fd59fe8e3fea947db4799491cf726f23e4259f06ad84"},
     "decision_bundle": {
-      "manifest": {"path": "proof/decision.json", "sha256": "5362dac1acd836833c7fff7ac96fdb4db36329ab6be56f9c907f7e37f94f2f74"},
+      "manifest": {"path": "proof/decision.json", "sha256": "c36c80154ba621263d26a61486549281ac438c2c3cbba2f78c9b0510b672f933"},
       "policy": {"path": "proof/policy.json", "sha256": "f30f1014895713a7c6930cd66954fdd466f542c0236ba303d0901ec8fac406cc"},
-      "snapshot": {"path": "proof/pre-snapshot.json", "sha256": "2d94276b5eddb5eaa7e2bfd5710ffec9426863590831f67a4a67c117705ad445"},
+      "snapshot": {"path": "proof/pre-snapshot.json", "sha256": "4eb04cb06f2eeadc0c188ad615ad7da3a3022276b46de49531f03d88cbe9db30"},
       "verification": {"path": "proof/verification.json", "sha256": "167df16304107d1620c8e8324d1434dba1dde7082dff05f1f5f3163362f9dce3"},
       "evidence": {"path": "proof/evidence.json", "sha256": "5c604b8bdd692fc92ee0a79e87d79be0d634bb5cad0041929c73261d67caf28f"},
       "contract": {"path": "proof/contract.json", "sha256": "6f4ef576e6870b981c2bd42cb90a441fd11663b88b978402f42696b7cd8581d6"},
@@ -32,7 +32,7 @@
     "check_name": "contract",
     "transport": {"path": "proof/actions-transport.json", "sha256": "186f86e36b03f0b968a633c4cd871c874f8248b15bb350f609e422b1c482d82a"},
     "observation": {"path": "proof/actions-observation.json", "sha256": "41abb797144b2fd1696a35a1774a549e7d596eb2acccee4ac5fd1a693f28bc38"},
-    "snapshot": {"path": "proof/actions-snapshot.json", "sha256": "328c9318e971d1cfee3fc252c4ade2c7e6e6a4cca99272ea49a9a0450a9c790c"}
+    "snapshot": {"path": "proof/actions-snapshot.json", "sha256": "4e92899ee4dc165ab87f1938baa39984761380b8cbb9fb587b0ef4613f927c99"}
   }},
   "evidence": {"github_ingress": "PASS", "forgejo_runtime": "PASS", "local_worktrees": "PASS", "local_main_merge": "PASS", "github_reconciliation": "PASS", "github_actions": "PASS", "final_merge": "HUMAN_ADMIT_REQUIRED"}
 }

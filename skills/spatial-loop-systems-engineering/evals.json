@@ -1,17 +1,56 @@
 {
   "skill_name": "spatial-loop-systems-engineering",
-  "version": "1.1.0",
+  "version": "2.1.0",
   "_meta": {
-    "coverage_metric": "exact-subject binding, realm/boundary/flow closure, state and invariant references, required-capability gating, teardown symmetry, performance measurement closure, evidence-state separation, and repeated-failure recovery routing",
-    "purpose": "Prove that an expert-sounding systems specification cannot advance to implementation while substrate capabilities, invariant oracles, lifecycle cleanup, state references, performance evidence, or bounded-recovery requirements remain hollow."
+    "coverage_metric": "monitor-first Shadow Architecture control, universal Constraint-First entry topology, A/B/C/D complexity classification, anti-degradation, source-claim separation, domain decoupling, exact-subject binding, realm/boundary/flow closure, state and invariant references, required-capability gating, teardown symmetry, performance measurement closure, evidence-state separation, and repeated-failure recovery routing",
+    "purpose": "Prove that useful Builder exploration remains allowed under MONITOR while material System Design drift, first-green overclaim, Level C/D degradation, hollow system contracts, and repeated blind repairs cannot remain silent."
   },
   "runnable": [
+    {
+      "id": "SLS-ARCHITECTURE-WATCH-1",
+      "checker_script": "tests/architecture-watch/verify.sh",
+      "test_verify": "tests/architecture-watch/verify.sh",
+      "good_fixture": null,
+      "good_evidence": "SKILL.md plus modes/ and references/architecture-watch-loop.md",
+      "hollow_fixture": null,
+      "hollow_mutations": "remove default MONITOR, prohibit normal Builder exploration, let Shadow Architect become a second writer, remove an intervention level, remove FIRST_GREEN review, or remove a material delta class",
+      "covers": [
+        "MONITOR is the default mode",
+        "the Builder may explore and implement normally before a material boundary requires reconciliation",
+        "the Shadow Architect observes architecture deltas and does not silently become a second implementation writer",
+        "architecture deltas include assumptions, state, authority, ownership, lifecycle, concurrency, resources, external side effects, failure surface, and evidence",
+        "intervention levels are L0 OBSERVE, L1 WARN, L2 REVIEW, and L3 BLOCK",
+        "FIRST_GREEN is a mandatory meta-review checkpoint and cannot directly mean done",
+        "PRECHECK remains available for high-risk or irreversible material transitions",
+        "POSTMORTEM reconstructs implicit architecture from observed implementation and evidence"
+      ],
+      "expected": "monitor-first exploration remains admitted while material architecture drift and first-green overclaim remain observable and bounded"
+    },
+    {
+      "id": "SLS-UNIVERSAL-ENTRY-1",
+      "checker_script": "tests/universal-entry/verify.sh",
+      "test_verify": "tests/universal-entry/verify.sh",
+      "good_fixture": null,
+      "good_evidence": "SKILL.md, references/system-prompt.md, and modules/README.md",
+      "hollow_fixture": null,
+      "hollow_mutations": "remove the Level C/D anti-degradation law or allow a domain module to replace/bypass the universal constraint compiler",
+      "covers": [
+        "the entrypoint remains a universal constraint discovery compiler rather than a substrate-only implementation recipe",
+        "the canonical topology reaches domain/unknown/hard-law expansion before evidence-sensitive implementation claims",
+        "Level A/B/C/D complexity classes are explicit",
+        "Level C/D work cannot silently degrade into Level A implementation behavior",
+        "the universal transformation is intent to boundary to state to invariant to failure to oracle to evidence to implementation",
+        "domain modules extend the core method and may not replace or bypass it"
+      ],
+      "expected": "canonical universal entry admitted; planted anti-degradation and domain-replacement regressions are distinguishable"
+    },
     {
       "id": "SLS-SYSTEM-CONTRACT-1",
       "checker_script": "scripts/check_system_contract.py",
       "test_verify": "tests/system-contract/verify.sh",
       "good_fixture": "tests/system-contract/fixtures/good.json",
-      "hollow_fixture": "runtime mutations that remove an invariant oracle or teardown ledger, advance an unexercised capability to READY_FOR_IMPLEMENTATION, add a vague low-latency claim, make PASS evidence-free, or introduce dangling state/transition references",
+      "hollow_fixture": null,
+      "hollow_mutations": "runtime mutations that remove an invariant oracle or teardown ledger, advance an unexercised capability to READY_FOR_IMPLEMENTATION, add a vague low-latency claim, make PASS evidence-free, or introduce dangling state/transition references",
       "covers": [
         "the exact subject has a revision and lowercase SHA-256 digest",
         "realms, boundaries, flows, states, resources, and teardown references close",
@@ -28,8 +67,10 @@
       "id": "SLS-RECOVERY-ESCALATION-1",
       "checker_script": "tests/recovery-escalation/verify.sh",
       "test_verify": "tests/recovery-escalation/verify.sh",
-      "good_fixture": "SKILL.md plus references/three-failure-escalation.md and references/system-prompt-recovery-overlay.md",
-      "hollow_fixture": "removing the qualifying-failure definition, allowing a fourth blind patch, removing Forgejo/GitHub routing, reusing the stale diagnosis context, removing the isolated-worktree requirement, allowing commit before the owning oracle passes, or silently granting merge authority",
+      "good_fixture": null,
+      "good_evidence": "SKILL.md plus references/three-failure-escalation.md and references/system-prompt-recovery-overlay.md",
+      "hollow_fixture": null,
+      "hollow_mutations": "removing the qualifying-failure definition, allowing a fourth blind patch, removing Forgejo/GitHub routing, reusing the stale diagnosis context, removing the isolated-worktree requirement, allowing commit before the owning oracle passes, or silently granting merge authority",
       "covers": [
         "three consecutive qualifying failures against the same invariant or acceptance target force escalation rather than a fourth blind patch",
         "the issue packet preserves exact subject, oracle, three failure trajectories, falsified hypotheses, unknowns, and rollback context",
@@ -44,11 +85,18 @@
     }
   ],
   "evidence_boundary": {
+    "monitor_first_shadow_architecture": "IMPLEMENTED",
+    "first_green_meta_review": "IMPLEMENTED",
+    "precheck_postmortem_modes": "IMPLEMENTED",
+    "universal_constraint_first_entry": "IMPLEMENTED",
+    "complexity_anti_degradation_control": "IMPLEMENTED",
+    "domain_decoupling_contract": "IMPLEMENTED",
     "portable_system_prompt": "IMPLEMENTED",
     "system_contract_checker": "IMPLEMENTED",
     "positive_hollow_mutation_controls": "IMPLEMENTED",
     "three_failure_escalation_contract": "IMPLEMENTED",
     "linux_isolation_module": "IMPLEMENTED",
+    "live_shadow_monitor_runtime": "NOT_EXERCISED",
     "fresh_chatgpt_desktop_execution": "NOT_EXERCISED",
     "live_forgejo_recovery_mutation": "NOT_EXERCISED",
     "live_github_actions_recovery": "NOT_EXERCISED",

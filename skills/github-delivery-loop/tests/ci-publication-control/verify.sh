@@ -55,6 +55,7 @@ snapshot = {
         "private": True,
     },
     "branch": {"name": "agent/example", "head_sha": None},
+    "initial_boundary": "trusted-initial",
     "pull_request": {
         "number": None,
         "state": "absent",

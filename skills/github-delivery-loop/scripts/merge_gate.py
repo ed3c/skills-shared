@@ -76,6 +76,40 @@ class GateError(RuntimeError):
     """Raised when merge authority cannot be established."""
 
 
+class UnevaluableError(GateError):
+    """Raised when provider evidence exists but its shape cannot be evaluated."""
+
+
+def validate_pending_merge_state(pull: dict[str, Any]) -> None:
+    """Fail closed when GraphQL pending state is not the exact queried shape."""
+    auto = pull.get("auto_merge_request")
+    if auto is not None:
+        if (
+            not isinstance(auto, dict)
+            or set(auto) != {"enabledAt"}
+            or not isinstance(auto.get("enabledAt"), str)
+            or not auto["enabledAt"]
+        ):
+            raise UnevaluableError(
+                f"PR #{pull.get('number')} malformed autoMergeRequest; "
+                "expected null or {enabledAt: non-empty string}"
+            )
+    queue = pull.get("merge_queue_entry")
+    if queue is not None:
+        if (
+            not isinstance(queue, dict)
+            or set(queue) != {"id", "state"}
+            or not isinstance(queue.get("id"), str)
+            or not queue["id"]
+            or not isinstance(queue.get("state"), str)
+            or not queue["state"]
+        ):
+            raise UnevaluableError(
+                f"PR #{pull.get('number')} malformed mergeQueueEntry; "
+                "expected null or {id: non-empty string, state: non-empty string}"
+            )
+
+
 def positive_pull_number(value: str) -> int:
     try:
         number = int(value)
@@ -225,6 +259,7 @@ def fetch_snapshot(
             )
         pull["auto_merge_request"] = pending_node.get("autoMergeRequest")
         pull["merge_queue_entry"] = pending_node.get("mergeQueueEntry")
+        validate_pending_merge_state(pull)
         head = pull["headRefOid"]
         pull["head_committed_at"] = _gh_json(
             [
@@ -601,13 +636,21 @@ def probe_codex(repository: str, merge_cmd: list[str]) -> tuple[str, str]:
 # --------------------------------------------------------------------------
 
 
-def check_github(pull: dict[str, Any], allow_unstable: bool) -> str | None:
+def check_github_identity(pull: dict[str, Any]) -> str | None:
+    """Validate the PR identity prerequisites shared by L3 and pending checks."""
     if "state" in pull and pull.get("state") != "OPEN":
         return f"state={pull.get('state')} -- PR is not open"
-    if pull.get("isDraft"):
-        return "PR is a draft -- mark it ready for review first"
     if not SHA_RE.fullmatch(str(pull.get("headRefOid", ""))):
         return "headRefOid is not a full 40-character SHA"
+    return None
+
+
+def check_github(pull: dict[str, Any], allow_unstable: bool) -> str | None:
+    identity_reason = check_github_identity(pull)
+    if identity_reason:
+        return identity_reason
+    if pull.get("isDraft"):
+        return "PR is a draft -- mark it ready for review first"
     mergeable = pull.get("mergeable")
     if mergeable == "CONFLICTING":
         return "CONFLICTING -- rebase onto the base branch"
@@ -998,6 +1041,15 @@ def land(
                 )
             ]
         for candidate in authorized:
+            identity_reason = check_github_identity(candidate)
+            if identity_reason:
+                print(
+                    f"BLOCK #{candidate['number']} "
+                    f"{str(candidate.get('headRefOid', ''))[:7]} "
+                    f"[L3 GITHUB] {identity_reason}",
+                    file=sys.stderr,
+                )
+                return 1
             pending_reason = pending_merge_reason(candidate)
             if pending_reason:
                 print(
@@ -1167,6 +1219,9 @@ def main(argv: list[str] | None = None) -> int:
                 policy_path,
             )
         return land(repository, args.allow_unstable, args.dry_run, policy, args.pr)
+    except UnevaluableError as error:
+        print(f"UNEVALUABLE {error}", file=sys.stderr)
+        return UNEVALUABLE
     except GateError as error:
         print(f"FAIL {error}", file=sys.stderr)
         return 1

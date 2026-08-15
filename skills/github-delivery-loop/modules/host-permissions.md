@@ -64,7 +64,7 @@
    保留 `--admin` 在黑名單是重點：`--admin` 是唯一能**繞過 GitHub 端所有要求**的形式，
    那才是不可逆的危險面；一般 `gh pr merge` 仍受 GitHub 的 mergeability 與 branch rule 約束。
 
-2. `/Users/neon/local_stack/execution/hooks/bash_command_classifier.py` 的 GH 前綴白名單加一行
+2. `<local-stack-root>/execution/hooks/bash_command_classifier.py` 的 GH 前綴白名單加一行
    `"gh pr merge",`。順序上 BASH_BLACKLIST 先跑，所以**單獨加這行是 inert 的**——
    在第 1 步套用前不會改變任何行為，可以安全先加。
 

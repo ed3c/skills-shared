@@ -19,18 +19,29 @@
       "test_verify": "tests/check-knowledge-continuity/verify.sh",
       "good_fixture": "tests/check-knowledge-continuity/fixtures/good/doc.md",
       "hollow_fixture": "tests/check-knowledge-continuity/fixtures/hollow/doc.md",
-      "covers": ["KC-01 外部記憶式引用", "KC-02 章節錯引", "KC-03 約數",
-                 "KC-04 知識外包", "KC-05 兩跳才到證據"],
+      "covers": [
+        "KC-01 外部記憶式引用",
+        "KC-02 章節錯引",
+        "KC-03 約數",
+        "KC-04 知識外包",
+        "KC-05 兩跳才到證據"
+      ],
       "expected": "good 全綠；hollow 上五條規則各自轉紅（不是只有總數轉紅）；hollow 的 exit code 非零"
     },
     {
       "id": "KC-2",
       "checker_script": "scripts/check_knowledge_continuity.py",
       "test_verify": "tests/check-knowledge-continuity/verify.sh",
-      "good_fixture": "in-process temp fixture（--selftest）",
-      "hollow_fixture": "in-process temp fixture（--selftest）",
-      "covers": ["本文自定義的代號不得誤報", "圖與程式碼區塊內的標籤不得誤報",
-                 "引號內的示範反例不得誤報", "ISO 日期不得被當成文件代號"],
+      "good_fixture": null,
+      "good_evidence": "in-process temp fixture（--selftest）",
+      "hollow_fixture": null,
+      "hollow_mutations": "in-process temp fixture（--selftest）",
+      "covers": [
+        "本文自定義的代號不得誤報",
+        "圖與程式碼區塊內的標籤不得誤報",
+        "引號內的示範反例不得誤報",
+        "ISO 日期不得被當成文件代號"
+      ],
       "expected": "--selftest 全過；本地定義的 ID、本文章節號、被展示的反例與日期一律不算斷點"
     }
   ],

@@ -2,6 +2,7 @@
   "schema": "github-actions-publish-snapshot/v4",
   "repository": {"full_name": "ed3c/example", "repository_id": 123, "owner_login": "ed3c", "private": true},
   "branch": {"name": "agent/integration", "head_sha": "997b637730f967af63f435d8f28fe6677a209574"},
+  "initial_boundary": "not-initial",
   "pull_request": {"number": 42, "state": "ready", "head_sha": "997b637730f967af63f435d8f28fe6677a209574", "last_published_sha": "997b637730f967af63f435d8f28fe6677a209574", "last_published_at": "2026-08-14T10:01:00Z", "feedback": null},
   "actions": {"circuit": "closed", "observed_at": null, "blocker": null, "latest_check": {"head_sha": "997b637730f967af63f435d8f28fe6677a209574", "conclusion": "success", "completed_at": "2026-08-14T10:04:00Z", "check_run_id": 9001, "check_suite_id": 8001, "workflow_run_id": 7001, "workflow_id": 6001, "job_id": 5001, "app_id": 15368}},
   "captured_at": "2026-08-14T10:05:00Z"

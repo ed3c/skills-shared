@@ -21,6 +21,8 @@ Exit: 0 done/nothing to do, 1 a pre-existing file changed (must never happen).
 from __future__ import annotations
 
 import argparse
+import contextlib
+import io
 import filecmp
 import hashlib
 import shutil
@@ -167,6 +169,94 @@ def selftest() -> int:
             print("FAIL: contested restore is not byte-identical to the first source",
                   file=sys.stderr)
             return 2
+
+    # The numbers in the success line had nobody checking them. #16 names this
+    # exactly: a count that lies and a count that tells the truth print the same
+    # shape, and asserting the shape is asserting nothing. Two files come back
+    # and three were already there, so both numbers are known in advance.
+    with tempfile.TemporaryDirectory() as raw:
+        root = Path(raw)
+        shared, backup = root / "shared", root / "backup"
+        (shared / "demo").mkdir(parents=True)
+        for name in ("SKILL.md", "README.md", "NOTES.md"):
+            (shared / "demo" / name).write_text(f"shared {name}\n")
+        source = backup / "demo" / "one_source"
+        source.mkdir(parents=True)
+        (source / "SKILL.md").write_text("ignored, same name\n")
+        (source / "first.md").write_text("a\n")
+        (source / "second.md").write_text("b\n")
+        captured = io.StringIO()
+        with contextlib.redirect_stdout(captured):
+            code = run(backup, shared, set(), apply=True)
+        text = captured.getvalue()
+        if code != 0:
+            print(f"FAIL: counted run exited {code}", file=sys.stderr)
+            return 2
+        if "RESTORED=2 " not in text:
+            print(f"FAIL: restored count is not 2: {text!r}", file=sys.stderr)
+            return 2
+        if "既有檔案 3 個" not in text:
+            print(f"FAIL: pre-existing count is not 3: {text!r}", file=sys.stderr)
+            return 2
+
+    # NOTHING-TO-RESTORE is an outcome, not a failure, and until now nothing
+    # distinguished its label from the FAIL label. The exit code was pinned; the
+    # half a human reads was not.
+    with tempfile.TemporaryDirectory() as raw:
+        root = Path(raw)
+        shared, backup = root / "shared", root / "backup"
+        (shared / "demo").mkdir(parents=True)
+        (shared / "demo" / "SKILL.md").write_text("shared\n")
+        source = backup / "demo" / "one_source"
+        source.mkdir(parents=True)
+        (source / "SKILL.md").write_text("same name, never moves\n")
+        captured = io.StringIO()
+        with contextlib.redirect_stdout(captured):
+            code = run(backup, shared, set(), apply=True)
+        text = captured.getvalue()
+        if code != 0:
+            print(f"FAIL: nothing-to-restore exited {code}", file=sys.stderr)
+            return 2
+        if not text.startswith("NOTHING-TO-RESTORE:"):
+            print(f"FAIL: nothing-to-restore is not labelled as itself: {text!r}",
+                  file=sys.stderr)
+            return 2
+        if "FAIL" in text:
+            print("FAIL: an outcome was labelled as a failure", file=sys.stderr)
+            return 2
+
+    # The post-condition: if a pre-existing file changed, refuse. Normal input
+    # cannot reach it -- `plan` skips every destination that already exists --
+    # so it was a check that ran and could not fail. Reaching it needs a plan
+    # that violates the rule `plan` itself enforces, which is precisely the bug
+    # this refusal exists to catch.
+    with tempfile.TemporaryDirectory() as raw:
+        root = Path(raw)
+        shared, backup = root / "shared", root / "backup"
+        (shared / "demo").mkdir(parents=True)
+        (shared / "demo" / "SKILL.md").write_text("shared version\n")
+        source = backup / "demo" / "one_source"
+        source.mkdir(parents=True)
+        (source / "SKILL.md").write_text("backup version\n")
+        destination = shared / "demo" / "SKILL.md"
+        broken = [("demo", "one_source", source / "SKILL.md", destination, 15)]
+        real_plan = globals()["plan"]
+        globals()["plan"] = lambda *args, **kwargs: broken
+        try:
+            captured = io.StringIO()
+            with contextlib.redirect_stdout(captured):
+                code = run(backup, shared, set(), apply=True)
+        finally:
+            globals()["plan"] = real_plan
+        if code != 1:
+            print(f"FAIL: a clobbered pre-existing file exited {code}, want 1",
+                  file=sys.stderr)
+            return 2
+        if destination.read_text() != "backup version\n":
+            print("FAIL: the fixture did not actually clobber anything",
+                  file=sys.stderr)
+            return 2
+
     print("SELFTEST GREEN")
     return 0
 

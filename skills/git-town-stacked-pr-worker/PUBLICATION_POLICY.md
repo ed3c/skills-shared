@@ -55,7 +55,7 @@ local edits and commits
 → task evals and negative controls on exact local HEAD
 → exact-HEAD local verification receipt
 → trusted GitHub state snapshot
-→ ci_publish_gate.py evaluate --intent <intent>
+→ ci_publish_gate.py evaluate --intent <intent> (receipt and the evidence its digest names)
 → ALLOW? execute exactly one returned operation
 → fetch remote and verify ancestry/head identity
 → record GitHub trusted-check state separately

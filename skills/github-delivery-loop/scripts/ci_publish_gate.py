@@ -346,7 +346,7 @@ def validate_actions(value: Any) -> dict[str, Any]:
 def validate_snapshot(value: dict[str, Any]) -> dict[str, Any]:
     exact_fields(
         value,
-        {"schema", "repository", "branch", "pull_request", "actions", "captured_at"},
+        {"schema", "repository", "branch", "initial_boundary", "pull_request", "actions", "captured_at"},
         "snapshot",
     )
     if value["schema"] != SNAPSHOT_SCHEMA:
@@ -354,11 +354,20 @@ def validate_snapshot(value: dict[str, Any]) -> dict[str, Any]:
     validate_repository(value["repository"])
     validate_branch(value["branch"])
     pull_request = validate_pull_request(value["pull_request"])
+    boundary = value["initial_boundary"]
+    if boundary not in {"trusted-initial", "branch-present-without-pr", "not-initial", "unproven"}:
+        raise InputError("snapshot.initial_boundary is unsupported")
     parse_time(value["captured_at"], "snapshot.captured_at")
-    if pull_request["state"] != "absent" and value["branch"]["head_sha"] != pull_request["head_sha"]:
-        raise InputError("snapshot branch head must match the observed PR head")
-    if pull_request["state"] == "absent" and value["branch"]["head_sha"] is not None:
-        raise InputError("absent PR publication requires the remote branch to be absent")
+    if pull_request["state"] != "absent":
+        if value["branch"]["head_sha"] != pull_request["head_sha"]:
+            raise InputError("snapshot branch head must match the observed PR head")
+        if boundary != "not-initial":
+            raise InputError("an observed PR requires initial_boundary=not-initial")
+    elif boundary == "branch-present-without-pr":
+        if value["branch"]["head_sha"] is None:
+            raise InputError("branch-present boundary requires an observed branch head")
+    elif value["branch"]["head_sha"] is not None:
+        raise InputError("absent/unproven branch boundary may not carry a branch head")
     validate_actions(value["actions"])
     return value
 
@@ -462,9 +471,10 @@ def validate_evidence(
         if not isinstance(command, dict):
             raise InputError(f"evidence.commands[{index}] must be an object")
         exact_fields(command, required, f"evidence.commands[{index}]")
+        if command["exit"] != 0:
+            raise InputError(f"evidence.commands[{index}] did not pass")
         if (
-            command["exit"] != 0
-            or command["timed_out"] is not False
+            command["timed_out"] is not False
             or command["spawn_error"] is not None
             or command["stdout_truncated"] is not False
             or command["stderr_truncated"] is not False
@@ -575,6 +585,21 @@ def evaluate(
     if intent == "initial-pr":
         if pr["state"] != "absent":
             return block("initial-pr-already-exists", intent, actual_head)
+        boundary = snapshot["initial_boundary"]
+        if boundary == "unproven":
+            return block(
+                "initial-boundary-unproven",
+                intent,
+                actual_head,
+                "snapshot lacks an independently observed remote branch ref",
+            )
+        if boundary != "trusted-initial":
+            return block(
+                "initial-boundary-refused",
+                intent,
+                actual_head,
+                f"initial_boundary is {boundary}",
+            )
         return Decision(
             "ALLOW",
             "allow-initial-pr",
@@ -653,6 +678,7 @@ def fixture_snapshot(head: str) -> dict[str, Any]:
             "private": True,
         },
         "branch": {"name": "feature", "head_sha": None},
+        "initial_boundary": "trusted-initial",
         "pull_request": {
             "number": None,
             "state": "absent",
@@ -736,6 +762,34 @@ def expect(
         )
 
 
+def refuse(
+    name: str,
+    snapshot: dict[str, Any],
+    proof: tuple[dict[str, Any], dict[str, Any], dict[str, Any]],
+    head: str,
+    mutate: Any,
+    *,
+    reseal: bool = False,
+) -> None:
+    """Plant one defect and require its named policy guard to refuse it."""
+    verification, evidence, contract = json.loads(json.dumps(proof))
+    mutate(verification, evidence, contract)
+    if reseal:
+        evidence_body = dict(evidence)
+        evidence_body.pop("content_sha256", None)
+        evidence["content_sha256"] = digest(evidence_body)
+        verification["evidence_sha256"] = digest(evidence)
+    try:
+        evaluate(
+            snapshot, verification, evidence, contract, "initial-pr", head,
+            "a" * 40, None,
+            datetime(2026, 8, 12, 5, 0, 5, tzinfo=timezone.utc),
+        )
+    except InputError:
+        return
+    raise InputError(f"selftest {name} unexpectedly passed")
+
+
 def selftest() -> None:
     head = "1" * 40
     new_head = "2" * 40
@@ -746,6 +800,30 @@ def selftest() -> None:
         "ALLOW",
         "allow-initial-pr",
         base,
+        proof,
+        "initial-pr",
+        head,
+    )
+
+    unproven = json.loads(json.dumps(base))
+    unproven["initial_boundary"] = "unproven"
+    expect(
+        "initial-boundary-unproven",
+        "BLOCK",
+        "initial-boundary-unproven",
+        unproven,
+        proof,
+        "initial-pr",
+        head,
+    )
+    orphan = json.loads(json.dumps(base))
+    orphan["branch"]["head_sha"] = "9" * 40
+    orphan["initial_boundary"] = "branch-present-without-pr"
+    expect(
+        "initial-boundary-refused",
+        "BLOCK",
+        "initial-boundary-refused",
+        orphan,
         proof,
         "initial-pr",
         head,
@@ -764,6 +842,47 @@ def selftest() -> None:
     else:
         raise InputError("selftest stale-local-verification unexpectedly passed")
 
+    refuse(
+        "fail-receipt-consumed-as-pass", base, proof, head,
+        lambda verification, evidence, contract: verification.__setitem__("status", "FAIL"),
+    )
+    refuse(
+        "receipt-names-other-evidence", base, proof, head,
+        lambda verification, evidence, contract: verification.__setitem__("evidence_sha256", "0" * 64),
+    )
+
+    def stale_content_digest(
+        verification: dict[str, Any],
+        evidence: dict[str, Any],
+        contract: dict[str, Any],
+    ) -> None:
+        verification["verified_at"] = "2026-08-12T05:00:01Z"
+        evidence["verified_at"] = verification["verified_at"]
+        verification["evidence_sha256"] = digest(evidence)
+
+    refuse("evidence-content-digest-stale", base, proof, head, stale_content_digest)
+    refuse(
+        "command-nonzero-exit", base, proof, head,
+        lambda verification, evidence, contract: evidence["commands"][0].__setitem__("exit", 1),
+        reseal=True,
+    )
+
+    def reorder_commands(
+        verification: dict[str, Any],
+        evidence: dict[str, Any],
+        contract: dict[str, Any],
+    ) -> None:
+        second_contract = dict(contract["commands"][0])
+        second_contract.update({"id": "second", "argv": ["python3", "-c", "raise SystemExit(0)"]})
+        contract["commands"].append(second_contract)
+        second_evidence = dict(evidence["commands"][0])
+        second_evidence.update({"id": second_contract["id"], "argv": second_contract["argv"]})
+        evidence["commands"].append(second_evidence)
+        evidence["contract_sha256"] = digest(contract)
+        verification["commands"] = ["second", "contract"]
+
+    refuse("receipt-command-order-differs", base, proof, head, reorder_commands, reseal=True)
+
     draft = json.loads(json.dumps(base))
     draft["pull_request"].update(
         {
@@ -775,6 +894,7 @@ def selftest() -> None:
         }
     )
     draft["branch"]["head_sha"] = head
+    draft["initial_boundary"] = "not-initial"
     expect(
         "repeat-initial",
         "BLOCK",
@@ -897,7 +1017,7 @@ def selftest() -> None:
         head,
         recovery,
     )
-    print("SELFTEST GREEN: GitHub Actions publication gate (10 policy cases)")
+    print("SELFTEST GREEN: GitHub Actions publication gate policy and mutation controls")
 
 
 def main(argv: list[str] | None = None) -> int:

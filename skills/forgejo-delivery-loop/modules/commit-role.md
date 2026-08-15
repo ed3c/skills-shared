@@ -59,9 +59,9 @@ git -C <repo> var GIT_AUTHOR_IDENT
 
 ---
 
-## §3 本機 Forgejo 線用哪個 email
+## §3 本機 Forgejo 線的人類預設身分
 
-**一律 `neon <neon@noreply.localhost>`**，兩個獨立理由：
+人直接操作時一律使用 `neon <neon@noreply.localhost>`，有兩個獨立理由：
 
 1. **歸屬**：Forgejo 用 author email 比對帳號。用 gmail commit，UI 上就是一個沒有頭像、
    點不進去的陌生人，issue／PR 的 `@` 關聯也對不上。
@@ -76,13 +76,20 @@ git -C <repo> config user.email neon@noreply.localhost
 **反向鐵律**：`neon@noreply.localhost` **只屬於這台機器的 Forgejo**。它出現在 GitHub／GitLab 的
 remote 上就是身分錯置——那邊的帳號永遠比對不到它，commit 直接失去歸屬。
 
+若目標 repo 有 `evals/commit-roles.json`，自動化 commit 另受該可執行契約約束：machine role
+必須使用 `<role>@<host>.invalid`，且 `Driven-By`／`Driven-On` 必須與 author 相符。這不是第二個
+Forgejo 帳號，也不產生 reviewer independence；它只防止把機器工作錯算成人的 contribution。
+
 ---
 
-## §4 agent 的署名（commit 由誰按下，與 commit 出自誰的手）
+## §4 agent 的署名（driver、carrier 與 forge actor 分開）
 
-- **author／committer 永遠是人**（上面設定的身分）。agent 不冒用第二個 git 身分去 commit——
-  一旦 agent 有自己的 author 身分，`git log` 就無法回答「這行程式碼是誰負責的」。
-- **agent 的參與寫在 trailer**，Claude Code 在 commit message 末尾附：
+- 人直接提交：使用 §3 的人類身分，`Driven-By: human`，並記錄實際 carrier。
+- agent 直接提交：使用 repo 的 machine-role vocabulary，例如
+  `agent-macro <agent-macro@codex-app.invalid>`，並連續寫入相符的 `Driven-By`／`Driven-On`
+  trailers。不可把 agent commit 偽標為 `human`。
+- forge 產生的 merge/squash commit：由可驗證的 forge committer address 分類；不要偽造 forge 身分。
+- `Co-Authored-By` 只補充模型參與。例如 Claude Code 可再附：
 
   ```
   Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
@@ -91,8 +98,8 @@ remote 上就是身分錯置——那邊的帳號永遠比對不到它，commit 
   Codex 有它自己的 trailer 慣例，依該 host 的規則走，**不要互相投射**。
   Forgejo 對 `Co-Authored-By:` 的 UI 呈現未實測——要它變成 UI 上的共同作者請先在本實例試一次，
   別假設與 GitHub 相同。
-- trailer 是**紀錄**不是**授權**：掛了 agent 名字不代表這個 commit 通過任何閘，
-  merge 仍然只由人 admit。
+- trailer 是**紀錄**不是**授權**：是否可自動 merge 由目標 repo 的 admission policy 決定，
+  不能從 author 身分推論。
 
 ---
 
@@ -100,11 +107,12 @@ remote 上就是身分錯置——那邊的帳號永遠比對不到它，commit 
 
 本實例是**單人本機部署**（`neon` 是唯一活躍帳號，且 `is_admin: false`）。因此：
 
-- 「讓另一個身分開 PR、由本人 review」在這裡沒有現實基礎——不必為此替 agent 造 git 身分。
-- **人閘就是人閘**：merge 永遠由人在 UI 上按（SKILL.md 的執行循環）。agent 推進到 PR 開好、
-  findings 齊備為止。
-- agent 自己捏一個 `user.email` **不會**在 Forgejo 眼中變成第二個人——它比對的是帳號上的 email，
-  比對不到就只是一串沒有歸屬的文字。
+- 「讓另一個身分開 PR、由本人 review」在這裡沒有現實基礎；machine-role identity 只是 provenance，
+  不是第二個帳號。
+- 需要人閘時仍須由真人 admit；允許自動 merge 時也必須由專屬 delivery gate 授權，不能靠改 email
+  冒充第二位 reviewer。
+- 任意捏一個 `user.email` **不會**在 Forgejo 眼中變成第二個人；只有 repo vocabulary 允許且 trailers
+  相符的 `.invalid` 身分才是可接受的 machine provenance。
 
 ---
 
@@ -112,9 +120,9 @@ remote 上就是身分錯置——那邊的帳號永遠比對不到它，commit 
 
 | repo | 觀測 | 機制 |
 |---|---|---|
-| `bettor-arena`（Forgejo 線） | log 同時有 `ed3c <mcnum01@gmail.com>` 與 `t <t@t.t>` | repo 層沒設 `user.email`，直接吃全域 gmail；另有一顆佔位身分。**這些 commit 在 Forgejo UI 上不連回 `neon`**（除非 gmail 已登記為次要 email，未查證），且把真實信箱寫進了 repo |
-| `ts-skill-bettor`（Forgejo 線） | 全部 `neon <neon@noreply.localhost>` | **這是正確樣板**。要抄就抄這個 |
-| `ed3c/skill-bettor`（GitHub 線，對照組） | 最近 6 個 commit 全是 `Loop Test <loop-test@example.invalid>` | 小迴圈為了測試在 repo 層設了 fixture 身分，之後真的推上去。`.invalid` 是保留 TLD，永遠比對不到任何帳號，且**無法事後修正而不 rewrite history** |
+| `<consumer-repo-a>`（Forgejo 線） | log 同時有全域真實信箱身分與 `Fixture User <fixture@example.invalid>` | repo 層沒設 `user.email`，直接吃全域身分；另有一顆佔位身分。**這些 commit 在 Forgejo UI 上不連回本機帳號**（除非真實信箱已登記為次要 email，未查證），且把真實信箱寫進了 repo |
+| `<consumer-repo-b>`（Forgejo 線） | 全部 `neon <neon@noreply.localhost>` | **這是正確樣板**。要抄就抄這個 |
+| `<owner>/<github-control-repo>`（GitHub 線，對照組） | 最近 6 個 commit 全是 `Loop Test <loop-test@example.invalid>` | 小迴圈為了測試在 repo 層設了 fixture 身分，之後真的推上去。`.invalid` 是保留 TLD，永遠比對不到任何帳號，且**無法事後修正而不 rewrite history** |
 
 **開工前的一次性檢查**（零網路，任何 CWD）：
 
@@ -142,7 +150,7 @@ Forgejo 線上輸出不是 `neon <neon@noreply.localhost>` → **停下先修設
    - 在**主 working tree** 切分支（`git checkout` / `git switch`）—— 共享 tree 會讓其他 session 的
      HEAD 漂移、commit 落錯分支。隔離一律走 worktree 或乾淨分支。
    - commit 不能編譯的程式碼。
-   - 用 agent 自造的 git 身分 commit（§4）。
+   - 使用 vocabulary 未登記，或與 trailers 不一致的 machine 身分（§4）。
    - 任意改 remote、force push。
 6. **與 delivery 收據的接合**：物化 repo 的那一刻同步寫 `delivery.json`；commit 前跑
    `check_delivery_receipt.py`（零網路 T0 閘）。**身分對、收據缺席一樣是 FATAL**，兩件事各管各的。
@@ -151,10 +159,11 @@ Forgejo 線上輸出不是 `neon <neon@noreply.localhost>` → **停下先修設
 
 ## §8 硬閘（本檔範圍內）
 
-- Forgejo 線上 `git var GIT_AUTHOR_IDENT` 不是 `neon <neon@noreply.localhost>` → 不得 commit。
+- 人直接提交時，`git var GIT_AUTHOR_IDENT` 不是 `neon <neon@noreply.localhost>` → 不得 commit。
+- agent 直接提交時，author 不是 vocabulary 允許的 `<role>@<host>.invalid`，或與 trailers 不一致 → 不得 commit。
 - 真實信箱（`mcnum01@gmail.com`）出現在 Forgejo 線的新 commit → 視為設定錯誤，不是風格差異。
 - `neon@noreply.localhost` 出現在 GitHub／GitLab 線 → 身分錯置，回去用對應的那一支 skill。
-- 身分靠環境變數臨時撐著、沒寫進 repo config → 視為未設定（下個 session 會漂回全域）。
-- agent 以自己的 author 身分 commit → 失敗，不是可接受的替代方案。
+- 人類預設身分只靠環境變數、沒寫進 repo config → 視為未設定；machine-role endpoint 則必須逐次
+  顯式注入並由 commit-role gate 回讀，不能污染 repo 的人類預設。
 - 憑證（`~/.git-credentials` 的內容、token、cookie）以任何形式進入 commit、log 或工具輸出 → FATAL。
 - 「未查證」與「已否定」在輸出裡必須長得不一樣（如 §1 的次要 email）。

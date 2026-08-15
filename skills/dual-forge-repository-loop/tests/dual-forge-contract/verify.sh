@@ -21,6 +21,91 @@ python3 "${forgejo_delivery_capture}" replay \
   --transport "${test_dir}/fixtures/proof/forgejo-delivery-transport.json" \
   --observation "${test_dir}/fixtures/proof/forgejo-delivery.json" >/dev/null
 
+# The live producer must obtain the worktree branch, HEAD/base ancestry, and
+# exclusive branch lease from a real Git worktree, not from receipt prose.
+worktree_case="${tmp}/worktree-producer"
+mkdir -p "${worktree_case}/repo"
+git -C "${worktree_case}/repo" init -q
+git -C "${worktree_case}/repo" fast-import --quiet < "${test_dir}/fixtures/proof/repository.fast-import"
+python3 - "${forgejo_delivery_capture}" "${test_dir}/fixtures/proof" \
+  "${worktree_case}/repo" "${worktree_case}/repair" <<'PY'
+import copy, importlib.util, json, pathlib, subprocess, sys
+script, proof, repo, worktree = map(pathlib.Path, sys.argv[1:])
+sys.path.insert(0, str(script.parent))
+spec = importlib.util.spec_from_file_location("forgejo_delivery_producer_test", script)
+module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+fixture = json.loads((proof / "forgejo-delivery-transport.json").read_text())
+responses = {
+    entry["argv"][1].removeprefix("/api/v1/"): entry["stdout"]
+    for entry in fixture["captures"]
+    if entry["argv"][0] == "forgejo-api-authenticated-read"
+}
+module.credentials = lambda _url: ("user", "password")
+module.forgejo_json = lambda _url, endpoint, _auth: (
+    json.loads(responses[endpoint]), responses[endpoint]
+)
+module.capture_artifact = lambda *_args: copy.deepcopy(fixture["desktop_artifacts"][0])
+creation = module.materialize(
+    repo, worktree, 12, "4cb614454eeb07e81ac1718746e2e99d3c3287d1",
+    "8a14401b45489bdc9a24b3a8a20178f1c06452e6400cc1b542ebc908e9bb4049",
+    "2026-08-14T09:55:05Z",
+)
+subprocess.run(
+    ["git", "-C", str(worktree), "merge", "--ff-only", "572aa3d2f0d50771cf2ab856f59a9b5923fed1f2"],
+    check=True, capture_output=True, text=True,
+)
+transport = module.capture(
+    "neon/example", "main", [12], [8],
+    "572aa3d2f0d50771cf2ab856f59a9b5923fed1f2", repo,
+    "http://localhost:3000", 12, worktree,
+    "4cb614454eeb07e81ac1718746e2e99d3c3287d1",
+    creation,
+)
+observation = json.loads((proof / "forgejo-delivery.json").read_text())
+observation["captured_at"] = transport["captured_at"]
+observation["recovery_worktree"]["observed_at"] = transport["captured_at"]
+observation["recovery_worktree"]["created_at"] = creation["created_at"]
+observation["recovery_worktree"]["creation_receipt_sha256"] = module.hashlib.sha256(
+    module.canonical(creation)
+).hexdigest()
+module.verify_observation(transport, observation)
+assert transport["captures"][4]["stdout"].startswith("<worktree>\ntrue\n")
+assert transport["captures"][9]["stdout"].count(
+    "branch refs/heads/recovery/issue-12-4b50cc080d2d8fc8"
+) == 1
+try:
+    module.capture(
+        "neon/example", "main", [12], [8],
+        "572aa3d2f0d50771cf2ab856f59a9b5923fed1f2", repo,
+        "http://localhost:3000", 12, repo,
+        "4cb614454eeb07e81ac1718746e2e99d3c3287d1", creation,
+    )
+except module.CaptureError as error:
+    assert "main working tree" in str(error)
+else:
+    raise AssertionError("main working tree was accepted as recovery worktree")
+alien = repo.parent / "alien"
+alien_worktree = repo.parent / "alien-repair"
+subprocess.run(["git", "clone", "-q", str(repo), str(alien)], check=True)
+subprocess.run(
+    ["git", "-C", str(alien), "worktree", "add", "-q", "--lock", "--reason",
+     creation["lock_reason"], "-b", creation["branch"], str(alien_worktree),
+     "572aa3d2f0d50771cf2ab856f59a9b5923fed1f2"],
+    check=True,
+)
+try:
+    module.capture(
+        "neon/example", "main", [12], [8],
+        "572aa3d2f0d50771cf2ab856f59a9b5923fed1f2", repo,
+        "http://localhost:3000", 12, alien_worktree,
+        "4cb614454eeb07e81ac1718746e2e99d3c3287d1", creation,
+    )
+except module.CaptureError as error:
+    assert "object graph" in str(error)
+else:
+    raise AssertionError("same-commit worktree from another clone was accepted")
+PY
+
 # The live producer must accept Forgejo's array list responses and enumerate
 # every open PR, not only PRs targeting the default branch.
 python3 - "${reconciliation_capture}" <<'PY'
@@ -309,6 +394,15 @@ expect_semantic_red unsent-desktop-recovery "t=load('forgejo-delivery-transport.
 expect_semantic_red desktop-screenshot-digest-forged "t=load('forgejo-delivery-transport.json'); comments=json.loads(t['captures'][2]['stdout']); body=comments[0]['body']; match=re.search(r'<!--\\s*three-strike-recovery\\s*(\\{.*?\\})\\s*-->',body,re.S); packet=json.loads(match.group(1)); packet['desktop_submission']['screenshot_sha256']='0'*64; comments[0]['body']=body[:match.start(1)]+json.dumps(packet,separators=(',',':'))+body[match.end(1):]; stdout=json.dumps(comments,separators=(',',':')); t['captures'][2]['stdout']=stdout; t['captures'][2]['stdout_sha256']=hashlib.sha256(stdout.encode()).hexdigest(); payload=(json.dumps(t,indent=2)+'\n').encode(); (proof_root/'forgejo-delivery-transport.json').write_bytes(payload); f=load('forgejo-delivery.json'); f['transport']['sha256']=hashlib.sha256(payload).hexdigest(); save('forgejo-delivery.json',f)"
 expect_semantic_red desktop-observer-not-comment-author "t=load('forgejo-delivery-transport.json'); comments=json.loads(t['captures'][2]['stdout']); body=comments[0]['body']; match=re.search(r'<!--\\s*three-strike-recovery\\s*(\\{.*?\\})\\s*-->',body,re.S); packet=json.loads(match.group(1)); packet['desktop_submission']['observer']['id']=99; comments[0]['body']=body[:match.start(1)]+json.dumps(packet,separators=(',',':'))+body[match.end(1):]; stdout=json.dumps(comments,separators=(',',':')); t['captures'][2]['stdout']=stdout; t['captures'][2]['stdout_sha256']=hashlib.sha256(stdout.encode()).hexdigest(); payload=(json.dumps(t,indent=2)+'\n').encode(); (proof_root/'forgejo-delivery-transport.json').write_bytes(payload); f=load('forgejo-delivery.json'); f['transport']['sha256']=hashlib.sha256(payload).hexdigest(); save('forgejo-delivery.json',f)"
 expect_semantic_red incomplete-three-strike-ledger "t=load('forgejo-delivery-transport.json'); comments=json.loads(t['captures'][2]['stdout']); body=comments[0]['body']; match=re.search(r'<!--\\s*three-strike-recovery\\s*(\\{.*?\\})\\s*-->',body,re.S); packet=json.loads(match.group(1)); packet['attempts']=packet['attempts'][:2]; comments[0]['body']=body[:match.start(1)]+json.dumps(packet,separators=(',',':'))+body[match.end(1):]; stdout=json.dumps(comments,separators=(',',':')); t['captures'][2]['stdout']=stdout; t['captures'][2]['stdout_sha256']=hashlib.sha256(stdout.encode()).hexdigest(); payload=(json.dumps(t,indent=2)+'\n').encode(); (proof_root/'forgejo-delivery-transport.json').write_bytes(payload); f=load('forgejo-delivery.json'); f['transport']['sha256']=hashlib.sha256(payload).hexdigest(); save('forgejo-delivery.json',f)"
+expect_semantic_red missing-recovery-worktree "f=load('forgejo-delivery.json'); del f['recovery_worktree']; save('forgejo-delivery.json',f)"
+expect_semantic_red recovery-worktree-before-desktop-response "t=load('forgejo-delivery-transport.json'); t['captured_at']='2026-08-14T09:55:04Z'; payload=(json.dumps(t,indent=2)+'\n').encode(); (proof_root/'forgejo-delivery-transport.json').write_bytes(payload); f=load('forgejo-delivery.json'); f['captured_at']=t['captured_at']; f['recovery_worktree']['observed_at']=t['captured_at']; f['transport']['sha256']=hashlib.sha256(payload).hexdigest(); save('forgejo-delivery.json',f)"
+expect_semantic_red recovery-worktree-wrong-issue "t=load('forgejo-delivery-transport.json'); t['recovery_worktree']['issue_number']=13; payload=(json.dumps(t,indent=2)+'\n').encode(); (proof_root/'forgejo-delivery-transport.json').write_bytes(payload); f=load('forgejo-delivery.json'); f['transport']['sha256']=hashlib.sha256(payload).hexdigest(); f['recovery_worktree']['issue_number']=13; save('forgejo-delivery.json',f)"
+expect_semantic_red recovery-worktree-wrong-head "t=load('forgejo-delivery-transport.json'); entry=t['captures'][4]; entry['stdout']=entry['stdout'].replace('572aa3d2f0d50771cf2ab856f59a9b5923fed1f2','0'*40); entry['stdout_sha256']=hashlib.sha256(entry['stdout'].encode()).hexdigest(); payload=(json.dumps(t,indent=2)+'\n').encode(); (proof_root/'forgejo-delivery-transport.json').write_bytes(payload); f=load('forgejo-delivery.json'); f['transport']['sha256']=hashlib.sha256(payload).hexdigest(); save('forgejo-delivery.json',f)"
+expect_semantic_red duplicate-recovery-writer-lease "t=load('forgejo-delivery-transport.json'); entry=t['captures'][9]; entry['stdout'] += '\nworktree <other-worktree-2>\nHEAD 572aa3d2f0d50771cf2ab856f59a9b5923fed1f2\nbranch refs/heads/recovery/issue-12-4b50cc080d2d8fc8\nlocked desktop-recovery:8a14401b45489bdc\n'; entry['stdout_sha256']=hashlib.sha256(entry['stdout'].encode()).hexdigest(); payload=(json.dumps(t,indent=2)+'\n').encode(); (proof_root/'forgejo-delivery-transport.json').write_bytes(payload); f=load('forgejo-delivery.json'); f['transport']['sha256']=hashlib.sha256(payload).hexdigest(); save('forgejo-delivery.json',f)"
+expect_semantic_red missing-worktree-creation "t=load('forgejo-delivery-transport.json'); del t['recovery_worktree']['creation']; payload=(json.dumps(t,indent=2)+'\n').encode(); (proof_root/'forgejo-delivery-transport.json').write_bytes(payload); f=load('forgejo-delivery.json'); f['transport']['sha256']=hashlib.sha256(payload).hexdigest(); save('forgejo-delivery.json',f)"
+expect_semantic_red stale-worktree-creation "t=load('forgejo-delivery-transport.json'); t['recovery_worktree']['creation']['created_at']='2026-08-14T09:55:04Z'; payload=(json.dumps(t,indent=2)+'\n').encode(); (proof_root/'forgejo-delivery-transport.json').write_bytes(payload); f=load('forgejo-delivery.json'); f['transport']['sha256']=hashlib.sha256(payload).hexdigest(); f['recovery_worktree']['created_at']='2026-08-14T09:55:04Z'; save('forgejo-delivery.json',f)"
+expect_semantic_red preexisting-worktree-before-creation "t=load('forgejo-delivery-transport.json'); entry=t['recovery_worktree']['creation']['captures'][0]; entry['stdout'] += 'worktree <worktree>\n'; entry['stdout_sha256']=hashlib.sha256(entry['stdout'].encode()).hexdigest(); payload=(json.dumps(t,indent=2)+'\n').encode(); (proof_root/'forgejo-delivery-transport.json').write_bytes(payload); f=load('forgejo-delivery.json'); f['transport']['sha256']=hashlib.sha256(payload).hexdigest(); save('forgejo-delivery.json',f)"
+expect_semantic_red split-worktree-common-dir "t=load('forgejo-delivery-transport.json'); entry=t['captures'][8]; entry['stdout']='<other-common-git-dir>\n'; entry['stdout_sha256']=hashlib.sha256(entry['stdout'].encode()).hexdigest(); payload=(json.dumps(t,indent=2)+'\n').encode(); (proof_root/'forgejo-delivery-transport.json').write_bytes(payload); f=load('forgejo-delivery.json'); f['transport']['sha256']=hashlib.sha256(payload).hexdigest(); save('forgejo-delivery.json',f)"
 expect_semantic_red missing-forgejo-pr-closure-link "t=load('forgejo-delivery-transport.json'); raw=json.loads(t['captures'][3]['stdout']); raw['body']='No closure link'; stdout=json.dumps(raw,separators=(',',':')); t['captures'][3]['stdout']=stdout; t['captures'][3]['stdout_sha256']=hashlib.sha256(stdout.encode()).hexdigest(); payload=(json.dumps(t,indent=2)+'\n').encode(); (proof_root/'forgejo-delivery-transport.json').write_bytes(payload); f=load('forgejo-delivery.json'); f['transport']['sha256']=hashlib.sha256(payload).hexdigest(); f['merged_prs'][0]['body_sha256']=hashlib.sha256(b'No closure link').hexdigest(); f['merged_prs'][0]['closes_issues']=[]; save('forgejo-delivery.json',f)"
 expect_semantic_red forged-forgejo-merged-pr "f=load('forgejo-delivery.json'); f['merged_prs'][0]['merged']=False; save('forgejo-delivery.json',f)"
 expect_semantic_red forged-local-main-merge "f=load('forgejo-delivery.json'); f['local_main_merge']['parents']=[]; save('forgejo-delivery.json',f)"
@@ -348,4 +442,4 @@ rc=$?
 set -e
 [ "${rc}" -eq 64 ] || { echo "absent input exit=${rc}, want 64" >&2; exit 1; }
 
-echo "SELFTEST GREEN: positive admitted; 59 planted publication/order/authority defects refused; partial and absent inputs stayed distinct"
+echo "SELFTEST GREEN: positive admitted; 68 planted publication/order/authority defects refused; partial and absent inputs stayed distinct"

@@ -138,6 +138,7 @@ class GateDecisionTests(unittest.TestCase):
                 "private": True,
             },
             "branch": {"name": "agent/fixture", "head_sha": None},
+            "initial_boundary": "trusted-initial",
             "pull_request": {
                 "number": None,
                 "state": "absent",
@@ -155,6 +156,11 @@ class GateDecisionTests(unittest.TestCase):
             "captured_at": now.isoformat().replace("+00:00", "Z"),
         }
         snapshot.update(overrides.get("snapshot", {}))
+        if (
+            snapshot["pull_request"]["state"] != "absent"
+            and "initial_boundary" not in overrides.get("snapshot", {})
+        ):
+            snapshot["initial_boundary"] = "not-initial"
         verification.update(overrides.get("verification", {}))
         if "evidence" in overrides:
             evidence.update(overrides["evidence"])
@@ -177,9 +183,10 @@ class GateDecisionTests(unittest.TestCase):
         module = load_module("ci_publish_gate")
         subject = self.subject(snapshot={
             "branch": {"name": "agent/fixture", "head_sha": "1" * 40},
+            "initial_boundary": "branch-present-without-pr",
         })
-        with self.assertRaisesRegex(module.InputError, "remote branch to be absent"):
-            self.decide(module, subject)
+        decision = self.decide(module, subject)
+        self.assertEqual(decision.reason, "initial-boundary-refused")
 
     def test_stale_verification_head_is_refused(self) -> None:
         module = load_module("ci_publish_gate")

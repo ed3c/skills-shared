@@ -1,82 +1,155 @@
 # spatial-loop-systems-engineering
 
-A portable method for turning kernel-, hardware-, concurrency-, resource-, and
-lifecycle-dependent work into a falsifiable system contract before core code is
-written.
+A portable **Constraint-First Spatial Systems Engineering** method with a monitor-first **Shadow Architecture Control Loop**.
 
-The Skill uses spatial language to preserve whole-system reasoning, but every
-metaphor must resolve to a concrete owner, mechanism, transition, budget, probe,
-oracle, or receipt.
+The default operating mode is `MONITOR`: the Builder may explore, design, implement, test, and refactor normally while a separate Shadow Architect watches material System Design deltas, hidden assumptions, and evidence drift. `PRECHECK` is reserved for high-risk or irreversible transitions. `POSTMORTEM` reverse-engineers the actual architecture after failure or first-green.
+
+The Skill still classifies work from Level A local deterministic changes through Level D substrate-sensitive systems. Level C/D work may never silently degrade into ordinary feature-generation behavior.
+
+## Canonical flow
+
+```text
+Universal Constraint-First System Prompt
+        ↓
+User Prompt / PDF / PRD / Diagram / Repo
+        ↓
+Constraint Compiler
+   ┌────┼────────┐
+   ↓    ↓        ↓
+Domain Unknown   Hard laws
+module probes
+   └────┼────────┘
+        ↓
+Executable Spec
+        ↓
+Builder implementation
+        ↕
+Shadow Architecture Watch Loop
+        ↓
+Harness / Evals
+```
+
+The core transformation remains:
+
+```text
+WHAT THE USER WANTS
+→ WHAT MUST ALWAYS REMAIN TRUE
+→ HOW WE CAN KNOW IT REMAINS TRUE
+
+Intent
+→ Boundary
+→ State
+→ Invariant
+→ Failure
+→ Oracle
+→ Evidence
+→ Implementation
+```
+
+Under `MONITOR`, that transformation can be applied incrementally as implementation reveals architecture deltas instead of blocking harmless exploration up front.
+
+## Operating modes
+
+| Mode | Default? | Purpose |
+|---|---:|---|
+| [`MONITOR`](modes/monitor.md) | yes | preserve Builder exploration while watching architecture/evidence drift |
+| [`PRECHECK`](modes/precheck.md) | no | gate high-risk or irreversible material transitions before they occur |
+| [`POSTMORTEM`](modes/postmortem.md) | no | reconstruct implicit architecture from actual code/runtime/failure evidence |
+
+The monitor contract is [`references/architecture-watch-loop.md`](references/architecture-watch-loop.md). A compact copyable prompt overlay is [`references/system-prompt-monitor-overlay.md`](references/system-prompt-monitor-overlay.md).
+
+## Shadow Architecture intervention
+
+```text
+L0 OBSERVE
+→ L1 WARN
+→ L2 REVIEW
+→ L3 BLOCK
+```
+
+The Shadow Architect monitors these material deltas:
+
+```text
+ASSUMPTION_DELTA
+STATE_DELTA
+AUTHORITY_DELTA
+OWNERSHIP_DELTA
+LIFECYCLE_DELTA
+CONCURRENCY_DELTA
+RESOURCE_DELTA
+EXTERNAL_SIDE_EFFECT_DELTA
+FAILURE_SURFACE_DELTA
+EVIDENCE_DELTA
+```
+
+It asks:
+
+```text
+What became newly possible?
+What must now remain true?
+How would we know it is false?
+```
+
+The Shadow Architect is not a second implementation writer.
+
+## Mandatory checkpoints
+
+```text
+ARCHITECTURE_CHOICE
+FIRST_VERTICAL_SLICE
+PERSISTENCE_INTRODUCED
+ASYNC_OR_CONCURRENCY_INTRODUCED
+EXTERNAL_INTEGRATION_INTRODUCED
+FIRST_GREEN
+BEFORE_PR_OR_PUBLICATION
+CI_OR_RUNTIME_FAILURE_WITH_DESIGN_IMPACT
+```
+
+`FIRST_GREEN` is intentionally special: passing tests may prove a coded path while leaving implicit assumptions, unexercised runtime behavior, failure states, or unreconciled side effects. Green remains green for its exact evidence subject; it does not automatically mean done.
 
 ## Document authority
 
 | Question | Route |
 |---|---|
-| Procedure, state machine, gates, and evidence laws | [`SKILL.md`](SKILL.md) |
-| Base copyable System / Spec Prompt | [`references/system-prompt.md`](references/system-prompt.md) |
+| Universal compiler, modes, complexity, hard laws, gates, anti-drift | [`SKILL.md`](SKILL.md) |
+| Base universal System / Spec Prompt | [`references/system-prompt.md`](references/system-prompt.md) |
+| MONITOR-mode copyable overlay | [`references/system-prompt-monitor-overlay.md`](references/system-prompt-monitor-overlay.md) |
+| Shadow Architecture watch loop | [`references/architecture-watch-loop.md`](references/architecture-watch-loop.md) |
 | Repeated-failure System Prompt overlay | [`references/system-prompt-recovery-overlay.md`](references/system-prompt-recovery-overlay.md) |
 | Three-failure issue/fresh-diagnosis/worktree contract | [`references/three-failure-escalation.md`](references/three-failure-escalation.md) |
 | Human-readable and JSON spec packet | [`references/spec-packet-template.md`](references/spec-packet-template.md) |
-| Linux namespace/cgroup/seccomp/microVM instance | [`modules/linux-isolation-runtime.md`](modules/linux-isolation-runtime.md) |
-| Deterministic contract checker | [`scripts/check_system_contract.py`](scripts/check_system_contract.py) |
-| Positive, hollow, mutation, and recovery-routing controls | [`evals.json`](evals.json), [`tests/`](tests/) |
+| Triggered domain expansion policy | [`modules/README.md`](modules/README.md) |
+| Linux isolation specialization | [`modules/linux-isolation-runtime.md`](modules/linux-isolation-runtime.md) |
+| Deterministic system-contract checker | [`scripts/check_system_contract.py`](scripts/check_system_contract.py) |
+| Regression controls | [`evals.json`](evals.json), [`tests/`](tests/) |
 
 ## Owned state and data flow
 
 ```text
-task + exact subject + environment
+source intent / candidate architecture
         ↓
-realm / boundary / flow map
+complexity A/B/C/D + operating mode
         ↓
-state machine + hard invariants + resource envelope
+Builder exploration / implementation
+        ↕
+Shadow Architect observes material deltas
         ↓
-capability probes + collision matrix + teardown symmetry
+assumption + state + authority + lifecycle + evidence ledgers
         ↓
-verification oracles + performance contract
+constraint compiler / domain expansion / unknown probes
         ↓
-spatial-loop-system-contract/v1
+material-boundary gate when required
         ↓
-deterministic closure check
-   ┌────┴────────────────────┐
-   ↓                         ↓
-BLOCKED / PROTOTYPE      READY_FOR_IMPLEMENTATION
-   ↓                         ↓
-bounded handoff          implementation reconciliation loop
-                              │
-                              ├── PASS → handoff
-                              ├── FAIL #1/#2 → bounded retry
-                              └── qualifying FAIL #3
-                                      ↓
-                              ESCALATION_REQUIRED
-                                      ↓
-                              forge issue + failure packet
-                                      ↓
-                              fresh diagnosis context
-                                      ↓
-                              new isolated worktree/branch
-                                      ↓
-                              repair → owning oracle + negative control
-                                      ↓ PASS
-                              commit → forge-native PR
-                                      ↓
-                              existing Human/trusted-operator merge policy
+Harness / Evals
+        ↓
+checkpoint review, especially FIRST_GREEN and BEFORE_PR
+        ↓
+PASS / bounded repair / postmortem / three-failure escalation
 ```
 
-Normal repositories with an admitted local Forgejo binding route the escalation
-issue and PR through `forgejo-delivery-loop`. GitHub Actions and GitHub-hosted CI
-incidents stay on GitHub so workflow/run/job/head evidence remains authoritative
-and publication uses `github-delivery-loop`. `git-town-stacked-pr-worker` owns
-the portable isolated-worktree/branch method when the consumer admits Git Town.
+## Domain decoupling
 
-The intended desktop recovery workflow opens a new ChatGPT Desktop
-question/session after the issue packet exists. That is a host/operator step; a
-runtime that cannot launch the desktop session must emit a fresh-diagnosis
-handoff instead of claiming it ran.
-
-`loop-harness-standard` owns generic execution-loop scaffolding.
-`truth-verify-loop` owns mutable external-claim verification. This Skill owns
-the system-state-space contract that decides what may be implemented and what
-may be claimed.
+The universal method stays in `SKILL.md`. Domain-specific knowledge stays in `modules/` and is loaded only when triggered. Domain modules may extend the core method; they may not replace it, downgrade complexity, redefine evidence states, bypass a material-boundary gate, or disable architecture monitoring.
 
 ## Directory map
 
@@ -85,9 +158,14 @@ skills/spatial-loop-systems-engineering/
 ├── README.md
 ├── SKILL.md
 ├── evals.json
+├── modes/
+│   ├── monitor.md
+│   ├── precheck.md
+│   └── postmortem.md
 ├── references/
-│   ├── README.md
+│   ├── architecture-watch-loop.md
 │   ├── system-prompt.md
+│   ├── system-prompt-monitor-overlay.md
 │   ├── system-prompt-recovery-overlay.md
 │   ├── three-failure-escalation.md
 │   └── spec-packet-template.md
@@ -95,13 +173,12 @@ skills/spatial-loop-systems-engineering/
 │   ├── README.md
 │   └── linux-isolation-runtime.md
 ├── scripts/
-│   ├── README.md
 │   └── check_system_contract.py
 └── tests/
-    ├── README.md
     ├── run-all.sh
-    ├── recovery-escalation/
-    │   └── verify.sh
+    ├── architecture-watch/verify.sh
+    ├── universal-entry/verify.sh
+    ├── recovery-escalation/verify.sh
     └── system-contract/
         ├── verify.sh
         └── fixtures/good.json
@@ -110,22 +187,21 @@ skills/spatial-loop-systems-engineering/
 ## Evidence boundary
 
 ```text
-contract structure and gate consistency       IMPLEMENTED
-vague-performance refusal                     IMPLEMENTED
-required-capability gate                       IMPLEMENTED
-teardown/reference closure                     IMPLEMENTED
-three-failure escalation routing               IMPLEMENTED
-fresh ChatGPT Desktop session execution        HOST_OPERATOR_BOUND
-physical Linux isolation behavior              NOT_EXERCISED
-real hardware performance                      NOT_EXERCISED
-security or production-readiness claim         HUMAN_ADMIT_REQUIRED
+monitor-first operating contract                   IMPLEMENTED
+Shadow Architecture delta/intervention contract    IMPLEMENTED
+FIRST_GREEN meta-review                             IMPLEMENTED
+PRECHECK / POSTMORTEM mode contracts               IMPLEMENTED
+universal Constraint-First entry method            IMPLEMENTED
+A/B/C/D anti-degradation law                       IMPLEMENTED
+domain-extension/decoupling contract               IMPLEMENTED
+machine contract structure and gate consistency    IMPLEMENTED
+three-failure escalation routing                   IMPLEMENTED
+live continuous Shadow Architect runtime           NOT_EXERCISED
+fresh ChatGPT Desktop session execution            HOST_OPERATOR_BOUND
+physical Linux isolation behavior                  NOT_EXERCISED
+real hardware performance                          NOT_EXERCISED
+security or production acceptance                  HUMAN_ADMIT_REQUIRED
 ```
-
-The deterministic checker proves that the contract is structurally closed and
-internally consistent. The recovery routing control proves that the mandatory
-three-failure/fresh-context/worktree/forge boundaries are present. Neither can
-prove that a referenced runtime receipt is truthful, that a desktop session ran,
-that the kernel behaves as assumed, or that the system is secure.
 
 ## Run the controls
 
@@ -133,7 +209,4 @@ that the kernel behaves as assumed, or that the system is secure.
 bash skills/spatial-loop-systems-engineering/tests/run-all.sh
 ```
 
-A green suite means the good contract is admitted, planted defects are refused,
-and the recovery-routing contract is present. It does not mean a sandbox,
-hypervisor, kernel, hardware target, Forgejo mutation, GitHub Actions run, or
-ChatGPT Desktop session was executed.
+A green suite proves the checked repository bytes retain the monitor-first laws, universal entry, machine-contract closure, and recovery routing. It does not prove that a live agent host continuously monitored another agent, that an external provider or physical substrate ran, or that the resulting system is production-safe.

@@ -124,6 +124,20 @@ def verify(repo_root: Path, policy_path: Path) -> Path:
     return receipt
 
 
+def _capture_live_state(
+    repository: str, branch: str, check_name: str
+) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
+    """Capture one provider-bound state and derive its strict snapshot."""
+    transport = github_actions_snapshot.capture_transport(
+        repository, branch, check_name, 30
+    )
+    observation = github_actions_snapshot.observation_from_transport(transport)
+    snapshot = github_actions_snapshot.build(
+        observation, check_name, strict=True
+    )
+    return transport, observation, snapshot
+
+
 def publish(
     repo_root: Path,
     policy_path: Path,
@@ -154,12 +168,10 @@ def publish(
     if len(policy["required_jobs"]) != 1:
         raise PublicationError("publication requires exactly one stable check name")
     if execute:
-        observation = github_actions_snapshot.capture(
-            policy["repository"], target_branch, policy["required_jobs"][0], "gh", 30
+        transport, observation, snapshot = _capture_live_state(
+            policy["repository"], target_branch, policy["required_jobs"][0]
         )
-        snapshot = github_actions_snapshot.build(
-            observation, policy["required_jobs"][0]
-        )
+        _write_json(_receipt_path(repo_root, "live-transport.json"), transport)
         _write_json(_receipt_path(repo_root, "live-observation.json"), observation)
         effective_snapshot_path = _receipt_path(repo_root, "live-snapshot.json")
         _write_json(effective_snapshot_path, snapshot)

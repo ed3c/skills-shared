@@ -56,6 +56,21 @@ python3 $INFRA adopt <name> --from <path> --why "…" [--defer <repo>] [--dry-ru
 `check` exit 0 乾淨｜1 有裁決被違反；`report` exit 3 有待裁項（**待裁不是失敗**）。
 正控＝`tests/verify.sh`（全合成世界，不碰這台機器真實 skill 樹，零網路）。
 
+### 內容 ownership 與 body-neutrality
+
+`evals/body-neutrality.json` v2 將受管 Markdown 明分四類：
+
+| 類別 | owner／判準 |
+|---|---|
+| `portable_body` | shared Skill 的通用程序；預設類別，接受 body-neutrality ratchet |
+| `repo_binding_source` | consumer-specific 投影真源；由其 projection manifest、byte equality、budget 與 UNREGISTERED 控制治理 |
+| `generated_projection` | consumer 端生成物；由 projection readback 治理，本 repo 目前不保存此類輸出 |
+| `archive_evidence` | 歷史／證據；不冒充現行程序，由其 receipt／fixture owner 治理 |
+
+未分類檔案一律落入 `portable_body`，不是默認豁免。非 body root 必須精確列入 manifest；整支 Skill
+不能被排除。執行入口為 `scripts/check_body_neutrality.py --selftest` 與 repo root 相容轉發器
+`scripts/check_body_neutrality.py`。
+
 ### `scripts/check_index.py` — 索引對它宣稱的那棵樹，兩個方向都要驗
 
 一份索引會**單向失效**：死連結點下去才知道，**漏列的檔案永遠沒人會知道**——

@@ -255,7 +255,14 @@ checking proves binding/replay of those bytes; a synthetic fixture still does no
 prove a live capture, so the live producer process remains the trusted provider lane.
 
 `capture_forgejo_delivery.py` binds the implementation issue, merged Forgejo
-PR, and local-main commit parents/tree. The checker separately requires the
+PR, and local-main commit parents/tree. After the Desktop response, its
+`materialize` command derives a causal branch from the Desktop receipt digest,
+issue, and base SHA, then performs the only admitted `git worktree add`: a fresh
+path, `--lock`, and no force/reset flags. Delivery replay rejects the main tree,
+a pre-existing path/ref, an older creation timestamp, an unlocked or duplicated
+branch holder, and a worktree whose common Git directory differs from the target
+repository. Commit identity alone cannot prove repository ownership because a
+separate clone can contain the same objects. The checker separately requires the
 canonical exact-HEAD verification receipt, detailed command evidence, and the
 content-addressed argv contract for that local-main tree; a bare `PASS` label or
 command-name list is not verification. Delivery capture also replays the full

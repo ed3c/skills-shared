@@ -20,6 +20,62 @@ cp "${real_script}" "${script}"
 # because `check` needs it: `check` no longer runs it.
 cp "$(dirname "${real_script}")/check_dead_assertions.py" \
    "${shared}/skills/shared-skills-infra/scripts/"
+# `check` now runs the two #1 gates as subprocesses, so the fixture has to carry
+# them. Leaving one out makes every later assertion pass or fail for a reason
+# that has nothing to do with what it is testing -- the same defect that had
+# check_publication_boundary.py reporting five killed mutations while killing
+# none.
+cp "$(dirname "${real_script}")/check_body_neutrality.py" \
+   "$(dirname "${real_script}")/check_binding_stale.py" \
+   "${shared}/skills/shared-skills-infra/scripts/"
+
+# Body neutrality judges portable procedure, not every Markdown byte stored
+# under a Skill. The ownership manifest must classify repository binding
+# sources explicitly; a generic excluded-directory constant is not evidence.
+typed="${world}/typed-ownership"
+typed_gate="${shared}/skills/shared-skills-infra/scripts/check_body_neutrality.py"
+mkdir -p "${typed}/evals" \
+         "${typed}/skills/demo" \
+         "${typed}/skills/forgejo-delivery-loop/agent-docs/example-repo"
+printf '%s\n' '# portable' 'This sentence is true in any repository.' \
+  > "${typed}/skills/demo/SKILL.md"
+printf '%s\n' '# binding source' 'Project: bettor-arena' \
+  > "${typed}/skills/forgejo-delivery-loop/agent-docs/example-repo/AGENTS.md"
+cat > "${typed}/evals/body-neutrality.json" <<'JSON'
+{
+  "schema": "body-neutrality/v2",
+  "ownership": {
+    "portable_body": {"default": true},
+    "repo_binding_source": {
+      "roots": ["skills/forgejo-delivery-loop/agent-docs"]
+    },
+    "generated_projection": {"roots": []},
+    "archive_evidence": {"parts": ["superseded"]}
+  },
+  "owed": {}
+}
+JSON
+if ! python3 "${typed_gate}" --repo-root "${typed}" \
+  >"${world}/typed.out" 2>"${world}/typed.err"; then
+  echo "FAIL: typed repo-binding ownership was not accepted" >&2
+  sed -n '1,80p' "${world}/typed.err" >&2
+  exit 1
+fi
+grep -q "repo_binding_source=1" "${world}/typed.out"
+
+mkdir -p "${shared}/evals"
+cat > "${shared}/evals/body-neutrality.json" <<'JSON'
+{
+  "schema": "body-neutrality/v2",
+  "ownership": {
+    "portable_body": {"default": true},
+    "repo_binding_source": {"roots": []},
+    "generated_projection": {"roots": []},
+    "archive_evidence": {"parts": ["superseded"]}
+  },
+  "owed": {}
+}
+JSON
 printf -- '---\nname: demo-skill\n---\nbody\n' > "${shared}/skills/demo-skill/SKILL.md"
 # the tool is itself a registered skill, so its fixture needs the same shape
 printf -- '---\nname: shared-skills-infra\n---\nbody\n' \
@@ -334,5 +390,42 @@ test "$(realpath "${world}/surfaces/codex/demo-skill")" = "$(realpath "${moved}/
 #    above would be read as live code and reported against this gate.
 python3 "$(dirname "${real_script}")/check_dead_assertions.py" > "${world}/7.out"
 grep -q "^PASS no dead assertions" "${world}/7.out"
+
+# 8. the two #1 gates are folded into `check` with different weights, and the
+#    difference is the point. A shared body naming a host repository FAILS,
+#    because it reaches four other repositories as if it were true there; a
+#    binding pinned to an older body SURFACES, because it means "re-retarget",
+#    not "broken". Wired-but-never-exercised would leave both indistinguishable
+#    from absent.
+printf '# Demo\n\nRun this inside skill-bettor.\n' \
+  > "${moved}/skills/shared-skills-infra/BOUND.md"
+set +e
+python3 "${moved_script}" check --sites "${sites}" \
+  > "${world}/8.out" 2> "${world}/8.err"
+neutrality_rc=$?
+set -e
+[ "${neutrality_rc}" -eq 1 ] || {
+  echo "FAIL: a host-bound shared body exited ${neutrality_rc}, expected 1" >&2
+  exit 1; }
+grep -q "names a host repository" "${world}/8.err"
+rm "${moved}/skills/shared-skills-infra/BOUND.md"
+
+# 9. a stale binding surfaces and `check` still passes. Nothing follows, so the
+#    planted slot stays in the discarded temp world rather than being cleaned up.
+mkdir -p "${moved}/.skill-bindings/shared-skills-infra"
+zeros="$(python3 -c 'print("0" * 64)')"
+{
+  printf -- '---\n'
+  printf 'skill: shared-skills-infra\n'
+  printf 'upstream: antigravity-shared-skills-infra@shared\n'
+  printf 'retargeted_at: 2026-08-14\n'
+  printf 'body_version: %s\n' "${zeros}"
+  printf -- '---\n\nplanted\n'
+} > "${moved}/.skill-bindings/shared-skills-infra/binding.md"
+python3 "${moved_script}" check --sites "${sites}" \
+  > "${world}/9.out" 2> "${world}/9.err"
+grep -q "^SURFACE" "${world}/9.out"
+grep -q "re-retarget" "${world}/9.out"
+grep -q "^PASS shared skills hold" "${world}/9.out"
 
 echo "PASS shared-skills gate"

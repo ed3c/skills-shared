@@ -66,6 +66,24 @@ step "delivery shape comparison controls"
 python3 scripts/measure_delivery_shape.py selftest
 
 step "guard controls"
+python3 scripts/check_binding_stale.py --selftest
+# Exit 3 is SURFACE, not failure: the body moved and some host has not caught
+# up. Collapsing it into failure would make routine drift indistinguishable from
+# a malformed contract, and whoever sees it would learn to ignore both.
+set +e
+python3 scripts/check_binding_stale.py
+binding_code=$?
+set -e
+if [ "${binding_code}" -ne 0 ] && [ "${binding_code}" -ne 3 ]; then
+  echo "FAIL check_binding_stale.py exited ${binding_code}" >&2
+  exit 1
+fi
+python3 scripts/check_body_neutrality.py --selftest
+python3 scripts/check_body_neutrality.py
+python3 scripts/check_ci_publication_profile.py --selftest
+python3 scripts/check_ci_publication_profile.py
+python3 scripts/skill_eval_plane_selftest.py
+python3 scripts/check_skill_eval_plane.py
 python3 scripts/check_guard_controls.py --repo-root . --selftest
 python3 scripts/check_guard_controls.py --repo-root .
 

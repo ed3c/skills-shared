@@ -26,6 +26,9 @@ zero-network ci_publish_gate.py
 | `ready-for-review` | the PR is still draft; all planned local commits have been batched | optionally one push, then one ready-for-review transition |
 | `batched-repair` | a ready PR has new actionable CI/review feedback bound to its exact remote head | one repair push containing the whole response batch |
 
+`initial-pr` 的「remote branch 不存在」必須來自 trusted capture 對 exact
+`refs/heads/<branch>` 的 raw API transport；只有 PR inventory 為空時，狀態仍是 `unproven`，不得出版。
+
 Everything else is a local checkpoint. Do not push after every commit, after every Agent turn, or merely to test whether billing recovered.
 
 ## Evidence-production pipeline
@@ -117,6 +120,10 @@ python3 skills/github-delivery-loop/scripts/github_actions_snapshot.py capture \
 ```
 
 It uses fixed `gh api` argv only and performs no mutation. It resolves exact private repository identity, zero or one open PR, exact PR head, exact stable check name, conclusion and annotations.
+
+需要把分支缺席當成 publication authority 時加 `--strict`；orphan remote branch 會轉紅，且
+snapshot 的 `initial_boundary` 只可能是 `trusted-initial`、`branch-present-without-pr`、
+`not-initial` 或 `unproven`。
 
 Proof replay starts from raw transport and is zero-network:
 

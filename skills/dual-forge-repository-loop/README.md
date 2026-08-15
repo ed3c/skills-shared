@@ -53,7 +53,7 @@ repository merge policy / Human Admit
 - [`scripts/export_git_proof.py`](scripts/export_git_proof.py): canonical four-ref Git ancestry/tree proof producer.
 - [`scripts/capture_origin_ref.py`](scripts/capture_origin_ref.py): canonical GitHub API, authenticated loopback Forgejo API, and local Git default-ref observation producer.
 - [`scripts/capture_reconciliation.py`](scripts/capture_reconciliation.py): exhaustive paginated GitHub/Forgejo open-PR/open-issue raw transport and typed-inventory replay.
-- [`scripts/capture_forgejo_delivery.py`](scripts/capture_forgejo_delivery.py): Forgejo issue/merged-PR plus local-main parent/tree receipt producer and replay.
+- [`scripts/capture_forgejo_delivery.py`](scripts/capture_forgejo_delivery.py): causal fresh-worktree materialization, Forgejo issue/merged-PR plus local-main parent/tree receipt producer and replay.
 - [`evals.json`](evals.json), [`tests/`](tests/): positive and planted-negative controls.
 
 ## Evidence boundary

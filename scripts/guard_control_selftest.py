@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import json
 import sys
+import subprocess
 import tempfile
 from pathlib import Path
 from typing import Any
@@ -108,6 +109,32 @@ def run_selftest(repo_root: Path) -> int:
         expect(any("cannot fail" in p for p in problems),
                f"an uncontrolled guard was not reported: {problems}")
 
+    # Every guard in the manifest, not the first one. The selftest called
+    # check_guard directly for each shape, so the loop in main() -- the one that
+    # actually decides whether the manifest was read in full -- was never
+    # exercised: truncating it to `guards[:1]` left this selftest green. That is
+    # #16's group-size-one shape, in the gate every other guard depends on.
+    with tempfile.TemporaryDirectory(prefix="gc-plural.") as raw:
+        root = Path(raw)
+        build(root, UNCONTROLLED_VERIFY)
+        (root / "second.py").write_text(GUARDED, encoding="utf-8")
+        (root / "evals").mkdir()
+        first = guard_entry()
+        first["id"] = "fixture-guard-first"
+        second = guard_entry()
+        second["id"] = "fixture-guard-second"
+        second["file"] = "second.py"
+        (root / "evals" / "guard-controls.json").write_text(
+            json.dumps({"schema": "guard-control-manifest/v1", "guards": [first, second]}),
+            encoding="utf-8")
+        completed = subprocess.run(
+            [sys.executable, str(Path(__file__).resolve().parent / "check_guard_controls.py"),
+             "--repo-root", str(root)],
+            capture_output=True, text=True, check=False)
+        reported = completed.stderr
+        expect("fixture-guard-first" in reported and "fixture-guard-second" in reported,
+               f"only some guards in the manifest were checked: {reported!r}")
+
     # Shape C: a verify whose assertions are unreachable is reported as
     # unproven, not as uncontrolled. Those are different findings.
     with tempfile.TemporaryDirectory(prefix="gc-unreachable.") as raw:
@@ -175,5 +202,6 @@ def run_selftest(repo_root: Path) -> int:
             print(f"SELFTEST RED: {item}", file=sys.stderr)
         return 2
     print("SELFTEST GREEN: controlled guard admitted; uncontrolled, unreachable, "
-          "drifted and ambiguous cases each reported distinctly")
+          "drifted and ambiguous cases each reported distinctly; every guard in the "
+          "manifest checked, not the first")
     return 0

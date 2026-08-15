@@ -90,7 +90,7 @@ for issue in <該線 open issues>:
 
 merge 永遠人 admit;本 skill 只推進到 PR 開好、findings 齊備。Forgejo API 呼叫一律透過既有
 credential helper 在記憶體內取憑證,**秘密不落盤不輸出**(本 repo `check_credential_hygiene.py` 守)。
-若 helper 尚未建立,由 host operator 在 `/Users/neon/runtime-env` 執行
+若 helper 尚未建立,由 host operator 在 `<runtime-env-root>` 執行
 `./runtime-env local-env migrate-forgejo-keychain`;本 skill 不讀 `runtime-env/.env`,也不實作第二套密碼儲存。
 
 這句話由 `scripts/route.ts` 的 merge 路由與 `tests/merge-authority/` 的窮舉掃描守住,不靠人記得:

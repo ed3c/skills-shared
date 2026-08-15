@@ -224,8 +224,8 @@ def verify_forgejo_delivery(
     )
     required = {
         "schema", "forgejo_repository", "forgejo_repository_id", "default_branch",
-        "captured_at", "transport", "issues", "merged_prs", "local_main_merge",
-        "verification",
+        "captured_at", "transport", "issues", "recovery_worktree", "merged_prs",
+        "local_main_merge", "verification",
     }
     if set(delivery) != required:
         raise ValueError("Forgejo delivery observation fields drifted")
@@ -245,7 +245,7 @@ def verify_forgejo_delivery(
             "comment_count", "context_state", "desktop_submission_state",
             "recovery_receipt_sha256", "desktop_receipt_sha256", "desktop_thread_url",
             "desktop_prompt_sha256", "desktop_observer_id", "desktop_observer_login",
-            "receipt",
+            "desktop_response_started_at", "receipt",
         } or item["state"] != "closed":
             raise ValueError(f"Forgejo delivery issues[{index}] is not a closed issue receipt")
         if item["context_state"] != "PASS" or item["desktop_submission_state"] != "PASS":
@@ -274,6 +274,22 @@ def verify_forgejo_delivery(
         observed_issue_numbers.add(item["number"])
     if not linked_issue_numbers or not linked_issue_numbers.issubset(observed_issue_numbers):
         raise ValueError("Forgejo linked issues lack provider-derived issue receipts")
+    recovery_worktree = obj(delivery["recovery_worktree"], "Forgejo recovery worktree")
+    if set(recovery_worktree) != {
+        "issue_number", "branch", "head_sha", "base_sha", "created_at",
+        "observed_at", "creation_receipt_sha256", "writer_lease", "receipt",
+    }:
+        raise ValueError("Forgejo recovery worktree fields drifted")
+    if recovery_worktree["issue_number"] not in linked_issue_numbers:
+        raise ValueError("Forgejo recovery worktree is not bound to a linked issue")
+    sha(recovery_worktree["head_sha"], "Forgejo recovery worktree head_sha")
+    sha(recovery_worktree["base_sha"], "Forgejo recovery worktree base_sha")
+    digest(recovery_worktree["creation_receipt_sha256"], "Forgejo recovery worktree creation receipt")
+    lease = obj(recovery_worktree["writer_lease"], "Forgejo recovery worktree writer lease")
+    if set(lease) != {"kind", "branch_ref", "holders", "reason"} or lease.get("kind") != "git-branch-lock" or lease.get("holders") != 1 or lease.get("branch_ref") != f"refs/heads/{recovery_worktree['branch']}" or not isinstance(lease.get("reason"), str) or not lease["reason"]:
+        raise ValueError("Forgejo recovery worktree lacks exactly one Git writer lease")
+    if not isinstance(recovery_worktree["receipt"], str) or not recovery_worktree["receipt"]:
+        raise ValueError("Forgejo recovery worktree lacks receipt identity")
     merged_prs = delivery["merged_prs"]
     if not isinstance(merged_prs, list) or not merged_prs:
         raise ValueError("Forgejo delivery lacks a provider-derived merged PR receipt")

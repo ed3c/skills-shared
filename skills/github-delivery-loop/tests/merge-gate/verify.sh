@@ -121,7 +121,7 @@ case "$*" in
     esac
     ;;
   "pr view 31 --repo example/infrastructure --json "*)
-    echo '{"id":"PR_owner_auto_31","number":31,"url":"https://github.com/example/infrastructure/pull/31","title":"selected live PR","state":"OPEN","isDraft":false,"headRefOid":"3131313131313131313131313131313131313131","mergeable":"MERGEABLE","mergeStateStatus":"CLEAN"}'
+    echo '{"id":"PR_owner_auto_31","number":31,"url":"https://github.com/example/infrastructure/pull/31","title":"selected live PR","state":"'"${GH_STATE:-OPEN}"'","isDraft":false,"headRefOid":"3131313131313131313131313131313131313131","mergeable":"MERGEABLE","mergeStateStatus":"'"${GH_MERGE_STATUS:-CLEAN}"'"}'
     ;;
   "pr view 6 --repo example/infrastructure --json "*)
     echo '{"id":"PR_owner_auto_6","number":6,"url":"https://github.com/example/infrastructure/pull/6","title":"selected failing PR","state":"OPEN","isDraft":false,"headRefOid":"6666666666666666666666666666666666666666","mergeable":"MERGEABLE","mergeStateStatus":"UNSTABLE"}'
@@ -151,6 +151,15 @@ case "$*" in
           ;;
         queue)
           echo '{"data":{"node":{"autoMergeRequest":null,"mergeQueueEntry":{"id":"MQE_31","state":"QUEUED"}}}}'
+          ;;
+        malformed_auto)
+          echo '{"data":{"node":{"autoMergeRequest":"invalid","mergeQueueEntry":null}}}'
+          ;;
+        malformed_queue_type)
+          echo '{"data":{"node":{"autoMergeRequest":null,"mergeQueueEntry":[]}}}'
+          ;;
+        malformed_queue_fields)
+          echo '{"data":{"node":{"autoMergeRequest":null,"mergeQueueEntry":{"id":"MQE_31"}}}}'
           ;;
         *)
           echo '{"data":{"node":{"autoMergeRequest":null,"mergeQueueEntry":null}}}'
@@ -215,6 +224,94 @@ for pending_kind in auto queue; do
   fi
   if grep -Eq "pr list|pullRequestId=PR_owner_auto_2" "${apply_log}"; then
     echo "FAIL: pending check escaped the selected PR scope" >&2
+    exit 1
+  fi
+done
+
+# A valid merge-queue entry owns transitional status. It must be recognized
+# before ordinary L3 mergeStateStatus evaluation and never be resubmitted.
+: > "${apply_log}"
+set +e
+GH_LOG="${apply_log}" GH_PENDING=queue GH_MERGE_STATUS=UNSTABLE \
+  PATH="${fake_bin}:${PATH}" \
+  run "${clean_home}" python3 "${gate}" land --repo "${repo}" --pr 31 \
+  --policy "${owner_policy}" \
+  >"${scratch}/owner-live-queue-unstable.out" \
+  2>"${scratch}/owner-live-queue-unstable.err"
+owner_queue_unstable_status=$?
+set -e
+test "${owner_queue_unstable_status}" -eq 5
+grep -q "ALREADY-PENDING #31 3131313.*merge queue entry MQE_31" \
+  "${scratch}/owner-live-queue-unstable.out"
+if grep -Eq "mergeStateStatus=UNSTABLE|query=mutation" \
+  "${scratch}/owner-live-queue-unstable.err" "${apply_log}"; then
+  echo "FAIL: valid queue transition was rejected or resubmitted" >&2
+  exit 1
+fi
+
+# A stale provider pending object cannot turn a non-open PR into an in-flight
+# merge. OPEN-state refusal has precedence over pending detection.
+: > "${apply_log}"
+set +e
+GH_LOG="${apply_log}" GH_STATE=CLOSED GH_PENDING=auto PATH="${fake_bin}:${PATH}" \
+  run "${clean_home}" python3 "${gate}" land --repo "${repo}" --pr 31 \
+  --policy "${owner_policy}" \
+  >"${scratch}/owner-live-closed-pending.out" \
+  2>"${scratch}/owner-live-closed-pending.err"
+owner_closed_pending_status=$?
+set -e
+if [[ "${owner_closed_pending_status}" -ne 1 ]]; then
+  echo "FAIL: CLOSED+pending returned ${owner_closed_pending_status}, expected L3 refusal 1" >&2
+  exit 1
+fi
+grep -q "BLOCK #31 .*L3 GITHUB.*state=CLOSED -- PR is not open" \
+  "${scratch}/owner-live-closed-pending.err"
+if grep -Eq "ALREADY-PENDING|query=mutation" \
+  "${scratch}/owner-live-closed-pending.out" "${apply_log}"; then
+  echo "FAIL: a CLOSED PR was treated as pending or submitted" >&2
+  exit 1
+fi
+
+# A provider type error is unevaluable, never equivalent to pending absence.
+: > "${apply_log}"
+set +e
+GH_LOG="${apply_log}" GH_PENDING=malformed_auto PATH="${fake_bin}:${PATH}" \
+  run "${clean_home}" python3 "${gate}" land --repo "${repo}" --pr 31 \
+  --policy "${owner_policy}" \
+  >"${scratch}/owner-live-malformed-auto.out" \
+  2>"${scratch}/owner-live-malformed-auto.err"
+owner_malformed_auto_status=$?
+set -e
+if [[ "${owner_malformed_auto_status}" -ne 4 ]]; then
+  echo "FAIL: malformed autoMergeRequest returned ${owner_malformed_auto_status}, expected UNEVALUABLE 4" >&2
+  exit 1
+fi
+grep -q "UNEVALUABLE.*autoMergeRequest" \
+  "${scratch}/owner-live-malformed-auto.err"
+if grep -q "query=mutation" "${apply_log}"; then
+  echo "FAIL: malformed autoMergeRequest reached merge mutation" >&2
+  exit 1
+fi
+
+for malformed_queue_kind in malformed_queue_type malformed_queue_fields; do
+  : > "${apply_log}"
+  set +e
+  GH_LOG="${apply_log}" GH_PENDING="${malformed_queue_kind}" \
+    PATH="${fake_bin}:${PATH}" \
+    run "${clean_home}" python3 "${gate}" land --repo "${repo}" --pr 31 \
+    --policy "${owner_policy}" \
+    >"${scratch}/owner-live-${malformed_queue_kind}.out" \
+    2>"${scratch}/owner-live-${malformed_queue_kind}.err"
+  owner_malformed_queue_status=$?
+  set -e
+  if [[ "${owner_malformed_queue_status}" -ne 4 ]]; then
+    echo "FAIL: ${malformed_queue_kind} returned ${owner_malformed_queue_status}, expected UNEVALUABLE 4" >&2
+    exit 1
+  fi
+  grep -q "UNEVALUABLE.*mergeQueueEntry" \
+    "${scratch}/owner-live-${malformed_queue_kind}.err"
+  if grep -q "query=mutation" "${apply_log}"; then
+    echo "FAIL: ${malformed_queue_kind} reached merge mutation" >&2
     exit 1
   fi
 done

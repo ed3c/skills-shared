@@ -48,7 +48,7 @@ A missing link is named explicitly. Similar content or a later branch does not s
 | Policy PR | [#44](https://github.com/ed3c/skills-shared/pull/44) | merged to `main` | `DELIVERY-5`, focused local selftests, evidence-producer tests |
 | Main mechanism | [`../scripts/ci_publish_gate.py`](../scripts/ci_publish_gate.py) | present | exact policy input validation and stable ALLOW/BLOCK reasons |
 | Local producer | [`../scripts/local_verification.py`](../scripts/local_verification.py) | present | fixed argv, exact clean HEAD, bounded output, safe environment |
-| GitHub producer | [`../scripts/github_actions_snapshot.py`](../scripts/github_actions_snapshot.py) | present | raw transport capture/replay, one PR, exact check identity, billing annotation classification |
+| GitHub producer | [`../scripts/github_actions_snapshot.py`](../scripts/github_actions_snapshot.py) | present | raw transport capture/replay, one PR, exact check identity, billing annotation classification, and independently observed exact branch ref for initial publication |
 | Method document | [`github-actions-cost-control.md`](github-actions-cost-control.md) | present | workflow pattern and evidence boundary |
 | Current live billing state | external | `NOT_EXERCISED` in repository docs | requires fresh trusted snapshot |
 | GitHub/Forgejo equivalence | external | `NOT_EXERCISED` | requires exact commit/tree/release equivalence receipt |

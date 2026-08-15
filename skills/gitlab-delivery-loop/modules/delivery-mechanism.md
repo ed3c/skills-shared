@@ -122,7 +122,7 @@ merge API   (glab mr merge --sha ... --auto-merge=false)
 ```bash
 bash ~/.agents/skills/gitlab-delivery-loop/scripts/install-codex-merge-rule.sh \
   --host gitlab.com --project GROUP/SUBGROUP/PROJECT \
-  --rules-dir /Users/neon/.codex/rules
+  --rules-dir <CODEX_HOME>/rules
 ```
 
 安裝器會備份同名規則、原子替換、用 **land 的真實 argv 形狀**跑
