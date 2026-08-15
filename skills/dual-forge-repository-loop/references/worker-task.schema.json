@@ -1,0 +1,154 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skills-shared.invalid/worker-task/v1",
+  "title": "Worker Task",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "task_id",
+    "attempt_id",
+    "parent_attempt_id",
+    "goal",
+    "base_subject_sha",
+    "branch",
+    "worktree_identity",
+    "stack_class",
+    "allowed_paths",
+    "excluded_paths",
+    "owned_mutable_state",
+    "external_resource_leases",
+    "dependencies",
+    "independent_progress_measure",
+    "terminal_success_condition",
+    "required_evals",
+    "negative_controls",
+    "budget",
+    "lease",
+    "checkpoint",
+    "state"
+  ],
+  "properties": {
+    "schema": {"const": "worker-task/v1"},
+    "task_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+    "attempt_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+    "parent_attempt_id": {
+      "oneOf": [
+        {"type": "null"},
+        {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"}
+      ]
+    },
+    "goal": {"type": "string", "minLength": 1},
+    "base_subject_sha": {"$ref": "#/$defs/git_sha"},
+    "branch": {"type": "string", "minLength": 1},
+    "worktree_identity": {"type": "string", "minLength": 1},
+    "stack_class": {"enum": ["foundation", "child", "sibling", "convergence", "hotfix"]},
+    "allowed_paths": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/repo_path"}
+    },
+    "excluded_paths": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/repo_path"}
+    },
+    "owned_mutable_state": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "external_resource_leases": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "dependencies": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"}
+    },
+    "independent_progress_measure": {"type": "string", "minLength": 1},
+    "terminal_success_condition": {"type": "string", "minLength": 1},
+    "required_evals": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "negative_controls": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tool_calls", "tokens", "wall_clock_seconds"],
+      "properties": {
+        "tool_calls": {"type": "integer", "minimum": 1},
+        "tokens": {"type": "integer", "minimum": 1},
+        "wall_clock_seconds": {"type": "integer", "minimum": 1}
+      }
+    },
+    "lease": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "expiry", "heartbeat_sequence"],
+      "properties": {
+        "status": {"enum": ["ACTIVE", "RELEASED", "EXPIRED", "CANCELLED"]},
+        "expiry": {"type": "string", "format": "date-time"},
+        "heartbeat_sequence": {"type": "integer", "minimum": 0}
+      }
+    },
+    "checkpoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sequence", "digest"],
+      "properties": {
+        "sequence": {"type": "integer", "minimum": 0},
+        "digest": {
+          "oneOf": [
+            {"type": "null"},
+            {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+          ]
+        }
+      }
+    },
+    "state": {
+      "enum": [
+        "PLANNED",
+        "ADMITTED",
+        "ASSIGNED",
+        "LEASED",
+        "RUNNING",
+        "CHECKPOINTED",
+        "RESULT_READY",
+        "RESULT_VERIFIED",
+        "INTEGRATED",
+        "REJECTED_NOT_DECOMPOSABLE",
+        "DUPLICATE_SUPPRESSED",
+        "STALE_ATTEMPT",
+        "LEASE_EXPIRED",
+        "TIMED_OUT",
+        "CANCELLED",
+        "STRAGGLER_DETACHED",
+        "FAILED_RETRYABLE",
+        "FAILED_TERMINAL",
+        "BLOCKED_AUTHORITY",
+        "BLOCKED_CONFLICT",
+        "SUPERSEDED"
+      ]
+    }
+  },
+  "$defs": {
+    "git_sha": {"type": "string", "pattern": "^[0-9a-f]{40}([0-9a-f]{24})?$"},
+    "repo_path": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*\\\\).+$"
+    }
+  }
+}
