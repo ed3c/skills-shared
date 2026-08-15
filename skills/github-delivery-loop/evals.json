@@ -130,6 +130,21 @@
         "the seal is private-repository only"
       ],
       "expected": "this repository's policy passes; each planted field turns red with a reason naming that field"
+    },
+    {
+      "id": "DELIVERY-10",
+      "checker_script": "tests/index/verify.sh",
+      "test_verify": "tests/index/verify.sh",
+      "good_fixture": null,
+      "good_evidence": "this skill's own SKILL.md against its own modules/ and scripts/ directories",
+      "hollow_fixture": null,
+      "hollow_mutations": "a dead link appended to a copy of SKILL.md, and a file added to a copied modules/ that SKILL.md cannot name",
+      "covers": [
+        "a link that resolves to nothing is refused",
+        "a file the index never names is refused, which is the half that is otherwise invisible",
+        "the checker's own --selftest runs first, so its verdict here means something"
+      ],
+      "expected": "green on this skill's tree; on first run it found eight files this SKILL.md never named, including scripts/delivery_sync.py"
     }
   ]
 }

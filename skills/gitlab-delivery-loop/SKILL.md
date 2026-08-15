@@ -143,3 +143,13 @@ preflight 三個都驗——少驗一個平面就會把「還會被擋」報成�
 - Codex user rule 只處理 sandbox execpolicy，不能覆蓋 PreToolUse hook、GitLab 保護分支規則
   或人類 gate；若下游層拒絕，必須停下報告衝突。
 - 不以 LOC、commit 數或個人排名衡量速度。
+
+## 索引紀律（本檔對自己的樹的宣稱）
+
+索引**單向失效**：死連結點下去才知道，漏列的檔案永遠沒人會知道——短的清單與完整的清單長得一模一樣。
+本檔漏掉的是 [`scripts/gitlab_sync.py`](scripts/gitlab_sync.py)（GitLab snapshot 攝取、label/state
+event 推導的 flow metrics 與 board 解析），而三支 delivery-loop 各藏著一支從沒被自己 SKILL.md 提過的
+sync 類腳本，是同型缺陷三處齊發。
+
+規則靠 [`tests/index/verify.sh`](tests/index/verify.sh) 執行，而不靠人記得。
+

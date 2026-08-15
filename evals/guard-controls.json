@@ -467,6 +467,16 @@
         "--selftest"
       ],
       "note": "A short index and a complete one look identical, so an omission is invisible forever. Found a test directory added three commits earlier that its own index never named."
+    },
+    {
+      "id": "skill-index-covers-own-tree",
+      "file": "skills/github-delivery-loop/tests/index/verify.sh",
+      "anchor": "  --covers \"${skill_dir}/scripts\"",
+      "verify": [
+        "bash",
+        "skills/github-delivery-loop/tests/index/verify.sh"
+      ],
+      "note": "#1: a SKILL.md that never names one of its own scripts reads exactly like one that names them all. On first run this SKILL.md was hiding eight files, including delivery_sync.py -- and the same shape was live in all three delivery loops."
     }
   ]
 }
