@@ -1,0 +1,226 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skills-shared.invalid/skill-resolution-receipt/v1",
+  "title": "Skill Resolution and Environment Bootstrap Receipt",
+  "description": "Records how an Agent resolved a minimal canonical Skill set, through which host surface, and whether the execution environment was actually prepared. A prompt instructing an Agent to load Skills establishes none of this.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "resolver_version",
+    "runtime_identity",
+    "consumer",
+    "canonical",
+    "selected_skills",
+    "rejected_candidates",
+    "shadowing_scan",
+    "environment",
+    "bootstrap_states"
+  ],
+  "properties": {
+    "schema": {"const": "skill-resolution-receipt/v1"},
+    "resolver_version": {"type": "string", "minLength": 1},
+    "runtime_identity": {"$ref": "#/$defs/runtime_identity"},
+    "consumer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository_id", "subject_sha", "visibility"],
+      "properties": {
+        "repository_id": {"type": "string", "minLength": 3},
+        "subject_sha": {"$ref": "#/$defs/git_sha"},
+        "visibility": {"enum": ["PUBLIC", "PRIVATE"]}
+      }
+    },
+    "canonical": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository_id", "visibility", "commit_sha", "registry_digest"],
+      "properties": {
+        "repository_id": {"type": "string", "minLength": 3},
+        "visibility": {"enum": ["PUBLIC", "PRIVATE"]},
+        "commit_sha": {
+          "comment": "An exact commit. A mutable ref such as `main` is not an execution identity.",
+          "$ref": "#/$defs/git_sha"
+        },
+        "registry_digest": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "selected_skills": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "canonical_path",
+          "blob_or_tree_identity",
+          "content_sha256",
+          "selection_reason",
+          "trigger_evidence",
+          "transitive_dependencies",
+          "access_mode",
+          "surface_readback_state",
+          "runtime_requirements_digest"
+        ],
+        "properties": {
+          "name": {"type": "string", "minLength": 1},
+          "canonical_path": {"type": "string", "minLength": 1},
+          "blob_or_tree_identity": {"type": "string", "minLength": 1},
+          "content_sha256": {"$ref": "#/$defs/sha256"},
+          "selection_reason": {
+            "comment": "REGISTRY_WIDE is deliberately absent: loading the whole registry as passive context is the behaviour this receipt exists to refuse.",
+            "enum": ["EXPLICIT_TASK_BINDING", "REPOSITORY_BINDING", "TRIGGER_MATCH", "DECLARED_DEPENDENCY"]
+          },
+          "trigger_evidence": {"type": "string", "minLength": 1},
+          "transitive_dependencies": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {"type": "string", "minLength": 1}
+          },
+          "access_mode": {"$ref": "#/$defs/access_mode"},
+          "surface_readback_state": {"enum": ["VERIFIED", "NOT_EXERCISED", "ABSENT"]},
+          "runtime_requirements_digest": {"$ref": "#/$defs/sha256_or_absent"}
+        }
+      }
+    },
+    "rejected_candidates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "reason"],
+        "properties": {
+          "name": {"type": "string", "minLength": 1},
+          "reason": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "shadowing_scan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "surfaces_scanned", "findings"],
+      "properties": {
+        "state": {"enum": ["CLEAN", "SHADOWED", "NOT_EXERCISED"]},
+        "surfaces_scanned": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "findings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "surface"],
+            "properties": {
+              "name": {"type": "string", "minLength": 1},
+              "surface": {"type": "string", "minLength": 1}
+            }
+          }
+        }
+      }
+    },
+    "environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "plan_digest", "required_secret_names", "absent_secret_names", "setup_entrypoints", "capability_probes"],
+      "properties": {
+        "state": {"enum": ["PREPARED", "NOT_PREPARED", "NOT_REQUIRED"]},
+        "plan_digest": {"$ref": "#/$defs/sha256_or_absent"},
+        "required_secret_names": {
+          "comment": "Names only. There is no field for a secret value, and additionalProperties is false, so a receipt carrying one is schema-invalid rather than merely discouraged.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/env_var_name"}
+        },
+        "absent_secret_names": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/env_var_name"}
+        },
+        "setup_entrypoints": {
+          "comment": "Fixed typed entrypoint IDs. No Skill may expose arbitrary shell as its setup API, so a shell string cannot be spelled here.",
+          "type": "array",
+          "items": {"$ref": "#/$defs/entrypoint_id"}
+        },
+        "capability_probes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "state"],
+            "properties": {
+              "id": {"$ref": "#/$defs/entrypoint_id"},
+              "state": {"enum": ["PASS", "FAIL", "NOT_EXERCISED"]}
+            }
+          }
+        }
+      }
+    },
+    "bootstrap_states": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/bootstrap_state"}
+    }
+  },
+  "$defs": {
+    "git_sha": {"type": "string", "pattern": "^[0-9a-f]{40}([0-9a-f]{24})?$"},
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "sha256_or_absent": {
+      "oneOf": [
+        {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        {"const": "ABSENT"}
+      ]
+    },
+    "env_var_name": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]*$"},
+    "entrypoint_id": {
+      "comment": "Dotted identifier. Spaces, pipes and redirects cannot appear, so a command line is not expressible.",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*([._-][a-z0-9]+)*$"
+    },
+    "runtime_identity": {
+      "enum": [
+        "CHATGPT_GITHUB_CONNECTOR",
+        "GITHUB_ACTIONS",
+        "CLAUDE_CODE_LOCAL",
+        "CODEX_CLI_LOCAL",
+        "CHATGPT_DESKTOP_WORKTREE",
+        "UNKNOWN"
+      ]
+    },
+    "access_mode": {
+      "enum": [
+        "LOCAL_CANONICAL_USER_SURFACE",
+        "PROJECT_CANONICAL_PROJECTION",
+        "CONNECTOR_EXACT_COMMIT_READ_ONLY",
+        "GITHUB_ACTIONS_PINNED_BUNDLE",
+        "IMMUTABLE_RELEASE_BUNDLE",
+        "ABSENT"
+      ]
+    },
+    "bootstrap_state": {
+      "enum": [
+        "RUNTIME_BOUND",
+        "REPOSITORY_POLICY_BOUND",
+        "SKILL_REQUIREMENTS_DISCOVERED",
+        "MINIMAL_SKILL_SET_RESOLVED",
+        "CANONICAL_SKILL_SUBJECTS_BOUND",
+        "SKILL_SURFACES_AVAILABLE",
+        "SKILL_RUNTIME_REQUIREMENTS_BOUND",
+        "RUNTIME_ENV_CLOSURE_BOUND",
+        "ENVIRONMENT_PLAN_RENDERED",
+        "ENVIRONMENT_PREPARED",
+        "CAPABILITY_PROBES_PASS",
+        "TASK_EXECUTION_ADMITTED",
+        "SKILL_ROUTE_ABSENT",
+        "SKILL_SUBJECT_STALE",
+        "SKILL_SHADOWED",
+        "SKILL_SURFACE_ABSENT",
+        "PRIVATE_SOURCE_NOT_ADMITTED",
+        "RUNTIME_REQUIREMENTS_ABSENT",
+        "RUNTIME_ENV_BINDING_ABSENT",
+        "ENVIRONMENT_NOT_PREPARED",
+        "CAPABILITY_NOT_EXERCISED",
+        "HOST_MUTATION_NOT_ADMITTED",
+        "SECRET_BOUNDARY_BLOCKED"
+      ]
+    }
+  }
+}

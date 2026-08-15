@@ -104,6 +104,35 @@ python3 ~/.agents/skills-shared/skills/shared-skills-infra/scripts/check_dead_as
 `if`／`while`／`until` **條件位置**的 `!` 是合法且有效的，一律豁免——沒有這條豁免，
 linter 自己就是噪音源而被關掉，比沒有它更糟。
 
+### `scripts/check_skill_bootstrap.py` — 消費端 Agent 動手前，憑什麼說 Skill 已就位
+
+上面的 `check` 管的是**這台機器上的 canonical 樹**；這一支管的是**消費 repo 的 Agent 在改動之前
+可以宣稱什麼**。System Prompt 給不了檔案系統或行程權限，所以一句「load 這些 Skill」證明不了
+讀到哪個 commit 的哪些 bytes、走哪個 host surface、環境有沒有真的備妥。這支驗
+`skill-resolution-receipt/v1`（schema 在 `references/skill-resolution-receipt.schema.json`）：
+
+```bash
+python3 ~/.agents/skills-shared/skills/shared-skills-infra/scripts/check_skill_bootstrap.py RECEIPT.json
+# exit 0 可執行｜2 收據違反 bootstrap 不變量｜64 缺席／不可讀／schema 不合｜70 缺 jsonschema
+```
+
+四條刀口：
+
+- **access mode 要該 runtime 真的觀測得到**。connector 讀得到 exact commit 的 bytes，就只證明
+  bytes——證明不了本機安裝、worktree、可執行環境；它宣稱 `TASK_EXECUTION_ADMITTED` 直接紅。
+  `ABSENT` 不是 PASS，`UNKNOWN` runtime fail closed。
+- **最小觸發閉集**。每個 selected Skill 宣告的相依必須也在集合裡，否則閉集是開的；
+  `selection_reason` 的 enum 裡**沒有** registry-wide 這個選項——把整個 registry 當被動上下文
+  載入，正是這張收據要拒絕的行為。
+- **影蓋掃描要 CLEAN 才准執行**。兩個 host 都優先吃 project-local 副本，所以同名被影蓋＝
+  canonical body 根本沒跑，而這件事從結果看不出來。
+- **secret 只留名字**。schema 沒有存 value 的欄位且 `additionalProperties: false`，所以帶了值的
+  收據是 schema 不合而不是「不建議」；setup entrypoint 是 dotted ID，pattern 上就拼不出
+  shell 命令列。
+
+正對照涵蓋四種該被admit的形狀（本機執行、connector 只推理、Actions pinned bundle、
+誠實記錄被擋的 lane），負對照 25 個。`tests/skill-bootstrap/verify.py`。
+
 ## clone 下來怎麼接線
 
 ```bash

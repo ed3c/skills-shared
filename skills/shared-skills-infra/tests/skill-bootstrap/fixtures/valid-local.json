@@ -1,0 +1,78 @@
+{
+  "schema": "skill-resolution-receipt/v1",
+  "resolver_version": "skill-resolver/1.0.0",
+  "runtime_identity": "CLAUDE_CODE_LOCAL",
+  "consumer": {
+    "repository_id": "example/consumer",
+    "subject_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "visibility": "PRIVATE"
+  },
+  "canonical": {
+    "repository_id": "example/skills-shared",
+    "visibility": "PRIVATE",
+    "commit_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "registry_digest": "1111111111111111111111111111111111111111111111111111111111111111"
+  },
+  "selected_skills": [
+    {
+      "name": "dual-forge-repository-loop",
+      "canonical_path": "skills/dual-forge-repository-loop",
+      "blob_or_tree_identity": "tree:cccccccccccccccccccccccccccccccccccccccc",
+      "content_sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+      "selection_reason": "TRIGGER_MATCH",
+      "trigger_evidence": "task binds a dual-forge delivery subject",
+      "transitive_dependencies": ["shared-skills-infra"],
+      "access_mode": "LOCAL_CANONICAL_USER_SURFACE",
+      "surface_readback_state": "VERIFIED",
+      "runtime_requirements_digest": "3333333333333333333333333333333333333333333333333333333333333333"
+    },
+    {
+      "name": "shared-skills-infra",
+      "canonical_path": "skills/shared-skills-infra",
+      "blob_or_tree_identity": "tree:dddddddddddddddddddddddddddddddddddddddd",
+      "content_sha256": "4444444444444444444444444444444444444444444444444444444444444444",
+      "selection_reason": "DECLARED_DEPENDENCY",
+      "trigger_evidence": "declared by dual-forge-repository-loop",
+      "transitive_dependencies": [],
+      "access_mode": "LOCAL_CANONICAL_USER_SURFACE",
+      "surface_readback_state": "VERIFIED",
+      "runtime_requirements_digest": "5555555555555555555555555555555555555555555555555555555555555555"
+    }
+  ],
+  "rejected_candidates": [
+    {
+      "name": "gitlab-delivery-loop",
+      "reason": "no GitLab subject in the task binding; a similar name is not a trigger"
+    }
+  ],
+  "shadowing_scan": {
+    "state": "CLEAN",
+    "surfaces_scanned": [".claude/skills", ".agents/skills"],
+    "findings": []
+  },
+  "environment": {
+    "state": "PREPARED",
+    "plan_digest": "6666666666666666666666666666666666666666666666666666666666666666",
+    "required_secret_names": ["FORGEJO_TOKEN"],
+    "absent_secret_names": [],
+    "setup_entrypoints": ["runtime-env.workload.delivery-loop"],
+    "capability_probes": [
+      {"id": "probe.git-available", "state": "PASS"},
+      {"id": "probe.forgejo-reachable", "state": "PASS"}
+    ]
+  },
+  "bootstrap_states": [
+    "RUNTIME_BOUND",
+    "REPOSITORY_POLICY_BOUND",
+    "SKILL_REQUIREMENTS_DISCOVERED",
+    "MINIMAL_SKILL_SET_RESOLVED",
+    "CANONICAL_SKILL_SUBJECTS_BOUND",
+    "SKILL_SURFACES_AVAILABLE",
+    "SKILL_RUNTIME_REQUIREMENTS_BOUND",
+    "RUNTIME_ENV_CLOSURE_BOUND",
+    "ENVIRONMENT_PLAN_RENDERED",
+    "ENVIRONMENT_PREPARED",
+    "CAPABILITY_PROBES_PASS",
+    "TASK_EXECUTION_ADMITTED"
+  ]
+}

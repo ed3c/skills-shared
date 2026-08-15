@@ -503,4 +503,10 @@ grep -q "^SURFACE" "${world}/9.out"
 grep -q "re-retarget" "${world}/9.out"
 grep -q "^PASS shared skills hold" "${world}/9.out"
 
+# 11. the bootstrap gate: which Skill bytes were resolved, through which host
+#     surface, and whether the environment exists. `check` above governs the
+#     canonical tree on this machine; this governs what a consumer Agent may
+#     claim before it mutates a repository. Own synthetic fixtures, no world.
+python3 "${test_dir}/skill-bootstrap/verify.py"
+
 echo "PASS shared-skills gate"
