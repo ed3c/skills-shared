@@ -171,6 +171,195 @@ def digest(path: Path) -> str:
     return sha.hexdigest()[:8]
 
 
+def content_digest(path: Path) -> str:
+    """Return a stable full-tree digest for one selected Skill."""
+    sha = hashlib.sha256()
+    for file in content_files(path):
+        sha.update(file.relative_to(path).as_posix().encode("utf-8"))
+        sha.update(b"\0")
+        try:
+            sha.update(file.read_bytes())
+        except OSError as error:
+            raise SharedSkillsError(f"cannot read {file}: {error}") from error
+        sha.update(b"\0")
+    return sha.hexdigest()
+
+
+def _git(*arguments: str) -> str:
+    result = subprocess.run(
+        ["git", "-C", str(REPO), *arguments],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        detail = result.stderr.strip() or result.stdout.strip() or "git failed"
+        raise SharedSkillsError(detail)
+    return result.stdout.strip()
+
+
+def _canonical_json(document: dict[str, Any]) -> str:
+    return json.dumps(
+        document, sort_keys=True, separators=(",", ":"), ensure_ascii=False
+    )
+
+
+def _repository_identity() -> str:
+    """Select a credential-free remote identity without recording host paths."""
+    remotes = set(_git("remote").splitlines())
+    for name in ("github", "github-archive", "origin", "forgejo"):
+        if name not in remotes:
+            continue
+        value = _git("remote", "get-url", name)
+        if value.startswith("git@") and ":" in value:
+            host, path = value[4:].split(":", 1)
+            value = f"https://{host}/{path}"
+        value = value.removesuffix(".git")
+        authority = value.split("://", 1)[1].split("/", 1)[0] if "://" in value else ""
+        if value.startswith(("https://", "http://")) and "@" not in authority:
+            return value
+    raise SharedSkillsError("no credential-free repository remote is configured")
+
+
+def _load_requirements(path: Path) -> dict[str, Any]:
+    try:
+        document = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as error:
+        raise SharedSkillsError(f"unreadable consumer requirements {path}: {error}") from error
+    expected = {"schema", "binding", "shared", "repo_owned", "surfaces"}
+    if not isinstance(document, dict) or set(document) != expected:
+        raise SharedSkillsError(
+            "consumer requirements must contain exactly schema, binding, shared, repo_owned, surfaces"
+        )
+    if document.get("schema") != "shared-skills/consumer-requirements/v1":
+        raise SharedSkillsError(
+            "consumer requirements schema must be shared-skills/consumer-requirements/v1"
+        )
+    binding = document.get("binding")
+    if not isinstance(binding, str) or not binding or any(
+        char not in "abcdefghijklmnopqrstuvwxyz0123456789-" for char in binding
+    ):
+        raise SharedSkillsError("binding must use lowercase letters, digits, and hyphens")
+    for field in ("shared", "repo_owned"):
+        value = document.get(field)
+        if not isinstance(value, list) or any(
+            not isinstance(item, str) or not item for item in value
+        ):
+            raise SharedSkillsError(f"{field} must be an array of non-empty names")
+        if len(value) != len(set(value)):
+            raise SharedSkillsError(f"{field} names must be unique")
+    surfaces = document.get("surfaces")
+    if not isinstance(surfaces, dict) or set(surfaces) != {"claude", "codex"}:
+        raise SharedSkillsError("surfaces must contain exactly claude and codex")
+    for carrier, relative in surfaces.items():
+        path_value = Path(relative) if isinstance(relative, str) else Path("/")
+        if path_value.is_absolute() or ".." in path_value.parts or not path_value.parts:
+            raise SharedSkillsError(f"{carrier} surface must be a safe repo-relative path")
+    return document
+
+
+def _consumer_binding(
+    registry: dict[str, Any],
+    requirements: dict[str, Any],
+    requirements_sha256: str,
+) -> tuple[Path, str]:
+    if _git("status", "--porcelain", "--untracked-files=all"):
+        raise SharedSkillsError("shared-skills repository must be clean before synchronization")
+    shared_registry = {item["name"] for item in registry["shared"]}
+    owned_registry = {item["name"] for item in registry["repo_owned"]}
+    requested = set(requirements["shared"])
+    unknown = sorted(requested - shared_registry)
+    if unknown:
+        raise SharedSkillsError(
+            f"requirements name unregistered shared skills: {', '.join(unknown)}"
+        )
+    overlap = sorted(requested & set(requirements["repo_owned"]))
+    if overlap:
+        raise SharedSkillsError(
+            f"a skill cannot be shared and repo-owned: {', '.join(overlap)}"
+        )
+    unknown_owned = sorted(set(requirements["repo_owned"]) - owned_registry)
+    if unknown_owned:
+        raise SharedSkillsError(
+            f"requirements name unregistered repo-owned skills: {', '.join(unknown_owned)}"
+        )
+
+    skills = []
+    for name in sorted(requested):
+        canonical = canonical_path(registry, name)
+        if not (canonical / "SKILL.md").is_file():
+            raise SharedSkillsError(f"canonical skill is incomplete: {name}")
+        skills.append(
+            {
+                "name": name,
+                "content_sha256": content_digest(canonical),
+                "entrypoint": f"skills/{name}/SKILL.md",
+            }
+        )
+    document: dict[str, Any] = {
+        "binding": requirements["binding"],
+        "registry_sha256": hashlib.sha256(REGISTRY.read_bytes()).hexdigest(),
+        "requirements_sha256": requirements_sha256,
+        "repo_owned": sorted(requirements["repo_owned"]),
+        "schema": "shared-skills/consumer-binding/v1",
+        "skills": skills,
+        "source": {
+            "commit": _git("rev-parse", "HEAD"),
+            "repository": _repository_identity(),
+            "tree": _git("rev-parse", "HEAD^{tree}"),
+        },
+        "surfaces": requirements["surfaces"],
+    }
+    document["content_sha256"] = hashlib.sha256(
+        _canonical_json(document).encode("utf-8")
+    ).hexdigest()
+    relative = Path(".agents") / "bindings" / f"{requirements['binding']}.json"
+    return relative, json.dumps(document, indent=2, sort_keys=True, ensure_ascii=False) + "\n"
+
+
+def sync_consumer(
+    registry: dict[str, Any],
+    *,
+    requirements_path: Path,
+    target_root: Path,
+    apply: bool,
+    check_only: bool,
+) -> int:
+    target = target_root.resolve()
+    if not _target_is_worktree(target):
+        raise SharedSkillsError(f"target root is not a Git worktree: {target}")
+    requirements = _load_requirements(requirements_path)
+    requirements_sha256 = hashlib.sha256(requirements_path.read_bytes()).hexdigest()
+    relative, expected = _consumer_binding(
+        registry, requirements, requirements_sha256
+    )
+    destination = target / relative
+    current = destination.read_text(encoding="utf-8") if destination.is_file() else None
+    if current == expected:
+        print(f"UNCHANGED {relative.as_posix()}")
+        return 0
+    if check_only:
+        print(f"{'MISSING' if current is None else 'DRIFT'} {relative.as_posix()}")
+        return 1
+    if not apply:
+        print(f"{'WOULD-CREATE' if current is None else 'WOULD-UPDATE'} {relative.as_posix()}")
+        return 0
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination.write_text(expected, encoding="utf-8")
+    print(f"{'CREATED' if current is None else 'UPDATED'} {relative.as_posix()}")
+    return 0
+
+
+def _target_is_worktree(path: Path) -> bool:
+    result = subprocess.run(
+        ["git", "-C", str(path), "rev-parse", "--is-inside-work-tree"],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    return result.returncode == 0 and result.stdout.strip() == "true"
+
+
 def is_pointer(entry: Path) -> bool:
     """Symlinks and single-SKILL.md forwarders point; they are not copies."""
     if entry.is_symlink():
@@ -612,6 +801,14 @@ def _parser() -> argparse.ArgumentParser:
         type=Path,
         default=Path(os.environ.get("TMPDIR", "/tmp")) / "shared-skills-superseded",
     )
+    sync_parser = commands.add_parser(
+        "sync", help="render a portable, secret-free consumer binding"
+    )
+    sync_parser.add_argument("--requirements", required=True, type=Path)
+    sync_parser.add_argument("--target-root", required=True, type=Path)
+    sync_mode = sync_parser.add_mutually_exclusive_group()
+    sync_mode.add_argument("--apply", action="store_true")
+    sync_mode.add_argument("--check", action="store_true")
     return parser
 
 
@@ -619,6 +816,14 @@ def main(argv: list[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     try:
         registry = load_registry()
+        if args.command == "sync":
+            return sync_consumer(
+                registry,
+                requirements_path=args.requirements,
+                target_root=args.target_root,
+                apply=args.apply,
+                check_only=args.check,
+            )
         sites = Sites(args.sites, args)
         if args.command == "install":
             return install(registry, sites)
