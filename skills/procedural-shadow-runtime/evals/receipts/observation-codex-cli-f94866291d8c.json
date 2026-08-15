@@ -1,0 +1,31 @@
+{
+  "argv": [
+    "codex",
+    "exec",
+    "--sandbox",
+    "workspace-write",
+    "Run exactly this command in the current repository and reply with only its exit code as a bare integer, nothing else: python3 scripts/evidence_bundle.py --selftest"
+  ],
+  "binary": "codex",
+  "elapsed_seconds": 13.13,
+  "exit_code": 0,
+  "host": "codex-cli",
+  "local_ground_truth": {
+    "command": "python3 scripts/evidence_bundle.py --selftest",
+    "exit_code": 0,
+    "stdout_sha256": "74e7974eab97a4fb3815832fa84c5fdd9a41e1c41f2a9a66bfd846fff9a5f174"
+  },
+  "reported_probe_exit": 0,
+  "runtime": "CODEX_CLI_LOCAL",
+  "stderr": "Reading additional input from stdin...\nOpenAI Codex v0.146.0\n--------\nworkdir: <HOME>/skills-shared\nmodel: gpt-5.6-sol\nprovider: openai\napproval: on-request\nsandbox: workspace-write [workdir, /tmp, $TMPDIR]\nreasoning effort: high\nreasoning summaries: none\nsession id: 01a006b3-ebb5-7820-993e-f73aece3fbc1\n--------\nuser\nRun exactly this command in the current repository and reply with only its exit code as a bare integer, nothing else: python3 scripts/evidence_bundle.py --selftest\nwarning: clamping SessionEnd hook timeout to 3s in <HOME>/.codex/plugins/cache/openai-codex/codex/1.0.6/hooks/hooks.json\nwarning: Skill descriptions were shortened to fit the 2% skills context budget. Codex can still see every skill, but some descriptions are shorter. Disable unused skills or plugins to leave more room for the rest.\nhook: SessionStart\nhook: SessionStart\nhook: SessionStart Completed\nhook: SessionStart Completed\nhook: PreToolUse\nhook: PreToolUse\nhook: PreToolUse Completed\nhook: PreToolUse Failed\nexec\n/bin/zsh -lc 'python3 scripts/evidence_bundle.py --selftest' in <HOME>/skills-shared\n succeeded in 0ms:\nEVIDENCE-BUNDLE-RED digest-mismatch: files/receipts/report.json manifest=e5f1eb4d8066 actual=db8c4a0c90cd\nEVIDENCE-BUNDLE-RED absent-file: files/receipts/.runtime/hidden-receipt.json\nEVIDENCE-BUNDLE-RED unlisted-file: files/receipts/smuggled.json\nEVIDENCE-BUNDLE-INVALID absent-manifest: <TMPDIR>\nEVIDENCE-BUNDLE-INVALID absent-source: <TMPDIR>\nEVIDENCE-BUNDLE-COLLECTED files=2 head=ABSENT run=1 python=3.14.6\nEVIDENCE-BUNDLE-GREEN files=2 head=ABSENT run=1 verified offline\nSELFTEST GREEN: hidden paths collected; tamper, removal, and smuggled-file each refused; absent manifest and absent source stayed distinct from mismatch\n\ncodex\n0\nhook: Stop\nhook: Stop Completed\ntokens used\n13,184\n",
+  "stdout": "0\n",
+  "stdout_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+  "subject": {
+    "base_sha": "f94866291d8cfd2007b00fffd4efbd3723e2028c",
+    "context_digest": "03d33c1e3445fbbc66814a025214b4551760e97c92eb84bc6a61452dbbdf888c",
+    "current_sha": "f94866291d8cfd2007b00fffd4efbd3723e2028c",
+    "repository": "ed3c/skills-shared",
+    "runtime": "CODEX_CLI_LOCAL"
+  },
+  "version": "codex-cli 0.146.0"
+}

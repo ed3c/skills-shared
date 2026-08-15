@@ -1,0 +1,31 @@
+{
+  "argv": [
+    "claude",
+    "-p",
+    "Run exactly this command in the current repository and reply with only its exit code as a bare integer, nothing else: python3 scripts/evidence_bundle.py --selftest",
+    "--allowedTools",
+    "Bash"
+  ],
+  "binary": "claude",
+  "elapsed_seconds": 9.402,
+  "exit_code": 0,
+  "host": "claude-code",
+  "local_ground_truth": {
+    "command": "python3 scripts/evidence_bundle.py --selftest",
+    "exit_code": 0,
+    "stdout_sha256": "74e7974eab97a4fb3815832fa84c5fdd9a41e1c41f2a9a66bfd846fff9a5f174"
+  },
+  "reported_probe_exit": 0,
+  "runtime": "CLAUDE_CODE_LOCAL",
+  "stderr": "",
+  "stdout": "0\n",
+  "stdout_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+  "subject": {
+    "base_sha": "f94866291d8cfd2007b00fffd4efbd3723e2028c",
+    "context_digest": "03d33c1e3445fbbc66814a025214b4551760e97c92eb84bc6a61452dbbdf888c",
+    "current_sha": "f94866291d8cfd2007b00fffd4efbd3723e2028c",
+    "repository": "ed3c/skills-shared",
+    "runtime": "CLAUDE_CODE_LOCAL"
+  },
+  "version": "2.1.221 (Claude Code)"
+}

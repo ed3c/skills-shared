@@ -1,0 +1,57 @@
+{
+  "action": {
+    "class": "DETERMINISTIC_PROBE_EXECUTION",
+    "intent_digest": "175decd8bacc320c44d493bb36ec3ef4ca9ce44f73c21c368288cc7c96daa8b5",
+    "side_effecting": false
+  },
+  "applicable_procedures": [
+    {
+      "criticality": "must",
+      "procedure_id": "procedural-shadow-runtime.execute-before-claiming",
+      "source": {
+        "content_sha256": "5d642e69cf4c20d6682f1abb384cfeb210e3777bd813ca5141ab8ba95d8c44ee",
+        "path": "skills/procedural-shadow-runtime/SKILL.md",
+        "ref": "f94866291d8cfd2007b00fffd4efbd3723e2028c",
+        "repository": "ed3c/skills-shared"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "assertion_id": "host-produced-observable-output",
+      "procedure_id": "procedural-shadow-runtime.execute-before-claiming",
+      "result": "PASS"
+    },
+    {
+      "assertion_id": "host-reported-exit-matches-local-computation",
+      "procedure_id": "procedural-shadow-runtime.execute-before-claiming",
+      "result": "PASS"
+    }
+  ],
+  "checkpoint": "BEFORE_PR_OR_PUBLICATION",
+  "close_state": "PASS",
+  "dispositions": [
+    {
+      "procedure_id": "procedural-shadow-runtime.execute-before-claiming",
+      "state": "VERIFIED"
+    }
+  ],
+  "evidence": [
+    {
+      "artifact_sha256": "394c5c6ea3c3144ee8a919142d92074fffe29df1ca291ff35a66fd86525161c4",
+      "evidence_id": "observation-codex-cli",
+      "exact_subject": true,
+      "kind": "COMMAND",
+      "procedure_id": "procedural-shadow-runtime.execute-before-claiming"
+    }
+  ],
+  "receipt_id": "host-codex-cli-f94866291d8c",
+  "schema": "procedural-shadow-runtime-receipt/v1",
+  "subject": {
+    "base_sha": "f94866291d8cfd2007b00fffd4efbd3723e2028c",
+    "context_digest": "03d33c1e3445fbbc66814a025214b4551760e97c92eb84bc6a61452dbbdf888c",
+    "current_sha": "f94866291d8cfd2007b00fffd4efbd3723e2028c",
+    "repository": "ed3c/skills-shared",
+    "runtime": "CODEX_CLI_LOCAL"
+  }
+}

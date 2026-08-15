@@ -170,6 +170,8 @@ jobs:
           python3 skills/shared-skills-infra/scripts/check_index.py --selftest
           python3 skills/shared-skills-infra/scripts/check_index_coverage.py --selftest
           python3 skills/shared-skills-infra/scripts/check_index_coverage.py
+          python3 scripts/evidence_bundle.py --selftest
+          python3 scripts/collect_host_receipt.py --selftest
           python3 scripts/check_binding_stale.py --selftest
           python3 scripts/check_body_neutrality.py --selftest
           python3 scripts/check_body_neutrality.py

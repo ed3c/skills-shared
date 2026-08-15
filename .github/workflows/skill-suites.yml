@@ -103,4 +103,30 @@ jobs:
         # rather than on a defect.
         run: python3 -m pip install --disable-pip-version-check 'jsonschema==4.26.0'
       - name: Run ${{ matrix.skill }} suite
-        run: bash "skills/${{ matrix.skill }}/tests/run-all.sh"
+        run: |
+          set -o pipefail
+          mkdir -p "${RUNNER_TEMP}/evidence"
+          bash "skills/${{ matrix.skill }}/tests/run-all.sh" 2>&1 \
+            | tee "${RUNNER_TEMP}/evidence/suite.log"
+
+      # Only the skill #212 names. Collecting a bundle from every matrix leg would
+      # spend upload on jobs whose evidence nothing is waiting for.
+      - name: Collect exact-head evidence bundle
+        if: always() && matrix.skill == 'procedural-shadow-runtime'
+        run: |
+          cp -R "skills/${{ matrix.skill }}/evals" "${RUNNER_TEMP}/evidence/evals"
+          cp "skills/${{ matrix.skill }}/evals.json" "${RUNNER_TEMP}/evidence/eval-plane.json"
+          python3 scripts/evidence_bundle.py collect "${RUNNER_TEMP}/evidence" \
+            --output "${RUNNER_TEMP}/bundle" \
+            --tree-sha "$(git rev-parse 'HEAD^{tree}')"
+          # Verify here as well as on download: a bundle that cannot be replayed
+          # in the job that produced it will not become replayable later.
+          python3 scripts/evidence_bundle.py verify "${RUNNER_TEMP}/bundle"
+
+      - name: Upload exact-head evidence bundle
+        if: always() && matrix.skill == 'procedural-shadow-runtime'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: evidence-${{ matrix.skill }}-${{ github.sha }}
+          path: ${{ runner.temp }}/bundle
+          if-no-files-found: error
