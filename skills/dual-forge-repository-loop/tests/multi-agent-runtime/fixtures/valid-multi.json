@@ -1,0 +1,228 @@
+{
+  "schema": "repository-multi-agent-runtime/v1",
+  "repository": {
+    "identity": "example/repository",
+    "base_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "current_sha": "dddddddddddddddddddddddddddddddddddddddd",
+    "admitted_subjects": [
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "cccccccccccccccccccccccccccccccccccccccc",
+      "dddddddddddddddddddddddddddddddddddddddd"
+    ]
+  },
+  "runtime": {
+    "identity": "CODEX_CLI_LOCAL",
+    "capabilities": ["local_checkout", "isolated_worktree", "deterministic_checker"],
+    "evidence_state": "PASS"
+  },
+  "topology": "MULTI_WORKER",
+  "shadow": {
+    "execution": "EXTERNAL_DETERMINISTIC_CHECKER",
+    "independent_state": "PASS",
+    "enforcement_state": "PASS",
+    "checkpoint_outcome": "CONTINUE_L0"
+  },
+  "budget": {
+    "profile_state": "PRESENT",
+    "limits": {
+      "active_workers": 2,
+      "total_workers": 4,
+      "spawn_depth": 2,
+      "tool_calls": 100,
+      "tokens": 50000,
+      "wall_clock_seconds": 3600,
+      "ci_runs": 4,
+      "pr_count": 4
+    },
+    "consumed": {
+      "active_workers": 2,
+      "total_workers": 2,
+      "spawn_depth": 1,
+      "tool_calls": 19,
+      "tokens": 3500,
+      "wall_clock_seconds": 190,
+      "ci_runs": 0,
+      "pr_count": 1
+    }
+  },
+  "admission": {
+    "independent_terminal_slices": true,
+    "independent_oracles": true,
+    "no_shared_mutable_owner": true,
+    "disjoint_path_and_resource_leases": true,
+    "dependency_graph_is_dag": true,
+    "convergence_owner_exists": true,
+    "coordination_cost_bounded": true,
+    "expected_saved_work_exceeds_coordination": true,
+    "worker_budget_admitted": true
+  },
+  "tasks": [
+    {
+      "schema": "worker-task/v1",
+      "task_id": "worker-a",
+      "attempt_id": "worker-a-attempt-1",
+      "parent_attempt_id": null,
+      "goal": "Implement the parser slice",
+      "base_subject_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "branch": "agent/parser-slice",
+      "worktree_identity": "worktree-parser-1",
+      "stack_class": "sibling",
+      "allowed_paths": ["src/parser", "tests/parser"],
+      "excluded_paths": ["README.md", "src/runtime"],
+      "owned_mutable_state": ["parser-contract"],
+      "external_resource_leases": ["fixture-set-parser"],
+      "dependencies": [],
+      "independent_progress_measure": "parser contract cases passing",
+      "terminal_success_condition": "parser oracle and planted negative control pass",
+      "required_evals": ["EVAL-PARSER-001"],
+      "negative_controls": ["CONTROL-PARSER-001"],
+      "budget": {
+        "tool_calls": 20,
+        "tokens": 10000,
+        "wall_clock_seconds": 900
+      },
+      "lease": {
+        "status": "ACTIVE",
+        "expiry": "2026-08-15T12:00:00Z",
+        "heartbeat_sequence": 3
+      },
+      "checkpoint": {
+        "sequence": 1,
+        "digest": "1111111111111111111111111111111111111111111111111111111111111111"
+      },
+      "state": "RESULT_VERIFIED"
+    },
+    {
+      "schema": "worker-task/v1",
+      "task_id": "worker-b",
+      "attempt_id": "worker-b-attempt-1",
+      "parent_attempt_id": null,
+      "goal": "Implement the scheduler slice",
+      "base_subject_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "branch": "agent/scheduler-slice",
+      "worktree_identity": "worktree-scheduler-1",
+      "stack_class": "sibling",
+      "allowed_paths": ["src/scheduler", "tests/scheduler"],
+      "excluded_paths": ["README.md", "src/parser"],
+      "owned_mutable_state": ["scheduler-contract"],
+      "external_resource_leases": ["fixture-set-scheduler"],
+      "dependencies": [],
+      "independent_progress_measure": "scheduler state-machine cases passing",
+      "terminal_success_condition": "scheduler oracle and stale-attempt control pass",
+      "required_evals": ["EVAL-SCHEDULER-001"],
+      "negative_controls": ["CONTROL-SCHEDULER-001"],
+      "budget": {
+        "tool_calls": 20,
+        "tokens": 10000,
+        "wall_clock_seconds": 900
+      },
+      "lease": {
+        "status": "ACTIVE",
+        "expiry": "2026-08-15T12:00:00Z",
+        "heartbeat_sequence": 4
+      },
+      "checkpoint": {
+        "sequence": 1,
+        "digest": "2222222222222222222222222222222222222222222222222222222222222222"
+      },
+      "state": "RESULT_VERIFIED"
+    }
+  ],
+  "results": [
+    {
+      "schema": "worker-result/v1",
+      "task_id": "worker-a",
+      "attempt_id": "worker-a-attempt-1",
+      "base_subject_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "head_subject_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "owned_paths": ["src/parser", "tests/parser"],
+      "artifacts": [
+        {
+          "immutable_identity": "parser-tree",
+          "logical_path_or_object_reference": "git:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb:src/parser",
+          "sha256": "3333333333333333333333333333333333333333333333333333333333333333"
+        }
+      ],
+      "commands_executed": ["python3 -m pytest tests/parser"],
+      "positive_evals": [
+        {
+          "id": "EVAL-PARSER-001",
+          "state": "PASS",
+          "evidence": "receipt:parser-positive"
+        }
+      ],
+      "negative_controls": [
+        {
+          "id": "CONTROL-PARSER-001",
+          "state": "PASS",
+          "evidence": "receipt:parser-negative"
+        }
+      ],
+      "unresolved_unknowns": [],
+      "architecture_deltas": ["STATE_DELTA: parser result state added"],
+      "budget_consumed": {
+        "tool_calls": 9,
+        "tokens": 1500,
+        "wall_clock_seconds": 80
+      },
+      "checkpoint_identity": "1111111111111111111111111111111111111111111111111111111111111111",
+      "stop_reason": "owning oracle and negative control passed",
+      "evidence_level": "L2",
+      "worker_claimed_confidence": 0.88,
+      "state": "RESULT_VERIFIED"
+    },
+    {
+      "schema": "worker-result/v1",
+      "task_id": "worker-b",
+      "attempt_id": "worker-b-attempt-1",
+      "base_subject_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "head_subject_sha": "cccccccccccccccccccccccccccccccccccccccc",
+      "owned_paths": ["src/scheduler", "tests/scheduler"],
+      "artifacts": [
+        {
+          "immutable_identity": "scheduler-tree",
+          "logical_path_or_object_reference": "git:cccccccccccccccccccccccccccccccccccccccc:src/scheduler",
+          "sha256": "4444444444444444444444444444444444444444444444444444444444444444"
+        }
+      ],
+      "commands_executed": ["python3 -m pytest tests/scheduler"],
+      "positive_evals": [
+        {
+          "id": "EVAL-SCHEDULER-001",
+          "state": "PASS",
+          "evidence": "receipt:scheduler-positive"
+        }
+      ],
+      "negative_controls": [
+        {
+          "id": "CONTROL-SCHEDULER-001",
+          "state": "PASS",
+          "evidence": "receipt:scheduler-negative"
+        }
+      ],
+      "unresolved_unknowns": [],
+      "architecture_deltas": ["CONCURRENCY_DELTA: scheduler lease state added"],
+      "budget_consumed": {
+        "tool_calls": 10,
+        "tokens": 2000,
+        "wall_clock_seconds": 110
+      },
+      "checkpoint_identity": "2222222222222222222222222222222222222222222222222222222222222222",
+      "stop_reason": "owning oracle and negative control passed",
+      "evidence_level": "L2",
+      "worker_claimed_confidence": 0.84,
+      "state": "RESULT_VERIFIED"
+    }
+  ],
+  "merge_boundary": {
+    "agent_merge_action": "DENY",
+    "merge_authority": "HUMAN_ADMIT_ONLY",
+    "observed_external_merge": false
+  },
+  "states": {
+    "evidence_state": "PASS",
+    "authority_state": "HUMAN_ADMIT_REQUIRED",
+    "delivery_state": "PR_OPEN"
+  }
+}
