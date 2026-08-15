@@ -56,9 +56,11 @@ class LiveCaptureSeamTests(unittest.TestCase):
             ) as build,
         ):
             actual_transport, actual_observation, actual_snapshot = publish._capture_live_state(
-                "ed3c/example", "agent/example", "verify"
+                "ed3c/example", "agent/example", "verify", ".github/workflows/verify.yml"
             )
-        capture_transport.assert_called_once_with("ed3c/example", "agent/example", "verify", 30)
+        capture_transport.assert_called_once_with(
+            "ed3c/example", "agent/example", "verify", ".github/workflows/verify.yml", 30
+        )
         derive.assert_called_once_with(transport)
         build.assert_called_once_with(observation, "verify", strict=True)
         self.assertIs(actual_transport, transport)

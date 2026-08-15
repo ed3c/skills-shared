@@ -149,10 +149,13 @@ CAPTURE_REQUESTED
     │ fixed read-only gh api calls
     ▼
 REPOSITORY_OBSERVED
+    │ resolve policy workflow path to exact provider workflow ID
+    ▼
+WORKFLOW_IDENTITY_OBSERVED
     │ resolve zero or one open PR for branch
     ▼
 PR_IDENTITY_OBSERVED
-    │ resolve exact stable check name and billing annotations
+    │ resolve exact workflow + stable check name + head and billing annotations
     ▼
 CHECK_STATE_OBSERVED
     │ write raw observation and normalized snapshot
@@ -174,6 +177,7 @@ SNAPSHOT_EMITTED
 ```text
 REPOSITORY_AMBIGUOUS
 PUBLIC_REPOSITORY_UNEXPECTED
+WORKFLOW_IDENTITY_DRIFT
 MULTIPLE_OPEN_PRS
 PR_HEAD_DRIFT
 CHECK_NAME_AMBIGUOUS

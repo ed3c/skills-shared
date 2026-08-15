@@ -39,6 +39,7 @@ A missing link is named explicitly. Similar content or a later branch does not s
 | `DEC-DELIVERY-06` | Git Town synchronizes branch hierarchy; it does not own push, merge, promotion, or semantic conflict repair. | [`../../git-town-stacked-pr-worker/README.md`](../../git-town-stacked-pr-worker/README.md) |
 | `DEC-DELIVERY-07` | Independent path-disjoint work uses sibling branches; only true byte dependencies form a stack. | Git Town README and task packets |
 | `DEC-DELIVERY-10` | Human ruling A selected the exact-HEAD/evidence-bound `ci_publish_gate.py` line over the earlier intent-only same-name divergence. Dual-origin convergence later extended that selected line with strict provider identity, causal publication evidence and merge readback; it did not reinstate the intent-only gate. | `ci_publish_gate.py`, `merge_gate.py`, issues #1, #53 and #70, human ruling A, Forgejo PRs #10–#11 |
+| `DEC-DELIVERY-11` | A stable check name is meaningful only inside the workflow named by policy. Live capture resolves that path to the provider workflow ID before selection; another workflow's same-name job cannot create authority, while a rerun inside the owning workflow remains ambiguous. | `github_actions_snapshot.py`, GitHub PR #189 failure receipt, Forgejo PR #13 and its follow-up admission |
 | `DEC-DELIVERY-09` | An absent open pull request does not prove an absent remote branch; the initial boundary requires an independently observed `refs/heads/<exact>`. | `github_actions_snapshot.py --strict`, issue #70 |
 | `DEC-DELIVERY-08` | Documentation explains state and ownership but cannot become a second API or evidence authority. | [`../README.md`](../README.md), issues #78 and PR #80 |
 
@@ -50,7 +51,7 @@ A missing link is named explicitly. Similar content or a later branch does not s
 | Policy PR | [#44](https://github.com/ed3c/skills-shared/pull/44) | merged to `main` | `DELIVERY-5`, focused local selftests, evidence-producer tests |
 | Main mechanism | [`../scripts/ci_publish_gate.py`](../scripts/ci_publish_gate.py) | present | exact policy input validation and stable ALLOW/BLOCK reasons |
 | Local producer | [`../scripts/local_verification.py`](../scripts/local_verification.py) | present | fixed argv, exact clean HEAD, bounded output, safe environment |
-| GitHub producer | [`../scripts/github_actions_snapshot.py`](../scripts/github_actions_snapshot.py) | present | raw transport capture/replay, one PR, exact check identity, billing annotation classification, and independently observed exact branch ref for initial publication |
+| GitHub producer | [`../scripts/github_actions_snapshot.py`](../scripts/github_actions_snapshot.py) | present | raw transport capture/replay, one PR, policy-workflow-bound exact check identity, billing annotation classification, and independently observed exact branch ref for initial publication |
 | Method document | [`github-actions-cost-control.md`](github-actions-cost-control.md) | present | workflow pattern and evidence boundary |
 | Current live billing state | external | `NOT_EXERCISED` in repository docs | requires fresh trusted snapshot |
 | GitHub/Forgejo equivalence | external | `NOT_EXERCISED` | requires exact commit/tree/release equivalence receipt |
@@ -124,7 +125,7 @@ The machine inventory is [`../evals.json`](../evals.json). Key families:
 | `DELIVERY-3` | merge gate | owner-admitted exact head | forged/stale admit and blocking hook rejected |
 | `DELIVERY-4` | canonical link | identical copy converts and remains readable | diverged copy refused and preserved |
 | `DELIVERY-5` | CI publication | exact-HEAD local receipt and admitted intent | draft checkpoint, stale SHA, reused feedback, billing circuit rejected |
-| evidence producers | local receipt and GitHub snapshot | fixed commands / one PR / exact check | shell strings, unsafe env, multiple PRs, stale check, malformed billing rejected |
+| evidence producers | local receipt and GitHub snapshot | fixed commands / one PR / exact workflow + check | shell strings, unsafe env, workflow-path drift, same-workflow rerun, multiple PRs, stale check, malformed billing rejected |
 | reference causality | source/evidence binding | exact implementation subject | reference-only or stale evidence rejected |
 
 ## 10. Current status summary

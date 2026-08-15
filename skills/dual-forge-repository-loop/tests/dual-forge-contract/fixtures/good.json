@@ -30,7 +30,7 @@
   },
   "actions": {"proof": {
     "check_name": "contract",
-    "transport": {"path": "proof/actions-transport.json", "sha256": "186f86e36b03f0b968a633c4cd871c874f8248b15bb350f609e422b1c482d82a"},
+    "transport": {"path": "proof/actions-transport.json", "sha256": "781e6b1e163ff9314aca5653829cf37c699c87f0866b2cf0117e860be48bbf27"},
     "observation": {"path": "proof/actions-observation.json", "sha256": "41abb797144b2fd1696a35a1774a549e7d596eb2acccee4ac5fd1a693f28bc38"},
     "snapshot": {"path": "proof/actions-snapshot.json", "sha256": "4e92899ee4dc165ab87f1938baa39984761380b8cbb9fb587b0ef4613f927c99"}
   }},

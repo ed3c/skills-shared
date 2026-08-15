@@ -107,11 +107,11 @@
       "hollow_fixture": "tests/evidence-producers/fixtures/stale",
       "covers": [
         "private repository identity and one PR are bound",
-        "stable check is selected by exact name and exact head",
+        "stable check is selected by policy workflow identity, exact name, and exact head",
         "actionable CI failure becomes one feedback identity",
         "known payment or spending annotation becomes billing-open with no test conclusion",
         "replay is zero-network",
-        "multiple PRs, public repositories, stale checks, incomplete checks, and malformed annotations fail closed"
+        "multiple PRs, public repositories, mismatched workflow paths, same-workflow reruns, stale checks, incomplete checks, and malformed annotations fail closed"
       ],
       "expected": "good observation produces a trusted snapshot; billing remains a circuit state; stale or ambiguous observations turn red"
     },
