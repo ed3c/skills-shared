@@ -38,6 +38,8 @@ A missing link is named explicitly. Similar content or a later branch does not s
 | `DEC-DELIVERY-05` | GitHub live capture and zero-network policy evaluation are separate producers. | `github_actions_snapshot.py`, `ci_publish_gate.py` |
 | `DEC-DELIVERY-06` | Git Town synchronizes branch hierarchy; it does not own push, merge, promotion, or semantic conflict repair. | [`../../git-town-stacked-pr-worker/README.md`](../../git-town-stacked-pr-worker/README.md) |
 | `DEC-DELIVERY-07` | Independent path-disjoint work uses sibling branches; only true byte dependencies form a stack. | Git Town README and task packets |
+| `DEC-DELIVERY-10` | Human ruling A selected the exact-HEAD/evidence-bound `ci_publish_gate.py` line over the earlier intent-only same-name divergence. Dual-origin convergence later extended that selected line with strict provider identity, causal publication evidence and merge readback; it did not reinstate the intent-only gate. | `ci_publish_gate.py`, `merge_gate.py`, issues #1, #53 and #70, human ruling A, Forgejo PRs #10–#11 |
+| `DEC-DELIVERY-09` | An absent open pull request does not prove an absent remote branch; the initial boundary requires an independently observed `refs/heads/<exact>`. | `github_actions_snapshot.py --strict`, issue #70 |
 | `DEC-DELIVERY-08` | Documentation explains state and ownership but cannot become a second API or evidence authority. | [`../README.md`](../README.md), issues #78 and PR #80 |
 
 ## 4. Canonical publication-policy line

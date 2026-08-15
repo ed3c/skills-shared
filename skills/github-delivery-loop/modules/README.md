@@ -6,6 +6,8 @@ This directory holds explanatory mechanism contracts. These files explain why th
 
 | Document | Owns | Primary executable |
 |---|---|---|
+| [`ci-publication.md`](ci-publication.md) | exact-HEAD private-repository verification and controlled publication boundary | `../scripts/ci_publish.py`, `../scripts/ci_publish_guard.py` |
+| [`commit-role.md`](commit-role.md) | commit driver/host trailers and machine identity separation | `../../../scripts/check_commit_roles.py` |
 | [`delivery-mechanism.md`](delivery-mechanism.md) | registry, receipt, publication attestation, metrics, dashboard and merge-authority model | `../scripts/github_delivery.py`, `../scripts/delivery_sync.py` |
 | [`github-actions-cost-control.md`](github-actions-cost-control.md) | private-repository publication cadence, billing circuit, evidence producer boundaries, workflow pattern | `../scripts/local_verification.py`, `../scripts/github_actions_snapshot.py`, `../scripts/ci_publish_gate.py` |
 | [`host-permissions.md`](host-permissions.md) | Claude/Codex/GitHub policy planes and exact repair ownership | `../scripts/merge_gate.py`, `../scripts/install-codex-merge-rule.sh` |

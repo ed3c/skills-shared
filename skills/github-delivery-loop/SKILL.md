@@ -232,3 +232,24 @@ delivery-loop **各藏著一支從沒被自己 SKILL.md 提過的 sync 類腳本
 - Codex user rule 只處理 sandbox execpolicy，不能覆蓋 repository PreToolUse hook、GitHub branch rule
   或人類 gate；若下游層拒絕，必須停下報告衝突。
 - 不以 LOC、commit 數或個人排名衡量速度。
+
+## 索引紀律（本檔對自己的樹的宣稱）
+
+本檔列出的 `modules/`／`scripts/` 就是一份索引，而索引**單向失效**：死連結點下去才知道，
+**漏列的檔案永遠沒人會知道**——短的清單與完整的清單長得一模一樣。首次真跑 `tests/index/verify.sh`
+時，本檔漏掉八個檔案，其中 `scripts/delivery_sync.py` 是 GitHub snapshot 攝取、flow metrics 與
+決策儀表板投影——三支 delivery-loop 各藏著一支從沒被自己 SKILL.md 提過的 sync 類腳本，同型缺陷三處齊發。
+
+| 檔案 | 擁有 |
+|---|---|
+| [`modules/README.md`](modules/README.md) | modules 目錄索引與各文件的擁有邊界 |
+| [`modules/state-machines.md`](modules/state-machines.md) | 跨所有機制的人類可讀轉移圖 |
+| [`modules/traceability-index.md`](modules/traceability-index.md) | 決策 → 實作的追溯索引 |
+| [`scripts/README.md`](scripts/README.md) | scripts 目錄索引：每支的輸入、網路面與輸出 |
+| [`scripts/ci_workflow_policy.py`](scripts/ci_workflow_policy.py) | 私有 repo publication workflow 的密封閘 |
+| [`scripts/delivery_sync.py`](scripts/delivery_sync.py) | GitHub snapshot 攝取、flow metrics 與決策儀表板投影 |
+| [`scripts/delivery_sync_impl.py`](scripts/delivery_sync_impl.py) | 上一列的實作本體 |
+| [`scripts/reference_causality.py`](scripts/reference_causality.py) | 參照因果檢查 |
+
+規則不靠人記得，靠 [`tests/index/verify.sh`](tests/index/verify.sh)：它先跑 checker 自己的
+`--selftest`，再驗本檔——**checker 不能證明自己會紅之前，它對本檔的綠燈不算數**。

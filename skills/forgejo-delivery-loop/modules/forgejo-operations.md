@@ -118,4 +118,4 @@ bun test tests/forgejo/forgejo-delivery-route.test.ts
 bash <本skill>/tests/issue-state/verify.sh
 ```
 
-完整契約與舊經驗取捨見 [references/contracts.md](references/contracts.md)。
+完整契約與舊經驗取捨見 [`../references/contracts.md`](../references/contracts.md)。
