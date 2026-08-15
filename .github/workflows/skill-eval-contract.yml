@@ -86,6 +86,14 @@ on:
       - 'scripts/**'
       - 'skills/shared-skills-infra/scripts/check_dead_assertions.py'
       - 'skills/shared-skills-infra/tests/**'
+      # The eval plane reads every skills/*/evals.json. The pull_request filter
+      # above selects all of skills/**, but this one did not, and this repository
+      # lands directly on main -- so three plane defects rode in with an
+      # integration and stayed invisible until an unrelated change under
+      # shared-skills-infra/tests happened to select this job. Narrow to the
+      # declarations themselves rather than widening to skills/**, which would
+      # spend a job on every unrelated Skill edit.
+      - 'skills/*/evals.json'
       - 'tests/**'
       - '.github/workflows/skill-eval-contract.yml'
   workflow_dispatch:
