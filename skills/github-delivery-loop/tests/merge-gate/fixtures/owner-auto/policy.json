@@ -1,0 +1,5 @@
+{
+  "version": 1,
+  "mode": "owner-auto",
+  "owner": {"login": "example", "id": 42, "type": "User"}
+}

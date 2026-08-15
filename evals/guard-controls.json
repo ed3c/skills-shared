@@ -435,6 +435,16 @@
         "skills/github-delivery-loop/tests/ci-workflow-policy/verify.sh"
       ],
       "note": "#82 landed .github-delivery/ci-policy.json with nothing in this tree able to read it. Without the workflow comparison the policy can name any job and stay green, and the drift only appears as a publication that paid for a runner and learned nothing."
+    },
+    {
+      "id": "owner-auto-no-author-email",
+      "file": "skills/github-delivery-loop/tests/merge-gate/verify.sh",
+      "anchor": "if grep -q \"authorEmail\" \"${scratch}/command.out\"; then",
+      "verify": [
+        "bash",
+        "skills/github-delivery-loop/tests/merge-gate/verify.sh"
+      ],
+      "note": "#25: the live failure was `gh: Invalid email address` from a generated noreply authorEmail. The fix is to send none and let the account's web Git privacy setting decide; without this control the field can come back and the next owner-auto land fails at the mutation, after every layer reported green."
     }
   ]
 }

@@ -42,9 +42,12 @@
         "merge-admit label applied by a non-owner is refused",
         "admit that predates the head commit is stale, not valid",
         "nothing admitted exits 3, distinct from a layer refusing with 1",
-        "a PreToolUse hook that exits 2 refuses the run on the active host only"
+        "a PreToolUse hook that exits 2 refuses the run on the active host only",
+        "owner-auto lands through GraphQL pinned to expectedHeadOid and never sends authorEmail",
+        "owner identity is refused for a foreign owner, an organization, or a non-personal account",
+        "owner-auto exposes no --admin bypass"
       ],
-      "expected": "good PREFLIGHT GREEN; hollow blocked at L1; empty exits 3; blocking hook exits 1"
+      "expected": "good PREFLIGHT GREEN; hollow blocked at L1; empty exits 3; blocking hook exits 1; owner-auto admits only an immutable personal-User owner and its merge command carries expectedHeadOid without authorEmail"
     },
     {
       "id": "DELIVERY-4",
