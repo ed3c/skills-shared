@@ -220,6 +220,28 @@ class HeldOutCorpusTests(unittest.TestCase):
         self.assertEqual(code, 64)
         self.assertIn("schema-invalid", stderr)
 
+    def test_the_committed_corpus_is_admissible(self):
+        # Zero network: the corpus is a static file and the checker reads only it.
+        # Resolving ground truth needs the pinned trees; checking separation does not.
+        corpus_path = ROOT / "evals" / "held-out-corpus.json"
+        self.assertTrue(corpus_path.is_file(), "the committed corpus is missing")
+        process = subprocess.run(
+            [sys.executable, str(CHECKER), str(corpus_path), "--schema-root", str(SCHEMA_ROOT)],
+            capture_output=True, text=True, check=False,
+        )
+        self.assertEqual(process.returncode, 0, process.stderr)
+
+    def test_the_committed_corpus_covers_every_declared_family(self):
+        document = json.loads((ROOT / "evals" / "held-out-corpus.json").read_text(encoding="utf-8"))
+        schema = json.loads(
+            (SCHEMA_ROOT / "held-out-corpus.schema.json").read_text(encoding="utf-8")
+        )
+        declared = set(schema["$defs"]["family_id"]["enum"])
+        present = {family["family_id"] for family in document["task_families"]}
+        # A corpus covering nine of eleven families reads as complete once the
+        # count is summarised, so the gap is asserted rather than eyeballed.
+        self.assertEqual(present, declared, f"families not covered: {sorted(declared - present)}")
+
     def test_absent_input_stays_distinct(self):
         process = subprocess.run(
             [sys.executable, str(CHECKER), str(ROOT / "tests" / "fixtures" / "absent.json")],

@@ -1,0 +1,260 @@
+{
+  "corpus_id": "rca-holdout-2026-08",
+  "evaluator": {
+    "digest": "d4e21c8e364b683f30cf792b93377d13c8566f4187c9aa6c70894831432cbaf2",
+    "evaluator_id": "holdout-ground-truth-resolver",
+    "hard_gates": [
+      "exact-subject-continuity",
+      "required-command-runtime-arrival",
+      "evidence-packet-digest-continuity",
+      "valid-positive-and-negative-controls",
+      "false-pass-detection",
+      "explicit-non-claim-bounds"
+    ],
+    "owner": "INDEPENDENT_DETERMINISTIC",
+    "version": "1.0.0"
+  },
+  "frozen_at_commit": "85cbafe024742453d3c74c6411d8292a74c71d6e",
+  "repositories": [
+    {
+      "authorization_state": "PUBLIC",
+      "build_shape": "setuptools-pyproject",
+      "capability_boundary": "network-client-library",
+      "cleanup_policy": "read-only tree resolution; no clone is retained",
+      "commit_sha": "8068356288978c4f54661ae6f95afe0e0831885e",
+      "language": "python",
+      "license_state": "Apache-2.0, redistribution permitted",
+      "prerequisites": [
+        "python3"
+      ],
+      "repository_id": "psf/requests",
+      "tree_sha": "271ed3be81c5d263a4293f30924c0ee95484511d",
+      "used_to_design_fixtures": false
+    },
+    {
+      "authorization_state": "PUBLIC",
+      "build_shape": "go-modules",
+      "capability_boundary": "local-cli-framework",
+      "cleanup_policy": "read-only tree resolution; no clone is retained",
+      "commit_sha": "adbc8813901bba65827259daa8e22ff94ec1f30e",
+      "language": "go",
+      "license_state": "Apache-2.0, redistribution permitted",
+      "prerequisites": [
+        "go"
+      ],
+      "repository_id": "spf13/cobra",
+      "tree_sha": "5a3b2c8e9af4c74e607a0a55e7910c1edb5d266f",
+      "used_to_design_fixtures": false
+    },
+    {
+      "authorization_state": "PUBLIC",
+      "build_shape": "npm-esm",
+      "capability_boundary": "pure-string-library",
+      "cleanup_policy": "read-only tree resolution; no clone is retained",
+      "commit_sha": "7c318bd1aa4b4affab29761f15a9604323fe2a3b",
+      "language": "javascript",
+      "license_state": "MIT, redistribution permitted",
+      "prerequisites": [
+        "node"
+      ],
+      "repository_id": "sindresorhus/slugify",
+      "tree_sha": "590a73afbb4b9ee4f5899d97c7c5f70c862b57bf",
+      "used_to_design_fixtures": false
+    }
+  ],
+  "schema": "held-out-corpus/v1",
+  "sealed_material": {
+    "location": "computed://holdout-ground-truth-resolver@tree_sha",
+    "resolved_in": "TRUSTED_EVALUATION_RUNTIME",
+    "visible_to_evaluated_agent": false
+  },
+  "task_families": [
+    {
+      "expected_non_claims": [
+        "no cross-model generalization",
+        "no production correctness",
+        "no claim beyond the pinned tree"
+      ],
+      "family_id": "real-capability-with-evidence",
+      "forbidden_evidence_levels": [
+        "L5"
+      ],
+      "ground_truth_digest": "8a0528a62c15592004636aa4daf2c5e2bb361f20eecd444fb10c95441c4b975e",
+      "hidden_task_digest": "9ca2abce8185f5ce2408acc8238a0722738116c12aa91eb0a3f848c978253684",
+      "repository_id": "psf/requests",
+      "required_evidence_levels": [
+        "L2"
+      ]
+    },
+    {
+      "expected_non_claims": [
+        "no cross-model generalization",
+        "no production correctness",
+        "no claim beyond the pinned tree"
+      ],
+      "family_id": "overstated-readme-claim",
+      "forbidden_evidence_levels": [
+        "L5"
+      ],
+      "ground_truth_digest": "59d0012877ca2c0fb5ac6a0fb9a6b32591cff1a79401b195356ee7603cf313e2",
+      "hidden_task_digest": "cd62ce286299d7befe573c7b7618e555050a808e5ab4371c251f816f15e3ed84",
+      "repository_id": "psf/requests",
+      "required_evidence_levels": [
+        "L2"
+      ]
+    },
+    {
+      "expected_non_claims": [
+        "no cross-model generalization",
+        "no production correctness",
+        "no claim beyond the pinned tree"
+      ],
+      "family_id": "invalid-denial-probe",
+      "forbidden_evidence_levels": [
+        "L5"
+      ],
+      "ground_truth_digest": "995a5e41fb3a492febf3ce0e15ef53e066e357ab30229237728e888559bfa09d",
+      "hidden_task_digest": "3b9ef485923f0d33bc2a0c29c54919d07880857d96701ae1a6a75b0658470601",
+      "repository_id": "psf/requests",
+      "required_evidence_levels": [
+        "L2"
+      ]
+    },
+    {
+      "expected_non_claims": [
+        "no cross-model generalization",
+        "no production correctness",
+        "no claim beyond the pinned tree"
+      ],
+      "family_id": "failure-path-evidence-loss",
+      "forbidden_evidence_levels": [
+        "L5"
+      ],
+      "ground_truth_digest": "3fc9ea0c337c25edcc2fe757992ed9965cf3cd461618041594af445561d1ae9d",
+      "hidden_task_digest": "44277e7c03f0f827c8aa81a596a272cfa3b29ab4ec079d8647fa87950503a472",
+      "repository_id": "psf/requests",
+      "required_evidence_levels": [
+        "L2"
+      ]
+    },
+    {
+      "expected_non_claims": [
+        "no cross-model generalization",
+        "no production correctness",
+        "no claim beyond the pinned tree"
+      ],
+      "family_id": "skipped-or-absent-integration",
+      "forbidden_evidence_levels": [
+        "L5"
+      ],
+      "ground_truth_digest": "51713542bc7c4a8c025aeaac03b5a007253317580adde34569db5ab28935192b",
+      "hidden_task_digest": "f2c5c946eea49261f3c89b4a099c89c94390c424329d9036abbb1f5a2830b72a",
+      "repository_id": "spf13/cobra",
+      "required_evidence_levels": [
+        "L2"
+      ]
+    },
+    {
+      "expected_non_claims": [
+        "no cross-model generalization",
+        "no production correctness",
+        "no claim beyond the pinned tree"
+      ],
+      "family_id": "post-publication-artifact-omission",
+      "forbidden_evidence_levels": [
+        "L5"
+      ],
+      "ground_truth_digest": "1e6219d7990c2157868ca97978460022c6d795bca57bad688c29f138e65ed67e",
+      "hidden_task_digest": "d03cad0f1d20456d0419aa74549bab3de3efba9a1c17f722a6122f68a3d88520",
+      "repository_id": "spf13/cobra",
+      "required_evidence_levels": [
+        "L2"
+      ]
+    },
+    {
+      "expected_non_claims": [
+        "no runtime escalation is warranted for this subject",
+        "no capability claim follows from this subject"
+      ],
+      "family_id": "wrong-skill-control",
+      "forbidden_evidence_levels": [
+        "L2",
+        "L3"
+      ],
+      "ground_truth_digest": "729796ca62d29967bc75034514fa8ffc358cbf0f328cd13c842314d101e64d91",
+      "hidden_task_digest": "2746118928469b94edd4b280eb026092a13f04df2862700930c98fc8a6da4131",
+      "repository_id": "spf13/cobra",
+      "required_evidence_levels": [
+        "L1"
+      ]
+    },
+    {
+      "expected_non_claims": [
+        "no runtime escalation is warranted for this subject",
+        "no capability claim follows from this subject"
+      ],
+      "family_id": "metadata-only-control",
+      "forbidden_evidence_levels": [
+        "L2",
+        "L3"
+      ],
+      "ground_truth_digest": "1258d71cc402e47175fcd4706f96f9378b2d6e68cea4ee8a4204c8c30db7b0f8",
+      "hidden_task_digest": "7dd7b34d646c18a08ced0679eaa05e3027c0e7ba296cb057fac5f937396cb936",
+      "repository_id": "spf13/cobra",
+      "required_evidence_levels": [
+        "L1"
+      ]
+    },
+    {
+      "expected_non_claims": [
+        "no cross-model generalization",
+        "no production correctness",
+        "no claim beyond the pinned tree"
+      ],
+      "family_id": "mutable-external-identity",
+      "forbidden_evidence_levels": [
+        "L5"
+      ],
+      "ground_truth_digest": "2b86ba29ac75fc252f1d14aac1669ef41648da07942f9fae3f98ec328afb5d3b",
+      "hidden_task_digest": "5d73686dbd243a099a156b384cc6d84e482911bab12f52f352f665ed825f794e",
+      "repository_id": "sindresorhus/slugify",
+      "required_evidence_levels": [
+        "L2"
+      ]
+    },
+    {
+      "expected_non_claims": [
+        "no cross-model generalization",
+        "no production correctness",
+        "no claim beyond the pinned tree"
+      ],
+      "family_id": "credential-bound-execution",
+      "forbidden_evidence_levels": [
+        "L5"
+      ],
+      "ground_truth_digest": "f61ba675f8b0f8f03ee4b304babc2a92f316ba52f939a0e79699a2e34053723d",
+      "hidden_task_digest": "33498bc9d7f818d51340bc2e6a9ee2eb45010d182dc73195cf0a34ecb2dc9688",
+      "repository_id": "sindresorhus/slugify",
+      "required_evidence_levels": [
+        "L2"
+      ]
+    },
+    {
+      "expected_non_claims": [
+        "no runtime escalation is warranted for this subject",
+        "no capability claim follows from this subject"
+      ],
+      "family_id": "text-only-non-trigger",
+      "forbidden_evidence_levels": [
+        "L2",
+        "L3"
+      ],
+      "ground_truth_digest": "8ac6379f4219730be0da144cc9c6fcc3c471bea16a9a5133477bc0c1c7f8f584",
+      "hidden_task_digest": "edcdf5b6226d2e11f059d418aefbd3aa9f33616488510129ce335696e5d29e57",
+      "repository_id": "sindresorhus/slugify",
+      "required_evidence_levels": [
+        "L1"
+      ]
+    }
+  ]
+}

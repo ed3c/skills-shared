@@ -42,8 +42,7 @@
       "id": "RCA-HOLDOUT-1",
       "checker_script": "scripts/check_held_out_corpus.py",
       "test_verify": "tests/test_held_out_corpus.py",
-      "good_fixture": null,
-      "good_evidence": "a corpus of at least three repositories that varies by language, build shape and capability boundary, none used to design the RCA fixtures, with sealed ground truth and an independent evaluator",
+      "good_fixture": "evals/held-out-corpus.json",
       "hollow_fixture": null,
       "hollow_mutations": "a tuning repository listed as held out, an unauthorized private repository, one repository listed three times, a corpus uniform in any declared dimension, a family naming an unlisted repository, required and forbidden evidence levels overlapping, a task digest equal to its ground truth, missing non-trigger or positive families, too few defect families, families sharing one ground truth, the evaluated Agent named as evaluator, and sealed material marked visible",
       "covers": [
@@ -54,7 +53,7 @@
         "the evaluated Agent cannot be named as its own evaluator, and sealed material marked visible is not sealed",
         "a passing corpus is admissible to run, never evidence that anything ran"
       ],
-      "expected": "a separated corpus is admitted; 12 planted separation, variation, family-coverage and sealing defects are refused; schema-level refusals stay distinct from semantic ones and absent input from both"
+      "expected": "the committed corpus of three public repositories covering all eleven families is admitted with zero network access; 12 planted separation, variation, family-coverage and sealing defects are refused; schema-level refusals stay distinct from semantic ones and absent input from both"
     }
   ],
   "evidence_boundary": {
