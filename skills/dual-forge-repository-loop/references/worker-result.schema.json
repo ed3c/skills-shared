@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skills-shared.invalid/worker-result/v1",
+  "title": "Worker Result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "task_id",
+    "attempt_id",
+    "base_subject_sha",
+    "head_subject_sha",
+    "owned_paths",
+    "artifacts",
+    "commands_executed",
+    "positive_evals",
+    "negative_controls",
+    "unresolved_unknowns",
+    "architecture_deltas",
+    "budget_consumed",
+    "checkpoint_identity",
+    "stop_reason",
+    "evidence_level",
+    "worker_claimed_confidence",
+    "state"
+  ],
+  "properties": {
+    "schema": {"const": "worker-result/v1"},
+    "task_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+    "attempt_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+    "base_subject_sha": {"$ref": "#/$defs/git_sha"},
+    "head_subject_sha": {"$ref": "#/$defs/git_sha"},
+    "owned_paths": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/repo_path"}
+    },
+    "artifacts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["immutable_identity", "logical_path_or_object_reference", "sha256"],
+        "properties": {
+          "immutable_identity": {"type": "string", "minLength": 1},
+          "logical_path_or_object_reference": {"type": "string", "minLength": 1},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        }
+      }
+    },
+    "commands_executed": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "positive_evals": {"$ref": "#/$defs/eval_results"},
+    "negative_controls": {"$ref": "#/$defs/eval_results"},
+    "unresolved_unknowns": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1}
+    },
+    "architecture_deltas": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1}
+    },
+    "budget_consumed": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tool_calls", "tokens", "wall_clock_seconds"],
+      "properties": {
+        "tool_calls": {"type": "integer", "minimum": 0},
+        "tokens": {"type": "integer", "minimum": 0},
+        "wall_clock_seconds": {"type": "integer", "minimum": 0}
+      }
+    },
+    "checkpoint_identity": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "stop_reason": {"type": "string", "minLength": 1},
+    "evidence_level": {"enum": ["L0", "L1", "L2", "L3", "L4", "L5", "L6"]},
+    "worker_claimed_confidence": {"type": "number", "minimum": 0, "maximum": 1},
+    "state": {
+      "enum": [
+        "RESULT_READY",
+        "RESULT_VERIFIED",
+        "INTEGRATED",
+        "STALE_ATTEMPT",
+        "FAILED_TERMINAL",
+        "BLOCKED_CONFLICT",
+        "SUPERSEDED"
+      ]
+    }
+  },
+  "$defs": {
+    "git_sha": {"type": "string", "pattern": "^[0-9a-f]{40}([0-9a-f]{24})?$"},
+    "repo_path": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*\\\\).+$"
+    },
+    "evidence_state": {
+      "enum": ["PASS", "FAIL", "ABSENT", "NOT_IMPLEMENTED", "NOT_EXERCISED", "SKIPPED_BY_POLICY"]
+    },
+    "eval_results": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "state", "evidence"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "state": {"$ref": "#/$defs/evidence_state"},
+          "evidence": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  }
+}
