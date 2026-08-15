@@ -124,3 +124,11 @@ bun run <本skill>/scripts/route.ts --selftest      # 改 router 或 cases 後�
 
 演化走小迴圈紀律:改本 skill 的程序前先開 op 沙盒迭代(loop-harness-standard),
 T0 錨＝`check_delivery_receipt.py --selftest`;經驗回填走 fold-in(本檔＝Layer A,modules/＝Layer B)。
+
+## 索引紀律（本檔對自己的樹的宣稱）
+
+索引**單向失效**：死連結點下去才知道，漏列的檔案永遠沒人會知道。本檔漏掉的是兩份目錄索引本身——
+[`modules/README.md`](modules/README.md) 與 [`scripts/README.md`](scripts/README.md)。
+
+規則靠 [`tests/index/verify.sh`](tests/index/verify.sh) 執行，而不靠人記得。
+
