@@ -106,4 +106,4 @@ bun run <本skill>/scripts/route.ts --selftest
 bun test tests/forgejo/forgejo-delivery-route.test.ts
 ```
 
-完整契約與舊經驗取捨見 [references/contracts.md](references/contracts.md)。
+完整契約與舊經驗取捨見 [`../references/contracts.md`](../references/contracts.md)。

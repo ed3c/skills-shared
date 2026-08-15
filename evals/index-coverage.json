@@ -1,0 +1,22 @@
+{
+  "schema": "index-coverage/v1",
+  "_why": "A document that indexes its own directory is opting into completeness: if it omits a file, the reader has no way to know the list is short, because a short index and a complete one look identical. Coverage is declared here rather than detected, because detection mis-classifies -- traceability-index.md has an index heading and indexes decisions, not the files beside it, and pointing a directory check at it reports defects that are not there. Link resolution needs no manifest and runs over every document.",
+  "covers": [
+    {
+      "document": "skills/git-town-stacked-pr-worker/README.md",
+      "directory": "skills/git-town-stacked-pr-worker"
+    },
+    {
+      "document": "skills/github-delivery-loop/README.md",
+      "directory": "skills/github-delivery-loop"
+    },
+    {
+      "document": "skills/github-delivery-loop/modules/README.md",
+      "directory": "skills/github-delivery-loop/modules"
+    },
+    {
+      "document": "skills/github-delivery-loop/tests/README.md",
+      "directory": "skills/github-delivery-loop/tests"
+    }
+  ]
+}
