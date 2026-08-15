@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "procedural-shadow-runtime-receipt/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "receipt_id", "checkpoint", "subject", "action", "applicable_procedures", "assertions", "evidence", "dispositions", "close_state"],
+  "properties": {
+    "schema": {"const": "procedural-shadow-runtime-receipt/v1"},
+    "receipt_id": {"type": "string", "minLength": 1},
+    "checkpoint": {"type": "string", "minLength": 1},
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "base_sha", "current_sha", "runtime", "context_digest"],
+      "properties": {
+        "repository": {"type": "string", "minLength": 1},
+        "base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "current_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "runtime": {"type": "string", "minLength": 1},
+        "context_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["class", "side_effecting", "intent_digest"],
+      "properties": {
+        "class": {"type": "string", "minLength": 1},
+        "side_effecting": {"type": "boolean"},
+        "intent_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "applicable_procedures": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["procedure_id", "criticality", "source"],
+        "properties": {
+          "procedure_id": {"type": "string", "minLength": 1},
+          "criticality": {"enum": ["must", "should", "may"]},
+          "source": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["repository", "ref", "path", "content_sha256"],
+            "properties": {
+              "repository": {"type": "string", "minLength": 1},
+              "ref": {"type": "string", "minLength": 1},
+              "path": {"type": "string", "minLength": 1},
+              "content_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+            }
+          }
+        }
+      }
+    },
+    "assertions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["assertion_id", "procedure_id", "result"],
+        "properties": {
+          "assertion_id": {"type": "string", "minLength": 1},
+          "procedure_id": {"type": "string", "minLength": 1},
+          "result": {"enum": ["PASS", "FAIL", "NOT_RUN"]}
+        }
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["evidence_id", "procedure_id", "kind", "artifact_sha256", "exact_subject"],
+        "properties": {
+          "evidence_id": {"type": "string", "minLength": 1},
+          "procedure_id": {"type": "string", "minLength": 1},
+          "kind": {"enum": ["COMMAND", "TEST", "DIFF", "TRACE", "BROWSER", "DEVICE", "EXTERNAL_STATE", "OTHER"]},
+          "artifact_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "exact_subject": {"const": true}
+        }
+      }
+    },
+    "dispositions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["procedure_id", "state"],
+        "properties": {
+          "procedure_id": {"type": "string", "minLength": 1},
+          "state": {"enum": ["VERIFIED", "SATISFIED_BY_PRIOR_EVIDENCE", "NOT_APPLICABLE_WITH_EVIDENCE", "BLOCKED", "FAILED", "WAIVED_WITH_AUTHORIZED_REASON", "MENTIONED", "PLANNED", "EXECUTED_PENDING_VERIFICATION"]},
+          "reason": {"type": "string"}
+        }
+      }
+    },
+    "close_state": {"enum": ["PASS", "BLOCKED", "FAIL"]}
+  }
+}
