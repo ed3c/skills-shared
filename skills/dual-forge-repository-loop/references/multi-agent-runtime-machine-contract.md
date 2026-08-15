@@ -81,6 +81,40 @@ The checker requires:
 - Agent merge action to remain `DENY`;
 - merge eligibility and observed merge to remain external authority states.
 
+## Recording the prompt that governs this contract
+
+The contract above governs one run. A separate gate governs whether the System
+Prompt driving those runs may become a *recorded* prompt at all:
+
+```text
+prompt prose
+!= runtime execution
+!= task success
+!= portable effectiveness
+!= recording authority
+```
+
+A prompt may exist as a candidate on a branch or in a Draft PR with evaluation
+authority only. It enters an active registry, instruction projection, or default
+Agent context only through `system-prompt-runtime-receipt/v1`, which binds exact
+prompt bytes, the evaluation contract, the runtime and model identity, the
+execution trace, a deterministic verifier result, and a scoped promotion decision.
+
+```bash
+python3 skills/dual-forge-repository-loop/scripts/check_system_prompt_record.py \
+  path/to/system-prompt-runtime-receipt.json
+# exit 0 supported | 2 claims authority the evidence does not carry | 64 invalid | 70 no jsonschema
+```
+
+Load-bearing refusals: `RECORDED` without a verifier PASS, without killed negative
+controls, without replay, or without release admission; `PROJECTED` without
+`RECORDED`; `PORTABLE_RECORD` backed by a single observed stack — portability is a
+claim about more than one, and one stack wearing a portable label is the specific
+overclaim this gate exists to stop. Declaring no negative controls is refused as
+absent controls rather than accepted as passing ones. Honest terminal states stay
+open: an unproven candidate and a refused candidate are both admitted, because a
+receipt recording refusal is evidence, not a failure.
+
 ## Command
 
 ```bash

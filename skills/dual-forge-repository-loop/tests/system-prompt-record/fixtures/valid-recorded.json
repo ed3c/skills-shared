@@ -1,0 +1,83 @@
+{
+  "schema": "system-prompt-runtime-receipt/v1",
+  "prompt": {
+    "prompt_id": "repository-multi-agent-runtime",
+    "version": "2.1",
+    "content_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+    "source_repository": "example/skills-shared",
+    "source_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "source_path": "skills/dual-forge-repository-loop/references/system-prompt.md",
+    "composition_skills": [
+      {
+        "name": "dual-forge-repository-loop",
+        "directory_digest": "2222222222222222222222222222222222222222222222222222222222222222"
+      }
+    ]
+  },
+  "evaluation_contract": {
+    "suite_id": "multi-agent-runtime-contract-suite",
+    "suite_sha256": "3333333333333333333333333333333333333333333333333333333333333333",
+    "case_ids": ["case-positive-multi", "case-single-builder", "case-retry-lineage"],
+    "acceptance_predicates": [
+      "every case reaches its declared terminal state",
+      "no planted defect is admitted"
+    ],
+    "negative_controls": ["control-expired-lease", "control-foreign-eval"],
+    "baseline_condition": "no-prompt baseline on the same suite and subject"
+  },
+  "runtime": {
+    "identity": "CODEX_CLI_LOCAL",
+    "harness_identity": "codex-cli/fixture-build",
+    "model_identity": "fixture-model/1",
+    "subject_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "environment_digest": "4444444444444444444444444444444444444444444444444444444444444444",
+    "effect_policy": "BOUNDED_WRITE",
+    "bootstrap_receipt_digest": "5555555555555555555555555555555555555555555555555555555555555555"
+  },
+  "execution": {
+    "run_id": "run-fixture-0001",
+    "started_at": "2026-08-15T09:00:00Z",
+    "ended_at": "2026-08-15T09:12:00Z",
+    "repetition_identity": "seed-1/repetition-1",
+    "trace_digest": "6666666666666666666666666666666666666666666666666666666666666666",
+    "artifact_digests": [
+      "7777777777777777777777777777777777777777777777777777777777777777"
+    ],
+    "terminal_state": "COMPLETED"
+  },
+  "verification": {
+    "verifier_id": "check_multi_agent_runtime",
+    "verifier_digest": "8888888888888888888888888888888888888888888888888888888888888888",
+    "replay_inputs_digest": "9999999999999999999999999999999999999999999999999999999999999999",
+    "result": "PASS",
+    "negative_control_results": [
+      {"id": "control-expired-lease", "state": "KILLED"},
+      {"id": "control-foreign-eval", "state": "KILLED"}
+    ],
+    "unsupported_claims": []
+  },
+  "promotion": {
+    "admitted_scope": ["example/skills-shared @ CODEX_CLI_LOCAL"],
+    "authority": "LOCAL_RECORD",
+    "baseline_comparison": "candidate admits every positive case the baseline admits and refuses 35 planted defects the baseline admits",
+    "regressions": [],
+    "release_admit_state": "ADMITTED",
+    "revocation_subject": "prompt content_sha256 or runtime identity change"
+  },
+  "observed_stacks": ["codex-cli/fixture-build+fixture-model/1"],
+  "record_states": [
+    "AUTHORED",
+    "CANDIDATE_BOUND",
+    "EVAL_CONTRACT_BOUND",
+    "RUNTIME_BOOTSTRAP_PASS",
+    "RUNTIME_EXECUTED",
+    "EXECUTOR_EVIDENCE_CAPTURED",
+    "DETERMINISTIC_VERIFIER_PASS",
+    "NEGATIVE_CONTROLS_PASS",
+    "RECEIPT_BUNDLE_REPLAY_PASS",
+    "SCOPE_DECIDED",
+    "LOCAL_RECORD_ELIGIBLE",
+    "RELEASE_ADMIT_REQUIRED",
+    "RECORDED"
+  ]
+}
