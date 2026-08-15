@@ -150,6 +150,8 @@ A job that never received a runner is `NOT_EXERCISED`; a job deliberately not re
 
 Local commit, remote publication, CI/Actions, review, merge, and release are separate state machines.
 
+Every automated commit is bound by [`evals/commit-roles.json`](evals/commit-roles.json), enforced by `scripts/check_commit_roles.py` from the `enforced_from` commit it records. An agent commit uses the machine-role author for its host — `agent-macro <agent-macro@claude-code.invalid>`, `agent-macro@codex-cli.invalid`, and so on — and carries matching `Driven-By` and `Driven-On` trailers. `human` is never a legal label for one. The identity rules are written out in [`commit-role.md`](skills/forgejo-delivery-loop/modules/commit-role.md); they are not Forgejo-specific despite living under that Skill, and a GitHub-only delivery is bound by them too. `enforced_from` does not move to clear a failure — a range that advances to whatever just failed enforces nothing — so an unlabelled commit is repaired at the endpoint that produced it, never by shortening the range.
+
 - [`github-delivery-loop`](skills/github-delivery-loop/README.md) owns GitHub issue/PR/check/publication and merge-preflight boundaries.
 - [`forgejo-delivery-loop`](skills/forgejo-delivery-loop/README.md) owns localhost Forgejo routing, line/receipt binding, deterministic outbox/recovery, and API-safe operation boundaries.
 - [`git-town-stacked-pr-worker`](skills/git-town-stacked-pr-worker/README.md) owns the portable branch/worktree/sync method.
