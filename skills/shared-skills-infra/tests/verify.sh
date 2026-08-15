@@ -382,7 +382,82 @@ python3 "${moved_script}" check --sites "${sites}" | grep -q "PASS shared skills
 # alias, not a difference in where the link points.
 test "$(realpath "${world}/surfaces/codex/demo-skill")" = "$(realpath "${moved}/skills/demo-skill")"
 
-# 7. the real checkout, read-only. The fixtures above prove each rule in a
+# 7. portable consumer binding pins desired state to one clean immutable source.
+git -C "${moved}" init -q
+git -C "${moved}" config user.email fixture@example.invalid
+git -C "${moved}" config user.name fixture
+git -C "${moved}" remote add github git@github.com:fixture/skills-shared.git
+git -C "${moved}" add .
+git -C "${moved}" commit -qm "fixture source"
+consumer="${world}/consumer"
+requirements="${consumer}/.agents/shared-skills.requirements.json"
+mkdir -p "${consumer}"
+git -C "${consumer}" init -q
+mkdir -p "$(dirname "${requirements}")"
+printf '%s\n' '{"schema":"shared-skills/consumer-requirements/v1","binding":"consumer","shared":["demo-skill"],"repo_owned":[],"surfaces":{"claude":".claude/skills","codex":".agents/skills"}}' > "${requirements}"
+python3 "${moved_script}" sync --requirements "${requirements}" \
+  --target-root "${consumer}" --apply > "${world}/7.out"
+binding="${consumer}/.agents/bindings/consumer.json"
+python3 - "${binding}" "${requirements}" <<'PY'
+import hashlib
+import json
+from pathlib import Path
+import sys
+
+binding = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+assert binding["source"]["repository"] == "https://github.com/fixture/skills-shared"
+assert binding["requirements_sha256"] == hashlib.sha256(Path(sys.argv[2]).read_bytes()).hexdigest()
+assert binding["skills"][0]["name"] == "demo-skill"
+assert len(binding["skills"][0]["content_sha256"]) == 64
+PY
+if grep -Fq "${world}" "${binding}"; then
+  echo "FAIL: portable binding leaked an absolute checkout path" >&2
+  exit 1
+fi
+python3 "${moved_script}" sync --requirements "${requirements}" \
+  --target-root "${consumer}" --check | grep -q '^UNCHANGED '
+printf '\n' >> "${binding}"
+set +e
+python3 "${moved_script}" sync --requirements "${requirements}" \
+  --target-root "${consumer}" --check > "${world}/7-stale.out"
+stale_status=$?
+set -e
+test "${stale_status}" -eq 1
+grep -q '^DRIFT ' "${world}/7-stale.out"
+python3 "${moved_script}" sync --requirements "${requirements}" \
+  --target-root "${consumer}" --apply > /dev/null
+
+printf '%s\n' '{"schema":"shared-skills/consumer-requirements/v1","binding":"consumer","shared":["missing"],"repo_owned":[],"surfaces":{"claude":".claude/skills","codex":".agents/skills"}}' > "${requirements}"
+if python3 "${moved_script}" sync --requirements "${requirements}" \
+  --target-root "${consumer}" --check > "${world}/7-unknown.out" 2>&1; then
+  echo "FAIL: unregistered desired Skill was accepted" >&2
+  exit 1
+fi
+grep -q 'unregistered shared skills' "${world}/7-unknown.out"
+printf '%s\n' '{"schema":"shared-skills/consumer-requirements/v1","binding":"consumer","shared":["demo-skill"],"repo_owned":["demo-skill"],"surfaces":{"claude":".claude/skills","codex":".agents/skills"}}' > "${requirements}"
+if python3 "${moved_script}" sync --requirements "${requirements}" \
+  --target-root "${consumer}" --check > "${world}/7-overlap.out" 2>&1; then
+  echo "FAIL: shared/repo-owned overlap was accepted" >&2
+  exit 1
+fi
+grep -q 'cannot be shared and repo-owned' "${world}/7-overlap.out"
+printf '%s\n' '{"schema":"shared-skills/consumer-requirements/v1","binding":"consumer","shared":["demo-skill"],"repo_owned":[],"surfaces":{"claude":"/tmp/escape","codex":".agents/skills"}}' > "${requirements}"
+if python3 "${moved_script}" sync --requirements "${requirements}" \
+  --target-root "${consumer}" --check > "${world}/7-surface.out" 2>&1; then
+  echo "FAIL: unsafe consumer surface was accepted" >&2
+  exit 1
+fi
+grep -q 'safe repo-relative path' "${world}/7-surface.out"
+printf '%s\n' '{"schema":"shared-skills/consumer-requirements/v1","binding":"consumer","shared":["demo-skill"],"repo_owned":[],"surfaces":{"claude":".claude/skills","codex":".agents/skills"}}' > "${requirements}"
+printf '\nmutation\n' >> "${moved}/skills/demo-skill/SKILL.md"
+if python3 "${moved_script}" sync --requirements "${requirements}" \
+  --target-root "${consumer}" --check > "${world}/7-dirty.out" 2>&1; then
+  echo "FAIL: dirty canonical source was accepted" >&2
+  exit 1
+fi
+grep -q 'must be clean' "${world}/7-dirty.out"
+
+# 8. the real checkout, read-only. The fixtures above prove each rule in a
 #    synthetic world; this proves the rules hold where they are load-bearing,
 #    over every tests/**/verify.sh and tests/run-all.sh actually shipped.
 #    It is also the only thing that puts *this* file under the linter -- its
@@ -391,7 +466,7 @@ test "$(realpath "${world}/surfaces/codex/demo-skill")" = "$(realpath "${moved}/
 python3 "$(dirname "${real_script}")/check_dead_assertions.py" > "${world}/7.out"
 grep -q "^PASS no dead assertions" "${world}/7.out"
 
-# 8. the two #1 gates are folded into `check` with different weights, and the
+# 9. the two #1 gates are folded into `check` with different weights, and the
 #    difference is the point. A shared body naming a host repository FAILS,
 #    because it reaches four other repositories as if it were true there; a
 #    binding pinned to an older body SURFACES, because it means "re-retarget",
@@ -410,7 +485,7 @@ set -e
 grep -q "names a host repository" "${world}/8.err"
 rm "${moved}/skills/shared-skills-infra/BOUND.md"
 
-# 9. a stale binding surfaces and `check` still passes. Nothing follows, so the
+# 10. a stale binding surfaces and `check` still passes. Nothing follows, so the
 #    planted slot stays in the discarded temp world rather than being cleaned up.
 mkdir -p "${moved}/.skill-bindings/shared-skills-infra"
 zeros="$(python3 -c 'print("0" * 64)')"

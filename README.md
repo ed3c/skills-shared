@@ -237,6 +237,8 @@ python3 skills/shared-skills-infra/scripts/shared_skills.py report
 bash skills/shared-skills-infra/tests/verify.sh
 ```
 
+Immutable consumer binding lifecycle: [`docs/modular-consumer-contract.md`](docs/modular-consumer-contract.md).
+
 A project-local shared-name copy is shadowing unless `registry.json` classifies the name as repo-owned.
 
 ## Evidence states

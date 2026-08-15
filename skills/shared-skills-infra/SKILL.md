@@ -51,10 +51,15 @@ python3 $INFRA check     # T0：已登記的裁決有沒有被違反（零網路
 python3 $INFRA report    # 決策佇列：同名多份、尚未裁決、以及延後裁決的清單＋內容 hash
 python3 $INFRA link <name>
 python3 $INFRA adopt <name> --from <path> --why "…" [--defer <repo>] [--dry-run]
+python3 $INFRA sync --requirements <consumer>/.agents/shared-skills.requirements.json \
+  --target-root <consumer> [--apply|--check]
 ```
 
 `check` exit 0 乾淨｜1 有裁決被違反；`report` exit 3 有待裁項（**待裁不是失敗**）。
 正控＝`tests/verify.sh`（全合成世界，不碰這台機器真實 skill 樹，零網路）。
+
+`sync` 只接受乾淨的 canonical commit，輸出 requirements-filtered immutable binding；
+完整欄位與 rollback 契約見 [modular consumer contract](../../docs/modular-consumer-contract.md)。
 
 ### 內容 ownership 與 body-neutrality
 
