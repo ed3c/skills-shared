@@ -142,3 +142,18 @@ flowchart LR
 - [scripts/package_markdown_email.py](scripts/package_markdown_email.py)：標準庫-only 的 HTML／ZIP／EML renderer。
 - [scripts/check_redaction.py](scripts/check_redaction.py)：阻擋**上游 skill 來源 repo 識別字**進入交付物。它比對的是一組固定 token，不是任意絕對路徑；目標 repo 自身的路徑與檔名是刻意保留的證據，不在擋的範圍。renderer 會在寫出任何檔案前先呼叫它。
 - worked instance 指針、宿主專屬致動器與移植帳本：見該 repo 的 `.skill-bindings/html-for-decisions/`。
+
+## 已裁決的分岔（別再重新推導）
+
+`scripts/package_markdown_email.py` 在 #1 記錄的另一份 history 裡有一個同名版本，兩者符號集完全相同
+（0 獨有 / 0 獨有 / 39 共有），33 個共有符號裡 29 個逐位元相同。差異只在四個函式：三個是那邊疊加的
+code graph 整合，第四個 `page_css` 是 **+11 −11 的純視覺改版**（色盤、`--nav`/`--purple`/`--grey`
+三個新變數、max-width 1120 → 1380、`Noto Sans CJK TC` → `Noto Sans TC`、header 換漸層、tabs 由
+換行改橫向捲動）。
+
+code graph 那半分不出來——三個函式裡與 graph 無關的改動各有 17／22／2 行，機械上與視覺改版交錯。
+
+**人裁結果：保留本版**（2026-08-15，ruling A）。因此那邊的 `scripts/code_graph.py`、
+`modules/code-graph-schema.md` 與三個 graph fixture 不採用，不是待辦。要重開這個決定，需要的是
+比較兩版**外觀**，不是再比一次程式碼——程式碼已經比完，答案是「兩個設計」。
+
