@@ -36,6 +36,11 @@ jobs:
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: '3.12'
+      - name: Install pinned validator
+        # check_skill_bootstrap.py exits 70 rather than skipping schema validation
+        # when jsonschema is absent, so an uninstalled validator fails the job
+        # instead of quietly reducing the gate to its semantic half.
+        run: python3 -m pip install --disable-pip-version-check 'jsonschema==4.26.0'
       - name: Verify shared-skills governance
         run: bash skills/shared-skills-infra/tests/verify.sh
       - name: Verify canonical-drift behavior

@@ -29,22 +29,26 @@
     {
       "id": "DFR-MULTI-AGENT-RUNTIME-1",
       "checker_script": "scripts/check_multi_agent_runtime.py",
-      "test_verify": "tests/multi-agent-runtime/verify.sh",
+      "test_verify": "tests/multi-agent-runtime/verify.py",
       "good_fixture": "tests/multi-agent-runtime/fixtures/valid-multi.json",
       "hollow_fixture": null,
-      "hollow_mutations": "false parallelism admission, overlapping path or external-resource leases, dependency cycles, duplicate attempt/branch/worktree identities, exceeded or unreconciled budgets, profileless fan-out, in-process Shadow independence overclaim, unenforced L3 continuation, Agent merge enablement, stale/wrong-base results, result paths outside the lease, non-PASS verified controls, missing Worker results, unknown dependencies, collapsed evidence/authority vocabulary, unobserved merge, and UNKNOWN-runtime publication",
+      "hollow_mutations": "false parallelism admission, overlapping path or external-resource leases between concurrently leased writers, unordered ownership reuse, dependency cycles, duplicate attempt/branch/worktree identities, concurrent or excess attempts of one logical task, retry lineage over a live parent, ACTIVE leases expired against evaluation_time, checkpoint identity mismatch, eval identity substitution, result heads outside admitted_subjects, closure-state publication with no accepted result, exceeded or unreconciled budgets, profileless fan-out, in-process Shadow independence overclaim, unenforced L3 continuation, Agent merge enablement, stale/wrong-base results, result paths outside the lease, non-PASS verified controls, missing Worker results, unknown dependencies, collapsed evidence/authority vocabulary, unobserved merge, and UNKNOWN-runtime publication",
       "covers": [
         "MULTI_WORKER is admitted only when every decomposition, oracle, DAG, ownership, convergence, coordination, and budget predicate passes",
         "an absent budget profile degrades to exactly one SINGLE_BUILDER instead of unbounded fan-out",
-        "task, attempt, branch, and worktree identities are unique and dependency edges form a closed DAG",
-        "parallel Workers have disjoint writable paths, mutable state, and external-resource leases",
-        "verified Worker results match task/attempt/base/path ownership and bind PASS positive plus negative evidence",
+        "attempt, branch, and worktree identities are unique while task_id names a logical slice that repeats across bounded retries",
+        "one logical task holds at most one active and one accepted attempt, within the repository-owned attempt limit, and every retry names a terminal parent attempt",
+        "path, mutable-state and resource ownership is disjoint between concurrently leased writers, a released predecessor may hand ownership to a declared successor, and an unordered reuse is refused",
+        "path containment is segment-aware, so a name-prefix sibling is not treated as a child",
+        "an ACTIVE lease must expire strictly after evaluation_time, which is validated by pattern rather than by an annotation-only format assertion",
+        "verified Worker results match task/attempt/base/path ownership, carry a head inside admitted_subjects, bind the task attempt's checkpoint digest, and report exactly the required eval and control identities",
+        "closure-claiming delivery states require one accepted attempt and one accepted result per logical task",
         "Worker and global token/tool/wall-clock ledgers reconcile and stay within limits",
         "in-process Shadow review cannot claim independent evidence and an L3 outcome cannot be bypassed",
         "Agent merge remains DENY and merge eligibility/observation stays an external authority state",
         "schema-invalid input exits 64 while semantic contradiction exits 2 and a valid contract exits 0"
       ],
-      "expected": "positive MULTI_WORKER and profileless SINGLE_BUILDER fallback contracts PASS; twenty-one planted topology, lease, DAG, budget, Shadow, evidence, result, and merge-boundary defects are refused; absent input remains distinct"
+      "expected": "positive MULTI_WORKER, profileless SINGLE_BUILDER fallback, bounded retry lineage, dependency-ordered handoff, and sibling-path contracts PASS; thirty-five planted topology, lease-expiry, attempt-model, checkpoint, eval-identity, subject-admission, closure, budget, Shadow, evidence, result, and merge-boundary defects are refused; absent input remains distinct"
     }
   ],
   "evidence_boundary": {

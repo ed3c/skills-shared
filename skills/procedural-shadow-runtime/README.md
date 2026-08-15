@@ -40,7 +40,9 @@ ELIGIBLE_FOR_HUMAN_ADMIT / HOLD / REJECT
 | `scripts/check_agent_architecture_eval.py` | 100-point architecture score and Vibe contradiction gate |
 | `scripts/check_meta_abstraction_eval.py` | Meta score and one-step eligibility gate |
 | `modules/ecommerce-dispute/` | Executable worked domain family and adapter protocol |
-| `evals.json` | Eval inventory and routing, not a live provider receipt |
+| `evals.json` | Repository eval-plane declaration: each runnable claim bound to the checker and test that exercise it |
+| `evals/meta-evals.json` | Meta-eval inventory and routing (`procedural-shadow-meta-evals/v2`), not a live provider receipt |
+| `tests/run-all.sh` | Entry point the repository runner and CI matrix discover |
 | `tests/` | Positive, Vibe, unsafe-adapter, mutation, and input controls |
 
 ## 100-point architecture assessment

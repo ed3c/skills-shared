@@ -21,6 +21,7 @@ on:
       - 'skills/gitlab-delivery-loop/**'
       - 'skills/html-for-decisions/**'
       - 'skills/knowledge-continuity/**'
+      - 'skills/procedural-shadow-runtime/**'
       - 'skills/repository-capability-audit/**'
       - 'skills/spatial-loop-systems-engineering/**'
       - 'scripts/check_intent_bound_constraints.py'
@@ -35,6 +36,7 @@ on:
       - 'skills/gitlab-delivery-loop/**'
       - 'skills/html-for-decisions/**'
       - 'skills/knowledge-continuity/**'
+      - 'skills/procedural-shadow-runtime/**'
       - 'skills/repository-capability-audit/**'
       - 'skills/spatial-loop-systems-engineering/**'
       - 'scripts/check_intent_bound_constraints.py'
@@ -81,6 +83,7 @@ jobs:
           - gitlab-delivery-loop
           - html-for-decisions
           - knowledge-continuity
+          - procedural-shadow-runtime
           - repository-capability-audit
           - spatial-loop-systems-engineering
     name: ${{ matrix.skill }}

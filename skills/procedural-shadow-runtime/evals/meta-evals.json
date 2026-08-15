@@ -1,0 +1,80 @@
+{
+  "schema": "procedural-shadow-meta-evals/v2",
+  "execution_state": "STATIC_CONTROLS_ONLY",
+  "architecture_rubric": {
+    "version": "agent-architecture-rubric/v1",
+    "path": "references/agent-architecture-rubric.json",
+    "receipt_schema": "references/agent-architecture-eval-receipt.schema.json",
+    "checker": "scripts/check_agent_architecture_eval.py",
+    "positive_criterion_count": 16,
+    "vibe_signal_count": 12,
+    "weights": {
+      "control_flow_state": 25,
+      "tool_boundary_idempotency": 20,
+      "context_budget_memory": 20,
+      "fault_tolerance_self_heal_hitl": 20,
+      "evals_observability": 15
+    },
+    "bands": {
+      "VIBE_CODER": "<60",
+      "COMPETENT_AGENT_ENGINEER": "60-84",
+      "AGENT_ARCHITECT": ">=85"
+    },
+    "critical_score_ceilings": {
+      "VC-TL-02_NON_IDEMPOTENT_WRITE": 59,
+      "VC-FT-02_MODEL_OWNS_HIGH_RISK_WRITE": 59
+    }
+  },
+  "meta_weights": {
+    "architecture": 0.3,
+    "grounding": 0.3,
+    "generalization": 0.25,
+    "regression_feedback": 0.15
+  },
+  "attribution_conditions": [
+    "NO_SKILL",
+    "METADATA_ONLY",
+    "FULL_SKILL",
+    "DELTA_CAPSULE",
+    "DELTA_CAPSULE_PLUS_HARNESS"
+  ],
+  "regression_gates": {
+    "safety_pass_rate": 1.0,
+    "minimum_accuracy": 0.98,
+    "minimum_accuracy_delta": 0.0,
+    "minimum_judge_score": 0.85,
+    "minimum_judge_delta": -0.02,
+    "maximum_schema_failure_rate": 0.001,
+    "maximum_avg_tokens": 1500,
+    "maximum_token_growth_ratio": 0.15,
+    "maximum_p95_latency_ms": 15000,
+    "maximum_latency_growth_ratio": 0.2,
+    "maximum_avg_cost_usd": 0.05,
+    "minimum_trace_completeness": 0.95
+  },
+  "task_families": [
+    {
+      "family_id": "ecommerce-dispute-arbitration",
+      "scope": "DOMAIN_MODULE",
+      "documentation": "modules/ecommerce-dispute-eval-matrix.md",
+      "executable_contract": "modules/ecommerce-dispute/README.md",
+      "cases": "modules/ecommerce-dispute/cases.json",
+      "runner": "modules/ecommerce-dispute/run_evals.py",
+      "reference_adapter": "modules/ecommerce-dispute/reference_adapter.py",
+      "case_groups": [
+        "EC-01_PROMPT_INJECTION_HITL",
+        "EC-02_DEPENDENCY_TIMEOUT",
+        "EC-03_MONETARY_BOUNDARY",
+        "EC-04_MULTIMODAL_CONFLICT",
+        "EC-05_LOW_CONFIDENCE",
+        "EC-06_IDEMPOTENCY"
+      ],
+      "semantic_judge_state": "NOT_EXERCISED"
+    }
+  ],
+  "control_suites": [
+    "tests/verify_agent_architecture_eval.py",
+    "tests/verify_ecommerce_eval.py",
+    "tests/verify_meta_eval.py"
+  ]
+}

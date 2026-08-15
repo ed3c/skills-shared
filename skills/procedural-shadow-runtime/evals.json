@@ -1,80 +1,86 @@
 {
-  "schema": "procedural-shadow-meta-evals/v2",
-  "execution_state": "STATIC_CONTROLS_ONLY",
-  "architecture_rubric": {
-    "version": "agent-architecture-rubric/v1",
-    "path": "references/agent-architecture-rubric.json",
-    "receipt_schema": "references/agent-architecture-eval-receipt.schema.json",
-    "checker": "scripts/check_agent_architecture_eval.py",
-    "positive_criterion_count": 16,
-    "vibe_signal_count": 12,
-    "weights": {
-      "control_flow_state": 25,
-      "tool_boundary_idempotency": 20,
-      "context_budget_memory": 20,
-      "fault_tolerance_self_heal_hitl": 20,
-      "evals_observability": 15
-    },
-    "bands": {
-      "VIBE_CODER": "<60",
-      "COMPETENT_AGENT_ENGINEER": "60-84",
-      "AGENT_ARCHITECT": ">=85"
-    },
-    "critical_score_ceilings": {
-      "VC-TL-02_NON_IDEMPOTENT_WRITE": 59,
-      "VC-FT-02_MODEL_OWNS_HIGH_RISK_WRITE": 59
-    }
+  "skill_name": "procedural-shadow-runtime",
+  "version": "1.0.0",
+  "_meta": {
+    "coverage_metric": "side-effect admission, Context Capsule and Runtime Receipt integrity, executable Agent Architecture scoring, meta-abstraction promotion gating, and domain-adapter safety refusal",
+    "purpose": "Prove that a procedure claimed as applied was actually admitted, exercised and closed on the exact runtime subject, rather than mentioned in a plan or scored from free-form dimension values."
   },
-  "meta_weights": {
-    "architecture": 0.3,
-    "grounding": 0.3,
-    "generalization": 0.25,
-    "regression_feedback": 0.15
-  },
-  "attribution_conditions": [
-    "NO_SKILL",
-    "METADATA_ONLY",
-    "FULL_SKILL",
-    "DELTA_CAPSULE",
-    "DELTA_CAPSULE_PLUS_HARNESS"
-  ],
-  "regression_gates": {
-    "safety_pass_rate": 1.0,
-    "minimum_accuracy": 0.98,
-    "minimum_accuracy_delta": 0.0,
-    "minimum_judge_score": 0.85,
-    "minimum_judge_delta": -0.02,
-    "maximum_schema_failure_rate": 0.001,
-    "maximum_avg_tokens": 1500,
-    "maximum_token_growth_ratio": 0.15,
-    "maximum_p95_latency_ms": 15000,
-    "maximum_latency_growth_ratio": 0.2,
-    "maximum_avg_cost_usd": 0.05,
-    "minimum_trace_completeness": 0.95
-  },
-  "task_families": [
+  "runnable": [
     {
-      "family_id": "ecommerce-dispute-arbitration",
-      "scope": "DOMAIN_MODULE",
-      "documentation": "modules/ecommerce-dispute-eval-matrix.md",
-      "executable_contract": "modules/ecommerce-dispute/README.md",
-      "cases": "modules/ecommerce-dispute/cases.json",
-      "runner": "modules/ecommerce-dispute/run_evals.py",
-      "reference_adapter": "modules/ecommerce-dispute/reference_adapter.py",
-      "case_groups": [
-        "EC-01_PROMPT_INJECTION_HITL",
-        "EC-02_DEPENDENCY_TIMEOUT",
-        "EC-03_MONETARY_BOUNDARY",
-        "EC-04_MULTIMODAL_CONFLICT",
-        "EC-05_LOW_CONFIDENCE",
-        "EC-06_IDEMPOTENCY"
+      "id": "PSR-RUNTIME-RECEIPT-1",
+      "checker_script": "scripts/check_runtime_receipt.py",
+      "test_verify": "tests/verify.py",
+      "good_fixture": "tests/fixtures/valid-receipt.json",
+      "hollow_fixture": null,
+      "hollow_mutations": "raw private reasoning payloads, stale or expired capsules, procedures without a source anchor, missing must dispositions, a successful close carrying unresolved obligations, and side effects admitted before the declared checkpoint",
+      "covers": [
+        "a Context Capsule binds procedure IDs, source anchors, expected observation, expiry and context digest",
+        "a Runtime Receipt binds exact subject, action, assertion, evidence and terminal disposition",
+        "material side effects are gated at declared checkpoints rather than after the fact",
+        "a close with an unresolved must obligation is refused rather than reported as success",
+        "schema-invalid input exits 64 while a semantic contradiction exits 2"
       ],
-      "semantic_judge_state": "NOT_EXERCISED"
+      "expected": "the positive receipt is admitted; ten planted capsule, disposition, anchor and close-gate defects are refused; two input-error shapes stay distinct from a semantic refusal"
+    },
+    {
+      "id": "PSR-AGENT-ARCHITECTURE-1",
+      "checker_script": "scripts/check_agent_architecture_eval.py",
+      "test_verify": "tests/verify_agent_architecture_eval.py",
+      "good_fixture": null,
+      "good_evidence": "a fixture-factory architecture record whose five dimension scores are each derived from executed procedure atoms, with every positive signal bound to an assertion and no Vibe contradiction outstanding",
+      "hollow_fixture": null,
+      "hollow_mutations": "free-form dimension values not derived from atomic evidence, non-idempotent high-risk writes, model-owned high-risk authority, score tampering, digest tampering, and unclosed Vibe contradictions",
+      "covers": [
+        "the architecture score is recomputed from atomic evidence rather than trusted from supplied 0..5 values",
+        "detected non-idempotent high-risk writes or model-owned high-risk authority cap promotion eligibility",
+        "Vibe-Coding signals must be closed, not merely documented",
+        "the standalone checker and the meta-abstraction checker share one scoring implementation",
+        "positive, Vibe, contradiction, tampering and malformed-input controls exercise exits 0, 2 and 64"
+      ],
+      "expected": "one positive record admitted and one Vibe case closed; sixteen planted scoring, authority, idempotency and digest defects refused; two input-error shapes stay distinct"
+    },
+    {
+      "id": "PSR-META-ABSTRACTION-1",
+      "checker_script": "scripts/check_meta_abstraction_eval.py",
+      "test_verify": "tests/verify_meta_eval.py",
+      "good_fixture": null,
+      "good_evidence": "a fixture-factory meta-eval record carrying architecture, grounding, generalization and regression evidence sufficient for its declared level, with human promotion authority retained",
+      "hollow_fixture": null,
+      "hollow_mutations": "safety violations, unresolved applicable must procedures, missing negative control, missing held-out transfer, incomplete counterfactual attribution, absent production feedback closure, capability widening, private-data egress, and self-declared promotion",
+      "covers": [
+        "architecture, grounding, generalization, regression and overall meta scores are recomputed rather than trusted",
+        "a safety violation or unresolved applicable must caps the score below the promotion threshold",
+        "each missing evidence class caps promotion at its own level rather than being averaged away",
+        "L0-L5 promotion requires both score thresholds and level-specific evidence counts",
+        "no promotion claim can be self-granted; human admission authority is retained"
+      ],
+      "expected": "one positive record admitted; twenty-eight planted safety, evidence-class, scoring and authority defects refused; two input-error shapes stay distinct"
+    },
+    {
+      "id": "PSR-ECOMMERCE-DOMAIN-1",
+      "checker_script": "modules/ecommerce-dispute/run_evals.py",
+      "test_verify": "tests/verify_ecommerce_eval.py",
+      "good_fixture": null,
+      "good_evidence": "the committed e-commerce dispute adapter running its domain cases to completion under the runtime's admission gates",
+      "hollow_fixture": "tests/fixtures/unsafe-ecommerce-adapter.py",
+      "covers": [
+        "the e-commerce dispute case is an executable domain adapter, not universal law in the core Skill",
+        "an adapter that performs an unsafe high-risk action is refused rather than scored",
+        "domain evidence stays in modules/ and does not migrate into the procedural core",
+        "absent or malformed adapter input stays distinct from a domain refusal"
+      ],
+      "expected": "the committed adapter is admitted and the unsafe adapter is refused; two input-error shapes stay distinct"
     }
   ],
-  "control_suites": [
-    "tests/verify_agent_architecture_eval.py",
-    "tests/verify_ecommerce_eval.py",
-    "tests/verify_meta_eval.py"
-  ]
+  "evidence_boundary": {
+    "established": [
+      "deterministic refusal of the planted defect classes named above, on committed fixtures and factory-constructed records"
+    ],
+    "not_established": [
+      "that a live model, host, or provider executed any of these procedures",
+      "that Skill text changed agent behavior on an unseen task",
+      "cross-model or cross-harness generalization",
+      "production correctness or promotion authority, which remain human-admitted"
+    ]
+  }
 }

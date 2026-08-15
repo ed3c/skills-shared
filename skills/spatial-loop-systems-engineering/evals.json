@@ -86,7 +86,7 @@
     {
       "id": "SLS-PROCEDURAL-GROUNDING-1",
       "checker_script": "scripts/check_procedural_grounding.py",
-      "test_verify": "tests/procedural-grounding/verify.sh",
+      "test_verify": "tests/procedural-grounding/verify.py",
       "good_fixture": "tests/procedural-grounding/fixtures/valid.json",
       "hollow_fixture": null,
       "hollow_mutations": "reduce critical execution to mention-only, skip a negative control, leave a critical novel assertion obligation open, use an unreviewed/unlicensed/script-bearing/dynamic source, exceed fork/depth/token/no-progress budget, inject a raw reasoning trace or low-grounded/stale/authority-conflicted capsule, reuse stale subject evidence, claim execution from model output, inflate coverage, promote UNKNOWN runtime, claim context independence without provenance, publish lift under NOT_EXERCISED attribution, promote Human/external proof, or duplicate procedure identity",
