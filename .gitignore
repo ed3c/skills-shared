@@ -1,3 +1,8 @@
 __pycache__/
 *.pyc
 sites.local.json
+
+# Session worktrees. Git already hides a *registered* worktree from the parent's
+# status, but a removal that fails partway leaves a full checkout behind, and
+# `git add -A` in this tree would stage all of it.
+.claude/worktrees/
