@@ -1,6 +1,6 @@
 # Procedural Shadow Runtime
 
-Reusable side-effect admission, evidence-closure, and abstraction-promotion primitive for Agent Skills.
+Reusable side-effect admission, evidence closure, executable Agent Architecture assessment, and bounded abstraction-promotion primitive for Agent Skills.
 
 ## Data flow
 
@@ -9,21 +9,19 @@ Task + public candidate plan/action intents
         ↓
 Applicable Skill procedures + source anchors
         ↓
-Procedure gap = applicable - already satisfied - prior verified evidence
+Procedure delta
         ↓
-Context Capsule admission
-        ↓
-PRE_SIDE_EFFECT_GATE
+Context Capsule + PRE_SIDE_EFFECT_GATE
         ↓
 Builder/tool execution
         ↓
-assertions + multimodal evidence
+Assertions + exact-subject evidence
         ↓
-Runtime Receipt reconciliation
+Runtime Receipt closure
         ↓
-PASS / BLOCKED / FAIL
+Executable Agent Architecture Rubric
         ↓
-optional Meta-Abstraction Evaluation
+Meta-Abstraction Evaluation
         ↓
 ELIGIBLE_FOR_HUMAN_ADMIT / HOLD / REJECT
 ```
@@ -32,77 +30,93 @@ ELIGIBLE_FOR_HUMAN_ADMIT / HOLD / REJECT
 
 | Surface | Owns |
 |---|---|
-| `SKILL.md` | runtime laws, state machine, composition, promotion boundary |
-| `references/context-capsule.schema.json` | source-bound delta capsule contract |
-| `references/runtime-receipt.schema.json` | exact-subject evidence/disposition contract |
-| `references/meta-abstraction-eval-standard.md` | four-plane score, ceilings, L0-L5 requirements |
-| `references/meta-abstraction-eval-receipt.schema.json` | machine-readable meta-eval receipt |
-| `modules/ecommerce-dispute-eval-matrix.md` | worked e-commerce task family and edge cases |
-| `evals.json` | machine-readable eval inventory and initial regression gates |
-| `scripts/check_runtime_receipt.py` | deterministic runtime-close gate |
-| `scripts/check_meta_abstraction_eval.py` | deterministic score/promotion eligibility gate |
-| `tests/` | positive, mutation, and input-error controls |
+| `SKILL.md` | Runtime laws, executable rubric procedure, domain composition, promotion boundary |
+| `references/context-capsule.schema.json` | Source-bound delta capsule |
+| `references/runtime-receipt.schema.json` | Exact-subject runtime closure |
+| `references/agent-architecture-rubric.json` | Five dimensions, positive procedure atoms, Vibe contradictions, weights |
+| `references/agent-architecture-eval-receipt.schema.json` | Atomic architecture evidence receipt |
+| `references/meta-abstraction-eval-standard.md` | Four-plane score, ceilings, L0–L5 requirements |
+| `references/meta-abstraction-eval-receipt.schema.json` | Meta-eval v2 receipt |
+| `scripts/check_agent_architecture_eval.py` | 100-point architecture score and Vibe contradiction gate |
+| `scripts/check_meta_abstraction_eval.py` | Meta score and one-step eligibility gate |
+| `modules/ecommerce-dispute/` | Executable worked domain family and adapter protocol |
+| `evals.json` | Eval inventory and routing, not a live provider receipt |
+| `tests/` | Positive, Vibe, unsafe-adapter, mutation, and input controls |
 
-## Relationship to Shadow Architecture
+## 100-point architecture assessment
 
-`spatial-loop-systems-engineering` discovers hard laws, architecture deltas, failure surfaces, and procedural-grounding drift. This Skill is the smaller runtime primitive that any repo agent can compose once procedures are known.
-
-It does not own Git, browser, device, deployment, or business-domain procedures. Those remain in the corresponding Skills; this layer binds them to side-effect admission, exact-subject receipts, regression evidence, and one-step abstraction eligibility.
-
-## Quantitative promotion model
+The five source dimensions remain:
 
 ```text
-Meta Score =
-  30% Agent Architecture Score
-+ 30% Procedural Grounding Score
-+ 25% Generalization Score
-+ 15% Regression / Feedback Score
+control flow and state governance        25
+tool boundary and idempotency            20
+context budget and memory                20
+fault tolerance, self-healing, and HITL  20
+Evals and observability                  15
 ```
 
-A high raw score cannot bypass:
+The checker does not trust five manually entered dimension ratings. It derives points from every source-derived positive control and Vibe signal:
 
-- safety and HITL failures;
-- unresolved applicable `must` procedures;
-- missing exact-subject evidence;
-- absent negative controls;
-- missing held-out task families;
-- incomplete five-condition attribution;
-- missing production feedback closure for L5.
+```text
+criterion or signal
+-> exact subject
+-> executable assertion/probe/trace/negative control
+-> terminal evidence state
+-> contradiction check
+-> recomputed score and band
+```
 
-The checker reports only machine eligibility. Human Admit remains required.
+A detected Vibe signal invalidates its mapped positive controls. Critical non-idempotent writes and model-owned high-risk authority cap the score at `59`.
+
+## Domain decoupling
+
+The e-commerce dispute example is one executable task family, not universal law.
+
+```text
+universal concepts:
+  deterministic state machine
+  bounded timeout/retry
+  context budget
+  idempotent writes
+  high-risk HITL
+  Evals + trace
+
+domain-only constants:
+  USD 500
+  logistics 5s timeout
+  vision evidence
+  refund/voucher/reject
+  15s / 1500 tokens / USD 0.05
+```
+
+A consumer supplies an adapter. The runner executes six mock cases and emits deterministic assertion receipts.
 
 ## Verification
 
-Runtime receipt controls:
-
 ```bash
 python3 skills/procedural-shadow-runtime/tests/verify.py
-```
-
-Meta-abstraction controls:
-
-```bash
+python3 skills/procedural-shadow-runtime/tests/verify_agent_architecture_eval.py
+python3 skills/procedural-shadow-runtime/tests/verify_ecommerce_eval.py
 python3 skills/procedural-shadow-runtime/tests/verify_meta_eval.py
 ```
 
 Expected semantics:
 
 ```text
-positive contract               exit 0
-planted semantic mutation       exit 2
-missing / malformed input       exit 64
+positive or closed low-band assessment   exit 0
+semantic/assertion/mutation refusal       exit 2
+missing or malformed input               exit 64
 ```
 
 ## Evidence boundary
 
 ```text
-static Skill/docs/schema/checker/fixtures          IMPLEMENTED
-one-step score and ceiling rules                    IMPLEMENTED
-e-commerce edge-case module                         IMPLEMENTED
-live Claude/Codex hooks                             NOT_EXERCISED
-live external registry retrieval                    NOT_EXERCISED
-live multimodal browser/device observation          NOT_EXERCISED
-live Langfuse/OpenTelemetry production feedback     NOT_EXERCISED
-cross-model causal uplift                           NOT_EXERCISED
-actual promotion                                    HUMAN_ADMIT_REQUIRED
+rubric/procedure atoms/checkers/fixtures              IMPLEMENTED
+local deterministic positive/Vibe/domain controls     IMPLEMENTED
+live Claude/Codex hooks                                NOT_EXERCISED
+live external registry retrieval                      NOT_EXERCISED
+live multimodal browser/device observation            NOT_EXERCISED
+live Langfuse/OpenTelemetry production feedback       NOT_EXERCISED
+cross-model causal uplift                             NOT_EXERCISED
+actual abstraction promotion                          HUMAN_ADMIT_REQUIRED
 ```

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Ceilings and level eligibility for procedural-meta-abstraction-eval/v1."""
+"""Ceilings and level eligibility for procedural-meta-abstraction-eval/v2."""
 from __future__ import annotations
 
 import math
@@ -64,14 +64,23 @@ def errors(target: str, design: dict[str, Any], architecture: float, grounding: 
     if LEVELS.index(target) >= 3 and generalization["held_out_family_count"] < 1:
         result.append("held-out transfer is required")
     if LEVELS.index(target) >= 4:
-        if set(generalization["conditions"]) != set(CONDITIONS): result.append("all five counterfactual attribution conditions are required")
-        if not design["clean_context_reset"]: result.append("clean-context reset is required")
-        if not design["same_runtime_model_bindings"]: result.append("baseline/candidate runtime and model bindings must match")
-        if not design["baseline_candidate_same_dataset"]: result.append("baseline/candidate must use the same dataset")
-        if not design["dataset_frozen"]: result.append("dataset must be frozen for the comparison")
+        if set(generalization["conditions"]) != set(CONDITIONS):
+            result.append("all five counterfactual attribution conditions are required")
+        if not design["clean_context_reset"]:
+            result.append("clean-context reset is required")
+        if not design["same_runtime_model_bindings"]:
+            result.append("baseline/candidate runtime and model bindings must match")
+        if not design["baseline_candidate_same_dataset"]:
+            result.append("baseline/candidate must use the same dataset")
+        if not design["dataset_frozen"]:
+            result.append("dataset must be frozen for the comparison")
     if LEVELS.index(target) >= 5:
-        if controls["production_feedback_evidence_state"] != "VERIFIED": result.append("verified production feedback evidence is required")
-        if not math.isclose(regression["feedback_closure"], 1.0, abs_tol=1e-9): result.append("production feedback closure rate must be 1.0")
-        if not math.isclose(regression["replay_coverage"], 1.0, abs_tol=1e-9): result.append("production replay coverage must be 1.0")
-        if feedback["human_adjudicated"] <= 0: result.append("human-adjudicated production examples are required")
+        if controls["production_feedback_evidence_state"] != "VERIFIED":
+            result.append("verified production feedback evidence is required")
+        if not math.isclose(regression["feedback_closure"], 1.0, abs_tol=1e-9):
+            result.append("production feedback closure rate must be 1.0")
+        if not math.isclose(regression["replay_coverage"], 1.0, abs_tol=1e-9):
+            result.append("production replay coverage must be 1.0")
+        if feedback["human_adjudicated"] <= 0:
+            result.append("human-adjudicated production examples are required")
     return result

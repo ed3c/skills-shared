@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Deterministic checker for procedural-meta-abstraction-eval/v1."""
+"""Deterministic checker for procedural-meta-abstraction-eval/v2."""
 from __future__ import annotations
 
 import json

@@ -14,27 +14,21 @@ Meta Score =
 + 15% Regression / Feedback Score
 ```
 
-The score is advisory until the deterministic checker recomputes it. Machine eligibility never replaces Human Admit.
+The score is advisory until deterministic checkers recompute it. Machine eligibility never replaces Human Admit.
 
-## Source-derived Agent architecture baseline
+## Source-derived Agent Architecture baseline
 
-The architecture baseline uses five dimensions and the original 100-point weighting:
+The source matrix defines five dimensions and the original 100-point weights:
 
-| Dimension | Weight | Agent-architecture evidence | Vibe-Coding signal |
+| Dimension | Weight | Positive controls | Vibe-Coding signals |
 |---|---:|---|---|
-| Control flow and state governance | 25 | explicit DAG/state machine; Plan/Execute/Verify separation; termination and maximum-step bounds; compensation/rollback | giant prompt; unconstrained ReAct loop; model decides when to stop |
-| Tool boundary and idempotency | 20 | single-responsibility tools; strict schemas; idempotency key for writes; slim return payloads | broad tools; duplicate writes; raw payload dumped into context |
-| Context budget and memory | 20 | scratchpad vs persistent state; pruning; structured extraction; overflow degradation | full history retained; no budget; late-turn quality and latency collapse |
-| Fault tolerance, self-healing, and HITL | 20 | bounded retry; timeout/backoff/circuit breaker; deterministic high-risk gate; human queue | restart on failure; unbounded self-repair; high-risk authority delegated to the model |
-| Evals and observability | 15 | deterministic assertions + Golden Dataset + semantic judge; full trace of state/tool/token/latency/cost | a few manual cases; no regression diff; no trace lineage |
+| Control flow and state governance | 25 | explicit DAG/state machine; Plan/Execute/Verify separation; terminal and maximum-step bounds; compensation or safe pause | giant prompt; model decides termination; query-fail retry loop |
+| Tool boundary and idempotency | 20 | single-responsibility tools; strict schemas; idempotent writes; slim outputs | broad manage tool; duplicate writes; raw payload dump |
+| Context budget and memory | 20 | scratchpad/durable-state separation; pruning and structured extraction; token budget and overflow fallback | retain full history; no cleanup or budget |
+| Fault tolerance, self-healing, and HITL | 20 | timeout/backoff/circuit breaker; bounded schema repair; deterministic high-risk gate and Human queue | crash/restart on tool error; high-risk authority delegated to model |
+| Evals and observability | 15 | deterministic assertions + Golden Dataset + semantic judge; full trace; CI Baseline/Candidate regression | a few manual cases; no measurable prompt/model regression |
 
-Each dimension is rated from `0` to `5`.
-
-```text
-Architecture Score = Σ (dimension_level / 5 × dimension_weight)
-```
-
-Bands:
+Bands remain:
 
 ```text
 < 60    VIBE_CODER
@@ -42,7 +36,54 @@ Bands:
 >= 85   AGENT_ARCHITECT
 ```
 
-A high architecture score is necessary but not sufficient for abstraction promotion.
+## Implementation calibration: atomic executable scoring
+
+The source defines dimension weights and qualitative controls, but does not assign numeric points to each bullet. Version `agent-architecture-rubric/v1` therefore uses this explicit calibration:
+
+1. each source-derived positive control becomes a stable criterion atom;
+2. positive controls share their dimension weight equally;
+3. every Vibe signal maps to the positive controls it contradicts;
+4. a detected Vibe signal makes those mapped points unavailable;
+5. `deduction_points` reports unavailable points and is not an arbitrary second subtraction;
+6. critical non-idempotent writes and model-owned high-risk authority impose a score ceiling of `59`.
+
+The machine authority is:
+
+```text
+references/agent-architecture-rubric.json
+references/agent-architecture-eval-receipt.schema.json
+scripts/agent_architecture_common.py
+scripts/check_agent_architecture_eval.py
+```
+
+Architecture scoring procedure:
+
+```text
+versioned rubric
+-> exact runtime/repository subject
+-> all positive criteria
+-> all Vibe signals
+-> executable evidence
+-> terminal states
+-> contradiction refusal
+-> dimension points
+-> safety ceiling
+-> effective 100-point score
+-> band
+```
+
+Allowed evidence modes:
+
+```text
+STATIC_ASSERTION
+RUNTIME_PROBE
+TRACE_ASSERTION
+NEGATIVE_CONTROL
+```
+
+`VERIFIED` and `NOT_DETECTED` require executable evidence bound to the exact subject. `NOT_EXERCISED` earns no points and cannot produce a `PASS` architecture receipt. Prose-only evidence is rejected.
+
+The Meta-Abstraction receipt embeds a closed `agent-architecture-eval/v1` receipt. Free-form `0..5` dimension ratings are no longer authoritative.
 
 ## Procedural Grounding Score
 
@@ -91,14 +132,14 @@ DELTA_CAPSULE
 DELTA_CAPSULE_PLUS_HARNESS
 ```
 
-The initial normalized uplift rule is:
+Initial calibration:
 
 ```text
 raw_uplift = success(DELTA_CAPSULE_PLUS_HARNESS) - success(NO_SKILL)
 causal_uplift_score = clamp(raw_uplift / 0.10, 0, 1)
 ```
 
-A ten-percentage-point lift receives the full uplift subscore. This is a calibration default, not a claim about model training membership.
+A ten-percentage-point lift receives the full uplift subscore. This is a versioned calibration default, not evidence of training-data membership.
 
 ## Regression / Feedback Score
 
@@ -136,7 +177,7 @@ Regression Score weights:
 | Golden-case replay coverage | 10 |
 | Trace completeness | 5 |
 
-The feedback ratios are recomputed:
+Feedback ratios:
 
 ```text
 feedback_closure = golden_admitted / human_adjudicated
@@ -159,15 +200,15 @@ PRODUCTION_TRACE
 
 High-value anomaly triggers include:
 
-- human override of the Agent decision;
+- Human override of the Agent decision;
 - confidence below the declared threshold;
 - repeated schema-repair failure;
 - latency, token, or cost budget anomaly;
 - user appeal or complaint;
 - tool timeout or unknown status;
-- safety gate intervention.
+- safety-gate intervention.
 
-A trace is not automatically admitted to the Golden Dataset. PII scrubbing and Human adjudication are required before admission. Dataset changes should be delivered as explicit reviewable changes.
+A trace is not automatically admitted. PII scrubbing and Human adjudication are required, and dataset changes remain explicit reviewable changes.
 
 ## Score ceilings
 
@@ -178,7 +219,7 @@ A raw score cannot compensate for missing evidence.
 | safety violation, unresolved `must`, or unbound exact subject | 59 | below all engineered promotion levels |
 | negative control absent for L2+ | 79 | cannot reach L2 |
 | held-out transfer absent for L3+ | 84 | cannot reach L3 |
-| five-condition counterfactual attribution incomplete for L4+ | 89 | cannot reach L4 |
+| five-condition attribution incomplete for L4+ | 89 | cannot reach L4 |
 | verified production feedback closure absent for L5 | 94 | cannot reach L5 |
 
 ```text
@@ -187,7 +228,9 @@ effective_meta_score = min(raw_meta_score, score_ceiling)
 
 Forbidden authority, private-data egress, raw private reasoning, model-weight introspection claims, or writable Shadow workers are direct eligibility failures.
 
-## Abstraction ladder promotion requirements
+The embedded architecture receipt applies its own safety ceilings before entering the Meta Score.
+
+## Abstraction-ladder promotion requirements
 
 Promotion is one level at a time.
 
@@ -197,12 +240,12 @@ Promotion is one level at a time.
 | L1 | normalized procedure | 70 | 70 | 2 | 0 | 6 | 2 | repeated paraphrase evidence |
 | L2 | invariant + executable oracle | 80 | 80 | 2 | 0 | 12 | 3 | executed negative control |
 | L3 | cross-domain pattern | 85 | 85 | 3 | 1 | 24 | 5 | held-out family evidence |
-| L4 | meta-policy | 90 | 90 | 4 | 1 | 30 | 5 | all five counterfactual conditions under clean contexts |
+| L4 | meta-policy | 90 | 90 | 4 | 1 | 30 | 5 | all five attribution conditions under clean contexts |
 | L5 | meta-controller | 92 | 95 | 5 | 2 | 50 | 10 | verified production feedback, full adjudication closure, full replay |
 
-These counts are initial defaults. Future calibration may change them only through a versioned contract and new negative controls.
+Counts are initial defaults. Change them only through a versioned contract and new negative controls.
 
-## Evaluation design invariants
+## Evaluation-design invariants
 
 For L4 and L5:
 
@@ -213,15 +256,34 @@ baseline_candidate_same_dataset = true
 dataset_frozen = true
 ```
 
-The evaluation receipt must pin:
+The receipt must pin:
 
 - repository and exact base/current subject;
+- architecture-rubric bytes and atomic evidence;
 - model/runtime binding;
 - dataset version;
 - judge-rubric version;
 - source procedure IDs and content digests;
 - trial and case counts;
 - Baseline/Candidate metrics and recomputed deltas.
+
+## Domain decoupling
+
+The e-commerce dispute case is one task family under `modules/ecommerce-dispute/`.
+
+Its USD 500 boundary, logistics timeout, vision evidence, refund/voucher tools, and cost/latency constants do not enter the universal rubric. The domain runner loads a consumer adapter and emits deterministic case receipts that can support generic criterion IDs.
+
+```text
+generic architecture criterion
+-> domain mapping
+-> executable case
+-> assertion result
+-> evidence artifact
+-> architecture receipt
+-> meta receipt
+```
+
+A semantic judge may score explanation quality, but it cannot overrule deterministic HITL, idempotency, timeout, or safety assertions.
 
 ## Decision vocabulary
 
@@ -231,18 +293,19 @@ HOLD
 REJECT
 ```
 
-`ELIGIBLE_FOR_HUMAN_ADMIT` means the machine gates are closed. It does not merge a branch, publish a release, change repository visibility, or promote the abstraction without Human authority.
+`ELIGIBLE_FOR_HUMAN_ADMIT` means machine gates are closed. It does not merge, release, change visibility, or promote without Human authority.
 
-## Checker
+## Checkers
 
 ```bash
-python3 scripts/check_meta_abstraction_eval.py receipt.json
+python3 scripts/check_agent_architecture_eval.py architecture-receipt.json
+python3 scripts/check_meta_abstraction_eval.py meta-receipt.json
 ```
 
 Exit contract:
 
 ```text
-0   structurally and semantically closed receipt
-2   semantic refusal
+0   structurally and semantically closed
+2   semantic/assertion refusal
 64  missing or malformed input
 ```

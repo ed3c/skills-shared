@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Shared contracts for procedural-meta-abstraction-eval/v1."""
+"""Shared contracts for procedural-meta-abstraction-eval/v2."""
 from __future__ import annotations
 
 import json
@@ -8,7 +8,7 @@ import re
 from pathlib import Path
 from typing import Any
 
-SCHEMA = "procedural-meta-abstraction-eval/v1"
+SCHEMA = "procedural-meta-abstraction-eval/v2"
 HEX40 = re.compile(r"^[0-9a-f]{40}$")
 HEX64 = re.compile(r"^[0-9a-f]{64}$")
 LEVELS = ["L0", "L1", "L2", "L3", "L4", "L5"]
@@ -27,13 +27,6 @@ CONDITIONS = [
     "DELTA_CAPSULE",
     "DELTA_CAPSULE_PLUS_HARNESS",
 ]
-ARCH_WEIGHTS = {
-    "control_flow_state": 25.0,
-    "tool_boundary_idempotency": 20.0,
-    "context_budget_memory": 20.0,
-    "fault_tolerance_self_heal_hitl": 20.0,
-    "evals_observability": 15.0,
-}
 GROUNDING_WEIGHTS = {
     "source_fidelity": 15.0,
     "applicability_precision": 10.0,
@@ -159,18 +152,21 @@ def parse(path: Path) -> dict[str, Any]:
     return data
 
 
-def validate_subject(data: dict[str, Any]) -> None:
+def validate_subject(data: dict[str, Any]) -> dict[str, str]:
     value = obj(data["subject"], "$.subject")
     fields = ["repository", "base_sha", "current_sha", "runtime", "model_binding", "dataset_version", "context_digest", "eval_run_id"]
     exact_keys(value, fields, "$.subject")
-    text(value["repository"], "$.subject.repository")
-    digest(value["base_sha"], HEX40, "$.subject.base_sha")
-    digest(value["current_sha"], HEX40, "$.subject.current_sha")
-    text(value["runtime"], "$.subject.runtime")
-    text(value["model_binding"], "$.subject.model_binding")
-    text(value["dataset_version"], "$.subject.dataset_version")
-    digest(value["context_digest"], HEX64, "$.subject.context_digest")
-    text(value["eval_run_id"], "$.subject.eval_run_id")
+    result = {
+        "repository": text(value["repository"], "$.subject.repository"),
+        "base_sha": digest(value["base_sha"], HEX40, "$.subject.base_sha"),
+        "current_sha": digest(value["current_sha"], HEX40, "$.subject.current_sha"),
+        "runtime": text(value["runtime"], "$.subject.runtime"),
+        "model_binding": text(value["model_binding"], "$.subject.model_binding"),
+        "dataset_version": text(value["dataset_version"], "$.subject.dataset_version"),
+        "context_digest": digest(value["context_digest"], HEX64, "$.subject.context_digest"),
+        "eval_run_id": text(value["eval_run_id"], "$.subject.eval_run_id"),
+    }
+    return result
 
 
 def validate_candidate(data: dict[str, Any]) -> tuple[str, str]:

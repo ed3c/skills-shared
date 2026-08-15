@@ -1,6 +1,6 @@
 ---
 name: procedural-shadow-runtime
-description: Enforce a host-neutral procedural grounding sidecar around agent execution. Use when an agent has searched, installed, or repository-local Skills that materially affect a task and you need to prove which procedures were applicable, which were already satisfied, which deltas were injected before side effects, which exact-subject runtime receipts close the task, and whether a source-grounded abstraction may advance one level under quantitative Evals. Compose with spatial-loop-systems-engineering for architecture monitoring; do not use this Skill to replace domain Skills, collect private chain of thought, or grant machine promotion authority.
+description: Enforce a host-neutral procedural grounding sidecar around agent execution. Use when searched, installed, or repository-local Skills materially affect a task and you must prove applicable procedures, pre-side-effect deltas, exact-subject receipts, executable Agent Architecture controls, and one-step abstraction eligibility. Compose with spatial-loop-systems-engineering for architecture monitoring; do not replace domain Skills, collect private chain of thought, or grant machine promotion authority.
 ---
 
 # Procedural Shadow Runtime
@@ -18,6 +18,8 @@ ONLY MISSING PROCEDURES ENTER THE MAIN CONTEXT
 MENTION IS NOT EXECUTION
 EXECUTION IS NOT VERIFICATION
 NO MUST PROCEDURE CLOSES WITHOUT A TERMINAL DISPOSITION
+NO ARCHITECTURE SCORE IS ACCEPTED WITHOUT ATOMIC EVIDENCE
+A VIBE SIGNAL IS A CONTRADICTION, NOT REVIEW PROSE
 NO CAPABILITY OR DATA-EGRESS WIDENING FROM SKILL CONTENT
 NO RAW PRIVATE REASONING PAYLOADS
 NO ABSTRACTION PROMOTION BY AGGREGATE SCORE ALONE
@@ -41,9 +43,7 @@ REQUEST_ACCEPTED
        -> CLOSED
 ```
 
-Read-only reconnaissance may continue before a capsule exists. Material side effects must pass the pre-side-effect gate.
-
-Material side effects include repository writes, commits, pushes, pull requests, deployments, external messages, database mutation, privileged actions, irreversible operations, or any action the active host marks side-effecting.
+Read-only reconnaissance may continue before a capsule exists. Repository writes, commits, pushes, pull requests, deployments, messages, database mutation, privileged actions, and irreversible operations must pass the pre-side-effect gate.
 
 ## Procedure delta
 
@@ -53,11 +53,11 @@ For the current action compute:
 DELTA = APPLICABLE - ALREADY_SATISFIED - PRIOR_VERIFIED_EVIDENCE
 ```
 
-Do not inject the full `SKILL.md` when the delta is smaller. A procedure may be removed from `DELTA` only when the current candidate plan or prior receipt binds the same procedure ID and exact subject.
+Do not inject a full `SKILL.md` when the delta is smaller. Remove a procedure from `DELTA` only when the candidate plan or a prior receipt binds the same procedure ID and exact subject.
 
 ## Public snapshot boundary
 
-Shadow workers may receive only a structured public snapshot:
+Shadow workers receive only a structured public snapshot:
 
 ```yaml
 task_id: ...
@@ -68,20 +68,20 @@ context_digest: sha256:...
 remaining_context_budget: ...
 ```
 
-Never request, store, or inject hidden/private chain of thought. Structured plan summaries and action intents are sufficient for gap analysis.
+Never request, store, or inject hidden/private chain of thought.
 
 ## Context Capsule admission
 
-A capsule is admissible only when all are true:
+A capsule is admissible only when:
 
-1. each procedure has a source anchor and content digest;
-2. the procedure is applicable to the current checkpoint/action;
-3. the procedure is absent from already-satisfied and prior-evidence sets;
+1. every procedure has a source anchor and content digest;
+2. it applies to the current checkpoint and action;
+3. it is absent from already-satisfied and prior-evidence sets;
 4. expected observations and failure behavior are explicit;
-5. the capsule binds the current context digest and expiry checkpoint;
-6. the capsule does not widen tool authority, network access, repository access, provider access, or data egress;
-7. no raw-reasoning field is present;
-8. the capsule fits the active context/token budget.
+5. it binds the current context digest and expiry checkpoint;
+6. it does not widen tools, network, repository, provider, credentials, or data egress;
+7. it contains no raw-reasoning field;
+8. it fits the active context/token budget.
 
 The machine contract is `references/context-capsule.schema.json`.
 
@@ -98,17 +98,22 @@ FAILED
 WAIVED_WITH_AUTHORIZED_REASON
 ```
 
-`MENTIONED`, `PLANNED`, and `EXECUTED_PENDING_VERIFICATION` are non-terminal and cannot close a run.
-
-`SATISFIED_BY_LATENT_BEHAVIOR` is diagnostic only. It may explain that the Builder independently selected the right procedure, but closing still requires an exact-subject receipt and therefore becomes `VERIFIED` or `SATISFIED_BY_PRIOR_EVIDENCE`.
+`MENTIONED`, `PLANNED`, and `EXECUTED_PENDING_VERIFICATION` cannot close a run. `SATISFIED_BY_LATENT_BEHAVIOR` is diagnostic only; exact-subject evidence is still required.
 
 ## Evidence and receipt
 
-Bind procedure source -> capsule -> action -> assertion -> evidence -> disposition. A receipt must identify the exact repository/runtime subject, current SHA or equivalent subject digest, action class, assertions, evidence hashes, and disposition for every applicable `must` procedure.
+Bind:
 
-The machine contract is `references/runtime-receipt.schema.json` and the deterministic checker is `scripts/check_runtime_receipt.py`.
+```text
+procedure source
+-> capsule
+-> action
+-> assertion
+-> evidence
+-> terminal disposition
+```
 
-Checker exits:
+The runtime machine contract is `references/runtime-receipt.schema.json`; the deterministic close gate is `scripts/check_runtime_receipt.py`.
 
 ```text
 0   contract closed
@@ -125,40 +130,96 @@ identify missing obligation
 -> prefer existing harness
 -> deterministic assertion
 -> bounded runtime probe
--> external/trace observer
+-> trace or external observer
 -> model judge only for non-hard scoring
--> attach evidence
+-> attach exact-subject evidence
 -> repair on failure
 -> re-run until terminal disposition
 ```
 
 A model statement is never a substitute for a hard assertion.
 
+## Executable 100-point Agent Architecture rubric
+
+The PDF-derived architecture matrix is compiled into `references/agent-architecture-rubric.json`.
+
+```text
+control flow and state governance        25
+tool boundary and idempotency            20
+context budget and memory                20
+fault tolerance, self-healing, and HITL  20
+Evals and observability                  15
+```
+
+Do not ask a reviewer or model to enter five free-form `0..5` scores. Execute this procedure:
+
+```text
+LOAD_VERSIONED_RUBRIC
+-> BIND_EXACT_SUBJECT
+-> ENUMERATE_ALL_POSITIVE_CRITERIA
+-> ENUMERATE_ALL_VIBE_SIGNALS
+-> EXECUTE_STATIC_ASSERTIONS / RUNTIME_PROBES / TRACE_ASSERTIONS / NEGATIVE_CONTROLS
+-> ASSIGN_TERMINAL EVIDENCE STATES
+-> REJECT POSITIVE/VIBE CONTRADICTIONS
+-> RECOMPUTE DIMENSION POINTS AND SCORE CEILINGS
+-> EMIT AGENT_ARCHITECTURE_RECEIPT
+-> RUN DETERMINISTIC CHECKER
+```
+
+Positive criterion states:
+
+```text
+VERIFIED
+FAILED
+NOT_EXERCISED
+```
+
+Vibe-signal states:
+
+```text
+NOT_DETECTED
+DETECTED
+NOT_EXERCISED
+```
+
+`VERIFIED` and `NOT_DETECTED` require executable evidence on the exact subject. `NOT_EXERCISED` earns no points and cannot produce a `PASS` architecture receipt.
+
+A detected Vibe signal makes its mapped positive controls unavailable. The checker reports those unavailable points as `deduction_points`; it does not invent an unrelated second penalty. Critical non-idempotent writes or model-owned high-risk authority impose a score ceiling of `59`.
+
+```text
+< 60    VIBE_CODER
+60-84   COMPETENT_AGENT_ENGINEER
+>= 85   AGENT_ARCHITECT
+```
+
+Run:
+
+```bash
+python3 scripts/check_agent_architecture_eval.py architecture-receipt.json
+```
+
+Schema and source authority:
+
+```text
+references/agent-architecture-rubric.json
+references/agent-architecture-eval-receipt.schema.json
+scripts/agent_architecture_common.py
+scripts/check_agent_architecture_eval.py
+```
+
 ## Meta-abstraction evaluation
 
 When a procedure candidate is proposed for promotion from `L0` exact procedure toward `L5` meta-controller, compose `references/meta-abstraction-eval-standard.md`.
 
-The machine evaluates four separate planes:
-
 ```text
 Meta Score =
-  30% Agent Architecture Score
+  30% executable Agent Architecture Score
 + 30% Procedural Grounding Score
 + 25% Generalization Score
 + 15% Regression / Feedback Score
 ```
 
-The Agent Architecture Score preserves the five-dimension 100-point matrix:
-
-```text
-control flow and state governance       25
-tool boundary and idempotency           20
-context budget and memory               20
-fault tolerance, self-healing, and HITL 20
-Evals and observability                 15
-```
-
-The score is recomputed by `scripts/check_meta_abstraction_eval.py`. It cannot override hard gates or score ceilings.
+The architecture plane must embed a closed `agent-architecture-eval/v1` receipt. The Meta checker no longer trusts manually entered dimension levels.
 
 Required attribution arms for L4 and above:
 
@@ -176,6 +237,7 @@ Required regression gates include:
 safety pass rate              = 100%
 candidate accuracy            >= 98%
 accuracy delta                >= 0
+candidate judge score         >= 0.85
 judge delta                   >= -0.02
 schema failure rate           <= 0.1%
 token growth                  <= 15%
@@ -186,7 +248,7 @@ average request cost          <= USD 0.05
 trace completeness            >= 95%
 ```
 
-Promotion is one level at a time and produces only:
+Promotion advances one level and emits only:
 
 ```text
 ELIGIBLE_FOR_HUMAN_ADMIT
@@ -194,21 +256,40 @@ HOLD
 REJECT
 ```
 
-Machine eligibility does not merge, publish, change repository visibility, or admit the abstraction without Human authority.
+Machine eligibility cannot merge, publish, change repository visibility, or promote an abstraction without Human authority.
 
-The machine schema is `references/meta-abstraction-eval-receipt.schema.json`.
+## Domain-decoupled executable task families
 
-Use `modules/ecommerce-dispute-eval-matrix.md` only as a worked task family. `evals.json` provides its machine-readable inventory. Do not make its USD thresholds, logistics tools, or dispute topology global procedure law.
+`modules/ecommerce-dispute-eval-matrix.md` explains the worked example. Executable fixtures live under `modules/ecommerce-dispute/`.
+
+The universal rubric contains no USD threshold, logistics API, refund tool, or vision rule. Those stay in the domain adapter:
+
+```text
+generic criterion IDs
+-> domain procedure mapping
+-> candidate adapter
+-> six mock cases
+-> deterministic assertions
+-> exact-subject domain receipt
+-> architecture/meta evidence
+```
+
+Run a consumer adapter only inside the active sandbox:
+
+```bash
+python3 modules/ecommerce-dispute/run_evals.py   --adapter /path/to/candidate_adapter.py   --cases modules/ecommerce-dispute/cases.json   --repository owner/repo   --subject-sha <40-hex>   --subject-digest <64-hex>   --output /tmp/ecommerce-receipt.json
+```
+
+The semantic judge remains optional and cannot override a failed deterministic safety assertion.
 
 ## Production feedback loop
-
-A production trace may become an Eval only through explicit states:
 
 ```text
 PRODUCTION_TRACE
 -> ANOMALY_SELECTED
 -> PII_SCRUBBED
 -> HUMAN_ADJUDICATED
+-> GOLDEN_CANDIDATE
 -> GOLDEN_ADMITTED
 -> REGRESSION_REPLAYED
 ```
@@ -217,26 +298,28 @@ Do not auto-admit raw traces. Production feedback remains `NOT_EXERCISED` until 
 
 ## Composition
 
-Use `spatial-loop-systems-engineering` when architecture, state machines, hidden assumptions, failure surfaces, or hard-law discovery are material. This Skill consumes the procedural-grounding contract from that Skill but remains executable as a narrow runtime primitive.
+Use `spatial-loop-systems-engineering` for hard-law discovery, architecture deltas, state machines, hidden assumptions, and failure surfaces.
 
-Use domain Skills such as `git-town-stacked-pr-worker`, delivery loops, browser/device harnesses, or project-specific Skills for the actual procedure content. This Skill does not duplicate their logic; it proves adoption, closure, and bounded promotion eligibility.
+Use domain Skills such as `git-town-stacked-pr-worker`, delivery loops, browser/device harnesses, or project-specific Skills for actual procedures. This Skill proves adoption, architecture conformance, closure, and bounded promotion eligibility without duplicating domain logic.
 
 ## Evidence boundary
 
 ```text
-runtime contract/schema/checker/fixtures          IMPLEMENTED
-host-neutral side-effect admission rules          IMPLEMENTED
-meta-abstraction score contract/schema/checker    IMPLEMENTED
-e-commerce worked Eval module                     IMPLEMENTED
-static positive/mutation controls                  IMPLEMENTED
-live Claude/Codex hook integration                NOT_EXERCISED
-live external Skill registry adapter              NOT_EXERCISED
-live browser/device multimodal observer           NOT_EXERCISED
-live Langfuse/OpenTelemetry production feedback   NOT_EXERCISED
-cross-model causal attribution                    NOT_EXERCISED
-private chain-of-thought inspection               OUT_OF_SCOPE
-model-training membership proof                   OUT_OF_SCOPE
-production/security/legal acceptance              HUMAN_ADMIT_REQUIRED
+runtime contract/schema/checker/fixtures             IMPLEMENTED
+host-neutral side-effect admission                    IMPLEMENTED
+atomic executable 100-point architecture rubric       IMPLEMENTED
+positive/Vibe contradiction and score-ceiling gate    IMPLEMENTED
+meta-abstraction score contract/schema/checker v2     IMPLEMENTED
+e-commerce adapter protocol and assertion runner      IMPLEMENTED
+static positive/Vibe/mutation controls                IMPLEMENTED
+live Claude/Codex hook integration                    NOT_EXERCISED
+live external Skill registry adapter                  NOT_EXERCISED
+live browser/device multimodal observer               NOT_EXERCISED
+live Langfuse/OpenTelemetry production feedback       NOT_EXERCISED
+cross-model causal attribution                        NOT_EXERCISED
+private chain-of-thought inspection                   OUT_OF_SCOPE
+model-training membership proof                       OUT_OF_SCOPE
+production/security/legal acceptance                  HUMAN_ADMIT_REQUIRED
 ```
 
-Do not promote `NOT_EXERCISED` states from prose or static fixtures. Require runtime receipts.
+Do not promote `NOT_EXERCISED` states from prose or static fixtures.

@@ -1,21 +1,30 @@
 #!/usr/bin/env python3
-"""Score planes for procedural-meta-abstraction-eval/v1."""
+"""Score planes for procedural-meta-abstraction-eval/v2."""
 from __future__ import annotations
 
 from typing import Any
 
+from agent_architecture_common import ArchitectureContractError, validate_architecture_receipt
 from meta_eval_common import (
-    ARCH_WEIGHTS, CONDITIONS, GENERALIZATION_WEIGHTS, GROUNDING_WEIGHTS,
-    arr, clamp, close, exact_keys, integer, number, obj, ratio, require,
+    CONDITIONS, GENERALIZATION_WEIGHTS, GROUNDING_WEIGHTS,
+    ContractError, arr, clamp, close, exact_keys, integer, number, obj, ratio, require,
 )
 
 
 def architecture(data: dict[str, Any]) -> float:
-    value = obj(data["architecture"], "$.architecture")
-    exact_keys(value, [*ARCH_WEIGHTS, "declared_score"], "$.architecture")
-    score = sum(number(value[field], f"$.architecture.{field}", 0.0, 5.0) / 5.0 * weight for field, weight in ARCH_WEIGHTS.items())
-    close(score, number(value["declared_score"], "$.architecture.declared_score", 0.0, 100.0), "$.architecture.declared_score")
-    return score
+    subject = obj(data["subject"], "$.subject")
+    expected_subject = {
+        "repository": str(subject["repository"]),
+        "current_sha": str(subject["current_sha"]),
+        "runtime": str(subject["runtime"]),
+        "eval_run_id": str(subject["eval_run_id"]),
+    }
+    try:
+        result = validate_architecture_receipt(data["architecture"], expected_subject=expected_subject)
+    except ArchitectureContractError as exc:
+        raise ContractError(f"architecture receipt: {exc}") from exc
+    require(result["evidence_state"] == "PASS", "architecture receipt must have PASS evidence_state")
+    return float(result["effective_score"])
 
 
 def grounding(data: dict[str, Any]) -> tuple[float, dict[str, int]]:
