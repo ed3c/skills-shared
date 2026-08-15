@@ -1,0 +1,358 @@
+{
+  "schema": "agent-architecture-rubric/v1",
+  "title": "Executable Agent Architecture Rubric",
+  "source_basis": {
+    "matrix": "Vibe Coding vs. Agent Architect 100-point matrix",
+    "weights_preserved": true,
+    "calibration": "Within each source dimension, positive controls share the dimension weight equally. A detected Vibe signal does not create an arbitrary second penalty: it makes its mapped positive controls unavailable and reports those unavailable points as deduction_points. Critical unsafe signals may additionally impose an explicit score ceiling."
+  },
+  "evidence_modes": [
+    "STATIC_ASSERTION",
+    "RUNTIME_PROBE",
+    "TRACE_ASSERTION",
+    "NEGATIVE_CONTROL"
+  ],
+  "dimensions": [
+    {
+      "dimension_id": "control_flow_state",
+      "weight": 25,
+      "positive_criteria": [
+        {
+          "criterion_id": "CF-01_EXPLICIT_DAG_OR_STATE_MACHINE",
+          "description": "Control flow is represented by an explicit DAG or state machine rather than one unconstrained ReAct loop.",
+          "required_any_modes": [
+            "STATIC_ASSERTION",
+            "RUNTIME_PROBE",
+            "TRACE_ASSERTION"
+          ]
+        },
+        {
+          "criterion_id": "CF-02_PLAN_EXECUTE_VERIFY_SEPARATION",
+          "description": "Planning, execution, and verification are distinct states or phases with structured handoff.",
+          "required_any_modes": [
+            "STATIC_ASSERTION",
+            "TRACE_ASSERTION"
+          ]
+        },
+        {
+          "criterion_id": "CF-03_TERMINATION_AND_MAX_STEPS",
+          "description": "The workflow has explicit terminal states, maximum-step or iteration bounds, and loop-exhaustion behavior.",
+          "required_any_modes": [
+            "RUNTIME_PROBE",
+            "TRACE_ASSERTION",
+            "NEGATIVE_CONTROL"
+          ]
+        },
+        {
+          "criterion_id": "CF-04_COMPENSATION_OR_SAFE_PAUSE",
+          "description": "Failed or partially completed side effects have compensation, rollback, or a safe resumable pause.",
+          "required_any_modes": [
+            "STATIC_ASSERTION",
+            "RUNTIME_PROBE",
+            "NEGATIVE_CONTROL"
+          ]
+        }
+      ],
+      "vibe_signals": [
+        {
+          "signal_id": "VC-CF-01_GIANT_SYSTEM_PROMPT",
+          "description": "Core workflow logic is concentrated in one giant System Prompt instead of governed states.",
+          "contradicts": [
+            "CF-01_EXPLICIT_DAG_OR_STATE_MACHINE",
+            "CF-02_PLAN_EXECUTE_VERIFY_SEPARATION"
+          ],
+          "required_any_modes": [
+            "STATIC_ASSERTION"
+          ]
+        },
+        {
+          "signal_id": "VC-CF-02_MODEL_DECIDES_TERMINATION",
+          "description": "The LLM is relied on to decide when execution ends without deterministic bounds.",
+          "contradicts": [
+            "CF-03_TERMINATION_AND_MAX_STEPS"
+          ],
+          "required_any_modes": [
+            "STATIC_ASSERTION",
+            "RUNTIME_PROBE",
+            "TRACE_ASSERTION"
+          ]
+        },
+        {
+          "signal_id": "VC-CF-03_QUERY_FAILURE_RETRY_LOOP",
+          "description": "The Agent can repeat query-fail-query without a bounded stop, fallback, or compensation path.",
+          "contradicts": [
+            "CF-03_TERMINATION_AND_MAX_STEPS",
+            "CF-04_COMPENSATION_OR_SAFE_PAUSE"
+          ],
+          "required_any_modes": [
+            "RUNTIME_PROBE",
+            "TRACE_ASSERTION",
+            "NEGATIVE_CONTROL"
+          ]
+        }
+      ]
+    },
+    {
+      "dimension_id": "tool_boundary_idempotency",
+      "weight": 20,
+      "positive_criteria": [
+        {
+          "criterion_id": "TL-01_SINGLE_RESPONSIBILITY_STRICT_SCHEMA",
+          "description": "Tools have single responsibility, explicit input/output schemas, validation, and declared failure modes.",
+          "required_any_modes": [
+            "STATIC_ASSERTION",
+            "RUNTIME_PROBE"
+          ]
+        },
+        {
+          "criterion_id": "TL-02_IDEMPOTENT_WRITE_OPERATIONS",
+          "description": "Every externally visible write is protected by a deterministic idempotency or deduplication identity.",
+          "required_any_modes": [
+            "RUNTIME_PROBE",
+            "NEGATIVE_CONTROL",
+            "TRACE_ASSERTION"
+          ]
+        },
+        {
+          "criterion_id": "TL-03_SLIM_TOOL_OUTPUTS",
+          "description": "Tool outputs are filtered to the fields required by the next state instead of dumping raw payloads.",
+          "required_any_modes": [
+            "STATIC_ASSERTION",
+            "RUNTIME_PROBE",
+            "TRACE_ASSERTION"
+          ]
+        }
+      ],
+      "vibe_signals": [
+        {
+          "signal_id": "VC-TL-01_BROAD_MANAGE_TOOL",
+          "description": "A broad tool such as manage_order owns unrelated reads, decisions, and writes.",
+          "contradicts": [
+            "TL-01_SINGLE_RESPONSIBILITY_STRICT_SCHEMA"
+          ],
+          "required_any_modes": [
+            "STATIC_ASSERTION"
+          ]
+        },
+        {
+          "signal_id": "VC-TL-02_NON_IDEMPOTENT_WRITE",
+          "description": "A refund, voucher, message, database write, or equivalent side effect can be submitted twice.",
+          "contradicts": [
+            "TL-02_IDEMPOTENT_WRITE_OPERATIONS"
+          ],
+          "required_any_modes": [
+            "RUNTIME_PROBE",
+            "NEGATIVE_CONTROL",
+            "TRACE_ASSERTION"
+          ],
+          "score_ceiling": 59
+        },
+        {
+          "signal_id": "VC-TL-03_RAW_PAYLOAD_DUMP",
+          "description": "Large raw tool payloads are injected into model context without extraction or slimming.",
+          "contradicts": [
+            "TL-03_SLIM_TOOL_OUTPUTS",
+            "CT-02_PRUNING_AND_STRUCTURED_EXTRACTION"
+          ],
+          "required_any_modes": [
+            "STATIC_ASSERTION",
+            "TRACE_ASSERTION"
+          ]
+        }
+      ]
+    },
+    {
+      "dimension_id": "context_budget_memory",
+      "weight": 20,
+      "positive_criteria": [
+        {
+          "criterion_id": "CT-01_SCRATCHPAD_PERSISTENT_STATE_SEPARATION",
+          "description": "Short-lived work memory is separated from durable state and long-term memory.",
+          "required_any_modes": [
+            "STATIC_ASSERTION",
+            "TRACE_ASSERTION"
+          ]
+        },
+        {
+          "criterion_id": "CT-02_PRUNING_AND_STRUCTURED_EXTRACTION",
+          "description": "History and tool data are actively pruned, summarized, or transformed into structured state.",
+          "required_any_modes": [
+            "STATIC_ASSERTION",
+            "RUNTIME_PROBE",
+            "TRACE_ASSERTION"
+          ]
+        },
+        {
+          "criterion_id": "CT-03_TOKEN_BUDGET_AND_OVERFLOW_DEGRADATION",
+          "description": "The maximum token/context budget is explicit and overflow routes to a bounded degradation path.",
+          "required_any_modes": [
+            "RUNTIME_PROBE",
+            "TRACE_ASSERTION",
+            "NEGATIVE_CONTROL"
+          ]
+        }
+      ],
+      "vibe_signals": [
+        {
+          "signal_id": "VC-CT-01_FULL_HISTORY_RETENTION",
+          "description": "All conversation and tool history is retained by default and passed forward.",
+          "contradicts": [
+            "CT-01_SCRATCHPAD_PERSISTENT_STATE_SEPARATION",
+            "CT-02_PRUNING_AND_STRUCTURED_EXTRACTION"
+          ],
+          "required_any_modes": [
+            "STATIC_ASSERTION",
+            "TRACE_ASSERTION"
+          ]
+        },
+        {
+          "signal_id": "VC-CT-02_NO_CONTEXT_CLEANUP",
+          "description": "There is no cleanup, pruning, token budget, or overflow fallback.",
+          "contradicts": [
+            "CT-02_PRUNING_AND_STRUCTURED_EXTRACTION",
+            "CT-03_TOKEN_BUDGET_AND_OVERFLOW_DEGRADATION"
+          ],
+          "required_any_modes": [
+            "STATIC_ASSERTION",
+            "RUNTIME_PROBE",
+            "TRACE_ASSERTION"
+          ]
+        }
+      ]
+    },
+    {
+      "dimension_id": "fault_tolerance_self_heal_hitl",
+      "weight": 20,
+      "positive_criteria": [
+        {
+          "criterion_id": "FT-01_TIMEOUT_BACKOFF_CIRCUIT_BREAKER",
+          "description": "External calls use explicit timeout, bounded retry/backoff, and circuit-breaker or fallback behavior.",
+          "required_any_modes": [
+            "RUNTIME_PROBE",
+            "TRACE_ASSERTION",
+            "NEGATIVE_CONTROL"
+          ]
+        },
+        {
+          "criterion_id": "FT-02_BOUNDED_SCHEMA_REPAIR",
+          "description": "Invalid structured model output receives a bounded one- or two-pass repair before deterministic fallback.",
+          "required_any_modes": [
+            "RUNTIME_PROBE",
+            "TRACE_ASSERTION",
+            "NEGATIVE_CONTROL"
+          ]
+        },
+        {
+          "criterion_id": "FT-03_DETERMINISTIC_HIGH_RISK_HITL",
+          "description": "High-risk writes are blocked by deterministic policy and routed to an auditable Human approval queue.",
+          "required_any_modes": [
+            "RUNTIME_PROBE",
+            "TRACE_ASSERTION",
+            "NEGATIVE_CONTROL"
+          ]
+        }
+      ],
+      "vibe_signals": [
+        {
+          "signal_id": "VC-FT-01_CRASH_OR_FULL_RESTART_ON_TOOL_ERROR",
+          "description": "A tool failure crashes the workflow or restarts the whole process without bounded recovery state.",
+          "contradicts": [
+            "FT-01_TIMEOUT_BACKOFF_CIRCUIT_BREAKER",
+            "FT-02_BOUNDED_SCHEMA_REPAIR"
+          ],
+          "required_any_modes": [
+            "RUNTIME_PROBE",
+            "TRACE_ASSERTION",
+            "NEGATIVE_CONTROL"
+          ]
+        },
+        {
+          "signal_id": "VC-FT-02_MODEL_OWNS_HIGH_RISK_WRITE",
+          "description": "The LLM can authorize high-risk refunds or equivalent writes without deterministic protection.",
+          "contradicts": [
+            "FT-03_DETERMINISTIC_HIGH_RISK_HITL"
+          ],
+          "required_any_modes": [
+            "RUNTIME_PROBE",
+            "TRACE_ASSERTION",
+            "NEGATIVE_CONTROL"
+          ],
+          "score_ceiling": 59
+        }
+      ]
+    },
+    {
+      "dimension_id": "evals_observability",
+      "weight": 15,
+      "positive_criteria": [
+        {
+          "criterion_id": "EV-01_DETERMINISTIC_GOLDEN_SEMANTIC_EVAL_MATRIX",
+          "description": "Evaluation combines deterministic assertions, a versioned Golden Dataset, and semantic judging where deterministic checks are insufficient.",
+          "required_any_modes": [
+            "STATIC_ASSERTION",
+            "RUNTIME_PROBE",
+            "NEGATIVE_CONTROL"
+          ]
+        },
+        {
+          "criterion_id": "EV-02_FULL_TRACE_TOOL_TOKEN_DECISION",
+          "description": "Traces bind state transitions, tool calls, model generations, token/cost/latency, decisions, and side effects.",
+          "required_any_modes": [
+            "TRACE_ASSERTION"
+          ]
+        },
+        {
+          "criterion_id": "EV-03_CI_BASELINE_CANDIDATE_REGRESSION",
+          "description": "CI runs the same frozen dataset against Baseline and Candidate and enforces safety, quality, cost, and latency gates.",
+          "required_any_modes": [
+            "STATIC_ASSERTION",
+            "RUNTIME_PROBE",
+            "TRACE_ASSERTION"
+          ]
+        }
+      ],
+      "vibe_signals": [
+        {
+          "signal_id": "VC-EV-01_FEW_MANUAL_CASES_ONLY",
+          "description": "Acceptance relies on a handful of manually observed examples.",
+          "contradicts": [
+            "EV-01_DETERMINISTIC_GOLDEN_SEMANTIC_EVAL_MATRIX",
+            "EV-03_CI_BASELINE_CANDIDATE_REGRESSION"
+          ],
+          "required_any_modes": [
+            "STATIC_ASSERTION"
+          ]
+        },
+        {
+          "signal_id": "VC-EV-02_NO_PROMPT_CHANGE_METRICS",
+          "description": "Prompt/model/tool changes cannot be compared for success rate, safety, cost, tokens, or latency.",
+          "contradicts": [
+            "EV-02_FULL_TRACE_TOOL_TOKEN_DECISION",
+            "EV-03_CI_BASELINE_CANDIDATE_REGRESSION"
+          ],
+          "required_any_modes": [
+            "STATIC_ASSERTION",
+            "TRACE_ASSERTION"
+          ]
+        }
+      ]
+    }
+  ],
+  "bands": [
+    {
+      "name": "VIBE_CODER",
+      "minimum": 0,
+      "maximum_exclusive": 60
+    },
+    {
+      "name": "COMPETENT_AGENT_ENGINEER",
+      "minimum": 60,
+      "maximum_exclusive": 85
+    },
+    {
+      "name": "AGENT_ARCHITECT",
+      "minimum": 85,
+      "maximum_inclusive": 100
+    }
+  ]
+}

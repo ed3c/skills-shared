@@ -38,7 +38,7 @@ Domain Module
 | Web/API | authz, rate limiting, validation, transaction boundaries, cache consistency, external side effects | core trigger profile; no dedicated module yet |
 | Database/storage | durability, WAL, isolation, replication, migration, crash recovery | core trigger profile; no dedicated module yet |
 | Distributed systems | partition, consensus/coordination, leases, retries, duplication, ordering | core trigger profile; no dedicated module yet |
-| Agentic AI | tool authority, semantic failure, loop termination, trajectory state, context bounds, side-effect replay, model nondeterminism | core trigger profile; no dedicated module yet |
+| Agentic AI | tool authority, semantic failure, loop termination, trajectory state, context bounds, side-effect replay, model nondeterminism, Skill discovery/fork/grounding | [`agent-host-procedural-grounding.md`](agent-host-procedural-grounding.md) when external Skill search, host context isolation, or procedure-uptake evidence is material; otherwise core trigger profile |
 | Mobile | process death, lifecycle, offline consistency, permissions, OS/background limits | core trigger profile; no dedicated module yet |
 | Browser/device automation | session ownership, DOM/UI drift, navigation races, device state, anti-bot/platform constraints | core trigger profile; no dedicated module yet |
 | Data pipeline | lineage, replay, deduplication, late events, schema evolution, backfills | core trigger profile; no dedicated module yet |

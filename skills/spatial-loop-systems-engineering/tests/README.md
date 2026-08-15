@@ -33,4 +33,19 @@ The recovery-escalation suite proves the shared prompt/procedure retains:
 - owning-oracle and negative-control PASS before commit/PR eligibility;
 - no silent grant of merge authority.
 
-These controls validate the method contract. They do not exercise external providers, Linux privilege, KVM, cgroups, seccomp, hardware, chaos/exploit paths, a live Forgejo mutation, a GitHub Actions repair incident, or a ChatGPT Desktop session.
+The procedural-grounding suite proves:
+
+- a critical execution procedure cannot pass through mention or planning alone;
+- a required negative control must execute and show the expected red observation;
+- Skill-specific/unknown critical procedures require satisfied assertion/probe obligations;
+- unreviewed sources, scripts, dynamic context, or license state cannot feed an injected critical capsule;
+- fork count/depth/token/no-progress and capsule-token budgets fail closed;
+- only actionable capsule payloads are admitted; raw reasoning traces are rejected;
+- injected capsules must be grounded, faithful, runtime-relevant, fresh, and authority-compatible;
+- exact-subject observations and weighted coverage are recomputed rather than trusted from model prose;
+- an `UNKNOWN` runtime, Human/external proof, or unexecuted four-condition attribution cannot become receipt-level runtime truth.
+
+These controls validate method contracts. They do not exercise external Skill
+search, live model/context forks, browser/device observers, external providers,
+Linux privilege, KVM, cgroups, seccomp, hardware, chaos/exploit paths, a live
+Forgejo mutation, a GitHub Actions repair incident, or a ChatGPT Desktop session.

@@ -1,0 +1,27 @@
+{
+  "schema": "procedural-shadow-context-capsule/v1",
+  "capsule_id": "capsule-valid-001",
+  "checkpoint": "BEFORE_COMMIT",
+  "context_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "expires_at_checkpoint": "BEFORE_PR_OR_PUBLICATION",
+  "procedures": [
+    {
+      "procedure_id": "git-town.verify-parent-before-propose",
+      "criticality": "must",
+      "source": {
+        "repository": "ed3c/skills-shared",
+        "ref": "1111111111111111111111111111111111111111",
+        "path": "skills/git-town-stacked-pr-worker/SKILL.md",
+        "content_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+      },
+      "expected_observation": "actual parent equals intended stack parent",
+      "failure_action": "BLOCK"
+    }
+  ],
+  "authority": {
+    "shadow_read_only": true,
+    "capability_widening": "DENY",
+    "private_data_egress": "DENY",
+    "raw_private_reasoning": "DENY"
+  }
+}

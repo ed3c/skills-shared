@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "procedural-shadow-context-capsule/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "capsule_id", "checkpoint", "context_digest", "expires_at_checkpoint", "procedures", "authority"],
+  "properties": {
+    "schema": {"const": "procedural-shadow-context-capsule/v1"},
+    "capsule_id": {"type": "string", "minLength": 1},
+    "checkpoint": {"type": "string", "minLength": 1},
+    "context_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "expires_at_checkpoint": {"type": "string", "minLength": 1},
+    "procedures": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["procedure_id", "criticality", "source", "expected_observation", "failure_action"],
+        "properties": {
+          "procedure_id": {"type": "string", "minLength": 1},
+          "criticality": {"enum": ["must", "should", "may"]},
+          "source": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["repository", "ref", "path", "content_sha256"],
+            "properties": {
+              "repository": {"type": "string", "minLength": 1},
+              "ref": {"type": "string", "minLength": 1},
+              "path": {"type": "string", "minLength": 1},
+              "content_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+            }
+          },
+          "expected_observation": {"type": "string", "minLength": 1},
+          "failure_action": {"enum": ["BLOCK", "REPAIR", "ESCALATE"]}
+        }
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["shadow_read_only", "capability_widening", "private_data_egress", "raw_private_reasoning"],
+      "properties": {
+        "shadow_read_only": {"const": true},
+        "capability_widening": {"const": "DENY"},
+        "private_data_egress": {"const": "DENY"},
+        "raw_private_reasoning": {"const": "DENY"}
+      }
+    }
+  }
+}

@@ -1,0 +1,225 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skills-shared.invalid/repository-multi-agent-runtime/v1",
+  "title": "Repository Multi-Agent Runtime Contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "repository",
+    "runtime",
+    "topology",
+    "shadow",
+    "budget",
+    "admission",
+    "tasks",
+    "results",
+    "merge_boundary",
+    "states"
+  ],
+  "properties": {
+    "schema": {"const": "repository-multi-agent-runtime/v1"},
+    "repository": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["identity", "base_sha", "current_sha", "admitted_subjects"],
+      "properties": {
+        "identity": {"type": "string", "minLength": 3},
+        "base_sha": {"$ref": "#/$defs/git_sha"},
+        "current_sha": {"$ref": "#/$defs/git_sha"},
+        "admitted_subjects": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/git_sha"}
+        }
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["identity", "capabilities", "evidence_state"],
+      "properties": {
+        "identity": {
+          "enum": [
+            "CHATGPT_GITHUB_CONNECTOR",
+            "GITHUB_ACTIONS",
+            "CLAUDE_CODE_LOCAL",
+            "CODEX_CLI_LOCAL",
+            "CHATGPT_DESKTOP_WORKTREE",
+            "UNKNOWN"
+          ]
+        },
+        "capabilities": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "evidence_state": {"$ref": "#/$defs/evidence_state"}
+      }
+    },
+    "topology": {
+      "enum": ["SINGLE_BUILDER", "BUILDER_SHADOW", "MULTI_WORKER"]
+    },
+    "shadow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "execution",
+        "independent_state",
+        "enforcement_state",
+        "checkpoint_outcome"
+      ],
+      "properties": {
+        "execution": {
+          "enum": [
+            "IN_PROCESS_LOGICAL",
+            "SEPARATE_CONTEXT",
+            "SEPARATE_MODEL",
+            "EXTERNAL_DETERMINISTIC_CHECKER"
+          ]
+        },
+        "independent_state": {"$ref": "#/$defs/evidence_state"},
+        "enforcement_state": {"$ref": "#/$defs/evidence_state"},
+        "checkpoint_outcome": {
+          "enum": [
+            "CONTINUE_L0",
+            "CONTINUE_WITH_WARNINGS_L1",
+            "RECONCILE_BEFORE_NEXT_STEP_L2",
+            "BLOCKED_AT_MATERIAL_BOUNDARY_L3"
+          ]
+        }
+      }
+    },
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["profile_state", "limits", "consumed"],
+      "properties": {
+        "profile_state": {"enum": ["PRESENT", "ABSENT"]},
+        "limits": {"$ref": "#/$defs/budget_vector"},
+        "consumed": {"$ref": "#/$defs/budget_vector"}
+      }
+    },
+    "admission": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "independent_terminal_slices",
+        "independent_oracles",
+        "no_shared_mutable_owner",
+        "disjoint_path_and_resource_leases",
+        "dependency_graph_is_dag",
+        "convergence_owner_exists",
+        "coordination_cost_bounded",
+        "expected_saved_work_exceeds_coordination",
+        "worker_budget_admitted"
+      ],
+      "properties": {
+        "independent_terminal_slices": {"type": "boolean"},
+        "independent_oracles": {"type": "boolean"},
+        "no_shared_mutable_owner": {"type": "boolean"},
+        "disjoint_path_and_resource_leases": {"type": "boolean"},
+        "dependency_graph_is_dag": {"type": "boolean"},
+        "convergence_owner_exists": {"type": "boolean"},
+        "coordination_cost_bounded": {"type": "boolean"},
+        "expected_saved_work_exceeds_coordination": {"type": "boolean"},
+        "worker_budget_admitted": {"type": "boolean"}
+      }
+    },
+    "tasks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "object"}
+    },
+    "results": {
+      "type": "array",
+      "items": {"type": "object"}
+    },
+    "merge_boundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["agent_merge_action", "merge_authority", "observed_external_merge"],
+      "properties": {
+        "agent_merge_action": {"const": "DENY"},
+        "merge_authority": {
+          "enum": ["EXTERNAL_TRUSTED_AUTOMATION_ONLY", "HUMAN_ADMIT_ONLY"]
+        },
+        "observed_external_merge": {"type": "boolean"}
+      }
+    },
+    "states": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evidence_state", "authority_state", "delivery_state"],
+      "properties": {
+        "evidence_state": {"$ref": "#/$defs/evidence_state"},
+        "authority_state": {
+          "enum": [
+            "ADMITTED",
+            "TRUSTED_AUTOMATION_REQUIRED",
+            "HUMAN_ADMIT_REQUIRED",
+            "DENIED_BY_POLICY",
+            "ABSENT"
+          ]
+        },
+        "delivery_state": {
+          "enum": [
+            "PLANNED",
+            "TASK_PACKET_READY",
+            "WORKTREE_READY",
+            "IMPLEMENTING",
+            "LOCAL_VERIFIED",
+            "COMMITTED",
+            "PUSHED",
+            "PR_OPEN",
+            "AUTO_MERGE_ELIGIBLE",
+            "MERGED",
+            "BLOCKED",
+            "SUPERSEDED"
+          ]
+        }
+      }
+    }
+  },
+  "$defs": {
+    "git_sha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}([0-9a-f]{24})?$"
+    },
+    "evidence_state": {
+      "enum": [
+        "PASS",
+        "FAIL",
+        "ABSENT",
+        "NOT_IMPLEMENTED",
+        "NOT_EXERCISED",
+        "SKIPPED_BY_POLICY"
+      ]
+    },
+    "budget_vector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "active_workers",
+        "total_workers",
+        "spawn_depth",
+        "tool_calls",
+        "tokens",
+        "wall_clock_seconds",
+        "ci_runs",
+        "pr_count"
+      ],
+      "properties": {
+        "active_workers": {"type": "integer", "minimum": 0},
+        "total_workers": {"type": "integer", "minimum": 0},
+        "spawn_depth": {"type": "integer", "minimum": 0},
+        "tool_calls": {"type": "integer", "minimum": 0},
+        "tokens": {"type": "integer", "minimum": 0},
+        "wall_clock_seconds": {"type": "integer", "minimum": 0},
+        "ci_runs": {"type": "integer", "minimum": 0},
+        "pr_count": {"type": "integer", "minimum": 0}
+      }
+    }
+  }
+}

@@ -1,9 +1,9 @@
 {
   "skill_name": "dual-forge-repository-loop",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "_meta": {
-    "coverage_metric": "dual-forge authority separation, causal fresh-worktree creation and repository identity, local-main-first ordering, issue namespace separation, GitHub reconciliation closure, exact-head Actions evidence, and publication evidence gating",
-    "purpose": "Prove that local/Forgejo implementation success cannot be published to GitHub while remote drift, open PR conflict routing, affected issue routing, or exact-head Actions evidence remains unresolved."
+    "coverage_metric": "dual-forge authority separation, causal fresh-worktree creation and repository identity, local-main-first ordering, issue namespace separation, GitHub reconciliation closure, exact-head Actions evidence, publication evidence gating, multi-Agent topology admission, Worker attempt and lease isolation, budget closure, Shadow non-bypass, stale-result rejection, and external merge authority separation",
+    "purpose": "Prove that local/Forgejo implementation success cannot be published to GitHub while remote drift, open PR conflict routing, affected issue routing, exact-head Actions evidence, multi-Agent admission, lease ownership, result verification, budget, Shadow enforcement, or merge authority remains unresolved."
   },
   "runnable": [
     {
@@ -25,12 +25,38 @@
         "absent receipt input remains distinct from a failed delivery contract"
       ],
       "expected": "positive receipts including canonical Git/origin/provider capture and billing recovery admitted; sixty-eight planted authority/order/evidence defects refused; partial input exits 3 and absent input exits 64"
+    },
+    {
+      "id": "DFR-MULTI-AGENT-RUNTIME-1",
+      "checker_script": "scripts/check_multi_agent_runtime.py",
+      "test_verify": "tests/multi-agent-runtime/verify.sh",
+      "good_fixture": "tests/multi-agent-runtime/fixtures/valid-multi.json",
+      "hollow_fixture": null,
+      "hollow_mutations": "false parallelism admission, overlapping path or external-resource leases, dependency cycles, duplicate attempt/branch/worktree identities, exceeded or unreconciled budgets, profileless fan-out, in-process Shadow independence overclaim, unenforced L3 continuation, Agent merge enablement, stale/wrong-base results, result paths outside the lease, non-PASS verified controls, missing Worker results, unknown dependencies, collapsed evidence/authority vocabulary, unobserved merge, and UNKNOWN-runtime publication",
+      "covers": [
+        "MULTI_WORKER is admitted only when every decomposition, oracle, DAG, ownership, convergence, coordination, and budget predicate passes",
+        "an absent budget profile degrades to exactly one SINGLE_BUILDER instead of unbounded fan-out",
+        "task, attempt, branch, and worktree identities are unique and dependency edges form a closed DAG",
+        "parallel Workers have disjoint writable paths, mutable state, and external-resource leases",
+        "verified Worker results match task/attempt/base/path ownership and bind PASS positive plus negative evidence",
+        "Worker and global token/tool/wall-clock ledgers reconcile and stay within limits",
+        "in-process Shadow review cannot claim independent evidence and an L3 outcome cannot be bypassed",
+        "Agent merge remains DENY and merge eligibility/observation stays an external authority state",
+        "schema-invalid input exits 64 while semantic contradiction exits 2 and a valid contract exits 0"
+      ],
+      "expected": "positive MULTI_WORKER and profileless SINGLE_BUILDER fallback contracts PASS; twenty-one planted topology, lease, DAG, budget, Shadow, evidence, result, and merge-boundary defects are refused; absent input remains distinct"
     }
   ],
   "evidence_boundary": {
     "portable_orchestration_contract": "IMPLEMENTED",
     "deterministic_publication_gate": "IMPLEMENTED",
+    "multi_agent_runtime_schemas": "IMPLEMENTED",
+    "multi_agent_runtime_semantic_checker": "IMPLEMENTED",
     "positive_mutation_controls": "IMPLEMENTED",
+    "live_multi_agent_scheduler": "NOT_EXERCISED",
+    "independent_shadow_context_or_model": "NOT_EXERCISED",
+    "live_checkpoint_resume_and_straggler_reassignment": "NOT_EXERCISED",
+    "organization_level_alignment": "NOT_EXERCISED",
     "chatgpt_private_github_ingress": "NOT_EXERCISED",
     "local_forgejo_mutation": "NOT_EXERCISED",
     "consumer_worktree_execution": "NOT_EXERCISED",

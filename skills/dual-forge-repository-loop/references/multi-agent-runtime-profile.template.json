@@ -1,0 +1,19 @@
+{
+  "schema": "repository-multi-agent-runtime-profile/v1",
+  "topology_default": "BUILDER_SHADOW",
+  "limits": {
+    "active_workers": 2,
+    "total_workers": 4,
+    "spawn_depth": 1,
+    "tool_calls": 200,
+    "tokens": 200000,
+    "wall_clock_seconds": 7200,
+    "ci_runs": 4,
+    "pr_count": 4
+  },
+  "max_attempts_per_work_packet": 3,
+  "max_no_progress_epochs": 2,
+  "max_duplicate_work_ratio": 0.1,
+  "agent_merge_action": "DENY",
+  "merge_authority": "EXTERNAL_TRUSTED_AUTOMATION_ONLY"
+}

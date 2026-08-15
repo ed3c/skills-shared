@@ -1,0 +1,52 @@
+{
+  "schema": "procedural-shadow-runtime-receipt/v1",
+  "receipt_id": "receipt-valid-001",
+  "checkpoint": "BEFORE_PR_OR_PUBLICATION",
+  "subject": {
+    "repository": "ed3c/example",
+    "base_sha": "1111111111111111111111111111111111111111",
+    "current_sha": "2222222222222222222222222222222222222222",
+    "runtime": "SANDBOX",
+    "context_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "action": {
+    "class": "PULL_REQUEST_CREATE",
+    "side_effecting": true,
+    "intent_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  },
+  "applicable_procedures": [
+    {
+      "procedure_id": "git-town.verify-parent-before-propose",
+      "criticality": "must",
+      "source": {
+        "repository": "ed3c/skills-shared",
+        "ref": "1111111111111111111111111111111111111111",
+        "path": "skills/git-town-stacked-pr-worker/SKILL.md",
+        "content_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "assertion_id": "actual-parent-equals-expected-parent",
+      "procedure_id": "git-town.verify-parent-before-propose",
+      "result": "PASS"
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "evidence-001",
+      "procedure_id": "git-town.verify-parent-before-propose",
+      "kind": "COMMAND",
+      "artifact_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "exact_subject": true
+    }
+  ],
+  "dispositions": [
+    {
+      "procedure_id": "git-town.verify-parent-before-propose",
+      "state": "VERIFIED"
+    }
+  ],
+  "close_state": "PASS"
+}
