@@ -1,0 +1,15 @@
+{
+  "authority": "forgejo-api",
+  "capture": {"argv": [["forgejo-api-authenticated-read", "/api/v1/repos/neon/example"], ["forgejo-api-authenticated-read", "/api/v1/repos/neon/example/branches/main"]], "exit_codes": [0, 0], "stdout": ["{\"full_name\":\"neon/example\",\"default_branch\":\"main\",\"id\":456}", "{\"commit\":{\"id\":\"4cb614454eeb07e81ac1718746e2e99d3c3287d1\"}}"], "stdout_sha256": ["e3ac767a486134522d80842d7bd43612ed0dbee674592708e3aa36ededb2f7e5", "9152367dff6a8e159d3d33a5e930b3f5a9ef3f750d369d4323e04890d2bbd9cf"]},
+  "captured_at": "2026-08-14T09:59:51Z",
+  "default_branch": "main",
+  "producer": "capture_origin_ref.py",
+  "ref": "refs/heads/main",
+  "repository": "neon/example",
+  "repository_id": 456,
+  "remote_bindings": null,
+  "schema": "dual-forge-ref-transport/v1",
+  "sha": "4cb614454eeb07e81ac1718746e2e99d3c3287d1",
+  "source": "forgejo-api-authenticated-read",
+  "source_identity": "repos/neon/example/branches/main"
+}

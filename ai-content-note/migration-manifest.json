@@ -1,0 +1,200 @@
+[
+  {
+    "id": "openai:responding-next-frontier-critical-cyber-capabilities",
+    "title": "Responding to the next frontier of critical cyber capabilities",
+    "source_name": "OpenAI Newsroom",
+    "legacy_google_doc_url": "https://docs.google.com/document/d/1ibRox4ynUhKJujqJQBuoMJxn3zC4iJT6nRJ-62kvFCw/edit",
+    "github_path": "ai-content-note/notes/security-governance/2026-08-07-openai-frontier-cyber-capability-governance.md",
+    "github_url": "https://github.com/ed3c/skills-shared/blob/main/ai-content-note/notes/security-governance/2026-08-07-openai-frontier-cyber-capability-governance.md",
+    "category": "security-governance"
+  },
+  {
+    "id": "anthropic:improving-fable-5-biology-safeguards",
+    "title": "Improving Fable 5's biology safeguards",
+    "source_name": "Anthropic Newsroom",
+    "legacy_google_doc_url": "https://docs.google.com/document/d/15hbtLCaxwgeqAjo4CrIChj26NQ8KuUyR3TcI_5mExWc/edit",
+    "github_path": "ai-content-note/notes/security-governance/2026-08-07-anthropic-fable-5-biology-safeguards.md",
+    "github_url": "https://github.com/ed3c/skills-shared/blob/main/ai-content-note/notes/security-governance/2026-08-07-anthropic-fable-5-biology-safeguards.md",
+    "category": "security-governance"
+  },
+  {
+    "id": "langchain:managed-deep-agents-public-beta",
+    "title": "Managed Deep Agents is now in Public Beta",
+    "source_name": "LangChain",
+    "legacy_google_doc_url": "https://docs.google.com/document/d/1WkxvFyszLLWk6hRhrLegy6H5neCvWUAyM8axbwmtTKU/edit",
+    "github_path": "ai-content-note/notes/agent-runtime/2026-08-07-managed-deep-agents-public-beta.md",
+    "github_url": "https://github.com/ed3c/skills-shared/blob/main/ai-content-note/notes/agent-runtime/2026-08-07-managed-deep-agents-public-beta.md",
+    "category": "agent-runtime"
+  },
+  {
+    "id": "openai:gpt-live-realtime-architecture",
+    "title": "How we built a realtime system for responsive voice AI in six months",
+    "source_name": "OpenAI Newsroom",
+    "legacy_google_doc_url": "https://docs.google.com/document/d/1wRyA2Q6dH5fn4KVYllQn3HsMF_ACRFQw22dAEA5qqks/edit",
+    "github_path": "ai-content-note/notes/multimodal-agents/2026-08-03-openai-realtime-voice-system.md",
+    "github_url": "https://github.com/ed3c/skills-shared/blob/main/ai-content-note/notes/multimodal-agents/2026-08-03-openai-realtime-voice-system.md",
+    "category": "multimodal-agents"
+  },
+  {
+    "id": "openai:ten-advances-mathematics",
+    "title": "Ten advances in mathematics and theoretical computer science",
+    "source_name": "OpenAI Newsroom",
+    "legacy_google_doc_url": "https://docs.google.com/document/d/10G33gpfIWoqCTzVbZpXD43BFa8ZgysgXAJptrAfRkqs/edit",
+    "github_path": "ai-content-note/notes/ai-research/2026-08-01-openai-ten-mathematics-advances.md",
+    "github_url": "https://github.com/ed3c/skills-shared/blob/main/ai-content-note/notes/ai-research/2026-08-01-openai-ten-mathematics-advances.md",
+    "category": "ai-research"
+  },
+  {
+    "id": "anthropic:investigating-incidents-cybersecurity-evals",
+    "title": "Investigating three real-world incidents in our cybersecurity evaluations",
+    "source_name": "Anthropic Newsroom",
+    "legacy_google_doc_url": "https://docs.google.com/document/d/1T1ZO2HI2mYVol_cebVmmtdduv3EjR4lo_V8axb968d4/edit",
+    "github_path": "ai-content-note/notes/security-governance/2026-07-30-anthropic-cyber-eval-incidents.md",
+    "github_url": "https://github.com/ed3c/skills-shared/blob/main/ai-content-note/notes/security-governance/2026-07-30-anthropic-cyber-eval-incidents.md",
+    "category": "security-governance"
+  },
+  {
+    "id": "langchain:deep-agents-v0-7",
+    "title": "Deep Agents v0.7",
+    "source_name": "LangChain",
+    "legacy_google_doc_url": "https://docs.google.com/document/d/1T931T72lf27-h-V13-VZdyXQHq0Gk9eecGuh_GcZYPw/edit",
+    "github_path": "ai-content-note/notes/agent-harness/2026-07-29-deep-agents-v0-7-harness-diet.md",
+    "github_url": "https://github.com/ed3c/skills-shared/blob/main/ai-content-note/notes/agent-harness/2026-07-29-deep-agents-v0-7-harness-diet.md",
+    "category": "agent-harness"
+  },
+  {
+    "id": "sequoia:cyera-oasis-agent-security",
+    "title": "Cyera and Oasis: Stronger Together",
+    "source_name": "Sequoia Capital",
+    "legacy_google_doc_url": "https://docs.google.com/document/d/1gBSQUUivGyb1Sgc-V6BoXGYLUemr8QlALjjjWoikEtI/edit",
+    "github_path": "ai-content-note/notes/security-governance/2026-07-28-cyera-oasis-agent-security-graph.md",
+    "github_url": "https://github.com/ed3c/skills-shared/blob/main/ai-content-note/notes/security-governance/2026-07-28-cyera-oasis-agent-security-graph.md",
+    "category": "security-governance"
+  },
+  {
+    "id": "anthropic:claude-opus-5",
+    "title": "Introducing Claude Opus 5",
+    "source_name": "Anthropic Newsroom",
+    "legacy_google_doc_url": "https://docs.google.com/document/d/1AuE5j37yNBjejlEPbKcY0CafSAMzAlzpSRjCCwWFP7s/edit",
+    "github_path": "ai-content-note/notes/frontier-models/2026-07-24-anthropic-claude-opus-5.md",
+    "github_url": "https://github.com/ed3c/skills-shared/blob/main/ai-content-note/notes/frontier-models/2026-07-24-anthropic-claude-opus-5.md",
+    "category": "frontier-models"
+  },
+  {
+    "id": "sequoia:americas-open-model-paradox",
+    "title": "America's Open-Model Paradox",
+    "source_name": "Sequoia Capital",
+    "legacy_google_doc_url": "https://docs.google.com/document/d/1CrKKv-7YQWwLMAbt8xb16u0Q133JXKEi-WrdzHFm8A8/edit",
+    "github_path": "ai-content-note/notes/open-model-supply-chain/2026-07-24-americas-open-model-paradox.md",
+    "github_url": "https://github.com/ed3c/skills-shared/blob/main/ai-content-note/notes/open-model-supply-chain/2026-07-24-americas-open-model-paradox.md",
+    "category": "open-model-supply-chain"
+  },
+  {
+    "id": "langchain:how-we-benchmark-deep-agents",
+    "title": "How We Benchmark Deep Agents",
+    "source_name": "LangChain",
+    "legacy_google_doc_url": "https://docs.google.com/document/d/1U3far14wAc8QBKRgnic_t1yo3EEmJAk7Jt_poE1esI4/edit",
+    "github_path": "ai-content-note/notes/agent-evaluation/2026-07-23-benchmarking-deep-agents.md",
+    "github_url": "https://github.com/ed3c/skills-shared/blob/main/ai-content-note/notes/agent-evaluation/2026-07-23-benchmarking-deep-agents.md",
+    "category": "agent-evaluation"
+  },
+  {
+    "id": "latent-space:poolside-model-factory",
+    "title": "Inside the Model Factory — Eiso Kant, Poolside AI",
+    "source_name": "Latent Space",
+    "legacy_google_doc_url": "https://docs.google.com/document/d/1UDv-nNjL9aA_ThDsDy1qRKxwaJuE18jXwGPQlyfsTtA/edit",
+    "github_path": "ai-content-note/notes/model-engineering/2026-07-23-poolside-model-factory.md",
+    "github_url": "https://github.com/ed3c/skills-shared/blob/main/ai-content-note/notes/model-engineering/2026-07-23-poolside-model-factory.md",
+    "category": "model-engineering"
+  },
+  {
+    "id": "latent-space:xaira-x-cell",
+    "title": "Causal Models Need Causal Data — Xaira X-Cell",
+    "source_name": "Latent Space",
+    "legacy_google_doc_url": "https://docs.google.com/document/d/1lnYWL6XFqKJTUqSBzUadi2Dc5iAdua7tkR1Ga6HMQOI/edit",
+    "github_path": "ai-content-note/notes/ai-science/2026-07-21-xaira-causal-models-causal-data.md",
+    "github_url": "https://github.com/ed3c/skills-shared/blob/main/ai-content-note/notes/ai-science/2026-07-21-xaira-causal-models-causal-data.md",
+    "category": "ai-science"
+  },
+  {
+    "id": "latent-space:lila-lab-data-center",
+    "title": "The Lab of the Future Should Feel Like a Data Center",
+    "source_name": "Latent Space",
+    "legacy_google_doc_url": "https://docs.google.com/document/d/1VsXAztFQinRMK2rM0fp91SAHCkNhvP9UGJ95ko-q6uI/edit",
+    "github_path": "ai-content-note/notes/ai-science/2026-07-16-autonomous-lab-as-data-center.md",
+    "github_url": "https://github.com/ed3c/skills-shared/blob/main/ai-content-note/notes/ai-science/2026-07-16-autonomous-lab-as-data-center.md",
+    "category": "ai-science"
+  },
+  {
+    "id": "no-priors:noam-brown-benchmark-test-time-compute",
+    "title": "Why Traditional Benchmarks Fail Modern AI Models with Noam Brown",
+    "source_name": "No Priors",
+    "legacy_google_doc_url": "https://docs.google.com/document/d/1CRMrS9603thE0hc3fFP_emlArImWpl90DNZdYkznKcs/edit",
+    "github_path": "ai-content-note/notes/agent-evaluation/2026-06-26-noam-brown-modern-benchmarks.md",
+    "github_url": "https://github.com/ed3c/skills-shared/blob/main/ai-content-note/notes/agent-evaluation/2026-06-26-noam-brown-modern-benchmarks.md",
+    "category": "agent-evaluation"
+  },
+  {
+    "id": "openai:arc-agi-3-retained-reasoning-compaction",
+    "title": "How enabling two settings tripled our scores on the ARC-AGI-3 benchmark",
+    "source_name": "OpenAI Newsroom",
+    "legacy_google_doc_url": "https://docs.google.com/document/d/18qVcoQaromqyDen4wMyoRil5nsTnV57CmMzh4ryAi8w/edit",
+    "github_path": "ai-content-note/notes/agent-harness/2026-07-29-arc-agi-3-retained-reasoning-compaction.md",
+    "github_url": "https://github.com/ed3c/skills-shared/blob/main/ai-content-note/notes/agent-harness/2026-07-29-arc-agi-3-retained-reasoning-compaction.md",
+    "category": "agent-harness"
+  },
+  {
+    "id": "langchain:agent-data-stack",
+    "title": "How we built LangChain's agent-first data stack",
+    "source_name": "LangChain",
+    "legacy_google_doc_url": "https://docs.google.com/document/d/1131kZibOah3uyYR-TiQQd5dtSr-9mLmo40PGeSa75P4/edit",
+    "github_path": "ai-content-note/notes/data-context/2026-07-27-langchain-agent-first-data-stack.md",
+    "github_url": "https://github.com/ed3c/skills-shared/blob/main/ai-content-note/notes/data-context/2026-07-27-langchain-agent-first-data-stack.md",
+    "category": "data-context"
+  },
+  {
+    "id": "no-priors:doordash-autonomous-delivery",
+    "title": "Building an Autonomous Delivery Experience with DoorDash Co-Founders Andy Fang and Stanley Tang",
+    "source_name": "No Priors",
+    "legacy_google_doc_url": "https://docs.google.com/document/d/1SiouLUNTP7cy757NeS09mgAmwDd86lgQyBtDqYgJJ84/edit",
+    "github_path": "ai-content-note/notes/vertical-agents/2026-07-23-doordash-autonomous-delivery.md",
+    "github_url": "https://github.com/ed3c/skills-shared/blob/main/ai-content-note/notes/vertical-agents/2026-07-23-doordash-autonomous-delivery.md",
+    "category": "vertical-agents"
+  },
+  {
+    "id": "sequoia:standard-intelligence-pixel-space",
+    "title": "Standard Intelligence: Training General Intelligence in Pixel Space",
+    "source_name": "Sequoia Capital",
+    "legacy_google_doc_url": "https://docs.google.com/document/d/1rZlhpaj5Fe76wVzocmBNh6p2DKZ5n1u7N05MAu2vR58/edit",
+    "github_path": "ai-content-note/notes/multimodal-agents/2026-04-30-standard-intelligence-pixel-space.md",
+    "github_url": "https://github.com/ed3c/skills-shared/blob/main/ai-content-note/notes/multimodal-agents/2026-04-30-standard-intelligence-pixel-space.md",
+    "category": "multimodal-agents"
+  },
+  {
+    "id": "anthropic:claude-for-teachers",
+    "title": "Introducing Claude for Teachers",
+    "source_name": "Anthropic Newsroom",
+    "legacy_google_doc_url": "https://docs.google.com/document/d/180qVCDCHLrM7fcBRxE32InRc5H1xrpXsg-IE4gNgsjQ/edit",
+    "github_path": "ai-content-note/notes/vertical-agents/2026-07-14-anthropic-claude-for-teachers.md",
+    "github_url": "https://github.com/ed3c/skills-shared/blob/main/ai-content-note/notes/vertical-agents/2026-07-14-anthropic-claude-for-teachers.md",
+    "category": "vertical-agents"
+  },
+  {
+    "id": "no-priors:booking-ai-travel",
+    "title": "Travel Through the Lens of AI with Booking.com CEO Glenn Fogel",
+    "source_name": "No Priors",
+    "legacy_google_doc_url": "https://docs.google.com/document/d/1qf75aqEK14GDV9RAZTVVHCryVsQwN3TIqjNq13YW_tk/edit",
+    "github_path": "ai-content-note/notes/vertical-agents/2026-07-09-booking-agentic-travel.md",
+    "github_url": "https://github.com/ed3c/skills-shared/blob/main/ai-content-note/notes/vertical-agents/2026-07-09-booking-agentic-travel.md",
+    "category": "vertical-agents"
+  },
+  {
+    "id": "sequoia:ai-ascent-2026",
+    "title": "AI Ascent 2026",
+    "source_name": "Sequoia Capital",
+    "legacy_google_doc_url": "https://docs.google.com/document/d/1Nzov13OKYzzfUzLBkU28bufI2I6wJuwBfXv7zj1O0Y4/edit",
+    "github_path": "ai-content-note/notes/ai-strategy/2026-05-08-sequoia-ai-ascent-2026.md",
+    "github_url": "https://github.com/ed3c/skills-shared/blob/main/ai-content-note/notes/ai-strategy/2026-05-08-sequoia-ai-ascent-2026.md",
+    "category": "ai-strategy"
+  }
+]

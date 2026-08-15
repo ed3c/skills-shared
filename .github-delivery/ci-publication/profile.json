@@ -1,0 +1,35 @@
+{
+  "schema": "github-delivery-ci-publication-profile/v1",
+  "repository": {
+    "full_name": "ed3c/skills-shared",
+    "repository_id": 1326262274,
+    "private": true
+  },
+  "check": {
+    "name": "contract",
+    "workflow": ".github/workflows/skill-eval-contract.yml"
+  },
+  "verification_contract": ".github-delivery/local-verification-contract.json",
+  "intents": [
+    "initial-pr",
+    "ready-for-review",
+    "batched-repair"
+  ],
+  "billing": {
+    "blocked_state": "billing-open",
+    "on_blocked": "stop",
+    "recovery": "owner-authored recovery receipt naming a later observation"
+  },
+  "generated_paths": [
+    ".git/github-delivery/local-verification.json",
+    ".git/github-delivery/local-verification-evidence.json",
+    ".git/github-delivery/github-state.transport.json",
+    ".git/github-delivery/github-state.observation.json",
+    ".git/github-delivery/github-state.snapshot.json",
+    ".git/github-delivery/live-transport.json",
+    ".git/github-delivery/live-observation.json",
+    ".git/github-delivery/live-snapshot.json",
+    ".git/github-delivery/publication-decision.json",
+    ".git/github-delivery/last-publication.json"
+  ]
+}

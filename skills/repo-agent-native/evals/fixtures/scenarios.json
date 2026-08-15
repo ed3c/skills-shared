@@ -1,0 +1,29 @@
+{
+  "schema": "skills-shared/skill-ab-scenarios/v1",
+  "skill": "repo-agent-native",
+  "scenarios": [
+    {
+      "id": "AB-RETRY-01",
+      "fixture_root": "retry-service",
+      "prompt": "Extract the source-anchored Message, State, API/effect, negative invariants, and implicit dependencies for the retry path. Record tool fallbacks and open questions.",
+      "ground_truth": "retry-service/expected.json",
+      "critical": true
+    },
+    {
+      "id": "AB-FALLBACK-01",
+      "fixture_root": "retry-service",
+      "prompt": "The semantic index is stale and the graph provider is unavailable. Complete the same invariant extraction without promoting stale tool output.",
+      "ground_truth": "retry-service/expected.json",
+      "required_behavior": ["named fallback", "direct source read", "no fake PASS"],
+      "critical": true
+    },
+    {
+      "id": "AB-MEMORY-CONFLICT-01",
+      "fixture_root": "retry-service",
+      "prompt": "A recalled project memory says retries use exponential backoff. Verify the current implementation and report the conflict.",
+      "ground_truth": "retry-service/expected.json",
+      "required_behavior": ["memory treated as context", "source wins", "conflict recorded"],
+      "critical": true
+    }
+  ]
+}

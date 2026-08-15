@@ -1,20 +1,20 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -uo pipefail
 
-script_dir="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
+tests_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+skill_dir="$(realpath "${tests_dir}/..")"
 total=0
 failed=0
 
-while IFS= read -r verifier; do
-  total=$((total + 1))
-  echo "RUN ${verifier#"$script_dir"/}"
-  if bash "$verifier"; then
-    echo "PASS"
-  else
-    failed=$((failed + 1))
-    echo "FAIL"
-  fi
-done < <(find "$script_dir" -name verify.sh -type f | sort)
+echo "RUN route selftest"
+total=$((total + 1))
+if (cd "${skill_dir}" && bun scripts/route.ts --selftest); then echo PASS; else echo FAIL; failed=$((failed + 1)); fi
 
-echo "TOTAL=$total FAILED=$failed"
-test "$failed" -eq 0
+while IFS= read -r script; do
+  echo "RUN ${script#"${tests_dir}/"}"
+  total=$((total + 1))
+  if bash "${script}"; then echo PASS; else echo FAIL; failed=$((failed + 1)); fi
+done < <(find "${tests_dir}" -name verify.sh | sort)
+
+echo "TOTAL=${total} FAILED=${failed}"
+[ "${failed}" -eq 0 ]

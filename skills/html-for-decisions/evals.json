@@ -16,7 +16,10 @@
       "test_verify": "tests/check-decision-html/verify.sh",
       "good_fixture": "tests/check-decision-html/fixtures/good/report.html",
       "hollow_fixture": "tests/check-decision-html/fixtures/hollow/report.html",
-      "covers": ["declare", "quiz"],
+      "covers": [
+        "declare",
+        "quiz"
+      ],
       "expected": "good PASS and hollow FAIL"
     },
     {
@@ -25,7 +28,9 @@
       "test_verify": "tests/check-decision-html/verify.sh",
       "good_fixture": "tests/check-decision-html/fixtures/good/report.html",
       "hollow_fixture": "tests/check-decision-html/fixtures/hollow-selfhost/report.html",
-      "covers": ["selfhost"],
+      "covers": [
+        "selfhost"
+      ],
       "expected": "isolating control: only selfhost FAILs on a protocol-relative external script"
     },
     {
@@ -34,16 +39,28 @@
       "test_verify": "tests/package-markdown-email/verify.sh",
       "good_fixture": "tests/package-markdown-email/fixtures/good",
       "hollow_fixture": "tests/package-markdown-email/fixtures/hollow",
-      "covers": ["missing source", "MIME parts", "Date/Message-ID", "figure atlas"],
+      "covers": [
+        "missing source",
+        "MIME parts",
+        "Date/Message-ID",
+        "figure atlas"
+      ],
       "expected": "good emits HTML ZIP EML manifest with figures and atlas; hollow fails on missing source"
     },
     {
       "id": "NAV-1",
       "checker_script": "scripts/package_markdown_email.py",
       "test_verify": "tests/package-markdown-email/verify.sh",
-      "good_fixture": "tests/package-markdown-email/fixtures/good（c.md 摘要 vs d.md 原始定義）",
-      "hollow_fixture": "暫時退回「先出現先贏」或停用範圍排除，實測轉紅",
-      "covers": ["跳轉落在原始來源", "範圍標題不算定義", "錨點 id 不重複", "零懸空連結"],
+      "good_fixture": null,
+      "good_evidence": "tests/package-markdown-email/fixtures/good（c.md 摘要 vs d.md 原始定義）",
+      "hollow_fixture": null,
+      "hollow_mutations": "暫時退回「先出現先贏」或停用範圍排除，實測轉紅",
+      "covers": [
+        "跳轉落在原始來源",
+        "範圍標題不算定義",
+        "錨點 id 不重複",
+        "零懸空連結"
+      ],
       "expected": "Commit 1 的錨點必須在 d.md（原始定義）而非 c.md（摘要表）；兩種退化都會讓斷言轉紅"
     },
     {
@@ -51,8 +68,17 @@
       "checker_script": "scripts/package_markdown_email.py",
       "test_verify": "tests/package-markdown-email/verify.sh",
       "good_fixture": "tests/package-markdown-email/fixtures/good",
-      "hollow_fixture": "—（結構性斷言，缺件即 fail）",
-      "covers": ["分頁", "文件預設收起", "上一步／下一步", "章節索引", "懸浮基準線", "in-view 需有版面", "highlight 可清除"],
+      "hollow_fixture": null,
+      "hollow_mutations": "—（結構性斷言，缺件即 fail）",
+      "covers": [
+        "分頁",
+        "文件預設收起",
+        "上一步／下一步",
+        "章節索引",
+        "懸浮基準線",
+        "in-view 需有版面",
+        "highlight 可清除"
+      ],
       "expected": "分頁存在且每份文件有挑選鈕；導覽與懸浮定位的關鍵函式齊備"
     },
     {
@@ -60,13 +86,16 @@
       "checker_script": "scripts/package_markdown_email.py",
       "test_verify": "tests/package-markdown-email/verify.sh",
       "good_fixture": "tests/package-markdown-email/fixtures/good/tool.py",
-      "hollow_fixture": "extras 指向不存在的檔案 → renderer 直接 fail",
-      "covers": ["文件引用的可執行工具必須隨包出貨"],
+      "hollow_fixture": null,
+      "hollow_mutations": "extras 指向不存在的檔案 → renderer 直接 fail",
+      "covers": [
+        "文件引用的可執行工具必須隨包出貨"
+      ],
       "expected": "ZIP 內含 tools/tool.py；extras 路徑不存在時中止而非靜默略過"
     },
     {
       "id": "GRAPH-1",
-      "checker_script": "scripts/package_markdown_email.py + scripts/code_graph.py",
+      "checker_script": "scripts/package_markdown_email.py",
       "test_verify": "tests/package-markdown-email/verify.sh",
       "good_fixture": "tests/package-markdown-email/fixtures/good/graph.json",
       "hollow_fixture": "tests/package-markdown-email/fixtures/good/bad-graph.json",
@@ -79,7 +108,9 @@
       "test_verify": "tests/package-markdown-email/verify.sh",
       "good_fixture": "tests/package-markdown-email/fixtures/good",
       "hollow_fixture": "tests/package-markdown-email/fixtures/no-diagram",
-      "covers": ["every source carries a data-flow diagram"],
+      "covers": [
+        "every source carries a data-flow diagram"
+      ],
       "expected": "isolating control: a source without a diagram is rejected and leaves no partial output"
     },
     {
@@ -88,7 +119,9 @@
       "test_verify": "tests/check-redaction/verify.sh",
       "good_fixture": "tests/check-redaction/fixtures/good",
       "hollow_fixture": "tests/check-redaction/fixtures/hollow",
-      "covers": ["substring matching mechanism, via --deny-token"],
+      "covers": [
+        "substring matching mechanism, via --deny-token"
+      ],
       "expected": "good PASS and planted identifier leak FAIL"
     },
     {
@@ -96,8 +129,11 @@
       "checker_script": "scripts/check_redaction.py",
       "test_verify": "tests/check-redaction/verify.sh",
       "good_fixture": "tests/check-redaction/fixtures/good",
-      "hollow_fixture": "run-time temp dir; token assembled in-process so the literal never lands in this repo",
-      "covers": ["the shipped FORBIDDEN list itself"],
+      "hollow_fixture": null,
+      "hollow_mutations": "run-time temp dir; token assembled in-process so the literal never lands in this repo",
+      "covers": [
+        "the shipped FORBIDDEN list itself"
+      ],
       "expected": "policy control: checker run WITHOUT --deny-token must reject the planted upstream identifier"
     }
   ]

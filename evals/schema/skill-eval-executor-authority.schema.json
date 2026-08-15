@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ed3c/skills-shared/evals/schema/skill-eval-executor-authority.schema.json",
+  "title": "Skill Eval Executor Authority",
+  "description": "What an execution adapter is and is not allowed to claim. Two adapters previously declared this schema_version with entirely different shapes and nothing validated either, so the acceptance rule 'no executor adapter owns promotion authority' could not be checked mechanically -- it required knowing which of two vocabularies each file happened to use.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schema_version",
+    "executor",
+    "repository",
+    "repository_sha",
+    "runtime_state",
+    "promotion_authority",
+    "allowed_claims",
+    "forbidden_claims"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "skill-eval-executor-authority/v1"
+    },
+    "executor": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{1,63}$"
+    },
+    "repository": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9._-]+/[A-Za-z0-9._-]+$"
+    },
+    "repository_sha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "runtime_state": {
+      "enum": [
+        "available_with_external_model_credential",
+        "available_offline_replay_only",
+        "blocked_external_authority",
+        "not_implemented"
+      ]
+    },
+    "promotion_authority": {
+      "const": false,
+      "description": "An executor runs cases. Deciding that a result promotes anything is a separate authority, and no adapter holds it. This is a constant rather than a boolean so the answer cannot drift per adapter."
+    },
+    "allowed_claims": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "control-plane-contract-available",
+          "paired-runner-available",
+          "offline-replay-available",
+          "physical-run-available"
+        ]
+      }
+    },
+    "forbidden_claims": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "physical-llm-runtime-qualified",
+          "cross-harness-capability-proven",
+          "ranking-claim-allowed",
+          "promotion-admitted"
+        ]
+      }
+    },
+    "blocking_issue": {"type": ["string", "null"]},
+    "blocking_reason": {"type": ["string", "null"]}
+  }
+}

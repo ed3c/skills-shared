@@ -64,7 +64,7 @@
    保留 `--admin` 在黑名單是重點：`--admin` 是唯一能**繞過 GitHub 端所有要求**的形式，
    那才是不可逆的危險面；一般 `gh pr merge` 仍受 GitHub 的 mergeability 與 branch rule 約束。
 
-2. `/Users/neon/local_stack/execution/hooks/bash_command_classifier.py` 的 GH 前綴白名單加一行
+2. `<local-stack-root>/execution/hooks/bash_command_classifier.py` 的 GH 前綴白名單加一行
    `"gh pr merge",`。順序上 BASH_BLACKLIST 先跑，所以**單獨加這行是 inert 的**——
    在第 1 步套用前不會改變任何行為，可以安全先加。
 
@@ -230,6 +230,8 @@ policy。這不是把 `gh pr merge`／`gh api graphql` 全域放行；Codex rule
 3. canonical `owner/repo` 沒有 redirect，viewer 仍有 admin；
 4. PR 非 draft、mergeable、required checks／branch rules 可落地，且 `expectedHeadOid` 等於剛驗過的 HEAD；
 5. 單張交付的 `preflight --pr N` 與 `land --pr N` 使用同一個範圍，成功一次即停止，不掃描其他 open PR。
+6. 每次送出前查同一 PR 的 auto-merge／merge queue 狀態，已有請求就以 exit 5 停止、不重送；送出後
+   回讀 exact HEAD、`state=MERGED` 與 `mergedAt`，不能用 command exit 0 代替 provider 落地證據。
 
 所以「未來 repo」不靠預先列白名單：只要日後 repo 仍由同一個 personal GitHub User 擁有就通過；
 collaborator、organization member／owner、以及他人 repo 的 admin 都拒絕。login rename、token 換人、repo

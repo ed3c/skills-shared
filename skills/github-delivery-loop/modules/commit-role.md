@@ -53,9 +53,9 @@ git -C <repo> var GIT_AUTHOR_IDENT
 
 commit 的 author email 會**永久寫進公開 repo 的 git object**，刪 commit 也還在 fork 與快取裡。
 
-- **對外公開的 repo**（如 `ed3c/ix-agy` 這條開源線）→ 用 `30064024+ed3c@users.noreply.github.com`。
+- **對外公開的 repo**（如 `<owner>/<public-repo>`）→ 用該帳號已驗證的 GitHub noreply 位址。
   GitHub 照樣把 commit 連回 `ed3c` 帳號、照樣算 contribution，但不外洩真實信箱。
-- **私有／託管 repo**（如 `ed3c/ix-agy-private`）→ 用哪個都可以，但**同一條線內不要混**：
+- **私有／託管 repo**（如 `<owner>/<private-repo>`）→ 用哪個都可以，但**同一條線內不要混**：
   混用會讓 `git log --author` 與 blame 統計裂成兩個人。
 - 決定完就寫進該 repo 的 `git config user.email`，別靠記憶每次手動帶。
 
@@ -104,8 +104,8 @@ identity policy 承擔，不代表需要第二身分。因此：
 
 | 事故 | 觀測 | 機制 |
 |---|---|---|
-| 測試身分落到真 remote | `ed3c/skill-bettor` 最近 6 個 commit 全是 `Loop Test <loop-test@example.invalid>` | 小迴圈為了測試在 repo 層設了 fixture 身分，之後真的推上 GitHub。`.invalid` 是保留 TLD，GitHub 永遠不可能把它連回任何帳號——這些 commit 沒有作者、不算 contribution，且**無法事後修正而不 rewrite history** |
-| 佔位身分混進真線 | `bettor-arena` 的 log 同時有 `ed3c <mcnum01@gmail.com>` 與 `t <t@t.t>` | 同上，只是佔位字串不同 |
+| 測試身分落到真 remote | `<owner>/<consumer-repo-a>` 最近 6 個 commit 全是 `Loop Test <loop-test@example.invalid>` | 小迴圈為了測試在 repo 層設了 fixture 身分，之後真的推上 GitHub。`.invalid` 是保留 TLD，GitHub 永遠不可能把它連回任何帳號——這些 commit 沒有作者、不算 contribution，且**無法事後修正而不 rewrite history** |
+| 佔位身分混進真線 | `<consumer-repo-b>` 的 log 同時有真實帳號身分與 `Fixture User <fixture@example.invalid>` | 同上，只是佔位字串不同 |
 
 **開工前的一次性檢查**（零網路，任何 CWD）：
 

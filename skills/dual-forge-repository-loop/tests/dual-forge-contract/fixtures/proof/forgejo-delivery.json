@@ -1,0 +1,17 @@
+{
+  "schema": "dual-forge-delivery-observation/v5",
+  "forgejo_repository": "neon/example",
+  "forgejo_repository_id": 456,
+  "default_branch": "main",
+  "captured_at": "2026-08-14T09:59:58Z",
+  "transport": {"path": "proof/forgejo-delivery-transport.json", "sha256": "c4528be6845883cb65b5a10d0e67115c0e41e402836782eb7fbadf87e95a0ba2"},
+  "issues": [{"number": 12, "state": "closed", "title_sha256": "68ee14abbe78496fe42740183700d7de834cdbdff832e2a8c9752efb30b63d7d", "body_sha256": "33d447d475d81c6ae5f0803a37f824cfe1be118385cbbf1d06d36b38a554d826", "comments_sha256": "b31e6ce8d084a8b3d5aa5194833a749f01f712f4516df17f2d68ef2008c8b792", "comment_count": 1, "context_state": "PASS", "desktop_submission_state": "PASS", "recovery_receipt_sha256": "53972af3326c7ea80f7d1ea6f31129dd9f1bb709a07f9caf77b76c629c946928", "desktop_receipt_sha256": "8a14401b45489bdc9a24b3a8a20178f1c06452e6400cc1b542ebc908e9bb4049", "desktop_thread_url": "https://chatgpt.com/c/12345678-1234-1234-1234-123456789abc", "desktop_prompt_sha256": "8641f1ba022b8fb393551dc4bf2dec79a43ad37f4dbeea20d41368394aa1616f", "desktop_observer_id": 42, "desktop_observer_login": "neon", "desktop_response_started_at": "2026-08-14T09:55:05Z", "receipt": "forgejo:issue/12"}],
+  "recovery_worktree": {"issue_number": 12, "branch": "recovery/issue-12-4b50cc080d2d8fc8", "head_sha": "572aa3d2f0d50771cf2ab856f59a9b5923fed1f2", "base_sha": "4cb614454eeb07e81ac1718746e2e99d3c3287d1", "created_at": "2026-08-14T09:56:00Z", "observed_at": "2026-08-14T09:59:58Z", "creation_receipt_sha256": "edd637347b3d3878c7f436e0341f3bf40760cc0c6cb528fad3d7456473efa6e8", "writer_lease": {"kind": "git-branch-lock", "branch_ref": "refs/heads/recovery/issue-12-4b50cc080d2d8fc8", "holders": 1, "reason": "desktop-recovery:8a14401b45489bdc"}, "receipt": "local-git:worktree@572aa3d"},
+  "merged_prs": [{"number": 8, "state": "closed", "merged": true, "head_sha": "572aa3d2f0d50771cf2ab856f59a9b5923fed1f2", "merge_commit_sha": "572aa3d2f0d50771cf2ab856f59a9b5923fed1f2", "base_branch": "main", "body_sha256": "dc31b51afbf81e3c8ece08608a4b0683880dabe9857f4584ae042dfa204417e3", "merged_at": "2026-08-14T09:59:00Z", "closes_issues": [12], "receipt": "forgejo:pr/8"}],
+  "local_main_merge": {"sha": "572aa3d2f0d50771cf2ab856f59a9b5923fed1f2", "parents": ["4cb614454eeb07e81ac1718746e2e99d3c3287d1"], "tree_sha": "674215c2e543d402f2b3b24d404bab5abab8bdee", "receipt": "local-git:main@572aa3d"},
+  "verification": {
+    "receipt": {"path": "proof/forgejo-verification.json", "sha256": "c0b780b4296832bbdb4e97a1137fd404cac58ceb55e00a4ce5cb4ccda6ace157"},
+    "evidence": {"path": "proof/forgejo-verification-evidence.json", "sha256": "60858993e4fccd7b77d7581592a26b0c8498cb145a54b1c44a8163a8fa154f19"},
+    "contract": {"path": "proof/forgejo-verification-contract.json", "sha256": "03fcc26302aa89c4f432c006dc8a0299d7ac8cc99445011739bd87ba6e385598"}
+  }
+}

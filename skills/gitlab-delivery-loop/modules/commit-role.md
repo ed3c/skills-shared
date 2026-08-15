@@ -106,9 +106,9 @@ approvals 都不完整（見 [host-permissions.md](host-permissions.md)）。所
 
 | 事故 | 觀測 | 機制 |
 |---|---|---|
-| 測試身分落到真 remote | `ed3c/skill-bettor` 最近 6 個 commit 全是 `Loop Test <loop-test@example.invalid>` | 小迴圈為了測試在 repo 層設了 fixture 身分，之後真的推上去。`.invalid` 是保留 TLD，永遠比對不到任何帳號——這些 commit 沒有作者，且**無法事後修正而不 rewrite history** |
-| 佔位身分混進真線 | `bettor-arena` 的 log 同時有 `ed3c <mcnum01@gmail.com>` 與 `t <t@t.t>` | 同上，只是佔位字串不同 |
-| 跨 host 位址錯置 | `ts-skill-bettor` 用 `neon@noreply.localhost` | 那是本機 Forgejo 的 noreply 位址；**推到 GitLab 會完全失去歸屬**，因為它不在 GitLab 帳號的已驗證清單上 |
+| 測試身分落到真 remote | `<owner>/<consumer-repo-a>` 最近 6 個 commit 全是 `Loop Test <loop-test@example.invalid>` | 小迴圈為了測試在 repo 層設了 fixture 身分，之後真的推上去。`.invalid` 是保留 TLD，永遠比對不到任何帳號——這些 commit 沒有作者，且**無法事後修正而不 rewrite history** |
+| 佔位身分混進真線 | `<consumer-repo-b>` 的 log 同時有真實帳號身分與 `Fixture User <fixture@example.invalid>` | 同上，只是佔位字串不同 |
+| 跨 host 位址錯置 | `<consumer-repo-c>` 用另一個 forge 的 noreply 位址 | 該位址不在 GitLab 帳號的已驗證清單上，**推到 GitLab 會完全失去歸屬** |
 
 **開工前的一次性檢查**（零網路，任何 CWD）：
 

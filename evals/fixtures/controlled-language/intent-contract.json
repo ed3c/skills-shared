@@ -1,0 +1,307 @@
+{
+  "schema_version": "intent-bound-constraint/v1",
+  "contract_id": "controlled-language-foundation",
+  "contract_version": "1.0.0",
+  "subject_identity": {
+    "repository": "ed3c/skills-shared",
+    "artifact_digest": "sha256:d919a887f9bc8acda76ad6350276059e4c4f71a739f048a47626c686d7175578"
+  },
+  "module_policy": {
+    "may_add_constraints": true,
+    "may_tighten_constraints": true,
+    "may_weaken_constraints": false,
+    "may_widen_effects": false,
+    "may_bypass_human_admit": false,
+    "ambiguity_action": "BLOCK"
+  },
+  "completion_policy": {
+    "deterministic_failure_vetoes_advisory": true,
+    "stale_evidence_blocks": true,
+    "no_improvement_action": "STOP",
+    "ambiguity_action": "BLOCK",
+    "private_chain_of_thought": "FORBIDDEN"
+  },
+  "meta_intents": [
+    {
+      "id": "MI-CTL-TRUTH",
+      "statement": "Bind each controlled-language result to exact input, profile, and termbase subjects.",
+      "protected_property": "exact-subject-truth",
+      "priority": "repository-invariant",
+      "scope": [
+        "request",
+        "standard pack",
+        "termbase",
+        "receipt"
+      ],
+      "forbidden_outcomes": [
+        "stale result",
+        "wrong profile",
+        "unbound termbase"
+      ],
+      "proof_obligations": [
+        "PO-CTL-SUBJECT",
+        "PO-CTL-PROFILE",
+        "PO-CTL-TERMBASE"
+      ],
+      "completion_criteria": [
+        "all artifact digests match exact bytes"
+      ],
+      "human_owned_boundaries": []
+    },
+    {
+      "id": "MI-CTL-EVIDENCE",
+      "statement": "Keep deterministic, calibrated heuristic, semantic, and Human evidence separate.",
+      "protected_property": "evidence-noncollapse",
+      "priority": "repository-invariant",
+      "scope": [
+        "evaluator runs",
+        "completion decision"
+      ],
+      "forbidden_outcomes": [
+        "advisory result overrides deterministic failure",
+        "not-exercised lane becomes pass"
+      ],
+      "proof_obligations": [
+        "PO-CTL-EVIDENCE-CLASS",
+        "PO-CTL-DETERMINISTIC-VETO"
+      ],
+      "completion_criteria": [
+        "requested lanes are present and deterministic failures veto PASS"
+      ],
+      "human_owned_boundaries": []
+    },
+    {
+      "id": "MI-CTL-PRIVACY",
+      "statement": "Route controlled text only through an execution lane admitted for its privacy class.",
+      "protected_property": "privacy-boundary",
+      "priority": "repository-invariant",
+      "scope": [
+        "request privacy policy"
+      ],
+      "forbidden_outcomes": [
+        "restricted text leaves local execution"
+      ],
+      "proof_obligations": [
+        "PO-CTL-PRIVACY"
+      ],
+      "completion_criteria": [
+        "privacy class and execution lane are compatible"
+      ],
+      "human_owned_boundaries": [
+        "approve external processing of confidential text"
+      ]
+    },
+    {
+      "id": "MI-CTL-HUMAN",
+      "statement": "Keep terminology admission, safety semantics, and compliance representation Human-owned.",
+      "protected_property": "human-authority",
+      "priority": "repository-invariant",
+      "scope": [
+        "termbase admission",
+        "Warning/Caution acceptance",
+        "official compliance claim"
+      ],
+      "forbidden_outcomes": [
+        "agent admits terminology",
+        "safety text passes without Human review",
+        "unapproved compliance claim"
+      ],
+      "proof_obligations": [
+        "PO-CTL-HUMAN"
+      ],
+      "completion_criteria": [
+        "Human-owned transitions require exact approval receipts"
+      ],
+      "human_owned_boundaries": [
+        "terminology admission",
+        "safety-critical acceptance",
+        "official compliance representation"
+      ]
+    }
+  ],
+  "constraints": [
+    {
+      "id": "C-CTL-EXACT-IDENTITY",
+      "protects_intents": [
+        "MI-CTL-TRUTH"
+      ],
+      "discharges_obligations": [
+        "PO-CTL-SUBJECT",
+        "PO-CTL-PROFILE",
+        "PO-CTL-TERMBASE"
+      ],
+      "subject": "controlled-language request and receipt bundle",
+      "trigger": "before completion",
+      "invariant": "Request, standard pack, termbase, and receipt identities bind exact bytes.",
+      "severity": "hard",
+      "evidence_class": "deterministic",
+      "evaluator": {
+        "id": "controlled-language-contract-checker",
+        "version": "1.0.0",
+        "kind": "command",
+        "argv": [
+          "python3",
+          "scripts/check_controlled_language_contracts.py",
+          "bundle"
+        ],
+        "success_exit_codes": [
+          0
+        ],
+        "timeout_seconds": 30
+      },
+      "repairability": "repairable",
+      "retry_budget": 1,
+      "allowed_repairs": [
+        "REGENERATE_EXACT_RECEIPT"
+      ],
+      "forbidden_repair_codes": [
+        "WEAKEN_CONSTRAINT",
+        "EDIT_EVALUATOR_FOR_PASS",
+        "DELETE_CONTROL",
+        "WIDEN_EFFECTS",
+        "BYPASS_HUMAN_ADMIT"
+      ],
+      "expected_delta_metric": "identity_mismatch_count",
+      "negative_controls": [
+        "receipt references an older request digest"
+      ],
+      "mutation_controls": [
+        "checker ignores profile digest mismatch"
+      ]
+    },
+    {
+      "id": "C-CTL-EVIDENCE-SEPARATION",
+      "protects_intents": [
+        "MI-CTL-EVIDENCE"
+      ],
+      "discharges_obligations": [
+        "PO-CTL-EVIDENCE-CLASS",
+        "PO-CTL-DETERMINISTIC-VETO"
+      ],
+      "subject": "controlled-language evaluator runs and final decision",
+      "trigger": "before final PASS",
+      "invariant": "Requested evidence classes stay distinct and deterministic failure vetoes final PASS.",
+      "severity": "hard",
+      "evidence_class": "deterministic",
+      "evaluator": {
+        "id": "controlled-language-contract-checker",
+        "version": "1.0.0",
+        "kind": "command",
+        "argv": [
+          "python3",
+          "scripts/check_controlled_language_contracts.py",
+          "bundle"
+        ],
+        "success_exit_codes": [
+          0
+        ],
+        "timeout_seconds": 30
+      },
+      "repairability": "repairable",
+      "retry_budget": 1,
+      "allowed_repairs": [
+        "RUN_MISSING_EVIDENCE_LANE",
+        "CORRECT_FINAL_STATUS"
+      ],
+      "forbidden_repair_codes": [
+        "WEAKEN_CONSTRAINT",
+        "EDIT_EVALUATOR_FOR_PASS",
+        "DELETE_CONTROL",
+        "WIDEN_EFFECTS",
+        "BYPASS_HUMAN_ADMIT"
+      ],
+      "expected_delta_metric": "evidence_lane_failure_count",
+      "negative_controls": [
+        "semantic PASS hides deterministic FAIL"
+      ],
+      "mutation_controls": [
+        "checker treats NOT_EXERCISED as PASS"
+      ]
+    },
+    {
+      "id": "C-CTL-PRIVACY",
+      "protects_intents": [
+        "MI-CTL-PRIVACY"
+      ],
+      "discharges_obligations": [
+        "PO-CTL-PRIVACY"
+      ],
+      "subject": "request privacy and execution lane",
+      "trigger": "before text processing",
+      "invariant": "Restricted text remains local and confidential external processing requires Human approval.",
+      "severity": "hard",
+      "evidence_class": "deterministic",
+      "evaluator": {
+        "id": "controlled-language-contract-checker",
+        "version": "1.0.0",
+        "kind": "command",
+        "argv": [
+          "python3",
+          "scripts/check_controlled_language_contracts.py",
+          "request"
+        ],
+        "success_exit_codes": [
+          0
+        ],
+        "timeout_seconds": 30
+      },
+      "repairability": "repairable",
+      "retry_budget": 1,
+      "allowed_repairs": [
+        "SELECT_LOCAL_EXECUTION_LANE"
+      ],
+      "forbidden_repair_codes": [
+        "WEAKEN_CONSTRAINT",
+        "EDIT_EVALUATOR_FOR_PASS",
+        "DELETE_CONTROL",
+        "WIDEN_EFFECTS",
+        "BYPASS_HUMAN_ADMIT"
+      ],
+      "expected_delta_metric": "privacy_route_violation_count",
+      "negative_controls": [
+        "restricted request selects external endpoint"
+      ],
+      "mutation_controls": [
+        "checker ignores allow_network for restricted text"
+      ]
+    },
+    {
+      "id": "C-CTL-HUMAN",
+      "protects_intents": [
+        "MI-CTL-HUMAN"
+      ],
+      "discharges_obligations": [
+        "PO-CTL-HUMAN"
+      ],
+      "subject": "Human-owned terminology, safety, and compliance transitions",
+      "trigger": "before admission or representation",
+      "invariant": "Human-owned transitions require an exact Human approval receipt.",
+      "severity": "hard",
+      "evidence_class": "deterministic",
+      "evaluator": {
+        "id": "controlled-language-human-boundary-schema",
+        "version": "1.0.0",
+        "kind": "schema",
+        "schema": "evals/schema/controlled-language-receipt.schema.json"
+      },
+      "repairability": "human_owned",
+      "retry_budget": 0,
+      "allowed_repairs": [],
+      "forbidden_repair_codes": [
+        "WEAKEN_CONSTRAINT",
+        "EDIT_EVALUATOR_FOR_PASS",
+        "DELETE_CONTROL",
+        "WIDEN_EFFECTS",
+        "BYPASS_HUMAN_ADMIT"
+      ],
+      "expected_delta_metric": null,
+      "negative_controls": [
+        "Warning text marked PASS without Human receipt"
+      ],
+      "mutation_controls": [
+        "schema permits official compliance without Human approval"
+      ]
+    }
+  ],
+  "diagnostic_reflection_schema": "evals/schema/diagnostic-reflection-receipt.schema.json"
+}

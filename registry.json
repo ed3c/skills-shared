@@ -116,6 +116,26 @@
       "name": "repo-wiki-converge",
       "admitted": "2026-08-07",
       "why": "Four copies. ix-agy's module had four operational fixes the others never learned -- monorepo git detection, judge timeout, and the zero-page hole where a mechanical checker passed because there was no code to fail. Exactly the rediscovery this repo exists to stop."
+    },
+    {
+      "name": "git-town-stacked-pr-worker",
+      "admitted": "2026-08-12",
+      "why": "Stack hierarchy, isolated Worker worktrees, eval-first task packets, bounded unattended synchronization, path leases, machine-readable receipts, GitHub Actions publication boundaries, and Human Admit for merge and promotion are cross-repository Git infrastructure. Repository-specific configuration, Bash wrappers, paths, issues, remotes and receipts remain consumer-owned bindings rather than duplicate canonical prompt bodies."
+    },
+    {
+      "name": "spatial-loop-systems-engineering",
+      "admitted": "2026-08-14",
+      "why": "Kernel-, hardware-, privilege-, concurrency-, resource-, and teardown-bound system design is a portable cross-repository method. The shared body owns exact-subject state-space contracts, hard-invariant and capability gates, collision/reconciliation logic, and falsifiable verification structure; consumer kernels, hardware, privileges, threat models, paths, and live receipts remain environment-owned."
+    },
+    {
+      "name": "dual-forge-repository-loop",
+      "admitted": "2026-08-14",
+      "why": "Coordinating GitHub private-repository ingress and Actions with a local Forgejo implementation plane, isolated worktrees, local-main-first integration, cross-forge SHA/ancestry receipts, and GitHub conflict/issue reconciliation is portable repository infrastructure. Consumer remotes, local paths, credentials, issue/PR identities, verification commands, live Forgejo state, and publication receipts remain repo/runtime-owned."
+    },
+    {
+      "name": "controlled-technical-language-harness",
+      "admitted": "2026-08-15",
+      "why": "It landed through CTL 01-06 without an entry, so it was reachable from every project with nothing having ruled on it -- which is the state the registry exists to make impossible. Controlled-language checking is host infrastructure by the same test as the delivery loops: the standard, the parser and the privacy classes are true anywhere, and only the termbase and document routes are consumer-owned."
     }
   ],
   "repo_owned": [

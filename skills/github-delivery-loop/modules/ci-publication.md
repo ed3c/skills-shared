@@ -24,40 +24,44 @@ skipped job as PASS. Separate local iteration cadence from remote publication.
 1. `initial-pr` — publish a reviewed local batch to create the draft PR. The
    snapshot must show that no PR exists yet.
 2. `ready-for-review` — publish the final reviewed batch before changing the PR
-   from draft to ready. The PR must still be draft and its remote head must differ.
-3. `repair` — publish one batch after actionable CI/review feedback against the
-   current remote head. Local verification must finish after that feedback; the
-   same feedback timestamp cannot authorize a second publication.
+   from draft to ready. The PR must still be draft. If the exact reviewed HEAD is
+   already remote, the only admitted operation is the no-push ready transition;
+   otherwise one final push precedes that transition.
+3. `batched-repair` — publish one batch after actionable CI/review feedback
+   against the current remote head. The local subject must be a new exact HEAD;
+   the same feedback ID cannot authorize a second publication.
 
 There is deliberately no `checkpoint` intent. Commit as often as needed locally;
 push once at a meaningful state transition.
 
-Every intent requires `local_verification.status=passed` on the exact 40-character
-`local_head`. Success from an older SHA is a BLOCK. A local receipt does not become
-a GitHub status merely because its JSON shape is valid.
+Every intent requires a separate `github-delivery-local-verification/v1` receipt
+with `status=PASS` on the exact local Git HEAD. Success from an older SHA is a
+BLOCK. A local receipt does not become a GitHub status merely because its JSON
+shape is valid.
 
 ## Billing circuit breaker
 
-When a GitHub check annotation identifies the account-level no-runner billing or
-spending-limit condition, record:
+When a trusted GitHub observation identifies the account-level no-runner billing
+or spending-limit condition, the snapshot records:
 
 ```json
 {
-  "billing_blocker": {
-    "kind": "account-billing-no-runner",
-    "observed_at": "2026-08-12T05:00:00Z"
-  },
-  "recovery": null
+  "actions": {
+    "circuit": "billing-open",
+    "observed_at": "2026-08-12T05:00:00Z",
+    "blocker": "billing-or-spending-limit",
+    "latest_check": null
+  }
 }
 ```
 
-All publication intents then BLOCK. Do not rerun, push a no-op commit, or push the
-next local fix: none changes account billing. Recovery requires a receipt whose
-`author` equals the repository owner, whose `status` is `actions-restored`, and
-whose timestamp is later than the blocker. Because evaluation is intentionally
-zero-network, the snapshot producer must retain the owner-authored issue/comment
-URL or billing-operation receipt outside this sanitized snapshot. Shape validation
-does not prove that the external action happened.
+All publication intents then BLOCK. Recovery requires a separate
+`github-actions-billing-recovery/v1` receipt bound to the numeric repository ID,
+repository owner, exact blocker timestamp, and a later recovery timestamp.
+Because evaluation is intentionally zero-network, the trusted capture lane must
+retain the owner-authored issue/comment URL or billing-operation receipt outside
+this sanitized decision input. Shape validation does not prove the external
+action happened.
 
 GitHub documents that private-repository hosted runners consume included quota,
 and usage can be blocked after quota exhaustion without a valid payment method or
@@ -67,28 +71,58 @@ by budgets. See [GitHub Actions billing](https://docs.github.com/en/billing/conc
 
 The evaluator is deliberately pure; enforcement is layered around it:
 
-1. `.github-delivery/ci-policy.json` enrolls one private repository, names the
-   workflow and stable required jobs, and defines the local verifier argv.
+1. `.github-delivery/ci-policy.json` (`github-ci-policy/v2`) enrolls one private
+   repository, names the workflow and stable required jobs, and points to one
+   repository-owned local verification contract.
 2. `ci_workflow_policy.py check` requires one explicit PR cost profile: the
    backwards-compatible `draft-first` profile rejects draft `synchronize` and
    `reopened`; the opt-in `universal` profile requires every opened, synchronized,
    and reopened PR head. Both reject push outside the default
    branch, missing dispatch/concurrency, and mutable action tags.
-3. `ci_publish.py verify` executes the configured verifier and writes an
-   exact-HEAD receipt under the git directory, outside the committed tree.
+3. `ci_publish.py verify` delegates to `local_verification.py`, which executes the
+   contract's fixed argv and writes exact-HEAD receipt plus detailed evidence
+   under the git directory, outside the committed tree.
 4. `ci_publish.py publish` rechecks policy, receipt, snapshot, GitHub remote
-   identity and the full-SHA refspec before one push. Ready publications then
-   mark the PR ready. Draft-first repairs explicitly dispatch the verifier;
+   identity, observed branch, and full-SHA refspec before one push. Initial
+   publication creates a draft PR; ready publication marks it ready. Draft-first
+   batched repairs explicitly dispatch the verifier;
    universal publications also require an open PR and an exact match between the
    target branch and snapshot PR head ref. Universal repairs rely on the required
    `synchronize` event and do not create a duplicate manual run for the same SHA.
+   After every zero-network precondition passes, the wrapper writes
+   `github-actions-publish-decision-manifest/v1` under the Git directory. The
+   manifest binds the evaluation time, stable required check name, admitted
+   operation, and raw SHA-256 digests of the canonical policy, snapshot, exact-HEAD
+   verification receipt/evidence/contract, and optional billing-recovery receipt.
+   A later dual-origin proof must replay those exact bytes; the manifest alone is
+   admission evidence, not evidence that a network command succeeded.
 5. `ci_publish_guard.py`, registered by `install-ci-publish-guard.py`, blocks a
    raw GitHub `git push` from enrolled repositories on Agent PreToolUse
-   surfaces. It leaves an explicit Forgejo remote available.
+   surfaces. It recognizes direct `git`, `git-push`, `exec`, admitted `env`
+   forms, Git aliases, repository selection, and remote resolution. It leaves an
+   explicit Forgejo remote available.
 
 The host guard cannot intercept a human terminal, a third-party bot, or a
 repository that has not enrolled. Do not describe that boundary as universal
-GitHub enforcement.
+GitHub enforcement. Its legacy hook input is a shell command string, not a
+resolved process event. Therefore arbitrary shell evaluation is deliberately
+outside the parser's sound interface. Direct argv-like Git/`git-push`, `exec`,
+`env`, literal shell pushes, and literal `git -C <enrolled>` invocations with
+variable/backtick expansion are covered; the last category fails closed even
+when the hook cwd is outside the repository. Static Forgejo pushes remain
+available. `-c` is recognized both alone and in normal combined shell option
+forms such as `-lc`. A shell program that computes executable, repository path, and remote
+without leaving those literals is outside this parser's claim. Universal
+prevention requires a host enforcement point that supplies resolved
+executable/argv/cwd/environment/remote after shell evaluation.
+
+The Actions capture CLI likewise does not accept a caller-selected `gh` path or
+resolve `gh` from inherited `PATH`. It selects from a closed absolute-path set,
+records invoked path, realpath, binary SHA-256, and version, then records exact
+absolute-path `gh api` argv and derives one GitHub-Actions-owned
+check suite plus workflow/run/job/check identities. More than one execution of
+the stable required check for the exact candidate is a cost/provenance conflict,
+not "latest wins"; publication remains blocked instead of blessing a rerun.
 
 ## Workflow shape for private repositories
 
@@ -136,29 +170,36 @@ success status as a substitute for executing the verifier.
 
 ```json
 {
-  "schema": "github-ci-publish-snapshot/v1",
-  "repository": "owner/private-repository",
-  "repository_owner": "owner",
-  "private": true,
-  "intent": "ready-for-review",
-  "local_head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-  "local_verification": {
-    "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-    "status": "passed",
-    "completed_at": "2026-08-12T05:10:00Z"
+  "schema": "github-actions-publish-snapshot/v4",
+  "repository": {
+    "full_name": "owner/private-repository",
+    "repository_id": 123456,
+    "owner_login": "owner",
+    "private": true
+  },
+  "branch": {
+    "name": "agent/feature",
+    "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
   },
   "pull_request": {
     "number": 42,
-    "is_draft": true,
-    "is_open": true,
-    "head_ref": "agent/example",
-    "remote_head": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    "state": "draft",
+    "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "last_published_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "last_published_at": "2026-08-12T05:00:00Z",
+    "feedback": null
   },
-  "actionable_feedback": null,
-  "billing_blocker": null,
-  "recovery": null
+  "actions": {
+    "circuit": "closed",
+    "observed_at": null,
+    "blocker": null,
+    "latest_check": null
+  },
+  "captured_at": "2026-08-12T05:10:00Z"
 }
 ```
 
-Exit `0` with `ALLOW <intent>` authorizes one publication. Exit `1` is a policy
-BLOCK. Exit `2` is malformed evidence. Any nonzero exit stops before `git push`.
+The intent and local verification receipt are separate inputs. Exit `0` with an
+`ALLOW` decision authorizes exactly the named operation. Exit `2` is a policy
+BLOCK and exit `64` is malformed/unavailable evidence. Any nonzero exit stops
+before `git push`.

@@ -1,0 +1,28 @@
+{
+  "schema_version": "skill-eval-executor-authority/v1",
+  "executor": "skill-up",
+  "repository": "alibaba/skill-up",
+  "repository_sha": "425e3f5a0c23e80f2c7933785d54c53ffe01b40c",
+  "github_action": "alibaba/skill-up@425e3f5a0c23e80f2c7933785d54c53ffe01b40c",
+  "runner_image": "ghcr.io/alibaba/skill-up-runner@sha256:f90aa1a320dadd14f354c12013dbbf78df262ece0e4f82683b8a70140a65bbcf",
+  "runtime_state": "available_with_external_model_credential",
+  "supported_engines": [
+    "claude_code",
+    "codex",
+    "qodercli",
+    "qwen_code"
+  ],
+  "secrets": [
+    "SKILL_EVAL_API_KEY"
+  ],
+  "promotion_authority": false,
+  "allowed_claims": [
+    "physical-run-available",
+    "offline-replay-available"
+  ],
+  "forbidden_claims": [
+    "cross-harness-capability-proven",
+    "ranking-claim-allowed",
+    "promotion-admitted"
+  ]
+}

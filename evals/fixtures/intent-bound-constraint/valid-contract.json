@@ -1,0 +1,111 @@
+{
+  "schema_version": "intent-bound-constraint/v1",
+  "contract_id": "knowledge-continuity-pilot",
+  "contract_version": "1.0.0",
+  "subject_identity": {
+    "repository": "ed3c/skills-shared",
+    "commit_sha": "0123456789abcdef0123456789abcdef01234567"
+  },
+  "module_policy": {
+    "may_add_constraints": true,
+    "may_tighten_constraints": true,
+    "may_weaken_constraints": false,
+    "may_widen_effects": false,
+    "may_bypass_human_admit": false,
+    "ambiguity_action": "BLOCK"
+  },
+  "completion_policy": {
+    "deterministic_failure_vetoes_advisory": true,
+    "stale_evidence_blocks": true,
+    "no_improvement_action": "STOP",
+    "ambiguity_action": "BLOCK",
+    "private_chain_of_thought": "FORBIDDEN"
+  },
+  "meta_intents": [
+    {
+      "id": "MI-KC-CANONICAL",
+      "statement": "Preserve one traceable canonical source for each governed claim.",
+      "protected_property": "canonical-continuity",
+      "priority": "repository-invariant",
+      "scope": ["canonical documents", "derived projections"],
+      "forbidden_outcomes": ["duplicate authority", "untraceable projection"],
+      "proof_obligations": ["PO-KC-UNIQUE", "PO-KC-TRACEABLE"],
+      "completion_criteria": ["one canonical source resolves", "each projection binds the canonical subject"],
+      "human_owned_boundaries": ["override canonical ownership"]
+    },
+    {
+      "id": "MI-KC-HUMAN",
+      "statement": "Keep canonical ownership changes under Human Admit.",
+      "protected_property": "authority-boundary",
+      "priority": "repository-invariant",
+      "scope": ["canonical ownership"],
+      "forbidden_outcomes": ["agent changes ownership silently"],
+      "proof_obligations": ["PO-KC-HUMAN"],
+      "completion_criteria": ["ownership mutation is blocked without Human Admit"],
+      "human_owned_boundaries": ["canonical ownership mutation"]
+    }
+  ],
+  "constraints": [
+    {
+      "id": "C-KC-UNIQUE",
+      "protects_intents": ["MI-KC-CANONICAL"],
+      "discharges_obligations": ["PO-KC-UNIQUE", "PO-KC-TRACEABLE"],
+      "subject": "selected repository knowledge routes",
+      "trigger": "before handoff",
+      "invariant": "Each governed route resolves to one canonical source and each projection identifies that source.",
+      "severity": "hard",
+      "evidence_class": "deterministic",
+      "evaluator": {
+        "id": "continuity-route-checker",
+        "version": "1.0.0",
+        "kind": "command",
+        "argv": ["python3", "scripts/check_continuity.py", "--json"],
+        "success_exit_codes": [0],
+        "timeout_seconds": 30
+      },
+      "repairability": "repairable",
+      "retry_budget": 2,
+      "allowed_repairs": ["REPAIR_CANONICAL_POINTER", "REGENERATE_PROJECTION"],
+      "forbidden_repair_codes": [
+        "WEAKEN_CONSTRAINT",
+        "EDIT_EVALUATOR_FOR_PASS",
+        "DELETE_CONTROL",
+        "WIDEN_EFFECTS",
+        "BYPASS_HUMAN_ADMIT"
+      ],
+      "expected_delta_metric": "continuity_violation_count",
+      "negative_controls": ["two competing canonical sources"],
+      "mutation_controls": ["checker ignores the second canonical source"]
+    },
+    {
+      "id": "C-KC-HUMAN",
+      "protects_intents": ["MI-KC-HUMAN"],
+      "discharges_obligations": ["PO-KC-HUMAN"],
+      "subject": "canonical ownership mutation",
+      "trigger": "before ownership change",
+      "invariant": "The Agent does not change canonical ownership without Human Admit.",
+      "severity": "hard",
+      "evidence_class": "deterministic",
+      "evaluator": {
+        "id": "ownership-boundary-checker",
+        "version": "1.0.0",
+        "kind": "schema",
+        "schema": "evals/schema/ownership-boundary.schema.json"
+      },
+      "repairability": "human_owned",
+      "retry_budget": 0,
+      "allowed_repairs": [],
+      "forbidden_repair_codes": [
+        "WEAKEN_CONSTRAINT",
+        "EDIT_EVALUATOR_FOR_PASS",
+        "DELETE_CONTROL",
+        "WIDEN_EFFECTS",
+        "BYPASS_HUMAN_ADMIT"
+      ],
+      "expected_delta_metric": null,
+      "negative_controls": ["agent-owned ownership mutation"],
+      "mutation_controls": ["schema accepts missing Human Admit"]
+    }
+  ],
+  "diagnostic_reflection_schema": "evals/schema/diagnostic-reflection-receipt.schema.json"
+}

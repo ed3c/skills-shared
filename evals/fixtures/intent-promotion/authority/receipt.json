@@ -1,0 +1,54 @@
+{
+  "approval": null,
+  "caller_flags": [],
+  "contract_digest": "sha256:5f414faf3d0106ee3a063578fca894eefc6a022816ef61ca34f9f5863b1c530a",
+  "contract_id": "skills-shared-intent-promotion",
+  "evaluator_receipts": [
+    {
+      "evaluator_artifact_digest": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "evaluator_id": "skill-eval-contract",
+      "evaluator_version": "1.0.0",
+      "execution_origin": "OWNING_WORKFLOW",
+      "output_digest": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "receipt_digest": "sha256:d346dac1033f47e09f712db6e2c7b398b261e5ddcfd7c6fe8c1fe215fe786feb",
+      "receipt_ref": "workflow-run:31794307867",
+      "status": "PASS",
+      "subject_commit_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "subject_tree_sha": "cccccccccccccccccccccccccccccccccccccccc"
+    }
+  ],
+  "from_state": "VERIFIED",
+  "intent_id": "MI-CTL-EVIDENCE",
+  "merge_subject": {
+    "admitted_by": "ed3c",
+    "candidate_head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "candidate_tree_sha": "cccccccccccccccccccccccccccccccccccccccc",
+    "forge_readback": {
+      "observed_at_commit_sha": "ffffffffffffffffffffffffffffffffffffffff",
+      "readback_digest": "sha256:71a2321f7eb64868e1e624c0c63aa7901576631fef81ae76d668bc022a3e92c3",
+      "source": "GITHUB_API"
+    },
+    "merge_commit_sha": "ffffffffffffffffffffffffffffffffffffffff",
+    "merge_tree_sha": "8888888888888888888888888888888888888888",
+    "release_artifact": null,
+    "repository": "ed3c/skills-shared"
+  },
+  "receipt_id": "IPR-FIXTURE-001",
+  "schema_version": "intent-promotion-receipt/v1",
+  "subject": {
+    "branch": "ctl/04b-intent-promotion-authority",
+    "commit_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "pull_request": 134,
+    "repository": "ed3c/skills-shared",
+    "tree_sha": "cccccccccccccccccccccccccccccccccccccccc"
+  },
+  "supersedes": null,
+  "to_state": "ADMITTED",
+  "writebacks": [
+    {
+      "destination_id": "module-notes",
+      "mode": "APPEND",
+      "scope": "MODULE"
+    }
+  ]
+}

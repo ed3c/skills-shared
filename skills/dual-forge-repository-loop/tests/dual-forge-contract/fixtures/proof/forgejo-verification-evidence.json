@@ -1,0 +1,29 @@
+{
+  "schema": "github-delivery-local-verification-evidence/v1",
+  "repository_id": 456,
+  "head_sha": "572aa3d2f0d50771cf2ab856f59a9b5923fed1f2",
+  "tree_sha": "674215c2e543d402f2b3b24d404bab5abab8bdee",
+  "contract_sha256": "0fe27707e5f2d84d63c08646d47f3d73270895f5f4550417ae77d7b34289131b",
+  "verified_at": "2026-08-14T09:59:55Z",
+  "clean_subject": true,
+  "commands": [{
+    "id": "local-verification",
+    "argv": ["bash", "scripts/local_verification.sh"],
+    "cwd": ".",
+    "timeout_seconds": 900,
+    "max_output_bytes": 1048576,
+    "started_at": "2026-08-14T09:44:55Z",
+    "duration_ms": 1000,
+    "exit": 0,
+    "timed_out": false,
+    "spawn_error": null,
+    "stdout_bytes": 0,
+    "stderr_bytes": 0,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_truncated": false,
+    "stderr_truncated": false
+  }],
+  "status": "PASS",
+  "content_sha256": "6973c3135c3a36077a1c2a04ff091fadc5588debcf86a6e38473f7c5deb29a9b"
+}

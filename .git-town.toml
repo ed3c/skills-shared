@@ -1,0 +1,42 @@
+# Git Town repository profile for skills-shared.
+#
+# This file format is Git Town's own: `.git-town.toml` is the checked-in
+# configuration the admitted release (24.0.0) reads and documents as "which you
+# commit". Nothing here is invented for this repository.
+#
+# Read `skills/git-town-stacked-pr-worker/references/REPOSITORY_PROFILE.md`
+# before changing any value. In particular: a clone-local `git config
+# git-town.*` setting OVERRIDES this file, so this is repository policy, not an
+# enforcement boundary. `scripts/check_repository_profile.py` validates it.
+
+[branches]
+main = "main"
+# No long-lived release lines exist. An empty list is the declaration that there
+# are none, which is a different statement from leaving the key out.
+perennials = []
+
+[sync]
+# Rebase keeps a stacked branch's own commits contiguous when its parent moves,
+# which is what makes a stack reviewable one leaf at a time.
+feature-strategy = "rebase"
+perennial-strategy = "ff-only"
+
+# Phantom-conflict auto-resolution defaults to on. An unattended Worker must not
+# resolve a conflict it cannot judge: a semantic conflict is Human-owned, and a
+# silently resolved one is indistinguishable from one that never occurred.
+auto-resolve = false
+
+# Background synchronisation must not publish. The Worker passes --no-push
+# explicitly as well; this makes the default match the requirement rather than
+# relying on every caller remembering the flag.
+push-branches = false
+
+# Tags are release identity. A background sync has no business moving them.
+tags = false
+
+[ship]
+# `ship` is merge. Merge is Human-owned here and goes through
+# github-delivery-loop's merge_gate, so no Git Town shipping strategy is
+# admitted for automated use.
+strategy = "squash-merge"
+delete-tracking-branch = true

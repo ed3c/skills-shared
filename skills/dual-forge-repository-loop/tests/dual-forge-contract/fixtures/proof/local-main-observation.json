@@ -1,0 +1,11 @@
+{
+  "schema": "dual-forge-ref-observation/v1",
+  "authority": "local-git",
+  "repository": "ed3c/example",
+  "repository_id": null,
+  "default_branch": "main",
+  "ref": "refs/heads/main",
+  "sha": "572aa3d2f0d50771cf2ab856f59a9b5923fed1f2",
+  "captured_at": "2026-08-14T09:59:52Z",
+  "transport": {"path": "proof/local-main-transport.json", "sha256": "7e244da7c3a2c59f052f8dc08da3555b4bf73613ca90fc313ddeabd34c549ae9"}
+}

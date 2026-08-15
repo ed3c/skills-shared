@@ -101,7 +101,11 @@ python3 "$renderer" "$tmp_dir/case/config.json" >/dev/null
 after="$(cd "$tmp_dir/case/output" && shasum -a 256 test-bundle.* | sort)"
 if [ "$before" != "$after" ]; then
   echo "rebuild from unchanged sources was not byte-identical" >&2
-  diff <(echo "$before") <(echo "$after") >&2 || true
+  # Diagnostic-only diff: the branch is already failing, so suppress diff's
+  # status explicitly without swallowing the enclosing assertion result.
+  set +e
+  diff <(echo "$before") <(echo "$after") >&2
+  set -e
   exit 1
 fi
 

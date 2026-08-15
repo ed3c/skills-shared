@@ -1,0 +1,15 @@
+{
+  "authority": "github-api",
+  "capture": {"argv": [["gh", "api", "repos/ed3c/example"], ["gh", "api", "repos/ed3c/example/git/ref/heads/main"]], "exit_codes": [0, 0], "stdout": ["{\"full_name\":\"ed3c/example\",\"default_branch\":\"main\",\"id\":123}", "{\"object\":{\"sha\":\"93c33411137875108419c2abe4dbe8f4d84ad5d6\"}}"], "stdout_sha256": ["b8428026c92c059b856739d296ccfada797c01955ebea853fc54abdd14e1b6d0", "bb09f6e1ba1cd221e71aba275601e2702aca338de28e45ab1840340e6333b4a5"]},
+  "captured_at": "2026-08-14T09:59:50Z",
+  "default_branch": "main",
+  "producer": "capture_origin_ref.py",
+  "ref": "refs/heads/main",
+  "remote_bindings": null,
+  "repository": "ed3c/example",
+  "repository_id": 123,
+  "schema": "dual-forge-ref-transport/v1",
+  "sha": "93c33411137875108419c2abe4dbe8f4d84ad5d6",
+  "source": "gh-api",
+  "source_identity": "repos/ed3c/example/git/ref/heads/main"
+}
