@@ -1,5 +1,5 @@
 {
-  "schema_version": "dual-forge-repository-loop/v2",
+  "schema_version": "dual-forge-repository-loop/v3",
   "repository": {"name": "ed3c/example", "default_branch": "main"},
   "authority": {"implementation": "local-forgejo", "publication": "github", "actions": "github-actions"},
   "github": {"repository_full_name": "ed3c/example", "remote_name": "github", "observed_main_sha": "93c33411137875108419c2abe4dbe8f4d84ad5d6"},
@@ -7,20 +7,21 @@
   "local": {"main_branch": "main", "local_main_sha": "572aa3d2f0d50771cf2ab856f59a9b5923fed1f2", "worktree_root": ".worktrees"},
   "issue_namespaces": {"forgejo": "forgejo#", "github": "github#"},
   "issue_links": [{"forgejo_issue": "forgejo#12", "github_issue": "github#34"}],
+  "implementation": {"forgejo_delivery": {"path": "proof/forgejo-delivery.json", "sha256": "1682cb5d6add040721087bfe919e6257a512caa54111aa4aa8870d5c05b81e73"}},
   "history": ["GITHUB_BOUND", "LOCAL_SYNCED", "FORGEJO_ISSUES_BOUND", "WORKTREES_VERIFIED", "FORGEJO_PRS_MERGED", "LOCAL_MAIN_MERGED", "GITHUB_RECONCILED", "GITHUB_ACTIONS_VERIFIED", "GITHUB_PUBLICATION_READY"],
   "observations": {
     "github_main": {"path": "proof/github-main-observation.json", "sha256": "500f28c0afbd14c64d3ac417ad7574d30ec77950360dd8f73db9fac104f780e4"},
     "forgejo_main": {"path": "proof/forgejo-main-observation.json", "sha256": "a1c9c591f771281fcfc4f5700b07350f61b15c943dfc3e062f7b9650c358e29b"},
     "local_main": {"path": "proof/local-main-observation.json", "sha256": "c56b1d6f16728c22afbbf45ec14653a4302c9761be5b9aeb7222d4a4b757e898"}
   },
-  "reconciliation": {"path": "proof/reconciliation.json", "sha256": "144540b51b8946ea7977f0c8604329c47f9cd7f6dd7fa1079d027d489d0cef32"},
+  "reconciliation": {"path": "proof/reconciliation.json", "sha256": "906bad1a325f2240322081ce4230270dc89e152f2407bd34a43ffa0b57f97477"},
   "publication": {
     "candidate_sha": "997b637730f967af63f435d8f28fe6677a209574",
     "git_proof": {"path": "proof/repository.fast-import", "sha256": "de172b9fe4eb58c7ddd9fd59fe8e3fea947db4799491cf726f23e4259f06ad84"},
     "decision_bundle": {
-      "manifest": {"path": "proof/decision.json", "sha256": "7aac184d1db392c7a140a8e6738a39a0da2a9bf98b58a0a6a0573f8c00038298"},
+      "manifest": {"path": "proof/decision.json", "sha256": "5362dac1acd836833c7fff7ac96fdb4db36329ab6be56f9c907f7e37f94f2f74"},
       "policy": {"path": "proof/policy.json", "sha256": "f30f1014895713a7c6930cd66954fdd466f542c0236ba303d0901ec8fac406cc"},
-      "snapshot": {"path": "proof/pre-snapshot.json", "sha256": "20895d3698c6a299423782cb9a935bfc4cccdc291f3ffa7093131c698c91d048"},
+      "snapshot": {"path": "proof/pre-snapshot.json", "sha256": "2d94276b5eddb5eaa7e2bfd5710ffec9426863590831f67a4a67c117705ad445"},
       "verification": {"path": "proof/verification.json", "sha256": "167df16304107d1620c8e8324d1434dba1dde7082dff05f1f5f3163362f9dce3"},
       "evidence": {"path": "proof/evidence.json", "sha256": "5c604b8bdd692fc92ee0a79e87d79be0d634bb5cad0041929c73261d67caf28f"},
       "contract": {"path": "proof/contract.json", "sha256": "6f4ef576e6870b981c2bd42cb90a441fd11663b88b978402f42696b7cd8581d6"},
@@ -29,8 +30,9 @@
   },
   "actions": {"proof": {
     "check_name": "contract",
-    "observation": {"path": "proof/actions-observation.json", "sha256": "d2dfd01809a515a66259c3aa75f7dbc6affd8a6ca3b18cfa2131138bd19c9836"},
-    "snapshot": {"path": "proof/actions-snapshot.json", "sha256": "ffc811258b86fac9dd65d99c431591945071a0afb689a44b1d5aadd0e013e970"}
+    "transport": {"path": "proof/actions-transport.json", "sha256": "186f86e36b03f0b968a633c4cd871c874f8248b15bb350f609e422b1c482d82a"},
+    "observation": {"path": "proof/actions-observation.json", "sha256": "41abb797144b2fd1696a35a1774a549e7d596eb2acccee4ac5fd1a693f28bc38"},
+    "snapshot": {"path": "proof/actions-snapshot.json", "sha256": "328c9318e971d1cfee3fc252c4ade2c7e6e6a4cca99272ea49a9a0450a9c790c"}
   }},
   "evidence": {"github_ingress": "PASS", "forgejo_runtime": "PASS", "local_worktrees": "PASS", "local_main_merge": "PASS", "github_reconciliation": "PASS", "github_actions": "PASS", "final_merge": "HUMAN_ADMIT_REQUIRED"}
 }

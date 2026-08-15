@@ -8,7 +8,13 @@
     "head_sha": "2222222222222222222222222222222222222222",
     "id": 9001,
     "name": "contract",
-    "status": "completed"
+    "status": "completed",
+    "app_id": 15368,
+    "app_slug": "github-actions",
+    "check_suite_id": 8001,
+    "workflow_run_id": 7001,
+    "workflow_id": 6001,
+    "job_id": 5001
   }],
   "pull_requests": [{
     "draft": false,
@@ -17,5 +23,5 @@
     "updated_at": "2026-08-12T05:00:00Z"
   }],
   "repository": {"full_name": "ed3c/skills-shared", "owner_login": "ed3c", "private": true, "repository_id": 1326262274},
-  "schema": "github-actions-publish-observation/v1"
+  "schema": "github-actions-publish-observation/v2"
 }

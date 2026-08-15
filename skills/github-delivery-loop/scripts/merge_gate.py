@@ -23,7 +23,8 @@ Usage:
 
 Exit codes: 0 ready, 1 a layer refuses, 3 nothing authorized (absence != refusal),
 4 a gate could not be evaluated (inability != refusal -- the repair is to the
-hook configuration or to this probe, never to a permission).
+hook configuration or to this probe, never to a permission), 5 GitHub accepted
+or already holds the exact-head merge request but has not merged it yet.
 """
 
 from __future__ import annotations
@@ -53,6 +54,16 @@ NOT_READY = 3
 # policy had made. Same three-way discipline as NOT_READY: absence, inability
 # and refusal each get their own exit, because each has a different repair.
 UNEVALUABLE = 4
+PENDING = 5
+
+PENDING_QUERY = """query($id:ID!){
+  node(id:$id){
+    ... on PullRequest{
+      autoMergeRequest{enabledAt}
+      mergeQueueEntry{id state}
+    }
+  }
+}"""
 
 MERGE_MUTATION = """mutation($pullRequestId:ID!,$expectedHeadOid:GitObjectID!){
   mergePullRequest(input:{pullRequestId:$pullRequestId,expectedHeadOid:$expectedHeadOid,mergeMethod:SQUASH}){
@@ -196,6 +207,24 @@ def fetch_snapshot(
         pull_args += ["--json", fields]
         pulls = _gh_json(pull_args, [])
     for pull in pulls:
+        pending = _gh_json(
+            [
+                "api",
+                "graphql",
+                "-f",
+                f"query={PENDING_QUERY}",
+                "-f",
+                f"id={pull['id']}",
+            ],
+            {},
+        )
+        pending_node = pending.get("data", {}).get("node")
+        if not isinstance(pending_node, dict):
+            raise GateError(
+                f"could not read pending merge state for PR #{pull['number']}"
+            )
+        pull["auto_merge_request"] = pending_node.get("autoMergeRequest")
+        pull["merge_queue_entry"] = pending_node.get("mergeQueueEntry")
         head = pull["headRefOid"]
         pull["head_committed_at"] = _gh_json(
             [
@@ -592,6 +621,17 @@ def check_github(pull: dict[str, Any], allow_unstable: bool) -> str | None:
     return None
 
 
+def pending_merge_reason(pull: dict[str, Any]) -> str | None:
+    """Describe an exact PR request GitHub already owns across invocations."""
+    queue = pull.get("merge_queue_entry")
+    if isinstance(queue, dict) and queue.get("id"):
+        return f"merge queue entry {queue['id']} state={queue.get('state')}"
+    auto = pull.get("auto_merge_request")
+    if isinstance(auto, dict):
+        return f"auto-merge enabled at {auto.get('enabledAt') or 'unknown time'}"
+    return None
+
+
 # --------------------------------------------------------------------------
 # commands
 # --------------------------------------------------------------------------
@@ -935,20 +975,47 @@ def land(
             admit_reason = owner_reason
             if policy is None:
                 admit_reason = check_admit(pull, owner_login(snapshot))
-            reason = admit_reason or check_github(
-                pull, allow_unstable and policy is None
-            )
-            if reason:
+            if admit_reason:
                 layer = (
                     "L1 OWNER-IDENTITY"
-                    if policy is not None and admit_reason
+                    if policy is not None
                     else "L1 HUMAN-ADMIT"
-                    if admit_reason
-                    else "L3 GITHUB"
                 )
                 print(
                     f"BLOCK #{pull_number} {str(pull.get('headRefOid', ''))[:7]} "
-                    f"[{layer}] {reason}",
+                    f"[{layer}] {admit_reason}",
+                    file=sys.stderr,
+                )
+                return 1
+            authorized = [pull]
+        else:
+            authorized = [
+                pull
+                for pull in sorted(pulls, key=lambda item: item["number"])
+                if (
+                    policy is not None
+                    or check_admit(pull, owner_login(snapshot)) is None
+                )
+            ]
+        for candidate in authorized:
+            pending_reason = pending_merge_reason(candidate)
+            if pending_reason:
+                print(
+                    f"ALREADY-PENDING #{candidate['number']} "
+                    f"{candidate['headRefOid'][:7]}: {pending_reason}; "
+                    "not submitted again."
+                )
+                if landed:
+                    print(f"LANDED={landed} before the pending PR.")
+                return PENDING
+        if pull_number is not None:
+            github_reason = check_github(
+                pull, allow_unstable and policy is None
+            )
+            if github_reason:
+                print(
+                    f"BLOCK #{pull_number} {str(pull.get('headRefOid', ''))[:7]} "
+                    f"[L3 GITHUB] {github_reason}",
                     file=sys.stderr,
                 )
                 return 1
@@ -956,12 +1023,8 @@ def land(
         else:
             pending = [
                 pull
-                for pull in sorted(pulls, key=lambda item: item["number"])
-                if (
-                    policy is not None
-                    or check_admit(pull, owner_login(snapshot)) is None
-                )
-                and check_github(pull, allow_unstable and policy is None) is None
+                for pull in authorized
+                if check_github(pull, allow_unstable and policy is None) is None
             ]
         if not pending:
             break
@@ -972,7 +1035,45 @@ def land(
             return 0
         done = subprocess.run(command, capture_output=True, text=True)
         if done.returncode != 0:
-            print(f"FAIL #{pull['number']}: {done.stderr.strip()}", file=sys.stderr)
+            detail = (done.stderr or done.stdout).strip() or f"exit {done.returncode}"
+            print(f"FAIL #{pull['number']}: {detail}", file=sys.stderr)
+            print(f"LANDED={landed} before the failure.", file=sys.stderr)
+            return 1
+        readback = _gh_json(
+            [
+                "pr",
+                "view",
+                str(pull["number"]),
+                "--repo",
+                repository,
+                "--json",
+                "state,mergedAt,headRefOid,url",
+            ],
+            {},
+        )
+        if readback.get("headRefOid") != pull["headRefOid"]:
+            print(
+                f"FAIL #{pull['number']}: merge readback head changed from "
+                f"{pull['headRefOid']} to {readback.get('headRefOid')}",
+                file=sys.stderr,
+            )
+            print(f"LANDED={landed} before the failure.", file=sys.stderr)
+            return 1
+        if readback.get("state") == "OPEN":
+            print(
+                f"PENDING #{pull['number']} {pull['headRefOid'][:7]}: GitHub "
+                "accepted the request but the PR remains open (merge queue or "
+                "auto-merge); it was not submitted again."
+            )
+            if landed:
+                print(f"LANDED={landed} before the pending PR.")
+            return PENDING
+        if readback.get("state") != "MERGED" or not readback.get("mergedAt"):
+            print(
+                f"FAIL #{pull['number']}: command succeeded but readback state="
+                f"{readback.get('state')!r}, mergedAt={readback.get('mergedAt')!r}",
+                file=sys.stderr,
+            )
             print(f"LANDED={landed} before the failure.", file=sys.stderr)
             return 1
         landed += 1

@@ -10,7 +10,7 @@ This directory contains the executable mechanisms for delivery evidence, GitHub 
 | [`delivery_sync.py`](delivery_sync.py) | sync public/compatibility adapter | depends on mode | delegates | normalized sync result |
 | [`delivery_sync_impl.py`](delivery_sync_impl.py) | delivery derivation implementation | snapshot or trusted GitHub lane | writes bounded outputs | receipt, publication attestation, metrics, dashboard |
 | [`local_verification.py`](local_verification.py) | exact-HEAD local verification | none | receipt/evidence output only | `github-delivery-local-verification/v1` |
-| [`github_actions_snapshot.py`](github_actions_snapshot.py) | GitHub observation capture/replay | capture: read-only GitHub; replay: none | observation/snapshot files only | `github-actions-publish-snapshot/v3` with capture time and exact branch/PR/check/billing state |
+| [`github_actions_snapshot.py`](github_actions_snapshot.py) | GitHub raw transport capture/derivation/replay | capture: read-only GitHub; replay: none | transport/observation/snapshot files only | admitted absolute `gh` path/realpath/binary-digest/version plus raw argv/stdout/exit transport and `github-actions-publish-snapshot/v4`, binding one workflow/run/job/check identity |
 | [`ci_publish_gate.py`](ci_publish_gate.py) | CI publication admission | none | none | one ALLOW operation or stable BLOCK reason |
 | [`ci_publish.py`](ci_publish.py) | enforced publication wrapper | dry run: none; execute: GitHub capture/publication | git-dir receipts; execute may push/create/update PR | content-addressed `github-actions-publish-decision-manifest/v1`, rendered or executed operation |
 | [`merge_gate.py`](merge_gate.py) | merge authority preflight/landing | preflight/land: GitHub and host policy planes | land may request merge after Human Admit | preflight result or merge result |
@@ -25,8 +25,9 @@ consumer fixed command contract
 → local_verification.py
 → exact-HEAD local receipt
 
-trusted GitHub observation
-→ github_actions_snapshot.py capture/replay
+trusted GitHub raw transport
+→ github_actions_snapshot.py capture/replay-transport
+→ derived observation
 → normalized snapshot
 
 local receipt + snapshot + intent

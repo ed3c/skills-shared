@@ -407,7 +407,10 @@ PREFLIGHT_GREEN
     ▼
 LANDING_REQUESTED_WITH_EXPECTED_HEAD
     ├── exact head merged ──────> MERGED
+    ├── request accepted/open ──> PENDING (exit 5; do not resubmit)
+    ├── existing auto/queue ────> PENDING (exit 5; do not resubmit)
     ├── head moved ─────────────> ADMIT_STALE
+    ├── closed without merge ───> MERGE_READBACK_FAILED
     ├── host policy denies ─────> HOST_POLICY_BLOCKED
     ├── GitHub rules deny ──────> GITHUB_BLOCKED
     └── no owner admit ─────────> NOT_ADMITTED
@@ -425,6 +428,7 @@ GitHub authentication
 GitHub branch/repository rules
 Required checks and mergeability
 Merge API exact-head result
+Provider readback of exact head, state, and mergedAt
 ```
 
 One green plane cannot override a red plane.

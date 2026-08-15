@@ -15,7 +15,9 @@ from typing import Any
 
 POLICY_PATH = Path(".github-delivery/ci-policy.json")
 ASSIGNMENT = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*=.*$")
-ENV_OPTIONS_WITH_VALUE = {"-u", "--unset", "-C", "--chdir", "-S", "--split-string"}
+ENV_OPTIONS_WITH_VALUE = {
+    "-u", "--unset", "-C", "--chdir", "-S", "--split-string", "-P",
+}
 PUSH_OPTIONS_WITH_VALUE = {"--receive-pack", "--exec", "--repo", "--push-option", "-o"}
 GIT_OPTIONS_WITH_VALUE = {"-c", "--config-env", "--git-dir", "--work-tree", "--namespace"}
 
@@ -177,14 +179,48 @@ def _expand_git_alias(
                 expanded = alias_tokens + arguments
                 cwd = root
                 continue
-            # Arbitrary shell aliases cannot be modelled safely. If they name a
-            # push, represent it as a push in the enrolled repository so the
-            # policy fails closed.
-            if "push" in alias_tokens:
-                return ["git", "-C", str(root), "push", *arguments]
-            return expanded
+            # Shell aliases are arbitrary programs. Once invoked inside an
+            # enrolled repository they are outside this parser's sound seam,
+            # so fail closed instead of guessing whether expansion reaches push.
+            return [
+                "git", "-C", str(root), "push",
+                "__GUARD_UNSUPPORTED_SHELL_ALIAS__", *arguments,
+            ]
         expanded[command_index : command_index + 1] = alias_tokens
     return expanded
+
+
+def _literal_shell_git_roots(script: str, cwd: Path) -> list[Path]:
+    """Resolve only lexically visible Git invocations inside a shell string.
+
+    This deliberately does not emulate shell evaluation. It exists so a shell
+    string that names an enrolled repository with a literal ``git -C`` cannot
+    escape merely because the Git subcommand is expanded from a variable.
+    """
+    lexer = shlex.shlex(script, posix=True, punctuation_chars=";&|")
+    lexer.whitespace_split = True
+    segments: list[list[str]] = [[]]
+    try:
+        for token in lexer:
+            if token and set(token).issubset({";", "&", "|"}):
+                segments.append([])
+            else:
+                segments[-1].append(token)
+    except ValueError:
+        return []
+    roots: list[Path] = []
+    for segment in segments:
+        for index, token in enumerate(segment):
+            if Path(token).name != "git":
+                continue
+            context = _git_command_context(segment[index:], cwd)
+            if context is None:
+                continue
+            command_cwd, options, _ = context
+            root = _repo_root(command_cwd, options, {})
+            if root is not None and (root / POLICY_PATH).is_file() and root not in roots:
+                roots.append(root)
+    return roots
 
 
 def _pushes(command: str, cwd: Path) -> list[tuple[Path, str | None, list[str], dict[str, str]]]:
@@ -208,6 +244,11 @@ def _pushes(command: str, cwd: Path) -> list[tuple[Path, str | None, list[str], 
             continue
         while tokens:
             executable = Path(tokens[0]).name
+            if executable == "exec":
+                tokens = tokens[1:]
+                while tokens and tokens[0].startswith("-"):
+                    tokens = tokens[1:]
+                continue
             if executable == "command":
                 tokens = tokens[1:]
                 while tokens and tokens[0].startswith("-"):
@@ -271,9 +312,29 @@ def _pushes(command: str, cwd: Path) -> list[tuple[Path, str | None, list[str], 
                 continue
             break
         if tokens and Path(tokens[0]).name in {"sh", "bash", "zsh"}:
-            if len(tokens) >= 3 and tokens[1] == "-c":
-                pushes.extend(_pushes(tokens[2], active_cwd))
+            command_index = next(
+                (
+                    index + 1
+                    for index, option in enumerate(tokens[1:], start=1)
+                    if option.startswith("-") and "c" in option[1:]
+                ),
+                None,
+            )
+            if command_index is not None and command_index < len(tokens):
+                script = tokens[command_index]
+                static_pushes = _pushes(script, active_cwd)
+                pushes.extend(static_pushes)
+                # Variable/command expansion is outside a string parser's sound
+                # boundary. Fail closed only when the string still exposes a
+                # literal Git invocation whose effective repo is enrolled.
+                if any(marker in script for marker in ("$", "`")):
+                    for root in _literal_shell_git_roots(script, active_cwd):
+                        pushes.append(
+                            (root, "__GUARD_UNSUPPORTED_SHELL_EVALUATION__", [], git_environment)
+                        )
             continue
+        if tokens and Path(tokens[0]).name == "git-push":
+            tokens = ["git", "push", *tokens[1:]]
         if not tokens or Path(tokens[0]).name != "git":
             continue
         tokens = _expand_git_alias(tokens, active_cwd, git_environment)
@@ -373,6 +434,11 @@ def should_block(payload: dict[str, Any]) -> tuple[bool, str]:
         root = _repo_root(command_cwd, git_options, git_environment)
         if root is None or not (root / POLICY_PATH).is_file():
             continue
+        if remote in {
+            "__GUARD_UNSUPPORTED_SHELL_ALIAS__",
+            "__GUARD_UNSUPPORTED_SHELL_EVALUATION__",
+        }:
+            return True, f"unsupported shell evaluation in managed repository {root}"
         if _github_remote(root, remote, git_options, git_environment):
             return True, f"managed GitHub publication in {root} must use ci_publish.py"
     return False, "no-managed-github-push"

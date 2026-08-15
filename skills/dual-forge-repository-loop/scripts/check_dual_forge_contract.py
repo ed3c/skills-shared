@@ -39,11 +39,13 @@ PR_CLASSIFICATIONS = {
     "UNAFFECTED",
     "CLEANLY_REBASEABLE",
     "SUPERSEDED_BY_LOCAL_MAIN",
+    "PUBLICATION_SUBJECT",
 }
 PR_TERMINAL_ROUTES = {
     "UNAFFECTED": {"NO_ACTION"},
     "CLEANLY_REBASEABLE": {"REBASED_OR_MERGED"},
     "SUPERSEDED_BY_LOCAL_MAIN": {"CLOSED_OR_RETARGETED"},
+    "PUBLICATION_SUBJECT": {"WIP_CAPTURED"},
 }
 ISSUE_TERMINAL_ROUTES = {
     "CLOSED",
@@ -51,6 +53,7 @@ ISSUE_TERMINAL_ROUTES = {
     "SUPERSEDED",
     "ROUTED_SEPARATE_ISSUE",
     "OWNER_HANDOFF_NONBLOCKING",
+    "NO_ACTION",
 }
 DECISION_MANIFEST_SCHEMA = "github-actions-publish-decision-manifest/v1"
 MAX_GIT_PROOF_BYTES = 64 * 1024 * 1024
@@ -70,6 +73,12 @@ def obj(v, name: str):
 def sha(v, name: str):
     if not isinstance(v, str) or not SHA40.fullmatch(v):
         raise ValueError(f"{name} must be a lowercase 40-hex commit SHA")
+    return v
+
+
+def digest(v, name: str):
+    if not isinstance(v, str) or re.fullmatch(r"[0-9a-f]{64}", v) is None:
+        raise ValueError(f"{name} must be a lowercase SHA-256")
     return v
 
 
@@ -152,12 +161,19 @@ def verify_pr_inventory(value, label: str) -> None:
         raise ValueError(f"reconciliation {label} must be an inventory array")
     for index, item_value in enumerate(value):
         item = obj(item_value, f"reconciliation {label}[{index}]")
-        if set(item) != {"number", "head_sha", "classification", "terminal_route", "receipt"}:
+        if set(item) != {
+            "number", "head_sha", "base_branch", "wip", "classification",
+            "terminal_route", "receipt",
+        }:
             raise ValueError(f"reconciliation {label}[{index}] fields drifted")
         number = item["number"]
         if not isinstance(number, int) or isinstance(number, bool) or number <= 0:
             raise ValueError(f"reconciliation {label}[{index}] number is invalid")
         sha(item["head_sha"], f"reconciliation {label}[{index}].head_sha")
+        if not isinstance(item["base_branch"], str) or not item["base_branch"]:
+            raise ValueError(f"reconciliation {label}[{index}] base branch is invalid")
+        if not isinstance(item["wip"], bool):
+            raise ValueError(f"reconciliation {label}[{index}] WIP state is invalid")
         classification = item["classification"]
         if classification not in PR_CLASSIFICATIONS:
             raise ValueError(f"reconciliation {label}[{index}] remains blocking or unclassified")
@@ -169,20 +185,167 @@ def verify_pr_inventory(value, label: str) -> None:
 
 def verify_issue_inventory(value) -> None:
     if not isinstance(value, list):
-        raise ValueError("reconciliation affected_issues must be an inventory array")
+        raise ValueError("reconciliation open_issues must be an inventory array")
     for index, item_value in enumerate(value):
-        item = obj(item_value, f"reconciliation affected_issues[{index}]")
-        if set(item) != {"forge", "number", "terminal_route", "receipt"}:
-            raise ValueError(f"reconciliation affected_issues[{index}] fields drifted")
+        item = obj(item_value, f"reconciliation open_issues[{index}]")
+        if set(item) != {"forge", "number", "scope", "terminal_route", "receipt"}:
+            raise ValueError(f"reconciliation open_issues[{index}] fields drifted")
         if item["forge"] not in {"github", "forgejo"}:
-            raise ValueError(f"reconciliation affected_issues[{index}] forge is invalid")
+            raise ValueError(f"reconciliation open_issues[{index}] forge is invalid")
         number = item["number"]
         if not isinstance(number, int) or isinstance(number, bool) or number <= 0:
-            raise ValueError(f"reconciliation affected_issues[{index}] number is invalid")
+            raise ValueError(f"reconciliation open_issues[{index}] number is invalid")
+        if item["scope"] not in {"AFFECTED", "UNAFFECTED"}:
+            raise ValueError(f"reconciliation open_issues[{index}] scope is invalid")
+        if item["scope"] == "UNAFFECTED" and item["terminal_route"] != "NO_ACTION":
+            raise ValueError(f"reconciliation open_issues[{index}] unrelated route is invalid")
+        if item["scope"] == "AFFECTED" and item["terminal_route"] == "NO_ACTION":
+            raise ValueError(f"reconciliation open_issues[{index}] affected issue is unrouted")
         if item["terminal_route"] not in ISSUE_TERMINAL_ROUTES:
-            raise ValueError(f"reconciliation affected_issues[{index}] is not terminally routed")
+            raise ValueError(f"reconciliation open_issues[{index}] is not terminally routed")
         if not isinstance(item["receipt"], str) or not item["receipt"]:
-            raise ValueError(f"reconciliation affected_issues[{index}] lacks a receipt identity")
+            raise ValueError(f"reconciliation open_issues[{index}] lacks a receipt identity")
+
+
+def verify_forgejo_delivery(
+    receipt_path: Path,
+    implementation,
+    forgejo_repository: str,
+    default_branch: str,
+    forgejo_main: str,
+    local_main: str,
+    linked_issue_numbers: set[int],
+) -> tuple[int, set[int]]:
+    implementation = obj(implementation, "implementation")
+    if set(implementation) != {"forgejo_delivery"}:
+        raise ValueError("implementation receipt fields drifted")
+    delivery = load_bound(
+        receipt_path.parent, implementation["forgejo_delivery"], "Forgejo delivery observation"
+    )
+    required = {
+        "schema", "forgejo_repository", "forgejo_repository_id", "default_branch",
+        "captured_at", "transport", "issues", "merged_prs", "local_main_merge",
+        "verification",
+    }
+    if set(delivery) != required:
+        raise ValueError("Forgejo delivery observation fields drifted")
+    if delivery["forgejo_repository"] != forgejo_repository or delivery["default_branch"] != default_branch:
+        raise ValueError("Forgejo delivery repository/default branch mismatch")
+    transport = load_bound(receipt_path.parent, delivery["transport"], "Forgejo delivery transport")
+    producer = load_module(
+        "dual_forge_delivery_capture", Path(__file__).resolve().parent / "capture_forgejo_delivery.py"
+    )
+    producer.verify_observation(transport, delivery)
+    issues = delivery["issues"]
+    observed_issue_numbers = set()
+    for index, value in enumerate(issues):
+        item = obj(value, f"Forgejo delivery issues[{index}]")
+        if set(item) != {
+            "number", "state", "title_sha256", "body_sha256", "comments_sha256",
+            "comment_count", "context_state", "desktop_submission_state",
+            "recovery_receipt_sha256", "desktop_receipt_sha256", "desktop_thread_url",
+            "desktop_prompt_sha256", "desktop_observer_id", "desktop_observer_login",
+            "receipt",
+        } or item["state"] != "closed":
+            raise ValueError(f"Forgejo delivery issues[{index}] is not a closed issue receipt")
+        if item["context_state"] != "PASS" or item["desktop_submission_state"] != "PASS":
+            raise ValueError(
+                f"Forgejo delivery issues[{index}] lacks full recovery context or submitted Desktop receipt"
+            )
+        for field in (
+            "title_sha256", "body_sha256", "comments_sha256", "recovery_receipt_sha256",
+            "desktop_receipt_sha256", "desktop_prompt_sha256",
+        ):
+            digest(item[field], f"Forgejo delivery issues[{index}].{field}")
+        if (
+            not isinstance(item["desktop_thread_url"], str)
+            or not item["desktop_thread_url"].startswith("https://chatgpt.com/")
+            or not isinstance(item["desktop_observer_id"], int)
+            or isinstance(item["desktop_observer_id"], bool)
+            or item["desktop_observer_id"] <= 0
+            or not isinstance(item["desktop_observer_login"], str)
+            or not item["desktop_observer_login"]
+        ):
+            raise ValueError(f"Forgejo delivery issues[{index}] Desktop identity is malformed")
+        if not isinstance(item["comment_count"], int) or isinstance(item["comment_count"], bool) or item["comment_count"] < 1:
+            raise ValueError(f"Forgejo delivery issues[{index}] lacks provider-derived comments")
+        if not isinstance(item["receipt"], str) or not item["receipt"]:
+            raise ValueError(f"Forgejo delivery issues[{index}] lacks receipt identity")
+        observed_issue_numbers.add(item["number"])
+    if not linked_issue_numbers or not linked_issue_numbers.issubset(observed_issue_numbers):
+        raise ValueError("Forgejo linked issues lack provider-derived issue receipts")
+    merged_prs = delivery["merged_prs"]
+    if not isinstance(merged_prs, list) or not merged_prs:
+        raise ValueError("Forgejo delivery lacks a provider-derived merged PR receipt")
+    closed_by_merged_prs: set[int] = set()
+    for index, value in enumerate(merged_prs):
+        item = obj(value, f"Forgejo delivery merged_prs[{index}]")
+        if set(item) != {
+            "number", "state", "merged", "head_sha", "merge_commit_sha", "base_branch",
+            "body_sha256", "merged_at", "closes_issues", "receipt",
+        }:
+            raise ValueError(f"Forgejo delivery merged_prs[{index}] fields drifted")
+        digest(item["body_sha256"], f"Forgejo delivery merged_prs[{index}].body_sha256")
+        timestamp(item["merged_at"], f"Forgejo delivery merged_prs[{index}].merged_at")
+        if not isinstance(item["closes_issues"], list) or any(
+            not isinstance(number, int) or isinstance(number, bool) or number <= 0
+            for number in item["closes_issues"]
+        ):
+            raise ValueError(f"Forgejo delivery merged_prs[{index}] closure links are malformed")
+        closed_by_merged_prs.update(item["closes_issues"])
+    if not linked_issue_numbers.issubset(closed_by_merged_prs):
+        raise ValueError("Forgejo merged PR bodies do not close every linked implementation issue")
+    if not any(
+        isinstance(item, dict)
+        and item.get("merged") is True
+        and item.get("state") == "closed"
+        and item.get("merge_commit_sha") == local_main
+        for item in merged_prs
+    ):
+        raise ValueError("no Forgejo merged PR produced admitted local main")
+    local_merge = obj(delivery["local_main_merge"], "local-main merge receipt")
+    if set(local_merge) != {"sha", "parents", "tree_sha", "receipt"}:
+        raise ValueError("local-main merge receipt fields drifted")
+    if local_merge["sha"] != local_main or forgejo_main not in local_merge["parents"]:
+        raise ValueError("local-main merge receipt does not contain Forgejo main")
+    verification_bundle = obj(delivery["verification"], "Forgejo verification bundle")
+    if set(verification_bundle) != {"receipt", "evidence", "contract"}:
+        raise ValueError("Forgejo verification bundle fields drifted")
+    verification = load_bound(
+        receipt_path.parent, verification_bundle["receipt"], "Forgejo verification receipt"
+    )
+    verification_evidence = load_bound(
+        receipt_path.parent, verification_bundle["evidence"], "Forgejo verification evidence"
+    )
+    verification_contract = load_bound(
+        receipt_path.parent, verification_bundle["contract"], "Forgejo verification contract"
+    )
+    gate = load_module(
+        "dual_forge_local_verification_gate",
+        Path(__file__).resolve().parents[2]
+        / "github-delivery-loop"
+        / "scripts"
+        / "ci_publish_gate.py",
+    )
+    try:
+        gate.validate_verification(
+            verification, delivery["forgejo_repository_id"], local_main
+        )
+        gate.validate_evidence(
+            verification_evidence,
+            verification,
+            verification_contract,
+            delivery["forgejo_repository_id"],
+            local_main,
+            local_merge["tree_sha"],
+        )
+    except gate.InputError as exc:
+        raise ValueError(f"Forgejo verification does not prove exact local main: {exc}") from exc
+    if timestamp(verification["verified_at"], "Forgejo verified_at") > timestamp(
+        delivery["captured_at"], "Forgejo delivery captured_at"
+    ):
+        raise ValueError("Forgejo verification occurs after its provider capture")
+    return delivery["forgejo_repository_id"], observed_issue_numbers
 
 
 def verify_git_ancestry(
@@ -223,6 +386,18 @@ def verify_git_ancestry(
             if git(repository, "rev-parse", ref) != expected:
                 raise ValueError(f"publication git proof ref mismatch: {ref}")
         git(repository, "fsck", "--strict", "--no-reflogs")
+        forgejo_to_local = subprocess.run(
+            [
+                "git", f"--git-dir={repository}", "merge-base", "--is-ancestor",
+                forgejo_main, local_main,
+            ],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+            timeout=15,
+        )
+        if forgejo_to_local.returncode != 0:
+            raise ValueError("admitted local main does not contain Forgejo main")
         for ancestor in (github_main, forgejo_main, local_main):
             probe = subprocess.run(
                 ["git", f"--git-dir={repository}", "merge-base", "--is-ancestor", ancestor, candidate],
@@ -250,6 +425,8 @@ def verify_canonical_publication(
     repository: str,
     default_branch: str,
     forgejo_repository: str,
+    forgejo_delivery_repository_id: int,
+    delivered_closed_issue_numbers: set[int],
     github_remote: str,
     forgejo_remote: str,
 ) -> None:
@@ -289,6 +466,7 @@ def verify_canonical_publication(
     }
     captured: list[datetime] = []
     github_repository_id: int | None = None
+    forgejo_repository_id: int | None = None
     for name, (authority, source, expected_repository, expected_sha, source_identity) in expected_origins.items():
         observation = load_bound(root, observations[name], f"{name} observation")
         if set(observation) != {
@@ -404,6 +582,7 @@ def verify_canonical_publication(
                 or observation["repository_id"] != repository_id
             ):
                 raise ValueError("Forgejo provider capture does not derive the observation")
+            forgejo_repository_id = repository_id
         else:
             expected_argv = [
                 ["git", "-C", "<repo-root>", "rev-parse", "--show-toplevel"],
@@ -432,13 +611,13 @@ def verify_canonical_publication(
 
     reconciliation = load_bound(root, reconciliation_binding, "reconciliation observation")
     if set(reconciliation) != {
-        "schema", "repository", "candidate_sha", "github_main_sha",
-        "forgejo_main_sha", "local_main_sha", "captured_at",
-        "github_open_prs", "forgejo_open_prs", "affected_issues",
-        "unresolved_conflicts",
+        "schema", "repository", "forgejo_repository", "repository_ids",
+        "candidate_sha", "github_main_sha", "forgejo_main_sha",
+        "local_main_sha", "captured_at", "transport", "publication_subject",
+        "github_open_prs", "forgejo_open_prs", "open_issues", "unresolved_conflicts",
     }:
         raise ValueError("reconciliation observation fields drifted")
-    if reconciliation["schema"] != "dual-forge-reconciliation-observation/v1":
+    if reconciliation["schema"] != "dual-forge-reconciliation-observation/v2":
         raise ValueError("reconciliation observation schema is unsupported")
     expected_reconciliation = {
         "repository": repository,
@@ -450,9 +629,73 @@ def verify_canonical_publication(
     for field, expected in expected_reconciliation.items():
         if reconciliation[field] != expected:
             raise ValueError(f"reconciliation {field} mismatch")
+    if reconciliation["forgejo_repository"] != forgejo_repository:
+        raise ValueError("reconciliation Forgejo repository mismatch")
+    reconciliation_transport = load_bound(
+        root, reconciliation["transport"], "reconciliation transport"
+    )
+    reconciliation_producer = load_module(
+        "dual_forge_reconciliation_capture", Path(__file__).resolve().parent / "capture_reconciliation.py"
+    )
+    reconciliation_producer.verify_observation(reconciliation_transport, reconciliation)
+    if reconciliation["repository_ids"].get("github") != github_repository_id:
+        raise ValueError("reconciliation and GitHub origin repository IDs differ")
+    if (
+        reconciliation["repository_ids"].get("forgejo") != forgejo_repository_id
+        or forgejo_delivery_repository_id != forgejo_repository_id
+    ):
+        raise ValueError("Forgejo origin, delivery, and reconciliation repository IDs differ")
     verify_pr_inventory(reconciliation["github_open_prs"], "github_open_prs")
     verify_pr_inventory(reconciliation["forgejo_open_prs"], "forgejo_open_prs")
-    verify_issue_inventory(reconciliation["affected_issues"])
+    verify_issue_inventory(reconciliation["open_issues"])
+    contradictory_issues = {
+        item.get("number")
+        for item in reconciliation["open_issues"]
+        if isinstance(item, dict) and item.get("forge") == "forgejo"
+    } & delivered_closed_issue_numbers
+    if contradictory_issues:
+        raise ValueError(
+            "Forgejo delivery-closed issues remain open in reconciliation: "
+            + ", ".join(str(value) for value in sorted(contradictory_issues))
+        )
+    publication_subject = obj(
+        reconciliation["publication_subject"], "reconciliation publication_subject"
+    )
+    if set(publication_subject) != {"forge", "number", "head_sha", "wip", "presence"}:
+        raise ValueError("reconciliation publication subject fields drifted")
+    publication_number = publication_subject["number"]
+    if (
+        publication_subject.get("forge") != "github"
+        or not isinstance(publication_number, int)
+        or isinstance(publication_number, bool)
+        or publication_number <= 0
+        or publication_subject.get("head_sha") != candidate
+        or publication_subject.get("wip") is not True
+        or publication_subject.get("presence") != "CAPTURED_OPEN_PR"
+    ):
+        raise ValueError("reconciliation publication subject is not exact captured WIP=1 PR")
+    publication_routes = [
+        item
+        for item in reconciliation["github_open_prs"]
+        if isinstance(item, dict)
+        and item.get("number") == publication_number
+        and item.get("head_sha") == candidate
+        and item.get("wip") is True
+    ]
+    if len(publication_routes) != 1 or (
+        publication_routes[0].get("classification") != "PUBLICATION_SUBJECT"
+        or publication_routes[0].get("terminal_route") != "WIP_CAPTURED"
+    ):
+        raise ValueError("publication subject lacks one exact typed WIP inventory route")
+    candidate_wip_routes = [
+        item
+        for item in reconciliation["github_open_prs"]
+        if isinstance(item, dict)
+        and item.get("head_sha") == candidate
+        and item.get("wip") is True
+    ]
+    if candidate_wip_routes != publication_routes:
+        raise ValueError("candidate has more than one captured WIP publication subject")
     if not isinstance(reconciliation["unresolved_conflicts"], list):
         raise ValueError("reconciliation unresolved_conflicts must be an inventory array")
     if reconciliation["unresolved_conflicts"]:
@@ -530,14 +773,19 @@ def verify_canonical_publication(
         raise ValueError("GitHub origin and publication repository numeric IDs differ")
 
     proof = obj(actions.get("proof"), "actions.proof")
-    if set(proof) != {"check_name", "observation", "snapshot"}:
+    if set(proof) != {"check_name", "transport", "observation", "snapshot"}:
         raise ValueError("actions.proof fields drifted")
     check_name = proof["check_name"]
     if check_name != required_check_name:
         raise ValueError("actions proof check name differs from publication policy")
+    producer = load_module("dual_forge_github_actions_snapshot", scripts / "github_actions_snapshot.py")
+    transport = load_bound(root, proof["transport"], "actions transport")
     observation = load_bound(root, proof["observation"], "actions observation")
     actions_snapshot = load_bound(root, proof["snapshot"], "actions snapshot")
-    producer = load_module("dual_forge_github_actions_snapshot", scripts / "github_actions_snapshot.py")
+    if transport.get("check_name") != check_name:
+        raise ValueError("actions transport check name differs from publication policy")
+    if producer.observation_from_transport(transport) != observation:
+        raise ValueError("actions observation does not reproduce from raw provider transport")
     if producer.build(observation, check_name) != actions_snapshot:
         raise ValueError("actions snapshot does not reproduce from canonical observation")
     if actions_snapshot.get("repository", {}).get("full_name") != repository:
@@ -552,6 +800,8 @@ def verify_canonical_publication(
         raise ValueError("prepublication and Actions branch subjects differ")
     if not isinstance(pull.get("number"), int) or isinstance(pull.get("number"), bool):
         raise ValueError("actions proof lacks a concrete pull request subject")
+    if pull.get("number") != publication_number:
+        raise ValueError("Actions pull request differs from reconciled publication subject")
     if intent == "initial-pr":
         if pre_pull.get("number") is not None or pull.get("state") != "draft":
             raise ValueError("initial publication did not create the admitted draft PR")
@@ -610,7 +860,7 @@ def main(argv: list[str]) -> int:
         return 64
 
     try:
-        if data.get("schema_version") != "dual-forge-repository-loop/v2":
+        if data.get("schema_version") != "dual-forge-repository-loop/v3":
             raise ValueError("unsupported schema_version")
 
         repository_binding = obj(data.get("repository"), "repository")
@@ -663,6 +913,7 @@ def main(argv: list[str]) -> int:
         links = data.get("issue_links", [])
         if not isinstance(links, list):
             raise ValueError("issue_links must be an array")
+        linked_forgejo_issue_numbers: set[int] = set()
         for i, link in enumerate(links):
             link = obj(link, f"issue_links[{i}]")
             fref, gref = link.get("forgejo_issue"), link.get("github_issue")
@@ -672,6 +923,10 @@ def main(argv: list[str]) -> int:
                 raise ValueError(f"issue_links[{i}].github_issue must use {gp!r}")
             if fref == gref:
                 raise ValueError("cross-forge issue identities cannot collapse")
+            suffix = fref[len(fp):]
+            if not suffix.isdigit() or int(suffix) <= 0:
+                raise ValueError(f"issue_links[{i}].forgejo_issue lacks a positive issue number")
+            linked_forgejo_issue_numbers.add(int(suffix))
 
         history = data.get("history")
         if not isinstance(history, list) or any(not isinstance(x, str) for x in history):
@@ -701,6 +956,11 @@ def main(argv: list[str]) -> int:
                 raise ValueError("publication allowed without GitHub Actions PASS")
             if evidence.get("final_merge") != "HUMAN_ADMIT_REQUIRED":
                 raise ValueError("publication-ready receipt cannot self-authorize final merge")
+            forgejo_delivery_repository_id, delivered_closed_issue_numbers = verify_forgejo_delivery(
+                path.resolve(), data.get("implementation"), forgejo["repository"],
+                default_branch, forgejo["observed_main_sha"], local["local_main_sha"],
+                linked_forgejo_issue_numbers,
+            )
             actual_tree = verify_git_ancestry(
                 path.resolve(), pub["git_proof"],
                 github["observed_main_sha"], forgejo["observed_main_sha"],
@@ -712,6 +972,8 @@ def main(argv: list[str]) -> int:
                 forgejo["observed_main_sha"], local["local_main_sha"],
                 candidate, actual_tree,
                 repository, default_branch, forgejo["repository"],
+                forgejo_delivery_repository_id,
+                delivered_closed_issue_numbers,
                 github["remote_name"], forgejo["remote_name"],
             )
         else:

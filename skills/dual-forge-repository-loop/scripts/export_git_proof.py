@@ -61,6 +61,17 @@ def export(repo: Path, commits: dict[str, str], output: Path) -> None:
     for label, value in commits.items():
         require_commit(repo, value, label)
     candidate = commits["candidate"]
+    forgejo_to_local = subprocess.run(
+        [
+            "git", "-C", str(repo), "merge-base", "--is-ancestor",
+            commits["forgejo_main"], commits["local_main"],
+        ],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=False,
+    )
+    if forgejo_to_local.returncode != 0:
+        raise ExportError("local_main does not contain forgejo_main")
     for label in ("github_main", "forgejo_main", "local_main"):
         probe = subprocess.run(
             ["git", "-C", str(repo), "merge-base", "--is-ancestor", commits[label], candidate],

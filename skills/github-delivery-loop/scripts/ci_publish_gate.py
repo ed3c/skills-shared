@@ -42,7 +42,7 @@ def _load_local_verification_module():
 
 LOCAL_VERIFICATION = _load_local_verification_module()
 
-SNAPSHOT_SCHEMA = "github-actions-publish-snapshot/v3"
+SNAPSHOT_SCHEMA = "github-actions-publish-snapshot/v4"
 VERIFICATION_SCHEMA = "github-delivery-local-verification/v1"
 EVIDENCE_SCHEMA = "github-delivery-local-verification-evidence/v1"
 CONTRACT_SCHEMA = "github-delivery-local-verification-contract/v1"
@@ -297,13 +297,21 @@ def validate_latest_check(value: Any) -> dict[str, Any] | None:
         raise InputError("actions.latest_check must be an object or null")
     exact_fields(
         value,
-        {"head_sha", "conclusion", "completed_at"},
+        {
+            "head_sha", "conclusion", "completed_at", "check_run_id",
+            "check_suite_id", "workflow_run_id", "workflow_id", "job_id", "app_id",
+        },
         "actions.latest_check",
     )
     require_sha(value["head_sha"], "latest_check.head_sha")
     if value["conclusion"] not in CHECK_CONCLUSIONS:
         raise InputError("latest_check.conclusion is unsupported")
     parse_time(value["completed_at"], "latest_check.completed_at")
+    for field in (
+        "check_run_id", "check_suite_id", "workflow_run_id", "workflow_id", "job_id", "app_id",
+    ):
+        if not isinstance(value[field], int) or isinstance(value[field], bool) or value[field] <= 0:
+            raise InputError(f"latest_check.{field} must be a positive integer")
     return value
 
 
@@ -824,6 +832,12 @@ def selftest() -> None:
         "head_sha": "3" * 40,
         "conclusion": "failure",
         "completed_at": "2026-08-12T05:02:00Z",
+        "check_run_id": 9001,
+        "check_suite_id": 8001,
+        "workflow_run_id": 7001,
+        "workflow_id": 6001,
+        "job_id": 5001,
+        "app_id": 15368,
     }
     expect(
         "older-ci-head",

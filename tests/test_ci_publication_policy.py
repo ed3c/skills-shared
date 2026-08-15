@@ -130,7 +130,7 @@ class GateDecisionTests(unittest.TestCase):
         head = verification["head_sha"]
         tree = evidence["tree_sha"]
         snapshot = {
-            "schema": "github-actions-publish-snapshot/v3",
+            "schema": "github-actions-publish-snapshot/v4",
             "repository": {
                 "full_name": "ed3c/skills-shared",
                 "repository_id": 1326262274,

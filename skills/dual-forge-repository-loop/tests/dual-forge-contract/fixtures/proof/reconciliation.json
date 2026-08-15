@@ -1,13 +1,25 @@
 {
-  "schema": "dual-forge-reconciliation-observation/v1",
+  "schema": "dual-forge-reconciliation-observation/v2",
   "repository": "ed3c/example",
+  "forgejo_repository": "neon/example",
+  "repository_ids": {"github": 123, "forgejo": 456},
   "candidate_sha": "997b637730f967af63f435d8f28fe6677a209574",
   "github_main_sha": "93c33411137875108419c2abe4dbe8f4d84ad5d6",
   "forgejo_main_sha": "4cb614454eeb07e81ac1718746e2e99d3c3287d1",
   "local_main_sha": "572aa3d2f0d50771cf2ab856f59a9b5923fed1f2",
   "captured_at": "2026-08-14T10:00:00Z",
-  "github_open_prs": [{"number": 7, "head_sha": "93c33411137875108419c2abe4dbe8f4d84ad5d6", "classification": "UNAFFECTED", "terminal_route": "NO_ACTION", "receipt": "github:pr/7@93c3341"}],
-  "forgejo_open_prs": [{"number": 9, "head_sha": "4cb614454eeb07e81ac1718746e2e99d3c3287d1", "classification": "SUPERSEDED_BY_LOCAL_MAIN", "terminal_route": "CLOSED_OR_RETARGETED", "receipt": "forgejo:pr/9@4cb6144"}],
-  "affected_issues": [{"forge": "github", "number": 34, "terminal_route": "IMPLEMENTED", "receipt": "github:issue/34"}],
+  "transport": {"path": "proof/reconciliation-transport.json", "sha256": "25e18caed80aeac0f6a054faaea9b05f8b36ba5d4373705d702b0ecf43c2e020"},
+  "publication_subject": {"forge": "github", "number": 42, "head_sha": "997b637730f967af63f435d8f28fe6677a209574", "wip": true, "presence": "CAPTURED_OPEN_PR"},
+  "github_open_prs": [
+    {"number": 7, "head_sha": "93c33411137875108419c2abe4dbe8f4d84ad5d6", "base_branch": "main", "wip": false, "classification": "UNAFFECTED", "terminal_route": "NO_ACTION", "receipt": "github:pr/7@93c3341"},
+    {"number": 42, "head_sha": "997b637730f967af63f435d8f28fe6677a209574", "base_branch": "main", "wip": true, "classification": "PUBLICATION_SUBJECT", "terminal_route": "WIP_CAPTURED", "receipt": "github:pr/42@997b637"}
+  ],
+  "forgejo_open_prs": [
+    {"number": 9, "head_sha": "4cb614454eeb07e81ac1718746e2e99d3c3287d1", "base_branch": "main", "wip": false, "classification": "SUPERSEDED_BY_LOCAL_MAIN", "terminal_route": "CLOSED_OR_RETARGETED", "receipt": "forgejo:pr/9@4cb6144"}
+  ],
+  "open_issues": [
+    {"forge": "github", "number": 34, "scope": "AFFECTED", "terminal_route": "IMPLEMENTED", "receipt": "github:issue/34"},
+    {"forge": "github", "number": 99, "scope": "UNAFFECTED", "terminal_route": "NO_ACTION", "receipt": "github:issue/99"}
+  ],
   "unresolved_conflicts": []
 }

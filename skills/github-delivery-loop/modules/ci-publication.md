@@ -98,11 +98,31 @@ The evaluator is deliberately pure; enforcement is layered around it:
    admission evidence, not evidence that a network command succeeded.
 5. `ci_publish_guard.py`, registered by `install-ci-publish-guard.py`, blocks a
    raw GitHub `git push` from enrolled repositories on Agent PreToolUse
-   surfaces. It leaves an explicit Forgejo remote available.
+   surfaces. It recognizes direct `git`, `git-push`, `exec`, admitted `env`
+   forms, Git aliases, repository selection, and remote resolution. It leaves an
+   explicit Forgejo remote available.
 
 The host guard cannot intercept a human terminal, a third-party bot, or a
 repository that has not enrolled. Do not describe that boundary as universal
-GitHub enforcement.
+GitHub enforcement. Its legacy hook input is a shell command string, not a
+resolved process event. Therefore arbitrary shell evaluation is deliberately
+outside the parser's sound interface. Direct argv-like Git/`git-push`, `exec`,
+`env`, literal shell pushes, and literal `git -C <enrolled>` invocations with
+variable/backtick expansion are covered; the last category fails closed even
+when the hook cwd is outside the repository. Static Forgejo pushes remain
+available. `-c` is recognized both alone and in normal combined shell option
+forms such as `-lc`. A shell program that computes executable, repository path, and remote
+without leaving those literals is outside this parser's claim. Universal
+prevention requires a host enforcement point that supplies resolved
+executable/argv/cwd/environment/remote after shell evaluation.
+
+The Actions capture CLI likewise does not accept a caller-selected `gh` path or
+resolve `gh` from inherited `PATH`. It selects from a closed absolute-path set,
+records invoked path, realpath, binary SHA-256, and version, then records exact
+absolute-path `gh api` argv and derives one GitHub-Actions-owned
+check suite plus workflow/run/job/check identities. More than one execution of
+the stable required check for the exact candidate is a cost/provenance conflict,
+not "latest wins"; publication remains blocked instead of blessing a rerun.
 
 ## Workflow shape for private repositories
 
@@ -150,7 +170,7 @@ success status as a substitute for executing the verifier.
 
 ```json
 {
-  "schema": "github-actions-publish-snapshot/v3",
+  "schema": "github-actions-publish-snapshot/v4",
   "repository": {
     "full_name": "owner/private-repository",
     "repository_id": 123456,

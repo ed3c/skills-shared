@@ -1,5 +1,5 @@
 {
-  "schema_version": "dual-forge-repository-loop/v2",
+  "schema_version": "dual-forge-repository-loop/v3",
   "repository": {"name": "owner/repo", "default_branch": "main"},
   "authority": {"implementation": "local-forgejo", "publication": "github", "actions": "github-actions"},
   "github": {"repository_full_name": "owner/repo", "remote_name": "github", "observed_main_sha": "1111111111111111111111111111111111111111"},
@@ -7,10 +7,11 @@
   "local": {"main_branch": "main", "local_main_sha": "3333333333333333333333333333333333333333", "worktree_root": ".worktrees"},
   "issue_namespaces": {"forgejo": "forgejo#", "github": "github#"},
   "issue_links": [{"forgejo_issue": "forgejo#12", "github_issue": "github#34"}],
+  "implementation": {"forgejo_delivery": null},
   "history": [],
   "observations": {"github_main": null, "forgejo_main": null, "local_main": null},
   "reconciliation": null,
   "publication": {"candidate_sha": "4444444444444444444444444444444444444444", "git_proof": null, "decision_bundle": null},
-  "actions": {"proof": null},
+  "actions": {"proof": {"check_name": null, "transport": null, "observation": null, "snapshot": null}},
   "evidence": {"github_ingress": "NOT_EXERCISED", "forgejo_runtime": "NOT_EXERCISED", "local_worktrees": "NOT_EXERCISED", "local_main_merge": "NOT_EXERCISED", "github_reconciliation": "NOT_EXERCISED", "github_actions": "NOT_EXERCISED", "final_merge": "HUMAN_ADMIT_REQUIRED"}
 }

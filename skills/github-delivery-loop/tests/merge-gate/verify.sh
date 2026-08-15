@@ -104,6 +104,22 @@ case "$*" in
   "api user --jq "*)
     echo '{"login":"example","id":42,"type":"User"}'
     ;;
+  "pr view 31 --repo example/infrastructure --json state,mergedAt,headRefOid,url")
+    case "${GH_READBACK:-merged}" in
+      open)
+        echo '{"state":"OPEN","mergedAt":null,"headRefOid":"3131313131313131313131313131313131313131","url":"https://github.com/example/infrastructure/pull/31"}'
+        ;;
+      closed)
+        echo '{"state":"CLOSED","mergedAt":null,"headRefOid":"3131313131313131313131313131313131313131","url":"https://github.com/example/infrastructure/pull/31"}'
+        ;;
+      drift)
+        echo '{"state":"MERGED","mergedAt":"2026-08-12T03:00:00Z","headRefOid":"3232323232323232323232323232323232323232","url":"https://github.com/example/infrastructure/pull/31"}'
+        ;;
+      *)
+        echo '{"state":"MERGED","mergedAt":"2026-08-12T03:00:00Z","headRefOid":"3131313131313131313131313131313131313131","url":"https://github.com/example/infrastructure/pull/31"}'
+        ;;
+    esac
+    ;;
   "pr view 31 --repo example/infrastructure --json "*)
     echo '{"id":"PR_owner_auto_31","number":31,"url":"https://github.com/example/infrastructure/pull/31","title":"selected live PR","state":"OPEN","isDraft":false,"headRefOid":"3131313131313131313131313131313131313131","mergeable":"MERGEABLE","mergeStateStatus":"CLEAN"}'
     ;;
@@ -127,8 +143,25 @@ case "$*" in
   "api repos/example/infrastructure/issues/8/events --paginate --jq "*)
     echo '{"actor":"delivery-bot","at":"2026-08-12T02:00:00Z"}'
     ;;
-  "api graphql -f query=mutation"*)
-    echo '{"data":{"mergePullRequest":{"pullRequest":{"number":31,"merged":true}}}}'
+  "api graphql "*)
+    if [[ "$*" == *"mergeQueueEntry"* ]]; then
+      case "${GH_PENDING:-none}" in
+        auto)
+          echo '{"data":{"node":{"autoMergeRequest":{"enabledAt":"2026-08-12T02:30:00Z"},"mergeQueueEntry":null}}}'
+          ;;
+        queue)
+          echo '{"data":{"node":{"autoMergeRequest":null,"mergeQueueEntry":{"id":"MQE_31","state":"QUEUED"}}}}'
+          ;;
+        *)
+          echo '{"data":{"node":{"autoMergeRequest":null,"mergeQueueEntry":null}}}'
+          ;;
+      esac
+    elif [[ "$*" == *"query=mutation"* ]]; then
+      echo '{"data":{"mergePullRequest":{"pullRequest":{"number":31,"merged":true}}}}'
+    else
+      echo "unexpected GraphQL call: $*" >&2
+      exit 70
+    fi
     ;;
   *)
     echo "unexpected gh call: $*" >&2
@@ -153,12 +186,74 @@ GH_LOG="${apply_log}" PATH="${fake_bin}:${PATH}" run "${clean_home}" \
   --policy "${owner_policy}" > "${scratch}/owner-live-land.out"
 grep -q "LANDED #31 3131313" "${scratch}/owner-live-land.out"
 grep -q "LANDED=1" "${scratch}/owner-live-land.out"
-test "$(grep -c "api graphql" "${apply_log}")" -eq 1
+test "$(grep -c "query=mutation" "${apply_log}")" -eq 1
 grep -q "pullRequestId=PR_owner_auto_31" "${apply_log}"
 if grep -Eq "pr list|pullRequestId=PR_owner_auto_2" "${apply_log}"; then
   echo "FAIL: scoped land touched an unrelated PR" >&2
   exit 1
 fi
+
+# A previous invocation may already have enabled auto-merge or entered the
+# merge queue. The selected PR must return a distinct pending status without a
+# second mutation; an unrelated PR is outside this --pr scope.
+for pending_kind in auto queue; do
+  : > "${apply_log}"
+  set +e
+  GH_LOG="${apply_log}" GH_PENDING="${pending_kind}" PATH="${fake_bin}:${PATH}" \
+    run "${clean_home}" python3 "${gate}" land --repo "${repo}" --pr 31 \
+    --policy "${owner_policy}" \
+    >"${scratch}/owner-live-${pending_kind}.out" \
+    2>"${scratch}/owner-live-${pending_kind}.err"
+  owner_pending_status=$?
+  set -e
+  test "${owner_pending_status}" -eq 5
+  grep -q "ALREADY-PENDING #31 3131313" \
+    "${scratch}/owner-live-${pending_kind}.out"
+  if grep -q "query=mutation" "${apply_log}"; then
+    echo "FAIL: ${pending_kind} merge request was submitted twice" >&2
+    exit 1
+  fi
+  if grep -Eq "pr list|pullRequestId=PR_owner_auto_2" "${apply_log}"; then
+    echo "FAIL: pending check escaped the selected PR scope" >&2
+    exit 1
+  fi
+done
+
+# A zero exit from the mutation is only request acceptance. Provider readback
+# decides whether the exact head landed, remains pending, or failed closed.
+: > "${apply_log}"
+set +e
+GH_LOG="${apply_log}" GH_READBACK=open PATH="${fake_bin}:${PATH}" \
+  run "${clean_home}" python3 "${gate}" land --repo "${repo}" --pr 31 \
+  --policy "${owner_policy}" \
+  >"${scratch}/owner-live-readback-open.out" \
+  2>"${scratch}/owner-live-readback-open.err"
+owner_readback_open_status=$?
+set -e
+test "${owner_readback_open_status}" -eq 5
+grep -q "PENDING #31 3131313" "${scratch}/owner-live-readback-open.out"
+if grep -q "LANDED #31" "${scratch}/owner-live-readback-open.out"; then
+  echo "FAIL: accepted-but-open merge was reported as landed" >&2
+  exit 1
+fi
+
+for readback in closed drift; do
+  : > "${apply_log}"
+  set +e
+  GH_LOG="${apply_log}" GH_READBACK="${readback}" PATH="${fake_bin}:${PATH}" \
+    run "${clean_home}" python3 "${gate}" land --repo "${repo}" --pr 31 \
+    --policy "${owner_policy}" \
+    >"${scratch}/owner-live-readback-${readback}.out" \
+    2>"${scratch}/owner-live-readback-${readback}.err"
+  owner_readback_status=$?
+  set -e
+  test "${owner_readback_status}" -eq 1
+  grep -q "FAIL #31" "${scratch}/owner-live-readback-${readback}.err"
+  if grep -q "LANDED #31" "${scratch}/owner-live-readback-${readback}.out"; then
+    echo "FAIL: ${readback} readback was reported as landed" >&2
+    exit 1
+  fi
+done
 
 : > "${apply_log}"
 GH_LOG="${apply_log}" PATH="${fake_bin}:${PATH}" run "${clean_home}" \
@@ -183,7 +278,7 @@ set -e
 test "${owner_land_blocked_status}" -eq 1
 grep -q "BLOCK #6 .*L3 GITHUB.*mergeStateStatus=UNSTABLE" \
   "${scratch}/owner-live-blocked.err"
-if grep -q "api graphql" "${apply_log}"; then
+if grep -q "query=mutation" "${apply_log}"; then
   echo "FAIL: scoped land attempted a merge after L3 refusal" >&2
   exit 1
 fi
@@ -205,7 +300,7 @@ grep -q "BLOCK #8 .*L1 HUMAN-ADMIT.*not repository owner" \
   "${scratch}/human-live-blocked.err"
 test "${owner_land_missing_status}" -eq 1
 grep -q "could not read PR #404" "${scratch}/owner-live-missing.err"
-if grep -Eq "api graphql|(^| )pr merge " "${apply_log}"; then
+if grep -Eq "query=mutation|(^| )pr merge " "${apply_log}"; then
   echo "FAIL: scoped land attempted a merge after L1 refusal or missing target" >&2
   exit 1
 fi

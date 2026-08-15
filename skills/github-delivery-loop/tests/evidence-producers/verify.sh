@@ -61,7 +61,7 @@ python3 "${snapshot}" replay \
 python3 - "${scratch}/good-snapshot.json" <<'PY'
 import json, pathlib, sys
 value = json.loads(pathlib.Path(sys.argv[1]).read_text())
-assert value["schema"] == "github-actions-publish-snapshot/v3"
+assert value["schema"] == "github-actions-publish-snapshot/v4"
 assert value["branch"] == {"name": "feature", "head_sha": "1" * 40}
 assert value["pull_request"]["feedback"]["id"] == "check-run:9001"
 assert value["actions"]["latest_check"]["conclusion"] == "failure"
@@ -91,5 +91,69 @@ grep -q "stale head" "${scratch}/stale.err"
 
 python3 "${local_verify}" --selftest
 python3 "${snapshot}" --selftest
+
+# The production capture CLI owns the canonical `gh` executable. Offline tests
+# may replay fixture bytes, but cannot inject a fake provider executable and
+# then call that provider provenance.
+if python3 "${snapshot}" capture \
+  --repository ed3c/example \
+  --branch feature \
+  --check-name contract \
+  --gh "${scratch}/fake-gh" \
+  --transport-output "${scratch}/actions-transport.json" \
+  --output "${scratch}/captured-snapshot.json" \
+  >"${scratch}/fake-gh.out" 2>"${scratch}/fake-gh.err"; then
+  echo "FAIL: capture CLI accepted a caller-selected provider executable" >&2
+  exit 1
+fi
+grep -q "unrecognized arguments: --gh" "${scratch}/fake-gh.err"
+
+mkdir -p "${scratch}/fake-bin"
+printf '#!/bin/sh\necho fake-gh\n' > "${scratch}/fake-bin/gh"
+chmod +x "${scratch}/fake-bin/gh"
+PATH="${scratch}/fake-bin:${PATH}" python3 - "${snapshot}" "${scratch}/fake-bin/gh" <<'PY'
+import importlib.util, pathlib, sys
+path = pathlib.Path(sys.argv[1])
+spec = importlib.util.spec_from_file_location("actions_snapshot_path_test", path)
+module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+identity = module._gh_identity(5)
+assert identity["invoked_path"] in module.GH_CANDIDATES
+assert identity["invoked_path"] != sys.argv[2]
+assert len(identity["sha256"]) == 64
+PY
+
+python3 - "${snapshot}" <<'PY'
+import importlib.util, hashlib, json, pathlib, sys
+path = pathlib.Path(sys.argv[1])
+spec = importlib.util.spec_from_file_location("actions_snapshot_test", path)
+module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+empty = hashlib.sha256(b"").hexdigest()
+transport = {
+    "schema": module.TRANSPORT_SCHEMA,
+    "producer": "github_actions_snapshot.py",
+    "gh_executable": {
+        "invoked_path": "/tmp/fake-gh", "resolved_path": "/tmp/fake-gh",
+        "sha256": "3" * 64, "version": "gh version fake",
+    },
+    "repository": "ed3c/example",
+    "branch": "feature",
+    "check_name": "contract",
+    "captured_at": "2026-08-14T10:05:00Z",
+    "captures": [{
+        "argv": ["/tmp/fake-gh", "api", "repos/ed3c/example"],
+        "exit": 0,
+        "stdout": "{}",
+        "stdout_sha256": hashlib.sha256(b"{}").hexdigest(),
+        "stderr": "",
+        "stderr_sha256": empty,
+    }],
+}
+try:
+    module.observation_from_transport(transport)
+except module.SnapshotError:
+    pass
+else:
+    raise AssertionError("replay accepted non-canonical provider executable")
+PY
 
 echo "PASS GitHub Actions publication evidence producers"

@@ -114,7 +114,7 @@ def credentials(forge_url: str) -> tuple[str, str]:
     return fields["username"], fields["password"]
 
 
-def forgejo_get(forge_url: str, endpoint: str, auth: str) -> tuple[dict[str, Any], str]:
+def forgejo_json(forge_url: str, endpoint: str, auth: str) -> tuple[Any, str]:
     url = f"{forge_url}/api/v1/{endpoint}"
     request = Request(url, headers={"Authorization": f"Basic {auth}"})
     try:
@@ -122,9 +122,19 @@ def forgejo_get(forge_url: str, endpoint: str, auth: str) -> tuple[dict[str, Any
             if response.geturl() != url:
                 raise CaptureError("Forgejo read crossed an origin boundary")
             stdout = response.read().decode()
-            return object_json(stdout, "Forgejo API"), stdout
+            try:
+                return json.loads(stdout), stdout
+            except json.JSONDecodeError as exc:
+                raise CaptureError("Forgejo API returned invalid JSON") from exc
     except (HTTPError, URLError, TimeoutError) as exc:
         raise CaptureError("authenticated Forgejo API read failed") from exc
+
+
+def forgejo_get(forge_url: str, endpoint: str, auth: str) -> tuple[dict[str, Any], str]:
+    value, stdout = forgejo_json(forge_url, endpoint, auth)
+    if not isinstance(value, dict):
+        raise CaptureError("Forgejo API response must be an object")
+    return value, stdout
 
 
 def forgejo(repo: str, branch: str, forge_url: str) -> tuple[str, str, int, dict[str, Any]]:

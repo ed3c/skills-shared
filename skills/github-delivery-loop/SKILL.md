@@ -156,6 +156,9 @@ preflight 三個都驗——少驗一個平面就會把「還會被擋」報成�
    `--match-head-commit`，owner-auto 用 GraphQL `expectedHeadOid`，語意相同。owner-auto 不覆寫
    commit email（交給 GitHub 帳號的 web Git privacy 設定），不使用 `--admin`，也忽略 `--allow-unstable` 的放寬；
    全量模式會在 base 移動後自動重算下一張；`--pr N` 模式成功合併一次就停止，不掃描其他 PR。
+   跨 invocation 重跑時先查該 PR 是否已有 auto-merge request／merge queue entry，有就不重送；merge
+   command exit 0 只代表 GitHub 接受請求，必須回讀同一 HEAD 的 `MERGED` 與非空 `mergedAt` 才能報
+   `LANDED`。仍是 `OPEN` 或已存在 pending request 回傳 `5`，`CLOSED`、HEAD 漂移或不可判讀都 fail closed。
 
    ```bash
    python3 ~/.claude/skills/github-delivery-loop/scripts/merge_gate.py land --repo OWNER/REPO [--pr N] [--dry-run]
@@ -216,8 +219,11 @@ delivery-loop **各藏著一支從沒被自己 SKILL.md 提過的 sync 類腳本
   `opened,synchronize,reopened`。`ready_for_review` 不改 head，若保留會在 universal ready 發佈時
   對同 SHA 重複執行。push 只准 default branch、必須有 manual
   dispatch/concurrency，且 action 一律釘完整 SHA；少一項就不得 enroll。
-- `ci_publish_guard.py` 只對已 enroll repo 的 GitHub push fail closed；它明確保留 Forgejo push，
-  不把雙 remote repo 的 canonical 免費路徑一起封死。
+- `ci_publish_guard.py` 對解析後明確指向 GitHub 的 push fail closed，直接 argv 與可靜態解析的
+  Forgejo push 仍保留。legacy hook 只給 shell 字串，並不是解析後 process event；因此帶
+  `$`/backtick 展開、且仍能以 literal Git invocation 定位到 enrolled repo 的 shell 包裝一律
+  fail closed。任意 shell 可計算 executable/path/remote 不在此 parser 的 sound boundary；完整
+  保證必須把 guard 放在 shell evaluation 之後，接收 resolved executable/argv/cwd/env/remote。
 - repository identity 釘 immutable GitHub node ID；owner/name 只作可轉移別名，redirect 不得冒充身份證據。
 - human-admit 的 `merge-admit` 只有 **repo owner 施加、且晚於 head commit** 才算數；owner-auto 則每次
   重驗 immutable viewer／personal owner。兩種模式都 pin HEAD，漂移即失敗。

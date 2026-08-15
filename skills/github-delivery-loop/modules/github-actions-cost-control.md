@@ -111,20 +111,24 @@ python3 skills/github-delivery-loop/scripts/github_actions_snapshot.py capture \
   --repository OWNER/REPO \
   --branch <HEAD_BRANCH> \
   --check-name <STABLE_JOB_CHECK_NAME> \
+  --transport-output /path/to/github-transport.json \
   --observation-output /path/to/github-observation.json \
   --output /path/to/github-state.snapshot.json
 ```
 
 It uses fixed `gh api` argv only and performs no mutation. It resolves exact private repository identity, zero or one open PR, exact PR head, exact stable check name, conclusion and annotations.
 
-Replay is zero-network:
+Proof replay starts from raw transport and is zero-network:
 
 ```bash
-python3 skills/github-delivery-loop/scripts/github_actions_snapshot.py replay \
-  --observation /path/to/github-observation.json \
-  --check-name <STABLE_JOB_CHECK_NAME> \
+python3 skills/github-delivery-loop/scripts/github_actions_snapshot.py replay-transport \
+  --transport /path/to/github-transport.json \
+  --observation-output /path/to/replayed-observation.json \
   --output /path/to/github-state.snapshot.json
 ```
+
+The legacy `replay --observation` interface remains useful for policy fixtures,
+but an observation authored without raw transport is not provider provenance.
 
 The producer fails closed on public repositories, multiple open PRs, stale-head checks, incomplete checks, malformed annotations and unknown API state. V1 derives actionable CI feedback only. Review feedback needs a separate explicit adapter; it is never guessed from general PR text.
 

@@ -256,7 +256,7 @@ class PublicationCommandTests(unittest.TestCase):
                 "draft" if intent == "ready-for-review" else "ready"
             )
             snapshot = {
-                "schema": "github-actions-publish-snapshot/v3",
+                "schema": "github-actions-publish-snapshot/v4",
                 "repository": {
                     "full_name": "ed3c/example",
                     "repository_id": 123,
@@ -294,6 +294,12 @@ class PublicationCommandTests(unittest.TestCase):
                             "head_sha": remote_head,
                             "conclusion": "failure",
                             "completed_at": "2026-08-12T06:01:00Z",
+                            "check_run_id": 9001,
+                            "check_suite_id": 8001,
+                            "workflow_run_id": 7001,
+                            "workflow_id": 6001,
+                            "job_id": 5001,
+                            "app_id": 15368,
                         }
                         if intent == "batched-repair" and state != "absent"
                         else None
@@ -625,6 +631,15 @@ class PublicationGuardTests(unittest.TestCase):
         }
         self.assertTrue(GUARD.should_block(payload)[0])
 
+    def test_env_search_path_cannot_hide_push(self) -> None:
+        path = self.root / ".github-delivery" / "ci-policy.json"
+        path.parent.mkdir()
+        path.write_text(json.dumps(policy()), encoding="utf-8")
+        command = f"/usr/bin/env -P /usr/bin git -C {self.root} push github HEAD"
+        payload = self.payload(command)
+        payload["tool_input"]["cwd"] = str(self.root.parent)
+        self.assertTrue(GUARD.should_block(payload)[0])
+
     def test_cd_double_dash_cannot_hide_push(self) -> None:
         path = self.root / ".github-delivery" / "ci-policy.json"
         path.parent.mkdir()
@@ -656,6 +671,15 @@ class PublicationGuardTests(unittest.TestCase):
             f"git -c \"alias.ship=!git -C {self.root} push github\" ship HEAD"
         )
         self.assertTrue(GUARD.should_block(self.payload(command))[0])
+
+    def test_command_local_dynamic_shell_alias_is_unsupported_in_managed_repo(self) -> None:
+        path = self.root / ".github-delivery" / "ci-policy.json"
+        path.parent.mkdir()
+        path.write_text(json.dumps(policy()), encoding="utf-8")
+        command = "git -c 'alias.ship=!p=push; git \"$p\" github HEAD' ship"
+        blocked, reason = GUARD.should_block(self.payload(command))
+        self.assertTrue(blocked)
+        self.assertIn("unsupported", reason)
 
     def test_environment_push_alias_cannot_hide_push(self) -> None:
         path = self.root / ".github-delivery" / "ci-policy.json"
@@ -723,6 +747,51 @@ class PublicationGuardTests(unittest.TestCase):
         path.parent.mkdir()
         path.write_text(json.dumps(policy()), encoding="utf-8")
         command = f"sh -c 'git -C {self.root} push github HEAD'"
+        self.assertTrue(GUARD.should_block(self.payload(command))[0])
+
+    def test_login_shell_command_string_cannot_hide_push(self) -> None:
+        path = self.root / ".github-delivery" / "ci-policy.json"
+        path.parent.mkdir()
+        path.write_text(json.dumps(policy()), encoding="utf-8")
+        command = f"bash -lc 'git -C {self.root} push github HEAD'"
+        self.assertTrue(GUARD.should_block(self.payload(command))[0])
+
+    def test_static_shell_forgejo_push_remains_available(self) -> None:
+        path = self.root / ".github-delivery" / "ci-policy.json"
+        path.parent.mkdir()
+        path.write_text(json.dumps(policy()), encoding="utf-8")
+        command = f"sh -c 'git -C {self.root} push forgejo HEAD'"
+        blocked, reason = GUARD.should_block(self.payload(command))
+        self.assertFalse(blocked)
+        self.assertEqual(reason, "no-managed-github-push")
+
+    def test_dynamic_shell_evaluation_is_unsupported_in_managed_repo(self) -> None:
+        path = self.root / ".github-delivery" / "ci-policy.json"
+        path.parent.mkdir()
+        path.write_text(json.dumps(policy()), encoding="utf-8")
+        command = f"sh -c 'p=push; git -C {self.root} \"$p\" github HEAD'"
+        payload = self.payload(command)
+        payload["tool_input"]["cwd"] = str(self.root.parent)
+        blocked, reason = GUARD.should_block(payload)
+        self.assertTrue(blocked)
+        self.assertIn("unsupported", reason)
+
+    def test_exec_wrapper_cannot_hide_push(self) -> None:
+        path = self.root / ".github-delivery" / "ci-policy.json"
+        path.parent.mkdir()
+        path.write_text(json.dumps(policy()), encoding="utf-8")
+        self.assertTrue(
+            GUARD.should_block(self.payload("exec git push github HEAD"))[0]
+        )
+
+    def test_direct_git_push_executable_cannot_bypass_guard(self) -> None:
+        path = self.root / ".github-delivery" / "ci-policy.json"
+        path.parent.mkdir()
+        path.write_text(json.dumps(policy()), encoding="utf-8")
+        git_exec_path = subprocess.run(
+            ["git", "--exec-path"], check=True, capture_output=True, text=True
+        ).stdout.strip()
+        command = f"{git_exec_path}/git-push github HEAD"
         self.assertTrue(GUARD.should_block(self.payload(command))[0])
 
 

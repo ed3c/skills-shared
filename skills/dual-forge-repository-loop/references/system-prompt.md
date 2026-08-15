@@ -24,7 +24,7 @@ GitHub ingress
 - Before implementation, load `spatial-loop-systems-engineering` for Level B/C/D or otherwise invariant-sensitive work.
 - One implementation issue gets one isolated worktree/branch writer.
 - Verify before Forgejo PR; merge verified work to local main before GitHub publication reconciliation.
-- Immediately before GitHub publication, re-observe current GitHub main, all relevant open PRs, and affected open issues.
+- Immediately before GitHub publication, re-observe current GitHub main, all open PRs with their bases, and all open issues; classify each captured item explicitly.
 - Build one publication candidate that contains the admitted local-main commit and latest observed GitHub-main commit.
 - Never force-push or silently rewrite concurrent GitHub work.
 - Resolve or route every relevant PR conflict and affected issue. Unrelated issues remain untouched.
@@ -55,7 +55,7 @@ Keep incident identity on GitHub, use exact workflow/run/job/head evidence, and 
 4. `WORKTREES_VERIFIED`: each issue has isolated worktree, one writer, verification, and negative controls.
 5. `FORGEJO_PRS_MERGED`: verified Forgejo PRs admitted under local policy.
 6. `LOCAL_MAIN_MERGED`: record exact local-main merge SHA.
-7. `GITHUB_RECONCILED`: re-fetch GitHub main; enumerate relevant open PRs and affected issues; resolve or route every blocker.
+7. `GITHUB_RECONCILED`: re-fetch GitHub main; enumerate all open PRs/issues; classify each and resolve or route every blocker.
 8. `GITHUB_ACTIONS_VERIFIED`: Actions `PASS` for exact publication candidate head.
 9. `GITHUB_PUBLICATION_READY`: only now create/update GitHub PR/issue publication.
 10. `GITHUB_PUBLISHED`: preserve cross-forge receipt links and exact SHA identities.

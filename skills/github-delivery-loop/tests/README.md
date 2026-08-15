@@ -61,7 +61,7 @@ Reaches the actual public script path, file layout, and data contract used by co
 | `DELIVERY-3` | owner-admitted exact head and green preflight | forged owner, stale admit, blocking hook, no-admit absence |
 | `DELIVERY-4` | identical copy converts to canonical link | diverged copy and self-link refused |
 | `DELIVERY-5` | exact-HEAD local verification + admitted publication intent | stale receipt, repeated draft, old check SHA, consumed feedback, billing-open/stale recovery |
-| evidence producers | valid fixed command and trusted observation | shell strings, unsafe env, multiple PRs, ambiguous checks, malformed billing |
+| evidence producers | admitted absolute `gh` identity, one workflow/run/job/check identity, raw-transport-derived observation | `PATH`/CLI fake provider executable, rerun/ambiguous check, tampered transport, shell strings, unsafe env, multiple PRs, malformed billing |
 | reference causality | implementation-bound evidence | source citation or old evidence used as promotion proof |
 
 ## State semantics in tests

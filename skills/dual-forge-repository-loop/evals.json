@@ -1,6 +1,6 @@
 {
   "skill_name": "dual-forge-repository-loop",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "_meta": {
     "coverage_metric": "dual-forge authority separation, local-main-first ordering, issue namespace separation, GitHub reconciliation closure, exact-head Actions evidence, and publication evidence gating",
     "purpose": "Prove that local/Forgejo implementation success cannot be published to GitHub while remote drift, open PR conflict routing, affected issue routing, or exact-head Actions evidence remains unresolved."
@@ -11,18 +11,18 @@
       "checker_script": "scripts/check_dual_forge_contract.py",
       "test_verify": "tests/dual-forge-contract/verify.sh",
       "good_fixture": "tests/dual-forge-contract/fixtures/good.json",
-      "hollow_fixture": "mutations collapsing remote or issue namespaces, swapping local-main/reconciliation order, stale or malformed origin/reconciliation observations, uncontained Git ancestry, tampering/missing content-addressed decision/policy/recovery inputs, cross-branch or unrequired Actions checks, or leaving local/Actions evidence unexercised at publication-ready",
+      "hollow_fixture": "mutations collapsing remote or issue namespaces, splitting immutable Forgejo repository IDs, swapping local-main/reconciliation order, omitting provider-captured PRs/issues or the WIP publication subject, forging Forgejo issue/merged-PR/local-main/verification receipts, violating forgejo_main->local_main ancestry, tampering raw Actions transport or content-addressed decision inputs, or leaving local/Actions evidence unexercised at publication-ready",
       "covers": [
         "GitHub, Forgejo, and GitHub Actions authority planes remain distinct",
         "Forgejo/GitHub issue identifiers remain explicitly namespaced",
         "local-main integration precedes GitHub reconciliation and publication",
-        "current GitHub main, relevant open PRs, affected issues, and conflict routing close before publication",
+        "current GitHub main, all provider-captured open PRs/issues, and conflict routing close before publication",
         "publication candidate proves it contains observed GitHub main and admitted local main",
         "GitHub Actions PASS is bound to the exact publication candidate SHA, branch/PR subject, and sole policy-required check",
         "local Forgejo/worktree/main/reconciliation evidence must be PASS before publication-ready",
         "absent receipt input remains distinct from a failed delivery contract"
       ],
-      "expected": "positive receipts including canonical Git/origin capture and billing recovery admitted; thirty-five planted authority/order/evidence defects refused; partial input exits 3 and absent input exits 64"
+      "expected": "positive receipts including canonical Git/origin/provider capture and billing recovery admitted; fifty-six planted authority/order/evidence defects refused; partial input exits 3 and absent input exits 64"
     }
   ],
   "evidence_boundary": {

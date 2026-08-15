@@ -47,7 +47,7 @@ from pathlib import Path
 
 receipt = json.loads(Path(sys.argv[1]).read_text())
 snapshot = {
-    "schema": "github-actions-publish-snapshot/v3",
+    "schema": "github-actions-publish-snapshot/v4",
     "repository": {
         "full_name": "ed3c/example",
         "repository_id": 123,
