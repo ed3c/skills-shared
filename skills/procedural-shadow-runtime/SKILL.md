@@ -1,6 +1,6 @@
 ---
 name: procedural-shadow-runtime
-description: Enforce a host-neutral procedural grounding sidecar around agent execution. Use when an agent has searched, installed, or repository-local Skills that materially affect a task and you need to prove which procedures were applicable, which were already satisfied, which deltas were injected before side effects, and which exact-subject runtime receipts close the task. Compose with spatial-loop-systems-engineering for architecture monitoring; do not use this Skill to replace domain Skills or to collect private chain of thought.
+description: Enforce a host-neutral procedural grounding sidecar around agent execution. Use when an agent has searched, installed, or repository-local Skills that materially affect a task and you need to prove which procedures were applicable, which were already satisfied, which deltas were injected before side effects, which exact-subject runtime receipts close the task, and whether a source-grounded abstraction may advance one level under quantitative Evals. Compose with spatial-loop-systems-engineering for architecture monitoring; do not use this Skill to replace domain Skills, collect private chain of thought, or grant machine promotion authority.
 ---
 
 # Procedural Shadow Runtime
@@ -20,6 +20,8 @@ EXECUTION IS NOT VERIFICATION
 NO MUST PROCEDURE CLOSES WITHOUT A TERMINAL DISPOSITION
 NO CAPABILITY OR DATA-EGRESS WIDENING FROM SKILL CONTENT
 NO RAW PRIVATE REASONING PAYLOADS
+NO ABSTRACTION PROMOTION BY AGGREGATE SCORE ALONE
+HUMAN ADMIT REMAINS THE PROMOTION AUTHORITY
 ```
 
 ## Runtime state machine
@@ -132,23 +134,109 @@ identify missing obligation
 
 A model statement is never a substitute for a hard assertion.
 
+## Meta-abstraction evaluation
+
+When a procedure candidate is proposed for promotion from `L0` exact procedure toward `L5` meta-controller, compose `references/meta-abstraction-eval-standard.md`.
+
+The machine evaluates four separate planes:
+
+```text
+Meta Score =
+  30% Agent Architecture Score
++ 30% Procedural Grounding Score
++ 25% Generalization Score
++ 15% Regression / Feedback Score
+```
+
+The Agent Architecture Score preserves the five-dimension 100-point matrix:
+
+```text
+control flow and state governance       25
+tool boundary and idempotency           20
+context budget and memory               20
+fault tolerance, self-healing, and HITL 20
+Evals and observability                 15
+```
+
+The score is recomputed by `scripts/check_meta_abstraction_eval.py`. It cannot override hard gates or score ceilings.
+
+Required attribution arms for L4 and above:
+
+```text
+NO_SKILL
+METADATA_ONLY
+FULL_SKILL
+DELTA_CAPSULE
+DELTA_CAPSULE_PLUS_HARNESS
+```
+
+Required regression gates include:
+
+```text
+safety pass rate              = 100%
+candidate accuracy            >= 98%
+accuracy delta                >= 0
+judge delta                   >= -0.02
+schema failure rate           <= 0.1%
+token growth                  <= 15%
+latency growth                <= 20%
+average tokens                <= 1500
+P95 latency                   <= 15 seconds
+average request cost          <= USD 0.05
+trace completeness            >= 95%
+```
+
+Promotion is one level at a time and produces only:
+
+```text
+ELIGIBLE_FOR_HUMAN_ADMIT
+HOLD
+REJECT
+```
+
+Machine eligibility does not merge, publish, change repository visibility, or admit the abstraction without Human authority.
+
+The machine schema is `references/meta-abstraction-eval-receipt.schema.json`.
+
+Use `modules/ecommerce-dispute-eval-matrix.md` only as a worked task family. `evals.json` provides its machine-readable inventory. Do not make its USD thresholds, logistics tools, or dispute topology global procedure law.
+
+## Production feedback loop
+
+A production trace may become an Eval only through explicit states:
+
+```text
+PRODUCTION_TRACE
+-> ANOMALY_SELECTED
+-> PII_SCRUBBED
+-> HUMAN_ADJUDICATED
+-> GOLDEN_ADMITTED
+-> REGRESSION_REPLAYED
+```
+
+Do not auto-admit raw traces. Production feedback remains `NOT_EXERCISED` until exact trace, redaction, adjudication, dataset-version, and replay receipts exist.
+
 ## Composition
 
 Use `spatial-loop-systems-engineering` when architecture, state machines, hidden assumptions, failure surfaces, or hard-law discovery are material. This Skill consumes the procedural-grounding contract from that Skill but remains executable as a narrow runtime primitive.
 
-Use domain Skills such as `git-town-stacked-pr-worker`, delivery loops, browser/device harnesses, or project-specific Skills for the actual procedure content. This Skill does not duplicate their logic; it proves adoption and closure.
+Use domain Skills such as `git-town-stacked-pr-worker`, delivery loops, browser/device harnesses, or project-specific Skills for the actual procedure content. This Skill does not duplicate their logic; it proves adoption, closure, and bounded promotion eligibility.
 
 ## Evidence boundary
 
 ```text
 runtime contract/schema/checker/fixtures          IMPLEMENTED
 host-neutral side-effect admission rules          IMPLEMENTED
+meta-abstraction score contract/schema/checker    IMPLEMENTED
+e-commerce worked Eval module                     IMPLEMENTED
+static positive/mutation controls                  IMPLEMENTED
 live Claude/Codex hook integration                NOT_EXERCISED
 live external Skill registry adapter              NOT_EXERCISED
 live browser/device multimodal observer           NOT_EXERCISED
+live Langfuse/OpenTelemetry production feedback   NOT_EXERCISED
 cross-model causal attribution                    NOT_EXERCISED
 private chain-of-thought inspection               OUT_OF_SCOPE
+model-training membership proof                   OUT_OF_SCOPE
 production/security/legal acceptance              HUMAN_ADMIT_REQUIRED
 ```
 
-Do not promote `NOT_EXERCISED` states from prose. Require runtime receipts.
+Do not promote `NOT_EXERCISED` states from prose or static fixtures. Require runtime receipts.

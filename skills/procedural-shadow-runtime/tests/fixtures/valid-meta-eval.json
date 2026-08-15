@@ -1,0 +1,150 @@
+{
+  "schema": "procedural-meta-abstraction-eval/v1",
+  "receipt_id": "meta-eval-receipt-001",
+  "subject": {
+    "repository": "ed3c/skills-shared",
+    "base_sha": "d8706047666a2fb9d621839242820ff3fc5a0e4b",
+    "current_sha": "1111111111111111111111111111111111111111",
+    "runtime": "HOST_NEUTRAL_STATIC_FIXTURE",
+    "model_binding": "candidate-model-v1",
+    "dataset_version": "ecommerce-dispute-evals/v1",
+    "context_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "eval_run_id": "eval-run-001"
+  },
+  "candidate": {
+    "abstraction_id": "meta-policy-side-effect-admission",
+    "current_level": "L3",
+    "target_level": "L4",
+    "source_procedure_ids": [
+      "procedural-shadow.pre-side-effect-gate",
+      "procedural-shadow.receipt-close-gate"
+    ],
+    "source_anchors": [
+      {
+        "repository": "ed3c/skills-shared",
+        "ref": "agent/procedural-shadow-runtime-v1",
+        "path": "skills/procedural-shadow-runtime/SKILL.md",
+        "content_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      }
+    ],
+    "raw_private_reasoning": false
+  },
+  "evaluation_design": {
+    "task_case_count": 36,
+    "trials_per_case": 5,
+    "clean_context_reset": true,
+    "same_runtime_model_bindings": true,
+    "baseline_candidate_same_dataset": true,
+    "dataset_frozen": true,
+    "judge_rubric_version": "agent-architecture-rubric/v1"
+  },
+  "architecture": {
+    "control_flow_state": 5,
+    "tool_boundary_idempotency": 5,
+    "context_budget_memory": 5,
+    "fault_tolerance_self_heal_hitl": 5,
+    "evals_observability": 4,
+    "declared_score": 97.0
+  },
+  "grounding": {
+    "source_fidelity": 0.98,
+    "applicability_precision": 0.96,
+    "decision_coverage": 0.95,
+    "execution_coverage": 0.96,
+    "assertion_coverage": 0.95,
+    "receipt_coverage": 1.0,
+    "harness_coverage": 0.92,
+    "negative_control_pass_rate": 1.0,
+    "must_total": 12,
+    "must_terminal": 12,
+    "unresolved_must": 0,
+    "declared_score": 96.65
+  },
+  "generalization": {
+    "paraphrase_transfer": 0.95,
+    "tool_runtime_transfer": 0.92,
+    "cross_domain_transfer": 0.9,
+    "held_out_family_performance": 0.88,
+    "task_family_count": 4,
+    "held_out_family_count": 1,
+    "conditions_exercised": [
+      "NO_SKILL",
+      "METADATA_ONLY",
+      "FULL_SKILL",
+      "DELTA_CAPSULE",
+      "DELTA_CAPSULE_PLUS_HARNESS"
+    ],
+    "condition_success_rates": {
+      "NO_SKILL": 0.72,
+      "METADATA_ONLY": 0.74,
+      "FULL_SKILL": 0.8,
+      "DELTA_CAPSULE": 0.84,
+      "DELTA_CAPSULE_PLUS_HARNESS": 0.9
+    },
+    "false_constraint_rate": 0.02,
+    "declared_score": 93.7
+  },
+  "regression": {
+    "baseline": {
+      "safety_pass_rate": 1.0,
+      "accuracy": 0.98,
+      "judge_score": 0.91,
+      "avg_tokens": 1120.0,
+      "p95_latency_ms": 4200.0,
+      "avg_cost_usd": 0.038,
+      "schema_failure_rate": 0.0005
+    },
+    "candidate": {
+      "safety_pass_rate": 1.0,
+      "accuracy": 0.985,
+      "judge_score": 0.93,
+      "avg_tokens": 1240.0,
+      "p95_latency_ms": 4500.0,
+      "avg_cost_usd": 0.042,
+      "schema_failure_rate": 0.0004
+    },
+    "deltas": {
+      "accuracy_delta": 0.005,
+      "judge_score_delta": 0.02,
+      "token_growth_ratio": 0.10714286,
+      "latency_growth_ratio": 0.07142857,
+      "cost_growth_ratio": 0.10526316
+    },
+    "feedback": {
+      "traces_observed": 100,
+      "anomalies_selected": 10,
+      "pii_scrubbed": 10,
+      "human_adjudicated": 8,
+      "golden_admitted": 6,
+      "regression_replayed": 6,
+      "trace_completeness": 0.98,
+      "declared_feedback_closure_rate": 0.75,
+      "declared_replay_coverage": 1.0
+    },
+    "declared_score": 96.15
+  },
+  "controls": {
+    "safety_violations": 0,
+    "unauthorized_capability_widening": false,
+    "private_data_egress": false,
+    "raw_private_reasoning": false,
+    "model_weights_or_hidden_cot_claimed": false,
+    "exact_subject_bound": true,
+    "negative_control_executed": true,
+    "source_rights_reviewed": true,
+    "shadow_workers_read_only": true,
+    "human_promotion_authority": true,
+    "production_feedback_evidence_state": "PARTIAL"
+  },
+  "promotion": {
+    "decision": "ELIGIBLE_FOR_HUMAN_ADMIT",
+    "evidence_state": "PASS",
+    "declared_raw_meta_score": 95.9425,
+    "declared_effective_meta_score": 95.9425,
+    "declared_score_ceiling": 100.0,
+    "ceiling_reasons": [],
+    "reasons": [
+      "All L4 machine gates pass; human admission remains required."
+    ]
+  }
+}
