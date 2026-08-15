@@ -1,148 +1,267 @@
-# skills-shared — 跨 repo 共用的基礎設施 skills ＋ 受管的 agent 文件
+# skills-shared — canonical cross-repository Skills
 
-所有 Claude Code 與 Codex CLI 專案共用的 skill 本體住在這裡，**一個名稱只有一份**。
-治理規則、指令與 why 全在 [`skills/shared-skills-infra/SKILL.md`](skills/shared-skills-infra/SKILL.md)；
-裁決帳在 [`registry.json`](registry.json)。本檔是**索引**：說什麼住哪裡、怎麼到達、怎麼驗，不複述規則。
+`skills-shared` is the **Instruction / Method Plane** shared by Claude Code and Codex CLI projects. A shared Skill name has one canonical body and one Git history. Classification authority is [`registry.json`](registry.json); portable behavior lives in each `SKILL.md`.
 
-## 頂層
+> **Agent entry:** read [`AGENTS.md`](AGENTS.md), [`CONTEXT.md`](CONTEXT.md), [`ARCHITECTURE.md`](ARCHITECTURE.md), and [`docs/INDEX.md`](docs/INDEX.md). Current Skill Eval/Evolution truth is in [`docs/AGENT_INTEGRATION_STATE.md`](docs/AGENT_INTEGRATION_STATE.md); target phases are in [`docs/SKILL_EVAL_ROADMAP.md`](docs/SKILL_EVAL_ROADMAP.md).
 
-| 路徑 | 是什麼 |
-|---|---|
-| [`skills/`](skills/) | 22 個共用 skill 的本體（下方逐一索引） |
-| [`registry.json`](registry.json) | 裁決帳：哪個名字是共用、哪個是 repo 自有、為什麼。**只存裁決，不存機器路徑、不存凍結 hash** |
-| `sites.local.json` | 這台機器的路徑（gitignored）。clone 到任何目錄都能用，靠的就是路徑不進版控 |
-| [`migration/`](migration/) | 2026-08-07 收編時被取代的 repo 副本（**移走不刪除**，讓遷移可對帳）＋ [`HANDOFF-2026-08-07.md`](migration/HANDOFF-2026-08-07.md) |
-
-## 拓撲
+## Four-repository role
 
 ```text
-~/.agents/skills-shared/            ← 本 repo（唯一副本，有 git 歷史）
-  skills/<name>/
-        │
-        ├─ ~/.agents/skills/<name>   → symlink（Codex user scope，canonical 側）
-        │        │
-        │        └─ ~/.claude/skills/<name> → ../../.agents/skills/<name>（Claude user scope）
-        │
-        └─ 所有專案自動看得到，包含未來新增的——不需要 per-repo 連結
+skills-shared
+  procedural Skills, generic method contracts, Skill eval/evolution truth
+        |
+        v
+runtime-env
+  secret-free variable/module/profile/workload/policy closure
+        |
+        v
+bettor-arena
+  module composition, proof/control/mutation, Context Capsules,
+  stateless MCP, project bootstrap, origin/external-release acceptance
+        |
+        v
+agent-shield-monorepo
+  domain product modules, provider adapters, and product canaries
 ```
 
-canonical 放 `.agents/` 側有兩個理由：那是 Codex 官方的 skill 發現路徑；且這台機器 user 層
-既有 42 條 symlink 就是 `.claude/ → .agents/` 這個方向，反過來做會製造第二種慣例。
+The arrows represent immutable releases, requirements, bindings, locks, and receipts—not mutable sibling imports. Local symlinks are development projections, not release identity. See [`docs/integration/CROSS_REPO_INTEGRATION.md`](docs/integration/CROSS_REPO_INTEGRATION.md).
 
-**repo 層不放共用 skill。** user 層已覆蓋全部專案，repo 再放一份同名的只會無聲影蓋
-（兩個 host 的 project skill 都優先於 user skill）。repo 層只放它自己真正差異化的 skill。
+## Document routing
 
-## Skill 索引（22 個，全部已登記）
+All four repositories use compatible route names:
 
-「跑」欄標示它自帶 `scripts/` 可執行入口（8 支）。其中 4 支自帶 `--selftest`
-（forgejo-delivery-loop、html-for-decisions、knowledge-continuity、loop-harness-standard），
-5 支另有 `tests/`（github／gitlab-delivery-loop、html-for-decisions、knowledge-continuity、
-shared-skills-infra）。**花錢前先找它自帶的便宜驗證面跑一次**——沒有 ✓ 不代表沒東西可驗，
-代表要進那支 skill 自己看。
+```text
+README.md
+AGENTS.md
+CLAUDE.md
+CONTEXT.md
+ARCHITECTURE.md
+docs/INDEX.md
+docs/architecture/DOCUMENT_ROUTING.md
+docs/architecture/STATE_MACHINES.md
+docs/integration/CROSS_REPO_INTEGRATION.md
+docs/traceability/TRACEABILITY_INDEX.md
+<governed-directory>/README.md
+```
 
-### 治理
+The route is:
 
-| skill | 一句話 | 跑 |
-|---|---|---|
-| [shared-skills-infra](skills/shared-skills-infra/SKILL.md) | 一個名字要嘛共用要嘛 repo 自有，不能兩者皆是；`check` 就是抓「repo 副本無聲影蓋共用版」的那道 | ✓ |
+```text
+task
+→ root procedure/current/stable context
+→ docs index
+→ nearest directory README
+→ machine authority
+→ current evidence and traceability
+```
 
-### 交付追蹤（三個 host，**不可混用**）
+Each hop leaves a local summary before linking away. Markdown is navigation, not a second registry, schema, verifier, receipt, or merge authority.
 
-| skill | 一句話 | 跑 |
-|---|---|---|
-| [forgejo-delivery-loop](skills/forgejo-delivery-loop/SKILL.md) | 本機 Forgejo：四層儀表板（PRD issue／slice／PR／milestone）＋零網路收據閘＋操作層；**也管本 repo 的 agent 文件**（見下節） | ✓ |
-| [github-delivery-loop](skills/github-delivery-loop/SKILL.md) | GitHub：同型閉環＋四層 merge 授權堆疊，`merge_gate.py` 開工前 preflight | ✓ |
-| [gitlab-delivery-loop](skills/gitlab-delivery-loop/SKILL.md) | GitLab／glab：MR 與 issue board 版本。**三者的 registry／receipt 互餵會被拒並指回正確那支** | ✓ |
+## Skill anatomy
 
-### 迴圈工程
+```text
+skills/<name>/
+├── README.md          navigation, ownership, state-machine and data-flow map
+├── SKILL.md           procedural generalization: workflow, method, laws, stop conditions
+├── references/        reusable host-neutral contracts/templates
+├── modules/           domain instances loaded only when their trigger matches
+├── scripts/           executable mechanisms
+├── tests/             positive, hollow, mutation and integration controls
+├── evals.json         eval inventory when used
+└── cases.json         deterministic routing/case inventory when used
+```
 
-| skill | 一句話 | 跑 |
-|---|---|---|
-| [loop-harness-standard](skills/loop-harness-standard/SKILL.md) | 大小迴圈八大基座設計標準：建沙盒、選 driver、分層 verify（T0／G 閘／holdout） | ✓ |
-| [loop-harness-review-handoff](skills/loop-harness-review-handoff/SKILL.md) | 把一次 harness 架構 review 交接給零上下文的 fresh-session reviewer | |
-| [truth-verify-loop](skills/truth-verify-loop/SKILL.md) | 對一組 claim 跑「抽取→多 tier 驗證→跨家族聚合→fresh 判官→純腳本計分」閉環 | |
-| [dr-research-loop](skills/dr-research-loop/SKILL.md) | DR proposal 迴圈 owner：一題研究跑成 proposal 並走完 T0 四閘＋人 admit | |
-| [dr-to-mvp](skills/dr-to-mvp/SKILL.md) | 把研究語料冷啟動成畢業 MVP 的 stateful workflow | |
+The separation is load-bearing:
 
-### 計劃與編排
+- `SKILL.md` remains portable and procedural.
+- `references/` remains reusable and domain-neutral.
+- `modules/` carries detailed Forgejo, repository, provider, or product instances and is loaded on demand.
+- Consumer branch names, paths, credentials, runtime sessions, and live receipts remain in consumer bindings and environments.
 
-| skill | 一句話 | 跑 |
-|---|---|---|
-| [sdlc-plan-composer](skills/sdlc-plan-composer/SKILL.md) | 多階段 SDLC 計劃編排：意圖對齊→不變量抽取→垂直切片→介面設計→執行者選型→驗證契約 | |
-| [unknown-discovery-composer](skills/unknown-discovery-composer/SKILL.md) | 起點在迷霧時用：對 KK／KU／UK／UU 四象限逐一路由，只 surface 不執行 | |
-| [autoresearch-composer](skills/autoresearch-composer/SKILL.md) | 有界 modify→verify→keep/discard 指標迭代迴圈的計劃編排（薄層 router） | |
+Worked patterns:
 
-### 驗證與判準
+- [`knowledge-continuity`](skills/knowledge-continuity/README.md) — procedural continuity loop + generic routing reference + on-demand four-repository example.
+- [`forgejo-delivery-loop`](skills/forgejo-delivery-loop/README.md) — procedural delivery law + generic contracts + Forgejo domain modules + deterministic Bun router + consumer registry binding.
+- [`github-delivery-loop`](skills/github-delivery-loop/README.md) — GitHub delivery, Actions publication, and merge-preflight state machines.
+- [`git-town-stacked-pr-worker`](skills/git-town-stacked-pr-worker/README.md) — portable molecular branch/worktree/sync method.
 
-| skill | 一句話 | 跑 |
-|---|---|---|
-| [judge-loop-chooser](skills/judge-loop-chooser/SKILL.md) | 把一個可判 deliverable 路由到驗證標準、grounding 三態、獨立性 tier 與人閘 | |
-| [path-b-reduction](skills/path-b-reduction/SKILL.md) | 把每個 claim 約分到確定性鐵錨（exit-code／test／selftest／已查證來源），擋認知卸載 | |
-| [external-verify](skills/external-verify/SKILL.md) | 官方規範類 claim 用 primary source 查到鐵錨，不靠訓練記憶或搜尋摘要 | |
+## Repository topology → state-machine ownership
 
-### repo 理解與診斷
+```text
+skills-shared/
+├── registry.json                   shared/repo-owned admission ledger
+├── skills/                         canonical Skill artifact and method state
+├── evals/
+│   ├── cases/                      public dev + gold-replay contracts
+│   ├── holdout/                    sealed post-selection contracts
+│   ├── fixtures/                   replay + verifier calibration inputs
+│   ├── verifiers/                  deterministic outcome authority
+│   ├── runtime/                    executor/model/harness/environment identity
+│   ├── adapters/                   external harness normalization
+│   ├── capability-unlocks.json     verified held-out capability state
+│   ├── releases.json               admitted release registry
+│   └── scorecards/                 ecosystem quality and verified capability
+├── mutations/                      hypothesis/candidate/evidence/promotion lineage
+├── scripts/                        deterministic control-plane transitions
+├── tests/                          regression and mutation-kill proofs
+├── .github/workflows/              orchestration, not semantic authority by itself
+└── docs/                            routing, current handoff, roadmap and traceability
+```
 
-| skill | 一句話 | 跑 |
-|---|---|---|
-| [repo-agent-native](skills/repo-agent-native/SKILL.md) | source-anchored 業務不變量抽取，每個事實帶 Evidence Level ＋ `path:line` | |
-| [repo-wiki-converge](skills/repo-wiki-converge/SKILL.md) | 任意 repo → Opus 級理解 wiki，靠「Opus 判官 × Gemini 作者」judge-loop 收斂 | |
-| [repo-fullstack-debugger](skills/repo-fullstack-debugger/SKILL.md) | 反覆失敗的黑盒診斷外層閉環，畢業成 tested playbook 再 fold-in | |
+## Integrated Skill state machine
 
-### 知識沉澱與產出
+```text
+DISCOVERED
+→ CANONICALIZED
+→ CLAIM_REGISTERED
+→ CASE_BOUND
+→ VERIFIER_CALIBRATED
+→ EXECUTABLE
+→ EVIDENCE_COLLECTED
+→ MUTATION_EVALUATED
+    ├── lost / tie / reverted → PRESERVED
+    └── won + recomputed evidence → PROMOTION_ELIGIBLE
+→ sealed post-selection holdout
+→ CAPABILITY_UNLOCKED
+→ RELEASE_ADMITTED
+→ CANONICAL_RELEASED
+    └── regression / drift → ROLLBACK or new mutation
+```
 
-| skill | 一句話 | 跑 |
-|---|---|---|
-| [fold-in](skills/fold-in/SKILL.md) | 把一段經驗折進既有結構，而不是為每段經驗造新 skill；判 durable home | |
-| [knowledge-continuity](skills/knowledge-continuity/SKILL.md) | 修補文件的知識斷點，讓讀者不必靠記憶補上文中沒給的前提 | ✓ |
-| [html-for-decisions](skills/html-for-decisions/SKILL.md) | 從 Markdown SSOT 產自包含 HTML 決策面與 email bundle；Markdown 永遠是源 | ✓ |
-| [gemini-conversation-research](skills/gemini-conversation-research/SKILL.md) | 把 Gemini 對話的隱性知識結構化，只把真缺口送 Deep Research | ✓ |
+Authority separation is intentional: canonical distribution does not prove capability; an LLM judge does not create hard-gate truth; adaptive mutation cannot read holdout outcomes; ecosystem quality cannot compensate for failed capability gates; release requires deterministic multi-stack evidence, rollback material, and Human Admit.
 
-## 受管的 agent 文件（CLAUDE.md／AGENTS.md）
+## Evidence data flow
 
-集中真源住在 **[`skills/forgejo-delivery-loop/agent-docs/`](skills/forgejo-delivery-loop/agent-docs/)**，
-不是獨立 repo。各 repo 內那份是投影，方向永遠是 `agent-docs → 目標`，閘只比位元。
+```text
+SKILL.md + implementation
+        ├── registry/shared-skills-infra → canonical projection and drift evidence
+        └── cases + sealed holdout
+                    ↓
+        implementation-target validation + verifier calibration
+                    ↓
+        runtime / harness adapters
+                    ↓
+        canonical run trace
+                    ↓
+        deterministic verifier receipt
+                    ↓
+        content-bound evidence bundle
+             ┌──────┴──────┐
+             ↓             ↓
+       mutation lane   sealed holdout lane
+             ↓             ↓
+       lineage and     capability unlock
+       promotion            ↓
+             └────────→ release receipt
+                           ├── separated scorecards
+                           ├── rollback artifact
+                           └── Human Admit
+```
 
-| 路徑 | 是什麼 |
-|---|---|
-| [`agent-docs/README.md`](skills/forgejo-delivery-loop/agent-docs/README.md) | 納管契約、五種輸出的意思、誰掛了 commit 閘誰沒有 |
-| [`agent-docs/HOST-SURFACES.md`](skills/forgejo-delivery-loop/agent-docs/HOST-SURFACES.md) | 兩個 host 各讀哪些檔／優先序／在哪裡靜默失效（官方 URL 錨定） |
-| [`agent-docs/manifest.json`](skills/forgejo-delivery-loop/agent-docs/manifest.json) | 誰被管、哪些缺席是登記過的、預算數字 |
-| [`agent-docs/_template/`](skills/forgejo-delivery-loop/agent-docs/_template/) | 新專案骨架：CLAUDE.md（一行 `@AGENTS.md` import）＋ AGENTS.md（路由層） |
-| `agent-docs/<repo 目錄名>/`、`agent-docs/_global/` | 各 repo 與兩個 host home 的受管檔 |
+## Current implementation state — 2026-08-14
 
-> **已知的規則張力，寫下來不掩蓋**：`registry.json` 的 `_rule` 說共用 skill 是 host 基礎設施、
-> 不含 repo 專屬內容，而 `agent-docs/<repo>/` 正是 repo 專屬內容。當前是刻意的例外
-> （2026-08-08 人裁「集中管理」），尚未在 `_rule` 補上對應條文。
+Landed mechanisms include:
 
-## 指令索引
+- implementation-target binding for real-incident evals (#72);
+- verifier positive/hollow calibration (#73);
+- evidence-driven mutation admission and holdout isolation (#74);
+- canonical-drift mutation proof (#75);
+- verified capability release receipts, scorecard separation, and rollback contract (#76);
+- isolated Shared Skills Infra CI (#77);
+- private GitHub Actions publication gating and billing circuit behavior (issue #43 and the landed implementation line);
+- Intent-Bound Constraint contract, closure evaluator, and adapters for the Git Town, knowledge-continuity, and Forgejo delivery methods (#104, #105, #106, #111);
+- a pinned live Git Town canary that exercises the real binary, linked-worktree sync, and semantic conflict fail-closed behavior (#107);
+- a CI arrival for every skill that ships a test suite, gated so a new suite cannot land without one (#112, #113).
+
+The Phase 4/5 contract Stack is no longer active: #73, #74, and #76 are merged. The four-repository documentation stack has also fully landed, including its convergence owner. There is no open PR at this snapshot; exact open-head identity, when one exists, remains GitHub metadata, not embedded prose.
+
+The Intent-Bound stack merged with a real gap worth carrying forward: two of its five leaves (#105, #106) landed with **no workflow run at their head commits at all**, which let two broken verifiers reach `main` unreported. Absence of a check is not a pass. The convergence report in [`docs/AGENT_INTEGRATION_STATE.md`](docs/AGENT_INTEGRATION_STATE.md) records what that cost and what now prevents it.
+
+The capability/release registries remain intentionally empty:
+
+```text
+evals/capability-unlocks.json  unlocks = []
+evals/releases.json            releases = []
+```
+
+Therefore:
+
+```text
+release hard-gate mechanism     IMPLEMENTED
+first physical capability unlock NOT_EXERCISED / absent
+first canonical capability release NOT_EXERCISED / absent
+```
+
+Real post-selection evidence still requires deterministic verification across at least two real model/harness stacks before Human Admit.
+
+## Git Town / molecular PR model
+
+Git Town is optional tooling; GitHub PR base/head metadata is publication truth.
+
+```text
+independent path-disjoint work
+→ sibling branches
+
+unmerged contract/data dependency
+→ true child branch
+
+smallest reviewable behavior + tests/evidence
+→ terminal leaf
+
+stable merged siblings + shared index/cold-start audit
+→ convergence leaf
+```
+
+The four-repository documentation set was four independent siblings, and all four have merged:
+
+```text
+skills-shared#85            MERGED
+runtime-env#30              MERGED
+agent-shield-monorepo#78    MERGED
+bettor-arena#37             MERGED
+bettor-arena#38             CLOSED (convergence owner)
+```
+
+Exact merged commits are recorded in [`docs/traceability/TRACEABILITY_INDEX.md`](docs/traceability/TRACEABILITY_INDEX.md). The parent contract issue `bettor-arena#35` is still open and is the only live item on that plane.
+
+## Local canonical projection
+
+The repository stores no machine-specific path in versioned contracts. Install/projection discovers the checkout from the running script and writes local path state only to ignored/host-owned surfaces.
 
 ```bash
-INFRA=~/.agents/skills-shared/skills/shared-skills-infra/scripts/shared_skills.py
-DOCS=~/.agents/skills-shared/skills/forgejo-delivery-loop/scripts/agent_docs.py
+python3 skills/shared-skills-infra/scripts/shared_skills.py install \
+  --project /path/to/project-a --project /path/to/project-b
 
-# 共用 skill 治理
-python3 $INFRA install --project ~/proj-a --project ~/proj-b   # 接上這台機器；冪等
-python3 $INFRA check                                           # T0：無影蓋、無未登記
-python3 $INFRA report                                          # 全表分類，待裁決佇列
-bash ~/.agents/skills-shared/skills/shared-skills-infra/tests/verify.sh   # 自測，零網路
-
-# agent 文件漂移
-python3 $DOCS selftest                    # 先證閘會紅（七種植入缺陷 ＋ 乾淨對照）
-python3 $DOCS check                       # 全掃
-python3 $DOCS diff                        # 漂在哪
-python3 $DOCS apply --to-targets          # 真源 → 各 repo（方向必須顯式）
-python3 $DOCS import --key <target>       # 收編某目標的現況為真源
+python3 skills/shared-skills-infra/scripts/shared_skills.py check
+python3 skills/shared-skills-infra/scripts/shared_skills.py report
+bash skills/shared-skills-infra/tests/verify.sh
 ```
 
-`install` 寫路徑 → 連 user 層與各專案 → 跑 `check`。換機器或搬 checkout 後重跑即復原。
-版控內容**沒有任何機器路徑**：canonical 位置由 `__file__` 推導，路徑全在 gitignored 的
-`sites.local.json` 或旗標。
+A project-local shared-name copy is shadowing unless `registry.json` classifies the name as repo-owned.
 
-## 現況（2026-08-08 實測，非抄錄）
+## Evidence states
 
-`shared_skills.py check` 綠：**22 個共用 skill 全部登記且無影蓋**；`registry.json` 另記
-8 個 repo 自有名稱。`agent_docs.py check` 綠：9 個受管檔位元相同。
+```text
+PASS
+FAIL
+ABSENT
+NOT_IMPLEMENTED
+NOT_EXERCISED
+SKIPPED_BY_POLICY
+```
 
-數字別在這裡凍結——`report` 與 `check` 隨時重算，與現實不符的紀錄比沒有紀錄更糟。
-2026-08-07 收編的來龍去脈（26 個同名多份、24 個內容分岔、`deferred_in` 待逐個裁決的變體）
-→ [`migration/HANDOFF-2026-08-07.md`](migration/HANDOFF-2026-08-07.md) 與 `registry.json` 的逐條 `why`。
+A workflow skipped by trigger policy is not execution evidence. A job that never receives a runner is not repository-test FAIL or PASS. Source prose, diagrams, package presence, an old SHA, or another environment cannot create current capability truth.
+
+## Source-proposal boundary
+
+The attached architecture document proposes E2B/Firecracker, local/cloud synchronization, mobile, wallet, security, licensing, cost, latency, and repair. These are candidate domain/provider inputs—not current shared-method or runtime facts. Independent verification, implementation, evals, canaries, receipts, and Human Admit are required.
+
+## Agent continuation checklist
+
+1. Read root routes and [`docs/AGENT_INTEGRATION_STATE.md`](docs/AGENT_INTEGRATION_STATE.md).
+2. Inspect current `main`, exact open PR base/head, and whether owning workflows executed.
+3. Identify the state-machine transition and authority boundary.
+4. Select procedural core, optional references, and domain modules explicitly.
+5. Preserve holdout, verifier, optimizer, release, and Human authorities.
+6. Run the owning positive and hollow/mutation controls.
+7. Update the nearest README, current handoff, and traceability when topology changes.

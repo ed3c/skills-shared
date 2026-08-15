@@ -1,0 +1,9 @@
+{
+  "schema": "github-delivery-local-verification/v1",
+  "repository_id": 456,
+  "head_sha": "572aa3d2f0d50771cf2ab856f59a9b5923fed1f2",
+  "status": "PASS",
+  "verified_at": "2026-08-14T09:59:55Z",
+  "evidence_sha256": "8621e2e1b01762ab69bc210eb6ad3d786f58dd9465f7d48b965bfa8868e72757",
+  "commands": ["local-verification"]
+}

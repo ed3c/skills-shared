@@ -9,10 +9,24 @@ trap 'rm -rf "$scratch"' EXIT
 python3 "$test_dir/test_control.py" -v
 
 mkdir -p "$scratch/repo/.github/workflows" "$scratch/repo/.github-delivery"
-git -C "$scratch/repo" init -q
+git -C "$scratch/repo" init -q -b agent/example
 git -C "$scratch/repo" remote add github git@github.com:ed3c/example.git
 cp "$test_dir/fixtures/verify.yml" "$scratch/repo/.github/workflows/verify.yml"
 cp "$test_dir/fixtures/policy.json" "$scratch/repo/.github-delivery/ci-policy.json"
+cat > "$scratch/repo/.github-delivery/local-verification-contract.json" <<'JSON'
+{
+  "schema": "github-delivery-local-verification-contract/v1",
+  "repository_id": 123,
+  "inherit_env": ["PATH"],
+  "commands": [{
+    "id": "fixture",
+    "argv": ["python3", "-c", "print('ok')"],
+    "cwd": ".",
+    "timeout_seconds": 10,
+    "max_output_bytes": 4096
+  }]
+}
+JSON
 printf 'ok\n' > "$scratch/repo/README.md"
 git -C "$scratch/repo" add .
 git -C "$scratch/repo" -c user.name=Test -c user.email=test@example.invalid commit -qm 'test fixture'
@@ -33,21 +47,30 @@ from pathlib import Path
 
 receipt = json.loads(Path(sys.argv[1]).read_text())
 snapshot = {
-    "schema": "github-ci-publish-snapshot/v1",
-    "repository": "ed3c/example",
-    "repository_owner": "ed3c",
-    "private": True,
-    "intent": "initial-pr",
-    "local_head": receipt["head_sha"],
-    "local_verification": {
-        "head_sha": receipt["head_sha"],
-        "status": receipt["status"],
-        "completed_at": receipt["completed_at"],
+    "schema": "github-actions-publish-snapshot/v4",
+    "repository": {
+        "full_name": "ed3c/example",
+        "repository_id": 123,
+        "owner_login": "ed3c",
+        "private": True,
     },
-    "pull_request": None,
-    "actionable_feedback": None,
-    "billing_blocker": None,
-    "recovery": None,
+    "branch": {"name": "agent/example", "head_sha": None},
+    "initial_boundary": "trusted-initial",
+    "pull_request": {
+        "number": None,
+        "state": "absent",
+        "head_sha": None,
+        "last_published_sha": None,
+        "last_published_at": None,
+        "feedback": None,
+    },
+    "actions": {
+        "circuit": "closed",
+        "observed_at": None,
+        "blocker": None,
+        "latest_check": None,
+    },
+    "captured_at": __import__("datetime").datetime.now(__import__("datetime").timezone.utc).isoformat().replace("+00:00", "Z"),
 }
 Path(sys.argv[2]).write_text(json.dumps(snapshot))
 PY
@@ -55,17 +78,23 @@ PY
 python3 "$skill_dir/scripts/ci_publish.py" publish \
   --repo-root "$scratch/repo" \
   --snapshot "$scratch/snapshot.json" \
+  --intent initial-pr \
   --remote github \
-  --branch agent/example > "$scratch/publish.out"
-grep -F 'ALLOW initial-pr DRY-RUN' "$scratch/publish.out"
+  --branch agent/example \
+  --pr-title 'Fixture PR' \
+  --pr-body 'Fixture body' > "$scratch/publish.out"
+grep -F 'ALLOW allow-initial-pr DRY-RUN' "$scratch/publish.out"
 grep -F 'git push github ' "$scratch/publish.out"
 
 printf 'dirty\n' >> "$scratch/repo/README.md"
 if python3 "$skill_dir/scripts/ci_publish.py" publish \
   --repo-root "$scratch/repo" \
   --snapshot "$scratch/snapshot.json" \
+  --intent initial-pr \
   --remote github \
-  --branch agent/example > "$scratch/dirty.out" 2> "$scratch/dirty.err"; then
+  --branch agent/example \
+  --pr-title 'Fixture PR' \
+  --pr-body 'Fixture body' > "$scratch/dirty.out" 2> "$scratch/dirty.err"; then
   echo 'FAIL: dirty worktree was admitted using an exact-HEAD receipt' >&2
   exit 1
 fi

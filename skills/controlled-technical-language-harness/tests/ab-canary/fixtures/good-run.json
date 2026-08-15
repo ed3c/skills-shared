@@ -1,0 +1,1079 @@
+{
+  "budget": {
+    "max_model_calls": 2,
+    "max_retries": 1,
+    "max_tool_calls": 2,
+    "seed": 7
+  },
+  "compliance_claim": "HUMAN_ADMIT_REQUIRED",
+  "conditions": [
+    {
+      "name": "no_skill",
+      "observed_budget": {
+        "max_model_calls": 2,
+        "max_retries": 1,
+        "max_tool_calls": 2,
+        "seed": 7
+      },
+      "results": [
+        {
+          "case_id": "procedural-budget",
+          "compliance_claim_made": false,
+          "deterministic_status": "PASS",
+          "evaluator_calls": 2,
+          "execution_lane": "LOCAL_ONLY",
+          "expected_violations": [],
+          "final_status": "PASS",
+          "human_override": false,
+          "human_review": {
+            "generated_by_agent": false
+          },
+          "latency_ms": 10,
+          "meaning_preservation_score": 1.0,
+          "provider_calls": 0,
+          "repair_attempts": 0,
+          "repair_converged": false,
+          "repair_stopped_no_improvement": false,
+          "restricted": false,
+          "span_valid": true,
+          "step_order_preserved": true,
+          "tokens_in": 100,
+          "tokens_out": 50,
+          "tool_calls": 1,
+          "violations_found": [],
+          "warnings_preserved": true
+        },
+        {
+          "case_id": "descriptive-budget",
+          "compliance_claim_made": false,
+          "deterministic_status": "PASS",
+          "evaluator_calls": 2,
+          "execution_lane": "LOCAL_ONLY",
+          "expected_violations": [],
+          "final_status": "PASS",
+          "human_override": false,
+          "human_review": {
+            "generated_by_agent": false
+          },
+          "latency_ms": 10,
+          "meaning_preservation_score": 1.0,
+          "provider_calls": 0,
+          "repair_attempts": 0,
+          "repair_converged": false,
+          "repair_stopped_no_improvement": false,
+          "restricted": false,
+          "span_valid": true,
+          "step_order_preserved": true,
+          "tokens_in": 100,
+          "tokens_out": 50,
+          "tool_calls": 1,
+          "violations_found": [],
+          "warnings_preserved": true
+        },
+        {
+          "case_id": "multiword-tn",
+          "compliance_claim_made": false,
+          "deterministic_status": "PASS",
+          "evaluator_calls": 2,
+          "execution_lane": "LOCAL_ONLY",
+          "expected_violations": [],
+          "final_status": "PASS",
+          "human_override": false,
+          "human_review": {
+            "generated_by_agent": false
+          },
+          "latency_ms": 10,
+          "meaning_preservation_score": 1.0,
+          "provider_calls": 0,
+          "repair_attempts": 0,
+          "repair_converged": false,
+          "repair_stopped_no_improvement": false,
+          "restricted": false,
+          "span_valid": true,
+          "step_order_preserved": true,
+          "tokens_in": 100,
+          "tokens_out": 50,
+          "tool_calls": 1,
+          "violations_found": [],
+          "warnings_preserved": true
+        },
+        {
+          "case_id": "forbidden-token",
+          "compliance_claim_made": false,
+          "deterministic_status": "PASS",
+          "evaluator_calls": 2,
+          "execution_lane": "LOCAL_ONLY",
+          "expected_violations": [],
+          "final_status": "PASS",
+          "human_override": false,
+          "human_review": {
+            "generated_by_agent": false
+          },
+          "latency_ms": 10,
+          "meaning_preservation_score": 1.0,
+          "provider_calls": 0,
+          "repair_attempts": 0,
+          "repair_converged": false,
+          "repair_stopped_no_improvement": false,
+          "restricted": false,
+          "span_valid": true,
+          "step_order_preserved": true,
+          "tokens_in": 100,
+          "tokens_out": 50,
+          "tool_calls": 1,
+          "violations_found": [],
+          "warnings_preserved": true
+        }
+      ],
+      "skill_content_included": false
+    },
+    {
+      "name": "prompt_only_baseline",
+      "observed_budget": {
+        "max_model_calls": 2,
+        "max_retries": 1,
+        "max_tool_calls": 2,
+        "seed": 7
+      },
+      "results": [
+        {
+          "case_id": "procedural-budget",
+          "compliance_claim_made": false,
+          "deterministic_status": "PASS",
+          "evaluator_calls": 2,
+          "execution_lane": "LOCAL_ONLY",
+          "expected_violations": [],
+          "final_status": "PASS",
+          "human_override": false,
+          "human_review": {
+            "generated_by_agent": false
+          },
+          "latency_ms": 10,
+          "meaning_preservation_score": 1.0,
+          "provider_calls": 0,
+          "repair_attempts": 0,
+          "repair_converged": false,
+          "repair_stopped_no_improvement": false,
+          "restricted": false,
+          "span_valid": true,
+          "step_order_preserved": true,
+          "tokens_in": 100,
+          "tokens_out": 50,
+          "tool_calls": 1,
+          "violations_found": [],
+          "warnings_preserved": true
+        },
+        {
+          "case_id": "descriptive-budget",
+          "compliance_claim_made": false,
+          "deterministic_status": "PASS",
+          "evaluator_calls": 2,
+          "execution_lane": "LOCAL_ONLY",
+          "expected_violations": [],
+          "final_status": "PASS",
+          "human_override": false,
+          "human_review": {
+            "generated_by_agent": false
+          },
+          "latency_ms": 10,
+          "meaning_preservation_score": 1.0,
+          "provider_calls": 0,
+          "repair_attempts": 0,
+          "repair_converged": false,
+          "repair_stopped_no_improvement": false,
+          "restricted": false,
+          "span_valid": true,
+          "step_order_preserved": true,
+          "tokens_in": 100,
+          "tokens_out": 50,
+          "tool_calls": 1,
+          "violations_found": [],
+          "warnings_preserved": true
+        },
+        {
+          "case_id": "multiword-tn",
+          "compliance_claim_made": false,
+          "deterministic_status": "PASS",
+          "evaluator_calls": 2,
+          "execution_lane": "LOCAL_ONLY",
+          "expected_violations": [],
+          "final_status": "PASS",
+          "human_override": false,
+          "human_review": {
+            "generated_by_agent": false
+          },
+          "latency_ms": 10,
+          "meaning_preservation_score": 1.0,
+          "provider_calls": 0,
+          "repair_attempts": 0,
+          "repair_converged": false,
+          "repair_stopped_no_improvement": false,
+          "restricted": false,
+          "span_valid": true,
+          "step_order_preserved": true,
+          "tokens_in": 100,
+          "tokens_out": 50,
+          "tool_calls": 1,
+          "violations_found": [],
+          "warnings_preserved": true
+        },
+        {
+          "case_id": "forbidden-token",
+          "compliance_claim_made": false,
+          "deterministic_status": "PASS",
+          "evaluator_calls": 2,
+          "execution_lane": "LOCAL_ONLY",
+          "expected_violations": [],
+          "final_status": "PASS",
+          "human_override": false,
+          "human_review": {
+            "generated_by_agent": false
+          },
+          "latency_ms": 10,
+          "meaning_preservation_score": 1.0,
+          "provider_calls": 0,
+          "repair_attempts": 0,
+          "repair_converged": false,
+          "repair_stopped_no_improvement": false,
+          "restricted": false,
+          "span_valid": true,
+          "step_order_preserved": true,
+          "tokens_in": 100,
+          "tokens_out": 50,
+          "tool_calls": 1,
+          "violations_found": [],
+          "warnings_preserved": true
+        }
+      ],
+      "skill_content_included": false
+    },
+    {
+      "name": "candidate_skill",
+      "observed_budget": {
+        "max_model_calls": 2,
+        "max_retries": 1,
+        "max_tool_calls": 2,
+        "seed": 7
+      },
+      "results": [
+        {
+          "case_id": "procedural-budget",
+          "compliance_claim_made": false,
+          "deterministic_status": "PASS",
+          "evaluator_calls": 2,
+          "execution_lane": "LOCAL_ONLY",
+          "expected_violations": [],
+          "final_status": "PASS",
+          "human_override": false,
+          "human_review": {
+            "generated_by_agent": false
+          },
+          "latency_ms": 10,
+          "meaning_preservation_score": 1.0,
+          "provider_calls": 0,
+          "repair_attempts": 0,
+          "repair_converged": false,
+          "repair_stopped_no_improvement": false,
+          "restricted": false,
+          "span_valid": true,
+          "step_order_preserved": true,
+          "tokens_in": 100,
+          "tokens_out": 50,
+          "tool_calls": 1,
+          "violations_found": [],
+          "warnings_preserved": true
+        },
+        {
+          "case_id": "descriptive-budget",
+          "compliance_claim_made": false,
+          "deterministic_status": "PASS",
+          "evaluator_calls": 2,
+          "execution_lane": "LOCAL_ONLY",
+          "expected_violations": [],
+          "final_status": "PASS",
+          "human_override": false,
+          "human_review": {
+            "generated_by_agent": false
+          },
+          "latency_ms": 10,
+          "meaning_preservation_score": 1.0,
+          "provider_calls": 0,
+          "repair_attempts": 0,
+          "repair_converged": false,
+          "repair_stopped_no_improvement": false,
+          "restricted": false,
+          "span_valid": true,
+          "step_order_preserved": true,
+          "tokens_in": 100,
+          "tokens_out": 50,
+          "tool_calls": 1,
+          "violations_found": [],
+          "warnings_preserved": true
+        },
+        {
+          "case_id": "multiword-tn",
+          "compliance_claim_made": false,
+          "deterministic_status": "PASS",
+          "evaluator_calls": 2,
+          "execution_lane": "LOCAL_ONLY",
+          "expected_violations": [],
+          "final_status": "PASS",
+          "human_override": false,
+          "human_review": {
+            "generated_by_agent": false
+          },
+          "latency_ms": 10,
+          "meaning_preservation_score": 1.0,
+          "provider_calls": 0,
+          "repair_attempts": 0,
+          "repair_converged": false,
+          "repair_stopped_no_improvement": false,
+          "restricted": false,
+          "span_valid": true,
+          "step_order_preserved": true,
+          "tokens_in": 100,
+          "tokens_out": 50,
+          "tool_calls": 1,
+          "violations_found": [],
+          "warnings_preserved": true
+        },
+        {
+          "case_id": "forbidden-token",
+          "compliance_claim_made": false,
+          "deterministic_status": "PASS",
+          "evaluator_calls": 2,
+          "execution_lane": "LOCAL_ONLY",
+          "expected_violations": [],
+          "final_status": "PASS",
+          "human_override": false,
+          "human_review": {
+            "generated_by_agent": false
+          },
+          "latency_ms": 10,
+          "meaning_preservation_score": 1.0,
+          "provider_calls": 0,
+          "repair_attempts": 0,
+          "repair_converged": false,
+          "repair_stopped_no_improvement": false,
+          "restricted": false,
+          "span_valid": true,
+          "step_order_preserved": true,
+          "tokens_in": 100,
+          "tokens_out": 50,
+          "tool_calls": 1,
+          "violations_found": [],
+          "warnings_preserved": true
+        }
+      ],
+      "skill_content_included": true
+    },
+    {
+      "name": "wrong_profile",
+      "observed_budget": {
+        "max_model_calls": 2,
+        "max_retries": 1,
+        "max_tool_calls": 2,
+        "seed": 7
+      },
+      "results": [
+        {
+          "case_id": "procedural-budget",
+          "compliance_claim_made": false,
+          "deterministic_status": "FAIL",
+          "evaluator_calls": 2,
+          "execution_lane": "LOCAL_ONLY",
+          "expected_violations": [
+            "V-BUDGET"
+          ],
+          "final_status": "FAIL",
+          "human_override": false,
+          "human_review": {
+            "generated_by_agent": false
+          },
+          "latency_ms": 10,
+          "meaning_preservation_score": 0.5,
+          "provider_calls": 0,
+          "repair_attempts": 0,
+          "repair_converged": false,
+          "repair_stopped_no_improvement": false,
+          "restricted": false,
+          "span_valid": true,
+          "step_order_preserved": true,
+          "tokens_in": 100,
+          "tokens_out": 50,
+          "tool_calls": 1,
+          "violations_found": [
+            "V-BUDGET"
+          ],
+          "warnings_preserved": true
+        },
+        {
+          "case_id": "descriptive-budget",
+          "compliance_claim_made": false,
+          "deterministic_status": "FAIL",
+          "evaluator_calls": 2,
+          "execution_lane": "LOCAL_ONLY",
+          "expected_violations": [
+            "V-BUDGET"
+          ],
+          "final_status": "FAIL",
+          "human_override": false,
+          "human_review": {
+            "generated_by_agent": false
+          },
+          "latency_ms": 10,
+          "meaning_preservation_score": 0.5,
+          "provider_calls": 0,
+          "repair_attempts": 0,
+          "repair_converged": false,
+          "repair_stopped_no_improvement": false,
+          "restricted": false,
+          "span_valid": true,
+          "step_order_preserved": true,
+          "tokens_in": 100,
+          "tokens_out": 50,
+          "tool_calls": 1,
+          "violations_found": [
+            "V-BUDGET"
+          ],
+          "warnings_preserved": true
+        },
+        {
+          "case_id": "multiword-tn",
+          "compliance_claim_made": false,
+          "deterministic_status": "FAIL",
+          "evaluator_calls": 2,
+          "execution_lane": "LOCAL_ONLY",
+          "expected_violations": [
+            "V-BUDGET"
+          ],
+          "final_status": "FAIL",
+          "human_override": false,
+          "human_review": {
+            "generated_by_agent": false
+          },
+          "latency_ms": 10,
+          "meaning_preservation_score": 0.5,
+          "provider_calls": 0,
+          "repair_attempts": 0,
+          "repair_converged": false,
+          "repair_stopped_no_improvement": false,
+          "restricted": false,
+          "span_valid": true,
+          "step_order_preserved": true,
+          "tokens_in": 100,
+          "tokens_out": 50,
+          "tool_calls": 1,
+          "violations_found": [
+            "V-BUDGET"
+          ],
+          "warnings_preserved": true
+        },
+        {
+          "case_id": "forbidden-token",
+          "compliance_claim_made": false,
+          "deterministic_status": "FAIL",
+          "evaluator_calls": 2,
+          "execution_lane": "LOCAL_ONLY",
+          "expected_violations": [
+            "V-BUDGET"
+          ],
+          "final_status": "FAIL",
+          "human_override": false,
+          "human_review": {
+            "generated_by_agent": false
+          },
+          "latency_ms": 10,
+          "meaning_preservation_score": 0.5,
+          "provider_calls": 0,
+          "repair_attempts": 0,
+          "repair_converged": false,
+          "repair_stopped_no_improvement": false,
+          "restricted": false,
+          "span_valid": true,
+          "step_order_preserved": true,
+          "tokens_in": 100,
+          "tokens_out": 50,
+          "tool_calls": 1,
+          "violations_found": [
+            "V-BUDGET"
+          ],
+          "warnings_preserved": true
+        }
+      ],
+      "skill_content_included": true
+    },
+    {
+      "name": "stale_termbase",
+      "observed_budget": {
+        "max_model_calls": 2,
+        "max_retries": 1,
+        "max_tool_calls": 2,
+        "seed": 7
+      },
+      "results": [
+        {
+          "case_id": "procedural-budget",
+          "compliance_claim_made": false,
+          "deterministic_status": "FAIL",
+          "evaluator_calls": 2,
+          "execution_lane": "LOCAL_ONLY",
+          "expected_violations": [
+            "V-BUDGET"
+          ],
+          "final_status": "FAIL",
+          "human_override": false,
+          "human_review": {
+            "generated_by_agent": false
+          },
+          "latency_ms": 10,
+          "meaning_preservation_score": 0.5,
+          "provider_calls": 0,
+          "repair_attempts": 0,
+          "repair_converged": false,
+          "repair_stopped_no_improvement": false,
+          "restricted": false,
+          "span_valid": true,
+          "step_order_preserved": true,
+          "tokens_in": 100,
+          "tokens_out": 50,
+          "tool_calls": 1,
+          "violations_found": [
+            "V-BUDGET"
+          ],
+          "warnings_preserved": true
+        },
+        {
+          "case_id": "descriptive-budget",
+          "compliance_claim_made": false,
+          "deterministic_status": "FAIL",
+          "evaluator_calls": 2,
+          "execution_lane": "LOCAL_ONLY",
+          "expected_violations": [
+            "V-BUDGET"
+          ],
+          "final_status": "FAIL",
+          "human_override": false,
+          "human_review": {
+            "generated_by_agent": false
+          },
+          "latency_ms": 10,
+          "meaning_preservation_score": 0.5,
+          "provider_calls": 0,
+          "repair_attempts": 0,
+          "repair_converged": false,
+          "repair_stopped_no_improvement": false,
+          "restricted": false,
+          "span_valid": true,
+          "step_order_preserved": true,
+          "tokens_in": 100,
+          "tokens_out": 50,
+          "tool_calls": 1,
+          "violations_found": [
+            "V-BUDGET"
+          ],
+          "warnings_preserved": true
+        },
+        {
+          "case_id": "multiword-tn",
+          "compliance_claim_made": false,
+          "deterministic_status": "FAIL",
+          "evaluator_calls": 2,
+          "execution_lane": "LOCAL_ONLY",
+          "expected_violations": [
+            "V-BUDGET"
+          ],
+          "final_status": "FAIL",
+          "human_override": false,
+          "human_review": {
+            "generated_by_agent": false
+          },
+          "latency_ms": 10,
+          "meaning_preservation_score": 0.5,
+          "provider_calls": 0,
+          "repair_attempts": 0,
+          "repair_converged": false,
+          "repair_stopped_no_improvement": false,
+          "restricted": false,
+          "span_valid": true,
+          "step_order_preserved": true,
+          "tokens_in": 100,
+          "tokens_out": 50,
+          "tool_calls": 1,
+          "violations_found": [
+            "V-BUDGET"
+          ],
+          "warnings_preserved": true
+        },
+        {
+          "case_id": "forbidden-token",
+          "compliance_claim_made": false,
+          "deterministic_status": "FAIL",
+          "evaluator_calls": 2,
+          "execution_lane": "LOCAL_ONLY",
+          "expected_violations": [
+            "V-BUDGET"
+          ],
+          "final_status": "FAIL",
+          "human_override": false,
+          "human_review": {
+            "generated_by_agent": false
+          },
+          "latency_ms": 10,
+          "meaning_preservation_score": 0.5,
+          "provider_calls": 0,
+          "repair_attempts": 0,
+          "repair_converged": false,
+          "repair_stopped_no_improvement": false,
+          "restricted": false,
+          "span_valid": true,
+          "step_order_preserved": true,
+          "tokens_in": 100,
+          "tokens_out": 50,
+          "tool_calls": 1,
+          "violations_found": [
+            "V-BUDGET"
+          ],
+          "warnings_preserved": true
+        }
+      ],
+      "skill_content_included": true
+    },
+    {
+      "name": "missing_human_review",
+      "observed_budget": {
+        "max_model_calls": 2,
+        "max_retries": 1,
+        "max_tool_calls": 2,
+        "seed": 7
+      },
+      "results": [
+        {
+          "case_id": "procedural-budget",
+          "compliance_claim_made": false,
+          "deterministic_status": "FAIL",
+          "evaluator_calls": 2,
+          "execution_lane": "LOCAL_ONLY",
+          "expected_violations": [
+            "V-BUDGET"
+          ],
+          "final_status": "FAIL",
+          "human_override": false,
+          "human_review": null,
+          "latency_ms": 10,
+          "meaning_preservation_score": 0.5,
+          "provider_calls": 0,
+          "repair_attempts": 0,
+          "repair_converged": false,
+          "repair_stopped_no_improvement": false,
+          "restricted": false,
+          "span_valid": true,
+          "step_order_preserved": true,
+          "tokens_in": 100,
+          "tokens_out": 50,
+          "tool_calls": 1,
+          "violations_found": [
+            "V-BUDGET"
+          ],
+          "warnings_preserved": true
+        },
+        {
+          "case_id": "descriptive-budget",
+          "compliance_claim_made": false,
+          "deterministic_status": "FAIL",
+          "evaluator_calls": 2,
+          "execution_lane": "LOCAL_ONLY",
+          "expected_violations": [
+            "V-BUDGET"
+          ],
+          "final_status": "FAIL",
+          "human_override": false,
+          "human_review": null,
+          "latency_ms": 10,
+          "meaning_preservation_score": 0.5,
+          "provider_calls": 0,
+          "repair_attempts": 0,
+          "repair_converged": false,
+          "repair_stopped_no_improvement": false,
+          "restricted": false,
+          "span_valid": true,
+          "step_order_preserved": true,
+          "tokens_in": 100,
+          "tokens_out": 50,
+          "tool_calls": 1,
+          "violations_found": [
+            "V-BUDGET"
+          ],
+          "warnings_preserved": true
+        },
+        {
+          "case_id": "multiword-tn",
+          "compliance_claim_made": false,
+          "deterministic_status": "FAIL",
+          "evaluator_calls": 2,
+          "execution_lane": "LOCAL_ONLY",
+          "expected_violations": [
+            "V-BUDGET"
+          ],
+          "final_status": "FAIL",
+          "human_override": false,
+          "human_review": null,
+          "latency_ms": 10,
+          "meaning_preservation_score": 0.5,
+          "provider_calls": 0,
+          "repair_attempts": 0,
+          "repair_converged": false,
+          "repair_stopped_no_improvement": false,
+          "restricted": false,
+          "span_valid": true,
+          "step_order_preserved": true,
+          "tokens_in": 100,
+          "tokens_out": 50,
+          "tool_calls": 1,
+          "violations_found": [
+            "V-BUDGET"
+          ],
+          "warnings_preserved": true
+        },
+        {
+          "case_id": "forbidden-token",
+          "compliance_claim_made": false,
+          "deterministic_status": "FAIL",
+          "evaluator_calls": 2,
+          "execution_lane": "LOCAL_ONLY",
+          "expected_violations": [
+            "V-BUDGET"
+          ],
+          "final_status": "FAIL",
+          "human_override": false,
+          "human_review": null,
+          "latency_ms": 10,
+          "meaning_preservation_score": 0.5,
+          "provider_calls": 0,
+          "repair_attempts": 0,
+          "repair_converged": false,
+          "repair_stopped_no_improvement": false,
+          "restricted": false,
+          "span_valid": true,
+          "step_order_preserved": true,
+          "tokens_in": 100,
+          "tokens_out": 50,
+          "tool_calls": 1,
+          "violations_found": [
+            "V-BUDGET"
+          ],
+          "warnings_preserved": true
+        }
+      ],
+      "skill_content_included": true
+    },
+    {
+      "name": "restricted_external_attempt",
+      "observed_budget": {
+        "max_model_calls": 2,
+        "max_retries": 1,
+        "max_tool_calls": 2,
+        "seed": 7
+      },
+      "results": [
+        {
+          "case_id": "procedural-budget",
+          "compliance_claim_made": false,
+          "deterministic_status": "FAIL",
+          "evaluator_calls": 2,
+          "execution_lane": "LOCAL_ONLY",
+          "expected_violations": [
+            "V-BUDGET"
+          ],
+          "final_status": "FAIL",
+          "human_override": false,
+          "human_review": {
+            "generated_by_agent": false
+          },
+          "latency_ms": 10,
+          "meaning_preservation_score": 0.5,
+          "provider_calls": 0,
+          "repair_attempts": 0,
+          "repair_converged": false,
+          "repair_stopped_no_improvement": false,
+          "restricted": true,
+          "span_valid": true,
+          "step_order_preserved": true,
+          "tokens_in": 100,
+          "tokens_out": 50,
+          "tool_calls": 1,
+          "violations_found": [
+            "V-BUDGET"
+          ],
+          "warnings_preserved": true
+        },
+        {
+          "case_id": "descriptive-budget",
+          "compliance_claim_made": false,
+          "deterministic_status": "FAIL",
+          "evaluator_calls": 2,
+          "execution_lane": "LOCAL_ONLY",
+          "expected_violations": [
+            "V-BUDGET"
+          ],
+          "final_status": "FAIL",
+          "human_override": false,
+          "human_review": {
+            "generated_by_agent": false
+          },
+          "latency_ms": 10,
+          "meaning_preservation_score": 0.5,
+          "provider_calls": 0,
+          "repair_attempts": 0,
+          "repair_converged": false,
+          "repair_stopped_no_improvement": false,
+          "restricted": true,
+          "span_valid": true,
+          "step_order_preserved": true,
+          "tokens_in": 100,
+          "tokens_out": 50,
+          "tool_calls": 1,
+          "violations_found": [
+            "V-BUDGET"
+          ],
+          "warnings_preserved": true
+        },
+        {
+          "case_id": "multiword-tn",
+          "compliance_claim_made": false,
+          "deterministic_status": "FAIL",
+          "evaluator_calls": 2,
+          "execution_lane": "LOCAL_ONLY",
+          "expected_violations": [
+            "V-BUDGET"
+          ],
+          "final_status": "FAIL",
+          "human_override": false,
+          "human_review": {
+            "generated_by_agent": false
+          },
+          "latency_ms": 10,
+          "meaning_preservation_score": 0.5,
+          "provider_calls": 0,
+          "repair_attempts": 0,
+          "repair_converged": false,
+          "repair_stopped_no_improvement": false,
+          "restricted": true,
+          "span_valid": true,
+          "step_order_preserved": true,
+          "tokens_in": 100,
+          "tokens_out": 50,
+          "tool_calls": 1,
+          "violations_found": [
+            "V-BUDGET"
+          ],
+          "warnings_preserved": true
+        },
+        {
+          "case_id": "forbidden-token",
+          "compliance_claim_made": false,
+          "deterministic_status": "FAIL",
+          "evaluator_calls": 2,
+          "execution_lane": "LOCAL_ONLY",
+          "expected_violations": [
+            "V-BUDGET"
+          ],
+          "final_status": "FAIL",
+          "human_override": false,
+          "human_review": {
+            "generated_by_agent": false
+          },
+          "latency_ms": 10,
+          "meaning_preservation_score": 0.5,
+          "provider_calls": 0,
+          "repair_attempts": 0,
+          "repair_converged": false,
+          "repair_stopped_no_improvement": false,
+          "restricted": true,
+          "span_valid": true,
+          "step_order_preserved": true,
+          "tokens_in": 100,
+          "tokens_out": 50,
+          "tool_calls": 1,
+          "violations_found": [
+            "V-BUDGET"
+          ],
+          "warnings_preserved": true
+        }
+      ],
+      "skill_content_included": true
+    },
+    {
+      "name": "lossy_document_rewrite",
+      "observed_budget": {
+        "max_model_calls": 2,
+        "max_retries": 1,
+        "max_tool_calls": 2,
+        "seed": 7
+      },
+      "results": [
+        {
+          "case_id": "procedural-budget",
+          "compliance_claim_made": false,
+          "deterministic_status": "FAIL",
+          "evaluator_calls": 2,
+          "execution_lane": "LOCAL_ONLY",
+          "expected_violations": [
+            "V-BUDGET"
+          ],
+          "final_status": "FAIL",
+          "human_override": false,
+          "human_review": {
+            "generated_by_agent": false
+          },
+          "latency_ms": 10,
+          "meaning_preservation_score": 0.5,
+          "provider_calls": 0,
+          "repair_attempts": 0,
+          "repair_converged": false,
+          "repair_stopped_no_improvement": false,
+          "restricted": false,
+          "span_valid": true,
+          "step_order_preserved": false,
+          "tokens_in": 100,
+          "tokens_out": 50,
+          "tool_calls": 1,
+          "violations_found": [
+            "V-BUDGET"
+          ],
+          "warnings_preserved": false
+        },
+        {
+          "case_id": "descriptive-budget",
+          "compliance_claim_made": false,
+          "deterministic_status": "FAIL",
+          "evaluator_calls": 2,
+          "execution_lane": "LOCAL_ONLY",
+          "expected_violations": [
+            "V-BUDGET"
+          ],
+          "final_status": "FAIL",
+          "human_override": false,
+          "human_review": {
+            "generated_by_agent": false
+          },
+          "latency_ms": 10,
+          "meaning_preservation_score": 0.5,
+          "provider_calls": 0,
+          "repair_attempts": 0,
+          "repair_converged": false,
+          "repair_stopped_no_improvement": false,
+          "restricted": false,
+          "span_valid": true,
+          "step_order_preserved": false,
+          "tokens_in": 100,
+          "tokens_out": 50,
+          "tool_calls": 1,
+          "violations_found": [
+            "V-BUDGET"
+          ],
+          "warnings_preserved": false
+        },
+        {
+          "case_id": "multiword-tn",
+          "compliance_claim_made": false,
+          "deterministic_status": "FAIL",
+          "evaluator_calls": 2,
+          "execution_lane": "LOCAL_ONLY",
+          "expected_violations": [
+            "V-BUDGET"
+          ],
+          "final_status": "FAIL",
+          "human_override": false,
+          "human_review": {
+            "generated_by_agent": false
+          },
+          "latency_ms": 10,
+          "meaning_preservation_score": 0.5,
+          "provider_calls": 0,
+          "repair_attempts": 0,
+          "repair_converged": false,
+          "repair_stopped_no_improvement": false,
+          "restricted": false,
+          "span_valid": true,
+          "step_order_preserved": false,
+          "tokens_in": 100,
+          "tokens_out": 50,
+          "tool_calls": 1,
+          "violations_found": [
+            "V-BUDGET"
+          ],
+          "warnings_preserved": false
+        },
+        {
+          "case_id": "forbidden-token",
+          "compliance_claim_made": false,
+          "deterministic_status": "FAIL",
+          "evaluator_calls": 2,
+          "execution_lane": "LOCAL_ONLY",
+          "expected_violations": [
+            "V-BUDGET"
+          ],
+          "final_status": "FAIL",
+          "human_override": false,
+          "human_review": {
+            "generated_by_agent": false
+          },
+          "latency_ms": 10,
+          "meaning_preservation_score": 0.5,
+          "provider_calls": 0,
+          "repair_attempts": 0,
+          "repair_converged": false,
+          "repair_stopped_no_improvement": false,
+          "restricted": false,
+          "span_valid": true,
+          "step_order_preserved": false,
+          "tokens_in": 100,
+          "tokens_out": 50,
+          "tool_calls": 1,
+          "violations_found": [
+            "V-BUDGET"
+          ],
+          "warnings_preserved": false
+        }
+      ],
+      "skill_content_included": true
+    }
+  ],
+  "declared_case_count": 4,
+  "environment_identity": {
+    "id": "fixture-env",
+    "version": "1.0.0"
+  },
+  "evaluator_identities": [
+    {
+      "artifact_digest": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "id": "check_exact_evidence",
+      "version": "1.0.0"
+    }
+  ],
+  "experiment_id": "ctl-06-offline-canary",
+  "fixture_identity": {
+    "artifact_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "corpus_id": "ctl-ab-fixture"
+  },
+  "generalization_claimed": false,
+  "harness_identity": {
+    "id": "fixture-harness",
+    "version": "1.0.0"
+  },
+  "model_identity": {
+    "id": "fixture-model",
+    "version": "1.0.0"
+  },
+  "physical_runs": 0,
+  "profile_identity": {
+    "edition": "0.1-proposal-derived",
+    "pack_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "pack_id": "ste-proposal-derived"
+  },
+  "schema_version": "controlled-language-ab-run/v1",
+  "termbase_identity": {
+    "artifact_digest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+  }
+}

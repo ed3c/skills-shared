@@ -19,7 +19,10 @@ rsync -a --exclude __pycache__ "${skill_dir}/" "${good}/"
 
 bash "${linker}" --target "${good}" --backup-dir "${backup}" > "${scratch}/dry.out"
 grep -q "^DRY-RUN move" "${scratch}/dry.out"
-test -d "${good}" && test ! -L "${good}"        # dry-run changed nothing
+# One assertion per line: in `test A && test B` only B runs under `set -e`, so a
+# failing A short-circuits and the script sails past it.
+test -d "${good}"                               # dry-run changed nothing
+test ! -L "${good}"
 
 bash "${linker}" --target "${good}" --backup-dir "${backup}" --apply > "${scratch}/apply.out"
 test -L "${good}"
@@ -44,7 +47,8 @@ if bash "${linker}" --target "${hollow}" --backup-dir "${backup}" --apply \
   exit 1
 fi
 grep -q "has diverged from canonical" "${scratch}/hollow.err"
-test -d "${hollow}" && test ! -L "${hollow}"    # untouched
+test -d "${hollow}"                             # untouched
+test ! -L "${hollow}"
 grep -q "local edit that only exists here" "${hollow}/SKILL.md"
 
 # refuse pointing the canonical directory at itself

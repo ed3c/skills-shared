@@ -1,0 +1,27 @@
+{
+  "branch": {"head_sha": "1111111111111111111111111111111111111111", "name": "feature"},
+  "captured_at": "2026-08-12T05:02:00Z",
+  "check_runs": [{
+    "annotations": [{"message": "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"}],
+    "completed_at": "2026-08-12T05:01:00Z",
+    "conclusion": "failure",
+    "head_sha": "1111111111111111111111111111111111111111",
+    "id": 9001,
+    "name": "contract",
+    "status": "completed",
+    "app_id": 15368,
+    "app_slug": "github-actions",
+    "check_suite_id": 8001,
+    "workflow_run_id": 7001,
+    "workflow_id": 6001,
+    "job_id": 5001
+  }],
+  "pull_requests": [{
+    "draft": false,
+    "head_sha": "1111111111111111111111111111111111111111",
+    "number": 42,
+    "updated_at": "2026-08-12T05:00:00Z"
+  }],
+  "repository": {"full_name": "ed3c/skills-shared", "owner_login": "ed3c", "private": true, "repository_id": 1326262274},
+  "schema": "github-actions-publish-observation/v2"
+}

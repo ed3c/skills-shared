@@ -19,7 +19,8 @@ python3 "${checker}" --selftest > /dev/null
 python3 "${checker}" "${skill_dir}/SKILL.md" \
   --root "${skill_dir}" \
   --covers "${skill_dir}/modules" \
-  --covers "${skill_dir}/scripts"
+  --covers "${skill_dir}/scripts" \
+  --covers "${skill_dir}/contracts"
 
 # hollow: a dead link and an unnamed file are both caught, through this wiring
 mkdir -p "${scratch}/modules"

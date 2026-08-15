@@ -1,0 +1,205 @@
+{
+  "schema_version": "intent-bound-constraint/v1",
+  "contract_id": "forgejo-delivery-loop-intents",
+  "contract_version": "1.0.0",
+  "subject_identity": {
+    "repository": "ed3c/skills-shared",
+    "commit_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "module_policy": {
+    "may_add_constraints": true,
+    "may_tighten_constraints": true,
+    "may_weaken_constraints": false,
+    "may_widen_effects": false,
+    "may_bypass_human_admit": false,
+    "ambiguity_action": "BLOCK"
+  },
+  "completion_policy": {
+    "deterministic_failure_vetoes_advisory": true,
+    "stale_evidence_blocks": true,
+    "no_improvement_action": "STOP",
+    "ambiguity_action": "BLOCK",
+    "private_chain_of_thought": "FORBIDDEN"
+  },
+  "meta_intents": [
+    {
+      "id": "MI-FJ-IDENTITY",
+      "statement": "Bind every route to the exact platform, repository and delivery line it claims.",
+      "protected_property": "subject-identity",
+      "priority": "repository-invariant",
+      "scope": ["route inputs", "delivery lines"],
+      "forbidden_outcomes": ["wrong-platform mutation", "cross-line side effect"],
+      "proof_obligations": ["PO-FJ-IDENTITY"],
+      "completion_criteria": ["non-local platforms route to the platform owner with no mutation"],
+      "human_owned_boundaries": ["platform allowlist change"]
+    },
+    {
+      "id": "MI-FJ-PREFLIGHT",
+      "statement": "Perform a read-only precondition check before any external mutation.",
+      "protected_property": "preflight-fail-closed",
+      "priority": "repository-invariant",
+      "scope": ["typed requests", "live operations"],
+      "forbidden_outcomes": ["mutation before admission", "skipped precondition check"],
+      "proof_obligations": ["PO-FJ-PREFLIGHT"],
+      "completion_criteria": ["absent and projected request states never grant mutation"],
+      "human_owned_boundaries": ["preflight exception"]
+    },
+    {
+      "id": "MI-FJ-IDEMPOTENT",
+      "statement": "Produce at most one side effect for one admitted request.",
+      "protected_property": "side-effect-idempotency",
+      "priority": "domain-invariant",
+      "scope": ["admitted operations", "outbox recovery"],
+      "forbidden_outcomes": ["duplicate side effect", "unbounded restart"],
+      "proof_obligations": ["PO-FJ-IDEMPOTENT"],
+      "completion_criteria": ["recovery stays bounded and falls back to the idempotent outbox"],
+      "human_owned_boundaries": ["recovery authority"]
+    },
+    {
+      "id": "MI-FJ-EVIDENCE",
+      "statement": "Keep routing decisions separate from observed live Forgejo state.",
+      "protected_property": "evidence-non-collapse",
+      "priority": "repository-invariant",
+      "scope": ["route receipts", "CI and merge state"],
+      "forbidden_outcomes": ["routing state reported as live state", "stale receipt reuse"],
+      "proof_obligations": ["PO-FJ-EVIDENCE"],
+      "completion_criteria": ["unexercised live lanes remain explicitly NOT_EXERCISED"],
+      "human_owned_boundaries": ["accept evidence sufficiency"]
+    },
+    {
+      "id": "MI-FJ-HUMAN",
+      "statement": "Keep merge, permission widening, publication and release Human-owned.",
+      "protected_property": "human-authority",
+      "priority": "repository-invariant",
+      "scope": ["merge routes", "permission and publication effects"],
+      "forbidden_outcomes": ["automatic merge", "request admission read as merge admission"],
+      "proof_obligations": ["PO-FJ-HUMAN"],
+      "completion_criteria": ["no reachable input routes merge to a mutation"],
+      "human_owned_boundaries": ["merge", "permission widening", "publication", "release"]
+    }
+  ],
+  "constraints": [
+    {
+      "id": "C-FJ-IDENTITY",
+      "protects_intents": ["MI-FJ-IDENTITY"],
+      "discharges_obligations": ["PO-FJ-IDENTITY"],
+      "subject": "route input platform and line",
+      "trigger": "before any routing decision",
+      "invariant": "A non-allowlisted platform returns not-applicable and never grants mutation.",
+      "severity": "hard",
+      "evidence_class": "deterministic",
+      "evaluator": {
+        "id": "forgejo-route-selftest",
+        "version": "1.0.0",
+        "kind": "command",
+        "argv": ["bun", "scripts/route.ts", "--selftest"],
+        "success_exit_codes": [0],
+        "timeout_seconds": 30
+      },
+      "repairability": "repairable",
+      "retry_budget": 3,
+      "allowed_repairs": ["CORRECT_PLATFORM_GUARD", "CORRECT_LINE_BINDING"],
+      "forbidden_repair_codes": ["WEAKEN_CONSTRAINT", "EDIT_EVALUATOR_FOR_PASS", "DELETE_CONTROL", "WIDEN_EFFECTS", "BYPASS_HUMAN_ADMIT"],
+      "expected_delta_metric": "wrong_platform_route_count",
+      "negative_controls": ["github, gitlab, external-forgejo and non-forgejo arms"],
+      "mutation_controls": ["platform guard accepts any platform"]
+    },
+    {
+      "id": "C-FJ-PREFLIGHT",
+      "protects_intents": ["MI-FJ-PREFLIGHT"],
+      "discharges_obligations": ["PO-FJ-PREFLIGHT"],
+      "subject": "typed request state",
+      "trigger": "before an external Forgejo operation",
+      "invariant": "Absent and projected request states route to projection or precondition check without mutation.",
+      "severity": "hard",
+      "evidence_class": "deterministic",
+      "evaluator": {
+        "id": "forgejo-route-selftest",
+        "version": "1.0.0",
+        "kind": "command",
+        "argv": ["bun", "scripts/route.ts", "--selftest"],
+        "success_exit_codes": [0],
+        "timeout_seconds": 30
+      },
+      "repairability": "repairable",
+      "retry_budget": 3,
+      "allowed_repairs": ["RESTORE_PRECONDITION_ROUTE", "CORRECT_REQUEST_STATE_GUARD"],
+      "forbidden_repair_codes": ["WEAKEN_CONSTRAINT", "EDIT_EVALUATOR_FOR_PASS", "DELETE_CONTROL", "WIDEN_EFFECTS", "BYPASS_HUMAN_ADMIT"],
+      "expected_delta_metric": "premature_mutation_route_count",
+      "negative_controls": ["absent and projected issue arms"],
+      "mutation_controls": ["router grants mutation on a projected request"]
+    },
+    {
+      "id": "C-FJ-IDEMPOTENT",
+      "protects_intents": ["MI-FJ-IDEMPOTENT"],
+      "discharges_obligations": ["PO-FJ-IDEMPOTENT"],
+      "subject": "admitted operation and its recovery lane",
+      "trigger": "when an operation is retried or recovered",
+      "invariant": "Recovery stays bounded and degrades to the idempotent outbox rather than repeating a side effect.",
+      "severity": "hard",
+      "evidence_class": "external",
+      "evaluator": {
+        "id": "forgejo-idempotency-receipt",
+        "version": "1.0.0",
+        "kind": "external_observation",
+        "authority": "idempotency marker and outbox receipt"
+      },
+      "repairability": "repairable",
+      "retry_budget": 2,
+      "allowed_repairs": ["APPEND_TO_OUTBOX", "REBIND_IDEMPOTENCY_MARKER"],
+      "forbidden_repair_codes": ["WEAKEN_CONSTRAINT", "EDIT_EVALUATOR_FOR_PASS", "DELETE_CONTROL", "WIDEN_EFFECTS", "BYPASS_HUMAN_ADMIT"],
+      "expected_delta_metric": "duplicate_side_effect_count",
+      "negative_controls": ["same admitted request replayed twice"],
+      "mutation_controls": ["recovery restarts without a bound"]
+    },
+    {
+      "id": "C-FJ-EVIDENCE",
+      "protects_intents": ["MI-FJ-EVIDENCE"],
+      "discharges_obligations": ["PO-FJ-EVIDENCE"],
+      "subject": "route receipt versus live Forgejo state",
+      "trigger": "before reporting delivery or CI state",
+      "invariant": "A routing decision is never reported as observed live state, and unexercised lanes stay explicit.",
+      "severity": "hard",
+      "evidence_class": "external",
+      "evaluator": {
+        "id": "forgejo-readback-receipt",
+        "version": "1.0.0",
+        "kind": "external_observation",
+        "authority": "exact readback receipt"
+      },
+      "repairability": "repairable",
+      "retry_budget": 2,
+      "allowed_repairs": ["REFRESH_READBACK_RECEIPT", "MARK_LANE_NOT_EXERCISED"],
+      "forbidden_repair_codes": ["WEAKEN_CONSTRAINT", "EDIT_EVALUATOR_FOR_PASS", "DELETE_CONTROL", "WIDEN_EFFECTS", "BYPASS_HUMAN_ADMIT"],
+      "expected_delta_metric": "collapsed_evidence_lane_count",
+      "negative_controls": ["stale receipt presented for a newer head"],
+      "mutation_controls": ["reporter treats routed as executed"]
+    },
+    {
+      "id": "C-FJ-HUMAN-MERGE",
+      "protects_intents": ["MI-FJ-HUMAN"],
+      "discharges_obligations": ["PO-FJ-HUMAN"],
+      "subject": "merge route under every reachable input",
+      "trigger": "on any route whose operation is merge",
+      "invariant": "No reachable input produces a merge route with mutation_allowed true.",
+      "severity": "hard",
+      "evidence_class": "deterministic",
+      "evaluator": {
+        "id": "forgejo-merge-authority-sweep",
+        "version": "1.0.0",
+        "kind": "command",
+        "argv": ["bash", "tests/merge-authority/verify.sh"],
+        "success_exit_codes": [0],
+        "timeout_seconds": 60
+      },
+      "repairability": "repairable",
+      "retry_budget": 1,
+      "allowed_repairs": ["RESTORE_MERGE_HUMAN_ROUTE"],
+      "forbidden_repair_codes": ["WEAKEN_CONSTRAINT", "EDIT_EVALUATOR_FOR_PASS", "DELETE_CONTROL", "WIDEN_EFFECTS", "BYPASS_HUMAN_ADMIT"],
+      "expected_delta_metric": "merge_mutation_route_count",
+      "negative_controls": ["admitted local merge request", "exhaustive sweep of every request and auth state"],
+      "mutation_controls": ["merge falls through to the shared execute route again"]
+    }
+  ],
+  "diagnostic_reflection_schema": "evals/schema/diagnostic-reflection-receipt.schema.json"
+}

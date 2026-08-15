@@ -1,0 +1,59 @@
+{
+  "schema": "dual-forge-reconciliation-transport/v2",
+  "producer": "capture_reconciliation.py",
+  "gh_executable": {"invoked_path": "/usr/bin/gh", "resolved_path": "/usr/bin/gh", "sha256": "3333333333333333333333333333333333333333333333333333333333333333", "version": "gh version 2.82.0 (fixture)"},
+  "github_repository": "ed3c/example",
+  "forgejo_repository": "neon/example",
+  "default_branch": "main",
+  "captured_at": "2026-08-14T10:00:00Z",
+  "captures": [
+    {
+      "argv": ["/usr/bin/gh", "api", "repos/ed3c/example"],
+      "exit": 0,
+      "stdout": "{\"id\":123,\"full_name\":\"ed3c/example\",\"default_branch\":\"main\"}",
+      "stdout_sha256": "a65674fa40b9eb07947b084c5b154bd34e9893e90e0d808a219684d3c3ba9eb2",
+      "stderr": "",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": ["/usr/bin/gh", "api", "--paginate", "--slurp", "repos/ed3c/example/pulls?state=open&per_page=100"],
+      "exit": 0,
+      "stdout": "[[{\"number\":7,\"draft\":false,\"head\":{\"sha\":\"93c33411137875108419c2abe4dbe8f4d84ad5d6\"},\"base\":{\"ref\":\"main\"}},{\"number\":42,\"draft\":true,\"head\":{\"sha\":\"997b637730f967af63f435d8f28fe6677a209574\"},\"base\":{\"ref\":\"main\"}}]]",
+      "stdout_sha256": "82b5fdee8d08dc2fe20de7d5633e22f9860d1c4c38ded4ef75b7bd935a5dc8ed",
+      "stderr": "",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": ["/usr/bin/gh", "api", "--paginate", "--slurp", "repos/ed3c/example/issues?state=open&per_page=100"],
+      "exit": 0,
+      "stdout": "[[{\"number\":34},{\"number\":42,\"pull_request\":{}},{\"number\":99}]]",
+      "stdout_sha256": "86f241e4672c753bfd0c3be9c81e5a036c88eea3912638f73563fc7339110d11",
+      "stderr": "",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": ["forgejo-api-authenticated-read", "/api/v1/repos/neon/example"],
+      "exit": 0,
+      "stdout": "{\"id\":456,\"full_name\":\"neon/example\",\"default_branch\":\"main\"}",
+      "stdout_sha256": "afa054a08ab6b2c7b67939299a7bcf0e2fc077c17a61cd80b6861d8457d36b7e",
+      "stderr": "",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": ["forgejo-api-authenticated-read", "/api/v1/repos/neon/example/pulls?state=open&limit=50&page=1"],
+      "exit": 0,
+      "stdout": "[{\"number\":9,\"draft\":false,\"head\":{\"sha\":\"4cb614454eeb07e81ac1718746e2e99d3c3287d1\"},\"base\":{\"ref\":\"main\"}}]",
+      "stdout_sha256": "e927875281a627945bdfd9b48b085a2d3841361c02a31d631c3964ce295badea",
+      "stderr": "",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": ["forgejo-api-authenticated-read", "/api/v1/repos/neon/example/issues?state=open&type=issues&limit=50&page=1"],
+      "exit": 0,
+      "stdout": "[]",
+      "stdout_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "stderr": "",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

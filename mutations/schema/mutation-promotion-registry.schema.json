@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ed3c/skills-shared/mutations/schema/mutation-promotion-registry.schema.json",
+  "title": "skill-mutation-promotion-registry/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "promotions"],
+  "properties": {
+    "schema_version": {"const": "skill-mutation-promotion-registry/v1"},
+    "promotions": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["skill", "candidate_sha", "lineage_ref", "line_number", "evaluation_receipt"],
+        "properties": {
+          "skill": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+          "candidate_sha": {"type": "string", "pattern": "^[0-9a-f]{7,64}$"},
+          "lineage_ref": {"type": "string", "minLength": 1},
+          "line_number": {"type": "integer", "minimum": 1},
+          "evaluation_receipt": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  }
+}

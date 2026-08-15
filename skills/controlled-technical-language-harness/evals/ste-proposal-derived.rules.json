@@ -1,0 +1,53 @@
+{
+  "ruleset_id": "ste-proposal-derived",
+  "ruleset_version": "0.1",
+  "provenance": "SOURCE_PROPOSAL",
+  "note": "Reconstructed from the architecture proposal recorded in docs/architecture/CONTROLLED_TECHNICAL_LANGUAGE_HARNESS.md. Not extracted from ASD-STE100 and not equivalent to it.",
+  "rules": [
+    {
+      "id": "STE-P-01",
+      "statement": "A procedural sentence states one instruction.",
+      "lane": "deterministic",
+      "implemented_by": null
+    },
+    {
+      "id": "STE-P-02",
+      "statement": "A procedural sentence does not exceed the declared word budget.",
+      "lane": "deterministic",
+      "implemented_by": null
+    },
+    {
+      "id": "STE-P-03",
+      "statement": "A descriptive sentence does not exceed the declared word budget.",
+      "lane": "deterministic",
+      "implemented_by": null
+    },
+    {
+      "id": "STE-P-04",
+      "statement": "An instruction uses the active voice and the imperative.",
+      "lane": "heuristic",
+      "implemented_by": null
+    },
+    {
+      "id": "STE-P-05",
+      "statement": "A word carries one approved meaning within one document.",
+      "lane": "deterministic",
+      "implemented_by": null
+    },
+    {
+      "id": "STE-P-06",
+      "statement": "A Technical Name or Technical Verb is used only if the project termbase admits it.",
+      "lane": "deterministic",
+      "implemented_by": null
+    },
+    {
+      "id": "STE-P-07",
+      "statement": "A warning or caution precedes the step it applies to.",
+      "lane": "heuristic",
+      "implemented_by": null
+    }
+  ],
+  "implementation_state": "PARTIALLY_IMPLEMENTED",
+  "implementation_owner": "CTL 03 deterministic linter",
+  "implementation_notes": "STE-P-02 and STE-P-03 word budgets are implemented deterministically in scripts/lint_deterministic.py. STE-P-04 and STE-P-07 are heuristic and remain unimplemented; they may only be admitted through scripts/check_heuristic_calibration.py, which forbids a heuristic from concluding a run. STE-P-01, STE-P-05 and STE-P-06 need a bound termbase and document class that the request contract supplies at runtime."
+}

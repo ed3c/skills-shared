@@ -1,0 +1,9 @@
+{
+  "schema": "github-delivery-local-verification/v1",
+  "repository_id": 123,
+  "head_sha": "997b637730f967af63f435d8f28fe6677a209574",
+  "status": "PASS",
+  "verified_at": "2026-08-14T09:59:00Z",
+  "evidence_sha256": "832473f0b161a95e899ae6b575cbf896fdb6aee3c442db4d78f8de7793df903a",
+  "commands": ["contract"]
+}

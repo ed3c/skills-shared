@@ -1,0 +1,12 @@
+{
+  "schema": "github-delivery-local-verification-contract/v1",
+  "repository_id": 123,
+  "inherit_env": ["PATH"],
+  "commands": [{
+    "id": "contract",
+    "argv": ["python3", "-c", "print('ok')"],
+    "cwd": ".",
+    "timeout_seconds": 10,
+    "max_output_bytes": 4096
+  }]
+}

@@ -1,9 +1,9 @@
 {
   "skill_name": "github-delivery-loop",
-  "version": "1.2.0",
+  "version": "1.4.0",
   "_meta": {
-    "coverage_metric": "planted hollow-receipt, unsafe merge-rule target and forged/stale merge-admit detection",
-    "purpose": "Prove that delivery receipts, repo-scoped Codex merge rules and the merge-authority preflight all fail closed without network access."
+    "coverage_metric": "planted hollow-receipt, unsafe merge-rule target, forged/stale merge-admit, canonical-link divergence, wasteful CI publication, stale local verification, and untrusted GitHub snapshot detection",
+    "purpose": "Prove that delivery receipts, repo-scoped Codex merge rules, merge-authority preflight, canonical linking, private-Actions publication, and its evidence producers fail closed without network access."
   },
   "runnable": [
     {
@@ -50,8 +50,10 @@
       "id": "DELIVERY-4",
       "checker_script": "scripts/link-canonical.sh",
       "test_verify": "tests/link-canonical/verify.sh",
-      "good_fixture": "identical copy of the canonical skill in a scratch repo",
-      "hollow_fixture": "same copy with a local edit appended to SKILL.md",
+      "good_fixture": null,
+      "good_evidence": "identical copy of the canonical skill in a scratch repo",
+      "hollow_fixture": null,
+      "hollow_mutations": "same copy with a local edit appended to SKILL.md",
       "covers": [
         "diverged copy is refused and left untouched, never moved aside",
         "old copy is moved to a backup, never deleted",
@@ -59,6 +61,72 @@
         "linking the canonical directory to itself is refused"
       ],
       "expected": "good converts and stays readable through the link; hollow exits non-zero naming the divergence"
+    },
+    {
+      "id": "DELIVERY-5",
+      "checker_script": "scripts/ci_publish_gate.py",
+      "test_verify": "tests/ci-publish-gate/verify.sh",
+      "good_fixture": "tests/ci-publish-gate/fixtures/good",
+      "hollow_fixture": "tests/ci-publish-gate/fixtures/hollow",
+      "covers": [
+        "local commit cadence is independent from remote CI publication cadence",
+        "exact local HEAD requires a passing local verification receipt",
+        "only initial draft PR, ready-for-review, and one batched repair are admitted",
+        "older-SHA CI success and repeated feedback fail closed",
+        "billing or spending-limit no-runner evidence opens a circuit breaker",
+        "only a later owner-authored recovery receipt can admit another attempt",
+        "a compact receipt cannot authorize publication unless the evidence its digest names is read and recomputed"
+      ],
+      "expected": "good initial publication ALLOW; hollow billing snapshot BLOCK; stale HEAD, repeated feedback, and stale recovery remain red; a perfect receipt paired with evidence from another run exits 64"
+    },
+    {
+      "id": "DELIVERY-6",
+      "checker_script": "scripts/local_verification.py",
+      "test_verify": "tests/evidence-producers/verify.sh",
+      "good_fixture": "tests/evidence-producers/fixtures/local",
+      "hollow_fixture": null,
+      "hollow_mutations": "dirty worktree, repository identity mismatch, shell string, unsafe inherited env, timeout, nonzero exit, or output overflow",
+      "covers": [
+        "clean exact local HEAD and tree are recorded",
+        "commands are fixed argv arrays executed without a shell",
+        "environment inheritance is a safe-name allowlist",
+        "timeout and output budgets are enforced",
+        "receipt digest binds detailed command evidence",
+        "FAIL evidence cannot be consumed as PASS"
+      ],
+      "expected": "clean fixed-command contract emits PASS; dirty, stale, unsafe, timed-out, overflowing, or nonzero subjects turn red"
+    },
+    {
+      "id": "DELIVERY-7",
+      "checker_script": "scripts/github_actions_snapshot.py",
+      "test_verify": "tests/evidence-producers/verify.sh",
+      "good_fixture": "tests/evidence-producers/fixtures/good",
+      "hollow_fixture": "tests/evidence-producers/fixtures/stale",
+      "covers": [
+        "private repository identity and one PR are bound",
+        "stable check is selected by exact name and exact head",
+        "actionable CI failure becomes one feedback identity",
+        "known payment or spending annotation becomes billing-open with no test conclusion",
+        "replay is zero-network",
+        "multiple PRs, public repositories, stale checks, incomplete checks, and malformed annotations fail closed"
+      ],
+      "expected": "good observation produces a trusted snapshot; billing remains a circuit state; stale or ambiguous observations turn red"
+    },
+    {
+      "id": "DELIVERY-9",
+      "checker_script": "scripts/ci_workflow_policy.py",
+      "test_verify": "tests/ci-workflow-policy/verify.sh",
+      "good_fixture": null,
+      "good_evidence": "this repository's own .github-delivery/ci-policy.json against the workflow it names, so the seal is exercised where it is load-bearing rather than against a synthetic pair",
+      "hollow_fixture": null,
+      "hollow_mutations": "a drifted schema, a public repository, a malformed repository slug, a workflow outside .github/workflows/, a workflow path that leaves the repository, an empty required-jobs list, a shell string where an argv array belongs, and a required job the workflow does not declare",
+      "covers": [
+        "a policy that names a workflow is checked against the workflow on disk, not only against its own shape",
+        "a required job absent from the owning workflow fails closed",
+        "publication policy admits argv arrays, never shell strings",
+        "the seal is private-repository only"
+      ],
+      "expected": "this repository's policy passes; each planted field turns red with a reason naming that field"
     }
   ]
 }

@@ -46,7 +46,8 @@ canonical 住 `~/.claude/skills/github-delivery-loop/`；各 repo 的 `.claude/s
 4. 需要 GitHub 活狀態與速度快照時執行 `sync --github`，明確提供 line、metrics、dashboard、
    40 字元 export source commit，以及該 commit 的 tree sha（artifact 就是 repo 本身時即
    `git rev-parse <export-source-commit>^{tree}`）；測試與重播改用 `--snapshot <json>`，
-   不得在測試中打網路。
+   不得在測試中打網路。`initial-pr` 另須由 raw transport 對 exact
+   `refs/heads/<branch>` 的獨立查詢證明 remote branch 不存在；「查不到 PR」不能替代這個證據。
 5. 每張 issue 在隔離 worktree 走 TDD → review；**本地 commit 可以高頻，remote push 不可以**。
    private repo 先以 `scripts/ci_publish.py verify` 產生 exact-HEAD 收據，再由同一腳本的
    `publish` 子命令走唯一 GitHub 發佈路徑；PR body 使用 `Closes #N`。
@@ -59,18 +60,28 @@ canonical 住 `~/.claude/skills/github-delivery-loop/`；各 repo 的 `.claude/s
 
 ```bash
 python3 ~/.claude/skills/github-delivery-loop/scripts/ci_publish_gate.py evaluate \
-  --snapshot /tmp/github-ci-publish.json
+  --repo-root /absolute/repo \
+  --snapshot /tmp/github-actions-publish.json \
+  --verification /absolute/repo/.git/github-delivery/local-verification.json \
+  --evidence /absolute/repo/.git/github-delivery/local-verification-evidence.json \
+  --verification-contract /absolute/repo/.github-delivery/local-verification-contract.json \
+  --intent initial-pr --json
 ```
 
-這支 `scripts/ci_publish_gate.py` 只有輸出 `ALLOW initial-pr|ready-for-review|repair` 才進下一層。
-`checkpoint`、驗證不是 exact HEAD、
-remote 已是同一 SHA、同一 feedback 已發佈，或 account billing no-runner circuit 未被 owner 的較新
+這支 `scripts/ci_publish_gate.py` 只承認 `initial-pr`、`ready-for-review`、`batched-repair`
+三種 intent，且只有 decision=`ALLOW` 才進下一層。
+`checkpoint`、驗證不是 exact HEAD、需要新 head 的 intent 卻沒有新 SHA、同一 feedback 已發佈，
+或 account billing no-runner circuit 未被 owner 的較新
 recovery receipt 關閉，都必須停止；禁止以 rerun、no-op commit 或改 intent 拼字繞過。
 
 `scripts/ci_publish.py` 是受管 private repo 的唯一網路發佈入口：`verify` 先跑
-`.github-delivery/ci-policy.json` 指定的本地 argv 並把 receipt 放進 git-dir；`publish` 再重驗
+`.github-delivery/ci-policy.json` 指向唯一的本地驗證 contract，由 `local_verification.py` 執行固定
+argv 並把 receipt/evidence 放進 git-dir；`publish` 再重驗
 workflow policy、git HEAD、receipt、snapshot 與 GitHub remote identity，最後以完整 SHA refspec push。
-`ready-for-review` 會接著執行 `gh pr ready`；`repair` 會 dispatch policy 指定的 workflow。
+`initial-pr` 同一 admission 會建立 draft PR；`ready-for-review` 在 head 已相同時只執行
+`gh pr ready`，否則先推 final batch 再轉 ready；
+`draft-first` batched repair 會 dispatch policy 指定的 workflow，`universal` batched repair 則由
+snapshot 釘住的 PR head ref 之 `synchronize` 事件執行，禁止同 SHA 再 dispatch。
 省略 `--execute` 必為 dry-run。
 
 ```bash
@@ -79,8 +90,9 @@ python3 ~/.claude/skills/github-delivery-loop/scripts/ci_workflow_policy.py chec
 python3 ~/.claude/skills/github-delivery-loop/scripts/ci_publish.py verify \
   --repo-root /absolute/repo
 python3 ~/.claude/skills/github-delivery-loop/scripts/ci_publish.py publish \
-  --repo-root /absolute/repo --snapshot /tmp/github-ci-publish.json \
-  --remote github --execute
+  --repo-root /absolute/repo --snapshot /tmp/github-actions-publish.json \
+  --intent initial-pr --remote github --branch agent/feature \
+  --pr-title 'Feature' --pr-body 'Closes #N' --execute
 ```
 
 `scripts/ci_publish_guard.py` 是兩個 host 共用的 PreToolUse guard：只有 repo 已登記
@@ -146,6 +158,9 @@ preflight 三個都驗——少驗一個平面就會把「還會被擋」報成�
    `--match-head-commit`，owner-auto 用 GraphQL `expectedHeadOid`，語意相同。owner-auto 不覆寫
    commit email（交給 GitHub 帳號的 web Git privacy 設定），不使用 `--admin`，也忽略 `--allow-unstable` 的放寬；
    全量模式會在 base 移動後自動重算下一張；`--pr N` 模式成功合併一次就停止，不掃描其他 PR。
+   跨 invocation 重跑時先查該 PR 是否已有 auto-merge request／merge queue entry，有就不重送；merge
+   command exit 0 只代表 GitHub 接受請求，必須回讀同一 HEAD 的 `MERGED` 與非空 `mergedAt` 才能報
+   `LANDED`。仍是 `OPEN` 或已存在 pending request 回傳 `5`，`CLOSED`、HEAD 漂移或不可判讀都 fail closed。
 
    ```bash
    python3 ~/.claude/skills/github-delivery-loop/scripts/merge_gate.py land --repo OWNER/REPO [--pr N] [--dry-run]
@@ -170,6 +185,24 @@ delivery-loop **各藏著一支從沒被自己 SKILL.md 提過的 sync 類腳本
 `scripts/delivery_sync.py`（GitHub snapshot 攝取、flow metrics 與決策儀表板投影）。
 同型缺陷三處齊發，正是「發現一個先掃同類全部實例」的形狀。
 
+完整 machine-support 索引如下；入口說明分別在
+[modules/README.md](modules/README.md) 與 [scripts/README.md](scripts/README.md)：
+
+- modules： [ci-publication](modules/ci-publication.md)、
+  [commit-role](modules/commit-role.md)、
+  [delivery-mechanism](modules/delivery-mechanism.md)、
+  [github-actions-cost-control](modules/github-actions-cost-control.md)、
+  [host-permissions](modules/host-permissions.md)、
+  [state-machines](modules/state-machines.md)、
+  [traceability-index](modules/traceability-index.md)。
+- scripts： `scripts/ci_publish.py`、`scripts/ci_publish_gate.py`、
+  `scripts/ci_publish_guard.py`、`scripts/ci_workflow_policy.py`、
+  `scripts/delivery_sync.py`、`scripts/delivery_sync_impl.py`、
+  `scripts/github_actions_snapshot.py`、`scripts/github_delivery.py`、
+  `scripts/install-ci-publish-guard.py`、`scripts/install-codex-merge-rule.sh`、
+  `scripts/link-canonical.sh`、`scripts/local_verification.py`、
+  `scripts/merge_gate.py`、`scripts/reference_causality.py`。
+
 規則不靠人記得，靠 `tests/index/verify.sh`（`tests/run-all.sh` 自動探索）：它先跑 checker
 自己的 `--selftest`，再驗本檔——**checker 不能證明自己會紅之前，它對本檔的綠燈不算數**。
 
@@ -183,10 +216,16 @@ delivery-loop **各藏著一支從沒被自己 SKILL.md 提過的 sync 類腳本
   `preflight`（無 `--snapshot`）負責，兩種證據不得混稱。
 - `ci_publish_gate.py evaluate` 同樣零網路；snapshot 的 GitHub/owner recovery 活證據必須由外部
   sync 或人工附上可查 URL，shape 通過不等於帳務已恢復。
-- `ci_workflow_policy.py check` 是 repo 密封閘：PR 只准 `ready_for_review`、push 只准 default
-  branch、必須有 manual dispatch/concurrency，且 action 一律釘完整 SHA；少一項就不得 enroll。
-- `ci_publish_guard.py` 只對已 enroll repo 的 GitHub push fail closed；它明確保留 Forgejo push，
-  不把雙 remote repo 的 canonical 免費路徑一起封死。
+- `ci_workflow_policy.py check` 是 repo 密封閘：`pull_request_mode` 缺省／`draft-first` 時 PR 只准
+  `ready_for_review`；只有 repo 明確選 `universal` 才精確准
+  `opened,synchronize,reopened`。`ready_for_review` 不改 head，若保留會在 universal ready 發佈時
+  對同 SHA 重複執行。push 只准 default branch、必須有 manual
+  dispatch/concurrency，且 action 一律釘完整 SHA；少一項就不得 enroll。
+- `ci_publish_guard.py` 對解析後明確指向 GitHub 的 push fail closed，直接 argv 與可靜態解析的
+  Forgejo push 仍保留。legacy hook 只給 shell 字串，並不是解析後 process event；因此帶
+  `$`/backtick 展開、且仍能以 literal Git invocation 定位到 enrolled repo 的 shell 包裝一律
+  fail closed。任意 shell 可計算 executable/path/remote 不在此 parser 的 sound boundary；完整
+  保證必須把 guard 放在 shell evaluation 之後，接收 resolved executable/argv/cwd/env/remote。
 - repository identity 釘 immutable GitHub node ID；owner/name 只作可轉移別名，redirect 不得冒充身份證據。
 - human-admit 的 `merge-admit` 只有 **repo owner 施加、且晚於 head commit** 才算數；owner-auto 則每次
   重驗 immutable viewer／personal owner。兩種模式都 pin HEAD，漂移即失敗。

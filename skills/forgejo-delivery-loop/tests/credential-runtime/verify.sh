@@ -5,7 +5,7 @@ test_dir="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
 skill_dir="$(realpath "${test_dir}/../..")"
 
 grep -Fq './runtime-env local-env migrate-forgejo-keychain' "${skill_dir}/SKILL.md"
-grep -Fq '/Users/neon/runtime-env/runtime-env local-env migrate-forgejo-keychain' \
+grep -Fq '<runtime-env-root>/runtime-env local-env migrate-forgejo-keychain' \
   "${skill_dir}/modules/forgejo-operations.md"
 grep -Fq '本 skill 禁止 source、解析或複製 `.env`' \
   "${skill_dir}/modules/forgejo-operations.md"

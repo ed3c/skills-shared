@@ -90,8 +90,13 @@ for issue in <該線 open issues>:
 
 merge 永遠人 admit;本 skill 只推進到 PR 開好、findings 齊備。Forgejo API 呼叫一律透過既有
 credential helper 在記憶體內取憑證,**秘密不落盤不輸出**(本 repo `check_credential_hygiene.py` 守)。
-若 helper 尚未建立,由 host operator 在 `/Users/neon/runtime-env` 執行
+若 helper 尚未建立,由 host operator 在 `<runtime-env-root>` 執行
 `./runtime-env local-env migrate-forgejo-keychain`;本 skill 不讀 `runtime-env/.env`,也不實作第二套密碼儲存。
+
+這句話由 `scripts/route.ts` 的 merge 路由與 `tests/merge-authority/` 的窮舉掃描守住,不靠人記得:
+任何 operation=merge 的輸入一律 `mutation_allowed: false`,`request_state: "admitted"` 指的是
+**typed request 被 admit**,從來不是人 admit 了 merge。intent 對應與這條界線的完整說明見
+[`references/INTENT_BOUND_CONSTRAINTS.md`](references/INTENT_BOUND_CONSTRAINTS.md)。
 
 ## 三種提示的放置鐵律
 
@@ -115,7 +120,26 @@ credential helper 在記憶體內取憑證,**秘密不落盤不輸出**(本 repo
 ```bash
 bun run <本skill>/scripts/route.ts --input <route-input.json>
 bun run <本skill>/scripts/route.ts --selftest      # 改 router 或 cases 後必跑
+python3 <本skill>/scripts/issue_state.py validate --request <request.json>
+python3 <本skill>/scripts/issue_state.py validate-source-live --request <request.json>
+python3 <本skill>/scripts/issue_state.py capture-pre-live \
+  --request <request.json> > <pre-observation.json>
+python3 <本skill>/scripts/issue_state.py verify-live \
+  --request <request.json> --pre-observation <pre-observation.json>
 ```
+
+issue 終態 mutation 必須先通過 `contracts/forgejo-terminal-issue-state-request.v2.schema.json`
+對應的語義驗證，再以 `contracts/forgejo-issue-state-observation.v1.schema.json` 回讀；只有
+`contracts/forgejo-issue-state-readback-receipt.v1.schema.json` 形狀的輸出才算完成。JSON Schema
+負責可攜形狀，`scripts/issue_state.py` 額外以 authenticated `gh`／Forgejo API read 驗證 GitHub
+source closure、mutation 前 expected state 與 mutation 後 desired state，並守 repository／number／
+source URL marker／request digest 一致，並要求 authenticated timeline 的唯一 close event 在 pre-read
+後五分鐘內發生。三者缺一即 fail closed；單純自填 observation JSON 不能產生 verified receipt。
+`admission` 是對既有 user 指令的 out-of-band operator attestation，不是密碼學 provenance；不得由
+agent 推斷或由 issue 內容取代。可驗證的 outcome evidence 是 authenticated source／state／timeline read。
+Source 與 post-observation identity digests 都排除查詢當下的 `observed_at`，因此同一組已驗狀態可
+離線重算；時間仍保留在 observation／receipt，但不讓時鐘噪音改變 evidence identity。Pre-observation
+digest 則綁完整已保存的 pre packet（含時間），用來連結 authenticated timeline 的五分鐘轉換窗口。
 
 八條不變量（只認 localhost:3000、憑證只留記憶體、Forgejo 不是真相來源、每個外部 mutation 下沉成
 一個小迴圈、repo 寫入交給 repo-local operator、缺 admission 即 fail closed……）、M0/G0/V0 狀態圖、
@@ -145,7 +169,7 @@ python3 $S apply --to-targets    # 方向必須顯式,永不由 mtime 推斷
 
 ## 索引紀律(本檔對自己的樹的宣稱)
 
-本檔列出的 `modules/`／`scripts/` 就是一份索引,而索引會**單向失效**:死連結點下去才知道,
+本檔列出的 `modules/`／`scripts/`／`contracts/` 就是一份索引,而索引會**單向失效**:死連結點下去才知道,
 **漏列的檔案永遠不會有人知道**——短的清單與完整的清單長得一模一樣。首次真跑時,三支
 delivery-loop **各藏著一支沒被自己 SKILL.md 提過的 sync 類腳本**,同型錯誤三處齊發。
 

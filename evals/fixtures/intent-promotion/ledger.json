@@ -1,0 +1,10 @@
+[
+  {
+    "current": true,
+    "intent_id": "MI-CTL-EVIDENCE",
+    "receipt_digest": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
+    "receipt_id": "IPR-FIXTURE-PRIOR",
+    "state": "CANONICAL",
+    "subject_commit_sha": "3333333333333333333333333333333333333333"
+  }
+]

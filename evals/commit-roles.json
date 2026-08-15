@@ -1,0 +1,103 @@
+{
+  "schema": "commit-role-vocabulary/v2",
+  "_meta": {
+    "purpose": "Machine-readable value domain for the Driven-By and Driven-On commit trailers, shared by the gate and by humans, so the vocabulary cannot drift between prose and enforcement.",
+    "why_two_dimensions": "Mechanism and host are orthogonal: agent-macro runs on Claude Code or Codex CLI, and the two hosts have entirely different gates. Folding them into one field is a combinatorial explosion.",
+    "why_identity_is_not_the_carrier": "A role is a property of a commit; git config is a property of a repository. One repository carries several drivers, so a per-repo setting can only label the dominant one correctly and mislabels the rest."
+  },
+  "enforced_from": {
+    "commit_sha": "382daf4b760a22a9e79302f9f5356232ab67b240",
+    "note": "History before this commit is not scanned. Roughly 1100 commits across these repositories were authored as an unset identity and no record can recover their driver; backfilling would be invention, not recovery.",
+    "moved_once": "Moved forward from b74d30835b40ff00a31cc185a67f93be6de6f273 on 2026-08-14. The gate landed before every commit endpoint knew to write the trailers, and one commit reached main without them. Moving the start point past it is honest about that adoption lag; doing it a second time would not be, because a start point that advances to whatever just failed enforces nothing. If it needs to move again, the answer is to fix the endpoint that produced the commit, not the range."
+  },
+  "driven_by": {
+    "human": {
+      "meaning": "A person acting directly, in a terminal or a forge web UI.",
+      "machine": false
+    },
+    "agent-macro": {
+      "meaning": "Main-loop agent delivery.",
+      "machine": true
+    },
+    "agent-subagent": {
+      "meaning": "A workflow or Task subagent.",
+      "machine": true
+    },
+    "loop-iterate": {
+      "meaning": "Small-loop automated iteration, such as an engine.sh driver.",
+      "machine": true
+    },
+    "forge-github": {
+      "meaning": "A GitHub-side action: gh, a PR merge, a label.",
+      "machine": true
+    },
+    "forge-gitlab": {
+      "meaning": "A GitLab-side action: glab, an MR.",
+      "machine": true
+    },
+    "forge-forgejo": {
+      "meaning": "A Forgejo-side action.",
+      "machine": true
+    }
+  },
+  "forge_values_stay_separate": "github, gitlab and forgejo are deliberately three values rather than one forge-*. This repository already treats github-delivery-loop, gitlab-delivery-loop and forgejo-delivery-loop as sister skills that must not be mixed; their APIs, permission models and merge-authority stacks differ. Collapsing them here would be the one place where the vocabulary contradicts the skill boundary, and 'some forge' does not answer which mechanism acted.",
+  "driven_on": {
+    "claude-code": "Claude Code, any surface.",
+    "codex-cli": "Codex CLI.",
+    "codex-app": "Codex App or IDE.",
+    "shell": "A plain shell with no agent harness.",
+    "ci": "A CI runner."
+  },
+  "identity_rules": {
+    "machine_author_email_pattern": "^(?P<role>[a-z][a-z0-9-]*)@(?P<host>[a-z][a-z0-9-]*)\\.invalid$",
+    "machine_author_email_note": "RFC 2606 reserves .invalid and it can never be delivered to, so the address is visibly synthetic. A real address on a machine commit counts machine work toward a person's contribution graph.",
+    "human_may_use_a_real_address": true,
+    "forge_committer_addresses": [
+      "noreply@github.com",
+      "noreply@gitlab.com",
+      "noreply@forgejo.org"
+    ],
+    "forge_committer_note": "A forge-created commit carries its own driver in its committer address: a squash merge is performed by the forge, not by whoever wrote the branch. Such a commit is classified as the matching forge-* role and is not required to carry trailers, because the forge will never write them. Requiring them would make every merge a violation and the gate would be turned off within a day.",
+    "unset_identities": [
+      "t@t.t",
+      "t@x",
+      "you@example.com",
+      "root@localhost"
+    ],
+    "unset_identity_note": "These are defaults nobody chose. They are refused by name rather than by heuristic, so the refusal cannot be argued with.",
+    "forge_committer_roles": {
+      "noreply@github.com": "forge-github",
+      "noreply@gitlab.com": "forge-gitlab",
+      "noreply@forgejo.org": "forge-forgejo"
+    }
+  },
+  "legacy_imports": [
+    {
+      "id": "forgejo-main-before-dual-origin-convergence-2026-08-14",
+      "tip_sha": "e5c239cce2c4494de6167155030df819a8f346cb",
+      "admitted_against_sha": "abb7b455b012c8aaa4701b32e470fcf758a06cb7",
+      "unclassified_commit_count": 33,
+      "unclassified_commits_sha256": "b66a3e798fe0dd88ad04e33390cea53b61e1cd1c1c1379273d721a562fc28a05",
+      "note": "Exact frozen Forgejo-only non-merge history imported during dual-origin convergence. This does not move enforced_from and cannot admit any later commit."
+    },
+    {
+      "id": "canonical-local-main-before-dual-origin-convergence-2026-08-15",
+      "tip_sha": "00543da877734a923b85d9423dee609fabf79d9d",
+      "admitted_against_sha": "d53cb97da37e08bcd9cf93b2f08ae5d81972a6f0",
+      "unclassified_commit_count": 9,
+      "unclassified_commits_sha256": "fa3c746d55f62bc416faf018597a23469a7b7fed1a1a826b6b0f30dc7a51fe2f",
+      "note": "Exact frozen canonical-local-only non-merge tail imported during dual-origin convergence. This preserves published commit identities, does not move enforced_from, and cannot admit any later commit."
+    }
+  ],
+  "known_unclassified": {
+    "_meta": "Commits that reached main without trailers, listed one by one rather than excused by a rule. Each entry is a commit that is already published and cannot be rewritten. Listing them keeps the gate blocking for everything else, and the length of this list is the honest measure of how far adoption has to go: a rule that quietly widened instead would report nothing.",
+    "how_to_stop_adding_to_this": "Write the trailers at the endpoint that produces the commit. Every entry here is an endpoint that does not yet.",
+    "commits": [
+      {
+        "commit_sha": "6e5986922b8fa83898e0b407b32f2dc3a32662cd",
+        "subject": "chore: project canonical Claude adapter",
+        "reason": "authored directly, outside this loop, after the gate landed"
+      }
+    ]
+  }
+}

@@ -1,0 +1,440 @@
+{
+  "schema": "guard-control-manifest/v1",
+  "_meta": {
+    "purpose": "Each entry names one load-bearing guard and the verify that must go red when it is removed. This is the executable form of #122 shape D: an assertion that runs but cannot fail is indistinguishable from one that works.",
+    "why_not_every_guard": "A guard whose removal is caught by three other checks adds a slow run and no signal. These are the ones where a silent failure would let a false claim through: identity binding, evidence readback, publication cadence, and the classification gates.",
+    "verify_must_be_self_contained": "A verify command runs inside an isolated copy that carries no .git. A command needing repository history reports as unreachable, which is a true statement about the isolated run and a useless one about the guard, so entries point at the self-contained subset instead."
+  },
+  "timeout_seconds": 300,
+  "guards": [
+    {
+      "id": "suite-ci-arrival",
+      "file": "scripts/check_suite_ci_coverage.py",
+      "anchor": "                if f\"skills/{skill}/{entrypoint}\" in command:",
+      "verify": [
+        "python3",
+        "scripts/check_suite_ci_coverage.py"
+      ],
+      "note": "Without this, a skill named only in a paths filter reads as covered. That is exactly how #105 landed two never-executed verifiers."
+    },
+    {
+      "id": "commit-role-machine-address",
+      "file": "scripts/check_commit_roles.py",
+      "anchor": "            if match is None:",
+      "verify": [
+        "python3",
+        "-m",
+        "unittest",
+        "tests.test_commit_roles.GateTests"
+      ],
+      "note": "A machine role wearing a real address counts machine work toward a person's contribution graph."
+    },
+    {
+      "id": "commit-role-forge-exemption",
+      "file": "scripts/check_commit_roles.py",
+      "anchor": "    if forge_role is not None and record[\"author_email\"] != record[\"committer_email\"]:",
+      "verify": [
+        "python3",
+        "-m",
+        "unittest",
+        "tests.test_commit_roles.GateTests"
+      ],
+      "note": "The exemption must apply to forge-created commits only, not to any commit wearing a forge address."
+    },
+    {
+      "id": "intent-promotion-evaluator-subject",
+      "file": "scripts/check_intent_promotions.py",
+      "anchor": "            if run[\"subject_commit_sha\"] != subject[\"commit_sha\"]:",
+      "verify": [
+        "python3",
+        "scripts/check_intent_promotions.py",
+        "selftest"
+      ],
+      "note": "An old receipt carried forward to a new commit is the substitution the lifecycle exists to block."
+    },
+    {
+      "id": "intent-promotion-agent-approval",
+      "file": "scripts/check_intent_promotions.py",
+      "anchor": "        if approval.get(\"generated_by_agent\") is not False:",
+      "verify": [
+        "python3",
+        "scripts/check_intent_promotions.py",
+        "selftest"
+      ],
+      "note": "An agent can write approver_kind HUMAN; it cannot honestly write generated_by_agent false."
+    },
+    {
+      "id": "authority-digest-binding",
+      "file": "scripts/check_intent_promotion_authority.py",
+      "anchor": "    if actual != declared[\"artifact_digest\"]:",
+      "verify": [
+        "python3",
+        "scripts/check_intent_promotion_authority.py",
+        "--selftest"
+      ],
+      "note": "The whole authority layer rests on this: a digest a caller writes is a label until something hashes the file. It shipped uncontrolled once."
+    },
+    {
+      "id": "authority-schema-execution",
+      "file": "scripts/check_intent_promotion_authority.py",
+      "anchor": "    validate_against(receipt_schema, receipt, \"receipt\")",
+      "verify": [
+        "python3",
+        "scripts/check_intent_promotion_authority.py",
+        "--selftest"
+      ],
+      "note": "A committed schema that is only parsed is not a gate."
+    },
+    {
+      "id": "union-first-source-wins",
+      "file": "migration/hotfix_union.py",
+      "anchor": "                if any(r[3] == destination for r in restores):",
+      "verify": [
+        "python3",
+        "migration/hotfix_union.py",
+        "--selftest"
+      ],
+      "note": "Every fixture had a group size of one, so first-wins and last-wins behaved identically until #148."
+    },
+    {
+      "id": "delivery-shape-controlled-fields",
+      "file": "scripts/measure_delivery_shape.py",
+      "anchor": "        if len(set(values.values())) != 1:",
+      "verify": [
+        "python3",
+        "scripts/measure_delivery_shape.py",
+        "selftest"
+      ],
+      "note": "Without this, a comparison whose arms ran different evaluators or carriers reports a difference and attributes it to the branch graph."
+    },
+    {
+      "id": "commit-role-exception-bounded",
+      "file": "scripts/check_commit_roles.py",
+      "anchor": "        if found.get(\"Driven-By\") or found.get(\"Driven-On\"):",
+      "verify": [
+        "python3",
+        "-m",
+        "unittest",
+        "tests.test_commit_roles.GateTests"
+      ],
+      "note": "Without this the exception list becomes a way to skip any commit, including ones that could simply carry the trailers."
+    },
+    {
+      "id": "executor-promotion-authority",
+      "file": "scripts/check_executor_authority.py",
+      "anchor": "    if not isinstance(field, dict) or field.get(\"const\") is not False:",
+      "verify": [
+        "python3",
+        "scripts/check_executor_authority.py",
+        "--repo-root",
+        ".",
+        "--selftest"
+      ],
+      "note": "#29 requires that no execution adapter owns promotion authority. The guard lives in the schema's const, so this protects the schema from being weakened back to a per-adapter boolean. An earlier Python re-check of the same thing was reported as uncontrolled by this very gate, correctly."
+    },
+    {
+      "id": "snapshot-branch-absence",
+      "file": "skills/github-delivery-loop/scripts/github_actions_snapshot.py",
+      "anchor": "            if ref[\"observed\"]:",
+      "verify": [
+        "python3",
+        "skills/github-delivery-loop/scripts/github_actions_snapshot.py",
+        "--selftest"
+      ],
+      "note": "#70: an absent open PR does not prove the remote branch is absent. Without this a repeated or orphaned branch is byte-identical to a truly unpublished one, and a second initial-pr gets admitted."
+    },
+    {
+      "id": "snapshot-ref-pr-agreement",
+      "file": "skills/github-delivery-loop/scripts/github_actions_snapshot.py",
+      "anchor": "    if \"branch_ref\" in v and v[\"branch_ref\"][\"object_sha\"]!=p[\"head_sha\"]:",
+      "verify": [
+        "python3",
+        "skills/github-delivery-loop/scripts/github_actions_snapshot.py",
+        "--selftest"
+      ],
+      "note": "The observed ref must agree with the pull request head, or the observation describes a different branch state than the one being published."
+    },
+    {
+      "id": "eval-plane-claim-attached",
+      "file": "scripts/check_skill_eval_plane.py",
+      "anchor": "    if checker.name in body or checker.stem in body:",
+      "verify": [
+        "python3",
+        "scripts/skill_eval_plane_selftest.py"
+      ],
+      "note": "#16: without this an eval can claim a checker the test never runs, and a claim plane that covers nothing looks the same as one that covers everything."
+    },
+    {
+      "id": "eval-plane-fixture-not-polymorphic",
+      "file": "scripts/check_skill_eval_plane.py",
+      "anchor": "        if prose_field in case:",
+      "verify": [
+        "python3",
+        "scripts/skill_eval_plane_selftest.py"
+      ],
+      "note": "#16: a fixture field carrying both a path and prose makes a mistyped path indistinguishable from a description."
+    },
+    {
+      "id": "eval-plane-nonempty-runnable",
+      "file": "scripts/check_skill_eval_plane.py",
+      "anchor": "    if not isinstance(runnable, list) or not runnable:",
+      "verify": [
+        "python3",
+        "scripts/skill_eval_plane_selftest.py"
+      ],
+      "note": "#16 n13: an empty runnable array declares no coverage, which must not read as complete coverage."
+    },
+    {
+      "id": "worker-publication-markers",
+      "file": "skills/git-town-stacked-pr-worker/scripts/check_publication_boundary.py",
+      "anchor": "        raise ContractError(f\"{relative}: missing markers: {missing}\")",
+      "verify": [
+        "python3",
+        "skills/git-town-stacked-pr-worker/scripts/check_publication_boundary.py",
+        "--selftest"
+      ],
+      "note": "#47: require_markers is what enforces every stated blocking condition in the Worker's instruction surface. Without it the laws stay in the prose and nothing notices when one is deleted."
+    },
+    {
+      "id": "ctl-profile-official-standard",
+      "file": "skills/controlled-technical-language-harness/scripts/check_profile_admission.py",
+      "anchor": "    if pack[\"source\"][\"classification\"] != \"OFFICIAL_STANDARD\":",
+      "verify": [
+        "bash",
+        "skills/controlled-technical-language-harness/tests/profile-admission/verify.sh"
+      ],
+      "note": "#47 sweep: a proposal-derived profile must not be admitted as the official standard. Registered to prove this selftest can go red at all, after the same class of hollow mutation was found in check_publication_boundary.py."
+    },
+    {
+      "id": "gate-evidence-receipt-binding",
+      "file": "skills/github-delivery-loop/scripts/ci_publish_gate.py",
+      "anchor": "    if digest(value) != verification[\"evidence_sha256\"]:",
+      "verify": [
+        "python3",
+        "skills/github-delivery-loop/scripts/ci_publish_gate.py",
+        "--selftest"
+      ],
+      "note": "#53: without this the receipt's evidence_sha256 is a claim nobody recomputes, and any detailed evidence at all authorizes publication as long as the compact receipt says PASS."
+    },
+    {
+      "id": "gate-evidence-content-digest",
+      "file": "skills/github-delivery-loop/scripts/ci_publish_gate.py",
+      "anchor": "    if require_digest(content_sha, \"evidence.content_sha256\") != digest(content):",
+      "verify": [
+        "python3",
+        "skills/github-delivery-loop/scripts/ci_publish_gate.py",
+        "--selftest"
+      ],
+      "note": "#53: the sidecar's self-digest. Checking only the receipt's digest leaves this one free to disagree with the bytes it covers."
+    },
+    {
+      "id": "gate-evidence-command-outcome",
+      "file": "skills/github-delivery-loop/scripts/ci_publish_gate.py",
+      "anchor": "        if command[\"exit\"] != 0:",
+      "verify": [
+        "python3",
+        "skills/github-delivery-loop/scripts/ci_publish_gate.py",
+        "--selftest"
+      ],
+      "note": "#53: a receipt says PASS; the per-command evidence says whether anything actually ran to completion. A failing command inside a PASS receipt was previously invisible."
+    },
+    {
+      "id": "gate-evidence-command-order",
+      "file": "skills/github-delivery-loop/scripts/ci_publish_gate.py",
+      "anchor": "    if ids != verification[\"commands\"]:",
+      "verify": [
+        "python3",
+        "skills/github-delivery-loop/scripts/ci_publish_gate.py",
+        "--selftest"
+      ],
+      "note": "#53: the receipt lists what the contract ran, in order. A reordering is a different execution, and set equality would accept it."
+    },
+    {
+      "id": "gate-receipt-status-pass",
+      "file": "skills/github-delivery-loop/scripts/ci_publish_gate.py",
+      "anchor": "    if value[\"status\"] != \"PASS\":",
+      "verify": [
+        "python3",
+        "skills/github-delivery-loop/scripts/ci_publish_gate.py",
+        "--selftest"
+      ],
+      "note": "#49: a FAIL receipt must not be consumed as PASS. This check ran and could not fail until the control existed."
+    },
+    {
+      "id": "publication-profile-check-identity",
+      "file": "scripts/check_ci_publication_profile.py",
+      "anchor": "    if not re.search(rf\"^  {re.escape(check_name)}:\\s*$\", text, re.MULTILINE):",
+      "verify": [
+        "python3",
+        "scripts/check_ci_publication_profile.py",
+        "--selftest"
+      ],
+      "note": "#54: a stable check name is stable only if a job answers to it. A name resolving to nothing produces no check run, and an absent check run reads as an absent blocker."
+    },
+    {
+      "id": "publication-profile-billing-stop",
+      "file": "scripts/check_ci_publication_profile.py",
+      "anchor": "    if billing[\"on_blocked\"] not in BILLING_ACTIONS:",
+      "verify": [
+        "python3",
+        "scripts/check_ci_publication_profile.py",
+        "--selftest"
+      ],
+      "note": "#54: rerunning or continuing while the billing circuit is open pays for no observation."
+    },
+    {
+      "id": "publication-profile-no-live-evidence",
+      "file": "scripts/check_ci_publication_profile.py",
+      "anchor": "            if f'\"{schema}\"' in text:",
+      "verify": [
+        "python3",
+        "scripts/check_ci_publication_profile.py",
+        "--selftest"
+      ],
+      "note": "#54: a committed receipt or snapshot describes a commit that is no longer HEAD, and a stale receipt that looks current is worse than none."
+    },
+    {
+      "id": "gate-initial-boundary",
+      "file": "skills/github-delivery-loop/scripts/ci_publish_gate.py",
+      "anchor": "        if boundary == \"unproven\":",
+      "verify": [
+        "python3",
+        "skills/github-delivery-loop/scripts/ci_publish_gate.py",
+        "--selftest"
+      ],
+      "note": "#54/#70: an absent pull request is not an absent branch. Without this the producer's independently observed ref is a field nobody reads, and a repeated or orphaned remote branch authorizes a second initial publication."
+    },
+    {
+      "id": "union-restored-count-truthful",
+      "file": "migration/hotfix_union.py",
+      "anchor": "    print(f\"\\nRESTORED={len(added)}  \u65e2\u6709\u6a94\u6848 {len(before)} \u500b\u9010\u4e00\u6bd4\u5c0d hash\uff0c\u5168\u90e8\u672a\u8b8a\")",
+      "verify": [
+        "python3",
+        "migration/hotfix_union.py",
+        "--selftest"
+      ],
+      "note": "#16 n8/n9: the numbers in the success line had nobody checking them. A count that lies and a count that tells the truth print the same shape."
+    },
+    {
+      "id": "union-changed-file-refusal",
+      "file": "migration/hotfix_union.py",
+      "anchor": "        return 1",
+      "verify": [
+        "python3",
+        "migration/hotfix_union.py",
+        "--selftest"
+      ],
+      "note": "#16: the post-condition that refuses when a pre-existing file changed. Normal input cannot reach it, so it was a check that ran and could not fail until the selftest planted a plan violating the rule plan itself enforces."
+    },
+    {
+      "id": "body-neutrality-no-new-debt",
+      "file": "skills/shared-skills-infra/scripts/check_body_neutrality.py",
+      "anchor": "        if has > allowed:",
+      "verify": [
+        "python3",
+        "skills/shared-skills-infra/scripts/check_body_neutrality.py",
+        "--selftest"
+      ],
+      "note": "#1: without this the ratchet has no pawl. A shared body that names a host repository is binding wearing a body's clothes, and it reaches four other repositories as if it were true there."
+    },
+    {
+      "id": "body-neutrality-no-stale-allowance",
+      "file": "skills/shared-skills-infra/scripts/check_body_neutrality.py",
+      "anchor": "        elif has < allowed:",
+      "verify": [
+        "python3",
+        "skills/shared-skills-infra/scripts/check_body_neutrality.py",
+        "--selftest"
+      ],
+      "note": "#1: an allowance nobody spends stops describing the debt and becomes a permanent exemption, which is how every ratchet quietly stops ratcheting."
+    },
+    {
+      "id": "binding-stale-surfaces",
+      "file": "skills/shared-skills-infra/scripts/check_binding_stale.py",
+      "anchor": "    if actual == fields[\"body_version\"]:",
+      "verify": [
+        "python3",
+        "skills/shared-skills-infra/scripts/check_binding_stale.py",
+        "--selftest"
+      ],
+      "note": "#1/#5: body_version is the whole mechanism. Without the comparison, a fix to the shared body reaches every host as a silent no-op and is rediscovered there later, one repository at a time."
+    },
+    {
+      "id": "binding-slot-name-agreement",
+      "file": "skills/shared-skills-infra/scripts/check_binding_stale.py",
+      "anchor": "    if fields[\"skill\"] != name:",
+      "verify": [
+        "python3",
+        "skills/shared-skills-infra/scripts/check_binding_stale.py",
+        "--selftest"
+      ],
+      "note": "#1/#5: a slot and its contract disagreeing about what is bound means every later check is about the wrong skill."
+    },
+    {
+      "id": "guard-controls-checks-every-guard",
+      "file": "scripts/check_guard_controls.py",
+      "anchor": "        for guard in guards:",
+      "verify": [
+        "python3",
+        "scripts/check_guard_controls.py",
+        "--repo-root",
+        ".",
+        "--selftest"
+      ],
+      "note": "#16: the gate every other guard depends on could check only the first manifest entry and stay green. Its selftest called check_guard directly per shape, so main()'s loop -- the thing that decides whether the manifest was read in full -- was never exercised."
+    },
+    {
+      "id": "body-neutrality-reports-every-file",
+      "file": "skills/shared-skills-infra/scripts/check_body_neutrality.py",
+      "anchor": "    for name in sorted(set(actual) | set(owed)):",
+      "verify": [
+        "python3",
+        "skills/shared-skills-infra/scripts/check_body_neutrality.py",
+        "--selftest"
+      ],
+      "note": "#16: with one offender per fixture, 'report every file' and 'report the first file' are the same program."
+    },
+    {
+      "id": "binding-checks-every-slot",
+      "file": "skills/shared-skills-infra/scripts/check_binding_stale.py",
+      "anchor": "    for directory in sorted(p for p in slots.iterdir() if p.is_dir()):",
+      "verify": [
+        "python3",
+        "skills/shared-skills-infra/scripts/check_binding_stale.py",
+        "--selftest"
+      ],
+      "note": "#16: the list this gate exists to produce would silently be a list of one."
+    },
+    {
+      "id": "publication-profile-checks-every-path",
+      "file": "scripts/check_ci_publication_profile.py",
+      "anchor": "    for entry in paths:",
+      "verify": [
+        "python3",
+        "scripts/check_ci_publication_profile.py",
+        "--selftest"
+      ],
+      "note": "#16: a receipt path in second position was unreachable while every fixture held exactly one."
+    },
+    {
+      "id": "shared-skills-check-runs-both-gates",
+      "file": "skills/shared-skills-infra/scripts/shared_skills.py",
+      "anchor": "    neutrality, surfaced = _body_and_binding(Path(__file__).resolve().parents[3])",
+      "verify": [
+        "bash",
+        "skills/shared-skills-infra/tests/verify.sh"
+      ],
+      "note": "#1: the two rulings are gates only if `check` runs them. Wired-but-never-exercised leaves a host-bound body and a stale binding indistinguishable from a clean tree."
+    },
+    {
+      "id": "workflow-policy-required-jobs",
+      "file": "skills/github-delivery-loop/scripts/ci_workflow_policy.py",
+      "anchor": "    missing_jobs = sorted(set(policy[\"required_jobs\"]) - job_names)",
+      "verify": [
+        "bash",
+        "skills/github-delivery-loop/tests/ci-workflow-policy/verify.sh"
+      ],
+      "note": "#82 landed .github-delivery/ci-policy.json with nothing in this tree able to read it. Without the workflow comparison the policy can name any job and stay green, and the drift only appears as a publication that paid for a runner and learned nothing."
+    }
+  ]
+}

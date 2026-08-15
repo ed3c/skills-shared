@@ -1,0 +1,93 @@
+{
+  "schema_version": "controlled-language-receipt/v1",
+  "receipt_id": "ctl-fixture-receipt-001",
+  "request_identity": {
+    "request_id": "ctl-fixture-procedural-001",
+    "artifact_digest": "sha256:5e05cb2a78cacdcc8779ee40f75d751e814bf86e01175565f33875200f4ca455"
+  },
+  "subject_identity": {
+    "artifact_digest": "sha256:85b0f2f9237523a7f059f951cd4045883069d86349e78b50ac01c50180de5d7e",
+    "locator": "inline:ctl-fixture-procedural-001"
+  },
+  "profile_identity": {
+    "pack_id": "fixture-controlled-technical-language",
+    "edition": "0.1-fixture",
+    "artifact_digest": "sha256:0d1cb3027d1f91a2c0a6c419c56b305355557e94c0bfeadc7a95eb13e6837ba7"
+  },
+  "termbase_identities": [
+    {
+      "term_id": "TERM-BLEED-VALVE",
+      "artifact_digest": "sha256:da14777871c92399b49928c54dd9b9b0cae212ca758fec634a388b0a74cdcfb6"
+    },
+    {
+      "term_id": "TERM-SAFETY-WIRE",
+      "artifact_digest": "sha256:d0c5ef8cc5e3325b874473e12e124b604f87cf00aa8034e0adfcc5a6325ab257"
+    }
+  ],
+  "evaluator_runs": [
+    {
+      "evaluator_id": "fixture-deterministic-linter",
+      "version": "1.0.0",
+      "evidence_class": "DETERMINISTIC",
+      "status": "PASS",
+      "input_digest": "sha256:85b0f2f9237523a7f059f951cd4045883069d86349e78b50ac01c50180de5d7e",
+      "output_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+      "exit_code": 0,
+      "calibration_ref": null,
+      "human_receipt_ref": null
+    },
+    {
+      "evaluator_id": "fixture-calibrated-parser",
+      "version": "1.0.0",
+      "evidence_class": "CALIBRATED_HEURISTIC",
+      "status": "PASS",
+      "input_digest": "sha256:85b0f2f9237523a7f059f951cd4045883069d86349e78b50ac01c50180de5d7e",
+      "output_digest": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+      "exit_code": null,
+      "calibration_ref": "fixture://calibration/parser-v1",
+      "human_receipt_ref": null
+    },
+    {
+      "evaluator_id": "fixture-semantic-reviewer",
+      "version": "1.0.0",
+      "evidence_class": "SEMANTIC",
+      "status": "PASS",
+      "input_digest": "sha256:85b0f2f9237523a7f059f951cd4045883069d86349e78b50ac01c50180de5d7e",
+      "output_digest": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+      "exit_code": null,
+      "calibration_ref": null,
+      "human_receipt_ref": null
+    },
+    {
+      "evaluator_id": "fixture-human-review",
+      "version": "1.0.0",
+      "evidence_class": "HUMAN",
+      "status": "PASS",
+      "input_digest": "sha256:85b0f2f9237523a7f059f951cd4045883069d86349e78b50ac01c50180de5d7e",
+      "output_digest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+      "exit_code": null,
+      "calibration_ref": null,
+      "human_receipt_ref": "fixture://human-review/ctl-fixture-001"
+    }
+  ],
+  "violations": {
+    "open_count": 0,
+    "repaired_count": 1,
+    "blocked_count": 0,
+    "waived_count": 0,
+    "violation_ids": [
+      "V-FIXTURE-WORD-LIMIT"
+    ]
+  },
+  "repair_history": [],
+  "diagnostic_reflection_receipts": [],
+  "exact_subject_fresh": true,
+  "human_review": {
+    "state": "ADMITTED",
+    "receipt_ref": "fixture://human-review/ctl-fixture-001",
+    "receipt_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "claim_level": "HUMAN_REVIEWED",
+  "official_compliance_receipt": null,
+  "final_status": "PASS"
+}

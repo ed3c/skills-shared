@@ -1,0 +1,26 @@
+{
+  "schema_version": "skill-eval-executor-authority/v1",
+  "executor": "arena",
+  "repository": "ed3c/agent-skills-repo",
+  "repository_sha": "7bc9d28c8b2b4b187713654c84c792f2283e3c8e",
+  "control_plane": {
+    "experiment_cli": "scripts/arena_experiment.py",
+    "paired_runtime_cli": "scripts/run_arena_benchflow_experiment.py",
+    "experiment_contract": "contracts/arena-experiment.schema.json"
+  },
+  "runtime_state": "blocked_external_authority",
+  "blocking_issue": "ed3c/agent-skills-repo#46",
+  "blocking_reason": "The previously implemented GitHub Models BenchFlow LLM profile is retired and intentionally fails closed. A replacement provider policy, credentials/budget authority, and physical run are required before this executor can contribute cross-harness capability evidence.",
+  "allowed_claims": [
+    "control-plane-contract-available",
+    "paired-runner-available",
+    "offline-replay-available"
+  ],
+  "forbidden_claims": [
+    "cross-harness-capability-proven",
+    "physical-llm-runtime-qualified",
+    "promotion-admitted",
+    "ranking-claim-allowed"
+  ],
+  "promotion_authority": false
+}
