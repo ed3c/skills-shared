@@ -1,0 +1,39 @@
+{
+  "repo": "example/infrastructure",
+  "canonical_repo": "example/infrastructure",
+  "owner": {"login": "example", "id": 42, "type": "User"},
+  "viewer": {"login": "example", "id": 42, "type": "User"},
+  "permissions": {"admin": true},
+  "pulls": [
+    {
+      "id": "PR_owner_auto_2",
+      "number": 2,
+      "url": "https://github.com/example/infrastructure/pull/2",
+      "title": "unrelated ready dependency update",
+      "isDraft": false,
+      "headRefOid": "2222222222222222222222222222222222222222",
+      "mergeable": "MERGEABLE",
+      "mergeStateStatus": "CLEAN"
+    },
+    {
+      "id": "PR_owner_auto_6",
+      "number": 6,
+      "url": "https://github.com/example/infrastructure/pull/6",
+      "title": "unrelated failing dependency update",
+      "isDraft": false,
+      "headRefOid": "6666666666666666666666666666666666666666",
+      "mergeable": "MERGEABLE",
+      "mergeStateStatus": "UNSTABLE"
+    },
+    {
+      "id": "PR_owner_auto_31",
+      "number": 31,
+      "url": "https://github.com/example/infrastructure/pull/31",
+      "title": "the explicitly selected delivery slice",
+      "isDraft": false,
+      "headRefOid": "3131313131313131313131313131313131313131",
+      "mergeable": "MERGEABLE",
+      "mergeStateStatus": "CLEAN"
+    }
+  ]
+}

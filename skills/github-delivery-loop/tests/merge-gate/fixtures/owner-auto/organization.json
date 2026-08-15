@@ -1,0 +1,8 @@
+{
+  "repo": "example/infrastructure",
+  "canonical_repo": "example/infrastructure",
+  "owner": {"login": "example", "id": 42, "type": "Organization"},
+  "viewer": {"login": "example", "id": 42, "type": "User"},
+  "permissions": {"admin": true},
+  "pulls": []
+}
