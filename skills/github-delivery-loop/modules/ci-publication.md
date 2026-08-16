@@ -89,9 +89,12 @@ The evaluator is deliberately pure; enforcement is layered around it:
 4. `ci_publish.py publish` rechecks policy, receipt, snapshot, GitHub remote
    identity, observed branch, and full-SHA refspec before one push. Its live
    capture resolves every declared workflow path to a provider workflow ID, so
-   another workflow cannot collide by reusing the same job name. A partially
-   observed declaration set, an incomplete check, or a rerun is ambiguous and
-   blocks repair. One or more actionable declared failures become one ordered,
+   another workflow cannot collide by reusing the same job name. Capture also
+   binds the exact Actions job and its step count. A completed `skipped` job with
+   zero steps is retained as a non-execution observation and does not create a
+   false rerun conflict; missing step provenance remains conservative. A partially
+   observed declaration set, an incomplete check, or two executed checks are
+   ambiguous and block repair. One or more actionable declared failures become one ordered,
    deterministic feedback identity for the whole repair batch. Initial
    publication creates a draft PR; ready publication marks it ready. Draft-first
    batched repairs explicitly dispatch the verifier;
@@ -129,9 +132,12 @@ The Actions capture CLI likewise does not accept a caller-selected `gh` path or
 resolve `gh` from inherited `PATH`. It selects from a closed absolute-path set,
 records invoked path, realpath, binary SHA-256, and version, then records exact
 absolute-path `gh api` argv and derives GitHub-Actions-owned check-suite plus
-workflow/run/job/check identities for every declared pair. More than one
-execution of any declared pair for the exact candidate is a provenance conflict,
-not "latest wins"; publication remains blocked instead of blessing a rerun.
+workflow/run/job/check identities, matching job/check status and conclusion, and
+job-step count for every declared pair.
+A zero-step `skipped` job is a non-execution, not a second run. More than one
+actual execution of any declared pair for the exact candidate is a provenance
+conflict, not "latest wins"; publication remains blocked instead of blessing a
+rerun. Billing annotations still open the circuit even on a zero-step job.
 
 Optional auxiliary feedback checks are declared without restating the primary:
 
@@ -232,8 +238,10 @@ The intent and local verification receipt are separate inputs. Exit `0` with an
 BLOCK and exit `64` is malformed/unavailable evidence. Any nonzero exit stops
 before `git push`.
 
-New capture emits observation v3, transport v5, and snapshot v5. The replay
-adapter keeps the prior single-workflow v2/v4/v4 shapes readable for existing
-dual-origin receipts. Publication admission accepts a v4 snapshot only when it
+New capture emits observation v4, transport v6, and snapshot v5. Observation
+v3 and transport v5 remain readable but carry unknown step provenance, so they
+cannot dismiss a skipped check from rerun ambiguity. The replay adapter also
+keeps the prior single-workflow v2/v4/v4 shapes readable for existing dual-origin
+receipts. Publication admission accepts a v4 snapshot only when it
 contains no CI check capable of authorizing a repair; legacy CI feedback must be
 recaptured as v5 so workflow/job provenance is explicit.
