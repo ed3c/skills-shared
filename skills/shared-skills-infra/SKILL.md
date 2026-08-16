@@ -159,6 +159,48 @@ access mode 矩陣**與 bootstrap checker 共用同一份**（直接 import，�
 正對照四個（含「離線 Skill 可以什麼都不宣告為未證」與「binding 可以沒有 runtime_env」——
 邊界是有條件的，不是普世的），負對照 23 個。`tests/skill-bootstrap/verify_requirements.py`。
 
+### Repository Control Plane profile — 新 repo 只掛薄 binding
+
+當新 repo 要同時使用 Git Town、dual forge、Spatial Loop、Shadow Architect 與 Agentic Tech Lead 時，
+不要把五支 Skill body 或安裝腳本複製進 consumer。使用
+[`references/repository-control-plane.default.json`](references/repository-control-plane.default.json)
+固定六段 controller chain，並用
+[`references/repository-control-plane-profile.schema.json`](references/repository-control-plane-profile.schema.json)
+封住 scope、authority、projection 與 evidence state。Consumer binding、offline issue snapshot 與 monitor plan
+另由 `references/repository-control-plane-consumer-binding.schema.json`、
+`references/github-open-issues-snapshot.schema.json`、
+`references/repository-control-plane-monitor-plan.schema.json` 驗證，schema 名稱不再只是未落地的字串。
+
+```bash
+RCP=~/.agents/skills-shared/skills/shared-skills-infra/scripts/repository_control_plane.py
+python3 "$RCP" profile-check
+python3 "$RCP" attach --target-root <repo> \
+  --consumer-repository-id <owner/repo> \
+  --runtime-env-commit <exact-commit> --apply
+python3 ~/.agents/skills-shared/skills/shared-skills-infra/scripts/shared_skills.py sync \
+  --requirements <repo>/.agents/shared-skills.requirements.json \
+  --target-root <repo> --apply
+python3 "$RCP" verify --target-root <repo>
+python3 "$RCP" monitor-plan --target-root <repo> --issues <offline-snapshot.json>
+```
+
+`repository_control_plane.py` 只是 CLI router；契約、consumer projection 與 monitor 分別由
+`scripts/repository_control_plane_profile.py`、
+`scripts/repository_control_plane_consumer.py`、
+`scripts/repository_control_plane_monitor.py` 擁有，避免形成另一個不可替換的單體 bootstrap。
+
+`attach` 只產生 `.agents/shared-skills.requirements.json` 與
+`.agents/repository-control-plane.json`；immutable Skill binding 仍由現有 `shared_skills.py sync`
+產生。`verify` 會拒絕 project-local body copy、mutable runtime ref、closure drift 與未生成的 binding；
+缺席回報 `NOT_EXERCISED`／exit 3，不冒充 PASS。`monitor-plan` 只把 host 提供的 GitHub issue
+snapshot 正規化成 controller plan，不輪詢網路、不執行 issue、不 merge。
+
+完整 ownership、一次安裝、遷移與 rollback 見
+[Repository Control Plane](../../docs/repository-control-plane.md)。正控與 planted mutations 在
+`tests/repository-control-plane/test_repository_control_plane.py`；CI 只證明 deterministic contract，
+不證明 Git Town、Forgejo、Worktree、Stack 或 dual-forge live execution。Host-scoped Git Town
+installer 與 doctor 由 `runtime-env#36` 擁有，不得回流成 consumer-local 安裝器。
+
 ## clone 下來怎麼接線
 
 ```bash

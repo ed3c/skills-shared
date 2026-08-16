@@ -9,11 +9,15 @@ on:
       - synchronize
     paths:
       - 'skills/shared-skills-infra/**'
+      - 'docs/repository-control-plane.md'
+      - 'registry.json'
       - '.github/workflows/shared-skills-infra.yml'
   push:
     branches: [main]
     paths:
       - 'skills/shared-skills-infra/**'
+      - 'docs/repository-control-plane.md'
+      - 'registry.json'
       - '.github/workflows/shared-skills-infra.yml'
   workflow_dispatch:
 
@@ -43,6 +47,61 @@ jobs:
         run: python3 -m pip install --disable-pip-version-check 'jsonschema==4.26.0'
       - name: Verify shared-skills governance
         run: bash skills/shared-skills-infra/tests/verify.sh
+      - name: Verify repository control-plane profile and thin attachment
+        run: >-
+          python3 -m unittest discover
+          -s skills/shared-skills-infra/tests/repository-control-plane
+          -p 'test_*.py' -v
+      - name: Verify repository control-plane JSON Schemas and generated documents
+        run: |
+          python3 - <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+          import jsonschema
+
+          skill = Path('skills/shared-skills-infra')
+          refs = skill / 'references'
+          sys.path.insert(0, str(skill / 'scripts'))
+          from repository_control_plane_monitor import build_monitor_plan
+          from repository_control_plane_profile import build_consumer_documents, load_profile
+
+          schemas = {}
+          for name in (
+              'repository-control-plane-profile.schema.json',
+              'repository-control-plane-consumer-binding.schema.json',
+              'github-open-issues-snapshot.schema.json',
+              'repository-control-plane-monitor-plan.schema.json',
+          ):
+              schema = json.loads((refs / name).read_text())
+              jsonschema.Draft202012Validator.check_schema(schema)
+              schemas[name] = schema
+
+          profile = load_profile(refs / 'repository-control-plane.default.json')
+          jsonschema.Draft202012Validator(
+              schemas['repository-control-plane-profile.schema.json']
+          ).validate(profile)
+          documents = build_consumer_documents(
+              profile,
+              consumer_repository_id='ed3c/schema-fixture',
+              runtime_env_commit='a' * 40,
+          )
+          control = documents[profile['projection']['control_plane_path']]
+          jsonschema.Draft202012Validator(
+              schemas['repository-control-plane-consumer-binding.schema.json']
+          ).validate(control)
+          snapshot = [
+              {'number': 1, 'title': 'ready', 'state': 'open', 'labels': []},
+              {'number': 2, 'title': 'blocked', 'state': 'open', 'blocked_by': [1]},
+          ]
+          jsonschema.Draft202012Validator(
+              schemas['github-open-issues-snapshot.schema.json']
+          ).validate(snapshot)
+          plan = build_monitor_plan(profile, control=control, snapshot=snapshot)
+          jsonschema.Draft202012Validator(
+              schemas['repository-control-plane-monitor-plan.schema.json']
+          ).validate(plan)
+          PY
       - name: Verify canonical-drift behavior
         run: bash skills/shared-skills-infra/tests/canonical-drift/verify.sh
       - name: Kill canonical-drift first-only mutants

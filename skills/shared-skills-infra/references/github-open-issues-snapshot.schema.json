@@ -1,0 +1,160 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skills-shared.invalid/github-open-issues-snapshot/v1",
+  "title": "GitHub Open Issues Snapshot",
+  "description": "Offline host-provided issue metadata. Extra provider fields are allowed and ignored by the portable normalizer.",
+  "oneOf": [
+    {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "title"
+        ],
+        "properties": {
+          "number": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "issue_number": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "state": {
+            "enum": [
+              "open",
+              "closed",
+              "OPEN",
+              "CLOSED"
+            ]
+          },
+          "labels": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "name"
+                  ],
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "blocked_by": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        "anyOf": [
+          {
+            "required": [
+              "number"
+            ]
+          },
+          {
+            "required": [
+              "issue_number"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "issues"
+      ],
+      "properties": {
+        "issues": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "title"
+            ],
+            "properties": {
+              "number": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "issue_number": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1
+              },
+              "state": {
+                "enum": [
+                  "open",
+                  "closed",
+                  "OPEN",
+                  "CLOSED"
+                ]
+              },
+              "labels": {
+                "type": "array",
+                "items": {
+                  "oneOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "object",
+                      "required": [
+                        "name"
+                      ],
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "blocked_by": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            },
+            "anyOf": [
+              {
+                "required": [
+                  "number"
+                ]
+              },
+              {
+                "required": [
+                  "issue_number"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

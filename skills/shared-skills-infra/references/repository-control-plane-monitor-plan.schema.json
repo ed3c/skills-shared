@@ -1,0 +1,315 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skills-shared.invalid/repository-control-plane-monitor-plan/v1",
+  "title": "Repository Control Plane Monitor Plan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "consumer_repository_id",
+    "profile",
+    "control_binding_sha256",
+    "source",
+    "mode",
+    "issues",
+    "authority"
+  ],
+  "properties": {
+    "schema": {
+      "const": "repository-control-plane/monitor-plan/v1"
+    },
+    "consumer_repository_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"
+    },
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "content_sha256"
+      ],
+      "properties": {
+        "id": {
+          "const": "skills-shared-default"
+        },
+        "content_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "control_binding_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "query",
+        "snapshot_sha256",
+        "input_issue_count",
+        "open_issue_count"
+      ],
+      "properties": {
+        "kind": {
+          "const": "github"
+        },
+        "query": {
+          "const": "is:issue is:open"
+        },
+        "snapshot_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "input_issue_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "open_issue_count": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "mode": {
+      "const": "READ_ONLY_PLAN"
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "task_id",
+          "number",
+          "title",
+          "routing_state",
+          "blocked_by",
+          "labels",
+          "controller_chain",
+          "required_receipts",
+          "execution_state",
+          "merge_admission"
+        ],
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "pattern": "^github-issue-[1-9][0-9]*$"
+          },
+          "number": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "routing_state": {
+            "enum": [
+              "READY",
+              "IN_PROGRESS",
+              "BLOCKED"
+            ]
+          },
+          "blocked_by": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "labels": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "string"
+            }
+          },
+          "controller_chain": {
+            "type": "array",
+            "minItems": 6,
+            "maxItems": 6,
+            "prefixItems": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "phase",
+                  "skill",
+                  "receipt"
+                ],
+                "properties": {
+                  "phase": {
+                    "const": "BOOTSTRAP"
+                  },
+                  "skill": {
+                    "const": "shared-skills-infra"
+                  },
+                  "receipt": {
+                    "const": "skill-resolution"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "phase",
+                  "skill",
+                  "receipt"
+                ],
+                "properties": {
+                  "phase": {
+                    "const": "SHADOW_ADMISSION"
+                  },
+                  "skill": {
+                    "const": "procedural-shadow-runtime"
+                  },
+                  "receipt": {
+                    "const": "shadow-admission"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "phase",
+                  "skill",
+                  "receipt"
+                ],
+                "properties": {
+                  "phase": {
+                    "const": "TECH_LEAD_PLAN"
+                  },
+                  "skill": {
+                    "const": "agentic-tech-lead-orchestration"
+                  },
+                  "receipt": {
+                    "const": "task-dag"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "phase",
+                  "skill",
+                  "receipt"
+                ],
+                "properties": {
+                  "phase": {
+                    "const": "SPATIAL_INVARIANTS"
+                  },
+                  "skill": {
+                    "const": "spatial-loop-systems-engineering"
+                  },
+                  "receipt": {
+                    "const": "spatial-invariants"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "phase",
+                  "skill",
+                  "receipt"
+                ],
+                "properties": {
+                  "phase": {
+                    "const": "STACK_DELIVERY"
+                  },
+                  "skill": {
+                    "const": "git-town-stacked-pr-worker"
+                  },
+                  "receipt": {
+                    "const": "git-town-stack"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "phase",
+                  "skill",
+                  "receipt"
+                ],
+                "properties": {
+                  "phase": {
+                    "const": "FORGE_RECONCILIATION"
+                  },
+                  "skill": {
+                    "const": "dual-forge-repository-loop"
+                  },
+                  "receipt": {
+                    "const": "dual-forge-reconciliation"
+                  }
+                }
+              }
+            ]
+          },
+          "required_receipts": {
+            "const": [
+              "skill-resolution",
+              "shadow-admission",
+              "task-dag",
+              "spatial-invariants",
+              "git-town-stack",
+              "dual-forge-reconciliation"
+            ]
+          },
+          "execution_state": {
+            "const": "NOT_EXERCISED"
+          },
+          "merge_admission": {
+            "const": "HUMAN_OR_TRUSTED_REPOSITORY_POLICY"
+          }
+        }
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "consumer_mutation",
+        "host_install",
+        "automatic_merge",
+        "automatic_conflict_resolution",
+        "visibility_change",
+        "skill_body_copy",
+        "secret_values"
+      ],
+      "properties": {
+        "consumer_mutation": {
+          "const": "CONSUMER_POLICY_REQUIRED"
+        },
+        "host_install": {
+          "const": "HOST_POLICY_REQUIRED"
+        },
+        "automatic_merge": {
+          "const": false
+        },
+        "automatic_conflict_resolution": {
+          "const": false
+        },
+        "visibility_change": {
+          "const": false
+        },
+        "skill_body_copy": {
+          "const": false
+        },
+        "secret_values": {
+          "const": "DENY"
+        }
+      }
+    }
+  }
+}

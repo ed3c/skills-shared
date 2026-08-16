@@ -1,0 +1,109 @@
+{
+  "schema": "repository-control-plane-profile/v1",
+  "id": "skills-shared-default",
+  "binding": "repository-control-plane",
+  "canonical": {
+    "repository_id": "ed3c/skills-shared",
+    "url": "https://github.com/ed3c/skills-shared"
+  },
+  "selected_skills": [
+    "shared-skills-infra",
+    "procedural-shadow-runtime",
+    "agentic-tech-lead-orchestration",
+    "spatial-loop-systems-engineering",
+    "git-town-stacked-pr-worker",
+    "dual-forge-repository-loop"
+  ],
+  "controller_chain": [
+    {
+      "phase": "BOOTSTRAP",
+      "skill": "shared-skills-infra",
+      "receipt": "skill-resolution"
+    },
+    {
+      "phase": "SHADOW_ADMISSION",
+      "skill": "procedural-shadow-runtime",
+      "receipt": "shadow-admission"
+    },
+    {
+      "phase": "TECH_LEAD_PLAN",
+      "skill": "agentic-tech-lead-orchestration",
+      "receipt": "task-dag"
+    },
+    {
+      "phase": "SPATIAL_INVARIANTS",
+      "skill": "spatial-loop-systems-engineering",
+      "receipt": "spatial-invariants"
+    },
+    {
+      "phase": "STACK_DELIVERY",
+      "skill": "git-town-stacked-pr-worker",
+      "receipt": "git-town-stack"
+    },
+    {
+      "phase": "FORGE_RECONCILIATION",
+      "skill": "dual-forge-repository-loop",
+      "receipt": "dual-forge-reconciliation"
+    }
+  ],
+  "runtime": {
+    "repository_id": "ed3c/runtime-env",
+    "skills": {
+      "scope": "user",
+      "owner": "skills-shared",
+      "setup_entrypoint": "shared-skills-infra.install",
+      "probe_entrypoint": "shared-skills-infra.check",
+      "without_receipt": "NOT_EXERCISED"
+    },
+    "git_town": {
+      "scope": "user",
+      "owner": "runtime-env",
+      "executable": "git-town",
+      "setup_entrypoint": "repository-control-plane.install-git-town",
+      "probe_entrypoint": "repository-control-plane.git-town-version",
+      "implementation_state": "NOT_IMPLEMENTED",
+      "without_receipt": "NOT_EXERCISED"
+    },
+    "forgejo": {
+      "scope": "host",
+      "owner": "runtime-env",
+      "endpoint_variable": "FORGEJO_URL",
+      "profile_id": "forgejo-delivery-keychain-local",
+      "workload_id": "forgejo-delivery-loop",
+      "probe_entrypoint": "credential-canary",
+      "without_receipt": "NOT_EXERCISED"
+    }
+  },
+  "monitor": {
+    "source": "github",
+    "query": "is:issue is:open",
+    "mode": "READ_ONLY_PLAN",
+    "polling_scope": "host",
+    "input_schema": "github-open-issues-snapshot/v1",
+    "output_schema": "repository-control-plane/monitor-plan/v1",
+    "unfinished_states": [
+      "OPEN",
+      "BLOCKED",
+      "IN_PROGRESS",
+      "NOT_EXERCISED"
+    ]
+  },
+  "projection": {
+    "requirements_path": ".agents/shared-skills.requirements.json",
+    "control_plane_path": ".agents/repository-control-plane.json",
+    "binding_path": ".agents/bindings/repository-control-plane.json",
+    "surfaces": {
+      "claude": ".claude/skills",
+      "codex": ".agents/skills"
+    }
+  },
+  "authority": {
+    "consumer_mutation": "CONSUMER_POLICY_REQUIRED",
+    "host_install": "HOST_POLICY_REQUIRED",
+    "automatic_merge": false,
+    "automatic_conflict_resolution": false,
+    "visibility_change": false,
+    "skill_body_copy": false,
+    "secret_values": "DENY"
+  }
+}

@@ -1,0 +1,480 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skills-shared.invalid/repository-control-plane-profile/v1",
+  "title": "Repository Control Plane Profile",
+  "description": "Portable composition of canonical Skills, host-scoped reusable runtime capabilities, a read-only unfinished-issue monitor, thin consumer projections, and authority ceilings. It contains no Skill body, credential value, local absolute path, mutable branch identity, or live execution claim.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "id",
+    "binding",
+    "canonical",
+    "selected_skills",
+    "controller_chain",
+    "runtime",
+    "monitor",
+    "projection",
+    "authority"
+  ],
+  "properties": {
+    "schema": {
+      "const": "repository-control-plane-profile/v1"
+    },
+    "id": {
+      "const": "skills-shared-default"
+    },
+    "binding": {
+      "const": "repository-control-plane"
+    },
+    "canonical": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository_id",
+        "url"
+      ],
+      "properties": {
+        "repository_id": {
+          "const": "ed3c/skills-shared"
+        },
+        "url": {
+          "const": "https://github.com/ed3c/skills-shared"
+        }
+      }
+    },
+    "selected_skills": {
+      "type": "array",
+      "minItems": 6,
+      "uniqueItems": true,
+      "prefixItems": [
+        {
+          "const": "shared-skills-infra"
+        },
+        {
+          "const": "procedural-shadow-runtime"
+        },
+        {
+          "const": "agentic-tech-lead-orchestration"
+        },
+        {
+          "const": "spatial-loop-systems-engineering"
+        },
+        {
+          "const": "git-town-stacked-pr-worker"
+        },
+        {
+          "const": "dual-forge-repository-loop"
+        }
+      ],
+      "maxItems": 6
+    },
+    "controller_chain": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "prefixItems": [
+        {
+          "$ref": "#/$defs/bootstrap"
+        },
+        {
+          "$ref": "#/$defs/shadow"
+        },
+        {
+          "$ref": "#/$defs/tech_lead"
+        },
+        {
+          "$ref": "#/$defs/spatial"
+        },
+        {
+          "$ref": "#/$defs/stack"
+        },
+        {
+          "$ref": "#/$defs/forge"
+        }
+      ]
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository_id",
+        "skills",
+        "git_town",
+        "forgejo"
+      ],
+      "properties": {
+        "repository_id": {
+          "const": "ed3c/runtime-env"
+        },
+        "skills": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "scope",
+            "owner",
+            "setup_entrypoint",
+            "probe_entrypoint",
+            "without_receipt"
+          ],
+          "properties": {
+            "scope": {
+              "const": "user"
+            },
+            "owner": {
+              "const": "skills-shared"
+            },
+            "setup_entrypoint": {
+              "const": "shared-skills-infra.install"
+            },
+            "probe_entrypoint": {
+              "const": "shared-skills-infra.check"
+            },
+            "without_receipt": {
+              "const": "NOT_EXERCISED"
+            }
+          }
+        },
+        "git_town": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "scope",
+            "owner",
+            "executable",
+            "setup_entrypoint",
+            "probe_entrypoint",
+            "implementation_state",
+            "without_receipt"
+          ],
+          "properties": {
+            "scope": {
+              "const": "user"
+            },
+            "owner": {
+              "const": "runtime-env"
+            },
+            "executable": {
+              "const": "git-town"
+            },
+            "setup_entrypoint": {
+              "const": "repository-control-plane.install-git-town"
+            },
+            "probe_entrypoint": {
+              "const": "repository-control-plane.git-town-version"
+            },
+            "implementation_state": {
+              "enum": [
+                "IMPLEMENTED",
+                "NOT_IMPLEMENTED"
+              ]
+            },
+            "without_receipt": {
+              "const": "NOT_EXERCISED"
+            }
+          }
+        },
+        "forgejo": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "scope",
+            "owner",
+            "endpoint_variable",
+            "profile_id",
+            "workload_id",
+            "probe_entrypoint",
+            "without_receipt"
+          ],
+          "properties": {
+            "scope": {
+              "const": "host"
+            },
+            "owner": {
+              "const": "runtime-env"
+            },
+            "endpoint_variable": {
+              "const": "FORGEJO_URL"
+            },
+            "profile_id": {
+              "const": "forgejo-delivery-keychain-local"
+            },
+            "workload_id": {
+              "const": "forgejo-delivery-loop"
+            },
+            "probe_entrypoint": {
+              "const": "credential-canary"
+            },
+            "without_receipt": {
+              "const": "NOT_EXERCISED"
+            }
+          }
+        }
+      }
+    },
+    "monitor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "query",
+        "mode",
+        "polling_scope",
+        "input_schema",
+        "output_schema",
+        "unfinished_states"
+      ],
+      "properties": {
+        "source": {
+          "const": "github"
+        },
+        "query": {
+          "const": "is:issue is:open"
+        },
+        "mode": {
+          "const": "READ_ONLY_PLAN"
+        },
+        "polling_scope": {
+          "const": "host"
+        },
+        "input_schema": {
+          "const": "github-open-issues-snapshot/v1"
+        },
+        "output_schema": {
+          "const": "repository-control-plane/monitor-plan/v1"
+        },
+        "unfinished_states": {
+          "const": [
+            "OPEN",
+            "BLOCKED",
+            "IN_PROGRESS",
+            "NOT_EXERCISED"
+          ]
+        }
+      }
+    },
+    "projection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirements_path",
+        "control_plane_path",
+        "binding_path",
+        "surfaces"
+      ],
+      "properties": {
+        "requirements_path": {
+          "const": ".agents/shared-skills.requirements.json"
+        },
+        "control_plane_path": {
+          "const": ".agents/repository-control-plane.json"
+        },
+        "binding_path": {
+          "const": ".agents/bindings/repository-control-plane.json"
+        },
+        "surfaces": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "claude",
+            "codex"
+          ],
+          "properties": {
+            "claude": {
+              "const": ".claude/skills"
+            },
+            "codex": {
+              "const": ".agents/skills"
+            }
+          }
+        }
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "consumer_mutation",
+        "host_install",
+        "automatic_merge",
+        "automatic_conflict_resolution",
+        "visibility_change",
+        "skill_body_copy",
+        "secret_values"
+      ],
+      "properties": {
+        "consumer_mutation": {
+          "const": "CONSUMER_POLICY_REQUIRED"
+        },
+        "host_install": {
+          "const": "HOST_POLICY_REQUIRED"
+        },
+        "automatic_merge": {
+          "const": false
+        },
+        "automatic_conflict_resolution": {
+          "const": false
+        },
+        "visibility_change": {
+          "const": false
+        },
+        "skill_body_copy": {
+          "const": false
+        },
+        "secret_values": {
+          "const": "DENY"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*([._-][a-z0-9]+)*$"
+    },
+    "path": {
+      "type": "string",
+      "pattern": "^(?!/)(?!.*(^|/)\\.\\.(/|$)).+$"
+    },
+    "controller": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "phase",
+        "skill",
+        "receipt"
+      ],
+      "properties": {
+        "phase": {
+          "type": "string"
+        },
+        "skill": {
+          "type": "string"
+        },
+        "receipt": {
+          "$ref": "#/$defs/id"
+        }
+      }
+    },
+    "bootstrap": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/controller"
+        },
+        {
+          "properties": {
+            "phase": {
+              "const": "BOOTSTRAP"
+            },
+            "skill": {
+              "const": "shared-skills-infra"
+            },
+            "receipt": {
+              "const": "skill-resolution"
+            }
+          }
+        }
+      ]
+    },
+    "shadow": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/controller"
+        },
+        {
+          "properties": {
+            "phase": {
+              "const": "SHADOW_ADMISSION"
+            },
+            "skill": {
+              "const": "procedural-shadow-runtime"
+            },
+            "receipt": {
+              "const": "shadow-admission"
+            }
+          }
+        }
+      ]
+    },
+    "tech_lead": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/controller"
+        },
+        {
+          "properties": {
+            "phase": {
+              "const": "TECH_LEAD_PLAN"
+            },
+            "skill": {
+              "const": "agentic-tech-lead-orchestration"
+            },
+            "receipt": {
+              "const": "task-dag"
+            }
+          }
+        }
+      ]
+    },
+    "spatial": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/controller"
+        },
+        {
+          "properties": {
+            "phase": {
+              "const": "SPATIAL_INVARIANTS"
+            },
+            "skill": {
+              "const": "spatial-loop-systems-engineering"
+            },
+            "receipt": {
+              "const": "spatial-invariants"
+            }
+          }
+        }
+      ]
+    },
+    "stack": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/controller"
+        },
+        {
+          "properties": {
+            "phase": {
+              "const": "STACK_DELIVERY"
+            },
+            "skill": {
+              "const": "git-town-stacked-pr-worker"
+            },
+            "receipt": {
+              "const": "git-town-stack"
+            }
+          }
+        }
+      ]
+    },
+    "forge": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/controller"
+        },
+        {
+          "properties": {
+            "phase": {
+              "const": "FORGE_RECONCILIATION"
+            },
+            "skill": {
+              "const": "dual-forge-repository-loop"
+            },
+            "receipt": {
+              "const": "dual-forge-reconciliation"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
