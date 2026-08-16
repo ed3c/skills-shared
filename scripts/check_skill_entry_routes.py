@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Verify and print executable navigation from SKILL.md to owned mechanisms.
+"""Verify and print executable navigation to owned Skill mechanisms.
 
-Issue #258 showed that hand-maintained basename indexes drift. This checker makes
-navigation procedural: each governed SKILL.md names this command, and the command
-indexes current repository bytes under scripts/, references/, and modules/.
+Issue #258 found that direct basename lists in SKILL.md drift. The canonical
+reading contract in skills/README.md now names this current-tree command once;
+the governed Skill manifest determines which entries must remain navigable.
 """
 from __future__ import annotations
 
@@ -17,14 +17,11 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 MANIFEST = REPO / "evals" / "skill-entry-routes.json"
 ROOTS = ("scripts", "references", "modules")
+COMMON_ROUTE = "python3 scripts/check_skill_entry_routes.py --skill <name> --print-index"
 
 
 def load_manifest(path: Path = MANIFEST) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
-
-
-def route_command(name: str) -> str:
-    return f"python3 scripts/check_skill_entry_routes.py --skill {name} --print-index"
 
 
 def owned_files(skill_root: Path) -> list[str]:
@@ -39,29 +36,34 @@ def owned_files(skill_root: Path) -> list[str]:
     return result
 
 
+def check_common_route(repo: Path) -> list[str]:
+    contract = repo / "skills" / "README.md"
+    if not contract.is_file():
+        return ["skills/README.md missing"]
+    text = contract.read_text(encoding="utf-8")
+    if COMMON_ROUTE not in text:
+        return ["shared executable mechanism-navigation route missing from skills/README.md"]
+    return []
+
+
 def check_skill(repo: Path, name: str) -> list[str]:
     skill_root = repo / "skills" / name
     skill = skill_root / "SKILL.md"
     if not skill.is_file():
         return [f"{name}: SKILL.md missing"]
-    text = skill.read_text(encoding="utf-8")
-    command = route_command(name)
-    errors = []
-    if command not in text:
-        errors.append(f"{name}: executable mechanism-navigation route missing")
     files = owned_files(skill_root)
     if not files:
-        errors.append(f"{name}: no owned scripts/references/modules were discoverable")
-    return errors
+        return [f"{name}: no owned scripts/references/modules were discoverable"]
+    return []
 
 
 def run(repo: Path, manifest: dict, only: str | None) -> list[str]:
+    errors = check_common_route(repo)
     names = manifest["skills"]
     if only is not None:
         if only not in names:
-            return [f"unknown governed Skill: {only}"]
+            return errors + [f"unknown governed Skill: {only}"]
         names = [only]
-    errors: list[str] = []
     for name in names:
         errors.extend(check_skill(repo, name))
     return errors
@@ -69,20 +71,17 @@ def run(repo: Path, manifest: dict, only: str | None) -> list[str]:
 
 def selftest(repo: Path, manifest: dict) -> list[str]:
     name = manifest["skills"][0]
-    source = repo / "skills" / name
     with tempfile.TemporaryDirectory(prefix="skill-entry-route-") as tmp:
         troot = Path(tmp)
         (troot / "skills").mkdir()
-        shutil.copytree(source, troot / "skills" / name)
-        skill = troot / "skills" / name / "SKILL.md"
-        original = skill.read_text(encoding="utf-8")
-        command = route_command(name)
-        if command not in original:
-            return ["selftest positive fixture lacks navigation command"]
-        skill.write_text(original.replace(command, "ROUTE_REMOVED", 1), encoding="utf-8")
-        if not check_skill(troot, name):
-            return ["selftest: missing route mutation survived"]
-        skill.write_text(original, encoding="utf-8")
+        shutil.copy2(repo / "skills" / "README.md", troot / "skills" / "README.md")
+        shutil.copytree(repo / "skills" / name, troot / "skills" / name)
+        contract = troot / "skills" / "README.md"
+        original = contract.read_text(encoding="utf-8")
+        contract.write_text(original.replace(COMMON_ROUTE, "ROUTE_REMOVED", 1), encoding="utf-8")
+        if not check_common_route(troot):
+            return ["selftest: missing common route mutation survived"]
+        contract.write_text(original, encoding="utf-8")
         injected = troot / "skills" / name / "modules" / "new-unindexed-fixture.md"
         injected.parent.mkdir(parents=True, exist_ok=True)
         injected.write_text("fixture\n", encoding="utf-8")
@@ -113,8 +112,11 @@ def main() -> int:
         if not args.skill:
             print("--print-index requires --skill", file=sys.stderr)
             return 64
-        files = owned_files(repo / "skills" / args.skill)
-        print(json.dumps({"schema":"skill-entry-index/v1","skill":args.skill,"files":files}, indent=2))
+        print(json.dumps({
+            "schema": "skill-entry-index/v1",
+            "skill": args.skill,
+            "files": owned_files(repo / "skills" / args.skill),
+        }, indent=2))
     else:
         print(f"SKILL-ENTRY-GREEN checked={1 if args.skill else len(manifest['skills'])}")
     return 0
