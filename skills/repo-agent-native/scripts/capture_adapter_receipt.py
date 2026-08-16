@@ -85,11 +85,18 @@ def subject(repo: Path, out: Path | None = None) -> dict[str, Any]:
         except ValueError:
             excluded = None
 
+    # Parse the status code by splitting rather than by column. `git()` strips
+    # the whole stdout, which eats the leading space of the *first* line only,
+    # so a fixed `line[3:]` slice takes one character too many from exactly one
+    # entry -- and that entry then fails every prefix match against the excluded
+    # directory. One receipt in ten looked dirty and the other nine did not,
+    # which reads like a race rather than an off-by-one.
     dirty = []
     for line in git(repo, "status", "--porcelain").splitlines():
-        if not line.strip():
+        parts = line.split(maxsplit=1)
+        if len(parts) < 2:
             continue
-        path = line[3:].strip().strip('"')
+        path = parts[1].strip().strip('"')
         if excluded and (path == excluded or path.startswith(excluded.rstrip("/") + "/")):
             continue
         dirty.append(path)
