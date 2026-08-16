@@ -1,24 +1,67 @@
 {
   "adapter": {
-    "executable": null,
+    "config_identity": {
+      "endpoint": "http://localhost:3000",
+      "transport": "http-loopback"
+    },
+    "executable": "http://localhost:3000",
     "executable_sha256": null,
     "kind": "private-lane-publication",
     "provider": "forgejo",
-    "version": null
+    "version": "9.0.3+gitea-1.22.0"
   },
   "budgets": {
-    "max_output_bytes": 0,
-    "timeout_seconds": 0
+    "max_output_bytes": 65536,
+    "timeout_seconds": 8
   },
-  "controls": [],
+  "controls": [
+    {
+      "expect": "RED",
+      "forge_repositories": [
+        "neon/ai-native-stack",
+        "neon/career"
+      ],
+      "forgejo_remote_configured": false,
+      "id": "repository-binding-absent",
+      "note": "The forge is live and this repository is not on it. #234 forbids introducing Forgejo into a repository with no admitted dual-forge configuration merely to satisfy an experiment, so the binding stays absent and is recorded as absent.",
+      "observed": "RED"
+    },
+    {
+      "expect": "RED",
+      "id": "provider-reachable-is-not-binding",
+      "note": "Reachability and binding were one field before this run and a live forge with no repository read the same as no forge at all.",
+      "observed": "RED"
+    }
+  ],
   "execution": {
-    "exit_code": null,
-    "terminal_state": "NOT_STARTED"
+    "argv": [
+      "GET http://localhost:3000/api/v1/version",
+      "GET http://localhost:3000/api/v1/repos/search"
+    ],
+    "cwd": "/Users/neon/skills-shared/.claude/worktrees/batch-tl-v21",
+    "duration_ms": 87,
+    "exit_code": 0,
+    "stderr_bytes": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_bytes": 4551,
+    "stdout_sha256": "16969a75c3183382f157e5b4e305de6b18371587d303bc1993840de6c1d7b486",
+    "terminal_state": "COMPLETED"
   },
   "policy": {
-    "allowed_argv": [],
+    "allowed_argv": [
+      [
+        "GET",
+        "http://localhost:3000/api/v1/version"
+      ],
+      [
+        "GET",
+        "http://localhost:3000/api/v1/repos/search"
+      ]
+    ],
     "filesystem": "none",
-    "network": "none",
+    "mutation_granted": false,
+    "mutation_note": "read-only inventory; no issue, PR, branch or push was created",
+    "network": "loopback-only",
     "secrets": "none"
   },
   "residue": {
@@ -26,23 +69,25 @@
     "paths": []
   },
   "result": {
-    "detail": "no Forgejo instance reachable on the checked local ports and no Forgejo remote configured on this repository",
-    "evidence_level": null,
-    "result_count": 0,
+    "detail": "provider reachable and identified; this repository has no Forgejo binding, so the publication-boundary lane remains unexercised",
+    "evidence_level": "B",
+    "evidence_level_note": "Provider identity and inventory only. No publication, ancestry or delivery transition was exercised.",
+    "repository_bound": false,
+    "result_count": 2,
     "source_readback": {
       "confirmed": 0,
       "performed": 0,
       "required": false
     },
-    "state": "ABSENT"
+    "state": "PASS"
   },
   "schema": "repo-agent-native/adapter-receipt/v1",
   "subject": {
-    "commit_sha": "9a6d22f89e9637f65803d8e56907042aa62935a6",
+    "commit_sha": "bb3820ee9bebed9f5c50f492fc1cf71e100feb9c",
     "dirty_excluded": "skills/repo-agent-native/evals/receipts",
     "dirty_paths": 0,
     "repository": "ed3c/skills-shared",
-    "tree_sha": "b3f0f020e2b8285e9539cf25806b93d16119478b",
+    "tree_sha": "1d83902810cd316b5c3eae834fee88dd2f975a4c",
     "workspace_root": "/Users/neon/skills-shared/.claude/worktrees/batch-tl-v21"
   }
 }

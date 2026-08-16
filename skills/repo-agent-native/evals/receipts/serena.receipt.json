@@ -17,7 +17,7 @@
   },
   "controls": [
     {
-      "coverage": "python=268",
+      "coverage": "python=270",
       "expect": "coverage is reported per language rather than as completeness",
       "id": "language-coverage-declared",
       "note": "266 Python files is not the repository. Markdown, JSON, shell and TypeScript carry contracts here and are outside this lane, so a Serena miss is not an absence proof.",
@@ -34,12 +34,12 @@
       "ERROR"
     ],
     "cwd": "/Users/neon/skills-shared/.claude/worktrees/batch-tl-v21",
-    "duration_ms": 1570,
+    "duration_ms": 1729,
     "exit_code": 0,
-    "stderr_bytes": 133,
-    "stderr_sha256": "27c8b82556861307ff7e13948d250c6c79b50946def8af2412a700388c1a4434",
+    "stderr_bytes": 289,
+    "stderr_sha256": "c6aa20dac99d9a81e66e9ecbbfce3abccae4513006daca756b60426540567eea",
     "stdout_bytes": 162,
-    "stdout_sha256": "737c8c95b1fef96f2dad55f488b4cb24bc4124bda3b4f10f0c9096c3b459564d",
+    "stdout_sha256": "fb1af3c27b6f65de67d392a7632f303c81298f61e10e1777ad7c2526e49783b4",
     "terminal_state": "COMPLETED"
   },
   "policy": {
@@ -86,8 +86,8 @@
   "result": {
     "evidence_level": "B",
     "evidence_level_note": "This lane builds an index and enumerates a tool surface. It answers no symbol query, so it produces no fact and cannot be A-. Serena's find_symbol and find_referencing_symbols live on the MCP surface, not the CLI, so an A- claim from a CLI capture would be a level the run cannot support -- the checker refuses it, which is how this was caught.",
-    "language_coverage": "python=268",
-    "result_count": 268,
+    "language_coverage": "python=270",
+    "result_count": 270,
     "source_readback": {
       "confirmed": 0,
       "note": "index build only; nothing was promoted to a fact",
@@ -98,11 +98,11 @@
   },
   "schema": "repo-agent-native/adapter-receipt/v1",
   "subject": {
-    "commit_sha": "9a6d22f89e9637f65803d8e56907042aa62935a6",
+    "commit_sha": "bb3820ee9bebed9f5c50f492fc1cf71e100feb9c",
     "dirty_excluded": "skills/repo-agent-native/evals/receipts",
     "dirty_paths": 0,
     "repository": "ed3c/skills-shared",
-    "tree_sha": "b3f0f020e2b8285e9539cf25806b93d16119478b",
+    "tree_sha": "1d83902810cd316b5c3eae834fee88dd2f975a4c",
     "workspace_root": "/Users/neon/skills-shared/.claude/worktrees/batch-tl-v21"
   }
 }

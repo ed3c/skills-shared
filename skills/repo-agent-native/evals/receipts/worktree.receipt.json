@@ -21,11 +21,11 @@
   ],
   "execution": {
     "argv": [
-      "git worktree add --detach <tmp>/worker-{0,1} 9a6d22f89e96"
+      "git worktree add --detach <tmp>/worker-{0,1} bb3820ee9beb"
     ],
     "concurrent_workers": 2,
     "cwd": "/Users/neon/skills-shared/.claude/worktrees/batch-tl-v21",
-    "duration_ms": 469,
+    "duration_ms": 577,
     "exit_code": 0,
     "stderr_bytes": 0,
     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -71,13 +71,13 @@
     "workers": [
       {
         "exit_code": 0,
-        "head": "9a6d22f89e9637f65803d8e56907042aa62935a6",
+        "head": "bb3820ee9bebed9f5c50f492fc1cf71e100feb9c",
         "path": "worker-0",
         "present": true
       },
       {
         "exit_code": 0,
-        "head": "9a6d22f89e9637f65803d8e56907042aa62935a6",
+        "head": "bb3820ee9bebed9f5c50f492fc1cf71e100feb9c",
         "path": "worker-1",
         "present": true
       }
@@ -85,11 +85,11 @@
   },
   "schema": "repo-agent-native/adapter-receipt/v1",
   "subject": {
-    "commit_sha": "9a6d22f89e9637f65803d8e56907042aa62935a6",
+    "commit_sha": "bb3820ee9bebed9f5c50f492fc1cf71e100feb9c",
     "dirty_excluded": "skills/repo-agent-native/evals/receipts",
     "dirty_paths": 0,
     "repository": "ed3c/skills-shared",
-    "tree_sha": "b3f0f020e2b8285e9539cf25806b93d16119478b",
+    "tree_sha": "1d83902810cd316b5c3eae834fee88dd2f975a4c",
     "workspace_root": "/Users/neon/skills-shared/.claude/worktrees/batch-tl-v21"
   }
 }
