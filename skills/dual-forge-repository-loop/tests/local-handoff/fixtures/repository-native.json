@@ -7,27 +7,17 @@
   },
   "required_inputs": [
     {
-      "path": "skills/dual-forge-repository-loop/references/system-prompt.md",
+      "path": "skills/dual-forge-repository-loop/tests/local-handoff/fixtures/replay/entrypoint.sh",
       "git_tracked": true,
-      "sha256": "c1774028cc6a3881e0cc6a69e8508caba7e2d683060e8ba8630306c0dec40772"
+      "sha256": "a5b505786966390388ff2d59fd75fae7a9e1ad45d7ebcca5060b17a5f4a648d4"
     },
     {
-      "path": "skills/dual-forge-repository-loop/evals/prompt-baseline-preregistration.json",
+      "path": "skills/dual-forge-repository-loop/tests/local-handoff/fixtures/replay/contract.json",
       "git_tracked": true,
-      "sha256": "1111111111111111111111111111111111111111111111111111111111111111"
-    },
-    {
-      "path": "skills/dual-forge-repository-loop/evals/prompt-baseline-cases.json",
-      "git_tracked": true,
-      "sha256": "2222222222222222222222222222222222222222222222222222222222222222"
-    },
-    {
-      "path": "skills/dual-forge-repository-loop/scripts/run_prompt_baseline.py",
-      "git_tracked": true,
-      "sha256": "3333333333333333333333333333333333333333333333333333333333333333"
+      "sha256": "31a7569ca0ec7470b4114c4f3de8ea5af723c8e7019c36a90f111304c440d204"
     }
   ],
-  "entrypoint": "skills/dual-forge-repository-loop/scripts/run_prompt_baseline.py",
+  "entrypoint": "skills/dual-forge-repository-loop/tests/local-handoff/fixtures/replay/entrypoint.sh",
   "runtime": {
     "allowed": [
       "CLAUDE_CODE_LOCAL",
