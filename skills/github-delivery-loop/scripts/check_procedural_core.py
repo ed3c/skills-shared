@@ -18,17 +18,17 @@ EVIDENCE_STATES = [
     "NOT_EXERCISED",
     "SKIPPED_BY_POLICY",
 ]
-FORBIDDEN_CORE_TOKENS = [
-    "GitHub",
-    "Actions",
-    "merge-admit",
-    "gh ",
-    "pull request",
-    "PR ",
-    "billing",
-    "Codex",
-    "Claude",
-    "Forgejo",
+FORBIDDEN_CORE_PATTERNS = [
+    (r"\bGitHub\b", "GitHub"),
+    (r"\bActions\b", "Actions"),
+    (r"\bmerge-admit\b", "merge-admit"),
+    (r"\bpull request\b", "pull request"),
+    (r"\bPR\b", "PR"),
+    (r"\bbilling\b", "billing"),
+    (r"\bCodex\b", "Codex"),
+    (r"\bClaude\b", "Claude"),
+    (r"\bForgejo\b", "Forgejo"),
+    (r"`gh\s+[^`]+`", "gh command"),
 ]
 
 
@@ -64,9 +64,9 @@ def check(root: Path) -> list[str]:
     for state in EVIDENCE_STATES:
         if state not in text:
             fail(f"evidence state absent: {state}")
-    for token in FORBIDDEN_CORE_TOKENS:
-        if re.search(re.escape(token), core, flags=re.IGNORECASE):
-            fail(f"domain token leaked into portable core: {token.strip()}")
+    for pattern, label in FORBIDDEN_CORE_PATTERNS:
+        if re.search(pattern, core, flags=re.IGNORECASE):
+            fail(f"domain token leaked into portable core: {label}")
 
     rows = [line for line in text.splitlines() if line.startswith("| DL-L")]
     if len(rows) != len(LAW_IDS):
