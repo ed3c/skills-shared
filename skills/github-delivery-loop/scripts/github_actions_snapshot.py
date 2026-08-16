@@ -12,9 +12,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-OBSERVATION_SCHEMA="github-actions-publish-observation/v2"
-SNAPSHOT_SCHEMA="github-actions-publish-snapshot/v4"
-TRANSPORT_SCHEMA="github-actions-publish-transport/v4"
+OBSERVATION_SCHEMA="github-actions-publish-observation/v3"
+SNAPSHOT_SCHEMA="github-actions-publish-snapshot/v5"
+TRANSPORT_SCHEMA="github-actions-publish-transport/v5"
+LEGACY_OBSERVATION_SCHEMA="github-actions-publish-observation/v2"
+LEGACY_SNAPSHOT_SCHEMA="github-actions-publish-snapshot/v4"
+LEGACY_TRANSPORT_SCHEMA="github-actions-publish-transport/v4"
 SHA_RE=re.compile(r"^[0-9a-f]{40}$");REPO_RE=re.compile(r"^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$")
 SHA256_RE=re.compile(r"^[0-9a-f]{64}$")
 GH_CANDIDATES=("/opt/homebrew/bin/gh","/usr/local/bin/gh","/usr/bin/gh","/home/linuxbrew/.linuxbrew/bin/gh")
@@ -40,6 +43,22 @@ def workflow_path(v:Any,label:str="workflow")->str:
     if not value.startswith(".github/workflows/") or ".." in value or "\n" in value:
         raise SnapshotError(f"{label} must be a safe .github/workflows/ path")
     return value
+def feedback_checks(v:Any)->list[dict[str,str]]:
+    if not isinstance(v,list) or not v:raise SnapshotError("feedback checks must be a non-empty array")
+    out=[];seen=set();primary=0
+    for i,item in enumerate(v):
+        label=f"feedback_checks[{i}]"
+        if not isinstance(item,dict):raise SnapshotError(f"{label} must be object")
+        exact(item,{"workflow","job","role"},label)
+        workflow=workflow_path(item["workflow"],f"{label}.workflow");job=text(item["job"],f"{label}.job");role=item["role"]
+        if "\n" in job:raise SnapshotError(f"{label}.job must be single line")
+        if role not in {"primary","auxiliary"}:raise SnapshotError(f"{label}.role is unsupported")
+        if role=="primary":primary+=1
+        pair=(workflow,job)
+        if pair in seen:raise SnapshotError(f"duplicate feedback check: {workflow} / {job}")
+        seen.add(pair);out.append({"workflow":workflow,"job":job,"role":role})
+    if primary!=1 or out[0]["role"]!="primary":raise SnapshotError("feedback checks require exactly one first primary")
+    return out
 def sha(v:Any,label:str)->str:
     s=text(v,label)
     if not SHA_RE.fullmatch(s):raise SnapshotError(f"{label} must be exact lowercase 40-character SHA")
@@ -89,7 +108,7 @@ def annotation(v:Any,label:str)->dict[str,str]:
 def check(v:Any,i:int)->dict[str,Any]:
     label=f"check_runs[{i}]"
     if not isinstance(v,dict):raise SnapshotError(f"{label} must be object")
-    exact(v,{"id","name","head_sha","status","conclusion","completed_at","annotations","app_id","app_slug","check_suite_id","workflow_run_id","workflow_id","job_id"},label);cid=v["id"]
+    exact(v,{"id","name","workflow_path","head_sha","status","conclusion","completed_at","annotations","app_id","app_slug","check_suite_id","workflow_run_id","workflow_id","job_id"},label);cid=v["id"]
     if not isinstance(cid,int) or isinstance(cid,bool) or cid<=0:raise SnapshotError("check id must be positive")
     status=text(v["status"],"check status")
     if status not in {"queued","in_progress","completed"}:raise SnapshotError("unsupported check status")
@@ -103,7 +122,7 @@ def check(v:Any,i:int)->dict[str,Any]:
     identities={name:v[name] for name in ("app_id","check_suite_id","workflow_run_id","workflow_id","job_id")}
     if any(not isinstance(value,int) or isinstance(value,bool) or value<=0 for value in identities.values()):raise SnapshotError("Actions app/suite/workflow/run/job identities must be positive integers")
     if v["app_slug"]!="github-actions":raise SnapshotError("required check must come from the GitHub Actions app")
-    return {"id":cid,"name":text(v["name"],"check name"),"head_sha":sha(v["head_sha"],"check head"),"status":status,"conclusion":conclusion,"completed_at":completed,"annotations":[annotation(a,f"annotation[{j}]") for j,a in enumerate(anns)],"app_id":identities["app_id"],"app_slug":"github-actions","check_suite_id":identities["check_suite_id"],"workflow_run_id":identities["workflow_run_id"],"workflow_id":identities["workflow_id"],"job_id":identities["job_id"]}
+    return {"id":cid,"name":text(v["name"],"check name"),"workflow_path":workflow_path(v["workflow_path"],"check workflow_path"),"head_sha":sha(v["head_sha"],"check head"),"status":status,"conclusion":conclusion,"completed_at":completed,"annotations":[annotation(a,f"annotation[{j}]") for j,a in enumerate(anns)],"app_id":identities["app_id"],"app_slug":"github-actions","check_suite_id":identities["check_suite_id"],"workflow_run_id":identities["workflow_run_id"],"workflow_id":identities["workflow_id"],"job_id":identities["job_id"]}
 def observation(v:dict[str,Any])->dict[str,Any]:
     fields={"schema","repository","branch","pull_requests","check_runs","captured_at"}
     if "branch_ref" in v:fields.add("branch_ref")
@@ -118,18 +137,35 @@ def observation(v:dict[str,Any])->dict[str,Any]:
 def billing(c:dict[str,Any])->bool:
     m=" ".join(a["message"].casefold() for a in c["annotations"])
     return (BILLING[0] in m and BILLING[1] in m) or (BILLING[0] in m and BILLING[2] in m)
-def select(checks:list[dict[str,Any]],name:str,head:str)->dict[str,Any]|None:
-    same=[c for c in checks if c["name"]==name];exact_head=[c for c in same if c["head_sha"]==head]
-    if same and not exact_head:raise SnapshotError(f"stable check {name!r} exists only for a stale head")
+def select(checks:list[dict[str,Any]],declared:dict[str,str],head:str)->dict[str,Any]|None:
+    name=declared["job"];workflow=declared["workflow"]
+    same=[c for c in checks if c["name"]==name and c["workflow_path"]==workflow];exact_head=[c for c in same if c["head_sha"]==head]
+    label=f"{workflow} / {name}"
+    if same and not exact_head:raise SnapshotError(f"declared repair-feedback check {label} exists only for a stale head")
     if not exact_head:return None
-    if len(exact_head)!=1:raise SnapshotError(f"stable check {name!r} ran more than once for the exact head")
+    if len(exact_head)!=1:raise SnapshotError(f"declared repair-feedback check {label} ran more than once for the exact head")
     done=[c for c in exact_head if c["status"]=="completed"]
-    if not done:raise SnapshotError(f"stable check {name!r} is not completed")
+    if not done:raise SnapshotError(f"declared repair-feedback check {label} is not completed")
     return done[0]
-def build(raw:dict[str,Any],check_name:str,strict:bool=False)->dict[str,Any]:
+def _snapshot_check(c:dict[str,Any],declared:dict[str,str])->dict[str,Any]:
+    return {"workflow":declared["workflow"],"job":declared["job"],"role":declared["role"],"head_sha":c["head_sha"],"conclusion":c["conclusion"],"completed_at":c["completed_at"],"check_run_id":c["id"],"check_suite_id":c["check_suite_id"],"workflow_run_id":c["workflow_run_id"],"workflow_id":c["workflow_id"],"job_id":c["job_id"],"app_id":c["app_id"]}
+def _legacy_build(raw:dict[str,Any],check_name:str,strict:bool)->dict[str,Any]:
+    upgraded=json.loads(json.dumps(raw));upgraded["schema"]=OBSERVATION_SCHEMA
+    workflow=".github/workflows/legacy-policy-bound.yml"
+    for item in upgraded.get("check_runs",[]):
+        if isinstance(item,dict):item["workflow_path"]=workflow
+    current=build(upgraded,[{"workflow":workflow,"job":check_name,"role":"primary"}],strict)
+    current["schema"]=LEGACY_SNAPSHOT_SCHEMA;actions=current["actions"];checks=actions.pop("checks")
+    actions["latest_check"]={key:value for key,value in checks[0].items() if key not in {"workflow","job","role"}} if checks else None
+    feedback=current["pull_request"]["feedback"]
+    if isinstance(feedback,dict) and feedback["kind"]=="ci" and feedback["id"].startswith("check-runs:"):
+        feedback["id"]="check-run:"+feedback["id"].split(":",1)[1]
+    return current
+def build(raw:dict[str,Any],declared_checks:list[dict[str,str]]|str,strict:bool=False)->dict[str,Any]:
+    if isinstance(declared_checks,str):return _legacy_build(raw,declared_checks,strict)
     v=observation(raw)
     if strict and "branch_ref" not in v:raise SnapshotError("strict mode requires an independently observed branch_ref")
-    if not check_name or '\n' in check_name:raise SnapshotError("check name must be non-empty single line")
+    declarations=feedback_checks(declared_checks)
     pulls=v["pull_requests"]
     if len(pulls)>1:raise SnapshotError("branch has multiple open pull requests")
     if not pulls:
@@ -145,17 +181,25 @@ def build(raw:dict[str,Any],check_name:str,strict:bool=False)->dict[str,Any]:
                 boundary="trusted-initial"
         elif strict:raise SnapshotError("strict mode requires an independently observed branch_ref")
         if strict and boundary=="branch-present-without-pr":raise SnapshotError("remote branch exists without an open pull request; this is not an initial publication")
-        return {"schema":SNAPSHOT_SCHEMA,"repository":v["repository"],"branch":v["branch"],"initial_boundary":boundary,"pull_request":{"number":None,"state":"absent","head_sha":None,"last_published_sha":None,"last_published_at":None,"feedback":None},"actions":{"circuit":"closed","observed_at":None,"blocker":None,"latest_check":None},"captured_at":v["captured_at"]}
+        return {"schema":SNAPSHOT_SCHEMA,"repository":v["repository"],"branch":v["branch"],"initial_boundary":boundary,"pull_request":{"number":None,"state":"absent","head_sha":None,"last_published_sha":None,"last_published_at":None,"feedback":None},"actions":{"circuit":"closed","observed_at":None,"blocker":None,"checks":[]},"captured_at":v["captured_at"]}
     p=pulls[0]
     if v["branch"]["head_sha"] is not None and v["branch"]["head_sha"]!=p["head_sha"]:raise SnapshotError("branch head does not match PR head")
     if "branch_ref" in v and v["branch_ref"]["object_sha"]!=p["head_sha"]:
         raise SnapshotError("an open pull request exists but its branch ref was not observed" if not v["branch_ref"]["observed"] else "observed branch ref disagrees with the pull request head")
-    c=select(v["check_runs"],check_name,p["head_sha"]);feedback=None
-    if c is None:actions={"circuit":"closed","observed_at":None,"blocker":None,"latest_check":None}
-    elif billing(c):actions={"circuit":"billing-open","observed_at":c["completed_at"],"blocker":"billing-or-spending-limit","latest_check":None}
+    selected=[select(v["check_runs"],item,p["head_sha"]) for item in declarations];feedback=None
+    present=[item for item in selected if item is not None]
+    if present and len(present)!=len(selected):
+        missing=declarations[selected.index(None)];raise SnapshotError(f"declared repair-feedback check {missing['workflow']} / {missing['job']} is missing")
+    if not present:actions={"circuit":"closed","observed_at":None,"blocker":None,"checks":[]}
+    elif any(billing(c) for c in present):
+        billing_observed=max(c["completed_at"] for c in present if billing(c));actions={"circuit":"billing-open","observed_at":billing_observed,"blocker":"billing-or-spending-limit","checks":[]}
     else:
-        actions={"circuit":"closed","observed_at":None,"blocker":None,"latest_check":{"head_sha":c["head_sha"],"conclusion":c["conclusion"],"completed_at":c["completed_at"],"check_run_id":c["id"],"check_suite_id":c["check_suite_id"],"workflow_run_id":c["workflow_run_id"],"workflow_id":c["workflow_id"],"job_id":c["job_id"],"app_id":c["app_id"]}}
-        if c["conclusion"] in ACTIONABLE:feedback={"id":f"check-run:{c['id']}","kind":"ci","head_sha":c["head_sha"],"observed_at":c["completed_at"],"consumed_by_sha":None}
+        snapshots=[_snapshot_check(c,d) for c,d in zip(present,declarations)]
+        actions={"circuit":"closed","observed_at":None,"blocker":None,"checks":snapshots}
+        actionable=[c for c in present if c["conclusion"] in ACTIONABLE]
+        if actionable:
+            ids=",".join(str(c["id"]) for c in actionable);observed=max(c["completed_at"] for c in actionable)
+            feedback={"id":f"check-runs:{ids}","kind":"ci","head_sha":p["head_sha"],"observed_at":observed,"consumed_by_sha":None}
     return {"schema":SNAPSHOT_SCHEMA,"repository":v["repository"],"branch":v["branch"],"initial_boundary":"not-initial","pull_request":{"number":p["number"],"state":"draft" if p["draft"] else "ready","head_sha":p["head_sha"],"last_published_sha":p["head_sha"],"last_published_at":p["updated_at"],"feedback":feedback},"actions":actions,"captured_at":v["captured_at"]}
 def atomic(path:Path,v:dict[str,Any])->None:
     path.parent.mkdir(parents=True,exist_ok=True);payload=json.dumps(v,ensure_ascii=False,sort_keys=True,indent=2)+"\n"
@@ -184,7 +228,7 @@ def _capture_entry(gh_path:str,endpoint:str,timeout:int,paginated:bool=False)->d
     return {"argv":argv,"exit":r.returncode,"stdout":r.stdout,"stdout_sha256":hashlib.sha256(r.stdout.encode()).hexdigest(),"stderr":r.stderr,"stderr_sha256":hashlib.sha256(r.stderr.encode()).hexdigest()}
 
 def _validated_captures(raw:dict[str,Any])->list[dict[str,Any]]:
-    exact(raw,{"schema","producer","gh_executable","repository","branch","check_name","workflow","captured_at","captures"},"transport")
+    exact(raw,{"schema","producer","gh_executable","repository","branch","feedback_checks","captured_at","captures"},"transport")
     if raw["schema"]!=TRANSPORT_SCHEMA or raw["producer"]!="github_actions_snapshot.py":raise SnapshotError("unsupported Actions transport producer")
     identity=raw["gh_executable"]
     if not isinstance(identity,dict):raise SnapshotError("transport gh_executable must be object")
@@ -193,7 +237,7 @@ def _validated_captures(raw:dict[str,Any])->list[dict[str,Any]]:
     if invoked not in GH_CANDIDATES or not resolved.startswith("/") or not SHA256_RE.fullmatch(text(identity["sha256"],"gh sha256")) or not text(identity["version"],"gh version").startswith("gh version "):raise SnapshotError("transport gh executable identity is not admitted")
     repo=text(raw["repository"],"transport.repository")
     if not REPO_RE.fullmatch(repo):raise SnapshotError("transport repository must be owner/name")
-    text(raw["branch"],"transport.branch");text(raw["check_name"],"transport.check_name");workflow_path(raw["workflow"],"transport.workflow");timestamp(raw["captured_at"],"transport.captured_at")
+    text(raw["branch"],"transport.branch");feedback_checks(raw["feedback_checks"]);timestamp(raw["captured_at"],"transport.captured_at")
     entries=raw["captures"]
     if not isinstance(entries,list) or not entries:raise SnapshotError("transport captures must be non-empty array")
     for i,entry in enumerate(entries):
@@ -228,30 +272,38 @@ def _for_workflow(checks:list[dict[str,Any]],workflow_id:int)->list[dict[str,Any
     return [value for value in checks if value["workflow_id"]==workflow_id]
 
 def observation_from_transport(raw:dict[str,Any])->dict[str,Any]:
-    entries=_validated_captures(raw);repo=raw["repository"];branch_name=raw["branch"];check_name=raw["check_name"];workflow=raw["workflow"];owner=repo.split('/',1)[0]
+    if raw.get("schema")==LEGACY_TRANSPORT_SCHEMA:
+        converted=json.loads(json.dumps(raw));workflow=converted.pop("workflow");job=converted.pop("check_name")
+        converted["schema"]=TRANSPORT_SCHEMA;converted["feedback_checks"]=[{"workflow":workflow,"job":job,"role":"primary"}]
+        current=observation_from_transport(converted);current["schema"]=LEGACY_OBSERVATION_SCHEMA
+        for item in current["check_runs"]:item.pop("workflow_path",None)
+        return current
+    entries=_validated_captures(raw);repo=raw["repository"];branch_name=raw["branch"];declarations=feedback_checks(raw["feedback_checks"]);owner=repo.split('/',1)[0]
     expected_repo=f"repos/{repo}"
     if entries[0]["argv"]!=[entries[0]["argv"][0],"api",expected_repo]:raise SnapshotError("transport repository argv mismatch")
     r=_json_stdout(entries[0],expected_repo)
     if not isinstance(r,dict):raise SnapshotError("repository response malformed")
     rv={"full_name":r.get("full_name"),"repository_id":r.get("id"),"owner_login":(r.get("owner") or {}).get("login"),"private":r.get("private")};repository(rv)
-    workflow_endpoint=f"repos/{repo}/actions/workflows/{quote(workflow,safe='')}"
-    if len(entries)<2 or entries[1]["argv"]!=[entries[1]["argv"][0],"api",workflow_endpoint]:raise SnapshotError("transport workflow argv mismatch")
-    workflow_id=_workflow_identity(_json_stdout(entries[1],workflow_endpoint),workflow)
+    workflow_ids={};index=1
+    for workflow in dict.fromkeys(item["workflow"] for item in declarations):
+        workflow_endpoint=f"repos/{repo}/actions/workflows/{quote(workflow,safe='')}"
+        if len(entries)<=index or entries[index]["argv"]!=[entries[index]["argv"][0],"api",workflow_endpoint]:raise SnapshotError("transport workflow argv mismatch")
+        workflow_ids[workflow]=_workflow_identity(_json_stdout(entries[index],workflow_endpoint),workflow);index+=1
     pulls_endpoint=f"repos/{repo}/pulls?state=open&head={owner}:{branch_name}&per_page=100"
-    if len(entries)<3 or entries[2]["argv"]!=[entries[2]["argv"][0],"api","--paginate","--slurp",pulls_endpoint]:raise SnapshotError("transport PR argv mismatch")
-    pages=_json_stdout(entries[2],pulls_endpoint)
+    if len(entries)<=index or entries[index]["argv"]!=[entries[index]["argv"][0],"api","--paginate","--slurp",pulls_endpoint]:raise SnapshotError("transport PR argv mismatch")
+    pages=_json_stdout(entries[index],pulls_endpoint);index+=1
     if not isinstance(pages,list) or any(not isinstance(page,list) for page in pages):raise SnapshotError("PR pagination response malformed")
     ps=[item for page in pages for item in page]
     if any(not isinstance(x,dict) for x in ps):raise SnapshotError("PR response malformed")
     pulls=[{"number":x.get("number"),"draft":x.get("draft"),"head_sha":(x.get("head") or {}).get("sha"),"updated_at":x.get("updated_at")} for x in ps]
     if len(pulls)>1:raise SnapshotError("branch has multiple open pull requests")
-    checks=[];head=None;branch_ref_value=None;index=3
+    checks=[];head=None;branch_ref_value=None
     if pulls:
         head=sha(pulls[0]["head_sha"],"live PR head");checks_endpoint=f"repos/{repo}/commits/{head}/check-runs?per_page=100"
         if len(entries)<=index or entries[index]["argv"]!=[entries[index]["argv"][0],"api","--paginate","--slurp",checks_endpoint]:raise SnapshotError("transport check-runs argv mismatch")
         check_pages=_json_stdout(entries[index],checks_endpoint);index+=1
         if not isinstance(check_pages,list) or any(not isinstance(page,dict) or not isinstance(page.get("check_runs"),list) for page in check_pages):raise SnapshotError("check-runs pagination response malformed")
-        selected=[x for page in check_pages for x in page["check_runs"] if isinstance(x,dict) and x.get("name")==check_name]
+        selected=[x for page in check_pages for x in page["check_runs"] if isinstance(x,dict) and x.get("name") in {item["job"] for item in declarations}]
         for x in selected:
             run_id,job_id,app_id,suite_id=_check_identity(x,repo)
             run_endpoint=f"repos/{repo}/actions/runs/{run_id}"
@@ -263,8 +315,9 @@ def observation_from_transport(raw:dict[str,Any])->dict[str,Any]:
             annotation_pages=_json_stdout(entries[index],endpoint);index+=1
             if not isinstance(annotation_pages,list) or any(not isinstance(page,list) for page in annotation_pages):raise SnapshotError("annotations pagination response malformed")
             anns=[item for page in annotation_pages for item in page]
-            checks.append({"id":x.get("id"),"name":x.get("name"),"head_sha":x.get("head_sha"),"status":x.get("status"),"conclusion":x.get("conclusion"),"completed_at":x.get("completed_at"),"annotations":[{"message":a.get("message")} for a in anns if isinstance(a,dict)],"app_id":app_id,"app_slug":"github-actions","check_suite_id":suite_id,"workflow_run_id":run_id,"workflow_id":run["workflow_id"],"job_id":job_id})
-        checks=_for_workflow(checks,workflow_id)
+            matching_workflow=next((path for path,wid in workflow_ids.items() if wid==run["workflow_id"]),None)
+            if matching_workflow is not None and any(d["workflow"]==matching_workflow and d["job"]==x.get("name") for d in declarations):
+                checks.append({"id":x.get("id"),"name":x.get("name"),"workflow_path":matching_workflow,"head_sha":x.get("head_sha"),"status":x.get("status"),"conclusion":x.get("conclusion"),"completed_at":x.get("completed_at"),"annotations":[{"message":a.get("message")} for a in anns if isinstance(a,dict)],"app_id":app_id,"app_slug":"github-actions","check_suite_id":suite_id,"workflow_run_id":run_id,"workflow_id":run["workflow_id"],"job_id":job_id})
     endpoint=f"repos/{repo}/git/ref/heads/{quote(branch_name,safe='')}"
     if len(entries)>index:
         if entries[index]["argv"]!=[entries[index]["argv"][0],"api",endpoint]:raise SnapshotError("transport branch-ref argv mismatch")
@@ -285,17 +338,18 @@ def observation_from_transport(raw:dict[str,Any])->dict[str,Any]:
     if branch_ref_value is not None:result["branch_ref"]=branch_ref_value
     return result
 
-def capture_transport(repo:str,branch_name:str,check_name:str,workflow:str,timeout:int)->dict[str,Any]:
+def capture_transport(repo:str,branch_name:str,declared_checks:list[dict[str,str]],timeout:int)->dict[str,Any]:
     if not REPO_RE.fullmatch(repo):raise CaptureError("repository must be owner/name")
     if not branch_name or branch_name.startswith('-') or '\n' in branch_name:raise CaptureError("unsafe branch")
-    workflow=workflow_path(workflow);gh_identity=_gh_identity(timeout);gh_path=gh_identity["resolved_path"];captures=[]
+    declarations=feedback_checks(declared_checks);gh_identity=_gh_identity(timeout);gh_path=gh_identity["resolved_path"];captures=[]
     def call(endpoint:str,paginated:bool=False)->Any:
         entry=_capture_entry(gh_path,endpoint,timeout,paginated);captures.append(entry);return _json_stdout(entry,endpoint)
     r=call(f"repos/{repo}");owner=repo.split('/',1)[0]
     if not isinstance(r,dict):raise CaptureError("repository response malformed")
     rv={"full_name":r.get("full_name"),"repository_id":r.get("id"),"owner_login":(r.get("owner") or {}).get("login"),"private":r.get("private")};repository(rv)
-    workflow_endpoint=f"repos/{repo}/actions/workflows/{quote(workflow,safe='')}"
-    _workflow_identity(call(workflow_endpoint),workflow)
+    for workflow in dict.fromkeys(item["workflow"] for item in declarations):
+        workflow_endpoint=f"repos/{repo}/actions/workflows/{quote(workflow,safe='')}"
+        _workflow_identity(call(workflow_endpoint),workflow)
     pull_pages=call(f"repos/{repo}/pulls?state=open&head={owner}:{branch_name}&per_page=100",True)
     if not isinstance(pull_pages,list) or any(not isinstance(page,list) for page in pull_pages):raise SnapshotError("branch PR pagination is malformed")
     ps=[item for page in pull_pages for item in page]
@@ -305,65 +359,71 @@ def capture_transport(repo:str,branch_name:str,check_name:str,workflow:str,timeo
         if not isinstance(check_pages,list) or any(not isinstance(page,dict) or not isinstance(page.get("check_runs"),list) for page in check_pages):raise CaptureError("check-runs pagination response malformed")
         for page in check_pages:
             for x in page["check_runs"]:
-                if isinstance(x,dict) and x.get("name")==check_name:
+                if isinstance(x,dict) and x.get("name") in {item["job"] for item in declarations}:
                     run_id,_,_,_=_check_identity(x,repo)
                     call(f"repos/{repo}/actions/runs/{run_id}")
                     call(f"repos/{repo}/check-runs/{x.get('id')}/annotations?per_page=100",True)
     captures.append(_capture_entry(gh_path,f"repos/{repo}/git/ref/heads/{quote(branch_name,safe='')}",timeout))
-    return {"schema":TRANSPORT_SCHEMA,"producer":"github_actions_snapshot.py","gh_executable":gh_identity,"repository":repo,"branch":branch_name,"check_name":check_name,"workflow":workflow,"captured_at":datetime.now(timezone.utc).isoformat().replace("+00:00","Z"),"captures":captures}
+    return {"schema":TRANSPORT_SCHEMA,"producer":"github_actions_snapshot.py","gh_executable":gh_identity,"repository":repo,"branch":branch_name,"feedback_checks":declarations,"captured_at":datetime.now(timezone.utc).isoformat().replace("+00:00","Z"),"captures":captures}
 
-def capture(repo:str,branch_name:str,check_name:str,workflow:str,timeout:int)->dict[str,Any]:
-    return observation_from_transport(capture_transport(repo,branch_name,check_name,workflow,timeout))
+def capture(repo:str,branch_name:str,declared_checks:list[dict[str,str]],timeout:int)->dict[str,Any]:
+    return observation_from_transport(capture_transport(repo,branch_name,declared_checks,timeout))
 def fixture()->dict[str,Any]:
     h="1"*40
-    return {"schema":OBSERVATION_SCHEMA,"repository":{"full_name":"ed3c/skills-shared","repository_id":1326262274,"owner_login":"ed3c","private":True},"branch":{"name":"feature","head_sha":h},"pull_requests":[{"number":42,"draft":False,"head_sha":h,"updated_at":"2026-08-12T05:00:00Z"}],"check_runs":[{"id":9001,"name":"contract","head_sha":h,"status":"completed","conclusion":"failure","completed_at":"2026-08-12T05:01:00Z","annotations":[{"message":"repository test failed"}],"app_id":15368,"app_slug":"github-actions","check_suite_id":8001,"workflow_run_id":7001,"workflow_id":6001,"job_id":5001}],"captured_at":"2026-08-12T05:02:00Z"}
+    return {"schema":OBSERVATION_SCHEMA,"repository":{"full_name":"ed3c/skills-shared","repository_id":1326262274,"owner_login":"ed3c","private":True},"branch":{"name":"feature","head_sha":h},"pull_requests":[{"number":42,"draft":False,"head_sha":h,"updated_at":"2026-08-12T05:00:00Z"}],"check_runs":[{"id":9001,"name":"contract","workflow_path":".github/workflows/verify.yml","head_sha":h,"status":"completed","conclusion":"failure","completed_at":"2026-08-12T05:01:00Z","annotations":[{"message":"repository test failed"}],"app_id":15368,"app_slug":"github-actions","check_suite_id":8001,"workflow_run_id":7001,"workflow_id":6001,"job_id":5001}],"captured_at":"2026-08-12T05:02:00Z"}
 def selftest()->None:
-    if build(fixture(),"contract")["pull_request"]["feedback"]["id"]!="check-run:9001":raise SnapshotError("actionable check lost")
+    declared=[{"workflow":".github/workflows/verify.yml","job":"contract","role":"primary"}]
+    if build(fixture(),declared)["pull_request"]["feedback"]["id"]!="check-runs:9001":raise SnapshotError("actionable check lost")
     agree=fixture();agree["branch_ref"]={"queried_ref":"refs/heads/feature","observed":True,"object_sha":"1"*40}
-    if build(agree,"contract",strict=True)["initial_boundary"]!="not-initial":raise SnapshotError("an agreeing PR branch ref was not admitted")
+    if build(agree,declared,strict=True)["initial_boundary"]!="not-initial":raise SnapshotError("an agreeing PR branch ref was not admitted")
     disagree=fixture();disagree["branch_ref"]={"queried_ref":"refs/heads/feature","observed":True,"object_sha":"9"*40}
-    try:build(disagree,"contract",strict=True)
+    try:build(disagree,declared,strict=True)
     except SnapshotError:pass
     else:raise SnapshotError("a PR whose independently observed ref disagrees with its head was admitted")
     missing=fixture()
-    try:build(missing,"contract",strict=True)
+    try:build(missing,declared,strict=True)
     except SnapshotError:pass
     else:raise SnapshotError("strict mode admitted a PR without an independently observed branch ref")
     absent=fixture();absent["branch"]["head_sha"]=None;absent["pull_requests"]=[];absent["check_runs"]=[]
-    if build(absent,"contract")["initial_boundary"]!="unproven":raise SnapshotError("unproved initial boundary was guessed")
+    if build(absent,declared)["initial_boundary"]!="unproven":raise SnapshotError("unproved initial boundary was guessed")
     absent["branch_ref"]={"queried_ref":"refs/heads/feature","observed":False,"object_sha":None}
-    if build(absent,"contract",strict=True)["initial_boundary"]!="trusted-initial":raise SnapshotError("independently absent branch was not admitted as initial")
+    if build(absent,declared,strict=True)["initial_boundary"]!="trusted-initial":raise SnapshotError("independently absent branch was not admitted as initial")
     orphan=fixture();orphan["pull_requests"]=[];orphan["check_runs"]=[];orphan["branch_ref"]={"queried_ref":"refs/heads/feature","observed":True,"object_sha":"1"*40}
-    if build(orphan,"contract")["initial_boundary"]!="branch-present-without-pr":raise SnapshotError("orphan branch was collapsed into initial publication")
-    try:build(orphan,"contract",strict=True)
+    if build(orphan,declared)["initial_boundary"]!="branch-present-without-pr":raise SnapshotError("orphan branch was collapsed into initial publication")
+    try:build(orphan,declared,strict=True)
     except SnapshotError:pass
     else:raise SnapshotError("strict mode admitted an orphan branch")
     b=fixture();b["check_runs"][0]["annotations"]=[{"message":"The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"}]
-    if build(b,"contract")["actions"]["circuit"]!="billing-open":raise SnapshotError("billing collapsed")
-    mixed=fixture();mixed["check_runs"].append(dict(mixed["check_runs"][0],id=9002,workflow_id=6002,job_id=5002))
-    mixed["check_runs"]=_for_workflow(mixed["check_runs"],6001)
-    if build(mixed,"contract")["pull_request"]["feedback"]["id"]!="check-run:9001":raise SnapshotError("workflow-bound check selection lost the required check")
+    if build(b,declared)["actions"]["circuit"]!="billing-open":raise SnapshotError("billing collapsed")
+    mixed=fixture();mixed["check_runs"].append(dict(mixed["check_runs"][0],id=9002,workflow_path=".github/workflows/other.yml",workflow_id=6002,job_id=5002))
+    if build(mixed,declared)["pull_request"]["feedback"]["id"]!="check-runs:9001":raise SnapshotError("workflow-bound check selection lost the required check")
     try:_workflow_identity({"id":6001,"path":".github/workflows/other.yml"},".github/workflows/verify.yml")
     except SnapshotError:pass
     else:raise SnapshotError("a workflow response for another path was admitted")
     cases=[];m=fixture();m["pull_requests"].append(dict(m["pull_requests"][0],number=43));cases.append(m);p=fixture();p["repository"]["private"]=False;cases.append(p);s=fixture();s["check_runs"][0]["head_sha"]="2"*40;cases.append(s);a=fixture();a["check_runs"][0]["annotations"]=[{}];cases.append(a);i=fixture();i["check_runs"][0].update({"status":"in_progress","conclusion":None,"completed_at":None});cases.append(i);d=fixture();d["check_runs"].append(dict(d["check_runs"][0],id=9002,job_id=5002));cases.append(d);foreign=fixture();foreign["check_runs"][0]["app_slug"]="other";cases.append(foreign)
     for x in cases:
-        try:build(x,"contract")
+        try:build(x,declared)
         except SnapshotError:pass
         else:raise SnapshotError("negative observation passed")
-    print("SELFTEST GREEN: trusted GitHub publication snapshots; branch absence proved independently")
+    print("SELFTEST GREEN: trusted multi-workflow GitHub publication snapshots; branch absence proved independently")
+def _cli_checks(workflow:str,job:str,auxiliary:list[str])->list[dict[str,str]]:
+    values=[{"workflow":workflow,"job":job,"role":"primary"}]
+    for item in auxiliary:
+        if "::" not in item:raise SnapshotError("repair-feedback-check must be WORKFLOW::JOB")
+        aux_workflow,aux_job=item.split("::",1);values.append({"workflow":aux_workflow,"job":aux_job,"role":"auxiliary"})
+    return feedback_checks(values)
 def main(argv:list[str]|None=None)->int:
-    p=argparse.ArgumentParser();p.add_argument("--selftest",action="store_true");subs=p.add_subparsers(dest="cmd");r=subs.add_parser("replay");r.add_argument("--observation",type=Path,required=True);r.add_argument("--check-name",required=True);r.add_argument("--output",type=Path,required=True);r.add_argument("--strict",action="store_true");t=subs.add_parser("replay-transport");t.add_argument("--transport",type=Path,required=True);t.add_argument("--observation-output",type=Path,required=True);t.add_argument("--output",type=Path,required=True);t.add_argument("--strict",action="store_true");c=subs.add_parser("capture");c.add_argument("--repository",required=True);c.add_argument("--branch",required=True);c.add_argument("--check-name",required=True);c.add_argument("--workflow",required=True);c.add_argument("--timeout-seconds",type=int,default=30);c.add_argument("--transport-output",type=Path,required=True);c.add_argument("--observation-output",type=Path);c.add_argument("--output",type=Path,required=True);c.add_argument("--strict",action="store_true");a=p.parse_args(argv)
+    p=argparse.ArgumentParser();p.add_argument("--selftest",action="store_true");subs=p.add_subparsers(dest="cmd");r=subs.add_parser("replay");r.add_argument("--observation",type=Path,required=True);r.add_argument("--check-name",required=True);r.add_argument("--workflow",default=".github/workflows/verify.yml");r.add_argument("--repair-feedback-check",action="append",default=[]);r.add_argument("--output",type=Path,required=True);r.add_argument("--strict",action="store_true");t=subs.add_parser("replay-transport");t.add_argument("--transport",type=Path,required=True);t.add_argument("--observation-output",type=Path,required=True);t.add_argument("--output",type=Path,required=True);t.add_argument("--strict",action="store_true");c=subs.add_parser("capture");c.add_argument("--repository",required=True);c.add_argument("--branch",required=True);c.add_argument("--check-name",required=True);c.add_argument("--workflow",required=True);c.add_argument("--repair-feedback-check",action="append",default=[]);c.add_argument("--timeout-seconds",type=int,default=30);c.add_argument("--transport-output",type=Path,required=True);c.add_argument("--observation-output",type=Path);c.add_argument("--output",type=Path,required=True);c.add_argument("--strict",action="store_true");a=p.parse_args(argv)
     if a.selftest:
         try:selftest();return 0
         except Exception as e:print(f"SELFTEST RED: {e}",file=sys.stderr);return 1
     try:
-        if a.cmd=="replay":v=build(load(a.observation,"observation"),a.check_name,strict=a.strict);atomic(a.output.resolve(),v);print(f"WROTE {a.output.resolve()}");return 0
+        if a.cmd=="replay":v=build(load(a.observation,"observation"),_cli_checks(a.workflow,a.check_name,a.repair_feedback_check),strict=a.strict);atomic(a.output.resolve(),v);print(f"WROTE {a.output.resolve()}");return 0
         if a.cmd=="replay-transport":
-            raw=load(a.transport,"transport");o=observation_from_transport(raw);v=build(o,raw["check_name"],strict=a.strict);atomic(a.observation_output.resolve(),o);atomic(a.output.resolve(),v);print(f"WROTE {a.output.resolve()}");return 0
+            raw=load(a.transport,"transport");o=observation_from_transport(raw);v=build(o,raw["feedback_checks"],strict=a.strict);atomic(a.observation_output.resolve(),o);atomic(a.output.resolve(),v);print(f"WROTE {a.output.resolve()}");return 0
         if a.cmd=="capture":
             if a.timeout_seconds<1:raise CaptureError("timeout must be positive")
-            raw=capture_transport(a.repository,a.branch,a.check_name,a.workflow,a.timeout_seconds);o=observation_from_transport(raw);v=build(o,a.check_name,strict=a.strict)
+            checks=_cli_checks(a.workflow,a.check_name,a.repair_feedback_check);raw=capture_transport(a.repository,a.branch,checks,a.timeout_seconds);o=observation_from_transport(raw);v=build(o,checks,strict=a.strict)
             atomic(a.transport_output.resolve(),raw)
             if a.observation_output:atomic(a.observation_output.resolve(),o)
             atomic(a.output.resolve(),v);print(f"WROTE {a.output.resolve()}");return 0

@@ -50,7 +50,7 @@ or spending-limit condition, the snapshot records:
     "circuit": "billing-open",
     "observed_at": "2026-08-12T05:00:00Z",
     "blocker": "billing-or-spending-limit",
-    "latest_check": null
+    "checks": []
   }
 }
 ```
@@ -72,8 +72,12 @@ by budgets. See [GitHub Actions billing](https://docs.github.com/en/billing/conc
 The evaluator is deliberately pure; enforcement is layered around it:
 
 1. `.github-delivery/ci-policy.json` (`github-ci-policy/v2`) enrolls one private
-   repository, names the workflow and stable required jobs, and points to one
-   repository-owned local verification contract.
+   repository, names one primary publication workflow/job and may declare
+   auxiliary `repair_feedback_checks` workflow/job pairs. It also points to one
+   repository-owned local verification contract. The primary remains the sole
+   billing/cost-control check; auxiliary checks grant feedback identity, not a
+   second publication scheduler. A known account-level no-runner annotation on
+   any declared check still opens the repository billing circuit.
 2. `ci_workflow_policy.py check` requires one explicit PR cost profile: the
    backwards-compatible `draft-first` profile rejects draft `synchronize` and
    `reopened`; the opt-in `universal` profile requires every opened, synchronized,
@@ -84,8 +88,11 @@ The evaluator is deliberately pure; enforcement is layered around it:
    under the git directory, outside the committed tree.
 4. `ci_publish.py publish` rechecks policy, receipt, snapshot, GitHub remote
    identity, observed branch, and full-SHA refspec before one push. Its live
-   capture resolves the policy's workflow path to the provider workflow ID, so
-   another workflow cannot collide by reusing the same job name. Initial
+   capture resolves every declared workflow path to a provider workflow ID, so
+   another workflow cannot collide by reusing the same job name. A partially
+   observed declaration set, an incomplete check, or a rerun is ambiguous and
+   blocks repair. One or more actionable declared failures become one ordered,
+   deterministic feedback identity for the whole repair batch. Initial
    publication creates a draft PR; ready publication marks it ready. Draft-first
    batched repairs explicitly dispatch the verifier;
    universal publications also require an open PR and an exact match between the
@@ -121,10 +128,29 @@ executable/argv/cwd/environment/remote after shell evaluation.
 The Actions capture CLI likewise does not accept a caller-selected `gh` path or
 resolve `gh` from inherited `PATH`. It selects from a closed absolute-path set,
 records invoked path, realpath, binary SHA-256, and version, then records exact
-absolute-path `gh api` argv and derives one GitHub-Actions-owned
-check suite plus workflow/run/job/check identities. More than one execution of
-the stable required check for the exact candidate is a cost/provenance conflict,
+absolute-path `gh api` argv and derives GitHub-Actions-owned check-suite plus
+workflow/run/job/check identities for every declared pair. More than one
+execution of any declared pair for the exact candidate is a provenance conflict,
 not "latest wins"; publication remains blocked instead of blessing a rerun.
+
+Optional auxiliary feedback checks are declared without restating the primary:
+
+```json
+{
+  "workflow": ".github/workflows/verify.yml",
+  "required_jobs": ["verify"],
+  "repair_feedback_checks": [
+    {
+      "workflow": ".github/workflows/binding.yml",
+      "job": "binding"
+    }
+  ]
+}
+```
+
+Each auxiliary workflow must exist, own the named job, and pin external actions
+to immutable SHAs. It need not copy the primary workflow's event/cost profile.
+The primary pair is implicitly first and must not be duplicated in the array.
 
 ## Workflow shape for private repositories
 
@@ -172,7 +198,7 @@ success status as a substitute for executing the verifier.
 
 ```json
 {
-  "schema": "github-actions-publish-snapshot/v4",
+  "schema": "github-actions-publish-snapshot/v5",
   "repository": {
     "full_name": "owner/private-repository",
     "repository_id": 123456,
@@ -195,7 +221,7 @@ success status as a substitute for executing the verifier.
     "circuit": "closed",
     "observed_at": null,
     "blocker": null,
-    "latest_check": null
+    "checks": []
   },
   "captured_at": "2026-08-12T05:10:00Z"
 }
@@ -205,3 +231,9 @@ The intent and local verification receipt are separate inputs. Exit `0` with an
 `ALLOW` decision authorizes exactly the named operation. Exit `2` is a policy
 BLOCK and exit `64` is malformed/unavailable evidence. Any nonzero exit stops
 before `git push`.
+
+New capture emits observation v3, transport v5, and snapshot v5. The replay
+adapter keeps the prior single-workflow v2/v4/v4 shapes readable for existing
+dual-origin receipts. Publication admission accepts a v4 snapshot only when it
+contains no CI check capable of authorizing a repair; legacy CI feedback must be
+recaptured as v5 so workflow/job provenance is explicit.

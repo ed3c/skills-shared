@@ -42,7 +42,8 @@ def _load_local_verification_module():
 
 LOCAL_VERIFICATION = _load_local_verification_module()
 
-SNAPSHOT_SCHEMA = "github-actions-publish-snapshot/v4"
+SNAPSHOT_SCHEMA = "github-actions-publish-snapshot/v5"
+LEGACY_SNAPSHOT_SCHEMA = "github-actions-publish-snapshot/v4"
 VERIFICATION_SCHEMA = "github-delivery-local-verification/v1"
 EVIDENCE_SCHEMA = "github-delivery-local-verification-evidence/v1"
 CONTRACT_SCHEMA = "github-delivery-local-verification-contract/v1"
@@ -290,28 +291,32 @@ def validate_pull_request(value: Any) -> dict[str, Any]:
     return value
 
 
-def validate_latest_check(value: Any) -> dict[str, Any] | None:
-    if value is None:
-        return None
+def validate_action_check(value: Any, index: int) -> dict[str, Any]:
     if not isinstance(value, dict):
-        raise InputError("actions.latest_check must be an object or null")
+        raise InputError(f"actions.checks[{index}] must be an object")
     exact_fields(
         value,
         {
-            "head_sha", "conclusion", "completed_at", "check_run_id",
+            "workflow", "job", "role", "head_sha", "conclusion", "completed_at", "check_run_id",
             "check_suite_id", "workflow_run_id", "workflow_id", "job_id", "app_id",
         },
-        "actions.latest_check",
+        f"actions.checks[{index}]",
     )
-    require_sha(value["head_sha"], "latest_check.head_sha")
+    workflow = require_string(value["workflow"], f"checks[{index}].workflow")
+    if not workflow.startswith(".github/workflows/") or ".." in workflow or "\n" in workflow:
+        raise InputError(f"checks[{index}].workflow must be a safe workflow path")
+    require_string(value["job"], f"checks[{index}].job")
+    if value["role"] not in {"primary", "auxiliary"}:
+        raise InputError(f"checks[{index}].role is unsupported")
+    require_sha(value["head_sha"], f"checks[{index}].head_sha")
     if value["conclusion"] not in CHECK_CONCLUSIONS:
-        raise InputError("latest_check.conclusion is unsupported")
-    parse_time(value["completed_at"], "latest_check.completed_at")
+        raise InputError(f"checks[{index}].conclusion is unsupported")
+    parse_time(value["completed_at"], f"checks[{index}].completed_at")
     for field in (
         "check_run_id", "check_suite_id", "workflow_run_id", "workflow_id", "job_id", "app_id",
     ):
         if not isinstance(value[field], int) or isinstance(value[field], bool) or value[field] <= 0:
-            raise InputError(f"latest_check.{field} must be a positive integer")
+            raise InputError(f"checks[{index}].{field} must be a positive integer")
     return value
 
 
@@ -320,7 +325,7 @@ def validate_actions(value: Any) -> dict[str, Any]:
         raise InputError("snapshot.actions must be an object")
     exact_fields(
         value,
-        {"circuit", "observed_at", "blocker", "latest_check"},
+        {"circuit", "observed_at", "blocker", "checks"},
         "snapshot.actions",
     )
     circuit = value["circuit"]
@@ -330,7 +335,22 @@ def validate_actions(value: Any) -> dict[str, Any]:
     blocker = value["blocker"]
     if blocker not in {None, "billing-or-spending-limit", "runner-unavailable", "other"}:
         raise InputError("actions.blocker is unsupported")
-    validate_latest_check(value["latest_check"])
+    checks = value["checks"]
+    if not isinstance(checks, list):
+        raise InputError("actions.checks must be an array")
+    pairs: set[tuple[str, str]] = set()
+    ids: set[int] = set()
+    primary_count = 0
+    for index, check in enumerate(checks):
+        validate_action_check(check, index)
+        pair = (check["workflow"], check["job"])
+        if pair in pairs or check["check_run_id"] in ids:
+            raise InputError("actions.checks contains duplicate identity")
+        pairs.add(pair)
+        ids.add(check["check_run_id"])
+        primary_count += check["role"] == "primary"
+    if checks and (primary_count != 1 or checks[0]["role"] != "primary"):
+        raise InputError("actions.checks requires exactly one first primary")
     if circuit == "closed" and blocker is not None:
         raise InputError("closed Actions circuit may not carry a blocker")
     if circuit == "billing-open":
@@ -338,6 +358,8 @@ def validate_actions(value: Any) -> dict[str, Any]:
             raise InputError(
                 "billing-open circuit requires observed_at and billing-or-spending-limit"
             )
+        if checks:
+            raise InputError("billing-open circuit may not carry test conclusions")
     if circuit == "unknown" and blocker is None:
         raise InputError("unknown Actions circuit must name the observation problem")
     return value
@@ -370,6 +392,28 @@ def validate_snapshot(value: dict[str, Any]) -> dict[str, Any]:
         raise InputError("absent/unproven branch boundary may not carry a branch head")
     validate_actions(value["actions"])
     return value
+
+
+def normalize_snapshot(value: dict[str, Any]) -> dict[str, Any]:
+    """Admit v4 only where no legacy CI result can authorize a repair."""
+    if value.get("schema") != LEGACY_SNAPSHOT_SCHEMA:
+        return value
+    actions = value.get("actions")
+    pull = value.get("pull_request")
+    if not isinstance(actions, dict) or not isinstance(pull, dict):
+        raise InputError("legacy snapshot is malformed")
+    feedback = pull.get("feedback")
+    if actions.get("latest_check") is not None or (
+        isinstance(feedback, dict) and feedback.get("kind") == "ci"
+    ):
+        raise InputError(
+            "legacy v4 CI evidence cannot authorize repair; recapture as v5"
+        )
+    upgraded = json.loads(json.dumps(value))
+    upgraded["schema"] = SNAPSHOT_SCHEMA
+    upgraded["actions"].pop("latest_check", None)
+    upgraded["actions"]["checks"] = []
+    return upgraded
 
 
 def validate_verification(
@@ -551,6 +595,7 @@ def evaluate(
 ) -> Decision:
     if intent not in INTENTS:
         raise InputError(f"intent must be one of {sorted(INTENTS)}")
+    snapshot = normalize_snapshot(snapshot)
     validate_snapshot(snapshot)
     repository = snapshot["repository"]
     validate_verification(verification, repository["repository_id"], actual_head)
@@ -641,13 +686,28 @@ def evaluate(
         return block("repair-feedback-not-newer-than-publication", intent, actual_head)
 
     if feedback["kind"] == "ci":
-        check = actions["latest_check"]
-        if check is None:
+        checks = actions["checks"]
+        if not checks:
             return block("repair-ci-check-missing", intent, actual_head)
-        if check["head_sha"] != pr["head_sha"]:
+        if any(check["head_sha"] != pr["head_sha"] for check in checks):
             return block("repair-ci-check-stale", intent, actual_head)
-        if check["conclusion"] not in ACTIONABLE_CI_CONCLUSIONS:
+        actionable = [
+            check for check in checks
+            if check["conclusion"] in ACTIONABLE_CI_CONCLUSIONS
+        ]
+        if not actionable:
             return block("repair-ci-check-not-actionable", intent, actual_head)
+        expected_id = "check-runs:" + ",".join(
+            str(check["check_run_id"]) for check in actionable
+        )
+        if feedback["id"] != expected_id:
+            return block("repair-ci-feedback-identity-mismatch", intent, actual_head)
+        latest_actionable = max(
+            parse_time(check["completed_at"], "check.completed_at")
+            for check in actionable
+        )
+        if observed != latest_actionable:
+            return block("repair-ci-feedback-time-mismatch", intent, actual_head)
 
     return Decision(
         "ALLOW",
@@ -691,7 +751,7 @@ def fixture_snapshot(head: str) -> dict[str, Any]:
             "circuit": "closed",
             "observed_at": None,
             "blocker": None,
-            "latest_check": None,
+            "checks": [],
         },
         "captured_at": "2026-08-12T05:00:00Z",
     }
@@ -948,7 +1008,10 @@ def selftest() -> None:
 
     ci = json.loads(json.dumps(ready))
     ci["pull_request"]["feedback"]["kind"] = "ci"
-    ci["actions"]["latest_check"] = {
+    ci["actions"]["checks"] = [{
+        "workflow": ".github/workflows/verify.yml",
+        "job": "contract",
+        "role": "primary",
         "head_sha": "3" * 40,
         "conclusion": "failure",
         "completed_at": "2026-08-12T05:02:00Z",
@@ -958,7 +1021,7 @@ def selftest() -> None:
         "workflow_id": 6001,
         "job_id": 5001,
         "app_id": 15368,
-    }
+    }]
     expect(
         "older-ci-head",
         "BLOCK",
@@ -969,12 +1032,87 @@ def selftest() -> None:
         new_head,
     )
 
+    multi_ci = json.loads(json.dumps(ready))
+    multi_ci["pull_request"]["feedback"].update({
+        "id": "check-runs:9001,9002",
+        "kind": "ci",
+        "observed_at": "2026-08-12T05:02:01Z",
+    })
+    multi_ci["actions"]["checks"] = [
+        {
+            "workflow": ".github/workflows/verify.yml",
+            "job": "contract",
+            "role": "primary",
+            "head_sha": head,
+            "conclusion": "failure",
+            "completed_at": "2026-08-12T05:02:00Z",
+            "check_run_id": 9001,
+            "check_suite_id": 8001,
+            "workflow_run_id": 7001,
+            "workflow_id": 6001,
+            "job_id": 5001,
+            "app_id": 15368,
+        },
+        {
+            "workflow": ".github/workflows/binding.yml",
+            "job": "binding",
+            "role": "auxiliary",
+            "head_sha": head,
+            "conclusion": "failure",
+            "completed_at": "2026-08-12T05:02:01Z",
+            "check_run_id": 9002,
+            "check_suite_id": 8002,
+            "workflow_run_id": 7002,
+            "workflow_id": 6002,
+            "job_id": 5002,
+            "app_id": 15368,
+        },
+    ]
+    expect(
+        "multi-workflow-ci-repair",
+        "ALLOW",
+        "allow-batched-repair",
+        multi_ci,
+        new_proof,
+        "batched-repair",
+        new_head,
+    )
+    forged_feedback = json.loads(json.dumps(multi_ci))
+    forged_feedback["pull_request"]["feedback"]["id"] = "check-runs:9002"
+    expect(
+        "multi-workflow-ci-feedback-forged",
+        "BLOCK",
+        "repair-ci-feedback-identity-mismatch",
+        forged_feedback,
+        new_proof,
+        "batched-repair",
+        new_head,
+    )
+    legacy_ci = json.loads(json.dumps(multi_ci))
+    legacy_ci["schema"] = LEGACY_SNAPSHOT_SCHEMA
+    legacy_ci["actions"]["latest_check"] = {
+        key: value for key, value in legacy_ci["actions"]["checks"][0].items()
+        if key not in {"workflow", "job", "role"}
+    }
+    legacy_ci["actions"].pop("checks")
+    legacy_ci["pull_request"]["feedback"]["id"] = "check-run:9001"
+    try:
+        evaluate(
+            legacy_ci, new_proof[0], new_proof[1], new_proof[2],
+            "batched-repair", new_head, "a" * 40, None,
+            datetime(2026, 8, 12, 5, 0, 5, tzinfo=timezone.utc),
+        )
+    except InputError:
+        pass
+    else:
+        raise InputError("selftest legacy v4 CI repair evidence unexpectedly passed")
+
     billing = json.loads(json.dumps(base))
     billing["actions"] = {
         "circuit": "billing-open",
         "observed_at": "2026-08-12T05:03:00Z",
         "blocker": "billing-or-spending-limit",
-        "latest_check": None,
+        "checks": [],
     }
     expect(
         "billing-open",
