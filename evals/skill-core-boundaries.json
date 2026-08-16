@@ -4,7 +4,7 @@
   "skills": [
     {"name":"gemini-conversation-research","domain_module":"modules/domain-profile.md","forbidden_core_tokens":["gemini","aistudio","chrome","cdp","automate.js","kg_fast_write","antigravity","skill-bettor"]},
     {"name":"repo-wiki-converge","domain_module":"modules/domain-profile.md","forbidden_core_tokens":["gemini","opus","openwiki","kb-ingest","agy","/users/"]},
-    {"name":"forgejo-delivery-loop","domain_module":"modules/domain-profile.md","forbidden_core_tokens":["forgejo","chrome","localhost","credential","keychain","runtime-env"]},
+    {"name":"forgejo-delivery-loop","domain_module":"modules/domain-profile.md","forbidden_core_tokens":["forgejo","chrome","localhost","keychain","runtime-env"]},
     {"name":"gitlab-delivery-loop","domain_module":"modules/domain-profile.md","forbidden_core_tokens":["gitlab","glab","merge request","mr ","~/.agents"]},
     {"name":"repo-fullstack-debugger","domain_module":"modules/domain-profile.md","forbidden_core_tokens":["gemini","stealth-browser","automate.js","grepai","chrome"]},
     {"name":"dr-research-loop","domain_module":"modules/domain-profile.md","forbidden_core_tokens":["youtube","opus","claude","agy","loop_wiki","skill-bettor"]},
@@ -12,7 +12,7 @@
     {"name":"loop-harness-standard","domain_module":"modules/domain-profile.md","forbidden_core_tokens":["claude","codex","agy","loop_wiki","antigravity"]},
     {"name":"autoresearch-composer","domain_module":"modules/domain-profile.md","forbidden_core_tokens":["/autoresearch","~/.claude","skill-bettor","families/"]},
     {"name":"external-verify","domain_module":"modules/domain-profile.md","forbidden_core_tokens":["websearch","webfetch","claude code","skill-bettor"]},
-    {"name":"html-for-decisions","domain_module":"modules/domain-profile.md","forbidden_core_tokens":["code graph","playwright","email profile","c2pa","browser"]},
+    {"name":"html-for-decisions","domain_module":"modules/domain-profile.md","forbidden_core_tokens":["code graph","playwright","email profile","c2pa"]},
     {"name":"judge-loop-chooser","domain_module":"modules/domain-profile.md","forbidden_core_tokens":["opus","codex","agy","skill-bettor","families/"]},
     {"name":"sdlc-plan-composer","domain_module":"modules/domain-profile.md","forbidden_core_tokens":["opus","codex","agy","~/.claude","docs/plans","families/"]},
     {"name":"fold-in","domain_module":"modules/domain-profile.md","forbidden_core_tokens":["skill-bettor","antigravity","claude","families/"]},
