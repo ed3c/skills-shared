@@ -1,193 +1,69 @@
 ---
 name: forgejo-delivery-loop
 description: |
-  把「小迴圈產出的 repo」與 Forgejo 追蹤面(issues／PR／milestone)綁成有物理收據的閉環——
-  據 registry.json 切到對的 repo／milestone／issues;小迴圈物化 repo 時必留 delivery.json 收據,
-  T0 閘 scripts/gates/check_delivery_receipt.py(零網路)驗收據,沒登記就擋。未完成項的執行循環＝
-  goal 鎖定 open issues → 每張 issue:worktree → tdd 實作 → code-review → PR body 寫 Closes #N →
-  merge 後 milestone 進度自動推進;漂移/新發現 → 開新 issue 回圈。三種提示的放置鐵律:
-  fixed/iteration/emergent 走 exchange packet 既有欄位,湧現提示落 packets 與 openwiki backlog,
-  禁入 development-standards.md 等規範模組。
-  也含**操作層**:本機 Forgejo 的登入、唯讀預檢、typed request、idempotency marker、確定性 router、
-  fail-closed 與降級 outbox 恢復。優先接管使用者已開啟且已登入的
-  Chrome;登入缺失時只用既有 Git credential helper 在記憶體內補登入。首次憑證由 runtime-env 的
-  localhost-only Keychain broker 遷入;本 skill 不解析 dotenv,不得輸出或落盤秘密。
-  觸發詞:交付進度、delivery 收據、issue 驅動實作、切線、Forgejo 登入、唯讀預檢、
-  forgejo-delivery-loop。
-  NOT for:日常晨檢與發佈輪替(product-ops);迴圈拓撲記錄(harness-wiki);建新迴圈工程規範
-  (loop-harness-standard);單純 code diff 審(code-review);GitHub／GitLab／外部 Forgejo
-  (github-delivery-loop／gitlab-delivery-loop);任意改 remote、force push、跳過 gate、主樹切分支。
+  Portable forge-delivery procedure for binding an exact local artifact to a tracked work item, verifying it, admitting publication, re-observing the remote result, and handing off integration without treating any forge, credential path, browser session, or local service as universal law.
 ---
 
-# forgejo-delivery-loop — 小迴圈產出 ↔ Forgejo 追蹤面的物理閉環
+# Forge Delivery Procedure
 
-> 完整前因後果、機制圖、重靶帳與維護方式 → [modules/delivery-mechanism.md](modules/delivery-mechanism.md)
-> (低壓縮全資訊版;本檔只放操作面)。移植自 `github-delivery-loop`,**整條重靶
-> 本地 Forgejo,零雲端 GitHub**(人裁 2026-08-06);逐機制對照見該模組 §7。
-> 各 repo 的線、PRD 與 milestone 登記在它自己的 `.skill-bindings/forgejo-delivery-loop/registry.json`。
-> **commit 角色(用哪個身分 commit、agent 怎麼署名、何時才准 commit)的完整設定 →
-> [modules/commit-role.md](modules/commit-role.md)**;開工前先跑它 §6 的
-> `git var GIT_AUTHOR_IDENT` 檢查——本機 Forgejo 線的正解是 `neon <neon@noreply.localhost>`,
-> 吃到全域 gmail 就是設定錯。
+<!-- PORTABLE_CORE_START -->
 
-## 四層原生儀表板(Forgejo 端的追蹤形狀)
+## Contract
 
-進度不自建工具,疊四層 Forgejo 原生機制(由下而上,每層只做一件事):
+This core owns the delivery state machine and evidence boundary. Concrete host APIs, credentials, local services, tracking projections, and consumer bindings are selected through `modules/domain-profile.md`.
 
-| 層 | 載體 | 職責 | 本 repo 的活錨點 |
-|---|---|---|---|
-| 1 規格根 | **PRD issue** | Problem／Solution／User Stories／Implementation & Testing Decisions／Out-of-scope,決策完整 | `#2` |
-| 2 工作單 | **slice issues** | 每張帶 `## Parent` 回鏈 PRD＋acceptance criteria checkbox＋`Blocked by` 依賴序 | `#3`–`#27` |
-| 3 交付載體 | **PR** | 分子 commit 鏈可審;body `Closes #N` 讓 merge 自動關工作單 | `#1`(已 merge)、`#25` |
-| 4 橫向視圖 | **milestone** | issue 開/關自動投影成完成率;跨線用不同 milestone | 「bettor-arena migration (PRD #2)」 |
+## State machine
 
-**第四層與上游不同,且原因是實測而非偏好**:GitHub 版用 Projects 看板;Forgejo 9.0.3 的
-`has_projects` 在 repo 單元為 true(UI 有),但 **API 回 404**(實測 `/repos/{o}/{r}/projects` 與
-`/user/projects`),agent 無法驅動看板。milestone 是唯一 API 可驅動且原生投影進度的橫向視圖,
-故第四層＝milestone;UI 看板仍可由人手動使用,但**不由機器維護**——這個缺口寫在這裡,不靠沉默掩蓋。
-
-新開一條線時按 1→2→4 鋪(PRD → slices → 掛 milestone),實作期只產生第 3 層;`delivery.json`
-收據記的就是這四層的位址。分層因果與「為何不自建儀表板」→ modules §6。
-
-## 三個 SSOT(改這裡,別散落)
-
-| 事實 | SSOT | 消費者 |
-|---|---|---|
-| 線 ↔ repo ↔ milestone ↔ issues 對映 | `registry.json` | 本 skill 全部程序＋T0 閘 |
-| 每個物化 repo 的交付狀態 | `<物化 repo>/delivery.json`(物理收據) | `scripts/gates/check_delivery_receipt.py` |
-| 未完成項的低壓縮追蹤 | 該線計畫文件的 as-run 節(本線＝`docs/plans/2026-08-06-bettor-arena-migration/as-run.md`) | 人＋grill;chat／PR 皆其投影 |
-
-## 觸發(自動,非靠人記得)
-
-小迴圈物化 repo ＝觸發點。物化者**同步寫** `delivery.json`(欄位見 registry.json 頭注:
-line／repo／issues[]／pr／milestone_url／synced_at_commit)。
-`python3 scripts/gates/check_delivery_receipt.py`(T0,零網路,`--selftest` 自證)掃 registry 列出的
-每條線:物化路徑存在而收據缺席或欄位缺漏＝FATAL——與「真的尚未物化」在輸出裡長得不一樣(缺席≠否)。
-
-**兩支工具各答一半,別混**:收據閘(零網路,commit 時)答「交付證據在不在、形狀對不對」;
-`scripts/delivery_status.py`(顯式審計,打網路,**禁進 hook**)答「此刻真實狀態」——把 forge 現況
-拉成四層總表。閘綠不代表狀態好,狀態好不代表證據留了,兩者不可互推。
-
-本 repo 的工廠已有同型交付終點:`trigger.sh` 在 route-result 全綠後確定性寫 wiki-update 請求。
-delivery 收據與它是**同一個交付終點的兩張帳**(一張對 wiki,一張對追蹤面),不是兩套機制。
-
-## 切線
-
-開工任何一條線前:`python3 scripts/gates/check_delivery_receipt.py --line <line-id>` 印出該線的
-repo／milestone／issues——這就是本次工作的追蹤上下文;跨線不共用 issue 編號空間。
-
-## 未完成項執行循環(goal 驅動)
-
-```
-goal 設定：完成 <line> 全部 open issues
-for issue in <該線 open issues>:
-  隔離工作面(worktree 或乾淨分支;禁在主樹切 branch)
-  → /tdd 實作(test-before-code)
-  → /code-review(standards+spec 雙軸)
-  → PR body 寫 "Closes #N" → 人 merge → milestone 進度自動推進
-  漂移或新問題 → 開新 issue(掛同 milestone)→ 回圈頂
+```text
+INTENT_BOUND
+→ SUBJECT_BOUND
+→ WORK_ITEM_BOUND
+→ LOCAL_VERIFIED
+→ PUBLICATION_ADMITTED
+→ REMOTE_PUBLISHED
+→ REMOTE_REOBSERVED
+→ INTEGRATION_ADMITTED
+→ TERMINAL_RECEIPT
 ```
 
-merge 永遠人 admit;本 skill 只推進到 PR 開好、findings 齊備。Forgejo API 呼叫一律透過既有
-credential helper 在記憶體內取憑證,**秘密不落盤不輸出**(本 repo `check_credential_hygiene.py` 守)。
-若 helper 尚未建立,由 host operator 在 `<runtime-env-root>` 執行
-`./runtime-env local-env migrate-forgejo-keychain`;本 skill 不讀 `runtime-env/.env`,也不實作第二套密碼儲存。
+## Hard laws
 
-這句話由 `scripts/route.ts` 的 merge 路由與 `tests/merge-authority/` 的窮舉掃描守住,不靠人記得:
-任何 operation=merge 的輸入一律 `mutation_allowed: false`,`request_state: "admitted"` 指的是
-**typed request 被 admit**,從來不是人 admit 了 merge。intent 對應與這條界線的完整說明見
-[`references/INTENT_BOUND_CONSTRAINTS.md`](references/INTENT_BOUND_CONSTRAINTS.md)。
+- **CORE-LAW-001 — bind exact subject.** Every delivery claim names the artifact/repository subject it applies to.
+- **CORE-LAW-002 — local evidence is not remote evidence.** Verification, publication, remote observation, integration, and merge remain separate states.
+- **CORE-LAW-003 — executable verification outranks prose.** A checklist, issue state, or API success cannot substitute for implementation assertions.
+- **CORE-LAW-004 — modules cannot widen authority.** Host modules may implement fixed transitions but may not override laws, expose secrets, change visibility, or invent merge authority.
+- **CORE-LAW-005 — terminal receipts are scoped.** Every terminal state records subject, work item, evidence state, residual blockers, and next authority.
 
-## 三種提示的放置鐵律
+## Procedure
 
-- **固定提示**(規範,改動=治理事件)→ 規範模組(如 `modules/development-standards.md`)。
-- **自動提示**(迭代上下文,機器生成)→ exchange packet 的 `iteration_auto_context` 與
-  `_engine-run/` 帳、wiki-update 請求的 delta 欄。
-- **湧現提示**(執行中冒出的新知)→ packet 的 `emergent_prompt_context`＋issue 內文＋
-  **openwiki 原生 backlog**;**禁寫入規範模組**——規範只收「已被人 admit 的穩定規則」,
-  湧現內容先進 packet／issue／backlog 沉澱,經 fold-in 判 durable home 後才可能升格。
-  本 repo 的工廠測試有 grep 負控守這條界。
+1. Bind intent, repository/artifact subject, work item, rollback subject, and allowed effects.
+2. Verify implementation locally with the owning deterministic assertions.
+3. Admit a bounded publication transition; arbitrary shell/ambient authority is not publication policy.
+4. Execute the selected host operation only through a module selected by explicit runtime binding.
+5. Re-observe the remote artifact and reconcile identity/ancestry/state.
+6. Admit integration only for the reviewed subject; stale receipts fail closed.
+7. Emit a terminal receipt and hand off merge/release to the owning authority unless explicitly delegated by a pre-existing policy.
 
-## 操作層(怎麼安全地動 Forgejo)
+## Module selection
 
-追蹤面說「該動哪一條線」，操作層說「怎麼動而不留下半套狀態」。兩者 2026-08-07 合併成一支
-（原 `forgejo-loop-ops`）——它們本來就是同一條迴圈的兩層，拆成兩個名字只是讓「先跑哪一支」
-變成每次都要重新想的問題。
+Load `modules/domain-profile.md` only for concrete host/API/session/tracking mechanics. Host choice cannot alter the core state machine.
 
-任何 mutation 之前先跑確定性 router，採用它輸出的 `actor`／`mode`／`mutation_allowed`，
-**不要在模型裡另寫一套平行路由規則**：
+## Executable assertion
 
 ```bash
-bun run <本skill>/scripts/route.ts --input <route-input.json>
-bun run <本skill>/scripts/route.ts --selftest      # 改 router 或 cases 後必跑
-python3 <本skill>/scripts/issue_state.py validate --request <request.json>
-python3 <本skill>/scripts/issue_state.py validate-source-live --request <request.json>
-python3 <本skill>/scripts/issue_state.py capture-pre-live \
-  --request <request.json> > <pre-observation.json>
-python3 <本skill>/scripts/issue_state.py verify-live \
-  --request <request.json> --pre-observation <pre-observation.json>
+python3 scripts/check_skill_core_boundaries.py --skill forgejo-delivery-loop
 ```
 
-issue 終態 mutation 必須先通過 `contracts/forgejo-terminal-issue-state-request.v2.schema.json`
-對應的語義驗證，再以 `contracts/forgejo-issue-state-observation.v1.schema.json` 回讀；只有
-`contracts/forgejo-issue-state-readback-receipt.v1.schema.json` 形狀的輸出才算完成。JSON Schema
-負責可攜形狀，`scripts/issue_state.py` 額外以 authenticated `gh`／Forgejo API read 驗證 GitHub
-source closure、mutation 前 expected state 與 mutation 後 desired state，並守 repository／number／
-source URL marker／request digest 一致，並要求 authenticated timeline 的唯一 close event 在 pre-read
-後五分鐘內發生。三者缺一即 fail closed；單純自填 observation JSON 不能產生 verified receipt。
-`admission` 是對既有 user 指令的 out-of-band operator attestation，不是密碼學 provenance；不得由
-agent 推斷或由 issue 內容取代。可驗證的 outcome evidence 是 authenticated source／state／timeline read。
-Source 與 post-observation identity digests 都排除查詢當下的 `observed_at`，因此同一組已驗狀態可
-離線重算；時間仍保留在 observation／receipt，但不讓時鐘噪音改變 evidence identity。Pre-observation
-digest 則綁完整已保存的 pre packet（含時間），用來連結 authenticated timeline 的五分鐘轉換窗口。
+## Evidence states
 
-八條不變量（只認 localhost:3000、憑證只留記憶體、Forgejo 不是真相來源、每個外部 mutation 下沉成
-一個小迴圈、repo 寫入交給 repo-local operator、缺 admission 即 fail closed……）、M0/G0/V0 狀態圖、
-降級與 outbox 恢復程序 → [modules/forgejo-operations.md](modules/forgejo-operations.md)。
-完整契約與舊經驗取捨 → [references/contracts.md](references/contracts.md)。
+Use `PASS`, `FAIL`, `ABSENT`, `NOT_IMPLEMENTED`, `NOT_EXERCISED`, `SKIPPED_BY_POLICY`, and `HUMAN_ADMIT_REQUIRED` without collapsing them.
 
-## 受管的 agent 文件(CLAUDE.md／AGENTS.md)
+## Stop and handoff
 
-追蹤面管「交付物在不在」,這一節管「每個 repo 與 host 讀進去的指令文件是不是同一份」。
-同型缺陷:文件分岔不會有任何機制吭聲——兩份都是合法 markdown、都被各自 host 完整載入。
+Stop on failed local verification, missing host capability, stale subject, semantic conflict, policy denial, or missing remote readback. Preserve the exact blocker in the receipt.
 
-```bash
-S=<本skill>/scripts/agent_docs.py
-python3 $S selftest              # 先證閘會紅
-python3 $S check                 # T0,零網路;OK/DRIFT/ABSENT/UNMANAGED/UNREGISTERED 五態不塌陷
-python3 $S apply --to-targets    # 方向必須顯式,永不由 mtime 推斷
-```
+<!-- PORTABLE_CORE_END -->
 
-各 repo 的 `.githooks/pre-commit` 只放六行轉發,呼叫 `scripts/pre-commit-agent-docs.sh`
-(邏輯單份;只在 commit 真的 stage 了受管文件時才跑,免得舊漂移擋住無關工作)。
+## Domain specialization
 
-真源=`agent-docs/<repo 目錄名>/`,repo 內那份是投影;新專案骨架=`agent-docs/_template/`。
-兩個 host 各讀哪些檔、優先序、以及 Codex 32 KiB **靜默截斷** vs Claude 200 行**遵循度衰減**
-的差別(官方 URL 錨定)→ [agent-docs/HOST-SURFACES.md](agent-docs/HOST-SURFACES.md)。
-納管範圍與缺席登記紀律 → [agent-docs/README.md](agent-docs/README.md)。
-`settings.json`／`config.toml` **不鏡像**(強制層 ＋ 憑證面),只在 HOST-SURFACES §2 記形狀。
-
-## 索引紀律(本檔對自己的樹的宣稱)
-
-本檔列出的 `modules/`／`scripts/`／`contracts/` 就是一份索引,而索引會**單向失效**:死連結點下去才知道,
-**漏列的檔案永遠不會有人知道**——短的清單與完整的清單長得一模一樣。首次真跑時,三支
-delivery-loop **各藏著一支沒被自己 SKILL.md 提過的 sync 類腳本**,同型錯誤三處齊發。
-
-```bash
-bash <本skill>/tests/run-all.sh        # 含 index 雙向檢查與本 skill 的兩支 selftest
-```
-
-規則不靠人記得,靠 `tests/index/verify.sh`;它先跑 checker 自己的 `--selftest`,
-再驗本檔——checker 不能證明自己會紅之前,它對本檔的綠燈不算數。
-
-## 本 skill 自身的維護
-
-演化走小迴圈紀律:改本 skill 的程序前先開 op 沙盒迭代(loop-harness-standard),
-T0 錨＝`check_delivery_receipt.py --selftest`;經驗回填走 fold-in(本檔＝Layer A,modules/＝Layer B)。
-
-## 索引紀律（本檔對自己的樹的宣稱）
-
-索引**單向失效**：死連結點下去才知道，漏列的檔案永遠沒人會知道。本檔漏掉的是兩份目錄索引本身——
-[`modules/README.md`](modules/README.md) 與 [`scripts/README.md`](scripts/README.md)。
-
-規則靠 [`tests/index/verify.sh`](tests/index/verify.sh) 執行，而不靠人記得。
+See [modules/domain-profile.md](modules/domain-profile.md) for host-specific mechanics.
