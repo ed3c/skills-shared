@@ -1,0 +1,418 @@
+{
+  "case_set_id": "v2-1-multi-agent-runtime-cases-2026-08",
+  "cell_count": 15,
+  "cells": [
+    {
+      "arm": "NO_PROMPT",
+      "arm_order_index": 1,
+      "cell_id": "NO_PROMPT__rep1",
+      "exit_code": 0,
+      "failure_reason": null,
+      "metrics": {
+        "answered": 6,
+        "parsed": true,
+        "rule_correct": 5,
+        "total": 6,
+        "verdict_correct": 6
+      },
+      "prompt_bytes": 0,
+      "prompt_sha256": null,
+      "repetition": 1,
+      "scored": true,
+      "usage": {
+        "cost_usd": 0.7710309999999999,
+        "duration_ms": 35484,
+        "input_tokens": 66916,
+        "output_tokens": 2181,
+        "turns": 2
+      }
+    },
+    {
+      "arm": "CURRENT_REPOSITORY_PROMPT",
+      "arm_order_index": 2,
+      "cell_id": "CURRENT_REPOSITORY_PROMPT__rep1",
+      "exit_code": 0,
+      "failure_reason": null,
+      "metrics": {
+        "answered": 6,
+        "parsed": true,
+        "rule_correct": 5,
+        "total": 6,
+        "verdict_correct": 6
+      },
+      "prompt_bytes": 4663,
+      "prompt_sha256": "f0b77ccc3e974b058c8a8fe54222852dcff80750cab860a6118ca28c7c17c909",
+      "repetition": 1,
+      "scored": true,
+      "usage": {
+        "cost_usd": 0.7733460000000001,
+        "duration_ms": 23427,
+        "input_tokens": 68946,
+        "output_tokens": 1571,
+        "turns": 2
+      }
+    },
+    {
+      "arm": "CANDIDATE_V2_1",
+      "arm_order_index": 3,
+      "cell_id": "CANDIDATE_V2_1__rep1",
+      "exit_code": 0,
+      "failure_reason": null,
+      "metrics": {
+        "answered": 6,
+        "parsed": true,
+        "rule_correct": 4,
+        "total": 6,
+        "verdict_correct": 6
+      },
+      "prompt_bytes": 36866,
+      "prompt_sha256": "c1774028cc6a3881e0cc6a69e8508caba7e2d683060e8ba8630306c0dec40772",
+      "repetition": 1,
+      "scored": true,
+      "usage": {
+        "cost_usd": 0.9176655,
+        "duration_ms": 28351,
+        "input_tokens": 82175,
+        "output_tokens": 1744,
+        "turns": 2
+      }
+    },
+    {
+      "arm": "NO_PROMPT",
+      "arm_order_index": 4,
+      "cell_id": "NO_PROMPT__rep2",
+      "exit_code": 0,
+      "failure_reason": null,
+      "metrics": {
+        "answered": 6,
+        "parsed": true,
+        "rule_correct": 4,
+        "total": 6,
+        "verdict_correct": 6
+      },
+      "prompt_bytes": 0,
+      "prompt_sha256": null,
+      "repetition": 2,
+      "scored": true,
+      "usage": {
+        "cost_usd": 0.748856,
+        "duration_ms": 23873,
+        "input_tokens": 66916,
+        "output_tokens": 1468,
+        "turns": 2
+      }
+    },
+    {
+      "arm": "CURRENT_REPOSITORY_PROMPT",
+      "arm_order_index": 5,
+      "cell_id": "CURRENT_REPOSITORY_PROMPT__rep2",
+      "exit_code": 0,
+      "failure_reason": null,
+      "metrics": {
+        "answered": 6,
+        "parsed": true,
+        "rule_correct": 4,
+        "total": 6,
+        "verdict_correct": 6
+      },
+      "prompt_bytes": 4663,
+      "prompt_sha256": "f0b77ccc3e974b058c8a8fe54222852dcff80750cab860a6118ca28c7c17c909",
+      "repetition": 2,
+      "scored": true,
+      "usage": {
+        "cost_usd": 0.768301,
+        "duration_ms": 20849,
+        "input_tokens": 68946,
+        "output_tokens": 1372,
+        "turns": 2
+      }
+    },
+    {
+      "arm": "CANDIDATE_V2_1",
+      "arm_order_index": 6,
+      "cell_id": "CANDIDATE_V2_1__rep2",
+      "exit_code": 0,
+      "failure_reason": null,
+      "metrics": {
+        "answered": 6,
+        "parsed": true,
+        "rule_correct": 4,
+        "total": 6,
+        "verdict_correct": 6
+      },
+      "prompt_bytes": 36866,
+      "prompt_sha256": "c1774028cc6a3881e0cc6a69e8508caba7e2d683060e8ba8630306c0dec40772",
+      "repetition": 2,
+      "scored": true,
+      "usage": {
+        "cost_usd": 0.9178304999999999,
+        "duration_ms": 28255,
+        "input_tokens": 82175,
+        "output_tokens": 1737,
+        "turns": 2
+      }
+    },
+    {
+      "arm": "NO_PROMPT",
+      "arm_order_index": 7,
+      "cell_id": "NO_PROMPT__rep3",
+      "exit_code": 0,
+      "failure_reason": null,
+      "metrics": {
+        "answered": 6,
+        "parsed": true,
+        "rule_correct": 5,
+        "total": 6,
+        "verdict_correct": 6
+      },
+      "prompt_bytes": 0,
+      "prompt_sha256": null,
+      "repetition": 3,
+      "scored": true,
+      "usage": {
+        "cost_usd": 0.761381,
+        "duration_ms": 31597,
+        "input_tokens": 66916,
+        "output_tokens": 1895,
+        "turns": 2
+      }
+    },
+    {
+      "arm": "CANDIDATE_V2_1",
+      "arm_order_index": 8,
+      "cell_id": "CANDIDATE_V2_1__rep3",
+      "exit_code": 0,
+      "failure_reason": null,
+      "metrics": {
+        "answered": 6,
+        "parsed": true,
+        "rule_correct": 4,
+        "total": 6,
+        "verdict_correct": 6
+      },
+      "prompt_bytes": 36866,
+      "prompt_sha256": "c1774028cc6a3881e0cc6a69e8508caba7e2d683060e8ba8630306c0dec40772",
+      "repetition": 3,
+      "scored": true,
+      "usage": {
+        "cost_usd": 0.9132954999999999,
+        "duration_ms": 25218,
+        "input_tokens": 82175,
+        "output_tokens": 1574,
+        "turns": 2
+      }
+    },
+    {
+      "arm": "CURRENT_REPOSITORY_PROMPT",
+      "arm_order_index": 9,
+      "cell_id": "CURRENT_REPOSITORY_PROMPT__rep3",
+      "exit_code": 0,
+      "failure_reason": null,
+      "metrics": {
+        "answered": 6,
+        "parsed": true,
+        "rule_correct": 5,
+        "total": 6,
+        "verdict_correct": 6
+      },
+      "prompt_bytes": 4663,
+      "prompt_sha256": "f0b77ccc3e974b058c8a8fe54222852dcff80750cab860a6118ca28c7c17c909",
+      "repetition": 3,
+      "scored": true,
+      "usage": {
+        "cost_usd": 0.774836,
+        "duration_ms": 23877,
+        "input_tokens": 68946,
+        "output_tokens": 1579,
+        "turns": 2
+      }
+    },
+    {
+      "arm": "CANDIDATE_V2_1",
+      "arm_order_index": 10,
+      "cell_id": "CANDIDATE_V2_1__rep4",
+      "exit_code": 0,
+      "failure_reason": null,
+      "metrics": {
+        "answered": 6,
+        "parsed": true,
+        "rule_correct": 4,
+        "total": 6,
+        "verdict_correct": 6
+      },
+      "prompt_bytes": 36866,
+      "prompt_sha256": "c1774028cc6a3881e0cc6a69e8508caba7e2d683060e8ba8630306c0dec40772",
+      "repetition": 4,
+      "scored": true,
+      "usage": {
+        "cost_usd": 0.9179255,
+        "duration_ms": 28680,
+        "input_tokens": 82175,
+        "output_tokens": 1756,
+        "turns": 2
+      }
+    },
+    {
+      "arm": "CURRENT_REPOSITORY_PROMPT",
+      "arm_order_index": 11,
+      "cell_id": "CURRENT_REPOSITORY_PROMPT__rep4",
+      "exit_code": 0,
+      "failure_reason": null,
+      "metrics": {
+        "answered": 6,
+        "parsed": true,
+        "rule_correct": 5,
+        "total": 6,
+        "verdict_correct": 6
+      },
+      "prompt_bytes": 4663,
+      "prompt_sha256": "f0b77ccc3e974b058c8a8fe54222852dcff80750cab860a6118ca28c7c17c909",
+      "repetition": 4,
+      "scored": true,
+      "usage": {
+        "cost_usd": 0.76974,
+        "duration_ms": 28944,
+        "input_tokens": 68114,
+        "output_tokens": 1759,
+        "turns": 2
+      }
+    },
+    {
+      "arm": "NO_PROMPT",
+      "arm_order_index": 12,
+      "cell_id": "NO_PROMPT__rep4",
+      "exit_code": 0,
+      "failure_reason": null,
+      "metrics": {
+        "answered": 6,
+        "parsed": true,
+        "rule_correct": 5,
+        "total": 6,
+        "verdict_correct": 6
+      },
+      "prompt_bytes": 0,
+      "prompt_sha256": null,
+      "repetition": 4,
+      "scored": true,
+      "usage": {
+        "cost_usd": 0.848983,
+        "duration_ms": 36192,
+        "input_tokens": 203004,
+        "output_tokens": 2401,
+        "turns": 4
+      }
+    },
+    {
+      "arm": "CURRENT_REPOSITORY_PROMPT",
+      "arm_order_index": 13,
+      "cell_id": "CURRENT_REPOSITORY_PROMPT__rep5",
+      "exit_code": 0,
+      "failure_reason": null,
+      "metrics": {
+        "answered": 6,
+        "parsed": true,
+        "rule_correct": 5,
+        "total": 6,
+        "verdict_correct": 6
+      },
+      "prompt_bytes": 4663,
+      "prompt_sha256": "f0b77ccc3e974b058c8a8fe54222852dcff80750cab860a6118ca28c7c17c909",
+      "repetition": 5,
+      "scored": true,
+      "usage": {
+        "cost_usd": 0.7642800000000001,
+        "duration_ms": 25059,
+        "input_tokens": 68114,
+        "output_tokens": 1531,
+        "turns": 2
+      }
+    },
+    {
+      "arm": "NO_PROMPT",
+      "arm_order_index": 14,
+      "cell_id": "NO_PROMPT__rep5",
+      "exit_code": 0,
+      "failure_reason": null,
+      "metrics": {
+        "answered": 6,
+        "parsed": true,
+        "rule_correct": 4,
+        "total": 6,
+        "verdict_correct": 6
+      },
+      "prompt_bytes": 0,
+      "prompt_sha256": null,
+      "repetition": 5,
+      "scored": true,
+      "usage": {
+        "cost_usd": 0.7509609999999999,
+        "duration_ms": 24891,
+        "input_tokens": 66916,
+        "output_tokens": 1501,
+        "turns": 2
+      }
+    },
+    {
+      "arm": "CANDIDATE_V2_1",
+      "arm_order_index": 15,
+      "cell_id": "CANDIDATE_V2_1__rep5",
+      "exit_code": 0,
+      "failure_reason": null,
+      "metrics": {
+        "answered": 6,
+        "parsed": true,
+        "rule_correct": 4,
+        "total": 6,
+        "verdict_correct": 6
+      },
+      "prompt_bytes": 36866,
+      "prompt_sha256": "c1774028cc6a3881e0cc6a69e8508caba7e2d683060e8ba8630306c0dec40772",
+      "repetition": 5,
+      "scored": true,
+      "usage": {
+        "cost_usd": 0.9080204999999999,
+        "duration_ms": 21857,
+        "input_tokens": 82175,
+        "output_tokens": 1373,
+        "turns": 2
+      }
+    }
+  ],
+  "declared_non_claims": [
+    "no cross-runtime result may be derived from this preregistration",
+    "eligibility here is not recording authority; #195 governs that separately",
+    "five repetitions bound variance, they do not establish portability",
+    "a candidate advantage cannot be attributed to prompt quality rather than prompt length under this design"
+  ],
+  "eligibility": {
+    "ceiling_effect": "verdict accuracy is 6.00/6 in every arm with zero variance; that metric carries no information about the treatment and the outcome rests entirely on rule naming",
+    "derived_by": "deterministic comparison, no model discretion",
+    "outcome": "NOT_ELIGIBLE",
+    "regression_against_strongest_baseline": true,
+    "rule": "LOCAL_RECORD_ELIGIBLE requires no hard regression against the strongest baseline arm",
+    "rule_naming_accuracy": {
+      "CANDIDATE_V2_1": 4,
+      "CURRENT_REPOSITORY_PROMPT": 4.8,
+      "NO_PROMPT": 4.6
+    },
+    "strongest_baseline": "CURRENT_REPOSITORY_PROMPT",
+    "verdict_accuracy": {
+      "CANDIDATE_V2_1": 6,
+      "CURRENT_REPOSITORY_PROMPT": 6,
+      "NO_PROMPT": 6
+    }
+  },
+  "failed_cells": 0,
+  "known_confounds": [
+    {
+      "confound": "prompt length",
+      "detail": "CANDIDATE_V2_1 is 36,866 bytes against CURRENT_REPOSITORY_PROMPT's 4,663 -- roughly eight times larger. A candidate advantage is therefore consistent with the prompt being better and equally consistent with it merely being longer and more specific.",
+      "how_to_separate": "a length-matched fourth arm, which #225 does not preregister and which would need its own frozen design",
+      "why_not_corrected": "Truncating the candidate to match length would no longer test the candidate, and padding the baseline would test neither. The confound is recorded so any result is read with it rather than discovered afterwards."
+    }
+  ],
+  "model": "opus",
+  "preregistration_id": "v2-1-prompt-baseline-2026-08",
+  "runtime": "CLAUDE_CODE_LOCAL",
+  "schema": "v2-1-prompt-baseline-result/v1"
+}
