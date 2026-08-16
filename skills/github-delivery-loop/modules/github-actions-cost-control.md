@@ -24,12 +24,17 @@ zero-network ci_publish_gate.py
 |---|---|---|
 | `initial-pr` | no PR or remote branch exists; exact local HEAD has a passing local receipt | one push and creation of a **draft** PR |
 | `ready-for-review` | the PR is still draft; all planned local commits have been batched | optionally one push, then one ready-for-review transition |
-| `batched-repair` | a ready PR has new actionable CI/review feedback bound to its exact remote head | one repair push containing the whole response batch |
+| `batched-repair` | a ready PR has new actionable CI/review feedback from the primary or a policy-declared auxiliary workflow/job, bound to its exact remote head | one repair push containing the whole response batch |
 
 `initial-pr` 的「remote branch 不存在」必須來自 trusted capture 對 exact
 `refs/heads/<branch>` 的 raw API transport；只有 PR inventory 為空時，狀態仍是 `unproven`，不得出版。
 
 Everything else is a local checkpoint. Do not push after every commit, after every Agent turn, or merely to test whether billing recovered.
+
+Auxiliary repair-feedback workflows do not multiply publication authority. The
+primary workflow alone owns the cost profile and any explicit draft-first
+dispatch. A repair push may naturally trigger auxiliary workflows, but the
+controller never dispatches them again merely to collect feedback.
 
 ## Evidence-production pipeline
 
@@ -154,7 +159,7 @@ When the exact check annotation says no runner started because recent account pa
   "circuit": "billing-open",
   "observed_at": "2026-08-12T05:03:00Z",
   "blocker": "billing-or-spending-limit",
-  "latest_check": null
+  "checks": []
 }
 ```
 

@@ -149,13 +149,13 @@ CAPTURE_REQUESTED
     │ fixed read-only gh api calls
     ▼
 REPOSITORY_OBSERVED
-    │ resolve policy workflow path to exact provider workflow ID
+    │ resolve every policy-declared workflow path to exact provider workflow ID
     ▼
 WORKFLOW_IDENTITY_OBSERVED
     │ resolve zero or one open PR for branch
     ▼
 PR_IDENTITY_OBSERVED
-    │ resolve exact workflow + stable check name + head and billing annotations
+    │ resolve each exact workflow + job + head; classify billing annotations
     ▼
 CHECK_STATE_OBSERVED
     │ write raw observation and normalized snapshot
@@ -266,6 +266,8 @@ DRAFT_PUBLISHED
 ```text
 READY_PUBLISHED
 + new actionable CI/review feedback bound to remote head
++ every policy-declared workflow/job is exact, completed, and unambiguous
++ all actionable declared CI failures share one deterministic feedback identity
 + feedback not previously consumed
 + new local verified HEAD
 → ALLOW one batched repair push
@@ -300,6 +302,8 @@ repair-requires-ready-pr
 repair-feedback-absent
 repair-feedback-already-consumed
 repair-ci-check-stale
+repair-ci-feedback-identity-mismatch
+repair-ci-feedback-time-mismatch
 actions-state-unknown
 billing-circuit-open
 billing-recovery-invalid

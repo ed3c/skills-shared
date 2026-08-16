@@ -10,13 +10,18 @@ This directory contains the executable mechanisms for delivery evidence, GitHub 
 | [`delivery_sync.py`](delivery_sync.py) | sync public/compatibility adapter | depends on mode | delegates | normalized sync result |
 | [`delivery_sync_impl.py`](delivery_sync_impl.py) | delivery derivation implementation | snapshot or trusted GitHub lane | writes bounded outputs | receipt, publication attestation, metrics, dashboard |
 | [`local_verification.py`](local_verification.py) | exact-HEAD local verification | none | receipt/evidence output only | `github-delivery-local-verification/v1` |
-| [`github_actions_snapshot.py`](github_actions_snapshot.py) | GitHub raw transport capture/derivation/replay | capture: read-only GitHub; replay: none | transport/observation/snapshot files only | admitted absolute `gh` path/realpath/binary-digest/version plus raw argv/stdout/exit transport and `github-actions-publish-snapshot/v4`, binding the policy workflow path to one provider workflow/run/job/check identity and exact initial branch-ref absence |
+| [`github_actions_snapshot.py`](github_actions_snapshot.py) | GitHub raw transport capture/derivation/replay | capture: read-only GitHub; replay: none | transport/observation/snapshot files only | admitted absolute `gh` path/realpath/binary-digest/version plus raw argv/stdout/exit transport and `github-actions-publish-snapshot/v5`, binding every policy-declared repair-feedback workflow/job to exact provider identities and the initial branch-ref boundary |
 | [`ci_publish_gate.py`](ci_publish_gate.py) | CI publication admission | none | none | one ALLOW operation or stable BLOCK reason |
 | [`ci_publish.py`](ci_publish.py) | enforced publication wrapper | dry run: none; execute: GitHub capture/publication | git-dir receipts; execute may push/create/update PR | content-addressed `github-actions-publish-decision-manifest/v1`, rendered or executed operation |
 | [`merge_gate.py`](merge_gate.py) | merge authority preflight/landing | preflight/land: GitHub and host policy planes | land may request merge after Human Admit | preflight result or merge result |
 | [`reference_causality.py`](reference_causality.py) | reference/evidence causality | none | none | causal validation result |
 | [`link-canonical.sh`](link-canonical.sh) | canonical Skill projection | none | optional backup + symlink | linked target or divergence refusal |
 | [`install-codex-merge-rule.sh`](install-codex-merge-rule.sh) | consumer Codex rule bootstrap | none | user rules directory | narrow repo-scoped rule + backup |
+
+New capture emits observation v3, transport v5, and snapshot v5. Replay keeps
+the prior single-workflow v2/v4/v4 receipt line readable for existing
+dual-origin evidence. The publication gate refuses legacy CI feedback as repair
+authority; only non-CI legacy publication states migrate without recapture.
 
 ## Public data flow
 
@@ -101,7 +106,7 @@ The shared scripts require consumer-generated inputs such as:
 ```text
 local verification command contract
 repository numeric ID
-GitHub branch and stable check name
+GitHub branch and policy-declared primary/auxiliary workflow-job pairs
 registry lines
 artifact and receipt paths
 merge-admit label

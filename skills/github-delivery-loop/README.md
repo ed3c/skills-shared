@@ -61,7 +61,7 @@ skills/github-delivery-loop/
 |---|---|---|---|---|
 | Delivery line | `github_delivery.py` + delivery modules | artifact, registry line, receipt, publication attestation | valid/invalid line, metrics/dashboard sync | issue/PR/project creation remains admitted work |
 | Local verification | `local_verification.py` | clean exact Git HEAD + fixed argv contract | local verification receipt + evidence | consumer chooses commands and accepts their meaning |
-| GitHub observation | `github_actions_snapshot.py` | trusted raw `gh api` transport or replay fixture | content-addressable transport plus derived PR/check/billing snapshot | credentials and live capture authority are consumer-owned |
+| GitHub observation | `github_actions_snapshot.py` | trusted raw `gh api` transport or replay fixture | content-addressable transport plus derived PR/multi-workflow-check/billing snapshot | credentials, declared workflow/job policy, and live capture authority are consumer-owned |
 | CI publication | `ci_publish_gate.py` | local receipt + GitHub snapshot + intent | one `ALLOW` operation or stable `BLOCK` reason | owner recovery required for billing circuit; no generic push authority |
 | Merge authority | `merge_gate.py` | owner-applied `merge-admit`, host policies, exact PR head | preflight result, provider-confirmed merge, or non-resubmitted pending state | owner label is the landing decision |
 | Canonical projection | `link-canonical.sh` | canonical Skill and consumer target | symlink or divergence refusal | divergent content requires human reconciliation |

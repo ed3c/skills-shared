@@ -31,6 +31,8 @@ cp "${repo_root}/.github-delivery/local-verification-contract.json" \
    "${work}/repo/.github-delivery/local-verification-contract.json"
 cp "${repo_root}/.github/workflows/skill-eval-contract.yml" \
    "${work}/repo/.github/workflows/skill-eval-contract.yml"
+cp "${test_dir}/fixtures/auxiliary.yml" \
+   "${work}/repo/.github/workflows/auxiliary.yml"
 python3 "${checker}" check --repo-root "${work}/repo" | grep -q "^ALLOW"
 
 refuse() {
@@ -82,6 +84,19 @@ refuse empty-required-jobs "required_jobs must be a non-empty string array"
 
 mutate local_verification_contract '"../../outside.json"'
 refuse escaping-verification-contract "local_verification_contract must be a safe repository-relative path"
+
+# Auxiliary workflows contribute feedback identity without becoming a second
+# publication scheduler. Their workflow/job pair and immutable action pins are
+# still sealed against repository bytes.
+mutate repair_feedback_checks '[{"workflow":".github/workflows/auxiliary.yml","job":"binding"}]'
+python3 "${checker}" check --repo-root "${work}/repo" \
+  --policy "${work}/mutated.json" | grep -q "feedback=.github/workflows/auxiliary.yml:binding"
+
+mutate repair_feedback_checks '[{"workflow":".github/workflows/auxiliary.yml","job":"missing"}]'
+refuse missing-auxiliary-job "missing repair-feedback job missing"
+
+mutate repair_feedback_checks '[{"workflow":".github/workflows/skill-eval-contract.yml","job":"contract"}]'
+refuse duplicate-primary-feedback "duplicate repair-feedback"
 
 # 3. the seal is about the workflow on disk, not only about the policy's own
 #    shape. A required job the workflow does not declare must be refused, or the

@@ -1,6 +1,6 @@
 {
   "skill_name": "github-delivery-loop",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "_meta": {
     "coverage_metric": "planted hollow-receipt, unsafe merge-rule target, forged/stale merge-admit, canonical-link divergence, wasteful CI publication, stale local verification, untrusted GitHub snapshot detection, and procedural-core/domain-decoupling mutation detection",
     "purpose": "Prove that the portable delivery method remains procedure-driven and executable while GitHub/provider/host details stay domain-decoupled, and that delivery receipts, publication, and merge controls fail closed without network access."
@@ -69,8 +69,8 @@
       "test_verify": "tests/evidence-producers/verify.sh",
       "good_fixture": "tests/evidence-producers/fixtures/good",
       "hollow_fixture": "tests/evidence-producers/fixtures/stale",
-      "covers": ["private repository identity and one PR are bound", "stable check is selected by policy workflow identity, exact name, and exact head", "actionable CI failure becomes one feedback identity", "known payment or spending annotation becomes billing-open with no test conclusion", "replay is zero-network", "multiple PRs, public repositories, mismatched workflow paths, same-workflow reruns, stale checks, incomplete checks, and malformed annotations fail closed"],
-      "expected": "good observation produces a trusted snapshot; billing remains a circuit state; stale or ambiguous observations turn red"
+      "covers": ["private repository identity and one PR are bound", "every repair-feedback check is selected by policy workflow identity, exact name, and exact head", "one or more actionable declared failures become one deterministic batched feedback identity", "known payment or spending annotation on any declared check becomes billing-open with no test conclusion", "replay is zero-network", "undeclared workflows, missing declared checks, multiple PRs, public repositories, mismatched workflow paths, same-workflow reruns, stale checks, incomplete checks, and malformed annotations fail closed"],
+      "expected": "good single- or multi-workflow observation produces a trusted snapshot; billing remains a circuit state; missing, stale, undeclared, incomplete, or ambiguous observations turn red"
     },
     {
       "id": "DELIVERY-9",
@@ -79,8 +79,8 @@
       "good_fixture": null,
       "good_evidence": "this repository's own .github-delivery/ci-policy.json against the workflow it names, so the seal is exercised where it is load-bearing rather than against a synthetic pair",
       "hollow_fixture": null,
-      "hollow_mutations": "a drifted schema, a public repository, a malformed repository slug, a workflow outside .github/workflows/, a workflow path that leaves the repository, an empty required-jobs list, a shell string where an argv array belongs, and a required job the workflow does not declare",
-      "covers": ["a policy that names a workflow is checked against the workflow on disk, not only against its own shape", "a required job absent from the owning workflow fails closed", "publication policy admits argv arrays, never shell strings", "the seal is private-repository only"],
+      "hollow_mutations": "a drifted schema, a public repository, a malformed repository slug, a workflow outside .github/workflows/, a workflow path that leaves the repository, an empty required-jobs list, a duplicate or malformed repair-feedback declaration, a shell string where an argv array belongs, and a primary or auxiliary job the owning workflow does not declare",
+      "covers": ["a policy that names primary and auxiliary feedback workflows is checked against each workflow on disk, not only against its own shape", "a declared job absent from its owning workflow fails closed", "primary publication billing remains singular while repair feedback may be multi-workflow", "publication policy admits argv arrays, never shell strings", "the seal is private-repository only"],
       "expected": "this repository's policy passes; each planted field turns red with a reason naming that field"
     },
     {
