@@ -1,0 +1,22 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Dispute 4471</title>
+<!--
+  Pixel-identical to truthful.html and wrong. The badge shows a settled refund
+  while the machine-readable state is still PENDING and the console reports a
+  failed settlement.
+
+  This is the image-only false positive #218 asks for: a screenshot diff clears
+  this page, and a screenshot is therefore not admissible on its own for a
+  state-transition claim.
+-->
+<style>
+  body { font: 16px/1.5 -apple-system, sans-serif; margin: 40px; color: #111; background: #fff; }
+  .badge { display: inline-block; padding: 6px 14px; border-radius: 4px; background: #0a7; color: #fff; }
+</style>
+<h1>Dispute 4471</h1>
+<p id="status" data-state="PENDING" class="badge">Order refunded</p>
+<p id="amount" data-usd="120.00">Amount: USD 120.00</p>
+<script>
+  console.error("[dispute] settlement failed state=PENDING");
+</script>
