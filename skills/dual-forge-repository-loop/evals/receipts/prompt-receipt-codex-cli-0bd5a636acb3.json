@@ -39,8 +39,8 @@
     "authority": "LOCAL_RECORD",
     "baseline_comparison": "the host reproduced the locally computed verifier terminal state; no uplift over a no-prompt baseline is claimed or measured",
     "regressions": [],
-    "release_admit_state": "HUMAN_ADMIT_REQUIRED",
-    "revocation_subject": "prompt content_sha256, carrier, or host version change"
+    "release_admit_state": "ADMITTED",
+    "revocation_subject": "prompt content_sha256, carrier, or host version change; admission v2-1-recording-2026-08-16 digest 960318909d93"
   },
   "prompt": {
     "composition_skills": [
@@ -68,7 +68,8 @@
     "RECEIPT_BUNDLE_REPLAY_PASS",
     "SCOPE_DECIDED",
     "LOCAL_RECORD_ELIGIBLE",
-    "RELEASE_ADMIT_REQUIRED"
+    "RELEASE_ADMIT_REQUIRED",
+    "RECORDED"
   ],
   "runtime": {
     "bootstrap_receipt_digest": "760eb966e38acd1433f8dd9b7cc40b4dfcaefcf8a1b61d6ff9cc73467edb3fb6",

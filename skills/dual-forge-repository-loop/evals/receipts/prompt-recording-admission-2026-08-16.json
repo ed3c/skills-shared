@@ -1,0 +1,30 @@
+{
+  "admission_id": "v2-1-recording-2026-08-16",
+  "admitted_by": "repository owner",
+  "admitted_on": "2026-08-16",
+  "authority_granted": "LOCAL_RECORD",
+  "authority_withheld": [
+    "PORTABLE_RECORD -- two stacks executed, but no uplift over a no-prompt baseline has been measured; portability is a claim about effectiveness",
+    "promotion to any L0-L5 level -- #220 computes the evidence ceiling at L0"
+  ],
+  "evidence": {
+    "bootstrap": "each prompt receipt binds a skill-resolution-receipt by digest; shadowing scan CLEAN across four host surfaces",
+    "negative_controls": "planted-defect-suite KILLED",
+    "receipts": [
+      "prompt-receipt-claude-code-0bd5a636acb3.json",
+      "prompt-receipt-codex-cli-0bd5a636acb3.json"
+    ],
+    "verifier": "multi-agent-runtime-verify",
+    "verifier_result": "PASS on both hosts, matching the locally computed terminal state"
+  },
+  "note": "Recording authority only. This does not admit the prompt for projection into consumer repositories, which needs its own decision.",
+  "prompt_content_sha256": "c1774028cc6a3881e0cc6a69e8508caba7e2d683060e8ba8630306c0dec40772",
+  "prompt_id": "repository-multi-agent-runtime",
+  "prompt_version": "2.1",
+  "revocation_subject": "prompt content_sha256, carrier, or host version change",
+  "schema": "prompt-recording-admission/v1",
+  "scope": [
+    "ed3c/skills-shared @ CLAUDE_CODE_LOCAL via SYSTEM_PROMPT_FILE",
+    "ed3c/skills-shared @ CODEX_CLI_LOCAL via INSTRUCTION_CHANNEL"
+  ]
+}
