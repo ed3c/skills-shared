@@ -157,6 +157,33 @@ p=json.load(open(sys.argv[1])); p['surfaces']['backups_replicas']='ERASED'; json
 PY
 expect_exit 2 "provider global erasure overclaim refused" python3 "${mode_root}/scripts/check_provider_retention.py" "${tmp}/provider-bad.json"
 
+# Local retirement inventory: what still reaches private objects after sealing.
+python3 - "${tmp}/retire-good.json" <<'PY'
+import json,sys
+surfaces=['clones','worktrees','mirrors','bundles','caches','forks','credentials']
+doc={'schema':'private-retirement-inventory/v1','repository_identity_digest':'c'*64,
+     'observed_at_head':'d'*40,'surfaces':{name:'RETIRED' for name in surfaces}}
+json.dump(doc,open(sys.argv[1],'w'),indent=2)
+PY
+expect_zero "retirement inventory complete" python3 "${mode_root}/scripts/check_retirement_inventory.py" "${tmp}/retire-good.json" --receipt "${tmp}/retire-receipt.json"
+if grep -Fq '"overall_state": "TERMINAL"' "${tmp}/retire-receipt.json"; then pass "retired inventory receipt is terminal"; else fail "retired inventory receipt is terminal"; fi
+for mutation in drop-surface erased outstanding unbound-head; do
+  python3 - "${tmp}/retire-good.json" "${tmp}/retire-${mutation}.json" "${mutation}" <<'PY'
+import json,sys
+doc=json.load(open(sys.argv[1])); mutation=sys.argv[3]
+if mutation=='drop-surface': del doc['surfaces']['bundles']
+elif mutation=='erased': doc['surfaces']['caches']='ERASED'
+elif mutation=='outstanding': doc['surfaces']['clones']='PRESENT'
+elif mutation=='unbound-head': doc['observed_at_head']='HEAD'
+json.dump(doc,open(sys.argv[2],'w'),indent=2)
+PY
+done
+expect_exit 2 "retirement inventory missing surface refused" python3 "${mode_root}/scripts/check_retirement_inventory.py" "${tmp}/retire-drop-surface.json"
+expect_exit 2 "retirement erasure overclaim refused" python3 "${mode_root}/scripts/check_retirement_inventory.py" "${tmp}/retire-erased.json"
+expect_exit 2 "retirement inventory unbound to a head refused" python3 "${mode_root}/scripts/check_retirement_inventory.py" "${tmp}/retire-unbound-head.json"
+expect_zero "surviving local copy stays in the inventory" python3 "${mode_root}/scripts/check_retirement_inventory.py" "${tmp}/retire-outstanding.json" --receipt "${tmp}/retire-outstanding-receipt.json"
+if grep -Fq '"overall_state": "OUTSTANDING"' "${tmp}/retire-outstanding-receipt.json"; then pass "surviving local copy refuses a terminal receipt"; else fail "surviving local copy refuses a terminal receipt"; fi
+
 # Fresh-root production and no-shared-lineage proof.
 public_source="${tmp}/public-source"
 init_repo "${public_source}" "independently authored public contract"

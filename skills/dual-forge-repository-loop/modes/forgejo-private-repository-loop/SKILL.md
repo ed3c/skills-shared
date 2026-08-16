@@ -131,6 +131,14 @@ python3 scripts/check_provider_retention.py <provider-disposition.json>
 
 The checker rejects global `ERASED` claims and derives whether all surfaces are terminal or whether provider confirmation/accepted limitations remain.
 
+### 7. Retire the local copies that still reach private objects
+
+```bash
+python3 scripts/check_retirement_inventory.py <retirement-inventory.json>
+```
+
+Sealing the origin repository does not retire the clones, worktrees, mirrors, bundles, caches, forks, and credentials that still reach its objects. The inventory must enumerate all seven and bind them to an exact observed head, so `RETIRED` everywhere is an observation rather than a claim. `ERASED` is refused here as it is in step 6: a retired local copy says nothing about provider-side backups.
+
 ## Evidence states
 
 Use only:

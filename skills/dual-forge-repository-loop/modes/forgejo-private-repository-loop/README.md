@@ -11,4 +11,5 @@ The directory is nested under `dual-forge-repository-loop` so the two modes rema
 - `pre-push.local-only-guard` — exact destination and alternate-object refusal;
 - `build_private_fingerprints.py` and `check_cleanroom_packet.py` — one-way clean-room boundary;
 - `create_fresh_root_snapshot.sh` and `assert_no_shared_lineage.sh` — public root production and lineage separation;
-- `check_provider_retention.py` — explicit provider surface disposition without overclaiming erasure.
+- `check_provider_retention.py` — explicit provider surface disposition without overclaiming erasure;
+- `check_retirement_inventory.py` — local clones, worktrees, mirrors, bundles, caches, forks, and credentials retired against an exact observed head.
