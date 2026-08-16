@@ -138,6 +138,10 @@ def main() -> int:
     parser.add_argument("--timeout", type=int, default=600)
     parser.add_argument("--limit", type=int, default=0, help="stop after N cells (smoke use only)")
     parser.add_argument(
+        "--skip", type=int, default=0,
+        help="skip the first N cells of this slice. With --limit it selects an exact\n             window, so a matrix can advance in batches short enough to finish inside\n             a bounded process without any cell running twice.",
+    )
+    parser.add_argument(
         "--only-host",
         help="run one host family. For re-running cells that never reached a model "
              "because of a harness defect; not for retrying a cell that did.",
@@ -209,9 +213,12 @@ def main() -> int:
                 continue
             for repetition in range(1, repetitions + 1):
               for arm in arm_order(repository_id, host["family"], arms):
-                if args.limit and count >= args.limit:
-                    break
+                position = count
                 count += 1
+                if position < args.skip:
+                    continue
+                if args.limit and (position - args.skip) >= args.limit:
+                    break
                 cell_id = (f"{repository_id.replace('/', '_')}__{host['family']}"
                            f"__{arm}__rep{repetition}")
                 workspace = args.output / "cells" / cell_id
