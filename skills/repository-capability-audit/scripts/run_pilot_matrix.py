@@ -143,6 +143,12 @@ def main() -> int:
              "because of a harness defect; not for retrying a cell that did.",
     )
     parser.add_argument(
+        "--only-repository",
+        help="run one repository's cells. The matrix is long enough that a single "
+             "process gets killed before finishing; splitting it by repository lets "
+             "each slice complete and be merged, without any cell being retried.",
+    )
+    parser.add_argument(
         "--repetitions", type=int, default=0,
         help="override the preregistered repetition count. The pilot froze 1; #228's "
              "own matrix specifies 5. Passing this makes the run a different frozen "
@@ -173,7 +179,8 @@ def main() -> int:
 
     repetitions = args.repetitions or prereg["matrix"]["repetitions"]
     active_hosts = [h for h in hosts if not args.only_host or h["family"] == args.only_host]
-    total_cells = len(by_repo) * len(active_hosts) * repetitions * len(arms)
+    active_repos = [r for r in by_repo if not args.only_repository or r == args.only_repository]
+    total_cells = len(active_repos) * len(active_hosts) * repetitions * len(arms)
 
     args.output.mkdir(parents=True, exist_ok=True)
     cells: list[dict[str, Any]] = []
@@ -181,6 +188,8 @@ def main() -> int:
     count = 0
 
     for repository_id, family in sorted(by_repo.items()):
+        if args.only_repository and repository_id != args.only_repository:
+            continue
         repo = repositories[repository_id]
         resolved = subprocess.run(
             [sys.executable, str(RESOLVER), "--repository", repository_id,
