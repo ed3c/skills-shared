@@ -1,0 +1,173 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "agentic-tech-lead/task-contract/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "task_id",
+    "mode",
+    "subject",
+    "goal",
+    "paths",
+    "architecture",
+    "providers",
+    "branches",
+    "acceptance",
+    "budgets",
+    "automation"
+  ],
+  "properties": {
+    "schema": {"const": "agentic-tech-lead/task-contract/v1"},
+    "task_id": {"type": "string", "minLength": 1},
+    "mode": {"enum": ["STACK", "TOURNAMENT"]},
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["base_commit", "base_tree"],
+      "properties": {
+        "base_commit": {"type": "string", "pattern": "^[0-9a-f]{7,64}$"},
+        "base_tree": {"type": "string", "pattern": "^[0-9a-f]{7,64}$"}
+      }
+    },
+    "goal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["objective", "non_goals"],
+      "properties": {
+        "objective": {"type": "string", "minLength": 1},
+        "non_goals": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "paths": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["write", "read_only", "forbidden", "changed"],
+      "properties": {
+        "write": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "read_only": {"type": "array", "items": {"type": "string"}},
+        "forbidden": {"type": "array", "items": {"type": "string"}},
+        "changed": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "architecture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "interface_locks",
+        "dependency_policy",
+        "allowed_dependencies",
+        "state_policy",
+        "no_double_graph"
+      ],
+      "properties": {
+        "interface_locks": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["path", "sha256"],
+            "properties": {
+              "path": {"type": "string", "minLength": 1},
+              "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+            }
+          }
+        },
+        "dependency_policy": {"enum": ["NO_NEW_DEPENDENCIES", "ALLOWLIST"]},
+        "allowed_dependencies": {"type": "array", "items": {"type": "string"}},
+        "state_policy": {"type": "string", "minLength": 1},
+        "no_double_graph": {"const": true}
+      }
+    },
+    "providers": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "role", "state"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "role": {"type": "string", "minLength": 1},
+          "state": {"enum": ["EXACT", "DEGRADED", "BLOCKED"]},
+          "subject": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["commit", "tree", "version", "coverage_sha256", "source_readback"],
+            "properties": {
+              "commit": {"type": "string", "pattern": "^[0-9a-f]{7,64}$"},
+              "tree": {"type": "string", "pattern": "^[0-9a-f]{7,64}$"},
+              "version": {"type": "string", "minLength": 1},
+              "coverage_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+              "source_readback": {"type": "boolean"}
+            }
+          }
+        }
+      }
+    },
+    "branches": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "parent", "focus", "write"],
+        "properties": {
+          "name": {"type": "string", "minLength": 1},
+          "parent": {"type": "string", "minLength": 1},
+          "focus": {"type": "string", "minLength": 1},
+          "write": {"type": "array", "minItems": 1, "items": {"type": "string"}}
+        }
+      }
+    },
+    "acceptance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["commands", "immutable_assertions"],
+      "properties": {
+        "commands": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "array",
+            "minItems": 1,
+            "items": {"type": "string", "minLength": 1}
+          }
+        },
+        "immutable_assertions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "budgets": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["max_repairs_per_signature", "max_workers"],
+      "properties": {
+        "max_repairs_per_signature": {"type": "integer", "minimum": 0, "maximum": 3},
+        "max_workers": {"type": "integer", "minimum": 1, "maximum": 16}
+      }
+    },
+    "automation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "git_town_admitted",
+        "auto_restack",
+        "auto_publish",
+        "auto_resolve_conflicts",
+        "auto_merge"
+      ],
+      "properties": {
+        "git_town_admitted": {"type": "boolean"},
+        "auto_restack": {"type": "boolean"},
+        "auto_publish": {"type": "boolean"},
+        "auto_resolve_conflicts": {"const": false},
+        "auto_merge": {"const": false}
+      }
+    }
+  }
+}
