@@ -121,16 +121,52 @@ def run_process(
     stdout_path.parent.mkdir(parents=True, exist_ok=True)
     stdout_path.write_text(stdout, encoding="utf-8")
     stderr_path.write_text(stderr, encoding="utf-8")
+    workspace = stdout_path.parent.parent
     return {
-        "argv": argv,
+        "argv": portable_argv(argv, workspace),
         "exit_code": exit_code,
         "timed_out": timed_out,
         "duration_ms": duration_ms,
-        "stdout_path": str(stdout_path),
-        "stderr_path": str(stderr_path),
+        "stdout_path": portable_path(stdout_path, workspace),
+        "stderr_path": portable_path(stderr_path, workspace),
         "stdout_sha256": file_digest(stdout_path),
         "stderr_sha256": file_digest(stderr_path),
     }
+
+
+def portable_path(path: Path, workspace: Path) -> str:
+    """Workspace-relative where possible, else basename.
+
+    The receipt binds log content by sha256, so the absolute location adds nothing
+    a replayer can use and everything an auditor should not have to redact.
+    """
+    try:
+        return "<workspace>/" + str(path.resolve().relative_to(workspace.resolve()))
+    except ValueError:
+        return "<path>/" + path.name
+
+
+def portable_argv(argv: list[str], workspace: Path) -> list[str]:
+    """Redact absolute paths anywhere in an argument, not only whole-argument ones.
+
+    A prompt argument embeds paths inside prose ("your task file is /abs/path"),
+    so matching only arguments that *are* paths leaves the interesting ones in.
+    Replay does not depend on these: the receipt binds every input by digest.
+    """
+    import re as _re
+
+    home = str(Path.home())
+    pattern = _re.compile(
+        r"(?:" + _re.escape(str(workspace.resolve())) + r"|"
+        + _re.escape(home) + r"|/(?:private/)?(?:var/folders|tmp)/[A-Za-z0-9._/+-]*)"
+    )
+    result = []
+    for item in argv:
+        if item.startswith("/") or item.startswith("~"):
+            result.append(portable_path(Path(item), workspace))
+        else:
+            result.append(pattern.sub("<redacted-path>", item))
+    return result
 
 
 def validate_hex(value: str, length: int, name: str) -> None:
@@ -375,7 +411,7 @@ def main() -> int:
                 "identity": args.evaluator_identity,
                 "version": args.evaluator_version,
                 "owner": args.evaluator_owner,
-                "command": evaluator_argv,
+                "command": portable_argv(evaluator_argv, workspace),
             },
             "agent_run": agent_run,
             "evaluator_run": evaluator_run,

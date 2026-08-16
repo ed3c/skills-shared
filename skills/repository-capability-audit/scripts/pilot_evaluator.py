@@ -31,9 +31,19 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--ground-truth", type=Path, required=True)
     parser.add_argument("--usage", type=Path, required=True)
-    parser.add_argument("--metrics-file", type=Path, required=True)
-    parser.add_argument("--workspace", type=Path, required=True)
+    # The cell harness passes the metrics path through the environment rather than
+    # as a placeholder, so accept either. Requiring the flag would force a wrapper
+    # whose only job is to move one value between two conventions.
+    parser.add_argument("--metrics-file", type=Path,
+                        default=Path(os.environ["RCA_EVAL_METRICS_FILE"])
+                        if os.environ.get("RCA_EVAL_METRICS_FILE") else None)
+    parser.add_argument("--workspace", type=Path,
+                        default=Path(os.environ["RCA_EVAL_WORKSPACE"])
+                        if os.environ.get("RCA_EVAL_WORKSPACE") else None)
     args = parser.parse_args()
+    if args.metrics_file is None or args.workspace is None:
+        parser.error("--metrics-file and --workspace are required unless "
+                     "RCA_EVAL_METRICS_FILE and RCA_EVAL_WORKSPACE are set")
 
     truth = read_json(args.ground_truth)
     usage = read_json(args.usage)

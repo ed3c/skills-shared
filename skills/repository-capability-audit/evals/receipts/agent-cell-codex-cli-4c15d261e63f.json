@@ -1,0 +1,140 @@
+{
+  "agent": {
+    "family": "codex-cli",
+    "harness": "codex-cli",
+    "harness_version": "codex-cli 0.146.0",
+    "model": "gpt-5.6-sol",
+    "provider": "openai",
+    "version": "codex-cli 0.146.0"
+  },
+  "agent_class": "language_model_agent",
+  "agent_run": {
+    "argv": [
+      "codex",
+      "exec",
+      "-m",
+      "gpt-5.6-sol",
+      "--sandbox",
+      "workspace-write",
+      "--skip-git-repo-check",
+      "Audit the pinned repository subject named in your task file and report only what its tree supports. Inspect it through the GitHub API, for example `gh api /repos/OWNER/NAME/git/trees/TREE?recursive=1`. Write agent-output.json in the current directory with exactly this shape: {\"tree_sha\": \"...\", \"evidence_paths\": [...], \"claims\": [...], \"non_claims\": [...], \"escalate\": true|false}. Cite only paths you actually resolved. Your task file is <redacted-path> Your working method is in <redacted-path>"
+    ],
+    "duration_ms": 291315,
+    "exit_code": 0,
+    "stderr_path": "<workspace>/.agent-eval-logs/agent.stderr.log",
+    "stderr_sha256": "adbf5b9415f5b375626157a2a0aae9fc01d2ff3b7e0aef0044e0067f3e1500f6",
+    "stdout_path": "<workspace>/.agent-eval-logs/agent.stdout.log",
+    "stdout_sha256": "3a54f7ba2ee15c0217176f7335c1d4f8924e74d4634c4b938b5dac476cea0c7f",
+    "timed_out": false
+  },
+  "arm_order": 0,
+  "artifacts": [
+    {
+      "bytes": 204678,
+      "path": ".agent-eval-logs/agent.stderr.log",
+      "sha256": "adbf5b9415f5b375626157a2a0aae9fc01d2ff3b7e0aef0044e0067f3e1500f6"
+    },
+    {
+      "bytes": 125,
+      "path": ".agent-eval-logs/agent.stdout.log",
+      "sha256": "3a54f7ba2ee15c0217176f7335c1d4f8924e74d4634c4b938b5dac476cea0c7f"
+    },
+    {
+      "bytes": 0,
+      "path": ".agent-eval-logs/evaluator.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 71,
+      "path": ".agent-eval-logs/evaluator.stdout.log",
+      "sha256": "8e24fb1918e07fb14298542579dbef0b72b039f4154907f4a1709d11177cf43e"
+    },
+    {
+      "bytes": 446,
+      "path": "agent-eval-metrics.json",
+      "sha256": "4d651984617ec6c1188ef5e93b26de6cd43fcbab3e63ffc14d57df658326a49f"
+    },
+    {
+      "bytes": 1910,
+      "path": "agent-output.json",
+      "sha256": "e3f2cef1192d53ad000e11cfdd3cf3dca354dcb976783fde81529ecfe134c8a6"
+    }
+  ],
+  "budgets": {
+    "max_input_tokens": 200000,
+    "max_output_tokens": 20000,
+    "max_tool_calls": 100,
+    "timeout_seconds": 600
+  },
+  "case_id": "real-capability-with-evidence",
+  "evaluator": {
+    "command": [
+      "<path>/python3.14",
+      "<path>/pilot_evaluator.py",
+      "--ground-truth",
+      "<path>/ground-truth.json",
+      "--usage",
+      "<path>/usage.json"
+    ],
+    "identity": "holdout-deterministic-evaluator",
+    "owner": "independent",
+    "version": "1.0.0"
+  },
+  "evaluator_digest": "273c79c52912ca504748ab25f8d76b5e1d23910fecd604f6614520d93318b0d0",
+  "evaluator_run": {
+    "argv": [
+      "<path>/python3.14",
+      "<path>/pilot_evaluator.py",
+      "--ground-truth",
+      "<path>/ground-truth.json",
+      "--usage",
+      "<path>/usage.json"
+    ],
+    "duration_ms": 49,
+    "exit_code": 0,
+    "stderr_path": "<workspace>/.agent-eval-logs/evaluator.stderr.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_path": "<workspace>/.agent-eval-logs/evaluator.stdout.log",
+    "stdout_sha256": "8e24fb1918e07fb14298542579dbef0b72b039f4154907f4a1709d11177cf43e",
+    "timed_out": false
+  },
+  "metrics": {
+    "cost_observed": false,
+    "cost_usd": 0.0,
+    "duration_ms": 0,
+    "evidence_packet_complete": true,
+    "exact_subject_continuity": true,
+    "explicit_non_claim_accuracy": true,
+    "false_pass_count": 4,
+    "false_pass_opportunities": 7,
+    "input_tokens": 0,
+    "material_defects_found": 1,
+    "material_defects_total": 1,
+    "negative_control_valid": true,
+    "output_tokens": 0,
+    "task_success": true,
+    "tool_calls": 0,
+    "trigger_correct": true
+  },
+  "profile": "candidate_trimmed_skill",
+  "receipt_digest": "0d97f9ea9455c68d293dae0ed73784c8ac8e492d5d4409cd43ca3df8f7302b5f",
+  "receipt_id": "a597903698feec53cec3e462e5315bedea073f23982224d4c3a2e6d6846f9e41",
+  "removed_ambient_environment_names": [
+    "GOOGLE_API_KEY",
+    "SSH_AUTH_SOCK"
+  ],
+  "repetition": 1,
+  "repository_id": "psf/requests",
+  "repository_subject": {
+    "commit": "8068356288978c4f54661ae6f95afe0e0831885e",
+    "tree": "271ed3be81c5d263a4293f30924c0ee95484511d"
+  },
+  "runtime": {
+    "identity": "CODEX_CLI_LOCAL",
+    "toolset_digest": "418c900a87809d45f7220dfb2c3e54b33bf6c7c223764cc5ea3b9b895cbf1b4b",
+    "version": "codex-cli 0.146.0"
+  },
+  "schema": "repository-capability-audit-agent-run/v1",
+  "task_digest": "2d85f9ad2b7af8d54e59402295820bca9e62e85898c76ccce8e370abaca92060",
+  "treatment_digest": "32aa3043b4a7c0b7e1dc829294c3555898997b2603185429600f1d232d568ba2"
+}

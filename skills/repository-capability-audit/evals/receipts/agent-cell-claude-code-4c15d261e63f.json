@@ -1,0 +1,308 @@
+{
+  "agent": {
+    "family": "claude-code",
+    "harness": "claude-code",
+    "harness_version": "2.1.221 (Claude Code)",
+    "model": "opus",
+    "provider": "anthropic",
+    "version": "2.1.221 (Claude Code)"
+  },
+  "agent_class": "language_model_agent",
+  "agent_run": {
+    "argv": [
+      "claude",
+      "-p",
+      "Audit the pinned repository subject named in your task file and report only what its tree supports. Inspect it through the GitHub API, for example `gh api /repos/OWNER/NAME/git/trees/TREE?recursive=1`. Write agent-output.json in the current directory with exactly this shape: {\"tree_sha\": \"...\", \"evidence_paths\": [...], \"claims\": [...], \"non_claims\": [...], \"escalate\": true|false}. Cite only paths you actually resolved. Your task file is <redacted-path>",
+      "--allowedTools",
+      "Bash,Read,Write,Glob,Grep",
+      "--model",
+      "opus",
+      "--output-format",
+      "json",
+      "--append-system-prompt-file",
+      "<path>/treatment.md"
+    ],
+    "duration_ms": 405496,
+    "exit_code": 0,
+    "stderr_path": "<workspace>/.agent-eval-logs/agent.stderr.log",
+    "stderr_sha256": "e705bbf8982385da2b1a03725921d0a6c6730bbaadd22c8f9168522573d067e0",
+    "stdout_path": "<workspace>/.agent-eval-logs/agent.stdout.log",
+    "stdout_sha256": "5b14496f6da8f2352063e7c330dc4cffafe65173fbebfbd01935110a03ea86de",
+    "timed_out": false
+  },
+  "arm_order": 0,
+  "artifacts": [
+    {
+      "bytes": 157,
+      "path": ".agent-eval-logs/agent.stderr.log",
+      "sha256": "e705bbf8982385da2b1a03725921d0a6c6730bbaadd22c8f9168522573d067e0"
+    },
+    {
+      "bytes": 8512,
+      "path": ".agent-eval-logs/agent.stdout.log",
+      "sha256": "5b14496f6da8f2352063e7c330dc4cffafe65173fbebfbd01935110a03ea86de"
+    },
+    {
+      "bytes": 0,
+      "path": ".agent-eval-logs/evaluator.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 73,
+      "path": ".agent-eval-logs/evaluator.stdout.log",
+      "sha256": "b7d979e10c0ad5eed6441c553ce8c2c831665a22ee388427fcc31f0e20d918e2"
+    },
+    {
+      "bytes": 834,
+      "path": ".blobs/Makefile",
+      "sha256": "c31f5628de71af324c7db9b61579e8a287caae87f76586d70994a7dc86964ec7"
+    },
+    {
+      "bytes": 2906,
+      "path": ".blobs/README.md",
+      "sha256": "2a9268c9be5f4dc9abe9105740be7c5234babc3dd2b25eb11ca376c538a0c67b"
+    },
+    {
+      "bytes": 1322,
+      "path": ".blobs/certs_ca.crt",
+      "sha256": "1407cb9c2502bf453ffa3f54cb846022f161a46b73fe4caf436157d95ad93367"
+    },
+    {
+      "bytes": 2628,
+      "path": ".blobs/certs_expired_server.pem",
+      "sha256": "232cc4e13f97688281a03e6a555e93c3a7bd6cfda4604fdee085f4ac2556f2c2"
+    },
+    {
+      "bytes": 2628,
+      "path": ".blobs/certs_mtls_client.pem",
+      "sha256": "d8601d058cf8958fff16250037b38a83e5eb93cc0507b4e083860ca9214023ea"
+    },
+    {
+      "bytes": 2770,
+      "path": ".blobs/certs_valid_server.pem",
+      "sha256": "d0b55dbe152874f2d7bce3513d52a8e5f587566186dfd7a88d14ad41367133d1"
+    },
+    {
+      "bytes": 5933,
+      "path": ".blobs/fetch.sh",
+      "sha256": "552ca93b3df816b5cdeeb4ba1dfe775a548caa3cafed06c4f7a26fd3b3b23764"
+    },
+    {
+      "bytes": 3404,
+      "path": ".blobs/pyproject.toml",
+      "sha256": "345f26b9f691435e39d0eb6f7f4150a390f43175b22f8d61ac95e7f2827f0a77"
+    },
+    {
+      "bytes": 93,
+      "path": ".blobs/requirements-dev.txt",
+      "sha256": "aed8622c9a3d9361a9cdbe71a4643831387aff5f622ebdd68de598a8b258c841"
+    },
+    {
+      "bytes": 6041,
+      "path": ".blobs/src___types.py",
+      "sha256": "84dec9789a8e839807242448a9aa86acd12c440211921e32f43afcbc422a629c"
+    },
+    {
+      "bytes": 27992,
+      "path": ".blobs/src__adapters.py",
+      "sha256": "cc9b1b02694fee0353481fbad84fe3ddbedec4441dba54df7914c63f2aa85937"
+    },
+    {
+      "bytes": 7152,
+      "path": ".blobs/src__api.py",
+      "sha256": "4d15480ac046f089209798e8650476ef4a28ebe6f81b400758f8ef42ec6b5509"
+    },
+    {
+      "bytes": 5637,
+      "path": ".blobs/src__init__.py",
+      "sha256": "80534322a1a3167d8775829ee220a6acf4fe455f3f778c4b8e94bcf7fadfa0b5"
+    },
+    {
+      "bytes": 469,
+      "path": ".blobs/tests____init__.py",
+      "sha256": "ac7f253daae0905f9b3dec647cae736bb3c090185aa373b30b3e851599e5342c"
+    },
+    {
+      "bytes": 343,
+      "path": ".blobs/tests__certs__README.md",
+      "sha256": "a902fe53d4cc6224b59532e47d94fc42726b2227462e801538aa50a7888d38f3"
+    },
+    {
+      "bytes": 480,
+      "path": ".blobs/tests__compat.py",
+      "sha256": "d58ff5e3167de0140a667cc51427f809c552e485875c95b9dad43ce13ba15083"
+    },
+    {
+      "bytes": 1934,
+      "path": ".blobs/tests__conftest.py",
+      "sha256": "6d65ffb582519f80a66c5d1ef571e3c33395a199f9e67fcb500c6ad2d7800e0a"
+    },
+    {
+      "bytes": 314,
+      "path": ".blobs/tests__test_adapters.py",
+      "sha256": "102494aa704f8505fb22fa476452f6aa3aae756da82fe2d5b2a2a3f366b38bf4"
+    },
+    {
+      "bytes": 839,
+      "path": ".blobs/tests__test_help.py",
+      "sha256": "1c2ac8ca9f4986429717791df766122b23e1fe90aa621318380ccf1f8e83d0f6"
+    },
+    {
+      "bytes": 424,
+      "path": ".blobs/tests__test_hooks.py",
+      "sha256": "a9e5163f538543a660be3b06650cd0b803ff0c503f5948f66b6fc50ede38109c"
+    },
+    {
+      "bytes": 15343,
+      "path": ".blobs/tests__test_lowlevel.py",
+      "sha256": "db5fac7340c49c49551e3e41679a8ee6e385c56054f84073932354a8da87df65"
+    },
+    {
+      "bytes": 229,
+      "path": ".blobs/tests__test_packages.py",
+      "sha256": "90875423db059d65b39416d7b6d01b18938851b8071279877400beb506e08676"
+    },
+    {
+      "bytes": 108534,
+      "path": ".blobs/tests__test_requests.py",
+      "sha256": "5eacf6341d236e225ce6a37a592f3b410f20e69ec17641f0e2c99b03a79b904d"
+    },
+    {
+      "bytes": 2757,
+      "path": ".blobs/tests__test_structures.py",
+      "sha256": "f984b7fc68fb2bd6ec82463b0cf5b6bd2ac773293cac6629fc3361f9f66947e9"
+    },
+    {
+      "bytes": 5547,
+      "path": ".blobs/tests__test_testserver.py",
+      "sha256": "90ac39d6cb9c0fbaa94c5aa59646bf6097829ae73e50ac284a41135188f95d33"
+    },
+    {
+      "bytes": 31454,
+      "path": ".blobs/tests__test_utils.py",
+      "sha256": "00d027432443a1aa9539c00a09550de9439cdd696d2e6acf2dc997de3a416946"
+    },
+    {
+      "bytes": 5147,
+      "path": ".blobs/tests__testserver__server.py",
+      "sha256": "15a9092cc5edb005af6732097555515c4b82093d9394f6463c966259f83068c3"
+    },
+    {
+      "bytes": 366,
+      "path": ".blobs/tests__utils.py",
+      "sha256": "cfaec86690eba62573c8c730a121332837809333fb2b1006a20e2e8f4d34d4de"
+    },
+    {
+      "bytes": 285,
+      "path": ".blobs/tox.ini",
+      "sha256": "65aeb46c94fc5723a9764bb029fdb448539658fe47d3a39550a829b2383804fd"
+    },
+    {
+      "bytes": 2305,
+      "path": ".blobs/wf__run-tests.yml",
+      "sha256": "881865cff186f47787598b2a3d7e6e7eb4d56a3fe4c015414c3cd4d90d9cbb90"
+    },
+    {
+      "bytes": 736,
+      "path": ".blobs/wf__typecheck.yml",
+      "sha256": "8540a9bdf2f7b1797426d781d70a104ac98f2e161abe731d84fb6b29b901de32"
+    },
+    {
+      "bytes": 449,
+      "path": "agent-eval-metrics.json",
+      "sha256": "f9abc97e5ef28fd389c0afa2ad0978adf8eb8abf4de0eed94728505aa37d8a54"
+    },
+    {
+      "bytes": 14515,
+      "path": "agent-output.json",
+      "sha256": "51517b52f58be0358b54163659626e928c718d71dfb08895d319c747a22c41e8"
+    },
+    {
+      "bytes": 787,
+      "path": "fetch_blobs.py",
+      "sha256": "323f8efcc3719356a44723d48c9c11ad7b54392997715864d826ee6c2a02d6e2"
+    },
+    {
+      "bytes": 668,
+      "path": "gen_fetch.py",
+      "sha256": "cceb55a83f76d4217f354007253df1280977a8d7ca6e4226e9dd00daea92e2e3"
+    }
+  ],
+  "budgets": {
+    "max_input_tokens": 200000,
+    "max_output_tokens": 20000,
+    "max_tool_calls": 100,
+    "timeout_seconds": 600
+  },
+  "case_id": "real-capability-with-evidence",
+  "evaluator": {
+    "command": [
+      "<path>/python3.14",
+      "<path>/pilot_evaluator.py",
+      "--ground-truth",
+      "<path>/ground-truth.json",
+      "--usage",
+      "<path>/usage.json"
+    ],
+    "identity": "holdout-deterministic-evaluator",
+    "owner": "independent",
+    "version": "1.0.0"
+  },
+  "evaluator_digest": "273c79c52912ca504748ab25f8d76b5e1d23910fecd604f6614520d93318b0d0",
+  "evaluator_run": {
+    "argv": [
+      "<path>/python3.14",
+      "<path>/pilot_evaluator.py",
+      "--ground-truth",
+      "<path>/ground-truth.json",
+      "--usage",
+      "<path>/usage.json"
+    ],
+    "duration_ms": 53,
+    "exit_code": 0,
+    "stderr_path": "<workspace>/.agent-eval-logs/evaluator.stderr.log",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_path": "<workspace>/.agent-eval-logs/evaluator.stdout.log",
+    "stdout_sha256": "b7d979e10c0ad5eed6441c553ce8c2c831665a22ee388427fcc31f0e20d918e2",
+    "timed_out": false
+  },
+  "metrics": {
+    "cost_observed": false,
+    "cost_usd": 0.0,
+    "duration_ms": 0,
+    "evidence_packet_complete": true,
+    "exact_subject_continuity": true,
+    "explicit_non_claim_accuracy": true,
+    "false_pass_count": 10,
+    "false_pass_opportunities": 31,
+    "input_tokens": 0,
+    "material_defects_found": 1,
+    "material_defects_total": 1,
+    "negative_control_valid": true,
+    "output_tokens": 0,
+    "task_success": true,
+    "tool_calls": 0,
+    "trigger_correct": false
+  },
+  "profile": "candidate_trimmed_skill",
+  "receipt_digest": "5af4d041cc8893e80ee800c361e52ab080c6e1c865f2f3ab64145fdef8cda59f",
+  "receipt_id": "cb71632865585fd24ada18db4e12253317bcc216f845ff19719864f49dc71438",
+  "removed_ambient_environment_names": [
+    "GOOGLE_API_KEY",
+    "SSH_AUTH_SOCK"
+  ],
+  "repetition": 1,
+  "repository_id": "psf/requests",
+  "repository_subject": {
+    "commit": "8068356288978c4f54661ae6f95afe0e0831885e",
+    "tree": "271ed3be81c5d263a4293f30924c0ee95484511d"
+  },
+  "runtime": {
+    "identity": "CLAUDE_CODE_LOCAL",
+    "toolset_digest": "418c900a87809d45f7220dfb2c3e54b33bf6c7c223764cc5ea3b9b895cbf1b4b",
+    "version": "2.1.221 (Claude Code)"
+  },
+  "schema": "repository-capability-audit-agent-run/v1",
+  "task_digest": "2d85f9ad2b7af8d54e59402295820bca9e62e85898c76ccce8e370abaca92060",
+  "treatment_digest": "32aa3043b4a7c0b7e1dc829294c3555898997b2603185429600f1d232d568ba2"
+}

@@ -80,7 +80,15 @@ class RepositoryCapabilityAuditAblationTests(unittest.TestCase):
 
         for path in receipts:
             data = json.loads(path.read_text(encoding="utf-8"))
-            claimed = data.get("artifacts", {}).get("committed_expected_report_sha256")
+            # This directory holds more than one receipt shape: an ablation receipt
+            # keys `artifacts` by name, while an agent-cell receipt uses it for a
+            # file manifest list. Assuming one shape is how this guard broke the
+            # first time an agent-cell receipt landed beside it -- the same
+            # unverified-shape assumption it exists to catch elsewhere.
+            artifacts = data.get("artifacts")
+            if not isinstance(artifacts, dict):
+                continue
+            claimed = artifacts.get("committed_expected_report_sha256")
             if claimed is None or claimed == current:
                 continue
             superseded = data.get("superseded")
