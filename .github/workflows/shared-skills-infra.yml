@@ -9,11 +9,21 @@ on:
       - synchronize
     paths:
       - 'skills/shared-skills-infra/**'
+      - 'skills/*/SKILL.md'
+      - 'skills/*/modules/domain-profile.md'
+      - 'scripts/check_skill_core_boundaries.py'
+      - 'evals/skill-core-boundaries.json'
+      - 'tests/skill-core-boundaries/**'
       - '.github/workflows/shared-skills-infra.yml'
   push:
     branches: [main]
     paths:
       - 'skills/shared-skills-infra/**'
+      - 'skills/*/SKILL.md'
+      - 'skills/*/modules/domain-profile.md'
+      - 'scripts/check_skill_core_boundaries.py'
+      - 'evals/skill-core-boundaries.json'
+      - 'tests/skill-core-boundaries/**'
       - '.github/workflows/shared-skills-infra.yml'
   workflow_dispatch:
 
@@ -48,3 +58,5 @@ jobs:
       - name: Kill canonical-drift first-only mutants
         if: ${{ hashFiles('skills/shared-skills-infra/tests/canonical-drift/mutation_proof.py') != '' }}
         run: python3 skills/shared-skills-infra/tests/canonical-drift/mutation_proof.py
+      - name: Verify procedural core and domain boundaries
+        run: bash tests/skill-core-boundaries/verify.sh
