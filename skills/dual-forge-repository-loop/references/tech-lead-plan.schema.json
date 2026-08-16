@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skills-shared.invalid/dual-forge-repository-loop/tech-lead-plan.schema.json",
+  "title": "Tech Lead branch-plan contract",
+  "type": "object",
+  "required": ["schema", "subject", "goal", "architecture_constraints", "max_parallel_workers", "tasks"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {"const": "dual-forge-repository-loop/tech-lead-plan/v1"},
+    "subject": {
+      "type": "object",
+      "required": ["repository", "base_branch", "base_commit", "tree"],
+      "additionalProperties": false,
+      "properties": {
+        "repository": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+        "base_branch": {"type": "string", "minLength": 1},
+        "base_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "tree": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+      }
+    },
+    "goal": {"type": "string", "minLength": 1},
+    "max_parallel_workers": {"type": "integer", "minimum": 1},
+    "architecture_constraints": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "statement", "enforced_by", "verification"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+          "statement": {"type": "string", "minLength": 1},
+          "enforced_by": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+          "verification": {"type": "array", "minItems": 1, "items": {"type": "string"}}
+        }
+      }
+    },
+    "tasks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "id", "title", "stack_class", "head_branch", "parent", "depends_on",
+          "allowed_paths", "excluded_paths", "provides_contracts", "consumes_contracts",
+          "non_goals", "required_evals", "negative_controls", "blindspot_queries",
+          "evidence_boundary", "cleanup_contract", "rollback_subject", "human_owned_operations"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+          "title": {"type": "string", "minLength": 1},
+          "stack_class": {"enum": ["foundation", "child", "sibling", "convergence", "hotfix"]},
+          "head_branch": {"type": "string", "minLength": 1},
+          "parent": {"type": "string", "minLength": 1},
+          "depends_on": {"type": "array", "items": {"type": "string"}},
+          "allowed_paths": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+          "excluded_paths": {"type": "array", "items": {"type": "string"}},
+          "provides_contracts": {"type": "array", "items": {"type": "string"}},
+          "consumes_contracts": {"type": "array", "items": {"type": "string"}},
+          "non_goals": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+          "required_evals": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+          "negative_controls": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+          "blindspot_queries": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["id", "intent", "lanes", "readback_required", "negative_control"],
+              "additionalProperties": false,
+              "properties": {
+                "id": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+                "intent": {"type": "string", "minLength": 1},
+                "lanes": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {"enum": ["grepai", "scip", "tree-sitter", "serena", "lancedb", "source-readback", "test"]}
+                },
+                "readback_required": {"const": true},
+                "negative_control": {"type": "string"}
+              }
+            }
+          },
+          "evidence_boundary": {"type": "string", "minLength": 1},
+          "cleanup_contract": {"type": "string", "minLength": 1},
+          "rollback_subject": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+          "human_owned_operations": {"type": "array", "minItems": 1, "items": {"type": "string"}}
+        }
+      }
+    }
+  }
+}

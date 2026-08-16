@@ -149,6 +149,33 @@ rollback subject
 
 If a GitHub issue is mirrored locally, record both namespaced identities explicitly.
 
+### 3a. Compile the Tech Lead task DAG before allocating Workers
+
+When one request needs more than one branch writer, the decomposition is a
+compiled artifact, not a supervising Agent's running judgement. The Tech Lead
+owns the goal graph, the contracts, the branch topology and the writer leases;
+a Worker owns one packet and one branch.
+
+Method and role separation:
+[`references/tech-lead-task-decomposition.md`](references/tech-lead-task-decomposition.md).
+Plan shape: [`references/tech-lead-plan.schema.json`](references/tech-lead-plan.schema.json),
+with a validated instance at
+[`references/tech-lead-plan.example.json`](references/tech-lead-plan.example.json).
+
+```bash
+python3 skills/dual-forge-repository-loop/scripts/compile_tech_lead_plan.py \
+  verify --plan path/to/plan.json
+python3 skills/dual-forge-repository-loop/scripts/compile_tech_lead_plan.py \
+  compile --plan path/to/plan.json --output path/to/packets
+```
+
+`verify` exits `2` and names the refusal on a path-lease collision, a dependency
+cycle, an incomplete blindspot query and a child branch that declares no
+consumed contract. `compile` writes Worker packets, a stack graph and a receipt
+whose `runtime_state` is `NOT_EXERCISED`: a compiled plan proves the packets are
+well formed, never that a branch, worktree, Agent or provider ran. Controls:
+[`tests/tech-lead-plan/verify.sh`](tests/tech-lead-plan/verify.sh).
+
 ### 4. Implement in isolated worktrees
 
 One issue gets one branch writer and one isolated worktree. Run the pre-implementation Spatial-Loop gate before high-complexity code. Implement the smallest vertical slice, then run owning tests/oracles and negative controls.
