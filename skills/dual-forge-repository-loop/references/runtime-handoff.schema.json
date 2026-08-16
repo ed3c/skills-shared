@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skills-shared.invalid/dual-forge-repository-loop/runtime-handoff.schema.json",
+  "title": "Runtime handoff packet",
+  "description": "One runtime passing bounded work to another after hitting a capability boundary. The schema rules on shape; the capability laws are enforced by scripts/check_runtime_handoff.py, because JSON Schema cannot compare a step's requirements against a runtime's matrix row.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "subject", "sender", "blocker", "capability_matrix", "steps",
+               "receiver", "done_when"],
+  "properties": {
+    "schema": {"const": "dual-forge-repository-loop/runtime-handoff/v1"},
+    "issue": {"type": "integer", "minimum": 1},
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "commit_sha", "tree_sha"],
+      "properties": {
+        "repository": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+        "commit_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "tree_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "branch": {"type": "string", "minLength": 1},
+        "pull_request": {"type": "integer", "minimum": 1}
+      }
+    },
+    "sender": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["runtime", "completed"],
+      "properties": {
+        "runtime": {"$ref": "#/$defs/runtime"},
+        "completed": {"type": "array", "minItems": 1,
+                      "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "blocker": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["missing_capability", "observation"],
+      "properties": {
+        "missing_capability": {"$ref": "#/$defs/capability"},
+        "observation": {"type": "string", "minLength": 1,
+                        "description": "the exact output that stopped the sender"},
+        "evidence_reference": {"type": "string", "minLength": 1,
+                               "description": "run id, receipt path or command that reproduces it"},
+        "why_not_worked_around": {"type": "string", "minLength": 1}
+      }
+    },
+    "capability_matrix": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "minProperties": 1,
+        "additionalProperties": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["verdict"],
+          "properties": {
+            "verdict": {"enum": ["OBSERVED", "OBSERVED_ABSENT", "DECLARED",
+                                 "DECLARED_ABSENT", "UNKNOWN"]},
+            "evidence": {"type": "string", "minLength": 1}
+          }
+        }
+      }
+    },
+    "steps": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "goal", "requires", "assigned_to"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+          "goal": {"type": "string", "minLength": 1},
+          "requires": {"type": "array", "minItems": 1,
+                       "items": {"$ref": "#/$defs/capability"}},
+          "assigned_to": {"oneOf": [{"$ref": "#/$defs/runtime"}, {"const": "HUMAN"}]},
+          "writes_commit": {"type": "boolean"},
+          "note": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "receiver": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["runtime"],
+      "properties": {
+        "runtime": {"$ref": "#/$defs/runtime"},
+        "note": {"type": "string", "minLength": 1}
+      }
+    },
+    "done_when": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["condition", "checkable_by"],
+      "properties": {
+        "condition": {"type": "string", "minLength": 1},
+        "checkable_by": {"type": "array", "minItems": 1,
+                         "items": {"type": "string", "minLength": 1},
+                         "description": "commands or observations the receiver can run"}
+      }
+    },
+    "does_not_transfer": {"type": "array", "items": {"type": "string", "minLength": 1}}
+  },
+  "$defs": {
+    "runtime": {
+      "enum": ["CHATGPT_GITHUB_CONNECTOR", "CHATGPT_DESKTOP_WORKTREE",
+               "CLAUDE_CODE_LOCAL", "CODEX_CLI_LOCAL", "GITHUB_ACTIONS", "UNKNOWN"]
+    },
+    "capability": {
+      "enum": ["github_read", "github_commit_create", "git_author_identity",
+               "local_checkout", "local_shell", "git_worktree", "forgejo_loopback",
+               "provider_execution", "agent_session_spawn", "actions_execution"]
+    }
+  }
+}

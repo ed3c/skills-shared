@@ -1,0 +1,97 @@
+{
+  "schema": "dual-forge-repository-loop/runtime-handoff/v1",
+  "issue": 255,
+  "subject": {
+    "repository": "ed3c/skills-shared",
+    "commit_sha": "0e9514ce74d8801dd3bd413e7ad7d6c2332dd768",
+    "tree_sha": "7c8f702745c963ce74d042c308885452677b30bb",
+    "branch": "agent/255-bundle-reconciliation",
+    "pull_request": 260
+  },
+  "sender": {
+    "runtime": "CHATGPT_GITHUB_CONNECTOR",
+    "completed": [
+      "reconciled 23 staged bundle entries into per-file decisions against the canonical Skills",
+      "collapsed 11 connector-written commits into one exact-tree commit",
+      "published branch and PR #260",
+      "triggered exact-head CI run 31946324638 and read its result",
+      "isolated the single remaining failure to one gate"
+    ]
+  },
+  "blocker": {
+    "missing_capability": "git_author_identity",
+    "observation": "COMMIT ROLE RED: 0e9514ce74d8: Driven-By agent-macro is a machine role but the author address 'mcnum01@gmail.com' is not a <role>@<host>.invalid address; machine work would count toward a person's contribution graph",
+    "evidence_reference": "actions run 31946324638 on head 0e9514ce; reproducible locally with python3 scripts/check_commit_roles.py",
+    "why_not_worked_around": "GitHub's Git-Data create_commit exposes message, tree and parents but not author or committer identity, so a connector commit necessarily carries the linked account's real address. Writing Driven-By: human would be false attribution and exempting the connector would put a hole in the gate for the one endpoint that cannot comply."
+  },
+  "capability_matrix": {
+    "CHATGPT_GITHUB_CONNECTOR": {
+      "github_read": {"verdict": "OBSERVED", "evidence": "read repository state and CI results for #255"},
+      "github_commit_create": {"verdict": "OBSERVED", "evidence": "created the commit behind PR #260"},
+      "git_author_identity": {"verdict": "OBSERVED_ABSENT", "evidence": "commit-role gate red on head 0e9514ce; the API exposes no author field"},
+      "local_checkout": {"verdict": "DECLARED_ABSENT", "evidence": "runtime-identity-contract.md non-equivalence laws"},
+      "local_shell": {"verdict": "DECLARED_ABSENT", "evidence": "runtime-identity-contract.md non-equivalence laws"},
+      "git_worktree": {"verdict": "DECLARED_ABSENT", "evidence": "runtime-identity-contract.md non-equivalence laws"},
+      "actions_execution": {"verdict": "DECLARED_ABSENT", "evidence": "the connector is not a GitHub Actions runner"}
+    },
+    "CLAUDE_CODE_LOCAL": {
+      "github_read": {"verdict": "OBSERVED", "evidence": "gh api reads throughout this repository's delivery lane"},
+      "github_commit_create": {"verdict": "OBSERVED", "evidence": "commits pushed to main from this host"},
+      "git_author_identity": {"verdict": "OBSERVED", "evidence": "commit 5f2de76 authored as agent-macro <agent-macro@codex-app.invalid>"},
+      "local_checkout": {"verdict": "OBSERVED", "evidence": "working tree at /Users/neon/skills-shared"},
+      "local_shell": {"verdict": "OBSERVED", "evidence": "scripts/local_verification.sh executed to completion"},
+      "git_worktree": {"verdict": "OBSERVED", "evidence": "isolated worktrees created and removed for this task"},
+      "actions_execution": {"verdict": "DECLARED_ABSENT", "evidence": "a local host can trigger Actions but not execute them"}
+    }
+  },
+  "steps": [
+    {
+      "id": "recreate-tree-with-machine-identity",
+      "goal": "Apply the same three-file change on the current head, authored as agent-macro <agent-macro@codex-app.invalid> with Driven-By: agent-macro and Driven-On: codex-app.",
+      "requires": ["local_checkout", "local_shell", "git_author_identity"],
+      "assigned_to": "CLAUDE_CODE_LOCAL",
+      "writes_commit": true,
+      "note": "The content is the sender's; only the authorship line needs a host that can set it."
+    },
+    {
+      "id": "verify-before-publishing",
+      "goal": "Run scripts/local_verification.sh and check_commit_roles.py at the exact new head before anything is pushed.",
+      "requires": ["local_checkout", "local_shell"],
+      "assigned_to": "CLAUDE_CODE_LOCAL",
+      "writes_commit": false
+    },
+    {
+      "id": "publish-and-collect-exact-head-ci",
+      "goal": "Publish the corrected head once and read the exact-head CI result for it.",
+      "requires": ["github_commit_create", "github_read"],
+      "assigned_to": "CLAUDE_CODE_LOCAL",
+      "writes_commit": false,
+      "note": "One publication. The receipt #255 asks for is CI on the corrected head, not on the sender's."
+    },
+    {
+      "id": "admit-and-close",
+      "goal": "Decide whether the corrected line satisfies #255 and close it.",
+      "requires": ["github_read"],
+      "assigned_to": "HUMAN",
+      "writes_commit": false,
+      "note": "Admission did not move with the handoff."
+    }
+  ],
+  "receiver": {
+    "runtime": "CLAUDE_CODE_LOCAL",
+    "note": "Selected because git_author_identity is the missing capability and this runtime has it OBSERVED."
+  },
+  "done_when": {
+    "condition": "The corrected head is on main, its commit-role gate is green, and exact-head CI succeeded.",
+    "checkable_by": [
+      "python3 scripts/check_commit_roles.py",
+      "bash scripts/local_verification.sh",
+      "gh api repos/ed3c/skills-shared/actions/runs?head_sha=<corrected head>"
+    ]
+  },
+  "does_not_transfer": [
+    "the sender's CI receipt: it is bound to head 0e9514ce and says nothing about the corrected head",
+    "merge, promotion and release admission, which stay with the Human",
+    "the branch write lease, which moves rather than being shared"
+  ]
+}

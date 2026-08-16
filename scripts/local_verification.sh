@@ -69,6 +69,10 @@ step "adapter receipt integrity"
 python3 skills/repo-agent-native/scripts/check_adapter_receipts.py selftest
 python3 skills/repo-agent-native/scripts/check_adapter_receipts.py check
 
+step "runtime handoff contract"
+python3 skills/dual-forge-repository-loop/scripts/check_runtime_handoff.py selftest
+python3 skills/dual-forge-repository-loop/scripts/check_runtime_handoff.py check
+
 step "consumer canary receipt integrity"
 python3 skills/dual-forge-repository-loop/scripts/check_consumer_canary.py selftest
 python3 skills/dual-forge-repository-loop/scripts/check_consumer_canary.py check

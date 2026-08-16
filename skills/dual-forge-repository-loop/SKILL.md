@@ -346,6 +346,41 @@ state whose state-specific receipts have not reached the full publication-ready
 closure. Exit `0` is reserved for the exact `GITHUB_PUBLICATION_READY` history
 and all proof lanes above.
 
+## Runtime handoff
+
+[`references/runtime-identity-contract.md`](references/runtime-identity-contract.md)
+says what each runtime may claim. It does not cover what happens when one of
+them runs out of capability halfway through, which is the situation that
+actually occurs.
+
+[`references/runtime-handoff-contract.md`](references/runtime-handoff-contract.md)
+covers that: a capability matrix where every cell records how it was
+established, and a packet that names the exact blocker, the remaining steps, and
+which runtime can perform each one. Shape:
+[`references/runtime-handoff.schema.json`](references/runtime-handoff.schema.json).
+Worked example from #255:
+[`references/runtime-handoff.example.json`](references/runtime-handoff.example.json).
+
+```bash
+python3 skills/dual-forge-repository-loop/scripts/check_runtime_handoff.py \
+  check --packet path/to/handoff.json
+```
+
+The rule it exists for is `IDENTITY_LAUNDERED`: a step that writes a commit
+assigned to a runtime without `git_author_identity`. That is #255 generalized —
+GitHub's Git-Data `create_commit` exposes message, tree and parents but not
+author, so a connector commit necessarily carries the linked account's real
+address, and a plan that routes commit-writing there produces a machine role
+under a person's address that the contribution gate catches one CI run too late.
+
+It also refuses a step assigned to a runtime the matrix records as lacking a
+required capability, a capability marked available with no evidence, a handoff
+with no reproducible blocker, a sender that turns out to have had the capability
+after all, a receiver missing something its own steps need, and a step no
+runtime can perform that was routed at one anyway rather than at a Human.
+
+A handoff moves work. It does not move evidence, authority, or the writer lease.
+
 ## Consumer delivery canary
 
 [`scripts/run_consumer_canary.py`](scripts/run_consumer_canary.py) walks a real
