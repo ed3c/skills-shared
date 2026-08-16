@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/forgejo-private-cleanroom-packet.schema.json",
+  "title": "Forgejo private clean-room packet",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "packet_id", "private_subject_digest", "items"],
+  "properties": {
+    "schema": {"const": "forgejo-private-cleanroom-packet/v1"},
+    "packet_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]{2,63}$"},
+    "private_subject_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "items": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "kind", "statement", "assertions", "public_references"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]{2,63}$"},
+          "kind": {
+            "enum": [
+              "capability-contract",
+              "state-machine",
+              "generalized-invariant",
+              "synthetic-negative-control",
+              "sanitized-receipt-schema",
+              "approved-public-reference"
+            ]
+          },
+          "statement": {"type": "string", "minLength": 1, "maxLength": 4000},
+          "assertions": {
+            "type": "array",
+            "items": {"type": "string", "minLength": 1, "maxLength": 1000}
+          },
+          "public_references": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["label", "url"],
+              "properties": {
+                "label": {"type": "string", "minLength": 1, "maxLength": 160},
+                "url": {"type": "string", "pattern": "^https://"}
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
