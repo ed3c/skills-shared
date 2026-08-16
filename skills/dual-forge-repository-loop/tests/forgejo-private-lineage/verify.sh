@@ -197,6 +197,21 @@ shared_blob="${tmp}/shared-blob"
 init_repo "${shared_blob}" "neutral content"
 expect_exit 2 "shared non-empty Git object refused" bash "${mode_root}/scripts/assert_no_shared_lineage.sh" "${shared_blob}" "${audit_repo}"
 
+# The producer already refuses these tracked paths. Without a control the refusal
+# branch is a claim: nothing proves it goes red, and a widened glob would not
+# report anything either.
+plant_and_reject() {
+  local name="$1" file="$2" body="$3" repo="${tmp}/public-${1// /-}"
+  init_repo "${repo}" "independently authored public contract"
+  printf '%s\n' "${body}" > "${repo}/${file}"
+  git -C "${repo}" add "${file}"
+  git -C "${repo}" commit -q -m "track ${file}"
+  expect_exit 67 "${name}" bash "${mode_root}/scripts/create_fresh_root_snapshot.sh" \
+    "${repo}" "${tmp}/fresh-${1// /-}" --patterns "${patterns}"
+}
+plant_and_reject "committed private denylist refused" "private-denylist.txt" "private-literal"
+plant_and_reject "committed runtime evidence refused" "run.log" "runtime line"
+
 # Syntax and executable inventory.
 expect_zero "Python sources compile" python3 -m compileall -q "${mode_root}/scripts"
 for executable in "${mode_root}"/scripts/*.sh "${mode_root}"/hooks/*; do
