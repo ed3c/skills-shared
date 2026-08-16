@@ -1,0 +1,29 @@
+{
+  "schema": "skill-core-boundaries/v1",
+  "evidence_boundary": "This manifest validates repository structure only. It cannot promote provider, browser, model, forge, scheduler, Git Town, CI, or production lanes to PASS.",
+  "skills": [
+    {"name":"gemini-conversation-research","domain_module":"modules/domain-profile.md","forbidden_core_tokens":["gemini","aistudio","chrome","cdp","automate.js","kg_fast_write","antigravity","skill-bettor"]},
+    {"name":"repo-wiki-converge","domain_module":"modules/domain-profile.md","forbidden_core_tokens":["gemini","opus","openwiki","kb-ingest","agy","/users/"]},
+    {"name":"forgejo-delivery-loop","domain_module":"modules/domain-profile.md","forbidden_core_tokens":["forgejo","chrome","localhost","credential","keychain","runtime-env"]},
+    {"name":"gitlab-delivery-loop","domain_module":"modules/domain-profile.md","forbidden_core_tokens":["gitlab","glab","merge request","mr ","~/.agents"]},
+    {"name":"repo-fullstack-debugger","domain_module":"modules/domain-profile.md","forbidden_core_tokens":["gemini","stealth-browser","automate.js","grepai","chrome"]},
+    {"name":"dr-research-loop","domain_module":"modules/domain-profile.md","forbidden_core_tokens":["youtube","opus","claude","agy","loop_wiki","skill-bettor"]},
+    {"name":"truth-verify-loop","domain_module":"modules/domain-profile.md","forbidden_core_tokens":["opus","codex","agy","loop_wiki","antigravity","skill-bettor"]},
+    {"name":"loop-harness-standard","domain_module":"modules/domain-profile.md","forbidden_core_tokens":["claude","codex","agy","loop_wiki","antigravity"]},
+    {"name":"autoresearch-composer","domain_module":"modules/domain-profile.md","forbidden_core_tokens":["/autoresearch","~/.claude","skill-bettor","families/"]},
+    {"name":"external-verify","domain_module":"modules/domain-profile.md","forbidden_core_tokens":["websearch","webfetch","claude code","skill-bettor"]},
+    {"name":"html-for-decisions","domain_module":"modules/domain-profile.md","forbidden_core_tokens":["code graph","playwright","email profile","c2pa","browser"]},
+    {"name":"judge-loop-chooser","domain_module":"modules/domain-profile.md","forbidden_core_tokens":["opus","codex","agy","skill-bettor","families/"]},
+    {"name":"sdlc-plan-composer","domain_module":"modules/domain-profile.md","forbidden_core_tokens":["opus","codex","agy","~/.claude","docs/plans","families/"]},
+    {"name":"fold-in","domain_module":"modules/domain-profile.md","forbidden_core_tokens":["skill-bettor","antigravity","claude","families/"]},
+    {"name":"dr-to-mvp","domain_module":"modules/domain-profile.md","forbidden_core_tokens":["opus","codex","agy","loop_wiki","families/"]},
+    {"name":"loop-harness-review-handoff","domain_module":"modules/domain-profile.md","forbidden_core_tokens":["opus","codex","agy","skill-bettor","fable"]},
+    {"name":"codebase-atlas","domain_module":"modules/domain-profile.md","forbidden_core_tokens":["isometric","drafting-paper","playwright","monochrome","css"]},
+    {"name":"path-b-reduction","domain_module":"modules/domain-profile.md","forbidden_core_tokens":["skill-bettor","antigravity","opus","codex"]},
+    {"name":"unknown-discovery-composer","domain_module":"modules/domain-profile.md","forbidden_core_tokens":["opus","codex","agy","~/.claude","skill-bettor"]},
+    {"name":"shared-skills-infra","domain_module":"modules/domain-profile.md","forbidden_core_tokens":["~/.agents","~/.claude","codex","claude code"]},
+    {"name":"git-town-stacked-pr-worker","domain_module":"modules/domain-profile.md","forbidden_core_tokens":["github","actions","forgejo","glab"]},
+    {"name":"dual-forge-repository-loop","domain_module":"modules/domain-profile.md","forbidden_core_tokens":["github","forgejo","actions","desktop","codex","claude"]},
+    {"name":"agentic-tech-lead-orchestration","domain_module":"modules/domain-profile.md","forbidden_core_tokens":["grepai","scip","tree-sitter","serena","lancedb"]}
+  ]
+}
