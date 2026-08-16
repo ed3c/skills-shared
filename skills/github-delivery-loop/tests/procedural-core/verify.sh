@@ -15,7 +15,7 @@ from pathlib import Path
 import sys
 p = Path(sys.argv[1])
 s = p.read_text(encoding="utf-8")
-s = s.replace("**DL-04 — Execute local verification.**", "**DL-X04 — Execute local verification.**", 1)
+s = s.replace("DL-04", "DL-X04")
 p.write_text(s, encoding="utf-8")
 PY
 if python3 "$checker" --root "$tmp/skill" >/dev/null 2>&1; then
