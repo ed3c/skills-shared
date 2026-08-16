@@ -1,0 +1,41 @@
+{
+  "schema": "staged-bundle-reconciliation/v1",
+  "issue": 255,
+  "source_bundle": {"name": "parallel-tech-lead-implementation.zip", "sha256": "d4f431ba2843d98d4bd4e9bb4ce770c1facc705263ea698897afda5fbb96c035"},
+  "verification_receipt": {"name": "parallel-tech-lead-verification.md", "sha256": "8caef755ff8eba4d49ccab4aa41ecdc8600d9f6b17e3963d76528ca688c0340f"},
+  "repository_base": {"commit": "fc8daf1a301dc293941e76cd5220664e47193880", "tree": "e2908aaf9e8094d7a12a2f93f86c4f5281c2193c"},
+  "canonical_ownership": {
+    "agentic-tech-lead-orchestration": "composition facade and contract-first Tech Lead procedure",
+    "dual-forge-repository-loop": "Tech Lead DAG compilation and delivery boundaries",
+    "git-town-stacked-pr-worker": "Stack topology/worktree/synchronization laws",
+    "repo-agent-native": "grepai/source/SCIP/Tree-sitter/SQLite Blindspots evidence procedure",
+    "consumer-repositories": "domain paths, commands, provider endpoints, credentials and live receipts"
+  },
+  "entries": [
+    {"path":"IMPLEMENTATION-MANIFEST.md","sha256":"c3c29090dd2ac6c366629951a6d3fe0f3c7843ae093da455bfa204f5ba2b8f33","decision":"preserve_reference","owner":"issue-255-reconciliation-record"},
+    {"path":"SHA256SUMS.txt","sha256":"4cf1ca46577bd251673e4035cf7a8c071d3feb44fd088f779a9002c74d54f2a8","decision":"preserve_reference","owner":"issue-255-reconciliation-record"},
+    {"path":"bettor-arena/.agentic/parallel-tech-lead/README.md","sha256":"0a4fad93c705fb9f6aa6694492a828bbcddf722badf8aea7c58e9fc802b308ec","decision":"route_to_consumer","owner":"ed3c/bettor-arena#146"},
+    {"path":"bettor-arena/.agentic/parallel-tech-lead/config.json","sha256":"7004ba625165b4aeb57bc3623f40516c059437edd091880a175e0a617f999588","decision":"route_to_consumer","owner":"ed3c/bettor-arena#146"},
+    {"path":"bettor-arena/.agentic/parallel-tech-lead/plan.example.json","sha256":"0fe15008e83727c0d42f1ff264b1e14d55bf336506ac35d6dc242fbee349381c","decision":"route_to_consumer","owner":"ed3c/bettor-arena#146"},
+    {"path":"bettor-arena/.github/workflows/parallel-tech-lead-contract.yml","sha256":"e47d115577ad9383e93f1733c953f1e93d8b46a58316be7e50539f4f5495ff3e","decision":"route_to_consumer","owner":"ed3c/bettor-arena#146"},
+    {"path":"bettor-arena/docs/architecture/parallel-tech-lead-ade.md","sha256":"fed5b939681353e0aeaa28289f397544ab8fd29eb8881b6431261a4e6df55527","decision":"route_to_consumer","owner":"ed3c/bettor-arena#146"},
+    {"path":"bettor-arena/scripts/agentic/assert_parallel_tech_lead_contract.py","sha256":"37199dd170c27247092717726775b1c6a3fbf064be5ca45ebe146c356dbc4450","decision":"route_to_consumer","owner":"ed3c/bettor-arena#146"},
+    {"path":"skills-shared/parallel-tech-lead-loop/README.md","sha256":"d333fa28886851a790b9b11b403c5f0a64f446d4af79b158e5d5b4af80584edb","decision":"discard_duplicate","owner":"canonical-skills"},
+    {"path":"skills-shared/parallel-tech-lead-loop/SKILL.md","sha256":"a21f0dbc7e41a63c204b049bd8f3c97a0a70a05b8d0b6d5c42e0ed07638b93cb","decision":"discard_duplicate","owner":"canonical-skills"},
+    {"path":"skills-shared/parallel-tech-lead-loop/contracts/task-plan.schema.json","sha256":"653c9b83c65f666a226108bc097a014b0b34cb16c3044806b23ec8523f00ac20","decision":"discard_duplicate","owner":"canonical-skills"},
+    {"path":"skills-shared/parallel-tech-lead-loop/contracts/tool-role-policy.json","sha256":"e3017456073e1ce67f1dd10d39bd02a4dd24828b25917ccc4712a57fa5c08d45","decision":"discard_duplicate","owner":"canonical-skills"},
+    {"path":"skills-shared/parallel-tech-lead-loop/examples/plan.json","sha256":"7a8215ce47202508a6c875b47e01435330530cb67334af2fd192bfe7d7124911","decision":"discard_duplicate","owner":"canonical-skills"},
+    {"path":"skills-shared/parallel-tech-lead-loop/modules/techlead/__init__.py","sha256":"dcf717390895984578a50ee51ee72fab7499d3043befa3666436b43b958fdce2","decision":"discard_duplicate","owner":"canonical-skills"},
+    {"path":"skills-shared/parallel-tech-lead-loop/modules/techlead/cli.py","sha256":"b53748f1d107f070ca3d9f10cd0d94db74c7e771f2ad88fe18a8de7cd5a49990","decision":"discard_duplicate","owner":"canonical-skills"},
+    {"path":"skills-shared/parallel-tech-lead-loop/modules/techlead/graph.py","sha256":"71166ce146214db6a9ad745d8087d68d86199768da38aec577bf3f84fdfa1d33","decision":"discard_duplicate","owner":"canonical-skills"},
+    {"path":"skills-shared/parallel-tech-lead-loop/modules/techlead/models.py","sha256":"de4edd36125dd713b4effeadcf438179e041abf94e386148d8b9674242aa6bb7","decision":"discard_duplicate","owner":"canonical-skills"},
+    {"path":"skills-shared/parallel-tech-lead-loop/modules/techlead/policy.py","sha256":"aa946ca5dc2f0f793d6a34a7c2235acde1e61a0f0c6fbf2bcad94f8ec11e53a2","decision":"discard_duplicate","owner":"canonical-skills"},
+    {"path":"skills-shared/parallel-tech-lead-loop/modules/techlead/prompts.py","sha256":"e4415c40bfd4fe03c0cb351e7c78fee74865ab53d63a40dce4336ddf2c021eda","decision":"discard_duplicate","owner":"canonical-skills"},
+    {"path":"skills-shared/parallel-tech-lead-loop/modules/techlead/routing.py","sha256":"b2c8a7918ddac8fb23506100858e6c60220881ade479345368413d1999495d53","decision":"discard_duplicate","owner":"canonical-skills"},
+    {"path":"skills-shared/parallel-tech-lead-loop/modules/techlead/scanner.py","sha256":"5909231ecb993063dd8aaf52ee0c8fb2a906e4d02b81ccc700ef39d89918bea9","decision":"discard_duplicate","owner":"canonical-skills"},
+    {"path":"skills-shared/parallel-tech-lead-loop/modules/techlead/store.py","sha256":"660e2ea2628abad9d283c55d247e36ec79890731f9d43ff75b77092dee4b2ef0","decision":"discard_duplicate","owner":"canonical-skills"},
+    {"path":"skills-shared/parallel-tech-lead-loop/tests/test_techlead.py","sha256":"03cdfe4c3ca7e8fa4cd0948c292620eaf5e56dce96231f2458e9a0a24dbe8480","decision":"discard_duplicate","owner":"canonical-skills"}
+  ],
+  "summary": {"discard_duplicate": 15, "route_to_consumer": 6, "preserve_reference": 2, "integrate": 0, "rewrite": 0},
+  "artifact_policy": "ZIP is migration input only and is not committed or required at runtime."
+}
