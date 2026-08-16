@@ -201,7 +201,7 @@
       {
         "commit_sha": "887c9698b6dad9d8eb4161253c9f14b067a96779",
         "subject": "x",
-        "reason": "authored directly by the repository owner, outside any agent loop"
+        "reason": "accidental GitHub connector content creation; immediately reverted; published and not rewritable. The connector writes through the Contents API and cannot produce this repository's .invalid machine identity, so no trailer could have been written at that endpoint"
       },
       {
         "commit_sha": "8ac501adc9e1acf83a9f45fcf474d29dd991c286",
@@ -246,7 +246,7 @@
       {
         "commit_sha": "d1da73a0b69a42a1d740fa6d2d9f480fc7bfaa29",
         "subject": "revert: remove accidental placeholder file",
-        "reason": "authored directly by the repository owner, outside any agent loop"
+        "reason": "cleanup commit restoring the tree after the accidental connector write; published and not rewritable. Same connector endpoint, so it carries no trailer either"
       },
       {
         "commit_sha": "d6cd334ff223ae5caa579ad62309a1daa9d08b88",
