@@ -2,157 +2,67 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://skills-shared.invalid/github-open-issues-snapshot/v1",
   "title": "GitHub Open Issues Snapshot",
-  "description": "Offline host-provided issue metadata. Extra provider fields are allowed and ignored by the portable normalizer.",
+  "description": "Offline host-provided issue metadata. Extra provider fields are allowed and ignored by the portable normalizer. required_phases is an explicit applicability hint; absence must not be guessed into Stack or forge execution.",
+  "$defs": {
+    "issue": {
+      "type": "object",
+      "required": ["title"],
+      "properties": {
+        "number": {"type": "integer", "minimum": 1},
+        "issue_number": {"type": "integer", "minimum": 1},
+        "title": {"type": "string", "minLength": 1},
+        "state": {"enum": ["open", "closed", "OPEN", "CLOSED"]},
+        "labels": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {"type": "string"},
+              {
+                "type": "object",
+                "required": ["name"],
+                "properties": {"name": {"type": "string"}}
+              }
+            ]
+          }
+        },
+        "blocked_by": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "integer", "minimum": 1}
+        },
+        "required_phases": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "BOOTSTRAP",
+              "SHADOW_ADMISSION",
+              "TECH_LEAD_PLAN",
+              "SPATIAL_INVARIANTS",
+              "STACK_DELIVERY",
+              "FORGE_RECONCILIATION"
+            ]
+          }
+        }
+      },
+      "anyOf": [
+        {"required": ["number"]},
+        {"required": ["issue_number"]}
+      ]
+    }
+  },
   "oneOf": [
     {
       "type": "array",
-      "items": {
-        "type": "object",
-        "required": [
-          "title"
-        ],
-        "properties": {
-          "number": {
-            "type": "integer",
-            "minimum": 1
-          },
-          "issue_number": {
-            "type": "integer",
-            "minimum": 1
-          },
-          "title": {
-            "type": "string",
-            "minLength": 1
-          },
-          "state": {
-            "enum": [
-              "open",
-              "closed",
-              "OPEN",
-              "CLOSED"
-            ]
-          },
-          "labels": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "object",
-                  "required": [
-                    "name"
-                  ],
-                  "properties": {
-                    "name": {
-                      "type": "string"
-                    }
-                  }
-                }
-              ]
-            }
-          },
-          "blocked_by": {
-            "type": "array",
-            "uniqueItems": true,
-            "items": {
-              "type": "integer",
-              "minimum": 1
-            }
-          }
-        },
-        "anyOf": [
-          {
-            "required": [
-              "number"
-            ]
-          },
-          {
-            "required": [
-              "issue_number"
-            ]
-          }
-        ]
-      }
+      "items": {"$ref": "#/$defs/issue"}
     },
     {
       "type": "object",
-      "required": [
-        "issues"
-      ],
+      "required": ["issues"],
       "properties": {
         "issues": {
           "type": "array",
-          "items": {
-            "type": "object",
-            "required": [
-              "title"
-            ],
-            "properties": {
-              "number": {
-                "type": "integer",
-                "minimum": 1
-              },
-              "issue_number": {
-                "type": "integer",
-                "minimum": 1
-              },
-              "title": {
-                "type": "string",
-                "minLength": 1
-              },
-              "state": {
-                "enum": [
-                  "open",
-                  "closed",
-                  "OPEN",
-                  "CLOSED"
-                ]
-              },
-              "labels": {
-                "type": "array",
-                "items": {
-                  "oneOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "object",
-                      "required": [
-                        "name"
-                      ],
-                      "properties": {
-                        "name": {
-                          "type": "string"
-                        }
-                      }
-                    }
-                  ]
-                }
-              },
-              "blocked_by": {
-                "type": "array",
-                "uniqueItems": true,
-                "items": {
-                  "type": "integer",
-                  "minimum": 1
-                }
-              }
-            },
-            "anyOf": [
-              {
-                "required": [
-                  "number"
-                ]
-              },
-              {
-                "required": [
-                  "issue_number"
-                ]
-              }
-            ]
-          }
+          "items": {"$ref": "#/$defs/issue"}
         }
       }
     }
