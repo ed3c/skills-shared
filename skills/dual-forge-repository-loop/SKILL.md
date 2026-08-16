@@ -68,3 +68,7 @@ Stop on failed local assertions, stale remote observation, ancestry mismatch, se
 ## Domain specialization
 
 See [modules/domain-profile.md](modules/domain-profile.md). Existing mode-specific subtrees remain trigger-selected implementations and may not replace the portable laws.
+
+## Runtime identity compatibility
+
+Runtime identity is based on observed capabilities/provenance, not model family. The compatibility transition name `RUNTIME_BOUND` remains part of the repository-owned runtime-identity contract; concrete runtime identities and carriers are defined by the referenced domain/runtime artifacts rather than by the portable core.
