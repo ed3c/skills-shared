@@ -1,0 +1,26 @@
+{
+  "artifacts": {},
+  "assertions": [],
+  "authority": {
+    "capability_widening": "DENY",
+    "observer_read_only": true,
+    "private_data_egress": "DENY",
+    "raw_private_reasoning": "DENY"
+  },
+  "bundle_digest": "06ad819a4b95a974ec8b1c02c54d25a1630c51ca71ac22e665b036e3c9544500",
+  "interaction_trace": [],
+  "lane": "DEVICE",
+  "lane_state": "NOT_EXERCISED",
+  "schema": "multimodal-evidence-bundle/v1",
+  "subject": {
+    "note": "no booted simulator and no device authorisation for this repository",
+    "page": null,
+    "repository": "ed3c/skills-shared"
+  },
+  "surface": {
+    "driver": "simctl",
+    "driver_version": null,
+    "headless": null,
+    "viewport": null
+  }
+}

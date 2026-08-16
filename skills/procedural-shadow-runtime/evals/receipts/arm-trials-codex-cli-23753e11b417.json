@@ -1,0 +1,309 @@
+{
+  "action": {
+    "class": "MATCHED_ARM_TRIAL_MATRIX",
+    "intent_digest": "d4317a703490acdd785b6bd2e10ae61c544f9ac4fc4f546acfa772507d4fd37f",
+    "side_effecting": false
+  },
+  "applicable_procedures": [
+    {
+      "criticality": "must",
+      "procedure_id": "procedural-shadow-runtime.matched-arm-trial",
+      "source": {
+        "content_sha256": "796def575dd9a489a59e2643f45fa088ce23b2085ee792295981914652fdcd55",
+        "path": "skills/procedural-shadow-runtime/SKILL.md",
+        "ref": "20b553105cbc00e9d916d3499b3498085f193b0b",
+        "repository": "ed3c/skills-shared"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "assertion_id": "every-arm-executed-on-exact-subject",
+      "procedure_id": "procedural-shadow-runtime.matched-arm-trial",
+      "result": "PASS"
+    },
+    {
+      "assertion_id": "no-cell-failed-for-a-host-reason",
+      "procedure_id": "procedural-shadow-runtime.matched-arm-trial",
+      "result": "PASS"
+    },
+    {
+      "assertion_id": "every-cell-returned-a-scorable-packet",
+      "procedure_id": "procedural-shadow-runtime.matched-arm-trial",
+      "result": "PASS"
+    },
+    {
+      "assertion_id": "evaluator-separated-at-least-two-arms",
+      "procedure_id": "procedural-shadow-runtime.matched-arm-trial",
+      "result": "PASS"
+    }
+  ],
+  "checkpoint": "BEFORE_PR_OR_PUBLICATION",
+  "close_state": "PASS",
+  "dispositions": [
+    {
+      "procedure_id": "procedural-shadow-runtime.matched-arm-trial",
+      "state": "VERIFIED"
+    }
+  ],
+  "evidence": [
+    {
+      "artifact_sha256": "016edc0c52d34e701c53d1b633fd1bcd89a4415709a826d6ac83807f096f41f5",
+      "evidence_id": "arm-cells-codex-cli",
+      "exact_subject": true,
+      "kind": "COMMAND",
+      "procedure_id": "procedural-shadow-runtime.matched-arm-trial"
+    }
+  ],
+  "receipt_id": "arm-trials-codex-cli-20b553105cbc",
+  "schema": "procedural-shadow-runtime-receipt/v1",
+  "subject": {
+    "base_sha": "20b553105cbc00e9d916d3499b3498085f193b0b",
+    "context_digest": "fc5046b20d6008ac328a3ff48cc0ecc53d2f67dec8dfb0a6277bc11c66f32f18",
+    "current_sha": "20b553105cbc00e9d916d3499b3498085f193b0b",
+    "repository": "ed3c/skills-shared",
+    "runtime": "CODEX_CLI_LOCAL"
+  },
+  "trial_matrix": {
+    "bindings": {
+      "arm_digests": {
+        "A_NO_SKILL": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "B_METADATA_ONLY": "44b3cac16d78876e2596e7bcb15cc470709b145234ea5f3e84af5aa8c01a6b6f",
+        "C_FULL_SKILL": "796def575dd9a489a59e2643f45fa088ce23b2085ee792295981914652fdcd55",
+        "D_DELTA_CAPSULE": "b1ee8a9be5b290deb09896abdf9b3f707bafcc77795805679d55dc068cf3d44b",
+        "E_DELTA_CAPSULE_PLUS_HARNESS": "a542509a60f9341705fb3d5db7ade2946f501df33663a0126b6323173ec7217a"
+      },
+      "evaluator_digest": "ed92af2824c339589509b49361fd13b1176f93dc7f9b461d26ad41a51bb2c61f",
+      "ground_truth_digest": "817e09e19dd102624a33e75f064893d100812eb6706f5af1112f0b0de88db018",
+      "host_version": "codex-cli 0.146.0",
+      "model": "gpt-5.6-sol",
+      "policy": {
+        "approval": "never",
+        "sandbox": "read-only"
+      },
+      "retries_permitted": 0,
+      "skill_digest": "796def575dd9a489a59e2643f45fa088ce23b2085ee792295981914652fdcd55",
+      "task_packet_digest": "bd46c83dd7f01177802744e6ce5240301ec53e8848c31272eb96654b1511d4c2",
+      "timeout_seconds": 600,
+      "tree_sha": "0c37a6f475d5a300b4e0212c005b5708bb65e15f"
+    },
+    "cells": [
+      {
+        "arm": "B_METADATA_ONLY",
+        "cell_state": "SCORED",
+        "observation": {
+          "argv_shape": [
+            "codex",
+            "exec",
+            "--model",
+            "gpt-5.6-sol",
+            "--sandbox",
+            "read-only",
+            "--ephemeral",
+            "--skip-git-repo-check",
+            "-o",
+            "<REPO>/.arm-runs/codex-cli/codex-last-message-0-B_METADATA_ONLY.txt",
+            "-"
+          ],
+          "cell_state": "SCORED",
+          "cost_observed": false,
+          "cost_usd": null,
+          "duration_ms": 41198,
+          "exit_code": 0,
+          "input_tokens": null,
+          "output_tokens": null,
+          "stderr_tail": "shadow-runtime/scripts/check_runtime_receipt.py\",\"skills/procedural-shadow-runtime/scripts/check_semantic_judge.py\"],\"non_claims\":[\"The evidence does not establish that these scripts execute successfully.\",\"The evidence does not establish the state of any tree other than the pinned tree SHA.\"],\"tree_sha\":\"0c37a6f475d5a300b4e0212c005b5708bb65e15f\"}\nhook: Stop\nhook: Stop Completed\ntokens used\n12,126",
+          "tool_calls": null,
+          "total_tokens": null
+        },
+        "prompt_digest": "79067c32e3d1ca6a57468206efdb2a973613bd63f4c094b68604e683daf994d7",
+        "repetition": 0,
+        "response_digest": "ac3ad86469a4bfed93ebfa1bf876db3b50d040a9112597053e34346d24f8c479",
+        "score": {
+          "cited_paths": 10,
+          "evidence_packet_complete": true,
+          "exact_subject_continuity": true,
+          "fabricated": [],
+          "fabricated_paths": 0,
+          "false_pass_rate": 0.0,
+          "schema_ok": true,
+          "task_success": true
+        }
+      },
+      {
+        "arm": "E_DELTA_CAPSULE_PLUS_HARNESS",
+        "cell_state": "SCORED",
+        "observation": {
+          "argv_shape": [
+            "codex",
+            "exec",
+            "--model",
+            "gpt-5.6-sol",
+            "--sandbox",
+            "read-only",
+            "--ephemeral",
+            "--skip-git-repo-check",
+            "-o",
+            "<REPO>/.arm-runs/codex-cli/codex-last-message-0-E_DELTA_CAPSULE_PLUS_HARNESS.txt",
+            "-"
+          ],
+          "cell_state": "SCORED",
+          "cost_observed": false,
+          "cost_usd": null,
+          "duration_ms": 40590,
+          "exit_code": 0,
+          "input_tokens": null,
+          "output_tokens": null,
+          "stderr_tail": "/check_meta_abstraction_eval.py\",\"skills/procedural-shadow-runtime/scripts/check_runtime_receipt.py\",\"skills/procedural-shadow-runtime/scripts/check_semantic_judge.py\"],\"non_claims\":[\"This evidence does not establish the files' correctness, runtime behavior, or state outside the pinned tree.\"],\"tree_sha\":\"0c37a6f475d5a300b4e0212c005b5708bb65e15f\"}\nhook: Stop\nhook: Stop Completed\ntokens used\n13,540",
+          "tool_calls": null,
+          "total_tokens": null
+        },
+        "prompt_digest": "0bd3163684fe1f2b58fe92806284ff03a93ae98e5f91ec85acb5c5b07210dda1",
+        "repetition": 0,
+        "response_digest": "7bfc05c5b7c4ccb25dd8f67f1158873cb6c6d22fe3ed750cff6376040069acb9",
+        "score": {
+          "cited_paths": 8,
+          "evidence_packet_complete": true,
+          "exact_subject_continuity": true,
+          "fabricated": [],
+          "fabricated_paths": 0,
+          "false_pass_rate": 0.0,
+          "schema_ok": true,
+          "task_success": true
+        }
+      },
+      {
+        "arm": "C_FULL_SKILL",
+        "cell_state": "SCORED",
+        "observation": {
+          "argv_shape": [
+            "codex",
+            "exec",
+            "--model",
+            "gpt-5.6-sol",
+            "--sandbox",
+            "read-only",
+            "--ephemeral",
+            "--skip-git-repo-check",
+            "-o",
+            "<REPO>/.arm-runs/codex-cli/codex-last-message-0-C_FULL_SKILL.txt",
+            "-"
+          ],
+          "cell_state": "SCORED",
+          "cost_observed": false,
+          "cost_usd": null,
+          "duration_ms": 34302,
+          "exit_code": 0,
+          "input_tokens": null,
+          "output_tokens": null,
+          "stderr_tail": "adow-runtime/scripts/check_runtime_receipt.py\",\"skills/procedural-shadow-runtime/scripts/check_semantic_judge.py\"],\"non_claims\":[\"This evidence does not establish that these scripts execute successfully.\",\"This evidence does not establish the state of any tree other than the pinned tree SHA.\"],\"tree_sha\":\"0c37a6f475d5a300b4e0212c005b5708bb65e15f\"}\nhook: Stop\nhook: Stop Completed\ntokens used\n19,120",
+          "tool_calls": null,
+          "total_tokens": null
+        },
+        "prompt_digest": "f1abb993cced5e430ff4ac5628b7eb621768d607c45b082af88a10e91efb7d5b",
+        "repetition": 0,
+        "response_digest": "7023c2a71f4baf8d48c71bf1c6addb49b6e1bb8bd95390bb0fd22e99bc058613",
+        "score": {
+          "cited_paths": 8,
+          "evidence_packet_complete": true,
+          "exact_subject_continuity": true,
+          "fabricated": [],
+          "fabricated_paths": 0,
+          "false_pass_rate": 0.0,
+          "schema_ok": true,
+          "task_success": true
+        }
+      },
+      {
+        "arm": "A_NO_SKILL",
+        "cell_state": "SCORED",
+        "observation": {
+          "argv_shape": [
+            "codex",
+            "exec",
+            "--model",
+            "gpt-5.6-sol",
+            "--sandbox",
+            "read-only",
+            "--ephemeral",
+            "--skip-git-repo-check",
+            "-o",
+            "<REPO>/.arm-runs/codex-cli/codex-last-message-0-A_NO_SKILL.txt",
+            "-"
+          ],
+          "cell_state": "SCORED",
+          "cost_observed": false,
+          "cost_usd": null,
+          "duration_ms": 25568,
+          "exit_code": 0,
+          "input_tokens": null,
+          "output_tokens": null,
+          "stderr_tail": "runtime_receipt.py\",\"skills/procedural-shadow-runtime/scripts/check_semantic_judge.py\"],\"non_claims\":[\"The evidence does not establish the contents, behavior, executability, or correctness of these files.\",\"The evidence does not establish the state of any tree other than the pinned tree SHA.\"],\"tree_sha\":\"0c37a6f475d5a300b4e0212c005b5708bb65e15f\"}\nhook: Stop\nhook: Stop Completed\ntokens used\n14,566",
+          "tool_calls": null,
+          "total_tokens": null
+        },
+        "prompt_digest": "0c99c42d47db5704ce881ba0a2ba91d720c71d66ad0502da923c69e7bcd97148",
+        "repetition": 0,
+        "response_digest": "e7e4a93e9dd22a03bba0e944d91fe1560c31a7e3c3c955e942593083bf8459ad",
+        "score": {
+          "cited_paths": 8,
+          "evidence_packet_complete": true,
+          "exact_subject_continuity": true,
+          "fabricated": [],
+          "fabricated_paths": 0,
+          "false_pass_rate": 0.0,
+          "schema_ok": true,
+          "task_success": true
+        }
+      },
+      {
+        "arm": "D_DELTA_CAPSULE",
+        "cell_state": "SCORED",
+        "observation": {
+          "argv_shape": [
+            "codex",
+            "exec",
+            "--model",
+            "gpt-5.6-sol",
+            "--sandbox",
+            "read-only",
+            "--ephemeral",
+            "--skip-git-repo-check",
+            "-o",
+            "<REPO>/.arm-runs/codex-cli/codex-last-message-0-D_DELTA_CAPSULE.txt",
+            "-"
+          ],
+          "cell_state": "SCORED",
+          "cost_observed": false,
+          "cost_usd": null,
+          "duration_ms": 18412,
+          "exit_code": 0,
+          "input_tokens": null,
+          "output_tokens": null,
+          "stderr_tail": "receipt.py\",\"skills/procedural-shadow-runtime/scripts/check_semantic_judge.py\"],\"non_claims\":[\"The evidence does not establish the contents, correctness, executability, or runtime behavior of these files.\",\"The evidence does not establish the state of any tree other than the pinned tree SHA.\"],\"tree_sha\":\"0c37a6f475d5a300b4e0212c005b5708bb65e15f\"}\nhook: Stop\nhook: Stop Completed\ntokens used\n13,679",
+          "tool_calls": null,
+          "total_tokens": null
+        },
+        "prompt_digest": "f34736da1e0e3c15607d1e93a345b49502aef498109eef233d7e37a3e8a17d33",
+        "repetition": 0,
+        "response_digest": "90ae7bcb28e65784c3d2090adb3cb7de3e702a0d1dc8b00e35177001737c64b9",
+        "score": {
+          "cited_paths": 8,
+          "evidence_packet_complete": true,
+          "exact_subject_continuity": true,
+          "fabricated": [],
+          "fabricated_paths": 0,
+          "false_pass_rate": 0.0,
+          "schema_ok": true,
+          "task_success": true
+        }
+      }
+    ],
+    "host": "codex-cli",
+    "host_error_arms": [],
+    "preregistered_repetitions_per_arm": 9,
+    "qualifies_for_219": false,
+    "repetitions_per_arm": 1,
+    "runtime": "CODEX_CLI_LOCAL"
+  }
+}

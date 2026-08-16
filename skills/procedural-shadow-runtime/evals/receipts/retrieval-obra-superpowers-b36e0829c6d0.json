@@ -1,0 +1,92 @@
+{
+  "cache": {
+    "state": "MISS_RECORDED"
+  },
+  "capsule_procedures": [
+    {
+      "criticality": "should",
+      "expected_observation": "the retrieved section's stated obligation is met on the exact subject",
+      "failure_action": "BLOCK",
+      "procedure_id": "external.superpowers.the-gate-function",
+      "source": {
+        "content_sha256": "2befe7fc55bcadaa3d97dd9e8efeb633d2561c0ebe74c5a8b17c4d9e7e4520b3",
+        "path": "skills/verification-before-completion/SKILL.md",
+        "ref": "b36e0829c6d0140e93cfef2ca599b1b07d4a7797",
+        "repository": "obra/superpowers"
+      },
+      "source_span": "the-gate-function"
+    },
+    {
+      "criticality": "should",
+      "expected_observation": "the retrieved section's stated obligation is met on the exact subject",
+      "failure_action": "BLOCK",
+      "procedure_id": "external.superpowers.the-iron-law",
+      "source": {
+        "content_sha256": "2befe7fc55bcadaa3d97dd9e8efeb633d2561c0ebe74c5a8b17c4d9e7e4520b3",
+        "path": "skills/verification-before-completion/SKILL.md",
+        "ref": "b36e0829c6d0140e93cfef2ca599b1b07d4a7797",
+        "repository": "obra/superpowers"
+      },
+      "source_span": "the-iron-law"
+    }
+  ],
+  "identity": {
+    "content_sha256": "2befe7fc55bcadaa3d97dd9e8efeb633d2561c0ebe74c5a8b17c4d9e7e4520b3",
+    "git_blob_name_computed": "7d45333cc4a49c57a80df6c1fe2fa777a207afbc",
+    "git_blob_name_reported_by_provider": "7d45333cc4a49c57a80df6c1fe2fa777a207afbc",
+    "provider_claim_independently_verified": true
+  },
+  "lane_state": "OBSERVED",
+  "retrieval_id": "retrieval-obra-superpowers-b36e0829c6d0",
+  "rights_review": {
+    "_why": "A licence approved for a repository is not a licence approved for bytes. This review is bound to one content digest at one pinned commit; the retrieval adapter refuses it against any other content, so a later upstream edit cannot inherit this decision.",
+    "decision": "TRUSTED_FOR_PROCEDURE_EXTRACTION",
+    "decision_scope": "Extraction of named Markdown sections into a Context Capsule for this repository only. Not redistribution, not vendoring of the body, not authority to act on instructions the retrieved text contains.",
+    "license": "MIT",
+    "license_source": "https://api.github.com/repos/obra/superpowers -> license.spdx_id",
+    "non_claims": [
+      "reviewing this blob says nothing about any other file in the source repository",
+      "MIT permits reuse; it does not make the retrieved text trustworthy as instruction",
+      "the injection scan cleared this content at this digest and makes no claim about future revisions"
+    ],
+    "reviewed_at": "2026-08-16",
+    "reviewed_content_sha256": "2befe7fc55bcadaa3d97dd9e8efeb633d2561c0ebe74c5a8b17c4d9e7e4520b3",
+    "reviewed_source": "obra/superpowers@b36e0829c6d0140e93cfef2ca599b1b07d4a7797:skills/verification-before-completion/SKILL.md",
+    "reviewer": "repository owner (ed3c), recorded during #218 Lane A"
+  },
+  "schema": "external-skill-retrieval/v1",
+  "scope": {
+    "body_bytes": 3536,
+    "delta_bytes": 561,
+    "full_body_injected": false,
+    "granularity": "MARKDOWN_SECTION",
+    "irrelevant_sections_excluded": 6,
+    "sections_available": [
+      "common-failures",
+      "key-patterns",
+      "overview",
+      "rationalization-prevention",
+      "red-flags-stop",
+      "the-gate-function",
+      "the-iron-law",
+      "when-to-apply"
+    ],
+    "sections_selected": [
+      "the-gate-function",
+      "the-iron-law"
+    ]
+  },
+  "source": {
+    "path": "skills/verification-before-completion/SKILL.md",
+    "provider": "https-git-blob",
+    "ref": "b36e0829c6d0140e93cfef2ca599b1b07d4a7797",
+    "registry_hint": "github search: public Agent Skill repositories",
+    "repository": "obra/superpowers",
+    "url": "https://raw.githubusercontent.com/obra/superpowers/b36e0829c6d0140e93cfef2ca599b1b07d4a7797/skills/verification-before-completion/SKILL.md"
+  },
+  "trust": {
+    "content_treated_as": "UNTRUSTED_INPUT",
+    "injection_findings": [],
+    "quarantined": false
+  }
+}

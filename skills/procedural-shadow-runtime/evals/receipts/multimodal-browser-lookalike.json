@@ -1,0 +1,108 @@
+{
+  "artifacts": {
+    "a11y": {
+      "kind": "ACCESSIBILITY_TREE",
+      "sha256": "464a4efddb7241747f70fadc4daaeec66440773487c1b93e86e574a8fe3e6b0e"
+    },
+    "console": {
+      "error_count": 1,
+      "kind": "CONSOLE",
+      "sha256": "d69c021b349af205165dccd377ec265c865a35487330bd96ab604f3b6b4286da"
+    },
+    "dom": {
+      "kind": "DOM_ASSERTION",
+      "sha256": "06d6292d05c564f9fb150660c0836bbf222326b4066a1e642bc709d32bacb2a6",
+      "value": {
+        "amount_usd": "120.00",
+        "status_state": "PENDING",
+        "status_text": "Order refunded"
+      }
+    },
+    "network": {
+      "kind": "NETWORK",
+      "sha256": "e393604b4fae8c1b27b1d52bc3f35e08a01694f707b1ef5c9de653e926ddd656",
+      "value": {
+        "request_count": 1
+      }
+    },
+    "screenshot": {
+      "bytes": 9821,
+      "kind": "SCREENSHOT",
+      "path": "lookalike.png",
+      "sha256": "2f8e1b8b14301c44c74aec41fc590efabfe6c1d5db8aaeed939133aafb33263a"
+    }
+  },
+  "assertions": [
+    {
+      "actual": "PENDING",
+      "artifact_ids": [
+        "dom",
+        "screenshot"
+      ],
+      "assertion_id": "settled-state-matches-declared-transition",
+      "claim_kind": "STATE_TRANSITION",
+      "expected": "REFUNDED",
+      "observed_at": "navigation:<REPO>/skills/procedural-shadow-runtime/tests/fixtures/multimodal/lookalike.html",
+      "result": "FAIL",
+      "subject": "lookalike.html"
+    },
+    {
+      "actual": 1,
+      "artifact_ids": [
+        "console"
+      ],
+      "assertion_id": "page-reported-no-runtime-error",
+      "claim_kind": "DIAGNOSTIC",
+      "expected": 0,
+      "observed_at": "navigation:<REPO>/skills/procedural-shadow-runtime/tests/fixtures/multimodal/lookalike.html",
+      "result": "FAIL",
+      "subject": "lookalike.html"
+    },
+    {
+      "actual": "Order refunded",
+      "artifact_ids": [
+        "screenshot",
+        "a11y"
+      ],
+      "assertion_id": "rendered-badge-is-visible",
+      "claim_kind": "PRESENCE",
+      "expected": "Order refunded",
+      "observed_at": "navigation:<REPO>/skills/procedural-shadow-runtime/tests/fixtures/multimodal/lookalike.html",
+      "result": "PASS",
+      "subject": "lookalike.html"
+    }
+  ],
+  "authority": {
+    "capability_widening": "DENY",
+    "observer_read_only": true,
+    "private_data_egress": "DENY",
+    "raw_private_reasoning": "DENY"
+  },
+  "bundle_digest": "b764506b6f2703d79150cc39d334aca0ca2323085757d1e2a0f4f3a29397fc39",
+  "interaction_trace": [
+    {
+      "action": "navigate",
+      "step": 0,
+      "target": "<REPO>/skills/procedural-shadow-runtime/tests/fixtures/multimodal/lookalike.html"
+    },
+    {
+      "action": "screenshot",
+      "step": 1,
+      "target": "lookalike.png"
+    }
+  ],
+  "lane": "BROWSER",
+  "lane_state": "OBSERVED",
+  "schema": "multimodal-evidence-bundle/v1",
+  "subject": {
+    "page": "lookalike.html",
+    "repository": "ed3c/skills-shared"
+  },
+  "surface": {
+    "driver": "playwright-chromium",
+    "driver_version": "unknown",
+    "headless": true,
+    "url": "<REPO>/skills/procedural-shadow-runtime/tests/fixtures/multimodal/lookalike.html",
+    "viewport": "720x400"
+  }
+}

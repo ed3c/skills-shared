@@ -1,0 +1,334 @@
+{
+  "action": {
+    "class": "MATCHED_ARM_TRIAL_MATRIX",
+    "intent_digest": "d4317a703490acdd785b6bd2e10ae61c544f9ac4fc4f546acfa772507d4fd37f",
+    "side_effecting": false
+  },
+  "applicable_procedures": [
+    {
+      "criticality": "must",
+      "procedure_id": "procedural-shadow-runtime.matched-arm-trial",
+      "source": {
+        "content_sha256": "796def575dd9a489a59e2643f45fa088ce23b2085ee792295981914652fdcd55",
+        "path": "skills/procedural-shadow-runtime/SKILL.md",
+        "ref": "20b553105cbc00e9d916d3499b3498085f193b0b",
+        "repository": "ed3c/skills-shared"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "assertion_id": "every-arm-executed-on-exact-subject",
+      "procedure_id": "procedural-shadow-runtime.matched-arm-trial",
+      "result": "PASS"
+    },
+    {
+      "assertion_id": "no-cell-failed-for-a-host-reason",
+      "procedure_id": "procedural-shadow-runtime.matched-arm-trial",
+      "result": "PASS"
+    },
+    {
+      "assertion_id": "every-cell-returned-a-scorable-packet",
+      "procedure_id": "procedural-shadow-runtime.matched-arm-trial",
+      "result": "PASS"
+    },
+    {
+      "assertion_id": "evaluator-separated-at-least-two-arms",
+      "procedure_id": "procedural-shadow-runtime.matched-arm-trial",
+      "result": "PASS"
+    }
+  ],
+  "checkpoint": "BEFORE_PR_OR_PUBLICATION",
+  "close_state": "PASS",
+  "dispositions": [
+    {
+      "procedure_id": "procedural-shadow-runtime.matched-arm-trial",
+      "state": "VERIFIED"
+    }
+  ],
+  "evidence": [
+    {
+      "artifact_sha256": "f950e1554f5382f44e40fd5517b0f02a40ec0b082ee7c517686c71d696010067",
+      "evidence_id": "arm-cells-claude-code",
+      "exact_subject": true,
+      "kind": "COMMAND",
+      "procedure_id": "procedural-shadow-runtime.matched-arm-trial"
+    }
+  ],
+  "receipt_id": "arm-trials-claude-code-20b553105cbc",
+  "schema": "procedural-shadow-runtime-receipt/v1",
+  "subject": {
+    "base_sha": "20b553105cbc00e9d916d3499b3498085f193b0b",
+    "context_digest": "fc5046b20d6008ac328a3ff48cc0ecc53d2f67dec8dfb0a6277bc11c66f32f18",
+    "current_sha": "20b553105cbc00e9d916d3499b3498085f193b0b",
+    "repository": "ed3c/skills-shared",
+    "runtime": "CLAUDE_CODE_LOCAL"
+  },
+  "trial_matrix": {
+    "bindings": {
+      "arm_digests": {
+        "A_NO_SKILL": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "B_METADATA_ONLY": "44b3cac16d78876e2596e7bcb15cc470709b145234ea5f3e84af5aa8c01a6b6f",
+        "C_FULL_SKILL": "796def575dd9a489a59e2643f45fa088ce23b2085ee792295981914652fdcd55",
+        "D_DELTA_CAPSULE": "b1ee8a9be5b290deb09896abdf9b3f707bafcc77795805679d55dc068cf3d44b",
+        "E_DELTA_CAPSULE_PLUS_HARNESS": "a542509a60f9341705fb3d5db7ade2946f501df33663a0126b6323173ec7217a"
+      },
+      "evaluator_digest": "ed92af2824c339589509b49361fd13b1176f93dc7f9b461d26ad41a51bb2c61f",
+      "ground_truth_digest": "817e09e19dd102624a33e75f064893d100812eb6706f5af1112f0b0de88db018",
+      "host_version": "2.1.221 (Claude Code)",
+      "model": "opus",
+      "policy": {
+        "allowed_tools": [
+          "Read",
+          "Glob",
+          "Grep",
+          "Bash"
+        ],
+        "disallowed_tools": [
+          "Write",
+          "Edit",
+          "NotebookEdit"
+        ],
+        "permission_mode": "default"
+      },
+      "retries_permitted": 0,
+      "skill_digest": "796def575dd9a489a59e2643f45fa088ce23b2085ee792295981914652fdcd55",
+      "task_packet_digest": "bd46c83dd7f01177802744e6ce5240301ec53e8848c31272eb96654b1511d4c2",
+      "timeout_seconds": 600,
+      "tree_sha": "0c37a6f475d5a300b4e0212c005b5708bb65e15f"
+    },
+    "cells": [
+      {
+        "arm": "E_DELTA_CAPSULE_PLUS_HARNESS",
+        "cell_state": "SCORED",
+        "observation": {
+          "argv_shape": [
+            "claude",
+            "-p",
+            "--model",
+            "opus",
+            "--output-format",
+            "json",
+            "--allowedTools",
+            "Read",
+            "Glob",
+            "Grep",
+            "Bash",
+            "--disallowedTools",
+            "Write",
+            "Edit",
+            "NotebookEdit"
+          ],
+          "cell_state": "SCORED",
+          "cost_observed": true,
+          "cost_usd": 0.368805,
+          "duration_ms": 20914,
+          "exit_code": 0,
+          "input_tokens": 4,
+          "output_tokens": 1196,
+          "stderr_tail": "",
+          "tool_calls": 2
+        },
+        "prompt_digest": "0bd3163684fe1f2b58fe92806284ff03a93ae98e5f91ec85acb5c5b07210dda1",
+        "repetition": 0,
+        "response_digest": "6a7a7da6a381a04624cc795758b48d060f6b5e3d8be23ed26a1d817faa8457d4",
+        "score": {
+          "cited_paths": 9,
+          "evidence_packet_complete": true,
+          "exact_subject_continuity": true,
+          "fabricated": [],
+          "fabricated_paths": 0,
+          "false_pass_rate": 0.0,
+          "schema_ok": true,
+          "task_success": true
+        }
+      },
+      {
+        "arm": "C_FULL_SKILL",
+        "cell_state": "SCORED",
+        "observation": {
+          "argv_shape": [
+            "claude",
+            "-p",
+            "--model",
+            "opus",
+            "--output-format",
+            "json",
+            "--allowedTools",
+            "Read",
+            "Glob",
+            "Grep",
+            "Bash",
+            "--disallowedTools",
+            "Write",
+            "Edit",
+            "NotebookEdit"
+          ],
+          "cell_state": "SCORED",
+          "cost_observed": true,
+          "cost_usd": 0.40368499999999996,
+          "duration_ms": 17909,
+          "exit_code": 0,
+          "input_tokens": 6,
+          "output_tokens": 806,
+          "stderr_tail": "",
+          "tool_calls": 3
+        },
+        "prompt_digest": "f1abb993cced5e430ff4ac5628b7eb621768d607c45b082af88a10e91efb7d5b",
+        "repetition": 0,
+        "response_digest": "45153076273f36aeb59c6a2a002f3fcc73538b2b6aad56bc429ad2db0f7b0f2a",
+        "score": {
+          "cited_paths": 5,
+          "evidence_packet_complete": true,
+          "exact_subject_continuity": true,
+          "fabricated": [],
+          "fabricated_paths": 0,
+          "false_pass_rate": 0.0,
+          "schema_ok": true,
+          "task_success": true
+        }
+      },
+      {
+        "arm": "D_DELTA_CAPSULE",
+        "cell_state": "SCORED",
+        "observation": {
+          "argv_shape": [
+            "claude",
+            "-p",
+            "--model",
+            "opus",
+            "--output-format",
+            "json",
+            "--allowedTools",
+            "Read",
+            "Glob",
+            "Grep",
+            "Bash",
+            "--disallowedTools",
+            "Write",
+            "Edit",
+            "NotebookEdit"
+          ],
+          "cell_state": "SCORED",
+          "cost_observed": true,
+          "cost_usd": 0.32113099999999994,
+          "duration_ms": 16471,
+          "exit_code": 0,
+          "input_tokens": 4,
+          "output_tokens": 723,
+          "stderr_tail": "",
+          "tool_calls": 2
+        },
+        "prompt_digest": "f34736da1e0e3c15607d1e93a345b49502aef498109eef233d7e37a3e8a17d33",
+        "repetition": 0,
+        "response_digest": "d9336a8c89335af24a727999cf986518073de2bc614c5a444fc1ca972b86e672",
+        "score": {
+          "cited_paths": 5,
+          "evidence_packet_complete": true,
+          "exact_subject_continuity": true,
+          "fabricated": [],
+          "fabricated_paths": 0,
+          "false_pass_rate": 0.0,
+          "schema_ok": true,
+          "task_success": true
+        }
+      },
+      {
+        "arm": "A_NO_SKILL",
+        "cell_state": "SCORED",
+        "observation": {
+          "argv_shape": [
+            "claude",
+            "-p",
+            "--model",
+            "opus",
+            "--output-format",
+            "json",
+            "--allowedTools",
+            "Read",
+            "Glob",
+            "Grep",
+            "Bash",
+            "--disallowedTools",
+            "Write",
+            "Edit",
+            "NotebookEdit"
+          ],
+          "cell_state": "SCORED",
+          "cost_observed": true,
+          "cost_usd": 0.34381,
+          "duration_ms": 18546,
+          "exit_code": 0,
+          "input_tokens": 6,
+          "output_tokens": 814,
+          "stderr_tail": "",
+          "tool_calls": 3
+        },
+        "prompt_digest": "0c99c42d47db5704ce881ba0a2ba91d720c71d66ad0502da923c69e7bcd97148",
+        "repetition": 0,
+        "response_digest": "67ec2b025bc56f1c095c536dfb8426230a8206fc138005d3fbca18b814d3943f",
+        "score": {
+          "cited_paths": 5,
+          "evidence_packet_complete": true,
+          "exact_subject_continuity": true,
+          "fabricated": [],
+          "fabricated_paths": 0,
+          "false_pass_rate": 0.0,
+          "schema_ok": true,
+          "task_success": true
+        }
+      },
+      {
+        "arm": "B_METADATA_ONLY",
+        "cell_state": "SCORED",
+        "observation": {
+          "argv_shape": [
+            "claude",
+            "-p",
+            "--model",
+            "opus",
+            "--output-format",
+            "json",
+            "--allowedTools",
+            "Read",
+            "Glob",
+            "Grep",
+            "Bash",
+            "--disallowedTools",
+            "Write",
+            "Edit",
+            "NotebookEdit"
+          ],
+          "cell_state": "SCORED",
+          "cost_observed": true,
+          "cost_usd": 0.33803649999999996,
+          "duration_ms": 14138,
+          "exit_code": 0,
+          "input_tokens": 4,
+          "output_tokens": 708,
+          "stderr_tail": "",
+          "tool_calls": 2
+        },
+        "prompt_digest": "79067c32e3d1ca6a57468206efdb2a973613bd63f4c094b68604e683daf994d7",
+        "repetition": 0,
+        "response_digest": "eb578d7a16ef4e4d4d8699402e61d3bab08731e8bce4e483905d62c27da9de99",
+        "score": {
+          "cited_paths": 5,
+          "evidence_packet_complete": true,
+          "exact_subject_continuity": true,
+          "fabricated": [],
+          "fabricated_paths": 0,
+          "false_pass_rate": 0.0,
+          "schema_ok": true,
+          "task_success": true
+        }
+      }
+    ],
+    "host": "claude-code",
+    "host_error_arms": [],
+    "preregistered_repetitions_per_arm": 9,
+    "qualifies_for_219": false,
+    "repetitions_per_arm": 1,
+    "runtime": "CLAUDE_CODE_LOCAL"
+  }
+}

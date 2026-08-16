@@ -1,0 +1,118 @@
+{
+  "binding_digest": "2502d16e48e0477670c8a0165b32a70f2d84944192fdc10d4a70af4176f77df9",
+  "canaries": [
+    {
+      "actual": true,
+      "canary_id": "canonical-skill-resolution-and-no-shadow-readback",
+      "detail": {
+        "consumer_local_shadow_present": false,
+        "resolved_entrypoint_sha256": "796def575dd9a489a59e2643f45fa088ce23b2085ee792295981914652fdcd55"
+      },
+      "expected": true
+    },
+    {
+      "actual": true,
+      "canary_id": "exact-subject-descends-from-bound-base",
+      "detail": {
+        "bound_base": "c1e7a78674b370abda052ef95a222b1a9d7a0a18",
+        "context_digest": "18023848d737a2784b1dc4a0ac03efb6ab0bf328cbbf89955a0c17626eabd6e4",
+        "subject": {
+          "commit": "30aa45c654ed92db05499e75484365eea1e7e303",
+          "tree": "a0263aa37ab40b7b49d4ef5471f656d949e7f4ca"
+        }
+      },
+      "expected": true
+    },
+    {
+      "actual": "NO_GATE_REQUIRED",
+      "canary_id": "read-only-task-needs-no-capsule",
+      "detail": {
+        "why": "discovery is not a side effect and must not pay the gate's cost"
+      },
+      "expected": "NO_GATE_REQUIRED"
+    },
+    {
+      "actual": "BLOCKED",
+      "canary_id": "material-action-blocked-on-missing-critical-must",
+      "detail": [
+        "procedural-shadow.pre-side-effect-gate:exclusive-lease-absent",
+        "procedural-shadow.assertion-before-claim:no-exact-subject-evidence"
+      ],
+      "expected": "BLOCKED"
+    },
+    {
+      "actual": "ADMITTED",
+      "canary_id": "admitted-material-action-closed-by-execution-and-assertion",
+      "detail": {
+        "evidence_kind": "content-addressed artifact on the exact subject"
+      },
+      "expected": "ADMITTED"
+    },
+    {
+      "actual": "BLOCKED",
+      "canary_id": "domain-negative-control-agent-claiming-release-authority",
+      "detail": {
+        "why": "AGENTS.md: agent exploration is discovery only, never release authority"
+      },
+      "expected": "BLOCKED"
+    },
+    {
+      "actual": false,
+      "canary_id": "stale-capsule-bound-to-another-subject-refused",
+      "detail": {
+        "why": "a capsule minted against another commit is not this subject's capsule"
+      },
+      "expected": false
+    },
+    {
+      "actual": true,
+      "canary_id": "tool-payload-slimming-versus-full-body",
+      "detail": {
+        "capsule_bytes": 274,
+        "full_body_bytes": 11014,
+        "ratio": 0.0249
+      },
+      "expected": true
+    },
+    {
+      "actual": true,
+      "canary_id": "retry-bounded-and-lease-released-on-termination",
+      "detail": {
+        "bounded_run": {
+          "attempts": 3,
+          "lease_released": true,
+          "retries_bounded": true,
+          "terminated": true
+        },
+        "terminating_run": {
+          "attempts": 1,
+          "lease_released": true,
+          "retries_bounded": true,
+          "terminated": true
+        }
+      },
+      "expected": true
+    },
+    {
+      "actual": true,
+      "canary_id": "deterministic-trace-completeness",
+      "detail": {
+        "required_spans": [
+          "plan",
+          "lease.acquire",
+          "worker.execute",
+          "evidence.seal",
+          "verdict.aggregate"
+        ],
+        "why": "an incomplete trace must be detectable, not merely declared complete"
+      },
+      "expected": true
+    }
+  ],
+  "schema": "consumer-canary-results/v1",
+  "subject": {
+    "commit": "30aa45c654ed92db05499e75484365eea1e7e303",
+    "tree": "a0263aa37ab40b7b49d4ef5471f656d949e7f4ca"
+  },
+  "upstream_commit": "23753e11b4175f98d986a1aaca8c0e5ee4f114d0"
+}

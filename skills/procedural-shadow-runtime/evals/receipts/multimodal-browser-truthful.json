@@ -1,0 +1,108 @@
+{
+  "artifacts": {
+    "a11y": {
+      "kind": "ACCESSIBILITY_TREE",
+      "sha256": "464a4efddb7241747f70fadc4daaeec66440773487c1b93e86e574a8fe3e6b0e"
+    },
+    "console": {
+      "error_count": 0,
+      "kind": "CONSOLE",
+      "sha256": "d54e2d3d21210d602cc6a1d70471dec0b1c9efae063e25b45632c910017570b5"
+    },
+    "dom": {
+      "kind": "DOM_ASSERTION",
+      "sha256": "707b9d85ac75ebd204f0e3ae69c7a69f9e57750ed7d1173507f63ee4a5c4e279",
+      "value": {
+        "amount_usd": "120.00",
+        "status_state": "REFUNDED",
+        "status_text": "Order refunded"
+      }
+    },
+    "network": {
+      "kind": "NETWORK",
+      "sha256": "e393604b4fae8c1b27b1d52bc3f35e08a01694f707b1ef5c9de653e926ddd656",
+      "value": {
+        "request_count": 1
+      }
+    },
+    "screenshot": {
+      "bytes": 9821,
+      "kind": "SCREENSHOT",
+      "path": "truthful.png",
+      "sha256": "2f8e1b8b14301c44c74aec41fc590efabfe6c1d5db8aaeed939133aafb33263a"
+    }
+  },
+  "assertions": [
+    {
+      "actual": "REFUNDED",
+      "artifact_ids": [
+        "dom",
+        "screenshot"
+      ],
+      "assertion_id": "settled-state-matches-declared-transition",
+      "claim_kind": "STATE_TRANSITION",
+      "expected": "REFUNDED",
+      "observed_at": "navigation:<REPO>/skills/procedural-shadow-runtime/tests/fixtures/multimodal/truthful.html",
+      "result": "PASS",
+      "subject": "truthful.html"
+    },
+    {
+      "actual": 0,
+      "artifact_ids": [
+        "console"
+      ],
+      "assertion_id": "page-reported-no-runtime-error",
+      "claim_kind": "DIAGNOSTIC",
+      "expected": 0,
+      "observed_at": "navigation:<REPO>/skills/procedural-shadow-runtime/tests/fixtures/multimodal/truthful.html",
+      "result": "PASS",
+      "subject": "truthful.html"
+    },
+    {
+      "actual": "Order refunded",
+      "artifact_ids": [
+        "screenshot",
+        "a11y"
+      ],
+      "assertion_id": "rendered-badge-is-visible",
+      "claim_kind": "PRESENCE",
+      "expected": "Order refunded",
+      "observed_at": "navigation:<REPO>/skills/procedural-shadow-runtime/tests/fixtures/multimodal/truthful.html",
+      "result": "PASS",
+      "subject": "truthful.html"
+    }
+  ],
+  "authority": {
+    "capability_widening": "DENY",
+    "observer_read_only": true,
+    "private_data_egress": "DENY",
+    "raw_private_reasoning": "DENY"
+  },
+  "bundle_digest": "9e768c600da7aa38eba6f342c93ffe0d8b6387a7d97c2edfabf15e3e99a8537e",
+  "interaction_trace": [
+    {
+      "action": "navigate",
+      "step": 0,
+      "target": "<REPO>/skills/procedural-shadow-runtime/tests/fixtures/multimodal/truthful.html"
+    },
+    {
+      "action": "screenshot",
+      "step": 1,
+      "target": "truthful.png"
+    }
+  ],
+  "lane": "BROWSER",
+  "lane_state": "OBSERVED",
+  "schema": "multimodal-evidence-bundle/v1",
+  "subject": {
+    "page": "truthful.html",
+    "repository": "ed3c/skills-shared"
+  },
+  "surface": {
+    "driver": "playwright-chromium",
+    "driver_version": "unknown",
+    "headless": true,
+    "url": "<REPO>/skills/procedural-shadow-runtime/tests/fixtures/multimodal/truthful.html",
+    "viewport": "720x400"
+  }
+}

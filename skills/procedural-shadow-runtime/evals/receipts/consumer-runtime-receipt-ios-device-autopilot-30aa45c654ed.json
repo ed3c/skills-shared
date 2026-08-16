@@ -1,0 +1,97 @@
+{
+  "action": {
+    "class": "DEVICE_LEASE_ADMISSION",
+    "intent_digest": "dc35d1508d71bf6040bdd6b77b41dd5ff732c3c1694539d8355fa49fa847a747",
+    "side_effecting": true
+  },
+  "applicable_procedures": [
+    {
+      "criticality": "must",
+      "procedure_id": "procedural-shadow.pre-side-effect-gate",
+      "source": {
+        "content_sha256": "796def575dd9a489a59e2643f45fa088ce23b2085ee792295981914652fdcd55",
+        "path": "skills/procedural-shadow-runtime/SKILL.md",
+        "ref": "23753e11b4175f98d986a1aaca8c0e5ee4f114d0",
+        "repository": "ed3c/skills-shared"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "assertion_id": "canonical-skill-resolution-and-no-shadow-readback",
+      "procedure_id": "procedural-shadow.pre-side-effect-gate",
+      "result": "PASS"
+    },
+    {
+      "assertion_id": "exact-subject-descends-from-bound-base",
+      "procedure_id": "procedural-shadow.pre-side-effect-gate",
+      "result": "PASS"
+    },
+    {
+      "assertion_id": "read-only-task-needs-no-capsule",
+      "procedure_id": "procedural-shadow.pre-side-effect-gate",
+      "result": "PASS"
+    },
+    {
+      "assertion_id": "material-action-blocked-on-missing-critical-must",
+      "procedure_id": "procedural-shadow.pre-side-effect-gate",
+      "result": "PASS"
+    },
+    {
+      "assertion_id": "admitted-material-action-closed-by-execution-and-assertion",
+      "procedure_id": "procedural-shadow.pre-side-effect-gate",
+      "result": "PASS"
+    },
+    {
+      "assertion_id": "domain-negative-control-agent-claiming-release-authority",
+      "procedure_id": "procedural-shadow.pre-side-effect-gate",
+      "result": "PASS"
+    },
+    {
+      "assertion_id": "stale-capsule-bound-to-another-subject-refused",
+      "procedure_id": "procedural-shadow.pre-side-effect-gate",
+      "result": "PASS"
+    },
+    {
+      "assertion_id": "tool-payload-slimming-versus-full-body",
+      "procedure_id": "procedural-shadow.pre-side-effect-gate",
+      "result": "PASS"
+    },
+    {
+      "assertion_id": "retry-bounded-and-lease-released-on-termination",
+      "procedure_id": "procedural-shadow.pre-side-effect-gate",
+      "result": "PASS"
+    },
+    {
+      "assertion_id": "deterministic-trace-completeness",
+      "procedure_id": "procedural-shadow.pre-side-effect-gate",
+      "result": "PASS"
+    }
+  ],
+  "checkpoint": "BEFORE_MATERIAL_DEVICE_ACTION",
+  "close_state": "PASS",
+  "dispositions": [
+    {
+      "procedure_id": "procedural-shadow.pre-side-effect-gate",
+      "state": "VERIFIED"
+    }
+  ],
+  "evidence": [
+    {
+      "artifact_sha256": "6678d796f9e6058a2177f069d6480b7f009405d10f93d92159f2ccdf308f4ce1",
+      "evidence_id": "consumer-canary-results",
+      "exact_subject": true,
+      "kind": "COMMAND",
+      "procedure_id": "procedural-shadow.pre-side-effect-gate"
+    }
+  ],
+  "receipt_id": "consumer-canary-30aa45c654ed",
+  "schema": "procedural-shadow-runtime-receipt/v1",
+  "subject": {
+    "base_sha": "30aa45c654ed92db05499e75484365eea1e7e303",
+    "context_digest": "18023848d737a2784b1dc4a0ac03efb6ab0bf328cbbf89955a0c17626eabd6e4",
+    "current_sha": "30aa45c654ed92db05499e75484365eea1e7e303",
+    "repository": "ed3c/ios-device-autopilot",
+    "runtime": "CLAUDE_CODE_LOCAL"
+  }
+}

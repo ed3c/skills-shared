@@ -61,6 +61,18 @@ def digest_json(value: Any) -> str:
     return sha256_bytes(json.dumps(value, sort_keys=True, separators=(",", ":")).encode())
 
 
+def portable_url(url: str) -> str:
+    """A file:// URL of a fixture is one machine's path.
+
+    The observation is about which page was rendered, not about where that
+    developer keeps their checkout, and a receipt carrying the second is
+    replayable nowhere else.
+    """
+    marker = "/skills/procedural-shadow-runtime/"
+    index = url.find(marker)
+    return f"<REPO>{url[index:]}" if index != -1 else url
+
+
 def admit_assertion(assertion: dict[str, Any], artifacts: dict[str, dict[str, Any]]) -> None:
     """Refuse anything that cannot be replayed or that leans on an image alone."""
     for key in ("assertion_id", "claim_kind", "subject", "observed_at"):
@@ -178,7 +190,8 @@ def browser_bundle(state: dict[str, Any], expected_state: str, subject: dict[str
         "network": {"kind": "NETWORK", "sha256": digest_json(state["network"]),
                     "value": state["network"]},
     }
-    observed_at = f"navigation:{state['url']}"
+    url = portable_url(state["url"])
+    observed_at = f"navigation:{url}"
     assertions = [
         {
             "assertion_id": "settled-state-matches-declared-transition",
@@ -219,9 +232,9 @@ def browser_bundle(state: dict[str, Any], expected_state: str, subject: dict[str
     return build_bundle(
         "BROWSER",
         {"driver": "playwright-chromium", "driver_version": version, "headless": True,
-         "viewport": "720x400"},
+         "viewport": "720x400", "url": url},
         subject, artifacts, assertions, "OBSERVED",
-        [{"step": 0, "action": "navigate", "target": state["url"]},
+        [{"step": 0, "action": "navigate", "target": url},
          {"step": 1, "action": "screenshot", "target": shot.name}],
     )
 
@@ -284,6 +297,15 @@ def selftest() -> int:
 
     for state in sorted(LANE_STATES):
         build_bundle("BROWSER", {}, {}, {}, [], state, [])
+
+    leaky = "file:///Users/someone/checkout/skills/procedural-shadow-runtime/tests/x.html"
+    if "/Users/someone" in portable_url(leaky):
+        print(f"SELFTEST RED: a machine path survived URL redaction: {portable_url(leaky)}",
+              file=sys.stderr)
+        return 1
+    if portable_url("https://example.invalid/page") != "https://example.invalid/page":
+        print("SELFTEST RED: a remote URL was rewritten by the path redactor", file=sys.stderr)
+        return 1
 
     if not FIXTURES.joinpath("truthful.html").is_file() or not FIXTURES.joinpath("lookalike.html").is_file():
         print("SELFTEST RED: the look-alike fixture pair is missing", file=sys.stderr)
