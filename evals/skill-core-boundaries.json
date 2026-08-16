@@ -23,7 +23,7 @@
     {"name":"unknown-discovery-composer","domain_module":"modules/domain-profile.md","forbidden_core_tokens":["opus","codex","agy","~/.claude","skill-bettor"]},
     {"name":"shared-skills-infra","domain_module":"modules/domain-profile.md","forbidden_core_tokens":["~/.agents","~/.claude","codex","claude code"]},
     {"name":"git-town-stacked-pr-worker","domain_module":"modules/domain-profile.md","forbidden_core_tokens":["github","actions","forgejo","glab"]},
-    {"name":"dual-forge-repository-loop","domain_module":"modules/domain-profile.md","forbidden_core_tokens":["github","forgejo","actions","desktop","codex","claude"]},
+    {"name":"dual-forge-repository-loop","domain_module":"modules/domain-profile.md","forbidden_core_tokens":["github","forgejo","actions","codex","claude"]},
     {"name":"agentic-tech-lead-orchestration","domain_module":"modules/domain-profile.md","forbidden_core_tokens":["grepai","scip","tree-sitter","serena","lancedb"]}
   ]
 }
