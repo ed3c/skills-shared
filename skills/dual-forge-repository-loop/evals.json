@@ -1,9 +1,9 @@
 {
   "skill_name": "dual-forge-repository-loop",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "_meta": {
-    "coverage_metric": "dual-forge authority separation, causal fresh-worktree creation and repository identity, local-main-first ordering, issue namespace separation, GitHub reconciliation closure, exact-head Actions evidence, publication evidence gating, multi-Agent topology admission, Worker attempt and lease isolation, budget closure, Shadow non-bypass, stale-result rejection, and external merge authority separation",
-    "purpose": "Prove that local/Forgejo implementation success cannot be published to GitHub while remote drift, open PR conflict routing, affected issue routing, exact-head Actions evidence, multi-Agent admission, lease ownership, result verification, budget, Shadow enforcement, or merge authority remains unresolved."
+    "coverage_metric": "dual-forge authority separation, causal fresh-worktree creation and repository identity, local-main-first ordering, issue namespace separation, GitHub reconciliation closure, exact-head Actions evidence, publication evidence gating, multi-Agent topology admission, Worker attempt and lease isolation, budget closure, Shadow non-bypass, stale-result rejection, private-lineage separation and clean-room controls, runtime evidence classification, and external merge authority separation",
+    "purpose": "Prove that local/Forgejo implementation success cannot be published to GitHub while remote drift, open PR conflict routing, affected issue routing, exact-head Actions evidence, multi-Agent admission, lease ownership, result verification, budget, Shadow enforcement, private-lineage separation, runtime evidence provenance, or merge authority remains unresolved."
   },
   "runnable": [
     {
@@ -49,6 +49,111 @@
         "schema-invalid input exits 64 while semantic contradiction exits 2 and a valid contract exits 0"
       ],
       "expected": "positive MULTI_WORKER, profileless SINGLE_BUILDER fallback, bounded retry lineage, dependency-ordered handoff, and sibling-path contracts PASS; thirty-five planted topology, lease-expiry, attempt-model, checkpoint, eval-identity, subject-admission, closure, budget, Shadow, evidence, result, and merge-boundary defects are refused; absent input remains distinct"
+    },
+    {
+      "id": "DFR-PRIVATE-HISTORY-AUDIT-1",
+      "checker_script": "modes/forgejo-private-repository-loop/scripts/audit_git_history.py",
+      "test_verify": "tests/forgejo-private-lineage/verify.sh",
+      "good_fixture": null,
+      "good_evidence": "the verifier creates an isolated Git repository with neutral content and records a zero-match history audit",
+      "hollow_fixture": null,
+      "hollow_mutations": "commit metadata, annotated tag, git-config, LFS-object content, and worktree-content surfaces are planted with denied material while diagnostics must not expose the denied bytes",
+      "covers": [
+        "private-lineage history audit scans multiple reachable Git and local evidence surfaces without copying denied source bytes into the receipt"
+      ],
+      "expected": "neutral repository exits 0; planted metadata/config/tag/LFS/worktree surfaces exit 2 and all required surface classes appear in the sanitized receipt"
+    },
+    {
+      "id": "DFR-PRIVATE-FORGEJO-ONLY-1",
+      "checker_script": "modes/forgejo-private-repository-loop/scripts/check_forgejo_only.py",
+      "test_verify": "tests/forgejo-private-lineage/verify.sh",
+      "good_fixture": null,
+      "good_evidence": "the verifier seals an isolated repository to one exact Forgejo fetch/push destination and rechecks the recovered state",
+      "hollow_fixture": null,
+      "hollow_mutations": "a GitHub pushurl, a second remote, an alternate object store, and a GitHub submodule are planted and must each be refused",
+      "covers": [
+        "the private checkout has one admitted Forgejo remote and refuses hidden provider or shared-object-graph escape routes"
+      ],
+      "expected": "one exact Forgejo remote passes; GitHub pushurl, extra remote, alternates, and GitHub submodule each exit 2"
+    },
+    {
+      "id": "DFR-PRIVATE-CLEANROOM-1",
+      "checker_script": "modes/forgejo-private-repository-loop/scripts/check_cleanroom_packet.py",
+      "test_verify": "tests/forgejo-private-lineage/verify.sh",
+      "good_fixture": null,
+      "good_evidence": "the verifier constructs a generalized state-machine packet with an approved public reference and validates it",
+      "hollow_fixture": null,
+      "hollow_mutations": "a private source_path field, a denied literal, and distinctive copied prose detected through private fingerprints are planted",
+      "covers": [
+        "only generalized contracts and synthetic controls cross the clean-room boundary; private source fields, literals, and distinctive copied prose are refused"
+      ],
+      "expected": "generalized packet exits 0; source-field, denied-literal, and fingerprint-copy mutations exit 2 without echoing denied literal bytes"
+    },
+    {
+      "id": "DFR-PRIVATE-PROVIDER-DISPOSITION-1",
+      "checker_script": "modes/forgejo-private-repository-loop/scripts/check_provider_retention.py",
+      "test_verify": "tests/forgejo-private-lineage/verify.sh",
+      "good_fixture": null,
+      "good_evidence": "the verifier constructs the complete provider-retention surface inventory with explicit CONFIRMED dispositions",
+      "hollow_fixture": null,
+      "hollow_mutations": "a provider backup/replica surface is changed to the unsupported global-erasure state ERASED",
+      "covers": [
+        "provider-side retention and erasure claims remain explicit per surface and local deletion cannot become a global provider-erasure claim"
+      ],
+      "expected": "complete explicit inventory exits 0; global ERASED overclaim exits 2"
+    },
+    {
+      "id": "DFR-PRIVATE-RETIREMENT-INVENTORY-1",
+      "checker_script": "modes/forgejo-private-repository-loop/scripts/check_retirement_inventory.py",
+      "test_verify": "tests/forgejo-private-lineage/verify.sh",
+      "good_fixture": null,
+      "good_evidence": "the verifier constructs a seven-surface local retirement inventory bound to an exact observed head and checks terminal and outstanding receipts",
+      "hollow_fixture": null,
+      "hollow_mutations": "one surface is removed, one is falsely ERASED, the observed head is replaced by mutable HEAD, and one surviving clone is kept PRESENT",
+      "covers": [
+        "all local copies that can still reach private objects are inventoried against an exact head and surviving copies prevent a false terminal classification"
+      ],
+      "expected": "complete retired inventory exits 0 with TERMINAL; missing surface, ERASED, and unbound-head mutations exit 2; a PRESENT clone stays valid but yields OUTSTANDING"
+    },
+    {
+      "id": "DFR-PRIVATE-NO-SHARED-LINEAGE-1",
+      "checker_script": "modes/forgejo-private-repository-loop/scripts/assert_no_shared_lineage.sh",
+      "test_verify": "tests/forgejo-private-lineage/verify.sh",
+      "good_fixture": null,
+      "good_evidence": "the verifier compares a fresh independently authored root with the private source repository",
+      "hollow_fixture": null,
+      "hollow_mutations": "a direct clone of the private source and an independently initialized repository sharing a non-empty object are used as contaminated public lineages",
+      "covers": [
+        "private and public lineages share no commits, trees, non-empty blobs, alternates, bundles, worktrees, or ancestry"
+      ],
+      "expected": "fresh independent root exits 0; copied private lineage and shared non-empty object lineage exit 2"
+    },
+    {
+      "id": "DFR-PRIVATE-FRESH-ROOT-1",
+      "checker_script": "modes/forgejo-private-repository-loop/scripts/create_fresh_root_snapshot.sh",
+      "test_verify": "tests/forgejo-private-lineage/verify.sh",
+      "good_fixture": null,
+      "good_evidence": "the verifier creates a fresh public root from an independently authored source and records its receipt",
+      "hollow_fixture": null,
+      "hollow_mutations": "tracked private-denylist.txt and runtime-evidence run.log files are planted in otherwise public source repositories",
+      "covers": [
+        "public output is rebuilt as a fresh root and producer-side deny rules refuse committed private denylist or runtime-evidence carriers"
+      ],
+      "expected": "independently authored public source produces a fresh root; committed private denylist and runtime evidence are refused with exit 67"
+    },
+    {
+      "id": "DFR-PRIVATE-RUNTIME-EVIDENCE-1",
+      "checker_script": "modes/forgejo-private-repository-loop/scripts/check_runtime_evidence_classification.py",
+      "test_verify": "tests/private-lineage-runtime-classification/verify.sh",
+      "good_fixture": null,
+      "good_evidence": "the checker selftest admits GitHub connector evidence only for GitHub lanes, permits explicit NOT_EXERCISED for local lanes, and admits local-runtime Forgejo evidence when separately referenced",
+      "hollow_fixture": null,
+      "hollow_mutations": "GitHub connector identity is paired with PASS, FAIL, or ABSENT claims for local Git, local worktree, Forgejo loopback, Forgejo issue, Forgejo PR, or Forgejo runtime receipt lanes",
+      "covers": [
+        "GitHub connector access is never treated as local Git/worktree/Forgejo execution evidence",
+        "observed PASS/FAIL/ABSENT states require an evidence reference while honest non-execution states remain representable"
+      ],
+      "expected": "GitHub-scoped connector claim and honest non-execution classifications pass; six connector-to-local/Forgejo laundering mutations and an observed state without evidence are refused"
     }
   ],
   "evidence_boundary": {
@@ -57,12 +162,16 @@
     "multi_agent_runtime_schemas": "IMPLEMENTED",
     "multi_agent_runtime_semantic_checker": "IMPLEMENTED",
     "positive_mutation_controls": "IMPLEMENTED",
+    "private_lineage_checker_plane": "IMPLEMENTED",
+    "private_lineage_runtime_evidence_classifier": "IMPLEMENTED",
     "live_multi_agent_scheduler": "NOT_EXERCISED",
     "independent_shadow_context_or_model": "NOT_EXERCISED",
     "live_checkpoint_resume_and_straggler_reassignment": "NOT_EXERCISED",
     "organization_level_alignment": "NOT_EXERCISED",
     "chatgpt_private_github_ingress": "NOT_EXERCISED",
     "local_forgejo_mutation": "NOT_EXERCISED",
+    "private_consumer_extraction": "NOT_EXERCISED",
+    "provider_cleanup_disposition": "NOT_EXERCISED",
     "consumer_worktree_execution": "NOT_EXERCISED",
     "consumer_github_actions": "NOT_EXERCISED",
     "final_merge": "HUMAN_ADMIT_REQUIRED"
