@@ -7,6 +7,22 @@
   },
   "runnable": [
     {
+      "id": "RCA-SEPARATION-1",
+      "checker_script": "scripts/analyze_arm_separation.py",
+      "test_verify": "tests/test_arm_separation.py",
+      "good_fixture": "evals/matrix-slice1-result.json",
+      "hollow_fixture": null,
+      "hollow_mutations": "declaring a zero-variance metric as primary, reporting a varying metric as flat, comparing raw counts across arms whose denominators differ, and reading an unmeasured metric as a measured null",
+      "covers": [
+        "a metric with zero within-arm variance is refused as primary rather than yielding a null about the treatment",
+        "a metric that does vary within arms is reported with its ranking rather than absorbed into its saturated neighbours",
+        "false-pass performance is compared as a rate, because the opportunity count differs between arms",
+        "a metric nothing recorded exits 64 rather than reading as a metric that was flat",
+        "the correction written into the slice-1 record is recomputable from that record"
+      ],
+      "expected": "the committed slice-1 result reproduces its recorded ranking; a saturated primary exits 2; an absent, empty or unmeasured input exits 64 and stays distinct from a refusal"
+    },
+    {
       "id": "RCA-ABLATION-1",
       "checker_script": "scripts/run_ablation.py",
       "test_verify": "tests/test_ablation.py",
@@ -59,12 +75,15 @@
   "evidence_boundary": {
     "established": [
       "deterministic necessity of the retained rules on committed fixtures",
-      "integrity of the harness and corpus contract that a live measurement would depend on"
+      "integrity of the harness and corpus contract that a live measurement would depend on",
+      "thirteen live cells on claude-code/opus across three arms on psf/requests, recorded in evals/matrix-slice1-result.json",
+      "that 8 of 14 measured metrics are saturated on this corpus, so most of the harness's quality metrics cannot carry a treatment signal here"
     ],
     "not_established": [
-      "that any language model adopted the trimmed Skill",
       "held-out uplift, cross-model generalization, or production correctness",
-      "that a held-out corpus exists yet -- the contract is checkable, the corpus is not written"
+      "any uplift from the trimmed Skill. On false_pass_rate -- the only quality metric that varied within arms -- the trimmed candidate ranked worst of three arms, behind supplying no Skill at all, while costing more than either. That result is underpowered at n=4-5 and is not itself a finding of harm; it is recorded because it is the opposite of the effect this Skill was trimmed to produce.",
+      "cross-model anything: slice 1 ran one host. codex-cli has never been run on this corpus.",
+      "the five-arm decomposition #219 asks for; its design is frozen in evals/uplift-preregistration.json and has not been executed"
     ]
   }
 }

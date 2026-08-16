@@ -214,6 +214,17 @@ python3 skills/repository-capability-audit/scripts/check_core.py \
 
 The checker fails when a core law has no deciding runtime delta, a domain instance leaks into this file, an expected report drifts, or a suite has no real CI arrival.
 
+## Before reading a null off a matrix result
+
+Ask which metrics could have moved at all.
+
+```bash
+python3 skills/repository-capability-audit/scripts/analyze_arm_separation.py \
+  --result skills/repository-capability-audit/evals/matrix-slice1-result.json
+```
+
+A metric with zero within-arm variance is saturated: it carries no information about the treatment, so a null on it describes the case set and not the Skill. Declaring one as primary exits 2. This exists because slice 1 stopped a six-slice matrix on exactly that reading, while `false_pass_rate` — recorded in every cell, and not saturated — sat unanalysed in the same file. Counts are compared as rates, since the opportunity count differs between arms.
+
 ## Stop conditions
 
 Stop and surface evidence when any of these holds.

@@ -55,6 +55,12 @@ DELTA = APPLICABLE - ALREADY_SATISFIED - PRIOR_VERIFIED_EVIDENCE
 
 Do not inject a full `SKILL.md` when the delta is smaller. Remove a procedure from `DELTA` only when the candidate plan or a prior receipt binds the same procedure ID and exact subject.
 
+That first sentence is a design claim, not a measured one: nothing here yet shows a delta capsule performs as well as the full body it replaces. `scripts/build_uplift_arms.py` renders the two as separate treatment arms — the capsule at 8.6% of the full body's length — so the claim becomes testable rather than assumed. The arms are verified pairwise byte-distinct, which is not the same as behaviourally distinct; the design frozen to measure that is `skills/repository-capability-audit/evals/uplift-preregistration.json`, and it has not been run.
+
+```bash
+python3 skills/procedural-shadow-runtime/scripts/build_uplift_arms.py --output /tmp/uplift-arms
+```
+
 ## Public snapshot boundary
 
 Shadow workers receive only a structured public snapshot:

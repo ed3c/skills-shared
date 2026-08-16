@@ -1,0 +1,135 @@
+{
+  "schema": "rca-agent-ab-preregistration/v1",
+  "preregistration_id": "rca-uplift-219-2026-08",
+  "status": "FROZEN_AWAITING_ADMISSION",
+  "_meta": {
+    "issue": "#219 cross-model causal uplift",
+    "frozen_before_execution": true,
+    "frozen_before_any_five_arm_result_existed": true,
+    "why_not_reanalysis": "#219 requires five arms. The three data sets already collected (#228 pilot, #228 slice 1, #225) carry three arms between them, and two of the five treatments -- METADATA_ONLY and both DELTA_CAPSULE variants -- did not exist as artefacts until they were built for this preregistration. No re-analysis of existing data can answer #219; the missing arms were never run.",
+    "supersedes_nothing": "This does not replace the #228 preregistration. #228 asks whether the trimmed candidate matches the full composition; #219 asks what component of a Skill carries any effect there is.",
+    "decided_by": "author-frozen; execution requires repository-owner admission (see execution_gate)"
+  },
+
+  "prior_result_that_shapes_this_design": {
+    "source": "evals/matrix-slice1-result.json, recomputed by scripts/analyze_arm_separation.py",
+    "saturation": "8 of 14 measured metrics have zero within-arm variance. Every quality metric except false_pass_rate is saturated on this case set. The five other unsaturated metrics measure expense, not correctness.",
+    "false_pass_rate_ranking": "current_full_composition 0.269 < no_skill 0.371 < candidate_trimmed_skill 0.380",
+    "adverse_to_the_shipped_skill": "The trimmed candidate -- what this Skill ships -- ranked worst of three arms on the only discriminating quality metric, behind supplying no Skill at all, while costing more than either arm. This is recorded here before execution so that a five-arm run cannot be presented as a neutral first look.",
+    "strength": "n=4-5 per arm, one outlier cell carrying much of one arm's spread. Suggestive, not significant. It is used here to choose the primary metric and to size the run, not as a finding."
+  },
+
+  "arms": {
+    "_built_by": "skills/procedural-shadow-runtime/scripts/build_uplift_arms.py",
+    "_pairwise_distinct_verified": true,
+    "A_NO_SKILL": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "isolates": "the floor: what the host does with the task alone"
+    },
+    "B_METADATA_ONLY": {
+      "bytes": 414,
+      "isolates": "recognition without procedure. Separates 'the model saw a name it knows' from 'the model read and applied a procedure'. Without this arm, any C-over-A effect is confounded with the host simply being told a relevant Skill exists."
+    },
+    "C_FULL_SKILL": {
+      "bytes": 10351,
+      "isolates": "the whole Skill body as shipped"
+    },
+    "D_DELTA_CAPSULE": {
+      "bytes": 886,
+      "isolates": "only the procedures applicable to the task, at 8.6% of C's length. Separates 'more text helped' from 'the applicable procedures helped' -- the confound #225 could not resolve, where its candidate was eight times longer than its baseline."
+    },
+    "E_DELTA_CAPSULE_PLUS_HARNESS": {
+      "bytes": 1309,
+      "isolates": "the same capsule plus a statement of what will be mechanically checked. Separates advice from enforcement."
+    }
+  },
+
+  "hosts": [
+    {"family": "claude-code", "model_pinned": true, "model": "opus", "cost_reported": true},
+    {"family": "codex-cli", "model_pinned": true, "model": "gpt-5.6-sol", "cost_reported": false}
+  ],
+
+  "metrics": {
+    "primary": "false_pass_rate",
+    "primary_definition": "false_pass_count / false_pass_opportunities, per cell",
+    "why_a_rate": "Opportunities ranged 19.6 to 23.8 across arms in slice 1. A raw count mixes 'made more mistakes' with 'was offered more chances to make them', so the count is not a usable scale here.",
+    "why_this_primary": "It is the only quality metric that varied within arms on the observed case set. A metric with zero within-arm variance cannot carry a treatment signal, so preregistering one as primary would guarantee a null that says nothing about the treatment.",
+    "secondary_recorded_never_primary": [
+      "cost_usd", "input_tokens", "output_tokens", "duration_ms", "tool_calls"
+    ],
+    "why_secondary": "These varied, but they measure expense rather than correctness. An arm that is cheaper while being wrong more often has not won.",
+    "saturated_recorded_as_case_set_evidence_only": [
+      "task_success", "trigger_correct", "defect_recall", "evidence_packet_complete",
+      "exact_subject_continuity", "explicit_non_claim_accuracy", "negative_control_valid"
+    ],
+    "saturation_rule": "If a saturated metric remains saturated in this run, that is evidence about the case set and is reported as such. It may never be reported as evidence that the treatment had no effect."
+  },
+
+  "preregistered_contrasts": [
+    {"contrast": "C vs A", "question": "does the shipped Skill body change the false-pass rate at all"},
+    {"contrast": "B vs A", "question": "is any C-over-A effect explained by mere recognition of a Skill name"},
+    {"contrast": "D vs C", "question": "does the applicable-procedure capsule match the full body at 8.6% of its length"},
+    {"contrast": "E vs D", "question": "does declaring the mechanical check add over stating the procedure"}
+  ],
+  "multiplicity": {
+    "correction": "Bonferroni across the four preregistered contrasts",
+    "alpha_per_contrast": 0.0125,
+    "no_other_contrast_may_be_reported_as_a_test": "Any comparison outside these four is exploratory and must be labelled so, whatever its p-value."
+  },
+
+  "power": {
+    "within_arm_sd_assumed": 0.069,
+    "source_of_assumption": "mean within-arm sd of false_pass_rate in slice 1",
+    "effect_size_targeted": 0.111,
+    "why_that_size": "the largest between-arm spread observed in slice 1; a run powered for less would be sized on an effect nothing has yet suggested exists",
+    "standardized_effect": 1.6,
+    "repetitions_per_arm_per_host": 9,
+    "physical_sessions": 90,
+    "note": "9 per arm gives ~80% power at the Bonferroni-corrected alpha for the assumed effect. The assumption is itself drawn from an underpowered slice, so the achieved power is uncertain in the direction of being lower."
+  },
+
+  "case_set": {
+    "repositories": 3,
+    "source": "evals/held-out-corpus.json",
+    "known_limitation": "8 of 14 metrics saturated on this corpus. Adding repetitions cannot unsaturate them; only harder cases can. This run is therefore powered to answer one question -- does any arm move the false-pass rate -- and is not powered to answer whether the arms differ on the saturated qualities.",
+    "not_fixed_here": "Building a harder corpus is separate work and is not folded into this preregistration, because a case set changed after seeing results is not a case set."
+  },
+
+  "randomization": {
+    "arm_order": "derived deterministically from sha256(repository_id + host_family + arm_id), recorded per cell",
+    "fresh_session_per_arm": true,
+    "isolated_workspace_per_arm": true
+  },
+  "retry_policy": {"retries_permitted": 0, "reason": "a retried cell is a selected cell"},
+  "cost_policy": {
+    "in_acceptance_weights": false,
+    "reason": "codex-cli does not report spend; scoring two hosts on a quantity only one can observe ranks the silent host as the cheaper one",
+    "recorded_per_cell": true
+  },
+
+  "stop_rules_frozen_now": {
+    "may_stop_early_if": "the primary metric is saturated in this run too -- zero within-arm variance across all arms on both hosts. That is a case-set finding and further cells cannot change it.",
+    "may_not_stop_because": "an interim look suggests a null on the primary metric. A null is a result to be reported at full n, not a reason to stop collecting.",
+    "must_report_even_if_adverse": "If the shipped trimmed Skill again ranks at or below A_NO_SKILL, that is the result and it is published as the result.",
+    "partial_runs": "Any run that stops before 90 sessions is reported as PARTIAL with the exact cells run, and may not be cited as the qualifying #219 matrix."
+  },
+
+  "execution_gate": {
+    "status": "NOT_YET_ADMITTED",
+    "estimated_cost_usd_claude_code_only": 115,
+    "cost_basis": "45 claude-code cells at the $2.15-$2.98 per-cell range observed in slice 1",
+    "estimated_wall_clock_hours": 6,
+    "cost_basis_time": "mean cell duration 262s in slice 1, run serially",
+    "why_gated": "This is an expensive and externally-billed run. The design is frozen so it cannot be shaped by results later; the spend is a separate decision and belongs to the repository owner.",
+    "codex_cli_cost": "unobservable; recorded as cost_observed=false rather than as zero"
+  },
+
+  "non_claims": [
+    "no promotion, production, or cross-repository claim follows from this design",
+    "five arms establish which component carries an effect, not that any effect exists",
+    "two hosts are two hosts; no claim about model families beyond these two pins",
+    "a null on the primary metric would bound the effect on this corpus, not on repository audit generally",
+    "the arms are verified byte-distinct, which is not evidence that they are behaviourally distinct; that is what the run is for"
+  ]
+}

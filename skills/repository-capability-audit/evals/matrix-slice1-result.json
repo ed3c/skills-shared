@@ -476,17 +476,30 @@
       "metric": "trigger",
       "reading": "arm difference is within run-to-run noise",
       "separable": false
+    },
+    {
+      "between_arm_spread": 0.1111,
+      "host": "claude-code",
+      "largest_within_arm_sd": 0.0947,
+      "metric": "false_pass_rate",
+      "reading": "between-arm spread exceeds the mean within-arm sd (ratio 1.62); the arms are not scoring identically on this metric, and its ranking runs against the trimming hypothesis",
+      "recomputed_by": "scripts/analyze_arm_separation.py",
+      "ranking": "current_full_composition 0.2691 < no_skill 0.3714 < candidate_trimmed_skill 0.3802",
+      "separable": true,
+      "underpowered": "n=4-5 per arm, and one current_full_composition cell at 0.429 against three near 0.21 carries much of that arm's spread. Suggestive, not decided; reported as a metric that must be measured rather than as an effect that has been shown."
     }
   ],
   "slice": {
     "arms": 3,
-    "ceiling_effect": "found and trigger are both 1.00 with zero variance in every arm. These metrics are saturated for this case set and this model, so they carry no information about the treatment regardless of how many repetitions are added.",
+    "ceiling_effect": "found and trigger are both 1.00 with zero variance in every arm. These metrics are saturated for this case set and this model, so they carry no information about the treatment regardless of how many repetitions are added. Recount by scripts/analyze_arm_separation.py: 8 of 14 measured metrics are saturated, and every quality metric except false_pass_rate is among them. The five other unsaturated metrics -- cost_usd, input_tokens, output_tokens, duration_ms, tool_calls -- measure expense rather than correctness. So the ceiling is real and narrower than this field first claimed: it covers every quality metric but one.",
     "cost_observation": "no_skill $8.60 < current_full_composition $11.93 < candidate_trimmed_skill $12.16. The candidate is the most expensive arm while scoring identically, which is directionally consistent with the #225 baseline result.",
     "host_family": "claude-code",
     "of_full_matrix": "1 of 6 slices",
     "repetitions": 5,
     "repository": "psf/requests",
-    "why_stopped_here": "Within-arm standard deviation is 0.00 across five repetitions and all three arms score identically. The pilot's single repetition could not distinguish 'signal buried in noise' from 'no difference'; five repetitions answer it: there is no noise and no difference. The remaining five slices cannot change that conclusion, so they were not run."
+    "why_stopped_here": "Within-arm standard deviation is 0.00 across five repetitions and all three arms score identically. The pilot's single repetition could not distinguish 'signal buried in noise' from 'no difference'; five repetitions answer it: there is no noise and no difference. The remaining five slices cannot change that conclusion, so they were not run.",
+    "why_stopped_here_withdrawn": "This justification is withdrawn. 'All three arms score identically' held only on the saturated metrics; it was read off those and applied to the whole result. false_pass_rate was recorded in every cell, was never analysed, and is not saturated -- the arms differ on it by more than the mean within-arm sd. The stop therefore rests on a claim this slice's own data contradicts, and the five unrun slices could change the conclusion after all. This record's own non-claim, 'a saturated metric cannot support a null finding about the treatment, only about the case set', is exactly what was violated by generalising from the saturated metrics to the matrix. Ranking the unanalysed metric does produce is adverse to the shipped Skill: the trimmed candidate scores worst of the three arms, behind supplying no Skill at all, while costing more than either -- which is why leaving it unanalysed was not a neutral omission.",
+    "defect_class": "a conclusion that could not distinguish 'measured and found equal' from 'never measured on a scale that could differ' -- the same class this repository has now recorded seven times"
   },
   "slices_expected": 6,
   "slices_found": 7,
