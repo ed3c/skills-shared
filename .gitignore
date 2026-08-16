@@ -16,6 +16,8 @@ sites.local.json
 # it was removed by hand before each of the first commits, and remembering that
 # every time is the wrong mechanism.
 skills/repo-agent-native/evals/receipts/*.sqlite3
+skills/repo-agent-native/evals/receipts/*.scip
+skills/repo-agent-native/evals/receipts/lancedb/
 
 # Working directories the procedural-shadow-runtime adapters write to when a
 # caller points --output at the repository root. Everything a committed receipt

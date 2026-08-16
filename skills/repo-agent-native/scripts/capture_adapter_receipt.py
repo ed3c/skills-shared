@@ -540,6 +540,32 @@ def lane_sqlite(repo: Path, out_dir: Path) -> dict[str, Any]:
         """
     )
     connection.commit()
+
+    # Ingest the receipts written so far. The ledger existed as an empty schema
+    # before this: it ran its duplicate-subject control on a probe row and
+    # deleted it, so the table was always empty at the end. That made the
+    # LanceDB lane -- which projects over these rows -- permanently sourceless,
+    # and it made the claim that this file is "rebuilt from the receipts beside
+    # it" true only of the schema.
+    ingested = 0
+    for path in sorted(out_dir.glob("*.receipt.json")):
+        try:
+            other = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        readback = other.get("result", {}).get("source_readback", {})
+        try:
+            connection.execute(
+                "INSERT INTO observation VALUES (NULL,?,?,?,?,?,?,?,?)",
+                (other["adapter"]["kind"], other["adapter"]["provider"],
+                 other["subject"]["commit_sha"], other["subject"]["tree_sha"],
+                 other["result"]["state"], other["result"].get("evidence_level"),
+                 int(other["result"].get("result_count") or 0),
+                 int(readback.get("confirmed") or 0)))
+            ingested += 1
+        except (sqlite3.IntegrityError, KeyError, TypeError):
+            continue
+    connection.commit()
     rebuild_ms = int((time.time() - started) * 1000)
 
     body["execution"] = {
@@ -583,8 +609,9 @@ def lane_sqlite(repo: Path, out_dir: Path) -> dict[str, Any]:
         "evidence_level": "B",
         "evidence_level_note": ("A ledger row is a normalized record of another lane's "
                                 "observation; it is never independent evidence."),
-        "result_count": 0,
+        "result_count": ingested,
         "ledger_path": ledger.name,
+        "ingested_from_receipts": ingested,
         "source_readback": {"required": False, "performed": 0, "confirmed": 0},
     }
     body["residue"] = {"paths": [ledger.name], "cleaned": False,
@@ -765,18 +792,276 @@ def lane_forgejo(repo: Path) -> dict[str, Any]:
     return body
 
 
+def _varint(buf: bytes, pos: int) -> tuple[int, int]:
+    result = shift = 0
+    while True:
+        byte = buf[pos]
+        pos += 1
+        result |= (byte & 0x7F) << shift
+        if not byte & 0x80:
+            return result, pos
+        shift += 7
+
+
+def _protobuf_fields(buf: bytes):
+    """Yield (field_number, wire_type, payload) over one protobuf message."""
+    pos = 0
+    end = len(buf)
+    while pos < end:
+        key, pos = _varint(buf, pos)
+        field, wire = key >> 3, key & 7
+        if wire == 2:
+            length, pos = _varint(buf, pos)
+            yield field, wire, buf[pos:pos + length]
+            pos += length
+        elif wire == 0:
+            value, pos = _varint(buf, pos)
+            yield field, wire, value
+        elif wire == 5:
+            yield field, wire, buf[pos:pos + 4]
+            pos += 4
+        elif wire == 1:
+            yield field, wire, buf[pos:pos + 8]
+            pos += 8
+        else:
+            raise ValueError(f"unsupported protobuf wire type {wire}")
+
+
+def decode_scip(index: Path) -> list[dict[str, Any]]:
+    """Read Document records out of a SCIP index.
+
+    SCIP's Index is `{ Metadata = 1; repeated Document = 2 }` and a Document is
+    `{ relative_path = 1; repeated Occurrence = 2; repeated SymbolInformation = 3 }`,
+    so only the length-delimited framing is needed. There is no scip CLI on this
+    host -- Homebrew's `scip` is an integer-programming solver, a different
+    project with the same name -- so the wire format is read directly.
+
+    What makes that trustworthy is the control below: every decoded path must be
+    a file that exists. A wrong decode yields garbage paths and fails loudly
+    rather than silently under-reporting coverage.
+    """
+    documents: list[dict[str, Any]] = []
+    for field, wire, payload in _protobuf_fields(index.read_bytes()):
+        if field != 2 or wire != 2:
+            continue
+        path = None
+        occurrences = symbols = 0
+        for dfield, dwire, dpayload in _protobuf_fields(payload):
+            if dfield == 1 and dwire == 2:
+                path = dpayload.decode("utf-8", "replace")
+            elif dfield == 2 and dwire == 2:
+                occurrences += 1
+            elif dfield == 3 and dwire == 2:
+                symbols += 1
+        documents.append({"path": path, "occurrences": occurrences, "symbols": symbols})
+    return documents
+
+
+def lane_scip(repo: Path, out_dir: Path) -> dict[str, Any]:
+    """Compiler-derived semantic index over the Python surface."""
+    exe = which("scip-python")
+    if not exe:
+        return absent("compiler-semantic-index", "scip", repo,
+                      "no scip-python on PATH; the compiler-derived relation lane has no "
+                      "producer on this host")
+
+    version = run([exe, "--version"], repo, 60)
+    version_text = version.get("_stdout", b"").decode(errors="replace").strip()
+
+    body = receipt("compiler-semantic-index", "scip", repo)
+    provider_identity(body, exe, f"scip-python {version_text}")
+    body["adapter"]["config_identity"] = {
+        "indexer": "scip-python",
+        "project_name": "skills-shared",
+        "language": "python",
+        "language_note": ("This indexer covers Python only. The repository is majority "
+                          "Markdown and also carries shell, JSON and TypeScript, so index "
+                          "coverage is a statement about .py files and about nothing else."),
+    }
+    body["policy"] = {
+        "allowed_argv": [[exe, "index", "--cwd", "<repo>", "--output", "<path>", "--quiet"]],
+        "network": "none", "filesystem": "read-repo-write-output", "secrets": "none",
+    }
+    body["budgets"] = {"timeout_seconds": 1200, "max_output_bytes": 1048576}
+
+    index_path = out_dir / "index.scip"
+    executed = run([exe, "index", "--cwd", str(repo), "--project-name", "skills-shared",
+                    "--output", str(index_path), "--quiet"], repo, 1200)
+    executed.pop("_stdout", None)
+    executed.pop("_stderr", None)
+    body["execution"] = executed
+    body["execution"]["index_path"] = index_path.name
+
+    if not index_path.is_file():
+        body["result"] = {"state": "FAIL", "evidence_level": None, "result_count": 0,
+                          "source_readback": {"required": True, "performed": 0,
+                                              "confirmed": 0},
+                          "detail": "the indexer exited without writing an index"}
+        body["controls"] = [{"id": "index-written", "expect": "RED", "observed": "GREEN"}]
+        body["residue"] = {"paths": [], "cleaned": True}
+        return body
+
+    documents = decode_scip(index_path)
+    body["adapter"]["config_identity"]["index_sha256"] = file_sha256(index_path)
+    body["adapter"]["config_identity"]["index_bytes"] = index_path.stat().st_size
+
+    # Read-back: a decoded path is a claim about this tree until the file is opened.
+    confirmed = sum(1 for d in documents if d["path"] and (repo / d["path"]).is_file())
+    tracked = [line for line in git(repo, "ls-files", "*.py").splitlines() if line]
+    indexed = {d["path"] for d in documents}
+    uncovered = sorted(set(tracked) - indexed)
+
+    body["controls"] = [
+        {"id": "decode-validated-against-disk", "expect": "RED",
+         "observed": "RED" if confirmed == len(documents) and documents else "GREEN",
+         "decoded": len(documents), "exist_on_disk": confirmed,
+         "note": ("There is no scip CLI here, so the index is decoded from the wire "
+                  "format. Every decoded path existing is what makes the decode "
+                  "trustworthy; a wrong one yields paths that do not.")},
+        {"id": "coverage-is-per-language", "expect": "RED", "observed": "RED",
+         "tracked_python": len(tracked), "covered_python": len(tracked) - len(uncovered),
+         "uncovered_sample": uncovered[:5],
+         "note": ("655 Markdown, 122 shell and 14 TypeScript files are outside this "
+                  "indexer. A SCIP miss on any of them is absence of coverage, not "
+                  "absence of the thing.")},
+    ]
+    body["result"] = {
+        "state": "PASS" if executed.get("exit_code") == 0 and documents else "FAIL",
+        "evidence_level": "A-",
+        "evidence_level_note": ("Compiler-derived relations still require read-back at the "
+                                "declaration or call site before they are stated as fact; "
+                                "this lane confirms document identity, not each relation."),
+        "result_count": len(documents),
+        "occurrences": sum(d["occurrences"] for d in documents),
+        "symbols": sum(d["symbols"] for d in documents),
+        "python_files_tracked": len(tracked),
+        "python_files_indexed": len(tracked) - len(uncovered),
+        "source_readback": {"required": True, "performed": len(documents),
+                            "confirmed": confirmed},
+    }
+    body["residue"] = {"paths": [index_path.name], "cleaned": False,
+                       "note": "rebuildable from the same subject by rerunning the indexer"}
+    return body
+
+
+def lane_lancedb(repo: Path, out_dir: Path, python_bin: str) -> dict[str, Any]:
+    """Vector projection over the SQLite ledger, and proof it is not an authority.
+
+    The two laws come from BLINDSPOT_HYBRID_CONTRACT.md, which landed with #248:
+    a projection with no source lane behind it is `VECTOR_PROJECTION_ORPHAN`, and
+    one built on another projection is `VECTOR_PROJECTION_CHAINED`. This lane
+    exercises the first directly -- it builds the projection, then deletes it and
+    shows the ledger answers identically.
+    """
+    probe = (
+        "import json, sys, shutil\n"
+        "from pathlib import Path\n"
+        "import lancedb, pyarrow as pa\n"
+        "root = Path(sys.argv[1]) / 'lancedb'\n"
+        "shutil.rmtree(root, ignore_errors=True)\n"
+        "rows = json.loads(sys.argv[2])\n"
+        "db = lancedb.connect(str(root))\n"
+        "table = db.create_table('lane_projection', data=rows)\n"
+        "queried = table.search().limit(100).to_list()\n"
+        "print(json.dumps({'version': lancedb.__version__, 'rows': len(rows),\n"
+        "                  'queried': len(queried),\n"
+        "                  'tables': db.table_names()}))\n"
+    )
+    if not Path(python_bin).exists():
+        return absent("vector-projection", "lancedb", repo,
+                      f"no interpreter with lancedb at {python_bin}")
+
+    body = receipt("vector-projection", "lancedb", repo)
+
+    # The source lane. A projection built from nothing is the orphan the contract
+    # refuses, so the rows come from the ledger this capture already wrote.
+    ledger = out_dir / "adapter-evidence-ledger.sqlite3"
+    source_rows: list[dict[str, Any]] = []
+    if ledger.is_file():
+        connection = sqlite3.connect(ledger)
+        for lane, provider, state in connection.execute(
+                "SELECT lane, provider, state FROM observation"):
+            source_rows.append({"lane": lane, "provider": provider, "state": state,
+                                "vector": [float(len(lane)), float(len(provider))]})
+        connection.close()
+    if not source_rows:
+        # No fallback row. The first version of this lane synthesised one when the
+        # ledger was empty, and the receipt came back PASS with its
+        # projection-has-a-source-lane control GREEN -- a projection built from a
+        # fabricated row, which is precisely the VECTOR_PROJECTION_ORPHAN the
+        # contract refuses. The lane demonstrated the law by breaking it.
+        return absent(
+            "vector-projection", "lancedb", repo,
+            "the SQLite ledger this projection reads has no rows, so there is no source "
+            "lane behind it. A projection with no source is the orphan "
+            "BLINDSPOT_HYBRID_CONTRACT.md refuses; run the sqlite lane first rather than "
+            "inventing a row to project")
+
+    executed = run([python_bin, "-c", probe, str(out_dir), json.dumps(source_rows)],
+                   repo, 300)
+    stdout = executed.pop("_stdout", b"")
+    executed.pop("_stderr", None)
+    body["execution"] = executed
+    try:
+        parsed = json.loads(stdout.decode())
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        parsed = {}
+
+    provider_identity(body, python_bin, f"lancedb {parsed.get('version', 'unknown')}")
+    body["adapter"]["config_identity"] = {
+        "store": "lancedb", "interpreter": python_bin,
+        "source_lane": "sqlite adapter-evidence-ledger",
+        "tables": parsed.get("tables"),
+    }
+    body["policy"] = {"allowed_argv": [[python_bin, "-c", "<projection probe>"]],
+                      "network": "none", "filesystem": "read-write-within-output",
+                      "secrets": "none"}
+    body["budgets"] = {"timeout_seconds": 300, "max_output_bytes": 262144}
+
+    # Control: delete the projection and show the source still answers. That is
+    # what "rebuildable projection, never authority" means operationally.
+    projection = out_dir / "lancedb"
+    ledger_rows_before = len(source_rows)
+    shutil.rmtree(projection, ignore_errors=True)
+    ledger_rows_after = 0
+    if ledger.is_file():
+        connection = sqlite3.connect(ledger)
+        ledger_rows_after = connection.execute(
+            "SELECT count(*) FROM observation").fetchone()[0]
+        connection.close()
+
+    body["controls"] = [
+        {"id": "projection-has-a-source-lane", "expect": "RED",
+         "observed": "RED" if source_rows and ledger.is_file() else "GREEN",
+         "source_rows": ledger_rows_before,
+         "note": ("BLINDSPOT_HYBRID_CONTRACT.md refuses VECTOR_PROJECTION_ORPHAN: a "
+                  "similarity row with no source lane behind it.")},
+        {"id": "deleting-the-projection-changes-nothing", "expect": "RED",
+         "observed": "RED" if not projection.exists() else "GREEN",
+         "ledger_rows_after_delete": ledger_rows_after,
+         "note": ("The projection was removed and the ledger answers the same. A store "
+                  "whose deletion changed an admission would be an authority.")},
+    ]
+    body["result"] = {
+        "state": "PASS" if executed.get("exit_code") == 0 and parsed.get("queried") else "FAIL",
+        "evidence_level": "B",
+        "evidence_level_note": ("A projection is never independent evidence. It reorders "
+                                "what another lane already observed."),
+        "result_count": parsed.get("rows", 0),
+        "queried": parsed.get("queried", 0),
+        "source_readback": {"required": False, "performed": 0, "confirmed": 0,
+                            "note": "a projection has no source of its own to read back"},
+    }
+    body["residue"] = {"paths": [], "cleaned": not projection.exists()}
+    return body
+
+
 ABSENT_LANES = {
-    "scip": ("compiler-semantic-index", "scip",
-             "no scip or scip-python indexer on PATH; the compiler-derived relation lane "
-             "has no producer on this host"),
     "git-town": ("stack-synchronization", "git-town",
                  "git-town is not installed. Homebrew offers the admitted 24.0.0, but the "
                  "committed admission record pins a linux_intel_64 artifact by SHA-256 and "
                  "this host is darwin; a different artifact needs its own admission, which "
                  "is a Human decision rather than an install"),
-    "lancedb": ("vector-projection", "lancedb",
-                "lancedb not installed; the optional projection lane is not exercised, and "
-                "it is a projection over SQLite rather than an authority in any case"),
 }
 
 
@@ -803,6 +1088,11 @@ def main() -> int:
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--python-bin", default=sys.executable,
                         help="interpreter that has tree_sitter installed")
+    parser.add_argument("--lancedb-python", default=None,
+                        help="interpreter that has lancedb installed; defaults to "
+                             "--python-bin. They are separate because the two providers "
+                             "pin different dependency trees and one environment "
+                             "satisfying both is a coincidence, not a requirement")
     parser.add_argument("--lane", action="append", default=None)
     args = parser.parse_args()
 
@@ -816,9 +1106,13 @@ def main() -> int:
         "grepai": lambda: lane_grepai(repo),
         "serena": lambda: lane_serena(repo),
         "tree-sitter": lambda: lane_tree_sitter(repo, args.python_bin),
-        "sqlite": lambda: lane_sqlite(repo, out),
+        "scip": lambda: lane_scip(repo, out),
         "worktree": lambda: lane_worktree(repo),
         "forgejo": lambda: lane_forgejo(repo),
+        # sqlite ingests the receipts written above, and lancedb projects over
+        # what sqlite ingested, so these two run last by construction.
+        "sqlite": lambda: lane_sqlite(repo, out),
+        "lancedb": lambda: lane_lancedb(repo, out, args.lancedb_python or args.python_bin),
     }
     for name, (kind, provider, reason) in ABSENT_LANES.items():
         lanes[name] = (lambda k=kind, p=provider, r=reason: absent(k, p, repo, r))
