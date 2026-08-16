@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 
 CORE_BEGIN = "## Portable procedural core"
-CORE_END = "## Evidence-state discipline"
+CORE_END = "## Hard laws and executable assertions"
 ATOM_IDS = [f"DL-{i:02d}" for i in range(1, 10)]
 LAW_IDS = [f"DL-L{i:02d}" for i in range(1, 11)]
 EVIDENCE_STATES = [

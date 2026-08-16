@@ -13,7 +13,7 @@ This Skill owns the delivery boundary between an implementation loop and an exte
 
 ## Portable procedural core
 
-The core method is deliberately independent of GitHub, a particular CI product, or a specific Agent host.
+The core method is deliberately independent of any particular forge, CI product, or Agent host.
 
 ```text
 DL-01 INTENT_BOUND
@@ -104,15 +104,22 @@ A domain module may instantiate `DL-01..DL-09`; it may not redefine those atoms 
 When GitHub is the selected forge, load [modules/github-domain.md](modules/github-domain.md) and the specialist modules it references. Existing executable surfaces remain authoritative for exact field shapes and exits:
 
 ```text
+scripts/README.md
+scripts/check_procedural_core.py
 scripts/github_delivery.py
 scripts/delivery_sync.py
+scripts/delivery_sync_impl.py
 scripts/local_verification.py
 scripts/github_actions_snapshot.py
 scripts/ci_publish_gate.py
 scripts/ci_publish.py
 scripts/ci_publish_guard.py
 scripts/ci_workflow_policy.py
+scripts/install-ci-publish-guard.py
+scripts/install-codex-merge-rule.sh
+scripts/link-canonical.sh
 scripts/merge_gate.py
+scripts/reference_causality.py
 ```
 
 The GitHub module maps these mechanisms onto the portable atoms; GitHub-specific implementation details are not universal procedure law.
