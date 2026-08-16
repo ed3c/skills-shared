@@ -72,6 +72,8 @@ python3 skills/repo-agent-native/scripts/check_adapter_receipts.py check
 step "prompt baseline record integrity"
 python3 skills/dual-forge-repository-loop/scripts/check_prompt_baseline.py selftest
 python3 skills/dual-forge-repository-loop/scripts/check_prompt_baseline.py check
+python3 skills/dual-forge-repository-loop/scripts/check_prompt_crossstack.py selftest
+python3 skills/dual-forge-repository-loop/scripts/check_prompt_crossstack.py check
 
 step "guard controls"
 python3 skills/shared-skills-infra/scripts/check_index.py --selftest

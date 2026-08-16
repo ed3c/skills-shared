@@ -1,7 +1,7 @@
 {
   "schema": "v2-1-crossstack-preregistration/v1",
   "preregistration_id": "v2-1-crossstack-2026-08",
-  "status": "FROZEN_NOT_EXECUTED",
+  "status": "EXECUTED_INDETERMINATE",
   "issue": 229,
   "_meta": {
     "why": "#225 measured one stack and returned NOT_ELIGIBLE. One stack cannot separate a property of the prompt from a property of the harness, so the same three arms run against the same frozen cases on a second, genuinely distinct stack.",
