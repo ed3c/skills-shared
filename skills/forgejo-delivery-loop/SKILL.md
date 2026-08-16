@@ -67,3 +67,21 @@ Stop on failed local verification, missing host capability, stale subject, seman
 ## Domain specialization
 
 See [modules/domain-profile.md](modules/domain-profile.md) for host-specific mechanics.
+
+## Mechanism index
+
+The portable core routes to these owned mechanisms without importing their host semantics into the bounded core:
+
+- `modules/README.md`
+- `modules/commit-role.md`
+- `modules/delivery-mechanism.md`
+- `modules/domain-profile.md`
+- `modules/forgejo-operations.md`
+- `scripts/README.md`
+- `scripts/agent_docs.py`
+- `scripts/issue_state.py`
+- `scripts/pre-commit-agent-docs.sh`
+- `scripts/route.ts`
+- `contracts/forgejo-issue-state-observation.v1.schema.json`
+- `contracts/forgejo-issue-state-readback-receipt.v1.schema.json`
+- `contracts/forgejo-terminal-issue-state-request.v2.schema.json`
