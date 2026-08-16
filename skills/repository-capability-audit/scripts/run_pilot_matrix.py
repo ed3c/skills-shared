@@ -142,6 +142,12 @@ def main() -> int:
         help="run one host family. For re-running cells that never reached a model "
              "because of a harness defect; not for retrying a cell that did.",
     )
+    parser.add_argument(
+        "--repetitions", type=int, default=0,
+        help="override the preregistered repetition count. The pilot froze 1; #228's "
+             "own matrix specifies 5. Passing this makes the run a different frozen "
+             "design, and the result records which.",
+    )
     args = parser.parse_args()
 
     for required in (PREREG, CORPUS, RESOLVER, EVALUATOR):
@@ -164,6 +170,10 @@ def main() -> int:
     for family in corpus["task_families"]:
         by_repo.setdefault(family["repository_id"], family)
     repositories = {r["repository_id"]: r for r in corpus["repositories"]}
+
+    repetitions = args.repetitions or prereg["matrix"]["repetitions"]
+    active_hosts = [h for h in hosts if not args.only_host or h["family"] == args.only_host]
+    total_cells = len(by_repo) * len(active_hosts) * repetitions * len(arms)
 
     args.output.mkdir(parents=True, exist_ok=True)
     cells: list[dict[str, Any]] = []
@@ -188,11 +198,13 @@ def main() -> int:
         for host in hosts:
             if args.only_host and host["family"] != args.only_host:
                 continue
-            for arm in arm_order(repository_id, host["family"], arms):
+            for repetition in range(1, repetitions + 1):
+              for arm in arm_order(repository_id, host["family"], arms):
                 if args.limit and count >= args.limit:
                     break
                 count += 1
-                cell_id = f"{repository_id.replace('/', '_')}__{host['family']}__{arm}"
+                cell_id = (f"{repository_id.replace('/', '_')}__{host['family']}"
+                           f"__{arm}__rep{repetition}")
                 workspace = args.output / "cells" / cell_id
                 if workspace.exists():
                     shutil.rmtree(workspace)
@@ -239,6 +251,7 @@ def main() -> int:
                     "host_family": host["family"],
                     "model": host["model"],
                     "arm": arm,
+                    "repetition": repetition,
                     "host_exit_code": result["exit_code"],
                     "scored": ok,
                     "failure_reason": None if ok else portable(evaluated.stderr)[-400:],
@@ -246,13 +259,14 @@ def main() -> int:
                     "treatment_sha256": sha256_text(treatment),
                     "treatment_bytes": len(treatment.encode("utf-8")),
                 })
-                print(f"cell {count}/18 {cell_id} scored={ok} "
+                print(f"cell {count}/{total_cells} {cell_id} scored={ok} "
                       f"found={metrics['material_defects_found'] if metrics else '-'}")
 
     report = {
         "schema": "rca-pilot-result/v1",
         "preregistration_id": prereg["preregistration_id"],
-        "status": "PILOT",
+        "status": "PILOT" if repetitions == 1 else "MATRIX",
+        "repetitions": repetitions,
         "corpus_id": corpus["corpus_id"],
         "cells": cells,
         "cell_count": len(cells),
