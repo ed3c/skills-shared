@@ -1,0 +1,43 @@
+{
+  "arm": "E_DELTA_CAPSULE_PLUS_HARNESS",
+  "cell_state": "SCORED",
+  "observation": {
+    "argv_shape": [
+      "codex",
+      "exec",
+      "--model",
+      "gpt-5.6-sol",
+      "--sandbox",
+      "read-only",
+      "--ephemeral",
+      "--skip-git-repo-check",
+      "-o",
+      "<REPO>/.arm-runs/codex-cli/codex-last-message-0-E_DELTA_CAPSULE_PLUS_HARNESS.txt",
+      "-"
+    ],
+    "cell_state": "SCORED",
+    "cost_observed": false,
+    "cost_usd": null,
+    "duration_ms": 40590,
+    "exit_code": 0,
+    "input_tokens": null,
+    "output_tokens": null,
+    "stderr_tail": "/check_meta_abstraction_eval.py\",\"skills/procedural-shadow-runtime/scripts/check_runtime_receipt.py\",\"skills/procedural-shadow-runtime/scripts/check_semantic_judge.py\"],\"non_claims\":[\"This evidence does not establish the files' correctness, runtime behavior, or state outside the pinned tree.\"],\"tree_sha\":\"0c37a6f475d5a300b4e0212c005b5708bb65e15f\"}\nhook: Stop\nhook: Stop Completed\ntokens used\n13,540",
+    "tool_calls": null,
+    "total_tokens": null
+  },
+  "prompt_digest": "0bd3163684fe1f2b58fe92806284ff03a93ae98e5f91ec85acb5c5b07210dda1",
+  "repetition": 0,
+  "response": "{\"answer\":[\"skills/procedural-shadow-runtime/scripts/check_agent_architecture_eval.py\",\"skills/procedural-shadow-runtime/scripts/check_meta_abstraction_eval.py\",\"skills/procedural-shadow-runtime/scripts/check_runtime_receipt.py\",\"skills/procedural-shadow-runtime/scripts/check_semantic_judge.py\"],\"evidence_paths\":[\"skills/procedural-shadow-runtime/scripts/check_agent_architecture_eval.py\",\"skills/procedural-shadow-runtime/scripts/check_meta_abstraction_eval.py\",\"skills/procedural-shadow-runtime/scripts/check_runtime_receipt.py\",\"skills/procedural-shadow-runtime/scripts/check_semantic_judge.py\"],\"non_claims\":[\"This evidence does not establish the files' correctness, runtime behavior, or state outside the pinned tree.\"],\"tree_sha\":\"0c37a6f475d5a300b4e0212c005b5708bb65e15f\"}",
+  "response_digest": "7bfc05c5b7c4ccb25dd8f67f1158873cb6c6d22fe3ed750cff6376040069acb9",
+  "score": {
+    "cited_paths": 8,
+    "evidence_packet_complete": true,
+    "exact_subject_continuity": true,
+    "fabricated": [],
+    "fabricated_paths": 0,
+    "false_pass_rate": 0.0,
+    "schema_ok": true,
+    "task_success": true
+  }
+}

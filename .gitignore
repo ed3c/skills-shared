@@ -16,3 +16,16 @@ sites.local.json
 # it was removed by hand before each of the first commits, and remembering that
 # every time is the wrong mechanism.
 skills/repo-agent-native/evals/receipts/*.sqlite3
+
+# Working directories the procedural-shadow-runtime adapters write to when a
+# caller points --output at the repository root. Everything a committed receipt
+# references by digest has been copied into evals/receipts/ and is verified
+# against that digest by tests/verify_arm_trials.py and verify_multimodal.py.
+# What stays here is the rest: per-cell handoff files the Codex adapter writes
+# then reads back, the generated Playwright driver, a retrieval cache, and
+# duplicate outputs from re-runs. None of it is referenced by anything, and
+# committing a cache would version a file whose whole purpose is to be stale.
+.arm-runs/
+.multimodal/
+.retrieval/
+.feedback/

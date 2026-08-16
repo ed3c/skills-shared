@@ -1,0 +1,46 @@
+{
+  "arm": "D_DELTA_CAPSULE",
+  "cell_state": "SCORED",
+  "observation": {
+    "argv_shape": [
+      "claude",
+      "-p",
+      "--model",
+      "opus",
+      "--output-format",
+      "json",
+      "--allowedTools",
+      "Read",
+      "Glob",
+      "Grep",
+      "Bash",
+      "--disallowedTools",
+      "Write",
+      "Edit",
+      "NotebookEdit"
+    ],
+    "cell_state": "SCORED",
+    "cost_observed": true,
+    "cost_usd": 0.32113099999999994,
+    "duration_ms": 16471,
+    "exit_code": 0,
+    "input_tokens": 4,
+    "output_tokens": 723,
+    "stderr_tail": "",
+    "tool_calls": 2
+  },
+  "prompt_digest": "f34736da1e0e3c15607d1e93a345b49502aef498109eef233d7e37a3e8a17d33",
+  "repetition": 0,
+  "response": "{\"answer\":[\"skills/procedural-shadow-runtime/scripts/check_agent_architecture_eval.py\",\"skills/procedural-shadow-runtime/scripts/check_meta_abstraction_eval.py\",\"skills/procedural-shadow-runtime/scripts/check_runtime_receipt.py\",\"skills/procedural-shadow-runtime/scripts/check_semantic_judge.py\"],\"evidence_paths\":[\"skills/procedural-shadow-runtime/scripts/\"],\"non_claims\":[\"The evidence is a recursive name listing of the pinned tree at skills/procedural-shadow-runtime/scripts/; it does not establish the contents, behavior, correctness, or executability of any listed file.\",\"It does not establish that files named 'check_*' exist elsewhere in the repository outside this directory, nor that none do.\",\"It does not establish that these filenames are unchanged at any other commit, branch, or the working tree; only at tree SHA 0c37a6f475d5a300b4e0212c005b5708bb65e15f.\",\"No file was opened or read, so no claim is made about what each script checks or whether it runs.\"],\"tree_sha\":\"0c37a6f475d5a300b4e0212c005b5708bb65e15f\"}",
+  "response_digest": "d9336a8c89335af24a727999cf986518073de2bc614c5a444fc1ca972b86e672",
+  "score": {
+    "cited_paths": 5,
+    "evidence_packet_complete": true,
+    "exact_subject_continuity": true,
+    "fabricated": [],
+    "fabricated_paths": 0,
+    "false_pass_rate": 0.0,
+    "schema_ok": true,
+    "task_success": true
+  }
+}

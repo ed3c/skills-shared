@@ -1,0 +1,46 @@
+{
+  "arm": "A_NO_SKILL",
+  "cell_state": "SCORED",
+  "observation": {
+    "argv_shape": [
+      "claude",
+      "-p",
+      "--model",
+      "opus",
+      "--output-format",
+      "json",
+      "--allowedTools",
+      "Read",
+      "Glob",
+      "Grep",
+      "Bash",
+      "--disallowedTools",
+      "Write",
+      "Edit",
+      "NotebookEdit"
+    ],
+    "cell_state": "SCORED",
+    "cost_observed": true,
+    "cost_usd": 0.34381,
+    "duration_ms": 18546,
+    "exit_code": 0,
+    "input_tokens": 6,
+    "output_tokens": 814,
+    "stderr_tail": "",
+    "tool_calls": 3
+  },
+  "prompt_digest": "0c99c42d47db5704ce881ba0a2ba91d720c71d66ad0502da923c69e7bcd97148",
+  "repetition": 0,
+  "response": "{\"answer\":[\"skills/procedural-shadow-runtime/scripts/check_agent_architecture_eval.py\",\"skills/procedural-shadow-runtime/scripts/check_meta_abstraction_eval.py\",\"skills/procedural-shadow-runtime/scripts/check_runtime_receipt.py\",\"skills/procedural-shadow-runtime/scripts/check_semantic_judge.py\"],\"evidence_paths\":[\"skills/procedural-shadow-runtime/scripts/\"],\"non_claims\":[\"Listing came from the working tree at HEAD (git rev-parse HEAD^{tree} = 0c37a6f475d5a300b4e0212c005b5708bb65e15f), not from a direct read of the pinned git object; untracked or locally modified files would not be distinguished.\",\"File contents were not read, so nothing is established about what these scripts do, whether they run, or whether they are referenced by any eval or gate.\",\"Only the 'check_' filename prefix was matched; files performing check-like roles under other names (e.g. verify_/gate_/validate_) are not covered.\",\"__pycache__ entries were excluded from the search, so any compiled artifacts with matching stems are not reported.\",\"No claim about other directories: only skills/procedural-shadow-runtime/scripts/ and its subdirectories were searched.\"],\"tree_sha\":\"0c37a6f475d5a300b4e0212c005b5708bb65e15f\"}",
+  "response_digest": "67ec2b025bc56f1c095c536dfb8426230a8206fc138005d3fbca18b814d3943f",
+  "score": {
+    "cited_paths": 5,
+    "evidence_packet_complete": true,
+    "exact_subject_continuity": true,
+    "fabricated": [],
+    "fabricated_paths": 0,
+    "false_pass_rate": 0.0,
+    "schema_ok": true,
+    "task_success": true
+  }
+}

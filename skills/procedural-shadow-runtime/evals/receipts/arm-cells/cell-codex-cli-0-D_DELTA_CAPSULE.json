@@ -1,0 +1,43 @@
+{
+  "arm": "D_DELTA_CAPSULE",
+  "cell_state": "SCORED",
+  "observation": {
+    "argv_shape": [
+      "codex",
+      "exec",
+      "--model",
+      "gpt-5.6-sol",
+      "--sandbox",
+      "read-only",
+      "--ephemeral",
+      "--skip-git-repo-check",
+      "-o",
+      "<REPO>/.arm-runs/codex-cli/codex-last-message-0-D_DELTA_CAPSULE.txt",
+      "-"
+    ],
+    "cell_state": "SCORED",
+    "cost_observed": false,
+    "cost_usd": null,
+    "duration_ms": 18412,
+    "exit_code": 0,
+    "input_tokens": null,
+    "output_tokens": null,
+    "stderr_tail": "receipt.py\",\"skills/procedural-shadow-runtime/scripts/check_semantic_judge.py\"],\"non_claims\":[\"The evidence does not establish the contents, correctness, executability, or runtime behavior of these files.\",\"The evidence does not establish the state of any tree other than the pinned tree SHA.\"],\"tree_sha\":\"0c37a6f475d5a300b4e0212c005b5708bb65e15f\"}\nhook: Stop\nhook: Stop Completed\ntokens used\n13,679",
+    "tool_calls": null,
+    "total_tokens": null
+  },
+  "prompt_digest": "f34736da1e0e3c15607d1e93a345b49502aef498109eef233d7e37a3e8a17d33",
+  "repetition": 0,
+  "response": "{\"answer\":[\"skills/procedural-shadow-runtime/scripts/check_agent_architecture_eval.py\",\"skills/procedural-shadow-runtime/scripts/check_meta_abstraction_eval.py\",\"skills/procedural-shadow-runtime/scripts/check_runtime_receipt.py\",\"skills/procedural-shadow-runtime/scripts/check_semantic_judge.py\"],\"evidence_paths\":[\"skills/procedural-shadow-runtime/scripts/check_agent_architecture_eval.py\",\"skills/procedural-shadow-runtime/scripts/check_meta_abstraction_eval.py\",\"skills/procedural-shadow-runtime/scripts/check_runtime_receipt.py\",\"skills/procedural-shadow-runtime/scripts/check_semantic_judge.py\"],\"non_claims\":[\"The evidence does not establish the contents, correctness, executability, or runtime behavior of these files.\",\"The evidence does not establish the state of any tree other than the pinned tree SHA.\"],\"tree_sha\":\"0c37a6f475d5a300b4e0212c005b5708bb65e15f\"}",
+  "response_digest": "90ae7bcb28e65784c3d2090adb3cb7de3e702a0d1dc8b00e35177001737c64b9",
+  "score": {
+    "cited_paths": 8,
+    "evidence_packet_complete": true,
+    "exact_subject_continuity": true,
+    "fabricated": [],
+    "fabricated_paths": 0,
+    "false_pass_rate": 0.0,
+    "schema_ok": true,
+    "task_success": true
+  }
+}

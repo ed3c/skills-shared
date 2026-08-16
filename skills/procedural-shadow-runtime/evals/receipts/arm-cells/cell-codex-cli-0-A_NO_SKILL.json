@@ -1,0 +1,43 @@
+{
+  "arm": "A_NO_SKILL",
+  "cell_state": "SCORED",
+  "observation": {
+    "argv_shape": [
+      "codex",
+      "exec",
+      "--model",
+      "gpt-5.6-sol",
+      "--sandbox",
+      "read-only",
+      "--ephemeral",
+      "--skip-git-repo-check",
+      "-o",
+      "<REPO>/.arm-runs/codex-cli/codex-last-message-0-A_NO_SKILL.txt",
+      "-"
+    ],
+    "cell_state": "SCORED",
+    "cost_observed": false,
+    "cost_usd": null,
+    "duration_ms": 25568,
+    "exit_code": 0,
+    "input_tokens": null,
+    "output_tokens": null,
+    "stderr_tail": "runtime_receipt.py\",\"skills/procedural-shadow-runtime/scripts/check_semantic_judge.py\"],\"non_claims\":[\"The evidence does not establish the contents, behavior, executability, or correctness of these files.\",\"The evidence does not establish the state of any tree other than the pinned tree SHA.\"],\"tree_sha\":\"0c37a6f475d5a300b4e0212c005b5708bb65e15f\"}\nhook: Stop\nhook: Stop Completed\ntokens used\n14,566",
+    "tool_calls": null,
+    "total_tokens": null
+  },
+  "prompt_digest": "0c99c42d47db5704ce881ba0a2ba91d720c71d66ad0502da923c69e7bcd97148",
+  "repetition": 0,
+  "response": "{\"answer\":[\"skills/procedural-shadow-runtime/scripts/check_agent_architecture_eval.py\",\"skills/procedural-shadow-runtime/scripts/check_meta_abstraction_eval.py\",\"skills/procedural-shadow-runtime/scripts/check_runtime_receipt.py\",\"skills/procedural-shadow-runtime/scripts/check_semantic_judge.py\"],\"evidence_paths\":[\"skills/procedural-shadow-runtime/scripts/check_agent_architecture_eval.py\",\"skills/procedural-shadow-runtime/scripts/check_meta_abstraction_eval.py\",\"skills/procedural-shadow-runtime/scripts/check_runtime_receipt.py\",\"skills/procedural-shadow-runtime/scripts/check_semantic_judge.py\"],\"non_claims\":[\"The evidence does not establish the contents, behavior, executability, or correctness of these files.\",\"The evidence does not establish the state of any tree other than the pinned tree SHA.\"],\"tree_sha\":\"0c37a6f475d5a300b4e0212c005b5708bb65e15f\"}",
+  "response_digest": "e7e4a93e9dd22a03bba0e944d91fe1560c31a7e3c3c955e942593083bf8459ad",
+  "score": {
+    "cited_paths": 8,
+    "evidence_packet_complete": true,
+    "exact_subject_continuity": true,
+    "fabricated": [],
+    "fabricated_paths": 0,
+    "false_pass_rate": 0.0,
+    "schema_ok": true,
+    "task_success": true
+  }
+}

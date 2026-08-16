@@ -7,6 +7,8 @@ here is decidable from the checkout.
 """
 from __future__ import annotations
 
+import hashlib
+import json
 import subprocess
 import sys
 from pathlib import Path
@@ -47,5 +49,33 @@ for arm in ("A_NO_SKILL", "B_METADATA_ONLY", "C_FULL_SKILL",
 if "DRY-RUN GREEN" not in plan.stdout:
     raise SystemExit(f"dry-run: no green line\n{plan.stdout}")
 
+# Each committed matrix receipt records a response_digest per cell. The response
+# it digests has to exist somewhere, or the digest is a claim about text nobody
+# can check. The cells live beside the receipts and are verified against it.
+RECEIPTS = Path(__file__).resolve().parents[1] / "evals" / "receipts"
+CELLS = RECEIPTS / "arm-cells"
+verified = 0
+for receipt_path in sorted(RECEIPTS.glob("arm-trials-*.json")):
+    receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+    host = receipt["trial_matrix"]["host"]
+    for cell in receipt["trial_matrix"]["cells"]:
+        cell_path = CELLS / f"cell-{host}-{cell['repetition']}-{cell['arm']}.json"
+        if not cell_path.is_file():
+            raise SystemExit(
+                f"{receipt_path.name} records a response_digest for {host}/{cell['arm']} "
+                f"but {cell_path.name} is not committed"
+            )
+        stored = json.loads(cell_path.read_text(encoding="utf-8"))
+        actual = hashlib.sha256(stored["response"].encode()).hexdigest()
+        if actual != cell["response_digest"]:
+            raise SystemExit(
+                f"{cell_path.name}: receipt records {cell['response_digest'][:12]}, "
+                f"the committed response hashes to {actual[:12]}"
+            )
+        if stored["score"] != cell["score"]:
+            raise SystemExit(f"{cell_path.name}: committed score disagrees with the receipt")
+        verified += 1
+
 print("ARM TRIALS GREEN: selftest passes; absent input exits 64; "
-      "the dry-run plan resolves all five arms without invoking a host")
+      "the dry-run plan resolves all five arms without invoking a host; "
+      f"{verified} committed cell response(s) hash to the digest their receipt records")

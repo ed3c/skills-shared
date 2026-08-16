@@ -13,6 +13,8 @@ receipts live in `evals/receipts/`.
 """
 from __future__ import annotations
 
+import hashlib
+import json
 import re
 import subprocess
 import sys
@@ -66,5 +68,39 @@ states = {
 if states["truthful.html"] == states["lookalike.html"]:
     raise SystemExit(f"look-alike fixtures no longer disagree on machine state: {states}")
 
+# Every image a committed bundle references by digest must exist and match it.
+# A bundle recording sha256 for a file that is not in the repository is a claim
+# about bytes nobody can check -- the shape of evidence this Skill exists to
+# refuse, arriving through its own artefacts.
+RECEIPTS = SKILL / "evals" / "receipts"
+ARTIFACTS = RECEIPTS / "multimodal"
+checked = 0
+digests = {}
+for bundle_path in sorted(RECEIPTS.glob("multimodal-browser-*.json")):
+    bundle = json.loads(bundle_path.read_text(encoding="utf-8"))
+    for name, artifact in bundle["artifacts"].items():
+        if artifact["kind"] not in {"SCREENSHOT", "VIDEO", "VISUAL_DIFF"}:
+            continue
+        artifact_path = ARTIFACTS / artifact["path"]
+        if not artifact_path.is_file():
+            raise SystemExit(
+                f"{bundle_path.name} references {artifact['path']} by digest, but no such "
+                f"artifact is committed under {ARTIFACTS.name}/"
+            )
+        actual = hashlib.sha256(artifact_path.read_bytes()).hexdigest()
+        if actual != artifact["sha256"]:
+            raise SystemExit(f"{artifact['path']}: recorded {artifact['sha256'][:12]}, "
+                             f"file is {actual[:12]}")
+        digests[artifact["path"]] = actual
+        checked += 1
+
+# The look-alike control only means something while the two images are the same
+# bytes. Asserting it on the committed artifacts, not only on the markup, is
+# what makes the claim checkable by someone who never runs a browser.
+if len(digests) == 2 and len(set(digests.values())) != 1:
+    raise SystemExit(f"committed screenshots are no longer byte-identical: {digests}")
+
 print("MULTIMODAL GREEN: selftest passes; absent input and absent lane exit 64; "
-      f"fixture pair renders identically while disagreeing on state {states}")
+      f"fixture pair renders identically while disagreeing on state {states}; "
+      f"{checked} committed image artifact(s) match their recorded digests and the "
+      "look-alike pair is still byte-identical")
