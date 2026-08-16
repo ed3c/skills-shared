@@ -192,6 +192,19 @@ def monitor_plan(issue_packet: list[dict[str, Any]]) -> dict[str, Any]:
         if not isinstance(deps, list) or any(not isinstance(dep, str) for dep in deps):
             raise ControlPlaneError(f"invalid depends_on for {identity}")
         by_id[identity] = item
+
+    # Dependency closure is part of the exact input subject. This planner is
+    # intentionally zero-network, so an absent dependency cannot be inferred as
+    # closed from provider state. Without this check, "absent" and "included +
+    # closed" collapse to the same scheduling result and a blocker can vanish
+    # from the packet without turning the plan red.
+    for identity, item in by_id.items():
+        for dep in item.get("depends_on", []):
+            if dep == identity:
+                raise ControlPlaneError(f"self dependency: {identity} -> {dep}")
+            if dep not in by_id:
+                raise ControlPlaneError(f"missing dependency closure: {identity} -> {dep}")
+
     open_ids = {
         identity
         for identity, item in by_id.items()
@@ -205,7 +218,7 @@ def monitor_plan(issue_packet: list[dict[str, Any]]) -> dict[str, Any]:
             if all(dep not in unresolved for dep in by_id[identity].get("depends_on", []))
         )
         if not ready:
-            raise ControlPlaneError("unfinished-issue dependency cycle or missing closure")
+            raise ControlPlaneError("unfinished-issue dependency cycle")
         waves.append(ready)
         unresolved.difference_update(ready)
     return {
