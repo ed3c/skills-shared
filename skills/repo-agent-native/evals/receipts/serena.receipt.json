@@ -3,7 +3,7 @@
     "config_identity": {
       "language": "python",
       "project_config": ".serena/project.yml",
-      "project_config_sha256": "1b0cc42822f9ba640ebe3d21b1259c966b708c6729b21a93f245145ad672515a"
+      "project_config_sha256": "6947b187e6b3481f6d0a03e8f2581e8ac7140eb85744caa497025654538dac38"
     },
     "executable": "/Users/neon/.local/bin/serena",
     "executable_sha256": "d777582f3b832329d04388bee222d905b3e110a6b4fdcd1df2aeec4007d9454b",
@@ -17,7 +17,7 @@
   },
   "controls": [
     {
-      "coverage": "python=270",
+      "coverage": "python=296",
       "expect": "coverage is reported per language rather than as completeness",
       "id": "language-coverage-declared",
       "note": "266 Python files is not the repository. Markdown, JSON, shell and TypeScript carry contracts here and are outside this lane, so a Serena miss is not an absence proof.",
@@ -29,17 +29,17 @@
       "/Users/neon/.local/bin/serena",
       "project",
       "index",
-      "/Users/neon/skills-shared/.claude/worktrees/batch-tl-v21",
+      "/Users/neon/skills-shared/.claude/worktrees/lanes-256",
       "--log-level",
       "ERROR"
     ],
-    "cwd": "/Users/neon/skills-shared/.claude/worktrees/batch-tl-v21",
-    "duration_ms": 1729,
+    "cwd": "/Users/neon/skills-shared/.claude/worktrees/lanes-256",
+    "duration_ms": 1743,
     "exit_code": 0,
-    "stderr_bytes": 289,
-    "stderr_sha256": "c6aa20dac99d9a81e66e9ecbbfce3abccae4513006daca756b60426540567eea",
-    "stdout_bytes": 162,
-    "stdout_sha256": "fb1af3c27b6f65de67d392a7632f303c81298f61e10e1777ad7c2526e49783b4",
+    "stderr_bytes": 133,
+    "stderr_sha256": "0a0d916febcb3168132d7c85cde5075e007429f93cb026afeee4f31936ced737",
+    "stdout_bytes": 149,
+    "stdout_sha256": "0a7526ef5000c8716d7da547307bca2947e7994f3b97e0958c4e6df3bfeabc81",
     "terminal_state": "COMPLETED"
   },
   "policy": {
@@ -86,8 +86,8 @@
   "result": {
     "evidence_level": "B",
     "evidence_level_note": "This lane builds an index and enumerates a tool surface. It answers no symbol query, so it produces no fact and cannot be A-. Serena's find_symbol and find_referencing_symbols live on the MCP surface, not the CLI, so an A- claim from a CLI capture would be a level the run cannot support -- the checker refuses it, which is how this was caught.",
-    "language_coverage": "python=270",
-    "result_count": 270,
+    "language_coverage": "python=296",
+    "result_count": 296,
     "source_readback": {
       "confirmed": 0,
       "note": "index build only; nothing was promoted to a fact",
@@ -98,11 +98,11 @@
   },
   "schema": "repo-agent-native/adapter-receipt/v1",
   "subject": {
-    "commit_sha": "bb3820ee9bebed9f5c50f492fc1cf71e100feb9c",
+    "commit_sha": "f50b2b9822db9e534169b5e63b523d940b32bb3c",
     "dirty_excluded": "skills/repo-agent-native/evals/receipts",
     "dirty_paths": 0,
     "repository": "ed3c/skills-shared",
-    "tree_sha": "1d83902810cd316b5c3eae834fee88dd2f975a4c",
-    "workspace_root": "/Users/neon/skills-shared/.claude/worktrees/batch-tl-v21"
+    "tree_sha": "42f289d44c1befefc9bdfb0bacf88a26a01b198a",
+    "workspace_root": "/Users/neon/skills-shared/.claude/worktrees/lanes-256"
   }
 }

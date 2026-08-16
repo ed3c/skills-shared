@@ -37,10 +37,10 @@
       "/private/tmp/claude-501/-Users-neon-skills-shared/be798cf5-1d89-4180-a2a3-3b76cd35b6c8/scratchpad/tsenv/bin/python",
       "-c",
       "import json,sys,hashlib\nimport tree_sitter, tree_sitter_python\nfrom tree_sitter import Language, Parser\nfrom pathlib import Path\ntarget = Path(sys.argv[1])\nsrc = target.read_bytes()\nlang = Language(tree_sitter_python.language())\ntree = Parser(lang).parse(src)\ndefs = []\ndef walk(node):\n    if node.type in ('function_definition','class_definition'):\n        name = node.child_by_field_name('name')\n        defs.append({'type': node.type,\n                     'name': src[name.start_byte:name.end_byte].decode(),\n                     'start_byte': node.start_byte, 'end_byte': node.end_byte,\n                     'start_line': node.start_point[0] + 1,\n                     'end_line': node.end_point[0] + 1})\n    for child in node.children:\n        walk(child)\nwalk(tree.root_node)\nprint(json.dumps({'grammar': 'python', 'tree_sitter': tree_sitter.__version__,\n                  'grammar_version': tree_sitter_python.__version__ if hasattr(tree_sitter_python,'__version__') else 'unknown',\n                  'has_error': tree.root_node.has_error,\n                  'source_sha256': hashlib.sha256(src).hexdigest(),\n                  'source_bytes': len(src), 'definitions': defs}))\n",
-      "/Users/neon/skills-shared/.claude/worktrees/batch-tl-v21/skills/dual-forge-repository-loop/scripts/compile_tech_lead_plan.py"
+      "/Users/neon/skills-shared/.claude/worktrees/lanes-256/skills/dual-forge-repository-loop/scripts/compile_tech_lead_plan.py"
     ],
-    "cwd": "/Users/neon/skills-shared/.claude/worktrees/batch-tl-v21",
-    "duration_ms": 70,
+    "cwd": "/Users/neon/skills-shared/.claude/worktrees/lanes-256",
+    "duration_ms": 72,
     "exit_code": 0,
     "stderr_bytes": 0,
     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -174,11 +174,11 @@
   },
   "schema": "repo-agent-native/adapter-receipt/v1",
   "subject": {
-    "commit_sha": "bb3820ee9bebed9f5c50f492fc1cf71e100feb9c",
+    "commit_sha": "f50b2b9822db9e534169b5e63b523d940b32bb3c",
     "dirty_excluded": "skills/repo-agent-native/evals/receipts",
     "dirty_paths": 0,
     "repository": "ed3c/skills-shared",
-    "tree_sha": "1d83902810cd316b5c3eae834fee88dd2f975a4c",
-    "workspace_root": "/Users/neon/skills-shared/.claude/worktrees/batch-tl-v21"
+    "tree_sha": "42f289d44c1befefc9bdfb0bacf88a26a01b198a",
+    "workspace_root": "/Users/neon/skills-shared/.claude/worktrees/lanes-256"
   }
 }

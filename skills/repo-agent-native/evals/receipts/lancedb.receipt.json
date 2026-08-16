@@ -1,23 +1,65 @@
 {
   "adapter": {
-    "executable": null,
-    "executable_sha256": null,
+    "config_identity": {
+      "interpreter": "/private/tmp/claude-501/-Users-neon-skills-shared/be798cf5-1d89-4180-a2a3-3b76cd35b6c8/scratchpad/lancedb-env/bin/python",
+      "source_lane": "sqlite adapter-evidence-ledger",
+      "store": "lancedb",
+      "tables": [
+        "lane_projection"
+      ]
+    },
+    "executable": "/private/tmp/claude-501/-Users-neon-skills-shared/be798cf5-1d89-4180-a2a3-3b76cd35b6c8/scratchpad/lancedb-env/bin/python",
+    "executable_sha256": "01ae36c38b5c824af906dac099d35ca97d5926017f7d0dbe4b4431903646b059",
     "kind": "vector-projection",
     "provider": "lancedb",
-    "version": null
+    "version": "lancedb 0.37.1"
   },
   "budgets": {
-    "max_output_bytes": 0,
-    "timeout_seconds": 0
+    "max_output_bytes": 262144,
+    "timeout_seconds": 300
   },
-  "controls": [],
+  "controls": [
+    {
+      "expect": "RED",
+      "id": "projection-has-a-source-lane",
+      "note": "BLINDSPOT_HYBRID_CONTRACT.md refuses VECTOR_PROJECTION_ORPHAN: a similarity row with no source lane behind it.",
+      "observed": "RED",
+      "source_rows": 9
+    },
+    {
+      "expect": "RED",
+      "id": "deleting-the-projection-changes-nothing",
+      "ledger_rows_after_delete": 9,
+      "note": "The projection was removed and the ledger answers the same. A store whose deletion changed an admission would be an authority.",
+      "observed": "RED"
+    }
+  ],
   "execution": {
-    "exit_code": null,
-    "terminal_state": "NOT_STARTED"
+    "argv": [
+      "/private/tmp/claude-501/-Users-neon-skills-shared/be798cf5-1d89-4180-a2a3-3b76cd35b6c8/scratchpad/lancedb-env/bin/python",
+      "-c",
+      "import json, sys, shutil\nfrom pathlib import Path\nimport lancedb, pyarrow as pa\nroot = Path(sys.argv[1]) / 'lancedb'\nshutil.rmtree(root, ignore_errors=True)\nrows = json.loads(sys.argv[2])\ndb = lancedb.connect(str(root))\ntable = db.create_table('lane_projection', data=rows)\nqueried = table.search().limit(100).to_list()\nprint(json.dumps({'version': lancedb.__version__, 'rows': len(rows),\n                  'queried': len(queried),\n                  'tables': db.table_names()}))\n",
+      "/Users/neon/skills-shared/.claude/worktrees/lanes-256/skills/repo-agent-native/evals/receipts",
+      "[{\"lane\": \"private-lane-publication\", \"provider\": \"forgejo\", \"state\": \"PASS\", \"vector\": [24.0, 7.0]}, {\"lane\": \"stack-synchronization\", \"provider\": \"git-town\", \"state\": \"ABSENT\", \"vector\": [21.0, 8.0]}, {\"lane\": \"semantic-intent-search\", \"provider\": \"grepai\", \"state\": \"PASS\", \"vector\": [22.0, 6.0]}, {\"lane\": \"vector-projection\", \"provider\": \"lancedb\", \"state\": \"PASS\", \"vector\": [17.0, 7.0]}, {\"lane\": \"compiler-semantic-index\", \"provider\": \"scip\", \"state\": \"PASS\", \"vector\": [23.0, 4.0]}, {\"lane\": \"symbol-lsp\", \"provider\": \"serena\", \"state\": \"PASS\", \"vector\": [10.0, 6.0]}, {\"lane\": \"evidence-ledger\", \"provider\": \"sqlite\", \"state\": \"PASS\", \"vector\": [15.0, 6.0]}, {\"lane\": \"syntax-slice\", \"provider\": \"tree-sitter\", \"state\": \"PASS\", \"vector\": [12.0, 11.0]}, {\"lane\": \"worker-execution\", \"provider\": \"git-worktree\", \"state\": \"PASS\", \"vector\": [16.0, 12.0]}]"
+    ],
+    "cwd": "/Users/neon/skills-shared/.claude/worktrees/lanes-256",
+    "duration_ms": 1271,
+    "exit_code": 0,
+    "stderr_bytes": 88,
+    "stderr_sha256": "8e71995daffe1df3bfcefbd4af8aa4a83235361d27904d41114ef34aadaf54b6",
+    "stdout_bytes": 78,
+    "stdout_sha256": "14339da3664c38797b4bcc49b6210bb524b36028b04c47f75b13f51bac290d68",
+    "terminal_state": "COMPLETED"
   },
   "policy": {
-    "allowed_argv": [],
-    "filesystem": "none",
+    "allowed_argv": [
+      [
+        "/private/tmp/claude-501/-Users-neon-skills-shared/be798cf5-1d89-4180-a2a3-3b76cd35b6c8/scratchpad/lancedb-env/bin/python",
+        "-c",
+        "<projection probe>"
+      ]
+    ],
+    "filesystem": "read-write-within-output",
     "network": "none",
     "secrets": "none"
   },
@@ -26,23 +68,25 @@
     "paths": []
   },
   "result": {
-    "detail": "lancedb not installed; the optional projection lane is not exercised, and it is a projection over SQLite rather than an authority in any case",
-    "evidence_level": null,
-    "result_count": 0,
+    "evidence_level": "B",
+    "evidence_level_note": "A projection is never independent evidence. It reorders what another lane already observed.",
+    "queried": 9,
+    "result_count": 9,
     "source_readback": {
       "confirmed": 0,
+      "note": "a projection has no source of its own to read back",
       "performed": 0,
       "required": false
     },
-    "state": "ABSENT"
+    "state": "PASS"
   },
   "schema": "repo-agent-native/adapter-receipt/v1",
   "subject": {
-    "commit_sha": "bb3820ee9bebed9f5c50f492fc1cf71e100feb9c",
+    "commit_sha": "f50b2b9822db9e534169b5e63b523d940b32bb3c",
     "dirty_excluded": "skills/repo-agent-native/evals/receipts",
     "dirty_paths": 0,
     "repository": "ed3c/skills-shared",
-    "tree_sha": "1d83902810cd316b5c3eae834fee88dd2f975a4c",
-    "workspace_root": "/Users/neon/skills-shared/.claude/worktrees/batch-tl-v21"
+    "tree_sha": "42f289d44c1befefc9bdfb0bacf88a26a01b198a",
+    "workspace_root": "/Users/neon/skills-shared/.claude/worktrees/lanes-256"
   }
 }

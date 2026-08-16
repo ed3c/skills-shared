@@ -38,11 +38,11 @@
   },
   "schema": "repo-agent-native/adapter-receipt/v1",
   "subject": {
-    "commit_sha": "bb3820ee9bebed9f5c50f492fc1cf71e100feb9c",
+    "commit_sha": "f50b2b9822db9e534169b5e63b523d940b32bb3c",
     "dirty_excluded": "skills/repo-agent-native/evals/receipts",
     "dirty_paths": 0,
     "repository": "ed3c/skills-shared",
-    "tree_sha": "1d83902810cd316b5c3eae834fee88dd2f975a4c",
-    "workspace_root": "/Users/neon/skills-shared/.claude/worktrees/batch-tl-v21"
+    "tree_sha": "42f289d44c1befefc9bdfb0bacf88a26a01b198a",
+    "workspace_root": "/Users/neon/skills-shared/.claude/worktrees/lanes-256"
   }
 }
