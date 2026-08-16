@@ -6,8 +6,9 @@ Exit codes:
   2  contract violation
  64  absent/malformed input
 
-The checker proves archive-independence of the declared handoff shape. It does
-not prove that a local runtime actually executed the handoff.
+The checker proves that every required local-handoff input is a repository path,
+is actually tracked by Git, and matches its declared SHA-256. It also refuses
+archive/base64/opaque external inputs. It does not prove a local runtime ran.
 """
 from __future__ import annotations
 
@@ -16,8 +17,8 @@ import copy
 import hashlib
 import json
 import re
+import subprocess
 import sys
-import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -49,7 +50,25 @@ def safe_repo_path(value: Any, label: str) -> str:
     return value
 
 
-def evaluate(doc: dict[str, Any]) -> None:
+def git_tracked(repo_root: Path, path: str) -> bool:
+    result = subprocess.run(
+        ["git", "-C", str(repo_root), "ls-files", "--error-unmatch", "--", path],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        check=False,
+    )
+    return result.returncode == 0
+
+
+def sha256_file(path: Path) -> str:
+    h = hashlib.sha256()
+    with path.open("rb") as fh:
+        for chunk in iter(lambda: fh.read(1024 * 1024), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def evaluate(doc: dict[str, Any], repo_root: Path | None = None) -> None:
     if doc.get("schema") != "repository-native-local-handoff/v1":
         refuse("schema must be repository-native-local-handoff/v1")
     repository = doc.get("repository")
@@ -76,8 +95,18 @@ def evaluate(doc: dict[str, Any]) -> None:
         seen.add(path)
         if item.get("git_tracked") is not True:
             refuse(f"required input must declare git_tracked=true: {path}")
-        if not SHA256.fullmatch(str(item.get("sha256", ""))):
+        digest = str(item.get("sha256", ""))
+        if not SHA256.fullmatch(digest):
             refuse(f"required input must carry exact sha256: {path}")
+        if repo_root is not None:
+            target = repo_root / path
+            if not target.is_file():
+                refuse(f"required input is absent from checkout: {path}")
+            if not git_tracked(repo_root, path):
+                refuse(f"required input is not Git-tracked: {path}")
+            actual = sha256_file(target)
+            if actual != digest:
+                refuse(f"required input digest mismatch: {path} expected={digest} actual={actual}")
 
     entrypoint = safe_repo_path(doc.get("entrypoint"), "entrypoint")
     if entrypoint not in seen:
@@ -161,6 +190,7 @@ def selftest() -> None:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("manifest", nargs="?")
+    parser.add_argument("--repo-root", default=None)
     parser.add_argument("--selftest", action="store_true")
     args = parser.parse_args()
     if args.selftest:
@@ -168,13 +198,15 @@ def main() -> int:
         return 0
     if not args.manifest:
         return 64
-    doc = load(Path(args.manifest))
+    manifest = Path(args.manifest).resolve()
+    repo_root = Path(args.repo_root).resolve() if args.repo_root else Path.cwd().resolve()
+    doc = load(manifest)
     try:
-        evaluate(doc)
+        evaluate(doc, repo_root=repo_root)
     except Invalid as e:
         print(f"LOCAL-HANDOFF-RED {e}")
         return 2
-    print("LOCAL-HANDOFF-GREEN repository-native; archives are optional exports only")
+    print("LOCAL-HANDOFF-GREEN repository-native; tracked bytes verified; archives optional only")
     return 0
 
 
