@@ -4,11 +4,13 @@ These Bun + TypeScript programs are deterministic hard gates for the portable Sk
 
 ## `validate-skill.ts`
 
-Input: a Skill directory. Output: a JSON receipt at a caller-selected existing parent directory. It validates portable frontmatter, the line budget, required procedure sections, Markdown link closure, bundled assertion files, the four optional-provider module contracts, and the admitted module-routing case inventory. The immutable legacy baseline remains addressable by the Git identity in `evals/baseline.json` rather than a second Markdown copy.
+Input: a Skill directory. Output: a JSON receipt at a caller-selected existing parent directory. It validates portable frontmatter, the line budget, required procedure sections, Markdown link closure, bundled assertion files, the active optional-module contracts, and the admitted module-routing case inventory. The immutable legacy baseline remains addressable by the Git identity in `evals/baseline.json` rather than a second Markdown copy.
 
 ```bash
 bun scripts/validate-skill.ts --skill-root . --json <skill-receipt.json>
 ```
+
+The active capability set is grepai, Serena, SCIP, Tree-sitter, SQLite code projection, the composed compiler-truth context funnel, and mem0. Code-Graph-RAG is not a required or routable module.
 
 ## `assert-output.ts`
 
@@ -70,4 +72,4 @@ Exit `0` is a bounded comparison PASS, not release admission. The receipt names 
 
 Repository-level normalization, deterministic replay, 24-cell aggregation, canonical run traces, verifier receipts, and evidence bundles are owned by `../../../evals/`, not this portable package. Use `evals/verifiers/verify_repo_agent_native_output.py`, `evals/adapters/normalize_repo_agent_native.py`, and `evals/adapters/summarize_repo_agent_native_matrix.py` from a skills-shared checkout. These root mechanisms are deliberately not portable-package dependencies.
 
-`no_skill` means no Skill package is installed. It does **not** mean the carrier automatically knows the procedure, invokes grepai/Serena/Code-Graph-RAG/mem0, or receives expected answers. All four conditions receive the same task, exact subject identity, and output-schema adapter so they remain deterministically evaluable. Optional providers are explicitly forbidden in this fixture; their integration requires separate degradation and freshness cases.
+`no_skill` means no Skill package is installed. It does **not** mean the carrier automatically knows the procedure, invokes optional compiler-truth modules, or receives expected answers. All four conditions receive the same task, exact subject identity, and output-schema adapter so they remain deterministically evaluable. Optional providers are explicitly forbidden in this fixture; their integration requires separate degradation, coverage, freshness, and subject-mismatch cases.

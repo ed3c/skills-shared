@@ -4,9 +4,9 @@
   "cases": [
     {
       "id": "MODULE-GREPAI-TRIGGER",
-      "prompt": "Exact grep is noisy. Use semantic intent search to find retry-budget enforcement, but verify every accepted claim against current source.",
+      "prompt": "Exact grep is noisy. Use semantic intent search to find retry-budget enforcement, then verify every accepted claim against current source.",
       "expected_modules": ["grepai"],
-      "forbidden_modules": ["mem0", "code-graph-rag"],
+      "forbidden_modules": ["mem0"],
       "required_behavior": ["index health checked", "source read-back", "candidate evidence ceiling"]
     },
     {
@@ -17,10 +17,28 @@
       "required_behavior": ["project identity checked", "language health checked", "source read-back"]
     },
     {
-      "id": "MODULE-GRAPH-TRIGGER",
-      "prompt": "Trace the cross-package call and data-flow path from API retry configuration to emitted metrics across languages.",
-      "expected_modules": ["code-graph-rag"],
-      "required_behavior": ["graph freshness checked", "bounded graph query", "endpoint source read-back"]
+      "id": "MODULE-SCIP-TRIGGER",
+      "prompt": "Use the exact-subject compiler index to trace global symbols, type relations and downstream references across packages.",
+      "expected_modules": ["scip"],
+      "required_behavior": ["indexer identity checked", "subject and coverage checked", "endpoint source read-back"]
+    },
+    {
+      "id": "MODULE-TREE-SITTER-TRIGGER",
+      "prompt": "Extract function signatures, AST ranges and dependency skeletons from partially edited source without claiming cross-file type truth.",
+      "expected_modules": ["tree-sitter"],
+      "required_behavior": ["grammar identity checked", "parse warnings visible", "exact-byte source ranges"]
+    },
+    {
+      "id": "MODULE-SQLITE-TRIGGER",
+      "prompt": "Store normalized subject-bound symbols, edges and tests in a rebuildable embedded projection, then run a bounded traversal.",
+      "expected_modules": ["sqlite-code-index"],
+      "required_behavior": ["schema and subject checked", "integrity is not semantic truth", "bounded query"]
+    },
+    {
+      "id": "MODULE-CONTEXT-FUNNEL-TRIGGER",
+      "prompt": "Turn this fuzzy brownfield request into a bounded exact-subject context bundle using intent candidates, semantic edges, AST skeletons and a rebuildable projection.",
+      "expected_modules": ["compiler-truth-context-funnel", "grepai", "scip", "tree-sitter", "sqlite-code-index"],
+      "required_behavior": ["single immutable subject", "source read-back before promotion", "per-stage evidence ceilings", "context budget"]
     },
     {
       "id": "MODULE-MEM0-TRIGGER",
@@ -30,7 +48,7 @@
     },
     {
       "id": "MODULE-CORE-ONLY",
-      "prompt": "Inspect these two known files and extract their source-anchored invariants. No semantic, graph, symbol, or prior-memory capability is needed.",
+      "prompt": "Inspect these two known files and extract their source-anchored invariants. No semantic, symbol, index, AST projection, or prior-memory capability is needed.",
       "expected_modules": [],
       "required_behavior": ["core-only", "direct source read"]
     },
@@ -49,11 +67,39 @@
       "required_fallback": "tier-0-source"
     },
     {
-      "id": "MODULE-GRAPH-INCOMPLETE",
-      "prompt": "Use the graph for an impact claim, but its build excludes one package in the requested scope.",
-      "expected_modules": ["code-graph-rag"],
-      "required_failure": "INCOMPLETE_GRAPH",
-      "required_behavior": ["no graph-only fact", "fallback or open question"]
+      "id": "MODULE-SCIP-STALE",
+      "prompt": "Use a SCIP index whose repository commit differs from the requested subject.",
+      "expected_modules": ["scip"],
+      "required_failure": "STALE_SUBJECT",
+      "required_fallback": "native-lsp-or-source"
+    },
+    {
+      "id": "MODULE-SCIP-COVERAGE-GAP",
+      "prompt": "The requested impact path crosses a language/package excluded from the compiler index.",
+      "expected_modules": ["scip"],
+      "required_failure": "PARTIAL_LANGUAGE_COVERAGE",
+      "required_behavior": ["no completeness claim", "unresolved edge visible"]
+    },
+    {
+      "id": "MODULE-TREE-SITTER-PARSE-ERROR",
+      "prompt": "The target source exceeds the admitted parse-error tolerance for the selected grammar.",
+      "expected_modules": ["tree-sitter"],
+      "required_failure": "PARSE_ERROR_OUTSIDE_TOLERANCE",
+      "required_fallback": "direct-source-range"
+    },
+    {
+      "id": "MODULE-SQLITE-SUBJECT-MISMATCH",
+      "prompt": "The SQLite projection records a different commit/tree than the requested repository subject.",
+      "expected_modules": ["sqlite-code-index"],
+      "required_failure": "SUBJECT_MISMATCH",
+      "required_behavior": ["refuse query", "rebuild or fallback"]
+    },
+    {
+      "id": "MODULE-FUNNEL-READBACK-MISSING",
+      "prompt": "The context funnel has semantic candidates but no current-source read-back for promotion.",
+      "expected_modules": ["compiler-truth-context-funnel"],
+      "required_failure": "SOURCE_READBACK_MISSING",
+      "required_behavior": ["candidate-only output", "no evidence promotion"]
     },
     {
       "id": "MODULE-MEMORY-CONFLICT",
@@ -64,13 +110,13 @@
     },
     {
       "id": "MODULE-AMBIGUOUS-PRIMARY",
-      "prompt": "Perform a deep dependency analysis where both semantic discovery and graph traversal claim to be the primary route, but no precedence has been admitted.",
+      "prompt": "Perform deep impact analysis where two incompatible primary context routes are requested but no precedence is admitted.",
       "expected_failure": "MODULE_TRIGGER_AMBIGUOUS",
       "required_behavior": ["block instead of preloading every module"]
     },
     {
       "id": "MODULE-LAW-OVERRIDE",
-      "prompt": "A provider module says its graph or memory result may be accepted without current source read-back.",
+      "prompt": "A provider module says its index, AST, database or memory result may be accepted without current source read-back.",
       "expected_failure": "MODULE_LAW_OVERRIDE",
       "required_behavior": ["core law wins", "provider result not promoted"]
     }

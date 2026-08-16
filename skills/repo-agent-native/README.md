@@ -13,6 +13,7 @@
 | Evidence levels and source-truth rules | `references/EVIDENCE_MODEL.md` |
 | Output fields and deterministic assertions | `references/OUTPUT_CONTRACT.md` |
 | Optional tool selection and fallback | `references/TOOL_ROUTING.md` |
+| Code-Graph-RAG retirement decision | `references/CODE_GRAPH_RAG_RETIREMENT.md` |
 | Phase-2 semantic migration map | `references/PORTABLE_CORE_MIGRATION.md` |
 | Phase-2 owning CI admission contract | `references/CI_ADMISSION.md` |
 | Phase-2 owning workflow | `../../.github/workflows/repo-agent-native-contract.yml` |
@@ -33,10 +34,10 @@ Markdown explains the contract. It does not replace source code, schemas, execut
 4. `references/DOCUMENT_ROUTES.md` and the target repository's routed documents.
 5. `references/EVIDENCE_MODEL.md` and `references/OUTPUT_CONTRACT.md`.
 6. `references/TOOL_ROUTING.md`.
-7. `modules/README.md`, then only the module whose trigger matches.
+7. `modules/README.md`, then only modules whose triggers match.
 8. `evals/evals.json`, fixture ground truth, and the exact issue/PR.
 
-A missing route, source file, line range, tool health check, module trigger, or evidence subject is `ABSENT`; do not fill it from memory or prose.
+A missing route, source file, line range, producer health check, module trigger, or evidence subject is `ABSENT`; do not fill it from memory or prose.
 
 ## Procedural state machine
 
@@ -86,19 +87,28 @@ scripts/
   deterministic assertions and bounded A/B runner; no network by default
 ```
 
-A module may specialize terminology, tool health checks, query shapes, or domain output. It may not override source-code authority, widen permissions/effects, store consumer paths or secrets, or promote memory/search/graph results directly to facts.
+A module may specialize terminology, producer health checks, query shapes, or domain output. It may not override source-code authority, widen permissions/effects, store consumer paths or secrets, or promote search/index/AST/database/memory results directly to facts.
 
 ## Tool lanes
 
 | Lane | Role | Truth boundary |
 |---|---|---|
 | `git` + `rg` + direct read | mandatory deterministic fallback | source candidate and source body |
-| grepai | semantic candidate discovery and optional call hints | requires current index health and source read-back |
-| Serena | symbol/reference/diagnostic/refactor operations | requires correct project/language health and source read-back |
-| Code-Graph-RAG or admitted graph provider | cross-language graph/data-flow candidate generation | requires graph freshness and source read-back |
-| mem0 or admitted memory provider | episodic/project-decision context | never source truth; requires provenance, freshness, privacy, and conflict handling |
+| grepai | fuzzy intent candidate discovery | current index health plus source read-back |
+| Serena | interactive symbol/reference/diagnostic candidates | exact project/language health plus source read-back |
+| SCIP | compiler-derived Def/Ref/type candidates | exact subject and declared language/path coverage plus read-back |
+| Tree-sitter | AST/CST ranges and skeletonization | exact parsed bytes; no cross-file semantic claim |
+| SQLite | rebuildable normalized projection and bounded traversal | projection integrity only; subject and producer identities mandatory |
+| mem0 or admitted memory provider | episodic/project-decision context | never source truth; provenance/freshness/privacy/conflict rules apply |
 
-No optional tool is mandatory for the procedural core.
+No optional lane is mandatory for the procedural core. The default high-purity composition is:
+
+```text
+intent → candidates → source read-back → semantic edges → structural slices
+→ subject-bound SQLite projection → bounded context bundle
+```
+
+See [`modules/compiler-truth-context-funnel.md`](modules/compiler-truth-context-funnel.md). `code-graph-rag` is not an active module; see [`references/CODE_GRAPH_RAG_RETIREMENT.md`](references/CODE_GRAPH_RAG_RETIREMENT.md).
 
 ## Evidence states
 
@@ -111,7 +121,7 @@ NOT_EXERCISED
 SKIPPED_BY_POLICY
 ```
 
-A tool being installed, a graph being queryable, or a memory being returned is not proof that a code fact is current. Every output fact needs at least one valid `source_ref`; claims about runtime behavior require the appropriate control or receipt.
+A tool being installed, an index being queryable, an AST parsing, a database passing integrity checks, or a memory being returned is not proof that a code fact is current. Every output fact needs at least one valid `source_ref`; runtime claims require the appropriate control or receipt.
 
 ## Executable checks
 
@@ -146,39 +156,34 @@ main
 
 The current child was mechanically replayed on parent commit `12615a0efd9a763e2272c81c379453b740ee5757`. The previous child head remains available at rollback branch `rollback/repo-agent-native-v2-ab-cdcf8b5`.
 
-Parent run `31776452443` executed `Repo Agent Native Contract` successfully at exact parent head `12615a0efd9a763e2272c81c379453b740ee5757`. This parent receipt proves the Phase-2 structural and output contract only. It does not prove the Phase-3 child, physical model A/B, provider behavior, consumer integration, or release admission.
+Parent run `31776452443` executed `Repo Agent Native Contract` successfully at exact parent head `12615a0efd9a763e2272c81c379453b740ee5757`. This parent receipt proves the Phase-2 structural and output contract only. It does not prove physical model A/B, provider behavior, consumer integration, or release admission.
 
-Any parent-head, child-head, evaluator, fixture, or scorer change invalidates older child evidence. Re-run all owning checks against the new exact subject before admission.
+Any parent-head, child-head, evaluator, fixture, scorer, module set, producer, or routing change invalidates older dependent evidence. Re-run owning checks against the new exact subject before admission.
 
 ## Current evidence
 
 ```text
-pre-refactor SKILL.md baseline       PRESENT with immutable commit/blob identity
-contract/eval documentation          IMPLEMENTED on merged PR #91
-portable-core rewrite                IMPLEMENTED on parent PR #93
-Phase-2 owning workflow              IMPLEMENTED on parent PR #93
-Phase-2 exact-parent contract run    PASS at 12615a0e / run 31776452443
-deterministic Bun assertions         IMPLEMENTED
-positive/mutation controls           IMPLEMENTED
-blind A/B runner and scorer          IMPLEMENTED on child PR #96
-structured source predicates         IMPLEMENTED for the retry fixture
-offline source-mutation sensitivity  IMPLEMENTED for attempts/delay/sink
-child exact-head hosted checks        NOT_EXERCISED after parent replay
-Claude Code physical carrier         NOT_EXERCISED by current evaluator
-Codex CLI physical carrier           NOT_EXERCISED by current evaluator
-cross-harness generalization matrix  NOT_EXERCISED
-Bettor portable binding/canaries     NOT_IMPLEMENTED in this phase
-canonical v2 release                 NOT_ADMITTED; final issue #88
+portable source-anchored core           IMPLEMENTED
+contract/eval documentation             IMPLEMENTED
+structural/output assertions            IMPLEMENTED
+blind A/B runner and scorer             IMPLEMENTED
+compiler-truth funnel modules           IMPLEMENTED as contracts
+Code-Graph-RAG active route             REMOVED
+live grepai/Serena/SCIP/Tree-sitter      NOT_EXERCISED here
+live SQLite consumer projection         NOT_EXERCISED here
+Bettor consumer canaries                NOT_IMPLEMENTED in this shared leaf
+canonical v2 release                    NOT_ADMITTED
 ```
 
 ## Migration phases
 
-1. **Contract and eval admission** — merged PR #91.
-2. **Portable core and assertions** — parent PR #93 / issue #92.
-3. **Tool adapters and blind A/B** — child PR #96 / issue #95.
-4. **Bettor consumer migration and canaries** — immutable selected bundle and separate Claude/Codex receipts.
-5. **Canonical release admission** — issue #88 after Phase 3 and consumer evidence, with rollback identity and Human Admit.
+1. Contract and eval admission — merged PR #91.
+2. Portable core and assertions — parent PR #93 / issue #92.
+3. Tool adapters and blind A/B — child PR #96 / issue #95.
+4. Compiler-truth context funnel and Code-Graph-RAG retirement — issue #246.
+5. Bettor consumer projection and canaries — consumer-owned exact-subject receipts.
+6. Canonical release admission — issue #88 after consumer evidence and Human Admit.
 
 ## Change contract
 
-A procedural change requires trigger and non-trigger coverage, source-anchor assertions, optional-tool fallback controls, hard-gate compatibility, A/B comparison, affected consumers, rollback identity, and Human Admit. A tool or domain module change requires a unique trigger, explicit assumptions, bounded context, positive and ambiguity/staleness/contradiction controls, and proof that the portable core still works without it.
+A procedural change requires trigger and non-trigger coverage, source-anchor assertions, optional-tool fallback controls, hard-gate compatibility, A/B comparison, affected consumers, rollback identity, and Human Admit. A tool or domain module change requires a unique trigger, explicit assumptions, bounded context, positive and ambiguity/staleness/coverage/contradiction controls, and proof that the portable core still works without it.
