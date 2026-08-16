@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/provider-retention-disposition.schema.json",
+  "title": "Provider retention disposition",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "repository_identity_digest", "surfaces"],
+  "properties": {
+    "schema": {"const": "provider-retention-disposition/v1"},
+    "repository_identity_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "surfaces": {"type": "object"}
+  }
+}
