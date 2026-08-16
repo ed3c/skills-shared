@@ -68,6 +68,14 @@ Stop on failed local verification, missing host capability, stale subject, seman
 
 See [modules/domain-profile.md](modules/domain-profile.md) for host-specific mechanics.
 
+## Runtime ownership compatibility
+
+The canonical procedure delegates credential migration to the runtime owner rather than sourcing or copying credential material itself. Existing consumers use this exact bounded handoff command:
+
+```bash
+./runtime-env local-env migrate-forgejo-keychain
+```
+
 ## Mechanism index
 
 The portable core routes to these owned mechanisms without importing their host semantics into the bounded core:
