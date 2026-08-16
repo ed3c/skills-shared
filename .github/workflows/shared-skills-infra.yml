@@ -8,6 +8,7 @@ on:
       - reopened
       - synchronize
     paths:
+      - 'registry.json'
       - 'skills/shared-skills-infra/**'
       - 'skills/*/SKILL.md'
       - 'skills/*/modules/domain-profile.md'
@@ -18,6 +19,7 @@ on:
   push:
     branches: [main]
     paths:
+      - 'registry.json'
       - 'skills/shared-skills-infra/**'
       - 'skills/*/SKILL.md'
       - 'skills/*/modules/domain-profile.md'
@@ -47,9 +49,6 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install pinned validator
-        # check_skill_bootstrap.py exits 70 rather than skipping schema validation
-        # when jsonschema is absent, so an uninstalled validator fails the job
-        # instead of quietly reducing the gate to its semantic half.
         run: python3 -m pip install --disable-pip-version-check 'jsonschema==4.26.0'
       - name: Verify shared-skills governance
         run: bash skills/shared-skills-infra/tests/verify.sh
@@ -58,5 +57,7 @@ jobs:
       - name: Kill canonical-drift first-only mutants
         if: ${{ hashFiles('skills/shared-skills-infra/tests/canonical-drift/mutation_proof.py') != '' }}
         run: python3 skills/shared-skills-infra/tests/canonical-drift/mutation_proof.py
+      - name: Verify repository control-plane profile and thin attachment
+        run: bash skills/shared-skills-infra/tests/control-plane/verify.sh
       - name: Verify procedural core and domain boundaries
         run: bash tests/skill-core-boundaries/verify.sh
