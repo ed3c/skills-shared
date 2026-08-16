@@ -67,3 +67,17 @@ Stop on stale subject, failed local assertion, missing host adapter, semantic co
 ## Domain specialization
 
 See [modules/domain-profile.md](modules/domain-profile.md).
+
+## Mechanism index
+
+The portable core routes to mechanisms without importing their host semantics into the bounded core:
+
+- [modules/commit-role.md](modules/commit-role.md)
+- [modules/delivery-mechanism.md](modules/delivery-mechanism.md)
+- [modules/domain-profile.md](modules/domain-profile.md)
+- [modules/github-vs-gitlab.md](modules/github-vs-gitlab.md)
+- [modules/host-permissions.md](modules/host-permissions.md)
+- `scripts/gitlab_delivery.py`
+- `scripts/gitlab_merge_gate.py`
+- `scripts/gitlab_sync.py`
+- `scripts/install-codex-merge-rule.sh`
