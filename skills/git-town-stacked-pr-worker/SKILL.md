@@ -67,3 +67,23 @@ Stop on overlapping leases, false dependency edges, semantic conflict, failed po
 ## Domain specialization
 
 See [modules/domain-profile.md](modules/domain-profile.md).
+
+## Publication compatibility contract
+
+These host-specific composition markers remain outside the portable-core boundary so the existing publication Harness keeps its exact safety contract while provider semantics stay modular.
+
+Compose the target Agent instruction surface from the **contents**, not file paths, of [`SYSTEM_PROMPT.md`](SYSTEM_PROMPT.md) and [`PUBLICATION_POLICY.md`](PUBLICATION_POLICY.md).
+
+Publication profile references:
+
+- `GITHUB_ACTIONS_PUBLICATION_ADOPTION.md`
+- `GITHUB_ACTIONS_PUBLICATION_PROFILE.template.md`
+- `GITHUB_ACTIONS_PUBLICATION_EVALS.md`
+- `GITHUB_ACTIONS_PUBLICATION_REPORT.template.md`
+- composition owner: `github-delivery-loop`
+
+Admitted publication intents remain exactly `initial-pr`, `ready-for-review`, and `batched-repair`. The provider circuit remains fail-closed on `billing-open`, stale local verification, old-SHA checks, repeated feedback, or ambiguous PR identity.
+
+Background synchronization may never invoke `git town sync --push`.
+
+Keep local sync, local verification, publication decision, remote publication as mechanically separate evidence states.
