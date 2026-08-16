@@ -39,8 +39,8 @@ expect("binder-selftest", BINDER, 0, "--selftest")
 expect("binder-missing-arguments", BINDER, 64)
 expect("packet-selftest", PACKET, 0, "--selftest")
 expect("packet-missing-output", PACKET, 64)
-expect("packet-unresolvable-rollback", PACKET, 64,
-       "--rollback-ref", "definitely-not-a-ref", "--output", "/dev/null")
+expect("packet-absent-rollback-bundle", PACKET, 64,
+       "--rollback-bundle", "/definitely/missing.json", "--output", "/dev/null")
 
 with tempfile.TemporaryDirectory() as tmp:
     built = Path(tmp) / "packet.json"
@@ -53,6 +53,15 @@ with tempfile.TemporaryDirectory() as tmp:
         raise SystemExit("the packet admitted itself with no Human Admit record")
     if not packet["rollback"]["distinct_from_candidate"]:
         raise SystemExit("the rollback bundle resolves to the candidate tree")
+    # Recorded identity must hold in a shallow checkout too. CI clones at
+    # depth 1, so a rollback resolved from history is green only where the
+    # author ran it.
+    if packet["rollback"]["resolution_state"] not in {
+        "RESOLVED_AND_MATCHES", "UNRESOLVABLE_IN_THIS_CHECKOUT"
+    }:
+        raise SystemExit(
+            f"rollback identity drifted: {packet['rollback']['resolution_state']}"
+        )
     if packet["security_privacy_licensing"]["privacy_scan"]["result"] != "CLEAN":
         raise SystemExit(
             "the packet's own privacy scan found forbidden values: "

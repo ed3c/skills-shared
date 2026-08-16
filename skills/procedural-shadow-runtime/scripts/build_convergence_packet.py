@@ -79,11 +79,25 @@ def git(*args: str) -> str:
 
 
 def bind_receipt(relative: str) -> dict[str, Any]:
-    """Re-read and re-digest. A recorded path is a claim; the bytes are evidence."""
+    """Re-read, re-digest, and read what the receipt itself concluded.
+
+    Presence is not closure. A receipt whose own close_state is FAIL or BLOCKED
+    counts against its lane; without this, dropping a red receipt into the
+    directory turned its lane green -- which is the exact shape of evidence
+    theatre this packet exists to prevent.
+    """
     path = SKILL / relative
     if not path.is_file():
-        return {"path": relative, "present": False, "sha256": None}
-    return {"path": relative, "present": True, "sha256": sha256_bytes(path.read_bytes())}
+        return {"path": relative, "present": False, "sha256": None, "close_state": None}
+    payload = path.read_bytes()
+    try:
+        close_state = json.loads(payload).get("close_state")
+    except (json.JSONDecodeError, AttributeError):
+        close_state = None
+    return {"path": relative, "present": True, "sha256": sha256_bytes(payload),
+            # Artefacts that are not runtime receipts have no close_state; that
+            # is not a failure, so it is recorded as None rather than as red.
+            "close_state": close_state}
 
 
 def run_checker(script: str, *relative_args: str) -> dict[str, Any]:
@@ -172,10 +186,19 @@ def evaluate_lanes() -> list[dict[str, Any]]:
     for lane in LANES:
         bound = [bind_receipt(item) for item in lane["receipts"]]
         present = [item for item in bound if item["present"]]
-        state = "PASS" if len(present) == len(bound) else (
-            "ABSENT" if not present else "BLOCKED")
+        red = [item["path"] for item in present
+               if item["close_state"] in {"FAIL", "BLOCKED"}]
+        if not present:
+            state = "ABSENT"
+        elif len(present) != len(bound):
+            state = "BLOCKED"
+        elif red:
+            state = "FAIL"
+        else:
+            state = "PASS"
         lanes.append({**lane, "receipts": bound, "state": state,
-                      "receipts_present": len(present), "receipts_named": len(bound)})
+                      "receipts_present": len(present), "receipts_named": len(bound),
+                      "red_receipts": red})
     return lanes
 
 
@@ -216,15 +239,38 @@ def privacy_review(packet_bytes: bytes) -> dict[str, Any]:
             "result": "CLEAN" if not findings else "FINDINGS_PRESENT"}
 
 
-def build(rollback_ref: str, admit_record: Path | None) -> dict[str, Any]:
-    candidate_commit = git("rev-parse", "HEAD")
-    candidate_tree = git("rev-parse", f"HEAD:skills/procedural-shadow-runtime")
-    try:
-        rollback_commit = git("rev-parse", rollback_ref)
-        rollback_tree = git("rev-parse", f"{rollback_ref}:skills/procedural-shadow-runtime")
-    except subprocess.CalledProcessError:
-        print(f"PACKET-INVALID unresolvable-rollback: {rollback_ref}", file=sys.stderr)
+def load_rollback(path: Path) -> dict[str, Any]:
+    """Rollback identity is committed data, not something resolved from history.
+
+    Resolving it with `git rev-parse` passed on a full clone and exited 64 on
+    CI's shallow checkout: the packet could only ever be green on the machine
+    that wrote it. The SHAs are recorded; whether this checkout can resolve them
+    is reported as an observation beside them.
+    """
+    if not path.is_file():
+        print(f"PACKET-INVALID absent-rollback-bundle: {path}", file=sys.stderr)
         raise SystemExit(INVALID)
+    bundle = json.loads(path.read_text(encoding="utf-8"))
+    for key in ("commit", "skill_tree", "tested_rollback_procedure"):
+        if not bundle.get(key):
+            print(f"PACKET-INVALID rollback-bundle-incomplete: {key}", file=sys.stderr)
+            raise SystemExit(INVALID)
+    return bundle
+
+
+def build(rollback_path: Path, admit_record: Path | None) -> dict[str, Any]:
+    candidate_commit = git("rev-parse", "HEAD")
+    candidate_tree = git("rev-parse", "HEAD:skills/procedural-shadow-runtime")
+    bundle = load_rollback(rollback_path)
+    rollback_commit = bundle["commit"]
+    rollback_tree = bundle["skill_tree"]
+    try:
+        resolved = git("rev-parse", f"{rollback_commit}:skills/procedural-shadow-runtime")
+        resolution_state = "RESOLVED_AND_MATCHES" if resolved == rollback_tree else "RESOLVED_AND_DIFFERS"
+    except subprocess.CalledProcessError:
+        # A shallow checkout is the normal CI shape. Not resolvable here is a
+        # fact about this checkout, not a defect in the bundle.
+        resolution_state = "UNRESOLVABLE_IN_THIS_CHECKOUT"
 
     lanes = evaluate_lanes()
     summary_path = SKILL / "evals" / "uplift-matrix-summary.json"
@@ -259,20 +305,33 @@ def build(rollback_ref: str, admit_record: Path | None) -> dict[str, Any]:
             "skill_tree": candidate_tree,
         },
         "rollback": {
-            "ref": rollback_ref,
+            "bundle": str(rollback_path.relative_to(SKILL)) if rollback_path.is_relative_to(SKILL)
+                      else rollback_path.name,
             "commit": rollback_commit,
             "skill_tree": rollback_tree,
-            # A rollback that resolves to the candidate is not a rollback, and
-            # nothing downstream would notice.
+            "resolution_state": resolution_state,
+            "tested_procedure": bundle["tested_rollback_procedure"],
+            # Compared as recorded SHAs, so the check holds in a shallow
+            # checkout too. A rollback that resolves to the candidate is not a
+            # rollback, and nothing downstream would notice.
             "distinct_from_candidate": rollback_tree != candidate_tree,
         },
         "lanes": lanes,
         "level_gates": gates,
         "current_admitted_level": "NONE",
-        "_why_none": "No prior Human Admit record exists for this candidate. Level skipping is forbidden, so the only proposable level is the first unreached one.",
-        "proposed_next_level": LEVELS[0] if highest_reachable is None else (
-            LEVELS[LEVELS.index(highest_reachable) + 1] if highest_reachable != "L5" else "L5"),
+        "_why_none": "No prior Human Admit record exists for this candidate.",
+        # One level above what is admitted, never one above what is reachable.
+        # Promotion advances a single step from the admitted position, so a
+        # candidate whose evidence reaches L2 from an admitted NONE still
+        # proposes L0. Proposing the top of the reachable range would skip
+        # every level under it in one move.
+        "proposed_next_level": LEVELS[0],
         "highest_reachable_level": highest_reachable,
+        "_why_reachable_is_not_proposed": (
+            "highest_reachable_level is what the evidence would support if levels could be "
+            "skipped. They cannot. It is reported so the gap between evidence and position is "
+            "visible, not so it can be admitted in one step."
+        ),
         "recomputation": recomputation,
         "security_privacy_licensing": {
             "source_rights_review": "evals/rights-reviews/obra-superpowers-verification-before-completion.json",
@@ -313,6 +372,9 @@ def build(rollback_ref: str, admit_record: Path | None) -> dict[str, Any]:
         reasons.append("privacy scan found forbidden values")
     if highest_reachable is None:
         reasons.append("no level gate is reachable")
+
+    if resolution_state == "RESOLVED_AND_DIFFERS":
+        reasons.append("recorded rollback tree disagrees with the resolved commit")
 
     if reasons:
         packet["terminal_outcome"] = "HOLD_FOR_MORE_EVIDENCE"
@@ -397,6 +459,58 @@ def selftest() -> int:
         print("SELFTEST RED: an absent receipt reported present", file=sys.stderr)
         return 1
 
+    # A receipt that closed FAIL must not close its lane merely by existing.
+    for lane in evaluate_lanes():
+        red = [item for item in lane["receipts"] if item["close_state"] in {"FAIL", "BLOCKED"}]
+        if red and lane["state"] == "PASS":
+            print(f"SELFTEST RED: {lane['issue']} closed PASS holding {red[0]['close_state']} "
+                  f"receipt {red[0]['path']}", file=sys.stderr)
+            return 1
+
+    # The shallow-checkout case, which is CI's normal shape and which exited 64
+    # here until the rollback identity stopped being resolved from history.
+    import tempfile
+    bundle = json.loads((SKILL / "evals" / "rollback-bundle.json").read_text(encoding="utf-8"))
+    with tempfile.TemporaryDirectory() as tmp:
+        unresolvable = Path(tmp) / "rollback.json"
+        unresolvable.write_text(json.dumps({**bundle, "commit": "0" * 40}), encoding="utf-8")
+        packet = build(unresolvable, None)
+        if packet["rollback"]["resolution_state"] != "UNRESOLVABLE_IN_THIS_CHECKOUT":
+            print(f"SELFTEST RED: an unresolvable rollback reported "
+                  f"{packet['rollback']['resolution_state']}", file=sys.stderr)
+            return 1
+        if not packet["rollback"]["distinct_from_candidate"]:
+            print("SELFTEST RED: distinctness stopped holding without history", file=sys.stderr)
+            return 1
+
+        # Anchored on HEAD, which resolves in any checkout. Anchoring the drift
+        # control on a historical commit made it silently unreachable in a
+        # shallow clone -- the same class of defect this whole change is about,
+        # found by running the suite in a depth-1 clone rather than assuming.
+        drifted = Path(tmp) / "drifted.json"
+        drifted.write_text(json.dumps({**bundle, "commit": git("rev-parse", "HEAD"),
+                                       "skill_tree": "1" * 40}), encoding="utf-8")
+        packet = build(drifted, None)
+        if packet["rollback"]["resolution_state"] != "RESOLVED_AND_DIFFERS":
+            print("SELFTEST RED: a recorded tree disagreeing with its commit was not caught",
+                  file=sys.stderr)
+            return 1
+        if "recorded rollback tree disagrees with the resolved commit" not in packet.get("hold_reasons", []):
+            print("SELFTEST RED: a drifted rollback record did not hold the packet", file=sys.stderr)
+            return 1
+
+        incomplete = Path(tmp) / "incomplete.json"
+        incomplete.write_text(json.dumps({"commit": "0" * 40}), encoding="utf-8")
+        try:
+            build(incomplete, None)
+        except SystemExit as exit_code:
+            if exit_code.code != 64:
+                print(f"SELFTEST RED: an incomplete bundle exited {exit_code.code}", file=sys.stderr)
+                return 1
+        else:
+            print("SELFTEST RED: an incomplete rollback bundle was accepted", file=sys.stderr)
+            return 1
+
     print(
         "SELFTEST GREEN: the privacy scan catches planted paths and credentials while passing "
         "reserved-range contact values; L3 and L5 are unreachable on this evidence by "
@@ -409,8 +523,9 @@ def selftest() -> int:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--selftest", action="store_true")
-    parser.add_argument("--rollback-ref", default="2eab9ddddd782188a46b32a3b829863ebd44d678",
-                        help="commit whose skill tree is the rollback bundle")
+    parser.add_argument("--rollback-bundle", type=Path,
+                        default=SKILL / "evals" / "rollback-bundle.json",
+                        help="committed rollback identity; resolvability is observed, not required")
     parser.add_argument("--human-admit", type=Path)
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
@@ -421,7 +536,7 @@ def main() -> int:
         print("PACKET-INVALID: --output is required unless --selftest", file=sys.stderr)
         return INVALID
 
-    packet = build(args.rollback_ref, args.human_admit)
+    packet = build(args.rollback_bundle, args.human_admit)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(packet, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
@@ -429,6 +544,7 @@ def main() -> int:
           f"proposed={packet['proposed_next_level']} "
           f"highest_reachable={packet['highest_reachable_level']} "
           f"rollback_distinct={packet['rollback']['distinct_from_candidate']} "
+          f"rollback={packet['rollback']['resolution_state']} "
           f"privacy={packet['security_privacy_licensing']['privacy_scan']['result']}")
     for lane in packet["lanes"]:
         print(f"  {lane['issue']:<5} {lane['state']:<8} "

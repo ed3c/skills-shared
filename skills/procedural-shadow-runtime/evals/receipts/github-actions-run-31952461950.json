@@ -1,0 +1,98 @@
+{
+  "action": {
+    "class": "EXACT_HEAD_CI_EXECUTION",
+    "intent_digest": "9f902b88592cd5de90727acf17b33eb2aaf772d0e9c2f08a5fd5a50e153113d1",
+    "side_effecting": false
+  },
+  "actions_run": {
+    "bundle_offline_replay": {
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "EVIDENCE-BUNDLE-GREEN files=26 head=6021233db7b2 run=31952461950 verified offline"
+    },
+    "conclusion": "failure",
+    "event": "push",
+    "expected_sha": "6021233db7b25a3b5ae2afcf3edc53fa7afe2082",
+    "failure_class": "REPOSITORY_TEST",
+    "head_sha": "6021233db7b25a3b5ae2afcf3edc53fa7afe2082",
+    "jobs": {
+      "failed_jobs": [
+        "procedural-shadow-runtime"
+      ],
+      "job_count": 11,
+      "jobs_with_steps": 11,
+      "provider_circuit_open": false,
+      "runnerless_jobs": []
+    },
+    "manifest_file_count": 26,
+    "run_attempt": 1,
+    "run_id": 31952461950,
+    "status": "completed",
+    "workflow": "Skill Suites"
+  },
+  "applicable_procedures": [
+    {
+      "criticality": "must",
+      "procedure_id": "procedural-shadow-runtime.exact-head-ci-execution",
+      "source": {
+        "content_sha256": "6497cd54c5b4112f2662d181c512b9491f07bb1d66765cdf584ef4ea2bc4cb7c",
+        "path": "skills/procedural-shadow-runtime/SKILL.md",
+        "ref": "6021233db7b25a3b5ae2afcf3edc53fa7afe2082",
+        "repository": "ed3c/skills-shared"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "assertion_id": "run-received-a-real-runner-with-non-empty-steps",
+      "procedure_id": "procedural-shadow-runtime.exact-head-ci-execution",
+      "result": "PASS"
+    },
+    {
+      "assertion_id": "run-head-sha-equals-the-expected-subject",
+      "procedure_id": "procedural-shadow-runtime.exact-head-ci-execution",
+      "result": "PASS"
+    },
+    {
+      "assertion_id": "declared-suite-commands-concluded-without-repository-failure",
+      "procedure_id": "procedural-shadow-runtime.exact-head-ci-execution",
+      "result": "FAIL"
+    },
+    {
+      "assertion_id": "artifact-manifest-binds-every-file-by-sha256",
+      "procedure_id": "procedural-shadow-runtime.exact-head-ci-execution",
+      "result": "PASS"
+    },
+    {
+      "assertion_id": "downloaded-bundle-replays-offline",
+      "procedure_id": "procedural-shadow-runtime.exact-head-ci-execution",
+      "result": "PASS"
+    }
+  ],
+  "checkpoint": "BEFORE_PR_OR_PUBLICATION",
+  "close_state": "FAIL",
+  "dispositions": [
+    {
+      "procedure_id": "procedural-shadow-runtime.exact-head-ci-execution",
+      "state": "FAILED"
+    }
+  ],
+  "evidence": [
+    {
+      "artifact_sha256": "466d31d7b3d93de885185a5aaa9465405345ca825140314ddab0de211a270bc1",
+      "evidence_id": "actions-run-31952461950",
+      "exact_subject": true,
+      "kind": "COMMAND",
+      "procedure_id": "procedural-shadow-runtime.exact-head-ci-execution"
+    }
+  ],
+  "receipt_id": "github-actions-31952461950-6021233db7b2",
+  "schema": "procedural-shadow-runtime-receipt/v1",
+  "subject": {
+    "base_sha": "6021233db7b25a3b5ae2afcf3edc53fa7afe2082",
+    "context_digest": "4bdaa7bc5af6c08e49b7cc130e586fcd266dd5822f935369de3b53fbdcd6d45a",
+    "current_sha": "6021233db7b25a3b5ae2afcf3edc53fa7afe2082",
+    "repository": "ed3c/skills-shared",
+    "runtime": "GITHUB_ACTIONS"
+  }
+}

@@ -1,10 +1,11 @@
 {
-  "_why_none": "No prior Human Admit record exists for this candidate. Level skipping is forbidden, so the only proposable level is the first unreached one.",
+  "_why_none": "No prior Human Admit record exists for this candidate.",
+  "_why_reachable_is_not_proposed": "highest_reachable_level is what the evidence would support if levels could be skipped. They cannot. It is reported so the gap between evidence and position is visible, not so it can be admitted in one step.",
   "candidate": {
-    "commit": "2af830671e943abc19c9bf1322f82192eaddcd8f",
+    "commit": "6021233db7b25a3b5ae2afcf3edc53fa7afe2082",
     "repository": "ed3c/skills-shared",
     "skill_path": "skills/procedural-shadow-runtime",
-    "skill_tree": "a5e7bfe76b5712a1e3ddca12fd73a958fc9b4cfb"
+    "skill_tree": "c264f14ceadd3dd587ac39de6fd14c5c0176d8d5"
   },
   "current_admitted_level": "NONE",
   "excluded_claims": [
@@ -33,14 +34,18 @@
       "note": "The workflow uploads an exact-head evidence bundle; the receipt binding a run_id, job_id and head SHA is written after that run completes.",
       "receipts": [
         {
+          "close_state": "FAIL",
           "path": "evals/receipts/github-actions-exact-head.json",
-          "present": false,
-          "sha256": null
+          "present": true,
+          "sha256": "63a1d4e1731cb9adf202783ccd40c7bb7a02752b92f6053e8e27ff5c08287d7a"
         }
       ],
       "receipts_named": 1,
-      "receipts_present": 0,
-      "state": "ABSENT"
+      "receipts_present": 1,
+      "red_receipts": [
+        "evals/receipts/github-actions-exact-head.json"
+      ],
+      "state": "FAIL"
     },
     {
       "if_absent": "ABSENT",
@@ -49,11 +54,13 @@
       "note": "Five matched arms plus a prior deterministic-probe receipt. One repetition: mechanism, not the preregistered matrix.",
       "receipts": [
         {
+          "close_state": "PASS",
           "path": "evals/receipts/arm-trials-claude-code-23753e11b417.json",
           "present": true,
           "sha256": "603be9d381293f8449a25e89278ffdd867c52dd25b140d2cfe835e7ac4f282e6"
         },
         {
+          "close_state": "PASS",
           "path": "evals/receipts/host-claude-code-f94866291d8c.json",
           "present": true,
           "sha256": "095e4e9e76b37010d523bfc1f90ad38a3e2acf162d9131a0912b2753e9a6e6a5"
@@ -61,6 +68,7 @@
       ],
       "receipts_named": 2,
       "receipts_present": 2,
+      "red_receipts": [],
       "state": "PASS"
     },
     {
@@ -70,11 +78,13 @@
       "note": "Same adapter, distinct host evidence; sandbox and approval policy bound per cell.",
       "receipts": [
         {
+          "close_state": "PASS",
           "path": "evals/receipts/arm-trials-codex-cli-23753e11b417.json",
           "present": true,
           "sha256": "fd14707aa60dc30006f514be8950372771826e81b2a3fc65dc4d896e39e3c4ba"
         },
         {
+          "close_state": "PASS",
           "path": "evals/receipts/host-codex-cli-f94866291d8c.json",
           "present": true,
           "sha256": "a5392793418fe456a6720d543f7b4133986411c0a82b5e816311ad7c1ca1a5c5"
@@ -82,6 +92,7 @@
       ],
       "receipts_named": 2,
       "receipts_present": 2,
+      "red_receipts": [],
       "state": "PASS"
     },
     {
@@ -91,11 +102,13 @@
       "note": "ed3c/ios-device-autopilot; the consumer branch is committed locally and unpushed.",
       "receipts": [
         {
+          "close_state": null,
           "path": "evals/receipts/consumer-canary-ios-device-autopilot-30aa45c654ed.json",
           "present": true,
           "sha256": "535c893afaff0c55f42a434a3f60516dc10475a4664fb07ec8a07762284c3889"
         },
         {
+          "close_state": "PASS",
           "path": "evals/receipts/consumer-runtime-receipt-ios-device-autopilot-30aa45c654ed.json",
           "present": true,
           "sha256": "97e0a282d26641c13316e85cf8a447f65c49ff2a8d4c794f1008b53cc0fa7794"
@@ -103,6 +116,7 @@
       ],
       "receipts_named": 2,
       "receipts_present": 2,
+      "red_receipts": [],
       "state": "PASS"
     },
     {
@@ -112,6 +126,7 @@
       "note": "Admitted production-like canary, not production traffic. All seven states closed against a named Human adjudication.",
       "receipts": [
         {
+          "close_state": null,
           "path": "evals/receipts/feedback-closure-canary-2026-08-16.json",
           "present": true,
           "sha256": "0a3d2074fef27bc65652f5d4c16acde5030bf31ceea906ab888c3b0493f7a14f"
@@ -119,6 +134,7 @@
       ],
       "receipts_named": 1,
       "receipts_present": 1,
+      "red_receipts": [],
       "state": "PASS"
     },
     {
@@ -128,11 +144,13 @@
       "note": "Closed upstream of this packet; anchors included so the calibration is re-checkable here.",
       "receipts": [
         {
+          "close_state": null,
           "path": "evals/receipts/judge-verdict-0-anchor-positive-0a7f7e3148cc.json",
           "present": true,
           "sha256": "d0cbdbead1c7571882b3838fac8bbbd79fd992e72c0096aaad82e78453ae4937"
         },
         {
+          "close_state": null,
           "path": "evals/receipts/judge-verdict-2-anchor-injection-0a7f7e3148cc.json",
           "present": true,
           "sha256": "21e0c8ca56e31e57b1a2ad45a9975ac816e634632929c52d1ff9426fc8d95de7"
@@ -140,6 +158,7 @@
       ],
       "receipts_named": 2,
       "receipts_present": 2,
+      "red_receipts": [],
       "state": "PASS"
     },
     {
@@ -149,21 +168,25 @@
       "note": "Two independent lanes. The device lane is NOT_EXERCISED and says so in its own bundle.",
       "receipts": [
         {
+          "close_state": null,
           "path": "evals/receipts/retrieval-obra-superpowers-b36e0829c6d0.json",
           "present": true,
           "sha256": "c51258c5ed486c3004e6c9efbfec7880323a433123cfee761b6afaf57935ff46"
         },
         {
+          "close_state": null,
           "path": "evals/receipts/multimodal-browser-truthful.json",
           "present": true,
           "sha256": "b4f2e57dc0458c3a864c34e9f29ca82d4c16cc43ddf63403e192b6f5b72c6c3a"
         },
         {
+          "close_state": null,
           "path": "evals/receipts/multimodal-browser-lookalike.json",
           "present": true,
           "sha256": "c9966d721fc94050243429f05b62782a705b719ff889fbf721e2ad03411cd5d6"
         },
         {
+          "close_state": null,
           "path": "evals/receipts/multimodal-device-lane.json",
           "present": true,
           "sha256": "729fc1cdd0dcc4911f214dcc2a3f311b32fda360f00155ae465acd7b5f28ba44"
@@ -171,6 +194,7 @@
       ],
       "receipts_named": 4,
       "receipts_present": 4,
+      "red_receipts": [],
       "state": "PASS"
     },
     {
@@ -180,6 +204,7 @@
       "note": "PARTIAL by owner decision, and saturated on this case set. No preregistered contrast is available.",
       "receipts": [
         {
+          "close_state": null,
           "path": "evals/uplift-matrix-summary.json",
           "present": true,
           "sha256": "d4506a6350de8e6e281f19e67927dd144ba489711fff9bf85fde38a6a68d9367"
@@ -187,6 +212,7 @@
       ],
       "receipts_named": 1,
       "receipts_present": 1,
+      "red_receipts": [],
       "state": "PASS"
     }
   ],
@@ -222,7 +248,7 @@
       "reachable": false
     }
   ],
-  "proposed_next_level": "L1",
+  "proposed_next_level": "L0",
   "recomputation": [
     {
       "args": [
@@ -250,10 +276,12 @@
     }
   ],
   "rollback": {
+    "bundle": "evals/rollback-bundle.json",
     "commit": "2eab9ddddd782188a46b32a3b829863ebd44d678",
     "distinct_from_candidate": true,
-    "ref": "2eab9ddddd782188a46b32a3b829863ebd44d678",
-    "skill_tree": "1ef10004f4d1550dbc1669e39fd1a601c6b44c15"
+    "resolution_state": "RESOLVED_AND_MATCHES",
+    "skill_tree": "1ef10004f4d1550dbc1669e39fd1a601c6b44c15",
+    "tested_procedure": "git checkout <commit> -- skills/procedural-shadow-runtime && bash skills/procedural-shadow-runtime/tests/run-all.sh"
   },
   "schema": "convergence-packet/v1",
   "security_privacy_licensing": {

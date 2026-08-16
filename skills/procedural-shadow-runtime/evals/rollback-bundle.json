@@ -1,0 +1,18 @@
+{
+  "schema": "rollback-bundle/v1",
+  "_why_this_is_data": "The convergence packet used to resolve this commit with git rev-parse. That works on a full clone and fails on the shallow checkout CI uses, so the packet was green locally for the same reason it could never be green in CI -- an upward resolution that only the author's machine could satisfy. The identity is recorded here as two SHAs; resolvability is an observation about whichever checkout is running, not a precondition for building the packet.",
+
+  "commit": "2eab9ddddd782188a46b32a3b829863ebd44d678",
+  "skill_tree": "1ef10004f4d1550dbc1669e39fd1a601c6b44c15",
+  "skill_path": "skills/procedural-shadow-runtime",
+  "recorded_from": "full local clone, 2026-08-16",
+
+  "what_it_is": "The skill tree as it stood when the executable Agent Architecture rubric landed and before any live lane existed. Rolling back to it returns the contracts, checkers and static controls, and withdraws every live receipt and adapter added after it.",
+  "tested_rollback_procedure": "git checkout <commit> -- skills/procedural-shadow-runtime && bash skills/procedural-shadow-runtime/tests/run-all.sh",
+  "what_rollback_costs": [
+    "the five-arm host adapter and both hosts' receipts",
+    "external registry retrieval and both multimodal lanes",
+    "the production-to-Golden feedback loop and its adjudicated Golden cases",
+    "the consumer canary binding and the uplift aggregator"
+  ]
+}
