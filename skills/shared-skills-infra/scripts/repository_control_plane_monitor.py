@@ -17,6 +17,18 @@ from repository_control_plane_profile import (
     sha256_document,
 )
 
+PHASES = (
+    "BOOTSTRAP",
+    "SHADOW_ADMISSION",
+    "TECH_LEAD_PLAN",
+    "SPATIAL_INVARIANTS",
+    "STACK_DELIVERY",
+    "FORGE_RECONCILIATION",
+)
+BASE_REQUIRED_PHASES = frozenset({"BOOTSTRAP", "SHADOW_ADMISSION", "TECH_LEAD_PLAN"})
+DEFAULT_MONITOR_PHASES = frozenset({"SPATIAL_INVARIANTS"})
+EXPLICIT_ONLY_PHASES = frozenset({"STACK_DELIVERY", "FORGE_RECONCILIATION"})
+
 
 def _normalize_labels(value: Any) -> list[str]:
     if value is None:
@@ -46,6 +58,19 @@ def _normalize_blockers(value: Any) -> list[int]:
             raise ContractError("issue blocked_by values must be positive integers")
         blockers.append(item)
     return sorted(set(blockers))
+
+
+def _normalize_required_phases(value: Any) -> list[str]:
+    if value is None:
+        return []
+    if not isinstance(value, list):
+        raise ContractError("issue required_phases must be an array")
+    phases: list[str] = []
+    for item in value:
+        if not isinstance(item, str) or item not in PHASES:
+            raise ContractError(f"unknown required phase: {item!r}")
+        phases.append(item)
+    return sorted(set(phases), key=PHASES.index)
 
 
 def issue_records(snapshot: Any) -> list[dict[str, Any]]:
@@ -80,6 +105,7 @@ def issue_records(snapshot: Any) -> list[dict[str, Any]]:
                 "state": state,
                 "labels": _normalize_labels(issue.get("labels")),
                 "blocked_by": _normalize_blockers(issue.get("blocked_by")),
+                "required_phases": _normalize_required_phases(issue.get("required_phases")),
             }
         )
     return sorted(normalized, key=lambda item: item["number"])
@@ -132,6 +158,21 @@ def _effective_open_issues(issues: list[dict[str, Any]]) -> list[dict[str, Any]]
     return open_issues
 
 
+def _phase_dispositions(required_phases: list[str]) -> dict[str, str]:
+    explicit = set(required_phases)
+    dispositions: dict[str, str] = {}
+    for phase in PHASES:
+        if phase in BASE_REQUIRED_PHASES or phase in explicit:
+            dispositions[phase] = "REQUIRED"
+        elif phase in DEFAULT_MONITOR_PHASES:
+            dispositions[phase] = "MONITOR"
+        elif phase in EXPLICIT_ONLY_PHASES:
+            dispositions[phase] = "NOT_APPLICABLE_WITH_EVIDENCE"
+        else:  # defensive: all current phases are classified above
+            dispositions[phase] = "NOT_APPLICABLE_WITH_EVIDENCE"
+    return dispositions
+
+
 def build_monitor_plan(
     profile: dict[str, Any],
     *,
@@ -144,6 +185,9 @@ def build_monitor_plan(
     open_issues = _effective_open_issues(issues)
     planned: list[dict[str, Any]] = []
     chain = profile["controller_chain"]
+    receipt_by_phase = {item["phase"]: item["receipt"] for item in chain}
+    if tuple(receipt_by_phase) != PHASES:
+        raise ContractError("controller chain phase order mismatch")
     blocked_labels = {"blocked", "status:blocked", "status/blocked"}
     in_progress_labels = {"in-progress", "status:in-progress", "status/in-progress"}
     for issue in open_issues:
@@ -154,6 +198,12 @@ def build_monitor_plan(
             routing_state = "IN_PROGRESS"
         else:
             routing_state = "READY"
+        dispositions = _phase_dispositions(issue["required_phases"])
+        required_receipts = [
+            receipt_by_phase[phase]
+            for phase in PHASES
+            if dispositions[phase] == "REQUIRED"
+        ]
         planned.append(
             {
                 "task_id": f"github-issue-{issue['number']}",
@@ -163,7 +213,8 @@ def build_monitor_plan(
                 "blocked_by": issue["blocked_by"],
                 "labels": issue["labels"],
                 "controller_chain": chain,
-                "required_receipts": [item["receipt"] for item in chain],
+                "phase_dispositions": dispositions,
+                "required_receipts": required_receipts,
                 "execution_state": "NOT_EXERCISED",
                 "merge_admission": "HUMAN_OR_TRUSTED_REPOSITORY_POLICY",
             }
