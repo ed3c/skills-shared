@@ -2,15 +2,15 @@
   "_why_none": "No prior Human Admit record exists for this candidate.",
   "_why_reachable_is_not_proposed": "highest_reachable_level is what the evidence would support if levels could be skipped. They cannot. It is reported so the gap between evidence and position is visible, not so it can be admitted in one step.",
   "candidate": {
-    "commit": "d56dac182ce255459b84274d63978c5df1606f59",
+    "commit": "f4cabfa908ad5190eb53f123dce99165b5eda117",
     "repository": "ed3c/skills-shared",
     "skill_path": "skills/procedural-shadow-runtime",
-    "skill_tree": "d6a1d133e08905a4e7330d6f7c00adef35f9d40f"
+    "skill_tree": "63bbb43fd80eeb86f013a6c545ef4969fd70b7af"
   },
   "ci_subject": {
-    "candidate_commit": "d56dac182ce255459b84274d63978c5df1606f59",
+    "candidate_commit": "f4cabfa908ad5190eb53f123dce99165b5eda117",
     "receipt_head": "d56dac182ce255459b84274d63978c5df1606f59",
-    "relation": "EXACT"
+    "relation": "ANCESTOR_OF_CANDIDATE"
   },
   "current_admitted_level": "NONE",
   "excluded_claims": [

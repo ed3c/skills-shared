@@ -78,6 +78,19 @@ def git(*args: str) -> str:
                           capture_output=True, text=True, check=True).stdout.strip()
 
 
+def has_object(sha: str | None) -> bool:
+    """Is this object present in the current checkout at all?
+
+    Every history question in this file has to ask this first. A shallow clone
+    is CI's normal shape, and an absent object makes `merge-base` and
+    `rev-parse` fail for a reason that has nothing to do with the answer.
+    """
+    if not sha:
+        return False
+    return subprocess.run(["git", "-C", str(ROOT), "cat-file", "-e", f"{sha}^{{commit}}"],
+                          capture_output=True, check=False).returncode == 0
+
+
 def bind_receipt(relative: str) -> dict[str, Any]:
     """Re-read, re-digest, and read what the receipt itself concluded.
 
@@ -285,14 +298,19 @@ def build(rollback_path: Path, admit_record: Path | None) -> dict[str, Any]:
         ci_head = json.loads(ci_receipt.read_text(encoding="utf-8")).get("subject", {}).get("current_sha")
         if ci_head == candidate_commit:
             ci_relation = "EXACT"
+        elif not has_object(ci_head):
+            # Third instance of one root cause in this file: a history lookup
+            # that is green wherever history is complete. A depth-1 clone does
+            # not contain the earlier commit at all, and "cannot resolve" is not
+            # "unrelated" -- reading it as unrelated made this check fail in the
+            # only environment it was written to run in.
+            ci_relation = "UNRESOLVABLE_IN_THIS_CHECKOUT"
         else:
             try:
                 git("merge-base", "--is-ancestor", ci_head, candidate_commit)
                 ci_relation = "ANCESTOR_OF_CANDIDATE"
             except subprocess.CalledProcessError:
                 ci_relation = "UNRELATED_TO_CANDIDATE"
-            except Exception:
-                ci_relation = "UNRESOLVABLE_IN_THIS_CHECKOUT"
     summary_path = SKILL / "evals" / "uplift-matrix-summary.json"
     uplift = json.loads(summary_path.read_text(encoding="utf-8")) if summary_path.is_file() else None
     gates = level_gates(lanes, uplift)
@@ -481,6 +499,13 @@ def selftest() -> int:
 
     if bind_receipt("evals/receipts/definitely-not-here.json")["present"]:
         print("SELFTEST RED: an absent receipt reported present", file=sys.stderr)
+        return 1
+
+    # Absence must be distinguishable from disagreement before any history
+    # question is asked. Reading "not in this clone" as "unrelated" is what made
+    # the CI-subject check fail in the only environment it runs in.
+    if has_object("0" * 40) or not has_object(git("rev-parse", "HEAD")) or has_object(None):
+        print("SELFTEST RED: object presence is not decided correctly", file=sys.stderr)
         return 1
 
     # A receipt that closed FAIL must not close its lane merely by existing.
