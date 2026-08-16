@@ -1,0 +1,97 @@
+{
+  "evaluation_contract": {
+    "acceptance_predicates": [
+      "the host reports the verifier exit code computed locally",
+      "the verifier admits every positive fixture and refuses every planted defect"
+    ],
+    "baseline_condition": "the same verifier executed locally without a host in the loop",
+    "case_ids": [
+      "positive-multi",
+      "positive-single-builder",
+      "positive-retry-lineage",
+      "positive-sequential-handoff",
+      "positive-sibling-path"
+    ],
+    "negative_controls": [
+      "planted-defect-suite"
+    ],
+    "suite_id": "multi-agent-runtime-contract-suite",
+    "suite_sha256": "b3a3c548485ca76b172029f22874020e03213dcaba05f1ccf29c504ba38553e5"
+  },
+  "execution": {
+    "artifact_digests": [
+      "2d53d43d63ca706315a72b7be5d353eb05c138d4f9c5eb29e354f4b3e1b39443"
+    ],
+    "ended_at": "2026-08-16T07:42:56Z",
+    "repetition_identity": "repetition-1",
+    "run_id": "prompt-claude-code-c821ee281ff5",
+    "started_at": "2026-08-16T07:42:41Z",
+    "terminal_state": "COMPLETED",
+    "trace_digest": "2d53d43d63ca706315a72b7be5d353eb05c138d4f9c5eb29e354f4b3e1b39443"
+  },
+  "observed_stacks": [
+    "claude-code+2.1.221 (Claude Code)"
+  ],
+  "promotion": {
+    "admitted_scope": [
+      "ed3c/skills-shared @ CLAUDE_CODE_LOCAL via SYSTEM_PROMPT_FILE"
+    ],
+    "authority": "LOCAL_RECORD",
+    "baseline_comparison": "the host reproduced the locally computed verifier terminal state; no uplift over a no-prompt baseline is claimed or measured",
+    "regressions": [],
+    "release_admit_state": "ADMITTED",
+    "revocation_subject": "prompt content_sha256, carrier, or host version change; admission v2-1-recording-2026-08-16 digest 5a853c0481dc"
+  },
+  "prompt": {
+    "composition_skills": [
+      {
+        "directory_digest": "6f0d23735558d20c89d3f63007db59e9257e5b085d9a7e9d4ca8ecbfb8ad1dcd",
+        "name": "dual-forge-repository-loop"
+      }
+    ],
+    "content_sha256": "c1774028cc6a3881e0cc6a69e8508caba7e2d683060e8ba8630306c0dec40772",
+    "prompt_id": "repository-multi-agent-runtime",
+    "source_commit": "c821ee281ff58b4d08c714f0e0dd5d7313fb7cde",
+    "source_path": "skills/dual-forge-repository-loop/references/system-prompt.md",
+    "source_repository": "ed3c/skills-shared",
+    "version": "2.1"
+  },
+  "record_states": [
+    "AUTHORED",
+    "CANDIDATE_BOUND",
+    "EVAL_CONTRACT_BOUND",
+    "RUNTIME_BOOTSTRAP_PASS",
+    "RUNTIME_EXECUTED",
+    "EXECUTOR_EVIDENCE_CAPTURED",
+    "DETERMINISTIC_VERIFIER_PASS",
+    "NEGATIVE_CONTROLS_PASS",
+    "RECEIPT_BUNDLE_REPLAY_PASS",
+    "SCOPE_DECIDED",
+    "LOCAL_RECORD_ELIGIBLE",
+    "RELEASE_ADMIT_REQUIRED",
+    "RECORDED"
+  ],
+  "runtime": {
+    "bootstrap_receipt_digest": "e21af3fbf06d477f8e738640dae1efc256bec66744b20cf8dd0fa9c943acfaa0",
+    "effect_policy": "BOUNDED_WRITE",
+    "environment_digest": "43f3916b507d75f83269f7c9e1de009277fcac9171bbfbbc782240bcc8af66b7",
+    "harness_identity": "2.1.221 (Claude Code)",
+    "identity": "CLAUDE_CODE_LOCAL",
+    "model_identity": "claude-opus-5",
+    "subject_sha": "c821ee281ff58b4d08c714f0e0dd5d7313fb7cde"
+  },
+  "schema": "system-prompt-runtime-receipt/v1",
+  "verification": {
+    "negative_control_results": [
+      {
+        "id": "planted-defect-suite",
+        "state": "KILLED"
+      }
+    ],
+    "replay_inputs_digest": "df72c325562837837ab4e71ba3ae6362f49bd1a88c9f24a0611a9a7e62e8db18",
+    "result": "PASS",
+    "unsupported_claims": [],
+    "verifier_digest": "b3a3c548485ca76b172029f22874020e03213dcaba05f1ccf29c504ba38553e5",
+    "verifier_id": "multi-agent-runtime-verify"
+  }
+}

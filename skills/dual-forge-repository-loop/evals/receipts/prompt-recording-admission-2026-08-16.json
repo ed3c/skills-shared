@@ -12,7 +12,9 @@
     "negative_controls": "planted-defect-suite KILLED",
     "receipts": [
       "prompt-receipt-claude-code-0bd5a636acb3.json",
-      "prompt-receipt-codex-cli-0bd5a636acb3.json"
+      "prompt-receipt-claude-code-12df78bdfac1.json",
+      "prompt-receipt-codex-cli-0bd5a636acb3.json",
+      "prompt-receipt-codex-cli-12df78bdfac1.json"
     ],
     "verifier": "multi-agent-runtime-verify",
     "verifier_result": "PASS on both hosts, matching the locally computed terminal state"

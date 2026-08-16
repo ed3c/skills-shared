@@ -1,0 +1,97 @@
+{
+  "evaluation_contract": {
+    "acceptance_predicates": [
+      "the host reports the verifier exit code computed locally",
+      "the verifier admits every positive fixture and refuses every planted defect"
+    ],
+    "baseline_condition": "the same verifier executed locally without a host in the loop",
+    "case_ids": [
+      "positive-multi",
+      "positive-single-builder",
+      "positive-retry-lineage",
+      "positive-sequential-handoff",
+      "positive-sibling-path"
+    ],
+    "negative_controls": [
+      "planted-defect-suite"
+    ],
+    "suite_id": "multi-agent-runtime-contract-suite",
+    "suite_sha256": "b3a3c548485ca76b172029f22874020e03213dcaba05f1ccf29c504ba38553e5"
+  },
+  "execution": {
+    "artifact_digests": [
+      "3b1c4f9f0ac51c6fda9e2e2f0b989754cfd59e5a63205eb4bf6869b52020fa81"
+    ],
+    "ended_at": "2026-08-16T08:07:10Z",
+    "repetition_identity": "repetition-1",
+    "run_id": "prompt-codex-cli-12df78bdfac1",
+    "started_at": "2026-08-16T08:06:47Z",
+    "terminal_state": "COMPLETED",
+    "trace_digest": "3b1c4f9f0ac51c6fda9e2e2f0b989754cfd59e5a63205eb4bf6869b52020fa81"
+  },
+  "observed_stacks": [
+    "codex-cli+codex-cli 0.146.0"
+  ],
+  "promotion": {
+    "admitted_scope": [
+      "ed3c/skills-shared @ CODEX_CLI_LOCAL via INSTRUCTION_CHANNEL"
+    ],
+    "authority": "LOCAL_RECORD",
+    "baseline_comparison": "the host reproduced the locally computed verifier terminal state; no uplift over a no-prompt baseline is claimed or measured",
+    "regressions": [],
+    "release_admit_state": "ADMITTED",
+    "revocation_subject": "prompt content_sha256, carrier, or host version change; admission v2-1-recording-2026-08-16 digest 5a853c0481dc"
+  },
+  "prompt": {
+    "composition_skills": [
+      {
+        "directory_digest": "6f0d23735558d20c89d3f63007db59e9257e5b085d9a7e9d4ca8ecbfb8ad1dcd",
+        "name": "dual-forge-repository-loop"
+      }
+    ],
+    "content_sha256": "c1774028cc6a3881e0cc6a69e8508caba7e2d683060e8ba8630306c0dec40772",
+    "prompt_id": "repository-multi-agent-runtime",
+    "source_commit": "12df78bdfac18935b1b4a6c3607d39187716ecf9",
+    "source_path": "skills/dual-forge-repository-loop/references/system-prompt.md",
+    "source_repository": "ed3c/skills-shared",
+    "version": "2.1"
+  },
+  "record_states": [
+    "AUTHORED",
+    "CANDIDATE_BOUND",
+    "EVAL_CONTRACT_BOUND",
+    "RUNTIME_BOOTSTRAP_PASS",
+    "RUNTIME_EXECUTED",
+    "EXECUTOR_EVIDENCE_CAPTURED",
+    "DETERMINISTIC_VERIFIER_PASS",
+    "NEGATIVE_CONTROLS_PASS",
+    "RECEIPT_BUNDLE_REPLAY_PASS",
+    "SCOPE_DECIDED",
+    "LOCAL_RECORD_ELIGIBLE",
+    "RELEASE_ADMIT_REQUIRED",
+    "RECORDED"
+  ],
+  "runtime": {
+    "bootstrap_receipt_digest": "19698092f7e9c0f499288da612dad00b87728143c2f70d9ef232122e221536b9",
+    "effect_policy": "BOUNDED_WRITE",
+    "environment_digest": "734b02ce0a22951f7e1e32a85f61355a930701a6eb254bb96fb22d882e490c7c",
+    "harness_identity": "codex-cli 0.146.0",
+    "identity": "CODEX_CLI_LOCAL",
+    "model_identity": "UNREPORTED_BY_HOST",
+    "subject_sha": "12df78bdfac18935b1b4a6c3607d39187716ecf9"
+  },
+  "schema": "system-prompt-runtime-receipt/v1",
+  "verification": {
+    "negative_control_results": [
+      {
+        "id": "planted-defect-suite",
+        "state": "KILLED"
+      }
+    ],
+    "replay_inputs_digest": "fd25d4d9017dc830b7ee22079ec93dd9f534945c4a187ebef4451a0bf0a96ed5",
+    "result": "PASS",
+    "unsupported_claims": [],
+    "verifier_digest": "b3a3c548485ca76b172029f22874020e03213dcaba05f1ccf29c504ba38553e5",
+    "verifier_id": "multi-agent-runtime-verify"
+  }
+}

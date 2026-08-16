@@ -107,8 +107,13 @@ def build_argv(host: str, prompt_path: Path, prompt_text: str, model: str,
         if exclude_dynamic:
             argv.append("--exclude-dynamic-system-prompt-sections")
         return argv
+    # Deliberately without --json. Adding it to read usage back made this host hang
+    # past a 900s timeout on a 36KB instruction payload, where the same call
+    # without it returns in ~15s. Usage is not worth an unreliable observation:
+    # this host reports no cost anyway, so the receipt records the pinned model as
+    # requested and leaves what answered UNREPORTED_BY_HOST rather than inventing it.
     return ["codex", "exec", "-m", model, "--sandbox", "workspace-write",
-            "--skip-git-repo-check", "--json",
+            "--skip-git-repo-check",
             f"{prompt_text}\n\n---\n\n{TASK}"]
 
 
