@@ -59,7 +59,12 @@
     "phaseDispositionBase": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["phase", "receipt", "disposition"]
+      "required": ["phase", "receipt", "disposition"],
+      "properties": {
+        "phase": {"type": "string"},
+        "receipt": {"type": "string"},
+        "disposition": {"type": "string"}
+      }
     },
     "issuePlan": {
       "type": "object",
