@@ -94,6 +94,21 @@
     "how_to_stop_adding_to_this": "Write the trailers at the endpoint that produces the commit. Every entry here is an endpoint that does not yet.",
     "commits": [
       {
+        "commit_sha": "0ea71f30c73a548cdebba9f23a6240d7c8ac6d93",
+        "subject": "feat(private-lineage): audit all reachable Git and local evidence surfaces",
+        "reason": "reached main through PR #245 authored under the owner's real address with no trailers; the driver cannot be observed from the commit and assigning one would be invention"
+      },
+      {
+        "commit_sha": "10f5734f168d4b0db360b796746fbd02a324160d",
+        "subject": "feat(private-lineage): enforce one-way clean-room packets",
+        "reason": "reached main through PR #245 authored under the owner's real address with no trailers; the driver cannot be observed from the commit and assigning one would be invention"
+      },
+      {
+        "commit_sha": "114c64c4f24dbcbda27c215241c5d3c01b57b645",
+        "subject": "feat(codebase-atlas): add self-contained atlas renderer template",
+        "reason": "reached main through PR #243 authored under the owner's real address with no trailers; the driver cannot be observed from the commit and assigning one would be invention"
+      },
+      {
         "commit_sha": "17790d29e25bd934114c1fc57c089206d0926d7c",
         "subject": "feat(dual-forge): add worker result schema",
         "reason": "imported with the integrated PR stacks; published and not rewritable"
@@ -114,6 +129,11 @@
         "reason": "authored by this session before AGENTS.md routed agents to the commit-role contract"
       },
       {
+        "commit_sha": "21882c93bd27ecfcb2148236743ee039d0b910e5",
+        "subject": "docs(private-lineage): add pre-state-machine routing gate",
+        "reason": "reached main through PR #245 authored under the owner's real address with no trailers; the driver cannot be observed from the commit and assigning one would be invention"
+      },
+      {
         "commit_sha": "2443ad8362514b21657e7a31c1fdf11cea548df5",
         "subject": "eval: publish local runtime receipt and CI blocker",
         "reason": "imported with the integrated PR stacks; published and not rewritable"
@@ -122,6 +142,11 @@
         "commit_sha": "2524c058a94913ed6d43a844dc56c325768d30a4",
         "subject": "feat(dual-forge): add multi-agent runtime profile template",
         "reason": "imported with the integrated PR stacks; published and not rewritable"
+      },
+      {
+        "commit_sha": "2621e33cab19f41d74bea8a3382761129d331192",
+        "subject": "feat(private-lineage): add provider disposition schema",
+        "reason": "reached main through PR #245 authored under the owner's real address with no trailers; the driver cannot be observed from the commit and assigning one would be invention"
       },
       {
         "commit_sha": "28544345befa3c586dded1cf381989bcbeb05bc3",
@@ -154,6 +179,21 @@
         "reason": "imported with the integrated PR stacks; published and not rewritable"
       },
       {
+        "commit_sha": "3db5ffcf99e5f79cbc63cab0adaffc63f13bdb67",
+        "subject": "feat(codebase-atlas): add evidence-driven isometric atlas skill",
+        "reason": "reached main through PR #243 authored under the owner's real address with no trailers; the driver cannot be observed from the commit and assigning one would be invention"
+      },
+      {
+        "commit_sha": "4b29c2f7e81c49f8f4238806a50bd7b1adf8d7b0",
+        "subject": "test(codebase-atlas): add share-safety receipt",
+        "reason": "reached main through PR #243 authored under the owner's real address with no trailers; the driver cannot be observed from the commit and assigning one would be invention"
+      },
+      {
+        "commit_sha": "4c529a7d991c20c7e3bf510958e751331095a54f",
+        "subject": "test(private-lineage): add 30 positive and hollow controls",
+        "reason": "reached main through PR #245 authored under the owner's real address with no trailers; the driver cannot be observed from the commit and assigning one would be invention"
+      },
+      {
         "commit_sha": "521895542681567657c05edf3358129fb96188aa",
         "subject": "feat(dual-forge): add deterministic multi-agent runtime checker",
         "reason": "imported with the integrated PR stacks; published and not rewritable"
@@ -179,6 +219,11 @@
         "reason": "imported with the integrated PR stacks; published and not rewritable"
       },
       {
+        "commit_sha": "6489ee19fb8569db7b79cb19789bde91598d2b5c",
+        "subject": "feat(private-lineage): add exact-destination pre-push guard",
+        "reason": "reached main through PR #245 authored under the owner's real address with no trailers; the driver cannot be observed from the commit and assigning one would be invention"
+      },
+      {
         "commit_sha": "6e5986922b8fa83898e0b407b32f2dc3a32662cd",
         "subject": "chore: project canonical Claude adapter",
         "reason": "authored directly, outside this loop, after the gate landed"
@@ -194,9 +239,24 @@
         "reason": "imported with the integrated PR stacks; published and not rewritable"
       },
       {
+        "commit_sha": "76da16371cce862b2a9e04aeae6ea97e245602de",
+        "subject": "feat(private-lineage): define Forgejo-only clean-room mode",
+        "reason": "reached main through PR #245 authored under the owner's real address with no trailers; the driver cannot be observed from the commit and assigning one would be invention"
+      },
+      {
+        "commit_sha": "79af68306d8f545cb1daebf956d9cc4a8718d4ca",
+        "subject": "feat(private-lineage): add remote URL policy",
+        "reason": "reached main through PR #245 authored under the owner's real address with no trailers; the driver cannot be observed from the commit and assigning one would be invention"
+      },
+      {
         "commit_sha": "7beddf1d9bb42e0d47d569a563f927cf15b76a1a",
         "subject": "fix(ci): run the suite that nothing was running, and repair the eval plane it broke",
         "reason": "authored by this session before AGENTS.md routed agents to the commit-role contract"
+      },
+      {
+        "commit_sha": "7ed1045948105746ca9beec11391342670e20494",
+        "subject": "docs(codebase-atlas): add state machine and data-flow contract",
+        "reason": "reached main through PR #243 authored under the owner's real address with no trailers; the driver cannot be observed from the commit and assigning one would be invention"
       },
       {
         "commit_sha": "887c9698b6dad9d8eb4161253c9f14b067a96779",
@@ -209,9 +269,19 @@
         "reason": "imported with the integrated PR stacks; published and not rewritable"
       },
       {
+        "commit_sha": "908ed73ca12a504dd7a3eeed9c8893398b77c151",
+        "subject": "docs(private-lineage): explain mode boundaries",
+        "reason": "reached main through PR #245 authored under the owner's real address with no trailers; the driver cannot be observed from the commit and assigning one would be invention"
+      },
+      {
         "commit_sha": "9353727bc1b6ae3a7c7fdff6b66a405a56183347",
         "subject": "feat(dual-forge): add worker task schema",
         "reason": "imported with the integrated PR stacks; published and not rewritable"
+      },
+      {
+        "commit_sha": "9893c018f41ab926afa3762b96fdbcf663420918",
+        "subject": "feat(private-lineage): produce checked fresh public roots",
+        "reason": "reached main through PR #245 authored under the owner's real address with no trailers; the driver cannot be observed from the commit and assigning one would be invention"
       },
       {
         "commit_sha": "9bcec6f72ef3264ebdfacfd3ef950a55bfd4321d",
@@ -219,9 +289,24 @@
         "reason": "imported with the integrated PR stacks; published and not rewritable"
       },
       {
+        "commit_sha": "afcb57ae7c498aa079205f2f430adc4191d165d0",
+        "subject": "feat(private-lineage): verify exact Forgejo-only binding",
+        "reason": "reached main through PR #245 authored under the owner's real address with no trailers; the driver cannot be observed from the commit and assigning one would be invention"
+      },
+      {
         "commit_sha": "b15dde8f06d47e1be13b3618f7b38173adb2a7d2",
         "subject": "test(dual-forge): wire multi-agent runtime verifier",
         "reason": "imported with the integrated PR stacks; published and not rewritable"
+      },
+      {
+        "commit_sha": "b4dd772da6ed83136dd27f4b6b856065bef4d696",
+        "subject": "feat(private-lineage): add clean-room packet schema",
+        "reason": "reached main through PR #245 authored under the owner's real address with no trailers; the driver cannot be observed from the commit and assigning one would be invention"
+      },
+      {
+        "commit_sha": "b81440e0e0d4ceb1ddd8b84731b0b0467495c63a",
+        "subject": "feat(private-lineage): validate provider retention dispositions",
+        "reason": "reached main through PR #245 authored under the owner's real address with no trailers; the driver cannot be observed from the commit and assigning one would be invention"
       },
       {
         "commit_sha": "bcb370b9e4546fe9ace46928f3b434341fc0435f",
@@ -234,14 +319,34 @@
         "reason": "imported with the integrated PR stacks; published and not rewritable"
       },
       {
+        "commit_sha": "c17535f4c40c6878483cf644940697e3fdd7e1c0",
+        "subject": "chore(registry): admit codebase-atlas as shared infrastructure",
+        "reason": "reached main through PR #243 authored under the owner's real address with no trailers; the driver cannot be observed from the commit and assigning one would be invention"
+      },
+      {
         "commit_sha": "c6682a11b577189d6c1bbf3f1f0acbbcbc03f646",
         "subject": "feat(spatial-loop): add procedural grounding shadow plane",
         "reason": "imported with the integrated PR stacks; published and not rewritable"
       },
       {
+        "commit_sha": "c7d03a8e4af383b748839846a55cbdbb316a5bcf",
+        "subject": "fix(registry): preserve repo-owned classifications while admitting codebase-atlas",
+        "reason": "reached main through PR #243 authored under the owner's real address with no trailers; the driver cannot be observed from the commit and assigning one would be invention"
+      },
+      {
         "commit_sha": "cc8716e017545dcb0d35eafd8d62840914c61bd9",
         "subject": "feat(spatial-loop): add procedural grounding profile",
         "reason": "imported with the integrated PR stacks; published and not rewritable"
+      },
+      {
+        "commit_sha": "ce449d3b52c19871e56d2fccd2dec4ff26346639",
+        "subject": "test(codebase-atlas): add admitted reference coverage receipt",
+        "reason": "reached main through PR #243 authored under the owner's real address with no trailers; the driver cannot be observed from the commit and assigning one would be invention"
+      },
+      {
+        "commit_sha": "d105d0ff58686c7dec77a840fa83142de29f191e",
+        "subject": "feat(private-lineage): seal checkouts to one Forgejo remote",
+        "reason": "reached main through PR #245 authored under the owner's real address with no trailers; the driver cannot be observed from the commit and assigning one would be invention"
       },
       {
         "commit_sha": "d1da73a0b69a42a1d740fa6d2d9f480fc7bfaa29",
@@ -259,9 +364,24 @@
         "reason": "imported with the integrated PR stacks; published and not rewritable"
       },
       {
+        "commit_sha": "d9e21a6d0b49288eaedd21e127df2df7513abe53",
+        "subject": "feat(private-lineage): prove no shared ancestry or Git objects",
+        "reason": "reached main through PR #245 authored under the owner's real address with no trailers; the driver cannot be observed from the commit and assigning one would be invention"
+      },
+      {
+        "commit_sha": "de310e2a0043b850579f04ce1deff97b5b4be055",
+        "subject": "feat(private-lineage): add local-only prose fingerprints",
+        "reason": "reached main through PR #245 authored under the owner's real address with no trailers; the driver cannot be observed from the commit and assigning one would be invention"
+      },
+      {
         "commit_sha": "e2891b3c3faf96131ccfe72627f8c03ad5a314e5",
         "subject": "test(repository-capability-audit): catch receipts that silently go stale",
         "reason": "authored by this session before AGENTS.md routed agents to the commit-role contract"
+      },
+      {
+        "commit_sha": "e7b62f056ed8d27728ebe8ff982a79d6c5f03e7d",
+        "subject": "test(codebase-atlas): add deterministic verifier",
+        "reason": "reached main through PR #243 authored under the owner's real address with no trailers; the driver cannot be observed from the commit and assigning one would be invention"
       },
       {
         "commit_sha": "f59d3f83f9936245bcd6e422f9fb986ac279ad20",
