@@ -29,6 +29,16 @@ REQUIRED_ORDER = [
     "git-town-stacked-pr-worker",
     "dual-forge-repository-loop",
 ]
+PHASES = [
+    ("BOOTSTRAP", "skill-resolution", "REQUIRED"),
+    ("SHADOW_ADMISSION", "shadow-admission", "REQUIRED"),
+    ("TECH_LEAD_PLAN", "task-dag", "REQUIRED"),
+    ("SPATIAL_INVARIANTS", "spatial-invariants", "MONITOR"),
+    ("STACK_DELIVERY", "git-town-stack", "NOT_APPLICABLE_WITH_EVIDENCE"),
+    ("FORGE_RECONCILIATION", "dual-forge-reconciliation", "NOT_APPLICABLE_WITH_EVIDENCE"),
+]
+PHASE_NAMES = {phase for phase, _, _ in PHASES}
+
 
 class ControlPlaneError(ValueError):
     pass
@@ -174,6 +184,36 @@ def attach(profile_path: Path, consumer: Path, *, check: bool) -> None:
     print("CONTROL-PLANE-ATTACHED thin binding rendered")
 
 
+def _required_phases(item: dict[str, Any], identity: str) -> set[str]:
+    raw = item.get("required_phases", [])
+    if not isinstance(raw, list) or any(not isinstance(phase, str) for phase in raw):
+        raise ControlPlaneError(f"invalid required_phases for {identity}")
+    requested = set(raw)
+    unknown = sorted(requested - PHASE_NAMES)
+    if unknown:
+        raise ControlPlaneError(
+            f"unknown required_phases for {identity}: {', '.join(unknown)}"
+        )
+    return requested
+
+
+def _phase_plan(required: set[str]) -> tuple[list[dict[str, str]], list[str]]:
+    dispositions: list[dict[str, str]] = []
+    required_receipts: list[str] = []
+    for phase, receipt, default in PHASES:
+        disposition = "REQUIRED" if phase in required else default
+        dispositions.append(
+            {
+                "phase": phase,
+                "receipt": receipt,
+                "disposition": disposition,
+            }
+        )
+        if disposition == "REQUIRED":
+            required_receipts.append(receipt)
+    return dispositions, required_receipts
+
+
 def monitor_plan(issue_packet: list[dict[str, Any]]) -> dict[str, Any]:
     if not isinstance(issue_packet, list):
         raise ControlPlaneError("issue packet must be an array")
@@ -191,7 +231,8 @@ def monitor_plan(issue_packet: list[dict[str, Any]]) -> dict[str, Any]:
         deps = item.get("depends_on", [])
         if not isinstance(deps, list) or any(not isinstance(dep, str) for dep in deps):
             raise ControlPlaneError(f"invalid depends_on for {identity}")
-        by_id[identity] = item
+        required = _required_phases(item, identity)
+        by_id[identity] = {**item, "_required_phases": required}
 
     # Dependency closure is part of the exact input subject. This planner is
     # intentionally zero-network, so an absent dependency cannot be inferred as
@@ -221,10 +262,21 @@ def monitor_plan(issue_packet: list[dict[str, Any]]) -> dict[str, Any]:
             raise ControlPlaneError("unfinished-issue dependency cycle")
         waves.append(ready)
         unresolved.difference_update(ready)
+
+    issue_plans: dict[str, dict[str, Any]] = {}
+    for identity in sorted(open_ids):
+        dispositions, required_receipts = _phase_plan(by_id[identity]["_required_phases"])
+        issue_plans[identity] = {
+            "phase_dispositions": dispositions,
+            "required_receipts": required_receipts,
+            "execution_state": "NOT_EXERCISED",
+        }
+
     return {
         "schema": "repository-control-plane-monitor-plan/v1",
         "issues": sorted(open_ids),
         "waves": waves,
+        "issue_plans": issue_plans,
         "automatic_merge": False,
         "automatic_conflict_resolution": False,
     }
