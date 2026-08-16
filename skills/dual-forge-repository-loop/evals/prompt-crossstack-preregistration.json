@@ -1,0 +1,131 @@
+{
+  "schema": "v2-1-crossstack-preregistration/v1",
+  "preregistration_id": "v2-1-crossstack-2026-08",
+  "status": "FROZEN_NOT_EXECUTED",
+  "issue": 229,
+  "_meta": {
+    "why": "#225 measured one stack and returned NOT_ELIGIBLE. One stack cannot separate a property of the prompt from a property of the harness, so the same three arms run against the same frozen cases on a second, genuinely distinct stack.",
+    "why_new_cases": "The #225 case set is committed, so it is no longer held out. These cases were generated for this run and every rule family in them is disjoint from the #225 set. Once this file is committed they stop being held out too, and any later run needs its own set.",
+    "execution_authorisation": "Owner instruction to run what can be run against #229. Bounded to 18 cells."
+  },
+  "stacks": [
+    {
+      "stack_id": "claude-code-opus",
+      "runtime_identity": "CLAUDE_CODE_LOCAL",
+      "harness": "claude-code",
+      "binary": "claude",
+      "model": "opus",
+      "provider": "anthropic",
+      "carrier": "SYSTEM_PROMPT_FILE",
+      "carrier_detail": "--append-system-prompt-file"
+    },
+    {
+      "stack_id": "codex-cli-gpt",
+      "runtime_identity": "CODEX_CLI_LOCAL",
+      "harness": "codex-cli",
+      "binary": "codex",
+      "model": "gpt-5.6-sol",
+      "provider": "openai",
+      "carrier": "INSTRUCTION_PREFIX",
+      "carrier_detail": "codex exec has no system-prompt channel; the bytes precede the task"
+    }
+  ],
+  "stack_distinctness": "Different provider, different model family, different harness and different prompt carrier. This is not one model behind two aliases, and it is not one harness with the model swapped.",
+  "subject": {
+    "repository": "ed3c/skills-shared",
+    "prompt_path": "skills/dual-forge-repository-loop/references/system-prompt.md"
+  },
+  "arms": [
+    {
+      "arm": "NO_PROMPT",
+      "prompt_commit": null,
+      "prompt_sha256": null,
+      "prompt_bytes": 0,
+      "absence_is_explicit": true
+    },
+    {
+      "arm": "CURRENT_REPOSITORY_PROMPT",
+      "prompt_commit": "1295cdd",
+      "prompt_sha256": "f0b77ccc3e97",
+      "prompt_bytes": 4663
+    },
+    {
+      "arm": "CANDIDATE_V2_1",
+      "prompt_commit": "d6cd334",
+      "prompt_sha256": "c1774028cc6a3881e0cc6a69e8508caba7e2d683060e8ba8630306c0dec40772",
+      "prompt_bytes": 36866
+    }
+  ],
+  "design": {
+    "repetitions_per_arm": 3,
+    "total_cells": 18,
+    "why_three_not_five": "#229's floor is on held-out case count, not repetitions. Three bounds the spend at 18 cells while still giving a per-cell spread; it buys less variance control than #225's five, and a result inside that spread is not a finding.",
+    "fresh_workspace_per_cell": true,
+    "arm_order": "sorted by sha256(stack_id|arm|repetition), so the order is reproducible from the receipt rather than chosen at run time",
+    "identical_across_stacks": [
+      "case set and case digests",
+      "task text and output shape",
+      "deterministic verifier",
+      "prompt bytes per arm",
+      "timeout"
+    ]
+  },
+  "case_set": {
+    "case_set_id": "v2-1-crossstack-heldout-cases-2026-08",
+    "path": "skills/dual-forge-repository-loop/evals/prompt-crossstack-cases.json",
+    "set_digest": "7a1254c3b3a4",
+    "case_count": 7,
+    "rule_families": [
+      "unknown-runtime-published",
+      "self-dependency",
+      "shadow-l3-unenforced",
+      "subject-base-not-admitted",
+      "parallelism-not-admitted",
+      "single-builder-cardinality"
+    ],
+    "ground_truth_authority": "DETERMINISTIC_CHECKER",
+    "agent_never_sees": "checker output, exit codes, or violated-rule markers"
+  },
+  "verifier": {
+    "verifier_id": "multi-agent-runtime-verify",
+    "authority": "DETERMINISTIC_ONLY",
+    "model_self_report_is_not_authority": true
+  },
+  "budgets": {
+    "retries_permitted": 0,
+    "retry_policy": "A failed cell stays in the denominator with its reason.",
+    "timeout_seconds": 900,
+    "identical_for_every_stack": true
+  },
+  "known_confounds": [
+    {
+      "confound": "prompt carrier",
+      "detail": "Claude Code takes the prompt through a system-prompt channel and Codex CLI has none, so the bytes arrive as instruction text. Every cross-stack difference is confounded with carrier.",
+      "how_to_separate": "a harness that offers both carriers, or a second Claude arm carrying the prompt as an instruction prefix",
+      "why_not_corrected": "Neither host can be made to use the other's channel, and faking symmetry would report a comparison that was never run."
+    },
+    {
+      "confound": "prompt length",
+      "detail": "CANDIDATE_V2_1 is 36,866 bytes against CURRENT_REPOSITORY_PROMPT's 4,663. Carried through an instruction prefix on Codex, that length competes with the task itself rather than sitting in a separate channel.",
+      "how_to_separate": "a length-matched fourth arm, which this preregistration does not freeze",
+      "why_not_corrected": "Truncating the candidate would no longer test the candidate."
+    },
+    {
+      "confound": "usage reporting",
+      "detail": "Claude Code reports token counts and cost; Codex CLI reports neither in a machine-readable form. Cost cannot be compared across stacks and is recorded as unobserved rather than as zero.",
+      "how_to_separate": "provider billing export",
+      "why_not_corrected": "outside this harness"
+    }
+  ],
+  "eligibility_threshold": {
+    "outcome_values": ["NOT_ELIGIBLE", "PORTABLE_CANDIDATE"],
+    "rule": "PORTABLE_CANDIDATE requires the candidate to show no hard regression against the strongest baseline arm on the deterministic verifier, on every stack. A regression on any stack is disqualifying, because portability is a claim about all of them.",
+    "scope_limit": "Two stacks and seven cases bound this to these stacks and this case set. It is not a general portability claim."
+  },
+  "declared_non_claims": [
+    "two stacks are not a population; this cannot estimate variance across harnesses",
+    "no cost comparison is available across stacks",
+    "eligibility here is not recording authority; #195 governs that separately",
+    "a difference smaller than the per-cell spread is not a finding"
+  ]
+}
