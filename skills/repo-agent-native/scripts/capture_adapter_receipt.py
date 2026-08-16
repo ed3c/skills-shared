@@ -664,15 +664,109 @@ def lane_worktree(repo: Path) -> dict[str, Any]:
     return body
 
 
+def lane_forgejo(repo: Path) -> dict[str, Any]:
+    """Private-lane publication.
+
+    The first version of this lane was a hardcoded ABSENT saying no Forgejo was
+    reachable. That was a sandbox artifact, not a fact: the probe ran where
+    loopback connections are blocked, so a live forge read as an absent one.
+    Two other tools failed the same way in this session. Absence is now
+    something this lane observes rather than something it assumes, and the
+    observation is separated into two questions that were previously one --
+    is the provider reachable, and is this repository bound to it.
+    """
+    body = receipt("private-lane-publication", "forgejo", repo)
+    base = "http://localhost:3000"
+    started = time.time()
+    version_text: str | None = None
+    reachable = False
+    try:
+        import urllib.request
+        with urllib.request.urlopen(f"{base}/api/v1/version", timeout=8) as response:
+            version_text = json.loads(response.read().decode()).get("version")
+            reachable = response.status == 200
+    except Exception as error:  # unreachable is an observation, not a crash
+        body["result"] = {
+            "state": "ABSENT", "evidence_level": None, "result_count": 0,
+            "source_readback": {"required": False, "performed": 0, "confirmed": 0},
+            "detail": f"no Forgejo answered {base}: {error!r}"}
+        body["adapter"].update({"executable": None, "version": None,
+                                "executable_sha256": None})
+        body["policy"] = {"network": "none", "filesystem": "none", "secrets": "none",
+                          "allowed_argv": []}
+        body["budgets"] = {"timeout_seconds": 0, "max_output_bytes": 0}
+        body["execution"] = {"terminal_state": "NOT_STARTED", "exit_code": None}
+        body["residue"] = {"paths": [], "cleaned": True}
+        return body
+
+    duration = int((time.time() - started) * 1000)
+    body["adapter"].update({"executable": base, "version": version_text,
+                            "executable_sha256": None})
+    body["adapter"]["config_identity"] = {"endpoint": base, "transport": "http-loopback"}
+    body["policy"] = {
+        "allowed_argv": [["GET", f"{base}/api/v1/version"],
+                         ["GET", f"{base}/api/v1/repos/search"]],
+        "network": "loopback-only", "filesystem": "none", "secrets": "none",
+        "mutation_granted": False,
+        "mutation_note": "read-only inventory; no issue, PR, branch or push was created",
+    }
+    body["budgets"] = {"timeout_seconds": 8, "max_output_bytes": 65536}
+
+    import urllib.request
+    with urllib.request.urlopen(f"{base}/api/v1/repos/search?limit=50", timeout=8) as r:
+        raw = r.read()
+        inventory = json.loads(raw.decode())
+    names = sorted(item["full_name"] for item in inventory.get("data", []))
+    bound = "ed3c/skills-shared" in names or "neon/skills-shared" in names
+
+    remotes = git(repo, "remote", "-v")
+    forgejo_remote = any(base in line or "localhost:3000" in line
+                         for line in remotes.splitlines())
+
+    body["execution"] = {
+        "argv": [f"GET {base}/api/v1/version", f"GET {base}/api/v1/repos/search"],
+        "cwd": str(repo), "duration_ms": duration, "exit_code": 0,
+        "terminal_state": "COMPLETED",
+        "stdout_bytes": len(raw), "stdout_sha256": sha256(raw),
+        "stderr_bytes": 0, "stderr_sha256": sha256(b""),
+    }
+    body["controls"] = [
+        {"id": "repository-binding-absent", "expect": "RED",
+         "observed": "RED" if not bound and not forgejo_remote else "GREEN",
+         "forge_repositories": names, "forgejo_remote_configured": forgejo_remote,
+         "note": ("The forge is live and this repository is not on it. #234 forbids "
+                  "introducing Forgejo into a repository with no admitted dual-forge "
+                  "configuration merely to satisfy an experiment, so the binding stays "
+                  "absent and is recorded as absent.")},
+        {"id": "provider-reachable-is-not-binding", "expect": "RED",
+         "observed": "RED",
+         "note": ("Reachability and binding were one field before this run and a live "
+                  "forge with no repository read the same as no forge at all.")},
+    ]
+    body["result"] = {
+        "state": "PASS" if reachable else "FAIL",
+        "evidence_level": "B",
+        "evidence_level_note": ("Provider identity and inventory only. No publication, "
+                                "ancestry or delivery transition was exercised."),
+        "result_count": len(names),
+        "repository_bound": bound or forgejo_remote,
+        "source_readback": {"required": False, "performed": 0, "confirmed": 0},
+        "detail": ("provider reachable and identified; this repository has no Forgejo "
+                   "binding, so the publication-boundary lane remains unexercised"),
+    }
+    body["residue"] = {"paths": [], "cleaned": True}
+    return body
+
+
 ABSENT_LANES = {
     "scip": ("compiler-semantic-index", "scip",
              "no scip or scip-python indexer on PATH; the compiler-derived relation lane "
              "has no producer on this host"),
     "git-town": ("stack-synchronization", "git-town",
-                 "git-town not installed; Stack synchronization has no producer here"),
-    "forgejo": ("private-lane-publication", "forgejo",
-                "no Forgejo instance reachable on the checked local ports and no Forgejo "
-                "remote configured on this repository"),
+                 "git-town is not installed. Homebrew offers the admitted 24.0.0, but the "
+                 "committed admission record pins a linux_intel_64 artifact by SHA-256 and "
+                 "this host is darwin; a different artifact needs its own admission, which "
+                 "is a Human decision rather than an install"),
     "lancedb": ("vector-projection", "lancedb",
                 "lancedb not installed; the optional projection lane is not exercised, and "
                 "it is a projection over SQLite rather than an authority in any case"),
@@ -717,6 +811,7 @@ def main() -> int:
         "tree-sitter": lambda: lane_tree_sitter(repo, args.python_bin),
         "sqlite": lambda: lane_sqlite(repo, out),
         "worktree": lambda: lane_worktree(repo),
+        "forgejo": lambda: lane_forgejo(repo),
     }
     for name, (kind, provider, reason) in ABSENT_LANES.items():
         lanes[name] = (lambda k=kind, p=provider, r=reason: absent(k, p, repo, r))
