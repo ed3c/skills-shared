@@ -1,72 +1,83 @@
-# Code-Graph-RAG Module
+# Code-Graph-RAG Compatibility Retirement Adapter
 
 ## Trigger
 
-Use when the task needs cross-language dependency, call/data-flow, architecture-impact, or hidden-coupling analysis that exact search and symbol operations cannot answer efficiently.
+Use only when reading a legacy consumer binding, historical eval, receipt, issue, or migration record that names `code-graph-rag` and the task must translate that record into the current Blindspot Hybrid contract.
 
 ## Non-trigger
 
-Do not start a graph stack for a small local scope, when graph freshness/project identity is unknown, or when source read-back cannot be performed.
+Do not select this module for new repository analysis, architecture-impact work, provider installation, graph queries, or Agent execution. New work uses `blindspot-hybrid.md` with bounded grepai, SCIP, Tree-sitter, Serena, SQLite, optional LanceDB, source-readback, and test lanes.
 
 ## Purpose
 
-Return provenance-carrying graph paths and impact candidates for direct source, test, and manifest readback.
+Preserve audit compatibility without keeping Code-Graph-RAG in the active routing surface.
+
+```text
+legacy code-graph-rag record
+→ bind immutable historical subject/provider identity
+→ preserve original evidence ceiling and warnings
+→ map only reproducible endpoints/relations to normalized blindspot events
+→ current source read-back
+→ targeted test when behavioral
+→ SQLite ledger
+→ retired record retained; no provider resurrection
+```
+
+This adapter is a tombstone, not a provider endorsement. It grants no permission to install Memgraph, mutate a graph, query a legacy endpoint, or treat old graph edges as current source truth.
 
 ## Assumptions
 
 ```text
-graph provider/version known
-exact repository/project selected
-graph build subject identified
-freshness checked against current source
-query budget bounded
+historical artifact identity known
+legacy repository/project/graph subject known when recorded
+original bytes or content digest available
+current replacement route known
+migration is read-only and bounded
 ```
 
 ## State machine
 
 ```text
-GRAPH ANALYSIS REQUESTED
-→ PROVIDER/GRAPH IDENTIFIED
-→ SUBJECT/FRESHNESS CHECKED
-→ QUERY BOUNDED
-→ EDGES/PATHS RETURNED
-→ ENDPOINT SOURCE READ BACK
-→ ACCEPT / DOWNGRADE / FALLBACK
+LEGACY REFERENCE OBSERVED
+→ HISTORICAL SUBJECT BOUND
+→ ORIGINAL CLAIM/EVIDENCE CEILING PRESERVED
+→ REPRODUCIBLE ENDPOINTS IDENTIFIED
+→ NORMALIZED CANDIDATE EVENTS
+→ CURRENT SOURCE READ-BACK
+→ ACCEPT / DOWNGRADE / RETIRE UNMAPPED
 ```
 
 Failure states:
 
 ```text
-PROVIDER_ABSENT
-WRONG_PROJECT
-GRAPH_ABSENT
-GRAPH_STALE
-INCOMPLETE_GRAPH
-SOURCE_CHANGED
+LEGACY_ARTIFACT_ABSENT
+HISTORICAL_SUBJECT_UNKNOWN
+LEGACY_GRAPH_STALE
 EDGE_NOT_REPRODUCIBLE
-RESULT_CONTRADICTS_SOURCE
+MIGRATION_WOULD_RAISE_EVIDENCE
+PROVIDER_RESURRECTION_REQUESTED
 ```
 
 ## Inputs
 
-Exact subject, seed symbols/files, relation/data-flow question, edge kinds, direction/depth limits, language scope, result budget, and freshness observation.
+Legacy artifact identity, historical subject/provider metadata when available, bounded claims/edges/paths, current exact subject, replacement blindspot event route, and read-back budget.
 
 ## Outputs and effects
 
-Bounded candidate nodes, edges, paths, impact sets, source provenance, graph identity, completeness warnings, and next readback actions. Effects are read-only. A graph edge is never an accepted invariant until its relevant endpoints and relations are checked against current source or a stronger runtime control.
+A read-only migration ledger containing preserved legacy IDs, mapped candidate events, unmapped evidence, current source read-backs, downgrade reasons, and retirement state. No provider, container, graph database, vector database, endpoint, branch, or remote is created or mutated.
 
 ## Fallback
 
-Use `git`, `rg`, direct reads, symbol/LSP analysis, compiler diagnostics, and targeted tests.
+Keep the historical record as retired/unmapped and use current deterministic repository discovery, SCIP/Tree-sitter/Serena where admitted, source read-back, and tests.
 
 ## Evidence class and freshness
 
-Graph output is `B+` candidate evidence. Freshness plus source read-back may upgrade specific relations; graph query success alone is not PASS.
+Legacy graph output keeps its original `B+` maximum and becomes stale when its exact graph/source subject cannot be reproduced. Migration never raises evidence. Only current source read-back and current targeted execution can support a new admitted claim.
 
 ## Core laws that remain authoritative
 
-`../SKILL.md` remains authoritative for source anchoring, evidence, effects, repair bounds, and completion.
+`../SKILL.md` remains authoritative. `blindspot-hybrid.md` is the active replacement contract.
 
 ## Consumer-owned values
 
-Containers, graph/vector databases, ports, credentials, indexes, mutation endpoints, network policy, and live provider receipts remain outside this shared module.
+Historical containers, graph/vector stores, ports, credentials, indexes, provider endpoints, network policy, and retained live receipts remain outside this shared adapter.
