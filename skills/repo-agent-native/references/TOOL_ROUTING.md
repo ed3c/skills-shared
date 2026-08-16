@@ -1,29 +1,31 @@
 # Tool Routing
 
-The procedural core works with deterministic source tools alone. Optional tools are selected by capability and health, not by installation popularity.
+The procedural core works with deterministic source tools alone. Optional tools are selected by capability, exact subject and health—not installation popularity.
 
 ## Routing order
 
 ```text
 Tier 0  git + rg + repository-relative direct read
-Tier 1  semantic candidate search
-Tier 2  symbol/LSP/AST analysis
-Tier 3  graph/data-flow analysis
+Tier 1  semantic intent candidates
+Tier 2a interactive symbol/LSP diagnostics
+Tier 2b compiler-derived semantic index
+Tier 3  syntax structure and skeletonization
+Tier 4  subject-bound normalized projection
 Tier M  episodic/project memory
 Tier X  compiler/tests/public-port/runtime controls
 ```
 
-Tier X is not a later truth level; it is the behavioral lane used when the claim concerns executable behavior.
+Tier X is a behavioral evidence lane, not a later retrieval tier.
 
 ## Tool health state machine
 
 ```text
 CAPABILITY REQUESTED
-→ PROVIDER DISCOVERED
-→ EXACT PROVIDER IDENTITY RECORDED
-→ PROJECT/INDEX/GRAPH/NAMESPACE MATCHED
-→ FRESHNESS AND SCOPE CHECKED
-→ QUERY EXECUTED
+→ PRODUCER/PROVIDER DISCOVERED
+→ EXACT IDENTITY RECORDED
+→ PROJECT + SUBJECT + COVERAGE MATCHED
+→ FRESHNESS/SCOPE CHECKED
+→ QUERY/PARSE EXECUTED
 → RESULT READ BACK AGAINST SOURCE
 → RESULT ACCEPTED OR DOWNGRADED
 ```
@@ -34,8 +36,8 @@ Failure states:
 PROVIDER_ABSENT
 PROVIDER_UNREACHABLE
 WRONG_PROJECT
-STALE_INDEX
-INCOMPLETE_GRAPH
+STALE_SUBJECT
+PARTIAL_LANGUAGE_COVERAGE
 UNSUPPORTED_LANGUAGE
 NAMESPACE_MISMATCH
 SOURCE_CHANGED
@@ -43,54 +45,67 @@ RESULT_CONTRADICTS_SOURCE
 OUTPUT_LIMIT
 ```
 
-Every failure has a named Tier 0 fallback unless the task specifically requires the missing capability.
+Every failure has a Tier-0 fallback unless the task specifically requires the missing relation class.
 
-## Current candidate providers
+## Current capability routes
 
-| Capability | Current candidate | Strength | Cost/risk | Default role |
+| Capability | Current route | Strength | Cost/risk | Default role |
 |---|---|---|---|---|
-| semantic search/call hints | grepai | local semantic search, watcher, MCP | embedding/index freshness; call hints require read-back | optional candidate lane |
-| symbol/refactor/diagnostics | Serena LSP backend | broad language support, symbol operations, diagnostics | project/language-server health; overlapping basic tools | preferred optional symbol lane |
-| graph/data flow | Code-Graph-RAG | Tree-sitter, Memgraph, structural/data-flow graph | heavier Docker/database/runtime footprint | optional deep graph lane |
-| lightweight graph alternative | codebase-memory-mcp | single-binary persistent graph candidate | requires independent accuracy/security eval | A/B competitor |
-| lightweight semantic alternative | Semble | focused agent code search candidate | requires independent recall/precision eval | A/B competitor |
-| episodic/personal memory | mem0 OSS | user/session/agent memory and SDKs | LLM/embedding cost, privacy, conflicts; hosted claims may exceed OSS | optional memory lane |
-| temporal relational memory | Graphiti | real-time knowledge graph memory | different operational model; not a drop-in personal memory store | A/B competitor |
+| semantic intent search | grepai | local concept search, watcher, MCP | embedding/index freshness; negative results incomplete | optional seed lane |
+| interactive symbols/diagnostics | Serena/LSP | definitions, references, diagnostics, edit planning | project/server health and language variance | optional interactive lane |
+| compiler semantic relations | SCIP indexers | stable global symbols, Def/Ref/type edges | build/config/language coverage; batch index cost | preferred impact-edge lane when healthy |
+| syntax/skeletons | Tree-sitter | tolerant AST/CST ranges and structural queries | no cross-file type inference | structural slicing lane |
+| normalized graph/projection | SQLite | embedded, inspectable, transactional, rebuildable | schema/subject/producer drift | deterministic storage/query lane |
+| episodic context | mem0 or admitted memory provider | prior decisions and incident context | privacy, freshness and conflicts | optional memory lane |
+
+The composed route is [`../modules/compiler-truth-context-funnel.md`](../modules/compiler-truth-context-funnel.md). The Code-Graph-RAG retirement decision is [`CODE_GRAPH_RAG_RETIREMENT.md`](CODE_GRAPH_RAG_RETIREMENT.md).
+
+## Selection rules
+
+### grepai
+
+Use to turn fuzzy intent into a small candidate set. Record exact workspace/index identity, cap results, and read every promoted result from current source.
+
+### Serena
+
+Use for interactive symbol/reference/diagnostic operations when the exact project and language backend are healthy. Treat edit output as a proposal unless the host separately grants mutation authority.
+
+### SCIP
+
+Use for compiler-derived cross-file relations when the exact commit/tree, indexer and language/path coverage are known. Do not describe partial coverage as 100% completeness.
+
+### Tree-sitter
+
+Use for exact-byte ranges, signatures, imports, snippets and skeletons. Do not infer type identity or runtime behavior from syntax alone.
+
+### SQLite
+
+Use only as a subject-bound projection of normalized observations. Database integrity proves the projection shape, not repository semantics. Refuse subject mismatch and rebuild stale stores.
+
+### Memory
+
+Use only for prior decisions, preferences, incident history or continuity. Current repository authority wins conflicts; writes require a separate policy.
 
 ## Commercial exclusion
 
-GitNexus is not admitted for the commercial core while the upstream repository is licensed under PolyForm Noncommercial. Repository popularity does not override license policy.
-
-## grepai module trigger
-
-Use when intent-based discovery can reduce candidate search cost and a current index for the exact repository is healthy. Do not use its result as an accepted fact without direct source read-back.
-
-## Serena module trigger
-
-Use when symbol identity, references, diagnostics, or a symbol-aware edit is needed and the configured project/language backend matches the exact repository. Disable overlapping basic shell/file tools when the host already owns them.
-
-## Graph module trigger
-
-Use when a task genuinely requires cross-language dependency, data-flow, dead-code, or architectural graph analysis that Tier 0/Tier 2 cannot answer efficiently. Do not start a heavyweight graph stack for a small local scope.
-
-## Memory module trigger
-
-Use only for prior decisions, preferences, incident history, or task continuity. Retrieve a bounded number of records and verify any repository claim against current documents/source. Production writes require explicit policy and are outside the offline Skill eval.
+GitNexus is not admitted for the commercial core while the upstream repository is licensed under PolyForm Noncommercial. Popularity does not override license policy.
 
 ## Tool receipt
 
 A run records:
 
 ```text
-provider and version/commit when known
+producer/provider version or commit
 capability requested
-project/index/graph/namespace identity
+repository/commit/tree
+project/index/grammar/schema identity
+language and path coverage
 freshness observation
-query budget
+query/depth/byte budget
 result count
 source read-back count
 fallback taken
 warnings and exclusions
 ```
 
-Provider presence and query success are not source-truth PASS.
+Provider presence, query success, parse success and database integrity are not source-truth PASS.

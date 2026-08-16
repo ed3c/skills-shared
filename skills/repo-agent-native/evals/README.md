@@ -40,7 +40,7 @@ Concept-alias matching is retained only for diagnosis under `lexical_advisory`. 
 
 The shared task prompt may specify subject identity and the host-supplied output schema, but it must not restate the Skill's record rules, evidence semantics, or assertion procedure. Otherwise `no_skill` and `wrong_skill` receive the treatment and cease to be controls.
 
-`no_skill` is an untreated Skill-discovery condition, not an ignorant model and not an automatic tool stack. It receives the same task, immutable subject, and schema adapter only. It does not automatically load procedural generalization or invoke grepai, Serena, Code-Graph-RAG, or mem0; this fixture prohibits those providers so source reading is the common execution surface.
+`no_skill` is an untreated Skill-discovery condition, not an ignorant model and not an automatic tool stack. It receives the same task, immutable subject, and schema adapter only. It does not automatically load procedural generalization or invoke grepai, Serena, SCIP, Tree-sitter, SQLite projections, or mem0; this fixture prohibits optional providers so source reading is the common execution surface.
 
 ## Same subject and evaluator
 
