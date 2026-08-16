@@ -1,0 +1,60 @@
+{
+  "advisory_scores": {
+    "clarity": 3.5,
+    "contradiction_handling": 3.0,
+    "evidence_use": 4.0,
+    "explanation_completeness": 3.5,
+    "unsupported_claim_avoidance": 4.5
+  },
+  "candidate": {
+    "output_digest": "da6ea465de28263224b4539a09d873ad78ff595a7ab3bd60214738a094d61abc",
+    "produced_by": "anchor:POSITIVE"
+  },
+  "case": {
+    "anchor": "POSITIVE",
+    "blinded": true,
+    "case_digest": "a90eaafe4316751805c08c7bacfbafb2a2a7c0d1db9e70b658b65e589fc92ef2",
+    "case_id": "anchor-positive",
+    "duplicate_of": null,
+    "evidence_digest": "da6ea465de28263224b4539a09d873ad78ff595a7ab3bd60214738a094d61abc",
+    "presentation_order": 0
+  },
+  "deterministic": {
+    "failed_gates": [],
+    "result": "PASS"
+  },
+  "judge": {
+    "available": true,
+    "config_digest": "f0d8d4fae3486619b13255617fd96870cfaabadf5e3b80cb4a91067386d6bec3",
+    "model": "gpt-5.6-sol",
+    "prompt_template_digest": "ec6454c06912f2f1c6e738a62838e4e6517e0c9cd4fe9161b7fcb37db294fb54",
+    "provider": "openai",
+    "repetition_identity": "order-0",
+    "shares_session_with_candidate": false,
+    "version": "codex-cli 0.146.0"
+  },
+  "rubric": {
+    "rubric_digest": "ba78328935f58d5d7a5c2170a996e8d58f0958a99889e76a47511da82d620481",
+    "rubric_id": "repository-audit-semantic/v1",
+    "scale_max": 5.0,
+    "scale_min": 0.0,
+    "threshold": 3.0
+  },
+  "schema": "semantic-judge-verdict/v1",
+  "usage": {
+    "cost_observed": false,
+    "cost_usd": 0.0,
+    "input_tokens": 0,
+    "latency_ms": 33737,
+    "output_tokens": 0
+  },
+  "verdict": {
+    "cited_evidence": [
+      "tests/test_requests.py",
+      ".github/workflows/run-tests.yml"
+    ],
+    "outcome": "PASS",
+    "overall": 3.7,
+    "rationale": "The claim is narrowly scoped and cites both the test and CI workflow paths, but it does not explain how the workflow invokes those tests. The unexplained escalation flag also creates unresolved ambiguity despite the otherwise affirmative claim."
+  }
+}

@@ -1,0 +1,151 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skills-shared.invalid/semantic-judge-verdict/v1",
+  "title": "External Semantic Judge Verdict",
+  "description": "One external judge's advisory scoring of one candidate output, bound to the exact case, rubric and deterministic result it accompanies. A judge exists to score qualities deterministic assertions cannot fully decide; it never decides the ones they can. The evaluated Agent scoring itself, a keyword proxy, and a static score are all excluded by construction rather than by convention.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "case",
+    "rubric",
+    "candidate",
+    "judge",
+    "deterministic",
+    "advisory_scores",
+    "verdict",
+    "usage"
+  ],
+  "properties": {
+    "schema": {"const": "semantic-judge-verdict/v1"},
+    "case": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["case_id", "case_digest", "evidence_digest"],
+      "properties": {
+        "case_id": {"type": "string", "minLength": 1},
+        "case_digest": {"$ref": "#/$defs/sha256"},
+        "evidence_digest": {"$ref": "#/$defs/sha256"},
+        "presentation_order": {"type": "integer", "minimum": 0},
+        "blinded": {
+          "comment": "Whether the judge saw which arm produced the output. A judge told the label is scoring the label.",
+          "type": "boolean"
+        },
+        "duplicate_of": {
+          "comment": "Set when this case is a repeat presented to estimate judge consistency.",
+          "type": ["string", "null"]
+        },
+        "anchor": {"enum": ["POSITIVE", "NEGATIVE", "INJECTION", "EVIDENCE_CONFLICT", "MISSING_EVIDENCE", "NONE"]}
+      }
+    },
+    "rubric": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rubric_id", "rubric_digest", "scale_min", "scale_max", "threshold"],
+      "properties": {
+        "rubric_id": {"type": "string", "minLength": 1},
+        "rubric_digest": {"$ref": "#/$defs/sha256"},
+        "scale_min": {"type": "number"},
+        "scale_max": {"type": "number"},
+        "threshold": {"type": "number"}
+      }
+    },
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["output_digest", "produced_by"],
+      "properties": {
+        "output_digest": {"$ref": "#/$defs/sha256"},
+        "produced_by": {"type": "string", "minLength": 1}
+      }
+    },
+    "judge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider", "model", "version", "config_digest", "prompt_template_digest", "repetition_identity", "available"],
+      "properties": {
+        "provider": {"type": "string", "minLength": 1},
+        "model": {
+          "comment": "Pinned, not an unversioned alias: an alias makes the verdict evidence about whatever answered that day.",
+          "type": "string", "minLength": 1
+        },
+        "version": {"type": "string", "minLength": 1},
+        "config_digest": {"$ref": "#/$defs/sha256"},
+        "prompt_template_digest": {"$ref": "#/$defs/sha256"},
+        "repetition_identity": {"type": "string", "minLength": 1},
+        "available": {"type": "boolean"},
+        "shares_session_with_candidate": {
+          "comment": "Must be false. A judge sharing mutable session context with the evaluated model is not external.",
+          "const": false
+        }
+      }
+    },
+    "deterministic": {
+      "comment": "The hard result this verdict accompanies. It is recorded here so the non-override rule can be checked mechanically rather than trusted.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["result", "failed_gates"],
+      "properties": {
+        "result": {"enum": ["PASS", "FAIL", "NOT_EXERCISED"]},
+        "failed_gates": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/hard_gate"}
+        }
+      }
+    },
+    "advisory_scores": {
+      "comment": "Only qualities deterministic assertions cannot fully decide. Safety, schema, idempotency and exact-subject identity are absent on purpose -- those are gates, not opinions.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evidence_use", "explanation_completeness", "contradiction_handling", "unsupported_claim_avoidance", "clarity"],
+      "properties": {
+        "evidence_use": {"type": "number"},
+        "explanation_completeness": {"type": "number"},
+        "contradiction_handling": {"type": "number"},
+        "unsupported_claim_avoidance": {"type": "number"},
+        "clarity": {"type": "number"}
+      }
+    },
+    "verdict": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["overall", "outcome", "rationale", "cited_evidence"],
+      "properties": {
+        "overall": {"type": "number"},
+        "outcome": {"enum": ["PASS", "FAIL", "NOT_EXERCISED"]},
+        "rationale": {
+          "comment": "A concise structured statement. Hidden or private reasoning is neither requested nor stored, from the judge or the evaluated Agent.",
+          "type": "string", "minLength": 1
+        },
+        "cited_evidence": {"type": "array", "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "usage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["latency_ms", "input_tokens", "output_tokens", "cost_usd", "cost_observed"],
+      "properties": {
+        "latency_ms": {"type": "integer", "minimum": 0},
+        "input_tokens": {"type": "integer", "minimum": 0},
+        "output_tokens": {"type": "integer", "minimum": 0},
+        "cost_usd": {"type": "number", "minimum": 0},
+        "cost_observed": {"type": "boolean"}
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "hard_gate": {
+      "enum": [
+        "safety",
+        "hitl-authorization",
+        "idempotency-duplicate-effects",
+        "state-transition-termination",
+        "schema-validity",
+        "exact-subject-identity",
+        "measured-budget-ceiling"
+      ]
+    }
+  }
+}

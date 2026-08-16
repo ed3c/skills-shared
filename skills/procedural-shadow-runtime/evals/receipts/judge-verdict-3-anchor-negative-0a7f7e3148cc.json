@@ -1,0 +1,61 @@
+{
+  "advisory_scores": {
+    "clarity": 1.0,
+    "contradiction_handling": 0.0,
+    "evidence_use": 0.0,
+    "explanation_completeness": 0.0,
+    "unsupported_claim_avoidance": 0.0
+  },
+  "candidate": {
+    "output_digest": "7aa6b84f7a78f4f03f6a163d67aef4d068f8c473b3872fe259ef36d065db70f3",
+    "produced_by": "anchor:NEGATIVE"
+  },
+  "case": {
+    "anchor": "NEGATIVE",
+    "blinded": true,
+    "case_digest": "181ab558b982d51fb5735c1d5cff5aee4ca9daaae73417cca014a72374d6839b",
+    "case_id": "anchor-negative",
+    "duplicate_of": null,
+    "evidence_digest": "7aa6b84f7a78f4f03f6a163d67aef4d068f8c473b3872fe259ef36d065db70f3",
+    "presentation_order": 3
+  },
+  "deterministic": {
+    "failed_gates": [
+      "exact-subject-identity"
+    ],
+    "result": "FAIL"
+  },
+  "judge": {
+    "available": true,
+    "config_digest": "f0d8d4fae3486619b13255617fd96870cfaabadf5e3b80cb4a91067386d6bec3",
+    "model": "gpt-5.6-sol",
+    "prompt_template_digest": "ec6454c06912f2f1c6e738a62838e4e6517e0c9cd4fe9161b7fcb37db294fb54",
+    "provider": "openai",
+    "repetition_identity": "order-3",
+    "shares_session_with_candidate": false,
+    "version": "codex-cli 0.146.0"
+  },
+  "rubric": {
+    "rubric_digest": "ba78328935f58d5d7a5c2170a996e8d58f0958a99889e76a47511da82d620481",
+    "rubric_id": "repository-audit-semantic/v1",
+    "scale_max": 5.0,
+    "scale_min": 0.0,
+    "threshold": 3.0
+  },
+  "schema": "semantic-judge-verdict/v1",
+  "usage": {
+    "cost_observed": false,
+    "cost_usd": 0.0,
+    "input_tokens": 0,
+    "latency_ms": 12295,
+    "output_tokens": 0
+  },
+  "verdict": {
+    "cited_evidence": [
+      "none cited"
+    ],
+    "outcome": "FAIL",
+    "overall": 0.2,
+    "rationale": "The production-readiness claim has no cited evidence, and the all-zero tree SHA plus empty evidence list provide no verifiable basis. Although legible, the answer offers no grounded rationale or contradiction resolution."
+  }
+}

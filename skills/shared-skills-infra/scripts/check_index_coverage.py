@@ -36,10 +36,34 @@ class CoverageError(Exception):
     pass
 
 
+def tracked_markdown(root: Path) -> set[Path] | None:
+    """Every .md git actually tracks, or None when git cannot answer.
+
+    A registered worktree lives inside .claude/worktrees/, is gitignored, and is
+    another session's checkout. Scanning it makes this gate red for a document
+    nobody in this tree owns -- one session opening a worktree would break the
+    gate for everyone. Asking git which files are tracked answers "is this
+    repository content" directly, instead of chasing directory names.
+    """
+    result = subprocess.run(
+        ["git", "-C", str(root), "ls-files", "-z", "--", "*.md"],
+        capture_output=True, check=False,
+    )
+    if result.returncode != 0:
+        return None
+    return {
+        root / name for name in result.stdout.decode("utf-8").split("\0") if name
+    }
+
+
 def documents(root: Path) -> list[Path]:
+    tracked = tracked_markdown(root)
     return [
         p for p in sorted(root.rglob("*.md"))
         if not SKIP_PARTS & set(p.relative_to(root).parts)
+        # Fall back to the directory filter alone when git is unavailable, rather
+        # than silently checking nothing.
+        and (tracked is None or p in tracked)
     ]
 
 

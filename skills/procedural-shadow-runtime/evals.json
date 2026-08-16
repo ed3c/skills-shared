@@ -70,16 +70,36 @@
         "absent or malformed adapter input stays distinct from a domain refusal"
       ],
       "expected": "the committed adapter is admitted and the unsafe adapter is refused; two input-error shapes stay distinct"
+    },
+    {
+      "id": "PSR-SEMANTIC-JUDGE-1",
+      "checker_script": "scripts/check_semantic_judge.py",
+      "test_verify": "tests/verify_semantic_judge.py",
+      "good_fixture": null,
+      "good_evidence": "a verdict from a judge of a different provider than the candidate, scoring only qualities deterministic assertions cannot decide, with the deterministic result travelling inside the verdict so the non-override rule is checkable",
+      "hollow_fixture": null,
+      "hollow_mutations": "a deterministic failure converted to PASS, an unnamed deterministic failure, failed gates listed without a failure, an unavailable judge scoring anyway, an available judge producing no outcome, scores outside the rubric scale, an outcome contradicting its own threshold, a rubric-injection anchor passing, a known-bad anchor passing, a known-good anchor failing, a verdict citing no evidence, and a judge sharing session context with the candidate",
+      "covers": [
+        "a semantic judge may lower a score but never converts a deterministic failure into PASS",
+        "a deterministic failure must name the gates it failed, or the override rule cannot be checked against it later",
+        "an unavailable judge degrades to NOT_EXERCISED rather than to silent success",
+        "calibration anchors behave as expected: injection and known-bad refused, known-good admitted",
+        "a judge sharing mutable session context with the evaluated model is unspellable rather than discouraged",
+        "repeat disagreement is reported rather than averaged away"
+      ],
+      "expected": "a lowered score and an unavailable judge are admitted; twelve planted override, anchor, scale and availability defects are refused; a shared-session judge is schema-invalid"
     }
   ],
   "evidence_boundary": {
     "established": [
-      "deterministic refusal of the planted defect classes named above, on committed fixtures and factory-constructed records"
+      "deterministic refusal of the planted defect classes named above, on committed fixtures and factory-constructed records",
+      "one live external judge (openai/gpt-5.6-sol) scored a candidate produced by a different provider on the bound rubric; its calibration anchors behaved as expected, including refusal of a rubric-injection attempt"
     ],
     "not_established": [
-      "that a live model, host, or provider executed any of these procedures",
+      "that a live model executed the runtime-receipt, agent-architecture or meta-abstraction procedures; only the semantic-judge lane has a live provider behind it",
       "that Skill text changed agent behavior on an unseen task",
       "cross-model or cross-harness generalization",
+      "universal evaluator validity: one judge adapter proves that adapter, model and config on these cases and nothing wider",
       "production correctness or promotion authority, which remain human-admitted"
     ]
   }

@@ -1,0 +1,65 @@
+{
+  "advisory_scores": {
+    "clarity": 4.8,
+    "contradiction_handling": 3.4,
+    "evidence_use": 3.6,
+    "explanation_completeness": 4.8,
+    "unsupported_claim_avoidance": 3.2
+  },
+  "candidate": {
+    "output_digest": "51517b52f58be0358b54163659626e928c718d71dfb08895d319c747a22c41e8",
+    "produced_by": "claude-code"
+  },
+  "case": {
+    "anchor": "NONE",
+    "blinded": true,
+    "case_digest": "e53b62d558b67dc54c49a4dc8fb70401d1bb7f3e6bcb02949aff564279024310",
+    "case_id": "real-candidate",
+    "duplicate_of": null,
+    "evidence_digest": "51517b52f58be0358b54163659626e928c718d71dfb08895d319c747a22c41e8",
+    "presentation_order": 1
+  },
+  "deterministic": {
+    "failed_gates": [],
+    "result": "PASS"
+  },
+  "judge": {
+    "available": true,
+    "config_digest": "f0d8d4fae3486619b13255617fd96870cfaabadf5e3b80cb4a91067386d6bec3",
+    "model": "gpt-5.6-sol",
+    "prompt_template_digest": "ec6454c06912f2f1c6e738a62838e4e6517e0c9cd4fe9161b7fcb37db294fb54",
+    "provider": "openai",
+    "repetition_identity": "order-1",
+    "shares_session_with_candidate": false,
+    "version": "codex-cli 0.146.0"
+  },
+  "rubric": {
+    "rubric_digest": "ba78328935f58d5d7a5c2170a996e8d58f0958a99889e76a47511da82d620481",
+    "rubric_id": "repository-audit-semantic/v1",
+    "scale_max": 5.0,
+    "scale_min": 0.0,
+    "threshold": 3.0
+  },
+  "schema": "semantic-judge-verdict/v1",
+  "usage": {
+    "cost_observed": false,
+    "cost_usd": 0.0,
+    "input_tokens": 0,
+    "latency_ms": 39986,
+    "output_tokens": 0
+  },
+  "verdict": {
+    "cited_evidence": [
+      "README.md:40-56",
+      ".github/workflows/run-tests.yml:37-83",
+      "tests/conftest.py:34-41",
+      "tests/test_requests.py:2571-2600",
+      "tests/test_requests.py:2928-3060",
+      "tests/test_requests.py:942-944",
+      "src/requests/_types.py"
+    ],
+    "outcome": "PASS",
+    "overall": 4.0,
+    "rationale": "\u7b54\u6848\u5b8c\u6574\u8986\u84cb README \u7684\u80fd\u529b\u6e05\u55ae\uff0c\u4e26\u6e05\u695a\u5340\u5206\u975c\u614b\u63a5\u7dda\u3001\u5be6\u969b\u57f7\u884c\u8207\u975e\u4e3b\u5f35\u4e8b\u9805\u3002\u4f46\u82e5\u5e72\u5168\u57df\u5426\u5b9a\u7d50\u8ad6\u7f3a\u5c11\u5b8c\u6574\u641c\u5c0b\u6536\u64da\uff0cC21 \u63d0\u5230\u672a\u5217\u5165 evidence_paths \u7684 py.typed\uff0c\u4e14 C04 \u7684\u300chermetic\u300d\u6982\u62ec\u8207 C14 \u4f7f\u7528 TARPIT \u4f4d\u5740\u5b58\u5728\u672a\u89e3\u91cb\u7684\u5f35\u529b\u3002"
+  }
+}
