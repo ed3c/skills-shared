@@ -1,0 +1,98 @@
+{
+  "schema": "ecommerce-dispute-canary/v1",
+  "_authorization": "Explicitly admitted production-like canary, per #216. Not production traffic and never described as such.",
+  "_pii_policy": "Every identifier below is drawn from a reserved-for-fiction range: example.invalid domains, +1-555-01xx numbers (reserved by NANP for fiction), and the 4111111111111111 test PAN. No value here belongs to a person. They exist so the scrubber has real work: a scrubber only tested against empty strings has not been tested.",
+  "cases": [
+    {
+      "case_id": "CANARY-01",
+      "category": "reviewer_override",
+      "input": {
+        "dispute_id": "disp-can01",
+        "order_id": "ord-can01",
+        "claimed_amount": 640.0,
+        "dispute_type": "item_not_received",
+        "user_description": "Parcel never arrived. Reach me at ada@example.invalid or +1-555-0142. Card ending 4111111111111111, billed to 12 Fictional Row, Springfield."
+      },
+      "mock": {
+        "logistics": {"latency_ms": 120, "status": "LOST", "delivered": false},
+        "vision": {"score": null},
+        "llm": {"action": "full_refund", "approved_amount": 640.0, "confidence": 0.91,
+                "reason": "Carrier confirms loss."}
+      },
+      "reviewer": {"overrode_agent": true, "reviewer_decision": "partial_refund"}
+    },
+    {
+      "case_id": "CANARY-02",
+      "category": "low_confidence",
+      "input": {
+        "dispute_id": "disp-can02",
+        "order_id": "ord-can02",
+        "claimed_amount": 90.0,
+        "dispute_type": "damaged",
+        "user_description": "Box was crushed. Contact grace@example.invalid, account 555-0177."
+      },
+      "mock": {
+        "logistics": {"latency_ms": 240, "status": "DELIVERED", "delivered": true},
+        "vision": {"score": 0.31},
+        "llm": {"action": "partial_refund", "approved_amount": 45.0, "confidence": 0.42,
+                "reason": "Image quality is poor."}
+      },
+      "reviewer": {"overrode_agent": false, "reviewer_decision": null}
+    },
+    {
+      "case_id": "CANARY-03",
+      "category": "tool_timeout",
+      "input": {
+        "dispute_id": "disp-can03",
+        "order_id": "ord-can03",
+        "claimed_amount": 220.0,
+        "dispute_type": "item_not_received",
+        "user_description": "No delivery. alan@example.invalid, +1-555-0198."
+      },
+      "mock": {
+        "logistics": {"latency_ms": 9000, "status": "UNKNOWN", "delivered": null},
+        "vision": {"score": null},
+        "llm": {"action": "escalate_human", "approved_amount": 0.0, "confidence": 0.55,
+                "reason": "Carrier unreachable."}
+      },
+      "reviewer": {"overrode_agent": false, "reviewer_decision": null}
+    },
+    {
+      "case_id": "CANARY-04",
+      "category": "clean_execution",
+      "input": {
+        "dispute_id": "disp-can04",
+        "order_id": "ord-can04",
+        "claimed_amount": 35.0,
+        "dispute_type": "damaged",
+        "user_description": "Minor damage, happy with a partial credit."
+      },
+      "mock": {
+        "logistics": {"latency_ms": 80, "status": "DELIVERED", "delivered": true},
+        "vision": {"score": 0.94},
+        "llm": {"action": "partial_refund", "approved_amount": 12.0, "confidence": 0.93,
+                "reason": "Damage visible and minor."}
+      },
+      "reviewer": {"overrode_agent": false, "reviewer_decision": null}
+    },
+    {
+      "case_id": "CANARY-05",
+      "category": "duplicate_of_canary_01",
+      "_why": "Byte-different, semantically the same failure as CANARY-01. Dataset admission must deduplicate on the normalised case digest, or one production incident becomes five Golden cases and the coverage number inflates itself.",
+      "input": {
+        "dispute_id": "disp-can05",
+        "order_id": "ord-can05",
+        "claimed_amount": 640.0,
+        "dispute_type": "item_not_received",
+        "user_description": "Parcel never arrived. Reach me at bob@example.invalid or +1-555-0155. Card ending 4111111111111111, billed to 9 Imaginary Lane, Springfield."
+      },
+      "mock": {
+        "logistics": {"latency_ms": 120, "status": "LOST", "delivered": false},
+        "vision": {"score": null},
+        "llm": {"action": "full_refund", "approved_amount": 640.0, "confidence": 0.91,
+                "reason": "Carrier confirms loss."}
+      },
+      "reviewer": {"overrode_agent": true, "reviewer_decision": "partial_refund"}
+    }
+  ]
+}

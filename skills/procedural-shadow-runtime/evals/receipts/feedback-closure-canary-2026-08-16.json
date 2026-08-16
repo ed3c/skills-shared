@@ -1,0 +1,750 @@
+{
+  "adjudication": {
+    "_why_this_file_exists": "GOLDEN_CANDIDATE to GOLDEN_ADMITTED is the one transition in #216 that a script may not make. This record names who decided, what they decided, and which exact scrubbed content they decided about. The loader refuses it if any candidate's content digest has moved since, so a decision cannot be inherited by text the approver never read.",
+    "approver": "ed3c (repository owner)",
+    "approver_role": "Human Admit authority for ed3c/skills-shared",
+    "decided_at": "2026-08-16",
+    "decision_context": "Three Golden candidates surfaced by deterministic selectors over the #216 production-like canary. Each carries a distinct failure shape, which is the stated reason all three were admitted rather than the strongest one.",
+    "decisions": [
+      {
+        "case_id": "CANARY-01",
+        "failure_shape": "human reviewer overrode the agent's full-refund decision",
+        "scrub_after_sha256": "9993af266e3c24941d12558c18984780db9d7e1a5c960caf48f458ce8ec4f285",
+        "verdict": "ADMIT"
+      },
+      {
+        "case_id": "CANARY-02",
+        "failure_shape": "model confidence 0.42 fell below the configured 0.80 threshold",
+        "scrub_after_sha256": "a86438db82f674411ce516e1a0e646acdac5c3a1009964fafae4947efd414357",
+        "verdict": "ADMIT"
+      },
+      {
+        "case_id": "CANARY-03",
+        "failure_shape": "logistics tool exceeded its 5000ms budget at 9000ms, compounded by low confidence",
+        "scrub_after_sha256": "7d3b0017b9bbbe48bd618778de528072681228dce99550fb650cf3d1bdc21058",
+        "verdict": "ADMIT"
+      }
+    ],
+    "not_admitted": [
+      {
+        "case_id": "CANARY-05",
+        "reason": "deduplicated against CANARY-01 by normalised case digest before reaching adjudication; never presented as a separate incident"
+      },
+      {
+        "case_id": "CANARY-04",
+        "reason": "no selector fired; a clean execution is not a Golden case"
+      }
+    ],
+    "revocation": "Withdrawn by deleting a decision entry. Re-running the loop then reports the case as a candidate again rather than silently keeping it admitted.",
+    "schema": "golden-adjudication/v1",
+    "scope": "Admits these cases to the Golden dataset for regression replay only. Not a promotion decision, not production authorisation, and not a data-retention approval for anything beyond the scrubbed payloads named here."
+  },
+  "anomalies": [
+    {
+      "case_id": "CANARY-01",
+      "reasons": [
+        "reviewer-override"
+      ],
+      "trace_id": "3f2b037fc9c0d2ea"
+    },
+    {
+      "case_id": "CANARY-02",
+      "reasons": [
+        "confidence-below-threshold"
+      ],
+      "trace_id": "c377e438e121d0ae"
+    },
+    {
+      "case_id": "CANARY-03",
+      "reasons": [
+        "confidence-below-threshold",
+        "tool-timeout"
+      ],
+      "trace_id": "28112bd582679f2e"
+    },
+    {
+      "case_id": "CANARY-05",
+      "reasons": [
+        "reviewer-override"
+      ],
+      "trace_id": "12f84c4e4b0874ef"
+    }
+  ],
+  "blocked_because": null,
+  "counts": {
+    "anomalies_selected": 4,
+    "duplicates_rejected": 1,
+    "feedback_closure_rate": 0.75,
+    "golden_admitted": 3,
+    "golden_candidates": 3,
+    "replay_coverage": 1.0,
+    "replayed": 3,
+    "scrub_receipts": 5,
+    "traces": 5
+  },
+  "duplicates_rejected": [
+    {
+      "case_id": "CANARY-05",
+      "duplicate_of": "CANARY-01",
+      "normalised_digest": "97ccadbaf90c8422e015d0e313a1cf3fc845d484e12ed4f099a2c3f7c04f6992"
+    }
+  ],
+  "exporter": {
+    "span_shape": "opentelemetry-compatible",
+    "vendor_exporter": "NOT_EXERCISED",
+    "why": "Langfuse is one exporter of this shape; no provider was enrolled for this repository"
+  },
+  "golden_candidates": [
+    {
+      "case_id": "CANARY-01",
+      "normalised_digest": "97ccadbaf90c8422e015d0e313a1cf3fc845d484e12ed4f099a2c3f7c04f6992",
+      "scrub_after_sha256": "9993af266e3c24941d12558c18984780db9d7e1a5c960caf48f458ce8ec4f285",
+      "scrubbed_payload": "Parcel never arrived. Reach me at <EMAIL> or <PHONE>. Card ending <PAN>, billed to <ADDRESS>, Springfield.",
+      "selected_because": [
+        "reviewer-override"
+      ],
+      "state": "GOLDEN_ADMITTED",
+      "trace_id": "3f2b037fc9c0d2ea"
+    },
+    {
+      "case_id": "CANARY-02",
+      "normalised_digest": "476eb277fb6a63b376202362cc7a8fa6183dec0e19fbb0e3a04b7bbb62fddfeb",
+      "scrub_after_sha256": "a86438db82f674411ce516e1a0e646acdac5c3a1009964fafae4947efd414357",
+      "scrubbed_payload": "Box was crushed. Contact <EMAIL>, account <PHONE>.",
+      "selected_because": [
+        "confidence-below-threshold"
+      ],
+      "state": "GOLDEN_ADMITTED",
+      "trace_id": "c377e438e121d0ae"
+    },
+    {
+      "case_id": "CANARY-03",
+      "normalised_digest": "ea6645e37dfc2937e7cb5eefb6e28a6c5a285665071c2844747461d552bbd51d",
+      "scrub_after_sha256": "7d3b0017b9bbbe48bd618778de528072681228dce99550fb650cf3d1bdc21058",
+      "scrubbed_payload": "No delivery. <EMAIL>, <PHONE>.",
+      "selected_because": [
+        "confidence-below-threshold",
+        "tool-timeout"
+      ],
+      "state": "GOLDEN_ADMITTED",
+      "trace_id": "28112bd582679f2e"
+    }
+  ],
+  "lanes": {
+    "ANOMALY_SELECTED": "OBSERVED",
+    "GOLDEN_ADMITTED": "OBSERVED",
+    "GOLDEN_CANDIDATE": "OBSERVED",
+    "HUMAN_ADJUDICATED": "OBSERVED",
+    "PII_SCRUBBED": "OBSERVED",
+    "PRODUCTION_TRACE": "OBSERVED",
+    "REGRESSION_REPLAYED": "OBSERVED"
+  },
+  "regression_replay": [
+    {
+      "baseline_requires_hitl": true,
+      "baseline_route": "HITL",
+      "candidate_requires_hitl": true,
+      "candidate_route": "HITL",
+      "case_id": "CANARY-01",
+      "route_delta": false,
+      "safety_preserved": true
+    },
+    {
+      "baseline_requires_hitl": true,
+      "baseline_route": "HITL",
+      "candidate_requires_hitl": true,
+      "candidate_route": "HITL",
+      "case_id": "CANARY-02",
+      "route_delta": false,
+      "safety_preserved": true
+    },
+    {
+      "baseline_requires_hitl": true,
+      "baseline_route": "HITL",
+      "candidate_requires_hitl": true,
+      "candidate_route": "HITL",
+      "case_id": "CANARY-03",
+      "route_delta": false,
+      "safety_preserved": true
+    }
+  ],
+  "report_digest": "ed7be291ce0d6acf0602e63769bd681a01b714fe930355edfe1627f6790dcf86",
+  "schema": "production-feedback-closure/v1",
+  "scrub_receipts": [
+    {
+      "after_sha256": "9993af266e3c24941d12558c18984780db9d7e1a5c960caf48f458ce8ec4f285",
+      "before_sha256": "0913f399293e62563def08643e29ef5b538a57aaa6e6f3ba53a7b6a801a5476c",
+      "case_id": "CANARY-01",
+      "findings": [
+        {
+          "count": 1,
+          "kind": "EMAIL"
+        },
+        {
+          "count": 1,
+          "kind": "PHONE"
+        },
+        {
+          "count": 1,
+          "kind": "PAN"
+        },
+        {
+          "count": 1,
+          "kind": "ADDRESS"
+        }
+      ],
+      "raw_retained": false,
+      "scrubber_version": "pii-scrubber/v1",
+      "trace_id": "3f2b037fc9c0d2ea"
+    },
+    {
+      "after_sha256": "a86438db82f674411ce516e1a0e646acdac5c3a1009964fafae4947efd414357",
+      "before_sha256": "fa2bd35b86a3703ac07e200be8a11bcda43fd4d6514e688ed1dea9f8e4256752",
+      "case_id": "CANARY-02",
+      "findings": [
+        {
+          "count": 1,
+          "kind": "EMAIL"
+        },
+        {
+          "count": 1,
+          "kind": "PHONE"
+        }
+      ],
+      "raw_retained": false,
+      "scrubber_version": "pii-scrubber/v1",
+      "trace_id": "c377e438e121d0ae"
+    },
+    {
+      "after_sha256": "7d3b0017b9bbbe48bd618778de528072681228dce99550fb650cf3d1bdc21058",
+      "before_sha256": "a79d0897e3bd11919d4720446d9e6e0ac559029b17738b9fdaee11db1c6bb016",
+      "case_id": "CANARY-03",
+      "findings": [
+        {
+          "count": 1,
+          "kind": "EMAIL"
+        },
+        {
+          "count": 1,
+          "kind": "PHONE"
+        }
+      ],
+      "raw_retained": false,
+      "scrubber_version": "pii-scrubber/v1",
+      "trace_id": "28112bd582679f2e"
+    },
+    {
+      "after_sha256": "5fc7afd0c958807af39e11112d39c3507939da576e832574e692782b650f2dc6",
+      "before_sha256": "5fc7afd0c958807af39e11112d39c3507939da576e832574e692782b650f2dc6",
+      "case_id": "CANARY-04",
+      "findings": [],
+      "raw_retained": false,
+      "scrubber_version": "pii-scrubber/v1",
+      "trace_id": "2d633c27bc61ac24"
+    },
+    {
+      "after_sha256": "9993af266e3c24941d12558c18984780db9d7e1a5c960caf48f458ce8ec4f285",
+      "before_sha256": "06f4c375073134b2e06012192ce90c202c1037f27cf8cc5f113a46f4d7293ac2",
+      "case_id": "CANARY-05",
+      "findings": [
+        {
+          "count": 1,
+          "kind": "EMAIL"
+        },
+        {
+          "count": 1,
+          "kind": "PHONE"
+        },
+        {
+          "count": 1,
+          "kind": "PAN"
+        },
+        {
+          "count": 1,
+          "kind": "ADDRESS"
+        }
+      ],
+      "raw_retained": false,
+      "scrubber_version": "pii-scrubber/v1",
+      "trace_id": "12f84c4e4b0874ef"
+    }
+  ],
+  "subject": {
+    "authorisation": "explicitly admitted for #216; not production traffic",
+    "provenance": "PRODUCTION_LIKE_CANARY",
+    "repository": "ed3c/skills-shared",
+    "tree_sha": "0c37a6f475d5a300b4e0212c005b5708bb65e15f"
+  },
+  "traces": [
+    {
+      "case_id": "CANARY-01",
+      "outcome": {
+        "confidence": 0.91,
+        "execution_status": "pending",
+        "latency_ms": 120,
+        "requires_hitl": true,
+        "reviewer_overrode_agent": true,
+        "route": "HITL"
+      },
+      "raw_payload_sha256": "0913f399293e62563def08643e29ef5b538a57aaa6e6f3ba53a7b6a801a5476c",
+      "spans": [
+        {
+          "attributes": {
+            "case_id": "CANARY-01",
+            "subject.tree_sha": "0c37a6f475d5a300b4e0212c005b5708bb65e15f"
+          },
+          "name": "root",
+          "parent_span_id": null,
+          "span_id": "b23da52583102c6e",
+          "trace_id": "3f2b037fc9c0d2ea"
+        },
+        {
+          "attributes": {
+            "claimed_amount": 640.0,
+            "dispute_id": "disp-can01"
+          },
+          "name": "state.initialise",
+          "parent_span_id": "b23da52583102c6e",
+          "span_id": "48b84a4780bd73dc",
+          "trace_id": "3f2b037fc9c0d2ea"
+        },
+        {
+          "attributes": {
+            "latency_ms": 120,
+            "status": "LOST"
+          },
+          "name": "tool.logistics",
+          "parent_span_id": "b23da52583102c6e",
+          "span_id": "83e6e5656024c11c",
+          "trace_id": "3f2b037fc9c0d2ea"
+        },
+        {
+          "attributes": {
+            "action": "full_refund",
+            "approved_amount": 640.0,
+            "confidence": 0.91
+          },
+          "name": "model.generate",
+          "parent_span_id": "b23da52583102c6e",
+          "span_id": "ac95b043aa33f6b6",
+          "trace_id": "3f2b037fc9c0d2ea"
+        },
+        {
+          "attributes": {
+            "requires_hitl": true,
+            "route": "HITL"
+          },
+          "name": "guardrail.evaluate",
+          "parent_span_id": "b23da52583102c6e",
+          "span_id": "4b00f72fc3c8046d",
+          "trace_id": "3f2b037fc9c0d2ea"
+        },
+        {
+          "attributes": {
+            "reviewer_decision": "partial_refund",
+            "reviewer_overrode_agent": true
+          },
+          "name": "hitl.event",
+          "parent_span_id": "b23da52583102c6e",
+          "span_id": "45d6fe5a88d49cf8",
+          "trace_id": "3f2b037fc9c0d2ea"
+        },
+        {
+          "attributes": {
+            "execution_status": "pending",
+            "idempotency_key": "idemp_disp-can01_full_refund_64000",
+            "tool_calls": null
+          },
+          "name": "sideeffect.execute",
+          "parent_span_id": "b23da52583102c6e",
+          "span_id": "57f4e610e5bfa95d",
+          "trace_id": "3f2b037fc9c0d2ea"
+        }
+      ],
+      "subject": {
+        "authorisation": "explicitly admitted for #216; not production traffic",
+        "provenance": "PRODUCTION_LIKE_CANARY",
+        "repository": "ed3c/skills-shared",
+        "tree_sha": "0c37a6f475d5a300b4e0212c005b5708bb65e15f"
+      },
+      "trace_complete": true,
+      "trace_id": "3f2b037fc9c0d2ea"
+    },
+    {
+      "case_id": "CANARY-02",
+      "outcome": {
+        "confidence": 0.42,
+        "execution_status": "pending",
+        "latency_ms": 240,
+        "requires_hitl": true,
+        "reviewer_overrode_agent": false,
+        "route": "HITL"
+      },
+      "raw_payload_sha256": "fa2bd35b86a3703ac07e200be8a11bcda43fd4d6514e688ed1dea9f8e4256752",
+      "spans": [
+        {
+          "attributes": {
+            "case_id": "CANARY-02",
+            "subject.tree_sha": "0c37a6f475d5a300b4e0212c005b5708bb65e15f"
+          },
+          "name": "root",
+          "parent_span_id": null,
+          "span_id": "1a0f85717aaf6524",
+          "trace_id": "c377e438e121d0ae"
+        },
+        {
+          "attributes": {
+            "claimed_amount": 90.0,
+            "dispute_id": "disp-can02"
+          },
+          "name": "state.initialise",
+          "parent_span_id": "1a0f85717aaf6524",
+          "span_id": "f5864a8be4c507a2",
+          "trace_id": "c377e438e121d0ae"
+        },
+        {
+          "attributes": {
+            "latency_ms": 240,
+            "status": "DELIVERED"
+          },
+          "name": "tool.logistics",
+          "parent_span_id": "1a0f85717aaf6524",
+          "span_id": "b44f6728a0620073",
+          "trace_id": "c377e438e121d0ae"
+        },
+        {
+          "attributes": {
+            "action": "partial_refund",
+            "approved_amount": 45.0,
+            "confidence": 0.42
+          },
+          "name": "model.generate",
+          "parent_span_id": "1a0f85717aaf6524",
+          "span_id": "c8e501ef97b601dc",
+          "trace_id": "c377e438e121d0ae"
+        },
+        {
+          "attributes": {
+            "requires_hitl": true,
+            "route": "HITL"
+          },
+          "name": "guardrail.evaluate",
+          "parent_span_id": "1a0f85717aaf6524",
+          "span_id": "8d79da8b542331bb",
+          "trace_id": "c377e438e121d0ae"
+        },
+        {
+          "attributes": {
+            "reviewer_decision": null,
+            "reviewer_overrode_agent": false
+          },
+          "name": "hitl.event",
+          "parent_span_id": "1a0f85717aaf6524",
+          "span_id": "96e980c30aab7df1",
+          "trace_id": "c377e438e121d0ae"
+        },
+        {
+          "attributes": {
+            "execution_status": "pending",
+            "idempotency_key": "idemp_disp-can02_partial_refund_4500",
+            "tool_calls": null
+          },
+          "name": "sideeffect.execute",
+          "parent_span_id": "1a0f85717aaf6524",
+          "span_id": "702704fe543a2aa5",
+          "trace_id": "c377e438e121d0ae"
+        }
+      ],
+      "subject": {
+        "authorisation": "explicitly admitted for #216; not production traffic",
+        "provenance": "PRODUCTION_LIKE_CANARY",
+        "repository": "ed3c/skills-shared",
+        "tree_sha": "0c37a6f475d5a300b4e0212c005b5708bb65e15f"
+      },
+      "trace_complete": true,
+      "trace_id": "c377e438e121d0ae"
+    },
+    {
+      "case_id": "CANARY-03",
+      "outcome": {
+        "confidence": 0.55,
+        "execution_status": "pending",
+        "latency_ms": 9000,
+        "requires_hitl": true,
+        "reviewer_overrode_agent": false,
+        "route": "HITL"
+      },
+      "raw_payload_sha256": "a79d0897e3bd11919d4720446d9e6e0ac559029b17738b9fdaee11db1c6bb016",
+      "spans": [
+        {
+          "attributes": {
+            "case_id": "CANARY-03",
+            "subject.tree_sha": "0c37a6f475d5a300b4e0212c005b5708bb65e15f"
+          },
+          "name": "root",
+          "parent_span_id": null,
+          "span_id": "6463474d2e39aaf1",
+          "trace_id": "28112bd582679f2e"
+        },
+        {
+          "attributes": {
+            "claimed_amount": 220.0,
+            "dispute_id": "disp-can03"
+          },
+          "name": "state.initialise",
+          "parent_span_id": "6463474d2e39aaf1",
+          "span_id": "4d645ee0be98c556",
+          "trace_id": "28112bd582679f2e"
+        },
+        {
+          "attributes": {
+            "latency_ms": 9000,
+            "status": "UNKNOWN"
+          },
+          "name": "tool.logistics",
+          "parent_span_id": "6463474d2e39aaf1",
+          "span_id": "ee2d056655afeaef",
+          "trace_id": "28112bd582679f2e"
+        },
+        {
+          "attributes": {
+            "action": "escalate_human",
+            "approved_amount": 0.0,
+            "confidence": 0.55
+          },
+          "name": "model.generate",
+          "parent_span_id": "6463474d2e39aaf1",
+          "span_id": "32a91e7aee4a49f8",
+          "trace_id": "28112bd582679f2e"
+        },
+        {
+          "attributes": {
+            "requires_hitl": true,
+            "route": "HITL"
+          },
+          "name": "guardrail.evaluate",
+          "parent_span_id": "6463474d2e39aaf1",
+          "span_id": "6ee6a6066d19463f",
+          "trace_id": "28112bd582679f2e"
+        },
+        {
+          "attributes": {
+            "reviewer_decision": null,
+            "reviewer_overrode_agent": false
+          },
+          "name": "hitl.event",
+          "parent_span_id": "6463474d2e39aaf1",
+          "span_id": "425954fe0b51ae71",
+          "trace_id": "28112bd582679f2e"
+        },
+        {
+          "attributes": {
+            "execution_status": "pending",
+            "idempotency_key": "idemp_disp-can03_escalate_human_0",
+            "tool_calls": null
+          },
+          "name": "sideeffect.execute",
+          "parent_span_id": "6463474d2e39aaf1",
+          "span_id": "d7c9e9bc707d23ad",
+          "trace_id": "28112bd582679f2e"
+        }
+      ],
+      "subject": {
+        "authorisation": "explicitly admitted for #216; not production traffic",
+        "provenance": "PRODUCTION_LIKE_CANARY",
+        "repository": "ed3c/skills-shared",
+        "tree_sha": "0c37a6f475d5a300b4e0212c005b5708bb65e15f"
+      },
+      "trace_complete": true,
+      "trace_id": "28112bd582679f2e"
+    },
+    {
+      "case_id": "CANARY-04",
+      "outcome": {
+        "confidence": 0.93,
+        "execution_status": "failed",
+        "latency_ms": 80,
+        "requires_hitl": false,
+        "reviewer_overrode_agent": false,
+        "route": "EXECUTE"
+      },
+      "raw_payload_sha256": "5fc7afd0c958807af39e11112d39c3507939da576e832574e692782b650f2dc6",
+      "spans": [
+        {
+          "attributes": {
+            "case_id": "CANARY-04",
+            "subject.tree_sha": "0c37a6f475d5a300b4e0212c005b5708bb65e15f"
+          },
+          "name": "root",
+          "parent_span_id": null,
+          "span_id": "52e56c2a9e10e65d",
+          "trace_id": "2d633c27bc61ac24"
+        },
+        {
+          "attributes": {
+            "claimed_amount": 35.0,
+            "dispute_id": "disp-can04"
+          },
+          "name": "state.initialise",
+          "parent_span_id": "52e56c2a9e10e65d",
+          "span_id": "2ad10ef69b3b3306",
+          "trace_id": "2d633c27bc61ac24"
+        },
+        {
+          "attributes": {
+            "latency_ms": 80,
+            "status": "DELIVERED"
+          },
+          "name": "tool.logistics",
+          "parent_span_id": "52e56c2a9e10e65d",
+          "span_id": "10800278148e7a6e",
+          "trace_id": "2d633c27bc61ac24"
+        },
+        {
+          "attributes": {
+            "action": "partial_refund",
+            "approved_amount": 12.0,
+            "confidence": 0.93
+          },
+          "name": "model.generate",
+          "parent_span_id": "52e56c2a9e10e65d",
+          "span_id": "13379f3c6debb2eb",
+          "trace_id": "2d633c27bc61ac24"
+        },
+        {
+          "attributes": {
+            "requires_hitl": false,
+            "route": "EXECUTE"
+          },
+          "name": "guardrail.evaluate",
+          "parent_span_id": "52e56c2a9e10e65d",
+          "span_id": "0d63f952a8e1940c",
+          "trace_id": "2d633c27bc61ac24"
+        },
+        {
+          "attributes": {
+            "reviewer_decision": null,
+            "reviewer_overrode_agent": false
+          },
+          "name": "hitl.event",
+          "parent_span_id": "52e56c2a9e10e65d",
+          "span_id": "14d3a1f62ab5b303",
+          "trace_id": "2d633c27bc61ac24"
+        },
+        {
+          "attributes": {
+            "execution_status": "failed",
+            "idempotency_key": "idemp_disp-can04_partial_refund_1200",
+            "tool_calls": null
+          },
+          "name": "sideeffect.execute",
+          "parent_span_id": "52e56c2a9e10e65d",
+          "span_id": "3d901fc9b61eb333",
+          "trace_id": "2d633c27bc61ac24"
+        }
+      ],
+      "subject": {
+        "authorisation": "explicitly admitted for #216; not production traffic",
+        "provenance": "PRODUCTION_LIKE_CANARY",
+        "repository": "ed3c/skills-shared",
+        "tree_sha": "0c37a6f475d5a300b4e0212c005b5708bb65e15f"
+      },
+      "trace_complete": true,
+      "trace_id": "2d633c27bc61ac24"
+    },
+    {
+      "case_id": "CANARY-05",
+      "outcome": {
+        "confidence": 0.91,
+        "execution_status": "pending",
+        "latency_ms": 120,
+        "requires_hitl": true,
+        "reviewer_overrode_agent": true,
+        "route": "HITL"
+      },
+      "raw_payload_sha256": "06f4c375073134b2e06012192ce90c202c1037f27cf8cc5f113a46f4d7293ac2",
+      "spans": [
+        {
+          "attributes": {
+            "case_id": "CANARY-05",
+            "subject.tree_sha": "0c37a6f475d5a300b4e0212c005b5708bb65e15f"
+          },
+          "name": "root",
+          "parent_span_id": null,
+          "span_id": "0d2d293fe43a2e77",
+          "trace_id": "12f84c4e4b0874ef"
+        },
+        {
+          "attributes": {
+            "claimed_amount": 640.0,
+            "dispute_id": "disp-can05"
+          },
+          "name": "state.initialise",
+          "parent_span_id": "0d2d293fe43a2e77",
+          "span_id": "21254c6059824416",
+          "trace_id": "12f84c4e4b0874ef"
+        },
+        {
+          "attributes": {
+            "latency_ms": 120,
+            "status": "LOST"
+          },
+          "name": "tool.logistics",
+          "parent_span_id": "0d2d293fe43a2e77",
+          "span_id": "7b08ef3fbb47b7dd",
+          "trace_id": "12f84c4e4b0874ef"
+        },
+        {
+          "attributes": {
+            "action": "full_refund",
+            "approved_amount": 640.0,
+            "confidence": 0.91
+          },
+          "name": "model.generate",
+          "parent_span_id": "0d2d293fe43a2e77",
+          "span_id": "9fe05f005d064f5a",
+          "trace_id": "12f84c4e4b0874ef"
+        },
+        {
+          "attributes": {
+            "requires_hitl": true,
+            "route": "HITL"
+          },
+          "name": "guardrail.evaluate",
+          "parent_span_id": "0d2d293fe43a2e77",
+          "span_id": "ad1f5eda60001164",
+          "trace_id": "12f84c4e4b0874ef"
+        },
+        {
+          "attributes": {
+            "reviewer_decision": "partial_refund",
+            "reviewer_overrode_agent": true
+          },
+          "name": "hitl.event",
+          "parent_span_id": "0d2d293fe43a2e77",
+          "span_id": "8d37527e086fe932",
+          "trace_id": "12f84c4e4b0874ef"
+        },
+        {
+          "attributes": {
+            "execution_status": "pending",
+            "idempotency_key": "idemp_disp-can05_full_refund_64000",
+            "tool_calls": null
+          },
+          "name": "sideeffect.execute",
+          "parent_span_id": "0d2d293fe43a2e77",
+          "span_id": "2922bf7f012aba6b",
+          "trace_id": "12f84c4e4b0874ef"
+        }
+      ],
+      "subject": {
+        "authorisation": "explicitly admitted for #216; not production traffic",
+        "provenance": "PRODUCTION_LIKE_CANARY",
+        "repository": "ed3c/skills-shared",
+        "tree_sha": "0c37a6f475d5a300b4e0212c005b5708bb65e15f"
+      },
+      "trace_complete": true,
+      "trace_id": "12f84c4e4b0874ef"
+    }
+  ]
+}

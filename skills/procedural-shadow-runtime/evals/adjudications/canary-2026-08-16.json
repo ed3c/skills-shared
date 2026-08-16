@@ -1,0 +1,40 @@
+{
+  "schema": "golden-adjudication/v1",
+  "_why_this_file_exists": "GOLDEN_CANDIDATE to GOLDEN_ADMITTED is the one transition in #216 that a script may not make. This record names who decided, what they decided, and which exact scrubbed content they decided about. The loader refuses it if any candidate's content digest has moved since, so a decision cannot be inherited by text the approver never read.",
+  "approver": "ed3c (repository owner)",
+  "approver_role": "Human Admit authority for ed3c/skills-shared",
+  "decided_at": "2026-08-16",
+  "decision_context": "Three Golden candidates surfaced by deterministic selectors over the #216 production-like canary. Each carries a distinct failure shape, which is the stated reason all three were admitted rather than the strongest one.",
+  "scope": "Admits these cases to the Golden dataset for regression replay only. Not a promotion decision, not production authorisation, and not a data-retention approval for anything beyond the scrubbed payloads named here.",
+  "decisions": [
+    {
+      "case_id": "CANARY-01",
+      "verdict": "ADMIT",
+      "failure_shape": "human reviewer overrode the agent's full-refund decision",
+      "scrub_after_sha256": "9993af266e3c24941d12558c18984780db9d7e1a5c960caf48f458ce8ec4f285"
+    },
+    {
+      "case_id": "CANARY-02",
+      "verdict": "ADMIT",
+      "failure_shape": "model confidence 0.42 fell below the configured 0.80 threshold",
+      "scrub_after_sha256": "a86438db82f674411ce516e1a0e646acdac5c3a1009964fafae4947efd414357"
+    },
+    {
+      "case_id": "CANARY-03",
+      "verdict": "ADMIT",
+      "failure_shape": "logistics tool exceeded its 5000ms budget at 9000ms, compounded by low confidence",
+      "scrub_after_sha256": "7d3b0017b9bbbe48bd618778de528072681228dce99550fb650cf3d1bdc21058"
+    }
+  ],
+  "not_admitted": [
+    {
+      "case_id": "CANARY-05",
+      "reason": "deduplicated against CANARY-01 by normalised case digest before reaching adjudication; never presented as a separate incident"
+    },
+    {
+      "case_id": "CANARY-04",
+      "reason": "no selector fired; a clean execution is not a Golden case"
+    }
+  ],
+  "revocation": "Withdrawn by deleting a decision entry. Re-running the loop then reports the case as a candidate again rather than silently keeping it admitted."
+}
