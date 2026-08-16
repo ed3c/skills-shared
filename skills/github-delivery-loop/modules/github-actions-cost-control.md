@@ -127,10 +127,12 @@ python3 skills/github-delivery-loop/scripts/github_actions_snapshot.py capture \
 
 It uses fixed `gh api` argv only and performs no mutation. It resolves the
 policy workflow path to an exact provider workflow ID before selecting the
-stable check by workflow ID, name, and PR head. A same-name job in another
-workflow is not authority; a rerun of the same job in the owning workflow stays
-ambiguous and turns red. It also resolves exact private repository identity,
-zero or one open PR, conclusion, and annotations.
+stable check by workflow ID, name, PR head, Actions job identity and job-step
+count. A same-name job in another workflow is not authority. A zero-step
+`skipped` job is retained as non-execution; two actual executions of the same
+job in the owning workflow stay ambiguous and turn red. Missing step provenance
+does not receive that exemption. Capture also resolves exact private repository
+identity, zero or one open PR, conclusion, and annotations.
 
 需要把分支缺席當成 publication authority 時加 `--strict`；orphan remote branch 會轉紅，且
 snapshot 的 `initial_boundary` 只可能是 `trusted-initial`、`branch-present-without-pr`、
