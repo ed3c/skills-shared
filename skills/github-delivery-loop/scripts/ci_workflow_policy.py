@@ -35,6 +35,45 @@ def _load_object(path: Path, label: str) -> dict[str, Any]:
     return value
 
 
+def _safe_workflow(value: Any, label: str) -> str:
+    if not isinstance(value, str) or not value.startswith(".github/workflows/"):
+        raise PolicyError(f"{label} must be under .github/workflows/")
+    path = Path(value)
+    if path.is_absolute() or ".." in path.parts:
+        raise PolicyError(f"{label} must be a safe repository-relative path")
+    return value
+
+
+def feedback_checks(policy: dict[str, Any]) -> list[dict[str, str]]:
+    jobs = policy.get("required_jobs")
+    if not isinstance(jobs, list) or len(jobs) != 1 or not isinstance(jobs[0], str) or not jobs[0]:
+        raise PolicyError("publication requires exactly one stable check name")
+    primary = {
+        "workflow": _safe_workflow(policy.get("workflow"), "workflow"),
+        "job": jobs[0],
+        "role": "primary",
+    }
+    auxiliary = policy.get("repair_feedback_checks", [])
+    if not isinstance(auxiliary, list):
+        raise PolicyError("repair_feedback_checks must be an array")
+    result = [primary]
+    seen = {(primary["workflow"], primary["job"])}
+    for index, value in enumerate(auxiliary):
+        label = f"repair_feedback_checks[{index}]"
+        if not isinstance(value, dict) or set(value) != {"workflow", "job"}:
+            raise PolicyError(f"{label} must contain exactly workflow and job")
+        workflow = _safe_workflow(value["workflow"], f"{label}.workflow")
+        job = value["job"]
+        if not isinstance(job, str) or not job or "\n" in job:
+            raise PolicyError(f"{label}.job must be a non-empty single-line string")
+        pair = (workflow, job)
+        if pair in seen:
+            raise PolicyError(f"duplicate repair-feedback workflow/job pair: {workflow} / {job}")
+        seen.add(pair)
+        result.append({"workflow": workflow, "job": job, "role": "auxiliary"})
+    return result
+
+
 def load_policy(path: Path) -> dict[str, Any]:
     value = _load_object(path, "policy")
     if value.get("schema") != SCHEMA:
@@ -47,11 +86,7 @@ def load_policy(path: Path) -> dict[str, Any]:
     default_branch = value.get("default_branch")
     if not isinstance(default_branch, str) or not default_branch:
         raise PolicyError("default_branch must be a non-empty string")
-    workflow = value.get("workflow")
-    if not isinstance(workflow, str) or not workflow.startswith(".github/workflows/"):
-        raise PolicyError("workflow must be under .github/workflows/")
-    if Path(workflow).is_absolute() or ".." in Path(workflow).parts:
-        raise PolicyError("workflow must be a safe repository-relative path")
+    _safe_workflow(value.get("workflow"), "workflow")
     jobs = value.get("required_jobs")
     if not isinstance(jobs, list) or not jobs or not all(
         isinstance(job, str) and job for job in jobs
@@ -70,6 +105,8 @@ def load_policy(path: Path) -> dict[str, Any]:
         allowed = ", ".join(sorted(PULL_REQUEST_TYPES))
         raise PolicyError(f"pull_request_mode must be one of: {allowed}")
     value["pull_request_mode"] = pull_request_mode
+    if len(jobs) == 1:
+        feedback_checks(value)
     return value
 
 
@@ -139,6 +176,32 @@ def _list_values(lines: list[str], key: str, indent: int) -> list[str]:
     raise PolicyError(f"missing {key}")
 
 
+def _require_immutable_actions(lines: list[str]) -> None:
+    unpinned: list[str] = []
+    for number, raw in enumerate(lines, 1):
+        match = re.search(r"\buses:\s*([^\s#]+)", raw)
+        if match is None:
+            continue
+        value = match.group(1).strip("'\"")
+        if value.startswith("./") or value.startswith("docker://"):
+            continue
+        if "@" not in value or SHA_RE.fullmatch(value.rsplit("@", 1)[1]) is None:
+            unpinned.append(f"line {number}: {value}")
+    if unpinned:
+        raise PolicyError("actions must use immutable SHAs: " + "; ".join(unpinned))
+
+
+def evaluate_feedback_workflow(check: dict[str, str], workflow_text: str) -> list[str]:
+    lines = workflow_text.splitlines()
+    jobs_lines = _section(lines, "jobs")
+    if check["job"] not in _mapping_keys(jobs_lines, 2):
+        raise PolicyError(
+            f"missing repair-feedback job {check['job']} in {check['workflow']}"
+        )
+    _require_immutable_actions(lines)
+    return [f"feedback={check['workflow']}:{check['job']}"]
+
+
 def evaluate_workflow(policy: dict[str, Any], workflow_text: str) -> list[str]:
     lines = workflow_text.splitlines()
     on_lines = _section(lines, "on")
@@ -181,18 +244,7 @@ def evaluate_workflow(policy: dict[str, Any], workflow_text: str) -> list[str]:
     if missing_jobs:
         raise PolicyError(f"missing required jobs: {', '.join(missing_jobs)}")
 
-    unpinned: list[str] = []
-    for number, raw in enumerate(lines, 1):
-        match = re.search(r"\buses:\s*([^\s#]+)", raw)
-        if match is None:
-            continue
-        value = match.group(1).strip("'\"")
-        if value.startswith("./") or value.startswith("docker://"):
-            continue
-        if "@" not in value or SHA_RE.fullmatch(value.rsplit("@", 1)[1]) is None:
-            unpinned.append(f"line {number}: {value}")
-    if unpinned:
-        raise PolicyError("actions must use immutable SHAs: " + "; ".join(unpinned))
+    _require_immutable_actions(lines)
 
     return [
         f"repository={policy['repository']}",
@@ -221,7 +273,19 @@ def check(repo_root: Path, policy_path: Path) -> list[str]:
         raise PolicyError("local verification contract resolves outside repository") from error
     if not contract_path.is_file():
         raise PolicyError("local verification contract is missing")
-    return evaluate_workflow(policy, workflow_text)
+    details = evaluate_workflow(policy, workflow_text)
+    declared_feedback = feedback_checks(policy) if len(policy["required_jobs"]) == 1 else []
+    for feedback in declared_feedback[1:]:
+        auxiliary_path = (root / feedback["workflow"]).resolve()
+        try:
+            auxiliary_path.relative_to(root)
+            auxiliary_text = auxiliary_path.read_text(encoding="utf-8")
+        except ValueError as error:
+            raise PolicyError("repair-feedback workflow resolves outside repository") from error
+        except OSError as error:
+            raise PolicyError(f"unreadable repair-feedback workflow: {error}") from error
+        details.extend(evaluate_feedback_workflow(feedback, auxiliary_text))
+    return details
 
 
 def main() -> int:

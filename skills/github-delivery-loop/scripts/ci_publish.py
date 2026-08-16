@@ -125,17 +125,37 @@ def verify(repo_root: Path, policy_path: Path) -> Path:
 
 
 def _capture_live_state(
-    repository: str, branch: str, check_name: str, workflow: str
+    repository: str, branch: str, feedback_checks: list[dict[str, str]]
 ) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
-    """Capture one provider-bound state and derive its strict snapshot."""
+    """Capture every policy-bound repair feedback check and derive one snapshot."""
     transport = github_actions_snapshot.capture_transport(
-        repository, branch, check_name, workflow, 30
+        repository, branch, feedback_checks, 30
     )
     observation = github_actions_snapshot.observation_from_transport(transport)
     snapshot = github_actions_snapshot.build(
-        observation, check_name, strict=True
+        observation, feedback_checks, strict=True
     )
     return transport, observation, snapshot
+
+
+def _require_snapshot_feedback_checks(
+    snapshot: dict[str, Any], declared: list[dict[str, str]]
+) -> None:
+    actions = snapshot.get("actions")
+    if not isinstance(actions, dict) or actions.get("circuit") != "closed":
+        return
+    checks = actions.get("checks")
+    if not checks:
+        return
+    actual = [
+        {key: item.get(key) for key in ("workflow", "job", "role")}
+        for item in checks
+        if isinstance(item, dict)
+    ] if isinstance(checks, list) else []
+    if actual != declared:
+        raise PublicationError(
+            "snapshot repair-feedback checks do not match policy declarations"
+        )
 
 
 def publish(
@@ -165,12 +185,10 @@ def publish(
     remote_url = _git(repo_root, "remote", "get-url", "--push", remote)
     if _repository_from_url(remote_url).lower() != policy["repository"].lower():
         raise PublicationError("push remote repository does not match policy")
-    if len(policy["required_jobs"]) != 1:
-        raise PublicationError("publication requires exactly one stable check name")
+    repair_feedback_checks = ci_workflow_policy.feedback_checks(policy)
     if execute:
         transport, observation, snapshot = _capture_live_state(
-            policy["repository"], target_branch, policy["required_jobs"][0],
-            policy["workflow"]
+            policy["repository"], target_branch, repair_feedback_checks
         )
         _write_json(_receipt_path(repo_root, "live-transport.json"), transport)
         _write_json(_receipt_path(repo_root, "live-observation.json"), observation)
@@ -181,6 +199,7 @@ def publish(
         effective_snapshot_path = snapshot_path
     if snapshot.get("repository", {}).get("full_name") != policy["repository"]:
         raise PublicationError("snapshot-repository-does-not-match-policy")
+    _require_snapshot_feedback_checks(snapshot, repair_feedback_checks)
     receipt_path = _receipt_path(repo_root, "local-verification.json")
     receipt = ci_publish_gate.load_object(receipt_path, "local verification receipt")
     evidence = ci_publish_gate.load_object(

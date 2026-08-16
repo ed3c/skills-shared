@@ -1,5 +1,5 @@
 {
-  "schema": "github-actions-publish-snapshot/v4",
+  "schema": "github-actions-publish-snapshot/v5",
   "repository": {
     "full_name": "ed3c/skills-shared",
     "repository_id": 1326262274,
@@ -20,7 +20,7 @@
     "circuit": "billing-open",
     "observed_at": "2026-08-12T05:03:00Z",
     "blocker": "billing-or-spending-limit",
-    "latest_check": null
+    "checks": []
   },
   "captured_at": "__CAPTURED_AT__"
 }

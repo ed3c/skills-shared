@@ -61,10 +61,10 @@ python3 "${snapshot}" replay \
 python3 - "${scratch}/good-snapshot.json" <<'PY'
 import json, pathlib, sys
 value = json.loads(pathlib.Path(sys.argv[1]).read_text())
-assert value["schema"] == "github-actions-publish-snapshot/v4"
+assert value["schema"] == "github-actions-publish-snapshot/v5"
 assert value["branch"] == {"name": "feature", "head_sha": "1" * 40}
-assert value["pull_request"]["feedback"]["id"] == "check-run:9001"
-assert value["actions"]["latest_check"]["conclusion"] == "failure"
+assert value["pull_request"]["feedback"]["id"] == "check-runs:9001"
+assert value["actions"]["checks"][0]["conclusion"] == "failure"
 PY
 
 python3 "${snapshot}" replay \
@@ -76,7 +76,7 @@ import json, pathlib, sys
 value = json.loads(pathlib.Path(sys.argv[1]).read_text())
 assert value["actions"]["circuit"] == "billing-open"
 assert value["actions"]["blocker"] == "billing-or-spending-limit"
-assert value["actions"]["latest_check"] is None
+assert value["actions"]["checks"] == []
 PY
 
 if python3 "${snapshot}" replay \
@@ -174,8 +174,11 @@ transport = {
     },
     "repository": "ed3c/example",
     "branch": "feature",
-    "check_name": "contract",
-    "workflow": ".github/workflows/verify.yml",
+    "feedback_checks": [{
+        "workflow": ".github/workflows/verify.yml",
+        "job": "contract",
+        "role": "primary",
+    }],
     "captured_at": "2026-08-14T10:05:00Z",
     "captures": [{
         "argv": ["/tmp/fake-gh", "api", "repos/ed3c/example"],

@@ -47,7 +47,7 @@ from pathlib import Path
 
 receipt = json.loads(Path(sys.argv[1]).read_text())
 snapshot = {
-    "schema": "github-actions-publish-snapshot/v4",
+    "schema": "github-actions-publish-snapshot/v5",
     "repository": {
         "full_name": "ed3c/example",
         "repository_id": 123,
@@ -68,7 +68,7 @@ snapshot = {
         "circuit": "closed",
         "observed_at": None,
         "blocker": None,
-        "latest_check": None,
+        "checks": [],
     },
     "captured_at": __import__("datetime").datetime.now(__import__("datetime").timezone.utc).isoformat().replace("+00:00", "Z"),
 }

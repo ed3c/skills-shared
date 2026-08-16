@@ -27,17 +27,18 @@ def load(name: str):
 
 POLICY = load("ci_workflow_policy")
 GUARD = load("ci_publish_guard")
+SNAPSHOT = load("github_actions_snapshot")
 
 
 class LiveCaptureSeamTests(unittest.TestCase):
-    def test_live_capture_uses_current_snapshot_signature(self) -> None:
+    def test_live_capture_binds_every_policy_declared_feedback_check(self) -> None:
         scripts = str(SKILL / "scripts")
         if scripts not in sys.path:
             sys.path.insert(0, scripts)
         publish = load("ci_publish")
         transport = {"schema": "github-actions-provider-transport/v4"}
         observation = {"schema": "github-actions-observation/v6"}
-        snapshot = {"schema": "github-actions-publish-snapshot/v4"}
+        snapshot = {"schema": "github-actions-publish-snapshot/v5"}
         with (
             mock.patch.object(
                 publish.github_actions_snapshot,
@@ -55,17 +56,45 @@ class LiveCaptureSeamTests(unittest.TestCase):
                 return_value=snapshot,
             ) as build,
         ):
+            checks = [
+                {"workflow": ".github/workflows/verify.yml", "job": "verify"},
+                {"workflow": ".github/workflows/binding.yml", "job": "binding"},
+            ]
             actual_transport, actual_observation, actual_snapshot = publish._capture_live_state(
-                "ed3c/example", "agent/example", "verify", ".github/workflows/verify.yml"
+                "ed3c/example", "agent/example", checks
             )
         capture_transport.assert_called_once_with(
-            "ed3c/example", "agent/example", "verify", ".github/workflows/verify.yml", 30
+            "ed3c/example", "agent/example", checks, 30
         )
         derive.assert_called_once_with(transport)
-        build.assert_called_once_with(observation, "verify", strict=True)
+        build.assert_called_once_with(observation, checks, strict=True)
         self.assertIs(actual_transport, transport)
         self.assertIs(actual_observation, observation)
         self.assertIs(actual_snapshot, snapshot)
+
+    def test_snapshot_cannot_omit_a_policy_declared_auxiliary_check(self) -> None:
+        scripts = str(SKILL / "scripts")
+        if scripts not in sys.path:
+            sys.path.insert(0, scripts)
+        publish = load("ci_publish")
+        declared = [
+            {"workflow": ".github/workflows/verify.yml", "job": "verify", "role": "primary"},
+            {"workflow": ".github/workflows/binding.yml", "job": "binding", "role": "auxiliary"},
+        ]
+        snapshot = {
+            "actions": {
+                "circuit": "closed",
+                "checks": [{
+                    "workflow": ".github/workflows/verify.yml",
+                    "job": "verify",
+                    "role": "primary",
+                }],
+            }
+        }
+        with self.assertRaisesRegex(
+            publish.PublicationError, "do not match policy"
+        ):
+            publish._require_snapshot_feedback_checks(snapshot, declared)
 
 
 WORKFLOW = """name: verify
@@ -99,6 +128,23 @@ UNIVERSAL_WORKFLOW = WORKFLOW.replace(
 )
 
 
+AUXILIARY_WORKFLOW = """name: binding
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  binding:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - run: bash verify-binding.sh
+"""
+
+
 def policy(pull_request_mode: str | None = "draft-first") -> dict:
     value = {
         "schema": "github-ci-policy/v2",
@@ -114,7 +160,48 @@ def policy(pull_request_mode: str | None = "draft-first") -> dict:
     return value
 
 
+def multi_workflow_policy() -> dict:
+    value = policy("universal")
+    value["repair_feedback_checks"] = [
+        {"workflow": ".github/workflows/binding.yml", "job": "binding"}
+    ]
+    return value
+
+
 class WorkflowPolicyTests(unittest.TestCase):
+    def test_auxiliary_feedback_workflow_is_normalized_after_primary(self) -> None:
+        checks = POLICY.feedback_checks(multi_workflow_policy())
+        self.assertEqual(checks, [
+            {"workflow": ".github/workflows/verify.yml", "job": "verify", "role": "primary"},
+            {"workflow": ".github/workflows/binding.yml", "job": "binding", "role": "auxiliary"},
+        ])
+
+    def test_duplicate_primary_feedback_pair_is_rejected(self) -> None:
+        value = policy()
+        value["repair_feedback_checks"] = [
+            {"workflow": value["workflow"], "job": value["required_jobs"][0]}
+        ]
+        with self.assertRaisesRegex(POLICY.PolicyError, "duplicate"):
+            POLICY.feedback_checks(value)
+
+    def test_auxiliary_feedback_workflow_must_own_declared_job(self) -> None:
+        with self.assertRaisesRegex(POLICY.PolicyError, "missing repair-feedback job"):
+            POLICY.evaluate_feedback_workflow(
+                {"workflow": ".github/workflows/binding.yml", "job": "missing"},
+                AUXILIARY_WORKFLOW,
+            )
+
+    def test_auxiliary_feedback_workflow_requires_pinned_actions(self) -> None:
+        hollow = AUXILIARY_WORKFLOW.replace(
+            "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "actions/checkout@v4",
+        )
+        with self.assertRaisesRegex(POLICY.PolicyError, "immutable SHAs"):
+            POLICY.evaluate_feedback_workflow(
+                {"workflow": ".github/workflows/binding.yml", "job": "binding"},
+                hollow,
+            )
+
     def test_cost_controlled_workflow_is_accepted(self) -> None:
         details = POLICY.evaluate_workflow(policy(), WORKFLOW)
         self.assertIn("required_jobs=verify", details)
@@ -183,6 +270,81 @@ class WorkflowPolicyTests(unittest.TestCase):
         )
         with self.assertRaisesRegex(POLICY.PolicyError, "immutable SHAs"):
             POLICY.evaluate_workflow(policy(), hollow)
+
+
+class MultiWorkflowSnapshotTests(unittest.TestCase):
+    CHECKS = [
+        {"workflow": ".github/workflows/verify.yml", "job": "verify", "role": "primary"},
+        {"workflow": ".github/workflows/binding.yml", "job": "binding", "role": "auxiliary"},
+    ]
+
+    @staticmethod
+    def observation() -> dict:
+        value = SNAPSHOT.fixture()
+        primary = value["check_runs"][0]
+        primary.update({
+            "name": "verify",
+            "workflow_path": ".github/workflows/verify.yml",
+            "conclusion": "success",
+        })
+        auxiliary = dict(primary)
+        auxiliary.update({
+            "id": 9002,
+            "name": "binding",
+            "workflow_path": ".github/workflows/binding.yml",
+            "conclusion": "failure",
+            "workflow_id": 6002,
+            "workflow_run_id": 7002,
+            "check_suite_id": 8002,
+            "job_id": 5002,
+            "completed_at": "2026-08-12T05:01:01Z",
+        })
+        value["check_runs"].append(auxiliary)
+        return value
+
+    def test_declared_auxiliary_failure_becomes_exact_batched_feedback(self) -> None:
+        result = SNAPSHOT.build(self.observation(), self.CHECKS)
+        self.assertEqual(result["schema"], "github-actions-publish-snapshot/v5")
+        self.assertEqual(result["pull_request"]["feedback"]["id"], "check-runs:9002")
+        self.assertEqual(
+            [(item["workflow"], item["job"], item["conclusion"]) for item in result["actions"]["checks"]],
+            [
+                (".github/workflows/verify.yml", "verify", "success"),
+                (".github/workflows/binding.yml", "binding", "failure"),
+            ],
+        )
+
+    def test_multiple_declared_failures_have_one_deterministic_feedback_id(self) -> None:
+        value = self.observation()
+        value["check_runs"][0]["conclusion"] = "failure"
+        result = SNAPSHOT.build(value, self.CHECKS)
+        self.assertEqual(
+            result["pull_request"]["feedback"]["id"],
+            "check-runs:9001,9002",
+        )
+
+    def test_missing_declared_auxiliary_check_fails_closed(self) -> None:
+        value = self.observation()
+        value["check_runs"] = value["check_runs"][:1]
+        with self.assertRaisesRegex(SNAPSHOT.SnapshotError, "declared repair-feedback check.*missing"):
+            SNAPSHOT.build(value, self.CHECKS)
+
+    def test_auxiliary_rerun_for_exact_head_is_ambiguous(self) -> None:
+        value = self.observation()
+        duplicate = dict(value["check_runs"][1], id=9003, job_id=5003)
+        value["check_runs"].append(duplicate)
+        with self.assertRaisesRegex(SNAPSHOT.SnapshotError, "ran more than once"):
+            SNAPSHOT.build(value, self.CHECKS)
+
+    def test_auxiliary_no_runner_billing_is_not_actionable_feedback(self) -> None:
+        value = self.observation()
+        value["check_runs"][1]["annotations"] = [{
+            "message": "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"
+        }]
+        result = SNAPSHOT.build(value, self.CHECKS)
+        self.assertEqual(result["actions"]["circuit"], "billing-open")
+        self.assertEqual(result["actions"]["checks"], [])
+        self.assertIsNone(result["pull_request"]["feedback"])
 
 
 class PublicationCommandTests(unittest.TestCase):
@@ -296,7 +458,7 @@ class PublicationCommandTests(unittest.TestCase):
                 "draft" if intent == "ready-for-review" else "ready"
             )
             snapshot = {
-                "schema": "github-actions-publish-snapshot/v4",
+                "schema": "github-actions-publish-snapshot/v5",
                 "repository": {
                     "full_name": "ed3c/example",
                     "repository_id": 123,
@@ -318,7 +480,7 @@ class PublicationCommandTests(unittest.TestCase):
                     "last_published_at": None if state == "absent" else "2026-08-12T06:00:00Z",
                     "feedback": (
                         {
-                            "id": "check-run:7",
+                            "id": "check-runs:9001",
                             "kind": "ci",
                             "head_sha": remote_head,
                             "observed_at": "2026-08-12T06:01:00Z",
@@ -332,8 +494,12 @@ class PublicationCommandTests(unittest.TestCase):
                     "circuit": "closed",
                     "observed_at": None,
                     "blocker": None,
-                    "latest_check": (
+                    "checks": (
+                        [
                         {
+                            "workflow": ".github/workflows/verify.yml",
+                            "job": "verify",
+                            "role": "primary",
                             "head_sha": remote_head,
                             "conclusion": "failure",
                             "completed_at": "2026-08-12T06:01:00Z",
@@ -344,8 +510,9 @@ class PublicationCommandTests(unittest.TestCase):
                             "job_id": 5001,
                             "app_id": 15368,
                         }
+                        ]
                         if intent == "batched-repair" and state != "absent"
-                        else None
+                        else []
                     ),
                 },
                 "captured_at": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
