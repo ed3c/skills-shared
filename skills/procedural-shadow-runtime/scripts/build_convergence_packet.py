@@ -273,6 +273,26 @@ def build(rollback_path: Path, admit_record: Path | None) -> dict[str, Any]:
         resolution_state = "UNRESOLVABLE_IN_THIS_CHECKOUT"
 
     lanes = evaluate_lanes()
+
+    # A CI receipt can never name the commit that contains it: committing the
+    # receipt moves HEAD. What it must not be is unrelated. #212 forbids
+    # promoting a stale or parent-head run to exact-head PASS, so the
+    # relationship is recorded rather than assumed.
+    ci_receipt = RECEIPTS / "github-actions-exact-head.json"
+    ci_head = None
+    ci_relation = "ABSENT"
+    if ci_receipt.is_file():
+        ci_head = json.loads(ci_receipt.read_text(encoding="utf-8")).get("subject", {}).get("current_sha")
+        if ci_head == candidate_commit:
+            ci_relation = "EXACT"
+        else:
+            try:
+                git("merge-base", "--is-ancestor", ci_head, candidate_commit)
+                ci_relation = "ANCESTOR_OF_CANDIDATE"
+            except subprocess.CalledProcessError:
+                ci_relation = "UNRELATED_TO_CANDIDATE"
+            except Exception:
+                ci_relation = "UNRESOLVABLE_IN_THIS_CHECKOUT"
     summary_path = SKILL / "evals" / "uplift-matrix-summary.json"
     uplift = json.loads(summary_path.read_text(encoding="utf-8")) if summary_path.is_file() else None
     gates = level_gates(lanes, uplift)
@@ -318,6 +338,8 @@ def build(rollback_path: Path, admit_record: Path | None) -> dict[str, Any]:
         },
         "lanes": lanes,
         "level_gates": gates,
+        "ci_subject": {"receipt_head": ci_head, "candidate_commit": candidate_commit,
+                       "relation": ci_relation},
         "current_admitted_level": "NONE",
         "_why_none": "No prior Human Admit record exists for this candidate.",
         # One level above what is admitted, never one above what is reachable.
@@ -370,6 +392,8 @@ def build(rollback_path: Path, admit_record: Path | None) -> dict[str, Any]:
         reasons.append("rollback tree equals candidate tree")
     if packet["security_privacy_licensing"]["privacy_scan"]["result"] != "CLEAN":
         reasons.append("privacy scan found forbidden values")
+    if ci_relation == "UNRELATED_TO_CANDIDATE":
+        reasons.append(f"CI receipt head {ci_head} is not an ancestor of the candidate")
     if highest_reachable is None:
         reasons.append("no level gate is reachable")
 
@@ -545,6 +569,7 @@ def main() -> int:
           f"highest_reachable={packet['highest_reachable_level']} "
           f"rollback_distinct={packet['rollback']['distinct_from_candidate']} "
           f"rollback={packet['rollback']['resolution_state']} "
+          f"ci_subject={packet['ci_subject']['relation']} "
           f"privacy={packet['security_privacy_licensing']['privacy_scan']['result']}")
     for lane in packet["lanes"]:
         print(f"  {lane['issue']:<5} {lane['state']:<8} "

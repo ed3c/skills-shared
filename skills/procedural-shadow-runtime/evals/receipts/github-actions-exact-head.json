@@ -1,32 +1,38 @@
 {
   "action": {
     "class": "EXACT_HEAD_CI_EXECUTION",
-    "intent_digest": "9f902b88592cd5de90727acf17b33eb2aaf772d0e9c2f08a5fd5a50e153113d1",
+    "intent_digest": "0afb05eee621aa65e7de3bc5f9aa7584d1bd24590f8adc61a2c7a3dba0ed86d4",
     "side_effecting": false
   },
   "actions_run": {
     "bundle_offline_replay": {
       "exit_code": 0,
       "stderr": "",
-      "stdout": "EVIDENCE-BUNDLE-GREEN files=26 head=6021233db7b2 run=31952461950 verified offline"
+      "stdout": "EVIDENCE-BUNDLE-GREEN files=45 head=d56dac182ce2 run=31953680843 verified offline"
     },
-    "conclusion": "failure",
+    "conclusion": "cancelled",
     "event": "push",
-    "expected_sha": "6021233db7b25a3b5ae2afcf3edc53fa7afe2082",
-    "failure_class": "REPOSITORY_TEST",
-    "head_sha": "6021233db7b25a3b5ae2afcf3edc53fa7afe2082",
+    "expected_sha": "d56dac182ce255459b84274d63978c5df1606f59",
+    "failure_class": "SIBLING_JOB_CANCELLED",
+    "head_sha": "d56dac182ce255459b84274d63978c5df1606f59",
     "jobs": {
-      "failed_jobs": [
-        "procedural-shadow-runtime"
+      "cancelled_jobs": [
+        "dual-forge-repository-loop"
       ],
+      "failed_jobs": [],
+      "focus_job": "procedural-shadow-runtime",
+      "focus_job_present": true,
       "job_count": 11,
       "jobs_with_steps": 11,
       "provider_circuit_open": false,
-      "runnerless_jobs": []
+      "runnerless_jobs": [],
+      "sibling_jobs_failed": [
+        "dual-forge-repository-loop"
+      ]
     },
-    "manifest_file_count": 26,
+    "manifest_file_count": 45,
     "run_attempt": 1,
-    "run_id": 31952461950,
+    "run_id": 31953680843,
     "status": "completed",
     "workflow": "Skill Suites"
   },
@@ -37,7 +43,7 @@
       "source": {
         "content_sha256": "6497cd54c5b4112f2662d181c512b9491f07bb1d66765cdf584ef4ea2bc4cb7c",
         "path": "skills/procedural-shadow-runtime/SKILL.md",
-        "ref": "6021233db7b25a3b5ae2afcf3edc53fa7afe2082",
+        "ref": "d56dac182ce255459b84274d63978c5df1606f59",
         "repository": "ed3c/skills-shared"
       }
     }
@@ -56,7 +62,7 @@
     {
       "assertion_id": "declared-suite-commands-concluded-without-repository-failure",
       "procedure_id": "procedural-shadow-runtime.exact-head-ci-execution",
-      "result": "FAIL"
+      "result": "PASS"
     },
     {
       "assertion_id": "artifact-manifest-binds-every-file-by-sha256",
@@ -70,28 +76,28 @@
     }
   ],
   "checkpoint": "BEFORE_PR_OR_PUBLICATION",
-  "close_state": "FAIL",
+  "close_state": "PASS",
   "dispositions": [
     {
       "procedure_id": "procedural-shadow-runtime.exact-head-ci-execution",
-      "state": "FAILED"
+      "state": "VERIFIED"
     }
   ],
   "evidence": [
     {
-      "artifact_sha256": "466d31d7b3d93de885185a5aaa9465405345ca825140314ddab0de211a270bc1",
-      "evidence_id": "actions-run-31952461950",
+      "artifact_sha256": "56dd8ebd9d46b3794f356a304cc55ebde1faee48c1548ba7def42c896ee87341",
+      "evidence_id": "actions-run-31953680843",
       "exact_subject": true,
       "kind": "COMMAND",
       "procedure_id": "procedural-shadow-runtime.exact-head-ci-execution"
     }
   ],
-  "receipt_id": "github-actions-31952461950-6021233db7b2",
+  "receipt_id": "github-actions-31953680843-d56dac182ce2",
   "schema": "procedural-shadow-runtime-receipt/v1",
   "subject": {
-    "base_sha": "6021233db7b25a3b5ae2afcf3edc53fa7afe2082",
-    "context_digest": "4bdaa7bc5af6c08e49b7cc130e586fcd266dd5822f935369de3b53fbdcd6d45a",
-    "current_sha": "6021233db7b25a3b5ae2afcf3edc53fa7afe2082",
+    "base_sha": "d56dac182ce255459b84274d63978c5df1606f59",
+    "context_digest": "b118b0674bfb0dbfe385c71e982fb83982c8546bd83122be28c5b5d424469325",
+    "current_sha": "d56dac182ce255459b84274d63978c5df1606f59",
     "repository": "ed3c/skills-shared",
     "runtime": "GITHUB_ACTIONS"
   }

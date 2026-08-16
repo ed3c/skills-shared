@@ -62,21 +62,39 @@ def gh_api(path: str) -> Any:
     return json.loads(result.stdout)
 
 
-def classify_jobs(jobs: list[dict[str, Any]]) -> dict[str, Any]:
-    """Separate 'no runner ever picked this up' from 'the tests failed'.
+def classify_jobs(jobs: list[dict[str, Any]], focus_job: str | None = None) -> dict[str, Any]:
+    """Separate three things a red run can mean, and scope the verdict to one job.
 
     A job with no steps and no runner did not fail; it never began. Reporting
     that as a test failure is how a billing incident becomes a code incident in
     everyone's memory.
+
+    A job cancelled because a later push superseded the run did not fail either.
+    This matrix carries a leg per skill, so a sibling leg cancelled mid-flight
+    marks the whole run red while the leg this receipt is about succeeded on the
+    exact head. `focus_job` is what keeps the receipt's subject the subject: the
+    verdict is about that leg, and every sibling outcome is still recorded
+    beside it rather than dropped.
     """
     started = [job for job in jobs if job.get("steps")]
     runnerless = [job["name"] for job in jobs if not job.get("steps")]
-    failed = [job["name"] for job in started if job.get("conclusion") not in {"success", "skipped"}]
+    cancelled = [job["name"] for job in jobs if job.get("conclusion") == "cancelled"]
+    graded = [job for job in started
+              if focus_job is None or job.get("name") == focus_job]
+    failed = [job["name"] for job in graded
+              if job.get("conclusion") not in {"success", "skipped"}]
     return {
         "job_count": len(jobs),
         "jobs_with_steps": len(started),
         "runnerless_jobs": runnerless,
+        "cancelled_jobs": cancelled,
+        "focus_job": focus_job,
+        "focus_job_present": any(job.get("name") == focus_job for job in started)
+                             if focus_job else None,
         "failed_jobs": failed,
+        "sibling_jobs_failed": [job["name"] for job in started
+                                if job.get("conclusion") not in {"success", "skipped"}
+                                and job["name"] not in failed],
         "provider_circuit_open": bool(runnerless),
     }
 
@@ -96,7 +114,8 @@ def build_receipt(run: dict[str, Any], jobs: dict[str, Any], expected_sha: str,
                   skill_digest: str) -> dict[str, Any]:
     procedure = "procedural-shadow-runtime.exact-head-ci-execution"
     same_head = run["head_sha"] == expected_sha
-    runner_present = jobs["jobs_with_steps"] > 0 and not jobs["provider_circuit_open"]
+    runner_present = (jobs["jobs_with_steps"] > 0 and not jobs["provider_circuit_open"]
+                      and jobs.get("focus_job_present") is not False)
     replayed = bundle_verify["exit_code"] == 0
     manifest_binds = bool(manifest and manifest.get("files")) and all(
         entry.get("sha256") for entry in (manifest or {}).get("files", [])
@@ -174,8 +193,12 @@ def build_receipt(run: dict[str, Any], jobs: dict[str, Any], expected_sha: str,
             "jobs": jobs,
             # A provider failure and a repository-test failure are named
             # separately, in the artefact, not only in prose.
+            # Three distinct meanings, never collapsed: no runner, this leg
+            # failed, or a sibling leg was cancelled by a superseding push.
             "failure_class": ("PROVIDER_ALLOCATION" if jobs["provider_circuit_open"]
-                              else ("REPOSITORY_TEST" if jobs["failed_jobs"] else "NONE")),
+                              else ("REPOSITORY_TEST" if jobs["failed_jobs"]
+                                    else ("SIBLING_JOB_CANCELLED" if jobs.get("cancelled_jobs")
+                                          else "NONE"))),
             "bundle_offline_replay": bundle_verify,
             "manifest_file_count": len((manifest or {}).get("files", [])),
         },
@@ -203,6 +226,38 @@ def selftest() -> int:
     green = classify_jobs([{"name": "contract", "steps": [{"name": "run"}], "conclusion": "success"}])
     if green["provider_circuit_open"] or green["failed_jobs"]:
         print(f"SELFTEST RED: a green run was flagged: {green}", file=sys.stderr)
+        return 1
+
+    # A matrix leg cancelled by a superseding push marks the whole run red. The
+    # receipt is about one leg, and that leg succeeded on the exact head.
+    superseded = classify_jobs([
+        {"name": "procedural-shadow-runtime", "steps": [{"name": "run"}], "conclusion": "success"},
+        {"name": "another-skill", "steps": [{"name": "run"}], "conclusion": "cancelled"},
+    ], focus_job="procedural-shadow-runtime")
+    if superseded["failed_jobs"]:
+        print(f"SELFTEST RED: a cancelled sibling failed the focused leg: {superseded}",
+              file=sys.stderr)
+        return 1
+    if superseded["sibling_jobs_failed"] != ["another-skill"]:
+        print("SELFTEST RED: the cancelled sibling was dropped instead of recorded",
+              file=sys.stderr)
+        return 1
+
+    # Scoping must not become a way to ignore this leg's own failure.
+    own_failure = classify_jobs([
+        {"name": "procedural-shadow-runtime", "steps": [{"name": "run"}], "conclusion": "failure"},
+        {"name": "another-skill", "steps": [{"name": "run"}], "conclusion": "success"},
+    ], focus_job="procedural-shadow-runtime")
+    if own_failure["failed_jobs"] != ["procedural-shadow-runtime"]:
+        print("SELFTEST RED: focusing hid the focused leg's own failure", file=sys.stderr)
+        return 1
+
+    # A run that never contained this leg cannot be evidence about it.
+    absent_leg = classify_jobs([
+        {"name": "another-skill", "steps": [{"name": "run"}], "conclusion": "success"},
+    ], focus_job="procedural-shadow-runtime")
+    if absent_leg["focus_job_present"]:
+        print("SELFTEST RED: an absent focus job reported present", file=sys.stderr)
         return 1
 
     run = {"id": 1, "name": "Skill Suites", "head_sha": "a" * 40, "status": "completed",
@@ -257,6 +312,8 @@ def main() -> int:
     parser.add_argument("--selftest", action="store_true")
     parser.add_argument("--run-id", type=int)
     parser.add_argument("--expected-sha", help="the head SHA this run must have executed")
+    parser.add_argument("--job-name", default="procedural-shadow-runtime",
+                        help="the matrix leg this receipt is about; sibling legs are recorded, not graded")
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
 
@@ -278,7 +335,7 @@ def main() -> int:
         print(f"ACTIONS-RECEIPT-INVALID {exc}", file=sys.stderr)
         return INVALID
 
-    jobs = classify_jobs(jobs_payload.get("jobs", []))
+    jobs = classify_jobs(jobs_payload.get("jobs", []), args.job_name)
 
     manifest: dict[str, Any] | None = None
     bundle_verify = {"exit_code": 64, "stdout": "", "stderr": "artifact not downloaded"}

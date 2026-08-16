@@ -68,6 +68,30 @@ with tempfile.TemporaryDirectory() as tmp:
             f"{packet['security_privacy_licensing']['privacy_scan']['findings']}"
         )
 
+    # A CI receipt can never name the commit that contains it, but it must not
+    # be unrelated to it either. #212 forbids promoting a stale or parent-head
+    # run to exact-head PASS.
+    if packet["ci_subject"]["relation"] not in {
+        "EXACT", "ANCESTOR_OF_CANDIDATE", "UNRESOLVABLE_IN_THIS_CHECKOUT", "ABSENT"
+    }:
+        raise SystemExit(f"CI receipt subject is {packet['ci_subject']['relation']}")
+
+    # A committed packet claiming admission must have the record that admitted
+    # it sitting beside it. Otherwise the strongest state in the vocabulary is
+    # reachable by editing a JSON file.
+    stored = SKILL / "evals" / "convergence-packet.json"
+    if stored.is_file():
+        committed = json.loads(stored.read_text(encoding="utf-8"))
+        if committed["terminal_outcome"] == "ADMITTED_FOR_BOUND_SCOPE":
+            record = committed.get("human_admit") or {}
+            if not record.get("approver") or not record.get("admitted_level"):
+                raise SystemExit("the committed packet claims admission with no approver or level")
+            if record["admitted_level"] != committed["proposed_next_level"]:
+                raise SystemExit(
+                    f"committed packet admits {record['admitted_level']} while proposing "
+                    f"{committed['proposed_next_level']}"
+                )
+
     # Every prerequisite issue must appear, closed or not. A lane that vanishes
     # from the packet has left the denominator.
     issues = {lane["issue"] for lane in packet["lanes"]}

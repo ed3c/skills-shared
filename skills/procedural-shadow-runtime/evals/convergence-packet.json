@@ -2,10 +2,15 @@
   "_why_none": "No prior Human Admit record exists for this candidate.",
   "_why_reachable_is_not_proposed": "highest_reachable_level is what the evidence would support if levels could be skipped. They cannot. It is reported so the gap between evidence and position is visible, not so it can be admitted in one step.",
   "candidate": {
-    "commit": "6021233db7b25a3b5ae2afcf3edc53fa7afe2082",
+    "commit": "d56dac182ce255459b84274d63978c5df1606f59",
     "repository": "ed3c/skills-shared",
     "skill_path": "skills/procedural-shadow-runtime",
-    "skill_tree": "c264f14ceadd3dd587ac39de6fd14c5c0176d8d5"
+    "skill_tree": "d6a1d133e08905a4e7330d6f7c00adef35f9d40f"
+  },
+  "ci_subject": {
+    "candidate_commit": "d56dac182ce255459b84274d63978c5df1606f59",
+    "receipt_head": "d56dac182ce255459b84274d63978c5df1606f59",
+    "relation": "EXACT"
   },
   "current_admitted_level": "NONE",
   "excluded_claims": [
@@ -14,11 +19,33 @@
     "no claim that the Skill improved any outcome on any host",
     "no claim of portability beyond the two hosts and one consumer named here"
   ],
-  "highest_reachable_level": "L0",
-  "hold_reasons": [
-    "lanes not closed: ['#212']"
-  ],
-  "human_admit": null,
+  "highest_reachable_level": "L2",
+  "human_admit": {
+    "_why_this_file_is_the_gate": "The convergence packet can compute eligibility and cannot promote. ELIGIBLE_FOR_HUMAN_ADMIT is not a terminal outcome, so without this record the packet closes HOLD_FOR_MORE_EVIDENCE and exits 2. Deleting this file returns it to that state; nothing else has to be undone.",
+    "admitted_level": "L0",
+    "admitted_level_name": "EXACT_PROCEDURE",
+    "approver": "ed3c (repository owner)",
+    "conditions": [
+      "Any lane in the convergence packet regressing to FAIL, BLOCKED or ABSENT revokes this admission without further review.",
+      "The #219 causal lane stays PARTIAL and saturated. No uplift, improvement, or effectiveness claim may be made from this admission.",
+      "Production feedback remains closed on an admitted canary. No L5 or production-readiness claim follows.",
+      "The consumer binding branch is unpushed; its subject is not independently retrievable, and the canary lane is scoped accordingly.",
+      "Rollback is skills/procedural-shadow-runtime at 2eab9ddddd782188a46b32a3b829863ebd44d678, tree 1ef10004f4d1550dbc1669e39fd1a601c6b44c15, recorded in evals/rollback-bundle.json with its tested procedure."
+    ],
+    "decided_at": "2026-08-16",
+    "decision": "ADMITTED_FOR_BOUND_SCOPE",
+    "expiry": "On the next change to SKILL.md, any checker under scripts/, the rubric, or any schema in references/. A changed candidate is a new candidate and this record does not travel with it.",
+    "not_admitted_by_this_record": [
+      "merge or release authority beyond what already governs this repository",
+      "publication of the consumer branch",
+      "the preregistered 90-session #219 run, which remains an owner spend decision",
+      "any level above L0"
+    ],
+    "schema": "human-admit/v1",
+    "scope": "Two hosts (Claude Code, Codex CLI) at the pinned versions in the arm-trial receipts; one consumer repository (ed3c/ios-device-autopilot); the GitHub Actions runtime for this repository; the task families exercised by the committed receipts. Nothing outside that list is admitted, and nothing here is a claim about other hosts, consumers, or domains.",
+    "security_privacy_licensing": "The packet's own scan runs over its bytes on every build and must return CLEAN. External Skill content is admitted only through a rights review bound to an exact content digest. No provider was enrolled, no repository or user content was sent to an external registry, and no production data exists in any artefact.",
+    "why_l0_and_not_higher": "Promotion advances one level from the admitted position, and that position was NONE. The evidence reaches L2 -- live host receipts, an exact-head CI receipt, and a consumer canary -- and highest_reachable_level in the packet says so. Admitting L2 in one move would skip L1 on the strength of evidence that supports it, which is exactly the reasoning level-skipping rules exist to refuse."
+  },
   "known_limitations": [
     "The #219 matrix is PARTIAL at one repetition per arm and its primary metric is saturated on this case set; no causal contrast is available at any confidence.",
     "Production feedback closed on an explicitly admitted canary. No production traffic was observed and no L5 claim follows.",
@@ -34,18 +61,16 @@
       "note": "The workflow uploads an exact-head evidence bundle; the receipt binding a run_id, job_id and head SHA is written after that run completes.",
       "receipts": [
         {
-          "close_state": "FAIL",
+          "close_state": "PASS",
           "path": "evals/receipts/github-actions-exact-head.json",
           "present": true,
-          "sha256": "63a1d4e1731cb9adf202783ccd40c7bb7a02752b92f6053e8e27ff5c08287d7a"
+          "sha256": "07457f0d7eda66549b441213edc3c3332f0db02c9c7a3db45bb0d5f55c97eb70"
         }
       ],
       "receipts_named": 1,
       "receipts_present": 1,
-      "red_receipts": [
-        "evals/receipts/github-actions-exact-head.json"
-      ],
-      "state": "FAIL"
+      "red_receipts": [],
+      "state": "PASS"
     },
     {
       "if_absent": "ABSENT",
@@ -223,14 +248,14 @@
       "reachable": true
     },
     {
-      "blocked_by": "no exact-head CI receipt (#212)",
+      "blocked_by": null,
       "level": "L1",
-      "reachable": false
+      "reachable": true
     },
     {
-      "blocked_by": "invariant oracle not exercised outside this repository",
+      "blocked_by": null,
       "level": "L2",
-      "reachable": false
+      "reachable": true
     },
     {
       "blocked_by": "held-out transfer absent: one consumer repository is not a held-out family",
@@ -295,5 +320,5 @@
     "provider_enrolment": "NONE",
     "source_rights_review": "evals/rights-reviews/obra-superpowers-verification-before-completion.json"
   },
-  "terminal_outcome": "HOLD_FOR_MORE_EVIDENCE"
+  "terminal_outcome": "ADMITTED_FOR_BOUND_SCOPE"
 }

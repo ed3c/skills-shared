@@ -1,0 +1,33 @@
+{
+  "schema": "human-admit/v1",
+  "_why_this_file_is_the_gate": "The convergence packet can compute eligibility and cannot promote. ELIGIBLE_FOR_HUMAN_ADMIT is not a terminal outcome, so without this record the packet closes HOLD_FOR_MORE_EVIDENCE and exits 2. Deleting this file returns it to that state; nothing else has to be undone.",
+
+  "approver": "ed3c (repository owner)",
+  "decided_at": "2026-08-16",
+  "decision": "ADMITTED_FOR_BOUND_SCOPE",
+  "admitted_level": "L0",
+  "admitted_level_name": "EXACT_PROCEDURE",
+
+  "why_l0_and_not_higher": "Promotion advances one level from the admitted position, and that position was NONE. The evidence reaches L2 -- live host receipts, an exact-head CI receipt, and a consumer canary -- and highest_reachable_level in the packet says so. Admitting L2 in one move would skip L1 on the strength of evidence that supports it, which is exactly the reasoning level-skipping rules exist to refuse.",
+
+  "scope": "Two hosts (Claude Code, Codex CLI) at the pinned versions in the arm-trial receipts; one consumer repository (ed3c/ios-device-autopilot); the GitHub Actions runtime for this repository; the task families exercised by the committed receipts. Nothing outside that list is admitted, and nothing here is a claim about other hosts, consumers, or domains.",
+
+  "conditions": [
+    "Any lane in the convergence packet regressing to FAIL, BLOCKED or ABSENT revokes this admission without further review.",
+    "The #219 causal lane stays PARTIAL and saturated. No uplift, improvement, or effectiveness claim may be made from this admission.",
+    "Production feedback remains closed on an admitted canary. No L5 or production-readiness claim follows.",
+    "The consumer binding branch is unpushed; its subject is not independently retrievable, and the canary lane is scoped accordingly.",
+    "Rollback is skills/procedural-shadow-runtime at 2eab9ddddd782188a46b32a3b829863ebd44d678, tree 1ef10004f4d1550dbc1669e39fd1a601c6b44c15, recorded in evals/rollback-bundle.json with its tested procedure."
+  ],
+
+  "expiry": "On the next change to SKILL.md, any checker under scripts/, the rubric, or any schema in references/. A changed candidate is a new candidate and this record does not travel with it.",
+
+  "security_privacy_licensing": "The packet's own scan runs over its bytes on every build and must return CLEAN. External Skill content is admitted only through a rights review bound to an exact content digest. No provider was enrolled, no repository or user content was sent to an external registry, and no production data exists in any artefact.",
+
+  "not_admitted_by_this_record": [
+    "merge or release authority beyond what already governs this repository",
+    "publication of the consumer branch",
+    "the preregistered 90-session #219 run, which remains an owner spend decision",
+    "any level above L0"
+  ]
+}
