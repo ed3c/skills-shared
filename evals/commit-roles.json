@@ -184,6 +184,11 @@
         "reason": "authored by this session before AGENTS.md routed agents to the commit-role contract"
       },
       {
+        "commit_sha": "887c9698b6dad9d8eb4161253c9f14b067a96779",
+        "subject": "x",
+        "reason": "authored directly by the repository owner, outside any agent loop"
+      },
+      {
         "commit_sha": "8ac501adc9e1acf83a9f45fcf474d29dd991c286",
         "subject": "test(dual-forge): register multi-agent runtime contract eval",
         "reason": "imported with the integrated PR stacks; published and not rewritable"
@@ -222,6 +227,11 @@
         "commit_sha": "cc8716e017545dcb0d35eafd8d62840914c61bd9",
         "subject": "feat(spatial-loop): add procedural grounding profile",
         "reason": "imported with the integrated PR stacks; published and not rewritable"
+      },
+      {
+        "commit_sha": "d1da73a0b69a42a1d740fa6d2d9f480fc7bfaa29",
+        "subject": "revert: remove accidental placeholder file",
+        "reason": "authored directly by the repository owner, outside any agent loop"
       },
       {
         "commit_sha": "d6cd334ff223ae5caa579ad62309a1daa9d08b88",
