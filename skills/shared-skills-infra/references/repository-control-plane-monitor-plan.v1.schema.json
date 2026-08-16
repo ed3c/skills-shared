@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skills-shared.invalid/repository-control-plane-monitor-plan/v1",
+  "title": "Repository Control Plane Monitor Plan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "issues",
+    "waves",
+    "issue_plans",
+    "automatic_merge",
+    "automatic_conflict_resolution"
+  ],
+  "properties": {
+    "schema": {"const": "repository-control-plane-monitor-plan/v1"},
+    "issues": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/identity"}
+    },
+    "waves": {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "minItems": 1,
+        "uniqueItems": true,
+        "items": {"$ref": "#/$defs/identity"}
+      }
+    },
+    "issue_plans": {
+      "type": "object",
+      "propertyNames": {"$ref": "#/$defs/identity"},
+      "additionalProperties": {"$ref": "#/$defs/issue_plan"}
+    },
+    "automatic_merge": {"const": false},
+    "automatic_conflict_resolution": {"const": false}
+  },
+  "$defs": {
+    "identity": {
+      "type": "string",
+      "pattern": "^[^/#[:space:]]+/[^#[:space:]]+#[1-9][0-9]*$"
+    },
+    "disposition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["phase", "receipt", "disposition"],
+      "properties": {
+        "phase": {
+          "enum": [
+            "BOOTSTRAP",
+            "SHADOW_ADMISSION",
+            "TECH_LEAD_PLAN",
+            "SPATIAL_INVARIANTS",
+            "STACK_DELIVERY",
+            "FORGE_RECONCILIATION"
+          ]
+        },
+        "receipt": {
+          "enum": [
+            "skill-resolution",
+            "shadow-admission",
+            "task-dag",
+            "spatial-invariants",
+            "git-town-stack",
+            "dual-forge-reconciliation"
+          ]
+        },
+        "disposition": {
+          "enum": ["REQUIRED", "MONITOR", "NOT_APPLICABLE_WITH_EVIDENCE"]
+        }
+      }
+    },
+    "issue_plan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["phase_dispositions", "required_receipts", "execution_state"],
+      "properties": {
+        "phase_dispositions": {
+          "type": "array",
+          "minItems": 6,
+          "maxItems": 6,
+          "items": {"$ref": "#/$defs/disposition"}
+        },
+        "required_receipts": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "skill-resolution",
+              "shadow-admission",
+              "task-dag",
+              "spatial-invariants",
+              "git-town-stack",
+              "dual-forge-reconciliation"
+            ]
+          }
+        },
+        "execution_state": {"const": "NOT_EXERCISED"}
+      }
+    }
+  }
+}
