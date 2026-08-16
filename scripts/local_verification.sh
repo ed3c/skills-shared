@@ -65,6 +65,10 @@ python3 scripts/check_executor_authority.py --repo-root . --selftest
 step "delivery shape comparison controls"
 python3 scripts/measure_delivery_shape.py selftest
 
+step "prompt baseline record integrity"
+python3 skills/dual-forge-repository-loop/scripts/check_prompt_baseline.py selftest
+python3 skills/dual-forge-repository-loop/scripts/check_prompt_baseline.py check
+
 step "guard controls"
 python3 skills/shared-skills-infra/scripts/check_index.py --selftest
 python3 skills/shared-skills-infra/scripts/check_index_coverage.py --selftest

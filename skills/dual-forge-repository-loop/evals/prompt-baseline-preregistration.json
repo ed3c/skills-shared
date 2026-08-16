@@ -1,11 +1,11 @@
 {
   "schema": "v2-1-prompt-baseline-preregistration/v1",
   "preregistration_id": "v2-1-prompt-baseline-2026-08",
-  "status": "FROZEN_NOT_EXECUTED",
+  "status": "EXECUTED",
   "issue": 225,
   "_meta": {
     "why_frozen_before_running": "#225 requires every listed item to be frozen before any arm runs. Freezing after seeing an arm's result is how a baseline becomes a rationalisation.",
-    "execution_authorisation": "NOT GRANTED. 15 sessions (3 arms x 5 repetitions) is a resource commitment the repository owner has not authorised; the owner's standing admit covers driving these hosts as evidence sources, not this volume. Nothing here has been executed.",
+    "execution_authorisation": "GRANTED and executed. The owner authorised the 15 sessions (3 arms x 5 repetitions) and they ran in commit fe48049, against the design frozen here in 71970f4 before any arm started; the result is prompt-baseline-result.json with outcome NOT_ELIGIBLE. This field read 'NOT GRANTED ... Nothing here has been executed' for as long as nothing compared the two files, which is why scripts/check_prompt_baseline.py now refuses that contradiction rather than trusting either file alone.",
     "single_runtime": "#225 forbids combining results across runtime identities, so this preregistration binds one runtime. A second runtime needs its own frozen preregistration and its own receipt set."
   },
   "runtime": {

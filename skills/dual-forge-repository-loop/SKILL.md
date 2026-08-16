@@ -346,6 +346,29 @@ state whose state-specific receipts have not reached the full publication-ready
 closure. Exit `0` is reserved for the exact `GITHUB_PUBLICATION_READY` history
 and all proof lanes above.
 
+## Prompt baseline record
+
+The #225 same-stack baseline for this Skill's System Prompt lives in
+`evals/prompt-baseline-preregistration.json` (frozen design),
+`evals/prompt-baseline-cases.json` (case set) and
+`evals/prompt-baseline-result.json` (executed cells), produced by
+[`scripts/run_prompt_baseline.py`](scripts/run_prompt_baseline.py).
+
+Those three files make claims about each other, so they are checked against
+each other:
+
+```bash
+python3 skills/dual-forge-repository-loop/scripts/check_prompt_baseline.py check
+python3 skills/dual-forge-repository-loop/scripts/check_prompt_baseline.py selftest
+```
+
+It refuses a preregistration whose lifecycle state contradicts the committed
+result, a drifted case set, a dropped or hidden arm, a cell that cannot have
+come from the bound runtime, an arm order that does not reproduce from the
+frozen derivation, and an eligibility outcome that the recorded cells do not
+compute. The recorded outcome is `NOT_ELIGIBLE`: the candidate regressed
+against the strongest baseline on the only metric that varied.
+
 ## Evidence states
 
 Use only:
