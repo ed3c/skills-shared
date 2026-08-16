@@ -43,6 +43,33 @@ The four implementation branches were siblings because each edited only its repo
 
 IBC 02 and IBC 03 merged with **no workflow run at their head commits at all**. That is an absence of evidence, not a pass, and it is recorded here rather than smoothed over. Its consequences and the repairs that followed are in [`../AGENT_INTEGRATION_STATE.md`](../AGENT_INTEGRATION_STATE.md).
 
+## Controlled Technical Language stack
+
+Parent programme `#115`. The architecture, evidence law, and full merged ledger live in
+[`../architecture/CONTROLLED_TECHNICAL_LANGUAGE_HARNESS.md`](../architecture/CONTROLLED_TECHNICAL_LANGUAGE_HARNESS.md);
+this table records the delivery trace only.
+
+| Leaf | Issue | PR | Merged commit | Owning check at the PR head |
+|---|---|---|---|---|
+| CTL 01 contract foundation | `#116` | `#117` | `a711316ec6ab50a952e2ec3df64c7feea2d181b1` | `contract` SUCCESS |
+| CTL 01 hotfix false-PASS paths | `#124` | `#125` | `65c72f7ab67af49d6237245eb64298cf62c11e14` | `contract` SUCCESS |
+| CTL 02 Harness core and STE profile | `#118` | `#126` | `061ff5e479e0f4595def11ec08bc4ddff8959708` | `controlled-technical-language-harness` SUCCESS |
+| CTL 03 deterministic evaluators | `#119` | `#127` | `edfa2922856a457167b56d32a73d679577718492` | `controlled-technical-language-harness` SUCCESS |
+| CTL 03 hardening exact subjects | `#129` | `#137` | `6764c67e7df9206dbc36f731f38f4c7dd252d51d` | `controlled-technical-language-harness` SUCCESS |
+| CTL 03 hardening calibration controls | `#129` | `#139` | `8e13b3ab9a2e34b75384c8fbc87ea5f8a3249f22` | `controlled-technical-language-harness` SUCCESS |
+| CTL 04 intent-promotion writeback gate | `#120` | `#130` | `8c040362eaad3fdf8d81a50cb594d15a7de8feb6` | `contract` SUCCESS |
+| CTL 04B authority substitutions | `#134` | `#138` | `c737e43d2cb6713a3fbbfd1f8d54c3b81b1870a7` | `contract` SUCCESS |
+| CTL 04C external authority readback | `#141` | `#143` | `a7b278aba8bdf744e901f605ea07b09e3b468e60` | `authority` SUCCESS |
+| CTL 05 document format and privacy routing | `#121` | `#131` | `e4f22e887bd1dfaea9cf673d75bb0a19a30d0ca6` | `controlled-technical-language-harness` SUCCESS |
+| CTL 06 integrated A/B canary | `#132` | `#140` | `47cbb259c0157535d6f40b703b487e225a1a9de1` | `controlled-technical-language-harness` SUCCESS |
+| CTL 06B A/B against external authority bytes | `#144` | `#152` | `b3d47948feb6e2d44d84261354117aecfaa4f5dc` | `controlled-technical-language-harness` SUCCESS |
+| CTL 07 consumer binding and canaries | `ed3c/bettor-arena#83` | none | n/a | none — open in another repository |
+| CTL 08 convergence index | `#133` | none | n/a | none — blocked on CTL 07 |
+
+Unlike the IBC rows above, every merged CTL leaf had a green owning check. That check ran at the **PR head**, which is a different commit from the merge commit recorded beside it; a green head is evidence about the reviewed bytes, not a re-run of `main`.
+
+CTL 08 is the convergence owner and stays unopened: its contract forbids creating the branch before every prerequisite merges, and CTL 07 is open in `bettor-arena`. A convergence PR cannot repair an implementation leaf, so the unmet condition sits with its owner rather than being absorbed here.
+
 ## Spatial-loop systems engineering leaf
 
 | Source | Issue | PR publication subject | Stack class | Publication state | Owning controls |
