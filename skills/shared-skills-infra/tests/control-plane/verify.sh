@@ -12,7 +12,11 @@ python3 "${cli}" profile-check --profile "${profile}"
 python3 -m py_compile "${cli}"
 python3 -m json.tool "${profile}" >/dev/null
 python3 -m json.tool "${repo_root}/skills/shared-skills-infra/references/repository-control-plane-profile.v1.schema.json" >/dev/null
-if [[ -f "${schema}" ]]; then python3 -m json.tool "${schema}" >/dev/null; fi
+python3 -m json.tool "${schema}" >/dev/null
+python3 - "${schema}" <<'PY'
+import json, sys, jsonschema
+s=json.load(open(sys.argv[1])); jsonschema.Draft202012Validator.check_schema(s)
+PY
 
 consumer="${tmp}/consumer"
 mkdir -p "${consumer}"
@@ -63,15 +67,14 @@ cat > "${tmp}/issues.json" <<'JSON'
 ]
 JSON
 python3 "${cli}" monitor-plan --issues "${tmp}/issues.json" > "${tmp}/plan.json"
-python3 - "${tmp}/plan.json" <<'PY'
-import json, sys
-p=json.load(open(sys.argv[1]))
+python3 - "${tmp}/plan.json" "${schema}" <<'PY'
+import json, sys, jsonschema
+p=json.load(open(sys.argv[1])); s=json.load(open(sys.argv[2]))
+jsonschema.Draft202012Validator(s).validate(p)
 assert p['waves'] == [['example/repo#1','example/repo#4'], ['example/repo#2']], p
 assert p['automatic_merge'] is False
 assert p['automatic_conflict_resolution'] is False
-simple=p['issue_plans']['example/repo#1']
-stack=p['issue_plans']['example/repo#2']
-closed_dep=p['issue_plans']['example/repo#4']
+simple=p['issue_plans']['example/repo#1']; stack=p['issue_plans']['example/repo#2']; closed_dep=p['issue_plans']['example/repo#4']
 assert simple['required_receipts'] == ['skill-resolution','shadow-admission','task-dag'], simple
 simple_disp={x['phase']:x['disposition'] for x in simple['phase_dispositions']}
 assert simple_disp['SPATIAL_INVARIANTS'] == 'MONITOR', simple_disp
@@ -83,6 +86,13 @@ assert stack_disp['STACK_DELIVERY'] == 'REQUIRED', stack_disp
 assert stack_disp['FORGE_RECONCILIATION'] == 'NOT_APPLICABLE_WITH_EVIDENCE', stack_disp
 assert closed_dep['execution_state'] == 'NOT_EXERCISED'
 assert all(x['execution_state']=='NOT_EXERCISED' for x in p['issue_plans'].values())
+mutated=dict(p); mutated['automatic_merge']=True
+try:
+    jsonschema.Draft202012Validator(s).validate(mutated)
+except jsonschema.ValidationError:
+    pass
+else:
+    raise AssertionError('schema accepted automatic_merge=true')
 PY
 
 cat > "${tmp}/missing.json" <<'JSON'
@@ -141,4 +151,4 @@ if python3 "${cli}" monitor-plan --issues "${tmp}/bad-state.json" >/dev/null 2>&
   echo 'FAIL: unknown issue state was accepted' >&2; exit 1
 fi
 
-echo 'PASS repository control-plane profile, applicability, and exact dependency closure'
+echo 'PASS repository control-plane profile, applicability, exact dependency closure, and monitor schema'
