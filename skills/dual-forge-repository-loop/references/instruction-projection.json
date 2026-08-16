@@ -1,6 +1,6 @@
 {
   "schema_version": "instruction-projection/v1",
-  "projection_version": "1.0.1",
+  "projection_version": "1.1.0",
   "canonical_skill": "skills/dual-forge-repository-loop",
   "managed_block": {
     "begin": "<!-- BEGIN SKILLS-SHARED INSTRUCTION PROJECTION -->",
@@ -33,6 +33,11 @@
     "A three-failure Desktop handoff names the exact owner/repo, requests the installed GitHub plugin or connector, and carries the full issue ledger, repository history, PR subjects, failing oracle, logs, and target branch or PR.",
     "External claims use primary-source external verification first; agy, Codex CLI, Claude Code, and cross-family models are reviewers rather than official truth authorities.",
     "UNKNOWN fails closed for irreversible delivery actions.",
+    "Before topology selection or implementation mutation, resolve the smallest closed set of triggered canonical Skills and bind one skill-resolution-receipt/v1 to the exact consumer subject, skills-shared commit, registry digest, Skill content digests, access modes, and runtime-requirements digests.",
+    "Skill content available for reasoning is not evidence that a local Skill surface, executable, environment, capability probe, or task execution is available; connector-only access must not claim local installation or preparation.",
+    "A Skill runtime-requirements manifest owns only abstract secret-free requirements; the consumer binding owns the exact runtime-env repository/commit and the concrete profile, workload, policy, fixed setup entrypoint, and capability-probe IDs that satisfy them.",
+    "Environment preparation precedes implementation and may execute only consumer/runtime-owned fixed entrypoint IDs under bounded policy; arbitrary setup shell, host-global package/profile mutation, access or visibility changes, and secret-value transport are denied.",
+    "Parallel Workers consume one content-bound bootstrap receipt; exactly one bootstrap owner holds any user Skill-surface or runtime-environment mutation lease.",
     "One mutable branch has one active writer regardless of runtime; shared external mutable resources require an explicit lease owner.",
     "Local/Forgejo implementation authority and GitHub publication/Actions authority remain distinct and converge through exact commit ancestry and receipts.",
     "Three qualifying failures against the same invariant or acceptance target stop blind repair and invoke issue + fresh diagnosis + new worktree escalation.",
