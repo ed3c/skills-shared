@@ -8,3 +8,11 @@ sites.local.json
 .claude/worktrees/
 .grepai/
 .serena/
+
+# The adapter evidence ledger is rebuilt from the receipts beside it on every
+# capture, so committing it would version a derived file that changes whenever
+# anything is captured. It sits inside the receipt directory that capture writes
+# to, which means `git add` on that directory stages it unless it is ignored --
+# it was removed by hand before each of the first commits, and remembering that
+# every time is the wrong mechanism.
+skills/repo-agent-native/evals/receipts/*.sqlite3
