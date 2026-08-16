@@ -346,6 +346,48 @@ state whose state-specific receipts have not reached the full publication-ready
 closure. Exit `0` is reserved for the exact `GITHUB_PUBLICATION_READY` history
 and all proof lanes above.
 
+## Live multi-Worker scheduler
+
+`references/worker-task.schema.json` declares twenty-one Worker states. A grep
+for each of them found that `ASSIGNED`, `LEASED`, `CHECKPOINTED`, `RESULT_READY`
+and `FAILED_RETRYABLE` had no producer anywhere -- not a script, not a fixture,
+not a test -- and that every other state appeared only in a checker that reads
+it or a fixture that constructs it. A state only tests can construct is a state
+the runtime does not have.
+
+[`scripts/run_worker_scheduler.py`](scripts/run_worker_scheduler.py) is the
+producer. It builds a disposable subject repository, admits two path-disjoint
+sibling Workers and one convergence owner, leases a worktree to each, runs a
+real Agent inside it, verifies with an oracle the Worker cannot edit, and
+integrates. The non-happy paths are driven on planted attempts. The committed
+run in [`evals/receipts/scheduler-run.receipt.json`](evals/receipts/scheduler-run.receipt.json)
+produced 17 of the 21 states; `BLOCKED_AUTHORITY`, `DUPLICATE_SUPPRESSED`,
+`FAILED_TERMINAL` and `REJECTED_NOT_DECOMPOSABLE` are listed as not produced
+rather than omitted.
+
+```bash
+python3 skills/dual-forge-repository-loop/scripts/run_worker_scheduler.py --out DIR
+python3 skills/dual-forge-repository-loop/scripts/check_scheduler_receipt.py check
+python3 skills/dual-forge-repository-loop/scripts/check_scheduler_receipt.py selftest
+```
+
+The checker is zero-network and runs no Agent. It refuses a duplicate attempt
+identity, a broken or backwards transition log, an undeclared state, an attempt
+that moves after a terminal state, an integration with no preceding verified
+oracle, two writers holding one branch at once, a `LEASE_EXPIRED` that nothing
+evaluated an expiry against, a skipped heartbeat, and a coverage claim the
+transition log does not support.
+
+Two scheduler defects were found by running it rather than by reading it, and
+both are recorded in the code that fixes them: refusing a sibling as stale
+merely because main advanced outside its lease (hidden serialism reintroduced
+by the scheduler), and leasing a convergence Worker from the plan's base rather
+than from the state containing the dependencies it consumes.
+
+Evidence boundary: the receipt proves the transitions happened and the refusals
+refused. It measures no throughput, latency or cost advantage over a single
+Builder, and a disposable subject is not a production repository.
+
 ## Prompt baseline record
 
 The #225 same-stack baseline for this Skill's System Prompt lives in
