@@ -318,14 +318,65 @@ positive/Vibe contradiction and score-ceiling gate    IMPLEMENTED
 meta-abstraction score contract/schema/checker v2     IMPLEMENTED
 e-commerce adapter protocol and assertion runner      IMPLEMENTED
 static positive/Vibe/mutation controls                IMPLEMENTED
-live Claude/Codex hook integration                    NOT_EXERCISED
-live external Skill registry adapter                  NOT_EXERCISED
-live browser/device multimodal observer               NOT_EXERCISED
-live Langfuse/OpenTelemetry production feedback       NOT_EXERCISED
-cross-model causal attribution                        NOT_EXERCISED
+live Claude Code five-arm trial matrix                OBSERVED (1 rep/arm)
+live Codex CLI five-arm trial matrix                  OBSERVED (1 rep/arm)
+live external Skill registry retrieval                OBSERVED
+live browser multimodal observer                      OBSERVED
+live device multimodal observer                       NOT_EXERCISED
+first consumer-repository canary                      OBSERVED
+production-to-Golden closure on admitted canary       OBSERVED
+production traffic feedback                           NOT_EXERCISED
+Langfuse or any vendor trace exporter                 NOT_EXERCISED
+cross-model causal attribution                        PARTIAL / SATURATED
+held-out cross-domain transfer                        NOT_EXERCISED
 private chain-of-thought inspection                   OUT_OF_SCOPE
 model-training membership proof                       OUT_OF_SCOPE
 production/security/legal acceptance                  HUMAN_ADMIT_REQUIRED
 ```
 
+Read the qualifiers, not the words. `OBSERVED (1 rep/arm)` is mechanism
+evidence: every arm executed on the exact subject and the evaluator ran. It is
+not the #219 matrix, which is preregistered at nine repetitions per arm per
+host, and the receipts carry `qualifies_for_219: false` so the distinction
+survives being quoted.
+
+`PARTIAL / SATURATED` carries a second fact worth stating plainly: the
+preregistered primary metric came back identical in every cell on both hosts.
+Neither host fabricated a path on this task, so nothing could have separated the
+arms at any sample size. That bounds the case set. It is not evidence that the
+arms do not differ, and reporting it as a null would be the one sentence the
+data cannot support.
+
+`OBSERVED` on the production line means an explicitly admitted production-like
+canary with a named Human adjudication. It is not production traffic, and no L5
+claim follows from it.
+
 Do not promote `NOT_EXERCISED` states from prose or static fixtures.
+
+## Live lanes
+
+```bash
+# five matched arms against a real host; add --dry-run to plan without spending
+python3 scripts/run_arm_trials.py --host claude-code --output /tmp/arms
+
+# retrieve an external Skill, pinned, rights-reviewed, delta-selected
+python3 scripts/retrieve_external_skill.py --repository owner/name --ref <40-hex> \
+  --path SKILL.md --select <section> --rights-review <review.json> --output /tmp/r.json
+
+# structured + visual browser evidence; an image alone cannot close a state claim
+python3 scripts/observe_multimodal.py --observe-browser <page.html> \
+  --artifact-dir /tmp/obs --output /tmp/browser.json
+
+# production-to-Golden state machine; BLOCKED without a Human adjudication
+python3 scripts/trace_feedback_loop.py --adjudication <record.json> --output /tmp/closure.json
+
+# aggregate arm receipts into a #219 verdict that refuses to overstate itself
+python3 scripts/summarise_uplift_matrix.py --receipt claude-code=<a.json> \
+  --receipt codex-cli=<b.json> --output evals/uplift-matrix-summary.json
+
+# bind one exact-head Actions run; a runnerless run is BLOCKED, never FAIL
+python3 scripts/bind_actions_receipt.py --run-id <id> --output <receipt.json>
+
+# assemble the convergence packet; it cannot promote itself
+python3 scripts/build_convergence_packet.py --output evals/convergence-packet.json
+```
