@@ -1,0 +1,105 @@
+{
+  "schema": "v2-1-prompt-baseline-preregistration/v1",
+  "preregistration_id": "v2-1-prompt-baseline-2026-08",
+  "status": "FROZEN_NOT_EXECUTED",
+  "issue": 225,
+  "_meta": {
+    "why_frozen_before_running": "#225 requires every listed item to be frozen before any arm runs. Freezing after seeing an arm's result is how a baseline becomes a rationalisation.",
+    "execution_authorisation": "NOT GRANTED. 15 sessions (3 arms x 5 repetitions) is a resource commitment the repository owner has not authorised; the owner's standing admit covers driving these hosts as evidence sources, not this volume. Nothing here has been executed.",
+    "single_runtime": "#225 forbids combining results across runtime identities, so this preregistration binds one runtime. A second runtime needs its own frozen preregistration and its own receipt set."
+  },
+  "runtime": {
+    "identity": "CLAUDE_CODE_LOCAL",
+    "harness": "claude",
+    "harness_version_pinned_at_run": true,
+    "model": "opus",
+    "carrier": "SYSTEM_PROMPT_FILE",
+    "carrier_detail": "--append-system-prompt-file",
+    "why_this_host": "It carries the prompt through a real system-prompt channel rather than an instruction prefix, and it reports tokens, duration and cost. Codex CLI reports no cost and takes the bytes through instructions; mixing them would confound carrier with model."
+  },
+  "subject": {
+    "repository": "ed3c/skills-shared",
+    "prompt_path": "skills/dual-forge-repository-loop/references/system-prompt.md"
+  },
+  "arms": [
+    {
+      "arm": "NO_PROMPT",
+      "prompt_commit": null,
+      "prompt_sha256": null,
+      "prompt_bytes": 0,
+      "absence_is_explicit": true,
+      "note": "Explicit absence, not an empty file. The receipt records that no prompt was carried rather than recording a prompt of length zero."
+    },
+    {
+      "arm": "CURRENT_REPOSITORY_PROMPT",
+      "prompt_commit": "1295cdd",
+      "prompt_sha256": "f0b77ccc3e97",
+      "prompt_bytes": 4663,
+      "note": "The repository's prompt immediately before v2.1. No prompt has ever been RECORDED under #195 -- the v2.1 candidate still terminates at RELEASE_ADMIT_REQUIRED -- so `current` resolves to the repository prompt rather than to a recorded one. Verified as a distinct blob: three prompt versions exist in history with three distinct digests."
+    },
+    {
+      "arm": "CANDIDATE_V2_1",
+      "prompt_commit": "d6cd334",
+      "prompt_sha256": "c1774028cc6a3881e0cc6a69e8508caba7e2d683060e8ba8630306c0dec40772",
+      "prompt_bytes": 36866,
+      "note": "Matches the subject recorded in #199 byte for byte; the prompt was not modified while its PR was integrated."
+    }
+  ],
+  "design": {
+    "repetitions_per_arm": 5,
+    "total_sessions": 15,
+    "fresh_context_per_arm": true,
+    "isolated_workspace_per_arm": true,
+    "arm_order": "derived from sha256(arm + repetition_index) so it is reproducible and recorded rather than chosen at run time",
+    "identical_across_arms": [
+      "repository commit and tree",
+      "case set and case digests",
+      "deterministic verifier and its digest",
+      "model, harness and config",
+      "tool allowance",
+      "token, time and cost budgets",
+      "retry policy"
+    ]
+  },
+  "verifier": {
+    "verifier_id": "multi-agent-runtime-verify",
+    "authority": "DETERMINISTIC_ONLY",
+    "model_self_report_is_not_authority": true,
+    "note": "The verifier computes the terminal state locally. The host's own claim about its result is compared against that, never substituted for it."
+  },
+  "budgets": {
+    "retries_permitted": 0,
+    "retry_policy": "A failed arm stays in the denominator with its reason. #225 lists opportunistic retry as a control that must turn red.",
+    "timeout_seconds": 900,
+    "identical_for_every_arm": true
+  },
+  "required_controls": [
+    {"id": "contaminated-context", "expect": "RED", "how": "reuse a workspace across two arms"},
+    {"id": "divergent-subject", "expect": "RED", "how": "change the repository head between arms"},
+    {"id": "asymmetric-tools", "expect": "RED", "how": "give the candidate arm a wider tool allowance"},
+    {"id": "baseline-leaks-candidate", "expect": "RED", "how": "let NO_PROMPT reach v2.1 through a user or project Skill projection"},
+    {"id": "dropped-arm", "expect": "RED", "how": "remove a failed run from the denominator"},
+    {"id": "model-as-verifier", "expect": "RED", "how": "accept the host's self-reported result as the verifier result"},
+    {"id": "fixture-as-physical", "expect": "RED", "how": "present a fixture agent run as a physical model run"},
+    {"id": "cross-runtime-copy", "expect": "RED", "how": "copy a codex-cli cell into a claude-code arm"}
+  ],
+  "eligibility_threshold": {
+    "outcome_values": ["NOT_ELIGIBLE", "LOCAL_RECORD_ELIGIBLE"],
+    "rule": "LOCAL_RECORD_ELIGIBLE requires the candidate to show no hard regression against the strongest baseline arm on the deterministic verifier result, with all required controls red and every arm preserved.",
+    "scope_limit": "Any eligibility is bounded to this repository, this runtime, this model and this case set. It is not portability and not a promotion."
+  },
+  "known_confounds": [
+    {
+      "confound": "prompt length",
+      "detail": "CANDIDATE_V2_1 is 36,866 bytes against CURRENT_REPOSITORY_PROMPT's 4,663 -- roughly eight times larger. A candidate advantage is therefore consistent with the prompt being better and equally consistent with it merely being longer and more specific.",
+      "why_not_corrected": "Truncating the candidate to match length would no longer test the candidate, and padding the baseline would test neither. The confound is recorded so any result is read with it rather than discovered afterwards.",
+      "how_to_separate": "a length-matched fourth arm, which #225 does not preregister and which would need its own frozen design"
+    }
+  ],
+  "declared_non_claims": [
+    "no cross-runtime result may be derived from this preregistration",
+    "eligibility here is not recording authority; #195 governs that separately",
+    "five repetitions bound variance, they do not establish portability",
+    "a candidate advantage cannot be attributed to prompt quality rather than prompt length under this design"
+  ]
+}
