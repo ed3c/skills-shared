@@ -63,6 +63,7 @@ NO_FALLBACK
 | `tree-sitter.md` | AST/CST ranges, signatures and skeletonization | exact-byte structural lane |
 | `sqlite-code-index.md` | rebuildable normalized code projection | subject-bound, non-authoritative store |
 | `compiler-truth-context-funnel.md` | composed intent → semantics → structure → context route | bounded composition; no evidence promotion |
+| `blindspot-hybrid.md` | cross-lane event ledger and coverage law behind `NO_FLOW` | absence is a coverage claim, never a provider miss |
 | `mem0.md` | episodic memory provider contract | optional projection, never source truth |
 | `canonical-terms.md` | refactor terminology preservation | audit-only |
 | `semantic-loss-ledger.md` | immutable baseline-to-current mapping | audit-only |

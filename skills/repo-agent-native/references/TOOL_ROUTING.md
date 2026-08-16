@@ -57,6 +57,7 @@ Every failure has a Tier-0 fallback unless the task specifically requires the mi
 | syntax/skeletons | Tree-sitter | tolerant AST/CST ranges and structural queries | no cross-file type inference | structural slicing lane |
 | normalized graph/projection | SQLite | embedded, inspectable, transactional, rebuildable | schema/subject/producer drift | deterministic storage/query lane |
 | episodic context | mem0 or admitted memory provider | prior decisions and incident context | privacy, freshness and conflicts | optional memory lane |
+| cross-lane absence | Blindspot Hybrid ledger | turns lane disagreement and missing coverage into a stated verdict | only as complete as the lanes feeding it | the lane that decides what absence means |
 
 The composed route is [`../modules/compiler-truth-context-funnel.md`](../modules/compiler-truth-context-funnel.md). The Code-Graph-RAG retirement decision is [`CODE_GRAPH_RAG_RETIREMENT.md`](CODE_GRAPH_RAG_RETIREMENT.md).
 
@@ -77,6 +78,45 @@ Use for compiler-derived cross-file relations when the exact commit/tree, indexe
 ### Tree-sitter
 
 Use for exact-byte ranges, signatures, imports, snippets and skeletons. Do not infer type identity or runtime behavior from syntax alone.
+
+### Blindspot Hybrid
+
+Use when a question is about *absence* — nothing calls this, no handler exists,
+this path is unreachable. Every other lane answers "I did not find it", and the
+routing table above already says why that is not the same claim: an embedding
+miss, a partial-coverage index, a parse hole and an unsupported language all
+look identical from the caller's side.
+
+[`BLINDSPOT_HYBRID_CONTRACT.md`](BLINDSPOT_HYBRID_CONTRACT.md) makes the
+difference decidable. Lane events land in a subject-bound SQLite ledger with a
+declared kind, the ledger moves `INITIALIZED → INGESTED → PASS`, and `PASS` is
+reachable only when no blindspot assertion holds:
+
+```text
+SOURCE_READBACK_MISSING     a candidate was never confirmed against current source
+AST_COVERAGE_MISSING        the structural lane never covered the range in question
+LINK_TARGET_MISSING         an event points at something the ledger does not contain
+READBACK_TARGET_INVALID     the read-back names a target the source does not have
+VECTOR_PROJECTION_ORPHAN    a similarity row with no source lane behind it
+VECTOR_PROJECTION_CHAINED   a projection built on another projection
+TEST_OBSERVATION_FAILED     the behavioural lane contradicts the claim
+PROVIDER_SELF_ADMISSION     a provider admitted its own output as truth
+EVENT_ID_DRIFT              the same logical event under two identities
+EVENT_SUBJECT_MISMATCH      an event bound to a different subject than the ledger
+```
+
+Exit `0` accepts the closure, `2` means an assertion failed or blindspots
+remain, `64` unusable input, `70` a mechanism failure.
+
+The inversion is the point. Every other lane reports what it found; this one
+refuses to close while a reason for not-finding is still standing. An absence
+survives only when none of the above explains it. Method:
+[`../modules/blindspot-hybrid.md`](../modules/blindspot-hybrid.md). Checker:
+[`../scripts/blindspot_contract.py`](../scripts/blindspot_contract.py). Controls:
+[`../tests/blindspot-hybrid/verify.sh`](../tests/blindspot-hybrid/verify.sh).
+
+A LanceDB projection may be rebuilt over the ledger; it is never the authority
+and the contract refuses a vector projection with no source lane behind it.
 
 ### SQLite
 
