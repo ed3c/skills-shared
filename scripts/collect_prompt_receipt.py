@@ -93,12 +93,57 @@ def git(*args: str) -> str:
     ).stdout.strip()
 
 
-def build_argv(host: str, prompt_path: Path, prompt_text: str) -> list[str]:
+# Pinned so the receipt is evidence about a named model rather than about
+# whatever default the host happened to resolve that day.
+DEFAULT_MODELS = {"claude-code": "opus", "codex-cli": "gpt-5.6-sol"}
+
+
+def build_argv(host: str, prompt_path: Path, prompt_text: str, model: str,
+               exclude_dynamic: bool = False) -> list[str]:
     if host == "claude-code":
-        return ["claude", "-p", TASK, "--allowedTools", "Bash",
+        argv = ["claude", "-p", TASK, "--allowedTools", "Bash",
+                "--model", model, "--output-format", "json",
                 "--append-system-prompt-file", str(prompt_path)]
-    return ["codex", "exec", "--sandbox", "workspace-write",
+        if exclude_dynamic:
+            argv.append("--exclude-dynamic-system-prompt-sections")
+        return argv
+    return ["codex", "exec", "-m", model, "--sandbox", "workspace-write",
+            "--skip-git-repo-check", "--json",
             f"{prompt_text}\n\n---\n\n{TASK}"]
+
+
+def answer_text(host: str, stdout: str) -> str:
+    """The host's answer, unwrapped from its transport.
+
+    Adding --output-format json to pin the model also changed stdout from the
+    bare answer into an envelope, and scanning the envelope for a trailing
+    integer finds nothing. The answer lives in `result`; the envelope is not it.
+    """
+    if host == "claude-code":
+        try:
+            return str(json.loads(stdout).get("result", ""))
+        except Exception:
+            return stdout
+    return stdout
+
+
+def observed_model(host: str, stdout: str) -> str:
+    """Read the model back from the host's own report, not from the flag we sent.
+
+    A flag records what was requested; this records what answered. They can differ
+    when a host resolves an alias, and the receipt should carry the resolved one.
+    """
+    import json as _json
+
+    if host == "claude-code":
+        try:
+            payload = _json.loads(stdout)
+            usage = payload.get("modelUsage") or {}
+            if usage:
+                return sorted(usage)[0]
+        except Exception:
+            pass
+    return "UNREPORTED_BY_HOST"
 
 
 REQUIREMENTS_PATH = ROOT / "skills" / "dual-forge-repository-loop" / "references" / "runtime-requirements.json"
@@ -205,6 +250,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--host", choices=sorted(HOSTS), required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--timeout", type=int, default=900)
+    parser.add_argument("--model", help="override the pinned model for this host")
+    parser.add_argument(
+        "--probe-load-order", action="store_true",
+        help="run a second cell with dynamic system-prompt sections excluded, making "
+             "the assembly observable by difference rather than assumed",
+    )
     args = parser.parse_args(argv)
 
     spec = HOSTS[args.host]
@@ -225,10 +276,11 @@ def main(argv: list[str] | None = None) -> int:
         spec["version_argv"], capture_output=True, text=True, check=False, timeout=60
     ).stdout.strip()
 
+    model = args.model or DEFAULT_MODELS[args.host]
     started = now()
     clock = time.time()
     process = subprocess.run(
-        build_argv(args.host, PROMPT_PATH, prompt_text),
+        build_argv(args.host, PROMPT_PATH, prompt_text, model),
         cwd=ROOT, capture_output=True, text=True, check=False, timeout=args.timeout,
     )
     ended = now()
@@ -236,7 +288,7 @@ def main(argv: list[str] | None = None) -> int:
 
     stdout = portable_text(process.stdout)
     stderr = portable_text(process.stderr)
-    reported = trailing_integer(stdout)
+    reported = trailing_integer(answer_text(args.host, stdout))
     agreed = reported == truth["exit_code"]
     produced = bool(stdout.strip())
 
@@ -247,6 +299,8 @@ def main(argv: list[str] | None = None) -> int:
         "version": version,
         "carrier": spec["carrier"],
         "carrier_detail": spec["carrier_detail"],
+        "model_requested": model,
+        "model_observed": observed_model(args.host, process.stdout),
         "prompt_sha256": digest_bytes(prompt_bytes),
         "prompt_bytes": len(prompt_bytes),
         "task": TASK,
@@ -257,6 +311,37 @@ def main(argv: list[str] | None = None) -> int:
         "local_verifier": truth,
         "subject_sha": subject_sha,
     }
+
+    if args.probe_load_order and args.host == "claude-code":
+        excluded = subprocess.run(
+            build_argv(args.host, PROMPT_PATH, prompt_text, model, exclude_dynamic=True),
+            cwd=ROOT, capture_output=True, text=True, check=False,
+            timeout=args.timeout, stdin=subprocess.DEVNULL,
+        )
+        excluded_stdout = portable_text(excluded.stdout)
+        observation["load_order_probe"] = {
+            "method": "same task and bytes, run again with "
+                      "--exclude-dynamic-system-prompt-sections",
+            "baseline_reported_exit": reported,
+            "excluded_reported_exit": trailing_integer(answer_text(args.host, excluded_stdout)),
+            "excluded_host_exit": excluded.returncode,
+            "carried_prompt_survives_exclusion": (
+                trailing_integer(answer_text(args.host, excluded_stdout)) == truth["exit_code"]
+            ),
+            "reading": (
+                "the carried prompt is not a dynamic section: excluding those left "
+                "the task answerable"
+                if trailing_integer(answer_text(args.host, excluded_stdout)) == truth["exit_code"] else
+                "excluding dynamic sections changed the outcome, so the carried bytes "
+                "share an assembly stage with something that was removed"
+            ),
+        }
+    elif args.probe_load_order:
+        observation["load_order_probe"] = {
+            "method": "NOT_AVAILABLE",
+            "reading": "this host exposes no flag that varies system-prompt assembly, "
+                       "so load order stays NOT_EXERCISED here rather than being inferred",
+        }
 
     args.output.mkdir(parents=True, exist_ok=True)
     observation_path = args.output / f"prompt-observation-{args.host}.json"
@@ -313,7 +398,7 @@ def main(argv: list[str] | None = None) -> int:
         "runtime": {
             "identity": spec["runtime"],
             "harness_identity": version or args.host,
-            "model_identity": f"{args.host}-default-model-unbound",
+            "model_identity": observation["model_observed"],
             "subject_sha": subject_sha,
             "environment_digest": digest({"cwd": "<REPO_ROOT>", "carrier": spec["carrier"]}),
             "effect_policy": "BOUNDED_WRITE",
