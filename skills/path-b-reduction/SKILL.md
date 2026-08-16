@@ -1,97 +1,68 @@
 ---
 name: path-b-reduction
 description: |
-  寫作、評估某架構/概念、或產出研究綜述時使用 — 把每個 claim 約分到它的
-  Path B 確定性鐵錨(exit-code / test / selftest good-hollow / external-verified source),
-  阻止認知卸載。當出現「平均 / 效率提升 / 優化 / 品質改善」等平滑抽象敘事時觸發。
+  Portable reduction procedure for shrinking a complex path, plan, or artifact while preserving hard invariants, evidence obligations, interfaces, and rollback. Consumer examples, lineage, actor mappings, and repository-specific reduction targets are domain modules.
 ---
 
-# Skill: Path B 底層原理解構引擎(Semantic Reduction Engine)
+# Path Reduction Procedure
 
-> **Role**:把任何 claim 約分到它的 Path B 確定性鐵錨,
-> 阻止認知卸載(語義表面化/平均值幻覺)。
-> **結構**:SKILL.md = 確定性程序 + pointer;
-> domain know-why 在 `modules/`(SKILL 不複述)。
-> ⚠ 此「Path B」= Path A/B 執行模式軸(`.md` 概率 → `.py` 確定),
-> **非** Layer A/B 抽象軸
-> (見 [fold-in](../fold-in/SKILL.md) 的 SKILL.md/modules 分層用法)
-> ——詳 [modules/know-why.md](modules/know-why.md)。
-> **Lineage**:移植鏈帳本在各 repo 的 `.skill-bindings/path-b-reduction/`;上游
-> (其本身 port 自 northstar `path-b-semantic-reduction-engine.md`)。
-> 方法論本身跨平台通用,無需 retarget 核心程序;
-> 逐項調整見 `.skill-bindings/path-b-reduction/retarget-map.md`。
+<!-- PORTABLE_CORE_START -->
 
-## When to Use
-- 評估/吹捧某架構、演算法、概念(「微服務」「優化」「模組化」「效率提升」)。
-- 寫研究綜述/family changelog 落地說明/faithful-absorption 輸出。
-- claim 帶「平均」「整體提升」「品質改善」等平滑指標。
-- 比較兩方案/兩實體優劣;解釋某機制「做了什麼」。
+## Contract
 
-## Not For
-- ❌ 純執行指令、檔案操作、聊天確認、
-  已 external-verified 的事實複述
-  (套四步驟 = 違反 TCC,能便宜就不貴)。
-- ❌ 查證外部/post-cutoff claim 本身
-  → [external-verify](../external-verify/SKILL.md)
-  (本 skill 消費它的查證結果當步驟一的候選鐵錨之一,不重做查證)。
+The core owns invariant extraction, redundancy classification, candidate reduction, information-loss checks, executable validation, and handoff. Concrete consumer reduction profiles live in `modules/domain-profile.md`.
 
-## 確定性程序 — Path B 四步驟稽核協議
+## State machine
 
-```mermaid
-graph LR
-A[物理鐵錨] --> B[人為槓桿]
-B --> C[微觀總代價]
-C --> D[約分消去]
+```text
+SUBJECT_BOUND
+→ INVARIANTS_EXTRACTED
+→ REDUNDANCY_CLASSIFIED
+→ REDUCTION_CANDIDATE_BUILT
+→ INFORMATION_LOSS_ASSERTED
+→ OWNER_ASSERTIONS_RUN
+→ {ADMIT | REVISE | REJECT}
+→ HANDOFF
 ```
 
-評估某架構/概念、或寫研究解構時,**嚴格執行並在輸出中清晰標記四步驟**:
+## Hard laws
 
-1. **物理鐵錨(Byte = Path B)**
-   → 指出焊死、不可被 prompt/統計操弄的確定性底線
-   (exit-code / test / selftest good=PASS∧hollow=FAIL /
-   external-verified primary source)。
-2. **人為槓桿(Tokens = Path A 被 game)**
-   → 指出哪個主觀分母被拿來刷數據
-   (通過率/命中數/覆蓋率字面值…),
-   拆穿作弊手法。
-3. **微觀總代價(Total Loss)**
-   → 用鏈式法則逐項累加真實總驚訝度,
-   繞過帳面平均,
-   不准用一個總分掩蓋微觀缺口。
-4. **約分消去**
-   → 總代價 ÷ 物理鐵錨,
-   把人為槓桿約掉,
-   給不帶水分的純資訊密度真相
-   (discrimination / 真問題解決淨流)。
+- **CORE-LAW-001 — invariants before compression.** Extract required behavior, evidence, interfaces, safety boundaries, and rollback before removing anything.
+- **CORE-LAW-002 — remove redundancy, not authority.** A reduction may eliminate duplicated or derivable material but cannot silently delete obligations or negative assumptions.
+- **CORE-LAW-003 — smaller is not proof.** The reduced form must pass owning assertions and explicit information-loss controls.
+- **CORE-LAW-004 — modules cannot widen authority.** Domain modules may provide concrete reduction cases but cannot override invariants, hide loss, or widen provider/secret/merge authority.
+- **CORE-LAW-005 — reduction is reversible and scoped.** Preserve source identity, removed-item rationale, rollback subject, evidence state, and exact admission scope.
 
-> 各步驟完整定義 + 原始 prompt 模板
-> → [modules/audit-protocol.md](modules/audit-protocol.md)
+## Procedure
 
-## Gotchas
-- frontmatter `description` 一律用 `|` block scalar;
-  **任何 `": "`(冒號+空格)會讓 YAML 解析失敗 →
-  skill 被靜默跳過**(連自己名字都 recall 不到)。
-- 「反認知卸載」≠ 堆長度。
-  能短則短(TCC):
-  重點是寫出底層**移動了什麼資料、改了什麼約束、付了什麼物理代價**,
-  而非字數。
-- 鐵錨 ≠ 訓練記憶。
-  post-cutoff 事實的鐵錨在外部 primary source
-  (配 external-verify skill),
-  不在 LLM 自述。
-- **判定式機械過 ≠ 因果成立**:
-  量測值受環境混因污染時,
-  照樣機械判 PASS 但**判定帶星號+混因全文披露、
-  因果宣稱明文不成立**——
-  不改門檻、不護航、也不把 PASS 說成「已證明」。
-  教科書案例(antigravity truth-verify 的降本假設全滅/PARTIAL/SKIPPED
-  顯式落帳/compaction 混因披露
-  ——**這是借來的示例,非 skill-bettor 自己的量測歷史**)
-  → [modules/know-why.md](modules/know-why.md) §借形案例。
+1. Bind exact subject, target reduction goal, consumers, and non-goals.
+2. Extract hard invariants, interfaces, evidence requirements, failure/rollback obligations, and non-derivable context.
+3. Classify material as required, duplicated, derivable, optional, stale, or domain-specific.
+4. Build the smallest candidate that preserves all required classes and routes domain-specific material through `modules/domain-profile.md` when needed.
+5. Run information-loss controls and the owning executable assertions.
+6. Admit only if behavior/evidence/authority are preserved; otherwise revise or reject.
+7. Handoff the reduced subject with removal map, evidence, rollback, and remaining tradeoffs.
 
-## Modules
-- [modules/audit-protocol.md](modules/audit-protocol.md)
-  — 四步驟完整定義 + 執行指令模板(原始 Path B prompt)
-- [modules/know-why.md](modules/know-why.md)
-  — 核心哲學 + 語義流風格約束(4 條)+ Path A/B 軸消歧 + 借形案例
-- `.skill-bindings/path-b-reduction/retarget-map.md` — antigravity → skill-bettor 逐項調整與誠實帳本
+## Module selection
+
+Load `modules/domain-profile.md` only for concrete consumer cases, repository lineage, actor/provider mappings, or repository-specific reduction targets.
+
+## Executable assertion
+
+```bash
+python3 scripts/check_skill_core_boundaries.py --skill path-b-reduction
+```
+
+## Evidence states
+
+Preserve `PASS`, `FAIL`, `ABSENT`, `NOT_IMPLEMENTED`, `NOT_EXERCISED`, `SKIPPED_BY_POLICY`, and `HUMAN_ADMIT_REQUIRED`.
+
+## Stop and handoff
+
+Stop when a required invariant would be lost, executable assertions fail, evidence is insufficient, or the reduction reaches the declared target. Handoff includes invariant map, removed/deferred material, assertion results, and rollback subject.
+
+<!-- PORTABLE_CORE_END -->
+
+## Domain specialization
+
+See [modules/domain-profile.md](modules/domain-profile.md).

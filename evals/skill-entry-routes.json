@@ -1,0 +1,22 @@
+{
+  "schema": "skill-entry-routes/v1",
+  "skills": [
+    "autoresearch-composer",
+    "controlled-technical-language-harness",
+    "dual-forge-repository-loop",
+    "external-verify",
+    "gemini-conversation-research",
+    "git-town-stacked-pr-worker",
+    "html-for-decisions",
+    "judge-loop-chooser",
+    "knowledge-continuity",
+    "loop-harness-standard",
+    "procedural-shadow-runtime",
+    "repo-agent-native",
+    "repository-capability-audit",
+    "sdlc-plan-composer",
+    "shared-skills-infra",
+    "spatial-loop-systems-engineering",
+    "truth-verify-loop"
+  ]
+}

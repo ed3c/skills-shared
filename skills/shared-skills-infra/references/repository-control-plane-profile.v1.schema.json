@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "repository-control-plane-profile/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "profile", "skills", "runtime_capabilities", "authority"],
+  "properties": {
+    "schema": {"const": "repository-control-plane-profile/v1"},
+    "profile": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+    "skills": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^[a-z0-9-]+$"}
+    },
+    "runtime_capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["git_town", "forgejo"],
+      "properties": {
+        "git_town": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["scope", "installer_state"],
+          "properties": {
+            "scope": {"const": "user"},
+            "installer_state": {"enum": ["NOT_IMPLEMENTED", "IMPLEMENTED"]}
+          }
+        },
+        "forgejo": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["scope", "service_state"],
+          "properties": {
+            "scope": {"const": "host"},
+            "service_state": {"enum": ["NOT_EXERCISED", "ABSENT", "PASS"]}
+          }
+        }
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["automatic_merge", "automatic_conflict_resolution", "visibility_change", "credential_values"],
+      "properties": {
+        "automatic_merge": {"const": false},
+        "automatic_conflict_resolution": {"const": false},
+        "visibility_change": {"const": false},
+        "credential_values": {"const": false}
+      }
+    }
+  }
+}

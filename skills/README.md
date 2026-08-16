@@ -50,6 +50,14 @@ Complex Skills and consumer repositories use the same route semantics defined in
 6. `tests/README.md` and `evals.json`/`cases.json` — positive and negative controls.
 7. Exact issue/PR — one admitted change and Human boundary.
 
+When a Skill has many tracked mechanism files, do **not** duplicate a hand-maintained list into procedural prose. Use the executable current-tree route:
+
+```bash
+python3 scripts/check_skill_entry_routes.py --skill <name> --print-index
+```
+
+The governed Skill set is declared in `../evals/skill-entry-routes.json`. The command indexes current repository bytes under `scripts/`, `references/`, and `modules/`, so a newly added mechanism becomes discoverable without waiting for a second handwritten basename list to be updated. CI rejects a missing common route or a governed Skill whose owned mechanism surface becomes undiscoverable.
+
 ## Cross-Skill composition
 
 ```text
@@ -69,15 +77,15 @@ Shared Skills may reference another method, but consumer selection remains expli
 - [`knowledge-continuity`](knowledge-continuity/README.md) — procedural continuity loop, generic routing reference, and on-demand cross-repository example.
 - [`spatial-loop-systems-engineering`](spatial-loop-systems-engineering/README.md) — pre-implementation state-space, hard-invariant, substrate-capability, teardown, and verification contract for kernel/hardware-bound work.
 - [`dual-forge-repository-loop`](dual-forge-repository-loop/README.md) — GitHub ingress/Actions plus local Forgejo worktree implementation, local-main-first integration, GitHub conflict/issue reconciliation, and exact-head publication.
-- [`agentic-tech-lead-orchestration`](agentic-tech-lead-orchestration/README.md) — candidate contract-first DAG, deterministic code-intelligence roles, bounded parallel Workers, tournament selection, and Stacked PR handoff. Directory presence is not registry admission.
+- [`agentic-tech-lead-orchestration`](agentic-tech-lead-orchestration/README.md) — candidate contract-first DAG, deterministic code-intelligence roles, bounded parallel Workers, tournament selection, and Stacked PR handoff. Registry admission is a separate governance fact from directory presence.
 
 ## Delivery methods
 
 | Skill | Owns | Does not own |
 |---|---|---|
-| [`dual-forge-repository-loop`](dual-forge-repository-loop/README.md) | cross-forge state machine, local-main-first ordering, SHA/ancestry receipts, GitHub reconciliation gate | forge-specific mechanics, credentials, semantic merge authority |
-| [`github-delivery-loop`](github-delivery-loop/README.md) | artifact/receipt binding, GitHub observation, Actions publication, merge preflight | implementation correctness, Git Town graph, Human merge |
-| [`forgejo-delivery-loop`](forgejo-delivery-loop/README.md) | localhost Forgejo routing, line/receipt binding, deterministic outbox/recovery, safe operation boundaries | consumer registry values, credentials, arbitrary remote changes, Human merge |
+| [`dual-forge-repository-loop`](dual-forge-repository-loop/README.md) | cross-forge state machine, local-main-first ordering, SHA/ancestry receipts, reconciliation gate | forge-specific mechanics, credentials, semantic merge authority |
+| [`github-delivery-loop`](github-delivery-loop/README.md) | artifact/receipt binding, remote observation, publication, merge preflight | implementation correctness, stack graph, Human merge |
+| [`forgejo-delivery-loop`](forgejo-delivery-loop/README.md) | local forge routing, line/receipt binding, deterministic outbox/recovery, safe operation boundaries | consumer registry values, credentials, arbitrary remote changes, Human merge |
 | [`git-town-stacked-pr-worker`](git-town-stacked-pr-worker/README.md) | portable branch/worktree/sync method | consumer config, branches, CI, push/merge/promotion |
 
 ## Evidence boundary
