@@ -16,6 +16,7 @@ This directory proves that the shared delivery mechanisms can turn red. A green 
 | [`link-canonical/`](link-canonical/) | canonical projection | diverged copy is preserved and refused |
 | [`reference-causality/`](reference-causality/) | source/evidence causality | reference-only or stale evidence cannot promote |
 | [`reference-causality-integration/`](reference-causality-integration/) | real-path causality wiring | eval target reaches the live implementation path |
+| [`procedural-core/`](procedural-core/) | portable core versus GitHub domain instance | a provider-specific term in the procedural core is refused |
 | [`run-all.sh`](run-all.sh) | aggregate local harness | every discovered `verify.sh` must pass |
 
 The machine-readable inventory is [`../evals.json`](../evals.json).
