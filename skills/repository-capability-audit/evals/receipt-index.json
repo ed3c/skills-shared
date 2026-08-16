@@ -1,0 +1,45 @@
+{
+  "github_hosted_execution": {
+    "head_sha": "45d5657c5c85b2e50d42b49730920dc56708cd41",
+    "job_id": 95053186610,
+    "job_name": "repository-capability-audit",
+    "run_id": 31901626597,
+    "state": "PASS",
+    "what_it_does_not_support": "a replayable artifact for this skill. The only artifact that run published was evidence-procedural-shadow-runtime-45d5657c. The artifact lane for this skill is added by the change that introduces this file, and its receipt is recorded on #222 once the run exists.",
+    "what_it_supports": "a GitHub-hosted runner executed skills/repository-capability-audit/tests/run-all.sh at that exact head",
+    "workflow": "Skill Suites"
+  },
+  "receipts": [
+    {
+      "layer": "A",
+      "path": "evals/receipts/local-runtime-2026-08-15.json",
+      "receipt_id": "local-runtime-2026-08-15",
+      "what_it_supports": "deterministic suite execution on a non-GitHub local runtime"
+    },
+    {
+      "layer": "B",
+      "path": "evals/receipts/agent-cell-claude-code-4c15d261e63f.json",
+      "receipt_id": "agent-cell-claude-code-4c15d261e63f",
+      "what_it_supports": "one live claude-code cell of the candidate arm; a single cell is not a matched pair"
+    },
+    {
+      "layer": "B",
+      "path": "evals/receipts/agent-cell-codex-cli-4c15d261e63f.json",
+      "receipt_id": "agent-cell-codex-cli-4c15d261e63f",
+      "what_it_supports": "one live codex-cli cell of the candidate arm; a single cell is not a matched pair"
+    },
+    {
+      "layer": "B",
+      "path": "evals/pilot-result.json",
+      "receipt_id": "pilot-result",
+      "what_it_supports": "18 pilot sessions at one repetition, frozen and reported as a pilot"
+    },
+    {
+      "layer": "B",
+      "path": "evals/matrix-slice1-result.json",
+      "receipt_id": "matrix-slice1-result",
+      "what_it_supports": "13 scored cells on one host, with 8 of 14 metrics saturated"
+    }
+  ],
+  "schema": "rca-receipt-index/v1"
+}

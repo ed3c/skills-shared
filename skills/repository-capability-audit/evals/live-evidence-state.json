@@ -1,0 +1,115 @@
+{
+  "schema": "rca-live-evidence-state/v1",
+  "_purpose": "One place that says what the live lanes have actually observed, so the contribution report joins Layer B from receipts instead of from prose. Every state here is a terminal state; NOT_EXERCISED is a state, not a blank.",
+  "_rule": "A lane or a rule may only carry a supported state when this file names qualifying receipt files that exist and whose recomputed digests match. scripts/publish_source_contribution.py refuses the file otherwise, so an edit that promotes a state without adding evidence fails the suite rather than shipping.",
+  "lanes": {
+    "228_matrix": {
+      "issue": "#228",
+      "state": "INSUFFICIENT_SAMPLE",
+      "preregistered_sessions": 90,
+      "observed_sessions": 31,
+      "observed_breakdown": [
+        {
+          "source": "evals/pilot-result.json",
+          "sessions": 18,
+          "repetitions": 1,
+          "hosts": ["claude-code", "codex-cli"],
+          "why_not_countable_as_the_matrix": "one repetition per cell cannot separate an arm effect from run-to-run variance, and its own preregistration is frozen as a PILOT"
+        },
+        {
+          "source": "evals/matrix-slice1-result.json",
+          "sessions": 13,
+          "repetitions": 5,
+          "hosts": ["claude-code"],
+          "why_not_countable_as_the_matrix": "one host and one repository; 8 of 14 measured metrics have zero within-arm variance, so those metrics cannot carry a treatment signal on this corpus"
+        }
+      ],
+      "acceptance_unmet": [
+        "90 primary sessions",
+        "2 model/harness families at 5 repetitions",
+        "paired bootstrap confidence interval for candidate uplift"
+      ],
+      "non_claim": "A missing arm is not a low score. The absent 59 sessions are absent, and no arm ordering observed so far is reported as an effect."
+    },
+    "230_rule_ablation": {
+      "issue": "#230",
+      "state": "NOT_EXERCISED",
+      "required_pairs_per_rule": 2,
+      "observed_pairs_total": 0,
+      "why": "No candidate_minus_RCA-### arm has been executed on any host. The deterministic leave-one-rule-out deltas in evals/expected/effectiveness.json are Layer A: they decide committed fixtures, not model behaviour.",
+      "non_claim": "NOT_EXERCISED is not evidence that a rule is ineffective, and a Layer A deciding delta is not a live one."
+    },
+    "233_source_contribution": {
+      "issue": "#233",
+      "state": "LAYER_A_ONLY",
+      "why": "Layer A mappings are derivable from evals/contract.json and are published here. Every Layer B state is inherited from 230_rule_ablation, which is NOT_EXERCISED, so no source claim can be LIVE_SUPPORTED_MAPPING yet."
+    },
+    "235_production_like": {
+      "issue": "#235",
+      "state": "NOT_EXERCISED",
+      "canaries_required": 3,
+      "canaries_observed": 0,
+      "observation_windows_required": 2,
+      "observation_windows_observed": 0,
+      "why": "No authorized consumer repository has been bound, and no canary has run in any window. The held-out corpus in evals/held-out-corpus.json is an offline audit corpus, not a production-like consumer topology.",
+      "non_claim": "Deterministic and offline-matrix evidence says nothing about production correctness, operational stability, or rollback."
+    }
+  },
+  "rules": {
+    "RCA-001": {"live_state": "NOT_EXERCISED", "pairs": []},
+    "RCA-002": {"live_state": "NOT_EXERCISED", "pairs": []},
+    "RCA-003": {"live_state": "NOT_EXERCISED", "pairs": []},
+    "RCA-004": {"live_state": "NOT_EXERCISED", "pairs": []},
+    "RCA-005": {"live_state": "NOT_EXERCISED", "pairs": []},
+    "RCA-006": {"live_state": "NOT_EXERCISED", "pairs": []},
+    "RCA-007": {"live_state": "NOT_EXERCISED", "pairs": []},
+    "RCA-008": {"live_state": "NOT_EXERCISED", "pairs": []},
+    "RCA-009": {"live_state": "NOT_EXERCISED", "pairs": []},
+    "RCA-010": {"live_state": "NOT_EXERCISED", "pairs": []},
+    "RCA-011": {"live_state": "NOT_EXERCISED", "pairs": []},
+    "RCA-012": {"live_state": "NOT_EXERCISED", "pairs": []},
+    "RCA-013": {"live_state": "NOT_EXERCISED", "pairs": []}
+  },
+  "receipts": [
+    {
+      "receipt_id": "local-runtime-2026-08-15",
+      "path": "evals/receipts/local-runtime-2026-08-15.json",
+      "layer": "A",
+      "what_it_supports": "deterministic suite execution on a non-GitHub local runtime"
+    },
+    {
+      "receipt_id": "agent-cell-claude-code-4c15d261e63f",
+      "path": "evals/receipts/agent-cell-claude-code-4c15d261e63f.json",
+      "layer": "B",
+      "what_it_supports": "one live claude-code cell of the candidate arm; a single cell is not a matched pair"
+    },
+    {
+      "receipt_id": "agent-cell-codex-cli-4c15d261e63f",
+      "path": "evals/receipts/agent-cell-codex-cli-4c15d261e63f.json",
+      "layer": "B",
+      "what_it_supports": "one live codex-cli cell of the candidate arm; a single cell is not a matched pair"
+    },
+    {
+      "receipt_id": "pilot-result",
+      "path": "evals/pilot-result.json",
+      "layer": "B",
+      "what_it_supports": "18 pilot sessions at one repetition, frozen and reported as a pilot"
+    },
+    {
+      "receipt_id": "matrix-slice1-result",
+      "path": "evals/matrix-slice1-result.json",
+      "layer": "B",
+      "what_it_supports": "13 scored cells on one host, with 8 of 14 metrics saturated"
+    }
+  ],
+  "github_hosted_execution": {
+    "state": "PASS",
+    "run_id": 31901626597,
+    "job_id": 95053186610,
+    "job_name": "repository-capability-audit",
+    "head_sha": "45d5657c5c85b2e50d42b49730920dc56708cd41",
+    "workflow": "Skill Suites",
+    "what_it_supports": "a GitHub-hosted runner executed skills/repository-capability-audit/tests/run-all.sh at that exact head",
+    "what_it_does_not_support": "a replayable artifact for this skill. The only artifact that run published was evidence-procedural-shadow-runtime-45d5657c. The artifact lane for this skill is added by the change that introduces this file, and its receipt is recorded on #222 once the run exists."
+  }
+}

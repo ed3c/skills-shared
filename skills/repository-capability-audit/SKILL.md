@@ -225,6 +225,17 @@ python3 skills/repository-capability-audit/scripts/analyze_arm_separation.py \
 
 A metric with zero within-arm variance is saturated: it carries no information about the treatment, so a null on it describes the case set and not the Skill. Declaring one as primary exits 2. This exists because slice 1 stopped a six-slice matrix on exactly that reading, while `false_pass_rate` — recorded in every cell, and not saturated — sat unanalysed in the same file. Counts are compared as rates, since the opportunity count differs between arms.
 
+## Before quoting a contribution number
+
+Regenerate it rather than reading a table someone maintained by hand.
+
+```bash
+python3 skills/repository-capability-audit/scripts/publish_source_contribution.py \
+  --skill-root skills/repository-capability-audit --check
+```
+
+Sources overlap: several map to one retained rule, so per-source fractions are bounded pairs and are never summed. A live state that asserts model behaviour changed is refused unless [`evals/live-evidence-state.json`](evals/live-evidence-state.json) names the required matched pairs and their receipts verify — a state cannot be promoted by editing a word. What the numbers cannot decide is in [`modules/measurement-limits.md`](modules/measurement-limits.md); the requested admission scope is in [`evals/admission-packet.md`](evals/admission-packet.md).
+
 ## Stop conditions
 
 Stop and surface evidence when any of these holds.

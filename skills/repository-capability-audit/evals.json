@@ -55,6 +55,23 @@
       "expected": "the harness admits a matched, independently evaluated cell set and refuses empty, producer-owned, tampered and fixture-as-evidence shapes; live model uplift remains NOT_EXERCISED"
     },
     {
+      "id": "RCA-CONTRIBUTION-1",
+      "checker_script": "scripts/publish_source_contribution.py",
+      "test_verify": "tests/test_source_contribution.py",
+      "good_fixture": "evals/live-evidence-state.json",
+      "hollow_fixture": null,
+      "hollow_mutations": "a rule declaring a live state with no matched pair, a pair naming a receipt that does not exist, a pair whose receipt moved under its recorded digest, a lane claiming more than its rules imply, a retained rule dropped from the state, a receipt named but absent, and a hand edit to a generated output or a pinned module",
+      "covers": [
+        "a Layer B state that asserts model behaviour changed is refused unless the state file names the required matched pairs and their receipts verify",
+        "the derived Layer A fractions reproduce the map that used to be maintained by hand, so the contract and its summary cannot disagree",
+        "a rule named by several sources stays named by several, and no summed total is published",
+        "unique claims, unique rules and source mappings stay separate denominators",
+        "a claim with no retained rule can never reach a live state, because there is nothing to ablate",
+        "a hand edit to a published output exits 2 and stays distinct from absent input, which exits 64"
+      ],
+      "expected": "the committed contribution outputs regenerate byte for byte from evals/contract.json and evals/live-evidence-state.json; 7 planted promotion and drift defects are refused; every source's Layer B state stays NOT_EXERCISED while #230 has run no ablation"
+    },
+    {
       "id": "RCA-HOLDOUT-1",
       "checker_script": "scripts/check_held_out_corpus.py",
       "test_verify": "tests/test_held_out_corpus.py",
@@ -77,13 +94,16 @@
       "deterministic necessity of the retained rules on committed fixtures",
       "integrity of the harness and corpus contract that a live measurement would depend on",
       "thirteen live cells on claude-code/opus across three arms on psf/requests, recorded in evals/matrix-slice1-result.json",
-      "that 8 of 14 measured metrics are saturated on this corpus, so most of the harness's quality metrics cannot carry a treatment signal here"
+      "that 8 of 14 measured metrics are saturated on this corpus, so most of the harness's quality metrics cannot carry a treatment signal here",
+      "an overlap-aware Layer A contribution report derived from the contract rather than maintained by hand, with four denominators kept apart and per-source bounds instead of shares"
     ],
     "not_established": [
       "held-out uplift, cross-model generalization, or production correctness",
       "any uplift from the trimmed Skill. On false_pass_rate -- the only quality metric that varied within arms -- the trimmed candidate ranked worst of three arms, behind supplying no Skill at all, while costing more than either. That result is underpowered at n=4-5 and is not itself a finding of harm; it is recorded because it is the opposite of the effect this Skill was trimmed to produce.",
       "cross-model anything: slice 1 ran one host. codex-cli has never been run on this corpus.",
-      "the five-arm decomposition #219 asks for; its design is frozen in evals/uplift-preregistration.json and has not been executed"
+      "the five-arm decomposition #219 asks for; its design is frozen in evals/uplift-preregistration.json and has not been executed",
+      "any live per-rule contribution: RCA-001..013 each carry a Layer B state of NOT_EXERCISED in evals/live-evidence-state.json, because no candidate_minus_RCA-### arm has run on any host",
+      "production-like or longitudinal behaviour: zero consumer canaries in zero observation windows (#235)"
     ]
   }
 }

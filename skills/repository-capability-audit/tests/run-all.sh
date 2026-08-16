@@ -1,12 +1,27 @@
 #!/usr/bin/env bash
 set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-OUT="$(mktemp -d)"
-trap 'rm -rf "$OUT"' EXIT
+
+# The generated run tree is the only copy of the deterministic observations, the
+# core checker verdict and the nested runtime packet. Deleting it on exit is
+# right for a laptop and wrong for CI: #222 asks for a replayable artifact, and
+# nothing can be uploaded from a directory this script already removed. Naming
+# RCA_EVIDENCE_DIR keeps it; leaving it unset keeps the old throwaway behaviour.
+OUT="${RCA_EVIDENCE_DIR:-}"
+if [ -n "$OUT" ]; then
+  mkdir -p "$OUT"
+else
+  OUT="$(mktemp -d)"
+  trap 'rm -rf "$OUT"' EXIT
+fi
 
 python3 "$HERE/scripts/run_ablation.py" --output "$OUT/run" > "$OUT/report.stdout"
-python3 "$HERE/scripts/check_core.py" --report "$OUT/run/effectiveness.json"
-python3 -m unittest discover -s "$HERE/tests" -p 'test_*.py' -v
+python3 "$HERE/scripts/check_core.py" --report "$OUT/run/effectiveness.json" \
+  | tee "$OUT/check-core.stdout"
+python3 "$HERE/scripts/publish_source_contribution.py" --skill-root "$HERE" --check \
+  | tee "$OUT/source-contribution.stdout"
+python3 -m unittest discover -s "$HERE/tests" -p 'test_*.py' -v 2>&1 \
+  | tee "$OUT/unittest.stdout"
 
 diff -u "$HERE/evals/expected/effectiveness.json" "$OUT/run/effectiveness.json"
 

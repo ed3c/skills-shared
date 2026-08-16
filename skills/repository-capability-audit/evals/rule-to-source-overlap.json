@@ -1,0 +1,216 @@
+{
+  "_rule": "A rule named by several sources cannot have its credit split by this file. The group is the unit that the current evidence can address.",
+  "groups": {
+    "controlled-technical-language-harness+current-system-prompt": {
+      "rule_count": 2,
+      "rules": [
+        "RCA-003",
+        "RCA-006"
+      ],
+      "sources": [
+        "controlled-technical-language-harness",
+        "current-system-prompt"
+      ]
+    },
+    "current-system-prompt": {
+      "rule_count": 2,
+      "rules": [
+        "RCA-009",
+        "RCA-013"
+      ],
+      "sources": [
+        "current-system-prompt"
+      ]
+    },
+    "current-system-prompt+external-verify": {
+      "rule_count": 2,
+      "rules": [
+        "RCA-008",
+        "RCA-012"
+      ],
+      "sources": [
+        "current-system-prompt",
+        "external-verify"
+      ]
+    },
+    "current-system-prompt+github-delivery-loop": {
+      "rule_count": 1,
+      "rules": [
+        "RCA-007"
+      ],
+      "sources": [
+        "current-system-prompt",
+        "github-delivery-loop"
+      ]
+    },
+    "current-system-prompt+github-delivery-loop+spatial-loop-systems-engineering": {
+      "rule_count": 2,
+      "rules": [
+        "RCA-001",
+        "RCA-011"
+      ],
+      "sources": [
+        "current-system-prompt",
+        "github-delivery-loop",
+        "spatial-loop-systems-engineering"
+      ]
+    },
+    "current-system-prompt+judge-loop-chooser+knowledge-continuity": {
+      "rule_count": 1,
+      "rules": [
+        "RCA-010"
+      ],
+      "sources": [
+        "current-system-prompt",
+        "judge-loop-chooser",
+        "knowledge-continuity"
+      ]
+    },
+    "current-system-prompt+spatial-loop-systems-engineering": {
+      "rule_count": 3,
+      "rules": [
+        "RCA-002",
+        "RCA-004",
+        "RCA-005"
+      ],
+      "sources": [
+        "current-system-prompt",
+        "spatial-loop-systems-engineering"
+      ]
+    }
+  },
+  "rules": {
+    "RCA-001": {
+      "layer_a_state": "RUNTIME_SUPPORTED",
+      "layer_b_state": "NOT_EXERCISED",
+      "overlap_group": "current-system-prompt+github-delivery-loop+spatial-loop-systems-engineering",
+      "source_count": 3,
+      "sources": [
+        "current-system-prompt",
+        "github-delivery-loop",
+        "spatial-loop-systems-engineering"
+      ]
+    },
+    "RCA-002": {
+      "layer_a_state": "RUNTIME_SUPPORTED",
+      "layer_b_state": "NOT_EXERCISED",
+      "overlap_group": "current-system-prompt+spatial-loop-systems-engineering",
+      "source_count": 2,
+      "sources": [
+        "current-system-prompt",
+        "spatial-loop-systems-engineering"
+      ]
+    },
+    "RCA-003": {
+      "layer_a_state": "RUNTIME_SUPPORTED",
+      "layer_b_state": "NOT_EXERCISED",
+      "overlap_group": "controlled-technical-language-harness+current-system-prompt",
+      "source_count": 2,
+      "sources": [
+        "controlled-technical-language-harness",
+        "current-system-prompt"
+      ]
+    },
+    "RCA-004": {
+      "layer_a_state": "RUNTIME_SUPPORTED",
+      "layer_b_state": "NOT_EXERCISED",
+      "overlap_group": "current-system-prompt+spatial-loop-systems-engineering",
+      "source_count": 2,
+      "sources": [
+        "current-system-prompt",
+        "spatial-loop-systems-engineering"
+      ]
+    },
+    "RCA-005": {
+      "layer_a_state": "RUNTIME_SUPPORTED",
+      "layer_b_state": "NOT_EXERCISED",
+      "overlap_group": "current-system-prompt+spatial-loop-systems-engineering",
+      "source_count": 2,
+      "sources": [
+        "current-system-prompt",
+        "spatial-loop-systems-engineering"
+      ]
+    },
+    "RCA-006": {
+      "layer_a_state": "RUNTIME_SUPPORTED",
+      "layer_b_state": "NOT_EXERCISED",
+      "overlap_group": "controlled-technical-language-harness+current-system-prompt",
+      "source_count": 2,
+      "sources": [
+        "controlled-technical-language-harness",
+        "current-system-prompt"
+      ]
+    },
+    "RCA-007": {
+      "layer_a_state": "RUNTIME_SUPPORTED",
+      "layer_b_state": "NOT_EXERCISED",
+      "overlap_group": "current-system-prompt+github-delivery-loop",
+      "source_count": 2,
+      "sources": [
+        "current-system-prompt",
+        "github-delivery-loop"
+      ]
+    },
+    "RCA-008": {
+      "layer_a_state": "RUNTIME_SUPPORTED",
+      "layer_b_state": "NOT_EXERCISED",
+      "overlap_group": "current-system-prompt+external-verify",
+      "source_count": 2,
+      "sources": [
+        "current-system-prompt",
+        "external-verify"
+      ]
+    },
+    "RCA-009": {
+      "layer_a_state": "RUNTIME_SUPPORTED",
+      "layer_b_state": "NOT_EXERCISED",
+      "overlap_group": "current-system-prompt",
+      "source_count": 1,
+      "sources": [
+        "current-system-prompt"
+      ]
+    },
+    "RCA-010": {
+      "layer_a_state": "RUNTIME_SUPPORTED",
+      "layer_b_state": "NOT_EXERCISED",
+      "overlap_group": "current-system-prompt+judge-loop-chooser+knowledge-continuity",
+      "source_count": 3,
+      "sources": [
+        "current-system-prompt",
+        "judge-loop-chooser",
+        "knowledge-continuity"
+      ]
+    },
+    "RCA-011": {
+      "layer_a_state": "RUNTIME_SUPPORTED",
+      "layer_b_state": "NOT_EXERCISED",
+      "overlap_group": "current-system-prompt+github-delivery-loop+spatial-loop-systems-engineering",
+      "source_count": 3,
+      "sources": [
+        "current-system-prompt",
+        "github-delivery-loop",
+        "spatial-loop-systems-engineering"
+      ]
+    },
+    "RCA-012": {
+      "layer_a_state": "RUNTIME_SUPPORTED",
+      "layer_b_state": "NOT_EXERCISED",
+      "overlap_group": "current-system-prompt+external-verify",
+      "source_count": 2,
+      "sources": [
+        "current-system-prompt",
+        "external-verify"
+      ]
+    },
+    "RCA-013": {
+      "layer_a_state": "RUNTIME_SUPPORTED",
+      "layer_b_state": "NOT_EXERCISED",
+      "overlap_group": "current-system-prompt",
+      "source_count": 1,
+      "sources": [
+        "current-system-prompt"
+      ]
+    }
+  },
+  "schema": "rca-rule-to-source-overlap/v1"
+}
