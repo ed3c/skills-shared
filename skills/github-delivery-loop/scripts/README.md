@@ -18,9 +18,11 @@ This directory contains the executable mechanisms for delivery evidence, GitHub 
 | [`link-canonical.sh`](link-canonical.sh) | canonical Skill projection | none | optional backup + symlink | linked target or divergence refusal |
 | [`install-codex-merge-rule.sh`](install-codex-merge-rule.sh) | consumer Codex rule bootstrap | none | user rules directory | narrow repo-scoped rule + backup |
 
-New capture emits observation v3, transport v5, and snapshot v5. Replay keeps
-the prior single-workflow v2/v4/v4 receipt line readable for existing
-dual-origin evidence. The publication gate refuses legacy CI feedback as repair
+New capture emits observation v4, transport v6, and snapshot v5. It binds the
+exact Actions job endpoint, matching status/conclusion, and step count, so a
+zero-step `skipped` job remains visible without being counted as a second execution. Replay keeps v3/v5
+readable with unknown step provenance and also preserves the prior single-workflow
+v2/v4/v4 receipt line. The publication gate refuses legacy CI feedback as repair
 authority; only non-CI legacy publication states migrate without recapture.
 
 ## Public data flow

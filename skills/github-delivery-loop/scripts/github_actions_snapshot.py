@@ -12,9 +12,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-OBSERVATION_SCHEMA="github-actions-publish-observation/v3"
+OBSERVATION_SCHEMA="github-actions-publish-observation/v4"
 SNAPSHOT_SCHEMA="github-actions-publish-snapshot/v5"
-TRANSPORT_SCHEMA="github-actions-publish-transport/v5"
+TRANSPORT_SCHEMA="github-actions-publish-transport/v6"
+PREVIOUS_OBSERVATION_SCHEMA="github-actions-publish-observation/v3"
+PREVIOUS_TRANSPORT_SCHEMA="github-actions-publish-transport/v5"
 LEGACY_OBSERVATION_SCHEMA="github-actions-publish-observation/v2"
 LEGACY_SNAPSHOT_SCHEMA="github-actions-publish-snapshot/v4"
 LEGACY_TRANSPORT_SCHEMA="github-actions-publish-transport/v4"
@@ -105,10 +107,10 @@ def pr(v:Any,i:int)->dict[str,Any]:
 def annotation(v:Any,label:str)->dict[str,str]:
     if not isinstance(v,dict):raise SnapshotError(f"{label} must be object")
     exact(v,{"message"},label);return {"message":text(v["message"],f"{label}.message")}
-def check(v:Any,i:int)->dict[str,Any]:
+def check(v:Any,i:int,allow_unknown_steps:bool=False)->dict[str,Any]:
     label=f"check_runs[{i}]"
     if not isinstance(v,dict):raise SnapshotError(f"{label} must be object")
-    exact(v,{"id","name","workflow_path","head_sha","status","conclusion","completed_at","annotations","app_id","app_slug","check_suite_id","workflow_run_id","workflow_id","job_id"},label);cid=v["id"]
+    exact(v,{"id","name","workflow_path","head_sha","status","conclusion","completed_at","annotations","app_id","app_slug","check_suite_id","workflow_run_id","workflow_id","job_id","step_count"},label);cid=v["id"]
     if not isinstance(cid,int) or isinstance(cid,bool) or cid<=0:raise SnapshotError("check id must be positive")
     status=text(v["status"],"check status")
     if status not in {"queued","in_progress","completed"}:raise SnapshotError("unsupported check status")
@@ -121,9 +123,19 @@ def check(v:Any,i:int)->dict[str,Any]:
     if not isinstance(anns,list):raise SnapshotError("annotations must be array")
     identities={name:v[name] for name in ("app_id","check_suite_id","workflow_run_id","workflow_id","job_id")}
     if any(not isinstance(value,int) or isinstance(value,bool) or value<=0 for value in identities.values()):raise SnapshotError("Actions app/suite/workflow/run/job identities must be positive integers")
+    step_count=v["step_count"]
+    if step_count is None:
+        if not allow_unknown_steps:raise SnapshotError("current check observation must bind job step count")
+    elif not isinstance(step_count,int) or isinstance(step_count,bool) or step_count<0:raise SnapshotError("job step count must be a non-negative integer")
     if v["app_slug"]!="github-actions":raise SnapshotError("required check must come from the GitHub Actions app")
-    return {"id":cid,"name":text(v["name"],"check name"),"workflow_path":workflow_path(v["workflow_path"],"check workflow_path"),"head_sha":sha(v["head_sha"],"check head"),"status":status,"conclusion":conclusion,"completed_at":completed,"annotations":[annotation(a,f"annotation[{j}]") for j,a in enumerate(anns)],"app_id":identities["app_id"],"app_slug":"github-actions","check_suite_id":identities["check_suite_id"],"workflow_run_id":identities["workflow_run_id"],"workflow_id":identities["workflow_id"],"job_id":identities["job_id"]}
+    return {"id":cid,"name":text(v["name"],"check name"),"workflow_path":workflow_path(v["workflow_path"],"check workflow_path"),"head_sha":sha(v["head_sha"],"check head"),"status":status,"conclusion":conclusion,"completed_at":completed,"annotations":[annotation(a,f"annotation[{j}]") for j,a in enumerate(anns)],"app_id":identities["app_id"],"app_slug":"github-actions","check_suite_id":identities["check_suite_id"],"workflow_run_id":identities["workflow_run_id"],"workflow_id":identities["workflow_id"],"job_id":identities["job_id"],"step_count":step_count}
 def observation(v:dict[str,Any])->dict[str,Any]:
+    allow_unknown_steps=False
+    if v.get("schema")==PREVIOUS_OBSERVATION_SCHEMA:
+        v=json.loads(json.dumps(v));v["schema"]=OBSERVATION_SCHEMA
+        for item in v.get("check_runs",[]):
+            if isinstance(item,dict):item["step_count"]=None
+        allow_unknown_steps=True
     fields={"schema","repository","branch","pull_requests","check_runs","captured_at"}
     if "branch_ref" in v:fields.add("branch_ref")
     exact(v,fields,"observation")
@@ -131,7 +143,7 @@ def observation(v:dict[str,Any])->dict[str,Any]:
     pulls=v["pull_requests"];checks=v["check_runs"]
     if not isinstance(pulls,list) or not isinstance(checks,list):raise SnapshotError("pull_requests/check_runs must be arrays")
     observed_branch=branch(v["branch"])
-    out={"schema":OBSERVATION_SCHEMA,"repository":repository(v["repository"]),"branch":observed_branch,"pull_requests":[pr(x,i) for i,x in enumerate(pulls)],"check_runs":[check(x,i) for i,x in enumerate(checks)],"captured_at":timestamp(v["captured_at"],"captured_at")}
+    out={"schema":OBSERVATION_SCHEMA,"repository":repository(v["repository"]),"branch":observed_branch,"pull_requests":[pr(x,i) for i,x in enumerate(pulls)],"check_runs":[check(x,i,allow_unknown_steps) for i,x in enumerate(checks)],"captured_at":timestamp(v["captured_at"],"captured_at")}
     if "branch_ref" in v:out["branch_ref"]=branch_ref(v["branch_ref"],observed_branch["name"])
     return out
 def billing(c:dict[str,Any])->bool:
@@ -143,14 +155,16 @@ def select(checks:list[dict[str,Any]],declared:dict[str,str],head:str)->dict[str
     label=f"{workflow} / {name}"
     if same and not exact_head:raise SnapshotError(f"declared repair-feedback check {label} exists only for a stale head")
     if not exact_head:return None
-    if len(exact_head)!=1:raise SnapshotError(f"declared repair-feedback check {label} ran more than once for the exact head")
-    done=[c for c in exact_head if c["status"]=="completed"]
+    executed=[c for c in exact_head if not (c["conclusion"]=="skipped" and c["step_count"]==0 and not billing(c))]
+    if not executed:return None
+    if len(executed)!=1:raise SnapshotError(f"declared repair-feedback check {label} ran more than once for the exact head")
+    done=[c for c in executed if c["status"]=="completed"]
     if not done:raise SnapshotError(f"declared repair-feedback check {label} is not completed")
     return done[0]
 def _snapshot_check(c:dict[str,Any],declared:dict[str,str])->dict[str,Any]:
     return {"workflow":declared["workflow"],"job":declared["job"],"role":declared["role"],"head_sha":c["head_sha"],"conclusion":c["conclusion"],"completed_at":c["completed_at"],"check_run_id":c["id"],"check_suite_id":c["check_suite_id"],"workflow_run_id":c["workflow_run_id"],"workflow_id":c["workflow_id"],"job_id":c["job_id"],"app_id":c["app_id"]}
 def _legacy_build(raw:dict[str,Any],check_name:str,strict:bool)->dict[str,Any]:
-    upgraded=json.loads(json.dumps(raw));upgraded["schema"]=OBSERVATION_SCHEMA
+    upgraded=json.loads(json.dumps(raw));upgraded["schema"]=PREVIOUS_OBSERVATION_SCHEMA
     workflow=".github/workflows/legacy-policy-bound.yml"
     for item in upgraded.get("check_runs",[]):
         if isinstance(item,dict):item["workflow_path"]=workflow
@@ -186,20 +200,25 @@ def build(raw:dict[str,Any],declared_checks:list[dict[str,str]]|str,strict:bool=
     if v["branch"]["head_sha"] is not None and v["branch"]["head_sha"]!=p["head_sha"]:raise SnapshotError("branch head does not match PR head")
     if "branch_ref" in v and v["branch_ref"]["object_sha"]!=p["head_sha"]:
         raise SnapshotError("an open pull request exists but its branch ref was not observed" if not v["branch_ref"]["observed"] else "observed branch ref disagrees with the pull request head")
-    selected=[select(v["check_runs"],item,p["head_sha"]) for item in declarations];feedback=None
-    present=[item for item in selected if item is not None]
-    if present and len(present)!=len(selected):
-        missing=declarations[selected.index(None)];raise SnapshotError(f"declared repair-feedback check {missing['workflow']} / {missing['job']} is missing")
-    if not present:actions={"circuit":"closed","observed_at":None,"blocker":None,"checks":[]}
-    elif any(billing(c) for c in present):
-        billing_observed=max(c["completed_at"] for c in present if billing(c));actions={"circuit":"billing-open","observed_at":billing_observed,"blocker":"billing-or-spending-limit","checks":[]}
+    declared_pairs={(item["workflow"],item["job"]) for item in declarations}
+    billing_checks=[c for c in v["check_runs"] if c["head_sha"]==p["head_sha"] and (c["workflow_path"],c["name"]) in declared_pairs and c["status"]=="completed" and billing(c)]
+    feedback=None
+    if billing_checks:
+        billing_observed=max(c["completed_at"] for c in billing_checks);actions={"circuit":"billing-open","observed_at":billing_observed,"blocker":"billing-or-spending-limit","checks":[]}
     else:
-        snapshots=[_snapshot_check(c,d) for c,d in zip(present,declarations)]
-        actions={"circuit":"closed","observed_at":None,"blocker":None,"checks":snapshots}
-        actionable=[c for c in present if c["conclusion"] in ACTIONABLE]
-        if actionable:
-            ids=",".join(str(c["id"]) for c in actionable);observed=max(c["completed_at"] for c in actionable)
-            feedback={"id":f"check-runs:{ids}","kind":"ci","head_sha":p["head_sha"],"observed_at":observed,"consumed_by_sha":None}
+        selected=[select(v["check_runs"],item,p["head_sha"]) for item in declarations]
+        present=[item for item in selected if item is not None]
+        if present and len(present)!=len(selected):
+            missing=declarations[selected.index(None)];raise SnapshotError(f"declared repair-feedback check {missing['workflow']} / {missing['job']} is missing")
+        if not present:
+            actions={"circuit":"closed","observed_at":None,"blocker":None,"checks":[]}
+        else:
+            snapshots=[_snapshot_check(c,d) for c,d in zip(present,declarations)]
+            actions={"circuit":"closed","observed_at":None,"blocker":None,"checks":snapshots}
+            actionable=[c for c in present if c["conclusion"] in ACTIONABLE]
+            if actionable:
+                ids=",".join(str(c["id"]) for c in actionable);observed=max(c["completed_at"] for c in actionable)
+                feedback={"id":f"check-runs:{ids}","kind":"ci","head_sha":p["head_sha"],"observed_at":observed,"consumed_by_sha":None}
     return {"schema":SNAPSHOT_SCHEMA,"repository":v["repository"],"branch":v["branch"],"initial_boundary":"not-initial","pull_request":{"number":p["number"],"state":"draft" if p["draft"] else "ready","head_sha":p["head_sha"],"last_published_sha":p["head_sha"],"last_published_at":p["updated_at"],"feedback":feedback},"actions":actions,"captured_at":v["captured_at"]}
 def atomic(path:Path,v:dict[str,Any])->None:
     path.parent.mkdir(parents=True,exist_ok=True);payload=json.dumps(v,ensure_ascii=False,sort_keys=True,indent=2)+"\n"
@@ -229,7 +248,7 @@ def _capture_entry(gh_path:str,endpoint:str,timeout:int,paginated:bool=False)->d
 
 def _validated_captures(raw:dict[str,Any])->list[dict[str,Any]]:
     exact(raw,{"schema","producer","gh_executable","repository","branch","feedback_checks","captured_at","captures"},"transport")
-    if raw["schema"]!=TRANSPORT_SCHEMA or raw["producer"]!="github_actions_snapshot.py":raise SnapshotError("unsupported Actions transport producer")
+    if raw["schema"] not in {TRANSPORT_SCHEMA,PREVIOUS_TRANSPORT_SCHEMA} or raw["producer"]!="github_actions_snapshot.py":raise SnapshotError("unsupported Actions transport producer")
     identity=raw["gh_executable"]
     if not isinstance(identity,dict):raise SnapshotError("transport gh_executable must be object")
     exact(identity,{"invoked_path","resolved_path","sha256","version"},"transport gh_executable")
@@ -274,11 +293,12 @@ def _for_workflow(checks:list[dict[str,Any]],workflow_id:int)->list[dict[str,Any
 def observation_from_transport(raw:dict[str,Any])->dict[str,Any]:
     if raw.get("schema")==LEGACY_TRANSPORT_SCHEMA:
         converted=json.loads(json.dumps(raw));workflow=converted.pop("workflow");job=converted.pop("check_name")
-        converted["schema"]=TRANSPORT_SCHEMA;converted["feedback_checks"]=[{"workflow":workflow,"job":job,"role":"primary"}]
+        converted["schema"]=PREVIOUS_TRANSPORT_SCHEMA;converted["feedback_checks"]=[{"workflow":workflow,"job":job,"role":"primary"}]
         current=observation_from_transport(converted);current["schema"]=LEGACY_OBSERVATION_SCHEMA
-        for item in current["check_runs"]:item.pop("workflow_path",None)
+        for item in current["check_runs"]:
+            item.pop("workflow_path",None);item.pop("step_count",None)
         return current
-    entries=_validated_captures(raw);repo=raw["repository"];branch_name=raw["branch"];declarations=feedback_checks(raw["feedback_checks"]);owner=repo.split('/',1)[0]
+    entries=_validated_captures(raw);binds_steps=raw["schema"]==TRANSPORT_SCHEMA;repo=raw["repository"];branch_name=raw["branch"];declarations=feedback_checks(raw["feedback_checks"]);owner=repo.split('/',1)[0]
     expected_repo=f"repos/{repo}"
     if entries[0]["argv"]!=[entries[0]["argv"][0],"api",expected_repo]:raise SnapshotError("transport repository argv mismatch")
     r=_json_stdout(entries[0],expected_repo)
@@ -310,6 +330,14 @@ def observation_from_transport(raw:dict[str,Any])->dict[str,Any]:
             if len(entries)<=index or entries[index]["argv"]!=[entries[0]["argv"][0],"api",run_endpoint]:raise SnapshotError("transport workflow-run argv mismatch")
             run=_json_stdout(entries[index],run_endpoint);index+=1
             if not isinstance(run,dict) or run.get("id")!=run_id or run.get("head_sha")!=head or not isinstance(run.get("workflow_id"),int) or isinstance(run.get("workflow_id"),bool) or run["workflow_id"]<=0:raise SnapshotError("workflow run identity/head mismatch")
+            step_count=None
+            if binds_steps:
+                job_endpoint=f"repos/{repo}/actions/jobs/{job_id}"
+                if len(entries)<=index or entries[index]["argv"]!=[entries[index]["argv"][0],"api",job_endpoint]:raise SnapshotError("transport Actions job argv mismatch")
+                job=_json_stdout(entries[index],job_endpoint);index+=1
+                steps=job.get("steps") if isinstance(job,dict) else None
+                if not isinstance(job,dict) or job.get("id")!=job_id or job.get("run_id")!=run_id or job.get("head_sha")!=head or job.get("status")!=x.get("status") or job.get("conclusion")!=x.get("conclusion") or not isinstance(steps,list) or any(not isinstance(step,dict) for step in steps):raise SnapshotError("Actions job identity/head/status/conclusion/steps mismatch")
+                step_count=len(steps)
             endpoint=f"repos/{repo}/check-runs/{x.get('id')}/annotations?per_page=100"
             if len(entries)<=index or entries[index]["argv"]!=[entries[index]["argv"][0],"api","--paginate","--slurp",endpoint]:raise SnapshotError("transport annotations argv mismatch")
             annotation_pages=_json_stdout(entries[index],endpoint);index+=1
@@ -317,7 +345,7 @@ def observation_from_transport(raw:dict[str,Any])->dict[str,Any]:
             anns=[item for page in annotation_pages for item in page]
             matching_workflow=next((path for path,wid in workflow_ids.items() if wid==run["workflow_id"]),None)
             if matching_workflow is not None and any(d["workflow"]==matching_workflow and d["job"]==x.get("name") for d in declarations):
-                checks.append({"id":x.get("id"),"name":x.get("name"),"workflow_path":matching_workflow,"head_sha":x.get("head_sha"),"status":x.get("status"),"conclusion":x.get("conclusion"),"completed_at":x.get("completed_at"),"annotations":[{"message":a.get("message")} for a in anns if isinstance(a,dict)],"app_id":app_id,"app_slug":"github-actions","check_suite_id":suite_id,"workflow_run_id":run_id,"workflow_id":run["workflow_id"],"job_id":job_id})
+                checks.append({"id":x.get("id"),"name":x.get("name"),"workflow_path":matching_workflow,"head_sha":x.get("head_sha"),"status":x.get("status"),"conclusion":x.get("conclusion"),"completed_at":x.get("completed_at"),"annotations":[{"message":a.get("message")} for a in anns if isinstance(a,dict)],"app_id":app_id,"app_slug":"github-actions","check_suite_id":suite_id,"workflow_run_id":run_id,"workflow_id":run["workflow_id"],"job_id":job_id,"step_count":step_count})
     endpoint=f"repos/{repo}/git/ref/heads/{quote(branch_name,safe='')}"
     if len(entries)>index:
         if entries[index]["argv"]!=[entries[index]["argv"][0],"api",endpoint]:raise SnapshotError("transport branch-ref argv mismatch")
@@ -334,7 +362,9 @@ def observation_from_transport(raw:dict[str,Any])->dict[str,Any]:
     elif not pulls:
         raise SnapshotError("transport branch-ref capture is missing")
     if index!=len(entries):raise SnapshotError("transport contains unconsumed provider calls")
-    result={"schema":OBSERVATION_SCHEMA,"repository":rv,"branch":{"name":branch_name,"head_sha":head},"pull_requests":pulls,"check_runs":checks,"captured_at":timestamp(raw["captured_at"],"transport.captured_at")}
+    result={"schema":OBSERVATION_SCHEMA if binds_steps else PREVIOUS_OBSERVATION_SCHEMA,"repository":rv,"branch":{"name":branch_name,"head_sha":head},"pull_requests":pulls,"check_runs":checks,"captured_at":timestamp(raw["captured_at"],"transport.captured_at")}
+    if not binds_steps:
+        for item in result["check_runs"]:item.pop("step_count",None)
     if branch_ref_value is not None:result["branch_ref"]=branch_ref_value
     return result
 
@@ -360,8 +390,9 @@ def capture_transport(repo:str,branch_name:str,declared_checks:list[dict[str,str
         for page in check_pages:
             for x in page["check_runs"]:
                 if isinstance(x,dict) and x.get("name") in {item["job"] for item in declarations}:
-                    run_id,_,_,_=_check_identity(x,repo)
+                    run_id,job_id,_,_=_check_identity(x,repo)
                     call(f"repos/{repo}/actions/runs/{run_id}")
+                    call(f"repos/{repo}/actions/jobs/{job_id}")
                     call(f"repos/{repo}/check-runs/{x.get('id')}/annotations?per_page=100",True)
     captures.append(_capture_entry(gh_path,f"repos/{repo}/git/ref/heads/{quote(branch_name,safe='')}",timeout))
     return {"schema":TRANSPORT_SCHEMA,"producer":"github_actions_snapshot.py","gh_executable":gh_identity,"repository":repo,"branch":branch_name,"feedback_checks":declarations,"captured_at":datetime.now(timezone.utc).isoformat().replace("+00:00","Z"),"captures":captures}
@@ -370,7 +401,7 @@ def capture(repo:str,branch_name:str,declared_checks:list[dict[str,str]],timeout
     return observation_from_transport(capture_transport(repo,branch_name,declared_checks,timeout))
 def fixture()->dict[str,Any]:
     h="1"*40
-    return {"schema":OBSERVATION_SCHEMA,"repository":{"full_name":"ed3c/skills-shared","repository_id":1326262274,"owner_login":"ed3c","private":True},"branch":{"name":"feature","head_sha":h},"pull_requests":[{"number":42,"draft":False,"head_sha":h,"updated_at":"2026-08-12T05:00:00Z"}],"check_runs":[{"id":9001,"name":"contract","workflow_path":".github/workflows/verify.yml","head_sha":h,"status":"completed","conclusion":"failure","completed_at":"2026-08-12T05:01:00Z","annotations":[{"message":"repository test failed"}],"app_id":15368,"app_slug":"github-actions","check_suite_id":8001,"workflow_run_id":7001,"workflow_id":6001,"job_id":5001}],"captured_at":"2026-08-12T05:02:00Z"}
+    return {"schema":OBSERVATION_SCHEMA,"repository":{"full_name":"ed3c/skills-shared","repository_id":1326262274,"owner_login":"ed3c","private":True},"branch":{"name":"feature","head_sha":h},"pull_requests":[{"number":42,"draft":False,"head_sha":h,"updated_at":"2026-08-12T05:00:00Z"}],"check_runs":[{"id":9001,"name":"contract","workflow_path":".github/workflows/verify.yml","head_sha":h,"status":"completed","conclusion":"failure","completed_at":"2026-08-12T05:01:00Z","annotations":[{"message":"repository test failed"}],"app_id":15368,"app_slug":"github-actions","check_suite_id":8001,"workflow_run_id":7001,"workflow_id":6001,"job_id":5001,"step_count":1}],"captured_at":"2026-08-12T05:02:00Z"}
 def selftest()->None:
     declared=[{"workflow":".github/workflows/verify.yml","job":"contract","role":"primary"}]
     if build(fixture(),declared)["pull_request"]["feedback"]["id"]!="check-runs:9001":raise SnapshotError("actionable check lost")

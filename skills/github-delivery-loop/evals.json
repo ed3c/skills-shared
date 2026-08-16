@@ -69,7 +69,7 @@
       "test_verify": "tests/evidence-producers/verify.sh",
       "good_fixture": "tests/evidence-producers/fixtures/good",
       "hollow_fixture": "tests/evidence-producers/fixtures/stale",
-      "covers": ["private repository identity and one PR are bound", "every repair-feedback check is selected by policy workflow identity, exact name, and exact head", "one or more actionable declared failures become one deterministic batched feedback identity", "known payment or spending annotation on any declared check becomes billing-open with no test conclusion", "replay is zero-network", "undeclared workflows, missing declared checks, multiple PRs, public repositories, mismatched workflow paths, same-workflow reruns, stale checks, incomplete checks, and malformed annotations fail closed"],
+      "covers": ["private repository identity and one PR are bound", "every repair-feedback check is selected by policy workflow identity, exact name, exact head, Actions job identity, and step count", "a proved zero-step skipped job is retained as non-execution while unknown step provenance stays conservative", "one or more actionable declared failures become one deterministic batched feedback identity", "known payment or spending annotation on any declared check becomes billing-open with no test conclusion", "replay is zero-network", "undeclared workflows, missing declared checks, multiple PRs, public repositories, mismatched workflow paths, two executed same-workflow checks, stale checks, incomplete checks, and malformed annotations fail closed"],
       "expected": "good single- or multi-workflow observation produces a trusted snapshot; billing remains a circuit state; missing, stale, undeclared, incomplete, or ambiguous observations turn red"
     },
     {

@@ -286,6 +286,7 @@ class MultiWorkflowSnapshotTests(unittest.TestCase):
             "name": "verify",
             "workflow_path": ".github/workflows/verify.yml",
             "conclusion": "success",
+            "step_count": 2,
         })
         auxiliary = dict(primary)
         auxiliary.update({
@@ -301,6 +302,109 @@ class MultiWorkflowSnapshotTests(unittest.TestCase):
         })
         value["check_runs"].append(auxiliary)
         return value
+
+    @staticmethod
+    def transport_with_skipped_draft_job() -> dict:
+        resolved = "/opt/homebrew/Cellar/gh/2.82.0/bin/gh"
+        repo = "ed3c/example"
+        head = "1" * 40
+
+        def entry(argv: list[str], payload: object) -> dict:
+            stdout = json.dumps(payload, separators=(",", ":"))
+            return {
+                "argv": argv,
+                "exit": 0,
+                "stdout": stdout,
+                "stdout_sha256": hashlib.sha256(stdout.encode()).hexdigest(),
+                "stderr": "",
+                "stderr_sha256": hashlib.sha256(b"").hexdigest(),
+            }
+
+        captures = [
+            entry([resolved, "api", f"repos/{repo}"], {
+                "full_name": repo,
+                "id": 123,
+                "owner": {"login": "ed3c"},
+                "private": True,
+            }),
+            entry([resolved, "api", f"repos/{repo}/actions/workflows/.github%2Fworkflows%2Fverify.yml"], {
+                "id": 6001,
+                "path": ".github/workflows/verify.yml",
+            }),
+            entry([resolved, "api", f"repos/{repo}/actions/workflows/.github%2Fworkflows%2Fbinding.yml"], {
+                "id": 6002,
+                "path": ".github/workflows/binding.yml",
+            }),
+            entry([resolved, "api", "--paginate", "--slurp", f"repos/{repo}/pulls?state=open&head=ed3c:feature&per_page=100"], [[{
+                "number": 42,
+                "draft": False,
+                "head": {"sha": head},
+                "updated_at": "2026-08-12T05:00:00Z",
+            }]]),
+        ]
+
+        checks = [
+            (9001, "verify", 7001, 8001, 5001, 6001, "success", [
+                {"name": "Set up job", "conclusion": "success"},
+            ]),
+            (9003, "binding", 7003, 8003, 5003, 6002, "skipped", []),
+            (9002, "binding", 7002, 8002, 5002, 6002, "failure", [
+                {"name": "Set up job", "conclusion": "success"},
+                {"name": "Validate binding", "conclusion": "failure"},
+            ]),
+        ]
+        check_runs = [{
+            "id": check_id,
+            "name": name,
+            "head_sha": head,
+            "status": "completed",
+            "conclusion": conclusion,
+            "completed_at": f"2026-08-12T05:01:0{index}Z",
+            "details_url": f"https://github.com/{repo}/actions/runs/{run_id}/job/{job_id}",
+            "app": {"id": 15368, "slug": "github-actions"},
+            "check_suite": {"id": suite_id},
+        } for index, (check_id, name, run_id, suite_id, job_id, _, conclusion, _) in enumerate(checks, 1)]
+        captures.append(entry(
+            [resolved, "api", "--paginate", "--slurp", f"repos/{repo}/commits/{head}/check-runs?per_page=100"],
+            [{"check_runs": check_runs}],
+        ))
+        for check_id, _, run_id, _, job_id, workflow_id, _, steps in checks:
+            captures.extend([
+                entry([resolved, "api", f"repos/{repo}/actions/runs/{run_id}"], {
+                    "id": run_id,
+                    "head_sha": head,
+                    "workflow_id": workflow_id,
+                }),
+                entry([resolved, "api", f"repos/{repo}/actions/jobs/{job_id}"], {
+                    "id": job_id,
+                    "run_id": run_id,
+                    "head_sha": head,
+                    "status": "completed",
+                    "conclusion": "skipped" if not steps else (
+                        "failure" if any(step["conclusion"] == "failure" for step in steps) else "success"
+                    ),
+                    "steps": steps,
+                }),
+                entry([resolved, "api", "--paginate", "--slurp", f"repos/{repo}/check-runs/{check_id}/annotations?per_page=100"], [[]]),
+            ])
+        captures.append(entry([resolved, "api", "repos/ed3c/example/git/ref/heads/feature"], {
+            "object": {"sha": head},
+        }))
+        return {
+            "schema": "github-actions-publish-transport/v6",
+            "producer": "github_actions_snapshot.py",
+            "gh_executable": {
+                "invoked_path": "/opt/homebrew/bin/gh",
+                "resolved_path": resolved,
+                "sha256": "3" * 64,
+                "version": "gh version 2.82.0",
+            },
+            "repository": repo,
+            "branch": "feature",
+            "feedback_checks": MultiWorkflowSnapshotTests.CHECKS,
+            "captured_at": "2026-08-12T05:02:00Z",
+            "captures": captures,
+        }
 
     def test_declared_auxiliary_failure_becomes_exact_batched_feedback(self) -> None:
         result = SNAPSHOT.build(self.observation(), self.CHECKS)
@@ -336,6 +440,86 @@ class MultiWorkflowSnapshotTests(unittest.TestCase):
         with self.assertRaisesRegex(SNAPSHOT.SnapshotError, "ran more than once"):
             SNAPSHOT.build(value, self.CHECKS)
 
+    def test_skipped_draft_observation_does_not_make_one_execution_ambiguous(self) -> None:
+        value = self.observation()
+        skipped = dict(
+            value["check_runs"][1],
+            id=9003,
+            job_id=5003,
+            conclusion="skipped",
+            completed_at="2026-08-12T05:00:30Z",
+            step_count=0,
+        )
+        value["check_runs"].append(skipped)
+
+        result = SNAPSHOT.build(value, self.CHECKS)
+
+        self.assertEqual(result["pull_request"]["feedback"]["id"], "check-runs:9002")
+        self.assertEqual(result["actions"]["checks"][1]["check_run_id"], 9002)
+
+    def test_transport_binds_job_steps_before_skipped_observation_is_ignored(self) -> None:
+        observation = SNAPSHOT.observation_from_transport(
+            self.transport_with_skipped_draft_job()
+        )
+        result = SNAPSHOT.build(observation, self.CHECKS, strict=True)
+
+        self.assertEqual([item["step_count"] for item in observation["check_runs"]], [1, 0, 2])
+        self.assertEqual(result["pull_request"]["feedback"]["id"], "check-runs:9002")
+
+    def test_transport_rejects_job_conclusion_that_disagrees_with_check_run(self) -> None:
+        transport = self.transport_with_skipped_draft_job()
+        job_entry = next(
+            item for item in transport["captures"]
+            if item["argv"][-1] == "repos/ed3c/example/actions/jobs/5003"
+        )
+        payload = json.loads(job_entry["stdout"])
+        payload["conclusion"] = "success"
+        job_entry["stdout"] = json.dumps(payload, separators=(",", ":"))
+        job_entry["stdout_sha256"] = hashlib.sha256(job_entry["stdout"].encode()).hexdigest()
+
+        with self.assertRaisesRegex(SNAPSHOT.SnapshotError, "Actions job.*mismatch"):
+            SNAPSHOT.observation_from_transport(transport)
+
+    def test_skipped_only_auxiliary_does_not_satisfy_declared_check(self) -> None:
+        value = self.observation()
+        value["check_runs"][1].update({"conclusion": "skipped", "step_count": 0})
+
+        with self.assertRaisesRegex(SNAPSHOT.SnapshotError, "declared repair-feedback check.*missing"):
+            SNAPSHOT.build(value, self.CHECKS)
+
+    def test_skipped_draft_plus_one_success_has_no_repair_feedback(self) -> None:
+        value = self.observation()
+        value["check_runs"][1]["conclusion"] = "success"
+        skipped = dict(
+            value["check_runs"][1],
+            id=9003,
+            job_id=5003,
+            conclusion="skipped",
+            step_count=0,
+        )
+        value["check_runs"].append(skipped)
+
+        result = SNAPSHOT.build(value, self.CHECKS)
+
+        self.assertIsNone(result["pull_request"]["feedback"])
+        self.assertEqual(result["actions"]["checks"][1]["check_run_id"], 9002)
+
+    def test_previous_observation_without_step_provenance_stays_ambiguous(self) -> None:
+        value = self.observation()
+        value["schema"] = "github-actions-publish-observation/v3"
+        skipped = dict(
+            value["check_runs"][1],
+            id=9003,
+            job_id=5003,
+            conclusion="skipped",
+        )
+        value["check_runs"].append(skipped)
+        for check_run in value["check_runs"]:
+            check_run.pop("step_count")
+
+        with self.assertRaisesRegex(SNAPSHOT.SnapshotError, "ran more than once"):
+            SNAPSHOT.build(value, self.CHECKS)
+
     def test_auxiliary_no_runner_billing_is_not_actionable_feedback(self) -> None:
         value = self.observation()
         value["check_runs"][1]["annotations"] = [{
@@ -344,6 +528,38 @@ class MultiWorkflowSnapshotTests(unittest.TestCase):
         result = SNAPSHOT.build(value, self.CHECKS)
         self.assertEqual(result["actions"]["circuit"], "billing-open")
         self.assertEqual(result["actions"]["checks"], [])
+        self.assertIsNone(result["pull_request"]["feedback"])
+
+    def test_zero_step_skipped_billing_observation_still_opens_circuit(self) -> None:
+        value = self.observation()
+        auxiliary = value["check_runs"][1]
+        auxiliary.update({"conclusion": "skipped", "step_count": 0})
+        auxiliary["annotations"] = [{
+            "message": "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"
+        }]
+
+        result = SNAPSHOT.build(value, self.CHECKS)
+
+        self.assertEqual(result["actions"]["circuit"], "billing-open")
+        self.assertEqual(result["actions"]["checks"], [])
+
+    def test_billing_observation_blocks_before_same_pair_execution_ambiguity(self) -> None:
+        value = self.observation()
+        billing_skip = dict(
+            value["check_runs"][1],
+            id=9003,
+            job_id=5003,
+            conclusion="skipped",
+            step_count=0,
+        )
+        billing_skip["annotations"] = [{
+            "message": "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"
+        }]
+        value["check_runs"].append(billing_skip)
+
+        result = SNAPSHOT.build(value, self.CHECKS)
+
+        self.assertEqual(result["actions"]["circuit"], "billing-open")
         self.assertIsNone(result["pull_request"]["feedback"])
 
 
