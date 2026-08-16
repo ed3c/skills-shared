@@ -61,6 +61,17 @@
       "retry policy"
     ]
   },
+  "case_set": {
+    "case_set_id": "v2-1-multi-agent-runtime-cases-2026-08",
+    "path": "skills/dual-forge-repository-loop/evals/prompt-baseline-cases.json",
+    "set_digest": "66828f62feb9",
+    "case_count": 6,
+    "case_ids": ["positive", "expired-lease", "concurrent-attempts", "foreign-eval",
+                 "unadmitted-result-head", "publication-before-closure"],
+    "why_this_task": "The task must be one the prompt could plausibly help with, or the experiment measures nothing. v2.1 is the multi-agent runtime contract, so each case is a contract document the deterministic checker already rules on. Five distinct rule families are spanned rather than five variants of one rule: lease time, attempt model, evidence identity, subject admission, and closure.",
+    "ground_truth_authority": "DETERMINISTIC_CHECKER",
+    "agent_never_sees": "checker output, exit codes, or violated-rule markers"
+  },
   "verifier": {
     "verifier_id": "multi-agent-runtime-verify",
     "authority": "DETERMINISTIC_ONLY",
