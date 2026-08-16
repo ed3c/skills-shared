@@ -69,6 +69,7 @@ Shared Skills may reference another method, but consumer selection remains expli
 - [`knowledge-continuity`](knowledge-continuity/README.md) — procedural continuity loop, generic routing reference, and on-demand cross-repository example.
 - [`spatial-loop-systems-engineering`](spatial-loop-systems-engineering/README.md) — pre-implementation state-space, hard-invariant, substrate-capability, teardown, and verification contract for kernel/hardware-bound work.
 - [`dual-forge-repository-loop`](dual-forge-repository-loop/README.md) — GitHub ingress/Actions plus local Forgejo worktree implementation, local-main-first integration, GitHub conflict/issue reconciliation, and exact-head publication.
+- [`agentic-tech-lead-orchestration`](agentic-tech-lead-orchestration/README.md) — candidate contract-first DAG, deterministic code-intelligence roles, bounded parallel Workers, tournament selection, and Stacked PR handoff. Directory presence is not registry admission.
 
 ## Delivery methods
 

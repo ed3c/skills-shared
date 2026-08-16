@@ -1,0 +1,16 @@
+{
+  "schema": "agentic-tech-lead/contract-cases/v1",
+  "skill": "agentic-tech-lead-orchestration",
+  "cases": [
+    {"id": "VALID-STACK", "expected": "PASS"},
+    {"id": "NO-CODE-GRAPH-RAG", "expected_failure": "NO_CODE_GRAPH_RAG"},
+    {"id": "NO-DOUBLE-GRAPH", "expected_failure": "NO_DOUBLE_GRAPH"},
+    {"id": "EXACT-SUBJECT-MISMATCH", "expected_failure": "PROVIDER_SUBJECT_MISMATCH"},
+    {"id": "READ-ONLY-PATH", "expected_failure": "READ_ONLY_PATH"},
+    {"id": "DAG-CYCLE", "expected_failure": "DAG_CYCLE"},
+    {"id": "DEGRADED-AUTOMATION", "expected_failure": "EVIDENCE_CEILING"},
+    {"id": "GIT-TOWN-NOT-ADMITTED", "expected_failure": "GIT_TOWN_ADMISSION"},
+    {"id": "AUTO-CONFLICT-RESOLUTION", "expected_failure": "SEMANTIC_CONFLICT_BOUNDARY"},
+    {"id": "AUTO-MERGE", "expected_failure": "HUMAN_ADMIT"}
+  ]
+}

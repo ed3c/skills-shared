@@ -30,7 +30,8 @@
 - [`../skills/repo-agent-native/README.md`](../skills/repo-agent-native/README.md) — source-anchored invariant extraction and its A/B evidence boundary.
 - [`../skills/knowledge-continuity/README.md`](../skills/knowledge-continuity/README.md) — continuity and routing method example.
 - [`../skills/spatial-loop-systems-engineering/README.md`](../skills/spatial-loop-systems-engineering/README.md) — substrate-bound state-space, invariant, capability, teardown, and verification method.
+- [`../skills/agentic-tech-lead-orchestration/README.md`](../skills/agentic-tech-lead-orchestration/README.md) — contract-first multi-branch decomposition, deterministic context, bounded Worker execution, tournament selection, and Stacked PR handoff candidate.
 
 The nearest directory README is the local ownership route. Machine contracts remain authoritative over prose.
 
-An index fails in one direction only: a dead link is found the moment someone follows it, while an omission looks exactly like completeness. On this candidate branch, 7 of 24 skills ship a `README.md` and all 7 are routed above; the other 17 have no nearest-README route to omit yet. Adding one without adding its route here recreates the omission.
+An index fails in one direction only: a dead link is found the moment someone follows it, while an omission looks exactly like completeness. On this candidate branch, 8 of 25 skill directories ship a `README.md` and all 8 are routed above; the other 17 have no nearest-README route to omit yet. The new directory's shared/repo-owned classification remains `ABSENT` until a separate `registry.json` governance change is Human-admitted.
