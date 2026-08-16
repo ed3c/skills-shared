@@ -1,6 +1,8 @@
 # Controlled Technical Language Harness — Contract Foundation
 
-> Status: Phase 1 contract foundation. No language checker, model, parser, official dictionary, consumer binding, or compliance claim is activated by this document.
+> Status: CTL 01–06 merged; CTL 07 (consumer binding) open in `ed3c/bettor-arena#83`; CTL 08 (convergence index, `#133`) not started because its prerequisite has not merged. No language checker, model, parser, official dictionary, consumer binding, or compliance claim is activated by this document.
+>
+> Current implementation state is owned by [`skills/controlled-technical-language-harness/SKILL.md`](../../skills/controlled-technical-language-harness/SKILL.md), not by this file. This document owns architecture, evidence law, and the Stack ledger.
 
 ## Source proposal
 
@@ -52,7 +54,7 @@ docs/architecture/CONTROLLED_TECHNICAL_LANGUAGE_HARNESS.md
   architecture, state machine, evidence boundary, and next Stack
 ```
 
-A future `skills/controlled-technical-language-harness/` directory will own the portable procedure only after these contracts are admitted. Domain profiles, parsers, privacy routes, and document formats will remain trigger-selected modules.
+[`skills/controlled-technical-language-harness/`](../../skills/controlled-technical-language-harness/README.md) landed with CTL 02 and owns the portable procedure. Domain profiles, parsers, privacy routes, and document formats stay trigger-selected modules under that directory.
 
 ## Contract set
 
@@ -131,42 +133,52 @@ Repair uses the repository-wide diagnostic-reflection receipt. It records only a
 13. Keep standard-pack bytes reference-only when redistribution is not admitted.
 14. Do not persist private reasoning fields.
 
-## What Phase 1 does not prove
+## What no merged slice proves
+
+Per-mechanism `IMPLEMENTED` / `NOT_IMPLEMENTED` / `NOT_EXERCISED` state is owned by
+[`skills/controlled-technical-language-harness/SKILL.md`](../../skills/controlled-technical-language-harness/SKILL.md)
+and its `tests/run-all.sh` exits. Copying that list here would give it a second
+place to go stale. What this document owns is the set of claims that no green
+control in this repository can ever produce:
 
 ```text
-real ASD-STE100 profile                  NOT_IMPLEMENTED
-current official vocabulary             ABSENT
+current official ASD-STE100 vocabulary   ABSENT — the specification is not held here
 project TN/TV termbase                   fixture only
-spaCy or another parser                  NOT_IMPLEMENTED
-heuristic calibration                    NOT_EXERCISED
-LLM rewrite                              NOT_IMPLEMENTED
-meaning-preservation evaluation          NOT_EXERCISED
-S1000D / DITA parsing                    NOT_IMPLEMENTED
-confidential document route              NOT_EXERCISED
-consumer repository binding              NOT_IMPLEMENTED
+consumer repository binding              NOT_IMPLEMENTED here — CTL 07 owns it
 certification or official compliance     NOT_CLAIMED
 Human semantic approval                  fixture identity only
 ```
 
-Fixture Human receipts test contract shape. They are not real Human approval.
+Fixture Human receipts test contract shape. They are not real Human approval. A
+green suite proves that planted defects were refused; it does not prove that any
+real manual was checked against any real standard.
 
-## Planned molecular Stack
-
-```text
-main
-└── ctl/01-contract-foundation       this slice
-    ├── ctl/02-ste-profile           profile metadata and Human boundaries; no dictionary vendoring
-    ├── ctl/03-deterministic-linter  exact, dependency-owned checks and calibration interface
-    ├── ctl/04-intent-promotion      ADMITTED/CANONICAL writeback contract
-    └── ctl/05-document-privacy      S1000D/DITA and privacy-routing modules
-
-required leaves admitted and merged
-└── ctl/06-integrated-ab-canary
-    └── ctl/07-consumer-binding
-        └── ctl/08-convergence-index
-```
+## Molecular Stack ledger
 
 A branch edge represents consumed unmerged bytes. Path-disjoint leaves remain siblings. A convergence branch is not created until required leaves are admitted and merged.
+
+Merged subjects below are commits on `ed3c/skills-shared` `main` and are immutable. Open rows carry no commit, because an open PR head is not a release identity.
+
+| Slice | Issue | PR | Merge commit | State |
+|---|---|---|---|---|
+| CTL 01 contract foundation | `#116` | `#117` | `a711316ec6ab50a952e2ec3df64c7feea2d181b1` | Merged |
+| CTL 01 hotfix — false-PASS paths | `#124` | `#125` | `65c72f7ab67af49d6237245eb64298cf62c11e14` | Merged |
+| CTL 02 Harness core and STE profile | `#118` | `#126` | `061ff5e479e0f4595def11ec08bc4ddff8959708` | Merged |
+| CTL 03 deterministic evaluators | `#119` | `#127` | `edfa2922856a457167b56d32a73d679577718492` | Merged |
+| CTL 03 hardening — exact profile subjects | `#129` | `#137` | `6764c67e7df9206dbc36f731f38f4c7dd252d51d` | Merged |
+| CTL 03 hardening — calibration controls | `#129` | `#139` | `8e13b3ab9a2e34b75384c8fbc87ea5f8a3249f22` | Merged |
+| CTL 04 intent-promotion and writeback gate | `#120` | `#130` | `8c040362eaad3fdf8d81a50cb594d15a7de8feb6` | Merged |
+| CTL 04B authority substitutions | `#134` | `#138` | `c737e43d2cb6713a3fbbfd1f8d54c3b81b1870a7` | Merged |
+| CTL 04C external authority readback | `#141` | `#143` | `a7b278aba8bdf744e901f605ea07b09e3b468e60` | Merged |
+| CTL 05 document format and privacy routing | `#121` | `#131` | `e4f22e887bd1dfaea9cf673d75bb0a19a30d0ca6` | Merged |
+| CTL 06 integrated A/B canary | `#132` | `#140` | `47cbb259c0157535d6f40b703b487e225a1a9de1` | Merged |
+| CTL 06B A/B against external authority bytes | `#144` | `#152` | `b3d47948feb6e2d44d84261354117aecfaa4f5dc` | Merged |
+| CTL 07 consumer binding and canaries | `ed3c/bettor-arena#83` | none | n/a | Open — different repository, different owner |
+| CTL 08 convergence index | `#133` | none | n/a | Blocked on CTL 07 |
+
+`#142` was an alternative Intent Promotion gate and was closed unmerged; it is not part of any subject above.
+
+CTL 08 cannot be opened yet. Its own contract forbids creating `ctl/08-convergence-index` before every prerequisite merges, and a convergence PR may not repair an implementation leaf, so the unmet condition returns to its owner in `bettor-arena`.
 
 ## Next-slice admission requirements
 
