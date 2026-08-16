@@ -9,23 +9,35 @@ on:
       - synchronize
     paths:
       - 'registry.json'
+      - 'skills/README.md'
       - 'skills/shared-skills-infra/**'
       - 'skills/*/SKILL.md'
-      - 'skills/*/modules/domain-profile.md'
+      - 'skills/*/modules/**'
+      - 'skills/*/references/**'
+      - 'skills/*/scripts/**'
       - 'scripts/check_skill_core_boundaries.py'
+      - 'scripts/check_skill_entry_routes.py'
       - 'evals/skill-core-boundaries.json'
+      - 'evals/skill-entry-routes.json'
       - 'tests/skill-core-boundaries/**'
+      - 'tests/skill-entry-routes/**'
       - '.github/workflows/shared-skills-infra.yml'
   push:
     branches: [main]
     paths:
       - 'registry.json'
+      - 'skills/README.md'
       - 'skills/shared-skills-infra/**'
       - 'skills/*/SKILL.md'
-      - 'skills/*/modules/domain-profile.md'
+      - 'skills/*/modules/**'
+      - 'skills/*/references/**'
+      - 'skills/*/scripts/**'
       - 'scripts/check_skill_core_boundaries.py'
+      - 'scripts/check_skill_entry_routes.py'
       - 'evals/skill-core-boundaries.json'
+      - 'evals/skill-entry-routes.json'
       - 'tests/skill-core-boundaries/**'
+      - 'tests/skill-entry-routes/**'
       - '.github/workflows/shared-skills-infra.yml'
   workflow_dispatch:
 
@@ -61,3 +73,5 @@ jobs:
         run: bash skills/shared-skills-infra/tests/control-plane/verify.sh
       - name: Verify procedural core and domain boundaries
         run: bash tests/skill-core-boundaries/verify.sh
+      - name: Verify executable Skill mechanism navigation
+        run: bash tests/skill-entry-routes/verify.sh
