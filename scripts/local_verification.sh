@@ -69,6 +69,10 @@ step "adapter receipt integrity"
 python3 skills/repo-agent-native/scripts/check_adapter_receipts.py selftest
 python3 skills/repo-agent-native/scripts/check_adapter_receipts.py check
 
+step "consumer canary receipt integrity"
+python3 skills/dual-forge-repository-loop/scripts/check_consumer_canary.py selftest
+python3 skills/dual-forge-repository-loop/scripts/check_consumer_canary.py check
+
 step "prompt baseline record integrity"
 python3 skills/dual-forge-repository-loop/scripts/check_prompt_baseline.py selftest
 python3 skills/dual-forge-repository-loop/scripts/check_prompt_baseline.py check

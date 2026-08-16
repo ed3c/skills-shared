@@ -1,0 +1,180 @@
+{
+  "chain": [
+    {
+      "detail": "consumer identity, both remotes, delivery config digests and rollback subject frozen before anything ran",
+      "link": "runtime-bootstrap-bind",
+      "remotes": [
+        "forgejo",
+        "github"
+      ],
+      "state": "EXERCISED"
+    },
+    {
+      "detail": "no task was compiled for this consumer; the Tech Lead compiler landed in this Skill but pointing it at a consumer objective is a separate admission",
+      "link": "consumer-task-packets",
+      "state": "NOT_EXERCISED"
+    },
+    {
+      "all_at_head": true,
+      "concurrent_worktrees": 2,
+      "consumer_dirty_after": 0,
+      "detail": "two concurrent worktrees at the consumer HEAD, both read back; a second checkout of the active branch refused by git",
+      "link": "isolated-worktrees-and-leases",
+      "one_writer_per_branch_refused": true,
+      "residue_after_cleanup": [],
+      "state": "EXERCISED",
+      "workers": [
+        {
+          "exit_code": 0,
+          "head": "254f2dedad82eca66ed825833827db3f7e33606d",
+          "path": "slice-0"
+        },
+        {
+          "exit_code": 0,
+          "head": "254f2dedad82eca66ed825833827db3f7e33606d",
+          "path": "slice-1"
+        }
+      ]
+    },
+    {
+      "consumer_executable_state": "EXECUTABLE_ABSENT",
+      "consumer_live_sync_state": "NOT_EXERCISED",
+      "detail": "the consumer's own contract records the same absence this host does",
+      "executable_on_path": null,
+      "human_admit_required": true,
+      "link": "git-town-dry-run-and-local-no-push-sync",
+      "note": "Homebrew offers the admitted 24.0.0, but the shared admission record pins a linux_intel_64 artifact by SHA-256 and this host is darwin. Binding a different artifact at the same version is a Human admission, not an install.",
+      "state": "BLOCKED"
+    },
+    {
+      "contract_sha256": "4350bdcd43f5affcf779441f21208dc370c0ed481a5198d1bd6f9de1cec1411d",
+      "detail": "the consumer ships a local verification contract, but running it proves the consumer's own tests rather than a slice this canary produced, and this canary produced none",
+      "link": "verified-implementation-slices",
+      "state": "NOT_EXERCISED"
+    },
+    {
+      "detail": "authenticated read of the Forgejo repository, open PRs and open issues; no issue or PR was created",
+      "forgejo_repository_id": 9,
+      "link": "forgejo-issue-pr-receipts",
+      "open_issues": 2,
+      "open_prs": 0,
+      "state": "EXERCISED"
+    },
+    {
+      "detail": "nothing was produced to integrate; the canary is read-only by construction",
+      "link": "admitted-local-main-integration",
+      "state": "NOT_EXERCISED"
+    },
+    {
+      "detail": "every open PR and issue on both forges classified exactly once, checked by capture_reconciliation.py replay rather than asserted",
+      "github_open_issues": 17,
+      "github_open_prs": 4,
+      "github_repository_id": 1330387399,
+      "link": "github-reconciliation-inventory",
+      "replay_exit_code": 0,
+      "replay_stderr": "",
+      "state": "EXERCISED"
+    },
+    {
+      "detail": "a publication candidate needs a local slice and an exact-HEAD verification receipt for it; neither exists in a read-only canary",
+      "link": "publication-candidate",
+      "state": "NOT_EXERCISED"
+    },
+    {
+      "actions_enabled": "true",
+      "billing_circuit_observed": "not-in-force",
+      "detail": "this canary does not spend an Actions job on a consumer repository",
+      "latest_runs": "[{\"conclusion\":\"success\",\"created_at\":\"2026-08-16T11:02:00Z\",\"name\":\"Modular contracts\",\"status\":\"completed\"},{\"conclusion\":\"success\",\"created_at\":\"2026-08-16T11:02:00Z\",\"name\":\"Knowledge provider contracts\",\"status\":\"completed\"},{\"conclusion\":\"success\",\"created_at\":\"2026-08-16T11:02:00Z\",\"name\":\"Provider canary contracts\",\"status\":\"completed\"},{\"conclusion\":\"success\",\"created_at\":\"2026-08-16T11:02:00Z\",\"name\":\"PDF Harness integration audit\",\"status\":\"completed\"},{\"conclusion\":\"failure\",\"created_at\":\"2026-08-16T11:02:00Z\",\"name\":\"Agentic Tech Lead Bettor Binding\",\"status\":\"completed\"}]",
+      "link": "exact-head-github-actions",
+      "note": "#191's billing circuit is not blocking this consumer: Actions are enabled and runs are completing. The link is held by a budget decision, not by a provider blocker.",
+      "state": "SKIPPED_BY_POLICY",
+      "total_runs_observed": "1439"
+    },
+    {
+      "detail": "#234 states it does not require or authorize merge",
+      "link": "external-merge-handoff",
+      "state": "SKIPPED_BY_POLICY"
+    }
+  ],
+  "chain_declared": [
+    "runtime-bootstrap-bind",
+    "consumer-task-packets",
+    "isolated-worktrees-and-leases",
+    "git-town-dry-run-and-local-no-push-sync",
+    "verified-implementation-slices",
+    "forgejo-issue-pr-receipts",
+    "admitted-local-main-integration",
+    "github-reconciliation-inventory",
+    "publication-candidate",
+    "exact-head-github-actions",
+    "external-merge-handoff"
+  ],
+  "consumer_selection_gate": {
+    "ci_policy_sha256": "87e28e9e3ea092156964b023f47b3bfe0da4d26dfbcee612c83fcabb7cf108ee",
+    "commit_sha": "254f2dedad82eca66ed825833827db3f7e33606d",
+    "consumer_root": "/Users/neon/bettor-arena",
+    "default_branch": "main",
+    "delivery_config_present": true,
+    "dirty_paths": 0,
+    "forgejo_repository": "neon/bettor-arena",
+    "git_town_contract": {
+      "admission_states": [
+        "EXECUTABLE_ABSENT",
+        "EXECUTABLE_PRESENT_NOT_ADMITTED",
+        "ADMITTED_DRY_RUN_ONLY",
+        "ADMITTED_LOCAL_NO_PUSH"
+      ],
+      "executable_state": "EXECUTABLE_ABSENT",
+      "human_admit_required": true,
+      "live_sync_state": "NOT_EXERCISED",
+      "manifest_sha256": "efb6c12c7a3dfbe03015798157b05094bb447e4de63ec0b3610f06805a59d292"
+    },
+    "git_town_executable": null,
+    "github_repository": "ed3c/bettor-arena",
+    "local_verification_contract_sha256": "4350bdcd43f5affcf779441f21208dc370c0ed481a5198d1bd6f9de1cec1411d",
+    "remotes": {
+      "forgejo": "http://localhost:3000/neon/bettor-arena.git",
+      "github": "git@github.com:ed3c/bettor-arena.git"
+    },
+    "rollback_subject": "254f2dedad82eca66ed825833827db3f7e33606d",
+    "tree_sha": "dfb47f7dfc21875a01f6476597e30c3e98e2e1f8"
+  },
+  "coverage": {
+    "blocked": [
+      "git-town-dry-run-and-local-no-push-sync"
+    ],
+    "exercised": [
+      "forgejo-issue-pr-receipts",
+      "github-reconciliation-inventory",
+      "isolated-worktrees-and-leases",
+      "runtime-bootstrap-bind"
+    ],
+    "not_exercised": [
+      "admitted-local-main-integration",
+      "consumer-task-packets",
+      "exact-head-github-actions",
+      "external-merge-handoff",
+      "publication-candidate",
+      "verified-implementation-slices"
+    ]
+  },
+  "declared_non_claims": [
+    "a read-only reconciliation is not a delivery transition",
+    "the consumer's own tests were not run, so nothing here says its main is green",
+    "no Git Town synchronization occurred, so no branch hierarchy claim is made",
+    "reaching a forge is not the same as being admitted to publish to it"
+  ],
+  "duration_ms": 8898,
+  "issue": 234,
+  "mutations_performed": {
+    "branches_created": false,
+    "consumer_files_changed": false,
+    "issues_created": false,
+    "merges": false,
+    "prs_created": false,
+    "pushes": false,
+    "worktrees_created_and_removed": true
+  },
+  "schema": "dual-forge-repository-loop/consumer-canary-receipt/v1",
+  "started_at": 1786886980
+}

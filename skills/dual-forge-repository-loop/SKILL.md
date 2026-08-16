@@ -346,6 +346,37 @@ state whose state-specific receipts have not reached the full publication-ready
 closure. Exit `0` is reserved for the exact `GITHUB_PUBLICATION_READY` history
 and all proof lanes above.
 
+## Consumer delivery canary
+
+[`scripts/run_consumer_canary.py`](scripts/run_consumer_canary.py) walks a real
+consumer's delivery chain and records a state for **every** link, because a
+receipt naming the four links that worked reads exactly like one that walked all
+eleven. It mutates nothing: worktrees are created from the consumer's HEAD and
+removed, both forge lanes are authenticated reads, and no branch, issue, PR,
+push or merge is created.
+
+```bash
+python3 skills/dual-forge-repository-loop/scripts/run_consumer_canary.py \
+  --consumer /path/to/consumer --github OWNER/NAME --forgejo OWNER/NAME \
+  --out DIR [--allow-worktree]
+python3 skills/dual-forge-repository-loop/scripts/check_consumer_canary.py check
+```
+
+[`scripts/check_consumer_canary.py`](scripts/check_consumer_canary.py) is
+zero-network. It refuses an incomplete selection gate, a dirty consumer, a
+consumer with no admitted dual-forge configuration, an unstated or duplicated
+link, a coverage summary the chain does not support, a reconciliation claimed
+`EXERCISED` without a passing replay, a credential-shaped value, and — the two
+that matter — a link marked `EXERCISED` while the receipt says none of the
+mutation it requires took place, and a link marked `BLOCKED` carrying no
+observation of what blocks it.
+
+That last rule refused its own author twice. `exact-head-github-actions` was
+first written as blocked by the #191 billing circuit; measuring it showed the
+consumer's Actions enabled and completing, so #191 is not in force there and the
+link is held by a budget decision instead. A blocker nobody measured is a
+blocker nobody can clear.
+
 ## Live multi-Worker scheduler
 
 `references/worker-task.schema.json` declares twenty-one Worker states. A grep
