@@ -1,0 +1,33 @@
+{
+  "schema": "codebase-atlas-eval/v1",
+  "status": "PASS",
+  "scope": "reference implementation admitted with the skill; consumer repositories must replay verification on their own generated artifact",
+  "reference_viewports": [
+    "2048x1090",
+    "1800x1000",
+    "760x980"
+  ],
+  "coverage": {
+    "variable_classes": "44/44",
+    "top_level_structures": 24,
+    "inside_child_stages": 4,
+    "edges": 16,
+    "animated_flow_edges": 12,
+    "dashed_advisory_edges": 4,
+    "external_boundaries": 3,
+    "canonical_trace_steps": 12,
+    "grid_footprint_overlaps": 0,
+    "console_or_page_errors": 0,
+    "external_subresource_requests": 0,
+    "share_safety_findings": 0
+  },
+  "runtime_repairs_observed": [
+    "empty hash incorrectly parsed as trace step 0",
+    "external provider label crossed the main block cluster",
+    "six structure grid footprints overlapped",
+    "stage pointer capture swallowed block and zoom clicks",
+    "edge click bubbled to stage and reset the overview",
+    "hover tooltip persisted into non-hover evidence screenshots"
+  ],
+  "evidence_boundary": "This receipt demonstrates the reference engine and method were exercised. It is not proof that any future consumer atlas passes."
+}
