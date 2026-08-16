@@ -1,0 +1,175 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "repository-control-plane-monitor-plan/v1",
+  "title": "Repository Control Plane Monitor Plan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "issues",
+    "waves",
+    "issue_plans",
+    "automatic_merge",
+    "automatic_conflict_resolution"
+  ],
+  "properties": {
+    "schema": {
+      "const": "repository-control-plane-monitor-plan/v1"
+    },
+    "issues": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/issueIdentity"
+      }
+    },
+    "waves": {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "minItems": 1,
+        "uniqueItems": true,
+        "items": {
+          "$ref": "#/$defs/issueIdentity"
+        }
+      }
+    },
+    "issue_plans": {
+      "type": "object",
+      "propertyNames": {
+        "$ref": "#/$defs/issueIdentity"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/issuePlan"
+      }
+    },
+    "automatic_merge": {
+      "const": false
+    },
+    "automatic_conflict_resolution": {
+      "const": false
+    }
+  },
+  "$defs": {
+    "issueIdentity": {
+      "type": "string",
+      "minLength": 3,
+      "pattern": "^[^#\\s]+#[1-9][0-9]*$"
+    },
+    "phaseDispositionBase": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["phase", "receipt", "disposition"]
+    },
+    "issuePlan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "phase_dispositions",
+        "required_receipts",
+        "execution_state"
+      ],
+      "properties": {
+        "phase_dispositions": {
+          "type": "array",
+          "minItems": 6,
+          "maxItems": 6,
+          "prefixItems": [
+            {
+              "allOf": [
+                {"$ref": "#/$defs/phaseDispositionBase"},
+                {
+                  "properties": {
+                    "phase": {"const": "BOOTSTRAP"},
+                    "receipt": {"const": "skill-resolution"},
+                    "disposition": {"const": "REQUIRED"}
+                  }
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {"$ref": "#/$defs/phaseDispositionBase"},
+                {
+                  "properties": {
+                    "phase": {"const": "SHADOW_ADMISSION"},
+                    "receipt": {"const": "shadow-admission"},
+                    "disposition": {"const": "REQUIRED"}
+                  }
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {"$ref": "#/$defs/phaseDispositionBase"},
+                {
+                  "properties": {
+                    "phase": {"const": "TECH_LEAD_PLAN"},
+                    "receipt": {"const": "task-dag"},
+                    "disposition": {"const": "REQUIRED"}
+                  }
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {"$ref": "#/$defs/phaseDispositionBase"},
+                {
+                  "properties": {
+                    "phase": {"const": "SPATIAL_INVARIANTS"},
+                    "receipt": {"const": "spatial-invariants"},
+                    "disposition": {"enum": ["MONITOR", "REQUIRED"]}
+                  }
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {"$ref": "#/$defs/phaseDispositionBase"},
+                {
+                  "properties": {
+                    "phase": {"const": "STACK_DELIVERY"},
+                    "receipt": {"const": "git-town-stack"},
+                    "disposition": {"enum": ["NOT_APPLICABLE_WITH_EVIDENCE", "REQUIRED"]}
+                  }
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {"$ref": "#/$defs/phaseDispositionBase"},
+                {
+                  "properties": {
+                    "phase": {"const": "FORGE_RECONCILIATION"},
+                    "receipt": {"const": "dual-forge-reconciliation"},
+                    "disposition": {"enum": ["NOT_APPLICABLE_WITH_EVIDENCE", "REQUIRED"]}
+                  }
+                }
+              ]
+            }
+          ],
+          "items": false
+        },
+        "required_receipts": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 6,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "skill-resolution",
+              "shadow-admission",
+              "task-dag",
+              "spatial-invariants",
+              "git-town-stack",
+              "dual-forge-reconciliation"
+            ]
+          }
+        },
+        "execution_state": {
+          "const": "NOT_EXERCISED"
+        }
+      }
+    }
+  }
+}
