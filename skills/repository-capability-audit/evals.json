@@ -95,6 +95,7 @@
       "integrity of the harness and corpus contract that a live measurement would depend on",
       "thirteen live cells on claude-code/opus across three arms on psf/requests, recorded in evals/matrix-slice1-result.json",
       "that 8 of 14 measured metrics are saturated on this corpus, so most of the harness's quality metrics cannot carry a treatment signal here",
+      "a GitHub-hosted runner executed this suite at an exact head (run 31901626597, job 95053186610); the replayable artifact lane for this skill is wired in .github/workflows/skill-suites.yml and its receipt is recorded on #222",
       "an overlap-aware Layer A contribution report derived from the contract rather than maintained by hand, with four denominators kept apart and per-source bounds instead of shares"
     ],
     "not_established": [
