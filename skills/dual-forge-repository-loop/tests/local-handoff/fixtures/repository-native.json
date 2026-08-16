@@ -1,0 +1,41 @@
+{
+  "schema": "repository-native-local-handoff/v1",
+  "repository": "ed3c/skills-shared",
+  "subject": {
+    "commit": "7498aa855686dbd5b9f97db29dce7571ec648bc3",
+    "tree": "049e81d7fb109da3ead784de7187322337fc6180"
+  },
+  "required_inputs": [
+    {
+      "path": "skills/dual-forge-repository-loop/tests/local-handoff/fixtures/replay/entrypoint.sh",
+      "git_tracked": true,
+      "sha256": "a5b505786966390388ff2d59fd75fae7a9e1ad45d7ebcca5060b17a5f4a648d4"
+    },
+    {
+      "path": "skills/dual-forge-repository-loop/tests/local-handoff/fixtures/replay/contract.json",
+      "git_tracked": true,
+      "sha256": "31a7569ca0ec7470b4114c4f3de8ea5af723c8e7019c36a90f111304c440d204"
+    }
+  ],
+  "entrypoint": "skills/dual-forge-repository-loop/tests/local-handoff/fixtures/replay/entrypoint.sh",
+  "runtime": {
+    "allowed": [
+      "CLAUDE_CODE_LOCAL",
+      "CODEX_CLI_LOCAL",
+      "CHATGPT_DESKTOP_WORKTREE"
+    ]
+  },
+  "optional_exports": [
+    {
+      "path": "repository-multi-agent-runtime-v2.1-runtime-validation.zip",
+      "required": false,
+      "purpose": "historical provenance/export only"
+    },
+    {
+      "path": "issue-199-base64-comments",
+      "required": false,
+      "purpose": "historical transport mirror only"
+    }
+  ],
+  "archive_independence": true
+}
