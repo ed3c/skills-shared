@@ -176,6 +176,37 @@ Rules:
 
 Record the graph before and after every synchronization event.
 
+### 6.1 Tech Lead fan-out
+
+When one request needs more than one branch writer, the branch graph is a
+checked contract, not a running judgement. Compile it and check it before any
+branch or worktree exists:
+
+```bash
+python3 skills/git-town-stacked-pr-worker/scripts/check_fanout_contract.py path/to/fanout.json
+```
+
+Modes are `TOURNAMENT`, `COOPERATIVE`, `SERIAL_STACK` and `HYBRID`. The Planner
+owns the contract, architecture, branch graph, context subject, budgets and
+acceptance oracles; a Worker owns one leased surface.
+
+- Every tournament competitor gets the same immutable base commit and the same
+  context bundle digest, and each declares a distinct branch focus. Competitors
+  may share a writable surface because at most one is ever admitted; every other
+  concurrent pair may not.
+- A child edge must name the unmerged contract or path it consumes. Stacking is
+  not a dependency, and a sibling that depends on a sibling is a child.
+- Acceptance oracles stay outside every writable lease.
+- Deterministic hard gates rank before qualitative review. Combining parts of two
+  competitors is a Human semantic decision, never an automatic one.
+- One Worker owns convergence, and it depends on every input it converges.
+- Winner admission, semantic conflict resolution, merge or ship, and release
+  promotion stay Human-owned.
+
+Exit `2` names the refused shape; exit `0` proves the plan is consistent and
+proves nothing about execution. Method and refusal table:
+[`references/TECH_LEAD_FAN_OUT.md`](references/TECH_LEAD_FAN_OUT.md).
+
 ---
 
 ## 7. Worktree and branch lease preflight

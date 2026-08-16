@@ -12,7 +12,8 @@ This Skill defines the portable method for using Git Town with multiple Worker A
 6. [`references/REPO_PROFILE.template.md`](references/REPO_PROFILE.template.md) — repository-owned values.
 7. [`references/EVALS.md`](references/EVALS.md) — eval design before implementation.
 8. [`references/COMPLETION_REPORT.template.md`](references/COMPLETION_REPORT.template.md) — required Worker report.
-9. [`evals.json`](evals.json), `scripts/`, and `tests/`.
+9. [`references/TECH_LEAD_FAN_OUT.md`](references/TECH_LEAD_FAN_OUT.md) and [`references/FAN_OUT_CONTRACT.schema.json`](references/FAN_OUT_CONTRACT.schema.json) — bounded multi-branch fan-out for TOURNAMENT, COOPERATIVE, SERIAL_STACK and HYBRID, checked by `scripts/check_fanout_contract.py`.
+10. [`evals.json`](evals.json), `scripts/`, and `tests/`.
 10. [`../github-delivery-loop/README.md`](../github-delivery-loop/README.md) for GitHub publication and merge state machines.
 
 ## Directory map
@@ -28,7 +29,9 @@ skills/git-town-stacked-pr-worker/
 │   ├── ADOPTION.md
 │   ├── REPO_PROFILE.template.md
 │   ├── EVALS.md
-│   └── COMPLETION_REPORT.template.md
+│   ├── COMPLETION_REPORT.template.md
+│   ├── TECH_LEAD_FAN_OUT.md
+│   └── FAN_OUT_CONTRACT.schema.json
 ├── scripts/               portable method checks/helpers
 └── tests/                 positive, hollow and policy controls
 ```

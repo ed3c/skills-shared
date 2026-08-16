@@ -301,8 +301,8 @@ def check_evals_json(root: Path) -> None:
         raise ContractError(f"{relative}: human admit must remain REQUIRED")
 
     runnable = value["runnable"]
-    if not isinstance(runnable, list) or len(runnable) != 3:
-        raise ContractError(f"{relative}: exactly three focused runnable evals are required")
+    if not isinstance(runnable, list) or len(runnable) != 4:
+        raise ContractError(f"{relative}: exactly four focused runnable evals are required")
     base_required = {
         "id",
         "checker_script",
@@ -323,11 +323,13 @@ def check_evals_json(root: Path) -> None:
         "GTSP-PUBLISH-1": base_required | {"good_evidence", "hollow_mutations"},
         "GTSP-STACK-1": base_required | {"intent_contract", "hollow_mutations"},
         "GTSP-PROFILE-1": base_required | {"good_evidence", "hollow_mutations"},
+        "GTSP-FANOUT-1": base_required | {"hollow_mutations"},
     }
     if [item.get("id") if isinstance(item, dict) else None for item in runnable] != [
         "GTSP-PUBLISH-1",
         "GTSP-STACK-1",
         "GTSP-PROFILE-1",
+        "GTSP-FANOUT-1",
     ]:
         raise ContractError(f"{relative}: focused eval ids or their order drifted")
     for entry in runnable:

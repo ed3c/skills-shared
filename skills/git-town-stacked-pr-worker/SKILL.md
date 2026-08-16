@@ -58,7 +58,14 @@ A missing required input is `ABSENT`; do not infer it from branch names, prose, 
 3. Design issue/PR evals before branch or implementation work using [`references/EVALS.md`](references/EVALS.md) plus [`references/GITHUB_ACTIONS_PUBLICATION_EVALS.md`](references/GITHUB_ACTIONS_PUBLICATION_EVALS.md).
 4. Keep target-repository scripts and configuration in that repository. Do not copy them back into this shared Skill.
 5. Require the base completion shape plus [`references/GITHUB_ACTIONS_PUBLICATION_REPORT.template.md`](references/GITHUB_ACTIONS_PUBLICATION_REPORT.template.md).
-6. Run `tests/run-all.sh` before publishing changes to this Skill.
+6. When one request needs more than one branch writer, compile and check the fan-out contract before any branch or worktree exists, using [`references/TECH_LEAD_FAN_OUT.md`](references/TECH_LEAD_FAN_OUT.md) and [`references/FAN_OUT_CONTRACT.schema.json`](references/FAN_OUT_CONTRACT.schema.json):
+
+   ```bash
+   python3 skills/git-town-stacked-pr-worker/scripts/check_fanout_contract.py path/to/fanout.json
+   ```
+
+   Exit `2` names the refused shape: a mutable base, unequal competitor context, an undifferentiated competitor, overlapping concurrent leases, a child edge with no consumed contract, a writable acceptance path, a budget overflow, qualitative review ranked before the hard gates, cross-competitor cherry-pick, an ambiguous or premature convergence, an automatic winner or semantic merge, a required Code-Graph-RAG provider, or a laundered compiler-truth funnel state. A pass proves the plan is consistent, never that a branch, worktree, Agent, provider or Git Town sync ran.
+7. Run `tests/run-all.sh` before publishing changes to this Skill.
 
 The base adoption path is in [`references/ADOPTION.md`](references/ADOPTION.md); GitHub publication integration is in [`references/GITHUB_ACTIONS_PUBLICATION_ADOPTION.md`](references/GITHUB_ACTIONS_PUBLICATION_ADOPTION.md).
 

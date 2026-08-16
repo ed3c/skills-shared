@@ -1,0 +1,70 @@
+{
+  "schema_version": "git-town-tech-lead-fanout/v1",
+  "repository": "example/monorepo",
+  "mode": "SERIAL_STACK",
+  "base": {
+    "branch": "main",
+    "commit_sha": "7777777777777777777777777777777777777777",
+    "tree_sha": "8888888888888888888888888888888888888888",
+    "immutable": true
+  },
+  "context_bundle": {
+    "digest": "9999999999999999999999999999999999999999999999999999999999999999",
+    "providers": [
+      {"name": "source-readback", "role": "source-readback", "required_provider": true, "state": "PASS"},
+      {"name": "tree-sitter", "role": "syntax-slice", "required_provider": false, "state": "NOT_EXERCISED"}
+    ],
+    "compiler_truth_funnel": {"state": "NOT_EXERCISED"}
+  },
+  "budgets": {
+    "max_workers": 2,
+    "max_tokens_per_worker": 200000,
+    "max_wall_clock_seconds": 3600,
+    "max_retries_per_worker": 2,
+    "circuit_breakers": [
+      "stop the child when the parent contract changes after the child started"
+    ]
+  },
+  "acceptance": {
+    "immutable_paths": ["tests/acceptance/**"],
+    "oracles": ["bash tests/acceptance/verify.sh"]
+  },
+  "ranking": {
+    "hard_gates": ["bash tests/acceptance/verify.sh exits 0 at the stack tip"],
+    "qualitative_review_after_hard_gates": true,
+    "winner_admission": "human",
+    "cross_competitor_cherry_pick": false
+  },
+  "semantic_conflict_resolution": "human",
+  "human_owned_operations": [
+    "semantic_conflict_resolution",
+    "winner_admission",
+    "merge_or_ship",
+    "release_promotion"
+  ],
+  "workers": [
+    {
+      "id": "S-schema",
+      "branch": "agent/event-schema",
+      "role": "sibling",
+      "parent": "main",
+      "depends_on": [],
+      "writable_paths": ["contracts/events/**"],
+      "read_only_paths": ["tests/acceptance/**"],
+      "provides_contracts": ["event-envelope-v1"],
+      "token_budget": 90000
+    },
+    {
+      "id": "S-consumer",
+      "branch": "agent/event-consumer",
+      "role": "child",
+      "parent": "agent/event-schema",
+      "depends_on": ["S-schema"],
+      "writable_paths": ["src/consumer/**"],
+      "read_only_paths": ["contracts/events/**", "tests/acceptance/**"],
+      "consumes_contracts": ["event-envelope-v1"],
+      "consumes_paths": ["contracts/events/envelope.schema.json"],
+      "token_budget": 160000
+    }
+  ]
+}

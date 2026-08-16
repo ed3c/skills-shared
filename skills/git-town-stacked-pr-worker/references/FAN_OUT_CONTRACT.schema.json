@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skills-shared.invalid/git-town-stacked-pr-worker/FAN_OUT_CONTRACT.schema.json",
+  "title": "Tech Lead fan-out contract",
+  "description": "Shape of one bounded multi-branch fan-out. The schema rules on structure only; the relational laws (path disjointness, equal competitor context, true dependency edges, budget closure, convergence ownership, ranking order) are enforced by scripts/check_fanout_contract.py, because JSON Schema cannot express them.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "repository",
+    "mode",
+    "base",
+    "context_bundle",
+    "budgets",
+    "acceptance",
+    "ranking",
+    "human_owned_operations",
+    "workers"
+  ],
+  "properties": {
+    "schema_version": {"const": "git-town-tech-lead-fanout/v1"},
+    "repository": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+    "mode": {"enum": ["TOURNAMENT", "COOPERATIVE", "SERIAL_STACK", "HYBRID"]},
+    "base": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["branch", "commit_sha", "tree_sha", "immutable"],
+      "properties": {
+        "branch": {"type": "string", "minLength": 1},
+        "commit_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "tree_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "immutable": {"type": "boolean"}
+      }
+    },
+    "context_bundle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["digest", "providers", "compiler_truth_funnel"],
+      "properties": {
+        "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "providers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "role", "state"],
+            "properties": {
+              "name": {"type": "string", "minLength": 1},
+              "role": {"enum": ["intent-discovery", "semantic-fact", "syntax-slice", "source-readback", "projection"]},
+              "required_provider": {"type": "boolean"},
+              "state": {"enum": ["PASS", "FAIL", "ABSENT", "NOT_IMPLEMENTED", "NOT_EXERCISED", "SKIPPED_BY_POLICY"]}
+            }
+          }
+        },
+        "compiler_truth_funnel": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["state"],
+          "properties": {
+            "state": {"enum": ["PASS", "FAIL", "ABSENT", "NOT_IMPLEMENTED", "NOT_EXERCISED", "SKIPPED_BY_POLICY"]},
+            "evidence": {"type": "string"}
+          }
+        }
+      }
+    },
+    "budgets": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "max_workers",
+        "max_tokens_per_worker",
+        "max_wall_clock_seconds",
+        "max_retries_per_worker",
+        "circuit_breakers"
+      ],
+      "properties": {
+        "max_workers": {"type": "integer", "minimum": 1},
+        "max_tokens_per_worker": {"type": "integer", "minimum": 1},
+        "max_wall_clock_seconds": {"type": "integer", "minimum": 1},
+        "max_retries_per_worker": {"type": "integer", "minimum": 0},
+        "circuit_breakers": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "acceptance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["immutable_paths", "oracles"],
+      "properties": {
+        "immutable_paths": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "oracles": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "ranking": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["hard_gates", "qualitative_review_after_hard_gates", "winner_admission"],
+      "properties": {
+        "hard_gates": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "qualitative_review_after_hard_gates": {"type": "boolean"},
+        "winner_admission": {"enum": ["human", "automatic"]},
+        "cross_competitor_cherry_pick": {"type": "boolean"}
+      }
+    },
+    "convergence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["owner_worker_id", "inputs"],
+      "properties": {
+        "owner_worker_id": {"type": "string", "minLength": 1},
+        "inputs": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "semantic_conflict_resolution": {"enum": ["human", "automatic"]},
+    "human_owned_operations": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "workers": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "branch", "role", "parent", "depends_on", "writable_paths"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$"},
+          "branch": {"type": "string", "minLength": 1},
+          "role": {"enum": ["competitor", "sibling", "child", "convergence"]},
+          "parent": {"type": "string", "minLength": 1},
+          "depends_on": {"type": "array", "items": {"type": "string", "minLength": 1}},
+          "focus": {"enum": ["minimal-diff", "architecture-types", "defensive-boundaries", "performance-security"]},
+          "writable_paths": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+          "read_only_paths": {"type": "array", "items": {"type": "string", "minLength": 1}},
+          "consumes_contracts": {"type": "array", "items": {"type": "string", "minLength": 1}},
+          "consumes_paths": {"type": "array", "items": {"type": "string", "minLength": 1}},
+          "provides_contracts": {"type": "array", "items": {"type": "string", "minLength": 1}},
+          "context_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "token_budget": {"type": "integer", "minimum": 1}
+        }
+      }
+    }
+  }
+}

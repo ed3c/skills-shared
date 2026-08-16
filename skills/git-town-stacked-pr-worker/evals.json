@@ -61,6 +61,26 @@
         "git-town ship and force push must not appear in an executable position in the Worker"
       ],
       "expected": "canonical profile validated; 16 planted defects refused; absent repository root exits 64"
+    },
+    {
+      "id": "GTSP-FANOUT-1",
+      "checker_script": "scripts/check_fanout_contract.py",
+      "test_verify": "tests/fan-out-contract/verify.sh",
+      "good_fixture": "tests/fan-out-contract/fixtures/valid-tournament.json",
+      "hollow_fixture": null,
+      "hollow_mutations": "concurrent siblings leasing the same path, a base declared mutable, one competitor given a different context digest, a competitor leasing the immutable acceptance tests, a child branch consuming no declared contract or path, more Workers than the budget admits, a competitor with no branch focus, two competitors repeating one focus, a convergence consuming an input it does not depend on, automatic semantic-conflict resolution, automatic winner admission, qualitative review ranked before the hard gates, cross-competitor cherry-pick, two Workers claiming the convergence role, Code-Graph-RAG declared a required context provider, an unexercised compiler-truth funnel rewritten as PASS, and a sibling depending on a sibling",
+      "covers": [
+        "one immutable base commit and one context bundle digest bind every tournament competitor, so two survivors were compared on the same question",
+        "competitors may share a writable surface because only one is ever admitted; every other concurrent pair may not",
+        "a child edge must name the unmerged contract or path it consumes, so stacking cannot pass as dependency",
+        "acceptance oracles stay outside every writable lease, so a competitor cannot move the test it is scored against",
+        "deterministic hard gates rank before qualitative review, and cross-competitor cherry-pick is refused",
+        "one Worker owns convergence and it depends on every input it converges",
+        "winner admission, semantic conflicts, merge and promotion stay Human-owned",
+        "Code-Graph-RAG cannot be a required context provider, while non-required historical residue still validates",
+        "an unexercised compiler-truth funnel stays NOT_EXERCISED instead of being normalized into PASS"
+      ],
+      "expected": "three valid mode contracts pass; 17 planted defects are each refused with their own code; non-required Code-Graph-RAG residue still passes, so the provider rule is not a blanket name ban"
     }
   ],
   "evidence_boundary": {
