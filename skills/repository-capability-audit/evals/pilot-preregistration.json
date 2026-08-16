@@ -1,0 +1,59 @@
+{
+  "schema": "rca-agent-ab-preregistration/v1",
+  "preregistration_id": "rca-pilot-2026-08",
+  "status": "PILOT",
+  "_meta": {
+    "why_pilot": "#228 preregisters 90 sessions at 5 repetitions. This is 1 repetition, frozen and reported as a pilot. A preregistration an executing agent quietly shrinks is not a preregistration, so the reduction is recorded here as its own frozen design rather than presented as the real matrix.",
+    "must_not": "A pilot result may never be folded into a promotion estimate, and may never be cited as the qualifying #228 matrix.",
+    "frozen_before_execution": true,
+    "decided_by": "repository owner, 2026-08-16"
+  },
+  "matrix": {
+    "repositories": 3,
+    "model_harness_families": 2,
+    "repetitions": 1,
+    "primary_arms": 3,
+    "physical_sessions": 18
+  },
+  "arms": {
+    "no_skill": "no Skill text is supplied; the host receives the task alone",
+    "current_full_composition": "the audit Skill plus the six source Skills it was trimmed from",
+    "candidate_trimmed_skill": "the audit Skill alone, carrying RCA-001..013"
+  },
+  "hosts": [
+    {
+      "family": "claude-code",
+      "model_pinned": true,
+      "model": "opus",
+      "cost_reported": true
+    },
+    {
+      "family": "codex-cli",
+      "model_pinned": true,
+      "model": "gpt-5.6-sol",
+      "model_note": "verified accepted by this CLI before freezing; three plausible names were rejected with HTTP 400, so the pin is the model this host actually serves rather than one that merely looks right",
+      "cost_reported": false
+    }
+  ],
+  "cost_policy": {
+    "in_acceptance_weights": false,
+    "reason": "Codex CLI does not report spend. Scoring two hosts on a quantity only one of them can observe would rank the silent host as the cheaper one. Cost is recorded per cell with cost_observed and excluded from this pilot's acceptance weights.",
+    "recorded": true
+  },
+  "randomization": {
+    "arm_order": "derived deterministically from sha256(repository_id + host_family) so the order is reproducible and recorded rather than chosen per run",
+    "fresh_session_per_arm": true,
+    "isolated_workspace_per_arm": true
+  },
+  "retry_policy": {
+    "retries_permitted": 0,
+    "reason": "#228 forbids retrying a promotion run unless retry is itself preregistered; it is not, so a failed cell stays in the denominator with its reason."
+  },
+  "primary_metric": "material_defects_found over material_defects_total, where each task family is a single decidable judgement: did the host cite at least one evidence path that actually exists in the pinned tree",
+  "declared_non_claims": [
+    "one repetition cannot separate an arm effect from run-to-run variance",
+    "tool_calls is approximated from the host's own turn count and is not an instrumented tool trace",
+    "cost is unobservable on one of the two hosts and is excluded from scoring",
+    "no production, cross-repository, or promotion claim follows from this pilot"
+  ]
+}
