@@ -4,6 +4,7 @@ set -euo pipefail
 repo_root="$(git rev-parse --show-toplevel)"
 cli="${repo_root}/skills/shared-skills-infra/scripts/repository_control_plane.py"
 profile="${repo_root}/skills/shared-skills-infra/references/repository-control-plane-profile.default.json"
+monitor_schema="${repo_root}/skills/shared-skills-infra/references/repository-control-plane-monitor-plan.v1.schema.json"
 tmp="$(mktemp -d)"
 trap 'rm -rf "${tmp}"' EXIT
 
@@ -11,6 +12,7 @@ python3 "${cli}" profile-check --profile "${profile}"
 python3 -m py_compile "${cli}"
 python3 -m json.tool "${profile}" >/dev/null
 python3 -m json.tool "${repo_root}/skills/shared-skills-infra/references/repository-control-plane-profile.v1.schema.json" >/dev/null
+python3 -m json.tool "${monitor_schema}" >/dev/null
 
 consumer="${tmp}/consumer"
 mkdir -p "${consumer}"
@@ -60,23 +62,55 @@ if python3 "${cli}" verify --profile "${profile}" --consumer "${consumer}" >/dev
 fi
 rm -rf "${consumer}/.agents/skills/shared-skills-infra"
 
-# Exact dependency subject: an included open blocker must occupy the earlier wave,
-# while an included closed blocker is satisfied without being scheduled.
+# Exact dependency subject plus applicability: issue #2 requests stack delivery,
+# while #1 stays simple and #3 is an explicitly included closed blocker.
 cat > "${tmp}/issues.json" <<'JSON'
 [
   {"repository":"example/repo","number":1,"state":"open","depends_on":[]},
-  {"repository":"example/repo","number":2,"state":"open","depends_on":["example/repo#1","example/repo#3"]},
+  {"repository":"example/repo","number":2,"state":"open","depends_on":["example/repo#1","example/repo#3"],"required_phases":["STACK_DELIVERY"]},
   {"repository":"example/repo","number":3,"state":"closed","depends_on":[]}
 ]
 JSON
 python3 "${cli}" monitor-plan --issues "${tmp}/issues.json" > "${tmp}/plan.json"
-python3 - "${tmp}/plan.json" <<'PY'
-import json, sys
-p=json.load(open(sys.argv[1]))
-assert p['issues'] == ['example/repo#1', 'example/repo#2'], p
-assert p['waves'] == [['example/repo#1'], ['example/repo#2']], p
-assert p['automatic_merge'] is False
-assert p['automatic_conflict_resolution'] is False
+python3 - "${tmp}/plan.json" "${monitor_schema}" <<'PY'
+import copy, json, sys
+from jsonschema import Draft202012Validator
+
+plan=json.load(open(sys.argv[1]))
+schema=json.load(open(sys.argv[2]))
+validator=Draft202012Validator(schema)
+validator.validate(plan)
+
+assert plan['issues'] == ['example/repo#1', 'example/repo#2'], plan
+assert plan['waves'] == [['example/repo#1'], ['example/repo#2']], plan
+assert plan['automatic_merge'] is False
+assert plan['automatic_conflict_resolution'] is False
+
+simple=plan['issue_plans']['example/repo#1']
+stack=plan['issue_plans']['example/repo#2']
+assert simple['required_receipts'] == ['skill-resolution','shadow-admission','task-dag'], simple
+simple_disp={x['phase']:x['disposition'] for x in simple['phase_dispositions']}
+assert simple_disp['SPATIAL_INVARIANTS'] == 'MONITOR', simple_disp
+assert simple_disp['STACK_DELIVERY'] == 'NOT_APPLICABLE_WITH_EVIDENCE', simple_disp
+assert simple_disp['FORGE_RECONCILIATION'] == 'NOT_APPLICABLE_WITH_EVIDENCE', simple_disp
+assert stack['required_receipts'] == ['skill-resolution','shadow-admission','task-dag','git-town-stack'], stack
+stack_disp={x['phase']:x['disposition'] for x in stack['phase_dispositions']}
+assert stack_disp['STACK_DELIVERY'] == 'REQUIRED', stack_disp
+assert stack_disp['FORGE_RECONCILIATION'] == 'NOT_APPLICABLE_WITH_EVIDENCE', stack_disp
+assert simple['execution_state'] == 'NOT_EXERCISED'
+assert stack['execution_state'] == 'NOT_EXERCISED'
+
+# Schema mutations: these shapes must never become a valid monitor receipt.
+mutations=[]
+m=copy.deepcopy(plan); del m['issue_plans']; mutations.append(('missing issue_plans', m))
+m=copy.deepcopy(plan); m['issue_plans']['example/repo#1']['execution_state']='PASS'; mutations.append(('runtime PASS promotion', m))
+m=copy.deepcopy(plan); m['automatic_merge']=True; mutations.append(('automatic merge widening', m))
+m=copy.deepcopy(plan); m['issue_plans']['example/repo#1']['phase_dispositions'][4]['disposition']='PASS'; mutations.append(('invalid phase disposition', m))
+m=copy.deepcopy(plan); m['issue_plans']['example/repo#1']['required_receipts'].append('provider-secret'); mutations.append(('unknown receipt', m))
+m=copy.deepcopy(plan); m['issue_plans']['example/repo#1']['phase_dispositions'].pop(); mutations.append(('truncated phase contract', m))
+for label, candidate in mutations:
+    errors=list(validator.iter_errors(candidate))
+    assert errors, f'{label} unexpectedly validated'
 PY
 
 # A closed blocker must be present in the exact packet. Presence, not network
@@ -88,12 +122,27 @@ cat > "${tmp}/closed-only.json" <<'JSON'
 ]
 JSON
 python3 "${cli}" monitor-plan --issues "${tmp}/closed-only.json" > "${tmp}/closed-only-plan.json"
-python3 - "${tmp}/closed-only-plan.json" <<'PY'
+python3 - "${tmp}/closed-only-plan.json" "${monitor_schema}" <<'PY'
 import json, sys
+from jsonschema import Draft202012Validator
 p=json.load(open(sys.argv[1]))
+s=json.load(open(sys.argv[2]))
+Draft202012Validator(s).validate(p)
 assert p['issues'] == ['example/repo#10'], p
 assert p['waves'] == [['example/repo#10']], p
+assert p['issue_plans']['example/repo#10']['execution_state'] == 'NOT_EXERCISED'
 PY
+
+# Unknown phase hints must fail closed instead of silently widening execution.
+cat > "${tmp}/unknown-phase.json" <<'JSON'
+[
+  {"repository":"example/repo","number":9,"state":"open","depends_on":[],"required_phases":["MAGIC_DEPLOY"]}
+]
+JSON
+if python3 "${cli}" monitor-plan --issues "${tmp}/unknown-phase.json" >/dev/null 2>&1; then
+  echo 'FAIL: unknown required phase was accepted' >&2
+  exit 1
+fi
 
 # An absent dependency is not shorthand for "closed somewhere on the provider".
 cat > "${tmp}/missing.json" <<'JSON'
@@ -155,4 +204,4 @@ if python3 "${cli}" monitor-plan --issues "${tmp}/cycle.json" >/dev/null 2>&1; t
   exit 1
 fi
 
-echo 'PASS repository control-plane profile, thin attachment, and exact dependency closure'
+echo 'PASS repository control-plane profile, exact dependency closure, applicability gate, and monitor-plan schema'
