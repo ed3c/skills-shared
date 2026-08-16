@@ -70,7 +70,11 @@ def check_entry(root: Path, entry: dict) -> list[str]:
     if entry["domain_module"] not in core:
         errors.append(f"{name}: core does not route to {entry['domain_module']}")
 
-    lowered = core.casefold()
+    # The executable assertion must name the Skill being checked. Exclude that
+    # mechanical identifier from the domain-leak scan so a provider-shaped Skill
+    # name does not create a false positive while provider semantics in prose still do.
+    domain_scan = core.replace(assertion, "")
+    lowered = domain_scan.casefold()
     for token in entry.get("forbidden_core_tokens", []):
         if token.casefold() in lowered:
             errors.append(f"{name}: forbidden core token: {token}")
