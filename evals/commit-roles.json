@@ -104,6 +104,11 @@
         "reason": "imported with the integrated PR stacks; published and not rewritable"
       },
       {
+        "commit_sha": "1ab15c028c84990c2ad0c9a2704eb48db725af36",
+        "subject": "chore(ade): archive parallel Tech Lead implementation bundle",
+        "reason": "reached main from another concurrent session without trailers. This session cannot observe which driver produced it, and assigning one from the commit alone would be invention; recorded as unclassified rather than guessed."
+      },
+      {
         "commit_sha": "20721bc68beeaa16d04d868f52d860c1c1eed66d",
         "subject": "feat(shared-skills-infra): gate what a consumer Agent may claim about Skill bootstrap",
         "reason": "authored by this session before AGENTS.md routed agents to the commit-role contract"
@@ -122,6 +127,11 @@
         "commit_sha": "28544345befa3c586dded1cf381989bcbeb05bc3",
         "subject": "fix(ci): let the eval plane guard pushes, not only pull requests",
         "reason": "authored by this session before AGENTS.md routed agents to the commit-role contract"
+      },
+      {
+        "commit_sha": "2aa3e29b0fdba026498c3188cf779dc170e84bf6",
+        "subject": "feat(219): build the five uplift arms, and withdraw a null that was never measured",
+        "reason": "this session committed before reading the commit-role contract, so no Driven-By/Driven-On was written and the commit was authored with the repository's real address rather than the agent-macro@claude-code.invalid machine identity. The work was agent-macro on claude-code; recording it as human here would be the false attribution the contract exists to prevent, and it is already pushed to shared main where a rewrite is not available. The endpoint that failed is the commit command in this session, which now passes --author and both trailers."
       },
       {
         "commit_sha": "2d3afb21043ab9f611ab4e1bf09126bc3f3832b9",
@@ -152,6 +162,11 @@
         "commit_sha": "5752fc75e24392c4568527c95303e76c41bf5cdf",
         "subject": "test(dual-forge): add valid multi-agent runtime fixture",
         "reason": "imported with the integrated PR stacks; published and not rewritable"
+      },
+      {
+        "commit_sha": "5b6e50abbfaf11aea798488169f8a7101c433805",
+        "subject": "revert: remove incomplete parallel Tech Lead archive placeholder",
+        "reason": "the revert of the commit above, from the same concurrent session and with the same absent trailers. Net file change across the pair is zero."
       },
       {
         "commit_sha": "5e4e48a7cf20567b9019dd38bf02a871b5d3c331",
