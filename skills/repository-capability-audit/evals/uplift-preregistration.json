@@ -115,6 +115,23 @@
     "partial_runs": "Any run that stops before 90 sessions is reported as PARTIAL with the exact cells run, and may not be cited as the qualifying #219 matrix."
   },
 
+  "execution_ledger": [
+    {
+      "date": "2026-08-16",
+      "decision": "DECLINED_FOR_NOW",
+      "decided_by": "repository owner",
+      "what_ran_instead": "1 repetition per arm per host, both hosts, all five arms, via skills/procedural-shadow-runtime/scripts/run_arm_trials.py",
+      "receipts": [
+        "skills/procedural-shadow-runtime/evals/receipts/arm-trials-claude-code-23753e11b417.json",
+        "skills/procedural-shadow-runtime/evals/receipts/arm-trials-codex-cli-23753e11b417.json"
+      ],
+      "aggregated_verdict": "PARTIAL_AND_PRIMARY_METRIC_SATURATED",
+      "observed": "false_pass_rate was 0.000 in all ten cells across both hosts. Neither host fabricated a path on this task, so the primary metric carried zero within-arm variance and could not have shown a treatment effect at any n.",
+      "why_this_does_not_change_the_design": "Nothing above this entry moved. The saturation stop rule anticipated exactly this outcome and states that repetitions cannot fix it -- only a harder case set can, and building one is separate work that must not be shaped by these results.",
+      "_this_entry_is_a_record_not_a_result": "Declining the spend is an execution decision. It is not evidence about the arms and may not be cited as one."
+    }
+  ],
+
   "execution_gate": {
     "status": "NOT_YET_ADMITTED",
     "estimated_cost_usd_claude_code_only": 115,

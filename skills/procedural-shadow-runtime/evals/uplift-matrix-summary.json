@@ -1,0 +1,187 @@
+{
+  "_why_no_contrasts": "Contrasts are reported only from a qualifying, unsaturated matrix. Emitting them from a PARTIAL run is how a pilot becomes a finding.",
+  "contrasts_reported": [],
+  "gaps": {
+    "host_error_arms": {},
+    "hosts_contributing": [
+      "claude-code",
+      "codex-cli"
+    ],
+    "missing_arms": {},
+    "observed_repetitions_per_arm": 1,
+    "required_repetitions_per_arm": 9
+  },
+  "hosts": {
+    "claude-code": {
+      "arms": {
+        "A_NO_SKILL": {
+          "n": 1,
+          "primary_false_pass_rate_mean": 0.0,
+          "primary_within_arm_sd": null,
+          "secondary_recorded": {
+            "cost_observed": true,
+            "median_cited_paths": 5,
+            "median_duration_ms": 18546
+          },
+          "task_success_rate": 1.0
+        },
+        "B_METADATA_ONLY": {
+          "n": 1,
+          "primary_false_pass_rate_mean": 0.0,
+          "primary_within_arm_sd": null,
+          "secondary_recorded": {
+            "cost_observed": true,
+            "median_cited_paths": 5,
+            "median_duration_ms": 14138
+          },
+          "task_success_rate": 1.0
+        },
+        "C_FULL_SKILL": {
+          "n": 1,
+          "primary_false_pass_rate_mean": 0.0,
+          "primary_within_arm_sd": null,
+          "secondary_recorded": {
+            "cost_observed": true,
+            "median_cited_paths": 5,
+            "median_duration_ms": 17909
+          },
+          "task_success_rate": 1.0
+        },
+        "D_DELTA_CAPSULE": {
+          "n": 1,
+          "primary_false_pass_rate_mean": 0.0,
+          "primary_within_arm_sd": null,
+          "secondary_recorded": {
+            "cost_observed": true,
+            "median_cited_paths": 5,
+            "median_duration_ms": 16471
+          },
+          "task_success_rate": 1.0
+        },
+        "E_DELTA_CAPSULE_PLUS_HARNESS": {
+          "n": 1,
+          "primary_false_pass_rate_mean": 0.0,
+          "primary_within_arm_sd": null,
+          "secondary_recorded": {
+            "cost_observed": true,
+            "median_cited_paths": 9,
+            "median_duration_ms": 20914
+          },
+          "task_success_rate": 1.0
+        }
+      },
+      "host_version": "2.1.221 (Claude Code)",
+      "model": "opus",
+      "policy": {
+        "allowed_tools": [
+          "Read",
+          "Glob",
+          "Grep",
+          "Bash"
+        ],
+        "disallowed_tools": [
+          "Write",
+          "Edit",
+          "NotebookEdit"
+        ],
+        "permission_mode": "default"
+      },
+      "repetitions_per_arm": 1,
+      "runtime": "CLAUDE_CODE_LOCAL"
+    },
+    "codex-cli": {
+      "arms": {
+        "A_NO_SKILL": {
+          "n": 1,
+          "primary_false_pass_rate_mean": 0.0,
+          "primary_within_arm_sd": null,
+          "secondary_recorded": {
+            "cost_observed": false,
+            "median_cited_paths": 8,
+            "median_duration_ms": 25568
+          },
+          "task_success_rate": 1.0
+        },
+        "B_METADATA_ONLY": {
+          "n": 1,
+          "primary_false_pass_rate_mean": 0.0,
+          "primary_within_arm_sd": null,
+          "secondary_recorded": {
+            "cost_observed": false,
+            "median_cited_paths": 10,
+            "median_duration_ms": 41198
+          },
+          "task_success_rate": 1.0
+        },
+        "C_FULL_SKILL": {
+          "n": 1,
+          "primary_false_pass_rate_mean": 0.0,
+          "primary_within_arm_sd": null,
+          "secondary_recorded": {
+            "cost_observed": false,
+            "median_cited_paths": 8,
+            "median_duration_ms": 34302
+          },
+          "task_success_rate": 1.0
+        },
+        "D_DELTA_CAPSULE": {
+          "n": 1,
+          "primary_false_pass_rate_mean": 0.0,
+          "primary_within_arm_sd": null,
+          "secondary_recorded": {
+            "cost_observed": false,
+            "median_cited_paths": 8,
+            "median_duration_ms": 18412
+          },
+          "task_success_rate": 1.0
+        },
+        "E_DELTA_CAPSULE_PLUS_HARNESS": {
+          "n": 1,
+          "primary_false_pass_rate_mean": 0.0,
+          "primary_within_arm_sd": null,
+          "secondary_recorded": {
+            "cost_observed": false,
+            "median_cited_paths": 8,
+            "median_duration_ms": 40590
+          },
+          "task_success_rate": 1.0
+        }
+      },
+      "host_version": "codex-cli 0.146.0",
+      "model": "gpt-5.6-sol",
+      "policy": {
+        "approval": "never",
+        "sandbox": "read-only"
+      },
+      "repetitions_per_arm": 1,
+      "runtime": "CODEX_CLI_LOCAL"
+    }
+  },
+  "interpretation": "Observed 1 repetitions per arm against a preregistered 9. Every cell returned the same primary value, so no treatment signal could have appeared regardless of the arms. This bounds the case set, not the arms, and may not be reported as evidence that the treatments do not differ. The preregistration names this outcome in advance: adding repetitions cannot unsaturate a metric, only harder cases can, and a case set changed after seeing results is not a case set.",
+  "non_claims": [
+    "no promotion, production, or cross-repository claim follows from this design",
+    "five arms establish which component carries an effect, not that any effect exists",
+    "two hosts are two hosts; no claim about model families beyond these two pins",
+    "a null on the primary metric would bound the effect on this corpus, not on repository audit generally",
+    "the arms are verified byte-distinct, which is not evidence that they are behaviourally distinct; that is what the run is for"
+  ],
+  "preregistered_contrasts": [
+    "C_FULL_SKILL vs A_NO_SKILL",
+    "B_METADATA_ONLY vs A_NO_SKILL",
+    "D_DELTA_CAPSULE vs C_FULL_SKILL",
+    "E_DELTA_CAPSULE_PLUS_HARNESS vs D_DELTA_CAPSULE"
+  ],
+  "preregistration_id": "rca-uplift-219-2026-08",
+  "primary_metric": "false_pass_rate",
+  "primary_metric_saturated": true,
+  "qualifies_for_219": false,
+  "required_arms": [
+    "A_NO_SKILL",
+    "B_METADATA_ONLY",
+    "C_FULL_SKILL",
+    "D_DELTA_CAPSULE",
+    "E_DELTA_CAPSULE_PLUS_HARNESS"
+  ],
+  "schema": "uplift-matrix-summary/v1",
+  "verdict": "PARTIAL_AND_PRIMARY_METRIC_SATURATED"
+}
