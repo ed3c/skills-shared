@@ -45,6 +45,13 @@ jobs:
           printf 'bun=%s\n' "$(bun --version)"
       - name: Exercise portable-core positive and mutation controls
         run: bun skills/repo-agent-native/tests/selftest.ts
+      - name: Run the Skill suite entrypoint
+        # This Skill keeps its own workflow rather than joining the skill-suites
+        # matrix, so its tests/run-all.sh has to be invoked here or the suite
+        # coverage gate reports it as shipped-but-never-executed -- the exact
+        # shape #105 landed through. The adapter receipt controls inside it are
+        # zero-network and need none of the providers that captured them.
+        run: bash skills/repo-agent-native/tests/run-all.sh
       - name: Validate the canonical Skill structure
         shell: bash
         run: |

@@ -1,0 +1,139 @@
+{
+  "adapter": {
+    "config_identity": {
+      "backend": "gob",
+      "config_path": ".grepai/config.yaml",
+      "config_sha256": "935a667099152464aba56eefc6036a1af5a7f36bdb7f78201921ef0d6a53e777",
+      "embedding_model": "nomic-embed-text",
+      "embedding_provider": "ollama"
+    },
+    "executable": "/opt/homebrew/bin/grepai",
+    "executable_sha256": "e2d5ad30710eba500cb5d783a914ea16ba4e5c66ac23abe8691165b4aa5732bc",
+    "kind": "semantic-intent-search",
+    "provider": "grepai",
+    "version": "grepai version 0.30.0"
+  },
+  "budgets": {
+    "max_output_bytes": 262144,
+    "timeout_seconds": 120
+  },
+  "controls": [
+    {
+      "expect": "no hit is promoted to a fact without read-back",
+      "id": "semantic-distractor",
+      "note": "A semantic index answers every query with its nearest neighbours, so a non-zero count here is expected and is exactly why absence of a hit is not proof of absence and presence of one is not proof of truth.",
+      "observed": "RED",
+      "observed_hits": 5
+    },
+    {
+      "exit_code": 1,
+      "expect": "RED",
+      "id": "wrong-project",
+      "observed": "RED"
+    }
+  ],
+  "execution": {
+    "argv": [
+      "/opt/homebrew/bin/grepai",
+      "search",
+      "where is the commit role trailer gate enforced",
+      "--json",
+      "-n",
+      "5"
+    ],
+    "cwd": "/Users/neon/skills-shared/.claude/worktrees/batch-tl-v21",
+    "duration_ms": 344,
+    "exit_code": 0,
+    "query": "where is the commit role trailer gate enforced",
+    "stderr_bytes": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_bytes": 11213,
+    "stdout_sha256": "a345857d0ef485ca046197c4e09b111c1dd21c9296b8d375df737ddd4ed2c4d9",
+    "terminal_state": "COMPLETED"
+  },
+  "policy": {
+    "allowed_argv": [
+      [
+        "/opt/homebrew/bin/grepai",
+        "search",
+        "<query>",
+        "--json",
+        "-n",
+        "<limit>"
+      ]
+    ],
+    "filesystem": "read-only-outside-index",
+    "network": "loopback-only",
+    "network_detail": "ollama embedding endpoint on 127.0.0.1:11434",
+    "secrets": "none"
+  },
+  "residue": {
+    "cleaned": false,
+    "note": "index directory is gitignored and rebuildable",
+    "paths": [
+      ".grepai/"
+    ]
+  },
+  "result": {
+    "evidence_level": "B+",
+    "evidence_level_note": "grepai produces candidates only. Each promoted hit carries its own read-back state; the lane never emits A.",
+    "hits": [
+      {
+        "end_line": 30,
+        "path": "evals/commit-roles.json",
+        "readback": "CONFIRMED",
+        "score": 0.68959767,
+        "source_sha256": "e3f26392ef2640f2898ee0c643c381b9e3b6735236af41311c1e567f0e5de284",
+        "start_line": 1
+      },
+      {
+        "end_line": 51,
+        "path": "scripts/check_commit_roles.py",
+        "readback": "CONFIRMED",
+        "score": 0.661835,
+        "source_sha256": "b17c7fa5b76fe1863dbd6fa0d15efe7033717ebf7a9a0878477dd4ee4a9167d3",
+        "start_line": 1
+      },
+      {
+        "end_line": 342,
+        "path": "evals/commit-roles.json",
+        "readback": "CONFIRMED",
+        "score": 0.65799415,
+        "source_sha256": "e3f26392ef2640f2898ee0c643c381b9e3b6735236af41311c1e567f0e5de284",
+        "start_line": 309
+      },
+      {
+        "end_line": 108,
+        "path": "evals/commit-roles.json",
+        "readback": "CONFIRMED",
+        "score": 0.65680397,
+        "source_sha256": "e3f26392ef2640f2898ee0c643c381b9e3b6735236af41311c1e567f0e5de284",
+        "start_line": 86
+      },
+      {
+        "end_line": 88,
+        "path": "evals/commit-roles.json",
+        "readback": "CONFIRMED",
+        "score": 0.6556279,
+        "source_sha256": "e3f26392ef2640f2898ee0c643c381b9e3b6735236af41311c1e567f0e5de284",
+        "start_line": 53
+      }
+    ],
+    "result_count": 5,
+    "source_readback": {
+      "confirmed": 5,
+      "performed": 5,
+      "required": true
+    },
+    "state": "PASS"
+  },
+  "schema": "repo-agent-native/adapter-receipt/v1",
+  "subject": {
+    "commit_sha": "9a6d22f89e9637f65803d8e56907042aa62935a6",
+    "dirty_excluded": "skills/repo-agent-native/evals/receipts",
+    "dirty_paths": 0,
+    "repository": "ed3c/skills-shared",
+    "tree_sha": "b3f0f020e2b8285e9539cf25806b93d16119478b",
+    "workspace_root": "/Users/neon/skills-shared/.claude/worktrees/batch-tl-v21"
+  }
+}

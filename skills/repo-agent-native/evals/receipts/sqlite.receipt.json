@@ -1,0 +1,80 @@
+{
+  "adapter": {
+    "config_identity": {
+      "library_version": "3.53.3",
+      "module": "python sqlite3",
+      "schema": "adapter-evidence-ledger/v1"
+    },
+    "executable": "/usr/bin/sqlite3",
+    "executable_sha256": "34de4799cc615e043abe3ce9163d952f465fbec718f65d8882ded1cc438f93d1",
+    "kind": "evidence-ledger",
+    "provider": "sqlite",
+    "version": "sqlite 3.53.3"
+  },
+  "budgets": {
+    "max_output_bytes": 65536,
+    "timeout_seconds": 60
+  },
+  "controls": [
+    {
+      "expect": "RED",
+      "id": "duplicate-subject-refused",
+      "observed": "RED"
+    },
+    {
+      "expect": "ok",
+      "id": "integrity-check",
+      "note": "Database integrity proves the projection's shape and says nothing about repository semantics.",
+      "observed": "RED",
+      "observed_value": "ok"
+    }
+  ],
+  "execution": {
+    "argv": [
+      "<in-process sqlite3>"
+    ],
+    "cwd": "/Users/neon/skills-shared/.claude/worktrees/batch-tl-v21/skills/repo-agent-native/evals/receipts",
+    "duration_ms": 1,
+    "exit_code": 0,
+    "stderr_bytes": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_bytes": 0,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "terminal_state": "COMPLETED"
+  },
+  "policy": {
+    "allowed_argv": [],
+    "filesystem": "read-write-within-output",
+    "network": "none",
+    "note": "in-process; the ledger is rebuilt from receipts, never edited",
+    "secrets": "none"
+  },
+  "residue": {
+    "cleaned": false,
+    "note": "rebuildable from the receipts in this directory",
+    "paths": [
+      "adapter-evidence-ledger.sqlite3"
+    ]
+  },
+  "result": {
+    "evidence_level": "B",
+    "evidence_level_note": "A ledger row is a normalized record of another lane's observation; it is never independent evidence.",
+    "ledger_path": "adapter-evidence-ledger.sqlite3",
+    "result_count": 0,
+    "source_readback": {
+      "confirmed": 0,
+      "performed": 0,
+      "required": false
+    },
+    "state": "PASS"
+  },
+  "schema": "repo-agent-native/adapter-receipt/v1",
+  "subject": {
+    "commit_sha": "9a6d22f89e9637f65803d8e56907042aa62935a6",
+    "dirty_excluded": "skills/repo-agent-native/evals/receipts",
+    "dirty_paths": 0,
+    "repository": "ed3c/skills-shared",
+    "tree_sha": "b3f0f020e2b8285e9539cf25806b93d16119478b",
+    "workspace_root": "/Users/neon/skills-shared/.claude/worktrees/batch-tl-v21"
+  }
+}

@@ -1,0 +1,184 @@
+{
+  "adapter": {
+    "config_identity": {
+      "grammar": "python",
+      "grammar_version": "unknown",
+      "interpreter": "/private/tmp/claude-501/-Users-neon-skills-shared/be798cf5-1d89-4180-a2a3-3b76cd35b6c8/scratchpad/tsenv/bin/python"
+    },
+    "executable": "/private/tmp/claude-501/-Users-neon-skills-shared/be798cf5-1d89-4180-a2a3-3b76cd35b6c8/scratchpad/tsenv/bin/python",
+    "executable_sha256": "01ae36c38b5c824af906dac099d35ca97d5926017f7d0dbe4b4431903646b059",
+    "kind": "syntax-slice",
+    "provider": "tree-sitter",
+    "version": "tree-sitter 0.26.0"
+  },
+  "budgets": {
+    "max_output_bytes": 262144,
+    "timeout_seconds": 120
+  },
+  "controls": [
+    {
+      "detail": {
+        "has_error": true
+      },
+      "expect": "a broken file reports has_error",
+      "id": "parse-error-surfaced",
+      "observed": "RED"
+    },
+    {
+      "confirmed": 21,
+      "expect": "every recorded range slices the construct it names",
+      "id": "byte-range-readback",
+      "observed": "RED",
+      "total": 21
+    }
+  ],
+  "execution": {
+    "argv": [
+      "/private/tmp/claude-501/-Users-neon-skills-shared/be798cf5-1d89-4180-a2a3-3b76cd35b6c8/scratchpad/tsenv/bin/python",
+      "-c",
+      "import json,sys,hashlib\nimport tree_sitter, tree_sitter_python\nfrom tree_sitter import Language, Parser\nfrom pathlib import Path\ntarget = Path(sys.argv[1])\nsrc = target.read_bytes()\nlang = Language(tree_sitter_python.language())\ntree = Parser(lang).parse(src)\ndefs = []\ndef walk(node):\n    if node.type in ('function_definition','class_definition'):\n        name = node.child_by_field_name('name')\n        defs.append({'type': node.type,\n                     'name': src[name.start_byte:name.end_byte].decode(),\n                     'start_byte': node.start_byte, 'end_byte': node.end_byte,\n                     'start_line': node.start_point[0] + 1,\n                     'end_line': node.end_point[0] + 1})\n    for child in node.children:\n        walk(child)\nwalk(tree.root_node)\nprint(json.dumps({'grammar': 'python', 'tree_sitter': tree_sitter.__version__,\n                  'grammar_version': tree_sitter_python.__version__ if hasattr(tree_sitter_python,'__version__') else 'unknown',\n                  'has_error': tree.root_node.has_error,\n                  'source_sha256': hashlib.sha256(src).hexdigest(),\n                  'source_bytes': len(src), 'definitions': defs}))\n",
+      "/Users/neon/skills-shared/.claude/worktrees/batch-tl-v21/skills/dual-forge-repository-loop/scripts/compile_tech_lead_plan.py"
+    ],
+    "cwd": "/Users/neon/skills-shared/.claude/worktrees/batch-tl-v21",
+    "duration_ms": 73,
+    "exit_code": 0,
+    "stderr_bytes": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_bytes": 2893,
+    "stdout_sha256": "180493f412692c32abe78a1c806fe847061aabb820ce1175d9bbe4ff882aed4c",
+    "target_path": "skills/dual-forge-repository-loop/scripts/compile_tech_lead_plan.py",
+    "terminal_state": "COMPLETED"
+  },
+  "policy": {
+    "allowed_argv": [
+      [
+        "/private/tmp/claude-501/-Users-neon-skills-shared/be798cf5-1d89-4180-a2a3-3b76cd35b6c8/scratchpad/tsenv/bin/python",
+        "-c",
+        "<parse probe>",
+        "<path>"
+      ]
+    ],
+    "filesystem": "read-only",
+    "network": "none",
+    "secrets": "none"
+  },
+  "residue": {
+    "cleaned": true,
+    "paths": []
+  },
+  "result": {
+    "definitions": [
+      {
+        "end_byte": 1259,
+        "end_line": 34,
+        "name": "InputError",
+        "readback": "CONFIRMED",
+        "start_byte": 1222,
+        "start_line": 33,
+        "type": "class_definition"
+      },
+      {
+        "end_byte": 1303,
+        "end_line": 38,
+        "name": "MechanismError",
+        "readback": "CONFIRMED",
+        "start_byte": 1262,
+        "start_line": 37,
+        "type": "class_definition"
+      },
+      {
+        "end_byte": 1468,
+        "end_line": 47,
+        "name": "Failure",
+        "readback": "CONFIRMED",
+        "start_byte": 1330,
+        "start_line": 42,
+        "type": "class_definition"
+      },
+      {
+        "end_byte": 1468,
+        "end_line": 47,
+        "name": "as_dict",
+        "readback": "CONFIRMED",
+        "start_byte": 1378,
+        "start_line": 46,
+        "type": "function_definition"
+      },
+      {
+        "end_byte": 1597,
+        "end_line": 51,
+        "name": "canonical_json",
+        "readback": "CONFIRMED",
+        "start_byte": 1471,
+        "start_line": 50,
+        "type": "function_definition"
+      },
+      {
+        "end_byte": 1700,
+        "end_line": 55,
+        "name": "digest",
+        "readback": "CONFIRMED",
+        "start_byte": 1600,
+        "start_line": 54,
+        "type": "function_definition"
+      },
+      {
+        "end_byte": 2104,
+        "end_line": 66,
+        "name": "read_json",
+        "readback": "CONFIRMED",
+        "start_byte": 1703,
+        "start_line": 58,
+        "type": "function_definition"
+      },
+      {
+        "end_byte": 2276,
+        "end_line": 72,
+        "name": "require_object",
+        "readback": "CONFIRMED",
+        "start_byte": 2107,
+        "start_line": 69,
+        "type": "function_definition"
+      },
+      {
+        "end_byte": 2683,
+        "end_line": 81,
+        "name": "strings",
+        "readback": "CONFIRMED",
+        "start_byte": 2279,
+        "start_line": 75,
+        "type": "function_definition"
+      },
+      {
+        "end_byte": 3263,
+        "end_line": 94,
+        "name": "path_root",
+        "readback": "CONFIRMED",
+        "start_byte": 2686,
+        "start_line": 84,
+        "type": "function_definition"
+      }
+    ],
+    "definitions_truncated": 11,
+    "evidence_level": "A-",
+    "evidence_level_note": "Syntax gives exact ranges and no type or runtime identity; a name here is a token, not a resolved symbol.",
+    "has_error": false,
+    "result_count": 21,
+    "source_readback": {
+      "confirmed": 21,
+      "performed": 21,
+      "required": true
+    },
+    "source_sha256": "b9caaaf8362b8b50e10d6e24f9f442def58a78fcb11d807ab7ca81790a3b5c60",
+    "state": "PASS"
+  },
+  "schema": "repo-agent-native/adapter-receipt/v1",
+  "subject": {
+    "commit_sha": "9a6d22f89e9637f65803d8e56907042aa62935a6",
+    "dirty_excluded": "skills/repo-agent-native/evals/receipts",
+    "dirty_paths": 0,
+    "repository": "ed3c/skills-shared",
+    "tree_sha": "b3f0f020e2b8285e9539cf25806b93d16119478b",
+    "workspace_root": "/Users/neon/skills-shared/.claude/worktrees/batch-tl-v21"
+  }
+}

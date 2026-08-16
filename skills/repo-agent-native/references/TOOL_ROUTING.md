@@ -109,3 +109,37 @@ warnings and exclusions
 ```
 
 Provider presence, query success, parse success and database integrity are not source-truth PASS.
+
+### Producing and checking one
+
+This section described a receipt for as long as nothing produced one, which is
+indistinguishable from a routed lane that never ran. Two scripts close that gap,
+and they deliberately share no code path:
+
+```bash
+# the only lane that starts a process or opens a socket
+python3 skills/repo-agent-native/scripts/capture_adapter_receipt.py \
+  --repo-root . --out skills/repo-agent-native/evals/receipts
+
+# zero network, zero provider execution; runnable where no provider exists
+python3 skills/repo-agent-native/scripts/check_adapter_receipts.py check
+python3 skills/repo-agent-native/scripts/check_adapter_receipts.py selftest
+```
+
+Captured receipts live in [`../evals/receipts/`](../evals/receipts/), one file per
+lane. A lane whose provider is absent still gets a receipt: omitting it reads
+exactly like a lane that passed.
+
+The checker refuses, each with its own code: an unbound or dirty subject, an
+unidentified provider, an undeclared network/filesystem/secret policy, an
+unbounded budget, a state laundered against its own execution record (an
+`ABSENT` lane carrying a duration, or `PASS` on a non-zero exit), an evidence
+level the read-back does not support, a missing read-back record, undeclared
+residue, a credential-shaped value, and — the one that matters most — a `PASS`
+whose controls all agreed with it.
+
+`A` and `A-` contain a read-back clause in their own definition in
+[`EVIDENCE_MODEL.md`](EVIDENCE_MODEL.md), so claiming either with zero confirmed
+read-backs is refused. That rule caught its own author: the Serena lane was
+written as `A-` and is recorded as `B`, because the CLI surface builds an index
+and lists tools without answering a symbol query, and so produces no fact.

@@ -1,0 +1,95 @@
+{
+  "adapter": {
+    "executable": "/usr/bin/git",
+    "executable_sha256": "12bed4523661307059b879b9b54e77a73176e9d27d27a0e40363271d8f0668ba",
+    "kind": "worker-execution",
+    "provider": "git-worktree",
+    "version": "git version 2.50.1 (Apple Git-155)"
+  },
+  "budgets": {
+    "max_output_bytes": 65536,
+    "timeout_seconds": 300
+  },
+  "controls": [
+    {
+      "exit_code": 128,
+      "expect": "RED",
+      "id": "one-writer-per-branch",
+      "note": "the second checkout of one branch is refused by git, not by convention",
+      "observed": "RED"
+    }
+  ],
+  "execution": {
+    "argv": [
+      "git worktree add --detach <tmp>/worker-{0,1} 9a6d22f89e96"
+    ],
+    "concurrent_workers": 2,
+    "cwd": "/Users/neon/skills-shared/.claude/worktrees/batch-tl-v21",
+    "duration_ms": 469,
+    "exit_code": 0,
+    "stderr_bytes": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_bytes": 0,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "terminal_state": "COMPLETED"
+  },
+  "policy": {
+    "allowed_argv": [
+      [
+        "git",
+        "worktree",
+        "add",
+        "--detach",
+        "<path>",
+        "<sha>"
+      ],
+      [
+        "git",
+        "worktree",
+        "remove",
+        "<path>"
+      ]
+    ],
+    "filesystem": "read-write-within-temp",
+    "network": "none",
+    "secrets": "none"
+  },
+  "residue": {
+    "cleaned": true,
+    "paths": []
+  },
+  "result": {
+    "evidence_level": "A",
+    "evidence_level_note": "Each worktree was created and its HEAD read back from the checkout itself.",
+    "result_count": 2,
+    "source_readback": {
+      "confirmed": 2,
+      "performed": 2,
+      "required": true
+    },
+    "state": "PASS",
+    "workers": [
+      {
+        "exit_code": 0,
+        "head": "9a6d22f89e9637f65803d8e56907042aa62935a6",
+        "path": "worker-0",
+        "present": true
+      },
+      {
+        "exit_code": 0,
+        "head": "9a6d22f89e9637f65803d8e56907042aa62935a6",
+        "path": "worker-1",
+        "present": true
+      }
+    ]
+  },
+  "schema": "repo-agent-native/adapter-receipt/v1",
+  "subject": {
+    "commit_sha": "9a6d22f89e9637f65803d8e56907042aa62935a6",
+    "dirty_excluded": "skills/repo-agent-native/evals/receipts",
+    "dirty_paths": 0,
+    "repository": "ed3c/skills-shared",
+    "tree_sha": "b3f0f020e2b8285e9539cf25806b93d16119478b",
+    "workspace_root": "/Users/neon/skills-shared/.claude/worktrees/batch-tl-v21"
+  }
+}

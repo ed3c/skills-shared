@@ -65,6 +65,10 @@ python3 scripts/check_executor_authority.py --repo-root . --selftest
 step "delivery shape comparison controls"
 python3 scripts/measure_delivery_shape.py selftest
 
+step "adapter receipt integrity"
+python3 skills/repo-agent-native/scripts/check_adapter_receipts.py selftest
+python3 skills/repo-agent-native/scripts/check_adapter_receipts.py check
+
 step "prompt baseline record integrity"
 python3 skills/dual-forge-repository-loop/scripts/check_prompt_baseline.py selftest
 python3 skills/dual-forge-repository-loop/scripts/check_prompt_baseline.py check

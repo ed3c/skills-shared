@@ -1,0 +1,108 @@
+{
+  "adapter": {
+    "config_identity": {
+      "language": "python",
+      "project_config": ".serena/project.yml",
+      "project_config_sha256": "1b0cc42822f9ba640ebe3d21b1259c966b708c6729b21a93f245145ad672515a"
+    },
+    "executable": "/Users/neon/.local/bin/serena",
+    "executable_sha256": "d777582f3b832329d04388bee222d905b3e110a6b4fdcd1df2aeec4007d9454b",
+    "kind": "symbol-lsp",
+    "provider": "serena",
+    "version": "serena-cli"
+  },
+  "budgets": {
+    "max_output_bytes": 1048576,
+    "timeout_seconds": 900
+  },
+  "controls": [
+    {
+      "coverage": "python=268",
+      "expect": "coverage is reported per language rather than as completeness",
+      "id": "language-coverage-declared",
+      "note": "266 Python files is not the repository. Markdown, JSON, shell and TypeScript carry contracts here and are outside this lane, so a Serena miss is not an absence proof.",
+      "observed": "RED"
+    }
+  ],
+  "execution": {
+    "argv": [
+      "/Users/neon/.local/bin/serena",
+      "project",
+      "index",
+      "/Users/neon/skills-shared/.claude/worktrees/batch-tl-v21",
+      "--log-level",
+      "ERROR"
+    ],
+    "cwd": "/Users/neon/skills-shared/.claude/worktrees/batch-tl-v21",
+    "duration_ms": 1570,
+    "exit_code": 0,
+    "stderr_bytes": 133,
+    "stderr_sha256": "27c8b82556861307ff7e13948d250c6c79b50946def8af2412a700388c1a4434",
+    "stdout_bytes": 162,
+    "stdout_sha256": "737c8c95b1fef96f2dad55f488b4cb24bc4124bda3b4f10f0c9096c3b459564d",
+    "terminal_state": "COMPLETED"
+  },
+  "policy": {
+    "allowed_argv": [
+      [
+        "/Users/neon/.local/bin/serena",
+        "project",
+        "index",
+        "<root>"
+      ],
+      [
+        "/Users/neon/.local/bin/serena",
+        "tools",
+        "list"
+      ]
+    ],
+    "filesystem": "read-write-within-workspace",
+    "mutation_granted": false,
+    "mutation_note": "Serena exposes file and shell mutation tools. This adapter invokes only the indexing and listing commands; edit output from this provider is a proposal, never an applied change.",
+    "network": "none",
+    "secrets": "none",
+    "tool_surface_mutating": [
+      "create_text_file",
+      "delete_memory",
+      "edit_memory",
+      "execute_shell_command",
+      "insert_after_symbol",
+      "insert_before_symbol",
+      "rename_symbol",
+      "replace_content",
+      "replace_symbol_body",
+      "write_memory"
+    ],
+    "tool_surface_total": 28
+  },
+  "residue": {
+    "cache_present": true,
+    "cleaned": false,
+    "note": "Serena writes its own .gitignore inside .serena/",
+    "paths": [
+      ".serena/"
+    ]
+  },
+  "result": {
+    "evidence_level": "B",
+    "evidence_level_note": "This lane builds an index and enumerates a tool surface. It answers no symbol query, so it produces no fact and cannot be A-. Serena's find_symbol and find_referencing_symbols live on the MCP surface, not the CLI, so an A- claim from a CLI capture would be a level the run cannot support -- the checker refuses it, which is how this was caught.",
+    "language_coverage": "python=268",
+    "result_count": 268,
+    "source_readback": {
+      "confirmed": 0,
+      "note": "index build only; nothing was promoted to a fact",
+      "performed": 0,
+      "required": false
+    },
+    "state": "PASS"
+  },
+  "schema": "repo-agent-native/adapter-receipt/v1",
+  "subject": {
+    "commit_sha": "9a6d22f89e9637f65803d8e56907042aa62935a6",
+    "dirty_excluded": "skills/repo-agent-native/evals/receipts",
+    "dirty_paths": 0,
+    "repository": "ed3c/skills-shared",
+    "tree_sha": "b3f0f020e2b8285e9539cf25806b93d16119478b",
+    "workspace_root": "/Users/neon/skills-shared/.claude/worktrees/batch-tl-v21"
+  }
+}
