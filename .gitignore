@@ -6,3 +6,5 @@ sites.local.json
 # status, but a removal that fails partway leaves a full checkout behind, and
 # `git add -A` in this tree would stage all of it.
 .claude/worktrees/
+.grepai/
+.serena/
