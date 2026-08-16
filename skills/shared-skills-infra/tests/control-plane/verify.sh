@@ -63,7 +63,7 @@ rm -rf "${consumer}/.agents/skills/shared-skills-infra"
 cat > "${tmp}/issues.json" <<'JSON'
 [
   {"repository":"example/repo","number":1,"state":"open","depends_on":[]},
-  {"repository":"example/repo","number":2,"state":"open","depends_on":["example/repo#1"]},
+  {"repository":"example/repo","number":2,"state":"open","depends_on":["example/repo#1"],"required_phases":["STACK_DELIVERY"]},
   {"repository":"example/repo","number":3,"state":"closed","depends_on":[]}
 ]
 JSON
@@ -74,7 +74,31 @@ p=json.load(open(sys.argv[1]))
 assert p['waves'] == [['example/repo#1'], ['example/repo#2']], p
 assert p['automatic_merge'] is False
 assert p['automatic_conflict_resolution'] is False
+simple=p['issue_plans']['example/repo#1']
+stack=p['issue_plans']['example/repo#2']
+assert simple['required_receipts'] == ['skill-resolution','shadow-admission','task-dag'], simple
+simple_disp={x['phase']:x['disposition'] for x in simple['phase_dispositions']}
+assert simple_disp['SPATIAL_INVARIANTS'] == 'MONITOR', simple_disp
+assert simple_disp['STACK_DELIVERY'] == 'NOT_APPLICABLE_WITH_EVIDENCE', simple_disp
+assert simple_disp['FORGE_RECONCILIATION'] == 'NOT_APPLICABLE_WITH_EVIDENCE', simple_disp
+assert stack['required_receipts'] == ['skill-resolution','shadow-admission','task-dag','git-town-stack'], stack
+stack_disp={x['phase']:x['disposition'] for x in stack['phase_dispositions']}
+assert stack_disp['STACK_DELIVERY'] == 'REQUIRED', stack_disp
+assert stack_disp['FORGE_RECONCILIATION'] == 'NOT_APPLICABLE_WITH_EVIDENCE', stack_disp
+assert simple['execution_state'] == 'NOT_EXERCISED'
+assert stack['execution_state'] == 'NOT_EXERCISED'
 PY
+
+# Unknown phase hints must fail closed instead of silently widening execution.
+cat > "${tmp}/unknown-phase.json" <<'JSON'
+[
+  {"repository":"example/repo","number":9,"state":"open","depends_on":[],"required_phases":["MAGIC_DEPLOY"]}
+]
+JSON
+if python3 "${cli}" monitor-plan --issues "${tmp}/unknown-phase.json" >/dev/null 2>&1; then
+  echo 'FAIL: unknown required phase was accepted' >&2
+  exit 1
+fi
 
 cat > "${tmp}/duplicate.json" <<'JSON'
 [
@@ -98,4 +122,4 @@ if python3 "${cli}" monitor-plan --issues "${tmp}/cycle.json" >/dev/null 2>&1; t
   exit 1
 fi
 
-echo 'PASS repository control-plane profile and thin attachment'
+echo 'PASS repository control-plane profile, thin attachment, and applicability gate'
