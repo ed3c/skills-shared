@@ -139,9 +139,7 @@ def check_commit(
         return []
 
     for field in ("author_email", "committer_email"):
-        if record[field].lower() in {
-            item.lower() for item in rules["unset_identities"]
-        }:
+        if record[field].lower() in {item.lower() for item in rules["unset_identities"]}:
             problems.append(
                 f"{short}: {field} {record[field]!r} is an unset default identity; "
                 f"nothing recorded who drove this commit"
