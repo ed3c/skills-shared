@@ -242,6 +242,8 @@ The `repository-capability-audit` ↔ `procedural-shadow-runtime` coupling is th
 
 The standard the audit applies was admitted for adoption governance in [`evals/proof-standard-admission.json`](evals/proof-standard-admission.json) (`ed3c (repository owner)`, 2026-08-17, subject `main@ce68a05`). That record is a decision: it carries no run, no receipt and no measurement, and it promoted no Skill's proof level. Every state in the ledger stays exactly as measured.
 
+That record expires by its own terms on any change to the six blobs it names as the admitted subject, so the renderer hashes all six against current bytes and states the verdict in the report header rather than citing the record as if it were live. Adding `migration_order` moved two of them — `SKILL.md` and `skill-adoption-ledger.schema.json` — so the report currently reads `expired`. Re-admission is a new Human record with a new `decided_at`; nothing in this pipeline re-points the old one, and no measurement changes, because none of them were ever derived from the admission.
+
 ## Local verification
 
 ```bash
