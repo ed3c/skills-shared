@@ -13,9 +13,10 @@ Portable method for coordinating multiple Worker Agents with Git Town, isolated 
 7. [`references/EVALS.md`](references/EVALS.md) — eval design before implementation.
 8. [`references/COMPLETION_REPORT.template.md`](references/COMPLETION_REPORT.template.md) — required Worker report.
 9. [`references/TECH_LEAD_FAN_OUT.md`](references/TECH_LEAD_FAN_OUT.md) and [`references/FAN_OUT_CONTRACT.schema.json`](references/FAN_OUT_CONTRACT.schema.json) — bounded TOURNAMENT/COOPERATIVE/SERIAL_STACK/HYBRID fan-out.
-10. [`evals.json`](evals.json), `scripts/`, and `tests/`.
-11. [`../skill-refactor-proof-loop/README.md`](../skill-refactor-proof-loop/README.md) for proof-carrying Skill refactor contracts and the current golden Stack.
-12. [`../github-delivery-loop/README.md`](../github-delivery-loop/README.md) for GitHub publication and merge State Machines.
+10. [`modules/domain-profile.md`](modules/domain-profile.md) — host/publication/CI domain bindings, loaded only when a concrete forge or carrier must be selected.
+11. [`evals.json`](evals.json), `scripts/`, and `tests/`.
+12. [`../skill-refactor-proof-loop/README.md`](../skill-refactor-proof-loop/README.md) for proof-carrying Skill refactor contracts and the current golden Stack.
+13. [`../github-delivery-loop/README.md`](../github-delivery-loop/README.md) for GitHub publication and merge State Machines.
 
 ## Directory map
 
@@ -26,6 +27,8 @@ skills/git-town-stacked-pr-worker/
 ├── SYSTEM_PROMPT.md
 ├── PUBLICATION_POLICY.md
 ├── evals.json
+├── modules/
+│   └── domain-profile.md  host/publication/CI domain bindings
 ├── references/
 │   ├── ADOPTION.md
 │   ├── REPO_PROFILE.template.md

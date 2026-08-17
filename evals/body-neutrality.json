@@ -1,12 +1,22 @@
 {
   "schema": "body-neutrality/v2",
   "ownership": {
-    "portable_body": {"default": true},
-    "repo_binding_source": {
-      "roots": ["skills/forgejo-delivery-loop/agent-docs"]
+    "portable_body": {
+      "default": true
     },
-    "generated_projection": {"roots": []},
-    "archive_evidence": {"parts": ["superseded"]}
+    "repo_binding_source": {
+      "roots": [
+        "skills/forgejo-delivery-loop/agent-docs"
+      ]
+    },
+    "generated_projection": {
+      "roots": []
+    },
+    "archive_evidence": {
+      "parts": [
+        "superseded"
+      ]
+    }
   },
   "owed": {
     "skills/dr-to-mvp/modules/domain-terms-and-intake.md": 2,
@@ -22,7 +32,7 @@
     "skills/gemini-conversation-research/modules/first-principles-probe.md": 1,
     "skills/gemini-conversation-research/modules/mode-b-contextqa.md": 3,
     "skills/gemini-conversation-research/modules/production-guidance-hardening.md": 1,
-    "skills/git-town-stacked-pr-worker/README.md": 4,
+    "skills/git-town-stacked-pr-worker/README.md": 1,
     "skills/github-delivery-loop/modules/host-permissions.md": 9,
     "skills/gitlab-delivery-loop/modules/host-permissions.md": 3,
     "skills/judge-loop-chooser/modules/fit-scoring-recipe.md": 1,
