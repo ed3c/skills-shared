@@ -60,12 +60,19 @@ body["subject"]["initial_sha"] = adapter
 body["subject"]["final_sha"] = adapter
 open(sys.argv[3], "w", encoding="utf-8").write(json.dumps(body))
 ' "${scheduler}" "${receipts}/worktree.receipt.json" "${collapsed}"
+# Exit 2 alone is not enough: any refusal would produce it, including one about
+# the mutated file's shape rather than about the collapse. Require the code.
 set +e
-python3 "${checker}" check --receipts "${receipts}" --bind-scheduler "${collapsed}" >/dev/null 2>&1
+refusal="$(python3 "${checker}" check --receipts "${receipts}" \
+  --bind-scheduler "${collapsed}" 2>&1 >/dev/null)"
 status=$?
 set -e
 test "${status}" -eq 2 \
   || { echo "collapsed cross-subject binding was not refused (exit ${status})" >&2; exit 1; }
+case "${refusal}" in
+  *"REFUSED SUBJECT_COLLAPSED"*) ;;
+  *) echo "collapsed binding was refused for the wrong reason: ${refusal}" >&2; exit 1 ;;
+esac
 echo "REFUSED scheduler-subject-collapsed-into-adapter-subject"
 
 echo "PASS adapter receipt contract"
