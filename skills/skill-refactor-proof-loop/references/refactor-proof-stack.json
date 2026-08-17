@@ -175,7 +175,7 @@
       "workflow": {"state": "NOT_EXERCISED", "source": "Admission landed in skills/skill-refactor-proof-loop/evals/proof-standard-admission.json; no PR subject exists, so no exact-head workflow has run. The audit gates run only in the local Skill suite."},
       "head": {"policy": "NOT_APPLICABLE", "observed_sha": null},
       "terminal_classification": "PARTIAL",
-      "remaining_evidence": ["one issue per remaining gap, deduplicated against #231/#232/#234/#256", "Human review of the audit scope and migration leaves", "delivery state of every node, which no zero-network audit can read"],
+      "remaining_evidence": ["Human review of the audit scope and migration leaves", "delivery state of every node, which no zero-network audit can read"],
       "rollback": "Delete skills/skill-refactor-proof-loop/evals/proof-standard-admission.json to return #322 to blocked-on-admission; the ledger, checkers and rendered report keep working unchanged.",
       "human_admit": "The standard is admitted for adoption governance only (2026-08-17, ed3c). Audit scope, migration leaves and every promotion remain Human authorities.",
       "authority": {

@@ -9,7 +9,7 @@ Reusable, host-neutral proof contracts live here.
 - `refactor-proof-stack.schema.json` defines molecular issue/PR nodes, true child/convergence/external evidence edges, exact-head policy, workflow state, rollback and Human boundaries.
 - `refactor-proof-stack.json` records the current #308 → #315 → #323 → #324 → #321 implementation line, planned #322 audit, and independent #231/#232/#234/#256 evidence lanes.
 - `skill-adoption-ledger.schema.json` defines the cross-Skill adoption matrix: one classification per Skill per criterion, its evidence paths, and the issue that owns every gap.
-- `skill-adoption-ledger.json` classifies the ten Skills named by issue #322 against that matrix.
+- `skill-adoption-ledger.json` classifies the ten Skills named by issue #322 against that matrix, and hands every gap it measures to that Skill's own migration leaf (#343–#352) rather than parking it on the audit issue.
 - `COMPLETION_REPORT.template.md` defines the handoff fields.
 
 Open PR heads remain GitHub PR metadata rather than self-embedded branch prose. These files do not claim model, provider, Git Town, Forgejo, merge, release or production PASS.

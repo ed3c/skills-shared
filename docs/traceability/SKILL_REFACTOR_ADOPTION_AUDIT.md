@@ -24,7 +24,7 @@ against current repository bytes.
 | `PASS` cells | 32 |
 | Non-`PASS` gaps | 68 |
 | Gaps carrying an owning issue | 68 |
-| Distinct owning issues | 5 |
+| Distinct owning issues | 14 |
 | Golden proofs registered | 1 |
 
 Highest proof layer reached, per Skill:
@@ -80,7 +80,7 @@ DELIVERY   molecular_traceability
 
 Every non-`PASS` cell above appears exactly once below, under the issue that owns it.
 An issue listed here is not a duplicate of the audit: it already exists in the ledger's
-`known_issues` (#231, #232, #234, #256, #312, #318, #322).
+`known_issues` (#231, #232, #234, #256, #312, #318, #322, #343, #344, #345, #346, #347, #348, #349, #350, #351, #352).
 
 ### #231 — 1 gap
 
@@ -109,11 +109,16 @@ An issue listed here is not a duplicate of the audit: it already exists in the l
 | `repository-capability-audit` | `matched_hermetic_task` | `PARTIAL` | The matrix is preregistered and scored deterministically, but every cell needs a real host binary. |
 | `repository-capability-audit` | `live_model_runtime_ab` | `NOT_EXERCISED` | Same-subject adapter receipts are owned by #256. |
 
-### #322 — 61 gaps
+### #343 — 1 gap
 
 | Skill | Criterion | State | Why |
 |---|---|---|---|
 | `agentic-tech-lead-orchestration` | `molecular_traceability` | `PARTIAL` | Nodes name their issues and PRs, but their state is declared READ_FROM_GITHUB and cannot be closed by a zero-network audit. |
+
+### #344 — 8 gaps
+
+| Skill | Criterion | State | Why |
+|---|---|---|---|
 | `controlled-technical-language-harness` | `old_canonical_treatment_frozen` | `ABSENT` | No pre-refactor treatment bytes are frozen anywhere in the Skill. |
 | `controlled-technical-language-harness` | `refactor_as_landed_treatment_frozen` | `ABSENT` | — |
 | `controlled-technical-language-harness` | `old_strengths_asserted` | `ABSENT` | Without a frozen old treatment there is nothing to assert preservation against. |
@@ -122,12 +127,22 @@ An issue listed here is not a duplicate of the audit: it already exists in the l
 | `controlled-technical-language-harness` | `golden_proof_registered` | `ABSENT` | — |
 | `controlled-technical-language-harness` | `live_model_runtime_ab` | `NOT_EXERCISED` | The scorer consumes live-run bundles; no live bundle is registered as evidence. |
 | `controlled-technical-language-harness` | `molecular_traceability` | `ABSENT` | — |
+
+### #345 — 6 gaps
+
+| Skill | Criterion | State | Why |
+|---|---|---|---|
 | `dual-forge-repository-loop` | `old_canonical_treatment_frozen` | `ABSENT` | — |
 | `dual-forge-repository-loop` | `refactor_as_landed_treatment_frozen` | `ABSENT` | — |
 | `dual-forge-repository-loop` | `old_strengths_asserted` | `ABSENT` | — |
 | `dual-forge-repository-loop` | `matched_hermetic_task` | `PARTIAL` | The cross-stack case set is frozen and checked, but the comparison itself is never executed in the suite. |
 | `dual-forge-repository-loop` | `golden_proof_registered` | `ABSENT` | — |
 | `dual-forge-repository-loop` | `molecular_traceability` | `ABSENT` | — |
+
+### #346 — 7 gaps
+
+| Skill | Criterion | State | Why |
+|---|---|---|---|
 | `forgejo-delivery-loop` | `old_canonical_treatment_frozen` | `ABSENT` | — |
 | `forgejo-delivery-loop` | `refactor_as_landed_treatment_frozen` | `ABSENT` | — |
 | `forgejo-delivery-loop` | `old_strengths_asserted` | `ABSENT` | — |
@@ -135,12 +150,22 @@ An issue listed here is not a duplicate of the audit: it already exists in the l
 | `forgejo-delivery-loop` | `golden_proof_registered` | `ABSENT` | — |
 | `forgejo-delivery-loop` | `live_model_runtime_ab` | `NOT_IMPLEMENTED` | No model/runtime A/B harness exists; live Forgejo delivery receipts are a separate lane. |
 | `forgejo-delivery-loop` | `molecular_traceability` | `ABSENT` | — |
+
+### #347 — 6 gaps
+
+| Skill | Criterion | State | Why |
+|---|---|---|---|
 | `git-town-stacked-pr-worker` | `old_canonical_treatment_frozen` | `ABSENT` | — |
 | `git-town-stacked-pr-worker` | `refactor_as_landed_treatment_frozen` | `ABSENT` | — |
 | `git-town-stacked-pr-worker` | `old_strengths_asserted` | `ABSENT` | — |
 | `git-town-stacked-pr-worker` | `matched_hermetic_task` | `ABSENT` | — |
 | `git-town-stacked-pr-worker` | `golden_proof_registered` | `ABSENT` | — |
 | `git-town-stacked-pr-worker` | `molecular_traceability` | `ABSENT` | — |
+
+### #348 — 7 gaps
+
+| Skill | Criterion | State | Why |
+|---|---|---|---|
 | `github-delivery-loop` | `old_canonical_treatment_frozen` | `ABSENT` | — |
 | `github-delivery-loop` | `refactor_as_landed_treatment_frozen` | `ABSENT` | — |
 | `github-delivery-loop` | `old_strengths_asserted` | `ABSENT` | — |
@@ -148,6 +173,11 @@ An issue listed here is not a duplicate of the audit: it already exists in the l
 | `github-delivery-loop` | `matched_hermetic_task` | `ABSENT` | — |
 | `github-delivery-loop` | `golden_proof_registered` | `ABSENT` | — |
 | `github-delivery-loop` | `molecular_traceability` | `ABSENT` | — |
+
+### #349 — 8 gaps
+
+| Skill | Criterion | State | Why |
+|---|---|---|---|
 | `knowledge-continuity` | `old_canonical_treatment_frozen` | `ABSENT` | — |
 | `knowledge-continuity` | `refactor_as_landed_treatment_frozen` | `ABSENT` | — |
 | `knowledge-continuity` | `old_strengths_asserted` | `ABSENT` | — |
@@ -156,17 +186,32 @@ An issue listed here is not a duplicate of the audit: it already exists in the l
 | `knowledge-continuity` | `golden_proof_registered` | `ABSENT` | — |
 | `knowledge-continuity` | `live_model_runtime_ab` | `NOT_IMPLEMENTED` | — |
 | `knowledge-continuity` | `molecular_traceability` | `ABSENT` | — |
+
+### #350 — 6 gaps
+
+| Skill | Criterion | State | Why |
+|---|---|---|---|
 | `procedural-shadow-runtime` | `old_canonical_treatment_frozen` | `ABSENT` | — |
 | `procedural-shadow-runtime` | `refactor_as_landed_treatment_frozen` | `ABSENT` | — |
 | `procedural-shadow-runtime` | `old_strengths_asserted` | `ABSENT` | — |
 | `procedural-shadow-runtime` | `matched_hermetic_task` | `PARTIAL` | Arms and trials are deterministic, but they are not bound to frozen refactor treatments of this Skill. |
 | `procedural-shadow-runtime` | `golden_proof_registered` | `ABSENT` | — |
 | `procedural-shadow-runtime` | `molecular_traceability` | `ABSENT` | — |
+
+### #351 — 5 gaps
+
+| Skill | Criterion | State | Why |
+|---|---|---|---|
 | `repository-capability-audit` | `old_canonical_treatment_frozen` | `ABSENT` | — |
 | `repository-capability-audit` | `refactor_as_landed_treatment_frozen` | `ABSENT` | — |
 | `repository-capability-audit` | `old_strengths_asserted` | `ABSENT` | — |
 | `repository-capability-audit` | `golden_proof_registered` | `ABSENT` | — |
 | `repository-capability-audit` | `molecular_traceability` | `ABSENT` | — |
+
+### #352 — 7 gaps
+
+| Skill | Criterion | State | Why |
+|---|---|---|---|
 | `spatial-loop-systems-engineering` | `old_canonical_treatment_frozen` | `ABSENT` | — |
 | `spatial-loop-systems-engineering` | `refactor_as_landed_treatment_frozen` | `ABSENT` | — |
 | `spatial-loop-systems-engineering` | `old_strengths_asserted` | `ABSENT` | — |
