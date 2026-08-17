@@ -6,14 +6,15 @@ Canonical repository method for refactoring a shared Skill into a portable proce
 
 | Surface | State | Owner / next step |
 |---|---|---|
-| Portable method and typed refactor contract | `IMPLEMENTED` in issue #327 | this branch |
-| Deterministic checker and mutation suite | `NOT_IMPLEMENTED` | issue #328 |
-| Agentic Tech Lead golden-proof ledger | `NOT_IMPLEMENTED` | issue #328, consumes #308/#315 |
+| Portable method and typed refactor contract | `IMPLEMENTED` | issue #327 / PR #330 |
+| Deterministic checker and mutation suite | `PASS` on repository fixtures | issue #328 / this child branch |
+| Agentic Tech Lead structural golden proof | `PASS / DETERMINISTIC_FIXTURE` | #308 exact proof head |
+| Production-shaped real-task proof | `PASS / SYNTHETIC_RUNTIME` | #312 / #315 exact proof head |
 | Registry, entry route and CI admission | `NOT_IMPLEMENTED` | issue #329 |
 | Live model/provider/delivery dominance | `NOT_EXERCISED` | #231/#232/#234/#256/#312 Phase 2 |
 | Merge/promotion | `HUMAN_ADMIT_REQUIRED` | repository authority |
 
-Do not interpret this contract leaf as completed executable proof. It establishes the method and input shape that the child PR must consume.
+The golden proof establishes deterministic structural and synthetic orchestration closure. It does not establish model quality uplift or live delivery.
 
 ## Read order
 
@@ -22,8 +23,9 @@ Do not interpret this contract leaf as completed executable proof. It establishe
 3. `SKILL.md` for the portable refactor state machine and hard laws;
 4. `references/refactor-contract.schema.json` and `references/example-refactor-contract.json`;
 5. `modules/README.md`, then only target modules selected by frozen triggers;
-6. `cases.json` and `evals.json` for proof obligations;
-7. executable assertions and proof ledger after issue #328 lands.
+6. `references/golden-proof.schema.json` and the selected proof ledger;
+7. `scripts/README.md`, `tests/README.md`, and `tests/run-all.sh`;
+8. `cases.json` and `evals.json` for claim and mutation routing.
 
 ## Directory ownership
 
@@ -34,13 +36,14 @@ procedural-core-refactor/
 ├── README.md
 │   └── read order, current integration state, directory/DAG/data-flow index
 ├── modules/
-│   └── target-specific proof instances and domain/provider/consumer specialization
+│   ├── README.md
+│   └── target-specific proof/domain specializations selected by frozen trigger
 ├── references/
 │   └── typed refactor/proof schemas, immutable treatment identities and examples
 ├── scripts/
-│   └── deterministic assertions and receipt emitters; added by issue #328
+│   └── deterministic assertions and receipt emitters
 ├── tests/
-│   └── positive, hollow, mutation and matched A/B controls; added by issue #328
+│   └── positive, hollow, mutation and matched-proof controls
 ├── cases.json
 │   └── case inventory, inputs, expected state transitions and negative controls
 └── evals.json
@@ -69,11 +72,11 @@ Ownership is exclusive. Provider, repository, host, path, credential, live index
 ## DAG responsibilities
 
 ```text
-contract/method leaf (#327)
+contract/method leaf (#327 / PR #330)
   produces refactor schema + PCR-LAW identities
        │
        ▼
-executable proof child (#328)
+executable proof child (#328 / current child)
   consumes schema/laws
   produces checker + mutations + Tech Lead golden proof
        │
@@ -107,26 +110,20 @@ refactor request
 
 Parallelize only when two slices have disjoint write/resource ownership and neither consumes the other's unmerged contracts or bytes. Use a Stack edge only when the child has a real predecessor dependency. One convergence owner updates shared indexes, registry, generated projections or aggregate proof state after prerequisites are verified.
 
-## Evidence ceiling
-
-The contract and example in this leaf establish `STATIC_CONTRACT`. They do not establish checker correctness, target refactor correctness, model behavior, provider health, Git Town synchronization, Forgejo/GitHub delivery, merge or production readiness.
-
-## Verification target
-
-Issue #328 will add the canonical command:
+## Local verification
 
 ```bash
 sh skills/procedural-core-refactor/tests/run-all.sh
 ```
 
-Until that executable owner exists, the truthful state is `NOT_IMPLEMENTED`, not `PASS`.
+The command validates schemas, positive contract/proof semantics, law/module routes, evidence ceilings and planted mutations. Its PASS remains `DETERMINISTIC_FIXTURE`.
 
 ## Traceability
 
 - Epic: #326
-- Contract/method: #327
+- Contract/method: #327 / PR #330
 - Executable proof: #328
 - Repository convergence: #329
-- Tech Lead causal repair: #308
-- Production-shaped A/B: #312 / #315
+- Tech Lead causal repair: #307 / PR #308
+- Production-shaped A/B: #312 / PR #315
 - Remaining live lanes: #231, #232, #234, #256

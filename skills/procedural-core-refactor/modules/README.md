@@ -4,7 +4,7 @@ Modules specialize the portable refactor method for one target Skill or proof fa
 
 ## Selection contract
 
-Every module must declare:
+Every module declares:
 
 ```text
 module_id
@@ -56,8 +56,8 @@ A module may not:
 
 ## Module registry
 
-| Module | Trigger | State |
-|---|---|---|
-| `golden-proof-tech-lead.md` | preserving the Agentic Tech Lead old/B0/B1/B2 and real-task proof chain | `NOT_IMPLEMENTED`; issue #328 |
+| Module | Trigger | Executable owner | Evidence ceiling | State |
+|---|---|---|---|---|
+| [`golden-proof-tech-lead.md`](golden-proof-tech-lead.md) | preserve the Agentic Tech Lead old/B0/B1/B2 and production-shaped deterministic proof chain | `scripts/check_refactor_contract.py` | structural `DETERMINISTIC_FIXTURE`; real-task `SYNTHETIC_RUNTIME` | `PASS` for the bounded proof ledger; live lanes remain `NOT_EXERCISED` |
 
 Future target modules must be indexed here before use. Unindexed module files are repository drift, not hidden capability.

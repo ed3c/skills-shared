@@ -10,67 +10,22 @@
   },
   "objective": {
     "goal": "Preserve the old causal strengths while separating portable procedure from provider/domain modules and binding every runtime transition to executable proof.",
-    "non_goals": [
-      "activate providers",
-      "claim live model uplift",
-      "perform merge or publication"
-    ]
+    "non_goals": ["activate providers", "claim live model uplift", "perform merge or publication"]
   },
   "baseline": {
     "immutable": true,
     "skill_blob": "a01f53592cda98f61b413b4467afa96356fb4ef7",
     "module_blobs": ["812f161c8abbe0517502ea988673197519132c1c"],
-    "strengths": [
-      "explicit T0-T10 causal narrative",
-      "bounded repair and Human delivery authority"
-    ],
-    "known_failures": [
-      "provider and runtime details mixed into the portable body"
-    ]
+    "strengths": ["explicit T0-T10 causal narrative", "bounded repair and Human delivery authority"],
+    "known_failures": ["provider and runtime details mixed into the portable body"]
   },
   "ownership": [
-    {
-      "atom_id": "PORTABLE-PROCEDURE",
-      "kind": "PROCEDURE",
-      "source": "skills/agentic-tech-lead-orchestration/SKILL.md",
-      "owner": "SKILL",
-      "target": "portable states and hard laws"
-    },
-    {
-      "atom_id": "PROVIDER-PROFILE",
-      "kind": "DOMAIN",
-      "source": "skills/agentic-tech-lead-orchestration/SKILL.md",
-      "owner": "MODULE",
-      "target": "modules/domain-profile.md"
-    },
-    {
-      "atom_id": "TASK-CONTRACT",
-      "kind": "CONTRACT",
-      "source": "skills/agentic-tech-lead-orchestration/references/task-contract.schema.json",
-      "owner": "REFERENCE",
-      "target": "typed task packet"
-    },
-    {
-      "atom_id": "CAUSAL-ASSERTION",
-      "kind": "ASSERTION",
-      "source": "skills/agentic-tech-lead-orchestration/scripts/assert_capability_dag.py",
-      "owner": "SCRIPT",
-      "target": "receipt-gated capability transition"
-    },
-    {
-      "atom_id": "REAL-TASK-AB",
-      "kind": "TEST",
-      "source": "skills/agentic-tech-lead-orchestration/tests/real_task_ab.py",
-      "owner": "TEST",
-      "target": "matched production-shaped deterministic task"
-    },
-    {
-      "atom_id": "LIVE-PROVIDERS",
-      "kind": "LIVE_RUNTIME",
-      "source": "skills/agentic-tech-lead-orchestration/modules/domain-profile.md",
-      "owner": "CONSUMER_RUNTIME",
-      "target": "exact-subject provider and delivery receipts"
-    }
+    {"atom_id": "PORTABLE-PROCEDURE", "kind": "PROCEDURE", "source": "skills/agentic-tech-lead-orchestration/SKILL.md", "owner": "SKILL", "target": "portable states and hard laws"},
+    {"atom_id": "PROVIDER-PROFILE", "kind": "DOMAIN", "source": "skills/agentic-tech-lead-orchestration/SKILL.md", "owner": "MODULE", "target": "modules/domain-profile.md"},
+    {"atom_id": "TASK-CONTRACT", "kind": "CONTRACT", "source": "skills/agentic-tech-lead-orchestration/references/task-contract.schema.json", "owner": "REFERENCE", "target": "typed task packet"},
+    {"atom_id": "CAUSAL-ASSERTION", "kind": "ASSERTION", "source": "skills/agentic-tech-lead-orchestration/scripts/assert_capability_dag.py", "owner": "SCRIPT", "target": "receipt-gated capability transition"},
+    {"atom_id": "REAL-TASK-AB", "kind": "TEST", "source": "skills/agentic-tech-lead-orchestration/tests/real_task_ab.py", "owner": "TEST", "target": "matched production-shaped deterministic task"},
+    {"atom_id": "LIVE-PROVIDERS", "kind": "LIVE_RUNTIME", "source": "skills/agentic-tech-lead-orchestration/modules/domain-profile.md", "owner": "CONSUMER_RUNTIME", "target": "exact-subject provider and delivery receipts"}
   ],
   "laws": [
     {"id": "PCR-LAW-001", "assertion_owner": "skills/procedural-core-refactor/scripts/check_refactor_contract.py", "test_owner": "skills/procedural-core-refactor/tests/selftest.py", "positive_control": "exact baseline identities", "negative_control": "mutable baseline"},
@@ -89,67 +44,52 @@
     {
       "module_id": "golden-proof-tech-lead",
       "path": "skills/procedural-core-refactor/modules/golden-proof-tech-lead.md",
-      "selection": "NOT_APPLICABLE",
-      "trigger_evidence": [],
+      "selection": "REQUIRED",
+      "trigger_evidence": ["preserve Agentic Tech Lead old/B0/B1/B2 and real-task proof"],
       "predecessor_states": ["STRUCTURAL_AB", "REAL_TASK_AB"],
       "produces_state": "GOLDEN_PROOF_ADMITTED",
-      "fallback": "SKIP",
-      "evidence_ceiling": "NOT_IMPLEMENTED",
+      "fallback": "STOP",
+      "evidence_ceiling": "PASS",
       "authority_widening": false
     }
   ],
   "treatments": [
     {"arm": "A_OLD_MONOLITH", "role": "OLD_BASELINE", "blob": "a01f53592cda98f61b413b4467afa96356fb4ef7", "immutable": true},
     {"arm": "B0_REFACTOR_AS_LANDED", "role": "REFACTOR_AS_LANDED", "blob": "8b2da7443aff7a9f53412b5af280048203bbd5e9", "immutable": true},
-    {"arm": "B1_REACHABILITY_REPAIRED", "role": "REPAIRED", "blob": "51c3fd81749598957f2b993c4d31c3b4c8c277c1", "immutable": true}
+    {"arm": "B1_REACHABILITY_REPAIRED", "role": "REPAIRED", "blob": "51c3fd81749598957f2b993c4d31c3b4c8c277c1", "immutable": true},
+    {"arm": "B2_CAUSAL_DAG_REPAIRED", "role": "CURRENT_CANDIDATE", "blob": "3fd01571b49b1dfd1c9256661fe4aafe3ecc6e99", "immutable": true}
   ],
   "ab": {
     "structural_required": true,
-    "real_task_claim": false,
-    "matched": false,
-    "same_task": false,
-    "same_base": false,
-    "same_tests": false,
-    "same_budgets": false,
-    "same_carrier": false,
+    "real_task_claim": true,
+    "matched": true,
+    "same_task": true,
+    "same_base": true,
+    "same_tests": true,
+    "same_budgets": true,
+    "same_carrier": true,
     "failed_arms_retained": true,
     "global_objective_required": true,
     "cleanup_required": true
   },
   "evidence": {
     "contract": "IMPLEMENTED",
-    "structural_ab": "NOT_IMPLEMENTED",
-    "real_task_ab": "NOT_IMPLEMENTED",
+    "structural_ab": "PASS",
+    "real_task_ab": "PASS",
     "live_model": "NOT_EXERCISED",
     "provider_runtime": "NOT_EXERCISED",
     "delivery": "NOT_EXERCISED",
     "merge": "HUMAN_ADMIT_REQUIRED"
   },
   "authority": {
-    "automation_forbidden": [
-      "merge",
-      "publication",
-      "provider_activation",
-      "permission_change",
-      "semantic_conflict_resolution",
-      "promotion",
-      "release",
-      "force_push"
-    ],
-    "human_owned": [
-      "merge",
-      "publication admission",
-      "provider activation",
-      "permission change",
-      "semantic conflict resolution",
-      "promotion and release"
-    ]
+    "automation_forbidden": ["merge", "publication", "provider_activation", "permission_change", "semantic_conflict_resolution", "promotion", "release", "force_push"],
+    "human_owned": ["merge", "publication admission", "provider activation", "permission change", "semantic conflict resolution", "promotion and release"]
   },
   "trace": {
-    "issues": [326, 327, 328, 329],
-    "pull_requests": [],
-    "branches": ["refactor/327-procedural-core-standard"],
-    "exact_heads": [],
+    "issues": [307, 312, 326, 327, 328, 329],
+    "pull_requests": [308, 315, 330],
+    "branches": ["refactor/327-procedural-core-standard", "refactor/328-procedural-core-proof"],
+    "exact_heads": ["504c18f10d3380be4874a59f7cfad5c290daa93f", "403a4f041c5f8c07b0d7c8bb0ef2ccc44ac0f113", "cffa44526d0d3e895256df36c2c7a1628fff49e2"],
     "ci_runs": []
   }
 }

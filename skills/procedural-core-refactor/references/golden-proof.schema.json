@@ -1,0 +1,199 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skills-shared.invalid/procedural-core-refactor/golden-proof.schema.json",
+  "title": "Procedural Core Refactor Golden Proof",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "target",
+    "treatments",
+    "structural_ab",
+    "real_task_ab",
+    "evidence",
+    "authority",
+    "trace",
+    "claims_not_proven"
+  ],
+  "$defs": {
+    "sha40": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "state": {
+      "enum": [
+        "IMPLEMENTED",
+        "PASS",
+        "FAIL",
+        "ABSENT",
+        "NOT_IMPLEMENTED",
+        "NOT_EXERCISED",
+        "SKIPPED_BY_POLICY",
+        "INSUFFICIENT_EVIDENCE",
+        "CONTESTED",
+        "HUMAN_ADMIT_REQUIRED"
+      ]
+    }
+  },
+  "properties": {
+    "schema": {"const": "procedural-core-refactor/golden-proof/v1"},
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "skill_path"],
+      "properties": {
+        "repository": {"type": "string", "minLength": 1},
+        "skill_path": {"type": "string", "minLength": 1}
+      }
+    },
+    "treatments": {
+      "type": "array",
+      "minItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["arm", "role", "blob", "immutable", "strengths", "regressions"],
+        "properties": {
+          "arm": {"enum": ["A_OLD_MONOLITH", "B0_REFACTOR_AS_LANDED", "B1_REACHABILITY_REPAIRED", "B2_CAUSAL_DAG_REPAIRED"]},
+          "role": {"enum": ["OLD_BASELINE", "REFACTOR_AS_LANDED", "REPAIRED", "CURRENT_CANDIDATE"]},
+          "blob": {"$ref": "#/$defs/sha40"},
+          "immutable": {"const": true},
+          "strengths": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+          "regressions": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true}
+        }
+      }
+    },
+    "structural_ab": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "evidence_class", "proof_head", "dimensions", "scores", "old_strengths_preserved", "landed_regression_visible", "b2_dominates_tested_dimensions"],
+      "properties": {
+        "state": {"const": "PASS"},
+        "evidence_class": {"const": "DETERMINISTIC_FIXTURE"},
+        "proof_head": {"$ref": "#/$defs/sha40"},
+        "dimensions": {"type": "integer", "minimum": 1},
+        "scores": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["A_OLD_MONOLITH", "B0_REFACTOR_AS_LANDED", "B1_REACHABILITY_REPAIRED", "B2_CAUSAL_DAG_REPAIRED"],
+          "properties": {
+            "A_OLD_MONOLITH": {"type": "integer", "minimum": 0},
+            "B0_REFACTOR_AS_LANDED": {"type": "integer", "minimum": 0},
+            "B1_REACHABILITY_REPAIRED": {"type": "integer", "minimum": 0},
+            "B2_CAUSAL_DAG_REPAIRED": {"type": "integer", "minimum": 0}
+          }
+        },
+        "old_strengths_preserved": {"const": true},
+        "landed_regression_visible": {"const": true},
+        "b2_dominates_tested_dimensions": {"const": true}
+      }
+    },
+    "real_task_ab": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "evidence_class",
+        "proof_head",
+        "same_task",
+        "same_base",
+        "same_tests",
+        "same_budgets",
+        "same_carrier",
+        "arms",
+        "output_equivalence_for_executed_arms",
+        "failed_candidates_retained",
+        "parallel_worktrees",
+        "subprocess_workers",
+        "checkpoint_resume",
+        "wrong_base_refused",
+        "local_pass_global_fail_refused",
+        "global_objective",
+        "cleanup"
+      ],
+      "properties": {
+        "state": {"const": "PASS"},
+        "evidence_class": {"const": "SYNTHETIC_RUNTIME"},
+        "proof_head": {"$ref": "#/$defs/sha40"},
+        "same_task": {"const": true},
+        "same_base": {"const": true},
+        "same_tests": {"const": true},
+        "same_budgets": {"const": true},
+        "same_carrier": {"const": true},
+        "arms": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["A_OLD_MONOLITH", "B0_REFACTOR_AS_LANDED", "B1_REACHABILITY_REPAIRED", "B2_CAUSAL_DAG_REPAIRED"],
+          "properties": {
+            "A_OLD_MONOLITH": {"enum": ["PASS", "FAIL", "NOT_EXERCISED"]},
+            "B0_REFACTOR_AS_LANDED": {"enum": ["BLOCKED_DISPATCH_ROUTE_ABSENT", "FAIL", "NOT_EXERCISED"]},
+            "B1_REACHABILITY_REPAIRED": {"enum": ["PASS", "FAIL", "NOT_EXERCISED"]},
+            "B2_CAUSAL_DAG_REPAIRED": {"enum": ["PASS", "FAIL", "NOT_EXERCISED"]}
+          }
+        },
+        "output_equivalence_for_executed_arms": {"const": true},
+        "failed_candidates_retained": {"const": true},
+        "parallel_worktrees": {"const": true},
+        "subprocess_workers": {"const": true},
+        "checkpoint_resume": {"const": true},
+        "wrong_base_refused": {"const": true},
+        "local_pass_global_fail_refused": {"const": true},
+        "global_objective": {"const": "PASS"},
+        "cleanup": {"const": "CLEAN"}
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["live_model", "provider_runtime", "git_town", "forgejo", "publication", "merge"],
+      "properties": {
+        "live_model": {"$ref": "#/$defs/state"},
+        "provider_runtime": {"$ref": "#/$defs/state"},
+        "git_town": {"$ref": "#/$defs/state"},
+        "forgejo": {"$ref": "#/$defs/state"},
+        "publication": {"$ref": "#/$defs/state"},
+        "merge": {"$ref": "#/$defs/state"}
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["merge", "publication", "provider_activation", "permission_change", "semantic_conflict_resolution", "promotion"],
+      "properties": {
+        "merge": {"const": false},
+        "publication": {"const": false},
+        "provider_activation": {"const": false},
+        "permission_change": {"const": false},
+        "semantic_conflict_resolution": {"const": false},
+        "promotion": {"const": false}
+      }
+    },
+    "trace": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["issues", "pull_requests", "branches", "exact_heads", "ci_runs"],
+      "properties": {
+        "issues": {"type": "array", "minItems": 1, "items": {"type": "integer", "minimum": 1}, "uniqueItems": true},
+        "pull_requests": {"type": "array", "minItems": 1, "items": {"type": "integer", "minimum": 1}, "uniqueItems": true},
+        "branches": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+        "exact_heads": {"type": "array", "minItems": 2, "items": {"$ref": "#/$defs/sha40"}, "uniqueItems": true},
+        "ci_runs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["run_id", "head", "state"],
+            "properties": {
+              "run_id": {"type": ["integer", "null"], "minimum": 1},
+              "head": {"$ref": "#/$defs/sha40"},
+              "state": {"$ref": "#/$defs/state"}
+            }
+          }
+        }
+      }
+    },
+    "claims_not_proven": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true
+    }
+  }
+}

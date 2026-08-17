@@ -23,7 +23,7 @@
         "live model/provider/delivery states cannot be inferred",
         "issue, branch, PR, exact-head and CI traceability remains explicit"
       ],
-      "expected": "the positive contract passes after issue #328 lands; every declared mutation is refused; contract-only evidence remains below live runtime/model/delivery PASS"
+      "expected": "the positive contract and proof pass; every declared mutation is refused; deterministic evidence remains below live runtime/model/delivery PASS"
     },
     {
       "id": "PCR-GOLDEN-PROOF-1",
@@ -44,11 +44,13 @@
   ],
   "evidence_boundary": {
     "established": [
-      "the portable refactor method and typed contract shape in issue #327"
+      "the portable refactor method and typed contract shape",
+      "deterministic contract/proof validation and planted mutation closure",
+      "preservation of the Agentic Tech Lead structural proof as DETERMINISTIC_FIXTURE",
+      "preservation of the matched linked-worktree/subprocess proof as SYNTHETIC_RUNTIME"
     ],
     "not_established": [
-      "checker or mutation correctness until issue #328 lands",
-      "registry and CI admission until issue #329 lands",
+      "registry and repository CI admission until issue #329 lands",
       "live model/provider behavior, Git Town/Forgejo delivery, merge, release or production readiness"
     ]
   }

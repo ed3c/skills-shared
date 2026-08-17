@@ -3,8 +3,9 @@
 These references are host-neutral and consumer-independent.
 
 - `refactor-contract.schema.json` defines the portable input contract for one Skill refactor.
-- `example-refactor-contract.json` is a positive static example. It does not prove a checker, target refactor, runtime, provider or delivery lane executed.
-- `golden-proof.schema.json` and `tech-lead-golden-proof.json` are introduced by issue #328 after the executable checker and proof subjects are available.
+- `example-refactor-contract.json` binds the Agentic Tech Lead worked proof to the portable law/ownership contract.
+- `golden-proof.schema.json` separates immutable treatments, structural A/B, synthetic real-task A/B, live evidence states, authority and traceability.
+- `tech-lead-golden-proof.json` preserves the exact old/B0/B1/B2 treatment blobs plus #308/#315 proof heads and explicit non-claims.
 
 ## Ownership
 
@@ -15,10 +16,20 @@ References may contain typed target identifiers, immutable content digests, evid
 ```text
 exact refactor request
 → refactor-contract.schema.json
-→ ownership and law manifest
+→ ownership and PCR-LAW manifest
 → immutable treatment references
-→ assertion and A/B receipts
-→ golden-proof contract
+→ structural A/B and real-task records
+→ golden-proof.schema.json
+→ check_refactor_contract.py
+→ deterministic proof receipt
 ```
 
-A schema-valid document remains `STATIC_CONTRACT`. Only an owning executable assertion can advance an assertion state, and only exact runtime/provider/Human receipts can advance their corresponding higher evidence class.
+## Evidence ceiling
+
+- schema-valid contract: `STATIC_CONTRACT`;
+- checker/mutation closure: `DETERMINISTIC_FIXTURE`;
+- linked-worktree/subprocess canary: `SYNTHETIC_RUNTIME`;
+- live model/provider/delivery: still `NOT_EXERCISED` until exact external receipts exist;
+- merge/promotion: `HUMAN_ADMIT_REQUIRED`.
+
+A lower evidence class cannot satisfy a higher claim.

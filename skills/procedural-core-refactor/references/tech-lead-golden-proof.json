@@ -1,0 +1,150 @@
+{
+  "schema": "procedural-core-refactor/golden-proof/v1",
+  "target": {
+    "repository": "ed3c/skills-shared",
+    "skill_path": "skills/agentic-tech-lead-orchestration/SKILL.md"
+  },
+  "treatments": [
+    {
+      "arm": "A_OLD_MONOLITH",
+      "role": "OLD_BASELINE",
+      "blob": "a01f53592cda98f61b413b4467afa96356fb4ef7",
+      "immutable": true,
+      "strengths": [
+        "explicit T0-T10 causal narrative",
+        "pre-dispatch task assertion",
+        "bounded repair and Human delivery authority"
+      ],
+      "regressions": [
+        "provider and runtime assumptions mixed into the portable body",
+        "global-objective retention was not a machine-scored structural dimension"
+      ]
+    },
+    {
+      "arm": "B0_REFACTOR_AS_LANDED",
+      "role": "REFACTOR_AS_LANDED",
+      "blob": "8b2da7443aff7a9f53412b5af280048203bbd5e9",
+      "immutable": true,
+      "strengths": [
+        "provider-neutral portable core",
+        "global-objective retention"
+      ],
+      "regressions": [
+        "pre-dispatch semantic assertion route absent",
+        "task assertion not ordered before Workers",
+        "concrete module trigger routing absent",
+        "module self-activation not refused"
+      ]
+    },
+    {
+      "arm": "B1_REACHABILITY_REPAIRED",
+      "role": "REPAIRED",
+      "blob": "51c3fd81749598957f2b993c4d31c3b4c8c277c1",
+      "immutable": true,
+      "strengths": [
+        "task shape and semantic gates restored",
+        "concrete modules reachable from frozen routing",
+        "module self-activation refused"
+      ],
+      "regressions": [
+        "module contribution remained reachable but not receipt-gated by predecessor consumption"
+      ]
+    },
+    {
+      "arm": "B2_CAUSAL_DAG_REPAIRED",
+      "role": "CURRENT_CANDIDATE",
+      "blob": "3fd01571b49b1dfd1c9256661fe4aafe3ecc6e99",
+      "immutable": true,
+      "strengths": [
+        "provider-neutral portable core",
+        "task shape and semantic gates before Worker admission",
+        "trigger-selected concrete modules",
+        "predecessor and receipt-gated capability transitions",
+        "global objective and Local Handoff Execution Queue retained",
+        "fixture evidence refused as live state"
+      ],
+      "regressions": []
+    }
+  ],
+  "structural_ab": {
+    "state": "PASS",
+    "evidence_class": "DETERMINISTIC_FIXTURE",
+    "proof_head": "504c18f10d3380be4874a59f7cfad5c290daa93f",
+    "dimensions": 11,
+    "scores": {
+      "A_OLD_MONOLITH": 9,
+      "B0_REFACTOR_AS_LANDED": 6,
+      "B1_REACHABILITY_REPAIRED": 10,
+      "B2_CAUSAL_DAG_REPAIRED": 11
+    },
+    "old_strengths_preserved": true,
+    "landed_regression_visible": true,
+    "b2_dominates_tested_dimensions": true
+  },
+  "real_task_ab": {
+    "state": "PASS",
+    "evidence_class": "SYNTHETIC_RUNTIME",
+    "proof_head": "403a4f041c5f8c07b0d7c8bb0ef2ccc44ac0f113",
+    "same_task": true,
+    "same_base": true,
+    "same_tests": true,
+    "same_budgets": true,
+    "same_carrier": true,
+    "arms": {
+      "A_OLD_MONOLITH": "PASS",
+      "B0_REFACTOR_AS_LANDED": "BLOCKED_DISPATCH_ROUTE_ABSENT",
+      "B1_REACHABILITY_REPAIRED": "PASS",
+      "B2_CAUSAL_DAG_REPAIRED": "PASS"
+    },
+    "output_equivalence_for_executed_arms": true,
+    "failed_candidates_retained": true,
+    "parallel_worktrees": true,
+    "subprocess_workers": true,
+    "checkpoint_resume": true,
+    "wrong_base_refused": true,
+    "local_pass_global_fail_refused": true,
+    "global_objective": "PASS",
+    "cleanup": "CLEAN"
+  },
+  "evidence": {
+    "live_model": "NOT_EXERCISED",
+    "provider_runtime": "NOT_EXERCISED",
+    "git_town": "NOT_EXERCISED",
+    "forgejo": "NOT_EXERCISED",
+    "publication": "NOT_EXERCISED",
+    "merge": "HUMAN_ADMIT_REQUIRED"
+  },
+  "authority": {
+    "merge": false,
+    "publication": false,
+    "provider_activation": false,
+    "permission_change": false,
+    "semantic_conflict_resolution": false,
+    "promotion": false
+  },
+  "trace": {
+    "issues": [307, 312, 326, 328],
+    "pull_requests": [308, 315],
+    "branches": [
+      "fix/307-tech-lead-runtime-reachability",
+      "agent/312-tech-lead-real-task-ab"
+    ],
+    "exact_heads": [
+      "504c18f10d3380be4874a59f7cfad5c290daa93f",
+      "403a4f041c5f8c07b0d7c8bb0ef2ccc44ac0f113"
+    ],
+    "ci_runs": [
+      {"run_id": null, "head": "504c18f10d3380be4874a59f7cfad5c290daa93f", "state": "NOT_EXERCISED"},
+      {"run_id": null, "head": "403a4f041c5f8c07b0d7c8bb0ef2ccc44ac0f113", "state": "NOT_EXERCISED"}
+    ]
+  },
+  "claims_not_proven": [
+    "live Claude, Codex, Serena or other model behavioral uplift",
+    "live grepai, SCIP, Tree-sitter or provider adapter execution on the matched task",
+    "Git Town Stack or restack correctness",
+    "Forgejo or GitHub publication",
+    "semantic conflict auto-resolution",
+    "cross-repository or cross-model portability",
+    "merge, release, production promotion or production readiness"
+  ]
+}
