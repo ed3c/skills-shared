@@ -43,7 +43,7 @@ root_count="$(git -C "${clean}" rev-list --max-parents=0 --all | wc -l | tr -d '
   exit 2
 }
 
-tmp="$(mktemp -d)"
+tmp="$(mktemp -d "${TMPDIR:-/tmp}/tmp.XXXXXXXX")"
 trap 'rm -rf "${tmp}"' EXIT
 git init -q --bare "${tmp}/graph.git"
 git -C "${tmp}/graph.git" fetch -q --no-tags "${clean}" HEAD:refs/heads/clean

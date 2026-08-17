@@ -1,0 +1,1053 @@
+{
+  "agent": "/Users/neon/.local/bin/claude",
+  "attempts": [
+    {
+      "allowed_paths": [
+        "src/celsius.py"
+      ],
+      "attempt_id": "att-7db311733331",
+      "base_subject_sha": "684f2afcf429cf33710c6655b58760b6b4776fbf",
+      "branch": "worker/celsius",
+      "checkpoint": {
+        "digest": "45662073482cdac8a28fc669c7904f111554aa2c5d2c9864c02d4e91510633ba",
+        "sequence": 2
+      },
+      "dependencies": [],
+      "heartbeats": [
+        {
+          "at": "2026-08-17T14:32:09Z",
+          "sequence": 1
+        },
+        {
+          "at": "2026-08-17T14:32:17Z",
+          "sequence": 2
+        }
+      ],
+      "lease": {
+        "expiry": "2026-08-17T14:47:09Z",
+        "heartbeat_sequence": 2,
+        "status": "RELEASED"
+      },
+      "logical_id": "celsius",
+      "stack_class": "sibling",
+      "state": "INTEGRATED",
+      "task_id": "task-1c296da7-celsius",
+      "worktree_identity": "/var/folders/l6/44bf7nvs64j60f1mpyy88hdm0000gn/T/scheduler-canary-rbym1i3_/worktrees/celsius"
+    },
+    {
+      "allowed_paths": [
+        "src/slug.py"
+      ],
+      "attempt_id": "att-28af2dba682b",
+      "base_subject_sha": "684f2afcf429cf33710c6655b58760b6b4776fbf",
+      "branch": "worker/slug",
+      "checkpoint": {
+        "digest": "5c7ca714713668550860cd4107227a52f7fcac018757a6db6dcb2f24fdf1b12b",
+        "sequence": 2
+      },
+      "dependencies": [],
+      "heartbeats": [
+        {
+          "at": "2026-08-17T14:32:17Z",
+          "sequence": 1
+        },
+        {
+          "at": "2026-08-17T14:32:26Z",
+          "sequence": 2
+        }
+      ],
+      "lease": {
+        "expiry": "2026-08-17T14:47:17Z",
+        "heartbeat_sequence": 2,
+        "status": "RELEASED"
+      },
+      "logical_id": "slug",
+      "stack_class": "sibling",
+      "state": "INTEGRATED",
+      "task_id": "task-1c296da7-slug",
+      "worktree_identity": "/var/folders/l6/44bf7nvs64j60f1mpyy88hdm0000gn/T/scheduler-canary-rbym1i3_/worktrees/slug"
+    },
+    {
+      "allowed_paths": [
+        "src/toolkit.py"
+      ],
+      "attempt_id": "att-e507ed26d7ca",
+      "base_subject_sha": "8c32b9be5795151a6df5589265fe710b0977de83",
+      "branch": "worker/toolkit",
+      "checkpoint": {
+        "digest": "cb80e61fa4e662823f94bd7569dbc16ff2a28e9a332ac62b1a43da7d6c637464",
+        "sequence": 2
+      },
+      "dependencies": [
+        "celsius",
+        "slug"
+      ],
+      "heartbeats": [
+        {
+          "at": "2026-08-17T14:32:27Z",
+          "sequence": 1
+        },
+        {
+          "at": "2026-08-17T14:32:39Z",
+          "sequence": 2
+        }
+      ],
+      "lease": {
+        "expiry": "2026-08-17T14:47:27Z",
+        "heartbeat_sequence": 2,
+        "status": "RELEASED"
+      },
+      "logical_id": "toolkit",
+      "stack_class": "convergence",
+      "state": "INTEGRATED",
+      "task_id": "task-1c296da7-toolkit",
+      "worktree_identity": "/var/folders/l6/44bf7nvs64j60f1mpyy88hdm0000gn/T/scheduler-canary-rbym1i3_/worktrees/toolkit"
+    },
+    {
+      "allowed_paths": [
+        "src/planted-stale.py"
+      ],
+      "attempt_id": "att-eaafc9a8d585",
+      "base_subject_sha": "0000000000000000000000000000000000000000",
+      "branch": "worker/planted-stale",
+      "checkpoint": {
+        "digest": null,
+        "sequence": 0
+      },
+      "dependencies": [],
+      "heartbeats": [],
+      "lease": {
+        "expiry": null,
+        "heartbeat_sequence": 0,
+        "status": null
+      },
+      "logical_id": "planted-stale",
+      "stack_class": "sibling",
+      "state": "STALE_ATTEMPT",
+      "task_id": "task-1c296da7-planted-stale"
+    },
+    {
+      "allowed_paths": [
+        "src/planted-expired.py"
+      ],
+      "attempt_id": "att-8c37e019a365",
+      "base_subject_sha": "8d2469e2a8676559f9a96a5ce8d5a4d3b5f4e728",
+      "branch": "worker/planted-expired",
+      "checkpoint": {
+        "digest": null,
+        "sequence": 0
+      },
+      "dependencies": [],
+      "heartbeats": [],
+      "lease": {
+        "expiry": "2026-08-17T14:31:39Z",
+        "heartbeat_sequence": 3,
+        "status": "EXPIRED"
+      },
+      "logical_id": "planted-expired",
+      "stack_class": "sibling",
+      "state": "LEASE_EXPIRED",
+      "task_id": "task-1c296da7-planted-expired"
+    },
+    {
+      "allowed_paths": [
+        "src/planted-straggler.py"
+      ],
+      "attempt_id": "att-22e1ea567de4",
+      "base_subject_sha": "8d2469e2a8676559f9a96a5ce8d5a4d3b5f4e728",
+      "branch": "worker/planted-straggler",
+      "checkpoint": {
+        "digest": null,
+        "sequence": 0
+      },
+      "dependencies": [],
+      "heartbeats": [],
+      "lease": {
+        "expiry": null,
+        "heartbeat_sequence": 0,
+        "status": null
+      },
+      "logical_id": "planted-straggler",
+      "stack_class": "sibling",
+      "state": "STRAGGLER_DETACHED",
+      "task_id": "task-1c296da7-planted-straggler"
+    },
+    {
+      "allowed_paths": [
+        "src/planted-retry.py"
+      ],
+      "attempt_id": "att-763509772308",
+      "base_subject_sha": "8d2469e2a8676559f9a96a5ce8d5a4d3b5f4e728",
+      "branch": "worker/planted-retry",
+      "checkpoint": {
+        "digest": null,
+        "sequence": 0
+      },
+      "dependencies": [],
+      "heartbeats": [],
+      "lease": {
+        "expiry": null,
+        "heartbeat_sequence": 0,
+        "status": null
+      },
+      "logical_id": "planted-retry",
+      "stack_class": "sibling",
+      "state": "SUPERSEDED",
+      "task_id": "task-1c296da7-planted-retry"
+    },
+    {
+      "allowed_paths": [
+        "src/planted-retry-2.py"
+      ],
+      "attempt_id": "att-bb8769aa66b4",
+      "base_subject_sha": "8d2469e2a8676559f9a96a5ce8d5a4d3b5f4e728",
+      "branch": "worker/planted-retry-2",
+      "checkpoint": {
+        "digest": null,
+        "sequence": 0
+      },
+      "dependencies": [],
+      "heartbeats": [],
+      "lease": {
+        "expiry": null,
+        "heartbeat_sequence": 0,
+        "status": null
+      },
+      "logical_id": "planted-retry-2",
+      "stack_class": "sibling",
+      "state": "PLANNED",
+      "task_id": "task-1c296da7-planted-retry"
+    },
+    {
+      "allowed_paths": [
+        "src/planted-cancelled.py"
+      ],
+      "attempt_id": "att-e53065d2b9bb",
+      "base_subject_sha": "8d2469e2a8676559f9a96a5ce8d5a4d3b5f4e728",
+      "branch": "worker/planted-cancelled",
+      "checkpoint": {
+        "digest": null,
+        "sequence": 0
+      },
+      "dependencies": [],
+      "heartbeats": [],
+      "lease": {
+        "expiry": null,
+        "heartbeat_sequence": 0,
+        "status": null
+      },
+      "logical_id": "planted-cancelled",
+      "stack_class": "sibling",
+      "state": "CANCELLED",
+      "task_id": "task-1c296da7-planted-cancelled"
+    },
+    {
+      "allowed_paths": [
+        "src/celsius.py"
+      ],
+      "attempt_id": "att-ea86f128e67a",
+      "base_subject_sha": "8d2469e2a8676559f9a96a5ce8d5a4d3b5f4e728",
+      "branch": "worker/planted-conflict",
+      "checkpoint": {
+        "digest": null,
+        "sequence": 0
+      },
+      "dependencies": [],
+      "heartbeats": [],
+      "lease": {
+        "expiry": null,
+        "heartbeat_sequence": 0,
+        "status": null
+      },
+      "logical_id": "planted-conflict",
+      "stack_class": "sibling",
+      "state": "BLOCKED_CONFLICT",
+      "task_id": "task-1c296da7-planted-conflict"
+    }
+  ],
+  "budget_ledger": {
+    "attempt_limits": {
+      "cost_usd": 2.0,
+      "tokens": 120000,
+      "turns": 40,
+      "wall_clock_seconds": 900
+    },
+    "attempts": [
+      {
+        "attempt_id": "att-7db311733331",
+        "observed": [
+          "cost_usd",
+          "tokens",
+          "turns",
+          "wall_clock_seconds"
+        ],
+        "over_budget": [],
+        "spend": {
+          "cost_usd": 0.49380749999999995,
+          "tokens": 46530,
+          "turns": 2,
+          "wall_clock_seconds": 8.335
+        }
+      },
+      {
+        "attempt_id": "att-28af2dba682b",
+        "observed": [
+          "cost_usd",
+          "tokens",
+          "turns",
+          "wall_clock_seconds"
+        ],
+        "over_budget": [],
+        "spend": {
+          "cost_usd": 0.493962,
+          "tokens": 46534,
+          "turns": 2,
+          "wall_clock_seconds": 9.029
+        }
+      },
+      {
+        "attempt_id": "att-e507ed26d7ca",
+        "observed": [
+          "cost_usd",
+          "tokens",
+          "turns",
+          "wall_clock_seconds"
+        ],
+        "over_budget": [],
+        "spend": {
+          "cost_usd": 0.5241645,
+          "tokens": 93435,
+          "turns": 3,
+          "wall_clock_seconds": 12.441
+        }
+      },
+      {
+        "attempt_id": "att-eaafc9a8d585",
+        "observed": [
+          "cost_usd",
+          "tokens",
+          "turns",
+          "wall_clock_seconds"
+        ],
+        "over_budget": [],
+        "spend": {
+          "cost_usd": 0,
+          "tokens": 0,
+          "turns": 0,
+          "wall_clock_seconds": 0
+        }
+      },
+      {
+        "attempt_id": "att-8c37e019a365",
+        "observed": [
+          "cost_usd",
+          "tokens",
+          "turns",
+          "wall_clock_seconds"
+        ],
+        "over_budget": [],
+        "spend": {
+          "cost_usd": 0,
+          "tokens": 0,
+          "turns": 0,
+          "wall_clock_seconds": 0
+        }
+      },
+      {
+        "attempt_id": "att-22e1ea567de4",
+        "observed": [
+          "cost_usd",
+          "tokens",
+          "turns",
+          "wall_clock_seconds"
+        ],
+        "over_budget": [
+          "wall_clock_seconds"
+        ],
+        "spend": {
+          "cost_usd": 0,
+          "tokens": 0,
+          "turns": 0,
+          "wall_clock_seconds": 901
+        }
+      },
+      {
+        "attempt_id": "att-763509772308",
+        "observed": [
+          "cost_usd",
+          "tokens",
+          "turns",
+          "wall_clock_seconds"
+        ],
+        "over_budget": [],
+        "spend": {
+          "cost_usd": 0,
+          "tokens": 0,
+          "turns": 0,
+          "wall_clock_seconds": 0
+        }
+      },
+      {
+        "attempt_id": "att-bb8769aa66b4",
+        "observed": [
+          "cost_usd",
+          "tokens",
+          "turns",
+          "wall_clock_seconds"
+        ],
+        "over_budget": [],
+        "spend": {
+          "cost_usd": 0,
+          "tokens": 0,
+          "turns": 0,
+          "wall_clock_seconds": 0
+        }
+      },
+      {
+        "attempt_id": "att-e53065d2b9bb",
+        "observed": [
+          "cost_usd",
+          "tokens",
+          "turns",
+          "wall_clock_seconds"
+        ],
+        "over_budget": [],
+        "spend": {
+          "cost_usd": 0,
+          "tokens": 0,
+          "turns": 0,
+          "wall_clock_seconds": 0
+        }
+      },
+      {
+        "attempt_id": "att-ea86f128e67a",
+        "observed": [
+          "cost_usd",
+          "tokens",
+          "turns",
+          "wall_clock_seconds"
+        ],
+        "over_budget": [],
+        "spend": {
+          "cost_usd": 0,
+          "tokens": 0,
+          "turns": 0,
+          "wall_clock_seconds": 0
+        }
+      }
+    ],
+    "dimensions": [
+      "cost_usd",
+      "tokens",
+      "turns",
+      "wall_clock_seconds"
+    ],
+    "global_limits": {
+      "cost_usd": 6.0,
+      "tokens": 600000,
+      "turns": 200,
+      "wall_clock_seconds": 3600
+    },
+    "global_over_budget": [],
+    "totals": {
+      "cost_usd": 1.5119340000000001,
+      "tokens": 186499,
+      "turns": 7,
+      "wall_clock_seconds": 930.805
+    },
+    "unobserved_dimensions": [],
+    "why_unobserved_is_not_zero": "A dimension this harness could not read is listed here and excluded from enforcement. Recording it as a spend of zero would let every budget reconcile and every cap pass, which is the failure this ledger exists to make visible."
+  },
+  "declared_non_claims": [
+    "no throughput, latency or cost advantage over a single Builder is measured",
+    "the Agent's code quality is judged only by the oracles listed here",
+    "a disposable subject is not a production repository",
+    "BLOCKED_AUTHORITY and the two rejection states are not produced by this canary; they belong to admission paths this plan does not exercise",
+    "tool calls are not counted; the Agent reports turns and this harness does not see individual calls, so no tool-call cap is claimed"
+  ],
+  "duration_ms": 30464,
+  "ended_at": "2026-08-17T14:32:39Z",
+  "happy_path": [
+    "PLANNED",
+    "ADMITTED",
+    "ASSIGNED",
+    "LEASED",
+    "RUNNING",
+    "CHECKPOINTED",
+    "RESULT_READY",
+    "RESULT_VERIFIED",
+    "INTEGRATED"
+  ],
+  "issue": 231,
+  "planted": [
+    {
+      "attempt_id": "att-eaafc9a8d585",
+      "state": "STALE_ATTEMPT"
+    },
+    {
+      "attempt_id": "att-8c37e019a365",
+      "state": "LEASE_EXPIRED"
+    },
+    {
+      "attempt_id": "att-22e1ea567de4",
+      "state": "STRAGGLER_DETACHED"
+    },
+    {
+      "attempt_id": "att-763509772308",
+      "state": "FAILED_RETRYABLE"
+    },
+    {
+      "attempt_id": "att-763509772308",
+      "state": "SUPERSEDED"
+    },
+    {
+      "attempt_id": "att-e53065d2b9bb",
+      "state": "CANCELLED"
+    },
+    {
+      "attempt_id": "att-ea86f128e67a",
+      "state": "BLOCKED_CONFLICT"
+    }
+  ],
+  "refusals": [
+    {
+      "at": "2026-08-17T14:32:39Z",
+      "attempt_id": "att-eaafc9a8d585",
+      "code": "STALE_BASE",
+      "detail": "att-eaafc9a8d585 produced against 000000000000, which this repository cannot diff against 8d2469e2a867"
+    },
+    {
+      "at": "2026-08-17T14:32:39Z",
+      "attempt_id": "att-8c37e019a365",
+      "code": "LEASE_EXPIRED",
+      "detail": "att-8c37e019a365 lease expired at 2026-08-17T14:31:39Z, evaluated 2026-08-17T14:32:39Z"
+    },
+    {
+      "at": "2026-08-17T14:32:39Z",
+      "attempt_id": "att-ea86f128e67a",
+      "code": "PATH_LEASE_HELD",
+      "detail": "att-ea86f128e67a requested src/celsius.py"
+    }
+  ],
+  "results": {
+    "celsius": {
+      "duration_ms": 8335,
+      "executed": {
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "stdout_bytes": 1413,
+        "stdout_sha256": "0f321ad180b87eb23f3f9ccdea20b35aa27d9e7871c90b28461a6968c62968fb"
+      },
+      "ok": true,
+      "oracle": {
+        "exit_code": 0,
+        "ok": true,
+        "oracle_digest": "70c767cd23358bd6104231c406673d5a6223eb49fedd534335ea18b30e0b4fa8"
+      },
+      "touched": [
+        "src/celsius.py"
+      ]
+    },
+    "slug": {
+      "duration_ms": 9029,
+      "executed": {
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "stdout_bytes": 1388,
+        "stdout_sha256": "5aedc115ec1cfdde72eb8612ace039d4798d1b58def685c890d527ef99f6e98f"
+      },
+      "ok": true,
+      "oracle": {
+        "exit_code": 0,
+        "ok": true,
+        "oracle_digest": "2772d2ce48a6ba40c7a335e157a97c45e98328e15e9117ff1181e80e69802593"
+      },
+      "touched": [
+        "src/slug.py"
+      ]
+    },
+    "toolkit": {
+      "duration_ms": 12441,
+      "executed": {
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "stdout_bytes": 1393,
+        "stdout_sha256": "7788cc26d07d82ceb90294a22f48afeb1cba94c3baf6651cbae8948a5b046d13"
+      },
+      "ok": true,
+      "oracle": {
+        "exit_code": 0,
+        "ok": true,
+        "oracle_digest": "ddf6adc5fc889ad0d4ddc745db8cb1b5ca538957a9f7957b6dbf1a4fd3c66926"
+      },
+      "touched": [
+        "src/toolkit.py"
+      ]
+    }
+  },
+  "run_id": "1c296da7830a4991b807bf89708d2731",
+  "schema": "dual-forge-repository-loop/scheduler-run-receipt/v1",
+  "started_at": "2026-08-17T14:32:09Z",
+  "state_coverage": {
+    "declared_not_produced": [
+      "BLOCKED_AUTHORITY",
+      "DUPLICATE_SUPPRESSED",
+      "FAILED_TERMINAL",
+      "REJECTED_NOT_DECOMPOSABLE"
+    ],
+    "produced": [
+      "ADMITTED",
+      "ASSIGNED",
+      "BLOCKED_CONFLICT",
+      "CANCELLED",
+      "CHECKPOINTED",
+      "FAILED_RETRYABLE",
+      "INTEGRATED",
+      "LEASED",
+      "LEASE_EXPIRED",
+      "PLANNED",
+      "RESULT_READY",
+      "RESULT_VERIFIED",
+      "RUNNING",
+      "STALE_ATTEMPT",
+      "STRAGGLER_DETACHED",
+      "SUPERSEDED",
+      "TIMED_OUT"
+    ]
+  },
+  "subject": {
+    "final_sha": "8d2469e2a8676559f9a96a5ce8d5a4d3b5f4e728",
+    "initial_sha": "684f2afcf429cf33710c6655b58760b6b4776fbf",
+    "kind": "disposable-canary-repository",
+    "note": "A throwaway repository, not skills-shared. Parallel Workers mutating the live repository during a session that other sessions are also writing to is a hazard, not a canary."
+  },
+  "transitions": [
+    {
+      "allowed_paths": [
+        "src/celsius.py"
+      ],
+      "at": "2026-08-17T14:32:09Z",
+      "attempt_id": "att-7db311733331",
+      "base_subject_sha": "684f2afcf429cf33710c6655b58760b6b4776fbf",
+      "sequence": 1,
+      "stack_class": "sibling",
+      "state": "PLANNED",
+      "task_id": "task-1c296da7-celsius"
+    },
+    {
+      "allowed_paths": [
+        "src/slug.py"
+      ],
+      "at": "2026-08-17T14:32:09Z",
+      "attempt_id": "att-28af2dba682b",
+      "base_subject_sha": "684f2afcf429cf33710c6655b58760b6b4776fbf",
+      "sequence": 2,
+      "stack_class": "sibling",
+      "state": "PLANNED",
+      "task_id": "task-1c296da7-slug"
+    },
+    {
+      "allowed_paths": [
+        "src/toolkit.py"
+      ],
+      "at": "2026-08-17T14:32:09Z",
+      "attempt_id": "att-e507ed26d7ca",
+      "base_subject_sha": "684f2afcf429cf33710c6655b58760b6b4776fbf",
+      "sequence": 3,
+      "stack_class": "convergence",
+      "state": "PLANNED",
+      "task_id": "task-1c296da7-toolkit"
+    },
+    {
+      "at": "2026-08-17T14:32:09Z",
+      "attempt_id": "att-7db311733331",
+      "sequence": 4,
+      "state": "ADMITTED",
+      "task_id": "task-1c296da7-celsius"
+    },
+    {
+      "at": "2026-08-17T14:32:09Z",
+      "attempt_id": "att-28af2dba682b",
+      "sequence": 5,
+      "state": "ADMITTED",
+      "task_id": "task-1c296da7-slug"
+    },
+    {
+      "at": "2026-08-17T14:32:09Z",
+      "attempt_id": "att-e507ed26d7ca",
+      "sequence": 6,
+      "state": "ADMITTED",
+      "task_id": "task-1c296da7-toolkit"
+    },
+    {
+      "at": "2026-08-17T14:32:09Z",
+      "attempt_id": "att-7db311733331",
+      "branch": "worker/celsius",
+      "sequence": 7,
+      "state": "ASSIGNED",
+      "task_id": "task-1c296da7-celsius"
+    },
+    {
+      "at": "2026-08-17T14:32:09Z",
+      "attempt_id": "att-7db311733331",
+      "lease_expiry": "2026-08-17T14:47:09Z",
+      "sequence": 8,
+      "state": "LEASED",
+      "task_id": "task-1c296da7-celsius",
+      "worktree_identity": "/var/folders/l6/44bf7nvs64j60f1mpyy88hdm0000gn/T/scheduler-canary-rbym1i3_/worktrees/celsius"
+    },
+    {
+      "agent": "/Users/neon/.local/bin/claude",
+      "at": "2026-08-17T14:32:09Z",
+      "attempt_id": "att-7db311733331",
+      "sequence": 9,
+      "state": "RUNNING",
+      "task_id": "task-1c296da7-celsius"
+    },
+    {
+      "at": "2026-08-17T14:32:17Z",
+      "attempt_id": "att-7db311733331",
+      "checkpoint_digest": "45662073482cdac8a28fc669c7904f111554aa2c5d2c9864c02d4e91510633ba",
+      "checkpoint_sequence": 2,
+      "sequence": 10,
+      "state": "CHECKPOINTED",
+      "task_id": "task-1c296da7-celsius"
+    },
+    {
+      "at": "2026-08-17T14:32:17Z",
+      "attempt_id": "att-7db311733331",
+      "duration_ms": 8335,
+      "sequence": 11,
+      "state": "RESULT_READY",
+      "task_id": "task-1c296da7-celsius",
+      "touched": [
+        "src/celsius.py"
+      ]
+    },
+    {
+      "at": "2026-08-17T14:32:17Z",
+      "attempt_id": "att-7db311733331",
+      "exit_code": 0,
+      "oracle": "oracles/celsius_oracle.py",
+      "oracle_digest": "70c767cd23358bd6104231c406673d5a6223eb49fedd534335ea18b30e0b4fa8",
+      "sequence": 12,
+      "state": "RESULT_VERIFIED",
+      "task_id": "task-1c296da7-celsius"
+    },
+    {
+      "at": "2026-08-17T14:32:17Z",
+      "attempt_id": "att-7db311733331",
+      "head_subject_sha": "faa82b23392c8e9fd98448b0a87e89ad472a9858",
+      "main_after": "faa82b23392c8e9fd98448b0a87e89ad472a9858",
+      "sequence": 13,
+      "state": "INTEGRATED",
+      "task_id": "task-1c296da7-celsius"
+    },
+    {
+      "at": "2026-08-17T14:32:17Z",
+      "attempt_id": "att-28af2dba682b",
+      "branch": "worker/slug",
+      "sequence": 14,
+      "state": "ASSIGNED",
+      "task_id": "task-1c296da7-slug"
+    },
+    {
+      "at": "2026-08-17T14:32:17Z",
+      "attempt_id": "att-28af2dba682b",
+      "lease_expiry": "2026-08-17T14:47:17Z",
+      "sequence": 15,
+      "state": "LEASED",
+      "task_id": "task-1c296da7-slug",
+      "worktree_identity": "/var/folders/l6/44bf7nvs64j60f1mpyy88hdm0000gn/T/scheduler-canary-rbym1i3_/worktrees/slug"
+    },
+    {
+      "agent": "/Users/neon/.local/bin/claude",
+      "at": "2026-08-17T14:32:17Z",
+      "attempt_id": "att-28af2dba682b",
+      "sequence": 16,
+      "state": "RUNNING",
+      "task_id": "task-1c296da7-slug"
+    },
+    {
+      "at": "2026-08-17T14:32:26Z",
+      "attempt_id": "att-28af2dba682b",
+      "checkpoint_digest": "5c7ca714713668550860cd4107227a52f7fcac018757a6db6dcb2f24fdf1b12b",
+      "checkpoint_sequence": 2,
+      "sequence": 17,
+      "state": "CHECKPOINTED",
+      "task_id": "task-1c296da7-slug"
+    },
+    {
+      "at": "2026-08-17T14:32:26Z",
+      "attempt_id": "att-28af2dba682b",
+      "duration_ms": 9029,
+      "sequence": 18,
+      "state": "RESULT_READY",
+      "task_id": "task-1c296da7-slug",
+      "touched": [
+        "src/slug.py"
+      ]
+    },
+    {
+      "at": "2026-08-17T14:32:27Z",
+      "attempt_id": "att-28af2dba682b",
+      "exit_code": 0,
+      "oracle": "oracles/slug_oracle.py",
+      "oracle_digest": "2772d2ce48a6ba40c7a335e157a97c45e98328e15e9117ff1181e80e69802593",
+      "sequence": 19,
+      "state": "RESULT_VERIFIED",
+      "task_id": "task-1c296da7-slug"
+    },
+    {
+      "at": "2026-08-17T14:32:27Z",
+      "attempt_id": "att-28af2dba682b",
+      "base_moved_from": "684f2afcf429cf33710c6655b58760b6b4776fbf",
+      "base_moved_to": "faa82b23392c8e9fd98448b0a87e89ad472a9858",
+      "checkpoint_digest": "5c7ca714713668550860cd4107227a52f7fcac018757a6db6dcb2f24fdf1b12b",
+      "checkpoint_sequence": 2,
+      "moved_paths": [
+        "src/__pycache__/celsius.cpython-314.pyc",
+        "src/celsius.py"
+      ],
+      "note": "base advanced outside this lease; not stale",
+      "sequence": 20,
+      "state": "CHECKPOINTED",
+      "task_id": "task-1c296da7-slug"
+    },
+    {
+      "at": "2026-08-17T14:32:27Z",
+      "attempt_id": "att-28af2dba682b",
+      "head_subject_sha": "831d156714f295081b9a5737955a9ec611259e6e",
+      "main_after": "8c32b9be5795151a6df5589265fe710b0977de83",
+      "sequence": 21,
+      "state": "INTEGRATED",
+      "task_id": "task-1c296da7-slug"
+    },
+    {
+      "at": "2026-08-17T14:32:27Z",
+      "attempt_id": "att-e507ed26d7ca",
+      "branch": "worker/toolkit",
+      "sequence": 22,
+      "state": "ASSIGNED",
+      "task_id": "task-1c296da7-toolkit"
+    },
+    {
+      "at": "2026-08-17T14:32:27Z",
+      "attempt_id": "att-e507ed26d7ca",
+      "base_rebound_from": "684f2afcf429cf33710c6655b58760b6b4776fbf",
+      "base_rebound_to": "8c32b9be5795151a6df5589265fe710b0977de83",
+      "reason": "convergence consumes integrated dependencies and is leased from the state that contains them",
+      "sequence": 23,
+      "state": "ADMITTED",
+      "task_id": "task-1c296da7-toolkit"
+    },
+    {
+      "at": "2026-08-17T14:32:27Z",
+      "attempt_id": "att-e507ed26d7ca",
+      "lease_expiry": "2026-08-17T14:47:27Z",
+      "sequence": 24,
+      "state": "LEASED",
+      "task_id": "task-1c296da7-toolkit",
+      "worktree_identity": "/var/folders/l6/44bf7nvs64j60f1mpyy88hdm0000gn/T/scheduler-canary-rbym1i3_/worktrees/toolkit"
+    },
+    {
+      "agent": "/Users/neon/.local/bin/claude",
+      "at": "2026-08-17T14:32:27Z",
+      "attempt_id": "att-e507ed26d7ca",
+      "sequence": 25,
+      "state": "RUNNING",
+      "task_id": "task-1c296da7-toolkit"
+    },
+    {
+      "at": "2026-08-17T14:32:39Z",
+      "attempt_id": "att-e507ed26d7ca",
+      "checkpoint_digest": "cb80e61fa4e662823f94bd7569dbc16ff2a28e9a332ac62b1a43da7d6c637464",
+      "checkpoint_sequence": 2,
+      "sequence": 26,
+      "state": "CHECKPOINTED",
+      "task_id": "task-1c296da7-toolkit"
+    },
+    {
+      "at": "2026-08-17T14:32:39Z",
+      "attempt_id": "att-e507ed26d7ca",
+      "duration_ms": 12441,
+      "sequence": 27,
+      "state": "RESULT_READY",
+      "task_id": "task-1c296da7-toolkit",
+      "touched": [
+        "src/toolkit.py"
+      ]
+    },
+    {
+      "at": "2026-08-17T14:32:39Z",
+      "attempt_id": "att-e507ed26d7ca",
+      "exit_code": 0,
+      "oracle": "oracles/convergence_oracle.py",
+      "oracle_digest": "ddf6adc5fc889ad0d4ddc745db8cb1b5ca538957a9f7957b6dbf1a4fd3c66926",
+      "sequence": 28,
+      "state": "RESULT_VERIFIED",
+      "task_id": "task-1c296da7-toolkit"
+    },
+    {
+      "at": "2026-08-17T14:32:39Z",
+      "attempt_id": "att-e507ed26d7ca",
+      "head_subject_sha": "8d2469e2a8676559f9a96a5ce8d5a4d3b5f4e728",
+      "main_after": "8d2469e2a8676559f9a96a5ce8d5a4d3b5f4e728",
+      "sequence": 29,
+      "state": "INTEGRATED",
+      "task_id": "task-1c296da7-toolkit"
+    },
+    {
+      "at": "2026-08-17T14:32:39Z",
+      "attempt_id": "att-eaafc9a8d585",
+      "sequence": 30,
+      "state": "PLANNED",
+      "task_id": "task-1c296da7-planted-stale"
+    },
+    {
+      "at": "2026-08-17T14:32:39Z",
+      "attempt_id": "att-eaafc9a8d585",
+      "note": "planted result",
+      "sequence": 31,
+      "state": "RESULT_READY",
+      "task_id": "task-1c296da7-planted-stale"
+    },
+    {
+      "at": "2026-08-17T14:32:39Z",
+      "attempt_id": "att-eaafc9a8d585",
+      "head": "8d2469e2a8676559f9a96a5ce8d5a4d3b5f4e728",
+      "produced_against": "0000000000000000000000000000000000000000",
+      "reason": "base-unresolvable",
+      "sequence": 32,
+      "state": "STALE_ATTEMPT",
+      "task_id": "task-1c296da7-planted-stale"
+    },
+    {
+      "at": "2026-08-17T14:32:39Z",
+      "attempt_id": "att-8c37e019a365",
+      "lease_expiry": "2026-08-17T14:31:39Z",
+      "sequence": 33,
+      "state": "LEASED",
+      "task_id": "task-1c296da7-planted-expired"
+    },
+    {
+      "at": "2026-08-17T14:32:39Z",
+      "attempt_id": "att-8c37e019a365",
+      "evaluated_at": "2026-08-17T14:32:39Z",
+      "sequence": 34,
+      "state": "LEASE_EXPIRED",
+      "task_id": "task-1c296da7-planted-expired"
+    },
+    {
+      "at": "2026-08-17T14:32:39Z",
+      "attempt_id": "att-22e1ea567de4",
+      "sequence": 35,
+      "state": "LEASED",
+      "task_id": "task-1c296da7-planted-straggler"
+    },
+    {
+      "at": "2026-08-17T14:32:39Z",
+      "attempt_id": "att-22e1ea567de4",
+      "sequence": 36,
+      "state": "RUNNING",
+      "task_id": "task-1c296da7-planted-straggler"
+    },
+    {
+      "at": "2026-08-17T14:32:39Z",
+      "attempt_id": "att-22e1ea567de4",
+      "budget_wall_clock_seconds": 900,
+      "sequence": 37,
+      "spend": {
+        "cost_usd": 0,
+        "tokens": 0,
+        "turns": 0,
+        "wall_clock_seconds": 901
+      },
+      "state": "TIMED_OUT",
+      "task_id": "task-1c296da7-planted-straggler"
+    },
+    {
+      "at": "2026-08-17T14:32:39Z",
+      "attempt_id": "att-22e1ea567de4",
+      "note": "detached; its lease is not granted to another attempt",
+      "sequence": 38,
+      "state": "STRAGGLER_DETACHED",
+      "task_id": "task-1c296da7-planted-straggler"
+    },
+    {
+      "at": "2026-08-17T14:32:39Z",
+      "attempt_id": "att-763509772308",
+      "sequence": 39,
+      "state": "LEASED",
+      "task_id": "task-1c296da7-planted-retry"
+    },
+    {
+      "at": "2026-08-17T14:32:39Z",
+      "attempt_id": "att-763509772308",
+      "sequence": 40,
+      "state": "RUNNING",
+      "task_id": "task-1c296da7-planted-retry"
+    },
+    {
+      "at": "2026-08-17T14:32:39Z",
+      "attempt_id": "att-763509772308",
+      "oracle_exit_code": 1,
+      "sequence": 41,
+      "state": "FAILED_RETRYABLE",
+      "task_id": "task-1c296da7-planted-retry"
+    },
+    {
+      "at": "2026-08-17T14:32:39Z",
+      "attempt_id": "att-bb8769aa66b4",
+      "sequence": 42,
+      "state": "PLANNED",
+      "supersedes": "att-763509772308",
+      "task_id": "task-1c296da7-planted-retry"
+    },
+    {
+      "at": "2026-08-17T14:32:39Z",
+      "attempt_id": "att-763509772308",
+      "sequence": 43,
+      "state": "SUPERSEDED",
+      "superseded_by": "att-bb8769aa66b4",
+      "task_id": "task-1c296da7-planted-retry"
+    },
+    {
+      "at": "2026-08-17T14:32:39Z",
+      "attempt_id": "att-e53065d2b9bb",
+      "sequence": 44,
+      "state": "PLANNED",
+      "task_id": "task-1c296da7-planted-cancelled"
+    },
+    {
+      "at": "2026-08-17T14:32:39Z",
+      "attempt_id": "att-e53065d2b9bb",
+      "sequence": 45,
+      "state": "ADMITTED",
+      "task_id": "task-1c296da7-planted-cancelled"
+    },
+    {
+      "at": "2026-08-17T14:32:39Z",
+      "attempt_id": "att-e53065d2b9bb",
+      "reason": "withdrawn by the scheduler before assignment",
+      "sequence": 46,
+      "state": "CANCELLED",
+      "task_id": "task-1c296da7-planted-cancelled"
+    },
+    {
+      "at": "2026-08-17T14:32:39Z",
+      "attempt_id": "att-ea86f128e67a",
+      "sequence": 47,
+      "state": "PLANNED",
+      "task_id": "task-1c296da7-planted-conflict"
+    },
+    {
+      "at": "2026-08-17T14:32:39Z",
+      "attempt_id": "att-ea86f128e67a",
+      "requested": "src/celsius.py",
+      "sequence": 48,
+      "state": "BLOCKED_CONFLICT",
+      "task_id": "task-1c296da7-planted-conflict"
+    }
+  ]
+}

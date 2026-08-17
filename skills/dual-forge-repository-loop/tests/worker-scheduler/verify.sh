@@ -62,6 +62,34 @@ assert not active, f"attempts still hold leases at close: {active}"
 print("PASS historical receipt: budget BUDGET_UNMEASURED, no lease held at close")
 PY
 
+# The budgeted live receipt: a second real canary run after the ledger landed,
+# so every dimension is observed and the checker reconciles real spend. It
+# lives beside the historical receipt instead of replacing it -- the historical
+# run honestly never measured its spend, and the two states must stay distinct.
+budgeted="${skill_dir}/evals/receipts/scheduler-run-budgeted.receipt.json"
+python3 -m json.tool "${budgeted}" >/dev/null
+python3 "${checker}" check --receipt "${budgeted}"
+python3 "${checker}" selftest --receipt "${budgeted}"
+python3 - "${budgeted}" <<'PY'
+import json, sys
+body = json.load(open(sys.argv[1]))
+ledger = body["budget_ledger"]
+assert ledger["unobserved_dimensions"] == [], \
+    f"the budgeted live run left dimensions unmeasured: {ledger['unobserved_dimensions']}"
+spent = ledger["totals"]["cost_usd"]
+assert spent > 0, "a live model run that cost nothing was not a live model run"
+active = [a["attempt_id"] for a in body["attempts"]
+          if (a.get("lease") or {}).get("status") == "ACTIVE"]
+assert not active, f"attempts still hold leases at close: {active}"
+attempts = {a["attempt_id"]: a for a in body["attempts"]}
+integrated = [t for t in body["transitions"] if t["state"] == "INTEGRATED"]
+classes = [attempts[t["attempt_id"]].get("stack_class") for t in integrated]
+assert classes.count("sibling") >= 2 and "convergence" in classes, \
+    f"budgeted run lost the multi-Worker shape: {classes}"
+print(f"PASS budgeted live receipt: {len(ledger['attempts'])} attempts, "
+      f"cost_usd {spent:.3f} reconciled, every dimension observed")
+PY
+
 # Drive the scheduler itself without a model. This is the producer/checker
 # boundary: the ledger the runner writes has to be one the checker reconciles,
 # and a run that ends with a Worker still holding its lease has to come out red.
