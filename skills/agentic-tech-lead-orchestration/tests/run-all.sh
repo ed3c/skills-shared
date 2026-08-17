@@ -27,6 +27,11 @@ python3 "$ROOT/scripts/assert_capability_dag.py" \
 # and current receipt-gated causal-DAG candidate.
 python3 "$ROOT/tests/refactor_ab.py"
 
+# Execute one production-shaped matched task with real linked worktrees and
+# subprocess Workers. This proves synthetic runtime closure only; provider,
+# model, Git Town and Forgejo lanes remain NOT_EXERCISED.
+python3 "$ROOT/tests/real_task_ab.py"
+
 # Exercise semantic/hard-law controls and scheduler lifecycle controls.
 python3 "$ROOT/tests/selftest.py"
 python3 "$ROOT/tests/scheduler_lifecycle_selftest.py"

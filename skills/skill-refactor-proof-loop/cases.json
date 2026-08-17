@@ -1,0 +1,20 @@
+{
+  "schema": "skill-refactor-proof-loop/cases/v1",
+  "cases": [
+    {
+      "id": "contract-positive",
+      "subject": "references/example-refactor-proof.json",
+      "expected": "PASS"
+    },
+    {
+      "id": "golden-registry-positive",
+      "subject": "references/golden-proof-registry.json",
+      "expected": "PASS"
+    },
+    {
+      "id": "mutation-controls",
+      "subject": "tests/selftest.py",
+      "expected": "PASS_WITH_ALL_MUTATIONS_REFUSED"
+    }
+  ]
+}
