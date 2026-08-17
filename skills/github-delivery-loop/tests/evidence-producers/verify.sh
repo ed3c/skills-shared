@@ -11,6 +11,17 @@ fixtures="${test_dir}/fixtures"
 scratch="$(mktemp -d)"
 trap 'rm -rf "${scratch}"' EXIT
 
+# The gh identity check runs the real `gh --version`. Under a scrubbed
+# environment (no HOME, as local_verification.py runs us) gh falls back to
+# writing its state (.local/state/gh/device-id) under the current directory,
+# which dirties the worktree that verification promised to leave
+# byte-identical. Pin every gh state/config surface into the scratch dir.
+export HOME="${scratch}/home"
+export XDG_STATE_HOME="${scratch}/home/state"
+export XDG_CONFIG_HOME="${scratch}/home/config"
+export XDG_DATA_HOME="${scratch}/home/data"
+mkdir -p "${HOME}"
+
 repo="${scratch}/repo"
 mkdir -p "${repo}"
 git -C "${repo}" init -q
