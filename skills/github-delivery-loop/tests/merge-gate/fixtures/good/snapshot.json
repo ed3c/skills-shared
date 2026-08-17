@@ -1,6 +1,7 @@
 {
   "repo": "example/infrastructure",
   "owner": "example",
+  "default_branch": "main",
   "pulls": [
     {
       "number": 7,
@@ -11,6 +12,7 @@
       "head_committed_at": "2026-08-07T01:00:00Z",
       "mergeable": "MERGEABLE",
       "mergeStateStatus": "CLEAN",
+      "baseRefName": "main",
       "admit": {"actor": "example", "at": "2026-08-07T02:00:00Z"}
     }
   ]

@@ -4,6 +4,7 @@
   "owner": {"login": "example", "id": 42, "type": "User"},
   "viewer": {"login": "example", "id": 42, "type": "User"},
   "permissions": {"admin": true},
+  "default_branch": "main",
   "pulls": [
     {
       "id": "PR_owner_auto_2",
@@ -13,7 +14,8 @@
       "isDraft": false,
       "headRefOid": "2222222222222222222222222222222222222222",
       "mergeable": "MERGEABLE",
-      "mergeStateStatus": "CLEAN"
+      "mergeStateStatus": "CLEAN",
+      "baseRefName": "main"
     },
     {
       "id": "PR_owner_auto_6",
@@ -23,7 +25,8 @@
       "isDraft": false,
       "headRefOid": "6666666666666666666666666666666666666666",
       "mergeable": "MERGEABLE",
-      "mergeStateStatus": "UNSTABLE"
+      "mergeStateStatus": "UNSTABLE",
+      "baseRefName": "main"
     },
     {
       "id": "PR_owner_auto_31",
@@ -33,7 +36,8 @@
       "isDraft": false,
       "headRefOid": "3131313131313131313131313131313131313131",
       "mergeable": "MERGEABLE",
-      "mergeStateStatus": "CLEAN"
+      "mergeStateStatus": "CLEAN",
+      "baseRefName": "main"
     }
   ]
 }

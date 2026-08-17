@@ -26,6 +26,21 @@ run "${clean_home}" python3 "${gate}" preflight --repo "${repo}" \
 grep -q "PREFLIGHT GREEN: 1 PR" "${scratch}/good.out"
 grep -q "READY #7" "${scratch}/good.out"
 
+# 1b. non-default-base: admitted and mergeable, but the PR's base is a stacked
+#     parent branch, not the default branch -- squash-merging it would land
+#     content into the parent while GitHub still reports MERGED with a real
+#     mergedAt timestamp, indistinguishable from a real landing (#335).
+set +e
+run "${clean_home}" python3 "${gate}" preflight --repo "${repo}" \
+  --snapshot "${test_dir}/fixtures/non-default-base/snapshot.json" \
+  >"${scratch}/nondefault.out" 2>"${scratch}/nondefault.err"
+nondefault_status=$?
+set -e
+test "${nondefault_status}" -eq 1
+grep -q "BLOCK #50 .*\[L3 GITHUB\].*baseRefName=.*!= default branch" \
+  "${scratch}/nondefault.err"
+grep -q "land the stack bottom-up" "${scratch}/nondefault.err"
+
 # 2. hollow: wrong admit actor and stale admit are both refusals, not passes
 if run "${clean_home}" python3 "${gate}" preflight --repo "${repo}" \
   --snapshot "${test_dir}/fixtures/hollow/snapshot.json" \
@@ -99,12 +114,12 @@ set -euo pipefail
 echo "$*" >> "${GH_LOG}"
 case "$*" in
   "api repos/example/infrastructure --jq "*)
-    echo '{"full_name":"example/infrastructure","node_id":"R_example","owner":{"login":"example","id":42,"type":"User"},"permissions":{"admin":true}}'
+    echo '{"full_name":"example/infrastructure","node_id":"R_example","owner":{"login":"example","id":42,"type":"User"},"permissions":{"admin":true},"default_branch":"main"}'
     ;;
   "api user --jq "*)
     echo '{"login":"example","id":42,"type":"User"}'
     ;;
-  "pr view 31 --repo example/infrastructure --json state,mergedAt,headRefOid,url")
+  "pr view 31 --repo example/infrastructure --json state,mergedAt,headRefOid,url,baseRefName")
     case "${GH_READBACK:-merged}" in
       open)
         echo '{"state":"OPEN","mergedAt":null,"headRefOid":"3131313131313131313131313131313131313131","url":"https://github.com/example/infrastructure/pull/31"}'
@@ -116,18 +131,21 @@ case "$*" in
         echo '{"state":"MERGED","mergedAt":"2026-08-12T03:00:00Z","headRefOid":"3232323232323232323232323232323232323232","url":"https://github.com/example/infrastructure/pull/31"}'
         ;;
       *)
-        echo '{"state":"MERGED","mergedAt":"2026-08-12T03:00:00Z","headRefOid":"3131313131313131313131313131313131313131","url":"https://github.com/example/infrastructure/pull/31"}'
+        echo '{"state":"MERGED","mergedAt":"2026-08-12T03:00:00Z","headRefOid":"3131313131313131313131313131313131313131","url":"https://github.com/example/infrastructure/pull/31","baseRefName":"main"}'
         ;;
     esac
     ;;
   "pr view 31 --repo example/infrastructure --json "*)
-    echo '{"id":"PR_owner_auto_31","number":31,"url":"https://github.com/example/infrastructure/pull/31","title":"selected live PR","state":"'"${GH_STATE:-OPEN}"'","isDraft":false,"headRefOid":"3131313131313131313131313131313131313131","mergeable":"MERGEABLE","mergeStateStatus":"'"${GH_MERGE_STATUS:-CLEAN}"'"}'
+    echo '{"id":"PR_owner_auto_31","number":31,"url":"https://github.com/example/infrastructure/pull/31","title":"selected live PR","state":"'"${GH_STATE:-OPEN}"'","isDraft":false,"headRefOid":"3131313131313131313131313131313131313131","mergeable":"MERGEABLE","mergeStateStatus":"'"${GH_MERGE_STATUS:-CLEAN}"'","baseRefName":"main"}'
     ;;
   "pr view 6 --repo example/infrastructure --json "*)
-    echo '{"id":"PR_owner_auto_6","number":6,"url":"https://github.com/example/infrastructure/pull/6","title":"selected failing PR","state":"OPEN","isDraft":false,"headRefOid":"6666666666666666666666666666666666666666","mergeable":"MERGEABLE","mergeStateStatus":"UNSTABLE"}'
+    echo '{"id":"PR_owner_auto_6","number":6,"url":"https://github.com/example/infrastructure/pull/6","title":"selected failing PR","state":"OPEN","isDraft":false,"headRefOid":"6666666666666666666666666666666666666666","mergeable":"MERGEABLE","mergeStateStatus":"UNSTABLE","baseRefName":"main"}'
     ;;
   "pr view 8 --repo example/infrastructure --json "*)
     echo '{"id":"PR_human_admit_8","number":8,"url":"https://github.com/example/infrastructure/pull/8","title":"selected PR admitted by non-owner","state":"OPEN","isDraft":false,"headRefOid":"8888888888888888888888888888888888888888","mergeable":"MERGEABLE","mergeStateStatus":"CLEAN"}'
+    ;;
+  "pr view 50 --repo example/infrastructure --json "*)
+    echo '{"id":"PR_stack_50","number":50,"url":"https://github.com/example/infrastructure/pull/50","title":"stacked PR whose base was never retargeted to main","state":"OPEN","isDraft":false,"headRefOid":"5050505050505050505050505050505050505050","mergeable":"MERGEABLE","mergeStateStatus":"CLEAN","baseRefName":"agent/319-refactor-proof-agent-docs"}'
     ;;
   "pr view 404 --repo example/infrastructure --json "*)
     ;;
@@ -139,6 +157,9 @@ case "$*" in
     ;;
   "api repos/example/infrastructure/commits/8888888888888888888888888888888888888888 --jq "*)
     echo '{"d":"2026-08-12T01:00:00Z"}'
+    ;;
+  "api repos/example/infrastructure/commits/5050505050505050505050505050505050505050 --jq "*)
+    echo '{"d":"2026-08-17T01:00:00Z"}'
     ;;
   "api repos/example/infrastructure/issues/8/events --paginate --jq "*)
     echo '{"actor":"delivery-bot","at":"2026-08-12T02:00:00Z"}'
@@ -377,6 +398,27 @@ grep -q "BLOCK #6 .*L3 GITHUB.*mergeStateStatus=UNSTABLE" \
   "${scratch}/owner-live-blocked.err"
 if grep -q "query=mutation" "${apply_log}"; then
   echo "FAIL: scoped land attempted a merge after L3 refusal" >&2
+  exit 1
+fi
+
+# land() must refuse a candidate whose base is not the default branch before
+# ever attempting the merge mutation -- the exact regression from #335: a
+# stacked PR merged into its parent reads back as MERGED, indistinguishable
+# from a real landing, unless the base is checked before submitting.
+: > "${apply_log}"
+set +e
+GH_LOG="${apply_log}" PATH="${fake_bin}:${PATH}" run "${clean_home}" \
+  python3 "${gate}" land --repo "${repo}" --pr 50 \
+  --policy "${owner_policy}" \
+  >"${scratch}/owner-live-nondefault-base.out" \
+  2>"${scratch}/owner-live-nondefault-base.err"
+owner_nondefault_base_status=$?
+set -e
+test "${owner_nondefault_base_status}" -eq 1
+grep -q "BLOCK #50 .*\[L3 GITHUB\].*baseRefName=.*!= default branch" \
+  "${scratch}/owner-live-nondefault-base.err"
+if grep -q "query=mutation" "${apply_log}"; then
+  echo "FAIL: land() merged a PR whose base was not the default branch" >&2
   exit 1
 fi
 

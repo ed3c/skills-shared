@@ -4,6 +4,7 @@
   "owner": {"login": "example", "id": 42, "type": "User"},
   "viewer": {"login": "example", "id": 42, "type": "User"},
   "permissions": {"admin": true},
+  "default_branch": "main",
   "pulls": [
     {
       "id": "PR_owner_auto_7",
@@ -13,7 +14,8 @@
       "isDraft": false,
       "headRefOid": "1111111111111111111111111111111111111111",
       "mergeable": "MERGEABLE",
-      "mergeStateStatus": "CLEAN"
+      "mergeStateStatus": "CLEAN",
+      "baseRefName": "main"
     }
   ]
 }
