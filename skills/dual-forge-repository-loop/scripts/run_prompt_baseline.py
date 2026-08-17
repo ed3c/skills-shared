@@ -29,8 +29,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[3]
 SKILL = Path(__file__).resolve().parents[1]
-PREREG = SKILL / "evals" / "prompt-baseline-preregistration.json"
-CASES = SKILL / "evals" / "prompt-baseline-cases.json"
+DEFAULT_PREREG = SKILL / "evals" / "prompt-baseline-preregistration.json"
 
 INVALID = 64
 CELL_FAILURE = 2
@@ -58,10 +57,16 @@ def git_show(commit: str, path: str) -> bytes:
     ).stdout
 
 
-def arm_prompt(arm: dict[str, Any], prompt_path: str) -> bytes:
+def arm_prompt(arm: dict[str, Any], subject_path: str) -> bytes:
+    """Resolve an arm's bytes from the commit it pins.
+
+    Arms may carry their own path: a design that compares two candidate prompts
+    is comparing two files, and reading both from the subject path would silently
+    give every arm the same bytes.
+    """
     if arm["arm"] == "NO_PROMPT":
         return b""
-    return git_show(arm["prompt_commit"], prompt_path)
+    return git_show(arm["prompt_commit"], arm.get("prompt_path") or subject_path)
 
 
 def build_task(cases: list[dict[str, Any]]) -> str:
@@ -148,23 +153,67 @@ def score(workspace: Path, cases: list[dict[str, Any]]) -> dict[str, Any]:
             "rule_correct": rule_correct, "total": len(cases)}
 
 
+def eligibility(prereg: dict[str, Any], cells: list[dict[str, Any]]) -> dict[str, Any]:
+    """Derive the outcome from the cells at write time.
+
+    Nobody hand-writes this block. check_prompt_baseline.py recomputes every
+    number in it from the same cells and refuses any disagreement, so the two
+    derivations are independent and a result whose outcome was chosen rather
+    than computed cannot pass.
+    """
+    by_arm: dict[str, list[dict[str, Any]]] = {}
+    for cell in cells:
+        by_arm.setdefault(cell["arm"], []).append(cell)
+
+    def mean(arm: str, metric: str) -> float:
+        values = [cell["metrics"][metric] for cell in by_arm[arm]]
+        return sum(values) / len(values)
+
+    rule = {arm: mean(arm, "rule_correct") for arm in by_arm}
+    verdict = {arm: mean(arm, "verdict_correct") for arm in by_arm}
+    candidates = [arm for arm in by_arm if arm.startswith("CANDIDATE")]
+    if len(candidates) != 1:
+        raise SystemExit(f"BASELINE-INVALID candidate-arm: {candidates}")
+    candidate = candidates[0]
+    baselines = {arm: score for arm, score in rule.items() if arm != candidate}
+    strongest = max(baselines, key=lambda arm: baselines[arm])
+    regressed = rule[candidate] < baselines[strongest]
+    return {
+        "derived_by": "deterministic comparison, no model discretion",
+        "rule": prereg["eligibility_threshold"]["rule"],
+        "rule_naming_accuracy": rule,
+        "verdict_accuracy": verdict,
+        "strongest_baseline": strongest,
+        "regression_against_strongest_baseline": regressed,
+        "outcome": "NOT_ELIGIBLE" if regressed else "LOCAL_RECORD_ELIGIBLE",
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--preregistration", type=Path, default=DEFAULT_PREREG,
+                        help="the frozen design to execute; its case_set.path is authoritative")
     parser.add_argument("--repetitions", type=int, default=0, help="override for smoke use only")
     parser.add_argument("--timeout", type=int, default=900)
+    parser.add_argument("--dry-run", action="store_true",
+                        help="resolve and verify every arm's bytes, then stop before the "
+                             "first paid session")
     args = parser.parse_args()
 
-    for required in (PREREG, CASES):
-        if not required.is_file():
-            print(f"BASELINE-INVALID absent-input: {required}", file=sys.stderr)
-            return INVALID
-    if shutil.which("claude") is None:
+    if not args.preregistration.is_file():
+        print(f"BASELINE-INVALID absent-input: {args.preregistration}", file=sys.stderr)
+        return INVALID
+    prereg = json.loads(args.preregistration.read_text(encoding="utf-8"))
+    cases_path = ROOT / prereg["case_set"]["path"]
+    if not cases_path.is_file():
+        print(f"BASELINE-INVALID absent-input: {cases_path}", file=sys.stderr)
+        return INVALID
+    if shutil.which("claude") is None and not args.dry_run:
         print("BASELINE-INVALID absent-binary: claude", file=sys.stderr)
         return INVALID
 
-    prereg = json.loads(PREREG.read_text(encoding="utf-8"))
-    case_set = json.loads(CASES.read_text(encoding="utf-8"))
+    case_set = json.loads(cases_path.read_text(encoding="utf-8"))
     cases = case_set["cases"]
     if case_set["set_digest"][:12] != prereg["case_set"]["set_digest"]:
         print("BASELINE-INVALID case-set-drift: frozen digest does not match the case file",
@@ -175,6 +224,44 @@ def main() -> int:
     prompt_path = prereg["subject"]["prompt_path"]
     repetitions = args.repetitions or prereg["design"]["repetitions_per_arm"]
     task = build_task(cases)
+
+    # Resolve and verify every arm's bytes before the first session: a pin that
+    # only fails on cell fourteen has already cost thirteen sessions.
+    resolved: dict[str, bytes] = {}
+    for arm in prereg["arms"]:
+        try:
+            prompt_bytes = arm_prompt(arm, prompt_path)
+        except subprocess.CalledProcessError as error:
+            print(f"BASELINE-INVALID unresolvable-prompt for {arm['arm']}: "
+                  f"{arm.get('prompt_commit')}:{arm.get('prompt_path') or prompt_path} "
+                  f"({error.stderr.decode(errors='replace').strip()})", file=sys.stderr)
+            return INVALID
+        if arm["arm"] != "NO_PROMPT":
+            # A pin is honoured to its full declared length: a 64-character
+            # digest is checked as 64 characters, not as its first twelve.
+            expected = arm.get("prompt_sha256", "").rstrip("…")
+            actual = sha256_bytes(prompt_bytes)
+            if actual[:len(expected)] != expected:
+                print(f"BASELINE-INVALID prompt-drift for {arm['arm']}: {actual[:12]}",
+                      file=sys.stderr)
+                return INVALID
+            if len(prompt_bytes) != arm["prompt_bytes"]:
+                print(f"BASELINE-INVALID prompt-drift for {arm['arm']}: "
+                      f"{len(prompt_bytes)} bytes against the frozen {arm['prompt_bytes']}",
+                      file=sys.stderr)
+                return INVALID
+        resolved[arm["arm"]] = prompt_bytes
+
+    if args.dry_run:
+        print(f"DRY-RUN {prereg['preregistration_id']} status={prereg['status']} "
+              f"model={model} cells={len(prereg['arms']) * repetitions} "
+              f"cases={len(cases)} task_chars={len(task)}")
+        for arm in prereg["arms"]:
+            blob = resolved[arm["arm"]]
+            print(f"  arm {arm['arm']:26s} bytes={len(blob):6d} "
+                  f"sha256={sha256_bytes(blob)[:12] if blob else '-'}")
+        print("DRY-RUN COMPLETE: every arm resolved and matched its pin; no session was run")
+        return 0
 
     args.output.mkdir(parents=True, exist_ok=True)
     cells: list[dict[str, Any]] = []
@@ -196,15 +283,7 @@ def main() -> int:
                 shutil.rmtree(workspace)
             workspace.mkdir(parents=True)
 
-            prompt_bytes = arm_prompt(arm, prompt_path)
-            if arm["arm"] != "NO_PROMPT":
-                expected = arm.get("prompt_sha256", "")
-                actual = sha256_bytes(prompt_bytes)
-                if not actual.startswith(expected.rstrip("…")[:12]):
-                    print(f"BASELINE-INVALID prompt-drift for {arm['arm']}: {actual[:12]}",
-                          file=sys.stderr)
-                    return INVALID
-
+            prompt_bytes = resolved[arm["arm"]]
             result = run_cell(model, prompt_bytes, task, workspace, args.timeout)
             scored = score(workspace, cases)
             ok = result["exit_code"] == 0 and scored["parsed"]
@@ -228,7 +307,7 @@ def main() -> int:
                   f"rule={scored['rule_correct']}")
 
     report = {
-        "schema": "v2-1-prompt-baseline-result/v1",
+        "schema": prereg["schema"].replace("-preregistration/", "-result/"),
         "preregistration_id": prereg["preregistration_id"],
         "runtime": prereg["runtime"]["identity"],
         "model": model,
@@ -236,6 +315,7 @@ def main() -> int:
         "cells": cells,
         "cell_count": len(cells),
         "failed_cells": failures,
+        "eligibility": eligibility(prereg, cells),
         "known_confounds": prereg["known_confounds"],
         "declared_non_claims": prereg["declared_non_claims"],
     }

@@ -1,0 +1,146 @@
+{
+  "schema": "v2-2-prompt-baseline-preregistration/v1",
+  "preregistration_id": "v2-2-prompt-baseline-2026-08",
+  "status": "FROZEN_NOT_EXECUTED",
+  "issue": 238,
+  "supersedes": {
+    "preregistration_id": "v2-1-prompt-baseline-2026-08",
+    "why": "That design executed and returned NOT_ELIGIBLE: the v2.1 candidate scored 4.00/5 on rule naming against the strongest baseline's 4.80/5, identically in all five repetitions, at 18.8% more cost per cell. #238 cannot record an admitted Prompt while the deterministic scorer says the candidate regresses. The executed run is history and stays exactly as it is; this file is a rerun of the same instrument against a revised candidate, not a re-reading of the old numbers.",
+    "what_is_inherited": "The case set, the scorer, the arm count, the repetition count, the runtime binding and the two baseline arms are deliberately identical, so the rule-naming means of the two runs are directly comparable.",
+    "what_is_not_inherited": "No cell or outcome carries over. CANDIDATE_V2_2 has never been executed in any arm of any design."
+  },
+  "_meta": {
+    "why_frozen_before_running": "Same law as #225: every listed item is frozen before any arm runs. This file is committed with no result beside it, and scripts/check_prompt_baseline.py refuses a FROZEN_NOT_EXECUTED status that has a result committed next to it.",
+    "execution_authorisation": "NOT GRANTED. Nothing here has been executed. Executing it costs fifteen live sessions on a paid host and needs the owner's authorisation; until then the status field and the absent result file are the only true statements about it.",
+    "single_runtime": "#225 forbids combining results across runtime identities and that carries here. One runtime, one receipt set. A second runtime needs its own frozen design.",
+    "why_the_case_set_is_reused": "Comparability. A new case set would make the candidate's number incomparable with the 4.00/4.80/4.60 this rerun exists to move. The cost is that the set stopped being held out when #225 committed it, and the author of CANDIDATE_V2_2 has read it -- so marker-leak is a required control below, enforced deterministically rather than promised."
+  },
+  "runtime": {
+    "identity": "CLAUDE_CODE_LOCAL",
+    "harness": "claude",
+    "harness_version_pinned_at_run": true,
+    "model": "opus",
+    "carrier": "SYSTEM_PROMPT_FILE",
+    "carrier_detail": "--append-system-prompt-file",
+    "why_this_host": "Unchanged from #225 on purpose. It carries the prompt through a real system-prompt channel and reports tokens, duration and cost. Changing the host would confound the prompt revision with a carrier change."
+  },
+  "subject": {
+    "repository": "ed3c/skills-shared",
+    "prompt_path": "skills/dual-forge-repository-loop/references/system-prompt-v2.2.md"
+  },
+  "arms": [
+    {
+      "arm": "NO_PROMPT",
+      "prompt_commit": null,
+      "prompt_path": null,
+      "prompt_sha256": null,
+      "prompt_bytes": 0,
+      "absence_is_explicit": true,
+      "note": "Explicit absence, not an empty file. The receipt records that no prompt was carried rather than recording a prompt of length zero."
+    },
+    {
+      "arm": "CURRENT_REPOSITORY_PROMPT",
+      "prompt_commit": "1295cdd",
+      "prompt_path": "skills/dual-forge-repository-loop/references/system-prompt.md",
+      "prompt_sha256": "f0b77ccc3e974b058c8a8fe54222852dcff80750cab860a6118ca28c7c17c909",
+      "prompt_bytes": 4663,
+      "note": "Byte-identical to the arm of the same name in #225, pinned at the same commit and the same digest, so the two runs share a common reference point. Its bytes are historical and are verified by the runner against the pinned digest when git resolves them; they are not present at HEAD, where that path now holds v2.1."
+    },
+    {
+      "arm": "CANDIDATE_V2_2",
+      "prompt_commit": "c411063",
+      "prompt_path": "skills/dual-forge-repository-loop/references/system-prompt-v2.2.md",
+      "pin_verified_at_head": true,
+      "prompt_sha256": "93ac295bfdc1f08fdfb17dfa59bec718ba493c62ecda20502cf80677c93081b5",
+      "prompt_bytes": 25926,
+      "note": "The revision described in references/system-prompt-v2.2-delta.md: 152 distinct labels cut to 16, 51 fenced label blocks cut to 4, 36,866 bytes cut to 25,926, every law kept. Because these bytes exist at HEAD, the checker rehashes the file on every run and refuses any drift from this digest."
+    }
+  ],
+  "design": {
+    "repetitions_per_arm": 5,
+    "total_sessions": 15,
+    "fresh_context_per_arm": true,
+    "isolated_workspace_per_arm": true,
+    "arm_order": "derived from sha256(arm + repetition_index) so it is reproducible and recorded rather than chosen at run time",
+    "identical_across_arms": [
+      "repository commit and tree",
+      "case set and case digests",
+      "deterministic verifier and its digest",
+      "model, harness and config",
+      "tool allowance",
+      "token, time and cost budgets",
+      "retry policy"
+    ]
+  },
+  "case_set": {
+    "case_set_id": "v2-1-multi-agent-runtime-cases-2026-08",
+    "path": "skills/dual-forge-repository-loop/evals/prompt-baseline-cases.json",
+    "set_digest": "66828f62feb9",
+    "case_count": 6,
+    "case_ids": ["positive", "expired-lease", "concurrent-attempts", "foreign-eval",
+                 "unadmitted-result-head", "publication-before-closure"],
+    "why_this_task": "Unchanged from #225, and unchanged for the same reason: each case is a contract document the repository's own deterministic checker already rules on, and the five refusal cases span five distinct rule families rather than five variants of one rule. Reusing it is what makes the two runs comparable.",
+    "ground_truth_authority": "DETERMINISTIC_CHECKER",
+    "agent_never_sees": "checker output, exit codes, or violated-rule markers"
+  },
+  "verifier": {
+    "verifier_id": "multi-agent-runtime-verify",
+    "authority": "DETERMINISTIC_ONLY",
+    "model_self_report_is_not_authority": true,
+    "scorer": "unchanged from #225 -- scripts/run_prompt_baseline.py score(), loose token overlap against the checker's marker string",
+    "why_the_scorer_is_not_repaired_here": "#229's generation-2 preregistration owns the metric repair and does it on its own held-out cases with a paraphrase rubric. Repairing the scorer here as well would change two things at once and leave neither run comparable with #225. This design measures one thing: whether the revised candidate still regresses on the instrument that judged v2.1.",
+    "note": "The verifier computes the terminal state locally. The host's own claim about its result is compared against that, never substituted for it."
+  },
+  "budgets": {
+    "retries_permitted": 0,
+    "retry_policy": "A failed arm stays in the denominator with its reason. Opportunistic retry is a control that must turn red.",
+    "timeout_seconds": 900,
+    "identical_for_every_arm": true
+  },
+  "required_controls": [
+    {"id": "contaminated-context", "expect": "RED", "how": "reuse a workspace across two arms"},
+    {"id": "divergent-subject", "expect": "RED", "how": "change the repository head between arms"},
+    {"id": "asymmetric-tools", "expect": "RED", "how": "give the candidate arm a wider tool allowance"},
+    {"id": "baseline-leaks-candidate", "expect": "RED", "how": "let NO_PROMPT reach v2.2 through a user or project Skill projection"},
+    {"id": "dropped-arm", "expect": "RED", "how": "remove a failed run from the denominator"},
+    {"id": "model-as-verifier", "expect": "RED", "how": "accept the host's self-reported result as the verifier result"},
+    {"id": "fixture-as-physical", "expect": "RED", "how": "present a fixture agent run as a physical model run"},
+    {"id": "cross-runtime-copy", "expect": "RED", "how": "copy a codex-cli cell into a claude-code arm"},
+    {"id": "prompt-pin-drift", "expect": "RED", "how": "edit the candidate prompt after this freeze without repinning its digest", "decided_from_the_record": true},
+    {"id": "marker-leak", "expect": "RED", "how": "write a case's violated-rule marker into the candidate prompt, which would let it score by echo rather than by judgement", "decided_from_the_record": true}
+  ],
+  "eligibility_threshold": {
+    "outcome_values": ["NOT_ELIGIBLE", "LOCAL_RECORD_ELIGIBLE"],
+    "rule": "LOCAL_RECORD_ELIGIBLE requires the candidate to show no hard regression against the strongest baseline arm on the deterministic verifier result, with all required controls red and every arm preserved.",
+    "scope_limit": "Any eligibility is bounded to this repository, this runtime, this model and this case set. It is not portability and not a promotion.",
+    "why_no_uplift_threshold": "The rule is unchanged from #225 so the two outcomes mean the same thing. Parity with the strongest baseline clears it; that is deliberately a low bar, and clearing it establishes only that the regression is gone, not that the prompt helps."
+  },
+  "known_confounds": [
+    {
+      "confound": "prompt length",
+      "detail": "CANDIDATE_V2_2 is 25,926 bytes against CURRENT_REPOSITORY_PROMPT's 4,663 -- still 5.6 times larger. Any candidate advantage remains consistent with the prompt being better and equally consistent with it merely being longer and more specific.",
+      "why_not_corrected": "A length-matched arm would no longer be the candidate. The confound is recorded so the result is read with it rather than discovered afterwards.",
+      "how_to_separate": "a length-matched fourth arm, which this design does not preregister and which would need its own freeze"
+    },
+    {
+      "confound": "the case set is no longer held out",
+      "detail": "prompt-baseline-cases.json has been committed since #225, so the author of CANDIDATE_V2_2 could see every marker string the scorer rewards. A candidate that gained points by echoing markers would look identical in the aggregate to one that gained them by judging better.",
+      "why_not_corrected": "A fresh case set would break comparability with the number this rerun exists to move, which is the whole reason the design is otherwise unchanged.",
+      "how_to_separate": "the marker-leak control below is enforced deterministically by scripts/check_prompt_baseline.py on every run: no case's marker string may appear anywhere in the candidate prompt. That bounds echo at the string level; it cannot bound deliberate near-synonym engineering, and #229's held-out generation-2 cases remain the real defence."
+    },
+    {
+      "confound": "lexical scorer",
+      "detail": "Rule naming is scored by loose token overlap with the checker's internal marker string, and #229's committed audit measured correct answers scoring zero under it. This design keeps that scorer on purpose, so both a win and a loss here are statements about the same instrument that judged v2.1 -- not about judgement in general.",
+      "why_not_corrected": "Changing the candidate and the instrument in one step would leave nothing comparable.",
+      "how_to_separate": "the generation-2 paraphrase rubric in prompt-crossstack-v2-preregistration.json, on its own case set"
+    }
+  ],
+  "declared_non_claims": [
+    "no cross-runtime result may be derived from this preregistration",
+    "eligibility here is not recording authority; #195 governs that separately",
+    "five repetitions bound variance, they do not establish portability",
+    "a candidate advantage cannot be attributed to prompt quality rather than prompt length under this design",
+    "clearing the threshold means the measured regression is gone, not that the prompt improves judgement",
+    "this design cannot show that any specific cut in v2.2 caused any specific change; it compares two whole prompts"
+  ]
+}
