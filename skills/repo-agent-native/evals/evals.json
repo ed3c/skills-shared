@@ -117,5 +117,44 @@
     "mutable-main-execution-identity",
     "child-behind-declared-parent",
     "parent-head-changed-after-child-receipt"
+  ],
+  "runnable": [
+    {
+      "id": "RAN-ADAPTER-RECEIPTS-1",
+      "checker_script": "scripts/check_adapter_receipts.py",
+      "test_verify": "tests/adapter-receipts/verify.sh",
+      "good_fixture": "evals/receipts/*.receipt.json",
+      "good_evidence": "the verifier validates every committed adapter receipt (grepai, scip, tree-sitter, serena, sqlite, lancedb, worktree, forgejo, git-town) against the receipt contract and requires every lane to be present, PASS, or an explicit unexercised state",
+      "hollow_fixture": null,
+      "hollow_mutations": "fourteen planted defects: unbound subject, dirty tree marked PASS, missing provider version, undeclared policy, secret admitted into policy, unbounded budget, an unexercised lane laundered into a completed run, PASS on nonzero exit, an absent lane claiming an evidence level, dropped source read-back, removed controls, a control set with no RED observation, undeclared residue, and a leaked secret-shaped value",
+      "covers": [
+        "grepai semantic-intent-search lane",
+        "scip compiler-semantic-index lane",
+        "tree-sitter syntax-slice lane",
+        "serena symbol-lsp lane",
+        "sqlite evidence-ledger lane",
+        "lancedb vector-projection lane",
+        "worktree worker-execution lane",
+        "forgejo private-lane-publication lane",
+        "git-town stack-synchronization lane"
+      ],
+      "expected": "committed receipts pass with 8 PASS lanes and 1 ABSENT lane (git-town, pinned linux_intel_64 artifact on a darwin host, Human admission required); fourteen planted defects are refused by their exact code; an empty receipt directory is refused rather than reported clean; see evals/ADAPTER_RECEIPT_MATRIX.md for the per-lane completion report"
+    },
+    {
+      "id": "RAN-BLINDSPOT-HYBRID-1",
+      "checker_script": "scripts/blindspot_contract.py",
+      "test_verify": "tests/blindspot-hybrid/verify.sh",
+      "good_fixture": null,
+      "good_evidence": "the verifier ingests a normalized event bundle spanning grepai/tree-sitter/scip/serena/source-readback/lancedb/test lanes for one subject and reports PASS with zero blindspots",
+      "hollow_fixture": null,
+      "hollow_mutations": "AST/read-back/test events are dropped (hollow closure), the subject commit is changed mid-run (EVENT_SUBJECT_MISMATCH), a provider lane sets its own admitted=true (PROVIDER_SELF_ADMISSION), and an existing event ID is replayed with changed payload bytes (EVENT_ID_DRIFT)",
+      "covers": [
+        "no provider lane can set its own admission truth state (admission law)",
+        "SCIP/Serena events require Tree-sitter structural coverage for every involved path (structural coverage law)",
+        "an admitted closure requires a linked, confirmed source-readback event",
+        "event identity is stable: replaying an ID with changed canonical bytes is a mechanism error, not a silent overwrite"
+      ],
+      "expected": "the good event bundle reports state PASS with zero blindspots and idempotent replay; hollow closure exits 2 with SOURCE_READBACK_MISSING/AST_COVERAGE_MISSING/LINK_TARGET_MISSING; wrong-subject ingest exits 64 with EVENT_SUBJECT_MISMATCH; self-admitted provider event exits 64 with PROVIDER_SELF_ADMISSION; drifted event replay exits 70 with EVENT_ID_DRIFT"
+    }
   ]
 }
