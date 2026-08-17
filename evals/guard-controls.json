@@ -261,39 +261,6 @@
       "note": "#49: a FAIL receipt must not be consumed as PASS. This check ran and could not fail until the control existed."
     },
     {
-      "id": "publication-profile-check-identity",
-      "file": "scripts/check_ci_publication_profile.py",
-      "anchor": "    if not re.search(rf\"^  {re.escape(check_name)}:\\s*$\", text, re.MULTILINE):",
-      "verify": [
-        "python3",
-        "scripts/check_ci_publication_profile.py",
-        "--selftest"
-      ],
-      "note": "#54: a stable check name is stable only if a job answers to it. A name resolving to nothing produces no check run, and an absent check run reads as an absent blocker."
-    },
-    {
-      "id": "publication-profile-billing-stop",
-      "file": "scripts/check_ci_publication_profile.py",
-      "anchor": "    if billing[\"on_blocked\"] not in BILLING_ACTIONS:",
-      "verify": [
-        "python3",
-        "scripts/check_ci_publication_profile.py",
-        "--selftest"
-      ],
-      "note": "#54: rerunning or continuing while the billing circuit is open pays for no observation."
-    },
-    {
-      "id": "publication-profile-no-live-evidence",
-      "file": "scripts/check_ci_publication_profile.py",
-      "anchor": "            if f'\"{schema}\"' in text:",
-      "verify": [
-        "python3",
-        "scripts/check_ci_publication_profile.py",
-        "--selftest"
-      ],
-      "note": "#54: a committed receipt or snapshot describes a commit that is no longer HEAD, and a stale receipt that looks current is worse than none."
-    },
-    {
       "id": "gate-initial-boundary",
       "file": "skills/github-delivery-loop/scripts/ci_publish_gate.py",
       "anchor": "        if boundary == \"unproven\":",
@@ -307,7 +274,7 @@
     {
       "id": "union-restored-count-truthful",
       "file": "migration/hotfix_union.py",
-      "anchor": "    print(f\"\\nRESTORED={len(added)}  \u65e2\u6709\u6a94\u6848 {len(before)} \u500b\u9010\u4e00\u6bd4\u5c0d hash\uff0c\u5168\u90e8\u672a\u8b8a\")",
+      "anchor": "    print(f\"\\nRESTORED={len(added)}  既有檔案 {len(before)} 個逐一比對 hash，全部未變\")",
       "verify": [
         "python3",
         "migration/hotfix_union.py",
@@ -404,17 +371,6 @@
         "--selftest"
       ],
       "note": "#16: the list this gate exists to produce would silently be a list of one."
-    },
-    {
-      "id": "publication-profile-checks-every-path",
-      "file": "scripts/check_ci_publication_profile.py",
-      "anchor": "    for entry in paths:",
-      "verify": [
-        "python3",
-        "scripts/check_ci_publication_profile.py",
-        "--selftest"
-      ],
-      "note": "#16: a receipt path in second position was unreachable while every fixture held exactly one."
     },
     {
       "id": "shared-skills-check-runs-both-gates",

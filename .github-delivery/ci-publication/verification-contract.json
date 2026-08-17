@@ -1,5 +1,0 @@
-{
-  "schema": "github-delivery-verification-contract-route/v1",
-  "canonical": ".github-delivery/local-verification-contract.json",
-  "status": "NON_EXECUTABLE_ROUTE_ONLY"
-}

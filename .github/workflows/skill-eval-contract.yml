@@ -2,10 +2,10 @@ name: Skill Eval Contract
 
 on:
   pull_request:
-    # Sealed to ready_for_review only, per .github-delivery/ci-policy.json.
-    # Every push to an open PR would otherwise spend a job on a private
-    # repository's Actions minutes; publication cadence is the gate, not a
-    # side effect of how often someone commits.
+    # Sealed to ready_for_review only. The repository is public now, so the
+    # private-repo billing gate (.github-delivery/ci-policy.json) is retired,
+    # but publication cadence stays the gate: one deliberate run per review
+    # request, never a side effect of how often someone commits.
     types:
       - ready_for_review
     paths:
@@ -37,8 +37,6 @@ on:
       - 'scripts/check_body_neutrality.py'
       - 'evals/body-neutrality.json'
       - 'skills/**'
-      - 'scripts/check_ci_publication_profile.py'
-      - '.github-delivery/ci-publication/**'
       - 'scripts/check_skill_eval_plane.py'
       - 'scripts/skill_eval_plane_selftest.py'
       - 'scripts/check_guard_controls.py'
@@ -175,8 +173,6 @@ jobs:
           python3 scripts/check_binding_stale.py --selftest
           python3 scripts/check_body_neutrality.py --selftest
           python3 scripts/check_body_neutrality.py
-          python3 scripts/check_ci_publication_profile.py --selftest
-          python3 scripts/check_ci_publication_profile.py
           python3 scripts/skill_eval_plane_selftest.py
           python3 scripts/check_skill_eval_plane.py
           python3 scripts/check_guard_controls.py --repo-root . --selftest
