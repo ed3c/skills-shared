@@ -1,20 +1,22 @@
 # `git-town-stacked-pr-worker`
 
-This Skill defines the portable method for using Git Town with multiple Worker Agents, isolated worktrees, eval-first task packets, bounded unattended synchronization, and Human Admit. It does not own a consumer repository's branches, `.git-town.toml`, CI, remotes, receipts, merge, or promotion.
+Portable method for coordinating multiple Worker Agents with Git Town, isolated linked worktrees, eval-first task packets, bounded no-push synchronization, molecular issue/PR traceability, and Human Admit. This Skill does not own a consumer repository's branches, `.git-town.toml`, CI, remotes, receipts, merge, release, or promotion.
 
 ## Read order
 
 1. [`SKILL.md`](SKILL.md) — portable operating law.
-2. This README — directory map, state machine, data flow, and integration with GitHub delivery.
+2. This README — directory ownership, State Machines, DAG rules, data flow and Stack indexes.
 3. [`SYSTEM_PROMPT.md`](SYSTEM_PROMPT.md) — reusable Worker instruction body.
 4. [`PUBLICATION_POLICY.md`](PUBLICATION_POLICY.md) — publication and no-push boundary.
 5. [`references/ADOPTION.md`](references/ADOPTION.md) — consumer adoption path.
 6. [`references/REPO_PROFILE.template.md`](references/REPO_PROFILE.template.md) — repository-owned values.
 7. [`references/EVALS.md`](references/EVALS.md) — eval design before implementation.
 8. [`references/COMPLETION_REPORT.template.md`](references/COMPLETION_REPORT.template.md) — required Worker report.
-9. [`references/TECH_LEAD_FAN_OUT.md`](references/TECH_LEAD_FAN_OUT.md) and [`references/FAN_OUT_CONTRACT.schema.json`](references/FAN_OUT_CONTRACT.schema.json) — bounded multi-branch fan-out for TOURNAMENT, COOPERATIVE, SERIAL_STACK and HYBRID, checked by `scripts/check_fanout_contract.py`.
-10. [`evals.json`](evals.json), `scripts/`, and `tests/`.
-10. [`../github-delivery-loop/README.md`](../github-delivery-loop/README.md) for GitHub publication and merge state machines.
+9. [`references/TECH_LEAD_FAN_OUT.md`](references/TECH_LEAD_FAN_OUT.md) and [`references/FAN_OUT_CONTRACT.schema.json`](references/FAN_OUT_CONTRACT.schema.json) — bounded TOURNAMENT/COOPERATIVE/SERIAL_STACK/HYBRID fan-out.
+10. [`modules/domain-profile.md`](modules/domain-profile.md) — host/publication/CI domain bindings, loaded only when a concrete forge or carrier must be selected.
+11. [`evals.json`](evals.json), `scripts/`, and `tests/`.
+12. [`../skill-refactor-proof-loop/README.md`](../skill-refactor-proof-loop/README.md) for proof-carrying Skill refactor contracts and the current golden Stack.
+13. [`../github-delivery-loop/README.md`](../github-delivery-loop/README.md) for GitHub publication and merge State Machines.
 
 ## Directory map
 
@@ -25,6 +27,8 @@ skills/git-town-stacked-pr-worker/
 ├── SYSTEM_PROMPT.md
 ├── PUBLICATION_POLICY.md
 ├── evals.json
+├── modules/
+│   └── domain-profile.md  host/publication/CI domain bindings
 ├── references/
 │   ├── ADOPTION.md
 │   ├── REPO_PROFILE.template.md
@@ -32,11 +36,11 @@ skills/git-town-stacked-pr-worker/
 │   ├── COMPLETION_REPORT.template.md
 │   ├── TECH_LEAD_FAN_OUT.md
 │   └── FAN_OUT_CONTRACT.schema.json
-├── scripts/               portable method checks/helpers
+├── scripts/               portable checks/helpers
 └── tests/                 positive, hollow and policy controls
 ```
 
-The consumer repository materializes the operational layer:
+Consumer-owned operational surface:
 
 ```text
 consumer-repo/
@@ -49,7 +53,7 @@ consumer-repo/
 └── isolated linked worktrees
 ```
 
-Those consumer files must not be copied back into the shared Skill as if they were universal.
+Consumer paths, branch names, remotes, credentials and receipts must not be copied into the shared Skill as universal law.
 
 ## Core ownership
 
@@ -58,31 +62,23 @@ Git Town
   branch hierarchy + parent-first synchronization
 
 Shared Skill
-  portable Worker method + prompt + eval design
+  portable Worker method + fan-out/eval/traceability contracts
 
 Consumer repository
-  branch names + parent graph + worktree/receipt roots + Bash wrapper + CI + publication guard
+  branch graph + worktrees + leases + commands + CI + publication guards
 
 Human / trusted operator
-  semantic conflict resolution + merge + legal acceptance + promotion + rollback
+  semantic conflict + force-push admission + merge + legal acceptance + release + rollback
 ```
 
-## Worker state machine
+## Worker State Machine
 
 ```text
 TASK_ABSENT
-    │ admitted issue/task packet
-    ▼
-TASK_ADMITTED
-    │ one branch + one linked worktree + one writer lease
-    ▼
-WORKTREE_READY
-    │ local implementation and commits
-    ▼
-LOCAL_ITERATION
-    │ bounded sync, no push, no auto-resolve
-    ▼
-SYNCING
+→ TASK_ADMITTED
+→ WORKTREE_READY
+→ LOCAL_ITERATION
+→ SYNCING
     ├── NO_CHANGE
     ├── SYNCED_LOCAL
     ├── BLOCKED_DIRTY
@@ -90,22 +86,44 @@ SYNCING
     ├── BLOCKED_ANCESTRY
     ├── BLOCKED_TIMEOUT
     └── FAILED_TOOL
-
-SYNCED_LOCAL
-    │ consumer local evals
-    ▼
-LOCALLY_GREEN
-    │ github-delivery publication gate
-    ▼
-PR_PUBLISHED
-    │ review + Human Admit
-    ▼
-MERGE_OWNED_OUTSIDE_WORKER
+→ LOCALLY_GREEN
+→ PR_PUBLISHED
+→ MERGE_OWNED_OUTSIDE_WORKER
 ```
 
-Stable Worker outcomes are defined in `SKILL.md`. A blocked state preserves worktree and recovery evidence; it does not silently continue.
+A blocked state preserves worktree, branch and recovery evidence. It never silently continues.
 
-## Synchronization command boundary
+## Molecular delivery State Machine
+
+```text
+ISSUE_CONTRACTED
+→ PATH_AND_BRANCH_LEASED
+→ BRANCH_CREATED
+→ LOCAL_IMPLEMENTATION
+→ LOCAL_EVALS_GREEN
+→ PR_DRAFT / PR_OPEN
+→ EXACT_HEAD_CHECKS_OBSERVED
+→ READY_FOR_HUMAN_ADMIT
+→ MERGED
+```
+
+Allowed tracked states:
+
+```text
+PLANNED
+BRANCH_CREATED
+PR_DRAFT
+PR_OPEN
+BLOCKED
+READY_FOR_HUMAN_ADMIT
+MERGED
+CLOSED_NOT_PLANNED
+EXTERNAL_OPEN
+```
+
+A branch name, issue close, merge-side effect, documentation PASS, or prior green run cannot substitute for an exact node state. Open PR heads are read from GitHub PR metadata; only an observed immutable merged commit may be recorded durably.
+
+## Synchronization boundary
 
 The unattended form is conceptually:
 
@@ -117,28 +135,25 @@ git town sync \
   --no-push
 ```
 
-The consumer wrapper additionally owns:
+The consumer wrapper owns:
 
 ```text
-exact Git Town version and artifact admission
+exact Git Town artifact/version admission
 dirty/rebase/merge preflight
-branch writer lease
-path lease
-timeout
-log budget
-receipt
-BLOCKED marker
+one active branch/path/resource writer
+bounded timeout and log budget
+receipt and BLOCKED marker
 post-sync ancestry check
-optional explicit double-guard publication
+explicit publication guard
 ```
 
-`git town sync` exit `0` proves only that synchronization completed. It does not prove tests, review, release readiness, or provider availability.
+`git town sync` exit `0` proves synchronization only. It does not prove implementation, tests, review, provider health, release readiness, or Human Admit.
 
-## Branch graph rules
+## DAG and branch rules
 
-### Sibling branches
+### Path-disjoint sibling
 
-Use sibling branches when work is path-disjoint and does not consume unmerged bytes:
+Use siblings when no branch consumes another branch's unmerged bytes:
 
 ```text
 main
@@ -147,55 +162,93 @@ main
 └── scripts/cost-gate
 ```
 
-Serializing these changes would create artificial waiting and wider conflict surfaces.
+Serializing these is a false dependency.
 
-### True child branches
+### True child
 
-Use a child only when the child requires the parent's unmerged contract or implementation:
+A child exists only when it consumes a parent's unmerged contract, code, proof artifact, or documentation bytes:
 
 ```text
 main
 └── contract/v1
-    └── adapter/v1
+    └── implementation/v1
         └── consumer/v1
 ```
 
+The edge names the consumed artifact. A parent name alone is not causality.
+
 ### Terminal leaf
 
-A terminal leaf is the smallest PR that delivers one accepted behavior with its tests and evidence. It should not absorb unrelated cleanup, index work, or newly discovered scope.
+Smallest reviewable behavior plus its tests and evidence. It does not absorb central index work or unrelated cleanup.
 
 ### Convergence leaf
 
-After independent siblings are reviewed or merged, a separate convergence/index PR may update shared indexes, links, coverage, and final acceptance. This avoids multiple Workers editing the same central file.
+One owner updates shared indexes, links, coverage and final traceability after prerequisite artifacts are stable. Verified side inputs may converge without becoming extra Git parents.
 
-## Molecular issue and PR packet
+### Process dependency / external evidence
 
-Every Worker task defines before implementation:
+A later audit may wait for an admitted standard, and a live runtime may provide evidence, without becoming a Git child:
 
 ```text
-goal
-non-goals
-parent branch/PR
-allowed paths
-forbidden paths
-provided/required contracts
-evals
-negative controls
-evidence state and receipt path
-timeout and cleanup
-rollback subject
+PROCESS_DEPENDENCY
+EXTERNAL_EVIDENCE
+```
+
+These edges are traceable and authority-bounded but do not alter branch ancestry.
+
+## Worker task packet
+
+Before implementation, bind:
+
+```text
+goal and non-goals
+issue(s), PR, branch and base/parent
+allowed/read-only/forbidden paths
+consumed and provided artifacts/contracts
+evals and negative controls
+exact-head source and workflow state
+terminal classification and remaining evidence
+timeout, cleanup and rollback
 Human Admit boundary
 ```
 
-Missing fields are `ABSENT`. The Worker does not guess them.
+Missing fields are `ABSENT`; Workers do not infer them.
+
+## Standard molecular Stack index
+
+Proof-carrying Skill refactors use:
+
+```text
+skills/skill-refactor-proof-loop/references/refactor-proof-stack.schema.json
+skills/skill-refactor-proof-loop/references/refactor-proof-stack.json
+skills/skill-refactor-proof-loop/scripts/check_refactor_proof_stack.py
+```
+
+Required node fields:
+
+| Field | Meaning |
+|---|---|
+| `issues` | issue contract identities; one node owns each issue |
+| `pull_request` | publication identity or `null` before publication |
+| `branch` / `base_branch` | true-child base equals parent branch |
+| `stack_class` | root, child, sibling, convergence, planned follow-up, external evidence |
+| `owns_paths` | molecular path lease; external evidence owns no Stack paths |
+| `consumes_artifacts` / `provides_artifacts` | explicit data dependency |
+| `evals` / `negative_controls` | falsifiable acceptance |
+| `workflow` | exact execution state and source |
+| `head` | open heads read from GitHub; merged heads are immutable |
+| `terminal_classification` | implemented, partial, blocked, planned, external, merged, not planned |
+| `remaining_evidence` | explicit ceiling |
+| `rollback` / `human_admit` | recovery and authority boundary |
+
+The checker rejects missing child artifacts, child/base mismatch, fake serial siblings, multiple convergence owners, duplicate issue/PR ownership, stale self-embedded open heads, false merged state, external evidence owning paths, and widened semantic-conflict/force-push/ship/merge/release/promotion authority.
 
 ## Integration with `github-delivery-loop`
 
 ```text
-Git Town Worker
-→ local commits and parent-first rebase
+local commits and parent-first sync
 → local consumer evals
-→ exact-HEAD local verification receipt
+→ exact-head local receipt
 → trusted GitHub snapshot
 → publication gate
 → draft / ready / one batched repair
@@ -205,58 +258,56 @@ Git Town Worker
 → merge preflight and checked-head landing
 ```
 
-Git Town never bypasses `ci_publish_gate.py` or `merge_gate.py`. Publication and merge are separate state machines with separate evidence.
+Git Town never bypasses publication or merge gates. Publication and merge are separate State Machines.
 
-## Current `skills-shared` Stack index
+## Current proof-carrying Skill refactor Stack
 
-The historical Skill Eval implementation line was reviewed as:
+Canonical machine graph: [`../skill-refactor-proof-loop/references/refactor-proof-stack.json`](../skill-refactor-proof-loop/references/refactor-proof-stack.json). Full human trace: [`../../docs/traceability/SKILL_REFACTOR_PROOF_STACK.md`](../../docs/traceability/SKILL_REFACTOR_PROOF_STACK.md).
+
+```text
+Epic #318
+
+#307/#309 → PR #308
+└─ #312 → PR #315
+   └─ #319 → PR #323
+      └─ #320 → PR #324
+         └─ #321 → PR #325
+            └─ #322 planned adoption audit after Human admission
+```
+
+| Node | Issue | PR | Stack class | Branch → base | Provides |
+|---|---|---|---|---|---|
+| Tech Lead causal repair | `#307/#309` | `#308` | root | `fix/307-tech-lead-runtime-reachability` → `main` | task/schema/semantic/capability gates and frozen treatments |
+| Hermetic golden proof | `#312` | `#315` | true child | `agent/312-tech-lead-real-task-ab` → PR #308 branch | matched worktree/process/checkpoint/tournament/global-objective L3 proof |
+| Portable proof contract | `#319` | `#323` | true child | `agent/319-skill-refactor-proof-contract` → PR #315 branch | shared proof Skill, schemas, registry and mutation controls |
+| Agent docs and State Machines | `#320` | `#324` | true child | `agent/320-refactor-proof-agent-docs` → PR #323 branch | root/nearest Agent contracts and directory DAG/data flow |
+| Molecular convergence/index | `#321` | `#325` | convergence | `agent/321-refactor-proof-stack-index` → PR #324 branch | machine Stack graph, Git Town standard and traceability |
+| Cross-Skill adoption audit | `#322` | none | planned follow-up | no branch before admission | adoption ledger and deduplicated migration backlog |
+
+Independent evidence lanes, not Git children:
+
+```text
+#231 live scheduler lifecycle
+#232 independent Shadow/global objective
+#234 real Git Town + dual-forge delivery
+#256 exact-subject GrepAI/SCIP/Tree-sitter/Serena/SQLite adapters
+```
+
+They may raise issue #312 from L3 to L4/L5 only with receipts matching treatment, repository, task graph, context, budget, carrier, repetitions and acceptance subjects.
+
+## Historical indexes
+
+The historical Skill Eval implementation line was:
 
 ```text
 #32 → #33 → #34 → #35 → #36 → #39 → #42 → #46
 ```
 
-The terminal leaf for the Actions-cadence consumer change was #46. The reusable publication policy was issue #43 / PR #44, developed as a separate policy line and then consumed by the workflow stack.
+The reusable publication policy was issue #43 / PR #44. Earlier independent documentation leaves were not forced into runtime ancestry when they consumed only merged bytes.
 
-Issue #78 was an earlier independent documentation leaf based on the then-current `main`; it was not forced under the runtime stack because it consumed only merged bytes. A later automated documentation checker remains a separate child.
-
-See [`../github-delivery-loop/modules/traceability-index.md`](../github-delivery-loop/modules/traceability-index.md).
-
-## Four-repository documentation sibling set
-
-The current shared document-routing work is deliberately **not** a serial Stack:
-
-```text
-parent contract: ed3c/bettor-arena#35
-
-main in each repository
-├── skills-shared#85             procedural/domain routing method
-├── runtime-env#30               runtime-contract route binding
-├── agent-shield-monorepo#78     product/reference-consumer route binding
-└── bettor-arena#37              integration/acceptance route binding
-
-all four merged
-└── bettor-arena#38              exact merged index + Claude/Codex cold-start convergence
-```
-
-Why these are siblings:
-
-- each writes only documentation in its own repository;
-- none consumes another sibling's unmerged bytes;
-- each can be reviewed and merged independently;
-- serializing them would create artificial ancestry and stale-green churn.
-
-Why `bettor-arena#38` is a child/convergence leaf:
-
-- it requires the exact merged commit/tree of all four siblings;
-- it owns cross-repository link/role assertion comparison;
-- it owns the fresh cold-start Agent audit;
-- its branch must not be created before those inputs exist.
-
-Exact candidate heads and current evidence states are recorded in [`../../docs/traceability/TRACEABILITY_INDEX.md`](../../docs/traceability/TRACEABILITY_INDEX.md). PR metadata remains the publication authority.
+The four-repository documentation change was a sibling set because each repository wrote only its own documentation. `bettor-arena#38` became the convergence owner only after all four merged. Exact historical subjects remain in [`../../docs/traceability/TRACEABILITY_INDEX.md`](../../docs/traceability/TRACEABILITY_INDEX.md).
 
 ## Publication policy
-
-Local commits and GitHub publications are different events. For private repositories:
 
 ```text
 many local commits
@@ -266,23 +317,23 @@ many local commits
 → one batched repair per actionable feedback subject
 ```
 
-Background sync remains no-push. See [`PUBLICATION_POLICY.md`](PUBLICATION_POLICY.md) and the GitHub delivery cost-control module.
+Background sync remains no-push. See [`PUBLICATION_POLICY.md`](PUBLICATION_POLICY.md).
 
 ## Conflict policy
 
-Semantic conflict is a terminal unattended state:
+Semantic conflict is terminal for unattended execution:
 
 ```text
 sync conflict
 → BLOCKED_CONFLICT receipt
-→ preserve worktree and Git Town suspended state
-→ dedicated Human/recovery assignment
+→ preserve worktree and suspended state
+→ Human/recovery assignment
 → reviewed resolution
 → explicit continue
 → full eval replay
 ```
 
-The Worker must not automatically run:
+Workers must not automatically run:
 
 ```text
 git town continue
@@ -290,6 +341,7 @@ git town skip
 git town undo
 git town ship
 semantic conflict edits
+force push
 merge
 permission widening
 production rollback
@@ -304,22 +356,20 @@ ABSENT
 NOT_IMPLEMENTED
 NOT_EXERCISED
 SKIPPED_BY_POLICY
+HUMAN_ADMIT_REQUIRED
 ```
 
-The shared prompt can be statically reviewed. It cannot prove that a host has the admitted Git Town executable, that a real rebase ran, that a remote push succeeded, or that Human Admit occurred.
-
-## Source-proposal boundary
-
-The external PDF `科技巨頭開源授權與AI框架v2.pdf` proposes cloud/local runtimes and synchronization. Git Town source repair deliberately does not adopt timestamp-based `newest` or `prefer-beta` source overwrites. Source changes use one writer, exact ancestry, reviewable commits, evals, and checked publication.
+A static prompt or Stack graph cannot prove an installed Git Town binary, real rebase, remote push, provider execution, model uplift, merge, or Human Admit.
 
 ## Adoption checklist
 
-- pin and admit the exact Git Town artifact in the consumer environment;
-- create the repository profile;
-- define `.git-town.toml` and parent graph;
-- add one-Worker/one-worktree and branch/path leases;
+- pin and admit the exact Git Town artifact;
+- define repository profile and `.git-town.toml`;
+- enforce one Worker/branch/worktree and branch/path/resource leases;
+- declare consumed/provided artifacts and one convergence owner;
+- add the machine-readable molecular Stack index;
 - add bounded no-push sync wrappers and receipts;
-- integrate consumer local verification;
-- integrate `github-delivery-loop` publication and merge gates;
-- plant conflict, dirty-state, ancestry, timeout, and publication negative controls;
-- keep merge/promotion human-owned.
+- run local verification before publication;
+- integrate GitHub publication and merge gates;
+- plant conflict, dirty, ancestry, timeout, false-child, stale-head and publication controls;
+- keep semantic conflict, force push, ship, merge, release and promotion Human-owned.

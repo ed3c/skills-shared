@@ -8,7 +8,8 @@ Every non-trivial Skill follows this ownership model:
 
 ```text
 skills/<name>/
-├── README.md          navigation, ownership, state-machine map
+├── AGENTS.md          mandatory Agent read order and local authority contract when needed
+├── README.md          navigation, ownership, state-machine map, DAG and data flow
 ├── SKILL.md           procedural generalization: workflow, method, laws
 ├── references/        reusable host-neutral contracts/templates
 ├── modules/           domain instances/examples loaded on demand
@@ -18,7 +19,11 @@ skills/<name>/
 └── cases.json         deterministic routing/case inventory when used
 ```
 
-A small Skill may contain only `SKILL.md`. When a Skill grows domain examples or executable surfaces, add the nearest READMEs and keep the layers separate.
+A small Skill may contain only `SKILL.md`. When a Skill grows domain examples, executable surfaces, a proof registry, or multiple state machines, add the nearest `AGENTS.md` and READMEs and keep the layers separate.
+
+### `AGENTS.md`
+
+Owns the mandatory read order, writer/path leases, evidence vocabulary, stop conditions, completion report and Human/trusted-operator boundary for the governed directory. It does not replace schemas, scripts, receipts, issues, PR metadata or Git history.
 
 ### `SKILL.md`
 
@@ -42,13 +47,14 @@ Complex Skills and consumer repositories use the same route semantics defined in
 
 ## Reading a complex Skill
 
-1. `README.md` — purpose, state machines, data flows, evidence boundary.
-2. `SKILL.md` — portable procedure.
-3. `references/README.md` — generic contracts.
-4. `modules/README.md` — on-demand domain examples.
-5. `scripts/README.md` — I/O, exits, network and mutation boundaries.
-6. `tests/README.md` and `evals.json`/`cases.json` — positive and negative controls.
-7. Exact issue/PR — one admitted change and Human boundary.
+1. nearest `AGENTS.md` — mandatory procedure and authority.
+2. `README.md` — purpose, state machines, DAGs, data flows, evidence boundary and current handoff.
+3. `SKILL.md` — portable procedure.
+4. `references/README.md` — generic contracts.
+5. `modules/README.md` — on-demand domain examples.
+6. `scripts/README.md` — I/O, exits, network and mutation boundaries.
+7. `tests/README.md` and `evals.json`/`cases.json` — positive and negative controls.
+8. Exact issue/PR — one admitted change, parent graph, current head and Human boundary.
 
 When a Skill has many tracked mechanism files, do **not** duplicate a hand-maintained list into procedural prose. Use the executable current-tree route:
 
@@ -57,6 +63,27 @@ python3 scripts/check_skill_entry_routes.py --skill <name> --print-index
 ```
 
 The governed Skill set is declared in `../evals/skill-entry-routes.json`. The command indexes current repository bytes under `scripts/`, `references/`, and `modules/`, so a newly added mechanism becomes discoverable without waiting for a second handwritten basename list to be updated. CI rejects a missing common route or a governed Skill whose owned mechanism surface becomes undiscoverable.
+
+## Proof-carrying Skill refactors
+
+Every material Skill refactor follows [`skill-refactor-proof-loop`](skill-refactor-proof-loop/README.md). “Material” includes monolith-to-module splits, provider/domain decoupling, moved assertion routes, changed runtime entrypoints, changed state-machine ownership, or a new evidence ceiling.
+
+The minimum refactor contract is:
+
+```text
+freeze OLD_CANONICAL bytes
+freeze REFACTOR_AS_LANDED bytes
+retain at least one REPAIRED_CANDIDATE
+bind protected old strengths
+prove current entrypoint → mechanisms → tests → suite → CI arrival
+separate structural, executable-contract, hermetic-task, live-runtime and delivery layers
+run matched tasks on the same base/tree/contracts/tests/budget/carrier when claiming L3+
+retain failed/stale/blocked/cancelled/superseded attempts in the denominator
+prove cleanup and non-widening authority
+register eligible golden proofs without copying their implementation
+```
+
+A shorter or more generic `SKILL.md` is not evidence of preservation. Missing old strengths, dead routes, unfair comparisons, fixture-to-live promotion, incomplete denominator, residue, or artificial Stack ancestry fail closed.
 
 ## Cross-Skill composition
 
@@ -78,6 +105,7 @@ Shared Skills may reference another method, but consumer selection remains expli
 - [`spatial-loop-systems-engineering`](spatial-loop-systems-engineering/README.md) — pre-implementation state-space, hard-invariant, substrate-capability, teardown, and verification contract for kernel/hardware-bound work.
 - [`dual-forge-repository-loop`](dual-forge-repository-loop/README.md) — GitHub ingress/Actions plus local Forgejo worktree implementation, local-main-first integration, GitHub conflict/issue reconciliation, and exact-head publication.
 - [`agentic-tech-lead-orchestration`](agentic-tech-lead-orchestration/README.md) — candidate contract-first DAG, deterministic code-intelligence roles, bounded parallel Workers, tournament selection, and Stacked PR handoff. Registry admission is a separate governance fact from directory presence.
+- [`skill-refactor-proof-loop`](skill-refactor-proof-loop/README.md) — frozen old/as-landed/repaired treatments, old-strength retention, executable reachability, matched hermetic/live A/B layers, golden-proof registration, and no evidence promotion.
 
 ## Delivery methods
 
@@ -97,16 +125,19 @@ ABSENT
 NOT_IMPLEMENTED
 NOT_EXERCISED
 SKIPPED_BY_POLICY
+HUMAN_ADMIT_REQUIRED
 ```
 
-Documentation can describe a target mechanism. It cannot promote a host tool, service, browser/device session, provider, model run, or release to `PASS`.
+Documentation can describe a target mechanism. It cannot promote a host tool, service, browser/device session, provider, model run, delivery transition or release to `PASS`.
 
 ## Change rules
 
 - Update `registry.json` when classification changes.
-- Update the nearest README when a governed directory or state machine appears.
-- Define evals/cases before implementation.
+- Update the nearest `AGENTS.md` and README when a governed directory, state machine, DAG, data flow or authority boundary appears.
+- Define evals/cases and protected old strengths before implementation.
+- Apply the proof-carrying refactor protocol to material Skill refactors.
 - Keep procedural core and domain instances decoupled.
 - Preserve one writer per branch and disjoint path leases for parallel Workers.
+- Use a child branch only when it consumes unmerged parent bytes/contracts; path-disjoint work remains sibling work.
 - Keep machine paths, credentials, sessions, and live receipts out of shared bodies.
 - Do not create empty directories only to match a planned architecture.

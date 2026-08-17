@@ -1,4 +1,4 @@
-# Traceability index — document routing
+# Traceability index — document routing and proof-carrying Skill delivery
 
 ## Trace model
 
@@ -9,10 +9,43 @@ source / incident
 → molecular issue
 → sibling or true-child PR
 → eval / negative control
-→ immutable subject
+→ immutable or GitHub-read subject
 → receipt / current evidence state
 → Human Admit
 ```
+
+## Proof-carrying Skill refactor Stack
+
+Detailed human trace: [`SKILL_REFACTOR_PROOF_STACK.md`](SKILL_REFACTOR_PROOF_STACK.md). Machine authority:
+
+```text
+skills/skill-refactor-proof-loop/references/refactor-proof-stack.json
+skills/skill-refactor-proof-loop/references/refactor-proof-stack.schema.json
+skills/skill-refactor-proof-loop/scripts/check_refactor_proof_stack.py
+```
+
+| Node | Issue | PR publication subject | Stack class | Branch / base | Current state source |
+|---|---|---|---|---|---|
+| Tech Lead task/capability causal repair | `#307/#309` | `#308` | root | `fix/307-tech-lead-runtime-reachability` / `main` | current GitHub PR metadata and owning workflows |
+| Production-shaped hermetic golden proof | `#312` | `#315` | true child | `agent/312-tech-lead-real-task-ab` / PR #308 branch | current GitHub PR metadata and Skill Suites |
+| Generalized proof contract + golden registry | `#319` | `#323` | true child | `agent/319-skill-refactor-proof-contract` / PR #315 branch | current GitHub PR metadata and Skill Suites/Shared Skills Infra |
+| Agent routes + directory State Machines/DAG/data flow | `#320` | `#324` | true child | `agent/320-refactor-proof-agent-docs` / PR #323 branch | current GitHub PR metadata and route/check workflows |
+| Molecular Stack + traceability convergence | `#321` | `#325` | convergence | `agent/321-refactor-proof-stack-index` / PR #324 branch | current GitHub PR metadata and exact-head workflows |
+| Cross-Skill adoption audit | `#322` | none | planned process follow-up | no branch leased | issue contract only; blocked on Human admission of the standard |
+
+True-child edges are justified by consumed unmerged artifacts:
+
+```text
+#308 task/capability contracts and frozen treatments
+→ #315 matched L3 proof
+→ #323 portable contract and golden registry
+→ #324 Agent and State Machine documentation
+→ #325 one convergence/index owner
+```
+
+Issue #322 is a process dependency after admission, not automatically a Git child. Issues #231, #232, #234 and #256 are independent scheduler, Shadow, delivery and adapter evidence lanes; they may raise #312 from L3 to L4/L5 only with matched exact-subject receipts. They are not fake Stack ancestry.
+
+Open PR heads are read from GitHub metadata rather than self-embedded in the same branch. A merged node may record an immutable merge SHA only after its owning checks/evidence are observed and terminal state is truly `MERGED`.
 
 ## Four-repository documentation stack
 
@@ -25,7 +58,7 @@ source / incident
 | Integration / Acceptance | `ed3c/bettor-arena#36` | `ed3c/bettor-arena#37` | independent sibling | Merged | `1f94d3d77992a1396959a15b2ada7836c07bf300` |
 | Exact merged index and cold-start audit | `ed3c/bettor-arena#38` | n/a | convergence leaf | Closed | n/a |
 
-All four siblings have merged and the convergence owner `bettor-arena#38` is closed, so this stack is no longer pending work. The parent contract issue `bettor-arena#35` remains open and is the only live item on this plane.
+All four siblings have merged and the convergence owner `bettor-arena#38` is closed, so this stack is no longer pending work. The parent contract issue `bettor-arena#35` remains open and is the only live item on that plane.
 
 The exact candidate head of an *open* PR is read from GitHub PR metadata rather than embedded in the same branch: self-embedding a commit SHA would make the document stale in the commit that updates it. Merged commits above are immutable and therefore safe to record.
 
@@ -85,9 +118,11 @@ Live root, KVM, cgroup, seccomp, network-namespace, hardware-performance, chaos,
 - `knowledge-continuity` supplies the rule that every hop leaves an in-place summary and evidence is not hidden behind unexplained redirects.
 - `github-delivery-loop` supplies issue/PR/receipt and publication-state separation.
 - `forgejo-delivery-loop` supplies local authoring, deterministic routing/outbox/recovery, and receipt separation.
-- `git-town-stacked-pr-worker` supplies sibling/true-child/terminal/convergence branch semantics and Human boundaries.
+- `git-town-stacked-pr-worker` supplies sibling/true-child/terminal/convergence branch semantics, machine-readable molecular traceability, and Human boundaries.
+- `skill-refactor-proof-loop` supplies treatment freeze, old-strength preservation, proof layers, golden registry, denominator completeness and no evidence promotion.
+- `agentic-tech-lead-orchestration` supplies the first production-shaped matched hermetic golden proof.
 - `spatial-loop-systems-engineering` supplies exact-subject state-space, capability, invariant, teardown, performance, and implementation-gate contracts for substrate-bound work.
 
 ## Evidence boundary
 
-PR presence and exact GitHub head metadata prove publication identity only. Documentation completion does not imply route-checker execution, fresh Claude/Codex cold-start, GitHub/Forgejo equivalence, live provider canaries, capability unlock, release promotion, or production readiness.
+PR presence and exact GitHub head metadata prove publication identity only. Documentation completion does not imply route-checker execution, fresh Claude/Codex cold-start, GitHub/Forgejo equivalence, live provider canaries, model behavioral uplift, capability unlock, release promotion, merge, or production readiness.

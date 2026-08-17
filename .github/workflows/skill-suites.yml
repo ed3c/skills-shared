@@ -24,6 +24,7 @@ on:
       - 'skills/knowledge-continuity/**'
       - 'skills/procedural-shadow-runtime/**'
       - 'skills/repository-capability-audit/**'
+      - 'skills/skill-refactor-proof-loop/**'
       - 'skills/spatial-loop-systems-engineering/**'
       - 'scripts/check_intent_bound_constraints.py'
       - 'scripts/check_suite_ci_coverage.py'
@@ -40,6 +41,7 @@ on:
       - 'skills/knowledge-continuity/**'
       - 'skills/procedural-shadow-runtime/**'
       - 'skills/repository-capability-audit/**'
+      - 'skills/skill-refactor-proof-loop/**'
       - 'skills/spatial-loop-systems-engineering/**'
       - 'scripts/check_intent_bound_constraints.py'
       - 'scripts/check_suite_ci_coverage.py'
@@ -88,6 +90,7 @@ jobs:
           - knowledge-continuity
           - procedural-shadow-runtime
           - repository-capability-audit
+          - skill-refactor-proof-loop
           - spatial-loop-systems-engineering
     name: ${{ matrix.skill }}
     steps:
