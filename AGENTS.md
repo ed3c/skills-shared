@@ -230,3 +230,35 @@ Connector ≠ Actions ≠ local worktree. Local claims require observed checkout
 Dual-forge order: `runtime bind → GitHub ingress → local/Forgejo issue+worktree → verified Forgejo PR → local main → GitHub reconciliation → exact-head Actions → GitHub publication`.
 Three qualifying failures trigger fresh diagnosis + new worktree; no fourth blind patch.
 <!-- END SHARED RUNTIME IDENTITY -->
+
+## Tech Lead + independent Shadow closure audit
+
+Before claiming that a source proposal, issue program, Skill refactor, consumer integration, physical run, Human admission, or release is closed, read [`docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md`](docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md).
+
+Use the relationship exactly:
+
+```text
+Tech Lead
+  → problem/capability/task DAG
+  → writer, branch/worktree, path and resource leases
+  → one convergence owner
+  → Local Handoff Queue when the current runtime cannot execute the next proof
+
+Independent Shadow
+  → same immutable subject
+  → separate applicability/contradiction/global-objective/evidence-ceiling review
+  → findings only; never a second state writer
+```
+
+Completion requires separate evidence for:
+
+```text
+METHOD_IMPLEMENTED
+CONSUMER_MECHANISM_IMPLEMENTED
+DETERMINISTIC_EVIDENCE_VERIFIED
+LIVE_OR_PHYSICAL_EVIDENCE_VERIFIED
+HUMAN_ADMITTED
+RELEASED
+```
+
+A merged PR, static fixture, documentation PASS, model agreement, workflow green, source proposal, process dependency, or external evidence lane cannot substitute for a later stage. Consumer snapshots in the shared repository are dated, non-authoritative navigation aids; refresh the consumer's machine queue, Stack index, current issue/PR metadata and receipts before acting.
