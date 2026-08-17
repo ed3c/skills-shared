@@ -217,7 +217,28 @@ Open live owners remain issue #312 Phase 2 and issues #231, #232, #234 and #256.
 
 Every gap names an existing owning issue; the checker refuses an owner that is not already known, so the audit cannot invent a duplicate. Gaps whose evidence lane already had an owner stay with it (#231, #232, #234, #256). Every other gap is owned by its Skill's own migration leaf — #343 `agentic-tech-lead-orchestration`, #344 `controlled-technical-language-harness`, #345 `dual-forge-repository-loop`, #346 `forgejo-delivery-loop`, #347 `git-town-stacked-pr-worker`, #348 `github-delivery-loop`, #349 `knowledge-continuity`, #350 `procedural-shadow-runtime`, #351 `repository-capability-audit`, #352 `spatial-loop-systems-engineering` — so no gap is parked on the audit issue that measured it.
 
-[`docs/traceability/SKILL_REFACTOR_ADOPTION_AUDIT.md`](../../docs/traceability/SKILL_REFACTOR_ADOPTION_AUDIT.md) is that ledger rendered for humans by `scripts/render_adoption_audit.py`. It is a generated file: `--check` re-renders and byte-compares it from the suite, so a hand-edited or stale report is a red suite rather than a second source. Opening the remaining migration leaves stays outside this ledger.
+### Migration order
+
+The ten leaves are not independent, so the ledger carries the order they can actually be closed in. Each edge comes from a file that already resolves or asserts a path into another in-scope Skill:
+
+```text
+1  agentic-tech-lead-orchestration        #343  —
+2  controlled-technical-language-harness  #344  —
+3  forgejo-delivery-loop                  #346  —
+4  github-delivery-loop                   #348  —
+5  dual-forge-repository-loop             #345  ← #348  loads ci_publish_gate.py, ci_workflow_policy.py
+6  git-town-stacked-pr-worker             #347  ← #348  require_markers("github-delivery-loop")
+7  knowledge-continuity                   #349  —
+8  spatial-loop-systems-engineering       #352  ← #346  require_literal("forgejo-delivery-loop")
+9  repository-capability-audit            #351  ← #344 #348 #349 #352  SOURCE_SKILLS subjects
+10 procedural-shadow-runtime              #350  ← #347 #351  reads uplift-preregistration.json
+```
+
+`check_skill_adoption_ledger.py` throws this list away and recomputes it from `depends_on` alone by stable topological sort, so a hand-sorted order is `MIGRATION_ORDER_NOT_CANONICAL` and a cycle is `MIGRATION_ORDER_CYCLE`. Rows with no blocker are genuinely unordered against each other — only the alphabetical tie-break fixes where they land, and nothing here is a schedule, an estimate or an assignment.
+
+The `repository-capability-audit` ↔ `procedural-shadow-runtime` coupling is the one place the two directions differ in kind. `summarise_uplift_matrix.py` opens the other Skill's preregistration from a module-level constant; the reverse only names this Skill's artifacts as inert preregistration data, and no script of its own reads them. The executable direction is the edge; recording both would have manufactured a cycle out of an asymmetry.
+
+[`docs/traceability/SKILL_REFACTOR_ADOPTION_AUDIT.md`](../../docs/traceability/SKILL_REFACTOR_ADOPTION_AUDIT.md) is that ledger rendered for humans by `scripts/render_adoption_audit.py`. It is a generated file: `--check` re-renders and byte-compares it from the suite, so a hand-edited or stale report is a red suite rather than a second source. The leaves themselves live on GitHub; this ledger records which gaps they own and what order the bytes allow, and reads nothing about their delivery state.
 
 The standard the audit applies was admitted for adoption governance in [`evals/proof-standard-admission.json`](evals/proof-standard-admission.json) (`ed3c (repository owner)`, 2026-08-17, subject `main@ce68a05`). That record is a decision: it carries no run, no receipt and no measurement, and it promoted no Skill's proof level. Every state in the ledger stays exactly as measured.
 

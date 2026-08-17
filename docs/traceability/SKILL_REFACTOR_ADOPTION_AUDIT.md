@@ -26,6 +26,7 @@ against current repository bytes.
 | Gaps carrying an owning issue | 68 |
 | Distinct owning issues | 14 |
 | Golden proofs registered | 1 |
+| Migration leaves ordered | 10 |
 
 Highest proof layer reached, per Skill:
 
@@ -220,9 +221,39 @@ An issue listed here is not a duplicate of the audit: it already exists in the l
 | `spatial-loop-systems-engineering` | `live_model_runtime_ab` | `NOT_IMPLEMENTED` | — |
 | `spatial-loop-systems-engineering` | `molecular_traceability` | `ABSENT` | — |
 
+## Migration order
+
+The leaves above are not independent. Each row's `Blocked by` is derived from files that
+already resolve or assert a path into another in-scope Skill, so closing them out of order
+means freezing a treatment whose bytes are still moving underneath it. `Basis` names the
+files the edge was read out of; the checker requires every one of them to exist.
+
+This sequence is not a preference. `check_skill_adoption_ledger.py` discards it, recomputes it
+from `depends_on` alone by stable topological sort — alphabetically first Skill whose blockers
+are all placed — and refuses the ledger if the recorded list differs or if a cycle means no
+order exists. Rows with no blocker are genuinely unordered against each other; only the
+alphabetical tie-break fixes where they land.
+
+| # | Skill | Leaf | Blocked by | Why | Basis |
+|---|---|---|---|---|---|
+| 1 | `agentic-tech-lead-orchestration` | #343 | — | Blocked by no other leaf, and it is the only Skill whose golden proof is registered, so its treatments are the one worked instance the other nine copy. | — |
+| 2 | `controlled-technical-language-harness` | #344 | — | No file under this Skill's scripts, tests, evals, references or contracts resolves a path into any other in-scope Skill. | — |
+| 3 | `forgejo-delivery-loop` | #346 | — | No file under this Skill's scripts, tests, evals, references or contracts resolves a path into any other in-scope Skill. | — |
+| 4 | `github-delivery-loop` | #348 | — | No file under this Skill's scripts, tests, evals, references or contracts resolves a path into any other in-scope Skill; two of them resolve paths into this one. | — |
+| 5 | `dual-forge-repository-loop` | #345 | `github-delivery-loop` | check_dual_forge_contract.py load_module()s github-delivery-loop/scripts/ci_publish_gate.py and ci_workflow_policy.py at gate time, so this Skill's executable contract is literally the other Skill's code running. | `skills/dual-forge-repository-loop/scripts/check_dual_forge_contract.py`, `skills/github-delivery-loop/scripts/ci_publish_gate.py`, `skills/github-delivery-loop/scripts/ci_workflow_policy.py` |
+| 6 | `git-town-stacked-pr-worker` | #347 | `github-delivery-loop` | check_publication_boundary.py require_markers() the literal string github-delivery-loop in this Skill's own publication surface, so freezing a treatment here freezes text bound to the other Skill's contract. | `skills/git-town-stacked-pr-worker/scripts/check_publication_boundary.py`, `skills/git-town-stacked-pr-worker/references/GITHUB_ACTIONS_PUBLICATION_ADOPTION.md` |
+| 7 | `knowledge-continuity` | #349 | — | No file under this Skill's scripts, tests, evals, references or contracts resolves a path into any other in-scope Skill. | — |
+| 8 | `spatial-loop-systems-engineering` | #352 | `forgejo-delivery-loop` | recovery-escalation/verify.sh require_literal()s forgejo-delivery-loop in the escalation overlay, so this Skill's hollow-route control is red the moment the other Skill's name moves. | `skills/spatial-loop-systems-engineering/tests/recovery-escalation/verify.sh`, `skills/spatial-loop-systems-engineering/references/three-failure-escalation.md` |
+| 9 | `repository-capability-audit` | #351 | `controlled-technical-language-harness`, `github-delivery-loop`, `knowledge-continuity`, `spatial-loop-systems-engineering` | run_pilot_matrix.py SOURCE_SKILLS names these four as measured subjects and test_source_contribution.py scores them by name, so a matched hermetic task here is comparing bytes those four Skills own. | `skills/repository-capability-audit/scripts/run_pilot_matrix.py`, `skills/repository-capability-audit/tests/test_source_contribution.py`, `skills/repository-capability-audit/evals/held-out-corpus.json` |
+| 10 | `procedural-shadow-runtime` | #350 | `git-town-stacked-pr-worker`, `repository-capability-audit` | summarise_uplift_matrix.py opens repository-capability-audit/evals/uplift-preregistration.json from a module-level constant, and the capsule and receipt fixtures pin git-town-stacked-pr-worker/SKILL.md as the procedure source. The reverse edge is not symmetric: repository-capability-audit only names this Skill's artifacts as inert preregistration data, and no script of its own reads them. | `skills/procedural-shadow-runtime/scripts/summarise_uplift_matrix.py`, `skills/repository-capability-audit/evals/uplift-preregistration.json`, `skills/procedural-shadow-runtime/tests/fixtures/valid-capsule.json` |
+
 ## Evidence boundary
 
 This report proves inventory and gap classification against current bytes. It does not prove
 model uplift, provider operation, scheduler or Shadow enforcement, Git Town/Forgejo delivery,
 merge, release or production readiness. `molecular_traceability` cannot reach `PASS` here at all:
 the audit is zero-network, and no offline byte proves current issue or PR delivery state.
+
+The migration order proves coupling between Skills as their current bytes express it. It is not a
+schedule, not an estimate, and not an assignment: it says which leaf would be freezing a moving
+target if it went first, and nothing about when any of them is worked or by whom.

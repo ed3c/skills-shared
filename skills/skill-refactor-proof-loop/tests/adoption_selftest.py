@@ -34,6 +34,10 @@ def entry(value: dict, skill: str) -> dict:
     return next(row for row in value["skills"] if row["skill"] == skill)
 
 
+def leaf(value: dict, skill: str) -> dict:
+    return next(row for row in value["migration_order"] if row["skill"] == skill)
+
+
 def main() -> int:
     base = json.loads(BASE.read_text(encoding="utf-8"))
     mutations: dict[str, tuple[dict, str]] = {}
@@ -125,6 +129,68 @@ def main() -> int:
     invented = copy.deepcopy(base)
     entry(invented, UNPROVEN)["criteria"]["matched_hermetic_task"]["owner_issue"] = 99999
     mutations["gap_owned_by_unknown_issue"] = (invented, "OWNER_ISSUE_NOT_KNOWN")
+
+    # The migration order is derived from observable coupling, so every way of
+    # asserting an order that the edges do not support has to name itself.
+    cycle = copy.deepcopy(base)
+    row = leaf(cycle, "github-delivery-loop")
+    row["depends_on"] = ["dual-forge-repository-loop"]
+    row["basis"] = ["skills/dual-forge-repository-loop/scripts/check_dual_forge_contract.py"]
+    mutations["migration_order_cycle"] = (cycle, "MIGRATION_ORDER_CYCLE")
+
+    resequenced = copy.deepcopy(base)
+    order = resequenced["migration_order"]
+    order[-2], order[-1] = order[-1], order[-2]
+    mutations["migration_order_resequenced"] = (resequenced, "MIGRATION_ORDER_NOT_CANONICAL")
+
+    unknown_leaf = copy.deepcopy(base)
+    leaf(unknown_leaf, UNPROVEN)["issue"] = 99999
+    mutations["migration_leaf_issue_unknown"] = (unknown_leaf, "MIGRATION_ISSUE_NOT_KNOWN")
+
+    idle_leaf = copy.deepcopy(base)
+    leaf(idle_leaf, UNPROVEN)["issue"] = 318
+    mutations["migration_leaf_owns_no_gap"] = (idle_leaf, "MIGRATION_ISSUE_OWNS_NO_GAP")
+
+    shared_leaf = copy.deepcopy(base)
+    shared = leaf(shared_leaf, "controlled-technical-language-harness")["issue"]
+    entry(shared_leaf, UNPROVEN)["criteria"]["matched_hermetic_task"]["owner_issue"] = shared
+    mutations["migration_leaf_owns_another_skills_gap"] = (shared_leaf, "MIGRATION_ISSUE_NOT_SKILL_LEAF")
+
+    unordered = copy.deepcopy(base)
+    unordered["migration_order"] = [
+        row for row in unordered["migration_order"] if row["skill"] != UNPROVEN
+    ]
+    mutations["migration_skill_unordered"] = (unordered, "MIGRATION_SKILL_UNORDERED")
+
+    strayed = copy.deepcopy(base)
+    stray = copy.deepcopy(leaf(strayed, UNPROVEN))
+    stray["skill"] = "skill-that-does-not-exist"
+    strayed["migration_order"].append(stray)
+    mutations["migration_skill_out_of_scope"] = (strayed, "MIGRATION_SKILL_OUT_OF_SCOPE")
+
+    twice = copy.deepcopy(base)
+    twice["migration_order"].append(copy.deepcopy(leaf(twice, UNPROVEN)))
+    mutations["migration_duplicate_skill"] = (twice, "MIGRATION_DUPLICATE_SKILL")
+
+    ghost_blocker = copy.deepcopy(base)
+    row = leaf(ghost_blocker, UNPROVEN)
+    row["depends_on"] = ["skill-that-does-not-exist"]
+    row["basis"] = ["skills/skill-refactor-proof-loop/tests/run-all.sh"]
+    mutations["migration_blocker_unknown_skill"] = (ghost_blocker, "MIGRATION_DEPENDENCY_UNKNOWN_SKILL")
+
+    unbacked = copy.deepcopy(base)
+    leaf(unbacked, "dual-forge-repository-loop")["basis"] = []
+    mutations["migration_blocker_without_basis"] = (unbacked, "MIGRATION_BASIS_REQUIRED")
+
+    padded = copy.deepcopy(base)
+    leaf(padded, UNPROVEN)["basis"] = ["skills/skill-refactor-proof-loop/tests/run-all.sh"]
+    mutations["migration_basis_without_blocker"] = (padded, "MIGRATION_BASIS_FORBIDDEN")
+
+    imagined = copy.deepcopy(base)
+    leaf(imagined, "dual-forge-repository-loop")["basis"] = [
+        "skills/dual-forge-repository-loop/scripts/never_written.py"
+    ]
+    mutations["migration_basis_path_absent"] = (imagined, "MIGRATION_BASIS_PATH_ABSENT")
 
     survivors = []
     with tempfile.TemporaryDirectory(prefix="adoption-selftest-") as raw:

@@ -128,6 +128,7 @@ def build_report(ledger: dict, admission: dict) -> str:
         ["Gaps carrying an owning issue", str(owned)],
         ["Distinct owning issues", str(len(gaps))],
         ["Golden proofs registered", str(registered)],
+        ["Migration leaves ordered", str(len(ledger["migration_order"]))],
     ]))
     out.extend(["", "Highest proof layer reached, per Skill:", ""])
     out.extend(table(
@@ -181,12 +182,47 @@ def build_report(ledger: dict, admission: dict) -> str:
 
     out.extend([
         "",
+        "## Migration order",
+        "",
+        "The leaves above are not independent. Each row's `Blocked by` is derived from files that",
+        "already resolve or assert a path into another in-scope Skill, so closing them out of order",
+        "means freezing a treatment whose bytes are still moving underneath it. `Basis` names the",
+        "files the edge was read out of; the checker requires every one of them to exist.",
+        "",
+        "This sequence is not a preference. `check_skill_adoption_ledger.py` discards it, recomputes it",
+        "from `depends_on` alone by stable topological sort — alphabetically first Skill whose blockers",
+        "are all placed — and refuses the ledger if the recorded list differs or if a cycle means no",
+        "order exists. Rows with no blocker are genuinely unordered against each other; only the",
+        "alphabetical tie-break fixes where they land.",
+        "",
+    ])
+    out.extend(table(
+        ["#", "Skill", "Leaf", "Blocked by", "Why", "Basis"],
+        [
+            [
+                str(position),
+                f"`{row['skill']}`",
+                f"#{row['issue']}",
+                ", ".join(f"`{name}`" for name in row["depends_on"]) or "—",
+                cell(row.get("note", "—")),
+                ", ".join(f"`{path}`" for path in row["basis"]) or "—",
+            ]
+            for position, row in enumerate(ledger["migration_order"], 1)
+        ],
+    ))
+
+    out.extend([
+        "",
         "## Evidence boundary",
         "",
         "This report proves inventory and gap classification against current bytes. It does not prove",
         "model uplift, provider operation, scheduler or Shadow enforcement, Git Town/Forgejo delivery,",
         "merge, release or production readiness. `molecular_traceability` cannot reach `PASS` here at all:",
         "the audit is zero-network, and no offline byte proves current issue or PR delivery state.",
+        "",
+        "The migration order proves coupling between Skills as their current bytes express it. It is not a",
+        "schedule, not an estimate, and not an assignment: it says which leaf would be freezing a moving",
+        "target if it went first, and nothing about when any of them is worked or by whom.",
         "",
     ])
     return "\n".join(out)

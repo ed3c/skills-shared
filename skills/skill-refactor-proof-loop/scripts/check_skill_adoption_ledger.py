@@ -13,6 +13,18 @@ has to survive a mechanical re-derivation:
     a layer above the registered proof    -> fixture evidence promoted upward
     a gap with no owning issue            -> the gap disappears at read time
 
+`migration_order` gets the same treatment. An order is the cheapest artefact in
+this repository to write from taste, so none of it is taken on the author's
+word: the recorded sequence is thrown away and recomputed from `depends_on` by
+a stable topological sort (alphabetical tie-break among Skills whose blockers
+are all placed), then compared. A hand-sorted list, a swapped pair, a
+dependency cycle and a leaf issue that owns nothing all read differently:
+
+    a dependency cycle                    -> no order exists at all
+    a resequenced list                    -> the order stopped following its edges
+    a leaf issue owning another's gaps    -> the leaf is not per-Skill
+    a blocker with no basis path          -> an edge asserted, nothing observed
+
 Exit codes: 0 green, 2 at least one refused claim, 70 unusable ledger/schema.
 """
 from __future__ import annotations
@@ -55,6 +67,80 @@ def registry_index(registry: dict[str, Any]) -> dict[str, dict[str, Any]]:
         if isinstance(proof, dict) and isinstance(proof.get("owner_skill"), str):
             index[proof["owner_skill"]] = proof
     return index
+
+
+def canonical_order(edges: dict[str, set[str]]) -> list[str]:
+    """Stable topological order: alphabetically first Skill whose blockers are placed.
+
+    Returned short when a cycle strands the rest, so the caller can tell "no
+    order exists" apart from "an order exists and this list is not it".
+    """
+    placed: set[str] = set()
+    order: list[str] = []
+    while True:
+        ready = sorted(name for name in edges if name not in placed and edges[name] <= placed)
+        if not ready:
+            return order
+        order.append(ready[0])
+        placed.add(ready[0])
+
+
+def validate_migration_order(repo: Path, ledger: dict[str, Any]) -> list[str]:
+    errors: list[str] = []
+    order = ledger["migration_order"]
+    listed = [row["skill"] for row in order]
+    unique = set(listed)
+    known = set(ledger["known_issues"])
+    owners = {
+        entry["skill"]: {
+            finding["owner_issue"]
+            for finding in entry["criteria"].values()
+            if finding.get("owner_issue") is not None
+        }
+        for entry in ledger["skills"]
+    }
+
+    for name in sorted({name for name in listed if listed.count(name) > 1}):
+        errors.append(f"MIGRATION_DUPLICATE_SKILL {name}")
+    for name in sorted(set(ledger["in_scope"]) - unique):
+        errors.append(f"MIGRATION_SKILL_UNORDERED {name}")
+    for name in sorted(unique - set(ledger["in_scope"])):
+        errors.append(f"MIGRATION_SKILL_OUT_OF_SCOPE {name}")
+
+    for row in order:
+        skill = row["skill"]
+        issue = row["issue"]
+        if issue not in known:
+            errors.append(f"MIGRATION_ISSUE_NOT_KNOWN {skill}:{issue}")
+        if issue not in owners.get(skill, set()):
+            errors.append(f"MIGRATION_ISSUE_OWNS_NO_GAP {skill}:{issue}")
+        for other in sorted(name for name, held in owners.items() if name != skill and issue in held):
+            errors.append(f"MIGRATION_ISSUE_NOT_SKILL_LEAF {skill}:{issue}:{other}")
+
+        for blocker in row["depends_on"]:
+            if blocker not in unique:
+                errors.append(f"MIGRATION_DEPENDENCY_UNKNOWN_SKILL {skill}:{blocker}")
+        if row["depends_on"] and not row["basis"]:
+            errors.append(f"MIGRATION_BASIS_REQUIRED {skill}")
+        if not row["depends_on"] and row["basis"]:
+            errors.append(f"MIGRATION_BASIS_FORBIDDEN {skill}")
+        for value in row["basis"]:
+            try:
+                path = safe_repo_path(repo, value)
+            except RegistryError as exc:
+                errors.append(f"{skill}:basis {exc}")
+                continue
+            if not path.exists():
+                errors.append(f"MIGRATION_BASIS_PATH_ABSENT {skill}:{value}")
+
+    edges = {row["skill"]: set(row["depends_on"]) & unique for row in order}
+    derived = canonical_order(edges)
+    stranded = sorted(set(edges) - set(derived))
+    if stranded:
+        errors.append(f"MIGRATION_ORDER_CYCLE {','.join(stranded)}")
+    elif derived != listed:
+        errors.append(f"MIGRATION_ORDER_NOT_CANONICAL expected={','.join(derived)}")
+    return errors
 
 
 def validate(repo: Path, ledger: dict[str, Any], registry: dict[str, Any]) -> list[str]:
@@ -150,6 +236,7 @@ def validate(repo: Path, ledger: dict[str, Any], registry: dict[str, Any]) -> li
             errors.append(f"LIVE_PASS_BELOW_LAYER {skill}:{highest}")
         if criteria["molecular_traceability"]["state"] == PASS:
             errors.append(f"DELIVERY_PASS_WITHOUT_LIVE_RECEIPT {skill}")
+    errors.extend(validate_migration_order(repo, ledger))
     return errors
 
 
@@ -188,7 +275,8 @@ def main(argv: list[str] | None = None) -> int:
     )
     print(
         f"SKILL-ADOPTION-GREEN skills={len(ledger['skills'])} gaps={gaps} "
-        "owned by known issues; delivery state and live runtime not inferred"
+        f"owned by known issues; migration_order={len(ledger['migration_order'])} leaves "
+        "recomputed from its own edges; delivery state and live runtime not inferred"
     )
     return 0
 
