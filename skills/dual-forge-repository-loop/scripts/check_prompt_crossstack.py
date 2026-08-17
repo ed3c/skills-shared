@@ -1,13 +1,25 @@
 #!/usr/bin/env python3
 """Validate the #229 cross-stack artifacts against each other. Zero network.
 
-The rule that matters most here is the last one. This run's own audit showed the
-discriminating metric to be lexical: every arm identified every refusal case
-correctly, and the whole score difference came from one case where the candidate
-prompt happens to carry the checker's vocabulary. So the outcome is recorded as
-INDETERMINATE, and that cannot be edited to a portability claim while the audit
-still says the metric measures words. Flipping the outcome now requires fixing
-the metric, which is the point.
+Two generations live here and the checker reads both.
+
+Generation 1 executed. Its own audit showed the discriminating metric to be
+lexical: every arm identified every refusal case correctly, and the whole score
+difference came from one case where the candidate prompt happens to carry the
+checker's vocabulary. So the outcome is recorded as INDETERMINATE, and that
+cannot be edited to a portability claim while the audit still says the metric
+measures words. That receipt is history; nothing here rewrites it.
+
+Generation 2 is the repaired instrument and has not been executed. It pairs
+every refusal family with an admitted near miss so no constant verdict scores
+well, and scores rule naming from a paraphrase rubric whose accept and reject
+phrasings are re-executed here.
+
+The two are told apart by evidence rather than by trust: a refusal case either
+carries a rubric or it does not. A set where none do is the lexical generation,
+which is exactly what generation 1's files say by carrying no rubric field --
+absence is read as its own declared state, never as a rubric the checker then
+pretends to have found. A set where only some do is refused outright.
 
 Exit codes: 0 pass, 2 contract failure, 64 unusable input, 70 evaluator defect.
 """
@@ -22,10 +34,15 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from crossstack_rubric import LEXICAL, MIXED, NO_REFUSAL_CASES, RUBRIC, observed_metric, validate_rubric
+
 SKILL = Path(__file__).resolve().parent.parent
 PREREG = SKILL / "evals" / "prompt-crossstack-preregistration.json"
 CASES = SKILL / "evals" / "prompt-crossstack-cases.json"
 RESULT = SKILL / "evals" / "prompt-crossstack-result.json"
+PREREG_V2 = SKILL / "evals" / "prompt-crossstack-v2-preregistration.json"
+CASES_V2 = SKILL / "evals" / "prompt-crossstack-v2-cases.json"
+RESULT_V2 = SKILL / "evals" / "prompt-crossstack-v2-result.json"
 
 EXECUTED = {"EXECUTED", "EXECUTED_INDETERMINATE"}
 UNEXECUTED = {"FROZEN_NOT_EXECUTED"}
@@ -183,37 +200,124 @@ def check_metric_audit(result: dict[str, Any]) -> None:
                f"way. Fix the metric, then the outcome may move")
 
 
+def metric_generation(prereg: dict[str, Any], cases: dict[str, Any]) -> str:
+    """Derive which metric the case set is scored by, from the cases themselves.
+
+    A file cannot be believed about its own metric, so the rubrics decide. The
+    absence of every rubric is the lexical generation's declared state and is
+    reported as such; a partial set is refused, because a run scored two ways has
+    no single metric to compare arms on.
+    """
+    observed = observed_metric(cases["cases"])
+    if observed == NO_REFUSAL_CASES:
+        refuse("CASE_SET_DRIFT", "no refusal cases, so no rule can be named or scored")
+    if observed == MIXED:
+        refuse("METRIC_GENERATION_MIXED",
+               "only some refusal cases carry a rubric; a set scored two ways has no "
+               "single metric to compare arms on")
+
+    declared = ((prereg.get("metric_design") or {}).get("rule_metric")
+                or cases.get("rule_metric"))
+    if declared is None and observed == RUBRIC:
+        refuse("METRIC_GENERATION_MISDECLARED",
+               "every refusal case carries a rubric and nothing declares it; only the "
+               "lexical generation may be declared by absence, and only because that is "
+               "what its committed files actually say")
+    if declared is not None and declared != observed:
+        refuse("METRIC_GENERATION_MISDECLARED",
+               f"declared {declared} against {observed} observed in the cases")
+    return observed
+
+
+def constant_verdict_share(cases: dict[str, Any]) -> float:
+    """What the best one-word answer scores. A high number is a ceiling, not a pass."""
+    verdicts = [c["ground_truth"]["verdict"] for c in cases["cases"]]
+    return max(verdicts.count("ADMIT"), verdicts.count("REFUSE")) / len(verdicts)
+
+
+def check_case_design(prereg: dict[str, Any], cases: dict[str, Any],
+                      generation: str) -> None:
+    """Gate the instrument, not the run: a set nothing can lose on measures nothing."""
+    policy = prereg.get("metric_design") or {}
+    ceiling = policy.get("max_constant_verdict_share")
+    if ceiling is not None:
+        share = constant_verdict_share(cases)
+        if share > ceiling:
+            refuse("METRIC_AT_CEILING",
+                   f"a constant verdict scores {share:.3f} against a frozen ceiling of "
+                   f"{ceiling}; every arm passing is not a measurement")
+
+    if generation != RUBRIC:
+        return
+
+    refusal_families = {c["field_family"] for c in cases["cases"]
+                        if c["ground_truth"]["verdict"] == "REFUSE"
+                        and "field_family" in c}
+    for case in cases["cases"]:
+        if case["ground_truth"]["verdict"] != "ADMIT" or "field_family" not in case:
+            continue
+        if case["field_family"] not in refusal_families:
+            refuse("NEAR_MISS_UNPAIRED",
+                   f"{case['case_id']} is admitted in field family "
+                   f"{case['field_family']}, where no refusal case lives; an admitted "
+                   f"case nothing is near is not a near miss")
+
+    problems: list[str] = []
+    for case in cases["cases"]:
+        marker = case["ground_truth"]["violated_rule"]
+        if marker:
+            problems.extend(validate_rubric(marker, case.get("rule_rubric")))
+    if problems:
+        refuse("RUBRIC_UNUSABLE",
+               "; ".join(problems[:3]) + (f" (+{len(problems) - 3} more)"
+                                          if len(problems) > 3 else ""))
+
+
+def check_result_metric(result: dict[str, Any], generation: str) -> None:
+    if result.get("rule_metric") != generation:
+        refuse("METRIC_GENERATION_MISDECLARED",
+               f"the result was scored as {result.get('rule_metric')!r} while the case "
+               f"set is {generation}")
+
+
 CHECKS = (check_stacks, check_cells, check_order)
 
 
 def validate(prereg: dict[str, Any], cases: dict[str, Any],
              result: dict[str, Any] | None) -> None:
     check_lifecycle(prereg, result)
+    generation = metric_generation(prereg, cases)
+    check_case_design(prereg, cases, generation)
     if result is None:
         return
     check_binding(prereg, cases, result)
     for check in CHECKS:
         check(prereg, result)
     check_summary(result)
-    check_metric_audit(result)
+    if generation == LEXICAL:
+        check_metric_audit(result)
+    else:
+        check_result_metric(result, generation)
 
 
-def selftest(prereg: dict[str, Any], cases: dict[str, Any],
-             result: dict[str, Any]) -> int:
-    try:
-        validate(prereg, cases, result)
-    except Refused as failure:
-        print(f"SELFTEST RED: committed artifacts already refused -- {failure}",
-              file=sys.stderr)
-        return 2
+Trio = tuple[dict[str, Any], dict[str, Any], dict[str, Any] | None]
 
-    def mutate(target: str, fn: Any) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
-        trio = {"prereg": copy.deepcopy(prereg), "cases": copy.deepcopy(cases),
-                "result": copy.deepcopy(result)}
+
+def mutator(prereg: dict[str, Any], cases: dict[str, Any],
+            result: dict[str, Any] | None) -> Any:
+    def mutate(target: str, fn: Any) -> Trio:
+        trio: dict[str, Any] = {"prereg": copy.deepcopy(prereg),
+                                "cases": copy.deepcopy(cases),
+                                "result": copy.deepcopy(result)}
         fn(trio[target])
         return trio["prereg"], trio["cases"], trio["result"]
+    return mutate
 
-    controls = [
+
+def generation1_controls(prereg: dict[str, Any], cases: dict[str, Any],
+                         result: dict[str, Any]) -> list[tuple[str, str, Trio]]:
+    mutate = mutator(prereg, cases, result)
+    return [
         ("stale-status", "LIFECYCLE_CONTRADICTION",
          mutate("prereg", lambda d: d.update({"status": "FROZEN_NOT_EXECUTED"}))),
         ("case-set-drift", "CASE_SET_DRIFT",
@@ -245,6 +349,46 @@ def selftest(prereg: dict[str, Any], cases: dict[str, Any],
          mutate("result", lambda d: d["eligibility"].update({"outcome": "NOT_ELIGIBLE"}))),
     ]
 
+
+def first_refusal(cases: dict[str, Any]) -> dict[str, Any]:
+    return next(c for c in cases["cases"] if c["ground_truth"]["violated_rule"])
+
+
+def drop_near_misses(cases: dict[str, Any]) -> None:
+    """Put the generation-1 ceiling back: refusals plus one admitted case."""
+    cases["cases"] = [c for c in cases["cases"]
+                      if c["ground_truth"]["verdict"] == "REFUSE"
+                      or c["case_id"] == "heldout-positive"]
+
+
+def generation2_controls(prereg: dict[str, Any],
+                         cases: dict[str, Any]) -> list[tuple[str, str, Trio]]:
+    """The instrument's own controls. Generation 2 has no result to plant defects in."""
+    mutate = mutator(prereg, cases, None)
+    return [
+        # A result beside a FROZEN_NOT_EXECUTED status is the one way "not executed"
+        # could quietly become "executed", so the absence has to be refusable.
+        ("gen2-result-smuggled", "LIFECYCLE_CONTRADICTION",
+         (copy.deepcopy(prereg), copy.deepcopy(cases),
+          {"preregistration_id": prereg["preregistration_id"], "cell_count": 18})),
+        ("gen2-ceiling-restored", "METRIC_AT_CEILING",
+         mutate("cases", drop_near_misses)),
+        ("gen2-near-miss-unpaired", "NEAR_MISS_UNPAIRED",
+         mutate("cases", lambda d: next(
+             c for c in d["cases"] if c["ground_truth"]["verdict"] == "ADMIT"
+             and "field_family" in c).update({"field_family": "budget-ledger"}))),
+        ("gen2-rubric-marker-echo", "RUBRIC_UNUSABLE",
+         mutate("cases", lambda d: first_refusal(d)["rule_rubric"].update(
+             {"accept_any": [[["runtime"]]]}))),
+        ("gen2-rubric-removed", "METRIC_GENERATION_MIXED",
+         mutate("cases", lambda d: first_refusal(d).pop("rule_rubric"))),
+        ("gen2-metric-misdeclared", "METRIC_GENERATION_MISDECLARED",
+         mutate("prereg", lambda d: d["metric_design"].update(
+             {"rule_metric": LEXICAL}))),
+    ]
+
+
+def run_controls(controls: list[tuple[str, str, Trio]]) -> int:
     failed = 0
     for name, code, trio in controls:
         try:
@@ -260,12 +404,49 @@ def selftest(prereg: dict[str, Any], cases: dict[str, Any],
         print(f"CONTROL FAILED {name}: expected {code}, nothing was refused",
               file=sys.stderr)
         failed += 1
+    return failed
 
-    if failed:
+
+def selftest(generation1: Trio, generation2: Trio) -> int:
+    for label, trio in (("generation 1", generation1), ("generation 2", generation2)):
+        try:
+            validate(*trio)
+        except Refused as failure:
+            print(f"SELFTEST RED: committed {label} artifacts already refused -- "
+                  f"{failure}", file=sys.stderr)
+            return 2
+
+    prereg, cases, result = generation1
+    assert result is not None
+    controls = (generation1_controls(prereg, cases, result)
+                + generation2_controls(generation2[0], generation2[1]))
+    if run_controls(controls):
         return 2
     print(f"SELFTEST GREEN: committed cross-stack artifacts admitted; "
           f"{len(controls)} planted defects refused")
     return 0
+
+
+def load(prereg_path: Path, cases_path: Path, result_path: Path) -> Trio:
+    result = (json.loads(result_path.read_text(encoding="utf-8"))
+              if result_path.is_file() else None)
+    return (json.loads(prereg_path.read_text(encoding="utf-8")),
+            json.loads(cases_path.read_text(encoding="utf-8")),
+            result)
+
+
+def report(trio: Trio) -> None:
+    prereg, cases, result = trio
+    generation = metric_generation(prereg, cases)
+    if result is None:
+        print(f"CROSS-STACK GREEN: {prereg['preregistration_id']} frozen, not executed; "
+              f"{cases['case_count']} cases, best constant verdict scores "
+              f"{constant_verdict_share(cases):.3f}, rule metric {generation}")
+        return
+    print(f"CROSS-STACK GREEN: {result['cell_count']} cells over "
+          f"{len(result['per_stack'])} stacks; outcome "
+          f"{result['eligibility']['outcome']} -- every arm judged every refusal case "
+          f"correctly and the score gap is vocabulary ({generation})")
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -274,9 +455,8 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     try:
-        prereg = json.loads(PREREG.read_text(encoding="utf-8"))
-        cases = json.loads(CASES.read_text(encoding="utf-8"))
-        result = json.loads(RESULT.read_text(encoding="utf-8")) if RESULT.is_file() else None
+        generation1 = load(PREREG, CASES, RESULT)
+        generation2 = load(PREREG_V2, CASES_V2, RESULT_V2)
     except OSError as error:
         print(f"USAGE: {error}", file=sys.stderr)
         return 64
@@ -285,27 +465,22 @@ def main(argv: list[str] | None = None) -> int:
         return 64
 
     if args.mode == "selftest":
-        if result is None:
-            print("USAGE: selftest needs a committed result", file=sys.stderr)
+        if generation1[2] is None:
+            print("USAGE: selftest needs the committed generation-1 result",
+                  file=sys.stderr)
             return 64
-        return selftest(prereg, cases, result)
+        return selftest(generation1, generation2)
 
-    try:
-        validate(prereg, cases, result)
-    except Refused as failure:
-        print(f"CROSS-STACK REFUSED {failure.code}: {failure.detail}", file=sys.stderr)
-        return 2
-    except Exception as error:
-        print(f"EVALUATOR FAILURE: {error!r}", file=sys.stderr)
-        return 70
-
-    if result is None:
-        print(f"CROSS-STACK GREEN: {prereg['preregistration_id']} frozen, not executed")
-        return 0
-    print(f"CROSS-STACK GREEN: {result['cell_count']} cells over "
-          f"{len(result['per_stack'])} stacks; outcome "
-          f"{result['eligibility']['outcome']} -- every arm judged every refusal case "
-          f"correctly and the score gap is vocabulary")
+    for trio in (generation1, generation2):
+        try:
+            validate(*trio)
+        except Refused as failure:
+            print(f"CROSS-STACK REFUSED {failure.code}: {failure.detail}", file=sys.stderr)
+            return 2
+        except Exception as error:
+            print(f"EVALUATOR FAILURE: {error!r}", file=sys.stderr)
+            return 70
+        report(trio)
     return 0
 
 
