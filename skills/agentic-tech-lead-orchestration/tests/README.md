@@ -1,5 +1,12 @@
 # Test controls
 
-`run-all.sh` executes the positive example and independent mutation cases for provider role/subject separation, active code-graph-rag rejection, no-double-graph, path leases, DAG cycles, Git Town admission, semantic-conflict blocking, evidence ceilings, and Human Admit.
+`run-all.sh` executes the positive examples and independent mutation cases for provider role/subject separation, active code-graph-rag rejection, no-double-graph, path leases, DAG cycles, Git Town admission, semantic-conflict blocking, evidence ceilings, Human Admit, scheduler lifecycle, and the matched real-task A/B.
 
-The suite is offline, uses only the Python standard library, performs no network/provider/forge operation, and deletes its temporary receipt.
+Real-task control ownership:
+
+- `real_task_ab.py` freezes the old monolith, refactor-as-landed, reachability repair, and causal-DAG repair; it compiles the matched task/capability contracts and reports the PDF-derived closed-loop stage states.
+- `real_task_fixture.py` owns the immutable contract/oracles, deterministic Worker carrier, true-dependency and tournament-lease controls, and exact frozen treatment identities.
+- `real_task_runtime.py` creates real linked worktrees and subprocess Workers, proves path-disjoint overlap, checkpoint/resume, candidate comparison, global-objective veto, correct convergence ancestry, and residue cleanup.
+- `real_task_scheduler.py` projects actual observations into the canonical scheduler lifecycle contract and requires planted active-writer, stale-result, retry-lineage, and fixture-to-PASS mutations to fail.
+
+The suite is offline and zero-network. It does not activate provider/model, Git Town, Forgejo, publication, merge, or production authority. Temporary repositories, worktrees, branches, processes, and receipts must be removed at close.
