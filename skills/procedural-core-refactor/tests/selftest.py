@@ -99,7 +99,7 @@ def main() -> int:
     mutations.append(("CI PASS without run", contract, planted, "CI_PASS_WITHOUT_RUN"))
 
     planted = copy.deepcopy(proof)
-    planted["trace"]["exact_heads"] = planted["trace"]["exact_heads"][1:]
+    planted["trace"]["exact_heads"][0] = "0" * 40
     mutations.append(("untraced proof head", contract, planted, "PROOF_HEAD_NOT_TRACED"))
 
     planted = copy.deepcopy(proof)
