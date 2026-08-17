@@ -318,7 +318,7 @@ They may raise issue #312 from L3 to L4/L5 only with receipts matching treatment
 
 ## External consumer Stack snapshot — Bettor order 13
 
-Observed `2026-08-17`. This section is `EXTERNAL_CONSUMER_SNAPSHOT`, not `ed3c/bettor-arena` state authority. Refresh the consumer's current issue/PR metadata, exact GitHub/local/Forgejo subjects, machine Stack index and Local Handoff Queue before acting.
+Observed `2026-08-17`. This section is an `EXTERNAL_CONSUMER_SNAPSHOT`, not the consumer's state authority. Refresh the consumer's current issue/PR metadata, exact GitHub/local/Forgejo subjects, machine Stack index and Local Handoff Queue before acting.
 
 Merged implementation/governance subjects:
 
