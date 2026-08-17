@@ -1,0 +1,669 @@
+{
+  "schema": "skill-refactor-proof-loop/refactor-proof-stack/v1",
+  "stack_id": "tech-lead-refactor-proof-v1",
+  "owner_skill": "skill-refactor-proof-loop",
+  "epic_issue": 318,
+  "convergence_owner": "molecular-stack-traceability",
+  "nodes": [
+    {
+      "id": "tech-lead-causal-repair",
+      "stack_class": "ROOT",
+      "issues": [
+        307,
+        309
+      ],
+      "pull_request": 308,
+      "branch": "fix/307-tech-lead-runtime-reachability",
+      "base_branch": "main",
+      "state": "PR_OPEN",
+      "owns_paths": [
+        ".github/workflows/commit-role-subject-selection.yml",
+        "scripts/check_commit_roles.py",
+        "skills/agentic-tech-lead-orchestration/**",
+        "tests/test_commit_role_subject_selection.py"
+      ],
+      "consumes_artifacts": [],
+      "provides_artifacts": [
+        "task-schema-and-semantic-admission",
+        "capability-receipt-causal-dag",
+        "runtime-reachability-controls",
+        "frozen-treatment-fixtures"
+      ],
+      "evals": [
+        "Skill Suites / agentic-tech-lead-orchestration",
+        "Shared Skills Infra",
+        "Commit Role Subject Selection"
+      ],
+      "negative_controls": [
+        "dead task assertion route",
+        "detached module route",
+        "fixture-to-live promotion",
+        "wrong predecessor subject"
+      ],
+      "workflow": {
+        "state": "READ_FROM_GITHUB",
+        "source": "GitHub PR #308 exact head"
+      },
+      "head": {
+        "policy": "READ_FROM_GITHUB_PR_METADATA",
+        "observed_sha": null
+      },
+      "terminal_classification": "IMPLEMENTED_PENDING_HUMAN",
+      "remaining_evidence": [
+        "Human review and merge",
+        "live provider/runtime behavior"
+      ],
+      "rollback": "Close PR #308 and preserve the current main subject.",
+      "human_admit": "Repository owner admits merge after exact-head checks and review.",
+      "authority": {
+        "auto_resolve_semantic_conflict": false,
+        "force_push": false,
+        "ship": false,
+        "merge": false,
+        "release": false,
+        "promotion": false
+      }
+    },
+    {
+      "id": "tech-lead-hermetic-golden",
+      "stack_class": "TRUE_CHILD",
+      "issues": [
+        312
+      ],
+      "pull_request": 315,
+      "branch": "agent/312-tech-lead-real-task-ab",
+      "base_branch": "fix/307-tech-lead-runtime-reachability",
+      "state": "PR_OPEN",
+      "owns_paths": [
+        "skills/agentic-tech-lead-orchestration/tests/README.md",
+        "skills/agentic-tech-lead-orchestration/tests/real_task_ab.py",
+        "skills/agentic-tech-lead-orchestration/tests/real_task_fixture.py",
+        "skills/agentic-tech-lead-orchestration/tests/real_task_runtime.py",
+        "skills/agentic-tech-lead-orchestration/tests/real_task_scheduler.py",
+        "skills/agentic-tech-lead-orchestration/tests/run-all.sh"
+      ],
+      "consumes_artifacts": [
+        "task-schema-and-semantic-admission",
+        "capability-receipt-causal-dag",
+        "frozen-treatment-fixtures"
+      ],
+      "provides_artifacts": [
+        "matched-L3-hermetic-real-task-report",
+        "worktree-process-overlap-evidence",
+        "checkpoint-retry-tournament-convergence-evidence",
+        "complete-denominator-and-cleanup-evidence"
+      ],
+      "evals": [
+        "production-shaped matched real-task A/B",
+        "Skill Suites / agentic-tech-lead-orchestration"
+      ],
+      "negative_controls": [
+        "false dependency edge",
+        "overlapping writers",
+        "read-only contract/test mutation",
+        "local PASS with global FAIL",
+        "wrong-base convergence",
+        "failed candidate omission",
+        "residue"
+      ],
+      "workflow": {
+        "state": "READ_FROM_GITHUB",
+        "source": "GitHub PR #315 exact head"
+      },
+      "head": {
+        "policy": "READ_FROM_GITHUB_PR_METADATA",
+        "observed_sha": null
+      },
+      "terminal_classification": "IMPLEMENTED_PENDING_HUMAN",
+      "remaining_evidence": [
+        "Phase-2 matched live model/runtime A/B",
+        "Git Town and dual-forge delivery",
+        "Human merge"
+      ],
+      "rollback": "Close PR #315 and preserve PR #308 unchanged.",
+      "human_admit": "Merge only after PR #308 lands and the restacked exact head is green.",
+      "authority": {
+        "auto_resolve_semantic_conflict": false,
+        "force_push": false,
+        "ship": false,
+        "merge": false,
+        "release": false,
+        "promotion": false
+      }
+    },
+    {
+      "id": "proof-contract-registry",
+      "stack_class": "TRUE_CHILD",
+      "issues": [
+        319
+      ],
+      "pull_request": 323,
+      "branch": "agent/319-skill-refactor-proof-contract",
+      "base_branch": "agent/312-tech-lead-real-task-ab",
+      "state": "PR_OPEN",
+      "owns_paths": [
+        ".github/workflows/skill-suites.yml",
+        "evals/skill-entry-routes.json",
+        "registry.json",
+        "skills/README.md",
+        "skills/skill-refactor-proof-loop/**"
+      ],
+      "consumes_artifacts": [
+        "matched-L3-hermetic-real-task-report",
+        "frozen-treatment-fixtures",
+        "complete-denominator-and-cleanup-evidence"
+      ],
+      "provides_artifacts": [
+        "portable-refactor-proof-contract",
+        "golden-proof-registry",
+        "proof-layer-and-authority-checkers",
+        "refactor-proof-mutation-suite"
+      ],
+      "evals": [
+        "Skill Suites / skill-refactor-proof-loop",
+        "Shared Skills Infra"
+      ],
+      "negative_controls": [
+        "missing as-landed treatment",
+        "old-strength erasure",
+        "proof-layer gap",
+        "unfair matched task",
+        "denominator erasure",
+        "golden runner disconnection",
+        "treatment blob drift",
+        "authority widening"
+      ],
+      "workflow": {
+        "state": "READ_FROM_GITHUB",
+        "source": "GitHub PR #323 exact head"
+      },
+      "head": {
+        "policy": "READ_FROM_GITHUB_PR_METADATA",
+        "observed_sha": null
+      },
+      "terminal_classification": "IMPLEMENTED_PENDING_HUMAN",
+      "remaining_evidence": [
+        "Human review and merge",
+        "cross-Skill adoption audit"
+      ],
+      "rollback": "Close PR #323 and preserve the Tech Lead golden proof in its owner Skill.",
+      "human_admit": "Repository owner admits the new shared Skill and registry.",
+      "authority": {
+        "auto_resolve_semantic_conflict": false,
+        "force_push": false,
+        "ship": false,
+        "merge": false,
+        "release": false,
+        "promotion": false
+      }
+    },
+    {
+      "id": "agent-docs-state-machines",
+      "stack_class": "TRUE_CHILD",
+      "issues": [
+        320
+      ],
+      "pull_request": 324,
+      "branch": "agent/320-refactor-proof-agent-docs",
+      "base_branch": "agent/319-skill-refactor-proof-contract",
+      "state": "PR_OPEN",
+      "owns_paths": [
+        "AGENTS.md",
+        "README.md",
+        "docs/architecture/STATE_MACHINES.md",
+        "skills/agentic-tech-lead-orchestration/AGENTS.md",
+        "skills/agentic-tech-lead-orchestration/README.md"
+      ],
+      "consumes_artifacts": [
+        "portable-refactor-proof-contract",
+        "golden-proof-registry",
+        "proof-layer-and-authority-checkers"
+      ],
+      "provides_artifacts": [
+        "root-Agent-refactor-contract",
+        "directory-to-State-Machine-map",
+        "Tech-Lead-DAG-and-data-flow-map"
+      ],
+      "evals": [
+        "document route/index coverage",
+        "Skill Suites",
+        "Shared Skills Infra"
+      ],
+      "negative_controls": [
+        "missing nearest Agent route",
+        "Markdown evidence promotion",
+        "artificial Stack ancestry"
+      ],
+      "workflow": {
+        "state": "READ_FROM_GITHUB",
+        "source": "GitHub PR #324 exact head"
+      },
+      "head": {
+        "policy": "READ_FROM_GITHUB_PR_METADATA",
+        "observed_sha": null
+      },
+      "terminal_classification": "IMPLEMENTED_PENDING_HUMAN",
+      "remaining_evidence": [
+        "molecular Stack convergence index",
+        "Human review and merge"
+      ],
+      "rollback": "Close PR #324 and preserve PR #323 contract/registry bytes.",
+      "human_admit": "Repository owner admits documentation as a navigation layer only.",
+      "authority": {
+        "auto_resolve_semantic_conflict": false,
+        "force_push": false,
+        "ship": false,
+        "merge": false,
+        "release": false,
+        "promotion": false
+      }
+    },
+    {
+      "id": "molecular-stack-traceability",
+      "stack_class": "CONVERGENCE",
+      "issues": [
+        321
+      ],
+      "pull_request": null,
+      "branch": "agent/321-refactor-proof-stack-index",
+      "base_branch": "agent/320-refactor-proof-agent-docs",
+      "state": "BRANCH_CREATED",
+      "owns_paths": [
+        "docs/traceability/SKILL_REFACTOR_PROOF_STACK.md",
+        "docs/traceability/TRACEABILITY_INDEX.md",
+        "skills/git-town-stacked-pr-worker/README.md",
+        "skills/skill-refactor-proof-loop/README.md",
+        "skills/skill-refactor-proof-loop/references/README.md",
+        "skills/skill-refactor-proof-loop/references/refactor-proof-stack.json",
+        "skills/skill-refactor-proof-loop/references/refactor-proof-stack.schema.json",
+        "skills/skill-refactor-proof-loop/scripts/README.md",
+        "skills/skill-refactor-proof-loop/scripts/check_refactor_proof_stack.py",
+        "skills/skill-refactor-proof-loop/tests/README.md",
+        "skills/skill-refactor-proof-loop/tests/run-all.sh",
+        "skills/skill-refactor-proof-loop/tests/stack_selftest.py"
+      ],
+      "consumes_artifacts": [
+        "root-Agent-refactor-contract",
+        "directory-to-State-Machine-map",
+        "Tech-Lead-DAG-and-data-flow-map",
+        "golden-proof-registry"
+      ],
+      "provides_artifacts": [
+        "machine-readable-molecular-Stack-index",
+        "Git-Town-proof-Stack-template",
+        "complete-issue-PR-evidence-trace"
+      ],
+      "evals": [
+        "refactor proof Stack checker",
+        "Stack mutation controls",
+        "document route/index coverage"
+      ],
+      "negative_controls": [
+        "child without consumed parent artifact",
+        "fake child for path-disjoint work",
+        "multiple convergence owners",
+        "stale self-embedded open head",
+        "merged state without immutable evidence",
+        "external evidence owning Stack paths"
+      ],
+      "workflow": {
+        "state": "NOT_EXERCISED",
+        "source": "No PR exact-head run until publication"
+      },
+      "head": {
+        "policy": "READ_FROM_GITHUB_PR_METADATA",
+        "observed_sha": null
+      },
+      "terminal_classification": "PARTIAL",
+      "remaining_evidence": [
+        "Open PR and observe exact-head workflows",
+        "Human review and merge"
+      ],
+      "rollback": "Delete the branch before publication or close its future PR.",
+      "human_admit": "Repository owner admits the convergence/index leaf after upstream review.",
+      "authority": {
+        "auto_resolve_semantic_conflict": false,
+        "force_push": false,
+        "ship": false,
+        "merge": false,
+        "release": false,
+        "promotion": false
+      }
+    },
+    {
+      "id": "cross-skill-adoption-audit",
+      "stack_class": "PLANNED_FOLLOWUP",
+      "issues": [
+        322
+      ],
+      "pull_request": null,
+      "branch": null,
+      "base_branch": null,
+      "state": "PLANNED",
+      "owns_paths": [],
+      "consumes_artifacts": [
+        "canonical-proof-standard-after-Human-admission"
+      ],
+      "provides_artifacts": [
+        "cross-Skill-adoption-ledger",
+        "deduplicated-migration-backlog"
+      ],
+      "evals": [
+        "future adoption-ledger checker"
+      ],
+      "negative_controls": [
+        "Markdown route counted as executable",
+        "unregistered golden proof claimed canonical",
+        "duplicate migration issue"
+      ],
+      "workflow": {
+        "state": "NOT_EXERCISED",
+        "source": "Blocked on canonical standard admission"
+      },
+      "head": {
+        "policy": "NOT_APPLICABLE",
+        "observed_sha": null
+      },
+      "terminal_classification": "PLANNED",
+      "remaining_evidence": [
+        "PR #321 convergence leaf admitted",
+        "audit implementation and receipts"
+      ],
+      "rollback": "Close issue #322 as not planned if the canonical protocol is withdrawn.",
+      "human_admit": "A Human admits audit scope and any per-Skill migration leaves.",
+      "authority": {
+        "auto_resolve_semantic_conflict": false,
+        "force_push": false,
+        "ship": false,
+        "merge": false,
+        "release": false,
+        "promotion": false
+      }
+    },
+    {
+      "id": "live-scheduler-evidence",
+      "stack_class": "EXTERNAL_EVIDENCE",
+      "issues": [
+        231
+      ],
+      "pull_request": null,
+      "branch": null,
+      "base_branch": null,
+      "state": "EXTERNAL_OPEN",
+      "owns_paths": [],
+      "consumes_artifacts": [],
+      "provides_artifacts": [
+        "live-attempt-lease-checkpoint-retry-stale-straggler-receipts"
+      ],
+      "evals": [
+        "issue #231 live scheduler acceptance"
+      ],
+      "negative_controls": [
+        "static fixture presented as live scheduler PASS"
+      ],
+      "workflow": {
+        "state": "NOT_EXERCISED",
+        "source": "Read issue #231 and runtime-env exact receipts"
+      },
+      "head": {
+        "policy": "NOT_APPLICABLE",
+        "observed_sha": null
+      },
+      "terminal_classification": "EXTERNAL_OPEN",
+      "remaining_evidence": [
+        "real consumer scheduler canary"
+      ],
+      "rollback": "No Stack rollback; this is an independently owned evidence lane.",
+      "human_admit": "No merge authority is transferred into the proof Stack.",
+      "authority": {
+        "auto_resolve_semantic_conflict": false,
+        "force_push": false,
+        "ship": false,
+        "merge": false,
+        "release": false,
+        "promotion": false
+      }
+    },
+    {
+      "id": "independent-shadow-evidence",
+      "stack_class": "EXTERNAL_EVIDENCE",
+      "issues": [
+        232
+      ],
+      "pull_request": null,
+      "branch": null,
+      "base_branch": null,
+      "state": "EXTERNAL_OPEN",
+      "owns_paths": [],
+      "consumes_artifacts": [],
+      "provides_artifacts": [
+        "independent-Shadow-global-objective-and-L3-enforcement-receipts"
+      ],
+      "evals": [
+        "issue #232 independent Shadow acceptance"
+      ],
+      "negative_controls": [
+        "in-process prose relabelled as independent Shadow"
+      ],
+      "workflow": {
+        "state": "NOT_EXERCISED",
+        "source": "Read issue #232 exact receipts"
+      },
+      "head": {
+        "policy": "NOT_APPLICABLE",
+        "observed_sha": null
+      },
+      "terminal_classification": "EXTERNAL_OPEN",
+      "remaining_evidence": [
+        "separate context/model/checker canary"
+      ],
+      "rollback": "No Stack rollback; this is an independently owned evidence lane.",
+      "human_admit": "No implementation or merge authority is transferred to Shadow.",
+      "authority": {
+        "auto_resolve_semantic_conflict": false,
+        "force_push": false,
+        "ship": false,
+        "merge": false,
+        "release": false,
+        "promotion": false
+      }
+    },
+    {
+      "id": "dual-forge-delivery-evidence",
+      "stack_class": "EXTERNAL_EVIDENCE",
+      "issues": [
+        234
+      ],
+      "pull_request": null,
+      "branch": null,
+      "base_branch": null,
+      "state": "EXTERNAL_OPEN",
+      "owns_paths": [],
+      "consumes_artifacts": [],
+      "provides_artifacts": [
+        "real-Git-Town-Forgejo-GitHub-publication-receipts"
+      ],
+      "evals": [
+        "issue #234 delivery acceptance"
+      ],
+      "negative_controls": [
+        "Git Town exit zero promoted to implementation PASS",
+        "semantic conflict auto-resolved"
+      ],
+      "workflow": {
+        "state": "NOT_EXERCISED",
+        "source": "Read issue #234 exact receipts"
+      },
+      "head": {
+        "policy": "NOT_APPLICABLE",
+        "observed_sha": null
+      },
+      "terminal_classification": "EXTERNAL_OPEN",
+      "remaining_evidence": [
+        "real consumer delivery canary"
+      ],
+      "rollback": "No Stack rollback; this is an independently owned evidence lane.",
+      "human_admit": "Merge remains external/Human authority.",
+      "authority": {
+        "auto_resolve_semantic_conflict": false,
+        "force_push": false,
+        "ship": false,
+        "merge": false,
+        "release": false,
+        "promotion": false
+      }
+    },
+    {
+      "id": "exact-subject-adapter-evidence",
+      "stack_class": "EXTERNAL_EVIDENCE",
+      "issues": [
+        256
+      ],
+      "pull_request": null,
+      "branch": null,
+      "base_branch": null,
+      "state": "EXTERNAL_OPEN",
+      "owns_paths": [],
+      "consumes_artifacts": [],
+      "provides_artifacts": [
+        "GrepAI-SCIP-Tree-sitter-Serena-SQLite-exact-subject-receipts"
+      ],
+      "evals": [
+        "issue #256 adapter acceptance"
+      ],
+      "negative_controls": [
+        "provider output promoted without source readback",
+        "unsupported coverage converted to absence proof"
+      ],
+      "workflow": {
+        "state": "NOT_EXERCISED",
+        "source": "Read issue #256 exact receipts"
+      },
+      "head": {
+        "policy": "NOT_APPLICABLE",
+        "observed_sha": null
+      },
+      "terminal_classification": "EXTERNAL_OPEN",
+      "remaining_evidence": [
+        "same-subject live adapter matrix"
+      ],
+      "rollback": "No Stack rollback; this is an independently owned evidence lane.",
+      "human_admit": "Provider activation and secrets remain runtime/operator authority.",
+      "authority": {
+        "auto_resolve_semantic_conflict": false,
+        "force_push": false,
+        "ship": false,
+        "merge": false,
+        "release": false,
+        "promotion": false
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "tech-lead-causal-repair",
+      "to": "tech-lead-hermetic-golden",
+      "type": "CONSUMES_UNMERGED_BYTES",
+      "artifacts": [
+        "task-schema-and-semantic-admission",
+        "capability-receipt-causal-dag",
+        "frozen-treatment-fixtures"
+      ],
+      "reason": "The matched real-task proof executes the repaired B2 contracts and checkers before PR #308 is merged."
+    },
+    {
+      "from": "tech-lead-hermetic-golden",
+      "to": "proof-contract-registry",
+      "type": "CONSUMES_UNMERGED_BYTES",
+      "artifacts": [
+        "matched-L3-hermetic-real-task-report",
+        "complete-denominator-and-cleanup-evidence"
+      ],
+      "reason": "The generalized registry binds the first golden proof while it remains on its parent Stack."
+    },
+    {
+      "from": "proof-contract-registry",
+      "to": "agent-docs-state-machines",
+      "type": "CONSUMES_UNMERGED_BYTES",
+      "artifacts": [
+        "portable-refactor-proof-contract",
+        "golden-proof-registry"
+      ],
+      "reason": "Agent routes and State Machines document the exact contract introduced by PR #323."
+    },
+    {
+      "from": "agent-docs-state-machines",
+      "to": "molecular-stack-traceability",
+      "type": "CONSUMES_UNMERGED_BYTES",
+      "artifacts": [
+        "root-Agent-refactor-contract",
+        "directory-to-State-Machine-map",
+        "Tech-Lead-DAG-and-data-flow-map"
+      ],
+      "reason": "The convergence index consumes the final Agent and directory documentation bytes."
+    },
+    {
+      "from": "proof-contract-registry",
+      "to": "molecular-stack-traceability",
+      "type": "CONVERGES_VERIFIED_ARTIFACTS",
+      "artifacts": [
+        "golden-proof-registry",
+        "proof-layer-and-authority-checkers"
+      ],
+      "reason": "One convergence owner reconciles the machine proof registry with the molecular delivery index."
+    },
+    {
+      "from": "molecular-stack-traceability",
+      "to": "cross-skill-adoption-audit",
+      "type": "PROCESS_DEPENDENCY",
+      "artifacts": [
+        "canonical-proof-standard-after-Human-admission"
+      ],
+      "reason": "The audit starts only after the standard and traceability layer are admitted; it need not consume unmerged bytes."
+    },
+    {
+      "from": "live-scheduler-evidence",
+      "to": "tech-lead-hermetic-golden",
+      "type": "EXTERNAL_EVIDENCE",
+      "artifacts": [
+        "live-attempt-lease-checkpoint-retry-stale-straggler-receipts"
+      ],
+      "reason": "Issue #231 can raise the Phase-2 evidence layer only on matched subjects."
+    },
+    {
+      "from": "independent-shadow-evidence",
+      "to": "tech-lead-hermetic-golden",
+      "type": "EXTERNAL_EVIDENCE",
+      "artifacts": [
+        "independent-Shadow-global-objective-and-L3-enforcement-receipts"
+      ],
+      "reason": "Issue #232 supplies independent global-objective enforcement without becoming a Git parent."
+    },
+    {
+      "from": "dual-forge-delivery-evidence",
+      "to": "tech-lead-hermetic-golden",
+      "type": "EXTERNAL_EVIDENCE",
+      "artifacts": [
+        "real-Git-Town-Forgejo-GitHub-publication-receipts"
+      ],
+      "reason": "Issue #234 owns delivery evidence and remains distinct from code correctness."
+    },
+    {
+      "from": "exact-subject-adapter-evidence",
+      "to": "tech-lead-hermetic-golden",
+      "type": "EXTERNAL_EVIDENCE",
+      "artifacts": [
+        "GrepAI-SCIP-Tree-sitter-Serena-SQLite-exact-subject-receipts"
+      ],
+      "reason": "Issue #256 supplies live adapter receipts for the same repository/task treatment subjects."
+    }
+  ],
+  "authority": {
+    "auto_resolve_semantic_conflict": false,
+    "force_push": false,
+    "ship": false,
+    "merge": false,
+    "release": false,
+    "promotion": false
+  }
+}
