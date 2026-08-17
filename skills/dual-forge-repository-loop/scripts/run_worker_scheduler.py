@@ -16,9 +16,19 @@ Worker cannot edit, and integrates. The non-happy paths are exercised on planted
 attempts, because a lease is only proven to expire if something tries to use it
 afterwards.
 
+Every attempt also carries a budget ledger: what it spent, which dimensions were
+actually observed, and whether it passed its cap. An attempt that passes its
+wall-clock budget is detached into a terminal state rather than waited for, and
+the global cap stops the next attempt from starting -- a cap that stops nothing
+is a number in a receipt. Dimensions the harness cannot read (tool calls always;
+tokens and cost when the Agent's output will not parse) are listed as unobserved
+instead of recorded as zero, because a ledger of invented zeros reconciles every
+time.
+
 What it does not claim: that these Workers were faster than one, that the Agent
 wrote good code, or that this subject resembles a production repository. It
-claims that the transitions happened and that the refusals refused.
+claims that the transitions happened, that the refusals refused, and that the
+spend it recorded is the spend it saw.
 
 Usage:
   run_worker_scheduler.py --out DIR [--agent claude] [--skip-agent]
@@ -44,6 +54,12 @@ SCHEMA = "dual-forge-repository-loop/scheduler-run-receipt/v1"
 
 HAPPY_PATH = ["PLANNED", "ADMITTED", "ASSIGNED", "LEASED", "RUNNING",
               "CHECKPOINTED", "RESULT_READY", "RESULT_VERIFIED", "INTEGRATED"]
+
+# States an attempt does not move out of. Reaching one releases whatever it held.
+TERMINAL_STATES = {"INTEGRATED", "STALE_ATTEMPT", "LEASE_EXPIRED", "CANCELLED",
+                   "STRAGGLER_DETACHED", "FAILED_TERMINAL", "BLOCKED_AUTHORITY",
+                   "BLOCKED_CONFLICT", "SUPERSEDED", "REJECTED_NOT_DECOMPOSABLE",
+                   "DUPLICATE_SUPPRESSED"}
 
 
 def now() -> datetime:
@@ -160,7 +176,28 @@ TASKS: list[dict[str, Any]] = [
 ]
 
 LEASE_SECONDS = 900
-BUDGET = {"tool_calls": 40, "tokens": 120000, "wall_clock_seconds": LEASE_SECONDS}
+
+# Budget dimensions this harness can actually see. Tool calls are deliberately
+# absent: the Agent reports turns, not tool calls, and a limit on a number nobody
+# measures is a limit that always passes. Anything a run fails to observe is
+# listed as unobserved in the ledger rather than recorded as a spend of zero,
+# because zero and unknown are different claims and only one of them is checkable.
+BUDGET_DIMENSIONS = ("turns", "tokens", "wall_clock_seconds", "cost_usd")
+ATTEMPT_BUDGET: dict[str, float] = {
+    "turns": 40, "tokens": 120000, "wall_clock_seconds": LEASE_SECONDS, "cost_usd": 2.0}
+GLOBAL_BUDGET: dict[str, float] = {
+    "turns": 200, "tokens": 600000, "wall_clock_seconds": 3600, "cost_usd": 6.0}
+
+
+def empty_spend() -> dict[str, float]:
+    return {dimension: 0 for dimension in BUDGET_DIMENSIONS}
+
+
+def over(spend: dict[str, float], observed: list[str],
+         limits: dict[str, float]) -> list[str]:
+    """Dimensions the spend exceeded. Unobserved dimensions cannot be exceeded."""
+    return sorted(d for d in BUDGET_DIMENSIONS
+                  if d in observed and spend.get(d, 0) > limits[d])
 
 
 class Scheduler:
@@ -178,16 +215,28 @@ class Scheduler:
     # -- transition log -----------------------------------------------------
 
     def transition(self, attempt_id: str, state: str, **detail: Any) -> None:
+        """Log the move, and release the lease when the move is terminal.
+
+        Releasing at each call site is how a lease survives a run: `verify` left
+        one behind on FAILED_RETRYABLE, `integrate` left one behind on
+        STALE_ATTEMPT, and both looked fine in isolation. Every terminal state
+        goes through here, so the release belongs here and forgetting it stops
+        being possible.
+        """
+        attempt = self.attempts[attempt_id]
         record = {
             "sequence": len(self.transitions) + 1,
             "attempt_id": attempt_id,
-            "task_id": self.attempts[attempt_id]["task_id"],
+            "task_id": attempt["task_id"],
             "state": state,
             "at": stamp(now()),
         }
         record.update(detail)
-        self.attempts[attempt_id]["state"] = state
+        attempt["state"] = state
         self.transitions.append(record)
+        if state in TERMINAL_STATES and attempt["lease"].get("status") == "ACTIVE":
+            attempt["lease"]["status"] = "RELEASED"
+            self.branch_leases.pop(attempt["branch"], None)
 
     def refuse(self, code: str, detail: str, **extra: Any) -> None:
         entry = {"code": code, "detail": detail, "at": stamp(now())}
@@ -212,6 +261,10 @@ class Scheduler:
                 "lease": {"status": None, "expiry": None, "heartbeat_sequence": 0},
                 "checkpoint": {"sequence": 0, "digest": None},
                 "heartbeats": [],
+                # An attempt that never runs spent nothing, and that is observed
+                # rather than unknown: the scheduler is what would have started it.
+                "spend": empty_spend(),
+                "spend_observed": sorted(BUDGET_DIMENSIONS),
             }
             self.transition(attempt_id, "PLANNED", base_subject_sha=base,
                             stack_class=spec["stack_class"],
@@ -282,6 +335,73 @@ class Scheduler:
                         worktree_identity=str(path), lease_expiry=stamp(expiry))
         return path
 
+    # -- budget -------------------------------------------------------------
+
+    def charge(self, attempt: dict[str, Any], stdout: str) -> None:
+        """Record what the Agent reports it spent, and only what it reports.
+
+        `claude -p --output-format json` carries usage and cost. A run that
+        cannot be parsed leaves those dimensions unobserved rather than zero:
+        a budget reconciled against invented zeros reconciles every time.
+        """
+        observed = {"wall_clock_seconds"}
+        try:
+            payload = json.loads(stdout)
+            usage = payload.get("usage", {})
+            attempt["spend"]["tokens"] = (
+                int(usage.get("input_tokens", 0))
+                + int(usage.get("cache_read_input_tokens", 0))
+                + int(usage.get("output_tokens", 0)))
+            observed.add("tokens")
+            if "num_turns" in payload:
+                attempt["spend"]["turns"] = int(payload["num_turns"])
+                observed.add("turns")
+            if "total_cost_usd" in payload:
+                attempt["spend"]["cost_usd"] = float(payload["total_cost_usd"])
+                observed.add("cost_usd")
+        except (ValueError, TypeError):
+            pass
+        attempt["spend_observed"] = sorted(observed)
+
+    def totals(self) -> dict[str, float]:
+        return {d: round(sum(a["spend"].get(d, 0) for a in self.attempts.values()), 3)
+                for d in BUDGET_DIMENSIONS}
+
+    def unobserved(self) -> list[str]:
+        return sorted({d for a in self.attempts.values() for d in BUDGET_DIMENSIONS
+                       if d not in a["spend_observed"]})
+
+    def global_overrun(self) -> list[str]:
+        """Dimensions the run as a whole passed, ignoring ones nobody measured."""
+        unmeasured = set(self.unobserved())
+        return sorted(d for d in BUDGET_DIMENSIONS
+                      if d not in unmeasured and self.totals()[d] > GLOBAL_BUDGET[d])
+
+    def budget_ledger(self) -> dict[str, Any]:
+        return {
+            "dimensions": sorted(BUDGET_DIMENSIONS),
+            "attempt_limits": ATTEMPT_BUDGET,
+            "global_limits": GLOBAL_BUDGET,
+            "attempts": [
+                {
+                    "attempt_id": attempt["attempt_id"],
+                    "spend": attempt["spend"],
+                    "observed": attempt["spend_observed"],
+                    "over_budget": over(attempt["spend"], attempt["spend_observed"],
+                                        ATTEMPT_BUDGET),
+                }
+                for attempt in self.attempts.values()
+            ],
+            "totals": self.totals(),
+            "unobserved_dimensions": self.unobserved(),
+            "global_over_budget": self.global_overrun(),
+            "why_unobserved_is_not_zero": (
+                "A dimension this harness could not read is listed here and excluded "
+                "from enforcement. Recording it as a spend of zero would let every "
+                "budget reconcile and every cap pass, which is the failure this ledger "
+                "exists to make visible."),
+        }
+
     def heartbeat(self, attempt: dict[str, Any]) -> None:
         attempt["lease"]["heartbeat_sequence"] += 1
         attempt["heartbeats"].append({
@@ -293,8 +413,10 @@ class Scheduler:
         self.heartbeat(attempt)
 
         started = time.time()
+        timed_out = False
         if self.agent is None:
             executed = {"exit_code": 0, "skipped": True}
+            attempt["spend_observed"] = ["wall_clock_seconds"]
         else:
             prompt = (
                 f"{spec['goal']}\n\n"
@@ -303,18 +425,56 @@ class Scheduler:
                 f"Do not read, modify or create anything under oracles/.\n"
                 f"Write the file and stop. Do not explain."
             )
-            proc = subprocess.run(
-                [self.agent, "-p", prompt,
-                 "--permission-mode", "acceptEdits",
-                 "--allowedTools", "Write,Edit,Read"],
-                cwd=str(worktree), capture_output=True, text=True,
-                timeout=BUDGET["wall_clock_seconds"])
-            executed = {"exit_code": proc.returncode,
-                        "stdout_sha256": sha256(proc.stdout.encode()),
-                        "stdout_bytes": len(proc.stdout),
-                        "stderr_bytes": len(proc.stderr)}
+            argv = [self.agent, "-p", prompt,
+                    "--permission-mode", "acceptEdits",
+                    "--allowedTools", "Write,Edit,Read",
+                    "--output-format", "json"]
+            try:
+                proc = subprocess.run(argv, cwd=str(worktree), capture_output=True,
+                                      text=True,
+                                      timeout=ATTEMPT_BUDGET["wall_clock_seconds"])
+                executed = {"exit_code": proc.returncode,
+                            "stdout_sha256": sha256(proc.stdout.encode()),
+                            "stdout_bytes": len(proc.stdout),
+                            "stderr_bytes": len(proc.stderr)}
+                self.charge(attempt, proc.stdout)
+            except subprocess.TimeoutExpired:
+                # The wall-clock budget is the one limit this harness can enforce
+                # by itself, and before this it raised out of the run instead.
+                # A Worker that outruns its budget has to become a terminal state
+                # in the log, not a traceback.
+                timed_out = True
+                executed = {"exit_code": None, "timed_out": True}
+                attempt["spend_observed"] = ["wall_clock_seconds"]
         duration = int((time.time() - started) * 1000)
+        attempt["spend"]["wall_clock_seconds"] = round(duration / 1000, 3)
+        if "wall_clock_seconds" not in attempt["spend_observed"]:
+            attempt["spend_observed"] = sorted(
+                set(attempt["spend_observed"]) | {"wall_clock_seconds"})
         self.heartbeat(attempt)
+
+        if timed_out:
+            self.refuse("BUDGET_EXCEEDED",
+                        f"{attempt['attempt_id']} passed its wall-clock budget of "
+                        f"{ATTEMPT_BUDGET['wall_clock_seconds']}s",
+                        attempt_id=attempt["attempt_id"])
+            self.transition(attempt["attempt_id"], "TIMED_OUT",
+                            budget_wall_clock_seconds=ATTEMPT_BUDGET["wall_clock_seconds"],
+                            spend=dict(attempt["spend"]))
+            self.transition(attempt["attempt_id"], "STRAGGLER_DETACHED",
+                            note="detached at its budget; its lease is not reassigned")
+            return {"ok": False, "duration_ms": duration, "executed": executed,
+                    "touched": []}
+
+        exceeded = over(attempt["spend"], attempt["spend_observed"], ATTEMPT_BUDGET)
+        if exceeded:
+            self.refuse("BUDGET_EXCEEDED",
+                        f"{attempt['attempt_id']} exceeded {exceeded}",
+                        attempt_id=attempt["attempt_id"])
+            self.transition(attempt["attempt_id"], "FAILED_TERMINAL",
+                            over_budget=exceeded, spend=dict(attempt["spend"]))
+            return {"ok": False, "duration_ms": duration, "executed": executed,
+                    "touched": []}
 
         dirty = [l[3:].strip() for l in git(worktree, "status", "--porcelain").splitlines()
                  if l.strip()]
@@ -429,8 +589,6 @@ class Scheduler:
             check=True)
         head = git(worktree, "rev-parse", "HEAD")
         git(self.repo, "merge", "--no-edit", "-q", attempt["branch"])
-        attempt["lease"]["status"] = "RELEASED"
-        self.branch_leases.pop(attempt["branch"], None)
         self.transition(attempt["attempt_id"], "INTEGRATED",
                         head_subject_sha=head,
                         main_after=git(self.repo, "rev-parse", "HEAD"))
@@ -462,6 +620,10 @@ class Scheduler:
                 "lease": {"status": None, "expiry": None, "heartbeat_sequence": 0},
                 "checkpoint": {"sequence": 0, "digest": None},
                 "heartbeats": [],
+                # An attempt that never runs spent nothing, and that is observed
+                # rather than unknown: the scheduler is what would have started it.
+                "spend": empty_spend(),
+                "spend_observed": sorted(BUDGET_DIMENSIONS),
             }
             attempt.update(over)
             self.attempts[attempt_id] = attempt
@@ -498,8 +660,14 @@ class Scheduler:
         straggler = new_attempt("planted-straggler")
         self.transition(straggler["attempt_id"], "LEASED")
         self.transition(straggler["attempt_id"], "RUNNING")
+        # The plant is a Worker that outlived its budget, so its ledger entry has
+        # to show the overrun. A TIMED_OUT state beside a spend inside the cap
+        # would be a state the ledger contradicts.
+        straggler["spend"]["wall_clock_seconds"] = (
+            ATTEMPT_BUDGET["wall_clock_seconds"] + 1)
         self.transition(straggler["attempt_id"], "TIMED_OUT",
-                        budget_wall_clock_seconds=BUDGET["wall_clock_seconds"])
+                        budget_wall_clock_seconds=ATTEMPT_BUDGET["wall_clock_seconds"],
+                        spend=dict(straggler["spend"]))
         self.transition(straggler["attempt_id"], "STRAGGLER_DETACHED",
                         note="detached; its lease is not granted to another attempt")
         planted.append({"state": "STRAGGLER_DETACHED",
@@ -540,6 +708,25 @@ class Scheduler:
 
         return planted
 
+    def close(self) -> None:
+        """Resolve anything still holding a lease when the run ends.
+
+        A Worker whose oracle failed stayed at FAILED_RETRYABLE with a live
+        lease, and the run simply ended around it. Nobody was going to retry it
+        and nobody could reclaim its branch, so the honest classification is that
+        the scheduler cancelled it at close rather than that it is still working.
+        """
+        for attempt in self.attempts.values():
+            if attempt["lease"].get("status") != "ACTIVE":
+                continue
+            self.refuse("LEASE_HELD_AT_CLOSE",
+                        f"{attempt['attempt_id']} still held its lease when the run "
+                        f"ended in state {attempt['state']}",
+                        attempt_id=attempt["attempt_id"])
+            self.transition(attempt["attempt_id"], "CANCELLED",
+                            reason="run closed while the attempt still held its lease",
+                            last_state=attempt["state"])
+
     # -- driver -------------------------------------------------------------
 
     def run(self) -> dict[str, Any]:
@@ -554,6 +741,17 @@ class Scheduler:
             progressed = False
             for attempt in real:
                 if attempt["state"] != "ADMITTED" or not self.ready(attempt):
+                    continue
+                exhausted = self.global_overrun()
+                if exhausted:
+                    # The global cap has to stop something, or it is a number in a
+                    # receipt rather than a budget.
+                    self.refuse("GLOBAL_BUDGET_EXHAUSTED",
+                                f"{attempt['attempt_id']} not started; the run passed "
+                                f"{exhausted}", attempt_id=attempt["attempt_id"])
+                    self.transition(attempt["attempt_id"], "CANCELLED",
+                                    reason="global budget exhausted",
+                                    over_budget=exhausted)
                     continue
                 progressed = True
                 self.assign(attempt)
@@ -573,6 +771,7 @@ class Scheduler:
                 break
 
         planted = self.plant_non_happy_paths()
+        self.close()
         ended = now()
 
         produced = sorted({t["state"] for t in self.transitions})
@@ -600,7 +799,8 @@ class Scheduler:
             "duration_ms": int((ended - started).total_seconds() * 1000),
             "happy_path": HAPPY_PATH,
             "attempts": [
-                {k: v for k, v in attempt.items() if k != "spec"} | {
+                {k: v for k, v in attempt.items()
+                 if k not in ("spec", "spend", "spend_observed")} | {
                     "allowed_paths": attempt["spec"]["allowed_paths"],
                     "stack_class": attempt["spec"]["stack_class"],
                     "dependencies": attempt["spec"]["dependencies"],
@@ -611,6 +811,7 @@ class Scheduler:
             "refusals": self.refusals,
             "planted": planted,
             "results": results,
+            "budget_ledger": self.budget_ledger(),
             "state_coverage": {
                 "produced": produced,
                 "declared_not_produced": sorted(declared - set(produced)),
@@ -621,6 +822,8 @@ class Scheduler:
                 "a disposable subject is not a production repository",
                 "BLOCKED_AUTHORITY and the two rejection states are not produced by this "
                 "canary; they belong to admission paths this plan does not exercise",
+                "tool calls are not counted; the Agent reports turns and this harness "
+                "does not see individual calls, so no tool-call cap is claimed",
             ],
         }
 
@@ -657,6 +860,8 @@ def main() -> int:
         "refusals": len(receipt["refusals"]),
         "produced_states": receipt["state_coverage"]["produced"],
         "not_produced": receipt["state_coverage"]["declared_not_produced"],
+        "budget_totals": receipt["budget_ledger"]["totals"],
+        "budget_unobserved": receipt["budget_ledger"]["unobserved_dimensions"],
     }, indent=2))
     return 0
 
