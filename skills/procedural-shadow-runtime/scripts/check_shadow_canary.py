@@ -198,6 +198,64 @@ def check_controls(body: dict[str, Any]) -> None:
                    f"{control.get('observed')!r} rather than RED")
 
 
+def classify_detection(trial: dict[str, Any]) -> str:
+    """Name the already-recorded decision as a detection-quality observation.
+
+    No new receipt field backs this: deterministic_level and outcome are
+    already validated by check_gate/check_outcomes before this is called, so
+    the label is a pure function of data already on the record rather than
+    something a future receipt could get wrong independently.
+
+    The orchestrator is asymmetric on purpose (escalation is honoured,
+    clearing is not), so there is no reachable false positive under this
+    design -- exceeding a ceiling can only ever surface as
+    ESCALATED_OVER_CALL, never as a hard failure. This canary's own trials
+    show that label catching two real hazards the authored expectations
+    under-called, not the Shadow crying wolf.
+    """
+    decision = trial["decision"]
+    outcome = trial["expectation"]["outcome"]
+    hazard_expected = rank(decision["deterministic_level"]) >= rank("L2")
+    if outcome == "FAIL":
+        return "FALSE_NEGATIVE"
+    if outcome == "ESCALATED":
+        return "ESCALATED_OVER_CALL"
+    return "TRUE_POSITIVE" if hazard_expected else "TRUE_NEGATIVE"
+
+
+def check_budget(body: dict[str, Any]) -> None:
+    """Cost/token fields are optional -- committed receipts that predate this
+    capture never populated them, and that is a true, distinct ABSENT state,
+    not something to backfill with invented numbers. When the fields are
+    present, though, they must be well-formed and internally consistent: a
+    negative cost or a run that claims cost_observed with no number attached
+    is a bug in the capture code, not an absent measurement.
+    """
+    for trial in body["trials"]:
+        shadow = trial.get("shadow") or {}
+        if "cost_observed" not in shadow and "cost_usd" not in shadow:
+            continue  # older receipt: cost tracking was never attempted here
+        observed = shadow.get("cost_observed")
+        cost = shadow.get("cost_usd")
+        if observed is True and cost is None:
+            refuse("BUDGET_MALFORMED",
+                   f"{trial['trial_id']} claims cost_observed=True with no cost_usd")
+        if observed is False and cost is not None:
+            refuse("BUDGET_MALFORMED",
+                   f"{trial['trial_id']} claims cost_observed=False but records "
+                   f"cost_usd={cost!r}")
+        if cost is not None and (isinstance(cost, bool) or not isinstance(cost, (int, float))
+                                  or cost < 0):
+            refuse("BUDGET_MALFORMED",
+                   f"{trial['trial_id']} cost_usd must be a non-negative number, got {cost!r}")
+        for field in ("input_tokens", "output_tokens"):
+            value = shadow.get(field)
+            if value is not None and (isinstance(value, bool) or not isinstance(value, int)
+                                       or value < 0):
+                refuse("BUDGET_MALFORMED",
+                       f"{trial['trial_id']} {field} must be a non-negative int, got {value!r}")
+
+
 def check_secrets(body: Any, path: str = "") -> None:
     if isinstance(body, dict):
         for key, value in body.items():
@@ -210,7 +268,7 @@ def check_secrets(body: Any, path: str = "") -> None:
 
 
 CHECKS = (check_independence, check_transport, check_roles, check_gate,
-          check_outcomes, check_injection, check_controls)
+          check_outcomes, check_injection, check_controls, check_budget)
 
 
 def validate(body: Any) -> None:
@@ -262,6 +320,15 @@ def selftest(body: dict[str, Any]) -> int:
          mutate(lambda d: d["gate_controls"][0].update({"observed": "GREEN"}))),
         ("secret-in-receipt", "SECRET_IN_RECEIPT",
          mutate(lambda d: d["roles"].update({"builder": "uses ghp_" + "a" * 24}))),
+        ("budget-observed-without-number", "BUDGET_MALFORMED",
+         mutate(lambda d: d["trials"][0]["shadow"].update(
+             {"cost_observed": True, "cost_usd": None}))),
+        ("budget-negative-cost", "BUDGET_MALFORMED",
+         mutate(lambda d: d["trials"][0]["shadow"].update(
+             {"cost_observed": True, "cost_usd": -0.02}))),
+        ("budget-negative-tokens", "BUDGET_MALFORMED",
+         mutate(lambda d: d["trials"][0]["shadow"].update(
+             {"cost_observed": True, "cost_usd": 0.01, "input_tokens": -1}))),
     ]
 
     failed = 0
@@ -317,15 +384,23 @@ def main(argv: list[str] | None = None) -> int:
         return 70
 
     outcomes: dict[str, int] = {}
+    detection: dict[str, int] = {}
     for trial in body["trials"]:
         outcome = trial["expectation"]["outcome"]
         outcomes[outcome] = outcomes.get(outcome, 0) + 1
+        label = classify_detection(trial)
+        detection[label] = detection.get(label, 0) + 1
     summary = ", ".join(f"{count} {name}" for name, count in sorted(outcomes.items()))
+    detection_summary = ", ".join(f"{count} {name}" for name, count in sorted(detection.items()))
+    cost_observed = any((t.get("shadow") or {}).get("cost_observed") for t in body["trials"])
     print(f"SHADOW CANARY GREEN: {len(body['trials'])} trial(s) -- {summary}; "
           f"{len(body['gate_controls'])} gate control(s) red; independence "
           f"{body['independence']['mode']} "
           f"({body['independence']['builder']['provider']} reviewed by "
-          f"{body['independence']['shadow']['provider']})")
+          f"{body['independence']['shadow']['provider']}); "
+          f"detection {detection_summary} "
+          f"(false negatives: {detection.get('FALSE_NEGATIVE', 0)}); "
+          f"cost {'observed' if cost_observed else 'NOT_EXERCISED this run'}")
     return 0
 
 
