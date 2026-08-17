@@ -2,14 +2,15 @@
 
 > 屬 [`gemini-conversation-research`](../SKILL.md) §S0..§S9。各階段的完整步驟、checkpoint、硬數據 schema、子代理 dispatch 模板。
 > Mode B 入口（S-1 + S0-ALT）→ [mode-b-contextqa.md](mode-b-contextqa.md)；追問構造 → [first-principles-probe.md](first-principles-probe.md)；閉環全景/gate → `.skill-bindings/gemini-conversation-research/loop-panorama-ssot.md`；retarget 帳本 → `.skill-bindings/gemini-conversation-research/retarget-map.md`。
-> **活基座**：DR 引擎 = 外部 `automate.js`（`runDrOnce`/`runGeminiDeepResearch*`/`extractReportHtmlInBrowser`/`htmlToMarkdown`）；DR 抽取 = 外部 `gemini-deep-research-extract`（skill-bettor 未安裝時標 `external_engine_required`）；反幻覺 = [external-verify](../../external-verify/SKILL.md)。
+> **詞彙**：**上游**＝這份 skill 被移植出來的那個 repo；**宿主**＝正在訂閱這份共用 body 的 repo。
+> **活基座**：DR 引擎 = 外部 `automate.js`（`runDrOnce`/`runGeminiDeepResearch*`/`extractReportHtmlInBrowser`/`htmlToMarkdown`）；DR 抽取 = 外部 `gemini-deep-research-extract`（宿主未安裝時標 `external_engine_required`）；反幻覺 = [external-verify](../../external-verify/SKILL.md)。
 
 ---
 
 ## AUP 內容隔離（跨 S0/S1/S3/S7/S9 共用，P0）
 
 **根因**: 21K+ 外部對話原文一次進入主 agent context = 資料外洩面（northstar 稱 Data Exfiltration）。
-**antigravity 設計**: **架構性 file-based 天生安全**——瀏覽器抽取直接寫檔、任何 LLM 分析走子代理。**不需要 northstar 的 `gemini-aup-guard.sh` hook + marker**（本 repo 無此 hook；為何「自主只因無 guard、架構決定 autonomy 非權限」→ `.skill-bindings/gemini-conversation-research/retarget-map.md`）。
+**上游設計**: **架構性 file-based 天生安全**——瀏覽器抽取直接寫檔、任何 LLM 分析走子代理。**不需要 northstar 的 `gemini-aup-guard.sh` hook + marker**（本 repo 無此 hook；為何「自主只因無 guard、架構決定 autonomy 非權限」→ `.skill-bindings/gemini-conversation-research/retarget-map.md`）。
 
 ```
 主會話 context（安全）：              子代理 context（隔離）：
@@ -47,12 +48,12 @@
 **執行**:
 
 - **primary / Codex Chrome extension**：claim 使用者已開啟且 URL 精確匹配 conv-id 的 tab，從目前 checkout 的絕對路徑 import repo-root `scripts/extract-gemini-conversation-browser-runtime.mjs`。先用 `inspectGeminiConversationMetadataFromBrowserTab`，再用 `extractGeminiConversationFromBrowserTab` 寫檔；外部只輸出 metadata receipt。禁止 snapshot fallback。完整 recipe 見 [browser-content-isolation.md](browser-content-isolation.md)。
-- **legacy CDP fallback**：外部 antigravity repo 根目錄 `/Users/neon/antigravity/scripts/extract-gemini-conversation.mjs <convId> [--port 9333] [--out <path>]`（⚠ 非本 skill 目錄下同名檔；skill-bettor packet 必標 `external_engine_required`）。
+- **legacy CDP fallback**：外部上游 repo 根目錄的 `scripts/extract-gemini-conversation.mjs <convId> [--port 9333] [--out <path>]`（絕對路徑與 repo 身分見 `.skill-bindings/gemini-conversation-research/`；⚠ 非本 skill 目錄下同名檔；宿主 packet 必標 `external_engine_required`）。
 
 兩條路徑都沿用 turn-structured HTML→Markdown、DR report panel、citation/bibliography 與 metadata-only receipt。手動細節：
 1. 取得已登入瀏覽器頁面：
    - **primary**：使用者既有、已登入、由 Chrome extension 暴露的 tab；不得另開測試 profile。
-   - **CDP fallback**（`auth_required` 且使用者拒新登入）：`puppeteer-core.connect({browserURL:'http://127.0.0.1:9333'})`（用 antigravity 已裝的 `node_modules/puppeteer-core`）。目標對話已是該瀏覽器一個開啟分頁 → `(await b.pages()).find(p=>p.url().includes(id))` 零導航直讀。**必須 `page.bringToFront()`**：多個 gemini.google.com 分頁同開時，非前景分頁的 timer 被 Chrome 節流，scroll-wait 迴圈會撞 puppeteer 180s `protocolTimeout`（cc-20260712 實測連續兩次重現，加回 bringToFront 即解）。
+   - **CDP fallback**（`auth_required` 且使用者拒新登入）：`puppeteer-core.connect({browserURL:'http://127.0.0.1:9333'})`（用上游已裝的 `node_modules/puppeteer-core`）。目標對話已是該瀏覽器一個開啟分頁 → `(await b.pages()).find(p=>p.url().includes(id))` 零導航直讀。**必須 `page.bringToFront()`**：多個 gemini.google.com 分頁同開時，非前景分頁的 timer 被 Chrome 節流，scroll-wait 迴圈會撞 puppeteer 180s `protocolTimeout`（cc-20260712 實測連續兩次重現，加回 bringToFront 即解）。
 2. 等 SPA 渲染（~10s，不靠 networkidle）；Gemini Web 連續 `scrollBy` 到底載入全對話；AI Studio 逐 `.prompt-scrollbar-dot` 導航（cc-20260712 只驗證過 Gemini Web 路徑，AI Studio 虛擬滾動分支未動）。
 3. **抽取 → 保真 md 寫檔**：一般 turn（`user-query`/`model-response`）走純 turndown；若偵測到 `deep-research-immersive-panel`（DR 報告面板，可能是 turn 序列裡任一輪觸發、渲染在 sibling 位置而非巢狀在該輪內）則額外走 `extractReportHtmlInBrowser`+`htmlToMarkdown`（citation marker `[cite:N]` + bibliography 保真，逐字元複製自 `data.js:17,24`）附加在 QA 之後。**turn 選擇器陷阱**：`model-response` 常有巢狀子元素 `.response-container`，若把兩者塞進同一個 `querySelectorAll` OR-list 會導致每輪被抓兩次（cc-20260712 實測 87 turns 應為 58，逐位元組重複）——每個角色只用命中的那一個 selector。**turndown ESM 陷阱**：`import` 走 `.../lib/turndown.cjs.js` build（`.es.js` 內部 `require()` 會炸 ES module scope）。
 4. 加 1 行 metadata header（URL + date）→ 寫 `gemini_research/<source>/<slug>-conversation.md`（產物目錄 gitignore，SSOT 在索引，同 dr-research-loop 慣例）。
@@ -175,7 +176,7 @@ Research Topic: <主題>
 
 ## S3: DEEP — Gemini Deep Research 執行（**複用狀態機；carrier 分流**）
 
-> **命門**：狀態機 SSOT 仍是 antigravity `automate.js`/`ui.js` 的 hardened sequence；Codex Chrome extension 不能接 `:9333`，所以以 repo-root bounded adapter 移植同一組 read-back gates，而非另造較弱 monitor。詳 [browser-content-isolation](browser-content-isolation.md)。
+> **命門**：狀態機 SSOT 仍是上游 `automate.js`/`ui.js` 的 hardened sequence；Codex Chrome extension 不能接 `:9333`，所以以 repo-root bounded adapter 移植同一組 read-back gates，而非另造較弱 monitor。詳 [browser-content-isolation](browser-content-isolation.md)。
 
 **步驟**:
 1. **投遞** → extension Chrome 優先呼叫 `launchGeminiDeepResearchFromPromptFile`；只有 extension 不可用才以 `automate.js runDrOnce` 接既有 `:9333`。兩者的 DR prompt 都只從 S2 `/tmp/dr-prompts/*.txt` 讀。
@@ -208,7 +209,7 @@ Research Topic: <主題>
 
 ## S6: FEEDBACK — 反饋閉環（**輕量版；治理路由拿掉**）
 
-> northstar 的 transcript-harvest / isolation-validator / 下游 concept-landing·dr-governance-router **拿掉**（antigravity 無基座，見 `.skill-bindings/gemini-conversation-research/retarget-map.md`）。保留的是 **feedback 三角紀律**。
+> northstar 的 transcript-harvest / isolation-validator / 下游 concept-landing·dr-governance-router **拿掉**（上游無基座，見 `.skill-bindings/gemini-conversation-research/retarget-map.md`）。保留的是 **feedback 三角紀律**。
 
 **步驟**:
 1. 寫 `outcome`（聚合 S0-S4 硬數據；記進 harvest 檔或 `AGENTS.md` Resolved）。
@@ -267,9 +268,9 @@ ssot_verification: { dr_ssot_is_complete_copy, bibliography_sync, conversation_f
 
 ---
 
-## S9: INGEST — 全知識點結構化落地（子代理隔離；**入 antigravity KG**）
+## S9: INGEST — 全知識點結構化落地（子代理隔離；**入上游 KG**）
 
-> northstar S9 是「純 Node.js kg-ingest.ts → rag-local KG 邊」。**antigravity 無 rag-local**——但**有自己的 KG**（`indexing/` GraphStore + `.cache/kg/graph.json`）。**KG 等價層已補**（cc-20260703）：新增 `Conversation` 源節點型別（`conv:gemini:<id>`，三重映射登記 models.py + CONTEXT.md + 設計 §1）+ `indexing/ingest_conversation.py`——**鏡像 `concepts.ingest_concepts_for_video`**，把對話概念走**同一個 `extract_concepts` 引擎** → `Conversation ─DISCUSSES→ Concept`。概念與既有 Video/RepoDoc 概念**跨源 join**（同 canonical concept id 自動合流）。詳 `.skill-bindings/gemini-conversation-research/retarget-map.md`。
+> northstar S9 是「純 Node.js kg-ingest.ts → rag-local KG 邊」。**上游無 rag-local**——但**有自己的 KG**（`indexing/` GraphStore + `.cache/kg/graph.json`）。**KG 等價層已補**（cc-20260703）：新增 `Conversation` 源節點型別（`conv:gemini:<id>`，三重映射登記 models.py + CONTEXT.md + 設計 §1）+ `indexing/ingest_conversation.py`——**鏡像 `concepts.ingest_concepts_for_video`**，把對話概念走**同一個 `extract_concepts` 引擎** → `Conversation ─DISCUSSES→ Concept`。概念與既有 Video/RepoDoc 概念**跨源 join**（同 canonical concept id 自動合流）。詳 `.skill-bindings/gemini-conversation-research/retarget-map.md`。
 
 **前置**: S8 收斂（或 S7 gap_list 為空）。
 **⚠ Context Isolation（P0）**: S9 讀全部 DR 報告 / 對話提取概念 → 委派子代理（子代理回**扁平概念名清單** `<slug>-concepts.txt` + 結構化 `<slug>-analysis.yaml`，不回原文）。

@@ -3,12 +3,13 @@
 > 屬 [`loop-harness-review-handoff`](../SKILL.md) skill。SKILL.md 6 步程序的第 ③ 步引用本檔。
 > **用法**:交接時把下列**已知維度**逐項放進 reviewer 的審計任務,再帶 §逼未知 的 completeness-critic 提問。維度可複用、可依 session-adjustment([handoff-know-why §4](handoff-know-why.md))刪去已答項。
 > 每維度指向的設計 SSOT 只**指針**(漂移時以真檔為準):[`harness-spec.md`](../../loop-harness-standard/modules/harness-spec.md)、[`evals-design-method.md`](../../loop-harness-standard/modules/evals-design-method.md)、`ARCHITECTURE.md`、pilot `families/pinescript-audit/`、引擎 `loop_wiki/engine.sh`。
-> **與 antigravity 原版的差異(誠實記)**:原版八項裡有兩項對 skill-bettor 不適用,已**移除,不佯裝存在**——見下方「④/⑤ 已移除」。移除理由承 `.skill-bindings/loop-harness-review-handoff/retarget-map.md` 第 1 行、`.skill-bindings/loop-harness-review-handoff/retarget-map.md` 第 2 行——不是本檔重新做的判斷,是同一個架構事實(skill-bettor 恆單 host,無 root `AGENTS.md`)的第三次引用。
+> **詞彙**:**上游**＝這份 skill 被移植出來的那個 repo;**宿主**＝正在訂閱這份共用 body 的 repo。
+> **與上游原版的差異(誠實記)**:原版八項裡有兩項對宿主不適用,已**移除,不佯裝存在**——見下方「④/⑤ 已移除」。移除理由承 `.skill-bindings/loop-harness-review-handoff/retarget-map.md` 第 1 行、`.skill-bindings/loop-harness-review-handoff/retarget-map.md` 第 2 行——不是本檔重新做的判斷,是同一個架構事實(宿主恆單 host,無 root `AGENTS.md`)的第三次引用。
 
 ## 已知審計維度(known dimensions;逐項掃)
 
 ### ① scripts/ vs tests/ 設計目的與最佳結構
-skill-bettor 現存**兩種**scripts↔fixtures 配對形態,結構不同:
+宿主現存**兩種**scripts↔fixtures 配對形態,結構不同:
 - **op 沙盒側**(`loop_demo/claude_agy`,本地唯一 canonical 範例):`scripts/<checker>` ↔ `tests/<checker>/fixtures/{good,hollow}/target.*`,1:1,**無 wrapper**——`evals.json` 的 `verify_topology.scripts_tests_pairing` 欄位已載明 wrapper 層(每 checker 一份 `tests/<checker>/verify.sh`)已在移植前的來源狀態就被砍掉,改用 naming-convention glob 探勘直呼 `scripts/<checker>`。
 - **family 側**(`families/pinescript-audit`):`skills/repaint-detection/scripts/scan_repaint.py`(production checker 本體)+ `evals/{cases,holdout}/repaint-detection/<case>/{task.md,expect.yaml,fixtures/}`,由 `evals/judge.py` 的三型 check(`program`/`absent`/`llm_judge`)評分——不是 op 沙盒側的 good/hollow 二元 fixture 形。family 側**目前沒有 checker 級 selftest**(只有 agent 級 `evals/mock_agent.py` 正控,驗證的是整條 runner 管線,不是單一 checker 的 good/hollow 區分力)。
 - **問**:兩種配對形態不同是否該統一?family 側要不要也建 per-checker 的 good/hollow selftest(仿 op 沙盒側)?`evals.json`/`expect.yaml` 該不該吸收其中一層?**要求 reviewer 給結構建議**。
@@ -17,21 +18,21 @@ skill-bettor 現存**兩種**scripts↔fixtures 配對形態,結構不同:
 ### ② 執行效率度量＋instrument
 - **具體度量**:收斂輪數 iterations-to-converge／每次收斂 token 成本／wall-clock／planted-defect 檢出率／cache 命中率／driver 失敗率／**Goodhart 逃逸率**(＝機械綠但畢業判官 HOLD 的比例)。**問**:哪些是虛榮指標、哪些真反映效率?
 - **現正存在、已知、未修的活案例**(這是本地唯一一個「效率度量已知失真」的真實案例,適合直接拿來當本維度的具體審計對象):`families/pinescript-audit/changelog/2026-07-11.md`「已知問題1:token 口徑失真」記錄 `runner.py` 的 `parse_agent_output` 把跨迭代 `cache_read` 累加,懲罰「多思考幾輪」而非「skill 膨脹」;`ARCHITECTURE.md` §7 鐵律 6 已把「改量測 max-over-iterations」定為修復方向但**尚未實作**。**要求 reviewer 給具體修法**(該從 `runner.py` 哪個函式改、驗證方式)。
-- **instrument 現況(誠實記)**:引擎 `loop_wiki/engine.sh` 設計了 `_engine-run/trajectory.log` 軌跡機制,但**本地任何沙盒都還沒真跑產生過這個目錄**(`loop_demo/claude_agy` 的 `RETARGET-NOTE.md` 已明記 dry-run 一節是 antigravity 移植前的舊測試,未在本地重跑)——這件事本身也是一個「已設計未證」的缺口,值得逼未知時提出。
+- **instrument 現況(誠實記)**:引擎 `loop_wiki/engine.sh` 設計了 `_engine-run/trajectory.log` 軌跡機制,但**本地任何沙盒都還沒真跑產生過這個目錄**(`loop_demo/claude_agy` 的 `RETARGET-NOTE.md` 已明記 dry-run 一節是上游移植前的舊測試,未在本地重跑)——這件事本身也是一個「已設計未證」的缺口,值得逼未知時提出。
 - 錨:`families/pinescript-audit/changelog/2026-07-11.md`、`families/pinescript-audit/evals/runner.py`、`ARCHITECTURE.md` §7 鐵律 6、`loop_wiki/engine.sh`、`loop_demo/RETARGET-NOTE.md`。
 
 ### ③ passive-context 的 domain/路由/規則混雜是否稀釋注意力＋最優切分
 - 沙盒 `CLAUDE.md`(`loop_wiki/_template/CLAUDE.md`,≤300 行)目前把 domain 知識＋路由指針＋standing rules 混在一起。**問**:這種混雜是否稀釋注意力、傷完成率(對照 [`harness-spec.md` §2❷](../../loop-harness-standard/modules/harness-spec.md) 記的 **91.6%→71.3%** 上下文腐化)?
 - **最優切分建議**:domain 知識→family `skills/`、路由/成功判準→`PROMPT.md`、少量鐵律→passive-context。**要求論證 + 含它對 cache 不變量([`harness-spec.md` §5](../../loop-harness-standard/modules/harness-spec.md))的影響**(切分若動搖 prefix 字元級穩定＝cache miss)。
-- **新增子問(skill-bettor 自己的角度,非復活已刪的 antigravity 維度)**:skill-bettor 實際有**三層**被動上下文/路由文件——root `CLAUDE.md`(≤300 行)／op 沙盒 `CLAUDE.md`(≤300 行)／family 路由器 `SKILL.md`(`ARCHITECTURE.md` §2「家族內部契約」規定「只放地圖不放知識」)。**問**:三層職責邊界是否清楚?有沒有重疊或該合併的情況?
+- **新增子問(宿主自己的角度,非復活已刪的上游維度)**:宿主實際有**三層**被動上下文/路由文件——root `CLAUDE.md`(≤300 行)／op 沙盒 `CLAUDE.md`(≤300 行)／family 路由器 `SKILL.md`(`ARCHITECTURE.md` §2「家族內部契約」規定「只放地圖不放知識」)。**問**:三層職責邊界是否清楚?有沒有重疊或該合併的情況?
 - 錨:`CLAUDE.md`(root)、`loop_wiki/_template/CLAUDE.md`、`families/pinescript-audit/SKILL.md`、`ARCHITECTURE.md` §2。
 
 ### ④ 已移除 — AGENTS.md／CLAUDE.md 差異
-skill-bettor 恆為 Claude Code 單 host,**沒有 root `AGENTS.md`**——`ARCHITECTURE.md` §2 目錄圖明寫「⚠️ 暫不建 root AGENTS.md——『dual-runnable 才雙檔』」,§11「為何不」重申。這項審計維度在 antigravity 問的是「雙份常駐上下文檔案是否最優」,skill-bettor 沒有第二份可比較,問題本身不成立,不是簡化掉一個困難問題。
+宿主恆為 Claude Code 單 host,**沒有 root `AGENTS.md`**——`ARCHITECTURE.md` §2 目錄圖明寫「⚠️ 暫不建 root AGENTS.md——『dual-runnable 才雙檔』」,§11「為何不」重申。這項審計維度在上游問的是「雙份常駐上下文檔案是否最優」,宿主沒有第二份可比較,問題本身不成立,不是簡化掉一個困難問題。
 錨:`ARCHITECTURE.md` §2／§11、`.skill-bindings/loop-harness-review-handoff/retarget-map.md` 第 1 行。
 
 ### ⑤ 已移除 — N×M(host×driver)覆蓋
-skill-bettor 不存在雙 host 翻面(不會有「開這個 repo 的 CLI 換家族」的情境),driver 只在小迴圈側單軸二選一(`claude -p`／`agy`)——[`harness-spec.md` §3](../../loop-harness-standard/modules/harness-spec.md) 已明寫此差異。**提醒**:`ARCHITECTURE.md` §6「N×M 政策」仍殘留「格 3/4(Gemini host)僅設計未證」的措辭,那是**假設性占位**(只有真的要接 Antigravity CLI host 才會啟用),不是本 repo 現存的雙 host 事實——reviewer 讀到 §6 別誤讀成「skill-bettor 其實有 N×M 矩陣需要審」。
+宿主不存在雙 host 翻面(不會有「開這個 repo 的 CLI 換家族」的情境),driver 只在小迴圈側單軸二選一(`claude -p`／`agy`)——[`harness-spec.md` §3](../../loop-harness-standard/modules/harness-spec.md) 已明寫此差異。**提醒**:`ARCHITECTURE.md` §6「N×M 政策」仍殘留「格 3/4(Gemini host)僅設計未證」的措辭,那是**假設性占位**(只有真的要接上游那類 CLI host 才會啟用),不是本 repo 現存的雙 host 事實——reviewer 讀到 §6 別誤讀成「宿主其實有 N×M 矩陣需要審」。
 錨:`ARCHITECTURE.md` §6、`.skill-bindings/loop-harness-review-handoff/retarget-map.md` 第 1 行、`.skill-bindings/loop-harness-review-handoff/retarget-map.md` 第 2 行。
 
 ### ⑥ 效益疊加 vs 冗餘
@@ -40,7 +41,7 @@ worked instance(本地實測疊加效益的唯一真實錨):`families/pinescript
 錨:`ARCHITECTURE.md` §3-§7、`families/pinescript-audit/{FAMILY.yaml,changelog/2026-07-11.md}`。
 
 ### ⑦ Goodhart 逃逸＋fold-back 閉環
-skill-bettor 沒有 antigravity 那種帶案例代號(R7/R8)的具體踩坑史,但**已經有一個活生生的早期訊號**:`families/pinescript-audit/changelog/2026-07-11.md` 記錄「本次 Δ 主要量測的是介面契約遵循 + 輸出穩定性,不是『找不找得到 bug』」,以及「已知問題 5:案例對強模型太簡單,新案例應往『語意級陷阱』走」。**問**:這是不是一個 Goodhart 早期警訊(機械/格式層對強模型幾乎滿分,但實際 bug-finding 能力未必被量到)?fold-back 閉環(finding→收緊 checker 或案例)在 skill-bettor 目前只有「人在 changelog 記已知問題」這種粗放形式,**尚無**像 antigravity 那種「finding→立即寫新 runnable checker」的機械化 fold-back 循環——這本身是不是一個缺口?機械層永遠關不完 Goodhart → semantic 判官(畢業段)是否永遠必要 backstop?
+宿主沒有上游那種帶案例代號(R7/R8)的具體踩坑史,但**已經有一個活生生的早期訊號**:`families/pinescript-audit/changelog/2026-07-11.md` 記錄「本次 Δ 主要量測的是介面契約遵循 + 輸出穩定性,不是『找不找得到 bug』」,以及「已知問題 5:案例對強模型太簡單,新案例應往『語意級陷阱』走」。**問**:這是不是一個 Goodhart 早期警訊(機械/格式層對強模型幾乎滿分,但實際 bug-finding 能力未必被量到)?fold-back 閉環(finding→收緊 checker 或案例)在宿主目前只有「人在 changelog 記已知問題」這種粗放形式,**尚無**像上游那種「finding→立即寫新 runnable checker」的機械化 fold-back 循環——這本身是不是一個缺口?機械層永遠關不完 Goodhart → semantic 判官(畢業段)是否永遠必要 backstop?
 錨:`families/pinescript-audit/changelog/2026-07-11.md`、[`evals-design-method.md`](../../loop-harness-standard/modules/evals-design-method.md)(Goodhart 提及段)、[`loop-harness-standard` Verify 三層](../../loop-harness-standard/SKILL.md)(semantic 判官 backstop 行)。
 
 ### ⑧ 驗證器設計/隔離/tier 經濟學
