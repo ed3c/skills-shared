@@ -15,6 +15,32 @@
     "must_not_invoke": ["diagnose", "tdd"]
   },
   "conditions": ["no_skill", "current_skill", "candidate_skill", "wrong_skill"],
+  "perturbations": [
+    {
+      "id": "context-drop-metric-definition",
+      "axis": "context",
+      "description": "Remove the explicit numeric metric definition from the prompt context and leave only the prose goal.",
+      "expected_effect": "The plan must still surface Metric as an open decision instead of inventing a number; silently fabricating a metric is a failure."
+    },
+    {
+      "id": "tool-remove-lint-runner",
+      "axis": "tool",
+      "description": "Make the lint runner named by the verifier unavailable in the workspace.",
+      "expected_effect": "Verify must be reported as unsatisfiable rather than the loop planning around an unverifiable metric."
+    },
+    {
+      "id": "state-preexisting-failing-loop",
+      "axis": "state",
+      "description": "Start from a workspace that already contains a half-finished iteration contract with a stale iteration budget.",
+      "expected_effect": "The stale budget is reconciled explicitly rather than inherited as if it were current."
+    },
+    {
+      "id": "task-swap-to-unbounded-goal",
+      "axis": "task",
+      "description": "Restate the task as an open-ended quality improvement with no stopping condition.",
+      "expected_effect": "Iterations must be refused or bounded by an explicit stop rule, never left unbounded."
+    }
+  ],
   "runtime": {"fresh_workspace": true, "retries": 0, "timeout_seconds": 300, "network_policy": "no-network", "seed_count": 3},
   "verifier": {
     "type": "script",
