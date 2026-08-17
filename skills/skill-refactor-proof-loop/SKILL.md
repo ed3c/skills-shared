@@ -143,7 +143,11 @@ For L3+, run the matched task and bind exact base/tree, process/worktree observa
 
 Add a content-bound entry only after its checker can replay path, blob, runner, evidence ceiling, denominator and authority assertions. The registry is an index, not a copy of the proof implementation.
 
-### 7. Hand off higher layers
+### 7. Classify adoption across Skills
+
+Record one state per Skill per criterion in an adoption ledger, with the evidence path that proves it and the issue that owns every non-`PASS` state. A criterion whose evidence is only Markdown is not executable, and a gap without a known owning issue is not a finding.
+
+### 8. Hand off higher layers
 
 Link each `NOT_EXERCISED`, `ABSENT`, or `HUMAN_ADMIT_REQUIRED` lane to its owner and issue. Do not close the proof gap through wording.
 

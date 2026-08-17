@@ -48,6 +48,9 @@ skills/skill-refactor-proof-loop/
 │   ├── refactor-proof-stack.schema.json
 │   ├── refactor-proof-stack.json
 │   │   └── molecular issue/PR/artifact/evidence graph
+│   ├── skill-adoption-ledger.schema.json
+│   ├── skill-adoption-ledger.json
+│   │   └── per-Skill adoption classifications, evidence paths and gap owners
 │   └── COMPLETION_REPORT.template.md
 │       └── handoff fields; never a verifier
 ├── modules/
@@ -58,13 +61,16 @@ skills/skill-refactor-proof-loop/
 │   │   └── contract semantics and layer monotonicity
 │   ├── check_golden_proof_registry.py
 │   │   └── path/blob/runner/denominator/authority registry assertions
-│   └── check_refactor_proof_stack.py
-│       └── true-child, convergence, exact-head-policy and traceability assertions
+│   ├── check_refactor_proof_stack.py
+│   │   └── true-child, convergence, exact-head-policy and traceability assertions
+│   └── check_skill_adoption_ledger.py
+│       └── adoption scope, evidence, executability, layer-ceiling and gap-owner assertions
 └── tests/
     ├── run-all.sh
     ├── selftest.py
-    └── stack_selftest.py
-        └── positive, hollow, mutation and Stack falsifiers
+    ├── stack_selftest.py
+    └── adoption_selftest.py
+        └── positive, hollow, mutation, Stack and adoption falsifiers
 ```
 
 ## Refactor proof State Machine
@@ -178,7 +184,20 @@ Tech Lead L5 delivery/Human Admit       HUMAN_ADMIT_REQUIRED
 
 For the matched deterministic carrier, A, B1 and B2 produce equivalent final bytes. B0 is blocked by an absent dispatch route. B2 improves receipt-gated causal and evidence closure; it does not establish live model/provider quality uplift.
 
-Open live owners remain issue #312 Phase 2 and issues #231, #232, #234 and #256. Issue #322 remains planned until the standard and traceability convergence are admitted.
+Open live owners remain issue #312 Phase 2 and issues #231, #232, #234 and #256.
+
+## Cross-Skill adoption
+
+[`references/skill-adoption-ledger.json`](references/skill-adoption-ledger.json) classifies the ten Skills named by issue #322 against the adoption matrix, and `scripts/check_skill_adoption_ledger.py` replays every classification against current bytes.
+
+```text
+10 Skills classified, 100 findings, 68 non-PASS
+1 Skill (agentic-tech-lead-orchestration) carries frozen treatments, a matched hermetic task and a registered golden proof
+9 Skills reach L2 executable contract: routes, gates and hollow-route controls, but no frozen refactor treatments
+0 Skills carry live model/runtime evidence
+```
+
+Every gap names an existing owning issue (#231, #232, #234, #256 or #322); the checker refuses an owner that is not already known, so the audit cannot invent a duplicate. Opening the remaining migration leaves, the Markdown report under `docs/traceability/`, and Human admission of the standard are outside this ledger.
 
 ## Local verification
 
@@ -192,7 +211,10 @@ python3 scripts/check_golden_proof_registry.py \
 python3 scripts/check_refactor_proof_stack.py \
   --stack references/refactor-proof-stack.json
 
+python3 scripts/check_skill_adoption_ledger.py \
+  --ledger references/skill-adoption-ledger.json
+
 bash tests/run-all.sh
 ```
 
-A green suite proves the portable mechanism, registered L3 golden proof, and molecular traceability graph remain connected to current repository bytes. It does not prove live providers, model quality, Git Town/Forgejo execution, merge, release or production.
+A green suite proves the portable mechanism, registered L3 golden proof, molecular traceability graph, and adoption ledger remain connected to current repository bytes. It does not prove live providers, model quality, Git Town/Forgejo execution, merge, release or production.
