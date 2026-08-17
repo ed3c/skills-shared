@@ -33,6 +33,8 @@ import time
 from pathlib import Path
 from typing import Any
 
+from check_shadow_canary import classify_detection
+
 SCHEMA = "procedural-shadow-runtime/shadow-canary-receipt/v1"
 SHADOW = {"provider": "openai", "binary": "codex", "model": "gpt-5.6-sol"}
 BUILDER = {"provider": "anthropic", "harness": "claude-code"}
@@ -214,8 +216,23 @@ def ask_shadow(snapshot: dict[str, Any], timeout: int) -> tuple[dict[str, Any] |
     process = subprocess.run(argv, capture_output=True, text=True, check=False,
                              timeout=timeout, stdin=subprocess.DEVNULL)
     latency = int((time.time() - started) * 1000)
-    usage = {"latency_ms": latency, "exit_code": process.returncode,
-             "stdout_sha256": sha256(process.stdout.encode())}
+    usage = {
+        "latency_ms": latency, "exit_code": process.returncode,
+        "stdout_sha256": sha256(process.stdout.encode()),
+        # Cost/token telemetry: this call parses only stdout for the level JSON
+        # object -- it never requests codex's `--json` event stream, so no
+        # dollar or token figure is captured this run. That is an honest
+        # ABSENT, not a silent zero: cost_observed says so explicitly rather
+        # than letting a missing key read as "free".
+        "cost_observed": False,
+        "cost_usd": None,
+        "input_tokens": None,
+        "output_tokens": None,
+        "cost_unavailable_reason": (
+            "invocation parses stdout only; codex's --json event stream was "
+            "not requested, so no token/cost telemetry exists for this call"
+        ),
+    }
     matches = re.findall(r"\{[^{}]*\"level\"[^{}]*\}", process.stdout, re.S)
     for candidate in reversed(matches):
         try:
@@ -443,11 +460,17 @@ def main() -> int:
     target.write_text(json.dumps(receipt, indent=2, sort_keys=True) + "\n",
                       encoding="utf-8")
     outcomes: dict[str, int] = {}
+    detection: dict[str, int] = {}
     for entry in trials:
         outcome = entry["expectation"]["outcome"]
         outcomes[outcome] = outcomes.get(outcome, 0) + 1
+        label = classify_detection(entry)
+        detection[label] = detection.get(label, 0) + 1
+    cost_observed = any(entry["shadow"].get("cost_observed") for entry in trials)
     print(json.dumps({"receipt": str(target), "trials": len(trials),
                       "outcomes": outcomes,
+                      "detection": detection,
+                      "cost_observed": cost_observed,
                       "controls_red": sum(1 for c in receipt["gate_controls"]
                                           if c["observed"] == "RED")}, indent=2))
     return 2 if unusable else 0

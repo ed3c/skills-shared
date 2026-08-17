@@ -31,7 +31,7 @@ skills/skill-refactor-proof-loop/scripts/check_refactor_proof_stack.py
 | Generalized proof contract + golden registry | `#319` | `#323` | true child | `agent/319-skill-refactor-proof-contract` / PR #315 branch | current GitHub PR metadata and Skill Suites/Shared Skills Infra |
 | Agent routes + directory State Machines/DAG/data flow | `#320` | `#324` | true child | `agent/320-refactor-proof-agent-docs` / PR #323 branch | current GitHub PR metadata and route/check workflows |
 | Molecular Stack + traceability convergence | `#321` | `#325` | convergence | `agent/321-refactor-proof-stack-index` / PR #324 branch | current GitHub PR metadata and exact-head workflows |
-| Cross-Skill adoption audit | `#322` | none | planned process follow-up | no branch leased | issue contract only; blocked on Human admission of the standard |
+| Cross-Skill adoption audit | `#322` | delivery PR of `agent/goal-33-issues-batch` (GitHub metadata) | planned process follow-up | `agent/goal-33-issues-batch` / `main` | machine ledger landed at `skills/skill-refactor-proof-loop/references/skill-adoption-ledger.json`; rendered report, gap issues and Human admission of the standard still open |
 
 True-child edges are justified by consumed unmerged artifacts:
 
@@ -44,6 +44,10 @@ True-child edges are justified by consumed unmerged artifacts:
 ```
 
 Issue #322 is a process dependency after admission, not automatically a Git child. Issues #231, #232, #234 and #256 are independent scheduler, Shadow, delivery and adapter evidence lanes; they may raise #312 from L3 to L4/L5 only with matched exact-subject receipts. They are not fake Stack ancestry.
+
+Adapter lane status (#256): 8/9 adapter lanes (grepai, scip, tree-sitter, serena, sqlite, lancedb, worktree, forgejo) carry live receipts on main at commit `f50b2b9822db9e534169b5e63b523d940b32bb3c`; git-town is honestly `ABSENT` pending a Human admission decision for a darwin-compatible Git Town artifact (the committed admission is pinned by SHA-256 to `linux_intel_64`). The completion-report matrix is [`skills/repo-agent-native/evals/ADAPTER_RECEIPT_MATRIX.md`](../../skills/repo-agent-native/evals/ADAPTER_RECEIPT_MATRIX.md). The #231/#234 scheduler/Git-Town/dual-forge receipt-binding acceptance item remains `NOT_EXERCISED` pending those issues' remaining slices.
+
+Closure generalization (#332): the repository-closure contract, Issue dual-DAG and Molecular Stack index are now typed, checked subjects — schemas, examples and deterministic gates live at `skills/agentic-tech-lead-orchestration/references/` (`repository-closure-contract.schema.json`, `issue-dual-dag.schema.json`, gate `scripts/assert_repository_closure_contract.py`) and `skills/git-town-stacked-pr-worker/references/` (`molecular-stack-index.schema.json`, gate `scripts/assert_molecular_stack_index.py`), with the atom law bound into the git-town portable core (CORE-LAW-006). The matching closure laws are NOT bound into the agentic-tech-lead portable core: that `SKILL.md` is the golden-proof-pinned `B2_CAUSAL_DAG_REPAIRED` treatment, and changing it requires re-running the refactor proof loop (see `skills/skill-refactor-proof-loop/references/golden-proof-registry.json`), so the laws live in `references/REPOSITORY_CLOSURE_RECONCILIATION.md` until a new proof re-registers the core. Publication subject: delivery PR of `agent/goal-33-issues-batch` (GitHub metadata).
 
 Open PR heads are read from GitHub metadata rather than self-embedded in the same branch. A merged node may record an immutable merge SHA only after its owning checks/evidence are observed and terminal state is truly `MERGED`.
 

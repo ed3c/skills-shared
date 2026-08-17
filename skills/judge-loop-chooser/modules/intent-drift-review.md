@@ -15,15 +15,17 @@
 >    `evals/` 內容)+ `PLAN.md` 迭代軌跡。
 > 2. **DR proposal**(D3 型):intent = 大迴圈 06:30 research 階段指派、源自 06:00 collect 挖出的
 >    「昨日軌跡失敗」研究題目。producer = agy(Gemini);artifact =
->    `proposals/YYYY-MM-DD-<topic>.md`。這個場景與 antigravity 原版(producer=Gemini DR)最貼近。
+>    `proposals/YYYY-MM-DD-<topic>.md`。這個場景與上游原版(producer=Gemini DR)最貼近。
 >
-> **誠實現況(2026-07-11)**:skill-bettor**尚無**已發生的漂移災難案例可當 canonical negative-space
-> 實例(antigravity 有剪貼簿污染案;skill-bettor 至今只有一個成長曲線原點 changelog,尚未跑完一輪真實
-> 演化 op,見 ARCHITECTURE.md §10 D2 待辦)。本檔用**已知風險**(changelog 記錄的「案例對強模型太簡單」
-> 覆蓋缺口)當最接近的可查證錨,**不是**宣稱已發生過同等級的漂移事故——後續若 D2/D5 跑出真實案例,
-> 錨換成該案例,不繼承本檔的假設性描述。
+> **詞彙**:**上游**＝這份 payload 被移植出來的那個 repo;**宿主**＝正在訂閱這份共用 body 的 repo。
 >
-> **封裝包 scope-boundary 紀律(承 antigravity fold-in 教訓)**:若某沙盒的 Success Criteria 提到的
+> **誠實現況紀律**:宿主若**尚無**已發生的漂移災難案例可當 canonical negative-space
+> 實例(上游有一件剪貼簿污染案;一個剛起步的宿主往往只有一個成長曲線原點 changelog,尚未跑完一輪
+> 真實演化 op),就用**已知風險**(changelog 記錄的覆蓋缺口,如「案例對強模型太簡單」)當最接近的
+> 可查證錨,**不得**宣稱已發生過同等級的漂移事故——後續跑出真實案例,錨換成該案例,不繼承這裡的
+> 假設性描述。
+>
+> **封裝包 scope-boundary 紀律(承上游 fold-in 教訓)**:若某沙盒的 Success Criteria 提到的
 > 一項要求實際由 `shared/`(引用不複製的共享原語)或另一家族服務,組裝封裝包時須附一句
 > **scope-boundary 註記**標明「此錨由 shared/ 或 sibling family 服務、非本 diff 職責」——否則零存取
 > reviewer 會把「本 diff 未覆蓋 X」誤判為 SI7 negative-space 假陽性。同理:若 Success Criteria 提到
@@ -74,7 +76,7 @@ residual 由鐵律 0.3 的 reproducibility 判準分流到 needs_diamond。
                          runner.py 輸出撐的,還是純敘事?
   SI5 SOURCE-INTEGRITY :知識來源守住「單向流」了嗎?diff 有沒有直接複製/引用 proposals/ 未驗證內容,
                          或把 holdout fixture 洩漏進 public/candidates(交叉污染),而非真正走「驗證後
-                         才轉入」正規流程?(skill-bettor 版的「污染/側欄劫持」)
+                         才轉入」正規流程?(本 repo 版的「污染/側欄劫持」)
   SI6 EQUIVALENT-FIT   :diff 宣稱新增的 check/fixture 是 planted-defect 的真實技術等價物,真的錨到
                          一個可執行 script/pattern、能被 selftest good/hollow 證明活著,還是空口宣稱
                          涵蓋了某類缺陷(hollow-T0 placebo,如只加字串比對卻聲稱「語意級陷阱」)?
@@ -86,12 +88,12 @@ residual 由鐵律 0.3 的 reproducibility 判準分流到 needs_diamond。
                          的分數)?
 
 ═══ 鐵律 2:drift 簽名隨 deliverable【類型】自適應(先判型,再選漂移面,寫在報告開頭)═══
-skill-bettor 的產物分兩類:
+本 repo 的產物分兩類:
   - **演化 op diff**(evolution,吸收 proposal/changelog 問題轉成資產改動)——漂移簽名:
     goodhart-not-fix(G 閘綠但沒解決底層問題,只是讓 check 通過的捷徑,如加一個過度寬鬆的 pattern)/
     案例污染(holdout 洩漏或直接引用 proposals/)/ 只做半套(changelog 列 5 問題只修 1 卻宣稱完成)/
     Guard-Metric 違反(動了 verify.sh/evals 本身讓判準對自己放水)。
-  - **DR proposal**(absorption,agy 研究外部題目寫成 proposal)——漂移簽名接近 antigravity 原版:
+  - **DR proposal**(absorption,agy 研究外部題目寫成 proposal)——漂移簽名接近上游原版:
     cohere-not-build 破功(沒把研究扣回原題目,自己長出無關敘事)/ external-verify 沒做(post-cutoff
     框架/庫/版本 claim 靠訓練記憶)/ 源頭污染。
 套錯簽名 = 問錯問題;明說本產物真正的漂移面為何。
@@ -122,22 +124,22 @@ LAND-DECISION(禁 LLM-judged score 當放行閘 / 禁 auto-DECISION)。你的分
 
 ---
 
-## antigravity → skill-bettor retarget(本 payload)
+## 上游 → 宿主 retarget(本 payload)
 
-| antigravity strategic-intent reviewer | 本檔對應 | 改了什麼 |
+| 上游 strategic-intent reviewer | 本檔對應 | 改了什麼 |
 |---|---|---|
-| intent = 原卡片盒問題 / DR thesis / 逐字稿源頭鐵錨 | intent = `PROMPT.md` 任務段 + 依據的 proposal/changelog 編號(D1)/ 大迴圈指派研究題目(D3) | 真相錨從「DR 管線源頭」換成 skill-bettor 真有的演化小迴圈合約檔 |
-| artifact = DR 報告 / Path B 精煉 / 覆蓋矩陣 | artifact = 家族 diff + `PLAN.md`(D1)/ `proposals/*.md`(D3) | skill-bettor 無 antigravity Path B 精煉 pipeline 產物/覆蓋矩陣資產;本地 `path-b-reduction` 只是 claim 約分 helper,可判物仍是演化資產與 proposal |
-| SI5 SOURCE-INTEGRITY(側欄劫持/污染/訓練記憶混入) | SI5 SOURCE-INTEGRITY(proposals/ 直接引用、holdout 洩漏 —— 知識單向流倒灌) | 換成 skill-bettor 真實失敗類:違反「proposals→驗證→沙盒 diff→eval 閘」單向流(ARCHITECTURE §7 鐵律 1) |
+| intent = 原卡片盒問題 / DR thesis / 逐字稿源頭鐵錨 | intent = `PROMPT.md` 任務段 + 依據的 proposal/changelog 編號(D1)/ 大迴圈指派研究題目(D3) | 真相錨從「DR 管線源頭」換成宿主真有的演化小迴圈合約檔 |
+| artifact = DR 報告 / Path B 精煉 / 覆蓋矩陣 | artifact = 家族 diff + `PLAN.md`(D1)/ `proposals/*.md`(D3) | 宿主無上游那套 Path B 精煉 pipeline 產物/覆蓋矩陣資產;本地 `path-b-reduction` 只是 claim 約分 helper,可判物仍是演化資產與 proposal |
+| SI5 SOURCE-INTEGRITY(側欄劫持/污染/訓練記憶混入) | SI5 SOURCE-INTEGRITY(proposals/ 直接引用、holdout 洩漏 —— 知識單向流倒灌) | 換成宿主真實失敗類:違反「proposals→驗證→沙盒 diff→eval 閘」單向流(ARCHITECTURE §7 鐵律 1) |
 | SI6 EQUIVALENT-FIT(空口 [推論] 冒充技術實現等價物) | SI6 EQUIVALENT-FIT(空口宣稱涵蓋缺陷類型,無 selftest good/hollow 佐證) | 錨到 `evals/judge.py` + `selftest.sh` 的等價物紀律,而非 COMPLETENESS_RUBRIC |
-| 報告落 `execution/state/drift-reports/`(northstar)/ 產物旁(antigravity) | 落沙盒 `logs/<slug>.intent-review.md` 或 SURFACE | skill-bettor 沙盒已有 `logs/` 慣例(ARCHITECTURE §3 基座 3) |
+| 報告落 `execution/state/drift-reports/`(更上游)/ 產物旁(上游) | 落沙盒 `logs/<slug>.intent-review.md` 或 SURFACE | 宿主沙盒已有 `logs/` 慣例(ARCHITECTURE §3 基座 3) |
 | needs_diamond 源:external-verify / stealth / Path B / 跨家族模型 | needs_diamond 源:external-verify 官方 doc / path-b-reduction claim 約分 / agy(Gemini)跨家族 findings / 人 | path-b-reduction 現已本地落地,但只補 claim 約分,不補 verdict/admit |
-| Same-Weights:Gemini 審 Gemini(producer 多半 Gemini) | Same-Weights:Sonnet 審 Sonnet(producer 多半 Claude `claude -p`);agy(Gemini)才是真跨家族 | skill-bettor 演化 author 預設 Claude 側,vendor 主客對調 |
-| canonical negative-space 實例:剪貼簿污染案(10148 字、過所有下游門檻、換了主題) | **尚無對應本地實例** —— 用 changelog「案例對強模型太簡單」已知缺口當最接近可查證錨,誠實標非同級事故 | skill-bettor 尚未跑完一輪真實演化 op(ARCHITECTURE §10 D2 待辦),沒有可引用的災難案例 |
+| Same-Weights:Gemini 審 Gemini(producer 多半 Gemini) | Same-Weights:Sonnet 審 Sonnet(producer 多半 Claude `claude -p`);agy(Gemini)才是真跨家族 | 宿主演化 author 預設 Claude 側,vendor 主客對調 |
+| canonical negative-space 實例:剪貼簿污染案(10148 字、過所有下游門檻、換了主題) | **尚無對應本地實例** —— 用 changelog「案例對強模型太簡單」已知缺口當最接近可查證錨,誠實標非同級事故 | 宿主尚未跑完一輪真實演化 op(ARCHITECTURE §10 D2 待辦),沒有可引用的災難案例 |
 
 > **一句話**:保留「8 探針 + 自適應簽名 + 證據表 + evaluator-first 自評 + REPORT-ONLY」骨架,把標的從
 > 「驗一份 DR 產物是否服務原卡片盒意圖」換成「驗一個演化 op diff / 一份 DR proposal 是否服務原
-> `PROMPT.md`/proposal/研究題目意圖」,並把 skill-bettor 真實的漂移類(單向流倒灌 / hollow check /
+> `PROMPT.md`/proposal/研究題目意圖」,並把宿主真實的漂移類(單向流倒灌 / hollow check /
 > 只做半套 / Guard-Metric 違反)烤進探針。**此 retarget 判定為乾淨映射,不是強行套用**——兩個場景
 > (演化 op diff、DR proposal)都有真實對應的 producer/artifact/intent 三元組,只是尚無本地災難案例
 > 可當 canonical 實例(見上表最後一列的誠實記錄)。

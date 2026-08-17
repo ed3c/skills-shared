@@ -13,6 +13,14 @@ state must appear either in the transition log or in the receipt's own
 `declared_not_produced` list, and the checker recomputes both rather than
 believing either.
 
+The budget ledger is read the same way. Its absence is its own state,
+BUDGET_UNMEASURED, because the committed canary ran before the ledger existed:
+that run's spend was never measured, which is a different claim from having
+spent nothing, and neither the receipt nor this checker may turn one into the
+other after the fact. When a ledger is present every number in it is recomputed
+from the attempts, and an attempt that passed a cap has to be terminal and
+unleased -- over budget and still running is a budget nothing enforced.
+
 Exit codes: 0 pass, 2 receipt failure, 64 unusable input, 70 evaluator defect.
 """
 
@@ -43,6 +51,14 @@ TERMINAL = {"INTEGRATED", "STALE_ATTEMPT", "LEASE_EXPIRED", "CANCELLED",
             "STRAGGLER_DETACHED", "FAILED_TERMINAL", "BLOCKED_AUTHORITY",
             "BLOCKED_CONFLICT", "SUPERSEDED", "REJECTED_NOT_DECOMPOSABLE",
             "DUPLICATE_SUPPRESSED"}
+
+# A receipt written before the budget ledger existed carries no ledger at all.
+# That is its own state and is reported as such: the run happened, its spend was
+# never measured, and no later edit may hand it numbers it did not record.
+BUDGET_UNMEASURED = "BUDGET_UNMEASURED"
+BUDGET_LEDGERED = "BUDGET_LEDGERED"
+LEDGER_FIELDS = ("dimensions", "attempt_limits", "global_limits", "attempts",
+                 "totals", "unobserved_dimensions", "global_over_budget")
 
 
 class Refused(Exception):
@@ -240,14 +256,206 @@ def check_coverage(body: dict[str, Any]) -> None:
                "declared_non_claims is empty")
 
 
+def last_states(body: dict[str, Any]) -> dict[str, str]:
+    """The state each attempt was left in, read off the log rather than the attempt."""
+    final: dict[str, str] = {}
+    for transition in body["transitions"]:
+        final[transition["attempt_id"]] = transition["state"]
+    return final
+
+
+def check_leases_released_at_close(body: dict[str, Any]) -> None:
+    """Nothing still holds a lease when the run ends.
+
+    A run that closes over a live lease has left a writer nobody will reclaim
+    from, and the next scheduler cannot tell that lease from one being used.
+    """
+    active = sorted(attempt["attempt_id"] for attempt in body["attempts"]
+                    if (attempt.get("lease") or {}).get("status") == "ACTIVE")
+    if active:
+        refuse("LEASE_ACTIVE_AT_CLOSE",
+               f"{', '.join(active)} still hold an ACTIVE lease at {body['ended_at']}")
+
+
+def budget_state(body: dict[str, Any]) -> str:
+    ledger = body.get("budget_ledger")
+    if ledger is None:
+        return BUDGET_UNMEASURED
+    if not isinstance(ledger, dict):
+        refuse("BUDGET_LEDGER_MALFORMED", "budget_ledger is not an object")
+    return BUDGET_LEDGERED
+
+
+def check_budget_ledger(body: dict[str, Any]) -> None:
+    """Reconcile every attempt's spend against the caps the receipt itself declares.
+
+    Three things have to hold together. Each attempt's declared overrun must be
+    the one recomputed from its own spend, so the ledger cannot report a clean
+    run it did not have. An attempt that did exceed a cap must be terminal and
+    unleased, because a Worker over budget and still running is a budget nothing
+    enforces. And a dimension declared unobserved must carry no spend, because a
+    ledger allowed to record unknowns as zero reconciles every time.
+    """
+    if budget_state(body) == BUDGET_UNMEASURED:
+        if body.get("budgets_reconciled"):
+            refuse("BUDGET_UNMEASURED_BUT_CLAIMED",
+                   "the receipt claims reconciled budgets and carries no budget_ledger; "
+                   "a run that recorded no spend cannot be reconciled afterwards")
+        return
+
+    ledger = body["budget_ledger"]
+    for field in LEDGER_FIELDS:
+        if field not in ledger:
+            refuse("BUDGET_LEDGER_MALFORMED", f"budget_ledger has no {field}")
+    dimensions = ledger["dimensions"]
+    if not dimensions:
+        refuse("BUDGET_LEDGER_MALFORMED", "budget_ledger measures no dimension")
+
+    entries: dict[str, Any] = {}
+    for entry in ledger["attempts"]:
+        attempt_id = entry.get("attempt_id")
+        if attempt_id in entries:
+            refuse("BUDGET_LEDGER_MALFORMED", f"{attempt_id} is charged twice")
+        entries[attempt_id] = entry
+    known = {attempt["attempt_id"] for attempt in body["attempts"]}
+    missing = sorted(known - set(entries))
+    strangers = sorted(set(entries) - known)
+    if missing or strangers:
+        refuse("BUDGET_LEDGER_INCOMPLETE",
+               f"unledgered attempts {missing}, ledgered strangers {strangers}")
+
+    final = last_states(body)
+    totals = {dimension: 0.0 for dimension in dimensions}
+    unobserved: set[str] = set()
+    for attempt in body["attempts"]:
+        attempt_id = attempt["attempt_id"]
+        entry = entries[attempt_id]
+        spend = entry.get("spend")
+        observed = entry.get("observed")
+        if not isinstance(spend, dict) or not isinstance(observed, list):
+            refuse("BUDGET_LEDGER_MALFORMED", f"{attempt_id} has no spend and observed")
+        for dimension in dimensions:
+            if dimension not in spend:
+                refuse("BUDGET_LEDGER_MALFORMED",
+                       f"{attempt_id} records no {dimension}")
+            if dimension not in observed:
+                unobserved.add(dimension)
+                if spend[dimension]:
+                    refuse("BUDGET_LEDGER_MALFORMED",
+                           f"{attempt_id} charges {spend[dimension]} {dimension} while "
+                           f"declaring that dimension unobserved; a number nobody "
+                           f"measured is not a spend")
+            totals[dimension] += spend[dimension]
+
+        derived = sorted(d for d in dimensions if d in observed
+                         and spend[d] > ledger["attempt_limits"][d])
+        if entry.get("over_budget") != derived:
+            refuse("BUDGET_NOT_RECONCILED",
+                   f"{attempt_id} declares over_budget {entry.get('over_budget')} while "
+                   f"its own spend exceeds {derived}")
+        if derived:
+            state = final.get(attempt_id)
+            if state not in TERMINAL:
+                refuse("BUDGET_OVERRUN_UNENFORCED",
+                       f"{attempt_id} exceeded {derived} and its last state is {state}, "
+                       f"which is not terminal")
+            if (attempt.get("lease") or {}).get("status") == "ACTIVE":
+                refuse("BUDGET_OVERRUN_UNENFORCED",
+                       f"{attempt_id} exceeded {derived} and still holds an ACTIVE lease")
+
+    for dimension in dimensions:
+        declared = ledger["totals"].get(dimension)
+        if not isinstance(declared, (int, float)) or abs(declared - totals[dimension]) > 1e-6:
+            refuse("BUDGET_NOT_RECONCILED",
+                   f"totals.{dimension} is {declared} against {round(totals[dimension], 3)} "
+                   f"summed from the ledger")
+    if ledger["unobserved_dimensions"] != sorted(unobserved):
+        refuse("BUDGET_NOT_RECONCILED",
+               f"unobserved_dimensions is {ledger['unobserved_dimensions']} against "
+               f"{sorted(unobserved)} derived from the attempts")
+
+    global_over = sorted(d for d in dimensions if d not in unobserved
+                         and totals[d] > ledger["global_limits"][d])
+    if ledger["global_over_budget"] != global_over:
+        refuse("BUDGET_NOT_RECONCILED",
+               f"global_over_budget is {ledger['global_over_budget']} against "
+               f"{global_over} derived from the totals")
+    if global_over:
+        refuse("BUDGET_OVERRUN_UNENFORCED",
+               f"the run as a whole passed {global_over}; a global cap that stopped "
+               f"nothing is a number in a receipt")
+
+
 CHECKS = (check_identities, check_sequence, check_verification_precedes_integration,
-          check_leases, check_lease_expiry, check_heartbeats, check_coverage)
+          check_leases, check_lease_expiry, check_heartbeats, check_coverage,
+          check_leases_released_at_close, check_budget_ledger)
 
 
 def validate(body: Any) -> None:
     check_shape(body)
     for check in CHECKS:
         check(body)
+
+
+def synthesize_ledger(body: dict[str, Any]) -> dict[str, Any]:
+    """Give the ledger controls a base, derived from the receipt they are planted in.
+
+    The committed receipt was produced before the ledger existed, so there is no
+    ledger in it to plant a defect in. Editing it to add one would rewrite an
+    executed run's evidence, which is the one thing this file must never do.
+    So the base is built here, in memory, from what the receipt does record --
+    each Worker's own measured duration -- and validated before anything is
+    planted in it. Every other dimension is left unobserved rather than filled
+    with zeros, which is also what a real run does when the Agent's output will
+    not parse.
+    """
+    copied = copy.deepcopy(body)
+
+    # The overrun control needs an attempt that is still live. A clean run leaves
+    # none, so one is added here rather than the control being skipped on the
+    # shapes it matters most for. PLANNED appears in every receipt, so adding it
+    # moves no coverage number.
+    final = last_states(copied)
+    if all(final.get(a["attempt_id"]) in TERMINAL for a in copied["attempts"]):
+        seed = copied["attempts"][0]
+        live = copy.deepcopy(seed)
+        live["attempt_id"] = f"{seed['attempt_id']}-selftest-live"
+        live["logical_id"] = f"{seed.get('logical_id')}-selftest-live"
+        live["lease"] = {"status": "RELEASED", "expiry": None, "heartbeat_sequence": 0}
+        live["heartbeats"] = []
+        copied["attempts"].append(live)
+        copied["transitions"].append({
+            "sequence": copied["transitions"][-1]["sequence"] + 1,
+            "attempt_id": live["attempt_id"], "task_id": live["task_id"],
+            "state": "PLANNED", "at": copied["ended_at"]})
+
+    by_logical = {attempt.get("logical_id"): attempt["attempt_id"]
+                  for attempt in copied["attempts"]}
+    measured = {by_logical[logical]: round(result.get("duration_ms", 0) / 1000, 3)
+                for logical, result in (copied.get("results") or {}).items()
+                if logical in by_logical}
+
+    entries = [{"attempt_id": attempt["attempt_id"],
+                "spend": {"turns": 0, "tokens": 0, "cost_usd": 0.0,
+                          "wall_clock_seconds": measured.get(attempt["attempt_id"], 0)},
+                "observed": ["wall_clock_seconds"],
+                "over_budget": []}
+               for attempt in copied["attempts"]]
+    copied["budget_ledger"] = {
+        "dimensions": ["cost_usd", "tokens", "turns", "wall_clock_seconds"],
+        # The fixture's own caps. The checker never assumes any producer's policy;
+        # it reconciles against whatever caps the receipt in front of it declares.
+        "attempt_limits": {"turns": 40, "tokens": 120000, "wall_clock_seconds": 900,
+                           "cost_usd": 2.0},
+        "global_limits": {"turns": 200, "tokens": 600000, "wall_clock_seconds": 3600,
+                          "cost_usd": 6.0},
+        "attempts": entries,
+        "totals": {"cost_usd": 0.0, "tokens": 0, "turns": 0,
+                   "wall_clock_seconds": round(sum(measured.values()), 3)},
+        "unobserved_dimensions": ["cost_usd", "tokens", "turns"],
+        "global_over_budget": [],
+    }
+    return copied
 
 
 def selftest(body: dict[str, Any]) -> int:
@@ -273,11 +481,14 @@ def selftest(body: dict[str, Any]) -> int:
         doc["transitions"][2]["state"] = "MOSTLY_FINE"
 
     def move_after_terminal(doc: dict[str, Any]) -> None:
+        # Any terminal state will do. Reaching for INTEGRATED specifically made
+        # this control crash on a receipt whose Workers all failed their oracle,
+        # which is a shape a real run produces.
         last = doc["transitions"][-1]
-        integrated = next(t for t in doc["transitions"] if t["state"] == "INTEGRATED")
+        finished = next(t for t in doc["transitions"] if t["state"] in TERMINAL)
         doc["transitions"].append({
-            "sequence": last["sequence"] + 1, "attempt_id": integrated["attempt_id"],
-            "task_id": integrated["task_id"], "state": "RUNNING", "at": doc["ended_at"]})
+            "sequence": last["sequence"] + 1, "attempt_id": finished["attempt_id"],
+            "task_id": finished["task_id"], "state": "RUNNING", "at": doc["ended_at"]})
 
     def integrate_unverified(doc: dict[str, Any]) -> None:
         for transition in doc["transitions"]:
@@ -334,6 +545,77 @@ def selftest(body: dict[str, Any]) -> int:
     def drop_non_claims(doc: dict[str, Any]) -> None:
         doc["declared_non_claims"] = []
 
+    ledgered = synthesize_ledger(body)
+    try:
+        validate(ledgered)
+    except Refused as failure:
+        print(f"SELFTEST RED: the synthesized ledger base is already refused, so "
+              f"nothing planted in it would prove anything -- {failure}", file=sys.stderr)
+        return 2
+
+    def with_ledger(fn: Any) -> dict[str, Any]:
+        copied = copy.deepcopy(ledgered)
+        fn(copied)
+        return copied
+
+    def entry_of(doc: dict[str, Any], attempt_id: str) -> dict[str, Any]:
+        return next(e for e in doc["budget_ledger"]["attempts"]
+                    if e["attempt_id"] == attempt_id)
+
+    def live_attempt(doc: dict[str, Any]) -> str:
+        final = last_states(doc)
+        return next(a["attempt_id"] for a in doc["attempts"]
+                    if final.get(a["attempt_id"]) not in TERMINAL)
+
+    def overrun_still_active(doc: dict[str, Any]) -> None:
+        """The issue's own control: a Worker over budget that nothing stopped."""
+        attempt_id = live_attempt(doc)
+        entry = entry_of(doc, attempt_id)
+        limit = doc["budget_ledger"]["attempt_limits"]["tokens"]
+        entry["spend"]["tokens"] = limit + 1
+        entry["observed"] = sorted(set(entry["observed"]) | {"tokens"})
+        entry["over_budget"] = ["tokens"]
+        doc["budget_ledger"]["totals"]["tokens"] += limit + 1
+
+    def overrun_hidden(doc: dict[str, Any]) -> None:
+        overrun_still_active(doc)
+        entry_of(doc, live_attempt(doc))["over_budget"] = []
+
+    def inflate_totals(doc: dict[str, Any]) -> None:
+        doc["budget_ledger"]["totals"]["wall_clock_seconds"] += 5
+
+    def drop_ledger_entry(doc: dict[str, Any]) -> None:
+        doc["budget_ledger"]["attempts"].pop(0)
+
+    def charge_unobserved(doc: dict[str, Any]) -> None:
+        entry = doc["budget_ledger"]["attempts"][0]
+        entry["spend"]["tokens"] = 5
+        doc["budget_ledger"]["totals"]["tokens"] += 5
+
+    def truncate_ledger(doc: dict[str, Any]) -> None:
+        doc["budget_ledger"].pop("totals")
+
+    def blow_global_cap(doc: dict[str, Any]) -> None:
+        # Charge a terminal attempt enough to pass the global cap without passing
+        # its own, so the only thing left unenforced is the global one.
+        ledger = doc["budget_ledger"]
+        entry = ledger["attempts"][0]
+        entry["spend"]["wall_clock_seconds"] += 10
+        entry["observed"] = sorted(set(entry["observed"]) | {"wall_clock_seconds"})
+        ledger["totals"]["wall_clock_seconds"] += 10
+        ledger["global_limits"]["wall_clock_seconds"] = 1
+        ledger["global_over_budget"] = ["wall_clock_seconds"]
+
+    def claim_without_ledger(doc: dict[str, Any]) -> None:
+        # Strip whatever ledger the receipt has: this control is about a run that
+        # measured nothing claiming it reconciled, and it must plant that state
+        # rather than assume the receipt already happens to be in it.
+        doc.pop("budget_ledger", None)
+        doc["budgets_reconciled"] = True
+
+    def hold_lease_at_close(doc: dict[str, Any]) -> None:
+        doc["attempts"][0]["lease"]["status"] = "ACTIVE"
+
     controls = [
         ("duplicate-attempt-id", "IDENTITY_NOT_UNIQUE", mutate(duplicate_attempt)),
         ("sequence-broken", "TRANSITION_LOG_BROKEN", mutate(break_sequence)),
@@ -347,6 +629,21 @@ def selftest(body: dict[str, Any]) -> int:
         ("hide-unproduced-states", "COVERAGE_MISREPORTED", mutate(hide_missing_states)),
         ("claim-every-state", "COVERAGE_MISREPORTED", mutate(inflate_produced)),
         ("drop-non-claims", "COVERAGE_MISREPORTED", mutate(drop_non_claims)),
+        ("lease-active-at-close", "LEASE_ACTIVE_AT_CLOSE", mutate(hold_lease_at_close)),
+        ("budget-claimed-without-ledger", "BUDGET_UNMEASURED_BUT_CLAIMED",
+         mutate(claim_without_ledger)),
+        ("budget-overrun-still-active", "BUDGET_OVERRUN_UNENFORCED",
+         with_ledger(overrun_still_active)),
+        ("budget-overrun-hidden", "BUDGET_NOT_RECONCILED", with_ledger(overrun_hidden)),
+        ("budget-totals-inflated", "BUDGET_NOT_RECONCILED", with_ledger(inflate_totals)),
+        ("budget-attempt-unledgered", "BUDGET_LEDGER_INCOMPLETE",
+         with_ledger(drop_ledger_entry)),
+        ("budget-unobserved-but-charged", "BUDGET_LEDGER_MALFORMED",
+         with_ledger(charge_unobserved)),
+        ("budget-ledger-truncated", "BUDGET_LEDGER_MALFORMED",
+         with_ledger(truncate_ledger)),
+        ("budget-global-cap-blown", "BUDGET_OVERRUN_UNENFORCED",
+         with_ledger(blow_global_cap)),
     ]
 
     failed = 0
@@ -404,9 +701,17 @@ def main(argv: list[str] | None = None) -> int:
     produced = body["state_coverage"]["produced"]
     missing = body["state_coverage"]["declared_not_produced"]
     integrated = sum(1 for t in body["transitions"] if t["state"] == "INTEGRATED")
+    state = budget_state(body)
+    if state == BUDGET_UNMEASURED:
+        budget = ("budget BUDGET_UNMEASURED: this run predates the ledger and recorded "
+                  "no spend, which is not the same as having spent nothing")
+    else:
+        ledger = body["budget_ledger"]
+        budget = (f"budget reconciled over {len(ledger['attempts'])} attempts, "
+                  f"unobserved {', '.join(ledger['unobserved_dimensions']) or 'none'}")
     print(f"SCHEDULER RECEIPT GREEN: {len(body['transitions'])} transitions, "
           f"{integrated} integrated, {len(produced)}/{len(DECLARED_STATES)} declared "
-          f"states produced; not produced: {', '.join(missing) or 'none'}")
+          f"states produced; not produced: {', '.join(missing) or 'none'}; {budget}")
     return 0
 
 

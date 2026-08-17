@@ -1,0 +1,753 @@
+{
+  "schema": "skill-refactor-proof-loop/skill-adoption-ledger/v1",
+  "audit_issue": 322,
+  "golden_proof_registry": "skills/skill-refactor-proof-loop/references/golden-proof-registry.json",
+  "known_issues": [
+    231,
+    232,
+    234,
+    256,
+    312,
+    318,
+    322
+  ],
+  "in_scope": [
+    "agentic-tech-lead-orchestration",
+    "controlled-technical-language-harness",
+    "dual-forge-repository-loop",
+    "forgejo-delivery-loop",
+    "git-town-stacked-pr-worker",
+    "github-delivery-loop",
+    "knowledge-continuity",
+    "procedural-shadow-runtime",
+    "repository-capability-audit",
+    "spatial-loop-systems-engineering"
+  ],
+  "skills": [
+    {
+      "skill": "agentic-tech-lead-orchestration",
+      "highest_layer": "L3_HERMETIC_REAL_TASK",
+      "golden_proof_id": "agentic-tech-lead-real-task-ab-v1",
+      "criteria": {
+        "old_canonical_treatment_frozen": {
+          "state": "PASS",
+          "evidence": [
+            "skills/agentic-tech-lead-orchestration/tests/fixtures/pre-refactor-SKILL.txt"
+          ],
+          "note": "Registered as treatment A_OLD_MONOLITH with a content-bound blob identity."
+        },
+        "refactor_as_landed_treatment_frozen": {
+          "state": "PASS",
+          "evidence": [
+            "skills/agentic-tech-lead-orchestration/tests/fixtures/refactor-as-landed-SKILL.txt"
+          ],
+          "note": "Registered as B0_REFACTOR_AS_LANDED and retained even though it regressed."
+        },
+        "old_strengths_asserted": {
+          "state": "PASS",
+          "evidence": [
+            "skills/agentic-tech-lead-orchestration/tests/refactor_ab.py",
+            "skills/agentic-tech-lead-orchestration/tests/run-all.sh"
+          ],
+          "note": "Old behaviours are compared treatment by treatment rather than asserted in prose."
+        },
+        "route_reachable": {
+          "state": "PASS",
+          "evidence": [
+            "skills/agentic-tech-lead-orchestration/SKILL.md",
+            "skills/agentic-tech-lead-orchestration/modules/domain-profile.md",
+            "skills/agentic-tech-lead-orchestration/scripts/check_runtime_reachability.py",
+            "skills/agentic-tech-lead-orchestration/tests/run-all.sh"
+          ],
+          "note": "check_runtime_reachability.py is the owning dead-route assertion and runs from the suite."
+        },
+        "schema_and_semantic_gates_executable": {
+          "state": "PASS",
+          "evidence": [
+            "skills/agentic-tech-lead-orchestration/references/task-contract.schema.json",
+            "skills/agentic-tech-lead-orchestration/scripts/check_task_contract_schema.py",
+            "skills/agentic-tech-lead-orchestration/scripts/assert_task_contract.py"
+          ],
+          "note": "Shape gate and semantic gate are separate executables."
+        },
+        "hollow_dead_route_controls": {
+          "state": "PASS",
+          "evidence": [
+            "skills/agentic-tech-lead-orchestration/tests/selftest.py",
+            "skills/agentic-tech-lead-orchestration/tests/capability_dag_selftest.py",
+            "skills/agentic-tech-lead-orchestration/tests/scheduler_lifecycle_selftest.py"
+          ]
+        },
+        "matched_hermetic_task": {
+          "state": "PASS",
+          "evidence": [
+            "skills/agentic-tech-lead-orchestration/tests/real_task_ab.py",
+            "skills/agentic-tech-lead-orchestration/tests/real_task_runtime.py"
+          ],
+          "note": "Frozen treatments run against the same base, budget and oracles."
+        },
+        "golden_proof_registered": {
+          "state": "PASS",
+          "evidence": [
+            "skills/skill-refactor-proof-loop/references/golden-proof-registry.json"
+          ]
+        },
+        "live_model_runtime_ab": {
+          "state": "NOT_EXERCISED",
+          "evidence": [
+            "skills/agentic-tech-lead-orchestration/tests/real_task_scheduler.py"
+          ],
+          "owner_issue": 231,
+          "note": "Deterministic carrier only; matched live receipts are owned by #231."
+        },
+        "molecular_traceability": {
+          "state": "PARTIAL",
+          "evidence": [
+            "skills/skill-refactor-proof-loop/references/refactor-proof-stack.json"
+          ],
+          "owner_issue": 322,
+          "note": "Nodes name their issues and PRs, but their state is declared READ_FROM_GITHUB and cannot be closed by a zero-network audit."
+        }
+      }
+    },
+    {
+      "skill": "controlled-technical-language-harness",
+      "highest_layer": "L2_EXECUTABLE_CONTRACT",
+      "golden_proof_id": null,
+      "criteria": {
+        "old_canonical_treatment_frozen": {
+          "state": "ABSENT",
+          "evidence": [],
+          "owner_issue": 322,
+          "note": "No pre-refactor treatment bytes are frozen anywhere in the Skill."
+        },
+        "refactor_as_landed_treatment_frozen": {
+          "state": "ABSENT",
+          "evidence": [],
+          "owner_issue": 322
+        },
+        "old_strengths_asserted": {
+          "state": "ABSENT",
+          "evidence": [],
+          "owner_issue": 322,
+          "note": "Without a frozen old treatment there is nothing to assert preservation against."
+        },
+        "route_reachable": {
+          "state": "PASS",
+          "evidence": [
+            "skills/controlled-technical-language-harness/SKILL.md",
+            "skills/controlled-technical-language-harness/scripts/lint_deterministic.py",
+            "skills/controlled-technical-language-harness/tests/run-all.sh"
+          ],
+          "note": "run-all.sh discovers every tests/*/verify.sh, so a new gate cannot be added unreachable."
+        },
+        "schema_and_semantic_gates_executable": {
+          "state": "PARTIAL",
+          "evidence": [
+            "skills/controlled-technical-language-harness/scripts/lint_deterministic.py",
+            "skills/controlled-technical-language-harness/scripts/check_profile_admission.py"
+          ],
+          "owner_issue": 322,
+          "note": "Semantic and deterministic gates are executable; no machine shape contract (*.schema.json) exists."
+        },
+        "hollow_dead_route_controls": {
+          "state": "PASS",
+          "evidence": [
+            "skills/controlled-technical-language-harness/scripts/ab_authority_selftest.py",
+            "skills/controlled-technical-language-harness/tests/ab-canary/fixtures/unfair-run.json",
+            "skills/controlled-technical-language-harness/tests/ab-canary/verify.sh"
+          ]
+        },
+        "matched_hermetic_task": {
+          "state": "PARTIAL",
+          "evidence": [
+            "skills/controlled-technical-language-harness/scripts/score_ab.py",
+            "skills/controlled-technical-language-harness/tests/ab-canary/verify.sh"
+          ],
+          "owner_issue": 322,
+          "note": "Matched-task fairness is enforced over recorded A/B bundles, not over frozen refactor treatments."
+        },
+        "golden_proof_registered": {
+          "state": "ABSENT",
+          "evidence": [],
+          "owner_issue": 322
+        },
+        "live_model_runtime_ab": {
+          "state": "NOT_EXERCISED",
+          "evidence": [
+            "skills/controlled-technical-language-harness/scripts/score_ab.py"
+          ],
+          "owner_issue": 322,
+          "note": "The scorer consumes live-run bundles; no live bundle is registered as evidence."
+        },
+        "molecular_traceability": {
+          "state": "ABSENT",
+          "evidence": [],
+          "owner_issue": 322
+        }
+      }
+    },
+    {
+      "skill": "dual-forge-repository-loop",
+      "highest_layer": "L2_EXECUTABLE_CONTRACT",
+      "golden_proof_id": null,
+      "criteria": {
+        "old_canonical_treatment_frozen": {
+          "state": "ABSENT",
+          "evidence": [],
+          "owner_issue": 322
+        },
+        "refactor_as_landed_treatment_frozen": {
+          "state": "ABSENT",
+          "evidence": [],
+          "owner_issue": 322
+        },
+        "old_strengths_asserted": {
+          "state": "ABSENT",
+          "evidence": [],
+          "owner_issue": 322
+        },
+        "route_reachable": {
+          "state": "PASS",
+          "evidence": [
+            "skills/dual-forge-repository-loop/SKILL.md",
+            "skills/dual-forge-repository-loop/modules/domain-profile.md",
+            "skills/dual-forge-repository-loop/scripts/check_dual_forge_contract.py",
+            "skills/dual-forge-repository-loop/tests/run-all.sh"
+          ]
+        },
+        "schema_and_semantic_gates_executable": {
+          "state": "PASS",
+          "evidence": [
+            "skills/dual-forge-repository-loop/references/tech-lead-plan.schema.json",
+            "skills/dual-forge-repository-loop/scripts/check_multi_agent_runtime.py",
+            "skills/dual-forge-repository-loop/scripts/check_dual_forge_contract.py"
+          ]
+        },
+        "hollow_dead_route_controls": {
+          "state": "PASS",
+          "evidence": [
+            "skills/dual-forge-repository-loop/tests/dual-forge-contract/verify.sh",
+            "skills/dual-forge-repository-loop/tests/multi-agent-runtime/verify.py"
+          ],
+          "note": "68 planted publication/order/authority defects must stay red."
+        },
+        "matched_hermetic_task": {
+          "state": "PARTIAL",
+          "evidence": [
+            "skills/dual-forge-repository-loop/scripts/check_prompt_crossstack.py",
+            "skills/dual-forge-repository-loop/tests/prompt-crossstack/verify.sh"
+          ],
+          "owner_issue": 322,
+          "note": "The cross-stack case set is frozen and checked, but the comparison itself is never executed in the suite."
+        },
+        "golden_proof_registered": {
+          "state": "ABSENT",
+          "evidence": [],
+          "owner_issue": 322
+        },
+        "live_model_runtime_ab": {
+          "state": "NOT_EXERCISED",
+          "evidence": [
+            "skills/dual-forge-repository-loop/scripts/run_prompt_crossstack.py"
+          ],
+          "owner_issue": 234,
+          "note": "Requires two provider binaries and real spend; delivery receipts are owned by #234."
+        },
+        "molecular_traceability": {
+          "state": "ABSENT",
+          "evidence": [],
+          "owner_issue": 322
+        }
+      }
+    },
+    {
+      "skill": "forgejo-delivery-loop",
+      "highest_layer": "L2_EXECUTABLE_CONTRACT",
+      "golden_proof_id": null,
+      "criteria": {
+        "old_canonical_treatment_frozen": {
+          "state": "ABSENT",
+          "evidence": [],
+          "owner_issue": 322
+        },
+        "refactor_as_landed_treatment_frozen": {
+          "state": "ABSENT",
+          "evidence": [],
+          "owner_issue": 322
+        },
+        "old_strengths_asserted": {
+          "state": "ABSENT",
+          "evidence": [],
+          "owner_issue": 322
+        },
+        "route_reachable": {
+          "state": "PASS",
+          "evidence": [
+            "skills/forgejo-delivery-loop/SKILL.md",
+            "skills/forgejo-delivery-loop/modules/domain-profile.md",
+            "skills/forgejo-delivery-loop/scripts/route.ts",
+            "skills/forgejo-delivery-loop/tests/run-all.sh"
+          ],
+          "note": "The runner executes the route selftest before discovering verify.sh gates."
+        },
+        "schema_and_semantic_gates_executable": {
+          "state": "PASS",
+          "evidence": [
+            "skills/forgejo-delivery-loop/contracts/forgejo-terminal-issue-state-request.v2.schema.json",
+            "skills/forgejo-delivery-loop/scripts/issue_state.py",
+            "skills/forgejo-delivery-loop/tests/issue-state/verify.sh"
+          ]
+        },
+        "hollow_dead_route_controls": {
+          "state": "PASS",
+          "evidence": [
+            "skills/forgejo-delivery-loop/tests/selftests/verify.sh",
+            "skills/forgejo-delivery-loop/tests/merge-authority/verify.sh"
+          ]
+        },
+        "matched_hermetic_task": {
+          "state": "ABSENT",
+          "evidence": [],
+          "owner_issue": 322
+        },
+        "golden_proof_registered": {
+          "state": "ABSENT",
+          "evidence": [],
+          "owner_issue": 322
+        },
+        "live_model_runtime_ab": {
+          "state": "NOT_IMPLEMENTED",
+          "evidence": [],
+          "owner_issue": 322,
+          "note": "No model/runtime A/B harness exists; live Forgejo delivery receipts are a separate lane."
+        },
+        "molecular_traceability": {
+          "state": "ABSENT",
+          "evidence": [],
+          "owner_issue": 322
+        }
+      }
+    },
+    {
+      "skill": "git-town-stacked-pr-worker",
+      "highest_layer": "L2_EXECUTABLE_CONTRACT",
+      "golden_proof_id": null,
+      "criteria": {
+        "old_canonical_treatment_frozen": {
+          "state": "ABSENT",
+          "evidence": [],
+          "owner_issue": 322
+        },
+        "refactor_as_landed_treatment_frozen": {
+          "state": "ABSENT",
+          "evidence": [],
+          "owner_issue": 322
+        },
+        "old_strengths_asserted": {
+          "state": "ABSENT",
+          "evidence": [],
+          "owner_issue": 322
+        },
+        "route_reachable": {
+          "state": "PASS",
+          "evidence": [
+            "skills/git-town-stacked-pr-worker/SKILL.md",
+            "skills/git-town-stacked-pr-worker/modules/domain-profile.md",
+            "skills/git-town-stacked-pr-worker/scripts/check_stack_contract.py",
+            "skills/git-town-stacked-pr-worker/tests/run-all.sh"
+          ]
+        },
+        "schema_and_semantic_gates_executable": {
+          "state": "PASS",
+          "evidence": [
+            "skills/git-town-stacked-pr-worker/references/STACK_CONTRACT.schema.json",
+            "skills/git-town-stacked-pr-worker/scripts/check_stack_contract.py",
+            "skills/git-town-stacked-pr-worker/tests/stack-contract/verify.sh"
+          ]
+        },
+        "hollow_dead_route_controls": {
+          "state": "PASS",
+          "evidence": [
+            "skills/git-town-stacked-pr-worker/tests/fan-out-contract/verify.sh",
+            "skills/git-town-stacked-pr-worker/tests/publication-boundary/verify.sh"
+          ],
+          "note": "Every negative fixture is one mutation away from a checked-in valid one."
+        },
+        "matched_hermetic_task": {
+          "state": "ABSENT",
+          "evidence": [],
+          "owner_issue": 322
+        },
+        "golden_proof_registered": {
+          "state": "ABSENT",
+          "evidence": [],
+          "owner_issue": 322
+        },
+        "live_model_runtime_ab": {
+          "state": "NOT_EXERCISED",
+          "evidence": [
+            "skills/git-town-stacked-pr-worker/tests/live-git-town/run_canary.py",
+            "skills/git-town-stacked-pr-worker/tests/live-git-town/admission.json"
+          ],
+          "owner_issue": 234,
+          "note": "A live canary exists behind an admission file; no admitted run is registered."
+        },
+        "molecular_traceability": {
+          "state": "ABSENT",
+          "evidence": [],
+          "owner_issue": 322
+        }
+      }
+    },
+    {
+      "skill": "github-delivery-loop",
+      "highest_layer": "L2_EXECUTABLE_CONTRACT",
+      "golden_proof_id": null,
+      "criteria": {
+        "old_canonical_treatment_frozen": {
+          "state": "ABSENT",
+          "evidence": [],
+          "owner_issue": 322
+        },
+        "refactor_as_landed_treatment_frozen": {
+          "state": "ABSENT",
+          "evidence": [],
+          "owner_issue": 322
+        },
+        "old_strengths_asserted": {
+          "state": "ABSENT",
+          "evidence": [],
+          "owner_issue": 322
+        },
+        "route_reachable": {
+          "state": "PASS",
+          "evidence": [
+            "skills/github-delivery-loop/SKILL.md",
+            "skills/github-delivery-loop/modules/README.md",
+            "skills/github-delivery-loop/scripts/merge_gate.py",
+            "skills/github-delivery-loop/tests/run-all.sh"
+          ]
+        },
+        "schema_and_semantic_gates_executable": {
+          "state": "PARTIAL",
+          "evidence": [
+            "skills/github-delivery-loop/scripts/merge_gate.py",
+            "skills/github-delivery-loop/scripts/ci_publish_gate.py"
+          ],
+          "owner_issue": 322,
+          "note": "Gates are executable and fail closed, but the delivery receipt shape has no machine schema."
+        },
+        "hollow_dead_route_controls": {
+          "state": "PASS",
+          "evidence": [
+            "skills/github-delivery-loop/tests/check-receipt/fixtures/hollow/registry.json",
+            "skills/github-delivery-loop/tests/merge-gate/fixtures/hollow/snapshot.json",
+            "skills/github-delivery-loop/tests/check-receipt/verify.sh"
+          ]
+        },
+        "matched_hermetic_task": {
+          "state": "ABSENT",
+          "evidence": [],
+          "owner_issue": 322
+        },
+        "golden_proof_registered": {
+          "state": "ABSENT",
+          "evidence": [],
+          "owner_issue": 322
+        },
+        "live_model_runtime_ab": {
+          "state": "NOT_IMPLEMENTED",
+          "evidence": [],
+          "owner_issue": 234,
+          "note": "Publication receipts are delivery evidence, not a matched model/runtime comparison."
+        },
+        "molecular_traceability": {
+          "state": "ABSENT",
+          "evidence": [],
+          "owner_issue": 322
+        }
+      }
+    },
+    {
+      "skill": "knowledge-continuity",
+      "highest_layer": "L2_EXECUTABLE_CONTRACT",
+      "golden_proof_id": null,
+      "criteria": {
+        "old_canonical_treatment_frozen": {
+          "state": "ABSENT",
+          "evidence": [],
+          "owner_issue": 322
+        },
+        "refactor_as_landed_treatment_frozen": {
+          "state": "ABSENT",
+          "evidence": [],
+          "owner_issue": 322
+        },
+        "old_strengths_asserted": {
+          "state": "ABSENT",
+          "evidence": [],
+          "owner_issue": 322
+        },
+        "route_reachable": {
+          "state": "PASS",
+          "evidence": [
+            "skills/knowledge-continuity/SKILL.md",
+            "skills/knowledge-continuity/modules/README.md",
+            "skills/knowledge-continuity/scripts/check_knowledge_continuity.py",
+            "skills/knowledge-continuity/tests/run-all.sh"
+          ]
+        },
+        "schema_and_semantic_gates_executable": {
+          "state": "PARTIAL",
+          "evidence": [
+            "skills/knowledge-continuity/scripts/check_knowledge_continuity.py",
+            "skills/knowledge-continuity/tests/check-knowledge-continuity/verify.sh"
+          ],
+          "owner_issue": 322,
+          "note": "Four mechanical rules are executable; the human-judgement half of the Skill has no machine gate."
+        },
+        "hollow_dead_route_controls": {
+          "state": "PASS",
+          "evidence": [
+            "skills/knowledge-continuity/tests/check-knowledge-continuity/fixtures/hollow/doc.md",
+            "skills/knowledge-continuity/tests/check-knowledge-continuity/verify.sh"
+          ]
+        },
+        "matched_hermetic_task": {
+          "state": "ABSENT",
+          "evidence": [],
+          "owner_issue": 322
+        },
+        "golden_proof_registered": {
+          "state": "ABSENT",
+          "evidence": [],
+          "owner_issue": 322
+        },
+        "live_model_runtime_ab": {
+          "state": "NOT_IMPLEMENTED",
+          "evidence": [],
+          "owner_issue": 322
+        },
+        "molecular_traceability": {
+          "state": "ABSENT",
+          "evidence": [],
+          "owner_issue": 322
+        }
+      }
+    },
+    {
+      "skill": "procedural-shadow-runtime",
+      "highest_layer": "L2_EXECUTABLE_CONTRACT",
+      "golden_proof_id": null,
+      "criteria": {
+        "old_canonical_treatment_frozen": {
+          "state": "ABSENT",
+          "evidence": [],
+          "owner_issue": 322
+        },
+        "refactor_as_landed_treatment_frozen": {
+          "state": "ABSENT",
+          "evidence": [],
+          "owner_issue": 322
+        },
+        "old_strengths_asserted": {
+          "state": "ABSENT",
+          "evidence": [],
+          "owner_issue": 322
+        },
+        "route_reachable": {
+          "state": "PASS",
+          "evidence": [
+            "skills/procedural-shadow-runtime/SKILL.md",
+            "skills/procedural-shadow-runtime/modules/README.md",
+            "skills/procedural-shadow-runtime/scripts/check_runtime_receipt.py",
+            "skills/procedural-shadow-runtime/tests/run-all.sh"
+          ]
+        },
+        "schema_and_semantic_gates_executable": {
+          "state": "PASS",
+          "evidence": [
+            "skills/procedural-shadow-runtime/references/runtime-receipt.schema.json",
+            "skills/procedural-shadow-runtime/references/semantic-judge-verdict.schema.json",
+            "skills/procedural-shadow-runtime/scripts/check_semantic_judge.py"
+          ]
+        },
+        "hollow_dead_route_controls": {
+          "state": "PASS",
+          "evidence": [
+            "skills/procedural-shadow-runtime/tests/verify.py",
+            "skills/procedural-shadow-runtime/tests/fixtures/unsafe-ecommerce-adapter.py"
+          ]
+        },
+        "matched_hermetic_task": {
+          "state": "PARTIAL",
+          "evidence": [
+            "skills/procedural-shadow-runtime/scripts/run_arm_trials.py",
+            "skills/procedural-shadow-runtime/tests/verify_arm_trials.py"
+          ],
+          "owner_issue": 322,
+          "note": "Arms and trials are deterministic, but they are not bound to frozen refactor treatments of this Skill."
+        },
+        "golden_proof_registered": {
+          "state": "ABSENT",
+          "evidence": [],
+          "owner_issue": 322
+        },
+        "live_model_runtime_ab": {
+          "state": "NOT_EXERCISED",
+          "evidence": [
+            "skills/procedural-shadow-runtime/scripts/run_shadow_canary.py"
+          ],
+          "owner_issue": 232,
+          "note": "Independent Shadow receipts are owned by #232."
+        },
+        "molecular_traceability": {
+          "state": "ABSENT",
+          "evidence": [],
+          "owner_issue": 322
+        }
+      }
+    },
+    {
+      "skill": "repository-capability-audit",
+      "highest_layer": "L2_EXECUTABLE_CONTRACT",
+      "golden_proof_id": null,
+      "criteria": {
+        "old_canonical_treatment_frozen": {
+          "state": "ABSENT",
+          "evidence": [],
+          "owner_issue": 322
+        },
+        "refactor_as_landed_treatment_frozen": {
+          "state": "ABSENT",
+          "evidence": [],
+          "owner_issue": 322
+        },
+        "old_strengths_asserted": {
+          "state": "ABSENT",
+          "evidence": [],
+          "owner_issue": 322
+        },
+        "route_reachable": {
+          "state": "PASS",
+          "evidence": [
+            "skills/repository-capability-audit/SKILL.md",
+            "skills/repository-capability-audit/scripts/check_core.py",
+            "skills/repository-capability-audit/tests/run-all.sh"
+          ]
+        },
+        "schema_and_semantic_gates_executable": {
+          "state": "PASS",
+          "evidence": [
+            "skills/repository-capability-audit/references/held-out-corpus.schema.json",
+            "skills/repository-capability-audit/scripts/check_held_out_corpus.py",
+            "skills/repository-capability-audit/scripts/analyze_arm_separation.py"
+          ]
+        },
+        "hollow_dead_route_controls": {
+          "state": "PASS",
+          "evidence": [
+            "skills/repository-capability-audit/tests/test_arm_separation.py",
+            "skills/repository-capability-audit/tests/test_held_out_corpus.py"
+          ]
+        },
+        "matched_hermetic_task": {
+          "state": "PARTIAL",
+          "evidence": [
+            "skills/repository-capability-audit/scripts/run_pilot_matrix.py",
+            "skills/repository-capability-audit/tests/test_agent_ab.py"
+          ],
+          "owner_issue": 256,
+          "note": "The matrix is preregistered and scored deterministically, but every cell needs a real host binary."
+        },
+        "golden_proof_registered": {
+          "state": "ABSENT",
+          "evidence": [],
+          "owner_issue": 322
+        },
+        "live_model_runtime_ab": {
+          "state": "NOT_EXERCISED",
+          "evidence": [
+            "skills/repository-capability-audit/scripts/run_pilot_matrix.py",
+            "skills/repository-capability-audit/scripts/run_agent_cell.py"
+          ],
+          "owner_issue": 256,
+          "note": "Same-subject adapter receipts are owned by #256."
+        },
+        "molecular_traceability": {
+          "state": "ABSENT",
+          "evidence": [],
+          "owner_issue": 322
+        }
+      }
+    },
+    {
+      "skill": "spatial-loop-systems-engineering",
+      "highest_layer": "L2_EXECUTABLE_CONTRACT",
+      "golden_proof_id": null,
+      "criteria": {
+        "old_canonical_treatment_frozen": {
+          "state": "ABSENT",
+          "evidence": [],
+          "owner_issue": 322
+        },
+        "refactor_as_landed_treatment_frozen": {
+          "state": "ABSENT",
+          "evidence": [],
+          "owner_issue": 322
+        },
+        "old_strengths_asserted": {
+          "state": "ABSENT",
+          "evidence": [],
+          "owner_issue": 322
+        },
+        "route_reachable": {
+          "state": "PASS",
+          "evidence": [
+            "skills/spatial-loop-systems-engineering/SKILL.md",
+            "skills/spatial-loop-systems-engineering/modules/README.md",
+            "skills/spatial-loop-systems-engineering/scripts/check_system_contract.py",
+            "skills/spatial-loop-systems-engineering/tests/run-all.sh"
+          ]
+        },
+        "schema_and_semantic_gates_executable": {
+          "state": "PASS",
+          "evidence": [
+            "skills/spatial-loop-systems-engineering/references/procedural-grounding-receipt.schema.json",
+            "skills/spatial-loop-systems-engineering/scripts/check_procedural_grounding.py",
+            "skills/spatial-loop-systems-engineering/scripts/check_system_contract.py"
+          ]
+        },
+        "hollow_dead_route_controls": {
+          "state": "PASS",
+          "evidence": [
+            "skills/spatial-loop-systems-engineering/tests/universal-entry/verify.sh",
+            "skills/spatial-loop-systems-engineering/tests/recovery-escalation/verify.sh"
+          ],
+          "note": "Planted anti-degradation and domain-replacement defects must stay red."
+        },
+        "matched_hermetic_task": {
+          "state": "ABSENT",
+          "evidence": [],
+          "owner_issue": 322
+        },
+        "golden_proof_registered": {
+          "state": "ABSENT",
+          "evidence": [],
+          "owner_issue": 322
+        },
+        "live_model_runtime_ab": {
+          "state": "NOT_IMPLEMENTED",
+          "evidence": [],
+          "owner_issue": 322
+        },
+        "molecular_traceability": {
+          "state": "ABSENT",
+          "evidence": [],
+          "owner_issue": 322
+        }
+      }
+    }
+  ]
+}

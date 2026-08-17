@@ -202,6 +202,33 @@ A, B1 and B2 produce equivalent deterministic output; B0 is blocked by its absen
 
 User-supplied architecture documents are `SOURCE_PROPOSAL`. Their provider, cost, latency, security, licensing, synchronization, mobile, wallet, sandbox, conflict-repair and production claims require independent verification and exact-subject receipts before becoming repository truth.
 
+## Repository-wide completion review
+
+A completion review starts from the tree, not from the index that describes it. Read in this order:
+
+```text
+repository reality readback
+→ current integration/closure index
+→ nearest directory README
+→ code/schema/verifier authority
+→ Issue dual DAG
+→ Molecular Stack index
+→ exact evidence subjects
+```
+
+Every repository-wide completion review reports:
+
+```text
+actual directory/file existence
+implementation state versus admission state
+start dependencies versus completion dependencies
+cloud/local/private/Human evidence lanes
+real-problem closure state
+missing Molecular atoms, Gates and convergence owners
+```
+
+An existing path is never `PLANNED` and an absent path is never implemented. Start-readiness never implies completion-readiness: a completion edge requires the prerequisite's own admitted receipt on the exact subject. A receipt satisfies only the lane it was produced in. Portable contracts and their deterministic gates are [`skills/agentic-tech-lead-orchestration/references/REPOSITORY_CLOSURE_RECONCILIATION.md`](skills/agentic-tech-lead-orchestration/references/REPOSITORY_CLOSURE_RECONCILIATION.md) and [`skills/git-town-stacked-pr-worker/references/MOLECULAR_STACK_INDEX.md`](skills/git-town-stacked-pr-worker/references/MOLECULAR_STACK_INDEX.md).
+
 ## Completion contract
 
 Before claiming completion, report:

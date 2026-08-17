@@ -19,6 +19,21 @@ This contract gives Claude Code, Codex CLI, and human maintainers the same multi
 | `DR-R5` | `<governed-directory>/README.md` | nearest owner and local data-flow contract |
 | `DR-R6` | machine authority | manifest/schema/script/verifier/receipt reached from README |
 
+## Repository closure route interface
+
+A repository-wide completion review binds six routes. Two of them are the standard routes above; a consumer binding names its own paths for the rest.
+
+| ID | Generic route | Responsibility |
+|---|---|---|
+| `DR-C1` | current integration status | what is landed, admitted, open and blocked right now, reconciled against the tree |
+| `DR-C2` | real-problem closure matrix | one row per real problem: closure state, evidence kind, lane, exact receipt |
+| `DR-C3` | Issue dual-dependency DAG | one Issue graph with separate start and completion edge classes |
+| `DR-C4` | Molecular Stack PR index | atoms, parents, path leases, Gates, heads and missing atoms |
+| `DR-R5` | nearest directory README | the owner who reconciles that directory next time |
+| `DR-R6` | machine authority / exact receipt | the schema, verifier or receipt that decides, on its exact subject |
+
+Portable contracts: [`../../skills/agentic-tech-lead-orchestration/references/REPOSITORY_CLOSURE_RECONCILIATION.md`](../../skills/agentic-tech-lead-orchestration/references/REPOSITORY_CLOSURE_RECONCILIATION.md) for `DR-C1`–`DR-C3`, [`../../skills/git-town-stacked-pr-worker/references/MOLECULAR_STACK_INDEX.md`](../../skills/git-town-stacked-pr-worker/references/MOLECULAR_STACK_INDEX.md) for `DR-C4`.
+
 A repository may keep a more detailed canonical document at another path. The standard route may be a thin forwarder, but it must summarize the local owner and direct destination; it must not send the reader to another unexplained index.
 
 ## Multi-hop procedure
@@ -51,6 +66,13 @@ The normal target is at most two intentional hops from the nearest README to the
 | `DR-10` | Cross-repository roles and immutable binding/release flow agree across all participants. |
 | `DR-11` | If Git Town is admitted, docs distinguish sibling, true child, terminal leaf, convergence leaf, and Human operations. |
 | `DR-12` | Source proposals do not become current implementation or live evidence without verification and receipts. |
+| `DR-13` | Route status is reconciled with the actual tree inventory, not with a prior diagram. |
+| `DR-14` | An existing path is not `PLANNED` and an absent path is not implemented. |
+| `DR-15` | Source-reported, synthetic, live-substrate, and business-outcome evidence remain distinct states. |
+| `DR-16` | Open Draft, admitted, merged, CI-passed, released, and production remain distinct states. |
+| `DR-17` | Start dependencies and completion dependencies are separate edge classes. |
+| `DR-18` | Cloud, local, private, and Human lanes cannot satisfy one another. |
+| `DR-19` | Every convergence has one explicit owner and exact parents. |
 
 ## Knowledge-continuity rule
 

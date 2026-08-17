@@ -74,6 +74,21 @@
       "items": {"enum": ["no_skill", "current_skill", "candidate_skill", "wrong_skill", "composed_skills"]},
       "contains": {"const": "candidate_skill"}
     },
+    "perturbations": {
+      "description": "Declared context/tool/state/task disturbances this case may be run under. This axis is orthogonal to conditions (which skill is loaded) and to run identity (model x harness x environment x seed): a perturbation changes the world the case runs in, not who runs it. Absent means the case is only ever run undisturbed; each entry is a named variant a run trace can bind to by id.",
+      "type": "array", "minItems": 1, "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "axis", "description", "expected_effect"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]{2,63}$"},
+          "axis": {"enum": ["context", "tool", "state", "task"]},
+          "description": {"type": "string", "minLength": 10},
+          "expected_effect": {"type": "string", "minLength": 10}
+        }
+      }
+    },
     "runtime": {
       "type": "object", "additionalProperties": false,
       "properties": {

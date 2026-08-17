@@ -197,7 +197,7 @@ The Git Town evidence became live only at #107, and only after the pinned releas
 
 ```text
 ABSENT              github-delivery-loop and gitlab-delivery-loop intent registrations
-ABSENT              .github-delivery/ci-policy.json for this private repository (#82)
+SKIPPED_BY_POLICY   .github-delivery/ci-policy.json enrollment (#82): the repository is public on GitHub (observed 2026-08-17), so the private-repo billing gate's premise no longer holds and enrollment was removed; the workflow stays sealed to ready_for_review
 NOT_EXERCISED       remote publication, live Forgejo session, consumer adoption
 NOT_EXERCISED       first physical capability unlock and canonical release
 NOT_IMPLEMENTED     semantic authority and ambiguity decisions as deterministic checks

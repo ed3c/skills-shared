@@ -1,0 +1,146 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "skill-refactor-proof-loop/skill-adoption-ledger/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "audit_issue",
+    "golden_proof_registry",
+    "known_issues",
+    "in_scope",
+    "skills"
+  ],
+  "properties": {
+    "schema": {
+      "const": "skill-refactor-proof-loop/skill-adoption-ledger/v1"
+    },
+    "audit_issue": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "golden_proof_registry": {
+      "type": "string",
+      "minLength": 1
+    },
+    "known_issues": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "integer",
+        "minimum": 1
+      }
+    },
+    "in_scope": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9][a-z0-9-]*$"
+      }
+    },
+    "skills": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "skill",
+          "highest_layer",
+          "golden_proof_id",
+          "criteria"
+        ],
+        "properties": {
+          "skill": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9-]*$"
+          },
+          "highest_layer": {
+            "enum": [
+              "L0_SOURCE_FREEZE",
+              "L1_STRUCTURAL_REACHABILITY",
+              "L2_EXECUTABLE_CONTRACT",
+              "L3_HERMETIC_REAL_TASK",
+              "L4_MATCHED_LIVE_MODEL_RUNTIME",
+              "L5_DELIVERY_AND_HUMAN_ADMIT"
+            ]
+          },
+          "golden_proof_id": {
+            "type": ["string", "null"],
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          },
+          "criteria": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "old_canonical_treatment_frozen",
+              "refactor_as_landed_treatment_frozen",
+              "old_strengths_asserted",
+              "route_reachable",
+              "schema_and_semantic_gates_executable",
+              "hollow_dead_route_controls",
+              "matched_hermetic_task",
+              "golden_proof_registered",
+              "live_model_runtime_ab",
+              "molecular_traceability"
+            ],
+            "properties": {
+              "old_canonical_treatment_frozen": {"$ref": "#/$defs/finding"},
+              "refactor_as_landed_treatment_frozen": {"$ref": "#/$defs/finding"},
+              "old_strengths_asserted": {"$ref": "#/$defs/finding"},
+              "route_reachable": {"$ref": "#/$defs/finding"},
+              "schema_and_semantic_gates_executable": {"$ref": "#/$defs/finding"},
+              "hollow_dead_route_controls": {"$ref": "#/$defs/finding"},
+              "matched_hermetic_task": {"$ref": "#/$defs/finding"},
+              "golden_proof_registered": {"$ref": "#/$defs/finding"},
+              "live_model_runtime_ab": {"$ref": "#/$defs/finding"},
+              "molecular_traceability": {"$ref": "#/$defs/finding"}
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "evidence"
+      ],
+      "properties": {
+        "state": {
+          "enum": [
+            "PASS",
+            "PARTIAL",
+            "ABSENT",
+            "NOT_IMPLEMENTED",
+            "NOT_EXERCISED",
+            "NOT_APPLICABLE",
+            "HUMAN_ADMIT_REQUIRED"
+          ]
+        },
+        "evidence": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "owner_issue": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "note": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

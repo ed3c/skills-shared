@@ -1,0 +1,78 @@
+{
+  "schema_version": "agentic-tech-lead/issue-dual-dag/v1",
+  "subject": {
+    "repository": "example/consumer",
+    "commit": "1111111111111111111111111111111111111111"
+  },
+  "convergence_owner": "ISSUE-D",
+  "nodes": [
+    {
+      "id": "ISSUE-C",
+      "purpose": "contract and schema lock",
+      "lane": "LOCAL",
+      "pr_state": "MERGED",
+      "admission_state": "ADMITTED",
+      "start_dependencies": [],
+      "completion_dependencies": []
+    },
+    {
+      "id": "ISSUE-K",
+      "purpose": "deterministic core against the locked contract",
+      "lane": "CLOUD",
+      "pr_state": "MERGED",
+      "admission_state": "ADMITTED",
+      "start_dependencies": [{"node": "ISSUE-C", "edge_class": "START"}],
+      "completion_dependencies": [
+        {
+          "node": "ISSUE-C",
+          "edge_class": "COMPLETION",
+          "receipt": {
+            "lane": "LOCAL",
+            "subject_commit": "1111111111111111111111111111111111111111",
+            "admission_state": "ADMITTED"
+          }
+        }
+      ]
+    },
+    {
+      "id": "ISSUE-A",
+      "purpose": "live substrate adapter",
+      "lane": "PRODUCTION",
+      "pr_state": "NOT_CREATED",
+      "admission_state": "NOT_ADMITTED",
+      "start_dependencies": [{"node": "ISSUE-C", "edge_class": "START"}],
+      "completion_dependencies": []
+    },
+    {
+      "id": "ISSUE-D",
+      "purpose": "documentation, index and handoff convergence",
+      "lane": "LOCAL",
+      "pr_state": "DRAFT",
+      "admission_state": "NOT_ADMITTED",
+      "start_dependencies": [
+        {"node": "ISSUE-C", "edge_class": "START"},
+        {"node": "ISSUE-K", "edge_class": "START"}
+      ],
+      "completion_dependencies": [
+        {
+          "node": "ISSUE-C",
+          "edge_class": "COMPLETION",
+          "receipt": {
+            "lane": "LOCAL",
+            "subject_commit": "1111111111111111111111111111111111111111",
+            "admission_state": "ADMITTED"
+          }
+        },
+        {
+          "node": "ISSUE-K",
+          "edge_class": "COMPLETION",
+          "receipt": {
+            "lane": "CLOUD",
+            "subject_commit": "1111111111111111111111111111111111111111",
+            "admission_state": "ADMITTED"
+          }
+        }
+      ]
+    }
+  ]
+}

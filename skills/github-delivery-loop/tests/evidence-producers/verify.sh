@@ -11,6 +11,17 @@ fixtures="${test_dir}/fixtures"
 scratch="$(mktemp -d)"
 trap 'rm -rf "${scratch}"' EXIT
 
+# The gh identity check runs the real `gh --version`. Under a scrubbed
+# environment (no HOME, as local_verification.py runs us) gh falls back to
+# writing its state (.local/state/gh/device-id) under the current directory,
+# which dirties the worktree that verification promised to leave
+# byte-identical. Pin the XDG surfaces into the scratch dir. HOME itself is
+# left alone: overriding it breaks the macOS git xcrun-shim cache.
+export XDG_STATE_HOME="${scratch}/xdg/state"
+export XDG_CONFIG_HOME="${scratch}/xdg/config"
+export XDG_DATA_HOME="${scratch}/xdg/data"
+mkdir -p "${XDG_STATE_HOME}"
+
 repo="${scratch}/repo"
 mkdir -p "${repo}"
 git -C "${repo}" init -q

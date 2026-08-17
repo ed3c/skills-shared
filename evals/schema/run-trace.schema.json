@@ -76,6 +76,16 @@
         }
       }
     },
+    "perturbation": {
+      "description": "Which declared case perturbation this run applied. Three states stay distinct on purpose: absent means the executor does not record perturbation identity at all, explicit null means the run was undisturbed baseline, and an object means the named perturbation was applied. Collapsing absent into null would let a perturbation-blind harness masquerade as proven baseline evidence. The id must match an entry in the case contract's perturbations array.",
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["id", "axis"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]{2,63}$"},
+        "axis": {"enum": ["context", "tool", "state", "task"]}
+      }
+    },
     "routing": {
       "type": "object",
       "additionalProperties": false,

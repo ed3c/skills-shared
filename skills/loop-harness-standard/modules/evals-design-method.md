@@ -6,18 +6,20 @@
 > 說謊——0-頁面過關/空測試 PASS/runs-pass-while-components-fail),設計一次、隨後被 T0 或人週期性重跑,
 > **不是每輪迭代 turn 都請一次 LLM 判官**(那正是本法否決的反模式:撞訓誡衰減/Goodhart)。
 >
-> **本地 worked instance**:`families/pinescript-audit/evals/`(cases/holdout/candidates/runner.py/
-> baselines/)——本法在 skill-bettor 已有的實作,詳情見該家族目錄,本檔不重抄。
+> **本地 worked instance**:宿主某個家族的 `evals/`(cases/holdout/candidates/runner.py/
+> baselines/)——本法在宿主已有的實作,詳情見該家族目錄,本檔不重抄。
 >
-> **進階實例指針(未移植,僅供參考)**:antigravity 的 `truth-verify-loop` skill 是這套方法論的
+> **進階實例指針(未移植,僅供參考)**:上游的 `truth-verify-loop` skill 是這套方法論的
 > 全套重量級實作——多 tier worker 交叉驗證、sealed mutation ledger、盲性拓撲(orchestrator/判官皆不可
-> 讀播錯真值)、G1-G5 質量閘,背後是一個 12MB/620 檔案的真實量測引擎(`antigravity/truth-verify/`)。
+> 讀播錯真值)、G1-G5 質量閘,背後是一個十餘 MB／數百檔的真實量測引擎。
 > **本次未移植**:單搬 skill 檔案會變成指向不存在引擎的空指標,真要搬等於要搬整個引擎(規模與
-> skill-bettor 現有需求不成比例),而且其歷史 run 記錄是 antigravity 自己的實驗軌跡,對 skill-bettor
-> 無意義。若 skill-bettor 未來真的需要「多 tier 交叉驗證 + sealed ledger」這種重量級量測迴圈(例如
-> 要對某 family 的判準做大規模盲性驗證),屆時可參考 `/Users/neon/antigravity/.agents/skills/
-> truth-verify-loop/`(SKILL.md + `modules/measurement-methodology.md`)當設計參照,重新按 skill-bettor
+> 一般宿主的現有需求不成比例),而且其歷史 run 記錄是上游自己的實驗軌跡,對宿主
+> 無意義。若宿主未來真的需要「多 tier 交叉驗證 + sealed ledger」這種重量級量測迴圈(例如
+> 要對某 family 的判準做大規模盲性驗證),屆時可參考上游 repo 的 `.agents/skills/truth-verify-loop/`
+> (SKILL.md + `modules/measurement-methodology.md`)當設計參照,重新按宿主
 > 自己的規模建置,而非移植其引擎。
+>
+> **詞彙**:**上游**＝這份 skill 被移植出來的那個 repo;**宿主**＝正在訂閱這份共用 body 的 repo。
 
 ## 設計法三段
 
@@ -78,6 +80,6 @@ demand-pull 不預先抽象)。
 
 ---
 
-*本檔＝evals 設計方法論(裁決類,Opus/Fable 設計);antigravity 原版附帶的 pilot 逐輪判官 finding 史
-(R7/R8/M15-M20 案例、engine-driven slice 記錄)是它自己的證成軌跡,不搬——skill-bettor 的等價軌跡
+*本檔＝evals 設計方法論(裁決類,Opus/Fable 設計);上游原版附帶的 pilot 逐輪判官 finding 史
+(編號案例、engine-driven slice 記錄)是它自己的證成軌跡,不搬——宿主的等價軌跡
 累積在各家族 `changelog/`,見 [retarget-map.md](retarget-map.md)。*

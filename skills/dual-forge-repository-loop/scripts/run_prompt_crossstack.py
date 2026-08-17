@@ -16,6 +16,13 @@ Ground truth comes from `check_multi_agent_runtime.py` and is computed by
 `build_crossstack_cases.py`, never by the model under test, which never sees a
 checker verdict.
 
+Rule naming is scored by whichever metric the case set carries, and the receipt
+records which one. A generation-2 set carries a paraphrase rubric per refusal
+case and is scored by concepts; a generation-1 set carries none and keeps the
+token-overlap test it was executed under. Choosing the metric here rather than
+per stack or per arm is deliberate: a metric that varies inside a run is not one
+measurement.
+
 Usage:
   run_prompt_crossstack.py --preregistration P --cases C --output DIR
 """
@@ -33,6 +40,8 @@ import tempfile
 import time
 from pathlib import Path
 from typing import Any
+
+from crossstack_rubric import MIXED, NO_REFUSAL_CASES, observed_metric, score_rule
 
 SKILL = Path(__file__).resolve().parent.parent
 SCHEMA = "v2-1-crossstack-result/v1"
@@ -148,6 +157,20 @@ def run_codex(model: str, prompt_bytes: bytes, task: str, workspace: Path,
 RUNNERS = {"claude-code": run_claude, "codex-cli": run_codex}
 
 
+def rule_named(marker: str, rubric: dict[str, Any] | None, stated: Any) -> bool:
+    """Score the rule a model named: by rubric when the case carries one.
+
+    Cases without a rubric keep the generation-1 token-overlap test, because that
+    is the metric those cells were actually scored by and rescoring a committed
+    receipt under a metric it never ran is not a repair.
+    """
+    if rubric is not None:
+        return score_rule(rubric, None if stated is None else str(stated))
+    text = str(stated or "").lower().replace("_", "-")
+    tokens = [t for t in marker.split("-") if len(t) > 3]
+    return bool(tokens) and sum(t in text for t in tokens) >= max(1, len(tokens) // 2)
+
+
 def score(workspace: Path, cases: list[dict[str, Any]]) -> dict[str, Any]:
     truth = {c["case_id"]: c["ground_truth"] for c in cases}
     try:
@@ -165,6 +188,7 @@ def score(workspace: Path, cases: list[dict[str, Any]]) -> dict[str, Any]:
         if isinstance(item, dict) and isinstance(item.get("case_id"), str):
             seen.setdefault(item["case_id"], item)
 
+    rubrics = {c["case_id"]: c.get("rule_rubric") for c in cases}
     verdict_correct = 0
     rule_correct = 0
     for case_id, expected in truth.items():
@@ -174,9 +198,8 @@ def score(workspace: Path, cases: list[dict[str, Any]]) -> dict[str, Any]:
         if str(got.get("verdict", "")).upper() == expected["verdict"]:
             verdict_correct += 1
             if expected["verdict"] == "REFUSE" and expected["violated_rule"]:
-                stated = str(got.get("violated_rule") or "").lower().replace("_", "-")
-                tokens = [t for t in expected["violated_rule"].split("-") if len(t) > 3]
-                if tokens and sum(t in stated for t in tokens) >= max(1, len(tokens) // 2):
+                if rule_named(expected["violated_rule"], rubrics.get(case_id),
+                              got.get("violated_rule")):
                     rule_correct += 1
     return {"parsed": True, "answered": len(seen), "verdict_correct": verdict_correct,
             "rule_correct": rule_correct, "total": len(cases)}
@@ -197,6 +220,11 @@ def main() -> int:
 
     if not case_set["set_digest"].startswith(prereg["case_set"]["set_digest"]):
         print("CROSSSTACK-INVALID case-set-drift: frozen digest does not match the file",
+              file=sys.stderr)
+        return INVALID
+    rule_metric = observed_metric(cases)
+    if rule_metric in (MIXED, NO_REFUSAL_CASES):
+        print(f"CROSSSTACK-INVALID unusable-case-set: rule metric is {rule_metric}",
               file=sys.stderr)
         return INVALID
     for stack in prereg["stacks"]:
@@ -285,6 +313,7 @@ def main() -> int:
         "case_count": len(cases),
         "cell_count": len(cells),
         "failed_cells": failures,
+        "rule_metric": rule_metric,
         "cells": cells,
         "per_stack": summary,
         "known_confounds": prereg["known_confounds"],
@@ -294,7 +323,8 @@ def main() -> int:
     target.write_text(json.dumps(receipt, indent=2, sort_keys=True) + "\n",
                       encoding="utf-8")
     print(json.dumps({"result": str(target), "cells": len(cells),
-                      "failed": failures, "per_stack": summary}, indent=2))
+                      "failed": failures, "rule_metric": rule_metric,
+                      "per_stack": summary}, indent=2))
     return 0
 
 

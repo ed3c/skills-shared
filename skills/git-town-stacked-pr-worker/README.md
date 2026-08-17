@@ -216,7 +216,17 @@ Missing fields are `ABSENT`; Workers do not infer them.
 
 ## Standard molecular Stack index
 
-Proof-carrying Skill refactors use:
+The portable index — atom vocabulary, structural laws, head lifecycle and the update algorithm — is [`references/MOLECULAR_STACK_INDEX.md`](references/MOLECULAR_STACK_INDEX.md), with:
+
+```text
+references/molecular-stack-index.schema.json
+references/example-molecular-stack-index.json
+scripts/assert_molecular_stack_index.py
+```
+
+Atoms are `C` contract/schema/interface lock, `K` deterministic core, `A` adapter/provider/substrate, `E` Eval/mutation/fault controls, `X` explicit multi-parent convergence/E2E, and `D` documentation/receipt/handoff. `assert_molecular_stack_index.py` refuses a hidden multi-parent convergence, a path-disjoint sibling serialized as a child, a required atom missing from the index, overlapping writer leases, a self-embedded mutable open PR head, and an atom that owns no paths, oracle or Gate. Its selftest plants all ten controls.
+
+Proof-carrying Skill refactors bind the same shape through their own registry:
 
 ```text
 skills/skill-refactor-proof-loop/references/refactor-proof-stack.schema.json

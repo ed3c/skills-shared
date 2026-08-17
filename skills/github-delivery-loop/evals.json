@@ -1,6 +1,6 @@
 {
   "skill_name": "github-delivery-loop",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "_meta": {
     "coverage_metric": "planted hollow-receipt, unsafe merge-rule target, forged/stale merge-admit, canonical-link divergence, wasteful CI publication, stale local verification, untrusted GitHub snapshot detection, and procedural-core/domain-decoupling mutation detection",
     "purpose": "Prove that the portable delivery method remains procedure-driven and executable while GitHub/provider/host details stay domain-decoupled, and that delivery receipts, publication, and merge controls fail closed without network access."
@@ -30,8 +30,8 @@
       "test_verify": "tests/merge-gate/verify.sh",
       "good_fixture": "tests/merge-gate/fixtures/good",
       "hollow_fixture": "tests/merge-gate/fixtures/hollow",
-      "covers": ["merge-admit label applied by a non-owner is refused", "admit that predates the head commit is stale, not valid", "nothing admitted exits 3, distinct from a layer refusing with 1", "a PreToolUse hook that exits 2 refuses the run on the active host only", "owner-auto lands through GraphQL pinned to expectedHeadOid and never sends authorEmail", "owner identity is refused for a foreign owner, an organization, or a non-personal account", "owner-auto exposes no --admin bypass"],
-      "expected": "good PREFLIGHT GREEN; hollow blocked at L1; empty exits 3; blocking hook exits 1; owner-auto admits only an immutable personal-User owner and its merge command carries expectedHeadOid without authorEmail"
+      "covers": ["merge-admit label applied by a non-owner is refused", "admit that predates the head commit is stale, not valid", "nothing admitted exits 3, distinct from a layer refusing with 1", "a PreToolUse hook that exits 2 refuses the run on the active host only", "owner-auto lands through GraphQL pinned to expectedHeadOid and never sends authorEmail", "owner identity is refused for a foreign owner, an organization, or a non-personal account", "owner-auto exposes no --admin bypass", "a PR whose baseRefName is not the repository's default branch is refused before merge in both preflight and land, not merged into a stacked parent branch", "the post-merge readback asserts the merged PR's baseRefName is the default branch, not merely state=MERGED and mergedAt", "missing or malformed baseRefName/default_branch is UNEVALUABLE, never a silent pass"],
+      "expected": "good PREFLIGHT GREEN; hollow blocked at L1; empty exits 3; blocking hook exits 1; owner-auto admits only an immutable personal-User owner and its merge command carries expectedHeadOid without authorEmail; non-default-base PR #50 is BLOCKED at L3 GITHUB in both preflight and land, never merged"
     },
     {
       "id": "DELIVERY-4",

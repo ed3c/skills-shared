@@ -1,8 +1,10 @@
 # Module: loop-harness-standard — 技術規格與設計決策 know-why
 
 > 屬 [`loop-harness-standard`](../SKILL.md)。SKILL.md＝基座組件卡＋不變量;本檔＝**目錄結構圖＋設計
-> 決策 know-why**——只留跨專案可轉移的方法論,antigravity 原版的歷史證成細節(具體 commit、具體案例
-> 編號)不搬,見 [retarget-map.md](retarget-map.md)。
+> 決策 know-why**——只留跨專案可轉移的方法論,上游原版的歷史證成細節(具體 commit、具體案例
+> 編號)不搬,見 [retarget-map.md](retarget-map.md)。**上游**＝這份 skill 被移植出來的那個 repo,
+> **宿主**＝正在訂閱這份共用 body 的 repo;誰是誰屬 binding,記在宿主的
+> `.skill-bindings/loop-harness-standard/`。
 
 ---
 
@@ -38,7 +40,7 @@ loop_wiki/evolve-<family>-<op>/       # 一沙盒一 op(spawn/refine/prune/spawn
 ### §1.5 大迴圈側全結構(control plane + engine)
 
 ```text
-skill-bettor/
+<repo-root>/
 ├── AGENTS.md                         # B1 cross-host engineering entry / seed
 ├── CLAUDE.md                         # B1 Claude carrier entry;指向共同架構事實
 ├── ARCHITECTURE.md                   # B1 repo design facts
@@ -57,8 +59,8 @@ skill-bettor/
 
 **契約鏈**:`engine.sh <loop> --target <path>` → `run.sh <driver> <target> [feedback]`(單發)→
 `verify.sh <target>`(0/2/64+PROGRESS)→ 綠即 exit 10 停人閘。engine 絕不:semantic 判官/commit/
-merge/自動 admit。薄版未實作(誠實範圍):儀表化、restore-best、host 偵測——需要時對照
-`/Users/neon/antigravity/loop_wiki/engine.sh` 增量補。
+merge/自動 admit。薄版未實作(誠實範圍):儀表化、restore-best、host 偵測——需要時對照上游
+repo 的 `loop_wiki/engine.sh` 增量補(它在哪個 checkout,記在宿主的 `.skill-bindings/`)。
 
 **scope 邊界**:engine.sh=每次選定單一 driver 逐發的機械 iterate/stop-loss 引擎,只做 T0 機械閘。
 「同時多模型 author＋判官進自動迴圈」不是 engine.sh 的擴充維度,而是獨立編排層 **Workflow** 承——
@@ -66,7 +68,7 @@ merge/自動 admit。薄版未實作(誠實範圍):儀表化、restore-best、ho
 
 ### §1.6 root 層 vs sandbox 層 + 設計規範差異 vs 實作差異
 
-antigravity root 層是 `AGENTS.md`=Antigravity/Gemini L1 SSOT,`CLAUDE.md`=Claude-tier 派生。skill-bettor
+有些上游的 root 層是 `AGENTS.md`=非 Claude 家族的 L1 SSOT,`CLAUDE.md`=Claude-tier 派生。本標準假設宿主
 已同時有 root `AGENTS.md` cross-host engineering entry、`CLAUDE.md` Claude carrier entry 與
 `ARCHITECTURE.md` 設計事實；Claude Code 或 Codex 都可承載 macro session。Carrier 可替換不等於主權可
 替換：Human admit 與專案聲明的 Claude-anchored 裁決邊界仍不由 carrier 自動取得。**不要把 root 層主權模型
@@ -113,7 +115,7 @@ extension。通用方法 SSOT=
 大迴圈折回本 skill 的只有這張方法和 extension 位置。domain 實作和固定數字留在小迴圈自己的
 `modules/production-readiness.md`、`baselines/`、`packets/`、`scripts/`。
 
-skill-bettor 的 carrier 與 driver 是正交選擇，不建立兩套平行治理樹：
+宿主的 carrier 與 driver 是正交選擇，不建立兩套平行治理樹：
 
 | 軸 | 隨什麼變 | 差異內容 |
 |---|---|---|
@@ -122,7 +124,7 @@ skill-bettor 的 carrier 與 driver 是正交選擇，不建立兩套平行治�
 | **route 規範差異** | **macro-loop vs small-loop** | macro-loop 指揮多個小迴圈與八大基座;small-loop 專注 domain/task。兩層可鏡射 `.agents/agents`/`.agents/skills` 目錄,但責任不可鏡射。交換資料流必經 `ROUTES.md` packet 欄位與 `route-ledger.md`。 |
 | **實作差異** | **driver 家族** | `claude -p`:讀沙盒 CLAUDE.md、acceptEdits；`agy`:讀 AGENTS.md wrapper、`--add-dir` 命門、可用性看輸出檔非 exit code；`codex`:由其正式 runtime 承載。是否需 fresh judge 取決於 author×judge 家族，不取決於 macro carrier。 |
 
-**與 antigravity 原版的差異**:antigravity 版為每個 host 維護平行 config 目錄。skill-bettor 允許
+**與上游原版的差異**:上游版為每個 host 維護平行 config 目錄。本標準允許
 Claude Code/Codex 作 macro carrier，但共用同一組 B1-B8 owner，不建立 `.agents/`/`.claude/` 雙份治理
 SSOT。授權走 repo hook 與 `run.sh` 明示介面；若沙盒有 `.agents/agents/*` 或 `.agents/skills/*`,它們是
 small-loop domain/task endpoint，不是第二套 host config。
@@ -139,8 +141,8 @@ small-loop domain/task endpoint，不是第二套 host config。
 subagent(禁 fork,fork 繼承脈絡＝非隔離)**。
 
 ### ❷ 為何被動上下文 ≤300 行?
-過大常駐上下文使模型定位關鍵約束(Never rules)時注意力被稀釋,任務完成率實測顯著下滑(antigravity
-`design_governance` pilot 錨:91.6%→71.3%)。被動上下文只宣告:簡介/演化紀律/≤5 條絕對禁止;其餘進
+過大常駐上下文使模型定位關鍵約束(Never rules)時注意力被稀釋,任務完成率實測顯著下滑(上游一個
+治理類 pilot 的實測錨:91.6%→71.3%)。被動上下文只宣告:簡介/演化紀律/≤5 條絕對禁止;其餘進
 `shared/` 或子技能漸進加載。
 
 ### ❸ 背景程序阻塞(Stdin Hang)與授權
@@ -152,12 +154,12 @@ allowlist 回核准後,driver 的 Bash 面＝default-deny(只 allowlist verify.s
 
 ### ❹ Hook payload
 Claude Code hooks 收在 `.claude/settings.json` 的 `hooks` 鍵,payload schema **依現場定**,需 hook 的
-op 才驗欄位名——不預判寫死。skill-bettor MVP 期尚未有需要生命週期 hook 的 op,沙盒本地 `logs/` 先佔位。
+op 才驗欄位名——不預判寫死。宿主 MVP 期若尚未有需要生命週期 hook 的 op,沙盒本地 `logs/` 先佔位。
 
 ### ❺′ 為何 run.sh 不含迭代邏輯?(2026-07-11 fold-in)
 第一版把 iterate-until-pass+stop-loss 寫進 run.sh——每個沙盒各自長出一套不一致的迴圈控制,且
 run.sh 的進度計數用「grep 累計 log」實作,單調遞增使 no-progress 永不觸發(實犯)。canonical 分層
-(對照 antigravity engine.sh 後修正):**run.sh=單發 dispatch(祈使任務綁 target)、engine.sh=
+(對照上游 engine.sh 後修正):**run.sh=單發 dispatch(祈使任務綁 target)、engine.sh=
 迭代/stop-loss/快照/軌跡的單點實作**。效益:迴圈控制 bug 只修一處;driver prompt 形式(祈使綁
 target)統一防「讀成規範不動手」反模式;engine 的 exit 10 讓「停在人閘」變成機械契約而非自律。
 
@@ -166,23 +168,23 @@ engine 判 no-progress 需要「每輪重算的接近度」。verify 的 exit co
 「差一條 check」與「全掛」;PROGRESS(如通過的 G 閘數/驗證層數)給 engine 一個單調且每輪重算的
 量,連 2 輪未升即 stop-loss。粒度可依 op 自訂(spawn-cases 用通過層數 0-3),契約只要求「越大越接近綠」。
 
-### ❻ 為何每個 model family 只佔一個 pipeline 階段(2026-07-17 fold-in，antigravity 同日經驗)
+### ❻ 為何每個 model family 只佔一個 pipeline 階段(2026-07-17 fold-in，上游同日經驗)
 多家族派工設計的核心原則：起草者(author)與審查者(judge)兩個角色，先問「能不能落在不同 family」，能
-就優先選不同家族——每加一個獨立家族，就多一層「執行者≠判官」式的天然隔離。antigravity 側真跑驗證：
+就優先選不同家族——每加一個獨立家族，就多一層「執行者≠判官」式的天然隔離。上游側真跑驗證：
 codex(執行)×Opus(判官) 是跨家族天然隔離，比 claude-p(執行)×Opus(判官) 同家族還需要 fresh-subagent
 額外工序更乾淨。這條原則不限於 codex 場景，任何委派任務只要有「誰做」「誰審」兩個角色，都適用。
 
-### ❼ 機械 drift-checker + fresh 獨立判官複核(2026-07-17 fold-in，antigravity 同日經驗)
-驗證「一份 domain 知識被獨立改寫是否忠實」的通用模式：機械 checker(如 antigravity 的
+### ❼ 機械 drift-checker + fresh 獨立判官複核(2026-07-17 fold-in，上游同日經驗)
+驗證「一份 domain 知識被獨立改寫是否忠實」的通用模式：機械 checker(如上游的
 `r9-dual-file-drift.py`)先抓表面候選（可能有大量假陽性——不同語言/措辭改寫同一事實會被字面 diff
 誤判成「新事實」），fresh 獨立判官(zero-context，非 fork)再對候選做語義複核，過濾假陽性、確認真缺口、
-甚至抓機械 checker 本身判準寫反的 bug。antigravity 實測：39 條候選裡機械層抓到的僅 ~3 類是真缺口，
+甚至抓機械 checker 本身判準寫反的 bug。上游實測：39 條候選裡機械層抓到的僅 ~3 類是真缺口，
 其餘是假陽性——沒有 fresh 判官這一步會嚴重高估漂移量。適用場景：任何「同一份知識被不同 driver/不同
 時間點獨立改寫」的沙盒(如本 repo 未來若對 `families/*/SKILL.md` 做跨家族改寫，同一模式可套用)。
 **校準**:對 `CLAUDE.md`/`AGENTS.md` 這種合法 entry-layer 改寫,字面 drift checker 只能當候選產生器,
 不可單獨作 hard gate;需用 judge-loop-chooser/fresh judge 判「合法呈現層差異」還是真缺口。
 
-### ❽ 多輪收斂測試需要刻意限制單輪範圍(2026-07-17 fold-in，antigravity 同日經驗)
+### ❽ 多輪收斂測試需要刻意限制單輪範圍(2026-07-17 fold-in，上游同日經驗)
 強模型(如 codex)單次 dispatch 內建的 agentic iterate-until-pass 太強，自然任務很難逼出 engine 外層
 的多輪迴圈——no-progress/regress/restore-best 這些機械路徑因此長期未被真實踩過。要驗證「engine 的
 多輪收斂機械本身是否真的 work」，需要刻意造一個單輪範圍受限的 dispatch(如環境變數開關「這輪只修一條
@@ -216,7 +218,7 @@ per-op driver 四態(`run.sh` switch):
    run 已補**（2026-07-17 同日稍後）：`codex:codex-rescue` 真跑 gpt-5.4-mini@medium 最小唯讀 tracer
    證通；A 級錨與「模型自報不可信、判 model 看 session log」教訓 → MEMORY
    [[multi-model-dispatch-verification]] 同段（指針不重抄）。**殘餘缺口**：小迴圈側 `--driver codex` 的完整 op 真跑仍未發生，首次使用前先跑小
-   target（antigravity 側已在 `loop_wiki/codex_demo`/`design_governance` 真跑驗證，見兩者 PLAN.md）。
+   target（上游側已在自己的 `loop_wiki/` demo 與治理沙盒真跑驗證，見那兩個沙盒的 PLAN.md）。
 
 **命令層級**:driver 由 active macro session 指揮並選定，小迴圈不自選 driver。需要觀測 carrier×driver
 組合時可記矩陣 receipt，但它不是平行設定樹；author×judge 是否同家族才決定驗證隔離。見
@@ -360,5 +362,5 @@ oracle＝`cache_read_input_tokens` > 0。誠實錨:cache 是次要優化,非降�
 
 ---
 
-*本檔＝可轉移方法論;antigravity 原版的 D 編號決策帳本、具體 commit 錨、pilot 案例史不搬——見
+*本檔＝可轉移方法論;上游原版的編號決策帳本、具體 commit 錨、pilot 案例史不搬——見
 [retarget-map.md](retarget-map.md)。*

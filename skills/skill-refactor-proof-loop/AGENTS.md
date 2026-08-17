@@ -11,8 +11,9 @@ Read this file before changing the `skill-refactor-proof-loop` or using it to re
 5. `references/refactor-proof-contract.schema.json`;
 6. `references/golden-proof-registry.schema.json`;
 7. `references/golden-proof-registry.json`;
-8. only the selected module under `modules/`;
-9. `scripts/`, `tests/`, and the exact issue/PR subjects.
+8. `references/skill-adoption-ledger.json` when the change touches another Skill's adoption state;
+9. only the selected module under `modules/`;
+10. `scripts/`, `tests/`, and the exact issue/PR subjects.
 
 Chat history, branch names, issue state, and Markdown claims are not evidence substitutes.
 

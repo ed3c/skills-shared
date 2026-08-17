@@ -8,5 +8,8 @@ These files are host-neutral and consumer-independent.
 - `example-local-handoff-queue.json` is a generic positive fixture for entry → runtime lane → receipt → exit → next routing; its commands and task IDs are examples only.
 - `scheduler-lifecycle.schema.json` defines scheduler/process-worktree lifecycle evidence.
 - `fanout-prompt.md` is the standard Worker prompt envelope for Stack and Tournament modes.
+- `REPOSITORY_CLOSURE_RECONCILIATION.md` explains the repository-wide completion review: tree inventory versus documented status, the real-problem closure matrix, evidence kinds and lanes, and the two Issue edge classes.
+- `repository-closure-contract.schema.json` closes the tree-inventory/closure-matrix shape; `example-repository-closure-contract.json` is a generic positive fixture, not a consumer readback.
+- `issue-dual-dag.schema.json` separates start dependencies from completion dependencies inside one Issue graph; `example-issue-dual-dag.json` is its generic positive fixture.
 
 Consumer repositories bind real commit/tree identities, issue/task references, path leases, commands, provider versions, indexes, budgets, branches, runtime capabilities, receipts, and Human admissions outside this shared directory. They consume these contracts without copying the shared `SKILL.md` body.

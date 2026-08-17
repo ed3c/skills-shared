@@ -1,23 +1,25 @@
-# Module: 已查證真相 — skill-bettor 本地累積表
+# Module: 已查證真相 — Claude Code 平台事實累積表
 
-> 屬 [`external-verify`](../SKILL.md) skill。本檔的**角色**跟 antigravity 原版相同:一份會隨時間增列
+> 屬 [`external-verify`](../SKILL.md) skill。本檔的**角色**跟上游原版相同:一份會隨時間增列
 > 的「已對外部 primary source 查證過的事實」快照,復用前依 SKILL.md step 1-2 重跑,別讓過期真相被當
 > 定局沿用。
 >
-> **與 antigravity 原版的差異(誠實現況)**:antigravity 原版這份表的每一列都是 **Google Antigravity
-> CLI 平台**的事實(`AGENTS.md` canonical 檔名、`.agents/skills/` 目錄、`~/.gemini/...` 三層 scope、
-> `GEMINI.md` 存在性)——那是**錯平台的事實**,skill-bettor 是 Claude-Code-only 專案,逐字複製視同灌入
-> 假鐵錨,故整份不搬(見 `.skill-bindings/external-verify/retarget-map.md`)。本檔改為 skill-bettor 自己的
+> **與上游原版的差異(誠實現況)**:上游原版這份表的每一列都是**另一家 CLI 平台**的事實
+> (該平台自己的 canonical entry 檔名、`.agents/skills/` 目錄、`~/.gemini/...` 三層 scope、
+> `GEMINI.md` 存在性)——對一個 Claude-Code-only 的宿主而言那是**錯平台的事實**,逐字複製視同灌入
+> 假鐵錨,故整份不搬(見 `.skill-bindings/external-verify/retarget-map.md`)。本檔改列 Claude Code 自己的
 > 表,目前只有下方這批**移植當下(2026-07-11)順手用 WebFetch 對官方文件真查證過**的 Claude Code
-> Skill 規範事實;其餘留白——等 skill-bettor 未來真的碰到 post-cutoff/不可錨 claim、真的跑過
+> Skill 規範事實;其餘留白——等宿主未來真的碰到 post-cutoff/不可錨 claim、真的跑過
 > SKILL.md 的 6 步 runbook,才 append 新列,不預先杜撰更多列撐場面。
+>
+> **詞彙**:**上游**＝這份 skill 被移植出來的那個 repo;**宿主**＝正在訂閱這份共用 body 的 repo。
 
 ## 已查證真相表(2026-07-11 snapshot)
 
 | Claim | 判定 | 信心層 | 鐵錨 |
 |---|---|---|---|
 | Claude Code 專案 skill 路徑 = `.claude/skills/<skill-name>/SKILL.md`;個人 skill = `~/.claude/skills/<skill-name>/SKILL.md` | ✅ 真 | CONSENSUS(primary) | Claude Code Docs「Where skills live」表 |
-| 官方建議 `SKILL.md` 本體 **保持在 500 行以下**,細節搬到獨立參考檔案 | ✅ 真 | CONSENSUS(primary) | 同上文件原句:"Keep `SKILL.md` under 500 lines. Move detailed reference material to separate files."(直接支持 skill-bettor `ARCHITECTURE.md` 已在用的「子技能 <500 行+references/」慣例——不是本檔發明,是官方文件本來就這樣建議) |
+| 官方建議 `SKILL.md` 本體 **保持在 500 行以下**,細節搬到獨立參考檔案 | ✅ 真 | CONSENSUS(primary) | 同上文件原句:"Keep `SKILL.md` under 500 lines. Move detailed reference material to separate files."(直接支持宿主 `ARCHITECTURE.md` 常用的「子技能 <500 行+references/」慣例——不是本檔發明,是官方文件本來就這樣建議) |
 | Claude Code 的 `.claude/commands/<name>.md` 已併入 skills;兩者建立同一個 `/name` 且行為相同 | ✅ 真 | CONSENSUS(primary) | 同上文件原句:"Custom commands have been merged into skills. A file at `.claude/commands/deploy.md` and a skill at `.claude/skills/deploy/SKILL.md` both create `/deploy` and work the same way." |
 | 在 **Claude Code** 這個 surface,SKILL.md frontmatter **全欄位選填**,只有 `description` 被「建議」(非強制);`name` 未填則退回目錄名 | ✅ 真(但見下一列的範圍落差) | CONSENSUS(primary) | 同上文件原句:"All fields are optional. Only `description` is recommended so Claude knows when to use the skill." |
 | ⚠ 兩份官方文件對 frontmatter 驗證嚴格度的敘述有落差,哪個規則實際套用到 Claude Code 本地 skill 尚待查證 | 未證(待查) | FRONTIER-CONTESTED | 更廣的「Agent Skills」開放標準頁明訂 `name`/`description` 為**必填**且有嚴格 regex(`name` ≤64 字元、僅小寫字母/數字/連字號、禁 XML tag、禁保留字 `anthropic`/`claude`;`description` 非空、≤1024 字元、禁 XML tag),但 Claude Code 專屬頁面同時稱「全欄位選填」。兩頁可能談的是不同 surface(API/claude.ai 上傳 skill vs. Claude Code 檔案系統 skill),本次未進一步查證兩條規則是否都對 Claude Code 本地 `.claude/skills/` 生效——**不可**斷言本地 skill 一定套用那組嚴格 regex 驗證,寫 `name`/`description` 時保守起見仍建議照嚴格規則走(小寫/連字號/避開保留字) |
@@ -218,12 +220,12 @@
 - **gcr 的 git-hook/CI 熔斷/500 行/「DeepMind G1 治理政策」框架=gcr 自行 embellish**:testing-skills
   **明言不提** git hooks/CI gates/skill 行數死線(WebFetch 逐字「does not mention git hooks, CI gates,
   or line-limit thresholds」);「>500 行 degrade reasoning」來自 Schmid 另一篇(talk/agent-skills-tips)非本文。
-- **對等價判定的意義**:skill-bettor 的 500 行閘/fluff/10-20 cases(WARN)/ablation 退役與 gcr **同源自
-  Schmid**——兩者是同一方法論的獨立實作(skill-bettor retarget 到 expect.yaml/Claude,gcr embellish 成
+- **對等價判定的意義**:本 repo 的 500 行閘/fluff/10-20 cases(WARN)/ablation 退役與 gcr **同源自
+  Schmid**——兩者是同一方法論的獨立實作(本 repo retarget 到 expect.yaml/Claude,gcr embellish 成
   部分虛構的完整藍圖),非誰抄誰。故「51.3% 行為等價」讀作「共享 methodology 骨幹,各自實作與擴充分歧」。
 - 查證日期 2026-07-21;過期紀律:Interactions API 版號/SkillsBench 版本會演進,引用前重跑 step1-2。
 
 ---
 **空白模板紀律**:上面這批是移植當下順手查證的種子,**不是**要求以後每次都補滿一張大表。之後 append
-新列的規則跟 antigravity 原版相同——真的碰到 post-cutoff/不可錨 claim、真的跑過 SKILL.md 6 步
+新列的規則跟上游原版相同——真的碰到 post-cutoff/不可錨 claim、真的跑過 SKILL.md 6 步
 runbook,才寫新列;沒發生驗證就不假裝已驗證。

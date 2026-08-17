@@ -1,0 +1,164 @@
+{
+  "schema": "v2-1-crossstack-preregistration/v1",
+  "preregistration_id": "v2-1-crossstack-gen2-2026-08",
+  "status": "FROZEN_NOT_EXECUTED",
+  "issue": 229,
+  "supersedes": {
+    "preregistration_id": "v2-1-crossstack-2026-08",
+    "why": "That run executed and returned INDETERMINATE, and its own audit says why: verdict accuracy sat at 6/6 in every arm, so the entire outcome rested on rule naming, and rule naming was scored by token overlap with the checker's marker string. The 36,866-byte candidate prompt carries that vocabulary and the 4,663-byte baseline does not, so the metric separated arms by vocabulary rather than judgement. The executed receipt is history and stays as it is; this preregistration is the repaired instrument, not a re-reading of the old one.",
+    "what_is_not_inherited": "No cell, score, or eligibility outcome carries over. The two case sets are different sets and their numbers are not comparable."
+  },
+  "_meta": {
+    "why": "#229 requires a deterministic gate that derives NOT_ELIGIBLE or PORTABLE_RECORD_ELIGIBLE. Generation 1 could derive neither without out-claiming its metric. This generation fixes the instrument first so that a future execution can land on a terminal state honestly.",
+    "why_new_cases": "The generation-1 cases are committed and therefore no longer held out. These contracts are generated fresh, and the near-miss halves of them did not exist in any committed file before this freeze. Once this file is committed they stop being held out too.",
+    "execution_state": "Frozen and not executed. Executing it needs two live provider stacks and real spend; this file is the instrument, and a result file beside a FROZEN_NOT_EXECUTED status is refused rather than believed."
+  },
+  "stacks": [
+    {
+      "stack_id": "claude-code-opus",
+      "runtime_identity": "CLAUDE_CODE_LOCAL",
+      "harness": "claude-code",
+      "binary": "claude",
+      "model": "opus",
+      "provider": "anthropic",
+      "carrier": "SYSTEM_PROMPT_FILE",
+      "carrier_detail": "--append-system-prompt-file"
+    },
+    {
+      "stack_id": "codex-cli-gpt",
+      "runtime_identity": "CODEX_CLI_LOCAL",
+      "harness": "codex-cli",
+      "binary": "codex",
+      "model": "gpt-5.6-sol",
+      "provider": "openai",
+      "carrier": "INSTRUCTION_PREFIX",
+      "carrier_detail": "codex exec has no system-prompt channel; the bytes precede the task"
+    }
+  ],
+  "stack_distinctness": "Different provider, different model family, different harness and different prompt carrier. This is not one model behind two aliases, and it is not one harness with the model swapped.",
+  "subject": {
+    "repository": "ed3c/skills-shared",
+    "prompt_path": "skills/dual-forge-repository-loop/references/system-prompt.md"
+  },
+  "arms": [
+    {
+      "arm": "NO_PROMPT",
+      "prompt_commit": null,
+      "prompt_sha256": null,
+      "prompt_bytes": 0,
+      "absence_is_explicit": true
+    },
+    {
+      "arm": "CURRENT_REPOSITORY_PROMPT",
+      "prompt_commit": "1295cdd",
+      "prompt_sha256": "f0b77ccc3e97",
+      "prompt_bytes": 4663
+    },
+    {
+      "arm": "CANDIDATE_V2_1",
+      "prompt_commit": "d6cd334",
+      "prompt_sha256": "c1774028cc6a3881e0cc6a69e8508caba7e2d683060e8ba8630306c0dec40772",
+      "prompt_bytes": 36866
+    }
+  ],
+  "design": {
+    "repetitions_per_arm": 3,
+    "total_cells": 18,
+    "why_three_not_five": "#229's floor is on held-out case count, not repetitions. Three bounds the spend at 18 cells while still giving a per-cell spread; it buys less variance control than #225's five, and a result inside that spread is not a finding.",
+    "fresh_workspace_per_cell": true,
+    "arm_order": "sorted by sha256(stack_id|arm|repetition), so the order is reproducible from the receipt rather than chosen at run time",
+    "identical_across_stacks": [
+      "case set and case digests",
+      "task text and output shape",
+      "deterministic verifier",
+      "prompt bytes per arm",
+      "timeout"
+    ]
+  },
+  "case_set": {
+    "case_set_id": "v2-1-crossstack-heldout-cases-gen2-2026-08",
+    "path": "skills/dual-forge-repository-loop/evals/prompt-crossstack-v2-cases.json",
+    "set_digest": "6beec3fe37d6",
+    "case_count": 13,
+    "rule_families": [
+      "unknown-runtime-published",
+      "self-dependency",
+      "shadow-l3-unenforced",
+      "subject-base-not-admitted",
+      "parallelism-not-admitted",
+      "single-builder-cardinality"
+    ],
+    "near_miss_families": [
+      "runtime-identity",
+      "task-dependencies",
+      "shadow-enforcement",
+      "repository-subjects",
+      "parallelism-admission",
+      "topology-cardinality"
+    ],
+    "ground_truth_authority": "DETERMINISTIC_CHECKER",
+    "agent_never_sees": "checker output, exit codes, or violated-rule markers"
+  },
+  "metric_design": {
+    "rule_metric": "PARAPHRASE_RUBRIC",
+    "max_constant_verdict_share": 0.6,
+    "why_the_ceiling_gate": "Generation 1 held one admitted case against six refusals, so answering REFUSE to everything scored 0.857 and every arm reached 6/6. A metric no arm can lose has no discriminating power in either direction. Six admitted near misses now sit against six refusals, so the best constant answer scores 0.538 and the set has to be read to be answered.",
+    "what_a_near_miss_is": "A contract mutated in the same region as a refusal case that the deterministic checker still admits. The pairing is enforced by field family: an admitted case whose field family has no refusal sibling is not near anything, and the generator refuses to emit it.",
+    "why_the_rubric": "Rule naming is now scored against an explicit conjunction of concept groups with several phrasings each, so an answer counts when it states the right concepts in its own words. Each rubric carries accept and reject phrasings that are executed at build time and re-executed by the checker: at least one accepted phrasing shares no word with the checker's marker, and at least one rejected phrasing echoes a marker word. A rubric that cannot separate those is refused.",
+    "what_this_still_does_not_fix": [
+      "the carrier confound: the two hosts still take the prompt through different channels",
+      "the length confound: the candidate is still nearly eight times the baseline",
+      "a rubric is authored, so it can still be wrong about which paraphrases a competent answer uses; its accept and reject examples are the only executed evidence that it is not"
+    ]
+  },
+  "verifier": {
+    "verifier_id": "multi-agent-runtime-verify",
+    "authority": "DETERMINISTIC_ONLY",
+    "model_self_report_is_not_authority": true
+  },
+  "budgets": {
+    "retries_permitted": 0,
+    "retry_policy": "A failed cell stays in the denominator with its reason.",
+    "timeout_seconds": 900,
+    "identical_for_every_stack": true
+  },
+  "known_confounds": [
+    {
+      "confound": "prompt carrier",
+      "detail": "Claude Code takes the prompt through a system-prompt channel and Codex CLI has none, so the bytes arrive as instruction text. Every cross-stack difference is confounded with carrier.",
+      "how_to_separate": "a harness that offers both carriers, or a second Claude arm carrying the prompt as an instruction prefix",
+      "why_not_corrected": "Neither host can be made to use the other's channel, and faking symmetry would report a comparison that was never run."
+    },
+    {
+      "confound": "prompt length",
+      "detail": "CANDIDATE_V2_1 is 36,866 bytes against CURRENT_REPOSITORY_PROMPT's 4,663. Carried through an instruction prefix on Codex, that length competes with the task itself rather than sitting in a separate channel.",
+      "how_to_separate": "a length-matched fourth arm, which this preregistration does not freeze",
+      "why_not_corrected": "Truncating the candidate would no longer test the candidate."
+    },
+    {
+      "confound": "usage reporting",
+      "detail": "Claude Code reports token counts and cost; Codex CLI reports neither in a machine-readable form. Cost cannot be compared across stacks and is recorded as unobserved rather than as zero.",
+      "how_to_separate": "provider billing export",
+      "why_not_corrected": "outside this harness"
+    },
+    {
+      "confound": "rubric authorship",
+      "detail": "The rubric removes the checker's vocabulary from the scoring path but replaces it with the rubric author's concept groups. A phrasing no group anticipates still scores zero.",
+      "how_to_separate": "score a sample of stated rules by an independent reader and compare with the rubric",
+      "why_not_corrected": "An independent reader is not available inside a zero-network deterministic gate; the executed accept and reject examples bound the failure rather than removing it."
+    }
+  ],
+  "eligibility_threshold": {
+    "outcome_values": ["NOT_ELIGIBLE", "PORTABLE_RECORD_ELIGIBLE"],
+    "rule": "PORTABLE_RECORD_ELIGIBLE requires the candidate to show no hard regression against the strongest baseline arm on the deterministic verifier, on every stack, with the rule-naming metric read from the paraphrase rubric rather than token overlap. A regression on any stack is disqualifying, because portability is a claim about all of them.",
+    "scope_limit": "Two stacks and thirteen cases bound this to these stacks and this case set. It is not a general portability claim.",
+    "indeterminate_is_still_available": "If a future audit of this instrument finds the discriminating metric unsound again, INDETERMINATE remains the honest answer. Fixing the instrument does not oblige the run to produce a terminal state."
+  },
+  "declared_non_claims": [
+    "two stacks are not a population; this cannot estimate variance across harnesses",
+    "no cost comparison is available across stacks",
+    "eligibility here is not recording authority; #195 governs that separately",
+    "a difference smaller than the per-cell spread is not a finding",
+    "nothing here re-reads or re-scores the generation-1 run; that receipt stands as executed"
+  ]
+}

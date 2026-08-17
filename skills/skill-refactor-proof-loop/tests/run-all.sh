@@ -11,5 +11,9 @@ python3 "$ROOT/scripts/check_golden_proof_registry.py" \
 python3 "$ROOT/scripts/check_refactor_proof_stack.py" \
   --stack "$ROOT/references/refactor-proof-stack.json"
 
+python3 "$ROOT/scripts/check_skill_adoption_ledger.py" \
+  --ledger "$ROOT/references/skill-adoption-ledger.json"
+
 python3 "$ROOT/tests/selftest.py"
 python3 "$ROOT/tests/stack_selftest.py"
+python3 "$ROOT/tests/adoption_selftest.py"

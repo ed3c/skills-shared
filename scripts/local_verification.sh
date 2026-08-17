@@ -101,8 +101,6 @@ if [ "${binding_code}" -ne 0 ] && [ "${binding_code}" -ne 3 ]; then
 fi
 python3 scripts/check_body_neutrality.py --selftest
 python3 scripts/check_body_neutrality.py
-python3 scripts/check_ci_publication_profile.py --selftest
-python3 scripts/check_ci_publication_profile.py
 python3 scripts/skill_eval_plane_selftest.py
 python3 scripts/check_skill_eval_plane.py
 python3 scripts/check_guard_controls.py --repo-root . --selftest

@@ -25,12 +25,18 @@ So this module does two separable things, and keeps them separable:
   `compare`  requires a paired experiment, refuses unfair pairings before
              computing anything, and refuses to unlock the default on a
              single task however good the numbers are.
+  `plan`     reads a pre-registered task pair — the treatment and the controls
+             fixed before either arm runs — and refuses any outcome field in
+             it. A pre-registration that already knows how it turned out is a
+             record wearing a plan's name, and the difference is the whole
+             value of registering it first.
 
 Exits: 0 done, 2 refused or gate failed, 64 unusable input.
 """
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -38,6 +44,7 @@ from typing import Any
 
 MEASUREMENT_SCHEMA = "delivery-shape-measurement/v1"
 EXPERIMENT_SCHEMA = "delivery-shape-experiment/v1"
+TASK_PAIR_SCHEMA = "delivery-shape-task-pair/v1"
 
 # Fields that must be identical across arms. A difference in any of them makes
 # the branch graph one variable among several, and the comparison answers a
@@ -51,6 +58,17 @@ CONTROLLED_FIELDS = (
     "reviewer_rubric_digest",
     "budget",
 )
+
+# A pre-registration declares the treatment and nothing about the outcome, so
+# its fields are allowlisted rather than denylisted: a metric added to the
+# measurement schema later would arrive here by default under a denylist, and
+# the first person to notice would be whoever read a fabricated number as data.
+PAIR_FIELDS = frozenset({"schema_version", "pair_id", "execution_state",
+                         "declared_budget", "arms", "_meta"})
+ARM_PLAN_FIELDS = frozenset(CONTROLLED_FIELDS) | {
+    "shape", "requirement_text", "reviewer_rubric", "planned_units"}
+UNIT_PLAN_FIELDS = frozenset({"id", "kind", "parent", "consumes_parent_paths",
+                              "paths", "prerequisites", "purpose"})
 
 
 class Refused(Exception):
@@ -77,19 +95,27 @@ def key(value: Any) -> str:
     return json.dumps(value, sort_keys=True)
 
 
-def check_units(arm: dict[str, Any], label: str) -> None:
-    """Structural rules a delivery record must satisfy to be measurable."""
-    units = arm.get("review_units")
+def check_units(arm: dict[str, Any], label: str, *,
+                field: str = "review_units", require_merged: bool = True) -> None:
+    """Structural rules a delivery record must satisfy to be measurable.
+
+    The same rules describe a branch graph that has been executed and one that
+    has only been planned, so `field` selects which the arm declares. Only the
+    merged-prerequisite rule differs: nothing is merged in a plan yet, and
+    demanding it there would make every honest pre-registration unwritable.
+    """
+    noun = "planned unit" if field == "planned_units" else "review unit"
+    units = arm.get(field)
     if not isinstance(units, list) or not units:
-        raise Refused(f"{label} declares no review units")
+        raise Refused(f"{label} declares no {noun}s")
 
     seen_ids: set[str] = set()
     for unit in units:
         unit_id = unit.get("id")
         if not unit_id:
-            raise Refused(f"{label}: a review unit has no id")
+            raise Refused(f"{label}: a {noun} has no id")
         if unit_id in seen_ids:
-            raise Refused(f"{label}: review unit {unit_id!r} is declared twice")
+            raise Refused(f"{label}: {noun} {unit_id!r} is declared twice")
         seen_ids.add(unit_id)
 
         parent = unit.get("parent")
@@ -146,7 +172,7 @@ def check_units(arm: dict[str, Any], label: str) -> None:
                     f"{label}: convergence unit {unit['id']!r} requires {required!r}, "
                     f"which is not a unit of this arm"
                 )
-            if not source.get("merged"):
+            if require_merged and not source.get("merged"):
                 raise Refused(
                     f"{label}: convergence unit {unit['id']!r} exists while "
                     f"prerequisite {required!r} is unmerged"
@@ -187,13 +213,15 @@ def measure(arm: dict[str, Any], label: str) -> dict[str, Any]:
     }
 
 
-def check_pairing(experiment: dict[str, Any]) -> None:
-    if experiment.get("schema_version") != EXPERIMENT_SCHEMA:
-        raise Refused(f"schema_version is not {EXPERIMENT_SCHEMA}")
-    arms = experiment.get("arms")
+def check_two_arms(body: dict[str, Any]) -> dict[str, Any]:
+    arms = body.get("arms")
     if not isinstance(arms, dict) or set(arms) != {"A", "B"}:
         raise Refused("an experiment has exactly two arms, A and B")
+    return arms
 
+
+def check_controlled(arms: dict[str, Any]) -> None:
+    """Every field that must be held identical, and actually declared."""
     for field in CONTROLLED_FIELDS:
         values = {name: key(arm.get(field)) for name, arm in arms.items()}
         if len(set(values.values())) != 1:
@@ -203,6 +231,18 @@ def check_pairing(experiment: dict[str, Any]) -> None:
             )
         if arms["A"].get(field) in (None, "", [], {}):
             raise Refused(f"{field} is undeclared, so it cannot be shown identical")
+
+
+def check_shapes(arms: dict[str, Any]) -> None:
+    if arms["A"].get("shape") != "monolithic" or arms["B"].get("shape") != "contract_first_stack":
+        raise Refused("arm A must be monolithic and arm B a contract-first stack")
+
+
+def check_pairing(experiment: dict[str, Any]) -> None:
+    if experiment.get("schema_version") != EXPERIMENT_SCHEMA:
+        raise Refused(f"schema_version is not {EXPERIMENT_SCHEMA}")
+    arms = check_two_arms(experiment)
+    check_controlled(arms)
 
     for name, arm in arms.items():
         observed = arm.get("observed_budget")
@@ -219,8 +259,93 @@ def check_pairing(experiment: dict[str, Any]) -> None:
                     f"attempts is not a better method"
                 )
 
-    if arms["A"].get("shape") != "monolithic" or arms["B"].get("shape") != "contract_first_stack":
-        raise Refused("arm A must be monolithic and arm B a contract-first stack")
+    check_shapes(arms)
+
+
+def digest(text: str) -> str:
+    return "sha256:" + hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+def check_plan(pair: dict[str, Any]) -> dict[str, Any]:
+    """Validate a task pair registered before either arm runs.
+
+    Two arms only answer the branch-graph question if the requirement, target,
+    evaluator, carrier, base commit, rubric and budget were fixed before anyone
+    saw a result. Fixing them afterwards is indistinguishable, in the file, from
+    fixing them before — so they are fixed here, in a document whose defining
+    property is that it contains no outcome at all.
+    """
+    if pair.get("schema_version") != TASK_PAIR_SCHEMA:
+        raise Refused(f"schema_version is not {TASK_PAIR_SCHEMA}")
+    unknown = sorted(set(pair) - PAIR_FIELDS)
+    if unknown:
+        raise Refused(
+            f"a task pair carries no outcome, and these are not plan fields: "
+            f"{', '.join(unknown)}"
+        )
+    if pair.get("execution_state") != "NOT_EXERCISED":
+        raise Refused(
+            "execution_state must be NOT_EXERCISED; a pair that has run is a "
+            "record, and records go through `compare`"
+        )
+
+    arms = check_two_arms(pair)
+    check_controlled(arms)
+    check_shapes(arms)
+
+    for name, arm in arms.items():
+        label = f"arm {name}"
+        stray = sorted(set(arm) - ARM_PLAN_FIELDS)
+        if stray:
+            raise Refused(
+                f"{label} declares outcome-bearing field(s) before running: "
+                f"{', '.join(stray)}"
+            )
+        # The controlled digests are the pre-registration's only falsifiable
+        # part: without the text beside them, "identical requirement" is a claim
+        # about two hex strings nobody can check.
+        for text_field, digest_field in (("requirement_text", "requirement_digest"),
+                                         ("reviewer_rubric", "reviewer_rubric_digest")):
+            text = arm.get(text_field)
+            if not isinstance(text, str) or not text.strip():
+                raise Refused(f"{label} declares no {text_field}")
+            if arm[digest_field] != digest(text):
+                raise Refused(
+                    f"{label}: {digest_field} does not digest its own "
+                    f"{text_field}, so the field it controls is unverifiable"
+                )
+        check_units(arm, label, field="planned_units", require_merged=False)
+        for unit in arm["planned_units"]:
+            leaked = sorted(set(unit) - UNIT_PLAN_FIELDS)
+            if leaked:
+                raise Refused(
+                    f"{label}: planned unit {unit['id']!r} declares measured "
+                    f"field(s) {', '.join(leaked)}; nothing has been measured yet"
+                )
+
+    # Two arms of one task end at the same tree. If B plans to touch files A
+    # does not, the arms are not the same work cut two ways, and the comparison
+    # would be reading a scope difference as a shape difference.
+    paths = {name: {p for u in arm["planned_units"] for p in (u.get("paths") or [])}
+             for name, arm in arms.items()}
+    if paths["A"] != paths["B"]:
+        raise Refused(
+            "the arms plan different files: "
+            f"A-only {sorted(paths['A'] - paths['B']) or '[]'}, "
+            f"B-only {sorted(paths['B'] - paths['A']) or '[]'}; two arms of one "
+            f"task must deliver the same tree"
+        )
+
+    return {
+        "schema_version": "delivery-shape-task-pair-receipt/v1",
+        "pair_id": pair.get("pair_id"),
+        "execution_state": "NOT_EXERCISED",
+        "planned_units": {name: len(arm["planned_units"]) for name, arm in arms.items()},
+        "planned_paths": len(paths["A"]),
+        "comparative_claim": "NONE — neither arm has run, so there is no outcome",
+        "canonical_default_unlock": "BLOCKED",
+        "status": "PRE_REGISTERED",
+    }
 
 
 def compare(experiment: dict[str, Any]) -> dict[str, Any]:
@@ -322,7 +447,7 @@ def _selftest() -> int:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("mode", choices=("measure", "compare", "selftest"))
+    parser.add_argument("mode", choices=("measure", "compare", "plan", "selftest"))
     parser.add_argument("subject", type=Path, nargs="?")
     parser.add_argument("--receipt", type=Path)
     args = parser.parse_args()
@@ -342,6 +467,8 @@ def main() -> int:
                       "shape": body.get("shape"),
                       "measured": measure(body, "arm"),
                       "comparative_claim": "NONE — a single arm has nothing to be better than"}
+        elif args.mode == "plan":
+            result = check_plan(body)
         else:
             result = compare(body)
     except Unusable as error:

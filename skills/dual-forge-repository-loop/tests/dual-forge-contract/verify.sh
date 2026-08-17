@@ -11,6 +11,17 @@ forgejo_delivery_capture="${skill_dir}/scripts/capture_forgejo_delivery.py"
 good="${test_dir}/fixtures/good.json"
 tmp="$(mktemp -d)"
 trap 'rm -rf "${tmp}"' EXIT
+
+# The capture producers run a real `gh --version` identity check. Under a
+# scrubbed environment (PATH only, no HOME), gh falls back to writing its
+# device-id state under the current directory as .local/state/gh/device-id,
+# dirtying the worktree that verification promises to leave byte-identical.
+# Pin the XDG surfaces into tmp. HOME itself is left alone: overriding it
+# breaks the macOS git xcrun-shim cache and poisons git output parsing.
+export XDG_STATE_HOME="${tmp}/xdg/state"
+export XDG_CONFIG_HOME="${tmp}/xdg/config"
+export XDG_DATA_HOME="${tmp}/xdg/data"
+mkdir -p "${XDG_STATE_HOME}"
 cp -R "${test_dir}/fixtures/proof" "${tmp}/proof"
 
 python3 "${checker}" "${good}" >/dev/null || { echo 'good fixture rejected' >&2; exit 1; }

@@ -12,8 +12,18 @@
       "expected": "PASS"
     },
     {
+      "id": "adoption-ledger-positive",
+      "subject": "references/skill-adoption-ledger.json",
+      "expected": "PASS"
+    },
+    {
       "id": "mutation-controls",
       "subject": "tests/selftest.py",
+      "expected": "PASS_WITH_ALL_MUTATIONS_REFUSED"
+    },
+    {
+      "id": "adoption-mutation-controls",
+      "subject": "tests/adoption_selftest.py",
       "expected": "PASS_WITH_ALL_MUTATIONS_REFUSED"
     }
   ]

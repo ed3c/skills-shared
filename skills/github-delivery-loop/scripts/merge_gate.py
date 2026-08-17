@@ -203,14 +203,17 @@ def fetch_snapshot(
             "api",
             f"repos/{repository}",
             "--jq",
-            "{full_name:.full_name,node_id:.node_id,owner:{login:.owner.login,id:.owner.id,type:.owner.type},permissions:.permissions}",
+            "{full_name:.full_name,node_id:.node_id,owner:{login:.owner.login,id:.owner.id,type:.owner.type},permissions:.permissions,default_branch:.default_branch}",
         ],
         {},
     )
     if not repo.get("owner", {}).get("login"):
         raise GateError(f"could not read the owner of {repository}")
     viewer = _gh_json(["api", "user", "--jq", "{login:.login,id:.id,type:.type}"], {})
-    fields = "id,number,url,title,state,isDraft,headRefOid,mergeable,mergeStateStatus"
+    fields = (
+        "id,number,url,title,state,isDraft,headRefOid,mergeable,mergeStateStatus,"
+        "baseRefName"
+    )
     if pull_number is not None:
         pull = _gh_json(
             [
@@ -289,6 +292,7 @@ def fetch_snapshot(
         "owner": repo["owner"],
         "viewer": viewer,
         "permissions": repo.get("permissions", {}),
+        "default_branch": repo.get("default_branch"),
         "pulls": pulls,
     }
 
@@ -664,6 +668,35 @@ def check_github(pull: dict[str, Any], allow_unstable: bool) -> str | None:
     return None
 
 
+def check_base_branch(pull: dict[str, Any], default_branch: Any) -> str | None:
+    """Refuse a PR whose base is not the repository's default branch.
+
+    GitHub only retargets a stacked child's base onto the default branch after
+    its parent's head branch is deleted post-merge. A PR merged into a parent
+    branch instead reads back as state=MERGED with a real mergedAt timestamp --
+    exactly like a real landing -- unless the base is checked here, before the
+    merge is submitted. Missing/malformed data is unevaluable, not a silent
+    pass: a landing decision must never be made on data that cannot be read.
+    """
+    if not isinstance(default_branch, str) or not default_branch:
+        raise UnevaluableError(
+            f"snapshot lacks a readable default_branch; got {default_branch!r}"
+        )
+    base = pull.get("baseRefName")
+    if not isinstance(base, str) or not base:
+        raise UnevaluableError(
+            f"PR #{pull.get('number')} malformed baseRefName; "
+            "expected a non-empty string"
+        )
+    if base != default_branch:
+        return (
+            f"baseRefName={base!r} != default branch {default_branch!r} -- land "
+            "the stack bottom-up and delete each head branch after merge so "
+            "GitHub retargets the next child onto the default branch"
+        )
+    return None
+
+
 def pending_merge_reason(pull: dict[str, Any]) -> str | None:
     """Describe an exact PR request GitHub already owns across invocations."""
     queue = pull.get("merge_queue_entry")
@@ -926,7 +959,11 @@ def preflight(
         admit_reason = owner_reason
         if policy is None:
             admit_reason = check_admit(pull, owner_login(snapshot))
-        reason = admit_reason or check_github(pull, allow_unstable and policy is None)
+        reason = (
+            admit_reason
+            or check_github(pull, allow_unstable and policy is None)
+            or check_base_branch(pull, snapshot.get("default_branch"))
+        )
         layer = (
             "L1 OWNER-IDENTITY"
             if policy is not None and admit_reason
@@ -1050,6 +1087,15 @@ def land(
                     file=sys.stderr,
                 )
                 return 1
+            base_reason = check_base_branch(candidate, snapshot.get("default_branch"))
+            if base_reason:
+                print(
+                    f"BLOCK #{candidate['number']} "
+                    f"{str(candidate.get('headRefOid', ''))[:7]} "
+                    f"[L3 GITHUB] {base_reason}",
+                    file=sys.stderr,
+                )
+                return 1
             pending_reason = pending_merge_reason(candidate)
             if pending_reason:
                 print(
@@ -1099,7 +1145,7 @@ def land(
                 "--repo",
                 repository,
                 "--json",
-                "state,mergedAt,headRefOid,url",
+                "state,mergedAt,headRefOid,url,baseRefName",
             ],
             {},
         )
@@ -1124,6 +1170,25 @@ def land(
             print(
                 f"FAIL #{pull['number']}: command succeeded but readback state="
                 f"{readback.get('state')!r}, mergedAt={readback.get('mergedAt')!r}",
+                file=sys.stderr,
+            )
+            print(f"LANDED={landed} before the failure.", file=sys.stderr)
+            return 1
+        # MERGED+mergedAt alone cannot distinguish a real landing from a squash
+        # into a stacked parent branch that was never retargeted to the
+        # default branch -- both read back identically otherwise (#335).
+        landed_base = readback.get("baseRefName")
+        if not isinstance(landed_base, str) or not landed_base:
+            raise UnevaluableError(
+                f"PR #{pull['number']} merge readback lacks a readable "
+                f"baseRefName; got {landed_base!r}"
+            )
+        if landed_base != snapshot.get("default_branch"):
+            print(
+                f"FAIL #{pull['number']}: merged but landed on {landed_base!r}, "
+                f"not the default branch {snapshot.get('default_branch')!r} -- "
+                "the merge commit reads back as MERGED but is not on the "
+                "default branch",
                 file=sys.stderr,
             )
             print(f"LANDED={landed} before the failure.", file=sys.stderr)

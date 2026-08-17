@@ -87,6 +87,35 @@
         "a passing corpus is admissible to run, never evidence that anything ran"
       ],
       "expected": "the committed corpus of three public repositories covering all eleven families is admitted with zero network access; 12 planted separation, variation, family-coverage and sealing defects are refused; schema-level refusals stay distinct from semantic ones and absent input from both"
+    },
+    {
+      "id": "RCA-CANARY-1",
+      "checker_script": "scripts/check_canary_receipt.py",
+      "test_verify": "tests/test_canary_receipt.py",
+      "good_fixture": null,
+      "good_evidence": "a complete canary-receipt/v1 object synthesized inside tests/test_canary_receipt.py, binding consumer subject, audit digests, model/harness/runtime/toolset identities, non-producer evaluator, authorizations, probes, rollback subject and run window, admitted by scripts/check_canary_receipt.py while each of the 10 planted mutations of the same object is refused for its own reason",
+      "hollow_fixture": null,
+      "hollow_mutations": "a stale receipt reused after its subject moved without revalidation, an external-service outage recorded as a repository defect, a missing credential recorded as a policy denial and the reverse, a partial artifact publication accepted as complete, a first-green result with the production-like gate skipped, a rollback target equal to the candidate, a consumer-local module shadowing canonical Skill content, private data routed to a provider not approved for it, a producer-owned evaluator, and a missing required field",
+      "covers": [
+        "#235's 8 required controls are each refused for their own distinct reason, never folded into a single generic failure",
+        "a schema-invalid receipt (missing field, producer-owned evaluator) exits distinctly from a structurally valid one that violates a control",
+        "absent input stays distinct from both"
+      ],
+      "expected": "a receipt binding all of #235's required canary-scope fields (consumer subject, audit digests, model/harness/runtime/toolset identities, evaluator and task digests, credential and data-egress authorization, network/filesystem/side-effect policy, positive and falsifying probes, rollback/cleanup subject, run window and expiry, and the longitudinal revalidation-trigger identities) is admitted; 10 planted control and schema defects are refused. There is no committed good_fixture because no live canary has run -- evals/live-evidence-state.json's 235_production_like lane stays NOT_EXERCISED; this entry proves the receipt contract a live canary will be validated against, not that one ran."
+    },
+    {
+      "id": "RCA-ABLATION-TREATMENT-1",
+      "checker_script": "scripts/generate_ablation_treatment.py",
+      "test_verify": "tests/test_ablation_treatment_generator.py",
+      "good_fixture": "SKILL.md",
+      "hollow_fixture": null,
+      "hollow_mutations": "a rule heading missing from the source, a duplicate rule heading, an absent skill file",
+      "covers": [
+        "every candidate_minus_RCA-0XX.md differs from SKILL.md only by its own named rule's heading and body -- every other line, including every other rule's heading, survives untouched",
+        "all 13 retained rules produce a treatment file, never a partial set",
+        "a missing or duplicate rule heading fails closed instead of silently emitting a wrong or incomplete file"
+      ],
+      "expected": "13 candidate_minus_RCA-0XX.md files are generated from the committed SKILL.md, each byte-identical to it outside the named rule's own section; a missing, duplicate, or unreadable rule heading exits 64. This only produces the treatment files #230's live ablation would consume -- it does not run an Agent, and evals/live-evidence-state.json's 230_rule_ablation lane and every RCA-0XX rule's live_state stay NOT_EXERCISED."
     }
   ],
   "evidence_boundary": {
@@ -96,15 +125,17 @@
       "thirteen live cells on claude-code/opus across three arms on psf/requests, recorded in evals/matrix-slice1-result.json",
       "that 8 of 14 measured metrics are saturated on this corpus, so most of the harness's quality metrics cannot carry a treatment signal here",
       "a GitHub-hosted runner executed this suite at an exact head (run 31901626597, job 95053186610); the replayable artifact lane for this skill is wired in .github/workflows/skill-suites.yml and its receipt is recorded on #222",
-      "an overlap-aware Layer A contribution report derived from the contract rather than maintained by hand, with four denominators kept apart and per-source bounds instead of shares"
+      "an overlap-aware Layer A contribution report derived from the contract rather than maintained by hand, with four denominators kept apart and per-source bounds instead of shares",
+      "a deterministic canary-receipt/v1 schema and checker (#235) that an authorized production-like canary's receipt must validate against before it counts toward the required three-canary/two-window acceptance state",
+      "a deterministic leave-one-rule-out treatment generator (#230) that emits the 13 candidate_minus_RCA-0XX.md files a live ablation cell would consume, verified byte-identical to SKILL.md outside the named rule's own section"
     ],
     "not_established": [
       "held-out uplift, cross-model generalization, or production correctness",
       "any uplift from the trimmed Skill. On false_pass_rate -- the only quality metric that varied within arms -- the trimmed candidate ranked worst of three arms, behind supplying no Skill at all, while costing more than either. That result is underpowered at n=4-5 and is not itself a finding of harm; it is recorded because it is the opposite of the effect this Skill was trimmed to produce.",
       "cross-model anything: slice 1 ran one host. codex-cli has never been run on this corpus.",
       "the five-arm decomposition #219 asks for; its design is frozen in evals/uplift-preregistration.json and has not been executed",
-      "any live per-rule contribution: RCA-001..013 each carry a Layer B state of NOT_EXERCISED in evals/live-evidence-state.json, because no candidate_minus_RCA-### arm has run on any host",
-      "production-like or longitudinal behaviour: zero consumer canaries in zero observation windows (#235)"
+      "any live per-rule contribution: RCA-001..013 each carry a Layer B state of NOT_EXERCISED in evals/live-evidence-state.json, because no candidate_minus_RCA-### arm has run on any host -- generating the treatment files (#230) is not running them",
+      "production-like or longitudinal behaviour: zero consumer canaries in zero observation windows (#235) -- the canary-receipt contract validates a receipt's shape, it does not run a canary"
     ]
   }
 }

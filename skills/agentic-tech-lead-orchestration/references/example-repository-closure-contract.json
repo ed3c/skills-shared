@@ -1,0 +1,75 @@
+{
+  "schema_version": "agentic-tech-lead/repository-closure-contract/v1",
+  "subject": {
+    "repository": "example/consumer",
+    "commit": "1111111111111111111111111111111111111111",
+    "tree": "2222222222222222222222222222222222222222"
+  },
+  "tree_inventory": [
+    {
+      "path": "packages/contract/",
+      "exists": true,
+      "documented_status": "IMPLEMENTED",
+      "nearest_readme": "packages/contract/README.md"
+    },
+    {
+      "path": "packages/core/",
+      "exists": true,
+      "documented_status": "PARTIAL_CONTRACT",
+      "nearest_readme": "packages/core/README.md"
+    },
+    {
+      "path": "packages/provider-adapter/",
+      "exists": false,
+      "documented_status": "PLANNED",
+      "nearest_readme": null
+    }
+  ],
+  "closure_matrix": [
+    {
+      "id": "RP-01",
+      "real_problem": "the deterministic core refuses a malformed request instead of guessing",
+      "closure_state": "IMPLEMENTED_DRAFT",
+      "human_admit_required": false,
+      "evidence": {
+        "kind": "DETERMINISTIC_RUN_OBSERVED",
+        "required_lane": "LOCAL",
+        "receipt": {
+          "lane": "LOCAL",
+          "subject_commit": "1111111111111111111111111111111111111111",
+          "runtime_state": "PASS"
+        }
+      }
+    },
+    {
+      "id": "RP-02",
+      "real_problem": "the published pipeline runs on the exact reviewed subject",
+      "closure_state": "INTEGRATION_ADMISSION_OPEN",
+      "human_admit_required": true,
+      "evidence": {
+        "kind": "SYNTHETIC_ANALOG_ONLY",
+        "required_lane": "CLOUD",
+        "receipt": {
+          "lane": "CLOUD",
+          "subject_commit": "1111111111111111111111111111111111111111",
+          "runtime_state": "NOT_EXERCISED"
+        }
+      }
+    },
+    {
+      "id": "RP-03",
+      "real_problem": "the live substrate serves real traffic without silent data loss",
+      "closure_state": "BLOCKED_LIVE_SUBSTRATE",
+      "human_admit_required": true,
+      "evidence": {
+        "kind": "SOURCE_REPORTED",
+        "required_lane": "PRODUCTION",
+        "receipt": {
+          "lane": "PRODUCTION",
+          "subject_commit": "1111111111111111111111111111111111111111",
+          "runtime_state": "NOT_EXERCISED"
+        }
+      }
+    }
+  ]
+}

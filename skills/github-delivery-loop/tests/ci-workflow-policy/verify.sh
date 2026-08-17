@@ -16,24 +16,27 @@ checker="${skill_dir}/scripts/ci_workflow_policy.py"
 work="$(mktemp -d)"
 trap 'rm -rf "${work}"' EXIT
 
-# 1. positive, against this repository's own policy and workflow rather than a
-#    synthetic pair. The seal is only worth anything where it is load-bearing.
-python3 "${checker}" check --repo-root "${repo_root}" > "${work}/good.out"
-grep -q "^ALLOW workflow-policy" "${work}/good.out"
-grep -q "repository=ed3c/skills-shared" "${work}/good.out"
-
-# 2. negatives. Each mutates one field of a copy of the real policy, so a
-#    refusal is about the rule it names rather than about a fixture that was
-#    already malformed.
+# 1. assemble an enrolled repository from fixture bytes. The host repository
+#    retired its own enrollment when it went public, so the retired policy and
+#    verification contract live on here as fixtures/enrolled/ — the archived
+#    enrollment bytes — paired with the real sealed workflow still on disk.
 mkdir -p "${work}/repo/.github/workflows" "${work}/repo/.github-delivery"
-cp "${repo_root}/.github-delivery/ci-policy.json" "${work}/repo/.github-delivery/ci-policy.json"
-cp "${repo_root}/.github-delivery/local-verification-contract.json" \
+cp "${test_dir}/fixtures/enrolled/ci-policy.json" "${work}/repo/.github-delivery/ci-policy.json"
+cp "${test_dir}/fixtures/enrolled/local-verification-contract.json" \
    "${work}/repo/.github-delivery/local-verification-contract.json"
 cp "${repo_root}/.github/workflows/skill-eval-contract.yml" \
    "${work}/repo/.github/workflows/skill-eval-contract.yml"
 cp "${test_dir}/fixtures/auxiliary.yml" \
    "${work}/repo/.github/workflows/auxiliary.yml"
-python3 "${checker}" check --repo-root "${work}/repo" | grep -q "^ALLOW"
+
+# positive: the assembled enrolled repository is admitted.
+python3 "${checker}" check --repo-root "${work}/repo" > "${work}/good.out"
+grep -q "^ALLOW workflow-policy" "${work}/good.out"
+grep -q "repository=ed3c/skills-shared" "${work}/good.out"
+
+# 2. negatives. Each mutates one field of a copy of the fixture policy, so a
+#    refusal is about the rule it names rather than about a fixture that was
+#    already malformed.
 
 refuse() {
   local label=$1 fragment=$2

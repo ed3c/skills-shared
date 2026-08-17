@@ -1,0 +1,243 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skills-shared.invalid/canary-receipt/v1",
+  "title": "Production-like Consumer Canary Receipt",
+  "description": "One authorized production-like canary run against a real (or disposable-replica) consumer repository, binding the exact subjects #235 requires before a capability verdict may be treated as production-like or longitudinal evidence. A receipt that validates against this schema and its semantic checks is admissible evidence for one canary in one observation window; it is not by itself the required three-canary, two-window acceptance state, which evals/live-evidence-state.json's 235_production_like lane tracks separately.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "canary_id",
+    "consumer",
+    "audit_subject",
+    "identities",
+    "evaluator",
+    "task_digest",
+    "credential_authorization",
+    "policy",
+    "probes",
+    "rollback",
+    "publication",
+    "gate_state",
+    "module_shadowing",
+    "service_status",
+    "staleness",
+    "revalidation_triggers",
+    "run_window"
+  ],
+  "properties": {
+    "schema": {"const": "canary-receipt/v1"},
+    "canary_id": {"type": "string", "minLength": 1},
+    "consumer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository_id", "commit_sha", "tree_sha", "authorization_state"],
+      "properties": {
+        "repository_id": {"type": "string", "minLength": 3},
+        "commit_sha": {"$ref": "#/$defs/git_sha"},
+        "tree_sha": {"$ref": "#/$defs/git_sha"},
+        "authorization_state": {"enum": ["PUBLIC", "PRIVATE_AUTHORIZED", "DISPOSABLE_REPLICA"]}
+      }
+    },
+    "audit_subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["skill_digest", "module_digests"],
+      "properties": {
+        "skill_digest": {"$ref": "#/$defs/sha256"},
+        "module_digests": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {"$ref": "#/$defs/sha256"}
+        }
+      }
+    },
+    "identities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "model_provider", "model_family", "model_version",
+        "agent_harness", "agent_harness_version",
+        "runtime_identity", "runtime_version", "toolset_digest"
+      ],
+      "properties": {
+        "model_provider": {"type": "string", "minLength": 1},
+        "model_family": {"type": "string", "minLength": 1},
+        "model_version": {"type": "string", "minLength": 1},
+        "agent_harness": {"type": "string", "minLength": 1},
+        "agent_harness_version": {"type": "string", "minLength": 1},
+        "runtime_identity": {"type": "string", "minLength": 1},
+        "runtime_version": {"type": "string", "minLength": 1},
+        "toolset_digest": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "evaluator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evaluator_id", "version", "digest", "owner"],
+      "properties": {
+        "evaluator_id": {"type": "string", "minLength": 1},
+        "version": {"type": "string", "minLength": 1},
+        "digest": {"$ref": "#/$defs/sha256"},
+        "owner": {
+          "comment": "PRODUCER is absent on purpose, matching RCA-005/held-out-corpus.schema.json's evaluator.owner: the audited Agent cannot certify its own canary.",
+          "enum": ["INDEPENDENT_DETERMINISTIC", "INDEPENDENT_HUMAN", "INDEPENDENT_EXTERNAL_JUDGE"]
+        }
+      }
+    },
+    "task_digest": {"$ref": "#/$defs/sha256"},
+    "credential_authorization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "credentials_granted", "credential_present", "denial_reason",
+        "data_egress_approved", "private_data_present", "data_egress_provider_approved"
+      ],
+      "properties": {
+        "credentials_granted": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "credential_present": {"type": "boolean"},
+        "denial_reason": {
+          "comment": "null means no credential was denied. A receipt that reports a denial must say which of the two distinct causes it was; #235 requires them kept apart.",
+          "enum": [null, "POLICY_DENIED", "CREDENTIAL_MISSING"]
+        },
+        "data_egress_approved": {"type": "boolean"},
+        "private_data_present": {"type": "boolean"},
+        "data_egress_provider_approved": {
+          "comment": "Whether the provider that data actually left to is an approved provider. Meaningless when private_data_present is false, but still typed boolean so the schema does not have to special-case its absence.",
+          "type": "boolean"
+        }
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["network_policy", "filesystem_policy", "side_effect_policy"],
+      "properties": {
+        "network_policy": {"type": "string", "minLength": 1},
+        "filesystem_policy": {"type": "string", "minLength": 1},
+        "side_effect_policy": {"type": "string", "minLength": 1}
+      }
+    },
+    "probes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["positive", "falsifying"],
+      "properties": {
+        "positive": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/probe"}},
+        "falsifying": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/probe"}}
+      }
+    },
+    "rollback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rollback_subject_id", "rollback_subject_digest",
+        "candidate_subject_id", "candidate_subject_digest",
+        "cleanup_verified", "cleanup_evidence"
+      ],
+      "properties": {
+        "rollback_subject_id": {"type": "string", "minLength": 1},
+        "rollback_subject_digest": {"$ref": "#/$defs/sha256"},
+        "candidate_subject_id": {"type": "string", "minLength": 1},
+        "candidate_subject_digest": {"$ref": "#/$defs/sha256"},
+        "cleanup_verified": {"type": "boolean"},
+        "cleanup_evidence": {"type": "string", "minLength": 1}
+      }
+    },
+    "publication": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required_artifacts", "published_artifacts", "all_required_artifacts_published"],
+      "properties": {
+        "required_artifacts": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "published_artifacts": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "all_required_artifacts_published": {"type": "boolean"}
+      }
+    },
+    "gate_state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["is_first_green", "production_like_gate_executed"],
+      "properties": {
+        "is_first_green": {"type": "boolean"},
+        "production_like_gate_executed": {"type": "boolean"}
+      }
+    },
+    "module_shadowing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["consumer_local_module_present", "shadows_canonical_digest"],
+      "properties": {
+        "consumer_local_module_present": {"type": "boolean"},
+        "shadows_canonical_digest": {
+          "comment": "True only when a consumer-local module both exists and diverges from the canonical Skill digest it shadows. False when no consumer-local module is present.",
+          "type": "boolean"
+        }
+      }
+    },
+    "service_status": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["external_service_reachable"],
+      "properties": {
+        "external_service_reachable": {"type": "boolean"}
+      }
+    },
+    "staleness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["material_identity_changed_since_bound", "revalidated"],
+      "properties": {
+        "material_identity_changed_since_bound": {"type": "boolean"},
+        "revalidated": {"type": "boolean"}
+      }
+    },
+    "revalidation_triggers": {
+      "comment": "The material-identity fields #235's 'Longitudinal and drift lanes' section names. Each is bound so a later run can tell whether this receipt's subject has since moved.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "skill_or_module_digest", "model_provider_version_config",
+        "agent_harness_or_tool_surface", "runtime_image_or_workflow_version",
+        "evaluator_corpus_or_policy_digest", "repository_head_or_capability_claim",
+        "artifact_publication_path"
+      ],
+      "properties": {
+        "skill_or_module_digest": {"type": "string", "minLength": 1},
+        "model_provider_version_config": {"type": "string", "minLength": 1},
+        "agent_harness_or_tool_surface": {"type": "string", "minLength": 1},
+        "runtime_image_or_workflow_version": {"type": "string", "minLength": 1},
+        "evaluator_corpus_or_policy_digest": {"type": "string", "minLength": 1},
+        "repository_head_or_capability_claim": {"type": "string", "minLength": 1},
+        "artifact_publication_path": {"type": "string", "minLength": 1}
+      }
+    },
+    "run_window": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["started_at", "ended_at", "expiry_at"],
+      "properties": {
+        "started_at": {"type": "string", "minLength": 1},
+        "ended_at": {"type": "string", "minLength": 1},
+        "expiry_at": {"type": "string", "minLength": 1}
+      }
+    }
+  },
+  "$defs": {
+    "git_sha": {"type": "string", "pattern": "^[0-9a-f]{40}([0-9a-f]{24})?$"},
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "probe": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["probe_id", "attempted", "outcome"],
+      "properties": {
+        "probe_id": {"type": "string", "minLength": 1},
+        "attempted": {"type": "boolean"},
+        "outcome": {
+          "comment": "FAIL_REPOSITORY_DEFECT and BLOCKED_EXTERNAL_SERVICE_UNAVAILABLE are distinct on purpose: #235 requires an unreachable external service never be recorded as a repository defect, or the reverse.",
+          "enum": ["PASS", "FAIL_REPOSITORY_DEFECT", "BLOCKED_EXTERNAL_SERVICE_UNAVAILABLE"]
+        }
+      }
+    }
+  }
+}
