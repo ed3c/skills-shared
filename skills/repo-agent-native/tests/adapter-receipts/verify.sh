@@ -41,4 +41,38 @@ set -e
 test "${status}" -eq 2 || { echo "empty directory was not refused (exit ${status})" >&2; exit 1; }
 echo "REFUSED empty-receipt-directory"
 
+# #231's live scheduler receipt binds as a CROSS-SUBJECT reference: it is real
+# evidence, but of a disposable canary repository, not of the tree these
+# adapter lanes describe. The binding is only honest while the two subjects
+# stay different, so plant the collapse and require it to go red.
+scheduler="$(realpath "${skill_dir}/../dual-forge-repository-loop/evals/receipts/scheduler-run.receipt.json")"
+test -f "${scheduler}" || { echo "MISSING SCHEDULER RECEIPT ${scheduler}" >&2; exit 1; }
+python3 "${checker}" check --receipts "${receipts}" --bind-scheduler "${scheduler}" \
+  | grep -q '^CROSS_SUBJECT_BINDING ' \
+  || { echo "scheduler binding did not report CROSS_SUBJECT_BINDING" >&2; exit 1; }
+
+collapsed="$(mktemp)"
+trap 'rm -rf "${empty}" "${collapsed}"' EXIT
+python3 -c 'import json, sys
+body = json.loads(open(sys.argv[1], encoding="utf-8").read())
+adapter = json.loads(open(sys.argv[2], encoding="utf-8").read())["subject"]["commit_sha"]
+body["subject"]["initial_sha"] = adapter
+body["subject"]["final_sha"] = adapter
+open(sys.argv[3], "w", encoding="utf-8").write(json.dumps(body))
+' "${scheduler}" "${receipts}/worktree.receipt.json" "${collapsed}"
+# Exit 2 alone is not enough: any refusal would produce it, including one about
+# the mutated file's shape rather than about the collapse. Require the code.
+set +e
+refusal="$(python3 "${checker}" check --receipts "${receipts}" \
+  --bind-scheduler "${collapsed}" 2>&1 >/dev/null)"
+status=$?
+set -e
+test "${status}" -eq 2 \
+  || { echo "collapsed cross-subject binding was not refused (exit ${status})" >&2; exit 1; }
+case "${refusal}" in
+  *"REFUSED SUBJECT_COLLAPSED"*) ;;
+  *) echo "collapsed binding was refused for the wrong reason: ${refusal}" >&2; exit 1 ;;
+esac
+echo "REFUSED scheduler-subject-collapsed-into-adapter-subject"
+
 echo "PASS adapter receipt contract"

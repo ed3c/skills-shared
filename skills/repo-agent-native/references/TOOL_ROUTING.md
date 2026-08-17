@@ -164,6 +164,12 @@ python3 skills/repo-agent-native/scripts/capture_adapter_receipt.py \
 # zero network, zero provider execution; runnable where no provider exists
 python3 skills/repo-agent-native/scripts/check_adapter_receipts.py check
 python3 skills/repo-agent-native/scripts/check_adapter_receipts.py selftest
+
+# bind another subject's receipt as a reference, never as a lane: this prints
+# CROSS_SUBJECT_BINDING only while the two subjects are different commits, and
+# refuses SUBJECT_COLLAPSED when they are the same
+python3 skills/repo-agent-native/scripts/check_adapter_receipts.py check \
+  --bind-scheduler skills/dual-forge-repository-loop/evals/receipts/scheduler-run.receipt.json
 ```
 
 Captured receipts live in [`../evals/receipts/`](../evals/receipts/), one file per
