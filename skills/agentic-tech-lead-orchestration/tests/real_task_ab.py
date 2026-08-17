@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import copy
 import json
+import subprocess
 import sys
 import tempfile
 from pathlib import Path
@@ -17,18 +18,29 @@ from real_task_fixture import (
 from real_task_runtime import run_arm
 
 
+def features(text: str) -> dict[str, Any]:
+    lower = text.casefold()
+    return {"treatment_blob": blob(text), "task_gate": "scripts/assert_task_contract.py" in text,
+            "capability_gate": "scripts/assert_capability_dag.py" in text,
+            "t0_t10": ("T0 ROUTE" in text and "T10 HANDOFF" in text) or "t0-t10-causal-map.json" in text,
+            "portable_core": "PORTABLE_CORE_START" in text,
+            "global_objective": "global objective" in lower or "global-objective" in lower,
+            "closure_laws": "closure lanes do not substitute" in lower and "completion-readiness" in lower}
+
+
 def treatment_metadata() -> dict[str, dict[str, Any]]:
+    """Every historical arm is a frozen fixture; the newest arm is the live body.
+
+    A treatment therefore has exactly one immutable subject. When the live body
+    changes again, freeze it as the next fixture instead of letting the previous
+    arm's identity drift with it.
+    """
     out: dict[str, dict[str, Any]] = {}
     for name, (relative, expected) in HISTORICAL.items():
         text = (ROOT / relative).read_text(); observed = blob(text)
         if observed != expected: raise CanaryError(f"frozen treatment drift {name}")
-        out[name] = {"treatment_blob": observed, "task_gate": "scripts/assert_task_contract.py" in text,
-                     "capability_gate": "scripts/assert_capability_dag.py" in text, "t0_t10": "T0 ROUTE" in text and "T10 HANDOFF" in text,
-                     "portable_core": "PORTABLE_CORE_START" in text, "global_objective": "global objective" in text.lower() or "global-objective" in text.lower()}
-    current = (ROOT / "SKILL.md").read_text(); out["B2_CAUSAL_DAG_REPAIRED"] = {"treatment_blob": blob(current),
-        "task_gate": "scripts/assert_task_contract.py" in current, "capability_gate": "scripts/assert_capability_dag.py" in current,
-        "t0_t10": "t0-t10-causal-map.json" in current, "portable_core": "PORTABLE_CORE_START" in current,
-        "global_objective": "global-objective" in current.lower()}
+        out[name] = features(text)
+    out["B3_CLOSURE_LAWS_BOUND"] = features((ROOT / "SKILL.md").read_text())
     return out
 
 
@@ -60,7 +72,12 @@ def capability_documents(base: str, tree: str) -> tuple[dict[str, Any], dict[str
     return plan, receipts
 
 
-def verify_b2(task: dict[str, Any], plan: dict[str, Any], receipts: dict[str, Any], temp: Path) -> dict[str, Any]:
+def verify_live_gates(task: dict[str, Any], plan: dict[str, Any], receipts: dict[str, Any], temp: Path) -> dict[str, Any]:
+    """Exercise the live gate scripts and their planted mutations.
+
+    These are the current repository's checkers, so the receipts belong to the
+    live arm, not to a frozen body that can no longer change them.
+    """
     temp.mkdir(); paths = {name: temp / f"{name}.json" for name in ("task", "plan", "receipts")}; dump(paths["task"], task); dump(paths["plan"], plan); dump(paths["receipts"], receipts)
     task_receipt = temp / "task-receipt.json"
     commands = {
@@ -69,7 +86,7 @@ def verify_b2(task: dict[str, Any], plan: dict[str, Any], receipts: dict[str, An
         "capability_causality": [sys.executable, str(ROOT / "scripts/assert_capability_dag.py"), "--contract", str(paths["task"]), "--plan", str(paths["plan"]), "--receipts", str(paths["receipts"]), "--admit-state", "CANDIDATES_COMPARED", "--fixture-mode"],
     }
     checks = {name: proc(cmd, cwd=ROOT, check=False).returncode == 0 for name, cmd in commands.items()}
-    if not all(checks.values()): raise CanaryError(f"B2 gate failed {checks}")
+    if not all(checks.values()): raise CanaryError(f"live gate failed {checks}")
     mutations: dict[str, tuple[dict[str, Any], list[str]]] = {}
     wrong_subject = copy.deepcopy(receipts); wrong_subject["receipts"][1]["subject"]["base_tree"] = "f" * 40
     wrong_module = copy.deepcopy(receipts); wrong_module["receipts"][1]["module_path"] = "modules/vector-store.md"
@@ -85,32 +102,33 @@ def verify_b2(task: dict[str, Any], plan: dict[str, Any], receipts: dict[str, An
         else: cmd = [sys.executable, str(ROOT / "scripts/assert_task_contract.py"), "--contract", str(path), "--receipt", str(temp / f"receipt-{name}.json")]
         planted[name] = proc(cmd, cwd=ROOT, check=False).returncode != 0
     live_cmd = commands["capability_causality"][:-1]; planted["fixture_cannot_promote_live"] = proc(live_cmd, cwd=ROOT, check=False).returncode != 0
-    if not all(planted.values()): raise CanaryError(f"B2 mutation survived {planted}")
+    if not all(planted.values()): raise CanaryError(f"live gate mutation survived {planted}")
     return {"checks": checks, "planted": planted}
 
 
 def compare() -> dict[str, Any]:
     metadata = treatment_metadata()
     with tempfile.TemporaryDirectory(prefix="tech-lead-real-task-") as raw:
-        temp = Path(raw); subject, base, tree = build_subject(temp); task = task_contract(base, tree, sha_file(subject / "contracts/checkout.py")); plan, receipts = capability_documents(base, tree); b2 = verify_b2(task, plan, receipts, temp / "b2")
+        temp = Path(raw); subject, base, tree = build_subject(temp); task = task_contract(base, tree, sha_file(subject / "contracts/checkout.py")); plan, receipts = capability_documents(base, tree); gates = verify_live_gates(task, plan, receipts, temp / "live-gates")
         results: dict[str, Any] = {}
-        for arm in ("A_OLD_MONOLITH", "B0_REFACTOR_AS_LANDED", "B1_REACHABILITY_REPAIRED", "B2_CAUSAL_DAG_REPAIRED"):
+        for arm in ("A_OLD_MONOLITH", "B0_REFACTOR_AS_LANDED", "B1_REACHABILITY_REPAIRED", "B2_CAUSAL_DAG_REPAIRED", "B3_CLOSURE_LAWS_BOUND"):
             meta = metadata[arm]
             if arm == "B0_REFACTOR_AS_LANDED" and not meta["task_gate"]:
                 results[arm] = {**meta, "execution_state": "BLOCKED_DISPATCH_ROUTE_ABSENT", "functional_output": "NOT_EXERCISED", "causal_closure": "FAIL"}; continue
             actual = run_arm(arm, subject, base, tree, temp, Path(__file__).resolve())
             closure = "PROCEDURAL_T0_T10_NO_CAPABILITY_RECEIPTS" if arm == "A_OLD_MONOLITH" else "REACHABLE_NOT_RECEIPT_GATED" if arm == "B1_REACHABILITY_REPAIRED" else "RECEIPT_GATED_FIXTURE_CLOSED"
-            results[arm] = {**meta, **actual, "execution_state": "PASS", "causal_closure": closure, "b2_gates": b2 if arm.startswith("B2_") else None}
+            results[arm] = {**meta, **actual, "execution_state": "PASS", "causal_closure": closure, "live_gates": gates if arm == "B3_CLOSURE_LAWS_BOUND" else None}
         executed = [row for row in results.values() if row.get("functional_output") == "PASS"]
         if len({row["content_digest"] for row in executed}) != 1: raise CanaryError("executed arms produced different bytes")
         if not results["A_OLD_MONOLITH"]["t0_t10"] or results["B1_REACHABILITY_REPAIRED"]["capability_gate"] or not results["B2_CAUSAL_DAG_REPAIRED"]["capability_gate"]: raise CanaryError("treatment identity/scoring drift")
+        if results["B2_CAUSAL_DAG_REPAIRED"]["closure_laws"] or not results["B3_CLOSURE_LAWS_BOUND"]["closure_laws"]: raise CanaryError("closure-law treatment identity drift")
         stages = {"contract_and_file_boundaries": "CLOSED_MECHANICALLY", "true_dag_worktrees_and_parallel_processes": "CLOSED_ON_SYNTHETIC_SUBJECT",
                   "checkpoint_retry_tournament_and_convergence": "CLOSED_ON_SYNTHETIC_SUBJECT", "global_objective_and_cleanup": "CLOSED_ON_SYNTHETIC_SUBJECT",
                   "grepai_scip_tree_sitter_serena_live_adapters": "NOT_EXERCISED", "git_town_restack_and_semantic_conflict": "NOT_EXERCISED",
                   "forgejo_github_publication": "NOT_EXERCISED", "matched_live_model_quality_cost_latency": "NOT_EXERCISED", "human_merge": "HUMAN_ADMIT_REQUIRED"}
         return {"schema": "agentic-tech-lead/real-task-ab/v1", "task": {"id": TASK_ID, "base_commit": base, "base_tree": tree, "same_base_tests_budgets_carrier": True},
                 "results": results, "output_equivalence_for_executed_arms": True, "b0_runtime_regression_exposed": True,
-                "b2_closure_dominates_without_model_claim": True, "pdf_closed_loop_stage_state": stages, "behavioral_model_uplift": "NOT_EXERCISED",
+                "b2_closure_dominates_without_model_claim": True, "b3_binds_closure_laws_without_model_claim": True, "pdf_closed_loop_stage_state": stages, "behavioral_model_uplift": "NOT_EXERCISED",
                 "live_provider_runtime": "NOT_EXERCISED", "git_town_forgejo_delivery": "NOT_EXERCISED", "merge_authority": False}
 
 
@@ -125,7 +143,7 @@ def main(argv: list[str] | None = None) -> int:
     except (CanaryError, OSError, subprocess.SubprocessError, KeyError, ValueError) as exc:
         print(f"TECH-LEAD-REAL-TASK-AB-RED {exc}", file=sys.stderr); return 2
     print(json.dumps(report, indent=2, sort_keys=True))
-    print("TECH-LEAD-REAL-TASK-AB-GREEN matched deterministic task closed; B0 route regression exposed; B2 receipt causality closed; live model/provider/Stack/Forgejo uplift NOT_EXERCISED")
+    print("TECH-LEAD-REAL-TASK-AB-GREEN matched deterministic task closed; B0 route regression exposed; B2 receipt causality closed; B3 closure laws bound in the live core; live model/provider/Stack/Forgejo uplift NOT_EXERCISED")
     return 0
 
 
