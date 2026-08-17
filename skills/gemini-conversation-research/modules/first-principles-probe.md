@@ -29,4 +29,4 @@
 - 顆粒度收窄（動作 1）有上限：鑽到「單一代數步」後再鑽即離題；收斂仍走 S0-ALT 4 輪 / S1.5 2 輪上限。
 
 ---
-> retarget 註：northstar 版錨 `path-b-semantic-reduction-engine.md` + `problem-graph/PG-001`（Same-Weights 自驗陷阱）。antigravity 對應物 = [`path-b-reduction`](../../path-b-reduction/SKILL.md) skill；PG-001「同權重自驗」紀律折成散文（動作 3 逼模型當證偽者而非附和者）。源：Gemini 對話 `7af1756ac3cb27e8`（Path B engine 的提問鏈本身就是活體示範）。
+> retarget 註：northstar 版錨 `path-b-semantic-reduction-engine.md` + `problem-graph/PG-001`（Same-Weights 自驗陷阱）。上游對應物 = [`path-b-reduction`](../../path-b-reduction/SKILL.md) skill；PG-001「同權重自驗」紀律折成散文（動作 3 逼模型當證偽者而非附和者）。源：Gemini 對話 `7af1756ac3cb27e8`（Path B engine 的提問鏈本身就是活體示範）。

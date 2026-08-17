@@ -38,7 +38,7 @@
 | family runtime must not cite `proposals/` | `ACTIVE_IN_SKILL` | `SKILL.md` G3/V3 + Gotchas; `reference/guiding-prompt.md` §0 | Illegal back-reference remains explicit。 |
 | `families/agent-harness` live anchor and metrics | `PRESERVED_IN_MODULE` | `reference/guiding-prompt.md` §2; `modules/retarget-map.md`; `SKILL.md` References | Main only points to worked instance; detail retained elsewhere。 |
 | eval harness design-only status | `PRESERVED_IN_MODULE` | `reference/guiding-prompt.md` §2 | Not a routing edge; kept in honesty ledger。 |
-| antigravity 2×2 host matrix removed | `LEGACY_ARCHIVED` + `PRESERVED_IN_MODULE` | `.skill-bindings/dr-to-mvp/legacy-skill-2026-07-22.md`; `modules/retarget-map.md`; `reference/guiding-prompt.md` §2 | Not applicable to Claude-Code-only repo, but original host wording remains recoverable。 |
+| upstream 2×2 host matrix removed | `LEGACY_ARCHIVED` + `PRESERVED_IN_MODULE` | `.skill-bindings/dr-to-mvp/legacy-skill-2026-07-22.md`; `modules/retarget-map.md`; `reference/guiding-prompt.md` §2 | Not applicable to Claude-Code-only repo, but original host wording remains recoverable。 |
 | live browser DR `:9333` occupancy | `CANONICAL_OWNER_WITH_LEGACY_COPY` + `ACTIVE_IN_SKILL` | `SKILL.md` Gotchas; `reference/guiding-prompt.md`; `modules/retarget-map.md`; legacy snapshot | Owner is `dr-research-loop`; main keeps conditional warning。 |
 | S0/S1 保真語料 intake | `PRESERVED_IN_MODULE` | `modules/domain-terms-and-intake.md` §3; `SKILL.md` M1 pointer | Recovered after initial state refactor。 |
 | post-cutoff 實體雙向警戒 | `PRESERVED_IN_MODULE` | `modules/domain-terms-and-intake.md` §3 | Recovered as Mode B intake discipline。 |
@@ -48,4 +48,4 @@
 
 ## Result
 
-No old load-bearing semantic unit is unaccounted for. Non-local antigravity history/path anchors and old trigger wording are not active route rules, but they are preserved verbatim in the legacy snapshot. Domain terms have a durable home and an output rule requiring first-use expansion.
+No old load-bearing semantic unit is unaccounted for. Non-local upstream history/path anchors and old trigger wording are not active route rules, but they are preserved verbatim in the legacy snapshot. Domain terms have a durable home and an output rule requiring first-use expansion.

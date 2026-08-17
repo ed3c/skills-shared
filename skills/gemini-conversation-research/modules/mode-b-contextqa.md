@@ -2,7 +2,7 @@
 
 > 屬 [`gemini-conversation-research`](../SKILL.md) §Mode B。**不抽取已有對話**，而是**主動開新 Gemini 對話**逐輪 Q&A、再併回 S1 分析。
 > 追問怎麼構造 → [first-principles-probe.md](first-principles-probe.md)；主線 S1-S9 → [conversation-pipeline.md](conversation-pipeline.md)。
-> **retarget 註**：northstar 的 signal-scanner / openclaw dispatch 上游**拿掉**（antigravity 無此基座）；觸發源 = 使用者直接給主題 + 上下文。資料主權的 northstar 內部名 regex 表**拿掉**，保留泛化紀律（見 §資料主權）。
+> **retarget 註**：northstar 的 signal-scanner / openclaw dispatch 上游**拿掉**（上游無此基座）；觸發源 = 使用者直接給主題 + 上下文。資料主權的 northstar 內部名 regex 表**拿掉**，保留泛化紀律（見 §資料主權）。
 
 ---
 
@@ -48,7 +48,7 @@
 - 不含商業敏感的識別碼（channel ID、token、私有 URL）。
 - 需要用到私有脈絡描述架構時，**泛化成公開術語**（例：某內部代號 → 其通用架構描述）。
 
-> retarget 註：northstar 版有硬編碼 `BLOCKED_PATTERNS` regex 表（DDR-NNN / Bug Scar / local_stack / openclaw / ixsecurity 等**northstar 內部名**）+ 確定性 `sovereignty_check()`。那些名字在 antigravity 不存在，**regex 表拿掉**。若本 repo 累積出需要固定過濾的私有詞，可在此 module 補一張 antigravity 自己的 pattern 表（demand-pull，別預先造空表）。**紀律不變**：越界洩漏私有脈絡 = BLOCK 修正後重試。
+> retarget 註：northstar 版有硬編碼 `BLOCKED_PATTERNS` regex 表（DDR-NNN / Bug Scar / local_stack / openclaw / ixsecurity 等**northstar 內部名**）+ 確定性 `sovereignty_check()`。那些名字在上游不存在，**regex 表拿掉**。若本 repo 累積出需要固定過濾的私有詞，可在此 module 補一張上游自己的 pattern 表（demand-pull，別預先造空表）。**紀律不變**：越界洩漏私有脈絡 = BLOCK 修正後重試。
 
 **Checkpoint**: 每輪 prompt 過人審 / pattern 表（若有）確認無私有脈絡洩漏。
 
@@ -59,4 +59,4 @@
 - **主題驅動**：「用 Gemini 研究〈主題〉。上下文：〈背景〉。需要分析〈方向 1〉〈方向 2〉的權衡。」
 - **帶主權約束**：「用 Gemini 研究〈主題〉。不可提及具體專案名 / 內部代號 / 識別碼，只用公開術語描述架構。」
 
-> retarget 註：northstar `activation-prompts.md` 的 GCR-0..5 含「已授權 stealth surface / autoMode.environment / INV-HUMAN-GATE」等 northstar engine-locus 術語——**拿掉**。antigravity 的閘就是「人跑瀏覽器 / 人開 CDP」，用平白話說即可。
+> retarget 註：northstar `activation-prompts.md` 的 GCR-0..5 含「已授權 stealth surface / autoMode.environment / INV-HUMAN-GATE」等 northstar engine-locus 術語——**拿掉**。上游的閘就是「人跑瀏覽器 / 人開 CDP」，用平白話說即可。

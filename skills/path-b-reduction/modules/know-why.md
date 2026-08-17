@@ -38,10 +38,10 @@ B=`.py`/確定性 exit-code / 0 LLM),**非** [fold-in](../../fold-in/SKILL.md) �
 | 鐵錨 ≠ 訓練記憶 | External-Verify |
 | 硬數據比較非 LLM-judge | 獨立性階梯 T0 優先於 T1(見 judge-loop-chooser) |
 
-## 4. 借形案例(antigravity 自己的量測歷史,非 skill-bettor 一手數據)
+## 4. 借形案例(上游自己的量測歷史,非宿主一手數據)
 
-以下案例**借自 antigravity** 的 `truth-verify` 量測迴圈六輪實測(2026-07-05/06)——skill-bettor 沒有
-對應的量測歷史,這裡只借它的**方法論教訓**,不是 skill-bettor 自己的數字:
+以下案例**借自上游**的 `truth-verify` 量測迴圈六輪實測(2026-07-05/06)——宿主沒有
+對應的量測歷史,這裡只借它的**方法論教訓**,不是宿主自己的數字:
 
 - **「假設 FAIL 是合法產出」的極端版**:四個降本假設**全滅**,零宣稱「已降本」——真收益全在質量軸與
   機制知識。
@@ -52,5 +52,5 @@ B=`.py`/確定性 exit-code / 0 LLM),**非** [fold-in](../../fold-in/SKILL.md) �
 - **物理代價如實入帳**:壞跑、bounce 輪、救援、v1 編排錯誤棄用——全額進成本分子,不因「不是設定的錯」
   而剔除(剔除=製造無法復現的美化數字)。
 
-skill-bettor 自己第一次真的跑演化 op 迴圈、累積 `families/*/changelog/` 之後,這裡應該換成本地真實
+宿主自己第一次真的跑演化 op 迴圈、累積 `families/*/changelog/` 之後,這裡應該換成本地真實
 案例——這是待補的種子,不是永久借形。

@@ -37,10 +37,10 @@ schema 守序列化邊界；驗證器守跨欄不變量，並直接執行 authen
 
 ## 從 local_stack 經驗保留與拒絕的部分
 
-來源：
+來源（絕對路徑與 repo 身分見 `.skill-bindings/forgejo-delivery-loop/`）：
 
-- `/Users/neon/local_stack/.agent/skills/_archive/forgejo-ops/skill.md`
-- `/Users/neon/local_stack/execution/scripts/forgejo-ops.sh`
+- 上游封存版 `forgejo-ops` skill 說明檔
+- 上游 `forgejo-ops.sh` 執行腳本
 
 保留：loopback version check、HTTP credential helper、API／UI 操作後回讀、錯誤快速失敗。
 
