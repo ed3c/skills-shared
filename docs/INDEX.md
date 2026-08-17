@@ -14,8 +14,10 @@
 
 | Route | Purpose |
 |---|---|
+| [`architecture/AGENTS.md`](architecture/AGENTS.md) | conditional architecture-topic router; does not preload all contracts |
 | [`architecture/DOCUMENT_ROUTING.md`](architecture/DOCUMENT_ROUTING.md) | canonical route names and DR assertions |
 | [`architecture/STATE_MACHINES.md`](architecture/STATE_MACHINES.md) | repository and document-loading state machines |
+| [`architecture/DOMAIN_DECOUPLING.md`](architecture/DOMAIN_DECOUPLING.md) | portable core, domain ports, consumer modules/adapters and monotonicity laws |
 | [`integration/CROSS_REPO_INTEGRATION.md`](integration/CROSS_REPO_INTEGRATION.md) | four-repository roles and data flow |
 | [`traceability/TRACEABILITY_INDEX.md`](traceability/TRACEABILITY_INDEX.md) | source → decision → issue → PR → eval → evidence |
 
