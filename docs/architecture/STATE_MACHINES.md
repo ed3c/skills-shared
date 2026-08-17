@@ -114,6 +114,53 @@ REQUEST_BOUND
 
 Independent path-disjoint Workers are siblings. Tournament replicas share one frozen contract but remain isolated. A convergence owner consumes only verified prerequisite bytes and starts from the integrated prerequisite state. Fixture receipts cannot advance live runtime state.
 
+## Repository closure review State Machine
+
+Canonical owner: [`../../skills/agentic-tech-lead-orchestration/references/REPOSITORY_CLOSURE_RECONCILIATION.md`](../../skills/agentic-tech-lead-orchestration/references/REPOSITORY_CLOSURE_RECONCILIATION.md).
+
+```text
+REPOSITORY_OBSERVED
+→ TREE_INVENTORIED
+→ DOC_STATUS_RECONCILED
+→ REAL_PROBLEMS_MAPPED
+→ DUAL_DAG_COMPILED
+→ STACK_INDEX_RECONCILED
+→ FALSIFIERS_RUN
+→ REVIEW_HANDOFF
+```
+
+The review may not skip forward from a diagram: `DOC_STATUS_RECONCILED` requires the observed `exists` readback from `TREE_INVENTORIED`. Fail-closed terminals are `EXISTING_PATH_MARKED_PLANNED`, `ABSENT_PATH_MARKED_IMPLEMENTED`, `EVIDENCE_KIND_PROMOTED_TO_RUNTIME_PASS`, `CROSS_LANE_RECEIPT`, and `STALE_SUBJECT`.
+
+## Issue admission State Machine
+
+```text
+ISSUE_DECLARED
+→ START_PREREQUISITES_SATISFIED
+→ CONTRACT_ATOM_ALLOWED
+→ COMPLETION_PREREQUISITES_SATISFIED
+→ INTEGRATION_GATE_ALLOWED
+→ HUMAN_ADMISSION
+```
+
+Start prerequisites and completion prerequisites are separate edge classes over the same Issue graph. Reaching `START_PREREQUISITES_SATISFIED` never implies `COMPLETION_PREREQUISITES_SATISFIED`: a completion edge requires the prerequisite's own admitted receipt on the exact subject and in the prerequisite's own lane. `NOT_CREATED` and `DRAFT` publication states can never reach `HUMAN_ADMISSION`.
+
+## Molecular Stack index State Machine
+
+Canonical owner: [`../../skills/git-town-stacked-pr-worker/references/MOLECULAR_STACK_INDEX.md`](../../skills/git-town-stacked-pr-worker/references/MOLECULAR_STACK_INDEX.md).
+
+```text
+ISSUE_BOUND
+→ ATOMS_DERIVED
+→ TRUE_EDGES_BOUND
+→ BRANCHES_READ_BACK
+→ PR_HEADS_READ_BACK
+→ GATES_BOUND
+→ MISSING_ATOMS_EXPOSED
+→ INDEX_RECEIPTED
+```
+
+`MISSING_ATOMS_EXPOSED` is a required transition, not an error path: an index that reached `INDEX_RECEIPTED` without it has smoothed a gap into completion. Exact-head drift returns the index to `PR_HEADS_READ_BACK`; an open PR head is never embedded as a receipt.
+
 ## Skill evolution State Machine
 
 ```text

@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skills-shared.invalid/agentic-tech-lead-orchestration/repository-closure-contract.schema.json",
+  "title": "Repository Closure Contract",
+  "description": "Reconciles documented status against actual tree inventory and binds each real problem to one evidence lane. Shape gate only; assert_repository_closure_contract.py owns the semantic laws.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "subject", "tree_inventory", "closure_matrix"],
+  "properties": {
+    "schema_version": {"const": "agentic-tech-lead/repository-closure-contract/v1"},
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "commit", "tree"],
+      "properties": {
+        "repository": {"type": "string", "minLength": 1},
+        "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "tree": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+      }
+    },
+    "tree_inventory": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "exists", "documented_status"],
+        "properties": {
+          "path": {"type": "string", "minLength": 1},
+          "exists": {"type": "boolean"},
+          "documented_status": {
+            "enum": [
+              "PLANNED",
+              "OPEN_DESIGN",
+              "NOT_PLANNED",
+              "IMPLEMENTED_DRAFT",
+              "PARTIAL_CONTRACT",
+              "IMPLEMENTED"
+            ]
+          },
+          "nearest_readme": {"type": ["string", "null"]}
+        }
+      }
+    },
+    "closure_matrix": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "real_problem", "closure_state", "evidence", "human_admit_required"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "real_problem": {"type": "string", "minLength": 1},
+          "closure_state": {
+            "enum": [
+              "IMPLEMENTED_DRAFT",
+              "PARTIAL_CONTRACT",
+              "SYNTHETIC_CLOSED",
+              "INTEGRATION_ADMISSION_OPEN",
+              "OPEN_DESIGN",
+              "BLOCKED_LIVE_SUBSTRATE"
+            ]
+          },
+          "human_admit_required": {"type": "boolean"},
+          "evidence": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["kind", "required_lane", "receipt"],
+            "properties": {
+              "kind": {
+                "enum": [
+                  "SOURCE_REPORTED",
+                  "PRIMARY_SOURCE_CONFIRMED",
+                  "SYNTHETIC_ANALOG_ONLY",
+                  "HUMAN_ADMIT_REQUIRED",
+                  "DETERMINISTIC_RUN_OBSERVED",
+                  "LIVE_SUBSTRATE_OBSERVED"
+                ]
+              },
+              "required_lane": {"enum": ["CLOUD", "LOCAL", "PRIVATE", "HUMAN", "PROVIDER", "PRODUCTION"]},
+              "receipt": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["lane", "subject_commit", "runtime_state"],
+                "properties": {
+                  "lane": {"enum": ["CLOUD", "LOCAL", "PRIVATE", "HUMAN", "PROVIDER", "PRODUCTION"]},
+                  "subject_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+                  "runtime_state": {
+                    "enum": [
+                      "PASS",
+                      "FAIL",
+                      "ABSENT",
+                      "NOT_IMPLEMENTED",
+                      "NOT_EXERCISED",
+                      "SKIPPED_BY_POLICY",
+                      "HUMAN_ADMIT_REQUIRED"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

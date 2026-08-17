@@ -55,6 +55,17 @@ python3 scripts/assert_local_handoff_queue.py --queue <queue.json> --selftest
 
 A queue PASS validates the continuation contract only. It does not execute consumer commands, providers, issue mutations, merges, promotions, or queue advancement.
 
+## Repository closure and Issue dual DAG
+
+`assert_repository_closure_contract.py` is the zero-network gate for a repository-wide completion review. It reconciles documented status against observed tree inventory, keeps documentation evidence kinds from reporting runtime `PASS`, holds cloud/local/private/Human/provider/production receipt lanes literally separate, and keeps start dependencies and completion dependencies as two edge classes with one declared convergence owner. Its selftest plants existing-path-`PLANNED`, absent-path-implemented, source-to-runtime-`PASS`, cross-lane receipt, stale-subject, laundered-admission, Draft-to-admitted, start-as-completion, receipt-less completion, unadmitted-prerequisite, and hidden-convergence defects.
+
+```bash
+python3 scripts/assert_repository_closure_contract.py --contract <closure.json> --dag <dual-dag.json>
+python3 scripts/assert_repository_closure_contract.py --contract <closure.json> --dag <dual-dag.json> --selftest
+```
+
+Shape is owned by `references/repository-closure-contract.schema.json` and `references/issue-dual-dag.schema.json`; this script owns the semantic laws. A green result reports internal consistency for the declared subject. It does not read the tree, run a consumer suite, reach a provider, or admit anything. The method behind the shapes is in [`../references/REPOSITORY_CLOSURE_RECONCILIATION.md`](../references/REPOSITORY_CLOSURE_RECONCILIATION.md).
+
 ## Refactor boundary
 
 `check_skill_core_boundaries.py --skill agentic-tech-lead-orchestration` verifies portable-core/domain-module separation. It does not admit tasks, capabilities, scheduler results, or handoff execution.

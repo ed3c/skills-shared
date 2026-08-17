@@ -53,6 +53,41 @@ python3 "$ROOT/scripts/assert_local_handoff_queue.py" \
   --queue "$ROOT/tests/fixtures/local-handoff-queue.single-item.json" \
   --selftest
 
+# Validate the repository closure contract and Issue dual-dependency DAG.
+# Shape first (the schemas are load-bearing, not decorative), then the semantic
+# laws and their planted mutations.
+python3 -m json.tool "$ROOT/references/repository-closure-contract.schema.json" >/dev/null
+python3 -m json.tool "$ROOT/references/issue-dual-dag.schema.json" >/dev/null
+python3 - "$ROOT" <<'PY1'
+import json, sys
+from pathlib import Path
+from jsonschema import Draft202012Validator
+
+references = Path(sys.argv[1]) / "references"
+pairs = [
+    ("repository-closure-contract.schema.json", "example-repository-closure-contract.json"),
+    ("issue-dual-dag.schema.json", "example-issue-dual-dag.json"),
+]
+for schema_name, example_name in pairs:
+    schema = json.loads((references / schema_name).read_text(encoding="utf-8"))
+    Draft202012Validator.check_schema(schema)
+    errors = [
+        f"{'.'.join(str(part) for part in error.absolute_path) or '<root>'}: {error.message}"
+        for error in Draft202012Validator(schema).iter_errors(
+            json.loads((references / example_name).read_text(encoding="utf-8"))
+        )
+    ]
+    assert not errors, (schema_name, errors)
+    print(f"CLOSURE-SHAPE-GREEN {schema_name} validated {example_name}")
+PY1
+python3 "$ROOT/scripts/assert_repository_closure_contract.py" \
+  --contract "$ROOT/references/example-repository-closure-contract.json" \
+  --dag "$ROOT/references/example-issue-dual-dag.json"
+python3 "$ROOT/scripts/assert_repository_closure_contract.py" \
+  --contract "$ROOT/references/example-repository-closure-contract.json" \
+  --dag "$ROOT/references/example-issue-dual-dag.json" \
+  --selftest
+
 # Emit and inspect the positive semantic task receipt.
 python3 "$ROOT/scripts/assert_task_contract.py" \
   --contract "$ROOT/references/example-stack-contract.json" \
