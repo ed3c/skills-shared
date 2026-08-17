@@ -45,6 +45,8 @@ Own deterministic behavior and falsifiable evidence. Markdown navigation cannot 
 
 Complex Skills and consumer repositories use the same route semantics defined in [`../docs/architecture/DOCUMENT_ROUTING.md`](../docs/architecture/DOCUMENT_ROUTING.md): root entry, Agent procedure, context, architecture, docs index, nearest README, machine authority, and traceability/evidence.
 
+Material Skill/module/binding/adapter work also reads [`../docs/architecture/DOMAIN_DECOUPLING.md`](../docs/architecture/DOMAIN_DECOUPLING.md). That contract defines domain ports, trigger-selected modules, consumer adapters, immutable bindings, dependency direction and the rule that a consumer can only strengthen constraints, narrow effects, increase evidence, or reduce authority.
+
 ## Reading a complex Skill
 
 1. nearest `AGENTS.md` — mandatory procedure and authority.
@@ -93,7 +95,7 @@ shared Skill body
 → user-scope projection or immutable bundle
 → consumer requirements/binding
 → runtime contract binding
-→ bettor composition/acceptance
+→ host composition/acceptance
 → consumer receipt
 ```
 

@@ -12,8 +12,10 @@ This contract gives Claude Code, Codex CLI, and human maintainers the same multi
 | `DR-R2C` | `CONTEXT.md` | mutable current handoff; no stable laws |
 | `DR-R2A` | `ARCHITECTURE.md` | stable ownership, planes, invariants |
 | `DR-R3` | `docs/INDEX.md` | complete local route map |
+| `DR-R4A` | `docs/architecture/AGENTS.md` | conditional router for architecture-document topics |
 | `DR-R4D` | `docs/architecture/DOCUMENT_ROUTING.md` | local binding of this route contract |
 | `DR-R4S` | `docs/architecture/STATE_MACHINES.md` | owner/input/output/transition/terminal/evidence map |
+| `DR-R4B` | `docs/architecture/DOMAIN_DECOUPLING.md` | procedural-core/domain-port/module/adapter dependency laws |
 | `DR-R4X` | `docs/integration/CROSS_REPO_INTEGRATION.md` | inter-repository roles and contract flow |
 | `DR-R4T` | `docs/traceability/TRACEABILITY_INDEX.md` | source → decision → issue → PR → eval → receipt |
 | `DR-R5` | `<governed-directory>/README.md` | nearest owner and local data-flow contract |
@@ -43,12 +45,13 @@ classify task
 → root README / AGENTS
 → current CONTEXT + stable ARCHITECTURE
 → docs/INDEX
-→ nearest directory README
+→ nearest conditional AGENTS + directory README
+→ selected topic contract
 → machine authority
 → current evidence / traceability
 ```
 
-The normal target is at most two intentional hops from the nearest README to the machine authority and evidence. Cross-repository facts are never inferred from a sibling checkout.
+The normal target is at most two intentional hops from the nearest README to the machine authority and evidence. Cross-repository facts are never inferred from a sibling checkout. Architecture topics use [`AGENTS.md`](AGENTS.md) to load only the applicable route.
 
 ## Assertions
 
@@ -73,6 +76,11 @@ The normal target is at most two intentional hops from the nearest README to the
 | `DR-17` | Start dependencies and completion dependencies are separate edge classes. |
 | `DR-18` | Cloud, local, private, and Human lanes cannot satisfy one another. |
 | `DR-19` | Every convergence has one explicit owner and exact parents. |
+| `DR-20` | A modular repository provides `DOMAIN_DECOUPLING.md` or declares `NOT_APPLICABLE` with a reason. |
+| `DR-21` | `AGENTS.md` routes to domain decoupling conditionally and does not duplicate the complete boundary contract. |
+| `DR-22` | Consumer bindings use immutable identities and consumer modules do not copy the canonical shared Skill body. |
+| `DR-23` | Consumer specialization only tightens constraints, narrows effects, increases evidence, or reduces authority. |
+| `DR-24` | Mutable consumer issue/PR/provider/runtime state does not enter the stable shared domain-decoupling contract. |
 
 ## Knowledge-continuity rule
 
@@ -80,7 +88,7 @@ Every route must leave an in-place summary before linking away. A reader may cho
 
 ## Skill loading rule
 
-The procedural core stays in `SKILL.md`. Generic contracts live in `references/`. Domain examples live in `modules/` and are loaded only when task/repository/domain triggers match. Consumer-specific facts stay in consumer bindings and READMEs.
+The procedural core stays in `SKILL.md`. Generic contracts live in `references/`. Domain examples live in `modules/` and are loaded only when task/repository/domain triggers match. Consumer-specific facts stay in consumer bindings and READMEs. The dependency and monotonicity laws are in [`DOMAIN_DECOUPLING.md`](DOMAIN_DECOUPLING.md).
 
 ## Evidence boundary
 
