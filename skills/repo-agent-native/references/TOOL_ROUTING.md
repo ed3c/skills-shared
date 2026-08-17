@@ -178,6 +178,31 @@ level the read-back does not support, a missing read-back record, undeclared
 residue, a credential-shaped value, and — the one that matters most — a `PASS`
 whose controls all agreed with it.
 
+### A lane that starts an admitted external artifact
+
+The `git-town` lane runs a binary this repository deliberately does not install.
+It is gated by a Human admission record,
+[`../evals/git-town-darwin-admission.json`](../evals/git-town-darwin-admission.json),
+and the gate compares SHA-256 rather than version strings: one release version
+ships as several artifacts, so a version match would admit whichever file
+happened to be on the host.
+
+```bash
+python3 skills/repo-agent-native/scripts/capture_adapter_receipt.py \
+  --repo-root . --out <capture directory> --lane git-town \
+  --git-town-bin <path to the extracted artifact>
+```
+
+Three outcomes, three states. No binary is `ABSENT` — the provider is not here.
+A binary whose digest is not the admitted one is `SKIPPED_BY_POLICY` and nothing
+starts. Only an exact digest match runs. The lane then builds its own repository
+and bare remote under `TMPDIR`, runs `hack`, `append` and
+`sync --stack --no-push` there, and reads the resulting stack back out of
+`git config` and `git merge-base` rather than out of git-town's own output — a
+provider confirming its own claim is `PROVIDER_SELF_ADMISSION`. Nothing it does
+touches this checkout, and the refusal path is exercised inside the receipt by
+flipping one byte of a copy of the admitted binary.
+
 `A` and `A-` contain a read-back clause in their own definition in
 [`EVIDENCE_MODEL.md`](EVIDENCE_MODEL.md), so claiming either with zero confirmed
 read-backs is refused. That rule caught its own author: the Serena lane was
