@@ -24,7 +24,10 @@
       "runtime_lane": {
         "class": "LOCAL_RUNTIME",
         "commands": [
-          {"argv": ["python3", "consumer/scripts/rebind_runtime.py", "--check"], "cwd": ".", "timeout_seconds": 120, "environment_names": []}
+          {"argv": ["python3", "consumer/scripts/check_runtime_binding.py"], "cwd": ".", "timeout_seconds": 120, "environment_names": []}
+        ],
+        "unresolved_operations": [
+          {"operation_id": "materialize-runtime-rebind-command", "resolver_source": "consumer runtime catalog and nearest runtime README", "required_output": "CONCRETE_COMMAND_CONTRACT"}
         ],
         "live_evidence_required": true
       },
@@ -51,6 +54,7 @@
         "commands": [
           {"argv": ["sh", "consumer/tests/run-physical-canary.sh"], "cwd": ".", "timeout_seconds": 900, "environment_names": ["LOCAL_PROVIDER_SESSION"]}
         ],
+        "unresolved_operations": [],
         "live_evidence_required": true
       },
       "receipt": {
@@ -76,6 +80,7 @@
         "commands": [
           {"argv": ["python3", "consumer/scripts/check_terminal_admission.py"], "cwd": ".", "timeout_seconds": 60, "environment_names": []}
         ],
+        "unresolved_operations": [],
         "live_evidence_required": false
       },
       "receipt": {
