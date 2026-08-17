@@ -159,7 +159,10 @@ and they deliberately share no code path:
 ```bash
 # the only lane that starts a process or opens a socket
 python3 skills/repo-agent-native/scripts/capture_adapter_receipt.py \
-  --repo-root . --out skills/repo-agent-native/evals/receipts
+  --repo-root . --out skills/repo-agent-native/evals/receipts \
+  --python-bin <interpreter with tree_sitter> \
+  --lancedb-python <interpreter with lancedb> \
+  --git-town-bin <path to the admitted artifact>
 
 # zero network, zero provider execution; runnable where no provider exists
 python3 skills/repo-agent-native/scripts/check_adapter_receipts.py check
@@ -175,6 +178,14 @@ python3 skills/repo-agent-native/scripts/check_adapter_receipts.py check \
 Captured receipts live in [`../evals/receipts/`](../evals/receipts/), one file per
 lane. A lane whose provider is absent still gets a receipt: omitting it reads
 exactly like a lane that passed.
+
+The three provider paths are pinned rather than defaulted because the defaults are
+not the same kind of wrong. `--python-bin` and `--lancedb-python` default to the
+interpreter running the capture; a host interpreter that exists but has no
+`tree_sitter` or `lancedb` produces `FAIL`, not `ABSENT`, so an unpinned capture
+records a working provider as a broken one. `--git-town-bin` defaults to nothing,
+which is `ABSENT` and honest — the admission forbids installing that artifact on
+`PATH`, so the lane is told where it is or it does not run.
 
 The checker refuses, each with its own code: an unbound or dirty subject, an
 unidentified provider, an undeclared network/filesystem/secret policy, an
