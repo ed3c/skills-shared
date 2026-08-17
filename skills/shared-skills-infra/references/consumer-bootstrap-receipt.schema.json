@@ -1,0 +1,153 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ed3c/skills-shared/schemas/consumer-bootstrap-receipt.schema.json",
+  "title": "Domain Decoupling consumer bootstrap receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "consumer", "shared_source", "profile", "binding", "artifacts",
+    "evidence", "authority", "rollback", "decision_record_policy", "receipt_sha256"
+  ],
+  "properties": {
+    "schema": {"const": "shared-skills/consumer-bootstrap-receipt/v1"},
+    "consumer": {
+      "type": "object", "additionalProperties": false,
+      "required": ["repository", "generated_subject_sha256"],
+      "properties": {
+        "repository": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+        "generated_subject_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "shared_source": {
+      "type": "object", "additionalProperties": false,
+      "required": ["schema", "source", "interface", "generator", "profile", "adapter"],
+      "properties": {
+        "schema": {"const": "shared-skills/source-pin/v1"},
+        "source": {"$ref": "#/$defs/source"},
+        "interface": {"$ref": "#/$defs/namedArtifact"},
+        "generator": {"$ref": "#/$defs/artifact"},
+        "profile": {"$ref": "#/$defs/artifact"},
+        "adapter": {"$ref": "#/$defs/namedArtifact"}
+      }
+    },
+    "profile": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "sha256", "skills"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "skills": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "binding": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "semantic_sha256", "content_sha256"],
+      "properties": {
+        "path": {"const": ".agents/bindings/repository-control-plane.json"},
+        "semantic_sha256": {"$ref": "#/$defs/sha256"},
+        "content_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "artifacts": {
+      "type": "array", "minItems": 19,
+      "items": {
+        "oneOf": [
+          {
+            "type": "object", "additionalProperties": false,
+            "required": ["path", "managed_block_sha256", "state"],
+            "properties": {
+              "path": {"$ref": "#/$defs/relativePath"},
+              "managed_block_sha256": {"$ref": "#/$defs/sha256"},
+              "state": {"const": "MANAGED_BLOCK"}
+            }
+          },
+          {
+            "type": "object", "additionalProperties": false,
+            "required": ["path", "sha256", "state"],
+            "properties": {
+              "path": {"$ref": "#/$defs/relativePath"},
+              "sha256": {"$ref": "#/$defs/sha256"},
+              "state": {"const": "GENERATED"}
+            }
+          }
+        ]
+      }
+    },
+    "evidence": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "route_scaffold", "immutable_source_binding", "consumer_binding_generation",
+        "byte_readback", "host_skill_discovery", "agent_runtime_execution",
+        "provider_execution", "merge", "release", "rollback_execution"
+      ],
+      "properties": {
+        "route_scaffold": {"const": "PASS"},
+        "immutable_source_binding": {"const": "PASS"},
+        "consumer_binding_generation": {"const": "PASS"},
+        "byte_readback": {"const": "PASS"},
+        "host_skill_discovery": {"const": "NOT_EXERCISED"},
+        "agent_runtime_execution": {"const": "NOT_EXERCISED"},
+        "provider_execution": {"const": "NOT_EXERCISED"},
+        "merge": {"const": "HUMAN_ADMIT_REQUIRED"},
+        "release": {"const": "HUMAN_ADMIT_REQUIRED"},
+        "rollback_execution": {"const": "NOT_EXERCISED"}
+      }
+    },
+    "authority": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "automatic_merge", "automatic_conflict_resolution", "visibility_change",
+        "credential_values", "provider_activation", "production_writeback"
+      ],
+      "properties": {
+        "automatic_merge": {"const": false},
+        "automatic_conflict_resolution": {"const": false},
+        "visibility_change": {"const": false},
+        "credential_values": {"const": false},
+        "provider_activation": {"const": false},
+        "production_writeback": {"const": false}
+      }
+    },
+    "rollback": {"$ref": "#/$defs/rollback"},
+    "decision_record_policy": {"const": "OBSERVATIONS_AND_DECISIONS_ONLY"},
+    "receipt_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha1": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "relativePath": {"type": "string", "minLength": 1, "not": {"pattern": "(^/|(^|/)\\.\\.(/|$)|^[A-Za-z]:)"}},
+    "rollback": {
+      "type": "object", "additionalProperties": false,
+      "required": ["commit", "tree"],
+      "properties": {"commit": {"$ref": "#/$defs/sha1"}, "tree": {"$ref": "#/$defs/sha1"}}
+    },
+    "source": {
+      "type": "object", "additionalProperties": false,
+      "required": ["repository", "commit", "tree"],
+      "properties": {
+        "repository": {"type": "string", "pattern": "^https?://[^@/]+/.+"},
+        "commit": {"$ref": "#/$defs/sha1"},
+        "tree": {"$ref": "#/$defs/sha1"}
+      }
+    },
+    "artifact": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "git_blob", "sha256"],
+      "properties": {
+        "path": {"$ref": "#/$defs/relativePath"},
+        "git_blob": {"$ref": "#/$defs/sha1"},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "namedArtifact": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "path", "git_blob", "sha256"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "path": {"$ref": "#/$defs/relativePath"},
+        "git_blob": {"$ref": "#/$defs/sha1"},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      }
+    }
+  }
+}
