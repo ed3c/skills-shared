@@ -1,8 +1,8 @@
 # Test controls
 
-`run-all.sh` validates the positive refactor packet and golden registry, then runs `selftest.py`.
+`run-all.sh` validates the positive refactor packet, golden registry, and molecular Stack, then runs `selftest.py` and `stack_selftest.py`.
 
-The selftest plants and refuses at least:
+The contract/registry selftest plants and refuses at least:
 
 ```text
 missing refactor-as-landed treatment
@@ -19,4 +19,18 @@ runner that does not invoke the entrypoint
 golden treatment blob mismatch
 ```
 
-A green test suite proves the portable mechanism and current registry connection only.
+The Stack selftest plants and refuses:
+
+```text
+child without a consumed unmerged parent artifact
+child base that differs from the parent branch
+path-disjoint sibling serialized as a fake child
+multiple convergence owners
+self-embedded stale open-PR head
+merged state without immutable head/workflow evidence
+external evidence owning Stack paths
+Stack merge authority widening
+duplicate issue ownership
+```
+
+A green test suite proves the portable mechanisms and current registry/Stack connections only.
