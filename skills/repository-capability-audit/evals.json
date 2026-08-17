@@ -93,6 +93,7 @@
       "checker_script": "scripts/check_canary_receipt.py",
       "test_verify": "tests/test_canary_receipt.py",
       "good_fixture": null,
+      "good_evidence": "a complete canary-receipt/v1 object synthesized inside tests/test_canary_receipt.py, binding consumer subject, audit digests, model/harness/runtime/toolset identities, non-producer evaluator, authorizations, probes, rollback subject and run window, admitted by scripts/check_canary_receipt.py while each of the 10 planted mutations of the same object is refused for its own reason",
       "hollow_fixture": null,
       "hollow_mutations": "a stale receipt reused after its subject moved without revalidation, an external-service outage recorded as a repository defect, a missing credential recorded as a policy denial and the reverse, a partial artifact publication accepted as complete, a first-green result with the production-like gate skipped, a rollback target equal to the candidate, a consumer-local module shadowing canonical Skill content, private data routed to a provider not approved for it, a producer-owned evaluator, and a missing required field",
       "covers": [
