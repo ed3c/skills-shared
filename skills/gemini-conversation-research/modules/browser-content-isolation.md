@@ -1,6 +1,6 @@
 # Module: Browser carrier content isolation
 
-> 屬 [`gemini-conversation-research`](../SKILL.md)。本模組定義 Codex/ChatGPT Chrome 擴充功能的 P0 carrier contract。antigravity 的 CDP 腳本直接寫檔；Chrome browser-client 多了一層工具回傳面，因此「最後 stdout 是 metadata」仍不足，必須同時限制中間 browser result。
+> 屬 [`gemini-conversation-research`](../SKILL.md)。本模組定義 Codex/ChatGPT Chrome 擴充功能的 P0 carrier contract。上游的 CDP 腳本直接寫檔；Chrome browser-client 多了一層工具回傳面，因此「最後 stdout 是 metadata」仍不足，必須同時限制中間 browser result。
 
 ## Hard boundary
 

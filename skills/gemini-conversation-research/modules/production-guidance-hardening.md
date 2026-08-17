@@ -1,6 +1,6 @@
 # Module: Production Guidance Hardening
 
-> 屬 [`gemini-conversation-research`](../SKILL.md)。當 GCR 對話要進入 skill-bettor 小迴圈、計畫包、或 `repo/agent-skills-repo` production seed 時，讀本模組。目的不是多寫一段 prompt，而是把對話引導、agy Gemini 3.6 Flash High 執行經驗、末端 repo 產物與小迴圈資料流綁成可驗證的物理契約。
+> 屬 [`gemini-conversation-research`](../SKILL.md)。當 GCR 對話要進入宿主小迴圈、計畫包、或 `repo/agent-skills-repo` production seed 時，讀本模組。目的不是多寫一段 prompt，而是把對話引導、agy Gemini 3.6 Flash High 執行經驗、末端 repo 產物與小迴圈資料流綁成可驗證的物理契約。
 
 ## Required Production Path
 

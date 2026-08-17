@@ -164,7 +164,7 @@ Format: Comma-separated without other characters.
 
 ### ❶ 大迴圈與小迴圈的沙盒化分工 (Harness vs. Sandbox)
 * **大迴圈（主基座，根目錄）**：負責全域生命週期監控（根目錄 `hooks.json`）、外部 MCP 服務註冊、跨子專案的目標與進度追蹤（根目錄 `PROMPT.md` 與 `IMPLEMENTATION_PLAN.md`）。禁止在大迴圈根目錄下直接執行單一子任務的高頻修改迭代。
-* **小迴圈（特化沙盒，位於 `loop_wiki/[loop_name]` 與 `/Users/neon/ix-agy/loop_demo/`）**：沙盒化隔離。每個特化小迴圈擁有獨立的啟動腳本、專屬的 `PROMPT.md`/`IMPLEMENTATION_PLAN.md` 狀態記錄與特化設定（如 `settings.json` 的 `"autoExecutionPolicy": "EAGER"` 自適應授權）。高頻修正與精修在沙盒內部隔離運行，收斂後結束控制並 Ingest。其中，`/Users/neon/ix-agy/loop_demo/` 作為 8-Harness 沙盒鏡像結構的基準參照（Baseline Reference），包含完整的自包含運行與校驗腳本。
+* **小迴圈（特化沙盒，位於 `loop_wiki/[loop_name]` 與上游的 `loop_demo/`，絕對路徑與 repo 身分見 `.skill-bindings/loop-harness-standard/`）**：沙盒化隔離。每個特化小迴圈擁有獨立的啟動腳本、專屬的 `PROMPT.md`/`IMPLEMENTATION_PLAN.md` 狀態記錄與特化設定（如 `settings.json` 的 `"autoExecutionPolicy": "EAGER"` 自適應授權）。高頻修正與精修在沙盒內部隔離運行，收斂後結束控制並 Ingest。其中，上游的 `loop_demo/` 作為 8-Harness 沙盒鏡像結構的基準參照（Baseline Reference），包含完整的自包含運行與校驗腳本。
 
 ### ❷ 疊加執行方式 (Stacked Pipeline Composition)
 小的迴圈工程可以疊加組合成更複雜的工程鏈。典型的疊加方式是「前一個小迴圈的產物，作為後一個小迴圈的 Scope 與輸入」：
@@ -217,7 +217,7 @@ fi
 * **執行約束**：小迴圈的常駐上下文（`AGENTS.md`、`.agents/settings.json`、`.agents/skills.json`）在多次迭代中必須**字符級完全穩定不變**。絕對禁止在常駐提示詞中加入動態變數（如當前時間戳記、動態臨時路徑、隨機 ID）。前綴的 any 微小變更都會導致 Cache 宣告失效（Cache Invalidation），造成嚴重 Token 浪費。
 
 ### ❸ 動態觸發路由優化 (Dynamic Trigger Routing)
-* **防注意力稀釋**：常駐 `AGENTS.md（file:///Users/neon/ix-agy/loop_wiki/subproject-ixsecurity-e2e/d2_e2e_loop/AGENTS.md）` 必須控制在 300 行以內。詳細業務邏輯與操作步驟（Procedural Know-How）應移至特化沙盒的 `SKILL.md` 中。
+* **防注意力稀釋**：常駐 `AGENTS.md`（例：某特化沙盒 `loop_wiki/<sub-project>/AGENTS.md`；上游實例的絕對路徑見 `.skill-bindings/loop-harness-standard/`）必須控制在 300 行以內。詳細業務邏輯與操作步驟（Procedural Know-How）應移至特化沙盒的 `SKILL.md` 中。
 * **觸發詞精準度**：為確保 `SKILL.md` 被動態加載（0 浪費按需調用），Skill 檔案的 frontmatter `triggers` 必須豐富地註冊核心業務特徵與文件名（如 `D2WalletVC`、`btnQRCode`、`BiometricPrompt` e.g., CIBALogin, NFC reader mode），避免因 Prompt 未包含預設的 `"local validation"` 字眼而遺失關鍵不變量知識。
 
 ### ❹ 小迴圈執行最佳實踐 (Best Execution Practice)

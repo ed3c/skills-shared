@@ -13,7 +13,7 @@ S1-S9 把對話萃取、缺口送 DR、報告存檔。但 **DR 報告是「平�
 
 ## 四段定序程序（每段 SURFACE-gated，人 admit 才續）
 
-> **LIVE ✓（cc-20260711）**：完整 D1→D2 端到端首次真跑——Gemini DR「Maestro 本地 iOS 真機測試」（S0 抽取 16.6K/130 引用/32 來源）→ D1 多模型分工（Opus 編排+判官／Sonnet repo 成熟度／Haiku iOS 事實層 8/8／主 session 親跑 GitHub API+Go proxy+release assets 確定性錨）→ 真實度計分卡（`devicelab-dev` 存在 ✅ 但「100% drop-in」**CONTRADICTED**、3.6x iOS **UNVERIFIED**）→ D2 合成分層架構+等價物矩陣 → 落成 checker-backed skill `ios-realdevice-automation`（**跨 repo** 落 `/Users/neon/ix-agy/.agents/skills/`，`tests/run-all.sh` ALL GREEN）。反-husk 錨＝skill 與研究產物皆真檔案在真路徑（`gemini_research/gcr/b6d196f0f7fb2c7d-SYNTHESIS.md`）。**最高價值揭露＝深研參考實作反證 DR 主張**（官方文檔自列 iOS 真機不支援命令 `setPermissions`/`openNotifications`，正撞落地測試需求）。
+> **LIVE ✓（cc-20260711）**：完整 D1→D2 端到端首次真跑——Gemini DR「Maestro 本地 iOS 真機測試」（S0 抽取 16.6K/130 引用/32 來源）→ D1 多模型分工（Opus 編排+判官／Sonnet repo 成熟度／Haiku iOS 事實層 8/8／主 session 親跑 GitHub API+Go proxy+release assets 確定性錨）→ 真實度計分卡（`devicelab-dev` 存在 ✅ 但「100% drop-in」**CONTRADICTED**、3.6x iOS **UNVERIFIED**）→ D2 合成分層架構+等價物矩陣 → 落成 checker-backed skill `ios-realdevice-automation`（**跨 repo** 落上游 skill 目錄，絕對路徑見 `.skill-bindings/gemini-conversation-research/`，`tests/run-all.sh` ALL GREEN）。反-husk 錨＝skill 與研究產物皆真檔案在真路徑（`gemini_research/gcr/b6d196f0f7fb2c7d-SYNTHESIS.md`）。**最高價值揭露＝深研參考實作反證 DR 主張**（官方文檔自列 iOS 真機不支援命令 `setPermissions`/`openNotifications`，正撞落地測試需求）。
 
 ### D1 — DR 落地驗證（可行度 / 真實度）
 把 DR 的 load-bearing claim 逐條裁決。**多模型分工**（實測有效的分派）：
@@ -43,7 +43,7 @@ UK/可行度 gap 中「非讀碼可答、要做出來才知」者，跑 **驗證
 
 ## DR→skill 落地程序（D2 已驗架構 → checker-backed skill 的可複用步驟序列）
 
-> D2 產出的是「架構設計」，本節是把它**落成一個有守門測試的 skill** 的步驟序列（actuate 委派 `skill-authoring（../../skill-authoring/SKILL.md）`，**非在此重造 skill 規範**）。錨＝cc-20260711 真跑產物 `ios-realdevice-automation`（絕對路徑 `/Users/neon/ix-agy/.agents/skills/ios-realdevice-automation/`，`tests/run-all.sh` 全綠）。
+> D2 產出的是「架構設計」，本節是把它**落成一個有守門測試的 skill** 的步驟序列（actuate 委派 `skill-authoring（../../skill-authoring/SKILL.md）`，**非在此重造 skill 規範**）。錨＝cc-20260711 真跑產物 `ios-realdevice-automation`（絕對路徑見 `.skill-bindings/gemini-conversation-research/`，`tests/run-all.sh` 全綠）。
 
 1. **S0 EXTRACT**：DR/對話 URL → 保真 md（metadata-only 進主 context，原文走檔案隔離）。
 2. **S1 ANALYZE（子代理）**：抽 `named_entities`（每個具名 repo/工具/版本＝機械查證清單）/ `feasibility_claims` / `tech_equivalents` / `implied_architecture`。

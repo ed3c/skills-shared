@@ -17,7 +17,7 @@ runtime-env
   find the secret-free browser/runtime profile, workload, and policy requirements
         |
         v
-bettor-arena
+the host repo
   find the selected module closure, MCP exposure policy, proof/control/mutation, and origin contract
         |
         v
@@ -38,7 +38,7 @@ At each repository:
 
 - The shared Skill explains how to verify and route; it does not store the consumer's browser profile or account.
 - `runtime-env` names variables and policy but not secret values.
-- `bettor-arena` proves composition and public execution surfaces but does not own the product implementation.
+- The host repo proves composition and public execution surfaces but does not own the product implementation.
 - Agent Shield owns the domain workflow and provider-specific outcome.
 
 A declaration in an upstream plane cannot proxy a downstream live receipt.

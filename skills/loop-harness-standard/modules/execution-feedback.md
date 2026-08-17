@@ -4,8 +4,9 @@
 > N 個版本 → Opus 判官挑最佳＋逐斷言比對軌跡偵測隱式飄移 → SURFACE 二分流:改執行方式(迴圈自主)
 > 或改計劃(人 admit plan-delta)。
 > **上游唯讀指針**(設計理由/權衡分析回上游查,不搬證成史;本地 SSOT=本檔):THE 規格=
-> `/Users/neon/antigravity/docs/plans/2026-07-19-composer-integration-oracle-completion/02-execution-feedback-loop.md`
-> (下稱「上游 02」),B-1/B-2/B-3 綁定解=同目錄 `05-integration-and-judge-findings.md`(下稱「上游 05」)。
+> 上游 `docs/plans/2026-07-19-composer-integration-oracle-completion/02-execution-feedback-loop.md`
+> (絕對路徑與 repo 身分見 `.skill-bindings/loop-harness-standard/`;下稱「上游 02」),B-1/B-2/B-3
+> 綁定解=同目錄 `05-integration-and-judge-findings.md`(下稱「上游 05」)。
 > 2026-07-19 遷入,retarget 帳見 [retarget-map.md](retarget-map.md) 同日節。
 
 ## 定位

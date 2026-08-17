@@ -9,7 +9,7 @@
 |---|---|---|
 | 會改變下一條 edge 的決策語意 | `SKILL.md` state/node contract | 每次冷啟動必讀 |
 | 可貼逐階段操作骨架 | `reference/guiding-prompt.md` | 需要產出完整 playbook 或 dispatch packet 時 |
-| antigravity→skill-bettor 移植判斷、拿掉什麼 | `modules/retarget-map.md` | 懷疑某機制是否被錯刪/錯搬時 |
+| 上游→宿主 移植判斷、拿掉什麼 | `modules/retarget-map.md` | 懷疑某機制是否被錯刪/錯搬時 |
 | Domain 詞、語料 intake、被降權 gotcha | 本檔 | fresh LLM 不懂術語、Mode B 語料、或 claim provenance 不清時 |
 | owner skill 內部程序 | owner skill 真檔 | 進入該 Phase 後才讀 |
 
@@ -77,4 +77,4 @@ Post-cutoff 實體要雙向警戒：
 - D4 artifact 留錨不刪、不升格的理由：刪掉會讓「UK 已關閉」失去可重驗鐵錨。
 - Mode B 先查既有同主題錨，再做增量驗。
 - families-type homing 的最終位置驗證與 `__file__` 相對路徑要求。
-- antigravity 2×2 host matrix、remote/reference-impl homing 是架構前提不適用，不是能力縮水。
+- 上游 2×2 host matrix、remote/reference-impl homing 是架構前提不適用，不是能力縮水。

@@ -367,7 +367,7 @@ The historical Skill Eval implementation line was:
 
 The reusable publication policy was issue #43 / PR #44. Earlier independent documentation leaves were not forced into runtime ancestry when they consumed only merged bytes.
 
-The four-repository documentation change was a sibling set because each repository wrote only its own documentation. `bettor-arena#38` became the convergence owner only after all four merged. Exact historical subjects remain in [`../../docs/traceability/TRACEABILITY_INDEX.md`](../../docs/traceability/TRACEABILITY_INDEX.md).
+The four-repository documentation change was a sibling set because each repository wrote only its own documentation. One of the four repositories' issue #38 became the convergence owner only after all four merged. Exact historical subjects (including which repository owned #38) remain in [`../../docs/traceability/TRACEABILITY_INDEX.md`](../../docs/traceability/TRACEABILITY_INDEX.md).
 
 ## Publication policy
 

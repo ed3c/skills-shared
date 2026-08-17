@@ -1,7 +1,7 @@
 # Module: Path B 四步驟稽核協議 — 完整定義 + 執行模板
 
 > 屬 [`path-b-reduction`](../SKILL.md) skill。SKILL.md 有確定性程序的 4 步骨架;本檔是各步**完整定義 +
-> 原始 prompt 模板**(移植自 antigravity 版,拿掉其 northstar 專屬落地細節,見
+> 原始 prompt 模板**(移植自上游版,拿掉其 northstar 專屬落地細節,見
 > `.skill-bindings/path-b-reduction/retarget-map.md`)。
 
 ## 四步驟完整定義
@@ -19,7 +19,7 @@
 
 ### 步驟三:還原微觀總代價(Reconstruct Cumulative Cost / Total Loss)
 - **定義**:繞過帳面平均,用鏈式法則把每次預測/條件機率相乘/系統震盪的「負對數總難度」實打實累加。
-- **skill-bettor 落地**:逐 checker、逐 fixture、逐輪迭代累加真實成本(壞包/棄用/救援輪不因「不是
+- **宿主落地**:逐 checker、逐 fixture、逐輪迭代累加真實成本(壞包/棄用/救援輪不因「不是
   config 的錯」而剔除)。
 
 ### 步驟四:見證約分消去(Perform Algebraic Cancellation)

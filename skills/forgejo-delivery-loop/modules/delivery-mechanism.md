@@ -5,7 +5,7 @@
 
 ## 1. 為什麼需要這個 skill(問題的來歷)
 
-上游(skill-bettor,2026-08-06)的 GCR 0c25bfd 線暴露三個斷點,每個都真實發生過:
+上游(repo 身分見 `.skill-bindings/forgejo-delivery-loop/`,2026-08-06)的 GCR 0c25bfd 線暴露三個斷點,每個都真實發生過:
 
 - **交付狀態只活在對話裡**:11 顆分子 commit、5 張 issues、1 個 PR、1 個看板,全在 chat 裡長出來;
   session 結束後「哪條線對到哪個 repo 的哪些 issues」沒有任何檔案記得,下個 session 要靠人回憶。
@@ -16,7 +16,7 @@
 解法抄自放置契約的手法(新檔先對映槽位,`check_placement.py` 機械擋):
 **把「交付了沒」變成一張機械可驗的收據,沒收據就擋**。
 
-本 repo(bettor-arena)承接同一問題的證據:遷移期間 22 張 issue、2 個 PR、6 波 workflow 的狀態
+本 repo(宿主)承接同一問題的證據:遷移期間 22 張 issue、2 個 PR、6 波 workflow 的狀態
 一度只活在 chat 與 session 記憶裡;儀表板搬進 Forgejo(人裁 2026-08-06)之後才有 session 外的真相。
 
 ## 2. 機制全景(每個箭頭都有物理載體)
@@ -87,7 +87,7 @@ flowchart TD
 - 程序改動走小迴圈沙盒迭代(loop-harness-standard 八大基座),T0 錨＝`--selftest`
   (內建 good／hollow 正負對照:合格收據放行、缺欄位收據被抓)。
 - 經驗回填走 fold-in:操作鐵律進 SKILL.md(Layer A),來歷與 know-why 進本模組(Layer B)。
-- 本 skill 自身的交付也留收據:見 registry 的 `bettor-arena-migration` 線。
+- 本 skill 自身的交付也留收據:見宿主 registry 的遷移實例線(具體名稱見 `.skill-bindings/forgejo-delivery-loop/`)。
 
 ## 6. 四層原生機制(為什麼不自建進度工具)
 
