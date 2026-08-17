@@ -44,6 +44,16 @@ class RouteGateTests(unittest.TestCase):
             symlinks=True,
             ignore=shutil.ignore_patterns(".git", "__pycache__", "node_modules"),
         )
+        # The gate's subject is what the repository ships, read from the Git
+        # index, so the copy must be a real repository: a plain directory has
+        # no index and the gate correctly refuses to guess one. Adding
+        # everything here also makes each planted defect a tracked change,
+        # which is what the assertion is about.
+        for command in (
+            ["git", "init", "--quiet"],
+            ["git", "add", "--all"],
+        ):
+            subprocess.run(command, cwd=cls.work, check=True, capture_output=True)
 
     @classmethod
     def tearDownClass(cls) -> None:

@@ -79,6 +79,7 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -135,11 +136,41 @@ def archive_parts(repo_root: Path) -> set[str]:
     return set(ownership["archive_evidence"]["parts"])
 
 
+def tracked_markdown(repo_root: Path) -> list[Path]:
+    """Subject is what the repository ships, i.e. what Git tracks.
+
+    Walking the filesystem instead reads whatever a host happens to leave in the
+    checkout: sibling agent sessions keep worktrees under `.claude/worktrees/`,
+    which is gitignored, and those copies carry a *different* repository's
+    documents whose links cannot resolve here. Enumerating them produced 60
+    phantom defects on a tree whose own documents were clean. A route the
+    repository does not ship is not a route this repository owes.
+    """
+    result = subprocess.run(
+        ["git", "-C", str(repo_root), "ls-files", "-z", "--", "*.md"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        raise Unusable(
+            "cannot enumerate tracked documents; the subject of this gate is "
+            "repository content, and an unreadable index is not a pass"
+        )
+    return sorted(repo_root / name for name in result.stdout.split("\0") if name)
+
+
 def governed_documents(repo_root: Path, excluded: set[str]) -> list[Path]:
     return [
         path
-        for path in sorted(repo_root.rglob("*.md"))
-        if not (set(path.relative_to(repo_root).parts) & (excluded | {".git"}))
+        for path in tracked_markdown(repo_root)
+        # A tracked path missing from the working tree is a deletion in flight,
+        # not an unreadable subject: the existence assertions (DR-01, DR-03)
+        # own that case and report it as a defect. Reading it here would raise
+        # UNUSABLE instead, which reports "the gate could not run" for a tree
+        # that is simply broken.
+        if path.is_file()
+        and not (set(path.relative_to(repo_root).parts) & (excluded | {".git"}))
     ]
 
 
