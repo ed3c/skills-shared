@@ -1,0 +1,67 @@
+{
+  "schema": "human-admit/v1",
+  "_why_this_file_is_the_gate": "lane_git_town in scripts/capture_adapter_receipt.py reads this file before it decides anything else. Without it the lane emits SKIPPED_BY_POLICY and never starts the binary, which is the state the git-town lane carried while only a linux artifact was admitted. Deleting this file returns the lane to that refusal; nothing else has to be undone, and no other file grants execution.",
+
+  "approver": "ed3c (repository owner)",
+  "decided_at": "2026-08-17",
+  "channel": "owner selection via AskUserQuestion in a live Claude Code session (goal: open-issue sweep), physicalized by agent-macro",
+  "decision": "ADMITTED_FOR_BOUND_SCOPE",
+  "issue": 256,
+
+  "what_was_asked": "Authorize downloading git-town v24.0.0 darwin-arm64 from the official release, whose SHA-256 is already pinned in the owner's runtime-env catalog, and executing it in a disposable repository so the ninth adapter lane produces a receipt instead of an ABSENT record.",
+
+  "why_this_record_exists": "skills/git-town-stacked-pr-worker/tests/live-git-town/admission.json admits a linux_intel_64 artifact at the same version number and declares platform linux. A different artifact is a different artifact: the version string is not the admitted identity, the digest is. This host is darwin/arm64, so the darwin asset needed its own decision rather than an install.",
+
+  "admitted_artifact": {
+    "tool": "git-town",
+    "version": "24.0.0",
+    "release_repository": "git-town/git-town",
+    "release_tag": "v24.0.0",
+    "release_url": "https://github.com/git-town/git-town/releases/tag/v24.0.0",
+    "platform": "darwin",
+    "architecture": "arm64",
+    "asset": {
+      "name": "git-town_macos_arm_64.tar.gz",
+      "url": "https://github.com/git-town/git-town/releases/download/v24.0.0/git-town_macos_arm_64.tar.gz",
+      "sha256": "0de42d52bad34316413c9d0ba0052d09d4ba8746930aa2cc6eaa5931562a91b2"
+    },
+    "pin_authority": {
+      "catalog": "/Users/neon/runtime-env/catalog/git-town-toolchain.json",
+      "schema": "runtime-env/git-town-toolchain-manifest/v1",
+      "pin_path": "assets.darwin-arm64.sha256",
+      "checksums_asset": "checksums.txt",
+      "checksums_sha256": "7532377166cb59dc01c74f86e3a71c54ba9567a461313a5d203a1ea99c571b24",
+      "note": "The catalog is upstream of this repository and read-only from here. This record admits the digest the catalog already pinned; it does not mint a new one."
+    }
+  },
+
+  "derived_executable_identity": {
+    "sha256": "9f3807e07a6be79e4637b140deda9dff5d3a89321b8026a2f2e4a04d2f37fa2d",
+    "member": "git-town",
+    "derivation": "sha256 of the git-town member extracted from the admitted archive, after the archive's own sha256 was compared byte-for-byte with the catalog pin above.",
+    "derived_by": "agent-macro on 2026-08-17 while physicalizing this admission",
+    "why_it_is_recorded_separately": "The owner admitted an archive digest. The executable digest is an observation derived from that archive, not a second decision. The lane requires this value because it executes the member, not the archive, and a lane that checked only the archive would admit any binary someone left beside it."
+  },
+
+  "scope": "One capability: the stack-synchronization lane of scripts/capture_adapter_receipt.py, on a darwin/arm64 host, against a repository the lane creates and deletes under TMPDIR. Nothing else on this host is admitted to run this binary.",
+
+  "conditions": [
+    "The executable is never installed system-wide, never placed on PATH by this repository, and never committed. Its path is supplied per run.",
+    "A sha256 that does not equal derived_executable_identity.sha256 is a refusal, not a warning: the lane records SKIPPED_BY_POLICY and does not start the process.",
+    "The lane runs only against a repository it creates under TMPDIR. Running git-town against this checkout, any worktree of it, or any branch of ed3c/skills-shared is outside this admission.",
+    "HOME, TMPDIR and the git config scope are redirected into the disposable tree so the binary's runlog and user configuration cannot escape it.",
+    "Sync runs with --no-push against a local bare remote. No network operation, forge token, propose or ship is admitted.",
+    "This record admits execution. It admits no evidence: whether the lane passed is decided by the receipt the capture writes, never by this file."
+  ],
+
+  "expiry": "On any change to the admitted version, the catalog pin, or the archive digest. A different digest is a different artifact and needs its own decision; this record does not travel to one.",
+
+  "not_admitted_by_this_record": [
+    "any git-town version other than 24.0.0, and any asset other than git-town_macos_arm_64.tar.gz",
+    "installing git-town on this host or adding it to PATH",
+    "running git-town against ed3c/skills-shared or any of its worktrees",
+    "any network-touching git-town command (propose, ship, repo, sync without --no-push)",
+    "promoting any lane whose measured gate outcome is NOT_ELIGIBLE; the owner explicitly did not select that option",
+    "the linux admission in skills/git-town-stacked-pr-worker, which is a separate record for a separate artifact and is unchanged by this one"
+  ]
+}

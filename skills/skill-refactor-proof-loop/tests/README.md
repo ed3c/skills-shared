@@ -1,6 +1,6 @@
 # Test controls
 
-`run-all.sh` validates the positive refactor packet, golden registry, molecular Stack, and cross-Skill adoption ledger, then runs `selftest.py`, `stack_selftest.py` and `adoption_selftest.py`.
+`run-all.sh` validates the positive refactor packet, golden registry, molecular Stack, and cross-Skill adoption ledger, byte-compares the rendered adoption report, then runs `selftest.py`, `stack_selftest.py`, `adoption_selftest.py` and `render_selftest.py`.
 
 The contract/registry selftest plants and refuses at least:
 
@@ -48,4 +48,12 @@ fixture evidence promoted to a live or delivery PASS
 gap with no owning issue, or owned by an invented issue number
 ```
 
-A green test suite proves the portable mechanisms and current registry/Stack/ledger connections only. The adoption ledger's classifications are offline inventory: they do not prove live runtime, issue/PR state, merge, or Human admission of the standard.
+The render selftest plants and refuses:
+
+```text
+rendered report edited by hand
+rendered report absent
+ledger changed without re-rendering the report
+```
+
+A green test suite proves the portable mechanisms and current registry/Stack/ledger/report connections only. The adoption ledger's classifications are offline inventory: they do not prove live runtime, issue/PR state or merge. Human admission of the standard is a decision record under `evals/`, not something this suite can produce.

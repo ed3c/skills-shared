@@ -31,9 +31,117 @@ for lane in grepai serena tree-sitter sqlite worktree scip git-town forgejo lanc
     || { echo "MISSING RECEIPT ${lane}" >&2; exit 1; }
 done
 
+# The git-town lane starts a binary this repository does not install, so the gate
+# in front of it is what has to be tested here. A host without the artifact must
+# still be able to prove that the refusal works -- and that it is a gate rather
+# than a constant no.
+tmp_root="$(mktemp -d)"
+trap 'rm -rf "${tmp_root}"' EXIT
+
+admission="${skill_dir}/evals/git-town-darwin-admission.json"
+test -f "${admission}" || { echo "MISSING ADMISSION ${admission}" >&2; exit 1; }
+python3 -m json.tool "${admission}" >/dev/null
+
+# The darwin git-town capture is a second subject, so it is a second directory:
+# it was taken at the commit that added the lane, and one capture is one subject.
+# Same checker, same laws, no exemption.
+darwin="${skill_dir}/evals/receipts-git-town-darwin"
+test -f "${darwin}/git-town.receipt.json" \
+  || { echo "MISSING RECEIPT git-town (darwin capture)" >&2; exit 1; }
+python3 -m json.tool "${darwin}/git-town.receipt.json" >/dev/null
+python3 "${checker}" check --receipts "${darwin}"
+
+python3 - "${skill_dir}" "${tmp_root}" <<'PY'
+import hashlib
+import importlib.util
+import json
+import pathlib
+import sys
+
+skill = pathlib.Path(sys.argv[1])
+tmp = pathlib.Path(sys.argv[2])
+spec = importlib.util.spec_from_file_location(
+    "capture", skill / "scripts" / "capture_adapter_receipt.py")
+capture = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(capture)
+
+record = json.loads(capture.GIT_TOWN_ADMISSION.read_text(encoding="utf-8"))
+for field, expected in (("schema", "human-admit/v1"),
+                        ("decision", "ADMITTED_FOR_BOUND_SCOPE"),
+                        ("approver", "ed3c (repository owner)"),
+                        ("decided_at", "2026-08-17")):
+    if record.get(field) != expected:
+        raise SystemExit(f"admission {field} is {record.get(field)!r}, expected {expected!r}")
+for pin in (record["admitted_artifact"]["asset"]["sha256"],
+            record["derived_executable_identity"]["sha256"]):
+    if len(pin) != 64 or pin.strip("0123456789abcdef"):
+        raise SystemExit(f"admission pins {pin!r}, which is not a SHA-256")
+
+
+# The captured receipt has to name the artifact this record admits, and the
+# record it names has to be these bytes. Editing the admission without
+# recapturing would otherwise leave a PASS standing for a decision that changed.
+captured = json.loads(
+    (skill / "evals" / "receipts-git-town-darwin" / "git-town.receipt.json")
+    .read_text(encoding="utf-8"))
+if captured["adapter"]["executable_sha256"] != record["derived_executable_identity"]["sha256"]:
+    raise SystemExit("the darwin receipt records a binary the admission does not pin")
+bound = captured["policy"]["admission"]["record_sha256"]
+actual = hashlib.sha256(capture.GIT_TOWN_ADMISSION.read_bytes()).hexdigest()
+if bound != actual:
+    raise SystemExit(f"the darwin receipt was captured against admission {bound}, "
+                     f"but this record hashes {actual}; recapture or revert")
+print(f"BOUND    receipt <- admission {actual[:12]} <- artifact "
+      f"{record['derived_executable_identity']['sha256'][:12]}")
+
+
+def gate(executable, admission=None):
+    original = capture.GIT_TOWN_ADMISSION
+    if admission is not None:
+        capture.GIT_TOWN_ADMISSION = admission
+    try:
+        return capture.git_town_gate(executable)
+    finally:
+        capture.GIT_TOWN_ADMISSION = original
+
+
+decoy = tmp / "not-git-town"
+decoy.write_bytes(b"this is not the admitted artifact\n")
+revoked = tmp / "revoked-admission.json"
+revoked.write_text(json.dumps({**record, "decision": "HOLD_FOR_MORE_EVIDENCE"}),
+                   encoding="utf-8")
+
+# A gate that always refuses would pass every control above, so the last case
+# plants a stand-in whose digest the record does admit and requires a yes.
+stand_in = tmp / "stand-in-artifact"
+stand_in.write_bytes(b"stand-in for an admitted artifact\n")
+digest = hashlib.sha256(stand_in.read_bytes()).hexdigest()
+matching = tmp / "matching-admission.json"
+matching.write_text(
+    json.dumps({**record, "derived_executable_identity": {"sha256": digest}}),
+    encoding="utf-8")
+
+cases = [
+    ("no binary at all is ABSENT, not a refusal", gate(None), "ABSENT"),
+    ("an unadmitted digest is refused", gate(str(decoy)), "SKIPPED_BY_POLICY"),
+    ("a missing admission refuses",
+     gate(str(decoy), tmp / "no-such-admission.json"), "SKIPPED_BY_POLICY"),
+    ("a withdrawn admission refuses", gate(str(decoy), revoked), "SKIPPED_BY_POLICY"),
+    ("a matching digest is admitted", gate(str(stand_in), matching), "ADMITTED"),
+]
+failed = []
+for name, (state, detail), expected in cases:
+    ok = state == expected and (state != "ADMITTED" or detail == digest)
+    print(f"{'GATE' if ok else 'GATE FAILED'} {expected:18} {name}")
+    if not ok:
+        failed.append(f"{name}: got {state}")
+if failed:
+    raise SystemExit("git-town admission gate controls failed: " + "; ".join(failed))
+PY
+
 # An empty receipt directory must be refused rather than reported as a clean run.
-empty="$(mktemp -d)"
-trap 'rm -rf "${empty}"' EXIT
+empty="${tmp_root}/empty"
+mkdir "${empty}"
 set +e
 python3 "${checker}" check --receipts "${empty}" >/dev/null 2>&1
 status=$?
