@@ -80,10 +80,86 @@
           "type": "array",
           "minItems": 6,
           "maxItems": 6,
-          "items": {"$ref": "#/$defs/disposition"}
+          "prefixItems": [
+            {
+              "allOf": [
+                {"$ref": "#/$defs/disposition"},
+                {
+                  "properties": {
+                    "phase": {"const": "BOOTSTRAP"},
+                    "receipt": {"const": "skill-resolution"},
+                    "disposition": {"const": "REQUIRED"}
+                  }
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {"$ref": "#/$defs/disposition"},
+                {
+                  "properties": {
+                    "phase": {"const": "SHADOW_ADMISSION"},
+                    "receipt": {"const": "shadow-admission"},
+                    "disposition": {"const": "REQUIRED"}
+                  }
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {"$ref": "#/$defs/disposition"},
+                {
+                  "properties": {
+                    "phase": {"const": "TECH_LEAD_PLAN"},
+                    "receipt": {"const": "task-dag"},
+                    "disposition": {"const": "REQUIRED"}
+                  }
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {"$ref": "#/$defs/disposition"},
+                {
+                  "properties": {
+                    "phase": {"const": "SPATIAL_INVARIANTS"},
+                    "receipt": {"const": "spatial-invariants"},
+                    "disposition": {"enum": ["MONITOR", "REQUIRED"]}
+                  }
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {"$ref": "#/$defs/disposition"},
+                {
+                  "properties": {
+                    "phase": {"const": "STACK_DELIVERY"},
+                    "receipt": {"const": "git-town-stack"},
+                    "disposition": {"enum": ["NOT_APPLICABLE_WITH_EVIDENCE", "REQUIRED"]}
+                  }
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {"$ref": "#/$defs/disposition"},
+                {
+                  "properties": {
+                    "phase": {"const": "FORGE_RECONCILIATION"},
+                    "receipt": {"const": "dual-forge-reconciliation"},
+                    "disposition": {"enum": ["NOT_APPLICABLE_WITH_EVIDENCE", "REQUIRED"]}
+                  }
+                }
+              ]
+            }
+          ],
+          "items": false
         },
         "required_receipts": {
           "type": "array",
+          "minItems": 3,
+          "maxItems": 6,
           "uniqueItems": true,
           "items": {
             "enum": [

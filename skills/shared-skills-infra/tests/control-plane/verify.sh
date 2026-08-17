@@ -87,14 +87,24 @@ kd={x['phase']:x['disposition'] for x in stack['phase_dispositions']}
 assert kd['STACK_DELIVERY']=='REQUIRED'
 assert kd['FORGE_RECONCILIATION']=='NOT_APPLICABLE_WITH_EVIDENCE'
 assert all(v['execution_state']=='NOT_EXERCISED' for v in p['issue_plans'].values())
-mut=copy.deepcopy(p); mut['automatic_merge']=True
-try: validator.validate(mut)
-except jsonschema.ValidationError: pass
-else: raise AssertionError('schema accepted automatic_merge=true')
-mut=copy.deepcopy(p); mut['issue_plans']['example/repo#1']['execution_state']='PASS'
-try: validator.validate(mut)
-except jsonschema.ValidationError: pass
-else: raise AssertionError('schema promoted fixture output to PASS')
+# Planted mutations: each shape must stay invalid, otherwise the schema is
+# decoration rather than a gate.
+mutations=[]
+m=copy.deepcopy(p); m['automatic_merge']=True; mutations.append(('automatic merge widening', m))
+m=copy.deepcopy(p); m['issue_plans']['example/repo#1']['execution_state']='PASS'; mutations.append(('runtime PASS promotion', m))
+m=copy.deepcopy(p); del m['issue_plans']; mutations.append(('missing issue_plans', m))
+m=copy.deepcopy(p); m['issue_plans']['example/repo#1']['phase_dispositions'][4]['disposition']='PASS'; mutations.append(('unknown disposition value', m))
+m=copy.deepcopy(p); m['issue_plans']['example/repo#1']['required_receipts'].append('provider-secret'); mutations.append(('unknown receipt', m))
+m=copy.deepcopy(p); m['issue_plans']['example/repo#1']['phase_dispositions'].pop(); mutations.append(('truncated phase contract', m))
+# Applicability is positional: the first three phases are unconditionally
+# REQUIRED and each phase owns exactly one receipt, so neither a waived
+# BOOTSTRAP nor a reordered contract may validate.
+m=copy.deepcopy(p); m['issue_plans']['example/repo#1']['phase_dispositions'][0]['disposition']='NOT_APPLICABLE_WITH_EVIDENCE'; mutations.append(('waived mandatory phase', m))
+m=copy.deepcopy(p); d=m['issue_plans']['example/repo#1']['phase_dispositions']; d[0], d[3] = d[3], d[0]; mutations.append(('reordered phase contract', m))
+m=copy.deepcopy(p); m['issue_plans']['example/repo#1']['phase_dispositions'][3]['receipt']='git-town-stack'; mutations.append(('phase/receipt mismatch', m))
+for label, candidate in mutations:
+    if not list(validator.iter_errors(candidate)):
+        raise AssertionError(f'schema accepted {label}')
 PY
 
 # Closed blocker is satisfied only when it is present in the exact packet.
@@ -105,9 +115,12 @@ cat > "${tmp}/closed-only.json" <<'JSON'
 ]
 JSON
 python3 "${cli}" monitor-plan --issues "${tmp}/closed-only.json" > "${tmp}/closed-only-plan.json"
-python3 - "${tmp}/closed-only-plan.json" <<'PY'
-import json, sys
-p=json.load(open(sys.argv[1])); assert p['issues']==['example/repo#10']; assert p['waves']==[['example/repo#10']]
+python3 - "${tmp}/closed-only-plan.json" "${schema}" <<'PY'
+import json, sys, jsonschema
+p=json.load(open(sys.argv[1])); s=json.load(open(sys.argv[2]))
+jsonschema.Draft202012Validator(s).validate(p)
+assert p['issues']==['example/repo#10']; assert p['waves']==[['example/repo#10']]
+assert p['issue_plans']['example/repo#10']['execution_state']=='NOT_EXERCISED'
 PY
 
 cat > "${tmp}/missing.json" <<'JSON'
