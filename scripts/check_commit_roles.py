@@ -1,24 +1,20 @@
 #!/usr/bin/env python3
-"""Verify Driven-By / Driven-On trailers over a commit range.
+"""Verify Driven-By / Driven-On trailers over the correct commit subject.
 
-The mechanism this replaces did not fail; it never started. Around 1100 of
-1138 commits across these repositories carry `t <t@t.t>`, the unset default,
-so `git log --author=...` cannot select the full set of *any* driver. That is
-not incomplete signal — it is a classification that never ran.
+A commit role belongs to a commit, not to a repository-wide git identity. The
+checker therefore classifies each non-merge commit in an explicit subject range.
 
-Two reasons it never ran, both addressed here:
+Default subject selection is event-aware:
 
-  1. Wrong dimension. A driver is a property of a commit; `git config` is a
-     property of a repository. One repository carries human decisions, main-loop
-     delivery and small-loop iteration at once, so a per-repo identity can only
-     label the dominant driver correctly and silently mislabels the rest.
-  2. No gate. Convention alone produced 1100 unclassified commits. A rule with
-     no gate is a rule nobody applies, which is the failure this repository
-     keeps rediscovering.
+* explicit ``--range`` is highest authority;
+* on a pull request, ``GITHUB_BASE_REF`` selects ``merge-base(base, HEAD)..HEAD``
+  so a PR is judged only for commits it introduces;
+* on push/manual/local runs without a PR base, the historical
+  ``enforced_from..HEAD`` audit remains intact.
 
-The vocabulary lives in `evals/commit-roles.json` so the gate and the humans
-read the same list, and adding a mechanism extends the trailer domain rather
-than the identity field.
+The PR rule is not an exception for bad commits already on main. Push/manual
+runs still expose that debt; PRs simply cannot repair or truthfully relabel
+upstream commit objects they did not introduce.
 
 Exits: 0 all commits classified, 2 violations found, 64 usage or unreadable.
 """
@@ -27,6 +23,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import re
 import subprocess
 import sys
@@ -74,8 +71,13 @@ def git(repo: Path, *args: str) -> str:
 
 def commits(repo: Path, rev_range: str) -> list[dict[str, str]]:
     """One record per commit. \x1e separates records, \x1f separates fields."""
-    raw = git(repo, "log", "--no-merges", "--format=%H\x1f%an\x1f%ae\x1f%cn\x1f%ce\x1f%B\x1e",
-              rev_range)
+    raw = git(
+        repo,
+        "log",
+        "--no-merges",
+        "--format=%H\x1f%an\x1f%ae\x1f%cn\x1f%ce\x1f%B\x1e",
+        rev_range,
+    )
     found: list[dict[str, str]] = []
     for chunk in raw.split("\x1e"):
         chunk = chunk.strip("\n")
@@ -84,10 +86,16 @@ def commits(repo: Path, rev_range: str) -> list[dict[str, str]]:
         parts = chunk.split("\x1f")
         if len(parts) < 6:
             continue
-        found.append({
-            "sha": parts[0], "author_name": parts[1], "author_email": parts[2],
-            "committer_name": parts[3], "committer_email": parts[4], "body": parts[5],
-        })
+        found.append(
+            {
+                "sha": parts[0],
+                "author_name": parts[1],
+                "author_email": parts[2],
+                "committer_name": parts[3],
+                "committer_email": parts[4],
+                "body": parts[5],
+            }
+        )
     return found
 
 
@@ -117,11 +125,6 @@ def check_commit(
     found = trailers(record["body"])
     rules = vocabulary["identity_rules"]
 
-    # Commits that reached main untrailed are listed one by one rather than
-    # excused by a rule. A widened rule would report nothing; a list reports its
-    # own length, which is the honest measure of how far adoption has to go.
-    # An entry is only honoured for a commit that genuinely lacks the trailers,
-    # so the list cannot be used to skip a commit that could simply be fixed.
     listed = {
         item["commit_sha"]
         for item in (vocabulary.get("known_unclassified") or {}).get("commits", [])
@@ -135,20 +138,19 @@ def check_commit(
             ]
         return []
 
-    # Rule 4 first: an unset identity is refused whatever the trailers say,
-    # because the trailers would be labelling a commit nobody claimed.
     for field in ("author_email", "committer_email"):
-        if record[field].lower() in {item.lower() for item in rules["unset_identities"]}:
+        if record[field].lower() in {
+            item.lower() for item in rules["unset_identities"]
+        }:
             problems.append(
                 f"{short}: {field} {record[field]!r} is an unset default identity; "
                 f"nothing recorded who drove this commit"
             )
 
-    # A forge-created commit carries its driver in its committer address. A
-    # squash merge is performed by the forge, not by whoever wrote the branch,
-    # and the forge will never add a trailer. Requiring one would make every
-    # merge a violation, and a gate that fails on every merge gets switched off.
-    forge_roles = {k.lower(): v for k, v in rules.get("forge_committer_roles", {}).items()}
+    forge_roles = {
+        key.lower(): value
+        for key, value in rules.get("forge_committer_roles", {}).items()
+    }
     forge_role = forge_roles.get(record["committer_email"].lower())
     if forge_role is not None and record["author_email"] != record["committer_email"]:
         if forge_role not in vocabulary["driven_by"]:
@@ -181,7 +183,6 @@ def check_commit(
             f"({', '.join(sorted(vocabulary['driven_on']))})"
         )
 
-    # Rule 3: a machine role may not wear a real address.
     if len(by) == 1 and by[0] in vocabulary["driven_by"]:
         role = vocabulary["driven_by"][by[0]]
         if role["machine"]:
@@ -205,9 +206,6 @@ def check_commit(
                     f"while Driven-On says {on[0]!r}"
                 )
 
-    # A forge committer is expected on a merged commit and is not drift: git
-    # preserves the author and rewrites the committer, which is the
-    # decision-versus-execution split this vocabulary is built on.
     committer = record["committer_email"].lower()
     forge = {item.lower() for item in rules["forge_committer_addresses"]}
     if committer in forge:
@@ -274,12 +272,60 @@ def evaluate(
     return len(records), problems
 
 
+def select_rev_range(
+    repo: Path,
+    vocabulary: dict[str, Any],
+    explicit_range: str | None = None,
+    base_ref: str | None = None,
+) -> str:
+    """Choose the exact commit subject without borrowing authority from history."""
+    if explicit_range:
+        return explicit_range
+
+    advertised_base = (base_ref if base_ref is not None else os.environ.get("GITHUB_BASE_REF", "")).strip()
+    if advertised_base:
+        candidates = [f"origin/{advertised_base}", advertised_base]
+        resolved: str | None = None
+        for candidate in candidates:
+            result = subprocess.run(
+                ["git", "-C", str(repo), "rev-parse", "--verify", f"{candidate}^{{commit}}"],
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            if result.returncode == 0:
+                resolved = result.stdout.strip()
+                break
+        if resolved is None:
+            raise Unusable(
+                f"advertised PR base {advertised_base!r} cannot be resolved; "
+                "refusing to widen to enforced history"
+            )
+        merge_base = git(repo, "merge-base", resolved, "HEAD").strip()
+        if not re.fullmatch(r"[0-9a-f]{40}", merge_base):
+            raise Unusable(f"invalid merge-base for PR base {advertised_base!r}")
+        return f"{merge_base}..HEAD"
+
+    start = vocabulary["enforced_from"]["commit_sha"]
+    try:
+        git(repo, "cat-file", "-e", f"{start}^{{commit}}")
+    except Unusable:
+        raise Unusable(
+            f"enforced_from {start[:12]} is not a commit in this repository"
+        )
+    return f"{start}..HEAD"
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--repo-root", type=Path, default=Path.cwd())
     parser.add_argument("--vocabulary", type=Path, default=None)
-    parser.add_argument("--range", dest="rev_range", default=None,
-                        help="commit range; defaults to enforced_from..HEAD")
+    parser.add_argument(
+        "--range",
+        dest="rev_range",
+        default=None,
+        help="explicit commit range; otherwise PR merge-base or enforced_from is selected",
+    )
     args = parser.parse_args()
 
     repo = args.repo_root.resolve()
@@ -287,19 +333,7 @@ def main() -> int:
 
     try:
         vocabulary = load_vocabulary(vocabulary_path)
-        start = vocabulary["enforced_from"]["commit_sha"]
-        rev_range = args.rev_range or f"{start}..HEAD"
-        try:
-            git(repo, "cat-file", "-e", f"{start}^{{commit}}")
-        except Unusable:
-            # A start point this repository cannot see means the range is
-            # meaningless; scanning everything would be worse than stopping.
-            print(
-                f"FATAL commit-roles: enforced_from {start[:12]} is not a commit "
-                f"in this repository",
-                file=sys.stderr,
-            )
-            return 64
+        rev_range = select_rev_range(repo, vocabulary, args.rev_range)
         legacy_unclassified = resolve_legacy_imports(repo, vocabulary)
         total, problems = evaluate(repo, rev_range, vocabulary, legacy_unclassified)
     except Unusable as error:
@@ -309,8 +343,11 @@ def main() -> int:
     if problems:
         for item in problems:
             print(f"COMMIT ROLE RED: {item}", file=sys.stderr)
-        print(f"COMMIT ROLE RED: {len(problems)} violation(s) over {total} commit(s) "
-              f"in {rev_range}", file=sys.stderr)
+        print(
+            f"COMMIT ROLE RED: {len(problems)} violation(s) over {total} commit(s) "
+            f"in {rev_range}",
+            file=sys.stderr,
+        )
         return 2
 
     listed = len((vocabulary.get("known_unclassified") or {}).get("commits", []))

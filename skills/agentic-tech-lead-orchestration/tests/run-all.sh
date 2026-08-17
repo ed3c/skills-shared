@@ -3,6 +3,31 @@ set -eu
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 TMP=${TMPDIR:-/tmp}/agentic-tech-lead-receipt-$$.json
 trap 'rm -f "$TMP"' EXIT HUP INT TERM
+
+# First prove the routing itself, including planted disconnections.
+python3 "$ROOT/scripts/check_runtime_reachability.py" --selftest
+
+# Exercise the Draft 2020-12 task-packet shape gate and its planted mutations.
+python3 "$ROOT/scripts/check_task_contract_schema.py" --selftest
+python3 "$ROOT/scripts/check_task_contract_schema.py" \
+  --contract "$ROOT/references/example-stack-contract.json"
+
+# Prove module reachability is also a causal DAG: trigger/selection, predecessor
+# closure, subject identity, receipt consumption, evidence kind, and downstream
+# state admission. Fixture mode proves the mechanism but cannot authorize live runtime.
+python3 "$ROOT/tests/capability_dag_selftest.py"
+python3 "$ROOT/scripts/assert_capability_dag.py" \
+  --contract "$ROOT/references/example-stack-contract.json" \
+  --plan "$ROOT/references/example-capability-plan.json" \
+  --receipts "$ROOT/references/example-capability-receipts.json" \
+  --admit-state DELIVERY_HANDOFF \
+  --fixture-mode
+
+# Freeze and compare the pre-refactor monolith, refactor-as-landed,
+# reachability-repaired refactor, and current causal-DAG candidate.
+python3 "$ROOT/tests/refactor_ab.py"
+
+# Then exercise semantic/hard-law negative controls and positive receipt.
 python3 "$ROOT/tests/selftest.py"
 python3 "$ROOT/tests/scheduler_lifecycle_selftest.py"
 python3 -m json.tool "$ROOT/references/scheduler-lifecycle.schema.json" >/dev/null

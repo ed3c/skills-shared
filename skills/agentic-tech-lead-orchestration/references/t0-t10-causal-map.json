@@ -1,0 +1,17 @@
+{
+  "schema": "agentic-tech-lead/t0-t10-causal-map/v1",
+  "stages": [
+    {"old": "T0_ROUTE", "new_states": ["REQUEST_BOUND"], "capability_transitions": []},
+    {"old": "T1_CONTRACT", "new_states": ["SYSTEM_CONTRACT_EXTRACTED", "CAPABILITY_PLAN_COMPILED"], "capability_transitions": []},
+    {"old": "T2_ANCHOR", "new_states": ["CONTEXT_ADMITTED"], "capability_transitions": ["intent-anchor"]},
+    {"old": "T3_EXPAND", "new_states": ["CONTEXT_ADMITTED"], "capability_transitions": ["deterministic-context"]},
+    {"old": "T4_SLICE", "new_states": ["CONTEXT_ADMITTED"], "capability_transitions": ["deterministic-context", "vector-examples"]},
+    {"old": "T5_DECOMPOSE", "new_states": ["TASK_DAG_COMPILED"], "capability_transitions": []},
+    {"old": "T6_DISPATCH", "new_states": ["TASK_SCHEMA_ASSERTED", "TASK_SEMANTICS_ASSERTED", "WORKERS_ADMITTED", "ATTEMPTS_EXECUTED"], "capability_transitions": ["worker-execution"]},
+    {"old": "T7_VERIFY_REPAIR", "new_states": ["RESULTS_VERIFIED"], "capability_transitions": []},
+    {"old": "T8_REVIEW_SELECT", "new_states": ["CANDIDATES_COMPARED"], "capability_transitions": ["candidate-tournament"]},
+    {"old": "T9_STACK_RESTACK", "new_states": ["CONVERGENCE_APPLIED", "GLOBAL_OBJECTIVE_ASSERTED"], "capability_transitions": ["stacked-delivery"]},
+    {"old": "T10_HANDOFF", "new_states": ["DELIVERY_HANDOFF"], "capability_transitions": ["stacked-delivery"]}
+  ],
+  "causal_law": "A capability transition may contribute to a downstream state only when its trigger is frozen in the plan, every selected predecessor is closed by an identity-matched receipt, the receipt consumes predecessor output states, and the receipt is admitted at or before the downstream state. LIVE runtime admission rejects FIXTURE evidence."
+}

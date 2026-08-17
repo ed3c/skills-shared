@@ -1,0 +1,88 @@
+{
+  "schema": "agentic-tech-lead/capability-plan/v1",
+  "task_id": "example-stack",
+  "subject": {
+    "base_commit": "0123456789abcdef0123456789abcdef01234567",
+    "base_tree": "89abcdef0123456789abcdef0123456789abcdef"
+  },
+  "transitions": [
+    {
+      "id": "intent-anchor",
+      "module_path": "modules/semantic-intent-anchor.md",
+      "selection": "OPTIONAL_SELECTED",
+      "trigger": {"matched": true, "evidence": ["conceptual intent requires bounded seed discovery"]},
+      "predecessor_transitions": [],
+      "requires_states": ["SYSTEM_CONTRACT_EXTRACTED"],
+      "produces_state": "INTENT_ANCHORED",
+      "required_before_state": "CONTEXT_ADMITTED",
+      "fallback": "DIRECT_SOURCE",
+      "runtime_state": "NOT_EXERCISED",
+      "authority": {"merge": false, "publication": false, "secret_access": false}
+    },
+    {
+      "id": "deterministic-context",
+      "module_path": "modules/deterministic-code-intelligence.md",
+      "selection": "REQUIRED",
+      "trigger": {"matched": true, "evidence": ["cross-file impact and AST slicing required"]},
+      "predecessor_transitions": ["intent-anchor"],
+      "requires_states": ["SYSTEM_CONTRACT_EXTRACTED", "INTENT_ANCHORED"],
+      "produces_state": "DETERMINISTIC_CONTEXT_READY",
+      "required_before_state": "CONTEXT_ADMITTED",
+      "fallback": "STOP",
+      "runtime_state": "NOT_EXERCISED",
+      "authority": {"merge": false, "publication": false, "secret_access": false}
+    },
+    {
+      "id": "vector-examples",
+      "module_path": "modules/vector-store.md",
+      "selection": "NOT_APPLICABLE",
+      "trigger": {"matched": false, "evidence": ["deterministic context is sufficient"]},
+      "predecessor_transitions": [],
+      "requires_states": ["SYSTEM_CONTRACT_EXTRACTED"],
+      "produces_state": "VECTOR_CONTEXT_READY",
+      "required_before_state": "CONTEXT_ADMITTED",
+      "fallback": "SKIP",
+      "runtime_state": "NOT_EXERCISED",
+      "authority": {"merge": false, "publication": false, "secret_access": false}
+    },
+    {
+      "id": "worker-execution",
+      "module_path": "modules/agent-executor.md",
+      "selection": "REQUIRED",
+      "trigger": {"matched": true, "evidence": ["admitted worker must execute bounded edits"]},
+      "predecessor_transitions": ["deterministic-context"],
+      "requires_states": ["WORKERS_ADMITTED", "DETERMINISTIC_CONTEXT_READY"],
+      "produces_state": "ATTEMPTS_EXECUTED",
+      "required_before_state": "ATTEMPTS_EXECUTED",
+      "fallback": "STOP",
+      "runtime_state": "NOT_EXERCISED",
+      "authority": {"merge": false, "publication": false, "secret_access": false}
+    },
+    {
+      "id": "candidate-tournament",
+      "module_path": "modules/tournament-mode.md",
+      "selection": "NOT_APPLICABLE",
+      "trigger": {"matched": false, "evidence": ["stack mode selected"]},
+      "predecessor_transitions": [],
+      "requires_states": ["RESULTS_VERIFIED"],
+      "produces_state": "CANDIDATES_COMPARED",
+      "required_before_state": "CANDIDATES_COMPARED",
+      "fallback": "SKIP",
+      "runtime_state": "NOT_EXERCISED",
+      "authority": {"merge": false, "publication": false, "secret_access": false}
+    },
+    {
+      "id": "stacked-delivery",
+      "module_path": "modules/stacked-delivery.md",
+      "selection": "OPTIONAL_SELECTED",
+      "trigger": {"matched": true, "evidence": ["reviewable stack handoff requested and repository policy admits adapter"]},
+      "predecessor_transitions": ["worker-execution"],
+      "requires_states": ["GLOBAL_OBJECTIVE_ASSERTED", "ATTEMPTS_EXECUTED"],
+      "produces_state": "DELIVERY_HANDOFF",
+      "required_before_state": "DELIVERY_HANDOFF",
+      "fallback": "STOP",
+      "runtime_state": "NOT_EXERCISED",
+      "authority": {"merge": false, "publication": false, "secret_access": false}
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "agentic-tech-lead/capability-receipts/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "receipts"],
+  "properties": {
+    "schema": {"const": "agentic-tech-lead/capability-receipts/v1"},
+    "receipts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "schema", "task_id", "transition_id", "module_path", "subject",
+          "attempt_id", "evidence_kind", "verdict", "input_states", "output_state",
+          "evidence_sha256", "source_readback", "authority"
+        ],
+        "properties": {
+          "schema": {"const": "agentic-tech-lead/capability-receipt/v1"},
+          "task_id": {"type": "string", "minLength": 1},
+          "transition_id": {"type": "string", "minLength": 1},
+          "module_path": {"type": "string", "minLength": 1},
+          "subject": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["base_commit", "base_tree"],
+            "properties": {
+              "base_commit": {"type": "string", "pattern": "^[0-9a-f]{7,64}$"},
+              "base_tree": {"type": "string", "pattern": "^[0-9a-f]{7,64}$"}
+            }
+          },
+          "attempt_id": {"type": "string", "minLength": 1},
+          "evidence_kind": {"enum": ["FIXTURE", "LIVE"]},
+          "verdict": {"enum": ["PASS", "DEGRADED", "FALLBACK", "FAIL", "BLOCKED"]},
+          "input_states": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {"type": "string", "minLength": 1}
+          },
+          "output_state": {"type": "string", "minLength": 1},
+          "evidence_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "source_readback": {"type": "boolean"},
+          "authority": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["merge", "publication", "secret_access"],
+            "properties": {
+              "merge": {"const": false},
+              "publication": {"const": false},
+              "secret_access": {"const": false}
+            }
+          }
+        }
+      }
+    }
+  }
+}

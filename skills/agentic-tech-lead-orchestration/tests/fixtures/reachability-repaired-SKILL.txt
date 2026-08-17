@@ -1,0 +1,106 @@
+---
+name: agentic-tech-lead-orchestration
+description: |
+  Portable Agentic Tech Lead procedure for compiling a request into typed task contracts, extracting invariants and unknowns, building only true dependency edges, admitting bounded workers with disjoint leases, verifying each result independently, selecting among candidate implementations, converging shared state, and handing off a reviewable stack. Concrete code-intelligence providers, parsers, symbol tools, executors, vector projections, schedulers, and consumer commands are domain modules.
+---
+
+# Agentic Tech Lead Orchestration
+
+<!-- PORTABLE_CORE_START -->
+
+## Contract
+
+The core owns task-contract compilation, invariant extraction, true dependency DAGs, worker/attempt identity, lease admission, independent verification, candidate comparison, convergence ownership, global-objective retention, and delivery handoff. Concrete tool/runtime implementations live in `modules/domain-profile.md`.
+
+The core owns a two-stage executable pre-dispatch gate. A task packet is not admissible for Worker execution until `scripts/check_task_contract_schema.py` validates its shape against `references/task-contract.schema.json`, then `scripts/assert_task_contract.py` evaluates semantic/hard-law assertions and emits a receipt. Structural core/domain separation is a third, independent assertion and cannot substitute for either task gate.
+
+## State machine
+
+```text
+REQUEST_BOUND
+→ SYSTEM_CONTRACT_EXTRACTED
+→ TASK_DAG_COMPILED
+→ TASK_SCHEMA_ASSERTED
+→ TASK_SEMANTICS_ASSERTED
+→ WORKERS_ADMITTED
+→ LEASES_BOUND
+→ ATTEMPTS_EXECUTED
+→ RESULTS_VERIFIED
+→ CANDIDATES_COMPARED
+→ CONVERGENCE_APPLIED
+→ GLOBAL_OBJECTIVE_ASSERTED
+→ DELIVERY_HANDOFF
+```
+
+## Hard laws
+
+- **CORE-LAW-001 — contracts before workers.** Freeze exact subject, invariants, task inputs/outputs, dependencies, acceptance criteria, negative controls, budgets, and authority before fan-out.
+- **CORE-LAW-002 — dependency edges must be real and writers disjoint.** A dependency exists only when a task consumes another task's unmerged contract/bytes/state; active writers may not overlap path/resource leases.
+- **CORE-LAW-003 — worker/provider output is candidate evidence.** Results require exact-source readback and owning assertions; self-report, index hits, graph edges, or process exit zero cannot become correctness `PASS` by themselves.
+- **CORE-LAW-004 — modules cannot widen authority.** Capability modules may implement retrieval/execution but cannot fabricate dependencies, weaken oracles, suppress failures/dissent, or widen filesystem/network/secret/merge authority.
+- **CORE-LAW-005 — convergence preserves the global objective.** Candidate selection and shared-state integration happen only after prerequisites are verified; local task success cannot override frozen repository/system invariants.
+
+## Procedure
+
+1. Bind exact repository/system/task subject, objective, non-goals, constraints, and Human-owned operations.
+2. Extract system invariants, interfaces, unknowns, evidence requirements, rollback conditions, and shared-state owners.
+3. Compile typed task packets with true dependency edges, path/resource scope, budgets, independent oracles, and negative controls.
+4. Before any Worker is admitted, run the two-stage gate in order:
+   - `python3 scripts/check_task_contract_schema.py --contract <task-contract.json>`; any non-zero result blocks dispatch.
+   - `python3 scripts/assert_task_contract.py --contract <task-contract.json> --receipt <receipt.json>`; any non-zero result blocks dispatch.
+   Preserve the schema verdict and semantic receipt as part of the exact task subject. A schema PASS cannot override a semantic failure, and a semantic checker must never receive authority to ignore a schema failure.
+5. Admit parallel workers only when scopes are disjoint and prerequisites/capabilities are satisfied; otherwise choose bounded serial/single-worker execution.
+6. Select optional retrieval/execution capabilities only through `modules/domain-profile.md`; direct source and deterministic controls remain authoritative.
+7. Build each Worker packet from the frozen contract and `references/fanout-prompt.md`; modules may add bounded invocation details but may not replace the contract envelope.
+8. Execute attempts with unique identities, observable artifacts, bounded retries, and no private-reasoning requirement.
+9. Verify every result independently; stale/wrong-subject/out-of-lease results fail closed and remain in the denominator.
+10. Compare competing valid candidates on frozen correctness, risk, cost, reviewability, and rollback criteria rather than model preference.
+11. Converge shared indexes/contracts/state through one explicit owner after prerequisites are verified.
+12. Assert both local task oracles and the frozen global objective before producing a stacked/delivery handoff.
+
+## Module selection
+
+Load `modules/domain-profile.md` only when concrete code-intelligence providers, parsers, symbol/executor tools, projections, schedulers, runtime carriers, or consumer commands must be bound. That profile is the only provider-specific router: follow only the module links whose triggers match the frozen task contract, record the selected module paths in the task evidence, and leave non-matching modules unloaded. A module may never activate itself merely because a tool is installed.
+
+## Executable assertions
+
+Three assertions have distinct authority and all must stay reachable:
+
+```bash
+# Refactor/boundary integrity. This does not admit a task packet.
+python3 scripts/check_skill_core_boundaries.py --skill agentic-tech-lead-orchestration
+
+# Stage 1: Draft 2020-12 packet shape. Requires the repository-pinned jsonschema validator.
+python3 skills/agentic-tech-lead-orchestration/scripts/check_task_contract_schema.py \
+  --contract <task-contract.json>
+
+# Stage 2: semantic/hard-law packet assertions and receipt.
+python3 skills/agentic-tech-lead-orchestration/scripts/assert_task_contract.py \
+  --contract <task-contract.json> \
+  --receipt <receipt.json>
+```
+
+Task-gate exit contract:
+
+```text
+0   the named gate passed for the declared packet
+2   packet was evaluable and the named gate found a violation
+64  usage/JSON/required input invalid or absent
+70  assertion mechanism or validator unavailable/invalid
+```
+
+Both task gates must return `0` before Worker admission. Their PASS states prove only packet shape and implemented semantic assertions. They do not prove provider installation, live indexing, Worker execution, delivery runtime, mergeability, or Human Admit.
+
+## Evidence states
+
+Preserve `PASS`, `FAIL`, `ABSENT`, `NOT_IMPLEMENTED`, `NOT_EXERCISED`, `SKIPPED_BY_POLICY`, and `HUMAN_ADMIT_REQUIRED`. Provider/tool implementation and live runtime execution remain distinct.
+
+## Stop and handoff
+
+Stop on missing system contract, failed schema gate, failed semantic task-contract assertion, false dependency graph, overlapping leases, failed oracle, stale result, unresolved safety dissent, unavailable required capability, budget exhaustion, or Human-owned merge/release/promotion. Handoff includes task DAG, schema-gate state, semantic task-contract receipt, selected module paths, attempts, leases, verified results, rejected candidates, convergence subject, global-objective receipt, and next delivery authority.
+
+<!-- PORTABLE_CORE_END -->
+
+## Domain specialization
+
+See [modules/domain-profile.md](modules/domain-profile.md). Existing deterministic task-graph/evidence mechanisms remain reusable; product-specific adapters must stay outside the portable core.
