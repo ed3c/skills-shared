@@ -443,6 +443,66 @@
         "skills/forgejo-delivery-loop/tests/selftests/verify.sh"
       ],
       "note": "#122 shape: route.ts carried a 19-case selftest that nothing ran -- not the suite, not any workflow. A selftest nobody reaches reports nothing, and reports it in the same green as one that runs."
+    },
+    {
+      "id": "document-route-link-resolution",
+      "file": "scripts/check_document_routes.py",
+      "anchor": "                if not (path.parent / resolved).exists():",
+      "verify": [
+        "python3",
+        "-m",
+        "unittest",
+        "tests.test_document_routes"
+      ],
+      "note": "DR-02 was prose for its whole life and 20 dead links accumulated under it. Without this line the gate reads every one of them as a route."
+    },
+    {
+      "id": "document-route-machine-local-target",
+      "file": "scripts/check_document_routes.py",
+      "anchor": "                if MACHINE_PATH.match(target):",
+      "verify": [
+        "python3",
+        "-m",
+        "unittest",
+        "tests.test_document_routes"
+      ],
+      "note": "DR-06. A file:///Users/... link resolves on exactly one machine, so without this check it is indistinguishable from a working route on the machine that wrote it."
+    },
+    {
+      "id": "document-route-index-count-reconciliation",
+      "file": "scripts/check_document_routes.py",
+      "anchor": "        if stated != measured[key]:",
+      "verify": [
+        "python3",
+        "-m",
+        "unittest",
+        "tests.test_document_routes"
+      ],
+      "note": "#322's criterion: the index stated 11 of 30 while the tree had 12 of 31. Remove this and the count goes back to being a self-report that is true because it says so."
+    },
+    {
+      "id": "document-route-unnamed-omission",
+      "file": "scripts/check_document_routes.py",
+      "anchor": "        if f\"`{name}`\" not in index:",
+      "verify": [
+        "python3",
+        "-m",
+        "unittest",
+        "tests.test_document_routes"
+      ],
+      "note": "An index fails in one direction only: a dead link is found when someone follows it, an omission looks exactly like completeness. This is the only thing that looks at the omission side."
+    },
+    {
+      "id": "adoption-report-projection-freshness",
+      "file": "skills/skill-refactor-proof-loop/scripts/render_adoption_report.py",
+      "anchor": "        if args.output.read_text(encoding=\"utf-8\") != rendered:",
+      "verify": [
+        "python3",
+        "-m",
+        "unittest",
+        "tests.test_adoption_report"
+      ],
+      "note": "#322's rendered report is a projection only while something compares its bytes to the ledger. Without this line --check passes on any content and the report becomes a second ledger that drifts silently."
     }
   ]
 }

@@ -31,7 +31,9 @@ skills/skill-refactor-proof-loop/scripts/check_refactor_proof_stack.py
 | Generalized proof contract + golden registry | `#319` | `#323` | true child | `agent/319-skill-refactor-proof-contract` / PR #315 branch | current GitHub PR metadata and Skill Suites/Shared Skills Infra |
 | Agent routes + directory State Machines/DAG/data flow | `#320` | `#324` | true child | `agent/320-refactor-proof-agent-docs` / PR #323 branch | current GitHub PR metadata and route/check workflows |
 | Molecular Stack + traceability convergence | `#321` | `#325` | convergence | `agent/321-refactor-proof-stack-index` / PR #324 branch | current GitHub PR metadata and exact-head workflows |
-| Cross-Skill adoption audit | `#322` | delivery PR of `agent/goal-33-issues-batch` (GitHub metadata) | planned process follow-up | `agent/goal-33-issues-batch` / `main` | machine ledger landed at `skills/skill-refactor-proof-loop/references/skill-adoption-ledger.json`; rendered report, gap issues and Human admission of the standard still open |
+| Cross-Skill adoption audit | `#322` | delivery PR of `agent/goal-33-issues-batch` (GitHub metadata) | planned process follow-up | `agent/goal-33-issues-batch` / `main` | machine ledger landed at `skills/skill-refactor-proof-loop/references/skill-adoption-ledger.json`; rendered report landed at [`SKILL_ADOPTION_AUDIT.md`](SKILL_ADOPTION_AUDIT.md); gap issues and Human admission of the standard still open |
+
+The rendered report is a projection, not a second ledger: `skills/skill-refactor-proof-loop/scripts/render_adoption_report.py` recomputes it from the ledger bytes and `--check` exits 2 on any difference, so a hand edit to the report is refused rather than believed. Reading it saves opening the ledger; it does not become an authority over it.
 
 True-child edges are justified by consumed unmerged artifacts:
 

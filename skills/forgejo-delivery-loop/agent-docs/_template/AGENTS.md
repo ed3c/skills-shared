@@ -19,7 +19,7 @@
 |---|---|---|---|---|
 | **法則層** | 全局 `~/.claude/CLAUDE.md` | 時間／資料流 | 跨專案通用判準，**不放實例**、不寫死目錄 | 不指向任何迴圈目錄 |
 | **路由層** | **本檔**（每個 repo 一份） | 空間／基座 | 法則主題 → 擁有實證的 Harness；基座 → 實體位置 | 不存實證副本 |
-| **編排層** | [`.claude/CLAUDE.md`](.claude/CLAUDE.md) | 觸發／編排 | 階段 × 時機、讓位規則、開不開迴圈、風格與邊界 | 不記結構位置、不抄能力清單 |
+| **編排層** | `.claude/CLAUDE.md` | 觸發／編排 | 階段 × 時機、讓位規則、開不開迴圈、風格與邊界 | 不記結構位置、不抄能力清單 |
 | **實證層** | 各 Harness 的 `modules/`／`domain/` | — | 完整方法論、逐案實證、可觸發的動作清單 | 不重述法則 |
 
 判斷歸屬：**判準**寫全局、**位置**寫本檔、**時機與取捨**寫編排層、**實例**寫 Harness。
@@ -78,12 +78,12 @@
 | B7 goal contract | versioned intent/requirements/acceptance/budget | `PROMPT.md` target/success/stop-loss |
 | B8 state ledger | execution topology/evolution/receipt state | `PLAN.md` iteration/Human edge |
 
-> 完整責任、正負控制、P0-P10 模組化測試經驗與資料流 → [loop-harness-standard modules/dual-loop-eight-base.md](<專案設定目錄>/skills/loop-harness-standard/modules/dual-loop-eight-base.md)
-> 泛用執行程序（設定 Prompt→啟動 Harness→驗證狀態→經驗折疊）→ [loop-harness-standard modules/harness-spec.md §6](<專案設定目錄>/skills/loop-harness-standard/modules/harness-spec.md)
+> 完整責任、正負控制、P0-P10 模組化測試經驗與資料流 → loop-harness-standard `<專案設定目錄>/skills/loop-harness-standard/modules/dual-loop-eight-base.md`
+> 泛用執行程序（設定 Prompt→啟動 Harness→驗證狀態→經驗折疊）→ loop-harness-standard §6 `<專案設定目錄>/skills/loop-harness-standard/modules/harness-spec.md`
 
 **Harness Configuration 實體位置**（本 repo 的基座落點）：
 
-- **B1 rules/context 三件**：`AGENTS.md`（本檔，路由層）＋[`.claude/CLAUDE.md`](.claude/CLAUDE.md)（編排層）＋`ARCHITECTURE.md`。
+- **B1 rules/context 三件**：`AGENTS.md`（本檔，路由層）＋`.claude/CLAUDE.md`（編排層）＋`ARCHITECTURE.md`。
   三件缺一件，該職責就只能靠記憶補。
 - **Config Path**: `.agents/mcp.json` — B4
 - **Skills Path**: `<專案設定目錄>/skills/` — B4
@@ -114,7 +114,7 @@
 ---
 
 ## §3 MCP Tools Index
-> SSOT = [<專案設定目錄>/modules/harness-config.md](<專案設定目錄>/modules/harness-config.md)（MCP servers／Skills／Problem Graph 目錄結構規範，本節不存副本）。
+> SSOT = `<專案設定目錄>/modules/harness-config.md`（MCP servers／Skills／Problem Graph 目錄結構規範，本節不存副本）。
 
 ---
 
