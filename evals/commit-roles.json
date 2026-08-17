@@ -46,7 +46,8 @@
     "codex-cli": "Codex CLI.",
     "codex-app": "Codex App or IDE.",
     "shell": "A plain shell with no agent harness.",
-    "ci": "A CI runner."
+    "ci": "A CI runner.",
+    "chatgpt-github-connector": "ChatGPT's GitHub connector, writing commits through the forge API with no local checkout. Added when PR #341 arrived carrying this value: the host is real and already producing commits, so the honest repair is to name it here rather than to relabel the commit as a host it did not run on."
   },
   "identity_rules": {
     "machine_author_email_pattern": "^(?P<role>[a-z][a-z0-9-]*)@(?P<host>[a-z][a-z0-9-]*)\\.invalid$",
