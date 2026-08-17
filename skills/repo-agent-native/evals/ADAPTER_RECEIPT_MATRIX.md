@@ -40,11 +40,13 @@ invariant, not an assertion made by this document.
 | lancedb | lancedb 0.37.1 (`sha256:01ae36c3…6b059`) | `14339da3…b90d68` / `8e71995d…f54b6` | PASS | B (declared contract) | `projection-has-a-source-lane` RED, `deleting-the-projection-changes-nothing` RED | Optional, consumer-owned projection per `references/BLINDSPOT_HYBRID_CONTRACT.md`; every row links to a non-LanceDB source event and carries no source of its own | cleaned, no paths left |
 | worktree | git 2.50.1 (Apple Git-155) (`sha256:12bed452…668ba`) | `e3b0c442…855` (empty) / `e3b0c442…855` (empty) | PASS | A (direct implementation evidence) | `one-writer-per-branch` RED | Proves the local `git worktree add/remove` mechanism and a concurrent-clash control only; it does **not** bind #231's live multi-Worker scheduler receipt (see "Scheduler / Git Town / Forgejo binding" below) | cleaned, no paths left |
 | forgejo | forgejo 9.0.3+gitea-1.22.0, loopback `http://localhost:3000` | `16969a75…7b855` / `e3b0c442…855` (empty) | PASS | B (declared contract) | `repository-binding-absent` RED, `provider-reachable-is-not-binding` RED | Provider identity/reachability inventory only. This repository has no admitted Forgejo remote, so `repository_bound=false`; no issue, PR, branch or push was created or attempted (`policy.mutation_granted=false`) | cleaned, no paths left |
-| git-town | — (not installed) | none (`terminal_state=NOT_STARTED`) | **ABSENT** | none | none (unexercised lanes carry no control, by contract) | Human-admission-required: the repository's admitted Git Town artifact is pinned by SHA-256 to `linux_intel_64`; this capture host is `darwin`. Binding a darwin artifact at the same version is a Human admission decision, not an install, per `git-town.receipt.json`'s own `result.detail` | cleaned, no paths left (nothing ran) |
+| git-town | — (not installed) | none (`terminal_state=NOT_STARTED`) | **ABSENT** in this capture set; **PASS** in `receipts-git-town-darwin/` | none here | none here | The darwin artifact was Human-admitted on 2026-08-17 (`evals/git-town-darwin-admission.json`, v24.0.0 darwin-arm64 pinned to the runtime-env catalog digest) and the lane was implemented and exercised live at its own subject. Its receipt lives in the single-subject directory `evals/receipts-git-town-darwin/` because one capture is one subject: this directory's eight receipts bind `f50b2b98` and cannot absorb a receipt from a later commit. The next full nine-lane recapture at one commit supersedes both | this row's lane: nothing ran here; the darwin capture cleaned its own tree |
 
 8 of 9 lanes are `PASS` with a real executed control that could have turned
 them red (`check_adapter_receipts.py`'s `CONTROL_MISSING` law refuses any
-`PASS` where no control observed `RED`). `git-town` is honestly `ABSENT`,
+`PASS` where no control observed `RED`). `git-town` is honestly `ABSENT`
+in this f50b2b98-bound set (its exercised darwin receipt lives in
+`receipts-git-town-darwin/` at its own subject),
 not laundered into `PASS` or silently omitted from the receipt directory —
 `tests/adapter-receipts/verify.sh` asserts all nine lane files exist,
 present or absent, so a missing file cannot read as a passing lane.
@@ -88,8 +90,10 @@ cleanup and rollback subjects are explicit                PASS (residue.cleaned 
 shared Skill bodies remain domain-neutral and
   secret-free                                          PASS (check_secrets() scans every receipt; no forbidden pattern found)
 merge, provider activation, publication, promotion
-  and rollback remain Human/trusted-operator authority   HUMAN_ADMIT_REQUIRED (git-town artifact binding; any GitHub
-                                                          publication of this matrix's findings)
+  and rollback remain Human/trusted-operator authority   HUMAN_ADMIT_REQUIRED (any GitHub publication of this
+                                                          matrix's findings); the git-town darwin artifact binding
+                                                          was Human-admitted 2026-08-17
+                                                          (evals/git-town-darwin-admission.json)
 ```
 
 Git Town remains the one lane this repository cannot exercise from a darwin
