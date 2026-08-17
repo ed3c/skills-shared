@@ -356,6 +356,7 @@ def selftest() -> int:
     exactly what that state has instead of cells.
     """
     executed: tuple[dict[str, Any], dict[str, Any], dict[str, Any]] | None = None
+    pinned_executed: tuple[dict[str, Any], dict[str, Any], dict[str, Any]] | None = None
     frozen: tuple[dict[str, Any], dict[str, Any]] | None = None
     for prereg_path, cases_path, result_path in designs():
         prereg = load(prereg_path)
@@ -369,6 +370,9 @@ def selftest() -> int:
             return 2
         if result is not None and executed is None:
             executed = (prereg, cases, result)
+        if (result is not None and pinned_executed is None
+                and any(arm.get("pin_verified_at_head") for arm in prereg["arms"])):
+            pinned_executed = (prereg, cases, result)
         if result is None and frozen is None:
             frozen = (prereg, cases)
 
@@ -376,8 +380,31 @@ def selftest() -> int:
         print("SELFTEST RED: no executed design to plant record defects in", file=sys.stderr)
         return 2
     if frozen is None:
-        print("SELFTEST RED: no frozen design to plant freeze defects in", file=sys.stderr)
-        return 2
+        # Every committed design has executed, which is a legitimate repository
+        # state, not a selftest failure. The freeze controls still need a
+        # frozen subject, so synthesize one from an executed design: same
+        # pins, same case set, status back to FROZEN_NOT_EXECUTED and no
+        # result beside it. The synthesized base is validated before any
+        # mutation, so a control that goes red is red about its planted
+        # defect and not about the synthesis.
+        # Prefer an executed design whose arms still verify their pins at
+        # HEAD: the freeze controls plant pin and marker defects, and a
+        # design without pin_verified_at_head arms skips those checks
+        # entirely, leaving the controls with nothing to trip.
+        source = pinned_executed or executed
+        if not any(arm.get("pin_verified_at_head") for arm in source[0]["arms"]):
+            print("SELFTEST RED: no executed design carries a HEAD-verified pin "
+                  "to synthesize freeze controls from", file=sys.stderr)
+            return 2
+        synthetic = copy.deepcopy(source[0])
+        synthetic["status"] = "FROZEN_NOT_EXECUTED"
+        try:
+            validate(synthetic, source[1], None)
+        except Refused as failure:
+            print(f"SELFTEST RED: synthesized frozen base refused -- {failure}",
+                  file=sys.stderr)
+            return 2
+        frozen = (synthetic, copy.deepcopy(source[1]))
     prereg, cases, result = executed
     frozen_prereg, frozen_cases = frozen
 

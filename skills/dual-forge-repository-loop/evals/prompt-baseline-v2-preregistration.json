@@ -1,7 +1,7 @@
 {
   "schema": "v2-2-prompt-baseline-preregistration/v1",
   "preregistration_id": "v2-2-prompt-baseline-2026-08",
-  "status": "FROZEN_NOT_EXECUTED",
+  "status": "EXECUTED",
   "issue": 238,
   "supersedes": {
     "preregistration_id": "v2-1-prompt-baseline-2026-08",
@@ -11,7 +11,7 @@
   },
   "_meta": {
     "why_frozen_before_running": "Same law as #225: every listed item is frozen before any arm runs. This file is committed with no result beside it, and scripts/check_prompt_baseline.py refuses a FROZEN_NOT_EXECUTED status that has a result committed next to it.",
-    "execution_authorisation": "NOT GRANTED. Nothing here has been executed. Executing it costs fifteen live sessions on a paid host and needs the owner's authorisation; until then the status field and the absent result file are the only true statements about it.",
+    "execution_authorisation": "Executed 2026-08-18 on CLAUDE_CODE_LOCAL under the owner standing Tier-B authorisation (AskUserQuestion selections + the A/B-both directive in the same live session), 15 cells, 0 failed; result landed beside this design.",
     "single_runtime": "#225 forbids combining results across runtime identities and that carries here. One runtime, one receipt set. A second runtime needs its own frozen design.",
     "why_the_case_set_is_reused": "Comparability. A new case set would make the candidate's number incomparable with the 4.00/4.80/4.60 this rerun exists to move. The cost is that the set stopped being held out when #225 committed it, and the author of CANDIDATE_V2_2 has read it -- so marker-leak is a required control below, enforced deterministically rather than promised."
   },
@@ -77,8 +77,14 @@
     "path": "skills/dual-forge-repository-loop/evals/prompt-baseline-cases.json",
     "set_digest": "66828f62feb9",
     "case_count": 6,
-    "case_ids": ["positive", "expired-lease", "concurrent-attempts", "foreign-eval",
-                 "unadmitted-result-head", "publication-before-closure"],
+    "case_ids": [
+      "positive",
+      "expired-lease",
+      "concurrent-attempts",
+      "foreign-eval",
+      "unadmitted-result-head",
+      "publication-before-closure"
+    ],
     "why_this_task": "Unchanged from #225, and unchanged for the same reason: each case is a contract document the repository's own deterministic checker already rules on, and the five refusal cases span five distinct rule families rather than five variants of one rule. Reusing it is what makes the two runs comparable.",
     "ground_truth_authority": "DETERMINISTIC_CHECKER",
     "agent_never_sees": "checker output, exit codes, or violated-rule markers"
@@ -98,19 +104,64 @@
     "identical_for_every_arm": true
   },
   "required_controls": [
-    {"id": "contaminated-context", "expect": "RED", "how": "reuse a workspace across two arms"},
-    {"id": "divergent-subject", "expect": "RED", "how": "change the repository head between arms"},
-    {"id": "asymmetric-tools", "expect": "RED", "how": "give the candidate arm a wider tool allowance"},
-    {"id": "baseline-leaks-candidate", "expect": "RED", "how": "let NO_PROMPT reach v2.2 through a user or project Skill projection"},
-    {"id": "dropped-arm", "expect": "RED", "how": "remove a failed run from the denominator"},
-    {"id": "model-as-verifier", "expect": "RED", "how": "accept the host's self-reported result as the verifier result"},
-    {"id": "fixture-as-physical", "expect": "RED", "how": "present a fixture agent run as a physical model run"},
-    {"id": "cross-runtime-copy", "expect": "RED", "how": "copy a codex-cli cell into a claude-code arm"},
-    {"id": "prompt-pin-drift", "expect": "RED", "how": "edit the candidate prompt after this freeze without repinning its digest", "decided_from_the_record": true},
-    {"id": "marker-leak", "expect": "RED", "how": "write a case's violated-rule marker into the candidate prompt, which would let it score by echo rather than by judgement", "decided_from_the_record": true}
+    {
+      "id": "contaminated-context",
+      "expect": "RED",
+      "how": "reuse a workspace across two arms"
+    },
+    {
+      "id": "divergent-subject",
+      "expect": "RED",
+      "how": "change the repository head between arms"
+    },
+    {
+      "id": "asymmetric-tools",
+      "expect": "RED",
+      "how": "give the candidate arm a wider tool allowance"
+    },
+    {
+      "id": "baseline-leaks-candidate",
+      "expect": "RED",
+      "how": "let NO_PROMPT reach v2.2 through a user or project Skill projection"
+    },
+    {
+      "id": "dropped-arm",
+      "expect": "RED",
+      "how": "remove a failed run from the denominator"
+    },
+    {
+      "id": "model-as-verifier",
+      "expect": "RED",
+      "how": "accept the host's self-reported result as the verifier result"
+    },
+    {
+      "id": "fixture-as-physical",
+      "expect": "RED",
+      "how": "present a fixture agent run as a physical model run"
+    },
+    {
+      "id": "cross-runtime-copy",
+      "expect": "RED",
+      "how": "copy a codex-cli cell into a claude-code arm"
+    },
+    {
+      "id": "prompt-pin-drift",
+      "expect": "RED",
+      "how": "edit the candidate prompt after this freeze without repinning its digest",
+      "decided_from_the_record": true
+    },
+    {
+      "id": "marker-leak",
+      "expect": "RED",
+      "how": "write a case's violated-rule marker into the candidate prompt, which would let it score by echo rather than by judgement",
+      "decided_from_the_record": true
+    }
   ],
   "eligibility_threshold": {
-    "outcome_values": ["NOT_ELIGIBLE", "LOCAL_RECORD_ELIGIBLE"],
+    "outcome_values": [
+      "NOT_ELIGIBLE",
+      "LOCAL_RECORD_ELIGIBLE"
+    ],
     "rule": "LOCAL_RECORD_ELIGIBLE requires the candidate to show no hard regression against the strongest baseline arm on the deterministic verifier result, with all required controls red and every arm preserved.",
     "scope_limit": "Any eligibility is bounded to this repository, this runtime, this model and this case set. It is not portability and not a promotion.",
     "why_no_uplift_threshold": "The rule is unchanged from #225 so the two outcomes mean the same thing. Parity with the strongest baseline clears it; that is deliberately a low bar, and clearing it establishes only that the regression is gone, not that the prompt helps."
