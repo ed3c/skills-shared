@@ -109,7 +109,7 @@ cat > "${hooks_dir}/pre-push" <<'EOF'
 set -euo pipefail
 # BEGIN PRIVATE-LINEAGE DISPATCHER
 hook_dir="$(cd "$(dirname "$0")" && pwd)"
-tmp="$(mktemp)"
+tmp="$(mktemp "${TMPDIR:-/tmp}/tmp.XXXXXXXX")"
 trap 'rm -f "${tmp}"' EXIT
 cat > "${tmp}"
 if [ -x "${hook_dir}/pre-push.user" ]; then

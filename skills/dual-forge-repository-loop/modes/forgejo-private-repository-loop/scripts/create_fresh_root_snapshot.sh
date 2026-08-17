@@ -89,7 +89,7 @@ case "${common_dir}" in /*) ;; *) common_dir="${destination}/${common_dir}" ;; e
 }
 
 if [ -n "${patterns}" ]; then
-  audit="$(mktemp)"
+  audit="$(mktemp "${TMPDIR:-/tmp}/audit.XXXXXXXX")"
   trap 'rm -f "${audit}"' EXIT
   python3 "${script_root}/audit_git_history.py" \
     --repo "${destination}" --patterns "${patterns}" --output "${audit}"
