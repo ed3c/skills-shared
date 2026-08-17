@@ -45,6 +45,74 @@ ELIGIBLE_FOR_HUMAN_ADMIT / HOLD / REJECT
 | `tests/run-all.sh` | Entry point the repository runner and CI matrix discover |
 | `tests/` | Positive, Vibe, unsafe-adapter, mutation, and input controls |
 
+## Independent Shadow State Machine
+
+```text
+EXACT_SUBJECT_BOUND
+→ REQUIREMENT_APPLICABILITY_CLASSIFIED
+→ SOURCE_AND_CONTRACT_CONTRADICTIONS_CHECKED
+→ PRE_SIDE_EFFECT_GATE_ASSERTED
+→ BUILDER_EXECUTION_OBSERVED
+→ ASSERTION_AND_RECEIPT_READBACK
+→ LOCAL_TASK_VS_GLOBAL_OBJECTIVE_CHECKED
+→ EVIDENCE_CEILING_ASSERTED
+→ DENOMINATOR_CLEANUP_ROLLBACK_CHECKED
+→ ELIGIBLE_FOR_HUMAN_ADMIT / HOLD / REJECT
+```
+
+The Shadow receives the Tech Lead's public plan, action intents, exact subject,
+contracts and observable evidence. The Shadow does not reuse the Tech Lead's
+conclusion as independent evidence.
+
+Shadow ownership:
+
+```text
+applicability and missing-requirement review
+source/document/contract/runtime contradiction detection
+global objective versus local task result
+false-promotion and evidence-ceiling review
+missing owner/issue/eval/receipt discovery
+failed/stale/cancelled/superseded denominator review
+cleanup and rollback review
+```
+
+Forbidden Shadow authority:
+
+```text
+second canonical state writer
+silent edit of the Builder branch
+unreviewed semantic-conflict repair
+fixture/deterministic PASS → live PASS
+model agreement → Human Admit
+workflow green → release
+private chain-of-thought persistence
+```
+
+The Tech Lead owns decomposition, leases, Worker admission and convergence. The
+Shadow owns independent findings. A Human or repository controller owns semantic
+admission, merge, promotion, release and rollback.
+
+## Relationship to task and Stack DAGs
+
+The Shadow is normally an `EXTERNAL_EVIDENCE` lane. It owns no implementation
+paths and does not become a Git child merely because its receipt is required.
+
+```text
+Tech Lead implementation siblings / true children
+        ↓ deterministic and local results
+independent Shadow EXTERNAL_EVIDENCE
+        ↓ same exact subject, separate evaluation path
+one convergence owner
+        ↓ Human Admit where required
+```
+
+Use `TRUE_CHILD` only when the Shadow implementation itself consumes unmerged
+parent bytes. Use `PROCESS_DEPENDENCY` when later admission waits for the Shadow
+receipt without changing branch ancestry.
+
+Full closure vocabulary and the dated external-consumer example:
+[`../../docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md`](../../docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md).
+
 ## 100-point architecture assessment
 
 The five source dimensions remain:
@@ -115,6 +183,7 @@ missing or malformed input               exit 64
 ```text
 rubric/procedure atoms/checkers/fixtures              IMPLEMENTED
 local deterministic positive/Vibe/domain controls     IMPLEMENTED
+independent same-subject live Shadow execution         NOT_EXERCISED
 live Claude/Codex hooks                                NOT_EXERCISED
 live external registry retrieval                      NOT_EXERCISED
 live multimodal browser/device observation            NOT_EXERCISED
