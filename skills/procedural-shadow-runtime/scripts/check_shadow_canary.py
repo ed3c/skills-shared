@@ -460,6 +460,17 @@ def main(argv: list[str] | None = None) -> int:
     summary = ", ".join(f"{count} {name}" for name, count in sorted(outcomes.items()))
     detection_summary = ", ".join(f"{count} {name}" for name, count in sorted(detection.items()))
     cost_observed = any((t.get("shadow") or {}).get("cost_observed") for t in body["trials"])
+    # Tokens and cost are reported separately: a receipt that measured every
+    # token but no price used to print only "cost NOT_EXERCISED", which reads
+    # as no telemetry at all and hides the half that was actually captured.
+    measured = [t for t in body["trials"] if (t.get("shadow") or {}).get("tokens_observed")]
+    if measured:
+        total_in = sum((t["shadow"].get("input_tokens") or 0) for t in measured)
+        total_out = sum((t["shadow"].get("output_tokens") or 0) for t in measured)
+        tokens_summary = (f"tokens measured on {len(measured)}/{len(body['trials'])} trial(s) "
+                          f"({total_in} in, {total_out} out)")
+    else:
+        tokens_summary = "tokens NOT_EXERCISED this run"
     print(f"SHADOW CANARY GREEN: {len(body['trials'])} trial(s) -- {summary}; "
           f"{len(body['gate_controls'])} gate control(s) red; independence "
           f"{body['independence']['mode']} "
@@ -467,7 +478,8 @@ def main(argv: list[str] | None = None) -> int:
           f"{body['independence']['shadow']['provider']}); "
           f"detection {detection_summary} "
           f"(false negatives: {detection.get('FALSE_NEGATIVE', 0)}); "
-          f"cost {'observed' if cost_observed else 'NOT_EXERCISED this run'}")
+          f"{tokens_summary}; "
+          f"cost {'observed' if cost_observed else 'ABSENT (no price in the event stream)'}")
     return 0
 
 
