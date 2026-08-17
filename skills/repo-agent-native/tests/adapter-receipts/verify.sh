@@ -42,6 +42,15 @@ admission="${skill_dir}/evals/git-town-darwin-admission.json"
 test -f "${admission}" || { echo "MISSING ADMISSION ${admission}" >&2; exit 1; }
 python3 -m json.tool "${admission}" >/dev/null
 
+# The darwin git-town capture is a second subject, so it is a second directory:
+# it was taken at the commit that added the lane, and one capture is one subject.
+# Same checker, same laws, no exemption.
+darwin="${skill_dir}/evals/receipts-git-town-darwin"
+test -f "${darwin}/git-town.receipt.json" \
+  || { echo "MISSING RECEIPT git-town (darwin capture)" >&2; exit 1; }
+python3 -m json.tool "${darwin}/git-town.receipt.json" >/dev/null
+python3 "${checker}" check --receipts "${darwin}"
+
 python3 - "${skill_dir}" "${tmp_root}" <<'PY'
 import hashlib
 import importlib.util
@@ -67,6 +76,23 @@ for pin in (record["admitted_artifact"]["asset"]["sha256"],
             record["derived_executable_identity"]["sha256"]):
     if len(pin) != 64 or pin.strip("0123456789abcdef"):
         raise SystemExit(f"admission pins {pin!r}, which is not a SHA-256")
+
+
+# The captured receipt has to name the artifact this record admits, and the
+# record it names has to be these bytes. Editing the admission without
+# recapturing would otherwise leave a PASS standing for a decision that changed.
+captured = json.loads(
+    (skill / "evals" / "receipts-git-town-darwin" / "git-town.receipt.json")
+    .read_text(encoding="utf-8"))
+if captured["adapter"]["executable_sha256"] != record["derived_executable_identity"]["sha256"]:
+    raise SystemExit("the darwin receipt records a binary the admission does not pin")
+bound = captured["policy"]["admission"]["record_sha256"]
+actual = hashlib.sha256(capture.GIT_TOWN_ADMISSION.read_bytes()).hexdigest()
+if bound != actual:
+    raise SystemExit(f"the darwin receipt was captured against admission {bound}, "
+                     f"but this record hashes {actual}; recapture or revert")
+print(f"BOUND    receipt <- admission {actual[:12]} <- artifact "
+      f"{record['derived_executable_identity']['sha256'][:12]}")
 
 
 def gate(executable, admission=None):
