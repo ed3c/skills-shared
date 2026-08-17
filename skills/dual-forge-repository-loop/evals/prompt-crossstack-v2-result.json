@@ -1,0 +1,661 @@
+{
+  "case_count": 13,
+  "case_set_id": "v2-1-crossstack-heldout-cases-gen2-2026-08",
+  "cell_count": 18,
+  "cells": [
+    {
+      "arm": "CANDIDATE_V2_1",
+      "arm_order_index": 1,
+      "cell_id": "claude-code-opus__CANDIDATE_V2_1__rep1",
+      "exit_code": 0,
+      "failure_reason": null,
+      "harness": "claude-code",
+      "metrics": {
+        "answered": 13,
+        "parsed": true,
+        "rule_correct": 5,
+        "total": 13,
+        "verdict_correct": 13
+      },
+      "model": "opus",
+      "prompt_bytes": 36866,
+      "prompt_sha256": "c1774028cc6a3881e0cc6a69e8508caba7e2d683060e8ba8630306c0dec40772",
+      "repetition": 1,
+      "scored": true,
+      "stack_id": "claude-code-opus",
+      "usage": {
+        "cost_observed": true,
+        "cost_usd": 1.1986955000000001,
+        "duration_ms": 29308,
+        "input_tokens": 106865,
+        "output_tokens": 1921,
+        "turns": 2
+      }
+    },
+    {
+      "arm": "NO_PROMPT",
+      "arm_order_index": 2,
+      "cell_id": "claude-code-opus__NO_PROMPT__rep1",
+      "exit_code": 0,
+      "failure_reason": null,
+      "harness": "claude-code",
+      "metrics": {
+        "answered": 13,
+        "parsed": true,
+        "rule_correct": 4,
+        "total": 13,
+        "verdict_correct": 13
+      },
+      "model": "opus",
+      "prompt_bytes": 0,
+      "prompt_sha256": null,
+      "repetition": 1,
+      "scored": true,
+      "stack_id": "claude-code-opus",
+      "usage": {
+        "cost_observed": true,
+        "cost_usd": 1.041388,
+        "duration_ms": 35678,
+        "input_tokens": 92280,
+        "output_tokens": 2168,
+        "turns": 2
+      }
+    },
+    {
+      "arm": "CURRENT_REPOSITORY_PROMPT",
+      "arm_order_index": 3,
+      "cell_id": "claude-code-opus__CURRENT_REPOSITORY_PROMPT__rep1",
+      "exit_code": 0,
+      "failure_reason": null,
+      "harness": "claude-code",
+      "metrics": {
+        "answered": 13,
+        "parsed": true,
+        "rule_correct": 6,
+        "total": 13,
+        "verdict_correct": 13
+      },
+      "model": "opus",
+      "prompt_bytes": 4663,
+      "prompt_sha256": "f0b77ccc3e974b058c8a8fe54222852dcff80750cab860a6118ca28c7c17c909",
+      "repetition": 1,
+      "scored": true,
+      "stack_id": "claude-code-opus",
+      "usage": {
+        "cost_observed": true,
+        "cost_usd": 1.0609175000000002,
+        "duration_ms": 28885,
+        "input_tokens": 94299,
+        "output_tokens": 2074,
+        "turns": 2
+      }
+    },
+    {
+      "arm": "NO_PROMPT",
+      "arm_order_index": 4,
+      "cell_id": "claude-code-opus__NO_PROMPT__rep2",
+      "exit_code": 0,
+      "failure_reason": null,
+      "harness": "claude-code",
+      "metrics": {
+        "answered": 13,
+        "parsed": true,
+        "rule_correct": 5,
+        "total": 13,
+        "verdict_correct": 13
+      },
+      "model": "opus",
+      "prompt_bytes": 0,
+      "prompt_sha256": null,
+      "repetition": 2,
+      "scored": true,
+      "stack_id": "claude-code-opus",
+      "usage": {
+        "cost_observed": true,
+        "cost_usd": 1.035668,
+        "duration_ms": 27805,
+        "input_tokens": 92280,
+        "output_tokens": 1998,
+        "turns": 2
+      }
+    },
+    {
+      "arm": "CURRENT_REPOSITORY_PROMPT",
+      "arm_order_index": 5,
+      "cell_id": "claude-code-opus__CURRENT_REPOSITORY_PROMPT__rep2",
+      "exit_code": 0,
+      "failure_reason": null,
+      "harness": "claude-code",
+      "metrics": {
+        "answered": 13,
+        "parsed": true,
+        "rule_correct": 4,
+        "total": 13,
+        "verdict_correct": 13
+      },
+      "model": "opus",
+      "prompt_bytes": 4663,
+      "prompt_sha256": "f0b77ccc3e974b058c8a8fe54222852dcff80750cab860a6118ca28c7c17c909",
+      "repetition": 2,
+      "scored": true,
+      "stack_id": "claude-code-opus",
+      "usage": {
+        "cost_observed": true,
+        "cost_usd": 1.0504725000000001,
+        "duration_ms": 28300,
+        "input_tokens": 94299,
+        "output_tokens": 1757,
+        "turns": 2
+      }
+    },
+    {
+      "arm": "CANDIDATE_V2_1",
+      "arm_order_index": 6,
+      "cell_id": "claude-code-opus__CANDIDATE_V2_1__rep2",
+      "exit_code": 0,
+      "failure_reason": null,
+      "harness": "claude-code",
+      "metrics": {
+        "answered": 13,
+        "parsed": true,
+        "rule_correct": 5,
+        "total": 13,
+        "verdict_correct": 13
+      },
+      "model": "opus",
+      "prompt_bytes": 36866,
+      "prompt_sha256": "c1774028cc6a3881e0cc6a69e8508caba7e2d683060e8ba8630306c0dec40772",
+      "repetition": 2,
+      "scored": true,
+      "stack_id": "claude-code-opus",
+      "usage": {
+        "cost_observed": true,
+        "cost_usd": 1.1968905,
+        "duration_ms": 27534,
+        "input_tokens": 107535,
+        "output_tokens": 1967,
+        "turns": 2
+      }
+    },
+    {
+      "arm": "CANDIDATE_V2_1",
+      "arm_order_index": 7,
+      "cell_id": "claude-code-opus__CANDIDATE_V2_1__rep3",
+      "exit_code": 0,
+      "failure_reason": null,
+      "harness": "claude-code",
+      "metrics": {
+        "answered": 13,
+        "parsed": true,
+        "rule_correct": 5,
+        "total": 13,
+        "verdict_correct": 13
+      },
+      "model": "opus",
+      "prompt_bytes": 36866,
+      "prompt_sha256": "c1774028cc6a3881e0cc6a69e8508caba7e2d683060e8ba8630306c0dec40772",
+      "repetition": 3,
+      "scored": true,
+      "stack_id": "claude-code-opus",
+      "usage": {
+        "cost_observed": true,
+        "cost_usd": 1.2030605,
+        "duration_ms": 30228,
+        "input_tokens": 107535,
+        "output_tokens": 2167,
+        "turns": 2
+      }
+    },
+    {
+      "arm": "NO_PROMPT",
+      "arm_order_index": 8,
+      "cell_id": "claude-code-opus__NO_PROMPT__rep3",
+      "exit_code": 0,
+      "failure_reason": null,
+      "harness": "claude-code",
+      "metrics": {
+        "answered": 13,
+        "parsed": true,
+        "rule_correct": 6,
+        "total": 13,
+        "verdict_correct": 13
+      },
+      "model": "opus",
+      "prompt_bytes": 0,
+      "prompt_sha256": null,
+      "repetition": 3,
+      "scored": true,
+      "stack_id": "claude-code-opus",
+      "usage": {
+        "cost_observed": true,
+        "cost_usd": 1.018548,
+        "duration_ms": 21551,
+        "input_tokens": 92280,
+        "output_tokens": 1426,
+        "turns": 2
+      }
+    },
+    {
+      "arm": "CURRENT_REPOSITORY_PROMPT",
+      "arm_order_index": 9,
+      "cell_id": "claude-code-opus__CURRENT_REPOSITORY_PROMPT__rep3",
+      "exit_code": 0,
+      "failure_reason": null,
+      "harness": "claude-code",
+      "metrics": {
+        "answered": 13,
+        "parsed": true,
+        "rule_correct": 6,
+        "total": 13,
+        "verdict_correct": 13
+      },
+      "model": "opus",
+      "prompt_bytes": 4663,
+      "prompt_sha256": "f0b77ccc3e974b058c8a8fe54222852dcff80750cab860a6118ca28c7c17c909",
+      "repetition": 3,
+      "scored": true,
+      "stack_id": "claude-code-opus",
+      "usage": {
+        "cost_observed": true,
+        "cost_usd": 1.0543375000000001,
+        "duration_ms": 32741,
+        "input_tokens": 94299,
+        "output_tokens": 1934,
+        "turns": 2
+      }
+    },
+    {
+      "arm": "CURRENT_REPOSITORY_PROMPT",
+      "arm_order_index": 10,
+      "cell_id": "codex-cli-gpt__CURRENT_REPOSITORY_PROMPT__rep1",
+      "exit_code": 0,
+      "failure_reason": null,
+      "harness": "codex-cli",
+      "metrics": {
+        "answered": 13,
+        "parsed": true,
+        "rule_correct": 0,
+        "total": 13,
+        "verdict_correct": 13
+      },
+      "model": "gpt-5.6-sol",
+      "prompt_bytes": 4663,
+      "prompt_sha256": "f0b77ccc3e974b058c8a8fe54222852dcff80750cab860a6118ca28c7c17c909",
+      "repetition": 1,
+      "scored": true,
+      "stack_id": "codex-cli-gpt",
+      "usage": {
+        "cost_observed": false,
+        "cost_usd": 0.0,
+        "duration_ms": 28925,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "turns": 0
+      }
+    },
+    {
+      "arm": "NO_PROMPT",
+      "arm_order_index": 11,
+      "cell_id": "codex-cli-gpt__NO_PROMPT__rep1",
+      "exit_code": 0,
+      "failure_reason": null,
+      "harness": "codex-cli",
+      "metrics": {
+        "answered": 13,
+        "parsed": true,
+        "rule_correct": 0,
+        "total": 13,
+        "verdict_correct": 13
+      },
+      "model": "gpt-5.6-sol",
+      "prompt_bytes": 0,
+      "prompt_sha256": null,
+      "repetition": 1,
+      "scored": true,
+      "stack_id": "codex-cli-gpt",
+      "usage": {
+        "cost_observed": false,
+        "cost_usd": 0.0,
+        "duration_ms": 46953,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "turns": 0
+      }
+    },
+    {
+      "arm": "CANDIDATE_V2_1",
+      "arm_order_index": 12,
+      "cell_id": "codex-cli-gpt__CANDIDATE_V2_1__rep1",
+      "exit_code": 0,
+      "failure_reason": null,
+      "harness": "codex-cli",
+      "metrics": {
+        "answered": 13,
+        "parsed": true,
+        "rule_correct": 1,
+        "total": 13,
+        "verdict_correct": 13
+      },
+      "model": "gpt-5.6-sol",
+      "prompt_bytes": 36866,
+      "prompt_sha256": "c1774028cc6a3881e0cc6a69e8508caba7e2d683060e8ba8630306c0dec40772",
+      "repetition": 1,
+      "scored": true,
+      "stack_id": "codex-cli-gpt",
+      "usage": {
+        "cost_observed": false,
+        "cost_usd": 0.0,
+        "duration_ms": 51287,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "turns": 0
+      }
+    },
+    {
+      "arm": "CURRENT_REPOSITORY_PROMPT",
+      "arm_order_index": 13,
+      "cell_id": "codex-cli-gpt__CURRENT_REPOSITORY_PROMPT__rep2",
+      "exit_code": 0,
+      "failure_reason": null,
+      "harness": "codex-cli",
+      "metrics": {
+        "answered": 13,
+        "parsed": true,
+        "rule_correct": 1,
+        "total": 13,
+        "verdict_correct": 13
+      },
+      "model": "gpt-5.6-sol",
+      "prompt_bytes": 4663,
+      "prompt_sha256": "f0b77ccc3e974b058c8a8fe54222852dcff80750cab860a6118ca28c7c17c909",
+      "repetition": 2,
+      "scored": true,
+      "stack_id": "codex-cli-gpt",
+      "usage": {
+        "cost_observed": false,
+        "cost_usd": 0.0,
+        "duration_ms": 50863,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "turns": 0
+      }
+    },
+    {
+      "arm": "CANDIDATE_V2_1",
+      "arm_order_index": 14,
+      "cell_id": "codex-cli-gpt__CANDIDATE_V2_1__rep2",
+      "exit_code": 0,
+      "failure_reason": null,
+      "harness": "codex-cli",
+      "metrics": {
+        "answered": 13,
+        "parsed": true,
+        "rule_correct": 1,
+        "total": 13,
+        "verdict_correct": 12
+      },
+      "model": "gpt-5.6-sol",
+      "prompt_bytes": 36866,
+      "prompt_sha256": "c1774028cc6a3881e0cc6a69e8508caba7e2d683060e8ba8630306c0dec40772",
+      "repetition": 2,
+      "scored": true,
+      "stack_id": "codex-cli-gpt",
+      "usage": {
+        "cost_observed": false,
+        "cost_usd": 0.0,
+        "duration_ms": 69503,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "turns": 0
+      }
+    },
+    {
+      "arm": "NO_PROMPT",
+      "arm_order_index": 15,
+      "cell_id": "codex-cli-gpt__NO_PROMPT__rep2",
+      "exit_code": 0,
+      "failure_reason": null,
+      "harness": "codex-cli",
+      "metrics": {
+        "answered": 13,
+        "parsed": true,
+        "rule_correct": 1,
+        "total": 13,
+        "verdict_correct": 13
+      },
+      "model": "gpt-5.6-sol",
+      "prompt_bytes": 0,
+      "prompt_sha256": null,
+      "repetition": 2,
+      "scored": true,
+      "stack_id": "codex-cli-gpt",
+      "usage": {
+        "cost_observed": false,
+        "cost_usd": 0.0,
+        "duration_ms": 44148,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "turns": 0
+      }
+    },
+    {
+      "arm": "CANDIDATE_V2_1",
+      "arm_order_index": 16,
+      "cell_id": "codex-cli-gpt__CANDIDATE_V2_1__rep3",
+      "exit_code": 0,
+      "failure_reason": null,
+      "harness": "codex-cli",
+      "metrics": {
+        "answered": 13,
+        "parsed": true,
+        "rule_correct": 1,
+        "total": 13,
+        "verdict_correct": 13
+      },
+      "model": "gpt-5.6-sol",
+      "prompt_bytes": 36866,
+      "prompt_sha256": "c1774028cc6a3881e0cc6a69e8508caba7e2d683060e8ba8630306c0dec40772",
+      "repetition": 3,
+      "scored": true,
+      "stack_id": "codex-cli-gpt",
+      "usage": {
+        "cost_observed": false,
+        "cost_usd": 0.0,
+        "duration_ms": 40176,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "turns": 0
+      }
+    },
+    {
+      "arm": "NO_PROMPT",
+      "arm_order_index": 17,
+      "cell_id": "codex-cli-gpt__NO_PROMPT__rep3",
+      "exit_code": 0,
+      "failure_reason": null,
+      "harness": "codex-cli",
+      "metrics": {
+        "answered": 13,
+        "parsed": true,
+        "rule_correct": 1,
+        "total": 13,
+        "verdict_correct": 13
+      },
+      "model": "gpt-5.6-sol",
+      "prompt_bytes": 0,
+      "prompt_sha256": null,
+      "repetition": 3,
+      "scored": true,
+      "stack_id": "codex-cli-gpt",
+      "usage": {
+        "cost_observed": false,
+        "cost_usd": 0.0,
+        "duration_ms": 47010,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "turns": 0
+      }
+    },
+    {
+      "arm": "CURRENT_REPOSITORY_PROMPT",
+      "arm_order_index": 18,
+      "cell_id": "codex-cli-gpt__CURRENT_REPOSITORY_PROMPT__rep3",
+      "exit_code": 0,
+      "failure_reason": null,
+      "harness": "codex-cli",
+      "metrics": {
+        "answered": 13,
+        "parsed": true,
+        "rule_correct": 0,
+        "total": 13,
+        "verdict_correct": 13
+      },
+      "model": "gpt-5.6-sol",
+      "prompt_bytes": 4663,
+      "prompt_sha256": "f0b77ccc3e974b058c8a8fe54222852dcff80750cab860a6118ca28c7c17c909",
+      "repetition": 3,
+      "scored": true,
+      "stack_id": "codex-cli-gpt",
+      "usage": {
+        "cost_observed": false,
+        "cost_usd": 0.0,
+        "duration_ms": 47336,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "turns": 0
+      }
+    }
+  ],
+  "declared_non_claims": [
+    "two stacks are not a population; this cannot estimate variance across harnesses",
+    "no cost comparison is available across stacks",
+    "eligibility here is not recording authority; #195 governs that separately",
+    "a difference smaller than the per-cell spread is not a finding",
+    "nothing here re-reads or re-scores the generation-1 run; that receipt stands as executed"
+  ],
+  "eligibility": {
+    "frozen_rule": "PORTABLE_RECORD_ELIGIBLE requires the candidate to show no hard regression against the strongest baseline arm on the deterministic verifier, on every stack, with the rule-naming metric read from the paraphrase rubric rather than token overlap. A regression on any stack is disqualifying, because portability is a claim about all of them.",
+    "outcome": "NOT_ELIGIBLE",
+    "regressed_stacks": [
+      "claude-code-opus",
+      "codex-cli-gpt"
+    ],
+    "regression_against_strongest_baseline": {
+      "claude-code-opus": {
+        "rule_accuracy": true,
+        "verdict_accuracy": false
+      },
+      "codex-cli-gpt": {
+        "rule_accuracy": false,
+        "verdict_accuracy": true
+      }
+    },
+    "rule_accuracy": {
+      "claude-code-opus": {
+        "CANDIDATE_V2_1": 5.0,
+        "CURRENT_REPOSITORY_PROMPT": 5.333333333333333,
+        "NO_PROMPT": 5.0
+      },
+      "codex-cli-gpt": {
+        "CANDIDATE_V2_1": 1.0,
+        "CURRENT_REPOSITORY_PROMPT": 0.3333333333333333,
+        "NO_PROMPT": 0.6666666666666666
+      }
+    },
+    "strongest_baseline": {
+      "claude-code-opus": {
+        "rule_accuracy": "CURRENT_REPOSITORY_PROMPT",
+        "verdict_accuracy": "NO_PROMPT"
+      },
+      "codex-cli-gpt": {
+        "rule_accuracy": "NO_PROMPT",
+        "verdict_accuracy": "CURRENT_REPOSITORY_PROMPT"
+      }
+    },
+    "verdict_accuracy": {
+      "claude-code-opus": {
+        "CANDIDATE_V2_1": 13.0,
+        "CURRENT_REPOSITORY_PROMPT": 13.0,
+        "NO_PROMPT": 13.0
+      },
+      "codex-cli-gpt": {
+        "CANDIDATE_V2_1": 12.666666666666666,
+        "CURRENT_REPOSITORY_PROMPT": 13.0,
+        "NO_PROMPT": 13.0
+      }
+    }
+  },
+  "failed_cells": 0,
+  "issue": 229,
+  "known_confounds": [
+    {
+      "confound": "prompt carrier",
+      "detail": "Claude Code takes the prompt through a system-prompt channel and Codex CLI has none, so the bytes arrive as instruction text. Every cross-stack difference is confounded with carrier.",
+      "how_to_separate": "a harness that offers both carriers, or a second Claude arm carrying the prompt as an instruction prefix",
+      "why_not_corrected": "Neither host can be made to use the other's channel, and faking symmetry would report a comparison that was never run."
+    },
+    {
+      "confound": "prompt length",
+      "detail": "CANDIDATE_V2_1 is 36,866 bytes against CURRENT_REPOSITORY_PROMPT's 4,663. Carried through an instruction prefix on Codex, that length competes with the task itself rather than sitting in a separate channel.",
+      "how_to_separate": "a length-matched fourth arm, which this preregistration does not freeze",
+      "why_not_corrected": "Truncating the candidate would no longer test the candidate."
+    },
+    {
+      "confound": "usage reporting",
+      "detail": "Claude Code reports token counts and cost; Codex CLI reports neither in a machine-readable form. Cost cannot be compared across stacks and is recorded as unobserved rather than as zero.",
+      "how_to_separate": "provider billing export",
+      "why_not_corrected": "outside this harness"
+    },
+    {
+      "confound": "rubric authorship",
+      "detail": "The rubric removes the checker's vocabulary from the scoring path but replaces it with the rubric author's concept groups. A phrasing no group anticipates still scores zero.",
+      "how_to_separate": "score a sample of stated rules by an independent reader and compare with the rubric",
+      "why_not_corrected": "An independent reader is not available inside a zero-network deterministic gate; the executed accept and reject examples bound the failure rather than removing it."
+    }
+  ],
+  "per_stack": {
+    "claude-code-opus": {
+      "CANDIDATE_V2_1": {
+        "n": 3,
+        "rule_accuracy": 5.0,
+        "scored_cells": 3,
+        "verdict_accuracy": 13.0
+      },
+      "CURRENT_REPOSITORY_PROMPT": {
+        "n": 3,
+        "rule_accuracy": 5.333333333333333,
+        "scored_cells": 3,
+        "verdict_accuracy": 13.0
+      },
+      "NO_PROMPT": {
+        "n": 3,
+        "rule_accuracy": 5.0,
+        "scored_cells": 3,
+        "verdict_accuracy": 13.0
+      }
+    },
+    "codex-cli-gpt": {
+      "CANDIDATE_V2_1": {
+        "n": 3,
+        "rule_accuracy": 1.0,
+        "scored_cells": 3,
+        "verdict_accuracy": 12.666666666666666
+      },
+      "CURRENT_REPOSITORY_PROMPT": {
+        "n": 3,
+        "rule_accuracy": 0.3333333333333333,
+        "scored_cells": 3,
+        "verdict_accuracy": 13.0
+      },
+      "NO_PROMPT": {
+        "n": 3,
+        "rule_accuracy": 0.6666666666666666,
+        "scored_cells": 3,
+        "verdict_accuracy": 13.0
+      }
+    }
+  },
+  "preregistration_id": "v2-1-crossstack-gen2-2026-08",
+  "rule_metric": "PARAPHRASE_RUBRIC",
+  "schema": "v2-1-crossstack-result/v1"
+}

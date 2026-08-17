@@ -20,7 +20,7 @@ python3 -m py_compile \
 
 for artifact in prompt-crossstack-preregistration prompt-crossstack-cases \
                 prompt-crossstack-result prompt-crossstack-v2-preregistration \
-                prompt-crossstack-v2-cases; do
+                prompt-crossstack-v2-cases prompt-crossstack-v2-result; do
   python3 -m json.tool "${skill_dir}/evals/${artifact}.json" >/dev/null
 done
 
@@ -93,6 +93,24 @@ assert paraphrased >= len(refusals), \
     "not every refusal family has an accepted phrasing free of the checker's words"
 print(f"PASS generation 2 instrument: constant verdict scores {share:.3f}, "
       f"{paraphrased} marker-free phrasings score across {len(refusals)} families")
+PY
+
+# The finding generation 2 exists for: the repaired instrument lands on a
+# terminal state instead of INDETERMINATE. If that ever stops being true the
+# #229 acceptance it satisfies has to be revisited, and a silent change here
+# is the thing to catch.
+python3 - "${skill_dir}/evals/prompt-crossstack-v2-result.json" <<'PY'
+import json, sys
+body = json.load(open(sys.argv[1]))
+eligibility = body["eligibility"]
+assert eligibility["outcome"] in ("NOT_ELIGIBLE", "PORTABLE_RECORD_ELIGIBLE"), \
+    f"gen2 outcome {eligibility['outcome']!r} is not a terminal state; #229 asked for one"
+assert eligibility["outcome"] == "NOT_ELIGIBLE", \
+    "the recorded gen2 derivation is NOT_ELIGIBLE; re-examine if this ever changes"
+assert eligibility["regressed_stacks"], \
+    "NOT_ELIGIBLE with no regressed stack recorded; the outcome has no cause"
+print(f"PASS gen2 eligibility: {eligibility['outcome']}, "
+      f"regressed stacks {eligibility['regressed_stacks']}")
 PY
 
 echo "PASS cross-stack held-out evaluation"
