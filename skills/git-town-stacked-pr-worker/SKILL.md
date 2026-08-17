@@ -33,6 +33,7 @@ TASK_GRAPH_BOUND
 - **CORE-LAW-003 — synchronization is not correctness.** A successful graph/sync operation cannot substitute for the owning implementation assertions after movement.
 - **CORE-LAW-004 — modules cannot widen authority.** Domain modules may bind a stack tool/host but cannot fabricate dependencies, auto-resolve semantic conflicts, reuse stale evidence, or widen push/merge/secret authority.
 - **CORE-LAW-005 — moved subjects require fresh evidence.** Parent movement, rebase, conflict resolution, or synchronization invalidates stale exact-head receipts for affected children.
+- **CORE-LAW-006 — the Stack index is derived, and every required atom is indexed.** `required_atoms` is declared before the work starts over the atom classes `C` contract/schema/interface lock, `K` deterministic core, `A` adapter/provider/substrate, `E` Eval/mutation/fault controls, `X` explicit multi-parent convergence/E2E, and `D` documentation/receipt/handoff. The index is derived from observed Issues, branches, PR heads, trees, parents, changed paths and Gates — never from branch names or the order the work happened to be written in. Deriving the required atoms and then indexing fewer of them is an unmeasured gap, not a smaller Stack; an atom with no paths, no oracle and no Gate is ceremonial and fails closed. Mechanism: `references/MOLECULAR_STACK_INDEX.md`.
 
 ## Procedure
 
