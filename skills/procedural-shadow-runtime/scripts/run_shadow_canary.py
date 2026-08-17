@@ -210,38 +210,80 @@ def build_snapshot(trial: dict[str, Any]) -> dict[str, Any]:
 def ask_shadow(snapshot: dict[str, Any], timeout: int) -> tuple[dict[str, Any] | None,
                                                                 dict[str, Any]]:
     prompt = PROMPT.format(delta=json.dumps(snapshot, indent=2))
-    argv = [SHADOW["binary"], "exec", "-m", SHADOW["model"], "--sandbox", "read-only",
-            "--skip-git-repo-check", prompt]
+    argv = [SHADOW["binary"], "exec", "--json", "-m", SHADOW["model"],
+            "--sandbox", "read-only", "--skip-git-repo-check", prompt]
     started = time.time()
     process = subprocess.run(argv, capture_output=True, text=True, check=False,
                              timeout=timeout, stdin=subprocess.DEVNULL)
     latency = int((time.time() - started) * 1000)
+    tokens, answers = read_events(process.stdout)
     usage = {
         "latency_ms": latency, "exit_code": process.returncode,
         "stdout_sha256": sha256(process.stdout.encode()),
-        # Cost/token telemetry: this call parses only stdout for the level JSON
-        # object -- it never requests codex's `--json` event stream, so no
-        # dollar or token figure is captured this run. That is an honest
-        # ABSENT, not a silent zero: cost_observed says so explicitly rather
-        # than letting a missing key read as "free".
+        # Token telemetry now comes from the provider's own `turn.completed`
+        # event rather than being declared absent. Dollars still do not: that
+        # event carries token counts and no price, so a cost figure could only
+        # be produced by multiplying against a rate table nobody published
+        # here. Tokens observed and cost observed are therefore two separate
+        # states -- collapsing them would turn an invented number into
+        # evidence.
+        "tokens_observed": tokens is not None,
+        "input_tokens": None if tokens is None else tokens.get("input_tokens"),
+        "output_tokens": None if tokens is None else tokens.get("output_tokens"),
+        "cached_input_tokens": None if tokens is None else tokens.get("cached_input_tokens"),
+        "reasoning_output_tokens": None if tokens is None else tokens.get("reasoning_output_tokens"),
         "cost_observed": False,
         "cost_usd": None,
-        "input_tokens": None,
-        "output_tokens": None,
         "cost_unavailable_reason": (
-            "invocation parses stdout only; codex's --json event stream was "
-            "not requested, so no token/cost telemetry exists for this call"
+            "codex's --json event stream reports token counts on turn.completed "
+            "and no price; converting them to dollars would require a rate table "
+            "this repository does not observe, so cost stays ABSENT while tokens "
+            "are measured"
         ),
     }
-    matches = re.findall(r"\{[^{}]*\"level\"[^{}]*\}", process.stdout, re.S)
-    for candidate in reversed(matches):
+    if tokens is None:
+        usage["tokens_unavailable_reason"] = (
+            "no turn.completed event carried a usage object; the run may have "
+            "failed before the turn closed"
+        )
+    for text in reversed(answers):
+        for candidate in reversed(re.findall(r"\{[^{}]*\"level\"[^{}]*\}", text, re.S)):
+            try:
+                parsed = json.loads(candidate)
+            except json.JSONDecodeError:
+                continue
+            if parsed.get("level") in LEVELS:
+                return parsed, usage
+    return None, usage
+
+
+def read_events(stdout: str) -> tuple[dict[str, Any] | None, list[str]]:
+    """Split the `--json` event stream into token usage and agent answers.
+
+    The stream is one JSON object per line: `turn.completed` carries the usage
+    object, and the assistant's reply arrives as an `item.completed` whose item
+    type is `agent_message`. Reading the answer out of the event rather than
+    scraping the whole stdout matters here, because the same stream also
+    carries `error` items whose text is not an answer.
+    """
+    tokens: dict[str, Any] | None = None
+    answers: list[str] = []
+    for line in stdout.splitlines():
+        line = line.strip()
+        if not line.startswith("{"):
+            continue
         try:
-            parsed = json.loads(candidate)
+            event = json.loads(line)
         except json.JSONDecodeError:
             continue
-        if parsed.get("level") in LEVELS:
-            return parsed, usage
-    return None, usage
+        if event.get("type") == "turn.completed" and isinstance(event.get("usage"), dict):
+            tokens = event["usage"]
+        item = event.get("item")
+        if isinstance(item, dict) and item.get("type") == "agent_message":
+            text = item.get("text")
+            if isinstance(text, str):
+                answers.append(text)
+    return tokens, answers
 
 
 def rank(level: str) -> int:

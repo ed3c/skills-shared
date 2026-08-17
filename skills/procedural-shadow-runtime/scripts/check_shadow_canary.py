@@ -233,6 +233,7 @@ def check_budget(body: dict[str, Any]) -> None:
     """
     for trial in body["trials"]:
         shadow = trial.get("shadow") or {}
+        check_token_fields(trial["trial_id"], shadow)
         if "cost_observed" not in shadow and "cost_usd" not in shadow:
             continue  # older receipt: cost tracking was never attempted here
         observed = shadow.get("cost_observed")
@@ -254,6 +255,49 @@ def check_budget(body: dict[str, Any]) -> None:
                                        or value < 0):
                 refuse("BUDGET_MALFORMED",
                        f"{trial['trial_id']} {field} must be a non-negative int, got {value!r}")
+
+
+TOKEN_FIELDS = ("input_tokens", "output_tokens", "cached_input_tokens",
+                "reasoning_output_tokens")
+
+
+def check_token_fields(trial_id: str, shadow: dict[str, Any]) -> None:
+    """Tokens and dollars are separate observations and get separate gates.
+
+    The provider's event stream reports token counts and no price, so a capture
+    can honestly measure tokens while cost stays ABSENT. This lives outside the
+    cost early-return on purpose: nesting it there made every assertion here
+    unreachable for the committed receipts, which carry no cost fields at all --
+    the gate read green for five planted defects before that was noticed.
+    """
+    for field in TOKEN_FIELDS:
+        value = shadow.get(field)
+        if value is not None and (isinstance(value, bool) or not isinstance(value, int)
+                                   or value < 0):
+            refuse("BUDGET_MALFORMED",
+                   f"{trial_id} {field} must be a non-negative int, got {value!r}")
+
+    if "tokens_observed" not in shadow:
+        return  # older receipt: this capture predates token telemetry
+    seen = shadow.get("tokens_observed")
+    if seen is True:
+        for field in ("input_tokens", "output_tokens"):
+            if shadow.get(field) is None:
+                refuse("BUDGET_MALFORMED",
+                       f"{trial_id} claims tokens_observed=True with no {field}")
+    elif seen is False:
+        for field in TOKEN_FIELDS:
+            if shadow.get(field) is not None:
+                refuse("BUDGET_MALFORMED",
+                       f"{trial_id} claims tokens_observed=False but records "
+                       f"{field}={shadow.get(field)!r}")
+        if not str(shadow.get("tokens_unavailable_reason", "")).strip():
+            refuse("BUDGET_MALFORMED",
+                   f"{trial_id} reports no tokens without saying why; an unexplained "
+                   f"absence is indistinguishable from an unattempted one")
+    else:
+        refuse("BUDGET_MALFORMED",
+               f"{trial_id} tokens_observed must be a boolean, got {seen!r}")
 
 
 def check_secrets(body: Any, path: str = "") -> None:
@@ -320,6 +364,29 @@ def selftest(body: dict[str, Any]) -> int:
          mutate(lambda d: d["gate_controls"][0].update({"observed": "GREEN"}))),
         ("secret-in-receipt", "SECRET_IN_RECEIPT",
          mutate(lambda d: d["roles"].update({"builder": "uses ghp_" + "a" * 24}))),
+        # Token telemetry: the provider's event stream reports counts and no
+        # price, so "tokens measured" and "cost measured" are separate claims
+        # and each owes its own control. These five caught a first version of
+        # the assertions that never executed at all, because they sat behind
+        # the cost early-return and no committed receipt carries cost fields.
+        ("tokens-claimed-without-counts", "BUDGET_MALFORMED",
+         mutate(lambda d: d["trials"][0].setdefault("shadow", {}).update(
+             {"tokens_observed": True, "input_tokens": None, "output_tokens": 5}))),
+        ("tokens-denied-while-recorded", "BUDGET_MALFORMED",
+         mutate(lambda d: d["trials"][0].setdefault("shadow", {}).update(
+             {"tokens_observed": False, "input_tokens": 10,
+              "tokens_unavailable_reason": "stated"}))),
+        ("tokens-absent-without-reason", "BUDGET_MALFORMED",
+         mutate(lambda d: d["trials"][0].setdefault("shadow", {}).update(
+             {"tokens_observed": False, "input_tokens": None, "output_tokens": None,
+              "tokens_unavailable_reason": "  "}))),
+        ("tokens-observed-not-boolean", "BUDGET_MALFORMED",
+         mutate(lambda d: d["trials"][0].setdefault("shadow", {}).update(
+             {"tokens_observed": "yes"}))),
+        ("negative-cached-tokens", "BUDGET_MALFORMED",
+         mutate(lambda d: d["trials"][0].setdefault("shadow", {}).update(
+             {"tokens_observed": True, "input_tokens": 1, "output_tokens": 1,
+              "cached_input_tokens": -3}))),
         ("budget-observed-without-number", "BUDGET_MALFORMED",
          mutate(lambda d: d["trials"][0]["shadow"].update(
              {"cost_observed": True, "cost_usd": None}))),
