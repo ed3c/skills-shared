@@ -1,18 +1,69 @@
 # Executable assertions
 
-`assert_task_contract.py` is a Python-standard-library hard gate. It performs no network calls, invokes no model/provider, and mutates only the requested receipt.
+Each script owns one evidence boundary. A green result from one script never substitutes for another script's state.
 
-It validates schema/required fields, immutable subjects, path leases, branch topology, provider-role separation, evidence ceilings, budgets, automation boundaries, and the prohibition on active `code-graph-rag` dependencies.
+## Task packet gates
+
+The portable pre-dispatch contract is a two-stage, zero-network gate. Neither stage invokes a model or provider.
+
+1. `check_task_contract_schema.py` validates packet shape with Draft 2020-12 `references/task-contract.schema.json`. The owning CI installs the pinned `jsonschema` validator. A missing or invalid validator/schema is mechanism error `70`; it is never skipped or converted to PASS.
+2. `assert_task_contract.py` is the Python-standard-library semantic/hard-law gate. It validates immutable subjects, safe paths and leases, branch/DAG topology, provider-role separation, exact-subject/readback rules, evidence ceilings, budgets, automation boundaries, Git Town admission, semantic-conflict refusal, Human merge authority, and the prohibition on active `code-graph-rag` dependencies. It mutates only the requested receipt.
 
 ```bash
+python3 scripts/check_task_contract_schema.py --contract <contract.json>
 python3 scripts/assert_task_contract.py --contract <contract.json> --receipt <receipt.json>
 ```
 
-`assert_local_handoff_queue.py` is the zero-network hard gate for consumer handoff continuation. It validates exact subject binding, exactly one ACTIVE item, predecessor/next ordering, concrete argv/cwd/timeout lanes, durable receipt contracts, evidence-state ceilings, rollback identity, and forbidden automation authority. Its selftest plants stale-subject, dual-active, early-successor, placeholder-command, authority-widening, receipt-laundering, and queue-skip defects.
+Both commands must return `0` before Worker admission. Shape PASS and semantic PASS are distinct states; neither proves a provider, Worker, Worktree, delivery lane, merge, or promotion ran.
+
+## Capability causal DAG
+
+`assert_capability_dag.py` validates `references/capability-plan.schema.json` and `references/capability-receipts.schema.json`. It enforces frozen trigger/selection consistency, predecessor closure, exact task/subject/module identity, predecessor-output consumption, evidence-kind ceilings, source readback where required, fallback policy, and authority ceilings.
+
+```bash
+python3 scripts/assert_capability_dag.py \
+  --contract <contract.json> \
+  --plan <capability-plan.json> \
+  --receipts <capability-receipts.json> \
+  --admit-state <STATE>
+```
+
+Default state admission requires identity-matched `LIVE` receipts. `--fixture-mode` proves only deterministic checker behavior and cannot advance a production runtime state.
+
+`check_runtime_reachability.py --selftest` proves that `SKILL.md → task gates → domain profile → concrete modules → capability assertion → owning test suite` remains reachable. Reachability proves a route exists, not that a module ran.
+
+## Scheduler lifecycle
+
+`assert_scheduler_lifecycle.py` keeps Worker attempts, retry lineage, leases, checkpoints, result states, stale/terminal refusal, accepted-oracle results, and active-lease closure mechanically separate from a static task graph.
+
+```bash
+python3 scripts/assert_scheduler_lifecycle.py \
+  --lifecycle <scheduler-lifecycle.json> \
+  --receipt <receipt.json>
+```
+
+A portable lifecycle fixture remains `IMPLEMENTED`; it cannot self-promote to live scheduler `PASS`.
+
+## Local Handoff Execution Queue
+
+`assert_local_handoff_queue.py` is the zero-network hard gate for consumer handoff continuation. It validates exact subject binding, exactly one `ACTIVE` item, predecessor/next ordering, concrete argv/cwd/timeout lanes, durable receipt contracts, evidence-state ceilings, rollback identity, and forbidden automation authority. Its selftest plants stale-subject, dual-active, early-successor, placeholder-command, authority-widening, receipt-laundering, and queue-skip defects.
 
 ```bash
 python3 scripts/assert_local_handoff_queue.py --queue <queue.json>
 python3 scripts/assert_local_handoff_queue.py --queue <queue.json> --selftest
 ```
 
-Exit codes for portable assertions: `0` pass, `2` evaluated assertion failure, `64` invalid/absent input. Assertions do not execute consumer commands, providers, issue mutations, merges, promotions, or queue advancement.
+A queue PASS validates the continuation contract only. It does not execute consumer commands, providers, issue mutations, merges, promotions, or queue advancement.
+
+## Refactor boundary
+
+`check_skill_core_boundaries.py --skill agentic-tech-lead-orchestration` verifies portable-core/domain-module separation. It does not admit tasks, capabilities, scheduler results, or handoff execution.
+
+## Exit contract
+
+```text
+0   the named gate passed for the declared subject/evidence mode
+2   the input was evaluable and a contract/causal violation was found
+64  usage, JSON, or required input was invalid/absent where supported
+70  validator, schema, or assertion mechanism was unavailable/invalid where supported
+```

@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "agentic-tech-lead/capability-plan/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "task_id", "subject", "transitions"],
+  "properties": {
+    "schema": {"const": "agentic-tech-lead/capability-plan/v1"},
+    "task_id": {"type": "string", "minLength": 1},
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["base_commit", "base_tree"],
+      "properties": {
+        "base_commit": {"type": "string", "pattern": "^[0-9a-f]{7,64}$"},
+        "base_tree": {"type": "string", "pattern": "^[0-9a-f]{7,64}$"}
+      }
+    },
+    "transitions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id", "module_path", "selection", "trigger", "predecessor_transitions",
+          "requires_states", "produces_state", "required_before_state", "fallback",
+          "runtime_state", "authority"
+        ],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$"},
+          "module_path": {
+            "enum": [
+              "modules/deterministic-code-intelligence.md",
+              "modules/semantic-intent-anchor.md",
+              "modules/agent-executor.md",
+              "modules/vector-store.md",
+              "modules/stacked-delivery.md",
+              "modules/tournament-mode.md"
+            ]
+          },
+          "selection": {"enum": ["REQUIRED", "OPTIONAL_SELECTED", "NOT_APPLICABLE"]},
+          "trigger": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["matched", "evidence"],
+            "properties": {
+              "matched": {"type": "boolean"},
+              "evidence": {"type": "array", "items": {"type": "string", "minLength": 1}}
+            }
+          },
+          "predecessor_transitions": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {"type": "string", "minLength": 1}
+          },
+          "requires_states": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {"type": "string", "minLength": 1}
+          },
+          "produces_state": {"type": "string", "minLength": 1},
+          "required_before_state": {
+            "enum": [
+              "CONTEXT_ADMITTED",
+              "TASK_DAG_COMPILED",
+              "WORKERS_ADMITTED",
+              "ATTEMPTS_EXECUTED",
+              "RESULTS_VERIFIED",
+              "CANDIDATES_COMPARED",
+              "CONVERGENCE_APPLIED",
+              "GLOBAL_OBJECTIVE_ASSERTED",
+              "DELIVERY_HANDOFF"
+            ]
+          },
+          "fallback": {"enum": ["STOP", "DIRECT_SOURCE", "SINGLE_WORKER", "SKIP"]},
+          "runtime_state": {"const": "NOT_EXERCISED"},
+          "authority": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["merge", "publication", "secret_access"],
+            "properties": {
+              "merge": {"const": false},
+              "publication": {"const": false},
+              "secret_access": {"const": false}
+            }
+          }
+        }
+      }
+    }
+  }
+}
