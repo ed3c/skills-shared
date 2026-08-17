@@ -130,6 +130,24 @@ def validate(queue: dict[str, Any]) -> list[str]:
 
 def selftest(queue: dict[str, Any]) -> list[str]:
     failures: list[str] = []
+    base = copy.deepcopy(queue)
+    items = base.get("items")
+    if isinstance(items, list) and len(items) == 1 and isinstance(items[0], dict):
+        # A schema-valid queue may hold a single item (one-item epochs occur when
+        # the active handoff mutates the subject before the next queue can be
+        # compiled). The two-active and successor-early controls need a second
+        # item, so synthesize a bounded successor inside the selftest only.
+        first = items[0]
+        successor = copy.deepcopy(first)
+        successor["id"] = f"{first.get('id')}-selftest-successor"
+        successor["state"] = "BLOCKED_BY_PREDECESSOR"
+        successor.setdefault("entry", {})["predecessor"] = first.get("id")
+        successor["next"] = None
+        first["next"] = successor["id"]
+        items.append(successor)
+        sanity = validate(base)
+        if sanity:
+            return [f"selftest successor synthesis broke queue validity: {e}" for e in sanity]
     cases = []
     def add(name: str, mutate, needle: str) -> None: cases.append((name, mutate, needle))
     add("two active", lambda q: q["items"][1].__setitem__("state", "ACTIVE"), "one ACTIVE")
@@ -141,10 +159,10 @@ def selftest(queue: dict[str, Any]) -> list[str]:
     add("receipt missing", lambda q: q["items"][0]["receipt"].__setitem__("path", ""), "receipt contract missing")
     add("promotion guard missing", lambda q: q["items"][0]["receipt"].__setitem__("forbidden_promotions", []), "promotion guard missing")
     add("exit laundering", lambda q: q["items"][0]["exit"].__setitem__("required_verdict", "NOT_EXERCISED"), "validated PASS")
-    add("skip next", lambda q: q["items"][0].__setitem__("next", "terminal-admission"), "skips queue order")
+    add("skip next", lambda q: q["items"][0].__setitem__("next", q["items"][0]["id"]), "skips queue order")
     add("unresolved complete", lambda q: (q["items"][0]["runtime_lane"].__setitem__("unresolved_operations", [{"operation_id":"resolve-x","resolver_source":"consumer manifest","required_output":"CONCRETE_COMMAND_CONTRACT"}]), q["items"][0].__setitem__("state", "COMPLETE"), q["items"][1].__setitem__("state", "ACTIVE"), q["current"].__setitem__("active_item", q["items"][1]["id"])), "unresolved operation cannot be COMPLETE")
     for name, mutate, needle in cases:
-        candidate = copy.deepcopy(queue); mutate(candidate); found = validate(candidate)
+        candidate = copy.deepcopy(base); mutate(candidate); found = validate(candidate)
         if not any(needle.lower() in error.lower() for error in found): failures.append(f"control did not turn red: {name}")
     return failures
 

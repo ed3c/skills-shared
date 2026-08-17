@@ -45,6 +45,14 @@ python3 "$ROOT/scripts/assert_local_handoff_queue.py" \
   --queue "$ROOT/references/example-local-handoff-queue.json" \
   --selftest
 
+# A schema-valid one-item queue epoch must validate and run its planted
+# controls (issue #317: the selftest used to crash on items[1]).
+python3 "$ROOT/scripts/assert_local_handoff_queue.py" \
+  --queue "$ROOT/tests/fixtures/local-handoff-queue.single-item.json"
+python3 "$ROOT/scripts/assert_local_handoff_queue.py" \
+  --queue "$ROOT/tests/fixtures/local-handoff-queue.single-item.json" \
+  --selftest
+
 # Emit and inspect the positive semantic task receipt.
 python3 "$ROOT/scripts/assert_task_contract.py" \
   --contract "$ROOT/references/example-stack-contract.json" \
