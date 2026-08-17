@@ -21,7 +21,9 @@
 所以本 skill 的對策是把發現時機前移：`scripts/merge_gate.py preflight`
 **用每個 host 自己的閘真跑一次**（合成 PreToolUse payload 餵進實際設定的 hook、呼叫
 `codex execpolicy check`、讀 `.codex/config.toml` 的 network 授權），不靠推論。
-2026-08-07 在 skill-bettor 主樹一條命令同時抓出上表前兩列，這是本檔所有結論的物理錨。
+2026-08-07 在一個訂閱 repo 的主樹上，一條命令同時抓出上表前兩列，這是本檔所有結論的物理錨。
+（本檔的病例都以角色稱呼 repo；哪一次跑在哪個 repo、哪個 PR 編號，屬 binding，記在該 repo 的
+`.skill-bindings/github-delivery-loop/`。）
 
 ## 1. Claude Code 層
 
@@ -87,9 +89,10 @@
 
 ### 本機實況與修法
 
-`skill-bettor/.codex/config.toml` 原本 `default_permissions = "skill-bettor-git"` extends `:workspace`
-並補了 `.git` write，但**沒有 network 區塊** → Codex 在此 repo 連 `git push` 都出不去。
-`ix-agy/.codex/config.toml` 原本連 profile 都沒有，吃內建預設，同樣無網路。
+受測的第一個 repo，其 `.codex/config.toml` 原本 `default_permissions` 指向一個自訂 profile
+（extends `:workspace` 並補了 `.git` write），但**沒有 network 區塊** → Codex 在該 repo 連
+`git push` 都出不去。第二個 repo 的 `.codex/config.toml` 原本連 profile 都沒有，吃內建預設，
+同樣無網路。
 
 > **2026-08-09 複量：上段所述的斷網狀態已不存在。** `~/.codex/config.toml` 現在頂層
 > `default_permissions = "agent-default"`，該 profile `extends = ":workspace"`、補了 `.git` write，
@@ -137,9 +140,9 @@ Codex 一次 merge 要同時通過：
 
 ### config 是分層的，只讀最近那份會報假紅（2026-08-07）
 
-把 permission profile 上收到 `~/.codex/config.toml` 之後，preflight 從 ix-agy 跑卻報
-「`ix-agy/.codex/config.toml`: default_permissions=None，內建 preset 沒網路」——**假紅**。
-ix-agy 那份 config 只為 MCP server 存在，沒提 permissions，按官方分層序它會繼承 user 層的
+把 permission profile 上收到 `~/.codex/config.toml` 之後，preflight 從第二個 repo 跑卻報
+「該 repo 的 `.codex/config.toml`: default_permissions=None，內建 preset 沒網路」——**假紅**。
+那份 project config 只為 MCP server 存在，沒提 permissions，按官方分層序它會繼承 user 層的
 `agent-default`。驗證器只讀「往上找到的第一份」，等於把繼承當成缺席。
 
 修法＝照官方分層解析（project 疊在 user 之上，`permissions.*` 也要合併），並在訊息裡印出
@@ -150,7 +153,8 @@ ix-agy 那份 config 只為 MCP server 存在，沒提 permissions，按官方�
 
 第一版 probe 用 `github-merge-<owner>-<repo>.rules` 去推檔名——那是**安裝器的命名慣例，不是 Codex 的
 載入契約**。`codex execpolicy check` 的 `--rules` 是**可重複**參數，Codex 讀的是整個 rules 目錄；
-一條手寫的、檔名叫 `ix-agy-merge.rules` 的有效規則，在 probe 眼裡等於不存在 → 又一次假紅。
+一條手寫的、檔名不照那個慣例（例如 `<anything>-merge.rules`）的有效規則，在 probe 眼裡等於不存在
+→ 又一次假紅。
 修法＝掃 `~/.codex/rules/*.rules` 全部丟給 `--rules`，讓 execpolicy 自己判，probe 不猜檔名。
 
 **三次都是同一個病**：假綠＝少驗一個平面（Codex hook 漏報）；假紅其一＝少讀一個層級（config 分層）；
@@ -203,9 +207,9 @@ prefix rule 只比對**前綴**，而 `--admin` 出現在 PR 編號之後、位�
 作者不能核可自己的 PR。要用 review 當人閘，必須讓 PR 出自另一個身分（GitHub App／machine account），
 那是額外基建。
 
-再加上實測：`ed3c/skill-bettor` 是 **private + free user plan**，rulesets 與 branch-protection API
+再加上實測：受測的 private repo 在 **free user plan** 下，rulesets 與 branch-protection API
 回 403「Upgrade to GitHub Pro or make this repository public」——**服務端閘在該 repo 根本不可用**。
-`ed3c/agent-skills-repo` 是 public、可用但當時未設；兩者 `allow_auto_merge` 皆為 false。
+同帳號下另一個 public repo 可用但當時未設；兩者 `allow_auto_merge` 皆為 false。
 
 所以人閘落在 **`merge-admit` label**：
 
@@ -366,7 +370,7 @@ installation 權限只能從那一頁人眼讀。
 同一個帳號下的物理證據,證明 CLI 那條路真的會寫：
 
 ```
-ed3c/ix-agy-private  PR #29  merged
+<owner>/<private-repo>  PR #29  merged
   head.ref   codex/code-truth-graph-softkey-v1.1
   50 files, +4924
   committer  neon <neon@noreply.localhost>   ← 本機 git 身分,不經 App

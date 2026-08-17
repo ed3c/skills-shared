@@ -22,7 +22,7 @@
 `推論（無真 impl）` ─── candidate(真 impl,覆蓋未掙) ─── technical_equivalent(完整覆蓋,已判讀)
 ```
 - **technical_equivalent**:判決約分到「判讀一個真實 planted-defect fixture 的**完整**
-  selftest good/hollow 覆蓋結果」。skill-bettor 合格錨 ＝ `evals/cases/<skill>/<case>/fixtures/*.pine`
+  selftest good/hollow 覆蓋結果」。合格錨 ＝ `evals/cases/<skill>/<case>/fixtures/*`
   這類真植入缺陷的樣本 + `selftest.sh` 已證該 checker 對 good fixture PASS、對 hollow fixture FAIL。
   **覆蓋是掙來的、非假設**——一個 check 存在不代表它真的被驗證過會抓到它宣稱要抓的缺陷。
 - **candidate**:真實 fixture/rubric **存在**但覆蓋未掙。字面例子 ——
@@ -38,15 +38,15 @@
   3. `external_primary`(external-verify 抓的官方文件事實,如 Pine Script v6 語法行為)——
      相鄰**事實**錨,**非方法-執行等價物**,另列。
 
-### 這條軸在 skill-bettor 早已被實踐(demand-pull,非外來 import)
+### 這條軸在本 repo 早已被實踐(demand-pull,非外來 import)
 `ARCHITECTURE.md §4`「① T0 機械」列的正是 `judge.py` program/absent checks(權重 ≥70%)+
 `runner.py --compare` G1-G3;「② 行為」列的正是 `evals/cases/`(埋 bug fixtures = planted-defect,
 負例 = good fixture 不得誤報)——**與本軸同一方法論**。**本 skill 不是新增紀律,是把散在
 `evals/` check 設計裡的紀律升格成可判標準**——判「`runner.py --compare` 吐回的 G 閘綠,哪些勾是真的
 還是空心」。
 
-### release ≠ 一個綠勾(skill-bettor 版三級)
-northstar/antigravity 版有「green anchor → gate → 人 admit」多級閘。skill-bettor 同精神:
+### release ≠ 一個綠勾(本 repo 版三級)
+上游版有「green anchor → gate → 人 admit」多級閘。本 repo 同精神:
 1. **證據**:該 check 真指到一個 `evals/cases`/`evals/holdout` 下的 fixture,且該 fixture 本身
    有 `selftest.sh` 的 good/hollow 正控佐證。
 2. **provenance**:來源可追溯(fixture 路徑/expect.yaml check id,非「模型自稱有測到」)。
@@ -65,7 +65,8 @@ northstar/antigravity 版有「green anchor → gate → 人 admit」多級閘�
 多數「修法」只碰**一個**。persona 多樣化 / 換更強的**同 vendor** tier / 多迭代都**破不了任一個
 完整**(仍同權重或同血緣)。**Sonnet author × Sonnet judge ＝ Sonnet-on-Sonnet(同權重)**;
 **Sonnet author × Opus judge** 減緩脈絡相關(不同 drafting 史)但仍**同 vendor**(Claude),不是真正
-跨家族。skill-bettor 唯一真跨家族的組合是 **agy(Gemini)產出 findings,交 Claude 側複核**(或反向)。
+跨家族。以 Claude 為主的 repo,唯一真跨家族的組合通常是 **agy(Gemini)產出 findings,交 Claude 側
+複核**(或反向)。
 
 ### 四層(cheapest first;每層抓下層抓不到的)
 - **T0 確定性**(exit-code / `verify.sh` 聚合 / `runner.py --compare` / selftest good-hollow)
@@ -123,13 +124,11 @@ grounding 軸判它 placebo(空心 pattern 沒驗真東西 —— 如 `pattern: 
 ---
 
 ## Sources / Lineage
-- antigravity 源:`/Users/neon/antigravity/.agents/skills/judge-loop-chooser/modules/
-  grounding-and-independence.md`(其 SSOT 錨 `data.js` COMPLETENESS_RUBRIC —— 該檔案在 antigravity
-  自己模組化後已從 `automate.js` 搬到 `data.js`,舊 skill 文件裡的行號引用已偏移,本次 port 不繼承
-  該行號)。northstar 更上游源見該檔案自己的 Sources 段。
-- skill-bettor 活基座:`families/pinescript-audit/evals/runner.py` +
-  `families/pinescript-audit/evals/judge.py` + `families/pinescript-audit/evals/cases/` +
-  `families/pinescript-audit/evals/holdout/` + `ARCHITECTURE.md` §4(disk 已驗證,見 retarget-map
-  的鐵錨清單)。
-- **不搬**:antigravity 版 truth-verify 實測錨(2026-07-05/06 六 run 的具體數字)——那是 antigravity
-  自己迴圈的證成軌跡,不是 skill-bettor 的證據;SKILL.md Gotchas 已用一句話轉述課,不重複数字表格。
+- 上游源:上游 repo 內的 `.agents/skills/judge-loop-chooser/modules/grounding-and-independence.md`
+  (其 SSOT 錨是該 repo 的 COMPLETENESS_RUBRIC —— 該常數在上游自己模組化後已從 `automate.js` 搬到
+  `data.js`,舊 skill 文件裡的行號引用已偏移,本次 port 不繼承該行號)。更上游的源見該檔案自己的
+  Sources 段;絕對路徑與 commit 屬 binding,記在宿主的 `.skill-bindings/judge-loop-chooser/`。
+- 宿主活基座:該 repo 家族的 `evals/runner.py` + `evals/judge.py` + `evals/cases/` +
+  `evals/holdout/` + `ARCHITECTURE.md` §4(落地時 disk 驗證一次,見 retarget-map 的鐵錨清單)。
+- **不搬**:上游版 truth-verify 實測錨(某幾天六個 run 的具體數字)——那是上游
+  自己迴圈的證成軌跡,不是宿主的證據;SKILL.md Gotchas 已用一句話轉述課,不重複數字表格。

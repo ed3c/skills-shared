@@ -1,9 +1,11 @@
 # Module: fold-in — know-why
 
 > 屬 [`fold-in`](../SKILL.md) skill。SKILL.md 有確定性程序＋不變量;本檔 = 為何這樣、durable-home
-> taxonomy 設計理由、boundary-aware 通則。逐機制 antigravity → skill-bettor retarget 映射表在
-> `.skill-bindings/fold-in/retarget-map.md`(含 upstream northstar lineage 引註,不重抄)。
+> taxonomy 設計理由、boundary-aware 通則。逐機制「上游 → 宿主」retarget 映射表在
+> `.skill-bindings/fold-in/retarget-map.md`(含更上游的 lineage 引註,不重抄)。
 > 查證方法 → [`external-verify`](../../external-verify/SKILL.md)。
+>
+> **詞彙**:**上游**＝這份 skill 被移植出來的那個 repo;**宿主**＝正在訂閱這份共用 body 的 repo。
 
 ## 1. 為何 fold,不造新(Slop #2 / anti-inflation)
 
@@ -17,12 +19,12 @@ skill,`.claude/skills/` 這種規模(目前個位數)一樣會迅速漂成**cata
 是全顆粒度推進(demand-scoped ✅);造個空殼 skill 把散文塞進去等它被 surface,是 supply-push 增殖(❌)。
 
 這正是「anti-inflation 是判準,不是字面禁令」的具體操作化——判準是「候選是不是真未覆蓋的 niche」,不是
-「規模小所以先別加」或「規模大所以隨便加」。skill-bettor 現在規模小、增長快(每日演化管線持續產出新
+「規模小所以先別加」或「規模大所以隨便加」。一個規模還小、但增長快的 repo(每日演化管線持續產出新
 教訓),更需要這條紀律從第一天就上緊,而不是等 catalog 膨脹了才追悔。
 
 ## 2. Layer A/B 為何分
 
-Claude Code 的漸進載入與 antigravity 的 `.agents/skills` 機制同構:skill 的 frontmatter
+Claude Code 的漸進載入與 agy 側 `.agents/skills` 機制同構:skill 的 frontmatter
 (`name`/`description`)被索引供語義選取,body ＋ `modules/` 在該 skill 被選中前**不載入**。所以:
 
 - **Layer A(SKILL.md / changelog 條目 / Gotchas 行 / 組件卡列)= 確定性事實／程序／處置**:被載入時
@@ -38,17 +40,17 @@ Claude Code 的漸進載入與 antigravity 的 `.agents/skills` 機制同構:ski
 ## 3. durable home 非 ephemeral —— 為何逼「畢業」,以及四路 taxonomy 怎麼設計出來的
 
 對話(以及隨手筆記)是**ephemeral**:下個 session 不保證載入,load-bearing 的操作課會**蒸發**。
-antigravity 有一個集中式 durable home ——root `AGENTS.md`「Resolved」帳本,一個檔案裝所有範疇的
-「症狀＋根因＋修法＋禁回退鐵錨」。**skill-bettor 沒有這個檔案,也不該造一個同構的**——理由不是
-偷懶,是 skill-bettor 的結構本來就比 antigravity 更分艙:
+有些 repo 用一個集中式 durable home ——root `AGENTS.md`「Resolved」帳本,一個檔案裝所有範疇的
+「症狀＋根因＋修法＋禁回退鐵錨」。**分艙型的 repo 沒有這個檔案,也不該造一個同構的**——理由不是
+偷懶,是這兩種形狀的分艙程度本來就不同:
 
-- antigravity 是單一大迴圈(一條 DR 管線)套多個 stage-skill,經驗的「範疇」大多數時候就是「該
-  stage」,集中式帳本尚可 scale。
-- skill-bettor 是**多家族×多迴圈**的資產工場:一段教訓的正確歸屬,取決於它是屬於**哪個家族的業務
+- 集中式帳本適用的形狀:單一大迴圈(例如一條 DR 管線)套多個 stage-skill,經驗的「範疇」大多數
+  時候就是「該 stage」,一個檔案尚可 scale。
+- 分艙型的形狀是**多家族×多迴圈**的資產工場:一段教訓的正確歸屬,取決於它是屬於**哪個家族的業務
   資產**、還是**跨家族的迴圈引擎本身**、還是**迴圈之間怎麼組合**、還是**repo 級的政策**——四個維度
   互不隸屬,硬塞進一個檔案會讓 家族A的 eval 教訓、harness 引擎教訓、迴圈拓撲事實、repo 政策決策
-  混在同一列表,任何人想找「某類教訓在哪」都要線性掃過整檔——這正是 antigravity 自己在
-  `AGENTS.md` 規模變大後可能面對的問題,skill-bettor 從結構上先避開。
+  混在同一列表,任何人想找「某類教訓在哪」都要線性掃過整檔——這正是集中式帳本規模變大後會
+  面對的問題,分艙型 repo 從結構上先避開。
 
 由此推出的四路 taxonomy(範疇 → durable home,详見 SKILL.md §程序 1/4):
 
@@ -58,7 +60,7 @@ antigravity 有一個集中式 durable home ——root `AGENTS.md`「Resolved」
 | 該家族某子技能的領域知識修正 | 子技能 `SKILL.md`(事實)+`references/`(why) | 子技能本身已是最貼近「owner skill」的單位(如 `repaint-detection`),`references/security-function-patterns.md` 已是現成的 Layer B 範例。家族頂層路由器 SKILL.md 明文「只放地圖不放知識」,故教訓不進那裡,進子技能自己的層。 |
 | 跨家族 harness 工程教訓 | `loop-harness-standard` 自己的 Gotchas/modules | 這正是它現在已有的用法——`agy quota 耗盡＝零輸出 exit 0`、`agy --add-dir 命門`都已是這個 skill 的 Gotchas 行,是跨任何家族都適用的驅動器層級事實。這條路是唯一「Layer A 本身就是防回退錨」的一路,因為它不像 changelog 那樣有「哪一天的條目」概念,是持續累積的 Gotchas 清單。 |
 | 迴圈拓撲事實變動 | `harness-wiki` 組件卡＋不變量清單 | harness-wiki 明文鐵律「只 MAP 不放內容」——這裡放的不是「教訓」而是「地圖跟真實系統同步」,錨不是「禁回退用 X」句式,而是「組件卡描述與磁碟上的真實迴圈狀態一致」本身。誤把教訓塞進這裡 = 讓地圖開始帶散文,是 harness-wiki 自己 Gotchas 點名的頭號風險。 |
-| repo 級跨切面架構決策 | `ARCHITECTURE.md` §10(遷移步驟)+§11(為何不) | §11 的標題本身已寫明「鏡像 antigravity §⑦」——即 skill-bettor 設計者已經在建 `ARCHITECTURE.md` 時,獨立長出了一個「為何不做 X」清單,功能上正是 repo 級範疇的防回退鏡像句式(只是措辭從「禁回退用」換成「不 X」)。fold-in 不需要為這一路發明新格式,只需要把新決策 additive 接進這兩節既有結構。 |
+| repo 級跨切面架構決策 | `ARCHITECTURE.md` §10(遷移步驟)+§11(為何不) | §11 的標題本身已寫明它鏡像上游的「為何不」節——即宿主設計者在建 `ARCHITECTURE.md` 時,獨立長出了一個「為何不做 X」清單,功能上正是 repo 級範疇的防回退鏡像句式(只是措辭從「禁回退用」換成「不 X」)。fold-in 不需要為這一路發明新格式,只需要把新決策 additive 接進這兩節既有結構。 |
 
 這張表不是憑空設計——是先讀了 `ARCHITECTURE.md`、`loop-harness-standard`/`harness-wiki` 現況、
 `pinescript-audit` 家族實際目錄形狀之後,**找出已經存在的四個「被固定查看的地方」**,再把它們的
@@ -71,7 +73,7 @@ antigravity 有一個集中式 durable home ——root `AGENTS.md`「Resolved」
 但對應的程式碼裡根本沒有實現,或實現了但沒有可回退偵測的鐵錨。這是 Half-Bridge —— 讀起來平滑,實際
 不可宣稱成立。
 
-skill-bettor 的確定性鐵錨,依範疇分兩種 load-bearing 檔案:
+宿主的確定性鐵錨,依範疇分兩種 load-bearing 檔案:
 
 1. **家族範疇**:該修法真的在該家族 `evals/runner.py`(或 `judge.py`、`scan_*.py` 掃描腳本、
    `expect.yaml` 案例定義)落地。例——修好 `evals/runner.py` 裡 `parse_agent_output` 的 token 累加
@@ -90,18 +92,18 @@ skill-bettor 的確定性鐵錨,依範疇分兩種 load-bearing 檔案:
 有這些鐵錨,「吸收成立」才有判別力(一個「連接但不判別」的假吸收 —— 光有散文沒有對應實現或實測
 —— 會被鐵錨抓出)。無鐵錨 → gate 擋下,退回,別存 husk。
 
-## 5. port 命門(antigravity → skill-bettor 這一手)
+## 5. port 命門(上游 → 宿主 這一手)
 
-antigravity `fold-in` 本身是 port 自 northstar `/fold-in`(Claude Code 斜線命令
-`.claude/commands/fold-in.md`,DDR-205 Layer A/B、Slop #2、PG-103/155/156)。那一手的完整
-northstar→antigravity 逐機制映射表記在 antigravity 自己的
+上游的 `fold-in` 本身也是 port 來的:更上游是一個 Claude Code 斜線命令
+`.claude/commands/fold-in.md`,帶它自己的 Layer A/B、anti-inflation 與編號論證。那一手的完整
+「更上游 → 上游」逐機制映射表記在上游自己的
 `.agents/skills/fold-in/modules/fold-in-know-why.md` §5——那是**第三手參照**,本檔不重抄它,只在
 `.skill-bindings/fold-in/retarget-map.md`引註為 upstream lineage。本檔與 retarget-map.md 只負責
-**antigravity → skill-bettor** 這一手的映射,新鮮寫出、不假設讀者看過 northstar 那份。
+**上游 → 宿主** 這一手的映射,新鮮寫出、不假設讀者看過第三手那份。
 
 ## 6. 為何 fold-in 要 boundary-aware(掌握系統邊界)＋ 技術等價物判斷通則
 
-fold-in 早期世界觀是「把經驗塞進一組**扁平的 N 個 skill**」。但 skill-bettor 的知識演化 harness 已經
+fold-in 早期世界觀是「把經驗塞進一組**扁平的 N 個 skill**」。但宿主的知識演化 harness 已經
 是**小迴圈組件的組合**(見 `harness-wiki`（../../harness-wiki/SKILL.md）):演化 op 迴圈、DR proposal
 迴圈,各自閉合、各有獨立收斂閘,未來會 additive 增列。這對 fold-in 有兩個硬後果:
 
@@ -112,11 +114,11 @@ fold-in 早期世界觀是「把經驗塞進一組**扁平的 N 個 skill**」�
    **讓 owner 候選源＝讀 harness-wiki 組件卡**——它本就是「系統邊界的單一真相」。fold-in 每次先讀
    它,才叫「掌握系統邊界」。
 
-   antigravity 的 `antigravity-harness-wiki` 已經踩過這個坑一次:曾把一個真迴圈(DS 分析工作流)
-   誤判為「只是 domain 內容」打掉,後來才更正為正式迴圈組件 `ds-workflow-loop`——這是**antigravity
-   自己的歷史案例**,skill-bettor 才剛起步(2026-07-11 首日),還沒有對應的真實負向錨。這裡引用
-   antigravity 的案例只為**校準風險意識**,不是宣稱 skill-bettor 已經犯過同樣的錯——若哪天
-   skill-bettor 真的發生「把一條真迴圈誤判成 domain 內容打掉」,那時才該把具體案例記進
+   上游的 harness-wiki 已經踩過這個坑一次:曾把一個真迴圈(一條分析工作流)
+   誤判為「只是 domain 內容」打掉,後來才更正為正式迴圈組件——這是**上游
+   自己的歷史案例**;剛起步的宿主還沒有對應的真實負向錨。這裡引用
+   上游的案例只為**校準風險意識**,不是宣稱宿主已經犯過同樣的錯——若哪天
+   宿主真的發生「把一條真迴圈誤判成 domain 內容打掉」,那時才該把具體案例記進
    `harness-wiki` 自己的 Gotchas,而非現在虛構一個。
 
 2. **fold-in 是最主要的變異操作,所以是最大漂移源**。harness-wiki 存在的唯一理由＝防雙圖漂移
@@ -180,10 +182,9 @@ mcp-serve 等 7/28 final)還是「漏做」——一句 why 讓 designed-wait �
 DESIGN-SCORE 的 designed-cut 論證。
 
 ## Sources / Lineage
-- antigravity 源:`/Users/neon/antigravity/.agents/skills/fold-in/`(SKILL.md +
-  `modules/fold-in-know-why.md`)。
-- northstar 源(第三手,不重抄):antigravity `modules/fold-in-know-why.md` §5 記錄的
-  northstar→antigravity 映射,原始出處 `/Users/neon/northstar/.claude/commands/fold-in.md`
-  (DDR-205、PG-103/155/156)。
-- skill-bettor 既有同構:`ARCHITECTURE.md`、`loop-harness-standard`/`harness-wiki`(同批移植)、
-  `families/pinescript-audit/changelog/2026-07-11.md`(四路 taxonomy 的實例依據)。
+- 上游源:上游 repo 內的 `.agents/skills/fold-in/`(SKILL.md + `modules/fold-in-know-why.md`);
+  它在哪台機器、哪個 checkout、釘哪個 commit,屬 binding,記在宿主的 `.skill-bindings/fold-in/`。
+- 第三手源(不重抄):上游 `modules/fold-in-know-why.md` §5 記錄的「更上游 → 上游」映射,
+  原始出處是更上游 repo 的 `.claude/commands/fold-in.md`。
+- 宿主既有同構:`ARCHITECTURE.md`、`loop-harness-standard`/`harness-wiki`(同批移植)、
+  宿主第一個家族的 `changelog/` 首日條目(四路 taxonomy 的實例依據)。
