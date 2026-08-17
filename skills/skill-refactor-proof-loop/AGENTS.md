@@ -12,8 +12,9 @@ Read this file before changing the `skill-refactor-proof-loop` or using it to re
 6. `references/golden-proof-registry.schema.json`;
 7. `references/golden-proof-registry.json`;
 8. `references/skill-adoption-ledger.json` when the change touches another Skill's adoption state;
-9. only the selected module under `modules/`;
-10. `scripts/`, `tests/`, and the exact issue/PR subjects.
+9. `evals/proof-standard-admission.json` for the bound scope this standard was admitted under;
+10. only the selected module under `modules/`;
+11. `scripts/`, `tests/`, and the exact issue/PR subjects.
 
 Chat history, branch names, issue state, and Markdown claims are not evidence substitutes.
 
@@ -26,6 +27,7 @@ Chat history, branch names, issue state, and Markdown claims are not evidence su
 - Keep structural, executable-contract, hermetic real-task, matched live runtime, and delivery evidence separate.
 - Failed, stale, blocked, cancelled, and superseded attempts remain in the denominator.
 - Fixture or synthetic evidence cannot become live model/provider PASS.
+- An admission record decides which method is canonical. It is never evidence, never a run, and never a reason to move a measured state.
 - Semantic conflict, provider activation, publication, merge, release, promotion, and rollback remain Human/trusted-operator authorities.
 
 ## Required change packet

@@ -1,0 +1,54 @@
+{
+  "schema": "human-admit/v1",
+  "_why_this_file_is_the_gate": "Every node, ledger row and document in this Skill can compute that the standard is ready and none of them can admit it. The Stack edge molecular-stack-traceability -> cross-skill-adoption-audit is a PROCESS_DEPENDENCY on the artifact canonical-proof-standard-after-Human-admission, and no byte in the repository produced that artifact before this file existed. Deleting this file returns #322 to blocked-on-admission; nothing else has to be undone, because this record carries no run, no receipt and no measurement.",
+
+  "approver": "ed3c (repository owner)",
+  "decided_at": "2026-08-17",
+  "channel": "owner selection via AskUserQuestion in a live Claude Code session (goal: open-issue sweep), physicalized by agent-macro",
+
+  "decision": "ADMITTED_FOR_BOUND_SCOPE",
+  "admitted_artifact": "canonical-proof-standard-after-Human-admission",
+
+  "what_is_admitted": "The proof-carrying Skill refactor standard becomes the canonical method for repository-wide adoption governance: future Skill refactors are classified against it, and the cross-Skill adoption audit of issue #322 may proceed against Skills that never consumed its unmerged bytes.",
+
+  "admitted_subject": {
+    "repository": "ed3c/skills-shared",
+    "commit": "ce68a0570de81ed0b4c1dba02bcc6e3d6360d8bd",
+    "branch_at_decision": "main",
+    "landed_via": "PR #338",
+    "blobs": {
+      "skills/skill-refactor-proof-loop/SKILL.md": "90b2720b54d2a6129ece6a862e36f620e5e9cf83",
+      "skills/skill-refactor-proof-loop/references/refactor-proof-contract.schema.json": "f6109becf312b7ae374ec8402f7554528d5c9d81",
+      "skills/skill-refactor-proof-loop/references/golden-proof-registry.schema.json": "837fb21b33c6e59c56fee979b2e471261c3b700f",
+      "skills/skill-refactor-proof-loop/references/golden-proof-registry.json": "15f9c65b9c714d1d8b5e5206e447fb6aa3869958",
+      "skills/skill-refactor-proof-loop/references/refactor-proof-stack.schema.json": "3268b80a6f79f76d1e6b78a5ffbea778b8a1ecf9",
+      "skills/skill-refactor-proof-loop/references/skill-adoption-ledger.schema.json": "af2dc469bdc5e480d5f283ccdd61ea58f5bda1b2"
+    },
+    "why_these_blobs": "The standard is the method text plus the contracts that make it executable, and the registry that binds the first golden proof. Instance data that changes as work proceeds -- refactor-proof-stack.json and skill-adoption-ledger.json -- is governed by the standard, not part of it."
+  },
+
+  "scope": "Adoption governance only, inside this repository. The standard may be cited as canonical when classifying a Skill refactor, when refusing a refactor that skips a layer, and when opening or deduplicating migration issues. Nothing outside that list is admitted.",
+
+  "promotes_no_proof_level": true,
+  "why_no_promotion": "The owner was offered a separate option to force NOT_ELIGIBLE promotions and did not select it. Admitting the standard changes which method is canonical, not what any Skill has proven under it. Every state in skill-adoption-ledger.json stays exactly as measured, and check_skill_adoption_ledger.py keeps refusing any layer above a registered proof.",
+
+  "creates_no_evidence": "This record is a decision, not a run. It reports no execution, no live model or provider, no Git Town or Forgejo operation, no CI receipt, no merge and no measurement. Any report rendered from it must say so on its face.",
+
+  "conditions": [
+    "The admitted subject is the exact blobs listed above. A changed candidate is a new candidate and this record does not travel with it.",
+    "Findings stay as measured. This admission may never be quoted to move a ledger state, a highest_layer, or a Stack node's terminal classification.",
+    "Every non-PASS adoption finding keeps an owning issue. Admission of the method does not close a gap.",
+    "The audit remains zero-network. molecular_traceability PASS stays refused because no offline byte proves current issue/PR delivery state.",
+    "Rollback is deleting this file. #322 returns to blocked-on-admission and the ledger, checkers and report keep working unchanged."
+  ],
+
+  "expiry": "On the next change to any blob in admitted_subject.blobs, or on the addition of a proof layer, criterion or state to the standard. Re-admission is a new record with a new decided_at.",
+
+  "not_admitted_by_this_record": [
+    "any promotion of an individual Skill's proof level, in either direction",
+    "live model, provider, scheduler, Shadow, Git Town, Forgejo or adapter receipts -- those stay owned by #231, #232, #234 and #256",
+    "merge, publication, release or production authority",
+    "bulk edits to shared Skill bodies without an admitted migration leaf",
+    "closure of #322 or #318"
+  ]
+}
