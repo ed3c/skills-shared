@@ -1,0 +1,91 @@
+{
+  "schema_version": "agentic-tech-lead/local-handoff-queue/v1",
+  "subject": {
+    "repository": "example/consumer",
+    "commit": "1111111111111111111111111111111111111111",
+    "tree": "2222222222222222222222222222222222222222",
+    "rollback_commit": "0000000000000000000000000000000000000000"
+  },
+  "authority": {
+    "automation_forbidden": ["merge", "force_push", "issue_close", "queue_advance", "provider_activation", "semantic_conflict_resolution"],
+    "human_owned": ["merge", "promotion", "rollback", "permission_change", "semantic_conflict_resolution"]
+  },
+  "current": {"active_item": "runtime-rebind", "state": "ACTIVE"},
+  "items": [
+    {
+      "id": "runtime-rebind",
+      "task_ref": "consumer-task-A",
+      "state": "ACTIVE",
+      "entry": {
+        "predecessor": null,
+        "required_subject_commit": "1111111111111111111111111111111111111111",
+        "required_capabilities": ["local-runtime-catalog", "scheduler-runtime"]
+      },
+      "runtime_lane": {
+        "class": "LOCAL_RUNTIME",
+        "commands": [
+          {"argv": ["python3", "consumer/scripts/rebind_runtime.py", "--check"], "cwd": ".", "timeout_seconds": 120, "environment_names": []}
+        ],
+        "live_evidence_required": true
+      },
+      "receipt": {
+        "path": "data/handoff/runtime-rebind.json",
+        "schema": "consumer/runtime-rebind/v1",
+        "required_states": ["PASS", "NOT_EXERCISED", "HUMAN_ADMIT_REQUIRED"],
+        "forbidden_promotions": ["synthetic_runtime_to_consumer_live_pass", "issue_ui_state_to_completion"]
+      },
+      "exit": {"requires_receipt": true, "required_verdict": "PASS", "cleanup_required": true},
+      "next": "physical-canary"
+    },
+    {
+      "id": "physical-canary",
+      "task_ref": "consumer-task-B",
+      "state": "BLOCKED_BY_PREDECESSOR",
+      "entry": {
+        "predecessor": "runtime-rebind",
+        "required_subject_commit": "1111111111111111111111111111111111111111",
+        "required_capabilities": ["local-worker-runtime", "local-provider-session"]
+      },
+      "runtime_lane": {
+        "class": "MIXED",
+        "commands": [
+          {"argv": ["sh", "consumer/tests/run-physical-canary.sh"], "cwd": ".", "timeout_seconds": 900, "environment_names": ["LOCAL_PROVIDER_SESSION"]}
+        ],
+        "live_evidence_required": true
+      },
+      "receipt": {
+        "path": "data/handoff/physical-canary.json",
+        "schema": "consumer/physical-canary/v1",
+        "required_states": ["PASS", "FAIL", "NOT_EXERCISED", "HUMAN_ADMIT_REQUIRED"],
+        "forbidden_promotions": ["static_fixture_to_live_pass", "provider_hit_to_source_truth"]
+      },
+      "exit": {"requires_receipt": true, "required_verdict": "PASS", "cleanup_required": true},
+      "next": "terminal-admission"
+    },
+    {
+      "id": "terminal-admission",
+      "task_ref": "consumer-task-C",
+      "state": "BLOCKED_BY_PREDECESSOR",
+      "entry": {
+        "predecessor": "physical-canary",
+        "required_subject_commit": "1111111111111111111111111111111111111111",
+        "required_capabilities": ["human-admission"]
+      },
+      "runtime_lane": {
+        "class": "LOCAL_HOST",
+        "commands": [
+          {"argv": ["python3", "consumer/scripts/check_terminal_admission.py"], "cwd": ".", "timeout_seconds": 60, "environment_names": []}
+        ],
+        "live_evidence_required": false
+      },
+      "receipt": {
+        "path": "data/handoff/terminal-admission.json",
+        "schema": "consumer/terminal-admission/v1",
+        "required_states": ["PASS", "HUMAN_ADMIT_REQUIRED"],
+        "forbidden_promotions": ["automation_to_human_admit", "queue_advance_without_admission"]
+      },
+      "exit": {"requires_receipt": true, "required_verdict": "PASS", "cleanup_required": false},
+      "next": null
+    }
+  ]
+}
