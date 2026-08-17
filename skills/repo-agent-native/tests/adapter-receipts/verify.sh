@@ -3,9 +3,12 @@
 #
 # Zero network and zero provider execution: this validates receipts that
 # `capture_adapter_receipt.py` wrote on a host that had the providers, so it is
-# runnable on a host that has none of them. The capture script is only compiled
-# here, never run -- running it would need grepai, Serena, ollama and a git
-# checkout, and a test that silently needs those is a test that gets disabled.
+# runnable on a host that has none of them. No provider lane is run here --
+# running one would need grepai, Serena or ollama, and a test that silently needs
+# those is a test that gets disabled. The one exception is the sqlite ledger
+# lane, which starts no provider at all: it is stdlib sqlite3 over the receipts
+# beside it, and it is exercised below against a repository this test creates
+# under TMPDIR, never against this checkout.
 set -euo pipefail
 
 test_dir="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
@@ -137,6 +140,51 @@ for name, (state, detail), expected in cases:
         failed.append(f"{name}: got {state}")
 if failed:
     raise SystemExit("git-town admission gate controls failed: " + "; ".join(failed))
+PY
+
+# A recapture writes into the directory the previous capture already filled. When
+# the sqlite lane globs, the lanes that run after it still hold their previous
+# receipts, at the previous commit. Ingesting those makes the ledger -- and the
+# LanceDB projection over it -- describe two trees while the receipt claims one.
+# Plant exactly that state and require the superseded subject to stay out.
+fixture="${tmp_root}/ledger-fixture"
+ledger_out="${tmp_root}/ledger-out"
+mkdir -p "${fixture}" "${ledger_out}"
+git init -q -b main "${fixture}"
+: > "${fixture}/seed.txt"
+git -C "${fixture}" add seed.txt
+git -C "${fixture}" -c user.name=t -c user.email=t@invalid commit -qm seed
+fixture_head="$(git -C "${fixture}" rev-parse HEAD)"
+
+python3 - "${receipts}/worktree.receipt.json" "${ledger_out}" "${fixture_head}" <<'PY'
+import json, pathlib, sys
+template = json.loads(pathlib.Path(sys.argv[1]).read_text(encoding="utf-8"))
+out, head = pathlib.Path(sys.argv[2]), sys.argv[3]
+current = json.loads(json.dumps(template))
+current["subject"]["commit_sha"] = head
+current["subject"]["tree_sha"] = head
+(out / "current.receipt.json").write_text(json.dumps(current, indent=2), encoding="utf-8")
+stale = json.loads(json.dumps(template))
+stale["adapter"]["kind"] = "superseded-lane"
+stale["subject"]["commit_sha"] = "0" * 40
+stale["subject"]["tree_sha"] = "0" * 40
+(out / "stale.receipt.json").write_text(json.dumps(stale, indent=2), encoding="utf-8")
+PY
+
+python3 "${capture}" --repo-root "${fixture}" --out "${ledger_out}" --lane sqlite >/dev/null
+python3 - "${ledger_out}" <<'PY'
+import json, pathlib, sys
+body = json.loads((pathlib.Path(sys.argv[1]) / "sqlite.receipt.json")
+                  .read_text(encoding="utf-8"))
+result = body["result"]
+control = next(c for c in body["controls"] if c["id"] == "ledger-holds-one-subject")
+if result["ingested_from_receipts"] != 1 or result["skipped_other_subject"] != 1:
+    raise SystemExit(f"the planted superseded receipt was ingested: "
+                     f"{result['ingested_from_receipts']} ingested, "
+                     f"{result['skipped_other_subject']} skipped")
+if control["observed"] != "RED" or control["distinct_subjects"] != 1:
+    raise SystemExit(f"the ledger holds {control['distinct_subjects']} subject(s)")
+print("REFUSED superseded-subject-ingested-into-ledger")
 PY
 
 # An empty receipt directory must be refused rather than reported as a clean run.

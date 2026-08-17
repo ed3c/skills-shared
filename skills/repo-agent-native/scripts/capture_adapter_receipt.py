@@ -556,11 +556,22 @@ def lane_sqlite(repo: Path, out_dir: Path) -> dict[str, Any]:
     # LanceDB lane -- which projects over these rows -- permanently sourceless,
     # and it made the claim that this file is "rebuilt from the receipts beside
     # it" true only of the schema.
-    ingested = 0
+    # Only this capture's subject. A recapture writes into a directory the last
+    # capture already filled, and the lanes that run after this one still hold
+    # their previous receipts at the previous commit when this lane globs. Those
+    # rows are a superseded subject: ingesting them makes the ledger -- and the
+    # LanceDB projection built on it -- describe two trees while claiming one,
+    # which is the same collapse `check_adapter_receipts.py` refuses across a
+    # receipt directory. Skipping is not a filter on taste; it is the directory's
+    # one-subject law applied where the directory is transiently two.
+    ingested = skipped_other_subject = 0
     for path in sorted(out_dir.glob("*.receipt.json")):
         try:
             other = json.loads(path.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError):
+            continue
+        if other.get("subject", {}).get("commit_sha") != body["subject"]["commit_sha"]:
+            skipped_other_subject += 1
             continue
         readback = other.get("result", {}).get("source_readback", {})
         try:
@@ -605,6 +616,19 @@ def lane_sqlite(repo: Path, out_dir: Path) -> dict[str, Any]:
     controls.append({"id": "duplicate-subject-refused", "expect": "RED",
                      "observed": "RED" if duplicate_refused else "GREEN"})
 
+    # Control: ask the table, not the loop, how many subjects it ended up holding.
+    # The skip above is the intent; this is the observation.
+    subjects = [row[0] for row in
+                connection.execute("SELECT DISTINCT commit_sha FROM observation")]
+    controls.append({
+        "id": "ledger-holds-one-subject", "expect": "RED",
+        "observed": "RED" if len(subjects) <= 1 else "GREEN",
+        "distinct_subjects": len(subjects),
+        "skipped_other_subject": skipped_other_subject,
+        "note": ("Receipts left in the output directory by a previous capture carry that "
+                 "capture's commit. They are skipped rather than ingested, so the ledger "
+                 "and the projection over it describe the tree this run bound.")})
+
     integrity = connection.execute("PRAGMA integrity_check").fetchone()[0]
     controls.append({"id": "integrity-check", "expect": "ok", "observed_value": integrity,
                      "observed": "RED" if integrity == "ok" else "GREEN",
@@ -621,6 +645,7 @@ def lane_sqlite(repo: Path, out_dir: Path) -> dict[str, Any]:
         "result_count": ingested,
         "ledger_path": ledger.name,
         "ingested_from_receipts": ingested,
+        "skipped_other_subject": skipped_other_subject,
         "source_readback": {"required": False, "performed": 0, "confirmed": 0},
     }
     body["residue"] = {"paths": [ledger.name], "cleaned": False,
