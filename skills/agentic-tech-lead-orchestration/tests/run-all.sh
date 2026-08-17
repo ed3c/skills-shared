@@ -6,9 +6,15 @@ trap 'rm -f "$TMP"' EXIT HUP INT TERM
 python3 "$ROOT/tests/selftest.py"
 python3 "$ROOT/tests/scheduler_lifecycle_selftest.py"
 python3 -m json.tool "$ROOT/references/scheduler-lifecycle.schema.json" >/dev/null
+python3 -m json.tool "$ROOT/references/local-handoff-queue.schema.json" >/dev/null
+python3 -m json.tool "$ROOT/references/example-local-handoff-queue.json" >/dev/null
 python3 "$ROOT/scripts/assert_task_contract.py" \
   --contract "$ROOT/references/example-stack-contract.json" \
   --receipt "$TMP"
+python3 "$ROOT/scripts/assert_local_handoff_queue.py" \
+  --queue "$ROOT/references/example-local-handoff-queue.json"
+python3 "$ROOT/scripts/assert_local_handoff_queue.py" \
+  --queue "$ROOT/references/example-local-handoff-queue.json" --selftest
 python3 - "$TMP" <<'PY2'
 import json, sys
 from pathlib import Path
