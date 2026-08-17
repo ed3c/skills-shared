@@ -397,6 +397,111 @@
         "commit_sha": "f7ec79d5250a86af4938976485e1a07d1ddb0d76",
         "subject": "registry: admit repository capability audit",
         "reason": "imported with the integrated PR stacks; published and not rewritable"
+      },
+      {
+        "commit_sha": "0422b6ae8a353de70e4d4c2986cd5c4f82171f3a",
+        "subject": "feat(tech-lead): add scheduler lifecycle contract schema",
+        "reason": "reached main through merge 'Merge pull request #311 from ed3c/agent/scheduler-lifecycle-contract-v1' (PR #311) under the owner's real address with no trailers; the driver cannot be observed from the commit and assigning one would be invention"
+      },
+      {
+        "commit_sha": "081b9c06c3888b5c63ea4ceaa46594b7a7a0606a",
+        "subject": "fix(313): model unresolved local operations explicitly",
+        "reason": "reached main through merge 'Merge PR #314: generalize Local Handoff Execution Queue' (PR #314) under the owner's real address with no trailers; the driver cannot be observed from the commit and assigning one would be invention"
+      },
+      {
+        "commit_sha": "0fda5c1864717418d577912808ebdc2fe3426470",
+        "subject": "feat(tech-lead): validate scheduler lifecycle semantics",
+        "reason": "reached main through merge 'Merge pull request #311 from ed3c/agent/scheduler-lifecycle-contract-v1' (PR #311) under the owner's real address with no trailers; the driver cannot be observed from the commit and assigning one would be invention"
+      },
+      {
+        "commit_sha": "16ce4e22d6d5cf8ee3f2ba07cb2bd172b0bbe70a",
+        "subject": "docs(313): document local handoff execution queue",
+        "reason": "reached main through merge 'Merge PR #314: generalize Local Handoff Execution Queue' (PR #314) under the owner's real address with no trailers; the driver cannot be observed from the commit and assigning one would be invention"
+      },
+      {
+        "commit_sha": "286471d80fabd6655f51fc47dea76ad32b3a1de5",
+        "subject": "docs(control-plane): reconcile PR 271 contracts with current main",
+        "reason": "reached main through merge 'Merge pull request #306 from ed3c/agent/control-plane-phase-convergence-v2' (PR #306) under the owner's real address with no trailers; the driver cannot be observed from the commit and assigning one would be invention"
+      },
+      {
+        "commit_sha": "35efbaa661816fb4a616e43bc0c7ccc0737ecd2d",
+        "subject": "fix(313): fail closed on unresolved local operations",
+        "reason": "reached main through merge 'Merge PR #314: generalize Local Handoff Execution Queue' (PR #314) under the owner's real address with no trailers; the driver cannot be observed from the commit and assigning one would be invention"
+      },
+      {
+        "commit_sha": "4707086d1134212d09f30cd2f6a913fd8c987d3c",
+        "subject": "test(tech-lead): add scheduler lifecycle planted controls",
+        "reason": "reached main through merge 'Merge pull request #311 from ed3c/agent/scheduler-lifecycle-contract-v1' (PR #311) under the owner's real address with no trailers; the driver cannot be observed from the commit and assigning one would be invention"
+      },
+      {
+        "commit_sha": "4c105efffb00ebdb22146e072cd17a1b8b54f496",
+        "subject": "feat(313): generalize local handoff queue in portable core",
+        "reason": "reached main through merge 'Merge PR #314: generalize Local Handoff Execution Queue' (PR #314) under the owner's real address with no trailers; the driver cannot be observed from the commit and assigning one would be invention"
+      },
+      {
+        "commit_sha": "5a8a4a35f93152c6b209c83506f83af3daab0078",
+        "subject": "fix(313): add unresolved-operation lane to handoff example",
+        "reason": "reached main through merge 'Merge PR #314: generalize Local Handoff Execution Queue' (PR #314) under the owner's real address with no trailers; the driver cannot be observed from the commit and assigning one would be invention"
+      },
+      {
+        "commit_sha": "5e837a8116d2a0297bffd82cbc4a4611cada0635",
+        "subject": "test(tech-lead): run scheduler lifecycle controls",
+        "reason": "reached main through merge 'Merge pull request #311 from ed3c/agent/scheduler-lifecycle-contract-v1' (PR #311) under the owner's real address with no trailers; the driver cannot be observed from the commit and assigning one would be invention"
+      },
+      {
+        "commit_sha": "62b66f3b4298ebe0bf32d28e8a3e27936bae5f23",
+        "subject": "docs(control-plane): codify Shadow Architect monitor contract",
+        "reason": "reached main through merge 'Merge pull request #306 from ed3c/agent/control-plane-phase-convergence-v2' (PR #306) under the owner's real address with no trailers; the driver cannot be observed from the commit and assigning one would be invention"
+      },
+      {
+        "commit_sha": "6caf246f9f0a7f9da8fbee63345412eafa0554fc",
+        "subject": "docs(313): index local handoff queue references",
+        "reason": "reached main through merge 'Merge PR #314: generalize Local Handoff Execution Queue' (PR #314) under the owner's real address with no trailers; the driver cannot be observed from the commit and assigning one would be invention"
+      },
+      {
+        "commit_sha": "7b8a8396582912a1e5d5a89046b77f7fc6713cff",
+        "subject": "feat(313): add local handoff queue schema",
+        "reason": "reached main through merge 'Merge PR #314: generalize Local Handoff Execution Queue' (PR #314) under the owner's real address with no trailers; the driver cannot be observed from the commit and assigning one would be invention"
+      },
+      {
+        "commit_sha": "87aa50313b472a96ecd46512db6715d4073fee08",
+        "subject": "docs(313): index local handoff assertion",
+        "reason": "reached main through merge 'Merge PR #314: generalize Local Handoff Execution Queue' (PR #314) under the owner's real address with no trailers; the driver cannot be observed from the commit and assigning one would be invention"
+      },
+      {
+        "commit_sha": "895c5a5759aef0bb42b0c995af7b94a70dfbace4",
+        "subject": "feat(313): add generic local handoff queue example",
+        "reason": "reached main through merge 'Merge PR #314: generalize Local Handoff Execution Queue' (PR #314) under the owner's real address with no trailers; the driver cannot be observed from the commit and assigning one would be invention"
+      },
+      {
+        "commit_sha": "b035a4c6767dae126a07894d7efa5c1d1626c4ee",
+        "subject": "test(313): run local handoff queue controls",
+        "reason": "reached main through merge 'Merge PR #314: generalize Local Handoff Execution Queue' (PR #314) under the owner's real address with no trailers; the driver cannot be observed from the commit and assigning one would be invention"
+      },
+      {
+        "commit_sha": "c2c779f32aad861186071a6ad2a4e87273c14a1a",
+        "subject": "feat(313): add deterministic local handoff queue assertion",
+        "reason": "reached main through merge 'Merge PR #314: generalize Local Handoff Execution Queue' (PR #314) under the owner's real address with no trailers; the driver cannot be observed from the commit and assigning one would be invention"
+      },
+      {
+        "commit_sha": "d97926d00096549a3e31014280dc425fcdb34002",
+        "subject": "feat(control-plane): add provider-neutral monitor plan schema",
+        "reason": "reached main through merge 'Merge pull request #306 from ed3c/agent/control-plane-phase-convergence-v2' (PR #306) under the owner's real address with no trailers; the driver cannot be observed from the commit and assigning one would be invention"
+      },
+      {
+        "commit_sha": "e13a34b350bd816f416ec5996fcf1e7887658b09",
+        "subject": "test(control-plane): prove applicability, schema, and closure laws",
+        "reason": "reached main through merge 'Merge pull request #306 from ed3c/agent/control-plane-phase-convergence-v2' (PR #306) under the owner's real address with no trailers; the driver cannot be observed from the commit and assigning one would be invention"
+      },
+      {
+        "commit_sha": "f1ee20231f17175abd700e36a6e2b893d2a82fea",
+        "subject": "fix(313): repair local handoff schema JSON",
+        "reason": "reached main through merge 'Merge PR #314: generalize Local Handoff Execution Queue' (PR #314) under the owner's real address with no trailers; the driver cannot be observed from the commit and assigning one would be invention"
+      },
+      {
+        "commit_sha": "f9ff1a1765ccfafba7a45d905ff2980282ef5357",
+        "subject": "feat(control-plane): add applicability-aware issue plans",
+        "reason": "reached main through merge 'Merge pull request #306 from ed3c/agent/control-plane-phase-convergence-v2' (PR #306) under the owner's real address with no trailers; the driver cannot be observed from the commit and assigning one would be invention"
       }
     ]
   }
