@@ -51,8 +51,8 @@
       "/tmp/claude-501/git-town-admit/git-town branch",
       "/tmp/claude-501/git-town-admit/git-town sync --stack --non-interactive --no-push"
     ],
-    "cwd": "/tmp/claude-501/adapter-git-town-rprbri3w/repo",
-    "duration_ms": 1106,
+    "cwd": "/tmp/claude-501/adapter-git-town-2b2iscnt/repo",
+    "duration_ms": 984,
     "exit_code": 0,
     "stderr_bytes": 136,
     "stderr_sha256": "2178d66d844aa5e35b7736ebae01fd096d13107e87ab3a8ea72df65ccd8583ec",
@@ -64,8 +64,8 @@
           "/tmp/claude-501/git-town-admit/git-town",
           "--version"
         ],
-        "cwd": "/tmp/claude-501/adapter-git-town-rprbri3w",
-        "duration_ms": 62,
+        "cwd": "/tmp/claude-501/adapter-git-town-2b2iscnt",
+        "duration_ms": 65,
         "exit_code": 0,
         "stderr_bytes": 0,
         "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -79,8 +79,8 @@
           "hack",
           "feature-a"
         ],
-        "cwd": "/tmp/claude-501/adapter-git-town-rprbri3w/repo",
-        "duration_ms": 185,
+        "cwd": "/tmp/claude-501/adapter-git-town-2b2iscnt/repo",
+        "duration_ms": 162,
         "exit_code": 0,
         "stderr_bytes": 37,
         "stderr_sha256": "f297b9a66a8f1f1ef3785538dbb310aefadaf1039c0f07f83ae0e78ec5240f47",
@@ -94,8 +94,8 @@
           "append",
           "feature-b"
         ],
-        "cwd": "/tmp/claude-501/adapter-git-town-rprbri3w/repo",
-        "duration_ms": 197,
+        "cwd": "/tmp/claude-501/adapter-git-town-2b2iscnt/repo",
+        "duration_ms": 166,
         "exit_code": 0,
         "stderr_bytes": 37,
         "stderr_sha256": "a53ddc2191801767ca6ff50c639e53095d5fbbebc45e4b2ba601f7290ab6ff60",
@@ -108,8 +108,8 @@
           "/tmp/claude-501/git-town-admit/git-town",
           "branch"
         ],
-        "cwd": "/tmp/claude-501/adapter-git-town-rprbri3w/repo",
-        "duration_ms": 82,
+        "cwd": "/tmp/claude-501/adapter-git-town-2b2iscnt/repo",
+        "duration_ms": 75,
         "exit_code": 0,
         "stderr_bytes": 0,
         "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -125,8 +125,8 @@
           "--non-interactive",
           "--no-push"
         ],
-        "cwd": "/tmp/claude-501/adapter-git-town-rprbri3w/repo",
-        "duration_ms": 207,
+        "cwd": "/tmp/claude-501/adapter-git-town-2b2iscnt/repo",
+        "duration_ms": 188,
         "exit_code": 0,
         "stderr_bytes": 62,
         "stderr_sha256": "7abc5659401dfcc713f1955744d88d831c4ec6e253c8ae31c3c50e779d81289f",
@@ -193,13 +193,13 @@
         "asked": "git rev-parse --verify refs/heads/feature-a",
         "claim": "branch feature-a exists",
         "confirmed": true,
-        "observed": "a979d140dc5e718c5f6c1ab9d78df3fce782f548"
+        "observed": "67a801894f8fce91780a65a626081288ea218ef0"
       },
       {
         "asked": "git rev-parse --verify refs/heads/feature-b",
         "claim": "branch feature-b exists",
         "confirmed": true,
-        "observed": "e773f7ef4d8f4a659ee13d158b71bd56154103f3"
+        "observed": "6b4a577f9d4fb77d31ab6b2242905059e5f218ca"
       },
       {
         "asked": "git config --get git-town-branch.feature-a.parent",
@@ -230,11 +230,11 @@
   },
   "schema": "repo-agent-native/adapter-receipt/v1",
   "subject": {
-    "commit_sha": "c960f356c405ace675f6289e49047e14fca53b06",
+    "commit_sha": "613ff64bd8cfa0f72df39dddff38975999304694",
     "dirty_excluded": "skills/repo-agent-native/evals/receipts-git-town-darwin",
     "dirty_paths": 0,
     "repository": "ed3c/skills-shared",
-    "tree_sha": "caea1a803152ffe6622429c5ed25cab08ba725b9",
-    "workspace_root": "/Users/neon/skills-shared/.claude/worktrees/wf_f0437ec1-295-2"
+    "tree_sha": "e011ab1c6c98cc8dc7a0c88dde3364f9f8c683c3",
+    "workspace_root": "/Users/neon/skills-shared/.claude/worktrees/admit-batch"
   }
 }
