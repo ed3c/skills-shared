@@ -174,7 +174,17 @@ The canonical machine index is [`references/refactor-proof-stack.json`](referenc
       └─ #320 → PR #324
          └─ #321 → agent/321-refactor-proof-stack-index
             └─ #322 cross-Skill adoption audit; standard admitted 2026-08-17,
-               ledger and rendered report landed, migration leaves still open
+               ledger and rendered report landed, every gap handed to a leaf
+               ├─ #343 agentic-tech-lead-orchestration
+               ├─ #344 controlled-technical-language-harness
+               ├─ #345 dual-forge-repository-loop
+               ├─ #346 forgejo-delivery-loop
+               ├─ #347 git-town-stacked-pr-worker
+               ├─ #348 github-delivery-loop
+               ├─ #349 knowledge-continuity
+               ├─ #350 procedural-shadow-runtime
+               ├─ #351 repository-capability-audit
+               └─ #352 spatial-loop-systems-engineering
 ```
 
 Open PR heads are deliberately not self-embedded in the same branches; the index records `READ_FROM_GITHUB_PR_METADATA`. A merged node may record an immutable merge SHA only after the state is actually observed. External issues #231, #232, #234 and #256 feed L4/L5 evidence but are not fake Stack children.
@@ -205,7 +215,7 @@ Open live owners remain issue #312 Phase 2 and issues #231, #232, #234 and #256.
 0 Skills carry live model/runtime evidence
 ```
 
-Every gap names an existing owning issue (#231, #232, #234, #256 or #322); the checker refuses an owner that is not already known, so the audit cannot invent a duplicate.
+Every gap names an existing owning issue; the checker refuses an owner that is not already known, so the audit cannot invent a duplicate. Gaps whose evidence lane already had an owner stay with it (#231, #232, #234, #256). Every other gap is owned by its Skill's own migration leaf — #343 `agentic-tech-lead-orchestration`, #344 `controlled-technical-language-harness`, #345 `dual-forge-repository-loop`, #346 `forgejo-delivery-loop`, #347 `git-town-stacked-pr-worker`, #348 `github-delivery-loop`, #349 `knowledge-continuity`, #350 `procedural-shadow-runtime`, #351 `repository-capability-audit`, #352 `spatial-loop-systems-engineering` — so no gap is parked on the audit issue that measured it.
 
 [`docs/traceability/SKILL_REFACTOR_ADOPTION_AUDIT.md`](../../docs/traceability/SKILL_REFACTOR_ADOPTION_AUDIT.md) is that ledger rendered for humans by `scripts/render_adoption_audit.py`. It is a generated file: `--check` re-renders and byte-compares it from the suite, so a hand-edited or stale report is a red suite rather than a second source. Opening the remaining migration leaves stays outside this ledger.
 
