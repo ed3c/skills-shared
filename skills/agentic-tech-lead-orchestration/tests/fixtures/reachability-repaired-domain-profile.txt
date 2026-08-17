@@ -1,0 +1,52 @@
+# Agentic Tech Lead capability profile
+
+Historical product/tool-specific orchestration detail remains recoverable from pre-refactor blob `a01f53592cda98f61b413b4467afa96356fb4ef7`.
+
+## Trigger
+Load when concrete code-intelligence providers, symbol/index adapters, structural parsers, bounded executor tools, vector projections, scheduler/runtime implementations, tournament execution, or consumer repository delivery integrations must be bound.
+
+## Non-trigger
+Do not load for generic task-contract compilation, DAG construction, dependency validation, path/resource leasing, worker admission, candidate comparison, convergence, global-objective verification, or delivery handoff when no concrete adapter is required.
+
+## Assumptions
+The orchestration problem can be expressed as typed task packets with explicit inputs, outputs, dependencies, owners, budgets, evidence oracles, and convergence rules before choosing tools. Module selection is derived from that frozen task packet; a module never activates itself from executable presence, model preference, provider availability, or a previous run.
+
+## Specialization inventory and selection router
+
+Select the smallest matching set. Every selected module path becomes part of the task evidence; every non-matching module remains unloaded.
+
+| Frozen task need / trigger | Load exactly this module | What it contributes |
+|---|---|---|
+| exact-subject Def/Ref/call/type impact graph, normalized SQLite evidence, or structural AST/CST slicing is required | [`deterministic-code-intelligence.md`](deterministic-code-intelligence.md) | compiler/language-service candidate graph, source-bound metadata, structural slicing, coverage and freshness rules |
+| conceptual intent cannot be located reliably by exact search and semantic seed discovery is admitted | [`semantic-intent-anchor.md`](semantic-intent-anchor.md) | grepai-style candidate seed discovery with mandatory direct-source readback |
+| an admitted Worker must execute bounded edits inside an isolated workspace/lease | [`agent-executor.md`](agent-executor.md) | Serena or equivalent executor binding, workspace/tool/path limits, observable artifact contract |
+| optional semantic/example retrieval benefits from a rebuildable vector projection | [`vector-store.md`](vector-store.md) | LanceDB-style candidate projection with canonical back-references; never source truth |
+| branch/Stack synchronization or forge handoff is actually required by the task and repository policy admits it | [`stacked-delivery.md`](stacked-delivery.md) | Git Town/forge adapter boundary, ancestry and delivery receipts; no merge authority |
+| multiple independent candidates implement the same locked contract and a deterministic tournament is requested | [`tournament-mode.md`](tournament-mode.md) | isolated competitor topology, matched contract/budget rules, deterministic selection boundary |
+
+For navigation and authority ceilings, [`README.md`](README.md) indexes the same modules. The table above is normative for runtime selection; the README is explanatory and cannot widen it.
+
+## Selection state
+
+Record one row per capability before dispatch:
+
+```text
+module_path
+trigger_evidence
+selection = REQUIRED | OPTIONAL_SELECTED | NOT_APPLICABLE
+subject / provider identity when selected
+freshness / coverage when selected
+fallback if unavailable
+runtime_state = NOT_EXERCISED until a live invocation receipt exists
+```
+
+A selected Markdown module is `IMPLEMENTED` procedure, not runtime `PASS`. A task-contract assertion may validate the declared selection and authority ceiling; only a later exact-subject invocation may establish runtime evidence for that adapter.
+
+## Evidence ceiling
+A provider hit, parsed graph, symbol index, vector retrieval, executor exit, Stack synchronization, or worker self-report is candidate/transport evidence only. Exact source readback and owning assertions remain higher authority. A module success cannot be copied into another module, provider, repository, worktree, model/harness, forge, CI, or merge state.
+
+## Fallback
+When optional intelligence/execution providers are absent, fall back to direct source reads, version-control search, compiler/language-service output, deterministic tests, and bounded single-worker execution while preserving unsupported lanes explicitly. When a required delivery/executor capability is unavailable, stop rather than silently substituting an unadmitted provider.
+
+## Forbidden overrides
+This module and every linked child module may not override `CORE-LAW-001` through `CORE-LAW-005`, fabricate DAG dependencies, accept overlapping writers, promote provider output without readback, suppress failed workers/dissent, weaken or skip `scripts/assert_task_contract.py`, widen filesystem/network/secret/provider/merge authority, or auto-activate itself because a tool is installed.

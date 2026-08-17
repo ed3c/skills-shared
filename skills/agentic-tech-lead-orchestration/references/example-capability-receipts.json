@@ -1,0 +1,77 @@
+{
+  "schema": "agentic-tech-lead/capability-receipts/v1",
+  "receipts": [
+    {
+      "schema": "agentic-tech-lead/capability-receipt/v1",
+      "task_id": "example-stack",
+      "transition_id": "intent-anchor",
+      "module_path": "modules/semantic-intent-anchor.md",
+      "subject": {
+        "base_commit": "0123456789abcdef0123456789abcdef01234567",
+        "base_tree": "89abcdef0123456789abcdef0123456789abcdef"
+      },
+      "attempt_id": "fixture-intent-1",
+      "evidence_kind": "FIXTURE",
+      "verdict": "PASS",
+      "input_states": ["SYSTEM_CONTRACT_EXTRACTED"],
+      "output_state": "INTENT_ANCHORED",
+      "evidence_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+      "source_readback": true,
+      "authority": {"merge": false, "publication": false, "secret_access": false}
+    },
+    {
+      "schema": "agentic-tech-lead/capability-receipt/v1",
+      "task_id": "example-stack",
+      "transition_id": "deterministic-context",
+      "module_path": "modules/deterministic-code-intelligence.md",
+      "subject": {
+        "base_commit": "0123456789abcdef0123456789abcdef01234567",
+        "base_tree": "89abcdef0123456789abcdef0123456789abcdef"
+      },
+      "attempt_id": "fixture-context-1",
+      "evidence_kind": "FIXTURE",
+      "verdict": "PASS",
+      "input_states": ["SYSTEM_CONTRACT_EXTRACTED", "INTENT_ANCHORED"],
+      "output_state": "DETERMINISTIC_CONTEXT_READY",
+      "evidence_sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+      "source_readback": true,
+      "authority": {"merge": false, "publication": false, "secret_access": false}
+    },
+    {
+      "schema": "agentic-tech-lead/capability-receipt/v1",
+      "task_id": "example-stack",
+      "transition_id": "worker-execution",
+      "module_path": "modules/agent-executor.md",
+      "subject": {
+        "base_commit": "0123456789abcdef0123456789abcdef01234567",
+        "base_tree": "89abcdef0123456789abcdef0123456789abcdef"
+      },
+      "attempt_id": "fixture-worker-1",
+      "evidence_kind": "FIXTURE",
+      "verdict": "PASS",
+      "input_states": ["WORKERS_ADMITTED", "DETERMINISTIC_CONTEXT_READY"],
+      "output_state": "ATTEMPTS_EXECUTED",
+      "evidence_sha256": "3333333333333333333333333333333333333333333333333333333333333333",
+      "source_readback": true,
+      "authority": {"merge": false, "publication": false, "secret_access": false}
+    },
+    {
+      "schema": "agentic-tech-lead/capability-receipt/v1",
+      "task_id": "example-stack",
+      "transition_id": "stacked-delivery",
+      "module_path": "modules/stacked-delivery.md",
+      "subject": {
+        "base_commit": "0123456789abcdef0123456789abcdef01234567",
+        "base_tree": "89abcdef0123456789abcdef0123456789abcdef"
+      },
+      "attempt_id": "fixture-delivery-1",
+      "evidence_kind": "FIXTURE",
+      "verdict": "PASS",
+      "input_states": ["GLOBAL_OBJECTIVE_ASSERTED", "ATTEMPTS_EXECUTED"],
+      "output_state": "DELIVERY_HANDOFF",
+      "evidence_sha256": "4444444444444444444444444444444444444444444444444444444444444444",
+      "source_readback": true,
+      "authority": {"merge": false, "publication": false, "secret_access": false}
+    }
+  ]
+}

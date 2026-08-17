@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ed3c/skills-shared/skills/agentic-tech-lead-orchestration/references/scheduler-lifecycle.schema.json",
+  "title": "Agentic Tech Lead Scheduler Lifecycle",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "repository", "task_graph_digest", "attempts", "leases", "checkpoints", "results", "evidence_state"],
+  "properties": {
+    "schema": {"const": "agentic-tech-lead/scheduler-lifecycle/v1"},
+    "repository": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "commit", "tree"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "tree": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+      }
+    },
+    "task_graph_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "attempts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["task_id", "attempt_id", "parent_attempt_id", "state", "budget", "consumed", "worktree", "head"],
+        "properties": {
+          "task_id": {"type": "string", "minLength": 1},
+          "attempt_id": {"type": "string", "minLength": 1},
+          "parent_attempt_id": {"type": ["string", "null"]},
+          "state": {"enum": ["PLANNED", "ADMITTED", "ASSIGNED", "LEASED", "RUNNING", "CHECKPOINTED", "RESULT_READY", "RESULT_VERIFIED", "INTEGRATED", "STALE_ATTEMPT", "LEASE_EXPIRED", "TIMED_OUT", "STRAGGLER_DETACHED", "FAILED_RETRYABLE", "CANCELLED", "SUPERSEDED"]},
+          "budget": {"type": "integer", "minimum": 0},
+          "consumed": {"type": "integer", "minimum": 0},
+          "worktree": {"type": "string", "minLength": 1},
+          "head": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+        }
+      }
+    },
+    "leases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["attempt_id", "resource", "active", "expires_at"],
+        "properties": {
+          "attempt_id": {"type": "string", "minLength": 1},
+          "resource": {"type": "string", "minLength": 1},
+          "active": {"type": "boolean"},
+          "expires_at": {"type": "integer", "minimum": 0}
+        }
+      }
+    },
+    "checkpoints": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["attempt_id", "checkpoint_id", "artifact_digest"],
+        "properties": {
+          "attempt_id": {"type": "string", "minLength": 1},
+          "checkpoint_id": {"type": "string", "minLength": 1},
+          "artifact_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        }
+      }
+    },
+    "results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["attempt_id", "result_digest", "oracle", "accepted"],
+        "properties": {
+          "attempt_id": {"type": "string", "minLength": 1},
+          "result_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "oracle": {"enum": ["PASS", "FAIL", "NOT_EXERCISED"]},
+          "accepted": {"type": "boolean"}
+        }
+      }
+    },
+    "evidence_state": {"enum": ["IMPLEMENTED", "PASS", "FAIL", "NOT_EXERCISED", "BLOCKED"]}
+  }
+}

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "repository-control-plane-monitor-plan/v1",
+  "$id": "https://skills-shared.invalid/repository-control-plane-monitor-plan/v1",
   "title": "Repository Control Plane Monitor Plan",
   "type": "object",
   "additionalProperties": false,
@@ -13,15 +13,11 @@
     "automatic_conflict_resolution"
   ],
   "properties": {
-    "schema": {
-      "const": "repository-control-plane-monitor-plan/v1"
-    },
+    "schema": {"const": "repository-control-plane-monitor-plan/v1"},
     "issues": {
       "type": "array",
       "uniqueItems": true,
-      "items": {
-        "$ref": "#/$defs/issueIdentity"
-      }
+      "items": {"$ref": "#/$defs/identity"}
     },
     "waves": {
       "type": "array",
@@ -29,51 +25,56 @@
         "type": "array",
         "minItems": 1,
         "uniqueItems": true,
-        "items": {
-          "$ref": "#/$defs/issueIdentity"
-        }
+        "items": {"$ref": "#/$defs/identity"}
       }
     },
     "issue_plans": {
       "type": "object",
-      "propertyNames": {
-        "$ref": "#/$defs/issueIdentity"
-      },
-      "additionalProperties": {
-        "$ref": "#/$defs/issuePlan"
-      }
+      "propertyNames": {"$ref": "#/$defs/identity"},
+      "additionalProperties": {"$ref": "#/$defs/issue_plan"}
     },
-    "automatic_merge": {
-      "const": false
-    },
-    "automatic_conflict_resolution": {
-      "const": false
-    }
+    "automatic_merge": {"const": false},
+    "automatic_conflict_resolution": {"const": false}
   },
   "$defs": {
-    "issueIdentity": {
+    "identity": {
       "type": "string",
-      "minLength": 3,
-      "pattern": "^[^#\\s]+#[1-9][0-9]*$"
+      "pattern": "^[^/#\\s]+/[^#\\s]+#[1-9][0-9]*$"
     },
-    "phaseDispositionBase": {
+    "disposition": {
       "type": "object",
       "additionalProperties": false,
       "required": ["phase", "receipt", "disposition"],
       "properties": {
-        "phase": {"type": "string"},
-        "receipt": {"type": "string"},
-        "disposition": {"type": "string"}
+        "phase": {
+          "enum": [
+            "BOOTSTRAP",
+            "SHADOW_ADMISSION",
+            "TECH_LEAD_PLAN",
+            "SPATIAL_INVARIANTS",
+            "STACK_DELIVERY",
+            "FORGE_RECONCILIATION"
+          ]
+        },
+        "receipt": {
+          "enum": [
+            "skill-resolution",
+            "shadow-admission",
+            "task-dag",
+            "spatial-invariants",
+            "git-town-stack",
+            "dual-forge-reconciliation"
+          ]
+        },
+        "disposition": {
+          "enum": ["REQUIRED", "MONITOR", "NOT_APPLICABLE_WITH_EVIDENCE"]
+        }
       }
     },
-    "issuePlan": {
+    "issue_plan": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "phase_dispositions",
-        "required_receipts",
-        "execution_state"
-      ],
+      "required": ["phase_dispositions", "required_receipts", "execution_state"],
       "properties": {
         "phase_dispositions": {
           "type": "array",
@@ -82,7 +83,7 @@
           "prefixItems": [
             {
               "allOf": [
-                {"$ref": "#/$defs/phaseDispositionBase"},
+                {"$ref": "#/$defs/disposition"},
                 {
                   "properties": {
                     "phase": {"const": "BOOTSTRAP"},
@@ -94,7 +95,7 @@
             },
             {
               "allOf": [
-                {"$ref": "#/$defs/phaseDispositionBase"},
+                {"$ref": "#/$defs/disposition"},
                 {
                   "properties": {
                     "phase": {"const": "SHADOW_ADMISSION"},
@@ -106,7 +107,7 @@
             },
             {
               "allOf": [
-                {"$ref": "#/$defs/phaseDispositionBase"},
+                {"$ref": "#/$defs/disposition"},
                 {
                   "properties": {
                     "phase": {"const": "TECH_LEAD_PLAN"},
@@ -118,7 +119,7 @@
             },
             {
               "allOf": [
-                {"$ref": "#/$defs/phaseDispositionBase"},
+                {"$ref": "#/$defs/disposition"},
                 {
                   "properties": {
                     "phase": {"const": "SPATIAL_INVARIANTS"},
@@ -130,7 +131,7 @@
             },
             {
               "allOf": [
-                {"$ref": "#/$defs/phaseDispositionBase"},
+                {"$ref": "#/$defs/disposition"},
                 {
                   "properties": {
                     "phase": {"const": "STACK_DELIVERY"},
@@ -142,7 +143,7 @@
             },
             {
               "allOf": [
-                {"$ref": "#/$defs/phaseDispositionBase"},
+                {"$ref": "#/$defs/disposition"},
                 {
                   "properties": {
                     "phase": {"const": "FORGE_RECONCILIATION"},
@@ -171,9 +172,7 @@
             ]
           }
         },
-        "execution_state": {
-          "const": "NOT_EXERCISED"
-        }
+        "execution_state": {"const": "NOT_EXERCISED"}
       }
     }
   }
