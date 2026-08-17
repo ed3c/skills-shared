@@ -1,8 +1,8 @@
 {
   "adapter": {
     "config_identity": {
-      "index_bytes": 12568682,
-      "index_sha256": "a80dfe75e38a80852925984514f39a025bf708a4cbd8290780a1f68180d74d7f",
+      "index_bytes": 14311493,
+      "index_sha256": "ee22782bb3eb62f05c7210068be850fbcf80332b2c611270906825ab5dd4dec4",
       "indexer": "scip-python",
       "language": "python",
       "language_note": "This indexer covers Python only. The repository is majority Markdown and also carries shell, JSON and TypeScript, so index coverage is a statement about .py files and about nothing else.",
@@ -20,20 +20,20 @@
   },
   "controls": [
     {
-      "decoded": 296,
-      "exist_on_disk": 296,
+      "decoded": 330,
+      "exist_on_disk": 330,
       "expect": "RED",
       "id": "decode-validated-against-disk",
       "note": "There is no scip CLI here, so the index is decoded from the wire format. Every decoded path existing is what makes the decode trustworthy; a wrong one yields paths that do not.",
       "observed": "RED"
     },
     {
-      "covered_python": 296,
+      "covered_python": 330,
       "expect": "RED",
       "id": "coverage-is-per-language",
       "note": "655 Markdown, 122 shell and 14 TypeScript files are outside this indexer. A SCIP miss on any of them is absence of coverage, not absence of the thing.",
       "observed": "RED",
-      "tracked_python": 296,
+      "tracked_python": 330,
       "uncovered_sample": []
     }
   ],
@@ -42,15 +42,15 @@
       "/Users/neon/.nvm/versions/node/v22.17.1/bin/scip-python",
       "index",
       "--cwd",
-      "/Users/neon/skills-shared/.claude/worktrees/lanes-256",
+      "/Users/neon/skills-shared/.claude/worktrees/phase-a-batch",
       "--project-name",
       "skills-shared",
       "--output",
-      "/Users/neon/skills-shared/.claude/worktrees/lanes-256/skills/repo-agent-native/evals/receipts/index.scip",
+      "/Users/neon/skills-shared/.claude/worktrees/phase-a-batch/skills/repo-agent-native/evals/receipts/index.scip",
       "--quiet"
     ],
-    "cwd": "/Users/neon/skills-shared/.claude/worktrees/lanes-256",
-    "duration_ms": 24550,
+    "cwd": "/Users/neon/skills-shared/.claude/worktrees/phase-a-batch",
+    "duration_ms": 33116,
     "exit_code": 0,
     "index_path": "index.scip",
     "stderr_bytes": 81,
@@ -85,25 +85,25 @@
   "result": {
     "evidence_level": "A-",
     "evidence_level_note": "Compiler-derived relations still require read-back at the declaration or call site before they are stated as fact; this lane confirms document identity, not each relation.",
-    "occurrences": 130970,
-    "python_files_indexed": 296,
-    "python_files_tracked": 296,
-    "result_count": 296,
+    "occurrences": 148517,
+    "python_files_indexed": 330,
+    "python_files_tracked": 330,
+    "result_count": 330,
     "source_readback": {
-      "confirmed": 296,
-      "performed": 296,
+      "confirmed": 330,
+      "performed": 330,
       "required": true
     },
     "state": "PASS",
-    "symbols": 18805
+    "symbols": 21231
   },
   "schema": "repo-agent-native/adapter-receipt/v1",
   "subject": {
-    "commit_sha": "f50b2b9822db9e534169b5e63b523d940b32bb3c",
+    "commit_sha": "8d4d8b9d9c55146fd5d92900d549cc797fc5b519",
     "dirty_excluded": "skills/repo-agent-native/evals/receipts",
     "dirty_paths": 0,
     "repository": "ed3c/skills-shared",
-    "tree_sha": "42f289d44c1befefc9bdfb0bacf88a26a01b198a",
-    "workspace_root": "/Users/neon/skills-shared/.claude/worktrees/lanes-256"
+    "tree_sha": "7c983ad131ffbeb6a084c529ea7ab4b7442883c3",
+    "workspace_root": "/Users/neon/skills-shared/.claude/worktrees/phase-a-batch"
   }
 }

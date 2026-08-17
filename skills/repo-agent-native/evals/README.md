@@ -93,14 +93,16 @@ The runner permits one to three repetitions. Where a carrier exposes a seed, use
 refuses a directory whose receipts span two commits, because a set read as one picture of
 one tree has to be one picture of one tree.
 
-`receipts-git-town-darwin/` is a second capture and therefore a second directory. The
-darwin git-town artifact was admitted by a Human (`git-town-darwin-admission.json`) after
-the nine-lane capture was taken, so its lane ran at a later commit. Folding it into
-`receipts/` would either span two subjects or require rerunning the other eight lanes; on a
-host where a provider is missing or loopback is blocked, that rerun replaces live evidence
-with an artifact of the sandbox it ran in. The next capture on a host with all nine
-providers live writes one directory again, and this one is deleted by that capture rather
-than kept beside it.
+There was briefly a second directory, `receipts-git-town-darwin/`: the darwin git-town
+artifact was Human-admitted (`git-town-darwin-admission.json`) after the original
+nine-lane capture, so its first exercised receipt ran at a later commit and could not
+join the earlier set without spanning two subjects. The promised consolidation happened
+on 2026-08-18: every provider went live on one host (persistent tree-sitter/lancedb venv,
+built grepai index over ollama, serena project config, local Forgejo, the admitted
+git-town binary), all nine lanes were recaptured at one commit, and the interim directory
+was deleted by that capture — its receipt superseded by the consolidated
+`receipts/git-town.receipt.json`, still bound to the same admission record and artifact
+digest.
 
 The rule that follows: a capture directory is one subject, one run, and one moment. Adding
 a lane later adds a directory, never a receipt with a different subject.

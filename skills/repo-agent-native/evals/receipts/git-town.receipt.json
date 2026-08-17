@@ -1,48 +1,240 @@
 {
   "adapter": {
-    "executable": null,
-    "executable_sha256": null,
+    "config_identity": {
+      "fixture_repository": "synthesized per run; never this checkout",
+      "git": "/Library/Developer/CommandLineTools/usr/bin/git",
+      "git_version": "git version 2.50.1 (Apple Git-155)",
+      "main_branch": "main",
+      "offline": true,
+      "remote": "bare repository inside the disposable tree"
+    },
+    "executable": "/Users/neon/.local/tools/git-town/git-town",
+    "executable_sha256": "9f3807e07a6be79e4637b140deda9dff5d3a89321b8026a2f2e4a04d2f37fa2d",
     "kind": "stack-synchronization",
     "provider": "git-town",
-    "version": null
+    "version": "Git Town 24.0.0"
   },
   "budgets": {
-    "max_output_bytes": 0,
-    "timeout_seconds": 0
+    "max_output_bytes": 262144,
+    "timeout_seconds": 180
   },
-  "controls": [],
+  "controls": [
+    {
+      "exit_code": 1,
+      "expect": "RED",
+      "id": "failure-is-captured-as-failure",
+      "note": "git-town run outside a repository. A lane that only ever recorded successful invocations could not tell a refusal from a hang.",
+      "observed": "RED"
+    },
+    {
+      "expect": "RED",
+      "gate_state": "SKIPPED_BY_POLICY",
+      "id": "admission-gate-refuses-a-tampered-binary",
+      "note": "The gate compares digests, not version strings, so an artifact that differs by one byte is refused before anything starts. Detail: the file supplied as git-town hashes 0d92987b4a605d0c8449b2834cb2cfc6152a2b2313607c3dda3327cb7266857e; the admission pins 9f3807e07a6be79e4637b140deda9dff5d3a89",
+      "observed": "RED",
+      "planted": "one byte flipped in a copy of the admitted executable"
+    },
+    {
+      "confirmed": 5,
+      "expect": "RED",
+      "id": "stack-read-back-from-git-not-from-git-town",
+      "note": "Every claim is answered by git's own refs and config. A provider confirming its own output is PROVIDER_SELF_ADMISSION, which the blindspot contract refuses.",
+      "observed": "RED",
+      "total": 5
+    }
+  ],
   "execution": {
-    "exit_code": null,
-    "terminal_state": "NOT_STARTED"
+    "argv": [
+      "/Users/neon/.local/tools/git-town/git-town --version",
+      "/Users/neon/.local/tools/git-town/git-town hack feature-a",
+      "/Users/neon/.local/tools/git-town/git-town append feature-b",
+      "/Users/neon/.local/tools/git-town/git-town branch",
+      "/Users/neon/.local/tools/git-town/git-town sync --stack --non-interactive --no-push"
+    ],
+    "cwd": "/var/folders/l6/44bf7nvs64j60f1mpyy88hdm0000gn/T/adapter-git-town-lk9vxwnu/repo",
+    "duration_ms": 1085,
+    "exit_code": 0,
+    "stderr_bytes": 136,
+    "stderr_sha256": "2178d66d844aa5e35b7736ebae01fd096d13107e87ab3a8ea72df65ccd8583ec",
+    "stdout_bytes": 451,
+    "stdout_sha256": "7c7917b8006d4acf0c603c35095df5979910e3079c39b1dff567a1548c0a80ec",
+    "steps": [
+      {
+        "argv": [
+          "/Users/neon/.local/tools/git-town/git-town",
+          "--version"
+        ],
+        "cwd": "/var/folders/l6/44bf7nvs64j60f1mpyy88hdm0000gn/T/adapter-git-town-lk9vxwnu",
+        "duration_ms": 83,
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_bytes": 16,
+        "stdout_sha256": "f724787fe4b4bc62c9885cc5482a04be9be1a1c19610c4fbd201adfb884ddc4c",
+        "terminal_state": "COMPLETED"
+      },
+      {
+        "argv": [
+          "/Users/neon/.local/tools/git-town/git-town",
+          "hack",
+          "feature-a"
+        ],
+        "cwd": "/var/folders/l6/44bf7nvs64j60f1mpyy88hdm0000gn/T/adapter-git-town-lk9vxwnu/repo",
+        "duration_ms": 174,
+        "exit_code": 0,
+        "stderr_bytes": 37,
+        "stderr_sha256": "f297b9a66a8f1f1ef3785538dbb310aefadaf1039c0f07f83ae0e78ec5240f47",
+        "stdout_bytes": 145,
+        "stdout_sha256": "d5029b621adc801bcac95310de3a8fd81b039556926deb4f55560b205cd3e507",
+        "terminal_state": "COMPLETED"
+      },
+      {
+        "argv": [
+          "/Users/neon/.local/tools/git-town/git-town",
+          "append",
+          "feature-b"
+        ],
+        "cwd": "/var/folders/l6/44bf7nvs64j60f1mpyy88hdm0000gn/T/adapter-git-town-lk9vxwnu/repo",
+        "duration_ms": 187,
+        "exit_code": 0,
+        "stderr_bytes": 37,
+        "stderr_sha256": "a53ddc2191801767ca6ff50c639e53095d5fbbebc45e4b2ba601f7290ab6ff60",
+        "stdout_bytes": 155,
+        "stdout_sha256": "e1c401cbff001d1349677f0725e10f8a712f3663b801e4e4078b47299d16333e",
+        "terminal_state": "COMPLETED"
+      },
+      {
+        "argv": [
+          "/Users/neon/.local/tools/git-town/git-town",
+          "branch"
+        ],
+        "cwd": "/var/folders/l6/44bf7nvs64j60f1mpyy88hdm0000gn/T/adapter-git-town-lk9vxwnu/repo",
+        "duration_ms": 74,
+        "exit_code": 0,
+        "stderr_bytes": 0,
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stdout_bytes": 46,
+        "stdout_sha256": "0ceb0f522522c947485f84d50d08b89e7d49153687e378b9b93e7bd358f39672",
+        "terminal_state": "COMPLETED"
+      },
+      {
+        "argv": [
+          "/Users/neon/.local/tools/git-town/git-town",
+          "sync",
+          "--stack",
+          "--non-interactive",
+          "--no-push"
+        ],
+        "cwd": "/var/folders/l6/44bf7nvs64j60f1mpyy88hdm0000gn/T/adapter-git-town-lk9vxwnu/repo",
+        "duration_ms": 180,
+        "exit_code": 0,
+        "stderr_bytes": 62,
+        "stderr_sha256": "7abc5659401dfcc713f1955744d88d831c4ec6e253c8ae31c3c50e779d81289f",
+        "stdout_bytes": 89,
+        "stdout_sha256": "4a472450396158c9001c0be238f559398a7a043e346678dc1cf7ada5b8768c11",
+        "terminal_state": "COMPLETED"
+      }
+    ],
+    "stream_digest_note": "the top-level digests are taken over the ordered per-step digests; each step carries the digest of its own stream",
+    "sync_exit_code": 0,
+    "terminal_state": "COMPLETED"
   },
   "policy": {
-    "allowed_argv": [],
-    "filesystem": "none",
+    "admission": {
+      "executable_sha256_admitted": "9f3807e07a6be79e4637b140deda9dff5d3a89321b8026a2f2e4a04d2f37fa2d",
+      "record": "evals/git-town-darwin-admission.json",
+      "record_sha256": "f34efec5a6c8e17572a0a8c51e22f69b397cbe99cfb187bf2231cbe6545b7239"
+    },
+    "allowed_argv": [
+      [
+        "/Users/neon/.local/tools/git-town/git-town",
+        "--version"
+      ],
+      [
+        "/Users/neon/.local/tools/git-town/git-town",
+        "hack",
+        "<branch>"
+      ],
+      [
+        "/Users/neon/.local/tools/git-town/git-town",
+        "append",
+        "<branch>"
+      ],
+      [
+        "/Users/neon/.local/tools/git-town/git-town",
+        "branch"
+      ],
+      [
+        "/Users/neon/.local/tools/git-town/git-town",
+        "sync",
+        "--stack",
+        "--non-interactive",
+        "--no-push"
+      ]
+    ],
+    "filesystem": "read-write-within-temp",
+    "mutation_granted": true,
+    "mutation_note": "git-town moves branches, which is the capability under test. It is pointed at a repository created inside TMPDIR for this run; this checkout and its worktrees are outside the admission and are never passed to it.",
     "network": "none",
+    "network_detail": "the only remote is a bare repository on the local filesystem and sync runs --no-push, so no admitted command opens a socket",
     "secrets": "none"
   },
   "residue": {
     "cleaned": true,
+    "note": "the fixture repository, its bare remote, the redirected HOME holding git-town's runlog, and the tampered copy are all inside one deleted directory",
     "paths": []
   },
   "result": {
-    "detail": "git-town is not installed. Homebrew offers the admitted 24.0.0, but the committed admission record pins a linux_intel_64 artifact by SHA-256 and this host is darwin; a different artifact needs its own admission, which is a Human decision rather than an install",
-    "evidence_level": null,
-    "result_count": 0,
+    "evidence_level": "A",
+    "evidence_level_note": "The branches and the parent lineage were created by git-town and read back from git itself, so this is direct evidence about the admitted binary's behaviour. It is evidence about the disposable repository this lane built and about nothing in ed3c/skills-shared; the subject below binds the capture, not the thing git-town touched.",
+    "exercised_subject": "a repository and bare remote created under TMPDIR for this run and deleted with it",
+    "readback": [
+      {
+        "asked": "git rev-parse --verify refs/heads/feature-a",
+        "claim": "branch feature-a exists",
+        "confirmed": true,
+        "observed": "6468203212b63fc29b40e923ebe7f8e31f6c0cc7"
+      },
+      {
+        "asked": "git rev-parse --verify refs/heads/feature-b",
+        "claim": "branch feature-b exists",
+        "confirmed": true,
+        "observed": "4b0f70d0427ac6e1c21653727130030e75c0d3ae"
+      },
+      {
+        "asked": "git config --get git-town-branch.feature-a.parent",
+        "claim": "feature-a is a child of main",
+        "confirmed": true,
+        "observed": "main"
+      },
+      {
+        "asked": "git config --get git-town-branch.feature-b.parent",
+        "claim": "feature-b is a child of feature-a",
+        "confirmed": true,
+        "observed": "feature-a"
+      },
+      {
+        "asked": "git merge-base --is-ancestor feature-a feature-b",
+        "claim": "the synced stack keeps feature-a inside feature-b",
+        "confirmed": true,
+        "observed": 0
+      }
+    ],
+    "result_count": 5,
     "source_readback": {
-      "confirmed": 0,
-      "performed": 0,
-      "required": false
+      "confirmed": 5,
+      "performed": 5,
+      "required": true
     },
-    "state": "ABSENT"
+    "state": "PASS"
   },
   "schema": "repo-agent-native/adapter-receipt/v1",
   "subject": {
-    "commit_sha": "f50b2b9822db9e534169b5e63b523d940b32bb3c",
+    "commit_sha": "8d4d8b9d9c55146fd5d92900d549cc797fc5b519",
     "dirty_excluded": "skills/repo-agent-native/evals/receipts",
     "dirty_paths": 0,
     "repository": "ed3c/skills-shared",
-    "tree_sha": "42f289d44c1befefc9bdfb0bacf88a26a01b198a",
-    "workspace_root": "/Users/neon/skills-shared/.claude/worktrees/lanes-256"
+    "tree_sha": "7c983ad131ffbeb6a084c529ea7ab4b7442883c3",
+    "workspace_root": "/Users/neon/skills-shared/.claude/worktrees/phase-a-batch"
   }
 }

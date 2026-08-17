@@ -68,8 +68,6 @@ python3 scripts/measure_delivery_shape.py selftest
 step "adapter receipt integrity"
 python3 skills/repo-agent-native/scripts/check_adapter_receipts.py selftest
 python3 skills/repo-agent-native/scripts/check_adapter_receipts.py check
-python3 skills/repo-agent-native/scripts/check_adapter_receipts.py check \
-  --receipts skills/repo-agent-native/evals/receipts-git-town-darwin
 
 step "runtime handoff contract"
 python3 skills/dual-forge-repository-loop/scripts/check_runtime_handoff.py selftest
