@@ -4,6 +4,8 @@ A repository-wide completion review answers one question: *which real problem is
 
 Machine authority: [`repository-closure-contract.schema.json`](repository-closure-contract.schema.json), [`issue-dual-dag.schema.json`](issue-dual-dag.schema.json) and [`../scripts/assert_repository_closure_contract.py`](../scripts/assert_repository_closure_contract.py). This file explains why those shapes exist; it is not a second verifier.
 
+Law authority: the six load-bearing rules below — the dual dependency DAG, reconciliation before fan-out, the typed closure matrix, lane ownership, start-versus-completion readiness, and receipted completion edges — are `CORE-LAW-009` through `CORE-LAW-014` in [`../SKILL.md`](../SKILL.md). They are restated here in the reviewer's vocabulary; they are not owned here.
+
 ## Reconciliation order
 
 ```text

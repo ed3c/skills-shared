@@ -28,6 +28,9 @@ HISTORICAL = {
     "A_OLD_MONOLITH": ("tests/fixtures/pre-refactor-SKILL.txt", "a01f53592cda98f61b413b4467afa96356fb4ef7"),
     "B0_REFACTOR_AS_LANDED": ("tests/fixtures/refactor-as-landed-SKILL.txt", "8b2da7443aff7a9f53412b5af280048203bbd5e9"),
     "B1_REACHABILITY_REPAIRED": ("tests/fixtures/reachability-repaired-SKILL.txt", "51c3fd81749598957f2b993c4d31c3b4c8c277c1"),
+    # Frozen from the live body it was registered as. The blob is the one the
+    # golden-proof registry already pins; only the path moved.
+    "B2_CAUSAL_DAG_REPAIRED": ("tests/fixtures/causal-dag-repaired-SKILL.txt", "3fd01571b49b1dfd1c9256661fe4aafe3ecc6e99"),
 }
 
 CONTRACT = 'PRICING="apply_discount(int,int)->int"\nRECEIPT="render_receipt(int)->str"\nCHECKOUT="checkout(int,int)->str"\n'
