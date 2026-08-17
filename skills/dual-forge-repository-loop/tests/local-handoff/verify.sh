@@ -11,7 +11,7 @@ python3 "${checker}" --repo-root "${repo_root}" "${manifest}"
 # A required ZIP must turn the gate red even if its digest shape and tracked flag
 # look plausible. Generate only the manifest mutation in tmp; no archive bytes are
 # needed for this negative control.
-tmp="$(mktemp)"
+tmp="$(mktemp "${TMPDIR:-/tmp}/tmp.XXXXXXXX")"
 trap 'rm -f "${tmp}"' EXIT
 python3 - "${manifest}" "${tmp}" <<'PY'
 import json, sys

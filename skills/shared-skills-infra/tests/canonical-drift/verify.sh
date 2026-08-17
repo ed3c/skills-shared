@@ -7,7 +7,7 @@ set -euo pipefail
 test_dir="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
 skill_dir="$(realpath "${test_dir}/../..")"
 drift="${DRIFT_SCRIPT:-${skill_dir}/scripts/check_canonical_drift.py}"
-world="$(mktemp -d)"
+world="$(mktemp -d "${TMPDIR:-/tmp}/world.XXXXXXXX")"
 trap 'rm -rf "${world}"' EXIT
 
 git init -q --bare "${world}/remote.git"

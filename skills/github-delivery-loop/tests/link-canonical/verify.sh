@@ -7,7 +7,7 @@ set -euo pipefail
 test_dir="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
 skill_dir="$(realpath "${test_dir}/../..")"
 linker="${skill_dir}/scripts/link-canonical.sh"
-scratch="$(mktemp -d)"
+scratch="$(mktemp -d "${TMPDIR:-/tmp}/scratch.XXXXXXXX")"
 trap 'rm -rf "${scratch}"' EXIT
 
 backup="${scratch}/backup"

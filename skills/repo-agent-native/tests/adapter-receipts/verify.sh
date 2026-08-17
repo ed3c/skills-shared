@@ -35,7 +35,7 @@ done
 # in front of it is what has to be tested here. A host without the artifact must
 # still be able to prove that the refusal works -- and that it is a gate rather
 # than a constant no.
-tmp_root="$(mktemp -d)"
+tmp_root="$(mktemp -d "${TMPDIR:-/tmp}/tmp-root.XXXXXXXX")"
 trap 'rm -rf "${tmp_root}"' EXIT
 
 admission="${skill_dir}/evals/git-town-darwin-admission.json"
@@ -159,7 +159,7 @@ python3 "${checker}" check --receipts "${receipts}" --bind-scheduler "${schedule
   | grep -q '^CROSS_SUBJECT_BINDING ' \
   || { echo "scheduler binding did not report CROSS_SUBJECT_BINDING" >&2; exit 1; }
 
-collapsed="$(mktemp)"
+collapsed="$(mktemp "${TMPDIR:-/tmp}/collapsed.XXXXXXXX")"
 trap 'rm -rf "${empty}" "${collapsed}"' EXIT
 python3 -c 'import json, sys
 body = json.loads(open(sys.argv[1], encoding="utf-8").read())

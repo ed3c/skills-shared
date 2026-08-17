@@ -3,7 +3,7 @@ set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SKILL="$(cd "$HERE/../.." && pwd)"
 SCRIPT="$SKILL/scripts/blindspot_contract.py"
-TMP="$(mktemp -d)"
+TMP="$(mktemp -d "${TMPDIR:-/tmp}/tmp.XXXXXXXX")"
 trap 'rm -rf "$TMP"' EXIT
 
 python3 -m py_compile "$SCRIPT"

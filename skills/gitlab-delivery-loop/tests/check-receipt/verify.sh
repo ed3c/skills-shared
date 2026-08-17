@@ -6,7 +6,7 @@ set -euo pipefail
 test_dir="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
 skill_dir="$(dirname "$(dirname "$test_dir")")"
 checker="$skill_dir/scripts/gitlab_delivery.py"
-scratch="$(mktemp -d)"
+scratch="$(mktemp -d "${TMPDIR:-/tmp}/scratch.XXXXXXXX")"
 trap 'rm -rf "$scratch"' EXIT
 
 python3 "$checker" check --registry "$test_dir/fixtures/good/registry.json"

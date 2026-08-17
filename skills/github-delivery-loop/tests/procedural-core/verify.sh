@@ -6,7 +6,7 @@ checker="$root/scripts/check_procedural_core.py"
 
 python3 "$checker" --root "$root"
 
-tmp="$(mktemp -d)"
+tmp="$(mktemp -d "${TMPDIR:-/tmp}/tmp.XXXXXXXX")"
 trap 'rm -rf "$tmp"' EXIT
 cp -R "$root/." "$tmp/skill"
 

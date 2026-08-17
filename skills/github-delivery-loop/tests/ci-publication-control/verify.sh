@@ -3,7 +3,7 @@ set -euo pipefail
 
 test_dir="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
 skill_dir="$(realpath "${test_dir}/../..")"
-scratch="$(mktemp -d)"
+scratch="$(mktemp -d "${TMPDIR:-/tmp}/scratch.XXXXXXXX")"
 trap 'rm -rf "$scratch"' EXIT
 
 python3 "$test_dir/test_control.py" -v

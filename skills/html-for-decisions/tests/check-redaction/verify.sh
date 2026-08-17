@@ -17,7 +17,7 @@ fi
 # emptied or misspelled. The token is assembled at run time and written to a temp
 # dir so its literal form never lands in this repo — which is the very leak the
 # checker exists to prevent.
-policy_dir="$(mktemp -d)"
+policy_dir="$(mktemp -d "${TMPDIR:-/tmp}/policy-dir.XXXXXXXX")"
 trap 'rm -rf "$policy_dir"' EXIT
 python3 - "$policy_dir" <<'PY'
 import sys

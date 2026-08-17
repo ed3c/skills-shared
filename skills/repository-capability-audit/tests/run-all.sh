@@ -11,7 +11,7 @@ OUT="${RCA_EVIDENCE_DIR:-}"
 if [ -n "$OUT" ]; then
   mkdir -p "$OUT"
 else
-  OUT="$(mktemp -d)"
+  OUT="$(mktemp -d "${TMPDIR:-/tmp}/out.XXXXXXXX")"
   trap 'rm -rf "$OUT"' EXIT
 fi
 

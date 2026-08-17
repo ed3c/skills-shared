@@ -6,7 +6,7 @@ skill="$root/skills/dual-forge-repository-loop"
 script="$skill/scripts/sync_instruction_projections.py"
 module="$skill/references/instruction-projection.json"
 commit="1111111111111111111111111111111111111111"
-tmp="$(mktemp -d)"
+tmp="$(mktemp -d "${TMPDIR:-/tmp}/tmp.XXXXXXXX")"
 trap 'rm -rf "$tmp"' EXIT
 repo="$tmp/repo"
 home="$tmp/home"
