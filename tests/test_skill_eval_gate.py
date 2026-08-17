@@ -110,6 +110,30 @@ class SkillEvalGateTests(unittest.TestCase):
         fn(value)
         self.coverage_path.write_text(json.dumps(value), encoding="utf-8")
 
+    def declare_perturbations(self, *entries: dict) -> None:
+        declared = list(entries) or [
+            {
+                "id": "context-drop-spec",
+                "axis": "context",
+                "description": "Remove the written spec from the working context.",
+                "expected_effect": "The gap is surfaced instead of guessed at.",
+            }
+        ]
+        self.mutate_case(lambda case: case.update({"perturbations": declared}))
+
+    def write_run_trace(self, perturbation, *, case_id="case-one", name="run.json") -> None:
+        """Write a run trace the gate must resolve; `...` means omit the key."""
+        trace = {
+            "schema_version": "skill-eval-run/v1",
+            "run_id": "aaaaaaaabbbbbbbbcccccccc",
+            "case_id": case_id,
+        }
+        if perturbation is not Ellipsis:
+            trace["perturbation"] = perturbation
+        path = self.root / "evals" / "runs" / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(trace), encoding="utf-8")
+
     def test_good_fixture_passes(self) -> None:
         result = self.run_gate()
         self.assertEqual(result.returncode, 0, result.stderr)
@@ -216,6 +240,74 @@ class SkillEvalGateTests(unittest.TestCase):
         result = self.run_gate()
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("task.fixture does not exist", result.stderr)
+
+    def test_bound_perturbation_passes(self) -> None:
+        self.declare_perturbations()
+        self.write_run_trace({"id": "context-drop-spec", "axis": "context"})
+        result = self.run_gate()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("1 bound run-trace perturbations", result.stdout)
+
+    def test_duplicate_perturbation_id_fails(self) -> None:
+        self.declare_perturbations(
+            {
+                "id": "context-drop-spec",
+                "axis": "context",
+                "description": "Remove the written spec from the working context.",
+                "expected_effect": "The gap is surfaced instead of guessed at.",
+            },
+            {
+                "id": "context-drop-spec",
+                "axis": "tool",
+                "description": "A second disturbance reusing the first identifier.",
+                "expected_effect": "Nothing can say which of the two a run applied.",
+            },
+        )
+        result = self.run_gate()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("duplicate perturbation id", result.stderr)
+
+    def test_run_trace_perturbation_must_resolve_to_a_declared_one(self) -> None:
+        self.declare_perturbations()
+        self.write_run_trace({"id": "never-declared-anywhere", "axis": "context"})
+        result = self.run_gate()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("does not declare", result.stderr)
+
+    def test_run_trace_perturbation_axis_must_match_the_declaration(self) -> None:
+        self.declare_perturbations()
+        self.write_run_trace({"id": "context-drop-spec", "axis": "tool"})
+        result = self.run_gate()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("declares axis 'context'", result.stderr)
+
+    def test_run_trace_bound_to_unknown_case_fails(self) -> None:
+        self.declare_perturbations()
+        self.write_run_trace({"id": "context-drop-spec", "axis": "context"}, case_id="case-nine")
+        result = self.run_gate()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("binds to unknown case", result.stderr)
+
+    def test_perturbation_claimed_against_a_case_that_declares_none_fails(self) -> None:
+        self.write_run_trace({"id": "context-drop-spec", "axis": "context"})
+        result = self.run_gate()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("does not declare", result.stderr)
+
+    def test_absent_and_null_perturbation_states_stay_green(self) -> None:
+        self.declare_perturbations()
+        self.write_run_trace(Ellipsis, name="absent.json")
+        self.write_run_trace(None, name="baseline.json")
+        result = self.run_gate()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("0 bound run-trace perturbations", result.stdout)
+
+    def test_unparsable_run_trace_candidate_fails(self) -> None:
+        (self.root / "evals" / "runs").mkdir(parents=True, exist_ok=True)
+        (self.root / "evals" / "runs" / "broken.json").write_text("{not json", encoding="utf-8")
+        result = self.run_gate()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("invalid JSON", result.stderr)
 
     def test_agent_judge_alone_fails_hard_gate(self) -> None:
         self.mutate_case(
