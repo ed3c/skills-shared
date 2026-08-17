@@ -17,6 +17,7 @@ Portable method for coordinating multiple Worker Agents with Git Town, isolated 
 11. [`evals.json`](evals.json), `scripts/`, and `tests/`.
 12. [`../skill-refactor-proof-loop/README.md`](../skill-refactor-proof-loop/README.md) for proof-carrying Skill refactor contracts and the current golden Stack.
 13. [`../github-delivery-loop/README.md`](../github-delivery-loop/README.md) for GitHub publication and merge State Machines.
+14. [`../../docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md`](../../docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md) for closure roles and dated consumer snapshots.
 
 ## Directory map
 
@@ -196,6 +197,16 @@ EXTERNAL_EVIDENCE
 
 These edges are traceable and authority-bounded but do not alter branch ancestry.
 
+### Historical subject
+
+An admitted or forensic prior subject can remain relevant without owning current mutable state:
+
+```text
+HISTORICAL
+```
+
+A historical node records exact head/merge/rollback identity and proven ceiling. It cannot become the current queue, branch writer, or live evidence source by age or documentation reuse.
+
 ## Worker task packet
 
 Before implementation, bind:
@@ -304,6 +315,47 @@ Independent evidence lanes, not Git children:
 ```
 
 They may raise issue #312 from L3 to L4/L5 only with receipts matching treatment, repository, task graph, context, budget, carrier, repetitions and acceptance subjects.
+
+## External consumer Stack snapshot — Bettor order 13
+
+Observed `2026-08-17`. This section is an `EXTERNAL_CONSUMER_SNAPSHOT`, not the consumer's state authority. Refresh the consumer's current issue/PR metadata, exact GitHub/local/Forgejo subjects, machine Stack index and Local Handoff Queue before acting.
+
+Merged implementation/governance subjects:
+
+| Subject | Relation | Proven ceiling |
+|---|---|---|
+| Bettor PR #81 | `HISTORICAL` | merged Git Town/document governance foundation |
+| Bettor PR #153 | `ROOT_AFTER_PREDECESSOR` | deterministic Blindspots ledger |
+| Bettor PR #155 | `ROOT_AFTER_PREDECESSOR` | deterministic exact-subject context funnel |
+| Bettor PR #156 | `ROOT_AFTER_PREDECESSOR` | planner/fixture Tech Lead, not physical Worker execution |
+| Bettor PR #157 | `ROOT_AFTER_PREDECESSOR` | canonical provider/route retirement |
+| Bettor PR #158 | `CONVERGENCE` | deterministic closure, no queue advancement |
+| Bettor PR #159 | `ROOT_AFTER_PREDECESSOR` | physical-run readiness only |
+| Bettor PR #169 | `ROOT_AFTER_PREDECESSOR` | Local Handoff queue contract, not execution |
+| Bettor PR #154 | `ROOT_AFTER_PREDECESSOR` | consumer contract adoption, not live Worker execution |
+
+Current process/evidence DAG:
+
+```text
+#172 dual-origin reconciliation                  PROCESS_DEPENDENCY / ACTIVE
+→ new exact accepted subject
+→ #161 runtime rebind and canary                 PROCESS_DEPENDENCY / BLOCKED
+→ #146 physical Tech Lead + Shadow run           PROCESS_DEPENDENCY / BLOCKED
+→ #140 Human terminal admission                  PROCESS_DEPENDENCY / BLOCKED
+→ #68 final convergence/release/rollback         CONVERGENCE / BLOCKED
+```
+
+Independent path-disjoint controls:
+
+```text
+#173 / PR #176 closure monitor and one queue authority  SIBLING
+#174 receipt-status laundering repair                   SIBLING
+#175 origin-projection freshness repair                 SIBLING
+```
+
+These are not Git children of #172 because they do not consume #172's unmerged bytes. Live Git Town, physical Workers, live carriers/providers, Human admission, release and rollback remain separate evidence/authority lanes.
+
+Full role, State Machine, data-flow and evidence-ceiling details: [`../../docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md`](../../docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md).
 
 ## Historical indexes
 
