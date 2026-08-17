@@ -1,6 +1,6 @@
 {
   "schema": "index-coverage/v2",
-  "_why": "A document that indexes its own directory is opting into completeness: if it omits a file, the reader has no way to know the list is short, because a short index and a complete one look identical. Coverage is declared here rather than detected, because detection mis-classifies -- traceability-index.md has an index heading and indexes decisions, not the files beside it, and pointing a directory check at it reports defects that are not there. Local link resolution runs over every other document. A governed projection whose relative links resolve only after materialization into its consumer tree is exempt only at an exact content digest; changing any byte invalidates the exemption.",
+  "_why": "A document that indexes its own directory is opting into completeness: if it omits a file, the reader has no way to know the list is short, because a short index and a complete one look identical. Coverage is declared here rather than detected, because detection mis-classifies. Local link resolution runs over every other document. A governed projection whose relative links resolve only after materialization into its consumer tree is exempt only at an exact content digest; changing any byte invalidates the exemption.",
   "covers": [
     {
       "document": "skills/git-town-stacked-pr-worker/README.md",
@@ -17,6 +17,26 @@
     {
       "document": "skills/github-delivery-loop/tests/README.md",
       "directory": "skills/github-delivery-loop/tests"
+    },
+    {
+      "document": "skills/procedural-core-refactor/README.md",
+      "directory": "skills/procedural-core-refactor"
+    },
+    {
+      "document": "skills/procedural-core-refactor/modules/README.md",
+      "directory": "skills/procedural-core-refactor/modules"
+    },
+    {
+      "document": "skills/procedural-core-refactor/references/README.md",
+      "directory": "skills/procedural-core-refactor/references"
+    },
+    {
+      "document": "skills/procedural-core-refactor/scripts/README.md",
+      "directory": "skills/procedural-core-refactor/scripts"
+    },
+    {
+      "document": "skills/procedural-core-refactor/tests/README.md",
+      "directory": "skills/procedural-core-refactor/tests"
     }
   ],
   "external_link_contexts": [

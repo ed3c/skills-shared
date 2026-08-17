@@ -1,11 +1,9 @@
 name: Skill Suites
 
 # These skills each ship a tests/run-all.sh that must have a real CI arrival.
-# A suite with no CI arrival cannot report a regression: #83 (a selftest that
-# had been red on main) and #105 (two verifiers that had never executed at all)
-# both landed through exactly that gap. Each skill that owns a suite gets an
-# arrival here; skills with their own dedicated workflow keep it and stay out
-# of this matrix.
+# A suite with no CI arrival cannot report a regression. Each skill that owns a
+# suite gets an arrival here; skills with a dedicated workflow stay out of this
+# matrix.
 
 on:
   pull_request:
@@ -22,6 +20,7 @@ on:
       - 'skills/gitlab-delivery-loop/**'
       - 'skills/html-for-decisions/**'
       - 'skills/knowledge-continuity/**'
+      - 'skills/procedural-core-refactor/**'
       - 'skills/procedural-shadow-runtime/**'
       - 'skills/repository-capability-audit/**'
       - 'skills/spatial-loop-systems-engineering/**'
@@ -38,6 +37,7 @@ on:
       - 'skills/gitlab-delivery-loop/**'
       - 'skills/html-for-decisions/**'
       - 'skills/knowledge-continuity/**'
+      - 'skills/procedural-core-refactor/**'
       - 'skills/procedural-shadow-runtime/**'
       - 'skills/repository-capability-audit/**'
       - 'skills/spatial-loop-systems-engineering/**'
@@ -86,6 +86,7 @@ jobs:
           - gitlab-delivery-loop
           - html-for-decisions
           - knowledge-continuity
+          - procedural-core-refactor
           - procedural-shadow-runtime
           - repository-capability-audit
           - spatial-loop-systems-engineering
@@ -99,18 +100,9 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install the pinned Draft 2020-12 validator
-        # The controlled-language authority composition executes the committed
-        # schemas as deciding gates and exits 70 rather than skipping when the
-        # validator is absent. Installing it here is what lets that gate run at
-        # all in this job; without it the suite fails on an environment gap
-        # rather than on a defect.
         run: python3 -m pip install --disable-pip-version-check 'jsonschema==4.26.0'
       - name: Run ${{ matrix.skill }} suite
         env:
-          # repository-capability-audit deletes its generated run tree on exit
-          # unless this names a directory. #222 needs the observations, the
-          # effectiveness report and the nested runtime packet to survive the
-          # script, so they can be uploaded rather than described.
           RCA_EVIDENCE_DIR: ${{ matrix.skill == 'repository-capability-audit' && format('{0}/evidence/run-all', runner.temp) || '' }}
         run: |
           set -o pipefail
@@ -118,10 +110,35 @@ jobs:
           bash "skills/${{ matrix.skill }}/tests/run-all.sh" 2>&1 \
             | tee "${RUNNER_TEMP}/evidence/suite.log"
 
+      - name: Collect procedural-core refactor golden-proof bundle
+        if: always() && matrix.skill == 'procedural-core-refactor'
+        run: |
+          mkdir -p "${RUNNER_TEMP}/evidence/procedural-core-refactor"
+          cp skills/procedural-core-refactor/references/refactor-contract.schema.json \
+             skills/procedural-core-refactor/references/example-refactor-contract.json \
+             skills/procedural-core-refactor/references/golden-proof.schema.json \
+             skills/procedural-core-refactor/references/tech-lead-golden-proof.json \
+             "${RUNNER_TEMP}/evidence/procedural-core-refactor/"
+          python3 skills/procedural-core-refactor/scripts/check_refactor_contract.py \
+            --contract skills/procedural-core-refactor/references/example-refactor-contract.json \
+            --proof skills/procedural-core-refactor/references/tech-lead-golden-proof.json \
+            --receipt "${RUNNER_TEMP}/evidence/procedural-core-refactor/validation-receipt.json"
+          python3 scripts/evidence_bundle.py collect "${RUNNER_TEMP}/evidence" \
+            --output "${RUNNER_TEMP}/procedural-core-refactor-bundle" \
+            --tree-sha "$(git rev-parse 'HEAD^{tree}')"
+          python3 scripts/evidence_bundle.py verify "${RUNNER_TEMP}/procedural-core-refactor-bundle"
+
+      - name: Upload procedural-core refactor golden-proof bundle
+        if: always() && matrix.skill == 'procedural-core-refactor'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: evidence-procedural-core-refactor-${{ github.sha }}
+          path: ${{ runner.temp }}/procedural-core-refactor-bundle
+          if-no-files-found: error
+          include-hidden-files: true
+
       # Only the skills whose Issues are waiting on a replayable artifact: #212
       # for procedural-shadow-runtime, #222 for repository-capability-audit.
-      # Collecting a bundle from every matrix leg would spend upload on jobs
-      # whose evidence nothing is waiting for.
       - name: Collect exact-head evidence bundle
         if: always() && (matrix.skill == 'procedural-shadow-runtime' || matrix.skill == 'repository-capability-audit')
         run: |
@@ -130,8 +147,6 @@ jobs:
           python3 scripts/evidence_bundle.py collect "${RUNNER_TEMP}/evidence" \
             --output "${RUNNER_TEMP}/bundle" \
             --tree-sha "$(git rev-parse 'HEAD^{tree}')"
-          # Verify here as well as on download: a bundle that cannot be replayed
-          # in the job that produced it will not become replayable later.
           python3 scripts/evidence_bundle.py verify "${RUNNER_TEMP}/bundle"
 
       - name: Upload exact-head evidence bundle

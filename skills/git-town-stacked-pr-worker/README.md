@@ -14,7 +14,8 @@ This Skill defines the portable method for using Git Town with multiple Worker A
 8. [`references/COMPLETION_REPORT.template.md`](references/COMPLETION_REPORT.template.md) — required Worker report.
 9. [`references/TECH_LEAD_FAN_OUT.md`](references/TECH_LEAD_FAN_OUT.md) and [`references/FAN_OUT_CONTRACT.schema.json`](references/FAN_OUT_CONTRACT.schema.json) — bounded multi-branch fan-out for TOURNAMENT, COOPERATIVE, SERIAL_STACK and HYBRID, checked by `scripts/check_fanout_contract.py`.
 10. [`evals.json`](evals.json), `scripts/`, and `tests/`.
-10. [`../github-delivery-loop/README.md`](../github-delivery-loop/README.md) for GitHub publication and merge state machines.
+11. [`../github-delivery-loop/README.md`](../github-delivery-loop/README.md) for GitHub publication and merge state machines.
+12. [`../procedural-core-refactor/README.md`](../procedural-core-refactor/README.md) when the Stack changes a shared `SKILL.md` ownership boundary.
 
 ## Directory map
 
@@ -221,6 +222,83 @@ Issue #78 was an earlier independent documentation leaf based on the then-curren
 
 See [`../github-delivery-loop/modules/traceability-index.md`](../github-delivery-loop/modules/traceability-index.md).
 
+## Agentic Tech Lead repair Stack — exact molecular trace
+
+This active Stack preserves the old T0–T10 strengths, repairs the modularization regression, runs the matched deterministic task, and then internalizes the refactor method.
+
+```text
+main
+└─ #307 / PR #308  Tech Lead task/module/causal-DAG repair
+   branch: fix/307-tech-lead-runtime-reachability
+   exact candidate: 504c18f10d3380be4874a59f7cfad5c290daa93f
+   evidence: DETERMINISTIC_FIXTURE
+   CI: pending exact-head readback
+   │
+   └─ #312 / PR #315  production-shaped real-task A/B
+      branch: agent/312-tech-lead-real-task-ab
+      exact candidate: 403a4f041c5f8c07b0d7c8bb0ef2ccc44ac0f113
+      evidence: SYNTHETIC_RUNTIME
+      CI: pending exact-head readback
+```
+
+The child edge is real: #315 consumes #308's unmerged task gates, capability schemas and causal assertion. #315 is not evidence that Git Town itself ran; it uses a true GitHub branch/PR parent relation and real linked worktrees/processes while the Git Town lane remains `NOT_EXERCISED`.
+
+## Procedural-core refactor standard Stack
+
+```text
+main
+└─ #327 / PR #330  portable method and typed refactor contract
+   branch: refactor/327-procedural-core-standard
+   exact candidate: cffa44526d0d3e895256df36c2c7a1628fff49e2
+   evidence: STATIC_CONTRACT
+   │
+   └─ #328 / PR #331  executable assertions + Tech Lead golden proof
+      branch: refactor/328-procedural-core-proof
+      exact candidate: f65e19c848831f2fcac5ed1f9c66e80b5680243f
+      evidence: DETERMINISTIC_FIXTURE + preserved SYNTHETIC_RUNTIME proof
+      │
+      └─ #329 / convergence PR  AGENTS/README/registry/CI/Stack indexes
+         branch: refactor/329-procedural-core-convergence
+         exact candidate: assigned by the convergence commit
+         evidence: NOT_EXERCISED until exact-head CI
+```
+
+These are true child edges:
+
+- #331 imports the unmerged schema and stable `PCR-LAW-*` identities from #330;
+- #329 consumes the unmerged checker and golden-proof ledger from #331 before it can admit registry, docs and CI routes.
+
+The convergence leaf owns central files so the contract and proof leaves do not race on `AGENTS.md`, root indexes, `registry.json` or workflow matrices.
+
+## Remaining terminal live lanes
+
+These are not folded into a fake linear Stack because their runtimes/resources differ and they do not consume one another's unmerged implementation bytes:
+
+| Issue | Terminal evidence sought | Current state |
+|---|---|---|
+| #231 | admitted live multi-Worker scheduler lifecycle and recovery | open; bounded canaries exist, universal/live scope not inferred |
+| #232 | independent Shadow enforcement and global-objective retention | `NOT_EXERCISED` for the required independent live mode |
+| #234 | actual Git Town commands plus Forgejo/GitHub consumer delivery | `NOT_EXERCISED` |
+| #256 | exact-subject grepai/SCIP/Tree-sitter/Serena/SQLite and delivery receipts | partial lanes; completion open |
+| #312 Phase 2 | matched clean-context live model/harness A/B | `NOT_EXERCISED` |
+
+The complete trace unit is:
+
+```text
+issue
+→ branch
+→ parent/child justification
+→ PR base/head
+→ exact candidate head/tree
+→ owning CI run/job
+→ contract/receipt digest
+→ evidence class and ceiling
+→ residual lane
+→ Human authority
+```
+
+An absent CI run stays `NOT_EXERCISED`; a PR link or Markdown claim cannot fill it in.
+
 ## Four-repository documentation sibling set
 
 The current shared document-routing work is deliberately **not** a serial Stack:
@@ -310,7 +388,7 @@ The shared prompt can be statically reviewed. It cannot prove that a host has th
 
 ## Source-proposal boundary
 
-The external PDF `科技巨頭開源授權與AI框架v2.pdf` proposes cloud/local runtimes and synchronization. Git Town source repair deliberately does not adopt timestamp-based `newest` or `prefer-beta` source overwrites. Source changes use one writer, exact ancestry, reviewable commits, evals, and checked publication.
+The external PDF proposes prompt fan-out into independent worktrees and side-by-side candidate selection; that source motivates the tournament/worktree test shape, but repository truth comes from exact code, assertions and receipts rather than the proposal. The PDF also proposes Contract-First constraints, immutable tests, true DAG edges and Stacked PRs; these remain requirements to prove, not automatic runtime facts.
 
 ## Adoption checklist
 
@@ -322,4 +400,5 @@ The external PDF `科技巨頭開源授權與AI框架v2.pdf` proposes cloud/loca
 - integrate consumer local verification;
 - integrate `github-delivery-loop` publication and merge gates;
 - plant conflict, dirty-state, ancestry, timeout, and publication negative controls;
+- invoke `procedural-core-refactor` before changing another shared `SKILL.md` boundary;
 - keep merge/promotion human-owned.

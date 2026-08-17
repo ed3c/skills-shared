@@ -1,6 +1,7 @@
 {
   "schema": "skill-entry-routes/v1",
   "skills": [
+    "agentic-tech-lead-orchestration",
     "autoresearch-composer",
     "controlled-technical-language-harness",
     "dual-forge-repository-loop",
@@ -11,6 +12,7 @@
     "judge-loop-chooser",
     "knowledge-continuity",
     "loop-harness-standard",
+    "procedural-core-refactor",
     "procedural-shadow-runtime",
     "repo-agent-native",
     "repository-capability-audit",
