@@ -145,7 +145,9 @@ Add a content-bound entry only after its checker can replay path, blob, runner, 
 
 ### 7. Classify adoption across Skills
 
-Record one state per Skill per criterion in an adoption ledger, with the evidence path that proves it and the issue that owns every non-`PASS` state. A criterion whose evidence is only Markdown is not executable, and a gap without a known owning issue is not a finding.
+Record one state per Skill per criterion in an adoption ledger, with the evidence path that proves it and the issue that owns every non-`PASS` state. A criterion whose evidence is only Markdown is not executable, and a gap without a known owning issue is not a finding. The audit issue is not an owner: a gap parked on the issue that measured it cannot be closed without abandoning it, so every gap goes to the Skill's own migration leaf.
+
+Order those leaves from coupling that already exists in the bytes — one Skill's gate loading another's module, one Skill's control asserting another's name, one Skill's matched task measuring another's files — not from judgement about difficulty. Record the edge with the files it was read out of, recompute the sequence from the edges rather than trusting the recorded one, and keep independent leaves visibly independent instead of inventing a total order over them.
 
 ### 8. Hand off higher layers
 

@@ -9,6 +9,7 @@
     "golden_proof_registry",
     "known_issues",
     "in_scope",
+    "migration_order",
     "skills"
   ],
   "properties": {
@@ -39,6 +40,50 @@
       "items": {
         "type": "string",
         "pattern": "^[a-z0-9][a-z0-9-]*$"
+      }
+    },
+    "migration_order": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "skill",
+          "issue",
+          "depends_on",
+          "basis"
+        ],
+        "properties": {
+          "skill": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9-]*$"
+          },
+          "issue": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "depends_on": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z0-9][a-z0-9-]*$"
+            }
+          },
+          "basis": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "note": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
       }
     },
     "skills": {

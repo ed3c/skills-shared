@@ -33,6 +33,110 @@
     "repository-capability-audit",
     "spatial-loop-systems-engineering"
   ],
+  "migration_order": [
+    {
+      "skill": "agentic-tech-lead-orchestration",
+      "issue": 343,
+      "depends_on": [],
+      "basis": [],
+      "note": "Blocked by no other leaf, and it is the only Skill whose golden proof is registered, so its treatments are the one worked instance the other nine copy."
+    },
+    {
+      "skill": "controlled-technical-language-harness",
+      "issue": 344,
+      "depends_on": [],
+      "basis": [],
+      "note": "No file under this Skill's scripts, tests, evals, references or contracts resolves a path into any other in-scope Skill."
+    },
+    {
+      "skill": "forgejo-delivery-loop",
+      "issue": 346,
+      "depends_on": [],
+      "basis": [],
+      "note": "No file under this Skill's scripts, tests, evals, references or contracts resolves a path into any other in-scope Skill."
+    },
+    {
+      "skill": "github-delivery-loop",
+      "issue": 348,
+      "depends_on": [],
+      "basis": [],
+      "note": "No file under this Skill's scripts, tests, evals, references or contracts resolves a path into any other in-scope Skill; two of them resolve paths into this one."
+    },
+    {
+      "skill": "dual-forge-repository-loop",
+      "issue": 345,
+      "depends_on": [
+        "github-delivery-loop"
+      ],
+      "basis": [
+        "skills/dual-forge-repository-loop/scripts/check_dual_forge_contract.py",
+        "skills/github-delivery-loop/scripts/ci_publish_gate.py",
+        "skills/github-delivery-loop/scripts/ci_workflow_policy.py"
+      ],
+      "note": "check_dual_forge_contract.py load_module()s github-delivery-loop/scripts/ci_publish_gate.py and ci_workflow_policy.py at gate time, so this Skill's executable contract is literally the other Skill's code running."
+    },
+    {
+      "skill": "git-town-stacked-pr-worker",
+      "issue": 347,
+      "depends_on": [
+        "github-delivery-loop"
+      ],
+      "basis": [
+        "skills/git-town-stacked-pr-worker/scripts/check_publication_boundary.py",
+        "skills/git-town-stacked-pr-worker/references/GITHUB_ACTIONS_PUBLICATION_ADOPTION.md"
+      ],
+      "note": "check_publication_boundary.py require_markers() the literal string github-delivery-loop in this Skill's own publication surface, so freezing a treatment here freezes text bound to the other Skill's contract."
+    },
+    {
+      "skill": "knowledge-continuity",
+      "issue": 349,
+      "depends_on": [],
+      "basis": [],
+      "note": "No file under this Skill's scripts, tests, evals, references or contracts resolves a path into any other in-scope Skill."
+    },
+    {
+      "skill": "spatial-loop-systems-engineering",
+      "issue": 352,
+      "depends_on": [
+        "forgejo-delivery-loop"
+      ],
+      "basis": [
+        "skills/spatial-loop-systems-engineering/tests/recovery-escalation/verify.sh",
+        "skills/spatial-loop-systems-engineering/references/three-failure-escalation.md"
+      ],
+      "note": "recovery-escalation/verify.sh require_literal()s forgejo-delivery-loop in the escalation overlay, so this Skill's hollow-route control is red the moment the other Skill's name moves."
+    },
+    {
+      "skill": "repository-capability-audit",
+      "issue": 351,
+      "depends_on": [
+        "controlled-technical-language-harness",
+        "github-delivery-loop",
+        "knowledge-continuity",
+        "spatial-loop-systems-engineering"
+      ],
+      "basis": [
+        "skills/repository-capability-audit/scripts/run_pilot_matrix.py",
+        "skills/repository-capability-audit/tests/test_source_contribution.py",
+        "skills/repository-capability-audit/evals/held-out-corpus.json"
+      ],
+      "note": "run_pilot_matrix.py SOURCE_SKILLS names these four as measured subjects and test_source_contribution.py scores them by name, so a matched hermetic task here is comparing bytes those four Skills own."
+    },
+    {
+      "skill": "procedural-shadow-runtime",
+      "issue": 350,
+      "depends_on": [
+        "git-town-stacked-pr-worker",
+        "repository-capability-audit"
+      ],
+      "basis": [
+        "skills/procedural-shadow-runtime/scripts/summarise_uplift_matrix.py",
+        "skills/repository-capability-audit/evals/uplift-preregistration.json",
+        "skills/procedural-shadow-runtime/tests/fixtures/valid-capsule.json"
+      ],
+      "note": "summarise_uplift_matrix.py opens repository-capability-audit/evals/uplift-preregistration.json from a module-level constant, and the capsule and receipt fixtures pin git-town-stacked-pr-worker/SKILL.md as the procedure source. The reverse edge is not symmetric: repository-capability-audit only names this Skill's artifacts as inert preregistration data, and no script of its own reads them."
+    }
+  ],
   "skills": [
     {
       "skill": "agentic-tech-lead-orchestration",
