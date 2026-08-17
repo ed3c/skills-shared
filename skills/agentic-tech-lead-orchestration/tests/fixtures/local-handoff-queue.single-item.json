@@ -1,0 +1,86 @@
+{
+  "schema_version": "agentic-tech-lead/local-handoff-queue/v1",
+  "subject": {
+    "repository": "example/consumer",
+    "commit": "1111111111111111111111111111111111111111",
+    "tree": "2222222222222222222222222222222222222222",
+    "rollback_commit": "0000000000000000000000000000000000000000"
+  },
+  "authority": {
+    "automation_forbidden": [
+      "merge",
+      "force_push",
+      "issue_close",
+      "queue_advance",
+      "provider_activation",
+      "semantic_conflict_resolution"
+    ],
+    "human_owned": [
+      "merge",
+      "promotion",
+      "rollback",
+      "permission_change",
+      "semantic_conflict_resolution"
+    ]
+  },
+  "current": {
+    "active_item": "runtime-rebind",
+    "state": "ACTIVE"
+  },
+  "items": [
+    {
+      "id": "runtime-rebind",
+      "task_ref": "consumer-task-A",
+      "state": "ACTIVE",
+      "entry": {
+        "predecessor": null,
+        "required_subject_commit": "1111111111111111111111111111111111111111",
+        "required_capabilities": [
+          "local-runtime-catalog",
+          "scheduler-runtime"
+        ]
+      },
+      "runtime_lane": {
+        "class": "LOCAL_RUNTIME",
+        "commands": [
+          {
+            "argv": [
+              "python3",
+              "consumer/scripts/check_runtime_binding.py"
+            ],
+            "cwd": ".",
+            "timeout_seconds": 120,
+            "environment_names": []
+          }
+        ],
+        "unresolved_operations": [
+          {
+            "operation_id": "materialize-runtime-rebind-command",
+            "resolver_source": "consumer runtime catalog and nearest runtime README",
+            "required_output": "CONCRETE_COMMAND_CONTRACT"
+          }
+        ],
+        "live_evidence_required": true
+      },
+      "receipt": {
+        "path": "data/handoff/runtime-rebind.json",
+        "schema": "consumer/runtime-rebind/v1",
+        "required_states": [
+          "PASS",
+          "NOT_EXERCISED",
+          "HUMAN_ADMIT_REQUIRED"
+        ],
+        "forbidden_promotions": [
+          "synthetic_runtime_to_consumer_live_pass",
+          "issue_ui_state_to_completion"
+        ]
+      },
+      "exit": {
+        "requires_receipt": true,
+        "required_verdict": "PASS",
+        "cleanup_required": true
+      },
+      "next": null
+    }
+  ]
+}
