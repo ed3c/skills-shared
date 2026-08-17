@@ -140,7 +140,7 @@
         "skills/git-town-stacked-pr-worker/README.md",
         "docs/traceability/**"
       ],
-      "consumes_artifacts": ["root-Agent-contract", "directory-State-Machine-map", "Tech-Lead-DAG-data-flow", "golden-proof-registry"],
+      "consumes_artifacts": ["root-Agent-contract", "directory-State-Machine-map", "Tech-Lead-DAG-data-flow", "golden-proof-registry", "proof-checkers"],
       "provides_artifacts": ["machine-molecular-Stack-index", "Git-Town-refactor-Stack-template", "complete-trace"],
       "evals": ["Stack checker", "nine Stack mutations", "document route/index coverage"],
       "negative_controls": ["child without consumed bytes", "fake child", "multiple convergence owners", "stale open head", "false merged state", "external path ownership"],
