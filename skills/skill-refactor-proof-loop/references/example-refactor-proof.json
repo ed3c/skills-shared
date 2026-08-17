@@ -1,0 +1,110 @@
+{
+  "schema": "skill-refactor-proof-loop/refactor-proof-contract/v1",
+  "proof_id": "agentic-tech-lead-real-task-ab-v1",
+  "owner_skill": "agentic-tech-lead-orchestration",
+  "source": {
+    "issue": 312,
+    "pull_requests": [
+      308,
+      315
+    ]
+  },
+  "treatments": [
+    {
+      "id": "A_OLD_MONOLITH",
+      "role": "OLD_CANONICAL",
+      "path": "skills/agentic-tech-lead-orchestration/tests/fixtures/pre-refactor-SKILL.txt",
+      "blob_sha": "a01f53592cda98f61b413b4467afa96356fb4ef7",
+      "state": "FROZEN"
+    },
+    {
+      "id": "B0_REFACTOR_AS_LANDED",
+      "role": "REFACTOR_AS_LANDED",
+      "path": "skills/agentic-tech-lead-orchestration/tests/fixtures/refactor-as-landed-SKILL.txt",
+      "blob_sha": "8b2da7443aff7a9f53412b5af280048203bbd5e9",
+      "state": "FROZEN"
+    },
+    {
+      "id": "B1_REACHABILITY_REPAIRED",
+      "role": "REPAIRED_CANDIDATE",
+      "path": "skills/agentic-tech-lead-orchestration/tests/fixtures/reachability-repaired-SKILL.txt",
+      "blob_sha": "51c3fd81749598957f2b993c4d31c3b4c8c277c1",
+      "state": "FROZEN"
+    },
+    {
+      "id": "B2_CAUSAL_DAG_REPAIRED",
+      "role": "REPAIRED_CANDIDATE",
+      "path": "skills/agentic-tech-lead-orchestration/SKILL.md",
+      "blob_sha": "805165f6638bd27b017f1df277ddc48dd6a27c39",
+      "state": "CURRENT_CANDIDATE"
+    }
+  ],
+  "protected_strengths": [
+    {
+      "id": "procedural-t0-t10",
+      "old_evidence": "A contains T0 ROUTE through T10 HANDOFF",
+      "new_assertion": "B2 binds t0-t10-causal-map.json and capability receipts"
+    },
+    {
+      "id": "pre-dispatch-task-assertion",
+      "old_evidence": "A requires a task contract before dispatch",
+      "new_assertion": "check_runtime_reachability.py and task schema/semantic gates precede Worker admission"
+    },
+    {
+      "id": "human-delivery-authority",
+      "old_evidence": "A retains Human merge authority",
+      "new_assertion": "task/capability schemas require merge=false and publication=false"
+    }
+  ],
+  "proof_layers": {
+    "L0_SOURCE_FREEZE": "PASS",
+    "L1_STRUCTURAL_REACHABILITY": "PASS",
+    "L2_EXECUTABLE_CONTRACT": "PASS",
+    "L3_HERMETIC_REAL_TASK": "PASS",
+    "L4_MATCHED_LIVE_MODEL_RUNTIME": "NOT_EXERCISED",
+    "L5_DELIVERY_AND_HUMAN_ADMIT": "HUMAN_ADMIT_REQUIRED"
+  },
+  "matched_task": {
+    "required": true,
+    "same_base_tree": true,
+    "same_contracts_tests": true,
+    "same_budget": true,
+    "same_carrier": true,
+    "global_objective": true
+  },
+  "denominator_policy": {
+    "failed_retained": true,
+    "stale_retained": true,
+    "blocked_retained": true,
+    "cancelled_retained": true,
+    "superseded_retained": true
+  },
+  "cleanup": {
+    "processes": "CLEAN",
+    "worktrees": "CLEAN",
+    "branches": "CLEAN",
+    "leases": "CLEAN",
+    "temporary_state": "CLEAN"
+  },
+  "authority": {
+    "provider_activation": false,
+    "publication": false,
+    "semantic_conflict_resolution": false,
+    "merge": false,
+    "release": false,
+    "promotion": false,
+    "rollback": false
+  },
+  "evidence": {
+    "live_runtime_receipts": [],
+    "delivery_receipts": [],
+    "human_admit_receipts": []
+  },
+  "remaining_issues": [
+    231,
+    232,
+    234,
+    256,
+    312
+  ]
+}

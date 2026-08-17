@@ -1,0 +1,263 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "skill-refactor-proof-loop/golden-proof-registry/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "proofs"
+  ],
+  "properties": {
+    "schema": {
+      "const": "skill-refactor-proof-loop/golden-proof-registry/v1"
+    },
+    "proofs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "owner_skill",
+          "issue",
+          "pull_requests",
+          "entrypoint",
+          "runner",
+          "treatments",
+          "proof_layers",
+          "highest_layer",
+          "denominator",
+          "cleanup",
+          "authority",
+          "remaining_issues"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
+          },
+          "owner_skill": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9-]*$"
+          },
+          "issue": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "pull_requests": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "entrypoint": {
+            "type": "string",
+            "minLength": 1
+          },
+          "runner": {
+            "type": "string",
+            "minLength": 1
+          },
+          "treatments": {
+            "type": "array",
+            "minItems": 3,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "role",
+                "path",
+                "blob_sha"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "role": {
+                  "enum": [
+                    "OLD_CANONICAL",
+                    "REFACTOR_AS_LANDED",
+                    "REPAIRED_CANDIDATE"
+                  ]
+                },
+                "path": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "blob_sha": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{40}$"
+                }
+              }
+            }
+          },
+          "proof_layers": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "L0_SOURCE_FREEZE",
+              "L1_STRUCTURAL_REACHABILITY",
+              "L2_EXECUTABLE_CONTRACT",
+              "L3_HERMETIC_REAL_TASK",
+              "L4_MATCHED_LIVE_MODEL_RUNTIME",
+              "L5_DELIVERY_AND_HUMAN_ADMIT"
+            ],
+            "properties": {
+              "L0_SOURCE_FREEZE": {
+                "enum": [
+                  "PASS",
+                  "FAIL",
+                  "ABSENT",
+                  "NOT_IMPLEMENTED",
+                  "NOT_EXERCISED",
+                  "HUMAN_ADMIT_REQUIRED"
+                ]
+              },
+              "L1_STRUCTURAL_REACHABILITY": {
+                "enum": [
+                  "PASS",
+                  "FAIL",
+                  "ABSENT",
+                  "NOT_IMPLEMENTED",
+                  "NOT_EXERCISED",
+                  "HUMAN_ADMIT_REQUIRED"
+                ]
+              },
+              "L2_EXECUTABLE_CONTRACT": {
+                "enum": [
+                  "PASS",
+                  "FAIL",
+                  "ABSENT",
+                  "NOT_IMPLEMENTED",
+                  "NOT_EXERCISED",
+                  "HUMAN_ADMIT_REQUIRED"
+                ]
+              },
+              "L3_HERMETIC_REAL_TASK": {
+                "enum": [
+                  "PASS",
+                  "FAIL",
+                  "ABSENT",
+                  "NOT_IMPLEMENTED",
+                  "NOT_EXERCISED",
+                  "HUMAN_ADMIT_REQUIRED"
+                ]
+              },
+              "L4_MATCHED_LIVE_MODEL_RUNTIME": {
+                "enum": [
+                  "PASS",
+                  "FAIL",
+                  "ABSENT",
+                  "NOT_IMPLEMENTED",
+                  "NOT_EXERCISED",
+                  "HUMAN_ADMIT_REQUIRED"
+                ]
+              },
+              "L5_DELIVERY_AND_HUMAN_ADMIT": {
+                "enum": [
+                  "PASS",
+                  "FAIL",
+                  "ABSENT",
+                  "NOT_IMPLEMENTED",
+                  "NOT_EXERCISED",
+                  "HUMAN_ADMIT_REQUIRED"
+                ]
+              }
+            }
+          },
+          "highest_layer": {
+            "enum": [
+              "L0_SOURCE_FREEZE",
+              "L1_STRUCTURAL_REACHABILITY",
+              "L2_EXECUTABLE_CONTRACT",
+              "L3_HERMETIC_REAL_TASK",
+              "L4_MATCHED_LIVE_MODEL_RUNTIME",
+              "L5_DELIVERY_AND_HUMAN_ADMIT"
+            ]
+          },
+          "denominator": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "failed_retained",
+              "stale_retained",
+              "blocked_retained",
+              "cancelled_retained",
+              "superseded_retained"
+            ],
+            "properties": {
+              "failed_retained": {
+                "const": true
+              },
+              "stale_retained": {
+                "const": true
+              },
+              "blocked_retained": {
+                "const": true
+              },
+              "cancelled_retained": {
+                "const": true
+              },
+              "superseded_retained": {
+                "const": true
+              }
+            }
+          },
+          "cleanup": {
+            "const": "CLEAN"
+          },
+          "authority": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "provider_activation",
+              "publication",
+              "semantic_conflict_resolution",
+              "merge",
+              "release",
+              "promotion",
+              "rollback"
+            ],
+            "properties": {
+              "provider_activation": {
+                "const": false
+              },
+              "publication": {
+                "const": false
+              },
+              "semantic_conflict_resolution": {
+                "const": false
+              },
+              "merge": {
+                "const": false
+              },
+              "release": {
+                "const": false
+              },
+              "promotion": {
+                "const": false
+              },
+              "rollback": {
+                "const": false
+              }
+            }
+          },
+          "remaining_issues": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "uniqueItems": true
+          }
+        }
+      }
+    }
+  }
+}
