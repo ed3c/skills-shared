@@ -13,6 +13,7 @@ Portable contract-first orchestration for turning one large coding request into 
 7. [`tests/README.md`](tests/README.md)
 8. [`../skill-refactor-proof-loop/README.md`](../skill-refactor-proof-loop/README.md) and its golden registry
 9. exact issue, PR base/head, workflow and receipt subjects
+10. [`../../docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md`](../../docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md) before a global completion claim
 
 ## Directory map → State Machine ownership
 
@@ -205,6 +206,35 @@ Human merge/release admission
 ```
 
 These issues are separately owned evidence lanes, not artificial Stack children.
+
+## Tech Lead + Shadow closure responsibility
+
+This Skill owns the plan, task/capability DAG, writer/path/resource leases, Worker admission, convergence owner and Local Handoff Queue. The independent Shadow is not another Worker and must not edit the Tech Lead's branch silently.
+
+```text
+Tech Lead result
+→ independent procedural-shadow-runtime review on the same immutable subject
+→ requirement applicability
+→ source/contract/runtime contradictions
+→ local task versus global objective
+→ evidence ceiling and denominator
+→ HOLD / REJECT / ELIGIBLE_FOR_HUMAN_ADMIT
+```
+
+A Tech Lead local PASS is not a global-objective PASS. A static or hermetic proof is not a live model/provider/runtime proof. When the current runtime cannot execute the next proof, emit one asserted queue bound to one immutable subject; do not guess host commands or mutate an old epoch after the accepted subject changes.
+
+Relation vocabulary:
+
+```text
+SIBLING             path-disjoint work
+TRUE_CHILD          named unmerged byte dependency
+CONVERGENCE         one shared-index/integration owner
+PROCESS_DEPENDENCY  ordering without Git ancestry
+EXTERNAL_EVIDENCE   independent receipt lane, no Stack paths
+HISTORICAL          admitted/forensic prior subject, not current state authority
+```
+
+The full portable audit and dated external-consumer example are in [`../../docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md`](../../docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md).
 
 ## Local verification
 
