@@ -75,6 +75,18 @@ on:
       - 'tests/test_intent_bound_constraints.py'
       - 'tests/test_intent_promotions.py'
       - 'tests/test_controlled_language_contracts.py'
+      # The routing gate's subject is every governed Markdown file plus the
+      # tree it claims to describe, so a docs-only or AGENTS.md-only edit is a
+      # change to what it checks -- selecting it on scripts/ alone would let
+      # the index drift from the inventory without ever selecting the job.
+      - 'scripts/check_document_routes.py'
+      - 'tests/test_document_routes.py'
+      - 'tests/test_adoption_report.py'
+      - 'docs/**'
+      - 'AGENTS.md'
+      - 'README.md'
+      - 'CONTEXT.md'
+      - 'ARCHITECTURE.md'
       - '.github/workflows/skill-eval-contract.yml'
   push:
     branches: [main]
@@ -93,6 +105,8 @@ on:
       # spend a job on every unrelated Skill edit.
       - 'skills/*/evals.json'
       - 'tests/**'
+      - 'docs/**'
+      - 'AGENTS.md'
       - '.github/workflows/skill-eval-contract.yml'
   workflow_dispatch:
 
@@ -178,6 +192,22 @@ jobs:
           python3 scripts/check_guard_controls.py --repo-root . --selftest
           python3 -m unittest tests/test_guard_controls.py -v
           python3 scripts/check_guard_controls.py --repo-root .
+      - name: Execute the document-routing contract
+        # DOCUMENT_ROUTING.md declared DR-01..DR-19 and nothing ran them, so
+        # every route it describes was green by construction. This runs the
+        # mechanisable subset against the tree and then proves, per assertion,
+        # that the gate goes red on a planted defect.
+        run: |
+          python3 scripts/check_document_routes.py
+          python3 -m unittest tests/test_document_routes.py -v
+      - name: Recompute the generated adoption report from its ledger
+        # #322's rendered-report criterion. The report is a projection: --check
+        # re-renders from the ledger and exits 2 on a byte difference, so a hand
+        # edit here is refused instead of becoming a second ledger.
+        run: |
+          python3 skills/skill-refactor-proof-loop/scripts/render_adoption_report.py \
+            --check --output docs/traceability/SKILL_ADOPTION_AUDIT.md
+          python3 -m unittest tests/test_adoption_report.py -v
       - name: Classify commit drivers since the enforced start point
         run: |
           python3 scripts/check_commit_roles.py --repo-root .

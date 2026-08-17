@@ -23,6 +23,8 @@
 
 - [`AGENT_INTEGRATION_STATE.md`](AGENT_INTEGRATION_STATE.md) — live Skill Eval/Evolution handoff.
 - [`SKILL_EVAL_ROADMAP.md`](SKILL_EVAL_ROADMAP.md) — target phase roadmap.
+- [`traceability/SKILL_ADOPTION_AUDIT.md`](traceability/SKILL_ADOPTION_AUDIT.md) — generated projection of the cross-Skill refactor-proof adoption ledger: per-Skill proven layer and every criterion that is not `PASS`, with its owner issue. Regenerate it, never edit it.
+- [`traceability/TECH_LEAD_SHADOW_CLOSURE.md`](traceability/TECH_LEAD_SHADOW_CLOSURE.md) — Tech Lead closure states and the independent Shadow audit that reviews the same immutable subject without becoming a second state writer. `AGENTS.md` makes reading it a precondition for claiming closure, so an unrouted copy was a route the index required and did not name.
 - [`../skills/README.md`](../skills/README.md) — Skill directory contract.
 - [`../skills/github-delivery-loop/README.md`](../skills/github-delivery-loop/README.md) — GitHub delivery state machines.
 - [`../skills/git-town-stacked-pr-worker/README.md`](../skills/git-town-stacked-pr-worker/README.md) — Stack PR method.
@@ -35,4 +37,4 @@
 
 The nearest directory README is the local ownership route. Machine contracts remain authoritative over prose.
 
-An index fails in one direction only: a dead link is found the moment someone follows it, while an omission looks exactly like completeness. On this candidate branch, 11 of 30 skill directories ship a `README.md` and 8 are routed above. The three that ship one and are still unrouted are `codebase-atlas`, `dual-forge-repository-loop`, and `procedural-shadow-runtime`; each is named here so the omission cannot read as completeness, and each belongs to its own line of work rather than to this change. The remaining 19 directories have no nearest-README route to omit yet. A directory's shared/repo-owned classification remains `ABSENT` until a separate `registry.json` governance change is Human-admitted.
+An index fails in one direction only: a dead link is found the moment someone follows it, while an omission looks exactly like completeness. So these numbers are no longer a self-report: `scripts/check_document_routes.py` measures them off the tree on every run and refuses the index when a stated count and the inventory disagree. 12 of 31 skill directories ship a `README.md` and 8 are routed above. The four that ship one and are still unrouted are `codebase-atlas`, `dual-forge-repository-loop`, `procedural-shadow-runtime`, and `skill-refactor-proof-loop`; each is named here so the omission cannot read as completeness, and each belongs to its own line of work rather than to this change. The remaining 19 directories have no nearest-README route to omit yet. A directory's shared/repo-owned classification remains `ABSENT` until a separate `registry.json` governance change is Human-admitted.

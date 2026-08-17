@@ -15,7 +15,7 @@
 |---|---|---|---|---|
 | **法則層** | 全局 `~/.claude/CLAUDE.md` | 時間／資料流 | 跨專案通用判準，**不放實例**、不寫死目錄 | 不指向任何迴圈目錄 |
 | **路由層** | **本檔**（每個 repo 一份） | 空間／基座 | 法則主題 → 擁有實證的 Harness；基座 → 實體位置 | 不存實證副本 |
-| **編排層** | [`.claude/CLAUDE.md`](.claude/CLAUDE.md) | 觸發／編排 | 階段 × 時機、讓位規則、開不開迴圈、風格與邊界 | 不記結構位置、不抄能力清單 |
+| **編排層** | `.claude/CLAUDE.md` | 觸發／編排 | 階段 × 時機、讓位規則、開不開迴圈、風格與邊界 | 不記結構位置、不抄能力清單 |
 | **實證層** | 各 Harness 的 `modules/`／`domain/` | — | 完整方法論、逐案實證、可觸發的動作清單 | 不重述法則 |
 
 判斷歸屬：**判準**寫全局、**位置**寫本檔、**時機與取捨**寫編排層、**實例**寫 Harness。
@@ -74,12 +74,12 @@
 | B7 goal contract | versioned intent/requirements/acceptance/budget | `PROMPT.md` target/success/stop-loss |
 | B8 state ledger | execution topology/evolution/receipt state | `PLAN.md` iteration/Human edge |
 
-> 完整責任、正負控制、P0-P10 模組化測試經驗與資料流 → [loop-harness-standard modules/dual-loop-eight-base.md](.agents/skills/loop-harness-standard/modules/dual-loop-eight-base.md)
-> 泛用執行程序（設定 Prompt→啟動 Harness→驗證狀態→經驗折疊）→ [loop-harness-standard modules/harness-spec.md §6](.agents/skills/loop-harness-standard/modules/harness-spec.md)
+> 完整責任、正負控制、P0-P10 模組化測試經驗與資料流 → loop-harness-standard `.agents/skills/loop-harness-standard/modules/dual-loop-eight-base.md`
+> 泛用執行程序（設定 Prompt→啟動 Harness→驗證狀態→經驗折疊）→ loop-harness-standard §6 `.agents/skills/loop-harness-standard/modules/harness-spec.md`
 
 **Harness Configuration 實體位置**（本 repo 的基座落點）：
 
-- **B1 rules/context 三件**：`AGENTS.md`（本檔，路由層）＋[`.claude/CLAUDE.md`](.claude/CLAUDE.md)（編排層）＋`ARCHITECTURE.md`。
+- **B1 rules/context 三件**：`AGENTS.md`（本檔，路由層）＋`.claude/CLAUDE.md`（編排層）＋`ARCHITECTURE.md`。
   三件缺一件，該職責就只能靠記憶補。
 - **Config Path**: `.agents/mcp.json` — B4
 - **Runtime Contract Path**: `.runtime-env/` — B2/B5; one desired-state file per workload plus generated secret-free bindings. Host dotenv, signing keys, browser profiles, and provider sessions never enter this repository.
@@ -89,7 +89,7 @@
 - **Mini-Loop Sandboxes**: Each workspace subproject or loop in `loop_wiki/` implements the 8-Harness standard with its own CWD isolation, EAGER execution rules, and page-specific tests in `.agents/skills/[skill_name]/tests/[page]/[function]/verify.sh` to prevent functional regression. — B6
 
 > **Modularized Section**: Please refer to `.agents/modules/harness-config.md` for the single source of truth regarding MCP servers, Skills, and Problem Graph directory structures.
-> **Loop Composite Map & Anti-Simplification Gate**: Please refer to [antigravity-harness-wiki](file:///Users/neon/ix-agy/.agents/skills/antigravity-harness-wiki/SKILL.md) for the overarching Loop Engineering roadmap (Big Loop vs. Mini-Loops). **任何變更皆嚴禁簡化已實裝的閉環架構，且嚴禁拷貝/複製 prompt 以免造成双图漂移（提示詞 SSOT 單一真源守則）。**
+> **Loop Composite Map & Anti-Simplification Gate**: Please refer to antigravity-harness-wiki `.agents/skills/antigravity-harness-wiki/SKILL.md` for the overarching Loop Engineering roadmap (Big Loop vs. Mini-Loops). **任何變更皆嚴禁簡化已實裝的閉環架構，且嚴禁拷貝/複製 prompt 以免造成双图漂移（提示詞 SSOT 單一真源守則）。**
 
 ---
 
@@ -117,7 +117,7 @@
 ---
 
 ## §3 MCP Tools Index
-> SSOT = [.agents/modules/harness-config.md](.agents/modules/harness-config.md)（MCP servers／Skills／Problem Graph 目錄結構規範，本節不存副本）。
+> SSOT = `.agents/modules/harness-config.md`（MCP servers／Skills／Problem Graph 目錄結構規範，本節不存副本）。
 
 ---
 
@@ -127,14 +127,14 @@
 
 | 法則主題 | 實證 Harness |
 |---|---|
-| 多態型別要驗生產端／綠燈值多少看抵達／觀察對象與待證對象要同源／要記得的事綁到共用出口／量測工具的綠燈也是宣稱 | [invariant-reach-graph](loop_wiki/invariant-reach-graph/.agents/skills/invariant-reach-graph/SKILL.md) — 方法論在 `modules/`，逐案實證在 `domain/`，兩者由該 SKILL.md 串連且不得合併 |
-| OOBE／REOOBE 金鑰素材覆寫的 Android domain 事實 | [android_e2e_loop soft-key-vault-overwrite](loop_wiki/subproject-ixsecurity-e2e/android_e2e_loop/.agents/skills/android-e2e-loop/modules/soft-key-vault-overwrite.md) |
-| 送進一次性資源前先驗素材形狀／搜不到不等於不存在 | [android_e2e_loop email-voip-registration-ceremony §11](loop_wiki/subproject-ixsecurity-e2e/android_e2e_loop/.agents/skills/android-e2e-loop/modules/email-voip-registration-ceremony.md) |
-| 落帳分三處／Harness 那端要寫成可觸發的形式 | [invariant-reach-graph refutation-history §7](loop_wiki/invariant-reach-graph/.agents/skills/invariant-reach-graph/modules/refutation-history.md) — **當寫法範本**：訊號→動作→為何有效的三段式，對照同檔 §1-§5（狀態機／落帳格式／收斂量化）看「敘事型」與「可觸發型」的差別 |
-| 卡住時換一個變因真跑，別再往深處解釋 | [invariant-reach-graph refutation-history §7](loop_wiki/invariant-reach-graph/.agents/skills/invariant-reach-graph/modules/refutation-history.md) — 觸發訊號（連續 2 個以上假說都在解釋同一失敗／正要讀第三層碼／解釋全指向對方）、動作（列全部輸入變因、只換一個、並列 diff）、為什麼能一次掀掉整疊 |
-| 文件的字面推論與目標矛盾時，不得擅自改目標 | [invariant-reach-graph refutation-history §8](loop_wiki/invariant-reach-graph/.agents/skills/invariant-reach-graph/modules/refutation-history.md) — 形狀（讀到成立的設計理由 → 默默換掉人的目標，且**沒有任何閘會紅**）、判準（低成本是它會贏的原因，不是它對的原因）、四步動作（停在矛盾處／明說不相容點／找難度更高但仍朝目標的路／攤開給人裁）。與靜默推論的差別：那是推論錯要補證據，這是**靜默換目標**要把決定權交回去 |
-| 靜默推論＝把窄觀察無聲擴張成強宣稱 | [invariant-reach-graph refutation-history §6](loop_wiki/invariant-reach-graph/.agents/skills/invariant-reach-graph/modules/refutation-history.md) — 三種形狀（樣本→全稱／同形兩態→單態／有回應→機制可用）各配可證偽動作，下結論前逐條過；上游是同檔 §3 的 `silent_refutation` 必須為 0 |
-| 自動化操作與測試腳本住在它驗證的那個 Harness 內 | [android_e2e_loop/scripts/](loop_wiki/subproject-ixsecurity-e2e/android_e2e_loop/scripts/) — OOBE 真機驅動四支（`activate-r2-account.py`／`capture-r2token.sh`／`realdevice-oobe-drive.sh`／`realdevice-force-oobe-drive.sh`），2026-08-08 自 `ixsecurity-samples/scripts/` 遷入；`.r2tokens.env` 由 `**/.r2tokens.env` 擋在版控外 |
+| 多態型別要驗生產端／綠燈值多少看抵達／觀察對象與待證對象要同源／要記得的事綁到共用出口／量測工具的綠燈也是宣稱 | invariant-reach-graph `loop_wiki/invariant-reach-graph/.agents/skills/invariant-reach-graph/SKILL.md` — 方法論在 `modules/`，逐案實證在 `domain/`，兩者由該 SKILL.md 串連且不得合併 |
+| OOBE／REOOBE 金鑰素材覆寫的 Android domain 事實 | android_e2e_loop soft-key-vault-overwrite `loop_wiki/subproject-ixsecurity-e2e/android_e2e_loop/.agents/skills/android-e2e-loop/modules/soft-key-vault-overwrite.md` |
+| 送進一次性資源前先驗素材形狀／搜不到不等於不存在 | android_e2e_loop email-voip-registration-ceremony §11 `loop_wiki/subproject-ixsecurity-e2e/android_e2e_loop/.agents/skills/android-e2e-loop/modules/email-voip-registration-ceremony.md` |
+| 落帳分三處／Harness 那端要寫成可觸發的形式 | invariant-reach-graph refutation-history §7 `loop_wiki/invariant-reach-graph/.agents/skills/invariant-reach-graph/modules/refutation-history.md` — **當寫法範本**：訊號→動作→為何有效的三段式，對照同檔 §1-§5（狀態機／落帳格式／收斂量化）看「敘事型」與「可觸發型」的差別 |
+| 卡住時換一個變因真跑，別再往深處解釋 | invariant-reach-graph refutation-history §7 `loop_wiki/invariant-reach-graph/.agents/skills/invariant-reach-graph/modules/refutation-history.md` — 觸發訊號（連續 2 個以上假說都在解釋同一失敗／正要讀第三層碼／解釋全指向對方）、動作（列全部輸入變因、只換一個、並列 diff）、為什麼能一次掀掉整疊 |
+| 文件的字面推論與目標矛盾時，不得擅自改目標 | invariant-reach-graph refutation-history §8 `loop_wiki/invariant-reach-graph/.agents/skills/invariant-reach-graph/modules/refutation-history.md` — 形狀（讀到成立的設計理由 → 默默換掉人的目標，且**沒有任何閘會紅**）、判準（低成本是它會贏的原因，不是它對的原因）、四步動作（停在矛盾處／明說不相容點／找難度更高但仍朝目標的路／攤開給人裁）。與靜默推論的差別：那是推論錯要補證據，這是**靜默換目標**要把決定權交回去 |
+| 靜默推論＝把窄觀察無聲擴張成強宣稱 | invariant-reach-graph refutation-history §6 `loop_wiki/invariant-reach-graph/.agents/skills/invariant-reach-graph/modules/refutation-history.md` — 三種形狀（樣本→全稱／同形兩態→單態／有回應→機制可用）各配可證偽動作，下結論前逐條過；上游是同檔 §3 的 `silent_refutation` 必須為 0 |
+| 自動化操作與測試腳本住在它驗證的那個 Harness 內 | `loop_wiki/subproject-ixsecurity-e2e/android_e2e_loop/scripts/` — OOBE 真機驅動四支（`activate-r2-account.py`／`capture-r2token.sh`／`realdevice-oobe-drive.sh`／`realdevice-force-oobe-drive.sh`），2026-08-08 自 `ixsecurity-samples/scripts/` 遷入；`.r2tokens.env` 由 `**/.r2tokens.env` 擋在版控外 |
 
 > 其他 repo 擁有的法則實證（不在本 repo）：`重複組件禁字面推論等價`／`「審計＋跑」不足以宣稱等價` → `skill-bettor/AGENTS.md` §工程原則。
 
@@ -164,7 +164,7 @@ This repository is tightly coupled with and orchestrates the following workspace
 7. **loop_wiki/subproject-ixsecurity-e2e** (`/Users/neon/ix-agy/loop_wiki/subproject-ixsecurity-e2e`): Modularized nested loops sandboxes (D2 mode, No Free Coffee Agora room, APNs/ECDSA, Android, Parity checking).
 
 ### Sovereignty
-> 主權分層架構（L2 Access Rules／Axiom Summary）→ [.agents/modules/sovereignty.md](.agents/modules/sovereignty.md)
+> 主權分層架構（L2 Access Rules／Axiom Summary）→ `.agents/modules/sovereignty.md`
 
 ### Resolved Issues & Gotchas
-> 已依 fold-in doctrine (B) 全遷至 owner modules（00:F-13/F-17 SSOT 收斂，2026-07-10）；索引與無主教訓全文 → [.agents/modules/resolved-ledger.md](.agents/modules/resolved-ledger.md)
+> 已依 fold-in doctrine (B) 全遷至 owner modules（00:F-13/F-17 SSOT 收斂，2026-07-10）；索引與無主教訓全文 → `.agents/modules/resolved-ledger.md`

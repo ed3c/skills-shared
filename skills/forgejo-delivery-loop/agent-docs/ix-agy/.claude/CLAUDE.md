@@ -116,7 +116,7 @@ stop-loss 在哪一步觸發。三個答不出來就還不到開的時候。
 - Modify files under '/Users/neon/TrueMe_iOS' (Must remain 100% pristine under all circumstances)
 - 絕對不能修改後端服務（`ixsecurity/auth52-service` 等 Go 代碼），後端應保持 100% pristine。
 
-> 其餘操作邊界（Allowed Operations／Confirmation Required 細則）→ [.agents/modules/operation-boundaries.md](../.agents/modules/operation-boundaries.md)
+> 其餘操作邊界（Allowed Operations／Confirmation Required 細則）→ `.agents/modules/operation-boundaries.md`
 
 **這些是硬約束，不是取捨**：需要改時是先解除邊界，不是繞過。
 
