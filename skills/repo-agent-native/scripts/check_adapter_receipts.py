@@ -14,6 +14,7 @@ nothing enforced:
   a lane cannot report PASS with no control that would have turned it red
   identity, policy, budget and residue are recorded or the receipt is not one
   no secret-shaped value survives into a durable receipt
+  another subject's receipt binds as a cross-subject reference, never as a lane
 
 Exit codes: 0 pass, 2 receipt failure, 64 unusable input, 70 evaluator defect.
 """
@@ -29,6 +30,7 @@ from pathlib import Path
 from typing import Any
 
 SCHEMA = "repo-agent-native/adapter-receipt/v1"
+SCHEDULER_SCHEMA = "dual-forge-repository-loop/scheduler-run-receipt/v1"
 
 VALID_STATES = {"PASS", "FAIL", "ABSENT", "NOT_IMPLEMENTED", "NOT_EXERCISED",
                 "SKIPPED_BY_POLICY"}
@@ -270,6 +272,53 @@ def validate_set(receipts: dict[str, Any]) -> None:
                f"receipts span {len(subjects)} commits; one capture is one subject")
 
 
+def bind_scheduler(receipts: dict[str, Any], path: Path) -> str:
+    """Bind #231's live scheduler receipt as evidence of a DIFFERENT subject.
+
+    That receipt is real -- a live `claude` run with planted attempt states and
+    named refusals -- but it was captured against a disposable canary
+    repository, not against the tree the adapter lanes describe. Folding it in
+    as a same-subject PASS would spend one subject's evidence on another's;
+    dropping it would lose evidence that exists. The only honest state is a
+    cross-subject binding, and the thing that keeps it honest is that the two
+    subjects must differ. Equal subjects are the defect this refuses.
+    """
+    name = path.name
+    body = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(body, dict) or body.get("schema") != SCHEDULER_SCHEMA:
+        refuse("SCHEDULER_UNBOUND", f"{name}: schema must be {SCHEDULER_SCHEMA}")
+    subject = body.get("subject")
+    if not isinstance(subject, dict):
+        refuse("SCHEDULER_UNBOUND", f"{name}: has no subject section")
+    shas: dict[str, str] = {}
+    for field in ("initial_sha", "final_sha"):
+        value = subject.get(field)
+        if not isinstance(value, str) or not SHA40.fullmatch(value):
+            refuse("SCHEDULER_UNBOUND",
+                   f"{name}: subject.{field} must be a 40-character lowercase SHA")
+        shas[field] = value
+    planted = body.get("planted")
+    refusals = body.get("refusals")
+    if not isinstance(planted, list) or not planted or not isinstance(refusals, list) \
+            or not refusals:
+        refuse("SCHEDULER_UNBOUND",
+               f"{name}: a scheduler receipt with no planted state and no named refusal is "
+               f"not evidence that a scheduler was exercised")
+
+    adapter_subject = next(iter(receipts.values()))["subject"]["commit_sha"]
+    collapsed = sorted(field for field, value in shas.items() if value == adapter_subject)
+    if collapsed:
+        refuse("SUBJECT_COLLAPSED",
+               f"{name}: subject.{'/'.join(collapsed)} equals the adapter subject "
+               f"{adapter_subject[:12]}; a cross-subject binding whose subjects are the same "
+               f"subject is one subject's evidence being passed off as another's")
+
+    return (f"CROSS_SUBJECT_BINDING {name}: {shas['initial_sha'][:12]}.."
+            f"{shas['final_sha'][:12]} ({subject.get('kind', 'unknown-kind')}) is not the "
+            f"adapter subject {adapter_subject[:12]} -- {len(planted)} planted state(s), "
+            f"{len(refusals)} named refusal(s) bound, not merged")
+
+
 def load_dir(directory: Path) -> dict[str, Any]:
     receipts: dict[str, Any] = {}
     for path in sorted(directory.glob("*.receipt.json")):
@@ -372,10 +421,16 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("mode", nargs="?", default="check", choices=["check", "selftest"])
     parser.add_argument("--receipts", type=Path,
                         default=Path(__file__).resolve().parent.parent / "evals" / "receipts")
+    parser.add_argument("--bind-scheduler", type=Path, default=None,
+                        help="cross-check a dual-forge scheduler-run receipt as a "
+                             "different-subject binding (check mode only)")
     args = parser.parse_args(argv)
 
     if not args.receipts.is_dir():
         print(f"USAGE: {args.receipts} is not a directory", file=sys.stderr)
+        return 64
+    if args.bind_scheduler is not None and not args.bind_scheduler.is_file():
+        print(f"USAGE: {args.bind_scheduler} is not a file", file=sys.stderr)
         return 64
     try:
         receipts = load_dir(args.receipts)
@@ -386,11 +441,17 @@ def main(argv: list[str] | None = None) -> int:
     if args.mode == "selftest":
         return selftest(receipts)
 
+    binding: str | None = None
     try:
         validate_set(receipts)
+        if args.bind_scheduler is not None:
+            binding = bind_scheduler(receipts, args.bind_scheduler)
     except Refused as failure:
         print(f"ADAPTER RECEIPT REFUSED {failure.code}: {failure.detail}", file=sys.stderr)
         return 2
+    except json.JSONDecodeError as error:
+        print(f"USAGE: unparseable scheduler receipt: {error}", file=sys.stderr)
+        return 64
     except Exception as error:
         print(f"EVALUATOR FAILURE: {error!r}", file=sys.stderr)
         return 70
@@ -402,6 +463,8 @@ def main(argv: list[str] | None = None) -> int:
     summary = ", ".join(f"{count} {state}" for state, count in sorted(states.items()))
     subject = next(iter(receipts.values()))["subject"]["commit_sha"][:12]
     print(f"ADAPTER RECEIPTS GREEN: {len(receipts)} lane(s) at {subject} -- {summary}")
+    if binding:
+        print(binding)
     return 0
 
 
