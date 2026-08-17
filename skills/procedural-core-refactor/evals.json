@@ -1,0 +1,55 @@
+{
+  "skill_name": "procedural-core-refactor",
+  "version": "1.0.0",
+  "_meta": {
+    "coverage_metric": "portable ownership separation plus executable assertion, causal transition, matched A/B, global objective, cleanup and traceability closure",
+    "purpose": "Prevent future Skill refactors from improving body neutrality while disconnecting scripts, modules, assertions, runtime receipts or old behavioral strengths."
+  },
+  "runnable": [
+    {
+      "id": "PCR-CONTRACT-1",
+      "checker_script": "scripts/check_refactor_contract.py",
+      "test_verify": "tests/selftest.py",
+      "good_fixture": "references/example-refactor-contract.json",
+      "hollow_fixture": null,
+      "hollow_mutations": "mutable treatment, missing law owner, provider atom owned by portable core, selected module without trigger, fixture promoted to live, unmatched A/B, failed global objective, cleanup residue, absent trace, or widened authority",
+      "covers": [
+        "baseline and treatment identities are immutable",
+        "portable, module, reference, script, test, README and consumer-runtime ownership stay distinct",
+        "every PCR law reaches an executable assertion and planted control",
+        "module selection requires trigger and predecessor evidence",
+        "structural and real-task proof remain separate evidence classes",
+        "matched A/B retains failed arms and the global objective",
+        "live model/provider/delivery states cannot be inferred",
+        "issue, branch, PR, exact-head and CI traceability remains explicit"
+      ],
+      "expected": "the positive contract passes after issue #328 lands; every declared mutation is refused; contract-only evidence remains below live runtime/model/delivery PASS"
+    },
+    {
+      "id": "PCR-GOLDEN-PROOF-1",
+      "checker_script": "scripts/check_refactor_contract.py",
+      "test_verify": "tests/selftest.py",
+      "good_fixture": "references/tech-lead-golden-proof.json",
+      "hollow_fixture": null,
+      "hollow_mutations": "rewritten historical blob, hidden B0 regression, missing old strength, structural score represented as behavioral uplift, synthetic real-task evidence represented as live provider evidence, or missing #308/#315 exact-subject trace",
+      "covers": [
+        "the Tech Lead old/B0/B1/B2 treatments remain frozen",
+        "B0 runtime regression remains visible",
+        "B2 deterministic causal closure is distinguished from model uplift",
+        "the production-shaped worktree/subprocess A/B is distinguished from admitted consumer/provider runtime",
+        "remaining live lanes stay NOT_EXERCISED or HUMAN_ADMIT_REQUIRED"
+      ],
+      "expected": "the content-addressed Tech Lead proof ledger validates without claiming live model/provider/Git Town/Forgejo dominance"
+    }
+  ],
+  "evidence_boundary": {
+    "established": [
+      "the portable refactor method and typed contract shape in issue #327"
+    ],
+    "not_established": [
+      "checker or mutation correctness until issue #328 lands",
+      "registry and CI admission until issue #329 lands",
+      "live model/provider behavior, Git Town/Forgejo delivery, merge, release or production readiness"
+    ]
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "schema": "procedural-core-refactor/cases/v1",
+  "skill": "procedural-core-refactor",
+  "cases": [
+    {
+      "id": "PCR-POSITIVE-CONTRACT",
+      "kind": "positive",
+      "input": "references/example-refactor-contract.json",
+      "expected_state": "STATIC_CONTRACT",
+      "expected_result": "PASS after issue #328 adds the owning checker",
+      "claims_not_proven": [
+        "target refactor correctness",
+        "live model or provider behavior",
+        "delivery or merge"
+      ]
+    },
+    {
+      "id": "PCR-HOLLOW-SEPARATION-ONLY",
+      "kind": "hollow",
+      "input": "a shorter provider-neutral SKILL.md with no assertion or module runtime route",
+      "expected_state": "FAIL",
+      "expected_result": "refuse completion because separation alone is not executable closure"
+    },
+    {
+      "id": "PCR-MUTATION-MUTABLE-HISTORY",
+      "kind": "mutation",
+      "input": "historical treatment marked mutable or replaced",
+      "expected_state": "FAIL",
+      "expected_result": "PCR-LAW-002 turns red"
+    },
+    {
+      "id": "PCR-MUTATION-DEAD-ASSERTION",
+      "kind": "mutation",
+      "input": "hard law without executable owner or planted negative control",
+      "expected_state": "FAIL",
+      "expected_result": "PCR-LAW-006 turns red"
+    },
+    {
+      "id": "PCR-MUTATION-MODULE-PRESENCE-AS-RUNTIME",
+      "kind": "mutation",
+      "input": "module link exists but trigger/predecessor/receipt causality is absent",
+      "expected_state": "FAIL",
+      "expected_result": "PCR-LAW-005 and PCR-LAW-007 turn red"
+    },
+    {
+      "id": "PCR-MUTATION-FIXTURE-PROMOTION",
+      "kind": "mutation",
+      "input": "fixture or synthetic evidence represented as live provider/model PASS",
+      "expected_state": "FAIL",
+      "expected_result": "PCR-LAW-008 turns red"
+    },
+    {
+      "id": "PCR-MUTATION-UNMATCHED-AB",
+      "kind": "mutation",
+      "input": "A/B arms use different task, base, tests, budgets or carrier",
+      "expected_state": "FAIL",
+      "expected_result": "PCR-LAW-009 turns red"
+    },
+    {
+      "id": "PCR-MUTATION-LOCAL-PASS-GLOBAL-FAIL",
+      "kind": "mutation",
+      "input": "local candidate passes while global objective or cleanup fails",
+      "expected_state": "FAIL",
+      "expected_result": "PCR-LAW-010 turns red"
+    },
+    {
+      "id": "PCR-MUTATION-AUTHORITY-WIDENING",
+      "kind": "mutation",
+      "input": "module or refactor grants merge, publication, provider activation or promotion",
+      "expected_state": "FAIL",
+      "expected_result": "PCR-LAW-011 turns red"
+    }
+  ]
+}

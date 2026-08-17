@@ -1,0 +1,155 @@
+{
+  "schema": "procedural-core-refactor/contract/v1",
+  "refactor_id": "agentic-tech-lead-golden-proof-standard-v1",
+  "target": {
+    "repository": "ed3c/skills-shared",
+    "skill_path": "skills/agentic-tech-lead-orchestration/SKILL.md",
+    "commit": "dbcfdb4df76609822893aeb595e5f8ada8483435",
+    "tree": "575d7e605be9f85c9b1f96b4d71a2116370d2ac5",
+    "rollback_commit": "dbcfdb4df76609822893aeb595e5f8ada8483435"
+  },
+  "objective": {
+    "goal": "Preserve the old causal strengths while separating portable procedure from provider/domain modules and binding every runtime transition to executable proof.",
+    "non_goals": [
+      "activate providers",
+      "claim live model uplift",
+      "perform merge or publication"
+    ]
+  },
+  "baseline": {
+    "immutable": true,
+    "skill_blob": "a01f53592cda98f61b413b4467afa96356fb4ef7",
+    "module_blobs": ["812f161c8abbe0517502ea988673197519132c1c"],
+    "strengths": [
+      "explicit T0-T10 causal narrative",
+      "bounded repair and Human delivery authority"
+    ],
+    "known_failures": [
+      "provider and runtime details mixed into the portable body"
+    ]
+  },
+  "ownership": [
+    {
+      "atom_id": "PORTABLE-PROCEDURE",
+      "kind": "PROCEDURE",
+      "source": "skills/agentic-tech-lead-orchestration/SKILL.md",
+      "owner": "SKILL",
+      "target": "portable states and hard laws"
+    },
+    {
+      "atom_id": "PROVIDER-PROFILE",
+      "kind": "DOMAIN",
+      "source": "skills/agentic-tech-lead-orchestration/SKILL.md",
+      "owner": "MODULE",
+      "target": "modules/domain-profile.md"
+    },
+    {
+      "atom_id": "TASK-CONTRACT",
+      "kind": "CONTRACT",
+      "source": "skills/agentic-tech-lead-orchestration/references/task-contract.schema.json",
+      "owner": "REFERENCE",
+      "target": "typed task packet"
+    },
+    {
+      "atom_id": "CAUSAL-ASSERTION",
+      "kind": "ASSERTION",
+      "source": "skills/agentic-tech-lead-orchestration/scripts/assert_capability_dag.py",
+      "owner": "SCRIPT",
+      "target": "receipt-gated capability transition"
+    },
+    {
+      "atom_id": "REAL-TASK-AB",
+      "kind": "TEST",
+      "source": "skills/agentic-tech-lead-orchestration/tests/real_task_ab.py",
+      "owner": "TEST",
+      "target": "matched production-shaped deterministic task"
+    },
+    {
+      "atom_id": "LIVE-PROVIDERS",
+      "kind": "LIVE_RUNTIME",
+      "source": "skills/agentic-tech-lead-orchestration/modules/domain-profile.md",
+      "owner": "CONSUMER_RUNTIME",
+      "target": "exact-subject provider and delivery receipts"
+    }
+  ],
+  "laws": [
+    {"id": "PCR-LAW-001", "assertion_owner": "skills/procedural-core-refactor/scripts/check_refactor_contract.py", "test_owner": "skills/procedural-core-refactor/tests/selftest.py", "positive_control": "exact baseline identities", "negative_control": "mutable baseline"},
+    {"id": "PCR-LAW-002", "assertion_owner": "skills/procedural-core-refactor/scripts/check_refactor_contract.py", "test_owner": "skills/procedural-core-refactor/tests/selftest.py", "positive_control": "immutable treatment set", "negative_control": "historical arm mutable"},
+    {"id": "PCR-LAW-003", "assertion_owner": "skills/procedural-core-refactor/scripts/check_refactor_contract.py", "test_owner": "skills/procedural-core-refactor/tests/selftest.py", "positive_control": "strength and failure inventory", "negative_control": "old strength omitted"},
+    {"id": "PCR-LAW-004", "assertion_owner": "skills/procedural-core-refactor/scripts/check_refactor_contract.py", "test_owner": "skills/procedural-core-refactor/tests/selftest.py", "positive_control": "exclusive ownership map", "negative_control": "provider atom owned by SKILL"},
+    {"id": "PCR-LAW-005", "assertion_owner": "skills/procedural-core-refactor/scripts/check_refactor_contract.py", "test_owner": "skills/procedural-core-refactor/tests/selftest.py", "positive_control": "trigger-selected module", "negative_control": "selected module without trigger"},
+    {"id": "PCR-LAW-006", "assertion_owner": "skills/procedural-core-refactor/scripts/check_refactor_contract.py", "test_owner": "skills/procedural-core-refactor/tests/selftest.py", "positive_control": "law assertion and test route", "negative_control": "missing assertion owner"},
+    {"id": "PCR-LAW-007", "assertion_owner": "skills/procedural-core-refactor/scripts/check_refactor_contract.py", "test_owner": "skills/procedural-core-refactor/tests/selftest.py", "positive_control": "separate reachability and receipt proof", "negative_control": "link treated as invocation"},
+    {"id": "PCR-LAW-008", "assertion_owner": "skills/procedural-core-refactor/scripts/check_refactor_contract.py", "test_owner": "skills/procedural-core-refactor/tests/selftest.py", "positive_control": "explicit evidence classes", "negative_control": "fixture promoted to live"},
+    {"id": "PCR-LAW-009", "assertion_owner": "skills/procedural-core-refactor/scripts/check_refactor_contract.py", "test_owner": "skills/procedural-core-refactor/tests/selftest.py", "positive_control": "matched A/B envelope", "negative_control": "different budget or carrier"},
+    {"id": "PCR-LAW-010", "assertion_owner": "skills/procedural-core-refactor/scripts/check_refactor_contract.py", "test_owner": "skills/procedural-core-refactor/tests/selftest.py", "positive_control": "global objective and cleanup required", "negative_control": "local-only PASS"},
+    {"id": "PCR-LAW-011", "assertion_owner": "skills/procedural-core-refactor/scripts/check_refactor_contract.py", "test_owner": "skills/procedural-core-refactor/tests/selftest.py", "positive_control": "issue branch and exact-subject trace", "negative_control": "authority widened or trace absent"}
+  ],
+  "modules": [
+    {
+      "module_id": "golden-proof-tech-lead",
+      "path": "skills/procedural-core-refactor/modules/golden-proof-tech-lead.md",
+      "selection": "NOT_APPLICABLE",
+      "trigger_evidence": [],
+      "predecessor_states": ["STRUCTURAL_AB", "REAL_TASK_AB"],
+      "produces_state": "GOLDEN_PROOF_ADMITTED",
+      "fallback": "SKIP",
+      "evidence_ceiling": "NOT_IMPLEMENTED",
+      "authority_widening": false
+    }
+  ],
+  "treatments": [
+    {"arm": "A_OLD_MONOLITH", "role": "OLD_BASELINE", "blob": "a01f53592cda98f61b413b4467afa96356fb4ef7", "immutable": true},
+    {"arm": "B0_REFACTOR_AS_LANDED", "role": "REFACTOR_AS_LANDED", "blob": "8b2da7443aff7a9f53412b5af280048203bbd5e9", "immutable": true},
+    {"arm": "B1_REACHABILITY_REPAIRED", "role": "REPAIRED", "blob": "51c3fd81749598957f2b993c4d31c3b4c8c277c1", "immutable": true}
+  ],
+  "ab": {
+    "structural_required": true,
+    "real_task_claim": false,
+    "matched": false,
+    "same_task": false,
+    "same_base": false,
+    "same_tests": false,
+    "same_budgets": false,
+    "same_carrier": false,
+    "failed_arms_retained": true,
+    "global_objective_required": true,
+    "cleanup_required": true
+  },
+  "evidence": {
+    "contract": "IMPLEMENTED",
+    "structural_ab": "NOT_IMPLEMENTED",
+    "real_task_ab": "NOT_IMPLEMENTED",
+    "live_model": "NOT_EXERCISED",
+    "provider_runtime": "NOT_EXERCISED",
+    "delivery": "NOT_EXERCISED",
+    "merge": "HUMAN_ADMIT_REQUIRED"
+  },
+  "authority": {
+    "automation_forbidden": [
+      "merge",
+      "publication",
+      "provider_activation",
+      "permission_change",
+      "semantic_conflict_resolution",
+      "promotion",
+      "release",
+      "force_push"
+    ],
+    "human_owned": [
+      "merge",
+      "publication admission",
+      "provider activation",
+      "permission change",
+      "semantic conflict resolution",
+      "promotion and release"
+    ]
+  },
+  "trace": {
+    "issues": [326, 327, 328, 329],
+    "pull_requests": [],
+    "branches": ["refactor/327-procedural-core-standard"],
+    "exact_heads": [],
+    "ci_runs": []
+  }
+}

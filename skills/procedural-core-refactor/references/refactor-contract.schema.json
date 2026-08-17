@@ -1,0 +1,202 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skills-shared.invalid/procedural-core-refactor/refactor-contract.schema.json",
+  "title": "Procedural Core Refactor Contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "refactor_id",
+    "target",
+    "objective",
+    "baseline",
+    "ownership",
+    "laws",
+    "modules",
+    "treatments",
+    "ab",
+    "evidence",
+    "authority",
+    "trace"
+  ],
+  "$defs": {
+    "sha40": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "path": {"type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+$"},
+    "evidenceState": {
+      "enum": [
+        "IMPLEMENTED",
+        "PASS",
+        "FAIL",
+        "ABSENT",
+        "NOT_IMPLEMENTED",
+        "NOT_EXERCISED",
+        "SKIPPED_BY_POLICY",
+        "INSUFFICIENT_EVIDENCE",
+        "CONTESTED",
+        "HUMAN_ADMIT_REQUIRED"
+      ]
+    }
+  },
+  "properties": {
+    "schema": {"const": "procedural-core-refactor/contract/v1"},
+    "refactor_id": {"type": "string", "minLength": 1},
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "skill_path", "commit", "tree", "rollback_commit"],
+      "properties": {
+        "repository": {"type": "string", "minLength": 1},
+        "skill_path": {"$ref": "#/$defs/path"},
+        "commit": {"$ref": "#/$defs/sha40"},
+        "tree": {"$ref": "#/$defs/sha40"},
+        "rollback_commit": {"$ref": "#/$defs/sha40"}
+      }
+    },
+    "objective": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["goal", "non_goals"],
+      "properties": {
+        "goal": {"type": "string", "minLength": 1},
+        "non_goals": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true}
+      }
+    },
+    "baseline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["immutable", "skill_blob", "module_blobs", "strengths", "known_failures"],
+      "properties": {
+        "immutable": {"const": true},
+        "skill_blob": {"$ref": "#/$defs/sha40"},
+        "module_blobs": {"type": "array", "items": {"$ref": "#/$defs/sha40"}, "uniqueItems": true},
+        "strengths": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+        "known_failures": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true}
+      }
+    },
+    "ownership": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["atom_id", "kind", "source", "owner", "target"],
+        "properties": {
+          "atom_id": {"type": "string", "pattern": "^[A-Z0-9][A-Z0-9._-]*$"},
+          "kind": {"enum": ["PROCEDURE", "DOMAIN", "CONTRACT", "ASSERTION", "TEST", "NAVIGATION", "LIVE_RUNTIME"]},
+          "source": {"$ref": "#/$defs/path"},
+          "owner": {"enum": ["SKILL", "MODULE", "REFERENCE", "SCRIPT", "TEST", "README", "CONSUMER_RUNTIME"]},
+          "target": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "laws": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "assertion_owner", "test_owner", "positive_control", "negative_control"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^PCR-LAW-[0-9]{3}$"},
+          "assertion_owner": {"$ref": "#/$defs/path"},
+          "test_owner": {"$ref": "#/$defs/path"},
+          "positive_control": {"type": "string", "minLength": 1},
+          "negative_control": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "modules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["module_id", "path", "selection", "trigger_evidence", "predecessor_states", "produces_state", "fallback", "evidence_ceiling", "authority_widening"],
+        "properties": {
+          "module_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$"},
+          "path": {"$ref": "#/$defs/path"},
+          "selection": {"enum": ["REQUIRED", "OPTIONAL_SELECTED", "NOT_APPLICABLE"]},
+          "trigger_evidence": {"type": "array", "items": {"type": "string", "minLength": 1}},
+          "predecessor_states": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+          "produces_state": {"type": "string", "minLength": 1},
+          "fallback": {"enum": ["STOP", "SKIP", "DIRECT_SOURCE", "MANUAL_REVIEW"]},
+          "evidence_ceiling": {"$ref": "#/$defs/evidenceState"},
+          "authority_widening": {"const": false}
+        }
+      }
+    },
+    "treatments": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["arm", "role", "blob", "immutable"],
+        "properties": {
+          "arm": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]*$"},
+          "role": {"enum": ["OLD_BASELINE", "REFACTOR_AS_LANDED", "REPAIRED", "CURRENT_CANDIDATE"]},
+          "blob": {"$ref": "#/$defs/sha40"},
+          "immutable": {"const": true}
+        }
+      }
+    },
+    "ab": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["structural_required", "real_task_claim", "matched", "same_task", "same_base", "same_tests", "same_budgets", "same_carrier", "failed_arms_retained", "global_objective_required", "cleanup_required"],
+      "properties": {
+        "structural_required": {"const": true},
+        "real_task_claim": {"type": "boolean"},
+        "matched": {"type": "boolean"},
+        "same_task": {"type": "boolean"},
+        "same_base": {"type": "boolean"},
+        "same_tests": {"type": "boolean"},
+        "same_budgets": {"type": "boolean"},
+        "same_carrier": {"type": "boolean"},
+        "failed_arms_retained": {"const": true},
+        "global_objective_required": {"const": true},
+        "cleanup_required": {"const": true}
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contract", "structural_ab", "real_task_ab", "live_model", "provider_runtime", "delivery", "merge"],
+      "properties": {
+        "contract": {"$ref": "#/$defs/evidenceState"},
+        "structural_ab": {"$ref": "#/$defs/evidenceState"},
+        "real_task_ab": {"$ref": "#/$defs/evidenceState"},
+        "live_model": {"$ref": "#/$defs/evidenceState"},
+        "provider_runtime": {"$ref": "#/$defs/evidenceState"},
+        "delivery": {"$ref": "#/$defs/evidenceState"},
+        "merge": {"$ref": "#/$defs/evidenceState"}
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["automation_forbidden", "human_owned"],
+      "properties": {
+        "automation_forbidden": {
+          "type": "array",
+          "minItems": 6,
+          "uniqueItems": true,
+          "items": {"enum": ["merge", "publication", "provider_activation", "permission_change", "semantic_conflict_resolution", "promotion", "release", "force_push"]}
+        },
+        "human_owned": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}, "uniqueItems": true}
+      }
+    },
+    "trace": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["issues", "pull_requests", "branches", "exact_heads", "ci_runs"],
+      "properties": {
+        "issues": {"type": "array", "minItems": 1, "items": {"type": "integer", "minimum": 1}, "uniqueItems": true},
+        "pull_requests": {"type": "array", "items": {"type": "integer", "minimum": 1}, "uniqueItems": true},
+        "branches": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+        "exact_heads": {"type": "array", "items": {"$ref": "#/$defs/sha40"}, "uniqueItems": true},
+        "ci_runs": {"type": "array", "items": {"type": "integer", "minimum": 1}, "uniqueItems": true}
+      }
+    }
+  }
+}
