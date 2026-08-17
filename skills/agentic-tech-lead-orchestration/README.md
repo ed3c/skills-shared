@@ -1,41 +1,185 @@
-# agentic-tech-lead-orchestration
+# `agentic-tech-lead-orchestration`
 
-Portable contract-first orchestration for turning one large coding request into a dependency-aware branch team. `SKILL.md` owns the method; `modules/` contains optional provider/delivery adapters; `references/` contains stable packet schemas and prompt templates; `scripts/` contains deterministic assertions.
+Portable contract-first orchestration for turning one large coding request into a dependency-aware branch team. `SKILL.md` owns the method; `references/` owns host-neutral contracts; `modules/` contains trigger-selected provider/runtime/delivery interpretations; `scripts/` and `tests/` own executable assertions and falsifiers.
 
-## Data flow
+## Read order
+
+1. [`AGENTS.md`](AGENTS.md)
+2. [`SKILL.md`](SKILL.md)
+3. task, capability and scheduler schemas under [`references/`](references/README.md)
+4. [`modules/README.md`](modules/README.md), then only selected modules
+5. [`scripts/README.md`](scripts/README.md)
+6. [`tests/README.md`](tests/README.md)
+7. [`../skill-refactor-proof-loop/README.md`](../skill-refactor-proof-loop/README.md) and its golden registry
+8. exact issue, PR base/head, workflow and receipt subjects
+
+## Directory map → State Machine ownership
+
+```text
+skills/agentic-tech-lead-orchestration/
+├── AGENTS.md
+│   └── Agent read order, writer leases, evidence and authority boundary
+├── README.md
+│   └── current integration state, directory map, State Machine, DAG and data flow
+├── SKILL.md
+│   └── portable request → task → capability → Worker → convergence law
+├── references/
+│   ├── task-contract.schema.json
+│   ├── capability-plan.schema.json
+│   ├── capability-receipts.schema.json
+│   ├── scheduler-lifecycle.schema.json
+│   ├── prompt/task examples and causal maps
+│   └── frozen contract and evidence vocabulary
+├── modules/
+│   ├── domain-profile.md
+│   ├── deterministic-code-intelligence.md
+│   ├── semantic-intent-anchor.md
+│   ├── agent-executor.md
+│   ├── vector-store.md
+│   ├── tournament-mode.md
+│   └── stacked-delivery.md
+├── scripts/
+│   ├── task shape and semantic gates
+│   ├── capability causal-DAG gate
+│   ├── reachability and core-boundary gates
+│   └── scheduler lifecycle validation
+└── tests/
+    ├── structural/reachability A/B
+    ├── capability and scheduler mutation controls
+    ├── frozen historical treatments
+    └── production-shaped matched real-task A/B
+```
+
+The executable mechanism index is generated from current bytes:
+
+```bash
+python3 ../../scripts/check_skill_entry_routes.py \
+  --skill agentic-tech-lead-orchestration --print-index
+```
+
+## Runtime State Machine
+
+```text
+REQUEST_BOUND
+→ SYSTEM_CONTRACT_EXTRACTED
+→ CAPABILITY_PLAN_COMPILED
+→ CAPABILITY_PLAN_ASSERTED
+→ CONTEXT_ADMITTED
+→ TASK_DAG_COMPILED
+→ TASK_SCHEMA_ASSERTED
+→ TASK_SEMANTICS_ASSERTED
+→ WORKERS_ADMITTED
+→ LEASES_BOUND
+→ ATTEMPTS_EXECUTED
+→ RESULTS_VERIFIED
+→ CANDIDATES_COMPARED
+→ CONVERGENCE_APPLIED
+→ GLOBAL_OBJECTIVE_ASSERTED
+→ DELIVERY_HANDOFF
+→ HUMAN_ADMIT_REQUIRED
+```
+
+Failure/control states include stale attempts, lease expiry, retryable/terminal failure, cancellation, supersession, straggler detach, authority block, semantic conflict, non-decomposable task, and duplicate suppression. A state declared only in a schema or fixture is not runtime evidence.
+
+## Task and branch DAG
+
+```text
+contract/interface freeze
+├─ path-disjoint implementation sibling A
+├─ path-disjoint implementation sibling B
+├─ matched tournament replicas for one locked output contract
+└─ independent verifier/negative-control leaves
+      ↓ verified results only
+one convergence owner
+      ↓ local + global objective oracles
+optional true Stack child only when unmerged parent bytes are consumed
+      ↓ delivery handoff
+Human review/merge
+```
+
+False edges are rejected. Path-disjoint work remains siblings. A dependent convergence attempt rebinds its base at lease time to the verified integrated prerequisites; independent candidates retain the common frozen base so comparison remains fair.
+
+## End-to-end data flow
 
 ```text
 Issue / PRD / PDF
-→ repository routing
-→ locked task contract
-→ grepai candidate intent anchors (optional)
+→ task contract and immutable interface/test anchors
+→ optional semantic intent candidates
 → current-source readback
-→ SCIP + SQLite deterministic impact graph (when admitted)
-→ Tree-sitter context slicing
-→ DAG + Worktree prompt packets
-→ Serena or another admitted Worker executor
-→ bounded gates and repair
-→ tournament selection or Git Town Stack
-→ Forgejo/GitHub review boundary
+→ admitted deterministic graph/structural context
+→ true task DAG + path/resource leases
+→ isolated worktree/process attempts
+→ bounded checkpoint/retry/self-heal
+→ independent local oracles
+→ tournament comparison with complete denominator
+→ convergence from verified prerequisite bytes
+→ frozen global-objective oracle
+→ optional Stack/delivery receipts
 → Human Admit
 ```
 
 `code-graph-rag` is intentionally not an active dependency. A consumer may retain old files for migration/audit, but the task contract assertion rejects it as a runtime provider.
 
-## Read order
+## Golden refactor proof
 
-1. repository instructions and current task packet;
-2. `SKILL.md`;
-3. `references/task-contract.schema.json`;
-4. `references/fanout-prompt.md`;
-5. `modules/README.md`, then only required modules;
-6. executable assertion and selftest.
+The first proof-carrying refactor line is:
+
+```text
+PR #308  deterministic reachability + receipt-gated capability repair
+└─ PR #315 production-shaped hermetic real-task proof
+   └─ PR #323 generalized proof contract and registry
+```
+
+Frozen treatments:
+
+```text
+A  OLD_MONOLITH              a01f53592cda98f61b413b4467afa96356fb4ef7
+B0 REFACTOR_AS_LANDED        8b2da7443aff7a9f53412b5af280048203bbd5e9
+B1 REACHABILITY_REPAIRED     51c3fd81749598957f2b993c4d31c3b4c8c277c1
+B2 CAUSAL_DAG_REPAIRED       current owner SKILL blob bound by registry
+```
+
+Matched deterministic result:
+
+```text
+A/B1/B2 functional output      PASS and byte-equivalent
+B0                              BLOCKED_DISPATCH_ROUTE_ABSENT
+B2 task/schema/semantic gates   PASS
+B2 capability receipt causality PASS
+parallel worktree processes     PASS on hermetic subject
+checkpoint/retry/tournament     PASS on hermetic subject
+global objective and cleanup    PASS on hermetic subject
+live model/provider quality     NOT_EXERCISED
+Git Town/Forgejo delivery       NOT_EXERCISED
+merge                           HUMAN_ADMIT_REQUIRED
+```
+
+The proof is registered by `skill-refactor-proof-loop`; its implementation remains here and is not copied into the generalized Skill.
+
+## Remaining evidence DAG
+
+```text
+#231 live scheduler receipts
+├─ #232 independent Shadow/global objective
+├─ #256 exact-subject code-intelligence/executor adapters
+└─ #234 real Git Town/dual-forge delivery
+      ↓ matched subjects
+#312 Phase 2 live A/B
+      ↓ external review
+Human merge/release admission
+```
+
+These issues are separately owned evidence lanes, not artificial Stack children.
 
 ## Local verification
 
 ```bash
-python3 scripts/assert_task_contract.py --contract references/example-stack-contract.json --receipt /tmp/agentic-tech-lead-receipt.json
+python3 scripts/check_task_contract_schema.py --selftest
+python3 scripts/assert_task_contract.py \
+  --contract references/example-stack-contract.json \
+  --receipt /tmp/agentic-tech-lead-receipt.json
+python3 tests/real_task_ab.py
 sh tests/run-all.sh
 ```
 
-A local PASS validates the packet mechanics only. Live providers, index freshness, Worktrees, Git Town, Forgejo, CI, and model quality remain `NOT_EXERCISED` until separate receipts exist.
+A local or CI PASS validates only the named subject and evidence layer. Provider installation, index freshness, real model behavior, Git Town/Forgejo delivery, merge, release, and production remain separate.

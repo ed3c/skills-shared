@@ -1,6 +1,6 @@
 # AGENTS.md — skills-shared operating contract
 
-`skills-shared` is the canonical **Instruction / Method Plane** for cross-repository Skills and the truth-gated Skill Eval/Evolution system. It is not a product monorepo and it must not absorb consumer paths, branches, credentials, provider sessions, or live receipts.
+`skills-shared` is the canonical **Instruction / Method Plane** for cross-repository Skills and the truth-gated Skill Eval/Evolution system. It is not a product monorepo and must not absorb consumer paths, branches, credentials, provider sessions, or live receipts.
 
 ## Mandatory multi-hop read order
 
@@ -9,17 +9,18 @@ Before changing this repository, read in order:
 1. [`README.md`](README.md) — repository role and current integrated state.
 2. [`CONTEXT.md`](CONTEXT.md) — mutable current handoff and four-repository relationship.
 3. [`ARCHITECTURE.md`](ARCHITECTURE.md) — stable ownership and authority boundaries.
-4. [`docs/INDEX.md`](docs/INDEX.md) — same-name document routes.
-5. [`docs/architecture/DOCUMENT_ROUTING.md`](docs/architecture/DOCUMENT_ROUTING.md) — shared routing contract and assertions.
-6. [`docs/AGENT_INTEGRATION_STATE.md`](docs/AGENT_INTEGRATION_STATE.md) — current Skill Eval/Evolution handoff.
-7. [`docs/SKILL_EVAL_ROADMAP.md`](docs/SKILL_EVAL_ROADMAP.md) — target phases; target is not current state.
+4. [`docs/INDEX.md`](docs/INDEX.md) — document routes.
+5. [`docs/architecture/DOCUMENT_ROUTING.md`](docs/architecture/DOCUMENT_ROUTING.md) — shared routing contract.
+6. [`docs/architecture/STATE_MACHINES.md`](docs/architecture/STATE_MACHINES.md) — document, Skill, refactor, Tech Lead and publication transitions.
+7. [`docs/traceability/TRACEABILITY_INDEX.md`](docs/traceability/TRACEABILITY_INDEX.md) — issue/PR/eval/evidence lineage.
 8. [`registry.json`](registry.json) and [`skills/README.md`](skills/README.md).
-9. The target Skill's nearest `README.md`, then `SKILL.md`, `references/`, `modules/`, `scripts/`, `tests/`, and `evals.json`/`cases.json` as applicable.
-10. The exact issue, PR base/head, eval contract, and evidence subject.
+9. The target Skill's nearest `AGENTS.md`, then `README.md`, `SKILL.md`, `references/`, `modules/`, `scripts/`, `tests/`, and `evals.json`/`cases.json` as applicable.
+10. For a material Skill refactor, [`skills/skill-refactor-proof-loop/AGENTS.md`](skills/skill-refactor-proof-loop/AGENTS.md) and its golden registry.
+11. The exact issue, PR base/head, eval contract, workflow and evidence subject.
 
 For GitHub delivery, read [`skills/github-delivery-loop/README.md`](skills/github-delivery-loop/README.md). For local Forgejo delivery, read [`skills/forgejo-delivery-loop/README.md`](skills/forgejo-delivery-loop/README.md). For Git Town/Stacked PR work, read [`skills/git-town-stacked-pr-worker/README.md`](skills/git-town-stacked-pr-worker/README.md).
 
-A missing route, issue, implementation target, parent, eval, or evidence subject is `ABSENT`. Do not reconstruct it from chat history, branch names, another repository, or source prose.
+A missing route, issue, implementation target, parent, eval, workflow run, or evidence subject is `ABSENT`. Do not reconstruct it from chat history, branch names, another repository, source prose, or a prior successful SHA.
 
 ## Document-route authority
 
@@ -36,16 +37,21 @@ docs/architecture/DOCUMENT_ROUTING.md
 docs/architecture/STATE_MACHINES.md
 docs/integration/CROSS_REPO_INTEGRATION.md
 docs/traceability/TRACEABILITY_INDEX.md
+<governed-directory>/AGENTS.md
 <governed-directory>/README.md
 ```
 
-`README.md` explains navigation and ownership. `AGENTS.md` defines mandatory procedure. `CLAUDE.md` is a thin host projection. `CONTEXT.md` records mutable current context. `ARCHITECTURE.md` owns stable boundaries. Machine-readable files, scripts, verifiers, receipts, and Git history remain the execution authorities.
+`README.md` explains navigation and current topology. `AGENTS.md` defines mandatory procedure and stop conditions. `CLAUDE.md` is a thin host projection. `CONTEXT.md` records mutable current context. `ARCHITECTURE.md` owns stable boundaries. Machine-readable files, scripts, verifiers, receipts, workflows and Git history remain execution authorities.
 
-## Skill anatomy: procedural core versus domain instances
-
-This separation is load-bearing:
+## Skill anatomy: procedural core versus instances
 
 ```text
+AGENTS.md
+  = local Agent read order, writer/authority contract, completion packet
+
+README.md
+  = directory ownership, State Machine, DAG, data flow, evidence ceiling, current handoff
+
 SKILL.md
   = procedural generalization: workflow, method, laws, stop conditions
 
@@ -53,16 +59,45 @@ references/
   = reusable host-neutral contracts, templates, schemas, assertion vocabulary
 
 modules/
-  = domain instances, worked examples, provider/repository-specific interpretations
-    loaded only when their trigger matches
+  = domain/golden/provider/repository instances loaded only when their trigger matches
 
 scripts/ + tests/ + evals.json or cases.json
   = deterministic mechanisms and falsifiable controls
 ```
 
-Do not put consumer branch names, repository paths, credentials, product topology, or live provider state into a shared `SKILL.md`. Do not make a domain module mandatory passive context for unrelated tasks. If an example becomes a universal law, promote the law into `SKILL.md` through an eval-first governance change; keep the example in `modules/`.
+Do not put consumer branch names, machine paths, credentials, product topology, or live provider state into a shared `SKILL.md`. Do not make a domain module passive context for unrelated tasks. If an example becomes a universal law, promote the law through eval-first governance and keep the example in `modules/`.
 
-The canonical routing example is under [`skills/knowledge-continuity/`](skills/knowledge-continuity/README.md). `forgejo-delivery-loop` demonstrates the complementary pattern: generic contracts in `references/`, operational/domain details in `modules/`, deterministic route logic in `scripts/`, and consumer-specific line/repository state in `.skill-bindings/`.
+## Mandatory proof-carrying Skill refactors
+
+A material refactor includes monolith-to-module extraction, provider/domain decoupling, moved assertion routes, changed runtime entrypoints, changed State Machine ownership, or a new evidence ceiling. It must follow [`skill-refactor-proof-loop`](skills/skill-refactor-proof-loop/README.md).
+
+Before mutation, bind:
+
+```text
+A   OLD_CANONICAL immutable bytes
+B0  REFACTOR_AS_LANDED immutable bytes
+B1+ REPAIRED_CANDIDATE bytes
+protected old strengths
+claimed proof layer
+same base/tree/contracts/tests/budget/carrier for matched L3+
+complete denominator and cleanup policy
+true parent/sibling/convergence DAG
+remaining evidence owners and issues
+rollback subject and Human boundary
+```
+
+Proof layers are separate:
+
+```text
+L0 SOURCE_FREEZE
+L1 STRUCTURAL_REACHABILITY
+L2 EXECUTABLE_CONTRACT
+L3 HERMETIC_REAL_TASK
+L4 MATCHED_LIVE_MODEL_RUNTIME
+L5 DELIVERY_AND_HUMAN_ADMIT
+```
+
+A shorter or more generic Skill body is not proof. A file link is not execution. A fixture is not live evidence. A local task PASS cannot hide a failed global objective. Failed, stale, blocked, cancelled and superseded attempts remain in the denominator. Golden proofs are registered by content identity and reference their owner implementation without copying it.
 
 ## Authority layers
 
@@ -71,16 +106,17 @@ The canonical routing example is under [`skills/knowledge-continuity/`](skills/k
 | `registry.json` | shared versus repo-owned classification |
 | `SKILL.md` | portable Agent method and behavior law |
 | `references/` | reusable generic contracts and templates |
-| `modules/` | on-demand domain instances and examples |
-| directory `README.md` | local ownership, state-machine explanation, routes |
-| `evals.json` / `cases.json` / `evals/` | machine-readable eval inventory and case contracts |
+| `modules/` | on-demand instances and examples |
+| directory `AGENTS.md` / `README.md` | local procedure, ownership, State Machine, DAG, data flow, handoff |
+| `evals.json` / `cases.json` / `evals/` | machine-readable eval inventory and contracts |
 | deterministic verifier | hard-gate outcome for its declared subject |
 | `scripts/` | executable transitions |
-| `tests/` | positive, hollow, mutation, and integration controls |
-| issue / PR | one admitted change, path lease, parent graph, and evidence boundary |
-| Human Admit | merge, promotion, legal/permission expansion, rollback |
+| `tests/` | positive, hollow, mutation and integration controls |
+| issue / PR | one admitted change, path lease, parent graph and evidence boundary |
+| workflow run | execution arrival for one exact checked-out subject; not semantic authority alone |
+| Human Admit | semantic conflict, provider/permission expansion, merge, release, promotion, rollback |
 
-Markdown must not become a second API, registry, schema, verifier, receipt, capability unlock, or merge authority.
+Markdown must not become a second API, registry, schema, verifier, receipt, capability unlock, workflow result, or merge authority.
 
 ## Four-repository integration roles
 
@@ -91,43 +127,28 @@ Markdown must not become a second API, registry, schema, verifier, receipt, capa
 
 The full data flow is in [`docs/integration/CROSS_REPO_INTEGRATION.md`](docs/integration/CROSS_REPO_INTEGRATION.md). Mutable sibling checkouts and local symlinks are development conveniences, not release identities.
 
-## Codex Desktop handoff and external review
+## Codex Desktop and external-review boundary
 
-- `codex app <workspace-path>` may open the installed ChatGPT desktop app and the
-  named workspace; it does not submit a prompt, create a chat turn, or prove a
-  worktree. See the official [CLI command](https://learn.chatgpt.com/docs/developer-commands?surface=cli#cli-codex-app).
-- A `codex://threads/new?...` or `codex://new?...` deep link may prefill composer
-  text, path, origin URL, and plugin context, but **does not send the prompt**.
-  The operator must submit it; until then fresh diagnosis is
-  `FRESH_DIAGNOSIS_HANDOFF_REQUIRED`, not PASS. See official
-  [deep links](https://learn.chatgpt.com/docs/reference/commands#deep-links).
-- Codex-managed worktrees are created by the ChatGPT desktop app after a Worktree
-  chat is selected and its prompt is submitted. Do not invent `EnterWorktree`,
-  `ExitWorktree`, `codex worktree`, or `codex -w`. Codex CLI may use
-  `codex -C <existing-worktree-path>` only after standard Git worktree path/HEAD
-  evidence is bound. See official [worktrees](https://learn.chatgpt.com/docs/environments/git-worktrees).
-- A three-failure Desktop packet must name the exact `owner/repo`, request the
-  installed GitHub plugin/connector explicitly, include the issue ledger, base/head,
-  relevant history, open PRs, failing oracle and logs, and name the PR/branch that
-  may receive the solution. A short issue/PR message is not sufficient context.
-- `external-verify` resolves external claims through primary sources first.
-  `agy`, Codex CLI, Claude Code, or another model may provide cross-family review,
-  but never becomes the official truth source by agreeing with a claim.
+- `codex app <workspace-path>` opens the desktop app/workspace; it does not submit a prompt or prove a worktree.
+- A Codex deep link may prefill text and context but does not send it. Until a Human submits, state is `FRESH_DIAGNOSIS_HANDOFF_REQUIRED`.
+- A desktop Worktree exists only after the app creates it. Do not invent `codex worktree`, `EnterWorktree`, or `ExitWorktree`. Codex CLI may use `-C` only after standard Git worktree path/HEAD evidence exists.
+- A three-failure handoff names exact repository, issue ledger, base/head, history, open PRs, failing oracle/logs and the branch allowed to receive the solution.
+- External models can review observable artifacts but do not become official truth sources by agreement. Private chain of thought is never required evidence.
 
 ## Shared versus consumer-owned
 
 Shared here:
 
-- portable Skill procedures;
-- reusable method contracts and host-neutral fixtures;
-- canonical Skill Eval schemas, adapters, verifier contracts, mutation lineage, and release gates admitted by this repository.
+- portable procedures;
+- reusable host-neutral contracts and fixtures;
+- canonical Skill Eval schemas, adapters, verifier contracts, mutation lineage, refactor-proof registry and release gates admitted by this repository.
 
-Consumer-owned elsewhere:
+Consumer/runtime-owned elsewhere:
 
-- `.git-town.toml`, branch names, worktrees, path leases, repository workflows, remotes, GitHub/Forgejo identities;
-- Skills/runtime bindings and product adapters;
-- secrets, browser/device sessions, API keys, host tools, live receipts;
-- merge, promotion, permission widening, and production rollback.
+- `.git-town.toml`, branches, worktrees, leases, repository workflows, remotes, GitHub/Forgejo identities;
+- runtime bindings, product/provider adapters and exact commands;
+- secrets, browser/device sessions, API keys, local indexes and live receipts;
+- merge, promotion, permission widening, production rollback.
 
 A consumer-local copy of a shared Skill silently shadows the canonical body unless `registry.json` explicitly classifies it as repo-owned.
 
@@ -142,25 +163,44 @@ ABSENT
 NOT_IMPLEMENTED
 NOT_EXERCISED
 SKIPPED_BY_POLICY
+HUMAN_ADMIT_REQUIRED
 ```
 
-A job that never received a runner is `NOT_EXERCISED`; a job deliberately not requested by policy is `SKIPPED_BY_POLICY`. Source prose, diagrams, package presence, license labels, old SHAs, another environment, and green documentation checks cannot create runtime `PASS`.
+A job that never received a runner is `NOT_EXERCISED`; a job deliberately not requested by policy is `SKIPPED_BY_POLICY`. Source prose, diagrams, package presence, license labels, old SHAs, another environment and green documentation checks cannot create runtime `PASS`.
 
-## GitHub, Forgejo, and Stacked PR delivery
+## GitHub, Forgejo and molecular PR delivery
 
-Local commit, remote publication, CI/Actions, review, merge, and release are separate state machines.
+Local commit, remote publication, CI/Actions, review, merge and release are separate State Machines.
 
-Every automated commit is bound by [`evals/commit-roles.json`](evals/commit-roles.json), enforced by `scripts/check_commit_roles.py` from the `enforced_from` commit it records. An agent commit uses the machine-role author for its host — `agent-macro <agent-macro@claude-code.invalid>`, `agent-macro@codex-cli.invalid`, and so on — and carries matching `Driven-By` and `Driven-On` trailers. `human` is never a legal label for one. The identity rules are written out in [`commit-role.md`](skills/forgejo-delivery-loop/modules/commit-role.md); they are not Forgejo-specific despite living under that Skill, and a GitHub-only delivery is bound by them too. `enforced_from` does not move to clear a failure — a range that advances to whatever just failed enforces nothing — so an unlabelled commit is repaired at the endpoint that produced it, never by shortening the range.
+Every automated commit is bound by [`evals/commit-roles.json`](evals/commit-roles.json) and `scripts/check_commit_roles.py`. `enforced_from` does not move to clear a failure. An unclassified commit is repaired at the endpoint that produced it, never hidden by shortening the subject range.
 
-- [`github-delivery-loop`](skills/github-delivery-loop/README.md) owns GitHub issue/PR/check/publication and merge-preflight boundaries.
-- [`forgejo-delivery-loop`](skills/forgejo-delivery-loop/README.md) owns localhost Forgejo routing, line/receipt binding, deterministic outbox/recovery, and API-safe operation boundaries.
-- [`git-town-stacked-pr-worker`](skills/git-town-stacked-pr-worker/README.md) owns the portable branch/worktree/sync method.
+One Worker owns one branch and isolated worktree. Independent path-disjoint work is sibling work. A child exists only when it consumes unmerged parent bytes/contracts. Terminal implementation leaves stay small; shared index/convergence work is a separate leaf with one owner. Unattended synchronization is bounded, non-interactive, no-push and no-auto-resolve. Semantic conflict, merge, promotion and rollback remain Human/trusted-operator boundaries.
 
-One Worker owns one branch and isolated worktree. Independent path-disjoint work is sibling work. A child exists only when it consumes unmerged parent bytes. Terminal implementation leaves stay small; shared index/convergence work is a separate leaf. Unattended synchronization is bounded, non-interactive, no-push, and no-auto-resolve. Semantic conflict, merge, promotion, and rollback remain Human/trusted-operator boundaries.
+## Current proof-carrying Tech Lead line
+
+```text
+PR #308  deterministic task/capability reachability and causal-DAG repair
+└─ PR #315 production-shaped matched hermetic real-task proof
+   └─ PR #323 canonical refactor-proof contract and golden registry
+      └─ documentation/State Machine/DAG leaf
+```
+
+Current proven ceiling:
+
+```text
+L0 SOURCE_FREEZE              PASS
+L1 STRUCTURAL_REACHABILITY    PASS
+L2 EXECUTABLE_CONTRACT        PASS
+L3 HERMETIC_REAL_TASK         PASS
+L4 MATCHED_LIVE_MODEL_RUNTIME NOT_EXERCISED
+L5 DELIVERY_AND_HUMAN_ADMIT   HUMAN_ADMIT_REQUIRED
+```
+
+A, B1 and B2 produce equivalent deterministic output; B0 is blocked by its absent dispatch route. B2 proves stronger causal/evidence closure, not live model quality. Live owners remain #312 Phase 2 and #231/#232/#234/#256.
 
 ## Source-document boundary
 
-The attached architecture document is `SOURCE_PROPOSAL`. Its E2B/Firecracker, local/cloud synchronization, mobile, wallet, security, licensing, cost, latency, and recovery claims require independent verification and subject-bound receipts before becoming repository truth.
+User-supplied architecture documents are `SOURCE_PROPOSAL`. Their provider, cost, latency, security, licensing, synchronization, mobile, wallet, sandbox, conflict-repair and production claims require independent verification and exact-subject receipts before becoming repository truth.
 
 ## Completion contract
 
@@ -168,24 +208,25 @@ Before claiming completion, report:
 
 ```text
 changed Skill names and paths
-changed route/state-machine/authority boundary
-procedural core versus domain-module impact
+changed route/State-Machine/DAG/data-flow/authority boundary
+procedural core versus module impact
 shared/repo-owned classification impact
 public interface/schema/workflow impact
-evals and positive/hollow/mutation results
-exact commit, PR base/head, parent/siblings/terminal leaf
+frozen treatments and protected old strengths for a refactor
+evals and positive/hollow/mutation/matched-task results
+exact commit, PR base/head, parent/siblings/terminal/convergence leaf
 owning workflow execution versus skipped/not-run state
-remaining ABSENT / NOT_IMPLEMENTED / NOT_EXERCISED / SKIPPED_BY_POLICY
-rollback subject and Human Admit still required
+remaining ABSENT / NOT_IMPLEMENTED / NOT_EXERCISED / SKIPPED_BY_POLICY / HUMAN_ADMIT_REQUIRED
+cleanup and rollback subject
 ```
 
-Do not claim merge, promotion, capability unlock, provider recovery, GitHub/Forgejo equivalence, or live runtime success without immutable evidence.
+Do not claim merge, promotion, capability unlock, provider recovery, GitHub/Forgejo equivalence, live model uplift, or production success without immutable evidence.
 
 <!-- BEGIN SHARED RUNTIME IDENTITY -->
 ## Shared runtime identity and dual-forge preflight
 Canonical contract: [`skills/dual-forge-repository-loop/references/runtime-identity-contract.md`](skills/dual-forge-repository-loop/references/runtime-identity-contract.md).
 Before mutating delivery state, classify runtime from evidence: `CHATGPT_GITHUB_CONNECTOR | GITHUB_ACTIONS | CLAUDE_CODE_LOCAL | CODEX_CLI_LOCAL | CHATGPT_DESKTOP_WORKTREE | UNKNOWN`.
-Connector ≠ Actions ≠ local worktree. Local claims require observed checkout/remotes/branch/HEAD; Forgejo requires a resolved local binding; Desktop requires an actually created worktree. `UNKNOWN` fails closed. Runtime, model family, and forge authority are separate. One mutable branch has one writer; runtime/HEAD changes require evidence rebinding.
+Connector ≠ Actions ≠ local worktree. Local claims require observed checkout/remotes/branch/HEAD; Forgejo requires a resolved local binding; Desktop requires an actually created worktree. `UNKNOWN` fails closed. Runtime, model family and forge authority are separate. One mutable branch has one writer; runtime/HEAD changes require evidence rebinding.
 Dual-forge order: `runtime bind → GitHub ingress → local/Forgejo issue+worktree → verified Forgejo PR → local main → GitHub reconciliation → exact-head Actions → GitHub publication`.
 Three qualifying failures trigger fresh diagnosis + new worktree; no fourth blind patch.
 <!-- END SHARED RUNTIME IDENTITY -->
