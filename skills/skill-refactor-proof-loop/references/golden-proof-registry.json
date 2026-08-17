@@ -5,10 +5,7 @@
       "id": "agentic-tech-lead-real-task-ab-v1",
       "owner_skill": "agentic-tech-lead-orchestration",
       "issue": 312,
-      "pull_requests": [
-        308,
-        315
-      ],
+      "pull_requests": [308, 315],
       "entrypoint": "skills/agentic-tech-lead-orchestration/tests/real_task_ab.py",
       "runner": "skills/agentic-tech-lead-orchestration/tests/run-all.sh",
       "treatments": [
@@ -34,7 +31,7 @@
           "id": "B2_CAUSAL_DAG_REPAIRED",
           "role": "REPAIRED_CANDIDATE",
           "path": "skills/agentic-tech-lead-orchestration/SKILL.md",
-          "blob_sha": "805165f6638bd27b017f1df277ddc48dd6a27c39"
+          "blob_sha": "3fd01571b49b1dfd1c9256661fe4aafe3ecc6e99"
         }
       ],
       "proof_layers": {
@@ -63,13 +60,7 @@
         "promotion": false,
         "rollback": false
       },
-      "remaining_issues": [
-        231,
-        232,
-        234,
-        256,
-        312
-      ]
+      "remaining_issues": [231, 232, 234, 256, 312]
     }
   ]
 }
