@@ -1,0 +1,43 @@
+{
+  "artifacts": [],
+  "case_id": "autoresearch-metric-loop-plan",
+  "condition": "candidate_skill",
+  "environment": {
+    "fresh_workspace": true,
+    "network_policy": "no-network",
+    "runtime": "docker"
+  },
+  "harness": {
+    "name": "arena",
+    "version": "1"
+  },
+  "metrics": {
+    "input_tokens": 100,
+    "output_tokens": 20,
+    "retries": 0,
+    "tool_calls": 3,
+    "wall_seconds": 2.5
+  },
+  "model": {
+    "name": "model-a",
+    "provider": "test"
+  },
+  "outcome": {
+    "failure_class": null,
+    "passed": true,
+    "verifier": "script"
+  },
+  "routing": {
+    "did_invoke": true,
+    "selected_skill": "autoresearch-composer",
+    "should_invoke": true
+  },
+  "run_id": "d10eb738ecaa3ddff1bde335",
+  "sampling": {
+    "index": 1,
+    "kind": "controlled_seed",
+    "seed": 7
+  },
+  "schema_version": "skill-eval-run/v1",
+  "skill_sha": "abcdef0123456789"
+}

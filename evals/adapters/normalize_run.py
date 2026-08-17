@@ -4,14 +4,37 @@
 Translation never grants promotion authority. Sampling identity is explicit:
 callers must provide either a controlled model seed or a repetition index; a
 harness without seed control must never fabricate one.
+
+Perturbation identity is explicit for the same reason and keeps three states
+distinct, matching run-trace.schema.json: passing neither perturbation flag
+omits the field (this harness invocation does not record perturbation identity
+at all), `--no-perturbation` emits an explicit null (measured undisturbed
+baseline), and `--perturbation-id` with `--perturbation-axis` emits the named
+object. A perturbation-blind run must never be readable as proven baseline.
+
+Run identity names the world a run happened in, so an applied perturbation
+joins the identity string -- without it two runs differing only by which
+perturbation was applied would collide onto one run_id. The component is
+appended only when a perturbation object is emitted, which keeps every
+undisturbed run_id byte-identical to what earlier revisions of this adapter
+produced (evals/fixtures/run-identity/baseline-absent.json pins that). The
+cost of that stability is that the absent and explicit-null states share a
+run_id: they describe the same world and differ only in recording fidelity,
+which the trace field, not the id, is responsible for keeping distinct.
 """
 from __future__ import annotations
 
 import argparse
 import hashlib
 import json
+import re
 import sys
 from pathlib import Path
+
+# Both mirror run-trace.schema.json; a value this adapter emits that the schema
+# would reject is a trace nothing downstream can read.
+PERTURBATION_ID = re.compile(r"[a-z0-9][a-z0-9-]{2,63}")
+PERTURBATION_AXES = ["context", "tool", "state", "task"]
 
 
 def load(path: Path) -> dict:
@@ -83,6 +106,22 @@ def sampling_from_args(args) -> dict:
     return {"kind": "repetition", "index": args.repetition, "seed": None}
 
 
+def perturbation_from_args(args) -> tuple[bool, dict | None]:
+    """Return (recorded, value) so absent stays distinguishable from null."""
+    named = args.perturbation_id is not None or args.perturbation_axis is not None
+    if args.no_perturbation and named:
+        raise ValueError("--no-perturbation cannot be combined with --perturbation-id/--perturbation-axis")
+    if args.no_perturbation:
+        return True, None
+    if not named:
+        return False, None
+    if args.perturbation_id is None or args.perturbation_axis is None:
+        raise ValueError("--perturbation-id and --perturbation-axis must be provided together")
+    if not PERTURBATION_ID.fullmatch(args.perturbation_id):
+        raise ValueError(f"perturbation id is not a declarable case id: {args.perturbation_id!r}")
+    return True, {"id": args.perturbation_id, "axis": args.perturbation_axis}
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--adapter", choices=["generic", "skill-up"], required=True)
@@ -101,6 +140,13 @@ def main() -> int:
     parser.add_argument("--seed", type=int)
     parser.add_argument("--repetition", type=int)
     parser.add_argument("--should-invoke", action="store_true")
+    parser.add_argument("--perturbation-id")
+    parser.add_argument("--perturbation-axis", choices=PERTURBATION_AXES)
+    parser.add_argument(
+        "--no-perturbation",
+        action="store_true",
+        help="record an explicit undisturbed baseline instead of omitting perturbation identity",
+    )
     parser.add_argument("--output", required=True)
     args = parser.parse_args()
 
@@ -110,11 +156,14 @@ def main() -> int:
         if args.condition != "no_skill" and not args.skill_sha:
             raise ValueError("skill_sha is required except for no_skill runs")
         sampling = sampling_from_args(args)
+        records_perturbation, perturbation = perturbation_from_args(args)
         sampling_identity = f"{sampling['kind']}:{sampling['seed'] if sampling['kind'] == 'controlled_seed' else sampling['index']}"
         identity = "|".join([
             args.case_id, args.condition, args.skill_sha or "none", args.model_provider,
             args.model_name, args.harness_name, args.harness_version, args.runtime, sampling_identity,
         ])
+        if perturbation is not None:
+            identity = f"{identity}|perturbation:{perturbation['id']}"
         run_id = hashlib.sha256(identity.encode()).hexdigest()[:24]
         trace = {
             "schema_version": "skill-eval-run/v1",
@@ -149,6 +198,8 @@ def main() -> int:
             },
             "artifacts": normalized["artifacts"],
         }
+        if records_perturbation:
+            trace["perturbation"] = perturbation
         out = Path(args.output)
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(json.dumps(trace, indent=2, sort_keys=True) + "\n", encoding="utf-8")
