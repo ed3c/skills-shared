@@ -22,10 +22,11 @@ The proof implementation remains under `../agentic-tech-lead-orchestration/tests
 4. [`references/refactor-proof-contract.schema.json`](references/refactor-proof-contract.schema.json)
 5. [`references/golden-proof-registry.json`](references/golden-proof-registry.json)
 6. [`references/refactor-proof-stack.json`](references/refactor-proof-stack.json)
-7. [`modules/README.md`](modules/README.md), then only the selected golden/domain module
-8. [`scripts/README.md`](scripts/README.md)
-9. [`tests/README.md`](tests/README.md)
-10. exact issue, PR base/head, workflow and evidence subject
+7. [`evals/proof-standard-admission.json`](evals/proof-standard-admission.json)
+8. [`modules/README.md`](modules/README.md), then only the selected golden/domain module
+9. [`scripts/README.md`](scripts/README.md)
+10. [`tests/README.md`](tests/README.md)
+11. exact issue, PR base/head, workflow and evidence subject
 
 ## Directory map → State Machine ownership
 
@@ -53,6 +54,9 @@ skills/skill-refactor-proof-loop/
 │   │   └── per-Skill adoption classifications, evidence paths and gap owners
 │   └── COMPLETION_REPORT.template.md
 │       └── handoff fields; never a verifier
+├── evals/
+│   └── proof-standard-admission.json
+│       └── the owner decision that made this standard canonical; carries no evidence
 ├── modules/
 │   └── agentic-tech-lead-golden-proof.md
 │       └── selected instance pointing to the original proof owner
@@ -63,14 +67,17 @@ skills/skill-refactor-proof-loop/
 │   │   └── path/blob/runner/denominator/authority registry assertions
 │   ├── check_refactor_proof_stack.py
 │   │   └── true-child, convergence, exact-head-policy and traceability assertions
-│   └── check_skill_adoption_ledger.py
-│       └── adoption scope, evidence, executability, layer-ceiling and gap-owner assertions
+│   ├── check_skill_adoption_ledger.py
+│   │   └── adoption scope, evidence, executability, layer-ceiling and gap-owner assertions
+│   └── render_adoption_audit.py
+│       └── renders the adoption report from the ledger; --check byte-compares it
 └── tests/
     ├── run-all.sh
     ├── selftest.py
     ├── stack_selftest.py
-    └── adoption_selftest.py
-        └── positive, hollow, mutation, Stack and adoption falsifiers
+    ├── adoption_selftest.py
+    └── render_selftest.py
+        └── positive, hollow, mutation, Stack, adoption and report-drift falsifiers
 ```
 
 ## Refactor proof State Machine
@@ -166,7 +173,8 @@ The canonical machine index is [`references/refactor-proof-stack.json`](referenc
    └─ #319 → PR #323
       └─ #320 → PR #324
          └─ #321 → agent/321-refactor-proof-stack-index
-            └─ #322 planned cross-Skill adoption audit after Human admission
+            └─ #322 cross-Skill adoption audit; standard admitted 2026-08-17,
+               ledger and rendered report landed, migration leaves still open
 ```
 
 Open PR heads are deliberately not self-embedded in the same branches; the index records `READ_FROM_GITHUB_PR_METADATA`. A merged node may record an immutable merge SHA only after the state is actually observed. External issues #231, #232, #234 and #256 feed L4/L5 evidence but are not fake Stack children.
@@ -197,7 +205,11 @@ Open live owners remain issue #312 Phase 2 and issues #231, #232, #234 and #256.
 0 Skills carry live model/runtime evidence
 ```
 
-Every gap names an existing owning issue (#231, #232, #234, #256 or #322); the checker refuses an owner that is not already known, so the audit cannot invent a duplicate. Opening the remaining migration leaves, the Markdown report under `docs/traceability/`, and Human admission of the standard are outside this ledger.
+Every gap names an existing owning issue (#231, #232, #234, #256 or #322); the checker refuses an owner that is not already known, so the audit cannot invent a duplicate.
+
+[`docs/traceability/SKILL_REFACTOR_ADOPTION_AUDIT.md`](../../docs/traceability/SKILL_REFACTOR_ADOPTION_AUDIT.md) is that ledger rendered for humans by `scripts/render_adoption_audit.py`. It is a generated file: `--check` re-renders and byte-compares it from the suite, so a hand-edited or stale report is a red suite rather than a second source. Opening the remaining migration leaves stays outside this ledger.
+
+The standard the audit applies was admitted for adoption governance in [`evals/proof-standard-admission.json`](evals/proof-standard-admission.json) (`ed3c (repository owner)`, 2026-08-17, subject `main@ce68a05`). That record is a decision: it carries no run, no receipt and no measurement, and it promoted no Skill's proof level. Every state in the ledger stays exactly as measured.
 
 ## Local verification
 
@@ -214,7 +226,9 @@ python3 scripts/check_refactor_proof_stack.py \
 python3 scripts/check_skill_adoption_ledger.py \
   --ledger references/skill-adoption-ledger.json
 
+python3 scripts/render_adoption_audit.py --check
+
 bash tests/run-all.sh
 ```
 
-A green suite proves the portable mechanism, registered L3 golden proof, molecular traceability graph, and adoption ledger remain connected to current repository bytes. It does not prove live providers, model quality, Git Town/Forgejo execution, merge, release or production.
+A green suite proves the portable mechanism, registered L3 golden proof, molecular traceability graph, adoption ledger and its rendered report remain connected to current repository bytes. It does not prove live providers, model quality, Git Town/Forgejo execution, merge, release or production.
