@@ -25,6 +25,16 @@
       "id": "adoption-mutation-controls",
       "subject": "tests/adoption_selftest.py",
       "expected": "PASS_WITH_ALL_MUTATIONS_REFUSED"
+    },
+    {
+      "id": "adoption-report-current",
+      "subject": "docs/traceability/SKILL_REFACTOR_ADOPTION_AUDIT.md",
+      "expected": "PASS"
+    },
+    {
+      "id": "adoption-report-drift-controls",
+      "subject": "tests/render_selftest.py",
+      "expected": "PASS_WITH_ALL_MUTATIONS_REFUSED"
     }
   ]
 }

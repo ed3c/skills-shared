@@ -38,6 +38,8 @@ from typing import Any
 
 SCHEMA = "repo-agent-native/adapter-receipt/v1"
 
+SHA40_LIKE = re.compile(r"[0-9a-f]{40}")
+
 # Values that must never reach a receipt, checked on the way out rather than
 # trusted to never arrive.
 SECRET_PATTERNS = [
@@ -158,14 +160,21 @@ def receipt(kind: str, provider: str, repo: Path) -> dict[str, Any]:
     }
 
 
-def absent(kind: str, provider: str, repo: Path, reason: str) -> dict[str, Any]:
+def unexercised(kind: str, provider: str, repo: Path, reason: str,
+                state: str = "ABSENT") -> dict[str, Any]:
+    """A receipt for a lane that did not start a process, and why it did not.
+
+    `ABSENT` means the provider is not here. `SKIPPED_BY_POLICY` means it is here
+    and this repository refused to start it. Collapsing those two into one state
+    would hide a refusal behind a missing install.
+    """
     body = receipt(kind, provider, repo)
     body["adapter"].update({"executable": None, "version": None, "executable_sha256": None})
     body["policy"] = {"network": "none", "filesystem": "none", "secrets": "none",
                       "allowed_argv": []}
     body["budgets"] = {"timeout_seconds": 0, "max_output_bytes": 0}
     body["execution"] = {"terminal_state": "NOT_STARTED", "exit_code": None}
-    body["result"] = {"state": "ABSENT", "evidence_level": None, "result_count": 0,
+    body["result"] = {"state": state, "evidence_level": None, "result_count": 0,
                       "source_readback": {"required": False, "performed": 0, "confirmed": 0},
                       "detail": reason}
     body["residue"] = {"paths": [], "cleaned": True}
@@ -193,7 +202,7 @@ def lane_grepai(repo: Path) -> dict[str, Any]:
     """Semantic intent search. Produces B+ candidates that must be read back."""
     exe = which("grepai")
     if not exe:
-        return absent("semantic-intent-search", "grepai", repo, "grepai not on PATH")
+        return unexercised("semantic-intent-search", "grepai", repo, "grepai not on PATH")
 
     version = run([exe, "version"], repo, 30)
     version_text = version.get("_stdout", b"").decode(errors="replace").strip()
@@ -315,7 +324,7 @@ def lane_serena(repo: Path) -> dict[str, Any]:
     """Symbol/LSP lane. The receipt records the tool policy, not only the run."""
     exe = which("serena")
     if not exe:
-        return absent("symbol-lsp", "serena", repo, "serena not on PATH")
+        return unexercised("symbol-lsp", "serena", repo, "serena not on PATH")
 
     body = receipt("symbol-lsp", "serena", repo)
     tools = run([exe, "tools", "list"], repo, 120)
@@ -419,7 +428,7 @@ def lane_tree_sitter(repo: Path, python_bin: str) -> dict[str, Any]:
         "                  'source_bytes': len(src), 'definitions': defs}))\n"
     )
     if not Path(python_bin).exists():
-        return absent("syntax-slice", "tree-sitter", repo,
+        return unexercised("syntax-slice", "tree-sitter", repo,
                       f"no interpreter with tree_sitter at {python_bin}")
 
     body = receipt("syntax-slice", "tree-sitter", repo)
@@ -792,6 +801,314 @@ def lane_forgejo(repo: Path) -> dict[str, Any]:
     return body
 
 
+GIT_TOWN_ADMISSION = (Path(__file__).resolve().parent.parent / "evals"
+                      / "git-town-darwin-admission.json")
+
+# `/usr/bin/git` on darwin is a developer-tools shim that writes an xcrun cache
+# into the system temporary directory and complains on stderr when it cannot.
+# The git-town lane redirects HOME, which is exactly when it cannot, and git-town
+# reads git's output: the shim's complaint arrives *inside* the value it uses as
+# a repository path, and every stack command fails with an unreadable chdir
+# error. A lane that redirects HOME therefore has to call the real git.
+REAL_GIT_DIRS = ("/Library/Developer/CommandLineTools/usr/bin",
+                 "/Applications/Xcode.app/Contents/Developer/usr/bin")
+
+
+def git_town_gate(executable: str | None) -> tuple[str, str]:
+    """Decide whether a git-town binary may be started, before anything starts.
+
+    Three outcomes, deliberately three different states. No binary at all is
+    `ABSENT` -- the provider is not on this host. A binary whose digest this
+    repository has not admitted is `SKIPPED_BY_POLICY` -- it is here and we
+    refused it. Only an exact digest match returns `ADMITTED`.
+
+    The distinction is the whole lane. #256 admitted one artifact by SHA-256, and
+    a version string is not that digest: Homebrew's 24.0.0 and the release's
+    darwin tarball print the same version and are different files. Gating on the
+    version would admit whichever one happened to be installed.
+
+    Returns `(state, detail)`, where detail is the observed digest when admitted
+    and the refusal reason otherwise.
+    """
+    try:
+        record = json.loads(GIT_TOWN_ADMISSION.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as error:
+        return "SKIPPED_BY_POLICY", (
+            f"no readable Human admission at evals/{GIT_TOWN_ADMISSION.name} ({error!r}); "
+            f"this lane starts an external binary only where a Human admitted that exact "
+            f"artifact")
+    if record.get("schema") != "human-admit/v1":
+        return "SKIPPED_BY_POLICY", (
+            f"evals/{GIT_TOWN_ADMISSION.name} is not a human-admit/v1 record")
+    if record.get("decision") != "ADMITTED_FOR_BOUND_SCOPE":
+        return "SKIPPED_BY_POLICY", (
+            f"evals/{GIT_TOWN_ADMISSION.name} records decision "
+            f"{record.get('decision')!r}, which does not admit execution")
+    admitted = str(record.get("derived_executable_identity", {}).get("sha256", ""))
+    if not re.fullmatch(r"[0-9a-f]{64}", admitted):
+        return "SKIPPED_BY_POLICY", (
+            f"evals/{GIT_TOWN_ADMISSION.name} pins no usable executable SHA-256")
+
+    if not executable:
+        return "ABSENT", (
+            "the darwin artifact is admitted but no binary was supplied and none is on "
+            "PATH; the admission forbids installing it, so --git-town-bin names the "
+            "extracted file")
+    observed = file_sha256(Path(executable))
+    if observed is None:
+        return "ABSENT", f"nothing readable at the supplied path {executable}"
+    if observed != admitted:
+        return "SKIPPED_BY_POLICY", (
+            f"the file supplied as git-town hashes {observed}; the admission pins "
+            f"{admitted}. A different digest is a different artifact and needs its own "
+            f"Human decision, so nothing was started")
+    return "ADMITTED", observed
+
+
+def lane_git_town(repo: Path, executable: str | None) -> dict[str, Any]:
+    """Stack synchronization, against a repository this lane builds and destroys.
+
+    Every other lane reads *this* repository. This one must not: git-town creates
+    branches, rewrites ancestry and writes its own configuration, and the
+    admission scopes it to a disposable subject. So the exercised repository is
+    synthesized under TMPDIR with its own bare remote, and `subject` below is
+    only the capture-wide binding, not the thing git-town touched.
+
+    The stack it builds is read back from git, never from git-town's own output.
+    A provider confirming its own claim is `PROVIDER_SELF_ADMISSION`; `git config`
+    and `git merge-base` are an authority git-town does not write the answer to.
+    """
+    kind, provider = "stack-synchronization", "git-town"
+    state, detail = git_town_gate(executable)
+    if state != "ADMITTED":
+        return unexercised(kind, provider, repo, detail, state=state)
+    exe = str(executable)
+
+    body = receipt(kind, provider, repo)
+    body["policy"] = {
+        "allowed_argv": [[exe, "--version"], [exe, "hack", "<branch>"],
+                         [exe, "append", "<branch>"], [exe, "branch"],
+                         [exe, "sync", "--stack", "--non-interactive", "--no-push"]],
+        "network": "none",
+        "network_detail": ("the only remote is a bare repository on the local filesystem "
+                           "and sync runs --no-push, so no admitted command opens a "
+                           "socket"),
+        "filesystem": "read-write-within-temp",
+        "secrets": "none",
+        "mutation_granted": True,
+        "mutation_note": ("git-town moves branches, which is the capability under test. "
+                          "It is pointed at a repository created inside TMPDIR for this "
+                          "run; this checkout and its worktrees are outside the "
+                          "admission and are never passed to it."),
+        "admission": {
+            "record": f"evals/{GIT_TOWN_ADMISSION.name}",
+            "record_sha256": file_sha256(GIT_TOWN_ADMISSION),
+            "executable_sha256_admitted": detail,
+        },
+    }
+    body["budgets"] = {"timeout_seconds": 180, "max_output_bytes": 262144}
+
+    root = Path(tempfile.mkdtemp(prefix="adapter-git-town-"))
+    home, tmp = root / "home", root / "tmp"
+    work, remote, outside = root / "repo", root / "remote.git", root / "outside"
+    steps: list[dict[str, Any]] = []
+    controls: list[dict[str, Any]] = []
+    readback: list[dict[str, Any]] = []
+    started = time.time()
+    try:
+        for directory in (home, tmp, work, outside):
+            directory.mkdir(parents=True)
+        # HOME and TMPDIR are redirected into the disposable tree because git-town
+        # writes a runlog under the user configuration directory. Without this the
+        # provider leaves residue outside everything this receipt declares, and
+        # residue nobody declared is residue nobody cleans.
+        search = os.environ.get("PATH", "")
+        git_bin = "git"
+        for directory in REAL_GIT_DIRS:
+            if Path(directory, "git").is_file():
+                search = f"{directory}:{search}"
+                git_bin = str(Path(directory, "git"))
+                break
+        env = {**os.environ, "HOME": str(home), "TMPDIR": str(tmp), "PATH": search,
+               "GIT_CONFIG_GLOBAL": str(home / ".gitconfig"),
+               "GIT_CONFIG_SYSTEM": "/dev/null", "GIT_TERMINAL_PROMPT": "0",
+               "GIT_EDITOR": ":", "GIT_SEQUENCE_EDITOR": ":", "GIT_PAGER": "cat",
+               "PAGER": "cat", "LC_ALL": "C", "NO_COLOR": "1"}
+        (home / ".gitconfig").write_text("", encoding="utf-8")
+
+        def plain(*args: str, cwd: Path = work) -> str:
+            done = subprocess.run([git_bin, *args], cwd=str(cwd), env=env,
+                                  capture_output=True, text=True, timeout=120)
+            return done.stdout.strip() if done.returncode == 0 else ""
+
+        def setup(*args: str, cwd: Path = work) -> None:
+            subprocess.run([git_bin, *args], cwd=str(cwd), env=env, check=True,
+                           capture_output=True, timeout=120)
+
+        def town(*args: str, cwd: Path = work, record: bool = True) -> dict[str, Any]:
+            executed = run([exe, *args], cwd, 180, env=env)
+            executed.pop("_stdout", None)
+            executed.pop("_stderr", None)
+            if record:
+                steps.append(executed)
+            return executed
+
+        subprocess.run([git_bin, "init", "--bare", "-b", "main", str(remote)],
+                       env=env, check=True, capture_output=True, timeout=120)
+        setup("init", "-b", "main", ".")
+        setup("config", "user.name", "adapter-capture")
+        setup("config", "user.email", "adapter-capture@invalid")
+        setup("remote", "add", "origin", str(remote))
+        # git-town's only non-interactive configuration surface is its own Git
+        # config keys; `git-town init` requires a terminal.
+        setup("config", "git-town.main-branch", "main")
+        setup("config", "git-town.offline", "true")
+        (work / "base.txt").write_text("base\n", encoding="utf-8")
+        setup("add", "base.txt")
+        setup("commit", "-m", "base")
+        setup("push", "-u", "origin", "main")
+
+        version = run([exe, "--version"], root, 60, env=env)
+        version_text = version.pop("_stdout", b"").decode(errors="replace").strip()
+        version.pop("_stderr", None)
+        steps.append(version)
+        provider_identity(body, exe, version_text)
+        body["adapter"]["config_identity"] = {
+            "main_branch": "main",
+            "offline": True,
+            "remote": "bare repository inside the disposable tree",
+            "fixture_repository": "synthesized per run; never this checkout",
+            "git": git_bin,
+            "git_version": plain("--version", cwd=work),
+        }
+
+        town("hack", "feature-a")
+        (work / "a.txt").write_text("a\n", encoding="utf-8")
+        setup("add", "a.txt")
+        setup("commit", "-m", "feature-a work")
+
+        town("append", "feature-b")
+        (work / "b.txt").write_text("b\n", encoding="utf-8")
+        setup("add", "b.txt")
+        setup("commit", "-m", "feature-b work")
+
+        town("branch")
+        sync = town("sync", "--stack", "--non-interactive", "--no-push")
+
+        # Read-back. Each claim is answered by git, not by git-town.
+        for branch in ("feature-a", "feature-b"):
+            observed = plain("rev-parse", "--verify", "--quiet", f"refs/heads/{branch}")
+            readback.append({"claim": f"branch {branch} exists",
+                             "asked": f"git rev-parse --verify refs/heads/{branch}",
+                             "observed": observed or None,
+                             "confirmed": bool(SHA40_LIKE.fullmatch(observed or ""))})
+        for child, parent in (("feature-a", "main"), ("feature-b", "feature-a")):
+            observed = plain("config", "--get", f"git-town-branch.{child}.parent")
+            readback.append({"claim": f"{child} is a child of {parent}",
+                             "asked": f"git config --get git-town-branch.{child}.parent",
+                             "observed": observed or None,
+                             "confirmed": observed == parent})
+        contains = subprocess.run(
+            [git_bin, "merge-base", "--is-ancestor", "feature-a", "feature-b"],
+            cwd=str(work), env=env, capture_output=True, timeout=120)
+        readback.append({"claim": "the synced stack keeps feature-a inside feature-b",
+                         "asked": "git merge-base --is-ancestor feature-a feature-b",
+                         "observed": contains.returncode,
+                         "confirmed": contains.returncode == 0})
+
+        # Control: a failure has to arrive as a failure. Outside a repository the
+        # provider must exit non-zero, and this lane must record that exit rather
+        # than an empty success.
+        refused_outside = town("branch", cwd=outside, record=False)
+        controls.append({
+            "id": "failure-is-captured-as-failure", "expect": "RED",
+            "observed": "RED" if refused_outside.get("exit_code") not in (0, None)
+                        else "GREEN",
+            "exit_code": refused_outside.get("exit_code"),
+            "note": ("git-town run outside a repository. A lane that only ever recorded "
+                     "successful invocations could not tell a refusal from a hang."),
+        })
+
+        # Control: plant one flipped byte in a copy of the admitted binary and
+        # require the gate to refuse it. This is the fail-closed path exercised
+        # rather than asserted, on the real artifact.
+        tampered = root / "tampered-git-town"
+        raw = bytearray(Path(exe).read_bytes())
+        raw[-1] ^= 0x01
+        tampered.write_bytes(bytes(raw))
+        planted_state, planted_detail = git_town_gate(str(tampered))
+        controls.append({
+            "id": "admission-gate-refuses-a-tampered-binary", "expect": "RED",
+            "observed": "RED" if planted_state == "SKIPPED_BY_POLICY" else "GREEN",
+            "planted": "one byte flipped in a copy of the admitted executable",
+            "gate_state": planted_state,
+            "note": ("The gate compares digests, not version strings, so an artifact "
+                     "that differs by one byte is refused before anything starts. "
+                     "Detail: " + planted_detail[:160]),
+        })
+        controls.append({
+            "id": "stack-read-back-from-git-not-from-git-town", "expect": "RED",
+            "observed": "RED" if readback and all(r["confirmed"] for r in readback)
+                        else "GREEN",
+            "confirmed": sum(1 for r in readback if r["confirmed"]),
+            "total": len(readback),
+            "note": ("Every claim is answered by git's own refs and config. A provider "
+                     "confirming its own output is PROVIDER_SELF_ADMISSION, which the "
+                     "blindspot contract refuses."),
+        })
+
+        duration = int((time.time() - started) * 1000)
+        completed = all(step.get("terminal_state") == "COMPLETED" for step in steps)
+        exits = [step.get("exit_code") for step in steps]
+        transcript = "".join(str(step.get("stdout_sha256")) for step in steps).encode()
+        errors = "".join(str(step.get("stderr_sha256")) for step in steps).encode()
+        body["execution"] = {
+            "argv": [f"{exe} --version", f"{exe} hack feature-a",
+                     f"{exe} append feature-b", f"{exe} branch",
+                     f"{exe} sync --stack --non-interactive --no-push"],
+            "cwd": str(work),
+            "duration_ms": duration,
+            "exit_code": 0 if all(code == 0 for code in exits) else 1,
+            "terminal_state": "COMPLETED" if completed else "TIMED_OUT",
+            "stdout_bytes": sum(int(step.get("stdout_bytes") or 0) for step in steps),
+            "stdout_sha256": sha256(transcript),
+            "stderr_bytes": sum(int(step.get("stderr_bytes") or 0) for step in steps),
+            "stderr_sha256": sha256(errors),
+            "stream_digest_note": ("the top-level digests are taken over the ordered "
+                                   "per-step digests; each step carries the digest of "
+                                   "its own stream"),
+            "steps": steps,
+            "sync_exit_code": sync.get("exit_code"),
+        }
+        confirmed = sum(1 for item in readback if item["confirmed"])
+        body["controls"] = controls
+        body["result"] = {
+            "state": ("PASS" if body["execution"]["exit_code"] == 0 and completed
+                      and confirmed == len(readback) and readback else "FAIL"),
+            "evidence_level": "A",
+            "evidence_level_note": (
+                "The branches and the parent lineage were created by git-town and read "
+                "back from git itself, so this is direct evidence about the admitted "
+                "binary's behaviour. It is evidence about the disposable repository this "
+                "lane built and about nothing in ed3c/skills-shared; the subject below "
+                "binds the capture, not the thing git-town touched."),
+            "result_count": len(steps),
+            "source_readback": {"required": True, "performed": len(readback),
+                                "confirmed": confirmed},
+            "readback": readback,
+            "exercised_subject": ("a repository and bare remote created under TMPDIR for "
+                                  "this run and deleted with it"),
+        }
+    finally:
+        shutil.rmtree(root, ignore_errors=True)
+
+    body["residue"] = {"paths": [], "cleaned": not root.exists(),
+                       "note": ("the fixture repository, its bare remote, the redirected "
+                                "HOME holding git-town's runlog, and the tampered copy "
+                                "are all inside one deleted directory")}
+    return body
+
+
 def _varint(buf: bytes, pos: int) -> tuple[int, int]:
     result = shift = 0
     while True:
@@ -861,7 +1178,7 @@ def lane_scip(repo: Path, out_dir: Path) -> dict[str, Any]:
     """Compiler-derived semantic index over the Python surface."""
     exe = which("scip-python")
     if not exe:
-        return absent("compiler-semantic-index", "scip", repo,
+        return unexercised("compiler-semantic-index", "scip", repo,
                       "no scip-python on PATH; the compiler-derived relation lane has no "
                       "producer on this host")
 
@@ -968,7 +1285,7 @@ def lane_lancedb(repo: Path, out_dir: Path, python_bin: str) -> dict[str, Any]:
         "                  'tables': db.table_names()}))\n"
     )
     if not Path(python_bin).exists():
-        return absent("vector-projection", "lancedb", repo,
+        return unexercised("vector-projection", "lancedb", repo,
                       f"no interpreter with lancedb at {python_bin}")
 
     body = receipt("vector-projection", "lancedb", repo)
@@ -990,7 +1307,7 @@ def lane_lancedb(repo: Path, out_dir: Path, python_bin: str) -> dict[str, Any]:
         # projection-has-a-source-lane control GREEN -- a projection built from a
         # fabricated row, which is precisely the VECTOR_PROJECTION_ORPHAN the
         # contract refuses. The lane demonstrated the law by breaking it.
-        return absent(
+        return unexercised(
             "vector-projection", "lancedb", repo,
             "the SQLite ledger this projection reads has no rows, so there is no source "
             "lane behind it. A projection with no source is the orphan "
@@ -1056,15 +1373,6 @@ def lane_lancedb(repo: Path, out_dir: Path, python_bin: str) -> dict[str, Any]:
     return body
 
 
-ABSENT_LANES = {
-    "git-town": ("stack-synchronization", "git-town",
-                 "git-town is not installed. Homebrew offers the admitted 24.0.0, but the "
-                 "committed admission record pins a linux_intel_64 artifact by SHA-256 and "
-                 "this host is darwin; a different artifact needs its own admission, which "
-                 "is a Human decision rather than an install"),
-}
-
-
 def scrub(body: Any, path: str = "") -> list[str]:
     """Find anything secret-shaped before a receipt is written, not after."""
     found: list[str] = []
@@ -1093,6 +1401,11 @@ def main() -> int:
                              "--python-bin. They are separate because the two providers "
                              "pin different dependency trees and one environment "
                              "satisfying both is a coincidence, not a requirement")
+    parser.add_argument("--git-town-bin", default=None,
+                        help="path to the git-town binary admitted in "
+                             "evals/git-town-darwin-admission.json. It is deliberately "
+                             "not installed on PATH, so the lane is told where the "
+                             "extracted artifact is rather than searching for one")
     parser.add_argument("--lane", action="append", default=None)
     args = parser.parse_args()
 
@@ -1109,13 +1422,12 @@ def main() -> int:
         "scip": lambda: lane_scip(repo, out),
         "worktree": lambda: lane_worktree(repo),
         "forgejo": lambda: lane_forgejo(repo),
+        "git-town": lambda: lane_git_town(repo, args.git_town_bin),
         # sqlite ingests the receipts written above, and lancedb projects over
         # what sqlite ingested, so these two run last by construction.
         "sqlite": lambda: lane_sqlite(repo, out),
         "lancedb": lambda: lane_lancedb(repo, out, args.lancedb_python or args.python_bin),
     }
-    for name, (kind, provider, reason) in ABSENT_LANES.items():
-        lanes[name] = (lambda k=kind, p=provider, r=reason: absent(k, p, repo, r))
 
     selected = args.lane or list(lanes)
     written = []

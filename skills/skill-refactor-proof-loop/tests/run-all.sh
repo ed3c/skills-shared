@@ -14,6 +14,9 @@ python3 "$ROOT/scripts/check_refactor_proof_stack.py" \
 python3 "$ROOT/scripts/check_skill_adoption_ledger.py" \
   --ledger "$ROOT/references/skill-adoption-ledger.json"
 
+python3 "$ROOT/scripts/render_adoption_audit.py" --check
+
 python3 "$ROOT/tests/selftest.py"
 python3 "$ROOT/tests/stack_selftest.py"
 python3 "$ROOT/tests/adoption_selftest.py"
+python3 "$ROOT/tests/render_selftest.py"

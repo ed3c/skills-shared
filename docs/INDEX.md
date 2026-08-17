@@ -23,7 +23,7 @@
 
 - [`AGENT_INTEGRATION_STATE.md`](AGENT_INTEGRATION_STATE.md) — live Skill Eval/Evolution handoff.
 - [`SKILL_EVAL_ROADMAP.md`](SKILL_EVAL_ROADMAP.md) — target phase roadmap.
-- [`traceability/SKILL_ADOPTION_AUDIT.md`](traceability/SKILL_ADOPTION_AUDIT.md) — generated projection of the cross-Skill refactor-proof adoption ledger: per-Skill proven layer and every criterion that is not `PASS`, with its owner issue. Regenerate it, never edit it.
+- [`traceability/SKILL_REFACTOR_ADOPTION_AUDIT.md`](traceability/SKILL_REFACTOR_ADOPTION_AUDIT.md) — generated projection of the cross-Skill refactor-proof adoption ledger: per-Skill proven layer and every criterion that is not `PASS`, with its owner issue. Regenerate it with `render_adoption_audit.py`, never edit it.
 - [`traceability/TECH_LEAD_SHADOW_CLOSURE.md`](traceability/TECH_LEAD_SHADOW_CLOSURE.md) — Tech Lead closure states and the independent Shadow audit that reviews the same immutable subject without becoming a second state writer. `AGENTS.md` makes reading it a precondition for claiming closure, so an unrouted copy was a route the index required and did not name.
 - [`../skills/README.md`](../skills/README.md) — Skill directory contract.
 - [`../skills/github-delivery-loop/README.md`](../skills/github-delivery-loop/README.md) — GitHub delivery state machines.

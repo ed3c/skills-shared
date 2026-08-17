@@ -87,6 +87,24 @@ isolation limitations
 
 The runner permits one to three repetitions. Where a carrier exposes a seed, use at least three distinct admitted seeds. Where it does not, repetitions remain stochastic samples and must not be described as seeded reproducibility. The currently implemented offline source-mutation suite is a mechanism calibration control, not the required physical cross-harness matrix.
 
+## Adapter receipt captures
+
+`receipts/` holds one capture: nine lanes bound to one commit. `check_adapter_receipts.py`
+refuses a directory whose receipts span two commits, because a set read as one picture of
+one tree has to be one picture of one tree.
+
+`receipts-git-town-darwin/` is a second capture and therefore a second directory. The
+darwin git-town artifact was admitted by a Human (`git-town-darwin-admission.json`) after
+the nine-lane capture was taken, so its lane ran at a later commit. Folding it into
+`receipts/` would either span two subjects or require rerunning the other eight lanes; on a
+host where a provider is missing or loopback is blocked, that rerun replaces live evidence
+with an artifact of the sandbox it ran in. The next capture on a host with all nine
+providers live writes one directory again, and this one is deleted by that capture rather
+than kept beside it.
+
+The rule that follows: a capture directory is one subject, one run, and one moment. Adding
+a lane later adds a directory, never a receipt with a different subject.
+
 ## Change contract
 
 Cases and weights are reviewed before candidate results are visible. A candidate PR may add a missing adversarial case, but must rerun baseline and candidate under the same case/version contract.

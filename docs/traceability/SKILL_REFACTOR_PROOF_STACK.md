@@ -45,7 +45,7 @@ PLANNED after the standard and convergence are Human-admitted
 | Portable proof contract | `#319` | `#323` | true child | `skill-refactor-proof-loop`, registry, route and CI admission | L0-L5 contract, golden registry, mutation controls | GitHub PR metadata + Skill Suites/Shared Skills Infra |
 | Agent documentation | `#320` | `#324` | true child | root and nearest Agent/README/State Machine routes | cold-start integration truth and directory DAG/data flow | GitHub PR metadata + route/check workflows |
 | Molecular convergence | `#321` | `#325` | convergence | Stack schema/index/checker, Git Town README, traceability | complete issue/PR/artifact/evidence index | GitHub PR #325 metadata + exact-head workflows |
-| Adoption audit | `#322` | none | planned follow-up | no paths leased yet | cross-Skill adoption ledger and migration backlog | issue contract only |
+| Adoption audit | `#322` | delivery PRs of `agent/goal-33-issues-batch` and `agent/admit-batch` (GitHub metadata) | planned follow-up, terminal classification `PARTIAL` | `skills/skill-refactor-proof-loop/references/skill-adoption-ledger.json` + schema + checker; `docs/traceability/SKILL_REFACTOR_ADOPTION_AUDIT.md` (rendered) | cross-Skill adoption ledger, rendered audit report, standard admission (`evals/proof-standard-admission.json`, 2026-08-17) | per-gap migration issues and migration ordering still open |
 
 ## Artifact dependency edges
 

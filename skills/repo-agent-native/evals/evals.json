@@ -139,7 +139,7 @@
         "forgejo private-lane-publication lane",
         "git-town stack-synchronization lane"
       ],
-      "expected": "committed receipts pass with 8 PASS lanes and 1 ABSENT lane (git-town, pinned linux_intel_64 artifact on a darwin host, Human admission required); fourteen planted defects are refused by their exact code; an empty receipt directory is refused rather than reported clean; --bind-scheduler prints CROSS_SUBJECT_BINDING for #231's live scheduler-run receipt only while its canary-repo subject differs from the adapter subject, and refuses SUBJECT_COLLAPSED when they are made equal; see evals/ADAPTER_RECEIPT_MATRIX.md for the per-lane completion report"
+      "expected": "committed receipts pass with 8 PASS lanes and 1 ABSENT lane in the f50b2b98-bound set, plus 1 PASS lane in the single-subject evals/receipts-git-town-darwin/ directory (darwin artifact Human-admitted 2026-08-17 per evals/git-town-darwin-admission.json; one capture is one subject, so the later capture cannot join the earlier set); planted defects are refused by their exact code; an empty receipt directory is refused rather than reported clean; --bind-scheduler prints CROSS_SUBJECT_BINDING for #231's live scheduler-run receipt only while its canary-repo subject differs from the adapter subject, and refuses SUBJECT_COLLAPSED when they are made equal; see evals/ADAPTER_RECEIPT_MATRIX.md for the per-lane completion report"
     },
     {
       "id": "RAN-BLINDSPOT-HYBRID-1",

@@ -491,18 +491,6 @@
         "tests.test_document_routes"
       ],
       "note": "An index fails in one direction only: a dead link is found when someone follows it, an omission looks exactly like completeness. This is the only thing that looks at the omission side."
-    },
-    {
-      "id": "adoption-report-projection-freshness",
-      "file": "skills/skill-refactor-proof-loop/scripts/render_adoption_report.py",
-      "anchor": "        if args.output.read_text(encoding=\"utf-8\") != rendered:",
-      "verify": [
-        "python3",
-        "-m",
-        "unittest",
-        "tests.test_adoption_report"
-      ],
-      "note": "#322's rendered report is a projection only while something compares its bytes to the ledger. Without this line --check passes on any content and the report becomes a second ledger that drifts silently."
     }
   ]
 }

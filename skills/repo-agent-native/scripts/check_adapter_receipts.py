@@ -326,6 +326,30 @@ def load_dir(directory: Path) -> dict[str, Any]:
     return receipts
 
 
+def derive_unexercised(body: dict[str, Any]) -> dict[str, Any]:
+    """Turn a copy of an executed receipt into the shape of a lane that did not run.
+
+    Derived here rather than imported from the capture script: the two files
+    deliberately share no code path, and a selftest that borrowed the producer's
+    idea of an unexercised receipt could not catch the producer disagreeing with
+    the law. Every field the unexercised laws read is set explicitly.
+    """
+    copied = copy.deepcopy(body)
+    copied["adapter"].update({"executable": None, "version": None,
+                              "executable_sha256": None})
+    copied["policy"] = {"network": "none", "filesystem": "none", "secrets": "none",
+                        "allowed_argv": []}
+    copied["budgets"] = {"timeout_seconds": 0, "max_output_bytes": 0}
+    copied["execution"] = {"terminal_state": "NOT_STARTED", "exit_code": None}
+    copied["result"] = {"state": "ABSENT", "evidence_level": None, "result_count": 0,
+                        "source_readback": {"required": False, "performed": 0,
+                                            "confirmed": 0},
+                        "detail": "derived by the selftest, never captured"}
+    copied["residue"] = {"paths": [], "cleaned": True}
+    copied["controls"] = []
+    return copied
+
+
 def selftest(receipts: dict[str, Any]) -> int:
     """Plant one defect per law and require its own refusal."""
     try:
@@ -335,14 +359,32 @@ def selftest(receipts: dict[str, Any]) -> int:
               file=sys.stderr)
         return 2
 
+    committed = len(receipts)
     executed = next((n for n, b in receipts.items()
                      if b["result"]["state"] not in UNEXERCISED_STATES), None)
+    if executed is None:
+        print("SELFTEST RED: no executed receipt to plant an executed lane's defects on",
+              file=sys.stderr)
+        return 2
+
     unexercised = next((n for n, b in receipts.items()
                         if b["result"]["state"] in UNEXERCISED_STATES), None)
-    if executed is None or unexercised is None:
-        print("SELFTEST RED: need at least one executed and one unexercised receipt "
-              "to plant both directions", file=sys.stderr)
-        return 2
+    derived = None
+    if unexercised is None:
+        # A capture in which every lane ran is the goal, not a reason to stop
+        # planting. The two laws about a lane that did not run must stay provable
+        # on a fully exercised set, or the day the last ABSENT lane is closed is
+        # the day those two refusals quietly stop being tested.
+        derived = "derived-unexercised.receipt.json"
+        receipts = dict(receipts)
+        receipts[derived] = derive_unexercised(receipts[executed])
+        unexercised = derived
+        try:
+            validate_set(receipts)
+        except Refused as failure:
+            print(f"SELFTEST RED: the derived unexercised receipt is itself refused "
+                  f"-- {failure}", file=sys.stderr)
+            return 2
 
     def mutated(target: str, fn: Any) -> dict[str, Any]:
         copied = copy.deepcopy(receipts)
@@ -411,8 +453,11 @@ def selftest(receipts: dict[str, Any]) -> int:
 
     if failed:
         return 2
-    print(f"SELFTEST GREEN: {len(receipts)} committed receipt(s) admitted; "
-          f"{len(controls)} planted defects refused")
+    note = "" if derived is None else (
+        " (every committed lane ran, so the unexercised receipt the last two "
+        "controls need was derived from an executed one)")
+    print(f"SELFTEST GREEN: {committed} committed receipt(s) admitted; "
+          f"{len(controls)} planted defects refused{note}")
     return 0
 
 
