@@ -68,19 +68,26 @@ def main() -> int:
             "is stale",
         )
 
-        # The admission verdict must be hashed, not copied. Re-pointing every
-        # admitted blob at the bytes actually in the tree flips the record from
-        # expired to current, so a renderer that printed the citation verbatim
-        # would emit identical bytes here and stay green.
+        # The admission verdict must be hashed, not copied. Mutate the pinned
+        # blobs in whichever direction flips the verdict the committed record
+        # actually has — expired records get re-pointed at the bytes in the
+        # tree (flipping them current), current records get one blob pinned to
+        # a hash nothing has (flipping them expired) — so a renderer that
+        # printed the citation verbatim would emit identical bytes here and
+        # stay green regardless of which world the committed record is in.
         readmitted = temp / "readmitted-admission.json"
         value = json.loads(ADMISSION.read_text(encoding="utf-8"))
-        value["admitted_subject"]["blobs"] = {
+        tree_blobs = {
             path: subprocess.run(
                 ["git", "hash-object", path],
                 cwd=REPO, text=True, capture_output=True, check=True,
             ).stdout.strip()
             for path in value["admitted_subject"]["blobs"]
         }
+        if value["admitted_subject"]["blobs"] == tree_blobs:
+            first = next(iter(tree_blobs))
+            tree_blobs[first] = "0" * 40
+        value["admitted_subject"]["blobs"] = tree_blobs
         readmitted.write_text(json.dumps(value, indent=2) + "\n", encoding="utf-8")
         checks["admission_expiry_not_recomputed"] = (
             ["--admission", str(readmitted), "--output", str(report)],

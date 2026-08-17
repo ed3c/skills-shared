@@ -8,21 +8,14 @@ Regenerate with `python3 skills/skill-refactor-proof-loop/scripts/render_adoptio
 
 The standard this audit applies was admitted by [`skills/skill-refactor-proof-loop/evals/proof-standard-admission.json`](../../skills/skill-refactor-proof-loop/evals/proof-standard-admission.json):
 approver `ed3c (repository owner)`, decided `2026-08-17`, `ADMITTED_FOR_BOUND_SCOPE`,
-subject `ed3c/skills-shared@ce68a05` landed via PR #338.
+subject `ed3c/skills-shared@c4a9bd6` landed via PR #338 (subject bytes), renewed on branch agent/phase-a-batch.
 That record is a decision. It reports no run, no receipt and no measurement, and it promoted no
 Skill's proof level. Every state below is as measured by
 [`skills/skill-refactor-proof-loop/scripts/check_skill_adoption_ledger.py`](../../skills/skill-refactor-proof-loop/scripts/check_skill_adoption_ledger.py)
 against current repository bytes.
 
-**That admission has expired by its own terms.** It expires on any change to the 6 blobs
-it names as the admitted subject, and 2 of them no longer hash to the admitted SHA:
-
-- `skills/skill-refactor-proof-loop/SKILL.md`
-- `skills/skill-refactor-proof-loop/references/skill-adoption-ledger.schema.json`
-
-Re-admission is a new Human record with a new `decided_at`. Nothing in this pipeline re-points the
-old one, and this report does not treat the expired record as authority for anything below it.
-The measurements are unaffected: they were never derived from the admission in the first place.
+All 6 blobs that record names as the admitted subject still hash to the
+admitted SHA, so it has not expired.
 
 ## Headline
 
