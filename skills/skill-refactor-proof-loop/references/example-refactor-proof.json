@@ -31,8 +31,15 @@
     {
       "id": "B2_CAUSAL_DAG_REPAIRED",
       "role": "REPAIRED_CANDIDATE",
-      "path": "skills/agentic-tech-lead-orchestration/SKILL.md",
+      "path": "skills/agentic-tech-lead-orchestration/tests/fixtures/causal-dag-repaired-SKILL.txt",
       "blob_sha": "3fd01571b49b1dfd1c9256661fe4aafe3ecc6e99",
+      "state": "FROZEN"
+    },
+    {
+      "id": "B3_CLOSURE_LAWS_BOUND",
+      "role": "REPAIRED_CANDIDATE",
+      "path": "skills/agentic-tech-lead-orchestration/SKILL.md",
+      "blob_sha": "f6d667956f653d26f6adb8081e04dd80445504a3",
       "state": "CURRENT_CANDIDATE"
     }
   ],
@@ -51,6 +58,11 @@
       "id": "human-delivery-authority",
       "old_evidence": "A retains Human merge authority",
       "new_assertion": "task/capability/delivery contracts require merge=false and publication=false"
+    },
+    {
+      "id": "treatment-single-subject",
+      "old_evidence": "B2 was scored as the live body, so its identity drifted whenever that body changed",
+      "new_assertion": "B2 is frozen at its registered blob and only the newest arm reads the live body"
     }
   ],
   "proof_layers": {

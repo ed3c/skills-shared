@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
-"""Frozen deterministic A/B/C/D for the Agentic Tech Lead refactor.
+"""Frozen deterministic A/B/C/D/E for the Agentic Tech Lead refactor.
 
 This is a structural/executable-contract experiment, not a model-behavior test.
 It keeps every historical treatment immutable and scores the current candidate
 on the same binary criteria plus one causal-transition criterion introduced by
-Shadow issue #309.
+Shadow issue #309 and one closure-law criterion introduced by issue #332.
+
+Every treatment has exactly one immutable subject: the newest arm is the live
+`SKILL.md`, and each older arm is a frozen fixture. When the live body changes,
+the previous arm is frozen first, so a candidate is always measured against the
+bytes its predecessor actually scored on rather than against itself.
 """
 from __future__ import annotations
 
@@ -21,6 +26,8 @@ LANDED = FIXTURES / "refactor-as-landed-SKILL.txt"
 LANDED_PROFILE = FIXTURES / "refactor-as-landed-domain-profile.txt"
 REACHABILITY = FIXTURES / "reachability-repaired-SKILL.txt"
 REACHABILITY_PROFILE = FIXTURES / "reachability-repaired-domain-profile.txt"
+CAUSAL = FIXTURES / "causal-dag-repaired-SKILL.txt"
+CAUSAL_PROFILE = FIXTURES / "causal-dag-repaired-domain-profile.txt"
 CURRENT = ROOT / "SKILL.md"
 CURRENT_PROFILE = ROOT / "modules" / "domain-profile.md"
 
@@ -30,6 +37,11 @@ EXPECTED_GIT_BLOBS = {
     LANDED_PROFILE: "812f161c8abbe0517502ea988673197519132c1c",
     REACHABILITY: "51c3fd81749598957f2b993c4d31c3b4c8c277c1",
     REACHABILITY_PROFILE: "7726ccc5a45db8e31723d457b9129b4697fdca3c",
+    # B2 is the treatment the golden-proof registry pins. Its blob is the one
+    # already registered for the live body it was frozen from; freezing changed
+    # the path, never the bytes.
+    CAUSAL: "3fd01571b49b1dfd1c9256661fe4aafe3ecc6e99",
+    CAUSAL_PROFILE: "0aa3ec544f8e31282633922126c9dfc358b2e2d5",
 }
 
 PROVIDER_TOKENS = ("grepai", "scip", "tree-sitter", "serena", "lancedb")
@@ -146,6 +158,21 @@ def score(arm: Arm) -> dict[str, bool]:
         and "live" in profile_lower
     )
 
+    # Issue #332: the two closure laws are bound into the core body itself, not
+    # parked in a reference. Scored on what the laws say, so a bare heading or a
+    # link to the reconciliation document cannot earn the point.
+    dual_dependency_classes = (
+        "start-readiness" in lower
+        and "completion-readiness" in lower
+        and ("two edge classes" in lower or "two distinct dependency sets" in lower)
+        and "convergence" in lower
+    )
+    lane_substitution_refused = (
+        "closure lanes do not substitute" in lower
+        and "human-admit" in lower
+        and "own lane" in lower
+    )
+
     return {
         "portable_core_provider_neutral": provider_neutral,
         "pre_dispatch_task_assertion_reachable": task_gate,
@@ -158,6 +185,7 @@ def score(arm: Arm) -> dict[str, bool]:
         "human_delivery_authority": human_authority,
         "module_self_activation_refused": self_activation_refusal,
         "causal_module_transitions_closed": old_causal_chain or modular_causal_chain,
+        "closure_laws_bound_in_core": dual_dependency_classes and lane_substitution_refused,
     }
 
 
@@ -178,7 +206,8 @@ def main() -> int:
         Arm("A_OLD_MONOLITH", OLD.read_text(encoding="utf-8")),
         Arm("B0_REFACTOR_AS_LANDED", LANDED.read_text(encoding="utf-8"), LANDED_PROFILE.read_text(encoding="utf-8")),
         Arm("B1_REACHABILITY_REPAIRED", REACHABILITY.read_text(encoding="utf-8"), REACHABILITY_PROFILE.read_text(encoding="utf-8")),
-        Arm("B2_CAUSAL_DAG_REPAIRED", CURRENT.read_text(encoding="utf-8"), CURRENT_PROFILE.read_text(encoding="utf-8")),
+        Arm("B2_CAUSAL_DAG_REPAIRED", CAUSAL.read_text(encoding="utf-8"), CAUSAL_PROFILE.read_text(encoding="utf-8")),
+        Arm("B3_CLOSURE_LAWS_BOUND", CURRENT.read_text(encoding="utf-8"), CURRENT_PROFILE.read_text(encoding="utf-8")),
     ]
     results = {arm.name: score(arm) for arm in arms}
     totals = {name: sum(values.values()) for name, values in results.items()}
@@ -187,6 +216,7 @@ def main() -> int:
     landed = results["B0_REFACTOR_AS_LANDED"]
     reachability = results["B1_REACHABILITY_REPAIRED"]
     causal = results["B2_CAUSAL_DAG_REPAIRED"]
+    closure = results["B3_CLOSURE_LAWS_BOUND"]
 
     expected_landed_regressions = {
         "pre_dispatch_task_assertion_reachable",
@@ -213,9 +243,19 @@ def main() -> int:
         regressed = [k for k in old if old[k] and not causal[k]]
         print(f"TECH-LEAD-AB-RED B2 does not dominate prior treatments; regressions={regressed}", file=sys.stderr)
         return 2
+    if causal["closure_laws_bound_in_core"]:
+        print("TECH-LEAD-AB-RED frozen B2 incorrectly credited with the closure laws", file=sys.stderr)
+        return 2
+    if not closure["closure_laws_bound_in_core"]:
+        print("TECH-LEAD-AB-RED B3 did not bind the closure laws into the portable core", file=sys.stderr)
+        return 2
+    if not dominates(closure, causal):
+        regressed = [k for k in causal if causal[k] and not closure[k]]
+        print(f"TECH-LEAD-AB-RED B3 does not dominate B2; regressions={regressed}", file=sys.stderr)
+        return 2
 
     report = {
-        "schema": "agentic-tech-lead/refactor-ab/v2",
+        "schema": "agentic-tech-lead/refactor-ab/v3",
         "evidence_scope": "deterministic structural, executable-contract, and causal-transition closure only",
         "behavioral_model_uplift": "NOT_EXERCISED",
         "live_provider_runtime": "NOT_EXERCISED",
@@ -225,17 +265,20 @@ def main() -> int:
             "B0_DOMAIN_PROFILE": EXPECTED_GIT_BLOBS[LANDED_PROFILE],
             "B1_REACHABILITY_REPAIRED": EXPECTED_GIT_BLOBS[REACHABILITY],
             "B1_DOMAIN_PROFILE": EXPECTED_GIT_BLOBS[REACHABILITY_PROFILE],
-            "B2_CAUSAL_DAG_REPAIRED": git_blob_sha(CURRENT.read_text(encoding="utf-8")),
-            "B2_DOMAIN_PROFILE": git_blob_sha(CURRENT_PROFILE.read_text(encoding="utf-8")),
+            "B2_CAUSAL_DAG_REPAIRED": EXPECTED_GIT_BLOBS[CAUSAL],
+            "B2_DOMAIN_PROFILE": EXPECTED_GIT_BLOBS[CAUSAL_PROFILE],
+            "B3_CLOSURE_LAWS_BOUND": git_blob_sha(CURRENT.read_text(encoding="utf-8")),
+            "B3_DOMAIN_PROFILE": git_blob_sha(CURRENT_PROFILE.read_text(encoding="utf-8")),
         },
         "results": results,
         "totals": totals,
         "landed_refactor_regression_exposed": True,
         "reachability_repair_preserved": True,
         "causal_dag_repair_dominates_prior_treatments": True,
+        "closure_laws_bound_dominates_causal_dag_repair": True,
     }
     print(json.dumps(report, indent=2, sort_keys=True))
-    print("TECH-LEAD-AB-GREEN B0 regressions exposed; B1 restores reachability; B2 adds receipt-gated causal closure and dominates prior deterministic treatments; live model/provider A/B NOT_EXERCISED")
+    print("TECH-LEAD-AB-GREEN B0 regressions exposed; B1 restores reachability; B2 adds receipt-gated causal closure; B3 binds the dual-DAG and lane-substitution closure laws and dominates every prior deterministic treatment; live model/provider A/B NOT_EXERCISED")
     return 0
 
 

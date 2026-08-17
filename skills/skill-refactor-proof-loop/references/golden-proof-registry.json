@@ -30,8 +30,14 @@
         {
           "id": "B2_CAUSAL_DAG_REPAIRED",
           "role": "REPAIRED_CANDIDATE",
-          "path": "skills/agentic-tech-lead-orchestration/SKILL.md",
+          "path": "skills/agentic-tech-lead-orchestration/tests/fixtures/causal-dag-repaired-SKILL.txt",
           "blob_sha": "3fd01571b49b1dfd1c9256661fe4aafe3ecc6e99"
+        },
+        {
+          "id": "B3_CLOSURE_LAWS_BOUND",
+          "role": "REPAIRED_CANDIDATE",
+          "path": "skills/agentic-tech-lead-orchestration/SKILL.md",
+          "blob_sha": "f6d667956f653d26f6adb8081e04dd80445504a3"
         }
       ],
       "proof_layers": {
