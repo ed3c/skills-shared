@@ -6,16 +6,24 @@ better, so each is planted here and must be refused. The admission rule gets a
 control of its own: a single task pair must not unlock the default however
 favourable the numbers are, because that is the inference the issue's evidence
 boundary rules out.
+
+The pre-registered task pairs on disk get the same treatment. Their whole value
+is that they were written before either arm ran, and the only mechanical proof
+of that is that they contain no outcome field at all — so every way of smuggling
+one in is planted here too.
 """
 from __future__ import annotations
 
 import copy
+import json
 import sys
 from pathlib import Path
 from typing import Any, Callable
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from measure_delivery_shape import Refused, compare, measure  # noqa: E402
+from measure_delivery_shape import Refused, check_plan, compare, measure  # noqa: E402
+
+PAIR_DIR = Path(__file__).resolve().parents[1] / "evals" / "fixtures" / "delivery-shape"
 
 SHARED = {
     "requirement_digest": "sha256:" + "a" * 64,
@@ -127,12 +135,15 @@ def run_selftest() -> int:
     expect("rollback_blast_radius" not in result["improvements_b_over_a"],
            "rollback radius leaked into the admission-bearing improvement set")
 
+    refused: list[str] = []
+
     def case(name: str, mutate: Callable[[dict[str, Any]], None]) -> None:
         body = experiment()
         mutate(body)
         try:
             compare(body)
         except Refused:
+            refused.append(name)
             return
         survived.append(name)
 
@@ -221,6 +232,93 @@ def run_selftest() -> int:
     single = measure(arm_b(), "arm B")
     expect(single["review_units"] == 4, "single-arm measurement failed")
 
+    # The pre-registered pairs that actually ship. An empty directory is its own
+    # state: it means the pairs are ABSENT, not that they passed.
+    pair_files = sorted(PAIR_DIR.glob("task-pair-*.json"))
+    if len(pair_files) < 2:
+        print(f"SELFTEST RED: {len(pair_files)} pre-registered task pair(s) under "
+              f"{PAIR_DIR}; the admission rule needs at least two", file=sys.stderr)
+        return 2
+
+    pairs: list[dict[str, Any]] = []
+    for path in pair_files:
+        body = json.loads(path.read_text(encoding="utf-8"))
+        try:
+            receipt = check_plan(body)
+        except Refused as error:
+            failures.append(f"committed pair {path.name} refused: {error}")
+            continue
+        pairs.append(body)
+        expect(receipt["status"] == "PRE_REGISTERED",
+               f"{path.name} did not read as a pre-registration")
+        expect(receipt["canonical_default_unlock"] == "BLOCKED",
+               f"{path.name} unlocked the default without running")
+        # A plan and a record must not be interchangeable in either direction.
+        try:
+            compare(copy.deepcopy(body))
+        except Refused:
+            pass
+        else:
+            failures.append(f"{path.name} was accepted as an executed experiment")
+
+    def plan_case(name: str, mutate: Callable[[dict[str, Any]], None]) -> None:
+        if not pairs:
+            return
+        body = copy.deepcopy(pairs[0])
+        mutate(body)
+        try:
+            check_plan(body)
+        except Refused:
+            plan_refusals.append(name)
+            return
+        survived.append(name)
+
+    plan_refusals: list[str] = []
+    # Every way an outcome can reach a document defined by having none.
+    plan_case("an outcome count on the pair",
+              lambda p: p.__setitem__("task_pairs", 2))
+    plan_case("an outcome count on an arm",
+              lambda p: p["arms"]["B"].__setitem__("false_pass_count", 0))
+    plan_case("CI minutes recorded before running",
+              lambda p: p["arms"]["B"].__setitem__("ci_minutes", 4.0))
+    plan_case("a measured size on a planned unit",
+              lambda p: p["arms"]["B"]["planned_units"][0].__setitem__("changed_files", 9))
+    plan_case("a planned unit already declared merged",
+              lambda p: p["arms"]["B"]["planned_units"][0].__setitem__("merged", True))
+    plan_case("an executed pair filed as a plan",
+              lambda p: p.__setitem__("execution_state", "EXERCISED"))
+    plan_case("a record's schema wearing a plan's name",
+              lambda p: p.__setitem__("schema_version", "delivery-shape-experiment/v1"))
+    # The controls carry over, because a pre-registration that is unfair on
+    # paper produces an unfair experiment when it runs.
+    plan_case("requirement digest that does not digest its own text",
+              lambda p: p["arms"]["A"].__setitem__("requirement_text", "something else"))
+    plan_case("reviewer rubric digest that does not digest its own text",
+              lambda p: (p["arms"]["A"].__setitem__("reviewer_rubric", "lenient"),
+                         p["arms"]["B"].__setitem__("reviewer_rubric", "lenient")))
+    plan_case("different carrier between arms",
+              lambda p: p["arms"]["B"]["carrier"].__setitem__("model", "a-bigger-model"))
+    plan_case("different base commit between arms",
+              lambda p: p["arms"]["B"].__setitem__("fixture_commit", "9" * 40))
+    plan_case("arm shapes swapped",
+              lambda p: (p["arms"]["A"].__setitem__("shape", "contract_first_stack"),
+                         p["arms"]["B"].__setitem__("shape", "monolithic")))
+    plan_case("arms planning different files",
+              lambda p: p["arms"]["A"]["planned_units"][0]["paths"].append("docs/extra.md"))
+    plan_case("fake serial stack with no consumed parent bytes",
+              lambda p: p["arms"]["B"]["planned_units"][1].__setitem__(
+                  "consumes_parent_paths", []))
+    plan_case("child consuming paths its parent never touched",
+              lambda p: p["arms"]["B"]["planned_units"][1].__setitem__(
+                  "consumes_parent_paths", ["skills/never-touched"]))
+    plan_case("overlapping sibling path leases",
+              lambda p: p["arms"]["B"]["planned_units"][2].__setitem__(
+                  "paths", list(p["arms"]["B"]["planned_units"][1]["paths"])))
+    plan_case("convergence naming no prerequisites",
+              lambda p: p["arms"]["B"]["planned_units"][3].__setitem__("prerequisites", []))
+    plan_case("an arm planning no units",
+              lambda p: p["arms"]["B"].__setitem__("planned_units", []))
+
     if survived:
         for name in survived:
             failures.append(f"mutation survived: {name}")
@@ -228,6 +326,8 @@ def run_selftest() -> int:
         for item in failures:
             print(f"SELFTEST RED: {item}", file=sys.stderr)
         return 2
-    print("SELFTEST GREEN: paired experiment measured; 17 unfairness controls "
-          "refused; the default stays blocked on a single pair")
+    print(f"SELFTEST GREEN: paired experiment measured; {len(refused)} unfairness "
+          f"controls refused; {len(pairs)} pre-registered task pairs validated with "
+          f"{len(plan_refusals)} outcome-leak controls refused; the default stays "
+          f"blocked on a single pair")
     return 0

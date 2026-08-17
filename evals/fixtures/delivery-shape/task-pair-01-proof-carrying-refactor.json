@@ -1,0 +1,129 @@
+{
+  "_meta": {
+    "held_out": "Both requirements name work this repository has open and has not done, so neither arm can be written from a remembered solution.",
+    "kind": "PRE_REGISTRATION",
+    "not_a_result": "This file fixes the requirement, target, evaluator, carrier, base commit, reviewer rubric and budget before either arm runs, and contains no outcome field of any kind. It is validated by `python3 scripts/measure_delivery_shape.py plan <this file>`, which refuses any measured field appearing here. Executing the pair produces a separate delivery-shape-experiment/v1 record; this file is never edited to match what happened.",
+    "provenance": "Pre-registered from open issue #322; the tree it plans does not exist yet."
+  },
+  "arms": {
+    "A": {
+      "budget": {
+        "max_model_calls": 40,
+        "max_retries": 3
+      },
+      "carrier": {
+        "harness": "claude-code",
+        "model": "claude-opus-5"
+      },
+      "evaluator_identities": [
+        {
+          "id": "scripts/local_verification.sh",
+          "version": "86a02a8a79651696b77f5af2c0976939bed5bc84"
+        }
+      ],
+      "fixture_commit": "86a02a8a79651696b77f5af2c0976939bed5bc84",
+      "implementation_target": "skills/skill-refactor-proof-loop",
+      "planned_units": [
+        {
+          "id": "A1-single-pr",
+          "kind": "monolithic",
+          "paths": [
+            "docs/architecture/PROOF_CARRYING_REFACTORS.md",
+            "skills/repo-agent-native/evals/proof-records/v2-refactor.json",
+            "skills/shared-skills-infra/evals/proof-records/index-guard-refactor.json",
+            "skills/skill-refactor-proof-loop/references/proof-record.schema.json",
+            "skills/skill-refactor-proof-loop/scripts/check_proof_records.py",
+            "skills/skill-refactor-proof-loop/scripts/proof_record_selftest.py"
+          ],
+          "purpose": "Deliver the whole requirement as one review unit."
+        }
+      ],
+      "requirement_digest": "sha256:1d5d1201bf50655da43e2c163e9ce4f4f3a919a685502c2422284a40bddf06bc",
+      "requirement_text": "Migrate two already-shipped Skill refactors onto the proof-carrying protocol.\n\nIntroduce one proof-record schema plus a deterministic checker with a planted-defect selftest, express the repo-agent-native v2 refactor and the shared-skills-infra index-guard refactor as records against that schema, and register the protocol in an architecture note. A record names the golden proof it preserves; a refactor with no preserved proof is refused rather than recorded. No existing checker may be relaxed to admit a record.\n",
+      "reviewer_rubric": "Advisory reviewer rubric, identical for both arms and non-binding by construction:\n1. Can a reviewer state, per review unit, what would have to be true for the unit to be wrong?\n2. Is every claim in the unit's description anchored to a file the unit actually changes?\n3. Does the unit leave a cheap way to make it go red?\n4. Is anything in the unit unrelated to the requirement text?\nA reviewer score never overturns a deterministic failure; it is recorded as reviewer_findings and read alongside, not instead of, the gate result.\n",
+      "reviewer_rubric_digest": "sha256:2defd7d20a3d38ae5a17d30c3f509534883f465ef33e88d0b949f419a54c82a7",
+      "shape": "monolithic"
+    },
+    "B": {
+      "budget": {
+        "max_model_calls": 40,
+        "max_retries": 3
+      },
+      "carrier": {
+        "harness": "claude-code",
+        "model": "claude-opus-5"
+      },
+      "evaluator_identities": [
+        {
+          "id": "scripts/local_verification.sh",
+          "version": "86a02a8a79651696b77f5af2c0976939bed5bc84"
+        }
+      ],
+      "fixture_commit": "86a02a8a79651696b77f5af2c0976939bed5bc84",
+      "implementation_target": "skills/skill-refactor-proof-loop",
+      "planned_units": [
+        {
+          "id": "B1-proof-record-contract",
+          "kind": "contract",
+          "paths": [
+            "skills/skill-refactor-proof-loop/references/proof-record.schema.json",
+            "skills/skill-refactor-proof-loop/scripts/check_proof_records.py",
+            "skills/skill-refactor-proof-loop/scripts/proof_record_selftest.py"
+          ],
+          "purpose": "Schema and checker every later unit is written against."
+        },
+        {
+          "consumes_parent_paths": [
+            "skills/skill-refactor-proof-loop/references/proof-record.schema.json",
+            "skills/skill-refactor-proof-loop/scripts/check_proof_records.py"
+          ],
+          "id": "B2-repo-agent-native-record",
+          "kind": "leaf",
+          "parent": "B1-proof-record-contract",
+          "paths": [
+            "skills/repo-agent-native/evals/proof-records/v2-refactor.json"
+          ],
+          "purpose": "First consumer: the v2 refactor stated as a proof record."
+        },
+        {
+          "consumes_parent_paths": [
+            "skills/skill-refactor-proof-loop/references/proof-record.schema.json",
+            "skills/skill-refactor-proof-loop/scripts/check_proof_records.py"
+          ],
+          "id": "B3-shared-skills-infra-record",
+          "kind": "leaf",
+          "parent": "B1-proof-record-contract",
+          "paths": [
+            "skills/shared-skills-infra/evals/proof-records/index-guard-refactor.json"
+          ],
+          "purpose": "Path-disjoint sibling of B2: the index-guard refactor."
+        },
+        {
+          "id": "B4-protocol-registration",
+          "kind": "convergence",
+          "paths": [
+            "docs/architecture/PROOF_CARRYING_REFACTORS.md"
+          ],
+          "prerequisites": [
+            "B1-proof-record-contract",
+            "B2-repo-agent-native-record",
+            "B3-shared-skills-infra-record"
+          ],
+          "purpose": "Registers the protocol only once both records exist."
+        }
+      ],
+      "requirement_digest": "sha256:1d5d1201bf50655da43e2c163e9ce4f4f3a919a685502c2422284a40bddf06bc",
+      "requirement_text": "Migrate two already-shipped Skill refactors onto the proof-carrying protocol.\n\nIntroduce one proof-record schema plus a deterministic checker with a planted-defect selftest, express the repo-agent-native v2 refactor and the shared-skills-infra index-guard refactor as records against that schema, and register the protocol in an architecture note. A record names the golden proof it preserves; a refactor with no preserved proof is refused rather than recorded. No existing checker may be relaxed to admit a record.\n",
+      "reviewer_rubric": "Advisory reviewer rubric, identical for both arms and non-binding by construction:\n1. Can a reviewer state, per review unit, what would have to be true for the unit to be wrong?\n2. Is every claim in the unit's description anchored to a file the unit actually changes?\n3. Does the unit leave a cheap way to make it go red?\n4. Is anything in the unit unrelated to the requirement text?\nA reviewer score never overturns a deterministic failure; it is recorded as reviewer_findings and read alongside, not instead of, the gate result.\n",
+      "reviewer_rubric_digest": "sha256:2defd7d20a3d38ae5a17d30c3f509534883f465ef33e88d0b949f419a54c82a7",
+      "shape": "contract_first_stack"
+    }
+  },
+  "declared_budget": {
+    "max_ci_minutes": 30.0,
+    "max_workflow_runs": 12
+  },
+  "execution_state": "NOT_EXERCISED",
+  "pair_id": "dsx-01-proof-carrying-refactor",
+  "schema_version": "delivery-shape-task-pair/v1"
+}

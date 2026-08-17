@@ -1,0 +1,125 @@
+{
+  "_meta": {
+    "held_out": "Both requirements name work this repository has open and has not done, so neither arm can be written from a remembered solution.",
+    "kind": "PRE_REGISTRATION",
+    "not_a_result": "This file fixes the requirement, target, evaluator, carrier, base commit, reviewer rubric and budget before either arm runs, and contains no outcome field of any kind. It is validated by `python3 scripts/measure_delivery_shape.py plan <this file>`, which refuses any measured field appearing here. Executing the pair produces a separate delivery-shape-experiment/v1 record; this file is never edited to match what happened.",
+    "provenance": "Pre-registered from open issue #332; the tree it plans does not exist yet."
+  },
+  "arms": {
+    "A": {
+      "budget": {
+        "max_model_calls": 40,
+        "max_retries": 3
+      },
+      "carrier": {
+        "harness": "claude-code",
+        "model": "claude-opus-5"
+      },
+      "evaluator_identities": [
+        {
+          "id": "scripts/local_verification.sh",
+          "version": "86a02a8a79651696b77f5af2c0976939bed5bc84"
+        }
+      ],
+      "fixture_commit": "86a02a8a79651696b77f5af2c0976939bed5bc84",
+      "implementation_target": "skills/git-town-stacked-pr-worker",
+      "planned_units": [
+        {
+          "id": "A1-single-pr",
+          "kind": "monolithic",
+          "paths": [
+            "skills/git-town-stacked-pr-worker/references/closure-reconciliation.schema.json",
+            "skills/git-town-stacked-pr-worker/references/molecular-stack-index.md",
+            "skills/git-town-stacked-pr-worker/scripts/check_forward_closure.py",
+            "skills/git-town-stacked-pr-worker/scripts/check_reverse_closure.py",
+            "skills/git-town-stacked-pr-worker/scripts/closure_graph.py"
+          ],
+          "purpose": "Deliver the whole requirement as one review unit."
+        }
+      ],
+      "requirement_digest": "sha256:7e2653212a078d79ee76c3c63cf5be69f5476c300f2ba5033f5eebb0d5ad516f",
+      "requirement_text": "Generalize stack closure reconciliation into forward and reverse dependency checks.\n\nIntroduce one closure schema plus a graph module, then a forward check (every declared prerequisite is an ancestor of the unit that names it) and a reverse check (every merged unit's dependents are revalidated against the moved parent), and publish the resulting molecular stack index. A receipt taken against a superseded parent SHA must be refused, not reused. Neither check may report a graph it did not traverse.\n",
+      "reviewer_rubric": "Advisory reviewer rubric, identical for both arms and non-binding by construction:\n1. Can a reviewer state, per review unit, what would have to be true for the unit to be wrong?\n2. Is every claim in the unit's description anchored to a file the unit actually changes?\n3. Does the unit leave a cheap way to make it go red?\n4. Is anything in the unit unrelated to the requirement text?\nA reviewer score never overturns a deterministic failure; it is recorded as reviewer_findings and read alongside, not instead of, the gate result.\n",
+      "reviewer_rubric_digest": "sha256:2defd7d20a3d38ae5a17d30c3f509534883f465ef33e88d0b949f419a54c82a7",
+      "shape": "monolithic"
+    },
+    "B": {
+      "budget": {
+        "max_model_calls": 40,
+        "max_retries": 3
+      },
+      "carrier": {
+        "harness": "claude-code",
+        "model": "claude-opus-5"
+      },
+      "evaluator_identities": [
+        {
+          "id": "scripts/local_verification.sh",
+          "version": "86a02a8a79651696b77f5af2c0976939bed5bc84"
+        }
+      ],
+      "fixture_commit": "86a02a8a79651696b77f5af2c0976939bed5bc84",
+      "implementation_target": "skills/git-town-stacked-pr-worker",
+      "planned_units": [
+        {
+          "id": "B1-closure-contract",
+          "kind": "contract",
+          "paths": [
+            "skills/git-town-stacked-pr-worker/references/closure-reconciliation.schema.json",
+            "skills/git-town-stacked-pr-worker/scripts/closure_graph.py"
+          ],
+          "purpose": "Closure schema and the graph module both checks traverse."
+        },
+        {
+          "consumes_parent_paths": [
+            "skills/git-town-stacked-pr-worker/scripts/closure_graph.py"
+          ],
+          "id": "B2-forward-closure",
+          "kind": "leaf",
+          "parent": "B1-closure-contract",
+          "paths": [
+            "skills/git-town-stacked-pr-worker/scripts/check_forward_closure.py"
+          ],
+          "purpose": "Ancestry direction: prerequisites must really be ancestors."
+        },
+        {
+          "consumes_parent_paths": [
+            "skills/git-town-stacked-pr-worker/scripts/closure_graph.py"
+          ],
+          "id": "B3-reverse-closure",
+          "kind": "leaf",
+          "parent": "B1-closure-contract",
+          "paths": [
+            "skills/git-town-stacked-pr-worker/scripts/check_reverse_closure.py"
+          ],
+          "purpose": "Dependent direction: stale receipts after a parent moves."
+        },
+        {
+          "id": "B4-molecular-stack-index",
+          "kind": "convergence",
+          "paths": [
+            "skills/git-town-stacked-pr-worker/references/molecular-stack-index.md"
+          ],
+          "prerequisites": [
+            "B1-closure-contract",
+            "B2-forward-closure",
+            "B3-reverse-closure"
+          ],
+          "purpose": "Index is only truthful once both directions are merged."
+        }
+      ],
+      "requirement_digest": "sha256:7e2653212a078d79ee76c3c63cf5be69f5476c300f2ba5033f5eebb0d5ad516f",
+      "requirement_text": "Generalize stack closure reconciliation into forward and reverse dependency checks.\n\nIntroduce one closure schema plus a graph module, then a forward check (every declared prerequisite is an ancestor of the unit that names it) and a reverse check (every merged unit's dependents are revalidated against the moved parent), and publish the resulting molecular stack index. A receipt taken against a superseded parent SHA must be refused, not reused. Neither check may report a graph it did not traverse.\n",
+      "reviewer_rubric": "Advisory reviewer rubric, identical for both arms and non-binding by construction:\n1. Can a reviewer state, per review unit, what would have to be true for the unit to be wrong?\n2. Is every claim in the unit's description anchored to a file the unit actually changes?\n3. Does the unit leave a cheap way to make it go red?\n4. Is anything in the unit unrelated to the requirement text?\nA reviewer score never overturns a deterministic failure; it is recorded as reviewer_findings and read alongside, not instead of, the gate result.\n",
+      "reviewer_rubric_digest": "sha256:2defd7d20a3d38ae5a17d30c3f509534883f465ef33e88d0b949f419a54c82a7",
+      "shape": "contract_first_stack"
+    }
+  },
+  "declared_budget": {
+    "max_ci_minutes": 30.0,
+    "max_workflow_runs": 12
+  },
+  "execution_state": "NOT_EXERCISED",
+  "pair_id": "dsx-02-closure-reconciliation",
+  "schema_version": "delivery-shape-task-pair/v1"
+}
