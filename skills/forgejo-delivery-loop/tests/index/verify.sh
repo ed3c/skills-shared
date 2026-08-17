@@ -9,7 +9,7 @@ set -euo pipefail
 test_dir="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
 skill_dir="$(realpath "${test_dir}/../..")"
 checker="$(realpath "${skill_dir}/../shared-skills-infra/scripts/check_index.py")"
-scratch="$(mktemp -d)"
+scratch="$(mktemp -d "${TMPDIR:-/tmp}/scratch.XXXXXXXX")"
 trap 'rm -rf "${scratch}"' EXIT
 
 # the checker itself must be able to go red before its verdict here means anything

@@ -9,7 +9,7 @@ python3 -m py_compile \
   "${skill_root}/scripts/exact_evidence_core.py" \
   "${skill_root}/scripts/exact_evidence_calibration.py"
 
-tmp="$(mktemp -d)"
+tmp="$(mktemp -d "${TMPDIR:-/tmp}/tmp.XXXXXXXX")"
 trap 'rm -rf "${tmp}"' EXIT
 printf '{not-json' >"${tmp}/bad.json"
 set +e

@@ -35,7 +35,7 @@ if grep -Fq "deterministic_hard_gate_pass_rate" <<<"${unfair_output}"; then
 fi
 
 # An unreadable bundle stays distinct from an invalid one.
-work="$(mktemp -d)"
+work="$(mktemp -d "${TMPDIR:-/tmp}/work.XXXXXXXX")"
 set +e
 python3 "${scorer}" --bundle "${work}/absent.json" >/dev/null 2>&1
 absent_code=$?

@@ -9,7 +9,7 @@ test_dir="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
 skill_dir="$(dirname "$(dirname "$test_dir")")"
 checker="$skill_dir/scripts/gitlab_delivery.py"
 gate="$skill_dir/scripts/gitlab_merge_gate.py"
-scratch="$(mktemp -d)"
+scratch="$(mktemp -d "${TMPDIR:-/tmp}/scratch.XXXXXXXX")"
 trap 'rm -rf "$scratch"' EXIT
 
 refuse() {  # refuse <fixture> <expected-substring>

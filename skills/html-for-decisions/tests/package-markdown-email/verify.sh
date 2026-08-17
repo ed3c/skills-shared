@@ -4,7 +4,7 @@ set -euo pipefail
 test_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 renderer="$test_dir/../../scripts/package_markdown_email.py"
 html_checker="$test_dir/../../scripts/check_decision_html.py"
-tmp_dir="$(mktemp -d)"
+tmp_dir="$(mktemp -d "${TMPDIR:-/tmp}/tmp-dir.XXXXXXXX")"
 trap 'rm -rf "$tmp_dir"' EXIT
 
 cp -R "$test_dir/fixtures/good" "$tmp_dir/case"

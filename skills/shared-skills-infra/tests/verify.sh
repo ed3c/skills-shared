@@ -6,7 +6,7 @@ set -euo pipefail
 
 test_dir="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
 real_script="$(dirname "${test_dir}")/scripts/shared_skills.py"
-world="$(mktemp -d)"
+world="$(mktemp -d "${TMPDIR:-/tmp}/world.XXXXXXXX")"
 trap 'rm -rf "${world}"' EXIT
 
 shared="${world}/shared"

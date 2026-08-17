@@ -7,7 +7,7 @@ set -euo pipefail
 test_dir="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
 skill_dir="$(realpath "${test_dir}/../..")"
 installer="${skill_dir}/scripts/install-codex-merge-rule.sh"
-scratch="$(mktemp -d)"
+scratch="$(mktemp -d "${TMPDIR:-/tmp}/scratch.XXXXXXXX")"
 trap 'rm -rf "${scratch}"' EXIT
 
 good="$(tr -d '\n' < "${test_dir}/fixtures/good/project.txt")"

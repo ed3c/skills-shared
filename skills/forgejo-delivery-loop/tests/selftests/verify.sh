@@ -9,7 +9,7 @@ set -euo pipefail
 test_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 skill_dir="$(cd "${test_dir}/../.." && pwd)"
 route="${skill_dir}/scripts/route.ts"
-scratch="$(mktemp -d)"
+scratch="$(mktemp -d "${TMPDIR:-/tmp}/scratch.XXXXXXXX")"
 trap 'rm -rf "${scratch}"' EXIT
 
 python3 "${skill_dir}/scripts/agent_docs.py" selftest > /dev/null

@@ -5,7 +5,7 @@ repo_root="$(git rev-parse --show-toplevel)"
 cli="${repo_root}/skills/shared-skills-infra/scripts/repository_control_plane.py"
 profile="${repo_root}/skills/shared-skills-infra/references/repository-control-plane-profile.default.json"
 schema="${repo_root}/skills/shared-skills-infra/references/repository-control-plane-monitor-plan.v1.schema.json"
-tmp="$(mktemp -d)"
+tmp="$(mktemp -d "${TMPDIR:-/tmp}/tmp.XXXXXXXX")"
 trap 'rm -rf "${tmp}"' EXIT
 
 python3 "${cli}" profile-check --profile "${profile}"

@@ -8,7 +8,7 @@ set -euo pipefail
 test_dir="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
 skill_dir="$(realpath "${test_dir}/../..")"
 delivery="${skill_dir}/scripts/gitlab_delivery.py"
-scratch="$(mktemp -d)"
+scratch="$(mktemp -d "${TMPDIR:-/tmp}/scratch.XXXXXXXX")"
 trap 'rm -rf "${scratch}"' EXIT
 
 work="${scratch}/work"

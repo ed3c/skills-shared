@@ -65,7 +65,7 @@ PY
 # Drive the scheduler itself without a model. This is the producer/checker
 # boundary: the ledger the runner writes has to be one the checker reconciles,
 # and a run that ends with a Worker still holding its lease has to come out red.
-work="$(mktemp -d)"
+work="$(mktemp -d "${TMPDIR:-/tmp}/work.XXXXXXXX")"
 trap 'rm -rf "${work}"' EXIT
 python3 "${runner}" --out "${work}" --skip-agent >"${work}/run.json"
 python3 "${checker}" check --receipt "${work}/scheduler-run.receipt.json"

@@ -12,7 +12,7 @@ test_dir="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
 skill_dir="$(realpath "${test_dir}/../..")"
 checker="${skill_dir}/scripts/check_fanout_contract.py"
 fixtures="${test_dir}/fixtures"
-tmp="$(mktemp -d)"
+tmp="$(mktemp -d "${TMPDIR:-/tmp}/tmp.XXXXXXXX")"
 trap 'rm -rf "${tmp}"' EXIT
 
 python3 -m py_compile "${checker}"

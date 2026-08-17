@@ -77,7 +77,7 @@ semantic_contract() {
   fi
 }
 
-tmp="$(mktemp -d)"
+tmp="$(mktemp -d "${TMPDIR:-/tmp}/tmp.XXXXXXXX")"
 trap 'rm -rf "${tmp}"' EXIT
 cp "$contract" "${tmp}/optional-prompt.md"
 perl -0pi -e 's/The submitted prompt must explicitly:/The submitted prompt may optionally:/' "${tmp}/optional-prompt.md"

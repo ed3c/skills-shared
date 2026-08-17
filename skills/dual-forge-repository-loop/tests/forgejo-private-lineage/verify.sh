@@ -4,7 +4,7 @@ set -euo pipefail
 tests_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 skill_root="$(cd "${tests_dir}/../.." && pwd)"
 mode_root="${skill_root}/modes/forgejo-private-repository-loop"
-tmp="$(mktemp -d)"
+tmp="$(mktemp -d "${TMPDIR:-/tmp}/tmp.XXXXXXXX")"
 trap 'rm -rf "${tmp}"' EXIT
 export HOME="${tmp}/home"
 export GIT_CONFIG_NOSYSTEM=1

@@ -15,7 +15,7 @@ python3 "${wrapper}" --repo-root "${repo_root}" --selftest
 python3 -m py_compile "${wrapper}" "${skill_dir}/scripts/ab_authority_selftest.py"
 
 # An absent manifest is unusable input (64), not a refused composition (2).
-work="$(mktemp -d)"
+work="$(mktemp -d "${TMPDIR:-/tmp}/work.XXXXXXXX")"
 set +e
 python3 "${wrapper}" --repo-root "${repo_root}" --manifest "${work}/absent.json" >/dev/null 2>&1
 absent_code=$?
