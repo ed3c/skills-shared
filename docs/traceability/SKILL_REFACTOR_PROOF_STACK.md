@@ -6,7 +6,7 @@ This document is the human-readable trace for Epic #318. Machine authority is:
 - `skills/skill-refactor-proof-loop/references/refactor-proof-stack.schema.json`;
 - `skills/skill-refactor-proof-loop/scripts/check_refactor_proof_stack.py`.
 
-Open PR heads and current workflow states are read from GitHub metadata. This document does not self-embed a mutable open head.
+Open PR heads and current workflow states are read from GitHub metadata. This document records PR identities but does not self-embed a mutable open head SHA.
 
 ## Molecular implementation graph
 
@@ -28,7 +28,7 @@ PR #324  agent/320-refactor-proof-agent-docs → PR #323 branch
 └─ consumes the new portable contract and registry
 
 #321 — molecular Stack and traceability convergence
-agent/321-refactor-proof-stack-index → PR #324 branch
+PR #325  agent/321-refactor-proof-stack-index → PR #324 branch
 ├─ consumes root/nearest Agent and State Machine documentation
 └─ converges the golden registry and Git Town traceability rules
 
@@ -43,38 +43,40 @@ PLANNED after the standard and convergence are Human-admitted
 | Tech Lead causal repair | `#307/#309` | `#308` | root | task/capability Skill, routes, governance subject selection | B2 task/schema/semantic/capability gates and frozen treatments | GitHub PR metadata + owning workflows |
 | Hermetic golden proof | `#312` | `#315` | true child | real-task fixture/runtime/scheduler/A-B suite | matched worktree/process/tournament/retry/global-objective/cleanup evidence | GitHub PR metadata + Skill Suites |
 | Portable proof contract | `#319` | `#323` | true child | `skill-refactor-proof-loop`, registry, route and CI admission | L0-L5 contract, golden registry, mutation controls | GitHub PR metadata + Skill Suites/Shared Skills Infra |
-| Agent documentation | `#320` | `#324` | true child | root and nearest Agent/README/State Machine routes | cold-start integration truth and directory DAG/data flow | GitHub PR metadata + documentation/Skill checks |
-| Molecular convergence | `#321` | pending publication | convergence | Stack schema/index/checker, Git Town README, traceability | complete issue/PR/artifact/evidence index | branch state until PR publication |
+| Agent documentation | `#320` | `#324` | true child | root and nearest Agent/README/State Machine routes | cold-start integration truth and directory DAG/data flow | GitHub PR metadata + route/check workflows |
+| Molecular convergence | `#321` | `#325` | convergence | Stack schema/index/checker, Git Town README, traceability | complete issue/PR/artifact/evidence index | GitHub PR #325 metadata + exact-head workflows |
 | Adoption audit | `#322` | none | planned follow-up | no paths leased yet | cross-Skill adoption ledger and migration backlog | issue contract only |
 
 ## Artifact dependency edges
 
 ```text
 PR #308
-  task-schema-and-semantic-admission
-  capability-receipt-causal-dag
+  task-and-semantic-admission
+  capability-causal-dag
   frozen-treatment-fixtures
         ↓ consumed unmerged
 PR #315
-  matched-L3-hermetic-real-task-report
-  complete-denominator-and-cleanup-evidence
+  matched-L3-report
+  complete-denominator
+  clean-worktree-process-receipt
         ↓ consumed unmerged
 PR #323
-  portable-refactor-proof-contract
+  portable-proof-contract
   golden-proof-registry
+  proof-checkers
         ↓ consumed unmerged
 PR #324
-  root-Agent-refactor-contract
-  directory-to-State-Machine-map
-  Tech-Lead-DAG-and-data-flow-map
+  root-Agent-contract
+  directory-State-Machine-map
+  Tech-Lead-DAG-data-flow
         ↓ consumed unmerged
-#321 convergence
-  machine-readable-molecular-Stack-index
-  Git-Town-proof-Stack-template
-  complete-issue-PR-evidence-trace
+PR #325 convergence
+  machine-molecular-Stack-index
+  Git-Town-refactor-Stack-template
+  complete-trace
 ```
 
-The #321 convergence node also consumes the verified registry from PR #323. This is a convergence edge, not a second Git parent.
+PR #325 also consumes the verified registry from PR #323. This is a convergence edge, not a second Git parent.
 
 ## Independent live evidence lanes
 
@@ -130,4 +132,4 @@ A stale self-embedded head, old green workflow, issue close, or merge-side effec
 
 ## Rollback and Human boundary
 
-Each node records its rollback. Closing or deleting a downstream branch preserves its parent artifacts. The Stack never grants automatic semantic conflict resolution, force push, `git town ship`, merge, release or promotion. Those remain Human/repository-trusted authorities.
+Each node records its rollback. Closing a downstream PR preserves its parent artifacts. The Stack never grants automatic semantic conflict resolution, force push, `git town ship`, merge, release or promotion. Those remain Human/repository-trusted authorities.

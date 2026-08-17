@@ -30,7 +30,7 @@ skills/skill-refactor-proof-loop/scripts/check_refactor_proof_stack.py
 | Production-shaped hermetic golden proof | `#312` | `#315` | true child | `agent/312-tech-lead-real-task-ab` / PR #308 branch | current GitHub PR metadata and Skill Suites |
 | Generalized proof contract + golden registry | `#319` | `#323` | true child | `agent/319-skill-refactor-proof-contract` / PR #315 branch | current GitHub PR metadata and Skill Suites/Shared Skills Infra |
 | Agent routes + directory State Machines/DAG/data flow | `#320` | `#324` | true child | `agent/320-refactor-proof-agent-docs` / PR #323 branch | current GitHub PR metadata and route/check workflows |
-| Molecular Stack + traceability convergence | `#321` | pending publication | convergence | `agent/321-refactor-proof-stack-index` / PR #324 branch | branch state; exact-head workflow `NOT_EXERCISED` until PR publication |
+| Molecular Stack + traceability convergence | `#321` | `#325` | convergence | `agent/321-refactor-proof-stack-index` / PR #324 branch | current GitHub PR metadata and exact-head workflows |
 | Cross-Skill adoption audit | `#322` | none | planned process follow-up | no branch leased | issue contract only; blocked on Human admission of the standard |
 
 True-child edges are justified by consumed unmerged artifacts:
@@ -40,7 +40,7 @@ True-child edges are justified by consumed unmerged artifacts:
 → #315 matched L3 proof
 → #323 portable contract and golden registry
 → #324 Agent and State Machine documentation
-→ #321 one convergence/index owner
+→ #325 one convergence/index owner
 ```
 
 Issue #322 is a process dependency after admission, not automatically a Git child. Issues #231, #232, #234 and #256 are independent scheduler, Shadow, delivery and adapter evidence lanes; they may raise #312 from L3 to L4/L5 only with matched exact-subject receipts. They are not fake Stack ancestry.
