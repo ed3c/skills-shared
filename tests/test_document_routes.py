@@ -20,6 +20,7 @@ configuration that a harness is entitled to remove.
 """
 from __future__ import annotations
 
+import re
 import shutil
 import subprocess
 import sys
@@ -190,8 +191,11 @@ class RouteGateTests(unittest.TestCase):
         self.plant(
             INDEX.as_posix(),
             lambda path: path.write_text(
-                path.read_text(encoding="utf-8").replace(
-                    "12 of 31 skill directories", "11 of 30 skill directories"
+                re.sub(
+                    r"\d+ of \d+ skill directories",
+                    "11 of 30 skill directories",
+                    path.read_text(encoding="utf-8"),
+                    count=1,
                 ),
                 encoding="utf-8",
             ),
@@ -210,8 +214,11 @@ class RouteGateTests(unittest.TestCase):
         self.plant(
             INDEX.as_posix(),
             lambda path: path.write_text(
-                path.read_text(encoding="utf-8").replace(
-                    "12 of 31 skill directories ship a", "several skill directories ship a"
+                re.sub(
+                    r"\d+ of \d+ skill directories ship a",
+                    "several skill directories ship a",
+                    path.read_text(encoding="utf-8"),
+                    count=1,
                 ),
                 encoding="utf-8",
             ),
