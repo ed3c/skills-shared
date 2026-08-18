@@ -1,0 +1,155 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "prel-prompt-packet.schema.json",
+  "title": "PREL prompt packet",
+  "description": "The nine portable prompt surfaces plus their common system envelope. Every surface binds an exact subject, a writer lease, start and completion dependencies, evidence lanes, negative controls, rollback and Human-owned operations. No surface may grant merge, permission, secret or production authority, and no surface may request private chain of thought. Consumer identifiers live only inside consumer_binding.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "envelope", "surfaces"],
+  "properties": {
+    "schema": {"const": "prel/prompt-packet/v1"},
+    "envelope": {"$ref": "#/$defs/envelope"},
+    "surfaces": {
+      "type": "array",
+      "minItems": 9,
+      "items": {"$ref": "#/$defs/surface"}
+    }
+  },
+  "$defs": {
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["merge", "permission", "secret", "production"],
+      "properties": {
+        "merge": {"const": false},
+        "permission": {"const": false},
+        "secret": {"const": false},
+        "production": {"const": false}
+      }
+    },
+    "consumer_binding": {
+      "type": "object",
+      "additionalProperties": {"type": "string"},
+      "description": "The only place a consumer branch, issue, remote or path may appear. Everything outside it is portable core text."
+    },
+    "envelope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "evidence_vocabulary",
+        "refusal_codes",
+        "requests_private_reasoning",
+        "authority",
+        "human_owned_operations",
+        "consumer_binding"
+      ],
+      "properties": {
+        "id": {"const": "COMMON_SYSTEM_ENVELOPE"},
+        "evidence_vocabulary": {
+          "type": "array",
+          "minItems": 7,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "PASS",
+              "FAIL",
+              "ABSENT",
+              "NOT_IMPLEMENTED",
+              "NOT_EXERCISED",
+              "SKIPPED_BY_POLICY",
+              "HUMAN_ADMIT_REQUIRED"
+            ]
+          }
+        },
+        "refusal_codes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 4}
+        },
+        "requests_private_reasoning": {"const": false},
+        "authority": {"$ref": "#/$defs/authority"},
+        "human_owned_operations": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 4}
+        },
+        "consumer_binding": {"$ref": "#/$defs/consumer_binding"}
+      }
+    },
+    "surface": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "exact_subject",
+        "lease",
+        "start_dependencies",
+        "completion_dependencies",
+        "evidence_lanes",
+        "negative_controls",
+        "rollback",
+        "human_owned_operations",
+        "requests_private_reasoning",
+        "authority",
+        "consumer_binding"
+      ],
+      "properties": {
+        "id": {
+          "enum": [
+            "STAGE_1_CONTROL_BINDER",
+            "STAGE_2_SOURCE_INTAKE",
+            "STAGE_3_EVIDENCE_COMPILER",
+            "STAGE_4_YC_PRODUCT_REVERSE_ENGINEER",
+            "STAGE_5_TECHNICAL_SYSTEMS_ARCHITECT",
+            "STAGE_6_SHADOW_MONITOR",
+            "STAGE_7_TECH_LEAD_PLANNER",
+            "STAGE_8_MOLECULAR_WORKER",
+            "STAGE_9_CONVERGENCE_OWNER"
+          ]
+        },
+        "exact_subject": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["artifact", "digest"],
+          "properties": {
+            "artifact": {"type": "string", "minLength": 1},
+            "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+          }
+        },
+        "lease": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "start_dependencies": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+        "completion_dependencies": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+        "evidence_lanes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"enum": ["DETERMINISTIC", "BEHAVIORAL", "USER", "PAID", "HUMAN_ADMIT"]}
+        },
+        "negative_controls": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 4}
+        },
+        "rollback": {"type": "string", "minLength": 8},
+        "human_owned_operations": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 4}
+        },
+        "requests_private_reasoning": {"const": false},
+        "authority": {"$ref": "#/$defs/authority"},
+        "consumer_binding": {"$ref": "#/$defs/consumer_binding"}
+      }
+    }
+  }
+}

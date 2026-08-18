@@ -1,0 +1,201 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "prel-reverse-engineering-dossier.schema.json",
+  "title": "PREL reverse-engineering dossier",
+  "description": "Deterministic projection of a product signal set into job, pain, workflow, magic moment, classified mechanism hypotheses, a capability/rights graph and a bounded MVP with its stop loss. Every slot carries the grade its evidence actually supports; a slot with no admissible signal is ABSENT and is never filled by inference.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "subject",
+    "derived_from",
+    "job",
+    "pain",
+    "workflow",
+    "magic_moment",
+    "mechanism_hypotheses",
+    "capability_graph",
+    "rights",
+    "mvp",
+    "evidence_ceiling"
+  ],
+  "properties": {
+    "schema": {"const": "prel/reverse-engineering-dossier/v1"},
+    "subject": {"$ref": "#/$defs/subject"},
+    "derived_from": {"$ref": "#/$defs/derived_from"},
+    "job": {"$ref": "#/$defs/slot"},
+    "pain": {"$ref": "#/$defs/slot"},
+    "workflow": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/slot"}
+    },
+    "magic_moment": {"$ref": "#/$defs/slot"},
+    "mechanism_hypotheses": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/mechanism"}
+    },
+    "capability_graph": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["nodes", "edges"],
+      "properties": {
+        "nodes": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/capability_node"}
+        },
+        "edges": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/capability_edge"}
+        }
+      }
+    },
+    "rights": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/right"}
+    },
+    "mvp": {"$ref": "#/$defs/mvp"},
+    "evidence_ceiling": {"$ref": "#/$defs/evidence_ceiling"}
+  },
+  "$defs": {
+    "state": {
+      "enum": [
+        "PASS",
+        "FAIL",
+        "ABSENT",
+        "NOT_IMPLEMENTED",
+        "NOT_EXERCISED",
+        "SKIPPED_BY_POLICY",
+        "HUMAN_ADMIT_REQUIRED"
+      ]
+    },
+    "grade": {"enum": ["OBSERVED", "REPORTED", "CLAIMED", "INFERRED", "ABSENT"]},
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["product_id", "surface", "captured_at", "subject_digest"],
+      "properties": {
+        "product_id": {"type": "string", "minLength": 1},
+        "surface": {"type": "string", "minLength": 1},
+        "captured_at": {"type": "string", "minLength": 10},
+        "subject_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "derived_from": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifact", "digest"],
+      "properties": {
+        "artifact": {"type": "string", "minLength": 1},
+        "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "slot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["grade", "statement", "signal_ids"],
+      "properties": {
+        "grade": {"$ref": "#/$defs/grade"},
+        "statement": {"type": "string"},
+        "signal_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string"}}
+      }
+    },
+    "mechanism": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "classification", "grade", "statement", "oracle_id", "signal_ids"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^MECH-[0-9]{3}$"},
+        "classification": {
+          "enum": ["OBSERVABLE_MECHANISM", "VENDOR_CLAIMED_MECHANISM", "UNOBSERVABLE_MECHANISM"]
+        },
+        "grade": {"$ref": "#/$defs/grade"},
+        "statement": {"type": "string", "minLength": 12},
+        "oracle_id": {"oneOf": [{"type": "null"}, {"type": "string", "pattern": "^ORC-[0-9]{3}$"}]},
+        "signal_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string"}}
+      }
+    },
+    "capability_node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "capability", "grade", "signal_ids"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^CAP-[0-9]{3}$"},
+        "capability": {"type": "string", "minLength": 4},
+        "grade": {"$ref": "#/$defs/grade"},
+        "signal_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string"}}
+      }
+    },
+    "capability_edge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from", "to", "basis"],
+      "properties": {
+        "from": {"type": "string", "pattern": "^CAP-[0-9]{3}$"},
+        "to": {"type": "string", "pattern": "^CAP-[0-9]{3}$"},
+        "basis": {"type": "string", "minLength": 8}
+      }
+    },
+    "right": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "resource", "state", "owner"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^RGT-[0-9]{3}$"},
+        "resource": {"type": "string", "minLength": 4},
+        "state": {"$ref": "#/$defs/state"},
+        "owner": {"type": "string", "minLength": 1}
+      }
+    },
+    "mvp": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scope", "excluded", "stop_loss"],
+      "properties": {
+        "scope": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "requirement", "lane", "oracle_id", "source_id"],
+            "properties": {
+              "id": {"type": "string", "pattern": "^REQ-[0-9]{3}$"},
+              "requirement": {"type": "string", "minLength": 12},
+              "lane": {"enum": ["DETERMINISTIC", "BEHAVIORAL", "USER", "PAID", "HUMAN_ADMIT"]},
+              "oracle_id": {"oneOf": [{"type": "null"}, {"type": "string", "pattern": "^ORC-[0-9]{3}$"}]},
+              "source_id": {"type": "string", "minLength": 4}
+            }
+          }
+        },
+        "excluded": {"type": "array", "items": {"type": "string", "minLength": 4}},
+        "stop_loss": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["condition", "action"],
+          "properties": {
+            "condition": {"type": "string", "minLength": 12},
+            "action": {"type": "string", "minLength": 8}
+          }
+        }
+      }
+    },
+    "evidence_ceiling": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "portable_procedure",
+        "deterministic_contract",
+        "product_market_fit",
+        "live_provider_execution",
+        "production_readiness"
+      ],
+      "properties": {
+        "portable_procedure": {"$ref": "#/$defs/state"},
+        "deterministic_contract": {"$ref": "#/$defs/state"},
+        "product_market_fit": {"$ref": "#/$defs/state"},
+        "live_provider_execution": {"$ref": "#/$defs/state"},
+        "production_readiness": {"$ref": "#/$defs/state"}
+      }
+    }
+  }
+}

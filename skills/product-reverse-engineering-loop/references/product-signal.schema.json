@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "prel-product-signal.schema.json",
+  "title": "PREL product signal set",
+  "description": "Compatibility binding for an evidence-bound product signal set. The producer of these signals is consumer-owned; this contract declares only the fields the portable loop consumes and the evidence kinds it will accept. A signal carries what was seen and how it could be refuted, never a conclusion.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "compatibility", "subject", "signals"],
+  "properties": {
+    "schema": {"const": "prel/product-signal/v1"},
+    "compatibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["producer_id", "producer_digest", "consumed_fields"],
+      "properties": {
+        "producer_id": {"type": "string", "minLength": 1},
+        "producer_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "consumed_fields": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "subject": {"$ref": "#/$defs/subject"},
+    "signals": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/signal"}
+    }
+  },
+  "$defs": {
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["product_id", "surface", "captured_at", "subject_digest"],
+      "properties": {
+        "product_id": {"type": "string", "minLength": 1},
+        "surface": {"type": "string", "minLength": 1},
+        "captured_at": {"type": "string", "minLength": 10},
+        "subject_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "signal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "slot", "kind", "statement", "observation", "oracle", "depends_on", "source_ref"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^SIG-[0-9]{3}$"},
+        "slot": {
+          "enum": ["JOB", "PAIN", "WORKFLOW", "MAGIC_MOMENT", "MECHANISM", "CAPABILITY", "RIGHTS", "MARKET"]
+        },
+        "kind": {
+          "enum": [
+            "OBSERVED_ARTIFACT",
+            "PAID_CONVERSION",
+            "USER_INTERVIEW",
+            "THIRD_PARTY_REPORT",
+            "SOURCE_STATEMENT",
+            "MARKET_ATTENTION",
+            "INFERENCE"
+          ]
+        },
+        "statement": {"type": "string", "minLength": 12},
+        "observation": {
+          "oneOf": [{"type": "null"}, {"$ref": "#/$defs/observation"}]
+        },
+        "oracle": {
+          "oneOf": [{"type": "null"}, {"$ref": "#/$defs/oracle"}]
+        },
+        "depends_on": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^SIG-[0-9]{3}$"},
+          "description": "Signals this one is downstream of. The only source of capability-graph edges: the compiler projects declared dependencies and never invents one."
+        },
+        "source_ref": {"type": "string", "minLength": 1}
+      }
+    },
+    "observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["method", "artifact_ref", "repeatable"],
+      "properties": {
+        "method": {"type": "string", "minLength": 8},
+        "artifact_ref": {"type": "string", "minLength": 1},
+        "repeatable": {"type": "boolean"}
+      }
+    },
+    "oracle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "lane", "procedure", "refuted_by"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^ORC-[0-9]{3}$"},
+        "lane": {"enum": ["DETERMINISTIC", "BEHAVIORAL", "USER", "PAID", "HUMAN_ADMIT"]},
+        "procedure": {"type": "string", "minLength": 12},
+        "refuted_by": {"type": "string", "minLength": 12}
+      }
+    }
+  }
+}

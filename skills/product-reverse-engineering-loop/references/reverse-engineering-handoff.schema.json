@@ -1,0 +1,136 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "prel-reverse-engineering-handoff.schema.json",
+  "title": "PREL executable handoff",
+  "description": "Bounded implementation packets compiled from the closure matrix. A packet names an exact digest-bound subject, a disjoint path lease, its own verification and exit condition. An edge between packets exists only when the successor consumes a named artifact the predecessor produces; path-disjoint packets with no consumed artifact stay siblings. Every non-closed row leaves the loop as a named remaining item with an owner, never as prose.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "subject", "derived_from", "packets", "remaining", "human_admit"],
+  "properties": {
+    "schema": {"const": "prel/reverse-engineering-handoff/v1"},
+    "subject": {"$ref": "#/$defs/subject"},
+    "derived_from": {"$ref": "#/$defs/derived_from"},
+    "packets": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/packet"}
+    },
+    "remaining": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/remaining_item"}
+    },
+    "human_admit": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 4}
+    }
+  },
+  "$defs": {
+    "state": {
+      "enum": [
+        "PASS",
+        "FAIL",
+        "ABSENT",
+        "NOT_IMPLEMENTED",
+        "NOT_EXERCISED",
+        "SKIPPED_BY_POLICY",
+        "HUMAN_ADMIT_REQUIRED"
+      ]
+    },
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["product_id", "surface", "captured_at", "subject_digest"],
+      "properties": {
+        "product_id": {"type": "string", "minLength": 1},
+        "surface": {"type": "string", "minLength": 1},
+        "captured_at": {"type": "string", "minLength": 10},
+        "subject_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "derived_from": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifact", "digest"],
+      "properties": {
+        "artifact": {"type": "string", "minLength": 1},
+        "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "packet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "closure_row_id",
+        "exact_subject",
+        "entry_condition",
+        "paths_lease",
+        "verification",
+        "exit_condition",
+        "depends_on",
+        "convergence_owner"
+      ],
+      "properties": {
+        "id": {"type": "string", "pattern": "^PKT-[0-9]{3}$"},
+        "closure_row_id": {"type": "string", "pattern": "^CLR-[0-9]{3}$"},
+        "exact_subject": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["artifact", "digest"],
+          "properties": {
+            "artifact": {"type": "string", "minLength": 1},
+            "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+          }
+        },
+        "entry_condition": {"type": "string", "minLength": 12},
+        "paths_lease": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "verification": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["lane", "procedure"],
+          "properties": {
+            "lane": {"enum": ["DETERMINISTIC", "BEHAVIORAL", "USER", "PAID", "HUMAN_ADMIT"]},
+            "procedure": {"type": "string", "minLength": 12}
+          }
+        },
+        "exit_condition": {"type": "string", "minLength": 12},
+        "depends_on": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["packet_id", "consumes"],
+            "properties": {
+              "packet_id": {"type": "string", "pattern": "^PKT-[0-9]{3}$"},
+              "consumes": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {"type": "string", "minLength": 1}
+              }
+            }
+          }
+        },
+        "convergence_owner": {"oneOf": [{"type": "null"}, {"type": "string", "minLength": 1}]}
+      }
+    },
+    "remaining_item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["closure_row_id", "criterion", "state", "owner"],
+      "properties": {
+        "closure_row_id": {"type": "string", "pattern": "^CLR-[0-9]{3}$"},
+        "criterion": {"type": "string", "minLength": 12},
+        "state": {"$ref": "#/$defs/state"},
+        "owner": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

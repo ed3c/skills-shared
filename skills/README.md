@@ -108,6 +108,7 @@ Shared Skills may reference another method, but consumer selection remains expli
 - [`dual-forge-repository-loop`](dual-forge-repository-loop/README.md) — GitHub ingress/Actions plus local Forgejo worktree implementation, local-main-first integration, GitHub conflict/issue reconciliation, and exact-head publication.
 - [`agentic-tech-lead-orchestration`](agentic-tech-lead-orchestration/README.md) — candidate contract-first DAG, deterministic code-intelligence roles, bounded parallel Workers, tournament selection, and Stacked PR handoff. Registry admission is a separate governance fact from directory presence.
 - [`skill-refactor-proof-loop`](skill-refactor-proof-loop/README.md) — frozen old/as-landed/repaired treatments, old-strength retention, executable reachability, matched hermetic/live A/B layers, golden-proof registration, and no evidence promotion.
+- [`product-reverse-engineering-loop`](product-reverse-engineering-loop/README.md) — evidence-graded product signals, mechanism classification against observable oracles, problem closure by lane, and bounded implementation packets. Its registry classification is `ABSENT` until a Human-admitted governance change; directory presence decides nothing.
 
 ## Delivery methods
 
