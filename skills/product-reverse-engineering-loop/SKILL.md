@@ -65,6 +65,32 @@ BLOCKED_STALE_SUBJECT
 A terminal is a state, not a failure to report. Every blocked row leaves the
 loop as a named remaining item with a named owner.
 
+## Closure levels
+
+What a closed problem has actually earned is one level on this ladder, over the
+six evidence lanes:
+
+```text
+SOURCE_ANCHORED         source
+MECHANISM_BOUND         mechanism
+IMPLEMENTED             implementation
+TECH_VERIFIED           implementation, verified over that exact subject
+LIVE_WORKFLOW_VERIFIED  runtime
+USER_VALIDATED          user
+PAID_VALIDATED          commercial
+BLOCKED                 nothing earned, nothing failed
+FAILED                  a rung is FAIL
+```
+
+The earned level is the longest unbroken `PASS` prefix and is recomputed from
+the rung states, never read from the claim. `CORE-LAW-004` decides the rest: the
+evidence kind that closes a rung is fixed per level, so a CI run closes
+`TECH_VERIFIED` and cannot reach the runtime, user or commercial lanes above it.
+Auditing a claim against this ladder read-only, and handing the result to an
+independent reviewer, is
+[`modules/shadow-closure-audit.md`](modules/shadow-closure-audit.md); the
+artifact contract is `references/product-closure-audit.schema.json`.
+
 ## Hard laws
 
 - **CORE-LAW-001 — grade before interpretation.** Every input carries a signal

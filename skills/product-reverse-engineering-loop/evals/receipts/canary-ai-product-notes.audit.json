@@ -1,0 +1,471 @@
+{
+  "audit_subject": {
+    "captured_at": "2026-08-18",
+    "compared_surfaces": [
+      "README.md",
+      "opportunities/vendor-api-blast-radius/opportunity.json",
+      "experiments/vendor-api-blast-radius/README.md",
+      "experiments/vendor-api-blast-radius/receipt.schema.json",
+      "scripts/compile_opportunity.py",
+      "tests/test_opportunity_compiler.py",
+      "canary-ai-product-notes-forge-capture.json"
+    ],
+    "subject_id": "ed3c/ai-product-notes",
+    "subject_revision": "f9339aa87cb10d6b6d47ce227d8b87e518d1f2eb",
+    "surface": "a read-only shallow clone at that revision, plus its forge issue, gate-issue body and check-run state captured beside this audit"
+  },
+  "evidence_ceiling": {
+    "deterministic_contract": "PASS",
+    "live_provider_execution": "NOT_EXERCISED",
+    "portable_procedure": "PASS",
+    "product_market_fit": "ABSENT",
+    "production_readiness": "NOT_EXERCISED"
+  },
+  "external_authority": {
+    "commercial": "HUMAN_ADMIT_REQUIRED",
+    "customer_truth": "HUMAN_ADMIT_REQUIRED",
+    "merge": "HUMAN_ADMIT_REQUIRED",
+    "release": "HUMAN_ADMIT_REQUIRED",
+    "rights": "HUMAN_ADMIT_REQUIRED"
+  },
+  "issue_delta": [
+    {
+      "action": "PROPOSE_UPDATE",
+      "id": "DLT-001",
+      "problem_id": "PRB-001",
+      "statement": "propose stating the technical-history count and the buyer-gate count in the same place, so nineteen closed items and zero of three qualified teams are read together rather than one section apart",
+      "write_authority": "NO_WRITE_AUTHORITY"
+    },
+    {
+      "action": "PROPOSE_UPDATE",
+      "id": "DLT-002",
+      "problem_id": "PRB-002",
+      "statement": "propose recording the experiment's runtime rung as an unrun obligation on the opportunity packet itself, since the packet's next required state is the one nobody has entered",
+      "write_authority": "NO_WRITE_AUTHORITY"
+    },
+    {
+      "action": "PROPOSE_OPEN",
+      "id": "DLT-003",
+      "problem_id": "PRB-003",
+      "statement": "propose binding the source document by digest in the repository before any archetype run consumes it, so the statements derived from it name bytes a reviewer can re-hash",
+      "write_authority": "NO_WRITE_AUTHORITY"
+    }
+  ],
+  "problems": [
+    {
+      "declared_status": {
+        "anchor": {
+          "exact_subject": {
+            "artifact": "README.md",
+            "digest": "b38556df41eb6b8fae677bb2e7eb206eb11e4500a05abb3cc61ff6595ac253a0"
+          },
+          "kind": "SOURCE_DOCUMENT",
+          "locator": "the current decision block",
+          "observed": "decision VALIDATE at score 62.06, paid demand ABSENT, customer-origin evidence ABSENT, and no promotion to BUILD without customer and paid-pilot receipts"
+        },
+        "claimed_level": "TECH_VERIFIED",
+        "statement": "the first external wedge is a compiler-validated opportunity and is not claimed as market evidence"
+      },
+      "findings": [
+        {
+          "anchors": [
+            {
+              "exact_subject": {
+                "artifact": "canary-ai-product-notes-forge-capture.json",
+                "digest": "a0e0ad76054573a13e3294b00292e8372aa7da94971d0bf0d6bf35c997a66d9c"
+              },
+              "kind": "ISSUE_RECORD",
+              "locator": "issue_lane.issues, counted by state",
+              "observed": "nineteen items are closed, nine of them implementation leaves, while six items titled as gates remain open, including the market, adoption and product-owner gates"
+            },
+            {
+              "exact_subject": {
+                "artifact": "canary-ai-product-notes-forge-capture.json",
+                "digest": "a0e0ad76054573a13e3294b00292e8372aa7da94971d0bf0d6bf35c997a66d9c"
+              },
+              "kind": "ISSUE_RECORD",
+              "locator": "gate_issue_bodies.issues[number=33]",
+              "observed": "customer-origin confirmations stand at zero of three, and the gate states that repository-generated technical evidence must not be substituted for buyer evidence"
+            }
+          ],
+          "authority": "FINDINGS_ONLY",
+          "code": "EVIDENCE_ABSENT",
+          "id": "FND-001",
+          "proposed_repair": "state the buyer-gate counts wherever the technical history is displayed, so the two are read as separate lanes with separate denominators",
+          "statement": "the visible progress record is technical and its density does not move the user, paid or owner rungs, all three of which are still owned by open gates"
+        },
+        {
+          "anchors": [
+            {
+              "exact_subject": {
+                "artifact": "canary-ai-product-notes-forge-capture.json",
+                "digest": "a0e0ad76054573a13e3294b00292e8372aa7da94971d0bf0d6bf35c997a66d9c"
+              },
+              "kind": "ISSUE_RECORD",
+              "locator": "gate_issue_bodies.issues[number=35]",
+              "observed": "the durable hosted owner is UNSELECTED, which the opportunity packet also records in its handoff block"
+            }
+          ],
+          "authority": "FINDINGS_ONLY",
+          "code": "EVIDENCE_ABSENT",
+          "id": "FND-002",
+          "proposed_repair": "keep the unselected owner visible on the opportunity packet, since a hosted product with no accountable owner cannot enter the runtime lane whatever the technical rungs say",
+          "statement": "no durable owner has been selected, so the lane that would operate the wedge has nobody in it"
+        }
+      ],
+      "highest_earned_level": "TECH_VERIFIED",
+      "id": "PRB-001",
+      "levels": [
+        {
+          "anchors": [
+            {
+              "exact_subject": {
+                "artifact": "opportunities/vendor-api-blast-radius/opportunity.json",
+                "digest": "6dd9dc92f690b49c793394db91f95796da8a32cd29a8db23455a23ce6e4157ef"
+              },
+              "kind": "SOURCE_DOCUMENT",
+              "locator": "source_identity and packet_digest",
+              "observed": "the packet pins the signal, asset-registry and public-portfolio digests it was compiled from, and carries its own packet digest"
+            }
+          ],
+          "lane": "SOURCE",
+          "level": "SOURCE_ANCHORED",
+          "state": "PASS"
+        },
+        {
+          "anchors": [
+            {
+              "exact_subject": {
+                "artifact": "opportunities/vendor-api-blast-radius/opportunity.json",
+                "digest": "6dd9dc92f690b49c793394db91f95796da8a32cd29a8db23455a23ce6e4157ef"
+              },
+              "kind": "MECHANISM_OBSERVATION",
+              "locator": "gates.demand and gates.uncovered_must_capabilities",
+              "observed": "the demand gate records three independent evidence groups, direct paid demand false, an empty customer-origin list and one uncovered must-have capability, each of which a different input would visibly change"
+            }
+          ],
+          "lane": "MECHANISM",
+          "level": "MECHANISM_BOUND",
+          "state": "PASS"
+        },
+        {
+          "anchors": [
+            {
+              "exact_subject": {
+                "artifact": "scripts/compile_opportunity.py",
+                "digest": "25e580d5231fc4a94e3e535298611d26258fb954c9df11fb2ec5a9d8c8b4f452"
+              },
+              "kind": "CODE_SUBJECT",
+              "locator": "the opportunity compiler entry point",
+              "observed": "the compiler that produced the packet exists at this revision"
+            }
+          ],
+          "lane": "IMPLEMENTATION",
+          "level": "IMPLEMENTED",
+          "state": "PASS"
+        },
+        {
+          "anchors": [
+            {
+              "exact_subject": {
+                "artifact": "canary-ai-product-notes-forge-capture.json",
+                "digest": "a0e0ad76054573a13e3294b00292e8372aa7da94971d0bf0d6bf35c997a66d9c"
+              },
+              "kind": "CI_RUN",
+              "locator": "ci_lane.check_runs.runs",
+              "observed": "the exact-head contracts check completed with conclusion success against this revision, and the synthetic-merge leg is recorded skipped rather than passed"
+            },
+            {
+              "exact_subject": {
+                "artifact": "tests/test_opportunity_compiler.py",
+                "digest": "a9683b57ec4789e363de03a9e22bde4dec78f9325732af6830d518584d6de501"
+              },
+              "kind": "DETERMINISTIC_SUITE",
+              "locator": "the opportunity compiler tests",
+              "observed": "the compiler's own suite is present at this revision and is what the exact-head check executes"
+            }
+          ],
+          "lane": "IMPLEMENTATION",
+          "level": "TECH_VERIFIED",
+          "state": "PASS"
+        },
+        {
+          "anchors": [],
+          "lane": "RUNTIME",
+          "level": "LIVE_WORKFLOW_VERIFIED",
+          "note": "the packet's required next state is an experiment that has not been entered; the runtime gate says so and forbids representing the absence as either pass or fail",
+          "state": "NOT_EXERCISED"
+        },
+        {
+          "anchors": [],
+          "lane": "USER",
+          "level": "USER_VALIDATED",
+          "note": "customer-origin confirmations stand at zero of three",
+          "state": "ABSENT"
+        },
+        {
+          "anchors": [],
+          "lane": "COMMERCIAL",
+          "level": "PAID_VALIDATED",
+          "note": "direct paid demand is recorded false with an empty paid-evidence list",
+          "state": "ABSENT"
+        }
+      ],
+      "missing_lanes": ["COMMERCIAL", "RUNTIME", "USER"],
+      "statement": "the first external wedge is an opportunity somebody would adopt and pay for, not only one the compiler scored"
+    },
+    {
+      "declared_status": {
+        "anchor": {
+          "exact_subject": {
+            "artifact": "experiments/vendor-api-blast-radius/README.md",
+            "digest": "690f9cd8928fa68824f075520b30101263b8c9cd761cfe4a5c84fa8d8d7ec8b3"
+          },
+          "kind": "SOURCE_DOCUMENT",
+          "locator": "the state line and the receipt rules",
+          "observed": "the experiment contract declares its own state NOT_EXERCISED and states that it holds no participant data and no success receipt"
+        },
+        "claimed_level": "BLOCKED",
+        "statement": "the bounded market experiment for the wedge has not been run and claims no outcome"
+      },
+      "findings": [
+        {
+          "anchors": [
+            {
+              "exact_subject": {
+                "artifact": "opportunities/vendor-api-blast-radius/opportunity.json",
+                "digest": "6dd9dc92f690b49c793394db91f95796da8a32cd29a8db23455a23ce6e4157ef"
+              },
+              "kind": "SOURCE_DOCUMENT",
+              "locator": "mvp_experiment.hypothesis and handoff.required_next_state",
+              "observed": "the packet carries a priced hypothesis at ninety-nine US dollars per repository per month and names the experiment as its required next state"
+            }
+          ],
+          "authority": "FINDINGS_ONLY",
+          "code": "OBLIGATION_SKIPPED_AT_FIRST_GREEN",
+          "id": "FND-003",
+          "proposed_repair": "carry the unrun experiment as an open obligation on the packet, so the priced hypothesis is never read as the price somebody agreed to",
+          "statement": "the falsifier for the priced hypothesis is fully specified and has never been executed, which is a different state from an absent oracle and is easy to lose beside a green technical record"
+        }
+      ],
+      "highest_earned_level": "MECHANISM_BOUND",
+      "id": "PRB-002",
+      "levels": [
+        {
+          "anchors": [
+            {
+              "exact_subject": {
+                "artifact": "experiments/vendor-api-blast-radius/README.md",
+                "digest": "690f9cd8928fa68824f075520b30101263b8c9cd761cfe4a5c84fa8d8d7ec8b3"
+              },
+              "kind": "SOURCE_DOCUMENT",
+              "locator": "the experiment contract",
+              "observed": "the interview, replay and pilot gates are written down with their metrics and their exclusions"
+            }
+          ],
+          "lane": "SOURCE",
+          "level": "SOURCE_ANCHORED",
+          "state": "PASS"
+        },
+        {
+          "anchors": [
+            {
+              "exact_subject": {
+                "artifact": "experiments/vendor-api-blast-radius/receipt.schema.json",
+                "digest": "e3900de7b49de6f5f406633cd7eb19fb012534a3c0dbb2d74e7c9079431ffa4f"
+              },
+              "kind": "MECHANISM_OBSERVATION",
+              "locator": "the receipt contract",
+              "observed": "a receipt must bind numerator, denominator, exclusions and commitment state, so a weak result cannot be recorded as a strong one"
+            }
+          ],
+          "lane": "MECHANISM",
+          "level": "MECHANISM_BOUND",
+          "state": "PASS"
+        },
+        {
+          "anchors": [],
+          "lane": "IMPLEMENTATION",
+          "level": "IMPLEMENTED",
+          "note": "no runner exists for the market experiment; the contract defines what a receipt must carry, not a process that produces one",
+          "state": "ABSENT"
+        },
+        {
+          "anchors": [],
+          "lane": "IMPLEMENTATION",
+          "level": "TECH_VERIFIED",
+          "state": "ABSENT"
+        },
+        {
+          "anchors": [],
+          "lane": "RUNTIME",
+          "level": "LIVE_WORKFLOW_VERIFIED",
+          "note": "the contract's own state line records that it has not been exercised",
+          "state": "NOT_EXERCISED"
+        },
+        {
+          "anchors": [],
+          "lane": "USER",
+          "level": "USER_VALIDATED",
+          "state": "ABSENT"
+        },
+        {
+          "anchors": [],
+          "lane": "COMMERCIAL",
+          "level": "PAID_VALIDATED",
+          "state": "ABSENT"
+        }
+      ],
+      "missing_lanes": ["COMMERCIAL", "IMPLEMENTATION", "RUNTIME", "USER"],
+      "statement": "the bounded market experiment for the wedge has produced an outcome that could refute its priced hypothesis"
+    },
+    {
+      "declared_status": {
+        "anchor": {
+          "exact_subject": {
+            "artifact": "canary-ai-product-notes-forge-capture.json",
+            "digest": "a0e0ad76054573a13e3294b00292e8372aa7da94971d0bf0d6bf35c997a66d9c"
+          },
+          "kind": "ISSUE_RECORD",
+          "locator": "gate_issue_bodies.issues[number=49]",
+          "observed": "the planned canaries name spatial constraint, multi-pass rendering, diffusion and inpainting as the internal stack of one archetype, and the same item states that such statements stay source statements or hypotheses until independently observed"
+        },
+        "claimed_level": "SOURCE_ANCHORED",
+        "statement": "the named products' internal technologies are as the attached source document describes them"
+      },
+      "findings": [
+        {
+          "anchors": [
+            {
+              "exact_subject": {
+                "artifact": "canary-ai-product-notes-forge-capture.json",
+                "digest": "a0e0ad76054573a13e3294b00292e8372aa7da94971d0bf0d6bf35c997a66d9c"
+              },
+              "kind": "ISSUE_RECORD",
+              "locator": "gate_issue_bodies.issues[number=49], the source line",
+              "observed": "the source is named as an attached document and no digest for it appears in the item or in the repository at this revision"
+            }
+          ],
+          "authority": "FINDINGS_ONLY",
+          "code": "EVIDENCE_ABSENT",
+          "id": "FND-004",
+          "proposed_repair": "bind the source document by digest before a run consumes it, so every derived statement names bytes an independent reviewer can re-hash",
+          "statement": "the source document is an attachment with no digest anywhere in the subject, so the exact-subject chain breaks at the first link and every statement derived from it rests on bytes nobody can re-read"
+        },
+        {
+          "anchors": [
+            {
+              "exact_subject": {
+                "artifact": "canary-ai-product-notes-forge-capture.json",
+                "digest": "a0e0ad76054573a13e3294b00292e8372aa7da94971d0bf0d6bf35c997a66d9c"
+              },
+              "kind": "ISSUE_RECORD",
+              "locator": "gate_issue_bodies.issues[number=49], the controls list",
+              "observed": "promoting an internal library mapping to fact, and treating technical closure as paid validation, are already listed as controls the run must fail on"
+            }
+          ],
+          "authority": "FINDINGS_ONLY",
+          "code": "LANE_SUBSTITUTION_OFFERED",
+          "id": "FND-005",
+          "proposed_repair": "keep every internal-stack statement at the source rung until an observation of the product exists, and record the mechanism rung as absent rather than inferred",
+          "statement": "the described internal stack is a proposal about someone else's system; no observation of any named product exists in the subject, so the mechanism rung cannot be entered from the source rung"
+        }
+      ],
+      "highest_earned_level": "SOURCE_ANCHORED",
+      "id": "PRB-003",
+      "levels": [
+        {
+          "anchors": [
+            {
+              "exact_subject": {
+                "artifact": "canary-ai-product-notes-forge-capture.json",
+                "digest": "a0e0ad76054573a13e3294b00292e8372aa7da94971d0bf0d6bf35c997a66d9c"
+              },
+              "kind": "ISSUE_RECORD",
+              "locator": "gate_issue_bodies.issues[number=49]",
+              "observed": "the claim exists as a written plan with its own source treatment rules and its own evidence boundary"
+            }
+          ],
+          "lane": "SOURCE",
+          "level": "SOURCE_ANCHORED",
+          "state": "PASS"
+        },
+        {
+          "anchors": [],
+          "lane": "MECHANISM",
+          "level": "MECHANISM_BOUND",
+          "note": "no observation of any named product's internals exists in the subject, and none is obtainable from the source document alone",
+          "state": "ABSENT"
+        },
+        {
+          "anchors": [],
+          "lane": "IMPLEMENTATION",
+          "level": "IMPLEMENTED",
+          "state": "ABSENT"
+        },
+        {
+          "anchors": [],
+          "lane": "IMPLEMENTATION",
+          "level": "TECH_VERIFIED",
+          "state": "ABSENT"
+        },
+        {
+          "anchors": [],
+          "lane": "RUNTIME",
+          "level": "LIVE_WORKFLOW_VERIFIED",
+          "state": "ABSENT"
+        },
+        {
+          "anchors": [],
+          "lane": "USER",
+          "level": "USER_VALIDATED",
+          "state": "ABSENT"
+        },
+        {
+          "anchors": [],
+          "lane": "COMMERCIAL",
+          "level": "PAID_VALIDATED",
+          "state": "ABSENT"
+        }
+      ],
+      "missing_lanes": ["COMMERCIAL", "IMPLEMENTATION", "MECHANISM", "RUNTIME", "USER"],
+      "statement": "the internal technologies attributed to the named products in the source document are what those products actually use"
+    }
+  ],
+  "public_snapshot": {
+    "completion_meaning": "REVIEW_ONLY_NOT_MERGE_OR_RELEASE",
+    "consumable_without_prior_conversation": true,
+    "contains_private_reasoning": false,
+    "excluded_from_snapshot": [
+      "any deliberation not carried by a named anchor in this artifact",
+      "the audited repository's file contents beyond the locators quoted here"
+    ]
+  },
+  "reopened_obligations": [
+    {
+      "level": "LIVE_WORKFLOW_VERIFIED",
+      "problem_id": "PRB-001",
+      "reason": "the packet's required next state is an experiment nobody has entered, and the exact-head check is green, so the obligation is exactly the one a first green absorbs",
+      "state": "NOT_EXERCISED"
+    },
+    {
+      "level": "LIVE_WORKFLOW_VERIFIED",
+      "problem_id": "PRB-002",
+      "reason": "the experiment contract is complete enough to run and its own state line records that it has not been",
+      "state": "NOT_EXERCISED"
+    }
+  ],
+  "review_denominator": {
+    "findings_raised": 5,
+    "findings_reported": 5,
+    "findings_withdrawn": []
+  },
+  "reviewer": {
+    "identity": "PREL_SHADOW_CLOSURE_MONITOR",
+    "mode": "READ_ONLY_FINDINGS_ONLY",
+    "requests_private_reasoning": false,
+    "requires_prior_conversation": false,
+    "writes_implementation": false
+  },
+  "schema": "prel/product-closure-audit/v1"
+}

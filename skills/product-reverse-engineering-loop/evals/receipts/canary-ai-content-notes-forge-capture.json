@@ -1,0 +1,191 @@
+{
+  "captured_at": "2026-08-18",
+  "ci_lane": {
+    "argv": [
+      "gh",
+      "api",
+      "repos/ed3c/ai-content-notes/commits/6afe799f9ba01c0c7ab4a25dffe5f226c0d05d53/check-runs",
+      "--jq",
+      "{total: .total_count, runs: [.check_runs[] | {name, status, conclusion, head_sha}]}"
+    ],
+    "check_runs": {
+      "runs": [
+        {
+          "conclusion": "success",
+          "head_sha": "6afe799f9ba01c0c7ab4a25dffe5f226c0d05d53",
+          "name": "validate (3.11)",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "head_sha": "6afe799f9ba01c0c7ab4a25dffe5f226c0d05d53",
+          "name": "validate (3.13)",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "head_sha": "6afe799f9ba01c0c7ab4a25dffe5f226c0d05d53",
+          "name": "validate (3.11)",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "head_sha": "6afe799f9ba01c0c7ab4a25dffe5f226c0d05d53",
+          "name": "validate (3.13)",
+          "status": "completed"
+        }
+      ],
+      "total": 4
+    },
+    "exit_code": 0,
+    "stderr": ""
+  },
+  "issue_lane": {
+    "argv": [
+      "gh",
+      "issue",
+      "list",
+      "--repo",
+      "ed3c/ai-content-notes",
+      "--state",
+      "all",
+      "--limit",
+      "50",
+      "--json",
+      "number,title,state,createdAt,updatedAt"
+    ],
+    "exit_code": 0,
+    "issues": [
+      {
+        "createdAt": "2026-08-18T03:12:33Z",
+        "number": 54,
+        "state": "OPEN",
+        "title": "[PREL C01-X] Persist and read back the Stage 3 product-signal packet",
+        "updatedAt": "2026-08-18T03:12:33Z"
+      },
+      {
+        "createdAt": "2026-08-17T17:39:33Z",
+        "number": 51,
+        "state": "OPEN",
+        "title": "[PREL A01] Unified GitHub, PDF, Google Docs and Sheets source intake registry",
+        "updatedAt": "2026-08-17T19:46:46Z"
+      },
+      {
+        "createdAt": "2026-08-17T17:39:13Z",
+        "number": 50,
+        "state": "OPEN",
+        "title": "[PREL C01] Product signal export and evidence lineage",
+        "updatedAt": "2026-08-18T03:05:00Z"
+      },
+      {
+        "createdAt": "2026-08-15T03:49:55Z",
+        "number": 49,
+        "state": "OPEN",
+        "title": "docs: bilingual documentation and open-source baseline",
+        "updatedAt": "2026-08-15T03:49:55Z"
+      },
+      {
+        "createdAt": "2026-08-14T15:29:31Z",
+        "number": 43,
+        "state": "OPEN",
+        "title": "runtime: expand external QG coverage past 12 of 24",
+        "updatedAt": "2026-08-17T17:44:57Z"
+      },
+      {
+        "createdAt": "2026-08-14T15:29:30Z",
+        "number": 42,
+        "state": "OPEN",
+        "title": "eval: authorized corpus and accuracy benchmark need a stated rights basis",
+        "updatedAt": "2026-08-14T15:29:30Z"
+      },
+      {
+        "createdAt": "2026-08-14T15:29:00Z",
+        "number": 41,
+        "state": "OPEN",
+        "title": "governance: decide whether the Google Doc lane is retired, and define GitHub-backed persistence",
+        "updatedAt": "2026-08-17T17:44:31Z"
+      },
+      {
+        "createdAt": "2026-08-14T15:28:58Z",
+        "number": 40,
+        "state": "OPEN",
+        "title": "runtime: provider invocation and the multimodal benchmark (Codex CLI lane)",
+        "updatedAt": "2026-08-14T15:28:58Z"
+      },
+      {
+        "createdAt": "2026-08-14T15:28:35Z",
+        "number": 39,
+        "state": "OPEN",
+        "title": "runtime: visual extraction and annotation need attested media",
+        "updatedAt": "2026-08-14T15:28:35Z"
+      },
+      {
+        "createdAt": "2026-08-14T15:27:59Z",
+        "number": 38,
+        "state": "CLOSED",
+        "title": "runtime: leaf 04 replay needs a retained subject",
+        "updatedAt": "2026-08-14T16:17:32Z"
+      },
+      {
+        "createdAt": "2026-08-14T10:24:24Z",
+        "number": 23,
+        "state": "CLOSED",
+        "title": "runtime epic: materialize Semantic Yield host pipeline as molecular Stack PRs",
+        "updatedAt": "2026-08-14T15:29:55Z"
+      },
+      {
+        "createdAt": "2026-08-14T06:34:02Z",
+        "number": 17,
+        "state": "CLOSED",
+        "title": "docs: make Semantic Yield card output discoverable and govern stacked delivery",
+        "updatedAt": "2026-08-14T10:22:31Z"
+      },
+      {
+        "createdAt": "2026-08-13T18:48:05Z",
+        "number": 14,
+        "state": "CLOSED",
+        "title": "runtime: complete semantic-yield gates and visual receipts",
+        "updatedAt": "2026-08-14T15:30:29Z"
+      },
+      {
+        "createdAt": "2026-08-13T10:56:54Z",
+        "number": 10,
+        "state": "CLOSED",
+        "title": "runtime: materialize v7.1 compiler host, external gates, and transactional persistence",
+        "updatedAt": "2026-08-14T15:30:31Z"
+      },
+      {
+        "createdAt": "2026-08-12T02:26:08Z",
+        "number": 7,
+        "state": "CLOSED",
+        "title": "eval: establish live YouTube transcript accuracy evidence and authorized allowlist",
+        "updatedAt": "2026-08-14T15:30:55Z"
+      },
+      {
+        "createdAt": "2026-08-09T10:28:06Z",
+        "number": 3,
+        "state": "CLOSED",
+        "title": "Materialize canonical CONTEXT.md and claim-map contract for Atlas ingestion",
+        "updatedAt": "2026-08-14T15:04:57Z"
+      },
+      {
+        "createdAt": "2026-08-09T01:29:51Z",
+        "number": 2,
+        "state": "CLOSED",
+        "title": "materialize-ai-content-notes-migration",
+        "updatedAt": "2026-08-14T15:01:16Z"
+      },
+      {
+        "createdAt": "2026-08-08T17:56:55Z",
+        "number": 1,
+        "state": "CLOSED",
+        "title": "materialize-ai-content-notes-migration",
+        "updatedAt": "2026-08-08T18:38:01Z"
+      }
+    ],
+    "stderr": ""
+  },
+  "repository": "ed3c/ai-content-notes",
+  "schema": "prel/canary-forge-capture/v1",
+  "subject_revision": "6afe799f9ba01c0c7ab4a25dffe5f226c0d05d53"
+}

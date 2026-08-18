@@ -29,6 +29,7 @@ COMPILE = ROOT / "scripts/compile_prel.py"
 SIGNALS = "example-product-signal.json"
 DOSSIER = "example-dossier.json"
 MATRIX = "example-closure-matrix.json"
+AUDIT = "example-closure-audit.json"
 HANDOFF = "example-handoff.json"
 PACKET = "example-prompt-packet.json"
 CATALOGUE = "prompt-catalogue.md"
@@ -56,6 +57,7 @@ def positive_control() -> list[str]:
         [SIGNALS, None],
         [DOSSIER, SIGNALS],
         [MATRIX, DOSSIER],
+        [AUDIT, None],
         [HANDOFF, MATRIX],
         [PACKET, None],
     ]
@@ -190,6 +192,30 @@ def packet(document: Any, identifier: str) -> dict:
     return next(item for item in document["packets"] if item["id"] == identifier)
 
 
+def audited(document: Any, identifier: str) -> dict:
+    return next(item for item in document["problems"] if item["id"] == identifier)
+
+
+def rung(document: Any, identifier: str, level: str) -> dict:
+    return next(
+        item for item in audited(document, identifier)["levels"] if item["level"] == level
+    )
+
+
+def anchor(kind: str, artifact: str, digest: str) -> dict:
+    return {
+        "kind": kind,
+        "locator": "planted control",
+        "observed": "a planted anchor whose kind may not close the level it was filed under",
+        "exact_subject": {"artifact": artifact, "digest": digest},
+    }
+
+
+def subject_of(document: Any, identifier: str, level: str) -> dict:
+    """Reuse an already-correct exact subject so only the kind is the defect."""
+    return copy.deepcopy(rung(document, identifier, level)["anchors"][0]["exact_subject"])
+
+
 def plant(controls: Controls) -> None:
     # --- product signal intake -------------------------------------------
     controls.refuse(
@@ -313,6 +339,125 @@ def plant(controls: Controls) -> None:
         "matrix_ceiling_overclaim", MATRIX,
         lambda doc: doc["evidence_ceiling"].__setitem__("live_provider_execution", "PASS"),
         "CEILING_OVERCLAIM",
+    )
+
+    # --- product closure audit -------------------------------------------
+    def planted_anchor(doc: Any, kind: str) -> dict:
+        subject = subject_of(doc, "PRB-001", "SOURCE_ANCHORED")
+        return anchor(kind, subject["artifact"], subject["digest"])
+
+    def green_ci_as_live_closure(doc: Any) -> None:
+        target = rung(doc, "PRB-001", "LIVE_WORKFLOW_VERIFIED")
+        target["state"] = "PASS"
+        target["anchors"] = [planted_anchor(doc, "CI_RUN")]
+
+    controls.refuse(
+        "green_ci_as_live_closure", AUDIT, green_ci_as_live_closure,
+        "EVIDENCE_LANE_PROMOTION",
+    )
+
+    def model_judgment_as_user_evidence(doc: Any) -> None:
+        target = rung(doc, "PRB-002", "USER_VALIDATED")
+        target["state"] = "PASS"
+        target["anchors"] = [planted_anchor(doc, "MODEL_JUDGMENT")]
+
+    controls.refuse(
+        "model_judgment_as_user_evidence", AUDIT, model_judgment_as_user_evidence,
+        "MODEL_JUDGE_OVERRIDE",
+    )
+    controls.refuse(
+        "audit_level_set_drift", AUDIT,
+        lambda doc: audited(doc, "PRB-001")["levels"].pop(4),
+        "AUDIT_LEVEL_SET_DRIFT",
+    )
+    controls.refuse(
+        "closure_level_ladder_skip", AUDIT,
+        lambda doc: audited(doc, "PRB-002").__setitem__(
+            "highest_earned_level", "TECH_VERIFIED"
+        ),
+        "LEVEL_LADDER_SKIP",
+    )
+    controls.refuse(
+        "missing_lane_undeclared", AUDIT,
+        lambda doc: audited(doc, "PRB-001")["missing_lanes"].remove("USER"),
+        "MISSING_LANE_UNDECLARED",
+    )
+    controls.refuse(
+        "contradictory_closure_status", AUDIT,
+        lambda doc: audited(doc, "PRB-002")["findings"][0].__setitem__(
+            "code", "EVIDENCE_ABSENT"
+        ),
+        "CONTRADICTORY_CLOSURE_STATUS",
+    )
+    controls.refuse(
+        "unanchored_finding", AUDIT,
+        lambda doc: audited(doc, "PRB-001")["findings"][0].__setitem__("anchors", []),
+        "UNANCHORED_FINDING",
+    )
+    controls.refuse(
+        "shadow_writes_implementation", AUDIT,
+        lambda doc: doc["reviewer"].__setitem__("writes_implementation", True),
+        "SHADOW_WRITE_AUTHORITY",
+    )
+    controls.refuse(
+        "issue_delta_claims_write_authority", AUDIT,
+        lambda doc: doc["issue_delta"][0].__setitem__("write_authority", "BUILDER_WRITE"),
+        "SHADOW_WRITE_AUTHORITY",
+    )
+    controls.refuse(
+        "first_green_obligation_skipped", AUDIT,
+        lambda doc: doc.__setitem__("reopened_obligations", []),
+        "FIRST_GREEN_OBLIGATION_SKIPPED",
+    )
+    controls.refuse(
+        "reopened_obligation_on_closed_rung", AUDIT,
+        lambda doc: doc["reopened_obligations"].append(
+            {
+                "problem_id": "PRB-001",
+                "level": "SOURCE_ANCHORED",
+                "state": "NOT_EXERCISED",
+                "reason": "a closed rung listed as reopened work, which hides which lane is open",
+            }
+        ),
+        "FIRST_GREEN_OBLIGATION_SKIPPED",
+    )
+    controls.refuse(
+        "dissent_omitted_from_denominator", AUDIT,
+        lambda doc: doc["review_denominator"].__setitem__("findings_withdrawn", []),
+        "DISSENT_OMITTED_FROM_DENOMINATOR",
+    )
+    controls.refuse(
+        "private_reasoning_in_public_snapshot", AUDIT,
+        lambda doc: doc["public_snapshot"]["excluded_from_snapshot"].append(
+            "the reviewer keeps the private reasoning that produced each verdict"
+        ),
+        "PRIVATE_REASONING_IN_PUBLIC_SNAPSHOT",
+    )
+    controls.refuse(
+        "snapshot_requires_prior_conversation", AUDIT,
+        lambda doc: audited(doc, "PRB-001")["findings"][0].__setitem__(
+            "proposed_repair", "apply the repair agreed in the earlier message"
+        ),
+        "SNAPSHOT_REQUIRES_PRIOR_CONVERSATION",
+    )
+    controls.refuse(
+        "merge_authority_assumed", AUDIT,
+        lambda doc: doc["external_authority"].__setitem__("merge", "SHADOW_REVIEWER"),
+        "MERGE_OR_RELEASE_AUTHORITY_ASSUMED",
+    )
+    controls.refuse(
+        "audit_ceiling_overclaim", AUDIT,
+        lambda doc: doc["evidence_ceiling"].__setitem__("live_provider_execution", "PASS"),
+        "CEILING_OVERCLAIM",
+    )
+    controls.refuse(
+        "stale_audit_anchor", AUDIT,
+        lambda doc: None,
+        "STALE_SUBJECT",
+        also_mutate=(
+            DOSSIER,
+            lambda doc: doc["mvp"]["excluded"].append("a requirement the audit never saw"),
+        ),
     )
 
     # --- executable handoff ----------------------------------------------

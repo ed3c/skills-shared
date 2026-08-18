@@ -9,6 +9,7 @@ the schema beside it — `tests/run-all.sh` proves both on current bytes.
 | [`product-signal.schema.json`](product-signal.schema.json) | intake contract and the producer compatibility binding |
 | [`reverse-engineering-dossier.schema.json`](reverse-engineering-dossier.schema.json) | job, pain, workflow, magic moment, classified mechanisms, capability/rights graph, MVP and stop loss |
 | [`problem-closure-matrix.schema.json`](problem-closure-matrix.schema.json) | one row per requirement, its oracle, its lane and its closure state |
+| [`product-closure-audit.schema.json`](product-closure-audit.schema.json) | the read-only Shadow audit: seven ordered levels over six lanes, exact-subject anchors, reopened obligations, the findings denominator, the issue delta and the public snapshot |
 | [`prompt-packet.schema.json`](prompt-packet.schema.json) | the envelope and the nine stage surfaces, with authority and private-reasoning both pinned false |
 | [`reverse-engineering-handoff.schema.json`](reverse-engineering-handoff.schema.json) | bounded implementation packets, real edges, disjoint leases, and remaining items with owners |
 | [`evidence-vocabulary.md`](evidence-vocabulary.md) | the four controlled vocabularies and every refusal code |
@@ -29,6 +30,12 @@ example-product-signal.json
 
 `--check` re-compiles and byte-compares each one, so a hand edit is a red suite
 rather than a second source of truth.
+
+[`example-closure-audit.json`](example-closure-audit.json) is hand-authored:
+an audit is an observation of a subject, not a projection of an upstream
+artifact, so there is no compiler stage that could regenerate it. What keeps it
+honest instead is that its earned levels are recomputed from its own rung states
+and every anchor it names is re-hashed by `--resolve-subjects`.
 
 [`example-prompt-packet.json`](example-prompt-packet.json) is hand-authored and
 pins the sha256 of each artifact its surfaces bind to. Those digests are not

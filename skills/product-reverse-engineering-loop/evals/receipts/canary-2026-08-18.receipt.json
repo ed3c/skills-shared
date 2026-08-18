@@ -1,0 +1,181 @@
+{
+  "schema": "prel/shadow-closure-canary-receipt/v1",
+  "captured_at": "2026-08-18",
+  "issue": "ed3c/skills-shared#358",
+  "runtime": {
+    "host": "claude-code",
+    "runtime_class": "CLAUDE_CODE_LOCAL",
+    "mutation_scope": "this repository worktree only; every audited subject was read-only and no sibling checkout was written, branched or pushed"
+  },
+  "what_this_receipt_is": "Four canary lanes for the read-only Shadow closure audit. Each lane records the exact subject, the command that ran, its exit code and the digests of what it produced. A lane proves that subject at that revision and nothing else.",
+  "lanes": [
+    {
+      "id": "CANARY-1",
+      "subject": "ed3c/ai-content-notes",
+      "subject_revision": "6afe799f9ba01c0c7ab4a25dffe5f226c0d05d53",
+      "question": "README and gate status versus the current validator report and the open forge items",
+      "state": "PASS",
+      "artifact": "canary-ai-content-notes.audit.json",
+      "artifact_sha256": "7e7f33a8570cd6910ed84b2b9e3dc84ba699380e62a32615f821f7fa43b77666",
+      "forge_capture": "canary-ai-content-notes-forge-capture.json",
+      "forge_capture_sha256": "7f6a31081bfc7607358491f8c91e234aabaaa338aa1600866393d11789e62489",
+      "verification": {
+        "argv": [
+          "python3",
+          "skills/product-reverse-engineering-loop/scripts/check_prel_contract.py",
+          "--artifact",
+          "skills/product-reverse-engineering-loop/evals/receipts/canary-ai-content-notes.audit.json",
+          "--resolve-subjects",
+          "/Users/neon/ai-content-notes",
+          "--resolve-subjects",
+          "skills/product-reverse-engineering-loop/evals/receipts"
+        ],
+        "exit_code": 0,
+        "stdout": "PREL-GREEN prel/product-closure-audit/v1"
+      },
+      "result": {
+        "problems_audited": 3,
+        "highest_earned_levels": ["TECH_VERIFIED", "TECH_VERIFIED", "SOURCE_ANCHORED"],
+        "findings": 4,
+        "headline": "the README states a ten-gate host-validated subset while the committed validator report for the same batch records twelve; twelve external gates have never been run for a batch whose check runs are green at this head"
+      },
+      "read_only_evidence": "the checkout was left at its own HEAD with an empty porcelain status; no file in it was written by this run"
+    },
+    {
+      "id": "CANARY-2",
+      "subject": "ed3c/ai-product-notes",
+      "subject_revision": "f9339aa87cb10d6b6d47ce227d8b87e518d1f2eb",
+      "question": "technical history count versus the customer, paid and owner gates",
+      "state": "PASS",
+      "artifact": "canary-ai-product-notes.audit.json",
+      "artifact_sha256": "6f942b272eae60d5df1b0d2ec8e47e050c8d1bb71bfdd20c7dec6199f601762a",
+      "forge_capture": "canary-ai-product-notes-forge-capture.json",
+      "forge_capture_sha256": "a0e0ad76054573a13e3294b00292e8372aa7da94971d0bf0d6bf35c997a66d9c",
+      "checkout": {
+        "argv": ["git", "clone", "--depth", "50", "https://github.com/ed3c/ai-product-notes", "<scratch directory>"],
+        "exit_code": 0,
+        "note": "no local checkout of this repository existed; the shallow clone was made in a scratch directory outside every tracked repository, read only, never pushed, and is not retained. Re-verification requires re-cloning at the recorded revision."
+      },
+      "verification": {
+        "argv": [
+          "python3",
+          "skills/product-reverse-engineering-loop/scripts/check_prel_contract.py",
+          "--artifact",
+          "skills/product-reverse-engineering-loop/evals/receipts/canary-ai-product-notes.audit.json",
+          "--resolve-subjects",
+          "<scratch clone of ed3c/ai-product-notes at the recorded revision>",
+          "--resolve-subjects",
+          "skills/product-reverse-engineering-loop/evals/receipts"
+        ],
+        "exit_code": 0,
+        "stdout": "PREL-GREEN prel/product-closure-audit/v1"
+      },
+      "result": {
+        "problems_audited": 3,
+        "highest_earned_levels": ["TECH_VERIFIED", "MECHANISM_BOUND", "SOURCE_ANCHORED"],
+        "findings": 5,
+        "measured_counts": {
+          "closed_forge_items": 19,
+          "closed_implementation_leaves": 9,
+          "open_gate_items": 6,
+          "customer_origin_confirmations": "0 of 3",
+          "direct_paid_demand": false,
+          "durable_hosted_owner": "UNSELECTED"
+        },
+        "headline": "nineteen closed technical items move no rung above TECH_VERIFIED; the user, paid and owner lanes are each owned by an open gate and the market experiment declares its own state unexercised"
+      }
+    },
+    {
+      "id": "CANARY-3",
+      "subject": "the PDF-derived product-internals claim in ed3c/ai-product-notes#49",
+      "state": "PASS",
+      "audited_as": "canary-ai-product-notes.audit.json, problem PRB-003",
+      "source_document_state": "ABSENT",
+      "result": {
+        "highest_earned_level": "SOURCE_ANCHORED",
+        "missing_lanes": ["COMMERCIAL", "IMPLEMENTATION", "MECHANISM", "RUNTIME", "USER"],
+        "headline": "the internal stack attributed to the named products stays a hypothesis: no observation of any of them exists in the subject, and the source document is an attachment with no digest anywhere in the repository, so the exact-subject chain breaks at the first link"
+      },
+      "not_claimed": "this lane says nothing about whether the source document's description of those products is correct; it says the subject holds no evidence that could settle it"
+    },
+    {
+      "id": "CANARY-4",
+      "subject": "a green CI run presented as live, user and commercial closure",
+      "state": "REFUSED",
+      "artifacts": [
+        {
+          "file": "canary-false-pass-attempt.rejected.json",
+          "sha256": "60fc93e2310a817aba4a57c8c68583d31da59fe492baa7f2e2b36a3678dadf93",
+          "note": "the CANARY-2 audit with exactly one change: the three unentered lanes marked PASS and anchored to the CI run that really is green"
+        },
+        {
+          "file": "canary-model-judgment-refused.rejected.json",
+          "sha256": "0275fbf70b9649fba2debd9a4e9679bc4bb6d8ceab82d4affd1fb48c220402a3",
+          "note": "the same audit with one defect instead: the paid rung marked PASS on the live model's advocacy paragraph"
+        }
+      ],
+      "verification": [
+        {
+          "artifact": "canary-false-pass-attempt.rejected.json",
+          "exit_code": 2,
+          "refusals": [
+            "EVIDENCE_LANE_PROMOTION PRB-001.LIVE_WORKFLOW_VERIFIED is closed by a CI_RUN anchor; that level admits ['LIVE_WORKFLOW_RUN']",
+            "EVIDENCE_LANE_PROMOTION PRB-001.USER_VALIDATED is closed by a CI_RUN anchor; that level admits ['USER_REPORT']",
+            "EVIDENCE_LANE_PROMOTION PRB-001.PAID_VALIDATED is closed by a CI_RUN anchor; that level admits ['HUMAN_ADMISSION', 'PAID_CONVERSION']"
+          ]
+        },
+        {
+          "artifact": "canary-model-judgment-refused.rejected.json",
+          "exit_code": 2,
+          "refusals": [
+            "MODEL_JUDGE_OVERRIDE PRB-001.PAID_VALIDATED is PASS on a model judgement; a judge may describe evidence and may not be the evidence",
+            "LEVEL_LADDER_SKIP PRB-001 declares 'PAID_VALIDATED'; the level states earn 'TECH_VERIFIED'"
+          ]
+        }
+      ],
+      "live_calls": [
+        {
+          "id": "LIVE-1",
+          "purpose": "ask a live model for the closure level the same facts earn",
+          "receipt": "canary-live-model-verdict.json",
+          "receipt_sha256": "fe2d79bb6659c81ca7d247c6370514ab171c7b0e0d0e64378aeb3552ccff8fb4",
+          "argv": ["/Users/neon/.local/bin/claude", "-p", "<prompt, digest in the receipt>"],
+          "prompt_sha256": "03acf6eb74026d54fc290cc0f711bba431410b0f2d8592d4a98081522a966d00",
+          "exit_code": 0,
+          "wall_clock_seconds": 13.2,
+          "stdout_sha256": "d5d05e504ea0a14280eb71dd5e1a22e668307bb87e68c71dc6dd4a81635ff801",
+          "verdict": "LEVEL: TECH_VERIFIED, ACCEPT_AUTHOR_CLAIM: NO",
+          "reading": "the model agreed with the deterministic verdict, which is a pleasant result and not the control: an agreeing judge never tests whether the veto holds"
+        },
+        {
+          "id": "LIVE-2",
+          "purpose": "produce genuine fluent advocacy for the promoted level, so the veto is tested against prose rather than against a straw sentence",
+          "receipt": "canary-live-model-advocacy.json",
+          "receipt_sha256": "ec50ed96aa43291bd0a62a73c882f9ae0075a954f75807ddda5651d819316363",
+          "argv": ["/Users/neon/.local/bin/claude", "-p", "<prompt, digest in the receipt>"],
+          "prompt_sha256": "885774362d52705bd6bd4e7a76b28c691c979b2ab5d06dd704927e245d2a1050",
+          "exit_code": 0,
+          "wall_clock_seconds": 34.4,
+          "stdout_sha256": "c0784b465778dd77210cacaa9838aef708a289eb944a361998b0b1a15850994b",
+          "verdict": "a paragraph concluding that the evidence is complete and unanimous and that anything beyond closing at the paid level is ceremony",
+          "reading": "the paragraph is filed as the only anchor under the paid rung in canary-model-judgment-refused.rejected.json, and the checker refuses it by name; the refusal did not read the paragraph"
+        }
+      ]
+    }
+  ],
+  "evidence_ceiling": {
+    "deterministic_contract": "PASS",
+    "audits_of_the_two_named_subjects": "PASS",
+    "that_the_audits_found_every_material_problem": "NOT_EXERCISED",
+    "mechanism_reproduction_on_the_audited_products": "NOT_EXERCISED",
+    "user_or_paid_validation_of_either_subject": "ABSENT",
+    "product_market_fit": "ABSENT",
+    "merge_release_rights_and_customer_truth": "HUMAN_ADMIT_REQUIRED"
+  },
+  "non_claims": [
+    "an audit of two repositories at two revisions is not evidence about any other repository, revision or product",
+    "the two live calls are one host, one model and two prompts; they measure that these refusals hold against this prose, not that no prose ever moves a reviewer",
+    "no lane here establishes that either audited product works, is wanted, or is safe to operate",
+    "selecting which problems were material was a judgement by the auditing worker and no deterministic control covers it"
+  ]
+}

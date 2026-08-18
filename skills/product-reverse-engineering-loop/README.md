@@ -42,13 +42,17 @@ skills/product-reverse-engineering-loop/
 │   ├── product-signal.schema.json          intake + producer compatibility binding
 │   ├── reverse-engineering-dossier.schema.json
 │   ├── problem-closure-matrix.schema.json
+│   ├── product-closure-audit.schema.json   read-only Shadow audit: levels, lanes, findings, handoff
 │   ├── prompt-packet.schema.json
 │   ├── reverse-engineering-handoff.schema.json
 │   ├── evidence-vocabulary.md              four controlled vocabularies, every refusal code
 │   ├── prompt-catalogue.md                 what each prompt surface exists to refuse
-│   └── example-*.json                      one hand-authored input, three compiled projections, one packet
+│   └── example-*.json                      two hand-authored inputs, three compiled projections, one packet, one audit
 ├── modules/
-│   └── domain-profile.md                   concrete surfaces, owners and adapters, on demand
+│   ├── domain-profile.md                   concrete surfaces, owners and adapters, on demand
+│   └── shadow-closure-audit.md             the read-only closure monitor and its review handoff
+├── evals/
+│   └── receipts/                           consumer canary receipts, one lane per file
 ├── scripts/
 │   ├── check_prel_contract.py              schema + controlled-law refusals
 │   └── compile_prel.py                     the three byte-stable compilers
@@ -124,6 +128,20 @@ consumer receipts (consumer-owned, one lane each)
 Every arrow narrows. No arrow upgrades a lane, and the artifact at each step
 records which lanes it did not enter.
 
+One read-only branch leaves this flow and never rejoins it:
+
+```text
+any subject that claims a problem is closed
+        ↓ modules/shadow-closure-audit.md          read-only, findings only
+product-closure-audit.json
+        ↓ check_prel_contract.py --resolve-subjects
+findings, reopened obligations, issue delta        proposals with no write authority
+```
+
+The audit is a monitor, not a second writer: it produces no state the loop
+consumes, and the repairs it proposes are performed — or refused — by whoever
+owns the subject.
+
 ## Work DAG
 
 ```text
@@ -176,10 +194,12 @@ bash skills/product-reverse-engineering-loop/tests/run-all.sh
 
 ```text
 portable procedure and directory contract        PASS
-five schemas with validating positive examples   PASS
+six schemas with validating positive examples    PASS
 deterministic compilers, byte-stable             PASS
-38 planted controls refused by their own code    PASS
+55 planted controls refused by their own code    PASS
 prompt catalogue reconciled with the packet      PASS
+Shadow closure audits of two external subjects   PASS, one revision each
+green CI offered as live/user/paid closure       REFUSED by name
 CI arrival for tests/run-all.sh                  ABSENT
 registry.json classification                     ABSENT
 mechanism reproduction on a real product         NOT_EXERCISED
@@ -200,6 +220,21 @@ out loud.
 `registry.json` classification is `ABSENT` because shared/repo-owned
 classification is a Human-admitted governance change, not a side effect of
 landing a directory.
+
+## Canary receipts
+
+`evals/receipts/canary-2026-08-18.receipt.json` records four lanes of the Shadow
+closure audit against real subjects: two external repositories audited read-only
+at a named revision, one PDF-derived product claim whose source document has no
+digest anywhere in its subject, and one attempt to present a green CI run — and
+then a live model's advocacy paragraph — as live, user and commercial closure.
+The attempt is refused by name in both forms, and the refusal never reads the
+paragraph.
+
+The audits are outside `tests/run-all.sh` on purpose: they resolve against
+checkouts this repository does not own, so a suite that ran them would go red
+whenever somebody else committed. Each lane records the exact command, its exit
+code and the digests, which is what makes it re-runnable rather than believed.
 
 ## Evidence boundary
 

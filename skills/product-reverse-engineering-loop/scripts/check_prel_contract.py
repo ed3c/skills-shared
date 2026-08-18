@@ -32,9 +32,43 @@ SCHEMA_FILES = {
     "prel/product-signal/v1": "product-signal.schema.json",
     "prel/reverse-engineering-dossier/v1": "reverse-engineering-dossier.schema.json",
     "prel/problem-closure-matrix/v1": "problem-closure-matrix.schema.json",
+    "prel/product-closure-audit/v1": "product-closure-audit.schema.json",
     "prel/prompt-packet/v1": "prompt-packet.schema.json",
     "prel/reverse-engineering-handoff/v1": "reverse-engineering-handoff.schema.json",
 }
+
+# The closure ladder, in order. Two rungs share the IMPLEMENTATION lane because
+# code existing and code being verified are different obligations produced by
+# different evidence kinds, and collapsing them is how "we wrote it" becomes
+# "it works".
+CLOSURE_LEVELS = (
+    ("SOURCE_ANCHORED", "SOURCE"),
+    ("MECHANISM_BOUND", "MECHANISM"),
+    ("IMPLEMENTED", "IMPLEMENTATION"),
+    ("TECH_VERIFIED", "IMPLEMENTATION"),
+    ("LIVE_WORKFLOW_VERIFIED", "RUNTIME"),
+    ("USER_VALIDATED", "USER"),
+    ("PAID_VALIDATED", "COMMERCIAL"),
+)
+LEVEL_RANK = {level: index for index, (level, _lane) in enumerate(CLOSURE_LEVELS)}
+
+# Which evidence kinds may close each level. The kind decides, not the prose
+# around it: a CI run is admissible where a suite is asked for and inadmissible
+# everywhere above, which is the whole of "green CI is not a live, user or paid
+# outcome". MODEL_JUDGMENT is admissible nowhere.
+ADMISSIBLE_KINDS = {
+    "SOURCE_ANCHORED": {"SOURCE_DOCUMENT", "ISSUE_RECORD"},
+    "MECHANISM_BOUND": {"MECHANISM_OBSERVATION"},
+    "IMPLEMENTED": {"CODE_SUBJECT"},
+    "TECH_VERIFIED": {"DETERMINISTIC_SUITE", "CI_RUN"},
+    "LIVE_WORKFLOW_VERIFIED": {"LIVE_WORKFLOW_RUN"},
+    "USER_VALIDATED": {"USER_REPORT"},
+    "PAID_VALIDATED": {"PAID_CONVERSION", "HUMAN_ADMISSION"},
+}
+
+# States that mean an oracle exists and nobody ran it. These are the obligations
+# a first green silently inherits as closed unless they are reopened by name.
+SKIPPED_STATES = {"NOT_EXERCISED", "NOT_IMPLEMENTED", "SKIPPED_BY_POLICY"}
 
 PROMPT_SURFACES = (
     "STAGE_1_CONTROL_BINDER",
@@ -314,6 +348,252 @@ def check_closure_matrix(artifact: dict) -> list[str]:
     return problems
 
 
+def audit_rung_problems(problem: dict, states: dict[str, str]) -> list[str]:
+    """Per-rung controls: the level set, its anchors, and what they may close."""
+    problems: list[str] = []
+    identifier = problem.get("id", "<unnamed>")
+    rungs = [row for row in problem.get("levels") or [] if isinstance(row, dict)]
+
+    observed = tuple((row.get("level"), row.get("lane")) for row in rungs)
+    if observed != CLOSURE_LEVELS:
+        problems.append(
+            f"AUDIT_LEVEL_SET_DRIFT {identifier}: levels must be exactly "
+            f"{[list(pair) for pair in CLOSURE_LEVELS]} in order; found "
+            f"{[list(pair) for pair in observed]}"
+        )
+
+    for row in rungs:
+        level, state = row.get("level"), row.get("state")
+        anchors = [item for item in row.get("anchors") or [] if isinstance(item, dict)]
+        if state != "PASS":
+            continue
+        kinds = [item.get("kind") for item in anchors]
+        if "MODEL_JUDGMENT" in kinds:
+            problems.append(
+                f"MODEL_JUDGE_OVERRIDE {identifier}.{level} is PASS on a model "
+                f"judgement; a judge may describe evidence and may not be the "
+                f"evidence"
+            )
+            continue
+        if not anchors:
+            problems.append(
+                f"EVIDENCE_LANE_PROMOTION {identifier}.{level} is PASS with no "
+                f"anchor; a state with no subject closes nothing"
+            )
+            continue
+        admissible = ADMISSIBLE_KINDS.get(level, set())
+        for kind in kinds:
+            if kind not in admissible:
+                problems.append(
+                    f"EVIDENCE_LANE_PROMOTION {identifier}.{level} is closed by a "
+                    f"{kind} anchor; that level admits {sorted(admissible)}"
+                )
+    # The ladder is recomputed, never read. A writer states the level and the
+    # checker decides whether the states underneath it support the claim.
+    prefix = 0
+    for level, _lane in CLOSURE_LEVELS:
+        if states.get(level) == "PASS":
+            prefix += 1
+        else:
+            break
+    if "FAIL" in states.values():
+        expected = "FAILED"
+    elif prefix:
+        expected = CLOSURE_LEVELS[prefix - 1][0]
+    else:
+        expected = "BLOCKED"
+    declared = problem.get("highest_earned_level")
+    if declared != expected:
+        problems.append(
+            f"LEVEL_LADDER_SKIP {identifier} declares {declared!r}; the level "
+            f"states earn {expected!r}"
+        )
+
+    expected_missing = sorted(
+        {lane for level, lane in CLOSURE_LEVELS if states.get(level) != "PASS"}
+    )
+    if sorted(problem.get("missing_lanes") or []) != expected_missing:
+        problems.append(
+            f"MISSING_LANE_UNDECLARED {identifier} declares missing lanes "
+            f"{sorted(problem.get('missing_lanes') or [])}; the level states "
+            f"leave {expected_missing} open"
+        )
+    return problems
+
+
+def check_closure_audit(artifact: dict) -> list[str]:
+    """Controls for the read-only Shadow closure audit.
+
+    Every control here answers one question: did this audit report what the
+    subject's own bytes support, or did it inherit a conclusion from somewhere
+    cheaper? Nothing in this function reaches a product, runs an oracle or
+    promotes a lane; it decides only whether the artifact's states are carried
+    by the anchors the artifact itself names.
+    """
+    problems: list[str] = []
+
+    reviewer = artifact.get("reviewer") or {}
+    if reviewer.get("writes_implementation") is not False:
+        problems.append(
+            "SHADOW_WRITE_AUTHORITY reviewer.writes_implementation is not false; "
+            "a monitor that edits the thing it audits has no independent lane"
+        )
+    if reviewer.get("mode") != "READ_ONLY_FINDINGS_ONLY":
+        problems.append(
+            f"SHADOW_WRITE_AUTHORITY reviewer.mode is {reviewer.get('mode')!r}; the "
+            f"only mode this contract defines is READ_ONLY_FINDINGS_ONLY"
+        )
+
+    authority = artifact.get("external_authority") or {}
+    for decision, value in authority.items():
+        if value != "HUMAN_ADMIT_REQUIRED":
+            problems.append(
+                f"MERGE_OR_RELEASE_AUTHORITY_ASSUMED external_authority.{decision} "
+                f"is {value!r}; this audit decides none of these"
+            )
+
+    snapshot = artifact.get("public_snapshot") or {}
+    if snapshot.get("completion_meaning") != "REVIEW_ONLY_NOT_MERGE_OR_RELEASE":
+        problems.append(
+            "MERGE_OR_RELEASE_AUTHORITY_ASSUMED public_snapshot.completion_meaning "
+            "does not state that a completed review is neither a merge nor a release"
+        )
+    if snapshot.get("contains_private_reasoning") is not False:
+        problems.append(
+            "PRIVATE_REASONING_IN_PUBLIC_SNAPSHOT the snapshot does not declare "
+            "contains_private_reasoning=false"
+        )
+    if snapshot.get("consumable_without_prior_conversation") is not True:
+        problems.append(
+            "SNAPSHOT_REQUIRES_PRIOR_CONVERSATION the snapshot does not declare "
+            "itself consumable with no prior context"
+        )
+
+    for path, text in walk_strings(artifact):
+        if PRIVATE_REASONING.search(text):
+            problems.append(
+                f"PRIVATE_REASONING_IN_PUBLIC_SNAPSHOT {path} publishes or requests "
+                f"hidden reasoning: {text!r}"
+            )
+        if PRIOR_CHAT.search(text):
+            problems.append(
+                f"SNAPSHOT_REQUIRES_PRIOR_CONVERSATION {path} points a reader at "
+                f"context that is not in this packet: {text!r}"
+            )
+
+    audited = [row for row in artifact.get("problems") or [] if isinstance(row, dict)]
+    reopened = {
+        (row.get("problem_id"), row.get("level"))
+        for row in artifact.get("reopened_obligations") or []
+        if isinstance(row, dict)
+    }
+    reported = 0
+
+    for problem in audited:
+        identifier = problem.get("id", "<unnamed>")
+        rungs = [row for row in problem.get("levels") or [] if isinstance(row, dict)]
+        states = {row.get("level"): row.get("state") for row in rungs}
+        problems.extend(audit_rung_problems(problem, states))
+
+        findings = [row for row in problem.get("findings") or [] if isinstance(row, dict)]
+        reported += len(findings)
+        for finding in findings:
+            if finding.get("authority") != "FINDINGS_ONLY":
+                problems.append(
+                    f"SHADOW_WRITE_AUTHORITY {identifier}/{finding.get('id')} claims "
+                    f"authority {finding.get('authority')!r}"
+                )
+            anchors = [row for row in finding.get("anchors") or [] if isinstance(row, dict)]
+            if not anchors:
+                problems.append(
+                    f"UNANCHORED_FINDING {identifier}/{finding.get('id')} names no "
+                    f"exact subject; an unanchored finding cannot be checked or repaired"
+                )
+            for anchor in anchors:
+                subject = anchor.get("exact_subject") or {}
+                if not subject.get("artifact") or not subject.get("digest"):
+                    problems.append(
+                        f"UNANCHORED_FINDING {identifier}/{finding.get('id')} carries "
+                        f"an anchor with no exact subject binding"
+                    )
+
+        # A subject that claims more than it earned is only reported honestly if
+        # the audit says so out loud; otherwise the audit absorbed the claim.
+        claimed = problem.get("declared_status", {}).get("claimed_level")
+        earned = problem.get("highest_earned_level")
+        if LEVEL_RANK.get(claimed, -1) > LEVEL_RANK.get(earned, -1) and not any(
+            row.get("code") == "DECLARED_STATUS_AHEAD_OF_EVIDENCE" for row in findings
+        ):
+            problems.append(
+                f"CONTRADICTORY_CLOSURE_STATUS {identifier} is declared {claimed!r} "
+                f"and earns {earned!r} with no DECLARED_STATUS_AHEAD_OF_EVIDENCE "
+                f"finding"
+            )
+
+        for row in rungs:
+            if row.get("state") in SKIPPED_STATES and (
+                identifier,
+                row.get("level"),
+            ) not in reopened:
+                problems.append(
+                    f"FIRST_GREEN_OBLIGATION_SKIPPED {identifier}.{row.get('level')} "
+                    f"is {row.get('state')} and is not reopened; a green elsewhere "
+                    f"would inherit it as closed"
+                )
+
+    known_rungs = {
+        (problem.get("id"), row.get("level"), row.get("state"))
+        for problem in audited
+        for row in problem.get("levels") or []
+        if isinstance(row, dict)
+    }
+    for key in sorted(reopened, key=lambda pair: (str(pair[0]), str(pair[1]))):
+        states = {state for identity, level, state in known_rungs if (identity, level) == key}
+        if not states:
+            problems.append(
+                f"FIRST_GREEN_OBLIGATION_SKIPPED reopened obligation {key} names no "
+                f"rung in this audit"
+            )
+        elif states == {"PASS"}:
+            problems.append(
+                f"FIRST_GREEN_OBLIGATION_SKIPPED reopened obligation {key} names a "
+                f"rung that is PASS; reopening a closed lane hides which one is open"
+            )
+
+    denominator = artifact.get("review_denominator") or {}
+    withdrawn = [row for row in denominator.get("findings_withdrawn") or [] if isinstance(row, dict)]
+    if denominator.get("findings_reported") != reported:
+        problems.append(
+            f"DISSENT_OMITTED_FROM_DENOMINATOR review_denominator.findings_reported "
+            f"is {denominator.get('findings_reported')!r} and {reported} findings "
+            f"are carried by the problems"
+        )
+    if denominator.get("findings_raised") != reported + len(withdrawn):
+        problems.append(
+            f"DISSENT_OMITTED_FROM_DENOMINATOR {denominator.get('findings_raised')!r} "
+            f"findings were raised, {reported} are reported and {len(withdrawn)} are "
+            f"withdrawn with a reason; the difference left no record"
+        )
+
+    known_problems = {problem.get("id") for problem in audited}
+    for item in artifact.get("issue_delta") or []:
+        if not isinstance(item, dict):
+            continue
+        if item.get("write_authority") != "NO_WRITE_AUTHORITY":
+            problems.append(
+                f"SHADOW_WRITE_AUTHORITY issue delta {item.get('id')} claims write "
+                f"authority {item.get('write_authority')!r}; this output is a proposal"
+            )
+        if item.get("problem_id") not in known_problems:
+            problems.append(
+                f"UNANCHORED_FINDING issue delta {item.get('id')} names problem "
+                f"{item.get('problem_id')!r}, which this audit does not carry"
+            )
+
+    problems.extend(check_ceiling(artifact.get("evidence_ceiling"), "evidence_ceiling"))
+    return problems
+
+
 def check_handoff(artifact: dict) -> list[str]:
     problems: list[str] = []
     packets = [row for row in artifact.get("packets") or [] if isinstance(row, dict)]
@@ -474,6 +754,7 @@ SEMANTIC = {
     "prel/product-signal/v1": check_product_signal,
     "prel/reverse-engineering-dossier/v1": check_dossier,
     "prel/problem-closure-matrix/v1": check_closure_matrix,
+    "prel/product-closure-audit/v1": check_closure_audit,
     "prel/reverse-engineering-handoff/v1": check_handoff,
     "prel/prompt-packet/v1": check_prompt_packet,
 }
@@ -507,30 +788,38 @@ def walk_subjects(value: Any, path: str = "") -> list[tuple[str, dict]]:
     return found
 
 
-def check_resolved_subjects(artifact: Any, root: Path) -> list[str]:
+def check_resolved_subjects(artifact: Any, roots: list[Path]) -> list[str]:
     """Every named subject must still exist and still hash to what was recorded.
 
     Without this, a digest is only a promise the artifact makes about a file
     nobody re-reads: the file moves, the packet keeps pointing at a subject that
     no longer exists, and every downstream state stays green describing bytes
     that are gone.
+
+    More than one root may be given, because an audit's subjects genuinely live
+    in different trees -- a README in the audited checkout, a captured issue
+    snapshot beside the receipt. A subject resolves when some root holds a file
+    of that name whose bytes hash to the recorded digest; a name that exists in
+    a root with different bytes reports that root's digest, which is the useful
+    half of the message.
     """
     problems: list[str] = []
     for where, binding in walk_subjects(artifact):
         name = binding.get("artifact")
         if not isinstance(name, str) or not name:
             continue
-        target = root / name
-        if not target.is_file():
+        found = [root / name for root in roots if (root / name).is_file()]
+        if not found:
             problems.append(
-                f"STALE_SUBJECT {where} names {name!r}, which is not in {root}"
+                f"STALE_SUBJECT {where} names {name!r}, which is in none of "
+                f"{[str(root) for root in roots]}"
             )
             continue
-        actual = digest(target)
-        if binding.get("digest") != actual:
+        actual = [digest(target) for target in found]
+        if binding.get("digest") not in actual:
             problems.append(
                 f"STALE_SUBJECT {where} records {binding.get('digest')!r} for "
-                f"{name!r}, which currently hashes to {actual!r}"
+                f"{name!r}, which currently hashes to {actual[0]!r}"
             )
     return problems
 
@@ -560,8 +849,10 @@ def main() -> int:
     parser.add_argument(
         "--resolve-subjects",
         type=Path,
+        action="append",
         help="directory the artifact's exact_subject/derived_from names resolve "
-        "against; enables the stale-subject control on every binding",
+        "against; enables the stale-subject control on every binding. Repeat it "
+        "when the audited subjects live in more than one tree",
     )
     args = parser.parse_args()
 
