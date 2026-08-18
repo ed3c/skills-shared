@@ -18,7 +18,9 @@ checker proved separate from what a model suggested.
 | Calibrated-heuristic admission | [`scripts/check_heuristic_calibration.py`](scripts/check_heuristic_calibration.py) |
 | Source-node preservation | [`scripts/check_document_preservation.py`](scripts/check_document_preservation.py) |
 | Privacy class to lane routing | [`scripts/check_privacy_routing.py`](scripts/check_privacy_routing.py) |
+| A/B run bundle shape contract | [`references/controlled-language-ab-run.schema.json`](references/controlled-language-ab-run.schema.json) |
 | Integrated A/B experiment gate | [`scripts/score_ab.py`](scripts/score_ab.py) |
+| Frozen body treatments and their A/B | [`scripts/refactor_ab.py`](scripts/refactor_ab.py) |
 | Authority-bound A/B composition | [`scripts/score_ab_authority.py`](scripts/score_ab_authority.py) |
 | Why the composition exists | [`references/A_B_AUTHORITY.md`](references/A_B_AUTHORITY.md) |
 | Structured XML formats | [`modules/format-structured-xml.md`](modules/format-structured-xml.md) |

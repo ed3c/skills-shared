@@ -228,25 +228,30 @@
     },
     {
       "skill": "controlled-technical-language-harness",
-      "highest_layer": "L2_EXECUTABLE_CONTRACT",
-      "golden_proof_id": null,
+      "highest_layer": "L3_HERMETIC_REAL_TASK",
+      "golden_proof_id": "controlled-technical-language-refactor-ab-v1",
       "criteria": {
         "old_canonical_treatment_frozen": {
-          "state": "ABSENT",
-          "evidence": [],
-          "owner_issue": 344,
-          "note": "No pre-refactor treatment bytes are frozen anywhere in the Skill."
+          "state": "PASS",
+          "evidence": [
+            "skills/controlled-technical-language-harness/tests/refactor-treatments/fixtures/old-canonical-SKILL.txt"
+          ],
+          "note": "Registered as A_PRE_LANE_SPLIT at blob bced264, the body as PR #126 landed it. Reproduced byte for byte from history, not reconstructed: git cat-file -p bced264 emits the fixture. The role is bound honestly to what this Skill's history contains -- the body was never restructured wholesale, so A is the body before the one landing that replaced an existing claim rather than appending to it, and refactor_ab.py says so in the bytes a reader runs."
         },
         "refactor_as_landed_treatment_frozen": {
-          "state": "ABSENT",
-          "evidence": [],
-          "owner_issue": 344
+          "state": "PASS",
+          "evidence": [
+            "skills/controlled-technical-language-harness/tests/refactor-treatments/fixtures/refactor-as-landed-SKILL.txt"
+          ],
+          "note": "Registered as B0_EVALUATOR_LANES_AS_LANDED at blob d4d3b97, PR #127: the landing that deleted the single undifferentiated 'deterministic rule evaluation IMPLEMENTED' claim -- which the ruleset itself contradicted with DECLARED_NOT_IMPLEMENTED -- and split it into two named evaluator lanes. Retained and scored whatever it comes out at; on this matrix it does not regress against A, which is a measured result rather than the reason it is kept."
         },
         "old_strengths_asserted": {
-          "state": "ABSENT",
-          "evidence": [],
-          "owner_issue": 344,
-          "note": "Without a frozen old treatment there is nothing to assert preservation against."
+          "state": "PASS",
+          "evidence": [
+            "skills/controlled-technical-language-harness/scripts/refactor_ab.py",
+            "skills/controlled-technical-language-harness/tests/refactor-treatments/verify.sh"
+          ],
+          "note": "Ten baseline guarantees are asserted arm by arm rather than in prose: A 10, B0 12, B1 13, B2 14 on fifteen criteria. One did leave the body -- A's BOUNDED_EXTERNAL lane was bound to a 'named field set, recorded in the receipt' and B1 replaced that lane -- so it is asserted against check_privacy_routing.py, which took it over, and deleting durable_receipt_fields there turns the suite red. A relocated guarantee and a deleted one read identically in prose and do not read identically here."
         },
         "route_reachable": {
           "state": "PASS",
@@ -258,13 +263,15 @@
           "note": "run-all.sh discovers every tests/*/verify.sh, so a new gate cannot be added unreachable."
         },
         "schema_and_semantic_gates_executable": {
-          "state": "PARTIAL",
+          "state": "PASS",
           "evidence": [
+            "skills/controlled-technical-language-harness/references/controlled-language-ab-run.schema.json",
+            "skills/controlled-technical-language-harness/tests/ab-canary/verify.sh",
+            "skills/controlled-technical-language-harness/scripts/score_ab.py",
             "skills/controlled-technical-language-harness/scripts/lint_deterministic.py",
             "skills/controlled-technical-language-harness/scripts/check_profile_admission.py"
           ],
-          "owner_issue": 344,
-          "note": "Semantic and deterministic gates are executable; no machine shape contract (*.schema.json) exists."
+          "note": "The shape contract for controlled-language-ab-run/v1 is executed as a deciding gate by ab-canary/verify.sh and refuses three planted shape defects. Shape and fairness stay separate: the committed unfair bundle is schema-valid and is still refused by score_ab.py, so a well-formed unfair experiment cannot read as admitted."
         },
         "hollow_dead_route_controls": {
           "state": "PASS",
@@ -275,18 +282,19 @@
           ]
         },
         "matched_hermetic_task": {
-          "state": "PARTIAL",
+          "state": "PASS",
           "evidence": [
-            "skills/controlled-technical-language-harness/scripts/score_ab.py",
-            "skills/controlled-technical-language-harness/tests/ab-canary/verify.sh"
+            "skills/controlled-technical-language-harness/scripts/refactor_ab.py",
+            "skills/controlled-technical-language-harness/tests/refactor-treatments/verify.sh"
           ],
-          "owner_issue": 344,
-          "note": "Matched-task fairness is enforced over recorded A/B bundles, not over frozen refactor treatments."
+          "note": "The four frozen treatments run against the same criteria matrix, the same blob assertions and the same non-regression rule, offline and with no model or provider. The A/B-bundle fairness gate over recorded bundles is a separate lane and stays where it was."
         },
         "golden_proof_registered": {
-          "state": "ABSENT",
-          "evidence": [],
-          "owner_issue": 344
+          "state": "PASS",
+          "evidence": [
+            "skills/skill-refactor-proof-loop/references/golden-proof-registry.json"
+          ],
+          "note": "Four content-bound treatments: A, B0, B1 and the live B2. The entry's pull_requests are the four merged PRs whose bytes each treatment is (#126, #127, #131, #140), because this leaf's own delivery PR is not open and naming one that does not exist would be the fabrication the registry is built to prevent. L4 stays NOT_EXERCISED and L5 stays HUMAN_ADMIT_REQUIRED."
         },
         "live_model_runtime_ab": {
           "state": "NOT_EXERCISED",
@@ -294,12 +302,16 @@
             "skills/controlled-technical-language-harness/scripts/score_ab.py"
           ],
           "owner_issue": 344,
-          "note": "The scorer consumes live-run bundles; no live bundle is registered as evidence."
+          "note": "The scorer consumes live-run bundles; no live bundle is registered as evidence. The frozen-treatment A/B is deterministic text comparison and promotes nothing here."
         },
         "molecular_traceability": {
-          "state": "ABSENT",
-          "evidence": [],
-          "owner_issue": 344
+          "state": "PARTIAL",
+          "evidence": [
+            "skills/skill-refactor-proof-loop/references/skill-adoption-ledger.json",
+            "skills/skill-refactor-proof-loop/references/golden-proof-registry.json"
+          ],
+          "owner_issue": 344,
+          "note": "The leaf, its edges and its treatment PRs are indexed in machine artifacts, but refactor-proof-stack.json carries no node for #344 and the delivery state of the ones it does carry is READ_FROM_GITHUB. A zero-network audit cannot close this."
         }
       }
     },

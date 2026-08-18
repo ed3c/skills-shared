@@ -1,0 +1,195 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "controlled-language-ab-run/v1",
+  "title": "Controlled-language integrated A/B run bundle",
+  "description": "Machine shape contract for the bundle scripts/score_ab.py consumes. Shape and fairness are separate questions and this file answers only the first: tests/ab-canary/fixtures/unfair-run.json is valid against this schema and is still refused by the scorer. A shape gate that also decided fairness would let a well-formed unfair experiment read as admitted.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "experiment_id",
+    "budget",
+    "compliance_claim",
+    "conditions",
+    "declared_case_count",
+    "environment_identity",
+    "evaluator_identities",
+    "fixture_identity",
+    "generalization_claimed",
+    "harness_identity",
+    "model_identity",
+    "physical_runs",
+    "profile_identity",
+    "termbase_identity"
+  ],
+  "$defs": {
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["max_model_calls", "max_tool_calls", "max_retries", "seed"],
+      "properties": {
+        "max_model_calls": { "type": "integer", "minimum": 0 },
+        "max_tool_calls": { "type": "integer", "minimum": 0 },
+        "max_retries": { "type": "integer", "minimum": 0 },
+        "seed": { "type": "integer" }
+      }
+    },
+    "named_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "minLength": 1 }
+      }
+    },
+    "evaluator_identities": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "version", "artifact_digest"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "version": { "type": "string", "minLength": 1 },
+          "artifact_digest": { "$ref": "#/$defs/digest" }
+        }
+      }
+    },
+    "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{6,64}$" },
+    "fixture_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["corpus_id", "artifact_digest"],
+      "properties": {
+        "corpus_id": { "type": "string", "minLength": 1 },
+        "artifact_digest": { "$ref": "#/$defs/digest" }
+      }
+    },
+    "profile_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pack_id", "edition", "pack_digest"],
+      "properties": {
+        "pack_id": { "type": "string", "minLength": 1 },
+        "edition": { "type": "string", "minLength": 1 },
+        "pack_digest": { "$ref": "#/$defs/digest" }
+      }
+    },
+    "termbase_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifact_digest"],
+      "properties": { "artifact_digest": { "$ref": "#/$defs/digest" } }
+    },
+    "result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "case_id",
+        "deterministic_status",
+        "final_status",
+        "execution_lane",
+        "restricted",
+        "span_valid",
+        "step_order_preserved",
+        "warnings_preserved",
+        "human_review",
+        "human_override",
+        "compliance_claim_made",
+        "expected_violations",
+        "violations_found",
+        "evaluator_calls",
+        "provider_calls",
+        "tool_calls",
+        "repair_attempts",
+        "repair_converged",
+        "repair_stopped_no_improvement",
+        "latency_ms",
+        "meaning_preservation_score",
+        "tokens_in",
+        "tokens_out"
+      ],
+      "properties": {
+        "case_id": { "type": "string", "minLength": 1 },
+        "deterministic_status": { "enum": ["PASS", "FAIL", "ERROR", "ABSENT"] },
+        "final_status": { "enum": ["PASS", "FAIL", "ERROR", "ABSENT"] },
+        "execution_lane": { "enum": ["LOCAL_ONLY", "PRIVATE_ENDPOINT", "EXTERNAL_APPROVED"] },
+        "restricted": { "type": "boolean" },
+        "span_valid": { "type": "boolean" },
+        "step_order_preserved": { "type": "boolean" },
+        "warnings_preserved": { "type": "boolean" },
+        "human_review": {
+          "description": "null is the declared absence of human review, which is a state the planted missing_human_review arm depends on. Collapsing it into an empty object would erase the distinction the arm exists to plant.",
+          "type": ["object", "null"],
+          "additionalProperties": false,
+          "required": ["generated_by_agent"],
+          "properties": { "generated_by_agent": { "type": "boolean" } }
+        },
+        "human_override": { "type": "boolean" },
+        "compliance_claim_made": { "type": "boolean" },
+        "expected_violations": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "violations_found": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "evaluator_calls": { "type": "integer", "minimum": 0 },
+        "provider_calls": { "type": "integer", "minimum": 0 },
+        "tool_calls": { "type": "integer", "minimum": 0 },
+        "repair_attempts": { "type": "integer", "minimum": 0 },
+        "repair_converged": { "type": "boolean" },
+        "repair_stopped_no_improvement": { "type": "boolean" },
+        "latency_ms": { "type": "number", "minimum": 0 },
+        "meaning_preservation_score": { "type": "number", "minimum": 0, "maximum": 1 },
+        "tokens_in": { "type": "integer", "minimum": 0 },
+        "tokens_out": { "type": "integer", "minimum": 0 }
+      }
+    }
+  },
+  "properties": {
+    "schema_version": { "const": "controlled-language-ab-run/v1" },
+    "experiment_id": { "type": "string", "minLength": 1 },
+    "budget": { "$ref": "#/$defs/budget" },
+    "compliance_claim": { "enum": ["NONE", "HUMAN_ADMIT_REQUIRED", null] },
+    "declared_case_count": { "type": "integer", "minimum": 1 },
+    "physical_runs": { "type": "integer", "minimum": 0 },
+    "generalization_claimed": { "type": "boolean" },
+    "environment_identity": { "$ref": "#/$defs/named_identity" },
+    "harness_identity": { "$ref": "#/$defs/named_identity" },
+    "model_identity": { "$ref": "#/$defs/named_identity" },
+    "evaluator_identities": { "$ref": "#/$defs/evaluator_identities" },
+    "fixture_identity": { "$ref": "#/$defs/fixture_identity" },
+    "profile_identity": { "$ref": "#/$defs/profile_identity" },
+    "termbase_identity": { "$ref": "#/$defs/termbase_identity" },
+    "conditions": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "observed_budget", "skill_content_included", "results"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "observed_budget": { "$ref": "#/$defs/budget" },
+          "skill_content_included": { "type": "boolean" },
+          "results": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "$ref": "#/$defs/result" }
+          },
+          "evaluator_identities": { "$ref": "#/$defs/evaluator_identities" },
+          "environment_identity": { "$ref": "#/$defs/named_identity" },
+          "harness_identity": { "$ref": "#/$defs/named_identity" },
+          "model_identity": { "$ref": "#/$defs/named_identity" },
+          "fixture_identity": { "$ref": "#/$defs/fixture_identity" },
+          "profile_identity": { "$ref": "#/$defs/profile_identity" },
+          "termbase_identity": { "$ref": "#/$defs/termbase_identity" }
+        }
+      }
+    }
+  }
+}
