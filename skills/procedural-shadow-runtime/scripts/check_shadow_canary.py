@@ -511,32 +511,46 @@ def check_budget(body: dict[str, Any]) -> None:
     negative cost or a run that claims cost_observed with no number attached
     is a bug in the capture code, not an absent measurement.
     """
+    # Every live invocation is one lane of the same ledger -- the Shadow, each
+    # Builder Worker, and the bypass attempt. They were checked separately once,
+    # and the split is what let the bypass call go unledgered without anything
+    # noticing, so they share one pass now.
+    for where, record in invocations(body):
+        check_token_fields(where, record)
+        check_cost_fields(where, record)
+
+
+def invocations(body: dict[str, Any]) -> list[tuple[str, dict[str, Any]]]:
+    lanes: list[tuple[str, dict[str, Any]]] = []
     for trial in body["trials"]:
-        shadow = trial.get("shadow") or {}
-        check_token_fields(trial["trial_id"], shadow)
+        lanes.append((trial["trial_id"], trial.get("shadow") or {}))
         for builder in trial.get("builders") or []:
-            check_token_fields(f"{trial['trial_id']}/{builder.get('worker')}", builder)
-        if "cost_observed" not in shadow and "cost_usd" not in shadow:
-            continue  # older receipt: cost tracking was never attempted here
-        observed = shadow.get("cost_observed")
-        cost = shadow.get("cost_usd")
-        if observed is True and cost is None:
+            lanes.append((f"{trial['trial_id']}/{builder.get('worker')}", builder))
+    for entry in body["attempted_bypasses"]:
+        lanes.append((f"bypass/{entry.get('id')}", entry))
+    return lanes
+
+
+def check_cost_fields(where: str, record: dict[str, Any]) -> None:
+    if "cost_observed" not in record and "cost_usd" not in record:
+        return  # this lane never attempted a cost measurement
+    observed = record.get("cost_observed")
+    cost = record.get("cost_usd")
+    if observed is True and cost is None:
+        refuse("BUDGET_MALFORMED", f"{where} claims cost_observed=True with no cost_usd")
+    if observed is False and cost is not None:
+        refuse("BUDGET_MALFORMED",
+               f"{where} claims cost_observed=False but records cost_usd={cost!r}")
+    if cost is not None and (isinstance(cost, bool) or not isinstance(cost, (int, float))
+                             or cost < 0):
+        refuse("BUDGET_MALFORMED",
+               f"{where} cost_usd must be a non-negative number, got {cost!r}")
+    for field in ("input_tokens", "output_tokens"):
+        value = record.get(field)
+        if value is not None and (isinstance(value, bool) or not isinstance(value, int)
+                                  or value < 0):
             refuse("BUDGET_MALFORMED",
-                   f"{trial['trial_id']} claims cost_observed=True with no cost_usd")
-        if observed is False and cost is not None:
-            refuse("BUDGET_MALFORMED",
-                   f"{trial['trial_id']} claims cost_observed=False but records "
-                   f"cost_usd={cost!r}")
-        if cost is not None and (isinstance(cost, bool) or not isinstance(cost, (int, float))
-                                  or cost < 0):
-            refuse("BUDGET_MALFORMED",
-                   f"{trial['trial_id']} cost_usd must be a non-negative number, got {cost!r}")
-        for field in ("input_tokens", "output_tokens"):
-            value = shadow.get(field)
-            if value is not None and (isinstance(value, bool) or not isinstance(value, int)
-                                       or value < 0):
-                refuse("BUDGET_MALFORMED",
-                       f"{trial['trial_id']} {field} must be a non-negative int, got {value!r}")
+                   f"{where} {field} must be a non-negative int, got {value!r}")
 
 
 TOKEN_FIELDS = ("input_tokens", "output_tokens", "cached_input_tokens",
@@ -795,6 +809,15 @@ def selftest(body: dict[str, Any]) -> int:
         ("budget-negative-tokens", "BUDGET_MALFORMED",
          mutate(lambda d: d["trials"][0]["shadow"].update(
              {"cost_observed": True, "cost_usd": 0.01, "input_tokens": -1}))),
+        # The Builder and bypass lanes joined the ledger after the Shadow lane
+        # did, and an unchecked lane is how the bypass call went unledgered in
+        # the first place. Each owns a control so the coverage is not by reading.
+        ("builder-budget-observed-without-number", "BUDGET_MALFORMED",
+         mutate(lambda d: d["trials"][0]["builders"][0].update(
+             {"cost_observed": True, "cost_usd": None}))),
+        ("bypass-tokens-claimed-without-counts", "BUDGET_MALFORMED",
+         mutate(lambda d: d["attempted_bypasses"][0].update(
+             {"tokens_observed": True, "input_tokens": None, "output_tokens": 5}))),
     ]
 
     # Two controls need something a receipt can honestly lack: a live Shadow
