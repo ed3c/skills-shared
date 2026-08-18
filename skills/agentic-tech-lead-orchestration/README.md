@@ -1,68 +1,43 @@
 # `agentic-tech-lead-orchestration`
 
-Portable contract-first orchestration for turning one large coding request into a dependency-aware branch team and, when the current session reaches a real host/runtime boundary, a zero-context Local Handoff Execution Queue. `SKILL.md` owns the method; `references/` owns host-neutral contracts; `modules/` contains trigger-selected provider/runtime/delivery interpretations; `scripts/` and `tests/` own executable assertions and falsifiers.
+Portable contract-first orchestration for turning an admitted system/case contract into a dependency-aware branch team and, when the current session reaches a real host/runtime boundary, a zero-context Local Handoff Execution Queue. `SKILL.md` owns the method; `references/` owns host-neutral contracts; `modules/` contains trigger-selected provider/runtime/delivery interpretations; `scripts/` and `tests/` own executable assertions and falsifiers.
 
 ## Read order
 
 1. [`AGENTS.md`](AGENTS.md)
 2. [`SKILL.md`](SKILL.md)
 3. task, capability and scheduler schemas under [`references/`](references/README.md)
-4. when local/runtime-only evidence remains, `references/local-handoff-queue.schema.json` and the example queue
-5. when the work must run in a remote lane while the local one is disconnected, [`references/dual-agent-offload/OFFLOAD_METHOD.md`](references/dual-agent-offload/OFFLOAD_METHOD.md)
+4. when Spatial Loop produced an ICPG, read `../spatial-loop-systems-engineering/references/intent-case-proof-graph.md` and bind its exact digest/required-case denominator into the task contract
+5. when local/runtime-only evidence remains, `references/local-handoff-queue.schema.json`
 6. [`modules/README.md`](modules/README.md), then only selected modules
 7. [`scripts/README.md`](scripts/README.md)
 8. [`tests/README.md`](tests/README.md)
-9. [`../skill-refactor-proof-loop/README.md`](../skill-refactor-proof-loop/README.md) and its golden registry
-10. exact issue, PR base/head, workflow and receipt subjects
-11. [`../../docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md`](../../docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md) before a global completion claim
+9. exact issue, PR base/head, workflow and receipt subjects
+10. [`../../docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md`](../../docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md) before a global completion claim
 
 ## Directory map → State Machine ownership
 
 ```text
 skills/agentic-tech-lead-orchestration/
-├── AGENTS.md
-│   └── Agent read order, writer/queue leases, evidence and authority boundary
-├── README.md
-│   └── integration state, directory map, State Machines, DAG and data flow
-├── SKILL.md
-│   └── portable request → task → capability → Worker → convergence → handoff law
+├── AGENTS.md                    Agent read order / authority boundary
+├── README.md                    topology / State Machines / DAG / data flow
+├── SKILL.md                     portable orchestration law
 ├── references/
 │   ├── task-contract.schema.json
-│   ├── capability-plan.schema.json
-│   ├── capability-receipts.schema.json
+│   │     └── exact subject + case_obligations + branch ownership + acceptance
+│   ├── example-stack-contract.json
+│   ├── capability-plan.schema.json / capability-receipts.schema.json
 │   ├── scheduler-lifecycle.schema.json
-│   ├── local-handoff-queue.schema.json
-│   ├── example-local-handoff-queue.json
-│   ├── dual-agent-offload/
-│   │     └── portable local/cloud offload method, contracts and controls
-│   ├── prompt/task examples and causal maps
-│   └── frozen contract and evidence vocabulary
-├── modules/
-│   ├── domain-profile.md
-│   ├── deterministic-code-intelligence.md
-│   ├── semantic-intent-anchor.md
-│   ├── agent-executor.md
-│   ├── vector-store.md
-│   ├── tournament-mode.md
-│   └── stacked-delivery.md
+│   └── local-handoff-queue.schema.json
+├── modules/                     trigger-selected capabilities
 ├── scripts/
-│   ├── task shape and semantic gates
-│   ├── capability causal-DAG gate
-│   ├── reachability and core-boundary gates
-│   ├── scheduler lifecycle validation
-│   └── Local Handoff Queue shape/semantic assertion
+│   ├── check_task_contract_schema.py
+│   ├── assert_task_contract.py  ← case denominator/ownership hard gate
+│   ├── assert_capability_dag.py
+│   └── lifecycle/handoff gates
 └── tests/
-    ├── structural/reachability A/B
-    ├── capability, scheduler and queue mutation controls
-    ├── frozen historical treatments
-    └── production-shaped matched real-task A/B
-```
-
-The executable mechanism index is generated from current bytes:
-
-```bash
-python3 ../../scripts/check_skill_entry_routes.py \
-  --skill agentic-tech-lead-orchestration --print-index
+    ├── selftest.py              ← orphan/duplicate/stale case controls
+    └── run-all.sh               owning suite
 ```
 
 ## Primary orchestration State Machine
@@ -70,188 +45,112 @@ python3 ../../scripts/check_skill_entry_routes.py \
 ```text
 REQUEST_BOUND
 → SYSTEM_CONTRACT_EXTRACTED
+→ CASE_GRAPH_BOUND_OR_EXPLICITLY_NOT_APPLICABLE
+→ CASE_OBLIGATIONS_FROZEN
 → CAPABILITY_PLAN_COMPILED
 → CAPABILITY_PLAN_ASSERTED
 → CONTEXT_ADMITTED
 → TASK_DAG_COMPILED
 → TASK_SCHEMA_ASSERTED
 → TASK_SEMANTICS_ASSERTED
+→ CASE_OWNERSHIP_ASSERTED
 → WORKERS_ADMITTED
 → LEASES_BOUND
 → ATTEMPTS_EXECUTED
 → RESULTS_VERIFIED
 → CANDIDATES_COMPARED
 → CONVERGENCE_APPLIED
-→ GLOBAL_OBJECTIVE_ASSERTED
+→ GLOBAL_OBJECTIVE_AND_CASE_COVERAGE_ASSERTED
 → DELIVERY_HANDOFF
 → HUMAN_ADMIT_REQUIRED
 ```
 
-Failure/control states include stale attempts, lease expiry, retryable/terminal failure, cancellation, supersession, straggler detach, authority block, semantic conflict, non-decomposable task, and duplicate suppression. A state declared only in a schema or fixture is not runtime evidence.
+## ICPG → Tech Lead DAG
 
-## Local Handoff Execution Queue State Machine
-
-When a valid next step requires a local host, signed-in carrier, installed tool, device, provider credential, real worktree, Git Town, Forgejo, or another runtime unavailable in the current session:
+The Tech Lead does not decompose directly from a short prompt when an admitted ICPG exists.
 
 ```text
-DELIVERY_HANDOFF or explicit runtime boundary
-→ LOCAL_HANDOFF_REQUIRED
-→ LOCAL_QUEUE_ASSERTED
-→ ACTIVE_ITEM_BOUND
-→ RUNTIME_LANE_EXECUTED
-→ RECEIPT_ASSERTED
-    ├── ITEM_COMPLETED
-    │     └── NEXT_ITEM_SELECTED or QUEUE_COMPLETED
-    └── ITEM_BLOCKED
-          └── preserve receipt + stop/Human handoff
+User prompt / source behavior
+→ Spatial Loop ICPG
+   ├── frozen graph digest
+   ├── required-case denominator
+   └── invariants / oracles
+→ task-contract.case_obligations
+   ├── required_case_ids
+   ├── branch_case_owners
+   └── convergence_owner
+→ true task DAG
+   ├── path-disjoint sibling Workers
+   ├── true child only when unmerged bytes/contracts are consumed
+   └── one convergence owner
+→ independent result/oracle verification
+→ global case-denominator reconciliation
+→ delivery / Local Handoff / Human Admit
 ```
 
-A valid queue has exactly one `ACTIVE` item, immutable subject identity, concrete bounded commands, durable receipt requirements, fail-closed exits, and explicit next-item routing. The queue is a continuation contract, not a claim that execution happened.
-
-## Task and branch DAG
+Hard failures before Worker admission:
 
 ```text
-contract/interface freeze
-├─ path-disjoint implementation sibling A
-├─ path-disjoint implementation sibling B
-├─ matched tournament replicas for one locked output contract
-└─ independent verifier/negative-control leaves
-      ↓ verified results only
-one convergence owner
-      ↓ local + global objective oracles
-optional true Stack child only when unmerged parent bytes are consumed
-      ↓ delivery or Local Handoff Queue
-Human/local-runtime authority
+stale/non-sha case graph identity
+required case without owner
+required case with multiple owners
+owner names an undeclared branch
+ownership map invents a case outside denominator
+missing/invalid convergence owner
+local task success presented as global case closure
 ```
 
-False edges are rejected. Path-disjoint work remains siblings. A dependent convergence attempt rebinds its base at lease time to the verified integrated prerequisites; independent candidates retain the common frozen base so comparison remains fair.
+Case dependencies and Git ancestry are separate. A semantic relation between two cases does not make their implementation branches parent/child. Git parentage exists only when the child consumes unmerged parent bytes/contracts/state.
 
 ## End-to-end data flow
 
 ```text
-Issue / PRD / PDF
-→ task contract and immutable interface/test anchors
-→ optional semantic intent candidates
-→ current-source readback
-→ admitted deterministic graph/structural context
-→ true task DAG + path/resource leases
-→ isolated worktree/process attempts
-→ bounded checkpoint/retry/self-heal
+Issue / PRD / PDF / short prompt
+→ Spatial Loop intent + source-behavior + use/edge-case expansion
+→ ICPG exact digest + required denominator
+→ Tech Lead task contract
+→ capability context + source readback
+→ true task DAG + branch→case ownership + path/resource leases
+→ isolated attempts
 → independent local oracles
-→ tournament comparison with complete denominator
-→ convergence from verified prerequisite bytes
-→ frozen global-objective oracle
+→ candidate comparison
+→ one convergence owner
+→ global objective + case coverage assertion
 → delivery handoff
     ├── current runtime can continue
-    │     → optional Stack/delivery receipts
-    └── local/runtime-only evidence remains
-          → asserted Local Handoff Queue
-          → local/runtime lane
-          → durable receipt
-          → next queue item or blocked Human handoff
+    └── physical/local evidence remains → Local Handoff Queue
 → Human Admit
 ```
 
-`code-graph-rag` is intentionally not an active dependency. A consumer may retain old files for migration/audit, but the task contract assertion rejects it as a runtime provider.
+`code-graph-rag` remains intentionally inactive. A consumer may retain historical files for migration/audit, but the task contract rejects it as a runtime provider.
 
-## Golden refactor proof
-
-The proof-carrying refactor line is:
+## #407 ICPG preparation line
 
 ```text
-PR #308  deterministic task/capability reachability,
-         receipt-gated causal repair, and Local Handoff Queue contract
-└─ PR #315 production-shaped hermetic real-task proof,
-           restacked onto the current causal handoff runtime
-   └─ PR #323 generalized proof contract and registry
-      └─ PR #324 Agent routes and directory State Machines/DAG/data flow
-         └─ PR #325 molecular Stack/traceability convergence
+#408 / PR #412   Spatial case contract + checker + semantic-loss mutations
+        ↓ consumes case contract
+#410            Tech Lead task contract gains exact ICPG denominator/ownership
+        ├── task-contract schema
+        ├── semantic assertion
+        ├── orphan/duplicate/stale controls
+        └── README route
+
+#409            Shadow monitor/system-prompt/spec-packet projection
+#411            live continuous Shadow canary (external evidence lane)
 ```
 
-Frozen treatments:
+#409 is not automatically a Git child of #410; #411 is a live evidence/process dependency, not a source-code ancestry edge.
+
+## Evidence boundary
 
 ```text
-A  OLD_MONOLITH              a01f53592cda98f61b413b4467afa96356fb4ef7
-B0 REFACTOR_AS_LANDED        8b2da7443aff7a9f53412b5af280048203bbd5e9
-B1 REACHABILITY_REPAIRED     51c3fd81749598957f2b993c4d31c3b4c8c277c1
-B2 CAUSAL_DAG_REPAIRED       current owner SKILL blob bound by registry
+ICPG task-contract shape                         IMPLEMENTED_ON_PR_412
+required-case denominator/owner semantic gate    IMPLEMENTED_ON_PR_412
+orphan/duplicate/stale ownership controls         IMPLEMENTED_ON_PR_412
+live Worker execution using ICPG                  NOT_EXERCISED
+live continuous Shadow case monitoring            NOT_EXERCISED / #411
+Git Town physical stack execution                 NOT_EXERCISED
+merge/release/promotion                           HUMAN_ADMIT_REQUIRED
 ```
 
-Matched deterministic result:
-
-```text
-A/B1/B2 functional output       PASS and byte-equivalent
-B0                               BLOCKED_DISPATCH_ROUTE_ABSENT
-B2 task/schema/semantic gates    PASS
-B2 capability receipt causality  PASS
-parallel worktree processes      PASS on hermetic subject
-checkpoint/retry/tournament      PASS on hermetic subject
-global objective and cleanup     PASS on hermetic subject
-Local Handoff Queue mechanism    contract/selftest evidence only
-live model/provider quality      NOT_EXERCISED
-Git Town/Forgejo delivery        NOT_EXERCISED
-merge                            HUMAN_ADMIT_REQUIRED
-```
-
-The proof is registered by `skill-refactor-proof-loop`; its implementation remains here and is not copied into the generalized Skill.
-
-## Remaining evidence DAG
-
-```text
-#231 live scheduler receipts
-├─ #232 independent Shadow/global objective
-├─ #256 exact-subject code-intelligence/executor adapters
-└─ #234 real Git Town/dual-forge delivery
-      ↓ matched subjects
-#312 Phase 2 live A/B
-      ↓ external review
-Human merge/release admission
-```
-
-These issues are separately owned evidence lanes, not artificial Stack children.
-
-## Tech Lead + Shadow closure responsibility
-
-This Skill owns the plan, task/capability DAG, writer/path/resource leases, Worker admission, convergence owner and Local Handoff Queue. The independent Shadow is not another Worker and must not edit the Tech Lead's branch silently.
-
-```text
-Tech Lead result
-→ independent procedural-shadow-runtime review on the same immutable subject
-→ requirement applicability
-→ source/contract/runtime contradictions
-→ local task versus global objective
-→ evidence ceiling and denominator
-→ HOLD / REJECT / ELIGIBLE_FOR_HUMAN_ADMIT
-```
-
-A Tech Lead local PASS is not a global-objective PASS. A static or hermetic proof is not a live model/provider/runtime proof. When the current runtime cannot execute the next proof, emit one asserted queue bound to one immutable subject; do not guess host commands or mutate an old epoch after the accepted subject changes.
-
-Relation vocabulary:
-
-```text
-SIBLING             path-disjoint work
-TRUE_CHILD          named unmerged byte dependency
-CONVERGENCE         one shared-index/integration owner
-PROCESS_DEPENDENCY  ordering without Git ancestry
-EXTERNAL_EVIDENCE   independent receipt lane, no Stack paths
-HISTORICAL          admitted/forensic prior subject, not current state authority
-```
-
-The full portable audit and dated external-consumer example are in [`../../docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md`](../../docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md).
-
-## Local verification
-
-```bash
-python3 scripts/check_task_contract_schema.py --selftest
-python3 scripts/assert_task_contract.py \
-  --contract references/example-stack-contract.json \
-  --receipt /tmp/agentic-tech-lead-receipt.json
-python3 scripts/assert_local_handoff_queue.py \
-  --queue references/example-local-handoff-queue.json
-python3 scripts/assert_local_handoff_queue.py \
-  --queue references/example-local-handoff-queue.json --selftest
-python3 tests/real_task_ab.py
-sh tests/run-all.sh
-```
-
-A local or CI PASS validates only the named subject and evidence layer. Provider installation, index freshness, real model behavior, real queue execution, Git Town/Forgejo delivery, merge, release, and production remain separate.
+A fixture PASS proves the gate can discriminate its planted defects. It does not prove a live Worker consumed the ICPG or that all real-world unknown cases were discovered.
