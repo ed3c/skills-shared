@@ -17,70 +17,37 @@
     "changed": ["feature/contracts.py", "tests/feature/test_contracts.py"]
   },
   "architecture": {
-    "interface_locks": [
-      {
-        "path": "shared/api.json",
-        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-      }
-    ],
+    "interface_locks": [{"path": "shared/api.json", "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}],
     "dependency_policy": "NO_NEW_DEPENDENCIES",
     "allowed_dependencies": [],
     "state_policy": "Reuse the existing state boundary; no new global store.",
     "no_double_graph": true
   },
+  "case_obligations": {
+    "case_graph_ref": "feature/case-graph.json",
+    "case_graph_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "required_case_ids": ["CASE-CONTRACT", "CASE-CORE"],
+    "branch_case_owners": [
+      {"branch": "feature/contract", "case_ids": ["CASE-CONTRACT"]},
+      {"branch": "feature/core", "case_ids": ["CASE-CORE"]}
+    ],
+    "convergence_owner": "feature/core"
+  },
   "providers": [
     {"id": "grepai", "role": "INTENT_ANCHOR", "state": "DEGRADED"},
-    {
-      "id": "scip-sqlite",
-      "role": "DETERMINISTIC_GRAPH",
-      "state": "EXACT",
-      "subject": {
-        "commit": "0123456789abcdef0123456789abcdef01234567",
-        "tree": "89abcdef0123456789abcdef0123456789abcdef",
-        "version": "example-1.0.0",
-        "coverage_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-        "source_readback": true
-      }
-    },
-    {
-      "id": "tree-sitter",
-      "role": "STRUCTURAL_SLICER",
-      "state": "EXACT",
-      "subject": {
-        "commit": "0123456789abcdef0123456789abcdef01234567",
-        "tree": "89abcdef0123456789abcdef0123456789abcdef",
-        "version": "example-1.0.0",
-        "coverage_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-        "source_readback": true
-      }
-    },
+    {"id": "scip-sqlite", "role": "DETERMINISTIC_GRAPH", "state": "EXACT", "subject": {"commit": "0123456789abcdef0123456789abcdef01234567", "tree": "89abcdef0123456789abcdef0123456789abcdef", "version": "example-1.0.0", "coverage_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "source_readback": true}},
+    {"id": "tree-sitter", "role": "STRUCTURAL_SLICER", "state": "EXACT", "subject": {"commit": "0123456789abcdef0123456789abcdef01234567", "tree": "89abcdef0123456789abcdef0123456789abcdef", "version": "example-1.0.0", "coverage_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "source_readback": true}},
     {"id": "serena", "role": "AGENT_EXECUTOR", "state": "DEGRADED"},
     {"id": "lancedb", "role": "VECTOR_CANDIDATE_STORE", "state": "DEGRADED"}
   ],
   "branches": [
-    {
-      "name": "feature/contract",
-      "parent": "main",
-      "focus": "contract",
-      "write": ["feature/contracts.py", "tests/feature/test_contracts.py"]
-    },
-    {
-      "name": "feature/core",
-      "parent": "feature/contract",
-      "focus": "minimal-diff",
-      "write": ["feature/core.py", "tests/feature/test_core.py"]
-    }
+    {"name": "feature/contract", "parent": "main", "focus": "contract", "write": ["feature/contracts.py", "tests/feature/test_contracts.py"]},
+    {"name": "feature/core", "parent": "feature/contract", "focus": "minimal-diff", "write": ["feature/core.py", "tests/feature/test_core.py"]}
   ],
   "acceptance": {
     "commands": [["python3", "-m", "unittest", "discover"]],
-    "immutable_assertions": ["contract-signatures", "path-boundaries", "no-code-graph-rag"]
+    "immutable_assertions": ["contract-signatures", "path-boundaries", "no-code-graph-rag", "case-obligation-coverage"]
   },
   "budgets": {"max_repairs_per_signature": 3, "max_workers": 2},
-  "automation": {
-    "git_town_admitted": true,
-    "auto_restack": true,
-    "auto_publish": false,
-    "auto_resolve_conflicts": false,
-    "auto_merge": false
-  }
+  "automation": {"git_town_admitted": true, "auto_restack": true, "auto_publish": false, "auto_resolve_conflicts": false, "auto_merge": false}
 }
