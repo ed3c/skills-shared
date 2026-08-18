@@ -1,0 +1,248 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skills-shared.invalid/agentic-tech-lead-orchestration/dual-agent-offload/method-contract.v1.schema.json",
+  "title": "Dual-Agent Offload Method Contract v1",
+  "description": "Portable, provider-neutral method requirement contract for local/cloud offload. Shape gate only: tests/dual-agent-offload-contract/verify.py owns the semantic laws and the executable disagreement controls. This document declares which logical runtime contracts must exist; it never defines their wire shapes, which belong to the Runtime Contract Plane.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "method",
+    "source",
+    "state_machine",
+    "data_classes",
+    "side_effect_classes",
+    "evidence_lanes",
+    "required_runtime_contracts",
+    "authority_map",
+    "failure_distinctions",
+    "shared_projections",
+    "forbidden_promotions",
+    "claims_not_proven",
+    "packets"
+  ],
+  "properties": {
+    "schema_version": {"const": "agentic-tech-lead/dual-agent/method-contract/v1"},
+    "method": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["method_id", "version"],
+      "properties": {
+        "method_id": {"type": "string", "minLength": 1},
+        "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"}
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "runtime_state"],
+      "properties": {
+        "kind": {"enum": ["SOURCE_PROPOSAL", "PRIMARY_SOURCE_CONFIRMED", "FIXTURE", "LIVE_SUBSTRATE_OBSERVED"]},
+        "runtime_state": {"$ref": "#/$defs/evidence_state"},
+        "note": {"type": "string"}
+      }
+    },
+    "state_machine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["initial_state", "terminal_state", "states", "transitions"],
+      "properties": {
+        "initial_state": {"type": "string", "minLength": 1},
+        "terminal_state": {"type": "string", "minLength": 1},
+        "states": {"type": "array", "minItems": 2, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "transitions": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["from", "to"],
+            "properties": {
+              "from": {"type": "string", "minLength": 1},
+              "to": {"type": "string", "minLength": 1}
+            }
+          }
+        }
+      }
+    },
+    "data_classes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/data_class"}},
+    "side_effect_classes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/side_effect_class"}},
+    "evidence_lanes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/lane"}},
+    "required_runtime_contracts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["contract_id", "owner_plane", "required_semantics", "implementation_state", "digest"],
+        "properties": {
+          "contract_id": {"type": "string", "minLength": 1},
+          "owner_plane": {"enum": ["RUNTIME_CONTRACT_PLANE", "INSTRUCTION_METHOD_PLANE"]},
+          "required_semantics": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+          "implementation_state": {"enum": ["NOT_IMPLEMENTED", "IMPLEMENTED"]},
+          "digest": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "authority_map": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["role", "capabilities"],
+        "properties": {
+          "role": {"enum": ["STRATEGY", "WORKER", "GATE", "CANONICAL_REDUCER", "EFFECT_LEDGER", "HUMAN_OR_TRUSTED_POLICY"]},
+          "capabilities": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "enum": [
+                "PROPOSE",
+                "EXECUTE",
+                "OBSERVE",
+                "EVALUATE_GATE",
+                "COMMIT_TASK_STATE",
+                "COMMIT_EFFECT_LEDGER",
+                "ADMIT_SEMANTIC_CONFLICT",
+                "ADMIT_IRREVERSIBLE",
+                "ADMIT_MERGE",
+                "ADMIT_PROMOTION",
+                "ADMIT_RELEASE",
+                "ADMIT_ROLLBACK"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "failure_distinctions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "terminal_state", "compensation_required"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "terminal_state": {"type": "string", "minLength": 1},
+          "compensation_required": {"type": "boolean"}
+        }
+      }
+    },
+    "shared_projections": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "kind", "authority"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "kind": {"enum": ["DOCUMENT", "VECTOR", "MEMORY"]},
+          "authority": {"enum": ["ADVISORY_ONLY", "WORKFLOW_AUTHORITY", "TRANSACTION_AUTHORITY"]}
+        }
+      }
+    },
+    "forbidden_promotions": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "claims_not_proven": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "packets": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "purpose",
+          "data_class",
+          "side_effect_class",
+          "execution_lane",
+          "egress_allowed",
+          "capability_class",
+          "evidence_class",
+          "idempotency_key_required",
+          "effect_ledger_required",
+          "human_admit_required",
+          "compensation",
+          "lane_states"
+        ],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "purpose": {"type": "string", "minLength": 1},
+          "data_class": {"$ref": "#/$defs/data_class"},
+          "side_effect_class": {"$ref": "#/$defs/side_effect_class"},
+          "execution_lane": {"enum": ["LOCAL", "CLOUD"]},
+          "egress_allowed": {"type": "boolean"},
+          "capability_class": {"enum": ["API", "BROWSER_FALLBACK", "LOCAL_PROCESS"]},
+          "evidence_class": {"enum": ["API_OBSERVATION", "BROWSER_OBSERVATION", "LOCAL_OBSERVATION"]},
+          "idempotency_key_required": {"type": "boolean"},
+          "effect_ledger_required": {"type": "boolean"},
+          "human_admit_required": {"type": "boolean"},
+          "compensation": {"enum": ["NOT_REQUIRED", "DECLARED", "HUMAN_OWNED"]},
+          "lane_states": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "LOCAL",
+              "CLOUD",
+              "TRANSPORT",
+              "WORKFLOW",
+              "TASK",
+              "GATE",
+              "EFFECT",
+              "ARTIFACT",
+              "USER_OUTCOME",
+              "HUMAN_ADMIT",
+              "RELEASE"
+            ],
+            "propertyNames": {"$ref": "#/$defs/lane"},
+            "patternProperties": {
+              "^[A-Z_]+$": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["state", "evidence_lane"],
+                "properties": {
+                  "state": {"$ref": "#/$defs/evidence_state"},
+                  "evidence_lane": {"$ref": "#/$defs/lane"}
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "data_class": {"enum": ["PUBLIC", "INTERNAL", "CONFIDENTIAL", "LOCAL_ONLY"]},
+    "side_effect_class": {"enum": ["READ_ONLY", "REVERSIBLE_WRITE", "IRREVERSIBLE_WRITE"]},
+    "lane": {
+      "enum": [
+        "LOCAL",
+        "CLOUD",
+        "TRANSPORT",
+        "WORKFLOW",
+        "TASK",
+        "GATE",
+        "EFFECT",
+        "ARTIFACT",
+        "USER_OUTCOME",
+        "HUMAN_ADMIT",
+        "RELEASE"
+      ]
+    },
+    "evidence_state": {
+      "enum": [
+        "PASS",
+        "FAIL",
+        "ABSENT",
+        "NOT_IMPLEMENTED",
+        "NOT_EXERCISED",
+        "SKIPPED_BY_POLICY",
+        "HUMAN_ADMIT_REQUIRED"
+      ]
+    }
+  }
+}

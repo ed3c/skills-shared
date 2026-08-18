@@ -1,0 +1,219 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skills-shared.invalid/agentic-tech-lead-orchestration/dual-agent-offload/handoff-requirements.v1.schema.json",
+  "title": "Dual-Agent Offload Handoff Requirements v1",
+  "description": "The exact-subject task packet a consumer plane must satisfy before it may start, and separately before it may complete, an implementation lane bound to a frozen method contract. Shape gate only: tests/dual-agent-offload-contract/verify.py owns the semantic laws. Start-readiness and completion-readiness are separate arrays because a start dependency can never close a completion edge.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "id",
+    "producer",
+    "consumer",
+    "required_runtime_contracts",
+    "path_lease",
+    "writer_lease",
+    "positive_fixtures",
+    "mutation_controls",
+    "required_gates",
+    "start_dependencies",
+    "completion_dependencies",
+    "rollback",
+    "evidence_ceiling",
+    "remaining_states",
+    "human_owned_operations",
+    "verdict"
+  ],
+  "properties": {
+    "schema_version": {"const": "agentic-tech-lead/dual-agent/handoff-requirements/v1"},
+    "id": {"type": "string", "minLength": 1},
+    "producer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "commit", "tree", "method_contract_id", "method_contract_digest"],
+      "properties": {
+        "repository": {"type": "string", "minLength": 1},
+        "commit": {"type": "string", "minLength": 1},
+        "tree": {"type": "string", "minLength": 1},
+        "method_contract_id": {"type": "string", "minLength": 1},
+        "method_contract_digest": {"type": "string", "minLength": 1}
+      }
+    },
+    "consumer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "base_commit", "base_tree", "plane", "owning_issue"],
+      "properties": {
+        "repository": {"type": "string", "minLength": 1},
+        "base_commit": {"type": "string", "minLength": 1},
+        "base_tree": {"type": "string", "minLength": 1},
+        "plane": {"enum": ["RUNTIME_CONTRACT_PLANE", "INSTRUCTION_METHOD_PLANE", "PRODUCT_PLANE"]},
+        "owning_issue": {"type": "string", "minLength": 1}
+      }
+    },
+    "required_runtime_contracts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["contract_id", "owner_plane", "implementation_state", "digest"],
+        "properties": {
+          "contract_id": {"type": "string", "minLength": 1},
+          "owner_plane": {"enum": ["RUNTIME_CONTRACT_PLANE", "INSTRUCTION_METHOD_PLANE"]},
+          "implementation_state": {"enum": ["NOT_IMPLEMENTED", "IMPLEMENTED"]},
+          "digest": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "path_lease": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["allowed", "read_only", "forbidden"],
+      "properties": {
+        "allowed": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "read_only": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "forbidden": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "writer_lease": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["writers", "worktree_required", "branch", "shared_resources"],
+      "properties": {
+        "writers": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "worktree_required": {"type": "boolean"},
+        "branch": {"type": "string", "minLength": 1},
+        "shared_resources": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "lease_owner"],
+            "properties": {
+              "id": {"type": "string", "minLength": 1},
+              "lease_owner": {"type": "string", "minLength": 1}
+            }
+          }
+        }
+      }
+    },
+    "positive_fixtures": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "mutation_controls": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "required_gates": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "command", "subject"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "command": {"type": "string", "minLength": 1},
+          "subject": {"enum": ["LOCAL_WORKTREE", "EXACT_HEAD"]}
+        }
+      }
+    },
+    "start_dependencies": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/dependency"}},
+    "completion_dependencies": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/dependency"}},
+    "rollback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["subject_commit", "owner"],
+      "properties": {
+        "subject_commit": {"type": "string", "minLength": 1},
+        "owner": {"type": "string", "minLength": 1}
+      }
+    },
+    "evidence_ceiling": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "statement"],
+      "properties": {
+        "kind": {"enum": ["PORTABLE_DETERMINISTIC_METHOD_CONTRACT", "SYNTHETIC_RUNTIME", "LIVE_SUBSTRATE"]},
+        "statement": {"type": "string", "minLength": 1}
+      }
+    },
+    "remaining_states": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["lane", "state"],
+        "properties": {
+          "lane": {"$ref": "#/$defs/lane"},
+          "state": {
+            "enum": [
+              "PASS",
+              "FAIL",
+              "ABSENT",
+              "NOT_IMPLEMENTED",
+              "NOT_EXERCISED",
+              "SKIPPED_BY_POLICY",
+              "HUMAN_ADMIT_REQUIRED"
+            ]
+          }
+        }
+      }
+    },
+    "human_owned_operations": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "verdict": {"enum": ["PASS", "BLOCKED_BY_RUNTIME_CONTRACT", "BLOCKED_BY_HUMAN_ADMIT", "REPLAN_REQUIRED"]}
+  },
+  "$defs": {
+    "lane": {
+      "enum": [
+        "LOCAL",
+        "CLOUD",
+        "TRANSPORT",
+        "WORKFLOW",
+        "TASK",
+        "GATE",
+        "EFFECT",
+        "ARTIFACT",
+        "USER_OUTCOME",
+        "HUMAN_ADMIT",
+        "RELEASE"
+      ]
+    },
+    "dependency": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "statement", "edge_class", "proof"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "statement": {"type": "string", "minLength": 1},
+        "edge_class": {"enum": ["START", "COMPLETION"]},
+        "proof": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "state"],
+          "properties": {
+            "kind": {
+              "enum": [
+                "START_READINESS",
+                "LOCAL_GATE",
+                "EXACT_HEAD_GATE",
+                "RUNTIME_CONTRACT_DIGEST",
+                "HUMAN_ADMIT",
+                "INDEPENDENT_REVIEW"
+              ]
+            },
+            "state": {
+              "enum": [
+                "PASS",
+                "FAIL",
+                "ABSENT",
+                "NOT_IMPLEMENTED",
+                "NOT_EXERCISED",
+                "SKIPPED_BY_POLICY",
+                "HUMAN_ADMIT_REQUIRED"
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

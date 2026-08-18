@@ -11,6 +11,27 @@
     {"id": "DEGRADED-AUTOMATION", "expected_failure": "EVIDENCE_CEILING"},
     {"id": "GIT-TOWN-NOT-ADMITTED", "expected_failure": "GIT_TOWN_ADMISSION"},
     {"id": "AUTO-CONFLICT-RESOLUTION", "expected_failure": "SEMANTIC_CONFLICT_BOUNDARY"},
-    {"id": "AUTO-MERGE", "expected_failure": "HUMAN_ADMIT"}
+    {"id": "AUTO-MERGE", "expected_failure": "HUMAN_ADMIT"},
+
+    {"id": "DA-P1", "expected": "PASS"},
+    {"id": "DA-P2", "expected": "PASS"},
+    {"id": "DA-P3", "expected": "PASS"},
+    {"id": "DA-P4", "expected": "PASS"},
+    {"id": "DA-M01", "expected_failure": "DUPLICATE_RUNTIME_SCHEMA_AUTHORITY"},
+    {"id": "DA-M02", "expected_failure": "MUTABLE_SUBJECT"},
+    {"id": "DA-M03", "expected_failure": "LANE_SUBSTITUTION"},
+    {"id": "DA-M04", "expected_failure": "ACK_PROMOTED_TO_TASK_PASS"},
+    {"id": "DA-M05", "expected_failure": "WRITE_WITHOUT_IDEMPOTENCY_OR_EFFECT_LEDGER"},
+    {"id": "DA-M06", "expected_failure": "LOCAL_ONLY_REMOTE_EGRESS"},
+    {"id": "DA-M07", "expected_failure": "SECRET_OR_SESSION_VALUE"},
+    {"id": "DA-M08", "expected_failure": "PROVIDER_NAME_AS_ARCHITECTURE_INVARIANT"},
+    {"id": "DA-M09", "expected_failure": "TERMINAL_STATE_COLLAPSE"},
+    {"id": "DA-M10", "expected_failure": "BROWSER_AS_API_EVIDENCE"},
+    {"id": "DA-M11", "expected_failure": "WORKER_SELF_PROMOTION"},
+    {"id": "DA-M12", "expected_failure": "START_DEPENDENCY_USED_AS_COMPLETION_PROOF"},
+    {"id": "DA-M13", "expected_failure": "SOURCE_OR_FIXTURE_AS_LIVE_PASS"},
+    {"id": "DA-M14", "expected_failure": "SHARED_MEMORY_AS_TRANSACTION_AUTHORITY"},
+    {"id": "DA-M15", "expected_failure": "CONSUMER_STATE_LEAKED_INTO_PORTABLE_CORE"},
+    {"id": "DA-M16", "expected_failure": "RUNTIME_CONTRACT_DECLARED_IMPLEMENTED_WITHOUT_DIGEST"}
   ]
 }
