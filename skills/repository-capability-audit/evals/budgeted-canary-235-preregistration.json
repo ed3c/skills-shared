@@ -1,0 +1,213 @@
+{
+  "schema": "rca-canary-preregistration/v1",
+  "preregistration_id": "rca-235-budgeted-2026-08",
+  "status": "FROZEN_NOT_EXECUTED",
+  "issue": 235,
+  "evidence_grade": "BUDGETED_PILOT",
+
+  "supersedes": {
+    "reduces": "the canary scope in the body of #235: at least three authorized consumer repositories or disposable replicas, and at least two separated observation windows or one baseline plus a material-version-change window",
+    "why": "repository-owner budget decision, 2026-08-18. Three consumers across two windows is six canary executions plus their controls and cannot be executed inside one session, and the second window cannot be executed at all today because it is defined by elapsed time.",
+    "what_is_inherited": "the canary-receipt/v1 contract in references/canary-receipt.schema.json, its checker scripts/check_canary_receipt.py, all eight of #235's required controls, the revalidation-trigger identity list, and the rule that a stale receipt cannot prove a new subject. None is relaxed.",
+    "what_is_not_inherited": "the counts. Two consumers is not three and one executed window is not two.",
+    "original_stays_open": "#235's acceptance requires at least three authorized consumer canaries and at least two compared windows. This design supplies two and one, so #235 cannot close on it and lanes.235_production_like cannot leave a state that names the shortfall."
+  },
+
+  "what_this_design_can_and_cannot_support": {
+    "can_support": [
+      "the first canary receipts that have ever existed for this Skill; the lane sits at zero canaries in zero windows today",
+      "whether the canary-receipt/v1 contract, which is proven today only against synthetic objects inside tests/test_canary_receipt.py, admits a receipt produced by a real consumer audit",
+      "an exact-subject baseline for window 1 that a future window 2 can be compared against"
+    ],
+    "cannot_support": [
+      "#235's acceptance on either count",
+      "any longitudinal or drift claim. One window is a point, not a trend, and a second window that has not happened is not evidence.",
+      "TIER C PRODUCTION_LIKE_CANARY_SUPPORTED in #237's admission ladder",
+      "production correctness. #235's own boundary applies unchanged: this authorizes no writes to real production systems, no private-data export, no unbounded spending, and no automatic release."
+    ],
+    "grade_rule": "Window 1 receipts are recorded as BUDGETED_PILOT evidence. lanes.235_production_like stays at a state that names canaries_observed 2 of 3 required and observation_windows_observed 1 of 2 required."
+  },
+
+  "consumer_selection": {
+    "rule": "Among the local checkouts the repository owner admitted as consumer subjects, count how many of #235's seven named capability boundaries are present in the tracked file set. Rank by that count descending, tie-break by directory name ascending, take the top 2.",
+    "why_this_rule": "#235 asks for consumers whose capability audits require real build, integration, browser or device, sandbox, remote-service, artifact-publication or credential boundaries. Counting how many of those boundaries a repository actually has is the closest reproducible proxy for that requirement, and it is applied to a count anyone can recompute rather than to a preference.",
+    "boundary_detection": {
+      "method": "case-insensitive extended-regex match over `git ls-files` at the pinned head; a boundary is present when at least one tracked path matches",
+      "markers": {
+        "build": "package\\.json$|pyproject\\.toml$|go\\.mod$|Cargo\\.toml$",
+        "integration": "(^|/)(tests?|__tests__|full-tests)/",
+        "browser_device": "playwright|cypress|puppeteer|maestro|automate\\.js",
+        "sandbox": "Dockerfile|docker-compose",
+        "remote_service": "\\.mcp\\.json$|mcp-servers/|(^|/)mcp/",
+        "artifact_publication": "\\.github/workflows/",
+        "credential": "\\.runtime-env|\\.env\\.example|keychain|credential"
+      },
+      "measured_at_freeze": {
+        "/Users/neon/bettor-arena": {"build": 4, "integration": 177, "browser_device": 0, "sandbox": 1, "remote_service": 35, "artifact_publication": 44, "credential": 12, "boundaries_present": 6},
+        "/Users/neon/ix-agy": {"build": 2, "integration": 430, "browser_device": 30, "sandbox": 0, "remote_service": 50, "artifact_publication": 2, "credential": 13, "boundaries_present": 6},
+        "/Users/neon/antigravity": {"build": 3, "integration": 155, "browser_device": 1, "sandbox": 0, "remote_service": 2, "artifact_publication": 8, "credential": 0, "boundaries_present": 5}
+      }
+    },
+    "selected": [
+      {
+        "consumer_path": "/Users/neon/bettor-arena",
+        "repository_id": "local/bettor-arena",
+        "commit_sha": "13ff9840fc5683b33670fa191591035bc96292dc",
+        "tree_sha": "947ba9a2c19268b95414a2918b88283d23a0ce2c",
+        "head_committed_at": "2026-08-18T01:29:29+08:00",
+        "authorization_state": "PRIVATE_AUTHORIZED",
+        "boundaries_present": 6,
+        "missing_boundary": "browser_device"
+      },
+      {
+        "consumer_path": "/Users/neon/ix-agy",
+        "repository_id": "local/ix-agy",
+        "commit_sha": "2d3d1b026185de5338da0c0ee9c4716b76593ff2",
+        "tree_sha": "50b1fa616a5218753775fcc9564d0e4c5c84112b",
+        "head_committed_at": "2026-08-17T12:54:22+08:00",
+        "authorization_state": "PRIVATE_AUTHORIZED",
+        "boundaries_present": 6,
+        "missing_boundary": "sandbox"
+      }
+    ],
+    "excluded": [
+      {
+        "consumer_path": "/Users/neon/antigravity",
+        "commit_sha": "f3f1da95ee8228e03d8f0713d5f479725a30555d",
+        "tree_sha": "28c9f440b356bc3a55a34b501bb5e3f349523cc1",
+        "reason": "5 of 7 boundaries present; ranked third by the stated rule. Excluded by the count, not by preference."
+      }
+    ],
+    "incidental_property_not_a_selection_reason": "The two selected consumers between them cover all seven boundaries, because each supplies the one the other lacks. That is a consequence of the ranking, not an input to it, and it is recorded here so it is not later presented as the reason they were chosen.",
+    "why_these_are_not_the_228_subjects": "These repositories carry this repository's own .skill-bindings and are consumers of the Skill under test. That disqualifies them as held-out audit subjects, which is why the #228 budgeted design refuses them, and it is exactly what qualifies them as production-like consumers here.",
+    "no_remote": "All three checkouts have no git remote. Every subject identity is therefore a local commit and tree SHA, and the receipt records that the subject is local-only rather than implying a hosted origin."
+  },
+
+  "audit_subject_at_freeze": {
+    "skill_digest": "7cc59be07992119b0842a7f3ec1b41fcb93b08e74f3252a24efe08bc1ebc4d54",
+    "module_digests": {
+      "modules/agent-effectiveness.md": "703ecf9594e3921329975111765451a2dbbaf84f6a9def7a3f3630cc158d25e6",
+      "modules/domain-instances.md": "8a7ee5030d82be8757579995d622ef82c9880f522cd1b01d7a7458961e9d06ce",
+      "modules/measurement-limits.md": "29ec5b3eba59a59965fcfce8069781390980cbb858c1f73eba7b093a32579181",
+      "modules/source-contribution-map.md": "bad24d387a78d018daffdcfcd61ba8040f676dc394a5837566e36c2713658752"
+    },
+    "drift_rule": "if any digest differs at run time, this design is stale for that subject. Re-freeze it or do not run it."
+  },
+
+  "windows": {
+    "window_1": {
+      "window_id": "w1",
+      "when": "executed on demand; run_window.started_at, ended_at and expiry_at are stamped from the actual run and never pre-filled",
+      "expiry_policy": "expiry_at = ended_at + 30 days. After expiry the receipt is historical evidence and cannot prove a current subject.",
+      "cells": 2
+    },
+    "window_2": {
+      "window_id": "w2",
+      "status": "NOT_EXERCISED",
+      "definition": "RELATIVE. Window 2 is the same two-consumer matrix re-run when either of the following first becomes true: (a) at least 14 days have elapsed since window 1's receipt run_window.ended_at, or (b) any identity in revalidation_triggers changes.",
+      "why_relative_and_not_a_date": "A second window that has not happened cannot be given a timestamp. Writing one would fabricate the longitudinal evidence this design exists to keep honest. The condition is written so a future session can evaluate it mechanically against window 1's own receipt.",
+      "why_14_days": "long enough that provider model routing, harness versions and consumer heads plausibly move; short enough that window 1's 30-day expiry has not lapsed, so the two windows compare live receipts rather than one live and one expired.",
+      "what_window_2_would_buy": "the first comparison of two separated observations, which is the only thing that can move any longitudinal claim off NOT_EXERCISED. Even then it remains one window pair on two consumers, short of #235's three-consumer requirement."
+    }
+  },
+
+  "receipt_contract": {
+    "schema": "canary-receipt/v1",
+    "definition": "references/canary-receipt.schema.json",
+    "checker": "scripts/check_canary_receipt.py",
+    "checker_state_today": "proven against synthetic objects only. tests/test_canary_receipt.py admits one complete object and refuses ten planted mutations; no receipt from a real canary has ever been passed through it.",
+    "required_top_level_fields": [
+      "schema", "canary_id", "consumer", "audit_subject", "identities", "evaluator",
+      "task_digest", "credential_authorization", "policy", "probes", "rollback",
+      "publication", "gate_state", "module_shadowing", "service_status", "staleness",
+      "revalidation_triggers", "run_window"
+    ],
+    "evaluator_owner": "INDEPENDENT_DETERMINISTIC",
+    "why_that_owner": "the evaluated Agent may not score itself; the schema enumerates the only three acceptable owners and this design pins the deterministic one."
+  },
+
+  "required_controls": [
+    {"id": "stale-receipt-after-subject-movement", "expect": "RED", "how": "present window 1's receipt for a consumer head that has since moved, with staleness.revalidated false"},
+    {"id": "external-service-unavailable-versus-repository-defect", "expect": "DISTINCT", "how": "a probe outcome of BLOCKED_EXTERNAL_SERVICE_UNAVAILABLE must never be recorded as FAIL_REPOSITORY_DEFECT"},
+    {"id": "missing-credential-versus-policy-denial", "expect": "DISTINCT", "how": "credential_authorization.denial_reason must be CREDENTIAL_MISSING or POLICY_DENIED, never whichever is convenient"},
+    {"id": "partial-artifact-publication", "expect": "RED", "how": "published_artifacts is a strict subset of required_artifacts while all_required_artifacts_published is true"},
+    {"id": "first-green-with-skipped-production-like-gate", "expect": "RED", "how": "gate_state.is_first_green true with production_like_gate_executed false"},
+    {"id": "rollback-target-equals-candidate", "expect": "RED", "how": "rollback_subject_digest equal to candidate_subject_digest"},
+    {"id": "consumer-local-module-shadowing", "expect": "RED", "how": "a consumer-local module present and shadowing the canonical Skill digest"},
+    {"id": "private-data-to-unapproved-provider", "expect": "RED", "how": "private_data_present true with data_egress_provider_approved false"}
+  ],
+  "controls_note": "These are #235's own eight. scripts/check_canary_receipt.py already refuses each for its own distinct reason; this design's obligation is that a real canary's receipt fills the fields honestly enough for those refusals to be meaningful, not that new checks are written.",
+
+  "rollback": {
+    "candidate_subject_id": "skills/repository-capability-audit/SKILL.md@HEAD",
+    "candidate_subject_digest": "7cc59be07992119b0842a7f3ec1b41fcb93b08e74f3252a24efe08bc1ebc4d54",
+    "rollback_subject_id": "skills/repository-capability-audit/tests/fixtures/old-canonical-SKILL.txt",
+    "rollback_subject_digest": "32aa3043b4a7c0b7e1dc829294c3555898997b2603185429600f1d232d568ba2",
+    "why_this_rollback_subject": "it is a distinct, immutable, committed prior body of the same Skill. Distinctness is what the control checks; using the candidate as its own rollback target is the failure being guarded.",
+    "cleanup": "every canary is read-only against the consumer tree. cleanup_verified is asserted by recomputing the consumer's head and tree after the run and comparing them to the pinned values; cleanup_evidence records both."
+  },
+
+  "policy": {
+    "network_policy": "read-only against the local consumer checkout; no fetch, no push, no external write",
+    "filesystem_policy": "no write inside the consumer checkout; all output lands in a separate canary output directory",
+    "side_effect_policy": "no build, no deploy, no artifact publication, no credential use. Boundary presence is audited from the tree, not exercised.",
+    "why_boundaries_are_audited_not_exercised": "#235 asks for consumers whose capability audits require these boundaries. Exercising them would mean running real builds and touching real credentials on the owner's machines, which this design is not authorized to do and does not need in order to produce an exact-subject receipt."
+  },
+
+  "denominator_policy": {
+    "every_attempt_counts": true,
+    "retries_permitted": 0,
+    "failed_canaries": "recorded with their refusal reason and counted; a canary that produced no valid receipt is a canary that ran and failed, not a canary that did not run",
+    "budget_aborted_canaries": "recorded with reason BUDGET_EXCEEDED, never re-run and never removed"
+  },
+
+  "budget_ledger": {
+    "dimensions": ["cost_usd", "wall_clock_seconds"],
+    "unobserved_dimensions": [],
+    "why_unobserved_is_not_zero": "a dimension the harness cannot read is listed and excluded from enforcement rather than recorded as a spend of zero",
+    "basis": "NO PRIOR OBSERVATION EXISTS. No consumer canary has ever run for this Skill, so there is nothing to extrapolate from. The figures below are caps, not estimates, and are set from the highest per-cell spend observed anywhere in this Skill's live record ($2.98, the slice-1 current_full_composition arm).",
+    "per_cell_caps": {
+      "cost_usd": 6.0,
+      "cost_cap_basis": "2x the highest per-cell spend ever observed here, because a real consumer tree is larger than any held-out corpus repository and a cap set at the observed figure would abort on shape rather than on waste",
+      "wall_clock_seconds": 900
+    },
+    "global_caps": {
+      "cost_usd": 12.0,
+      "wall_clock_seconds": 1800
+    },
+    "estimated_totals": {
+      "cells": 2,
+      "cost_usd": "UNKNOWN, bounded above by the global cap of 12.0",
+      "wall_clock_seconds": "UNKNOWN, bounded above by the global cap of 1800"
+    },
+    "why_unknown_rather_than_a_number": "An estimate with no observation behind it is a guess wearing a decimal point. The cap is the honest commitment; the first window's receipts become the basis for window 2's estimate."
+  },
+
+  "stop_rules_frozen_now": {
+    "abort_a_cell_when": "it exceeds either per-cell cap. Kill it, record the canary as failed with reason BUDGET_EXCEEDED, continue to the next consumer.",
+    "abort_the_run_when": "cumulative spend exceeds a global cap, or both consumers abort. Report PARTIAL with the exact consumers attempted.",
+    "may_stop_early_if": "the first consumer's receipt is refused by scripts/check_canary_receipt.py for a contract defect rather than a canary finding. Fix the contract binding before spending the second consumer's budget on the same refusal.",
+    "may_not_stop_because": "the first consumer's verdict is uninteresting",
+    "must_report_even_if_adverse": "if the audit produces a false PASS or a false block on a real consumer, that is the result and it is published as the result"
+  },
+
+  "revalidation_triggers": [
+    "skill_or_module_digest",
+    "model_provider_version_config",
+    "agent_harness_or_tool_surface",
+    "runtime_image_or_workflow_version",
+    "evaluator_corpus_or_policy_digest",
+    "repository_head_or_capability_claim",
+    "artifact_publication_path"
+  ],
+
+  "declared_non_claims": [
+    "two consumers is not three and one window is not two; #235 cannot close on this design",
+    "no longitudinal or drift claim follows from a single window, and window 2 has not happened",
+    "no production correctness, operational stability, release, or promotion claim follows",
+    "boundary presence is audited from the tree; no build, integration, browser, device, credential or publication path is exercised, so nothing is claimed about their runtime behaviour",
+    "these consumers are private local checkouts with no remote; nothing about hosted consumer topologies follows",
+    "the canary-receipt checker has never admitted a real receipt before this run, so a first green is evidence about the contract as much as about the consumer",
+    "TIER C in #237's ladder is not reachable from this design"
+  ]
+}

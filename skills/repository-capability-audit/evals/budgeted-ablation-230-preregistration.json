@@ -1,0 +1,227 @@
+{
+  "schema": "rca-agent-ab-preregistration/v1",
+  "preregistration_id": "rca-230-budgeted-2026-08",
+  "status": "FROZEN_NOT_EXECUTED",
+  "issue": 230,
+  "evidence_grade": "BUDGETED_PILOT",
+
+  "supersedes": {
+    "reduces": "the leave-one-rule-out design in the body of #230: all 13 retained rules, each as candidate_trimmed_skill versus candidate_minus_RCA-0XX",
+    "why": "repository-owner budget decision, 2026-08-18. 13 rules on one host at the minimum two matched pairs is 28 physical sessions and does not fit the executing session's budget.",
+    "what_is_inherited": "#230's own per-rule admission rule, unchanged and unrelaxed: at least two valid matched pairs, mean quality delta in favour of the full candidate of at least 0.02, positive paired bootstrap lower bound, hard-gate outcomes visible, reported by repository and host rather than pooled. Also inherited: the one-rule-only treatment law, the receipt binding list, and every terminal state name.",
+    "what_is_not_inherited": "rule coverage. 3 of 13 rules are exercised. The other 10 stay NOT_EXERCISED and are named below so the absence is explicit rather than implied.",
+    "original_stays_open": "#230 is not closed or partially satisfied. Its acceptance requires an explicit live terminal state for all of RCA-001..013, which this design cannot supply."
+  },
+
+  "what_this_design_can_and_cannot_support": {
+    "can_support": [
+      "an explicit live terminal state for exactly three rules, on one repository and one host, under #230's own unmodified admission rule",
+      "the first candidate_minus_RCA-### cells that have ever executed; the lane is at zero pairs today",
+      "whether a leave-one-rule-out treatment changes any hard-gate outcome at all on this subject"
+    ],
+    "cannot_support": [
+      "#230's acceptance, which requires all thirteen rules to carry an explicit live state",
+      "any statement about the ten unexercised rules. NOT_EXERCISED is not evidence that a rule is ineffective.",
+      "cross-repository or cross-host rule sensitivity. One of each runs.",
+      "removal or retention of any rule from the deterministic core. Layer A necessity is untouched by this design and a LIVE_MODEL_NOT_SUPPORTED result triggers a scope review, never a deletion."
+    ],
+    "grade_rule": "Results are written into evals/live-evidence-state.json rules[RCA-0XX] only for the three exercised rules, only with receipts that verify, and lanes.230_rule_ablation stays at a state that names the 10 absent rules."
+  },
+
+  "rule_selection": {
+    "why_the_obvious_sort_key_is_refused": "The instruction that produced this design proposed selecting the N=3 rules with the largest claimed effect in the deterministic findings. That key does not exist: in evals/expected/effectiveness.json every one of RCA-001..012 carries score_delta -0.055128 and RCA-013 carries -0.033333. Twelve rules tie at the top, so 'largest effect' would in practice be an unstated arbitrary pick dressed as a criterion. A different key is used and stated.",
+    "key": "live observability of the rule's own metric on this corpus, then quality weight, then rule id",
+    "procedure": [
+      "1. For each retained rule take its case metric from evals/contract.json cases[].metric.",
+      "2. Join that metric to a quality component in scripts/score_agent_ab.py quality_components(). The join is declared in metric_to_component below.",
+      "3. Tier 1 = the component has non-zero within-arm variance on this corpus, as measured by scripts/analyze_arm_separation.py over evals/matrix-slice1-result.json.",
+      "4. Tier 2 = the component is saturated on this corpus; a rule removal can still flip it visibly in a single cell even though the aggregate is flat.",
+      "5. Tier 3 = no quality component carries the rule's metric at all; removal cannot move the scored quantity by any route.",
+      "6. Take Tier 1 first, then Tier 2 sorted by the component's quality weight descending and rule id ascending, until 3 rules are selected."
+    ],
+    "mapping_authority": "DECLARED_IN_THIS_PREREGISTRATION",
+    "why_that_matters": "Neither evals/contract.json nor scripts/pilot_evaluator.py declares this join. The names correspond one-to-one and the correspondence is obvious, but obvious is not derived. It is frozen here before execution as an author judgement so it cannot be adjusted after seeing which rules moved.",
+    "metric_to_component": {
+      "RCA-001": {"case_metric": "subject_continuity", "component": "exact_subject_continuity", "weight": 0.10, "tier": 2},
+      "RCA-002": {"case_metric": "claim_bounding", "component": null, "weight": 0.0, "tier": 3},
+      "RCA-003": {"case_metric": "false_pass", "component": "false_pass_avoidance", "weight": 0.15, "tier": 1},
+      "RCA-004": {"case_metric": "runtime_identity", "component": null, "weight": 0.0, "tier": 3},
+      "RCA-005": {"case_metric": "negative_control_validity", "component": "negative_control_valid", "weight": 0.05, "tier": 2},
+      "RCA-006": {"case_metric": "failure_evidence", "component": null, "weight": 0.0, "tier": 3},
+      "RCA-007": {"case_metric": "packet_completeness", "component": "evidence_packet_complete", "weight": 0.10, "tier": 2},
+      "RCA-008": {"case_metric": "external_identity", "component": null, "weight": 0.0, "tier": 3},
+      "RCA-009": {"case_metric": "credential_boundary", "component": null, "weight": 0.0, "tier": 3},
+      "RCA-010": {"case_metric": "review_packet", "component": null, "weight": 0.0, "tier": 3},
+      "RCA-011": {"case_metric": "first_green_review", "component": null, "weight": 0.0, "tier": 3},
+      "RCA-012": {"case_metric": "non_claim_accuracy", "component": "explicit_non_claim_accuracy", "weight": 0.05, "tier": 2},
+      "RCA-013": {"case_metric": "trigger_precision", "component": "trigger_correct", "weight": 0.05, "tier": 2}
+    },
+    "_tier_field_note": "The table records the tier each rule lands in. It is a summary of the procedure above, not the selection authority; if the two ever disagree the procedure decides and the table is wrong.",
+    "selected": [
+      {"rule_id": "RCA-003", "name": "preserve_absent_and_skipped_states", "case_id": "silent-skip", "tier": 1, "why": "the only rule whose metric maps to the one quality component with non-zero within-arm variance on this corpus"},
+      {"rule_id": "RCA-001", "name": "bind_exact_subject", "case_id": "subject-drift", "tier": 2, "why": "highest-weighted saturated component (0.10), tie-broken ahead of RCA-007 by rule id"},
+      {"rule_id": "RCA-007", "name": "verify_after_trust_boundary", "case_id": "hidden-artifact-omission", "tier": 2, "why": "the other 0.10-weighted saturated component"}
+    ],
+    "not_selected_and_therefore_NOT_EXERCISED": [
+      "RCA-002", "RCA-004", "RCA-005", "RCA-006", "RCA-008",
+      "RCA-009", "RCA-010", "RCA-011", "RCA-012", "RCA-013"
+    ]
+  },
+
+  "threshold_reachability": {
+    "_why_this_block_exists": "Same law as the #228 budgeted design: a threshold the instrument cannot reach produces a guaranteed null that reads like a finding about the rule.",
+    "rule_retention_threshold": 0.02,
+    "source": "evals/agent-effectiveness-contract.json acceptance.rule_retention.minimum_mean_quality_delta, matching #230's own stated 0.02",
+    "delta_false_pass_rate_required_if_only_false_pass_avoidance_moves": 0.133333,
+    "largest_between_arm_false_pass_rate_spread_ever_observed": 0.1111,
+    "consequence_for_tier_1": "RCA-003 can only clear 0.02 through false_pass_avoidance if removing it separates the false-pass rate by more than any treatment has separated it here. Possible, and not demonstrated.",
+    "consequence_for_tier_2": "RCA-001 and RCA-007 can clear 0.02 only by flipping a saturated boolean, which is worth 0.10 in one cell. That is the design's actual bet: a saturated component is flat across treatments that all satisfy it, and a rule removal is the one treatment that might not.",
+    "honest_reading": "This design is powered to detect a hard-gate flip, not a distributional shift. A null is reported as 'no flip observed in two pairs on this subject', never as 'the rule does not matter'."
+  },
+
+  "design": {
+    "repositories": 1,
+    "model_harness_families": 1,
+    "repetitions": 2,
+    "profiles_per_cell": 4,
+    "physical_sessions": 8,
+    "profiles": [
+      "candidate_trimmed_skill",
+      "candidate_minus_RCA-001",
+      "candidate_minus_RCA-003",
+      "candidate_minus_RCA-007"
+    ],
+    "pairing": "scripts/score_agent_ab.py pairs candidate_trimmed_skill against each candidate_minus_RCA-0XX inside one matched cell key. One candidate cell therefore serves all three ablations at a given repetition, which is why 3 rules cost 8 sessions and not 12.",
+    "matched_pairs_per_rule": 2,
+    "meets_230_minimum_pairs": true,
+    "why_two_repetitions_is_not_a_relaxation": "#230's own admission rule asks for at least two valid matched pairs per rule. The budget reduction here is entirely in rule coverage, not in per-rule statistical strength."
+  },
+
+  "subject": {
+    "repository_id": "psf/requests",
+    "commit_sha": "8068356288978c4f54661ae6f95afe0e0831885e",
+    "tree_sha": "271ed3be81c5d263a4293f30924c0ee95484511d",
+    "case_id": "real-capability-with-evidence",
+    "selection_rule": "the held-out repository carrying the most observed live cells at freeze time (19), and the task family scripts/bind_agent_harness.py already binds (task_families[0])",
+    "why_the_opposite_rule_to_the_228_budgeted_design": "The two designs ask different questions. #228 asks whether findings generalize across subjects, so its budget goes to the least-observed repositories. #230 asks whether removing one rule changes behaviour on a fixed subject, so its budget goes to the best-characterised one, where two live candidate receipts and thirteen scored slice-1 cells already exist to compare against. Using the same rule for both would serve one question badly.",
+    "prior_observations_on_this_exact_subject_and_harness": {
+      "receipts": [
+        "evals/receipts/agent-cell-claude-code-4c15d261e63f.json",
+        "evals/receipts/agent-cell-codex-cli-4c15d261e63f.json"
+      ],
+      "claude_code_candidate_cell": {"quality": 0.901612903, "false_pass_rate": 0.3226, "trigger_correct": false, "task_success": true},
+      "codex_cli_candidate_cell": {"quality": 0.914285714, "false_pass_rate": 0.5714, "trigger_correct": true, "task_success": true},
+      "why_recorded": "trigger_correct was false in the claude-code cell on this harness, although the same component is saturated true across every run_pilot_matrix cell. The two harnesses carry the treatment differently (--append-system-prompt-file versus inline prompt text), so the saturation profile measured on one is not automatically the profile of the other. This is stated before execution so a difference is not later read as a rule effect."
+    }
+  },
+
+  "host": {
+    "family": "claude-code",
+    "model": "opus",
+    "model_pin_authority": "scripts/bind_agent_harness.py MODELS['claude-code']; the resolved harness version is observed from `claude --version` at run time and recorded in the receipt, never declared here",
+    "cost_reported": false,
+    "why_cost_is_not_reported_on_this_path": "scripts/run_agent_cell.py does not collect host usage. Its evaluator is handed a usage file the adapter pre-writes with cost_observed=false, so cost, tokens, tool calls and duration land as zeros in the receipt. The committed cells at evals/receipts/agent-cell-*-4c15d261e63f.json show exactly this. Those dimensions are therefore unobserved here and are not enforced.",
+    "why_one_host": "the same budget arithmetic as the #228 budgeted design, and codex-cli reports no spend at all"
+  },
+
+  "treatment_generation": {
+    "generator": "scripts/generate_ablation_treatment.py --skill-file SKILL.md --output-dir <treatments>",
+    "guarantee": "each candidate_minus_RCA-0XX.md is byte-identical to SKILL.md outside the named rule's own section; the generator fails closed on a missing or duplicate rule heading",
+    "verified_by": "tests/test_ablation_treatment_generator.py, which runs in the committed suite",
+    "candidate_treatment": "SKILL.md itself",
+    "skill_digest_at_freeze": "7cc59be07992119b0842a7f3ec1b41fcb93b08e74f3252a24efe08bc1ebc4d54",
+    "drift_rule": "if SKILL.md's digest differs from the value above at run time, this design is stale. Re-freeze it or do not run it; do not run it against a Skill it was not written for.",
+    "one_rule_only": "exactly one rule heading and body is removed per treatment. A treatment differing from SKILL.md anywhere else invalidates its pair."
+  },
+
+  "randomization": {
+    "arm_order_derivation": "order = sorted(profiles, key=lambda p: sha256(f'{p}|{repetition}').hexdigest()); arm_order = the profile's index in that order, passed to scripts/run_agent_cell.py --arm-order and recorded in every receipt. Sorting on the digest rather than taking it modulo the profile count is deliberate: a modulo assigns the same position to two profiles and is a label, not an ordering.",
+    "computed_orders_at_freeze": {
+      "repetition_1": ["candidate_minus_RCA-003", "candidate_minus_RCA-007", "candidate_trimmed_skill", "candidate_minus_RCA-001"],
+      "repetition_2": ["candidate_minus_RCA-007", "candidate_minus_RCA-003", "candidate_trimmed_skill", "candidate_minus_RCA-001"]
+    },
+    "why_not_the_run_pilot_matrix_derivation": "that function seeds on repository and host only, which is constant across every cell of a one-repository one-host run and would record a position that never varies. The convention borrowed here is the one in skills/dual-forge-repository-loop/evals/prompt-baseline-v2-preregistration.json, which includes the repetition index.",
+    "fresh_session_per_arm": true,
+    "isolated_workspace_per_arm": true
+  },
+
+  "receipt_binding_required_per_cell": [
+    "rule id and source treatment digest",
+    "candidate treatment digest",
+    "ablated treatment digest",
+    "repository commit and tree",
+    "hidden task and evaluator digests",
+    "model, harness and runtime identities",
+    "arm order and repetition",
+    "raw tool and evidence artifacts",
+    "hard-gate and quality metrics",
+    "paired delta and exclusion reason"
+  ],
+
+  "terminal_states": {
+    "per_rule": ["NOT_EXERCISED", "INSUFFICIENT_SAMPLE", "INVALID_EXPERIMENT", "LIVE_MODEL_NOT_SUPPORTED", "LIVE_MODEL_SUPPORTED", "CONTEXT_DEPENDENT"],
+    "expected_for_the_ten_unselected": "NOT_EXERCISED, unchanged",
+    "not_supported_is_not_deletion": "LIVE_MODEL_NOT_SUPPORTED triggers a separate scope review. Layer A may still require the rule for executable Harness correctness, and this design measures nothing about that."
+  },
+
+  "denominator_policy": {
+    "every_attempt_counts": true,
+    "retries_permitted": 0,
+    "failed_cells": "recorded with their refusal reason and kept in the denominator; scripts/run_agent_cell.py exits non-zero and the receipt is retained",
+    "budget_aborted_cells": "a cell killed by the stop-loss is a failed cell with reason BUDGET_EXCEEDED, never re-run and never removed",
+    "a_pair_needs_both_halves": "if either half of a candidate/ablation pair fails, the pair is not counted and the rule's pair count drops. It does not silently borrow the other repetition's candidate cell."
+  },
+
+  "budget_ledger": {
+    "dimensions": ["wall_clock_seconds"],
+    "unobserved_dimensions": ["cost_usd", "input_tokens", "output_tokens", "tool_calls"],
+    "why_unobserved_is_not_zero": "scripts/run_agent_cell.py writes these as zeros with cost_observed=false because it never collects them. Enforcing a cap against a recorded zero would let every cap pass. They are listed as unobserved and excluded from enforcement.",
+    "basis": "wall clock only, from the slice-1 candidate-arm mean of 287 s per cell on this repository and host",
+    "per_cell_estimates": [
+      {"profile": "candidate_trimmed_skill", "wall_clock_seconds": 287, "cost_usd_unobserved_reference": 2.4326},
+      {"profile": "candidate_minus_RCA-001", "wall_clock_seconds": 287, "cost_usd_unobserved_reference": 2.4326},
+      {"profile": "candidate_minus_RCA-003", "wall_clock_seconds": 287, "cost_usd_unobserved_reference": 2.4326},
+      {"profile": "candidate_minus_RCA-007", "wall_clock_seconds": 287, "cost_usd_unobserved_reference": 2.4326}
+    ],
+    "cost_usd_unobserved_reference_note": "The dollar figures are the slice-1 candidate-arm mean on the other harness and are printed only so the owner can size the spend. They are not observed on this path and must never be written into a receipt as an observation.",
+    "estimated_totals": {
+      "cells": 8,
+      "wall_clock_seconds": 2296,
+      "cost_usd_unobserved_reference": 19.46
+    },
+    "caps": {
+      "per_cell_wall_clock_seconds": 600,
+      "per_cell_cap_basis": "scripts/run_agent_cell.py --timeout-seconds default, already enforced by the runner",
+      "global_wall_clock_seconds": 3600
+    }
+  },
+
+  "stop_rules_frozen_now": {
+    "abort_a_cell_when": "it exceeds per_cell_wall_clock_seconds. The runner's own --timeout-seconds does this; record the cell as failed with reason BUDGET_EXCEEDED.",
+    "abort_the_run_when": "cumulative wall clock exceeds global_wall_clock_seconds, or any two cells abort for BUDGET_EXCEEDED. Report PARTIAL with the exact cells run.",
+    "may_stop_early_if": "the first repetition produces byte-identical hard-gate outcomes across the candidate and all three ablations. That is the informative negative and the second repetition is still run, because one repetition cannot separate a treatment effect from run-to-run variance; the run does not stop, and this clause exists to say so explicitly.",
+    "may_not_stop_because": "an interim look suggests a null",
+    "must_report_even_if_adverse": "if an ablated arm outperforms the full candidate, that is the result and it is published as the result",
+    "partial_runs": "any run short of 8 sessions is reported as PARTIAL and no rule reaches a supported state from it"
+  },
+
+  "matching_held_constant_within_a_pair": [
+    "every Skill byte except the one removed rule's own section",
+    "task and repository subject",
+    "model, harness, runtime and toolset digest",
+    "evaluator identity and digest",
+    "budgets",
+    "repetition",
+    "tool policy"
+  ],
+
+  "declared_non_claims": [
+    "three rules is not thirteen and this design may never be cited as satisfying #230",
+    "a rule's live state here is bounded to psf/requests, claude-code and this task family",
+    "NOT_EXERCISED on the other ten rules is not evidence that they are ineffective",
+    "a deterministic deciding delta in evals/expected/effectiveness.json is Layer A and is not a live one",
+    "cost and token figures cannot be claimed from this run; the harness does not observe them",
+    "the metric-to-component join used to select the rules is a declared author judgement, not a derived fact, and a different defensible join would select different rules",
+    "two matched pairs satisfy #230's own minimum; they do not make a bootstrap interval over two values a strong interval"
+  ]
+}
