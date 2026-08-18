@@ -383,6 +383,72 @@
         234,
         345
       ]
+    },
+    {
+      "id": "git-town-stacked-pr-worker-refactor-proof-v1",
+      "owner_skill": "git-town-stacked-pr-worker",
+      "issue": 347,
+      "pull_requests": [
+        270
+      ],
+      "entrypoint": "skills/git-town-stacked-pr-worker/tests/refactor-proof/refactor_ab.py",
+      "runner": "skills/git-town-stacked-pr-worker/tests/refactor-proof/verify.sh",
+      "treatments": [
+        {
+          "id": "A_OLD_CANONICAL",
+          "role": "OLD_CANONICAL",
+          "path": "skills/git-town-stacked-pr-worker/tests/refactor-proof/fixtures/pre-refactor-SKILL.txt",
+          "blob_sha": "36d894d756ceca6d754b4c248b70680c7d199148"
+        },
+        {
+          "id": "B0_REFACTOR_AS_LANDED",
+          "role": "REFACTOR_AS_LANDED",
+          "path": "skills/git-town-stacked-pr-worker/tests/refactor-proof/fixtures/refactor-as-landed-SKILL.txt",
+          "blob_sha": "714f1b0e3abb6d569f59c0eef18c09318d0886cf"
+        },
+        {
+          "id": "B1_MOLECULAR_INDEX_BOUND",
+          "role": "REPAIRED_CANDIDATE",
+          "path": "skills/git-town-stacked-pr-worker/tests/refactor-proof/fixtures/molecular-index-bound-SKILL.txt",
+          "blob_sha": "b06742db95cff1e43ed8eeae7db451012b3a2fb6"
+        },
+        {
+          "id": "B2_OWNED_GATE_ROUTE_REPAIRED",
+          "role": "REPAIRED_CANDIDATE",
+          "path": "skills/git-town-stacked-pr-worker/SKILL.md",
+          "blob_sha": "a6627267fe7f197f8fc8b1438ca8d09597799e1a"
+        }
+      ],
+      "proof_layers": {
+        "L0_SOURCE_FREEZE": "PASS",
+        "L1_STRUCTURAL_REACHABILITY": "PASS",
+        "L2_EXECUTABLE_CONTRACT": "PASS",
+        "L3_HERMETIC_REAL_TASK": "PASS",
+        "L4_MATCHED_LIVE_MODEL_RUNTIME": "NOT_EXERCISED",
+        "L5_DELIVERY_AND_HUMAN_ADMIT": "HUMAN_ADMIT_REQUIRED"
+      },
+      "highest_layer": "L3_HERMETIC_REAL_TASK",
+      "denominator": {
+        "failed_retained": true,
+        "stale_retained": true,
+        "blocked_retained": true,
+        "cancelled_retained": true,
+        "superseded_retained": true
+      },
+      "cleanup": "CLEAN",
+      "authority": {
+        "provider_activation": false,
+        "publication": false,
+        "semantic_conflict_resolution": false,
+        "merge": false,
+        "release": false,
+        "promotion": false,
+        "rollback": false
+      },
+      "remaining_issues": [
+        234,
+        347
+      ]
     }
   ]
 }

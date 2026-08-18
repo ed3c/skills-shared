@@ -486,23 +486,30 @@
     },
     {
       "skill": "git-town-stacked-pr-worker",
-      "highest_layer": "L2_EXECUTABLE_CONTRACT",
-      "golden_proof_id": null,
+      "highest_layer": "L3_HERMETIC_REAL_TASK",
+      "golden_proof_id": "git-town-stacked-pr-worker-refactor-proof-v1",
       "criteria": {
         "old_canonical_treatment_frozen": {
-          "state": "ABSENT",
-          "evidence": [],
-          "owner_issue": 347
+          "state": "PASS",
+          "evidence": [
+            "skills/git-town-stacked-pr-worker/tests/refactor-proof/fixtures/pre-refactor-SKILL.txt"
+          ],
+          "note": "SKILL.md at d757a5c~1, the parent of the only material refactor git log --follow finds on this body. Registered as A_OLD_CANONICAL at blob 36d894d7, which is also the blob modules/domain-profile.md already cites as where the forge-specific detail went."
         },
         "refactor_as_landed_treatment_frozen": {
-          "state": "ABSENT",
-          "evidence": [],
-          "owner_issue": 347
+          "state": "PASS",
+          "evidence": [
+            "skills/git-town-stacked-pr-worker/tests/refactor-proof/fixtures/refactor-as-landed-SKILL.txt"
+          ],
+          "note": "SKILL.md at d757a5c (#270) itself, kept as B0_REFACTOR_AS_LANDED even though it dropped two strengths, so the regression stays in the denominator."
         },
         "old_strengths_asserted": {
-          "state": "ABSENT",
-          "evidence": [],
-          "owner_issue": 347
+          "state": "PASS",
+          "evidence": [
+            "skills/git-town-stacked-pr-worker/tests/refactor-proof/refactor_ab.py",
+            "skills/git-town-stacked-pr-worker/tests/refactor-proof/verify.sh"
+          ],
+          "note": "Thirteen binary criteria scored on four frozen arms rather than asserted in prose: A 8, B0 10, B1 11, B2 13. Six old strengths survived #270; two did not, and B2 restores both. Strengths that merely relocated (Worker outcomes and the credential refusal to SYSTEM_PROMPT.md, the read order and reference routes to README.md, the repo-owned inventory to modules/domain-profile.md) are recorded as retained non-claims instead of being scored as losses."
         },
         "route_reachable": {
           "state": "PASS",
@@ -530,14 +537,18 @@
           "note": "Every negative fixture is one mutation away from a checked-in valid one."
         },
         "matched_hermetic_task": {
-          "state": "ABSENT",
-          "evidence": [],
-          "owner_issue": 347
+          "state": "PASS",
+          "evidence": [
+            "skills/git-town-stacked-pr-worker/tests/refactor-proof/refactor_ab.py"
+          ],
+          "note": "Each arm gets its own scratch repository with modules/, scripts/, references/, tests/ and evals.json symlinked from one source, so only SKILL.md differs; two real subprocess oracles then run against it (check_skill_core_boundaries.py and this Skill's own check_publication_boundary.py). Observed A FAIL/PASS, B0 and B1 PASS/PASS, B2 PASS/PASS with the publication gate's ten planted mutations killed. Zero network, no forge, no provider, no model; scratch removal is asserted before the report is emitted."
         },
         "golden_proof_registered": {
-          "state": "ABSENT",
-          "evidence": [],
-          "owner_issue": 347
+          "state": "PASS",
+          "evidence": [
+            "skills/skill-refactor-proof-loop/references/golden-proof-registry.json"
+          ],
+          "note": "git-town-stacked-pr-worker-refactor-proof-v1: four content-bound treatments, L0-L3 PASS, L4 NOT_EXERCISED, L5 HUMAN_ADMIT_REQUIRED."
         },
         "live_model_runtime_ab": {
           "state": "NOT_EXERCISED",
@@ -546,12 +557,16 @@
             "skills/git-town-stacked-pr-worker/tests/live-git-town/admission.json"
           ],
           "owner_issue": 234,
-          "note": "A live canary exists behind an admission file; no admitted run is registered."
+          "note": "A live canary exists behind an admission file; no admitted run is registered. The hermetic task below it contacted no Git Town binary, forge or model and cannot raise this lane."
         },
         "molecular_traceability": {
-          "state": "ABSENT",
-          "evidence": [],
-          "owner_issue": 347
+          "state": "PARTIAL",
+          "evidence": [
+            "skills/skill-refactor-proof-loop/references/refactor-proof-stack.json",
+            "skills/git-town-stacked-pr-worker/references/MOLECULAR_STACK_INDEX.md"
+          ],
+          "owner_issue": 347,
+          "note": "The edge this leaf hangs on is read out of bytes and replayed by check_skill_adoption_ledger.py: migration_order records #347 blocked by github-delivery-loop with the two files that resolve the coupling. What a zero-network audit cannot close is the delivery half — the epic Stack's node states are declared READ_FROM_GITHUB, and no PR node exists for this leaf at all, so PARTIAL is the ceiling by design rather than a missing artefact."
         }
       }
     },
