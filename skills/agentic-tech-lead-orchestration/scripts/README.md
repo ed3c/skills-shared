@@ -73,7 +73,7 @@ Shape is owned by `references/repository-closure-contract.schema.json` and `refe
 ```bash
 python3 scripts/run_behavioral_ab.py --selftest
 python3 scripts/run_behavioral_ab.py --dry-run
-python3 scripts/run_behavioral_ab.py --consumer ~/bettor-arena \
+python3 scripts/run_behavioral_ab.py --consumer <consumer-checkout> \
   --output ../evals/receipts --result ../evals/behavioral-ab-result.json
 ```
 
