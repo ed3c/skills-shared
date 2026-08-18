@@ -33,10 +33,6 @@ INTENT_BOUND
 - **CORE-LAW-003 — executable verification outranks prose.** A checklist, issue state, or API success cannot substitute for implementation assertions.
 - **CORE-LAW-004 — modules cannot widen authority.** Host modules may implement fixed transitions but may not override laws, expose secrets, change visibility, or invent merge authority.
 - **CORE-LAW-005 — terminal receipts are scoped.** Every terminal state records subject, work item, evidence state, residual blockers, and next authority.
-- **CORE-LAW-006 — readback, never self-report.** A terminal receipt requires a pre-observation captured before the mutation and an authenticated post-mutation read of the same subject. A hand-filled observation document cannot produce a verified receipt.
-- **CORE-LAW-007 — an admitted request is not an admitted merge.** `request_state: "admitted"` says a typed request passed its own gate. Every routed merge operation stays `mutation_allowed: false`; merge remains the owning authority's act.
-- **CORE-LAW-008 — the evidence gate and the status audit are separate lanes.** The zero-network receipt gate answers whether the evidence exists and has the right shape; the networked audit answers what the remote state is now. Neither verdict may be inferred from the other.
-- **CORE-LAW-009 — credential material never lands in this loop.** Secrets stay in the runtime owner's store and in memory for the call that needs them. This loop implements no second secret store, parses no host environment file, and never writes or prints credential material.
 
 ## Procedure
 
@@ -57,17 +53,6 @@ Load `modules/domain-profile.md` only for concrete host/API/session/tracking mec
 ```bash
 python3 scripts/check_skill_core_boundaries.py --skill forgejo-delivery-loop
 ```
-
-## Executable controls
-
-The laws above are held by owned deterministic controls, not by anyone reading this file:
-
-- `scripts/route.ts --selftest` — the router decides `actor`, `mode`, and `mutation_allowed` before any mutation. A parallel routing rule written in prose is not the router.
-- `tests/merge-authority/verify.sh` — sweeps every reachable routing input, so re-widening merge cannot be hidden by editing one expectation (CORE-LAW-007).
-- `scripts/issue_state.py validate | capture-pre-live | verify-live` — runs the typed request, pre-observation, and authenticated readback chain against the schemas under `contracts/`, and fails closed on a missing link (CORE-LAW-006).
-- `tests/index/verify.sh` — checks the mechanism index below in both directions. An index that omits one of its own files reads exactly like a complete one.
-- `tests/refactor_ab.py` and `tests/real_task_ab.py` — hold the frozen treatments and score this body against them on the strengths the refactor had to preserve.
-- `tests/run-all.sh` — the single runner that reaches all of the above and the one CI executes.
 
 ## Evidence states
 

@@ -391,23 +391,31 @@
     },
     {
       "skill": "forgejo-delivery-loop",
-      "highest_layer": "L2_EXECUTABLE_CONTRACT",
-      "golden_proof_id": null,
+      "highest_layer": "L3_HERMETIC_REAL_TASK",
+      "golden_proof_id": "forgejo-delivery-readback-ab-v1",
       "criteria": {
         "old_canonical_treatment_frozen": {
-          "state": "ABSENT",
-          "evidence": [],
-          "owner_issue": 346
+          "state": "PASS",
+          "evidence": [
+            "skills/forgejo-delivery-loop/tests/fixtures/pre-refactor-SKILL.txt"
+          ],
+          "note": "Registered as A_OLD_CANONICAL at blob 9f47aa5d, the body commit 1295cdd (PR #189) left behind and commit d757a5c (PR #270) replaced. modules/domain-profile.md already named that blob as where the deleted host detail went; the fixture is the same bytes, now readable without git."
         },
         "refactor_as_landed_treatment_frozen": {
-          "state": "ABSENT",
-          "evidence": [],
-          "owner_issue": 346
+          "state": "PASS",
+          "evidence": [
+            "skills/forgejo-delivery-loop/tests/fixtures/refactor-as-landed-SKILL.txt",
+            "skills/forgejo-delivery-loop/tests/fixtures/refactor-as-landed-domain-profile.txt"
+          ],
+          "note": "Registered as B0_REFACTOR_AS_LANDED at blob c75c7f2d, exactly what PR #270 landed, retained even though the A/B shows it dropped five old strengths. Its domain profile is frozen alongside it so B0's identity stops moving with the live module."
         },
         "old_strengths_asserted": {
-          "state": "ABSENT",
-          "evidence": [],
-          "owner_issue": 346
+          "state": "PASS",
+          "evidence": [
+            "skills/forgejo-delivery-loop/tests/refactor_ab.py",
+            "skills/forgejo-delivery-loop/tests/run-all.sh"
+          ],
+          "note": "Twelve binary criteria scored per treatment: A 8, B0 7, B1 12. The five strengths PR #270 dropped (merge-authority sweep, typed readback chain, self-report refusal, both-ways index check, router-before-mutation) are named as expected B0 regressions, so a scorer retuned to agree with the current body goes red instead of green."
         },
         "route_reachable": {
           "state": "PASS",
@@ -435,25 +443,33 @@
           ]
         },
         "matched_hermetic_task": {
-          "state": "ABSENT",
-          "evidence": [],
-          "owner_issue": 346
+          "state": "PASS",
+          "evidence": [
+            "skills/forgejo-delivery-loop/tests/real_task_ab.py",
+            "skills/forgejo-delivery-loop/tests/issue-state/fixtures/request-valid.json"
+          ],
+          "note": "One terminal work-item closure driven per treatment against the same unmodified request, the same three committed schemas, the live scripts/issue_state.py as a real CLI and as a library with injected readers, one attempt each and no network. A and B1 produced the same clock-independent receipt identity; B0 is retained as BLOCKED_READBACK_ROUTE_ABSENT; five planted mutations were refused and stay in the denominator. Fixture evidence only."
         },
         "golden_proof_registered": {
-          "state": "ABSENT",
-          "evidence": [],
-          "owner_issue": 346
+          "state": "PASS",
+          "evidence": [
+            "skills/skill-refactor-proof-loop/references/golden-proof-registry.json"
+          ],
+          "note": "forgejo-delivery-readback-ab-v1: three content-bound treatments, entrypoint tests/real_task_ab.py reached by tests/run-all.sh, which is the command CI already runs for this Skill."
         },
         "live_model_runtime_ab": {
           "state": "NOT_IMPLEMENTED",
           "evidence": [],
           "owner_issue": 346,
-          "note": "No model/runtime A/B harness exists; live Forgejo delivery receipts are a separate lane."
+          "note": "No model/runtime A/B harness exists; live Forgejo delivery receipts are a separate lane. The matched task injects its three authenticated reads, so nothing in it could become a live observation."
         },
         "molecular_traceability": {
-          "state": "ABSENT",
-          "evidence": [],
-          "owner_issue": 346
+          "state": "PARTIAL",
+          "evidence": [
+            "skills/skill-refactor-proof-loop/references/golden-proof-registry.json"
+          ],
+          "owner_issue": 346,
+          "note": "The proof names its issue (#346) and the pull requests that landed the frozen treatments (#189 for A, #270 for B0, both read out of the commit subjects at 1295cdd and d757a5c). Forge-side state of those nodes is READ_FROM_GITHUB and a zero-network audit cannot close it."
         }
       }
     },
