@@ -23,6 +23,12 @@ python3 "$HERE/scripts/publish_source_contribution.py" --skill-root "$HERE" --ch
 python3 -m unittest discover -s "$HERE/tests" -p 'test_*.py' -v 2>&1 \
   | tee "$OUT/unittest.stdout"
 
+# The matched hermetic A/B over the three frozen bodies (#351). Its own subject
+# is built and torn down inside a TemporaryDirectory, so only the report lands
+# here; discover(-p 'test_*.py') cannot see it, which is why it is named.
+python3 "$HERE/tests/refactor_proof_ab.py" --output "$OUT/refactor-proof-ab.json" \
+  | tee "$OUT/refactor-proof-ab.stdout"
+
 diff -u "$HERE/evals/expected/effectiveness.json" "$OUT/run/effectiveness.json"
 
 test "$(find "$OUT/run/observations" -type f -name '*.json' | wc -l | tr -d ' ')" = "15"

@@ -815,23 +815,30 @@
     },
     {
       "skill": "repository-capability-audit",
-      "highest_layer": "L2_EXECUTABLE_CONTRACT",
-      "golden_proof_id": null,
+      "highest_layer": "L3_HERMETIC_REAL_TASK",
+      "golden_proof_id": "repository-capability-audit-refactor-proof-ab-v1",
       "criteria": {
         "old_canonical_treatment_frozen": {
-          "state": "ABSENT",
-          "evidence": [],
-          "owner_issue": 351
+          "state": "PASS",
+          "evidence": [
+            "skills/repository-capability-audit/tests/fixtures/old-canonical-SKILL.txt"
+          ],
+          "note": "Registered as A_OLD_CANONICAL. The bytes are git blob 0cbced53 as landed by commit f59d3f8; the fixture is the blob itself, so `git cat-file blob 0cbced53` reproduces it and a hand-written copy would not."
         },
         "refactor_as_landed_treatment_frozen": {
-          "state": "ABSENT",
-          "evidence": [],
-          "owner_issue": 351
+          "state": "PASS",
+          "evidence": [
+            "skills/repository-capability-audit/tests/fixtures/refactor-as-landed-SKILL.txt"
+          ],
+          "note": "Registered as B0_REFACTOR_AS_LANDED at git blob 2283322f (commit 2aa3e29). Honest limit on the role name: this Skill's body was never structurally refactored. `git log --follow` returns exactly three revisions and every diff between them is a pure append, so B0 is the first landed revision after the canonical one, not a restructuring. No refactor was invented to fill the role."
         },
         "old_strengths_asserted": {
-          "state": "ABSENT",
-          "evidence": [],
-          "owner_issue": 351
+          "state": "PASS",
+          "evidence": [
+            "skills/repository-capability-audit/tests/refactor_proof_ab.py",
+            "skills/repository-capability-audit/tests/run-all.sh"
+          ],
+          "note": "Seven guarantees arm A already made -- the thirteen RCA headings, the terminal-state vocabulary, the state machine, the required-output manifest, the stop conditions, the core self-check route and the modules boundary -- are asserted on every arm's bytes, and a dropped RCA section in a mutated copy of the live body is refused."
         },
         "route_reachable": {
           "state": "PASS",
@@ -857,18 +864,19 @@
           ]
         },
         "matched_hermetic_task": {
-          "state": "PARTIAL",
+          "state": "PASS",
           "evidence": [
-            "skills/repository-capability-audit/scripts/run_pilot_matrix.py",
-            "skills/repository-capability-audit/tests/test_agent_ab.py"
+            "skills/repository-capability-audit/tests/refactor_proof_ab.py",
+            "skills/repository-capability-audit/tests/run-all.sh"
           ],
-          "owner_issue": 256,
-          "note": "The matrix is preregistered and scored deterministically, but every cell needs a real host binary."
+          "note": "One subject, three defects, one budget: the three frozen bodies run only the checkers their own bytes name, and detection is 1 < 2 < 3 read off real subprocess exit codes. Every guard is a matched pair -- clean subject exits 0, planted subject exits non-zero -- so a checker that cannot go red is refused. This observes no model and no host binary; the preregistered #228/#230 agent matrix is a separate lane and stays with live_model_runtime_ab under #256."
         },
         "golden_proof_registered": {
-          "state": "ABSENT",
-          "evidence": [],
-          "owner_issue": 351
+          "state": "PASS",
+          "evidence": [
+            "skills/skill-refactor-proof-loop/references/golden-proof-registry.json"
+          ],
+          "note": "Three content-bound treatments, one per revision that exists in history. The registered pull_requests entry is #354, the PR that landed the migration-leaf ledger row this proof retires; the treatment commits were never landed through numbered PRs and the PR carrying this proof is not published, so no other PR identity is knowable offline."
         },
         "live_model_runtime_ab": {
           "state": "NOT_EXERCISED",
@@ -877,12 +885,16 @@
             "skills/repository-capability-audit/scripts/run_agent_cell.py"
           ],
           "owner_issue": 256,
-          "note": "Same-subject adapter receipts are owned by #256."
+          "note": "Same-subject adapter receipts are owned by #256. The #351 hermetic task did not move this: it observes no model, no provider and no host binary."
         },
         "molecular_traceability": {
-          "state": "ABSENT",
-          "evidence": [],
-          "owner_issue": 351
+          "state": "PARTIAL",
+          "evidence": [
+            "skills/skill-refactor-proof-loop/references/refactor-proof-stack.json",
+            "skills/repository-capability-audit/tests/refactor_proof_ab.py"
+          ],
+          "owner_issue": 351,
+          "note": "The proof report names its issue, its treatment lineage and the commit each treatment blob came from. This leaf has no node of its own in the Stack index: that file has one convergence owner and is not this leaf's write. Either way node delivery state is declared READ_FROM_GITHUB, so a zero-network audit cannot reach PASS here by design."
         }
       }
     },
