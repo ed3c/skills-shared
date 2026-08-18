@@ -89,6 +89,16 @@
           ]
         },
         "independent_state": {"$ref": "#/$defs/evidence_state"},
+        "independence_evidence": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["reference", "shadow_identity", "builder_identity"],
+          "properties": {
+            "reference": {"type": "string", "minLength": 3},
+            "shadow_identity": {"type": "string", "minLength": 1},
+            "builder_identity": {"type": "string", "minLength": 1}
+          }
+        },
         "enforcement_state": {"$ref": "#/$defs/evidence_state"},
         "checkpoint_outcome": {
           "enum": [

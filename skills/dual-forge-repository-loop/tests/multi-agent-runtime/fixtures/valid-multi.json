@@ -22,6 +22,11 @@
   "shadow": {
     "execution": "EXTERNAL_DETERMINISTIC_CHECKER",
     "independent_state": "PASS",
+    "independence_evidence": {
+      "reference": "skills/procedural-shadow-runtime/evals/receipts/shadow-canary.receipt.json",
+      "shadow_identity": "openai/gpt-5.6-sol via codex exec",
+      "builder_identity": "anthropic/sonnet via claude -p"
+    },
     "enforcement_state": "PASS",
     "checkpoint_outcome": "CONTINUE_L0"
   },

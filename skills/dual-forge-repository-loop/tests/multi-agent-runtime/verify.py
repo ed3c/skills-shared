@@ -62,6 +62,16 @@ def mutate(name: str, document: dict) -> None:
     elif name == "shadow-overclaim":
         document["shadow"]["execution"] = "IN_PROCESS_LOGICAL"
         document["shadow"]["independent_state"] = "PASS"
+    elif name == "shadow-independence-unbound":
+        # The inverse of shadow-overclaim: naming a separate reviewer and
+        # asserting PASS with nothing behind it. The fixture itself was in this
+        # state until #232, so the rule and its control landed together.
+        document["shadow"].pop("independence_evidence", None)
+    elif name == "shadow-independence-collapsed":
+        evidence = document["shadow"]["independence_evidence"]
+        evidence["shadow_identity"] = evidence["builder_identity"]
+    elif name == "shadow-independence-evidence-empty":
+        document["shadow"]["independence_evidence"]["reference"] = ""
     elif name == "l3-bypass":
         document["shadow"]["checkpoint_outcome"] = "BLOCKED_AT_MATERIAL_BOUNDARY_L3"
         document["shadow"]["enforcement_state"] = "NOT_IMPLEMENTED"
@@ -234,6 +244,9 @@ def main() -> int:
         ("budget-exceeded", 2, "budget-exceeded:tokens"),
         ("missing-profile-fanout", 2, "missing-profile-fanout"),
         ("shadow-overclaim", 2, "shadow-independence-overclaim"),
+        ("shadow-independence-unbound", 2, "shadow-independence-unbound"),
+        ("shadow-independence-collapsed", 2, "shadow-independence-collapsed"),
+        ("shadow-independence-evidence-empty", 64, "schema-invalid"),
         ("l3-bypass", 2, "shadow-l3-unenforced"),
         ("agent-merge-enabled", 64, "schema-invalid"),
         ("stale-result", 2, "stale-result-base"),
