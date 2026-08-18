@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/spatial-loop-case-graph-v1.schema.json",
+  "title": "Spatial Loop Case Graph v1",
+  "type": "object",
+  "required": ["schema", "subject", "intent_atoms", "semantic_axes", "source_behaviors", "cases", "implementations", "oracles", "evidence", "edges", "coverage", "gate"],
+  "properties": {
+    "schema": {"const": "spatial-loop-case-graph/v1"},
+    "subject": {
+      "type": "object",
+      "required": ["id", "revision", "digest"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "revision": {"type": "string", "minLength": 1},
+        "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+      },
+      "additionalProperties": true
+    },
+    "intent_atoms": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/idNode"}},
+    "semantic_axes": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/axisNode"}},
+    "source_behaviors": {"type": "array", "items": {"$ref": "#/$defs/sourceBehavior"}},
+    "cases": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/caseNode"}},
+    "implementations": {"type": "array", "items": {"$ref": "#/$defs/implementation"}},
+    "oracles": {"type": "array", "items": {"$ref": "#/$defs/oracle"}},
+    "evidence": {"type": "array", "items": {"$ref": "#/$defs/evidence"}},
+    "decisions": {"type": "array", "items": {"$ref": "#/$defs/decision"}},
+    "edges": {"type": "array", "items": {"$ref": "#/$defs/edge"}},
+    "coverage": {
+      "type": "object",
+      "required": ["intent", "source_behavior_disposition", "required_case", "implementation_binding", "oracle", "executed_evidence", "unknown_blocking_count"],
+      "additionalProperties": false,
+      "properties": {
+        "intent": {"type": "number", "minimum": 0, "maximum": 1},
+        "source_behavior_disposition": {"type": "number", "minimum": 0, "maximum": 1},
+        "required_case": {"type": "number", "minimum": 0, "maximum": 1},
+        "implementation_binding": {"type": "number", "minimum": 0, "maximum": 1},
+        "oracle": {"type": "number", "minimum": 0, "maximum": 1},
+        "executed_evidence": {"type": "number", "minimum": 0, "maximum": 1},
+        "unknown_blocking_count": {"type": "integer", "minimum": 0}
+      }
+    },
+    "gate": {
+      "type": "object",
+      "required": ["status", "rationale"],
+      "properties": {
+        "status": {"enum": ["BLOCKED", "READY_FOR_PROTOTYPE", "READY_FOR_IMPLEMENTATION", "READY_FOR_PUBLICATION_REVIEW"]},
+        "rationale": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": true
+    }
+  },
+  "$defs": {
+    "idNode": {
+      "type": "object",
+      "required": ["id", "statement"],
+      "properties": {"id": {"type": "string", "minLength": 1}, "statement": {"type": "string", "minLength": 1}},
+      "additionalProperties": true
+    },
+    "axisNode": {
+      "type": "object",
+      "required": ["id", "name", "state"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "name": {"type": "string", "minLength": 1},
+        "state": {"enum": ["APPLICABLE", "NOT_APPLICABLE"]},
+        "reason": {"type": "string"}
+      },
+      "additionalProperties": true
+    },
+    "sourceBehavior": {
+      "type": "object",
+      "required": ["id", "statement", "disposition"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "statement": {"type": "string", "minLength": 1},
+        "disposition": {"enum": ["PRESERVE_EXACT", "PRESERVE_OBSERVABLE", "ADAPT_WITH_COMPATIBILITY", "INTENTIONAL_CHANGE", "DEFER_EXPLICIT", "DROP_EXPLICIT", "UNKNOWN_BLOCKING"]},
+        "decision_id": {"type": ["string", "null"]}
+      },
+      "additionalProperties": true
+    },
+    "caseNode": {
+      "type": "object",
+      "required": ["id", "classification", "intent_ids", "axis_ids", "invariant_or_state_refs", "implementation_ids", "oracle_ids", "evidence_state"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "classification": {"enum": ["REQUIRED_CASE", "INVALID_INPUT_CASE", "IMPOSSIBLE_BY_INVARIANT", "OUT_OF_SCOPE_EXPLICIT", "DUPLICATE_EQUIVALENCE_CLASS", "UNKNOWN_BLOCKING"]},
+        "intent_ids": {"type": "array", "items": {"type": "string"}},
+        "axis_ids": {"type": "array", "items": {"type": "string"}},
+        "invariant_or_state_refs": {"type": "array", "items": {"type": "string"}},
+        "implementation_ids": {"type": "array", "items": {"type": "string"}},
+        "oracle_ids": {"type": "array", "items": {"type": "string"}},
+        "decision_id": {"type": ["string", "null"]},
+        "evidence_state": {"enum": ["PASS", "FAIL", "ABSENT", "NOT_IMPLEMENTED", "NOT_EXERCISED", "SKIPPED_BY_POLICY", "HUMAN_ADMIT_REQUIRED"]}
+      },
+      "additionalProperties": true
+    },
+    "implementation": {
+      "type": "object",
+      "required": ["id", "owner", "subject_ref"],
+      "properties": {"id": {"type": "string"}, "owner": {"type": "string"}, "subject_ref": {"type": "string"}, "convergence_owner": {"type": "boolean"}},
+      "additionalProperties": true
+    },
+    "oracle": {
+      "type": "object",
+      "required": ["id", "procedure", "pass_condition"],
+      "properties": {"id": {"type": "string"}, "procedure": {"type": "string"}, "pass_condition": {"type": "string"}, "negative_control": {"type": "string"}},
+      "additionalProperties": true
+    },
+    "evidence": {
+      "type": "object",
+      "required": ["id", "state", "subject_ref"],
+      "properties": {"id": {"type": "string"}, "state": {"enum": ["PASS", "FAIL", "ABSENT", "NOT_IMPLEMENTED", "NOT_EXERCISED", "SKIPPED_BY_POLICY", "HUMAN_ADMIT_REQUIRED"]}, "subject_ref": {"type": "string"}},
+      "additionalProperties": true
+    },
+    "decision": {
+      "type": "object",
+      "required": ["id", "authority", "rationale"],
+      "properties": {"id": {"type": "string"}, "authority": {"type": "string"}, "rationale": {"type": "string"}},
+      "additionalProperties": true
+    },
+    "edge": {
+      "type": "object",
+      "required": ["from", "to", "kind"],
+      "properties": {"from": {"type": "string"}, "to": {"type": "string"}, "kind": {"type": "string"}},
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": true
+}
