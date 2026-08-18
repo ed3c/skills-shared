@@ -33,7 +33,6 @@ PLANES_BOUND
 - **CORE-LAW-003 — local verified subject precedes publication.** Remote transport cannot be used as a substitute for implementation correctness or current-source readback.
 - **CORE-LAW-004 — modules cannot widen authority.** Host modules may bind concrete planes/adapters but cannot conflate evidence, auto-resolve semantic conflicts, change access/visibility, expose secrets, or create merge authority.
 - **CORE-LAW-005 — publication requires current ancestry reconciliation.** A candidate must contain admitted local integration and reconcile with the currently observed remote base; stale observations/receipts fail closed.
-- **CORE-LAW-006 — no plane's history is overwritten to make a candidate fit.** Force ref updates, silent history rewrites, and overwriting concurrent work on another plane are refused. A conflicting remote subject stays an explicit blocker routed to its owner.
 
 ## Procedure
 
@@ -70,49 +69,6 @@ Stop on failed local assertions, stale remote observation, ancestry mismatch, se
 
 See [modules/domain-profile.md](modules/domain-profile.md). Existing mode-specific subtrees remain trigger-selected implementations and may not replace the portable laws.
 
-## Runtime identity preflight
+## Runtime identity compatibility
 
-Before any repository mutation, load
-[`references/runtime-identity-contract.md`](references/runtime-identity-contract.md)
-and classify the current execution runtime as exactly one of the identities that
-contract enumerates.
-
-Runtime identity is based on observed capabilities/provenance, not model family.
-Connector access does not prove a local checkout, shell, worktree, or local
-forge, and a CI runner does not inherit developer worktree authority. An
-unclassified runtime fails closed for every irreversible delivery step. If the
-runtime changes mid-loop, rebind its evidence before continuing; the
-compatibility transition name `RUNTIME_BOUND` remains part of the
-repository-owned runtime-identity contract.
-
-## Owned executable mechanisms
-
-The portable core states the laws; these are the deterministic producers and
-checkers that make them fail. Each route is executed against this tree by
-[`tests/refactor-proof/refactor_ab.py`](tests/refactor-proof/refactor_ab.py), so
-a renamed or deleted mechanism turns the suite red instead of leaving a route
-that only reads correctly.
-
-```bash
-python3 skills/dual-forge-repository-loop/scripts/export_git_proof.py \
-  --repo-root /absolute/path/to/integration-worktree --candidate <candidate-sha> \
-  --output path/to/receipt/proof/repository.fast-import
-python3 skills/dual-forge-repository-loop/scripts/check_dual_forge_contract.py path/to/receipt.json
-python3 skills/dual-forge-repository-loop/scripts/check_runtime_handoff.py check --packet path/to/handoff.json
-python3 skills/dual-forge-repository-loop/scripts/compile_tech_lead_plan.py verify --plan path/to/plan.json
-python3 skills/dual-forge-repository-loop/scripts/check_consumer_canary.py selftest
-python3 skills/dual-forge-repository-loop/scripts/check_scheduler_receipt.py selftest
-python3 skills/dual-forge-repository-loop/scripts/check_prompt_baseline.py selftest
-```
-
-`export_git_proof.py` is the only canonical ancestry producer; the checkers are
-zero-network replayers of bytes those producers emitted. A green checker proves
-binding and replay of a recorded subject, never that a live plane was contacted.
-
-## Refactor proof
-
-[`tests/refactor-proof/refactor_ab.py`](tests/refactor-proof/refactor_ab.py)
-scores the pre-refactor body, the refactor as it landed, and this body on the
-same binary criteria and runs both frozen treatments through the same hermetic
-oracles. Deterministic structure and executable routes only: no model, provider,
-forge, or CI lane is exercised by it.
+Runtime identity is based on observed capabilities/provenance, not model family. The compatibility transition name `RUNTIME_BOUND` remains part of the repository-owned runtime-identity contract; concrete runtime identities and carriers are defined by the referenced domain/runtime artifacts rather than by the portable core.

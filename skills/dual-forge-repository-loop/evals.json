@@ -154,6 +154,20 @@
         "observed PASS/FAIL/ABSENT states require an evidence reference while honest non-execution states remain representable"
       ],
       "expected": "GitHub-scoped connector claim and honest non-execution classifications pass; six connector-to-local/Forgejo laundering mutations and an observed state without evidence are refused"
+    },
+    {
+      "id": "DFR-REFACTOR-PROOF-1",
+      "checker_script": "tests/refactor-proof/refactor_ab.py",
+      "test_verify": "tests/refactor-proof/verify.sh",
+      "good_fixture": "tests/refactor-proof/fixtures",
+      "hollow_fixture": null,
+      "hollow_mutations": "a frozen treatment gains a byte; the live body drops the restored route section, CORE-LAW-006, or the runtime-identity preflight; a routed mechanism is renamed out from under the body that names it",
+      "covers": [
+        "the pre-refactor and refactor-as-landed bodies stay byte-identical to the blobs history recorded for them",
+        "the three strengths #270 dropped and the three it introduced are scored per treatment instead of asserted in prose",
+        "every owned mechanism the body routes to resolves in a matched tree and the routed selftests run"
+      ],
+      "expected": "A and B0 tie at 7 of 10 by trading strengths, B1 holds all ten and dominates both, hermetic oracles read A=FAIL/PASS, B0=PASS/NOT_IMPLEMENTED, B1=PASS/PASS with zero network; each planted defect exits 2"
     }
   ],
   "evidence_boundary": {

@@ -317,23 +317,30 @@
     },
     {
       "skill": "dual-forge-repository-loop",
-      "highest_layer": "L2_EXECUTABLE_CONTRACT",
-      "golden_proof_id": null,
+      "highest_layer": "L3_HERMETIC_REAL_TASK",
+      "golden_proof_id": "dual-forge-repository-loop-refactor-proof-v1",
       "criteria": {
         "old_canonical_treatment_frozen": {
-          "state": "ABSENT",
-          "evidence": [],
-          "owner_issue": 345
+          "state": "PASS",
+          "evidence": [
+            "skills/dual-forge-repository-loop/tests/refactor-proof/fixtures/pre-refactor-SKILL.txt"
+          ],
+          "note": "SKILL.md at d757a5c~1, the parent of the only material refactor `git log --follow` reports for this body. Registered as A_OLD_CANONICAL at blob bd3559e730c9a4f16c95d72b675d9c8cae4c9f7f and recomputed on every run."
         },
         "refactor_as_landed_treatment_frozen": {
-          "state": "ABSENT",
-          "evidence": [],
-          "owner_issue": 345
+          "state": "PASS",
+          "evidence": [
+            "skills/dual-forge-repository-loop/tests/refactor-proof/fixtures/refactor-as-landed-SKILL.txt"
+          ],
+          "note": "SKILL.md as #270 landed it, blob 1e88ad5b1bf883de42ccc6bac83b75d56fe8b62d. Retained in the denominator although it dropped three strengths the monolith held."
         },
         "old_strengths_asserted": {
-          "state": "ABSENT",
-          "evidence": [],
-          "owner_issue": 345
+          "state": "PASS",
+          "evidence": [
+            "skills/dual-forge-repository-loop/tests/refactor-proof/refactor_ab.py",
+            "skills/dual-forge-repository-loop/tests/refactor-proof/verify.sh"
+          ],
+          "note": "Ten binary criteria scored per treatment. A and B0 tie at 7: the refactor traded the runtime-identity preflight, the owned-mechanism routes and the history-overwrite refusal for a bounded host-neutral core, numbered laws and a domain route. B1 restores the three and holds all ten, so it is the first arm to dominate both predecessors."
         },
         "route_reachable": {
           "state": "PASS",
@@ -361,18 +368,19 @@
           "note": "68 planted publication/order/authority defects must stay red."
         },
         "matched_hermetic_task": {
-          "state": "PARTIAL",
+          "state": "PASS",
           "evidence": [
-            "skills/dual-forge-repository-loop/scripts/check_prompt_crossstack.py",
-            "skills/dual-forge-repository-loop/tests/prompt-crossstack/verify.sh"
+            "skills/dual-forge-repository-loop/tests/refactor-proof/refactor_ab.py",
+            "skills/dual-forge-repository-loop/tests/run-all.sh"
           ],
-          "owner_issue": 345,
-          "note": "The cross-stack case set is frozen and checked, but the comparison itself is never executed in the suite."
+          "note": "Each frozen treatment is materialised into its own scratch tree where only SKILL.md differs, then run through two real subprocess oracles: the repository's portable-core boundary checker and an owned-route probe that resolves and executes the mechanisms the body names. Observed A=FAIL/PASS, B0=PASS/NOT_IMPLEMENTED, B1=PASS/PASS, zero network. The #229 cross-stack case set stays a frozen record; its comparison needs two provider binaries and real spend, and remains owned by #234."
         },
         "golden_proof_registered": {
-          "state": "ABSENT",
-          "evidence": [],
-          "owner_issue": 345
+          "state": "PASS",
+          "evidence": [
+            "skills/skill-refactor-proof-loop/references/golden-proof-registry.json"
+          ],
+          "note": "dual-forge-repository-loop-refactor-proof-v1: three content-bound treatments, L0-L3 PASS, L4 NOT_EXERCISED, L5 HUMAN_ADMIT_REQUIRED."
         },
         "live_model_runtime_ab": {
           "state": "NOT_EXERCISED",
@@ -383,9 +391,12 @@
           "note": "Requires two provider binaries and real spend; delivery receipts are owned by #234."
         },
         "molecular_traceability": {
-          "state": "ABSENT",
-          "evidence": [],
-          "owner_issue": 345
+          "state": "PARTIAL",
+          "evidence": [
+            "skills/skill-refactor-proof-loop/references/refactor-proof-stack.json"
+          ],
+          "owner_issue": 345,
+          "note": "The Stack index names this Skill's delivery lane and its issues, but every node's state is declared READ_FROM_GITHUB. A zero-network checker cannot close it, so PARTIAL is the ceiling rather than a gap awaiting more work here."
         }
       }
     },

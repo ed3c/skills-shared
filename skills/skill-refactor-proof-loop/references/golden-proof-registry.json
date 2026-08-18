@@ -323,6 +323,66 @@
       "remaining_issues": [
         349
       ]
+    },
+    {
+      "id": "dual-forge-repository-loop-refactor-proof-v1",
+      "owner_skill": "dual-forge-repository-loop",
+      "issue": 345,
+      "pull_requests": [
+        270
+      ],
+      "entrypoint": "skills/dual-forge-repository-loop/tests/refactor-proof/refactor_ab.py",
+      "runner": "skills/dual-forge-repository-loop/tests/refactor-proof/verify.sh",
+      "treatments": [
+        {
+          "id": "A_OLD_CANONICAL",
+          "role": "OLD_CANONICAL",
+          "path": "skills/dual-forge-repository-loop/tests/refactor-proof/fixtures/pre-refactor-SKILL.txt",
+          "blob_sha": "bd3559e730c9a4f16c95d72b675d9c8cae4c9f7f"
+        },
+        {
+          "id": "B0_REFACTOR_AS_LANDED",
+          "role": "REFACTOR_AS_LANDED",
+          "path": "skills/dual-forge-repository-loop/tests/refactor-proof/fixtures/refactor-as-landed-SKILL.txt",
+          "blob_sha": "1e88ad5b1bf883de42ccc6bac83b75d56fe8b62d"
+        },
+        {
+          "id": "B1_ROUTES_AND_PREFLIGHT_RESTORED",
+          "role": "REPAIRED_CANDIDATE",
+          "path": "skills/dual-forge-repository-loop/SKILL.md",
+          "blob_sha": "f7169cab2eb23f7339023b4211cfadd1c66d217d"
+        }
+      ],
+      "proof_layers": {
+        "L0_SOURCE_FREEZE": "PASS",
+        "L1_STRUCTURAL_REACHABILITY": "PASS",
+        "L2_EXECUTABLE_CONTRACT": "PASS",
+        "L3_HERMETIC_REAL_TASK": "PASS",
+        "L4_MATCHED_LIVE_MODEL_RUNTIME": "NOT_EXERCISED",
+        "L5_DELIVERY_AND_HUMAN_ADMIT": "HUMAN_ADMIT_REQUIRED"
+      },
+      "highest_layer": "L3_HERMETIC_REAL_TASK",
+      "denominator": {
+        "failed_retained": true,
+        "stale_retained": true,
+        "blocked_retained": true,
+        "cancelled_retained": true,
+        "superseded_retained": true
+      },
+      "cleanup": "CLEAN",
+      "authority": {
+        "provider_activation": false,
+        "publication": false,
+        "semantic_conflict_resolution": false,
+        "merge": false,
+        "release": false,
+        "promotion": false,
+        "rollback": false
+      },
+      "remaining_issues": [
+        234,
+        345
+      ]
     }
   ]
 }
