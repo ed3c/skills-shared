@@ -37,6 +37,7 @@
 - [`../skills/agentic-tech-lead-orchestration/README.md`](../skills/agentic-tech-lead-orchestration/README.md) — contract-first multi-branch decomposition, deterministic context, bounded Worker execution, tournament selection, and Stacked PR handoff candidate.
 - [`../skills/controlled-technical-language-harness/README.md`](../skills/controlled-technical-language-harness/README.md) — controlled-language checking and rewriting, with the deterministic, calibrated-heuristic, semantic, and Human lanes kept apart.
 - [`../skills/product-reverse-engineering-loop/README.md`](../skills/product-reverse-engineering-loop/README.md) — evidence-graded product signals, classified mechanisms, problem closure by lane, and bounded implementation packets, with the user, paid and market lanes left where they belong.
+- [`governance/LICENSE_DECISION.md`](governance/LICENSE_DECISION.md) — MIT vs Apache-2.0 decision packet against this repository's real dependency scan and four-repository integration, with ready-to-activate drafts under `governance/drafts/`. `HUMAN_ADMIT_REQUIRED`; no root `LICENSE` exists yet.
 
 The nearest directory README is the local ownership route. Machine contracts remain authoritative over prose.
 
