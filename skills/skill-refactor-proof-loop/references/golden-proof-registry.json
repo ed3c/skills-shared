@@ -67,6 +67,61 @@
         "rollback": false
       },
       "remaining_issues": [231, 232, 234, 256, 312]
+    },
+    {
+      "id": "repository-capability-audit-refactor-proof-ab-v1",
+      "owner_skill": "repository-capability-audit",
+      "issue": 351,
+      "pull_requests": [354],
+      "entrypoint": "skills/repository-capability-audit/tests/refactor_proof_ab.py",
+      "runner": "skills/repository-capability-audit/tests/run-all.sh",
+      "treatments": [
+        {
+          "id": "A_OLD_CANONICAL",
+          "role": "OLD_CANONICAL",
+          "path": "skills/repository-capability-audit/tests/fixtures/old-canonical-SKILL.txt",
+          "blob_sha": "0cbced53d29090b1cd7cd875482a4658351f053b"
+        },
+        {
+          "id": "B0_REFACTOR_AS_LANDED",
+          "role": "REFACTOR_AS_LANDED",
+          "path": "skills/repository-capability-audit/tests/fixtures/refactor-as-landed-SKILL.txt",
+          "blob_sha": "2283322fb3997f00e710bfef90fd5ac1388d9127"
+        },
+        {
+          "id": "B1_CONTRIBUTION_GATE_BOUND",
+          "role": "REPAIRED_CANDIDATE",
+          "path": "skills/repository-capability-audit/SKILL.md",
+          "blob_sha": "b9ccc71f63ef5f34be16cae303452c90a4e1532b"
+        }
+      ],
+      "proof_layers": {
+        "L0_SOURCE_FREEZE": "PASS",
+        "L1_STRUCTURAL_REACHABILITY": "PASS",
+        "L2_EXECUTABLE_CONTRACT": "PASS",
+        "L3_HERMETIC_REAL_TASK": "PASS",
+        "L4_MATCHED_LIVE_MODEL_RUNTIME": "NOT_EXERCISED",
+        "L5_DELIVERY_AND_HUMAN_ADMIT": "HUMAN_ADMIT_REQUIRED"
+      },
+      "highest_layer": "L3_HERMETIC_REAL_TASK",
+      "denominator": {
+        "failed_retained": true,
+        "stale_retained": true,
+        "blocked_retained": true,
+        "cancelled_retained": true,
+        "superseded_retained": true
+      },
+      "cleanup": "CLEAN",
+      "authority": {
+        "provider_activation": false,
+        "publication": false,
+        "semantic_conflict_resolution": false,
+        "merge": false,
+        "release": false,
+        "promotion": false,
+        "rollback": false
+      },
+      "remaining_issues": [256, 351]
     }
   ]
 }
