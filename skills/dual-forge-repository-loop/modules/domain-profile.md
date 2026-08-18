@@ -21,4 +21,4 @@ Success on one plane proves only that plane. Local verification, remote forge st
 If one plane is unavailable, preserve the local verified subject and reconciliation packet; do not infer the missing plane from another plane's receipt.
 
 ## Forbidden overrides
-This module may not override `CORE-LAW-001` through `CORE-LAW-005`, conflate plane evidence, auto-resolve semantic conflicts, change visibility/access, expose secrets, or create merge/release authority.
+This module may not override `CORE-LAW-001` through `CORE-LAW-006`, conflate plane evidence, auto-resolve semantic conflicts, change visibility/access, expose secrets, or create merge/release authority.
