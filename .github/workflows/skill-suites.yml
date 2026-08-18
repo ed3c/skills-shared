@@ -25,6 +25,7 @@ on:
       - 'skills/procedural-shadow-runtime/**'
       - 'skills/product-reverse-engineering-loop/**'
       - 'skills/repository-capability-audit/**'
+      - 'skills/repository-entropy-reclamation/**'
       - 'skills/skill-refactor-proof-loop/**'
       - 'skills/spatial-loop-systems-engineering/**'
       - 'scripts/check_intent_bound_constraints.py'
@@ -43,6 +44,7 @@ on:
       - 'skills/procedural-shadow-runtime/**'
       - 'skills/product-reverse-engineering-loop/**'
       - 'skills/repository-capability-audit/**'
+      - 'skills/repository-entropy-reclamation/**'
       - 'skills/skill-refactor-proof-loop/**'
       - 'skills/spatial-loop-systems-engineering/**'
       - 'scripts/check_intent_bound_constraints.py'
@@ -93,6 +95,7 @@ jobs:
           - procedural-shadow-runtime
           - product-reverse-engineering-loop
           - repository-capability-audit
+          - repository-entropy-reclamation
           - skill-refactor-proof-loop
           - spatial-loop-systems-engineering
     name: ${{ matrix.skill }}
