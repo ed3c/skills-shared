@@ -17,14 +17,19 @@ knowledge-continuity/
 ├── README.md
 ├── SKILL.md
 ├── evals.json
-├── references/
-│   ├── README.md
-│   └── DOCUMENT_ROUTING_CONTRACT.md
-├── modules/
-│   ├── README.md
-│   └── four-repository-routing-example.md
-├── scripts/
-└── tests/
+├── references/   generic reusable contracts and machine shapes
+├── modules/      on-demand domain examples
+├── scripts/      the deterministic checker and its semantic gate
+└── tests/        controls, frozen refactor treatments and the matched A/B
+```
+
+The file-level index is not copied here, because a hand-kept basename list drifts
+the moment a file lands — this tree already lost `references/INTENT_BOUND_CONSTRAINTS.md`
+that way. Read the current one out of the tree instead:
+
+```bash
+# 從 repo 根目錄執行（[`skills/README.md`](../README.md) 的共用路由）
+python3 scripts/check_skill_entry_routes.py --skill knowledge-continuity --print-index
 ```
 
 ## State machine

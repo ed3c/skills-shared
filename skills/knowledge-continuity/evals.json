@@ -8,7 +8,8 @@
       "解釋本身是否足夠 — 規則只檢查引用的形狀，不檢查說明的品質",
       "未裁決的事被畫成已裁決 — 需要理解語意，且矛盾常常跨檔案，逐檔檢查抓不到",
       "圖例是否存在 — 符號表缺席時機械層仍可能全綠（實測發生過）",
-      "跳轉是否落在原始來源 — 屬於 html-for-decisions 的渲染層，不在本 skill 範圍"
+      "跳轉是否落在原始來源 — 屬於 html-for-decisions 的渲染層，不在本 skill 範圍",
+      "人判斷層 H-1..H-6 的裁決本身 — assert_continuity_audit.py 只能擋住『機械層綠被寫成收斂』，擋不住答錯"
     ],
     "purpose": "Catch the mechanical knowledge breaks that force a reader to supply information the document withheld."
   },
@@ -43,6 +44,36 @@
         "ISO 日期不得被當成文件代號"
       ],
       "expected": "--selftest 全過；本地定義的 ID、本文章節號、被展示的反例與日期一律不算斷點"
+    },
+    {
+      "id": "KC-3",
+      "checker_script": "scripts/assert_continuity_audit.py",
+      "test_verify": "tests/continuity-audit/verify.sh",
+      "good_fixture": "tests/check-knowledge-continuity/fixtures/good/doc.md",
+      "hollow_fixture": null,
+      "hollow_mutations": "in-process 植入缺陷（--selftest）：subject 摘要漂移、subject 缺席、規則被刪、規則狀態與計數矛盾、總數說謊、exit code 說謊、人判斷層被截短、機械層全綠寫成 CONVERGED、機器自行裁決人判斷層、人判斷有結論卻沒有裁決者",
+      "covers": [
+        "形狀契約 references/continuity-audit.schema.json",
+        "規則集合直接讀回 checker 實作，不由紀錄自報",
+        "subject.sha256 對現有位元組重算",
+        "只有機械層綠不算收斂——CONVERGED 需要每條人判斷都有具名裁決者"
+      ],
+      "expected": "合規與斷點文件都能產出合法紀錄；10 個植入缺陷各自以自己的錯誤碼被拒"
+    },
+    {
+      "id": "KC-4",
+      "checker_script": "tests/refactor-ab/refactor_ab.py",
+      "test_verify": "tests/refactor-ab/verify.sh",
+      "good_fixture": "tests/refactor-ab/fixtures/refactor-as-landed-SKILL.txt",
+      "hollow_fixture": "tests/refactor-ab/fixtures/old-canonical-SKILL.txt",
+      "hollow_mutations": "in-process 植入缺陷（--selftest）：凍結治療體位元組漂移、凍結檔缺席、老強度被弱化、引號規則被中和、宣稱的規則數說謊、步驟一指令退回主機投影路徑",
+      "covers": [
+        "L0 凍結：A（blob 99b9af12）與 B0（blob 8c095d34）以 git 記錄的 blob 身分比對",
+        "老強度矩陣 OS-01..OS-09 對現行規則重新量測",
+        "同一份語料、同一個 carrier 的三臂比較與 denominator 保留",
+        "A 與 B0 被自己宣告的指令擋住，B1 收斂 3/3 宣稱"
+      ],
+      "expected": "A 與 B0 為 BLOCKED_DECLARED_COMMAND_ABSENT 且留在 denominator；B1 執行並通過語料 oracle；L4 live 與 L5 delivery 維持 NOT_EXERCISED／HUMAN_ADMIT_REQUIRED"
     }
   ],
   "field_evidence": {
