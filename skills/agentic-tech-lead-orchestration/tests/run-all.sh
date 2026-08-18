@@ -32,6 +32,11 @@ python3 "$ROOT/tests/refactor_ab.py"
 # model, Git Town and Forgejo lanes remain NOT_EXERCISED.
 python3 "$ROOT/tests/real_task_ab.py"
 
+# Prove the #316 behavioral A/B scorer discriminates before it is ever pointed at
+# a live host. Zero network, zero spend: fixed packets are scored against the
+# pinned consumer tree and every planted defect must turn its own check red.
+python3 "$ROOT/scripts/run_behavioral_ab.py" --selftest
+
 # Exercise semantic/hard-law controls and scheduler lifecycle controls.
 python3 "$ROOT/tests/selftest.py"
 python3 "$ROOT/tests/scheduler_lifecycle_selftest.py"

@@ -66,6 +66,19 @@ python3 scripts/assert_repository_closure_contract.py --contract <closure.json> 
 
 Shape is owned by `references/repository-closure-contract.schema.json` and `references/issue-dual-dag.schema.json`; this script owns the semantic laws. A green result reports internal consistency for the declared subject. It does not read the tree, run a consumer suite, reach a provider, or admit anything. The method behind the shapes is in [`../references/REPOSITORY_CLOSURE_RECONCILIATION.md`](../references/REPOSITORY_CLOSURE_RECONCILIATION.md).
 
+## Behavioral A/B (spends real tokens)
+
+`run_behavioral_ab.py` is the only script here that invokes a model. It answers the one question the deterministic canary prints as `matched_live_model_quality_cost_latency: NOT_EXERCISED`: given the same real consumer task, does the repaired modular body change what a live host actually orchestrates, compared with the frozen T0–T10 monolith. Each cell is a fresh non-interactive host process whose stdin is `<arm bytes>` followed by a byte-identical task packet; the arm identities and the whole rubric come from `../evals/behavioral-ab-preregistration.json`, which was frozen before any cell ran.
+
+```bash
+python3 scripts/run_behavioral_ab.py --selftest
+python3 scripts/run_behavioral_ab.py --dry-run
+python3 scripts/run_behavioral_ab.py --consumer ~/bettor-arena \
+  --output ../evals/receipts --result ../evals/behavioral-ab-result.json
+```
+
+`--selftest` builds its own throwaway subject and scores fixed packets against it, so the controls fire with no consumer checkout, no network and no spend. Scoring is deterministic against the pinned consumer tree; no model judges another model's output. A run below the preregistered repetition minimum reports `INSUFFICIENT_EVIDENCE` whatever the table says, and provider, Git Town, Forgejo, publication and merge lanes stay `NOT_EXERCISED`.
+
 ## Refactor boundary
 
 `check_skill_core_boundaries.py --skill agentic-tech-lead-orchestration` verifies portable-core/domain-module separation. It does not admit tasks, capabilities, scheduler results, or handoff execution.

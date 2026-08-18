@@ -1,0 +1,109 @@
+{
+  "schema": "agentic-tech-lead/behavioral-ab-preregistration/v1",
+  "preregistration_id": "tech-lead-behavioral-316-2026-08",
+  "issue": "ed3c/skills-shared#316",
+  "status": "FROZEN_BEFORE_EXECUTION",
+  "_meta": {
+    "frozen_before_any_live_cell_existed": true,
+    "why_this_exists": "tests/real_task_ab.py closes orchestration structure on a synthetic subject and prints matched_live_model_quality_cost_latency: NOT_EXERCISED. #316 asks the one question that lane cannot answer: given the same real task, does the repaired modular body make a live model orchestrate better than the frozen T0-T10 monolith did. Nothing here re-analyses the deterministic canary; the live cells did not exist before this file was committed.",
+    "what_is_being_compared": "Tech Lead instruction bytes. The live model is the same in both arms, the task packet is byte-identical in both arms, and the only varying input is which body is prepended to the packet.",
+    "what_is_not_being_compared": "worker code quality, provider adapters, Git Town, Forgejo, publication and merge. Those lanes keep their own evidence and stay NOT_EXERCISED here."
+  },
+
+  "arms": {
+    "A_OLD_T0_T10_MONOLITH": {
+      "material_path": "skills/agentic-tech-lead-orchestration/tests/fixtures/pre-refactor-SKILL.txt",
+      "git_blob_sha1": "a01f53592cda98f61b413b4467afa96356fb4ef7",
+      "identity": "the frozen pre-refactor body already used as arm A by #309; a frozen fixture, so this arm's identity cannot drift when the live body changes",
+      "owns": "T0-T10 procedure, core laws, evidence states, Blindspots, module law"
+    },
+    "B_REPAIRED_MODULAR_TECH_LEAD": {
+      "material_path": "skills/agentic-tech-lead-orchestration/SKILL.md",
+      "git_blob_sha1": "f6d667956f653d26f6adb8081e04dd80445504a3",
+      "pinned_repository_commit": "306f75c6a30d969bd833f073a1b484d8d8e3341d",
+      "identity": "canonical main after the #308/#309 reconciliation and the #332 closure-law binding, not an unmerged branch snapshot",
+      "owns": "contract, state machine, hard laws, procedure, module selection, executable assertions, evidence states, handoff"
+    },
+    "fairness_law": "The arm bytes are prepended verbatim. Neither arm is trimmed, summarised, re-ordered or denied a mechanism it actually owns. Everything after the arm bytes is byte-identical across arms and its digest is recorded per cell."
+  },
+
+  "subject": {
+    "consumer_repository": "ed3c/bettor-arena",
+    "why_this_consumer": "ed3c/bettor-arena#146 is the named first real consumer physical golden run. Its harness-console slice is a real three-node dependency shape already on disk: packages/harness-console-contracts produces schemas that apps/harness-console and services/hitl-api consume.",
+    "access": "READ_ONLY. The live cells run with Read/Glob/Grep only; Write, Edit, NotebookEdit and Bash are refused at the host. The consumer worktree porcelain digest is recorded before and after every run and any change is reported as residue.",
+    "commit_and_tree": "resolved at run time from the consumer checkout and recorded per cell; ground truth for path existence is git cat-file against that exact tree, never the working directory"
+  },
+
+  "task_shapes": [
+    {
+      "id": "TOURNAMENT",
+      "shape": "one bounded feature fanned out from one immutable base to three differentiated candidates judged by immutable oracles",
+      "candidate_foci": ["minimal-diff", "architecture-types", "defensive-boundaries"],
+      "feature": "validate decision-request payloads in services/hitl-api against the frozen decision-request schema"
+    },
+    {
+      "id": "COOPERATIVE_DAG",
+      "shape": "one real bounded slice with two path-disjoint siblings, a true child consuming exact unmerged parent bytes, and one convergence owner",
+      "feature": "add one field to the console projection contract and make both consumers honour it"
+    }
+  ],
+
+  "rubric": {
+    "kind": "DETERMINISTIC_ONLY",
+    "no_model_judge": "Every check below is decidable from the emitted packet plus git cat-file against the pinned consumer tree. No model scores another model's output, here or anywhere downstream of here.",
+    "common_checks": [
+      {"id": "schema_ok", "asks": "the response contains one parseable JSON object carrying every required key with the required type"},
+      {"id": "exact_subject_continuity", "asks": "base_commit and base_tree are echoed exactly as supplied"},
+      {"id": "depends_on_resolvable", "asks": "every depends_on entry names a declared node"},
+      {"id": "acyclic", "asks": "the depends_on graph has no cycle"},
+      {"id": "write_readonly_disjoint", "asks": "no node writes a path it also declares read-only, and no node writes a forbidden path"},
+      {"id": "lease_disjoint", "asks": "two nodes never claim the same write path, except tournament candidates, which are replicas of one lease"},
+      {"id": "no_auto_merge", "asks": "auto_merge, auto_publish, auto_resolve_conflicts and git_town_admitted are all false and human_admit_required is true"},
+      {"id": "evidence_packet_complete", "asks": "non_claims is non-empty"},
+      {"id": "no_placeholder_commands", "asks": "acceptance_commands is non-empty and carries no REPLACE_WITH/TODO/FIXME/PLACEHOLDER/angle-bracket token"}
+    ],
+    "tournament_checks": [
+      {"id": "three_differentiated_candidates", "asks": "at least three CANDIDATE nodes with pairwise-distinct focus", "control": "duplicate focus represented as diversity"},
+      {"id": "candidates_share_base", "asks": "no CANDIDATE node depends on another node", "control": "unequal base or context digest"},
+      {"id": "denominator_complete", "asks": "selection.denominator equals the number of candidate attempts, is at least three, and oracle_results covers every candidate attempt", "control": "failed/stale/cancelled candidate omitted from the denominator"},
+      {"id": "winner_declared_with_rationale", "asks": "winner names a declared candidate and rationale is at least forty characters", "control": "candidate self-report promoted without an exact-source readback"}
+    ],
+    "dag_checks": [
+      {"id": "edges_fully_bound", "asks": "every edge binds producer, produced_path, content_digest, consumer, consumed_digest, edge_type, reason and admission_receipt as non-empty strings"},
+      {"id": "edge_implies_dependency", "asks": "for every edge the consumer's depends_on contains the producer", "control": "false parallelism where implementation starts before the contract it consumes exists"},
+      {"id": "no_false_parallelism", "asks": "no node labelled SIBLING appears as the consumer of an edge", "control": "omitted dependency hidden by a sibling label"},
+      {"id": "convergence_after_all_inputs", "asks": "exactly one CONVERGENCE node and its depends_on covers every other node", "control": "convergence before all required verified inputs"},
+      {"id": "attempts_cover_every_node", "asks": "every declared node has at least one attempt record", "control": "stale/cancelled attempt dropped from the record"}
+    ],
+    "rates": [
+      {"id": "path_fabrication_rate", "definition": "fabricated_paths / cited_paths, where a cited path is fabricated unless it exists in the pinned consumer tree or its parent directory does", "null_when": "no path was cited at all; a packet that cites nothing must not outrank one that cites ten and gets nine right"}
+    ],
+    "recorded_never_scored": ["cost_usd", "input_tokens", "output_tokens", "duration_ms", "tool_calls"],
+    "why_recorded_never_scored": "cost and latency answer a different question from correctness. An arm that is cheaper while orchestrating worse has not won, so expense is reported beside the quality table and never folded into it."
+  },
+
+  "power": {
+    "repetitions_per_cell_this_run": 3,
+    "minimum_repetitions_for_a_general_claim": 9,
+    "verdict_floor": "Below the minimum the verdict is INSUFFICIENT_EVIDENCE whatever the numbers say. The observed per-check tallies are still published, labelled as the exercised mechanism and the observed direction, never as uplift.",
+    "why_a_floor": "One paired observation per cell is a mechanism demonstration. Calling it a general uplift is the failure mode #316 names explicitly."
+  },
+
+  "verdict_rule": {
+    "evaluated_only_at_or_above_the_minimum": true,
+    "B_DOMINATES": "for every task shape, B's mean passed-check count is strictly greater than A's and B's path fabrication rate is not worse",
+    "A_DOMINATES": "the same condition with the arms exchanged",
+    "NO_DETECTABLE_DIFFERENCE": "every shape ties on both the passed-check count and the fabrication rate",
+    "TRADEOFF": "any other outcome at or above the minimum",
+    "INSUFFICIENT_EVIDENCE": "below the minimum, or any cell that did not return a scorable packet for a host reason"
+  },
+
+  "denominator_law": "Every attempt is recorded, including cells that timed out, exited non-zero or returned nothing parseable. A HOST_ERROR cell stays in the denominator and is never re-run into silence; a re-run is a new attempt with its own row.",
+
+  "evidence_boundary": [
+    "This establishes behavioral evidence only for these two bodies, this consumer subject, this model, this host and this repetition count.",
+    "Linked worktrees and physical Worker processes are closed deterministically by tests/real_task_ab.py, not by this lane; this lane runs one physical host process per cell and claims nothing more.",
+    "Provider adapters, Git Town, Forgejo, publication and GitHub Actions remain NOT_EXERCISED.",
+    "Merge and promotion remain HUMAN_ADMIT_REQUIRED."
+  ]
+}
