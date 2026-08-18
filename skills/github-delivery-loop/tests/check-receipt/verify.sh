@@ -17,6 +17,29 @@ if python3 "$checker" check --registry "$hollow" >"$scratch/hollow.out" 2>"$scra
 fi
 grep -q "UNMATERIALIZED portable-loop" "$scratch/hollow.err"
 
+# Mutation control for the receipt shape gate. Every semantic assertion in
+# github_delivery.py reads one named field at a time, so a field nobody reads --
+# here a misspelled `pr_url` next to the real `pr_urls` -- satisfies all of them.
+# Only the machine schema sees the document as a whole, so this fixture is red if
+# and only if the shape gate ran.
+cp -R "$test_dir/fixtures/good" "$scratch/shape-drift"
+python3 - "$scratch/shape-drift/receipt.json" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+path = Path(sys.argv[1])
+receipt = json.loads(path.read_text(encoding="utf-8"))
+receipt["pr_url"] = receipt["pr_urls"][0]
+path.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
+PY
+if python3 "$checker" check --registry "$scratch/shape-drift/registry.json" \
+  >"$scratch/shape.out" 2>"$scratch/shape.err"; then
+  echo "a receipt field outside the schema was accepted" >&2
+  exit 1
+fi
+grep -q "RECEIPT-SHAPE portable-loop" "$scratch/shape.err"
+
 # A repository can legitimately grow a second PRD for a later product line.
 # Keep this delivery line pinned to its existing receipt PRD instead of
 # guessing from a title search.

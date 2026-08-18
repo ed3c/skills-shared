@@ -546,23 +546,32 @@
     },
     {
       "skill": "github-delivery-loop",
-      "highest_layer": "L2_EXECUTABLE_CONTRACT",
-      "golden_proof_id": null,
+      "highest_layer": "L3_HERMETIC_REAL_TASK",
+      "golden_proof_id": "github-delivery-loop-refactor-proof-v1",
       "criteria": {
         "old_canonical_treatment_frozen": {
-          "state": "ABSENT",
-          "evidence": [],
-          "owner_issue": 348
+          "state": "PASS",
+          "evidence": [
+            "skills/github-delivery-loop/tests/refactor-proof/fixtures/pre-refactor-SKILL.txt",
+            "skills/github-delivery-loop/tests/refactor-proof/refactor_ab.py"
+          ],
+          "note": "SKILL.md at bca8e5a~1, frozen at its historical blob 1e26bfae; the entrypoint recomputes the blob every run, so an edit to improve a score turns the suite red."
         },
         "refactor_as_landed_treatment_frozen": {
-          "state": "ABSENT",
-          "evidence": [],
-          "owner_issue": 348
+          "state": "PASS",
+          "evidence": [
+            "skills/github-delivery-loop/tests/refactor-proof/fixtures/refactor-as-landed-SKILL.txt",
+            "skills/github-delivery-loop/tests/refactor-proof/refactor_ab.py"
+          ],
+          "note": "SKILL.md at bca8e5a (#242, the generalization), frozen at blob 3faf7ca with its index-discipline regression retained rather than repaired in place."
         },
         "old_strengths_asserted": {
-          "state": "ABSENT",
-          "evidence": [],
-          "owner_issue": 348
+          "state": "PASS",
+          "evidence": [
+            "skills/github-delivery-loop/tests/refactor-proof/refactor_ab.py",
+            "skills/github-delivery-loop/tests/refactor-proof/verify.sh"
+          ],
+          "note": "Eight binary criteria scored on all three treatments. Three old strengths survived the refactor, one (index discipline) was dropped and is restored by the candidate, and the drop is corroborated by commit 9a14f52."
         },
         "route_reachable": {
           "state": "PASS",
@@ -574,13 +583,15 @@
           ]
         },
         "schema_and_semantic_gates_executable": {
-          "state": "PARTIAL",
+          "state": "PASS",
           "evidence": [
             "skills/github-delivery-loop/scripts/merge_gate.py",
-            "skills/github-delivery-loop/scripts/ci_publish_gate.py"
+            "skills/github-delivery-loop/scripts/ci_publish_gate.py",
+            "skills/github-delivery-loop/scripts/delivery_receipt.schema.json",
+            "skills/github-delivery-loop/scripts/github_delivery.py",
+            "skills/github-delivery-loop/tests/check-receipt/verify.sh"
           ],
-          "owner_issue": 348,
-          "note": "Gates are executable and fail closed, but the delivery receipt shape has no machine schema."
+          "note": "The delivery receipt now has a Draft 2020-12 shape gate asserted by github_delivery.py before its semantic checks, with a control proving a field no semantic assertion reads is refused."
         },
         "hollow_dead_route_controls": {
           "state": "PASS",
@@ -591,14 +602,19 @@
           ]
         },
         "matched_hermetic_task": {
-          "state": "ABSENT",
-          "evidence": [],
-          "owner_issue": 348
+          "state": "PASS",
+          "evidence": [
+            "skills/github-delivery-loop/tests/refactor-proof/refactor_ab.py",
+            "skills/github-delivery-loop/tests/refactor-proof/verify.sh"
+          ],
+          "note": "Every treatment runs the same two local oracles as real subprocesses on a tree that differs only in SKILL.md: the portable-core contract, and a route probe that must refuse a planted out-of-schema receipt. Zero network, fixtures only; no forge, provider or model is contacted."
         },
         "golden_proof_registered": {
-          "state": "ABSENT",
-          "evidence": [],
-          "owner_issue": 348
+          "state": "PASS",
+          "evidence": [
+            "skills/skill-refactor-proof-loop/references/golden-proof-registry.json",
+            "skills/github-delivery-loop/modules/traceability-index.md"
+          ]
         },
         "live_model_runtime_ab": {
           "state": "NOT_IMPLEMENTED",
@@ -607,9 +623,13 @@
           "note": "Publication receipts are delivery evidence, not a matched model/runtime comparison."
         },
         "molecular_traceability": {
-          "state": "ABSENT",
-          "evidence": [],
-          "owner_issue": 348
+          "state": "PARTIAL",
+          "evidence": [
+            "skills/github-delivery-loop/modules/traceability-index.md",
+            "skills/skill-refactor-proof-loop/references/refactor-proof-stack.json"
+          ],
+          "owner_issue": 348,
+          "note": "DEC-DELIVERY-14 binds the decision to the commits, the entrypoint and the registry entry, but the zero-network checkers cannot observe issue #348's own PR, review or merge state, and this leaf has no node in the Stack index. PASS is refused by design, not pending."
         }
       }
     },

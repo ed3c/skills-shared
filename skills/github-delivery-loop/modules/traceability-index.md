@@ -44,6 +44,7 @@ A missing link is named explicitly. Similar content or a later branch does not s
 | `DEC-DELIVERY-13` | Draft-first can create a zero-step skipped check before the one real execution. Capture binds the Actions job endpoint and step count; only a proved zero-step `skipped` job is non-execution. Unknown step provenance remains ambiguous, two real executions still block, and billing annotations still open the circuit. | `github_actions_snapshot.py`, issue #265 exact consumer-run receipt |
 | `DEC-DELIVERY-09` | An absent open pull request does not prove an absent remote branch; the initial boundary requires an independently observed `refs/heads/<exact>`. | `github_actions_snapshot.py --strict`, issue #70 |
 | `DEC-DELIVERY-08` | Documentation explains state and ownership but cannot become a second API or evidence authority. | [`../README.md`](../README.md), issues #78 and PR #80 |
+| `DEC-DELIVERY-14` | This Skill's own generalization is proof-carrying: the pre-refactor body and the refactor exactly as it landed stay frozen at their historical blob identities, the strength the landed refactor dropped stays named and scored rather than edited away, and the live body must dominate both. Registered as a golden proof at `L3_HERMETIC_REAL_TASK`; live model/runtime comparison remains `NOT_IMPLEMENTED` and merge remains Human Admit. | [`../tests/refactor-proof/refactor_ab.py`](../tests/refactor-proof/refactor_ab.py), [`../scripts/delivery_receipt.schema.json`](../scripts/delivery_receipt.schema.json), commits `bca8e5a` (#242) and `9a14f52`, issue #348, [`../../skill-refactor-proof-loop/references/golden-proof-registry.json`](../../skill-refactor-proof-loop/references/golden-proof-registry.json) |
 
 ## 4. Canonical publication-policy line
 
@@ -129,6 +130,7 @@ The machine inventory is [`../evals.json`](../evals.json). Key families:
 | `DELIVERY-5` | CI publication | exact-HEAD local receipt and admitted intent | draft checkpoint, stale SHA, reused feedback, billing circuit rejected |
 | evidence producers | local receipt and GitHub snapshot | fixed commands / one PR / exact workflow + check | shell strings, unsafe env, workflow-path drift, same-workflow rerun, multiple PRs, stale check, malformed billing rejected |
 | reference causality | source/evidence binding | exact implementation subject | reference-only or stale evidence rejected |
+| `DELIVERY-12` | frozen refactor treatments | pre-refactor and as-landed bodies at their historical blobs, matched task per treatment | edited frozen bytes and a candidate that drops the restored index-discipline claim rejected |
 
 ## 10. Current status summary
 

@@ -26,6 +26,7 @@ class DeliveryError(ValueError):
 
 COMMIT_RE = re.compile(r"[0-9a-f]{40}")
 REPO_RE = re.compile(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+")
+RECEIPT_SCHEMA_PATH = Path(__file__).resolve().parent / "delivery_receipt.schema.json"
 
 
 def _load_json(path: Path) -> dict[str, Any]:
@@ -45,6 +46,34 @@ def _relative(raw: Any, field: str) -> Path:
     if value.is_absolute() or ".." in value.parts:
         raise DeliveryError(f"unsafe path in {field}: {raw}")
     return Path(*value.parts)
+
+
+def _receipt_shape_failures(receipt: dict[str, Any]) -> list[str]:
+    """Assert the receipt's machine shape, separately from its semantics.
+
+    The semantic checks below read named fields one at a time, so a receipt could
+    carry an unknown field, a misspelled one, or a well-formed value of the wrong
+    type in a field nobody happened to read, and still pass every assertion this
+    file makes. Shape is a property of the whole document; keeping it in a schema
+    means a shape drift and a semantic drift produce different failures instead of
+    one masking the other.
+    """
+    try:
+        from jsonschema import Draft202012Validator
+    except ImportError as error:  # fail closed: an unverifiable shape is not a pass
+        raise DeliveryError(f"receipt shape gate unavailable: {error}") from error
+    schema = _load_json(RECEIPT_SCHEMA_PATH)
+    try:
+        Draft202012Validator.check_schema(schema)
+    except Exception as error:  # noqa: BLE001 - jsonschema raises its own error types
+        raise DeliveryError(f"unusable receipt schema: {error}") from error
+    return [
+        f"{'/'.join(str(part) for part in error.absolute_path) or '<root>'}: {error.message}"
+        for error in sorted(
+            Draft202012Validator(schema).iter_errors(receipt),
+            key=lambda error: list(error.absolute_path),
+        )
+    ]
 
 
 def _github_url(value: Any, field: str, repository: str, kind: str) -> str | None:
@@ -96,6 +125,11 @@ def _validate_line(line: dict[str, Any], repo_root: Path) -> list[str]:
         receipt = _load_json(receipt_path)
     except DeliveryError as error:
         return [f"{line_id}: {error}"]
+
+    failures.extend(
+        f"RECEIPT-SHAPE {line_id}: {problem}"
+        for problem in _receipt_shape_failures(receipt)
+    )
 
     if receipt.get("schema") != "github-delivery-receipt/v1":
         failures.append(f"{line_id}: invalid receipt schema")
