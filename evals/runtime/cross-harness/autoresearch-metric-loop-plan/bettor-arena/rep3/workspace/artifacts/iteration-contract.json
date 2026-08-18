@@ -1,0 +1,22 @@
+{
+  "Goal": "Maximize lint pass rate for skills/autoresearch-composer/ by generating bounded candidate improvements, running a numeric verifier after each candidate, and halting when improvement evidence is sufficient or the budget is exhausted.",
+  "Scope": "skills/autoresearch-composer/SKILL.md and skills/autoresearch-composer/modules/ — all files reachable from the skill entry point, excluding external references and host-adapter layers outside this directory.",
+  "Metric": "lint_pass_rate = (lint_rules_passing / lint_rules_total) * 100  — a float in [0, 100] produced by the verifier after every candidate run. Baseline is frozen from the first verifier execution before any candidate is generated (CORE-LAW-001).",
+  "Direction": "maximize",
+  "Verify": "Run scripts/check_skill_core_boundaries.py --skill autoresearch-composer plus any markdown/YAML/controlled-language linters registered for this skill. The verifier must emit a JSON object with keys {passes: int, total: int, score: float, violations: [string]} written to evals/verifiers/autoresearch-lint-result.json. Adoption requires score_candidate > score_baseline with zero hard-law violations (CORE-LAW-003).",
+  "Guard": "Invariant assertions checked before each ADOPT transition: (1) PORTABLE_CORE_START…END block is structurally intact — state machine, hard laws CORE-LAW-001 through CORE-LAW-005, and procedure steps are present and not narrowed; (2) no new ABSENT or NOT_IMPLEMENTED evidence states are introduced without an explicit justification comment; (3) score_candidate >= score_baseline (no lint regression from any single iteration); (4) module authority has not widened beyond the runner/host-binding role defined by CORE-LAW-004. Any guard failure stops iteration with state=BLOCK and requires Human Admit before resumption.",
+  "Iterations": {
+    "max": 5,
+    "early_stop_conditions": [
+      "ADOPT: score_candidate > score_baseline with all guard assertions passing",
+      "BLOCK: any guard assertion fails",
+      "NO_UPLIFT: two consecutive iterations produce score_candidate <= score_baseline",
+      "BUDGET_EXHAUSTED: iteration count reaches max"
+    ],
+    "per_iteration_contract": {
+      "candidate_generation": "smallest change expected to fix one or more identified lint violations without altering frozen objective or evaluator",
+      "matching_requirement": "baseline and candidate cells must differ only by the treatment change — same verifier version, same input files minus the treatment diff (CORE-LAW-002)",
+      "lineage": "each iteration records {iteration_n, baseline_score, candidate_score, delta, violations_before, violations_after, decision, reason}"
+    }
+  }
+}

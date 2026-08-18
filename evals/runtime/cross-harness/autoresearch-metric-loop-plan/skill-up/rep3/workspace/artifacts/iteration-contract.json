@@ -1,0 +1,45 @@
+{
+  "Goal": "Maximize lint pass rate across the codebase by iteratively fixing lint violations within a finite budget, stopping early when the pass rate reaches 100% or the guard fires.",
+  "Scope": "All source files matched by the project lint configuration (e.g. eslint / ruff / golangci-lint), excluding generated files and vendored dependencies.",
+  "Metric": "lint_pass_rate — ratio of files (or rules) with zero violations to total files (or rules) checked, expressed as a float in [0.0, 1.0].",
+  "Direction": "maximize",
+  "Verify": {
+    "tool": "numeric_verifier",
+    "description": "After each iteration run the linter in check-only mode, parse its output, compute lint_pass_rate = (total_files - files_with_violations) / total_files, and compare to the value from the previous iteration. The iteration is accepted only if lint_pass_rate strictly increases. If the rate does not improve, the iteration is rejected and counted toward the stall budget.",
+    "command_template": "lint_check && python scripts/compute_lint_rate.py --output evidence/metric_snapshot.json",
+    "acceptance_condition": "metric_after > metric_before"
+  },
+  "Guard": {
+    "name": "invariant_guard",
+    "description": "Hard constraints that must hold after every accepted iteration. If any guard fires the loop halts immediately regardless of remaining budget.",
+    "invariants": [
+      {
+        "id": "no_test_deletion",
+        "rule": "git diff --name-only HEAD | grep -E '(test|spec)' must return empty — no test files may be deleted or emptied."
+      },
+      {
+        "id": "build_must_pass",
+        "rule": "The project build (compile / type-check) must succeed after every lint fix; a lint fix that breaks the build is rolled back."
+      },
+      {
+        "id": "no_logic_change",
+        "rule": "Only whitespace, formatting, import ordering, and trivially-safe auto-fixable rules are applied. Any rule that requires semantic understanding is skipped and logged."
+      },
+      {
+        "id": "metric_monotone",
+        "rule": "lint_pass_rate must be non-decreasing across accepted iterations; a regression fires the guard and halts the loop."
+      }
+    ]
+  },
+  "Iterations": {
+    "max": 10,
+    "stall_limit": 2,
+    "description": "Run at most 10 fix iterations. If lint_pass_rate fails to improve in 2 consecutive iterations the loop terminates early (stall_limit). Each iteration applies the linter's --fix flag to the highest-violation files first (greedy ordering by violation count), then runs the numeric verifier. The loop also terminates early on guard fire or when lint_pass_rate reaches 1.0.",
+    "termination_conditions": [
+      "lint_pass_rate == 1.0",
+      "iteration_count >= max",
+      "consecutive_stalls >= stall_limit",
+      "any invariant_guard fires"
+    ]
+  }
+}

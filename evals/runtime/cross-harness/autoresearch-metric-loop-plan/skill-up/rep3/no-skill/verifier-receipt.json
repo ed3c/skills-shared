@@ -1,0 +1,14 @@
+{
+  "authority": "deterministic",
+  "case_id": "autoresearch-metric-loop-plan",
+  "input_digest": "2f2177747dfbbd0e893896cb7761b05dbe1969aad8d0aebb7b3efb50386b13a0",
+  "notes": null,
+  "passed": true,
+  "replay_command": "python3 /private/tmp/claude-501/wt-2937/evals/verifiers/verify_autoresearch_contract.py --case autoresearch-metric-loop-plan",
+  "run_id": "e62d7268cc39c57b545aa0ae",
+  "schema_version": "skill-eval-verifier-receipt/v1",
+  "verifier": {
+    "implementation_sha256": "819205af4577f98809465131b018b9fb4d471e8e2c21d42d7e7a5667dbc78c1b",
+    "kind": "script"
+  }
+}

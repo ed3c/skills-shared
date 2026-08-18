@@ -1,0 +1,24 @@
+{
+  "Goal": "Maximize lint pass rate for the target codebase by iteratively applying automated fixes and validating each iteration against a numeric threshold, halting when the pass rate reaches 100% or the iteration budget is exhausted.",
+  "Scope": "All source files matched by the project lint configuration (e.g., *.ts, *.tsx, *.js under src/); excludes generated files, vendored third-party code, and files listed in .eslintignore or equivalent.",
+  "Metric": "lint_pass_rate — ratio of lint-clean files to total in-scope files, expressed as a float in [0.0, 1.0]. Computed by running the linter in check mode (no auto-fix) and dividing (total_files - error_file_count) / total_files.",
+  "Direction": "maximize — each iteration must produce a strictly higher lint_pass_rate than the previous iteration's recorded baseline; a flat or regressing iteration is treated as a failed attempt and does not advance the budget counter for productive steps.",
+  "Verify": "After every fix attempt, re-run the linter in check-only mode and parse its JSON output to extract (error_file_count, total_files). Compute lint_pass_rate = (total_files - error_file_count) / total_files. Assert: (a) lint_pass_rate >= previous_pass_rate (non-regression guard), (b) lint_pass_rate is a finite float in [0.0, 1.0], (c) total_files equals the baseline file count (no files were silently excluded). Emit the triple (iteration_number, lint_pass_rate, delta) to evidence/iterations.jsonl before proceeding.",
+  "Guard": "Invariant: total_files_in_scope must remain constant across all iterations (baseline established at iteration 0). If total_files changes, halt immediately with status=INVARIANT_VIOLATION and surface the diff of added/removed files. Secondary guard: no file that was lint-clean at iteration N may have new lint errors introduced at iteration N+1 (no regression on previously-passing files). Both guards are evaluated before recording a successful iteration.",
+  "Iterations": {
+    "budget": 10,
+    "termination_conditions": [
+      "lint_pass_rate == 1.0 (all files pass — success)",
+      "iteration_count == budget and lint_pass_rate < 1.0 (budget exhausted — partial success, emit final report)",
+      "Guard violation detected (halt immediately — emit INVARIANT_VIOLATION report)",
+      "Two consecutive iterations with delta == 0 (stuck — halt with status=STALLED)"
+    ],
+    "iteration_structure": {
+      "step_1": "Record baseline lint_pass_rate (iteration 0, no changes).",
+      "step_2": "Identify the highest-frequency lint rule responsible for the most failing files.",
+      "step_3": "Apply targeted auto-fix or minimal manual patch for that rule class only.",
+      "step_4": "Run Verify protocol; check Guard invariants.",
+      "step_5": "If guards pass and metric improved, commit iteration and increment counter; else rollback and halt or retry with a different rule class."
+    }
+  }
+}

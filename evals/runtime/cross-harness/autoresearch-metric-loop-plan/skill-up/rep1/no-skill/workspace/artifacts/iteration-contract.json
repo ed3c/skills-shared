@@ -1,0 +1,28 @@
+{
+  "Goal": "Maximize lint pass rate across the target codebase by iteratively applying automated fixes and re-evaluating until the budget is exhausted or the guard condition is triggered.",
+  "Scope": "All source files matched by the project linter configuration (e.g., ESLint, Ruff, or equivalent); excludes generated files, vendored dependencies, and files explicitly suppressed in the lint ignore list.",
+  "Metric": "lint_pass_rate — fraction of lint rules that pass over total rules checked, expressed as a float in [0.0, 1.0]. Computed by: passed_rules / total_rules after each iteration.",
+  "Direction": "maximize",
+  "Verify": {
+    "type": "numeric",
+    "description": "After each iteration, run the linter in check-only mode and parse its structured output (JSON or SARIF). Compute lint_pass_rate = (total_rules - violated_rules) / total_rules. Accept the iteration's changes only if lint_pass_rate is strictly greater than the value recorded at the start of that iteration (monotone improvement gate). If the rate is unchanged or regresses, reject the patch and record a non-improvement event.",
+    "command_template": "lint-check --format=json | python3 -c \"import sys,json; r=json.load(sys.stdin); total=r['total']; fail=r['violations']; print((total-fail)/total)\"",
+    "acceptance_threshold": "lint_pass_rate > previous_lint_pass_rate"
+  },
+  "Guard": {
+    "type": "invariant",
+    "description": "No existing passing rule may be converted to a failing rule by any patch. Before committing an iteration's changes, diff the set of currently-passing rules against the baseline set recorded at iteration 0. If any rule that was passing at baseline is now failing, the invariant is violated — reject the patch immediately and terminate the loop with status=GUARD_VIOLATED.",
+    "check": "baseline_passing_rules ⊆ current_passing_rules",
+    "on_violation": "reject patch, do not advance iteration counter, emit FATAL with diff of regressions, halt loop"
+  },
+  "Iterations": {
+    "max": 10,
+    "termination_conditions": [
+      "lint_pass_rate reaches 1.0 (all rules pass)",
+      "two consecutive iterations produce no improvement (stagnation)",
+      "Guard invariant is violated",
+      "max iteration count (10) is reached"
+    ],
+    "budget_note": "Each iteration constitutes one lint-fix-verify cycle. Iteration counter increments only on accepted (non-guard-violating, improvement-confirmed) patches."
+  }
+}

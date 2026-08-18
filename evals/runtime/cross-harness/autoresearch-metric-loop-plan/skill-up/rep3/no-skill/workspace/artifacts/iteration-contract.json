@@ -1,0 +1,9 @@
+{
+  "Goal": "Improve lint pass rate from baseline toward 100% by iteratively fixing lint violations, stopping when the metric stops improving or the iteration budget is exhausted.",
+  "Scope": "All source files tracked by the repository's configured linter (e.g. ESLint, Ruff, golangci-lint). Excludes generated files and vendored dependencies declared in lint-ignore lists.",
+  "Metric": "lint_pass_rate — the ratio of files with zero lint errors to total linted files, expressed as a percentage (0–100). Computed by running the project linter in machine-readable mode and counting clean files.",
+  "Direction": "maximize — each iteration must produce a metric value strictly greater than the previous iteration's value to be accepted; a tie or regression causes the guard to halt the loop.",
+  "Verify": "After each iteration run `lint --format=json | jq '[.[] | select(.errorCount==0)] | length / [.[]] | length * 100'` (or equivalent for the project linter) and compare the resulting float to the prior iteration's stored value. Accept only if new_value > prior_value.",
+  "Guard": "Invariant: lint_pass_rate must be monotonically non-decreasing across accepted iterations. If any accepted iteration produces a value ≤ the prior accepted value, immediately halt the loop, roll back the last change, and emit a GUARD_VIOLATION event with both values. This prevents regressions from being masked by later improvements.",
+  "Iterations": 8
+}
