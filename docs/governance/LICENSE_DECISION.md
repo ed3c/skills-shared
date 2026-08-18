@@ -168,6 +168,15 @@ licenses, not a case where one candidate fails a hard constraint — which is
 exactly why #360 reserves it for Human/Legal admission rather than treating
 it as automatic.
 
+## Activation record
+
+**2026-08-18 — the owner selected Apache-2.0** (decision given interactively
+in the delivery session). `LICENSE`, `NOTICE` and `THIRD_PARTY_NOTICES.md`
+were activated at the repository root from the drafts below, byte-identical.
+The MIT draft remains staged as the record of the road not taken. From this
+commit on, statements above saying no root `LICENSE` exists describe the
+pre-activation state this decision was made in, not the current tree.
+
 ## 7. Left explicitly to the human owner
 
 Per #360's own "Human boundary": license selection, copyright assertion,
