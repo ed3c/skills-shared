@@ -1,0 +1,18 @@
+skills-shared
+Copyright 2026 ed3c
+
+This product is licensed under the Apache License, Version 2.0. See the
+LICENSE file for the full license text.
+
+This distribution does not bundle, vendor, or redistribute any third-party
+source code, binaries, or license texts. It is consumed as a Git checkout of
+Markdown Skill bodies and Python verification scripts; third-party Python
+packages named in docs/governance/LICENSE_DECISION.md and
+THIRD_PARTY_NOTICES.md are installed separately by the consuming environment
+(CI runner or local toolchain) under their own licenses, which travel with
+those packages and are not altered or relicensed by this NOTICE.
+
+This NOTICE file is required only if the Apache License, Version 2.0 is the
+license the copyright owner activates for this repository (see
+docs/governance/LICENSE_DECISION.md). It is not applicable if MIT is
+activated instead; MIT does not use a NOTICE mechanism.
