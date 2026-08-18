@@ -77,7 +77,10 @@ mechanism nobody can refute is `UNOBSERVABLE_MECHANISM`, not a design input.
 Reviews the same immutable subject and writes no state of its own. It owns the
 lane-substitution refusal: a deterministic oracle closing a user or paid
 requirement is the cheapest laundering path available and the one most likely to
-be reported as progress.
+be reported as progress. When the subject is a product claiming a problem is
+closed, this surface produces a `product-closure-audit.schema.json` artifact and
+nothing else — findings, reopened obligations and proposed issue deltas, none of
+which carry write authority.
 
 ## `STAGE_7_TECH_LEAD_PLANNER`
 
