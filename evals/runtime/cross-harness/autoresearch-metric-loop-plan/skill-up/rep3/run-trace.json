@@ -1,0 +1,46 @@
+{
+  "artifacts": [
+    "evidence/run.json",
+    "artifacts/iteration-contract.json"
+  ],
+  "case_id": "autoresearch-metric-loop-plan",
+  "condition": "candidate_skill",
+  "environment": {
+    "fresh_workspace": true,
+    "network_policy": "model-api-egress",
+    "runtime": "skill-up:none"
+  },
+  "harness": {
+    "name": "skill-up",
+    "version": "425e3f5a0c23e80f2c7933785d54c53ffe01b40c"
+  },
+  "metrics": {
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "retries": 0,
+    "tool_calls": 0,
+    "wall_seconds": 38.974
+  },
+  "model": {
+    "name": "claude-sonnet-4-6",
+    "provider": "anthropic"
+  },
+  "outcome": {
+    "failure_class": null,
+    "passed": true,
+    "verifier": "deterministic-script"
+  },
+  "routing": {
+    "did_invoke": true,
+    "selected_skill": "autoresearch-composer",
+    "should_invoke": true
+  },
+  "run_id": "b7b3f69e1f7c287392174b65",
+  "sampling": {
+    "index": 3,
+    "kind": "repetition",
+    "seed": null
+  },
+  "schema_version": "skill-eval-run/v1",
+  "skill_sha": "85e6723869bdd545666e07b7c5c6a8f491256cb9"
+}

@@ -18,6 +18,13 @@ def main() -> int:
     p = argparse.ArgumentParser()
     p.add_argument("--executor-evidence", required=True); p.add_argument("--verifier-receipt", required=True)
     p.add_argument("--routing-evidence", required=True); p.add_argument("--output", required=True)
+    # Both fields were hardcoded to skill-up's environment, so any second
+    # harness's trace claimed it had run under skill-up, and every physical run
+    # claimed no-network while its agent was talking to a model API. The
+    # defaults keep existing skill-up callers byte-identical; a caller that
+    # knows better must say so.
+    p.add_argument("--runtime", default="skill-up:none")
+    p.add_argument("--network-policy", default="no-network")
     args = p.parse_args()
     try:
         executor = load(Path(args.executor_evidence)); receipt = load(Path(args.verifier_receipt)); routing = load(Path(args.routing_evidence))
@@ -44,7 +51,7 @@ def main() -> int:
             "run_id": executor["run_id"], "case_id": executor["case_id"], "condition": condition,
             "skill_sha": executor.get("skill_sha"), "model": executor["model"],
             "harness": {"name": executor["harness"]["name"], "version": executor["harness"]["version"]},
-            "environment": {"runtime": "skill-up:none", "fresh_workspace": True, "network_policy": "no-network"},
+            "environment": {"runtime": args.runtime, "fresh_workspace": True, "network_policy": args.network_policy},
             "sampling": canonical_sampling,
             "outcome": {"passed": bool(receipt.get("passed")), "verifier": "deterministic-script", "failure_class": None if receipt.get("passed") else "weak-verification"},
             "routing": {"should_invoke": condition != "no_skill", "did_invoke": routing.get("decision") == "invoke", "selected_skill": routing.get("selected_skill")},

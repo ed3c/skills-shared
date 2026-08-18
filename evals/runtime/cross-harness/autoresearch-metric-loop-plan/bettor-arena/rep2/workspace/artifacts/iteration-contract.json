@@ -1,0 +1,32 @@
+{
+  "Goal": "Increase lint pass rate of the autoresearch-composer skill codebase by iteratively proposing and evaluating lint-rule-compliant candidates until the pass rate reaches 100 % or the iteration budget is exhausted.",
+  "Scope": "All source files covered by the project's configured linter (e.g., ESLint, Ruff, or shellcheck) under skills/autoresearch-composer/ and its referenced modules.",
+  "Metric": "lint_pass_rate — proportion of lint checks that exit with status 0 out of total checks run, expressed as a float in [0.0, 1.0].",
+  "Direction": "maximize",
+  "Verify": {
+    "tool": "numeric verifier",
+    "procedure": "Run the project linter in non-fix mode and parse its exit codes and error-count output. Compute lint_pass_rate = (total_checks - failing_checks) / total_checks. The verifier must return a JSON object with keys: baseline_rate (float), candidate_rate (float), delta (float), checks_total (int), checks_failed (int).",
+    "baseline_binding": "Freeze the lint_pass_rate measured on HEAD before generating any candidate. Store as baseline_rate in each iteration's result record.",
+    "matched_identity": "Baseline and candidate runs must use the same linter binary, version, configuration file, and file set. Only the source under treatment differs."
+  },
+  "Guard": {
+    "name": "invariant_guard",
+    "invariants": [
+      "candidate_rate >= baseline_rate  — no regression allowed; if candidate_rate < baseline_rate the candidate is REJECTED and the arm is preserved as FAIL.",
+      "lint_pass_rate never decreases across adopted iterations  — each ADOPT must record a strictly non-decreasing sequence of accepted rates.",
+      "No new lint rules may be suppressed or disabled to inflate pass rate  — any suppression directive introduced by the candidate triggers BLOCK + Human-Admit-Required.",
+      "Hard-gate: if lint_pass_rate == 1.0 after candidate application, stop immediately with HANDOFF(terminal=PASS).",
+      "Hard-gate: if three consecutive candidates produce delta == 0 (no-uplift) the loop stops with HANDOFF(terminal=STALLED)."
+    ]
+  },
+  "Iterations": {
+    "budget": 5,
+    "per_iteration": {
+      "generate": "Produce the smallest diff expected to fix the highest-density lint cluster (fewest files, most errors eliminated).",
+      "run": "Apply candidate diff to a matched subject branch, re-run verifier, record result.",
+      "decide": "ADOPT if candidate_rate > baseline_rate and all invariants pass; REJECT otherwise; BLOCK if any suppression directive detected; ITERATE if budget remaining and expected gain positive.",
+      "lineage": "Each iteration record must include: iteration_id (int), baseline_rate (float), candidate_rate (float), delta (float), decision (ADOPT|REJECT|BLOCK|ITERATE), reason (str), remaining_budget (int)."
+    },
+    "terminal_states": ["PASS", "STALLED", "BUDGET_EXHAUSTED", "BLOCK", "HARD_REGRESSION"]
+  }
+}

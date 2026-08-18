@@ -1,0 +1,153 @@
+{
+  "skill_name": "autoresearch-composer",
+  "schema_version": "v1alpha1",
+  "engine_name": "claude_code",
+  "model_name": "anthropic/claude-sonnet-4-6",
+  "start_time": "2026-08-18T17:44:27.843688+08:00",
+  "end_time": "2026-08-18T17:46:39.743722+08:00",
+  "case_results": [
+    {
+      "case_id": "autoresearch-metric-loop-plan",
+      "title": "skills-shared runtime export: autoresearch-metric-loop-plan",
+      "status": "PASS",
+      "duration_ms": 40490,
+      "turns": 1,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "correct skill is selected",
+            "passed": true,
+            "evidence": "evidence/run.json contains `\"selected_skill\": \"autoresearch-composer\"` and `\"decision\": \"invoke\"`. The final message also explicitly states: \"`autoresearch-composer` 技能被選定為執行此計畫的協調器，因為它具備多輪研究迴圈與指標驅動終止條件的原生支援。\" Both match the expected skill named in the user prompt."
+          },
+          {
+            "text": "Goal Scope Metric Direction Verify Guard Iterations are all materialized",
+            "passed": true,
+            "evidence": "artifacts/iteration-contract.json contains all 7 required non-empty keys: Goal (\"Maximize lint pass rate across the codebase...\"), Scope (\"All source files tracked by the repository's configured linter...\"), Metric (\"lint_pass_rate — the ratio of lint-clean files to total linted files...\"), Direction (\"maximize\"), Verify (\"After each iteration, run `linter --format json` and compute pass_rate...\"), Guard (\"Invariant: lint_pass_rate must never decrease across accepted iterations...\"), and Iterations ({\"budget\": 10, \"early_stop_condition\": \"lint_pass_rate \u003e= 0.95 OR two consecutive iterations produce delta \u003c 0.001\", \"per_iteration_steps\": [7 steps]}). All keys are present and contain substantive content."
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        },
+        "judge_context": {
+          "profile": "standard",
+          "materialized_dir": "judge/context",
+          "manifest": {
+            "profile": "standard",
+            "materialized_dir": "judge/context",
+            "materials": [
+              {
+                "key": "final_message",
+                "mode": "include",
+                "path": "judge/context/final_message.txt",
+                "bytes": 1326,
+                "original_bytes": 1326
+              },
+              {
+                "key": "transcript",
+                "mode": "file_ref",
+                "path": "judge/context/transcript.json",
+                "bytes": 2227,
+                "original_bytes": 2227
+              },
+              {
+                "key": "workspace_diff",
+                "mode": "omit",
+                "bytes": 0
+              },
+              {
+                "key": "generated_files",
+                "mode": "omit",
+                "bytes": 0
+              }
+            ]
+          },
+          "prompt_delivery": "inline",
+          "prompt_bytes": 2772
+        }
+      },
+      "configuration": "with_skill",
+      "prompt": "Plan a bounded optimization loop that improves lint pass rate using a numeric verifier, an invariant guard, and a finite iteration budget.\n\nRuntime evidence protocol (required for this evaluation):\n- Do not only describe the plan in chat. Materialize `artifacts/iteration-contract.json` as a JSON object with non-empty keys: Goal, Scope, Metric, Direction, Verify, Guard, Iterations.\n- Materialize `evidence/run.json` as JSON with: case_id=`autoresearch-metric-loop-plan`, decision=`invoke`, selected_skill=`autoresearch-composer`, and plan_artifact=`artifacts/iteration-contract.json`.\n- These files are machine-verified after the agent exits. Do not claim success unless both files exist and match the requested contract.",
+      "response": "兩個物化檔案均已建立。以下是計畫摘要：\n\n---\n\n## 有界 Lint 最佳化迴圈計畫\n\n### 核心結構\n\n**目標 (Goal)**：迭代提升 lint 通過率，直到達到 0.95 閾值或用盡預算。\n\n**指標 (Metric)**：`lint_pass_rate = (total_files - error_files) / total_files`，由 linter 的 JSON 輸出即時計算，每次迭代前後各量測一次。\n\n**方向 (Direction)**：最大化（maximize）。\n\n### 三道保護機制\n\n| 機制 | 作用 |\n|------|------|\n| **數值驗證器** | 每輪迭代後執行 `linter --format json`，計算精確 pass_rate 浮點值並與前輪比較 |\n| **不變量守衛** | 若新 pass_rate \u003c 快照值，立即 `git restore` 回滾本輪所有變更，發出 `GUARD_VIOLATION` 事件 |\n| **有限迭代預算** | 最多 10 輪；提前終止條件：pass_rate ≥ 0.95 **或**連續兩輪 delta \u003c 0.001 |\n\n### 每輪流程（7 步）\n\n1. 快照當前 pass_rate\n2. `linter --fix` 自動修復\n3. 重新量測 pass_rate\n4. 守衛判斷：退步 → 回滾 + 記錄違規\n5. 通過 → commit（訊息含迭代索引）\n6. 記錄 `{iteration, snapshot_rate, new_rate, delta, status}`\n7. 檢查提前終止條件\n\n`autoresearch-composer` 技能被選定為執行此計畫的協調器，因為它具備多輪研究迴圈與指標驅動終止條件的原生支援。"
+    },
+    {
+      "case_id": "autoresearch-metric-loop-plan",
+      "title": "skills-shared runtime export: autoresearch-metric-loop-plan",
+      "status": "PASS",
+      "duration_ms": 41697,
+      "turns": 1,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "grading": {
+        "status": "PASS",
+        "turns_executed": 1,
+        "turns_total": 1,
+        "assertion_results": [
+          {
+            "text": "correct skill is selected",
+            "passed": true,
+            "evidence": "evidence/run.json contains \"selected_skill\": \"autoresearch-composer\" and \"decision\": \"invoke\", matching the expected skill for planning a bounded optimization loop."
+          },
+          {
+            "text": "Goal Scope Metric Direction Verify Guard Iterations are all materialized",
+            "passed": true,
+            "evidence": "artifacts/iteration-contract.json contains all 7 required non-empty keys: Goal (maximize lint pass rate), Scope (all source files matched by lint config), Metric (lint_pass_rate = passing_files/total_files * 100), Direction (maximize), Verify (numeric_verifier with re-run protocol and failure_action revert), Guard (invariant_guard with 4 invariants including STALL after 2 consecutive zero-delta iterations), Iterations (max=10 with three early-stop conditions and full iteration_schema)."
+          }
+        ],
+        "summary": {
+          "passed": 2,
+          "failed": 0,
+          "total": 2,
+          "pass_rate": 1
+        },
+        "judge_context": {
+          "profile": "standard",
+          "materialized_dir": "judge/context",
+          "manifest": {
+            "profile": "standard",
+            "materialized_dir": "judge/context",
+            "materials": [
+              {
+                "key": "final_message",
+                "mode": "include",
+                "path": "judge/context/final_message.txt",
+                "bytes": 1074,
+                "original_bytes": 1074
+              },
+              {
+                "key": "transcript",
+                "mode": "file_ref",
+                "path": "judge/context/transcript.json",
+                "bytes": 1949,
+                "original_bytes": 1949
+              },
+              {
+                "key": "workspace_diff",
+                "mode": "omit",
+                "bytes": 0
+              },
+              {
+                "key": "generated_files",
+                "mode": "omit",
+                "bytes": 0
+              }
+            ]
+          },
+          "prompt_delivery": "inline",
+          "prompt_bytes": 2520
+        }
+      },
+      "configuration": "without_skill",
+      "prompt": "Plan a bounded optimization loop that improves lint pass rate using a numeric verifier, an invariant guard, and a finite iteration budget.\n\nRuntime evidence protocol (required for this evaluation):\n- Do not only describe the plan in chat. Materialize `artifacts/iteration-contract.json` as a JSON object with non-empty keys: Goal, Scope, Metric, Direction, Verify, Guard, Iterations.\n- Materialize `evidence/run.json` as JSON with: case_id=`autoresearch-metric-loop-plan`, decision=`invoke`, selected_skill=`autoresearch-composer`, and plan_artifact=`artifacts/iteration-contract.json`.\n- These files are machine-verified after the agent exits. Do not claim success unless both files exist and match the requested contract.",
+      "response": "兩份文件已具現化。以下是合約的核心設計邏輯：\n\n---\n\n**迴圈設計概述**\n\n| 層 | 機制 | 作用 |\n|---|---|---|\n| **Metric** | `lint_pass_rate = passing_files / total_files × 100` | 每輪算一個數字，方向明確（maximize） |\n| **Verify（數值驗證器）** | 每次修復後重跑 lint、比較前後 rate | 只接受真正進步的迭代；失敗則回滾，iteration budget 仍扣除 |\n| **Guard（不變量守門）** | 四條硬性不變量，含連續停滯 2 輪即 STALL | 防止 rate 倒退、防止破壞已通過的檔案、防止無限空轉 |\n| **Iterations** | max = 10，含三個早停條件 | 有界：不管情況如何最多 10 輪後一定終止 |\n\n**關鍵設計決策**：\n- Verify 與 Guard 分兩層——Verify 答「這輪進步了嗎」，Guard 答「整體態勢還健康嗎」，職責不混。\n- STALL 門檻設 2 輪（而非 1）是給一次偶發零進步的容錯空間，但不允許持續耗預算。\n- 回滾是 Verify 失敗的強制動作，避免把壞狀態帶進下一輪的「before」基準。"
+    }
+  ],
+  "total_tokens": 0
+}

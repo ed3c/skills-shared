@@ -1,0 +1,97 @@
+{
+  "artifacts": {
+    "git_diff": "sha256:c7244441088e945172968ebd49203aab6ce8f554139c5f3c2fc305b60de3d8ae",
+    "runner_diagnostics": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout": "sha256:3d7def4ab48907dfac00e0fab980a330450d94c270184c439ab13a343ae1a53a",
+    "test_report": null
+  },
+  "assertions": [
+    {
+      "evidence": [
+        "commit:85e6723869bdd545666e07b7c5c6a8f491256cb9",
+        "tree:e0bc41f15c581e769aab27af325268c94ce8db81"
+      ],
+      "id": "subject-is-requested-commit",
+      "severity": "hard",
+      "status": "PASS"
+    },
+    {
+      "evidence": [
+        "exit_code:0"
+      ],
+      "id": "agent-exited-cleanly",
+      "severity": "advisory",
+      "status": "PASS"
+    },
+    {
+      "evidence": [
+        "path:evidence/run.json"
+      ],
+      "id": "artifact-exists-0",
+      "severity": "hard",
+      "status": "PASS"
+    },
+    {
+      "evidence": [
+        "sha256:e817a3424dbf273dd7056dea6bf927cdb251dcae6168572e436a83746a885f92"
+      ],
+      "id": "artifact-content-0",
+      "severity": "hard",
+      "status": "PASS"
+    },
+    {
+      "evidence": [
+        "path:artifacts/iteration-contract.json"
+      ],
+      "id": "artifact-exists-1",
+      "severity": "hard",
+      "status": "PASS"
+    },
+    {
+      "evidence": [
+        "sha256:69ea79b7b876d05480a18c9189d8cc0ba8c0a48049129015a457fc341e6bed74"
+      ],
+      "id": "artifact-content-1",
+      "severity": "hard",
+      "status": "PASS"
+    }
+  ],
+  "cleanup": {
+    "residue": [],
+    "status": "PASS"
+  },
+  "executed": true,
+  "exit_code": 0,
+  "human_admit_required": true,
+  "isolation": {
+    "environment": "explicit-allowlist",
+    "filesystem": "post-run-diff-boundary-not-os-sandbox",
+    "network": "inherit",
+    "process": "new-process-group-with-timeout",
+    "workspace": "detached-disposable-git-worktree"
+  },
+  "request_id": "autoresearch-metric-loop-plan-arena-candidate_skill-rep2",
+  "runner": {
+    "command_digest": "sha256:3bc0b66c1c6b8182d2cc3ea05f9094214c0e7aead030e99ee2229320db93dad3",
+    "id": "loopctl-local-process",
+    "version": "1"
+  },
+  "schema_version": "skill-execution-receipt/v1",
+  "skill": {
+    "canonical_source": "ed3c/skills-shared/skills/autoresearch-composer",
+    "content_digest": "sha256:ee2cf05c96a123231e39ed851f5315808e88e5a372de81171e25a4ab7413ce40",
+    "name": "autoresearch-composer"
+  },
+  "status": "PASS",
+  "subject": {
+    "commit": "85e6723869bdd545666e07b7c5c6a8f491256cb9",
+    "repository": "ed3c/skills-shared",
+    "tree": "e0bc41f15c581e769aab27af325268c94ce8db81"
+  },
+  "timing": {
+    "duration_ms": 67117,
+    "ended_at": "2026-08-18T09:51:44Z",
+    "started_at": "2026-08-18T09:50:37Z"
+  }
+}

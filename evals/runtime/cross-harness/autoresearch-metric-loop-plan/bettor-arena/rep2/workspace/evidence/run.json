@@ -1,0 +1,21 @@
+{
+  "case_id": "autoresearch-metric-loop-plan",
+  "decision": "invoke",
+  "selected_skill": "autoresearch-composer",
+  "plan_artifact": "artifacts/iteration-contract.json",
+  "routing_rationale": {
+    "skill_match": "autoresearch-composer SKILL.md describes a portable iterative-research composer with a state machine (OBJECTIVE_BOUND → EVALUATOR_FROZEN → BASELINE_BOUND → CANDIDATE_GENERATED → MATCHED_EXPERIMENT_RUN → RESULT_VALIDATED → {ADOPT|REJECT|ITERATE|BLOCK} → HANDOFF) that directly models a bounded optimization loop.",
+    "core_laws_satisfied": [
+      "CORE-LAW-001: objective (maximize lint_pass_rate) and evaluator (numeric verifier) are frozen before candidate generation.",
+      "CORE-LAW-002: baseline and candidate runs share the same linter binary, version, config, and file set.",
+      "CORE-LAW-003: pass rate is measured by the verifier, not inferred from candidate description.",
+      "CORE-LAW-004: the invariant guard (no suppression, no regression) is encoded in Guard.invariants and cannot be widened by modules.",
+      "CORE-LAW-005: iteration budget is 5, with terminal states PASS/STALLED/BUDGET_EXHAUSTED/BLOCK/HARD_REGRESSION."
+    ],
+    "alternatives_rejected": [
+      "autoresearch:fix — narrow repair loop, lacks the objective/evaluator freeze and matched-experiment protocol required here.",
+      "tdd — test-coverage focus, not lint-metric optimization.",
+      "Manual iteration — no invariant guard or budget enforcement."
+    ]
+  }
+}

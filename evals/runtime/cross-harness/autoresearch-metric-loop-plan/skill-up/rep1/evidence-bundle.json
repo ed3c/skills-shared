@@ -1,0 +1,21 @@
+{
+  "artifact_hashes": {
+    "evals/runtime/cross-harness/autoresearch-metric-loop-plan/skill-up/rep1/workspace/artifacts/iteration-contract.json": "794cd0c3832e7b0c10f7f2788c65b1f6f9b5b64bfa6def504a87390361380a2f",
+    "evals/runtime/cross-harness/autoresearch-metric-loop-plan/skill-up/rep1/workspace/evidence/run.json": "83067b78030c1de1602010adb7096a87d3af1809b15579009231d76765338452"
+  },
+  "case_id": "autoresearch-metric-loop-plan",
+  "eval_suite_sha": "85e6723869bdd545666e07b7c5c6a8f491256cb9",
+  "executor_raw_result": "evals/runtime/cross-harness/autoresearch-metric-loop-plan/skill-up/rep1/raw-result.json",
+  "promotion_eligible": true,
+  "replay": {
+    "command": "python3 scripts/verify_collected_runtime.py --case autoresearch-metric-loop-plan --workspace evals/runtime/cross-harness/autoresearch-metric-loop-plan/skill-up/rep1/workspace --run-id e2a24b1fd80cd82f0f28cac4 --output evals/runtime/cross-harness/autoresearch-metric-loop-plan/skill-up/rep1/verifier-receipt.json",
+    "notes": null,
+    "offline_capable": true
+  },
+  "run_id": "e2a24b1fd80cd82f0f28cac4",
+  "run_trace": "evals/runtime/cross-harness/autoresearch-metric-loop-plan/skill-up/rep1/run-trace.json",
+  "schema_version": "skill-eval-evidence/v1",
+  "skill_sha": "85e6723869bdd545666e07b7c5c6a8f491256cb9",
+  "verifier_receipt": "evals/runtime/cross-harness/autoresearch-metric-loop-plan/skill-up/rep1/verifier-receipt.json",
+  "verifier_receipt_sha256": "ce99830f38e10952057ab8d88b5840ac9dd6d9e41cf23f98dd374fa980c361d9"
+}

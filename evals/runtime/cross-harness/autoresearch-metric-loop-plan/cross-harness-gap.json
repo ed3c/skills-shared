@@ -1,0 +1,32 @@
+{
+  "by_stack": {
+    "claude-sonnet-4-6@bettor-arena": {
+      "candidate_skill": {
+        "pass_rate": 1.0,
+        "runs": 3
+      }
+    },
+    "claude-sonnet-4-6@skill-up": {
+      "candidate_skill": {
+        "pass_rate": 1.0,
+        "runs": 3
+      },
+      "no_skill": {
+        "pass_rate": 1.0,
+        "runs": 3
+      }
+    }
+  },
+  "generalization_gap_by_condition": {
+    "candidate_skill": 0.0,
+    "no_skill": null
+  },
+  "paired_agreement": {
+    "comparisons": 3,
+    "disagreement_rate": 0.0,
+    "disagreements": 0,
+    "shared_identities": 3
+  },
+  "schema_version": "cross-harness-gap/v1",
+  "stack_count": 2
+}

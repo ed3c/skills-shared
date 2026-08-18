@@ -1,0 +1,34 @@
+{
+  "Goal": "Maximize lint pass rate across the codebase by iteratively fixing lint violations within a bounded budget",
+  "Scope": "All source files matched by the project lint configuration (e.g., src/**/*.{ts,js,py}); excludes auto-generated files and vendored dependencies",
+  "Metric": "lint_pass_rate = (passing_files / total_files) * 100  — measured as a percentage rounded to two decimal places after each iteration",
+  "Direction": "maximize",
+  "Verify": {
+    "tool": "numeric_verifier",
+    "protocol": "After each fix attempt, re-run the lint tool against the full file set; parse its exit code and violation count; compute lint_pass_rate; assert current_rate > previous_rate before accepting the iteration as progress",
+    "failure_action": "Revert the attempted fix, log the delta as 0, and count the iteration as consumed"
+  },
+  "Guard": {
+    "name": "invariant_guard",
+    "invariants": [
+      "lint_pass_rate must be non-decreasing across accepted iterations (monotonic improvement)",
+      "No iteration may introduce new lint violations in files that were previously clean",
+      "No source file may be deleted or have its public API signature changed as a side-effect of a lint fix",
+      "If lint_pass_rate stalls (delta = 0) for 2 consecutive iterations, the guard raises STALL and halts early"
+    ],
+    "violation_action": "Hard-stop the loop, restore last known-good state, and emit a GUARD_VIOLATION record in the run log"
+  },
+  "Iterations": {
+    "max": 10,
+    "early_stop_condition": "lint_pass_rate reaches 100% OR invariant_guard raises STALL OR GUARD_VIOLATION",
+    "iteration_schema": {
+      "id": "integer 1..max",
+      "files_targeted": "list of file paths attempted this iteration",
+      "lint_pass_rate_before": "numeric",
+      "lint_pass_rate_after": "numeric",
+      "delta": "lint_pass_rate_after - lint_pass_rate_before",
+      "accepted": "boolean",
+      "guard_status": "PASS | STALL | GUARD_VIOLATION"
+    }
+  }
+}

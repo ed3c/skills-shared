@@ -1,0 +1,49 @@
+{
+  "case_id": "autoresearch-metric-loop-plan",
+  "condition": "candidate_skill",
+  "eval_suite_sha": "85e6723869bdd545666e07b7c5c6a8f491256cb9",
+  "harness": {
+    "engine": "claude_code",
+    "name": "bettor-arena",
+    "version": "13ff9840fc5683b33670fa191591035bc96292dc"
+  },
+  "model": {
+    "name": "claude-sonnet-4-6",
+    "provider": "anthropic"
+  },
+  "outcome": {
+    "duration_ms": 75280,
+    "input_tokens": 12,
+    "output_tokens": 3005,
+    "passed": true,
+    "status": "pass",
+    "token_accounting": "PASS",
+    "verifier": "arena/portable-assertions"
+  },
+  "promotion": {
+    "eligible": false,
+    "reason": "executor assertions are not deterministic promotion authority",
+    "required_next_receipt": "skill-eval-verifier-receipt/v1"
+  },
+  "raw_report": {
+    "path": "/private/tmp/claude-501/xh/arena/rep1b/receipt/receipt.json",
+    "sha256": "49923a12c4332bd9500016e3abe12cfe67d6c88d432be5f1cef971e1a95c7adf"
+  },
+  "rebuilt_workspace": {
+    "artifacts": [
+      "evidence/run.json",
+      "artifacts/iteration-contract.json"
+    ],
+    "path": "/private/tmp/claude-501/xh/out/arena/rep1/workspace"
+  },
+  "run_id": "8b120dc7154a894a5316410f",
+  "sampling": {
+    "model_seed": null,
+    "repetition_index": 1,
+    "seed_controlled": false
+  },
+  "schema_version": "skill-eval-executor-evidence/v1",
+  "skill": "autoresearch-composer",
+  "skill_delivery": "canonical-path-in-worktree",
+  "skill_sha": "85e6723869bdd545666e07b7c5c6a8f491256cb9"
+}

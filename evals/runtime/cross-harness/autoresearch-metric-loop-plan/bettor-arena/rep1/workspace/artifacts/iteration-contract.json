@@ -1,0 +1,9 @@
+{
+  "Goal": "Improve lint pass rate for autoresearch-composer skill outputs by iteratively generating candidates, scoring them against a frozen evaluator, and adopting only evidence-supported improvements within a finite budget.",
+  "Scope": "autoresearch-composer skill — portable core state machine (OBJECTIVE_BOUND → HANDOFF); excludes domain-specific modules, merge authority, and secret/runtime expansion.",
+  "Metric": "lint_pass_rate — ratio of lint-clean outputs (zero lint violations) to total outputs evaluated per iteration cell, expressed as a float in [0.0, 1.0].",
+  "Direction": "maximize — each candidate iteration must demonstrate a non-negative delta in lint_pass_rate relative to the frozen baseline; zero-delta iterations are rejected, not adopted.",
+  "Verify": "numeric verifier: run lint suite (e.g., eslint/pylint/markdownlint as applicable) against baseline and candidate outputs in matched cells; record raw pass/fail counts and compute lint_pass_rate for each cell; compare candidate rate minus baseline rate; adopt only if delta > 0 and no hard gate regression.",
+  "Guard": "invariant guard: (1) CORE-LAW-001 — objective and evaluator definition locked before first candidate is generated and cannot be mutated mid-loop; (2) CORE-LAW-002 — baseline and candidate cells must share identical non-treatment identities (same subject, same budget, same runner); (3) CORE-LAW-003 — candidate prose or runner success message is not evidence of improvement — only numeric verifier output counts; (4) regression gate — any iteration that introduces a lint_pass_rate below the frozen baseline immediately enters BLOCK state and stops the loop.",
+  "Iterations": 5
+}

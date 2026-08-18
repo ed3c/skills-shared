@@ -1,0 +1,21 @@
+{
+  "Goal": "Maximize lint pass rate across the codebase by iteratively applying automated fixes and targeted refactors, stopping only when the rate reaches the target threshold or the iteration budget is exhausted.",
+  "Scope": "All source files tracked by the repository's configured linter (e.g., ESLint, Ruff, golangci-lint), excluding generated files and vendor directories.",
+  "Metric": "lint_pass_rate — the ratio of lint-clean files to total linted files, expressed as a float in [0.0, 1.0] and measured by running the linter in check-only mode and parsing its exit code plus structured JSON output.",
+  "Direction": "maximize",
+  "Verify": "After each iteration, run `linter --format json` and compute pass_rate = (total_files - error_files) / total_files. Compare against the previous iteration's pass_rate. An iteration is accepted only if pass_rate >= previous_pass_rate (monotone non-regression). If pass_rate drops, roll back the iteration's changes and mark iteration as FAILED.",
+  "Guard": "Invariant: lint_pass_rate must never decrease across accepted iterations. Implementation — before committing any fix batch, snapshot the current pass_rate; after applying fixes, re-measure; if new_rate < snapshot_rate, revert all changes in this batch via git restore and log a GUARD_VIOLATION event. Additionally, no iteration may introduce new lint rule categories not present in the baseline violation set (scope creep guard).",
+  "Iterations": {
+    "budget": 10,
+    "early_stop_condition": "lint_pass_rate >= 0.95 OR two consecutive iterations produce delta < 0.001",
+    "per_iteration_steps": [
+      "1. Snapshot current lint_pass_rate (numeric verifier read)",
+      "2. Run linter with --fix flag to apply auto-fixable violations",
+      "3. Re-run linter in check mode to compute new lint_pass_rate",
+      "4. Invariant guard check: if new_rate < snapshot_rate → revert + log GUARD_VIOLATION",
+      "5. If guard passes: commit fix batch with iteration index in message",
+      "6. Log iteration result: {iteration, snapshot_rate, new_rate, delta, status}",
+      "7. Check early-stop conditions; if met, exit loop and emit final report"
+    ]
+  }
+}

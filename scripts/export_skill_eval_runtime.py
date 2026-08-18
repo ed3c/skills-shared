@@ -66,7 +66,7 @@ def skill_up_config(case: dict, engine: str, provider: str, model: str) -> tuple
     eval_config = {
         "schema_version": "v1alpha1",
         "environment": {"type": "none"},
-        "skills": [{"source": "local_path", "path": ".", "include": ["SKILL.md", "references/**", "scripts/**"]}],
+        "skills": [{"source": "local_path", "path": ".", "include": ["SKILL.md", "modules/**", "references/**", "scripts/**"]}],
         "engine": {"name": engine, "model": {"provider": provider, "name": model}},
         "cases": {
             "files": [f".runtime-eval/cases/{case['id']}.yaml"],
@@ -85,7 +85,16 @@ def skill_up_config(case: dict, engine: str, provider: str, model: str) -> tuple
         "id": case["id"],
         "title": f"skills-shared runtime export: {case['id']}",
         "input": {"prompt": prompt},
-        "judge": {"type": "agent_judge", "criteria": assertions, "pass_threshold": 1.0}
+        # judge.model is required by the pinned skill-up whenever judge.type is
+        # agent_judge, and it parses as "provider/name". Omitting it made every
+        # export fail `skill-up validate` before a single model turn was spent,
+        # which is why this exporter had never been physically exercised.
+        "judge": {
+            "type": "agent_judge",
+            "model": f"{provider}/{model}",
+            "criteria": assertions,
+            "pass_threshold": 1.0,
+        },
     }
     return eval_config, case_config
 

@@ -1,0 +1,40 @@
+{
+  "case_id": "autoresearch-metric-loop-plan",
+  "condition": "no_skill",
+  "eval_suite_sha": "85e6723869bdd545666e07b7c5c6a8f491256cb9",
+  "harness": {
+    "engine": "claude_code",
+    "name": "skill-up",
+    "version": "425e3f5a0c23e80f2c7933785d54c53ffe01b40c"
+  },
+  "model": {
+    "name": "claude-sonnet-4-6",
+    "provider": "anthropic"
+  },
+  "outcome": {
+    "duration_ms": 41697,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "passed": true,
+    "status": "pass",
+    "verifier": "skill-up/agent_judge"
+  },
+  "promotion": {
+    "eligible": false,
+    "reason": "executor agent_judge is not deterministic promotion authority",
+    "required_next_receipt": "skill-eval-verifier-receipt/v1"
+  },
+  "raw_report": {
+    "path": "/tmp/claude-501/xh/skillup-cand-rep2/iteration-1/report.json",
+    "sha256": "7d6e2b645a3c5acbfad2287bc858a784037a746e6eb1c9be2a861832ff1fbc76"
+  },
+  "run_id": "8fae59a8b305d6a007398396",
+  "sampling": {
+    "model_seed": null,
+    "repetition_index": 2,
+    "seed_controlled": false
+  },
+  "schema_version": "skill-eval-executor-evidence/v1",
+  "skill": "autoresearch-composer",
+  "skill_sha": null
+}

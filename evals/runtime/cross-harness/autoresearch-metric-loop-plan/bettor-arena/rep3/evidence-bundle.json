@@ -1,0 +1,21 @@
+{
+  "artifact_hashes": {
+    "evals/runtime/cross-harness/autoresearch-metric-loop-plan/bettor-arena/rep3/workspace/artifacts/iteration-contract.json": "e4423744acdbc5b05cd004d22bdf762dd7840d17e1c2d3eb9d20f8d3777a9107",
+    "evals/runtime/cross-harness/autoresearch-metric-loop-plan/bettor-arena/rep3/workspace/evidence/run.json": "83067b78030c1de1602010adb7096a87d3af1809b15579009231d76765338452"
+  },
+  "case_id": "autoresearch-metric-loop-plan",
+  "eval_suite_sha": "85e6723869bdd545666e07b7c5c6a8f491256cb9",
+  "executor_raw_result": "evals/runtime/cross-harness/autoresearch-metric-loop-plan/bettor-arena/rep3/raw-result.json",
+  "promotion_eligible": true,
+  "replay": {
+    "command": "python3 scripts/verify_collected_runtime.py --case autoresearch-metric-loop-plan --workspace evals/runtime/cross-harness/autoresearch-metric-loop-plan/bettor-arena/rep3/workspace --run-id 9d1fc752631105fff3028378 --output evals/runtime/cross-harness/autoresearch-metric-loop-plan/bettor-arena/rep3/verifier-receipt.json",
+    "notes": null,
+    "offline_capable": true
+  },
+  "run_id": "9d1fc752631105fff3028378",
+  "run_trace": "evals/runtime/cross-harness/autoresearch-metric-loop-plan/bettor-arena/rep3/run-trace.json",
+  "schema_version": "skill-eval-evidence/v1",
+  "skill_sha": "85e6723869bdd545666e07b7c5c6a8f491256cb9",
+  "verifier_receipt": "evals/runtime/cross-harness/autoresearch-metric-loop-plan/bettor-arena/rep3/verifier-receipt.json",
+  "verifier_receipt_sha256": "a40cee4f82d975c4d44323d655427d0cfaa2d7d1eed791a6eaeab7cda73d9e6b"
+}

@@ -1,0 +1,6 @@
+{
+  "case_id": "autoresearch-metric-loop-plan",
+  "decision": "invoke",
+  "selected_skill": "autoresearch-composer",
+  "plan_artifact": "artifacts/iteration-contract.json"
+}

@@ -1,0 +1,26 @@
+{
+  "schema_version": "skill-eval-executor-authority/v1",
+  "executor": "bettor-arena",
+  "repository": "ed3c/bettor-arena",
+  "repository_sha": "13ff9840fc5683b33670fa191591035bc96292dc",
+  "entry_point": "sh loopctl/loopctl.sh skill-execution run --request <request> --assertions <assertions> --repo <subject checkout> --output <receipt dir>",
+  "runtime_state": "available_with_external_model_credential",
+  "credential_channel": "The runner refuses credential-shaped environment names outright. The agent CLI authenticates from the host's own login state reached through HOME; no API key is passed into the request, and only environment variable names -- never values -- appear in it.",
+  "skill_delivery": "canonical-path-in-worktree: this executor installs nothing into .claude/skills, so the exported prompt names the Skill's canonical path inside the disposable worktree. That is a real difference from skill-up's install-and-autodiscover delivery and must not be averaged away.",
+  "artifact_retention": "The disposable worktree is destroyed on exit (cleanup=required), so produced artifacts survive only as blobs the file_content assertions copy into the receipt's content-addressed store before cleanup.",
+  "supported_engines": [
+    "claude_code"
+  ],
+  "secrets": [],
+  "promotion_authority": false,
+  "allowed_claims": [
+    "control-plane-contract-available",
+    "physical-run-available",
+    "offline-replay-available"
+  ],
+  "forbidden_claims": [
+    "cross-harness-capability-proven",
+    "ranking-claim-allowed",
+    "promotion-admitted"
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "artifacts": [
+    "evidence/run.json",
+    "artifacts/iteration-contract.json"
+  ],
+  "case_id": "autoresearch-metric-loop-plan",
+  "condition": "candidate_skill",
+  "environment": {
+    "fresh_workspace": true,
+    "network_policy": "model-api-egress",
+    "runtime": "bettor-arena:local-process-disposable-worktree"
+  },
+  "harness": {
+    "name": "bettor-arena",
+    "version": "13ff9840fc5683b33670fa191591035bc96292dc"
+  },
+  "metrics": {
+    "input_tokens": 10,
+    "output_tokens": 2984,
+    "retries": 0,
+    "tool_calls": 0,
+    "wall_seconds": 70.12
+  },
+  "model": {
+    "name": "claude-sonnet-4-6",
+    "provider": "anthropic"
+  },
+  "outcome": {
+    "failure_class": null,
+    "passed": true,
+    "verifier": "deterministic-script"
+  },
+  "routing": {
+    "did_invoke": true,
+    "selected_skill": "autoresearch-composer",
+    "should_invoke": true
+  },
+  "run_id": "9d1fc752631105fff3028378",
+  "sampling": {
+    "index": 3,
+    "kind": "repetition",
+    "seed": null
+  },
+  "schema_version": "skill-eval-run/v1",
+  "skill_sha": "85e6723869bdd545666e07b7c5c6a8f491256cb9"
+}
