@@ -4,7 +4,8 @@
 This is a structural/executable-contract experiment, not a model-behavior test.
 It keeps every historical treatment immutable and scores the current candidate
 on the same binary criteria plus one causal-transition criterion introduced by
-Shadow issue #309 and one closure-law criterion introduced by issue #332.
+Shadow issue #309, one closure-law criterion introduced by issue #332, and one
+offload-method criterion introduced by issue #359.
 
 Every treatment has exactly one immutable subject: the newest arm is the live
 `SKILL.md`, and each older arm is a frozen fixture. When the live body changes,
@@ -28,6 +29,8 @@ REACHABILITY = FIXTURES / "reachability-repaired-SKILL.txt"
 REACHABILITY_PROFILE = FIXTURES / "reachability-repaired-domain-profile.txt"
 CAUSAL = FIXTURES / "causal-dag-repaired-SKILL.txt"
 CAUSAL_PROFILE = FIXTURES / "causal-dag-repaired-domain-profile.txt"
+CLOSURE = FIXTURES / "closure-laws-bound-SKILL.txt"
+CLOSURE_PROFILE = FIXTURES / "closure-laws-bound-domain-profile.txt"
 CURRENT = ROOT / "SKILL.md"
 CURRENT_PROFILE = ROOT / "modules" / "domain-profile.md"
 
@@ -37,11 +40,13 @@ EXPECTED_GIT_BLOBS = {
     LANDED_PROFILE: "812f161c8abbe0517502ea988673197519132c1c",
     REACHABILITY: "51c3fd81749598957f2b993c4d31c3b4c8c277c1",
     REACHABILITY_PROFILE: "7726ccc5a45db8e31723d457b9129b4697fdca3c",
-    # B2 is the treatment the golden-proof registry pins. Its blob is the one
-    # already registered for the live body it was frozen from; freezing changed
-    # the path, never the bytes.
     CAUSAL: "3fd01571b49b1dfd1c9256661fe4aafe3ecc6e99",
     CAUSAL_PROFILE: "0aa3ec544f8e31282633922126c9dfc358b2e2d5",
+    # B3 is the treatment the golden-proof registry pins. Its blob is the one
+    # already registered for the live body it was frozen from; freezing changed
+    # the path, never the bytes.
+    CLOSURE: "f6d667956f653d26f6adb8081e04dd80445504a3",
+    CLOSURE_PROFILE: "0aa3ec544f8e31282633922126c9dfc358b2e2d5",
 }
 
 PROVIDER_TOKENS = ("grepai", "scip", "tree-sitter", "serena", "lancedb")
@@ -173,6 +178,20 @@ def score(arm: Arm) -> dict[str, bool]:
         and "own lane" in lower
     )
 
+    # Issue #359: the local/cloud offload method is routed from the core body
+    # with its executable semantic authority named, and the plane boundary is
+    # stated as a refused promotion. Scored on what the routing says, so a bare
+    # heading or a link to the method document cannot earn the point.
+    offload_method_routed = (
+        "references/dual-agent-offload/OFFLOAD_METHOD.md" in skill
+        and "tests/dual-agent-offload-contract/verify.py" in skill
+        and "at-least-once" in lower
+    )
+    offload_plane_promotion_refused = (
+        "runtime contract plane" in lower
+        and "may never claim it is implemented or live" in lower
+    )
+
     return {
         "portable_core_provider_neutral": provider_neutral,
         "pre_dispatch_task_assertion_reachable": task_gate,
@@ -186,6 +205,7 @@ def score(arm: Arm) -> dict[str, bool]:
         "module_self_activation_refused": self_activation_refusal,
         "causal_module_transitions_closed": old_causal_chain or modular_causal_chain,
         "closure_laws_bound_in_core": dual_dependency_classes and lane_substitution_refused,
+        "offload_method_routed_from_core": offload_method_routed and offload_plane_promotion_refused,
     }
 
 
@@ -207,7 +227,8 @@ def main() -> int:
         Arm("B0_REFACTOR_AS_LANDED", LANDED.read_text(encoding="utf-8"), LANDED_PROFILE.read_text(encoding="utf-8")),
         Arm("B1_REACHABILITY_REPAIRED", REACHABILITY.read_text(encoding="utf-8"), REACHABILITY_PROFILE.read_text(encoding="utf-8")),
         Arm("B2_CAUSAL_DAG_REPAIRED", CAUSAL.read_text(encoding="utf-8"), CAUSAL_PROFILE.read_text(encoding="utf-8")),
-        Arm("B3_CLOSURE_LAWS_BOUND", CURRENT.read_text(encoding="utf-8"), CURRENT_PROFILE.read_text(encoding="utf-8")),
+        Arm("B3_CLOSURE_LAWS_BOUND", CLOSURE.read_text(encoding="utf-8"), CLOSURE_PROFILE.read_text(encoding="utf-8")),
+        Arm("B4_OFFLOAD_METHOD_BOUND", CURRENT.read_text(encoding="utf-8"), CURRENT_PROFILE.read_text(encoding="utf-8")),
     ]
     results = {arm.name: score(arm) for arm in arms}
     totals = {name: sum(values.values()) for name, values in results.items()}
@@ -217,6 +238,7 @@ def main() -> int:
     reachability = results["B1_REACHABILITY_REPAIRED"]
     causal = results["B2_CAUSAL_DAG_REPAIRED"]
     closure = results["B3_CLOSURE_LAWS_BOUND"]
+    offload = results["B4_OFFLOAD_METHOD_BOUND"]
 
     expected_landed_regressions = {
         "pre_dispatch_task_assertion_reachable",
@@ -253,6 +275,16 @@ def main() -> int:
         regressed = [k for k in causal if causal[k] and not closure[k]]
         print(f"TECH-LEAD-AB-RED B3 does not dominate B2; regressions={regressed}", file=sys.stderr)
         return 2
+    if closure["offload_method_routed_from_core"]:
+        print("TECH-LEAD-AB-RED frozen B3 incorrectly credited with the offload method route", file=sys.stderr)
+        return 2
+    if not offload["offload_method_routed_from_core"]:
+        print("TECH-LEAD-AB-RED B4 did not route the offload method from the portable core", file=sys.stderr)
+        return 2
+    if not dominates(offload, closure):
+        regressed = [k for k in closure if closure[k] and not offload[k]]
+        print(f"TECH-LEAD-AB-RED B4 does not dominate B3; regressions={regressed}", file=sys.stderr)
+        return 2
 
     report = {
         "schema": "agentic-tech-lead/refactor-ab/v3",
@@ -267,8 +299,10 @@ def main() -> int:
             "B1_DOMAIN_PROFILE": EXPECTED_GIT_BLOBS[REACHABILITY_PROFILE],
             "B2_CAUSAL_DAG_REPAIRED": EXPECTED_GIT_BLOBS[CAUSAL],
             "B2_DOMAIN_PROFILE": EXPECTED_GIT_BLOBS[CAUSAL_PROFILE],
-            "B3_CLOSURE_LAWS_BOUND": git_blob_sha(CURRENT.read_text(encoding="utf-8")),
-            "B3_DOMAIN_PROFILE": git_blob_sha(CURRENT_PROFILE.read_text(encoding="utf-8")),
+            "B3_CLOSURE_LAWS_BOUND": EXPECTED_GIT_BLOBS[CLOSURE],
+            "B3_DOMAIN_PROFILE": EXPECTED_GIT_BLOBS[CLOSURE_PROFILE],
+            "B4_OFFLOAD_METHOD_BOUND": git_blob_sha(CURRENT.read_text(encoding="utf-8")),
+            "B4_DOMAIN_PROFILE": git_blob_sha(CURRENT_PROFILE.read_text(encoding="utf-8")),
         },
         "results": results,
         "totals": totals,
@@ -276,9 +310,10 @@ def main() -> int:
         "reachability_repair_preserved": True,
         "causal_dag_repair_dominates_prior_treatments": True,
         "closure_laws_bound_dominates_causal_dag_repair": True,
+        "offload_method_bound_dominates_closure_laws_bound": True,
     }
     print(json.dumps(report, indent=2, sort_keys=True))
-    print("TECH-LEAD-AB-GREEN B0 regressions exposed; B1 restores reachability; B2 adds receipt-gated causal closure; B3 binds the dual-DAG and lane-substitution closure laws and dominates every prior deterministic treatment; live model/provider A/B NOT_EXERCISED")
+    print("TECH-LEAD-AB-GREEN B0 regressions exposed; B1 restores reachability; B2 adds receipt-gated causal closure; B3 binds the dual-DAG and lane-substitution closure laws; B4 routes the local/cloud offload method with its executable authority and refused plane promotion, and dominates every prior deterministic treatment; live model/provider A/B NOT_EXERCISED")
     return 0
 
 

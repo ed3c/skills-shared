@@ -39,8 +39,14 @@
         {
           "id": "B3_CLOSURE_LAWS_BOUND",
           "role": "REPAIRED_CANDIDATE",
-          "path": "skills/agentic-tech-lead-orchestration/SKILL.md",
+          "path": "skills/agentic-tech-lead-orchestration/tests/fixtures/closure-laws-bound-SKILL.txt",
           "blob_sha": "f6d667956f653d26f6adb8081e04dd80445504a3"
+        },
+        {
+          "id": "B4_OFFLOAD_METHOD_BOUND",
+          "role": "REPAIRED_CANDIDATE",
+          "path": "skills/agentic-tech-lead-orchestration/SKILL.md",
+          "blob_sha": "b9401bf2ae720780dc30ca2d1b4af5c9181367e1"
         }
       ],
       "proof_layers": {
