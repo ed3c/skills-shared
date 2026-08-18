@@ -88,9 +88,3 @@ Admitted publication intents remain exactly `initial-pr`, `ready-for-review`, an
 Background synchronization may never invoke `git town sync --push`.
 
 Keep local sync, local verification, publication decision, remote publication as mechanically separate evidence states.
-
-## Owned gates and shared-body boundary
-
-Run [`tests/run-all.sh`](tests/run-all.sh) before publishing changes to this Skill. It is the only route that reaches every gate this Skill owns — `check_stack_contract.py`, `check_fanout_contract.py`, `check_publication_boundary.py`, `check_repository_profile.py` and `assert_molecular_stack_index.py` — and a gate nothing runs is indistinguishable from a gate that was deleted.
-
-A consumer-local `git-town-stacked-pr-worker` or `github-delivery-loop` copy would shadow the shared canonical body and is a governance error. Retarget through a repository profile or binding instead.
