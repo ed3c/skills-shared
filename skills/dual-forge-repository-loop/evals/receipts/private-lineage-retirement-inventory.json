@@ -1,0 +1,14 @@
+{
+  "observed_at_head": "73dc5db93d8b7a82e68d2e3f6987475f5ed56c87",
+  "repository_identity_digest": "90745f3e4ce3c56a0b767625a0e4814a9cd049832ff3c0efc816dcb7b83f6dac",
+  "schema": "private-retirement-inventory/v1",
+  "surfaces": {
+    "bundles": "ABSENT",
+    "caches": "ABSENT",
+    "clones": "RETIRED",
+    "credentials": "ACCEPTED_LIMITATION",
+    "forks": "ABSENT",
+    "mirrors": "ABSENT",
+    "worktrees": "RETIRED"
+  }
+}

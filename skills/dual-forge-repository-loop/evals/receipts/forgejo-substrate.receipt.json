@@ -1,0 +1,46 @@
+{
+  "authenticated_identity_request": {
+    "endpoint": "/api/v1/user",
+    "http_status": 200,
+    "method": "GET",
+    "response_bytes": 544,
+    "response_sha256": "50684a47d15510277ef5967fdfdfb12d8d6c37aadba649f60d119635d6ac64aa"
+  },
+  "container_evidence": {
+    "containers": [
+      {
+        "image": "gitea/act_runner",
+        "name": "forgejo-runner",
+        "ports": "",
+        "status": "Up 5 days"
+      },
+      {
+        "image": "codeberg.org/forgejo/forgejo:9",
+        "name": "forgejo",
+        "ports": "0.0.0.0:3000->3000/tcp, [::]:3000->3000/tcp, 0.0.0.0:2222->22/tcp, [::]:2222->22/tcp",
+        "status": "Up 7 days (healthy)"
+      }
+    ],
+    "state": "PASS"
+  },
+  "declared_non_claims": [
+    "this is substrate evidence only: it admits no delivery, issue, or PR transition",
+    "it is scoped to this host and this loopback URL and travels to no other runtime",
+    "the act_runner container is observed, not exercised: no Forgejo Actions job ran"
+  ],
+  "detail": "a local Forgejo answers this host on the allowlisted loopback forge and admits the existing Git credential helper; the substrate is present, not ABSENT",
+  "forge_url": "http://127.0.0.1:3000",
+  "host": "claude-code-local",
+  "observed_at": 1787031888,
+  "probe_note": "an agent command sandbox that intercepts loopback connections refuses 127.0.0.1:3000 with ECONNREFUSED while lsof still shows the listener, so a sandboxed probe observes exactly what an absent forge looks like; ABSENT is only honest once the probe has run outside that sandbox",
+  "schema": "dual-forge-repository-loop/forgejo-substrate-receipt/v1",
+  "state": "PASS",
+  "version": "9.0.3+gitea-1.22.0",
+  "version_request": {
+    "endpoint": "/api/v1/version",
+    "http_status": 200,
+    "method": "GET",
+    "response_bytes": 33,
+    "response_sha256": "f6d96d7e5fe6bc4ceb3ef68b01611cb22d83d2673f4c349236d79234ef6b6e8b"
+  }
+}
