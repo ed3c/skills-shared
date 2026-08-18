@@ -193,7 +193,7 @@ L5 delivery/Human Admit       HUMAN_ADMIT_REQUIRED
 
 B2 improves causal and evidence closure, not live model quality. B3 binds the dual-DAG and lane-substitution closure laws into the same core and dominates B2 on the deterministic criteria; the proof ceiling above is unchanged by it. Open evidence owners are #312 Phase 2, #231 scheduler, #232 independent Shadow, #234 Git Town/dual-forge, and #256 exact-subject code-intelligence/executor adapters. Merge, release and production remain outside Agent authority.
 
-Other landed control-plane mechanisms include implementation-target binding, verifier calibration, mutation admission, holdout isolation, capability/release schemas, isolated Shared Skills Infra CI, Intent-Bound Constraints, pinned Git Town canaries, Skill-suite arrival coverage, controlled-language authority gates, repository capability audits and procedural Shadow contracts. Current capability/release registries may still be empty; mechanism implementation does not imply the first physical unlock or release.
+Other landed control-plane mechanisms include implementation-target binding, verifier calibration, mutation admission, holdout isolation, capability/release schemas, isolated Shared Skills Infra CI, Intent-Bound Constraints, pinned Git Town canaries, Skill-suite arrival coverage, [controlled-language authority gates](docs/architecture/CONTROLLED_TECHNICAL_LANGUAGE_HARNESS.md), repository capability audits and procedural Shadow contracts. Current capability/release registries may still be empty; mechanism implementation does not imply the first physical unlock or release.
 
 ## Git Town / molecular PR model
 

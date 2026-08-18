@@ -101,11 +101,16 @@ this table records the delivery trace only.
 | CTL 06 integrated A/B canary | `#132` | `#140` | `47cbb259c0157535d6f40b703b487e225a1a9de1` | `controlled-technical-language-harness` SUCCESS |
 | CTL 06B A/B against external authority bytes | `#144` | `#152` | `b3d47948feb6e2d44d84261354117aecfaa4f5dc` | `controlled-technical-language-harness` SUCCESS |
 | CTL 07 consumer binding and canaries | `ed3c/bettor-arena#83` | none | n/a | none — open in another repository |
-| CTL 08 convergence index | `#133` | none | n/a | none — blocked on CTL 07 |
+| CTL 07A immutable consumer binding | `ed3c/bettor-arena#84` | `ed3c/bettor-arena#85` | `a3bee10b1e8ffc3c85bad518a18d044915a415bb` | that repository's `contracts` lane, read there |
+| CTL 07B sealed projection materializer | `ed3c/bettor-arena#88` | none | `0b0d1a5d571dfdda89d655e1a4fd619ad8d27d55` | that repository's lanes, read there |
+| CTL 07B paired carrier canaries | `ed3c/bettor-arena#108` | none | n/a | none — open, and the lane CTL 08 waits on |
+| CTL 08 convergence index | `#133` | none | n/a | none — recording only, not admitted |
 
 Unlike the IBC rows above, every merged CTL leaf had a green owning check. That check ran at the **PR head**, which is a different commit from the merge commit recorded beside it; a green head is evidence about the reviewed bytes, not a re-run of `main`.
 
-CTL 08 is the convergence owner and stays unopened: its contract forbids creating the branch before every prerequisite merges, and CTL 07 is open in `bettor-arena`. A convergence PR cannot repair an implementation leaf, so the unmet condition sits with its owner rather than being absorbed here.
+The three `bettor-arena` rows carry no owning check in this column on purpose. Their checks ran in that repository, against its heads, and this repository cannot observe them; the commits are recorded because they are immutable and this repository produced the bundle they bind. Those states were read on 2026-08-18 from a local clone and from read-only `gh issue` reads.
+
+CTL 08 is the convergence owner and stays unopened as a PR. Its contract forbids creating the branch before every prerequisite merges, and while CTL 07A landed, the CTL 07 parent and the `#108` paired-carrier leaf are still open. A convergence PR cannot repair an implementation leaf, so that condition sits with its owner rather than being absorbed here; what CTL 08 has done is record the merged subjects, the selected and rollback bundle identities, the routes and the unmet preconditions in [`../architecture/CONTROLLED_TECHNICAL_LANGUAGE_HARNESS.md`](../architecture/CONTROLLED_TECHNICAL_LANGUAGE_HARNESS.md).
 
 ## Spatial-loop systems engineering leaf
 

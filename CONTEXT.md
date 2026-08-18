@@ -40,6 +40,19 @@ remain `NOT_EXERCISED`; security acceptance, production promotion, permission
 widening, merge, and rollback remain Human/trusted-operator boundaries. Exact
 branch, PR head, and workflow state are read from GitHub metadata.
 
+## Controlled-language convergence state
+
+CTL 01–06B are merged here and CTL 08 (`#133`) has recorded what is admitted: the
+merged subjects with their trees, the immutable selected bundle
+(`b3d47948…`, CTL 06B) and its distinct rollback subject (`47cbb259…`, CTL 06), the
+routes, and the preconditions that are still unmet. The record is in
+[`docs/architecture/CONTROLLED_TECHNICAL_LANGUAGE_HARNESS.md`](docs/architecture/CONTROLLED_TECHNICAL_LANGUAGE_HARNESS.md).
+
+CTL 08 is not admitted. Consumer projection digests for Claude and Codex are
+`NOT_IMPLEMENTED` and the paired physical carrier canaries are `NOT_EXERCISED`;
+both belong to `ed3c/bettor-arena#83` and its open leaf `#108`, and a convergence
+leaf may not repair them.
+
 ## Current evidence boundary
 
 - Procedural/domain documentation separation: documented in this branch.

@@ -1,0 +1,123 @@
+{
+  "receipt_id": "ctl-08-cold-start-route-probe",
+  "owner_issue": 133,
+  "owner_skill": "controlled-technical-language-harness",
+  "recorded": "2026-08-18",
+  "question": "Following only the documentation routes, which single file owns the controlled-language architecture, evidence law and merged-slice ledger?",
+  "expected_answer": "docs/architecture/CONTROLLED_TECHNICAL_LANGUAGE_HARNESS.md",
+  "prompt_sha256": "4e312aa43162f15758c57824639e51c98738af623fdfb1ff55bbb6bf03d98f7e",
+  "denominator": {
+    "arms": ["PRE", "POST"],
+    "carriers": ["claude", "codex"],
+    "runs_per_arm_per_carrier": 1,
+    "cells_planned": 4,
+    "cells_observed": 3,
+    "cells_absent": [
+      {
+        "carrier": "codex",
+        "arm": "PRE",
+        "state": "NOT_EXERCISED",
+        "reason": "the Codex carrier was only reached after the PRE tree had already been edited; re-creating the PRE tree to run it was not done, and a POST run is not evidence about PRE"
+      }
+    ]
+  },
+  "subjects": {
+    "PRE": {
+      "kind": "committed",
+      "commit": "306f75c",
+      "note": "clean worktree at main; no route edit had been made"
+    },
+    "POST": {
+      "kind": "working_tree",
+      "note": "the route tables under test were already edited and unchanged for both POST runs; the architecture document itself gained its findings section afterwards, which adds no route",
+      "route_files_sha256": {
+        "docs/INDEX.md": "39c89a1e065f7f03f88feadf443db1bc36ecbb251907929ac56cdcd4527bde35",
+        "docs/architecture/AGENTS.md": "88d758a57e28c92ec945ae99e24ed63b7007925ff6b76c487dd5af78122fcea8",
+        "README.md": "494ec892928e357cebd5096b01ee5fd247cbda911d9ed775718b68a682695ee3"
+      }
+    }
+  },
+  "runs": [
+    {
+      "carrier": "claude",
+      "arm": "PRE",
+      "argv": [
+        "/Users/neon/.local/bin/claude",
+        "-p",
+        "<prompt_sha256 above>",
+        "--model",
+        "sonnet",
+        "--output-format",
+        "text",
+        "--allowedTools",
+        "Read",
+        "--disallowedTools",
+        "Bash,Grep,Glob,Task,WebFetch,WebSearch,Edit,Write,NotebookEdit",
+        "--permission-mode",
+        "dontAsk"
+      ],
+      "carrier_version": "2.1.233 (Claude Code)",
+      "exit_code": 0,
+      "wall_seconds": 27.8,
+      "stdout_sha256": "8d86e482b89834731170916d242b614196055965c0b3830a0fd82c7a63986c95",
+      "stdout_bytes": 61,
+      "answer": "docs/architecture/CONTROLLED_TECHNICAL_LANGUAGE_HARNESS.md",
+      "result": "REACHED",
+      "route_used": "docs/INDEX.md routed traceability/TRACEABILITY_INDEX.md, whose prose links the architecture document; no route table named it"
+    },
+    {
+      "carrier": "claude",
+      "arm": "POST",
+      "argv": "identical to the claude PRE argv",
+      "carrier_version": "2.1.233 (Claude Code)",
+      "exit_code": 0,
+      "wall_seconds": 23.1,
+      "stdout_sha256": "d94c7b4d3fac0a396979c949ad9d8dc0bbf08e92b3167927496092fa8b1e1fea",
+      "stdout_bytes": 184,
+      "answer": "docs/architecture/CONTROLLED_TECHNICAL_LANGUAGE_HARNESS.md",
+      "result": "REACHED",
+      "route_used": "quoted the document's own ownership line; the run added prose the prompt asked it not to add"
+    },
+    {
+      "carrier": "codex",
+      "arm": "POST",
+      "argv": [
+        "/Users/neon/.local/bin/codex",
+        "exec",
+        "--skip-git-repo-check",
+        "--sandbox",
+        "read-only",
+        "<prompt_sha256 above>"
+      ],
+      "carrier_version": "codex-cli 0.146.0",
+      "exit_code": 0,
+      "wall_seconds": 41.1,
+      "tokens_used_reported_by_carrier": 45703,
+      "stdout_sha256": "53609712e9a2b9ddeaf86f47c79af40b267ef86614a9d765558386af164c581d",
+      "stdout_bytes": 59,
+      "answer": "docs/architecture/CONTROLLED_TECHNICAL_LANGUAGE_HARNESS.md",
+      "result": "REACHED",
+      "first_attempt": {
+        "exit_code": 1,
+        "wall_seconds": 0.1,
+        "stderr": "Operation not permitted (os error 1)",
+        "classification": "harness sandbox refused the carrier before it ran; not a route observation"
+      }
+    }
+  ],
+  "findings": [
+    "PRE falsified the hypothesis that the route was unreachable: one fresh Claude reader reached the document without any route table naming it, by following a prose link inside the routed traceability index.",
+    "The gap the edit closes is therefore a route-table gap, not a reachability gap. docs/architecture/AGENTS.md states that a stable architecture topic is registered in docs/INDEX.md, and the controlled-language topic was in neither that index nor that router's own trigger table.",
+    "A two-hop prose link is a reachability that depends on a reader choosing to open a traceability index while looking for architecture. It is not a route the repository declared."
+  ],
+  "evidence_boundary": {
+    "what_this_is": "a bounded navigation probe over this repository's own documents",
+    "what_this_is_not": [
+      "the bettor-arena consumer cold-start canary, which ed3c/bettor-arena#83 and #108 own",
+      "a physical carrier A/B result",
+      "evidence at any repetition count above 1 per cell",
+      "evidence that either carrier would answer the same way again"
+    ],
+    "carrier_proxying": "FORBIDDEN — the claude runs say nothing about codex and the codex run says nothing about claude; the codex PRE cell stays NOT_EXERCISED rather than being imputed from either"
+  }
+}

@@ -131,6 +131,22 @@ REPOSITORY_OBSERVED
 
 The review may not skip forward from a diagram: `DOC_STATUS_RECONCILED` requires the observed `exists` readback from `TREE_INVENTORIED`. Fail-closed terminals are `EXISTING_PATH_MARKED_PLANNED`, `ABSENT_PATH_MARKED_IMPLEMENTED`, `EVIDENCE_KIND_PROMOTED_TO_RUNTIME_PASS`, `CROSS_LANE_RECEIPT`, and `STALE_SUBJECT`.
 
+## Controlled technical language State Machine
+
+Two owners, not one, and they are not interchangeable. The contract-level machine
+— request, profile, termbase, privacy lane, evaluator dispatch, exact receipt —
+lives in [`CONTROLLED_TECHNICAL_LANGUAGE_HARNESS.md`](CONTROLLED_TECHNICAL_LANGUAGE_HARNESS.md)
+together with the evidence classes and the merged CTL ledger. The procedure an
+Agent executes, and the named failure each transition emits instead of advancing,
+lives in [`../../skills/controlled-technical-language-harness/SKILL.md`](../../skills/controlled-technical-language-harness/SKILL.md).
+
+The transition this route exists to protect is the terminal one. `PASS` is not an
+average over lanes: a requested lane that ends `FAIL`, `BLOCKED`, `NOT_EXERCISED`
+or `SKIPPED_BY_POLICY` prevents final `PASS`, and a deterministic failure is never
+overturned by a semantic or Human advisory success. Consumer binding, projection
+and physical carrier canaries are a different machine in a different repository;
+a green lane here cannot advance them.
+
 ## Issue admission State Machine
 
 ```text
