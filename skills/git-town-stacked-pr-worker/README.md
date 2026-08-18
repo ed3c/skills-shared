@@ -316,6 +316,59 @@ Independent evidence lanes, not Git children:
 
 They may raise issue #312 from L3 to L4/L5 only with receipts matching treatment, repository, task graph, context, budget, carrier, repetitions and acceptance subjects.
 
+## Repository entropy reclamation Stack — #386
+
+This Stack internalizes evidence-backed simplification without granting scanners deletion authority.
+
+```text
+main
+└─ C  #386 / PR #387  contract, schema, source lineage
+   ├─ K  #386 / PR #388  deterministic semantic gate
+   │  └─ E  #386 / PR #390  positive + mutation controls
+   │       └──────────────┐
+   └─ A  #386 / PR #389  domain ports/adapters ─┤
+                                          X  #386 / PR #391
+                                          └─ D  #403 / current docs branch
+```
+
+| Atom | Relation | Consumed unmerged artifacts | Owns | Evidence ceiling |
+|---|---|---|---|---|
+| `C` | root | none | portable procedure, audit schema/example, upstream lineage | contract/source freeze |
+| `K` | true child of C | C schema/procedure bytes | deterministic audit semantics | local deterministic gate |
+| `A` | sibling of K/E after C | C domain-port contract | trigger-selected adapter/profile contract | routing/monotonicity only |
+| `E` | true child of K | K checker | positive/hollow/mutation controls | falsifier mechanism |
+| `X` | explicit convergence over E + A | both parent artifact sets | registry, entry route, CI arrival, third-party notice | integration definition; no live consumer deletion |
+| `D` | true child of X | converged route/issue/PR facts | entropy `AGENTS.md`, README, this Stack index | docs/traceability only |
+
+Open PR head SHA is mutable provider state and is intentionally not hard-coded here. Current provider metadata remains the source for exact head/check state.
+
+Residual lanes stay separate:
+
+```text
+consumer repository safe deletion       NOT_EXERCISED
+cross-language live adoption             NOT_EXERCISED
+real Git Town worktree/no-push sync      NOT_EXERCISED
+merge/release/production                 HUMAN_ADMIT_REQUIRED
+```
+
+## Universal capability-preserving refactor program — #398
+
+This program is a composition layer, not a duplicate implementation of #318 or #386.
+
+```text
+#318 proof-preservation method ─┐
+#386 entropy safe-cut method ───┼─→ #399 UCR-C controller + Complexity Delta contract
+                                │      ├─→ #400 UCR-K/E executable composition + mutations
+                                │      └─→ #401 UCR-A Skill/Repository target adapters
+                                │                 \ 
+                                │                  └─→ #402 UCR-LIVE two-domain golden canary
+                                └────────────────────→ later X/D convergence after verified leaves
+```
+
+The controller's global objective is `Capability-Preserving Complexity Reduction`: preserve required capability, observable behavior, safety and evidence strength while proving at least one declared non-LOC complexity dimension decreases without hiding replacement burden, new sources of truth or ownership edges.
+
+All #398 leaves are currently implementation/evidence work, not a claim that universal refactoring is already proven.
+
 ## External consumer Stack snapshot — Bettor order 13
 
 Observed `2026-08-17`. This section is an `EXTERNAL_CONSUMER_SNAPSHOT`, not the consumer's state authority. Refresh the consumer's current issue/PR metadata, exact GitHub/local/Forgejo subjects, machine Stack index and Local Handoff Queue before acting.
