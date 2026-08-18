@@ -1,0 +1,245 @@
+{
+  "schema_version": "agentic-tech-lead/dual-agent/method-contract/v1",
+  "method": {
+    "method_id": "dual-agent/local-cloud-offload",
+    "version": "1.0.0"
+  },
+  "source": {
+    "kind": "SOURCE_PROPOSAL",
+    "runtime_state": "NOT_IMPLEMENTED",
+    "note": "A proposal document describes an intended architecture. Nothing here observed a transport, a worker, an effect or a user."
+  },
+  "state_machine": {
+    "initial_state": "LOCAL_INTENT_BOUND",
+    "terminal_state": "OFFLOAD_HANDOFF_FROZEN",
+    "states": [
+      "LOCAL_INTENT_BOUND",
+      "DATA_CLASSIFIED",
+      "AUTHORITY_AND_EFFECTS_DECLARED",
+      "REQUIRED_RUNTIME_CONTRACTS_DECLARED",
+      "OFFLOAD_HANDOFF_FROZEN"
+    ],
+    "transitions": [
+      {"from": "LOCAL_INTENT_BOUND", "to": "DATA_CLASSIFIED"},
+      {"from": "DATA_CLASSIFIED", "to": "AUTHORITY_AND_EFFECTS_DECLARED"},
+      {"from": "AUTHORITY_AND_EFFECTS_DECLARED", "to": "REQUIRED_RUNTIME_CONTRACTS_DECLARED"},
+      {"from": "REQUIRED_RUNTIME_CONTRACTS_DECLARED", "to": "OFFLOAD_HANDOFF_FROZEN"}
+    ]
+  },
+  "data_classes": ["PUBLIC", "INTERNAL", "CONFIDENTIAL", "LOCAL_ONLY"],
+  "side_effect_classes": ["READ_ONLY", "REVERSIBLE_WRITE", "IRREVERSIBLE_WRITE"],
+  "evidence_lanes": [
+    "LOCAL",
+    "CLOUD",
+    "TRANSPORT",
+    "WORKFLOW",
+    "TASK",
+    "GATE",
+    "EFFECT",
+    "ARTIFACT",
+    "USER_OUTCOME",
+    "HUMAN_ADMIT",
+    "RELEASE"
+  ],
+  "required_runtime_contracts": [
+    {
+      "contract_id": "runtime-env/dual-agent/offload-job/v1",
+      "owner_plane": "RUNTIME_CONTRACT_PLANE",
+      "required_semantics": [
+        "carries an exact immutable subject and a caller-chosen idempotency key",
+        "carries the declared data class and side-effect class of the work",
+        "never carries a secret value, a browser or device session, or a host path"
+      ],
+      "implementation_state": "NOT_IMPLEMENTED",
+      "digest": "UNRESOLVED"
+    },
+    {
+      "contract_id": "runtime-env/dual-agent/capability-grant/v1",
+      "owner_plane": "RUNTIME_CONTRACT_PLANE",
+      "required_semantics": [
+        "names the capability class granted and the lane it may observe",
+        "separates an interface-level grant from a fallback-surface grant",
+        "expires and cannot be widened by the holder"
+      ],
+      "implementation_state": "NOT_IMPLEMENTED",
+      "digest": "UNRESOLVED"
+    },
+    {
+      "contract_id": "runtime-env/dual-agent/effect-intent/v1",
+      "owner_plane": "RUNTIME_CONTRACT_PLANE",
+      "required_semantics": [
+        "declares one observable effect before it is attempted",
+        "binds an idempotency key so at-least-once delivery cannot double-apply",
+        "declares the compensation path or names the Human owner of the irreversible case"
+      ],
+      "implementation_state": "NOT_IMPLEMENTED",
+      "digest": "UNRESOLVED"
+    },
+    {
+      "contract_id": "runtime-env/dual-agent/artifact-manifest/v1",
+      "owner_plane": "RUNTIME_CONTRACT_PLANE",
+      "required_semantics": [
+        "enumerates produced artifacts with content digests",
+        "distinguishes a complete manifest from a partial one",
+        "cannot be presented as task, gate or user-outcome success"
+      ],
+      "implementation_state": "NOT_IMPLEMENTED",
+      "digest": "UNRESOLVED"
+    },
+    {
+      "contract_id": "runtime-env/dual-agent/execution-receipt/v1",
+      "owner_plane": "RUNTIME_CONTRACT_PLANE",
+      "required_semantics": [
+        "records which lane actually produced each observation",
+        "keeps every declared failure distinction separable in its terminal state",
+        "is written by the observing lane and committed by the canonical reducer"
+      ],
+      "implementation_state": "NOT_IMPLEMENTED",
+      "digest": "UNRESOLVED"
+    }
+  ],
+  "authority_map": [
+    {"role": "STRATEGY", "capabilities": ["PROPOSE"]},
+    {"role": "WORKER", "capabilities": ["EXECUTE", "OBSERVE"]},
+    {"role": "GATE", "capabilities": ["OBSERVE", "EVALUATE_GATE"]},
+    {"role": "CANONICAL_REDUCER", "capabilities": ["COMMIT_TASK_STATE"]},
+    {"role": "EFFECT_LEDGER", "capabilities": ["COMMIT_EFFECT_LEDGER"]},
+    {
+      "role": "HUMAN_OR_TRUSTED_POLICY",
+      "capabilities": [
+        "ADMIT_SEMANTIC_CONFLICT",
+        "ADMIT_IRREVERSIBLE",
+        "ADMIT_MERGE",
+        "ADMIT_PROMOTION",
+        "ADMIT_RELEASE",
+        "ADMIT_ROLLBACK"
+      ]
+    }
+  ],
+  "failure_distinctions": [
+    {"id": "DISCONNECT", "terminal_state": "TERMINATED_DISCONNECTED", "compensation_required": false},
+    {"id": "DUPLICATE", "terminal_state": "TERMINATED_DUPLICATE_SUPPRESSED", "compensation_required": false},
+    {"id": "TIMEOUT", "terminal_state": "TERMINATED_TIMED_OUT", "compensation_required": false},
+    {"id": "CANCELLATION", "terminal_state": "TERMINATED_CANCELLED", "compensation_required": true},
+    {"id": "STALE_RESULT", "terminal_state": "TERMINATED_STALE_RESULT_REFUSED", "compensation_required": false},
+    {"id": "POLICY_REFUSAL", "terminal_state": "TERMINATED_POLICY_REFUSED", "compensation_required": false},
+    {"id": "CAPABILITY_REFUSAL", "terminal_state": "TERMINATED_CAPABILITY_REFUSED", "compensation_required": false},
+    {"id": "PARTIAL_ARTIFACT", "terminal_state": "TERMINATED_PARTIAL_ARTIFACT", "compensation_required": true},
+    {"id": "CLEANUP_FAILURE", "terminal_state": "TERMINATED_CLEANUP_FAILED", "compensation_required": true},
+    {"id": "UNKNOWN_EXTERNAL_EFFECT", "terminal_state": "TERMINATED_UNKNOWN_EXTERNAL_EFFECT", "compensation_required": true},
+    {"id": "COMPENSATION_FAILURE", "terminal_state": "TERMINATED_COMPENSATION_FAILED", "compensation_required": true}
+  ],
+  "shared_projections": [
+    {"id": "shared-document-space", "kind": "DOCUMENT", "authority": "ADVISORY_ONLY"},
+    {"id": "shared-vector-index", "kind": "VECTOR", "authority": "ADVISORY_ONLY"},
+    {"id": "shared-conversation-memory", "kind": "MEMORY", "authority": "ADVISORY_ONLY"}
+  ],
+  "forbidden_promotions": [
+    "DUPLICATE_RUNTIME_SCHEMA_AUTHORITY",
+    "MUTABLE_SUBJECT",
+    "LANE_SUBSTITUTION",
+    "ACK_PROMOTED_TO_TASK_PASS",
+    "WRITE_WITHOUT_IDEMPOTENCY_OR_EFFECT_LEDGER",
+    "LOCAL_ONLY_REMOTE_EGRESS",
+    "SECRET_OR_SESSION_VALUE",
+    "PROVIDER_NAME_AS_ARCHITECTURE_INVARIANT",
+    "TERMINAL_STATE_COLLAPSE",
+    "BROWSER_AS_API_EVIDENCE",
+    "WORKER_SELF_PROMOTION",
+    "START_DEPENDENCY_USED_AS_COMPLETION_PROOF",
+    "SOURCE_OR_FIXTURE_AS_LIVE_PASS",
+    "SHARED_MEMORY_AS_TRANSACTION_AUTHORITY",
+    "CONSUMER_STATE_LEAKED_INTO_PORTABLE_CORE",
+    "RUNTIME_CONTRACT_DECLARED_IMPLEMENTED_WITHOUT_DIGEST"
+  ],
+  "claims_not_proven": [
+    "No wire schema for any required logical runtime contract exists or passes; only their required semantics are frozen here.",
+    "No transport, scheduler, worker process, provider adapter or browser surface was executed.",
+    "No observable external effect was attempted, committed or compensated.",
+    "No user outcome, commercial use, merge, promotion or release was observed.",
+    "Reconnect, cancellation and cleanup behaviour are declared distinctions, not measured ones."
+  ],
+  "packets": [
+    {
+      "id": "P1",
+      "purpose": "bounded read-only monitoring of a public remote surface, offloaded to the cloud lane",
+      "data_class": "PUBLIC",
+      "side_effect_class": "READ_ONLY",
+      "execution_lane": "CLOUD",
+      "egress_allowed": true,
+      "capability_class": "API",
+      "evidence_class": "API_OBSERVATION",
+      "idempotency_key_required": false,
+      "effect_ledger_required": false,
+      "human_admit_required": false,
+      "compensation": "NOT_REQUIRED",
+      "lane_states": {
+        "LOCAL": {"state": "NOT_EXERCISED", "evidence_lane": "LOCAL"},
+        "CLOUD": {"state": "NOT_IMPLEMENTED", "evidence_lane": "CLOUD"},
+        "TRANSPORT": {"state": "NOT_IMPLEMENTED", "evidence_lane": "TRANSPORT"},
+        "WORKFLOW": {"state": "NOT_IMPLEMENTED", "evidence_lane": "WORKFLOW"},
+        "TASK": {"state": "NOT_EXERCISED", "evidence_lane": "TASK"},
+        "GATE": {"state": "NOT_EXERCISED", "evidence_lane": "GATE"},
+        "EFFECT": {"state": "SKIPPED_BY_POLICY", "evidence_lane": "EFFECT"},
+        "ARTIFACT": {"state": "NOT_EXERCISED", "evidence_lane": "ARTIFACT"},
+        "USER_OUTCOME": {"state": "NOT_EXERCISED", "evidence_lane": "USER_OUTCOME"},
+        "HUMAN_ADMIT": {"state": "SKIPPED_BY_POLICY", "evidence_lane": "HUMAN_ADMIT"},
+        "RELEASE": {"state": "NOT_EXERCISED", "evidence_lane": "RELEASE"}
+      }
+    },
+    {
+      "id": "P2",
+      "purpose": "local-only code analysis over material that may not leave the local lane, with zero egress",
+      "data_class": "LOCAL_ONLY",
+      "side_effect_class": "READ_ONLY",
+      "execution_lane": "LOCAL",
+      "egress_allowed": false,
+      "capability_class": "LOCAL_PROCESS",
+      "evidence_class": "LOCAL_OBSERVATION",
+      "idempotency_key_required": false,
+      "effect_ledger_required": false,
+      "human_admit_required": false,
+      "compensation": "NOT_REQUIRED",
+      "lane_states": {
+        "LOCAL": {"state": "NOT_IMPLEMENTED", "evidence_lane": "LOCAL"},
+        "CLOUD": {"state": "SKIPPED_BY_POLICY", "evidence_lane": "CLOUD"},
+        "TRANSPORT": {"state": "SKIPPED_BY_POLICY", "evidence_lane": "TRANSPORT"},
+        "WORKFLOW": {"state": "NOT_IMPLEMENTED", "evidence_lane": "WORKFLOW"},
+        "TASK": {"state": "NOT_EXERCISED", "evidence_lane": "TASK"},
+        "GATE": {"state": "NOT_EXERCISED", "evidence_lane": "GATE"},
+        "EFFECT": {"state": "SKIPPED_BY_POLICY", "evidence_lane": "EFFECT"},
+        "ARTIFACT": {"state": "NOT_EXERCISED", "evidence_lane": "ARTIFACT"},
+        "USER_OUTCOME": {"state": "NOT_EXERCISED", "evidence_lane": "USER_OUTCOME"},
+        "HUMAN_ADMIT": {"state": "SKIPPED_BY_POLICY", "evidence_lane": "HUMAN_ADMIT"},
+        "RELEASE": {"state": "NOT_EXERCISED", "evidence_lane": "RELEASE"}
+      }
+    },
+    {
+      "id": "P3",
+      "purpose": "reversible remote write that requires Human approval, effect-ledger admission and a declared compensation path",
+      "data_class": "INTERNAL",
+      "side_effect_class": "REVERSIBLE_WRITE",
+      "execution_lane": "CLOUD",
+      "egress_allowed": true,
+      "capability_class": "API",
+      "evidence_class": "API_OBSERVATION",
+      "idempotency_key_required": true,
+      "effect_ledger_required": true,
+      "human_admit_required": true,
+      "compensation": "DECLARED",
+      "lane_states": {
+        "LOCAL": {"state": "NOT_EXERCISED", "evidence_lane": "LOCAL"},
+        "CLOUD": {"state": "NOT_IMPLEMENTED", "evidence_lane": "CLOUD"},
+        "TRANSPORT": {"state": "NOT_IMPLEMENTED", "evidence_lane": "TRANSPORT"},
+        "WORKFLOW": {"state": "NOT_IMPLEMENTED", "evidence_lane": "WORKFLOW"},
+        "TASK": {"state": "NOT_EXERCISED", "evidence_lane": "TASK"},
+        "GATE": {"state": "NOT_EXERCISED", "evidence_lane": "GATE"},
+        "EFFECT": {"state": "NOT_IMPLEMENTED", "evidence_lane": "EFFECT"},
+        "ARTIFACT": {"state": "NOT_EXERCISED", "evidence_lane": "ARTIFACT"},
+        "USER_OUTCOME": {"state": "NOT_EXERCISED", "evidence_lane": "USER_OUTCOME"},
+        "HUMAN_ADMIT": {"state": "HUMAN_ADMIT_REQUIRED", "evidence_lane": "HUMAN_ADMIT"},
+        "RELEASE": {"state": "NOT_EXERCISED", "evidence_lane": "RELEASE"}
+      }
+    }
+  ]
+}

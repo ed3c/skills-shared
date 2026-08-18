@@ -88,6 +88,11 @@ python3 "$ROOT/scripts/assert_repository_closure_contract.py" \
   --dag "$ROOT/references/example-issue-dual-dag.json" \
   --selftest
 
+# Freeze the portable Dual-Agent offload method contract and its exact-subject
+# handoff packet, and prove all sixteen semantic controls still turn red. No
+# runtime wire schema, transport, provider or effect lane is claimed here.
+bash "$ROOT/tests/dual-agent-offload-contract/verify.sh"
+
 # Emit and inspect the positive semantic task receipt.
 python3 "$ROOT/scripts/assert_task_contract.py" \
   --contract "$ROOT/references/example-stack-contract.json" \

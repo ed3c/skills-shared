@@ -1,0 +1,210 @@
+{
+  "schema_version": "agentic-tech-lead/dual-agent/handoff-requirements/v1",
+  "id": "P4",
+  "producer": {
+    "repository": "skills-shared",
+    "commit": "1111111111111111111111111111111111111111",
+    "tree": "2222222222222222222222222222222222222222",
+    "method_contract_id": "dual-agent/local-cloud-offload",
+    "method_contract_digest": "83e1393a87c7caee5bc7cb8772b3706d3114b568b11a916609dccf723b251daf"
+  },
+  "consumer": {
+    "repository": "example/runtime-contract-plane",
+    "base_commit": "3333333333333333333333333333333333333333",
+    "base_tree": "4444444444444444444444444444444444444444",
+    "plane": "RUNTIME_CONTRACT_PLANE",
+    "owning_issue": "EXAMPLE-RUNTIME-CONTRACT-ISSUE"
+  },
+  "required_runtime_contracts": [
+    {
+      "contract_id": "runtime-env/dual-agent/offload-job/v1",
+      "owner_plane": "RUNTIME_CONTRACT_PLANE",
+      "implementation_state": "NOT_IMPLEMENTED",
+      "digest": "UNRESOLVED"
+    },
+    {
+      "contract_id": "runtime-env/dual-agent/capability-grant/v1",
+      "owner_plane": "RUNTIME_CONTRACT_PLANE",
+      "implementation_state": "NOT_IMPLEMENTED",
+      "digest": "UNRESOLVED"
+    },
+    {
+      "contract_id": "runtime-env/dual-agent/effect-intent/v1",
+      "owner_plane": "RUNTIME_CONTRACT_PLANE",
+      "implementation_state": "NOT_IMPLEMENTED",
+      "digest": "UNRESOLVED"
+    },
+    {
+      "contract_id": "runtime-env/dual-agent/artifact-manifest/v1",
+      "owner_plane": "RUNTIME_CONTRACT_PLANE",
+      "implementation_state": "NOT_IMPLEMENTED",
+      "digest": "UNRESOLVED"
+    },
+    {
+      "contract_id": "runtime-env/dual-agent/execution-receipt/v1",
+      "owner_plane": "RUNTIME_CONTRACT_PLANE",
+      "implementation_state": "NOT_IMPLEMENTED",
+      "digest": "UNRESOLVED"
+    }
+  ],
+  "path_lease": {
+    "allowed": [
+      "<consumer-schema-root>/dual-agent/**",
+      "<consumer-test-root>/dual-agent/**"
+    ],
+    "read_only": [
+      "<consumer-root>/README.md",
+      "<consumer-root>/AGENTS.md"
+    ],
+    "forbidden": [
+      "<consumer-root>/.github/workflows/**",
+      "<consumer-root>/<secret-store>/**"
+    ]
+  },
+  "writer_lease": {
+    "writers": ["<single-declared-writer>"],
+    "worktree_required": true,
+    "branch": "<consumer-implementation-branch>",
+    "shared_resources": [
+      {"id": "<consumer-implementation-branch>", "lease_owner": "<single-declared-writer>"}
+    ]
+  },
+  "positive_fixtures": ["P1", "P2", "P3", "P4"],
+  "mutation_controls": [
+    "M01",
+    "M02",
+    "M03",
+    "M04",
+    "M05",
+    "M06",
+    "M07",
+    "M08",
+    "M09",
+    "M10",
+    "M11",
+    "M12",
+    "M13",
+    "M14",
+    "M15",
+    "M16"
+  ],
+  "required_gates": [
+    {
+      "id": "SHAPE",
+      "command": "python3 -m json.tool <every new schema and example>",
+      "subject": "LOCAL_WORKTREE"
+    },
+    {
+      "id": "CONTRACT",
+      "command": "python3 skills/agentic-tech-lead-orchestration/tests/dual-agent-offload-contract/verify.py",
+      "subject": "LOCAL_WORKTREE"
+    },
+    {
+      "id": "SUITE",
+      "command": "bash skills/agentic-tech-lead-orchestration/tests/run-all.sh",
+      "subject": "LOCAL_WORKTREE"
+    },
+    {
+      "id": "EVALS",
+      "command": "python3 scripts/check_skill_evals.py",
+      "subject": "LOCAL_WORKTREE"
+    },
+    {
+      "id": "COMMIT_ROLES",
+      "command": "python3 scripts/check_commit_roles.py --repo-root .",
+      "subject": "LOCAL_WORKTREE"
+    },
+    {
+      "id": "EXACT_HEAD_WORKFLOW",
+      "command": "<owning exact-head workflow, executed once against the published candidate head>",
+      "subject": "EXACT_HEAD"
+    }
+  ],
+  "start_dependencies": [
+    {
+      "id": "S1",
+      "statement": "The exact base commit and tree, the branch head, and the open change-request inventory were re-observed before any mutation.",
+      "edge_class": "START",
+      "proof": {"kind": "START_READINESS", "state": "PASS"}
+    },
+    {
+      "id": "S2",
+      "statement": "One linked worktree is bound to the implementation branch and exactly one writer owns the branch and the declared paths.",
+      "edge_class": "START",
+      "proof": {"kind": "START_READINESS", "state": "PASS"}
+    },
+    {
+      "id": "S3",
+      "statement": "The repository-required machine commit identity and role trailers are available in the executing runtime.",
+      "edge_class": "START",
+      "proof": {"kind": "START_READINESS", "state": "PASS"}
+    },
+    {
+      "id": "S4",
+      "statement": "Positive fixtures and mutation controls were frozen before implementation, so the denominator cannot be chosen after the result.",
+      "edge_class": "START",
+      "proof": {"kind": "START_READINESS", "state": "PASS"}
+    }
+  ],
+  "completion_dependencies": [
+    {
+      "id": "C1",
+      "statement": "Every required logical runtime contract resolves to an exact wire-schema digest owned by the Runtime Contract Plane.",
+      "edge_class": "COMPLETION",
+      "proof": {"kind": "RUNTIME_CONTRACT_DIGEST", "state": "NOT_IMPLEMENTED"}
+    },
+    {
+      "id": "C2",
+      "statement": "The declared local gate chain passes on the candidate worktree.",
+      "edge_class": "COMPLETION",
+      "proof": {"kind": "LOCAL_GATE", "state": "NOT_EXERCISED"}
+    },
+    {
+      "id": "C3",
+      "statement": "The owning workflow executes with non-empty steps against the exact published candidate head.",
+      "edge_class": "COMPLETION",
+      "proof": {"kind": "EXACT_HEAD_GATE", "state": "NOT_EXERCISED"}
+    },
+    {
+      "id": "C4",
+      "statement": "Independent review reports no lane substitution, consumer-state leak, second canonical state writer or authority widening.",
+      "edge_class": "COMPLETION",
+      "proof": {"kind": "INDEPENDENT_REVIEW", "state": "NOT_EXERCISED"}
+    },
+    {
+      "id": "C5",
+      "statement": "Merge, promotion, release and rollback are admitted by the Human or trusted policy owner.",
+      "edge_class": "COMPLETION",
+      "proof": {"kind": "HUMAN_ADMIT", "state": "HUMAN_ADMIT_REQUIRED"}
+    }
+  ],
+  "rollback": {
+    "subject_commit": "3333333333333333333333333333333333333333",
+    "owner": "HUMAN_OR_TRUSTED_POLICY"
+  },
+  "evidence_ceiling": {
+    "kind": "PORTABLE_DETERMINISTIC_METHOD_CONTRACT",
+    "statement": "A frozen portable method contract and its executable controls. No transport, cloud execution, provider isolation, external effect, user outcome, merge or release is claimed."
+  },
+  "remaining_states": [
+    {"lane": "CLOUD", "state": "NOT_IMPLEMENTED"},
+    {"lane": "TRANSPORT", "state": "NOT_IMPLEMENTED"},
+    {"lane": "WORKFLOW", "state": "NOT_IMPLEMENTED"},
+    {"lane": "TASK", "state": "NOT_EXERCISED"},
+    {"lane": "GATE", "state": "NOT_EXERCISED"},
+    {"lane": "EFFECT", "state": "NOT_IMPLEMENTED"},
+    {"lane": "ARTIFACT", "state": "NOT_EXERCISED"},
+    {"lane": "USER_OUTCOME", "state": "NOT_EXERCISED"},
+    {"lane": "RELEASE", "state": "NOT_EXERCISED"},
+    {"lane": "HUMAN_ADMIT", "state": "HUMAN_ADMIT_REQUIRED"}
+  ],
+  "human_owned_operations": [
+    "semantic conflict resolution",
+    "any irreversible external effect",
+    "merge",
+    "promotion",
+    "release",
+    "rollback"
+  ],
+  "verdict": "BLOCKED_BY_RUNTIME_CONTRACT"
+}
