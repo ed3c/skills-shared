@@ -503,6 +503,11 @@
         "commit_sha": "f9ff1a1765ccfafba7a45d905ff2980282ef5357",
         "subject": "feat(control-plane): add applicability-aware issue plans",
         "reason": "reached main through merge 'Merge pull request #306 from ed3c/agent/control-plane-phase-convergence-v2' (PR #306) under the owner's real address with no trailers; the driver cannot be observed from the commit and assigning one would be invention"
+      },
+      {
+        "commit_sha": "867a4c73e0136d64ab041789d622b503e811d01f",
+        "subject": "chore(license): adopt Apache-2.0",
+        "reason": "pushed straight to main by a concurrent writer session on this host during the 2026-08-18 delivery batch, colliding with the decision-package activation 874ab7c; the producing endpoint wrote no trailers and the driver cannot be observed from the commit, so assigning one would be invention"
       }
     ]
   }
