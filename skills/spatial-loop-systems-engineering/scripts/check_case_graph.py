@@ -16,29 +16,16 @@ from typing import Any
 SCHEMA = "spatial-loop-case-graph/v1"
 DIGEST_RE = re.compile(r"^sha256:[0-9a-f]{64}$")
 DECISION_REQUIRED = {"INTENTIONAL_CHANGE", "DEFER_EXPLICIT", "DROP_EXPLICIT"}
+PRESERVATION_DISPOSITIONS = {"PRESERVE_EXACT", "PRESERVE_OBSERVABLE", "ADAPT_WITH_COMPATIBILITY"}
 CASE_CLASSES = {
-    "REQUIRED_CASE",
-    "INVALID_INPUT_CASE",
-    "IMPOSSIBLE_BY_INVARIANT",
-    "OUT_OF_SCOPE_EXPLICIT",
-    "DUPLICATE_EQUIVALENCE_CLASS",
-    "UNKNOWN_BLOCKING",
+    "REQUIRED_CASE", "INVALID_INPUT_CASE", "IMPOSSIBLE_BY_INVARIANT",
+    "OUT_OF_SCOPE_EXPLICIT", "DUPLICATE_EQUIVALENCE_CLASS", "UNKNOWN_BLOCKING",
 }
 EVIDENCE_STATES = {
-    "PASS",
-    "FAIL",
-    "ABSENT",
-    "NOT_IMPLEMENTED",
-    "NOT_EXERCISED",
-    "SKIPPED_BY_POLICY",
-    "HUMAN_ADMIT_REQUIRED",
+    "PASS", "FAIL", "ABSENT", "NOT_IMPLEMENTED", "NOT_EXERCISED",
+    "SKIPPED_BY_POLICY", "HUMAN_ADMIT_REQUIRED",
 }
-GATES = {
-    "BLOCKED",
-    "READY_FOR_PROTOTYPE",
-    "READY_FOR_IMPLEMENTATION",
-    "READY_FOR_PUBLICATION_REVIEW",
-}
+GATES = {"BLOCKED", "READY_FOR_PROTOTYPE", "READY_FOR_IMPLEMENTATION", "READY_FOR_PUBLICATION_REVIEW"}
 
 
 def fail(msg: str) -> None:
@@ -137,23 +124,15 @@ def validate(doc: Any) -> list[str]:
         if state == "NOT_APPLICABLE" and not str(axis.get("reason", "")).strip():
             errors.append(f"semantic axis {axis_id} NOT_APPLICABLE requires reason")
 
+    behavior_dispositions: dict[str, str] = {}
     blocking_behavior_count = 0
-    disposed_behavior_count = 0
+    allowed_dispositions = PRESERVATION_DISPOSITIONS | DECISION_REQUIRED | {"UNKNOWN_BLOCKING"}
     for behavior_id, behavior in behaviors.items():
         disposition = behavior.get("disposition")
-        allowed = {
-            "PRESERVE_EXACT",
-            "PRESERVE_OBSERVABLE",
-            "ADAPT_WITH_COMPATIBILITY",
-            "INTENTIONAL_CHANGE",
-            "DEFER_EXPLICIT",
-            "DROP_EXPLICIT",
-            "UNKNOWN_BLOCKING",
-        }
-        if disposition not in allowed:
+        if disposition not in allowed_dispositions:
             errors.append(f"source behavior {behavior_id} has invalid/unmapped disposition")
             continue
-        disposed_behavior_count += 1
+        behavior_dispositions[behavior_id] = disposition
         if disposition == "UNKNOWN_BLOCKING":
             blocking_behavior_count += 1
         if disposition in DECISION_REQUIRED:
@@ -179,6 +158,8 @@ def validate(doc: Any) -> list[str]:
         inv_refs = as_list(case.get("invariant_or_state_refs"), f"case {case_id}.invariant_or_state_refs", errors)
         impl_ids = as_list(case.get("implementation_ids"), f"case {case_id}.implementation_ids", errors)
         oracle_ids = as_list(case.get("oracle_ids"), f"case {case_id}.oracle_ids", errors)
+        evidence_ids = as_list(case.get("evidence_ids"), f"case {case_id}.evidence_ids", errors)
+
         for ref in intent_ids:
             if ref not in intents:
                 errors.append(f"case {case_id} references unknown intent {ref}")
@@ -193,9 +174,21 @@ def validate(doc: Any) -> list[str]:
         for ref in oracle_ids:
             if ref not in oracles:
                 errors.append(f"case {case_id} references unknown oracle {ref}")
+        referenced_evidence_states: list[str] = []
+        for ref in evidence_ids:
+            if ref not in evidence:
+                errors.append(f"case {case_id} references unknown evidence {ref}")
+            else:
+                referenced_evidence_states.append(str(evidence[ref].get("state")))
+
         state = case.get("evidence_state")
         if state not in EVIDENCE_STATES:
             errors.append(f"case {case_id} has invalid evidence_state")
+        if evidence_ids:
+            if state in {"PASS", "FAIL"} and state not in referenced_evidence_states:
+                errors.append(f"case {case_id} evidence_state {state} is not backed by referenced evidence")
+        elif state in {"PASS", "FAIL"}:
+            errors.append(f"case {case_id} {state} requires evidence_ids")
 
         if classification == "REQUIRED_CASE":
             if not intent_ids:
@@ -214,7 +207,7 @@ def validate(doc: Any) -> list[str]:
                 case_oracle_closed += 1
             if intent_ids and axis_ids and inv_refs and impl_ids and oracle_ids:
                 required_case_closed += 1
-            if state in {"PASS", "FAIL"}:
+            if evidence_ids and state in {"PASS", "FAIL"} and state in referenced_evidence_states:
                 executed_evidence_closed += 1
 
         if classification == "OUT_OF_SCOPE_EXPLICIT":
@@ -242,23 +235,43 @@ def validate(doc: Any) -> list[str]:
 
     all_ids = set(intents) | set(axes) | set(behaviors) | set(cases) | set(impls) | set(oracles) | set(evidence) | set(decisions)
     graph_edges: list[tuple[str, str]] = []
+    outgoing: dict[str, list[tuple[str, str]]] = {node_id: [] for node_id in all_ids}
     for i, edge in enumerate(as_list(doc.get("edges"), "edges", errors)):
         if not isinstance(edge, dict):
             errors.append(f"edges[{i}] must be an object")
             continue
-        src, dst = edge.get("from"), edge.get("to")
+        src, dst, kind = edge.get("from"), edge.get("to"), edge.get("kind")
         if src not in all_ids:
             errors.append(f"edge {i} references unknown source {src}")
         if dst not in all_ids:
             errors.append(f"edge {i} references unknown target {dst}")
+        if not isinstance(kind, str) or not kind.strip():
+            errors.append(f"edge {i} requires kind")
         if src in all_ids and dst in all_ids:
             graph_edges.append((src, dst))
+            outgoing[src].append((dst, str(kind)))
     if detect_cycle(all_ids, graph_edges):
         errors.append("provenance graph contains a cycle")
 
+    behavior_closed = 0
+    for behavior_id, disposition in behavior_dispositions.items():
+        links = outgoing.get(behavior_id, [])
+        case_links = [dst for dst, _ in links if dst in cases]
+        decision_id = behaviors[behavior_id].get("decision_id")
+        if disposition in PRESERVATION_DISPOSITIONS:
+            if not case_links:
+                errors.append(f"source behavior {behavior_id} disposition {disposition} requires a case edge")
+            else:
+                behavior_closed += 1
+        elif disposition in DECISION_REQUIRED:
+            if isinstance(decision_id, str) and decision_id in decisions:
+                behavior_closed += 1
+        elif disposition == "UNKNOWN_BLOCKING":
+            behavior_closed += 1
+
     computed = {
         "intent": ratio(len(intent_covered), len(intents)),
-        "source_behavior_disposition": ratio(disposed_behavior_count, len(behaviors)),
+        "source_behavior_disposition": ratio(behavior_closed, len(behaviors)),
         "required_case": ratio(required_case_closed, len(required_cases)),
         "implementation_binding": ratio(case_impl_closed, len(required_cases)),
         "oracle": ratio(case_oracle_closed, len(required_cases)),
@@ -304,8 +317,7 @@ def main(argv: list[str]) -> int:
         return 64
     path = Path(argv[2])
     try:
-        raw = path.read_text(encoding="utf-8")
-        doc = json.loads(raw)
+        doc = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, UnicodeError, json.JSONDecodeError) as exc:
         print(f"CASE-GRAPH-UNUSABLE {exc}", file=sys.stderr)
         return 64
