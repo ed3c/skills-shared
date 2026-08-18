@@ -1,0 +1,188 @@
+{
+  "schema": "prel/product-signal/v1",
+  "compatibility": {
+    "producer_id": "prel/product-signal-producer/v1",
+    "producer_digest": "d1597890bcb085af768005cd26893865c8cfebd56d366de99ecc79098c1c575d",
+    "consumed_fields": ["id", "slot", "kind", "statement", "observation", "oracle", "depends_on", "source_ref"]
+  },
+  "subject": {
+    "product_id": "PRODUCT-ALPHA",
+    "surface": "public web application, unauthenticated and trial tiers",
+    "captured_at": "2026-08-18",
+    "subject_digest": "91e1eeda3cef8a642bd63d74d1d3b9cc529f0fc635c56b25919fdbd8db0b21ae"
+  },
+  "signals": [
+    {
+      "id": "SIG-001",
+      "slot": "JOB",
+      "kind": "USER_INTERVIEW",
+      "statement": "a buyer needs one defensible comparison instead of nine vendor pages",
+      "observation": null,
+      "oracle": null,
+      "depends_on": [],
+      "source_ref": "INTERVIEW-SET-A"
+    },
+    {
+      "id": "SIG-002",
+      "slot": "PAIN",
+      "kind": "OBSERVED_ARTIFACT",
+      "statement": "the trial funnel loses users at the manual data-entry step",
+      "observation": {
+        "method": "counted funnel steps on the public trial surface, three repeats",
+        "artifact_ref": "CAPTURE-TRIAL-FUNNEL-01",
+        "repeatable": true
+      },
+      "oracle": null,
+      "depends_on": [],
+      "source_ref": "CAPTURE-SET-A"
+    },
+    {
+      "id": "SIG-003",
+      "slot": "WORKFLOW",
+      "kind": "OBSERVED_ARTIFACT",
+      "statement": "the user uploads a source file before any comparison is offered",
+      "observation": {
+        "method": "walked the unauthenticated flow end to end, three repeats",
+        "artifact_ref": "CAPTURE-FLOW-01",
+        "repeatable": true
+      },
+      "oracle": null,
+      "depends_on": [],
+      "source_ref": "CAPTURE-SET-A"
+    },
+    {
+      "id": "SIG-004",
+      "slot": "WORKFLOW",
+      "kind": "OBSERVED_ARTIFACT",
+      "statement": "the comparison view is regenerated whenever a source file changes",
+      "observation": {
+        "method": "replaced the source file and re-read the comparison view",
+        "artifact_ref": "CAPTURE-FLOW-02",
+        "repeatable": true
+      },
+      "oracle": null,
+      "depends_on": [],
+      "source_ref": "CAPTURE-SET-A"
+    },
+    {
+      "id": "SIG-005",
+      "slot": "MAGIC_MOMENT",
+      "kind": "OBSERVED_ARTIFACT",
+      "statement": "the first defensible comparison appears without any manual re-entry",
+      "observation": {
+        "method": "timed the first comparison from a cold trial account",
+        "artifact_ref": "CAPTURE-FIRST-VALUE-01",
+        "repeatable": true
+      },
+      "oracle": null,
+      "depends_on": [],
+      "source_ref": "CAPTURE-SET-A"
+    },
+    {
+      "id": "SIG-006",
+      "slot": "MECHANISM",
+      "kind": "OBSERVED_ARTIFACT",
+      "statement": "identical source files produce byte-identical comparison output",
+      "observation": {
+        "method": "submitted the same source file twice and diffed both outputs",
+        "artifact_ref": "CAPTURE-DETERMINISM-01",
+        "repeatable": true
+      },
+      "oracle": {
+        "id": "ORC-001",
+        "lane": "DETERMINISTIC",
+        "procedure": "submit one source file twice and byte-compare both outputs",
+        "refuted_by": "any byte difference between the two outputs"
+      },
+      "depends_on": [],
+      "source_ref": "CAPTURE-SET-A"
+    },
+    {
+      "id": "SIG-007",
+      "slot": "MECHANISM",
+      "kind": "OBSERVED_ARTIFACT",
+      "statement": "an unparseable source file is refused before any comparison is shown",
+      "observation": {
+        "method": "submitted a deliberately malformed source file, three repeats",
+        "artifact_ref": "CAPTURE-REFUSAL-01",
+        "repeatable": true
+      },
+      "oracle": {
+        "id": "ORC-002",
+        "lane": "BEHAVIORAL",
+        "procedure": "submit a malformed source file and read the surface response",
+        "refuted_by": "a comparison rendered from a file the surface could not parse"
+      },
+      "depends_on": [],
+      "source_ref": "CAPTURE-SET-A"
+    },
+    {
+      "id": "SIG-008",
+      "slot": "MECHANISM",
+      "kind": "SOURCE_STATEMENT",
+      "statement": "the vendor states that ranking is computed by a proprietary model",
+      "observation": null,
+      "oracle": null,
+      "depends_on": [],
+      "source_ref": "VENDOR-PAGE-A"
+    },
+    {
+      "id": "SIG-009",
+      "slot": "MECHANISM",
+      "kind": "INFERENCE",
+      "statement": "response latency suggests results are cached per source digest",
+      "observation": null,
+      "oracle": null,
+      "depends_on": [],
+      "source_ref": "ANALYST-NOTE-A"
+    },
+    {
+      "id": "SIG-010",
+      "slot": "CAPABILITY",
+      "kind": "OBSERVED_ARTIFACT",
+      "statement": "parse an uploaded source file into typed records",
+      "observation": {
+        "method": "read the typed records the surface exposes after upload",
+        "artifact_ref": "CAPTURE-CAPABILITY-01",
+        "repeatable": true
+      },
+      "oracle": null,
+      "depends_on": [],
+      "source_ref": "CAPTURE-SET-A"
+    },
+    {
+      "id": "SIG-011",
+      "slot": "CAPABILITY",
+      "kind": "OBSERVED_ARTIFACT",
+      "statement": "render a comparison view over the typed records",
+      "observation": {
+        "method": "read the comparison view against the typed records it cites",
+        "artifact_ref": "CAPTURE-CAPABILITY-02",
+        "repeatable": true
+      },
+      "oracle": null,
+      "depends_on": ["SIG-010"],
+      "source_ref": "CAPTURE-SET-A"
+    },
+    {
+      "id": "SIG-012",
+      "slot": "RIGHTS",
+      "kind": "SOURCE_STATEMENT",
+      "statement": "the published terms restrict automated retrieval of the comparison view",
+      "observation": null,
+      "oracle": null,
+      "depends_on": [],
+      "source_ref": "PUBLISHED-TERMS-A"
+    },
+    {
+      "id": "SIG-013",
+      "slot": "MARKET",
+      "kind": "MARKET_ATTENTION",
+      "statement": "the category is discussed heavily on public aggregator boards",
+      "observation": null,
+      "oracle": null,
+      "depends_on": [],
+      "source_ref": "AGGREGATOR-SET-A"
+    }
+  ]
+}

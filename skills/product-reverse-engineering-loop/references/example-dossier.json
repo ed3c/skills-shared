@@ -1,0 +1,167 @@
+{
+  "capability_graph": {
+    "edges": [
+      {
+        "basis": "declared dependency SIG-010 -> SIG-011",
+        "from": "CAP-001",
+        "to": "CAP-002"
+      }
+    ],
+    "nodes": [
+      {
+        "capability": "parse an uploaded source file into typed records",
+        "grade": "OBSERVED",
+        "id": "CAP-001",
+        "signal_ids": [
+          "SIG-010"
+        ]
+      },
+      {
+        "capability": "render a comparison view over the typed records",
+        "grade": "OBSERVED",
+        "id": "CAP-002",
+        "signal_ids": [
+          "SIG-011"
+        ]
+      }
+    ]
+  },
+  "derived_from": {
+    "artifact": "example-product-signal.json",
+    "digest": "046e052e3a084f74ef10654b03b32b959e8022ddab2be442971a542c2f7527f6"
+  },
+  "evidence_ceiling": {
+    "deterministic_contract": "PASS",
+    "live_provider_execution": "NOT_EXERCISED",
+    "portable_procedure": "PASS",
+    "product_market_fit": "NOT_EXERCISED",
+    "production_readiness": "NOT_EXERCISED"
+  },
+  "job": {
+    "grade": "REPORTED",
+    "signal_ids": [
+      "SIG-001"
+    ],
+    "statement": "a buyer needs one defensible comparison instead of nine vendor pages"
+  },
+  "magic_moment": {
+    "grade": "OBSERVED",
+    "signal_ids": [
+      "SIG-005"
+    ],
+    "statement": "the first defensible comparison appears without any manual re-entry"
+  },
+  "mechanism_hypotheses": [
+    {
+      "classification": "OBSERVABLE_MECHANISM",
+      "grade": "OBSERVED",
+      "id": "MECH-001",
+      "oracle_id": "ORC-001",
+      "signal_ids": [
+        "SIG-006"
+      ],
+      "statement": "identical source files produce byte-identical comparison output"
+    },
+    {
+      "classification": "OBSERVABLE_MECHANISM",
+      "grade": "OBSERVED",
+      "id": "MECH-002",
+      "oracle_id": "ORC-002",
+      "signal_ids": [
+        "SIG-007"
+      ],
+      "statement": "an unparseable source file is refused before any comparison is shown"
+    },
+    {
+      "classification": "VENDOR_CLAIMED_MECHANISM",
+      "grade": "CLAIMED",
+      "id": "MECH-003",
+      "oracle_id": null,
+      "signal_ids": [
+        "SIG-008"
+      ],
+      "statement": "the vendor states that ranking is computed by a proprietary model"
+    },
+    {
+      "classification": "UNOBSERVABLE_MECHANISM",
+      "grade": "INFERRED",
+      "id": "MECH-004",
+      "oracle_id": null,
+      "signal_ids": [
+        "SIG-009"
+      ],
+      "statement": "response latency suggests results are cached per source digest"
+    }
+  ],
+  "mvp": {
+    "excluded": [
+      "response latency suggests results are cached per source digest",
+      "the vendor states that ranking is computed by a proprietary model"
+    ],
+    "scope": [
+      {
+        "id": "REQ-001",
+        "lane": "DETERMINISTIC",
+        "oracle_id": "ORC-001",
+        "requirement": "reproduce MECH-001: identical source files produce byte-identical comparison output",
+        "source_id": "MECH-001"
+      },
+      {
+        "id": "REQ-002",
+        "lane": "BEHAVIORAL",
+        "oracle_id": "ORC-002",
+        "requirement": "reproduce MECH-002: an unparseable source file is refused before any comparison is shown",
+        "source_id": "MECH-002"
+      },
+      {
+        "id": "REQ-003",
+        "lane": "USER",
+        "oracle_id": null,
+        "requirement": "deliver the magic moment: the first defensible comparison appears without any manual re-entry",
+        "source_id": "MAGIC_MOMENT"
+      }
+    ],
+    "stop_loss": {
+      "action": "stop implementation and return the row to its named owner as a remaining item",
+      "condition": "any compiled MVP scope row is still BLOCKED_NO_ORACLE, BLOCKED_NOT_FALSIFIABLE or BLOCKED_LANE_MISMATCH after the closure matrix is compiled"
+    }
+  },
+  "pain": {
+    "grade": "OBSERVED",
+    "signal_ids": [
+      "SIG-002"
+    ],
+    "statement": "the trial funnel loses users at the manual data-entry step"
+  },
+  "rights": [
+    {
+      "id": "RGT-001",
+      "owner": "PUBLISHED-TERMS-A",
+      "resource": "the published terms restrict automated retrieval of the comparison view",
+      "state": "HUMAN_ADMIT_REQUIRED"
+    }
+  ],
+  "schema": "prel/reverse-engineering-dossier/v1",
+  "subject": {
+    "captured_at": "2026-08-18",
+    "product_id": "PRODUCT-ALPHA",
+    "subject_digest": "91e1eeda3cef8a642bd63d74d1d3b9cc529f0fc635c56b25919fdbd8db0b21ae",
+    "surface": "public web application, unauthenticated and trial tiers"
+  },
+  "workflow": [
+    {
+      "grade": "OBSERVED",
+      "signal_ids": [
+        "SIG-003"
+      ],
+      "statement": "the user uploads a source file before any comparison is offered"
+    },
+    {
+      "grade": "OBSERVED",
+      "signal_ids": [
+        "SIG-004"
+      ],
+      "statement": "the comparison view is regenerated whenever a source file changes"
+    }
+  ]
+}

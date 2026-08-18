@@ -1,0 +1,86 @@
+{
+  "derived_from": {
+    "artifact": "example-closure-matrix.json",
+    "digest": "457777ada28d6c8bba32cf7c46453b6773c1a356969fe04d335e77404500c074"
+  },
+  "human_admit": [
+    "commercial or usage rights admission",
+    "merge",
+    "permission or legal expansion",
+    "release or promotion",
+    "rollback"
+  ],
+  "packets": [
+    {
+      "closure_row_id": "CLR-001",
+      "convergence_owner": null,
+      "depends_on": [],
+      "entry_condition": "closure row CLR-001 is OPEN_WITH_ORACLE against the digest named in exact_subject",
+      "exact_subject": {
+        "artifact": "example-closure-matrix.json",
+        "digest": "457777ada28d6c8bba32cf7c46453b6773c1a356969fe04d335e77404500c074"
+      },
+      "exit_condition": "oracle ORC-001 produced a verdict bound to the same subject digest",
+      "id": "PKT-001",
+      "paths_lease": [
+        "prel/CLR-001/"
+      ],
+      "verification": {
+        "lane": "DETERMINISTIC",
+        "procedure": "run oracle ORC-001 and record its verdict"
+      }
+    },
+    {
+      "closure_row_id": "CLR-002",
+      "convergence_owner": null,
+      "depends_on": [],
+      "entry_condition": "closure row CLR-002 is OPEN_WITH_ORACLE against the digest named in exact_subject",
+      "exact_subject": {
+        "artifact": "example-closure-matrix.json",
+        "digest": "457777ada28d6c8bba32cf7c46453b6773c1a356969fe04d335e77404500c074"
+      },
+      "exit_condition": "oracle ORC-002 produced a verdict bound to the same subject digest",
+      "id": "PKT-002",
+      "paths_lease": [
+        "prel/CLR-002/"
+      ],
+      "verification": {
+        "lane": "BEHAVIORAL",
+        "procedure": "run oracle ORC-002 and record its verdict"
+      }
+    }
+  ],
+  "remaining": [
+    {
+      "closure_row_id": "CLR-003",
+      "criterion": "deliver the magic moment: the first defensible comparison appears without any manual re-entry",
+      "owner": "CONSUMER_USER_EVIDENCE_OWNER",
+      "state": "ABSENT"
+    },
+    {
+      "closure_row_id": "CLR-004",
+      "criterion": "design an oracle for MECH-003: the vendor states that ranking is computed by a proprietary model",
+      "owner": "HUMAN_ADMIT_OWNER",
+      "state": "ABSENT"
+    },
+    {
+      "closure_row_id": "CLR-005",
+      "criterion": "design an oracle for MECH-004: response latency suggests results are cached per source digest",
+      "owner": "PORTABLE_DETERMINISTIC_OWNER",
+      "state": "ABSENT"
+    },
+    {
+      "closure_row_id": "CLR-006",
+      "criterion": "admit usage rights for the published terms restrict automated retrieval of the comparison view",
+      "owner": "HUMAN_ADMIT_OWNER",
+      "state": "HUMAN_ADMIT_REQUIRED"
+    }
+  ],
+  "schema": "prel/reverse-engineering-handoff/v1",
+  "subject": {
+    "captured_at": "2026-08-18",
+    "product_id": "PRODUCT-ALPHA",
+    "subject_digest": "91e1eeda3cef8a642bd63d74d1d3b9cc529f0fc635c56b25919fdbd8db0b21ae",
+    "surface": "public web application, unauthenticated and trial tiers"
+  }
+}

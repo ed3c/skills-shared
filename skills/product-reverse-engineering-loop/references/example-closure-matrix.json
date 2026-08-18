@@ -1,0 +1,88 @@
+{
+  "derived_from": {
+    "artifact": "example-dossier.json",
+    "digest": "5cd1fbc2f878565f3cbb305e9f8d40704f31a526e33807a53f9b56e4cdf04eb4"
+  },
+  "evidence_ceiling": {
+    "deterministic_contract": "PASS",
+    "live_provider_execution": "NOT_EXERCISED",
+    "portable_procedure": "PASS",
+    "product_market_fit": "NOT_EXERCISED",
+    "production_readiness": "NOT_EXERCISED"
+  },
+  "rows": [
+    {
+      "closure_state": "OPEN_WITH_ORACLE",
+      "evidence_state": "NOT_EXERCISED",
+      "id": "CLR-001",
+      "lane": "DETERMINISTIC",
+      "oracle_id": "ORC-001",
+      "oracle_lane": "DETERMINISTIC",
+      "owner": "PORTABLE_DETERMINISTIC_OWNER",
+      "requirement": "reproduce MECH-001: identical source files produce byte-identical comparison output",
+      "source_id": "MECH-001"
+    },
+    {
+      "closure_state": "OPEN_WITH_ORACLE",
+      "evidence_state": "NOT_EXERCISED",
+      "id": "CLR-002",
+      "lane": "BEHAVIORAL",
+      "oracle_id": "ORC-002",
+      "oracle_lane": "BEHAVIORAL",
+      "owner": "PORTABLE_DETERMINISTIC_OWNER",
+      "requirement": "reproduce MECH-002: an unparseable source file is refused before any comparison is shown",
+      "source_id": "MECH-002"
+    },
+    {
+      "closure_state": "BLOCKED_NO_ORACLE",
+      "evidence_state": "ABSENT",
+      "id": "CLR-003",
+      "lane": "USER",
+      "oracle_id": null,
+      "oracle_lane": null,
+      "owner": "CONSUMER_USER_EVIDENCE_OWNER",
+      "requirement": "deliver the magic moment: the first defensible comparison appears without any manual re-entry",
+      "source_id": "MAGIC_MOMENT"
+    },
+    {
+      "closure_state": "BLOCKED_NOT_FALSIFIABLE",
+      "evidence_state": "ABSENT",
+      "id": "CLR-004",
+      "lane": "HUMAN_ADMIT",
+      "oracle_id": null,
+      "oracle_lane": null,
+      "owner": "HUMAN_ADMIT_OWNER",
+      "requirement": "design an oracle for MECH-003: the vendor states that ranking is computed by a proprietary model",
+      "source_id": "MECH-003"
+    },
+    {
+      "closure_state": "BLOCKED_NO_ORACLE",
+      "evidence_state": "ABSENT",
+      "id": "CLR-005",
+      "lane": "BEHAVIORAL",
+      "oracle_id": null,
+      "oracle_lane": null,
+      "owner": "PORTABLE_DETERMINISTIC_OWNER",
+      "requirement": "design an oracle for MECH-004: response latency suggests results are cached per source digest",
+      "source_id": "MECH-004"
+    },
+    {
+      "closure_state": "HUMAN_ADMIT_REQUIRED",
+      "evidence_state": "HUMAN_ADMIT_REQUIRED",
+      "id": "CLR-006",
+      "lane": "HUMAN_ADMIT",
+      "oracle_id": null,
+      "oracle_lane": null,
+      "owner": "HUMAN_ADMIT_OWNER",
+      "requirement": "admit usage rights for the published terms restrict automated retrieval of the comparison view",
+      "source_id": "RGT-001"
+    }
+  ],
+  "schema": "prel/problem-closure-matrix/v1",
+  "subject": {
+    "captured_at": "2026-08-18",
+    "product_id": "PRODUCT-ALPHA",
+    "subject_digest": "91e1eeda3cef8a642bd63d74d1d3b9cc529f0fc635c56b25919fdbd8db0b21ae",
+    "surface": "public web application, unauthenticated and trial tiers"
+  }
+}

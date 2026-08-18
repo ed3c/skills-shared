@@ -1,0 +1,240 @@
+{
+  "schema": "prel/prompt-packet/v1",
+  "envelope": {
+    "id": "COMMON_SYSTEM_ENVELOPE",
+    "evidence_vocabulary": [
+      "PASS",
+      "FAIL",
+      "ABSENT",
+      "NOT_IMPLEMENTED",
+      "NOT_EXERCISED",
+      "SKIPPED_BY_POLICY",
+      "HUMAN_ADMIT_REQUIRED"
+    ],
+    "refusal_codes": [
+      "SOURCE_STATEMENT_AS_OBSERVED_ARCHITECTURE",
+      "FEATURE_CLONE_WITHOUT_JOB_HYPOTHESIS",
+      "MARKET_ATTENTION_AS_DEMAND",
+      "MECHANISM_WITHOUT_OBSERVABLE_ORACLE",
+      "TECHNICAL_PASS_AS_USER_VALIDATION",
+      "FALSE_SERIALIZATION_OF_INDEPENDENT_LEAVES",
+      "HIDDEN_CONVERGENCE_OR_OVERLAPPING_LEASE",
+      "PRIOR_CHAT_PROSE_AS_HANDOFF",
+      "CONSUMER_TOPOLOGY_IN_PORTABLE_CORE",
+      "PROMPT_GRANTS_RESERVED_AUTHORITY",
+      "PROMPT_REQUESTS_PRIVATE_REASONING",
+      "STALE_SUBJECT",
+      "HOLLOW_EVIDENCE",
+      "CEILING_OVERCLAIM"
+    ],
+    "requests_private_reasoning": false,
+    "authority": {"merge": false, "permission": false, "secret": false, "production": false},
+    "human_owned_operations": [
+      "merge",
+      "permission or legal expansion",
+      "release or promotion",
+      "rollback",
+      "commercial or usage rights admission",
+      "semantic conflict resolution"
+    ],
+    "consumer_binding": {
+      "issue_ref": "#000",
+      "worker_branch": "refs/heads/<worker-branch>",
+      "workspace_root": "/home/<consumer-workspace>"
+    }
+  },
+  "surfaces": [
+    {
+      "id": "STAGE_1_CONTROL_BINDER",
+      "exact_subject": {
+        "artifact": "example-product-signal.json",
+        "digest": "046e052e3a084f74ef10654b03b32b959e8022ddab2be442971a542c2f7527f6"
+      },
+      "lease": ["prel/control-binding/"],
+      "start_dependencies": ["COMMON_SYSTEM_ENVELOPE"],
+      "completion_dependencies": [],
+      "evidence_lanes": ["DETERMINISTIC"],
+      "negative_controls": [
+        "refuse a run whose refusal codes are not bound before any signal is read",
+        "refuse an objective that names a conclusion instead of a question"
+      ],
+      "rollback": "discard the binding and re-enter INPUT_BOUND with no artifact written",
+      "human_owned_operations": ["admit the scope and the evidence ceiling of the run"],
+      "requests_private_reasoning": false,
+      "authority": {"merge": false, "permission": false, "secret": false, "production": false},
+      "consumer_binding": {}
+    },
+    {
+      "id": "STAGE_2_SOURCE_INTAKE",
+      "exact_subject": {
+        "artifact": "example-product-signal.json",
+        "digest": "046e052e3a084f74ef10654b03b32b959e8022ddab2be442971a542c2f7527f6"
+      },
+      "lease": ["prel/source-intake/"],
+      "start_dependencies": ["STAGE_1_CONTROL_BINDER"],
+      "completion_dependencies": ["STAGE_1_CONTROL_BINDER"],
+      "evidence_lanes": ["DETERMINISTIC", "BEHAVIORAL"],
+      "negative_controls": [
+        "refuse a source statement filed with an observation block",
+        "refuse market attention filed under a job or a pain slot",
+        "refuse a retrieval the published terms of the surface do not allow"
+      ],
+      "rollback": "drop the intake batch and keep the previously admitted signal set",
+      "human_owned_operations": ["admit retrieval against a surface whose terms restrict it"],
+      "requests_private_reasoning": false,
+      "authority": {"merge": false, "permission": false, "secret": false, "production": false},
+      "consumer_binding": {}
+    },
+    {
+      "id": "STAGE_3_EVIDENCE_COMPILER",
+      "exact_subject": {
+        "artifact": "example-product-signal.json",
+        "digest": "046e052e3a084f74ef10654b03b32b959e8022ddab2be442971a542c2f7527f6"
+      },
+      "lease": ["prel/evidence-compilation/"],
+      "start_dependencies": ["STAGE_2_SOURCE_INTAKE"],
+      "completion_dependencies": ["STAGE_2_SOURCE_INTAKE"],
+      "evidence_lanes": ["DETERMINISTIC"],
+      "negative_controls": [
+        "refuse a grade the signal kind does not support",
+        "refuse a slot that cites no signal and still carries a grade"
+      ],
+      "rollback": "delete the compiled projection and keep the signal set unchanged",
+      "human_owned_operations": ["admit a new evidence kind into the grading table"],
+      "requests_private_reasoning": false,
+      "authority": {"merge": false, "permission": false, "secret": false, "production": false},
+      "consumer_binding": {}
+    },
+    {
+      "id": "STAGE_4_YC_PRODUCT_REVERSE_ENGINEER",
+      "exact_subject": {
+        "artifact": "example-dossier.json",
+        "digest": "5cd1fbc2f878565f3cbb305e9f8d40704f31a526e33807a53f9b56e4cdf04eb4"
+      },
+      "lease": ["prel/product-hypothesis/"],
+      "start_dependencies": ["STAGE_3_EVIDENCE_COMPILER"],
+      "completion_dependencies": ["STAGE_3_EVIDENCE_COMPILER"],
+      "evidence_lanes": ["DETERMINISTIC", "USER"],
+      "negative_controls": [
+        "refuse a workflow or mechanism list while job or pain is ABSENT",
+        "refuse attention volume offered as demand",
+        "refuse a magic moment with no observed first-value path"
+      ],
+      "rollback": "return the dossier to its previous digest and re-open the job hypothesis",
+      "human_owned_operations": ["admit that a job hypothesis is worth pursuing"],
+      "requests_private_reasoning": false,
+      "authority": {"merge": false, "permission": false, "secret": false, "production": false},
+      "consumer_binding": {}
+    },
+    {
+      "id": "STAGE_5_TECHNICAL_SYSTEMS_ARCHITECT",
+      "exact_subject": {
+        "artifact": "example-dossier.json",
+        "digest": "5cd1fbc2f878565f3cbb305e9f8d40704f31a526e33807a53f9b56e4cdf04eb4"
+      },
+      "lease": ["prel/capability-graph/"],
+      "start_dependencies": ["STAGE_4_YC_PRODUCT_REVERSE_ENGINEER"],
+      "completion_dependencies": ["STAGE_4_YC_PRODUCT_REVERSE_ENGINEER"],
+      "evidence_lanes": ["DETERMINISTIC", "BEHAVIORAL"],
+      "negative_controls": [
+        "refuse a mechanism classified observable with no oracle",
+        "refuse a capability edge no signal declared",
+        "refuse a usage right marked PASS by anything other than a Human record"
+      ],
+      "rollback": "drop the capability graph and keep the classified mechanisms only",
+      "human_owned_operations": ["admit usage and licensing rights for a named resource"],
+      "requests_private_reasoning": false,
+      "authority": {"merge": false, "permission": false, "secret": false, "production": false},
+      "consumer_binding": {}
+    },
+    {
+      "id": "STAGE_6_SHADOW_MONITOR",
+      "exact_subject": {
+        "artifact": "example-closure-matrix.json",
+        "digest": "457777ada28d6c8bba32cf7c46453b6773c1a356969fe04d335e77404500c074"
+      },
+      "lease": ["prel/shadow-findings/"],
+      "start_dependencies": ["STAGE_5_TECHNICAL_SYSTEMS_ARCHITECT"],
+      "completion_dependencies": ["STAGE_5_TECHNICAL_SYSTEMS_ARCHITECT"],
+      "evidence_lanes": ["DETERMINISTIC"],
+      "negative_controls": [
+        "refuse a technical oracle offered as user or paid validation",
+        "refuse a closure state the row's own oracle lane does not support",
+        "refuse to write any state: this surface reports findings and owns none"
+      ],
+      "rollback": "withdraw the findings record; no reviewed state was ever mutated",
+      "human_owned_operations": ["decide what a finding means for the objective"],
+      "requests_private_reasoning": false,
+      "authority": {"merge": false, "permission": false, "secret": false, "production": false},
+      "consumer_binding": {}
+    },
+    {
+      "id": "STAGE_7_TECH_LEAD_PLANNER",
+      "exact_subject": {
+        "artifact": "example-closure-matrix.json",
+        "digest": "457777ada28d6c8bba32cf7c46453b6773c1a356969fe04d335e77404500c074"
+      },
+      "lease": ["prel/implementation-plan/"],
+      "start_dependencies": ["STAGE_6_SHADOW_MONITOR"],
+      "completion_dependencies": ["STAGE_6_SHADOW_MONITOR"],
+      "evidence_lanes": ["DETERMINISTIC"],
+      "negative_controls": [
+        "refuse an edge between packets that consumes nothing the parent produces",
+        "refuse two packets holding an overlapping path lease",
+        "refuse a convergence with more than one owner or with none"
+      ],
+      "rollback": "discard the packet graph and keep the closure matrix as the record",
+      "human_owned_operations": ["admit the budget and the parallelism of the plan"],
+      "requests_private_reasoning": false,
+      "authority": {"merge": false, "permission": false, "secret": false, "production": false},
+      "consumer_binding": {}
+    },
+    {
+      "id": "STAGE_8_MOLECULAR_WORKER",
+      "exact_subject": {
+        "artifact": "example-handoff.json",
+        "digest": "97534638c33859f10027df794a6102389b0dd2ad39d22b92f5e9e78d5614709d"
+      },
+      "lease": ["prel/worker-attempt/"],
+      "start_dependencies": ["STAGE_7_TECH_LEAD_PLANNER"],
+      "completion_dependencies": ["STAGE_7_TECH_LEAD_PLANNER"],
+      "evidence_lanes": ["DETERMINISTIC", "BEHAVIORAL"],
+      "negative_controls": [
+        "refuse work outside the packet's own path lease",
+        "refuse a subject digest that no longer matches the named artifact",
+        "refuse a verdict produced in a lane other than the packet's own"
+      ],
+      "rollback": "abandon the attempt inside its lease; no shared state was written",
+      "human_owned_operations": ["merge", "release or promotion", "rollback"],
+      "requests_private_reasoning": false,
+      "authority": {"merge": false, "permission": false, "secret": false, "production": false},
+      "consumer_binding": {}
+    },
+    {
+      "id": "STAGE_9_CONVERGENCE_OWNER",
+      "exact_subject": {
+        "artifact": "example-handoff.json",
+        "digest": "97534638c33859f10027df794a6102389b0dd2ad39d22b92f5e9e78d5614709d"
+      },
+      "lease": ["prel/convergence/"],
+      "start_dependencies": ["STAGE_8_MOLECULAR_WORKER"],
+      "completion_dependencies": ["STAGE_8_MOLECULAR_WORKER"],
+      "evidence_lanes": ["DETERMINISTIC", "HUMAN_ADMIT"],
+      "negative_controls": [
+        "refuse to converge while any packet's exit condition is unmet",
+        "refuse to promote a remaining item to PASS at convergence",
+        "refuse to close a lane whose owner is a consumer or a Human"
+      ],
+      "rollback": "restore the pre-convergence indexes and leave every packet open",
+      "human_owned_operations": [
+        "merge",
+        "release or promotion",
+        "rollback",
+        "permission or legal expansion"
+      ],
+      "requests_private_reasoning": false,
+      "authority": {"merge": false, "permission": false, "secret": false, "production": false},
+      "consumer_binding": {}
+    }
+  ]
+}

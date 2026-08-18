@@ -1,0 +1,148 @@
+{
+  "skill_name": "product-reverse-engineering-loop",
+  "version": "1.0.0",
+  "_meta": {
+    "coverage_metric": "planted-defect refusal rate by refusal code. A defect counts only when the checker exits non-zero AND names the code that owns it; a generic failure is not detection, because a checker that fails everything for one reason is indistinguishable from a working one at the exit status.",
+    "scope": "This plane records what the local suite decides. It is not the repository skill-eval plane (evals/cases + evals/coverage.json); a claim here is closed by tests/run-all.sh on current repository bytes and by nothing else.",
+    "uncovered_by_design": [
+      "whether a signal statement is true of the real product -- the checker validates evidence grade and shape, never the world",
+      "whether the compiled job hypothesis is the right one -- that is a USER-lane judgement with no deterministic oracle",
+      "whether an oracle's refutation condition is strong enough -- shape is checkable, adequacy is not",
+      "whether a capability edge that nobody declared should exist -- the compiler cannot know what was not observed"
+    ]
+  },
+  "runnable": [
+    {
+      "id": "PREL-1",
+      "checker_script": "scripts/check_prel_contract.py",
+      "test_verify": "tests/selftest.py",
+      "good_fixture": "references/example-product-signal.json",
+      "hollow_fixture": null,
+      "hollow_mutations": "in-process temp copies of references/ carrying one planted defect each: source statement filed with an observation, attention filed as a pain, an observed mechanism with no oracle, a placeholder source_ref, an OBSERVED_ARTIFACT with a null observation, an unknown consumed field, an unbound signal dependency",
+      "covers": [
+        "SOURCE_STATEMENT_AS_OBSERVED_ARCHITECTURE",
+        "MARKET_ATTENTION_AS_DEMAND",
+        "MECHANISM_WITHOUT_OBSERVABLE_ORACLE",
+        "HOLLOW_EVIDENCE",
+        "COMPATIBILITY_FIELD_UNKNOWN",
+        "SIGNAL_DEPENDENCY_UNBOUND"
+      ],
+      "expected": "the committed signal set is green; every planted intake defect exits non-zero and names its own refusal code"
+    },
+    {
+      "id": "PREL-2",
+      "checker_script": "scripts/check_prel_contract.py",
+      "test_verify": "tests/selftest.py",
+      "good_fixture": "references/example-dossier.json",
+      "hollow_fixture": null,
+      "hollow_mutations": "a blanked job slot beside a populated workflow, an observable mechanism stripped of its oracle, a vendor claim regraded OBSERVED, a graded slot citing no signal, a PASS on product-market fit, an unbound capability edge, a usage right marked PASS",
+      "covers": [
+        "FEATURE_CLONE_WITHOUT_JOB_HYPOTHESIS",
+        "MECHANISM_WITHOUT_OBSERVABLE_ORACLE",
+        "SOURCE_STATEMENT_AS_OBSERVED_ARCHITECTURE",
+        "UNGRADED_SLOT",
+        "CEILING_OVERCLAIM",
+        "CAPABILITY_EDGE_UNBOUND"
+      ],
+      "expected": "the compiled dossier is green against its schema, its laws and its upstream digest; every planted dossier defect is refused by its own code"
+    },
+    {
+      "id": "PREL-3",
+      "checker_script": "scripts/check_prel_contract.py",
+      "test_verify": "tests/selftest.py",
+      "good_fixture": "references/example-closure-matrix.json",
+      "hollow_fixture": null,
+      "hollow_mutations": "a USER-lane row closed by a DETERMINISTIC oracle, a closure claimed with no oracle, a blocked row marked PASS, a PASS on live provider execution",
+      "covers": [
+        "TECHNICAL_PASS_AS_USER_VALIDATION",
+        "CLOSURE_STATE_UNSUPPORTED",
+        "CEILING_OVERCLAIM"
+      ],
+      "expected": "the compiled matrix is green; a technical oracle offered as user validation is refused by name, which is the cheapest laundering path in the loop"
+    },
+    {
+      "id": "PREL-4",
+      "checker_script": "scripts/check_prel_contract.py",
+      "test_verify": "tests/selftest.py",
+      "good_fixture": "references/example-handoff.json",
+      "hollow_fixture": null,
+      "hollow_mutations": "an edge consuming a path its parent does not lease, two packets sharing a lease, a convergence owner on a non-convergence, a dependency cycle, an edge to a packet that does not exist, an entry condition pointing at conversation prose, a remaining item marked PASS",
+      "covers": [
+        "FALSE_SERIALIZATION_OF_INDEPENDENT_LEAVES",
+        "HIDDEN_CONVERGENCE_OR_OVERLAPPING_LEASE",
+        "HANDOFF_CYCLE",
+        "HANDOFF_EDGE_UNBOUND",
+        "PRIOR_CHAT_PROSE_AS_HANDOFF",
+        "CEILING_OVERCLAIM"
+      ],
+      "expected": "the compiled handoff is green; every fabricated edge, shared lease and prose subject is refused by its own code"
+    },
+    {
+      "id": "PREL-5",
+      "checker_script": "scripts/check_prel_contract.py",
+      "test_verify": "tests/selftest.py",
+      "good_fixture": "references/example-prompt-packet.json",
+      "hollow_fixture": null,
+      "hollow_mutations": "merge authority granted in the envelope, a surface asking for chain of thought, a surface reserving no Human operation, a branch reference outside consumer_binding, a dropped surface, an unbound stage dependency, two surfaces sharing a lease, and a catalogue with a surface silently removed",
+      "covers": [
+        "PROMPT_GRANTS_RESERVED_AUTHORITY",
+        "PROMPT_REQUESTS_PRIVATE_REASONING",
+        "CONSUMER_TOPOLOGY_IN_PORTABLE_CORE",
+        "PROMPT_SURFACE_SET_DRIFT",
+        "PROMPT_DEPENDENCY_UNBOUND",
+        "HIDDEN_CONVERGENCE_OR_OVERLAPPING_LEASE"
+      ],
+      "expected": "the committed packet and catalogue are green and reconciled with each other; every planted authority, reasoning, topology and drift defect is refused by name"
+    },
+    {
+      "id": "PREL-6",
+      "checker_script": "scripts/compile_prel.py",
+      "test_verify": "tests/selftest.py",
+      "good_fixture": "references/example-product-signal.json",
+      "hollow_fixture": null,
+      "hollow_mutations": "a hand-edited closure matrix that --check must reject, and a signal set stripped of every observable mechanism and graded magic moment, which the dossier compiler must refuse rather than compile into an empty MVP",
+      "covers": [
+        "byte-stable dossier compilation",
+        "byte-stable closure compilation",
+        "byte-stable handoff compilation",
+        "PREL-COMPILE-RED on a hand-edited projection",
+        "PREL-COMPILE-RED on an empty MVP scope"
+      ],
+      "expected": "all three committed projections are byte-identical on recompilation; a hand edit and an empty scope both exit non-zero"
+    },
+    {
+      "id": "PREL-7",
+      "checker_script": "scripts/check_prel_contract.py",
+      "test_verify": "tests/selftest.py",
+      "good_fixture": "references",
+      "hollow_fixture": null,
+      "hollow_mutations": "three distinct stale states, because they fail differently: an upstream artifact changed after its projection was compiled, a named subject whose bytes moved, and a named subject that is no longer on the tree",
+      "covers": [
+        "STALE_SUBJECT on derived_from",
+        "STALE_SUBJECT on a resolved exact_subject",
+        "STALE_SUBJECT on a vanished artifact"
+      ],
+      "expected": "each stale state is refused; a digest is otherwise only a promise about a file nobody re-reads"
+    }
+  ],
+  "evidence_ceiling": {
+    "portable_procedure": "PASS",
+    "deterministic_contract": "PASS",
+    "closed_by_oracle_producer": "NOT_IMPLEMENTED",
+    "mechanism_reproduction_on_a_real_product": "NOT_EXERCISED",
+    "user_or_paid_validation": "NOT_EXERCISED",
+    "product_market_fit": "ABSENT",
+    "live_provider_execution": "NOT_EXERCISED",
+    "ci_arrival_for_this_suite": "ABSENT",
+    "registry_classification": "ABSENT",
+    "merge_release_and_rights": "HUMAN_ADMIT_REQUIRED"
+  },
+  "ceiling_owners": {
+    "closed_by_oracle_producer": "no code in this repository emits CLOSED_BY_ORACLE; compiling an oracle is not running one, and the state is validated rather than reachable",
+    "mechanism_reproduction_on_a_real_product": "consumer capture adapter, bound through modules/domain-profile.md",
+    "user_or_paid_validation": "consumer user and commercial evidence owners",
+    "product_market_fit": "outside this Skill's boundary entirely",
+    "ci_arrival_for_this_suite": "the lane that owns .github/workflows/ must add this Skill to the Skill Suites matrix and its path filters",
+    "registry_classification": "a Human-admitted registry.json governance change"
+  }
+}
