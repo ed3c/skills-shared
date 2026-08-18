@@ -23,9 +23,21 @@ from typing import Any
 
 SCHEMA = "dual-forge-repository-loop/consumer-canary-receipt/v1"
 SHA40 = re.compile(r"^[0-9a-f]{40}$")
-STATES = {"EXERCISED", "BLOCKED", "NOT_EXERCISED", "SKIPPED_BY_POLICY", "FAIL"}
+SHA256 = re.compile(r"^[0-9a-f]{64}$")
+STATES = {"EXERCISED", "BLOCKED", "ABSENT", "NOT_EXERCISED", "SKIPPED_BY_POLICY", "FAIL"}
 SECRET = re.compile(r"(gh[pousr]_[A-Za-z0-9]{16,}|sk-[A-Za-z0-9]{20,}"
                     r"|://[^/\s:]+:[^/\s@]+@)")
+GIT_TOWN_LINK = "git-town-dry-run-and-local-no-push-sync"
+
+# The four lanes the publication candidate is reported through, and the chain
+# link each one projects. Reported separately from the chain, they are a second
+# place for the receipt to state the same fact -- so they are recomputed here.
+LANES = {
+    "git_town_local": GIT_TOWN_LINK,
+    "forgejo": "forgejo-issue-pr-receipts",
+    "github_actions": "exact-head-github-actions",
+    "publication": "publication-candidate",
+}
 
 # Links that cannot be honestly EXERCISED by a canary that mutated nothing.
 NEEDS_MUTATION = {
@@ -52,7 +64,7 @@ def check_shape(body: Any) -> None:
     if not isinstance(body, dict) or body.get("schema") != SCHEMA:
         refuse("RECEIPT_MALFORMED", f"schema must be {SCHEMA}")
     for section in ("consumer_selection_gate", "chain", "chain_declared", "coverage",
-                    "mutations_performed", "declared_non_claims"):
+                    "lanes", "mutations_performed", "declared_non_claims"):
         if section not in body:
             refuse("RECEIPT_MALFORMED", f"receipt has no {section}")
 
@@ -118,6 +130,7 @@ def check_coverage(body: dict[str, Any]) -> None:
     computed = {
         "exercised": sorted(l["link"] for l in chain if l["state"] == "EXERCISED"),
         "blocked": sorted(l["link"] for l in chain if l["state"] == "BLOCKED"),
+        "absent": sorted(l["link"] for l in chain if l["state"] == "ABSENT"),
         "not_exercised": sorted(l["link"] for l in chain
                                 if l["state"] in {"NOT_EXERCISED", "SKIPPED_BY_POLICY"}),
     }
@@ -125,6 +138,15 @@ def check_coverage(body: dict[str, Any]) -> None:
         if body["coverage"].get(key) != value:
             refuse("COVERAGE_MISREPORTED",
                    f"coverage.{key} does not match the chain; the chain gives {value}")
+
+
+def check_lanes(body: dict[str, Any]) -> None:
+    """The lane summary is a projection of the chain, so it is recomputed, not read."""
+    states = {l["link"]: l["state"] for l in body["chain"]}
+    computed = {lane: states.get(name) for lane, name in LANES.items()}
+    if body["lanes"] != computed:
+        refuse("LANE_MISREPORTED",
+               f"the lane summary disagrees with the chain; the chain gives {computed}")
 
 
 def check_mutation_consistency(body: dict[str, Any]) -> None:
@@ -142,17 +164,86 @@ def check_mutation_consistency(body: dict[str, Any]) -> None:
                "worktree link is EXERCISED with no worktree recorded")
 
 
+def check_git_town(body: dict[str, Any]) -> None:
+    """An EXERCISED synchronization link states which binary ran and what it did.
+
+    The failure this exists for is the cheapest one available: `git town sync`
+    exiting zero is not a synchronization, and a link that records the exit code
+    alone cannot tell a sync that restored ancestry from one that did nothing.
+    So the link must name the executable by digest, name the digest it was
+    admitted against, carry the argv it actually ran, and carry the git-side
+    read-backs -- a dry run that moved no ref, a local remote that did not move,
+    and ancestry that holds after the live run.
+    """
+    entry = next((l for l in body["chain"] if l["link"] == GIT_TOWN_LINK), None)
+    if entry is None or entry["state"] != "EXERCISED":
+        return
+    digest = entry.get("executable_sha256")
+    admitted = entry.get("admitted_executable_sha256")
+    if not isinstance(digest, str) or SHA256.fullmatch(digest) is None:
+        refuse("GIT_TOWN_UNPROVEN", "the link names no executable digest")
+    if digest != admitted:
+        refuse("GIT_TOWN_UNPROVEN",
+               "the executed digest is not the admitted one; an unadmitted artifact "
+               "cannot produce an EXERCISED lane")
+    commands = entry.get("commands")
+    if not isinstance(commands, list) or not commands:
+        refuse("GIT_TOWN_UNPROVEN", "the link records no command it ran")
+    if not any("sync" in cmd.get("argv", []) for cmd in commands):
+        refuse("GIT_TOWN_UNPROVEN", "no sync appears among the recorded commands")
+    if entry.get("forbidden_flags_observed"):
+        refuse("GIT_TOWN_FORBIDDEN_FLAG",
+               f"the consumer forbids {entry['forbidden_flags_observed']} and they were run")
+    for field, expected in (("dry_run_mutated_local_refs", False),
+                            ("local_bare_remote_refs_unchanged", True),
+                            ("parent_is_ancestor_after_sync", True),
+                            ("consumer_head_unchanged", True),
+                            ("pushes_to_forge", False)):
+        if entry.get(field) is not expected:
+            refuse("GIT_TOWN_UNPROVEN",
+                   f"{field} is {entry.get(field)!r}; EXERCISED requires {expected!r}")
+
+    # #234 requires a planted semantic conflict that fails closed. A run whose
+    # every command succeeded has not met one, so the result has to be bound from
+    # the run that did -- by digest, and with the failure states read back.
+    conflict = entry.get("conflict_canary")
+    if not isinstance(conflict, dict):
+        refuse("CONFLICT_CANARY_ABSENT",
+               "the synchronization link is EXERCISED with no planted-conflict result "
+               "bound; nothing here says a semantic conflict fails closed")
+    if (not isinstance(conflict.get("receipt_sha256"), str)
+            or SHA256.fullmatch(conflict["receipt_sha256"]) is None):
+        refuse("CONFLICT_CANARY_ABSENT", "the bound conflict result has no receipt digest")
+    if conflict.get("result") != "PASS":
+        refuse("CONFLICT_CANARY_ABSENT",
+               f"the bound conflict run reports {conflict.get('result')!r}, so its own "
+               f"validator did not admit it")
+    if conflict.get("sync_exit") in (0, None):
+        refuse("CONFLICT_NOT_FAIL_CLOSED",
+               f"the planted conflict exited {conflict.get('sync_exit')!r}; a conflict "
+               f"that exits zero was resolved by something")
+    for field in ("unmerged_paths_present", "suspended_operation_present",
+                  "git_town_reports_suspended"):
+        if conflict.get(field) is not True:
+            refuse("CONFLICT_NOT_FAIL_CLOSED",
+                   f"{field} is {conflict.get(field)!r}; the conflict did not stay open "
+                   f"for a Human")
+    if conflict.get("automatic_semantic_recovery_attempted") is not False:
+        refuse("CONFLICT_NOT_FAIL_CLOSED",
+               "automatic semantic recovery was attempted; #234 forbids it")
+
+
 def check_blocked_evidence(body: dict[str, Any]) -> None:
-    """A BLOCKED link must carry the observation that blocks it, not an assertion."""
+    """A BLOCKED or ABSENT link must carry the observation, not an assertion."""
     for entry in body["chain"]:
-        if entry["state"] != "BLOCKED":
+        if entry["state"] not in {"BLOCKED", "ABSENT"}:
             continue
         evidence = {k: v for k, v in entry.items()
                     if k not in {"link", "state", "detail"} and v not in (None, "", [])}
         if not evidence:
             refuse("BLOCKED_WITHOUT_EVIDENCE",
-                   f"{entry['link']} is BLOCKED with no recorded observation; a blocker "
-                   f"nobody measured is a blocker nobody can clear")
+                   f"{entry['link']} is {entry['state']} with no recorded observation; a "
+                   f"blocker nobody measured is a blocker nobody can clear")
 
 
 def check_reconciliation(body: dict[str, Any]) -> None:
@@ -181,8 +272,9 @@ def check_secrets(body: Any, path: str = "") -> None:
         refuse("SECRET_IN_RECEIPT", f"credential-shaped value at {path}")
 
 
-CHECKS = (check_gate, check_links, check_coverage, check_mutation_consistency,
-          check_blocked_evidence, check_reconciliation)
+CHECKS = (check_gate, check_links, check_coverage, check_lanes,
+          check_mutation_consistency, check_git_town, check_blocked_evidence,
+          check_reconciliation)
 
 
 def validate(body: Any) -> None:
@@ -209,13 +301,36 @@ def selftest(body: dict[str, Any]) -> int:
         doc["chain"] = [l for l in doc["chain"]
                         if l["link"] != "git-town-dry-run-and-local-no-push-sync"]
 
-    def blocked_bare(doc: dict[str, Any]) -> None:
-        for entry in doc["chain"]:
-            if entry["state"] == "BLOCKED":
-                for key in list(entry):
-                    if key not in {"link", "state", "detail"}:
-                        entry.pop(key)
-                break
+    def recompute(doc: dict[str, Any]) -> None:
+        """Keep the derived summaries consistent after a control changes a state.
+
+        A control that leaves the coverage or lane summary stale trips
+        COVERAGE_MISREPORTED or LANE_MISREPORTED first, and then it tests those
+        rules rather than the one it was written for.
+        """
+        chain = doc["chain"]
+        states = {l["link"]: l["state"] for l in chain}
+        doc["coverage"] = {
+            "exercised": sorted(l["link"] for l in chain if l["state"] == "EXERCISED"),
+            "blocked": sorted(l["link"] for l in chain if l["state"] == "BLOCKED"),
+            "absent": sorted(l["link"] for l in chain if l["state"] == "ABSENT"),
+            "not_exercised": sorted(
+                l["link"] for l in chain
+                if l["state"] in {"NOT_EXERCISED", "SKIPPED_BY_POLICY"}),
+        }
+        doc["lanes"] = {lane: states.get(name) for lane, name in LANES.items()}
+
+    def absent_bare(doc: dict[str, Any]) -> None:
+        """An unreachable lane reported without the probe that found it unreachable."""
+        entry = next(l for l in doc["chain"] if l["link"] == "forgejo-issue-pr-receipts")
+        entry["state"] = "ABSENT"
+        for key in list(entry):
+            if key not in {"link", "state", "detail"}:
+                entry.pop(key)
+        recompute(doc)
+
+    def git_town(doc: dict[str, Any]) -> dict[str, Any]:
+        return next(l for l in doc["chain"] if l["link"] == GIT_TOWN_LINK)
 
     def claim_integration(doc: dict[str, Any]) -> None:
         """Claim a link that needs a merge, with the coverage kept consistent.
@@ -229,14 +344,7 @@ def selftest(body: dict[str, Any]) -> int:
             if entry["link"] == "admitted-local-main-integration":
                 entry["state"] = "EXERCISED"
                 break
-        chain = doc["chain"]
-        doc["coverage"] = {
-            "exercised": sorted(l["link"] for l in chain if l["state"] == "EXERCISED"),
-            "blocked": sorted(l["link"] for l in chain if l["state"] == "BLOCKED"),
-            "not_exercised": sorted(
-                l["link"] for l in chain
-                if l["state"] in {"NOT_EXERCISED", "SKIPPED_BY_POLICY"}),
-        }
+        recompute(doc)
 
     controls = [
         ("dirty-consumer", "SELECTION_GATE_INCOMPLETE",
@@ -254,7 +362,24 @@ def selftest(body: dict[str, Any]) -> int:
          mutate(lambda d: d["coverage"].update({"exercised": d["chain_declared"]}))),
         ("integration-without-merge", "EXERCISED_WITHOUT_MUTATION",
          mutate(claim_integration)),
-        ("blocked-without-evidence", "BLOCKED_WITHOUT_EVIDENCE", mutate(blocked_bare)),
+        ("absent-without-evidence", "BLOCKED_WITHOUT_EVIDENCE", mutate(absent_bare)),
+        ("lane-summary-disagrees", "LANE_MISREPORTED",
+         mutate(lambda d: d["lanes"].update({"publication": "EXERCISED"}))),
+        ("unadmitted-binary", "GIT_TOWN_UNPROVEN",
+         mutate(lambda d: git_town(d).update({"executable_sha256": "f" * 64}))),
+        ("sync-exit-zero-without-readback", "GIT_TOWN_UNPROVEN",
+         mutate(lambda d: git_town(d).update({"parent_is_ancestor_after_sync": False}))),
+        ("dry-run-moved-refs", "GIT_TOWN_UNPROVEN",
+         mutate(lambda d: git_town(d).update({"dry_run_mutated_local_refs": True}))),
+        ("forbidden-flag-run", "GIT_TOWN_FORBIDDEN_FLAG",
+         mutate(lambda d: git_town(d).update({"forbidden_flags_observed": ["--push"]}))),
+        ("conflict-canary-unbound", "CONFLICT_CANARY_ABSENT",
+         mutate(lambda d: git_town(d).pop("conflict_canary"))),
+        ("conflict-resolved-itself", "CONFLICT_NOT_FAIL_CLOSED",
+         mutate(lambda d: git_town(d)["conflict_canary"].update({"sync_exit": 0}))),
+        ("conflict-auto-recovered", "CONFLICT_NOT_FAIL_CLOSED",
+         mutate(lambda d: git_town(d)["conflict_canary"].update(
+             {"automatic_semantic_recovery_attempted": True}))),
         ("reconciliation-unreplayed", "RECONCILIATION_UNPROVEN",
          mutate(lambda d: next(l for l in d["chain"]
                                if l["link"] == "github-reconciliation-inventory")
@@ -321,8 +446,9 @@ def main(argv: list[str] | None = None) -> int:
     print(f"CONSUMER CANARY GREEN: {gate['github_repository']} / "
           f"{gate['forgejo_repository']} at {gate['commit_sha'][:12]}; "
           f"{len(coverage['exercised'])} exercised, {len(coverage['blocked'])} blocked, "
+          f"{len(coverage.get('absent', []))} absent, "
           f"{len(coverage['not_exercised'])} not exercised of "
-          f"{len(body['chain_declared'])} links")
+          f"{len(body['chain_declared'])} links; lanes={body['lanes']}")
     return 0
 
 
