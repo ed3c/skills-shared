@@ -43,6 +43,10 @@ POST_PUBLICATION_STATES = {
     "AUTO_MERGE_ELIGIBLE",
     "MERGED",
 }
+# Evidence states that assert somebody looked. The rest of the vocabulary --
+# ABSENT, NOT_IMPLEMENTED, NOT_EXERCISED, SKIPPED_BY_POLICY, HUMAN_ADMIT_REQUIRED
+# -- are honest non-observations and owe no provenance.
+OBSERVED_STATES = {"PASS", "FAIL"}
 # States that assert Worker closure has happened. Wider than POST_PUBLICATION_STATES:
 # LOCAL_VERIFIED makes the same closure claim without publishing anything.
 CLOSURE_GATED_STATES = POST_PUBLICATION_STATES | {"LOCAL_VERIFIED"}
@@ -245,6 +249,25 @@ def semantic_errors(contract: dict[str, Any]) -> list[str]:
 
     if shadow["execution"] == "IN_PROCESS_LOGICAL" and shadow["independent_state"] != "NOT_EXERCISED":
         errors.append("shadow-independence-overclaim: in-process logical Shadow is NOT_EXERCISED for independence")
+    # The overclaim rule above only refuses the in-process case. Its inverse rode
+    # through: naming a separate context, model or checker and asserting PASS was
+    # accepted with nothing behind it, so the contract's own positive fixture
+    # claimed independent review and bound no reviewer. An observed independence
+    # state now has to name where it was observed and which two identities it
+    # separated -- NOT_EXERCISED and the other honest non-observations stay free.
+    if shadow["execution"] != "IN_PROCESS_LOGICAL" and shadow["independent_state"] in OBSERVED_STATES:
+        evidence = shadow.get("independence_evidence")
+        if not evidence:
+            errors.append(
+                f"shadow-independence-unbound: {shadow['execution']} claims "
+                f"independent_state={shadow['independent_state']} with no "
+                "independence_evidence"
+            )
+        elif evidence["shadow_identity"] == evidence["builder_identity"]:
+            errors.append(
+                "shadow-independence-collapsed: independence_evidence names one identity "
+                f"({evidence['shadow_identity']}) on both sides"
+            )
     if shadow["checkpoint_outcome"] == "BLOCKED_AT_MATERIAL_BOUNDARY_L3":
         if shadow["enforcement_state"] != "PASS":
             errors.append("shadow-l3-unenforced: L3 requires PASS enforcement state")
