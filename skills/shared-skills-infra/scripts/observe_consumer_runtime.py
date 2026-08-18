@@ -383,12 +383,16 @@ def build_receipt(
     except BootstrapError as exc:
         raise ObservationError(str(exc)) from exc
 
-    if source != identity.source_document():
-        raise ObservationError("consumer source pin is stale or substituted")
-    if repository_id_from_url(identity.repository) != repository_id_from_url(
-        source["source"]["repository"]
-    ):
-        raise ObservationError("shared repository identity differs from source pin")
+    # The binding-readback probe IS this pair of comparisons, not a literal: did
+    # the consumer's committed source pin read back as the exact source document
+    # (and repository identity) we resolved from the live shared root. Neither
+    # comparison raises immediately -- both flow into fixed_probe_results() below
+    # so the FAIL state is reachable in the emitted receipt/error, same as the
+    # other fixed probes.
+    binding_readback = source == identity.source_document() and (
+        repository_id_from_url(identity.repository)
+        == repository_id_from_url(source["source"]["repository"])
+    )
     selected = validate_binding(binding, source, shared_root)
     bootstrap_digest = validate_bootstrap_receipt(
         receipt=bootstrap_receipt,
@@ -404,7 +408,7 @@ def build_receipt(
         raise ObservationError(str(exc)) from exc
 
     requirements, requirements_digest = validate_runtime_requirements(shared_root)
-    probes = fixed_probe_results(binding_readback=True)
+    probes = fixed_probe_results(binding_readback=binding_readback)
     failed = [row["id"] for row in probes if row["state"] != "PASS"]
     if failed:
         raise ObservationError("capability probe failed: " + ",".join(failed))
@@ -558,7 +562,7 @@ def main(argv: list[str] | None = None) -> int:
         "--consumer-visibility", choices=("PUBLIC", "PRIVATE"), required=True
     )
     parser.add_argument(
-        "--canonical-visibility", choices=("PUBLIC", "PRIVATE"), default="PUBLIC"
+        "--canonical-visibility", choices=("PUBLIC", "PRIVATE"), required=True
     )
     parser.add_argument("--output", required=True, type=Path)
     args = parser.parse_args(argv)

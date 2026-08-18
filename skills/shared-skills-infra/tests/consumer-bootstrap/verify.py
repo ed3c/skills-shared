@@ -127,6 +127,8 @@ def main() -> None:
         assert files(failed) == original
         mutations += 1
 
+    assert positives == 6
+    assert mutations == 15
     print(f"CONSUMER-BOOTSTRAP-TESTS-GREEN positive={positives} mutations={mutations} shadow=PASS")
 
 

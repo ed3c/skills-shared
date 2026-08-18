@@ -99,6 +99,10 @@ def make_shared(root: Path):
     loaded = importlib.util.module_from_spec(spec)
     sys.modules[spec.name] = loaded
     spec.loader.exec_module(loaded)
+    # consumer_bootstrap.py no longer imports `canonical` for its own use (it was
+    # dead there); fixtures still need it, so bind it from its real owner, the
+    # module consumer_bootstrap.py's own import statement already loaded.
+    loaded.canonical = sys.modules["consumer_bootstrap_common"].canonical
     return loaded, profile_path
 
 
