@@ -1,0 +1,261 @@
+{
+  "schema": "rca-agent-ab-preregistration/v1",
+  "preregistration_id": "rca-228-budgeted-2026-08",
+  "status": "FROZEN_NOT_EXECUTED",
+  "issue": 228,
+  "evidence_grade": "BUDGETED_PILOT",
+
+  "supersedes": {
+    "reduces": "the primary matrix preregistered in the body of #228: 3 held-out repositories x 2 model/harness families x 5 repetitions x 3 primary arms = 90 physical Agent sessions",
+    "why": "repository-owner budget decision, 2026-08-18. 90 sessions do not fit the executing session's budget. The reduction is written down as its own frozen design rather than performed quietly inside the original, because a preregistration an executing agent shrinks in flight is not a preregistration.",
+    "what_is_inherited": "the frozen held-out corpus (evals/held-out-corpus.json, corpus_id rca-holdout-2026-08), the three primary arms, the independent deterministic evaluator, the zero-retry policy, the denominator policy, and every threshold in evals/agent-effectiveness-contract.json. None of them is relaxed here.",
+    "what_is_not_inherited": "the scale. 12 sessions is not 90 and is never reported as 90.",
+    "original_stays_open": "#228 is not closed, satisfied, or partially satisfied by this design. Its 90-session matrix remains the only design that can move lanes.228_matrix out of INSUFFICIENT_SAMPLE, and this run cannot be cited as that matrix or merged into it.",
+    "relationship_to_the_pilot": "evals/pilot-preregistration.json froze 1 repetition across 3 repositories and 2 hosts. This is a different reduction along different axes (fewer repositories, one host, more repetitions) and does not supersede or extend the pilot. Its cells are not poolable with the pilot's."
+  },
+
+  "what_this_design_can_and_cannot_support": {
+    "can_support": [
+      "whether the metric-saturation profile measured on psf/requests (8 of 14 metrics with zero within-arm variance) also holds on two held-out repositories that have never carried more than one repetition",
+      "a first repeated-measure observation of within-arm variance on spf13/cobra and sindresorhus/slugify",
+      "per-repository and per-arm cost, token, latency and tool-call figures for those two subjects"
+    ],
+    "cannot_support": [
+      "SUPPORTED under evals/agent-effectiveness-contract.json. The sample gate in scripts/score_agent_ab.py requires minimum_repetitions_per_cell 5, minimum_model_families 2 and minimum_held_out_repositories 3; this design supplies 2, 1 and 2. The scorer returns INSUFFICIENT_SAMPLE by construction, before any number is looked at.",
+      "the 0.10 mean quality uplift in #228's acceptance list. See threshold_reachability below: it is arithmetically out of reach on this corpus at any repetition count, so a null here is a statement about the corpus and not about the candidate.",
+      "cross-model or cross-harness generalization. One host family runs.",
+      "any promotion, admission tier, registry state change, or production claim."
+    ],
+    "grade_rule": "Every artifact produced by this run carries evidence_grade BUDGETED_PILOT. A BUDGETED_PILOT result may not be written into evals/live-evidence-state.json as anything other than an additional observed_breakdown entry under lanes.228_matrix, whose state stays INSUFFICIENT_SAMPLE."
+  },
+
+  "threshold_reachability": {
+    "_why_this_block_exists": "Preregistering a threshold that the instrument cannot reach produces a guaranteed null that reads like a finding about the treatment. The ceiling is computed here, before execution, from committed data.",
+    "computed_from": [
+      "evals/matrix-slice1-result.json via scripts/analyze_arm_separation.py",
+      "evals/agent-effectiveness-contract.json quality_weights",
+      "scripts/score_agent_ab.py quality_components()"
+    ],
+    "saturated_quality_components_on_this_corpus": [
+      "task_success",
+      "defect_recall",
+      "evidence_packet_complete",
+      "exact_subject_continuity",
+      "negative_control_valid",
+      "explicit_non_claim_accuracy",
+      "trigger_correct"
+    ],
+    "only_unsaturated_quality_component": "false_pass_avoidance",
+    "its_weight": 0.15,
+    "therefore": "delta_quality = 0.15 * delta_false_pass_rate while the other seven components stay saturated.",
+    "delta_false_pass_rate_required_for_the_0_10_uplift_threshold": 0.666667,
+    "largest_between_arm_false_pass_rate_spread_ever_observed": 0.1111,
+    "conclusion": "0.10 mean quality uplift requires a false-pass-rate separation six times larger than the largest ever measured here. Repetitions cannot close that gap; only an unsaturating case set can. This is recorded before execution so that the expected null cannot be presented afterwards as evidence the candidate does not help.",
+    "observed_uplift_for_reference": {
+      "candidate_mean_quality_slice1": 0.942963,
+      "no_skill_mean_quality_slice1": 0.944288,
+      "candidate_minus_no_skill": -0.001325,
+      "note": "n=5 and n=4 on one repository and one host. Suggestive, not significant. It is stated here so a repeat of the same sign is not read as a new discovery."
+    }
+  },
+
+  "matrix": {
+    "repositories": 2,
+    "model_harness_families": 1,
+    "repetitions": 2,
+    "primary_arms": 3,
+    "physical_sessions": 12,
+    "diagnostic_arms": "none. metadata_only, wrong_skill and irrelevant-Skill arms are not run and not added later; #228 permits them only if frozen before execution."
+  },
+
+  "repository_selection": {
+    "rule": "From evals/held-out-corpus.json, count the live cells already observed against each repository across evals/pilot-result.json and evals/matrix-slice1-result.json. Sort ascending by that count, tie-break by repository_id ascending, take the first 2.",
+    "why_this_rule": "The budget buys the most new information where the least has been observed. The rule is stated as a rule and applied to a count that anyone can recompute, so the two subjects are not chosen after looking at what they would say.",
+    "observed_cell_counts_at_freeze": {
+      "psf/requests": 19,
+      "sindresorhus/slugify": 6,
+      "spf13/cobra": 6
+    },
+    "selected": [
+      {
+        "repository_id": "sindresorhus/slugify",
+        "commit_sha": "7c318bd1aa4b4affab29761f15a9604323fe2a3b",
+        "tree_sha": "590a73afbb4b9ee4f5899d97c7c5f70c862b57bf",
+        "family_id": "mutable-external-identity",
+        "why_this_family": "scripts/run_pilot_matrix.py binds one family per repository, the first that corpus order supplies. It is recorded rather than chosen."
+      },
+      {
+        "repository_id": "spf13/cobra",
+        "commit_sha": "adbc8813901bba65827259daa8e22ff94ec1f30e",
+        "tree_sha": "5a3b2c8e9af4c74e607a0a55e7910c1edb5d266f",
+        "family_id": "skipped-or-absent-integration",
+        "why_this_family": "same rule; recorded rather than chosen."
+      }
+    ],
+    "excluded": [
+      {
+        "repository_id": "psf/requests",
+        "reason": "most-observed subject at freeze time (19 live cells). Excluded by the stated rule, not by preference."
+      }
+    ],
+    "why_not_local_consumer_checkouts": "The instruction that produced this design suggested substituting real local checkouts (/Users/neon/bettor-arena, /Users/neon/ix-agy, /Users/neon/antigravity) for the held-out repositories. That is refused here for mechanical reasons, not stylistic ones: scripts/resolve_holdout_ground_truth.py resolves every ground truth through `gh api /repos/{id}/git/trees/{tree}`, and all three checkouts have no remote, so no ground truth can be resolved for them; the corpus is frozen at commit 85cbafe024742453d3c74c6411d8292a74c71d6e and adding subjects to it after results exist is a case-set change, not a budget reduction; and a repository carrying this repository's own .skill-bindings is not held out from the author of the Skill under test. Those checkouts are the right subjects for #235, where they are used."
+  },
+
+  "arms": {
+    "no_skill": "no Skill text is supplied; the host receives the task alone",
+    "current_full_composition": "the audit Skill plus the six source Skills it was trimmed from",
+    "candidate_trimmed_skill": "the audit Skill alone, carrying RCA-001..013",
+    "why_all_three_survive_the_reduction": "The instruction that produced this design suggested dropping candidate_trimmed_skill and running no_skill against full. scripts/score_agent_ab.py refuses that shape outright: a matched cell carrying some but not all of MAIN_PROFILES raises 'matched cell is missing a main treatment arm', and a receipt set with no complete triple raises 'no complete no-skill/full/trimmed matched cells'. Both are INVALID_EXPERIMENT, not a smaller result. Dropping the candidate would also remove both contrasts #228 exists to measure, since the candidate is the subject of admission. The reduction is therefore taken on repositories, hosts and repetitions, where it costs sample size rather than validity."
+  },
+
+  "host": {
+    "family": "claude-code",
+    "invocation": "claude -p, non-interactive, via scripts/run_pilot_matrix.py",
+    "model": "opus",
+    "model_pin_authority": "scripts/run_pilot_matrix.py reads hosts[].model from evals/pilot-preregistration.json, which pins opus. The exact resolved model string and harness version are recorded per cell at run time and are authoritative over this field if they differ.",
+    "cost_reported": true,
+    "why_one_host": "codex-cli cells cost the same wall clock and report no spend, so a two-host budgeted run halves the repetitions without adding an observable cost dimension. One host at 2 repetitions beats two hosts at 1, which is the pilot that already ran.",
+    "what_is_given_up": "cross-model generalization, which is a named #228 lane and stays NOT_EXERCISED."
+  },
+
+  "randomization": {
+    "arm_order_derivation": "scripts/run_pilot_matrix.py arm_order(): seed = int(sha256(f'{repository_id}|{host_family}')[:8], 16); order = [sorted(arms)[(seed + i) % 3] for i in range(3)]. Reused rather than redefined, so the design specifies the code that will actually run.",
+    "computed_orders_at_freeze": {
+      "sindresorhus/slugify|claude-code": ["candidate_trimmed_skill", "current_full_composition", "no_skill"],
+      "spf13/cobra|claude-code": ["candidate_trimmed_skill", "current_full_composition", "no_skill"]
+    },
+    "fresh_session_per_arm": true,
+    "isolated_workspace_per_arm": true
+  },
+
+  "known_confounds": [
+    {
+      "confound": "arm order is constant across every cell of this run",
+      "detail": "The shipped derivation seeds on repository and host only. For host claude-code, all three corpus repositories yield seed % 3 == 0, so every cell receives the identical order candidate, full, no_skill. Dropping to one host removed the only axis on which the derivation varied. Anything that drifts with position inside a slice -- provider cache warmth, rate limiting, time of day -- is perfectly confounded with arm.",
+      "why_not_corrected": "Correcting it means editing run_pilot_matrix.py's seed to include the repetition index, which is a runner change this design-only preregistration does not make and must not make silently after freeze.",
+      "how_to_separate": "seed on sha256(repository_id|host_family|repetition), the convention already used in skills/dual-forge-repository-loop/evals/prompt-baseline-v2-preregistration.json. That is a one-line change and its own freeze."
+    },
+    {
+      "confound": "spf13/cobra recorded false_pass_rate 1.000 in all three arms of the pilot",
+      "detail": "Pilot cells for cobra were 15/15, 11/11 and 12/12 false passes over opportunities. If that reproduces, false_pass_avoidance is 0 in every arm on that repository, the last unsaturated quality component saturates at the floor, and cobra contributes a cell set on which no arm can differ from any other on quality.",
+      "why_not_corrected": "The repository was selected by the stated least-observed rule before this figure was consulted. Swapping it out now would be exactly the post-hoc selection the rule exists to prevent.",
+      "how_to_separate": "report per repository, never pooled, and read a flat cobra result as a case-set fact. It is preregistered here as an expectation so a repeat cannot be presented as a finding."
+    },
+    {
+      "confound": "treatment length",
+      "detail": "current_full_composition is the audit Skill plus six source Skills and is several times the byte length of candidate_trimmed_skill. Any full-composition advantage remains equally consistent with more applicable procedure and with more text.",
+      "why_not_corrected": "A length-matched arm is no longer the full composition, and #219's five-arm design in evals/uplift-preregistration.json already owns that decomposition.",
+      "how_to_separate": "execute evals/uplift-preregistration.json, which is frozen and unexecuted."
+    }
+  ],
+
+  "metrics": {
+    "recorded_per_cell": [
+      "task_success",
+      "material_defects_found",
+      "material_defects_total",
+      "false_pass_count",
+      "false_pass_opportunities",
+      "evidence_packet_complete",
+      "exact_subject_continuity",
+      "negative_control_valid",
+      "explicit_non_claim_accuracy",
+      "trigger_correct",
+      "tool_calls",
+      "input_tokens",
+      "output_tokens",
+      "duration_ms",
+      "cost_usd",
+      "cost_observed"
+    ],
+    "primary": "false_pass_rate = false_pass_count / false_pass_opportunities",
+    "why_this_primary": "It is the only quality component with non-zero within-arm variance on this corpus. Preregistering a saturated metric as primary guarantees a null that says nothing about the treatment.",
+    "why_a_rate_not_a_count": "Opportunity counts differ between arms and between repositories by an order of magnitude. A raw count mixes 'made more mistakes' with 'was offered more chances'.",
+    "secondary_recorded_never_primary": ["cost_usd", "input_tokens", "output_tokens", "duration_ms", "tool_calls"],
+    "why_secondary": "They measure expense, not correctness. An arm that is cheaper while being wrong more often has not won.",
+    "saturation_rule": "A component that stays saturated in this run is reported as evidence about the case set. It may never be reported as evidence that the treatment had no effect."
+  },
+
+  "scorer": {
+    "cell_scorer": "scripts/pilot_evaluator.py, invoked per cell by scripts/run_pilot_matrix.py; independent of the evaluated Agent and never sees its reasoning",
+    "aggregate_scorer": "scripts/analyze_arm_separation.py --result <slice>/pilot-result.json, which is the scorer that produced the committed slice-1 ranking",
+    "slice_merge": "scripts/merge_matrix_slices.py --input <output-root>",
+    "why_not_score_agent_ab_py": "scripts/run_pilot_matrix.py emits rca-pilot-result/v1 cells, not the per-cell receipts scripts/score_agent_ab.py consumes. The two harnesses have never been joined and joining them is not a budget reduction. The acceptance thresholds in evals/agent-effectiveness-contract.json are therefore quoted in this design and checked by hand against the reported means; the mechanical sample gate that returns INSUFFICIENT_SAMPLE lives in score_agent_ab.py and is not reached by this run. That gap is named rather than papered over, and it is a reason this run's grade is BUDGETED_PILOT.",
+    "ground_truth_authority": "DETERMINISTIC_ONLY. The host's own account of how it did is never substituted for the evaluator's."
+  },
+
+  "runner_binding": {
+    "known_gap": "scripts/run_pilot_matrix.py hardcodes PREREG = evals/pilot-preregistration.json and stamps preregistration_id from it. A slice run under this design will therefore emit preregistration_id 'rca-pilot-2026-08', which is the wrong design.",
+    "required_of_the_runner": "Beside every slice output directory, write budgeted-binding.json containing {\"preregistration_id\": \"rca-228-budgeted-2026-08\", \"preregistration_path\": \"skills/repository-capability-audit/evals/budgeted-matrix-228-preregistration.json\", \"preregistration_sha256\": \"<recomputed at run time>\", \"result_preregistration_id_is_wrong_because\": \"the runner hardcodes the pilot design\"}. A slice without that sidecar is not this design's evidence.",
+    "durable_fix_not_made_here": "add --preregistration PATH to run_pilot_matrix.py. That is a runner change, it is untested today, and this design-only change does not make it."
+  },
+
+  "denominator_policy": {
+    "every_attempt_counts": true,
+    "retries_permitted": 0,
+    "why_zero": "#228 forbids retrying a promotion run unless retry is itself a preregistered variable. It is not.",
+    "failed_cells": "stay in the denominator with scored=false and a named failure_reason, exactly as scripts/run_pilot_matrix.py already records them",
+    "excluded_cells": "there is no exclusion path. A cell that ran is counted.",
+    "budget_aborted_cells": "a cell killed by the stop-loss below is a failed cell with reason BUDGET_EXCEEDED. It is never re-run and never removed."
+  },
+
+  "budget_ledger": {
+    "dimensions": ["cost_usd", "input_tokens", "output_tokens", "wall_clock_seconds"],
+    "basis": "per-arm per-repository means measured on claude-code cells in evals/pilot-result.json. These are observations, not forecasts; a cell may cost more.",
+    "per_cell_estimates": [
+      {"repository_id": "sindresorhus/slugify", "arm": "candidate_trimmed_skill", "cost_usd": 1.1549, "input_tokens": 679731, "output_tokens": 4932, "wall_clock_seconds": 100},
+      {"repository_id": "sindresorhus/slugify", "arm": "current_full_composition", "cost_usd": 1.5607, "input_tokens": 989423, "output_tokens": 4806, "wall_clock_seconds": 90},
+      {"repository_id": "sindresorhus/slugify", "arm": "no_skill", "cost_usd": 0.9998, "input_tokens": 644770, "output_tokens": 5167, "wall_clock_seconds": 98},
+      {"repository_id": "spf13/cobra", "arm": "candidate_trimmed_skill", "cost_usd": 1.7304, "input_tokens": 1265536, "output_tokens": 12108, "wall_clock_seconds": 253},
+      {"repository_id": "spf13/cobra", "arm": "current_full_composition", "cost_usd": 2.2580, "input_tokens": 1848621, "output_tokens": 9385, "wall_clock_seconds": 178},
+      {"repository_id": "spf13/cobra", "arm": "no_skill", "cost_usd": 2.0010, "input_tokens": 1902516, "output_tokens": 12325, "wall_clock_seconds": 247}
+    ],
+    "estimated_totals_at_2_repetitions": {
+      "cells": 12,
+      "cost_usd": 19.41,
+      "input_tokens": 14661194,
+      "output_tokens": 97446,
+      "wall_clock_seconds": 1932
+    },
+    "caps": {
+      "per_cell_cost_usd": 4.0,
+      "per_cell_wall_clock_seconds": 600,
+      "per_cell_cap_basis": "roughly 1.35x the highest per-cell spend ever observed in this Skill's live record ($2.98) and the runner's existing default --timeout 600",
+      "global_cost_usd": 30.0,
+      "global_wall_clock_seconds": 3600
+    },
+    "unobserved_dimensions": [],
+    "why_unobserved_is_not_zero": "A dimension the harness cannot read is listed and excluded from enforcement. Recording it as a spend of zero lets every cap pass, which is the failure a ledger exists to make visible."
+  },
+
+  "stop_rules_frozen_now": {
+    "abort_a_cell_when": "it exceeds per_cell_cost_usd or per_cell_wall_clock_seconds. Kill it, record scored=false with reason BUDGET_EXCEEDED, continue.",
+    "abort_the_run_when": "cumulative spend exceeds global_cost_usd, or three cells in one slice abort for BUDGET_EXCEEDED. Report PARTIAL with the exact cells run.",
+    "may_stop_early_if": "false_pass_rate is saturated across every arm in both repositories. That is a case-set finding and further cells cannot change it.",
+    "may_not_stop_because": "an interim look suggests a null. A null is a result to be reported at full n.",
+    "must_report_even_if_adverse": "If the candidate again ranks at or below no_skill, that is the result and it is published as the result.",
+    "partial_runs": "Any run short of 12 sessions is reported as PARTIAL with the exact cells run and may not be cited even as a complete budgeted pilot."
+  },
+
+  "matching_held_constant_within_a_cell": [
+    "repository commit and tree",
+    "hidden task and evaluator digests",
+    "model, provider and version",
+    "harness, version and config",
+    "runtime and toolset digest",
+    "network, sandbox and approval policy",
+    "input, output, tool-call and time budgets",
+    "retry policy",
+    "repetition identity"
+  ],
+
+  "declared_non_claims": [
+    "12 sessions is not the 90-session matrix #228 preregisters and may never be cited as it",
+    "no admission tier, registry state, or promotion follows from this design",
+    "one host family is one host family; nothing about model portability follows",
+    "a null on the primary metric bounds the effect on this corpus, not on repository audit generally",
+    "a flat result on a repository whose false_pass_rate is already 1.000 in every arm is a case-set observation, not a treatment observation",
+    "cost is recorded per cell and is not in any acceptance weight; a cheaper arm that is wrong more often has not won",
+    "this design cannot separate arm from arm position, because arm order is constant across every one of its cells"
+  ]
+}
