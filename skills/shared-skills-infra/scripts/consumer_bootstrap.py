@@ -11,7 +11,7 @@ from typing import Callable
 from consumer_bootstrap_common import (
     BINDING_REL, BootstrapError, PROFILE_REL, PROFILE_SOURCE, RECEIPT_REL,
     RECEIPT_SCHEMA, REQUIREMENTS_REL, REPOSITORY_ID, SOURCE_REL, SOURCE_SCHEMA,
-    WORKFLOW_REL, SharedIdentity, canonical, capture, ensure_git_worktree, json_text,
+    WORKFLOW_REL, SharedIdentity, capture, ensure_git_worktree, json_text,
     preflight_generated, read_json, reject_copied_skill_bodies, restore,
     sha256, shared_identity,
 )

@@ -145,6 +145,8 @@ def observer_command(
         expected_sha or actual,
         "--consumer-visibility",
         "PUBLIC",
+        "--canonical-visibility",
+        "PUBLIC",
         "--output",
         str(output),
     ]

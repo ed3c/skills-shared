@@ -8,8 +8,10 @@ import tempfile
 
 from support import (
     clone,
+    commit_all,
     make_world,
     mutate_shared_requirements,
+    refresh_consumer,
     resign_bootstrap,
     run,
     run_observer,
@@ -101,6 +103,27 @@ def main() -> None:
         value["source"]["tree"] = "1" * 40
         p.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n")
         expect_red(run_observer(s, c, out, check=False), "source-tree", "source pin")
+        mutations += 1
+
+        # probe.binding-readback exercised through the aggregate probe path, not
+        # through validate_binding()/validate_bootstrap_receipt()'s own cascading
+        # raises: regenerate a fully self-consistent (correctly signed) document
+        # set against a shared root that has since moved (a trivial extra commit,
+        # same pinned file content), then observe it against the *original*
+        # shared root. Every internal cross-document check still agrees with
+        # itself, so only the live readback against the real shared root can
+        # catch the drift -- this is what makes the FAIL branch reachable.
+        s, c, out = pair()
+        stale_shared = clone(s, world / "stale-shared")
+        stale_consumer = clone(c, world / "stale-consumer")
+        (stale_shared / "NOOP.md").write_text("noop\n")
+        commit_all(stale_shared, "noop bump")
+        expected = refresh_consumer(module, selected, stale_shared, stale_consumer)
+        expect_red(
+            run_observer(s, stale_consumer, out, expected_sha=expected, check=False),
+            "stale-shared-root-readback",
+            "probe.binding-readback",
+        )
         mutations += 1
 
         s, c, out = pair()
@@ -294,7 +317,7 @@ def main() -> None:
         mutations += 1
 
     assert positives == 4
-    assert mutations == 18
+    assert mutations == 19
     print(
         f"CONSUMER-RUNTIME-TESTS-GREEN positive={positives} "
         f"mutations={mutations} selected=1 rejected=5 shadow=PASS"

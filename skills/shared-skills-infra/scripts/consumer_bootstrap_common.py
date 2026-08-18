@@ -18,7 +18,7 @@ FORBIDDEN_KEYS = {
     "password", "private_key", "chain_of_thought", "hidden_reasoning",
     "private_reasoning", "reasoning_trace", "scratchpad",
 }
-ABSOLUTE_HOST = re.compile(r"(?:^|[\s`'\"])(?:/Users/|/home/|[A-Za-z]:\\\\Users\\\\)")
+ABSOLUTE_HOST = re.compile(r"(?:^|[\s`'\"])(?:/Users/|/home/|[A-Za-z]:\\Users\\)")
 
 SOURCE_REL = Path(".agents/control-plane/source.json")
 PROFILE_REL = Path(".agents/control-plane/profile.json")
