@@ -26,6 +26,7 @@
       "invariant_or_state_refs": ["INV-COMPAT"],
       "implementation_ids": ["IMPL-001"],
       "oracle_ids": ["ORACLE-001"],
+      "evidence_ids": ["EVID-001"],
       "decision_id": null,
       "evidence_state": "PASS"
     },
@@ -37,6 +38,7 @@
       "invariant_or_state_refs": ["INV-BRANCH-B"],
       "implementation_ids": ["IMPL-002"],
       "oracle_ids": ["ORACLE-002"],
+      "evidence_ids": ["EVID-002"],
       "decision_id": null,
       "evidence_state": "PASS"
     }
@@ -79,6 +81,6 @@
   },
   "gate": {
     "status": "READY_FOR_PUBLICATION_REVIEW",
-    "rationale": "All declared fixture intents, source behaviors, required cases, implementation bindings and oracles are closed; both required cases carry executed evidence."
+    "rationale": "All declared fixture intents, source behaviors, required cases, implementation bindings, oracles and evidence references are closed."
   }
 }
