@@ -1,4 +1,4 @@
-# Module: skill-bettor 本地 truth-verify 實例
+# Module: 宿主本地 truth-verify 實例
 
 > 本檔只做能力索引與誠實狀態表。執行證據 SSOT 永遠在
 > `loop_wiki/tv-dual-loop-context/` 的程式、inputs、runs、receipts 與 Git history;不要把 receipt

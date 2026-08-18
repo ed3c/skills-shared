@@ -50,7 +50,7 @@ star 數/下載量不是匹配度。匹配度的切入點 = **每個維度的 DS
 
 3. **D/E 軸結論翻計劃寫定預設 → 跨家族辯論從建議升硬要求**（§Same-Weights 落地機制）:單模型心證不足以翻計劃。例:D4 預設 adapter 翻轉(notebooklm-py→LlamaIndex,主權)走 Opus×真 Gemini 跨家族辯論 2 輪 + Opus 裁落地,非我單方定案。
 
-> 錨（皆真檔）:`docs/plans/2026-07-04-ds-workflow-oss-stack/FIT-JUDGMENT-FRAMEWORK.md §1`(逐維度第一性)、同目錄 `CONTEXT.md` D4/C1(翻轉落地)、`gemini_research/c1-default-debate.md`(跨家族辯論記錄)。running-code 印證留 product repo `/Users/neon/ds-workflow` + memory `ds-stack-risk4-fit-outcomes`（**產品經驗不進 skill**——選型方法論才進,產品堆疊留 CONTEXT.md/memory）。
+> 錨（皆真檔）:`docs/plans/2026-07-04-ds-workflow-oss-stack/FIT-JUDGMENT-FRAMEWORK.md §1`(逐維度第一性)、同目錄 `CONTEXT.md` D4/C1(翻轉落地)、`gemini_research/c1-default-debate.md`(跨家族辯論記錄)。running-code 印證留上游 product repo（絕對路徑見 `.skill-bindings/judge-loop-chooser/`）+ memory `ds-stack-risk4-fit-outcomes`（**產品經驗不進 skill**——選型方法論才進,產品堆疊留 CONTEXT.md/memory）。
 
 ## 為何是 judge-loop-chooser 的型,不是新 skill
 

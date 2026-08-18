@@ -8,7 +8,7 @@ skill_dir="$(cd "${test_dir}/../.." && pwd -P)"
 local_verify="${skill_dir}/scripts/local_verification.py"
 snapshot="${skill_dir}/scripts/github_actions_snapshot.py"
 fixtures="${test_dir}/fixtures"
-scratch="$(mktemp -d)"
+scratch="$(mktemp -d "${TMPDIR:-/tmp}/scratch.XXXXXXXX")"
 trap 'rm -rf "${scratch}"' EXIT
 
 # The gh identity check runs the real `gh --version`. Under a scrubbed

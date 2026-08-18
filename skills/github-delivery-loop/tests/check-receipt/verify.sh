@@ -6,7 +6,7 @@ skill_dir="$(dirname "$(dirname "$test_dir")")"
 checker="$skill_dir/scripts/github_delivery.py"
 good="$test_dir/fixtures/good/registry.json"
 hollow="$test_dir/fixtures/hollow/registry.json"
-scratch="$(mktemp -d)"
+scratch="$(mktemp -d "${TMPDIR:-/tmp}/scratch.XXXXXXXX")"
 trap 'rm -rf "$scratch"' EXIT
 
 python3 "$checker" check --registry "$good"

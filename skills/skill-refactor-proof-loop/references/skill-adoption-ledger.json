@@ -9,7 +9,17 @@
     256,
     312,
     318,
-    322
+    322,
+    343,
+    344,
+    345,
+    346,
+    347,
+    348,
+    349,
+    350,
+    351,
+    352
   ],
   "in_scope": [
     "agentic-tech-lead-orchestration",
@@ -22,6 +32,110 @@
     "procedural-shadow-runtime",
     "repository-capability-audit",
     "spatial-loop-systems-engineering"
+  ],
+  "migration_order": [
+    {
+      "skill": "agentic-tech-lead-orchestration",
+      "issue": 343,
+      "depends_on": [],
+      "basis": [],
+      "note": "Blocked by no other leaf, and it is the only Skill whose golden proof is registered, so its treatments are the one worked instance the other nine copy."
+    },
+    {
+      "skill": "controlled-technical-language-harness",
+      "issue": 344,
+      "depends_on": [],
+      "basis": [],
+      "note": "No file under this Skill's scripts, tests, evals, references or contracts resolves a path into any other in-scope Skill."
+    },
+    {
+      "skill": "forgejo-delivery-loop",
+      "issue": 346,
+      "depends_on": [],
+      "basis": [],
+      "note": "No file under this Skill's scripts, tests, evals, references or contracts resolves a path into any other in-scope Skill."
+    },
+    {
+      "skill": "github-delivery-loop",
+      "issue": 348,
+      "depends_on": [],
+      "basis": [],
+      "note": "No file under this Skill's scripts, tests, evals, references or contracts resolves a path into any other in-scope Skill; two of them resolve paths into this one."
+    },
+    {
+      "skill": "dual-forge-repository-loop",
+      "issue": 345,
+      "depends_on": [
+        "github-delivery-loop"
+      ],
+      "basis": [
+        "skills/dual-forge-repository-loop/scripts/check_dual_forge_contract.py",
+        "skills/github-delivery-loop/scripts/ci_publish_gate.py",
+        "skills/github-delivery-loop/scripts/ci_workflow_policy.py"
+      ],
+      "note": "check_dual_forge_contract.py load_module()s github-delivery-loop/scripts/ci_publish_gate.py and ci_workflow_policy.py at gate time, so this Skill's executable contract is literally the other Skill's code running."
+    },
+    {
+      "skill": "git-town-stacked-pr-worker",
+      "issue": 347,
+      "depends_on": [
+        "github-delivery-loop"
+      ],
+      "basis": [
+        "skills/git-town-stacked-pr-worker/scripts/check_publication_boundary.py",
+        "skills/git-town-stacked-pr-worker/references/GITHUB_ACTIONS_PUBLICATION_ADOPTION.md"
+      ],
+      "note": "check_publication_boundary.py require_markers() the literal string github-delivery-loop in this Skill's own publication surface, so freezing a treatment here freezes text bound to the other Skill's contract."
+    },
+    {
+      "skill": "knowledge-continuity",
+      "issue": 349,
+      "depends_on": [],
+      "basis": [],
+      "note": "No file under this Skill's scripts, tests, evals, references or contracts resolves a path into any other in-scope Skill."
+    },
+    {
+      "skill": "spatial-loop-systems-engineering",
+      "issue": 352,
+      "depends_on": [
+        "forgejo-delivery-loop"
+      ],
+      "basis": [
+        "skills/spatial-loop-systems-engineering/tests/recovery-escalation/verify.sh",
+        "skills/spatial-loop-systems-engineering/references/three-failure-escalation.md"
+      ],
+      "note": "recovery-escalation/verify.sh require_literal()s forgejo-delivery-loop in the escalation overlay, so this Skill's hollow-route control is red the moment the other Skill's name moves."
+    },
+    {
+      "skill": "repository-capability-audit",
+      "issue": 351,
+      "depends_on": [
+        "controlled-technical-language-harness",
+        "github-delivery-loop",
+        "knowledge-continuity",
+        "spatial-loop-systems-engineering"
+      ],
+      "basis": [
+        "skills/repository-capability-audit/scripts/run_pilot_matrix.py",
+        "skills/repository-capability-audit/tests/test_source_contribution.py",
+        "skills/repository-capability-audit/evals/held-out-corpus.json"
+      ],
+      "note": "run_pilot_matrix.py SOURCE_SKILLS names these four as measured subjects and test_source_contribution.py scores them by name, so a matched hermetic task here is comparing bytes those four Skills own."
+    },
+    {
+      "skill": "procedural-shadow-runtime",
+      "issue": 350,
+      "depends_on": [
+        "git-town-stacked-pr-worker",
+        "repository-capability-audit"
+      ],
+      "basis": [
+        "skills/procedural-shadow-runtime/scripts/summarise_uplift_matrix.py",
+        "skills/repository-capability-audit/evals/uplift-preregistration.json",
+        "skills/procedural-shadow-runtime/tests/fixtures/valid-capsule.json"
+      ],
+      "note": "summarise_uplift_matrix.py opens repository-capability-audit/evals/uplift-preregistration.json from a module-level constant, and the capsule and receipt fixtures pin git-town-stacked-pr-worker/SKILL.md as the procedure source. The reverse edge is not symmetric: repository-capability-audit only names this Skill's artifacts as inert preregistration data, and no script of its own reads them."
+    }
   ],
   "skills": [
     {
@@ -107,7 +221,7 @@
           "evidence": [
             "skills/skill-refactor-proof-loop/references/refactor-proof-stack.json"
           ],
-          "owner_issue": 322,
+          "owner_issue": 343,
           "note": "Nodes name their issues and PRs, but their state is declared READ_FROM_GITHUB and cannot be closed by a zero-network audit."
         }
       }
@@ -120,18 +234,18 @@
         "old_canonical_treatment_frozen": {
           "state": "ABSENT",
           "evidence": [],
-          "owner_issue": 322,
+          "owner_issue": 344,
           "note": "No pre-refactor treatment bytes are frozen anywhere in the Skill."
         },
         "refactor_as_landed_treatment_frozen": {
           "state": "ABSENT",
           "evidence": [],
-          "owner_issue": 322
+          "owner_issue": 344
         },
         "old_strengths_asserted": {
           "state": "ABSENT",
           "evidence": [],
-          "owner_issue": 322,
+          "owner_issue": 344,
           "note": "Without a frozen old treatment there is nothing to assert preservation against."
         },
         "route_reachable": {
@@ -149,7 +263,7 @@
             "skills/controlled-technical-language-harness/scripts/lint_deterministic.py",
             "skills/controlled-technical-language-harness/scripts/check_profile_admission.py"
           ],
-          "owner_issue": 322,
+          "owner_issue": 344,
           "note": "Semantic and deterministic gates are executable; no machine shape contract (*.schema.json) exists."
         },
         "hollow_dead_route_controls": {
@@ -166,26 +280,26 @@
             "skills/controlled-technical-language-harness/scripts/score_ab.py",
             "skills/controlled-technical-language-harness/tests/ab-canary/verify.sh"
           ],
-          "owner_issue": 322,
+          "owner_issue": 344,
           "note": "Matched-task fairness is enforced over recorded A/B bundles, not over frozen refactor treatments."
         },
         "golden_proof_registered": {
           "state": "ABSENT",
           "evidence": [],
-          "owner_issue": 322
+          "owner_issue": 344
         },
         "live_model_runtime_ab": {
           "state": "NOT_EXERCISED",
           "evidence": [
             "skills/controlled-technical-language-harness/scripts/score_ab.py"
           ],
-          "owner_issue": 322,
+          "owner_issue": 344,
           "note": "The scorer consumes live-run bundles; no live bundle is registered as evidence."
         },
         "molecular_traceability": {
           "state": "ABSENT",
           "evidence": [],
-          "owner_issue": 322
+          "owner_issue": 344
         }
       }
     },
@@ -197,17 +311,17 @@
         "old_canonical_treatment_frozen": {
           "state": "ABSENT",
           "evidence": [],
-          "owner_issue": 322
+          "owner_issue": 345
         },
         "refactor_as_landed_treatment_frozen": {
           "state": "ABSENT",
           "evidence": [],
-          "owner_issue": 322
+          "owner_issue": 345
         },
         "old_strengths_asserted": {
           "state": "ABSENT",
           "evidence": [],
-          "owner_issue": 322
+          "owner_issue": 345
         },
         "route_reachable": {
           "state": "PASS",
@@ -240,13 +354,13 @@
             "skills/dual-forge-repository-loop/scripts/check_prompt_crossstack.py",
             "skills/dual-forge-repository-loop/tests/prompt-crossstack/verify.sh"
           ],
-          "owner_issue": 322,
+          "owner_issue": 345,
           "note": "The cross-stack case set is frozen and checked, but the comparison itself is never executed in the suite."
         },
         "golden_proof_registered": {
           "state": "ABSENT",
           "evidence": [],
-          "owner_issue": 322
+          "owner_issue": 345
         },
         "live_model_runtime_ab": {
           "state": "NOT_EXERCISED",
@@ -259,7 +373,7 @@
         "molecular_traceability": {
           "state": "ABSENT",
           "evidence": [],
-          "owner_issue": 322
+          "owner_issue": 345
         }
       }
     },
@@ -271,17 +385,17 @@
         "old_canonical_treatment_frozen": {
           "state": "ABSENT",
           "evidence": [],
-          "owner_issue": 322
+          "owner_issue": 346
         },
         "refactor_as_landed_treatment_frozen": {
           "state": "ABSENT",
           "evidence": [],
-          "owner_issue": 322
+          "owner_issue": 346
         },
         "old_strengths_asserted": {
           "state": "ABSENT",
           "evidence": [],
-          "owner_issue": 322
+          "owner_issue": 346
         },
         "route_reachable": {
           "state": "PASS",
@@ -311,23 +425,23 @@
         "matched_hermetic_task": {
           "state": "ABSENT",
           "evidence": [],
-          "owner_issue": 322
+          "owner_issue": 346
         },
         "golden_proof_registered": {
           "state": "ABSENT",
           "evidence": [],
-          "owner_issue": 322
+          "owner_issue": 346
         },
         "live_model_runtime_ab": {
           "state": "NOT_IMPLEMENTED",
           "evidence": [],
-          "owner_issue": 322,
+          "owner_issue": 346,
           "note": "No model/runtime A/B harness exists; live Forgejo delivery receipts are a separate lane."
         },
         "molecular_traceability": {
           "state": "ABSENT",
           "evidence": [],
-          "owner_issue": 322
+          "owner_issue": 346
         }
       }
     },
@@ -339,17 +453,17 @@
         "old_canonical_treatment_frozen": {
           "state": "ABSENT",
           "evidence": [],
-          "owner_issue": 322
+          "owner_issue": 347
         },
         "refactor_as_landed_treatment_frozen": {
           "state": "ABSENT",
           "evidence": [],
-          "owner_issue": 322
+          "owner_issue": 347
         },
         "old_strengths_asserted": {
           "state": "ABSENT",
           "evidence": [],
-          "owner_issue": 322
+          "owner_issue": 347
         },
         "route_reachable": {
           "state": "PASS",
@@ -379,12 +493,12 @@
         "matched_hermetic_task": {
           "state": "ABSENT",
           "evidence": [],
-          "owner_issue": 322
+          "owner_issue": 347
         },
         "golden_proof_registered": {
           "state": "ABSENT",
           "evidence": [],
-          "owner_issue": 322
+          "owner_issue": 347
         },
         "live_model_runtime_ab": {
           "state": "NOT_EXERCISED",
@@ -398,7 +512,7 @@
         "molecular_traceability": {
           "state": "ABSENT",
           "evidence": [],
-          "owner_issue": 322
+          "owner_issue": 347
         }
       }
     },
@@ -410,17 +524,17 @@
         "old_canonical_treatment_frozen": {
           "state": "ABSENT",
           "evidence": [],
-          "owner_issue": 322
+          "owner_issue": 348
         },
         "refactor_as_landed_treatment_frozen": {
           "state": "ABSENT",
           "evidence": [],
-          "owner_issue": 322
+          "owner_issue": 348
         },
         "old_strengths_asserted": {
           "state": "ABSENT",
           "evidence": [],
-          "owner_issue": 322
+          "owner_issue": 348
         },
         "route_reachable": {
           "state": "PASS",
@@ -437,7 +551,7 @@
             "skills/github-delivery-loop/scripts/merge_gate.py",
             "skills/github-delivery-loop/scripts/ci_publish_gate.py"
           ],
-          "owner_issue": 322,
+          "owner_issue": 348,
           "note": "Gates are executable and fail closed, but the delivery receipt shape has no machine schema."
         },
         "hollow_dead_route_controls": {
@@ -451,12 +565,12 @@
         "matched_hermetic_task": {
           "state": "ABSENT",
           "evidence": [],
-          "owner_issue": 322
+          "owner_issue": 348
         },
         "golden_proof_registered": {
           "state": "ABSENT",
           "evidence": [],
-          "owner_issue": 322
+          "owner_issue": 348
         },
         "live_model_runtime_ab": {
           "state": "NOT_IMPLEMENTED",
@@ -467,7 +581,7 @@
         "molecular_traceability": {
           "state": "ABSENT",
           "evidence": [],
-          "owner_issue": 322
+          "owner_issue": 348
         }
       }
     },
@@ -479,17 +593,17 @@
         "old_canonical_treatment_frozen": {
           "state": "ABSENT",
           "evidence": [],
-          "owner_issue": 322
+          "owner_issue": 349
         },
         "refactor_as_landed_treatment_frozen": {
           "state": "ABSENT",
           "evidence": [],
-          "owner_issue": 322
+          "owner_issue": 349
         },
         "old_strengths_asserted": {
           "state": "ABSENT",
           "evidence": [],
-          "owner_issue": 322
+          "owner_issue": 349
         },
         "route_reachable": {
           "state": "PASS",
@@ -506,7 +620,7 @@
             "skills/knowledge-continuity/scripts/check_knowledge_continuity.py",
             "skills/knowledge-continuity/tests/check-knowledge-continuity/verify.sh"
           ],
-          "owner_issue": 322,
+          "owner_issue": 349,
           "note": "Four mechanical rules are executable; the human-judgement half of the Skill has no machine gate."
         },
         "hollow_dead_route_controls": {
@@ -519,22 +633,22 @@
         "matched_hermetic_task": {
           "state": "ABSENT",
           "evidence": [],
-          "owner_issue": 322
+          "owner_issue": 349
         },
         "golden_proof_registered": {
           "state": "ABSENT",
           "evidence": [],
-          "owner_issue": 322
+          "owner_issue": 349
         },
         "live_model_runtime_ab": {
           "state": "NOT_IMPLEMENTED",
           "evidence": [],
-          "owner_issue": 322
+          "owner_issue": 349
         },
         "molecular_traceability": {
           "state": "ABSENT",
           "evidence": [],
-          "owner_issue": 322
+          "owner_issue": 349
         }
       }
     },
@@ -546,17 +660,17 @@
         "old_canonical_treatment_frozen": {
           "state": "ABSENT",
           "evidence": [],
-          "owner_issue": 322
+          "owner_issue": 350
         },
         "refactor_as_landed_treatment_frozen": {
           "state": "ABSENT",
           "evidence": [],
-          "owner_issue": 322
+          "owner_issue": 350
         },
         "old_strengths_asserted": {
           "state": "ABSENT",
           "evidence": [],
-          "owner_issue": 322
+          "owner_issue": 350
         },
         "route_reachable": {
           "state": "PASS",
@@ -588,13 +702,13 @@
             "skills/procedural-shadow-runtime/scripts/run_arm_trials.py",
             "skills/procedural-shadow-runtime/tests/verify_arm_trials.py"
           ],
-          "owner_issue": 322,
+          "owner_issue": 350,
           "note": "Arms and trials are deterministic, but they are not bound to frozen refactor treatments of this Skill."
         },
         "golden_proof_registered": {
           "state": "ABSENT",
           "evidence": [],
-          "owner_issue": 322
+          "owner_issue": 350
         },
         "live_model_runtime_ab": {
           "state": "NOT_EXERCISED",
@@ -607,7 +721,7 @@
         "molecular_traceability": {
           "state": "ABSENT",
           "evidence": [],
-          "owner_issue": 322
+          "owner_issue": 350
         }
       }
     },
@@ -619,17 +733,17 @@
         "old_canonical_treatment_frozen": {
           "state": "ABSENT",
           "evidence": [],
-          "owner_issue": 322
+          "owner_issue": 351
         },
         "refactor_as_landed_treatment_frozen": {
           "state": "ABSENT",
           "evidence": [],
-          "owner_issue": 322
+          "owner_issue": 351
         },
         "old_strengths_asserted": {
           "state": "ABSENT",
           "evidence": [],
-          "owner_issue": 322
+          "owner_issue": 351
         },
         "route_reachable": {
           "state": "PASS",
@@ -666,7 +780,7 @@
         "golden_proof_registered": {
           "state": "ABSENT",
           "evidence": [],
-          "owner_issue": 322
+          "owner_issue": 351
         },
         "live_model_runtime_ab": {
           "state": "NOT_EXERCISED",
@@ -680,7 +794,7 @@
         "molecular_traceability": {
           "state": "ABSENT",
           "evidence": [],
-          "owner_issue": 322
+          "owner_issue": 351
         }
       }
     },
@@ -692,17 +806,17 @@
         "old_canonical_treatment_frozen": {
           "state": "ABSENT",
           "evidence": [],
-          "owner_issue": 322
+          "owner_issue": 352
         },
         "refactor_as_landed_treatment_frozen": {
           "state": "ABSENT",
           "evidence": [],
-          "owner_issue": 322
+          "owner_issue": 352
         },
         "old_strengths_asserted": {
           "state": "ABSENT",
           "evidence": [],
-          "owner_issue": 322
+          "owner_issue": 352
         },
         "route_reachable": {
           "state": "PASS",
@@ -732,22 +846,22 @@
         "matched_hermetic_task": {
           "state": "ABSENT",
           "evidence": [],
-          "owner_issue": 322
+          "owner_issue": 352
         },
         "golden_proof_registered": {
           "state": "ABSENT",
           "evidence": [],
-          "owner_issue": 322
+          "owner_issue": 352
         },
         "live_model_runtime_ab": {
           "state": "NOT_IMPLEMENTED",
           "evidence": [],
-          "owner_issue": 322
+          "owner_issue": 352
         },
         "molecular_traceability": {
           "state": "ABSENT",
           "evidence": [],
-          "owner_issue": 322
+          "owner_issue": 352
         }
       }
     }

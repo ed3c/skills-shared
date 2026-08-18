@@ -4,7 +4,7 @@ set -euo pipefail
 test_dir="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
 skill_dir="$(dirname "$(dirname "$test_dir")")"
 checker="$skill_dir/scripts/ci_publish_gate.py"
-scratch="$(mktemp -d)"
+scratch="$(mktemp -d "${TMPDIR:-/tmp}/scratch.XXXXXXXX")"
 trap 'rm -rf "$scratch"' EXIT
 
 python3 "$checker" --selftest

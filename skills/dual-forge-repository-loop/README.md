@@ -93,6 +93,8 @@ repository merge policy / Human Admit
 
 - [`SKILL.md`](SKILL.md): dual-forge procedure and hard laws.
 - [`references/system-prompt.md`](references/system-prompt.md): Repository Multi-Agent Runtime + Dual-Lane Delivery system prompt v2.1.
+- [`references/system-prompt-v2.2.md`](references/system-prompt-v2.2.md): v2.2 candidate. Not recorded and not projected — it exists to be measured by the frozen baseline rerun.
+- [`references/system-prompt-v2.2-delta.md`](references/system-prompt-v2.2-delta.md): what v2.2 cut, which measured failure asked for it, and what the rerun cannot settle.
 - [`references/multi-agent-runtime-machine-contract.md`](references/multi-agent-runtime-machine-contract.md): checker scope, state machine, exits, and evidence boundary.
 - [`references/multi-agent-runtime-contract.schema.json`](references/multi-agent-runtime-contract.schema.json): top-level runtime/topology/Shadow/budget/state contract.
 - [`references/worker-task.schema.json`](references/worker-task.schema.json): task, attempt, branch/worktree, lease, oracle, budget, and lifecycle packet.

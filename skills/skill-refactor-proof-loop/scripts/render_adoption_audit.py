@@ -9,13 +9,20 @@ report, a stale report, or a ledger change that nobody re-rendered is a red
 suite rather than a document that quietly disagrees with its own source.
 
 The admission record is named in the header and nothing more: it says which
-method is canonical, not what any Skill proved under it.
+method is canonical, not what any Skill proved under it. Whether it still says
+even that is measured, not quoted -- the record expires by its own terms on any
+change to the blobs it names as the admitted subject, so those blobs are hashed
+against current bytes and the header states the verdict. Citing an expired
+admission as if it were live is the one lie a report about proof standards
+cannot be allowed to tell, and a citation is exactly the shape of claim that
+survives the thing it points at.
 
 Exit codes: 0 green, 1 stale/unusable.
 """
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -68,9 +75,31 @@ def table(header: list[str], rows: list[list[str]]) -> list[str]:
     return lines
 
 
-def build_report(ledger: dict, admission: dict) -> str:
+def git_blob(path: Path) -> str:
+    raw = path.read_bytes()
+    return hashlib.sha1(f"blob {len(raw)}\0".encode("ascii") + raw).hexdigest()
+
+
+def moved_blobs(root: Path, admission: dict) -> list[str]:
+    """Admitted blob paths whose current bytes no longer hash to the admitted SHA.
+
+    The record expires by its own terms on any change to these, so whether it
+    still describes the standard in the tree is a measurement, not a citation.
+    An absent path counts as moved: a subject that is gone is not a subject
+    that still matches.
+    """
+    moved = []
+    for value, sha in sorted(admission["admitted_subject"]["blobs"].items()):
+        path = root / value
+        if not path.is_file() or git_blob(path) != sha:
+            moved.append(value)
+    return moved
+
+
+def build_report(root: Path, ledger: dict, admission: dict) -> str:
     skills = sorted(ledger["skills"], key=lambda entry: entry["skill"])
     subject = admission["admitted_subject"]
+    moved = moved_blobs(root, admission)
     counts = {state: 0 for state in STATES}
     layers: dict[str, int] = {}
     gaps: dict[int, list[tuple[tuple[str, int], list[str]]]] = {}
@@ -116,9 +145,32 @@ def build_report(ledger: dict, admission: dict) -> str:
         "(../../skills/skill-refactor-proof-loop/scripts/check_skill_adoption_ledger.py)",
         "against current repository bytes.",
         "",
+    ]
+    if moved:
+        out.extend([
+            f"**That admission has expired by its own terms.** It expires on any change to the "
+            f"{len(subject['blobs'])} blobs",
+            f"it names as the admitted subject, and {len(moved)} of them no longer hash to the admitted SHA:",
+            "",
+        ])
+        out.extend(f"- `{value}`" for value in moved)
+        out.extend([
+            "",
+            "Re-admission is a new Human record with a new `decided_at`. Nothing in this pipeline re-points the",
+            "old one, and this report does not treat the expired record as authority for anything below it.",
+            "The measurements are unaffected: they were never derived from the admission in the first place.",
+            "",
+        ])
+    else:
+        out.extend([
+            f"All {len(subject['blobs'])} blobs that record names as the admitted subject still hash to the",
+            "admitted SHA, so it has not expired.",
+            "",
+        ])
+    out.extend([
         "## Headline",
         "",
-    ]
+    ])
     out.extend(table(["Measure", "Value"], [
         ["Skills classified", str(len(skills))],
         ["Criteria per Skill", str(len(CRITERIA))],
@@ -128,6 +180,7 @@ def build_report(ledger: dict, admission: dict) -> str:
         ["Gaps carrying an owning issue", str(owned)],
         ["Distinct owning issues", str(len(gaps))],
         ["Golden proofs registered", str(registered)],
+        ["Migration leaves ordered", str(len(ledger["migration_order"]))],
     ]))
     out.extend(["", "Highest proof layer reached, per Skill:", ""])
     out.extend(table(
@@ -181,12 +234,47 @@ def build_report(ledger: dict, admission: dict) -> str:
 
     out.extend([
         "",
+        "## Migration order",
+        "",
+        "The leaves above are not independent. Each row's `Blocked by` is derived from files that",
+        "already resolve or assert a path into another in-scope Skill, so closing them out of order",
+        "means freezing a treatment whose bytes are still moving underneath it. `Basis` names the",
+        "files the edge was read out of; the checker requires every one of them to exist.",
+        "",
+        "This sequence is not a preference. `check_skill_adoption_ledger.py` discards it, recomputes it",
+        "from `depends_on` alone by stable topological sort — alphabetically first Skill whose blockers",
+        "are all placed — and refuses the ledger if the recorded list differs or if a cycle means no",
+        "order exists. Rows with no blocker are genuinely unordered against each other; only the",
+        "alphabetical tie-break fixes where they land.",
+        "",
+    ])
+    out.extend(table(
+        ["#", "Skill", "Leaf", "Blocked by", "Why", "Basis"],
+        [
+            [
+                str(position),
+                f"`{row['skill']}`",
+                f"#{row['issue']}",
+                ", ".join(f"`{name}`" for name in row["depends_on"]) or "—",
+                cell(row.get("note", "—")),
+                ", ".join(f"`{path}`" for path in row["basis"]) or "—",
+            ]
+            for position, row in enumerate(ledger["migration_order"], 1)
+        ],
+    ))
+
+    out.extend([
+        "",
         "## Evidence boundary",
         "",
         "This report proves inventory and gap classification against current bytes. It does not prove",
         "model uplift, provider operation, scheduler or Shadow enforcement, Git Town/Forgejo delivery,",
         "merge, release or production readiness. `molecular_traceability` cannot reach `PASS` here at all:",
         "the audit is zero-network, and no offline byte proves current issue or PR delivery state.",
+        "",
+        "The migration order proves coupling between Skills as their current bytes express it. It is not a",
+        "schedule, not an estimate, and not an assignment: it says which leaf would be freezing a moving",
+        "target if it went first, and nothing about when any of them is worked or by whom.",
         "",
     ])
     return "\n".join(out)
@@ -203,6 +291,7 @@ def main(argv: list[str] | None = None) -> int:
     root = args.root.resolve()
     try:
         rendered = build_report(
+            root,
             load(args.ledger or (root / LEDGER)),
             load(args.admission or (root / ADMISSION)),
         )

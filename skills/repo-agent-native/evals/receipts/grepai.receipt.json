@@ -3,7 +3,7 @@
     "config_identity": {
       "backend": "gob",
       "config_path": ".grepai/config.yaml",
-      "config_sha256": "afbc719370884793063bf124fd0fb375df8cde453a61ad0076c8c78175523b0c",
+      "config_sha256": "34837070590b8ff453b50dcc458c1e764420304ee6e3a672d54224b40276422c",
       "embedding_model": "nomic-embed-text",
       "embedding_provider": "ollama"
     },
@@ -41,14 +41,14 @@
       "-n",
       "5"
     ],
-    "cwd": "/Users/neon/skills-shared/.claude/worktrees/lanes-256",
-    "duration_ms": 143,
+    "cwd": "/Users/neon/skills-shared/.claude/worktrees/phase-a-batch",
+    "duration_ms": 96,
     "exit_code": 0,
     "query": "where is the commit role trailer gate enforced",
     "stderr_bytes": 0,
     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "stdout_bytes": 11213,
-    "stdout_sha256": "ccf9c321f395728f03bd5187a2fbd1eeb36bece982c3375cc6aadf93e1122831",
+    "stdout_bytes": 9321,
+    "stdout_sha256": "84caf78c04106c572355d94bdae79a6da8b9e7edb5de62f9bb7956fb8d3c58dd",
     "terminal_state": "COMPLETED"
   },
   "policy": {
@@ -83,40 +83,40 @@
         "path": "evals/commit-roles.json",
         "readback": "CONFIRMED",
         "score": 0.68959767,
-        "source_sha256": "e3f26392ef2640f2898ee0c643c381b9e3b6735236af41311c1e567f0e5de284",
+        "source_sha256": "38439b8611d3df89d3a1a8bf8ba29146efc6e9b727f07f06a6eb9c42bb2b638b",
         "start_line": 1
       },
       {
-        "end_line": 342,
+        "end_line": 509,
+        "path": "evals/commit-roles.json",
+        "readback": "CONFIRMED",
+        "score": 0.6689148,
+        "source_sha256": "38439b8611d3df89d3a1a8bf8ba29146efc6e9b727f07f06a6eb9c42bb2b638b",
+        "start_line": 505
+      },
+      {
+        "end_line": 343,
         "path": "evals/commit-roles.json",
         "readback": "CONFIRMED",
         "score": 0.65799415,
-        "source_sha256": "e3f26392ef2640f2898ee0c643c381b9e3b6735236af41311c1e567f0e5de284",
-        "start_line": 309
+        "source_sha256": "38439b8611d3df89d3a1a8bf8ba29146efc6e9b727f07f06a6eb9c42bb2b638b",
+        "start_line": 310
       },
       {
-        "end_line": 108,
+        "end_line": 109,
         "path": "evals/commit-roles.json",
         "readback": "CONFIRMED",
         "score": 0.65680397,
-        "source_sha256": "e3f26392ef2640f2898ee0c643c381b9e3b6735236af41311c1e567f0e5de284",
-        "start_line": 86
+        "source_sha256": "38439b8611d3df89d3a1a8bf8ba29146efc6e9b727f07f06a6eb9c42bb2b638b",
+        "start_line": 87
       },
       {
-        "end_line": 88,
+        "end_line": 89,
         "path": "evals/commit-roles.json",
         "readback": "CONFIRMED",
         "score": 0.6556279,
-        "source_sha256": "e3f26392ef2640f2898ee0c643c381b9e3b6735236af41311c1e567f0e5de284",
-        "start_line": 53
-      },
-      {
-        "end_line": 223,
-        "path": "evals/commit-roles.json",
-        "readback": "CONFIRMED",
-        "score": 0.6517614,
-        "source_sha256": "e3f26392ef2640f2898ee0c643c381b9e3b6735236af41311c1e567f0e5de284",
-        "start_line": 189
+        "source_sha256": "38439b8611d3df89d3a1a8bf8ba29146efc6e9b727f07f06a6eb9c42bb2b638b",
+        "start_line": 54
       }
     ],
     "result_count": 5,
@@ -129,11 +129,11 @@
   },
   "schema": "repo-agent-native/adapter-receipt/v1",
   "subject": {
-    "commit_sha": "f50b2b9822db9e534169b5e63b523d940b32bb3c",
+    "commit_sha": "8d4d8b9d9c55146fd5d92900d549cc797fc5b519",
     "dirty_excluded": "skills/repo-agent-native/evals/receipts",
     "dirty_paths": 0,
     "repository": "ed3c/skills-shared",
-    "tree_sha": "42f289d44c1befefc9bdfb0bacf88a26a01b198a",
-    "workspace_root": "/Users/neon/skills-shared/.claude/worktrees/lanes-256"
+    "tree_sha": "7c983ad131ffbeb6a084c529ea7ab4b7442883c3",
+    "workspace_root": "/Users/neon/skills-shared/.claude/worktrees/phase-a-batch"
   }
 }

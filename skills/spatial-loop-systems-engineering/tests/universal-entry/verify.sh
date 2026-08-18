@@ -45,7 +45,7 @@ require "$modules" "bypass universal compiler"
 require "$modules" "linux-isolation-runtime.md"
 
 # Negative control: C/D work may not be downgraded to ordinary Level A work.
-tmp="$(mktemp -d)"
+tmp="$(mktemp -d "${TMPDIR:-/tmp}/tmp.XXXXXXXX")"
 trap 'rm -rf "$tmp"' EXIT
 cp "$skill" "$tmp/SKILL.md"
 python3 - "$tmp/SKILL.md" <<'PY'

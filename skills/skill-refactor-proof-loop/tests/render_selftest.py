@@ -20,6 +20,7 @@ ROOT = Path(__file__).resolve().parents[1]
 REPO = ROOT.parents[1]
 RENDERER = ROOT / "scripts/render_adoption_audit.py"
 LEDGER = ROOT / "references/skill-adoption-ledger.json"
+ADMISSION = ROOT / "evals/proof-standard-admission.json"
 
 
 def run(*args: str) -> subprocess.CompletedProcess[str]:
@@ -67,6 +68,32 @@ def main() -> int:
             "is stale",
         )
 
+        # The admission verdict must be hashed, not copied. Mutate the pinned
+        # blobs in whichever direction flips the verdict the committed record
+        # actually has — expired records get re-pointed at the bytes in the
+        # tree (flipping them current), current records get one blob pinned to
+        # a hash nothing has (flipping them expired) — so a renderer that
+        # printed the citation verbatim would emit identical bytes here and
+        # stay green regardless of which world the committed record is in.
+        readmitted = temp / "readmitted-admission.json"
+        value = json.loads(ADMISSION.read_text(encoding="utf-8"))
+        tree_blobs = {
+            path: subprocess.run(
+                ["git", "hash-object", path],
+                cwd=REPO, text=True, capture_output=True, check=True,
+            ).stdout.strip()
+            for path in value["admitted_subject"]["blobs"]
+        }
+        if value["admitted_subject"]["blobs"] == tree_blobs:
+            first = next(iter(tree_blobs))
+            tree_blobs[first] = "0" * 40
+        value["admitted_subject"]["blobs"] = tree_blobs
+        readmitted.write_text(json.dumps(value, indent=2) + "\n", encoding="utf-8")
+        checks["admission_expiry_not_recomputed"] = (
+            ["--admission", str(readmitted), "--output", str(report)],
+            "is stale",
+        )
+
         for name, (args, expected) in checks.items():
             done = run("--check", *args)
             if done.returncode == 0 or expected not in done.stderr:
@@ -75,7 +102,7 @@ def main() -> int:
     if survivors:
         print(f"RENDER-SELFTEST-RED survived={','.join(sorted(survivors))}", file=sys.stderr)
         return 2
-    print("RENDER-SELFTEST-GREEN mutations=3 all refused by name")
+    print(f"RENDER-SELFTEST-GREEN mutations={len(checks)} all refused by name")
     return 0
 
 

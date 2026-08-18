@@ -5,7 +5,7 @@ test_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 skill_root="$(cd "${test_dir}/../.." && pwd)"
 checker="${skill_root}/scripts/check_system_contract.py"
 good="${test_dir}/fixtures/good.json"
-tmp="$(mktemp -d)"
+tmp="$(mktemp -d "${TMPDIR:-/tmp}/tmp.XXXXXXXX")"
 trap 'rm -rf "${tmp}"' EXIT
 
 green_output="$(python3 "${checker}" check "${good}")"

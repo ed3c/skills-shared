@@ -27,7 +27,7 @@ assert body['sync']['tags'] is False, body['sync']
 "
 
 # A checker error is not a policy failure: an absent repository root exits 64.
-work="$(mktemp -d)"
+work="$(mktemp -d "${TMPDIR:-/tmp}/work.XXXXXXXX")"
 set +e
 python3 "${checker}" --repo-root "${work}" >/dev/null 2>&1
 absent_code=$?

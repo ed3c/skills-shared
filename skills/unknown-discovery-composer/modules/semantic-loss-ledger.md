@@ -73,7 +73,7 @@ The old `SKILL.md` has full preservation coverage:
 | Artifact verdict to `judge-loop-chooser`; code to `code-review` | `ACTIVE_IN_SKILL` + `LEGACY_ARCHIVED` | `../SKILL.md`; legacy archive | Active split preserved. |
 | Human understanding half vs artifact judgment half | `PRESERVED_IN_MODULE` + `LEGACY_ARCHIVED` | `domain-lexicon.md`; legacy archive | Preserved as domain term. |
 | Downstream boundaries for `sdlc-plan-composer`, `to-spec+implement`, `judge-loop-chooser`, `code-review` | `ACTIVE_IN_SKILL` + `CANONICAL_OWNER_WITH_LEGACY_COPY` | `../SKILL.md`; legacy archive; owner skills | Active boundary preserved without duplicating owner internals. |
-| Lineage from antigravity and no skill-conformance-hub governance | `PRESERVED_IN_MODULE` + `LEGACY_ARCHIVED` | `retarget-map.md`; legacy archive | Preserved as lineage, not active route logic. |
+| Lineage from upstream and no skill-conformance-hub governance | `PRESERVED_IN_MODULE` + `LEGACY_ARCHIVED` | `retarget-map.md`; legacy archive | Preserved as lineage, not active route logic. |
 
 ## Out Of Active Catalog But Preserved
 
@@ -83,6 +83,6 @@ These items are intentionally not in the compact active route catalog, but they 
 |---|---|
 | Prose shaping after proposal or explanation | Use `to-spec` or `writing-shape` when the route packet identifies prose shaping as the next unknown. |
 | Conversational leftover issue filing | Use the repo's delivery-loop skill (`forgejo-delivery-loop` / `github-delivery-loop` / `gitlab-delivery-loop`) when post-implementation residue is issue reporting rather than understanding, code review, or artifact verdict. |
-| Antigravity-specific deliverable examples such as DR report / Path-B / COMPLETENESS matrix | Keep as lineage examples unless the local `judge-loop-chooser` owner establishes a corresponding skill-bettor deliverable. |
+| Antigravity-specific deliverable examples such as DR report / Path-B / COMPLETENESS matrix | Keep as lineage examples unless the local `judge-loop-chooser` owner establishes a corresponding host deliverable. |
 | Exact old U0-U3 linear graph | Use only as historical shape; current execution uses the state graph in `../SKILL.md`. |
 | Long frontmatter retarget story | Use `retarget-map.md` and the legacy archive for history; frontmatter stays invocation-focused. |

@@ -1,7 +1,7 @@
 {
   "schema": "v2-1-crossstack-preregistration/v1",
   "preregistration_id": "v2-1-crossstack-gen2-2026-08",
-  "status": "FROZEN_NOT_EXECUTED",
+  "status": "EXECUTED",
   "issue": 229,
   "supersedes": {
     "preregistration_id": "v2-1-crossstack-2026-08",
@@ -11,7 +11,7 @@
   "_meta": {
     "why": "#229 requires a deterministic gate that derives NOT_ELIGIBLE or PORTABLE_RECORD_ELIGIBLE. Generation 1 could derive neither without out-claiming its metric. This generation fixes the instrument first so that a future execution can land on a terminal state honestly.",
     "why_new_cases": "The generation-1 cases are committed and therefore no longer held out. These contracts are generated fresh, and the near-miss halves of them did not exist in any committed file before this freeze. Once this file is committed they stop being held out too.",
-    "execution_state": "Frozen and not executed. Executing it needs two live provider stacks and real spend; this file is the instrument, and a result file beside a FROZEN_NOT_EXECUTED status is refused rather than believed."
+    "execution_state": "Executed: 18/18 cells on both stacks, zero failed cells. The frozen rule applied to the result's own cells (scripts/audit_crossstack_metric.py) finds a hard regression on both stacks -- rule_accuracy on claude-code-opus, verdict_accuracy on codex-cli-gpt -- so the outcome is NOT_ELIGIBLE, not the INDETERMINATE generation 1 was stuck at. See evals/prompt-crossstack-v2-result.json for the full derivation."
   },
   "stacks": [
     {

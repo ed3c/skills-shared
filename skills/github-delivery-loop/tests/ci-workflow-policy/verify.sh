@@ -13,7 +13,7 @@ test_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 skill_dir="$(cd "${test_dir}/../.." && pwd)"
 repo_root="$(cd "${skill_dir}/../.." && pwd)"
 checker="${skill_dir}/scripts/ci_workflow_policy.py"
-work="$(mktemp -d)"
+work="$(mktemp -d "${TMPDIR:-/tmp}/work.XXXXXXXX")"
 trap 'rm -rf "${work}"' EXIT
 
 # 1. assemble an enrolled repository from fixture bytes. The host repository

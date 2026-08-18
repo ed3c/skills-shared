@@ -9,7 +9,7 @@ origin_capture="${skill_dir}/scripts/capture_origin_ref.py"
 reconciliation_capture="${skill_dir}/scripts/capture_reconciliation.py"
 forgejo_delivery_capture="${skill_dir}/scripts/capture_forgejo_delivery.py"
 good="${test_dir}/fixtures/good.json"
-tmp="$(mktemp -d)"
+tmp="$(mktemp -d "${TMPDIR:-/tmp}/tmp.XXXXXXXX")"
 trap 'rm -rf "${tmp}"' EXIT
 
 # The capture producers run a real `gh --version` identity check. Under a

@@ -48,12 +48,25 @@ fixture evidence promoted to a live or delivery PASS
 gap with no owning issue, or owned by an invented issue number
 ```
 
+and, over the migration order:
+
+```text
+dependency cycle, so no order exists at all
+recorded order resequenced away from its own edges
+in-scope Skill left unordered, duplicated, or a stray one ordered
+leaf issue unknown, owning no gap, or owning another Skill's gaps
+blocker naming a Skill that is not in the order
+blocker asserted with no basis, basis asserted with no blocker
+basis path that does not exist
+```
+
 The render selftest plants and refuses:
 
 ```text
 rendered report edited by hand
 rendered report absent
 ledger changed without re-rendering the report
+admission expiry copied from the record instead of hashed from current bytes
 ```
 
 A green test suite proves the portable mechanisms and current registry/Stack/ledger/report connections only. The adoption ledger's classifications are offline inventory: they do not prove live runtime, issue/PR state or merge. Human admission of the standard is a decision record under `evals/`, not something this suite can produce.

@@ -22,6 +22,14 @@
       "observed": "RED"
     },
     {
+      "distinct_subjects": 1,
+      "expect": "RED",
+      "id": "ledger-holds-one-subject",
+      "note": "Receipts left in the output directory by a previous capture carry that capture's commit. They are skipped rather than ingested, so the ledger and the projection over it describe the tree this run bound.",
+      "observed": "RED",
+      "skipped_other_subject": 2
+    },
+    {
       "expect": "ok",
       "id": "integrity-check",
       "note": "Database integrity proves the projection's shape and says nothing about repository semantics.",
@@ -33,8 +41,8 @@
     "argv": [
       "<in-process sqlite3>"
     ],
-    "cwd": "/Users/neon/skills-shared/.claude/worktrees/lanes-256/skills/repo-agent-native/evals/receipts",
-    "duration_ms": 3,
+    "cwd": "/Users/neon/skills-shared/.claude/worktrees/phase-a-batch/skills/repo-agent-native/evals/receipts",
+    "duration_ms": 8,
     "exit_code": 0,
     "stderr_bytes": 0,
     "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -59,9 +67,10 @@
   "result": {
     "evidence_level": "B",
     "evidence_level_note": "A ledger row is a normalized record of another lane's observation; it is never independent evidence.",
-    "ingested_from_receipts": 9,
+    "ingested_from_receipts": 7,
     "ledger_path": "adapter-evidence-ledger.sqlite3",
-    "result_count": 9,
+    "result_count": 7,
+    "skipped_other_subject": 2,
     "source_readback": {
       "confirmed": 0,
       "performed": 0,
@@ -71,11 +80,11 @@
   },
   "schema": "repo-agent-native/adapter-receipt/v1",
   "subject": {
-    "commit_sha": "f50b2b9822db9e534169b5e63b523d940b32bb3c",
+    "commit_sha": "8d4d8b9d9c55146fd5d92900d549cc797fc5b519",
     "dirty_excluded": "skills/repo-agent-native/evals/receipts",
     "dirty_paths": 0,
     "repository": "ed3c/skills-shared",
-    "tree_sha": "42f289d44c1befefc9bdfb0bacf88a26a01b198a",
-    "workspace_root": "/Users/neon/skills-shared/.claude/worktrees/lanes-256"
+    "tree_sha": "7c983ad131ffbeb6a084c529ea7ab4b7442883c3",
+    "workspace_root": "/Users/neon/skills-shared/.claude/worktrees/phase-a-batch"
   }
 }

@@ -6,9 +6,9 @@ L2 的核心：**別重造推理引擎，選對象限集**。目標決定用哪�
 
 ## A. 瀏覽器象限(Bot / Timing / Selector / Auth)
 
-antigravity 的 `automate.js`「Resolved」帳本(AGENTS.md)是這四象限的**實據庫**——每條已解失敗先比對，命中就直接載入已知修法，別重新探索。
+上游的 `automate.js`「Resolved」帳本(AGENTS.md)是這四象限的**實據庫**——每條已解失敗先比對，命中就直接載入已知修法，別重新探索。
 
-| 象限 | 失敗簽名(antigravity 實例) | 診斷起手 | 已知修法錨 |
+| 象限 | 失敗簽名(上游實例) | 診斷起手 | 已知修法錨 |
 |------|---------------------------|---------|-----------|
 | **Bot**(反自動化偵測／soft-block) | Google headless soft-block；DR 模式對某 query 回「having a hard time fulfilling」；YouTube 純文字 URL `CONNECTION_LIMITED` | 換 headed／換附件路徑；`planRefusedCheck` 早退重試 | AGENTS.md DR 拒絕條、`aistudio-youtube-embed` 附件路徑 |
 | **Timing**(race／未 render 完就找／protocolTimeout) | DR item 還沒 render 完就被找 → `dr_not_found`；`protocolTimeout < waitForFunction` → CDP timeout；固定 timeout 誤砍長輸出 | 輪詢等 render(N×間隔)＋整段重試；停滯感知輪詢(非固定 timeout)；`protocolTimeout` 放寬 | AGENTS.md protocolTimeout 條、停滯感知輪詢條 |

@@ -13,7 +13,7 @@ python3 -m py_compile "${preservation}" "${routing}"
 
 # CLI exit contract: a lossy rewrite must exit 2, and an absent file must exit
 # 64, so a broken invocation is not read as a lossy document.
-work="$(mktemp -d)"
+work="$(mktemp -d "${TMPDIR:-/tmp}/work.XXXXXXXX")"
 cat > "${work}/source.xml" <<'XML'
 <dmodule><content><procedure>
   <warning id="W-1"><simplePara>De-energise the system.</simplePara></warning>

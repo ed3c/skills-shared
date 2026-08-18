@@ -12,7 +12,7 @@ python3 -m py_compile "${linter}"
 
 # The CLI contract, not only the library: a caller acts on the exit code, so the
 # exit code is asserted here rather than assumed from the selftest.
-work="$(mktemp -d)"
+work="$(mktemp -d "${TMPDIR:-/tmp}/work.XXXXXXXX")"
 subject="${work}/subject.txt"
 printf 'Open the valve and then close the valve and then wait for pressure.\n' > "${subject}"
 

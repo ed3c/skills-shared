@@ -5,7 +5,7 @@ test_dir="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
 skill_dir="$(realpath "${test_dir}/../..")"
 validator="${skill_dir}/scripts/issue_state.py"
 fixture="${test_dir}/fixtures/request-valid.json"
-scratch="$(mktemp -d)"
+scratch="$(mktemp -d "${TMPDIR:-/tmp}/scratch.XXXXXXXX")"
 trap 'rm -rf "${scratch}"' EXIT
 
 python3 "${validator}" validate --request "${fixture}" > "${scratch}/validated.json"

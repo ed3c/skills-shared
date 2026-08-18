@@ -1,6 +1,6 @@
 # Reference: loop-harness review 交接提示詞 — 可複用骨架
 
-> 屬 [`loop-harness-review-handoff`](../SKILL.md) skill。這份骨架泛化自 antigravity 的 worked instance `docs/plans/2026-07-09-loop-harness-panorama/REVIEW-HANDOFF-fable5.md`(**外部,跨 repo,結構參考用**——skill-bettor 沒有本地副本,也沒有本地 worked instance;見 [SKILL.md](../SKILL.md) 頂部誠實記)。
+> 屬 [`loop-harness-review-handoff`](../SKILL.md) skill。這份骨架泛化自上游的 worked instance `docs/plans/2026-07-09-loop-harness-panorama/REVIEW-HANDOFF-fable5.md`(**外部,跨 repo,結構參考用**——宿主沒有本地副本,也沒有本地 worked instance;見 [SKILL.md](../SKILL.md) 頂部誠實記)。
 > **用法**:照 [SKILL.md](../SKILL.md) 6 步程序填下方 `{{佔位}}`,產出一份**零上下文自足**的交接提示詞,貼進 reviewer 的新 fresh session。填錨時每個路徑必真存在(anti-husk)——這份骨架本身就是可直接填空使用的範本,不必先造一份本地「範例」再泛化。
 
 ---
@@ -23,9 +23,9 @@
 1. **設計意圖與決策**:{{`ARCHITECTURE.md` 全篇,尤其 §1 對映表／§3 八大基座卡／§5 tier-dispatch／§7 防退化鐵律／§10 遷移步驟;root `CLAUDE.md`}}。
 2. **設計 SSOT(「建了什麼」的權威)**:{{`.claude/skills/loop-harness-standard/{SKILL.md,modules/harness-spec.md,modules/evals-design-method.md}`、`.claude/skills/harness-wiki/SKILL.md`(誠實現況只 2 列)}}。
 3. **canonical 標準範例**:{{`loop_demo/claude_agy`(本地唯一份,無 `agy/` 對照版,見 `loop_demo/RETARGET-NOTE.md`)}}。
-4. **pilot/成長曲線活實例(真跑過的證據)**:{{`families/pinescript-audit/{evals/,changelog/2026-07-11.md,FAMILY.yaml}`——**誠實註記**:這是家族 eval 成長曲線(有 skill 1.000 vs 無 skill 0.5834,+41.7pp),不是 harness-engineering pilot;skill-bettor 目前沒有 antigravity `design_governance`/`agy_demo` 那種對照}}。
+4. **pilot/成長曲線活實例(真跑過的證據)**:{{`families/pinescript-audit/{evals/,changelog/2026-07-11.md,FAMILY.yaml}`——**誠實註記**:這是家族 eval 成長曲線(有 skill 1.000 vs 無 skill 0.5834,+41.7pp),不是 harness-engineering pilot;宿主目前沒有上游 `design_governance`/`agy_demo` 那種對照}}。
 5. **引擎**:{{`loop_wiki/engine.sh`(dispatch→T0 verify→stop-loss→admit)、`loop_wiki/_template`(八大基座骨架)}}。
-6. **執行故事**:{{`git log --oneline`——每 commit 一個 slice ＋它揭的教訓,skill-bettor 目前 3 個 commit 起}}。
+6. **執行故事**:{{`git log --oneline`——每 commit 一個 slice ＋它揭的教訓,宿主目前 3 個 commit 起}}。
 你**可跑 read-only 驗證**來 ground:{{`loop_wiki/_template/selftest.sh`、`loop_demo/claude_agy/{selftest.sh,verify.sh}`、`families/pinescript-audit/evals/runner.py --set public --agent-cmd "python3 evals/mock_agent.py {task}"`(mock 自測,不需真 CLI)、`git show <commit>`}}。
 
 ## Review 任務
@@ -62,7 +62,7 @@
 
 ## 填寫檢查(產出交接提示詞前自核)
 - [ ] reviewer tier 選對(設計/高推理→Fable、裁決→Opus、**非 agy**)。
-- [ ] 入口 curation 由淺入深、每路徑真存在(anti-husk;別指 phantom,尤其別把 antigravity 的 `docs/plans/`、`loop_wiki/design_governance`、`loop_wiki/agy_demo` 誤植成本地路徑)。
+- [ ] 入口 curation 由淺入深、每路徑真存在(anti-husk;別指 phantom,尤其別把上游的 `docs/plans/`、`loop_wiki/design_governance`、`loop_wiki/agy_demo` 誤植成本地路徑)。
 - [ ] 授權 read-only 驗證(讓 reviewer 自己 ground)。
 - [ ] 審計任務只放**已變動＋未答**維度(session-adjustment;首次交接例外,全量)。
 - [ ] findings-only／每 claim 帶錨／未錨明標 三紀律寫進提示詞。

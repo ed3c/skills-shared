@@ -364,7 +364,10 @@ class Scheduler:
         attempt["spend_observed"] = sorted(observed)
 
     def totals(self) -> dict[str, float]:
-        return {d: round(sum(a["spend"].get(d, 0) for a in self.attempts.values()), 3)
+        # Exact sum of the recorded per-attempt spends. Rounding here while the
+        # attempts stay unrounded made totals.cost_usd drift past the checker's
+        # 1e-6 reconciliation tolerance on the first real budgeted run.
+        return {d: sum(a["spend"].get(d, 0) for a in self.attempts.values())
                 for d in BUDGET_DIMENSIONS}
 
     def unobserved(self) -> list[str]:

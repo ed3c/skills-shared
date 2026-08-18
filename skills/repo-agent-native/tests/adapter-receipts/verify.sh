@@ -3,9 +3,12 @@
 #
 # Zero network and zero provider execution: this validates receipts that
 # `capture_adapter_receipt.py` wrote on a host that had the providers, so it is
-# runnable on a host that has none of them. The capture script is only compiled
-# here, never run -- running it would need grepai, Serena, ollama and a git
-# checkout, and a test that silently needs those is a test that gets disabled.
+# runnable on a host that has none of them. No provider lane is run here --
+# running one would need grepai, Serena or ollama, and a test that silently needs
+# those is a test that gets disabled. The one exception is the sqlite ledger
+# lane, which starts no provider at all: it is stdlib sqlite3 over the receipts
+# beside it, and it is exercised below against a repository this test creates
+# under TMPDIR, never against this checkout.
 set -euo pipefail
 
 test_dir="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
@@ -35,21 +38,21 @@ done
 # in front of it is what has to be tested here. A host without the artifact must
 # still be able to prove that the refusal works -- and that it is a gate rather
 # than a constant no.
-tmp_root="$(mktemp -d)"
+tmp_root="$(mktemp -d "${TMPDIR:-/tmp}/tmp-root.XXXXXXXX")"
 trap 'rm -rf "${tmp_root}"' EXIT
 
 admission="${skill_dir}/evals/git-town-darwin-admission.json"
 test -f "${admission}" || { echo "MISSING ADMISSION ${admission}" >&2; exit 1; }
 python3 -m json.tool "${admission}" >/dev/null
 
-# The darwin git-town capture is a second subject, so it is a second directory:
-# it was taken at the commit that added the lane, and one capture is one subject.
-# Same checker, same laws, no exemption.
-darwin="${skill_dir}/evals/receipts-git-town-darwin"
-test -f "${darwin}/git-town.receipt.json" \
-  || { echo "MISSING RECEIPT git-town (darwin capture)" >&2; exit 1; }
-python3 -m json.tool "${darwin}/git-town.receipt.json" >/dev/null
-python3 "${checker}" check --receipts "${darwin}"
+# The git-town lane now lives in the consolidated nine-lane capture: the
+# 2026-08-18 recapture ran every provider live at one commit, so the interim
+# second directory (receipts-git-town-darwin/) was deleted by that capture,
+# exactly as the capture story promised. Same checker, same laws, no exemption.
+gittown="${skill_dir}/evals/receipts/git-town.receipt.json"
+test -f "${gittown}" \
+  || { echo "MISSING RECEIPT git-town (consolidated capture)" >&2; exit 1; }
+python3 -m json.tool "${gittown}" >/dev/null
 
 python3 - "${skill_dir}" "${tmp_root}" <<'PY'
 import hashlib
@@ -82,14 +85,14 @@ for pin in (record["admitted_artifact"]["asset"]["sha256"],
 # record it names has to be these bytes. Editing the admission without
 # recapturing would otherwise leave a PASS standing for a decision that changed.
 captured = json.loads(
-    (skill / "evals" / "receipts-git-town-darwin" / "git-town.receipt.json")
+    (skill / "evals" / "receipts" / "git-town.receipt.json")
     .read_text(encoding="utf-8"))
 if captured["adapter"]["executable_sha256"] != record["derived_executable_identity"]["sha256"]:
-    raise SystemExit("the darwin receipt records a binary the admission does not pin")
+    raise SystemExit("the git-town receipt records a binary the admission does not pin")
 bound = captured["policy"]["admission"]["record_sha256"]
 actual = hashlib.sha256(capture.GIT_TOWN_ADMISSION.read_bytes()).hexdigest()
 if bound != actual:
-    raise SystemExit(f"the darwin receipt was captured against admission {bound}, "
+    raise SystemExit(f"the git-town receipt was captured against admission {bound}, "
                      f"but this record hashes {actual}; recapture or revert")
 print(f"BOUND    receipt <- admission {actual[:12]} <- artifact "
       f"{record['derived_executable_identity']['sha256'][:12]}")
@@ -139,6 +142,51 @@ if failed:
     raise SystemExit("git-town admission gate controls failed: " + "; ".join(failed))
 PY
 
+# A recapture writes into the directory the previous capture already filled. When
+# the sqlite lane globs, the lanes that run after it still hold their previous
+# receipts, at the previous commit. Ingesting those makes the ledger -- and the
+# LanceDB projection over it -- describe two trees while the receipt claims one.
+# Plant exactly that state and require the superseded subject to stay out.
+fixture="${tmp_root}/ledger-fixture"
+ledger_out="${tmp_root}/ledger-out"
+mkdir -p "${fixture}" "${ledger_out}"
+git init -q -b main "${fixture}"
+: > "${fixture}/seed.txt"
+git -C "${fixture}" add seed.txt
+git -C "${fixture}" -c user.name=t -c user.email=t@invalid commit -qm seed
+fixture_head="$(git -C "${fixture}" rev-parse HEAD)"
+
+python3 - "${receipts}/worktree.receipt.json" "${ledger_out}" "${fixture_head}" <<'PY'
+import json, pathlib, sys
+template = json.loads(pathlib.Path(sys.argv[1]).read_text(encoding="utf-8"))
+out, head = pathlib.Path(sys.argv[2]), sys.argv[3]
+current = json.loads(json.dumps(template))
+current["subject"]["commit_sha"] = head
+current["subject"]["tree_sha"] = head
+(out / "current.receipt.json").write_text(json.dumps(current, indent=2), encoding="utf-8")
+stale = json.loads(json.dumps(template))
+stale["adapter"]["kind"] = "superseded-lane"
+stale["subject"]["commit_sha"] = "0" * 40
+stale["subject"]["tree_sha"] = "0" * 40
+(out / "stale.receipt.json").write_text(json.dumps(stale, indent=2), encoding="utf-8")
+PY
+
+python3 "${capture}" --repo-root "${fixture}" --out "${ledger_out}" --lane sqlite >/dev/null
+python3 - "${ledger_out}" <<'PY'
+import json, pathlib, sys
+body = json.loads((pathlib.Path(sys.argv[1]) / "sqlite.receipt.json")
+                  .read_text(encoding="utf-8"))
+result = body["result"]
+control = next(c for c in body["controls"] if c["id"] == "ledger-holds-one-subject")
+if result["ingested_from_receipts"] != 1 or result["skipped_other_subject"] != 1:
+    raise SystemExit(f"the planted superseded receipt was ingested: "
+                     f"{result['ingested_from_receipts']} ingested, "
+                     f"{result['skipped_other_subject']} skipped")
+if control["observed"] != "RED" or control["distinct_subjects"] != 1:
+    raise SystemExit(f"the ledger holds {control['distinct_subjects']} subject(s)")
+print("REFUSED superseded-subject-ingested-into-ledger")
+PY
+
 # An empty receipt directory must be refused rather than reported as a clean run.
 empty="${tmp_root}/empty"
 mkdir "${empty}"
@@ -159,7 +207,7 @@ python3 "${checker}" check --receipts "${receipts}" --bind-scheduler "${schedule
   | grep -q '^CROSS_SUBJECT_BINDING ' \
   || { echo "scheduler binding did not report CROSS_SUBJECT_BINDING" >&2; exit 1; }
 
-collapsed="$(mktemp)"
+collapsed="$(mktemp "${TMPDIR:-/tmp}/collapsed.XXXXXXXX")"
 trap 'rm -rf "${empty}" "${collapsed}"' EXIT
 python3 -c 'import json, sys
 body = json.loads(open(sys.argv[1], encoding="utf-8").read())

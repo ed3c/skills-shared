@@ -10,10 +10,12 @@ checker's vocabulary. So the outcome is recorded as INDETERMINATE, and that
 cannot be edited to a portability claim while the audit still says the metric
 measures words. That receipt is history; nothing here rewrites it.
 
-Generation 2 is the repaired instrument and has not been executed. It pairs
-every refusal family with an admitted near miss so no constant verdict scores
-well, and scores rule naming from a paraphrase rubric whose accept and reject
-phrasings are re-executed here.
+Generation 2 is the repaired instrument. It pairs every refusal family with an
+admitted near miss so no constant verdict scores well, and scores rule naming
+from a paraphrase rubric whose accept and reject phrasings are re-executed
+here. Once it carries a result, its eligibility outcome is recomputed from the
+cells rather than accepted: mean verdict and rule accuracy per (stack, arm),
+compared against the strongest baseline on each axis, on every stack.
 
 The two are told apart by evidence rather than by trust: a refusal case either
 carries a rubric or it does not. A set where none do is the lexical generation,
@@ -280,6 +282,88 @@ def check_result_metric(result: dict[str, Any], generation: str) -> None:
                f"set is {generation}")
 
 
+def check_eligibility_crossstack(prereg: dict[str, Any], result: dict[str, Any]) -> None:
+    """Recompute the frozen cross-stack outcome instead of accepting what was written.
+
+    Mirrors #225's check_eligibility, generalised over stacks: mean verdict and
+    rule accuracy per (stack, arm) from the cells, the strongest non-candidate
+    baseline on each axis per stack, and a regression wherever the candidate
+    scores below it. Any regression on any stack is disqualifying, so the
+    outcome is derived rather than trusted.
+    """
+    eligibility = result.get("eligibility")
+    if not isinstance(eligibility, dict):
+        refuse("ELIGIBILITY_NOT_DERIVED", "result.eligibility must be an object")
+
+    by_stack_arm: dict[str, dict[str, list[dict[str, Any]]]] = {}
+    for cell in result["cells"]:
+        by_stack_arm.setdefault(cell["stack_id"], {}).setdefault(cell["arm"], []).append(cell)
+
+    def mean(values: list[float]) -> float:
+        return sum(values) / len(values)
+
+    verdict = {stack: {arm: mean([c["metrics"]["verdict_correct"] for c in cells])
+                       for arm, cells in arms.items()}
+              for stack, arms in by_stack_arm.items()}
+    rule = {stack: {arm: mean([c["metrics"]["rule_correct"] for c in cells])
+                    for arm, cells in arms.items()}
+           for stack, arms in by_stack_arm.items()}
+
+    for name, computed in (("verdict_accuracy", verdict), ("rule_accuracy", rule)):
+        recorded = eligibility.get(name)
+        if not isinstance(recorded, dict):
+            refuse("ELIGIBILITY_NOT_DERIVED", f"eligibility.{name} is missing")
+        for stack, arms in computed.items():
+            for arm, value in arms.items():
+                got = (recorded.get(stack) or {}).get(arm)
+                if got is None or abs(float(got) - value) > 1e-9:
+                    refuse("ELIGIBILITY_NOT_DERIVED",
+                           f"eligibility.{name}[{stack}][{arm}] records {got!r}, the "
+                           f"cells compute {value}")
+
+    candidate = "CANDIDATE_V2_1"
+    strongest: dict[str, dict[str, str]] = {}
+    regression: dict[str, dict[str, bool]] = {}
+    regressed_stacks: list[str] = []
+    for stack in by_stack_arm:
+        stack_strongest: dict[str, str] = {}
+        stack_regression: dict[str, bool] = {}
+        for name, computed in (("verdict_accuracy", verdict), ("rule_accuracy", rule)):
+            baselines = {arm: score for arm, score in computed[stack].items()
+                        if arm != candidate}
+            best = max(baselines, key=lambda arm: baselines[arm])
+            stack_strongest[name] = best
+            stack_regression[name] = computed[stack][candidate] < baselines[best]
+        strongest[stack] = stack_strongest
+        regression[stack] = stack_regression
+        if any(stack_regression.values()):
+            regressed_stacks.append(stack)
+
+    if eligibility.get("strongest_baseline") != strongest:
+        refuse("ELIGIBILITY_NOT_DERIVED",
+               f"strongest_baseline records {eligibility.get('strongest_baseline')!r}, "
+               f"the cells compute {strongest!r}")
+    if eligibility.get("regression_against_strongest_baseline") != regression:
+        refuse("ELIGIBILITY_NOT_DERIVED",
+               f"regression_against_strongest_baseline records "
+               f"{eligibility.get('regression_against_strongest_baseline')!r}, the cells "
+               f"compute {regression!r}")
+
+    computed_regressed = sorted(regressed_stacks)
+    if eligibility.get("regressed_stacks") != computed_regressed:
+        refuse("ELIGIBILITY_NOT_DERIVED",
+               f"regressed_stacks records {eligibility.get('regressed_stacks')!r}, the "
+               f"cells compute {computed_regressed!r}")
+
+    outcome = "NOT_ELIGIBLE" if regressed_stacks else "PORTABLE_RECORD_ELIGIBLE"
+    if outcome not in prereg["eligibility_threshold"]["outcome_values"]:
+        refuse("ELIGIBILITY_NOT_DERIVED", f"{outcome} is not a frozen outcome value")
+    if eligibility.get("outcome") != outcome:
+        refuse("ELIGIBILITY_NOT_DERIVED",
+               f"outcome records {eligibility.get('outcome')!r}; the frozen rule applied "
+               f"to these cells gives {outcome}")
+
+
 CHECKS = (check_stacks, check_cells, check_order)
 
 
@@ -298,6 +382,7 @@ def validate(prereg: dict[str, Any], cases: dict[str, Any],
         check_metric_audit(result)
     else:
         check_result_metric(result, generation)
+        check_eligibility_crossstack(prereg, result)
 
 
 Trio = tuple[dict[str, Any], dict[str, Any], dict[str, Any] | None]
@@ -361,16 +446,17 @@ def drop_near_misses(cases: dict[str, Any]) -> None:
                       or c["case_id"] == "heldout-positive"]
 
 
-def generation2_controls(prereg: dict[str, Any],
-                         cases: dict[str, Any]) -> list[tuple[str, str, Trio]]:
-    """The instrument's own controls. Generation 2 has no result to plant defects in."""
-    mutate = mutator(prereg, cases, None)
+def generation2_controls(prereg: dict[str, Any], cases: dict[str, Any],
+                         result: dict[str, Any] | None) -> list[tuple[str, str, Trio]]:
+    """The instrument's own controls: properties of the case set, independent of a result.
+
+    `result` is threaded through unmutated so check_lifecycle does not trip on
+    its own -- once generation 2 carries a real result, a trio built with
+    result=None would be refused as LIFECYCLE_CONTRADICTION before the planted
+    case-set defect is ever reached, masking the control this exists to prove.
+    """
+    mutate = mutator(prereg, cases, result)
     return [
-        # A result beside a FROZEN_NOT_EXECUTED status is the one way "not executed"
-        # could quietly become "executed", so the absence has to be refusable.
-        ("gen2-result-smuggled", "LIFECYCLE_CONTRADICTION",
-         (copy.deepcopy(prereg), copy.deepcopy(cases),
-          {"preregistration_id": prereg["preregistration_id"], "cell_count": 18})),
         ("gen2-ceiling-restored", "METRIC_AT_CEILING",
          mutate("cases", drop_near_misses)),
         ("gen2-near-miss-unpaired", "NEAR_MISS_UNPAIRED",
@@ -385,6 +471,25 @@ def generation2_controls(prereg: dict[str, Any],
         ("gen2-metric-misdeclared", "METRIC_GENERATION_MISDECLARED",
          mutate("prereg", lambda d: d["metric_design"].update(
              {"rule_metric": LEXICAL}))),
+    ]
+
+
+def generation2_result_controls(prereg: dict[str, Any], cases: dict[str, Any],
+                                result: dict[str, Any]) -> list[tuple[str, str, Trio]]:
+    """Controls for the executed generation-2 result and its recomputed eligibility."""
+    mutate = mutator(prereg, cases, result)
+    return [
+        ("gen2-stale-status", "LIFECYCLE_CONTRADICTION",
+         mutate("prereg", lambda d: d.update({"status": "FROZEN_NOT_EXECUTED"}))),
+        ("gen2-eligibility-removed", "ELIGIBILITY_NOT_DERIVED",
+         mutate("result", lambda d: d.pop("eligibility"))),
+        ("gen2-eligibility-hand-flipped", "ELIGIBILITY_NOT_DERIVED",
+         mutate("result", lambda d: d["eligibility"].update(
+             {"outcome": "PORTABLE_RECORD_ELIGIBLE"
+                        if d["eligibility"]["outcome"] == "NOT_ELIGIBLE" else "NOT_ELIGIBLE"}))),
+        ("gen2-verdict-accuracy-inflated", "ELIGIBILITY_NOT_DERIVED",
+         mutate("result", lambda d: d["eligibility"]["verdict_accuracy"]["codex-cli-gpt"]
+                .update({"CANDIDATE_V2_1": 13.0}))),
     ]
 
 
@@ -418,8 +523,11 @@ def selftest(generation1: Trio, generation2: Trio) -> int:
 
     prereg, cases, result = generation1
     assert result is not None
+    prereg2, cases2, result2 = generation2
     controls = (generation1_controls(prereg, cases, result)
-                + generation2_controls(generation2[0], generation2[1]))
+                + generation2_controls(prereg2, cases2, result2))
+    if result2 is not None:
+        controls += generation2_result_controls(prereg2, cases2, result2)
     if run_controls(controls):
         return 2
     print(f"SELFTEST GREEN: committed cross-stack artifacts admitted; "
@@ -443,10 +551,16 @@ def report(trio: Trio) -> None:
               f"{cases['case_count']} cases, best constant verdict scores "
               f"{constant_verdict_share(cases):.3f}, rule metric {generation}")
         return
+    if generation == LEXICAL:
+        print(f"CROSS-STACK GREEN: {result['cell_count']} cells over "
+              f"{len(result['per_stack'])} stacks; outcome "
+              f"{result['eligibility']['outcome']} -- every arm judged every refusal case "
+              f"correctly and the score gap is vocabulary ({generation})")
+        return
     print(f"CROSS-STACK GREEN: {result['cell_count']} cells over "
           f"{len(result['per_stack'])} stacks; outcome "
-          f"{result['eligibility']['outcome']} -- every arm judged every refusal case "
-          f"correctly and the score gap is vocabulary ({generation})")
+          f"{result['eligibility']['outcome']} -- regressed stacks: "
+          f"{result['eligibility']['regressed_stacks'] or 'none'} ({generation})")
 
 
 def main(argv: list[str] | None = None) -> int:
