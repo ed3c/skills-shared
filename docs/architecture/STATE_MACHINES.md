@@ -161,6 +161,8 @@ ISSUE_BOUND
 
 `MISSING_ATOMS_EXPOSED` is a required transition, not an error path: an index that reached `INDEX_RECEIPTED` without it has smoothed a gap into completion. Exact-head drift returns the index to `PR_HEADS_READ_BACK`; an open PR head is never embedded as a receipt.
 
+`GATES_BOUND` binds each Gate to the lane it requires and the lane its receipt came from, so a cross-lane receipt fails there rather than at `INDEX_RECEIPTED`. Atom blockers and unexercised Gates survive to `INDEX_RECEIPTED` as declared state; a merged atom may not carry either. A `review-only` atom is indexed but is never an edge source: nothing bases on it and it does not reach a merged state.
+
 ## Skill evolution State Machine
 
 ```text

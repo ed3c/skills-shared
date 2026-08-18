@@ -23,27 +23,39 @@ Only required atoms are derived. An atom with no paths, no oracle and no Gate is
 
 ```text
 read actual Issues, branches, PR heads, trees, parents, changed paths, Gates, directory inventory
-→ classify each atom: root, sibling, true child, convergence
-→ bind one purpose, one writer lease, one oracle, one exact parent set per atom
+→ classify each atom: root, sibling, true child, review-only, convergence
+→ bind one purpose, one lane, one writer lease, one oracle, one exact parent set per atom
+→ bind each Gate to the lane it requires and the lane its receipt was produced in
 → re-read open PR heads from the provider; mark exact-head drift stale
-→ expose missing atoms, blocked atoms and Gates rather than smoothing them
+→ expose missing atoms, blocked atoms and unexercised Gates rather than smoothing them
 → receipt the index against its exact subject
 ```
 
 ## Structural laws
 
-| Class | Parents | Base | Consumes |
-|---|---|---|---|
-| `root` | none | `main_branch` | nothing |
-| `sibling` | none | `main_branch` | nothing |
-| `child` | exactly one | that parent's branch | at least one path the parent owns |
-| `convergence` | two or more | one parent's branch | its parents' paths |
+| Class | Parents | Base | Owns | Consumes |
+|---|---|---|---|---|
+| `root` | none | `main_branch` | at least one path | nothing |
+| `sibling` | none | `main_branch` | at least one path | nothing |
+| `child` | exactly one | that parent's branch | at least one path | at least one path the parent owns |
+| `review-only` | none | `main_branch` | nothing | nothing |
+| `convergence` | two or more | one parent's branch | at least one path | its parents' paths |
 
 Exactly one root and exactly one declared `convergence_owner`. Any other atom with more than one parent is a hidden convergence: the reader sees a chain, the graph is a lattice, and no single owner is responsible for reconciling it.
 
 A child that consumes no parent path is a path-disjoint sibling serialized for no reason. False serialization is expensive in exactly the way it is invisible — the Stack looks ordered, and each atom waits on a parent it never reads.
 
 Every atom's `owns_paths` is a writer lease. Two atoms whose leases overlap have two writers on the same bytes regardless of how the branches are drawn.
+
+A `review-only` atom is the one atom that writes nothing: it exists to be read. It may never be named as a parent and may never merge. Without that class an index has only one way to record a review PR — as an ordinary atom — and the next Worker bases work on a branch that was never meant to carry any.
+
+## Lanes and blockers
+
+Each atom declares one lane — `CLOUD`, `LOCAL`, `PRIVATE` or `HUMAN` — and each Gate declares both the lane it requires and the lane its receipt was produced in. A receipt satisfies only its own lane; a `receipt_lane` that differs from `required_lane` is a cheaper lane's receipt pasted into an expensive slot, which is what lane laundering looks like in an index rather than in prose. A null `receipt_lane` is an honest `NOT_EXERCISED`, not a pass.
+
+Private lineage propagates through the graph, so a `CLOUD`, `LOCAL` or `HUMAN` atom may not name a `PRIVATE` parent: consuming private bytes into a published atom launders the lane through ancestry instead of through a receipt. An atom in the `HUMAN` lane that declares no `HUMAN` Gate has a decorative lane.
+
+`blockers` is the field that keeps a gap visible. An atom may carry blockers at any open state, but a `MERGED` atom with a blocker or an unexercised Gate has been smoothed into completion — which is the one outcome this index exists to make impossible to read as done.
 
 ## PR head lifecycle
 

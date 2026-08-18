@@ -224,7 +224,7 @@ implementation state versus admission state
 start dependencies versus completion dependencies
 cloud/local/private/Human evidence lanes
 real-problem closure state
-missing Molecular atoms, Gates and convergence owners
+missing Molecular atoms, unexercised Gates, blocked atoms and convergence owners
 ```
 
 An existing path is never `PLANNED` and an absent path is never implemented. Start-readiness never implies completion-readiness: a completion edge requires the prerequisite's own admitted receipt on the exact subject. A receipt satisfies only the lane it was produced in. Portable contracts and their deterministic gates are [`skills/agentic-tech-lead-orchestration/references/REPOSITORY_CLOSURE_RECONCILIATION.md`](skills/agentic-tech-lead-orchestration/references/REPOSITORY_CLOSURE_RECONCILIATION.md) and [`skills/git-town-stacked-pr-worker/references/MOLECULAR_STACK_INDEX.md`](skills/git-town-stacked-pr-worker/references/MOLECULAR_STACK_INDEX.md).

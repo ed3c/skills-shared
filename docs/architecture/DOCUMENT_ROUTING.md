@@ -30,7 +30,7 @@ A repository-wide completion review binds six routes. Two of them are the standa
 | `DR-C1` | current integration status | what is landed, admitted, open and blocked right now, reconciled against the tree |
 | `DR-C2` | real-problem closure matrix | one row per real problem: closure state, evidence kind, lane, exact receipt |
 | `DR-C3` | Issue dual-dependency DAG | one Issue graph with separate start and completion edge classes |
-| `DR-C4` | Molecular Stack PR index | atoms, parents, path leases, Gates, heads and missing atoms |
+| `DR-C4` | Molecular Stack PR index | atoms, parents, path leases, lanes, Gates, heads, blockers and missing atoms |
 | `DR-R5` | nearest directory README | the owner who reconciles that directory next time |
 | `DR-R6` | machine authority / exact receipt | the schema, verifier or receipt that decides, on its exact subject |
 
