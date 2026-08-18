@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import hashlib
 import importlib.util
 import json
 from pathlib import Path
@@ -23,6 +24,30 @@ make_consumer = _parent_support.make_consumer
 make_shared = _parent_support.make_shared
 profile = _parent_support.profile
 run = _parent_support.run
+
+
+def canonical_content_digest(path: Path) -> str:
+    """Mirror shared_skills.py: transient Python caches are not Skill content."""
+    digest = hashlib.sha256()
+    files = sorted(
+        item
+        for item in path.rglob("*")
+        if item.is_file()
+        and "__pycache__" not in item.parts
+        and not item.name.endswith(".pyc")
+    )
+    for item in files:
+        digest.update(item.relative_to(path).as_posix().encode("utf-8"))
+        digest.update(b"\0")
+        digest.update(item.read_bytes())
+        digest.update(b"\0")
+    return digest.hexdigest()
+
+
+# fake_attach resolves this symbol from the imported support module at call time.
+# Rebind only the runtime-observer fixture; the parent bootstrap suite remains
+# unchanged and production continues to use shared_skills.py as authority.
+_parent_support.content_digest = canonical_content_digest
 
 SKILL_ROOT = Path(__file__).resolve().parents[2]
 SCRIPT_FILES = (
