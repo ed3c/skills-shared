@@ -2,6 +2,8 @@
 
 `run-all.sh` executes the positive examples and independent mutation cases for provider role/subject separation, active code-graph-rag rejection, no-double-graph, path leases, DAG cycles, Git Town admission, semantic-conflict blocking, evidence ceilings, Human Admit, scheduler lifecycle, and the matched real-task A/B.
 
+`dual-agent-offload-contract/verify.sh` is the only executable authority over the portable local/cloud offload method: it freezes the vocabulary in [`../references/dual-agent-offload/OFFLOAD_METHOD.md`](../references/dual-agent-offload/OFFLOAD_METHOD.md), validates the two schemas and four positive fixtures, asserts that the method document still names every executable control, and requires all sixteen semantic controls to turn red on a mutant that stays schema-valid.
+
 Real-task control ownership:
 
 - `real_task_ab.py` freezes the old monolith, refactor-as-landed, reachability repair, and causal-DAG repair; it compiles the matched task/capability contracts and reports the PDF-derived closed-loop stage states.

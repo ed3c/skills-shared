@@ -45,6 +45,7 @@ METHOD_SCHEMA = REFERENCES / "method-contract.v1.schema.json"
 HANDOFF_SCHEMA = REFERENCES / "handoff-requirements.v1.schema.json"
 METHOD_EXAMPLE = REFERENCES / "example-method-contract.json"
 HANDOFF_EXAMPLE = REFERENCES / "example-handoff-requirements.json"
+METHOD_DOCUMENT = REFERENCES / "OFFLOAD_METHOD.md"
 
 # --- frozen portable vocabulary -------------------------------------------
 # Frozen means frozen: the point of a contract leaf is that a later lane cannot
@@ -171,6 +172,13 @@ def load(path: Path) -> Any:
     try:
         return json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as error:
+        raise Unusable(f"{path}: {error}") from error
+
+
+def read_text(path: Path) -> str:
+    try:
+        return path.read_text(encoding="utf-8")
+    except OSError as error:
         raise Unusable(f"{path}: {error}") from error
 
 
@@ -486,6 +494,38 @@ def wire_authority_errors() -> list[str]:
     return errors
 
 
+def method_document_errors(text: str) -> list[str]:
+    """The method document is the only route a reader has to these controls.
+
+    Schemas say what a document must contain; they never say why, and nobody
+    navigates a JSON Schema to find out which of ten laws actually turns red.
+    `OFFLOAD_METHOD.md` is where a reader arrives, so a control renamed or added
+    in a later leaf with the prose left alone leaves that reader working from a
+    list that is silently short -- and a short index and a complete one look
+    identical from the inside. Route completeness is therefore asserted rather
+    than assumed: every executable control, its refused promotion, every frozen
+    runtime contract ID and every frozen state must be named where the reader is.
+
+    This is a route check, not a semantic one. It proves the words are reachable,
+    never that the paragraph around them is right.
+    """
+    errors: list[str] = []
+    for label, required in (
+        ("control", sorted(CONTROL_REASONS)),
+        ("refused promotion", sorted(CONTROL_REASONS.values())),
+        ("runtime contract", FROZEN_RUNTIME_CONTRACT_IDS),
+        ("frozen state", FROZEN_STATE_CHAIN),
+        ("failure distinction", FROZEN_FAILURE_DISTINCTIONS),
+    ):
+        missing = [item for item in required if item not in text]
+        if missing:
+            errors.append(
+                f"METHOD_DOCUMENT_ROUTE_INCOMPLETE: {METHOD_DOCUMENT.name} never names "
+                f"{label} {missing}; a reader arriving here would not learn it exists"
+            )
+    return errors
+
+
 def case_registry_errors(contract: dict[str, Any]) -> list[str]:
     """The registered contract cases must be the ones that actually execute."""
     cases = load(CASES)
@@ -564,6 +604,7 @@ def main() -> int:
         handoff_schema = load(HANDOFF_SCHEMA)
         contract = load(METHOD_EXAMPLE)
         handoff = load(HANDOFF_EXAMPLE)
+        method_document = read_text(METHOD_DOCUMENT)
         contract_digest = hashlib.sha256(METHOD_EXAMPLE.read_bytes()).hexdigest()
         Draft202012Validator.check_schema(method_schema)
         Draft202012Validator.check_schema(handoff_schema)
@@ -585,6 +626,7 @@ def main() -> int:
     failures.extend(method_errors(contract))
     failures.extend(handoff_errors(handoff, contract, contract_digest))
     failures.extend(wire_authority_errors())
+    failures.extend(method_document_errors(method_document))
     failures.extend(case_registry_errors(contract))
     if failures:
         for failure in failures:
