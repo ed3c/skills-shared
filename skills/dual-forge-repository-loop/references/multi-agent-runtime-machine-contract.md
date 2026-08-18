@@ -77,6 +77,11 @@ The checker requires:
   to require one accepted attempt with one accepted result per logical task;
 - Worker and global budget ledgers to reconcile exactly;
 - in-process logical Shadow review to remain `NOT_EXERCISED` for independence;
+- an observed (`PASS`/`FAIL`) independence state on any other execution mode to
+  carry `shadow.independence_evidence` naming where it was observed and which two
+  identities it separated, and to refuse one identity on both sides — the rule
+  above only ever refused the in-process overclaim, so a `SEPARATE_MODEL` review
+  could assert independence with nothing behind it;
 - L3 Shadow outcomes to be enforced and keep delivery `BLOCKED`;
 - Agent merge action to remain `DENY`;
 - merge eligibility and observed merge to remain external authority states.
@@ -143,7 +148,11 @@ The deterministic gate proves only the contract relationships it replays. It
 cannot prove:
 
 - a live multi-Agent scheduler or model process ran;
-- a separate Shadow context/model was actually independent;
+- a separate Shadow context/model was actually independent — the gate checks that
+  a claim of independence is bound to evidence, never that the bound evidence is
+  sound; the live canary behind that binding is
+  `skills/procedural-shadow-runtime/evals/receipts/shadow-canary.receipt.json`
+  and covers one Builder provider, one Shadow provider and one disposable subject;
 - heartbeats, lease expiry, checkpoint/resume, or straggler cancellation occurred;
 - Git Town synchronized a real stack;
 - Forgejo/GitHub/provider observations are authentic unless separately captured;
