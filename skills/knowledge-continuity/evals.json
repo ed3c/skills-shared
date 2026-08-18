@@ -65,7 +65,7 @@
       "checker_script": "tests/refactor-ab/refactor_ab.py",
       "test_verify": "tests/refactor-ab/verify.sh",
       "good_fixture": "tests/refactor-ab/fixtures/refactor-as-landed-SKILL.txt",
-      "hollow_fixture": "tests/refactor-ab/fixtures/old-canonical-SKILL.txt",
+      "hollow_fixture": null,
       "hollow_mutations": "in-process 植入缺陷（--selftest）：凍結治療體位元組漂移、凍結檔缺席、老強度被弱化、引號規則被中和、宣稱的規則數說謊、步驟一指令退回主機投影路徑",
       "covers": [
         "L0 凍結：A（blob 99b9af12）與 B0（blob 8c095d34）以 git 記錄的 blob 身分比對",
