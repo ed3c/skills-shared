@@ -48,7 +48,7 @@
     },
     {
       "arm": "CANDIDATE_V2_2",
-      "prompt_commit": "c411063",
+      "prompt_commit": "e97723c",
       "prompt_path": "skills/dual-forge-repository-loop/references/system-prompt-v2.2.md",
       "pin_verified_at_head": true,
       "prompt_sha256": "93ac295bfdc1f08fdfb17dfa59bec718ba493c62ecda20502cf80677c93081b5",
