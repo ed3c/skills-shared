@@ -47,6 +47,20 @@ merge authority              false
 
 The Local Handoff Queue adds an executable continuation contract for host/runtime-only work. It does not upgrade the hermetic proof into live runtime evidence.
 
+## Behavioral A/B lane (#316)
+
+The deterministic proof above compares bodies by what their mechanisms admit. It cannot say whether the repaired body changes what a live model orchestrates, which is why every one of its reports ends in `live model/provider uplift NOT_EXERCISED`.
+
+`scripts/run_behavioral_ab.py` is the separate lane that can. Its rubric and both arm blobs were frozen in `evals/behavioral-ab-preregistration.json` and committed before any cell ran; the results and per-cell receipts live in `evals/`. Read the result document for the current numbers rather than restating them here — a summary copied into prose is the first thing to go stale.
+
+Three boundaries hold whatever that document says:
+
+- it is one host, one model, one consumer subject and one repetition count, and the verdict is forced to `INSUFFICIENT_EVIDENCE` below the preregistered repetition minimum;
+- linked worktrees and physical Worker processes are closed by `tests/real_task_ab.py`, not by this lane, which runs one host process per cell and claims nothing more;
+- provider adapters, Git Town, Forgejo, publication and merge stay in their own lanes, unchanged and still `NOT_EXERCISED`.
+
+Three rubric checks did not discriminate in the first run: `candidates_share_base` and `lease_disjoint` on the tournament shape, `edge_implies_dependency` on the DAG shape. Every arm failed all three in every repetition, for the same reason in both arms — both bodies produce a topology the frozen rubric did not anticipate, where candidates depend on an immutable acceptance-oracle node and the convergence owner writes paths its candidates also wrote. That is a fact about the rubric, not about either treatment, and it is recorded rather than repaired: editing a check after seeing which way it fell is the exact move the preregistration exists to prevent. A future run may widen those three checks only in a new preregistration, frozen before its own cells.
+
 ## Writer, path, and attempt rules
 
 - One Worker owns one branch, linked worktree, attempt lineage, and disjoint path/resource lease.
