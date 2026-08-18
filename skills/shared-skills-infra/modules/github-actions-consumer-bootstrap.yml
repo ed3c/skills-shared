@@ -34,6 +34,11 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 0
           persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned validator
+        run: python3 -m pip install --disable-pip-version-check 'jsonschema==4.26.0'
       - name: Resolve immutable shared source
         id: source
         shell: bash
@@ -66,3 +71,16 @@ jobs:
             --consumer "$GITHUB_WORKSPACE" \
             --repository-id "$CONSUMER_REPOSITORY" \
             --check
+      - name: Observe task-bound runtime admission
+        env:
+          CONSUMER_REPOSITORY: ${{ github.repository }}
+          CONSUMER_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          CONSUMER_VISIBILITY: ${{ github.event.repository.private && 'PRIVATE' || 'PUBLIC' }}
+        run: |
+          python3 .shared-skills-source/skills/shared-skills-infra/scripts/observe_consumer_runtime.py \
+            --consumer "$GITHUB_WORKSPACE" \
+            --shared-root "$GITHUB_WORKSPACE/.shared-skills-source" \
+            --repository-id "$CONSUMER_REPOSITORY" \
+            --expected-consumer-sha "$CONSUMER_SHA" \
+            --consumer-visibility "$CONSUMER_VISIBILITY" \
+            --output "$RUNNER_TEMP/skill-resolution-receipt.json"

@@ -48,7 +48,7 @@ jobs:
   verify:
     if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
@@ -69,6 +69,8 @@ jobs:
         run: bash skills/shared-skills-infra/tests/control-plane/verify.sh
       - name: Verify fresh consumer Domain Decoupling bootstrap
         run: bash skills/shared-skills-infra/tests/consumer-bootstrap/verify.sh
+      - name: Verify task-bound GitHub Actions runtime admission
+        run: bash skills/shared-skills-infra/tests/runtime-observer/verify.sh
       - name: Verify procedural core and domain boundaries
         run: bash tests/skill-core-boundaries/verify.sh
       - name: Verify executable Skill mechanism navigation

@@ -94,6 +94,35 @@ FAIL
 HUMAN_ADMIT_REQUIRED
 ```
 
+## GitHub Actions runtime-admission child
+
+The generated read-only workflow continues from deterministic bootstrap verification into one task-bound runtime observation:
+
+```text
+VERIFIED bootstrap receipt
+→ exact consumer head readback
+→ exact shared source/binding readback
+→ select shared-skills-infra only
+→ read runtime-requirements.json
+→ run the fixed safe probe registry
+→ emit skill-resolution-receipt/v1 outside the repository
+→ check_skill_bootstrap.py
+→ TASK_EXECUTION_ADMITTED
+```
+
+The admitted task is only `consumer-bootstrap-verification/v1`. The workflow uses `GITHUB_ACTIONS_PINNED_BUNDLE`; it does not claim a local Codex/Claude surface. All other profile Skills remain explicit rejected candidates for this task instead of entering passive context.
+
+The fixed probe registry is:
+
+```text
+probe.binding-readback
+probe.git-available
+probe.jsonschema-available
+probe.python-version
+```
+
+No JSON, model output, Skill body, or consumer document can supply an arbitrary command. Unknown setup/probe IDs fail closed.
+
 ## Atomicity
 
 Before mutation, snapshot every path owned by the bootstrap. If route generation, profile attachment, binding generation, byte readback, or receipt validation fails, restore all original bytes and remove newly created files/directories where safe.
@@ -102,7 +131,7 @@ An apply retry can update only recognized generated files and marked blocks. It 
 
 ## Shadow Architect controls
 
-The owning test plants and refuses at least:
+The owning tests plant and refuse at least:
 
 ```text
 missing or drifted route
@@ -118,8 +147,20 @@ missing or non-ancestor rollback
 private reasoning or secret-shaped fields
 stale receipt artifact digest
 downstream attach failure without full rollback
+
+wrong consumer head
+substituted source commit/tree
+stale binding or selected Skill digest
+missing or invalid runtime requirements
+network/write/secret/setup requirements in the read-only task
+unknown or shell-shaped probe
+GitHub Actions represented as a local user surface
+profile-wide selection represented as minimal
+runtime probe PASS represented as Agent/model/provider PASS
 ```
 
 ## Evidence boundary
 
-A green bootstrap receipt establishes deterministic route scaffolding, immutable shared-source selection, thin binding generation, exact byte readback, and rollback identity for one consumer repository. It does not establish host Skill discovery, Agent/model execution, provider execution, confidential-data approval, Git Town execution, merge, release, or rollback execution.
+A green bootstrap receipt establishes deterministic route scaffolding, immutable shared-source selection, thin binding generation, exact byte readback, and rollback identity for one consumer repository.
+
+A green task-bound runtime receipt additionally establishes that an exact GitHub Actions checkout can read the exact pinned Skill bundle, validate its runtime requirements, and pass the fixed deterministic probes for bootstrap verification. It does not establish local host Skill discovery, Agent/model execution, provider execution, confidential-data approval, Git Town/Forgejo execution, merge, release, or rollback execution.
