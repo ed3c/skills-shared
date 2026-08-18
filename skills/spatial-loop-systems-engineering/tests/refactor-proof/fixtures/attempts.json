@@ -1,0 +1,29 @@
+{
+  "task": "admit-one-bounded-repair",
+  "subject": {
+    "id": "spatial-loop/system-contract/tests/system-contract/fixtures/good.json",
+    "invariant": "INV-CGROUP-TEARDOWN"
+  },
+  "note": "Three repair attempts against one invariant. Exactly two are qualifying: R2 changed the subject but its owning oracle never executed, so it is NOT_EXERCISED rather than a failed repair. A treatment that can decide the escalation question must reach BOUNDED_RETRY here; a treatment that counts raw attempts reaches a false ESCALATE at the third row.",
+  "attempts": [
+    {
+      "id": "R1",
+      "subject_changed": true,
+      "oracle_executed": true,
+      "oracle_result": "FAIL"
+    },
+    {
+      "id": "R2",
+      "subject_changed": true,
+      "oracle_executed": false,
+      "oracle_result": "NOT_EXERCISED"
+    },
+    {
+      "id": "R3",
+      "subject_changed": true,
+      "oracle_executed": true,
+      "oracle_result": "FAIL"
+    }
+  ],
+  "escalation_threshold": 3
+}

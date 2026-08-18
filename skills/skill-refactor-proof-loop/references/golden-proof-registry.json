@@ -67,6 +67,67 @@
         "rollback": false
       },
       "remaining_issues": [231, 232, 234, 256, 312]
+    },
+    {
+      "id": "spatial-loop-escalation-gate-ab-v1",
+      "owner_skill": "spatial-loop-systems-engineering",
+      "issue": 352,
+      "pull_requests": [136, 189],
+      "entrypoint": "skills/spatial-loop-systems-engineering/tests/refactor-proof/real_task_ab.py",
+      "runner": "skills/spatial-loop-systems-engineering/tests/refactor-proof/verify.sh",
+      "treatments": [
+        {
+          "id": "A_OLD_CANONICAL",
+          "role": "OLD_CANONICAL",
+          "path": "skills/spatial-loop-systems-engineering/tests/refactor-proof/fixtures/pre-refactor-SKILL.txt",
+          "blob_sha": "4f21a487e85360b36dfd524d1d20f7b1010b08d3"
+        },
+        {
+          "id": "B0_REFACTOR_AS_LANDED",
+          "role": "REFACTOR_AS_LANDED",
+          "path": "skills/spatial-loop-systems-engineering/tests/refactor-proof/fixtures/refactor-as-landed-SKILL.txt",
+          "blob_sha": "388be0ff697e015968209b028fd04c5de0c5664a"
+        },
+        {
+          "id": "B1_ESCALATION_LAW_RESTORED",
+          "role": "REPAIRED_CANDIDATE",
+          "path": "skills/spatial-loop-systems-engineering/tests/refactor-proof/fixtures/escalation-restored-SKILL.txt",
+          "blob_sha": "c190932dc0043ef975da3e34bc22c7a466e61edc"
+        },
+        {
+          "id": "B2_HARD_LAWS_REBOUND",
+          "role": "REPAIRED_CANDIDATE",
+          "path": "skills/spatial-loop-systems-engineering/SKILL.md",
+          "blob_sha": "90d03b0a2e7ce049ee4d64291c974e6834ee9337"
+        }
+      ],
+      "proof_layers": {
+        "L0_SOURCE_FREEZE": "PASS",
+        "L1_STRUCTURAL_REACHABILITY": "PASS",
+        "L2_EXECUTABLE_CONTRACT": "PASS",
+        "L3_HERMETIC_REAL_TASK": "PASS",
+        "L4_MATCHED_LIVE_MODEL_RUNTIME": "NOT_IMPLEMENTED",
+        "L5_DELIVERY_AND_HUMAN_ADMIT": "HUMAN_ADMIT_REQUIRED"
+      },
+      "highest_layer": "L3_HERMETIC_REAL_TASK",
+      "denominator": {
+        "failed_retained": true,
+        "stale_retained": true,
+        "blocked_retained": true,
+        "cancelled_retained": true,
+        "superseded_retained": true
+      },
+      "cleanup": "CLEAN",
+      "authority": {
+        "provider_activation": false,
+        "publication": false,
+        "semantic_conflict_resolution": false,
+        "merge": false,
+        "release": false,
+        "promotion": false,
+        "rollback": false
+      },
+      "remaining_issues": [352]
     }
   ]
 }

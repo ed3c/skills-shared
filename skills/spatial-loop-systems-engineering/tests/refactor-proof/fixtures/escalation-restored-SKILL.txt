@@ -581,31 +581,6 @@ invariant, remove a negative control, expand privilege, hide an error, rename th
 same failure to reset the counter, or substitute model judgment for physical
 execution.
 
-## Hard laws
-
-The phases above say how to reason. These laws say what no phase, mode, domain
-module, or intervention level may relax. The three-failure escalation law is
-stated in full in the preceding section.
-
-1. **Authority law** — documentation, source material, vendor claims, and Agent
-   confidence never outrank an executed deterministic oracle for its declared
-   subject. Reasoning selects what to run; it does not replace the run.
-2. **No-silent-fallback law** — a missing privilege, capability, or substrate
-   becomes an evidence state, never a weaker implementation that satisfies the
-   request while hiding the gap. Degrading the mechanism without degrading the
-   claim is the failure this law names.
-3. **Capability-evidence law** — a capability reported by package presence,
-   documentation, a peer's report, another machine, or an earlier run is not
-   current-runtime evidence for this subject. Probe it here, now, and record the
-   receipt; `required` plus `NOT_EXERCISED` can support `READY_FOR_PROTOTYPE`
-   and nothing above it, which
-   [`scripts/check_system_contract.py`](scripts/check_system_contract.py)
-   enforces on the persisted contract.
-4. **Non-certification law** — this Skill produces a pre-implementation
-   contract, a monitored architecture model, and a gate. It does not certify
-   security, production readiness, or legal compliance, and no mode, module, or
-   green suite may issue such a certification on its behalf.
-
 ## Rules against plausible but unsupported engineering
 
 Never treat any of these phrases as proof:
