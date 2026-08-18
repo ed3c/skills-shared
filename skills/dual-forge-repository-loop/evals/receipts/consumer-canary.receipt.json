@@ -26,25 +26,158 @@
       "workers": [
         {
           "exit_code": 0,
-          "head": "254f2dedad82eca66ed825833827db3f7e33606d",
+          "head": "13ff9840fc5683b33670fa191591035bc96292dc",
           "path": "slice-0"
         },
         {
           "exit_code": 0,
-          "head": "254f2dedad82eca66ed825833827db3f7e33606d",
+          "head": "13ff9840fc5683b33670fa191591035bc96292dc",
           "path": "slice-1"
         }
       ]
     },
     {
+      "admission_record": "skills/repo-agent-native/evals/git-town-darwin-admission.json",
+      "admission_record_sha256": "f34efec5a6c8e17572a0a8c51e22f69b397cbe99cfb187bf2231cbe6545b7239",
+      "admitted_executable_sha256": "9f3807e07a6be79e4637b140deda9dff5d3a89321b8026a2f2e4a04d2f37fa2d",
+      "commands": [
+        {
+          "argv": [
+            "git-town",
+            "--version"
+          ],
+          "exit": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_bytes": 16,
+          "stdout_sha256": "f724787fe4b4bc62c9885cc5482a04be9be1a1c19610c4fbd201adfb884ddc4c"
+        },
+        {
+          "argv": [
+            "git-town",
+            "config"
+          ],
+          "exit": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_bytes": 1474,
+          "stdout_sha256": "b7ea3faafd0a62ddcbad72b0de9208cecafa0b128d5b0c3e31317878e43273a7"
+        },
+        {
+          "argv": [
+            "git-town",
+            "status"
+          ],
+          "exit": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_bytes": 43,
+          "stdout_sha256": "bf5e343cc7d2bc3cd6701ccaf156399d306b1387b5ba0f49ecc3f49eec0b902a"
+        },
+        {
+          "argv": [
+            "git-town",
+            "hack",
+            "canary-parent"
+          ],
+          "exit": 0,
+          "stderr_sha256": "5b71ce403d7cfbed78757f7786c0f9ebb4300db9a9d644d95260d74e98a3f786",
+          "stdout_bytes": 198,
+          "stdout_sha256": "4db6ec46ee531eb42ad47c1652214515358f150ea7826685c55f326848610b0b"
+        },
+        {
+          "argv": [
+            "git-town",
+            "append",
+            "canary-child"
+          ],
+          "exit": 0,
+          "stderr_sha256": "7f2aae12b3f3f552148aa08ab040fe4a4e6c140e6ccb52a18a40dcdb248aeb1e",
+          "stdout_bytes": 343,
+          "stdout_sha256": "d507d4b099b6510384fcdfaf26689ac2b3cbf202cd6aab98ec9ff0f7168ca087"
+        },
+        {
+          "argv": [
+            "git-town",
+            "sync",
+            "--stack",
+            "--non-interactive",
+            "--no-auto-resolve",
+            "--no-push",
+            "--dry-run"
+          ],
+          "exit": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stdout_bytes": 255,
+          "stdout_sha256": "f165f2b9f3dd23d4bacce2b0e4926526b711bddfc32600483e80182390a7989c"
+        },
+        {
+          "argv": [
+            "git-town",
+            "sync",
+            "--stack",
+            "--non-interactive",
+            "--no-auto-resolve",
+            "--no-push"
+          ],
+          "exit": 0,
+          "stderr_sha256": "74931953fcacccdd79cacc133a23e5dfa4d3f8485c0241d47ad46958fcb22f62",
+          "stdout_bytes": 415,
+          "stdout_sha256": "815c1d78d5b443c077b6793d32538b9d86b7844a222d9889ed7a99acf1c02582"
+        }
+      ],
+      "conflict_canary": {
+        "automatic_semantic_recovery_attempted": false,
+        "git_town_reports_suspended": true,
+        "receipt": "git-town-live-canary.receipt.json",
+        "receipt_sha256": "1eead9fb2074c641f88223f289202b0d4f3de57a5e7e7fde586c3cdae9443071",
+        "result": "PASS",
+        "suspended_operation_present": true,
+        "sync_exit": 1,
+        "tool_version": "24.0.0",
+        "unmerged_paths_present": true
+      },
+      "consumer_dirty_after": 0,
       "consumer_executable_state": "EXECUTABLE_ABSENT",
+      "consumer_head_unchanged": true,
       "consumer_live_sync_state": "NOT_EXERCISED",
-      "detail": "the consumer's own contract records the same absence this host does",
-      "executable_on_path": null,
+      "consumer_worktree_execution": "HUMAN_ADMIT_REQUIRED",
+      "consumer_worktree_execution_reason": "git-town activation writes git-town.* into the configuration a linked worktree shares with the consumer, and the consumer manifest assigns config activation to HUMAN",
+      "detail": "the consumer's declared sync argv run against a disposable clone carrying its exact commit, with a local bare remote; dry-run then local no-push, both read back from git rather than from git-town's own output",
+      "digest_matches_admission": true,
+      "dry_run_exit": 0,
+      "dry_run_mutated_local_refs": false,
+      "executable_path": "/Users/neon/.local/tools/git-town/git-town",
+      "executable_sha256": "9f3807e07a6be79e4637b140deda9dff5d3a89321b8026a2f2e4a04d2f37fa2d",
+      "forbidden_flags_observed": [],
       "human_admit_required": true,
       "link": "git-town-dry-run-and-local-no-push-sync",
-      "note": "Homebrew offers the admitted 24.0.0, but the shared admission record pins a linux_intel_64 artifact by SHA-256 and this host is darwin. Binding a different artifact at the same version is a Human admission, not an install.",
-      "state": "BLOCKED"
+      "live_no_push_exit": 0,
+      "local_bare_remote_refs_unchanged": true,
+      "modes_declared_by_consumer": [
+        "config",
+        "sync_dry_run",
+        "sync_local_no_push",
+        "version"
+      ],
+      "parent_is_ancestor_after_sync": true,
+      "pushes_to_forge": false,
+      "pushes_to_local_bare_mirror": true,
+      "state": "EXERCISED",
+      "subject": {
+        "consumer_commit": "13ff9840fc5683b33670fa191591035bc96292dc",
+        "consumer_default_branch": "main",
+        "consumer_git_dir_touched_by_git_town": false,
+        "execution_repository": "disposable clone under TMPDIR",
+        "origin_remote": "local bare mirror under TMPDIR"
+      },
+      "sync_argv_from_consumer_manifest": [
+        "git",
+        "town",
+        "sync",
+        "--stack",
+        "--non-interactive",
+        "--no-auto-resolve",
+        "--no-push"
+      ],
+      "worker_worktree_clean_after": true
     },
     {
       "contract_sha256": "4350bdcd43f5affcf779441f21208dc370c0ed481a5198d1bd6f9de1cec1411d",
@@ -57,7 +190,7 @@
       "forgejo_repository_id": 9,
       "link": "forgejo-issue-pr-receipts",
       "open_issues": 2,
-      "open_prs": 0,
+      "open_prs": 1,
       "state": "EXERCISED"
     },
     {
@@ -67,8 +200,8 @@
     },
     {
       "detail": "every open PR and issue on both forges classified exactly once, checked by capture_reconciliation.py replay rather than asserted",
-      "github_open_issues": 17,
-      "github_open_prs": 4,
+      "github_open_issues": 24,
+      "github_open_prs": 2,
       "github_repository_id": 1330387399,
       "link": "github-reconciliation-inventory",
       "replay_exit_code": 0,
@@ -84,11 +217,11 @@
       "actions_enabled": "true",
       "billing_circuit_observed": "not-in-force",
       "detail": "this canary does not spend an Actions job on a consumer repository",
-      "latest_runs": "[{\"conclusion\":\"success\",\"created_at\":\"2026-08-16T11:02:00Z\",\"name\":\"Modular contracts\",\"status\":\"completed\"},{\"conclusion\":\"success\",\"created_at\":\"2026-08-16T11:02:00Z\",\"name\":\"Knowledge provider contracts\",\"status\":\"completed\"},{\"conclusion\":\"success\",\"created_at\":\"2026-08-16T11:02:00Z\",\"name\":\"Provider canary contracts\",\"status\":\"completed\"},{\"conclusion\":\"success\",\"created_at\":\"2026-08-16T11:02:00Z\",\"name\":\"PDF Harness integration audit\",\"status\":\"completed\"},{\"conclusion\":\"failure\",\"created_at\":\"2026-08-16T11:02:00Z\",\"name\":\"Agentic Tech Lead Bettor Binding\",\"status\":\"completed\"}]",
+      "latest_runs": "[{\"conclusion\":\"success\",\"created_at\":\"2026-08-18T02:20:20Z\",\"name\":\"Sync feature modular contracts\",\"status\":\"completed\"},{\"conclusion\":\"success\",\"created_at\":\"2026-08-17T18:44:08Z\",\"name\":\"Sync feature modular contracts\",\"status\":\"completed\"},{\"conclusion\":\"skipped\",\"created_at\":\"2026-08-17T18:04:32Z\",\"name\":\"Git Town Stack governance docs\",\"status\":\"completed\"},{\"conclusion\":\"skipped\",\"created_at\":\"2026-08-17T18:04:32Z\",\"name\":\"PDF Harness integration audit\",\"status\":\"completed\"},{\"conclusion\":\"skipped\",\"created_at\":\"2026-08-17T18:04:32Z\",\"name\":\"LoopX PDF modular integration\",\"status\":\"completed\"}]",
       "link": "exact-head-github-actions",
       "note": "#191's billing circuit is not blocking this consumer: Actions are enabled and runs are completing. The link is held by a budget decision, not by a provider blocker.",
       "state": "SKIPPED_BY_POLICY",
-      "total_runs_observed": "1439"
+      "total_runs_observed": "2079"
     },
     {
       "detail": "#234 states it does not require or authorize merge",
@@ -110,8 +243,8 @@
     "external-merge-handoff"
   ],
   "consumer_selection_gate": {
-    "ci_policy_sha256": "87e28e9e3ea092156964b023f47b3bfe0da4d26dfbcee612c83fcabb7cf108ee",
-    "commit_sha": "254f2dedad82eca66ed825833827db3f7e33606d",
+    "ci_policy_sha256": "6a593afbbfe7112156c6ce47d0c1aff87c74be14b33d54c41e8c3592446c73e5",
+    "commit_sha": "13ff9840fc5683b33670fa191591035bc96292dc",
     "consumer_root": "/Users/neon/bettor-arena",
     "default_branch": "main",
     "delivery_config_present": true,
@@ -136,15 +269,15 @@
       "forgejo": "http://localhost:3000/neon/bettor-arena.git",
       "github": "git@github.com:ed3c/bettor-arena.git"
     },
-    "rollback_subject": "254f2dedad82eca66ed825833827db3f7e33606d",
-    "tree_sha": "dfb47f7dfc21875a01f6476597e30c3e98e2e1f8"
+    "rollback_subject": "13ff9840fc5683b33670fa191591035bc96292dc",
+    "tree_sha": "947ba9a2c19268b95414a2918b88283d23a0ce2c"
   },
   "coverage": {
-    "blocked": [
-      "git-town-dry-run-and-local-no-push-sync"
-    ],
+    "absent": [],
+    "blocked": [],
     "exercised": [
       "forgejo-issue-pr-receipts",
+      "git-town-dry-run-and-local-no-push-sync",
       "github-reconciliation-inventory",
       "isolated-worktrees-and-leases",
       "runtime-bootstrap-bind"
@@ -161,14 +294,23 @@
   "declared_non_claims": [
     "a read-only reconciliation is not a delivery transition",
     "the consumer's own tests were not run, so nothing here says its main is green",
-    "no Git Town synchronization occurred, so no branch hierarchy claim is made",
-    "reaching a forge is not the same as being admitted to publish to it"
+    "reaching a forge is not the same as being admitted to publish to it",
+    "Git Town ran against a disposable clone of the consumer, so it says what the admitted binary does to the consumer's history, not that the consumer's own checkout has ever been synchronized",
+    "the Forgejo lane is absent rather than failed; nothing here says a local forge would or would not have accepted a delivery"
   ],
-  "duration_ms": 8898,
+  "duration_ms": 15493,
   "issue": 234,
+  "lanes": {
+    "forgejo": "EXERCISED",
+    "git_town_local": "EXERCISED",
+    "github_actions": "SKIPPED_BY_POLICY",
+    "publication": "NOT_EXERCISED"
+  },
   "mutations_performed": {
     "branches_created": false,
     "consumer_files_changed": false,
+    "disposable_clone_branches_created": true,
+    "disposable_clone_pushes_to_local_bare_remote": true,
     "issues_created": false,
     "merges": false,
     "prs_created": false,
@@ -176,5 +318,5 @@
     "worktrees_created_and_removed": true
   },
   "schema": "dual-forge-repository-loop/consumer-canary-receipt/v1",
-  "started_at": 1786886980
+  "started_at": 1787031100
 }

@@ -13,11 +13,21 @@ removing a worktree touches the consumer's git directory.
 
 Credentials are never handled here: the Forgejo lane goes through
 `capture_reconciliation.py`, which reads them from the git credential helper in
-memory and puts none of them in its transport.
+memory and puts none of them in its transport. The forge is probed before that
+lane runs, so a forge that is not listening is recorded as ABSENT with the
+failed connection rather than as a delivery that did not happen: a forge nobody
+could reach and a forge that answered are different observations.
+
+`--git-town-bin` points the synchronization lane at an already-admitted
+executable. It is never installed, never put on PATH, and never run against the
+consumer's own git directory -- git-town writes its configuration into the
+common config a linked worktree shares, and the consumer's own contract reserves
+config activation to a Human. The subject is a disposable clone of the consumer
+carrying its exact bytes, with a local bare remote, under TMPDIR.
 
 Usage:
   run_consumer_canary.py --consumer PATH --github OWNER/NAME --forgejo OWNER/NAME \
-      --out DIR [--allow-worktree]
+      --out DIR [--allow-worktree] [--git-town-bin PATH]
 """
 
 from __future__ import annotations
@@ -25,7 +35,9 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import shutil
+import socket
 import subprocess
 import sys
 import tempfile
@@ -34,7 +46,18 @@ from pathlib import Path
 from typing import Any
 
 SKILL = Path(__file__).resolve().parent.parent
+ROOT = SKILL.parent.parent
 SCHEMA = "dual-forge-repository-loop/consumer-canary-receipt/v1"
+
+# The record that admits this host's git-town artifact. It is read, never
+# written: a lane that could edit its own admission admits itself.
+GIT_TOWN_ADMISSION = (ROOT / "skills" / "repo-agent-native" / "evals"
+                      / "git-town-darwin-admission.json")
+
+# /usr/bin/git is the xcrun shim. With HOME redirected it cannot write its cache
+# and every git-town chdir fails with an error that names neither cause.
+REAL_GIT_DIRS = ("/Library/Developer/CommandLineTools/usr/bin",
+                 "/Applications/Xcode.app/Contents/Developer/usr/bin")
 
 # The chain #234 names, in order. Every link gets a state in the receipt.
 CHAIN = [
@@ -167,6 +190,226 @@ def exercise_worktree(consumer: Path) -> dict[str, Any]:
     }
 
 
+def _ref_digest(repo: Path, git_bin: str, env: dict[str, str]) -> str:
+    result = subprocess.run([git_bin, "for-each-ref", "--format=%(refname) %(objectname)"],
+                            cwd=str(repo), env=env, capture_output=True, text=True,
+                            timeout=120)
+    lines = "\n".join(sorted(l for l in result.stdout.splitlines() if l))
+    return sha256(lines.encode())
+
+
+def exercise_git_town(consumer: Path, executable: Path,
+                      manifest: dict[str, Any]) -> dict[str, Any]:
+    """Run the consumer's declared Git Town modes against the consumer's own bytes.
+
+    The subject is a disposable clone, not the consumer's checkout, and that is a
+    decision rather than a convenience. git-town writes `git-town.*` keys into the
+    repository configuration, and a linked worktree shares the common config with
+    the repository it came from, so activating it in a worktree of the consumer
+    would write into the consumer -- which its own manifest assigns to HUMAN. The
+    clone carries the consumer's exact commit, so what git-town synchronizes is
+    the consumer's real history; what it configures is a tree that gets deleted.
+
+    Every claim below is read back from git, never from git-town's own output.
+    """
+    admitted = json.loads(GIT_TOWN_ADMISSION.read_text(encoding="utf-8"))
+    expected = admitted["derived_executable_identity"]["sha256"]
+    observed = file_sha256(executable) if executable.is_file() else None
+    base: dict[str, Any] = {
+        "executable_path": str(executable),
+        "executable_sha256": observed,
+        "admitted_executable_sha256": expected,
+        "admission_record": str(GIT_TOWN_ADMISSION.relative_to(ROOT)),
+        "admission_record_sha256": file_sha256(GIT_TOWN_ADMISSION),
+        "digest_matches_admission": observed == expected,
+        "consumer_worktree_execution": "HUMAN_ADMIT_REQUIRED",
+        "consumer_worktree_execution_reason": (
+            "git-town activation writes git-town.* into the configuration a linked "
+            "worktree shares with the consumer, and the consumer manifest assigns "
+            "config activation to HUMAN"),
+    }
+    if not base["digest_matches_admission"]:
+        base["detail"] = ("executable digest does not equal the admitted one; the lane "
+                          "did not start the process")
+        return base
+
+    root = Path(tempfile.mkdtemp(prefix="consumer-git-town-"))
+    home, tmp = root / "home", root / "tmp"
+    mirror, work, worker = root / "remote.git", root / "work", root / "worker"
+    commands: list[dict[str, Any]] = []
+    try:
+        for directory in (home, tmp):
+            directory.mkdir(parents=True)
+        (home / ".gitconfig").write_text("", encoding="utf-8")
+        search = os.environ.get("PATH", "")
+        git_bin = "git"
+        for directory in REAL_GIT_DIRS:
+            if Path(directory, "git").is_file():
+                search = f"{directory}:{search}"
+                git_bin = str(Path(directory, "git"))
+                break
+        env = {**os.environ, "HOME": str(home), "TMPDIR": str(tmp), "PATH": search,
+               "GIT_CONFIG_GLOBAL": str(home / ".gitconfig"),
+               "GIT_CONFIG_SYSTEM": "/dev/null", "GIT_TERMINAL_PROMPT": "0",
+               "GIT_EDITOR": ":", "GIT_SEQUENCE_EDITOR": ":", "GIT_PAGER": "cat",
+               "PAGER": "cat", "LC_ALL": "C", "NO_COLOR": "1"}
+
+        def plain(*args: str, cwd: Path = work) -> subprocess.CompletedProcess[str]:
+            return subprocess.run([git_bin, *args], cwd=str(cwd), env=env,
+                                  capture_output=True, text=True, timeout=300)
+
+        def town(*args: str, cwd: Path = work) -> int:
+            done = subprocess.run([str(executable), *args], cwd=str(cwd), env=env,
+                                  capture_output=True, text=True, timeout=300)
+            commands.append({
+                "argv": ["git-town", *args],
+                "exit": done.returncode,
+                "stdout_bytes": len(done.stdout.encode()),
+                "stdout_sha256": sha256(done.stdout.encode()),
+                "stderr_sha256": sha256(done.stderr.encode()),
+            })
+            return done.returncode
+
+        head = git(consumer, "rev-parse", "HEAD")
+        branch = git(consumer, "rev-parse", "--abbrev-ref", "HEAD")
+        plain("clone", "--local", "--bare", str(consumer), str(mirror), cwd=root)
+        plain("clone", str(mirror), str(work), cwd=root)
+        plain("config", "user.name", "Consumer Canary")
+        plain("config", "user.email", "consumer-canary@example.invalid")
+        plain("config", f"git-town.main-branch", branch)
+
+        town("--version")
+        town("config")
+        town("status")
+
+        # A stack on the consumer's real history: a child that consumes bytes its
+        # parent has not merged is the only shape whose synchronization means
+        # anything. Both branch tips are pushed to the local bare mirror, which is
+        # a filesystem path and not a forge.
+        town("hack", "canary-parent")
+        (work / "canary-parent.txt").write_text("parent-v1\n", encoding="utf-8")
+        plain("add", "canary-parent.txt")
+        plain("commit", "-m", "canary parent v1")
+        town("append", "canary-child")
+        (work / "canary-child.txt").write_text("child\n", encoding="utf-8")
+        plain("add", "canary-child.txt")
+        plain("commit", "-m", "canary child")
+        plain("push", "-u", "origin", "canary-parent", "canary-child")
+        plain("switch", "canary-parent")
+        with (work / "canary-parent.txt").open("a", encoding="utf-8") as stream:
+            stream.write("parent-v2\n")
+        plain("add", "canary-parent.txt")
+        plain("commit", "-m", "canary parent v2")
+        plain("push", "origin", "canary-parent")
+        plain("switch", branch)
+
+        plain("worktree", "add", str(worker), "canary-child")
+        subprocess.run([git_bin, "config", "user.email", "consumer-canary@example.invalid"],
+                       cwd=str(worker), env=env, capture_output=True, timeout=60)
+
+        sync_argv = [str(a) for a in manifest.get("sync_argv", [])][2:] or [
+            "sync", "--stack", "--non-interactive", "--no-auto-resolve", "--no-push"]
+        refs_before = _ref_digest(worker, git_bin, env)
+        mirror_before = _ref_digest(mirror, git_bin, env)
+        dry_exit = town(*sync_argv, "--dry-run", cwd=worker)
+        refs_after = _ref_digest(worker, git_bin, env)
+        live_exit = town(*sync_argv, cwd=worker)
+        mirror_after = _ref_digest(mirror, git_bin, env)
+        ancestor = subprocess.run(
+            [git_bin, "merge-base", "--is-ancestor", "canary-parent", "canary-child"],
+            cwd=str(worker), env=env, capture_output=True, timeout=120).returncode == 0
+        clean = plain("status", "--porcelain=v1", cwd=worker).stdout.strip() == ""
+
+        forbidden = set(manifest.get("forbidden_flags", []))
+        observed_forbidden = sorted({token for entry in commands for token in entry["argv"]
+                                     if token in forbidden})
+        base.update({
+            "subject": {
+                "consumer_commit": head,
+                "consumer_default_branch": branch,
+                "execution_repository": "disposable clone under TMPDIR",
+                "origin_remote": "local bare mirror under TMPDIR",
+                "consumer_git_dir_touched_by_git_town": False,
+            },
+            "modes_declared_by_consumer": manifest.get("modes"),
+            "sync_argv_from_consumer_manifest": manifest.get("sync_argv"),
+            "commands": commands,
+            "forbidden_flags_observed": observed_forbidden,
+            "dry_run_exit": dry_exit,
+            "dry_run_mutated_local_refs": refs_before != refs_after,
+            "live_no_push_exit": live_exit,
+            "local_bare_remote_refs_unchanged": mirror_before == mirror_after,
+            "parent_is_ancestor_after_sync": ancestor,
+            "worker_worktree_clean_after": clean,
+            "pushes_to_forge": False,
+            "pushes_to_local_bare_mirror": True,
+            "consumer_head_unchanged": git(consumer, "rev-parse", "HEAD") == head,
+            "consumer_dirty_after": len([l for l in git(consumer, "status", "--porcelain")
+                                         .splitlines() if l.strip()]),
+        })
+        return base
+    finally:
+        shutil.rmtree(root, ignore_errors=True)
+
+
+def bind_conflict_canary(path: Path) -> dict[str, Any]:
+    """Bind the planted-conflict result #234 requires to the run that produced it.
+
+    The conflict canary is a separate run against disposable fixtures, because a
+    semantic conflict has to be planted and the consumer's history is not ours to
+    plant one in. Binding it by digest is what stops "a conflict fails closed"
+    from being a sentence in a receipt whose own run never met a conflict.
+    """
+    body = json.loads(path.read_text(encoding="utf-8"))
+    conflict = body.get("conflict_canary", {})
+    return {
+        "receipt": path.name,
+        "receipt_sha256": file_sha256(path),
+        "tool_version": body.get("tool_version"),
+        "result": body.get("result"),
+        "sync_exit": conflict.get("sync_exit"),
+        "unmerged_paths_present": conflict.get("unmerged_paths_present"),
+        "suspended_operation_present": conflict.get("suspended_operation_present"),
+        "git_town_reports_suspended": conflict.get("git_town_reports_suspended"),
+        "automatic_semantic_recovery_attempted": conflict.get(
+            "automatic_semantic_recovery_attempted"),
+    }
+
+
+def git_town_state(observation: dict[str, Any]) -> str:
+    """EXERCISED only when every claim the link needs was read back and held."""
+    if not observation.get("digest_matches_admission"):
+        return "BLOCKED"
+    required = (
+        observation.get("dry_run_exit") == 0,
+        observation.get("dry_run_mutated_local_refs") is False,
+        observation.get("live_no_push_exit") == 0,
+        observation.get("local_bare_remote_refs_unchanged") is True,
+        observation.get("parent_is_ancestor_after_sync") is True,
+        observation.get("consumer_head_unchanged") is True,
+        observation.get("consumer_dirty_after") == 0,
+        observation.get("forbidden_flags_observed") == [],
+    )
+    return "EXERCISED" if all(required) else "FAIL"
+
+
+def probe_forgejo(url: str, timeout: float = 5.0) -> dict[str, Any]:
+    """Ask the loopback forge whether it is there, and record the answer either way."""
+    host, _, port = url.split("//", 1)[1].partition(":")
+    port_number = int(port.split("/")[0] or 80)
+    try:
+        with socket.create_connection((host, port_number), timeout=timeout):
+            return {"forge_url": url, "reachable": True}
+    except OSError as error:
+        return {
+            "forge_url": url,
+            "reachable": False,
+            "probe": f"tcp-connect {host}:{port_number}",
+            "errno": getattr(error, "errno", None),
+            "error": str(error),
+        }
+
+
 def observe_actions(repository: str) -> dict[str, Any]:
     """Measure the consumer's Actions state instead of asserting a blocker.
 
@@ -237,13 +480,45 @@ def build_observation(transport: dict[str, Any], inventory: dict[str, Any],
     }
 
 
+LANES = {
+    "git_town_local": "git-town-dry-run-and-local-no-push-sync",
+    "forgejo": "forgejo-issue-pr-receipts",
+    "github_actions": "exact-head-github-actions",
+    "publication": "publication-candidate",
+}
+
+
+def coverage(links: list[dict[str, Any]]) -> dict[str, list[str]]:
+    return {
+        "exercised": sorted(l["link"] for l in links if l["state"] == "EXERCISED"),
+        "blocked": sorted(l["link"] for l in links if l["state"] == "BLOCKED"),
+        "absent": sorted(l["link"] for l in links if l["state"] == "ABSENT"),
+        "not_exercised": sorted(l["link"] for l in links
+                                if l["state"] in {"NOT_EXERCISED", "SKIPPED_BY_POLICY"}),
+    }
+
+
+def lanes(links: list[dict[str, Any]]) -> dict[str, str]:
+    states = {l["link"]: l["state"] for l in links}
+    return {lane: states[name] for lane, name in LANES.items()}
+
+
 def main() -> int:
+    if len(sys.argv) > 1 and sys.argv[1] == "replay":
+        return replay(sys.argv[2:])
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--consumer", type=Path, required=True)
     parser.add_argument("--github", required=True)
     parser.add_argument("--forgejo", required=True)
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--allow-worktree", action="store_true")
+    parser.add_argument("--git-town-bin", type=Path, default=None,
+                        help="already-admitted git-town executable; never installed, "
+                             "never put on PATH, never pointed at the consumer's own "
+                             "git directory")
+    parser.add_argument("--conflict-canary-receipt", type=Path, default=None,
+                        help="git-town-live-canary-receipt/v1 from the planted-conflict "
+                             "run, bound into the synchronization link by digest")
     args = parser.parse_args()
 
     sys.path.insert(0, str(SKILL / "scripts"))
@@ -286,17 +561,33 @@ def main() -> int:
                           "consumer's git directory"))
 
     town = gate["git_town_contract"]
-    links.append(link(
-        "git-town-dry-run-and-local-no-push-sync", "BLOCKED",
-        "the consumer's own contract records the same absence this host does",
-        executable_on_path=gate["git_town_executable"],
-        consumer_executable_state=town.get("executable_state"),
-        consumer_live_sync_state=town.get("live_sync_state"),
-        human_admit_required=town.get("human_admit_required"),
-        note=("Homebrew offers the admitted 24.0.0, but the shared admission record pins "
-              "a linux_intel_64 artifact by SHA-256 and this host is darwin. Binding a "
-              "different artifact at the same version is a Human admission, not an "
-              "install.")))
+    if args.git_town_bin is None:
+        links.append(link(
+            "git-town-dry-run-and-local-no-push-sync", "BLOCKED",
+            "no admitted executable was supplied; the lane did not start a process",
+            executable_on_path=gate["git_town_executable"],
+            consumer_executable_state=town.get("executable_state"),
+            consumer_live_sync_state=town.get("live_sync_state"),
+            human_admit_required=town.get("human_admit_required"),
+            note=("--git-town-bin is how an admitted artifact reaches this lane. The "
+                  "executable is never installed and never placed on PATH, so its "
+                  "absence from PATH is not evidence about admission.")))
+    else:
+        manifest_path = consumer / ".github-delivery" / "git-town" / "manifest.json"
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        observation = exercise_git_town(consumer, args.git_town_bin.resolve(), manifest)
+        if args.conflict_canary_receipt is not None:
+            observation["conflict_canary"] = bind_conflict_canary(
+                args.conflict_canary_receipt)
+        links.append(link(
+            "git-town-dry-run-and-local-no-push-sync", git_town_state(observation),
+            "the consumer's declared sync argv run against a disposable clone carrying "
+            "its exact commit, with a local bare remote; dry-run then local no-push, "
+            "both read back from git rather than from git-town's own output",
+            consumer_executable_state=town.get("executable_state"),
+            consumer_live_sync_state=town.get("live_sync_state"),
+            human_admit_required=town.get("human_admit_required"),
+            **observation))
 
     links.append(link(
         "verified-implementation-slices", "NOT_EXERCISED",
@@ -305,45 +596,62 @@ def main() -> int:
         "produced none",
         contract_sha256=gate["local_verification_contract_sha256"]))
 
-    transport_path = args.out / "reconciliation-transport.json"
-    transport = reconciliation.capture(args.github, args.forgejo,
-                                       gate["default_branch"], "http://localhost:3000", 30)
-    transport_path.write_text(json.dumps(transport, indent=2, sort_keys=True) + "\n",
-                              encoding="utf-8")
-    inventory = reconciliation._provider_inventory(transport)
+    # The forge is probed before it is read. Without this the reconciliation
+    # raises on connect and the whole canary dies with no receipt, which reports
+    # a host with no forge as a run that never happened.
+    forge = probe_forgejo(gate["remotes"].get("forgejo", "http://localhost:3000"))
+    if not forge["reachable"]:
+        exhaustive = False
+        links.append(link(
+            "forgejo-issue-pr-receipts", "ABSENT",
+            "the loopback forge is not listening on this host; no Forgejo read, issue or "
+            "PR happened", **forge))
+        links.append(link(
+            "admitted-local-main-integration", "NOT_EXERCISED",
+            "nothing was produced to integrate; the canary is read-only by construction"))
+        links.append(link(
+            "github-reconciliation-inventory", "BLOCKED",
+            "the dual-forge reconciliation cannot close with one forge unreachable, and a "
+            "GitHub-only inventory is a different claim than the one this link makes",
+            **forge))
+    else:
+        transport_path = args.out / "reconciliation-transport.json"
+        observation_path = args.out / "reconciliation-observation.json"
+        transport = reconciliation.capture(args.github, args.forgejo,
+                                           gate["default_branch"], "http://localhost:3000", 30)
+        inventory = reconciliation._provider_inventory(transport)
+        observation = build_observation(transport, inventory, local_main_changed=False)
+        transport_path.write_text(json.dumps(transport, indent=2, sort_keys=True) + "\n",
+                                  encoding="utf-8")
+        observation_path.write_text(json.dumps(observation, indent=2, sort_keys=True) + "\n",
+                                    encoding="utf-8")
+        replayed = subprocess.run(
+            [sys.executable, str(SKILL / "scripts" / "capture_reconciliation.py"), "replay",
+             "--transport", str(transport_path), "--observation", str(observation_path)],
+            capture_output=True, text=True)
+        exhaustive = replayed.returncode == 0
 
-    observation = build_observation(transport, inventory, local_main_changed=False)
-    observation_path = args.out / "reconciliation-observation.json"
-    observation_path.write_text(json.dumps(observation, indent=2, sort_keys=True) + "\n",
-                                encoding="utf-8")
+        links.append(link(
+            "forgejo-issue-pr-receipts", "EXERCISED" if exhaustive else "FAIL",
+            "authenticated read of the Forgejo repository, open PRs and open issues; no "
+            "issue or PR was created",
+            forgejo_repository_id=inventory["repository_ids"].get("forgejo"),
+            open_prs=len(inventory["forgejo_prs"]),
+            open_issues=len(inventory["forgejo_issues"])))
 
-    replayed = subprocess.run(
-        [sys.executable, str(SKILL / "scripts" / "capture_reconciliation.py"), "replay",
-         "--transport", str(transport_path), "--observation", str(observation_path)],
-        capture_output=True, text=True)
-    exhaustive = replayed.returncode == 0
+        links.append(link(
+            "admitted-local-main-integration", "NOT_EXERCISED",
+            "nothing was produced to integrate; the canary is read-only by construction"))
 
-    links.append(link(
-        "forgejo-issue-pr-receipts", "EXERCISED" if exhaustive else "FAIL",
-        "authenticated read of the Forgejo repository, open PRs and open issues; no "
-        "issue or PR was created",
-        forgejo_repository_id=inventory["repository_ids"].get("forgejo"),
-        open_prs=len(inventory["forgejo_prs"]),
-        open_issues=len(inventory["forgejo_issues"])))
-
-    links.append(link(
-        "admitted-local-main-integration", "NOT_EXERCISED",
-        "nothing was produced to integrate; the canary is read-only by construction"))
-
-    links.append(link(
-        "github-reconciliation-inventory", "EXERCISED" if exhaustive else "FAIL",
-        "every open PR and issue on both forges classified exactly once, checked by "
-        "capture_reconciliation.py replay rather than asserted",
-        github_repository_id=inventory["repository_ids"].get("github"),
-        github_open_prs=len(inventory["github_prs"]),
-        github_open_issues=len(inventory["github_issues"]),
-        replay_exit_code=replayed.returncode,
-        replay_stderr=replayed.stderr.strip()[-400:]))
+        links.append(link(
+            "github-reconciliation-inventory", "EXERCISED" if exhaustive else "FAIL",
+            "every open PR and issue on both forges classified exactly once, checked by "
+            "capture_reconciliation.py replay rather than asserted",
+            github_repository_id=inventory["repository_ids"].get("github"),
+            github_open_prs=len(inventory["github_prs"]),
+            github_open_issues=len(inventory["github_issues"]),
+            replay_exit_code=replayed.returncode,
+            replay_stderr=replayed.stderr.strip()[-400:]))
 
     links.append(link(
         "publication-candidate", "NOT_EXERCISED",
@@ -368,22 +676,28 @@ def main() -> int:
         "duration_ms": int((time.time() - started) * 1000),
         "chain": links,
         "chain_declared": CHAIN,
-        "coverage": {
-            "exercised": sorted(l["link"] for l in links if l["state"] == "EXERCISED"),
-            "blocked": sorted(l["link"] for l in links if l["state"] == "BLOCKED"),
-            "not_exercised": sorted(l["link"] for l in links
-                                    if l["state"] in {"NOT_EXERCISED", "SKIPPED_BY_POLICY"}),
-        },
+        "coverage": coverage(links),
+        "lanes": lanes(links),
+        # Every flag here is about the consumer. The synchronization lane does
+        # create branches and does push, inside a disposable clone with a local
+        # bare remote -- recorded separately so this block cannot be read as
+        # "nothing anywhere was mutated".
         "mutations_performed": {
             "branches_created": False, "issues_created": False, "prs_created": False,
             "pushes": False, "merges": False, "consumer_files_changed": False,
             "worktrees_created_and_removed": bool(args.allow_worktree),
+            "disposable_clone_branches_created": args.git_town_bin is not None,
+            "disposable_clone_pushes_to_local_bare_remote": args.git_town_bin is not None,
         },
         "declared_non_claims": [
             "a read-only reconciliation is not a delivery transition",
             "the consumer's own tests were not run, so nothing here says its main is green",
-            "no Git Town synchronization occurred, so no branch hierarchy claim is made",
             "reaching a forge is not the same as being admitted to publish to it",
+            "Git Town ran against a disposable clone of the consumer, so it says what the "
+            "admitted binary does to the consumer's history, not that the consumer's own "
+            "checkout has ever been synchronized",
+            "the Forgejo lane is absent rather than failed; nothing here says a local "
+            "forge would or would not have accepted a delivery",
         ],
     }
 

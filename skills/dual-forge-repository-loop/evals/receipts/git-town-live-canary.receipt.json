@@ -1,0 +1,40 @@
+{
+  "artifact_admission": "NOT_EXERCISED",
+  "asset_sha256": null,
+  "checksums_sha256": null,
+  "conflict_canary": {
+    "automatic_semantic_recovery_attempted": false,
+    "git_town_reports_suspended": true,
+    "main_unchanged": true,
+    "remote_refs_unchanged": true,
+    "suspended_operation_present": true,
+    "sync_exit": 1,
+    "unmerged_paths_present": true
+  },
+  "errors": [],
+  "legal_acceptance": "HUMAN_ADMIT_REQUIRED",
+  "license_marker": "MIT License",
+  "license_sha256": null,
+  "merge": "HUMAN_ADMIT_REQUIRED",
+  "network_publication": "NOT_EXERCISED",
+  "observed_sync_flags": [
+    "--stack",
+    "--dry-run",
+    "--non-interactive",
+    "--no-auto-resolve",
+    "--no-push"
+  ],
+  "positive_canary": {
+    "dry_run_exit": 0,
+    "dry_run_mutated_local_refs": false,
+    "main_unchanged": true,
+    "parent_is_ancestor": true,
+    "remote_refs_unchanged": true,
+    "sync_exit": 0,
+    "worktree_clean_after": true
+  },
+  "result": "PASS",
+  "schema_version": "git-town-live-canary-receipt/v1",
+  "subject_sha": "306f75cba24c8e9db4d5d9d4c4a2c0f0e6bd3e5c",
+  "tool_version": "24.0.0"
+}

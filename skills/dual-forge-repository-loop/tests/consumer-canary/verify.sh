@@ -42,4 +42,28 @@ assert declared == stated, f"unstated links: {sorted(declared - stated)}"
 print(f"PASS non-destructive: {len(stated)}/{len(declared)} links stated, consumer clean")
 PY
 
+# The synchronization link binds the planted-conflict run by digest. A digest
+# that no longer matches the committed file is a binding to a receipt that no
+# longer exists, and the checker cannot see it from inside one file.
+python3 - "${receipt}" "${skill_dir}/evals/receipts" <<'PY'
+import hashlib, json, pathlib, sys
+body = json.load(open(sys.argv[1]))
+link = next(l for l in body["chain"]
+            if l["link"] == "git-town-dry-run-and-local-no-push-sync")
+if link["state"] != "EXERCISED":
+    print("SKIP conflict binding: synchronization link is not EXERCISED")
+    raise SystemExit(0)
+bound = link["conflict_canary"]
+target = pathlib.Path(sys.argv[2]) / bound["receipt"]
+assert target.is_file(), f"bound conflict receipt {bound['receipt']} is not committed"
+digest = hashlib.sha256(target.read_bytes()).hexdigest()
+assert digest == bound["receipt_sha256"], \
+    f"{bound['receipt']} hashes to {digest}, the receipt binds {bound['receipt_sha256']}"
+committed = json.loads(target.read_text(encoding="utf-8"))
+assert committed["conflict_canary"]["sync_exit"] == bound["sync_exit"], \
+    "the bound conflict exit differs from the run that produced it"
+print(f"PASS conflict binding: {bound['receipt']} matches its digest, sync exited "
+      f"{bound['sync_exit']}")
+PY
+
 echo "PASS consumer dual-forge canary"
