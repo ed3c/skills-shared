@@ -36,7 +36,6 @@ def expect_red(name: str, doc: dict, needle: str) -> None:
 
 expect_green("positive migration-copy graph", base)
 
-# Orphan required case / missing implementation binding.
 m = copy.deepcopy(base)
 m["cases"][1]["implementation_ids"] = []
 m["coverage"]["required_case"] = 0.5
@@ -44,28 +43,24 @@ m["coverage"]["implementation_binding"] = 0.5
 m["gate"]["status"] = "READY_FOR_PROTOTYPE"
 expect_red("orphan required case", m, "requires implementation_ids")
 
-# Silent source-logic drop: compatibility remains modeled but source branch becomes unmapped.
 m = copy.deepcopy(base)
 m["source_behaviors"][1]["disposition"] = "UNMAPPED"
 m["coverage"]["source_behavior_disposition"] = 0.5
 m["gate"]["status"] = "READY_FOR_PROTOTYPE"
 expect_red("silent semantic loss", m, "invalid/unmapped disposition")
 
-# A syntactically valid preserve disposition without a case edge is still semantic loss.
 m = copy.deepcopy(base)
 m["edges"] = [e for e in m["edges"] if not (e["from"] == "SRC-002" and e["to"] == "CASE-002")]
 m["coverage"]["source_behavior_disposition"] = 0.5
 m["gate"]["status"] = "READY_FOR_PROTOTYPE"
 expect_red("unbound source behavior", m, "requires a case edge")
 
-# Intentional drop without authority decision.
 m = copy.deepcopy(base)
 m["source_behaviors"][1]["disposition"] = "DROP_EXPLICIT"
 m["source_behaviors"][1]["decision_id"] = None
 m["gate"]["status"] = "READY_FOR_PROTOTYPE"
 expect_red("unauthorized drop", m, "requires decision_id")
 
-# Missing semantic-parity oracle while compatibility lane remains green.
 m = copy.deepcopy(base)
 m["cases"][1]["oracle_ids"] = []
 m["coverage"]["required_case"] = 0.5
@@ -73,26 +68,28 @@ m["coverage"]["oracle"] = 0.5
 m["gate"]["status"] = "READY_FOR_PROTOTYPE"
 expect_red("compatibility-only migration", m, "requires oracle_ids")
 
-# PASS cannot exist only as model prose on the case object; bind an evidence receipt.
 m = copy.deepcopy(base)
 m["cases"][1]["evidence_ids"] = []
 m["coverage"]["executed_evidence"] = 0.5
 m["gate"]["status"] = "READY_FOR_IMPLEMENTATION"
 expect_red("evidence laundering", m, "PASS requires evidence_ids")
 
-# Case PASS must agree with the state of its referenced evidence.
 m = copy.deepcopy(base)
 m["evidence"][1]["state"] = "NOT_EXERCISED"
 m["coverage"]["executed_evidence"] = 0.5
 m["gate"]["status"] = "READY_FOR_IMPLEMENTATION"
 expect_red("evidence state mismatch", m, "is not backed by referenced evidence")
 
-# Provenance cycle is forbidden even though runtime state machines may cycle.
+# Executed FAIL is still execution coverage, but cannot authorize publication.
+m = copy.deepcopy(base)
+m["cases"][1]["evidence_state"] = "FAIL"
+m["evidence"][1]["state"] = "FAIL"
+expect_red("failed required case publication", m, "every required case to have subject-bound PASS evidence")
+
 m = copy.deepcopy(base)
 m["edges"].append({"from": "EVID-002", "to": "INT-002", "kind": "INVALID_BACKEDGE"})
 expect_red("provenance cycle", m, "contains a cycle")
 
-# Unknown blocking case cannot be promoted by prose/coverage.
 m = copy.deepcopy(base)
 m["cases"].append({
     "id": "CASE-003",
@@ -109,7 +106,6 @@ m["cases"].append({
 m["coverage"]["unknown_blocking_count"] = 1
 expect_red("unknown blocking promotion", m, "require gate BLOCKED")
 
-# Coverage is recomputed; hidden denominator members cannot be ignored.
 m = copy.deepcopy(base)
 m["intent_atoms"].append({"id": "INT-003", "statement": "Preserve recovery semantics."})
 expect_red("hidden intent denominator", m, "coverage.intent must be recomputed")
