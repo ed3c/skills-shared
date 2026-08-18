@@ -260,6 +260,15 @@ skills/spatial-loop-systems-engineering/
     │   └── fixtures/valid.json
     ├── universal-entry/verify.sh
     ├── recovery-escalation/verify.sh
+    ├── refactor-proof/
+    │   ├── verify.sh
+    │   ├── refactor_ab.py
+    │   ├── real_task_ab.py
+    │   └── fixtures/
+    │       ├── pre-refactor-SKILL.txt
+    │       ├── refactor-as-landed-SKILL.txt
+    │       ├── escalation-restored-SKILL.txt
+    │       └── attempts.json
     └── system-contract/
         ├── verify.sh
         └── fixtures/good.json
@@ -280,6 +289,10 @@ three-failure escalation routing                   IMPLEMENTED
 procedural atom/coverage/fork/capsule contract      IMPLEMENTED
 procedural-grounding schema/checker                 IMPLEMENTED
 procedural positive/hollow/mutation controls        IMPLEMENTED
+blob-frozen refactor treatments A/B0/B1/B2         IMPLEMENTED
+old-strength preservation scoring                  IMPLEMENTED
+matched hermetic escalation-gate task              IMPLEMENTED
+matched live model/runtime refactor A/B            NOT_IMPLEMENTED
 live continuous Shadow Architect runtime           NOT_EXERCISED
 live external Skill search adapter                  NOT_EXERCISED
 live Claude/Codex separate context                  NOT_EXERCISED

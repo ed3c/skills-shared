@@ -84,6 +84,24 @@
       "expected": "recovery contract contains all mandatory stop, routing, fresh-context, worktree, verification, publication, and merge-authority boundaries"
     },
     {
+      "id": "SLS-REFACTOR-PROOF-1",
+      "checker_script": "tests/refactor-proof/refactor_ab.py",
+      "test_verify": "tests/refactor-proof/verify.sh",
+      "good_fixture": "tests/refactor-proof/fixtures/attempts.json",
+      "hollow_fixture": null,
+      "hollow_mutations": "edit a frozen historical treatment, remove the authority law from the live body, keep the word qualifying while deleting the rule that decides it, make the system-contract checker admit a gate promoted above its capability evidence, or retune the attempts fixture instead of measuring the treatments",
+      "covers": [
+        "the pre-refactor, refactor-as-landed, escalation-restored and current bodies are pinned by Git blob identity",
+        "behaviours deleted by the Constraint-First refactor are named and scored rather than assumed preserved",
+        "the pre-refactor body is not credited with properties the refactor introduced",
+        "the current body dominates its predecessor instead of trading one strength for another",
+        "one matched escalation-gate closure per treatment runs against identical fixtures with the live checker as subprocess and as library",
+        "a treatment that cannot decide the escalation question is retained as BLOCKED and stays in the denominator",
+        "no live model, provider or runtime claim is produced by fixture evidence"
+      ],
+      "expected": "four treatments score 10/6/12/16, the matched task closes three arms to one receipt and blocks one by name, and five planted mutations exit 2"
+    },
+    {
       "id": "SLS-PROCEDURAL-GROUNDING-1",
       "checker_script": "scripts/check_procedural_grounding.py",
       "test_verify": "tests/procedural-grounding/verify.py",
@@ -123,6 +141,10 @@
     "procedural_grounding_schema": "IMPLEMENTED",
     "procedural_grounding_checker": "IMPLEMENTED",
     "procedural_grounding_positive_hollow_mutation_controls": "IMPLEMENTED",
+    "frozen_refactor_treatments": "IMPLEMENTED",
+    "old_strength_preservation_scoring": "IMPLEMENTED",
+    "matched_hermetic_escalation_task": "IMPLEMENTED",
+    "matched_live_model_refactor_ab": "NOT_IMPLEMENTED",
     "agent_host_adapter_guidance": "IMPLEMENTED",
     "live_shadow_monitor_runtime": "NOT_EXERCISED",
     "live_external_skill_search": "NOT_EXERCISED",

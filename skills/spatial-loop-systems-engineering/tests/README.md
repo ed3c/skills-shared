@@ -33,6 +33,24 @@ The recovery-escalation suite proves the shared prompt/procedure retains:
 - owning-oracle and negative-control PASS before commit/PR eligibility;
 - no silent grant of merge authority.
 
+The refactor-proof suite proves (issue #352):
+
+- the four treatments of this Skill's entrypoint are the real bytes of commits
+  `ea48423`, `4283b48` and `1295cdd` plus the live body, pinned by Git blob
+  identity, so a frozen treatment cannot be edited to improve a score;
+- the eight behaviours `4283b48` deleted are scored as B0 regressions, and the
+  six properties that refactor introduced are refused to the pre-refactor body;
+- the current body restores every one of them without losing anything `#189`
+  had already restored;
+- one matched escalation-gate closure per treatment against the same attempts
+  fixture and the same committed system contract, with the live checker run as
+  a CLI subprocess and as an imported library, resolves to the same receipt for
+  A, B1 and B2 while B0 is retained as `BLOCKED_QUALIFYING_RULE_ABSENT`;
+- five planted mutations — frozen-fixture drift, the live body losing the
+  authority law, the live body losing the qualifying-failure rule, the checker
+  admitting a gate promoted above its capability evidence, and task-fixture
+  drift — each turn the owning entrypoint red with a named reason.
+
 The procedural-grounding suite proves:
 
 - a critical execution procedure cannot pass through mention or planning alone;

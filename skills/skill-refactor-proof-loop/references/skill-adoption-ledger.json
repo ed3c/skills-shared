@@ -888,23 +888,31 @@
     },
     {
       "skill": "spatial-loop-systems-engineering",
-      "highest_layer": "L2_EXECUTABLE_CONTRACT",
-      "golden_proof_id": null,
+      "highest_layer": "L3_HERMETIC_REAL_TASK",
+      "golden_proof_id": "spatial-loop-escalation-gate-ab-v1",
       "criteria": {
         "old_canonical_treatment_frozen": {
-          "state": "ABSENT",
-          "evidence": [],
-          "owner_issue": 352
+          "state": "PASS",
+          "evidence": [
+            "skills/spatial-loop-systems-engineering/tests/refactor-proof/fixtures/pre-refactor-SKILL.txt",
+            "skills/spatial-loop-systems-engineering/tests/refactor-proof/fixtures/escalation-restored-SKILL.txt"
+          ],
+          "note": "A_OLD_CANONICAL is the body ea48423 left behind, taken from blob 4f21a487 by git log --follow rather than reconstructed. The same rule was applied forward: the body #189 landed was frozen at its blob c190932d as B1 before the live SKILL.md became the newer arm B2, so every treatment has exactly one immutable subject."
         },
         "refactor_as_landed_treatment_frozen": {
-          "state": "ABSENT",
-          "evidence": [],
-          "owner_issue": 352
+          "state": "PASS",
+          "evidence": [
+            "skills/spatial-loop-systems-engineering/tests/refactor-proof/fixtures/refactor-as-landed-SKILL.txt"
+          ],
+          "note": "B0 is 4283b48 exactly as it landed, blob 388be0ff, retained with its regressions."
         },
         "old_strengths_asserted": {
-          "state": "ABSENT",
-          "evidence": [],
-          "owner_issue": 352
+          "state": "PASS",
+          "evidence": [
+            "skills/spatial-loop-systems-engineering/tests/refactor-proof/refactor_ab.py",
+            "skills/spatial-loop-systems-engineering/tests/refactor-proof/verify.sh"
+          ],
+          "note": "Four arms scored on sixteen anchored criteria: A 10, B0 6, B1 12, B2 16. Eight old strengths are hard-asserted as B0 regressions and six post-refactor properties are refused to A, so the scorer cannot be retuned to agree with the current body and stay green."
         },
         "route_reachable": {
           "state": "PASS",
@@ -932,24 +940,34 @@
           "note": "Planted anti-degradation and domain-replacement defects must stay red."
         },
         "matched_hermetic_task": {
-          "state": "ABSENT",
-          "evidence": [],
-          "owner_issue": 352
+          "state": "PASS",
+          "evidence": [
+            "skills/spatial-loop-systems-engineering/tests/refactor-proof/real_task_ab.py",
+            "skills/spatial-loop-systems-engineering/tests/refactor-proof/fixtures/attempts.json"
+          ],
+          "note": "One escalation-gate closure per treatment against the same attempts fixture and the same committed system contract, with scripts/check_system_contract.py run as a real CLI subprocess and as an imported library, one attempt each, zero network. A, B1 and B2 produce the same clock-independent receipt; B0 is retained as BLOCKED_QUALIFYING_RULE_ABSENT with the exact missing tokens rather than dropped."
         },
         "golden_proof_registered": {
-          "state": "ABSENT",
-          "evidence": [],
-          "owner_issue": 352
+          "state": "PASS",
+          "evidence": [
+            "skills/skill-refactor-proof-loop/references/golden-proof-registry.json"
+          ],
+          "note": "spatial-loop-escalation-gate-ab-v1: four content-bound treatments, L0-L3 PASS, L4 NOT_IMPLEMENTED, L5 HUMAN_ADMIT_REQUIRED."
         },
         "live_model_runtime_ab": {
           "state": "NOT_IMPLEMENTED",
           "evidence": [],
-          "owner_issue": 352
+          "owner_issue": 352,
+          "note": "No model/runtime A/B harness exists for this Skill; the proof arms are frozen text and deterministic checkers only."
         },
         "molecular_traceability": {
-          "state": "ABSENT",
-          "evidence": [],
-          "owner_issue": 352
+          "state": "PARTIAL",
+          "evidence": [
+            "skills/skill-refactor-proof-loop/references/golden-proof-registry.json",
+            "docs/traceability/TRACEABILITY_INDEX.md"
+          ],
+          "owner_issue": 352,
+          "note": "The registry entry names issue #352 and the two publication subjects this repository records for the leaf (#136 in the traceability index, #189 in the delivery-loop index). Their live state is READ_FROM_GITHUB and a zero-network audit cannot close it."
         }
       }
     }
