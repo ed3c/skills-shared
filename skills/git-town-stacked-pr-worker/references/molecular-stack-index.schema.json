@@ -36,6 +36,7 @@
           "atom",
           "purpose",
           "stack_class",
+          "lane",
           "branch",
           "base_branch",
           "parents",
@@ -43,6 +44,7 @@
           "consumes_paths",
           "oracle",
           "gates",
+          "blockers",
           "writer_lease",
           "pr"
         ],
@@ -50,14 +52,28 @@
           "id": {"type": "string", "minLength": 1},
           "atom": {"enum": ["C", "K", "A", "E", "X", "D"]},
           "purpose": {"type": "string"},
-          "stack_class": {"enum": ["root", "sibling", "child", "convergence"]},
+          "stack_class": {"enum": ["root", "sibling", "child", "review-only", "convergence"]},
+          "lane": {"enum": ["CLOUD", "LOCAL", "PRIVATE", "HUMAN"]},
           "branch": {"type": "string", "minLength": 1},
           "base_branch": {"type": "string", "minLength": 1},
           "parents": {"type": "array", "items": {"type": "string", "minLength": 1}},
           "owns_paths": {"type": "array", "items": {"type": "string"}},
           "consumes_paths": {"type": "array", "items": {"type": "string"}},
           "oracle": {"type": "string"},
-          "gates": {"type": "array", "items": {"type": "string"}},
+          "gates": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["name", "required_lane", "receipt_lane"],
+              "properties": {
+                "name": {"type": "string", "minLength": 1},
+                "required_lane": {"enum": ["CLOUD", "LOCAL", "PRIVATE", "HUMAN"]},
+                "receipt_lane": {"enum": ["CLOUD", "LOCAL", "PRIVATE", "HUMAN", null]}
+              }
+            }
+          },
+          "blockers": {"type": "array", "items": {"type": "string", "minLength": 1}},
           "writer_lease": {"type": "string"},
           "pr": {
             "type": "object",

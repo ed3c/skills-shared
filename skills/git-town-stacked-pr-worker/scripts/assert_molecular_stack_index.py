@@ -1,12 +1,21 @@
 #!/usr/bin/env python3
 """Validate a Molecular Stack index.
 
-A Stack index is only useful if it can be wrong. This gate refuses the six ways
-an index quietly stops describing the Stack: a hidden multi-parent convergence,
-a path-disjoint sibling dressed up as a serialized child, a required atom that
-was never indexed, two atoms holding the same path lease, a mutable open PR head
+A Stack index is only useful if it can be wrong. This gate refuses the ways an
+index quietly stops describing the Stack: a hidden multi-parent convergence, a
+path-disjoint sibling dressed up as a serialized child, a required atom that was
+never indexed, two atoms holding the same path lease, a mutable open PR head
 frozen into the index, and a ceremonial atom that owns nothing and proves
 nothing.
+
+It also holds the three distinctions an index loses first once it starts being
+read as a progress report. Lanes: a Gate satisfied in a lane other than the one
+it requires is a cheaper receipt pasted into an expensive slot, and private
+lineage consumed by a public atom is that same laundering done through the
+graph. Review-only atoms: a PR opened to be read is not a PR anything may be
+built on, and an index that lets one become a parent has made a review
+load-bearing. Blockers: an atom carrying a blocker or an unexercised Gate has
+not finished, and merging it is the smoothing this index exists to expose.
 
 Exit codes: 0 pass, 2 index failure, 64 input/usage.
 """
@@ -23,9 +32,12 @@ SKILL_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_INDEX = SKILL_ROOT / "references" / "example-molecular-stack-index.json"
 
 ATOM_LETTERS = {"C", "K", "A", "E", "X", "D"}
-STACK_CLASSES = {"root", "sibling", "child", "convergence"}
+STACK_CLASSES = {"root", "sibling", "child", "review-only", "convergence"}
 PR_STATES = {"NOT_CREATED", "DRAFT", "READY", "MERGED"}
 OPEN_PR_STATES = {"DRAFT", "READY"}
+LANES = {"CLOUD", "LOCAL", "PRIVATE", "HUMAN"}
+# Private lineage may only be consumed by an atom that is itself private.
+PUBLISHING_LANES = {"CLOUD", "LOCAL", "HUMAN"}
 SHA40 = set("0123456789abcdef")
 
 
@@ -105,24 +117,71 @@ def validate(index: dict[str, Any]) -> list[str]:
     if len(roots) != 1:
         errors.append("exactly one atom must be the Stack root")
 
+    review_only = {
+        atom_id for atom_id, atom in by_id.items() if atom.get("stack_class") == "review-only"
+    }
+
     for atom_id, atom in by_id.items():
         letter = atom.get("atom")
         stack_class = atom.get("stack_class")
+        lane = atom.get("lane")
         if letter not in ATOM_LETTERS:
             errors.append(f"{atom_id}: invalid atom letter")
         if stack_class not in STACK_CLASSES:
             errors.append(f"{atom_id}: invalid stack_class")
+        if lane not in LANES:
+            errors.append(f"{atom_id}: invalid lane")
 
         owns = atom.get("owns_paths")
         consumes = atom.get("consumes_paths")
         gates = atom.get("gates")
-        if not isinstance(owns, list) or not isinstance(consumes, list) or not isinstance(gates, list):
-            errors.append(f"{atom_id}: owns_paths, consumes_paths and gates must be arrays")
+        blockers = atom.get("blockers")
+        if (
+            not isinstance(owns, list)
+            or not isinstance(consumes, list)
+            or not isinstance(gates, list)
+            or not isinstance(blockers, list)
+        ):
+            errors.append(f"{atom_id}: owns_paths, consumes_paths, gates and blockers must be arrays")
             continue
-        if not owns or not gates or not str(atom.get("oracle", "")).strip() or not str(atom.get("purpose", "")).strip():
+        # A review-only atom is the one atom that legitimately owns no bytes;
+        # everything else with no paths is a ceremonial PR.
+        writes_bytes = stack_class != "review-only"
+        if (
+            (writes_bytes and not owns)
+            or not gates
+            or not str(atom.get("oracle", "")).strip()
+            or not str(atom.get("purpose", "")).strip()
+        ):
             errors.append(f"{atom_id}: empty ceremonial atom — an atom owns paths, one oracle and at least one Gate")
         if not str(atom.get("writer_lease", "")).strip():
             errors.append(f"{atom_id}: no writer lease owner")
+
+        # Gate lanes: a receipt satisfies only the lane it was produced in, and
+        # a null receipt is an honest NOT_EXERCISED rather than a pass.
+        unexercised_gates = 0
+        human_gate = False
+        for gate in gates:
+            if not isinstance(gate, dict):
+                errors.append(f"{atom_id}: gate must be an object")
+                continue
+            gate_name = str(gate.get("name"))
+            required_lane = gate.get("required_lane")
+            receipt_lane = gate.get("receipt_lane")
+            if required_lane not in LANES:
+                errors.append(f"{atom_id}: gate {gate_name} has an invalid required_lane")
+            if required_lane == "HUMAN":
+                human_gate = True
+            if receipt_lane is None:
+                unexercised_gates += 1
+            elif receipt_lane not in LANES:
+                errors.append(f"{atom_id}: gate {gate_name} has an invalid receipt_lane")
+            elif receipt_lane != required_lane:
+                errors.append(
+                    f"{atom_id}: gate {gate_name} — {receipt_lane} receipt cannot satisfy {required_lane} lane"
+                )
+        if lane == "HUMAN" and not human_gate:
+            errors.append(f"{atom_id}: HUMAN lane atom declares no HUMAN Gate")
 
         parents = atom.get("parents")
         if not isinstance(parents, list):
@@ -134,6 +193,13 @@ def validate(index: dict[str, Any]) -> list[str]:
         known_parents = [by_id[parent] for parent in parents if parent in by_id]
         if len(parents) > 1 and (stack_class != "convergence" or atom_id != owner):
             errors.append(f"{atom_id}: multi-parent convergence is not the declared convergence owner")
+        for parent in parents:
+            if parent in review_only:
+                errors.append(f"{atom_id}: review-only atom {parent} cannot be a load-bearing parent")
+            elif parent in by_id and by_id[parent].get("lane") == "PRIVATE" and lane in PUBLISHING_LANES:
+                errors.append(
+                    f"{atom_id}: {lane} atom consumes PRIVATE lineage from {parent} — lanes do not substitute"
+                )
 
         base = atom.get("base_branch")
         parent_branches = [str(parent.get("branch")) for parent in known_parents]
@@ -144,6 +210,13 @@ def validate(index: dict[str, Any]) -> list[str]:
                 errors.append(f"{atom_id}: {stack_class} must base on {main}")
             if consumes:
                 errors.append(f"{atom_id}: {stack_class} consumes unmerged parent bytes and is really a child")
+        elif stack_class == "review-only":
+            if parents:
+                errors.append(f"{atom_id}: review-only must not name a parent atom")
+            if base != main:
+                errors.append(f"{atom_id}: review-only must base on {main}")
+            if owns or consumes:
+                errors.append(f"{atom_id}: review-only atom holds a writer lease — it is read, not built on")
         elif stack_class == "child":
             if len(parents) != 1:
                 errors.append(f"{atom_id}: child must name exactly one parent atom")
@@ -184,6 +257,12 @@ def validate(index: dict[str, Any]) -> list[str]:
                 errors.append(f"{atom_id}: merged atom must record an exact head SHA")
             if head_source != "IMMUTABLE_MERGED":
                 errors.append(f"{atom_id}: merged head must be IMMUTABLE_MERGED")
+            if stack_class == "review-only":
+                errors.append(f"{atom_id}: review-only atom cannot be MERGED")
+            if blockers:
+                errors.append(f"{atom_id}: merged atom still carries {len(blockers)} blocker(s)")
+            if unexercised_gates:
+                errors.append(f"{atom_id}: merged atom has {unexercised_gates} Gate(s) with no receipt")
         elif state == "NOT_CREATED":
             if head_sha is not None or head_source != "ABSENT":
                 errors.append(f"{atom_id}: uncreated PR must be ABSENT with no head")
@@ -239,6 +318,30 @@ def selftest(index: dict[str, Any]) -> list[str]:
         ("CONSUMED_PATH_WITHOUT_A_PARENT_OWNER",
          lambda i: i["atoms"][1].__setitem__("consumes_paths", ["packages/adapter/"]),
          "is owned by no declared parent"),
+        ("CROSS_LANE_GATE_RECEIPT",
+         lambda i: i["atoms"][0]["gates"][0].__setitem__("receipt_lane", "CLOUD"),
+         "CLOUD receipt cannot satisfy LOCAL lane"),
+        ("MERGED_ATOM_WITH_AN_UNEXERCISED_GATE",
+         lambda i: i["atoms"][0]["gates"][0].__setitem__("receipt_lane", None),
+         "Gate(s) with no receipt"),
+        ("BLOCKER_SMOOTHED_INTO_A_MERGED_ATOM",
+         lambda i: i["atoms"][0].__setitem__("blockers", ["substrate never captured"]),
+         "still carries 1 blocker"),
+        ("PRIVATE_LINEAGE_LAUNDERED_INTO_A_PUBLISHED_ATOM",
+         lambda i: i["atoms"][0].__setitem__("lane", "PRIVATE"),
+         "consumes PRIVATE lineage"),
+        ("HUMAN_LANE_ATOM_WITHOUT_A_HUMAN_GATE",
+         lambda i: i["atoms"][6]["gates"][0].__setitem__("required_lane", "LOCAL"),
+         "HUMAN lane atom declares no HUMAN Gate"),
+        ("REVIEW_ONLY_ATOM_USED_AS_A_LOAD_BEARING_PARENT",
+         lambda i: i["atoms"][5].__setitem__("parents", ["ATOM-R1"]),
+         "cannot be a load-bearing parent"),
+        ("REVIEW_ONLY_ATOM_MERGED",
+         lambda i: i["atoms"][6]["pr"].__setitem__("state", "MERGED"),
+         "review-only atom cannot be MERGED"),
+        ("REVIEW_ONLY_ATOM_HOLDING_A_WRITER_LEASE",
+         lambda i: i["atoms"][6].__setitem__("owns_paths", ["docs/review/"]),
+         "review-only atom holds a writer lease"),
     ]
 
     failures: list[str] = []
@@ -268,11 +371,13 @@ def main(argv: list[str] | None = None) -> int:
             print(f"FAIL: {error}", file=sys.stderr)
         return 2
     if args.selftest:
-        print("SELFTEST GREEN: Molecular Stack index controls (10 mutations killed)")
+        print("SELFTEST GREEN: Molecular Stack index controls (19 mutations killed)")
     else:
+        blocked = sum(1 for atom in index["atoms"] if atom.get("blockers"))
         print(
             f"PASS: Molecular Stack index ({len(index['atoms'])} atom(s), "
-            f"required={''.join(index['required_atoms'])}, convergence owner={index['convergence_owner']})"
+            f"required={''.join(index['required_atoms'])}, convergence owner={index['convergence_owner']}, "
+            f"{blocked} blocked atom(s))"
         )
     return 0
 

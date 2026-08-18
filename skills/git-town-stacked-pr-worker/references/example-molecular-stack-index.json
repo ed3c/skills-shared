@@ -5,7 +5,14 @@
     "commit": "1111111111111111111111111111111111111111"
   },
   "main_branch": "main",
-  "required_atoms": ["C", "K", "A", "E", "X", "D"],
+  "required_atoms": [
+    "C",
+    "K",
+    "A",
+    "E",
+    "X",
+    "D"
+  ],
   "convergence_owner": "ATOM-X1",
   "atoms": [
     {
@@ -13,13 +20,23 @@
       "atom": "C",
       "purpose": "lock the contract, schema and interface the rest of the Stack consumes",
       "stack_class": "root",
+      "lane": "LOCAL",
       "branch": "stack/01-contract",
       "base_branch": "main",
       "parents": [],
-      "owns_paths": ["packages/contract/"],
+      "owns_paths": [
+        "packages/contract/"
+      ],
       "consumes_paths": [],
       "oracle": "schema shape gate on the positive example",
-      "gates": ["contract-schema"],
+      "gates": [
+        {
+          "name": "contract-schema",
+          "required_lane": "LOCAL",
+          "receipt_lane": "LOCAL"
+        }
+      ],
+      "blockers": [],
       "writer_lease": "worker-contract",
       "pr": {
         "state": "MERGED",
@@ -32,13 +49,27 @@
       "atom": "K",
       "purpose": "deterministic core implemented against the locked contract",
       "stack_class": "child",
+      "lane": "LOCAL",
       "branch": "stack/02-core",
       "base_branch": "stack/01-contract",
-      "parents": ["ATOM-C1"],
-      "owns_paths": ["packages/core/"],
-      "consumes_paths": ["packages/contract/"],
+      "parents": [
+        "ATOM-C1"
+      ],
+      "owns_paths": [
+        "packages/core/"
+      ],
+      "consumes_paths": [
+        "packages/contract/"
+      ],
       "oracle": "core unit gate",
-      "gates": ["core-unit"],
+      "gates": [
+        {
+          "name": "core-unit",
+          "required_lane": "LOCAL",
+          "receipt_lane": null
+        }
+      ],
+      "blockers": [],
       "writer_lease": "worker-core",
       "pr": {
         "state": "READY",
@@ -51,13 +82,25 @@
       "atom": "A",
       "purpose": "substrate adapter that shares no bytes with the core",
       "stack_class": "sibling",
+      "lane": "CLOUD",
       "branch": "stack/03-adapter",
       "base_branch": "main",
       "parents": [],
-      "owns_paths": ["packages/adapter/"],
+      "owns_paths": [
+        "packages/adapter/"
+      ],
       "consumes_paths": [],
       "oracle": "adapter contract gate against a recorded substrate",
-      "gates": ["adapter-contract"],
+      "gates": [
+        {
+          "name": "adapter-contract",
+          "required_lane": "CLOUD",
+          "receipt_lane": null
+        }
+      ],
+      "blockers": [
+        "recorded substrate fixture not captured yet"
+      ],
       "writer_lease": "worker-adapter",
       "pr": {
         "state": "DRAFT",
@@ -70,13 +113,27 @@
       "atom": "E",
       "purpose": "mutation and fault controls that prove the core gate can turn red",
       "stack_class": "child",
+      "lane": "LOCAL",
       "branch": "stack/04-controls",
       "base_branch": "stack/02-core",
-      "parents": ["ATOM-K1"],
-      "owns_paths": ["tests/controls/"],
-      "consumes_paths": ["packages/core/"],
+      "parents": [
+        "ATOM-K1"
+      ],
+      "owns_paths": [
+        "tests/controls/"
+      ],
+      "consumes_paths": [
+        "packages/core/"
+      ],
       "oracle": "planted-defect detection rate",
-      "gates": ["mutation-controls"],
+      "gates": [
+        {
+          "name": "mutation-controls",
+          "required_lane": "LOCAL",
+          "receipt_lane": null
+        }
+      ],
+      "blockers": [],
       "writer_lease": "worker-controls",
       "pr": {
         "state": "DRAFT",
@@ -89,13 +146,31 @@
       "atom": "X",
       "purpose": "the one explicit multi-parent convergence over controls and adapter",
       "stack_class": "convergence",
+      "lane": "CLOUD",
       "branch": "stack/05-convergence",
       "base_branch": "stack/04-controls",
-      "parents": ["ATOM-E1", "ATOM-A1"],
-      "owns_paths": ["tests/e2e/"],
-      "consumes_paths": ["tests/controls/", "packages/adapter/"],
+      "parents": [
+        "ATOM-E1",
+        "ATOM-A1"
+      ],
+      "owns_paths": [
+        "tests/e2e/"
+      ],
+      "consumes_paths": [
+        "tests/controls/",
+        "packages/adapter/"
+      ],
       "oracle": "end-to-end gate over both parents",
-      "gates": ["e2e"],
+      "gates": [
+        {
+          "name": "e2e",
+          "required_lane": "CLOUD",
+          "receipt_lane": null
+        }
+      ],
+      "blockers": [
+        "both parents are still open"
+      ],
       "writer_lease": "worker-convergence",
       "pr": {
         "state": "NOT_CREATED",
@@ -108,18 +183,61 @@
       "atom": "D",
       "purpose": "documentation, index and handoff receipt for the landed Stack",
       "stack_class": "child",
+      "lane": "LOCAL",
       "branch": "stack/06-docs",
       "base_branch": "stack/05-convergence",
-      "parents": ["ATOM-X1"],
-      "owns_paths": ["docs/"],
-      "consumes_paths": ["tests/e2e/"],
+      "parents": [
+        "ATOM-X1"
+      ],
+      "owns_paths": [
+        "docs/"
+      ],
+      "consumes_paths": [
+        "tests/e2e/"
+      ],
       "oracle": "route and link assertions",
-      "gates": ["doc-routes"],
+      "gates": [
+        {
+          "name": "doc-routes",
+          "required_lane": "LOCAL",
+          "receipt_lane": null
+        }
+      ],
+      "blockers": [],
       "writer_lease": "worker-docs",
       "pr": {
         "state": "NOT_CREATED",
         "head_sha": null,
         "head_source": "ABSENT"
+      }
+    },
+    {
+      "id": "ATOM-R1",
+      "atom": "D",
+      "purpose": "independent review-only pass over the Stack; it reads every atom and writes none",
+      "stack_class": "review-only",
+      "lane": "HUMAN",
+      "branch": "stack/07-review",
+      "base_branch": "main",
+      "parents": [],
+      "owns_paths": [],
+      "consumes_paths": [],
+      "oracle": "reviewer findings recorded against the exact subject",
+      "gates": [
+        {
+          "name": "human-review",
+          "required_lane": "HUMAN",
+          "receipt_lane": null
+        }
+      ],
+      "blockers": [
+        "review is open"
+      ],
+      "writer_lease": "NONE",
+      "pr": {
+        "state": "DRAFT",
+        "head_sha": null,
+        "head_source": "LIVE_PROVIDER"
       }
     }
   ]
