@@ -86,7 +86,8 @@ cat > "${shared}/registry.json" <<'JSON'
   "schema": "shared-skills-registry/v2",
   "canonical_root": "skills",
   "shared": [
-    {"name": "demo-skill", "admitted": "2026-08-07", "why": "fixture"},
+    {"name": "demo-skill", "admitted": "2026-08-07", "why": "fixture",
+     "commands": ["demo"]},
     {"name": "shared-skills-infra", "admitted": "2026-08-07",
      "why": "the tool itself sits in canonical, so it needs an entry like anything else"}
   ],
@@ -149,6 +150,88 @@ grep -q "SHADOWED demo-skill: repoA/.claude" "${world}/3.err"
 rm -rf "${world}/repoA/.claude/skills/demo-skill"
 ln -s "${shared}/skills/demo-skill" "${world}/repoA/.claude/skills/demo-skill"
 run check | grep -q "PASS shared skills hold"
+
+# 4b. command forwarders are generated from the registry rather than hand-kept
+#     in five repositories (#1 ruling 4). A `.claude/commands/<name>.md` names a
+#     skill and a repository surface path, so it is binding by #1's own test --
+#     and binding that is derivable should be derived.
+cmds="${world}/repoA/.claude/commands"
+set +e; run commands >"${world}/4b.out" 2>&1; commands_status=$?; set -e
+test "${commands_status}" -eq 0
+grep -q "WOULD-GENERATE .*/commands/demo-skill.md" "${world}/4b.out"
+grep -q "WOULD-GENERATE .*/commands/demo.md" "${world}/4b.out"
+test ! -e "${cmds}"                          # a dry run wrote nothing
+
+run commands --apply > "${world}/4c.out"
+grep -q "^GENERATED .*/commands/demo-skill.md" "${world}/4c.out"
+test -f "${cmds}/demo.md"
+grep -q "skills/demo-skill/SKILL.md" "${cmds}/demo.md"       # alias resolves to the skill
+grep -q "相容別名" "${cmds}/demo.md"
+grep -q "本 repo 命令入口" "${cmds}/demo-skill.md"
+# The counted line, not just the verb: "wrote everything" and "wrote the first
+# one" print the same shape, and three is known in advance here -- two names for
+# demo-skill plus the governance skill's own.
+run commands --apply > "${world}/4d.out"
+grep -q "COMMANDS 0 to write, 0 stale, 3 already current" "${world}/4d.out"
+
+# hollow (1): a hand-maintained file sitting on a generated name. It usually
+# holds host binding that has to move to .skill-bindings/<skill>/ first, so
+# overwriting it would destroy exactly what the migration exists to preserve.
+# SURFACE, and the bytes stay put.
+printf 'hand written, holds host binding\n' > "${cmds}/demo.md"
+set +e; run commands --apply >"${world}/4e.out" 2>&1; foreign_status=$?; set -e
+test "${foreign_status}" -eq 3
+grep -q "hand-maintained command file" "${world}/4e.out"
+grep -q "^hand written, holds host binding$" "${cmds}/demo.md"
+
+# hollow (2): two of them. With one, "report every un-migrated file" and
+# "report the first one" are the same program -- the shape #16 names.
+printf 'hand written B\n' > "${cmds}/demo-skill.md"
+set +e; run commands --apply >"${world}/4f.out" 2>&1; plural_status=$?; set -e
+test "${plural_status}" -eq 3
+grep -q "SURFACE 2 hand-maintained" "${world}/4f.out"
+grep -q "/commands/demo.md" "${world}/4f.out"
+grep -q "/commands/demo-skill.md" "${world}/4f.out"
+rm "${cmds}/demo.md" "${cmds}/demo-skill.md"
+run commands --apply > /dev/null
+
+# hollow (3): a generated file whose name left the registry is stale and goes;
+# a file nobody generated, under a name the registry does not claim, is not
+# ours to remove. Without the second one, "remove stale" and "remove anything
+# unclaimed" behave identically.
+cp "${cmds}/demo.md" "${cmds}/retired.md"
+printf 'not ours\n' > "${cmds}/keepme.md"
+run commands --apply > "${world}/4g.out"
+grep -q "REMOVED .*/commands/retired.md" "${world}/4g.out"
+test ! -e "${cmds}/retired.md"
+test -f "${cmds}/keepme.md"
+rm "${cmds}/keepme.md"
+
+# hollow (4): one command name claimed by two skills. It resolves to neither,
+# so this is FAIL, and it must be refused before anything is written -- demo.md
+# still pointing at demo-skill is what proves the refusal came first.
+cp "${shared}/registry.json" "${world}/registry.bak"
+cat > "${shared}/registry.json" <<'JSON'
+{
+  "schema": "shared-skills-registry/v2",
+  "canonical_root": "skills",
+  "shared": [
+    {"name": "demo-skill", "admitted": "2026-08-07", "why": "fixture",
+     "commands": ["demo"]},
+    {"name": "shared-skills-infra", "admitted": "2026-08-07", "why": "fixture",
+     "commands": ["demo"]}
+  ],
+  "repo_owned": []
+}
+JSON
+set +e; run commands --apply >"${world}/4h.out" 2>&1; clash_status=$?; set -e
+test "${clash_status}" -eq 1
+grep -q "claimed by both" "${world}/4h.out"
+grep -q "skills/demo-skill/SKILL.md" "${cmds}/demo.md"
+cp "${world}/registry.bak" "${shared}/registry.json"
+
+# the world section 5 onward expects: no generated commands lying around
+rm -rf "${cmds}"
 
 # 5. report surfaces an unruled duplicate without calling it a failure
 for repo_surface in "${world}/repoA/.agents/skills" "${world}/repoA/.claude/skills"; do
