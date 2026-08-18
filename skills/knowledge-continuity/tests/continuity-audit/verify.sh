@@ -23,8 +23,12 @@ python3 "$gate" --audit "$work/good.json"
 #    hollow 文件的 exit code 非零，所以這一步不能被 set -e 吃掉。
 (
   cd "$skill_dir"
+  set +e
   python3 "$checker" tests/check-knowledge-continuity/fixtures/hollow/doc.md \
-    --quiet --audit-json "$work/hollow.json" >/dev/null || true
+    --quiet --audit-json "$work/hollow.json" >/dev/null
+  status=$?
+  set -e
+  test "${status}" -ne 0
 )
 python3 "$gate" --audit "$work/hollow.json"
 python3 - "$work/hollow.json" <<'PY'
