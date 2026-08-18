@@ -806,6 +806,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--result", type=Path, help="path for the run result document")
     parser.add_argument("--repetitions", type=int, default=None)
     parser.add_argument("--timeout", type=int, default=420)
+    # A previous run's attempts happened whether or not their receipts survived.
+    # These record that fact in the denominator instead of quietly restarting the
+    # count at zero; the lost scores are never admitted, only the attempt count.
+    parser.add_argument("--prior-lost-attempts", type=int, default=0)
+    parser.add_argument("--prior-lost-reason", default="")
     args = parser.parse_args(argv)
 
     try:
@@ -837,6 +842,20 @@ def main(argv: list[str] | None = None) -> int:
         porcelain_before = digest(git(consumer, "status", "--porcelain"))
         packets = {shape: build_packet(shape, repository, commit, tree) for shape in shapes}
 
+        bindings = {
+            "packet_digests": {shape: digest(text.encode()) for shape, text in packets.items()},
+            "scorer_sha256": digest(Path(__file__).read_bytes()),
+            "timeout_seconds": args.timeout,
+            "retries_permitted": 0,
+        }
+        # Identity of everything a cell's result depends on. A stored cell may be
+        # reused only when this matches, so a resumed run cannot silently mix
+        # results produced under two different rubrics or task packets.
+        binding_digest = digest({"bindings": bindings, "arms": {n: s["blob_sha1"] for n, s in arms.items()},
+                                 "commit": commit, "tree": tree})
+        if args.output:
+            args.output.mkdir(parents=True, exist_ok=True)
+
         cells: list[dict[str, Any]] = []
         for shape in shapes:
             for repetition in range(reps):
@@ -846,13 +865,26 @@ def main(argv: list[str] | None = None) -> int:
                         print(f"PLAN shape={shape} rep={repetition} arm={arm} "
                               f"prompt_bytes={len(prompt.encode())} packet_digest={digest(packets[shape].encode())[:12]}")
                         continue
+                    path = args.output / f"cell-{shape.lower()}-{arm.lower()}-{repetition}-{commit[:12]}.json"
+                    # Resume. A cell costs real tokens, so a run interrupted at
+                    # cell eleven must not buy the first ten again -- and each
+                    # cell is written the moment it is scored, because a receipt
+                    # that only exists at the end does not exist.
+                    if path.is_file():
+                        stored = json.loads(path.read_text(encoding="utf-8"))
+                        if stored.get("binding_digest") == binding_digest:
+                            cells.append(stored)
+                            print(f"CELL {shape} rep={repetition} arm={arm} REUSED "
+                                  f"passed={stored['score']['checks_passed']}/{stored['score']['checks_total']}", flush=True)
+                            continue
                     observation = run_host(prompt, consumer, args.timeout)
                     packet = extract_json_object(observation["text"])
-                    cells.append({
+                    cell = {
                         "shape": shape,
                         "arm": arm,
                         "repetition": repetition,
                         "cell_state": observation["cell_state"],
+                        "binding_digest": binding_digest,
                         "prompt_digest": digest(prompt.encode()),
                         "packet_digest": digest(packets[shape].encode()),
                         "arm_blob_sha1": arms[arm]["blob_sha1"],
@@ -860,10 +892,12 @@ def main(argv: list[str] | None = None) -> int:
                         "response": observation["text"],
                         "observation": {k: v for k, v in observation.items() if k != "text"},
                         "score": score(packet, shape, consumer, tree, commit, repository),
-                    })
+                    }
+                    path.write_text(json.dumps(cell, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+                    cells.append(cell)
                     print(f"CELL {shape} rep={repetition} arm={arm} state={observation['cell_state']} "
-                          f"passed={cells[-1]['score']['checks_passed']}/{cells[-1]['score']['checks_total']} "
-                          f"fabricated={cells[-1]['score']['fabricated_paths']}", flush=True)
+                          f"passed={cell['score']['checks_passed']}/{cell['score']['checks_total']} "
+                          f"fabricated={cell['score']['fabricated_paths']}", flush=True)
         if args.dry_run:
             print(f"PLAN-COMPLETE arms={sorted(arms)} shapes={shapes} repetitions={reps} "
                   f"cells={len(shapes) * reps * len(arms)}")
@@ -872,11 +906,6 @@ def main(argv: list[str] | None = None) -> int:
         porcelain_after = digest(git(consumer, "status", "--porcelain"))
         summary = summarise(cells, shapes, sorted(arms))
         decision = verdict(summary, cells, shapes, sorted(arms), reps, minimum)
-
-        args.output.mkdir(parents=True, exist_ok=True)
-        for cell in cells:
-            name = f"cell-{cell['shape'].lower()}-{cell['arm'].lower()}-{cell['repetition']}-{commit[:12]}.json"
-            (args.output / name).write_text(json.dumps(cell, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
         result = {
             "schema": "agentic-tech-lead/behavioral-ab-result/v1",
@@ -899,18 +928,16 @@ def main(argv: list[str] | None = None) -> int:
                      "version": subprocess.run([HOST["binary"], "--version"], capture_output=True,
                                                text=True, check=False).stdout.strip()},
             "arms": {name: {k: v for k, v in spec.items() if k != "text"} for name, spec in arms.items()},
-            "bindings": {
-                "packet_digests": {shape: digest(text.encode()) for shape, text in packets.items()},
-                "scorer_sha256": digest(Path(__file__).read_bytes()),
-                "timeout_seconds": args.timeout,
-                "retries_permitted": 0,
-            },
+            "bindings": {**bindings, "binding_digest": binding_digest},
             "repetitions_per_cell": reps,
             "minimum_repetitions_for_a_general_claim": minimum,
             "denominator": {
                 "attempts": len(cells),
                 "scored": sum(1 for cell in cells if cell["cell_state"] == "SCORED"),
                 "host_errors": sum(1 for cell in cells if cell["cell_state"] != "SCORED"),
+                "prior_attempts_lost_without_receipts": args.prior_lost_attempts,
+                "prior_attempts_lost_reason": args.prior_lost_reason,
+                "prior_attempts_scores_admitted": False,
                 "every_attempt_recorded": True,
             },
             "summary": summary,

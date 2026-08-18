@@ -1,0 +1,268 @@
+{
+  "arms": {
+    "A_OLD_T0_T10_MONOLITH": {
+      "blob_sha1": "a01f53592cda98f61b413b4467afa96356fb4ef7",
+      "path": "skills/agentic-tech-lead-orchestration/tests/fixtures/pre-refactor-SKILL.txt",
+      "sha256": "bd852c2b6c9c1f6cf5d5ddcd14f3d0ae2c6f1e83221841178d78c4227bf5ab28"
+    },
+    "B_REPAIRED_MODULAR_TECH_LEAD": {
+      "blob_sha1": "f6d667956f653d26f6adb8081e04dd80445504a3",
+      "path": "skills/agentic-tech-lead-orchestration/SKILL.md",
+      "sha256": "a1b2eb2e5f5e53135e5ae7b52e12acbb26c59eb9e47f7d87223028a3bbe8ae67"
+    }
+  },
+  "bindings": {
+    "binding_digest": "c8086f23cfc221351b2c6b31f30d33d0ebc2b2a59682b7279f7a94c2a2c719b2",
+    "packet_digests": {
+      "COOPERATIVE_DAG": "cb23f2cb934e9914bc047f733115658bcf1e27cf2e11a2ef6c989a456efa7e7c",
+      "TOURNAMENT": "0f14dc46d0f9e941a205f9478da62aac36dff9282ce99e0c4a6d79395467d83e"
+    },
+    "retries_permitted": 0,
+    "scorer_sha256": "2204b25478ee555e18b54b2c537d2b4a4370e5193f322c47851d39ed944db8a3",
+    "timeout_seconds": 420
+  },
+  "conclusion": "INSUFFICIENT_EVIDENCE",
+  "conclusion_reasons": [
+    "repetitions_per_cell 3 < preregistered minimum 9"
+  ],
+  "cost_and_latency_recorded_never_scored": {
+    "COOPERATIVE_DAG|A_OLD_T0_T10_MONOLITH|0": {
+      "cost_usd": 1.3264345,
+      "duration_ms": 256000,
+      "input_tokens": 2518,
+      "output_tokens": 19378,
+      "tool_calls": 19
+    },
+    "COOPERATIVE_DAG|A_OLD_T0_T10_MONOLITH|1": {
+      "cost_usd": 1.395639,
+      "duration_ms": 280171,
+      "input_tokens": 20,
+      "output_tokens": 20868,
+      "tool_calls": 17
+    },
+    "COOPERATIVE_DAG|A_OLD_T0_T10_MONOLITH|2": {
+      "cost_usd": 1.3317805000000003,
+      "duration_ms": 309315,
+      "input_tokens": 14,
+      "output_tokens": 22380,
+      "tool_calls": 16
+    },
+    "COOPERATIVE_DAG|B_REPAIRED_MODULAR_TECH_LEAD|0": {
+      "cost_usd": 1.6231445,
+      "duration_ms": 316577,
+      "input_tokens": 8139,
+      "output_tokens": 23692,
+      "tool_calls": 20
+    },
+    "COOPERATIVE_DAG|B_REPAIRED_MODULAR_TECH_LEAD|1": {
+      "cost_usd": 1.8432680000000001,
+      "duration_ms": 371086,
+      "input_tokens": 26,
+      "output_tokens": 28240,
+      "tool_calls": 21
+    },
+    "COOPERATIVE_DAG|B_REPAIRED_MODULAR_TECH_LEAD|2": {
+      "cost_usd": 1.791166,
+      "duration_ms": 304338,
+      "input_tokens": 1044,
+      "output_tokens": 23092,
+      "tool_calls": 29
+    },
+    "TOURNAMENT|A_OLD_T0_T10_MONOLITH|0": {
+      "cost_usd": 1.3991605000000003,
+      "duration_ms": 263453,
+      "input_tokens": 24,
+      "output_tokens": 19854,
+      "tool_calls": 19
+    },
+    "TOURNAMENT|A_OLD_T0_T10_MONOLITH|1": {
+      "cost_usd": 1.2415515000000001,
+      "duration_ms": 260469,
+      "input_tokens": 16,
+      "output_tokens": 20078,
+      "tool_calls": 16
+    },
+    "TOURNAMENT|A_OLD_T0_T10_MONOLITH|2": {
+      "cost_usd": 1.2937235,
+      "duration_ms": 319446,
+      "input_tokens": 14,
+      "output_tokens": 25006,
+      "tool_calls": 18
+    },
+    "TOURNAMENT|B_REPAIRED_MODULAR_TECH_LEAD|0": {
+      "cost_usd": 1.9283099999999997,
+      "duration_ms": 372565,
+      "input_tokens": 2562,
+      "output_tokens": 29171,
+      "tool_calls": 26
+    },
+    "TOURNAMENT|B_REPAIRED_MODULAR_TECH_LEAD|1": {
+      "cost_usd": 1.3145425,
+      "duration_ms": 268973,
+      "input_tokens": 3508,
+      "output_tokens": 20227,
+      "tool_calls": 18
+    },
+    "TOURNAMENT|B_REPAIRED_MODULAR_TECH_LEAD|2": {
+      "cost_usd": 1.9711969999999996,
+      "duration_ms": 341443,
+      "input_tokens": 32,
+      "output_tokens": 27097,
+      "tool_calls": 31
+    }
+  },
+  "denominator": {
+    "attempts": 12,
+    "every_attempt_recorded": true,
+    "host_errors": 0,
+    "prior_attempts_lost_reason": "first execution of this matrix was stopped by the harness at cell 12 of 12; that runner only persisted receipts at the end, so eleven attempts left no admissible receipt and their observed scores are not admitted",
+    "prior_attempts_lost_without_receipts": 11,
+    "prior_attempts_scores_admitted": false,
+    "scored": 12
+  },
+  "evidence_boundary": [
+    "This establishes behavioral evidence only for these two bodies, this consumer subject, this model, this host and this repetition count.",
+    "Linked worktrees and physical Worker processes are closed deterministically by tests/real_task_ab.py, not by this lane; this lane runs one physical host process per cell and claims nothing more.",
+    "Provider adapters, Git Town, Forgejo, publication and GitHub Actions remain NOT_EXERCISED.",
+    "Merge and promotion remain HUMAN_ADMIT_REQUIRED."
+  ],
+  "host": {
+    "allowed_tools": [
+      "Read",
+      "Glob",
+      "Grep"
+    ],
+    "binary": "claude",
+    "disallowed_tools": [
+      "Write",
+      "Edit",
+      "NotebookEdit",
+      "Bash"
+    ],
+    "id": "claude-code",
+    "model": "opus",
+    "runtime": "CLAUDE_CODE_LOCAL",
+    "version": "2.1.233 (Claude Code)"
+  },
+  "issue": "ed3c/skills-shared#316",
+  "minimum_repetitions_for_a_general_claim": 9,
+  "not_exercised": {
+    "forgejo_and_github_publication": "NOT_EXERCISED",
+    "git_town": "NOT_EXERCISED",
+    "linked_worktrees_and_physical_workers": "CLOSED_ELSEWHERE tests/real_task_ab.py",
+    "merge_authority": "HUMAN_ADMIT_REQUIRED",
+    "provider_adapters": "NOT_EXERCISED"
+  },
+  "preregistration": {
+    "frozen_before_execution": true,
+    "path": "skills/agentic-tech-lead-orchestration/evals/behavioral-ab-preregistration.json",
+    "sha256": "ad6496a504f6cf69d1a18e9a05d47a004afa8ac2e2332ce69faf9b0b20cada29"
+  },
+  "repetitions_per_cell": 3,
+  "schema": "agentic-tech-lead/behavioral-ab-result/v1",
+  "subject": {
+    "base_commit": "13ff9840fc5683b33670fa191591035bc96292dc",
+    "base_tree": "947ba9a2c19268b95414a2918b88283d23a0ce2c",
+    "consumer_repository": "ed3c/bettor-arena",
+    "residue": "CLEAN",
+    "skills_shared_head": "711fa3f4bf804a2c69bf7f5774e48fc3e3d346a2",
+    "worktree_porcelain_after": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126",
+    "worktree_porcelain_before": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126"
+  },
+  "summary": {
+    "COOPERATIVE_DAG|A_OLD_T0_T10_MONOLITH": {
+      "attempts": 3,
+      "checks_total": 14,
+      "host_errors": 0,
+      "mean_checks_passed": 12.0,
+      "mean_path_fabrication_rate": 0.0523,
+      "per_check_pass_count": {
+        "acyclic": 3,
+        "attempts_cover_every_node": 3,
+        "convergence_after_all_inputs": 0,
+        "depends_on_resolvable": 3,
+        "edge_implies_dependency": 0,
+        "edges_fully_bound": 3,
+        "evidence_packet_complete": 3,
+        "exact_subject_continuity": 3,
+        "lease_disjoint": 3,
+        "no_auto_merge": 3,
+        "no_false_parallelism": 3,
+        "no_placeholder_commands": 3,
+        "schema_ok": 3,
+        "write_readonly_disjoint": 3
+      },
+      "scored": 3
+    },
+    "COOPERATIVE_DAG|B_REPAIRED_MODULAR_TECH_LEAD": {
+      "attempts": 3,
+      "checks_total": 14,
+      "host_errors": 0,
+      "mean_checks_passed": 12.6667,
+      "mean_path_fabrication_rate": 0.0663,
+      "per_check_pass_count": {
+        "acyclic": 3,
+        "attempts_cover_every_node": 3,
+        "convergence_after_all_inputs": 2,
+        "depends_on_resolvable": 3,
+        "edge_implies_dependency": 0,
+        "edges_fully_bound": 3,
+        "evidence_packet_complete": 3,
+        "exact_subject_continuity": 3,
+        "lease_disjoint": 3,
+        "no_auto_merge": 3,
+        "no_false_parallelism": 3,
+        "no_placeholder_commands": 3,
+        "schema_ok": 3,
+        "write_readonly_disjoint": 3
+      },
+      "scored": 3
+    },
+    "TOURNAMENT|A_OLD_T0_T10_MONOLITH": {
+      "attempts": 3,
+      "checks_total": 13,
+      "host_errors": 0,
+      "mean_checks_passed": 9.6667,
+      "mean_path_fabrication_rate": 0.0379,
+      "per_check_pass_count": {
+        "acyclic": 3,
+        "candidates_share_base": 0,
+        "denominator_complete": 2,
+        "depends_on_resolvable": 3,
+        "evidence_packet_complete": 3,
+        "exact_subject_continuity": 3,
+        "lease_disjoint": 0,
+        "no_auto_merge": 3,
+        "no_placeholder_commands": 3,
+        "schema_ok": 3,
+        "three_differentiated_candidates": 3,
+        "winner_declared_with_rationale": 0,
+        "write_readonly_disjoint": 3
+      },
+      "scored": 3
+    },
+    "TOURNAMENT|B_REPAIRED_MODULAR_TECH_LEAD": {
+      "attempts": 3,
+      "checks_total": 13,
+      "host_errors": 0,
+      "mean_checks_passed": 10.3333,
+      "mean_path_fabrication_rate": 0.0419,
+      "per_check_pass_count": {
+        "acyclic": 3,
+        "candidates_share_base": 0,
+        "denominator_complete": 3,
+        "depends_on_resolvable": 3,
+        "evidence_packet_complete": 3,
+        "exact_subject_continuity": 3,
+        "lease_disjoint": 0,
+        "no_auto_merge": 3,
+        "no_placeholder_commands": 3,
+        "schema_ok": 3,
+        "three_differentiated_candidates": 3,
+        "winner_declared_with_rationale": 1,
+        "write_readonly_disjoint": 3
+      },
+      "scored": 3
+    }
+  }
+}

@@ -9,4 +9,6 @@ Real-task control ownership:
 - `real_task_runtime.py` creates real linked worktrees and subprocess Workers, proves path-disjoint overlap, checkpoint/resume, candidate comparison, global-objective veto, correct convergence ancestry, and residue cleanup.
 - `real_task_scheduler.py` projects actual observations into the canonical scheduler lifecycle contract and requires planted active-writer, stale-result, retry-lineage, and fixture-to-PASS mutations to fail.
 
+`run-all.sh` also runs `../scripts/run_behavioral_ab.py --selftest`. That script is the only one in this Skill that can spend tokens, and its selftest is the cheap surface that proves it discriminates before it is ever pointed at a host: it builds its own throwaway subject, scores two clean packets, and requires every planted rubric defect to turn its own check red. The selftest never invokes a model; the live run is a separate, explicitly-argumented invocation whose receipts land in `../evals/`.
+
 The suite is offline and zero-network. It does not activate provider/model, Git Town, Forgejo, publication, merge, or production authority. Temporary repositories, worktrees, branches, processes, and receipts must be removed at close.
