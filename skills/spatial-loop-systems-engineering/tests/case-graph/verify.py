@@ -51,6 +51,13 @@ m["coverage"]["source_behavior_disposition"] = 0.5
 m["gate"]["status"] = "READY_FOR_PROTOTYPE"
 expect_red("silent semantic loss", m, "invalid/unmapped disposition")
 
+# A syntactically valid preserve disposition without a case edge is still semantic loss.
+m = copy.deepcopy(base)
+m["edges"] = [e for e in m["edges"] if not (e["from"] == "SRC-002" and e["to"] == "CASE-002")]
+m["coverage"]["source_behavior_disposition"] = 0.5
+m["gate"]["status"] = "READY_FOR_PROTOTYPE"
+expect_red("unbound source behavior", m, "requires a case edge")
+
 # Intentional drop without authority decision.
 m = copy.deepcopy(base)
 m["source_behaviors"][1]["disposition"] = "DROP_EXPLICIT"
@@ -65,6 +72,20 @@ m["coverage"]["required_case"] = 0.5
 m["coverage"]["oracle"] = 0.5
 m["gate"]["status"] = "READY_FOR_PROTOTYPE"
 expect_red("compatibility-only migration", m, "requires oracle_ids")
+
+# PASS cannot exist only as model prose on the case object; bind an evidence receipt.
+m = copy.deepcopy(base)
+m["cases"][1]["evidence_ids"] = []
+m["coverage"]["executed_evidence"] = 0.5
+m["gate"]["status"] = "READY_FOR_IMPLEMENTATION"
+expect_red("evidence laundering", m, "PASS requires evidence_ids")
+
+# Case PASS must agree with the state of its referenced evidence.
+m = copy.deepcopy(base)
+m["evidence"][1]["state"] = "NOT_EXERCISED"
+m["coverage"]["executed_evidence"] = 0.5
+m["gate"]["status"] = "READY_FOR_IMPLEMENTATION"
+expect_red("evidence state mismatch", m, "is not backed by referenced evidence")
 
 # Provenance cycle is forbidden even though runtime state machines may cycle.
 m = copy.deepcopy(base)
@@ -81,6 +102,7 @@ m["cases"].append({
     "invariant_or_state_refs": [],
     "implementation_ids": [],
     "oracle_ids": [],
+    "evidence_ids": [],
     "decision_id": None,
     "evidence_state": "ABSENT"
 })
