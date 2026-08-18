@@ -67,6 +67,61 @@
         "rollback": false
       },
       "remaining_issues": [231, 232, 234, 256, 312]
+    },
+    {
+      "id": "forgejo-delivery-readback-ab-v1",
+      "owner_skill": "forgejo-delivery-loop",
+      "issue": 346,
+      "pull_requests": [189, 270],
+      "entrypoint": "skills/forgejo-delivery-loop/tests/real_task_ab.py",
+      "runner": "skills/forgejo-delivery-loop/tests/run-all.sh",
+      "treatments": [
+        {
+          "id": "A_OLD_CANONICAL",
+          "role": "OLD_CANONICAL",
+          "path": "skills/forgejo-delivery-loop/tests/fixtures/pre-refactor-SKILL.txt",
+          "blob_sha": "9f47aa5d8c90b1141afd7ca15ef06e086c7f2fbb"
+        },
+        {
+          "id": "B0_REFACTOR_AS_LANDED",
+          "role": "REFACTOR_AS_LANDED",
+          "path": "skills/forgejo-delivery-loop/tests/fixtures/refactor-as-landed-SKILL.txt",
+          "blob_sha": "c75c7f2d7e94eb0b4ec0a5b4355084849154fe15"
+        },
+        {
+          "id": "B1_CONTROLS_REBOUND",
+          "role": "REPAIRED_CANDIDATE",
+          "path": "skills/forgejo-delivery-loop/SKILL.md",
+          "blob_sha": "4d8ec3ad2bb920b92751b397f1c62265a26934c8"
+        }
+      ],
+      "proof_layers": {
+        "L0_SOURCE_FREEZE": "PASS",
+        "L1_STRUCTURAL_REACHABILITY": "PASS",
+        "L2_EXECUTABLE_CONTRACT": "PASS",
+        "L3_HERMETIC_REAL_TASK": "PASS",
+        "L4_MATCHED_LIVE_MODEL_RUNTIME": "NOT_IMPLEMENTED",
+        "L5_DELIVERY_AND_HUMAN_ADMIT": "HUMAN_ADMIT_REQUIRED"
+      },
+      "highest_layer": "L3_HERMETIC_REAL_TASK",
+      "denominator": {
+        "failed_retained": true,
+        "stale_retained": true,
+        "blocked_retained": true,
+        "cancelled_retained": true,
+        "superseded_retained": true
+      },
+      "cleanup": "CLEAN",
+      "authority": {
+        "provider_activation": false,
+        "publication": false,
+        "semantic_conflict_resolution": false,
+        "merge": false,
+        "release": false,
+        "promotion": false,
+        "rollback": false
+      },
+      "remaining_issues": [346]
     }
   ]
 }
