@@ -146,6 +146,7 @@ def validate(doc: Any) -> list[str]:
     case_oracle_closed = 0
     required_case_closed = 0
     executed_evidence_closed = 0
+    required_pass_closed = 0
     intent_covered: set[str] = set()
 
     for case_id, case in cases.items():
@@ -174,6 +175,7 @@ def validate(doc: Any) -> list[str]:
         for ref in oracle_ids:
             if ref not in oracles:
                 errors.append(f"case {case_id} references unknown oracle {ref}")
+
         referenced_evidence_states: list[str] = []
         for ref in evidence_ids:
             if ref not in evidence:
@@ -209,6 +211,8 @@ def validate(doc: Any) -> list[str]:
                 required_case_closed += 1
             if evidence_ids and state in {"PASS", "FAIL"} and state in referenced_evidence_states:
                 executed_evidence_closed += 1
+            if evidence_ids and state == "PASS" and "PASS" in referenced_evidence_states:
+                required_pass_closed += 1
 
         if classification == "OUT_OF_SCOPE_EXPLICIT":
             decision_id = case.get("decision_id")
@@ -305,8 +309,11 @@ def validate(doc: Any) -> list[str]:
         for key in ("intent", "source_behavior_disposition", "required_case", "implementation_binding", "oracle"):
             if computed[key] != 1.0:
                 errors.append(f"gate {status} requires coverage.{key}=1.0")
-    if status == "READY_FOR_PUBLICATION_REVIEW" and computed["executed_evidence"] != 1.0:
-        errors.append("READY_FOR_PUBLICATION_REVIEW requires executed_evidence=1.0")
+    if status == "READY_FOR_PUBLICATION_REVIEW":
+        if computed["executed_evidence"] != 1.0:
+            errors.append("READY_FOR_PUBLICATION_REVIEW requires executed_evidence=1.0")
+        if required_pass_closed != len(required_cases):
+            errors.append("READY_FOR_PUBLICATION_REVIEW requires every required case to have subject-bound PASS evidence")
 
     return errors
 
