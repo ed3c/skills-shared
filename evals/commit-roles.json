@@ -508,6 +508,11 @@
         "commit_sha": "867a4c73e0136d64ab041789d622b503e811d01f",
         "subject": "chore(license): adopt Apache-2.0",
         "reason": "pushed straight to main by a concurrent writer session on this host during the 2026-08-18 delivery batch, colliding with the decision-package activation 874ab7c; the producing endpoint wrote no trailers and the driver cannot be observed from the commit, so assigning one would be invention"
+      },
+      {
+        "commit_sha": "6079a8980544101744b76d8b797b2770976852ad",
+        "subject": "fix(license): make Apache-2.0 SPDX-detectable",
+        "reason": "second trailerless push from the same concurrent writer session on this host (2026-08-18); published history cannot be rewritten; the producing endpoint still writes no trailers"
       }
     ]
   }
