@@ -140,6 +140,22 @@ python3 skills/agentic-tech-lead-orchestration/scripts/assert_local_handoff_queu
   --selftest
 ```
 
+## Local/cloud offload
+
+The Local Handoff Execution Queue answers "another host must continue this".
+A different boundary is "a remote lane runs this while the local lane is
+disconnected", and it is not the same method: two lanes execute concurrently,
+delivery is at-least-once, and the result arrives after local state has moved.
+Route there with [`references/dual-agent-offload/OFFLOAD_METHOD.md`](references/dual-agent-offload/OFFLOAD_METHOD.md), which owns the portable state
+machine, the authority roles, the idempotency and effect-ledger requirements,
+and the evidence and egress laws. Its shape gates are the two schemas beside it
+and its only semantic authority is `tests/dual-agent-offload-contract/verify.py`.
+
+That method declares which logical runtime contracts must exist and never
+defines their wire shapes; those belong to the Runtime Contract Plane, and one
+interface owned by two planes guarantees drift. A method contract may pin a
+runtime contract ID and digest, and may never claim it is implemented or live.
+
 ## Module selection
 
 Load `modules/domain-profile.md` only when concrete code-intelligence providers, parsers, symbol/executor tools, projections, schedulers, runtime carriers, or consumer commands must be bound. That profile is the only provider-specific router. Selection must be materialized in a capability plan, not inferred ad hoc during execution.

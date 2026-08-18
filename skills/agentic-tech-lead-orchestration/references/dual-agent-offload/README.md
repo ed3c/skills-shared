@@ -19,6 +19,13 @@ LOCAL_INTENT_BOUND
 → OFFLOAD_HANDOFF_FROZEN
 ```
 
+- [`OFFLOAD_METHOD.md`](OFFLOAD_METHOD.md) — the method itself in the reviewer's
+  vocabulary: the full ten-state offload machine, its five terminals, and why
+  the frozen contract
+  stops at state five, the authority roles, the idempotency and effect-ledger
+  requirements, the evidence and egress laws, the plane boundary, and the table
+  mapping each law to the control that enforces it. Read this first; the schemas
+  say what a document must contain and never say why.
 - `method-contract.v1.schema.json` — the portable method: data classes,
   side-effect classes, evidence lanes, the authority map, the failure
   distinctions that must stay separable, and the logical runtime contracts an

@@ -8,12 +8,13 @@ Portable contract-first orchestration for turning one large coding request into 
 2. [`SKILL.md`](SKILL.md)
 3. task, capability and scheduler schemas under [`references/`](references/README.md)
 4. when local/runtime-only evidence remains, `references/local-handoff-queue.schema.json` and the example queue
-5. [`modules/README.md`](modules/README.md), then only selected modules
-6. [`scripts/README.md`](scripts/README.md)
-7. [`tests/README.md`](tests/README.md)
-8. [`../skill-refactor-proof-loop/README.md`](../skill-refactor-proof-loop/README.md) and its golden registry
-9. exact issue, PR base/head, workflow and receipt subjects
-10. [`../../docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md`](../../docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md) before a global completion claim
+5. when the work must run in a remote lane while the local one is disconnected, [`references/dual-agent-offload/OFFLOAD_METHOD.md`](references/dual-agent-offload/OFFLOAD_METHOD.md)
+6. [`modules/README.md`](modules/README.md), then only selected modules
+7. [`scripts/README.md`](scripts/README.md)
+8. [`tests/README.md`](tests/README.md)
+9. [`../skill-refactor-proof-loop/README.md`](../skill-refactor-proof-loop/README.md) and its golden registry
+10. exact issue, PR base/head, workflow and receipt subjects
+11. [`../../docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md`](../../docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md) before a global completion claim
 
 ## Directory map → State Machine ownership
 
@@ -32,6 +33,8 @@ skills/agentic-tech-lead-orchestration/
 │   ├── scheduler-lifecycle.schema.json
 │   ├── local-handoff-queue.schema.json
 │   ├── example-local-handoff-queue.json
+│   ├── dual-agent-offload/
+│   │     └── portable local/cloud offload method, contracts and controls
 │   ├── prompt/task examples and causal maps
 │   └── frozen contract and evidence vocabulary
 ├── modules/
