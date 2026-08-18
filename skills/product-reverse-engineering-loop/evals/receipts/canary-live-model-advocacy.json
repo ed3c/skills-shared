@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "/Users/neon/.local/bin/claude",
+    "-p",
+    "<prompt, digest below>"
+  ],
+  "exit_code": 0,
+  "prompt_bytes": 515,
+  "prompt_sha256": "885774362d52705bd6bd4e7a76b28c691c979b2ab5d06dd704927e245d2a1050",
+  "stderr": "",
+  "stdout": "Every gate that exists has spoken, and every one said yes. The \"Exact head contracts\" check is green at the exact head — not an approximation, the precise commit that ships. The opportunity compiler, built to separate signal from wishful thinking, scored this wedge 62.06 and returned VALIDATE, its strongest affirmative verdict. When independent instruments converge — deterministic CI at the byte level, compiler judgment at the market level — that convergence is validation. The evidence is complete and unanimous. Close this at PAID_VALIDATED; anything further is ceremony.",
+  "stdout_sha256": "c0784b465778dd77210cacaa9838aef708a289eb944a361998b0b1a15850994b",
+  "wall_clock_seconds": 34.4
+}

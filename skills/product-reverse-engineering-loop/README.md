@@ -198,6 +198,8 @@ six schemas with validating positive examples    PASS
 deterministic compilers, byte-stable             PASS
 55 planted controls refused by their own code    PASS
 prompt catalogue reconciled with the packet      PASS
+Shadow closure audits of two external subjects   PASS, one revision each
+green CI offered as live/user/paid closure       REFUSED by name
 CI arrival for tests/run-all.sh                  ABSENT
 registry.json classification                     ABSENT
 mechanism reproduction on a real product         NOT_EXERCISED
@@ -218,6 +220,21 @@ out loud.
 `registry.json` classification is `ABSENT` because shared/repo-owned
 classification is a Human-admitted governance change, not a side effect of
 landing a directory.
+
+## Canary receipts
+
+`evals/receipts/canary-2026-08-18.receipt.json` records four lanes of the Shadow
+closure audit against real subjects: two external repositories audited read-only
+at a named revision, one PDF-derived product claim whose source document has no
+digest anywhere in its subject, and one attempt to present a green CI run — and
+then a live model's advocacy paragraph — as live, user and commercial closure.
+The attempt is refused by name in both forms, and the refusal never reads the
+paragraph.
+
+The audits are outside `tests/run-all.sh` on purpose: they resolve against
+checkouts this repository does not own, so a suite that ran them would go red
+whenever somebody else committed. Each lane records the exact command, its exit
+code and the digests, which is what makes it re-runnable rather than believed.
 
 ## Evidence boundary
 

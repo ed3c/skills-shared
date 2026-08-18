@@ -788,30 +788,38 @@ def walk_subjects(value: Any, path: str = "") -> list[tuple[str, dict]]:
     return found
 
 
-def check_resolved_subjects(artifact: Any, root: Path) -> list[str]:
+def check_resolved_subjects(artifact: Any, roots: list[Path]) -> list[str]:
     """Every named subject must still exist and still hash to what was recorded.
 
     Without this, a digest is only a promise the artifact makes about a file
     nobody re-reads: the file moves, the packet keeps pointing at a subject that
     no longer exists, and every downstream state stays green describing bytes
     that are gone.
+
+    More than one root may be given, because an audit's subjects genuinely live
+    in different trees -- a README in the audited checkout, a captured issue
+    snapshot beside the receipt. A subject resolves when some root holds a file
+    of that name whose bytes hash to the recorded digest; a name that exists in
+    a root with different bytes reports that root's digest, which is the useful
+    half of the message.
     """
     problems: list[str] = []
     for where, binding in walk_subjects(artifact):
         name = binding.get("artifact")
         if not isinstance(name, str) or not name:
             continue
-        target = root / name
-        if not target.is_file():
+        found = [root / name for root in roots if (root / name).is_file()]
+        if not found:
             problems.append(
-                f"STALE_SUBJECT {where} names {name!r}, which is not in {root}"
+                f"STALE_SUBJECT {where} names {name!r}, which is in none of "
+                f"{[str(root) for root in roots]}"
             )
             continue
-        actual = digest(target)
-        if binding.get("digest") != actual:
+        actual = [digest(target) for target in found]
+        if binding.get("digest") not in actual:
             problems.append(
                 f"STALE_SUBJECT {where} records {binding.get('digest')!r} for "
-                f"{name!r}, which currently hashes to {actual!r}"
+                f"{name!r}, which currently hashes to {actual[0]!r}"
             )
     return problems
 
@@ -841,8 +849,10 @@ def main() -> int:
     parser.add_argument(
         "--resolve-subjects",
         type=Path,
+        action="append",
         help="directory the artifact's exact_subject/derived_from names resolve "
-        "against; enables the stale-subject control on every binding",
+        "against; enables the stale-subject control on every binding. Repeat it "
+        "when the audited subjects live in more than one tree",
     )
     args = parser.parse_args()
 

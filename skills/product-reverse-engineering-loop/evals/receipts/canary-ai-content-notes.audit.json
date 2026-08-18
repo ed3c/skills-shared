@@ -1,0 +1,486 @@
+{
+  "audit_subject": {
+    "captured_at": "2026-08-18",
+    "compared_surfaces": [
+      "README.md",
+      "AGENTS.md",
+      "evals/semantic-yield/CvRngaQZQ3Y/semantic-validator-report.json",
+      "evals/semantic-yield/CvRngaQZQ3Y/run-state.md",
+      "tools/validate_semantic_yield_artifacts.py",
+      "tools/build_model_run_receipt.py",
+      "canary-ai-content-notes-forge-capture.json"
+    ],
+    "subject_id": "ed3c/ai-content-notes",
+    "subject_revision": "6afe799f9ba01c0c7ab4a25dffe5f226c0d05d53",
+    "surface": "the checked-out repository at that revision, plus its forge issue and check-run state captured beside this audit"
+  },
+  "evidence_ceiling": {
+    "deterministic_contract": "PASS",
+    "live_provider_execution": "NOT_EXERCISED",
+    "portable_procedure": "PASS",
+    "product_market_fit": "ABSENT",
+    "production_readiness": "NOT_EXERCISED"
+  },
+  "external_authority": {
+    "commercial": "HUMAN_ADMIT_REQUIRED",
+    "customer_truth": "HUMAN_ADMIT_REQUIRED",
+    "merge": "HUMAN_ADMIT_REQUIRED",
+    "release": "HUMAN_ADMIT_REQUIRED",
+    "rights": "HUMAN_ADMIT_REQUIRED"
+  },
+  "issue_delta": [
+    {
+      "action": "PROPOSE_UPDATE",
+      "id": "DLT-001",
+      "problem_id": "PRB-001",
+      "statement": "propose restating the README gate-coverage line as twelve of twenty-four, matching the committed validator report and the open coverage item, so the count has one value across the surfaces",
+      "write_authority": "NO_WRITE_AUTHORITY"
+    },
+    {
+      "action": "PROPOSE_UPDATE",
+      "id": "DLT-002",
+      "problem_id": "PRB-001",
+      "statement": "propose recording the twelve gates that were never run as an explicit obligation on the batch, so a green check run at this head is not read as gate coverage",
+      "write_authority": "NO_WRITE_AUTHORITY"
+    },
+    {
+      "action": "PROPOSE_UPDATE",
+      "id": "DLT-003",
+      "problem_id": "PRB-002",
+      "statement": "propose stating on the batch itself that no provider run receipt exists for its compilation, beside the schemas and builder that would carry one",
+      "write_authority": "NO_WRITE_AUTHORITY"
+    },
+    {
+      "action": "PROPOSE_BLOCKED_NOTE",
+      "id": "DLT-004",
+      "problem_id": "PRB-003",
+      "statement": "propose recording the visual lane as blocked on an unadmitted rights basis rather than deferred, since a deferred check reads as scheduling and this one is waiting on a person",
+      "write_authority": "NO_WRITE_AUTHORITY"
+    }
+  ],
+  "problems": [
+    {
+      "declared_status": {
+        "anchor": {
+          "exact_subject": {
+            "artifact": "README.md",
+            "digest": "566cb1d9a68e5ff22eec82e3ae8c8a26d0005a496fdd8a0fb0c49494496209c9"
+          },
+          "kind": "SOURCE_DOCUMENT",
+          "locator": "line 185 and lines 220-224",
+          "observed": "the materialized list states a deterministic semantic validator with a ten-gate evidence subset, and the validation section lists ten gate identifiers as the existing host-validated subset"
+        },
+        "claimed_level": "TECH_VERIFIED",
+        "statement": "the persisted card batch is host-validated over a ten-gate evidence subset"
+      },
+      "findings": [
+        {
+          "anchors": [
+            {
+              "exact_subject": {
+                "artifact": "evals/semantic-yield/CvRngaQZQ3Y/semantic-validator-report.json",
+                "digest": "34c51957317f104d332fbd7471016e3069011278488db3fa7576ab44e3317a1a"
+              },
+              "kind": "DETERMINISTIC_SUITE",
+              "locator": "qg_subset",
+              "observed": "twelve gates are recorded PASS, including two the README's ten-gate list omits, and qg_not_run holds the other twelve"
+            },
+            {
+              "exact_subject": {
+                "artifact": "canary-ai-content-notes-forge-capture.json",
+                "digest": "7f6a31081bfc7607358491f8c91e234aabaaa338aa1600866393d11789e62489"
+              },
+              "kind": "ISSUE_RECORD",
+              "locator": "issue_lane.issues[number=43]",
+              "observed": "an open item states the coverage target as expanding past twelve of twenty-four"
+            }
+          ],
+          "authority": "FINDINGS_ONLY",
+          "code": "SUBJECT_STALE",
+          "id": "FND-001",
+          "proposed_repair": "restate the README count from the committed report rather than from the earlier subset, and cite the report as its source so the two cannot drift again",
+          "statement": "the README states a ten-gate host-validated subset while the committed validator report for the same batch records twelve, so the surface a reader trusts is behind the receipt it summarises"
+        },
+        {
+          "anchors": [
+            {
+              "exact_subject": {
+                "artifact": "evals/semantic-yield/CvRngaQZQ3Y/run-state.md",
+                "digest": "d19978d432d186c31d8eae35e017531d3b27c62c296ce637e0f01e39a151d4b0"
+              },
+              "kind": "SOURCE_DOCUMENT",
+              "locator": "remaining_work",
+              "observed": "running the external gates one through twenty-four is still listed as remaining work while the batch is persisted and the run state is CONTINUE"
+            }
+          ],
+          "authority": "FINDINGS_ONLY",
+          "code": "OBLIGATION_SKIPPED_AT_FIRST_GREEN",
+          "id": "FND-002",
+          "proposed_repair": "keep the twelve unrun gates named on the batch as an open obligation, so the persisted state carries them instead of the reader having to reconstruct which half ran",
+          "statement": "half the external gates have never been executed for this batch, and the green check runs at this head say nothing about them"
+        }
+      ],
+      "highest_earned_level": "TECH_VERIFIED",
+      "id": "PRB-001",
+      "levels": [
+        {
+          "anchors": [
+            {
+              "exact_subject": {
+                "artifact": "README.md",
+                "digest": "566cb1d9a68e5ff22eec82e3ae8c8a26d0005a496fdd8a0fb0c49494496209c9"
+              },
+              "kind": "SOURCE_DOCUMENT",
+              "locator": "the deterministic validation section",
+              "observed": "the gate subset, the validator command and the batch it applies to are stated in the repository's own entry document"
+            }
+          ],
+          "lane": "SOURCE",
+          "level": "SOURCE_ANCHORED",
+          "state": "PASS"
+        },
+        {
+          "anchors": [
+            {
+              "exact_subject": {
+                "artifact": "evals/semantic-yield/CvRngaQZQ3Y/semantic-validator-report.json",
+                "digest": "34c51957317f104d332fbd7471016e3069011278488db3fa7576ab44e3317a1a"
+              },
+              "kind": "MECHANISM_OBSERVATION",
+              "locator": "checks and qg_subset, each with its own evidence and failures list",
+              "observed": "each gate records the evidence it consumed and the failures it would have reported, so a gate that stopped holding would show as a failure rather than as silence"
+            }
+          ],
+          "lane": "MECHANISM",
+          "level": "MECHANISM_BOUND",
+          "state": "PASS"
+        },
+        {
+          "anchors": [
+            {
+              "exact_subject": {
+                "artifact": "tools/validate_semantic_yield_artifacts.py",
+                "digest": "4cb2af0d954b90180fef9785fa98bda518f00ce3c4fbaece25440995da4b008c"
+              },
+              "kind": "CODE_SUBJECT",
+              "locator": "the validator entry point",
+              "observed": "the validator that produces the report exists at this revision and is the tool the README's command invokes"
+            }
+          ],
+          "lane": "IMPLEMENTATION",
+          "level": "IMPLEMENTED",
+          "state": "PASS"
+        },
+        {
+          "anchors": [
+            {
+              "exact_subject": {
+                "artifact": "canary-ai-content-notes-forge-capture.json",
+                "digest": "7f6a31081bfc7607358491f8c91e234aabaaa338aa1600866393d11789e62489"
+              },
+              "kind": "CI_RUN",
+              "locator": "ci_lane.check_runs.runs",
+              "observed": "the validate legs on Python 3.11 and 3.13 completed with conclusion success against this exact head"
+            },
+            {
+              "exact_subject": {
+                "artifact": "evals/semantic-yield/CvRngaQZQ3Y/semantic-validator-report.json",
+                "digest": "34c51957317f104d332fbd7471016e3069011278488db3fa7576ab44e3317a1a"
+              },
+              "kind": "DETERMINISTIC_SUITE",
+              "locator": "overall_status",
+              "observed": "the persisted report is PASS_WITH_DEFERRED_VISUAL_AND_PARTIAL_QG, which is a pass over the subset it ran and states its own two exclusions"
+            }
+          ],
+          "lane": "IMPLEMENTATION",
+          "level": "TECH_VERIFIED",
+          "state": "PASS"
+        },
+        {
+          "anchors": [],
+          "lane": "RUNTIME",
+          "level": "LIVE_WORKFLOW_VERIFIED",
+          "note": "the external gates one through twenty-four are named as remaining work in the batch run state; the oracle exists and half of it has not been executed",
+          "state": "NOT_EXERCISED"
+        },
+        {
+          "anchors": [],
+          "lane": "USER",
+          "level": "USER_VALIDATED",
+          "note": "no user-lane evidence exists in this repository for gate coverage",
+          "state": "ABSENT"
+        },
+        {
+          "anchors": [],
+          "lane": "COMMERCIAL",
+          "level": "PAID_VALIDATED",
+          "state": "ABSENT"
+        }
+      ],
+      "missing_lanes": ["COMMERCIAL", "RUNTIME", "USER"],
+      "statement": "the persisted card batch's quality gates are covered, and the coverage a reader is told about is the coverage the receipts hold"
+    },
+    {
+      "declared_status": {
+        "anchor": {
+          "exact_subject": {
+            "artifact": "README.md",
+            "digest": "566cb1d9a68e5ff22eec82e3ae8c8a26d0005a496fdd8a0fb0c49494496209c9"
+          },
+          "kind": "SOURCE_DOCUMENT",
+          "locator": "line 196, under still incomplete",
+          "observed": "the provider and model raw-run receipt for the historical batch compilation is listed as still incomplete"
+        },
+        "claimed_level": "BLOCKED",
+        "statement": "no provider or model run receipt exists for the compilation that produced the persisted batch"
+      },
+      "findings": [
+        {
+          "anchors": [
+            {
+              "exact_subject": {
+                "artifact": "canary-ai-content-notes-forge-capture.json",
+                "digest": "7f6a31081bfc7607358491f8c91e234aabaaa338aa1600866393d11789e62489"
+              },
+              "kind": "ISSUE_RECORD",
+              "locator": "issue_lane.issues[number=40]",
+              "observed": "provider invocation and the multimodal benchmark remain open on the forge"
+            },
+            {
+              "exact_subject": {
+                "artifact": "evals/semantic-yield/CvRngaQZQ3Y/run-state.md",
+                "digest": "d19978d432d186c31d8eae35e017531d3b27c62c296ce637e0f01e39a151d4b0"
+              },
+              "kind": "SOURCE_DOCUMENT",
+              "locator": "remaining_work",
+              "observed": "persisting a provider and model run receipt is listed as remaining work for this batch"
+            }
+          ],
+          "authority": "FINDINGS_ONLY",
+          "code": "EVIDENCE_ABSENT",
+          "id": "FND-003",
+          "proposed_repair": "keep the runtime rung explicitly absent on the batch, so the green check runs at this head are read as covering the builders and not the compilation they describe",
+          "statement": "the receipt schemas and their builder are implemented and verified at this head, and no live provider run for the persisted batch exists, so the runtime lane is unentered rather than passing"
+        }
+      ],
+      "highest_earned_level": "TECH_VERIFIED",
+      "id": "PRB-002",
+      "levels": [
+        {
+          "anchors": [
+            {
+              "exact_subject": {
+                "artifact": "README.md",
+                "digest": "566cb1d9a68e5ff22eec82e3ae8c8a26d0005a496fdd8a0fb0c49494496209c9"
+              },
+              "kind": "SOURCE_DOCUMENT",
+              "locator": "the materialization status section",
+              "observed": "the provider-neutral run descriptor and receipt schemas are listed as materialized and the raw-run receipt for the historical compilation as incomplete"
+            }
+          ],
+          "lane": "SOURCE",
+          "level": "SOURCE_ANCHORED",
+          "state": "PASS"
+        },
+        {
+          "anchors": [
+            {
+              "exact_subject": {
+                "artifact": "AGENTS.md",
+                "digest": "699efbf073e50e6e32d0c7608982f8a9245848c028067489818eaf9651075352"
+              },
+              "kind": "MECHANISM_OBSERVATION",
+              "locator": "the exact-subject receipt rules",
+              "observed": "a run receipt is defined as binding an exact provider, model, sampling and subject identity, which is a condition a wrong receipt would visibly fail"
+            }
+          ],
+          "lane": "MECHANISM",
+          "level": "MECHANISM_BOUND",
+          "state": "PASS"
+        },
+        {
+          "anchors": [
+            {
+              "exact_subject": {
+                "artifact": "tools/build_model_run_receipt.py",
+                "digest": "57147e1cfbc0a42d78d9a91eabe492bf05c9bfdab1e62fcac2dc6ab7fdf8a6f6"
+              },
+              "kind": "CODE_SUBJECT",
+              "locator": "the run-receipt builder",
+              "observed": "the builder that would emit a provider run receipt exists at this revision"
+            }
+          ],
+          "lane": "IMPLEMENTATION",
+          "level": "IMPLEMENTED",
+          "state": "PASS"
+        },
+        {
+          "anchors": [
+            {
+              "exact_subject": {
+                "artifact": "canary-ai-content-notes-forge-capture.json",
+                "digest": "7f6a31081bfc7607358491f8c91e234aabaaa338aa1600866393d11789e62489"
+              },
+              "kind": "CI_RUN",
+              "locator": "ci_lane.check_runs.runs",
+              "observed": "the validate legs completed with conclusion success against this exact head, covering the builder and its contracts"
+            }
+          ],
+          "lane": "IMPLEMENTATION",
+          "level": "TECH_VERIFIED",
+          "state": "PASS"
+        },
+        {
+          "anchors": [],
+          "lane": "RUNTIME",
+          "level": "LIVE_WORKFLOW_VERIFIED",
+          "note": "no provider run receipt exists for the persisted batch; the builder has never been given a live run to record",
+          "state": "ABSENT"
+        },
+        {
+          "anchors": [],
+          "lane": "USER",
+          "level": "USER_VALIDATED",
+          "state": "ABSENT"
+        },
+        {
+          "anchors": [],
+          "lane": "COMMERCIAL",
+          "level": "PAID_VALIDATED",
+          "state": "ABSENT"
+        }
+      ],
+      "missing_lanes": ["COMMERCIAL", "RUNTIME", "USER"],
+      "statement": "the persisted card batch can name the exact provider and model run that compiled it"
+    },
+    {
+      "declared_status": {
+        "anchor": {
+          "exact_subject": {
+            "artifact": "evals/semantic-yield/CvRngaQZQ3Y/semantic-validator-report.json",
+            "digest": "34c51957317f104d332fbd7471016e3069011278488db3fa7576ab44e3317a1a"
+          },
+          "kind": "SOURCE_DOCUMENT",
+          "locator": "checks.SV-06-visual-authority-tracking and hg.HG-03",
+          "observed": "both visual-authority checks are recorded DEFERRED rather than passed or failed"
+        },
+        "claimed_level": "BLOCKED",
+        "statement": "visual and identifier evidence for the batch is deferred pending authorized media"
+      },
+      "findings": [
+        {
+          "anchors": [
+            {
+              "exact_subject": {
+                "artifact": "canary-ai-content-notes-forge-capture.json",
+                "digest": "7f6a31081bfc7607358491f8c91e234aabaaa338aa1600866393d11789e62489"
+              },
+              "kind": "ISSUE_RECORD",
+              "locator": "issue_lane.issues[number=39] and issue_lane.issues[number=42]",
+              "observed": "visual extraction needs attested media, and the corpus rights basis is open on the forge"
+            }
+          ],
+          "authority": "FINDINGS_ONLY",
+          "code": "RIGHTS_UNADMITTED",
+          "id": "FND-004",
+          "proposed_repair": "record the visual lane as waiting on an admitted rights basis, so the deferral names the person who can end it rather than reading as a scheduling choice",
+          "statement": "the visual lane is blocked on a usage right that no procedure in the repository can admit, which is a different state from a check that has not been scheduled"
+        }
+      ],
+      "highest_earned_level": "SOURCE_ANCHORED",
+      "id": "PRB-003",
+      "levels": [
+        {
+          "anchors": [
+            {
+              "exact_subject": {
+                "artifact": "evals/semantic-yield/CvRngaQZQ3Y/run-state.md",
+                "digest": "d19978d432d186c31d8eae35e017531d3b27c62c296ce637e0f01e39a151d4b0"
+              },
+              "kind": "SOURCE_DOCUMENT",
+              "locator": "next_cursor and remaining_work",
+              "observed": "obtaining authorized frames or creator slides is the first item of remaining work and the cursor names the visual and identifier review"
+            }
+          ],
+          "lane": "SOURCE",
+          "level": "SOURCE_ANCHORED",
+          "state": "PASS"
+        },
+        {
+          "anchors": [],
+          "lane": "MECHANISM",
+          "level": "MECHANISM_BOUND",
+          "note": "no observation exists of an authorized extraction path; the mechanism cannot be bound before the media may be used",
+          "state": "HUMAN_ADMIT_REQUIRED"
+        },
+        {
+          "anchors": [],
+          "lane": "IMPLEMENTATION",
+          "level": "IMPLEMENTED",
+          "state": "ABSENT"
+        },
+        {
+          "anchors": [],
+          "lane": "IMPLEMENTATION",
+          "level": "TECH_VERIFIED",
+          "state": "ABSENT"
+        },
+        {
+          "anchors": [],
+          "lane": "RUNTIME",
+          "level": "LIVE_WORKFLOW_VERIFIED",
+          "state": "ABSENT"
+        },
+        {
+          "anchors": [],
+          "lane": "USER",
+          "level": "USER_VALIDATED",
+          "state": "ABSENT"
+        },
+        {
+          "anchors": [],
+          "lane": "COMMERCIAL",
+          "level": "PAID_VALIDATED",
+          "state": "ABSENT"
+        }
+      ],
+      "missing_lanes": ["COMMERCIAL", "IMPLEMENTATION", "MECHANISM", "RUNTIME", "USER"],
+      "statement": "the visual and identifier evidence the card batch depends on is authorized and bound to attested media"
+    }
+  ],
+  "public_snapshot": {
+    "completion_meaning": "REVIEW_ONLY_NOT_MERGE_OR_RELEASE",
+    "consumable_without_prior_conversation": true,
+    "contains_private_reasoning": false,
+    "excluded_from_snapshot": [
+      "any deliberation not carried by a named anchor in this artifact",
+      "the audited repository's file contents beyond the locators quoted here"
+    ]
+  },
+  "reopened_obligations": [
+    {
+      "level": "LIVE_WORKFLOW_VERIFIED",
+      "problem_id": "PRB-001",
+      "reason": "twelve external gates were never executed for this batch while its check runs are green; without reopening, the green head reads as gate coverage",
+      "state": "NOT_EXERCISED"
+    }
+  ],
+  "review_denominator": {
+    "findings_raised": 5,
+    "findings_reported": 4,
+    "findings_withdrawn": [
+      {
+        "finding_id": "FND-005",
+        "reason": "raised as a separate drift between the README count and the open coverage item, withdrawn because it is the same defect at the same anchor already reported as FND-001"
+      }
+    ]
+  },
+  "reviewer": {
+    "identity": "PREL_SHADOW_CLOSURE_MONITOR",
+    "mode": "READ_ONLY_FINDINGS_ONLY",
+    "requests_private_reasoning": false,
+    "requires_prior_conversation": false,
+    "writes_implementation": false
+  },
+  "schema": "prel/product-closure-audit/v1"
+}

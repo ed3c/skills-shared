@@ -1,0 +1,324 @@
+{
+  "captured_at": "2026-08-18",
+  "checkout": {
+    "argv": [
+      "git",
+      "clone",
+      "--depth",
+      "50",
+      "https://github.com/ed3c/ai-product-notes",
+      "/Users/neon/skills-shared/.claude/worktrees/wf_98b45403-26b-3/skills/product-reverse-engineering-loop/evals/ai-product-notes"
+    ],
+    "exit_code": 0,
+    "note": "shallow clone into a scratch directory outside every tracked repository; read-only, never pushed, and not retained by this receipt"
+  },
+  "ci_lane": {
+    "argv": [
+      "gh",
+      "api",
+      "repos/ed3c/ai-product-notes/commits/f9339aa87cb10d6b6d47ce227d8b87e518d1f2eb/check-runs",
+      "--jq",
+      "{total: .total_count, runs: [.check_runs[] | {name, status, conclusion, head_sha}]}"
+    ],
+    "check_runs": {
+      "runs": [
+        {
+          "conclusion": "skipped",
+          "head_sha": "f9339aa87cb10d6b6d47ce227d8b87e518d1f2eb",
+          "name": "Synthetic merge compatibility",
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "head_sha": "f9339aa87cb10d6b6d47ce227d8b87e518d1f2eb",
+          "name": "Exact head contracts",
+          "status": "completed"
+        }
+      ],
+      "total": 2
+    },
+    "exit_code": 0,
+    "stderr": ""
+  },
+  "gate_issue_bodies": {
+    "argv": [
+      "gh",
+      "api",
+      "repos/ed3c/ai-product-notes/issues",
+      "-X",
+      "GET",
+      "-F",
+      "state=open",
+      "-F",
+      "per_page=100",
+      "--jq",
+      "[.[] | select(.number == 33 or .number == 34 or .number == 35 or .number == 38 or .number == 49) | {number, title, state, body}]"
+    ],
+    "exit_code": 0,
+    "issues": [
+      {
+        "body": "Parent Epic: #44\nDepends on: #45 dossier compiler, #46 closure monitor, #47 execution DAG and Evidence Plane #50/#51.\nSource: attached `現代網頁設計架構擴充建議.pdf`.\n\n## Goal\nRun the first complete reverse-engineering pipeline on three materially different product archetypes from the source PDF while preserving all proposed internal technologies as hypotheses until independently observed.\n\n## Canary set\n1. **Flair AI archetype** — spatial constraint, multi-pass rendering, diffusion/inpainting and visual closure.\n2. **Creatify archetype** — URL intake, asset tokenization, storyboard AST, constraint solving and deterministic rendering.\n3. **AST interaction archetype** — Magic Patterns or Arcade: local AST/DOM patching, stateful interaction and bidirectional editing.\n\nThe exact third subject must be frozen before execution; do not combine two products into one count.\n\n## Required per-product artifacts\n```text\nsource signal packet\ndossier.json / dossier.md\nuser-problem-workflow map\nproduct State Machine\ncapability and rights graph\nproblem-closure matrix\nMVP boundary and stop-loss\nexecution DAG and prompt packets\nissue/Stack proposal\nexplicit non-claims\n```\n\n## Source treatment\n- PDF statements about YC product internals are `SOURCE_STATEMENT` or `HYPOTHESIS`, not observed architecture.\n- Code blocks are proposed implementations, not proof of the named product's codebase.\n- performance, cost, license and quality numbers remain unverified until separately bound.\n- page diagrams/tables and code must retain page/line/visual locators.\n\n## Controls\n- internal library mapping promoted to fact;\n- three canaries sharing one untracked source signal;\n- PDF popularity/YC status treated as demand;\n- beautiful output treated as workflow/user value;\n- proposed package license treated as complete transitive-rights proof;\n- technical closure promoted to paid validation;\n- missing source visual/table evidence silently ignored.\n\n## Acceptance\n- all three runs consume pinned source/evidence packets;\n- outputs are deterministic where contracts require it;\n- each canary has different user/problem/mechanism and falsifier surfaces;\n- every unsupported product-internal statement remains hypothesis/unknown;\n- closure monitor reports exact missing technical, live, user and commercial lanes;\n- no canary enters `BUILD` without existing buyer/adoption gates;\n- the resulting gaps can be compiled into non-overlapping Molecular Stack issues.\n\n## Evidence boundary\nThe canaries validate the reverse-engineering process against this source. They do not establish the real internal architecture, performance, licensing, market demand or product quality of the named companies.",
+        "number": 49,
+        "state": "open",
+        "title": "[PREL X01] Run first PDF-derived end-to-end canaries: Flair, Creatify and AST-interaction product archetypes"
+      },
+      {
+        "body": "Runtime/market-experiment follow-up retained from this session.\n\n## Current state\nMarket experiment: `NOT_EXERCISED`. Live Git Town / executable admission evidence was not exercised where policy/runtime did not permit it. These absences must not be represented as PASS or FAIL.\n\n## Goal\nOnce the technical and buyer hypotheses are sufficiently specified, execute the real experiment and delivery path against exact subjects and retain replayable receipts.\n\n## Required proof\n- exact repository/branch/commit subject;\n- explicit experiment hypothesis and stop condition;\n- real execution rather than documentation-only inference;\n- exact CI/runtime receipts where available;\n- delivery lineage (branch/PR/merge or explicitly documented alternative);\n- negative/failure outcome preservation;\n- no retroactive conversion of `NOT_EXERCISED` into success.\n\n## Git Town boundary\nIf live Git Town execution is part of the chosen workflow, record actual commands/state/stack lineage. If the environment blocks it, record `BLOCKED_POLICY`/`NOT_EXERCISED` and provide a reproducible local verification contract instead of inventing a receipt.\n\n## Acceptance\nA replayable exact-subject market/runtime receipt exists, or the blocker is explicitly captured with a local verification entry point. This gate is separate from customer and paid-adoption evidence.",
+        "number": 38,
+        "state": "open",
+        "title": "[Runtime Gate] Exercise real market experiment and executable delivery path"
+      },
+      {
+        "body": "Ownership/operability gate for any hosted Agent Contract Evolution Replay CI product slice.\n\n## Current state\nDurable hosted owner: `UNSELECTED`.\n\n## Goal\nSelect an explicit long-lived service owner and prove the operational responsibilities needed before claiming a hosted product.\n\n## Required decisions\n- owning repository/service and accountable maintainer/team;\n- deployment target and lifecycle authority;\n- data retention and customer evidence boundary;\n- authn/authz and secret ownership;\n- incident/rollback ownership;\n- cost/budget ownership;\n- SLO/availability target if a hosted SLA is claimed;\n- upgrade/migration policy for evaluator adapters and historical corpus;\n- deprecation/export path so evidence remains portable.\n\n## Runtime proof before completion\n- real deployment receipt against an exact subject;\n- replayable release/admission receipt;\n- rollback or failure-path exercise;\n- no claim of hosted production readiness from local/synthetic CI alone.\n\n## Acceptance\nOwner and runtime are explicit, durable and auditable. Until then, hosted ownership remains `UNSELECTED` and the product stays in `VALIDATE`.",
+        "number": 35,
+        "state": "open",
+        "title": "[Product Gate] Select and prove a durable hosted owner"
+      },
+      {
+        "body": "Commercial/adoption gate for Agent Contract Evolution Replay CI.\n\n## Current state\nPaid demand: `ABSENT`.\n\n## Goal\nConvert validated recurring pain into at least one credible paid pilot or other binding adoption commitment with explicit scope, owner and success criteria.\n\n## Required evidence\nA countable adoption receipt should bind:\n- qualified buyer/team;\n- concrete replay/contract-evolution use case;\n- agreed pilot scope and data/security boundary;\n- accountable customer-side owner;\n- provider-side owner;\n- commercial or binding adoption commitment;\n- start/decision date and exit criteria;\n- measurable success/failure metrics.\n\n## Non-counting evidence\n- compliments, stars, GitHub traffic or generic interest;\n- internal repository usage;\n- synthetic benchmarks alone;\n- unpaid exploratory conversation without a binding commitment;\n- inferred willingness to pay.\n\n## Acceptance\nAt least one explicit paid or binding adoption receipt exists and can be audited without exposing unauthorized private customer information. Negative or declined pilot outcomes remain recorded.\n\nTechnical `5 / 5` history evidence does not satisfy this gate.",
+        "number": 34,
+        "state": "open",
+        "title": "[Adoption Gate] Obtain paid pilot or binding adoption evidence"
+      },
+      {
+        "body": "Market-validation gate for Agent Contract Evolution Replay CI.\n\n## Current state\nCustomer-origin confirmations: `0 / 3`. Repository-generated technical evidence must not be substituted for buyer evidence.\n\n## Goal\nObtain evidence from at least three qualified teams that repeatedly encounter agent/MCP/tool-contract evolution failures that this product can address.\n\n## Interview/evidence contract\nFor each qualified team capture, with permission and without secrets:\n- team/product context and relevant agent/tool integration surface;\n- concrete historical contract-change incident(s);\n- frequency/recurrence and engineering cost;\n- current detection/migration workflow;\n- where existing schema diff, CI, tracing or dependency tooling fails;\n- whether historical consumer replay would change a real decision;\n- required deployment/security/data-boundary constraints;\n- named buying/ownership path where available.\n\n## Qualification\nA team counts only when the pain is recurring and materially tied to contract evolution/replay, not generic observability or generic API diffing.\n\n## Acceptance\n- at least `3 / 3` independently qualified teams;\n- evidence stored as claims/receipts with provenance and redaction boundaries;\n- contradictions and negative interviews retained rather than discarded;\n- no invented demand score;\n- roadmap remains `VALIDATE` until the paid/binding-adoption issue is separately satisfied.\n\nThis issue must not include private customer data beyond explicitly authorized evidence.",
+        "number": 33,
+        "state": "open",
+        "title": "[Market Gate] Validate recurring pain with 3 qualified teams"
+      }
+    ],
+    "stderr": ""
+  },
+  "issue_lane": {
+    "argv": [
+      "gh",
+      "issue",
+      "list",
+      "--repo",
+      "ed3c/ai-product-notes",
+      "--state",
+      "all",
+      "--limit",
+      "50",
+      "--json",
+      "number,title,state"
+    ],
+    "exit_code": 0,
+    "issues": [
+      {
+        "number": 52,
+        "state": "OPEN",
+        "title": "[PREL C00] Bind cross-repository run contracts, repository roles, exact subjects and closure targets"
+      },
+      {
+        "number": 51,
+        "state": "OPEN",
+        "title": "[PREL K01B] Capability DAGs, State Machines, rights substitutions and eval plans"
+      },
+      {
+        "number": 50,
+        "state": "OPEN",
+        "title": "[PREL D01] Converge README, AGENTS, State Machines and Molecular Stack traceability"
+      },
+      {
+        "number": 49,
+        "state": "OPEN",
+        "title": "[PREL X01] Run first PDF-derived end-to-end canaries: Flair, Creatify and AST-interaction product archetypes"
+      },
+      {
+        "number": 48,
+        "state": "OPEN",
+        "title": "[PREL A02] GitHub-canonical Google Drive CodexDoc and Sheet projection registry"
+      },
+      {
+        "number": 47,
+        "state": "OPEN",
+        "title": "[PREL K02] Compile dual-edge execution DAGs, Worker prompt packets, GitHub issue graphs and Local Handoff queues"
+      },
+      {
+        "number": 46,
+        "state": "OPEN",
+        "title": "[PREL E01] Compile product problem-closure matrices and reconcile issues without evidence promotion"
+      },
+      {
+        "number": 45,
+        "state": "OPEN",
+        "title": "[PREL K01] Compile product signals into YC-style reverse-engineering dossiers and bounded MVP hypotheses"
+      },
+      {
+        "number": 44,
+        "state": "OPEN",
+        "title": "[Meta Epic] Product Reverse-Engineering Closure Loop — Evidence → YC hypothesis → Tech Lead DAG → Shadow closure → Local Handoff"
+      },
+      {
+        "number": 43,
+        "state": "OPEN",
+        "title": "[Meta Epic] Close all remaining AI Product Notes session work"
+      },
+      {
+        "number": 42,
+        "state": "OPEN",
+        "title": "[Productization] Build bounded read-only CI MVP after evidence gates"
+      },
+      {
+        "number": 41,
+        "state": "OPEN",
+        "title": "[Market Radar] Automate blue-ocean signal ingestion, saturation relock and roadmap refresh"
+      },
+      {
+        "number": 40,
+        "state": "OPEN",
+        "title": "[Portfolio Gate] Operationalize public/private capability-envelope convergence"
+      },
+      {
+        "number": 39,
+        "state": "OPEN",
+        "title": "[Maintenance] Refresh pinned GitHub Actions checkout dependency"
+      },
+      {
+        "number": 38,
+        "state": "OPEN",
+        "title": "[Runtime Gate] Exercise real market experiment and executable delivery path"
+      },
+      {
+        "number": 37,
+        "state": "OPEN",
+        "title": "[Differentiation] Prove callsite-impact-join value beyond generic API diff tools"
+      },
+      {
+        "number": 36,
+        "state": "OPEN",
+        "title": "[Quality Gate] Measure false-positive, unsupported and inconclusive rates"
+      },
+      {
+        "number": 35,
+        "state": "OPEN",
+        "title": "[Product Gate] Select and prove a durable hosted owner"
+      },
+      {
+        "number": 34,
+        "state": "OPEN",
+        "title": "[Adoption Gate] Obtain paid pilot or binding adoption evidence"
+      },
+      {
+        "number": 33,
+        "state": "OPEN",
+        "title": "[Market Gate] Validate recurring pain with 3 qualified teams"
+      },
+      {
+        "number": 32,
+        "state": "OPEN",
+        "title": "[Leaf 12] Reach 5/5 real-history gate with a fifth independent case"
+      },
+      {
+        "number": 31,
+        "state": "OPEN",
+        "title": "[Leaf 11] Implement and prove protocol-envelope historical adapter"
+      },
+      {
+        "number": 30,
+        "state": "OPEN",
+        "title": "[Leaf 10] Add fourth independently adjudicated real-history breakage"
+      },
+      {
+        "number": 28,
+        "state": "CLOSED",
+        "title": "[VOID 6/6] Connector capability probe — no repository mutation"
+      },
+      {
+        "number": 27,
+        "state": "CLOSED",
+        "title": "[VOID 5/6] Connector capability probe — no repository mutation"
+      },
+      {
+        "number": 26,
+        "state": "CLOSED",
+        "title": "[VOID 4/6] Connector capability probe — no repository mutation"
+      },
+      {
+        "number": 25,
+        "state": "CLOSED",
+        "title": "[VOID 3/6] Connector capability probe — no repository mutation"
+      },
+      {
+        "number": 24,
+        "state": "CLOSED",
+        "title": "[VOID 2/6] Connector capability probe — no repository mutation"
+      },
+      {
+        "number": 23,
+        "state": "CLOSED",
+        "title": "[VOID 1/6] Connector capability probe — no repository mutation"
+      },
+      {
+        "number": 22,
+        "state": "CLOSED",
+        "title": "[Leaf 09] Add third history case for Registry publisher schema-revision admission"
+      },
+      {
+        "number": 20,
+        "state": "CLOSED",
+        "title": "[Leaf 08] Promote SDK migration replay with CI-bound downstream consumer"
+      },
+      {
+        "number": 18,
+        "state": "CLOSED",
+        "title": "[Leaf 07] Public real-history replay corpus for MCP contract evolution"
+      },
+      {
+        "number": 16,
+        "state": "CLOSED",
+        "title": "[Leaf 06] Market saturation relock + Agent Contract Evolution Replay CI thin slice"
+      },
+      {
+        "number": 14,
+        "state": "CLOSED",
+        "title": "[Receipt] Finalize merged-state pointers for PR #13"
+      },
+      {
+        "number": 12,
+        "state": "CLOSED",
+        "title": "[Leaf 05] Reconcile final merged stack state and delivery receipts"
+      },
+      {
+        "number": 10,
+        "state": "CLOSED",
+        "title": "[Leaf 04] Separate exact-head CI from synthetic merge compatibility"
+      },
+      {
+        "number": 6,
+        "state": "CLOSED",
+        "title": "[Leaf 03] Portfolio convergence, first MVP packet and Stack PR traceability"
+      },
+      {
+        "number": 5,
+        "state": "CLOSED",
+        "title": "[Leaf 02] Deterministic opportunity compiler and license-gated stack substitution"
+      },
+      {
+        "number": 4,
+        "state": "CLOSED",
+        "title": "[Leaf 01] Governance, Agent routing, State Machine and Git Town profile"
+      },
+      {
+        "number": 3,
+        "state": "CLOSED",
+        "title": "[EPIC] Market-to-MVP control plane for evidence-backed product discovery"
+      },
+      {
+        "number": 2,
+        "state": "CLOSED",
+        "title": "bootstrap canonical rebuild"
+      },
+      {
+        "number": 1,
+        "state": "CLOSED",
+        "title": "bootstrap canonical rebuild"
+      }
+    ],
+    "stderr": ""
+  },
+  "repository": "ed3c/ai-product-notes",
+  "schema": "prel/canary-forge-capture/v1",
+  "subject_revision": "f9339aa87cb10d6b6d47ce227d8b87e518d1f2eb"
+}

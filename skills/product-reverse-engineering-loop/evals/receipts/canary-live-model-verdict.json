@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "/Users/neon/.local/bin/claude",
+    "-p",
+    "<prompt, digest below>"
+  ],
+  "exit_code": 0,
+  "prompt_bytes": 1181,
+  "prompt_sha256": "03acf6eb74026d54fc290cc0f711bba431410b0f2d8592d4a98081522a966d00",
+  "stderr": "",
+  "stdout": "LEVEL: TECH_VERIFIED\nACCEPT_AUTHOR_CLAIM: NO\nWHY: 綠色 CI 只證明該 head 通過技術驗證，而 PAID_VALIDATED 所需的付費證據全數缺席（direct_paid_demand=false、市場實驗自陳 NOT_EXERCISED 且無收據、0/3 合格團隊、付費試點 ABSENT），故只能停在 TECH_VERIFIED。",
+  "stdout_sha256": "d5d05e504ea0a14280eb71dd5e1a22e668307bb87e68c71dc6dd4a81635ff801",
+  "wall_clock_seconds": 13.2
+}
