@@ -575,6 +575,72 @@
         256,
         351
       ]
+    },
+    {
+      "id": "procedural-shadow-runtime-refactor-ab-v1",
+      "owner_skill": "procedural-shadow-runtime",
+      "issue": 350,
+      "pull_requests": [
+        354
+      ],
+      "entrypoint": "skills/procedural-shadow-runtime/tests/verify_refactor_ab.py",
+      "runner": "skills/procedural-shadow-runtime/tests/run-all.sh",
+      "treatments": [
+        {
+          "id": "A_OLD_CANONICAL",
+          "role": "OLD_CANONICAL",
+          "path": "skills/procedural-shadow-runtime/tests/fixtures/refactor/old-canonical-SKILL.txt",
+          "blob_sha": "e3fff105c7e62b4f42964975d918701e76588fe1"
+        },
+        {
+          "id": "B0_REFACTOR_AS_LANDED",
+          "role": "REFACTOR_AS_LANDED",
+          "path": "skills/procedural-shadow-runtime/tests/fixtures/refactor/refactor-as-landed-SKILL.txt",
+          "blob_sha": "a15f34f036e279b7559e14990aa8aadd69342fc9"
+        },
+        {
+          "id": "B1_UPLIFT_ARMS_REPAIRED",
+          "role": "REPAIRED_CANDIDATE",
+          "path": "skills/procedural-shadow-runtime/tests/fixtures/refactor/uplift-arms-repaired-SKILL.txt",
+          "blob_sha": "1440da35e6c41e19de7720ccd1af5abb1225bd6a"
+        },
+        {
+          "id": "B2_LIVE_LANES_REPAIRED",
+          "role": "REPAIRED_CANDIDATE",
+          "path": "skills/procedural-shadow-runtime/SKILL.md",
+          "blob_sha": "730c780410028dc20562b9a15d54ad0357235eec"
+        }
+      ],
+      "proof_layers": {
+        "L0_SOURCE_FREEZE": "PASS",
+        "L1_STRUCTURAL_REACHABILITY": "PASS",
+        "L2_EXECUTABLE_CONTRACT": "PASS",
+        "L3_HERMETIC_REAL_TASK": "PASS",
+        "L4_MATCHED_LIVE_MODEL_RUNTIME": "NOT_EXERCISED",
+        "L5_DELIVERY_AND_HUMAN_ADMIT": "HUMAN_ADMIT_REQUIRED"
+      },
+      "highest_layer": "L3_HERMETIC_REAL_TASK",
+      "denominator": {
+        "failed_retained": true,
+        "stale_retained": true,
+        "blocked_retained": true,
+        "cancelled_retained": true,
+        "superseded_retained": true
+      },
+      "cleanup": "CLEAN",
+      "authority": {
+        "provider_activation": false,
+        "publication": false,
+        "semantic_conflict_resolution": false,
+        "merge": false,
+        "release": false,
+        "promotion": false,
+        "rollback": false
+      },
+      "remaining_issues": [
+        232,
+        350
+      ]
     }
   ]
 }
