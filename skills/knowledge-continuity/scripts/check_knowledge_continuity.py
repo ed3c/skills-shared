@@ -19,6 +19,8 @@ The rules catch the mechanical breaks; a human still reads for the rest.
 from __future__ import annotations
 
 import argparse
+import hashlib
+import json
 import re
 import sys
 import tempfile
@@ -86,6 +88,24 @@ def strip_quoted(text: str) -> str:
     """Blank out quoted spans so demonstrated examples are not counted as usage."""
     return QUOTED.sub(" ", text)
 
+
+AUDIT_SCHEMA = "knowledge-continuity/continuity-audit/v1"
+
+# The half of this Skill no script can judge. It lives here as data, not only as
+# prose in SKILL.md §4, for one reason: a machine run that emits nothing about
+# this lane reads as convergence, and "機械層綠 = 收斂" is the exact inference
+# SKILL.md forbids. Emitting the lane as HUMAN_ADMIT_REQUIRED makes the missing
+# half visible in the artefact instead of only in the document nobody reopens.
+# The wording is bound to the document by tests/refactor-ab/refactor_ab.py, so a
+# body that renumbers this lane without renumbering the tool turns red.
+HUMAN_LANE = (
+    ("H-1", "圖是不是從輸入開始畫的？"),
+    ("H-2", "圖用到的符號有沒有解釋過？"),
+    ("H-3", "未裁決的事有沒有被畫成已裁決？"),
+    ("H-4", "有沒有過度宣稱？"),
+    ("H-5", "索引跳轉會不會把讀者送到另一個索引？"),
+    ("H-6", "一個沒讀過前置文件的人，讀得完嗎？"),
+)
 
 REJECTED_RULES = """
 Rules written, tested against real prose, and deliberately NOT shipped:
@@ -377,6 +397,46 @@ def evaluate(path: Path) -> list[Rule]:
     ]
 
 
+def audit(path: Path, rules: list[Rule]) -> dict:
+    """Build the machine-readable audit record for one document.
+
+    A machine can only ever emit `MECHANICAL_ONLY`: the human lane it carries is
+    unanswered by construction, and `scripts/assert_continuity_audit.py` refuses
+    a `CONVERGED` record whose lane nobody admitted.
+    """
+    total = sum(len(rule.findings) for rule in rules)
+    return {
+        "schema": AUDIT_SCHEMA,
+        "subject": {
+            "path": path.as_posix(),
+            "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+        },
+        "mechanical": {
+            "rules": [
+                {
+                    "rule_id": rule.rule_id,
+                    "state": "PASS" if not rule.findings else "FAIL",
+                    "breaks": len(rule.findings),
+                    "lines": [item.line for item in rule.findings],
+                }
+                for rule in rules
+            ],
+            "total_breaks": total,
+            "exit_code": 0 if total == 0 else 2,
+        },
+        "human_lane": [
+            {
+                "id": rule_id,
+                "question": question,
+                "state": "HUMAN_ADMIT_REQUIRED",
+                "admitted_by": None,
+            }
+            for rule_id, question in HUMAN_LANE
+        ],
+        "convergence": "MECHANICAL_ONLY",
+    }
+
+
 def report(path: Path, rules: list[Rule], verbose: bool) -> int:
     """Print findings; return 0 only when the document has no breaks."""
     total = sum(len(r.findings) for r in rules)
@@ -535,6 +595,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--rejected", action="store_true", help="show rules deliberately not shipped"
     )
+    parser.add_argument(
+        "--audit-json",
+        type=Path,
+        help="write the machine audit record (schema: references/continuity-audit.schema.json)",
+    )
     args = parser.parse_args(argv)
 
     if args.rejected:
@@ -547,7 +612,13 @@ def main(argv: list[str] | None = None) -> int:
     if not args.target.is_file():
         print(f"ERROR: 檔案不存在：{args.target}", file=sys.stderr)
         return 1
-    return report(args.target, evaluate(args.target), not args.quiet)
+    rules = evaluate(args.target)
+    if args.audit_json is not None:
+        args.audit_json.write_text(
+            json.dumps(audit(args.target, rules), ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
+    return report(args.target, rules, not args.quiet)
 
 
 if __name__ == "__main__":

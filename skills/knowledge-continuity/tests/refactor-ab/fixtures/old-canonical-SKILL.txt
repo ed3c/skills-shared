@@ -8,8 +8,8 @@ description: |
   wiki 敘述修訂、解決方案文件審視、把縮寫落地。
   何時用：一份給人看的決策／規格／計畫文件寫完後，或被人反映「看不懂為什麼」時。
   NOT for：程式碼審查（用 code-review）；把經驗折回既有結構（用 fold-in）；
-  造新 skill 的規範（用該 repo 自己的 skill-authoring 或內建 write-a-skill）；產 HTML 交付包（用 html-for-decisions）。
-  五條機械規則在 scripts/，人判斷的部分在本檔 §4。
+  造新 skill 的規範（用 antigravity-skill-authoring）；產 HTML 交付包（用 html-for-decisions）。
+  四條機械規則在 scripts/，人判斷的部分在本檔 §4。
 ---
 
 # Skill: knowledge-continuity — 消除文件的知識斷點
@@ -17,14 +17,13 @@ description: |
 > **Role**：對一份**給人讀的**文件，找出並修掉「讀者必須自己補知識才能繼續」的地方。
 >   它不改善文筆，也不判斷結論對不對——它只保證**因果鏈在文件內部是完整的**。
 > **結構**：SKILL.md ＝ 確定性程序 ＋ 人判斷準則 ＋ Gotchas；
->   五條可機械檢查的規則在 [`scripts/check_knowledge_continuity.py`](scripts/check_knowledge_continuity.py)，
->   它產出的稽核紀錄由 [`scripts/assert_continuity_audit.py`](scripts/assert_continuity_audit.py) 驗收。
+>   四條可機械檢查的規則在 [`scripts/check_knowledge_continuity.py`](scripts/check_knowledge_continuity.py)。
 > **No Prose Husk 錨**：規則有真實腳本與正負控（[`tests/run-all.sh`](tests/run-all.sh)），
 >   而且每條都在真實文件上量過命中率（見 [`evals.json`](evals.json) 的 `field_evidence`）。
 
 ## 什麼是「知識斷點」
 
-讀者讀到某一句，**必須動用文件沒有提供的知識才能繼續**。五種常見形態：
+讀者讀到某一句，**必須動用文件沒有提供的知識才能繼續**。四種常見形態：
 
 | 形態 | 讀者的實際體驗 | 規則 |
 |---|---|---|
@@ -43,7 +42,7 @@ description: |
 | 「這個縮寫團隊都知道，不用解釋」 | ❌ 文件的讀者包含三個月後的你，以及接手的人。「團隊都知道」是最常見的知識斷點藉口 |
 | 「我在開頭定義過了，後面直接用就好」 | ⚠️ 長文件是被跳讀的。定義過的代號可以直接用，但**定義必須在文件內、且可被找到**（表格首欄或標題）——這正是 KC-01 的判準 |
 | 「詳細內容在另一份，這裡指過去比較不重複」 | ❌ 指過去可以，但**原地必須留一句話摘要**。讀者不必離開才叫連續 |
-| 「checker 全綠了，這份文件沒問題」 | ❌ 五條規則只檢查**引用的形狀**，不檢查**說明是否足夠**。全綠只代表沒有機械斷點，人還是要讀（見 §4） |
+| 「checker 全綠了，這份文件沒問題」 | ❌ 四條規則只檢查**引用的形狀**，不檢查**說明是否足夠**。全綠只代表沒有機械斷點，人還是要讀（見 §4） |
 | 「約數比較誠實，我不確定精確值」 | ❌ 不確定就去數。數不出來就不要宣稱有這個數，改成描述性語句 |
 
 ## 確定性程序
@@ -51,8 +50,7 @@ description: |
 ### 1. 先量，不要先改
 
 ```bash
-# 在本 skill 目錄下執行；--audit-json 另存一份可被閘驗收的機器紀錄。
-python3 scripts/check_knowledge_continuity.py <file.md> --audit-json audit.json
+python3 .agents/skills/knowledge-continuity/scripts/check_knowledge_continuity.py <file.md>
 ```
 
 輸出每條規則的斷點數與行號。**先記下總數**——這是這輪的起點，也是之後判斷有沒有改好的唯一客觀依據。
@@ -67,27 +65,22 @@ python3 scripts/check_knowledge_continuity.py <file.md> --audit-json audit.json
 | KC-04 | 原地補一句話摘要，再指過去。摘要要能讓讀者**不點進去也能繼續讀** |
 | KC-05 | 把實碼錨點搬到提出主張的同一段。若證據在附錄，原地就貼出關鍵的三五行，再附代號讓人看全文 |
 
-### 3. 人判斷的六件事（腳本做不到，見 §4）
+### 3. 人判斷的四件事（腳本做不到，見 §4）
 
 ### 4. 收斂條件
 
 ```text
-   機械層：checker 五條全綠（exit 0）
+   機械層：checker 四條全綠（exit 0）
        ＋
-   人判斷層：§4 的六個問題都能回答「是」
+   人判斷層：§4 的四個問題都能回答「是」
        ＝ 收斂
 ```
 
 **只有機械層綠不算收斂。** 腳本檢查形狀，人檢查是否真的說得通。
-這條法則現在有閘：機器產出的紀錄只能寫 `MECHANICAL_ONLY`，
-`scripts/assert_continuity_audit.py` 會拒絕一份人判斷層沒有具名裁決者、
-卻自稱 `CONVERGED` 的稽核紀錄。
 
-## §4 人判斷的六件事
+## §4 人判斷的四件事
 
-腳本無法檢查以下六項，但它們是知識斷點最嚴重的形態。**每一輪都要人親自回答**：
-這六項與 `scripts/check_knowledge_continuity.py` 的 `HUMAN_LANE`（H-1 到 H-6）
-逐條對應，稽核紀錄一定會帶著它們，所以「機械層綠」永遠不會長得像「收斂」。
+腳本無法檢查以下四項，但它們是知識斷點最嚴重的形態。**每一輪都要人親自回答**：
 
 1. **圖是不是從輸入開始畫的？**
    一張從「結論」起跳的圖（例如直接畫三個決策分支，卻沒畫證據從哪來），
@@ -130,7 +123,7 @@ python3 scripts/check_knowledge_continuity.py <file.md> --audit-json audit.json
    │  3. 重跑 checker                              │
    │     N 沒降 → 修錯地方了，回第 2 步            │
    │     N 降到 0 → 進第 4 步                      │
-   │  4. 人回答 §4 的六個問題                      │
+   │  4. 人回答 §4 的四個問題                      │
    │     有任一個「否」→ 補內容，回第 1 步          │
    │     全部「是」→ 收斂                          │
    └──────────────────────────────────────────────┘
@@ -166,16 +159,6 @@ python3 scripts/check_knowledge_continuity.py <file.md> --audit-json audit.json
 
 ```bash
 python3 scripts/check_knowledge_continuity.py --selftest   # 規則自身的正負控
-python3 scripts/assert_continuity_audit.py --selftest       # 稽核紀錄語意閘的植入缺陷控制
 bash tests/run-all.sh                                      # 完整套件
 python3 scripts/check_knowledge_continuity.py --rejected    # 看被否決的規則與理由
 ```
-
-稽核紀錄的形狀契約是 [`references/continuity-audit.schema.json`](references/continuity-audit.schema.json)，
-語意由 [`scripts/assert_continuity_audit.py`](scripts/assert_continuity_audit.py) 執行：
-規則集合直接讀回 checker 的實作，`subject.sha256` 對現有位元組重算，
-所以「紀錄比實際量到的多」與「量完之後文件又改了」都會轉紅。
-
-本 skill 三個處理過的重構治療體（as-admitted、去主機名之後、本次修好路由之後）
-凍結在 [`tests/refactor-ab/`](tests/refactor-ab/)，
-由 [`tests/refactor-ab/refactor_ab.py`](tests/refactor-ab/refactor_ab.py) 在同一份語料上比較。

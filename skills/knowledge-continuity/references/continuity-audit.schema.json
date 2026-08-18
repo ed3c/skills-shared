@@ -1,0 +1,139 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "knowledge-continuity/continuity-audit/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "subject",
+    "mechanical",
+    "human_lane",
+    "convergence"
+  ],
+  "properties": {
+    "schema": {
+      "const": "knowledge-continuity/continuity-audit/v1"
+    },
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "mechanical": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rules",
+        "total_breaks",
+        "exit_code"
+      ],
+      "properties": {
+        "rules": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "rule_id",
+              "state",
+              "breaks",
+              "lines"
+            ],
+            "properties": {
+              "rule_id": {
+                "type": "string",
+                "pattern": "^KC-\\d{2}$"
+              },
+              "state": {
+                "enum": [
+                  "PASS",
+                  "FAIL"
+                ]
+              },
+              "breaks": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "lines": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            }
+          }
+        },
+        "total_breaks": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "exit_code": {
+          "enum": [
+            0,
+            2
+          ]
+        }
+      }
+    },
+    "human_lane": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "question",
+          "state",
+          "admitted_by"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^H-\\d+$"
+          },
+          "question": {
+            "type": "string",
+            "minLength": 1
+          },
+          "state": {
+            "enum": [
+              "PASS",
+              "FAIL",
+              "HUMAN_ADMIT_REQUIRED"
+            ]
+          },
+          "admitted_by": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "convergence": {
+      "enum": [
+        "MECHANICAL_ONLY",
+        "CONVERGED",
+        "NOT_CONVERGED"
+      ]
+    }
+  }
+}

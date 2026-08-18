@@ -264,6 +264,65 @@
         234,
         348
       ]
+    },
+    {
+      "id": "knowledge-continuity-entrypoint-claim-closure-v1",
+      "owner_skill": "knowledge-continuity",
+      "issue": 349,
+      "pull_requests": [
+        354
+      ],
+      "entrypoint": "skills/knowledge-continuity/tests/refactor-ab/refactor_ab.py",
+      "runner": "skills/knowledge-continuity/tests/refactor-ab/verify.sh",
+      "treatments": [
+        {
+          "id": "A_ADMITTED_HOST_BOUND",
+          "role": "OLD_CANONICAL",
+          "path": "skills/knowledge-continuity/tests/refactor-ab/fixtures/old-canonical-SKILL.txt",
+          "blob_sha": "99b9af12b421f781688bba02ba9f0ccf69eaca26"
+        },
+        {
+          "id": "B0_DEHOSTED_AS_LANDED",
+          "role": "REFACTOR_AS_LANDED",
+          "path": "skills/knowledge-continuity/tests/refactor-ab/fixtures/refactor-as-landed-SKILL.txt",
+          "blob_sha": "8c095d34607dc0aa45df12fcdf4cef5dd0778129"
+        },
+        {
+          "id": "B1_AUDIT_ROUTE_REPAIRED",
+          "role": "REPAIRED_CANDIDATE",
+          "path": "skills/knowledge-continuity/SKILL.md",
+          "blob_sha": "12e81cd4b5787bd79812d2d550343b4ff0c52e8c"
+        }
+      ],
+      "proof_layers": {
+        "L0_SOURCE_FREEZE": "PASS",
+        "L1_STRUCTURAL_REACHABILITY": "PASS",
+        "L2_EXECUTABLE_CONTRACT": "PASS",
+        "L3_HERMETIC_REAL_TASK": "PASS",
+        "L4_MATCHED_LIVE_MODEL_RUNTIME": "NOT_EXERCISED",
+        "L5_DELIVERY_AND_HUMAN_ADMIT": "HUMAN_ADMIT_REQUIRED"
+      },
+      "highest_layer": "L3_HERMETIC_REAL_TASK",
+      "denominator": {
+        "failed_retained": true,
+        "stale_retained": true,
+        "blocked_retained": true,
+        "cancelled_retained": true,
+        "superseded_retained": true
+      },
+      "cleanup": "CLEAN",
+      "authority": {
+        "provider_activation": false,
+        "publication": false,
+        "semantic_conflict_resolution": false,
+        "merge": false,
+        "release": false,
+        "promotion": false,
+        "rollback": false
+      },
+      "remaining_issues": [
+        349
+      ]
     }
   ]
 }

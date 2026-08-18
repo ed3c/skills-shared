@@ -635,23 +635,29 @@
     },
     {
       "skill": "knowledge-continuity",
-      "highest_layer": "L2_EXECUTABLE_CONTRACT",
-      "golden_proof_id": null,
+      "highest_layer": "L3_HERMETIC_REAL_TASK",
+      "golden_proof_id": "knowledge-continuity-entrypoint-claim-closure-v1",
       "criteria": {
         "old_canonical_treatment_frozen": {
-          "state": "ABSENT",
-          "evidence": [],
-          "owner_issue": 349
+          "state": "PASS",
+          "evidence": [
+            "skills/knowledge-continuity/tests/refactor-ab/fixtures/old-canonical-SKILL.txt",
+            "skills/knowledge-continuity/tests/refactor-ab/refactor_ab.py"
+          ]
         },
         "refactor_as_landed_treatment_frozen": {
-          "state": "ABSENT",
-          "evidence": [],
-          "owner_issue": 349
+          "state": "PASS",
+          "evidence": [
+            "skills/knowledge-continuity/tests/refactor-ab/fixtures/refactor-as-landed-SKILL.txt",
+            "skills/knowledge-continuity/tests/refactor-ab/refactor_ab.py"
+          ]
         },
         "old_strengths_asserted": {
-          "state": "ABSENT",
-          "evidence": [],
-          "owner_issue": 349
+          "state": "PASS",
+          "evidence": [
+            "skills/knowledge-continuity/tests/refactor-ab/refactor_ab.py",
+            "skills/knowledge-continuity/tests/refactor-ab/verify.sh"
+          ]
         },
         "route_reachable": {
           "state": "PASS",
@@ -663,13 +669,13 @@
           ]
         },
         "schema_and_semantic_gates_executable": {
-          "state": "PARTIAL",
+          "state": "PASS",
           "evidence": [
+            "skills/knowledge-continuity/references/continuity-audit.schema.json",
             "skills/knowledge-continuity/scripts/check_knowledge_continuity.py",
-            "skills/knowledge-continuity/tests/check-knowledge-continuity/verify.sh"
-          ],
-          "owner_issue": 349,
-          "note": "Four mechanical rules are executable; the human-judgement half of the Skill has no machine gate."
+            "skills/knowledge-continuity/scripts/assert_continuity_audit.py",
+            "skills/knowledge-continuity/tests/continuity-audit/verify.sh"
+          ]
         },
         "hollow_dead_route_controls": {
           "state": "PASS",
@@ -679,24 +685,32 @@
           ]
         },
         "matched_hermetic_task": {
-          "state": "ABSENT",
-          "evidence": [],
-          "owner_issue": 349
+          "state": "PASS",
+          "evidence": [
+            "skills/knowledge-continuity/tests/refactor-ab/refactor_ab.py",
+            "skills/knowledge-continuity/tests/refactor-ab/verify.sh"
+          ]
         },
         "golden_proof_registered": {
-          "state": "ABSENT",
-          "evidence": [],
-          "owner_issue": 349
+          "state": "PASS",
+          "evidence": [
+            "skills/skill-refactor-proof-loop/references/golden-proof-registry.json"
+          ]
         },
         "live_model_runtime_ab": {
           "state": "NOT_IMPLEMENTED",
           "evidence": [],
-          "owner_issue": 349
+          "owner_issue": 349,
+          "note": "No live model or provider lane exists for this Skill; nothing here was run against one."
         },
         "molecular_traceability": {
-          "state": "ABSENT",
-          "evidence": [],
-          "owner_issue": 349
+          "state": "PARTIAL",
+          "evidence": [
+            "skills/skill-refactor-proof-loop/references/skill-adoption-ledger.json",
+            "skills/skill-refactor-proof-loop/scripts/check_skill_adoption_ledger.py"
+          ],
+          "owner_issue": 349,
+          "note": "The leaf, its owner issue and its ordering edges are machine-checked here; PR, head and delivery state are GitHub facts this zero-network checker refuses to assert."
         }
       }
     },
