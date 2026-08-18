@@ -654,23 +654,32 @@
     },
     {
       "skill": "procedural-shadow-runtime",
-      "highest_layer": "L2_EXECUTABLE_CONTRACT",
-      "golden_proof_id": null,
+      "highest_layer": "L3_HERMETIC_REAL_TASK",
+      "golden_proof_id": "procedural-shadow-runtime-refactor-ab-v1",
       "criteria": {
         "old_canonical_treatment_frozen": {
-          "state": "ABSENT",
-          "evidence": [],
-          "owner_issue": 350
+          "state": "PASS",
+          "evidence": [
+            "skills/procedural-shadow-runtime/tests/fixtures/refactor/old-canonical-SKILL.txt",
+            "skills/procedural-shadow-runtime/tests/verify_refactor_ab.py"
+          ],
+          "note": "Registered as A_OLD_CANONICAL at blob e3fff10, the body commit 74dc0b4 left behind -- the revision immediately before the landing that rewrote it. Reproduced byte for byte from history rather than reconstructed: git cat-file -p e3fff10 emits the fixture, and verify_refactor_ab.py recomputes the blob before scoring anything."
         },
         "refactor_as_landed_treatment_frozen": {
-          "state": "ABSENT",
-          "evidence": [],
-          "owner_issue": 350
+          "state": "PASS",
+          "evidence": [
+            "skills/procedural-shadow-runtime/tests/fixtures/refactor/refactor-as-landed-SKILL.txt",
+            "skills/procedural-shadow-runtime/tests/verify_refactor_ab.py"
+          ],
+          "note": "Registered as B0_REFACTOR_AS_LANDED at blob a15f34f, commit 2eab9dd: the landing that compiled the manually entered architecture dimension score into an executable rubric and rewrote the capsule, disposition and side-effect prose around it. It is retained at whatever it scores, and it scores 15 against A's 16 -- it dropped three guarantees while adding two. Frozen because it regressed, not despite it."
         },
         "old_strengths_asserted": {
-          "state": "ABSENT",
-          "evidence": [],
-          "owner_issue": 350
+          "state": "PASS",
+          "evidence": [
+            "skills/procedural-shadow-runtime/tests/verify_refactor_ab.py",
+            "skills/procedural-shadow-runtime/tests/run-all.sh"
+          ],
+          "note": "Twenty-two named guarantees scored arm by arm: A 16, B0 15, B1 17, B2 19. Three left the body at B0 and none of the three has come back at HEAD. Two are relocations -- check_meta_abstraction_eval.py and meta-abstraction-eval-receipt.schema.json are still routed from AGENTS.md, README.md, evals.json and the meta standard -- and the checker reads those files rather than taking the distinction on trust, because a relocated guarantee and a deleted one read identically in prose. The third, the open-ended 'any action the active host marks side-effecting' class, is a deletion: it is in no file of this Skill, and RETAINED_NON_CLAIM records it as LOST_AND_OPEN and turns the suite red if it returns unrecorded. The scorer plants one removal and one addition against the frozen A body first, so a matrix that cannot go red is refused."
         },
         "route_reachable": {
           "state": "PASS",
@@ -697,18 +706,19 @@
           ]
         },
         "matched_hermetic_task": {
-          "state": "PARTIAL",
+          "state": "PASS",
           "evidence": [
-            "skills/procedural-shadow-runtime/scripts/run_arm_trials.py",
-            "skills/procedural-shadow-runtime/tests/verify_arm_trials.py"
+            "skills/procedural-shadow-runtime/tests/verify_refactor_ab.py",
+            "skills/procedural-shadow-runtime/tests/run-all.sh"
           ],
-          "owner_issue": 350,
-          "note": "Arms and trials are deterministic, but they are not bound to frozen refactor treatments of this Skill."
+          "note": "The arm producer this Skill already ships now runs over its own four frozen bodies with one capsule, one procedure set and one builder, so the treatment is the only free variable -- which is the binding the previous PARTIAL was missing. Determinism is checked by rebuilding, the five arms are required pairwise distinct per body, and the delta capsule is required body-invariant so that C vs D is the treatment contrast and not a builder artefact. It also retires a number: the body states the capsule is 8.6% of the full body, and recomputation puts 8.6% at B0, 8.0% at the body the sentence was actually written into, and 6.5% at HEAD. The assertion is that a stated ratio must be the measured ratio of a body that existed. Offline, no host, no model."
         },
         "golden_proof_registered": {
-          "state": "ABSENT",
-          "evidence": [],
-          "owner_issue": 350
+          "state": "PASS",
+          "evidence": [
+            "skills/skill-refactor-proof-loop/references/golden-proof-registry.json"
+          ],
+          "note": "Four content-bound treatments, one per body this Skill's history contains from the refactor point onward, with the live SKILL.md as B2. The registered pull_requests entry is #354, the PR that landed the migration-leaf row this proof retires: the treatment commits reached main through worktree-shadow-runtime-211 without numbered PRs, and this leaf's own delivery PR is not open, so no other PR identity is knowable offline. L4 stays NOT_EXERCISED and L5 stays HUMAN_ADMIT_REQUIRED."
         },
         "live_model_runtime_ab": {
           "state": "NOT_EXERCISED",
@@ -719,9 +729,13 @@
           "note": "Independent Shadow receipts are owned by #232."
         },
         "molecular_traceability": {
-          "state": "ABSENT",
-          "evidence": [],
-          "owner_issue": 350
+          "state": "PARTIAL",
+          "evidence": [
+            "skills/skill-refactor-proof-loop/references/refactor-proof-stack.json",
+            "skills/procedural-shadow-runtime/tests/verify_refactor_ab.py"
+          ],
+          "owner_issue": 350,
+          "note": "The proof report names its issue, its four treatment blobs and the commit each came from, and the Stack index carries this leaf under #322. It has no node of its own: that file has one convergence owner and is not this leaf's write. Node delivery state is declared READ_FROM_GITHUB either way, so a zero-network checker cannot reach PASS here by design."
         }
       }
     },
