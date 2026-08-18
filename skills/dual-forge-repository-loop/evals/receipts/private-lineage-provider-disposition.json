@@ -1,0 +1,27 @@
+{
+  "repository_identity_digest": "90745f3e4ce3c56a0b767625a0e4814a9cd049832ff3c0efc816dcb7b83f6dac",
+  "schema": "provider-retention-disposition/v1",
+  "surfaces": {
+    "actions_artifacts": "CLEAN",
+    "actions_caches": "CLEAN",
+    "actions_logs": "CLEAN",
+    "apps": "CLEAN",
+    "backups_replicas": "NOT_AVAILABLE",
+    "branches": "REMOVED",
+    "code_search_indexes": "PROVIDER_DISPOSITION_REQUIRED",
+    "deploy_keys": "CLEAN",
+    "environments": "CLEAN",
+    "forks": "CLEAN",
+    "lfs": "CLEAN",
+    "mirrors": "CLEAN",
+    "packages": "CLEAN",
+    "pages": "CLEAN",
+    "pull_request_refs": "CLEAN",
+    "releases": "CLEAN",
+    "review_diffs": "CLEAN",
+    "secrets_metadata": "CLEAN",
+    "tags": "CLEAN",
+    "webhooks": "CLEAN",
+    "wiki": "CLEAN"
+  }
+}

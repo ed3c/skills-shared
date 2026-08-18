@@ -1,6 +1,6 @@
 {
   "skill_name": "dual-forge-repository-loop",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "_meta": {
     "coverage_metric": "dual-forge authority separation, causal fresh-worktree creation and repository identity, local-main-first ordering, issue namespace separation, GitHub reconciliation closure, exact-head Actions evidence, publication evidence gating, multi-Agent topology admission, Worker attempt and lease isolation, budget closure, Shadow non-bypass, stale-result rejection, private-lineage separation and clean-room controls, runtime evidence classification, and external merge authority separation",
     "purpose": "Prove that local/Forgejo implementation success cannot be published to GitHub while remote drift, open PR conflict routing, affected issue routing, exact-head Actions evidence, multi-Agent admission, lease ownership, result verification, budget, Shadow enforcement, private-lineage separation, runtime evidence provenance, or merge authority remains unresolved."
@@ -156,6 +156,24 @@
       "expected": "GitHub-scoped connector claim and honest non-execution classifications pass; six connector-to-local/Forgejo laundering mutations and an observed state without evidence are refused"
     },
     {
+      "id": "DFR-PRIVATE-LIVE-CANARY-1",
+      "checker_script": "scripts/check_private_lineage_canary.py",
+      "test_verify": "tests/private-lineage-live-canary/verify.sh",
+      "good_fixture": "evals/receipts/private-lineage-canary.receipt.json",
+      "hollow_fixture": null,
+      "hollow_mutations": "a declared link goes unstated or gains an invented state, coverage is inflated past the chain, an observed lane loses its request/command evidence, repository creation is claimed without an observed 201, the readback head is substituted, the deletion 404 is dropped so erasure is claimed rather than observed, a mutation is left owed while cleanup claims PASS, the mutation ledger names a repository this canary did not create, the fresh root is the private head, a dry run claims provider PASS, or a credential-shaped URL enters the receipt",
+      "covers": [
+        "a live local Forgejo canary is receipted from real wire results rather than from a reachable port",
+        "provider lanes reach PASS only with the exact status codes that produced them, and deletion needs both the 204 and the follow-up 404",
+        "every Forgejo mutation names a repository this run created and carries a terminal cleanup disposition before cleanup may be PASS",
+        "the public fresh root and the pushed private repository are two lineages, not one",
+        "the committed provider-disposition and local-retirement documents are the exact ones the canary checked",
+        "the substrate receipt observes the same forge URL and version as the canary that ran against it",
+        "credential material never reaches the receipt"
+      ],
+      "expected": "the committed live receipt passes with ten of ten links PASS and both provider mutations deleted; twelve planted receipt defects are refused; the provider-retention and retirement-inventory checkers re-derive INCOMPLETE_OR_LIMITED and OUTSTANDING from the committed documents"
+    },
+    {
       "id": "DFR-REFACTOR-PROOF-1",
       "checker_script": "tests/refactor-proof/refactor_ab.py",
       "test_verify": "tests/refactor-proof/verify.sh",
@@ -184,9 +202,11 @@
     "live_checkpoint_resume_and_straggler_reassignment": "NOT_EXERCISED",
     "organization_level_alignment": "NOT_EXERCISED",
     "chatgpt_private_github_ingress": "NOT_EXERCISED",
-    "local_forgejo_mutation": "NOT_EXERCISED",
-    "private_consumer_extraction": "NOT_EXERCISED",
-    "provider_cleanup_disposition": "NOT_EXERCISED",
+    "local_forgejo_mutation": "EXERCISED",
+    "private_consumer_extraction": "EXERCISED",
+    "real_private_consumer_subject": "NOT_EXERCISED",
+    "provider_cleanup_disposition": "EXERCISED",
+    "provider_backup_and_index_confirmation": "PROVIDER_DISPOSITION_REQUIRED",
     "consumer_worktree_execution": "NOT_EXERCISED",
     "consumer_github_actions": "NOT_EXERCISED",
     "final_merge": "HUMAN_ADMIT_REQUIRED"

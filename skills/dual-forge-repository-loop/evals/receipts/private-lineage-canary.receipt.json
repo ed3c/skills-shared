@@ -1,0 +1,412 @@
+{
+  "chain": [
+    {
+      "container_evidence": {
+        "containers": [
+          {
+            "image": "gitea/act_runner",
+            "name": "forgejo-runner",
+            "ports": "",
+            "status": "Up 5 days"
+          },
+          {
+            "image": "codeberg.org/forgejo/forgejo:9",
+            "name": "forgejo",
+            "ports": "0.0.0.0:3000->3000/tcp, [::]:3000->3000/tcp, 0.0.0.0:2222->22/tcp, [::]:2222->22/tcp",
+            "status": "Up 7 days (healthy)"
+          }
+        ],
+        "state": "PASS"
+      },
+      "detail": "unauthenticated version read answered 200 with version 9.0.3+gitea-1.22.0",
+      "link": "forgejo-substrate-probe",
+      "request": {
+        "endpoint": "/api/v1/version",
+        "http_status": 200,
+        "method": "GET",
+        "response_bytes": 33,
+        "response_sha256": "f6d96d7e5fe6bc4ceb3ef68b01611cb22d83d2673f4c349236d79234ef6b6e8b"
+      },
+      "state": "PASS"
+    },
+    {
+      "credential_source": "git credential fill (existing helper)",
+      "detail": "git credential fill supplied an in-memory credential for the forge host; authenticated identity is neon",
+      "link": "credential-helper-auth-lane",
+      "request": {
+        "endpoint": "/api/v1/user",
+        "http_status": 200,
+        "method": "GET",
+        "response_bytes": 544,
+        "response_sha256": "50684a47d15510277ef5967fdfdfb12d8d6c37aadba649f60d119635d6ac64aa"
+      },
+      "state": "PASS"
+    },
+    {
+      "detail": "created private repository neon/canary-262-private-1787031888 id=23",
+      "link": "private-repository-created",
+      "request": {
+        "endpoint": "/api/v1/user/repos",
+        "http_status": 201,
+        "method": "POST",
+        "response_bytes": 2379,
+        "response_sha256": "ef177fb7c5e6cf36a955a7d8f2d9ce0c5ec121191a2e32089f7de8f87dc7d3f5"
+      },
+      "state": "PASS"
+    },
+    {
+      "commands": [
+        {
+          "argv": [
+            "python3",
+            "<skill>/modes/forgejo-private-repository-loop/scripts/audit_git_history.py",
+            "--repo",
+            "<workspace>/private-consumer",
+            "--patterns",
+            "<workspace>/private-patterns.txt",
+            "--output",
+            "<workspace>/audit-private.json"
+          ],
+          "exit_code": 2,
+          "stderr_tail": [],
+          "stdout_tail": [
+            "HISTORY-AUDIT FAIL: 4 finding(s)"
+          ]
+        },
+        {
+          "argv": [
+            "python3",
+            "<skill>/modes/forgejo-private-repository-loop/scripts/audit_git_history.py",
+            "--repo",
+            "<workspace>/public-implementation",
+            "--patterns",
+            "<workspace>/private-patterns.txt",
+            "--output",
+            "<workspace>/audit-public.json"
+          ],
+          "exit_code": 0,
+          "stderr_tail": [],
+          "stdout_tail": [
+            "HISTORY-AUDIT PASS: 0 finding(s)"
+          ]
+        }
+      ],
+      "detail": "real worktree/object audit found 4 denied-literal surfaces in the private source and none in the independently authored public source",
+      "head": "73dc5db93d8b7a82e68d2e3f6987475f5ed56c87",
+      "link": "private-source-audited",
+      "state": "PASS"
+    },
+    {
+      "admitted_remote_url": "http://127.0.0.1:3000/neon/canary-262-private-1787031888.git",
+      "commands": [
+        {
+          "argv": [
+            "bash",
+            "<skill>/modes/forgejo-private-repository-loop/scripts/configure_forgejo_only.sh",
+            "<workspace>/private-consumer",
+            "http://127.0.0.1:3000/neon/canary-262-private-1787031888.git"
+          ],
+          "exit_code": 0,
+          "stderr_tail": [],
+          "stdout_tail": [
+            "FORGEJO-ONLY CONFIGURED remote=forgejo host=127.0.0.1"
+          ]
+        },
+        {
+          "argv": [
+            "python3",
+            "<skill>/modes/forgejo-private-repository-loop/scripts/check_forgejo_only.py",
+            "<workspace>/private-consumer"
+          ],
+          "exit_code": 0,
+          "stderr_tail": [],
+          "stdout_tail": [
+            "FORGEJO-ONLY GREEN remote=forgejo host=127.0.0.1"
+          ]
+        },
+        {
+          "argv": [
+            "bash",
+            "<workspace>/private-consumer/.git/hooks/pre-push",
+            "forgejo",
+            "http://127.0.0.1:3000/neon/canary-262-private-1787031888.git"
+          ],
+          "exit_code": 0,
+          "stderr_tail": [],
+          "stdout_tail": [
+            "PRIVATE-LINEAGE GUARD: exact Forgejo-only destination admitted."
+          ]
+        },
+        {
+          "argv": [
+            "bash",
+            "<workspace>/private-consumer/.git/hooks/pre-push",
+            "origin",
+            "https://github.com/example/private.git"
+          ],
+          "exit_code": 72,
+          "stderr_tail": [
+            "PRIVATE-LINEAGE GUARD: GitHub destination is forbidden."
+          ],
+          "stdout_tail": []
+        }
+      ],
+      "detail": "the live checkout carries exactly one admitted remote pointing at the real forge; the installed guard admitted it and refused a GitHub destination",
+      "link": "forgejo-only-bound",
+      "state": "PASS"
+    },
+    {
+      "commands": [
+        {
+          "argv": [
+            "git",
+            "-C",
+            "<workspace>/private-consumer",
+            "push",
+            "forgejo",
+            "HEAD:refs/heads/main"
+          ],
+          "exit_code": 0,
+          "stderr_tail": [
+            "To http://127.0.0.1:3000/neon/canary-262-private-1787031888.git",
+            " * [new branch]      HEAD -> main"
+          ],
+          "stdout_tail": [
+            "PRIVATE-LINEAGE GUARD: exact Forgejo-only destination admitted."
+          ]
+        }
+      ],
+      "detail": "push traversed the installed pre-push guard and the authenticated readback returned the exact local head",
+      "head": "73dc5db93d8b7a82e68d2e3f6987475f5ed56c87",
+      "link": "private-main-sealed",
+      "readback_attempts": 4,
+      "request": {
+        "endpoint": "/api/v1/repos/neon/canary-262-private-1787031888/branches/main",
+        "http_status": 200,
+        "method": "GET",
+        "response_bytes": 814,
+        "response_sha256": "4619f9450fc6a2bd89356d0336045fc45fbd52cc3bb713612780789eea4b4ae6"
+      },
+      "state": "PASS"
+    },
+    {
+      "commands": [
+        {
+          "argv": [
+            "python3",
+            "<skill>/modes/forgejo-private-repository-loop/scripts/build_private_fingerprints.py",
+            "--source",
+            "<workspace>/private-consumer",
+            "--output",
+            "<workspace>/private-fingerprints.json"
+          ],
+          "exit_code": 0,
+          "stderr_tail": [],
+          "stdout_tail": [
+            "PRIVATE-FINGERPRINTS files=2 count=48"
+          ]
+        },
+        {
+          "argv": [
+            "python3",
+            "<skill>/modes/forgejo-private-repository-loop/scripts/check_cleanroom_packet.py",
+            "<workspace>/cleanroom-packet.json",
+            "--private-patterns",
+            "<workspace>/private-patterns.txt",
+            "--private-fingerprints",
+            "<workspace>/private-fingerprints.json"
+          ],
+          "exit_code": 0,
+          "stderr_tail": [],
+          "stdout_tail": [
+            "CLEANROOM GREEN packet_sha256=b4a3a87299739d8a2b6024f7276db417a0680095908655f91996dafb10575046"
+          ]
+        },
+        {
+          "argv": [
+            "python3",
+            "<skill>/modes/forgejo-private-repository-loop/scripts/check_cleanroom_packet.py",
+            "<workspace>/cleanroom-packet-leaking.json",
+            "--private-patterns",
+            "<workspace>/private-patterns.txt",
+            "--private-fingerprints",
+            "<workspace>/private-fingerprints.json"
+          ],
+          "exit_code": 2,
+          "stderr_tail": [
+            "FAIL distinctive private text fingerprints matched: count=22",
+            "CLEANROOM RED problems=1"
+          ],
+          "stdout_tail": []
+        }
+      ],
+      "detail": "fingerprints built from the live private worktree admit the generalized packet and refuse a packet carrying the private source prose",
+      "link": "cleanroom-requirements-exported",
+      "packet_sha256": "b4a3a87299739d8a2b6024f7276db417a0680095908655f91996dafb10575046",
+      "private_fingerprints_sha256": "be7598ed623d450ca4f1fec77e2bcdc0d704ea1418e4462e06dbc946f73c5be6",
+      "state": "PASS"
+    },
+    {
+      "commands": [
+        {
+          "argv": [
+            "bash",
+            "<skill>/modes/forgejo-private-repository-loop/scripts/create_fresh_root_snapshot.sh",
+            "<workspace>/public-implementation",
+            "<workspace>/fresh-root",
+            "--patterns",
+            "<workspace>/private-patterns.txt",
+            "--receipt",
+            "<workspace>/fresh-root-receipt.json"
+          ],
+          "exit_code": 0,
+          "stderr_tail": [],
+          "stdout_tail": [
+            "FRESH-ROOT GREEN head=22613150b4be3e0b5a4ce97fea1904581556f19a tree=a95e48e0ee54258f7f2a5d9df3df84db882133df"
+          ]
+        },
+        {
+          "argv": [
+            "bash",
+            "<skill>/modes/forgejo-private-repository-loop/scripts/assert_no_shared_lineage.sh",
+            "<workspace>/fresh-root",
+            "<workspace>/private-consumer"
+          ],
+          "exit_code": 0,
+          "stderr_tail": [],
+          "stdout_tail": [
+            "LINEAGE GREEN no-merge-base no-alternates no-shared-nonempty-objects"
+          ]
+        }
+      ],
+      "detail": "the public snapshot has exactly one root, no remotes and no alternates, and shares no merge base or non-empty object with the pushed private repository",
+      "fresh_root_head": "22613150b4be3e0b5a4ce97fea1904581556f19a",
+      "link": "fresh-root-verified",
+      "state": "PASS"
+    },
+    {
+      "detail": "repository deleted and the absence confirmed by an authenticated 404",
+      "disposition_check": {
+        "argv": [
+          "python3",
+          "<skill>/modes/forgejo-private-repository-loop/scripts/check_provider_retention.py",
+          "<receipts>/private-lineage-provider-disposition.json"
+        ],
+        "exit_code": 0,
+        "stderr_tail": [],
+        "stdout_tail": [
+          "PROVIDER-RETENTION GREEN overall=INCOMPLETE_OR_LIMITED"
+        ]
+      },
+      "disposition_document": "private-lineage-provider-disposition.json",
+      "disposition_sha256": "6ac763900a2652698c20942abc9e72c540629e1a612e50a452083d0c0a35ee9d",
+      "link": "provider-cleanup-disposition",
+      "requests": [
+        {
+          "endpoint": "/api/v1/repos/neon/canary-262-private-1787031888",
+          "http_status": 204,
+          "method": "DELETE",
+          "response_bytes": 0,
+          "response_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "endpoint": "/api/v1/repos/neon/canary-262-private-1787031888",
+          "http_status": 404,
+          "method": "GET",
+          "response_bytes": 98,
+          "response_sha256": "412a7f254674e2fe530faa0ab5f6e8b6ed4f1d4293eff74d43a75dcdcec3cdfd"
+        }
+      ],
+      "state": "PASS"
+    },
+    {
+      "commands": [
+        {
+          "argv": [
+            "python3",
+            "<skill>/modes/forgejo-private-repository-loop/scripts/check_retirement_inventory.py",
+            "<receipts>/private-lineage-retirement-inventory.json"
+          ],
+          "exit_code": 0,
+          "stderr_tail": [],
+          "stdout_tail": [
+            "RETIREMENT-INVENTORY GREEN overall=OUTSTANDING"
+          ]
+        }
+      ],
+      "detail": "the canary workspace holding the private clone and worktrees was removed and its absence observed; the runtime owner's credential is an accepted limitation",
+      "inventory_document": "private-lineage-retirement-inventory.json",
+      "inventory_sha256": "a3548e0777990fbea0bbf5ea65b1d5b42741f6740f7714e924927c8de8a6e917",
+      "link": "local-retirement-inventory",
+      "state": "PASS"
+    }
+  ],
+  "chain_declared": [
+    "forgejo-substrate-probe",
+    "credential-helper-auth-lane",
+    "private-repository-created",
+    "private-source-audited",
+    "forgejo-only-bound",
+    "private-main-sealed",
+    "cleanroom-requirements-exported",
+    "fresh-root-verified",
+    "provider-cleanup-disposition",
+    "local-retirement-inventory"
+  ],
+  "coverage": {
+    "not_exercised": [],
+    "other": {},
+    "pass": [
+      "cleanroom-requirements-exported",
+      "credential-helper-auth-lane",
+      "forgejo-only-bound",
+      "forgejo-substrate-probe",
+      "fresh-root-verified",
+      "local-retirement-inventory",
+      "private-main-sealed",
+      "private-repository-created",
+      "private-source-audited",
+      "provider-cleanup-disposition"
+    ]
+  },
+  "declared_non_claims": [
+    "the private source is a fixture built by this run, so no real private tree was audited",
+    "reaching this forge says nothing about any other Forgejo instance or provider",
+    "provider-side search indexes and backups are not observable from this API and stay limited",
+    "the Forgejo credential remains in the runtime owner's helper; this run cannot retire it",
+    "no GitHub surface was contacted and no GitHub evidence is claimed here"
+  ],
+  "dry_run": false,
+  "duration_ms": 7125,
+  "forge": {
+    "authenticated_identity": "neon",
+    "url": "http://127.0.0.1:3000",
+    "version": "9.0.3+gitea-1.22.0"
+  },
+  "issue": 262,
+  "mutations_performed": [
+    {
+      "cleanup": "DELETED",
+      "kind": "forgejo-repository",
+      "private": true,
+      "purpose": "live private-lineage canary subject for issue #262",
+      "repository_id": 23,
+      "subject": "neon/canary-262-private-1787031888"
+    },
+    {
+      "cleanup": "DELETED",
+      "kind": "forgejo-branch",
+      "purpose": "prove the sealed checkout reaches the real forge through the guard",
+      "subject": "neon/canary-262-private-1787031888@refs/heads/main"
+    }
+  ],
+  "schema": "dual-forge-repository-loop/private-lineage-canary-receipt/v1",
+  "started_at": 1787031888,
+  "subject": {
+    "head": "73dc5db93d8b7a82e68d2e3f6987475f5ed56c87",
+    "identity_digest": "90745f3e4ce3c56a0b767625a0e4814a9cd049832ff3c0efc816dcb7b83f6dac",
+    "private": true,
+    "repository": "neon/canary-262-private-1787031888",
+    "repository_id": 23
+  }
+}

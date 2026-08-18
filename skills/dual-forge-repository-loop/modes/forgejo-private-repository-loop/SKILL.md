@@ -156,8 +156,24 @@ PROVIDER_DISPOSITION_REQUIRED
 
 Hermetic tests prove these software contracts only. A live Forgejo repository, local worktree delivery, provider cleanup, or provider support disposition requires separate runtime evidence.
 
-## Verification
+## Runtime evidence
+
+The producer of that separate evidence lives one level up, in the parent Skill, because it composes the mode checkers above through subprocesses rather than importing them:
 
 ```bash
-bash tests/private-lineage/verify.sh
+python3 ../../scripts/run_private_lineage_canary.py --owner <forgejo-owner> \
+  --out ../../evals/receipts [--dry-run]
+```
+
+It creates its own throwaway private repository on a live local Forgejo, seals a checkout to it, pushes through the installed guard, reads the head back, extracts a clean-room packet from the live private worktree, verifies a fresh root against it, then deletes the repository and confirms the absence. `--dry-run` exercises everything except the three provider mutations, so the local half can be verified before anything is created.
+
+The receipt, the provider disposition and the local retirement inventory land in the parent Skill's `evals/receipts/`, and `../../scripts/check_private_lineage_canary.py` refuses a receipt that claims a provider lane without the wire result behind it. The private source is a fixture built by that run, so a real private consumer tree remains `NOT_EXERCISED`.
+
+## Verification
+
+Both suites are paths in the parent Skill:
+
+```bash
+bash tests/forgejo-private-lineage/verify.sh
+bash tests/private-lineage-live-canary/verify.sh
 ```
