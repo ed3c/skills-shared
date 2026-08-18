@@ -1,8 +1,8 @@
 {
   "skill_name": "github-delivery-loop",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "_meta": {
-    "coverage_metric": "planted hollow-receipt, unsafe merge-rule target, forged/stale merge-admit, canonical-link divergence, wasteful CI publication, stale local verification, untrusted GitHub snapshot detection, and procedural-core/domain-decoupling mutation detection",
+    "coverage_metric": "planted hollow-receipt, out-of-schema receipt field, unsafe merge-rule target, forged/stale merge-admit, canonical-link divergence, wasteful CI publication, stale local verification, untrusted GitHub snapshot detection, procedural-core/domain-decoupling mutation detection, and frozen-treatment drift in this Skill's own refactor proof",
     "purpose": "Prove that the portable delivery method remains procedure-driven and executable while GitHub/provider/host details stay domain-decoupled, and that delivery receipts, publication, and merge controls fail closed without network access."
   },
   "runnable": [
@@ -12,8 +12,8 @@
       "test_verify": "tests/check-receipt/verify.sh",
       "good_fixture": "tests/check-receipt/fixtures/good",
       "hollow_fixture": "tests/check-receipt/fixtures/hollow",
-      "covers": ["complete receipt", "missing artifact is failure rather than skip"],
-      "expected": "good PASS and hollow UNMATERIALIZED FAIL"
+      "covers": ["complete receipt", "missing artifact is failure rather than skip", "the receipt shape is asserted by a machine schema separately from the semantic checks, so a field no semantic assertion reads cannot ride through"],
+      "expected": "good PASS, hollow UNMATERIALIZED FAIL, and a receipt carrying an out-of-schema field RECEIPT-SHAPE FAIL"
     },
     {
       "id": "DELIVERY-2",
@@ -104,6 +104,16 @@
       "hollow_mutations": "remove one DL procedure atom, inject GitHub/Actions billing language into the portable core, or replace a hard-law executable assertion with prose-only documentation",
       "covers": ["all DL-01..DL-09 procedure atoms remain in the portable bounded core", "all DL-L01..DL-L10 hard laws have executable assertion commands", "GitHub/provider/host domain tokens stay outside the portable core", "github-domain.md maps every portable atom to GitHub-specific executable owners"],
       "expected": "canonical core GREEN; missing atom, domain leakage, and prose-only hard-law assertion each turn red"
+    },
+    {
+      "id": "DELIVERY-12",
+      "checker_script": "tests/refactor-proof/refactor_ab.py",
+      "test_verify": "tests/refactor-proof/verify.sh",
+      "good_fixture": "tests/refactor-proof/fixtures",
+      "hollow_fixture": null,
+      "hollow_mutations": "bytes appended to the frozen refactor-as-landed treatment, and a live body that drops the index-discipline claim it was repaired to restore",
+      "covers": ["the pre-refactor body and the refactor exactly as it landed stay frozen at their historical Git blob identities", "the strength #242 dropped is named and scored, so the as-landed regression stays in the denominator instead of being edited away", "the repaired candidate must dominate every prior treatment on the same criteria", "each treatment runs the same matched zero-network task on a tree that differs only in SKILL.md", "a body that names no receipt shape gate reports NOT_IMPLEMENTED rather than passing"],
+      "expected": "three treatments scored and run; edited frozen bytes exit red naming frozen treatment drift; a candidate that drops the restored index-discipline claim exits red even though it still dominates the as-landed arm"
     }
   ]
 }

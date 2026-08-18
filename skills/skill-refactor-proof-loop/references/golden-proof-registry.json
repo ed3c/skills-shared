@@ -67,6 +67,61 @@
         "rollback": false
       },
       "remaining_issues": [231, 232, 234, 256, 312]
+    },
+    {
+      "id": "github-delivery-loop-refactor-proof-v1",
+      "owner_skill": "github-delivery-loop",
+      "issue": 348,
+      "pull_requests": [242],
+      "entrypoint": "skills/github-delivery-loop/tests/refactor-proof/refactor_ab.py",
+      "runner": "skills/github-delivery-loop/tests/refactor-proof/verify.sh",
+      "treatments": [
+        {
+          "id": "A_OLD_CANONICAL",
+          "role": "OLD_CANONICAL",
+          "path": "skills/github-delivery-loop/tests/refactor-proof/fixtures/pre-refactor-SKILL.txt",
+          "blob_sha": "1e26bfae0630fa2635996380e05014bea8ecbf4c"
+        },
+        {
+          "id": "B0_REFACTOR_AS_LANDED",
+          "role": "REFACTOR_AS_LANDED",
+          "path": "skills/github-delivery-loop/tests/refactor-proof/fixtures/refactor-as-landed-SKILL.txt",
+          "blob_sha": "3faf7ca0e35a651648e80b1ad486c1921cc1d6d4"
+        },
+        {
+          "id": "B1_INDEX_AND_SHAPE_REPAIRED",
+          "role": "REPAIRED_CANDIDATE",
+          "path": "skills/github-delivery-loop/SKILL.md",
+          "blob_sha": "2256aa5d2cfaf680c42bf614a6207bf82cf27f2e"
+        }
+      ],
+      "proof_layers": {
+        "L0_SOURCE_FREEZE": "PASS",
+        "L1_STRUCTURAL_REACHABILITY": "PASS",
+        "L2_EXECUTABLE_CONTRACT": "PASS",
+        "L3_HERMETIC_REAL_TASK": "PASS",
+        "L4_MATCHED_LIVE_MODEL_RUNTIME": "NOT_EXERCISED",
+        "L5_DELIVERY_AND_HUMAN_ADMIT": "HUMAN_ADMIT_REQUIRED"
+      },
+      "highest_layer": "L3_HERMETIC_REAL_TASK",
+      "denominator": {
+        "failed_retained": true,
+        "stale_retained": true,
+        "blocked_retained": true,
+        "cancelled_retained": true,
+        "superseded_retained": true
+      },
+      "cleanup": "CLEAN",
+      "authority": {
+        "provider_activation": false,
+        "publication": false,
+        "semantic_conflict_resolution": false,
+        "merge": false,
+        "release": false,
+        "promotion": false,
+        "rollback": false
+      },
+      "remaining_issues": [234, 348]
     }
   ]
 }

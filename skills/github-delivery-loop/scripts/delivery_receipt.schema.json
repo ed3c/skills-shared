@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "github-delivery-loop/delivery-receipt/v1",
+  "title": "github-delivery-receipt/v1",
+  "description": "Machine shape of the delivery receipt github_delivery.py emits and consumes. Shape only: identity agreement with the registry line, commit reachability, and publication cross-binding stay in the semantic gate, so a shape drift and a semantic drift fail separately instead of one hiding the other.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "line",
+    "github_repo",
+    "prd_issue_url",
+    "issue_urls",
+    "pr_urls",
+    "project_url",
+    "source_commit",
+    "synced_at"
+  ],
+  "properties": {
+    "schema": {
+      "const": "github-delivery-receipt/v1"
+    },
+    "line": {
+      "type": "string",
+      "minLength": 1
+    },
+    "github_repo": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"
+    },
+    "github_repository_id": {
+      "type": ["string", "null"],
+      "minLength": 1
+    },
+    "prd_issue_url": {
+      "type": "string",
+      "pattern": "^https://github\\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/issues/[1-9][0-9]*$"
+    },
+    "issue_urls": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^https://github\\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/issues/[1-9][0-9]*$"
+      }
+    },
+    "pr_urls": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^https://github\\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/pull/[1-9][0-9]*$"
+      }
+    },
+    "project_url": {
+      "type": "string",
+      "pattern": "^https://github\\.com/(?:users|orgs)/[A-Za-z0-9_.-]+/projects/[1-9][0-9]*$"
+    },
+    "source_commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "synced_at": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]+)?(?:Z|[+-][0-9]{2}:[0-9]{2})$"
+    }
+  }
+}

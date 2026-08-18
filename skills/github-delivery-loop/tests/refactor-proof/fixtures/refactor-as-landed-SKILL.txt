@@ -106,7 +106,6 @@ When GitHub is the selected forge, load [modules/github-domain.md](modules/githu
 ```text
 scripts/README.md
 scripts/check_procedural_core.py
-scripts/delivery_receipt.schema.json
 scripts/github_delivery.py
 scripts/delivery_sync.py
 scripts/delivery_sync_impl.py
@@ -124,26 +123,6 @@ scripts/reference_causality.py
 ```
 
 The GitHub module maps these mechanisms onto the portable atoms; GitHub-specific implementation details are not universal procedure law.
-
-`scripts/delivery_receipt.schema.json` is the machine shape of `github-delivery-receipt/v1`, and `scripts/github_delivery.py check` asserts it before its semantic checks. Shape and semantics are separate gates on purpose: the semantic pass reads one named field at a time, so a field it never reads — a misspelling next to a real key, a wrong type in an unused slot — satisfies every semantic assertion. Only the schema sees the document as a whole.
-
-## Index discipline
-
-The `modules/` and `scripts/` lists above are claims this file makes about its own tree, and an index fails one way only. A dead link announces itself the moment somebody follows it; a file the index never names is invisible, because a short list and a complete list read identically. The first run of the index checker found eight files this body never named, `scripts/delivery_sync.py` among them.
-
-That failure mode is not hypothetical for this Skill's own history. The refactor that generalized this core added `tests/procedural-core/` without naming it in `tests/README.md`, which declares itself a complete index; the gap was invisible on the branch and only turned the suite red on merge, because index coverage is a property of the combined tree rather than of either side.
-
-So the claim is enforced rather than remembered:
-
-```bash
-bash skills/github-delivery-loop/tests/index/verify.sh
-```
-
-The checker runs its own `--selftest` first. Until it can prove it turns red, its green verdict on this file counts for nothing.
-
-## Refactor treatments
-
-This Skill's own generalization is frozen as immutable treatments and replayed on every run: `tests/refactor-proof/fixtures/pre-refactor-SKILL.txt` is the pre-refactor body, `tests/refactor-proof/fixtures/refactor-as-landed-SKILL.txt` is the refactor exactly as it landed, and this file is the repaired candidate. `bash skills/github-delivery-loop/tests/refactor-proof/verify.sh` re-scores all three on the same old-strength criteria and runs the same matched zero-network task against each. The as-landed treatment stays in the denominator with its regression visible; it is evidence, never something to edit into a better score.
 
 ## Change protocol
 

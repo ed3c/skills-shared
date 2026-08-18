@@ -17,6 +17,8 @@ This directory proves that the shared delivery mechanisms can turn red. A green 
 | [`reference-causality/`](reference-causality/) | source/evidence causality | reference-only or stale evidence cannot promote |
 | [`reference-causality-integration/`](reference-causality-integration/) | real-path causality wiring | eval target reaches the live implementation path |
 | [`procedural-core/`](procedural-core/) | portable core versus GitHub domain instance | a provider-specific term in the procedural core is refused |
+| [`index/`](index/) | this Skill's index of its own tree | a dead link and a file the index never names are both refused |
+| [`refactor-proof/`](refactor-proof/) | this Skill's own frozen refactor treatments | edited historical bytes and a candidate that drops a restored strength both turn red |
 | [`run-all.sh`](run-all.sh) | aggregate local harness | every discovered `verify.sh` must pass |
 
 The machine-readable inventory is [`../evals.json`](../evals.json).
@@ -66,6 +68,7 @@ Reaches the actual public script path, file layout, and data contract used by co
 | `DELIVERY-5` | exact-HEAD local verification + admitted publication intent | stale receipt, repeated draft, old check SHA, consumed feedback, billing-open/stale recovery |
 | evidence producers | admitted absolute `gh` identity, one workflow/run/job/check identity, raw-transport-derived observation | `PATH`/CLI fake provider executable, rerun/ambiguous check, tampered transport, shell strings, unsafe env, multiple PRs, malformed billing |
 | reference causality | implementation-bound evidence | source citation or old evidence used as promotion proof |
+| `DELIVERY-12` | frozen pre-refactor and as-landed bodies, matched task per treatment | edited frozen bytes, candidate that drops the restored index-discipline claim |
 
 ## State semantics in tests
 
