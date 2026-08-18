@@ -14,8 +14,14 @@ Skill's proof level. Every state below is as measured by
 [`skills/skill-refactor-proof-loop/scripts/check_skill_adoption_ledger.py`](../../skills/skill-refactor-proof-loop/scripts/check_skill_adoption_ledger.py)
 against current repository bytes.
 
-All 6 blobs that record names as the admitted subject still hash to the
-admitted SHA, so it has not expired.
+**That admission has expired by its own terms.** It expires on any change to the 6 blobs
+it names as the admitted subject, and 1 of them no longer hash to the admitted SHA:
+
+- `skills/skill-refactor-proof-loop/references/golden-proof-registry.json`
+
+Re-admission is a new Human record with a new `decided_at`. Nothing in this pipeline re-points the
+old one, and this report does not treat the expired record as authority for anything below it.
+The measurements are unaffected: they were never derived from the admission in the first place.
 
 ## Headline
 
@@ -24,27 +30,26 @@ admitted SHA, so it has not expired.
 | Skills classified | 10 |
 | Criteria per Skill | 10 |
 | Classification cells | 100 |
-| `PASS` cells | 32 |
-| Non-`PASS` gaps | 68 |
-| Gaps carrying an owning issue | 68 |
+| `PASS` cells | 80 |
+| Non-`PASS` gaps | 20 |
+| Gaps carrying an owning issue | 20 |
 | Distinct owning issues | 14 |
-| Golden proofs registered | 1 |
+| Golden proofs registered | 10 |
 | Migration leaves ordered | 10 |
 
 Highest proof layer reached, per Skill:
 
 | Layer | Skills |
 |---|---|
-| `L2_EXECUTABLE_CONTRACT` | 9 |
-| `L3_HERMETIC_REAL_TASK` | 1 |
+| `L3_HERMETIC_REAL_TASK` | 10 |
 
 Every classification cell, by state:
 
 | State | Cells |
 |---|---|
-| `PASS` | 32 |
-| `PARTIAL` | 8 |
-| `ABSENT` | 50 |
+| `PASS` | 80 |
+| `PARTIAL` | 10 |
+| `ABSENT` | 0 |
 | `NOT_IMPLEMENTED` | 4 |
 | `NOT_EXERCISED` | 6 |
 | `NOT_APPLICABLE` | 0 |
@@ -70,15 +75,15 @@ DELIVERY   molecular_traceability
 | Skill | Layer | Proof | FROZEN_A | FROZEN_B0 | STRENGTHS | ROUTES | GATES | CONTROLS | HERMETIC | GOLDEN | LIVE_AB | DELIVERY |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | `agentic-tech-lead-orchestration` | `L3_HERMETIC_REAL_TASK` | `agentic-tech-lead-real-task-ab-v1` | `PASS` | `PASS` | `PASS` | `PASS` | `PASS` | `PASS` | `PASS` | `PASS` | `NOT_EXERCISED` | `PARTIAL` |
-| `controlled-technical-language-harness` | `L2_EXECUTABLE_CONTRACT` | none | `ABSENT` | `ABSENT` | `ABSENT` | `PASS` | `PARTIAL` | `PASS` | `PARTIAL` | `ABSENT` | `NOT_EXERCISED` | `ABSENT` |
-| `dual-forge-repository-loop` | `L2_EXECUTABLE_CONTRACT` | none | `ABSENT` | `ABSENT` | `ABSENT` | `PASS` | `PASS` | `PASS` | `PARTIAL` | `ABSENT` | `NOT_EXERCISED` | `ABSENT` |
-| `forgejo-delivery-loop` | `L2_EXECUTABLE_CONTRACT` | none | `ABSENT` | `ABSENT` | `ABSENT` | `PASS` | `PASS` | `PASS` | `ABSENT` | `ABSENT` | `NOT_IMPLEMENTED` | `ABSENT` |
-| `git-town-stacked-pr-worker` | `L2_EXECUTABLE_CONTRACT` | none | `ABSENT` | `ABSENT` | `ABSENT` | `PASS` | `PASS` | `PASS` | `ABSENT` | `ABSENT` | `NOT_EXERCISED` | `ABSENT` |
-| `github-delivery-loop` | `L2_EXECUTABLE_CONTRACT` | none | `ABSENT` | `ABSENT` | `ABSENT` | `PASS` | `PARTIAL` | `PASS` | `ABSENT` | `ABSENT` | `NOT_IMPLEMENTED` | `ABSENT` |
-| `knowledge-continuity` | `L2_EXECUTABLE_CONTRACT` | none | `ABSENT` | `ABSENT` | `ABSENT` | `PASS` | `PARTIAL` | `PASS` | `ABSENT` | `ABSENT` | `NOT_IMPLEMENTED` | `ABSENT` |
-| `procedural-shadow-runtime` | `L2_EXECUTABLE_CONTRACT` | none | `ABSENT` | `ABSENT` | `ABSENT` | `PASS` | `PASS` | `PASS` | `PARTIAL` | `ABSENT` | `NOT_EXERCISED` | `ABSENT` |
-| `repository-capability-audit` | `L2_EXECUTABLE_CONTRACT` | none | `ABSENT` | `ABSENT` | `ABSENT` | `PASS` | `PASS` | `PASS` | `PARTIAL` | `ABSENT` | `NOT_EXERCISED` | `ABSENT` |
-| `spatial-loop-systems-engineering` | `L2_EXECUTABLE_CONTRACT` | none | `ABSENT` | `ABSENT` | `ABSENT` | `PASS` | `PASS` | `PASS` | `ABSENT` | `ABSENT` | `NOT_IMPLEMENTED` | `ABSENT` |
+| `controlled-technical-language-harness` | `L3_HERMETIC_REAL_TASK` | `controlled-technical-language-refactor-ab-v1` | `PASS` | `PASS` | `PASS` | `PASS` | `PASS` | `PASS` | `PASS` | `PASS` | `NOT_EXERCISED` | `PARTIAL` |
+| `dual-forge-repository-loop` | `L3_HERMETIC_REAL_TASK` | `dual-forge-repository-loop-refactor-proof-v1` | `PASS` | `PASS` | `PASS` | `PASS` | `PASS` | `PASS` | `PASS` | `PASS` | `NOT_EXERCISED` | `PARTIAL` |
+| `forgejo-delivery-loop` | `L3_HERMETIC_REAL_TASK` | `forgejo-delivery-readback-ab-v1` | `PASS` | `PASS` | `PASS` | `PASS` | `PASS` | `PASS` | `PASS` | `PASS` | `NOT_IMPLEMENTED` | `PARTIAL` |
+| `git-town-stacked-pr-worker` | `L3_HERMETIC_REAL_TASK` | `git-town-stacked-pr-worker-refactor-proof-v1` | `PASS` | `PASS` | `PASS` | `PASS` | `PASS` | `PASS` | `PASS` | `PASS` | `NOT_EXERCISED` | `PARTIAL` |
+| `github-delivery-loop` | `L3_HERMETIC_REAL_TASK` | `github-delivery-loop-refactor-proof-v1` | `PASS` | `PASS` | `PASS` | `PASS` | `PASS` | `PASS` | `PASS` | `PASS` | `NOT_IMPLEMENTED` | `PARTIAL` |
+| `knowledge-continuity` | `L3_HERMETIC_REAL_TASK` | `knowledge-continuity-entrypoint-claim-closure-v1` | `PASS` | `PASS` | `PASS` | `PASS` | `PASS` | `PASS` | `PASS` | `PASS` | `NOT_IMPLEMENTED` | `PARTIAL` |
+| `procedural-shadow-runtime` | `L3_HERMETIC_REAL_TASK` | `procedural-shadow-runtime-refactor-ab-v1` | `PASS` | `PASS` | `PASS` | `PASS` | `PASS` | `PASS` | `PASS` | `PASS` | `NOT_EXERCISED` | `PARTIAL` |
+| `repository-capability-audit` | `L3_HERMETIC_REAL_TASK` | `repository-capability-audit-refactor-proof-ab-v1` | `PASS` | `PASS` | `PASS` | `PASS` | `PASS` | `PASS` | `PASS` | `PASS` | `NOT_EXERCISED` | `PARTIAL` |
+| `spatial-loop-systems-engineering` | `L3_HERMETIC_REAL_TASK` | `spatial-loop-escalation-gate-ab-v1` | `PASS` | `PASS` | `PASS` | `PASS` | `PASS` | `PASS` | `PASS` | `PASS` | `NOT_IMPLEMENTED` | `PARTIAL` |
 
 ## Gaps by owner issue
 
@@ -103,15 +108,14 @@ An issue listed here is not a duplicate of the audit: it already exists in the l
 | Skill | Criterion | State | Why |
 |---|---|---|---|
 | `dual-forge-repository-loop` | `live_model_runtime_ab` | `NOT_EXERCISED` | Requires two provider binaries and real spend; delivery receipts are owned by #234. |
-| `git-town-stacked-pr-worker` | `live_model_runtime_ab` | `NOT_EXERCISED` | A live canary exists behind an admission file; no admitted run is registered. |
+| `git-town-stacked-pr-worker` | `live_model_runtime_ab` | `NOT_EXERCISED` | A live canary exists behind an admission file; no admitted run is registered. The hermetic task below it contacted no Git Town binary, forge or model and cannot raise this lane. |
 | `github-delivery-loop` | `live_model_runtime_ab` | `NOT_IMPLEMENTED` | Publication receipts are delivery evidence, not a matched model/runtime comparison. |
 
-### #256 — 2 gaps
+### #256 — 1 gap
 
 | Skill | Criterion | State | Why |
 |---|---|---|---|
-| `repository-capability-audit` | `matched_hermetic_task` | `PARTIAL` | The matrix is preregistered and scored deterministically, but every cell needs a real host binary. |
-| `repository-capability-audit` | `live_model_runtime_ab` | `NOT_EXERCISED` | Same-subject adapter receipts are owned by #256. |
+| `repository-capability-audit` | `live_model_runtime_ab` | `NOT_EXERCISED` | Same-subject adapter receipts are owned by #256. The #351 hermetic task did not move this: it observes no model, no provider and no host binary. |
 
 ### #343 — 1 gap
 
@@ -119,110 +123,63 @@ An issue listed here is not a duplicate of the audit: it already exists in the l
 |---|---|---|---|
 | `agentic-tech-lead-orchestration` | `molecular_traceability` | `PARTIAL` | Nodes name their issues and PRs, but their state is declared READ_FROM_GITHUB and cannot be closed by a zero-network audit. |
 
-### #344 — 8 gaps
+### #344 — 2 gaps
 
 | Skill | Criterion | State | Why |
 |---|---|---|---|
-| `controlled-technical-language-harness` | `old_canonical_treatment_frozen` | `ABSENT` | No pre-refactor treatment bytes are frozen anywhere in the Skill. |
-| `controlled-technical-language-harness` | `refactor_as_landed_treatment_frozen` | `ABSENT` | — |
-| `controlled-technical-language-harness` | `old_strengths_asserted` | `ABSENT` | Without a frozen old treatment there is nothing to assert preservation against. |
-| `controlled-technical-language-harness` | `schema_and_semantic_gates_executable` | `PARTIAL` | Semantic and deterministic gates are executable; no machine shape contract (*.schema.json) exists. |
-| `controlled-technical-language-harness` | `matched_hermetic_task` | `PARTIAL` | Matched-task fairness is enforced over recorded A/B bundles, not over frozen refactor treatments. |
-| `controlled-technical-language-harness` | `golden_proof_registered` | `ABSENT` | — |
-| `controlled-technical-language-harness` | `live_model_runtime_ab` | `NOT_EXERCISED` | The scorer consumes live-run bundles; no live bundle is registered as evidence. |
-| `controlled-technical-language-harness` | `molecular_traceability` | `ABSENT` | — |
+| `controlled-technical-language-harness` | `live_model_runtime_ab` | `NOT_EXERCISED` | The scorer consumes live-run bundles; no live bundle is registered as evidence. The frozen-treatment A/B is deterministic text comparison and promotes nothing here. |
+| `controlled-technical-language-harness` | `molecular_traceability` | `PARTIAL` | The leaf, its edges and its treatment PRs are indexed in machine artifacts, but refactor-proof-stack.json carries no node for #344 and the delivery state of the ones it does carry is READ_FROM_GITHUB. A zero-network audit cannot close this. |
 
-### #345 — 6 gaps
+### #345 — 1 gap
 
 | Skill | Criterion | State | Why |
 |---|---|---|---|
-| `dual-forge-repository-loop` | `old_canonical_treatment_frozen` | `ABSENT` | — |
-| `dual-forge-repository-loop` | `refactor_as_landed_treatment_frozen` | `ABSENT` | — |
-| `dual-forge-repository-loop` | `old_strengths_asserted` | `ABSENT` | — |
-| `dual-forge-repository-loop` | `matched_hermetic_task` | `PARTIAL` | The cross-stack case set is frozen and checked, but the comparison itself is never executed in the suite. |
-| `dual-forge-repository-loop` | `golden_proof_registered` | `ABSENT` | — |
-| `dual-forge-repository-loop` | `molecular_traceability` | `ABSENT` | — |
+| `dual-forge-repository-loop` | `molecular_traceability` | `PARTIAL` | The Stack index names this Skill's delivery lane and its issues, but every node's state is declared READ_FROM_GITHUB. A zero-network checker cannot close it, so PARTIAL is the ceiling rather than a gap awaiting more work here. |
 
-### #346 — 7 gaps
+### #346 — 2 gaps
 
 | Skill | Criterion | State | Why |
 |---|---|---|---|
-| `forgejo-delivery-loop` | `old_canonical_treatment_frozen` | `ABSENT` | — |
-| `forgejo-delivery-loop` | `refactor_as_landed_treatment_frozen` | `ABSENT` | — |
-| `forgejo-delivery-loop` | `old_strengths_asserted` | `ABSENT` | — |
-| `forgejo-delivery-loop` | `matched_hermetic_task` | `ABSENT` | — |
-| `forgejo-delivery-loop` | `golden_proof_registered` | `ABSENT` | — |
-| `forgejo-delivery-loop` | `live_model_runtime_ab` | `NOT_IMPLEMENTED` | No model/runtime A/B harness exists; live Forgejo delivery receipts are a separate lane. |
-| `forgejo-delivery-loop` | `molecular_traceability` | `ABSENT` | — |
+| `forgejo-delivery-loop` | `live_model_runtime_ab` | `NOT_IMPLEMENTED` | No model/runtime A/B harness exists; live Forgejo delivery receipts are a separate lane. The matched task injects its three authenticated reads, so nothing in it could become a live observation. |
+| `forgejo-delivery-loop` | `molecular_traceability` | `PARTIAL` | The proof names its issue (#346) and the pull requests that landed the frozen treatments (#189 for A, #270 for B0, both read out of the commit subjects at 1295cdd and d757a5c). Forge-side state of those nodes is READ_FROM_GITHUB and a zero-network audit cannot close it. |
 
-### #347 — 6 gaps
+### #347 — 1 gap
 
 | Skill | Criterion | State | Why |
 |---|---|---|---|
-| `git-town-stacked-pr-worker` | `old_canonical_treatment_frozen` | `ABSENT` | — |
-| `git-town-stacked-pr-worker` | `refactor_as_landed_treatment_frozen` | `ABSENT` | — |
-| `git-town-stacked-pr-worker` | `old_strengths_asserted` | `ABSENT` | — |
-| `git-town-stacked-pr-worker` | `matched_hermetic_task` | `ABSENT` | — |
-| `git-town-stacked-pr-worker` | `golden_proof_registered` | `ABSENT` | — |
-| `git-town-stacked-pr-worker` | `molecular_traceability` | `ABSENT` | — |
+| `git-town-stacked-pr-worker` | `molecular_traceability` | `PARTIAL` | The edge this leaf hangs on is read out of bytes and replayed by check_skill_adoption_ledger.py: migration_order records #347 blocked by github-delivery-loop with the two files that resolve the coupling. What a zero-network audit cannot close is the delivery half — the epic Stack's node states are declared READ_FROM_GITHUB, and no PR node exists for this leaf at all, so PARTIAL is the ceiling by design rather than a missing artefact. |
 
-### #348 — 7 gaps
+### #348 — 1 gap
 
 | Skill | Criterion | State | Why |
 |---|---|---|---|
-| `github-delivery-loop` | `old_canonical_treatment_frozen` | `ABSENT` | — |
-| `github-delivery-loop` | `refactor_as_landed_treatment_frozen` | `ABSENT` | — |
-| `github-delivery-loop` | `old_strengths_asserted` | `ABSENT` | — |
-| `github-delivery-loop` | `schema_and_semantic_gates_executable` | `PARTIAL` | Gates are executable and fail closed, but the delivery receipt shape has no machine schema. |
-| `github-delivery-loop` | `matched_hermetic_task` | `ABSENT` | — |
-| `github-delivery-loop` | `golden_proof_registered` | `ABSENT` | — |
-| `github-delivery-loop` | `molecular_traceability` | `ABSENT` | — |
+| `github-delivery-loop` | `molecular_traceability` | `PARTIAL` | DEC-DELIVERY-14 binds the decision to the commits, the entrypoint and the registry entry, but the zero-network checkers cannot observe issue #348's own PR, review or merge state, and this leaf has no node in the Stack index. PASS is refused by design, not pending. |
 
-### #349 — 8 gaps
+### #349 — 2 gaps
 
 | Skill | Criterion | State | Why |
 |---|---|---|---|
-| `knowledge-continuity` | `old_canonical_treatment_frozen` | `ABSENT` | — |
-| `knowledge-continuity` | `refactor_as_landed_treatment_frozen` | `ABSENT` | — |
-| `knowledge-continuity` | `old_strengths_asserted` | `ABSENT` | — |
-| `knowledge-continuity` | `schema_and_semantic_gates_executable` | `PARTIAL` | Four mechanical rules are executable; the human-judgement half of the Skill has no machine gate. |
-| `knowledge-continuity` | `matched_hermetic_task` | `ABSENT` | — |
-| `knowledge-continuity` | `golden_proof_registered` | `ABSENT` | — |
-| `knowledge-continuity` | `live_model_runtime_ab` | `NOT_IMPLEMENTED` | — |
-| `knowledge-continuity` | `molecular_traceability` | `ABSENT` | — |
+| `knowledge-continuity` | `live_model_runtime_ab` | `NOT_IMPLEMENTED` | No live model or provider lane exists for this Skill; nothing here was run against one. |
+| `knowledge-continuity` | `molecular_traceability` | `PARTIAL` | The leaf, its owner issue and its ordering edges are machine-checked here; PR, head and delivery state are GitHub facts this zero-network checker refuses to assert. |
 
-### #350 — 6 gaps
+### #350 — 1 gap
 
 | Skill | Criterion | State | Why |
 |---|---|---|---|
-| `procedural-shadow-runtime` | `old_canonical_treatment_frozen` | `ABSENT` | — |
-| `procedural-shadow-runtime` | `refactor_as_landed_treatment_frozen` | `ABSENT` | — |
-| `procedural-shadow-runtime` | `old_strengths_asserted` | `ABSENT` | — |
-| `procedural-shadow-runtime` | `matched_hermetic_task` | `PARTIAL` | Arms and trials are deterministic, but they are not bound to frozen refactor treatments of this Skill. |
-| `procedural-shadow-runtime` | `golden_proof_registered` | `ABSENT` | — |
-| `procedural-shadow-runtime` | `molecular_traceability` | `ABSENT` | — |
+| `procedural-shadow-runtime` | `molecular_traceability` | `PARTIAL` | The proof report names its issue, its four treatment blobs and the commit each came from, and the Stack index carries this leaf under #322. It has no node of its own: that file has one convergence owner and is not this leaf's write. Node delivery state is declared READ_FROM_GITHUB either way, so a zero-network checker cannot reach PASS here by design. |
 
-### #351 — 5 gaps
+### #351 — 1 gap
 
 | Skill | Criterion | State | Why |
 |---|---|---|---|
-| `repository-capability-audit` | `old_canonical_treatment_frozen` | `ABSENT` | — |
-| `repository-capability-audit` | `refactor_as_landed_treatment_frozen` | `ABSENT` | — |
-| `repository-capability-audit` | `old_strengths_asserted` | `ABSENT` | — |
-| `repository-capability-audit` | `golden_proof_registered` | `ABSENT` | — |
-| `repository-capability-audit` | `molecular_traceability` | `ABSENT` | — |
+| `repository-capability-audit` | `molecular_traceability` | `PARTIAL` | The proof report names its issue, its treatment lineage and the commit each treatment blob came from. This leaf has no node of its own in the Stack index: that file has one convergence owner and is not this leaf's write. Either way node delivery state is declared READ_FROM_GITHUB, so a zero-network audit cannot reach PASS here by design. |
 
-### #352 — 7 gaps
+### #352 — 2 gaps
 
 | Skill | Criterion | State | Why |
 |---|---|---|---|
-| `spatial-loop-systems-engineering` | `old_canonical_treatment_frozen` | `ABSENT` | — |
-| `spatial-loop-systems-engineering` | `refactor_as_landed_treatment_frozen` | `ABSENT` | — |
-| `spatial-loop-systems-engineering` | `old_strengths_asserted` | `ABSENT` | — |
-| `spatial-loop-systems-engineering` | `matched_hermetic_task` | `ABSENT` | — |
-| `spatial-loop-systems-engineering` | `golden_proof_registered` | `ABSENT` | — |
-| `spatial-loop-systems-engineering` | `live_model_runtime_ab` | `NOT_IMPLEMENTED` | — |
-| `spatial-loop-systems-engineering` | `molecular_traceability` | `ABSENT` | — |
+| `spatial-loop-systems-engineering` | `live_model_runtime_ab` | `NOT_IMPLEMENTED` | No model/runtime A/B harness exists for this Skill; the proof arms are frozen text and deterministic checkers only. |
+| `spatial-loop-systems-engineering` | `molecular_traceability` | `PARTIAL` | The registry entry names issue #352 and the two publication subjects this repository records for the leaf (#136 in the traceability index, #189 in the delivery-loop index). Their live state is READ_FROM_GITHUB and a zero-network audit cannot close it. |
 
 ## Migration order
 

@@ -23,6 +23,7 @@ on:
       - 'skills/html-for-decisions/**'
       - 'skills/knowledge-continuity/**'
       - 'skills/procedural-shadow-runtime/**'
+      - 'skills/product-reverse-engineering-loop/**'
       - 'skills/repository-capability-audit/**'
       - 'skills/skill-refactor-proof-loop/**'
       - 'skills/spatial-loop-systems-engineering/**'
@@ -40,6 +41,7 @@ on:
       - 'skills/html-for-decisions/**'
       - 'skills/knowledge-continuity/**'
       - 'skills/procedural-shadow-runtime/**'
+      - 'skills/product-reverse-engineering-loop/**'
       - 'skills/repository-capability-audit/**'
       - 'skills/skill-refactor-proof-loop/**'
       - 'skills/spatial-loop-systems-engineering/**'
@@ -89,6 +91,7 @@ jobs:
           - html-for-decisions
           - knowledge-continuity
           - procedural-shadow-runtime
+          - product-reverse-engineering-loop
           - repository-capability-audit
           - skill-refactor-proof-loop
           - spatial-loop-systems-engineering

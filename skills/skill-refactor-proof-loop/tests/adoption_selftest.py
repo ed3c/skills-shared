@@ -19,15 +19,21 @@ SCHEMA = ROOT / "references/skill-adoption-ledger.schema.json"
 BASE = ROOT / "references/skill-adoption-ledger.json"
 PROVEN = "agentic-tech-lead-orchestration"
 UNPROVEN = "knowledge-continuity"
+# Every in-scope Skill now carries a registered proof, so gap/absence mutations
+# use live_model_runtime_ab (kept NOT_IMPLEMENTED by the zero-network law) and
+# proof-absence mutations run against a registry copy with this proof stripped.
+REGISTRY = ROOT / "references/golden-proof-registry.json"
+STRIPPED_REGISTRY_MUTATIONS = {
+    "unregistered_golden_proof_claimed",
+    "layer_above_registered_proof",
+}
 
 
-def run(path: Path) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(
-        [sys.executable, str(CHECKER), "--ledger", str(path), "--schema", str(SCHEMA)],
-        text=True,
-        capture_output=True,
-        check=False,
-    )
+def run(path: Path, registry: Path | None = None) -> subprocess.CompletedProcess[str]:
+    argv = [sys.executable, str(CHECKER), "--ledger", str(path), "--schema", str(SCHEMA)]
+    if registry is not None:
+        argv += ["--registry", str(registry)]
+    return subprocess.run(argv, text=True, capture_output=True, check=False)
 
 
 def entry(value: dict, skill: str) -> dict:
@@ -73,16 +79,12 @@ def main() -> int:
     mutations["pass_without_evidence"] = (bare, "EVIDENCE_REQUIRED")
 
     contradiction = copy.deepcopy(base)
-    entry(contradiction, UNPROVEN)["criteria"]["golden_proof_registered"]["evidence"] = [
+    entry(contradiction, UNPROVEN)["criteria"]["live_model_runtime_ab"]["evidence"] = [
         f"skills/{UNPROVEN}/SKILL.md"
     ]
     mutations["absent_finding_with_evidence"] = (contradiction, "EVIDENCE_FORBIDDEN")
 
     claimed = copy.deepcopy(base)
-    row = entry(claimed, UNPROVEN)["criteria"]["golden_proof_registered"]
-    row["state"] = "PASS"
-    row["evidence"] = [base["golden_proof_registry"]]
-    row.pop("owner_issue", None)
     mutations["unregistered_golden_proof_claimed"] = (claimed, "GOLDEN_PROOF_UNREGISTERED")
 
     hidden = copy.deepcopy(base)
@@ -123,11 +125,11 @@ def main() -> int:
     mutations["delivery_pass_without_receipt"] = (delivered, "DELIVERY_PASS_WITHOUT_LIVE_RECEIPT")
 
     orphan = copy.deepcopy(base)
-    entry(orphan, UNPROVEN)["criteria"]["matched_hermetic_task"].pop("owner_issue")
+    entry(orphan, UNPROVEN)["criteria"]["live_model_runtime_ab"].pop("owner_issue")
     mutations["gap_without_owner_issue"] = (orphan, "GAP_WITHOUT_OWNER_ISSUE")
 
     invented = copy.deepcopy(base)
-    entry(invented, UNPROVEN)["criteria"]["matched_hermetic_task"]["owner_issue"] = 99999
+    entry(invented, UNPROVEN)["criteria"]["live_model_runtime_ab"]["owner_issue"] = 99999
     mutations["gap_owned_by_unknown_issue"] = (invented, "OWNER_ISSUE_NOT_KNOWN")
 
     # The migration order is derived from observable coupling, so every way of
@@ -153,7 +155,7 @@ def main() -> int:
 
     shared_leaf = copy.deepcopy(base)
     shared = leaf(shared_leaf, "controlled-technical-language-harness")["issue"]
-    entry(shared_leaf, UNPROVEN)["criteria"]["matched_hermetic_task"]["owner_issue"] = shared
+    entry(shared_leaf, UNPROVEN)["criteria"]["live_model_runtime_ab"]["owner_issue"] = shared
     mutations["migration_leaf_owns_another_skills_gap"] = (shared_leaf, "MIGRATION_ISSUE_NOT_SKILL_LEAF")
 
     unordered = copy.deepcopy(base)
@@ -199,10 +201,16 @@ def main() -> int:
         if positive.returncode != 0:
             print(f"ADOPTION-LEDGER-SELFTEST-RED positive={positive.stderr.strip()}", file=sys.stderr)
             return 2
+        stripped = json.loads(REGISTRY.read_text(encoding="utf-8"))
+        stripped["proofs"] = [
+            proof for proof in stripped["proofs"] if proof.get("owner_skill") != UNPROVEN
+        ]
+        stripped_path = temp / "registry-without-subject-proof.json"
+        stripped_path.write_text(json.dumps(stripped, indent=2) + "\n", encoding="utf-8")
         for name, (value, expected) in mutations.items():
             path = temp / f"{name}.json"
             path.write_text(json.dumps(value, indent=2) + "\n", encoding="utf-8")
-            done = run(path)
+            done = run(path, stripped_path if name in STRIPPED_REGISTRY_MUTATIONS else None)
             if done.returncode == 0 or expected not in done.stderr:
                 survivors.append(name)
     if survivors:
