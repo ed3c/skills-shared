@@ -19,6 +19,10 @@ python3 "$ROOT/scripts/check_prel_contract.py" \
   --resolve-subjects "$REF"
 
 python3 "$ROOT/scripts/check_prel_contract.py" \
+  --artifact "$REF/example-closure-audit.json" \
+  --resolve-subjects "$REF"
+
+python3 "$ROOT/scripts/check_prel_contract.py" \
   --artifact "$REF/example-handoff.json" \
   --input "$REF/example-closure-matrix.json" \
   --resolve-subjects "$REF"

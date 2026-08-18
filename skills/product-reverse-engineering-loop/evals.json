@@ -123,6 +123,32 @@
         "STALE_SUBJECT on a vanished artifact"
       ],
       "expected": "each stale state is refused; a digest is otherwise only a promise about a file nobody re-reads"
+    },
+    {
+      "id": "PREL-8",
+      "checker_script": "scripts/check_prel_contract.py",
+      "test_verify": "tests/selftest.py",
+      "good_fixture": "references/example-closure-audit.json",
+      "hollow_fixture": null,
+      "hollow_mutations": "a CI run offered as live-workflow closure, a model judgement offered as user evidence, a dropped level rung, an earned level above what the rungs support, a lane missing from missing_lanes, a declared status ahead of evidence with the finding reclassified away, a finding stripped of its anchors, a reviewer that writes implementation, an issue delta claiming Builder write authority, dropped and misdirected reopened obligations, a withdrawn finding erased from the denominator, private reasoning published in the snapshot, a repair that points at context outside the packet, merge authority taken by the reviewer, a PASS on live provider execution, and an anchor whose subject moved",
+      "covers": [
+        "EVIDENCE_LANE_PROMOTION",
+        "MODEL_JUDGE_OVERRIDE",
+        "AUDIT_LEVEL_SET_DRIFT",
+        "LEVEL_LADDER_SKIP",
+        "MISSING_LANE_UNDECLARED",
+        "CONTRADICTORY_CLOSURE_STATUS",
+        "UNANCHORED_FINDING",
+        "SHADOW_WRITE_AUTHORITY",
+        "FIRST_GREEN_OBLIGATION_SKIPPED",
+        "DISSENT_OMITTED_FROM_DENOMINATOR",
+        "PRIVATE_REASONING_IN_PUBLIC_SNAPSHOT",
+        "SNAPSHOT_REQUIRES_PRIOR_CONVERSATION",
+        "MERGE_OR_RELEASE_AUTHORITY_ASSUMED",
+        "CEILING_OVERCLAIM",
+        "STALE_SUBJECT"
+      ],
+      "expected": "the committed audit is green; the earned level is recomputed from the rung states rather than read, and every planted promotion, authority, obligation and denominator defect is refused by its own code"
     }
   ],
   "evidence_ceiling": {

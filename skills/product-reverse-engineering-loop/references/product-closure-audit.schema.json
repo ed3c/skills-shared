@@ -1,0 +1,331 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "prel-product-closure-audit.schema.json",
+  "title": "PREL product closure audit",
+  "description": "A read-only Shadow audit of whether a product problem is actually closed. One row per material problem, seven ordered levels across the six evidence lanes, and one highest earned level that is recomputed from the level states rather than trusted. The audit reports; it never writes an implementation, never opens an issue, and never carries merge, release or rights authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "reviewer",
+    "audit_subject",
+    "external_authority",
+    "problems",
+    "reopened_obligations",
+    "review_denominator",
+    "issue_delta",
+    "public_snapshot",
+    "evidence_ceiling"
+  ],
+  "properties": {
+    "schema": {"const": "prel/product-closure-audit/v1"},
+    "reviewer": {"$ref": "#/$defs/reviewer"},
+    "audit_subject": {"$ref": "#/$defs/audit_subject"},
+    "external_authority": {"$ref": "#/$defs/external_authority"},
+    "problems": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/problem"}
+    },
+    "reopened_obligations": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/reopened"}
+    },
+    "review_denominator": {"$ref": "#/$defs/review_denominator"},
+    "issue_delta": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/issue_delta_item"}
+    },
+    "public_snapshot": {"$ref": "#/$defs/public_snapshot"},
+    "evidence_ceiling": {"$ref": "#/$defs/evidence_ceiling"}
+  },
+  "$defs": {
+    "state": {
+      "enum": [
+        "PASS",
+        "FAIL",
+        "ABSENT",
+        "NOT_IMPLEMENTED",
+        "NOT_EXERCISED",
+        "SKIPPED_BY_POLICY",
+        "HUMAN_ADMIT_REQUIRED"
+      ]
+    },
+    "level": {
+      "enum": [
+        "SOURCE_ANCHORED",
+        "MECHANISM_BOUND",
+        "IMPLEMENTED",
+        "TECH_VERIFIED",
+        "LIVE_WORKFLOW_VERIFIED",
+        "USER_VALIDATED",
+        "PAID_VALIDATED",
+        "BLOCKED",
+        "FAILED"
+      ]
+    },
+    "lane": {
+      "enum": [
+        "SOURCE",
+        "MECHANISM",
+        "IMPLEMENTATION",
+        "RUNTIME",
+        "USER",
+        "COMMERCIAL"
+      ]
+    },
+    "anchor_kind": {
+      "description": "What produced this evidence. The kind alone decides which levels the anchor may close; no anchor is promoted by argument about its content.",
+      "enum": [
+        "SOURCE_DOCUMENT",
+        "ISSUE_RECORD",
+        "MECHANISM_OBSERVATION",
+        "CODE_SUBJECT",
+        "DETERMINISTIC_SUITE",
+        "CI_RUN",
+        "LIVE_WORKFLOW_RUN",
+        "USER_REPORT",
+        "PAID_CONVERSION",
+        "HUMAN_ADMISSION",
+        "MODEL_JUDGMENT"
+      ]
+    },
+    "exact_subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifact", "digest"],
+      "properties": {
+        "artifact": {"type": "string", "minLength": 1},
+        "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "anchor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "locator", "observed", "exact_subject"],
+      "properties": {
+        "kind": {"$ref": "#/$defs/anchor_kind"},
+        "locator": {"type": "string", "minLength": 3},
+        "observed": {"type": "string", "minLength": 8},
+        "exact_subject": {"$ref": "#/$defs/exact_subject"}
+      }
+    },
+    "reviewer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "identity",
+        "mode",
+        "writes_implementation",
+        "requires_prior_conversation",
+        "requests_private_reasoning"
+      ],
+      "properties": {
+        "identity": {"type": "string", "minLength": 4},
+        "mode": {"const": "READ_ONLY_FINDINGS_ONLY"},
+        "writes_implementation": {"const": false},
+        "requires_prior_conversation": {"const": false},
+        "requests_private_reasoning": {"const": false}
+      }
+    },
+    "audit_subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["subject_id", "surface", "captured_at", "subject_revision", "compared_surfaces"],
+      "properties": {
+        "subject_id": {"type": "string", "minLength": 1},
+        "surface": {"type": "string", "minLength": 1},
+        "captured_at": {"type": "string", "minLength": 10},
+        "subject_revision": {"type": "string", "minLength": 7},
+        "compared_surfaces": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "external_authority": {
+      "description": "Decisions this audit may not make. All five are pinned, because an audit that can decide any of them has stopped being read-only.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["merge", "release", "rights", "customer_truth", "commercial"],
+      "properties": {
+        "merge": {"const": "HUMAN_ADMIT_REQUIRED"},
+        "release": {"const": "HUMAN_ADMIT_REQUIRED"},
+        "rights": {"const": "HUMAN_ADMIT_REQUIRED"},
+        "customer_truth": {"const": "HUMAN_ADMIT_REQUIRED"},
+        "commercial": {"const": "HUMAN_ADMIT_REQUIRED"}
+      }
+    },
+    "declared_status": {
+      "description": "What the subject says about itself, bound to the exact bytes that say it.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["statement", "claimed_level", "anchor"],
+      "properties": {
+        "statement": {"type": "string", "minLength": 12},
+        "claimed_level": {"$ref": "#/$defs/level"},
+        "anchor": {"$ref": "#/$defs/anchor"}
+      }
+    },
+    "rung": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["level", "lane", "state", "anchors"],
+      "properties": {
+        "level": {"$ref": "#/$defs/level"},
+        "lane": {"$ref": "#/$defs/lane"},
+        "state": {"$ref": "#/$defs/state"},
+        "anchors": {"type": "array", "items": {"$ref": "#/$defs/anchor"}},
+        "note": {"type": "string", "minLength": 8}
+      }
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "code", "statement", "anchors", "proposed_repair", "authority"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^FND-[0-9]{3}$"},
+        "code": {
+          "enum": [
+            "DECLARED_STATUS_AHEAD_OF_EVIDENCE",
+            "LANE_SUBSTITUTION_OFFERED",
+            "OBLIGATION_SKIPPED_AT_FIRST_GREEN",
+            "SUBJECT_STALE",
+            "EVIDENCE_ABSENT",
+            "RIGHTS_UNADMITTED"
+          ]
+        },
+        "statement": {"type": "string", "minLength": 12},
+        "anchors": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/anchor"}
+        },
+        "proposed_repair": {"type": "string", "minLength": 12},
+        "authority": {"const": "FINDINGS_ONLY"}
+      }
+    },
+    "problem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "statement",
+        "declared_status",
+        "highest_earned_level",
+        "missing_lanes",
+        "levels",
+        "findings"
+      ],
+      "properties": {
+        "id": {"type": "string", "pattern": "^PRB-[0-9]{3}$"},
+        "statement": {"type": "string", "minLength": 12},
+        "declared_status": {"$ref": "#/$defs/declared_status"},
+        "highest_earned_level": {"$ref": "#/$defs/level"},
+        "missing_lanes": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/lane"},
+          "uniqueItems": true
+        },
+        "levels": {
+          "type": "array",
+          "minItems": 7,
+          "maxItems": 7,
+          "items": {"$ref": "#/$defs/rung"}
+        },
+        "findings": {"type": "array", "items": {"$ref": "#/$defs/finding"}}
+      }
+    },
+    "reopened": {
+      "description": "A proof obligation that a green elsewhere would otherwise inherit as closed.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["problem_id", "level", "state", "reason"],
+      "properties": {
+        "problem_id": {"type": "string", "pattern": "^PRB-[0-9]{3}$"},
+        "level": {"$ref": "#/$defs/level"},
+        "state": {"$ref": "#/$defs/state"},
+        "reason": {"type": "string", "minLength": 12}
+      }
+    },
+    "review_denominator": {
+      "description": "Findings raised, findings reported, and every finding withdrawn with its reason. Dissent leaves the denominator only by being written down.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["findings_raised", "findings_reported", "findings_withdrawn"],
+      "properties": {
+        "findings_raised": {"type": "integer", "minimum": 0},
+        "findings_reported": {"type": "integer", "minimum": 0},
+        "findings_withdrawn": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["finding_id", "reason"],
+            "properties": {
+              "finding_id": {"type": "string", "pattern": "^FND-[0-9]{3}$"},
+              "reason": {"type": "string", "minLength": 12}
+            }
+          }
+        }
+      }
+    },
+    "issue_delta_item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "problem_id", "action", "statement", "write_authority"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^DLT-[0-9]{3}$"},
+        "problem_id": {"type": "string", "pattern": "^PRB-[0-9]{3}$"},
+        "action": {
+          "enum": [
+            "PROPOSE_OPEN",
+            "PROPOSE_UPDATE",
+            "PROPOSE_REOPEN",
+            "PROPOSE_BLOCKED_NOTE"
+          ]
+        },
+        "statement": {"type": "string", "minLength": 12},
+        "write_authority": {"const": "NO_WRITE_AUTHORITY"}
+      }
+    },
+    "public_snapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contains_private_reasoning",
+        "consumable_without_prior_conversation",
+        "completion_meaning",
+        "excluded_from_snapshot"
+      ],
+      "properties": {
+        "contains_private_reasoning": {"const": false},
+        "consumable_without_prior_conversation": {"const": true},
+        "completion_meaning": {"const": "REVIEW_ONLY_NOT_MERGE_OR_RELEASE"},
+        "excluded_from_snapshot": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 4}
+        }
+      }
+    },
+    "evidence_ceiling": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "portable_procedure",
+        "deterministic_contract",
+        "product_market_fit",
+        "live_provider_execution",
+        "production_readiness"
+      ],
+      "properties": {
+        "portable_procedure": {"$ref": "#/$defs/state"},
+        "deterministic_contract": {"$ref": "#/$defs/state"},
+        "product_market_fit": {"$ref": "#/$defs/state"},
+        "live_provider_execution": {"$ref": "#/$defs/state"},
+        "production_readiness": {"$ref": "#/$defs/state"}
+      }
+    }
+  }
+}

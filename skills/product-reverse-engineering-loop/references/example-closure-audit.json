@@ -1,0 +1,297 @@
+{
+  "audit_subject": {
+    "captured_at": "2026-08-18",
+    "compared_surfaces": [
+      "example-product-signal.json",
+      "example-dossier.json",
+      "example-closure-matrix.json",
+      "example-handoff.json"
+    ],
+    "subject_id": "PRODUCT-ALPHA",
+    "subject_revision": "example-closure-matrix.json@457777a",
+    "surface": "the committed PREL example artifact chain"
+  },
+  "evidence_ceiling": {
+    "deterministic_contract": "PASS",
+    "live_provider_execution": "NOT_EXERCISED",
+    "portable_procedure": "PASS",
+    "product_market_fit": "ABSENT",
+    "production_readiness": "NOT_EXERCISED"
+  },
+  "external_authority": {
+    "commercial": "HUMAN_ADMIT_REQUIRED",
+    "customer_truth": "HUMAN_ADMIT_REQUIRED",
+    "merge": "HUMAN_ADMIT_REQUIRED",
+    "release": "HUMAN_ADMIT_REQUIRED",
+    "rights": "HUMAN_ADMIT_REQUIRED"
+  },
+  "issue_delta": [
+    {
+      "action": "PROPOSE_OPEN",
+      "id": "DLT-001",
+      "problem_id": "PRB-001",
+      "statement": "propose an item that runs ORC-001 against two identical source files and records the result as a deterministic receipt, so TECH_VERIFIED stops being an obligation nobody executed",
+      "write_authority": "NO_WRITE_AUTHORITY"
+    },
+    {
+      "action": "PROPOSE_UPDATE",
+      "id": "DLT-002",
+      "problem_id": "PRB-002",
+      "statement": "propose restating the magic-moment claim at the level its evidence earns, and naming the owner of the user lane it currently borrows from",
+      "write_authority": "NO_WRITE_AUTHORITY"
+    }
+  ],
+  "problems": [
+    {
+      "declared_status": {
+        "anchor": {
+          "exact_subject": {
+            "artifact": "example-closure-matrix.json",
+            "digest": "457777ada28d6c8bba32cf7c46453b6773c1a356969fe04d335e77404500c074"
+          },
+          "kind": "SOURCE_DOCUMENT",
+          "locator": "rows[CLR-001]",
+          "observed": "closure_state OPEN_WITH_ORACLE, evidence_state NOT_EXERCISED, oracle ORC-001 in the DETERMINISTIC lane"
+        },
+        "claimed_level": "MECHANISM_BOUND",
+        "statement": "the comparison mechanism is bound to an oracle and the oracle has not been run"
+      },
+      "findings": [
+        {
+          "anchors": [
+            {
+              "exact_subject": {
+                "artifact": "example-closure-matrix.json",
+                "digest": "457777ada28d6c8bba32cf7c46453b6773c1a356969fe04d335e77404500c074"
+              },
+              "kind": "SOURCE_DOCUMENT",
+              "locator": "rows[CLR-003]",
+              "observed": "the USER-lane row for the magic moment is BLOCKED_NO_ORACLE with evidence_state ABSENT"
+            }
+          ],
+          "code": "EVIDENCE_ABSENT",
+          "id": "FND-001",
+          "proposed_repair": "name the consumer that owns the user lane for this mechanism, or record the lane as owned elsewhere and leave the rung open",
+          "statement": "no user-lane evidence exists for the mechanism, so its value to anybody is unmeasured rather than negative",
+          "authority": "FINDINGS_ONLY"
+        }
+      ],
+      "highest_earned_level": "MECHANISM_BOUND",
+      "id": "PRB-001",
+      "levels": [
+        {
+          "anchors": [
+            {
+              "exact_subject": {
+                "artifact": "example-product-signal.json",
+                "digest": "046e052e3a084f74ef10654b03b32b959e8022ddab2be442971a542c2f7527f6"
+              },
+              "kind": "SOURCE_DOCUMENT",
+              "locator": "signals[SIG-006]",
+              "observed": "a graded signal names the comparison mechanism and cites the surface it was seen on"
+            }
+          ],
+          "lane": "SOURCE",
+          "level": "SOURCE_ANCHORED",
+          "state": "PASS"
+        },
+        {
+          "anchors": [
+            {
+              "exact_subject": {
+                "artifact": "example-product-signal.json",
+                "digest": "046e052e3a084f74ef10654b03b32b959e8022ddab2be442971a542c2f7527f6"
+              },
+              "kind": "MECHANISM_OBSERVATION",
+              "locator": "signals[SIG-006].observation",
+              "observed": "a repeatable observation with a stated refutation condition, carried by the oracle the dossier classifies as OBSERVABLE_MECHANISM"
+            }
+          ],
+          "lane": "MECHANISM",
+          "level": "MECHANISM_BOUND",
+          "state": "PASS"
+        },
+        {
+          "anchors": [],
+          "lane": "IMPLEMENTATION",
+          "level": "IMPLEMENTED",
+          "note": "the loop compiles packets; no implementation subject exists in this example chain",
+          "state": "ABSENT"
+        },
+        {
+          "anchors": [],
+          "lane": "IMPLEMENTATION",
+          "level": "TECH_VERIFIED",
+          "note": "ORC-001 exists and has never been executed, which is an obligation rather than an absence",
+          "state": "NOT_EXERCISED"
+        },
+        {
+          "anchors": [],
+          "lane": "RUNTIME",
+          "level": "LIVE_WORKFLOW_VERIFIED",
+          "state": "ABSENT"
+        },
+        {
+          "anchors": [],
+          "lane": "USER",
+          "level": "USER_VALIDATED",
+          "state": "ABSENT"
+        },
+        {
+          "anchors": [],
+          "lane": "COMMERCIAL",
+          "level": "PAID_VALIDATED",
+          "state": "ABSENT"
+        }
+      ],
+      "missing_lanes": ["COMMERCIAL", "IMPLEMENTATION", "RUNTIME", "USER"],
+      "statement": "identical source files produce byte-identical comparison output on the observed surface"
+    },
+    {
+      "declared_status": {
+        "anchor": {
+          "exact_subject": {
+            "artifact": "example-dossier.json",
+            "digest": "5cd1fbc2f878565f3cbb305e9f8d40704f31a526e33807a53f9b56e4cdf04eb4"
+          },
+          "kind": "SOURCE_DOCUMENT",
+          "locator": "magic_moment",
+          "observed": "the dossier carries a magic-moment slot whose value is presented as delivered first value"
+        },
+        "claimed_level": "USER_VALIDATED",
+        "statement": "the first defensible comparison is delivered with no manual re-entry, and users get value at that point"
+      },
+      "findings": [
+        {
+          "anchors": [
+            {
+              "exact_subject": {
+                "artifact": "example-closure-matrix.json",
+                "digest": "457777ada28d6c8bba32cf7c46453b6773c1a356969fe04d335e77404500c074"
+              },
+              "kind": "SOURCE_DOCUMENT",
+              "locator": "rows[CLR-003]",
+              "observed": "the magic-moment requirement is BLOCKED_NO_ORACLE and its evidence_state is ABSENT"
+            }
+          ],
+          "code": "DECLARED_STATUS_AHEAD_OF_EVIDENCE",
+          "id": "FND-002",
+          "proposed_repair": "restate the claim at SOURCE_ANCHORED and record the user lane as owned by a consumer who can produce a user-lane oracle",
+          "statement": "the claim is stated at the user level while every rung above the source lane is unevidenced",
+          "authority": "FINDINGS_ONLY"
+        },
+        {
+          "anchors": [
+            {
+              "exact_subject": {
+                "artifact": "evidence-vocabulary.md",
+                "digest": "f9ded499382fc55c7a9f93613d0a1092af10166f7c37d42dd3fabd1831ffd93c"
+              },
+              "kind": "SOURCE_DOCUMENT",
+              "locator": "the lane table",
+              "observed": "deterministic, behavioral, user, paid and Human-admit evidence are declared independent"
+            }
+          ],
+          "code": "LANE_SUBSTITUTION_OFFERED",
+          "id": "FND-003",
+          "proposed_repair": "keep the deterministic result in the lane that produced it and leave the user rung open with its owner named",
+          "statement": "a deterministic result about the comparison path is the nearest available evidence and it does not speak the user lane",
+          "authority": "FINDINGS_ONLY"
+        }
+      ],
+      "highest_earned_level": "SOURCE_ANCHORED",
+      "id": "PRB-002",
+      "levels": [
+        {
+          "anchors": [
+            {
+              "exact_subject": {
+                "artifact": "example-product-signal.json",
+                "digest": "046e052e3a084f74ef10654b03b32b959e8022ddab2be442971a542c2f7527f6"
+              },
+              "kind": "SOURCE_DOCUMENT",
+              "locator": "signals[SIG-009]",
+              "observed": "a graded signal describes the first-value path the magic-moment claim rests on"
+            }
+          ],
+          "lane": "SOURCE",
+          "level": "SOURCE_ANCHORED",
+          "state": "PASS"
+        },
+        {
+          "anchors": [],
+          "lane": "MECHANISM",
+          "level": "MECHANISM_BOUND",
+          "note": "no procedure exists that would show the first-value claim false",
+          "state": "ABSENT"
+        },
+        {
+          "anchors": [],
+          "lane": "IMPLEMENTATION",
+          "level": "IMPLEMENTED",
+          "state": "ABSENT"
+        },
+        {
+          "anchors": [],
+          "lane": "IMPLEMENTATION",
+          "level": "TECH_VERIFIED",
+          "state": "ABSENT"
+        },
+        {
+          "anchors": [],
+          "lane": "RUNTIME",
+          "level": "LIVE_WORKFLOW_VERIFIED",
+          "state": "ABSENT"
+        },
+        {
+          "anchors": [],
+          "lane": "USER",
+          "level": "USER_VALIDATED",
+          "state": "ABSENT"
+        },
+        {
+          "anchors": [],
+          "lane": "COMMERCIAL",
+          "level": "PAID_VALIDATED",
+          "state": "ABSENT"
+        }
+      ],
+      "missing_lanes": ["COMMERCIAL", "IMPLEMENTATION", "MECHANISM", "RUNTIME", "USER"],
+      "statement": "the first defensible comparison appears without any manual re-entry"
+    }
+  ],
+  "public_snapshot": {
+    "completion_meaning": "REVIEW_ONLY_NOT_MERGE_OR_RELEASE",
+    "consumable_without_prior_conversation": true,
+    "contains_private_reasoning": false,
+    "excluded_from_snapshot": [
+      "any deliberation that is not carried by a named anchor in this artifact"
+    ]
+  },
+  "reopened_obligations": [
+    {
+      "level": "TECH_VERIFIED",
+      "problem_id": "PRB-001",
+      "reason": "ORC-001 was compiled and never executed; a green suite elsewhere in the loop would otherwise be read as having covered it",
+      "state": "NOT_EXERCISED"
+    }
+  ],
+  "review_denominator": {
+    "findings_raised": 4,
+    "findings_reported": 3,
+    "findings_withdrawn": [
+      {
+        "finding_id": "FND-004",
+        "reason": "duplicate of FND-002 against the same anchor, withdrawn to keep one finding per defect rather than to soften the report"
+      }
+    ]
+  },
+  "reviewer": {
+    "identity": "PREL_SHADOW_CLOSURE_MONITOR",
+    "mode": "READ_ONLY_FINDINGS_ONLY",
+    "requests_private_reasoning": false,
+    "requires_prior_conversation": false,
+    "writes_implementation": false
+  },
+  "schema": "prel/product-closure-audit/v1"
+}
