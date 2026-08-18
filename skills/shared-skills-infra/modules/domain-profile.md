@@ -1,6 +1,6 @@
 # Shared-Skill infrastructure domain profile
 
-Historical host-surface and deployment-specific details remain recoverable from pre-refactor history. This module binds concrete carriers without changing portable laws.
+Historical host-surface and deployment-specific details remain recoverable from pre-refactor blob `2d3712d2fd1b3918793829aa8f322f2b2c7a1dd8`. This module binds concrete carriers without changing portable laws.
 
 ## Trigger
 
