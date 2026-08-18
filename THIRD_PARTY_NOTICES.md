@@ -1,8 +1,8 @@
-# Third-party notices (draft)
+# Third-party notices
 
-**Status: draft, not activated.** This file documents what `skills-shared`
+**Status: active supporting notice.** This file documents what `skills-shared`
 actually depends on today, scanned from the tree on 2026-08-18. It ships
-alongside whichever `LICENSE` the copyright owner activates; it is not a
+alongside the repository's active Apache License 2.0 `LICENSE`; it is not a
 license itself and grants no rights.
 
 ## Scope of the scan
@@ -31,8 +31,7 @@ license itself and grants no rights.
 None of these four packages' source, binaries, or license text is copied
 into this repository. Each is installed independently by whatever environment
 runs the script or workflow, under that package's own license, which travels
-with the package and is unaffected by whichever license `skills-shared`
-activates.
+with the package and is unaffected by the repository's Apache-2.0 license.
 
 ## Verification caveat
 
@@ -40,11 +39,9 @@ The license values above were read from locally installed package metadata
 in the worker's environment on 2026-08-18 (`pip show` / `importlib.metadata`
 `License-Expression` and `License` fields), not fetched from each project's
 canonical repository or PyPI project page. Package metadata self-reports its
-license and is generally reliable, but before this file is activated the
-Human owner should re-confirm current license terms directly from each
-project's PyPI page or upstream `LICENSE` file, since a package can relicense
-between versions and the version actually resolved in a given environment
-can drift from the pins recorded above.
+license and is generally reliable. Re-confirm current terms from each
+project's canonical source whenever a pinned version changes or before a
+release begins redistributing third-party source or binaries.
 
 ## Generated output and content boundary
 
