@@ -1,0 +1,92 @@
+{
+  "non_claims": [
+    "No probe was executed against any boundary: nothing was built, installed, published, or run, so no row establishes that its marker corresponds to working executable behavior.",
+    "Presence of .github/workflows YAML does not establish that any GitHub Actions run has ever executed for this commit, nor that publication succeeded at the delivery side.",
+    "Presence of maestro/Playwright markers does not establish that a physical device, simulator, or browser was ever driven; the resolved runner fixtures are explicitly fakes and the .log files are prior-run artifacts from an unbound revision, not evidence bound to this tree_sha.",
+    "Presence of pyproject.toml and go.mod does not establish that the project builds, that dependencies resolve, or that these two manifests cover the whole repository's buildable surface.",
+    "Presence of .runtime-env bindings and .env.example files does not establish that credential minimization is enforced at runtime, that no secret is leaked, or that any real credential resolves; no secret-scanning probe was run.",
+    "Presence of tests/ directories does not establish that any test passes, that the suite is executed in CI, or that these are integration rather than unit or fixture files; no collection or run was attempted.",
+    "Presence of mcp-servers/ source does not establish that any MCP server starts, registers, or is reachable; no .mcp.json client registration exists in the tracked tree, so client-side wiring is unproven.",
+    "sandbox=ABSENT means no path matching /Dockerfile|docker-compose/i is tracked at this revision; it does not establish that the repository lacks containerization or sandbox enforcement by some other mechanism, and it is not a claim that sandboxing was tested and failed.",
+    "Boundary states were decided from tracked path names only; no file contents were read, so a matched path could be documentation, a fixture, or dead code rather than a live capability.",
+    "The working tree carries one untracked file (.env) that is outside the tracked-tree subject and was neither read nor audited.",
+    "repository_id is taken from the 'escrow' remote (ed3c/ix-agy-private); a second remote 'forgejo' at localhost:3000/neon/ix-agy also exists, and no probe confirmed which remote holds the authoritative subject."
+  ],
+  "rows": [
+    {
+      "capability": "artifact_publication",
+      "evidence_paths": [
+        ".github/workflows/invariant-reach-graph.yml",
+        "public/.github/workflows/ci.yml"
+      ],
+      "state": "NOT_EXERCISED"
+    },
+    {
+      "capability": "browser_device",
+      "evidence_paths": [
+        "maestro_bns_test.yaml",
+        "maestro_real_approve.yaml",
+        ".agents/skills/ios-agent-autopilot/reference-impl/tests/fixtures/fake_maestro_runner.sh",
+        ".agents/skills/ios-agent-autopilot/reference-impl/tests/fixtures/fake_maestro_runner_sleep.sh",
+        "data/production/synthesis/obsidian-notes/Playwright MCP (Accessibility Tree).md",
+        "reports/2026-07-13_19-51-42/maestro-runner.log"
+      ],
+      "state": "NOT_EXERCISED"
+    },
+    {
+      "capability": "build",
+      "evidence_paths": [
+        "loop_wiki/invariant-reach-graph/pyproject.toml",
+        "full-tests/ixsecurity/unit_tests/general/go.mod"
+      ],
+      "state": "NOT_EXERCISED"
+    },
+    {
+      "capability": "credential",
+      "evidence_paths": [
+        ".runtime-env/README.md",
+        ".runtime-env/examples/ix-agy-repo-wiki.env.example",
+        ".runtime-env/examples/ix-agy-ios-beta.env.example",
+        ".runtime-env/examples/ix-agy-ios-verify.env.example",
+        ".runtime-env/bindings/ix-agy-repo-wiki.json",
+        ".runtime-env/requirements/ix-agy-repo-wiki.json",
+        ".runtime-env/workloads/ix-agy-repo-wiki.json"
+      ],
+      "state": "NOT_EXERCISED"
+    },
+    {
+      "capability": "integration",
+      "evidence_paths": [
+        ".agents/skills/ios-agent-autopilot/reference-impl/tests/conftest.py",
+        ".agents/skills/ios-agent-autopilot/reference-impl/tests/test_autopilot_loop.py",
+        ".agents/skills/ios-agent-autopilot/tests/_positive_control.sh",
+        ".agents/skills/ios-agent-autopilot/tests/check-command-guard/verify.sh",
+        "full-tests/ixsecurity/unit_tests/general/go.mod",
+        "indexing/tests/fixtures/repowiki/mcp/agent-harness.md"
+      ],
+      "state": "NOT_EXERCISED"
+    },
+    {
+      "capability": "remote_service",
+      "evidence_paths": [
+        "mcp-servers/ios-test-automation/server.py",
+        "mcp-servers/android-test-automation/server.py",
+        "mcp-servers/rag-local/capability_plane.py",
+        "mcp-servers/ios-test-automation/policy.py",
+        "mcp-servers/android-test-automation/policy.py",
+        "indexing/tests/fixtures/repowiki/mcp/agent-harness.md"
+      ],
+      "state": "NOT_EXERCISED"
+    },
+    {
+      "capability": "sandbox",
+      "evidence_paths": [],
+      "state": "ABSENT"
+    }
+  ],
+  "subject": {
+    "commit_sha": "d7b21cf0c39599499046149c43b5b247e099771c",
+    "repository_id": "ed3c/ix-agy-private",
+    "tree_sha": "a3af896ba4665807a2b57e38de40002f7124bff9"
+  }
+}

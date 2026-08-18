@@ -6,9 +6,10 @@ The exact commands a runner session executes for the three budgeted designs froz
 - [`budgeted-ablation-230-preregistration.json`](budgeted-ablation-230-preregistration.json)
 - [`budgeted-canary-235-preregistration.json`](budgeted-canary-235-preregistration.json)
 
-Nothing here has been executed. Every lane in [`live-evidence-state.json`](live-evidence-state.json) is
-unchanged by this runbook's existence, and running it does not by itself change one: a lane moves only
-when a receipt exists and verifies.
+Section #235 window 1 has been executed; sections #228 and #230 have not. Running this file does not by
+itself move a lane in [`live-evidence-state.json`](live-evidence-state.json): a lane moves only when a
+receipt exists and verifies, which is why `235_production_like` now reads `INSUFFICIENT_SAMPLE` with the
+shortfall counted, and `228_matrix` and `230_rule_ablation` are untouched.
 
 Read the design before running its section. This file is the invocation, not the contract; where the two
 disagree the design decides.
@@ -90,24 +91,26 @@ size the spend. It is not observed on this path and must not be written into a r
 
 ### #235 — 2 consumers x 1 window = 2 cells
 
-| Consumer | Cells | Cap/cell | Estimate |
+| Consumer | Cells | Cap/cell | Window 1, measured |
 |---|---:|---:|---|
-| `consumer_selection.selected[0]` | 1 | $6.00 / 900 s | unknown |
-| `consumer_selection.selected[1]` | 1 | $6.00 / 900 s | unknown |
-| **total** | **2** | **$12.00 / 1800 s** | **unknown, capped at $12.00** |
+| `consumer_selection.selected[0]` | 1 | $6.00 / 900 s | $0.6870 / 76.6 s |
+| `consumer_selection.selected[1]` | 1 | $6.00 / 900 s | $0.8571 / 72.5 s |
+| **total** | **2** | **$12.00 / 1800 s** | **$1.5442 / 149.1 s, plus $0.4835 / 7.7 s of preflight** |
 
 The two consumer paths, their pinned commits and their pinned trees live in
 `budgeted-canary-235-preregistration.json` under `consumer_selection.selected`. That file is the single
 source for them; this runbook reads them rather than restating them, so a repinned subject cannot end up
 recorded in two places with two values.
 
-No consumer canary has ever run for this Skill, so there is nothing to extrapolate from. The cap is the
-commitment; window 1's receipts become window 2's estimate.
+The cap was set with no prior observation to extrapolate from and window 1 came in at 17% of it. These
+figures are window 2's estimate, and they are two sessions on two consumers — not a per-consumer cost
+model, and not transferable to a consumer whose tree is a different size.
 
 ### Total across all three sections
 
-**22 cells, ~$38.87 observed-basis plus a $12.00 cap on the unestimated canaries, so bounded at $50.87.**
-Wall clock roughly 70 minutes serial, excluding the canary section.
+**22 cells. 2 of them (#235 window 1) have run, for $2.03 including preflight; the remaining 20 are the
+~$38.87 observed-basis estimate for #228 and #230, so the whole set is bounded at $40.90.** Wall clock
+roughly 70 minutes serial for what remains; the canary section took 157 seconds.
 
 ## Section #228
 
@@ -289,8 +292,30 @@ PY
 A moved head is not a blocker — it is the subject. Re-pin the design or record the new SHAs in the
 receipt; what is forbidden is running against a moved subject while reporting the frozen one.
 
-Run each consumer audit under the caps, then emit one `canary-receipt/v1` object per consumer binding
-every field the design lists, and validate before recording anything:
+Run each consumer audit under the caps. One invocation is one cell: it recomputes the boundary ground
+truth from `git ls-files` with the design's own frozen markers, spawns one bounded `claude -p` audit
+under the candidate Skill body, scores it deterministically, and emits the `canary-receipt/v1` object.
+`$OUT` is this section's own directory — the `$OUT` above belongs to #230 — and it must be outside every
+consumer checkout, because the design forbids writing inside one.
+
+```bash
+OUT=${TMPDIR:-/tmp}/rca-235-budgeted
+V=$(claude --version)
+for index in 0 1; do
+  python3 "$SKILL/scripts/run_canary_cell.py" \
+    --consumer-index "$index" \
+    --output "$OUT" \
+    --claude-bin "$(command -v claude)" \
+    --harness-version "$V"
+done
+```
+
+Exit 0 is a completed cell, 2 an aborted or blocked one, 64 a cell that never started (subject drift,
+unreadable consumer). All three write what they know; a cell that produced no valid receipt is a cell
+that ran and failed, not a cell that did not run. Rehearse the whole chain first with `--selftest` and
+`--dry-run`, which stub the session and spend nothing.
+
+Then validate before recording anything:
 
 ```bash
 for receipt in "$OUT"/*.canary.json; do
@@ -305,9 +330,38 @@ the checker, and do not spend the second consumer's budget on a refusal the firs
 (the committed prior Skill body) and must never equal the candidate digest — that equality is one of the
 eight controls and the checker refuses it.
 
+A receipt cannot name the design it was run under: `canary-receipt/v1` sets `additionalProperties: false`
+and has no field for one. The binding therefore lives beside the receipts in
+[`receipts/rca-235-w1-run-ledger.json`](receipts/rca-235-w1-run-ledger.json), which is this section's
+equivalent of #228's `budgeted-binding.json` sidecar — needed for the opposite reason, since #228's
+runner stamps the wrong id and this one can stamp none at all.
+
 Window 2 is not scheduled. It becomes runnable when either 14 days have passed since window 1's
 `run_window.ended_at` or any `revalidation_triggers` identity changes, whichever comes first. Until one
 of those is true there is no second window and no longitudinal claim.
+
+### What window 1 recorded
+
+Two cells, both completed, no retries and no aborts. $2.03 of the $12.00 global cap and 157 s of the
+1800 s, including a preflight probe that is not a canary and is counted anyway because it spent money.
+Both receipts were admitted — the first real objects this contract has ever accepted, having until then
+only ever seen ones synthesized inside its own test.
+
+The two consumers split. `local/ix-agy` passed all 11 probes. `local/bettor-arena` passed 4 of 11: its
+audit gave all six present boundaries a row-level `PASS` while nothing had been executed, which
+[`../SKILL.md`](../SKILL.md)'s terminal-state section forbids in those words, and said so itself in the
+same message — *"PASS here means only that a tracked path matching the boundary's marker pattern was
+resolved … it is a STATIC path-presence observation"*. That is a live false PASS on a real consumer, and
+the design's `must_report_even_if_adverse` makes it the result rather than a reason to re-run. At n=2
+with no repetition and no matched control arm it is one observation, not a rate, and it is attributed to
+nothing.
+
+Four discrepancies between this runbook and what running it required, recorded in the run ledger and
+repaired above where they were repairable: `gh auth status` fails on this machine (blocking #228 and
+#230, not #235, which needs no GitHub access); `--append-system-prompt-file` works but is absent from
+`claude --help` on 2.1.233; this section named no cell invocation and inherited #230's `$OUT`; and
+`/Users/neon/ix-agy` had moved off its pinned commit, so its receipt binds the observed SHAs and records
+the revalidation rather than reporting the frozen ones.
 
 ## After any section
 

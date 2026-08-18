@@ -39,7 +39,7 @@ shared credit this evidence cannot split.
 | 228_matrix | #228 | INSUFFICIENT_SAMPLE |
 | 230_rule_ablation | #230 | NOT_EXERCISED |
 | 233_source_contribution | #233 | LAYER_A_ONLY |
-| 235_production_like | #235 | NOT_EXERCISED |
+| 235_production_like | #235 | INSUFFICIENT_SAMPLE |
 
 ## Non-claims
 

@@ -39,6 +39,24 @@
       "path": "evals/matrix-slice1-result.json",
       "receipt_id": "matrix-slice1-result",
       "what_it_supports": "13 scored cells on one host, with 8 of 14 metrics saturated"
+    },
+    {
+      "layer": "B",
+      "path": "evals/receipts/rca-canary-w1-local-bettor-arena-13ff9840fc56.canary.json",
+      "receipt_id": "rca-canary-w1-local-bettor-arena-13ff9840fc56",
+      "what_it_supports": "one window-1 consumer canary on local/bettor-arena, admitted by scripts/check_canary_receipt.py; 4 of 11 probes passed, and the six failures are one finding -- a row-level PASS emitted with nothing executed"
+    },
+    {
+      "layer": "B",
+      "path": "evals/receipts/rca-canary-w1-local-ix-agy-d7b21cf0c395.canary.json",
+      "receipt_id": "rca-canary-w1-local-ix-agy-d7b21cf0c395",
+      "what_it_supports": "one window-1 consumer canary on local/ix-agy at its observed head, admitted by the same checker with 11 of 11 probes passed; its subject had moved since the design was frozen, so the receipt binds the observed SHAs and records the revalidation"
+    },
+    {
+      "layer": "B",
+      "path": "evals/receipts/rca-235-w1-run-ledger.json",
+      "receipt_id": "rca-235-w1-run-ledger",
+      "what_it_supports": "the window-1 run itself: the binding to preregistration rca-235-budgeted-2026-08 that canary-receipt/v1 has no field for, every attempt in the denominator including the non-canary preflight spend, the observed budget against the $12.00 / 1800 s global cap, and the runbook discrepancies found while executing it"
     }
   ],
   "schema": "rca-receipt-index/v1"

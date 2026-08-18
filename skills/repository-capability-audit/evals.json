@@ -101,7 +101,22 @@
         "a schema-invalid receipt (missing field, producer-owned evaluator) exits distinctly from a structurally valid one that violates a control",
         "absent input stays distinct from both"
       ],
-      "expected": "a receipt binding all of #235's required canary-scope fields (consumer subject, audit digests, model/harness/runtime/toolset identities, evaluator and task digests, credential and data-egress authorization, network/filesystem/side-effect policy, positive and falsifying probes, rollback/cleanup subject, run window and expiry, and the longitudinal revalidation-trigger identities) is admitted; 10 planted control and schema defects are refused. There is no committed good_fixture because no live canary has run -- evals/live-evidence-state.json's 235_production_like lane stays NOT_EXERCISED; this entry proves the receipt contract a live canary will be validated against, not that one ran."
+      "expected": "a receipt binding all of #235's required canary-scope fields (consumer subject, audit digests, model/harness/runtime/toolset identities, evaluator and task digests, credential and data-egress authorization, network/filesystem/side-effect policy, positive and falsifying probes, rollback/cleanup subject, run window and expiry, and the longitudinal revalidation-trigger identities) is admitted; 10 planted control and schema defects are refused. The good_fixture stays null because this entry proves the contract, not a run: the synthetic object is built inside the test. Two real window-1 receipts now exist under evals/receipts/ and were admitted by this same checker, which is why evals/live-evidence-state.json's 235_production_like lane reads INSUFFICIENT_SAMPLE rather than NOT_EXERCISED -- 2 canaries of 3 required, in 1 window of 2."
+    },
+    {
+      "id": "RCA-CANARY-CELL-1",
+      "checker_script": "scripts/run_canary_cell.py",
+      "test_verify": "tests/test_canary_cell.py",
+      "good_fixture": null,
+      "good_evidence": "an audit output that binds the consumer's exact commit and tree, gives every present boundary a non-PASS terminal state backed by a tracked path the design's own marker actually matches, leaves the absent boundary ABSENT with no cited evidence, and publishes non-claims -- scored PASS on all probes by scripts/run_canary_cell.py --selftest, which also normalizes absolute and ./ spellings of a cited path so the probe measures the audit rather than its formatting",
+      "hollow_fixture": null,
+      "hollow_mutations": "an unbound subject, a row-level PASS emitted while nothing was executed, a fabricated evidence path, an absent boundary claimed as present, missing non-claims, a present boundary cited with a path its marker does not match, a dropped row, and a model-service outage (which must come back BLOCKED_EXTERNAL_SERVICE_UNAVAILABLE on every probe and report no finding, never FAIL_REPOSITORY_DEFECT)",
+      "covers": [
+        "the canary evaluator is deterministic and independent of the audited session: boundary ground truth is recomputed from git ls-files with the preregistration's own frozen markers, never read from what the session claimed",
+        "an audit error and an external-service outage stay distinct outcomes, which is #235's control 2 exercised on the producing side rather than only on the receipt",
+        "a cell with nowhere to write its receipt refuses to start rather than spending a session it cannot record"
+      ],
+      "expected": "the honest audit is admitted on all probes; 7 planted audit defects each fire their own named probe and leave a finding; an outage marks every probe unattempted and blocked with no finding. This scores one canary cell -- it does not decide the receipt's admission, which scripts/check_canary_receipt.py owns separately."
     },
     {
       "id": "RCA-ABLATION-TREATMENT-1",
@@ -127,6 +142,7 @@
       "a GitHub-hosted runner executed this suite at an exact head (run 31901626597, job 95053186610); the replayable artifact lane for this skill is wired in .github/workflows/skill-suites.yml and its receipt is recorded on #222",
       "an overlap-aware Layer A contribution report derived from the contract rather than maintained by hand, with four denominators kept apart and per-source bounds instead of shares",
       "a deterministic canary-receipt/v1 schema and checker (#235) that an authorized production-like canary's receipt must validate against before it counts toward the required three-canary/two-window acceptance state",
+      "two window-1 consumer canaries under the budgeted #235 design, both admitted by that checker -- the first receipts it has ever accepted that were not synthesized inside its own test. One of the two audits emitted a row-level PASS for every present boundary while nothing had been executed, which this Skill's own terminal-state section forbids; that is recorded in evals/receipts/ as the result",
       "a deterministic leave-one-rule-out treatment generator (#230) that emits the 13 candidate_minus_RCA-0XX.md files a live ablation cell would consume, verified byte-identical to SKILL.md outside the named rule's own section"
     ],
     "not_established": [
@@ -135,7 +151,8 @@
       "cross-model anything: slice 1 ran one host. codex-cli has never been run on this corpus.",
       "the five-arm decomposition #219 asks for; its design is frozen in evals/uplift-preregistration.json and has not been executed",
       "any live per-rule contribution: RCA-001..013 each carry a Layer B state of NOT_EXERCISED in evals/live-evidence-state.json, because no candidate_minus_RCA-### arm has run on any host -- generating the treatment files (#230) is not running them",
-      "production-like or longitudinal behaviour: zero consumer canaries in zero observation windows (#235) -- the canary-receipt contract validates a receipt's shape, it does not run a canary"
+      "production-like or longitudinal behaviour: 2 consumer canaries of the 3 required, in 1 observation window of the 2 required (#235). Window 2 is a preregistered relative condition that has not become runnable, and a single window is a point rather than a trend. Boundary presence was audited from the tracked tree, so no build, integration, browser, device, credential or publication path was exercised on either consumer",
+      "any rate, cause or attribution behind window 1's 1-of-2 false PASS: two consumers at one repetition with no matched control arm cannot separate a treatment effect from a case-set fact"
     ]
   }
 }

@@ -46,13 +46,38 @@
     },
     "235_production_like": {
       "issue": "#235",
-      "state": "NOT_EXERCISED",
+      "state": "INSUFFICIENT_SAMPLE",
+      "evidence_grade": "BUDGETED_PILOT",
+      "preregistration": "evals/budgeted-canary-235-preregistration.json",
       "canaries_required": 3,
-      "canaries_observed": 0,
+      "canaries_observed": 2,
       "observation_windows_required": 2,
-      "observation_windows_observed": 0,
-      "why": "No authorized consumer repository has been bound, and no canary has run in any window. The held-out corpus in evals/held-out-corpus.json is an offline audit corpus, not a production-like consumer topology.",
-      "non_claim": "Deterministic and offline-matrix evidence says nothing about production correctness, operational stability, or rollback."
+      "observation_windows_observed": 1,
+      "why": "Window 1 of the budgeted design ran against the two authorized local consumer checkouts it names. Both receipts were admitted by scripts/check_canary_receipt.py, which until then had only ever admitted objects synthesized inside its own test. That is two canaries of the three #235 requires, in one window of the two it requires, so this lane counts the shortfall rather than clearing it.",
+      "observed_breakdown": [
+        {
+          "source": "evals/receipts/rca-canary-w1-local-bettor-arena-13ff9840fc56.canary.json",
+          "consumer": "local/bettor-arena",
+          "window": "w1",
+          "probes_pass": 4,
+          "probes_total": 11,
+          "what_it_supports": "one admitted canary receipt from a real consumer audit, recording a live false PASS: six boundaries were given a row-level PASS while nothing was executed, which this Skill's own terminal-state section forbids"
+        },
+        {
+          "source": "evals/receipts/rca-canary-w1-local-ix-agy-d7b21cf0c395.canary.json",
+          "consumer": "local/ix-agy",
+          "window": "w1",
+          "probes_pass": 11,
+          "probes_total": 11,
+          "what_it_supports": "one admitted canary receipt whose audit used NOT_EXERCISED for every present boundary and ABSENT for the one the tree lacks, passing every positive and falsifying probe"
+        }
+      ],
+      "acceptance_unmet": [
+        "3 authorized consumer canaries; 2 ran",
+        "2 separated observation windows; 1 ran. Window 2 is a preregistered relative condition -- 14 days after window 1's run_window.ended_at, or the first change in any revalidation_triggers identity -- and has not become runnable.",
+        "a comparison between two windows, which is the only thing that can move a longitudinal claim off NOT_EXERCISED"
+      ],
+      "non_claim": "Deterministic and offline-matrix evidence says nothing about production correctness, operational stability, or rollback, and neither does one window of two canaries. The 1-of-2 false PASS is a live observation at n=2 with no repetition and no matched control arm: it is not a rate, and nothing about it is attributed to the Skill, the model, or the consumer."
     }
   },
   "rules": {
@@ -100,6 +125,24 @@
       "path": "evals/matrix-slice1-result.json",
       "layer": "B",
       "what_it_supports": "13 scored cells on one host, with 8 of 14 metrics saturated"
+    },
+    {
+      "receipt_id": "rca-canary-w1-local-bettor-arena-13ff9840fc56",
+      "path": "evals/receipts/rca-canary-w1-local-bettor-arena-13ff9840fc56.canary.json",
+      "layer": "B",
+      "what_it_supports": "one window-1 consumer canary on local/bettor-arena, admitted by scripts/check_canary_receipt.py; 4 of 11 probes passed, and the six failures are one finding -- a row-level PASS emitted with nothing executed"
+    },
+    {
+      "receipt_id": "rca-canary-w1-local-ix-agy-d7b21cf0c395",
+      "path": "evals/receipts/rca-canary-w1-local-ix-agy-d7b21cf0c395.canary.json",
+      "layer": "B",
+      "what_it_supports": "one window-1 consumer canary on local/ix-agy at its observed head, admitted by the same checker with 11 of 11 probes passed; its subject had moved since the design was frozen, so the receipt binds the observed SHAs and records the revalidation"
+    },
+    {
+      "receipt_id": "rca-235-w1-run-ledger",
+      "path": "evals/receipts/rca-235-w1-run-ledger.json",
+      "layer": "B",
+      "what_it_supports": "the window-1 run itself: the binding to preregistration rca-235-budgeted-2026-08 that canary-receipt/v1 has no field for, every attempt in the denominator including the non-canary preflight spend, the observed budget against the $12.00 / 1800 s global cap, and the runbook discrepancies found while executing it"
     }
   ],
   "github_hosted_execution": {

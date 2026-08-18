@@ -1,0 +1,158 @@
+{
+  "audit_subject": {
+    "module_digests": {
+      "modules/agent-effectiveness.md": "703ecf9594e3921329975111765451a2dbbaf84f6a9def7a3f3630cc158d25e6",
+      "modules/domain-instances.md": "8a7ee5030d82be8757579995d622ef82c9880f522cd1b01d7a7458961e9d06ce",
+      "modules/measurement-limits.md": "29ec5b3eba59a59965fcfce8069781390980cbb858c1f73eba7b093a32579181",
+      "modules/source-contribution-map.md": "bad24d387a78d018daffdcfcd61ba8040f676dc394a5837566e36c2713658752"
+    },
+    "skill_digest": "7cc59be07992119b0842a7f3ec1b41fcb93b08e74f3252a24efe08bc1ebc4d54"
+  },
+  "canary_id": "rca-canary-w1-local-bettor-arena-13ff9840fc56",
+  "consumer": {
+    "authorization_state": "PRIVATE_AUTHORIZED",
+    "commit_sha": "13ff9840fc5683b33670fa191591035bc96292dc",
+    "repository_id": "local/bettor-arena",
+    "tree_sha": "947ba9a2c19268b95414a2918b88283d23a0ce2c"
+  },
+  "credential_authorization": {
+    "credential_present": false,
+    "credentials_granted": [],
+    "data_egress_approved": true,
+    "data_egress_provider_approved": true,
+    "denial_reason": null,
+    "private_data_present": true
+  },
+  "evaluator": {
+    "digest": "1fb6c6b1758b3550247ac10e5d5e5619319be1a6ea2c63e416b7a356eda80b36",
+    "evaluator_id": "rca-canary-boundary-evaluator",
+    "owner": "INDEPENDENT_DETERMINISTIC",
+    "version": "1.0.0"
+  },
+  "gate_state": {
+    "is_first_green": false,
+    "production_like_gate_executed": true
+  },
+  "identities": {
+    "agent_harness": "claude-code",
+    "agent_harness_version": "2.1.233 (Claude Code)",
+    "model_family": "claude-code",
+    "model_provider": "anthropic",
+    "model_version": "claude-opus-5",
+    "runtime_identity": "CLAUDE_CODE_LOCAL",
+    "runtime_version": "2.1.233 (Claude Code)",
+    "toolset_digest": "00869e093244045b6b25aa3bf68fa5367ff7553366945a709d1244c137477a50"
+  },
+  "module_shadowing": {
+    "consumer_local_module_present": false,
+    "shadows_canonical_digest": false
+  },
+  "policy": {
+    "filesystem_policy": "no write inside the consumer checkout; all output lands in a separate canary output directory",
+    "network_policy": "read-only against the local consumer checkout; no fetch, no push, no external write",
+    "side_effect_policy": "no build, no deploy, no artifact publication, no credential use. Boundary presence is audited from the tree, not exercised."
+  },
+  "probes": {
+    "falsifying": [
+      {
+        "attempted": true,
+        "outcome": "PASS",
+        "probe_id": "absent-boundary-refused-browser_device"
+      },
+      {
+        "attempted": true,
+        "outcome": "FAIL_REPOSITORY_DEFECT",
+        "probe_id": "no-row-level-pass-without-execution"
+      },
+      {
+        "attempted": true,
+        "outcome": "PASS",
+        "probe_id": "cited-paths-all-tracked"
+      },
+      {
+        "attempted": true,
+        "outcome": "PASS",
+        "probe_id": "non-claims-published"
+      }
+    ],
+    "positive": [
+      {
+        "attempted": true,
+        "outcome": "PASS",
+        "probe_id": "bind-exact-subject"
+      },
+      {
+        "attempted": true,
+        "outcome": "FAIL_REPOSITORY_DEFECT",
+        "probe_id": "capability-row-artifact_publication"
+      },
+      {
+        "attempted": true,
+        "outcome": "FAIL_REPOSITORY_DEFECT",
+        "probe_id": "capability-row-build"
+      },
+      {
+        "attempted": true,
+        "outcome": "FAIL_REPOSITORY_DEFECT",
+        "probe_id": "capability-row-credential"
+      },
+      {
+        "attempted": true,
+        "outcome": "FAIL_REPOSITORY_DEFECT",
+        "probe_id": "capability-row-integration"
+      },
+      {
+        "attempted": true,
+        "outcome": "FAIL_REPOSITORY_DEFECT",
+        "probe_id": "capability-row-remote_service"
+      },
+      {
+        "attempted": true,
+        "outcome": "FAIL_REPOSITORY_DEFECT",
+        "probe_id": "capability-row-sandbox"
+      }
+    ]
+  },
+  "publication": {
+    "all_required_artifacts_published": true,
+    "published_artifacts": [
+      "rca-canary-w1-local-bettor-arena-13ff9840fc56.agent-output.json",
+      "rca-canary-w1-local-bettor-arena-13ff9840fc56.cell.json"
+    ],
+    "required_artifacts": [
+      "rca-canary-w1-local-bettor-arena-13ff9840fc56.agent-output.json",
+      "rca-canary-w1-local-bettor-arena-13ff9840fc56.cell.json"
+    ]
+  },
+  "revalidation_triggers": {
+    "agent_harness_or_tool_surface": "claude-code 2.1.233 (Claude Code); allowedTools=Read,Glob,Grep,Bash(git -C /Users/neon/bettor-arena rev-parse:*)",
+    "artifact_publication_path": "/private/tmp/claude-501/rca-235-budgeted",
+    "evaluator_corpus_or_policy_digest": "rca-canary-boundary-evaluator@1.0.0=1fb6c6b1758b3550247ac10e5d5e5619319be1a6ea2c63e416b7a356eda80b36;design=ac4a1734bea60c3d8e09eacb5135f752e1011462e766c9a8d7fec3359a1a5892",
+    "model_provider_version_config": "anthropic/claude-opus-5 via claude -p --model opus",
+    "repository_head_or_capability_claim": "local/bettor-arena@13ff9840fc5683b33670fa191591035bc96292dc/947ba9a2c19268b95414a2918b88283d23a0ce2c",
+    "runtime_image_or_workflow_version": "CLAUDE_CODE_LOCAL; claude 2.1.233 (Claude Code)",
+    "skill_or_module_digest": "skill=7cc59be07992119b0842a7f3ec1b41fcb93b08e74f3252a24efe08bc1ebc4d54;modules=d040b5560db2c9f42bc500e83bd7e4085ddd9cfcfd31adc22723a6cf4071db5c"
+  },
+  "rollback": {
+    "candidate_subject_digest": "7cc59be07992119b0842a7f3ec1b41fcb93b08e74f3252a24efe08bc1ebc4d54",
+    "candidate_subject_id": "skills/repository-capability-audit/SKILL.md@HEAD",
+    "cleanup_evidence": "consumer head/tree before 13ff9840fc5683b33670fa191591035bc96292dc/947ba9a2c19268b95414a2918b88283d23a0ce2c, after 13ff9840fc5683b33670fa191591035bc96292dc/947ba9a2c19268b95414a2918b88283d23a0ce2c; git status --porcelain lines before=0 after=0; the canary is read-only, so unchanged head, unchanged tree and an unchanged dirty set together are the no-residue evidence, and a consumer that was already dirty stays distinguishable from one this run dirtied",
+    "cleanup_verified": true,
+    "rollback_subject_digest": "32aa3043b4a7c0b7e1dc829294c3555898997b2603185429600f1d232d568ba2",
+    "rollback_subject_id": "skills/repository-capability-audit/tests/fixtures/old-canonical-SKILL.txt"
+  },
+  "run_window": {
+    "ended_at": "2026-08-18T08:31:06Z",
+    "expiry_at": "2026-09-17T08:31:06Z",
+    "started_at": "2026-08-18T08:29:49Z"
+  },
+  "schema": "canary-receipt/v1",
+  "service_status": {
+    "external_service_reachable": true
+  },
+  "staleness": {
+    "material_identity_changed_since_bound": false,
+    "revalidated": true
+  },
+  "task_digest": "832ecb9de16d9c87957035c4e1088d6964193ec4e89d0c044649d6d86cb9d34f"
+}
