@@ -21,6 +21,7 @@ Then load only the topic route that matches the task.
 | route name, hop order, route assertion | [`DOCUMENT_ROUTING.md`](DOCUMENT_ROUTING.md) |
 | state, event, transition, terminal, evidence transition | [`STATE_MACHINES.md`](STATE_MACHINES.md) |
 | Skill core, `references/`, `modules/`, consumer binding, adapter, domain boundary | [`DOMAIN_DECOUPLING.md`](DOMAIN_DECOUPLING.md) |
+| controlled language, writing standard, termbase, STE profile, CTL slice or bundle | [`CONTROLLED_TECHNICAL_LANGUAGE_HARNESS.md`](CONTROLLED_TECHNICAL_LANGUAGE_HARNESS.md) |
 | cross-repository ownership, binding, release or origin | [`../integration/CROSS_REPO_INTEGRATION.md`](../integration/CROSS_REPO_INTEGRATION.md) |
 | source-to-issue/PR/eval/receipt lineage | [`../traceability/TRACEABILITY_INDEX.md`](../traceability/TRACEABILITY_INDEX.md) |
 
