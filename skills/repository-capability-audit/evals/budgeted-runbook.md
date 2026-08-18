@@ -347,7 +347,7 @@ Two cells, both completed, no retries and no aborts. $2.03 of the $12.00 global 
 Both receipts were admitted — the first real objects this contract has ever accepted, having until then
 only ever seen ones synthesized inside its own test.
 
-The two consumers split. `local/ix-agy` passed all 11 probes. `local/bettor-arena` passed 4 of 11: its
+The two consumers split (cell identities live in the preregistration and the run ledger, not in this portable body). Cell 2's consumer passed all 11 probes. Cell 1's consumer passed 4 of 11: its
 audit gave all six present boundaries a row-level `PASS` while nothing had been executed, which
 [`../SKILL.md`](../SKILL.md)'s terminal-state section forbids in those words, and said so itself in the
 same message — *"PASS here means only that a tracked path matching the boundary's marker pattern was
@@ -360,7 +360,7 @@ Four discrepancies between this runbook and what running it required, recorded i
 repaired above where they were repairable: `gh auth status` fails on this machine (blocking #228 and
 #230, not #235, which needs no GitHub access); `--append-system-prompt-file` works but is absent from
 `claude --help` on 2.1.233; this section named no cell invocation and inherited #230's `$OUT`; and
-`/Users/neon/ix-agy` had moved off its pinned commit, so its receipt binds the observed SHAs and records
+Cell 2's consumer checkout had moved off its pinned commit, so its receipt binds the observed SHAs and records
 the revalidation rather than reporting the frozen ones.
 
 ## After any section
