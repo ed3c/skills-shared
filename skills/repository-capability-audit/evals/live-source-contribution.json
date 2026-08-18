@@ -11,7 +11,7 @@
     "228_matrix": "INSUFFICIENT_SAMPLE",
     "230_rule_ablation": "NOT_EXERCISED",
     "233_source_contribution": "LAYER_A_ONLY",
-    "235_production_like": "NOT_EXERCISED"
+    "235_production_like": "INSUFFICIENT_SAMPLE"
   },
   "non_claims": [
     "a source fraction is the share of that source's semantic claims with qualifying mapped evidence in this audit niche; it is not a Shapley value, a percentage of prose effectiveness, or a model-weight attribution",

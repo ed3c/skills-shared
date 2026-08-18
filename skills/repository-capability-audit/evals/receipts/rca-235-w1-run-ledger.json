@@ -1,0 +1,143 @@
+{
+  "binding": {
+    "evidence_grade": "BUDGETED_PILOT",
+    "preregistration_id": "rca-235-budgeted-2026-08",
+    "preregistration_path": "skills/repository-capability-audit/evals/budgeted-canary-235-preregistration.json",
+    "preregistration_sha256": "ac4a1734bea60c3d8e09eacb5135f752e1011462e766c9a8d7fec3359a1a5892",
+    "why_a_binding_block_exists": "canary-receipt/v1 sets additionalProperties false and has no field naming the design a receipt was run under, so a receipt cannot bind itself to this preregistration. The runbook prescribes a budgeted-binding.json sidecar for #228 because run_pilot_matrix.py stamps the wrong id; the same need exists here for the opposite reason -- the id cannot be stamped at all -- and this block is that sidecar, kept in the same file as the run it binds so the two cannot drift apart.",
+    "window_id": "w1"
+  },
+  "budget": {
+    "canary_cost_usd": 1.544175,
+    "canary_wall_clock_seconds": 149.125,
+    "cost_observed": true,
+    "global_caps": {
+      "cost_usd": 12.0,
+      "wall_clock_seconds": 1800
+    },
+    "per_cell_caps": {
+      "cost_usd": 6.0,
+      "wall_clock_seconds": 900
+    },
+    "preflight_cost_usd": 0.48348,
+    "total_cost_usd_against_global_cap": 2.027655,
+    "total_wall_clock_seconds_against_global_cap": 156.795,
+    "unobserved_dimensions": [],
+    "why_cost_is_observed_here": "claude -p --output-format json reports total_cost_usd per session, so this path does not have run_agent_cell.py's blind spot and no dimension is recorded as a zero it did not measure."
+  },
+  "cells": [
+    {
+      "cache_creation_input_tokens": 39088,
+      "cache_read_input_tokens": 348081,
+      "canary_id": "rca-canary-w1-local-bettor-arena-13ff9840fc56",
+      "consumer": {
+        "commit_sha": "13ff9840fc5683b33670fa191591035bc96292dc",
+        "tree_sha": "947ba9a2c19268b95414a2918b88283d23a0ce2c"
+      },
+      "cost_usd": 0.6870404999999999,
+      "exit_code": 0,
+      "findings": [
+        "capability-row-artifact_publication: state='PASS' evidence_backed=3 of 3 cited",
+        "capability-row-build: state='PASS' evidence_backed=3 of 3 cited",
+        "capability-row-credential: state='PASS' evidence_backed=3 of 3 cited",
+        "capability-row-integration: state='PASS' evidence_backed=3 of 3 cited",
+        "capability-row-remote_service: state='PASS' evidence_backed=3 of 3 cited",
+        "capability-row-sandbox: state='PASS' evidence_backed=1 of 1 cited",
+        "no-row-level-pass-without-execution: row-level PASS emitted for artifact_publication,build,credential,integration,remote_service,sandbox while nothing was executed"
+      ],
+      "green": false,
+      "input_tokens": 14,
+      "num_turns": 7,
+      "output_tokens": 4882,
+      "probes_pass": 4,
+      "probes_total": 11,
+      "state": "COMPLETED",
+      "subject_moved_since_freeze": false,
+      "wall_clock_seconds": 76.591
+    },
+    {
+      "cache_creation_input_tokens": 59517,
+      "cache_read_input_tokens": 271359,
+      "canary_id": "rca-canary-w1-local-ix-agy-d7b21cf0c395",
+      "consumer": {
+        "commit_sha": "d7b21cf0c39599499046149c43b5b247e099771c",
+        "tree_sha": "a3af896ba4665807a2b57e38de40002f7124bff9"
+      },
+      "cost_usd": 0.8571344999999999,
+      "exit_code": 0,
+      "findings": [],
+      "green": true,
+      "input_tokens": 12,
+      "num_turns": 6,
+      "output_tokens": 5049,
+      "probes_pass": 11,
+      "probes_total": 11,
+      "state": "COMPLETED",
+      "subject_moved_since_freeze": true,
+      "wall_clock_seconds": 72.534
+    }
+  ],
+  "committed_artifacts": [
+    "rca-canary-w1-local-bettor-arena-13ff9840fc56.agent-output.json",
+    "rca-canary-w1-local-bettor-arena-13ff9840fc56.canary.json",
+    "rca-canary-w1-local-bettor-arena-13ff9840fc56.cell.json",
+    "rca-canary-w1-local-ix-agy-d7b21cf0c395.agent-output.json",
+    "rca-canary-w1-local-ix-agy-d7b21cf0c395.canary.json",
+    "rca-canary-w1-local-ix-agy-d7b21cf0c395.cell.json"
+  ],
+  "denominator": {
+    "canary_cells_attempted": 2,
+    "canary_cells_blocked_external_service": 0,
+    "canary_cells_budget_aborted": 0,
+    "canary_cells_completed": 2,
+    "canary_cells_retried": 0,
+    "non_canary_attempts": [
+      {
+        "cost_usd": 0.48348,
+        "outcome": "SMOKE_OK",
+        "wall_clock_seconds": 7.67,
+        "what": "harness preflight probe: one claude -p session with the cell's exact flag set and a trivial prompt, to prove --add-dir, --append-system-prompt-file and --output-format json before spending a cell"
+      },
+      {
+        "cost_usd": 0.0,
+        "outcome": "CANARY-RECEIPT-GREEN x2",
+        "wall_clock_seconds": 0.0,
+        "what": "two full-chain dry runs (one per consumer) with the model session stubbed; both receipts admitted by scripts/check_canary_receipt.py"
+      }
+    ],
+    "policy": "every attempt counts; retries permitted 0",
+    "why_non_canary_attempts_are_listed": "they spent real money against the same global cap. They are not canaries and are not counted as such, and hiding them would understate the run's cost."
+  },
+  "discrepancies": [
+    "runbook vs environment: `gh auth status` fails on this machine (token in keyring reported invalid, with and without the proxy unset). Section #235 needs no GitHub access -- it is read-only against local checkouts -- so it ran; sections #228 and #230 cannot run until that precondition is repaired.",
+    "runbook vs CLI: section #230's cell command passes --append-system-prompt-file, which is absent from `claude --help` on 2.1.233. It is accepted and works; verified in the preflight probe before it was used here.",
+    "runbook gap: section #235 names no cell invocation, only the pre-spend subject check and the post-hoc receipt validation loop, and its $OUT is inherited from section #230. scripts/run_canary_cell.py and the runbook section added by this change close that gap.",
+    "design vs observed subject: /Users/neon/ix-agy had moved from the pinned 2d3d1b026185de5338da0c0ee9c4716b76593ff2 to d7b21cf0c39599499046149c43b5b247e099771c by run time. The preregistration is frozen, so the receipt records the observed SHAs with staleness.material_identity_changed_since_bound true and revalidated true, per the runbook's rule that running against a moved subject while reporting the frozen one is what is forbidden. Its seven boundary counts at the observed head are identical to the freeze's, so the consumer selection ranking is unaffected.",
+    "design vs contract: canary-receipt/v1 has no field that can name the preregistration a receipt was run under, so the binding lives in this ledger. Recorded rather than repaired, because the schema is frozen evidence."
+  ],
+  "non_claims": [
+    "two consumers is not three and one window is not two, so #235 cannot close on this run",
+    "no longitudinal or drift claim follows: window 2 has not happened and a single window is a point",
+    "boundary presence was audited from the tracked tree; no build, integration, browser, device, credential or publication path was exercised, so nothing here describes their runtime behaviour",
+    "the two consumers are private local checkouts with no remote; nothing about hosted consumer topologies follows",
+    "no matched control arm ran, so the false-PASS on one consumer is not attributed to the Skill, to the model, or to the consumer",
+    "TIER C PRODUCTION_LIKE_CANARY_SUPPORTED in #237's admission ladder is not reachable from this design and is not claimed"
+  ],
+  "outcome": {
+    "adverse_finding": "local/bettor-arena's audit emitted a row-level PASS for all six boundaries it found present while nothing was executed, which the Skill's own terminal-state section forbids ('configuration presence ... is never a row-level PASS') and RCA-003 restates. Its own non_claims recorded the contradiction in the same message: 'PASS here means only that a tracked path matching the boundary's marker pattern was resolved ... it is a STATIC path-presence observation'. local/ix-agy's audit, same Skill body and same task shape, used NOT_EXERCISED for its six present boundaries and ABSENT for the one it lacked, and passed every probe.",
+    "first_real_receipts": "before this run the canary-receipt/v1 contract had only ever admitted objects synthesized inside tests/test_canary_receipt.py. Both of these were produced by a real consumer audit and both were admitted, so the contract's first green is evidence about the contract as much as about the consumers.",
+    "receipts_admitted": 2,
+    "receipts_refused": 0,
+    "what_that_split_is_and_is_not": "one false-PASS in two consumers is a live observation at n=2 with no repetition. It is not a rate, not a per-consumer property, and not evidence that the Skill causes or prevents the behaviour -- there is no matched no_skill arm here, so nothing is attributable to the treatment."
+  },
+  "runner": {
+    "evaluator_id": "rca-canary-boundary-evaluator",
+    "evaluator_owner": "INDEPENDENT_DETERMINISTIC",
+    "run_output_directory": "/private/tmp/claude-501/rca-235-budgeted",
+    "script": "skills/repository-capability-audit/scripts/run_canary_cell.py",
+    "sha256": "1fb6c6b1758b3550247ac10e5d5e5619319be1a6ea2c63e416b7a356eda80b36",
+    "skills_shared_head": "1b14b88dbf79f7075ba8269b805eecc859d72ecc",
+    "why_not_home": "the runbook's $OUT for this section is inherited from section #230 and resolves to $HOME/rca-230-budgeted; $HOME is not writable under this runner's sandbox, so the canary output directory is under $TMPDIR and recorded here rather than assumed."
+  },
+  "schema": "rca-canary-run-ledger/v1"
+}

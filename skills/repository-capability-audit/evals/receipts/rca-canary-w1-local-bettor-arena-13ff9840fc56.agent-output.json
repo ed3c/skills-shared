@@ -1,0 +1,77 @@
+{
+  "non_claims": [
+    "No probe was executed against this checkout: nothing was built, installed, run, published, or containerized, so no row is evidence that the boundary works at runtime.",
+    "PASS here means only that a tracked path matching the boundary's marker pattern was resolved in tree 947ba9a2c19268b95414a2918b88283d23a0ce2c; it is a STATIC path-presence observation, not SANDBOX or PROD reachability.",
+    "The .github/workflows/ files were not shown to have run at this head, and no GitHub Actions run receipt for commit 13ff9840fc5683b33670fa191591035bc96292dc was obtained.",
+    "The tests/ directories were not executed; their pass/fail status, coverage, and whether they exercise any integration boundary are unestablished (they may be fixtures only).",
+    "The Dockerfile was not built and no container or sandbox policy was shown to enforce anything; sandbox enforcement has no positive/negative control pair in this run.",
+    ".mcp.json and mcp/ were not started or connected to; no remote service was shown to be reachable or to be the runtime identity these files name.",
+    "No file content was read, so no claim is made about what any cited file declares, whether declared credentials resolve, or whether prohibited secret material is present or absent in the tree.",
+    "browser_device is ABSENT only under the given marker regex over tracked paths; a browser or device capability reached by some other name or by an untracked/ignored file would not have been detected.",
+    "Untracked and gitignored files were excluded by construction, so nothing here describes the working directory beyond the tracked tree."
+  ],
+  "rows": [
+    {
+      "capability": "artifact_publication",
+      "evidence_paths": [
+        ".github/workflows/ci-parity.yml",
+        ".github/workflows/git-town-runtime.yml",
+        ".github/workflows/harness-console.yml"
+      ],
+      "state": "PASS"
+    },
+    {
+      "capability": "browser_device",
+      "evidence_paths": [],
+      "state": "ABSENT"
+    },
+    {
+      "capability": "build",
+      "evidence_paths": [
+        "loopctl/package.json",
+        "loop_wiki/evolve-perfect-seed-repo-factory/package.json",
+        "mcp/context-pack/pyproject.toml"
+      ],
+      "state": "PASS"
+    },
+    {
+      "capability": "credential",
+      "evidence_paths": [
+        ".runtime-env/README.md",
+        ".runtime-env/examples/bettor-arena-local.env.example",
+        ".runtime-env/bindings/bettor-arena-local.json"
+      ],
+      "state": "PASS"
+    },
+    {
+      "capability": "integration",
+      "evidence_paths": [
+        ".agents/skills/harness-wiki/tests/fixtures/good/case.json",
+        "loop_wiki/loopx-kernel/tests/fixtures/good/bundle.json",
+        "loop_wiki/code-truth-graph-v2/tests/run-all.sh"
+      ],
+      "state": "PASS"
+    },
+    {
+      "capability": "remote_service",
+      "evidence_paths": [
+        ".mcp.json",
+        "mcp/README.md",
+        "data/mcp/exposure.json"
+      ],
+      "state": "PASS"
+    },
+    {
+      "capability": "sandbox",
+      "evidence_paths": [
+        "loopctl/Dockerfile"
+      ],
+      "state": "PASS"
+    }
+  ],
+  "subject": {
+    "commit_sha": "13ff9840fc5683b33670fa191591035bc96292dc",
+    "repository_id": "ed3c/bettor-arena",
+    "tree_sha": "947ba9a2c19268b95414a2918b88283d23a0ce2c"
+  }
+}
