@@ -264,6 +264,65 @@ Required node fields:
 
 The checker rejects missing child artifacts, child/base mismatch, fake serial siblings, multiple convergence owners, duplicate issue/PR ownership, stale self-embedded open heads, false merged state, external evidence owning paths, and widened semantic-conflict/force-push/ship/merge/release/promotion authority.
 
+## Current Spatial Loop ICPG molecular Stack — #407
+
+This index tracks the terminal implementation slices for `spatial-loop-systems-engineering` Intent–Case–Proof Graph work. It is a traceability projection, not a substitute for the canonical machine molecular Stack schema or exact PR metadata.
+
+```text
+#407  global objective / program issue
+│
+├─ ICPG-C1/K1/E1  #408  contract + checker + migration semantic-loss controls
+│      branch: agent/spatial-intent-case-proof-graph-v1
+│      relation: root terminal implementation leaf
+│
+├─ ICPG-M1        #409  Shadow intent/case/semantic-parity monitor
+│      relation: true child when consuming #408 unmerged contract vocabulary
+│
+├─ ICPG-D1        #410  Tech Lead task-DAG + Stack/index convergence
+│      relation: sibling or convergence according to path ownership;
+│                do not serialize merely because issue number is later
+│
+└─ ICPG-X1        #411  live continuous Shadow runtime canary
+       relation: EXTERNAL_EVIDENCE / PROCESS_DEPENDENCY unless harness bytes
+                 actually consume an unmerged parent implementation
+```
+
+Data flow:
+
+```text
+Prompt / source behavior
+→ ICPG exact subject + digest
+→ required-case ownership
+→ Tech Lead task contracts
+→ true dependency DAG
+→ path/resource leases
+→ molecular terminal Workers
+→ independent case/oracle receipts
+→ one convergence owner
+→ global intent/case reconciliation
+→ publication review
+```
+
+| Atom | Issue | Type | Owns | Stack class | Current state |
+|---|---:|---|---|---|---|
+| `ICPG-C1` | #408 | `C` | case graph reference/schema | root | implemented on candidate branch |
+| `ICPG-K1` | #408 | `K` | deterministic semantic checker | same terminal leaf | implemented on candidate branch |
+| `ICPG-E1` | #408 | `E` | positive + semantic-loss/mutation controls | same terminal leaf | implemented; CI/execution receipt pending |
+| `ICPG-M1` | #409 | `K/E` | Shadow case-delta contract | child of #408 semantics | implemented contract; live runtime pending |
+| `ICPG-D1` | #410 | `D/K` | README/AGENTS/Tech Lead/Stack traceability | convergence by shared-file ownership | partial until full Tech Lead machine binding lands |
+| `ICPG-X1` | #411 | `X` | exact-subject independent live Shadow canary | external evidence | `NOT_EXERCISED` |
+
+Hard laws for this Stack:
+
+- every required case has one terminal implementation owner or one explicit convergence owner;
+- case dependency does not create a Git child by itself;
+- a Git child must name the unmerged parent artifact it consumes;
+- path-disjoint case work remains sibling work;
+- shared case/index files have one convergence owner;
+- terminal Worker PASS cannot close global intent/case coverage;
+- live #411 evidence cannot be manufactured from static #408/#409 fixtures;
+- merge, release, promotion and semantic conflict remain outside Worker authority.
+
 ## Integration with `github-delivery-loop`
 
 ```text
