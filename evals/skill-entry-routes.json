@@ -16,6 +16,7 @@
     "product-reverse-engineering-loop",
     "repo-agent-native",
     "repository-capability-audit",
+    "repository-entropy-reclamation",
     "sdlc-plan-composer",
     "shared-skills-infra",
     "skill-refactor-proof-loop",
