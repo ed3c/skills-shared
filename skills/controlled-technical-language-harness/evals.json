@@ -1,8 +1,8 @@
 {
   "skill_name": "controlled-technical-language-harness",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "_meta": {
-    "coverage_metric": "profile source-identity honesty, edition immutability, Human-owned terminology and compliance boundaries, ruleset binding, profile optionality, and uncommitted official bytes; deterministic tokenization and word budgets; calibrated-heuristic admission and composition; source-node preservation for structured XML; extraction-quality declaration; privacy class to execution lane routing; exact profile/termbase/source/candidate evidence binding; corpus-recomputed calibration; integrated A/B experiment validity and outcome gates; authority-bound A/B composition",
+    "coverage_metric": "profile source-identity honesty, edition immutability, Human-owned terminology and compliance boundaries, ruleset binding, profile optionality, and uncommitted official bytes; deterministic tokenization and word budgets; calibrated-heuristic admission and composition; source-node preservation for structured XML; extraction-quality declaration; privacy class to execution lane routing; exact profile/termbase/source/candidate evidence binding; corpus-recomputed calibration; integrated A/B experiment validity and outcome gates; authority-bound A/B composition; A/B run bundle shape; frozen body-treatment comparison and old-strength preservation",
     "purpose": "Prove that a proposal-derived controlled-language profile cannot present itself as an official standard edition, cannot bind a ruleset it does not have, cannot become a mandatory core dependency, cannot relax deterministic, privacy, or Human Admit boundaries, and cannot use primitive mechanism success as a proxy for exact profile-conformance evidence."
   },
   "runnable": [
@@ -154,6 +154,23 @@
         "a gate that could not run exits 70, distinct from a gate that refused (2) and from unreadable input (64)"
       ],
       "expected": "canonical composition admitted with the gate order recorded; 18 planted defects refused"
+    },
+    {
+      "id": "CTL-REFACTOR-AB-1",
+      "checker_script": "scripts/refactor_ab.py",
+      "test_verify": "tests/refactor-treatments/verify.sh",
+      "good_fixture": "tests/refactor-treatments/fixtures",
+      "hollow_fixture": null,
+      "hollow_mutations": "3 planted defects, each refused by its own error code: a byte appended to a frozen treatment (TREATMENT_BLOB_DRIFT), the relocated field-set guarantee deleted from check_privacy_routing.py (OLD_STRENGTH_LOST), and a guarantee dropped from the live body that an earlier arm carried (TREATMENT_REGRESSION)",
+      "covers": [
+        "every treatment is a real historical blob and a drifted fixture is refused rather than rescored",
+        "a guarantee the baseline body carried must still be asserted in a later body or against the executable owner that took it over",
+        "a relocated guarantee and a deleted one produce different results",
+        "no arm may regress a criterion an earlier arm had, and each step must gain at least one",
+        "the intermediate landing stays in the denominator whatever it scores",
+        "absent treatments exit 64, distinct from a comparison that refused (2)"
+      ],
+      "expected": "the three frozen bodies (blobs bced264, d4d3b97, a002af7) and the live SKILL.md (blob 5c19321) score 10/12/13/14 on 15 criteria; 3 planted defects refused by name"
     }
   ],
   "evidence_boundary": {
@@ -176,6 +193,8 @@
     "physical_model_or_harness_runs": "NOT_EXERCISED",
     "official_asd_ste100_compliance": "NOT_EXERCISED",
     "authority_bound_ab_composition": "IMPLEMENTED",
+    "ab_run_bundle_shape_contract": "IMPLEMENTED",
+    "frozen_body_treatment_ab": "IMPLEMENTED",
     "semantic_generalization": "NOT_EXERCISED"
   }
 }

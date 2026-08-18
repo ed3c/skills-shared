@@ -67,6 +67,67 @@
         "rollback": false
       },
       "remaining_issues": [231, 232, 234, 256, 312]
+    },
+    {
+      "id": "controlled-technical-language-refactor-ab-v1",
+      "owner_skill": "controlled-technical-language-harness",
+      "issue": 344,
+      "pull_requests": [126, 127, 131, 140],
+      "entrypoint": "skills/controlled-technical-language-harness/scripts/refactor_ab.py",
+      "runner": "skills/controlled-technical-language-harness/tests/refactor-treatments/verify.sh",
+      "treatments": [
+        {
+          "id": "A_PRE_LANE_SPLIT",
+          "role": "OLD_CANONICAL",
+          "path": "skills/controlled-technical-language-harness/tests/refactor-treatments/fixtures/old-canonical-SKILL.txt",
+          "blob_sha": "bced26459939d78c086139f40513393542b11d89"
+        },
+        {
+          "id": "B0_EVALUATOR_LANES_AS_LANDED",
+          "role": "REFACTOR_AS_LANDED",
+          "path": "skills/controlled-technical-language-harness/tests/refactor-treatments/fixtures/refactor-as-landed-SKILL.txt",
+          "blob_sha": "d4d3b9773c5ec4a640c280d36cc090b8f3f7ba2b"
+        },
+        {
+          "id": "B1_FORMAT_PRIVACY_REPAIRED",
+          "role": "REPAIRED_CANDIDATE",
+          "path": "skills/controlled-technical-language-harness/tests/refactor-treatments/fixtures/format-privacy-repaired-SKILL.txt",
+          "blob_sha": "a002af7079b516836b1167185f3d53572125851a"
+        },
+        {
+          "id": "B2_AB_VALIDITY_REPAIRED",
+          "role": "REPAIRED_CANDIDATE",
+          "path": "skills/controlled-technical-language-harness/SKILL.md",
+          "blob_sha": "5c1932161e9d4164b013f0e2b1f7dc7830021c5d"
+        }
+      ],
+      "proof_layers": {
+        "L0_SOURCE_FREEZE": "PASS",
+        "L1_STRUCTURAL_REACHABILITY": "PASS",
+        "L2_EXECUTABLE_CONTRACT": "PASS",
+        "L3_HERMETIC_REAL_TASK": "PASS",
+        "L4_MATCHED_LIVE_MODEL_RUNTIME": "NOT_EXERCISED",
+        "L5_DELIVERY_AND_HUMAN_ADMIT": "HUMAN_ADMIT_REQUIRED"
+      },
+      "highest_layer": "L3_HERMETIC_REAL_TASK",
+      "denominator": {
+        "failed_retained": true,
+        "stale_retained": true,
+        "blocked_retained": true,
+        "cancelled_retained": true,
+        "superseded_retained": true
+      },
+      "cleanup": "CLEAN",
+      "authority": {
+        "provider_activation": false,
+        "publication": false,
+        "semantic_conflict_resolution": false,
+        "merge": false,
+        "release": false,
+        "promotion": false,
+        "rollback": false
+      },
+      "remaining_issues": [344]
     }
   ]
 }
