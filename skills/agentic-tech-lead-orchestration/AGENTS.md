@@ -37,9 +37,10 @@ B0_REFACTOR_AS_LANDED     BLOCKED_DISPATCH_ROUTE_ABSENT
 B1_REACHABILITY_REPAIRED  PASS
 B2_CAUSAL_DAG_REPAIRED    PASS
 B3_CLOSURE_LAWS_BOUND     PASS
+B4_OFFLOAD_METHOD_BOUND   PASS
 
-A/B1/B2/B3 final bytes       equivalent
-B3 causal/evidence proof     strongest
+A/B1/B2/B3/B4 final bytes    equivalent
+B4 causal/evidence proof     strongest
 live model/provider uplift   NOT_EXERCISED
 Git Town/Forgejo delivery    NOT_EXERCISED
 merge authority              false

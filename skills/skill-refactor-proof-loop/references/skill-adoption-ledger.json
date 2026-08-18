@@ -147,9 +147,10 @@
           "state": "PASS",
           "evidence": [
             "skills/agentic-tech-lead-orchestration/tests/fixtures/pre-refactor-SKILL.txt",
-            "skills/agentic-tech-lead-orchestration/tests/fixtures/causal-dag-repaired-SKILL.txt"
+            "skills/agentic-tech-lead-orchestration/tests/fixtures/causal-dag-repaired-SKILL.txt",
+            "skills/agentic-tech-lead-orchestration/tests/fixtures/closure-laws-bound-SKILL.txt"
           ],
-          "note": "Registered as treatment A_OLD_MONOLITH with a content-bound blob identity. Issue #332 extended the same rule forward: B2_CAUSAL_DAG_REPAIRED was frozen byte-for-byte at its registered blob 3fd01571 before the live SKILL.md became the new arm B3_CLOSURE_LAWS_BOUND, so every treatment has exactly one immutable subject."
+          "note": "Registered as treatment A_OLD_MONOLITH with a content-bound blob identity. Issue #332 extended the same rule forward: B2_CAUSAL_DAG_REPAIRED was frozen byte-for-byte at its registered blob 3fd01571 before the live SKILL.md became the new arm B3_CLOSURE_LAWS_BOUND. Issue #359 applied it again: B3_CLOSURE_LAWS_BOUND was frozen at its registered blob f6d66795 before the live SKILL.md became B4_OFFLOAD_METHOD_BOUND, so every treatment has exactly one immutable subject."
         },
         "refactor_as_landed_treatment_frozen": {
           "state": "PASS",
@@ -164,7 +165,7 @@
             "skills/agentic-tech-lead-orchestration/tests/refactor_ab.py",
             "skills/agentic-tech-lead-orchestration/tests/run-all.sh"
           ],
-          "note": "Old behaviours are compared treatment by treatment rather than asserted in prose. Five arms now score on twelve criteria: A 9, B0 6, B1 10, B2 11, B3 12, with B3 required to dominate B2 rather than merely tie it."
+          "note": "Old behaviours are compared treatment by treatment rather than asserted in prose. Six arms now score on thirteen criteria: A 9, B0 6, B1 10, B2 11, B3 12, B4 13, with B4 required to dominate B3 rather than merely tie it."
         },
         "route_reachable": {
           "state": "PASS",

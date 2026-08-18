@@ -25,7 +25,8 @@ def features(text: str) -> dict[str, Any]:
             "t0_t10": ("T0 ROUTE" in text and "T10 HANDOFF" in text) or "t0-t10-causal-map.json" in text,
             "portable_core": "PORTABLE_CORE_START" in text,
             "global_objective": "global objective" in lower or "global-objective" in lower,
-            "closure_laws": "closure lanes do not substitute" in lower and "completion-readiness" in lower}
+            "closure_laws": "closure lanes do not substitute" in lower and "completion-readiness" in lower,
+            "offload_method": "tests/dual-agent-offload-contract/verify.py" in text and "may never claim it is implemented or live" in lower}
 
 
 def treatment_metadata() -> dict[str, dict[str, Any]]:
@@ -40,7 +41,7 @@ def treatment_metadata() -> dict[str, dict[str, Any]]:
         text = (ROOT / relative).read_text(); observed = blob(text)
         if observed != expected: raise CanaryError(f"frozen treatment drift {name}")
         out[name] = features(text)
-    out["B3_CLOSURE_LAWS_BOUND"] = features((ROOT / "SKILL.md").read_text())
+    out["B4_OFFLOAD_METHOD_BOUND"] = features((ROOT / "SKILL.md").read_text())
     return out
 
 
@@ -111,24 +112,26 @@ def compare() -> dict[str, Any]:
     with tempfile.TemporaryDirectory(prefix="tech-lead-real-task-") as raw:
         temp = Path(raw); subject, base, tree = build_subject(temp); task = task_contract(base, tree, sha_file(subject / "contracts/checkout.py")); plan, receipts = capability_documents(base, tree); gates = verify_live_gates(task, plan, receipts, temp / "live-gates")
         results: dict[str, Any] = {}
-        for arm in ("A_OLD_MONOLITH", "B0_REFACTOR_AS_LANDED", "B1_REACHABILITY_REPAIRED", "B2_CAUSAL_DAG_REPAIRED", "B3_CLOSURE_LAWS_BOUND"):
+        for arm in ("A_OLD_MONOLITH", "B0_REFACTOR_AS_LANDED", "B1_REACHABILITY_REPAIRED", "B2_CAUSAL_DAG_REPAIRED", "B3_CLOSURE_LAWS_BOUND", "B4_OFFLOAD_METHOD_BOUND"):
             meta = metadata[arm]
             if arm == "B0_REFACTOR_AS_LANDED" and not meta["task_gate"]:
                 results[arm] = {**meta, "execution_state": "BLOCKED_DISPATCH_ROUTE_ABSENT", "functional_output": "NOT_EXERCISED", "causal_closure": "FAIL"}; continue
             actual = run_arm(arm, subject, base, tree, temp, Path(__file__).resolve())
             closure = "PROCEDURAL_T0_T10_NO_CAPABILITY_RECEIPTS" if arm == "A_OLD_MONOLITH" else "REACHABLE_NOT_RECEIPT_GATED" if arm == "B1_REACHABILITY_REPAIRED" else "RECEIPT_GATED_FIXTURE_CLOSED"
-            results[arm] = {**meta, **actual, "execution_state": "PASS", "causal_closure": closure, "live_gates": gates if arm == "B3_CLOSURE_LAWS_BOUND" else None}
+            results[arm] = {**meta, **actual, "execution_state": "PASS", "causal_closure": closure, "live_gates": gates if arm == "B4_OFFLOAD_METHOD_BOUND" else None}
         executed = [row for row in results.values() if row.get("functional_output") == "PASS"]
         if len({row["content_digest"] for row in executed}) != 1: raise CanaryError("executed arms produced different bytes")
         if not results["A_OLD_MONOLITH"]["t0_t10"] or results["B1_REACHABILITY_REPAIRED"]["capability_gate"] or not results["B2_CAUSAL_DAG_REPAIRED"]["capability_gate"]: raise CanaryError("treatment identity/scoring drift")
         if results["B2_CAUSAL_DAG_REPAIRED"]["closure_laws"] or not results["B3_CLOSURE_LAWS_BOUND"]["closure_laws"]: raise CanaryError("closure-law treatment identity drift")
+        if results["B3_CLOSURE_LAWS_BOUND"]["offload_method"] or not results["B4_OFFLOAD_METHOD_BOUND"]["offload_method"]: raise CanaryError("offload-method treatment identity drift")
         stages = {"contract_and_file_boundaries": "CLOSED_MECHANICALLY", "true_dag_worktrees_and_parallel_processes": "CLOSED_ON_SYNTHETIC_SUBJECT",
                   "checkpoint_retry_tournament_and_convergence": "CLOSED_ON_SYNTHETIC_SUBJECT", "global_objective_and_cleanup": "CLOSED_ON_SYNTHETIC_SUBJECT",
                   "grepai_scip_tree_sitter_serena_live_adapters": "NOT_EXERCISED", "git_town_restack_and_semantic_conflict": "NOT_EXERCISED",
                   "forgejo_github_publication": "NOT_EXERCISED", "matched_live_model_quality_cost_latency": "NOT_EXERCISED", "human_merge": "HUMAN_ADMIT_REQUIRED"}
         return {"schema": "agentic-tech-lead/real-task-ab/v1", "task": {"id": TASK_ID, "base_commit": base, "base_tree": tree, "same_base_tests_budgets_carrier": True},
                 "results": results, "output_equivalence_for_executed_arms": True, "b0_runtime_regression_exposed": True,
-                "b2_closure_dominates_without_model_claim": True, "b3_binds_closure_laws_without_model_claim": True, "pdf_closed_loop_stage_state": stages, "behavioral_model_uplift": "NOT_EXERCISED",
+                "b2_closure_dominates_without_model_claim": True, "b3_binds_closure_laws_without_model_claim": True, "b4_routes_offload_method_without_runtime_claim": True,
+                "pdf_closed_loop_stage_state": stages, "behavioral_model_uplift": "NOT_EXERCISED",
                 "live_provider_runtime": "NOT_EXERCISED", "git_town_forgejo_delivery": "NOT_EXERCISED", "merge_authority": False}
 
 
@@ -143,7 +146,7 @@ def main(argv: list[str] | None = None) -> int:
     except (CanaryError, OSError, subprocess.SubprocessError, KeyError, ValueError) as exc:
         print(f"TECH-LEAD-REAL-TASK-AB-RED {exc}", file=sys.stderr); return 2
     print(json.dumps(report, indent=2, sort_keys=True))
-    print("TECH-LEAD-REAL-TASK-AB-GREEN matched deterministic task closed; B0 route regression exposed; B2 receipt causality closed; B3 closure laws bound in the live core; live model/provider/Stack/Forgejo uplift NOT_EXERCISED")
+    print("TECH-LEAD-REAL-TASK-AB-GREEN matched deterministic task closed; B0 route regression exposed; B2 receipt causality closed; B3 closure laws bound; B4 offload method routed from the live core; live model/provider/Stack/Forgejo uplift NOT_EXERCISED")
     return 0
 
 

@@ -26,7 +26,7 @@ L4 MATCHED_LIVE_MODEL_RUNTIME NOT_EXERCISED
 L5 DELIVERY_AND_HUMAN_ADMIT   HUMAN_ADMIT_REQUIRED
 ```
 
-On the deterministic matched task, A, B1, B2 and B3 produce equivalent final bytes. B0 is blocked because the pre-dispatch route is absent. B2 adds receipt-gated causal/evidence closure and B3 binds the closure laws into the same core; neither proves model/provider quality uplift.
+On the deterministic matched task, A, B1, B2, B3 and B4 produce equivalent final bytes. B0 is blocked because the pre-dispatch route is absent. B2 adds receipt-gated causal/evidence closure, B3 binds the closure laws into the same core, and B4 routes the local/cloud offload method with its executable authority named and its plane promotion refused; none of them proves model/provider quality uplift or any live offload runtime.
 
 Each arm reads exactly one immutable subject. When the owner's live body changes, the previous arm is frozen as a fixture at the blob the registry already pins and the live body becomes the next arm — never a re-freeze of an existing treatment against changed bytes.
 

@@ -99,14 +99,15 @@ B0_REFACTOR_AS_LANDED       BLOCKED_DISPATCH_ROUTE_ABSENT
 B1_REACHABILITY_REPAIRED    PASS
 B2_CAUSAL_DAG_REPAIRED      PASS
 B3_CLOSURE_LAWS_BOUND       PASS
+B4_OFFLOAD_METHOD_BOUND     PASS
 
-A/B1/B2/B3 final bytes      equivalent
-B3 causal/evidence closure  strongest
+A/B1/B2/B3/B4 final bytes   equivalent
+B4 causal/evidence closure  strongest
 ```
 
-B2 is frozen at the blob the registry pins; B3 is the live body carrying the
-closure laws. Every treatment has exactly one immutable subject, so the newest
-arm is the only one that moves when the core changes.
+B3 is frozen at the blob the registry pins; B4 is the live body carrying the
+local/cloud offload route. Every treatment has exactly one immutable subject, so
+the newest arm is the only one that moves when the core changes.
 
 Current ceiling:
 
