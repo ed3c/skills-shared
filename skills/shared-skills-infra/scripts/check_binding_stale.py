@@ -129,13 +129,12 @@ def check_binding(directory: Path, skills_root: Path) -> tuple[str, str]:
     return "stale", actual
 
 
-def scan(repo_root: Path) -> tuple[dict[str, tuple[str, str]], list[str]]:
+def scan(repo_root: Path, skills_root: Path) -> tuple[dict[str, tuple[str, str]], list[str]]:
     slots = repo_root / ".skill-bindings"
     results: dict[str, tuple[str, str]] = {}
     problems: list[str] = []
     if not slots.is_dir():
         return results, problems
-    skills_root = repo_root / "skills"
     for directory in sorted(p for p in slots.iterdir() if p.is_dir()):
         try:
             results[directory.name] = check_binding(directory, skills_root)
@@ -147,6 +146,17 @@ def scan(repo_root: Path) -> tuple[dict[str, tuple[str, str]], list[str]]:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--repo-root", type=Path, default=ROOT)
+    # The bindings and the bodies are not in the same place in every repository.
+    # The shared checkout keeps its bodies in `skills/`; a consumer reaches them
+    # through `.agents/skills/` and keeps only `.skill-bindings/` of its own. A
+    # gate that can look in one shape only is a gate that no repository holding
+    # a binding can run -- which is the state measured on 2026-08-18, when all
+    # twelve live slots were in repositories of the second shape.
+    parser.add_argument(
+        "--body-root",
+        type=Path,
+        help="where this repository's shared bodies live; default <repo-root>/skills",
+    )
     parser.add_argument("--selftest", action="store_true")
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
@@ -154,8 +164,9 @@ def main() -> int:
         return selftest()
 
     repo_root = args.repo_root.resolve()
+    body_root = (args.body_root or repo_root / "skills").resolve()
     try:
-        results, problems = scan(repo_root)
+        results, problems = scan(repo_root, body_root)
     except OSError as error:
         print(f"BINDING UNUSABLE: {error}", file=sys.stderr)
         return 64
@@ -212,7 +223,7 @@ def selftest() -> int:
         }
 
     def state(root: Path) -> tuple[dict[str, tuple[str, str]], list[str]]:
-        return scan(root)
+        return scan(root, root / "skills")
 
     def expect_problem(label: str, root: Path, fragment: str) -> int:
         _, problems = state(root)
@@ -324,6 +335,37 @@ def selftest() -> int:
         code = expect_problem("malformed", root, "must open with a YAML frontmatter")
         if code:
             return code
+
+        # A consumer repository is the shape that actually holds bindings: the
+        # bodies arrive at `.agents/skills/<name>` and there is no `skills/` at
+        # all. A correct binding there must read as current, and pointing the
+        # gate at the empty default must not -- otherwise "no body" and "body
+        # unchanged" are the same answer, and every consumer would be told its
+        # bindings are wrong for a reason that has nothing to do with them.
+        root = base / "consumer-shape"
+        body = root / ".agents" / "skills" / "demo"
+        body.mkdir(parents=True)
+        (body / "SKILL.md").write_text("method\n", encoding="utf-8")
+        slot = root / ".skill-bindings" / "demo"
+        slot.mkdir(parents=True)
+        pinned = {
+            "skill": "demo",
+            "upstream": "antigravity-demo@shared",
+            "retargeted_at": "2026-08-18",
+            "body_version": body_hash(body),
+        }
+        block = "".join(f"{k}: {v}\n" for k, v in pinned.items())
+        (slot / "binding.md").write_text(f"---\n{block}---\n\nnotes\n", encoding="utf-8")
+        results, problems = scan(root, root / ".agents" / "skills")
+        if problems or results.get("demo", ("", ""))[0] != "current":
+            print(f"FAIL consumer-shape: a correct binding was refused where the "
+                  f"bodies actually live: {results} {problems}", file=sys.stderr)
+            return 2
+        _, problems = scan(root, root / "skills")
+        if not problems:
+            print("FAIL consumer-shape: an absent body root read as a valid binding",
+                  file=sys.stderr)
+            return 2
 
     print("SELFTEST GREEN: a moved body surfaces every binding pinned behind it")
     return 0
