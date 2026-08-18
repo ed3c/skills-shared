@@ -74,6 +74,10 @@ def load_real_consumer_bootstrap():
     module = importlib.util.module_from_spec(spec)
     sys.modules[spec.name] = module
     spec.loader.exec_module(module)
+    # consumer_bootstrap.py does not import `canonical` for its own use (it is
+    # dead there); this exercise still needs it, so bind it from its actual
+    # owner, the module consumer_bootstrap.py's own import already loaded.
+    module.canonical = sys.modules["consumer_bootstrap_common"].canonical
     return module
 
 
