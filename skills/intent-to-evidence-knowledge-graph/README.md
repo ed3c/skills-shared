@@ -32,7 +32,7 @@ skills/intent-to-evidence-knowledge-graph/
 ├── README.md
 │   └── State Machine, DAG, data flow, issue/Stack ownership and evidence ceiling
 ├── SKILL.md
-│   └── portable projection/traversal laws
+│   └── portable projection/traversal laws + canonical prompt routing
 └── references/
     ├── SYSTEM_PROMPT_V7_2.md
     │   └── complete reusable Evidence-First + Intent-to-Evidence Graph system prompt
@@ -51,7 +51,7 @@ skills/intent-to-evidence-knowledge-graph/
     ├── IMPLEMENTATION_PREFLIGHT.md
     │   └── Tech Lead terminal packets, relation classes and stage boundary
     └── NEGATIVE_CONTROL_MATRIX.md
-        └── required deterministic false-ancestry/freshness/authority/evidence controls
+        └── required deterministic false-ancestry/freshness/authority/evidence/prompt-divergence controls
 ```
 
 The full prompt and machine schemas now exist. Deterministic checker/runtime validation and mutation execution remain owned by #414–#416 and are not implied by file presence.
@@ -74,11 +74,12 @@ SOURCE_OR_ARTIFACT_BOUND
 → SHADOW_GRAPH_REVIEW
 → SYSTEM_PROMPT_V7_2_DESIGNED
 → MACHINE_SCHEMAS_PRESENT
+→ PROMPT_DESIGN_STAGE_COMPLETE
 → READY_FOR_DETERMINISTIC_CHECKER_IMPLEMENTATION
 → LIVE_RETRIEVAL_NOT_EXERCISED
 ```
 
-Failure states include duplicate case truth, fabricated artifact identity, stale mutable state, false Git ancestry, orphan implementation, broken reverse trace, authority inversion, evidence laundering, unresolved blocking case and connectivity inflation.
+Failure states include duplicate case truth, fabricated artifact identity, stale mutable state, false Git ancestry, orphan implementation, broken reverse trace, authority inversion, evidence laundering, unresolved blocking case, connectivity inflation and divergent prompt authority.
 
 ## Graph layers and ownership
 
@@ -126,13 +127,13 @@ The semantic graph and delivery graph are joined by typed bridges. A semantic re
                ├─ #414 deterministic checker/mutations next
                ├─ #415 case→task→issue→Stack/document binding
                ├─ #416 authority-aware traversal + reverse-trace checker
-               └─ #417 final prompt/docs/Molecular convergence
+               └─ #417 final root/routing/Molecular convergence
 
 #411 live continuous Spatial Shadow       EXTERNAL_EVIDENCE / PROCESS_DEPENDENCY
 #418 live multi-hop GraphRAG/Shadow canary EXTERNAL_EVIDENCE / PROCESS_DEPENDENCY
 ```
 
-Issue order is not Git ancestry. #415/#416 remain siblings unless their implementation actually consumes another leaf's unmerged bytes/contracts. #417 is the one convergence/index owner after terminal artifact identities stabilize.
+Issue order is not Git ancestry. #415/#416 remain siblings unless their implementation actually consumes another leaf's unmerged bytes/contracts. #417 is the one convergence/index owner after terminal artifact identities stabilize; it must route to the canonical prompt rather than recreate it.
 
 ## Molecular Stack decomposition
 
@@ -218,17 +219,31 @@ UNKNOWN_BLOCKING case
 → blocked Intent closure
 ```
 
+## Prompt authority
+
+```text
+canonical full prompt:
+references/SYSTEM_PROMPT_V7_2.md
+
+maintenance-only delta:
+references/SYSTEM_PROMPT_V7_2_DELTA.md
+```
+
+Root docs, consumers and #417 convergence should route to the canonical prompt. A copied decision-active full prompt is a governance/traceability defect because it can diverge from the reviewed contract.
+
 ## Shadow Architect design verdict
 
-`references/SHADOW_REVIEW_V7_2.md` currently records:
+`references/SHADOW_REVIEW_V7_2.md` records:
 
 ```text
 FULL_V7_2_SYSTEM_PROMPT                  PASS_AS_DESIGN_ARTIFACT
+STANDALONE_PROMPT_PACKAGING              PASS_AS_DESIGN_ARTIFACT
 V7_1_SEMANTIC_BASELINE                   PRESERVED
 ICPG_NON_DUPLICATION                     SPECIFIED
 INTENT_TO_EVIDENCE_TRACE                 SPECIFIED
 AUTHORITY/FRESHNESS/EVIDENCE_CEILING     SPECIFIED
 BIDIRECTIONAL_GRAPH_TRAVERSAL            SPECIFIED
+PROMPT_DIVERGENCE_CONTROLS               SPECIFIED
 DETERMINISTIC_CHECKER                    NOT_IMPLEMENTED
 MUTATION_EXECUTION                       NOT_EXERCISED
 LIVE_GRAPHRAG_SHADOW                     NOT_EXERCISED
@@ -249,6 +264,7 @@ Knowledge Graph portable method/trace contract     IMPLEMENTED_ON_PR_419
 Complete Zettelkasten v7.2 system prompt           IMPLEMENTED_ON_PR_420
 Intent/Artifact/Trace machine schemas              IMPLEMENTED_ON_PR_420
 Shadow v7.2 design review                           IMPLEMENTED_ON_PR_420
+Prompt-design packaging stage                      STAGE_COMPLETE_AS_DESIGN_ARTIFACT
 Deterministic semantic checker                     NOT_IMPLEMENTED
 Negative mutation execution                        NOT_EXERCISED
 Live GraphRAG multi-hop canary                      NOT_EXERCISED / #418
@@ -260,7 +276,7 @@ Do not lift these states based on documentation presence.
 
 ## Next deterministic frontier
 
-No additional prompt redesign is required before executable work unless a checker/mutation exposes a contract defect.
+No additional prompt redesign is admitted before executable work unless a deterministic checker/mutation exposes a contract defect.
 
 ```text
 complete v7.2 prompt + schemas
