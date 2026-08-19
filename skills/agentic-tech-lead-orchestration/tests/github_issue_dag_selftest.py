@@ -20,10 +20,12 @@ def graph():
     }
 
 g=graph(); mod.validate_graph(g)
+assert len(mod.canonical_graph_digest(g))==64
 assert mod.desired_blocked_by(g)=={1:[],2:[],3:[2]}
 assert mod.ready_wave(g)==[1,2]
 assert mod.compare_readback(g,{"1":{"blockedBy":[]},"2":{"blockedBy":[]},"3":{"blockedBy":[2]}})["match"]
-assert not mod.compare_readback(g,{"1":{"blockedBy":[]},"2":{"blockedBy":[]},"3":{"blockedBy":[1]}})["match"]
+extra=mod.compare_readback(g,{"1":{"blockedBy":[]},"2":{"blockedBy":[]},"3":{"blockedBy":[1,2]}})
+assert not extra["match"] and extra["extra"]=={"3":[1]}
 
 def fail(mut):
     x=copy.deepcopy(graph()); mut(x)
@@ -36,4 +38,25 @@ fail(lambda x:x["edges"].append({"blocker":1,"blocked":1,"readiness":"completion
 fail(lambda x:x["edges"][0].update(project_to_github=True))
 fail(lambda x:x["edges"].append(copy.deepcopy(x["edges"][0])))
 fail(lambda x:x["edges"][0].update(blocker=99))
-print("github-issue-dag selftest: PASS (positive=4 mutations=5 live=NOT_EXERCISED)")
+fail(lambda x:x.update(graph_digest="0"*64))
+fail(lambda x:x["nodes"][0].update(issue=True))
+
+try: mod.compare_readback(g,{"1":{"blockedBy":[]},"2":{"blockedBy":[]}})
+except mod.ContractError: pass
+else: raise AssertionError("incomplete readback passed")
+
+orig_readback=mod.live_readback
+orig_run=mod._run
+calls=[]
+try:
+    mod.live_readback=lambda repo,issues:{"1":{"blockedBy":[]},"2":{"blockedBy":[]},"3":{"blockedBy":[1,2]}}
+    mod._run=lambda argv:calls.append(argv) or ""
+    try: mod.apply_projection(g)
+    except mod.ContractError: pass
+    else: raise AssertionError("destructive extra-edge reconciliation passed")
+    assert calls==[], "extra blockers must fail before any mutation"
+finally:
+    mod.live_readback=orig_readback
+    mod._run=orig_run
+
+print("github-issue-dag selftest: PASS (positive=5 mutations=9 live=NOT_EXERCISED)")
