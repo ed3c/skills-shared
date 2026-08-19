@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ed3c/skills-shared/skills/agentic-tech-lead-orchestration/codex-worker-result.schema.json",
+  "title": "Agentic Tech Lead Codex Worker Self-Report",
+  "description": "Model-produced structured result. This is a claim requiring independent source/diff/test readback, never acceptance proof by itself.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["status", "changed_files", "tests_run", "acceptance_claim", "blockers"],
+  "properties": {
+    "status": {"enum": ["completed", "blocked", "needs_human", "failed"]},
+    "changed_files": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+    "tests_run": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "acceptance_claim": {"type": "boolean"},
+    "blockers": {"type": "array", "items": {"type": "string", "minLength": 1}}
+  }
+}

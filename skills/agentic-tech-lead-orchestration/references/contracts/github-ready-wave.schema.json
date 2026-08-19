@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ed3c/skills-shared/skills/agentic-tech-lead-orchestration/github-ready-wave.schema.json",
+  "title": "GitHub Ready Wave Dispatch Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["repo", "graph_digest", "issues", "dispatch_eligible"],
+  "properties": {
+    "repo": {"type": "string", "pattern": "^[^/]+/[^/]+$"},
+    "graph_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "issues": {"type": "array", "items": {"type": "integer", "minimum": 1}, "uniqueItems": true},
+    "dispatch_eligible": {"type": "boolean"},
+    "remote_readback_subject": {"type": ["string", "null"]}
+  }
+}

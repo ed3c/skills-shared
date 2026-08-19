@@ -1,76 +1,129 @@
 # AGENTS.md — Agentic Tech Lead integration contract
 
-Read this file before changing `agentic-tech-lead-orchestration`, its golden proof, its Local Handoff Execution Queue, or any consumer binding that claims to implement it.
+Read this file before changing `agentic-tech-lead-orchestration`, its golden proof, its Local Handoff Execution Queue, the Codex control-plane adapters, or any consumer binding that claims to implement it.
 
 ## Mandatory read order
 
 1. repository root `AGENTS.md`, `README.md`, `CONTEXT.md`, and `ARCHITECTURE.md`;
 2. this `AGENTS.md`;
 3. this directory's `README.md`;
-4. `SKILL.md`;
+4. `SKILL.md` — provider-neutral core law;
 5. `references/task-contract.schema.json`, `references/capability-plan.schema.json`, `references/capability-receipts.schema.json`, and `references/scheduler-lifecycle.schema.json`;
-6. when a host/runtime boundary exists, `references/local-handoff-queue.schema.json`, `references/example-local-handoff-queue.json`, and `scripts/assert_local_handoff_queue.py`;
-7. `modules/domain-profile.md`, then only modules whose frozen trigger matches;
-8. `scripts/README.md`, executable checkers, and `tests/README.md`;
-9. `../skill-refactor-proof-loop/README.md` and its golden registry;
-10. exact issue/PR base/head/workflow/evidence subjects.
+6. when issues #375–#379, Codex SDK, GitHub Issue Dependencies, Herdr, or problem closure are in scope, read `../../docs/traceability/CODEX_SDK_TECH_LEAD_CONTROL_PLANE.md`, then the exact `references/execution-packets/375-*.md`–`378-*.md` packet and only the selected modules/contracts;
+7. when a host/runtime boundary exists, `references/local-handoff-queue.schema.json`, `references/example-local-handoff-queue.json`, and `scripts/assert_local_handoff_queue.py`;
+8. `modules/domain-profile.md`, then only modules whose frozen trigger matches;
+9. `scripts/README.md`, executable checkers, and `tests/README.md`;
+10. `../skill-refactor-proof-loop/README.md` and its golden registry;
+11. exact issue/PR base/head/workflow/evidence subjects;
+12. `../../docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md` before any completion claim.
 
-Do not use chat history, branch names, module presence, provider installation, issue state, or a previous successful SHA as current runtime evidence.
+Do not use chat history, branch names, module presence, provider installation, issue state, terminal `done`, or a previous successful SHA as current runtime evidence.
 
 ## Current integration truth
 
-```text
-PR #308  task/schema/semantic/capability reachability,
-         causal-DAG repair, and Local Handoff Queue contract
-└─ PR #315 matched production-shaped hermetic real-task A/B,
-           restacked onto the current causal handoff runtime
-   └─ PR #323 generalized refactor-proof contract and golden registry
-      └─ PR #324 Agent routes, directory State Machines, DAG and data flow
-         └─ PR #325 molecular Stack and traceability convergence
-```
-
-The matched deterministic task establishes:
+The existing proof-carrying Tech Lead line remains authoritative for the portable core:
 
 ```text
-A_OLD_MONOLITH            PASS
-B0_REFACTOR_AS_LANDED     BLOCKED_DISPATCH_ROUTE_ABSENT
-B1_REACHABILITY_REPAIRED  PASS
-B2_CAUSAL_DAG_REPAIRED    PASS
-B3_CLOSURE_LAWS_BOUND     PASS
-B4_OFFLOAD_METHOD_BOUND   PASS
-
-A/B1/B2/B3/B4 final bytes    equivalent
-B4 causal/evidence proof     strongest
-live model/provider uplift   NOT_EXERCISED
-Git Town/Forgejo delivery    NOT_EXERCISED
-merge authority              false
+PR #308 task/schema/semantic/capability reachability + Local Handoff contract
+→ PR #315 matched production-shaped hermetic real-task A/B
+→ PR #323 generalized refactor-proof contract and registry
+→ PR #324 Agent routes + directory State Machines/DAG/data flow
+→ PR #325 Molecular Stack + traceability convergence
 ```
 
-The Local Handoff Queue adds an executable continuation contract for host/runtime-only work. It does not upgrade the hermetic proof into live runtime evidence.
+The Codex control-plane extension is a separate sibling/convergence program:
 
-## Behavioral A/B lane (#316)
+```text
+#375 / PR #451  Codex SDK controller/session adapter      SIBLING / UNMERGED CANDIDATE
+#376 / PR #452  GitHub Issue DAG projection              SIBLING / UNMERGED CANDIDATE
+#377 / PR #456  Herdr runtime observer v3                SIBLING / UNMERGED CANDIDATE
+#378 / PR #457  problem-closure ledger v3                SIBLING / UNMERGED CANDIDATE
+PR #380         traceability/document routing foundation  DOCUMENTATION SIBLING
+       ↓ exact consumed candidate bytes
+#379 / PR #455  one multi-parent convergence owner       CONVERGENCE CANDIDATE
+```
 
-The deterministic proof above compares bodies by what their mechanisms admit. It cannot say whether the repaired body changes what a live model orchestrates, which is why every one of its reports ends in `live model/provider uplift NOT_EXERCISED`.
+`#379` may consume exact unmerged sibling bytes because convergence is its job. That does **not** admit or merge those siblings and does not make #375→#376→#377→#378 a serial Stack. A `TRUE_CHILD` edge requires a named byte/contract dependency between the actual child and parent.
 
-`scripts/run_behavioral_ab.py` is the separate lane that can. Its rubric and both arm blobs were frozen in `evals/behavioral-ab-preregistration.json` and committed before any cell ran; the results and per-cell receipts live in `evals/`. Read the result document for the current numbers rather than restating them here — a summary copied into prose is the first thing to go stale.
+Current selected sibling heads are read from GitHub immediately before convergence decisions. The current epoch is documented in `../../docs/traceability/CODEX_SDK_TECH_LEAD_CONTROL_PLANE.md`; this router does not duplicate mutable head SHAs.
 
-Three boundaries hold whatever that document says:
+Current mechanism/evidence split:
 
-- it is one host, one model, one consumer subject and one repetition count, and the verdict is forced to `INSUFFICIENT_EVIDENCE` below the preregistered repetition minimum;
-- linked worktrees and physical Worker processes are closed by `tests/real_task_ab.py`, not by this lane, which runs one host process per cell and claims nothing more;
-- provider adapters, Git Town, Forgejo, publication and merge stay in their own lanes, unchanged and still `NOT_EXERCISED`.
+```text
+Codex SDK mechanism
+  exact worktree HEAD/tree/clean preflight + writable-lease readback implemented
+Codex SDK live thread/turn
+  NOT_EXERCISED
 
-Three rubric checks did not discriminate in the first run: `candidates_share_base` and `lease_disjoint` on the tournament shape, `edge_implies_dependency` on the DAG shape. Every arm failed all three in every repetition, for the same reason in both arms — both bodies produce a topology the frozen rubric did not anticipate, where candidates depend on an immutable acceptance-oracle node and the convergence owner writes paths its candidates also wrote. That is a fact about the rubric, not about either treatment, and it is recorded rather than repaired: editing a check after seeing which way it fell is the exact move the preregistration exists to prevent. A future run may widen those three checks only in a new preregistration, frozen before its own cells.
+GitHub DAG mechanism
+  completion-edge projection + repo/default-branch/visibility + expected issue-state
+  + closing-PR-reference duplicate preflight implemented
+Generic development-link ownership beyond closing references
+  RESIDUAL / do not overclaim from closedByPullRequestsReferences
+GitHub remote dependency mutation/readback
+  NOT_EXERCISED
+
+Herdr observer mechanism
+  exact Git subject + worktree/pane/workspace/PID/native-session identity
+  + PID start-time + freshness/liveness + terminal cleanup/residue implemented
+Herdr DONE_CANDIDATE
+  advisory only; controller source/diff/test readback still required
+Herdr live observation
+  NOT_EXERCISED
+
+problem-closure mechanism
+  frozen denominator/source manifest + claim digest + exact repo subject
+  + current/historical evidence + exact receipts + supersession validation implemented
+real article/PDF/provider closure
+  EVIDENCE_DEPENDENT
+
+merge/release
+  HUMAN_ADMIT_REQUIRED
+```
+
+A shared deterministic suite may prove the exact convergence mechanism. It cannot raise any live lane or convert an unmerged candidate into admitted repository truth.
 
 ## Writer, path, and attempt rules
 
 - One Worker owns one branch, linked worktree, attempt lineage, and disjoint path/resource lease.
 - Tournament replicas may share one candidate output path only within the same frozen tournament contract and isolated worktrees.
 - Independent path-disjoint siblings do not become a linear Stack for scheduling convenience.
-- A convergence Worker starts from the state containing verified prerequisite bytes, not the original plan base.
+- A convergence Worker starts from the state containing the selected prerequisite bytes, not the original plan base.
 - Contracts, acceptance oracles, frozen treatment fixtures, owning eval definitions, global-objective assertions, queue schemas, and evidence ceilings are read-only to implementation Workers.
-- Failed, stale, blocked, cancelled, superseded, losing, and refused attempts remain in the denominator.
-- An Agent may not weaken tests, change interface locks, erase a predecessor, or rewrite a receipt to make a failed implementation pass.
+- Failed, stale, blocked, cancelled, superseded, losing, refused, closed-unmerged and historical attempts remain in the denominator.
+- An Agent may not weaken tests, change interface locks, erase a predecessor, rewrite a receipt, or delete an unmanaged remote dependency to make an implementation pass.
+- Any selected sibling head change after convergence freezes a new epoch: re-read exact head/tree, compare changed bytes, rebind the convergence ancestry, rerun hosted gates, and supersede the earlier Shadow verdict. Never call an earlier green convergence current after one consumed parent moves.
+
+## Codex control-plane authority boundaries
+
+```text
+codex-sdk-controller
+  may start/resume one compatible SDK thread and return a bounded runtime receipt
+  must bind exact 40-hex HEAD/tree and a clean worktree before execution
+  must read changed paths after the turn and refuse read-only/out-of-lease mutation
+  may not plan the DAG, admit a result, merge, release, or persist credentials/private reasoning
+
+github-issue-dag-projection
+  may project validated completion-readiness edges and read them back
+  may bind repository visibility/default branch, expected issue state and closing PR refs
+  may add missing managed edges only on explicit apply
+  may not delete extra unmanaged blockers or treat GitHub metadata as semantic truth
+  may not claim generic linked-PR ownership beyond the observed closing-reference surface
+
+herdr-runtime-observer
+  may observe exact worktree/pane/workspace/PID/PID-start/session identity, freshness, liveness and cleanup/residue
+  stale/future observation, PID reuse, dead nonterminal process, orphan session and terminal residue fail closed
+  DONE_CANDIDATE is not implementation PASS
+  absence degrades to direct Codex SDK + git worktree, not to failure or success
+
+problem-closure-ledger
+  may recompute closure from a frozen source/problem denominator and typed exact-subject evidence/receipts
+  SUPERSEDED remains residual and must route to an existing non-cyclic successor
+  machine-local worktree paths, stale CURRENT evidence, denominator deletion and source drift fail closed
+  issue close, PR merge, navigation links, prose, and workflow UI are not verification lanes
+```
+
+Every provider-specific adapter remains trigger-selected. Presence of its file or binary does not activate it.
 
 ## Local Handoff Queue rules
 
@@ -108,23 +161,27 @@ A static queue example proves only packet mechanics. It cannot launch a Worker, 
 
 ```text
 SKILL.md
-  portable task/capability/Worker/convergence/handoff law
+  portable provider-neutral task/capability/Worker/convergence/handoff law
 
 references/
-  task, capability, scheduler, prompt and Local Handoff Queue schemas/examples
+  task/capability/scheduler/queue contracts plus trigger-selected control-plane contracts,
+  examples and frozen zero-context execution packets
 
 modules/
-  trigger-selected provider/runtime/tournament/vector/delivery interpretations
+  trigger-selected provider/runtime/projection/tournament/vector/delivery interpretations
 
 scripts/
-  deterministic shape, semantics, reachability, capability, scheduler and queue assertions
+  deterministic shape/semantics/reachability/capability/scheduler/queue assertions plus
+  bounded Codex/GitHub-DAG/Herdr/problem-closure adapters/checkers
 
 tests/
-  structural, causal, scheduler, queue and matched real-task falsifiers
+  structural/causal/scheduler/queue/matched-task falsifiers plus four control-plane selftests
 
 issues/PRs
   exact implementation, publication and evidence subjects
 ```
+
+`tests/run-all.sh` owns the shared deterministic denominator once a convergence subject contains all required files. Conditional "if file exists" skips are forbidden for required gates.
 
 ## Required gates before Worker admission
 
@@ -138,6 +195,8 @@ TASK_SCHEMA_ASSERTED
 ```
 
 A fixture receipt may prove the mechanism in fixture mode. It cannot advance a live runtime state.
+
+For the GitHub-DAG path, remote `blockedBy` readback must agree with the managed projection before dispatch eligibility is claimed. For Codex, a returned turn is followed by exact worktree/lease readback and then independent source/diff/test acceptance. For Herdr, `DONE_CANDIDATE` requires fresh identity/liveness/cleanup evidence and is followed by controller readback. Problem closure is recomputed only from the frozen denominator and typed exact-subject evidence.
 
 ## Required gates before Local Handoff execution
 
@@ -162,10 +221,16 @@ A queue cannot infer the runtime, command availability, secret access, provider 
 #232          independent Shadow/global objective
 #234          real Git Town + dual-forge delivery
 #256          GrepAI/SCIP/Tree-sitter/Serena/SQLite exact-subject receipts
+#375          live Codex SDK execution receipt remains open
+#376          live GitHub dependency mutation/readback remains open;
+              generic linked-PR ownership beyond closing references remains residual
+#377          live Herdr observation remains open
+#378          real source/provider claim closure remains evidence-dependent
+#379          shared deterministic convergence + route/index completeness
 ```
 
-These are independent evidence lanes, not artificial Git children. Semantic conflict resolution, provider activation, publication, merge, release, promotion, and rollback remain Human/trusted-operator boundaries.
+These are independent evidence/process lanes except where an explicit convergence subject consumes their bytes. Semantic conflict resolution, provider activation, publication, merge, release, promotion, and rollback remain Human/trusted-operator boundaries.
 
 ## Completion report
 
-Report changed paths, affected states/edges, frozen treatments, protected old strengths, task and queue subjects, local/global oracle results, denominator, process/worktree/lease/queue cleanup, exact PR Stack and workflow state, every `NOT_EXERCISED` lane, rollback subject, and Human Admit still required.
+Report changed paths, affected states/edges, frozen inputs, selected/consumed parent heads, protected old strengths, task/session/queue subjects, local/global oracle results, denominator, process/worktree/lease cleanup, exact PR/DAG/workflow state, superseded convergence epochs, every `NOT_EXERCISED` or evidence-dependent lane, rollback subject, and Human Admit still required.

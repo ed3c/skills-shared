@@ -3,7 +3,8 @@ set -eu
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 TMP=${TMPDIR:-/tmp}/agentic-tech-lead-receipt-$$.json
 QUEUE_TMP=${TMPDIR:-/tmp}/agentic-tech-lead-queue-receipt-$$.json
-trap 'rm -f "$TMP" "$QUEUE_TMP"' EXIT HUP INT TERM
+CONTROL_TMP=${TMPDIR:-/tmp}/agentic-tech-lead-control-plane-$$.md
+trap 'rm -f "$TMP" "$QUEUE_TMP" "$CONTROL_TMP"' EXIT HUP INT TERM
 
 # Prove the routing itself, including planted disconnections.
 python3 "$ROOT/scripts/check_runtime_reachability.py" --selftest
@@ -92,6 +93,50 @@ python3 "$ROOT/scripts/assert_repository_closure_contract.py" \
   --contract "$ROOT/references/example-repository-closure-contract.json" \
   --dag "$ROOT/references/example-issue-dual-dag.json" \
   --selftest
+
+# Execute the Codex/GitHub-DAG/Herdr/problem-closure control-plane denominator.
+# These are deterministic/offline gates. They intentionally do not invoke live
+# Codex SDK execution, GitHub dependency mutation, Herdr, or provider/source
+# evidence. A green result therefore cannot promote those lanes to live PASS.
+python3 - "$ROOT" <<'PYCP'
+import json, sys
+from pathlib import Path
+from jsonschema import Draft202012Validator
+
+root = Path(sys.argv[1])
+schemas = [
+    "references/contracts/codex-session-manifest.schema.json",
+    "references/contracts/codex-worker-result.schema.json",
+    "references/contracts/github-issue-dag-receipt.schema.json",
+    "references/contracts/github-ready-wave.schema.json",
+    "references/contracts/herdr-observer-receipt.schema.json",
+    "references/contracts/problem-closure.schema.json",
+]
+for rel in schemas:
+    schema = json.loads((root / rel).read_text(encoding="utf-8"))
+    Draft202012Validator.check_schema(schema)
+
+closure_schema = json.loads(
+    (root / "references/contracts/problem-closure.schema.json").read_text(encoding="utf-8")
+)
+closure_example = json.loads(
+    (root / "references/examples/problem-closure.example.json").read_text(encoding="utf-8")
+)
+errors = list(Draft202012Validator(closure_schema).iter_errors(closure_example))
+assert not errors, [error.message for error in errors]
+print("CONTROL-PLANE-SHAPE-GREEN 6 schemas; problem-closure example validated")
+PYCP
+python3 "$ROOT/tests/codex_sdk_controller_selftest.py"
+python3 "$ROOT/tests/github_issue_dag_selftest.py"
+python3 "$ROOT/tests/herdr_observer_selftest.py"
+python3 "$ROOT/tests/problem_closure_selftest.py"
+python3 "$ROOT/scripts/check_problem_closure.py" \
+  "$ROOT/references/examples/problem-closure.example.json" >/dev/null
+python3 "$ROOT/scripts/render_problem_closure.py" \
+  "$ROOT/references/examples/problem-closure.example.json" \
+  --output "$CONTROL_TMP"
+grep -F '> Generated projection. Machine truth remains the checked JSON ledger' \
+  "$CONTROL_TMP" >/dev/null
 
 # Freeze the portable Dual-Agent offload method contract and its exact-subject
 # handoff packet, and prove all sixteen semantic controls still turn red. No
