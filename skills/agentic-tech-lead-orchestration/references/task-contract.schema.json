@@ -4,15 +4,26 @@
   "type": "object",
   "additionalProperties": false,
   "required": [
-    "schema", "task_id", "mode", "subject", "goal", "paths", "architecture",
-    "case_obligations", "providers", "branches", "acceptance", "budgets", "automation"
+    "schema",
+    "task_id",
+    "mode",
+    "subject",
+    "goal",
+    "paths",
+    "architecture",
+    "providers",
+    "branches",
+    "acceptance",
+    "budgets",
+    "automation"
   ],
   "properties": {
     "schema": {"const": "agentic-tech-lead/task-contract/v1"},
     "task_id": {"type": "string", "minLength": 1},
     "mode": {"enum": ["STACK", "TOURNAMENT"]},
     "subject": {
-      "type": "object", "additionalProperties": false,
+      "type": "object",
+      "additionalProperties": false,
       "required": ["base_commit", "base_tree"],
       "properties": {
         "base_commit": {"type": "string", "pattern": "^[0-9a-f]{7,64}$"},
@@ -20,7 +31,8 @@
       }
     },
     "goal": {
-      "type": "object", "additionalProperties": false,
+      "type": "object",
+      "additionalProperties": false,
       "required": ["objective", "non_goals"],
       "properties": {
         "objective": {"type": "string", "minLength": 1},
@@ -28,7 +40,8 @@
       }
     },
     "paths": {
-      "type": "object", "additionalProperties": false,
+      "type": "object",
+      "additionalProperties": false,
       "required": ["write", "read_only", "forbidden", "changed"],
       "properties": {
         "write": {"type": "array", "minItems": 1, "items": {"type": "string"}},
@@ -38,13 +51,16 @@
       }
     },
     "architecture": {
-      "type": "object", "additionalProperties": false,
+      "type": "object",
+      "additionalProperties": false,
       "required": ["interface_locks", "dependency_policy", "allowed_dependencies", "state_policy", "no_double_graph"],
       "properties": {
         "interface_locks": {
-          "type": "array", "minItems": 1,
+          "type": "array",
+          "minItems": 1,
           "items": {
-            "type": "object", "additionalProperties": false,
+            "type": "object",
+            "additionalProperties": false,
             "required": ["path", "sha256"],
             "properties": {
               "path": {"type": "string", "minLength": 1},
@@ -59,16 +75,20 @@
       }
     },
     "case_obligations": {
-      "type": "object", "additionalProperties": false,
+      "description": "Optional additive ICPG sidecar. Required by orchestration when an admitted spatial-loop-case-graph/v1 is supplied upstream; legacy/non-ICPG v1 packets may omit it.",
+      "type": "object",
+      "additionalProperties": false,
       "required": ["case_graph_ref", "case_graph_sha256", "required_case_ids", "branch_case_owners", "convergence_owner"],
       "properties": {
         "case_graph_ref": {"type": "string", "minLength": 1},
         "case_graph_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
         "required_case_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
         "branch_case_owners": {
-          "type": "array", "minItems": 1,
+          "type": "array",
+          "minItems": 1,
           "items": {
-            "type": "object", "additionalProperties": false,
+            "type": "object",
+            "additionalProperties": false,
             "required": ["branch", "case_ids"],
             "properties": {
               "branch": {"type": "string", "minLength": 1},
@@ -80,16 +100,19 @@
       }
     },
     "providers": {
-      "type": "array", "minItems": 2,
+      "type": "array",
+      "minItems": 2,
       "items": {
-        "type": "object", "additionalProperties": false,
+        "type": "object",
+        "additionalProperties": false,
         "required": ["id", "role", "state"],
         "properties": {
           "id": {"type": "string", "minLength": 1},
           "role": {"type": "string", "minLength": 1},
           "state": {"enum": ["EXACT", "DEGRADED", "BLOCKED"]},
           "subject": {
-            "type": "object", "additionalProperties": false,
+            "type": "object",
+            "additionalProperties": false,
             "required": ["commit", "tree", "version", "coverage_sha256", "source_readback"],
             "properties": {
               "commit": {"type": "string", "pattern": "^[0-9a-f]{7,64}$"},
@@ -103,9 +126,11 @@
       }
     },
     "branches": {
-      "type": "array", "minItems": 1,
+      "type": "array",
+      "minItems": 1,
       "items": {
-        "type": "object", "additionalProperties": false,
+        "type": "object",
+        "additionalProperties": false,
         "required": ["name", "parent", "focus", "write"],
         "properties": {
           "name": {"type": "string", "minLength": 1},
@@ -116,7 +141,8 @@
       }
     },
     "acceptance": {
-      "type": "object", "additionalProperties": false,
+      "type": "object",
+      "additionalProperties": false,
       "required": ["commands", "immutable_assertions"],
       "properties": {
         "commands": {"type": "array", "minItems": 1, "items": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}},
@@ -124,7 +150,8 @@
       }
     },
     "budgets": {
-      "type": "object", "additionalProperties": false,
+      "type": "object",
+      "additionalProperties": false,
       "required": ["max_repairs_per_signature", "max_workers"],
       "properties": {
         "max_repairs_per_signature": {"type": "integer", "minimum": 0, "maximum": 3},
@@ -132,7 +159,8 @@
       }
     },
     "automation": {
-      "type": "object", "additionalProperties": false,
+      "type": "object",
+      "additionalProperties": false,
       "required": ["git_town_admitted", "auto_restack", "auto_publish", "auto_resolve_conflicts", "auto_merge"],
       "properties": {
         "git_town_admitted": {"type": "boolean"},
