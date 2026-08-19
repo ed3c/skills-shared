@@ -34,32 +34,48 @@ PR #308 task/schema/semantic/capability reachability + Local Handoff contract
 The Codex control-plane extension is a separate sibling/convergence program:
 
 ```text
-#375 / PR #451  Codex SDK controller/session adapter      STATIC_ADMITTED / SIBLING
-#376 / PR #452  GitHub Issue DAG projection              STATIC_ADMITTED / SIBLING
-#377 / PR #453  Herdr runtime observer                   STATIC_ADMITTED / SIBLING
-#378 / PR #454  problem-closure ledger                   STATIC_ADMITTED / SIBLING
+#375 / PR #451  Codex SDK controller/session adapter      SIBLING
+#376 / PR #452  GitHub Issue DAG projection              SIBLING
+#377 / PR #453  Herdr runtime observer                   SIBLING
+#378 / PR #454  problem-closure ledger                   SIBLING
 PR #380         traceability/document routing foundation  DOCUMENTATION SIBLING
        ↓ exact consumed bytes
-#379             one multi-parent convergence owner       CONVERGENCE
+#379 / PR #455  one multi-parent convergence owner       CONVERGENCE
 ```
 
-`#379` is allowed to consume those exact unmerged sibling bytes because convergence is its job. That does **not** make #375→#376→#377→#378 a serial Stack. A `TRUE_CHILD` edge requires a named byte/contract dependency between the actual child and parent.
+`#379` may consume those exact unmerged sibling bytes because convergence is its job. That does **not** make #375→#376→#377→#378 a serial Stack. A `TRUE_CHILD` edge requires a named byte/contract dependency between the actual child and parent.
 
-Current evidence ceilings remain:
+Current mechanism/evidence split:
 
 ```text
-Codex SDK mechanism                    IMPLEMENTED_ON_CONVERGENCE_SUBJECT
-Codex SDK live thread/turn             NOT_EXERCISED
-GitHub DAG mechanism                   IMPLEMENTED_ON_CONVERGENCE_SUBJECT
-GitHub remote dependency mutation      NOT_EXERCISED
-Herdr observer mechanism               IMPLEMENTED_ON_CONVERGENCE_SUBJECT
-Herdr live observation                 NOT_EXERCISED
-problem-closure mechanism              IMPLEMENTED_ON_CONVERGENCE_SUBJECT
-real article/PDF/provider closure      EVIDENCE_DEPENDENT
-merge/release                          HUMAN_ADMIT_REQUIRED
+Codex SDK mechanism
+  exact worktree HEAD/tree/clean preflight + writable-lease readback implemented
+Codex SDK live thread/turn
+  NOT_EXERCISED
+
+GitHub DAG mechanism
+  completion-edge projection + repo/default-branch/visibility + expected issue-state
+  + closing-PR-reference duplicate preflight implemented
+Generic development-link ownership beyond closing references
+  RESIDUAL / do not overclaim from closedByPullRequestsReferences
+GitHub remote dependency mutation/readback
+  NOT_EXERCISED
+
+Herdr observer mechanism
+  IMPLEMENTED_ON_CONVERGENCE_SUBJECT
+Herdr live observation
+  NOT_EXERCISED
+
+problem-closure mechanism
+  IMPLEMENTED_ON_CONVERGENCE_SUBJECT
+real article/PDF/provider closure
+  EVIDENCE_DEPENDENT
+
+merge/release
+  HUMAN_ADMIT_REQUIRED
 ```
 
-A shared deterministic suite may raise a mechanism from `STATIC_ADMITTED` to deterministic/exact-head evidence for the convergence subject. It cannot raise any live lane.
+A shared deterministic suite may prove the exact convergence mechanism. It cannot raise any live lane.
 
 ## Writer, path, and attempt rules
 
@@ -70,18 +86,23 @@ A shared deterministic suite may raise a mechanism from `STATIC_ADMITTED` to det
 - Contracts, acceptance oracles, frozen treatment fixtures, owning eval definitions, global-objective assertions, queue schemas, and evidence ceilings are read-only to implementation Workers.
 - Failed, stale, blocked, cancelled, superseded, losing, and refused attempts remain in the denominator.
 - An Agent may not weaken tests, change interface locks, erase a predecessor, rewrite a receipt, or delete an unmanaged remote dependency to make an implementation pass.
+- Any sibling head change after convergence freezes a new epoch: re-read exact head/tree, compare changed bytes, rebind the convergence ancestry, rerun hosted gates, and supersede the earlier Shadow verdict. Never call an earlier green convergence current after one consumed parent moves.
 
 ## Codex control-plane authority boundaries
 
 ```text
 codex-sdk-controller
   may start/resume one compatible SDK thread and return a bounded runtime receipt
+  must bind exact 40-hex HEAD/tree and a clean worktree before execution
+  must read changed paths after the turn and refuse read-only/out-of-lease mutation
   may not plan the DAG, admit a result, merge, release, or persist credentials/private reasoning
 
 github-issue-dag-projection
   may project validated completion-readiness edges and read them back
+  may bind repository visibility/default branch, expected issue state and closing PR refs
   may add missing managed edges only on explicit apply
   may not delete extra unmanaged blockers or treat GitHub metadata as semantic truth
+  may not claim generic linked-PR ownership beyond the observed closing-reference surface
 
 herdr-runtime-observer
   may observe workspace/pane/process/session/worktree identity
@@ -166,7 +187,7 @@ TASK_SCHEMA_ASSERTED
 
 A fixture receipt may prove the mechanism in fixture mode. It cannot advance a live runtime state.
 
-For the GitHub-DAG path, remote `blockedBy` readback must agree with the managed projection before dispatch eligibility is claimed. For Codex, a returned turn is still followed by independent source/diff/test readback. For Herdr, `DONE_CANDIDATE` is followed by the same controller readback. Problem closure is recomputed only from typed admitted evidence.
+For the GitHub-DAG path, remote `blockedBy` readback must agree with the managed projection before dispatch eligibility is claimed. For Codex, a returned turn is followed by exact worktree/lease readback and then independent source/diff/test acceptance. For Herdr, `DONE_CANDIDATE` is followed by controller readback. Problem closure is recomputed only from typed admitted evidence.
 
 ## Required gates before Local Handoff execution
 
@@ -192,7 +213,8 @@ A queue cannot infer the runtime, command availability, secret access, provider 
 #234          real Git Town + dual-forge delivery
 #256          GrepAI/SCIP/Tree-sitter/Serena/SQLite exact-subject receipts
 #375          live Codex SDK execution receipt remains open
-#376          live GitHub dependency mutation/readback + remote preflight remains open
+#376          live GitHub dependency mutation/readback remains open;
+              generic linked-PR ownership beyond closing references remains residual
 #377          live Herdr stale/orphan/residue observation remains open
 #378          real source/provider claim closure remains evidence-dependent
 #379          shared deterministic convergence + route/index completeness
@@ -202,4 +224,4 @@ These are independent evidence/process lanes except where an explicit convergenc
 
 ## Completion report
 
-Report changed paths, affected states/edges, frozen inputs, protected old strengths, task/session/queue subjects, local/global oracle results, denominator, process/worktree/lease cleanup, exact PR/DAG/workflow state, every `NOT_EXERCISED` or evidence-dependent lane, rollback subject, and Human Admit still required.
+Report changed paths, affected states/edges, frozen inputs, consumed parent heads, protected old strengths, task/session/queue subjects, local/global oracle results, denominator, process/worktree/lease cleanup, exact PR/DAG/workflow state, superseded convergence epochs, every `NOT_EXERCISED` or evidence-dependent lane, rollback subject, and Human Admit still required.

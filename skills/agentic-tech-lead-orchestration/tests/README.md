@@ -4,18 +4,20 @@
 
 ## Codex control-plane denominator — #375–#378
 
-The convergence suite now executes four required selftests unconditionally:
+The convergence suite executes four required selftests unconditionally. Current frozen denominator for the convergence epoch:
 
 | Test | Positive denominator | Mutation denominator | Live lane |
 |---|---:|---:|---|
-| `codex_sdk_controller_selftest.py` | 2 | 8 | `NOT_EXERCISED` |
-| `github_issue_dag_selftest.py` | 5 | 9 | `NOT_EXERCISED` |
+| `codex_sdk_controller_selftest.py` | 4 | 14 | `NOT_EXERCISED` |
+| `github_issue_dag_selftest.py` | 6 | 17 | `NOT_EXERCISED` |
 | `herdr_observer_selftest.py` | 4 | 9 | `NOT_EXERCISED` |
 | `problem_closure_selftest.py` | 4 | 11 | evidence-dependent |
 
+The Codex denominator includes exact 40-hex subject checks, clean-worktree preflight, ancestor/descendant lease conflict, repository-path escape refusal, and post-turn changed-file readback that rejects read-only/out-of-lease mutations. The GitHub-DAG denominator includes repository visibility/default-branch binding, expected issue state, closing-PR reference ownership checks, graph/readback drift and destructive extra-edge refusal. Generic development-link ownership beyond the closing-reference surface remains a separate residual; the deterministic test does not claim broader GitHub linkage semantics than it exercises.
+
 The suite also validates six new JSON Schemas as Draft 2020-12, validates `references/examples/problem-closure.example.json`, runs the deterministic closure checker, renders its Markdown human projection, and asserts that the projection still declares machine JSON as authority.
 
-No required control uses an `if file exists` skip. The #379 convergence subject contains the exact #451–#454 sibling bytes first, then wires the shared gate. This keeps a green result from being green merely because a sibling file was absent.
+No required control uses an `if file exists` skip. The #379 convergence subject contains the exact current sibling bytes first, then wires the shared gate. This keeps a green result from being green merely because a sibling file was absent.
 
 The shared suite intentionally does **not**:
 

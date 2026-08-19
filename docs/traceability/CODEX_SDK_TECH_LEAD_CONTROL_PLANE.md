@@ -1,30 +1,65 @@
 # Codex SDK Tech Lead Control Plane — Shadow-monitored trace
 
-Status: `STATIC_IMPLEMENTATION_CONVERGENCE_IN_PROGRESS`.
+Status: `STATIC_DETERMINISTIC_CONVERGENCE_REVALIDATION_REQUIRED`.
 
-The provider-specific mechanisms for issues #375–#378 are implemented on exact sibling subjects and consumed by the #379 multi-parent convergence subject. Their **live** runtime/effect lanes remain `NOT_EXERCISED` or evidence-dependent until exact receipts exist. This document is navigation/traceability, not runtime authority.
+This document is the human trace for issues #375–#379. Machine/runtime authority remains with exact Git ancestry, schemas/checkers, current GitHub metadata, hosted workflows, provider/runtime receipts and Human repository policy. A green earlier convergence is historical the moment any consumed sibling head moves.
 
-## Exact implementation and convergence subjects
+## Current epoch
 
-Frozen sibling heads, all based directly on `main@ccef97dedd7ea8b1873e3afa130ca82b8eabb413`:
+Current repository base observed for this convergence family:
 
 ```text
-#375 / PR #451  339ae874b070fb3a8a5fa89b0241d90434257e99  SIBLING
-#376 / PR #452  b5295df681d6471b19775db38860b2d151339879  SIBLING
+main@4ca9417b1da5ff32f1d4d3e7af64a15908749024
+```
+
+Current sibling heads to be consumed by #379:
+
+```text
+#375 / PR #451  86f9e8d940b76cb71b713c098ff09cb68eb4e0c1  SIBLING
+#376 / PR #452  426fb6f6f548f71572d4402e73e0b05ecf6f8aa8  SIBLING
 #377 / PR #453  5b6e58d1e7e9e127123dbb4a9189b98e5ff973cf  SIBLING
 #378 / PR #454  32c5425de1cf4f083bd998e81873a86af8771e1e  SIBLING
+#380            7a9d68fcd58b1ed78ed6d05595a8df7eae53f5a5  DOCUMENTATION SIBLING
 ```
 
-Each of #451–#454 independently reached exact-head:
+Current hardened-parent refresh already recorded in Git:
 
 ```text
-Skill Suites          SUCCESS
-Shared Skills Infra   SUCCESS
-Skill Eval Contract   SUCCESS
-Shadow verdict        STATIC_ADMITTED
+5d21ecab137cb26586ef1636dc279ee29733e913
+parents:
+  prior #455 convergence head 35874af7a6d04783983b05c8f1b1e402471b4451
+  #451 current head            86f9e8d940b76cb71b713c098ff09cb68eb4e0c1
+  #452 current head            426fb6f6f548f71572d4402e73e0b05ecf6f8aa8
 ```
 
-Their rejected predecessor candidates remain visible rather than rewritten away:
+The mutable final #455 head is deliberately **not** self-embedded. Read it from GitHub after every convergence edit. The static/hardened epoch becomes current only after exact-head hosted gates and independent Shadow readback complete again.
+
+## Historical convergence epochs
+
+Epoch 1 remains immutable evidence, not current truth:
+
+```text
+c0f6979f80038394350aea724c598c8dba5ac338
+parents:
+  ccef97dedd7ea8b1873e3afa130ca82b8eabb413  historical main
+  339ae874b070fb3a8a5fa89b0241d90434257e99  historical #451 head
+  b5295df681d6471b19775db38860b2d151339879  historical #452 head
+  5b6e58d1e7e9e127123dbb4a9189b98e5ff973cf  #453
+  32c5425de1cf4f083bd998e81873a86af8771e1e  #454
+union tree:
+  37cb2c56e7dfc939cacaa0f65cf8f9b0f8318b22
+```
+
+Documentation was then admitted through:
+
+```text
+af427a13a7096df91d74a48c0a4ca6ce3f3e2ac9
+parents: c0f6979f... + PR #380 head 7a9d68fc...
+```
+
+Shared routes/tests were added and current-main-at-the-time refreshed through `35874af7...`. That head passed Skill Suites, Shared Skills Infra, Skill Eval Contract and Git Town Stacked PR Worker, and received a Shadow `ELIGIBLE_FOR_HUMAN_ADMIT` verdict **for Epoch 1 only**. The verdict was superseded when #451/#452 moved.
+
+Rejected first candidates remain visible:
 
 ```text
 #444 → #451
@@ -33,39 +68,31 @@ Their rejected predecessor candidates remain visible rather than rewritten away:
 #447 → #454
 ```
 
-The first #379 integration commit is:
-
-```text
-c0f6979f80038394350aea724c598c8dba5ac338
-```
-
-Its parents are current main plus all four sibling heads. Its tree `37cb2c56e7dfc939cacaa0f65cf8f9b0f8318b22` contains the exact admitted sibling blobs. Therefore Git itself records the convergence dependency without serializing the siblings into a false Stack.
-
-PR #380 is a documentation sibling. Its exact head `7a9d68fcd58b1ed78ed6d05595a8df7eae53f5a5` is admitted as an additional documentation parent by immutable integration commit:
-
-```text
-af427a13a7096df91d74a48c0a4ca6ce3f3e2ac9
-```
-
-Both PR #380 non-merge commits carry valid `Driven-By: human` / `Driven-On: chatgpt-github-connector` trailers, so the documentation ancestry does not weaken the repository commit-role gate.
+They were closed unmerged after commit-role provenance failed. Failure lineage is not erased to make the successful path appear cleaner.
 
 ## Ownership
 
 ```text
-skills-shared
-  portable method + trigger-selected contracts/modules/checkers/evals + Agent routes
+agentic-tech-lead-orchestration
+  semantic task/capability/dual-DAG law, leases, Worker admission, convergence, handoff
 
-runtime-env / consumer runtime
-  Codex SDK installation/auth state, Herdr installation, process/session execution,
-  local worktree/tool/provider capabilities
+Codex SDK adapter (#375)
+  one bounded task/session attempt and runtime-result receipt
 
-consumer repository
-  issue/PR identities, worktrees, branches, path/resource leases, exact commands,
-  provider/session receipts and business acceptance
+GitHub Issue DAG adapter (#376)
+  durable completion-edge projection/readback plus remote preflight
+
+Herdr observer (#377)
+  optional process/worktree/session observation only
+
+problem-closure ledger (#378)
+  source→problem→task/DAG→session/evidence→Shadow reconciliation
+
+#379 convergence
+  shared run-all / Agent routes / README / Shadow / Git Town / traceability
 
 Human / repository authority
-  semantic conflict, merge, release, visibility/access/license/permission widening,
-  destructive dependency removal, rollback and promotion
+  semantic conflict, unmanaged dependency deletion, merge, release, promotion, rollback
 ```
 
 ## Directory → State Machine responsibility
@@ -86,7 +113,7 @@ skills/agentic-tech-lead-orchestration/
 │   ├── examples/
 │   │   ├── herdr-runtime-binding.example.json            #377
 │   │   └── problem-closure.example.json                  #378
-│   └── execution-packets/375..378                        frozen zero-context task contracts
+│   └── execution-packets/375..378                        frozen task packets
 ├── modules/
 │   ├── codex-sdk-controller.md                           #375
 │   ├── github-issue-dag-projection.md                    #376
@@ -97,7 +124,7 @@ skills/agentic-tech-lead-orchestration/
 │   ├── github_issue_dag_projection.py                    #376
 │   ├── herdr_runtime_observer.py                         #377
 │   ├── check_problem_closure.py                          #378
-│   └── render_problem_closure.py                         #378 human projection
+│   └── render_problem_closure.py                         #378
 └── tests/
     ├── codex_sdk_controller_selftest.py                  #375
     ├── github_issue_dag_selftest.py                      #376
@@ -108,13 +135,13 @@ skills/procedural-shadow-runtime/
 └── independent same-subject applicability/contradiction/evidence-ceiling review
 
 skills/git-town-stacked-pr-worker/
-└── Molecular relation/index vocabulary and terminal branch/PR traceability
+└── molecular relation/index vocabulary and terminal branch/PR traceability
 
 docs/traceability/
-└── human projections that route to exact Git/schema/receipt/workflow subjects
+└── human projections; never a second machine authority
 ```
 
-## End-to-end control-plane State Machine
+## End-to-end State Machine
 
 ```text
 SOURCE / ISSUE / ARTICLE / PDF / PRD
@@ -123,13 +150,15 @@ SOURCE / ISSUE / ARTICLE / PDF / PRD
 → TASK_DAG_COMPILED
 → TASK_DAG_ASSERTED
 → GITHUB_PROJECTION_COMPILED                  #376
+→ REMOTE_PREFLIGHT_BOUND
 → REMOTE_READBACK_REQUIRED
 → READY_WAVE_COMPUTED
 → SESSION_PACKET_COMPILED                     #375
-→ ISOLATED_WORKTREE_BOUND
+→ EXACT_WORKTREE_SUBJECT_BOUND
 → CODEX_THREAD_STARTED | COMPATIBLE_RESUME
 → ATTEMPT_EXECUTED
 → STRUCTURED_RESULT_COLLECTED
+→ POST_TURN_LEASE_READBACK
 → CONTROLLER_SOURCE_DIFF_TEST_READBACK_REQUIRED
 → HERDR_OBSERVATION_OPTIONAL                  #377
 → INDEPENDENT_SHADOW_RECONCILIATION
@@ -139,83 +168,102 @@ SOURCE / ISSUE / ARTICLE / PDF / PRD
 → NEXT_WAVE | LOCAL_HANDOFF | HUMAN_ADMIT_REQUIRED
 ```
 
-A Herdr terminal `done`, Codex model prose, issue close, PR merge, workflow green, Google/CodexDoc link, article/PDF prose, or documentation update cannot skip a state.
+A Herdr terminal `done`, Codex model prose, issue close, PR merge, workflow green, article/PDF prose or documentation update cannot skip a state.
 
-## Dual DAG and GitHub projection
+## #375 — subscription-safe Codex SDK runtime adapter
 
-The controller maintains two semantic edge classes:
-
-```text
-start-readiness
-  predecessor output is readable enough to begin downstream work
-
-completion-readiness
-  predecessor must be independently admitted before downstream completion
-```
-
-GitHub exposes one dependency relation. The #376 adapter therefore projects only explicitly marked `completion` edges to `blockedBy`.
-
-```text
-portable semantic dual DAG
-→ validate cycle/self/duplicate/unknown-node + graph digest
-→ desired GitHub blockedBy set
-→ exact remote readback
-→ missing managed edges may be added only on explicit --apply
-→ extra remote blockers fail closed; they are never auto-deleted
-→ ready-wave projection
-```
-
-GitHub dependency state is a durable collaboration projection, not semantic truth by itself.
-
-## Codex SDK session execution
-
-#375 binds a frozen task to one worktree/session attempt:
+Current deterministic mechanism binds:
 
 ```text
 task_id + attempt_id
-repo/base/tree + worktree
-allowed/read-only paths
-prompt + prompt digest
+exact 40-hex base commit + tree
+clean Git worktree
+repository-relative allowed/read-only path leases
+prompt + digest
 predecessor receipts
 new | resume-compatible thread policy
-→ official openai-codex SDK
-→ existing signed-in Codex/ChatGPT authentication
-→ TurnResult identifiers/status
-→ RUNTIME_RESULT_ONLY
-→ controller source/diff/test readback still required
 ```
 
-Repository paths reject absolute/`..` escapes and ancestor/descendant writable/read-only overlap. Credentials, refresh/access tokens, full model prose and private reasoning are forbidden durable control-plane fields. The adapter does not require a repository-stored API key.
+Before `openai-codex` is invoked, the adapter verifies the worktree exists, is a Git worktree, has exact `HEAD == base_sha`, exact `HEAD^{tree} == tree_sha`, and is clean. After the turn, it reads changed/untracked paths and rejects any read-only or out-of-lease mutation. `Sandbox.workspace_write` therefore does not make path leases documentary-only.
 
-## Herdr observer
+Durable control-plane state excludes API keys, access/refresh tokens, browser-login artifacts, full model prose and private reasoning. Existing signed-in Codex/ChatGPT authentication is reused on the live path; no repository API key is required.
 
-Herdr is optional and non-authoritative:
+Current deterministic selftest denominator:
+
+```text
+positive=4
+mutations=14
+live=NOT_EXERCISED
+```
+
+A live SDK turn remains `RUNTIME_RESULT_ONLY`; independent source/diff/test acceptance still follows.
+
+## #376 — GitHub Issue Dependencies projection
+
+The portable DAG retains two semantic edges:
+
+```text
+start-readiness
+completion-readiness
+```
+
+Only explicitly marked completion-readiness edges may project to GitHub `blockedBy`.
+
+Before live mutation, the adapter binds/re-reads:
+
+```text
+exact owner/name repository
+visibility
+expected default branch
+every issue number + expected OPEN/CLOSED state
+closing pull-request references exposed by closedByPullRequestsReferences
+```
+
+It refuses repository identity/visibility/default-branch drift, stale issue state, more than one open **closing-reference** PR, cycle/self/unknown-node defects, malformed readback, graph-digest drift and extra unmanaged remote blockers. `--apply` may add missing managed blockers only; extra blockers fail before mutation and are not auto-deleted. Preflight must remain stable across mutation/readback.
+
+Important ceiling: `closedByPullRequestsReferences` proves the closing-reference surface. It does **not** by itself prove uniqueness across every possible GitHub development-link/cross-reference mechanism. Generic linked-PR ownership remains residual until a broader exact readback is implemented/admitted.
+
+Current deterministic selftest denominator:
+
+```text
+positive=6
+mutations=17
+live=NOT_EXERCISED
+```
+
+Live dependency mutation/readback against an admitted issue graph remains separate evidence.
+
+## #377 — Herdr optional observer
+
+Herdr remains optional and non-authoritative:
 
 ```text
 worktree allocated
-→ optional Herdr target
+→ optional target
 → pane/workspace/process/native-session/foreground_cwd identity
 → RUNNING | BLOCKED | IDLE | DONE_CANDIDATE | UNKNOWN
 → controller readback required
 ```
 
-`foreground_cwd` binds the observed process to the expected worktree by default. Herdr absence emits `UNAVAILABLE_FALLBACK` and preserves the direct Codex SDK + git worktree path. No transcript/private reasoning/credential body becomes durable receipt truth.
+`foreground_cwd` binds the observed process to the expected worktree by default. Absence emits `UNAVAILABLE_FALLBACK` and preserves direct Codex SDK + standard git worktree execution. Transcript/private reasoning/credential bodies are not durable receipt truth.
 
-## Problem closure chain
+Current deterministic denominator: `positive=4, mutations=9, live=NOT_EXERCISED`.
+
+## #378 — problem closure
 
 ```text
 source identity + exact location
 → problem id
-→ applicability / superseded route where applicable
-→ exact repo/commit/tree subject
-→ task nodes + DAG nodes + GitHub issues
-→ session / attempt / worktree trace
+→ applicability / superseded route
+→ exact repo/commit/tree
+→ task + DAG + GitHub issue
+→ session / attempt / worktree
 → implementation evidence
 → typed verification evidence + matching receipts
-→ merge subjects as provenance only
+→ merge provenance only
 → Shadow verdict
 → residual gaps
-→ independently recomputed closure state
+→ independently recomputed closure
 ```
 
 Allowed closure values:
@@ -230,42 +278,54 @@ NOT_APPLICABLE
 HUMAN_ADMIT_REQUIRED
 ```
 
-`issue closed == solved`, `PR merged == verification`, and `local/CI == provider-live` are forbidden substitutions. `render_problem_closure.py` emits a human projection only after the JSON ledger passes deterministic checking.
+Issue close/PR merge are not verification lanes, local/CI cannot promote to provider-live, and the Markdown renderer remains a human projection after JSON validation.
 
-## #379 shared deterministic convergence gate
+Current deterministic denominator: `positive=4, mutations=11`; real article/PDF/provider claims remain evidence-dependent.
 
-The convergence subject owns shared routes and test wiring after it contains the exact sibling bytes:
+## #379 shared convergence gate
 
-```text
-six Draft-2020-12 control-plane schemas validated
-→ problem-closure positive example validated
-→ codex_sdk_controller_selftest.py             2 positive / 8 mutations
-→ github_issue_dag_selftest.py                 5 positive / 9 mutations
-→ herdr_observer_selftest.py                   4 positive / 9 mutations
-→ problem_closure_selftest.py                  4 positive / 11 mutations
-→ deterministic closure checker
-→ Markdown projection non-authority marker
-→ existing ATL full suite
-```
-
-Required selftests are unconditional. A missing file must make the suite fail; `if file exists` is not an accepted convergence strategy.
-
-## Molecular delivery relations
+The exact convergence subject must contain the current sibling bytes **before** the shared gate is wired/read. Required gates are unconditional:
 
 ```text
-#375  SIBLING
-#376  SIBLING
-#377  SIBLING
-#378  SIBLING
-#380  SIBLING / DOCUMENTATION
-#379  CONVERGENCE consuming exact sibling heads
-Shadow EXTERNAL_EVIDENCE / PROCESS_DEPENDENCY for admission
-live provider receipts EXTERNAL_EVIDENCE
+6 Draft-2020-12 schemas
+problem-closure example
+codex_sdk_controller_selftest.py             4 / 14
+github_issue_dag_selftest.py                 6 / 17
+herdr_observer_selftest.py                   4 / 9
+problem_closure_selftest.py                  4 / 11
+closure checker + Markdown non-authority marker
+existing ATL full suite
 ```
 
-A `TRUE_CHILD` appears only if an actual branch consumes another branch's named unmerged bytes as its base dependency. The current implementation siblings do not.
+No `if file exists` bypass is accepted.
 
-## Cold-start read route
+Hosted admission denominator for the **final current #455 head** must include:
+
+```text
+Skill Suites
+Shared Skills Infra
+Skill Eval Contract
+Git Town Stacked PR Worker
+```
+
+The earlier all-green `35874af7...` run is historical after parent movement. The current hardened-parent convergence must rerun every required hosted gate before Shadow may emit a new current verdict.
+
+## Molecular relations
+
+```text
+#375 SIBLING
+#376 SIBLING
+#377 SIBLING
+#378 SIBLING
+#380 DOCUMENTATION SIBLING
+#379 CONVERGENCE consuming exact current sibling heads
+Shadow EXTERNAL_EVIDENCE / PROCESS_DEPENDENCY
+live Codex / GitHub mutation / Herdr / real source closure EXTERNAL_EVIDENCE
+```
+
+A multi-parent convergence records consumed sibling bytes without making the siblings children of one another.
+
+## Cold-start route
 
 ```text
 root AGENTS.md
@@ -274,37 +334,29 @@ root AGENTS.md
 → docs/traceability/AGENTS.md
 → this trace
 → agentic-tech-lead-orchestration/AGENTS.md + README + SKILL.md
-→ selected execution packet + selected module/contracts only
+→ selected execution packet + module/contracts only
 → procedural-shadow-runtime README
 → git-town-stacked-pr-worker README
 → issues #375–#379 / current PR metadata
 → exact Git/workflow/runtime/receipt subjects
 ```
 
-Chat history is not a required dependency.
+Chat history is not required.
 
-## Current Shadow verdict / residual work
+## Current residual/evidence ceiling
 
 ```text
-portable Tech Lead core                         IMPLEMENTED
-issue dual-DAG contract                         IMPLEMENTED
-Molecular Stack method                          IMPLEMENTED
-independent Shadow procedure                    IMPLEMENTED
-#375 static Codex SDK mechanism                 STATIC_ADMITTED / CONSUMED_BY_#379
-#376 static GitHub DAG mechanism                STATIC_ADMITTED / CONSUMED_BY_#379
-#377 static Herdr observer mechanism            STATIC_ADMITTED / CONSUMED_BY_#379
-#378 deterministic closure mechanism            STATIC_ADMITTED / CONSUMED_BY_#379
-#380 documentation foundation                   CONSUMED_BY_#379
-#379 shared route/test/index convergence        IN_PROGRESS on exact integration subject
-live Codex SDK session execution                NOT_EXERCISED
-live GitHub dependency mutation/readback         NOT_EXERCISED
-live Herdr observation                          NOT_EXERCISED
-real article/PDF/provider closure               EVIDENCE_DEPENDENT
-merge/release                                   HUMAN_ADMIT_REQUIRED
+#375 static mechanism with worktree/lease readback      IMPLEMENTED / awaiting current convergence revalidation
+#375 live Codex SDK execution                           NOT_EXERCISED
+#376 static projection + remote preflight mechanism     IMPLEMENTED / awaiting current convergence revalidation
+#376 generic linked-PR ownership beyond closing refs    RESIDUAL
+#376 live GitHub dependency mutation/readback           NOT_EXERCISED
+#377 static observer mechanism                          IMPLEMENTED / awaiting current convergence revalidation
+#377 live stale/orphan/residue observation              NOT_EXERCISED
+#378 deterministic closure mechanism                    IMPLEMENTED / awaiting current convergence revalidation
+#378 real article/PDF/provider closure                  EVIDENCE_DEPENDENT
+#379 shared route/test/index convergence                REVALIDATING current parent epoch
+merge/release                                           HUMAN_ADMIT_REQUIRED
 ```
 
-#376 still owns live repository/default-branch/visibility, stale issue and duplicate linked-PR preflight proof. #377 still owns live stale/orphan/residue observation. #378 real source/provider claims can legitimately stay OPEN/PARTIAL/HUMAN_ADMIT_REQUIRED.
-
-## Evidence ceiling
-
-This trace can report exact Git ancestry, file routes, deterministic tests and hosted workflow states only after those subjects are observed. It cannot prove live Codex, live Herdr, GitHub dependency effects, provider behavior, production safety, Human Admit, merge or release.
+Only after the current final #455 head passes the complete hosted denominator and independent Shadow readback may the static/deterministic convergence return to `ELIGIBLE_FOR_HUMAN_ADMIT`. That verdict still does not prove any live lane or authorize merge/release.

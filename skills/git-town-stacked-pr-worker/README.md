@@ -1,73 +1,40 @@
 # `git-town-stacked-pr-worker`
 
-Portable method for coordinating multiple Worker Agents with Git Town, isolated linked worktrees, eval-first task packets, bounded no-push synchronization, molecular issue/PR traceability, and Human Admit. This Skill does not own a consumer repository's branches, `.git-town.toml`, CI, remotes, receipts, merge, release, or promotion.
+Portable method for coordinating multiple Worker Agents with Git Town, isolated linked worktrees, eval-first task packets, bounded no-push synchronization, molecular issue/PR traceability, explicit multi-parent convergence, and Human Admit. This Skill does not own a consumer repository's branches, `.git-town.toml`, CI, remotes, receipts, merge, release, or promotion.
 
 ## Read order
 
 1. [`SKILL.md`](SKILL.md) — portable operating law.
-2. This README — directory ownership, State Machines, DAG rules, data flow and Stack indexes.
-3. [`SYSTEM_PROMPT.md`](SYSTEM_PROMPT.md) — reusable Worker instruction body.
-4. [`PUBLICATION_POLICY.md`](PUBLICATION_POLICY.md) — publication and no-push boundary.
-5. [`references/ADOPTION.md`](references/ADOPTION.md) — consumer adoption path.
-6. [`references/REPO_PROFILE.template.md`](references/REPO_PROFILE.template.md) — repository-owned values.
-7. [`references/EVALS.md`](references/EVALS.md) — eval design before implementation.
-8. [`references/COMPLETION_REPORT.template.md`](references/COMPLETION_REPORT.template.md) — required Worker report.
-9. [`references/TECH_LEAD_FAN_OUT.md`](references/TECH_LEAD_FAN_OUT.md) and [`references/FAN_OUT_CONTRACT.schema.json`](references/FAN_OUT_CONTRACT.schema.json) — bounded TOURNAMENT/COOPERATIVE/SERIAL_STACK/HYBRID fan-out.
-10. [`modules/domain-profile.md`](modules/domain-profile.md) — host/publication/CI domain bindings, loaded only when a concrete forge or carrier must be selected.
-11. [`evals.json`](evals.json), `scripts/`, and `tests/`.
-12. [`../skill-refactor-proof-loop/README.md`](../skill-refactor-proof-loop/README.md) for proof-carrying Skill refactor contracts and the current golden Stack.
-13. [`../github-delivery-loop/README.md`](../github-delivery-loop/README.md) for GitHub publication and merge State Machines.
-14. [`../../docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md`](../../docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md) for closure roles and dated consumer snapshots.
-15. [`../../docs/traceability/CODEX_SDK_TECH_LEAD_CONTROL_PLANE.md`](../../docs/traceability/CODEX_SDK_TECH_LEAD_CONTROL_PLANE.md) for the current #375–#379 multi-parent convergence example.
+2. This README — State Machines, DAG rules, data flow and current Molecular index.
+3. [`SYSTEM_PROMPT.md`](SYSTEM_PROMPT.md) — Worker instruction body.
+4. [`PUBLICATION_POLICY.md`](PUBLICATION_POLICY.md) — publication/no-push boundary.
+5. [`references/ADOPTION.md`](references/ADOPTION.md), [`references/REPO_PROFILE.template.md`](references/REPO_PROFILE.template.md), [`references/EVALS.md`](references/EVALS.md), [`references/COMPLETION_REPORT.template.md`](references/COMPLETION_REPORT.template.md).
+6. [`references/TECH_LEAD_FAN_OUT.md`](references/TECH_LEAD_FAN_OUT.md) and [`references/FAN_OUT_CONTRACT.schema.json`](references/FAN_OUT_CONTRACT.schema.json).
+7. [`references/MOLECULAR_STACK_INDEX.md`](references/MOLECULAR_STACK_INDEX.md), `references/molecular-stack-index.schema.json`, example and checker.
+8. [`modules/domain-profile.md`](modules/domain-profile.md) only when a concrete forge/carrier must be selected.
+9. `evals.json`, `scripts/`, `tests/`.
+10. [`../skill-refactor-proof-loop/README.md`](../skill-refactor-proof-loop/README.md) for proof-carrying refactor contracts.
+11. [`../github-delivery-loop/README.md`](../github-delivery-loop/README.md) for GitHub publication/merge State Machines.
+12. [`../../docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md`](../../docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md) and [`../../docs/traceability/CODEX_SDK_TECH_LEAD_CONTROL_PLANE.md`](../../docs/traceability/CODEX_SDK_TECH_LEAD_CONTROL_PLANE.md) for current closure/control-plane subjects.
+13. current issue/PR/workflow/Git subjects before mutation.
 
-## Directory map
-
-```text
-skills/git-town-stacked-pr-worker/
-├── README.md
-├── SKILL.md
-├── SYSTEM_PROMPT.md
-├── PUBLICATION_POLICY.md
-├── evals.json
-├── modules/
-│   └── domain-profile.md  host/publication/CI domain bindings
-├── references/
-│   ├── ADOPTION.md
-│   ├── REPO_PROFILE.template.md
-│   ├── EVALS.md
-│   ├── COMPLETION_REPORT.template.md
-│   ├── TECH_LEAD_FAN_OUT.md
-│   └── FAN_OUT_CONTRACT.schema.json
-├── scripts/               portable checks/helpers
-└── tests/                 positive, hollow and policy controls
-```
-
-Consumer-owned operational surface:
-
-```text
-consumer-repo/
-├── .git-town.toml
-├── AGENTS.md / CLAUDE.md
-├── docs/git/
-├── scripts/git-town/
-├── data/git-town/receipts/
-├── issue/PR task packets
-└── isolated linked worktrees
-```
-
-Consumer paths, branch names, remotes, credentials and receipts must not be copied into the shared Skill as universal law.
-
-## Core ownership
+## Ownership
 
 ```text
 Git Town
   branch hierarchy + parent-first synchronization
 
 Shared Skill
-  portable Worker method + fan-out/eval/traceability contracts
+  portable Worker method + fan-out/eval/Molecular traceability contracts
 
 Consumer repository
   branch graph + worktrees + leases + commands + CI + publication guards
+
+Tech Lead
+  semantic task DAG, writer/lease admission, one convergence owner
+
+Independent Shadow
+  same-subject applicability/contradiction/evidence-ceiling findings; no second writer
 
 Human / trusted operator
   semantic conflict + force-push admission + merge + legal acceptance + release + rollback
@@ -109,25 +76,11 @@ ISSUE_CONTRACTED
 → MERGED
 ```
 
-Allowed tracked states:
-
-```text
-PLANNED
-BRANCH_CREATED
-PR_DRAFT
-PR_OPEN
-BLOCKED
-READY_FOR_HUMAN_ADMIT
-MERGED
-CLOSED_NOT_PLANNED
-EXTERNAL_OPEN
-```
-
-A branch name, issue close, merge-side effect, documentation PASS, or prior green run cannot substitute for an exact node state. Open PR heads are read from GitHub PR metadata; only an observed immutable merged commit may be recorded durably.
+Allowed tracked states include `PLANNED`, `BRANCH_CREATED`, `PR_DRAFT`, `PR_OPEN`, `BLOCKED`, `READY_FOR_HUMAN_ADMIT`, `MERGED`, `CLOSED_NOT_PLANNED`, `EXTERNAL_OPEN`. Branch names, issue closure, documentation PASS, prior green runs, or merge-side effects do not substitute for exact node state.
 
 ## Synchronization boundary
 
-The unattended form is conceptually:
+Unattended sync is conceptually:
 
 ```bash
 git town sync \
@@ -137,181 +90,117 @@ git town sync \
   --no-push
 ```
 
-The consumer wrapper owns:
+Consumer wrappers own exact Git Town artifact admission, dirty/rebase/merge preflight, one active branch/path/resource writer, bounded timeout/log budget, receipts/BLOCKED markers, post-sync ancestry and explicit publication guards. `git town sync` exit `0` proves synchronization only.
 
-```text
-exact Git Town artifact/version admission
-dirty/rebase/merge preflight
-one active branch/path/resource writer
-bounded timeout and log budget
-receipt and BLOCKED marker
-post-sync ancestry check
-explicit publication guard
-```
+## DAG relation vocabulary
 
-`git town sync` exit `0` proves synchronization only. It does not prove implementation, tests, review, provider health, release readiness, or Human Admit.
+### `SIBLING`
 
-## DAG and branch rules
-
-### Path-disjoint sibling
-
-Use siblings when no branch consumes another branch's unmerged bytes:
+Path/resource-disjoint work that consumes only a common admitted base. Do not serialize it for visual convenience.
 
 ```text
 main
-├── docs/architecture
-├── tests/negative-controls
-└── scripts/cost-gate
+├── sibling-A
+├── sibling-B
+└── sibling-C
 ```
 
-Serializing these is a false dependency.
+### `TRUE_CHILD`
 
-### True child
-
-A child exists only when it consumes a parent's unmerged contract, code, proof artifact, or documentation bytes:
+A child consumes a named unmerged parent contract/code/proof/document artifact. The branch base must reflect that dependency.
 
 ```text
 main
-└── contract/v1
-    └── implementation/v1
-        └── consumer/v1
+└── contract
+    └── implementation
+        └── consumer
 ```
 
-The edge names the consumed artifact. A parent name alone is not causality.
+### `CONVERGENCE`
 
-### Terminal leaf
+One owner consumes several admitted prerequisite artifacts and updates shared indexes/integration/e2e surfaces. A convergence commit may have multiple sibling parents. That records consumption without making the siblings children of each other.
 
-Smallest reviewable behavior plus its tests and evidence. It does not absorb central index work or unrelated cleanup.
+### `PROCESS_DEPENDENCY`
 
-### Convergence leaf
+Ordering without Git ancestry, for example waiting for an audit/receipt before Human Admit.
 
-One owner updates shared indexes, links, coverage and final traceability after prerequisite artifacts are stable. A convergence commit may have several sibling parents when it actually consumes their exact bytes. That multi-parent merge records causality without making the siblings parents of one another.
+### `EXTERNAL_EVIDENCE`
 
-### Process dependency / external evidence
+Independent runtime/Shadow/provider receipt lane. It owns no implementation paths unless it is itself implementing code.
 
-A later audit may wait for an admitted standard, and a live runtime may provide evidence, without becoming a Git child:
+### `HISTORICAL`
+
+Immutable admitted/rejected/forensic subject retained for lineage, not current mutable authority.
+
+## Molecular atom contract
+
+Each implementation atom records:
 
 ```text
-PROCESS_DEPENDENCY
-EXTERNAL_EVIDENCE
+issue / PR
+relation class
+branch + common base or true parent
+owns_paths
+consumes_artifacts / provides_artifacts
+one writer/resource lease
+evals + negative controls
+exact-head hosted/runtime evidence
+terminal classification
+remaining evidence ceiling
+rollback
+Human-owned operations
+successor/convergence owner
 ```
 
-These edges are traceable and authority-bounded but do not alter branch ancestry.
+The machine index and `assert_molecular_stack_index.py` reject hidden multi-parent convergence, fake serial siblings, overlapping writer leases, self-embedded mutable open heads, review-only atoms used as parents, external evidence owning Stack paths, false merged state and widened merge/release authority.
 
-### Historical subject
+## Current Codex control-plane Molecular index — #375–#380
 
-An admitted or forensic prior subject can remain relevant without owning current mutable state:
+Current common base observed for the hardened sibling epoch:
 
 ```text
-HISTORICAL
+main@4ca9417b1da5ff32f1d4d3e7af64a15908749024
 ```
 
-A historical node records exact head/merge/rollback identity and proven ceiling. It cannot become the current queue, branch writer, or live evidence source by age or documentation reuse.
+| Atom | Issue / PR | Relation | Current exact head | Provides | Deterministic denominator | Remaining ceiling |
+|---|---|---|---|---|---|---|
+| `A-CODEX` | `#375 / #451` | `SIBLING` | `86f9e8d940b76cb71b713c098ff09cb68eb4e0c1` | exact session/result contract, clean-worktree subject preflight, SDK runner, post-turn writable-lease readback | `4 positive / 14 mutations`; own Skill Suites + Shared Skills Infra green | live SDK `NOT_EXERCISED`; independent acceptance still required |
+| `A-GH-DAG` | `#376 / #452` | `SIBLING` | `426fb6f6f548f71572d4402e73e0b05ecf6f8aa8` | completion-edge projection, repo/default-branch/visibility + issue-state + closing-PR-reference preflight, non-destructive readback | `6 positive / 17 mutations`; own Skill Suites + Shared Skills Infra green | live mutation/readback `NOT_EXERCISED`; generic development-link ownership beyond closing refs residual |
+| `A-HERDR` | `#377 / #453` | `SIBLING` | `5b6e58d1e7e9e127123dbb4a9189b98e5ff973cf` | optional pane/workspace/process/native-session/foreground-CWD observer + fallback | `4 positive / 9 mutations` | live Herdr `NOT_EXERCISED` |
+| `K-CLOSURE` | `#378 / #454` | `SIBLING` | `32c5425de1cf4f083bd998e81873a86af8771e1e` | source→task/DAG→session/evidence closure schema/checker/renderer | `4 positive / 11 mutations` | real source/provider closure `EVIDENCE_DEPENDENT` |
+| `D-TRACE` | `#379 refs / #380` | `SIBLING / DOCUMENTATION` | `7a9d68fcd58b1ed78ed6d05595a8df7eae53f5a5` | original control-plane design/trace routing | navigation only | consumed by convergence; no runtime claim |
+| `X-CONVERGENCE` | `#379 / #455` | `CONVERGENCE` | read current head from GitHub | exact sibling bytes + shared `run-all`, Agent routes, Shadow relation, Git Town/trace indexes | current final head must rerun Skill Suites + Shared Skills Infra + Skill Eval Contract + Git Town workflow | static/deterministic scope only; Human Admit/merge/release separate |
 
-## Worker task packet
-
-Before implementation, bind:
+Current hardened-parent convergence refresh:
 
 ```text
-goal and non-goals
-issue(s), PR, branch and base/parent
-allowed/read-only/forbidden paths
-consumed and provided artifacts/contracts
-evals and negative controls
-exact-head source and workflow state
-terminal classification and remaining evidence
-timeout, cleanup and rollback
-Human Admit boundary
+5d21ecab137cb26586ef1636dc279ee29733e913
+parents:
+  35874af7a6d04783983b05c8f1b1e402471b4451  prior #455 epoch
+  86f9e8d940b76cb71b713c098ff09cb68eb4e0c1  #451 current
+  426fb6f6f548f71572d4402e73e0b05ecf6f8aa8  #452 current
 ```
 
-Missing fields are `ABSENT`; Workers do not infer them.
+The final mutable #455 head is never self-embedded in this README. Read it from GitHub after every convergence edit.
 
-## Standard molecular Stack index
+### Historical convergence epoch 1
 
-The portable index — atom vocabulary, structural laws, head lifecycle and the update algorithm — is [`references/MOLECULAR_STACK_INDEX.md`](references/MOLECULAR_STACK_INDEX.md), with:
-
-```text
-references/molecular-stack-index.schema.json
-references/example-molecular-stack-index.json
-scripts/assert_molecular_stack_index.py
-```
-
-Atoms are `C` contract/schema/interface lock, `K` deterministic core, `A` adapter/provider/substrate, `E` Eval/mutation/fault controls, `X` explicit multi-parent convergence/E2E, and `D` documentation/receipt/handoff. Each atom is classified `root`, `sibling`, `child`, `review-only` or `convergence`, declares one lane (`CLOUD`, `LOCAL`, `PRIVATE`, `HUMAN`), and carries its open `blockers`. `assert_molecular_stack_index.py` refuses a hidden multi-parent convergence, a path-disjoint sibling serialized as a child, a required atom missing from the index, overlapping writer leases, a self-embedded mutable open PR head, an atom that owns no paths, oracle or Gate, a Gate whose receipt came from another lane, private lineage consumed by a published atom, a review-only atom used as a parent or merged, and a merged atom that still carries a blocker or an unexercised Gate.
-
-Required node fields:
-
-| Field | Meaning |
-|---|---|
-| `issues` | issue contract identities; one node owns each issue |
-| `pull_request` | publication identity or `null` before publication |
-| `branch` / `base_branch` | true-child base equals parent branch; sibling base remains common admitted base |
-| `stack_class` | root, child, sibling, convergence, planned follow-up, external evidence |
-| `owns_paths` | molecular path lease; external evidence owns no Stack paths |
-| `consumes_artifacts` / `provides_artifacts` | explicit data dependency |
-| `evals` / `negative_controls` | falsifiable acceptance |
-| `workflow` | exact execution state and source |
-| `head` | open heads read from GitHub; merged heads are immutable |
-| `terminal_classification` | implemented, partial, blocked, planned, external, merged, not planned |
-| `remaining_evidence` | explicit ceiling |
-| `rollback` / `human_admit` | recovery and authority boundary |
-
-The checker rejects missing child artifacts, child/base mismatch, fake serial siblings, multiple convergence owners, duplicate issue/PR ownership, stale self-embedded open heads, false merged state, external evidence owning paths, and widened semantic-conflict/force-push/ship/merge/release/promotion authority.
-
-## Codex control-plane Molecular terminal index — #375–#380
-
-This is the current concrete example of **parallel SIBLING atoms feeding one explicit multi-parent CONVERGENCE atom**. Current open PR heads should still be refreshed from GitHub before mutation; the exact heads below are frozen because they are also immutable parents of the convergence commit.
-
-Common admitted base for implementation siblings:
-
-```text
-main@ccef97dedd7ea8b1873e3afa130ca82b8eabb413
-```
-
-| Atom | Issue / PR | Class | Branch → base | Consumes | Provides | Writable lease | Gates / controls | Terminal / next |
-|---|---|---|---|---|---|---|---|---|
-| `A-CODEX` | `#375 / #451` | `SIBLING` | `ctl/375-codex-sdk-runtime-adapter-v2` → `main` | frozen Tech Lead task/session contract; existing Codex auth only on live path | Codex session/result schemas; bounded SDK runner; selftest | issue-owned Codex adapter/contracts/packet/script/test only | exact-head Skill Suites + Shared Skills Infra + Skill Eval Contract `SUCCESS`; Shadow `STATIC_ADMITTED`; lease/prompt/thread/credential mutations | static mechanism admitted; live SDK `NOT_EXERCISED`; successor `#379` |
-| `A-GH-DAG` | `#376 / #452` | `SIBLING` | `ctl/376-github-issue-dag-projection-v2` → `main` | asserted semantic dual DAG only | GitHub projection/ready-wave schemas; non-destructive projection/readback checker; selftest | issue-owned DAG module/contracts/packet/script/test only | same three exact-head gates `SUCCESS`; Shadow `STATIC_ADMITTED`; cycle/self/start-edge/digest/readback/destructive-extra mutations | static mechanism admitted; live mutation/readback `NOT_EXERCISED`; successor `#379` |
-| `A-HERDR` | `#377 / #453` | `SIBLING` | `ctl/377-herdr-runtime-observer-v2` → `main` | allocated worktree/attempt + optional Herdr target | observer receipt schema; host-neutral binding example; identity reducer/fallback; selftest | issue-owned Herdr module/contracts/example/packet/script/test only | same three exact-head gates `SUCCESS`; Shadow `STATIC_ADMITTED`; CWD/pane/session/credential/transcript controls | static mechanism admitted; live Herdr `NOT_EXERCISED`; successor `#379` |
-| `K-CLOSURE` | `#378 / #454` | `SIBLING` | `ctl/378-problem-closure-ledger-v2` → `main` | exact source claim + repo/task/DAG/issue/session/evidence identities | problem-closure schema/example/checker/renderer/selftest | issue-owned closure module/contracts/example/packet/scripts/test only | same three exact-head gates `SUCCESS`; Shadow `STATIC_ADMITTED`; missing receipt/local→live/N-A/superseded/merge-laundering controls | deterministic mechanism admitted; real source/provider closure `EVIDENCE_DEPENDENT`; successor `#379` |
-| `D-TRACE` | `#379 refs / #380` | `SIBLING / DOCUMENTATION` | `docs/codex-sdk-tech-lead-shadow-control-plane` → historical common base | program requirements only | nearest traceability Agent route + original control-plane design trace | docs/traceability two-file lease only | both non-merge commits carry valid commit-role trailers; navigation only | consumed by #379; no runtime evidence |
-| `X-CONVERGENCE` | `#379` | `CONVERGENCE` | `ctl/379-codex-control-plane-convergence` → `main` | exact heads of #451/#452/#453/#454 + PR #380 docs bytes | shared ATL test wiring/routes; Shadow relationship; Git Town/trace indexes | shared convergence surfaces only; no sibling implementation rewrite | all four dedicated selftests + six schemas + existing ATL suite + hosted exact-head workflows + independent Shadow denominator | target stage `READY_FOR_HUMAN_ADMIT` for static/deterministic scope only; live/merge/release remain open |
-
-Frozen sibling heads consumed by `X-CONVERGENCE`:
-
-```text
-#451 339ae874b070fb3a8a5fa89b0241d90434257e99
-#452 b5295df681d6471b19775db38860b2d151339879
-#453 5b6e58d1e7e9e127123dbb4a9189b98e5ff973cf
-#454 32c5425de1cf4f083bd998e81873a86af8771e1e
-#380 7a9d68fcd58b1ed78ed6d05595a8df7eae53f5a5
-```
-
-The first implementation convergence commit is immutable:
+The earlier implementation convergence remains immutable lineage:
 
 ```text
 c0f6979f80038394350aea724c598c8dba5ac338
 parents:
-  ccef97dedd7ea8b1873e3afa130ca82b8eabb413  main
-  339ae874b070fb3a8a5fa89b0241d90434257e99  #451
-  b5295df681d6471b19775db38860b2d151339879  #452
-  5b6e58d1e7e9e127123dbb4a9189b98e5ff973cf  #453
-  32c5425de1cf4f083bd998e81873a86af8771e1e  #454
-union tree:
-  37cb2c56e7dfc939cacaa0f65cf8f9b0f8318b22
+  ccef97dedd7ea8b1873e3afa130ca82b8eabb413
+  339ae874b070fb3a8a5fa89b0241d90434257e99  historical #451
+  b5295df681d6471b19775db38860b2d151339879  historical #452
+  5b6e58d1e7e9e127123dbb4a9189b98e5ff973cf
+  32c5425de1cf4f083bd998e81873a86af8771e1e
+union tree 37cb2c56e7dfc939cacaa0f65cf8f9b0f8318b22
 ```
 
-Documentation is then admitted by immutable convergence-base commit:
+Then `af427a13...` consumed PR #380 documentation and `35874af7...` refreshed current-main-at-that-time. That epoch passed all four hosted workflows and received a Shadow static verdict, but it became `HISTORICAL` when #451/#452 moved. Green evidence never follows a moving parent automatically.
 
-```text
-af427a13a7096df91d74a48c0a4ca6ce3f3e2ac9
-parents:
-  c0f6979f80038394350aea724c598c8dba5ac338
-  7a9d68fcd58b1ed78ed6d05595a8df7eae53f5a5  #380
-```
-
-The final mutable #379 branch head is **not** self-embedded here. Read it from GitHub PR/branch metadata after each shared convergence edit. This prevents the index from becoming stale in the commit that updates it.
-
-Rejected candidate lineage is retained:
+Rejected first candidates are preserved:
 
 ```text
 #444 → #451
@@ -320,155 +209,80 @@ Rejected candidate lineage is retained:
 #447 → #454
 ```
 
-Those first candidates were closed unmerged after the commit-role gate rejected their multi-commit Contents-API provenance. They are `HISTORICAL / REJECTED`, not alternate merge candidates.
+They are `HISTORICAL / REJECTED`, not alternate merge candidates.
 
-### Molecular data flow
+### Current control-plane data flow
 
 ```text
 A-CODEX ─┐
-A-GH-DAG ├─ exact STATIC_ADMITTED bytes ─┐
+A-GH-DAG ├─ exact current sibling bytes ─┐
 A-HERDR ─┤                               │
-K-CLOSURE┘                               ├→ X-CONVERGENCE (#379)
-D-TRACE ─── navigation sibling ──────────┘       │
-                                                  ├→ shared deterministic suite
+K-CLOSURE┘                               ├→ X-CONVERGENCE (#379/#455)
+D-TRACE ─── documentation sibling ───────┘       │
+                                                  ├→ unconditional shared ATL suite
                                                   ├→ independent Shadow readback
-                                                  ├→ hosted exact-head workflows
+                                                  ├→ repository-wide hosted workflows
                                                   └→ Human Admit for static scope
 
 live Codex / live GitHub mutation / live Herdr / real source-provider closure
-  = EXTERNAL_EVIDENCE / PROCESS_DEPENDENCY lanes
+  = EXTERNAL_EVIDENCE / PROCESS_DEPENDENCY
   ≠ Git children of X-CONVERGENCE
 ```
 
-### Human-owned operations and rollback
+## Required shared convergence gates
+
+The convergence subject contains the sibling bytes first; then `agentic-tech-lead-orchestration/tests/run-all.sh` unconditionally executes:
+
+```text
+6 Draft-2020-12 schemas
+problem-closure example
+Codex selftest        4 / 14
+GitHub DAG selftest   6 / 17
+Herdr selftest        4 / 9
+closure selftest      4 / 11
+closure checker + Markdown non-authority marker
+existing ATL suite
+```
+
+No required test may be hidden behind `if file exists`.
+
+Hosted final-head denominator:
+
+```text
+Skill Suites
+Shared Skills Infra
+Skill Eval Contract
+Git Town Stacked PR Worker (offline-contract + live-canary)
+```
+
+An earlier green head is historical after any consumed sibling head moves.
+
+## Human-owned operations / rollback
 
 ```text
 semantic conflict resolution       HUMAN
 force update / force push          HUMAN / repository policy
 unmanaged GitHub blocker deletion  HUMAN or separately admitted policy
-merge of convergence PR            HUMAN / repository merge authority
+merge                              HUMAN / repository merge authority
 release / promotion                HUMAN / repository release authority
-rollback                           return to exact pre-convergence main subject or reviewed revert
+rollback                           reviewed revert to an exact admitted pre-convergence subject
 ```
 
-No hosted CI green state, Shadow agreement, issue close, or PR publication can substitute for these operations.
+No workflow green state, Shadow agreement, issue close or PR publication substitutes for these operations.
 
-## Integration with `github-delivery-loop`
+## Publication and merge boundary
 
 ```text
-local commits and parent-first sync
-→ local consumer evals
-→ exact-head local receipt
+local verified batch
 → trusted GitHub snapshot
-→ publication gate
-→ draft / ready / one batched repair
-→ GitHub checks
+→ draft / ready publication
+→ exact-head checks
 → review
-→ owner merge-admit
-→ merge preflight and checked-head landing
+→ Human merge-admit
+→ checked-head landing
 ```
 
-Git Town never bypasses publication or merge gates. Publication and merge are separate State Machines.
-
-## Current proof-carrying Skill refactor Stack
-
-Canonical machine graph: [`../skill-refactor-proof-loop/references/refactor-proof-stack.json`](../skill-refactor-proof-loop/references/refactor-proof-stack.json). Full human trace: [`../../docs/traceability/SKILL_REFACTOR_PROOF_STACK.md`](../../docs/traceability/SKILL_REFACTOR_PROOF_STACK.md).
-
-```text
-Epic #318
-
-#307/#309 → PR #308
-└─ #312 → PR #315
-   └─ #319 → PR #323
-      └─ #320 → PR #324
-         └─ #321 → PR #325
-            └─ #322 planned adoption audit after Human admission
-```
-
-| Node | Issue | PR | Stack class | Branch → base | Provides |
-|---|---|---|---|---|---|
-| Tech Lead causal repair | `#307/#309` | `#308` | root | `fix/307-tech-lead-runtime-reachability` → `main` | task/schema/semantic/capability gates and frozen treatments |
-| Hermetic golden proof | `#312` | `#315` | true child | `agent/312-tech-lead-real-task-ab` → PR #308 branch | matched worktree/process/checkpoint/tournament/global-objective L3 proof |
-| Portable proof contract | `#319` | `#323` | true child | `agent/319-skill-refactor-proof-contract` → PR #315 branch | shared proof Skill, schemas, registry and mutation controls |
-| Agent docs and State Machines | `#320` | `#324` | true child | `agent/320-refactor-proof-agent-docs` → PR #323 branch | root/nearest Agent contracts and directory DAG/data flow |
-| Molecular convergence/index | `#321` | `#325` | convergence | `agent/321-refactor-proof-stack-index` → PR #324 branch | machine Stack graph, Git Town standard and traceability |
-| Cross-Skill adoption audit | `#322` | none | planned follow-up | no branch before admission | adoption ledger and deduplicated migration backlog |
-
-Independent evidence lanes, not Git children:
-
-```text
-#231 live scheduler lifecycle
-#232 independent Shadow/global objective
-#234 real Git Town + dual-forge delivery
-#256 exact-subject GrepAI/SCIP/Tree-sitter/Serena/SQLite adapters
-```
-
-They may raise issue #312 from L3 to L4/L5 only with receipts matching treatment, repository, task graph, context, budget, carrier, repetitions and acceptance subjects.
-
-## External consumer Stack snapshot — Bettor order 13
-
-Observed `2026-08-17`. This section is an `EXTERNAL_CONSUMER_SNAPSHOT`, not the consumer's state authority. Refresh the consumer's current issue/PR metadata, exact GitHub/local/Forgejo subjects, machine Stack index and Local Handoff Queue before acting.
-
-Merged implementation/governance subjects:
-
-| Subject | Relation | Proven ceiling |
-|---|---|---|
-| Bettor PR #81 | `HISTORICAL` | merged Git Town/document governance foundation |
-| Bettor PR #153 | `ROOT_AFTER_PREDECESSOR` | deterministic Blindspots ledger |
-| Bettor PR #155 | `ROOT_AFTER_PREDECESSOR` | deterministic exact-subject context funnel |
-| Bettor PR #156 | `ROOT_AFTER_PREDECESSOR` | planner/fixture Tech Lead, not physical Worker execution |
-| Bettor PR #157 | `ROOT_AFTER_PREDECESSOR` | canonical provider/route retirement |
-| Bettor PR #158 | `CONVERGENCE` | deterministic closure, no queue advancement |
-| Bettor PR #159 | `ROOT_AFTER_PREDECESSOR` | physical-run readiness only |
-| Bettor PR #169 | `ROOT_AFTER_PREDECESSOR` | Local Handoff queue contract, not execution |
-| Bettor PR #154 | `ROOT_AFTER_PREDECESSOR` | consumer contract adoption, not live Worker execution |
-
-Current process/evidence DAG:
-
-```text
-#172 dual-origin reconciliation                  PROCESS_DEPENDENCY / ACTIVE
-→ new exact accepted subject
-→ #161 runtime rebind and canary                 PROCESS_DEPENDENCY / BLOCKED
-→ #146 physical Tech Lead + Shadow run           PROCESS_DEPENDENCY / BLOCKED
-→ #140 Human terminal admission                  PROCESS_DEPENDENCY / BLOCKED
-→ #68 final convergence/release/rollback         CONVERGENCE / BLOCKED
-```
-
-Independent path-disjoint controls:
-
-```text
-#173 / PR #176 closure monitor and one queue authority  SIBLING
-#174 receipt-status laundering repair                   SIBLING
-#175 origin-projection freshness repair                 SIBLING
-```
-
-These are not Git children of #172 because they do not consume #172's unmerged bytes. Live Git Town, physical Workers, live carriers/providers, Human admission, release and rollback remain separate evidence/authority lanes.
-
-Full role, State Machine, data-flow and evidence-ceiling details: [`../../docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md`](../../docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md).
-
-## Historical indexes
-
-The historical Skill Eval implementation line was:
-
-```text
-#32 → #33 → #34 → #35 → #36 → #39 → #42 → #46
-```
-
-The reusable publication policy was issue #43 / PR #44. Earlier independent documentation leaves were not forced into runtime ancestry when they consumed only merged bytes.
-
-The four-repository documentation change was a sibling set because each repository wrote only its own documentation. One of the four repositories' issue #38 became the convergence owner only after all four merged. Exact historical subjects remain in [`../../docs/traceability/TRACEABILITY_INDEX.md`](../../docs/traceability/TRACEABILITY_INDEX.md).
-
-## Publication policy
-
-```text
-many local commits
-→ one locally verified batch
-→ initial draft publication
-→ ready-for-review publication
-→ one batched repair per actionable feedback subject
-```
-
-Background sync remains no-push. See [`PUBLICATION_POLICY.md`](PUBLICATION_POLICY.md).
+Git Town does not bypass publication or merge gates. Open PR heads are read from GitHub metadata; immutable merged/rejected/convergence ancestors may be recorded durably.
 
 ## Conflict policy
 
@@ -484,19 +298,11 @@ sync conflict
 → full eval replay
 ```
 
-Workers must not automatically run:
+Workers must not automatically run `git town continue`, `skip`, `undo`, `ship`, semantic conflict edits, force push, merge, permission widening or production rollback.
 
-```text
-git town continue
-git town skip
-git town undo
-git town ship
-semantic conflict edits
-force push
-merge
-permission widening
-production rollback
-```
+## Proof-carrying refactor and historical indexes
+
+The current golden proof lineage and cross-Skill adoption state live in [`../skill-refactor-proof-loop/README.md`](../skill-refactor-proof-loop/README.md) and [`../../docs/traceability/TRACEABILITY_INDEX.md`](../../docs/traceability/TRACEABILITY_INDEX.md). Historical consumer snapshots, IBC/CTL delivery lines and other programme indexes remain traceability subjects rather than being duplicated as current mutable state here.
 
 ## Evidence states
 
@@ -511,15 +317,15 @@ EVIDENCE_DEPENDENT
 HUMAN_ADMIT_REQUIRED
 ```
 
-A static prompt or Stack graph cannot prove an installed Git Town binary, real rebase, remote push, provider execution, model uplift, merge, or Human Admit.
+A static prompt, schema, Stack graph, deterministic test or hosted workflow cannot by itself prove live Codex/Herdr/GitHub effects, real source/provider closure, model uplift, merge, release or production readiness.
 
 ## Adoption checklist
 
-- pin and admit the exact Git Town artifact;
+- pin/admit exact Git Town artifact;
 - define repository profile and `.git-town.toml`;
 - enforce one Worker/branch/worktree and branch/path/resource leases;
 - declare consumed/provided artifacts and one convergence owner;
-- add the machine-readable molecular Stack index;
+- add machine-readable Molecular Stack index;
 - add bounded no-push sync wrappers and receipts;
 - run local verification before publication;
 - integrate GitHub publication and merge gates;
