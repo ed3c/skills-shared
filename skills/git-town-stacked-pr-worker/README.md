@@ -316,6 +316,51 @@ Independent evidence lanes, not Git children:
 
 They may raise issue #312 from L3 to L4/L5 only with receipts matching treatment, repository, task graph, context, budget, carrier, repetitions and acceptance subjects.
 
+## Universal refactor controller Stack — Epic #398
+
+Machine graph: [`../universal-refactor-controller/references/ucr-program-trace.json`](../universal-refactor-controller/references/ucr-program-trace.json). Current method/evidence overview: [`../universal-refactor-controller/README.md`](../universal-refactor-controller/README.md).
+
+The implementation is intentionally fan-out/fan-in:
+
+```text
+#399 / PR #405  UCR-C
+├─ #400 / PR #441  UCR-K/E
+└─ #401 / PR #442  UCR-A
+       \           /
+        #402 / PR #458  UCR-LIVE
+           ├─ validation PR #461
+           └─ #406  UCR-X/D convergence
+```
+
+| Atom | Issue | PR | Stack class | Evidence ceiling | Provides |
+|---|---|---|---|---|---|
+| `C` | `#399` | `#405` | root contract | `IMPLEMENTED` | controller + Complexity Delta contracts |
+| `K/E` | `#400` | `#441` | path-disjoint sibling | `LOCAL_DETERMINISTIC_VERIFIED` | cross-owner gate + false-simplification controls |
+| `A` | `#401` | `#442` | path-disjoint sibling | `STATIC_CONTRACT_VERIFIED` | Skill/repository target adapters |
+| `X/LIVE` | `#402` | `#458` | true multi-parent convergence | `BOUNDED_CROSS_DOMAIN_REMOTE_VERIFIED` | one Skill + one ordinary-repository canary |
+| validation | `#402` | `#461` | validation-only convergence | `REMOTE_REPOSITORY_CI_VERIFIED` | same-subject Skill Suites/shared-infra receipt |
+| `X/D` | `#406` | none until publication | convergence/documentation | `IMPLEMENTING` | registry, CI arrival, Agent routes, README State Machine, canary corpus, Stack index |
+
+Supporting process/evidence leaves are not semantic Git children of UCR-C:
+
+```text
+skills-shared #459 / PR #460
+  PROCESS_DEPENDENCY — repairs a schema-invalid entropy positive fixture;
+  exact entropy suite is remotely verified.
+
+blackbox-auto-research #62 / PR #63
+  EXTERNAL_EVIDENCE — ordinary-repository canary.
+
+blackbox-auto-research #64 / PR #65
+  PROCESS_DEPENDENCY — fixes pre-existing Apache-2.0 public-surface CI drift.
+
+blackbox-auto-research PR #66
+  EXTERNAL_EVIDENCE / VALIDATION — exact combined canary subject;
+  full repository verify is remotely green.
+```
+
+The UCR Golden Refactor corpus keeps both canaries `HOLD_UNMERGED`. Open PR heads remain mutable GitHub state and are not embedded here; merge, release, promotion, rollback, unseen-domain claims, live provider/model uplift, production safety and real local Git Town worktree execution remain separate Human/runtime evidence lanes.
+
 ## External consumer Stack snapshot — Bettor order 13
 
 Observed `2026-08-17`. This section is an `EXTERNAL_CONSUMER_SNAPSHOT`, not the consumer's state authority. Refresh the consumer's current issue/PR metadata, exact GitHub/local/Forgejo subjects, machine Stack index and Local Handoff Queue before acting.
