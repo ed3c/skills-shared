@@ -102,6 +102,7 @@ This stage is considered complete as a **design artifact stage** when:
 - Intent, ICPG bridge, Artifact Projection, authority, freshness, evidence ceiling, exact Stack relation semantics and bidirectional traversal are all normative parts of the prompt;
 - AGENTS/README route to one canonical full prompt artifact;
 - Shadow review explicitly lists the remaining executable risks;
+- negative controls include prompt-authority divergence and incomplete standalone packaging;
 - #414–#418 retain distinct deterministic/live/Human evidence lanes.
 
 These conditions are now represented by repository bytes on the PR #420 candidate branch. File presence proves design packaging only.
