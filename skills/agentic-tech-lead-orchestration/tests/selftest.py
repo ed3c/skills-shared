@@ -10,14 +10,21 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts" / "assert_task_contract.py"
+SCHEMA_SCRIPT = ROOT / "scripts" / "check_task_contract_schema.py"
 EXAMPLE = ROOT / "references" / "example-stack-contract.json"
 
-spec = importlib.util.spec_from_file_location("assert_task_contract", SCRIPT)
-assert spec and spec.loader
-module = importlib.util.module_from_spec(spec)
-sys.modules[spec.name] = module
-spec.loader.exec_module(module)
 
+def load_module(name: str, path: Path):
+    spec = importlib.util.spec_from_file_location(name, path)
+    assert spec and spec.loader
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+module = load_module("assert_task_contract", SCRIPT)
+schema_module = load_module("check_task_contract_schema", SCHEMA_SCRIPT)
 base = json.loads(EXAMPLE.read_text(encoding="utf-8"))
 
 
@@ -25,8 +32,19 @@ def ids(value: dict) -> set[str]:
     return {failure.assertion for failure in module.validate(value)}
 
 
+# Positive packet must satisfy both the Draft-2020-12 shape gate and the
+# composed baseline + ICPG semantic gate.
+assert not schema_module.validate_object(base), schema_module.validate_object(base)
 assert not module.validate(base), module.validate(base)
 
+# v1 compatibility law: case_obligations is additive. Legacy/non-ICPG packets
+# remain valid, while an admitted ICPG packet is fail-closed once the sidecar is present.
+legacy = copy.deepcopy(base)
+legacy.pop("case_obligations")
+assert not schema_module.validate_object(legacy), schema_module.validate_object(legacy)
+assert not module.validate(legacy), module.validate(legacy)
+
+# Preserve the pre-ICPG hard-law controls.
 case = copy.deepcopy(base)
 case["providers"].append(
     {"id": "code-graph-rag", "role": "GRAPH", "state": "EXACT"}
@@ -69,6 +87,43 @@ case = copy.deepcopy(base)
 case["automation"]["auto_resolve_conflicts"] = True
 assert "SEMANTIC_CONFLICT_BOUNDARY" in ids(case)
 
+# Regression control for the Shadow finding: branch-specific writes must never
+# widen beyond the frozen global write lease.
+case = copy.deepcopy(base)
+case["branches"][0]["write"].append("outside/file.py")
+assert "BRANCH_WRITE" in ids(case)
+
+# ICPG -> Tech Lead denominator and ownership controls.
+case = copy.deepcopy(base)
+case["case_obligations"]["required_case_ids"].append("CASE-ORPHAN")
+assert "CASE_UNOWNED" in ids(case)
+
+case = copy.deepcopy(base)
+case["case_obligations"]["branch_case_owners"][1]["case_ids"].append("CASE-CONTRACT")
+assert "CASE_DUPLICATE_OWNER" in ids(case)
+
+case = copy.deepcopy(base)
+case["case_obligations"]["branch_case_owners"][0]["branch"] = "missing/branch"
+assert "CASE_OWNER" in ids(case)
+
+case = copy.deepcopy(base)
+case["case_obligations"]["convergence_owner"] = "missing/branch"
+assert "CASE_CONVERGENCE_OWNER" in ids(case)
+
+case = copy.deepcopy(base)
+case["case_obligations"]["case_graph_sha256"] = "latest"
+assert "CASE_GRAPH_BINDING" in ids(case)
+
+case = copy.deepcopy(base)
+case["case_obligations"]["branch_case_owners"][0]["case_ids"].append("CASE-OUTSIDE")
+assert "CASE_UNKNOWN_OWNER" in ids(case)
+
+# Shape gate must reject a present-but-hollow sidecar even though absence is
+# admitted for legacy/non-ICPG v1 packets.
+case = copy.deepcopy(base)
+del case["case_obligations"]["case_graph_sha256"]
+assert schema_module.validate_object(case)
+
 with tempfile.TemporaryDirectory() as tmp:
     receipt = Path(tmp) / "receipt.json"
     code = module.main(
@@ -77,5 +132,7 @@ with tempfile.TemporaryDirectory() as tmp:
     assert code == 0
     observed = json.loads(receipt.read_text(encoding="utf-8"))
     assert observed["verdict"] == "PASS"
+    assert "case-obligation-denominator-and-ownership" in observed["assertions"]["implemented"]
+    assert observed["claims_not_proven"]
 
-print("agentic-tech-lead selftest: PASS")
+print("agentic-tech-lead selftest: PASS baseline + additive ICPG controls")
