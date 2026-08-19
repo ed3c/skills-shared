@@ -234,51 +234,106 @@ def reduce_observation(
     if source_observed_at > now:
         raise ContractError("Herdr source observation timestamp is in the future")
     observation_age = now - source_observed_at
-    if observation_aeHˆ]VÈ›X^ÛØœÙ\˜][Û—ØYÙWÜÙXÛÛ™È—N‚ˆ˜Z\ÙHÛÛ˜XÝ\œ›ÜŠˆˆœÝ[H\™ˆØœÙ\˜][ÛŽˆYÙO^ÛØœÙ\˜][Û—ØYÙ_\È‚ˆˆ›[Z]^Ù]VÉÛX^ÛØœÙ\˜][Û—ØYÙWÜÙXÛÛ™É×_\È‚ˆ
-B‚ˆ™\]Z\™WØÝÙH]K™Ù]
-œ™\]Z\™WÙ›Ü™YÜ›Ý[™ØÝÙ‹YJBˆYˆ™\]Z\™WØÝÙ[™›Ü™YÜ›Ý[™ØÝÙ[ˆ
-›Û™KˆŠN‚ˆ˜Z\ÙHÛÛ˜XÝ\œ›ÜŠ’\™ˆØœÙ\˜][ÛˆXÚÜÈ›Ü™YÜ›Ý[™ØÝÙÈØ[››Ýš[™YÙ[ÈÛÜšÝ™YHŠBˆYˆ›Ü™YÜ›Ý[™ØÝÙ›Ý[ˆ
-›Û™KˆŠN‚ˆYˆ]
-ÝŠ›Ü™YÜ›Ý[™ØÝÙ
-JKœ™\ÛÛ™J
-HOH]
-]VÈÛÜšÝ™YH—JKœ™\ÛÛ™J
-N‚ˆ˜Z\ÙHÛÛ˜XÝ\œ›ÜŠˆˆ™›Ü™YÜ›Ý[™ØÝÙÝÛÜšÝ™YHZ\ÛX]ÚˆØœÙ\™YÙ›Ü™YÜ›Ý[™ØÝÙ\ŸK‚ˆˆ™^XÝYÙ]VÉÝÛÜšÝ™YI×H\ŸH‚ˆ
-B‚ˆ›ÜˆšY[^XÝYXÝX[[ˆ
-ˆ
-œ[™WÚY‹]K™Ù]
-™^XÝYÜ[™WÚYŠK[™JKˆ
-ÛÜšÜÜXÙWÚY‹]K™Ù]
-™^XÝYÝÛÜšÜÜXÙWÚYŠKÛÜšÜÜXÙJKˆ
-œ›ØÙ\Ü×ÚY‹]K™Ù]
-™^XÝYÜ›ØÙ\Ü×ÚYŠK›ØÙ\ÜÊKˆ
-˜YÙ[ÜÙ\ÜÚ[Û—ÚY‹]K™Ù]
-™^XÝYØYÙ[ÜÙ\ÜÚ[Û—ÚYŠK˜]]™WÜÙ\ÜÚ[ÛŠKˆ
-œ›ØÙ\Ü×ÜÝ\YØ]Ý[š^‹]K™Ù]
-™^XÝYÜ›ØÙ\Ü×ÜÝ\YØ]Ý[š^ŠK›ØÙ\Ü×ÜÝ\YØ]
-Kˆ
-N‚ˆYˆ^XÝY\È›Ý›Û™H[™ÝŠ^XÝY
-HOHÝŠXÝX[
-N‚ˆ˜Z\ÙHÛÛ˜XÝ\œ›ÜŠˆžÙšY[HZ\ÛX]Úˆ^XÝYÙ^XÝY\ŸKØœÙ\™YØXÝX[\ŸHŠB‚ˆ™\]Z\™WÛ]™[™\ÜÈH]K™Ù]
-œ™\]Z\™WÜ›ØÙ\Ü×Û]™[™\ÜÈ‹YJBˆYˆ™\]Z\™WÛ]™[™\ÜÈ[™X\Y[ˆÈ”•S“’S‘È‹“ÐÒÑQ‹’QHŸN‚ˆYˆ›ØÙ\Ü×Ø[]™H\È›ÝYN‚ˆYˆ˜]]™WÜÙ\ÜÚ[Ûˆ›Ý[ˆ
-›Û™KˆŠN‚ˆ˜Z\ÙHÛÛ˜XÝ\œ›ÜŠˆ›Üœ[ˆÙ\ÜÚ[Û‹Ü›ØÙ\ÜÈØœÙ\˜][ÛŽˆ›Û\›Z[˜[Ù\ÜÚ[Ûˆ\È›È]™H›ØÙ\ÜÈ‚ˆ
-Bˆ˜Z\ÙHÛÛ˜XÝ\œ›ÜŠ››Û\›Z[˜[\™ˆØœÙ\˜][Ûˆ\È›È]™H›ØÙ\ÜÈŠB‚ˆ™\]Z\™WØÛX[—Ý\›Z[˜[H]K™Ù]
-œ™\]Z\™WØÛX[—Ý\›Z[˜[‹YJBˆYˆX\YOH‘Ó‘WÐÐS‘QUHˆ[™™\]Z\™WØÛX[—Ý\›Z[˜[‚ˆYˆÛX[\ÜÝ]HOHÓPSˆŽ‚ˆ˜Z\ÙHÛÛ˜XÝ\œ›ÜŠ‘Ó‘WÐÐS‘QUH™\]Z\™\ÈÛX[\ÜÝ]OPÓPSˆŠBˆYˆ™\ÚYYWØÛÝ[OH‚ˆ˜Z\ÙHÛÛ˜XÝ\œ›ÜŠ‘Ó‘WÐÐS‘QUH™\]Z\™\È™\ÚYYWØÛÝ[LŠB‚ˆ™]\›ˆÂˆœØÚ[XWÝ™\œÚ[ÛˆŽˆKˆ\Ú×ÚYŽˆ]VÈ\Ú×ÚY—Kˆ˜][\ÚYŽˆ]VÈ˜][\ÚY—Kˆœ™\ÈŽˆ]VÈœ™\È—Kˆ˜˜\ÙWÜÚHŽˆ]VÈ˜˜\ÙWÜÚH—Kˆ™YWÜÚHŽˆ]VÈ™YWÜÚH—KˆÛÜšÝ™YHŽˆ]VÈÛÜšÝ™YH—Kˆ\™Ù]Žˆ]VÈ\™Ù]—Kˆœ[™WÚYŽˆ[™KˆÛÜšÜÜXÙWÚYŽˆÛÜšÜÜXÙKˆœ›ØÙ\Ü×ÚYŽˆ›ØÙ\ÜËˆœ›ØÙ\Ü×ÜÝ\YØ]Ý[š^Žˆ›ØÙ\Ü×ÜÝ\YØ]ˆœ›ØÙ\Ü×Ø[]™HŽˆ›ØÙ\Ü×Ø[]™Kˆ˜YÙ[ÜÙ\ÜÚ[Û—ÚYŽˆ˜]]™WÜÙ\ÜÚ[Û‹ˆ™›Ü™YÜ›Ý[™ØÝÙŽˆ›Ü™YÜ›Ý[™ØÝÙˆœÛÝ\˜ÙWÛØœÙ\™YØ]Ý[š^ŽˆÛÝ\˜ÙWÛØœÙ\™YØ]ˆ›ØœÙ\™YØ]Ý[š^Žˆ›ÝËˆ›ØœÙ\˜][Û—ØYÙWÜÙXÛÛ™ÈŽˆØœÙ\˜][Û—ØYÙKˆ˜ÛX[\ÜÝ]HŽˆÛX[\ÜÝ]Kˆœ™\ÚYYWØÛÝ[Žˆ™\ÚYYWØÛÝ[ˆœ˜]×ÜÝ]HŽˆ˜]×ÜÝ]Kˆ›ØœÙ\™\—ÜÝ]HŽˆX\Yˆš\™—Ø]˜Z[X›HŽˆYKˆ˜]]Üš]]]™HŽˆ˜[ÙKˆ˜ÛÛ›Û\—Ü™XY˜XÚ×Ü™\]Z\™YŽˆYKˆ™]šY[˜ÙWØÙZ[[™ÈŽˆ“Ð”ÑT•‘T—ÒQS•UWÑ”‘TÒ‘TÔ×ÐÓPS•TÓÓ“H‹ˆB‚‚™YˆØœÙ\™J]NˆXÝÜÝ‹[žWJHOˆXÝÜÝ‹[žWN‚ˆ˜[Y]WÛX[šY™\Ý
-]JBˆYˆÚ][ÚXÚ
-š\™ˆŠH\È›Û™N‚ˆ™]\›ˆ˜[˜XÚ×Ü™XÙZ\
-]JBˆYÙ[HÜ[ŠÈš\™ˆ‹˜YÙ[‹™Ù]‹]VÈ\™Ù]—WJBˆ^Z[ˆHÜ[ŠÈš\™ˆ‹˜YÙ[‹™^Z[ˆ‹]VÈ\™Ù]—K‹KZœÛÛˆ—JBˆ™]\›ˆ™YXÙWÛØœÙ\˜][ÛŠ]KYÙ[^Z[ŠB‚‚™YˆXZ[Š
-HOˆ[‚ˆ\œÙ\ˆH\™Ü\œÙK\™Ý[Y[\œÙ\Š
-Bˆ\œÙ\‹˜YØ\™Ý[Y[
-›X[šY™\ÝŠBˆ\œÙ\‹˜YØ\™Ý[Y[
-‹K[Ý]]ŠBˆ\™ÜÈH\œÙ\‹œ\œÙWØ\™ÜÊ
-Bˆ]HHœÛÛ‹›ØYÊ]
-\™ÜË›X[šY™\Ý
-Kœ™XYÝ^
-[˜ÛÙ[™ÏH]‹NŠJBˆ™XÙZ\HØœÙ\™J]JBˆ^HœÛÛ‹™[\Ê™XÙZ\[™[L‹ÛÜÚÙ^\ÏUYJH
-È—ˆ‚ˆYˆ\™ÜË›Ý]]‚ˆ]
-\™ÜË›Ý]]
-KÜš]WÝ^
-^[˜ÛÙ[™ÏH]‹NŠBˆ[ÙN‚ˆš[
-^[™HˆŠBˆ™]\›ˆ‚‚šYˆ×Û˜[YW×ÈOH—×ÛXZ[—×ÈŽ‚ˆ˜Z\ÙHÞ\Ý[Q^]
-XZ[Š
-JB
+    if observation_age > data["max_observation_age_seconds"]:
+        raise ContractError(
+            f"Herdr observation is stale: age={observation_age}s "
+            f"max={data['max_observation_age_seconds']}s"
+        )
+
+    require_cwd = data.get("require_foreground_cwd", True)
+    if require_cwd and foreground_cwd in (None, ""):
+        raise ContractError("Herdr observation lacks foreground_cwd; cannot bind agent to worktree")
+    if foreground_cwd not in (None, ""):
+        if Path(str(foreground_cwd)).resolve() != Path(data["worktree"]).resolve():
+            raise ContractError(
+                f"foreground_cwd/worktree mismatch: observed {foreground_cwd!r}, "
+                f"expected {data['worktree']!r}"
+            )
+
+    for field, expected, actual in (
+        ("pane_id", data.get("expected_pane_id"), pane),
+        ("workspace_id", data.get("expected_workspace_id"), workspace),
+        ("process_id", data.get("expected_process_id"), process),
+        ("agent_session_id", data.get("expected_agent_session_id"), native_session),
+    ):
+        if expected is not None and str(expected) != str(actual):
+            raise ContractError(f"{field} mismatch: expected {expected!r}, observed {actual!r}")
+
+    expected_started = data.get("expected_process_started_at_unix")
+    if expected_started is not None:
+        if process_started_at is None:
+            raise ContractError("process_started_at_unix missing; cannot reject PID reuse")
+        if process_started_at != expected_started:
+            raise ContractError(
+                f"process_started_at_unix mismatch: expected {expected_started!r}, "
+                f"observed {process_started_at!r}"
+            )
+
+    if mapped != "DONE_CANDIDATE" and data.get("require_process_liveness", True):
+        if process_alive is not True:
+            raise ContractError("nonterminal Herdr observation lacks a live process; orphan session refused")
+
+    if mapped == "DONE_CANDIDATE" and data.get("require_clean_terminal", True):
+        if cleanup_state != "CLEAN" or residue_count != 0:
+            raise ContractError(
+                "terminal Herdr state requires cleanup_state=CLEAN and residue_count=0"
+            )
+
+    return {
+        "schema_version": 1,
+        "task_id": data["task_id"],
+        "attempt_id": data["attempt_id"],
+        "repo": data["repo"],
+        "base_sha": data["base_sha"],
+        "tree_sha": data["tree_sha"],
+        "worktree": data["worktree"],
+        "target": data["target"],
+        "pane_id": pane,
+        "workspace_id": workspace,
+        "process_id": process,
+        "process_started_at_unix": process_started_at,
+        "process_alive": process_alive,
+        "agent_session_id": native_session,
+        "foreground_cwd": foreground_cwd,
+        "source_observed_at_unix": source_observed_at,
+        "observed_at_unix": now,
+        "observation_age_seconds": observation_age,
+        "cleanup_state": cleanup_state,
+        "residue_count": residue_count,
+        "raw_state": raw_state,
+        "observer_state": mapped,
+        "herdr_available": True,
+        "authoritative": False,
+        "controller_readback_required": True,
+        "evidence_ceiling": "OBSERVER_IDENTITY_FRESHNESS_CLEANUP_ONLY",
+    }
+
+
+def observe(data: dict[str, Any]) -> dict[str, Any]:
+    validate_manifest(data)
+    if shutil.which("herdr") is None:
+        return fallback_receipt(data)
+    agent = _run(["herdr", "agent", "get", data["target"]])
+    explain = _run(["herdr", "agent", "explain", data["target"], "--json"])
+    if not isinstance(agent, dict) or not isinstance(explain, dict):
+        raise ContractError("Herdr observer expects object-shaped agent/explain JSON")
+    return reduce_observation(data, agent, explain)
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("manifest")
+    parser.add_argument("--output")
+    args = parser.parse_args()
+    data = json.loads(Path(args.manifest).read_text(encoding="utf-8"))
+    receipt = observe(data)
+    encoded = json.dumps(receipt, indent=2, sort_keys=True) + "\n"
+    if args.output:
+        Path(args.output).write_text(encoded, encoding="utf-8")
+    else:
+        print(encoded, end="")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
