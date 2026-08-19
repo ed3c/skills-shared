@@ -125,7 +125,7 @@ No branch, PR, terminal state, model prose, issue state, article/PDF prose, work
 ```text
 Wave 2 retained:
   Codex SDK adapter          4 positive / 14 mutations
-  GitHub DAG projection      6 positive / 17 mutations
+  GitHub DAG projection      7 positive / 23 mutations (#497 live_readback producer controls)
   Herdr observer             4 positive / 18 mutations
   problem closure            6 positive / 22 mutations
 
@@ -181,7 +181,7 @@ semantic_authority            false
 evidence_ceiling              REMOTE_CANARY_EDGE_ONLY
 ```
 
-Attempt `32295401831` is retained as fail-closed pre-mutation evidence for the earlier CLI response-shape mismatch. It is not a PASS and no edge had been added when it failed.
+Attempts `32295401831` and `32295854524` are retained as fail-closed pre-mutation evidence for the earlier CLI response-shape mismatch; the second run repeated the identical `blockedBy malformed` signature on unchanged carrier bytes before the #496 repair landed. Neither is a PASS and no edge had been added when they failed. The same CLI `LinkedIssueConnection` shape defect survived in the #376 projection's `live_readback` until it was separately repaired with producer controls under #497.
 
 The successful canary proves only the reversible remote fixture edge and cleanup/readback contract. It never becomes semantic DAG authority and does not prove release or production readiness.
 

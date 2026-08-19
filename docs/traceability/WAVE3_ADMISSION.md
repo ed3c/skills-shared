@@ -56,7 +56,7 @@ Git Town Stacked PR Worker    run 32286000382  SUCCESS
 ```text
 Wave 2 retained
   Codex SDK adapter          4 positive / 14 mutations
-  GitHub DAG projection      6 positive / 17 mutations
+  GitHub DAG projection      7 positive / 23 mutations (#497 live_readback producer controls)
   Herdr observer             4 positive / 18 mutations
   problem closure            6 positive / 22 mutations
 

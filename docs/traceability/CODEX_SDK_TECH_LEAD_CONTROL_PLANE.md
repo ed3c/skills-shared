@@ -285,7 +285,9 @@ root AGENTS.md
 
 Chat history is not required.
 
-## Current residual / evidence ceiling
+## Residual / evidence ceiling at Wave-2 pre-admission (historical)
+
+Live-lane ownership has since transferred to the Wave-3 successors #464–#467 through the admitted #485 reconciliation; current ownership authority is [`WAVE3_ADMISSION.md`](WAVE3_ADMISSION.md). The rows below are the pre-admission Wave-2 snapshot.
 
 ```text
 #375 deterministic mechanism candidate             IMPLEMENTED / shared suite PASS

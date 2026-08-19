@@ -71,7 +71,7 @@ Wave‑2 deterministic denominator:
 
 ```text
 Codex SDK       4 positive / 14 mutations
-GitHub DAG      6 positive / 17 mutations
+GitHub DAG      7 positive / 23 mutations (#497 live_readback producer controls)
 Herdr           4 positive / 18 mutations
 problem closure 6 positive / 22 mutations
 ```

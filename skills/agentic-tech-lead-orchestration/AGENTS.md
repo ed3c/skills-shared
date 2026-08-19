@@ -221,11 +221,15 @@ A queue cannot infer the runtime, command availability, secret access, provider 
 #232          independent Shadow/global objective
 #234          real Git Town + dual-forge delivery
 #256          GrepAI/SCIP/Tree-sitter/Serena/SQLite exact-subject receipts
-#375          live Codex SDK execution receipt remains open
-#376          live GitHub dependency mutation/readback remains open;
-              generic linked-PR ownership beyond closing references remains residual
-#377          live Herdr observation remains open
-#378          real source/provider claim closure remains evidence-dependent
+#375          HISTORICAL static Codex mechanism lineage; live Codex ownership
+              transferred to #464 by the admitted #485 transfer
+#376          generic linked-PR ownership beyond closing references remains
+              #376 RESIDUAL; live GitHub dependency mutation/readback
+              transferred to #465 and satisfied by hosted run 32296935756
+#377          HISTORICAL static Herdr observer lineage; live Herdr lifecycle
+              ownership transferred to #466
+#378          HISTORICAL static closure lineage; real source/provider evidence
+              ownership transferred to #467
 #379          shared deterministic convergence + route/index completeness
 ```
 
@@ -289,7 +293,7 @@ STATIC_CONTROL_PLANE_READY
 Current deterministic denominator must include, unconditionally:
 
 ```text
-Wave 2: Codex 4/14 + GitHub DAG 6/17 + Herdr 4/18 + closure 6/22
+Wave 2: Codex 4/14 + GitHub DAG 7/23 + Herdr 4/18 + closure 6/22
 Wave 3: Codex live 1/12 + GitHub canary 1/6 + Herdr lifecycle 2/7 + source compiler 4 kinds/11
 10 Draft-2020-12 control-plane schemas
 source-claims example → compiler → existing closure checker
