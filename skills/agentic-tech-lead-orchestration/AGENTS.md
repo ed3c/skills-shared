@@ -234,3 +234,77 @@ These are independent evidence/process lanes except where an explicit convergenc
 ## Completion report
 
 Report changed paths, affected states/edges, frozen inputs, selected/consumed parent heads, protected old strengths, task/session/queue subjects, local/global oracle results, denominator, process/worktree/lease cleanup, exact PR/DAG/workflow state, superseded convergence epochs, every `NOT_EXERCISED` or evidence-dependent lane, rollback subject, and Human Admit still required.
+
+## Wave 3 live-evidence overlay (#464–#468)
+
+When #464, #465, #466, #467, #468, PR #469–#473, or a live-evidence carrier is in scope, insert this route immediately after the existing Codex control-plane trace:
+
+```text
+../../docs/traceability/WAVE3_LIVE_EVIDENCE.md
+→ exact current PR #469/#470/#471/#472 heads
+→ scripts/compile_codex_live_acceptance.py              #464
+→ scripts/github_issue_dag_live_canary.py               #465
+→ scripts/collect_herdr_lifecycle.py                    #466
+→ scripts/compile_source_claims.py                      #467
+→ references/contracts/*live*.schema.json + source-claims-input.schema.json
+→ references/wave3-live-handoff-queue.json              #468 runtime continuation
+→ tests/codex_live_acceptance_selftest.py
+→ tests/github_issue_dag_live_canary_selftest.py
+→ tests/herdr_lifecycle_selftest.py
+→ tests/source_claim_compiler_selftest.py
+→ tests/run-all.sh                                      #468 single shared denominator
+→ current PR #473 / workflows / receipts
+```
+
+Wave-3 DAG law:
+
+```text
+#455 / #379  TRUE_PARENT
+├─ #464 / #469  TRUE_CHILD / SIBLING
+├─ #465 / #470  TRUE_CHILD / SIBLING
+├─ #466 / #471  TRUE_CHILD / SIBLING
+└─ #467 / #472  TRUE_CHILD / SIBLING
+        ↓ exact selected bytes
+#468 / #473  CONVERGENCE
+```
+
+The four leaves are true children only of #455 because they consume its unmerged adapter/contracts. They are not children of one another. `#468` is the only writer for shared schemas, `run-all.sh`, Agent routes, Shadow/Git Town indexes, and Wave-3 traceability.
+
+Wave-3 State Machine overlay:
+
+```text
+STATIC_CONTROL_PLANE_READY
+→ LIVE_EVIDENCE_CARRIER_BOUND
+→ EXACT_PARENT_SUBJECT_ASSERTED
+→ DETERMINISTIC_CARRIER_CONTROLS_PASS
+→ LIVE_RUNTIME_EXECUTION_OPTIONAL
+→ CONTENT_BOUND_RECEIPT
+→ CONTROLLER / SHADOW READBACK
+→ SHARED_WAVE3_CONVERGENCE
+→ EXACT_HEAD_HOSTED_GATES
+→ LOCAL_HANDOFF_FOR_REMAINING_RUNTIME
+→ READY_FOR_HUMAN_ADMIT | HOLD | REJECT
+```
+
+Current deterministic denominator must include, unconditionally:
+
+```text
+Wave 2: Codex 4/14 + GitHub DAG 6/17 + Herdr 4/18 + closure 6/22
+Wave 3: Codex live 1/12 + GitHub canary 1/6 + Herdr lifecycle 2/7 + source compiler 4 kinds/11
+10 Draft-2020-12 control-plane schemas
+source-claims example → compiler → existing closure checker
+Wave-3 Local Handoff Queue assertion
+```
+
+Evidence ceilings remain strict:
+
+```text
+public live-evidence carrier code      deterministic mechanism only
+live Codex SDK/controller receipt      NOT_EXERCISED until real signed-in runtime receipt
+live GitHub canary                     NOT_EXERCISED until add/readback/remove receipt
+live Herdr lifecycle                   NOT_EXERCISED until real process receipt
+article/PDF/PRD truth                  SOURCE_PROPOSAL / EVIDENCE_DEPENDENT
+Human Admit / merge / release          HUMAN_ADMIT_REQUIRED / NOT_PERFORMED
+```
+
+A carrier name containing `live`, a schema const such as `EXERCISED`, or a deterministic selftest can never manufacture live evidence. Only an exact runtime receipt plus required controller/Shadow readback may raise the corresponding lane.
