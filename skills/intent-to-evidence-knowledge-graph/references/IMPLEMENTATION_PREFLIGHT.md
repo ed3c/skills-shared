@@ -74,6 +74,7 @@ Before admitting a Worker:
 10. Is live #418 evidence still separate from deterministic fixtures?
 11. Does any Agent need to compose v7.1 + delta manually? If yes, prompt packaging is incomplete.
 12. Does any root/convergence document duplicate the full prompt instead of routing to one canonical artifact? If yes, BLOCK prompt divergence.
+13. If a deterministic checker proves a prompt contract defect, is the canonical prompt updated instead of hiding the failure in README prose? If no, BLOCK.
 
 ## Admission states
 
@@ -100,9 +101,9 @@ This stage is considered complete as a **design artifact stage** when:
 - a fresh Agent no longer needs to manually combine v7.1 + delta;
 - v7.1 Evidence/Narrative/Action baseline is preserved;
 - Intent, ICPG bridge, Artifact Projection, authority, freshness, evidence ceiling, exact Stack relation semantics and bidirectional traversal are all normative parts of the prompt;
-- AGENTS/README route to one canonical full prompt artifact;
+- AGENTS/README/SKILL route to one canonical full prompt artifact;
 - Shadow review explicitly lists the remaining executable risks;
-- negative controls include prompt-authority divergence and incomplete standalone packaging;
+- negative controls include prompt-authority divergence, incomplete standalone packaging and prose-only hiding of checker failure;
 - #414–#418 retain distinct deterministic/live/Human evidence lanes.
 
 These conditions are now represented by repository bytes on the PR #420 candidate branch. File presence proves design packaging only.
