@@ -68,7 +68,9 @@ STATIC_MECHANISMS_IMPLEMENTED
 
 The next phases are independent evidence/process lanes; they do not reopen or rewrite this admission record.
 
-## Remaining evidence owners
+## Historical remaining evidence owners at Wave-2 admission
+
+At the time #455/#475 closed the Wave-2 static/deterministic phase, the unresolved lanes were routed as follows:
 
 ```text
 #375 live Codex SDK execution                      NOT_EXERCISED
@@ -79,17 +81,41 @@ The next phases are independent evidence/process lanes; they do not reopen or re
 release / production promotion                     NOT_PERFORMED
 ```
 
-Issues #375–#378 remain the owners of those live/residual lanes. Closing or merging #455 does not convert them to PASS.
+That routing is historical evidence for the Wave-2 handoff. It must not be used as current live-owner authority after the admitted Wave-3 successor layer exists.
+
+## Successor ownership after Wave-3 admission
+
+`WAVE3_ADMISSION.md` supersedes only the live/evidence owner assignment, not the Wave-2 implementation lineage or denominator:
+
+```text
+#375  STATIC MECHANISM LINEAGE ONLY
+  → #464 owns live Codex SDK/controller acceptance
+
+#376  STATIC GITHUB DAG PROJECTION LINEAGE
+  → #465 owns live add/readback/remove canary
+  → #376 retains only generic development-link ownership RESIDUAL
+
+#377  STATIC HERDR OBSERVER LINEAGE ONLY
+  → #466 owns live Herdr lifecycle evidence
+
+#378  STATIC PROBLEM-CLOSURE LINEAGE ONLY
+  → #467 owns article/PDF/PRD truth and real source/provider evidence
+
+release / production promotion                     NOT_PERFORMED
+```
+
+A live receipt has exactly one owning successor issue. Do not write the same mutable live state to both a Wave-2 parent and a Wave-3 successor. #375/#377/#378 may be closed as completed static-mechanism parents only after this ownership transfer is Human-admitted; #376 stays open until its separate generic development-link residual is resolved or transferred.
 
 ## Agent read order after admission
 
 For #375–#379 work after this merge:
 
-1. read this admission record;
-2. read current `main` and GitHub issue/PR/workflow metadata;
-3. use `CODEX_SDK_TECH_LEAD_CONTROL_PLANE.md` for the pre-admission design, State Machine, denominator, failure history, and evidence ceilings;
-4. load the selected Agentic Tech Lead module/contracts only when their trigger matches;
-5. keep #375–#378 live evidence in their owning issue/runtime lane.
+1. read this admission record for immutable Wave-2 implementation lineage;
+2. read `WAVE3_ADMISSION.md` before assigning any current live/evidence owner;
+3. read current `main` and GitHub issue/PR/workflow metadata;
+4. use `CODEX_SDK_TECH_LEAD_CONTROL_PLANE.md` for the pre-admission design, State Machine, denominator, failure history, and evidence ceilings;
+5. load the selected Agentic Tech Lead module/contracts only when their trigger matches;
+6. route live Codex/GitHub-canary/Herdr/source-provider receipts only to #464/#465/#466/#467 respectively; keep #376 generic development-link residual in #376.
 
 If prose conflicts with current GitHub metadata, exact Git subjects, executable contracts, or runtime receipts, those machine/external subjects win. A later live receipt appends evidence; it does not mutate this historical static/deterministic admission.
 

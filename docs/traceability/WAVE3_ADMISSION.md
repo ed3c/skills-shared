@@ -95,7 +95,9 @@ PR #480 predecessor / 1eae9b47...  HISTORICAL_AFTER_MAIN_DRIFT
   provenance-complete, but main advanced through admitted UCR work before final admission
 ```
 
-No force rewrite erased either subject.
+PR #479 is `SUPERSEDED_FORENSIC` and closed unmerged after #480/#484 established the admitted/current Wave‑3 route. It remains historical exact-head evidence only and is not an alternate convergence authority.
+
+No force rewrite erased any rejected or stale subject.
 
 ## Admission State Machine
 
@@ -111,16 +113,29 @@ WAVE3_CARRIERS_IMPLEMENTED
 → STATIC_DETERMINISTIC_WAVE3_PHASE_CLOSED
 ```
 
-## Remaining evidence owners
+## Sole live/evidence owners after Wave-3 admission
+
+Wave‑3 is the successor ownership layer for mutable live/evidence receipts. Wave‑2 parent issues retain immutable implementation lineage only, except for the explicitly untransferred #376 residual:
 
 ```text
 #464 live Codex SDK/controller acceptance       NOT_EXERCISED
+  predecessor lineage: #375
+
 #465 live GitHub add/readback/remove canary      NOT_EXERCISED
+  predecessor lineage: #376
+
 #466 live Herdr lifecycle                        NOT_EXERCISED
+  predecessor lineage: #377
+
 #467 article/PDF/PRD truth                       SOURCE_PROPOSAL / EVIDENCE_DEPENDENT
 #467 real source/provider closure                EVIDENCE_DEPENDENT
+  predecessor lineage: #378
+
+#376 generic development-link ownership          RESIDUAL / NOT TRANSFERRED
 release / production promotion                   NOT_PERFORMED
 ```
+
+A live/evidence receipt has exactly one owning issue. Do not mirror current live state into both a Wave‑2 parent and its Wave‑3 successor. #375/#377/#378 are eligible to close as completed static-mechanism parents only after issue #485's ownership reconciliation is Human-admitted; #376 remains open while its generic development-link residual exists.
 
 The committed Wave‑3 Local Handoff Queue remains a continuation contract for those live lanes. Queue presence, static validation, PR merge, or this admission record cannot promote a live receipt.
 
@@ -128,12 +143,13 @@ The committed Wave‑3 Local Handoff Queue remains a continuation contract for t
 
 For #464–#468 work after this admission:
 
-1. read this record for the immutable admitted static/deterministic subject;
+1. read this record for the immutable admitted static/deterministic subject and current live-owner routing;
 2. re-read current `main`, issue/PR state, workflows, and runtime receipts from GitHub/runtime authority;
-3. use `WAVE3_PARENT_ADMISSION.md` for fork/current-main transition history;
-4. use `WAVE3_LIVE_EVIDENCE.md` for carrier contracts, State Machine, deterministic denominator, and Local Handoff semantics;
-5. load the selected Agentic Tech Lead modules/scripts/contracts only when their trigger matches;
-6. keep live #464–#467 evidence in the owning runtime/evidence lane.
+3. use `CODEX_SDK_TECH_LEAD_CONTROL_PLANE_ADMISSION.md` for Wave‑2 implementation lineage, not current live-owner assignment;
+4. use `WAVE3_PARENT_ADMISSION.md` for fork/current-main transition history;
+5. use `WAVE3_LIVE_EVIDENCE.md` for carrier contracts, State Machine, deterministic denominator, and Local Handoff semantics;
+6. load the selected Agentic Tech Lead modules/scripts/contracts only when their trigger matches;
+7. route live receipts only to #464/#465/#466/#467 as declared above; keep #376's generic development-link residual in #376.
 
 If prose conflicts with current GitHub metadata, exact Git subjects, executable contracts, or runtime receipts, the machine/external subjects win.
 
