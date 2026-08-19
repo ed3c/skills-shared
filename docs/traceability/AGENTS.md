@@ -9,11 +9,12 @@ Read this file before adding or changing repository-wide traceability, Tech Lead
 3. `TRACEABILITY_INDEX.md`;
 4. `TECH_LEAD_SHADOW_CLOSURE.md`;
 5. `CODEX_SDK_TECH_LEAD_CONTROL_PLANE.md` when issues #375–#379 or Codex SDK/GitHub DAG/Herdr/problem-closure work is involved;
-6. `skills/agentic-tech-lead-orchestration/AGENTS.md`, README and SKILL;
-7. selected control-plane execution packet/module/contracts when the trigger matches;
-8. `skills/procedural-shadow-runtime/README.md`;
-9. `skills/git-town-stacked-pr-worker/README.md`;
-10. exact issue/PR/workflow/runtime/evidence subjects.
+6. `WAVE3_LIVE_EVIDENCE.md` when #464–#468, runtime carriers, reversible GitHub canaries, source compilation, or the live-evidence Local Handoff Queue is involved;
+7. `skills/agentic-tech-lead-orchestration/AGENTS.md`, README and SKILL;
+8. selected control-plane execution packet/module/contracts when the trigger matches;
+9. `skills/procedural-shadow-runtime/README.md`;
+10. `skills/git-town-stacked-pr-worker/README.md`;
+11. exact issue/PR/workflow/runtime/evidence subjects.
 
 ## Authority
 
@@ -78,6 +79,22 @@ real source/provider closure           EVIDENCE_DEPENDENT
 sibling merge/admission                 HUMAN_ADMIT_REQUIRED
 #455 merge/release                      HUMAN_ADMIT_REQUIRED
 ```
+
+## Wave-3 live-evidence extension
+
+```text
+#455 / #379
+├─ #464 / PR #469  Codex live acceptance carrier         TRUE_CHILD
+├─ #465 / PR #470  GitHub reversible dependency canary  TRUE_CHILD
+├─ #466 / PR #471  Herdr lifecycle carrier              TRUE_CHILD
+└─ #467 / PR #472  immutable source-claim compiler      TRUE_CHILD
+          ↓
+#468 / PR #473     CONVERGENCE
+```
+
+#469–#472 are siblings of one another because they consume #455 but not each other. `WAVE3_LIVE_EVIDENCE.md` owns the detailed State Machine, immutable integration checkpoint, deterministic denominator, queue state and live evidence ceiling. PR #473 owns all shared route/index updates for this wave.
+
+The live-evidence Local Handoff Queue is a continuation contract only. It may point to live Codex, Herdr and reversible GitHub canary commands, but the queue itself cannot prove those commands ran or promote their receipts.
 
 ## Completion report
 
