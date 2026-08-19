@@ -20,5 +20,26 @@ These controls are required before any deterministic graph checker may claim sem
 | NC-14 | fresh Agent requires v7.1 + delta manual composition because standalone prompt is missing/stale | BLOCK incomplete prompt packaging |
 | NC-15 | deterministic checker fails a prompt contract but Worker hides failure by rewriting only README prose | BLOCK evidence laundering; canonical prompt/checker contract must reconcile |
 | NC-16 | a durable doc self-embeds the current mutable PR head and later treats it as current truth | BLOCK stale self-reference; refresh from GitHub authority |
+| NC-17 | ArtifactProjection external identity is fabricated or does not match the observed repository/subject | BLOCK fabricated artifact identity |
 
-The eventual checker/tests must bind each failure to an exact subject and deterministic terminal disposition. Presence of this matrix is preparation evidence only.
+## Executable ownership by stage
+
+`#414/#438` owns the first deterministic subset because those controls are implied directly by the projection schemas rather than by later task/traversal semantics:
+
+```text
+NC-01  duplicate ICPG authority       EXECUTABLE_IN_#438
+NC-02  stale mutable projection        EXECUTABLE_IN_#438
+NC-03  prose over receipt              EXECUTABLE_IN_#438
+NC-17  fabricated artifact identity    EXECUTABLE_IN_#438
+```
+
+The remaining controls retain their later owners:
+
+```text
+#415 ownership / Stack semantics      NC-04, NC-05, NC-06, NC-07
+#416 traversal / authority semantics  NC-08, NC-09, NC-10, NC-12
+#417 convergence / prompt routing     NC-13, NC-14, NC-15, NC-16
+#418 live evidence lane               NC-11 plus live stale-head/reverse-trace canaries
+```
+
+A control is not `PASS` because it appears in this matrix. It becomes deterministic evidence only when its executable mutation runs on the exact candidate bytes and is rejected for the expected reason. Live #418 remains a separate evidence lane.
