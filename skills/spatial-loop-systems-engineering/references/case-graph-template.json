@@ -1,0 +1,73 @@
+{
+  "schema": "spatial-loop-case-graph/v1",
+  "subject": {
+    "id": "replace-with-exact-subject-id",
+    "revision": "replace-with-exact-revision",
+    "digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "intent_atoms": [
+    {
+      "id": "INT-001",
+      "statement": "Replace with one irreducible user or source intent obligation."
+    }
+  ],
+  "semantic_axes": [
+    {
+      "id": "AXIS-001",
+      "name": "REPLACE_WITH_APPLICABLE_SEMANTIC_AXIS",
+      "state": "APPLICABLE"
+    }
+  ],
+  "source_behaviors": [],
+  "cases": [
+    {
+      "id": "CASE-001",
+      "classification": "REQUIRED_CASE",
+      "intent_ids": ["INT-001"],
+      "axis_ids": ["AXIS-001"],
+      "invariant_or_state_refs": ["INV-001"],
+      "implementation_ids": ["IMPL-001"],
+      "oracle_ids": ["ORACLE-001"],
+      "evidence_ids": [],
+      "decision_id": null,
+      "evidence_state": "NOT_EXERCISED"
+    }
+  ],
+  "implementations": [
+    {
+      "id": "IMPL-001",
+      "owner": "replace-with-one-writer-owner",
+      "subject_ref": "replace-with-bounded-implementation-subject",
+      "convergence_owner": false
+    }
+  ],
+  "oracles": [
+    {
+      "id": "ORACLE-001",
+      "procedure": "Replace with a deterministic procedure that decides the case.",
+      "pass_condition": "Replace with an observable pass condition.",
+      "negative_control": "Replace with a mutation or counterexample that must turn the oracle red."
+    }
+  ],
+  "evidence": [],
+  "decisions": [],
+  "edges": [
+    {"from": "INT-001", "to": "CASE-001", "kind": "REQUIRES"},
+    {"from": "AXIS-001", "to": "CASE-001", "kind": "COVERS"},
+    {"from": "CASE-001", "to": "IMPL-001", "kind": "IMPLEMENTED_BY"},
+    {"from": "CASE-001", "to": "ORACLE-001", "kind": "PROVED_BY"}
+  ],
+  "coverage": {
+    "intent": 1.0,
+    "source_behavior_disposition": 1.0,
+    "required_case": 1.0,
+    "implementation_binding": 1.0,
+    "oracle": 1.0,
+    "executed_evidence": 0.0,
+    "unknown_blocking_count": 0
+  },
+  "gate": {
+    "status": "READY_FOR_PROTOTYPE",
+    "rationale": "Template carries structural obligations only. Evidence remains NOT_EXERCISED until exact-subject receipts are attached."
+  }
+}
