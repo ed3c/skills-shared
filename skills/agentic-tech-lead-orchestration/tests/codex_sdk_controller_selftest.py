@@ -51,6 +51,8 @@ assert "final_response" not in r
 
 must_fail(lambda d: d.update(prompt_digest="0" * 64))
 must_fail(lambda d: d["read_only_paths"].append(d["allowed_paths"][0]))
+must_fail(lambda d: d["read_only_paths"].append("skills/agentic-tech-lead-orchestration/scripts/private.py"))
+must_fail(lambda d: d["allowed_paths"].append("../outside-repo"))
 must_fail(lambda d: d.update(api_key="sk-should-never-be-here"))
 must_fail(lambda d: d.update(thread_policy="resume-compatible"))
 must_fail(lambda d: d.update(resume_thread_id="thread-x"))
@@ -61,4 +63,4 @@ resume["thread_policy"] = "resume-compatible"
 resume["resume_thread_id"] = "thread_123"
 mod.validate_manifest(resume)
 
-print("codex-sdk-controller selftest: PASS (positive=2 mutations=6 live=NOT_EXERCISED)")
+print("codex-sdk-controller selftest: PASS (positive=2 mutations=8 live=NOT_EXERCISED)")
