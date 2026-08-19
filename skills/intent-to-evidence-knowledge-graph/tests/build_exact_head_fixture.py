@@ -3,7 +3,19 @@ from __future__ import annotations
 
 import argparse
 import json
+from datetime import datetime
 from pathlib import Path
+
+
+def _validate_timestamp(value: str) -> str:
+    candidate = value.replace("Z", "+00:00")
+    try:
+        parsed = datetime.fromisoformat(candidate)
+    except ValueError as exc:
+        raise SystemExit(f"observed-at must be RFC3339/date-time: {exc}") from None
+    if parsed.tzinfo is None:
+        raise SystemExit("observed-at must include an explicit timezone")
+    return value
 
 
 def main() -> int:
@@ -12,15 +24,16 @@ def main() -> int:
     parser.add_argument("--ref", required=True)
     parser.add_argument("--sha", required=True)
     parser.add_argument("--pr-number", required=True, type=int)
+    parser.add_argument("--observed-at", required=True)
     parser.add_argument("--graph-out", required=True, type=Path)
     parser.add_argument("--authority-out", required=True, type=Path)
     args = parser.parse_args()
 
     if len(args.sha) != 40 or any(character not in "0123456789abcdef" for character in args.sha):
         raise SystemExit("sha must be 40 lowercase hex chars")
+    observed_at = _validate_timestamp(args.observed_at)
 
     graph_digest = "sha256:" + "a" * 64
-    observed_at = "1970-01-01T00:00:00Z"
     intent = {
         "schema_version": "intent-projection/v1",
         "intent_id": "intent:knowledge-graph-v7.2",
@@ -129,11 +142,13 @@ def main() -> int:
     }
     authority = {
         "schema_version": "authority-snapshot/v1",
+        "observed_at": observed_at,
         "artifacts": {
             pr["artifact_id"]: {
                 "external_identity": pr["external_identity"],
                 "sha": args.sha,
                 "state": "open",
+                "observed_at": observed_at,
             }
         },
     }
