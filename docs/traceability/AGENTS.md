@@ -10,19 +10,20 @@ Read this file before adding or changing repository-wide traceability, Tech Lead
 4. `TECH_LEAD_SHADOW_CLOSURE.md`;
 5. `CODEX_SDK_TECH_LEAD_CONTROL_PLANE_ADMISSION.md` for the admitted #379 static/deterministic convergence, merge provenance, consumed sibling publication state and remaining live evidence owners;
 6. `CODEX_SDK_TECH_LEAD_CONTROL_PLANE.md` for the pre-admission State Machine, denominator, rejected epochs and evidence ceilings;
-7. `WAVE3_PARENT_ADMISSION.md` before #464–#468 decisions; it records the transition of #455 from fork-time unmerged true parent to Human-admitted `main` history;
-8. `WAVE3_LIVE_EVIDENCE.md` for the Wave-3 State Machine, carriers, reversible GitHub canary, source compiler, immutable integration checkpoint and Local Handoff Queue;
-9. `skills/agentic-tech-lead-orchestration/AGENTS.md`, README and SKILL;
-10. selected control-plane execution packet/module/contracts when the trigger matches;
-11. `skills/procedural-shadow-runtime/README.md`;
-12. `skills/git-town-stacked-pr-worker/README.md`;
-13. exact issue/PR/workflow/runtime/evidence subjects.
+7. `WAVE3_PARENT_ADMISSION.md` for #455/#475 parent authority and the Wave-3 fork/admission transition;
+8. `WAVE3_REPLACEMENT_CONVERGENCE.md` before treating any #473/#479 state in older Git Town, Shadow, or Wave-3 snapshots as current;
+9. `WAVE3_LIVE_EVIDENCE.md` for the Wave-3 State Machine, carriers, reversible GitHub canary, source compiler, immutable integration checkpoint and Local Handoff Queue;
+10. `skills/agentic-tech-lead-orchestration/AGENTS.md`, README and SKILL;
+11. selected control-plane execution packet/module/contracts when the trigger matches;
+12. `skills/procedural-shadow-runtime/README.md`;
+13. `skills/git-town-stacked-pr-worker/README.md`;
+14. exact issue/PR/workflow/runtime/evidence subjects.
 
 ## Authority
 
 Traceability documents are human projections. They may route to machine truth but must never replace schemas, current GitHub metadata, Git ancestry, runtime receipts, source readback, CI execution, or Human Admit.
 
-`CODEX_SDK_TECH_LEAD_CONTROL_PLANE_ADMISSION.md` records the immutable static/deterministic admission subject for #379. `WAVE3_PARENT_ADMISSION.md` records the later fork/admission transition needed to interpret Wave 3. Current mutable issue/runtime/main state must still be read from GitHub and owning runtime receipts.
+`CODEX_SDK_TECH_LEAD_CONTROL_PLANE_ADMISSION.md` records the immutable static/deterministic admission subject for #379. `WAVE3_PARENT_ADMISSION.md` records the later fork/admission transition. `WAVE3_REPLACEMENT_CONVERGENCE.md` owns the current #473→#479 replacement routing until a later exact subject supersedes it. Current mutable issue/runtime/main state must still be read from GitHub and owning runtime receipts.
 
 A convergence branch may consume exact sibling candidate bytes for integration testing. Such ancestry proves byte consumption only; it does **not** promote an unadmitted sibling PR itself to `MERGED`. After #455 admission, its consumed sibling PRs remain closed-unmerged publication lineage while their exact bytes are present on `main` through the convergence merge.
 
@@ -64,7 +65,7 @@ merge commit    ca31e0b1e640f0dba2c3d94da9d9786fbed32f2c
 shared tree     8a75271851f2e9dd47dd3a019c93e4a0f9272d24
 ```
 
-Post-merge admission documentation was itself admitted through PR #475. Current `main` must always be read live; at the Wave-3 v2 reconciliation epoch it was observed at `4be4d6744fe432e4be24d94750bb4fc034aab189`.
+Post-merge admission documentation was itself admitted through PR #475. Current `main` must always be read live; at the Wave-3 replacement reconciliation epoch it was observed at `4be4d6744fe432e4be24d94750bb4fc034aab189`.
 
 Historical rejected/closed-unmerged implementation candidates remain part of the denominator. They are not alternate merge candidates.
 
@@ -106,11 +107,11 @@ Fork-time provenance and current replacement convergence are distinct facts:
 ├─ #466 / PR #471  Herdr lifecycle carrier              TRUE_CHILD at fork / selected leaf
 └─ #467 / PR #472  immutable source-claim compiler      TRUE_CHILD at fork / selected leaf
           ↓ exact selected bytes
-#468 / PR #473     REJECTED convergence lineage; functional/document gates passed, commit-role provenance rejected one accidental noop ancestor
+#468 / PR #473     HISTORICAL / REJECTED_COMMIT_ROLE
 #468 / PR #479     CURRENT replacement convergence candidate
 ```
 
-#469–#472 are siblings of one another because they consumed #455 but not each other. PR #479 reuses the exact final Wave-3 semantic tree while excluding the rejected accidental `3fe0a79...` noop ancestry, then reconciles current admitted #475 routes instead of overwriting them.
+#469–#472 are siblings of one another because they consumed #455 but not each other. PR #479 excludes the rejected accidental `3fe0a79...` noop ancestry, preserves the selected leaf bytes, and semantically reconciles current admitted #475 routes instead of overwriting them.
 
 Wave-3 static infrastructure does not itself prove live effects:
 
