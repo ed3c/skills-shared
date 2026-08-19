@@ -1,0 +1,98 @@
+{
+  "schema_version": "intent-to-evidence-trace-graph/v1",
+  "subject": {
+    "repository": "ed3c/skills-shared",
+    "ref": "agent/test",
+    "sha": "1111111111111111111111111111111111111111"
+  },
+  "intents": [
+    {
+      "schema_version": "intent-projection/v1",
+      "intent_id": "intent:example",
+      "desired_outcome": "deliver example",
+      "non_goals": [],
+      "invariants": ["case ownership"],
+      "acceptance_criteria": ["trace"],
+      "authority_boundary": "human",
+      "icpg": {
+        "graph_digest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "case_ids": ["CASE-CONTRACT", "CASE-CORE"]
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "schema_version": "artifact-projection/v1",
+      "artifact_id": "pr-contract",
+      "artifact_type": "PR",
+      "authority_class": "DELIVERY_ARTIFACT",
+      "external_identity": "pr:ed3c/skills-shared#501",
+      "mutable": true,
+      "observed_subject": {"repository": "ed3c/skills-shared", "ref_or_identity": "agent/test", "sha": "1111111111111111111111111111111111111111", "observed_at": "2026-08-19T12:00:00Z", "freshness_policy": "REFRESH_BEFORE_DECISION"},
+      "evidence_ceiling": "L2",
+      "trace": {"intent_id": "intent:example", "icpg_graph_digest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc", "case_ids": ["CASE-CONTRACT"], "invariant_ids": ["INV-CONTRACT"]}
+    },
+    {
+      "schema_version": "artifact-projection/v1",
+      "artifact_id": "file-contract",
+      "artifact_type": "FILE",
+      "authority_class": "IMPLEMENTATION",
+      "external_identity": "path:ed3c/skills-shared@1111111111111111111111111111111111111111:feature/contracts.py",
+      "mutable": false,
+      "observed_subject": {"repository": "ed3c/skills-shared", "ref_or_identity": "agent/test", "sha": "1111111111111111111111111111111111111111", "observed_at": "2026-08-19T12:00:00Z", "freshness_policy": "IMMUTABLE"},
+      "evidence_ceiling": "L2",
+      "trace": {"intent_id": "intent:example", "icpg_graph_digest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc", "case_ids": ["CASE-CONTRACT"], "invariant_ids": ["INV-CONTRACT"]}
+    },
+    {
+      "schema_version": "artifact-projection/v1",
+      "artifact_id": "agents-contract",
+      "artifact_type": "AGENTS",
+      "authority_class": "PROCEDURE",
+      "external_identity": "path:ed3c/skills-shared@1111111111111111111111111111111111111111:feature/AGENTS.md",
+      "mutable": false,
+      "observed_subject": {"repository": "ed3c/skills-shared", "ref_or_identity": "agent/test", "sha": "1111111111111111111111111111111111111111", "observed_at": "2026-08-19T12:00:00Z", "freshness_policy": "IMMUTABLE"},
+      "evidence_ceiling": "L2",
+      "trace": {"intent_id": "intent:example", "icpg_graph_digest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc", "case_ids": ["CASE-CONTRACT"], "invariant_ids": ["INV-CONTRACT"]}
+    },
+    {
+      "schema_version": "artifact-projection/v1",
+      "artifact_id": "pr-core",
+      "artifact_type": "PR",
+      "authority_class": "DELIVERY_ARTIFACT",
+      "external_identity": "pr:ed3c/skills-shared#502",
+      "mutable": true,
+      "observed_subject": {"repository": "ed3c/skills-shared", "ref_or_identity": "agent/test", "sha": "1111111111111111111111111111111111111111", "observed_at": "2026-08-19T12:00:00Z", "freshness_policy": "REFRESH_BEFORE_DECISION"},
+      "evidence_ceiling": "L2",
+      "trace": {"intent_id": "intent:example", "icpg_graph_digest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc", "case_ids": ["CASE-CORE"], "invariant_ids": ["INV-CORE"]}
+    },
+    {
+      "schema_version": "artifact-projection/v1",
+      "artifact_id": "file-core",
+      "artifact_type": "FILE",
+      "authority_class": "IMPLEMENTATION",
+      "external_identity": "path:ed3c/skills-shared@1111111111111111111111111111111111111111:feature/core.py",
+      "mutable": false,
+      "observed_subject": {"repository": "ed3c/skills-shared", "ref_or_identity": "agent/test", "sha": "1111111111111111111111111111111111111111", "observed_at": "2026-08-19T12:00:00Z", "freshness_policy": "IMMUTABLE"},
+      "evidence_ceiling": "L2",
+      "trace": {"intent_id": "intent:example", "icpg_graph_digest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc", "case_ids": ["CASE-CORE"], "invariant_ids": ["INV-CORE"]}
+    },
+    {
+      "schema_version": "artifact-projection/v1",
+      "artifact_id": "readme-core",
+      "artifact_type": "README",
+      "authority_class": "NAVIGATION",
+      "external_identity": "path:ed3c/skills-shared@1111111111111111111111111111111111111111:feature/README.md",
+      "mutable": false,
+      "observed_subject": {"repository": "ed3c/skills-shared", "ref_or_identity": "agent/test", "sha": "1111111111111111111111111111111111111111", "observed_at": "2026-08-19T12:00:00Z", "freshness_policy": "IMMUTABLE"},
+      "evidence_ceiling": "L2",
+      "trace": {"intent_id": "intent:example", "icpg_graph_digest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc", "case_ids": ["CASE-CORE"], "invariant_ids": ["INV-CORE"]}
+    }
+  ],
+  "edges": [
+    {"from": "pr-contract", "relation": "TOUCHES", "to": "file-contract", "utility": "IMPLEMENTATION"},
+    {"from": "agents-contract", "relation": "PROTECTS_CASE", "to": "intent:example", "utility": "AUTHORITY"},
+    {"from": "pr-core", "relation": "TOUCHES", "to": "file-core", "utility": "IMPLEMENTATION"},
+    {"from": "readme-core", "relation": "DOCUMENTS_INVARIANT", "to": "intent:example", "utility": "RETRIEVAL"}
+  ],
+  "required_traversals": ["WHY_TO_PROOF", "IMPLEMENTATION_TO_WHY"]
+}
