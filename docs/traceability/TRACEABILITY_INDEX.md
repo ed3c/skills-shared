@@ -178,3 +178,65 @@ Issue #128 / PR #136 remains an independent terminal leaf for the substrate-boun
 ## Evidence boundary
 
 PR presence, ancestry and mergeability prove neither admission nor implementation correctness nor live execution. Documentation completion, deterministic fixtures, hosted workflow success, terminal `done`, issue close, PR merge, model agreement or an external link cannot substitute for live Codex/Herdr/GitHub effects, real source/provider closure, Human Admit, release or production readiness.
+
+## Codex control-plane Wave 3 — live-evidence infrastructure
+
+Canonical Wave-3 trace: [`WAVE3_LIVE_EVIDENCE.md`](WAVE3_LIVE_EVIDENCE.md). It extends #455 without modifying the provider-neutral core.
+
+```text
+#455 / #379 static convergence
+├─ #464 / PR #469  Codex live acceptance carrier        TRUE_CHILD
+├─ #465 / PR #470  GitHub dependency reversible canary TRUE_CHILD
+├─ #466 / PR #471  Herdr lifecycle carrier             TRUE_CHILD
+└─ #467 / PR #472  immutable source-claim compiler     TRUE_CHILD
+          ↓ exact selected bytes
+#468 / PR #473     Wave-3 convergence
+```
+
+Selected exact leaf heads for the current integration epoch:
+
+```text
+#469 d239d17d1d718f3e5e8c1975307665cae43d3b09
+#470 f4c3215b6c52c2e6106070eaa1121dee1dbd48e3
+#471 9eb70b2b62193b62a28f243de91e51337f1906b3
+#472 44d779a02e1749aa88a502d946646c22af38a026
+```
+
+Immutable integration checkpoint:
+
+```text
+691b342c44c9c6c4e61a9997e778ae4ed6e920d5
+parents:
+  847e56c3418fce920c42d983e84ee44fdc6e8971  #455 true parent
+  d239d17d1d718f3e5e8c1975307665cae43d3b09  #469
+  f4c3215b6c52c2e6106070eaa1121dee1dbd48e3  #470
+  9eb70b2b62193b62a28f243de91e51337f1906b3  #471
+  44d779a02e1749aa88a502d946646c22af38a026  #472
+```
+
+Wave-3 deterministic evidence denominator:
+
+```text
+4 new Draft-2020-12 contracts
+Codex live acceptance       1 positive / 12 mutations
+GitHub reversible canary    1 / 6
+Herdr lifecycle             2 / 7
+source-claim compiler       4 source kinds / 11 mutations
+source compiler → existing problem-closure checker integration
+Local Handoff Queue schema + semantic assertion
+```
+
+The queue is bound to the immutable integration checkpoint, not to a mutable PR head. It sequences runtime-only work as Codex live execution → Herdr observation → GitHub reversible canary and requires a durable receipt before each next item.
+
+Current evidence ceiling before live execution:
+
+```text
+Codex live carrier mechanism             IMPLEMENTED_CANDIDATE / runtime NOT_EXERCISED
+GitHub reversible canary mechanism       IMPLEMENTED_CANDIDATE / remote NOT_EXERCISED
+Herdr lifecycle carrier                  IMPLEMENTED_CANDIDATE / runtime NOT_EXERCISED
+source compiler                          IMPLEMENTED_CANDIDATE / source truth EVIDENCE_DEPENDENT
+#473 deterministic convergence           pending exact-head hosted validation
+Human Admit / merge / release            NOT_PERFORMED
+```
+
+A future runtime receipt must bind the exact subject it observed. It cannot inherit PASS from #455/#473 CI, and #473 ancestry cannot admit #455 or any leaf. Mutable #473 state is always read live from GitHub.
