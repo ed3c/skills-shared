@@ -8,31 +8,53 @@ This Skill does not replace Spatial Loop, Tech Lead, Git Town, GitHub/Git, verif
 
 1. `AGENTS.md`
 2. `SKILL.md`
-3. `references/TRACE_GRAPH_CONTRACT.md`
-4. `references/SYSTEM_PROMPT_V7_2_DELTA.md`
-5. Spatial Loop ICPG reference/schema/checker
-6. Tech Lead case obligations/task DAG
-7. Git Town Molecular Stack index
-8. exact current external artifact subjects and receipts
+3. `references/SYSTEM_PROMPT_V7_2.md` — complete reusable Zettelkasten v7.2 system prompt
+4. `references/SHADOW_REVIEW_V7_2.md` — Shadow Architect design review and remaining executable risks
+5. `references/TRACE_GRAPH_CONTRACT.md`
+6. `references/intent-projection.schema.json`
+7. `references/artifact-projection.schema.json`
+8. `references/trace-graph.schema.json`
+9. `references/IMPLEMENTATION_PREFLIGHT.md`
+10. `references/NEGATIVE_CONTROL_MATRIX.md`
+11. Spatial Loop ICPG reference/schema/checker
+12. Tech Lead case obligations/task DAG
+13. Git Town Molecular Stack index
+14. exact current external artifact subjects and receipts
+
+`references/SYSTEM_PROMPT_V7_2_DELTA.md` remains a maintenance/history aid. A fresh Agent must not need to compose v7.1 + delta manually; `SYSTEM_PROMPT_V7_2.md` is the canonical complete prompt artifact for this branch.
 
 ## Directory map → State Machine ownership
 
 ```text
 skills/intent-to-evidence-knowledge-graph/
 ├── AGENTS.md
-│   └── Agent read order, authority/freshness/evidence stop conditions
+│   └── Agent read order, prompt ownership, authority/freshness/evidence stop conditions
 ├── README.md
 │   └── State Machine, DAG, data flow, issue/Stack ownership and evidence ceiling
 ├── SKILL.md
 │   └── portable projection/traversal laws
 └── references/
+    ├── SYSTEM_PROMPT_V7_2.md
+    │   └── complete reusable Evidence-First + Intent-to-Evidence Graph system prompt
+    ├── SHADOW_REVIEW_V7_2.md
+    │   └── independent architecture/design review and executable residual risks
     ├── TRACE_GRAPH_CONTRACT.md
     │   └── node classes, edge types, authority classes, freshness and proof propagation
-    └── SYSTEM_PROMPT_V7_2_DELTA.md
-        └── v7.1 → v7.2 knowledge-compiler additions without duplicating ICPG truth
+    ├── SYSTEM_PROMPT_V7_2_DELTA.md
+    │   └── v7.1 → v7.2 maintenance delta; not the canonical runtime prompt
+    ├── intent-projection.schema.json
+    │   └── Intent → exact ICPG digest/case IDs contract
+    ├── artifact-projection.schema.json
+    │   └── external artifact identity/authority/freshness/evidence projection contract
+    ├── trace-graph.schema.json
+    │   └── exact typed trace and Git-topology relation contract
+    ├── IMPLEMENTATION_PREFLIGHT.md
+    │   └── Tech Lead terminal packets, relation classes and stage boundary
+    └── NEGATIVE_CONTROL_MATRIX.md
+        └── required deterministic false-ancestry/freshness/authority/evidence controls
 ```
 
-Planned deterministic schemas/checkers/mutations are owned by #414–#416 and remain `NOT_IMPLEMENTED` until their exact bytes exist.
+The full prompt and machine schemas now exist. Deterministic checker/runtime validation and mutation execution remain owned by #414–#416 and are not implied by file presence.
 
 ## Primary State Machine
 
@@ -50,7 +72,9 @@ SOURCE_OR_ARTIFACT_BOUND
 → EVIDENCE_CEILING_PROPAGATED
 → GRAPH_QUERY_ROUTES_READY
 → SHADOW_GRAPH_REVIEW
-→ READY_FOR_DETERMINISTIC_GATE
+→ SYSTEM_PROMPT_V7_2_DESIGNED
+→ MACHINE_SCHEMAS_PRESENT
+→ READY_FOR_DETERMINISTIC_CHECKER_IMPLEMENTATION
 → LIVE_RETRIEVAL_NOT_EXERCISED
 ```
 
@@ -97,31 +121,34 @@ The semantic graph and delivery graph are joined by typed bridges. A semantic re
 └─ #408/#409/#410 deterministic ICPG + monitor + Tech Lead ownership preparation
    └─ PR #412 draft exact implementation candidate
       └─ #413 Knowledge Graph integration program consumes ICPG candidate contract
-         ├─ #414 projection schemas + ICPG bridge
-         ├─ #415 case→task→issue→Stack/document binding
-         ├─ #416 authority-aware traversal + reverse-trace checker
-         └─ #417 v7.2 prompt/docs/Molecular convergence
+         └─ PR #419 portable method + trace contract
+            └─ PR #420 #414 machine contracts + complete v7.2 prompt
+               ├─ #414 deterministic checker/mutations next
+               ├─ #415 case→task→issue→Stack/document binding
+               ├─ #416 authority-aware traversal + reverse-trace checker
+               └─ #417 final prompt/docs/Molecular convergence
 
 #411 live continuous Spatial Shadow       EXTERNAL_EVIDENCE / PROCESS_DEPENDENCY
 #418 live multi-hop GraphRAG/Shadow canary EXTERNAL_EVIDENCE / PROCESS_DEPENDENCY
 ```
 
-#414–#416 are logical work packets; their Git relation must be chosen from actual consumed unmerged artifacts, not from issue numbering. #417 is the convergence/index owner after prerequisite artifact identities stabilize.
+Issue order is not Git ancestry. #415/#416 remain siblings unless their implementation actually consumes another leaf's unmerged bytes/contracts. #417 is the one convergence/index owner after terminal artifact identities stabilize.
 
 ## Molecular Stack decomposition
 
 ```text
-PR #412  ICPG contract/Shadow/Tech Lead ownership preparation [PARENT BY UNMERGED CONTRACT]
-└─ K1 #414  Intent + Artifact projection contract
-   ├─ K2 #415 implementation/Issue/Stack/AGENTS bridge     sibling or child only if K1 bytes consumed
-   └─ K3 #416 traversal/authority/reverse-trace controls  sibling or child only if K1/K2 bytes consumed
-      ↓ verified artifacts
-   K4 #417 one documentation/system-prompt/index convergence owner
+PR #412 ICPG contract/Shadow/Tech Lead ownership preparation
+└─ PR #419 KG-C1/D1 portable Knowledge Graph contract
+   └─ PR #420 KG-C2/P1 #414 machine schemas + complete v7.2 prompt
+      ├─ KG-E1 #414 deterministic checker/mutation implementation
+      ├─ KG-K1/E2 #415 case→task/issue→Stack/AGENTS binding
+      ├─ KG-K2/E3 #416 traversal/authority/freshness/reverse-trace controls
+      └─ KG-D2/X1 #417 one convergence owner after exact artifacts stabilize
 
-#418 live retrieval canary = EXTERNAL_EVIDENCE, no Stack paths unless a later repair issue is opened.
+#418 live retrieval canary = EXTERNAL_EVIDENCE / PROCESS_DEPENDENCY.
 ```
 
-Terminal leaves must own disjoint paths or explicitly consume parent contracts. Documentation/index work does not silently absorb implementation paths.
+A future implementation becomes `TRUE_CHILD` only when it consumes an unmerged parent artifact. Documentation/index convergence never manufactures ancestry.
 
 ## End-to-end data flow
 
@@ -191,20 +218,58 @@ UNKNOWN_BLOCKING case
 → blocked Intent closure
 ```
 
+## Shadow Architect design verdict
+
+`references/SHADOW_REVIEW_V7_2.md` currently records:
+
+```text
+FULL_V7_2_SYSTEM_PROMPT                  PASS_AS_DESIGN_ARTIFACT
+V7_1_SEMANTIC_BASELINE                   PRESERVED
+ICPG_NON_DUPLICATION                     SPECIFIED
+INTENT_TO_EVIDENCE_TRACE                 SPECIFIED
+AUTHORITY/FRESHNESS/EVIDENCE_CEILING     SPECIFIED
+BIDIRECTIONAL_GRAPH_TRAVERSAL            SPECIFIED
+DETERMINISTIC_CHECKER                    NOT_IMPLEMENTED
+MUTATION_EXECUTION                       NOT_EXERCISED
+LIVE_GRAPHRAG_SHADOW                     NOT_EXERCISED
+HUMAN_ADMIT                              REQUIRED
+```
+
+Design PASS is not execution PASS.
+
 ## Evidence ceiling
 
-Current program state at creation of this branch:
+Current branch state:
 
 ```text
 Spatial ICPG contract/checker/routes              IMPLEMENTED_ON_PARENT_PR_412
 Spatial Shadow/static prompt projection            IMPLEMENTED_ON_PARENT_PR_412
 Tech Lead ICPG denominator/ownership gate          IMPLEMENTED_ON_PARENT_PR_412
-Knowledge Graph issues #413–#418                  CREATED
-Knowledge Graph AGENTS/README/SKILL/contracts     IMPLEMENTATION_IN_PROGRESS
-Knowledge Graph deterministic schema/checker       NOT_IMPLEMENTED
+Knowledge Graph portable method/trace contract     IMPLEMENTED_ON_PR_419
+Complete Zettelkasten v7.2 system prompt           IMPLEMENTED_ON_PR_420
+Intent/Artifact/Trace machine schemas              IMPLEMENTED_ON_PR_420
+Shadow v7.2 design review                           IMPLEMENTED_ON_PR_420
+Deterministic semantic checker                     NOT_IMPLEMENTED
+Negative mutation execution                        NOT_EXERCISED
 Live GraphRAG multi-hop canary                      NOT_EXERCISED / #418
 Live continuous Spatial Shadow                      NOT_EXERCISED / #411
 merge/release/promotion                             HUMAN_ADMIT_REQUIRED
 ```
 
 Do not lift these states based on documentation presence.
+
+## Next deterministic frontier
+
+No additional prompt redesign is required before executable work unless a checker/mutation exposes a contract defect.
+
+```text
+complete v7.2 prompt + schemas
+→ deterministic schema validation
+→ semantic trace checker
+→ negative controls
+→ exact-head deterministic receipt
+→ #415/#416 terminal implementation leaves
+→ #417 convergence
+→ #418 live GraphRAG/Shadow canary
+→ Human Admit
+```
