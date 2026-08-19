@@ -16,13 +16,13 @@ Skill canary                                  REMOTE_SKILL_SUITE_VERIFIED
 ordinary-repository canary                    REMOTE_REPOSITORY_VERIFIED
 whole-subject Skill Suites / shared infra     REMOTE_REPOSITORY_CI_VERIFIED
 UCR-X/D shared convergence                    REMOTE_INTEGRATION_VERIFIED
-current-main landing / PR #477                PR_DRAFT / REVERIFY_CURRENT_MAIN
+current-main landing / PR #477                MERGED / MAIN_ADMITTED
 Golden Refactor promotion                     HOLD_UNMERGED
 live provider / production                    NOT_EXERCISED
 release / promotion / rollback                HUMAN_ADMIT_REQUIRED
 ```
 
-The canary ledger under `evals/canaries/` records issue/PR/workflow identities without embedding mutable open PR head SHAs as durable truth. Mutable landing state is read from GitHub; this README records only the stable routing identity.
+The canary ledger under `evals/canaries/` records issue/PR/workflow identities without embedding mutable open PR head SHAs as durable truth. The admitted landing is PR #477 at merge commit `2bf90d7182d42dfc3a908ffa68d7ea4b26898042`; current remote state remains GitHub authority.
 
 ## Read order
 
@@ -124,7 +124,7 @@ The current program is a fan-out/fan-in graph, not a fake linear Stack:
                                                    └─→ #398 / PR #477  current-main landing
 ```
 
-PR #477 is deliberately rebuilt on the then-current admitted `main` rather than importing the stale UCR branch ancestry. The landing preserves the independently admitted #375–#379 Tech Lead/Shadow/Codex control-plane bytes and revalidates the combined exact subject before checked-head merge.
+PR #477 was deliberately rebuilt on the then-current admitted `main` rather than importing stale UCR branch ancestry, then converged with the later #475 post-merge traceability closure. Its exact checked head `1442629313091f0e1a08221bfe058f2bbe21a971` passed all required hosted gates and independent same-subject Shadow review before GitHub merged it as `2bf90d7182d42dfc3a908ffa68d7ea4b26898042`.
 
 Independent support/evidence leaves discovered by the canaries stay outside the semantic ancestry:
 
@@ -165,6 +165,8 @@ git-town-stacked-pr-worker delivery graph
 remote receipts / Local Handoff / Human Admit
         ↓
 current-main semantic union / exact-head revalidation / checked-head merge
+        ↓
+main@2bf90d7182d42dfc3a908ffa68d7ea4b26898042
 ```
 
 Adapters may add constraints or reduce authority. They never decide simplification, hide a consumer, turn missing/live evidence into PASS, or copy consumer mutable state into the portable core.
@@ -231,11 +233,11 @@ private repository evidence
 hardware/device/session-bound verification
 production or secret-bearing environment
 real Git Town local worktree execution unavailable to the current carrier
-Human semantic conflict, merge, release, promotion or rollback admission
+Human semantic conflict, release, promotion or rollback admission
 ```
 
 A handoff records exact subject, required command/oracle, expected receipt, blocker and authority owner. It does not mark the missing lane PASS.
 
 ## Completion rule
 
-A repository or Skill refactor is not closed because code became shorter or tests are green. Closure requires exact-subject capability preservation, admitted entropy/root-cause evidence, independent Shadow review, matched proof at the claimed layer, strict non-LOC Complexity Delta, residue/regression proof, and delivery state appropriate to the claim. Unseen domains, live production, release and promotion remain separate claims; merge state is read from the forge rather than inferred from this document.
+A repository or Skill refactor is not closed because code became shorter or tests are green. Closure requires exact-subject capability preservation, admitted entropy/root-cause evidence, independent Shadow review, matched proof at the claimed layer, strict non-LOC Complexity Delta, residue/regression proof, and delivery state appropriate to the claim. The #398 programme merge is proven by PR #477 and merge commit `2bf90d7182d42dfc3a908ffa68d7ea4b26898042`; unseen domains, live production, release and promotion remain separate claims.
