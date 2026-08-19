@@ -1,0 +1,93 @@
+{
+  "schema_version": "universal-refactor/program-trace/v1",
+  "epic": "ed3c/skills-shared#398",
+  "nodes": [
+    {
+      "id": "UCR-C",
+      "issue": "ed3c/skills-shared#399",
+      "pull_request": "ed3c/skills-shared#405",
+      "stack_class": "ROOT_CONTRACT",
+      "evidence_state": "IMPLEMENTED",
+      "provides": ["controller-contract/v1", "complexity-delta/v1"]
+    },
+    {
+      "id": "UCR-K-E",
+      "issue": "ed3c/skills-shared#400",
+      "pull_request": "ed3c/skills-shared#441",
+      "stack_class": "SIBLING",
+      "evidence_state": "LOCAL_DETERMINISTIC_VERIFIED",
+      "provides": ["composition-gate", "false-simplification-controls"]
+    },
+    {
+      "id": "UCR-A",
+      "issue": "ed3c/skills-shared#401",
+      "pull_request": "ed3c/skills-shared#442",
+      "stack_class": "SIBLING",
+      "evidence_state": "STATIC_CONTRACT_VERIFIED",
+      "provides": ["SkillTargetAdapter", "RepositoryTargetAdapter"]
+    },
+    {
+      "id": "UCR-LIVE",
+      "issue": "ed3c/skills-shared#402",
+      "pull_request": "ed3c/skills-shared#458",
+      "stack_class": "MULTI_PARENT_CONVERGENCE",
+      "evidence_state": "BOUNDED_CROSS_DOMAIN_REMOTE_VERIFIED",
+      "provides": ["Skill-canary", "ordinary-repository-canary"]
+    },
+    {
+      "id": "UCR-LIVE-VALIDATION",
+      "issue": "ed3c/skills-shared#402",
+      "pull_request": "ed3c/skills-shared#461",
+      "stack_class": "VALIDATION_ONLY",
+      "evidence_state": "REMOTE_REPOSITORY_CI_VERIFIED",
+      "provides": ["whole-subject-Skill-Suites", "shared-infra-receipt"]
+    },
+    {
+      "id": "UCR-X-D",
+      "issue": "ed3c/skills-shared#406",
+      "pull_request": "ed3c/skills-shared#462",
+      "stack_class": "CONVERGENCE_DOCUMENTATION",
+      "evidence_state": "PR_DRAFT",
+      "provides": ["registry", "CI-arrival", "Agent-routes", "README-State-Machine", "canary-corpus", "Stack-index"]
+    },
+    {
+      "id": "ENTROPY-CI-REPAIR",
+      "issue": "ed3c/skills-shared#459",
+      "pull_request": "ed3c/skills-shared#460",
+      "stack_class": "PROCESS_DEPENDENCY",
+      "evidence_state": "REMOTE_SKILL_SUITE_VERIFIED",
+      "provides": ["schema-valid-positive-entropy-fixture"]
+    },
+    {
+      "id": "ORDINARY-CANARY",
+      "issue": "ed3c/blackbox-auto-research#62",
+      "pull_request": "ed3c/blackbox-auto-research#63",
+      "stack_class": "EXTERNAL_EVIDENCE",
+      "evidence_state": "REMOTE_REPOSITORY_VERIFIED",
+      "provides": ["ordinary-repository-complexity-delta"]
+    },
+    {
+      "id": "ORDINARY-CANARY-VALIDATION",
+      "issue": "ed3c/blackbox-auto-research#62",
+      "pull_request": "ed3c/blackbox-auto-research#66",
+      "stack_class": "EXTERNAL_EVIDENCE",
+      "evidence_state": "REMOTE_REPOSITORY_VERIFIED",
+      "provides": ["exact-combined-verify-receipt"]
+    }
+  ],
+  "edges": [
+    {"from": "UCR-C", "to": "UCR-K-E", "relation": "CONTRACT_PARENT"},
+    {"from": "UCR-C", "to": "UCR-A", "relation": "CONTRACT_PARENT"},
+    {"from": "UCR-K-E", "to": "UCR-LIVE", "relation": "CONSUMED_BY_CONVERGENCE"},
+    {"from": "UCR-A", "to": "UCR-LIVE", "relation": "CONSUMED_BY_CONVERGENCE"},
+    {"from": "UCR-LIVE", "to": "UCR-LIVE-VALIDATION", "relation": "VALIDATED_BY"},
+    {"from": "ENTROPY-CI-REPAIR", "to": "UCR-LIVE-VALIDATION", "relation": "PROCESS_DEPENDENCY"},
+    {"from": "ORDINARY-CANARY", "to": "ORDINARY-CANARY-VALIDATION", "relation": "VALIDATED_BY"},
+    {"from": "UCR-LIVE-VALIDATION", "to": "UCR-X-D", "relation": "EVIDENCE_PARENT"},
+    {"from": "ORDINARY-CANARY-VALIDATION", "to": "UCR-X-D", "relation": "EXTERNAL_EVIDENCE"}
+  ],
+  "evidence_boundary": {
+    "verified": ["bounded Skill transfer", "bounded ordinary-repository transfer", "repository CI compatibility for recorded validation subjects"],
+    "not_proven": ["unseen domains", "live provider/model uplift", "production safety", "real Git Town local worktree execution", "merge", "release", "promotion", "rollback"]
+  }
+}
