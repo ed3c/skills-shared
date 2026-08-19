@@ -1,0 +1,37 @@
+{
+  "schema_version": "wave3-git-town-admission-projection/v1",
+  "authoritative": false,
+  "canonical_route": "docs/traceability/WAVE3_ADMISSION.md",
+  "repository": "ed3c/skills-shared",
+  "programme": "issues-464-468-wave3-live-evidence",
+  "fork_parent": {
+    "kind": "HISTORICAL_TRUE_PARENT",
+    "commit": "847e56c3418fce920c42d983e84ee44fdc6e8971"
+  },
+  "consumed_leaf_heads": [
+    "d239d17d1d718f3e5e8c1975307665cae43d3b09",
+    "f4c3215b6c52c2e6106070eaa1121dee1dbd48e3",
+    "9eb70b2b62193b62a28f243de91e51337f1906b3",
+    "44d779a02e1749aa88a502d946646c22af38a026"
+  ],
+  "convergence": {
+    "issue": 468,
+    "pull_request": 480,
+    "checked_head": "8a33b9b3994a39e4ebb220a06fe17e33812661f0",
+    "merge_commit": "dd86861972f41f6d36c3de7ac156358ed5fae9d5",
+    "relation": "CONVERGENCE",
+    "terminal_state": "HUMAN_ADMITTED_MERGED"
+  },
+  "rejected_history": [
+    {
+      "pull_request": 473,
+      "state": "REJECTED_BY_COMMIT_ROLE"
+    },
+    {
+      "commit": "1eae9b4752ecb7b63520ba8c0712e6f8149d97b5",
+      "state": "HISTORICAL_AFTER_MAIN_DRIFT"
+    }
+  ],
+  "evidence_ceiling": "STATIC_DETERMINISTIC_INFRASTRUCTURE_ONLY",
+  "note": "Git Town projection only. It records terminal relation/state and never grants merge, release, provider, or live-evidence authority."
+}
