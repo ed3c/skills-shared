@@ -344,3 +344,83 @@ A static prompt, schema, Stack graph, deterministic test or hosted workflow cann
 - integrate GitHub publication and merge gates;
 - plant conflict, dirty, ancestry, timeout, false-child, stale-head and publication controls;
 - keep semantic conflict, force push, ship, merge, release and promotion Human-owned.
+
+## Wave-3 Codex control-plane Molecular terminal index — #464–#468
+
+Wave 3 is a real TRUE_CHILD fan-out from the unmerged #455 control-plane convergence. The four leaves consume #455 bytes but do not consume each other, so they remain siblings of one another.
+
+```text
+#455 / ctl/379-codex-control-plane-convergence
+├── #464 / PR #469  Codex live-acceptance carrier        TRUE_CHILD
+├── #465 / PR #470  GitHub dependency reversible canary TRUE_CHILD
+├── #466 / PR #471  Herdr lifecycle carrier             TRUE_CHILD
+└── #467 / PR #472  source-claim compiler               TRUE_CHILD
+       \             |             |             /
+        \____________|_____________|____________/
+                     ↓ exact selected bytes
+              #468 / PR #473        CONVERGENCE
+                     ↓
+         deterministic gates + Shadow
+                     ↓
+        runtime Local Handoff Queue
+                     ↓
+          EXTERNAL_EVIDENCE lanes
+```
+
+Immutable byte-integration checkpoint for the four selected leaves:
+
+```text
+691b342c44c9c6c4e61a9997e778ae4ed6e920d5
+parents:
+  847e56c3418fce920c42d983e84ee44fdc6e8971  #455 true parent
+  d239d17d1d718f3e5e8c1975307665cae43d3b09  #469 selected leaf
+  f4c3215b6c52c2e6106070eaa1121dee1dbd48e3  #470 selected leaf
+  9eb70b2b62193b62a28f243de91e51337f1906b3  #471 selected leaf
+  44d779a02e1749aa88a502d946646c22af38a026  #472 selected leaf
+```
+
+| Atom | Issue / PR | Relation | True parent | Owns/provides | Deterministic gate | Runtime ceiling | Successor |
+|---|---|---|---|---|---|---|---|
+| `L-CODEX` | `#464 / #469` | `TRUE_CHILD + sibling` | `#455@847e56c3...` | `compile_codex_live_acceptance.py`, dedicated selftest; binds real SDK result to controller source/diff/test receipt | `1 positive / 12 mutations` | live Codex remains `NOT_EXERCISED`; emitted live receipt still Shadow-pending | `#468` |
+| `L-GH-CANARY` | `#465 / #470` | `TRUE_CHILD + sibling` | `#455@847e56c3...` | reversible one-edge GitHub dependency canary + ownership/cleanup controls | `1 / 6` | remote canary `NOT_EXERCISED`; unexpected drift refuses destructive cleanup | `#468` |
+| `L-HERDR` | `#466 / #471` | `TRUE_CHILD + sibling` | `#455@847e56c3...` | bounded Herdr lifecycle carrier over existing observer | `2 / 7` | live Herdr remains `NOT_EXERCISED`; `DONE_CANDIDATE` stays advisory | `#468` |
+| `L-SOURCE` | `#467 / #472` | `TRUE_CHILD + sibling` | `#455@847e56c3...` | immutable Issue/Article/PDF/PRD compiler into existing problem-closure model | `4 source kinds / 11 mutations` | source truth/applicability/provider verification remain `EVIDENCE_DEPENDENT` | `#468` |
+| `X-LIVE` | `#468 / #473` | `CONVERGENCE` | selected #469–#472 + #455 | 4 live-evidence schemas, shared `run-all`, Agent routes, Shadow, traceability, Git Town index, Local Handoff Queue | final exact head owns aggregate gate | no live lane promoted by static CI; merge/release remain Human-owned | Human/runtime evidence |
+
+Path/resource lease law for this wave:
+
+```text
+#469 owns only Codex live carrier + dedicated test
+#470 owns only GitHub live-canary carrier + dedicated test
+#471 owns only Herdr lifecycle carrier + dedicated test
+#472 owns only source-claim compiler + dedicated test
+#473 alone owns shared contracts/run-all/README/AGENTS/Shadow/Git-Town/traceability/queue
+```
+
+The four leaf PRs target `ctl/379-codex-control-plane-convergence`, proving the true unmerged parent relation. #473 may have a multi-parent convergence commit to record exact selected bytes. That ancestry does not admit #455 or any leaf and does not mean live execution happened.
+
+Wave-3 deterministic denominator after convergence:
+
+```text
+Wave 2 schemas/selftests remain mandatory
++ 4 Wave-3 Draft-2020-12 contracts
++ Codex live acceptance       1 / 12
++ GitHub reversible canary    1 / 6
++ Herdr lifecycle             2 / 7
++ source-claim compiler       4 source kinds / 11 mutations
++ source compiler → existing problem-closure checker integration
++ asserted Local Handoff Queue bound to 691b342c...
+```
+
+Runtime/Human boundaries remain explicit:
+
+```text
+signed-in Codex execution + controller readback     LOCAL_RUNTIME / EXTERNAL_EVIDENCE
+Herdr lifecycle observation                         LOCAL_RUNTIME / EXTERNAL_EVIDENCE
+GitHub reversible fixture canary                    REMOTE_RUNTIME / EXTERNAL_EVIDENCE
+real article/PDF/PRD truth and applicability        EVIDENCE_DEPENDENT
+semantic conflict / unmanaged remote mutation       HUMAN
+merge / release / promotion / rollback              HUMAN / repository policy
+```
+
+A green #473 hosted suite may establish only static/deterministic Wave-3 integration. It cannot turn any `NOT_EXERCISED` or `EVIDENCE_DEPENDENT` lane into PASS. Mutable #473 head is read live from GitHub; do not self-embed it here.

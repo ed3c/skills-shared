@@ -123,3 +123,41 @@ This closes deterministic convergence coverage only. Live Codex, GitHub mutation
 64  usage, JSON, or required input was invalid/absent where supported
 70  validator, schema, or assertion mechanism was unavailable/invalid where supported
 ```
+
+## Wave 3 live-evidence carriers — #464–#467
+
+These scripts consume the Wave-2 adapters/checkers. They do not replace them and they do not own the Tech Lead semantic DAG.
+
+### `compile_codex_live_acceptance.py` — #464
+
+Binds an actual `run_codex_sdk_worker.py` runtime result to controller-owned source/diff/test readback. It accepts only `sdk_execution=EXERCISED`, `lease_readback=PASS`, a completed turn, exact task/attempt/repo/base/tree identities, exact changed-file denominator, and successful digest-bound controller verification commands. Output remains Shadow-pending.
+
+Raw model prose, prompt bytes, private reasoning, auth material, tokens, credentials and API keys are forbidden durable input fields.
+
+### `github_issue_dag_live_canary.py` — #465
+
+Owns a single reversible test edge only when both fixture issues are OPEN and carry the declared canary ownership label. It freezes repository identity and the complete original `blockedBy` denominator, adds exactly one edge, reads it back, removes only that edge, and proves the original denominator is restored. Unexpected drift and cleanup failure are terminal.
+
+Static invocation reports `NOT_EXERCISED`; only explicit `--execute` can produce a remote-canary candidate.
+
+### `collect_herdr_lifecycle.py` — #466
+
+Reuses `herdr_runtime_observer.py` over a bounded sample window. Task/attempt/repo/Git/worktree/target plus pane/workspace/PID-start/native-session identity must remain stable; source timestamps cannot regress; nonterminal states require a live process; terminal state requires `CLEAN`/zero residue; no state may follow terminal. `UNAVAILABLE_FALLBACK` is preserved as non-success.
+
+### `compile_source_claims.py` — #467
+
+Converts exact GitHub Issue / ARTICLE / PDF / PRD source records into the existing #378 problem-closure ledger. GitHub issues require `owner/repo#number`; external documents require immutable `sha256:<64hex>` identity plus exact locator. It computes per-claim and complete source-manifest digests, preserves NOT_APPLICABLE/SUPERSEDED rows, and emits no invented verification, receipt, or merge evidence.
+
+## Wave-3 shared gate — #468
+
+`../tests/run-all.sh` now extends the denominator to:
+
+```text
+10 Draft-2020-12 control-plane schemas
+Wave 2 selftests: 4/14 + 6/17 + 4/18 + 6/22
+Wave 3 selftests: 1/12 + 1/6 + 2/7 + 4-source/11
+source-claims example → compile_source_claims.py → check_problem_closure.py
+wave3-live-handoff-queue.json → assert_local_handoff_queue.py
+```
+
+No Wave-3 deterministic command calls live Codex, live Herdr, or remote GitHub mutation. A green shared gate proves the carrier/checker integration only; it cannot raise the runtime evidence ceiling.

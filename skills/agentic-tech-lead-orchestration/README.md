@@ -334,3 +334,130 @@ sh tests/run-all.sh
 ```
 
 A local or CI PASS validates only the named subject and evidence layer. Provider installation, index freshness, live Codex/Herdr/GitHub mutation, real source closure, real queue execution, Git Town/Forgejo delivery, sibling admission, merge, release, and production remain separate.
+
+## Wave 3 — live-evidence infrastructure (#464–#468)
+
+Detailed trace: [`../../docs/traceability/WAVE3_LIVE_EVIDENCE.md`](../../docs/traceability/WAVE3_LIVE_EVIDENCE.md).
+
+Wave 3 is a real dependent layer above the unmerged #455 control-plane convergence. Every Wave-3 implementation leaf consumes #455 bytes, so each is a `TRUE_CHILD` of #455. The four leaves remain path-disjoint `SIBLING`s of each other; only #468 writes shared gates/routes/indexes.
+
+```text
+#455 / #379  STATIC_CONTROL_PLANE_READY   TRUE_PARENT
+│
+├── #464 / PR #469  Codex live acceptance carrier       TRUE_CHILD / SIBLING
+├── #465 / PR #470  GitHub DAG reversible live canary   TRUE_CHILD / SIBLING
+├── #466 / PR #471  Herdr lifecycle carrier             TRUE_CHILD / SIBLING
+└── #467 / PR #472  immutable source-claim compiler     TRUE_CHILD / SIBLING
+        │
+        └── exact selected leaf bytes
+                    ↓
+#468 / PR #473  LIVE_EVIDENCE_CONVERGENCE
+```
+
+Immutable integration checkpoint:
+
+```text
+commit 691b342c44c9c6c4e61a9997e778ae4ed6e920d5
+tree   ba6ef27631546af466284f44af7c81cd347765dd
+```
+
+### Wave-3 directory map
+
+```text
+references/contracts/
+├── codex-live-acceptance-receipt.schema.json     #468 / #464 output
+├── github-dag-live-canary-receipt.schema.json    #468 / #465 output
+├── herdr-lifecycle-receipt.schema.json           #468 / #466 output
+└── source-claims-input.schema.json                #468 / #467 input
+
+references/examples/source-claims.example.json    #468 cross-check fixture
+references/wave3-live-handoff-queue.json           #468 zero-context runtime continuation
+
+scripts/
+├── compile_codex_live_acceptance.py               #464
+├── github_issue_dag_live_canary.py                #465
+├── collect_herdr_lifecycle.py                     #466
+└── compile_source_claims.py                       #467
+
+tests/
+├── codex_live_acceptance_selftest.py              #464 1/12
+├── github_issue_dag_live_canary_selftest.py       #465 1/6
+├── herdr_lifecycle_selftest.py                    #466 2/7
+├── source_claim_compiler_selftest.py              #467 4 kinds/11
+└── run-all.sh                                      #468 shared denominator
+```
+
+### Wave-3 State Machine
+
+```text
+STATIC_CONTROL_PLANE_READY
+→ EXACT_#455_PARENT_BOUND
+→ LIVE_EVIDENCE_CARRIER_SELECTED
+    ├── CODEX_RUNTIME_RESULT
+    │   → LEASE_READBACK
+    │   → CONTROLLER_SOURCE_DIFF_TEST_READBACK
+    │   → SHADOW_PENDING_LIVE_CANDIDATE
+    ├── GITHUB_CANARY_PREFLIGHT
+    │   → ONE_OWNED_EDGE_ADD
+    │   → EXACT_READBACK
+    │   → ONE_OWNED_EDGE_REMOVE
+    │   → ORIGINAL_DENOMINATOR_RESTORED
+    ├── HERDR_BOUNDED_LIFECYCLE
+    │   → IDENTITY_STABLE
+    │   → FRESHNESS_LIVENESS_STABLE
+    │   → CLEAN_TERMINAL | UNAVAILABLE_FALLBACK
+    └── IMMUTABLE_SOURCE_CLAIMS
+        → PER_CLAIM_DIGEST
+        → COMPLETE_MANIFEST_DIGEST
+        → EXISTING_PROBLEM_CLOSURE_LEDGER
+→ SHARED_WAVE3_CONVERGENCE
+→ 10_SCHEMA_GATE
+→ WAVE2_PLUS_WAVE3_MUTATION_DENOMINATOR
+→ SOURCE_COMPILER_TO_EXISTING_CLOSURE_CHECKER
+→ WAVE3_HANDOFF_QUEUE_ASSERTED
+→ EXACT_HEAD_HOSTED_GATES
+→ LOCAL_RUNTIME_HANDOFF | READY_FOR_HUMAN_ADMIT | HOLD | REJECT
+```
+
+### Wave-3 data flow
+
+```text
+#455 exact adapters/contracts
+→ #469/#470/#471/#472 isolated leaf bytes
+→ multi-parent #468 integration
+→ receipt/input schemas
+→ deterministic selftests
+→ shared run-all
+→ independent Shadow readback
+→ hosted repository gates
+→ unresolved runtime lanes
+    └── wave3-live-handoff-queue.json
+        ├── signed-in Codex runtime → controller acceptance receipt
+        ├── Herdr target → lifecycle receipt
+        └── owned GitHub fixture issues → reversible dependency receipt
+→ problem-closure reconciliation
+→ Human Admit boundary
+```
+
+### Wave-3 deterministic denominator and evidence ceiling
+
+```text
+Wave 2 retained:
+  Codex adapter       4 / 14
+  GitHub DAG          6 / 17
+  Herdr observer      4 / 18
+  closure ledger      6 / 22
+
+Wave 3 added:
+  Codex live binder   1 / 12
+  GitHub canary       1 / 6
+  Herdr lifecycle     2 / 7
+  source compiler     4 source kinds / 11 mutations
+
+Shape/integration:
+  10 Draft-2020-12 control-plane schemas
+  source example → compiler → existing closure checker
+  Wave-3 Local Handoff Queue assertion
+```
+
+All Wave-3 selftests are offline mechanism evidence. They do not prove live Codex SDK execution, GitHub remote mutation, Herdr process observation, article/PDF/provider truth, Human Admit, merge, release, or production safety. Only exact runtime receipts plus required controller/Shadow readback may raise those lanes.
