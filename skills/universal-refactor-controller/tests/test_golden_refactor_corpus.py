@@ -10,6 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 CANARY_ROOT = ROOT / "evals" / "canaries"
 SCHEMA = CANARY_ROOT / "golden-refactor-corpus.schema.json"
 INDEX = CANARY_ROOT / "golden-refactor-corpus.index.json"
+TRACE = ROOT / "references" / "ucr-program-trace.json"
 
 
 class GoldenRefactorCorpusTests(unittest.TestCase):
@@ -46,6 +47,47 @@ class GoldenRefactorCorpusTests(unittest.TestCase):
 
     def test_two_materially_different_target_classes_are_present(self) -> None:
         self.assertEqual({"SKILL", "REPOSITORY"}, {case["target_kind"] for case in self.index["cases"]})
+
+    def test_program_trace_is_acyclic_and_has_one_current_convergence_owner(self) -> None:
+        trace = json.loads(TRACE.read_text(encoding="utf-8"))
+        self.assertEqual("universal-refactor/program-trace/v1", trace["schema_version"])
+        ids = [node["id"] for node in trace["nodes"]]
+        self.assertEqual(len(ids), len(set(ids)))
+        known = set(ids)
+        graph: dict[str, list[str]] = {node_id: [] for node_id in ids}
+        for edge in trace["edges"]:
+            self.assertIn(edge["from"], known)
+            self.assertIn(edge["to"], known)
+            graph[edge["from"]].append(edge["to"])
+
+        visiting: set[str] = set()
+        visited: set[str] = set()
+
+        def visit(node: str) -> None:
+            self.assertNotIn(node, visiting, f"cycle through {node}")
+            if node in visited:
+                return
+            visiting.add(node)
+            for child in graph[node]:
+                visit(child)
+            visiting.remove(node)
+            visited.add(node)
+
+        for node_id in ids:
+            visit(node_id)
+
+        current = [
+            node for node in trace["nodes"]
+            if node["stack_class"] == "CONVERGENCE_DOCUMENTATION"
+            and node["evidence_state"] == "IMPLEMENTING"
+        ]
+        self.assertEqual(["UCR-X-D"], [node["id"] for node in current])
+
+    def test_program_trace_has_no_mutable_open_head_sha_fields(self) -> None:
+        trace = json.loads(TRACE.read_text(encoding="utf-8"))
+        forbidden = {"head", "head_sha", "candidate_head_sha", "open_pr_head_sha"}
+        for node in trace["nodes"]:
+            self.assertTrue(forbidden.isdisjoint(node), node["id"])
 
 
 if __name__ == "__main__":
