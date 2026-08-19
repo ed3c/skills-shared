@@ -24,12 +24,12 @@
     "no_double_graph": true
   },
   "case_obligations": {
-    "case_graph_ref": "feature/case-graph.json",
-    "case_graph_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
-    "required_case_ids": ["CASE-CONTRACT", "CASE-CORE"],
+    "case_graph_ref": "skills/spatial-loop-systems-engineering/tests/case-graph/fixtures/good.json",
+    "case_graph_sha256": "4b7f2afac3ceaf1572a9d4f55cd3c1b3f6eb42bccd1fc39725fc44caa7b1d052",
+    "required_case_ids": ["CASE-001", "CASE-002"],
     "branch_case_owners": [
-      {"branch": "feature/contract", "case_ids": ["CASE-CONTRACT"]},
-      {"branch": "feature/core", "case_ids": ["CASE-CORE"]}
+      {"branch": "feature/contract", "case_ids": ["CASE-001"]},
+      {"branch": "feature/core", "case_ids": ["CASE-002"]}
     ],
     "convergence_owner": "feature/core"
   },
