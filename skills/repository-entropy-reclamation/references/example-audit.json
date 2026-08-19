@@ -50,7 +50,7 @@
         {
           "kind": "TEST",
           "locator": "tests/session/test_stop.py",
-          "digest": "sha256:6666666666666666666666666666666666666666666666666666666666666"
+          "digest": "sha256:6666666666666666666666666666666666666666666666666666666666666666"
         }
       ]
     }
@@ -174,9 +174,9 @@
       [
         "python3",
         "-m",
-          "pytest",
-          "tests/session/test_controller.py",
-          "-q"
+        "pytest",
+        "tests/session/test_controller.py",
+        "-q"
       ],
       [
         "rg",
