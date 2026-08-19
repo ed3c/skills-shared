@@ -11,11 +11,14 @@ import argparse
 import hashlib
 import json
 from pathlib import Path, PurePosixPath
+import re
+import subprocess
 from typing import Any
 
 TERMINAL_STATES = {"completed", "failed", "interrupted"}
 FORBIDDEN_KEY_FRAGMENTS = ("api_key", "apikey", "access_token", "refresh_token", "credential", "secret")
 THREAD_POLICIES = {"new", "resume-compatible"}
+EXACT_SHA = re.compile(r"^[0-9a-f]{40}$")
 
 
 class ContractError(ValueError):
@@ -55,6 +58,65 @@ def _paths_overlap(left: str, right: str) -> bool:
     return a[:shorter] == b[:shorter]
 
 
+def _path_within(candidate: str, lease: str) -> bool:
+    c = _repo_path(candidate).parts
+    l = _repo_path(lease).parts
+    return len(c) >= len(l) and c[: len(l)] == l
+
+
+def _git(worktree: Path, *args: str, check: bool = True) -> str:
+    result = subprocess.run(
+        ["git", "-C", str(worktree), *args],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    if check and result.returncode:
+        detail = (result.stderr or result.stdout).strip()
+        raise ContractError(f"git {' '.join(args)} failed: {detail or result.returncode}")
+    return result.stdout.strip()
+
+
+def _validate_worktree_subject(worktree: Path, data: dict[str, Any]) -> None:
+    if not worktree.is_dir():
+        raise ContractError(f"worktree does not exist: {worktree}")
+    if _git(worktree, "rev-parse", "--is-inside-work-tree") != "true":
+        raise ContractError("worktree is not a Git worktree")
+    head = _git(worktree, "rev-parse", "HEAD")
+    tree = _git(worktree, "rev-parse", "HEAD^{tree}")
+    if head != data["base_sha"]:
+        raise ContractError(f"worktree HEAD drifted: expected {data['base_sha']} observed {head}")
+    if tree != data["tree_sha"]:
+        raise ContractError(f"worktree tree drifted: expected {data['tree_sha']} observed {tree}")
+    if _git(worktree, "status", "--porcelain=v1", "--untracked-files=all"):
+        raise ContractError("worktree must be clean before Codex execution")
+
+
+def _changed_paths(worktree: Path) -> list[str]:
+    paths: set[str] = set()
+    commands = (
+        ("diff", "--name-only", "-z", "HEAD"),
+        ("diff", "--cached", "--name-only", "-z", "HEAD"),
+        ("ls-files", "--others", "--exclude-standard", "-z"),
+    )
+    for args in commands:
+        raw = _git(worktree, *args)
+        if not raw:
+            continue
+        for path in raw.split("\0"):
+            if path:
+                paths.add(_repo_path(path).as_posix())
+    return sorted(paths)
+
+
+def _assert_lease_readback(data: dict[str, Any], changed_paths: list[str]) -> None:
+    for path in changed_paths:
+        if any(_path_within(path, ro) for ro in data["read_only_paths"]):
+            raise ContractError(f"read-only path changed: {path}")
+        if not any(_path_within(path, allowed) for allowed in data["allowed_paths"]):
+            raise ContractError(f"out-of-lease path changed: {path}")
+
+
 def validate_manifest(data: dict[str, Any]) -> None:
     required = {
         "task_id", "attempt_id", "repo", "base_sha", "tree_sha", "worktree",
@@ -69,8 +131,8 @@ def validate_manifest(data: dict[str, Any]) -> None:
         if not isinstance(data[field], str) or not data[field].strip():
             raise ContractError(f"{field} must be a non-empty string")
 
-    if len(data["base_sha"]) < 7 or len(data["tree_sha"]) < 7:
-        raise ContractError("base_sha/tree_sha must identify immutable git subjects")
+    if not EXACT_SHA.fullmatch(data["base_sha"]) or not EXACT_SHA.fullmatch(data["tree_sha"]):
+        raise ContractError("base_sha/tree_sha must be exact 40-hex immutable git subjects")
 
     for field in ("allowed_paths", "read_only_paths", "predecessor_receipts"):
         if not isinstance(data[field], list) or not all(isinstance(x, str) and x for x in data[field]):
@@ -124,6 +186,7 @@ def compile_static_receipt(data: dict[str, Any]) -> dict[str, Any]:
         "adapter_state": "STATIC_VALIDATED",
         "sdk_execution": "NOT_EXERCISED",
         "controller_readback_required": True,
+        "lease_readback": "NOT_EXERCISED",
         "evidence_ceiling": "STATIC_CONTRACT_ONLY",
     }
 
@@ -136,8 +199,7 @@ def execute(data: dict[str, Any]) -> dict[str, Any]:
     validate_manifest(data)
 
     worktree = Path(data["worktree"]).resolve()
-    if not worktree.is_dir():
-        raise ContractError(f"worktree does not exist: {worktree}")
+    _validate_worktree_subject(worktree, data)
 
     # Import only on the live path so static validation has no SDK dependency.
     from openai_codex import Codex, Sandbox  # type: ignore
@@ -170,6 +232,9 @@ def execute(data: dict[str, Any]) -> dict[str, Any]:
         status = _status_value(result.status)
         thread_id = thread.id
 
+    changed_paths = _changed_paths(worktree)
+    _assert_lease_readback(data, changed_paths)
+
     return {
         "schema_version": 1,
         "task_id": data["task_id"],
@@ -186,6 +251,8 @@ def execute(data: dict[str, Any]) -> dict[str, Any]:
         "adapter_state": "RUNTIME_RETURNED" if status in TERMINAL_STATES else "RUNTIME_NONTERMINAL",
         "sdk_execution": "EXERCISED",
         "controller_readback_required": True,
+        "lease_readback": "PASS",
+        "changed_files": changed_paths,
         "final_response_digest": _digest(result.final_response) if result.final_response else None,
         "evidence_ceiling": "RUNTIME_RESULT_ONLY",
     }

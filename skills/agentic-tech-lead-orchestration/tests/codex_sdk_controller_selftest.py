@@ -5,6 +5,8 @@ import copy
 import hashlib
 import importlib.util
 from pathlib import Path
+import subprocess
+import tempfile
 
 HERE = Path(__file__).resolve().parent
 SCRIPT = HERE.parent / "scripts" / "run_codex_sdk_worker.py"
@@ -47,8 +49,11 @@ mod.validate_manifest(m)
 r = mod.compile_static_receipt(m)
 assert r["sdk_execution"] == "NOT_EXERCISED"
 assert r["controller_readback_required"] is True
+assert r["lease_readback"] == "NOT_EXERCISED"
 assert "final_response" not in r
 
+must_fail(lambda d: d.update(base_sha="85e6723"))
+must_fail(lambda d: d.update(tree_sha="not-a-40-hex-subject"))
 must_fail(lambda d: d.update(prompt_digest="0" * 64))
 must_fail(lambda d: d["read_only_paths"].append(d["allowed_paths"][0]))
 must_fail(lambda d: d["read_only_paths"].append("skills/agentic-tech-lead-orchestration/scripts/private.py"))
@@ -63,4 +68,39 @@ resume["thread_policy"] = "resume-compatible"
 resume["resume_thread_id"] = "thread_123"
 mod.validate_manifest(resume)
 
-print("codex-sdk-controller selftest: PASS (positive=2 mutations=8 live=NOT_EXERCISED)")
+mod._assert_lease_readback(m, ["skills/agentic-tech-lead-orchestration/scripts/new.py"])
+try:
+    mod._assert_lease_readback(m, ["skills/agentic-tech-lead-orchestration/README.md"])
+except mod.ContractError:
+    pass
+else:
+    raise AssertionError("read-only mutation unexpectedly passed")
+try:
+    mod._assert_lease_readback(m, ["docs/outside.md"])
+except mod.ContractError:
+    pass
+else:
+    raise AssertionError("out-of-lease mutation unexpectedly passed")
+
+with tempfile.TemporaryDirectory() as td:
+    repo = Path(td)
+    subprocess.run(["git", "init", "-q", str(repo)], check=True)
+    subprocess.run(["git", "-C", str(repo), "config", "user.name", "fixture"], check=True)
+    subprocess.run(["git", "-C", str(repo), "config", "user.email", "fixture@example.invalid"], check=True)
+    (repo / "a.txt").write_text("a\n", encoding="utf-8")
+    subprocess.run(["git", "-C", str(repo), "add", "a.txt"], check=True)
+    subprocess.run(["git", "-C", str(repo), "commit", "-qm", "fixture"], check=True)
+    subject = copy.deepcopy(m)
+    subject["worktree"] = str(repo)
+    subject["base_sha"] = subprocess.check_output(["git", "-C", str(repo), "rev-parse", "HEAD"], text=True).strip()
+    subject["tree_sha"] = subprocess.check_output(["git", "-C", str(repo), "rev-parse", "HEAD^{tree}"], text=True).strip()
+    mod._validate_worktree_subject(repo, subject)
+    (repo / "outside.txt").write_text("x\n", encoding="utf-8")
+    try:
+        mod._validate_worktree_subject(repo, subject)
+    except mod.ContractError:
+        pass
+    else:
+        raise AssertionError("dirty worktree unexpectedly passed")
+
+print("codex-sdk-controller selftest: PASS (positive=4 mutations=14 live=NOT_EXERCISED)")
