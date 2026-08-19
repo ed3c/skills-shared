@@ -20,51 +20,28 @@ anything ran.
 from __future__ import annotations
 
 import argparse
-import json
 import sys
 from collections import Counter
 from pathlib import Path
 from typing import Any
 
-try:
-    from jsonschema import Draft202012Validator
-except ImportError:  # pragma: no cover - environment guard
-    print(
-        "HELD-OUT-CORPUS-RED validator-unavailable: jsonschema is required; "
-        "the checker refuses to skip schema validation",
-        file=sys.stderr,
-    )
-    raise SystemExit(70)
+from _json_schema_validation import (
+    load_json_document,
+    require_draft202012_validator,
+    schema_errors as shared_schema_errors,
+)
 
 SCHEMA_INVALID = 64
 SEMANTIC_FAIL = 2
 SCHEMA_NAME = "held-out-corpus.schema.json"
+PREFIX = "HELD-OUT-CORPUS"
+Draft202012Validator = require_draft202012_validator(PREFIX)
 
 # A corpus that only contains defect families measures whether an Agent escalates,
 # never whether it correctly declines to. Both directions or neither.
 REQUIRED_NON_TRIGGER = {"text-only-non-trigger", "metadata-only-control", "wrong-skill-control"}
 REQUIRED_POSITIVE = {"real-capability-with-evidence"}
 MINIMUM_DEFECT_FAMILIES = 3
-
-
-def load_json(path: Path) -> Any:
-    try:
-        return json.loads(path.read_text(encoding="utf-8"))
-    except FileNotFoundError:
-        print(f"HELD-OUT-CORPUS-INVALID absent-input: {path}", file=sys.stderr)
-        raise SystemExit(SCHEMA_INVALID)
-    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
-        print(f"HELD-OUT-CORPUS-INVALID unreadable-input: {path}: {exc}", file=sys.stderr)
-        raise SystemExit(SCHEMA_INVALID)
-
-
-def validate_schema(document: Any, schema: Any) -> list[str]:
-    validator = Draft202012Validator(schema)
-    errors = sorted(validator.iter_errors(document), key=lambda item: list(item.absolute_path))
-    return [
-        f"schema-invalid at {'/'.join(str(part) for part in error.absolute_path) or '$'}: {error.message}"
-        for error in errors
-    ]
 
 
 def semantic_errors(corpus: dict[str, Any]) -> list[str]:
@@ -140,19 +117,21 @@ def semantic_errors(corpus: dict[str, Any]) -> list[str]:
 
 
 def check(path: Path, schema_root: Path) -> int:
-    corpus = load_json(path)
-    schema = load_json(schema_root / SCHEMA_NAME)
+    corpus = load_json_document(path, prefix=PREFIX, invalid_exit=SCHEMA_INVALID)
+    schema = load_json_document(
+        schema_root / SCHEMA_NAME, prefix=PREFIX, invalid_exit=SCHEMA_INVALID
+    )
 
-    schema_errors = validate_schema(corpus, schema)
+    schema_errors = shared_schema_errors(corpus, schema, Draft202012Validator)
     if schema_errors:
         for error in schema_errors:
-            print(f"HELD-OUT-CORPUS-INVALID {error}", file=sys.stderr)
+            print(f"{PREFIX}-INVALID {error}", file=sys.stderr)
         return SCHEMA_INVALID
 
     errors = semantic_errors(corpus)
     if errors:
         for error in errors:
-            print(f"HELD-OUT-CORPUS-RED {error}", file=sys.stderr)
+            print(f"{PREFIX}-RED {error}", file=sys.stderr)
         return SEMANTIC_FAIL
 
     print(

@@ -1,4 +1,4 @@
-# Traceability index — document routing and proof-carrying Skill delivery
+# Traceability index — document routing and proof-carrying delivery
 
 ## Trace model
 
@@ -7,16 +7,18 @@ source / incident
 → repository decision
 → parent issue
 → molecular issue
-→ sibling or true-child PR
-→ eval / negative control
-→ immutable or GitHub-read subject
+→ sibling / true-child / convergence PR
+→ eval + negative controls
+→ immutable or exact GitHub-read subject
 → receipt / current evidence state
 → Human Admit
 ```
 
+Mutable open PR heads are read from GitHub immediately before decision use. This document records immutable merged/rejected/integration ancestors and current observed snapshots, but never self-embeds its own mutable final head. A convergence ancestry edge proves consumed bytes, not admission of an unmerged sibling.
+
 ## Proof-carrying Skill refactor Stack
 
-Detailed human trace: [`SKILL_REFACTOR_PROOF_STACK.md`](SKILL_REFACTOR_PROOF_STACK.md). Machine authority:
+Detailed human trace: [`SKILL_REFACTOR_PROOF_STACK.md`](SKILL_REFACTOR_PROOF_STACK.md). Machine authority remains:
 
 ```text
 skills/skill-refactor-proof-loop/references/refactor-proof-stack.json
@@ -24,116 +26,217 @@ skills/skill-refactor-proof-loop/references/refactor-proof-stack.schema.json
 skills/skill-refactor-proof-loop/scripts/check_refactor_proof_stack.py
 ```
 
-| Node | Issue | PR publication subject | Stack class | Branch / base | Current state source |
-|---|---|---|---|---|---|
-| Tech Lead task/capability causal repair | `#307/#309` | `#308` | root | `fix/307-tech-lead-runtime-reachability` / `main` | current GitHub PR metadata and owning workflows |
-| Production-shaped hermetic golden proof | `#312` | `#315` | true child | `agent/312-tech-lead-real-task-ab` / PR #308 branch | current GitHub PR metadata and Skill Suites |
-| Generalized proof contract + golden registry | `#319` | `#323` | true child | `agent/319-skill-refactor-proof-contract` / PR #315 branch | current GitHub PR metadata and Skill Suites/Shared Skills Infra |
-| Agent routes + directory State Machines/DAG/data flow | `#320` | `#324` | true child | `agent/320-refactor-proof-agent-docs` / PR #323 branch | current GitHub PR metadata and route/check workflows |
-| Molecular Stack + traceability convergence | `#321` | `#325` | convergence | `agent/321-refactor-proof-stack-index` / PR #324 branch | current GitHub PR metadata and exact-head workflows |
-| Cross-Skill adoption audit | `#322` | delivery PR of `agent/goal-33-issues-batch` (GitHub metadata) | planned process follow-up | `agent/goal-33-issues-batch` / `main` | machine ledger at `skills/skill-refactor-proof-loop/references/skill-adoption-ledger.json`; rendered report at [`SKILL_REFACTOR_ADOPTION_AUDIT.md`](SKILL_REFACTOR_ADOPTION_AUDIT.md), byte-compared by `render_adoption_audit.py --check` in the Skill suite; standard admitted for adoption governance on 2026-08-17 and re-admitted the same day after the subject moved (`skills/skill-refactor-proof-loop/evals/proof-standard-admission.json` — the ledger schema gained `migration_order`, the golden registry gained B3, so the prior record expired by its own clause); every measured gap now owned by its Skill's migration leaf (#343–#352, one per Skill), with #231/#232/#234/#256 keeping their own evidence lanes; migration order over the ten leaves recorded in the ledger and recomputed from its own edges by `check_skill_adoption_ledger.py`; Human review of audit scope and each leaf's execution remain open |
-
-True-child edges are justified by consumed unmerged artifacts:
-
 ```text
-#308 task/capability contracts and frozen treatments
-→ #315 matched L3 proof
-→ #323 portable contract and golden registry
-→ #324 Agent and State Machine documentation
-→ #325 one convergence/index owner
+#307/#309 → PR #308  root causal repair
+└─ #312 → PR #315    production-shaped hermetic proof
+   └─ #319 → PR #323 portable proof contract/registry
+      └─ #320 → PR #324 Agent routes + directory State Machines/DAG
+         └─ #321 → PR #325 Molecular convergence/index
+            └─ #322  process follow-up/adoption audit after admission
 ```
 
-Issue #322 is a process dependency after admission, not automatically a Git child. Issues #231, #232, #234 and #256 are independent scheduler, Shadow, delivery and adapter evidence lanes; they may raise #312 from L3 to L4/L5 only with matched exact-subject receipts. They are not fake Stack ancestry.
+#231 scheduler-live, #232 independent Shadow/global objective, #234 real Git Town/dual-forge delivery and #256 exact-subject adapter evidence remain independent evidence/process lanes, not fake Git children. The cross-Skill adoption ledger and generated audit remain canonical for per-Skill migration state.
 
-Adapter lane status (#256): 8/9 adapter lanes (grepai, scip, tree-sitter, serena, sqlite, lancedb, worktree, forgejo) carry live receipts on main at commit `f50b2b9822db9e534169b5e63b523d940b32bb3c`; git-town is honestly `ABSENT` pending a Human admission decision for a darwin-compatible Git Town artifact (the committed admission is pinned by SHA-256 to `linux_intel_64`). The completion-report matrix is [`skills/repo-agent-native/evals/ADAPTER_RECEIPT_MATRIX.md`](../../skills/repo-agent-native/evals/ADAPTER_RECEIPT_MATRIX.md). The #231/#234 scheduler/Git-Town/dual-forge receipt-binding acceptance item remains `NOT_EXERCISED` pending those issues' remaining slices. On 2026-08-17 the owner admitted the darwin git-town artifact (`skills/repo-agent-native/evals/git-town-darwin-admission.json`, v24.0.0 darwin-arm64 pinned to the runtime-env catalog digest) and the ninth lane was implemented and exercised live. On 2026-08-18 the consolidated recapture ran with every provider live on one host: all nine lanes captured at one subject (`ADAPTER RECEIPTS GREEN: 9 lane(s), 9 PASS`), the interim single-subject darwin directory deleted by that capture as promised, and the admission binding repointed at the consolidated `evals/receipts/git-town.receipt.json`.
+## Codex SDK Tech Lead control plane — current epoch
 
-Closure generalization (#332): the repository-closure contract, Issue dual-DAG and Molecular Stack index are now typed, checked subjects — schemas, examples and deterministic gates live at `skills/agentic-tech-lead-orchestration/references/` (`repository-closure-contract.schema.json`, `issue-dual-dag.schema.json`, gate `scripts/assert_repository_closure_contract.py`) and `skills/git-town-stacked-pr-worker/references/` (`molecular-stack-index.schema.json`, gate `scripts/assert_molecular_stack_index.py`), with the atom law bound into the git-town portable core (CORE-LAW-006). The matching closure laws are now bound into the agentic-tech-lead portable core as `CORE-LAW-009` (start-readiness and completion-readiness are two edge classes) and `CORE-LAW-010` (closure lanes do not substitute); `references/REPOSITORY_CLOSURE_RECONCILIATION.md` remains the know-why for the schemas and the gate, not the home of the laws. That binding went through the refactor proof loop rather than around it: the golden-proof-pinned body was frozen byte-for-byte as `tests/fixtures/causal-dag-repaired-SKILL.txt`, so `B2_CAUSAL_DAG_REPAIRED` keeps its registered blob `3fd01571` on an immutable path, and the then-live `SKILL.md` became the new treatment `B3_CLOSURE_LAWS_BOUND` (blob `f6d66795`) registered in `skills/skill-refactor-proof-loop/references/golden-proof-registry.json`. All five arms were re-run on the same base by `skills/agentic-tech-lead-orchestration/tests/run-all.sh`: A 9, B0 6, B1 10, B2 11, B3 12 of 12 deterministic criteria, with B3 dominating B2 and no criterion regressed. Evidence ceiling unchanged: `L4_MATCHED_LIVE_MODEL_RUNTIME` stays `NOT_EXERCISED` and `L5_DELIVERY_AND_HUMAN_ADMIT` stays `HUMAN_ADMIT_REQUIRED`. Publication subject: delivery PR of `agent/goal-33-issues-batch` (GitHub metadata).
+Canonical programme trace: [`CODEX_SDK_TECH_LEAD_CONTROL_PLANE.md`](CODEX_SDK_TECH_LEAD_CONTROL_PLANE.md). Portable law remains `skills/agentic-tech-lead-orchestration/SKILL.md`.
 
-Offload method binding (#359): commit `a65761f` added the `## Local/cloud offload` section to the agentic-tech-lead portable core, which moved the live `SKILL.md` off the blob the golden-proof registry pinned for `B3_CLOSURE_LAWS_BOUND` and turned the Skill Suites run red with `GOLDEN-PROOF-RED TREATMENT_BLOB_DRIFT`. That is the mechanism working: the newest arm points at the live body precisely so a change to the portable core forces the proof to be re-run. The repair was the same restructure #332 used, not a refreshed hash — editing the body and repointing `f6d66795` at the new bytes is exactly what this apparatus exists to prevent. `B3_CLOSURE_LAWS_BOUND` was frozen byte-for-byte as `tests/fixtures/closure-laws-bound-SKILL.txt` (recovered from `40e4d96`, verified to hash to the registered `f6d66795`) with its domain profile as `tests/fixtures/closure-laws-bound-domain-profile.txt` (`0aa3ec54`, unchanged since B2), and the live `SKILL.md` is the new treatment `B4_OFFLOAD_METHOD_BOUND` (blob `b9401bf2`). The scorer gained a thirteenth criterion, `offload_method_routed_from_core`, scored on what the routing says — the method document, its only executable semantic authority `tests/dual-agent-offload-contract/verify.py`, the at-least-once distinction from the Local Handoff Execution Queue, and the refused plane promotion — so a bare heading or a link cannot earn it. All six arms were re-run on the same base by `skills/agentic-tech-lead-orchestration/tests/run-all.sh`: A 9, B0 6, B1 10, B2 11, B3 12, B4 13 of 13 deterministic criteria, with B4 dominating B3 and no criterion regressed. Evidence ceiling unchanged: `L4_MATCHED_LIVE_MODEL_RUNTIME` stays `NOT_EXERCISED`, `L5_DELIVERY_AND_HUMAN_ADMIT` stays `HUMAN_ADMIT_REQUIRED`, and every offload runtime lane remains `NOT_IMPLEMENTED`.
+Current common base observed for this sibling epoch:
 
-Open PR heads are read from GitHub metadata rather than self-embedded in the same branch. A merged node may record an immutable merge SHA only after its owning checks/evidence are observed and terminal state is truly `MERGED`.
+```text
+main@4ca9417b1da5ff32f1d4d3e7af64a15908749024
+```
+
+| Atom | Issue / PR | Relation | Current selected exact head | Mechanism state | Remaining ceiling |
+|---|---|---|---|---|---|
+| Codex SDK controller/session | `#375 / #451` | `SIBLING / UNMERGED CANDIDATE` | `86f9e8d940b76cb71b713c098ff09cb68eb4e0c1` | exact worktree HEAD/tree/clean preflight + post-turn path-lease readback; selftest `4/14` | live SDK `NOT_EXERCISED`; independent source/diff/test acceptance still required |
+| GitHub Issue DAG projection | `#376 / #452` | `SIBLING / UNMERGED CANDIDATE` | `426fb6f6f548f71572d4402e73e0b05ecf6f8aa8` | completion-edge projection + repo/default-branch/visibility + issue-state + closing-PR-reference preflight; selftest `6/17` | live mutation/readback `NOT_EXERCISED`; generic development-link ownership beyond closing refs residual |
+| Herdr observer | `#377 / #456` | `SIBLING / UNMERGED CANDIDATE` | `6a2ebcbe87078cecaf67f82f3c9c10643bcc9123` | exact Git/worktree/process/session identity + PID-start/freshness/liveness + cleanup/residue; selftest `4/18` | live Herdr `NOT_EXERCISED`; `DONE_CANDIDATE` remains advisory |
+| Problem closure | `#378 / #457` | `SIBLING / UNMERGED CANDIDATE` | `ac5ddc0287eb4e4156a7c7eef178b7be8bbd1d34` | frozen denominator/source manifest + exact repo/evidence subjects + supersession validation; selftest `6/22` | real source/provider closure `EVIDENCE_DEPENDENT` |
+| Documentation foundation | `#379 refs / #380` | `DOCUMENTATION SIBLING` | `7a9d68fcd58b1ed78ed6d05595a8df7eae53f5a5` | original traceability design bytes | navigation only |
+| Shared convergence | `#379 / #455` | `CONVERGENCE CANDIDATE` | read live from GitHub | selected sibling bytes + shared tests/routes/Shadow/Git Town/trace | final exact head must pass full hosted denominator; sibling/merge admission remains Human-owned |
+
+### Current dependency integration
+
+The repaired Herdr candidate is consumed by this immutable convergence ancestor:
+
+```text
+fc40cf833609328ded0141dd8d9629c9a727a159
+parents:
+  d52ab2aad8e20be0c738e77356f75633813ad444  prior #455 route/index head
+  6a2ebcbe87078cecaf67f82f3c9c10643bcc9123  repaired #456 candidate
+```
+
+The rejected predecessor integration remains visible:
+
+```text
+ed852502437570c7c86bae12c07c16a3f5d37ea8
+parents:
+  c306b3b4cea797f5f4d1323f8ec7fcd94a94f3ec  prior #455 convergence head
+  23b03826b1bf8fe66bd731716466a9349d3242d6  corrupted #456 candidate
+  ac5ddc0287eb4e4156a7c7eef178b7be8bbd1d34  #457 selected candidate
+```
+
+`ed852502...` is `HISTORICAL / REJECTED_BY_SHARED_SUITE`: the shared ATL gate reached the Herdr selftest and failed Python import on non-printable source corruption. Its predecessor green evidence is not reused.
+
+Before these checkpoints, #451/#452 hardening had already been integrated through:
+
+```text
+5d21ecab137cb26586ef1636dc279ee29733e913
+parents:
+  35874af7a6d04783983b05c8f1b1e402471b4451  prior #455 epoch
+  86f9e8d940b76cb71b713c098ff09cb68eb4e0c1  #451 selected head
+  426fb6f6f548f71572d4402e73e0b05ecf6f8aa8  #452 selected head
+```
+
+The earlier `35874af7...` hosted-green/Shadow result is `HISTORICAL` because selected parent heads moved. It is not reused as current evidence.
+
+### Historical convergence and rejected candidates
+
+```text
+c0f6979f80038394350aea724c598c8dba5ac338  epoch-1 union
+  historical #451 339ae874...
+  historical #452 b5295df6...
+  #453 5b6e58d1...
+  #454 32c5425d...
+
+af427a13a7096df91d74a48c0a4ca6ce3f3e2ac9  epoch-1 + PR #380 docs
+35874af7a6d04783983b05c8f1b1e402471b4451  historical hosted-green convergence
+ed852502437570c7c86bae12c07c16a3f5d37ea8  rejected corrupted-Herdr integration
+
+#444 → #451
+#445 → #452
+#446 → #453 → #456
+#447 → #454 → #457
+```
+
+#446/#447 are rejected provenance candidates. #453/#454 are provenance-correct replacements later closed unmerged. The first #456 v3 head is retained as a rejected source-corruption subject; current #456 is `6a2ebcbe...`. All remain denominator history, not alternate merge candidates.
+
+### Current convergence gate
+
+The exact final #455 head must execute, not merely contain:
+
+```text
+6 Draft-2020-12 control-plane schemas
+Codex selftest        4 positive / 14 mutations
+GitHub DAG selftest   6 positive / 17 mutations
+Herdr selftest        4 positive / 18 mutations
+closure selftest      6 positive / 22 mutations
+problem-closure example + checker + non-authority Markdown projection
+existing ATL suite
+```
+
+At repaired ancestor `fc40cf83...`, synchronize-triggered hosted gates are:
+
+```text
+Skill Suites                         PASS
+Shared Skills Infra                  PASS
+Git Town Stacked PR Worker           PASS
+```
+
+The ATL log explicitly records all four selected control-plane selftests PASS at the denominators above. The final documentation/index head must rerun those workflows. `Skill Eval Contract` is triggered only by `ready_for_review`; after the final head stabilizes it must be explicitly retriggered and pass at that exact head. Missing execution is not PASS.
+
+No earlier green head follows a moving parent automatically. Only a new exact-head run plus independent Shadow readback can make the static/deterministic convergence `READY_FOR_HUMAN_ADMIT`. That state still does not admit or merge #451/#452/#456/#457 and cannot raise any live evidence lane.
 
 ## Four-repository documentation stack
 
-| Plane | Issue | PR publication subject | Stack class | State | Merged commit |
-|---|---|---|---|---|---|
-| Parent integration contract | `ed3c/bettor-arena#35` | n/a | parent | open | n/a |
-| Instruction / Method | `ed3c/skills-shared#84` | `ed3c/skills-shared#85` | independent sibling | Merged | `e3b327ad49c088f1962c33167ecd5ac9d28125fb` |
-| Runtime Contract | `ed3c/runtime-env#29` | `ed3c/runtime-env#30` | independent sibling | Merged | `4a333ccf106ef60bc6942b922b7f5efffb3876f5` |
-| Domain Product / Consumer | `ed3c/agent-shield-monorepo#77` | `ed3c/agent-shield-monorepo#78` | independent terminal sibling | Merged | `1af04c1ef5cb68eab198987feba008c93d3ec22f` |
-| Integration / Acceptance | `ed3c/bettor-arena#36` | `ed3c/bettor-arena#37` | independent sibling | Merged | `1f94d3d77992a1396959a15b2ada7836c07bf300` |
-| Exact merged index and cold-start audit | `ed3c/bettor-arena#38` | n/a | convergence leaf | Closed | n/a |
+The established documentation-plane relationship remains:
 
-All four siblings have merged and the convergence owner `bettor-arena#38` is closed, so this stack is no longer pending work. The parent contract issue `bettor-arena#35` remains open and is the only live item on that plane.
+| Plane | Issue / PR | Relation | Current known terminal state |
+|---|---|---|---|
+| Instruction / Method | `skills-shared #84/#85` | independent sibling | merged historical |
+| Runtime Contract | `runtime-env #29/#30` | independent sibling | merged historical |
+| Domain Product / Consumer | `agent-shield-monorepo #77/#78` | terminal sibling | merged historical |
+| Integration / Acceptance | `bettor-arena #36/#37` | independent sibling | merged historical |
+| Exact merged index / cold-start audit | `bettor-arena #38` | convergence | closed historical |
 
-The exact candidate head of an *open* PR is read from GitHub PR metadata rather than embedded in the same branch: self-embedding a commit SHA would make the document stale in the commit that updates it. Merged commits above are immutable and therefore safe to record.
+The parent Bettor integration contract remains separately owned. Consumer snapshots here are navigation only; current consumer state must be read in that repository.
 
-The four implementation branches were siblings because each edited only its repository's documentation and consumed merged inputs. A serial stack would have added false dependencies.
+## Intent-Bound Constraint line
 
-## Intent-Bound Constraint stack
+Historical IBC delivery remains traceable as `#98→#104`, `#99→#105`, `#100→#106`, `#101→#111`, and `#102→#107`. Two historical merged heads (#105/#106) had no owning workflow run at their exact heads; that absence remains recorded as absence, not retroactive PASS. Current details stay in `docs/AGENT_INTEGRATION_STATE.md` and the owning IBC contracts.
 
-| Leaf | Issue | PR | Merged commit | Merged tree | Owning workflow at the admitted head |
-|---|---|---|---|---|---|
-| IBC 01 contract + closure evaluator | `#98` | `#104` | `fe660a990e9c66d364afd6519579048276ac7980` | `ea5e0a23ffc57b35039e8ffaf085f65d2bf3aa08` | `Skill Eval Contract` SUCCESS |
-| IBC 02 Git Town Stack binding | `#99` | `#105` | `0f18b483d6f31cbfd59c887ef146833fa2186f77` | `1891f98129daacf3fa75401a69254eea00a49419` | **none — zero runs at that head** |
-| IBC 03 knowledge-continuity adapter | `#100` | `#106` | `6d0c54f63cfa8aa7224d395095efe0cc5cf9b7e2` | `261b6aed0c7a92ab17a03b1a7595cc17736e290e` | **none — zero runs at that head** |
-| IBC 04 forgejo-delivery-loop adapter | `#101` | `#111` | `9d937458178f0315220710f4cc356a4d6549e977` | `f6bed242309c9f9904d12f0a14b4eb0a2b4b37e0` | `Forgejo Delivery Loop Contract` SUCCESS |
-| IBC 05 pinned live Git Town canary | `#102` | `#107` | `c8f4813b402095ed1d72060dcb81f1ac0edfc838` | `60b6425b568293b644057b6028b2955686b93586` | `Git Town Stacked PR Worker / live-canary` SUCCESS |
+## Controlled Technical Language line
 
-IBC 02 and IBC 03 merged with **no workflow run at their head commits at all**. That is an absence of evidence, not a pass, and it is recorded here rather than smoothed over. Its consequences and the repairs that followed are in [`../AGENT_INTEGRATION_STATE.md`](../AGENT_INTEGRATION_STATE.md).
+Parent programme `#115`; architecture/evidence law remains [`../architecture/CONTROLLED_TECHNICAL_LANGUAGE_HARNESS.md`](../architecture/CONTROLLED_TECHNICAL_LANGUAGE_HARNESS.md). Merged leaves #117/#125/#126/#127/#137/#139/#130/#138/#143/#131/#140/#152 retain their owning exact-head checks. Consumer CTL 07/07A/07B state belongs to `bettor-arena`; CTL 08 remains a convergence concern only when its prerequisites are actually admitted.
 
-## Controlled Technical Language stack
+## Spatial-loop systems engineering
 
-Parent programme `#115`. The architecture, evidence law, and full merged ledger live in
-[`../architecture/CONTROLLED_TECHNICAL_LANGUAGE_HARNESS.md`](../architecture/CONTROLLED_TECHNICAL_LANGUAGE_HARNESS.md);
-this table records the delivery trace only.
-
-| Leaf | Issue | PR | Merged commit | Owning check at the PR head |
-|---|---|---|---|---|
-| CTL 01 contract foundation | `#116` | `#117` | `a711316ec6ab50a952e2ec3df64c7feea2d181b1` | `contract` SUCCESS |
-| CTL 01 hotfix false-PASS paths | `#124` | `#125` | `65c72f7ab67af49d6237245eb64298cf62c11e14` | `contract` SUCCESS |
-| CTL 02 Harness core and STE profile | `#118` | `#126` | `061ff5e479e0f4595def11ec08bc4ddff8959708` | `controlled-technical-language-harness` SUCCESS |
-| CTL 03 deterministic evaluators | `#119` | `#127` | `edfa2922856a457167b56d32a73d679577718492` | `controlled-technical-language-harness` SUCCESS |
-| CTL 03 hardening exact subjects | `#129` | `#137` | `6764c67e7df9206dbc36f731f38f4c7dd252d51d` | `controlled-technical-language-harness` SUCCESS |
-| CTL 03 hardening calibration controls | `#129` | `#139` | `8e13b3ab9a2e34b75384c8fbc87ea5f8a3249f22` | `controlled-technical-language-harness` SUCCESS |
-| CTL 04 intent-promotion writeback gate | `#120` | `#130` | `8c040362eaad3fdf8d81a50cb594d15a7de8feb6` | `contract` SUCCESS |
-| CTL 04B authority substitutions | `#134` | `#138` | `c737e43d2cb6713a3fbbfd1f8d54c3b81b1870a7` | `contract` SUCCESS |
-| CTL 04C external authority readback | `#141` | `#143` | `a7b278aba8bdf744e901f605ea07b09e3b468e60` | `authority` SUCCESS |
-| CTL 05 document format and privacy routing | `#121` | `#131` | `e4f22e887bd1dfaea9cf673d75bb0a19a30d0ca6` | `controlled-technical-language-harness` SUCCESS |
-| CTL 06 integrated A/B canary | `#132` | `#140` | `47cbb259c0157535d6f40b703b487e225a1a9de1` | `controlled-technical-language-harness` SUCCESS |
-| CTL 06B A/B against external authority bytes | `#144` | `#152` | `b3d47948feb6e2d44d84261354117aecfaa4f5dc` | `controlled-technical-language-harness` SUCCESS |
-| CTL 07 consumer binding and canaries | `ed3c/bettor-arena#83` | none | n/a | none — open in another repository |
-| CTL 07A immutable consumer binding | `ed3c/bettor-arena#84` | `ed3c/bettor-arena#85` | `a3bee10b1e8ffc3c85bad518a18d044915a415bb` | that repository's `contracts` lane, read there |
-| CTL 07B sealed projection materializer | `ed3c/bettor-arena#88` | none | `0b0d1a5d571dfdda89d655e1a4fd619ad8d27d55` | that repository's lanes, read there |
-| CTL 07B paired carrier canaries | `ed3c/bettor-arena#108` | none | n/a | none — open, and the lane CTL 08 waits on |
-| CTL 08 convergence index | `#133` | none | n/a | none — recording only, not admitted |
-
-Unlike the IBC rows above, every merged CTL leaf had a green owning check. That check ran at the **PR head**, which is a different commit from the merge commit recorded beside it; a green head is evidence about the reviewed bytes, not a re-run of `main`.
-
-The three `bettor-arena` rows carry no owning check in this column on purpose. Their checks ran in that repository, against its heads, and this repository cannot observe them; the commits are recorded because they are immutable and this repository produced the bundle they bind. Those states were read on 2026-08-18 from a local clone and from read-only `gh issue` reads.
-
-CTL 08 is the convergence owner and stays unopened as a PR. Its contract forbids creating the branch before every prerequisite merges, and while CTL 07A landed, the CTL 07 parent and the `#108` paired-carrier leaf are still open. A convergence PR cannot repair an implementation leaf, so that condition sits with its owner rather than being absorbed here; what CTL 08 has done is record the merged subjects, the selected and rollback bundle identities, the routes and the unmet preconditions in [`../architecture/CONTROLLED_TECHNICAL_LANGUAGE_HARNESS.md`](../architecture/CONTROLLED_TECHNICAL_LANGUAGE_HARNESS.md).
-
-## Spatial-loop systems engineering leaf
-
-| Source | Issue | PR publication subject | Stack class | Publication state | Owning controls |
-|---|---|---|---|---|---|
-| User-supplied system-engineering proposal | `#128` | `#136` | independent terminal leaf | Open Draft; read exact live state from GitHub | local `tests/run-all.sh` PASS; GitHub jobs remain policy-gated while Draft |
-
-The leaf binds the generalized method to `spatial-loop-system-contract/v1`, its deterministic checker, positive/hollow/mutation controls, the trigger-loaded Linux isolation module, and the Skill Suites arrival. The exact open-PR head and workflow state are read from GitHub rather than self-embedded here.
-
-Live root, KVM, cgroup, seccomp, network-namespace, hardware-performance, chaos, exploit, and sandbox-escape execution remain `NOT_EXERCISED`. Destructive privileged testing, security acceptance, production promotion, permission widening, merge, and rollback remain Human/trusted-operator boundaries.
+Issue #128 / PR #136 remains an independent terminal leaf for the substrate-bound method. Static/deterministic contracts do not prove privileged root/KVM/cgroup/seccomp/network/hardware/chaos/security execution. Destructive testing, security acceptance, merge, promotion and rollback remain Human/trusted-operator boundaries.
 
 ## Method lineage
 
-- `knowledge-continuity` supplies the rule that every hop leaves an in-place summary and evidence is not hidden behind unexplained redirects.
-- `github-delivery-loop` supplies issue/PR/receipt and publication-state separation.
-- `forgejo-delivery-loop` supplies local authoring, deterministic routing/outbox/recovery, and receipt separation.
-- `git-town-stacked-pr-worker` supplies sibling/true-child/terminal/convergence branch semantics, machine-readable molecular traceability, and Human boundaries.
-- `skill-refactor-proof-loop` supplies treatment freeze, old-strength preservation, proof layers, golden registry, denominator completeness and no evidence promotion.
-- `agentic-tech-lead-orchestration` supplies the first production-shaped matched hermetic golden proof.
-- `spatial-loop-systems-engineering` supplies exact-subject state-space, capability, invariant, teardown, performance, and implementation-gate contracts for substrate-bound work.
+- `knowledge-continuity` — every hop leaves in-place summaries; no unexplained redirect-only evidence.
+- `github-delivery-loop` — issue/PR/receipt/publication-state separation.
+- `forgejo-delivery-loop` — local authoring/routing/outbox/recovery separation.
+- `git-town-stacked-pr-worker` — SIBLING/TRUE_CHILD/CONVERGENCE/PROCESS/EXTERNAL/HISTORICAL branch semantics and Molecular traceability.
+- `skill-refactor-proof-loop` — treatment freeze, old-strength preservation, proof layers, golden registry, complete denominator, no evidence promotion.
+- `agentic-tech-lead-orchestration` — task/capability/dual-DAG ownership, worktree/session contracts, current Codex control-plane convergence.
+- `procedural-shadow-runtime` — independent same-subject applicability/contradiction/evidence-ceiling review.
+- `spatial-loop-systems-engineering` — exact-subject capability/invariant/teardown/performance gates for substrate-bound work.
 
 ## Evidence boundary
 
-PR presence and exact GitHub head metadata prove publication identity only. Documentation completion does not imply route-checker execution, fresh Claude/Codex cold-start, GitHub/Forgejo equivalence, live provider canaries, model behavioral uplift, capability unlock, release promotion, merge, or production readiness.
+PR presence, ancestry and mergeability prove neither admission nor implementation correctness nor live execution. Documentation completion, deterministic fixtures, hosted workflow success, terminal `done`, issue close, PR merge, model agreement or an external link cannot substitute for live Codex/Herdr/GitHub effects, real source/provider closure, Human Admit, release or production readiness.
+
+## Codex control-plane Wave 3 — live-evidence infrastructure
+
+Canonical Wave-3 trace: [`WAVE3_LIVE_EVIDENCE.md`](WAVE3_LIVE_EVIDENCE.md). It extends #455 without modifying the provider-neutral core.
+
+```text
+#455 / #379 static convergence
+├─ #464 / PR #469  Codex live acceptance carrier        TRUE_CHILD
+├─ #465 / PR #470  GitHub dependency reversible canary TRUE_CHILD
+├─ #466 / PR #471  Herdr lifecycle carrier             TRUE_CHILD
+└─ #467 / PR #472  immutable source-claim compiler     TRUE_CHILD
+          ↓ exact selected bytes
+#468 / PR #473     Wave-3 convergence
+```
+
+Selected exact leaf heads for the current integration epoch:
+
+```text
+#469 d239d17d1d718f3e5e8c1975307665cae43d3b09
+#470 f4c3215b6c52c2e6106070eaa1121dee1dbd48e3
+#471 9eb70b2b62193b62a28f243de91e51337f1906b3
+#472 44d779a02e1749aa88a502d946646c22af38a026
+```
+
+Immutable integration checkpoint:
+
+```text
+691b342c44c9c6c4e61a9997e778ae4ed6e920d5
+parents:
+  847e56c3418fce920c42d983e84ee44fdc6e8971  #455 true parent
+  d239d17d1d718f3e5e8c1975307665cae43d3b09  #469
+  f4c3215b6c52c2e6106070eaa1121dee1dbd48e3  #470
+  9eb70b2b62193b62a28f243de91e51337f1906b3  #471
+  44d779a02e1749aa88a502d946646c22af38a026  #472
+```
+
+Wave-3 deterministic evidence denominator:
+
+```text
+4 new Draft-2020-12 contracts
+Codex live acceptance       1 positive / 12 mutations
+GitHub reversible canary    1 / 6
+Herdr lifecycle             2 / 7
+source-claim compiler       4 source kinds / 11 mutations
+source compiler → existing problem-closure checker integration
+Local Handoff Queue schema + semantic assertion
+```
+
+The queue is bound to the immutable integration checkpoint, not to a mutable PR head. It sequences runtime-only work as Codex live execution → Herdr observation → GitHub reversible canary and requires a durable receipt before each next item.
+
+Current evidence ceiling before live execution:
+
+```text
+Codex live carrier mechanism             IMPLEMENTED_CANDIDATE / runtime NOT_EXERCISED
+GitHub reversible canary mechanism       IMPLEMENTED_CANDIDATE / remote NOT_EXERCISED
+Herdr lifecycle carrier                  IMPLEMENTED_CANDIDATE / runtime NOT_EXERCISED
+source compiler                          IMPLEMENTED_CANDIDATE / source truth EVIDENCE_DEPENDENT
+#473 deterministic convergence           pending exact-head hosted validation
+Human Admit / merge / release            NOT_PERFORMED
+```
+
+A future runtime receipt must bind the exact subject it observed. It cannot inherit PASS from #455/#473 CI, and #473 ancestry cannot admit #455 or any leaf. Mutable #473 state is always read live from GitHub.

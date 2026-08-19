@@ -6,9 +6,13 @@ import importlib.util
 import json
 from pathlib import Path
 
+from jsonschema import Draft202012Validator
+
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 CHECKER = ROOT / "scripts" / "check_case_graph.py"
+SCHEMA = ROOT / "references" / "case-graph.schema.json"
+TEMPLATE = ROOT / "references" / "case-graph-template.json"
 GOOD = HERE / "fixtures" / "good.json"
 
 spec = importlib.util.spec_from_file_location("case_graph_checker", CHECKER)
@@ -16,10 +20,21 @@ assert spec and spec.loader
 mod = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(mod)
 
+schema = json.loads(SCHEMA.read_text(encoding="utf-8"))
 base = json.loads(GOOD.read_text(encoding="utf-8"))
+template = json.loads(TEMPLATE.read_text(encoding="utf-8"))
+validator = Draft202012Validator(schema)
+Draft202012Validator.check_schema(schema)
+
+
+def shape_errors(doc: dict) -> list[str]:
+    return [error.message for error in validator.iter_errors(doc)]
 
 
 def expect_green(name: str, doc: dict) -> None:
+    shape = shape_errors(doc)
+    if shape:
+        raise AssertionError(f"{name}: schema red: {shape}")
     errors = mod.validate(doc)
     if errors:
         raise AssertionError(f"{name}: expected green, got {errors}")
@@ -35,6 +50,7 @@ def expect_red(name: str, doc: dict, needle: str) -> None:
 
 
 expect_green("positive migration-copy graph", base)
+expect_green("non-laundering prototype template", template)
 
 m = copy.deepcopy(base)
 m["cases"][1]["implementation_ids"] = []
@@ -110,4 +126,27 @@ m = copy.deepcopy(base)
 m["intent_atoms"].append({"id": "INT-003", "statement": "Preserve recovery semantics."})
 expect_red("hidden intent denominator", m, "coverage.intent must be recomputed")
 
-print("CASE-GRAPH-MUTATIONS-GREEN")
+# Node identity is global across the provenance DAG, not merely unique inside
+# each node family. Otherwise an edge endpoint can become ambiguous.
+m = copy.deepcopy(base)
+m["oracles"][1]["id"] = "INT-002"
+expect_red("cross-category duplicate id", m, "duplicate id INT-002 across intent_atoms and oracles")
+
+# Implementation and evidence receipts must bind the exact graph revision and
+# digest; a path-looking subject_ref alone cannot prove freshness.
+m = copy.deepcopy(base)
+m["implementations"][1]["subject_revision"] = "stale-revision"
+expect_red("stale implementation subject", m, "implementation IMPL-002 subject_revision")
+
+m = copy.deepcopy(base)
+m["evidence"][1]["subject_digest"] = "sha256:" + "f" * 64
+expect_red("stale evidence subject", m, "evidence EVID-002 subject_digest")
+
+# Decision records are authority-bearing state, not prose labels.
+m = copy.deepcopy(base)
+m["source_behaviors"][1]["disposition"] = "DROP_EXPLICIT"
+m["source_behaviors"][1]["decision_id"] = "DEC-001"
+m["decisions"] = [{"id": "DEC-001", "authority": "", "rationale": "explicit test mutation"}]
+expect_red("hollow authority decision", m, "decision DEC-001 requires authority")
+
+print("CASE-GRAPH-MUTATIONS-GREEN exact-subject + global-id controls")
