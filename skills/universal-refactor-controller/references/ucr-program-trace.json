@@ -47,8 +47,16 @@
       "issue": "ed3c/skills-shared#406",
       "pull_request": "ed3c/skills-shared#463",
       "stack_class": "CONVERGENCE_DOCUMENTATION",
-      "evidence_state": "PR_DRAFT",
+      "evidence_state": "REMOTE_INTEGRATION_VERIFIED",
       "provides": ["registry", "CI-arrival", "Agent-routes", "README-State-Machine", "canary-corpus", "Stack-index"]
+    },
+    {
+      "id": "UCR-MAIN-LANDING",
+      "issue": "ed3c/skills-shared#398",
+      "pull_request": "ed3c/skills-shared#477",
+      "stack_class": "MAIN_LANDING",
+      "evidence_state": "PR_DRAFT",
+      "provides": ["current-main-semantic-union", "forge-commit-role-clean-history", "checked-head-landing"]
     },
     {
       "id": "ENTROPY-CI-REPAIR",
@@ -84,10 +92,11 @@
     {"from": "ENTROPY-CI-REPAIR", "to": "UCR-LIVE-VALIDATION", "relation": "PROCESS_DEPENDENCY"},
     {"from": "ORDINARY-CANARY", "to": "ORDINARY-CANARY-VALIDATION", "relation": "VALIDATED_BY"},
     {"from": "UCR-LIVE-VALIDATION", "to": "UCR-X-D", "relation": "EVIDENCE_PARENT"},
-    {"from": "ORDINARY-CANARY-VALIDATION", "to": "UCR-X-D", "relation": "EXTERNAL_EVIDENCE"}
+    {"from": "ORDINARY-CANARY-VALIDATION", "to": "UCR-X-D", "relation": "EXTERNAL_EVIDENCE"},
+    {"from": "UCR-X-D", "to": "UCR-MAIN-LANDING", "relation": "HUMAN_ADMITTED_FOR_LANDING"}
   ],
   "evidence_boundary": {
-    "verified": ["bounded Skill transfer", "bounded ordinary-repository transfer", "repository CI compatibility for recorded validation subjects"],
+    "verified": ["bounded Skill transfer", "bounded ordinary-repository transfer", "repository CI compatibility for recorded validation subjects", "current-main semantic union prepared for exact-head revalidation"],
     "not_proven": ["unseen domains", "live provider/model uplift", "production safety", "real Git Town local worktree execution", "merge", "release", "promotion", "rollback"]
   }
 }
