@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ed3c/skills-shared/skills/agentic-tech-lead-orchestration/github-issue-dag-receipt.schema.json",
+  "title": "GitHub Issue DAG Projection Receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["repo", "graph_digest", "desired", "ready_wave", "evidence_ceiling"],
+  "properties": {
+    "repo": {"type": "string", "pattern": "^[^/]+/[^/]+$"},
+    "graph_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "desired": {"type": "object", "additionalProperties": {"type": "array", "items": {"type": "integer", "minimum": 1}, "uniqueItems": true}},
+    "before": {"type": "object"},
+    "after": {"type": "object"},
+    "ready_wave": {"type": "array", "items": {"type": "integer", "minimum": 1}, "uniqueItems": true},
+    "evidence_ceiling": {"enum": ["STATIC_PROJECTION_ONLY", "REMOTE_PROJECTION_READBACK_ONLY"]}
+  }
+}
