@@ -133,6 +133,7 @@ def assert_hosted_workflow_contract():
         "github.event.pull_request.title == '[LIVE-CANARY][#465] Execute GitHub dependency canary'",
         "ref: ${{ github.event.pull_request.base.sha }}",
         "persist-credentials: false",
+        "RECEIPT: /tmp/wave3-github-dependency-live-receipt.json",
         "gh api \"repos/${REPO}/branches/main\"",
         "gh issue edit --help | grep -F -- '--add-blocked-by'",
         "gh issue edit --help | grep -F -- '--remove-blocked-by'",
@@ -142,6 +143,7 @@ def assert_hosted_workflow_contract():
         "github_issue_dag_live_canary_selftest.py",
         "github_issue_dag_live_canary.py",
         "--execute",
+        "Path(os.environ['RECEIPT'])",
         "Draft202012Validator(schema).validate(receipt)",
         "assert receipt['before']['blockedBy'] == []",
         "assert receipt['applied']['blockedBy'] == [486]",
@@ -160,6 +162,7 @@ def assert_hosted_workflow_contract():
         "actions: write",
         "secrets.",
         "github.event.pull_request.head.sha",
+        "${{ runner.temp }}",
     ]
     for fragment in forbidden:
         assert fragment not in workflow, fragment
