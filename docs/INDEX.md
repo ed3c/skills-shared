@@ -28,8 +28,9 @@
 - [`SKILL_EVAL_ROADMAP.md`](SKILL_EVAL_ROADMAP.md) — target phase roadmap.
 - [`traceability/SKILL_REFACTOR_ADOPTION_AUDIT.md`](traceability/SKILL_REFACTOR_ADOPTION_AUDIT.md) — generated projection of the cross-Skill refactor-proof adoption ledger; regenerate it with its renderer, never edit it.
 - [`traceability/TECH_LEAD_SHADOW_CLOSURE.md`](traceability/TECH_LEAD_SHADOW_CLOSURE.md) — provider-neutral Tech Lead closure states and independent Shadow audit over the same immutable subject.
-- [`traceability/CODEX_SDK_TECH_LEAD_CONTROL_PLANE.md`](traceability/CODEX_SDK_TECH_LEAD_CONTROL_PLANE.md) — #375–#379 Codex SDK/GitHub Issue DAG/Herdr/problem-closure State Machine and historical convergence trace.
-- [`traceability/WAVE3_PARENT_ADMISSION.md`](traceability/WAVE3_PARENT_ADMISSION.md) — current authority transition showing #455 Human Admit/merge into `main` while preserving its fork-time TRUE_CHILD provenance for Wave 3.
+- [`traceability/CODEX_SDK_TECH_LEAD_CONTROL_PLANE_ADMISSION.md`](traceability/CODEX_SDK_TECH_LEAD_CONTROL_PLANE_ADMISSION.md) — admitted #379 static/deterministic convergence subject, exact merge provenance, hosted evidence, consumed sibling publication state, and remaining live evidence owners.
+- [`traceability/CODEX_SDK_TECH_LEAD_CONTROL_PLANE.md`](traceability/CODEX_SDK_TECH_LEAD_CONTROL_PLANE.md) — #375–#379 pre-admission Codex SDK/GitHub Issue DAG/Herdr/problem-closure State Machine and historical convergence trace.
+- [`traceability/WAVE3_PARENT_ADMISSION.md`](traceability/WAVE3_PARENT_ADMISSION.md) — Wave‑3 parent authority transition: fork-time #455 provenance, admitted #455 merge, #379 admission-route merge, and current-main refresh law.
 - [`traceability/WAVE3_LIVE_EVIDENCE.md`](traceability/WAVE3_LIVE_EVIDENCE.md) — #464–#468 live-evidence carriers, fork-time dependency graph, convergence State Machine, immutable integration checkpoint, deterministic denominator and Local Handoff Queue boundary.
 - [`architecture/CONTROLLED_TECHNICAL_LANGUAGE_HARNESS.md`](architecture/CONTROLLED_TECHNICAL_LANGUAGE_HARNESS.md) — controlled-language architecture, evidence classes and merged CTL ledger.
 - [`../skills/README.md`](../skills/README.md) — Skill directory contract.

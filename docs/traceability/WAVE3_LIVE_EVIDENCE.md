@@ -1,12 +1,12 @@
 # Wave 3 live-evidence control plane — Tech Lead + Shadow trace
 
-Status: `STATIC_LIVE_EVIDENCE_INFRASTRUCTURE_CONVERGING`.
+Status: `STATIC_LIVE_EVIDENCE_INFRASTRUCTURE_REVALIDATING_CURRENT_MAIN`.
 
 This document records the public-repository mechanism that prepares live Codex SDK, GitHub Issue Dependencies, Herdr lifecycle, and source-claim evidence without pretending those external/runtime effects occurred. Machine authority remains exact Git ancestry, contracts/checkers, current GitHub metadata, exact-head hosted workflows, runtime receipts, source readback, and Human repository policy.
 
 ## Parent and molecular DAG
 
-Wave 3 directly consumes the unmerged static/deterministic control plane in #455, so every leaf is a real `TRUE_CHILD` of that exact parent. The four leaves are still siblings of one another.
+At Wave‑3 fork time, the leaves directly consumed the then-unmerged static/deterministic control plane in #455, so every leaf is a real `TRUE_CHILD` of that exact fork-time parent. The four leaves are still siblings of one another. #455 was later Human-admitted and merged; `WAVE3_PARENT_ADMISSION.md` owns that authority transition and the current-main refresh law.
 
 ```text
 #455 / #379  static/deterministic control-plane convergence
@@ -24,22 +24,24 @@ head at Wave-3 fork: 847e56c3418fce920c42d983e84ee44fdc6e8971
         └──── exact selected bytes ────┐
                                        ▼
 #468 / PR #473                     CONVERGENCE
+                                       ↑
+                              current main refresh input
 ```
 
-Immutable byte-integration checkpoint:
+Immutable fork-time byte-integration checkpoint:
 
 ```text
 commit 691b342c44c9c6c4e61a9997e778ae4ed6e920d5
 tree   ba6ef27631546af466284f44af7c81cd347765dd
 parents:
-  847e56c3418fce920c42d983e84ee44fdc6e8971  #455 parent contract
+  847e56c3418fce920c42d983e84ee44fdc6e8971  #455 fork-time parent contract
   d239d17d1d718f3e5e8c1975307665cae43d3b09  #469
   f4c3215b6c52c2e6106070eaa1121dee1dbd48e3  #470
   9eb70b2b62193b62a28f243de91e51337f1906b3  #471
   44d779a02e1749aa88a502d946646c22af38a026  #472
 ```
 
-This ancestry proves byte consumption only. It does not admit, merge, release, or prove a live effect.
+This ancestry proves byte consumption only. It does not admit, merge, release, or prove a live effect. Before final Wave‑3 admission, #473 must additionally consume current `main`; any earlier hosted green becomes historical after that refresh.
 
 ## Directory → responsibility map
 
@@ -98,6 +100,7 @@ STATIC_CONTROL_PLANE_READY                   #455
         → EXISTING_PROBLEM_CLOSURE_LEDGER
         → OPEN | IMPLEMENTED_UNVERIFIED | NOT_APPLICABLE | PARTIAL | HUMAN_ADMIT_REQUIRED
 → INDEPENDENT_SHADOW_READBACK
+→ CURRENT_MAIN_CONSUMED                      #468 convergence freshness
 → EXACT_HEAD_HOSTED_GATES                    #468
 → LOCAL_HANDOFF_FOR_UNEXECUTED_LIVE_LANES
 → READY_FOR_HUMAN_ADMIT | HOLD | REJECT
@@ -156,7 +159,7 @@ Compiler PASS proves binding and shape only, not source truth or closure.
 
 ## Local Handoff Execution Queue
 
-`skills/agentic-tech-lead-orchestration/references/wave3-live-handoff-queue.json` binds local/runtime continuation to immutable integration commit `691b342c...` and tree `ba6ef276...`.
+`skills/agentic-tech-lead-orchestration/references/wave3-live-handoff-queue.json` binds local/runtime continuation to immutable fork-time integration commit `691b342c...` and tree `ba6ef276...`.
 
 ```text
 ACTIVE  codex-live-receipt
@@ -167,11 +170,13 @@ ACTIVE  codex-live-receipt
 
 Each item has concrete bounded commands plus an explicit unresolved materialization operation for runtime-specific manifest/target/fixture identities. Queue advance, provider activation, issue close, merge, force push, semantic conflict resolution, release, permission change, and rollback remain outside unattended Worker authority.
 
+The queue's immutable fork-time subject is a reproducible execution input, not the final Wave‑3 admission subject. Any live receipt intended to establish current repository closure must still be rebound/read against the exact admitted runtime subject and independently reviewed.
+
 ## Evidence ceiling
 
 ```text
 Wave-3 public carrier code                    IMPLEMENTED_CANDIDATE
-Wave-3 deterministic controls                 MUST_PASS_ON_EXACT_HEAD
+Wave-3 deterministic controls                 MUST_PASS_ON_EXACT_CURRENT_HEAD
 live Codex SDK execution                      NOT_EXERCISED unless runtime receipt exists
 live controller acceptance                    NOT_EXERCISED unless matching receipt + Shadow exists
 live GitHub dependency canary                 NOT_EXERCISED unless remote add/readback/remove receipt exists
@@ -182,4 +187,4 @@ Human Admit                                    HUMAN_ADMIT_REQUIRED
 merge/release/production safety                NOT_PERFORMED
 ```
 
-PR #473 may prove static/deterministic Wave-3 infrastructure convergence only. Its mutable head must be read from GitHub and must freshly pass all configured hosted gates after the final documentation/index edit.
+PR #473 may prove static/deterministic Wave‑3 infrastructure convergence only. Its mutable head must be read from GitHub and must freshly pass all configured hosted gates after the final current-main/documentation refresh.
