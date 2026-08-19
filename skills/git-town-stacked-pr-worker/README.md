@@ -325,7 +325,7 @@ This is a durable traceability projection, not mutable PR-state authority. Read 
            ├─ validation PR #461
            └─ #406 / PR #463  UCR-X/D convergence
                          │
-                         └─ Epic #398 current-main landing  PENDING_PUBLICATION
+                         └─ #398 / PR #477  current-main landing
 ```
 
 | Atom | Issue | PR | Evidence ceiling | Role |
@@ -336,9 +336,9 @@ This is a durable traceability projection, not mutable PR-state authority. Read 
 | `X/LIVE` | `#402` | `#458` | `BOUNDED_CROSS_DOMAIN_REMOTE_VERIFIED` | Skill + ordinary-repository canaries |
 | validation | `#402` | `#461` | `REMOTE_REPOSITORY_CI_VERIFIED` | repaired whole-subject hosted receipt |
 | `X/D` | `#406` | `#463` | `REMOTE_INTEGRATION_VERIFIED` | registry, CI arrival, Agent routes, corpus and program trace |
-| main landing | `#398` | pending publication | `HUMAN_ADMITTED / REVERIFY_ON_CURRENT_MAIN` | preserve concurrent main governance and land one compliant subject |
+| main landing | `#398` | `#477` | `PR_DRAFT / REVERIFY_CURRENT_MAIN` | preserve concurrent main governance and land one checked-head subject |
 
-PR #462 remains `SUPERSEDED_FORENSIC`; it exposed document-route inventory drift and the connector commit-role endpoint gap. PR #463 repaired that history with CI-authored `agent-macro@ci.invalid` commits and is the immutable semantic source for this landing. The landing itself is rebuilt on current `main`; it does not import stale UCR Git ancestry or overwrite the concurrently admitted #375–#379 Tech Lead/Shadow control-plane bytes.
+PR #462 remains `SUPERSEDED_FORENSIC`; it exposed document-route inventory drift and the connector commit-role endpoint gap. PR #463 repaired that history with CI-authored `agent-macro@ci.invalid` commits and is the immutable semantic source for this landing. PR #476 is `TRANSPORT_ONLY`: it squashed disposable connector-authored construction history into GitHub forge commit `d809f44004bb24b204f78af560366a413db76803`; its tree equals the admitted semantic work tree and it is not a separate capability claim. PR #477 is rebuilt on current `main`; it does not import stale UCR Git ancestry or overwrite the concurrently admitted #375–#379 Tech Lead/Shadow control-plane bytes.
 
 Golden Refactor cases remain bounded. Open ordinary-repository evidence is not promoted by this admission. Live provider/model uplift, production safety, release, promotion and rollback remain separate evidence/Human lanes.
 
