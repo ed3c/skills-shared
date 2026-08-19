@@ -16,8 +16,10 @@ class ContractError(ValueError): pass
 def _nonempty(v): return isinstance(v,str) and bool(v.strip())
 
 def validate_problem(p:dict[str,Any])->None:
-    for key in ("problem_id","source","claim","applicability","repo_subject","task_nodes","issue_nodes",
-                "implementation_evidence","verification_evidence","shadow_verdict","residual_gaps","closure"):
+    required=("problem_id","source","claim","applicability","repo_subject","task_nodes","dag_nodes","issue_nodes",
+              "session_attempts","implementation_evidence","verification_evidence","receipts","merge_subjects",
+              "shadow_verdict","residual_gaps","closure")
+    for key in required:
         if key not in p: raise ContractError(f"{p.get('problem_id','?')}: missing {key}")
     if not _nonempty(p["problem_id"]): raise ContractError("problem_id must be non-empty")
     src=p["source"]
@@ -30,16 +32,42 @@ def validate_problem(p:dict[str,Any])->None:
     rs=p["repo_subject"]
     if not isinstance(rs,dict) or not all(_nonempty(rs.get(k)) for k in ("repo","commit","tree")):
         raise ContractError(f"{p['problem_id']}: exact repo/commit/tree required")
-    for field in ("task_nodes","issue_nodes","implementation_evidence","verification_evidence","residual_gaps"):
+    list_fields=("task_nodes","dag_nodes","issue_nodes","session_attempts","implementation_evidence",
+                 "verification_evidence","receipts","merge_subjects","residual_gaps")
+    for field in list_fields:
         if not isinstance(p[field],list): raise ContractError(f"{p['problem_id']}: {field} must be a list")
+    if not all(_nonempty(x) for x in p["task_nodes"]): raise ContractError(f"{p['problem_id']}: invalid task node")
+    if not all(_nonempty(x) for x in p["dag_nodes"]): raise ContractError(f"{p['problem_id']}: invalid DAG node")
+    if not all(isinstance(x,int) and not isinstance(x,bool) and x>0 for x in p["issue_nodes"]):
+        raise ContractError(f"{p['problem_id']}: issue nodes must be positive integers")
+    if not all(_nonempty(x) for x in p["merge_subjects"]): raise ContractError(f"{p['problem_id']}: invalid merge subject")
     if p["applicability"]=="NOT_APPLICABLE" and not _nonempty(p.get("applicability_rationale")):
         raise ContractError(f"{p['problem_id']}: NOT_APPLICABLE requires rationale")
+    if p["applicability"]=="SUPERSEDED" and not _nonempty(p.get("superseded_by")):
+        raise ContractError(f"{p['problem_id']}: SUPERSEDED requires superseded_by")
+
+    for attempt in p["session_attempts"]:
+        if not isinstance(attempt,dict) or not all(_nonempty(attempt.get(k)) for k in ("task_id","attempt_id","worktree")):
+            raise ContractError(f"{p['problem_id']}: invalid session/attempt/worktree trace")
+        if "thread_id" in attempt and attempt["thread_id"] is not None and not _nonempty(attempt["thread_id"]):
+            raise ContractError(f"{p['problem_id']}: invalid thread_id")
+
     for ev in p["implementation_evidence"]:
         if not isinstance(ev,dict) or ev.get("kind") not in IMPLEMENTATION_KINDS or not _nonempty(ev.get("subject")):
             raise ContractError(f"{p['problem_id']}: invalid implementation evidence")
+        if ev["kind"]=="MERGE_SUBJECT" and ev["subject"] not in p["merge_subjects"]:
+            raise ContractError(f"{p['problem_id']}: merge evidence must bind a declared merge_subject")
+
+    receipt_pairs=set()
+    for receipt in p["receipts"]:
+        if not isinstance(receipt,dict) or receipt.get("lane") not in VERIFY_LANES or not _nonempty(receipt.get("subject")):
+            raise ContractError(f"{p['problem_id']}: invalid receipt")
+        receipt_pairs.add((receipt["lane"],receipt["subject"]))
     for ev in p["verification_evidence"]:
         if not isinstance(ev,dict) or ev.get("lane") not in VERIFY_LANES or not _nonempty(ev.get("subject")):
             raise ContractError(f"{p['problem_id']}: invalid verification evidence lane")
+        if (ev["lane"],ev["subject"]) not in receipt_pairs:
+            raise ContractError(f"{p['problem_id']}: verification evidence lacks matching receipt: {ev}")
     for gap in p["residual_gaps"]:
         if not _nonempty(gap): raise ContractError(f"{p['problem_id']}: residual gaps must be non-empty strings")
 
