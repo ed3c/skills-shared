@@ -28,7 +28,8 @@
 - [`SKILL_EVAL_ROADMAP.md`](SKILL_EVAL_ROADMAP.md) — target phase roadmap.
 - [`traceability/SKILL_REFACTOR_ADOPTION_AUDIT.md`](traceability/SKILL_REFACTOR_ADOPTION_AUDIT.md) — generated projection of the cross-Skill refactor-proof adoption ledger; regenerate it with its renderer, never edit it.
 - [`traceability/TECH_LEAD_SHADOW_CLOSURE.md`](traceability/TECH_LEAD_SHADOW_CLOSURE.md) — provider-neutral Tech Lead closure states and independent Shadow audit over the same immutable subject.
-- [`traceability/CODEX_SDK_TECH_LEAD_CONTROL_PLANE.md`](traceability/CODEX_SDK_TECH_LEAD_CONTROL_PLANE.md) — #375–#379 Codex SDK/GitHub Issue DAG/Herdr/problem-closure State Machine, exact sibling/convergence subjects, evidence ceilings and cold-start route.
+- [`traceability/CODEX_SDK_TECH_LEAD_CONTROL_PLANE_ADMISSION.md`](traceability/CODEX_SDK_TECH_LEAD_CONTROL_PLANE_ADMISSION.md) — admitted #379 static/deterministic convergence subject, exact merge provenance, hosted evidence, consumed sibling publication state, and remaining live evidence owners.
+- [`traceability/CODEX_SDK_TECH_LEAD_CONTROL_PLANE.md`](traceability/CODEX_SDK_TECH_LEAD_CONTROL_PLANE.md) — #375–#379 pre-admission Codex SDK/GitHub Issue DAG/Herdr/problem-closure State Machine, exact sibling/convergence subjects, rejected epochs, evidence ceilings and cold-start route.
 - [`architecture/CONTROLLED_TECHNICAL_LANGUAGE_HARNESS.md`](architecture/CONTROLLED_TECHNICAL_LANGUAGE_HARNESS.md) — controlled-language architecture, evidence classes and merged CTL ledger.
 - [`../skills/README.md`](../skills/README.md) — Skill directory contract.
 - [`../skills/github-delivery-loop/README.md`](../skills/github-delivery-loop/README.md) — GitHub delivery State Machines.
