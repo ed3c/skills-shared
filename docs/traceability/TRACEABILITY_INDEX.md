@@ -51,24 +51,35 @@ main@4ca9417b1da5ff32f1d4d3e7af64a15908749024
 |---|---|---|---|---|---|
 | Codex SDK controller/session | `#375 / #451` | `SIBLING / UNMERGED CANDIDATE` | `86f9e8d940b76cb71b713c098ff09cb68eb4e0c1` | exact worktree HEAD/tree/clean preflight + post-turn path-lease readback; selftest `4/14` | live SDK `NOT_EXERCISED`; independent source/diff/test acceptance still required |
 | GitHub Issue DAG projection | `#376 / #452` | `SIBLING / UNMERGED CANDIDATE` | `426fb6f6f548f71572d4402e73e0b05ecf6f8aa8` | completion-edge projection + repo/default-branch/visibility + issue-state + closing-PR-reference preflight; selftest `6/17` | live mutation/readback `NOT_EXERCISED`; generic development-link ownership beyond closing refs residual |
-| Herdr observer | `#377 / #456` | `SIBLING / UNMERGED CANDIDATE` | `23b03826b1bf8fe66bd731716466a9349d3242d6` | exact Git/worktree/process/session identity + PID-start/freshness/liveness + cleanup/residue; selftest `4/18` | live Herdr `NOT_EXERCISED`; `DONE_CANDIDATE` remains advisory |
+| Herdr observer | `#377 / #456` | `SIBLING / UNMERGED CANDIDATE` | `6a2ebcbe87078cecaf67f82f3c9c10643bcc9123` | exact Git/worktree/process/session identity + PID-start/freshness/liveness + cleanup/residue; selftest `4/18` | live Herdr `NOT_EXERCISED`; `DONE_CANDIDATE` remains advisory |
 | Problem closure | `#378 / #457` | `SIBLING / UNMERGED CANDIDATE` | `ac5ddc0287eb4e4156a7c7eef178b7be8bbd1d34` | frozen denominator/source manifest + exact repo/evidence subjects + supersession validation; selftest `6/22` | real source/provider closure `EVIDENCE_DEPENDENT` |
 | Documentation foundation | `#379 refs / #380` | `DOCUMENTATION SIBLING` | `7a9d68fcd58b1ed78ed6d05595a8df7eae53f5a5` | original traceability design bytes | navigation only |
 | Shared convergence | `#379 / #455` | `CONVERGENCE CANDIDATE` | read live from GitHub | selected sibling bytes + shared tests/routes/Shadow/Git Town/trace | final exact head must pass full hosted denominator; sibling/merge admission remains Human-owned |
 
 ### Current dependency integration
 
-The current integration ancestry checkpoint consumes the new #456/#457 candidates without treating them as admitted:
+The repaired Herdr candidate is consumed by this immutable convergence ancestor:
+
+```text
+fc40cf833609328ded0141dd8d9629c9a727a159
+parents:
+  d52ab2aad8e20be0c738e77356f75633813ad444  prior #455 route/index head
+  6a2ebcbe87078cecaf67f82f3c9c10643bcc9123  repaired #456 candidate
+```
+
+The rejected predecessor integration remains visible:
 
 ```text
 ed852502437570c7c86bae12c07c16a3f5d37ea8
 parents:
   c306b3b4cea797f5f4d1323f8ec7fcd94a94f3ec  prior #455 convergence head
-  23b03826b1bf8fe66bd731716466a9349d3242d6  #456 exact candidate
-  ac5ddc0287eb4e4156a7c7eef178b7be8bbd1d34  #457 exact candidate
+  23b03826b1bf8fe66bd731716466a9349d3242d6  corrupted #456 candidate
+  ac5ddc0287eb4e4156a7c7eef178b7be8bbd1d34  #457 selected candidate
 ```
 
-Before this checkpoint, #451/#452 hardening had already been integrated through:
+`ed852502...` is `HISTORICAL / REJECTED_BY_SHARED_SUITE`: the shared ATL gate reached the Herdr selftest and failed Python import on non-printable source corruption. Its predecessor green evidence is not reused.
+
+Before these checkpoints, #451/#452 hardening had already been integrated through:
 
 ```text
 5d21ecab137cb26586ef1636dc279ee29733e913
@@ -91,6 +102,7 @@ c0f6979f80038394350aea724c598c8dba5ac338  epoch-1 union
 
 af427a13a7096df91d74a48c0a4ca6ce3f3e2ac9  epoch-1 + PR #380 docs
 35874af7a6d04783983b05c8f1b1e402471b4451  historical hosted-green convergence
+ed852502437570c7c86bae12c07c16a3f5d37ea8  rejected corrupted-Herdr integration
 
 #444 → #451
 #445 → #452
@@ -98,7 +110,7 @@ af427a13a7096df91d74a48c0a4ca6ce3f3e2ac9  epoch-1 + PR #380 docs
 #447 → #454 → #457
 ```
 
-#446/#447 are rejected provenance candidates. #453/#454 are provenance-correct replacements later closed unmerged. All remain denominator history, not current merge candidates.
+#446/#447 are rejected provenance candidates. #453/#454 are provenance-correct replacements later closed unmerged. The first #456 v3 head is retained as a rejected source-corruption subject; current #456 is `6a2ebcbe...`. All remain denominator history, not alternate merge candidates.
 
 ### Current convergence gate
 
@@ -114,14 +126,15 @@ problem-closure example + checker + non-authority Markdown projection
 existing ATL suite
 ```
 
-Hosted denominator:
+At repaired ancestor `fc40cf83...`, synchronize-triggered hosted gates are:
 
 ```text
-Skill Suites
-Shared Skills Infra
-Skill Eval Contract
-Git Town Stacked PR Worker
+Skill Suites                         PASS
+Shared Skills Infra                  PASS
+Git Town Stacked PR Worker           PASS
 ```
+
+The ATL log explicitly records all four selected control-plane selftests PASS at the denominators above. The final documentation/index head must rerun those workflows. `Skill Eval Contract` is triggered only by `ready_for_review`; after the final head stabilizes it must be explicitly retriggered and pass at that exact head. Missing execution is not PASS.
 
 No earlier green head follows a moving parent automatically. Only a new exact-head run plus independent Shadow readback can make the static/deterministic convergence `READY_FOR_HUMAN_ADMIT`. That state still does not admit or merge #451/#452/#456/#457 and cannot raise any live evidence lane.
 
