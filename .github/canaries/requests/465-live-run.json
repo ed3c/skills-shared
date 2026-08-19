@@ -1,6 +1,6 @@
 {
   "purpose": "event-only trigger for the admitted #465 hosted GitHub dependency canary",
-  "executor_main": "74580ea52401a7e71a72fedf9e177865ef6c440f",
+  "executor_main": "81041d1b88283fabdc1c4db05efaf8dd945e24df",
   "blocker_issue": 486,
   "blocked_issue": 487,
   "expected_before_blocked_by": [],
