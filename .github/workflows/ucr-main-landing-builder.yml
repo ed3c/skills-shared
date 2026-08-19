@@ -1,0 +1,54 @@
+name: UCR Main Landing Builder
+
+on:
+  push:
+    branches:
+      - agent/406-ucr-convergence-docs-v2
+    paths:
+      - '.github/workflows/ucr-main-landing-builder.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    if: github.repository == 'ed3c/skills-shared'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Build current-main UCR landing branch with compliant identity
+        env:
+          EXPECTED_MAIN_SHA: 4ca9417b1da5ff32f1d4d3e7af64a15908749024
+          MERGE_BASE_SHA: b5d98eec0c486b94c81412dc07c109a3c379ea4f
+          SOURCE_SHA: 950b9f901a91de28ad99d62a4c8db45b49eaddbd
+          DEST_BRANCH: agent/398-ucr-main-landing
+        run: |
+          set -euo pipefail
+          if git ls-remote --exit-code --heads origin "refs/heads/${DEST_BRANCH}" >/dev/null 2>&1; then
+            echo "destination branch already exists; refusing to rewrite it" >&2
+            exit 2
+          fi
+          git fetch origin \
+            "+refs/heads/main:refs/remotes/origin/main" \
+            "+refs/heads/agent/406-ucr-convergence-docs-v2:refs/remotes/origin/agent/406-ucr-convergence-docs-v2"
+          test "$(git rev-parse refs/remotes/origin/main)" = "${EXPECTED_MAIN_SHA}"
+          git cat-file -e "${MERGE_BASE_SHA}^{commit}"
+          git cat-file -e "${SOURCE_SHA}^{commit}"
+          test "$(git merge-base "${MERGE_BASE_SHA}" "${SOURCE_SHA}")" = "${MERGE_BASE_SHA}"
+          git diff --binary "${MERGE_BASE_SHA}" "${SOURCE_SHA}" > "${RUNNER_TEMP}/ucr-main.patch"
+          git switch --detach "${EXPECTED_MAIN_SHA}"
+          git apply --index "${RUNNER_TEMP}/ucr-main.patch"
+          test -f noop
+          git diff --cached --check
+          git config user.name "agent-macro"
+          git config user.email "agent-macro@ci.invalid"
+          git commit \
+            -m "feat(ucr): land admitted universal refactor stack on main" \
+            -m $'Driven-By: agent-macro\nDriven-On: ci'
+          test "$(git rev-list --count "${EXPECTED_MAIN_SHA}..HEAD")" -eq 1
+          test -f noop
+          git push origin "HEAD:refs/heads/${DEST_BRANCH}"
