@@ -32,6 +32,7 @@ jobs:
       BLOCKER_ISSUE: '486'
       BLOCKED_ISSUE: '487'
       EVIDENCE_ISSUE: '465'
+      GITHUB_API_VERSION: '2026-03-10'
     steps:
       - name: Checkout exact base/main subject
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -47,15 +48,22 @@ jobs:
       - name: Install pinned receipt validator
         run: python3 -m pip install --disable-pip-version-check 'jsonschema==4.26.0'
 
-      - name: Refuse stale main or unsupported gh dependency mutation
+      - name: Refuse stale main or unavailable dependency REST surface
         env:
           EXPECTED_BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
           set -euo pipefail
           actual_main="$(gh api "repos/${REPO}/branches/main" --jq '.commit.sha')"
           test "${actual_main}" = "${EXPECTED_BASE_SHA}"
-          gh issue edit --help | grep -F -- '--add-blocked-by' >/dev/null
-          gh issue edit --help | grep -F -- '--remove-blocked-by' >/dev/null
+          blocker_id="$(gh api "repos/${REPO}/issues/${BLOCKER_ISSUE}" \
+            -H "X-GitHub-Api-Version: ${GITHUB_API_VERSION}" \
+            --jq '.id')"
+          case "${blocker_id}" in
+            ''|*[!0-9]*) echo 'blocker REST id malformed' >&2; exit 2 ;;
+          esac
+          test "${blocker_id}" -gt 0
+          gh api "repos/${REPO}/issues/${BLOCKED_ISSUE}/dependencies/blocked_by?per_page=100" \
+            -H "X-GitHub-Api-Version: ${GITHUB_API_VERSION}" >/dev/null
 
       - name: Bind dedicated fixture ownership label
         run: |

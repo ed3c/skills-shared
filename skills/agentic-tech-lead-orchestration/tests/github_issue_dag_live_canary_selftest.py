@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-import copy, importlib.util, json
+import copy
+import importlib.util
+import json
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -28,11 +30,16 @@ class Remote:
     def __init__(self):
         self.blocked = [8999]
         self.cleanup_fail = False
+        self.add_fail = False
         self.missing_label = False
         self.closed = False
+        self.malformed_blocked = False
+        self.cross_repo = False
+        self.bad_rest_id = False
+        self.rest_ids = {8999: 18999, 9001: 19001, 9002: 19002}
 
-    def run(self, a):
-        if a[:3] == ["gh", "repo", "view"]:
+    def run(self, argv):
+        if argv[:3] == ["gh", "repo", "view"]:
             return json.dumps(
                 {
                     "nameWithOwner": "ed3c/skills-shared",
@@ -40,56 +47,92 @@ class Remote:
                     "defaultBranchRef": {"name": "main"},
                 }
             )
-        if a[:3] == ["gh", "issue", "view"]:
-            n = int(a[3])
-            fields = a[-1]
+        if argv[:3] == ["gh", "issue", "view"]:
+            number = int(argv[3])
+            fields = argv[-1]
             if fields == "number,state,labels":
                 return json.dumps(
                     {
-                        "number": n,
-                        "state": "CLOSED" if self.closed and n == 9002 else "OPEN",
+                        "number": number,
+                        "state": "CLOSED" if self.closed and number == 9002 else "OPEN",
                         "labels": []
-                        if self.missing_label and n == 9001
+                        if self.missing_label and number == 9001
                         else [{"name": "ctl-live-canary"}],
                     }
                 )
-            if fields == "blockedBy":
-                return json.dumps(
-                    {"blockedBy": [{"number": x} for x in self.blocked]}
+        if argv[:2] == ["gh", "api"]:
+            endpoint = argv[2]
+            prefix = "repos/ed3c/skills-shared/issues/"
+            if endpoint.startswith(prefix) and "/dependencies/" not in endpoint:
+                number = int(endpoint.removeprefix(prefix))
+                if "--jq" in argv and argv[argv.index("--jq") + 1] == ".id":
+                    if self.bad_rest_id and number == 9001:
+                        return "not-an-int\n"
+                    return f"{self.rest_ids[number]}\n"
+            if endpoint == (
+                "repos/ed3c/skills-shared/issues/9002/"
+                "dependencies/blocked_by?per_page=100"
+            ):
+                rows = []
+                for number in self.blocked:
+                    rows.append(
+                        {
+                            "number": str(number)
+                            if self.malformed_blocked
+                            else number,
+                            "repository_url": (
+                                "https://api.github.com/repos/other/repo"
+                                if self.cross_repo
+                                else "https://api.github.com/repos/ed3c/skills-shared"
+                            ),
+                        }
+                    )
+                return json.dumps([rows])
+            if endpoint == (
+                "repos/ed3c/skills-shared/issues/9002/dependencies/blocked_by"
+            ) and argv[argv.index("--method") + 1] == "POST":
+                if self.add_fail:
+                    raise mod.ContractError("forced add failure")
+                issue_id = int(argv[argv.index("-F") + 1].split("=", 1)[1])
+                number = next(
+                    n for n, rest_id in self.rest_ids.items() if rest_id == issue_id
                 )
-        if a[:3] == ["gh", "issue", "edit"]:
-            if "--add-blocked-by" in a:
-                n = int(a[a.index("--add-blocked-by") + 1])
-                self.blocked = sorted(set(self.blocked + [n]))
+                self.blocked = sorted(set(self.blocked + [number]))
                 return ""
-            if "--remove-blocked-by" in a:
+            remove_prefix = (
+                "repos/ed3c/skills-shared/issues/9002/dependencies/blocked_by/"
+            )
+            if endpoint.startswith(remove_prefix) and argv[argv.index("--method") + 1] == "DELETE":
                 if self.cleanup_fail:
                     raise mod.ContractError("forced cleanup failure")
-                n = int(a[a.index("--remove-blocked-by") + 1])
-                self.blocked = [x for x in self.blocked if x != n]
+                issue_id = int(endpoint.removeprefix(remove_prefix))
+                number = next(
+                    n for n, rest_id in self.rest_ids.items() if rest_id == issue_id
+                )
+                self.blocked = [x for x in self.blocked if x != number]
                 return ""
-        raise AssertionError(a)
+        raise AssertionError(argv)
 
 
 orig = mod._run
-r = Remote()
-mod._run = r.run
+remote = Remote()
+mod._run = remote.run
 try:
     out = mod.execute(plan())
     assert out["canary_state"] == "LIVE_GITHUB_DEPENDENCY_CANARY_PASS"
-    assert r.blocked == [8999]
+    assert remote.blocked == [8999]
 finally:
     mod._run = orig
 
 
-def fail(pm=lambda p: None, rm=lambda r: None):
-    p = copy.deepcopy(plan())
-    pm(p)
-    r = Remote()
-    rm(r)
-    mod._run = r.run
+def fail(plan_mutation=lambda p: None, remote_mutation=lambda r: None):
+    candidate = copy.deepcopy(plan())
+    plan_mutation(candidate)
+    remote = Remote()
+    remote_mutation(remote)
+    mod._run = remote.run
     try:
-        mod.execute(p)
+        mod.execute(candidate)
     except mod.ContractError:
         return
     finally:
@@ -99,10 +142,14 @@ def fail(pm=lambda p: None, rm=lambda r: None):
 
 fail(lambda p: p.update(blocker_issue=9002))
 fail(lambda p: p.update(expected_before_blocked_by=[8999, 9001]))
-fail(rm=lambda r: setattr(r, "blocked", [8998]))
-fail(rm=lambda r: setattr(r, "missing_label", True))
-fail(rm=lambda r: setattr(r, "closed", True))
-fail(rm=lambda r: setattr(r, "cleanup_fail", True))
+fail(remote_mutation=lambda r: setattr(r, "blocked", [8998]))
+fail(remote_mutation=lambda r: setattr(r, "missing_label", True))
+fail(remote_mutation=lambda r: setattr(r, "closed", True))
+fail(remote_mutation=lambda r: setattr(r, "cleanup_fail", True))
+fail(remote_mutation=lambda r: setattr(r, "add_fail", True))
+fail(remote_mutation=lambda r: setattr(r, "malformed_blocked", True))
+fail(remote_mutation=lambda r: setattr(r, "cross_repo", True))
+fail(remote_mutation=lambda r: setattr(r, "bad_rest_id", True))
 
 
 def assert_hosted_workflow_contract():
@@ -134,9 +181,10 @@ def assert_hosted_workflow_contract():
         "ref: ${{ github.event.pull_request.base.sha }}",
         "persist-credentials: false",
         "RECEIPT: /tmp/wave3-github-dependency-live-receipt.json",
+        "GITHUB_API_VERSION: '2026-03-10'",
+        'X-GitHub-Api-Version: ${GITHUB_API_VERSION}',
         "gh api \"repos/${REPO}/branches/main\"",
-        "gh issue edit --help | grep -F -- '--add-blocked-by'",
-        "gh issue edit --help | grep -F -- '--remove-blocked-by'",
+        "dependencies/blocked_by?per_page=100",
         "BLOCKER_ISSUE: '486'",
         "BLOCKED_ISSUE: '487'",
         "EVIDENCE_ISSUE: '465'",
@@ -163,12 +211,27 @@ def assert_hosted_workflow_contract():
         "secrets.",
         "github.event.pull_request.head.sha",
         "${{ runner.temp }}",
+        "gh issue edit --help",
     ]
     for fragment in forbidden:
         assert fragment not in workflow, fragment
     assert workflow.count("issues: write") == 1
-    assert workflow.count("--add-blocked-by") >= 1
-    assert workflow.count("--remove-blocked-by") >= 1
+
+    carrier = SCRIPT.read_text(encoding="utf-8")
+    for fragment in [
+        'API_VERSION = "2026-03-10"',
+        "/dependencies/blocked_by?per_page=100",
+        '"--paginate"',
+        '"--slurp"',
+        '"POST"',
+        '"DELETE"',
+        'f"issue_id={blocker_rest_id}"',
+        "cross-repository blockedBy forbidden for canary fixture",
+        "canary cleanup failed after remote mutation",
+    ]:
+        assert fragment in carrier, fragment
+    for fragment in ["--add-blocked-by", "--remove-blocked-by"]:
+        assert fragment not in carrier, fragment
 
     governance = governance_path.read_text(encoding="utf-8")
     for fragment in [
@@ -189,5 +252,5 @@ def assert_hosted_workflow_contract():
 assert_hosted_workflow_contract()
 print(
     "github-dag-live-canary selftest: PASS "
-    "(positive=1 mutations=6 hosted-workflow=1 live=NOT_EXERCISED)"
+    "(positive=1 mutations=10 hosted-workflow=1 live=NOT_EXERCISED)"
 )
