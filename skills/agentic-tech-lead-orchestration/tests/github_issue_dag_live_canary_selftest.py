@@ -94,7 +94,9 @@ class Remote:
                 if self.add_fail:
                     raise mod.ContractError("forced add failure")
                 issue_id = int(argv[argv.index("-F") + 1].split("=", 1)[1])
-                number = next(n for n, rest_id in self.rest_ids.items() if rest_id == issue_id)
+                number = next(
+                    n for n, rest_id in self.rest_ids.items() if rest_id == issue_id
+                )
                 self.blocked = sorted(set(self.blocked + [number]))
                 return ""
             remove_prefix = (
@@ -104,7 +106,9 @@ class Remote:
                 if self.cleanup_fail:
                     raise mod.ContractError("forced cleanup failure")
                 issue_id = int(endpoint.removeprefix(remove_prefix))
-                number = next(n for n, rest_id in self.rest_ids.items() if rest_id == issue_id)
+                number = next(
+                    n for n, rest_id in self.rest_ids.items() if rest_id == issue_id
+                )
                 self.blocked = [x for x in self.blocked if x != number]
                 return ""
         raise AssertionError(argv)
@@ -177,8 +181,9 @@ def assert_hosted_workflow_contract():
         "ref: ${{ github.event.pull_request.base.sha }}",
         "persist-credentials: false",
         "RECEIPT: /tmp/wave3-github-dependency-live-receipt.json",
+        "GITHUB_API_VERSION: '2026-03-10'",
+        'X-GitHub-Api-Version: ${GITHUB_API_VERSION}',
         "gh api \"repos/${REPO}/branches/main\"",
-        "X-GitHub-Api-Version: 2026-03-10",
         "dependencies/blocked_by?per_page=100",
         "BLOCKER_ISSUE: '486'",
         "BLOCKED_ISSUE: '487'",
@@ -221,8 +226,8 @@ def assert_hosted_workflow_contract():
         '"POST"',
         '"DELETE"',
         'f"issue_id={blocker_rest_id}"',
-        'cross-repository blockedBy forbidden for canary fixture',
-        'canary cleanup failed after remote mutation',
+        "cross-repository blockedBy forbidden for canary fixture",
+        "canary cleanup failed after remote mutation",
     ]:
         assert fragment in carrier, fragment
     for fragment in ["--add-blocked-by", "--remove-blocked-by"]:
