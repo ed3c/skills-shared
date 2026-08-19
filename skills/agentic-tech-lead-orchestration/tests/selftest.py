@@ -33,7 +33,7 @@ def ids(value: dict) -> set[str]:
 
 
 # Positive packet must satisfy both the Draft-2020-12 shape gate and the
-# composed baseline + ICPG semantic gate.
+# composed baseline + exact-byte ICPG semantic gate.
 assert not schema_module.validate_object(base), schema_module.validate_object(base)
 assert not module.validate(base), module.validate(base)
 
@@ -96,10 +96,11 @@ assert "BRANCH_WRITE" in ids(case)
 # ICPG -> Tech Lead denominator and ownership controls.
 case = copy.deepcopy(base)
 case["case_obligations"]["required_case_ids"].append("CASE-ORPHAN")
+assert "CASE_DENOMINATOR_DRIFT" in ids(case)
 assert "CASE_UNOWNED" in ids(case)
 
 case = copy.deepcopy(base)
-case["case_obligations"]["branch_case_owners"][1]["case_ids"].append("CASE-CONTRACT")
+case["case_obligations"]["branch_case_owners"][1]["case_ids"].append("CASE-001")
 assert "CASE_DUPLICATE_OWNER" in ids(case)
 
 case = copy.deepcopy(base)
@@ -110,13 +111,26 @@ case = copy.deepcopy(base)
 case["case_obligations"]["convergence_owner"] = "missing/branch"
 assert "CASE_CONVERGENCE_OWNER" in ids(case)
 
+# Valid-looking but stale digest must fail against the referenced graph bytes.
 case = copy.deepcopy(base)
-case["case_obligations"]["case_graph_sha256"] = "latest"
-assert "CASE_GRAPH_BINDING" in ids(case)
+case["case_obligations"]["case_graph_sha256"] = "d" * 64
+assert "CASE_GRAPH_DIGEST_MISMATCH" in ids(case)
+
+# The task denominator must equal the actual REQUIRED_CASE set in the admitted graph.
+case = copy.deepcopy(base)
+case["case_obligations"]["required_case_ids"] = ["CASE-001"]
+case["case_obligations"]["branch_case_owners"] = [
+    {"branch": "feature/contract", "case_ids": ["CASE-001"]}
+]
+assert "CASE_DENOMINATOR_SHRINK" in ids(case)
 
 case = copy.deepcopy(base)
 case["case_obligations"]["branch_case_owners"][0]["case_ids"].append("CASE-OUTSIDE")
 assert "CASE_UNKNOWN_OWNER" in ids(case)
+
+case = copy.deepcopy(base)
+case["case_obligations"]["case_graph_ref"] = "skills/spatial-loop-systems-engineering/tests/case-graph/fixtures/absent.json"
+assert "CASE_GRAPH_ABSENT" in ids(case)
 
 # Shape gate must reject a present-but-hollow sidecar even though absence is
 # admitted for legacy/non-ICPG v1 packets.
@@ -135,4 +149,4 @@ with tempfile.TemporaryDirectory() as tmp:
     assert "case-obligation-denominator-and-ownership" in observed["assertions"]["implemented"]
     assert observed["claims_not_proven"]
 
-print("agentic-tech-lead selftest: PASS baseline + additive ICPG controls")
+print("agentic-tech-lead selftest: PASS baseline + exact-byte ICPG controls")
