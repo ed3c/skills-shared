@@ -66,7 +66,7 @@ skills/agentic-tech-lead-orchestration/
     └── problem_closure_selftest.py                        #378
 ```
 
-`tests/run-all.sh` is the shared deterministic convergence gate. It validates the new schemas and executes all four dedicated selftests; it intentionally does **not** pass `--execute` to the Codex adapter, `--apply` to the GitHub projection, or invoke a live Herdr/provider lane.
+`tests/run-all.sh` is the shared deterministic convergence gate. It validates the control-plane schemas and executes all four dedicated selftests; it intentionally does **not** pass `--execute` to the Codex adapter, `--apply` to the GitHub projection, require a live Herdr process, or claim real provider/source closure.
 
 ## Primary orchestration State Machine
 
@@ -90,26 +90,30 @@ REQUEST_BOUND
 → HUMAN_ADMIT_REQUIRED
 ```
 
-Failure/control states include stale attempts, lease expiry, retryable/terminal failure, cancellation, supersession, straggler detach, authority block, semantic conflict, non-decomposable task, and duplicate suppression. A state declared only in a schema or fixture is not runtime evidence.
+Failure/control states include stale attempts, lease expiry, retryable/terminal failure, cancellation, supersession, straggler detach, authority block, semantic conflict, non-decomposable task, duplicate suppression, stale consumed sibling head and historical convergence invalidation. A state declared only in a schema or fixture is not runtime evidence.
 
 ## Codex control-plane extension State Machine
 
-The provider-neutral State Machine above remains authoritative. The trigger-selected #375–#378 adapters refine only the execution/projection/evidence portions:
+The provider-neutral State Machine above remains authoritative. The trigger-selected #375–#378 adapters refine only execution/projection/evidence portions:
 
 ```text
 TASK_DAG_ASSERTED
 → GITHUB_PROJECTION_COMPILED                     #376
+→ REMOTE_PREFLIGHT_BOUND
 → REMOTE_READBACK_REQUIRED
 → READY_WAVE_COMPUTED
 → SESSION_PACKET_COMPILED                        #375
-→ ISOLATED_WORKTREE_BOUND
+→ EXACT_WORKTREE_SUBJECT_BOUND
 → CODEX_THREAD_STARTED | COMPATIBLE_THREAD_RESUMED
 → ATTEMPT_EXECUTED
 → STRUCTURED_RESULT_COLLECTED
+→ POST_TURN_LEASE_READBACK
 → CONTROLLER_SOURCE_DIFF_TEST_READBACK_REQUIRED
 → HERDR_OBSERVATION_OPTIONAL                     #377
+→ FRESHNESS_LIVENESS_CLEANUP_ASSERTED
 → INDEPENDENT_SHADOW_REVIEW
-→ PROBLEM_CLOSURE_RECOMPUTED                     #378
+→ PROBLEM_DENOMINATOR_RECOMPUTED                 #378
+→ EXACT_HEAD_HOSTED_REVALIDATION                 #379
 → NEXT_WAVE | LOCAL_HANDOFF | HUMAN_ADMIT_REQUIRED
 ```
 
@@ -119,32 +123,32 @@ Authority stays separated:
 Tech Lead core       semantic decomposition, dual DAG, leases, convergence
 Codex SDK adapter    one bounded execution attempt; never acceptance/merge authority
 GitHub DAG adapter   durable completion-edge projection; never semantic truth alone
-Herdr adapter        process/worktree/session observation; DONE_CANDIDATE only
-closure ledger       typed source→problem→evidence reconciliation; no UI-state laundering
+Herdr adapter        exact identity/freshness/liveness/cleanup observation; DONE_CANDIDATE only
+closure ledger       frozen denominator + exact-subject evidence reconciliation; no UI-state laundering
 Shadow               independent findings/evidence ceiling; never second writer
-Human/repo policy    semantic conflict, merge, release, promotion, rollback
+Human/repo policy    semantic conflict, sibling admission, merge, release, promotion, rollback
 ```
 
 ## Control-plane DAG and convergence
 
-The current implementation program is a real sibling fan-out, not a serial Stack:
+The current implementation program is a real sibling fan-out, not a serial Stack. Current selected candidate heads are read from GitHub and recorded in the trace document rather than duplicated here:
 
 ```text
 main
-├── #375 / PR #451  Codex SDK runtime adapter         SIBLING
-├── #376 / PR #452  GitHub Issue DAG projection      SIBLING
-├── #377 / PR #453  Herdr runtime observer           SIBLING
-├── #378 / PR #454  problem-closure ledger           SIBLING
-└── PR #380         documentation foundation         SIBLING
-       ↓ exact STATIC_ADMITTED bytes only
-#379                 CONVERGENCE
+├── #375 / PR #451  Codex SDK runtime adapter         SIBLING / UNMERGED CANDIDATE
+├── #376 / PR #452  GitHub Issue DAG projection      SIBLING / UNMERGED CANDIDATE
+├── #377 / PR #456  Herdr runtime observer v3        SIBLING / UNMERGED CANDIDATE
+├── #378 / PR #457  problem-closure ledger v3        SIBLING / UNMERGED CANDIDATE
+└── PR #380         documentation foundation         DOCUMENTATION SIBLING
+       ↓ exact selected candidate bytes
+#379 / PR #455      CONVERGENCE CANDIDATE
        ↓ shared run-all / README / AGENTS / Git Town / traceability
 independent Shadow + exact-head CI
        ↓
-HUMAN_ADMIT_REQUIRED
+READY_FOR_HUMAN_ADMIT | HOLD | REJECT
 ```
 
-The #379 integration subject is intentionally multi-parent: its Git ancestry records the exact sibling heads it consumes. That makes convergence causality inspectable without pretending one sibling is another sibling's parent. A later implementation may use `TRUE_CHILD` only when it actually consumes named unmerged parent bytes.
+The #379 integration subject may be multi-parent so Git ancestry records exact byte consumption. That does not admit or merge the sibling candidates and does not make one sibling the parent of another. A later implementation may use `TRUE_CHILD` only when it actually consumes named unmerged parent bytes.
 
 ## Local Handoff Execution Queue State Machine
 
@@ -181,7 +185,7 @@ optional true Stack child only when unmerged parent bytes are consumed
 Human/local-runtime authority
 ```
 
-False edges are rejected. Path-disjoint work remains siblings. A dependent convergence attempt rebinds its base at lease time to the verified integrated prerequisites; independent candidates retain the common frozen base so comparison remains fair.
+False edges are rejected. Path-disjoint work remains siblings. A dependent convergence attempt rebinds its base at lease time to the selected integrated prerequisites; independent candidates retain the common frozen base so comparison remains fair.
 
 ## End-to-end data flow
 
@@ -196,12 +200,12 @@ Issue / PRD / PDF / article
 → isolated worktree/session attempts
 → Codex runtime result or another admitted executor result
 → independent source/diff/test readback
-→ optional Herdr identity/state observation
+→ optional Herdr identity/freshness/liveness/cleanup observation
 → independent Shadow review
-→ typed implementation/verification receipts
+→ frozen problem denominator + typed exact-subject receipts
 → problem-closure recomputation
-→ convergence from verified prerequisite bytes
-→ frozen global-objective oracle
+→ convergence from selected prerequisite bytes
+→ exact-head deterministic and hosted revalidation
 → delivery handoff / next wave
     ├── current runtime can continue
     └── local/runtime-only evidence remains → asserted Local Handoff Queue
@@ -213,19 +217,19 @@ Issue / PRD / PDF / article
 ## Evidence ceilings for #375–#379
 
 ```text
-Codex SDK adapter bytes + selftest          deterministic/static only
+Codex SDK adapter bytes + selftest          deterministic/static only; 4/14
 Codex SDK live thread/turn                  NOT_EXERCISED until exact runtime receipt
-GitHub dependency projection checker        deterministic/static only
+GitHub dependency projection checker        deterministic/static only; 6/17
 GitHub remote dependency mutation/readback  NOT_EXERCISED until explicit live receipt
-Herdr observer checker/fallback              deterministic/static only
+Herdr observer checker/fallback              deterministic/static only; 4/18
 Herdr live process/worktree observation      NOT_EXERCISED until runtime receipt
-problem-closure schema/checker/renderer       deterministic/local consistency only
-real article/PDF/provider claim closure       evidence-dependent
-#379 shared convergence docs/tests            route + deterministic convergence only
-merge/release                                HUMAN_ADMIT_REQUIRED
+problem-closure schema/checker/renderer       deterministic consistency only; 6/22
+real article/PDF/provider claim closure       EVIDENCE_DEPENDENT
+#379 convergence candidate                   route + deterministic integration only
+sibling admission / merge / release          HUMAN_ADMIT_REQUIRED
 ```
 
-A workflow green state proves only the workflow's exact subject and denominator. It cannot convert a static adapter into live provider evidence.
+A workflow green state proves only the workflow's exact subject and denominator. It cannot convert static adapter bytes or a convergence ancestry edge into live provider evidence or Human admission.
 
 ## Golden refactor proof
 
@@ -281,7 +285,7 @@ The proof is registered by `skill-refactor-proof-loop`; its implementation remai
 Human merge/release admission
 ```
 
-The #375–#378 live lanes remain additional independent evidence work even after their static mechanisms converge. They are separately owned evidence lanes, not artificial Stack children.
+The #375–#378 live lanes remain additional independent evidence work even after their deterministic mechanisms are integrated into #379. They are separately owned evidence/process lanes, not artificial Stack children.
 
 ## Tech Lead + Shadow closure responsibility
 
@@ -294,10 +298,10 @@ Tech Lead result
 → source/contract/runtime contradictions
 → local task versus global objective
 → evidence ceiling and denominator
-→ HOLD / REJECT / ELIGIBLE_FOR_HUMAN_ADMIT
+→ HOLD / REJECT / READY_FOR_HUMAN_ADMIT
 ```
 
-A Tech Lead local PASS is not a global-objective PASS. A static or hermetic proof is not a live model/provider/runtime proof. When the current runtime cannot execute the next proof, emit one asserted queue bound to one immutable subject; do not guess host commands or mutate an old epoch after the accepted subject changes.
+A Tech Lead local PASS is not a global-objective PASS. A static or hermetic proof is not a live model/provider/runtime proof. A convergence candidate consuming unmerged sibling bytes is not sibling admission. When the current runtime cannot execute the next proof, emit one asserted queue bound to one immutable subject; do not guess host commands or mutate an old epoch after the selected subject changes.
 
 Relation vocabulary:
 
@@ -307,7 +311,7 @@ TRUE_CHILD          named unmerged byte dependency
 CONVERGENCE         one shared-index/integration owner
 PROCESS_DEPENDENCY  ordering without Git ancestry
 EXTERNAL_EVIDENCE   independent receipt lane, no Stack paths
-HISTORICAL          admitted/forensic prior subject, not current state authority
+HISTORICAL          admitted/rejected/forensic prior subject, not current state authority
 ```
 
 The full portable audit is in [`../../docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md`](../../docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md). The current Codex control-plane trace is [`../../docs/traceability/CODEX_SDK_TECH_LEAD_CONTROL_PLANE.md`](../../docs/traceability/CODEX_SDK_TECH_LEAD_CONTROL_PLANE.md).
@@ -329,4 +333,4 @@ python3 tests/real_task_ab.py
 sh tests/run-all.sh
 ```
 
-A local or CI PASS validates only the named subject and evidence layer. Provider installation, index freshness, live Codex/Herdr/GitHub mutation, real source closure, real queue execution, Git Town/Forgejo delivery, merge, release, and production remain separate.
+A local or CI PASS validates only the named subject and evidence layer. Provider installation, index freshness, live Codex/Herdr/GitHub mutation, real source closure, real queue execution, Git Town/Forgejo delivery, sibling admission, merge, release, and production remain separate.

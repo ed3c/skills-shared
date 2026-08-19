@@ -118,7 +118,7 @@ main
 
 ### `CONVERGENCE`
 
-One owner consumes several admitted prerequisite artifacts and updates shared indexes/integration/e2e surfaces. A convergence commit may have multiple sibling parents. That records consumption without making the siblings children of each other.
+One owner consumes several selected prerequisite artifacts and updates shared indexes/integration/e2e surfaces. A convergence commit may have multiple sibling parents. That records byte consumption without making the siblings children of each other and without admitting unmerged candidates by ancestry alone.
 
 ### `PROCESS_DEPENDENCY`
 
@@ -130,7 +130,7 @@ Independent runtime/Shadow/provider receipt lane. It owns no implementation path
 
 ### `HISTORICAL`
 
-Immutable admitted/rejected/forensic subject retained for lineage, not current mutable authority.
+Immutable admitted/rejected/closed-unmerged/forensic subject retained for lineage, not current mutable authority.
 
 ## Molecular atom contract
 
@@ -145,6 +145,7 @@ consumes_artifacts / provides_artifacts
 one writer/resource lease
 evals + negative controls
 exact-head hosted/runtime evidence
+candidate/admitted/merged distinction
 terminal classification
 remaining evidence ceiling
 rollback
@@ -156,73 +157,70 @@ The machine index and `assert_molecular_stack_index.py` reject hidden multi-pare
 
 ## Current Codex control-plane Molecular index — #375–#380
 
-Current common base observed for the hardened sibling epoch:
+Current common base observed for this sibling epoch:
 
 ```text
 main@4ca9417b1da5ff32f1d4d3e7af64a15908749024
 ```
 
-| Atom | Issue / PR | Relation | Current exact head | Provides | Deterministic denominator | Remaining ceiling |
+| Atom | Issue / PR | Relation | Current selected head | Provides | Deterministic denominator | Remaining ceiling |
 |---|---|---|---|---|---|---|
-| `A-CODEX` | `#375 / #451` | `SIBLING` | `86f9e8d940b76cb71b713c098ff09cb68eb4e0c1` | exact session/result contract, clean-worktree subject preflight, SDK runner, post-turn writable-lease readback | `4 positive / 14 mutations`; own Skill Suites + Shared Skills Infra green | live SDK `NOT_EXERCISED`; independent acceptance still required |
-| `A-GH-DAG` | `#376 / #452` | `SIBLING` | `426fb6f6f548f71572d4402e73e0b05ecf6f8aa8` | completion-edge projection, repo/default-branch/visibility + issue-state + closing-PR-reference preflight, non-destructive readback | `6 positive / 17 mutations`; own Skill Suites + Shared Skills Infra green | live mutation/readback `NOT_EXERCISED`; generic development-link ownership beyond closing refs residual |
-| `A-HERDR` | `#377 / #453` | `SIBLING` | `5b6e58d1e7e9e127123dbb4a9189b98e5ff973cf` | optional pane/workspace/process/native-session/foreground-CWD observer + fallback | `4 positive / 9 mutations` | live Herdr `NOT_EXERCISED` |
-| `K-CLOSURE` | `#378 / #454` | `SIBLING` | `32c5425de1cf4f083bd998e81873a86af8771e1e` | source→task/DAG→session/evidence closure schema/checker/renderer | `4 positive / 11 mutations` | real source/provider closure `EVIDENCE_DEPENDENT` |
-| `D-TRACE` | `#379 refs / #380` | `SIBLING / DOCUMENTATION` | `7a9d68fcd58b1ed78ed6d05595a8df7eae53f5a5` | original control-plane design/trace routing | navigation only | consumed by convergence; no runtime claim |
-| `X-CONVERGENCE` | `#379 / #455` | `CONVERGENCE` | read current head from GitHub | exact sibling bytes + shared `run-all`, Agent routes, Shadow relation, Git Town/trace indexes | current final head must rerun Skill Suites + Shared Skills Infra + Skill Eval Contract + Git Town workflow | static/deterministic scope only; Human Admit/merge/release separate |
+| `A-CODEX` | `#375 / #451` | `SIBLING / UNMERGED CANDIDATE` | `86f9e8d940b76cb71b713c098ff09cb68eb4e0c1` | exact session/result contract, clean-worktree subject preflight, SDK runner, post-turn writable-lease readback | `4 / 14`; own exact-head shared workflows green | live SDK `NOT_EXERCISED`; independent acceptance still required |
+| `A-GH-DAG` | `#376 / #452` | `SIBLING / UNMERGED CANDIDATE` | `426fb6f6f548f71572d4402e73e0b05ecf6f8aa8` | completion-edge projection, repo/default-branch/visibility + issue-state + closing-PR-reference preflight, non-destructive readback | `6 / 17`; own exact-head shared workflows green | live mutation/readback `NOT_EXERCISED`; generic development-link ownership beyond closing refs residual |
+| `A-HERDR` | `#377 / #456` | `SIBLING / UNMERGED CANDIDATE` | `23b03826b1bf8fe66bd731716466a9349d3242d6` | exact Git/worktree/pane/workspace/PID/session + PID-start/freshness/liveness + cleanup/residue observer | `4 / 18`; own exact-head shared workflows green | live Herdr `NOT_EXERCISED`; `DONE_CANDIDATE` advisory only |
+| `K-CLOSURE` | `#378 / #457` | `SIBLING / UNMERGED CANDIDATE` | `ac5ddc0287eb4e4156a7c7eef178b7be8bbd1d34` | frozen denominator/source manifest + exact repo/evidence/receipt subjects + supersession validation | `6 / 22`; own exact-head shared workflows green | real source/provider closure `EVIDENCE_DEPENDENT` |
+| `D-TRACE` | `#379 refs / #380` | `DOCUMENTATION SIBLING` | `7a9d68fcd58b1ed78ed6d05595a8df7eae53f5a5` | original control-plane design/trace routing | navigation only | consumed by convergence; no runtime claim |
+| `X-CONVERGENCE` | `#379 / #455` | `CONVERGENCE CANDIDATE` | read current head from GitHub | exact selected sibling bytes + shared `run-all`, Agent routes, Shadow relation, Git Town/trace indexes | final current head must rerun full hosted denominator | static/deterministic scope only; sibling admission/Human merge/release separate |
 
-Current hardened-parent convergence refresh:
+Current #377/#378 candidate integration checkpoint:
+
+```text
+ed852502437570c7c86bae12c07c16a3f5d37ea8
+parents:
+  c306b3b4cea797f5f4d1323f8ec7fcd94a94f3ec  prior #455 convergence head
+  23b03826b1bf8fe66bd731716466a9349d3242d6  #456 selected candidate
+  ac5ddc0287eb4e4156a7c7eef178b7be8bbd1d34  #457 selected candidate
+```
+
+Earlier #451/#452 hardening entered through:
 
 ```text
 5d21ecab137cb26586ef1636dc279ee29733e913
 parents:
   35874af7a6d04783983b05c8f1b1e402471b4451  prior #455 epoch
-  86f9e8d940b76cb71b713c098ff09cb68eb4e0c1  #451 current
-  426fb6f6f548f71572d4402e73e0b05ecf6f8aa8  #452 current
+  86f9e8d940b76cb71b713c098ff09cb68eb4e0c1  #451 selected candidate
+  426fb6f6f548f71572d4402e73e0b05ecf6f8aa8  #452 selected candidate
 ```
 
 The final mutable #455 head is never self-embedded in this README. Read it from GitHub after every convergence edit.
 
-### Historical convergence epoch 1
-
-The earlier implementation convergence remains immutable lineage:
+### Historical convergence and rejected candidates
 
 ```text
-c0f6979f80038394350aea724c598c8dba5ac338
-parents:
-  ccef97dedd7ea8b1873e3afa130ca82b8eabb413
-  339ae874b070fb3a8a5fa89b0241d90434257e99  historical #451
-  b5295df681d6471b19775db38860b2d151339879  historical #452
-  5b6e58d1e7e9e127123dbb4a9189b98e5ff973cf
-  32c5425de1cf4f083bd998e81873a86af8771e1e
-union tree 37cb2c56e7dfc939cacaa0f65cf8f9b0f8318b22
-```
+c0f6979f80038394350aea724c598c8dba5ac338  epoch-1 union
+af427a13a7096df91d74a48c0a4ca6ce3f3e2ac9  epoch-1 + PR #380 documentation
+35874af7a6d04783983b05c8f1b1e402471b4451  historical hosted-green convergence
 
-Then `af427a13...` consumed PR #380 documentation and `35874af7...` refreshed current-main-at-that-time. That epoch passed all four hosted workflows and received a Shadow static verdict, but it became `HISTORICAL` when #451/#452 moved. Green evidence never follows a moving parent automatically.
-
-Rejected first candidates are preserved:
-
-```text
 #444 → #451
 #445 → #452
-#446 → #453
-#447 → #454
+#446 → #453 → #456
+#447 → #454 → #457
 ```
 
-They are `HISTORICAL / REJECTED`, not alternate merge candidates.
+#446/#447 are rejected provenance candidates. #453/#454 are provenance-correct replacements later closed unmerged. They remain `HISTORICAL`, not alternate merge candidates. The older hosted-green convergence became historical when selected sibling heads moved; green evidence never follows a moving parent automatically.
 
 ### Current control-plane data flow
 
 ```text
 A-CODEX ─┐
-A-GH-DAG ├─ exact current sibling bytes ─┐
-A-HERDR ─┤                               │
-K-CLOSURE┘                               ├→ X-CONVERGENCE (#379/#455)
-D-TRACE ─── documentation sibling ───────┘       │
-                                                  ├→ unconditional shared ATL suite
-                                                  ├→ independent Shadow readback
-                                                  ├→ repository-wide hosted workflows
-                                                  └→ Human Admit for static scope
+A-GH-DAG ├─ exact selected candidate bytes ─┐
+A-HERDR ─┤                                  │
+K-CLOSURE┘                                  ├→ X-CONVERGENCE (#379/#455)
+D-TRACE ─── documentation sibling ──────────┘       │
+                                                     ├→ unconditional shared ATL suite
+                                                     ├→ independent Shadow readback
+                                                     ├→ repository-wide hosted workflows
+                                                     └→ READY_FOR_HUMAN_ADMIT | HOLD | REJECT
 
 live Codex / live GitHub mutation / live Herdr / real source-provider closure
   = EXTERNAL_EVIDENCE / PROCESS_DEPENDENCY
@@ -231,15 +229,15 @@ live Codex / live GitHub mutation / live Herdr / real source-provider closure
 
 ## Required shared convergence gates
 
-The convergence subject contains the sibling bytes first; then `agentic-tech-lead-orchestration/tests/run-all.sh` unconditionally executes:
+The convergence subject contains selected sibling bytes first; then `agentic-tech-lead-orchestration/tests/run-all.sh` unconditionally executes:
 
 ```text
-6 Draft-2020-12 schemas
+6 Draft-2020-12 control-plane schemas
 problem-closure example
 Codex selftest        4 / 14
 GitHub DAG selftest   6 / 17
-Herdr selftest        4 / 9
-closure selftest      4 / 11
+Herdr selftest        4 / 18
+closure selftest      6 / 22
 closure checker + Markdown non-authority marker
 existing ATL suite
 ```
@@ -255,7 +253,7 @@ Skill Eval Contract
 Git Town Stacked PR Worker (offline-contract + live-canary)
 ```
 
-An earlier green head is historical after any consumed sibling head moves.
+An earlier green head is historical after any selected sibling head moves. A final-head hosted PASS does not admit or merge an unmerged sibling and does not raise live evidence.
 
 ## Human-owned operations / rollback
 
@@ -263,12 +261,13 @@ An earlier green head is historical after any consumed sibling head moves.
 semantic conflict resolution       HUMAN
 force update / force push          HUMAN / repository policy
 unmanaged GitHub blocker deletion  HUMAN or separately admitted policy
+sibling admission                  HUMAN / repository policy
 merge                              HUMAN / repository merge authority
 release / promotion                HUMAN / repository release authority
 rollback                           reviewed revert to an exact admitted pre-convergence subject
 ```
 
-No workflow green state, Shadow agreement, issue close or PR publication substitutes for these operations.
+No workflow green state, Shadow agreement, issue close, PR publication or convergence ancestry substitutes for these operations.
 
 ## Publication and merge boundary
 
@@ -317,7 +316,7 @@ EVIDENCE_DEPENDENT
 HUMAN_ADMIT_REQUIRED
 ```
 
-A static prompt, schema, Stack graph, deterministic test or hosted workflow cannot by itself prove live Codex/Herdr/GitHub effects, real source/provider closure, model uplift, merge, release or production readiness.
+A static prompt, schema, Stack graph, deterministic test or hosted workflow cannot by itself prove live Codex/Herdr/GitHub effects, real source/provider closure, model uplift, sibling admission, merge, release or production readiness.
 
 ## Adoption checklist
 
@@ -325,6 +324,7 @@ A static prompt, schema, Stack graph, deterministic test or hosted workflow cann
 - define repository profile and `.git-town.toml`;
 - enforce one Worker/branch/worktree and branch/path/resource leases;
 - declare consumed/provided artifacts and one convergence owner;
+- distinguish selected candidate ancestry from admitted/merged ancestry;
 - add machine-readable Molecular Stack index;
 - add bounded no-push sync wrappers and receipts;
 - run local verification before publication;

@@ -23,7 +23,7 @@ Executable Agent Architecture Rubric
         ↓
 Meta-Abstraction Evaluation
         ↓
-ELIGIBLE_FOR_HUMAN_ADMIT / HOLD / REJECT
+READY_FOR_HUMAN_ADMIT / HOLD / REJECT
 ```
 
 ## State ownership
@@ -57,7 +57,7 @@ EXACT_SUBJECT_BOUND
 → LOCAL_TASK_VS_GLOBAL_OBJECTIVE_CHECKED
 → EVIDENCE_CEILING_ASSERTED
 → DENOMINATOR_CLEANUP_ROLLBACK_CHECKED
-→ ELIGIBLE_FOR_HUMAN_ADMIT / HOLD / REJECT
+→ READY_FOR_HUMAN_ADMIT / HOLD / REJECT
 ```
 
 The Shadow receives the Tech Lead's public plan, action intents, exact subject, contracts and observable evidence. The Shadow does not reuse the Tech Lead's conclusion as independent evidence.
@@ -70,7 +70,7 @@ source/document/contract/runtime contradiction detection
 global objective versus local task result
 false-promotion and evidence-ceiling review
 missing owner/issue/eval/receipt discovery
-failed/stale/cancelled/superseded denominator review
+failed/stale/cancelled/superseded/closed-unmerged denominator review
 cleanup and rollback review
 ```
 
@@ -82,11 +82,12 @@ silent edit of the Builder branch
 unreviewed semantic-conflict repair
 fixture/deterministic PASS → live PASS
 model agreement → Human Admit
+convergence ancestry → sibling admission
 workflow green → release
 private chain-of-thought persistence
 ```
 
-The Tech Lead owns decomposition, leases, Worker admission and convergence. Shadow owns independent findings. A Human or repository controller owns semantic admission, merge, promotion, release and rollback.
+The Tech Lead owns decomposition, leases, Worker admission and convergence. Shadow owns independent findings. A Human or repository controller owns semantic admission, sibling admission, merge, promotion, release and rollback.
 
 ## Codex control-plane monitor — #375–#379
 
@@ -94,48 +95,53 @@ When `agentic-tech-lead-orchestration` selects the Codex SDK / GitHub Issue DAG 
 
 ```text
 #375 Codex SDK candidate
-  → manifest/task/attempt/worktree/thread identity
-  → runtime result is self-report
-  → independent source/diff/test readback remains required
+  → exact task/attempt/worktree/commit/tree/thread identity
+  → post-turn writable-lease readback
+  → runtime result remains below implementation acceptance
 
 #376 GitHub Issue DAG candidate
   → portable semantic dual DAG
-  → projected completion edges
-  → exact blockedBy readback
+  → repository/default-branch/visibility + issue-state preflight
+  → projected completion edges + exact blockedBy readback
   → refuse extra unmanaged blockers, drift, or start-edge serialization
 
-#377 Herdr observation
-  → pane/workspace/process/native-session/foreground_cwd identity
+#377 Herdr candidate v3
+  → exact Git/worktree/pane/workspace/PID/native-session identity
+  → PID start-time + bounded freshness + process liveness
+  → DONE_CANDIDATE requires CLEAN cleanup and zero residue
   → DONE_CANDIDATE remains advisory
-  → controller readback remains required
 
-#378 problem closure
-  → exact source identity/location
-  → task/DAG/issue/session-attempt lineage
-  → typed implementation + verification + receipt lanes
-  → independent closure recomputation
+#378 problem-closure candidate v3
+  → frozen source/problem denominator + claim digest
+  → exact repo/commit/tree + portable session/worktree identity
+  → CURRENT/HISTORICAL/SUPERSEDED implementation mapping
+  → exact-subject verification + matching receipt lanes
+  → deterministic supersession/residual/closure recomputation
 ```
 
-#379 is the single convergence writer. Shadow must read the exact multi-parent convergence subject and verify:
+#379 is the single convergence writer. Shadow must read the exact multi-parent convergence candidate and verify:
 
 ```text
-every admitted sibling head is actually an ancestor/consumed subject
-shared run-all executes every required new selftest with no conditional skip
-README / AGENTS / module / script / test routes match current files
+every selected sibling candidate head is actually an ancestor/consumed subject
+selected candidates are not mislabeled admitted/merged
+shared run-all executes every required control-plane selftest with no conditional skip
+current denominator is Codex 4/14, GitHub DAG 6/17, Herdr 4/18, closure 6/22
+README / AGENTS / module / script / test / traceability / Git Town routes match current selected bytes
 Git Town index records SIBLING rather than fake TRUE_CHILD edges
 open/live/evidence-dependent lanes remain in the denominator
-rejected/superseded candidate lineage is not erased
+rejected/superseded/closed-unmerged candidate lineage is not erased
 no merge/release/Human Admit is inferred from hosted CI
 ```
 
-The Shadow verdict for a deterministic convergence subject may be `STATIC_ADMITTED` or `ELIGIBLE_FOR_HUMAN_ADMIT` only for the named static/deterministic scope. It must separately report:
+A Shadow verdict on a deterministic convergence candidate may be `READY_FOR_HUMAN_ADMIT` only for the named static/deterministic integration scope. It must separately report:
 
 ```text
-live Codex SDK execution                 NOT_EXERCISED until runtime receipt
-live GitHub dependency mutation/readback NOT_EXERCISED until remote receipt
-live Herdr observation                   NOT_EXERCISED until runtime receipt
-real source/provider closure             EVIDENCE_DEPENDENT
-merge/release                            HUMAN_ADMIT_REQUIRED
+#451/#452/#456/#457 sibling admission      HUMAN_ADMIT_REQUIRED
+live Codex SDK execution                   NOT_EXERCISED until runtime receipt
+live GitHub dependency mutation/readback   NOT_EXERCISED until remote receipt
+live Herdr observation                     NOT_EXERCISED until runtime receipt
+real source/provider closure               EVIDENCE_DEPENDENT
+#455 merge/release                         HUMAN_ADMIT_REQUIRED
 ```
 
 A live lane becoming green later does not rewrite the historical static verdict; it creates a new exact-subject receipt and a new closure computation.
@@ -153,7 +159,7 @@ one convergence owner
         ↓ Human Admit where required
 ```
 
-Use `TRUE_CHILD` only when the Shadow implementation itself consumes unmerged parent bytes. Use `PROCESS_DEPENDENCY` when later admission waits for the Shadow receipt without changing branch ancestry. A multi-parent convergence commit may consume several SIBLING heads while leaving those heads siblings of each other.
+Use `TRUE_CHILD` only when the Shadow implementation itself consumes unmerged parent bytes. Use `PROCESS_DEPENDENCY` when later admission waits for the Shadow receipt without changing branch ancestry. A multi-parent convergence commit may consume several SIBLING candidate heads while leaving those heads siblings of each other; ancestry alone is not admission.
 
 Full closure vocabulary and current control-plane trace:
 
@@ -219,12 +225,13 @@ missing or malformed input               exit 64
 ```text
 rubric/procedure atoms/checkers/fixtures              IMPLEMENTED
 local deterministic positive/Vibe/domain controls     IMPLEMENTED
-Codex control-plane deterministic convergence         owned by #379 exact subject
+Codex control-plane deterministic convergence         owned by #379 exact candidate subject
 independent same-subject live Shadow execution         NOT_EXERCISED
 live Codex SDK / Herdr / GitHub dependency effects     NOT_EXERCISED unless exact receipts exist
+real source/provider closure                           EVIDENCE_DEPENDENT
 live external registry retrieval                       NOT_EXERCISED
 live multimodal browser/device observation             NOT_EXERCISED
 live Langfuse/OpenTelemetry production feedback        NOT_EXERCISED
 cross-model causal uplift                              NOT_EXERCISED
-actual abstraction promotion / merge / release         HUMAN_ADMIT_REQUIRED
+actual sibling admission / abstraction promotion / merge / release  HUMAN_ADMIT_REQUIRED
 ```

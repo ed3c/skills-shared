@@ -19,6 +19,8 @@ Read this file before adding or changing repository-wide traceability, Tech Lead
 
 Traceability documents are human projections. They may route to machine truth but must never replace schemas, current GitHub metadata, Git ancestry, runtime receipts, source readback, CI execution, or Human Admit.
 
+A convergence branch may consume exact unmerged sibling candidate bytes for integration testing. Such ancestry proves byte consumption only; it does **not** promote the sibling to `ADMITTED`, `MERGED`, or repository truth.
+
 ## Closure law
 
 ```text
@@ -35,36 +37,48 @@ Never equate issue closure, PR merge, workflow green, model agreement, article/P
 
 ## Writer law
 
-Exactly one convergence writer owns each shared traceability/index subject. Parallel implementation lanes remain siblings unless a child consumes named unmerged parent bytes. A convergence commit may have several sibling parents to make the consumed bytes inspectable; those parents remain siblings of each other. Shadow reviewers do not mutate the Tech Lead's implementation branch.
+Exactly one convergence writer owns each shared traceability/index subject. Parallel implementation lanes remain siblings unless a child consumes named unmerged parent bytes. A convergence commit may have several sibling parents to make consumed bytes inspectable; those parents remain siblings of each other. Shadow reviewers do not mutate the Tech Lead's implementation branch.
 
 ## Codex control-plane program
 
 ```text
-#375 / PR #451  Codex SDK controller/session adapter       SIBLING / STATIC_ADMITTED
-#376 / PR #452  GitHub Issue DAG projection               SIBLING / STATIC_ADMITTED
-#377 / PR #453  Herdr observer                            SIBLING / STATIC_ADMITTED
-#378 / PR #454  problem-closure ledger                    SIBLING / STATIC_ADMITTED
-PR #380         design/traceability foundation            SIBLING / DOCUMENTATION
-      ↓ exact consumed bytes
-#379             control-plane convergence                 CONVERGENCE
+#375 / PR #451  Codex SDK controller/session adapter       SIBLING / UNMERGED CANDIDATE
+#376 / PR #452  GitHub Issue DAG projection               SIBLING / UNMERGED CANDIDATE
+#377 / PR #456  Herdr observer v3                         SIBLING / UNMERGED CANDIDATE
+#378 / PR #457  problem-closure ledger v3                 SIBLING / UNMERGED CANDIDATE
+PR #380         design/traceability foundation            DOCUMENTATION SIBLING
+      ↓ exact candidate bytes
+#379 / PR #455  control-plane convergence                 CONVERGENCE CANDIDATE
 ```
 
-The canonical working trace is `CODEX_SDK_TECH_LEAD_CONTROL_PLANE.md`. The #379 convergence branch consumes the exact sibling heads rather than copying their implementation from prose. The shared deterministic suite must execute all required control-plane selftests with no `if file exists` bypass.
+Historical closed-unmerged implementation candidates remain part of the denominator: #446/#453 for #377 and #447/#454 for #378. They are not current merge candidates.
+
+The canonical working trace is `CODEX_SDK_TECH_LEAD_CONTROL_PLANE.md`. The #379 convergence branch consumes exact sibling heads rather than reconstructing implementation from prose. The shared deterministic suite must execute all required control-plane selftests with no `if file exists` bypass.
+
+Current deterministic denominator:
+
+```text
+Codex SDK       4 positive / 14 mutations
+GitHub DAG      6 positive / 17 mutations
+Herdr           4 positive / 18 mutations
+problem closure 6 positive / 22 mutations
+```
 
 Static/deterministic implementation and live evidence remain separate:
 
 ```text
-Codex SDK mechanism                    implemented on convergence subject
+Codex SDK mechanism                    convergence-candidate bytes present
 Codex SDK live execution               NOT_EXERCISED
-GitHub DAG mechanism                   implemented on convergence subject
+GitHub DAG mechanism                   convergence-candidate bytes present
 GitHub remote dependency mutation      NOT_EXERCISED
-Herdr observer mechanism               implemented on convergence subject
+Herdr observer mechanism               convergence-candidate bytes present
 Herdr live observation                 NOT_EXERCISED
-problem-closure mechanism              implemented on convergence subject
+problem-closure mechanism              convergence-candidate bytes present
 real source/provider closure           EVIDENCE_DEPENDENT
-merge/release                          HUMAN_ADMIT_REQUIRED
+sibling merge/admission                 HUMAN_ADMIT_REQUIRED
+#455 merge/release                      HUMAN_ADMIT_REQUIRED
 ```
 
 ## Completion report
 
-Before declaring this directory synchronized, report current repository subject, consumed parent subjects, changed routes, issue/PR graph changes, exact evidence subjects, hosted workflow denominator, unresolved source/runtime items, stale external snapshots, rejected/superseded candidates, rollback subject, and all `ABSENT`, `NOT_IMPLEMENTED`, `NOT_EXERCISED`, `SKIPPED_BY_POLICY`, `EVIDENCE_DEPENDENT`, and `HUMAN_ADMIT_REQUIRED` states.
+Before declaring this directory synchronized, report current repository subject, selected/consumed parent subjects, candidate/admitted distinction, changed routes, issue/PR graph changes, exact evidence subjects, hosted workflow denominator, unresolved source/runtime items, stale external snapshots, rejected/superseded candidates, rollback subject, and all `ABSENT`, `NOT_IMPLEMENTED`, `NOT_EXERCISED`, `SKIPPED_BY_POLICY`, `EVIDENCE_DEPENDENT`, and `HUMAN_ADMIT_REQUIRED` states.

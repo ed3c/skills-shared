@@ -14,7 +14,7 @@ source / incident
 → Human Admit
 ```
 
-Mutable open PR heads are read from GitHub immediately before decision use. This document records immutable merged/rejected/integration ancestors and current observed snapshots, but never self-embeds its own mutable final head.
+Mutable open PR heads are read from GitHub immediately before decision use. This document records immutable merged/rejected/integration ancestors and current observed snapshots, but never self-embeds its own mutable final head. A convergence ancestry edge proves consumed bytes, not admission of an unmerged sibling.
 
 ## Proof-carrying Skill refactor Stack
 
@@ -41,71 +41,75 @@ skills/skill-refactor-proof-loop/scripts/check_refactor_proof_stack.py
 
 Canonical programme trace: [`CODEX_SDK_TECH_LEAD_CONTROL_PLANE.md`](CODEX_SDK_TECH_LEAD_CONTROL_PLANE.md). Portable law remains `skills/agentic-tech-lead-orchestration/SKILL.md`.
 
-Current common base observed for the hardened sibling epoch:
+Current common base observed for this sibling epoch:
 
 ```text
 main@4ca9417b1da5ff32f1d4d3e7af64a15908749024
 ```
 
-| Atom | Issue / PR | Relation | Current exact sibling head | Mechanism state | Remaining ceiling |
+| Atom | Issue / PR | Relation | Current selected exact head | Mechanism state | Remaining ceiling |
 |---|---|---|---|---|---|
-| Codex SDK controller/session | `#375 / #451` | `SIBLING` | `86f9e8d940b76cb71b713c098ff09cb68eb4e0c1` | exact worktree HEAD/tree/clean preflight + post-turn path-lease readback; selftest `4/14` | live SDK `NOT_EXERCISED`; independent source/diff/test acceptance still required |
-| GitHub Issue DAG projection | `#376 / #452` | `SIBLING` | `426fb6f6f548f71572d4402e73e0b05ecf6f8aa8` | completion-edge projection + repo/default-branch/visibility + issue-state + closing-PR-reference preflight; selftest `6/17` | live mutation/readback `NOT_EXERCISED`; generic development-link ownership beyond closing refs residual |
-| Herdr observer | `#377 / #453` | `SIBLING` | `5b6e58d1e7e9e127123dbb4a9189b98e5ff973cf` | optional worktree/session observer + fallback; selftest `4/9` | live Herdr `NOT_EXERCISED` |
-| Problem closure | `#378 / #454` | `SIBLING` | `32c5425de1cf4f083bd998e81873a86af8771e1e` | source→task/DAG→session/evidence closure checker/renderer; selftest `4/11` | real source/provider closure `EVIDENCE_DEPENDENT` |
+| Codex SDK controller/session | `#375 / #451` | `SIBLING / UNMERGED CANDIDATE` | `86f9e8d940b76cb71b713c098ff09cb68eb4e0c1` | exact worktree HEAD/tree/clean preflight + post-turn path-lease readback; selftest `4/14` | live SDK `NOT_EXERCISED`; independent source/diff/test acceptance still required |
+| GitHub Issue DAG projection | `#376 / #452` | `SIBLING / UNMERGED CANDIDATE` | `426fb6f6f548f71572d4402e73e0b05ecf6f8aa8` | completion-edge projection + repo/default-branch/visibility + issue-state + closing-PR-reference preflight; selftest `6/17` | live mutation/readback `NOT_EXERCISED`; generic development-link ownership beyond closing refs residual |
+| Herdr observer | `#377 / #456` | `SIBLING / UNMERGED CANDIDATE` | `23b03826b1bf8fe66bd731716466a9349d3242d6` | exact Git/worktree/process/session identity + PID-start/freshness/liveness + cleanup/residue; selftest `4/18` | live Herdr `NOT_EXERCISED`; `DONE_CANDIDATE` remains advisory |
+| Problem closure | `#378 / #457` | `SIBLING / UNMERGED CANDIDATE` | `ac5ddc0287eb4e4156a7c7eef178b7be8bbd1d34` | frozen denominator/source manifest + exact repo/evidence subjects + supersession validation; selftest `6/22` | real source/provider closure `EVIDENCE_DEPENDENT` |
 | Documentation foundation | `#379 refs / #380` | `DOCUMENTATION SIBLING` | `7a9d68fcd58b1ed78ed6d05595a8df7eae53f5a5` | original traceability design bytes | navigation only |
-| Shared convergence | `#379 / #455` | `CONVERGENCE` | read live from GitHub | current sibling bytes + shared tests/routes/Shadow/Git Town/trace | current final head must pass full hosted denominator before new Shadow admission |
+| Shared convergence | `#379 / #455` | `CONVERGENCE CANDIDATE` | read live from GitHub | selected sibling bytes + shared tests/routes/Shadow/Git Town/trace | final exact head must pass full hosted denominator; sibling/merge admission remains Human-owned |
 
 ### Current dependency integration
 
-Concurrent hardening moved #451/#452 after the first all-green convergence. #379 therefore created a new immutable parent refresh:
+The current integration ancestry checkpoint consumes the new #456/#457 candidates without treating them as admitted:
+
+```text
+ed852502437570c7c86bae12c07c16a3f5d37ea8
+parents:
+  c306b3b4cea797f5f4d1323f8ec7fcd94a94f3ec  prior #455 convergence head
+  23b03826b1bf8fe66bd731716466a9349d3242d6  #456 exact candidate
+  ac5ddc0287eb4e4156a7c7eef178b7be8bbd1d34  #457 exact candidate
+```
+
+Before this checkpoint, #451/#452 hardening had already been integrated through:
 
 ```text
 5d21ecab137cb26586ef1636dc279ee29733e913
 parents:
-  35874af7a6d04783983b05c8f1b1e402471b4451  prior #455 convergence head
-  86f9e8d940b76cb71b713c098ff09cb68eb4e0c1  current #451
-  426fb6f6f548f71572d4402e73e0b05ecf6f8aa8  current #452
+  35874af7a6d04783983b05c8f1b1e402471b4451  prior #455 epoch
+  86f9e8d940b76cb71b713c098ff09cb68eb4e0c1  #451 selected head
+  426fb6f6f548f71572d4402e73e0b05ecf6f8aa8  #452 selected head
 ```
 
-The earlier `35874af7...` hosted-green/Shadow-admitted result is now `HISTORICAL` because consumed parents moved. It is not reused as current evidence.
+The earlier `35874af7...` hosted-green/Shadow result is `HISTORICAL` because selected parent heads moved. It is not reused as current evidence.
 
-### Historical convergence epoch 1
-
-```text
-c0f6979f80038394350aea724c598c8dba5ac338
-parents:
-  ccef97dedd7ea8b1873e3afa130ca82b8eabb413
-  339ae874b070fb3a8a5fa89b0241d90434257e99  historical #451
-  b5295df681d6471b19775db38860b2d151339879  historical #452
-  5b6e58d1e7e9e127123dbb4a9189b98e5ff973cf
-  32c5425de1cf4f083bd998e81873a86af8771e1e
-union tree 37cb2c56e7dfc939cacaa0f65cf8f9b0f8318b22
-```
-
-`af427a13...` then consumed PR #380 documentation. `35874af7...` refreshed current-main-at-that-time and passed Skill Suites, Shared Skills Infra, Skill Eval Contract and Git Town Stacked PR Worker before it was superseded by the parent movement above.
-
-Rejected first candidates remain explicit:
+### Historical convergence and rejected candidates
 
 ```text
+c0f6979f80038394350aea724c598c8dba5ac338  epoch-1 union
+  historical #451 339ae874...
+  historical #452 b5295df6...
+  #453 5b6e58d1...
+  #454 32c5425d...
+
+af427a13a7096df91d74a48c0a4ca6ce3f3e2ac9  epoch-1 + PR #380 docs
+35874af7a6d04783983b05c8f1b1e402471b4451  historical hosted-green convergence
+
 #444 → #451
 #445 → #452
-#446 → #453
-#447 → #454
+#446 → #453 → #456
+#447 → #454 → #457
 ```
 
-Those first candidates are closed-unmerged provenance failures, not alternate merge candidates.
+#446/#447 are rejected provenance candidates. #453/#454 are provenance-correct replacements later closed unmerged. All remain denominator history, not current merge candidates.
 
 ### Current convergence gate
 
 The exact final #455 head must execute, not merely contain:
 
 ```text
-6 Draft-2020-12 schemas
+6 Draft-2020-12 control-plane schemas
 Codex selftest        4 positive / 14 mutations
 GitHub DAG selftest   6 positive / 17 mutations
-Herdr selftest        4 positive / 9 mutations
-closure selftest      4 positive / 11 mutations
+Herdr selftest        4 positive / 18 mutations
+closure selftest      6 positive / 22 mutations
 problem-closure example + checker + non-authority Markdown projection
 existing ATL suite
 ```
@@ -119,7 +123,7 @@ Skill Eval Contract
 Git Town Stacked PR Worker
 ```
 
-No earlier green head follows a moving parent automatically. Only a new exact-head run plus independent Shadow readback can restore `ELIGIBLE_FOR_HUMAN_ADMIT` for the static/deterministic scope. Live Codex/GitHub/Herdr/source-provider evidence and merge/release remain separate.
+No earlier green head follows a moving parent automatically. Only a new exact-head run plus independent Shadow readback can make the static/deterministic convergence `READY_FOR_HUMAN_ADMIT`. That state still does not admit or merge #451/#452/#456/#457 and cannot raise any live evidence lane.
 
 ## Four-repository documentation stack
 
@@ -160,4 +164,4 @@ Issue #128 / PR #136 remains an independent terminal leaf for the substrate-boun
 
 ## Evidence boundary
 
-PR presence and mergeability prove neither implementation correctness nor live execution. Documentation completion, deterministic fixtures, hosted workflow success, terminal `done`, issue close, PR merge, model agreement or an external link cannot substitute for live Codex/Herdr/GitHub effects, real source/provider closure, Human Admit, release or production readiness.
+PR presence, ancestry and mergeability prove neither admission nor implementation correctness nor live execution. Documentation completion, deterministic fixtures, hosted workflow success, terminal `done`, issue close, PR merge, model agreement or an external link cannot substitute for live Codex/Herdr/GitHub effects, real source/provider closure, Human Admit, release or production readiness.

@@ -1,98 +1,83 @@
 # Codex SDK Tech Lead Control Plane — Shadow-monitored trace
 
-Status: `STATIC_DETERMINISTIC_CONVERGENCE_REVALIDATION_REQUIRED`.
+Status: `STATIC_DETERMINISTIC_CONVERGENCE_REVALIDATING`.
 
-This document is the human trace for issues #375–#379. Machine/runtime authority remains with exact Git ancestry, schemas/checkers, current GitHub metadata, hosted workflows, provider/runtime receipts and Human repository policy. A green earlier convergence is historical the moment any consumed sibling head moves.
+This is the human trace for issues #375–#379. Machine/runtime authority remains exact Git ancestry, schemas/checkers, current GitHub metadata, exact-head workflow runs, runtime/provider receipts, and Human repository policy. A convergence branch may consume unmerged candidate bytes for integration proof; that consumption is not admission or merge.
 
-## Current epoch
+## Current convergence epoch
 
-Current repository base observed for this convergence family:
+Repository base observed for this family:
 
 ```text
 main@4ca9417b1da5ff32f1d4d3e7af64a15908749024
 ```
 
-Current sibling heads to be consumed by #379:
+Selected sibling candidates:
 
 ```text
-#375 / PR #451  86f9e8d940b76cb71b713c098ff09cb68eb4e0c1  SIBLING
-#376 / PR #452  426fb6f6f548f71572d4402e73e0b05ecf6f8aa8  SIBLING
-#377 / PR #453  5b6e58d1e7e9e127123dbb4a9189b98e5ff973cf  SIBLING
-#378 / PR #454  32c5425de1cf4f083bd998e81873a86af8771e1e  SIBLING
-#380            7a9d68fcd58b1ed78ed6d05595a8df7eae53f5a5  DOCUMENTATION SIBLING
+#375 / PR #451  86f9e8d940b76cb71b713c098ff09cb68eb4e0c1  SIBLING / UNMERGED CANDIDATE
+#376 / PR #452  426fb6f6f548f71572d4402e73e0b05ecf6f8aa8  SIBLING / UNMERGED CANDIDATE
+#377 / PR #456  23b03826b1bf8fe66bd731716466a9349d3242d6  SIBLING / UNMERGED CANDIDATE
+#378 / PR #457  ac5ddc0287eb4e4156a7c7eef178b7be8bbd1d34  SIBLING / UNMERGED CANDIDATE
+PR #380            7a9d68fcd58b1ed78ed6d05595a8df7eae53f5a5  DOCUMENTATION SIBLING
 ```
 
-Current hardened-parent refresh already recorded in Git:
+The current #379 integration ancestry checkpoint is:
 
 ```text
-5d21ecab137cb26586ef1636dc279ee29733e913
+ed852502437570c7c86bae12c07c16a3f5d37ea8
 parents:
-  prior #455 convergence head 35874af7a6d04783983b05c8f1b1e402471b4451
-  #451 current head            86f9e8d940b76cb71b713c098ff09cb68eb4e0c1
-  #452 current head            426fb6f6f548f71572d4402e73e0b05ecf6f8aa8
+  c306b3b4cea797f5f4d1323f8ec7fcd94a94f3ec  prior #455 convergence head
+  23b03826b1bf8fe66bd731716466a9349d3242d6  #456 exact candidate
+  ac5ddc0287eb4e4156a7c7eef178b7be8bbd1d34  #457 exact candidate
 ```
 
-The mutable final #455 head is deliberately **not** self-embedded. Read it from GitHub after every convergence edit. The static/hardened epoch becomes current only after exact-head hosted gates and independent Shadow readback complete again.
+The final mutable PR #455 head is deliberately not self-embedded. Read it from GitHub after every convergence edit. The checkpoint proves exact byte consumption only; #456/#457 remain unmerged candidates.
 
-## Historical convergence epochs
+## Historical denominator
 
-Epoch 1 remains immutable evidence, not current truth:
-
-```text
-c0f6979f80038394350aea724c598c8dba5ac338
-parents:
-  ccef97dedd7ea8b1873e3afa130ca82b8eabb413  historical main
-  339ae874b070fb3a8a5fa89b0241d90434257e99  historical #451 head
-  b5295df681d6471b19775db38860b2d151339879  historical #452 head
-  5b6e58d1e7e9e127123dbb4a9189b98e5ff973cf  #453
-  32c5425de1cf4f083bd998e81873a86af8771e1e  #454
-union tree:
-  37cb2c56e7dfc939cacaa0f65cf8f9b0f8318b22
-```
-
-Documentation was then admitted through:
+Historical convergence and rejected/superseded candidates remain visible:
 
 ```text
-af427a13a7096df91d74a48c0a4ca6ce3f3e2ac9
-parents: c0f6979f... + PR #380 head 7a9d68fc...
-```
+c0f6979f80038394350aea724c598c8dba5ac338  epoch-1 integration
+35874af7a6d04783983b05c8f1b1e402471b4451  historical all-green convergence
+5d21ecab137cb26586ef1636dc279ee29733e913  #451/#452 hardened-parent refresh
+c306b3b4cea797f5f4d1323f8ec7fcd94a94f3ec  pre-#456/#457 convergence head
 
-Shared routes/tests were added and current-main-at-the-time refreshed through `35874af7...`. That head passed Skill Suites, Shared Skills Infra, Skill Eval Contract and Git Town Stacked PR Worker, and received a Shadow `ELIGIBLE_FOR_HUMAN_ADMIT` verdict **for Epoch 1 only**. The verdict was superseded when #451/#452 moved.
-
-Rejected first candidates remain visible:
-
-```text
 #444 → #451
 #445 → #452
-#446 → #453
-#447 → #454
+#446 → #453 → #456
+#447 → #454 → #457
 ```
 
-They were closed unmerged after commit-role provenance failed. Failure lineage is not erased to make the successful path appear cleaner.
+#446/#447 were rejected provenance candidates. #453/#454 were provenance-correct replacements later closed unmerged. They remain historical evidence and are not current merge candidates.
 
-## Ownership
+## Ownership planes
 
 ```text
 agentic-tech-lead-orchestration
   semantic task/capability/dual-DAG law, leases, Worker admission, convergence, handoff
 
-Codex SDK adapter (#375)
-  one bounded task/session attempt and runtime-result receipt
+#375 Codex SDK adapter
+  one bounded task/session attempt + runtime-result receipt
 
-GitHub Issue DAG adapter (#376)
-  durable completion-edge projection/readback plus remote preflight
+#376 GitHub Issue DAG adapter
+  durable completion-edge projection/readback + remote preflight
 
-Herdr observer (#377)
-  optional process/worktree/session observation only
+#377 Herdr observer
+  optional worktree/process/session/freshness/liveness/cleanup observation only
 
-problem-closure ledger (#378)
-  source→problem→task/DAG→session/evidence→Shadow reconciliation
+#378 problem-closure ledger
+  frozen source/problem denominator + exact-subject evidence reconciliation
 
 #379 convergence
-  shared run-all / Agent routes / README / Shadow / Git Town / traceability
+  exact sibling-byte consumption + shared tests/routes/README/Shadow/Git Town/traceability
+
+Shadow
+  independent same-subject contradiction/denominator/evidence-ceiling review; no second writer
 
 Human / repository authority
-  semantic conflict, unmanaged dependency deletion, merge, release, promotion, rollback
+  semantic conflict, unmanaged dependency deletion, sibling admission, merge, release, promotion, rollback
 ```
 
 ## Directory → State Machine responsibility
@@ -100,9 +85,9 @@ Human / repository authority
 ```text
 skills/agentic-tech-lead-orchestration/
 ├── SKILL.md
-│   └── provider-neutral request/contract/capability/task DAG/lease/convergence/handoff law
+│   └── provider-neutral request/task/capability/dual-DAG/lease/convergence/handoff law
 ├── references/
-│   ├── core task/capability/scheduler/dual-DAG/queue contracts
+│   ├── core task/capability/scheduler/queue contracts
 │   ├── contracts/
 │   │   ├── codex-session-manifest.schema.json            #375
 │   │   ├── codex-worker-result.schema.json               #375
@@ -113,7 +98,7 @@ skills/agentic-tech-lead-orchestration/
 │   ├── examples/
 │   │   ├── herdr-runtime-binding.example.json            #377
 │   │   └── problem-closure.example.json                  #378
-│   └── execution-packets/375..378                        frozen task packets
+│   └── execution-packets/375..378
 ├── modules/
 │   ├── codex-sdk-controller.md                           #375
 │   ├── github-issue-dag-projection.md                    #376
@@ -130,15 +115,6 @@ skills/agentic-tech-lead-orchestration/
     ├── github_issue_dag_selftest.py                      #376
     ├── herdr_observer_selftest.py                        #377
     └── problem_closure_selftest.py                       #378
-
-skills/procedural-shadow-runtime/
-└── independent same-subject applicability/contradiction/evidence-ceiling review
-
-skills/git-town-stacked-pr-worker/
-└── molecular relation/index vocabulary and terminal branch/PR traceability
-
-docs/traceability/
-└── human projections; never a second machine authority
 ```
 
 ## End-to-end State Machine
@@ -147,7 +123,6 @@ docs/traceability/
 SOURCE / ISSUE / ARTICLE / PDF / PRD
 → REAL_PROBLEM_BOUND
 → SYSTEM_CONTRACT_EXTRACTED
-→ TASK_DAG_COMPILED
 → TASK_DAG_ASSERTED
 → GITHUB_PROJECTION_COMPILED                  #376
 → REMOTE_PREFLIGHT_BOUND
@@ -161,145 +136,106 @@ SOURCE / ISSUE / ARTICLE / PDF / PRD
 → POST_TURN_LEASE_READBACK
 → CONTROLLER_SOURCE_DIFF_TEST_READBACK_REQUIRED
 → HERDR_OBSERVATION_OPTIONAL                  #377
+→ FRESHNESS_LIVENESS_CLEANUP_ASSERTED
 → INDEPENDENT_SHADOW_RECONCILIATION
-→ PR / CONVERGENCE DELIVERY
-→ CI / EXACT-HEAD READBACK
-→ PROBLEM_CLOSURE_RECOMPUTED                  #378
+→ PROBLEM_DENOMINATOR_RECOMPUTED              #378
+→ EXACT_HEAD_HOSTED_REVALIDATION              #379
 → NEXT_WAVE | LOCAL_HANDOFF | HUMAN_ADMIT_REQUIRED
 ```
 
-A Herdr terminal `done`, Codex model prose, issue close, PR merge, workflow green, article/PDF prose or documentation update cannot skip a state.
+A Herdr terminal `done`, Codex model prose, issue close, PR merge, workflow green, article/PDF prose, or documentation update cannot skip a state.
 
-## #375 — subscription-safe Codex SDK runtime adapter
+## #375 — Codex SDK runtime adapter
 
-Current deterministic mechanism binds:
-
-```text
-task_id + attempt_id
-exact 40-hex base commit + tree
-clean Git worktree
-repository-relative allowed/read-only path leases
-prompt + digest
-predecessor receipts
-new | resume-compatible thread policy
-```
-
-Before `openai-codex` is invoked, the adapter verifies the worktree exists, is a Git worktree, has exact `HEAD == base_sha`, exact `HEAD^{tree} == tree_sha`, and is clean. After the turn, it reads changed/untracked paths and rejects any read-only or out-of-lease mutation. `Sandbox.workspace_write` therefore does not make path leases documentary-only.
-
-Durable control-plane state excludes API keys, access/refresh tokens, browser-login artifacts, full model prose and private reasoning. Existing signed-in Codex/ChatGPT authentication is reused on the live path; no repository API key is required.
-
-Current deterministic selftest denominator:
+Deterministic mechanism:
 
 ```text
-positive=4
-mutations=14
-live=NOT_EXERCISED
+task/attempt/repo
++ exact 40-hex base commit/tree
++ clean Git worktree
++ repository-relative writable/read-only leases
++ prompt digest + predecessor receipts
++ new | resume-compatible thread policy
+→ optional live SDK turn
+→ changed/staged/untracked path readback
+→ refuse read-only or out-of-lease mutation
 ```
 
-A live SDK turn remains `RUNTIME_RESULT_ONLY`; independent source/diff/test acceptance still follows.
+Deterministic denominator: `positive=4 / mutations=14`.
+
+Evidence ceiling: live SDK `NOT_EXERCISED`; even a live turn is `RUNTIME_RESULT_ONLY` until independent source/diff/test acceptance.
 
 ## #376 — GitHub Issue Dependencies projection
 
-The portable DAG retains two semantic edges:
+Only completion-readiness edges may project to `blockedBy`. Before mutation the adapter binds repository owner/name, visibility, default branch, issue identity/expected state and closing-PR references. Missing/extra edge drift, stale issue state and extra unmanaged blockers fail closed; `--apply` never auto-deletes unmanaged blockers.
+
+Deterministic denominator: `positive=6 / mutations=17`.
+
+Evidence ceiling: live dependency mutation/readback `NOT_EXERCISED`; generic development-link ownership beyond `closedByPullRequestsReferences` remains residual.
+
+## #377 — Herdr optional observer v3
+
+Current v3 candidate binds:
 
 ```text
-start-readiness
-completion-readiness
+exact 40-hex base/tree
++ owner/name repo
++ foreground worktree
++ pane/workspace/PID/native session
++ PID start-time identity
++ bounded observation timestamp/freshness
++ nonterminal process liveness
++ terminal cleanup_state + residue_count
 ```
 
-Only explicitly marked completion-readiness edges may project to GitHub `blockedBy`.
+Stale/future observation, PID reuse, dead nonterminal process, orphan session, dirty cleanup or residue fail closed. `DONE_CANDIDATE` requires clean terminal evidence but remains advisory and still requires controller source/diff/test readback. Herdr absence emits `UNAVAILABLE_FALLBACK`.
 
-Before live mutation, the adapter binds/re-reads:
+Deterministic denominator: `positive=4 / mutations=18`.
 
-```text
-exact owner/name repository
-visibility
-expected default branch
-every issue number + expected OPEN/CLOSED state
-closing pull-request references exposed by closedByPullRequestsReferences
-```
+Evidence ceiling: live Herdr observation `NOT_EXERCISED`.
 
-It refuses repository identity/visibility/default-branch drift, stale issue state, more than one open **closing-reference** PR, cycle/self/unknown-node defects, malformed readback, graph-digest drift and extra unmanaged remote blockers. `--apply` may add missing managed blockers only; extra blockers fail before mutation and are not auto-deleted. Preflight must remain stable across mutation/readback.
+## #378 — problem-closure ledger v3
 
-Important ceiling: `closedByPullRequestsReferences` proves the closing-reference surface. It does **not** by itself prove uniqueness across every possible GitHub development-link/cross-reference mechanism. Generic linked-PR ownership remains residual until a broader exact readback is implemented/admitted.
-
-Current deterministic selftest denominator:
+Current v3 candidate binds:
 
 ```text
-positive=6
-mutations=17
-live=NOT_EXERCISED
-```
-
-Live dependency mutation/readback against an admitted issue graph remains separate evidence.
-
-## #377 — Herdr optional observer
-
-Herdr remains optional and non-authoritative:
-
-```text
-worktree allocated
-→ optional target
-→ pane/workspace/process/native-session/foreground_cwd identity
-→ RUNNING | BLOCKED | IDLE | DONE_CANDIDATE | UNKNOWN
-→ controller readback required
-```
-
-`foreground_cwd` binds the observed process to the expected worktree by default. Absence emits `UNAVAILABLE_FALLBACK` and preserves direct Codex SDK + standard git worktree execution. Transcript/private reasoning/credential bodies are not durable receipt truth.
-
-Current deterministic denominator: `positive=4, mutations=9, live=NOT_EXERCISED`.
-
-## #378 — problem closure
-
-```text
-source identity + exact location
-→ problem id
-→ applicability / superseded route
-→ exact repo/commit/tree
-→ task + DAG + GitHub issue
-→ session / attempt / worktree
-→ implementation evidence
-→ typed verification evidence + matching receipts
-→ merge provenance only
-→ Shadow verdict
-→ residual gaps
+frozen problem denominator
++ canonical source manifest digest
++ per-claim digest
++ exact source kind/identity/location
++ exact 40-hex repo commit/tree
++ task/DAG/issue lineage
++ portable session/attempt/worktree identity
++ CURRENT/HISTORICAL/SUPERSEDED implementation evidence
++ exact-subject verification evidence and matching receipts
++ Shadow verdict + residual gaps
 → independently recomputed closure
 ```
 
-Allowed closure values:
+Deleting a problem row, changing source bytes/location, using abbreviated/stale subjects, persisting machine-local paths, reusing stale verification receipts, duplicate evidence, hidden fields, or supersession to a missing/cyclic target fails closed. `SUPERSEDED` is residual (`PARTIAL`), not terminal success.
 
-```text
-OPEN
-PARTIAL
-IMPLEMENTED_UNVERIFIED
-VERIFIED_LOCAL
-VERIFIED_LIVE
-NOT_APPLICABLE
-HUMAN_ADMIT_REQUIRED
-```
+Deterministic denominator: `positive=6 / mutations=22`.
 
-Issue close/PR merge are not verification lanes, local/CI cannot promote to provider-live, and the Markdown renderer remains a human projection after JSON validation.
-
-Current deterministic denominator: `positive=4, mutations=11`; real article/PDF/provider claims remain evidence-dependent.
+Evidence ceiling: real article/PDF/provider claim closure remains `EVIDENCE_DEPENDENT`.
 
 ## #379 shared convergence gate
 
-The exact convergence subject must contain the current sibling bytes **before** the shared gate is wired/read. Required gates are unconditional:
+The convergence subject must contain the selected exact sibling bytes **before** the shared gate runs. Required deterministic gates are unconditional:
 
 ```text
-6 Draft-2020-12 schemas
+6 Draft-2020-12 control-plane schemas
 problem-closure example
 codex_sdk_controller_selftest.py             4 / 14
 github_issue_dag_selftest.py                 6 / 17
-herdr_observer_selftest.py                   4 / 9
-problem_closure_selftest.py                  4 / 11
+herdr_observer_selftest.py                    4 / 18
+problem_closure_selftest.py                   6 / 22
 closure checker + Markdown non-authority marker
 existing ATL full suite
 ```
 
 No `if file exists` bypass is accepted.
 
-Hosted admission denominator for the **final current #455 head** must include:
+Hosted final-head denominator:
 
 ```text
 Skill Suites
@@ -308,22 +244,22 @@ Skill Eval Contract
 Git Town Stacked PR Worker
 ```
 
-The earlier all-green `35874af7...` run is historical after parent movement. The current hardened-parent convergence must rerun every required hosted gate before Shadow may emit a new current verdict.
+Every selected sibling head move supersedes earlier convergence workflow and Shadow evidence. The final PR #455 head must rerun the hosted denominator after this epoch's route/index refresh.
 
 ## Molecular relations
 
 ```text
-#375 SIBLING
-#376 SIBLING
-#377 SIBLING
-#378 SIBLING
+#375 SIBLING / unmerged candidate
+#376 SIBLING / unmerged candidate
+#377 SIBLING / unmerged candidate
+#378 SIBLING / unmerged candidate
 #380 DOCUMENTATION SIBLING
-#379 CONVERGENCE consuming exact current sibling heads
+#379 CONVERGENCE CANDIDATE consuming exact selected heads
 Shadow EXTERNAL_EVIDENCE / PROCESS_DEPENDENCY
 live Codex / GitHub mutation / Herdr / real source closure EXTERNAL_EVIDENCE
 ```
 
-A multi-parent convergence records consumed sibling bytes without making the siblings children of one another.
+A multi-parent convergence records byte consumption without making the siblings children of one another or admitted by ancestry alone.
 
 ## Cold-start route
 
@@ -343,20 +279,21 @@ root AGENTS.md
 
 Chat history is not required.
 
-## Current residual/evidence ceiling
+## Current residual / evidence ceiling
 
 ```text
-#375 static mechanism with worktree/lease readback      IMPLEMENTED / awaiting current convergence revalidation
-#375 live Codex SDK execution                           NOT_EXERCISED
-#376 static projection + remote preflight mechanism     IMPLEMENTED / awaiting current convergence revalidation
-#376 generic linked-PR ownership beyond closing refs    RESIDUAL
-#376 live GitHub dependency mutation/readback           NOT_EXERCISED
-#377 static observer mechanism                          IMPLEMENTED / awaiting current convergence revalidation
-#377 live stale/orphan/residue observation              NOT_EXERCISED
-#378 deterministic closure mechanism                    IMPLEMENTED / awaiting current convergence revalidation
-#378 real article/PDF/provider closure                  EVIDENCE_DEPENDENT
-#379 shared route/test/index convergence                REVALIDATING current parent epoch
-merge/release                                           HUMAN_ADMIT_REQUIRED
+#375 deterministic mechanism candidate             IMPLEMENTED / convergence revalidating
+#375 live Codex SDK execution                      NOT_EXERCISED
+#376 deterministic projection candidate            IMPLEMENTED / convergence revalidating
+#376 generic linked-PR ownership                   RESIDUAL
+#376 live GitHub dependency mutation/readback      NOT_EXERCISED
+#377 deterministic observer candidate v3           IMPLEMENTED / convergence revalidating
+#377 live Herdr observation                        NOT_EXERCISED
+#378 deterministic closure candidate v3            IMPLEMENTED / convergence revalidating
+#378 real article/PDF/provider closure             EVIDENCE_DEPENDENT
+#379 route/test/index convergence                  REVALIDATING current epoch
+#451/#452/#456/#457 admission/merge                HUMAN_ADMIT_REQUIRED
+#455 merge/release                                 HUMAN_ADMIT_REQUIRED
 ```
 
-Only after the current final #455 head passes the complete hosted denominator and independent Shadow readback may the static/deterministic convergence return to `ELIGIBLE_FOR_HUMAN_ADMIT`. That verdict still does not prove any live lane or authorize merge/release.
+Only after the final current #455 head passes the complete hosted denominator and independent Shadow readback may this static/deterministic convergence become `READY_FOR_HUMAN_ADMIT`. That verdict still does not admit or merge any sibling and does not prove any live lane.
