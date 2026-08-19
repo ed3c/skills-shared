@@ -1,0 +1,9 @@
+{
+  "repo": "ed3c/skills-shared",
+  "repo_visibility": "PUBLIC",
+  "default_branch": "main",
+  "blocker_issue": 486,
+  "blocked_issue": 487,
+  "canary_label": "wave3-live-canary-fixture",
+  "expected_before_blocked_by": []
+}
