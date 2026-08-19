@@ -19,5 +19,6 @@ These controls are required before any deterministic graph checker may claim sem
 | NC-13 | root/convergence docs copy and mutate a second full v7.2 prompt instead of routing to canonical `SYSTEM_PROMPT_V7_2.md` | BLOCK prompt-authority divergence |
 | NC-14 | fresh Agent requires v7.1 + delta manual composition because standalone prompt is missing/stale | BLOCK incomplete prompt packaging |
 | NC-15 | deterministic checker fails a prompt contract but Worker hides failure by rewriting only README prose | BLOCK evidence laundering; canonical prompt/checker contract must reconcile |
+| NC-16 | a durable doc self-embeds the current mutable PR head and later treats it as current truth | BLOCK stale self-reference; refresh from GitHub authority |
 
 The eventual checker/tests must bind each failure to an exact subject and deterministic terminal disposition. Presence of this matrix is preparation evidence only.
