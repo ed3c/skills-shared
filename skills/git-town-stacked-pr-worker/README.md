@@ -312,6 +312,36 @@ sync conflict
 
 Workers must not automatically run `git town continue`, `skip`, `undo`, `ship`, semantic conflict edits, force push, merge, permission widening or production rollback.
 
+## Universal refactor controller admission — Epic #398
+
+This is a durable traceability projection, not mutable PR-state authority. Read current GitHub metadata before acting on an open subject.
+
+```text
+#399 / PR #405  UCR-C contract
+├─ #400 / PR #441  UCR-K/E deterministic gate
+└─ #401 / PR #442  UCR-A adapters
+       \           /
+        #402 / PR #458  UCR-LIVE
+           ├─ validation PR #461
+           └─ #406 / PR #463  UCR-X/D convergence
+                         │
+                         └─ Epic #398 current-main landing  PENDING_PUBLICATION
+```
+
+| Atom | Issue | PR | Evidence ceiling | Role |
+|---|---|---|---|---|
+| `C` | `#399` | `#405` | `IMPLEMENTED` | controller + Complexity Delta contract |
+| `K/E` | `#400` | `#441` | `LOCAL_DETERMINISTIC_VERIFIED` | composition gate + false-simplification controls |
+| `A` | `#401` | `#442` | `STATIC_CONTRACT_VERIFIED` | Skill/repository target adapters |
+| `X/LIVE` | `#402` | `#458` | `BOUNDED_CROSS_DOMAIN_REMOTE_VERIFIED` | Skill + ordinary-repository canaries |
+| validation | `#402` | `#461` | `REMOTE_REPOSITORY_CI_VERIFIED` | repaired whole-subject hosted receipt |
+| `X/D` | `#406` | `#463` | `REMOTE_INTEGRATION_VERIFIED` | registry, CI arrival, Agent routes, corpus and program trace |
+| main landing | `#398` | pending publication | `HUMAN_ADMITTED / REVERIFY_ON_CURRENT_MAIN` | preserve concurrent main governance and land one compliant subject |
+
+PR #462 remains `SUPERSEDED_FORENSIC`; it exposed document-route inventory drift and the connector commit-role endpoint gap. PR #463 repaired that history with CI-authored `agent-macro@ci.invalid` commits and is the immutable semantic source for this landing. The landing itself is rebuilt on current `main`; it does not import stale UCR Git ancestry or overwrite the concurrently admitted #375–#379 Tech Lead/Shadow control-plane bytes.
+
+Golden Refactor cases remain bounded. Open ordinary-repository evidence is not promoted by this admission. Live provider/model uplift, production safety, release, promotion and rollback remain separate evidence/Human lanes.
+
 ## Proof-carrying refactor and historical indexes
 
 The current golden proof lineage and cross-Skill adoption state live in [`../skill-refactor-proof-loop/README.md`](../skill-refactor-proof-loop/README.md) and [`../../docs/traceability/TRACEABILITY_INDEX.md`](../../docs/traceability/TRACEABILITY_INDEX.md). Historical consumer snapshots, IBC/CTL delivery lines and other programme indexes remain traceability subjects rather than being duplicated as current mutable state here.
