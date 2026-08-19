@@ -1,6 +1,6 @@
 # Codex SDK Tech Lead Control Plane — Shadow-monitored trace
 
-Status: `STATIC_DETERMINISTIC_CONVERGENCE_REVALIDATING`.
+Status: `STATIC_DETERMINISTIC_CONVERGENCE_FINAL_GATE`.
 
 This is the human trace for issues #375–#379. Machine/runtime authority remains exact Git ancestry, schemas/checkers, current GitHub metadata, exact-head workflow runs, runtime/provider receipts, and Human repository policy. A convergence branch may consume unmerged candidate bytes for integration proof; that consumption is not admission or merge.
 
@@ -17,22 +17,21 @@ Selected sibling candidates:
 ```text
 #375 / PR #451  86f9e8d940b76cb71b713c098ff09cb68eb4e0c1  SIBLING / UNMERGED CANDIDATE
 #376 / PR #452  426fb6f6f548f71572d4402e73e0b05ecf6f8aa8  SIBLING / UNMERGED CANDIDATE
-#377 / PR #456  23b03826b1bf8fe66bd731716466a9349d3242d6  SIBLING / UNMERGED CANDIDATE
+#377 / PR #456  6a2ebcbe87078cecaf67f82f3c9c10643bcc9123  SIBLING / UNMERGED CANDIDATE
 #378 / PR #457  ac5ddc0287eb4e4156a7c7eef178b7be8bbd1d34  SIBLING / UNMERGED CANDIDATE
 PR #380            7a9d68fcd58b1ed78ed6d05595a8df7eae53f5a5  DOCUMENTATION SIBLING
 ```
 
-The current #379 integration ancestry checkpoint is:
+The fixed #377 reconciliation ancestor is:
 
 ```text
-ed852502437570c7c86bae12c07c16a3f5d37ea8
+fc40cf833609328ded0141dd8d9629c9a727a159
 parents:
-  c306b3b4cea797f5f4d1323f8ec7fcd94a94f3ec  prior #455 convergence head
-  23b03826b1bf8fe66bd731716466a9349d3242d6  #456 exact candidate
-  ac5ddc0287eb4e4156a7c7eef178b7be8bbd1d34  #457 exact candidate
+  d52ab2aad8e20be0c738e77356f75633813ad444  prior #455 route/index head
+  6a2ebcbe87078cecaf67f82f3c9c10643bcc9123  repaired #456 candidate
 ```
 
-The final mutable PR #455 head is deliberately not self-embedded. Read it from GitHub after every convergence edit. The checkpoint proves exact byte consumption only; #456/#457 remain unmerged candidates.
+The final mutable PR #455 head is deliberately not self-embedded. Read it from GitHub after every convergence edit. The checkpoint proves exact byte consumption only; #451/#452/#456/#457 remain unmerged candidates.
 
 ## Historical denominator
 
@@ -43,6 +42,10 @@ c0f6979f80038394350aea724c598c8dba5ac338  epoch-1 integration
 35874af7a6d04783983b05c8f1b1e402471b4451  historical all-green convergence
 5d21ecab137cb26586ef1636dc279ee29733e913  #451/#452 hardened-parent refresh
 c306b3b4cea797f5f4d1323f8ec7fcd94a94f3ec  pre-#456/#457 convergence head
+ed852502437570c7c86bae12c07c16a3f5d37ea8  rejected: corrupted Herdr source reached shared suite
+
+d52ab2aad8e20be0c738e77356f75633813ad444  route/index projection over rejected Herdr bytes
+fc40cf833609328ded0141dd8d9629c9a727a159  repaired Herdr reconciliation; hosted synchronize gates green
 
 #444 → #451
 #445 → #452
@@ -50,7 +53,7 @@ c306b3b4cea797f5f4d1323f8ec7fcd94a94f3ec  pre-#456/#457 convergence head
 #447 → #454 → #457
 ```
 
-#446/#447 were rejected provenance candidates. #453/#454 were provenance-correct replacements later closed unmerged. They remain historical evidence and are not current merge candidates.
+#446/#447 were rejected provenance candidates. #453/#454 were provenance-correct replacements later closed unmerged. `ed852502...` is retained because the shared ATL suite exposed non-printable corruption in the then-current Herdr script; its green predecessor evidence is not reused. These subjects remain historical evidence and are not current merge candidates.
 
 ## Ownership planes
 
@@ -190,6 +193,8 @@ exact 40-hex base/tree
 
 Stale/future observation, PID reuse, dead nonterminal process, orphan session, dirty cleanup or residue fail closed. `DONE_CANDIDATE` requires clean terminal evidence but remains advisory and still requires controller source/diff/test readback. Herdr absence emits `UNAVAILABLE_FALLBACK`.
 
+The first v3 published candidate (`23b03826...`) contained corrupted non-printable script bytes that its own branch workflow did not execute because the shared `run-all.sh` wiring lives in #379. The #455 shared suite caught the `SyntaxError`; #456 was repaired to `6a2ebcbe...` without changing the 4/18 test denominator.
+
 Deterministic denominator: `positive=4 / mutations=18`.
 
 Evidence ceiling: live Herdr observation `NOT_EXERCISED`.
@@ -235,16 +240,17 @@ existing ATL full suite
 
 No `if file exists` bypass is accepted.
 
-Hosted final-head denominator:
+Hosted synchronize gate observed at repaired integration ancestor `fc40cf83...`:
 
 ```text
-Skill Suites
-Shared Skills Infra
-Skill Eval Contract
-Git Town Stacked PR Worker
+Skill Suites                         PASS
+Shared Skills Infra                  PASS
+Git Town Stacked PR Worker           PASS
 ```
 
-Every selected sibling head move supersedes earlier convergence workflow and Shadow evidence. The final PR #455 head must rerun the hosted denominator after this epoch's route/index refresh.
+`Skill Eval Contract` is sealed to `pull_request: ready_for_review`, so after the final documentation/index bytes stabilize the PR must be toggled Draft → Ready and that exact final head must pass the contract. A missing run is never PASS.
+
+Every selected sibling head move supersedes earlier convergence workflow and Shadow evidence.
 
 ## Molecular relations
 
@@ -282,16 +288,16 @@ Chat history is not required.
 ## Current residual / evidence ceiling
 
 ```text
-#375 deterministic mechanism candidate             IMPLEMENTED / convergence revalidating
+#375 deterministic mechanism candidate             IMPLEMENTED / shared suite PASS
 #375 live Codex SDK execution                      NOT_EXERCISED
-#376 deterministic projection candidate            IMPLEMENTED / convergence revalidating
+#376 deterministic projection candidate            IMPLEMENTED / shared suite PASS
 #376 generic linked-PR ownership                   RESIDUAL
 #376 live GitHub dependency mutation/readback      NOT_EXERCISED
-#377 deterministic observer candidate v3           IMPLEMENTED / convergence revalidating
+#377 deterministic observer candidate v3           IMPLEMENTED / shared suite PASS after corruption repair
 #377 live Herdr observation                        NOT_EXERCISED
-#378 deterministic closure candidate v3            IMPLEMENTED / convergence revalidating
+#378 deterministic closure candidate v3            IMPLEMENTED / shared suite PASS
 #378 real article/PDF/provider closure             EVIDENCE_DEPENDENT
-#379 route/test/index convergence                  REVALIDATING current epoch
+#379 route/test/index convergence                  FINAL GOVERNANCE REVALIDATION
 #451/#452/#456/#457 admission/merge                HUMAN_ADMIT_REQUIRED
 #455 merge/release                                 HUMAN_ADMIT_REQUIRED
 ```
