@@ -1,0 +1,143 @@
+name: UCR Main Landing PR Carrier
+
+on:
+  pull_request:
+    branches:
+      - agent/402-ucr-live-validation
+    types:
+      - synchronize
+      - ready_for_review
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    if: github.repository == 'ed3c/skills-shared' && github.event.pull_request.number == 463
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Build current-main UCR landing branch with compliant identity
+        env:
+          EXPECTED_MAIN_SHA: ca31e0b1e640f0dba2c3d94da9d9786fbed32f2c
+          MERGE_BASE_SHA: b5d98eec0c486b94c81412dc07c109a3c379ea4f
+          SOURCE_SHA: 950b9f901a91de28ad99d62a4c8db45b49eaddbd
+          DEST_BRANCH: agent/398-ucr-main-landing
+        run: |
+          set -euo pipefail
+          if git ls-remote --exit-code --heads origin "refs/heads/${DEST_BRANCH}" >/dev/null 2>&1; then
+            echo "destination branch already exists; refusing to rewrite it" >&2
+            exit 2
+          fi
+          git fetch origin \
+            "+refs/heads/main:refs/remotes/origin/main" \
+            "+refs/heads/agent/406-ucr-convergence-docs-v2:refs/remotes/origin/agent/406-ucr-convergence-docs-v2"
+          test "$(git rev-parse refs/remotes/origin/main)" = "${EXPECTED_MAIN_SHA}"
+          git cat-file -e "${MERGE_BASE_SHA}^{commit}"
+          git cat-file -e "${SOURCE_SHA}^{commit}"
+          test "$(git merge-base "${MERGE_BASE_SHA}" "${SOURCE_SHA}")" = "${MERGE_BASE_SHA}"
+
+          git diff --binary "${MERGE_BASE_SHA}" "${SOURCE_SHA}" -- . \
+            ':(exclude)docs/INDEX.md' \
+            ':(exclude)skills/git-town-stacked-pr-worker/README.md' \
+            > "${RUNNER_TEMP}/ucr-main.patch"
+
+          git switch --detach "${EXPECTED_MAIN_SHA}"
+          git apply --index "${RUNNER_TEMP}/ucr-main.patch"
+
+          python3 - <<'PY'
+          from pathlib import Path
+
+          index = Path("docs/INDEX.md")
+          text = index.read_text(encoding="utf-8")
+          route_anchor = (
+              "- [`../skills/product-reverse-engineering-loop/README.md`](../skills/product-reverse-engineering-loop/README.md) "
+              "— evidence-graded product signals and problem closure by lane.\n"
+          )
+          ucr_route = (
+              "- [`../skills/universal-refactor-controller/README.md`](../skills/universal-refactor-controller/README.md) "
+              "— capability-preserving complexity-reduction controller, State Machine, cross-owner DAG, bounded canary evidence and Human boundary.\n"
+          )
+          if ucr_route not in text:
+              if route_anchor not in text:
+                  raise SystemExit("docs/INDEX.md UCR route anchor drifted")
+              text = text.replace(route_anchor, route_anchor + ucr_route, 1)
+
+          old_counts = (
+              "An index fails in one direction only: a dead link is found the moment someone follows it, while an omission looks exactly like completeness. "
+              "`scripts/check_document_routes.py` measures the stated Skill-directory counts off the tree and refuses drift. "
+              "13 of 32 skill directories ship a `README.md` and 10 are routed above. "
+              "The three that ship one and are still unrouted are `codebase-atlas`, `dual-forge-repository-loop`, and `skill-refactor-proof-loop`; "
+              "each is named here so the omission cannot read as completeness, and each belongs to its own line of work rather than to this change. "
+              "The remaining 19 directories have no nearest-README route to omit yet. "
+              "A directory's shared/repo-owned classification remains `ABSENT` until a separate `registry.json` governance change is Human-admitted."
+          )
+          new_counts = (
+              "An index fails in one direction only: a dead link is found the moment someone follows it, while an omission looks exactly like completeness. "
+              "`scripts/check_document_routes.py` measures the stated Skill-directory counts off the tree and refuses drift. "
+              "14 of 34 skill directories ship a `README.md` and 11 are routed above. "
+              "The three that ship one and are still unrouted are `codebase-atlas`, `dual-forge-repository-loop`, and `skill-refactor-proof-loop`; "
+              "each is named here so the omission cannot read as completeness, and each belongs to its own line of work rather than to this change. "
+              "The remaining 20 directories have no nearest-README route to omit yet. "
+              "A directory's shared/repo-owned classification remains `ABSENT` until a separate `registry.json` governance change is Human-admitted."
+          )
+          if old_counts not in text:
+              raise SystemExit("docs/INDEX.md measured-count paragraph drifted")
+          index.write_text(text.replace(old_counts, new_counts, 1), encoding="utf-8")
+
+          stack = Path("skills/git-town-stacked-pr-worker/README.md")
+          stack_text = stack.read_text(encoding="utf-8")
+          anchor = "## Proof-carrying refactor and historical indexes\n"
+          if anchor not in stack_text:
+              raise SystemExit("Git Town historical-index anchor drifted")
+          section = r'''## Universal refactor controller admission — Epic #398
+
+This is a durable traceability projection, not mutable PR-state authority. Read current GitHub metadata before acting on an open subject.
+
+```text
+#399 / PR #405  UCR-C contract
+├─ #400 / PR #441  UCR-K/E deterministic gate
+└─ #401 / PR #442  UCR-A adapters
+       \           /
+        #402 / PR #458  UCR-LIVE
+           ├─ validation PR #461
+           └─ #406 / PR #463  UCR-X/D convergence
+                         │
+                         └─ Epic #398 current-main landing  PENDING_PUBLICATION
+```
+
+| Atom | Issue | PR | Evidence ceiling | Role |
+|---|---|---|---|---|
+| `C` | `#399` | `#405` | `IMPLEMENTED` | controller + Complexity Delta contract |
+| `K/E` | `#400` | `#441` | `LOCAL_DETERMINISTIC_VERIFIED` | composition gate + false-simplification controls |
+| `A` | `#401` | `#442` | `STATIC_CONTRACT_VERIFIED` | Skill/repository target adapters |
+| `X/LIVE` | `#402` | `#458` | `BOUNDED_CROSS_DOMAIN_REMOTE_VERIFIED` | Skill + ordinary-repository canaries |
+| validation | `#402` | `#461` | `REMOTE_REPOSITORY_CI_VERIFIED` | repaired whole-subject hosted receipt |
+| `X/D` | `#406` | `#463` | `REMOTE_INTEGRATION_VERIFIED` | registry, CI arrival, Agent routes, corpus and program trace |
+| main landing | `#398` | pending publication | `HUMAN_ADMITTED / REVERIFY_ON_CURRENT_MAIN` | preserve concurrent main governance and land one compliant subject |
+
+PR #462 remains `SUPERSEDED_FORENSIC`; it exposed document-route inventory drift and the connector commit-role endpoint gap. PR #463 repaired that history with CI-authored `agent-macro@ci.invalid` commits and is the immutable semantic source for this landing. The landing itself is rebuilt on current `main`; it does not import stale UCR Git ancestry or overwrite the concurrently admitted #375–#379 Tech Lead/Shadow control-plane bytes.
+
+Golden Refactor cases remain bounded. Open ordinary-repository evidence is not promoted by this admission. Live provider/model uplift, production safety, release, promotion and rollback remain separate evidence/Human lanes.
+
+'''
+          if "## Universal refactor controller admission — Epic #398" not in stack_text:
+              stack_text = stack_text.replace(anchor, section + anchor, 1)
+          stack.write_text(stack_text, encoding="utf-8")
+          PY
+
+          git add docs/INDEX.md skills/git-town-stacked-pr-worker/README.md
+          test -f noop
+          git diff --cached --check
+          git config user.name "agent-macro"
+          git config user.email "agent-macro@ci.invalid"
+          git commit \
+            -m "feat(ucr): land admitted universal refactor stack on current main" \
+            -m $'Driven-By: agent-macro\nDriven-On: ci'
+          test "$(git rev-list --count "${EXPECTED_MAIN_SHA}..HEAD")" -eq 1
+          test -f noop
+          git push origin "HEAD:refs/heads/${DEST_BRANCH}"
