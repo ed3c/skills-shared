@@ -298,6 +298,37 @@ def live_preflight(data: dict[str, Any]) -> dict[str, Any]:
         "issues": issues,
     }
 
+def _linked_issue_numbers(value: Any, repo: str) -> list[int]:
+    # gh issue view --json blockedBy returns a LinkedIssueConnection
+    # ({"nodes": [...], "totalCount": N}), never a bare list (#497).
+    if not isinstance(value, dict) or set(value) != {"nodes", "totalCount"}:
+        raise ContractError("blockedBy connection malformed")
+    nodes = value["nodes"]
+    total = value["totalCount"]
+    if not isinstance(nodes, list):
+        raise ContractError("blockedBy nodes malformed")
+    if not isinstance(total, int) or isinstance(total, bool) or total < 0:
+        raise ContractError("blockedBy totalCount malformed")
+    if total != len(nodes):
+        raise ContractError("blockedBy totalCount mismatch")
+    numbers: list[int] = []
+    for node in nodes:
+        if not isinstance(node, dict):
+            raise ContractError("blockedBy node malformed")
+        number = node.get("number")
+        if not isinstance(number, int) or isinstance(number, bool) or number <= 0:
+            raise ContractError("blockedBy number malformed")
+        repository = node.get("repository")
+        if (
+            not isinstance(repository, dict)
+            or repository.get("nameWithOwner") != repo
+        ):
+            raise ContractError("blockedBy repository drift")
+        numbers.append(number)
+    if len(set(numbers)) != len(numbers):
+        raise ContractError("blockedBy duplicate")
+    return sorted(numbers)
+
 def live_readback(repo: str, issues: list[int]) -> dict[str, Any]:
     result: dict[str, Any] = {}
     for issue in issues:
@@ -305,19 +336,13 @@ def live_readback(repo: str, issues: list[int]) -> dict[str, Any]:
             ["gh", "issue", "view", str(issue), "--repo", repo, "--json", "blockedBy"]
         )
         obj = json.loads(raw)
-        numbers: list[int] = []
-        for item in obj.get("blockedBy", []):
-            number = item.get("number") if isinstance(item, dict) else None
-            if (
-                not isinstance(number, int)
-                or isinstance(number, bool)
-                or number <= 0
-            ):
-                raise ContractError(
-                    f"malformed GitHub blockedBy item for issue {issue}"
-                )
-            numbers.append(number)
-        result[str(issue)] = {"blockedBy": sorted(numbers)}
+        if not isinstance(obj, dict) or set(obj) != {"blockedBy"}:
+            raise ContractError(
+                f"malformed GitHub blockedBy response for issue {issue}"
+            )
+        result[str(issue)] = {
+            "blockedBy": _linked_issue_numbers(obj["blockedBy"], repo)
+        }
     return result
 
 def apply_projection(data: dict[str, Any]) -> dict[str, Any]:
