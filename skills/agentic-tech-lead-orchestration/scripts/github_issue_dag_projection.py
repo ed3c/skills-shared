@@ -5,28 +5,38 @@ GitHub blockedBy is treated as a durable projection of completion-readiness
 edges, not as semantic authority. Start-readiness edges stay in portable truth.
 """
 from __future__ import annotations
-import argparse, json, subprocess
+import argparse, hashlib, json, subprocess
 from collections import defaultdict, deque
 from pathlib import Path
 from typing import Any
 
 class ContractError(ValueError): pass
 
+def canonical_graph_digest(data: dict[str, Any]) -> str:
+    subject={"repo":data.get("repo"),"nodes":data.get("nodes"),"edges":data.get("edges")}
+    encoded=json.dumps(subject,sort_keys=True,separators=(",",":"),ensure_ascii=False).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
 def validate_graph(data: dict[str, Any]) -> None:
-    if not isinstance(data.get("repo"), str) or "/" not in data["repo"]:
-        raise ContractError("repo must be owner/name")
+    if not isinstance(data.get("repo"), str) or data["repo"].count("/") != 1:
+        raise ContractError("repo must be exact owner/name")
     nodes = data.get("nodes")
     edges = data.get("edges")
     if not isinstance(nodes, list) or not isinstance(edges, list):
         raise ContractError("nodes/edges must be lists")
+    expected_digest=data.get("graph_digest")
+    if expected_digest is not None and expected_digest != canonical_graph_digest(data):
+        raise ContractError("graph_digest does not match frozen graph bytes")
     issues=[]
     for node in nodes:
+        if not isinstance(node,dict): raise ContractError("node must be an object")
         issue=node.get("issue")
-        if not isinstance(issue,int) or issue <= 0:
+        if not isinstance(issue,int) or isinstance(issue,bool) or issue <= 0:
             raise ContractError("node issue must be positive integer")
         if issue in issues: raise ContractError(f"duplicate node: {issue}")
         issues.append(issue)
         state=node.get("state",{})
+        if not isinstance(state,dict): raise ContractError(f"state must be object for issue {issue}")
         if set(state) - {"start_readable","completion_admitted"}:
             raise ContractError(f"unsupported state fields for issue {issue}")
         if not all(isinstance(v,bool) for v in state.values()):
@@ -36,8 +46,10 @@ def validate_graph(data: dict[str, Any]) -> None:
     adjacency=defaultdict(list)
     indeg={i:0 for i in issues}
     for edge in edges:
+        if not isinstance(edge,dict): raise ContractError("edge must be an object")
         blocker=edge.get("blocker"); blocked=edge.get("blocked")
         readiness=edge.get("readiness"); project=edge.get("project_to_github",False)
+        if not isinstance(project,bool): raise ContractError("project_to_github must be boolean")
         if blocker not in known or blocked not in known:
             raise ContractError("edge references unknown issue")
         if blocker == blocked: raise ContractError("self dependency is forbidden")
@@ -85,7 +97,13 @@ def compare_readback(data: dict[str, Any], readback: dict[str, Any]) -> dict[str
     desired=desired_blocked_by(data)
     missing={}; extra={}
     for issue,want in desired.items():
-        got=sorted(readback.get(str(issue),{}).get("blockedBy",[]))
+        row=readback.get(str(issue))
+        if not isinstance(row,dict) or not isinstance(row.get("blockedBy"),list):
+            raise ContractError(f"missing complete blockedBy readback for issue {issue}")
+        got=row["blockedBy"]
+        if not all(isinstance(v,int) and not isinstance(v,bool) and v>0 for v in got):
+            raise ContractError(f"malformed blockedBy readback for issue {issue}")
+        got=sorted(got)
         m=sorted(set(want)-set(got)); x=sorted(set(got)-set(want))
         if m: missing[str(issue)]=m
         if x: extra[str(issue)]=x
@@ -104,8 +122,10 @@ def live_readback(repo:str, issues:list[int]) -> dict[str,Any]:
         obj=json.loads(raw)
         nums=[]
         for item in obj.get("blockedBy",[]):
-            num=item.get("number")
-            if isinstance(num,int): nums.append(num)
+            num=item.get("number") if isinstance(item,dict) else None
+            if not isinstance(num,int) or isinstance(num,bool) or num<=0:
+                raise ContractError(f"malformed GitHub blockedBy item for issue {issue}")
+            nums.append(num)
         result[str(issue)]={"blockedBy":sorted(nums)}
     return result
 
@@ -113,17 +133,20 @@ def apply_projection(data:dict[str,Any]) -> dict[str,Any]:
     desired=desired_blocked_by(data)
     before=live_readback(data["repo"], sorted(desired))
     diff=compare_readback(data,before)
+    if diff["extra"]:
+        raise ContractError(
+            "remote contains extra blockedBy edges not owned by this projection; "
+            f"refusing destructive reconciliation: {diff['extra']}"
+        )
     for issue, vals in diff["missing"].items():
         for blocker in vals:
             _run(["gh","issue","edit",issue,"--repo",data["repo"],"--add-blocked-by",str(blocker)])
-    for issue, vals in diff["extra"].items():
-        for blocker in vals:
-            _run(["gh","issue","edit",issue,"--repo",data["repo"],"--remove-blocked-by",str(blocker)])
     after=live_readback(data["repo"], sorted(desired))
     check=compare_readback(data,after)
     if not check["match"]:
         raise ContractError(f"remote readback drift remains: {check}")
-    return {"repo":data["repo"],"desired":desired,"before":before,"after":after,"ready_wave":ready_wave(data),
+    return {"repo":data["repo"],"graph_digest":canonical_graph_digest(data),"desired":desired,
+            "before":before,"after":after,"ready_wave":ready_wave(data),
             "evidence_ceiling":"REMOTE_PROJECTION_READBACK_ONLY"}
 
 def main()->int:
@@ -133,7 +156,8 @@ def main()->int:
     ap.add_argument("--apply",action="store_true")
     args=ap.parse_args()
     data=json.loads(Path(args.graph).read_text())
-    out={"repo":data["repo"],"desired":desired_blocked_by(data),"ready_wave":ready_wave(data),
+    out={"repo":data["repo"],"graph_digest":canonical_graph_digest(data),
+         "desired":desired_blocked_by(data),"ready_wave":ready_wave(data),
          "evidence_ceiling":"STATIC_PROJECTION_ONLY"}
     if args.readback:
         rb=json.loads(Path(args.readback).read_text())
