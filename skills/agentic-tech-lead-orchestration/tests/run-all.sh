@@ -4,7 +4,8 @@ ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 TMP=${TMPDIR:-/tmp}/agentic-tech-lead-receipt-$$.json
 QUEUE_TMP=${TMPDIR:-/tmp}/agentic-tech-lead-queue-receipt-$$.json
 CONTROL_TMP=${TMPDIR:-/tmp}/agentic-tech-lead-control-plane-$$.md
-trap 'rm -f "$TMP" "$QUEUE_TMP" "$CONTROL_TMP"' EXIT HUP INT TERM
+SOURCE_TMP=${TMPDIR:-/tmp}/agentic-tech-lead-source-ledger-$$.json
+trap 'rm -f "$TMP" "$QUEUE_TMP" "$CONTROL_TMP" "$SOURCE_TMP"' EXIT HUP INT TERM
 
 # Prove the routing itself, including planted disconnections.
 python3 "$ROOT/scripts/check_runtime_reachability.py" --selftest
@@ -111,6 +112,10 @@ schemas = [
     "references/contracts/github-ready-wave.schema.json",
     "references/contracts/herdr-observer-receipt.schema.json",
     "references/contracts/problem-closure.schema.json",
+    "references/contracts/codex-live-acceptance-receipt.schema.json",
+    "references/contracts/github-dag-live-canary-receipt.schema.json",
+    "references/contracts/herdr-lifecycle-receipt.schema.json",
+    "references/contracts/source-claims-input.schema.json",
 ]
 for rel in schemas:
     schema = json.loads((root / rel).read_text(encoding="utf-8"))
@@ -124,12 +129,25 @@ closure_example = json.loads(
 )
 errors = list(Draft202012Validator(closure_schema).iter_errors(closure_example))
 assert not errors, [error.message for error in errors]
-print("CONTROL-PLANE-SHAPE-GREEN 6 schemas; problem-closure example validated")
+
+source_schema = json.loads(
+    (root / "references/contracts/source-claims-input.schema.json").read_text(encoding="utf-8")
+)
+source_example = json.loads(
+    (root / "references/examples/source-claims.example.json").read_text(encoding="utf-8")
+)
+errors = list(Draft202012Validator(source_schema).iter_errors(source_example))
+assert not errors, [error.message for error in errors]
+print("CONTROL-PLANE-SHAPE-GREEN 10 schemas; closure/source examples validated")
 PYCP
 python3 "$ROOT/tests/codex_sdk_controller_selftest.py"
 python3 "$ROOT/tests/github_issue_dag_selftest.py"
 python3 "$ROOT/tests/herdr_observer_selftest.py"
 python3 "$ROOT/tests/problem_closure_selftest.py"
+python3 "$ROOT/tests/codex_live_acceptance_selftest.py"
+python3 "$ROOT/tests/github_issue_dag_live_canary_selftest.py"
+python3 "$ROOT/tests/herdr_lifecycle_selftest.py"
+python3 "$ROOT/tests/source_claim_compiler_selftest.py"
 python3 "$ROOT/scripts/check_problem_closure.py" \
   "$ROOT/references/examples/problem-closure.example.json" >/dev/null
 python3 "$ROOT/scripts/render_problem_closure.py" \
@@ -137,6 +155,13 @@ python3 "$ROOT/scripts/render_problem_closure.py" \
   --output "$CONTROL_TMP"
 grep -F '> Generated projection. Machine truth remains the checked JSON ledger' \
   "$CONTROL_TMP" >/dev/null
+
+# Prove the source compiler emits the existing problem-closure truth model,
+# rather than a second incompatible ledger format.
+python3 "$ROOT/scripts/compile_source_claims.py" \
+  "$ROOT/references/examples/source-claims.example.json" \
+  --output "$SOURCE_TMP"
+python3 "$ROOT/scripts/check_problem_closure.py" "$SOURCE_TMP" >/dev/null
 
 # Freeze the portable Dual-Agent offload method contract and its exact-subject
 # handoff packet, and prove all sixteen semantic controls still turn red. No
