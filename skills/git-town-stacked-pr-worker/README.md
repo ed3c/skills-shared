@@ -165,22 +165,33 @@ main@4ca9417b1da5ff32f1d4d3e7af64a15908749024
 
 | Atom | Issue / PR | Relation | Current selected head | Provides | Deterministic denominator | Remaining ceiling |
 |---|---|---|---|---|---|---|
-| `A-CODEX` | `#375 / #451` | `SIBLING / UNMERGED CANDIDATE` | `86f9e8d940b76cb71b713c098ff09cb68eb4e0c1` | exact session/result contract, clean-worktree subject preflight, SDK runner, post-turn writable-lease readback | `4 / 14`; own exact-head shared workflows green | live SDK `NOT_EXERCISED`; independent acceptance still required |
-| `A-GH-DAG` | `#376 / #452` | `SIBLING / UNMERGED CANDIDATE` | `426fb6f6f548f71572d4402e73e0b05ecf6f8aa8` | completion-edge projection, repo/default-branch/visibility + issue-state + closing-PR-reference preflight, non-destructive readback | `6 / 17`; own exact-head shared workflows green | live mutation/readback `NOT_EXERCISED`; generic development-link ownership beyond closing refs residual |
-| `A-HERDR` | `#377 / #456` | `SIBLING / UNMERGED CANDIDATE` | `23b03826b1bf8fe66bd731716466a9349d3242d6` | exact Git/worktree/pane/workspace/PID/session + PID-start/freshness/liveness + cleanup/residue observer | `4 / 18`; own exact-head shared workflows green | live Herdr `NOT_EXERCISED`; `DONE_CANDIDATE` advisory only |
-| `K-CLOSURE` | `#378 / #457` | `SIBLING / UNMERGED CANDIDATE` | `ac5ddc0287eb4e4156a7c7eef178b7be8bbd1d34` | frozen denominator/source manifest + exact repo/evidence/receipt subjects + supersession validation | `6 / 22`; own exact-head shared workflows green | real source/provider closure `EVIDENCE_DEPENDENT` |
+| `A-CODEX` | `#375 / #451` | `SIBLING / UNMERGED CANDIDATE` | `86f9e8d940b76cb71b713c098ff09cb68eb4e0c1` | exact session/result contract, clean-worktree subject preflight, SDK runner, post-turn writable-lease readback | `4 / 14`; selected bytes pass shared ATL suite in convergence | live SDK `NOT_EXERCISED`; independent acceptance still required |
+| `A-GH-DAG` | `#376 / #452` | `SIBLING / UNMERGED CANDIDATE` | `426fb6f6f548f71572d4402e73e0b05ecf6f8aa8` | completion-edge projection, repo/default-branch/visibility + issue-state + closing-PR-reference preflight, non-destructive readback | `6 / 17`; selected bytes pass shared ATL suite in convergence | live mutation/readback `NOT_EXERCISED`; generic development-link ownership beyond closing refs residual |
+| `A-HERDR` | `#377 / #456` | `SIBLING / UNMERGED CANDIDATE` | `6a2ebcbe87078cecaf67f82f3c9c10643bcc9123` | exact Git/worktree/pane/workspace/PID/session + PID-start/freshness/liveness + cleanup/residue observer | `4 / 18`; repaired source passes shared ATL suite in convergence | live Herdr `NOT_EXERCISED`; `DONE_CANDIDATE` advisory only |
+| `K-CLOSURE` | `#378 / #457` | `SIBLING / UNMERGED CANDIDATE` | `ac5ddc0287eb4e4156a7c7eef178b7be8bbd1d34` | frozen denominator/source manifest + exact repo/evidence/receipt subjects + supersession validation | `6 / 22`; selected bytes pass shared ATL suite in convergence | real source/provider closure `EVIDENCE_DEPENDENT` |
 | `D-TRACE` | `#379 refs / #380` | `DOCUMENTATION SIBLING` | `7a9d68fcd58b1ed78ed6d05595a8df7eae53f5a5` | original control-plane design/trace routing | navigation only | consumed by convergence; no runtime claim |
 | `X-CONVERGENCE` | `#379 / #455` | `CONVERGENCE CANDIDATE` | read current head from GitHub | exact selected sibling bytes + shared `run-all`, Agent routes, Shadow relation, Git Town/trace indexes | final current head must rerun full hosted denominator | static/deterministic scope only; sibling admission/Human merge/release separate |
 
-Current #377/#378 candidate integration checkpoint:
+Current repaired #377 integration checkpoint:
+
+```text
+fc40cf833609328ded0141dd8d9629c9a727a159
+parents:
+  d52ab2aad8e20be0c738e77356f75633813ad444  prior #455 route/index head
+  6a2ebcbe87078cecaf67f82f3c9c10643bcc9123  repaired #456 selected candidate
+```
+
+Rejected predecessor checkpoint retained for audit:
 
 ```text
 ed852502437570c7c86bae12c07c16a3f5d37ea8
 parents:
   c306b3b4cea797f5f4d1323f8ec7fcd94a94f3ec  prior #455 convergence head
-  23b03826b1bf8fe66bd731716466a9349d3242d6  #456 selected candidate
+  23b03826b1bf8fe66bd731716466a9349d3242d6  corrupted #456 candidate
   ac5ddc0287eb4e4156a7c7eef178b7be8bbd1d34  #457 selected candidate
 ```
+
+The shared ATL suite rejected `ed852502...` because the Herdr script contained a non-printable `U+000F` source corruption and could not import. The #377 owner repaired the source without changing the 4/18 selftest denominator; the repaired integration then passed the shared ATL suite.
 
 Earlier #451/#452 hardening entered through:
 
@@ -200,6 +211,7 @@ The final mutable #455 head is never self-embedded in this README. Read it from 
 c0f6979f80038394350aea724c598c8dba5ac338  epoch-1 union
 af427a13a7096df91d74a48c0a4ca6ce3f3e2ac9  epoch-1 + PR #380 documentation
 35874af7a6d04783983b05c8f1b1e402471b4451  historical hosted-green convergence
+ed852502437570c7c86bae12c07c16a3f5d37ea8  rejected corrupted-Herdr integration
 
 #444 → #451
 #445 → #452
@@ -207,7 +219,7 @@ af427a13a7096df91d74a48c0a4ca6ce3f3e2ac9  epoch-1 + PR #380 documentation
 #447 → #454 → #457
 ```
 
-#446/#447 are rejected provenance candidates. #453/#454 are provenance-correct replacements later closed unmerged. They remain `HISTORICAL`, not alternate merge candidates. The older hosted-green convergence became historical when selected sibling heads moved; green evidence never follows a moving parent automatically.
+#446/#447 are rejected provenance candidates. #453/#454 are provenance-correct replacements later closed unmerged. The first v3 #456 head is retained as a rejected source-corruption subject and is superseded by `6a2ebcbe...`. All remain `HISTORICAL`, not alternate merge candidates. An older hosted-green convergence became historical when selected sibling heads moved; green evidence never follows a moving parent automatically.
 
 ### Current control-plane data flow
 
@@ -244,14 +256,15 @@ existing ATL suite
 
 No required test may be hidden behind `if file exists`.
 
-Hosted final-head denominator:
+At repaired integration ancestor `fc40cf83...`, synchronize-triggered hosted gates are:
 
 ```text
-Skill Suites
-Shared Skills Infra
-Skill Eval Contract
-Git Town Stacked PR Worker (offline-contract + live-canary)
+Skill Suites                         PASS
+Shared Skills Infra                  PASS
+Git Town Stacked PR Worker           PASS
 ```
+
+The ATL suite log explicitly records all four control-plane denominators PASS. The final documentation/index head must rerun the synchronize-triggered workflows. `Skill Eval Contract` is `ready_for_review`-triggered and must be explicitly retriggered after the final head stabilizes; absence is never PASS.
 
 An earlier green head is historical after any selected sibling head moves. A final-head hosted PASS does not admit or merge an unmerged sibling and does not raise live evidence.
 
