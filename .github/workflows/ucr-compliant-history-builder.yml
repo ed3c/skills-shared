@@ -20,26 +20,64 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: true
-      - name: Materialize one compliant UCR-X/D commit on a new branch
+      - name: Fast-forward replacement PR metadata with compliant identity
         env:
-          BASE_SHA: ac924a66607310e3d0cc7e3c0278a341e18770f2
-          SOURCE_SHA: fe93fdec52005a18de0a0c52606691180829c9d2
           DEST_BRANCH: agent/406-ucr-convergence-docs-v2
         run: |
           set -euo pipefail
-          if git ls-remote --exit-code --heads origin "refs/heads/${DEST_BRANCH}" >/dev/null 2>&1; then
-            echo "destination branch already exists; refusing to rewrite it" >&2
-            exit 2
-          fi
-          git cat-file -e "${BASE_SHA}^{commit}"
-          git cat-file -e "${SOURCE_SHA}^{commit}"
-          git diff --binary "${BASE_SHA}" "${SOURCE_SHA}" > "${RUNNER_TEMP}/ucr-xd.patch"
-          git switch --detach "${BASE_SHA}"
-          git apply --index "${RUNNER_TEMP}/ucr-xd.patch"
+          git fetch origin "refs/heads/${DEST_BRANCH}:refs/remotes/origin/${DEST_BRANCH}"
+          git switch --detach "refs/remotes/origin/${DEST_BRANCH}"
+          python3 - <<'PY'
+          from pathlib import Path
+
+          trace = Path("skills/universal-refactor-controller/references/ucr-program-trace.json")
+          trace_text = trace.read_text(encoding="utf-8")
+          old = '"pull_request": "ed3c/skills-shared#462",\n      "stack_class": "CONVERGENCE_DOCUMENTATION"'
+          new = '"pull_request": "ed3c/skills-shared#463",\n      "stack_class": "CONVERGENCE_DOCUMENTATION"'
+          if old not in trace_text:
+              raise SystemExit("UCR-X-D PR #462 binding not found exactly once")
+          trace.write_text(trace_text.replace(old, new, 1), encoding="utf-8")
+
+          ucr_readme = Path("skills/universal-refactor-controller/README.md")
+          ucr_text = ucr_readme.read_text(encoding="utf-8")
+          marker = "└─→ #406  UCR-X/D"
+          if marker in ucr_text:
+              ucr_text = ucr_text.replace(marker, "└─→ #406 / PR #463  UCR-X/D", 1)
+          elif "#406 / PR #463  UCR-X/D" not in ucr_text:
+              raise SystemExit("UCR README convergence marker not found")
+          ucr_readme.write_text(ucr_text, encoding="utf-8")
+
+          stack = Path("skills/git-town-stacked-pr-worker/README.md")
+          stack_text = stack.read_text(encoding="utf-8")
+          stack_text = stack_text.replace(
+              "#406  UCR-X/D convergence",
+              "#406 / PR #463  UCR-X/D convergence",
+              1,
+          )
+          old_row = "| `X/D` | `#406` | none until publication | convergence/documentation | `IMPLEMENTING` | registry, CI arrival, Agent routes, README State Machine, canary corpus, Stack index |"
+          new_row = "| `X/D` | `#406` | `#463` | convergence/documentation | `PR_DRAFT` | registry, CI arrival, Agent routes, README State Machine, canary corpus, Stack index |"
+          if old_row not in stack_text:
+              raise SystemExit("Git Town UCR-X/D table row not found")
+          stack_text = stack_text.replace(old_row, new_row, 1)
+          anchor = "Supporting process/evidence leaves are not semantic Git children of UCR-C:\n"
+          note = (
+              "PR #462 is a `SUPERSEDED_FORENSIC` publication subject: it proved the semantic tree and exposed the commit-role endpoint gap, "
+              "but it is not the current convergence PR. PR #463 rebuilds the same admitted tree on the same validated base with compliant "
+              "`agent-macro@ci.invalid` identity and `Driven-By: agent-macro` / `Driven-On: ci` trailers, without force-pushing #462.\n\n"
+          )
+          if anchor not in stack_text:
+              raise SystemExit("Git Town support-leaf anchor not found")
+          stack_text = stack_text.replace(anchor, note + anchor, 1)
+          stack.write_text(stack_text, encoding="utf-8")
+          PY
+          git diff --check
+          git add \
+            skills/universal-refactor-controller/references/ucr-program-trace.json \
+            skills/universal-refactor-controller/README.md \
+            skills/git-town-stacked-pr-worker/README.md
           git config user.name "agent-macro"
           git config user.email "agent-macro@ci.invalid"
           git commit \
-            -m "feat(ucr): converge universal refactor controller" \
+            -m "docs(ucr): bind replacement convergence PR" \
             -m $'Driven-By: agent-macro\nDriven-On: ci'
-          test "$(git rev-list --count "${BASE_SHA}..HEAD")" -eq 1
           git push origin "HEAD:refs/heads/${DEST_BRANCH}"
