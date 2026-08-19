@@ -1,13 +1,26 @@
 # Wave 3 parent admission transition
 
-Current authority note for the Wave‑3 live-evidence program.
+Status: `CURRENT_MAIN_REFRESH_REQUIRED_BEFORE_WAVE3_ADMIT`.
 
-At Wave‑3 fork time, #464–#467 were created as `TRUE_CHILD` leaves of the then-unmerged #455 exact head `847e56c3418fce920c42d983e84ee44fdc6e8971`. That historical dependency remains valid provenance: every leaf consumed those exact unmerged bytes and none consumed another leaf.
+This document records the authority transition for the #464–#468 live-evidence program. It separates fork-time ancestry from current repository authority so a later Agent does not treat an old green convergence as current.
 
-During Wave‑3 convergence, #455 was Human-admitted and merged as the Wave‑2 implementation subject:
+## Fork-time parent
+
+At Wave‑3 fork time, #464–#467 were real `TRUE_CHILD` leaves of the then-unmerged #455 exact head:
 
 ```text
-ca31e0b1e640f0dba2c3d94da9d9786fbed32f2c
+#455 fork head  847e56c3418fce920c42d983e84ee44fdc6e8971
+#455 tree       8a75271851f2e9dd47dd3a019c93e4a0f9272d24
+```
+
+Every leaf consumed those exact bytes and none consumed another Wave‑3 leaf, so #464–#467 remain siblings of one another.
+
+## Wave‑2 admission
+
+#455 was subsequently Human-admitted and merged:
+
+```text
+merge commit  ca31e0b1e640f0dba2c3d94da9d9786fbed32f2c
 parents:
   4ca9417b1da5ff32f1d4d3e7af64a15908749024
   847e56c3418fce920c42d983e84ee44fdc6e8971
@@ -15,32 +28,41 @@ tree:
   8a75271851f2e9dd47dd3a019c93e4a0f9272d24
 ```
 
-The merge tree is exactly the #455 candidate tree, so no Wave‑2 implementation bytes changed at admission. The post-merge admission record and multi-hop route were then landed through provenance-complete PR #475:
+The merge tree equals the reviewed #455 candidate tree byte-for-byte. The post-merge admission route was then published through provenance-complete PR #475; rejected PR #474 remains historical commit-role evidence.
+
+## Wave‑3 publication history
+
+The first Wave‑3 convergence publication PR #473 preserved the four leaf bytes but carried a historical `noop` commit without repository-required provenance trailers. `Skill Eval Contract` correctly rejected that ancestry after document-routing had already passed. PR #473 is therefore historical/rejected publication evidence, not an admissible merge subject.
+
+PR #480 replayed the same reconciled Wave‑3 tree on the then-current main as one provenance-complete commit. Its first exact-head gate epoch became stale when another Human-admitted program, PR #477, advanced `main` during validation.
+
+The current refresh input for this epoch is:
 
 ```text
-main refresh observed for Wave‑3 convergence:
-  4be4d6744fe432e4be24d94750bb4fc034aab189
-parents:
-  ca31e0b1e640f0dba2c3d94da9d9786fbed32f2c
-  6e9b84acd4e676d444a2be93454a1bb867e34501
+main@2bf90d7182d42dfc3a908ffa68d7ea4b26898042
+main tree e002c1cad03df0c64ce87cff649fafabfdd2619c
 ```
 
-PR #474 remains closed-unmerged historical evidence because its document-routing gate passed but commit-role provenance failed. PR #475 replayed the same three document blobs with required commit-level provenance; no gate or evidence ceiling was weakened.
+That main movement is not a semantic Wave‑3 parent. It is a repository-freshness dependency: the final #468 publication subject must preserve the admitted #477 UCR/workflow/registry bytes and consume the Wave‑3 selected bytes before a new exact-head verdict can exist.
 
-From this point forward:
+## Current law
 
 ```text
-#455 / #379                HUMAN_ADMITTED / MERGED / HISTORICAL_PARENT
-#475 admission route        MERGED / CURRENT ROUTING INPUT
-#469–#472                   historical TRUE_CHILD provenance of #455; selected candidate bytes
-#473                        must consume current main plus the four selected leaf bytes before final admission
+fork-time #455 ancestry                         HISTORICAL_TRUE_PARENT
+#455/#379 static deterministic convergence     HUMAN_ADMITTED / MERGED
+#475 admission route                           MERGED / ROUTING_INPUT
+#477 UCR current-main movement                  ADMITTED_CURRENT_MAIN_INPUT
+#469–#472 selected Wave‑3 leaf bytes            IMPLEMENTED_CANDIDATES
+#473 provenance-defective convergence           HISTORICAL / REJECTED
+#480 predecessor exact-head evidence            HISTORICAL_AFTER_MAIN_DRIFT
+current #468 publication subject                MUST_CONSUME_CURRENT_MAIN_AND_SELECTED_LEAVES
 ```
 
-The concrete `main` SHA above is the refresh input observed for this convergence epoch, not perpetual mutable authority. Re-read `main` immediately before every decision or merge.
+Re-read `main`, the current #468 PR head, #469–#472 heads, review threads and hosted workflows immediately before Human Admit. A green predecessor head never follows a moving main automatically.
 
-This note supersedes any earlier use of the word `unmerged` when that wording is read as **current** #455 state. Earlier documents remain correct as fork-time provenance.
+## Evidence ceiling
 
-No live evidence state changes because of #455/#475 admission:
+No authority transition above changes live evidence:
 
 ```text
 live Codex SDK/controller acceptance       NOT_EXERCISED
@@ -48,7 +70,7 @@ live GitHub add/readback/remove canary      NOT_EXERCISED
 live Herdr lifecycle                        NOT_EXERCISED
 article/PDF/PRD truth                      SOURCE_PROPOSAL / EVIDENCE_DEPENDENT
 real source/provider closure               EVIDENCE_DEPENDENT
-#473 Human Admit / merge / release          NOT_PERFORMED until final exact-head gates + Shadow
+release / production promotion             NOT_PERFORMED
 ```
 
-Machine authority remains current GitHub metadata, Git ancestry, exact-head workflows and runtime receipts.
+Machine authority remains current GitHub metadata, Git ancestry, executable contracts, exact-head workflow runs and runtime receipts.

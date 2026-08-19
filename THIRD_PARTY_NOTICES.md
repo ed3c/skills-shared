@@ -33,24 +33,48 @@ into this repository. Each is installed independently by whatever environment
 runs the script or workflow, under that package's own license, which travels
 with the package and is unaffected by the repository's Apache-2.0 license.
 
+## Method provenance for repository entropy reclamation
+
+`skills/repository-entropy-reclamation/` records procedural-method provenance
+from these MIT-licensed public sources at immutable commits:
+
+| Source | Exact subject reviewed | Role in the generalized method |
+|---|---|---|
+| `Yevanchen/reclaim-code-entropy` | commit `491cbff12cdc6988dfb18dec15b2c3bc4db512f1`; `skills/reclaim-code-entropy/SKILL.md`, `README.md`, `README.zh.md` | Contract-first survey, consumer/history/ownership proof, candidate classes, ownership-boundary cuts, decisive verification, and acceptance of an empty safe-cut set. |
+| `deepseek-ai/deepseek-harness` | commit `99f6f02fecdb7dff40c3fbc9470f5907c29f74ca`; `.agents/skills/dsh-find-simplifications/SKILL.md` | Broad simplification survey, trust/lifecycle ownership, dependency-substitution bar, proposal coalescing, repository-context-first review, and PR hygiene. |
+
+No source file or source tree from either repository is vendored or copied.
+The shared Skill, schema, verifier, controls, adapters, and documentation are
+newly authored, domain-neutral expressions under this repository's
+Apache-2.0 license. DeepSeek-specific package names, Agent Note locations,
+`pnpm`/`knip`/Cordis/ACP/MCP conventions, commands, paths, and current state
+remain consumer-owned adapter facts rather than portable law. The more exact
+mapping, exclusions, and license boundary live in
+`skills/repository-entropy-reclamation/references/UPSTREAM_LINEAGE.md`.
+
 ## Verification caveat
 
-The license values above were read from locally installed package metadata
-in the worker's environment on 2026-08-18 (`pip show` / `importlib.metadata`
-`License-Expression` and `License` fields), not fetched from each project's
-canonical repository or PyPI project page. Package metadata self-reports its
-license and is generally reliable. Re-confirm current terms from each
-project's canonical source whenever a pinned version changes or before a
-release begins redistributing third-party source or binaries.
+The package license values above were read from locally installed package
+metadata in the worker's environment on 2026-08-18 (`pip show` /
+`importlib.metadata` `License-Expression` and `License` fields), not fetched
+from each project's canonical repository or PyPI project page. Package
+metadata self-reports its license and is generally reliable. Re-confirm current
+terms from each project's canonical source whenever a pinned version changes
+or before a release begins redistributing third-party source or binaries.
+
+The two method-source licenses and immutable source identities above were
+reviewed from their public repository files for this integration. Re-check the
+exact pinned commits and their license files before redistributing any future
+verbatim source material; this repository currently redistributes none.
 
 ## Generated output and content boundary
 
 This repository's Python scripts are verification/CI tooling; none trains,
 fine-tunes, or bundles a model, dataset, or model weights, so there is no
 model/dataset license question in scope. Skill bodies (`SKILL.md`, `modules/`,
-`references/`) are original prose and code authored for this repository; no
-third-party prose, proprietary standards text, or scraped content was found
-during this scan. If any Skill later incorporates external
-text/code/standards content, that Skill's own directory must record its
-source and license separately — this file only covers repository-wide
-Python tooling dependencies.
+`references/`) are original prose and code authored for this repository. The
+repository may record attributed method provenance, as above, without copying
+third-party prose or code. If any Skill later incorporates external
+text/code/standards content, that Skill's own directory must record its source
+and license separately — this file only covers repository-wide Python tooling
+dependencies and the method provenance explicitly listed here.

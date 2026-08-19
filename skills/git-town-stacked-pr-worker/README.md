@@ -15,7 +15,7 @@ Portable method for coordinating multiple Worker Agents with Git Town, isolated 
 9. `evals.json`, `scripts/`, `tests/`.
 10. [`../skill-refactor-proof-loop/README.md`](../skill-refactor-proof-loop/README.md) for proof-carrying refactor contracts.
 11. [`../github-delivery-loop/README.md`](../github-delivery-loop/README.md) for GitHub publication/merge State Machines.
-12. [`../../docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md`](../../docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md) and [`../../docs/traceability/CODEX_SDK_TECH_LEAD_CONTROL_PLANE.md`](../../docs/traceability/CODEX_SDK_TECH_LEAD_CONTROL_PLANE.md) for current closure/control-plane subjects.
+12. [`../../docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md`](../../docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md), [`../../docs/traceability/CODEX_SDK_TECH_LEAD_CONTROL_PLANE_ADMISSION.md`](../../docs/traceability/CODEX_SDK_TECH_LEAD_CONTROL_PLANE_ADMISSION.md), and [`../../docs/traceability/WAVE3_LIVE_EVIDENCE.md`](../../docs/traceability/WAVE3_LIVE_EVIDENCE.md) for current closure/control-plane subjects.
 13. current issue/PR/workflow/Git subjects before mutation.
 
 ## Ownership
@@ -157,20 +157,22 @@ The machine index and `assert_molecular_stack_index.py` reject hidden multi-pare
 
 ## Current Codex control-plane Molecular index — #375–#380
 
-Current common base observed for this sibling epoch:
+Current authority correction: #455 was Human-admitted and merged as `ca31e0b1e640f0dba2c3d94da9d9786fbed32f2c`; its reviewed candidate and merge share tree `8a75271851f2e9dd47dd3a019c93e4a0f9272d24`. The table and checkpoints below preserve the implementation-candidate lineage that produced that admitted tree. Current mutable repository state must be read from GitHub and [`CODEX_SDK_TECH_LEAD_CONTROL_PLANE_ADMISSION.md`](../../docs/traceability/CODEX_SDK_TECH_LEAD_CONTROL_PLANE_ADMISSION.md), not inferred from historical wording below.
+
+Historical common base for this sibling epoch:
 
 ```text
 main@4ca9417b1da5ff32f1d4d3e7af64a15908749024
 ```
 
-| Atom | Issue / PR | Relation | Current selected head | Provides | Deterministic denominator | Remaining ceiling |
+| Atom | Issue / PR | Relation | Selected head | Provides | Deterministic denominator | Remaining ceiling |
 |---|---|---|---|---|---|---|
-| `A-CODEX` | `#375 / #451` | `SIBLING / UNMERGED CANDIDATE` | `86f9e8d940b76cb71b713c098ff09cb68eb4e0c1` | exact session/result contract, clean-worktree subject preflight, SDK runner, post-turn writable-lease readback | `4 / 14`; selected bytes pass shared ATL suite in convergence | live SDK `NOT_EXERCISED`; independent acceptance still required |
-| `A-GH-DAG` | `#376 / #452` | `SIBLING / UNMERGED CANDIDATE` | `426fb6f6f548f71572d4402e73e0b05ecf6f8aa8` | completion-edge projection, repo/default-branch/visibility + issue-state + closing-PR-reference preflight, non-destructive readback | `6 / 17`; selected bytes pass shared ATL suite in convergence | live mutation/readback `NOT_EXERCISED`; generic development-link ownership beyond closing refs residual |
-| `A-HERDR` | `#377 / #456` | `SIBLING / UNMERGED CANDIDATE` | `6a2ebcbe87078cecaf67f82f3c9c10643bcc9123` | exact Git/worktree/pane/workspace/PID/session + PID-start/freshness/liveness + cleanup/residue observer | `4 / 18`; repaired source passes shared ATL suite in convergence | live Herdr `NOT_EXERCISED`; `DONE_CANDIDATE` advisory only |
-| `K-CLOSURE` | `#378 / #457` | `SIBLING / UNMERGED CANDIDATE` | `ac5ddc0287eb4e4156a7c7eef178b7be8bbd1d34` | frozen denominator/source manifest + exact repo/evidence/receipt subjects + supersession validation | `6 / 22`; selected bytes pass shared ATL suite in convergence | real source/provider closure `EVIDENCE_DEPENDENT` |
-| `D-TRACE` | `#379 refs / #380` | `DOCUMENTATION SIBLING` | `7a9d68fcd58b1ed78ed6d05595a8df7eae53f5a5` | original control-plane design/trace routing | navigation only | consumed by convergence; no runtime claim |
-| `X-CONVERGENCE` | `#379 / #455` | `CONVERGENCE CANDIDATE` | read current head from GitHub | exact selected sibling bytes + shared `run-all`, Agent routes, Shadow relation, Git Town/trace indexes | final current head must rerun full hosted denominator | static/deterministic scope only; sibling admission/Human merge/release separate |
+| `A-CODEX` | `#375 / #451` | `SIBLING / CLOSED-UNMERGED / CONSUMED` | `86f9e8d940b76cb71b713c098ff09cb68eb4e0c1` | exact session/result contract, clean-worktree subject preflight, SDK runner, post-turn writable-lease readback | `4 / 14`; selected bytes passed shared ATL convergence | live SDK `NOT_EXERCISED`; independent acceptance still required |
+| `A-GH-DAG` | `#376 / #452` | `SIBLING / CLOSED-UNMERGED / CONSUMED` | `426fb6f6f548f71572d4402e73e0b05ecf6f8aa8` | completion-edge projection, repo/default-branch/visibility + issue-state + closing-PR-reference preflight, non-destructive readback | `6 / 17`; selected bytes passed shared ATL convergence | live mutation/readback `NOT_EXERCISED`; generic development-link ownership beyond closing refs residual |
+| `A-HERDR` | `#377 / #456` | `SIBLING / CLOSED-UNMERGED / CONSUMED` | `6a2ebcbe87078cecaf67f82f3c9c10643bcc9123` | exact Git/worktree/pane/workspace/PID/session + PID-start/freshness/liveness + cleanup/residue observer | `4 / 18`; repaired source passed shared ATL convergence | live Herdr `NOT_EXERCISED`; `DONE_CANDIDATE` advisory only |
+| `K-CLOSURE` | `#378 / #457` | `SIBLING / CLOSED-UNMERGED / CONSUMED` | `ac5ddc0287eb4e4156a7c7eef178b7be8bbd1d34` | frozen denominator/source manifest + exact repo/evidence/receipt subjects + supersession validation | `6 / 22`; selected bytes passed shared ATL convergence | real source/provider closure `EVIDENCE_DEPENDENT` |
+| `D-TRACE` | `#379 refs / #380` | `DOCUMENTATION SIBLING / CLOSED-UNMERGED / CONSUMED` | `7a9d68fcd58b1ed78ed6d05595a8df7eae53f5a5` | original control-plane design/trace routing | navigation only | consumed by #455; no runtime claim |
+| `X-CONVERGENCE` | `#379 / #455` | `CONVERGENCE / HUMAN_ADMITTED / MERGED` | reviewed head `847e56c3418fce920c42d983e84ee44fdc6e8971` | exact selected sibling bytes + shared `run-all`, Agent routes, Shadow relation, Git Town/trace indexes | four exact-head hosted lanes passed before Admit | live lanes remain separate; release not implied |
 
 Current repaired #377 integration checkpoint:
 
@@ -203,8 +205,6 @@ parents:
   426fb6f6f548f71572d4402e73e0b05ecf6f8aa8  #452 selected candidate
 ```
 
-The final mutable #455 head is never self-embedded in this README. Read it from GitHub after every convergence edit.
-
 ### Historical convergence and rejected candidates
 
 ```text
@@ -219,9 +219,9 @@ ed852502437570c7c86bae12c07c16a3f5d37ea8  rejected corrupted-Herdr integration
 #447 → #454 → #457
 ```
 
-#446/#447 are rejected provenance candidates. #453/#454 are provenance-correct replacements later closed unmerged. The first v3 #456 head is retained as a rejected source-corruption subject and is superseded by `6a2ebcbe...`. All remain `HISTORICAL`, not alternate merge candidates. An older hosted-green convergence became historical when selected sibling heads moved; green evidence never follows a moving parent automatically.
+#446/#447 are rejected provenance candidates. #453/#454 are provenance-correct replacements later closed unmerged. The first v3 #456 head is retained as a rejected source-corruption subject and is superseded by `6a2ebcbe...`. All remain `HISTORICAL`, not alternate merge candidates. Green evidence never follows a moving parent automatically.
 
-### Current control-plane data flow
+### Control-plane data flow
 
 ```text
 A-CODEX ─┐
@@ -232,7 +232,7 @@ D-TRACE ─── documentation sibling ──────────┘       
                                                      ├→ unconditional shared ATL suite
                                                      ├→ independent Shadow readback
                                                      ├→ repository-wide hosted workflows
-                                                     └→ READY_FOR_HUMAN_ADMIT | HOLD | REJECT
+                                                     └→ HUMAN_ADMIT → MERGED
 
 live Codex / live GitHub mutation / live Herdr / real source-provider closure
   = EXTERNAL_EVIDENCE / PROCESS_DEPENDENCY
@@ -241,7 +241,7 @@ live Codex / live GitHub mutation / live Herdr / real source-provider closure
 
 ## Required shared convergence gates
 
-The convergence subject contains selected sibling bytes first; then `agentic-tech-lead-orchestration/tests/run-all.sh` unconditionally executes:
+The admitted #455 subject contained selected sibling bytes before `agentic-tech-lead-orchestration/tests/run-all.sh` executed:
 
 ```text
 6 Draft-2020-12 control-plane schemas
@@ -255,18 +255,6 @@ existing ATL suite
 ```
 
 No required test may be hidden behind `if file exists`.
-
-At repaired integration ancestor `fc40cf83...`, synchronize-triggered hosted gates are:
-
-```text
-Skill Suites                         PASS
-Shared Skills Infra                  PASS
-Git Town Stacked PR Worker           PASS
-```
-
-The ATL suite log explicitly records all four control-plane denominators PASS. The final documentation/index head must rerun the synchronize-triggered workflows. `Skill Eval Contract` is `ready_for_review`-triggered and must be explicitly retriggered after the final head stabilizes; absence is never PASS.
-
-An earlier green head is historical after any selected sibling head moves. A final-head hosted PASS does not admit or merge an unmerged sibling and does not raise live evidence.
 
 ## Human-owned operations / rollback
 
@@ -312,6 +300,84 @@ sync conflict
 
 Workers must not automatically run `git town continue`, `skip`, `undo`, `ship`, semantic conflict edits, force push, merge, permission widening or production rollback.
 
+## Wave-3 live-evidence Molecular index — #464–#468
+
+Fork-time parent and selected leaf epoch:
+
+```text
+#455 fork head 847e56c3418fce920c42d983e84ee44fdc6e8971
+├─ #464 / PR #469  d239d17d1d718f3e5e8c1975307665cae43d3b09  TRUE_CHILD / SIBLING
+├─ #465 / PR #470  f4c3215b6c52c2e6106070eaa1121dee1dbd48e3  TRUE_CHILD / SIBLING
+├─ #466 / PR #471  9eb70b2b62193b62a28f243de91e51337f1906b3  TRUE_CHILD / SIBLING
+└─ #467 / PR #472  44d779a02e1749aa88a502d946646c22af38a026  TRUE_CHILD / SIBLING
+         ↓ exact selected bytes
+#468 current publication candidate  CONVERGENCE + CURRENT_MAIN_FRESHNESS
+```
+
+| Atom | Issue / PR | Deterministic denominator | Live/evidence ceiling |
+|---|---|---:|---|
+| `A-CODEX-LIVE` | `#464 / #469` | `1 positive / 12 mutations` | live Codex/controller acceptance `NOT_EXERCISED` |
+| `A-GH-CANARY` | `#465 / #470` | `1 / 6` | live add/readback/remove `NOT_EXERCISED` |
+| `A-HERDR-LIFECYCLE` | `#466 / #471` | `2 / 7` | live Herdr lifecycle `NOT_EXERCISED` |
+| `K-SOURCE-COMPILER` | `#467 / #472` | `4 source kinds / 11 mutations` | source/provider truth `EVIDENCE_DEPENDENT` |
+| `X-WAVE3` | `#468 / current PR` | 10 control-plane schemas + all Wave‑2/Wave‑3 selftests + queue assertion | static/deterministic infrastructure only until Human Admit |
+
+Immutable fork-time byte integration:
+
+```text
+691b342c44c9c6c4e61a9997e778ae4ed6e920d5
+└─ tree ba6ef27631546af466284f44af7c81cd347765dd
+```
+
+Publication history is intentionally not erased:
+
+```text
+#473  historical convergence; document routing passed but ancestry commit-role provenance failed
+#480  provenance-complete replay; exact-head evidence became stale when current main moved through admitted #477
+current #468 publication subject
+      must preserve #477 UCR/workflow/registry bytes,
+      consume selected Wave‑3 bytes,
+      rerun exact-head Skill Suites + Shared Skills Infra + Skill Eval Contract + Git Town,
+      then pass independent Shadow freshness readback before Human Admit
+```
+
+Wave‑3 Local Handoff remains a continuation contract for actual live Codex, Herdr and reversible GitHub canary execution. Static queue validation, hosted CI or merge cannot promote those live lanes.
+
+Full current authority transition and State Machine:
+
+- [`../../docs/traceability/WAVE3_PARENT_ADMISSION.md`](../../docs/traceability/WAVE3_PARENT_ADMISSION.md)
+- [`../../docs/traceability/WAVE3_LIVE_EVIDENCE.md`](../../docs/traceability/WAVE3_LIVE_EVIDENCE.md)
+
+## Universal refactor controller admission — Epic #398
+
+This is a durable traceability projection, not mutable PR-state authority. Read current GitHub metadata before acting on an open subject.
+
+```text
+#399 / PR #405  UCR-C contract
+├─ #400 / PR #441  UCR-K/E deterministic gate
+└─ #401 / PR #442  UCR-A adapters
+       \           /
+        #402 / PR #458  UCR-LIVE
+           ├─ validation PR #461
+           └─ #406 / PR #463  UCR-X/D convergence
+                         │
+                         └─ #398 / PR #477  current-main landing
+```
+
+| Atom | Issue | PR | Evidence ceiling | Role |
+|---|---|---|---|---|
+| `C` | `#399` | `#405` | `IMPLEMENTED` | controller + Complexity Delta contract |
+| `K/E` | `#400` | `#441` | `LOCAL_DETERMINISTIC_VERIFIED` | composition gate + false-simplification controls |
+| `A` | `#401` | `#442` | `STATIC_CONTRACT_VERIFIED` | Skill/repository target adapters |
+| `X/LIVE` | `#402` | `#458` | `BOUNDED_CROSS_DOMAIN_REMOTE_VERIFIED` | Skill + ordinary-repository canaries |
+| validation | `#402` | `#461` | `REMOTE_REPOSITORY_CI_VERIFIED` | repaired whole-subject hosted receipt |
+| `X/D` | `#406` | `#463` | `REMOTE_INTEGRATION_VERIFIED` | registry, CI arrival, Agent routes, corpus and program trace |
+| main landing | `#398` | `#477` | `HUMAN_ADMITTED / MERGED` | preserve concurrent main governance and land one checked-head subject |
+
+PR #462 remains `SUPERSEDED_FORENSIC`; it exposed document-route inventory drift and the connector commit-role endpoint gap. PR #463 repaired that history with CI-authored `agent-macro@ci.invalid` commits and is the immutable semantic source for this landing. PR #476 is `TRANSPORT_ONLY`: it squashed disposable connector-authored construction history into GitHub forge commit `d809f44004bb24b204f78af560366a413db76803`; its tree equals the admitted semantic work tree and it is not a separate capability claim. PR #477 landed on current `main`; it does not import stale UCR Git ancestry or overwrite the admitted #375–#379 Tech Lead/Shadow control-plane bytes.
+
+Golden Refactor cases remain bounded. Open ordinary-repository evidence is not promoted by this admission. Live provider/model uplift, production safety, release, promotion and rollback remain separate evidence/Human lanes.
+
 ## Proof-carrying refactor and historical indexes
 
 The current golden proof lineage and cross-Skill adoption state live in [`../skill-refactor-proof-loop/README.md`](../skill-refactor-proof-loop/README.md) and [`../../docs/traceability/TRACEABILITY_INDEX.md`](../../docs/traceability/TRACEABILITY_INDEX.md). Historical consumer snapshots, IBC/CTL delivery lines and other programme indexes remain traceability subjects rather than being duplicated as current mutable state here.
@@ -344,83 +410,3 @@ A static prompt, schema, Stack graph, deterministic test or hosted workflow cann
 - integrate GitHub publication and merge gates;
 - plant conflict, dirty, ancestry, timeout, false-child, stale-head and publication controls;
 - keep semantic conflict, force push, ship, merge, release and promotion Human-owned.
-
-## Wave-3 Codex control-plane Molecular terminal index — #464–#468
-
-Wave 3 is a real TRUE_CHILD fan-out from the unmerged #455 control-plane convergence. The four leaves consume #455 bytes but do not consume each other, so they remain siblings of one another.
-
-```text
-#455 / ctl/379-codex-control-plane-convergence
-├── #464 / PR #469  Codex live-acceptance carrier        TRUE_CHILD
-├── #465 / PR #470  GitHub dependency reversible canary TRUE_CHILD
-├── #466 / PR #471  Herdr lifecycle carrier             TRUE_CHILD
-└── #467 / PR #472  source-claim compiler               TRUE_CHILD
-       \             |             |             /
-        \____________|_____________|____________/
-                     ↓ exact selected bytes
-              #468 / PR #473        CONVERGENCE
-                     ↓
-         deterministic gates + Shadow
-                     ↓
-        runtime Local Handoff Queue
-                     ↓
-          EXTERNAL_EVIDENCE lanes
-```
-
-Immutable byte-integration checkpoint for the four selected leaves:
-
-```text
-691b342c44c9c6c4e61a9997e778ae4ed6e920d5
-parents:
-  847e56c3418fce920c42d983e84ee44fdc6e8971  #455 true parent
-  d239d17d1d718f3e5e8c1975307665cae43d3b09  #469 selected leaf
-  f4c3215b6c52c2e6106070eaa1121dee1dbd48e3  #470 selected leaf
-  9eb70b2b62193b62a28f243de91e51337f1906b3  #471 selected leaf
-  44d779a02e1749aa88a502d946646c22af38a026  #472 selected leaf
-```
-
-| Atom | Issue / PR | Relation | True parent | Owns/provides | Deterministic gate | Runtime ceiling | Successor |
-|---|---|---|---|---|---|---|---|
-| `L-CODEX` | `#464 / #469` | `TRUE_CHILD + sibling` | `#455@847e56c3...` | `compile_codex_live_acceptance.py`, dedicated selftest; binds real SDK result to controller source/diff/test receipt | `1 positive / 12 mutations` | live Codex remains `NOT_EXERCISED`; emitted live receipt still Shadow-pending | `#468` |
-| `L-GH-CANARY` | `#465 / #470` | `TRUE_CHILD + sibling` | `#455@847e56c3...` | reversible one-edge GitHub dependency canary + ownership/cleanup controls | `1 / 6` | remote canary `NOT_EXERCISED`; unexpected drift refuses destructive cleanup | `#468` |
-| `L-HERDR` | `#466 / #471` | `TRUE_CHILD + sibling` | `#455@847e56c3...` | bounded Herdr lifecycle carrier over existing observer | `2 / 7` | live Herdr remains `NOT_EXERCISED`; `DONE_CANDIDATE` stays advisory | `#468` |
-| `L-SOURCE` | `#467 / #472` | `TRUE_CHILD + sibling` | `#455@847e56c3...` | immutable Issue/Article/PDF/PRD compiler into existing problem-closure model | `4 source kinds / 11 mutations` | source truth/applicability/provider verification remain `EVIDENCE_DEPENDENT` | `#468` |
-| `X-LIVE` | `#468 / #473` | `CONVERGENCE` | selected #469–#472 + #455 | 4 live-evidence schemas, shared `run-all`, Agent routes, Shadow, traceability, Git Town index, Local Handoff Queue | final exact head owns aggregate gate | no live lane promoted by static CI; merge/release remain Human-owned | Human/runtime evidence |
-
-Path/resource lease law for this wave:
-
-```text
-#469 owns only Codex live carrier + dedicated test
-#470 owns only GitHub live-canary carrier + dedicated test
-#471 owns only Herdr lifecycle carrier + dedicated test
-#472 owns only source-claim compiler + dedicated test
-#473 alone owns shared contracts/run-all/README/AGENTS/Shadow/Git-Town/traceability/queue
-```
-
-The four leaf PRs target `ctl/379-codex-control-plane-convergence`, proving the true unmerged parent relation. #473 may have a multi-parent convergence commit to record exact selected bytes. That ancestry does not admit #455 or any leaf and does not mean live execution happened.
-
-Wave-3 deterministic denominator after convergence:
-
-```text
-Wave 2 schemas/selftests remain mandatory
-+ 4 Wave-3 Draft-2020-12 contracts
-+ Codex live acceptance       1 / 12
-+ GitHub reversible canary    1 / 6
-+ Herdr lifecycle             2 / 7
-+ source-claim compiler       4 source kinds / 11 mutations
-+ source compiler → existing problem-closure checker integration
-+ asserted Local Handoff Queue bound to 691b342c...
-```
-
-Runtime/Human boundaries remain explicit:
-
-```text
-signed-in Codex execution + controller readback     LOCAL_RUNTIME / EXTERNAL_EVIDENCE
-Herdr lifecycle observation                         LOCAL_RUNTIME / EXTERNAL_EVIDENCE
-GitHub reversible fixture canary                    REMOTE_RUNTIME / EXTERNAL_EVIDENCE
-real article/PDF/PRD truth and applicability        EVIDENCE_DEPENDENT
-semantic conflict / unmanaged remote mutation       HUMAN
-merge / release / promotion / rollback              HUMAN / repository policy
-```
-
-A green #473 hosted suite may establish only static/deterministic Wave-3 integration. It cannot turn any `NOT_EXERCISED` or `EVIDENCE_DEPENDENT` lane into PASS. Mutable #473 head is read live from GitHub; do not self-embed it here.

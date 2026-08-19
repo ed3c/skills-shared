@@ -25,8 +25,10 @@ on:
       - 'skills/procedural-shadow-runtime/**'
       - 'skills/product-reverse-engineering-loop/**'
       - 'skills/repository-capability-audit/**'
+      - 'skills/repository-entropy-reclamation/**'
       - 'skills/skill-refactor-proof-loop/**'
       - 'skills/spatial-loop-systems-engineering/**'
+      - 'skills/universal-refactor-controller/**'
       - 'scripts/check_intent_bound_constraints.py'
       - 'scripts/check_suite_ci_coverage.py'
       - '.github/workflows/skill-suites.yml'
@@ -43,8 +45,10 @@ on:
       - 'skills/procedural-shadow-runtime/**'
       - 'skills/product-reverse-engineering-loop/**'
       - 'skills/repository-capability-audit/**'
+      - 'skills/repository-entropy-reclamation/**'
       - 'skills/skill-refactor-proof-loop/**'
       - 'skills/spatial-loop-systems-engineering/**'
+      - 'skills/universal-refactor-controller/**'
       - 'scripts/check_intent_bound_constraints.py'
       - 'scripts/check_suite_ci_coverage.py'
       - '.github/workflows/skill-suites.yml'
@@ -93,8 +97,10 @@ jobs:
           - procedural-shadow-runtime
           - product-reverse-engineering-loop
           - repository-capability-audit
+          - repository-entropy-reclamation
           - skill-refactor-proof-loop
           - spatial-loop-systems-engineering
+          - universal-refactor-controller
     name: ${{ matrix.skill }}
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
