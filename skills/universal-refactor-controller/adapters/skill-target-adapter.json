@@ -1,0 +1,48 @@
+{
+  "schema_version": "universal-refactor/target-adapter/v1",
+  "id": "SkillTargetAdapter",
+  "accepted_target_kinds": ["SKILL"],
+  "trigger": {
+    "mode": "EXPLICIT_TARGET_KIND",
+    "required_markers": ["SKILL.md"],
+    "marker_presence_is_applicability_proof": false
+  },
+  "surface_groups": {
+    "entrypoints": ["SKILL.md"],
+    "supporting_surfaces": ["references/**", "modules/**", "scripts/**", "tests/**", "evals/**"],
+    "agent_routes": ["AGENTS.md", "nearest instructions", "read-order routes"],
+    "arrival": ["tests", "evals", "CI", "registry", "classification", "binding"],
+    "preservation": ["old procedural strengths", "golden proof surfaces", "executable routes"],
+    "trust": ["filesystem", "network", "secrets", "merge", "release", "promotion", "rollback", "permission"]
+  },
+  "required_outputs": [
+    "exact_subject",
+    "entrypoint_inventory",
+    "supporting_surface_inventory",
+    "agent_route_inventory",
+    "test_eval_ci_arrival_inventory",
+    "registry_classification_binding_inventory",
+    "old_strength_inventory",
+    "authority_boundary_inventory",
+    "ambiguities"
+  ],
+  "authority": {
+    "decide_simplification": false,
+    "admit_entropy_cut": false,
+    "promote_evidence": false,
+    "merge": false,
+    "release": false,
+    "permission_change": false
+  },
+  "monotonicity": {
+    "may_add_constraints": true,
+    "may_narrow_effects": true,
+    "may_narrow_authority": true,
+    "may_remove_core_dimensions": false,
+    "may_hide_consumers": false,
+    "may_treat_installation_as_applicability": false,
+    "may_copy_mutable_consumer_state_to_core": false,
+    "on_ambiguity": "HOLD"
+  },
+  "evidence_ceiling": "ROUTING_AND_SURFACE_MAPPING_ONLY"
+}
