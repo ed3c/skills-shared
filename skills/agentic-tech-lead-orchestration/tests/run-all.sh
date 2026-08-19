@@ -44,13 +44,15 @@ python3 "$ROOT/tests/selftest.py"
 python3 "$ROOT/tests/scheduler_lifecycle_selftest.py"
 python3 -m json.tool "$ROOT/references/scheduler-lifecycle.schema.json" >/dev/null
 
-# Validate the zero-context local handoff queue and its planted controls.
+# Validate the zero-context local handoff queues and their planted controls.
 python3 -m json.tool "$ROOT/references/local-handoff-queue.schema.json" >/dev/null
 python3 "$ROOT/scripts/assert_local_handoff_queue.py" \
   --queue "$ROOT/references/example-local-handoff-queue.json"
 python3 "$ROOT/scripts/assert_local_handoff_queue.py" \
   --queue "$ROOT/references/example-local-handoff-queue.json" \
   --selftest
+python3 "$ROOT/scripts/assert_local_handoff_queue.py" \
+  --queue "$ROOT/references/wave3-live-handoff-queue.json"
 
 # A schema-valid one-item queue epoch must validate and run its planted
 # controls (issue #317: the selftest used to crash on items[1]).
