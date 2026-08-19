@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ed3c/skills-shared/skills/agentic-tech-lead-orchestration/herdr-lifecycle-receipt.schema.json",
+  "title": "Herdr Lifecycle Receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version","task_id","attempt_id","repo","base_sha","tree_sha","worktree","target","sample_count","sample_digests","lifecycle_state","controller_readback_required","shadow_review_required","evidence_ceiling"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "task_id": {"type": "string", "minLength": 1},
+    "attempt_id": {"type": "string", "minLength": 1},
+    "repo": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+    "base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "tree_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "worktree": {"type": "string", "minLength": 1},
+    "target": {"type": "string", "minLength": 1},
+    "pane_id": {"type": ["string","null"]},
+    "workspace_id": {"type": ["string","null"]},
+    "process_id": {"type": ["integer","string","null"]},
+    "process_started_at_unix": {"type": ["integer","null"], "minimum": 1},
+    "agent_session_id": {"type": ["string","null"]},
+    "sample_count": {"type": "integer", "minimum": 1, "maximum": 100},
+    "sample_digests": {"type": "array", "minItems": 1, "maxItems": 100, "items": {"type": "string", "pattern": "^[0-9a-f]{64}$"}},
+    "first_source_observed_at_unix": {"type": "integer", "minimum": 1},
+    "last_source_observed_at_unix": {"type": "integer", "minimum": 1},
+    "final_observer_state": {"enum": ["RUNNING","BLOCKED","IDLE","UNKNOWN","DONE_CANDIDATE"]},
+    "lifecycle_state": {"enum": ["UNAVAILABLE_FALLBACK","LIVE_HERDR_LIFECYCLE_OBSERVED_CANDIDATE"]},
+    "controller_readback_required": {"const": true},
+    "shadow_review_required": {"const": true},
+    "evidence_ceiling": {"enum": ["NO_HERDR_OBSERVATION","LIVE_OBSERVER_LIFECYCLE_SHADOW_PENDING"]}
+  },
+  "oneOf": [
+    {"properties": {"lifecycle_state": {"const": "UNAVAILABLE_FALLBACK"}, "sample_count": {"const": 1}, "evidence_ceiling": {"const": "NO_HERDR_OBSERVATION"}}},
+    {"required": ["pane_id","workspace_id","process_id","process_started_at_unix","agent_session_id","first_source_observed_at_unix","last_source_observed_at_unix","final_observer_state"], "properties": {"lifecycle_state": {"const": "LIVE_HERDR_LIFECYCLE_OBSERVED_CANDIDATE"}, "evidence_ceiling": {"const": "LIVE_OBSERVER_LIFECYCLE_SHADOW_PENDING"}}}
+  ]
+}

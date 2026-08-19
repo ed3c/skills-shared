@@ -9,17 +9,19 @@ Read this file before adding or changing repository-wide traceability, Tech Lead
 3. `TRACEABILITY_INDEX.md`;
 4. `TECH_LEAD_SHADOW_CLOSURE.md`;
 5. `CODEX_SDK_TECH_LEAD_CONTROL_PLANE.md` when issues #375–#379 or Codex SDK/GitHub DAG/Herdr/problem-closure work is involved;
-6. `skills/agentic-tech-lead-orchestration/AGENTS.md`, README and SKILL;
-7. selected control-plane execution packet/module/contracts when the trigger matches;
-8. `skills/procedural-shadow-runtime/README.md`;
-9. `skills/git-town-stacked-pr-worker/README.md`;
-10. exact issue/PR/workflow/runtime/evidence subjects.
+6. `WAVE3_PARENT_ADMISSION.md` before current #464–#468 decisions, because it records the transition of #455 from fork-time unmerged parent to Human-admitted `main` history;
+7. `WAVE3_LIVE_EVIDENCE.md` for the Wave-3 State Machine, carriers, reversible canary, source compiler, immutable integration checkpoint and Local Handoff Queue;
+8. `skills/agentic-tech-lead-orchestration/AGENTS.md`, README and SKILL;
+9. selected control-plane execution packet/module/contracts when the trigger matches;
+10. `skills/procedural-shadow-runtime/README.md`;
+11. `skills/git-town-stacked-pr-worker/README.md`;
+12. exact issue/PR/workflow/runtime/evidence subjects.
 
 ## Authority
 
 Traceability documents are human projections. They may route to machine truth but must never replace schemas, current GitHub metadata, Git ancestry, runtime receipts, source readback, CI execution, or Human Admit.
 
-A convergence branch may consume exact unmerged sibling candidate bytes for integration testing. Such ancestry proves byte consumption only; it does **not** promote the sibling to `ADMITTED`, `MERGED`, or repository truth.
+A convergence branch may consume exact sibling candidate bytes for integration testing. Such ancestry proves byte consumption only; it does **not** promote an unadmitted sibling to `ADMITTED`, `MERGED`, or repository truth.
 
 ## Closure law
 
@@ -37,23 +39,31 @@ Never equate issue closure, PR merge, workflow green, model agreement, article/P
 
 ## Writer law
 
-Exactly one convergence writer owns each shared traceability/index subject. Parallel implementation lanes remain siblings unless a child consumes named unmerged parent bytes. A convergence commit may have several sibling parents to make consumed bytes inspectable; those parents remain siblings of each other. Shadow reviewers do not mutate the Tech Lead's implementation branch.
+Exactly one convergence writer owns each shared traceability/index subject. Parallel implementation lanes remain siblings unless a child consumes named unmerged parent bytes at its fork epoch. A convergence commit may have several sibling parents to make consumed bytes inspectable; those parents remain siblings of each other. Shadow reviewers do not mutate the Tech Lead's implementation branch.
 
 ## Codex control-plane program
 
+Fork-time implementation graph:
+
 ```text
-#375 / PR #451  Codex SDK controller/session adapter       SIBLING / UNMERGED CANDIDATE
-#376 / PR #452  GitHub Issue DAG projection               SIBLING / UNMERGED CANDIDATE
-#377 / PR #456  Herdr observer v3                         SIBLING / UNMERGED CANDIDATE
-#378 / PR #457  problem-closure ledger v3                 SIBLING / UNMERGED CANDIDATE
-PR #380         design/traceability foundation            DOCUMENTATION SIBLING
+#375 / PR #451  Codex SDK controller/session adapter       SIBLING / closed-unmerged consumed lineage
+#376 / PR #452  GitHub Issue DAG projection               SIBLING / closed-unmerged consumed lineage
+#377 / PR #456  Herdr observer v3                         SIBLING / closed-unmerged consumed lineage
+#378 / PR #457  problem-closure ledger v3                 SIBLING / closed-unmerged consumed lineage
+PR #380         design/traceability foundation            DOCUMENTATION SIBLING / closed-unmerged consumed lineage
       ↓ exact candidate bytes
-#379 / PR #455  control-plane convergence                 CONVERGENCE CANDIDATE
+#379 / PR #455  control-plane convergence                 HUMAN_ADMITTED / MERGED
 ```
 
-Historical closed-unmerged implementation candidates remain part of the denominator: #446/#453 for #377 and #447/#454 for #378. They are not current merge candidates.
+Current admitted Wave-2 merge subject:
 
-The canonical working trace is `CODEX_SDK_TECH_LEAD_CONTROL_PLANE.md`. The #379 convergence branch consumes exact sibling heads rather than reconstructing implementation from prose. The shared deterministic suite must execute all required control-plane selftests with no `if file exists` bypass.
+```text
+main@ca31e0b1e640f0dba2c3d94da9d9786fbed32f2c
+  consumes #455 exact head 847e56c3418fce920c42d983e84ee44fdc6e8971
+  tree 8a75271851f2e9dd47dd3a019c93e4a0f9272d24
+```
+
+Historical closed-unmerged candidates remain part of the denominator. Human admission of #455 changes repository authority but does not convert any live Codex/GitHub/Herdr/source evidence lane into PASS.
 
 Current deterministic denominator:
 
@@ -64,20 +74,34 @@ Herdr           4 positive / 18 mutations
 problem closure 6 positive / 22 mutations
 ```
 
-Static/deterministic implementation and live evidence remain separate:
+Current mechanism/evidence split:
 
 ```text
-Codex SDK mechanism                    convergence-candidate bytes present
-Codex SDK live execution               NOT_EXERCISED
-GitHub DAG mechanism                   convergence-candidate bytes present
-GitHub remote dependency mutation      NOT_EXERCISED
-Herdr observer mechanism               convergence-candidate bytes present
-Herdr live observation                 NOT_EXERCISED
-problem-closure mechanism              convergence-candidate bytes present
-real source/provider closure           EVIDENCE_DEPENDENT
-sibling merge/admission                 HUMAN_ADMIT_REQUIRED
-#455 merge/release                      HUMAN_ADMIT_REQUIRED
+Wave-2 control-plane mechanism             HUMAN_ADMITTED / MERGED in main
+Codex SDK live execution                   NOT_EXERCISED
+GitHub remote dependency mutation          NOT_EXERCISED
+Herdr live observation                     NOT_EXERCISED
+real source/provider closure               EVIDENCE_DEPENDENT
+Wave-3 #473 Human Admit / merge / release  NOT_PERFORMED
 ```
+
+## Wave-3 live-evidence extension
+
+Historical fork relation and current convergence route:
+
+```text
+#455 exact head 847e56c3...  fork-time TRUE_PARENT; now admitted via main@ca31e0b1...
+├─ #464 / PR #469  Codex live acceptance carrier         TRUE_CHILD at fork / current selected leaf
+├─ #465 / PR #470  GitHub reversible dependency canary  TRUE_CHILD at fork / current selected leaf
+├─ #466 / PR #471  Herdr lifecycle carrier              TRUE_CHILD at fork / current selected leaf
+└─ #467 / PR #472  immutable source-claim compiler      TRUE_CHILD at fork / current selected leaf
+          ↓ exact selected bytes
+#468 / PR #473     CONVERGENCE; must refresh to and target current main
+```
+
+#469–#472 are siblings of one another because they consumed #455 but not each other. `WAVE3_PARENT_ADMISSION.md` owns the current parent-state correction; `WAVE3_LIVE_EVIDENCE.md` owns the detailed Wave-3 State Machine and immutable fork-time integration; PR #473 owns all shared route/index updates for this wave.
+
+The live-evidence Local Handoff Queue is a continuation contract only. It may point to live Codex, Herdr and reversible GitHub canary commands, but the queue itself cannot prove those commands ran or promote their receipts.
 
 ## Completion report
 

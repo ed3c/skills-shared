@@ -49,3 +49,20 @@ Real-task control ownership:
 ## Evidence and cleanup law
 
 The suite is offline and zero-network. It does not activate provider/model, GitHub Issue mutation, Herdr, Git Town, Forgejo, publication, merge, release, or production authority. Temporary repositories, worktrees, branches, processes, receipts and generated projections must be removed at close. A test PASS may raise only the evidence lane it actually exercised.
+
+## Wave 3 live-evidence denominator — #464–#468
+
+Wave 3 adds four required selftests. They are unconditionally invoked by `run-all.sh` after their exact leaf bytes are consumed by #468:
+
+| Test | Positive denominator | Mutation denominator | Live lane |
+|---|---:|---:|---|
+| `codex_live_acceptance_selftest.py` | 1 | 12 | `NOT_EXERCISED` |
+| `github_issue_dag_live_canary_selftest.py` | 1 | 6 | `NOT_EXERCISED` |
+| `herdr_lifecycle_selftest.py` | 2 | 7 | `NOT_EXERCISED` |
+| `source_claim_compiler_selftest.py` | 4 source kinds | 11 | `EVIDENCE_DEPENDENT` |
+
+The shape denominator expands from six to ten Draft 2020-12 control-plane schemas. In addition, `references/examples/source-claims.example.json` is schema-validated, compiled through `compile_source_claims.py`, and then checked by the existing `check_problem_closure.py`; this prevents the source compiler from becoming a second ledger authority.
+
+`references/wave3-live-handoff-queue.json` is asserted by the same shared suite. The queue is bound to immutable integration commit `691b342c44c9c6c4e61a9997e778ae4ed6e920d5` and carries the still-unexecuted live Codex, Herdr, and GitHub canary work into a local/runtime lane.
+
+Wave-3 controls intentionally do **not** call `--execute` on Codex or the GitHub canary and do not require Herdr. A test may contain expected output vocabulary such as `EXERCISED` only as deterministic fixture input; such fixture bytes never establish a live receipt. Hosted PASS proves the exact static carrier/checker subject only.
