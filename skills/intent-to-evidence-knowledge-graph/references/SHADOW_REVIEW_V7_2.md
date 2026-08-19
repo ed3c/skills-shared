@@ -75,4 +75,6 @@ LIVE_GRAPHRAG_SHADOW                     NOT_EXERCISED
 HUMAN_ADMIT                              REQUIRED
 ```
 
-The **prompt-design stage is complete**. Do not create another prompt-design branch merely to rewrite wording. The next Tech Lead frontier is executable checker/tests; only a deterministic failing control may reopen prompt semantics.
+The **prompt-design stage is complete** on the current PR #420 candidate lineage. Exact mutable PR head must still be refreshed when this file is used for decision-grade status; this document intentionally does not self-embed a mutable head SHA.
+
+Do not create another prompt-design branch merely to rewrite wording. The next Tech Lead frontier is executable checker/tests; only a deterministic failing control may reopen prompt semantics.
