@@ -45,7 +45,7 @@
     {
       "id": "UCR-X-D",
       "issue": "ed3c/skills-shared#406",
-      "pull_request": "ed3c/skills-shared#462",
+      "pull_request": "ed3c/skills-shared#463",
       "stack_class": "CONVERGENCE_DOCUMENTATION",
       "evidence_state": "PR_DRAFT",
       "provides": ["registry", "CI-arrival", "Agent-routes", "README-State-Machine", "canary-corpus", "Stack-index"]

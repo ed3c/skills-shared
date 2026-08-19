@@ -117,7 +117,7 @@ The current program is a fan-out/fan-in graph, not a fake linear Stack:
                                         #402 / PR #458  UCR-LIVE
                                            │
                                            ├─ validation PR #461
-                                           └─→ #406  UCR-X/D
+                                           └─→ #406 / PR #463  UCR-X/D
 ```
 
 Independent support/evidence leaves discovered by the canaries stay outside the semantic ancestry:

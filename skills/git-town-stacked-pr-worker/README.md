@@ -329,7 +329,7 @@ The implementation is intentionally fan-out/fan-in:
        \           /
         #402 / PR #458  UCR-LIVE
            ├─ validation PR #461
-           └─ #406  UCR-X/D convergence
+           └─ #406 / PR #463  UCR-X/D convergence
 ```
 
 | Atom | Issue | PR | Stack class | Evidence ceiling | Provides |
@@ -339,7 +339,9 @@ The implementation is intentionally fan-out/fan-in:
 | `A` | `#401` | `#442` | path-disjoint sibling | `STATIC_CONTRACT_VERIFIED` | Skill/repository target adapters |
 | `X/LIVE` | `#402` | `#458` | true multi-parent convergence | `BOUNDED_CROSS_DOMAIN_REMOTE_VERIFIED` | one Skill + one ordinary-repository canary |
 | validation | `#402` | `#461` | validation-only convergence | `REMOTE_REPOSITORY_CI_VERIFIED` | same-subject Skill Suites/shared-infra receipt |
-| `X/D` | `#406` | none until publication | convergence/documentation | `IMPLEMENTING` | registry, CI arrival, Agent routes, README State Machine, canary corpus, Stack index |
+| `X/D` | `#406` | `#463` | convergence/documentation | `PR_DRAFT` | registry, CI arrival, Agent routes, README State Machine, canary corpus, Stack index |
+
+PR #462 is a `SUPERSEDED_FORENSIC` publication subject: it proved the semantic tree and exposed the commit-role endpoint gap, but it is not the current convergence PR. PR #463 rebuilds the same admitted tree on the same validated base with compliant `agent-macro@ci.invalid` identity and `Driven-By: agent-macro` / `Driven-On: ci` trailers, without force-pushing #462.
 
 Supporting process/evidence leaves are not semantic Git children of UCR-C:
 
