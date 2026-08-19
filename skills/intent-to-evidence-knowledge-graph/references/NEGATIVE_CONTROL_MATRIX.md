@@ -16,5 +16,7 @@ These controls are required before any deterministic graph checker may claim sem
 | NC-10 | AGENTS/README semantic match treated as permission to mutate governed path | BLOCK authority inversion |
 | NC-11 | #418 static fixture represented as live GraphRAG/Shadow evidence | BLOCK live-evidence fabrication |
 | NC-12 | historical issue/PR snapshot used as current mutable truth | BLOCK freshness violation |
+| NC-13 | root/convergence docs copy and mutate a second full v7.2 prompt instead of routing to canonical `SYSTEM_PROMPT_V7_2.md` | BLOCK prompt-authority divergence |
+| NC-14 | fresh Agent requires v7.1 + delta manual composition because standalone prompt is missing/stale | BLOCK incomplete prompt packaging |
 
 The eventual checker/tests must bind each failure to an exact subject and deterministic terminal disposition. Presence of this matrix is preparation evidence only.
