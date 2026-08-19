@@ -33,4 +33,4 @@ jobs:
       - name: Validate Productization implementation preflight
         run: python3 scripts/check_productization_preflight.py
       - name: Run Productization preflight mutation controls
-        run: python3 -m unittest tests/test_productization_preflight.py -v
+        run: python3 -m unittest discover -s tests -p 'test_productization_preflight.py' -v
