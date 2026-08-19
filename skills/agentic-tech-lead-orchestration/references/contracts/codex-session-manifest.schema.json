@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ed3c/skills-shared/skills/agentic-tech-lead-orchestration/codex-session-manifest.schema.json",
+  "title": "Agentic Tech Lead Codex Session Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "task_id", "attempt_id", "repo", "base_sha", "tree_sha", "worktree",
+    "allowed_paths", "read_only_paths", "prompt", "prompt_digest",
+    "predecessor_receipts", "thread_policy"
+  ],
+  "properties": {
+    "task_id": {"type": "string", "minLength": 1},
+    "attempt_id": {"type": "string", "minLength": 1},
+    "repo": {"type": "string", "pattern": "^[^/]+/[^/]+$"},
+    "base_sha": {"type": "string", "minLength": 7},
+    "tree_sha": {"type": "string", "minLength": 7},
+    "worktree": {"type": "string", "minLength": 1},
+    "allowed_paths": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+    "read_only_paths": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+    "prompt": {"type": "string", "minLength": 1},
+    "prompt_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "predecessor_receipts": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+    "thread_policy": {"enum": ["new", "resume-compatible"]},
+    "resume_thread_id": {"type": "string", "minLength": 1},
+    "output_schema": {"type": "object"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"thread_policy": {"const": "resume-compatible"}}},
+      "then": {"required": ["resume_thread_id"]},
+      "else": {"not": {"required": ["resume_thread_id"]}}
+    }
+  ]
+}
