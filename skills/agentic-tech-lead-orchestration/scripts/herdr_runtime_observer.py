@@ -29,6 +29,8 @@ def validate_manifest(d:dict[str,Any])->None:
     for k in req:
         if not isinstance(d[k],str) or not d[k].strip(): raise ContractError(f"{k} must be non-empty string")
     if d.get("authoritative") is True: raise ContractError("Herdr observer can never be authoritative")
+    if "require_foreground_cwd" in d and not isinstance(d["require_foreground_cwd"],bool):
+        raise ContractError("require_foreground_cwd must be boolean")
     for key in _keys(d):
         leaf=key.rsplit(".",1)[-1].replace("-","_")
         if any(x in leaf for x in FORBIDDEN): raise ContractError(f"forbidden durable field: {key}")
@@ -62,6 +64,13 @@ def _find(v:Any,*names:str):
             if got not in (None,""): return got
     return None
 
+def _native_session_id(agent:dict[str,Any]):
+    session=_find(agent,"agent_session","agentSession")
+    if isinstance(session,dict):
+        value=session.get("value") or session.get("id") or session.get("session_id") or session.get("sessionId")
+        if value not in (None,""): return value
+    return _find(agent,"agent_session_id","agentSessionId")
+
 def reduce_observation(d:dict[str,Any], agent:dict[str,Any], explain:dict[str,Any])->dict[str,Any]:
     validate_manifest(d)
     raw_state=_find(explain,"final_state","state") or _find(agent,"state","status") or "unknown"
@@ -70,18 +79,32 @@ def reduce_observation(d:dict[str,Any], agent:dict[str,Any], explain:dict[str,An
     pane=_find(agent,"pane_id","paneId") or _find(explain,"pane_id","paneId")
     workspace=_find(agent,"workspace_id","workspaceId") or _find(explain,"workspace_id","workspaceId")
     process=_find(agent,"process_id","processId","pid")
+    foreground_cwd=_find(agent,"foreground_cwd","foregroundCwd")
+    native_session=_native_session_id(agent)
+
+    require_cwd=d.get("require_foreground_cwd",True)
+    if require_cwd and foreground_cwd in (None,""):
+        raise ContractError("Herdr observation lacks foreground_cwd; cannot bind agent to worktree")
+    if foreground_cwd not in (None,""):
+        if Path(str(foreground_cwd)).resolve() != Path(d["worktree"]).resolve():
+            raise ContractError(
+                f"foreground_cwd/worktree mismatch: observed {foreground_cwd!r}, expected {d['worktree']!r}"
+            )
+
     for field,expected,actual in (
         ("pane_id",d.get("expected_pane_id"),pane),
         ("workspace_id",d.get("expected_workspace_id"),workspace),
         ("process_id",d.get("expected_process_id"),process),
+        ("agent_session_id",d.get("expected_agent_session_id"),native_session),
     ):
         if expected is not None and str(expected)!=str(actual):
             raise ContractError(f"{field} mismatch: expected {expected!r}, observed {actual!r}")
     return {
       "schema_version":1,"task_id":d["task_id"],"attempt_id":d["attempt_id"],"repo":d["repo"],
       "base_sha":d["base_sha"],"tree_sha":d["tree_sha"],"worktree":d["worktree"],"target":d["target"],
-      "pane_id":pane,"workspace_id":workspace,"process_id":process,
-      "observed_at_unix":int(time.time()),"raw_state":raw_state,"observer_state":mapped,
+      "pane_id":pane,"workspace_id":workspace,"process_id":process,"agent_session_id":native_session,
+      "foreground_cwd":foreground_cwd,"observed_at_unix":int(time.time()),
+      "raw_state":raw_state,"observer_state":mapped,
       "herdr_available":True,"authoritative":False,"controller_readback_required":True,
       "evidence_ceiling":"OBSERVER_IDENTITY_STATE_ONLY",
     }
