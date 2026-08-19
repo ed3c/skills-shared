@@ -28,7 +28,7 @@
           {"argv": ["python3", "skills/agentic-tech-lead-orchestration/scripts/compile_codex_live_acceptance.py", "data/handoff/wave3/codex-acceptance-input.json", "--output", "data/handoff/wave3/codex-acceptance-receipt.json"], "cwd": ".", "timeout_seconds": 120, "environment_names": []}
         ],
         "unresolved_operations": [
-          {"operation_id": "materialize-codex-session-and-controller-readback", "resolver_source": "nearest AGENTS/README plus exact local worktree and existing ChatGPT/Codex sign-in", "required_output": "EXACT_SESSION_MANIFEST_AND_CONTROLLER_READBACK_INPUT"}
+          {"operation_id": "materialize-codex-session-and-controller-readback", "resolver_source": "nearest AGENTS/README plus exact local worktree and existing ChatGPT/Codex sign-in; produce the exact session manifest and controller-readback input consumed by the declared commands", "required_output": "CONCRETE_COMMAND_CONTRACT"}
         ],
         "live_evidence_required": true
       },
@@ -56,7 +56,7 @@
           {"argv": ["python3", "skills/agentic-tech-lead-orchestration/scripts/collect_herdr_lifecycle.py", "data/handoff/wave3/herdr-plan.json", "--output", "data/handoff/wave3/herdr-lifecycle-receipt.json"], "cwd": ".", "timeout_seconds": 1800, "environment_names": []}
         ],
         "unresolved_operations": [
-          {"operation_id": "materialize-herdr-target-plan", "resolver_source": "current Herdr agent target plus exact worktree/session/PID-start identity", "required_output": "EXACT_HERDR_LIFECYCLE_PLAN"}
+          {"operation_id": "materialize-herdr-target-plan", "resolver_source": "current Herdr agent target plus exact worktree/session/PID-start identity; produce the exact lifecycle plan consumed by the declared command", "required_output": "CONCRETE_COMMAND_CONTRACT"}
         ],
         "live_evidence_required": true
       },
@@ -84,7 +84,7 @@
           {"argv": ["python3", "skills/agentic-tech-lead-orchestration/scripts/github_issue_dag_live_canary.py", "data/handoff/wave3/github-dag-canary-plan.json", "--execute", "--output", "data/handoff/wave3/github-dag-canary-receipt.json"], "cwd": ".", "timeout_seconds": 300, "environment_names": []}
         ],
         "unresolved_operations": [
-          {"operation_id": "bind-owned-canary-issues", "resolver_source": "current GitHub fixture issues explicitly labeled for CTL live canary", "required_output": "EXACT_REVERSIBLE_CANARY_PLAN"}
+          {"operation_id": "bind-owned-canary-issues", "resolver_source": "current GitHub fixture issues explicitly labeled for CTL live canary; produce the exact reversible canary plan consumed by the declared command", "required_output": "CONCRETE_COMMAND_CONTRACT"}
         ],
         "live_evidence_required": true
       },
