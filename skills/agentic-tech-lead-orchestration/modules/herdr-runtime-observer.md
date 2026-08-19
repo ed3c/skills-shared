@@ -47,3 +47,12 @@ When Herdr is available, the adapter reads `agent get` and `agent explain --json
 The host-neutral receipt contract is `../references/contracts/herdr-observer-receipt.schema.json`. `../references/examples/herdr-runtime-binding.example.json` is an abstract runtime binding example only; it carries no consumer live state.
 
 `../tests/herdr_observer_selftest.py` covers fallback, fresh running/done observations, exact 40-hex Git subjects, worktree/session/process identity, stale/future observations, dead/orphan process state, cleanup residue, credentials/transcripts, and authority denial. Live Herdr execution remains `NOT_EXERCISED` until a consumer/runtime receipt proves it.
+
+## Live-probe operational facts (2026-08-20, #466 attempt)
+
+Observed on a real macOS host with herdr 0.8.0 while attempting the #466 live lifecycle leg; recorded so the next attempt does not rediscover them.
+
+- `herdr_runtime_observer.py` and `collect_herdr_lifecycle.py` invoke bare `herdr agent get/explain` with no `--session` flag, so they only ever observe herdr's `default` session. A safe live probe must isolate through a scratch `$HOME` (not herdr's own `--session` flag) or it reads — and can disturb — the operator's real persistent session.
+- Under the Claude Code Bash sandbox, `~/.config/herdr/herdr.sock` is outside the write allowlist; every socket call needs the sandbox disabled. The failure otherwise surfaces as `PermissionDenied` on the socket, not as a herdr defect.
+- The manual `herdr pane report-agent --state <idle|working|blocked|unknown>` fallback structurally cannot produce `DONE_CANDIDATE`: its state enum has no terminal value and it carries no `cleanup_state`/`residue_count`. Only a real managed agent lifecycle can reach the terminal branch of `herdr-lifecycle-receipt.schema.json`.
+- An unattended automated session may be unable to drive a nested managed agent at all (send-keys into its pane, spawning it under real credentials, and even read-only `pane process-info` can each be refused by host permission policy). In that case the live leg stays truthfully `NOT_EXERCISED`; a human-attended terminal is the unblocking lane.
