@@ -1,0 +1,50 @@
+{
+  "schema_version": "universal-refactor/target-adapter/v1",
+  "id": "RepositoryTargetAdapter",
+  "accepted_target_kinds": ["REPOSITORY", "PACKAGE", "SERVICE", "WORKFLOW", "DOCUMENT_SYSTEM"],
+  "trigger": {
+    "mode": "EXPLICIT_TARGET_KIND",
+    "required_markers": [],
+    "marker_presence_is_applicability_proof": false
+  },
+  "surface_groups": {
+    "api": ["public APIs", "internal APIs", "CLI", "events", "schemas"],
+    "persistence": ["storage", "migrations", "serialization", "cache", "generated persisted artifacts"],
+    "runtime": ["entrypoints", "workers", "processes", "schedulers", "background tasks"],
+    "configuration": ["configuration", "environment", "generated surfaces", "feature flags"],
+    "delivery": ["build", "tests", "CI", "deploy", "packaging", "release"],
+    "lifecycle": ["startup", "shutdown", "resource cleanup", "retry", "cancellation", "rollback"],
+    "trust": ["security", "permissions", "secrets", "network", "accessibility", "data-loss boundaries"]
+  },
+  "required_outputs": [
+    "exact_subject",
+    "api_contract_inventory",
+    "persistence_migration_inventory",
+    "runtime_entrypoint_inventory",
+    "configuration_generated_surface_inventory",
+    "build_test_deploy_inventory",
+    "lifecycle_resource_inventory",
+    "security_trust_data_loss_inventory",
+    "authority_boundary_inventory",
+    "ambiguities"
+  ],
+  "authority": {
+    "decide_simplification": false,
+    "admit_entropy_cut": false,
+    "promote_evidence": false,
+    "merge": false,
+    "release": false,
+    "permission_change": false
+  },
+  "monotonicity": {
+    "may_add_constraints": true,
+    "may_narrow_effects": true,
+    "may_narrow_authority": true,
+    "may_remove_core_dimensions": false,
+    "may_hide_consumers": false,
+    "may_treat_installation_as_applicability": false,
+    "may_copy_mutable_consumer_state_to_core": false,
+    "on_ambiguity": "HOLD"
+  },
+  "evidence_ceiling": "ROUTING_AND_SURFACE_MAPPING_ONLY"
+}
