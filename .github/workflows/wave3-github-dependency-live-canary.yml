@@ -27,7 +27,7 @@ jobs:
       GH_TOKEN: ${{ github.token }}
       REPO: ed3c/skills-shared
       PLAN: .github/canaries/wave3-github-dependency-live-plan.json
-      RECEIPT: ${{ runner.temp }}/wave3-github-dependency-live-receipt.json
+      RECEIPT: /tmp/wave3-github-dependency-live-receipt.json
       CANARY_LABEL: wave3-live-canary-fixture
       BLOCKER_ISSUE: '486'
       BLOCKED_ISSUE: '487'
@@ -84,10 +84,11 @@ jobs:
           set -euo pipefail
           python3 - <<'PY'
           import json
+          import os
           from pathlib import Path
           from jsonschema import Draft202012Validator
 
-          receipt_path = Path('${{ runner.temp }}/wave3-github-dependency-live-receipt.json')
+          receipt_path = Path(os.environ['RECEIPT'])
           schema_path = Path('skills/agentic-tech-lead-orchestration/references/contracts/github-dag-live-canary-receipt.schema.json')
           receipt = json.loads(receipt_path.read_text())
           schema = json.loads(schema_path.read_text())
