@@ -55,7 +55,7 @@
       "issue": "ed3c/skills-shared#398",
       "pull_request": "ed3c/skills-shared#477",
       "stack_class": "MAIN_LANDING",
-      "evidence_state": "PR_DRAFT",
+      "evidence_state": "MERGED",
       "provides": ["current-main-semantic-union", "forge-commit-role-clean-history", "checked-head-landing"]
     },
     {
@@ -96,7 +96,7 @@
     {"from": "UCR-X-D", "to": "UCR-MAIN-LANDING", "relation": "HUMAN_ADMITTED_FOR_LANDING"}
   ],
   "evidence_boundary": {
-    "verified": ["bounded Skill transfer", "bounded ordinary-repository transfer", "repository CI compatibility for recorded validation subjects", "current-main semantic union prepared for exact-head revalidation"],
-    "not_proven": ["unseen domains", "live provider/model uplift", "production safety", "real Git Town local worktree execution", "merge", "release", "promotion", "rollback"]
+    "verified": ["bounded Skill transfer", "bounded ordinary-repository transfer", "repository CI compatibility for recorded validation subjects", "current-main checked-head merge"],
+    "not_proven": ["unseen domains", "live provider/model uplift", "production safety", "real Git Town local worktree execution", "external canary merge", "release", "promotion", "rollback"]
   }
 }
