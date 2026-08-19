@@ -12,6 +12,10 @@ Verify that v7.2 preserves the v7.1 knowledge-compilation baseline while adding 
 
 The prompt retains evidence-first compilation, source dependency awareness, epistemic separation, anti-fragmentation, action honesty, narrative richness, stable identity, typed links, idempotency and explicit completion states.
 
+### PASS — full prompt is standalone
+
+A fresh Agent can use `SYSTEM_PROMPT_V7_2.md` directly. It no longer needs to manually combine the v7.1 prompt with a delta file. `SYSTEM_PROMPT_V7_2_DELTA.md` is maintenance/history only, preventing two runtime prompt authorities.
+
 ### PASS — Intent is first-class without replacing source evidence
 
 Implementation-oriented subjects require an Intent projection, but source evidence remains independently anchored. Issue/PR/source artifacts do not become substitutes for the desired outcome.
@@ -65,15 +69,16 @@ These are not prompt-design blockers; they belong to #414–#416 executable cont
 
 ```text
 FULL_V7_2_SYSTEM_PROMPT                  PASS_AS_DESIGN_ARTIFACT
+STANDALONE_PROMPT_PACKAGING              PASS_AS_DESIGN_ARTIFACT
 V7_1_SEMANTIC_BASELINE                   PRESERVED
 ICPG_NON_DUPLICATION                     SPECIFIED
 INTENT_TO_EVIDENCE_TRACE                 SPECIFIED
 AUTHORITY/FRESHNESS/EVIDENCE_CEILING     SPECIFIED
-BIDIRECTIONAL_GRAPH_TRAVERSAL             SPECIFIED
+BIDIRECTIONAL_GRAPH_TRAVERSAL            SPECIFIED
 DETERMINISTIC_CHECKER                    NOT_IMPLEMENTED
 MUTATION_EXECUTION                       NOT_EXERCISED
 LIVE_GRAPHRAG_SHADOW                     NOT_EXERCISED
 HUMAN_ADMIT                              REQUIRED
 ```
 
-The next Tech Lead frontier is executable checker/tests, not another prompt rewrite unless a deterministic control proves the current prompt contract insufficient.
+The prompt-design stage is complete. The next Tech Lead frontier is executable checker/tests, not another prompt rewrite unless a deterministic control proves the current prompt contract insufficient.
