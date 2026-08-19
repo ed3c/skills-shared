@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "denominator": {
+    "problem_ids": [
+      "P-EXAMPLE-001"
+    ],
+    "source_manifest_sha256": "f37c10388a86133eddef76c935008fdff7b06a3fc467bb183c875cd363f83f21"
+  },
+  "source_manifest": [
+    {
+      "problem_id": "P-EXAMPLE-001",
+      "kind": "PDF",
+      "identity": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "location": "page:22",
+      "claim_sha256": "bfd51c1f90b86fa2d6be1982a7a101db3a970d20b98d44aa4a8b6b6d68263bbd"
+    }
+  ],
+  "problems": [
+    {
+      "problem_id": "P-EXAMPLE-001",
+      "source": {
+        "kind": "PDF",
+        "identity": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "location": "page:22"
+      },
+      "claim": "An implementation claim must not be promoted beyond its verified evidence lane.",
+      "applicability": "APPLICABLE",
+      "repo_subject": {
+        "repo": "owner/example-repo",
+        "commit": "0123456789abcdef0123456789abcdef01234567",
+        "tree": "89abcdef0123456789abcdef0123456789abcdef"
+      },
+      "task_nodes": [
+        "T1"
+      ],
+      "dag_nodes": [
+        "DAG:T1"
+      ],
+      "issue_nodes": [
+        123
+      ],
+      "session_attempts": [
+        {
+          "task_id": "T1",
+          "attempt_id": "a01",
+          "worktree": "worktree:T1:a01",
+          "thread_id": "codex-thread-id"
+        }
+      ],
+      "implementation_evidence": [
+        {
+          "kind": "COMMIT",
+          "subject": "0123456789abcdef0123456789abcdef01234567",
+          "repo_subject": {
+            "repo": "owner/example-repo",
+            "commit": "0123456789abcdef0123456789abcdef01234567",
+            "tree": "89abcdef0123456789abcdef0123456789abcdef"
+          },
+          "status": "CURRENT"
+        }
+      ],
+      "verification_evidence": [
+        {
+          "lane": "LOCAL",
+          "subject": "receipt:local:example",
+          "repo_subject": {
+            "repo": "owner/example-repo",
+            "commit": "0123456789abcdef0123456789abcdef01234567",
+            "tree": "89abcdef0123456789abcdef0123456789abcdef"
+          }
+        }
+      ],
+      "receipts": [
+        {
+          "lane": "LOCAL",
+          "subject": "receipt:local:example",
+          "repo_subject": {
+            "repo": "owner/example-repo",
+            "commit": "0123456789abcdef0123456789abcdef01234567",
+            "tree": "89abcdef0123456789abcdef0123456789abcdef"
+          }
+        }
+      ],
+      "merge_subjects": [],
+      "shadow_verdict": "PASS",
+      "residual_gaps": [],
+      "closure": "VERIFIED_LOCAL"
+    }
+  ]
+}
