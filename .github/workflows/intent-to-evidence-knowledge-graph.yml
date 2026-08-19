@@ -41,6 +41,7 @@ jobs:
           ITEKG_REF: ${{ github.head_ref || github.ref_name }}
           ITEKG_EXPECTED_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
           ITEKG_PR_NUMBER: ${{ github.event.pull_request.number || 0 }}
+          ITEKG_OBSERVED_AT: ${{ github.event.pull_request.updated_at || github.event.repository.updated_at }}
           ITEKG_EVIDENCE_DIR: ${{ runner.temp }}/intent-to-evidence-knowledge-graph
         run: bash skills/intent-to-evidence-knowledge-graph/tests/run-all.sh
       - name: Upload exact-head deterministic receipt
