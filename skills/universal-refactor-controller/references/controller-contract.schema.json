@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ed3c/skills-shared/skills/universal-refactor-controller/references/controller-contract.schema.json",
+  "title": "Universal Refactor Controller Contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "subject",
+    "target_kind",
+    "owner_receipts",
+    "capabilities",
+    "old_strengths",
+    "entropy_findings",
+    "root_cause_edges",
+    "treatments",
+    "proof_requirements",
+    "complexity_delta_ref",
+    "human_owned_operations"
+  ],
+  "properties": {
+    "schema_version": {"const": "universal-refactor/controller-contract/v1"},
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "commit", "tree", "dirty"],
+      "properties": {
+        "repository": {"type": "string", "pattern": "^[^/]+/[^/]+$"},
+        "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "tree": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "dirty": {"const": false}
+      }
+    },
+    "target_kind": {"enum": ["SKILL", "REPOSITORY", "PACKAGE", "SERVICE", "WORKFLOW", "DOCUMENT_SYSTEM"]},
+    "owner_receipts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["entropy", "refactor_proof", "tech_lead", "shadow"],
+      "properties": {
+        "entropy": {"type": "string", "minLength": 1},
+        "refactor_proof": {"type": "string", "minLength": 1},
+        "tech_lead": {"type": "string", "minLength": 1},
+        "shadow": {"type": "string", "minLength": 1}
+      }
+    },
+    "capabilities": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "old_strengths": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "entropy_findings": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "root_cause_edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["from", "to", "relation", "evidence"],
+        "properties": {
+          "from": {"type": "string", "minLength": 1},
+          "to": {"type": "string", "minLength": 1},
+          "relation": {"enum": ["DUPLICATES", "MIRRORS", "OWNS", "SYNCHRONIZES", "CONSUMES", "DERIVES", "COMPATIBILITY", "LIFECYCLE"]},
+          "evidence": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "treatments": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["A", "B0", "B1"],
+      "properties": {
+        "A": {"type": "string", "minLength": 1},
+        "B0": {"type": "string", "minLength": 1},
+        "B1": {"type": "string", "minLength": 1}
+      }
+    },
+    "proof_requirements": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"enum": ["L0_SOURCE_FREEZE", "L1_STRUCTURAL_REACHABILITY", "L2_EXECUTABLE_CONTRACT", "L3_HERMETIC_REAL_TASK", "L4_MATCHED_LIVE_RUNTIME", "L5_DELIVERY_HUMAN_ADMIT"]}
+    },
+    "complexity_delta_ref": {"type": "string", "minLength": 1},
+    "human_owned_operations": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"enum": ["SEMANTIC_CONFLICT", "INTENTIONAL_CAPABILITY_CHANGE", "MERGE", "RELEASE", "PROMOTION", "ROLLBACK", "PERMISSION_CHANGE"]}
+    }
+  }
+}

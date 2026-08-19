@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ed3c/skills-shared/skills/universal-refactor-controller/references/complexity-delta.schema.json",
+  "title": "Capability-Preserving Complexity Delta",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "subject",
+    "target_kind",
+    "baseline",
+    "candidate",
+    "dimensions",
+    "replacement_burden",
+    "capability_preservation",
+    "shadow",
+    "global_objective",
+    "verdict"
+  ],
+  "properties": {
+    "schema_version": {"const": "universal-refactor/complexity-delta/v1"},
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "commit", "tree", "dirty"],
+      "properties": {
+        "repository": {"type": "string", "pattern": "^[^/]+/[^/]+$"},
+        "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "tree": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "dirty": {"const": false}
+      }
+    },
+    "target_kind": {"enum": ["SKILL", "REPOSITORY", "PACKAGE", "SERVICE", "WORKFLOW", "DOCUMENT_SYSTEM"]},
+    "baseline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["treatment_id", "content_digest"],
+      "properties": {
+        "treatment_id": {"type": "string", "minLength": 1},
+        "content_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["treatment_id", "content_digest", "entropy_finding_ids"],
+      "properties": {
+        "treatment_id": {"type": "string", "minLength": 1},
+        "content_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "entropy_finding_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "dimensions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "role", "before", "after", "measurement", "evidence_class"],
+        "properties": {
+          "id": {
+            "enum": [
+              "concepts",
+              "states",
+              "sources_of_truth",
+              "ownership_edges",
+              "coordination_paths",
+              "compatibility_branches",
+              "synchronization_paths",
+              "runtime_dependencies",
+              "policy_authorities"
+            ]
+          },
+          "role": {"enum": ["REDUCTION_TARGET", "NON_REGRESSION"]},
+          "before": {"type": "number", "minimum": 0},
+          "after": {"type": "number", "minimum": 0},
+          "measurement": {"type": "string", "minLength": 1},
+          "evidence_class": {"enum": ["STATIC", "HERMETIC", "LOCAL", "PRIVATE", "LIVE", "HUMAN"]}
+        }
+      }
+    },
+    "replacement_burden": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["removed", "added", "measurement"],
+      "properties": {
+        "removed": {"type": "number", "exclusiveMinimum": 0},
+        "added": {"type": "number", "minimum": 0},
+        "measurement": {"type": "string", "minLength": 1}
+      }
+    },
+    "capability_preservation": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "state", "evidence"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "state": {"enum": ["PRESERVED_WITH_EXACT_EVIDENCE", "STRENGTHENED_WITH_EXACT_EVIDENCE", "INTENTIONALLY_CHANGED_WITH_HUMAN_AUTHORITY"]},
+          "evidence": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "shadow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["independent", "read_only", "subject_match", "verdict", "evidence"],
+      "properties": {
+        "independent": {"const": true},
+        "read_only": {"const": true},
+        "subject_match": {"const": true},
+        "verdict": {"enum": ["ELIGIBLE_FOR_IMPLEMENTATION", "HOLD", "REJECT", "HUMAN_ADMIT_REQUIRED"]},
+        "evidence": {"type": "string", "minLength": 1}
+      }
+    },
+    "global_objective": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "evidence"],
+      "properties": {
+        "state": {"enum": ["PASS", "FAIL", "NOT_EXERCISED", "HUMAN_ADMIT_REQUIRED"]},
+        "evidence": {"type": "string", "minLength": 1}
+      }
+    },
+    "verdict": {"enum": ["PASS", "FAIL", "HOLD", "HUMAN_ADMIT_REQUIRED"]}
+  }
+}
