@@ -1,0 +1,18 @@
+{
+  "schema": "agentic-tech-lead/task-contract/v1",
+  "task_id": "example-stack",
+  "case_obligations": {
+    "case_graph_ref": "feature/case-graph.json",
+    "case_graph_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "required_case_ids": ["CASE-CONTRACT", "CASE-CORE"],
+    "branch_case_owners": [
+      {"branch": "feature/contract", "case_ids": ["CASE-CONTRACT"]},
+      {"branch": "feature/core", "case_ids": ["CASE-CORE"]}
+    ],
+    "convergence_owner": "feature/core"
+  },
+  "branches": [
+    {"name": "feature/contract", "parent": "main", "focus": "contract", "write": ["feature/contracts.py", "tests/feature/test_contracts.py"]},
+    {"name": "feature/core", "parent": "feature/contract", "focus": "minimal-diff", "write": ["feature/core.py", "tests/feature/test_core.py"]}
+  ]
+}
