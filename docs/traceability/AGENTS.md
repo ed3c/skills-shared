@@ -8,18 +8,21 @@ Read this file before adding or changing repository-wide traceability, Tech Lead
 2. `docs/INDEX.md` and `docs/architecture/STATE_MACHINES.md`;
 3. `TRACEABILITY_INDEX.md`;
 4. `TECH_LEAD_SHADOW_CLOSURE.md`;
-5. `CODEX_SDK_TECH_LEAD_CONTROL_PLANE.md` when issues #375–#379 or Codex SDK/GitHub DAG/Herdr/problem-closure work is involved;
-6. `skills/agentic-tech-lead-orchestration/AGENTS.md`, README and SKILL;
-7. selected control-plane execution packet/module/contracts when the trigger matches;
-8. `skills/procedural-shadow-runtime/README.md`;
-9. `skills/git-town-stacked-pr-worker/README.md`;
-10. exact issue/PR/workflow/runtime/evidence subjects.
+5. `CODEX_SDK_TECH_LEAD_CONTROL_PLANE_ADMISSION.md` when issues #375–#379 or the admitted Codex control-plane convergence is involved;
+6. `CODEX_SDK_TECH_LEAD_CONTROL_PLANE.md` for the pre-admission State Machine, denominator, rejected epochs, and evidence ceilings;
+7. `skills/agentic-tech-lead-orchestration/AGENTS.md`, README and SKILL;
+8. selected control-plane execution packet/module/contracts when the trigger matches;
+9. `skills/procedural-shadow-runtime/README.md`;
+10. `skills/git-town-stacked-pr-worker/README.md`;
+11. exact issue/PR/workflow/runtime/evidence subjects.
 
 ## Authority
 
 Traceability documents are human projections. They may route to machine truth but must never replace schemas, current GitHub metadata, Git ancestry, runtime receipts, source readback, CI execution, or Human Admit.
 
-A convergence branch may consume exact unmerged sibling candidate bytes for integration testing. Such ancestry proves byte consumption only; it does **not** promote the sibling to `ADMITTED`, `MERGED`, or repository truth.
+`CODEX_SDK_TECH_LEAD_CONTROL_PLANE_ADMISSION.md` records the immutable static/deterministic admission subject for #379. Current mutable issue/runtime state must still be read from GitHub and owning runtime receipts.
+
+A convergence branch may consume exact unmerged sibling candidate bytes for integration testing. Such ancestry proves byte consumption only; it does **not** promote the sibling PR itself to `MERGED`. After #455 admission, the consumed sibling PRs remain closed-unmerged publication lineage while their exact bytes are present on `main` through the convergence merge.
 
 ## Closure law
 
@@ -42,18 +45,22 @@ Exactly one convergence writer owns each shared traceability/index subject. Para
 ## Codex control-plane program
 
 ```text
-#375 / PR #451  Codex SDK controller/session adapter       SIBLING / UNMERGED CANDIDATE
-#376 / PR #452  GitHub Issue DAG projection               SIBLING / UNMERGED CANDIDATE
-#377 / PR #456  Herdr observer v3                         SIBLING / UNMERGED CANDIDATE
-#378 / PR #457  problem-closure ledger v3                 SIBLING / UNMERGED CANDIDATE
-PR #380         design/traceability foundation            DOCUMENTATION SIBLING
-      ↓ exact candidate bytes
-#379 / PR #455  control-plane convergence                 CONVERGENCE CANDIDATE
+#375 / PR #451  Codex SDK controller/session adapter       SIBLING / CLOSED-UNMERGED / CONSUMED
+#376 / PR #452  GitHub Issue DAG projection               SIBLING / CLOSED-UNMERGED / CONSUMED
+#377 / PR #456  Herdr observer v3                         SIBLING / CLOSED-UNMERGED / CONSUMED
+#378 / PR #457  problem-closure ledger v3                 SIBLING / CLOSED-UNMERGED / CONSUMED
+PR #380         design/traceability foundation            DOCUMENTATION SIBLING / CLOSED-UNMERGED / CONSUMED
+      ↓ exact consumed bytes
+#379 / PR #455  control-plane convergence                 HUMAN_ADMITTED / MERGED
+      ↓
+main@ca31e0b1e640f0dba2c3d94da9d9786fbed32f2c
 ```
 
-Historical closed-unmerged implementation candidates remain part of the denominator: #446/#453 for #377 and #447/#454 for #378. They are not current merge candidates.
+The admitted candidate is `847e56c3418fce920c42d983e84ee44fdc6e8971`; the merge commit is `ca31e0b1e640f0dba2c3d94da9d9786fbed32f2c`. Both resolve to tree `8a75271851f2e9dd47dd3a019c93e4a0f9272d24`. The admission record owns this historical fact; current `main` must still be read before acting.
 
-The canonical working trace is `CODEX_SDK_TECH_LEAD_CONTROL_PLANE.md`. The #379 convergence branch consumes exact sibling heads rather than reconstructing implementation from prose. The shared deterministic suite must execute all required control-plane selftests with no `if file exists` bypass.
+Historical rejected/closed-unmerged implementation candidates remain part of the denominator, including #444/#451, #445/#452, #446/#453/#456 lineage, and #447/#454/#457 lineage. They are not alternate merge candidates.
+
+The pre-admission design trace is `CODEX_SDK_TECH_LEAD_CONTROL_PLANE.md`. The shared deterministic suite must execute all required control-plane selftests with no `if file exists` bypass.
 
 Current deterministic denominator:
 
@@ -67,18 +74,22 @@ problem closure 6 positive / 22 mutations
 Static/deterministic implementation and live evidence remain separate:
 
 ```text
-Codex SDK mechanism                    convergence-candidate bytes present
+Codex SDK mechanism                    ADMITTED_ON_MAIN
 Codex SDK live execution               NOT_EXERCISED
-GitHub DAG mechanism                   convergence-candidate bytes present
+GitHub DAG mechanism                   ADMITTED_ON_MAIN
 GitHub remote dependency mutation      NOT_EXERCISED
-Herdr observer mechanism               convergence-candidate bytes present
+GitHub generic development-link scope  RESIDUAL
+Herdr observer mechanism               ADMITTED_ON_MAIN
 Herdr live observation                 NOT_EXERCISED
-problem-closure mechanism              convergence-candidate bytes present
+problem-closure mechanism              ADMITTED_ON_MAIN
 real source/provider closure           EVIDENCE_DEPENDENT
-sibling merge/admission                 HUMAN_ADMIT_REQUIRED
-#455 merge/release                      HUMAN_ADMIT_REQUIRED
+#451/#452/#456/#457/#380 PRs            CLOSED_UNMERGED / CONSUMED
+#455 convergence                        MERGED / HUMAN_ADMITTED_STATIC_SCOPE
+release / production promotion         NOT_PERFORMED
 ```
+
+Issues #375–#378 remain open owners for their live/residual evidence lanes. Do not close them merely because their static mechanism bytes landed through #455.
 
 ## Completion report
 
-Before declaring this directory synchronized, report current repository subject, selected/consumed parent subjects, candidate/admitted distinction, changed routes, issue/PR graph changes, exact evidence subjects, hosted workflow denominator, unresolved source/runtime items, stale external snapshots, rejected/superseded candidates, rollback subject, and all `ABSENT`, `NOT_IMPLEMENTED`, `NOT_EXERCISED`, `SKIPPED_BY_POLICY`, `EVIDENCE_DEPENDENT`, and `HUMAN_ADMIT_REQUIRED` states.
+Before declaring this directory synchronized, report current repository subject, admitted/consumed parent subjects, candidate/admitted distinction, changed routes, issue/PR graph changes, exact evidence subjects, hosted workflow denominator, unresolved source/runtime items, stale external snapshots, rejected/superseded candidates, rollback subject, and all `ABSENT`, `NOT_IMPLEMENTED`, `NOT_EXERCISED`, `SKIPPED_BY_POLICY`, `EVIDENCE_DEPENDENT`, and `HUMAN_ADMIT_REQUIRED` states.
