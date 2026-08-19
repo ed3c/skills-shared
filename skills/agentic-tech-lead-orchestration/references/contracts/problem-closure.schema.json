@@ -4,92 +4,365 @@
   "title": "Problem Closure Ledger",
   "type": "object",
   "additionalProperties": false,
-  "required": ["problems"],
+  "required": [
+    "schema_version",
+    "denominator",
+    "source_manifest",
+    "problems"
+  ],
   "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "denominator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "problem_ids",
+        "source_manifest_sha256"
+      ],
+      "properties": {
+        "problem_ids": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "source_manifest_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "source_manifest": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "problem_id",
+          "kind",
+          "identity",
+          "location",
+          "claim_sha256"
+        ],
+        "properties": {
+          "problem_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kind": {
+            "enum": [
+              "GITHUB_ISSUE",
+              "ARTICLE",
+              "PDF",
+              "PRD"
+            ]
+          },
+          "identity": {
+            "type": "string",
+            "minLength": 1
+          },
+          "location": {
+            "type": "string",
+            "minLength": 1
+          },
+          "claim_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      }
+    },
     "problems": {
       "type": "array",
-      "items": {"$ref": "#/$defs/problem"}
+      "items": {
+        "$ref": "#/$defs/problem"
+      }
     }
   },
   "$defs": {
     "subject": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["repo", "commit", "tree"],
+      "required": [
+        "repo",
+        "commit",
+        "tree"
+      ],
       "properties": {
-        "repo": {"type": "string", "pattern": "^[^/]+/[^/]+$"},
-        "commit": {"type": "string", "minLength": 7},
-        "tree": {"type": "string", "minLength": 7}
+        "repo": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"
+        },
+        "commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "tree": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        }
       }
     },
     "source": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["kind", "identity", "location"],
+      "required": [
+        "kind",
+        "identity",
+        "location"
+      ],
       "properties": {
-        "kind": {"type": "string", "minLength": 1},
-        "identity": {"type": "string", "minLength": 1},
-        "location": {"type": "string", "minLength": 1}
+        "kind": {
+          "enum": [
+            "GITHUB_ISSUE",
+            "ARTICLE",
+            "PDF",
+            "PRD"
+          ]
+        },
+        "identity": {
+          "type": "string",
+          "minLength": 1
+        },
+        "location": {
+          "type": "string",
+          "minLength": 1
+        }
       }
     },
     "sessionAttempt": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["task_id", "attempt_id", "worktree"],
+      "required": [
+        "task_id",
+        "attempt_id",
+        "worktree"
+      ],
       "properties": {
-        "task_id": {"type": "string", "minLength": 1},
-        "attempt_id": {"type": "string", "minLength": 1},
-        "worktree": {"type": "string", "minLength": 1},
-        "thread_id": {"type": ["string", "null"], "minLength": 1}
+        "task_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "attempt_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "worktree": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.:@-]+$"
+        },
+        "thread_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        }
       }
     },
     "implementationEvidence": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["kind", "subject"],
+      "required": [
+        "kind",
+        "subject",
+        "repo_subject",
+        "status"
+      ],
       "properties": {
-        "kind": {"enum": ["COMMIT", "PR", "MERGE_SUBJECT", "SOURCE_DIFF", "GENERATED_ARTIFACT"]},
-        "subject": {"type": "string", "minLength": 1}
+        "kind": {
+          "enum": [
+            "COMMIT",
+            "PR",
+            "MERGE_SUBJECT",
+            "SOURCE_DIFF",
+            "GENERATED_ARTIFACT"
+          ]
+        },
+        "subject": {
+          "type": "string",
+          "minLength": 1
+        },
+        "repo_subject": {
+          "$ref": "#/$defs/subject"
+        },
+        "status": {
+          "enum": [
+            "CURRENT",
+            "HISTORICAL",
+            "SUPERSEDED"
+          ]
+        }
       }
     },
     "verificationEvidence": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["lane", "subject"],
+      "required": [
+        "lane",
+        "subject",
+        "repo_subject"
+      ],
       "properties": {
-        "lane": {"enum": ["LOCAL", "CI", "PROVIDER_LIVE", "HUMAN", "RELEASE"]},
-        "subject": {"type": "string", "minLength": 1}
+        "lane": {
+          "enum": [
+            "LOCAL",
+            "CI",
+            "PROVIDER_LIVE",
+            "HUMAN",
+            "RELEASE"
+          ]
+        },
+        "subject": {
+          "type": "string",
+          "minLength": 1
+        },
+        "repo_subject": {
+          "$ref": "#/$defs/subject"
+        }
       }
     },
     "problem": {
       "type": "object",
       "additionalProperties": false,
       "required": [
-        "problem_id", "source", "claim", "applicability", "repo_subject",
-        "task_nodes", "dag_nodes", "issue_nodes", "session_attempts",
-        "implementation_evidence", "verification_evidence", "receipts",
-        "merge_subjects", "shadow_verdict", "residual_gaps", "closure"
+        "problem_id",
+        "source",
+        "claim",
+        "applicability",
+        "repo_subject",
+        "task_nodes",
+        "dag_nodes",
+        "issue_nodes",
+        "session_attempts",
+        "implementation_evidence",
+        "verification_evidence",
+        "receipts",
+        "merge_subjects",
+        "shadow_verdict",
+        "residual_gaps",
+        "closure"
       ],
       "properties": {
-        "problem_id": {"type": "string", "minLength": 1},
-        "source": {"$ref": "#/$defs/source"},
-        "claim": {"type": "string", "minLength": 1},
-        "applicability": {"enum": ["APPLICABLE", "NOT_APPLICABLE", "SUPERSEDED"]},
-        "applicability_rationale": {"type": "string", "minLength": 1},
-        "superseded_by": {"type": "string", "minLength": 1},
-        "repo_subject": {"$ref": "#/$defs/subject"},
-        "task_nodes": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
-        "dag_nodes": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
-        "issue_nodes": {"type": "array", "items": {"type": "integer", "minimum": 1}, "uniqueItems": true},
-        "session_attempts": {"type": "array", "items": {"$ref": "#/$defs/sessionAttempt"}},
-        "implementation_evidence": {"type": "array", "items": {"$ref": "#/$defs/implementationEvidence"}},
-        "verification_evidence": {"type": "array", "items": {"$ref": "#/$defs/verificationEvidence"}},
-        "receipts": {"type": "array", "items": {"$ref": "#/$defs/verificationEvidence"}},
-        "merge_subjects": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
-        "shadow_verdict": {"enum": ["PASS", "FAIL", "PARTIAL", "NOT_REVIEWED"]},
-        "residual_gaps": {"type": "array", "items": {"type": "string", "minLength": 1}},
-        "requires_human": {"type": "boolean"},
-        "closure": {"enum": ["OPEN", "PARTIAL", "IMPLEMENTED_UNVERIFIED", "VERIFIED_LOCAL", "VERIFIED_LIVE", "NOT_APPLICABLE", "HUMAN_ADMIT_REQUIRED"]}
+        "problem_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "claim": {
+          "type": "string",
+          "minLength": 1
+        },
+        "applicability": {
+          "enum": [
+            "APPLICABLE",
+            "NOT_APPLICABLE",
+            "SUPERSEDED"
+          ]
+        },
+        "applicability_rationale": {
+          "type": "string",
+          "minLength": 1
+        },
+        "superseded_by": {
+          "type": "string",
+          "minLength": 1
+        },
+        "repo_subject": {
+          "$ref": "#/$defs/subject"
+        },
+        "task_nodes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "dag_nodes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "issue_nodes": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "uniqueItems": true
+        },
+        "session_attempts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/sessionAttempt"
+          }
+        },
+        "implementation_evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/implementationEvidence"
+          }
+        },
+        "verification_evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/verificationEvidence"
+          }
+        },
+        "receipts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/verificationEvidence"
+          }
+        },
+        "merge_subjects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/subject"
+          }
+        },
+        "shadow_verdict": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "PARTIAL",
+            "NOT_REVIEWED"
+          ]
+        },
+        "residual_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "requires_human": {
+          "type": "boolean"
+        },
+        "closure": {
+          "enum": [
+            "OPEN",
+            "PARTIAL",
+            "IMPLEMENTED_UNVERIFIED",
+            "VERIFIED_LOCAL",
+            "VERIFIED_LIVE",
+            "NOT_APPLICABLE",
+            "HUMAN_ADMIT_REQUIRED"
+          ]
+        }
       }
     }
   }

@@ -1,45 +1,52 @@
 # Problem closure ledger
 
-A GitHub issue, pull request, commit, or document link is evidence routing, not proof that the source problem is closed.
+A GitHub issue, pull request, workflow, document link, or generated projection is evidence routing, not proof that the source problem is closed.
 
 ## Source-to-closure route
 
 ```text
-source identity + exact location
-  -> problem_id
-  -> applicability
-  -> repo subject (repo/commit/tree)
-  -> task nodes
-  -> GitHub issue nodes
-  -> implementation evidence
-  -> verification evidence lanes
-  -> Shadow verdict
-  -> residual gaps
-  -> closure state
+frozen source manifest + digest
+  → complete problem denominator
+  → problem_id + exact source location + claim digest
+  → applicability
+  → exact repo commit/tree
+  → task / DAG / issue lineage
+  → session / attempt / portable worktree identity
+  → current + historical implementation evidence
+  → exact-subject verification evidence + matching receipts
+  → Shadow verdict
+  → residual gaps
+  → recomputed closure state
 ```
 
-The ledger denominator retains unresolved, superseded, and `NOT_APPLICABLE` claims. Duplicate IDs and missing source locations fail closed.
+The denominator is explicit and content-bound. Deleting a problem row without changing the frozen denominator turns red. A changed source claim, source location, or source manifest digest also turns red.
 
 ## Closure vocabulary
 
-- `OPEN`: no admitted implementation evidence yet;
-- `PARTIAL`: implementation exists but residual gaps or Shadow failure/partial verdict remain;
-- `IMPLEMENTED_UNVERIFIED`: implementation exists but admitted verification is absent/incomplete;
-- `VERIFIED_LOCAL`: local or CI verification plus Shadow PASS, with no residual gaps;
-- `VERIFIED_LIVE`: provider-live verification plus Shadow PASS, with no residual gaps;
-- `NOT_APPLICABLE`: explicitly justified as outside the repository contract;
-- `HUMAN_ADMIT_REQUIRED`: policy says human authority is still required.
+- `OPEN`: no current implementation evidence;
+- `PARTIAL`: residual gaps, Shadow dissent, or a superseded problem remains;
+- `IMPLEMENTED_UNVERIFIED`: current implementation exists but verification/Shadow is incomplete;
+- `VERIFIED_LOCAL`: exact-subject LOCAL/CI evidence plus Shadow PASS and no residual gaps;
+- `VERIFIED_LIVE`: exact-subject PROVIDER_LIVE evidence plus Shadow PASS and no residual gaps;
+- `NOT_APPLICABLE`: explicit rationale says the claim is outside repository scope;
+- `HUMAN_ADMIT_REQUIRED`: the declared policy still requires Human evidence.
 
-Issue closure and PR merge are not verification lanes. A merge may be recorded as implementation provenance, but cannot promote a claim to `VERIFIED_LIVE`.
+`SUPERSEDED` is applicability, not a terminal success. It must reference another denominator problem and recomputes to `PARTIAL`, preserving the historical item.
+
+## Exact-subject and portability laws
+
+Repository commit/tree identities are full 40-hex Git subjects. Verification evidence and matching receipts must bind the current repo subject. Historical implementation evidence can remain in the ledger, but only `CURRENT` evidence for the exact current subject counts as implementation.
+
+The portable ledger stores a worktree identity, not a machine-local filesystem path. Runtime-specific physical paths belong in consumer/runtime receipts.
 
 ## Evidence lanes
 
-Verification lanes remain explicit: `LOCAL`, `CI`, `PROVIDER_LIVE`, `HUMAN`, and `RELEASE`. Navigation links, source prose, model summaries, issue labels, or UI status are not verification evidence.
+`LOCAL`, `CI`, `PROVIDER_LIVE`, `HUMAN`, and `RELEASE` remain distinct. Issue close, PR merge, labels, UI status, source prose, navigation URLs, or generated Markdown cannot substitute for a verification receipt.
 
 ## Implementation
 
-`../scripts/check_problem_closure.py` validates the full problem denominator and independently recomputes every declared closure state. Declared state must equal recomputed state or the checker rejects the ledger as closure laundering/drift.
+`../scripts/check_problem_closure.py` validates the frozen denominator and independently recomputes every closure state. `../scripts/render_problem_closure.py` creates a deterministic human projection only after the ledger passes.
 
-`../tests/problem_closure_selftest.py` covers local/live/partial/human-positive cases and mutations for missing source location, invalid merge-as-verification, local-to-live promotion, residual-gap laundering, unjustified `NOT_APPLICABLE`, and duplicate problem IDs.
+`../tests/problem_closure_selftest.py` covers positive closure states and planted denominator loss, source drift, stale-subject, supersession, evidence-laundering, machine-local-path, duplicate and extra-field mutations.
 
-Deterministic checker PASS proves only ledger consistency. Real article/PDF/consumer claims can legitimately remain `OPEN`, `PARTIAL`, or `HUMAN_ADMIT_REQUIRED` until stronger evidence exists.
+Deterministic checker PASS proves only the exact ledger contract. Real article/PDF/consumer claims can remain `OPEN`, `PARTIAL`, or `HUMAN_ADMIT_REQUIRED` until stronger external evidence exists.

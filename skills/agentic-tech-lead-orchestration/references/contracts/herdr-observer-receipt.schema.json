@@ -4,27 +4,37 @@
   "title": "Herdr Runtime Observer Receipt",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "task_id", "attempt_id", "repo", "base_sha", "tree_sha", "worktree", "target", "observer_state", "herdr_available", "authoritative", "controller_readback_required", "evidence_ceiling"],
+  "required": [
+    "schema_version", "task_id", "attempt_id", "repo", "base_sha", "tree_sha",
+    "worktree", "target", "observer_state", "herdr_available", "authoritative",
+    "controller_readback_required", "evidence_ceiling"
+  ],
   "properties": {
     "schema_version": {"const": 1},
     "task_id": {"type": "string", "minLength": 1},
     "attempt_id": {"type": "string", "minLength": 1},
-    "repo": {"type": "string", "pattern": "^[^/]+/[^/]+$"},
-    "base_sha": {"type": "string", "minLength": 7},
-    "tree_sha": {"type": "string", "minLength": 7},
+    "repo": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+    "base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "tree_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
     "worktree": {"type": "string", "minLength": 1},
     "target": {"type": "string", "minLength": 1},
     "pane_id": {"type": ["string", "null"]},
     "workspace_id": {"type": ["string", "null"]},
     "process_id": {"type": ["string", "integer", "null"]},
+    "process_started_at_unix": {"type": ["integer", "null"], "minimum": 1},
+    "process_alive": {"type": ["boolean", "null"]},
     "agent_session_id": {"type": ["string", "null"]},
     "foreground_cwd": {"type": ["string", "null"]},
-    "observed_at_unix": {"type": "integer", "minimum": 0},
+    "source_observed_at_unix": {"type": "integer", "minimum": 1},
+    "observed_at_unix": {"type": "integer", "minimum": 1},
+    "observation_age_seconds": {"type": "integer", "minimum": 0},
+    "cleanup_state": {"type": ["string", "null"], "enum": ["CLEAN", "DIRTY", "NOT_APPLICABLE", null]},
+    "residue_count": {"type": ["integer", "null"], "minimum": 0},
     "raw_state": {"type": "string"},
     "observer_state": {"enum": ["RUNNING", "BLOCKED", "IDLE", "DONE_CANDIDATE", "UNKNOWN", "UNAVAILABLE_FALLBACK"]},
     "herdr_available": {"type": "boolean"},
     "authoritative": {"const": false},
     "controller_readback_required": {"const": true},
-    "evidence_ceiling": {"enum": ["NO_HERDR_OBSERVATION", "OBSERVER_IDENTITY_STATE_ONLY"]}
+    "evidence_ceiling": {"enum": ["NO_HERDR_OBSERVATION", "OBSERVER_IDENTITY_FRESHNESS_CLEANUP_ONLY"]}
   }
 }
