@@ -6,17 +6,10 @@
     "digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
   },
   "intent_atoms": [
-    {
-      "id": "INT-001",
-      "statement": "Replace with one irreducible user or source intent obligation."
-    }
+    {"id": "INT-001", "statement": "Replace with one irreducible user or source intent obligation."}
   ],
   "semantic_axes": [
-    {
-      "id": "AXIS-001",
-      "name": "REPLACE_WITH_APPLICABLE_SEMANTIC_AXIS",
-      "state": "APPLICABLE"
-    }
+    {"id": "AXIS-001", "name": "REPLACE_WITH_APPLICABLE_SEMANTIC_AXIS", "state": "APPLICABLE"}
   ],
   "source_behaviors": [],
   "cases": [
@@ -38,6 +31,8 @@
       "id": "IMPL-001",
       "owner": "replace-with-one-writer-owner",
       "subject_ref": "replace-with-bounded-implementation-subject",
+      "subject_revision": "replace-with-exact-revision",
+      "subject_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
       "convergence_owner": false
     }
   ],
@@ -68,6 +63,6 @@
   },
   "gate": {
     "status": "READY_FOR_PROTOTYPE",
-    "rationale": "Template carries structural obligations only. Evidence remains NOT_EXERCISED until exact-subject receipts are attached."
+    "rationale": "Template carries structural and exact-subject binding obligations only. Evidence remains NOT_EXERCISED until receipts are attached."
   }
 }
