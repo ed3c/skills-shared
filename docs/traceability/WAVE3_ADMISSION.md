@@ -1,8 +1,8 @@
 # Wave 3 live-evidence infrastructure — admission record
 
-Status: `STATIC_DETERMINISTIC_LIVE_EVIDENCE_INFRASTRUCTURE_ADMITTED_ON_MAIN`.
+Status: `STATIC_DETERMINISTIC_INFRASTRUCTURE_ADMITTED / GITHUB_REMOTE_CANARY_EXERCISED`.
 
-This record closes the public/static Wave‑3 infrastructure phase for issues #464–#468. It records the exact Human-admitted Git subjects and the post-merge reconciliation boundary. The static admission itself does **not** prove live Codex, GitHub dependency, Herdr, source/provider, release, promotion, or production effects; later exact live receipts are appended below without rewriting the admission event.
+This record closes the public/static Wave‑3 infrastructure phase for issues #464–#468 and records the later bounded live GitHub Issue Dependencies receipt for #465. It records exact Human-admitted Git subjects, post-merge reconciliation, and one real reversible remote fixture-edge execution. It does **not** claim that live Codex, Herdr, source/provider, release, promotion, or production effects occurred.
 
 ## Admitted subjects
 
@@ -60,11 +60,19 @@ Wave 2 retained
   Herdr observer             4 positive / 18 mutations
   problem closure            6 positive / 22 mutations
 
-Wave 3 admitted infrastructure
+Wave 3 current implementation
   Codex live acceptance      1 positive / 12 mutations
-  GitHub DAG live canary     1 positive / 6 mutations at initial admission
+  GitHub DAG live canary     1 positive / 10 mutations
   Herdr lifecycle            2 positive / 7 mutations
   source claim compiler      4 source kinds / 11 mutations
+
+GitHub hosted-canary governance
+  fixed #486/#487 repository plan
+  exact same-repo branch/title Ready trigger
+  base/main checkout + current-main freshness guard
+  read-only static governance workflow
+  repository commit-role gate
+  versioned Issue Dependencies REST transport
 
 Shared shape/integration
   10 Draft-2020-12 control-plane schemas
@@ -72,7 +80,7 @@ Shared shape/integration
   Wave‑3 Local Handoff Queue assertion
 ```
 
-Later #465 transport hardening moved the live GitHub dependency carrier to the versioned REST Issue Dependencies API and expanded its deterministic transport controls. That later repair is additive live-lane history; it does not change the Wave‑3 admission denominator above.
+The extra GitHub live-canary controls were admitted after the original static Wave‑3 merge through the #465 hosted execution/repair line. They strengthen the same bounded mechanism and do not widen authority.
 
 ## Publication lineage
 
@@ -111,57 +119,73 @@ WAVE3_CARRIERS_IMPLEMENTED
 → MERGED_ON_MAIN
 → POST_MERGE_RACE_RECONCILED
 → STATIC_DETERMINISTIC_WAVE3_PHASE_CLOSED
+→ #465 HOSTED_EXECUTOR_ADMITTED
+→ WORKFLOW_REGISTRATION_REPAIRED
+→ VERSIONED_DEPENDENCY_REST_CARRIER_ADMITTED
+→ REMOTE_FIXTURE_EDGE_ADDED
+→ EXACT_REMOTE_READBACK
+→ OWNED_EDGE_REMOVED
+→ ORIGINAL_DENOMINATOR_RESTORED
+→ LIVE_GITHUB_DEPENDENCY_CANARY_PASS
 ```
 
-## Post-admission live-evidence update
+The post-admission live transitions above apply only to #465. They do not advance #464, #466, or #467.
 
-Wave‑3 is the successor layer for mutable live/evidence ownership. Wave‑2 #375–#378 remain immutable mechanism lineage; they are not alternate live-receipt owners.
+## Post-admission live evidence — #465
+
+A dedicated public hosted execution plane was admitted after the static Wave‑3 merge. It binds fixture issues #486/#487 and grants only the `issues: write` authority required for the reversible canary; trigger-head code is never executed.
+
+The first remote attempt, run `32295401831`, failed closed during the initial dependency-denominator read before any add operation. That failure exposed a live CLI projection-shape mismatch and is retained as negative evidence.
+
+The carrier was then repaired to use GitHub's dedicated versioned Issue Dependencies REST surface, with complete paginated denominator reads, same-repository row validation, dedicated POST/DELETE mutation, and mandatory cleanup. The repaired carrier was Human-admitted on current main before retry.
+
+The successful remote receipt is:
+
+```text
+issue                         #465
+fixture blocker               #486
+fixture blocked target        #487
+executor base/main             81041d1b88283fabdc1c4db05efaf8dd945e24df
+event-only PR                 #492  CLOSED_UNMERGED
+workflow run                  32296935756
+receipt sha256                da227e94215a1b28a9e550546242c8a482bd718f7b35d67f159ccaa95f23efe5
+before.blockedBy              []
+applied.blockedBy             [486]
+cleanup.blockedBy             []
+execution                     EXERCISED
+canary_state                  LIVE_GITHUB_DEPENDENCY_CANARY_PASS
+semantic_authority            false
+evidence_ceiling              REMOTE_CANARY_EDGE_ONLY
+```
+
+All mutation, receipt-validation, and evidence-publication workflow steps succeeded. The event PR was then closed unmerged by design. The two fixture issues remained OPEN with their ownership label after cleanup, independently confirming their state did not move during the canary.
+
+This establishes one real reversible GitHub Issue Dependencies fixture edge and cleanup/readback contract. It does not establish semantic task-DAG truth, arbitrary issue-mutation safety, Codex/Herdr execution, source/provider closure, release, promotion, or production safety.
+
+## Remaining evidence owners
 
 ```text
 #464 live Codex SDK/controller acceptance       NOT_EXERCISED
-
-#465 bounded GitHub Issue Dependencies canary   LIVE_GITHUB_DEPENDENCY_CANARY_PASS
-  issue state                                   CLOSED / COMPLETED
-  executed base/main                            81041d1b88283fabdc1c4db05efaf8dd945e24df
-  event-only trigger PR                         #492 CLOSED / NOT_MERGED
-  trigger head                                  a977c21fd516cbd3a55bbd443da85206a22302bd
-  workflow run                                  32296935756 SUCCESS
-  receipt sha256                                da227e94215a1b28a9e550546242c8a482bd718f7b35d67f159ccaa95f23efe5
-  before.blockedBy                              []
-  applied.blockedBy                             [486]
-  cleanup.blockedBy                             []
-  execution                                     EXERCISED
-  semantic_authority                            false
-  evidence_ceiling                              REMOTE_CANARY_EDGE_ONLY
-
-#466 live Herdr lifecycle                       NOT_EXERCISED
-#467 article/PDF/PRD truth                      SOURCE_PROPOSAL / EVIDENCE_DEPENDENT
-#467 real source/provider closure               EVIDENCE_DEPENDENT
-release / production promotion                  NOT_PERFORMED
+#465 live GitHub add/readback/remove canary      LIVE_GITHUB_DEPENDENCY_CANARY_PASS
+                                                  REMOTE_CANARY_EDGE_ONLY
+#466 live Herdr lifecycle                        NOT_EXERCISED
+#467 article/PDF/PRD truth                       SOURCE_PROPOSAL / EVIDENCE_DEPENDENT
+#467 real source/provider closure                EVIDENCE_DEPENDENT
+release / production promotion                   NOT_PERFORMED
 ```
 
-The #465 PASS proves only the dedicated public fixture edge could be added, exactly read back, removed, and restored to the original denominator under the admitted permission-bounded workflow. It does **not** grant semantic DAG authority and does not close #376's generic development-link residual.
-
-Historical live-attempt denominator is preserved:
-
-```text
-32295401831  FAIL  pre-mutation CLI blockedBy projection-shape mismatch
-32295854524  FAIL  same signature on unchanged old carrier
-#496              admitted versioned REST Issue Dependencies carrier
-32296935756  PASS  first valid remote add → readback → remove → restore receipt
-```
+`wave3-live-handoff-queue.json` remains the immutable fork-time/local-runtime continuation packet. Its historical predecessor ordering is not mutable evidence authority: #465 was later satisfied through the independently admitted hosted GitHub lane. The queue remains useful for the unresolved #464/#466 local runtime obligations; queue presence or another lane's PASS cannot promote them.
 
 ## Agent read order after admission
 
-For #464–#468 or predecessor #375–#379 work:
+For #464–#468 work after this admission:
 
-1. read this record for the immutable admitted Wave‑3 infrastructure and current successor ownership;
+1. read this record for the immutable admitted static/deterministic subject plus the bounded #465 remote receipt;
 2. re-read current `main`, issue/PR state, workflows, and runtime receipts from GitHub/runtime authority;
 3. use `WAVE3_PARENT_ADMISSION.md` for fork/current-main transition history;
-4. use `WAVE3_LIVE_EVIDENCE.md` for carrier contracts, State Machine, deterministic denominator, and Local Handoff semantics;
-5. load selected Agentic Tech Lead modules/scripts/contracts only when their trigger matches;
-6. route new live evidence to #464/#466/#467; #465 is a completed bounded canary subject unless a separately admitted new canary epoch is created;
-7. keep #376's generic development-link residual separate from #465's completed remote canary.
+4. use `WAVE3_LIVE_EVIDENCE.md` for carrier contracts, State Machine, deterministic denominator, #465 receipt, and Local Handoff semantics;
+5. load the selected Agentic Tech Lead modules/scripts/contracts only when their trigger matches;
+6. keep live #464/#466 and source/provider #467 evidence in the owning runtime/evidence lane.
 
 If prose conflicts with current GitHub metadata, exact Git subjects, executable contracts, or runtime receipts, the machine/external subjects win.
 
