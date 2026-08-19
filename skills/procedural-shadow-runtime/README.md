@@ -146,6 +146,46 @@ real source/provider closure               EVIDENCE_DEPENDENT
 
 A live lane becoming green later does not rewrite the historical static verdict; it creates a new exact-subject receipt and a new closure computation.
 
+## Wave-3 live-evidence monitor — #464–#468
+
+Wave 3 consumes #455 as an unmerged true parent and makes the previously residual live lanes executable without declaring them executed.
+
+```text
+#455
+├─ #464 / PR #469  Codex live acceptance carrier        TRUE_CHILD
+├─ #465 / PR #470  GitHub reversible dependency canary TRUE_CHILD
+├─ #466 / PR #471  Herdr lifecycle carrier             TRUE_CHILD
+└─ #467 / PR #472  immutable source-claim compiler     TRUE_CHILD
+          ↓ exact selected bytes
+#468 / PR #473     CONVERGENCE
+```
+
+Shadow independently checks the #473 exact subject for:
+
+```text
+#469 worker-result + controller-readback identity and digest match
+#470 canary ownership label + one-edge mutation + original-denominator cleanup
+#471 stable lifecycle identity + monotonic timestamps + liveness + clean terminal
+#472 immutable source identity/location + complete denominator + compatibility with problem-closure checker
+#473 multi-parent selected-byte ancestry
+10 total control-plane schemas and all 8 control-plane selftests executed unconditionally
+Wave-3 Local Handoff Queue passes the existing semantic queue assertion
+no live receipt is synthesized from a static fixture or hosted CI
+```
+
+Runtime evidence ceilings are non-substitutable:
+
+```text
+Codex carrier deterministic PASS            != signed-in Codex execution
+GitHub canary deterministic PASS            != remote dependency mutation
+Herdr lifecycle deterministic PASS          != live Herdr process observation
+source compiler deterministic PASS          != source truth/applicability/verification
+queue PASS                                  != runtime commands executed
+#473 hosted PASS                            != Human Admit / merge / release
+```
+
+If any live receipt later appears, Shadow must bind it to the exact task/repo/commit/tree/session or fixture issue subjects named by that receipt and recompute closure. Historical #473 CI cannot be reused after the runtime subject changes.
+
 ## Relationship to task and Stack DAGs
 
 The Shadow is normally an `EXTERNAL_EVIDENCE` lane. It owns no implementation paths and does not become a Git child merely because its receipt is required.
@@ -165,6 +205,7 @@ Full closure vocabulary and current control-plane trace:
 
 - [`../../docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md`](../../docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md)
 - [`../../docs/traceability/CODEX_SDK_TECH_LEAD_CONTROL_PLANE.md`](../../docs/traceability/CODEX_SDK_TECH_LEAD_CONTROL_PLANE.md)
+- [`../../docs/traceability/WAVE3_LIVE_EVIDENCE.md`](../../docs/traceability/WAVE3_LIVE_EVIDENCE.md)
 
 ## 100-point architecture assessment
 
@@ -226,6 +267,7 @@ missing or malformed input               exit 64
 rubric/procedure atoms/checkers/fixtures              IMPLEMENTED
 local deterministic positive/Vibe/domain controls     IMPLEMENTED
 Codex control-plane deterministic convergence         owned by #379 exact candidate subject
+Wave-3 live-evidence deterministic convergence        owned by #468 exact candidate subject
 independent same-subject live Shadow execution         NOT_EXERCISED
 live Codex SDK / Herdr / GitHub dependency effects     NOT_EXERCISED unless exact receipts exist
 real source/provider closure                           EVIDENCE_DEPENDENT

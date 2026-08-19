@@ -303,3 +303,33 @@ Chat history is not required.
 ```
 
 Only after the final current #455 head passes the complete hosted denominator and independent Shadow readback may this static/deterministic convergence become `READY_FOR_HUMAN_ADMIT`. That verdict still does not admit or merge any sibling and does not prove any live lane.
+
+## Successor: Wave-3 live-evidence infrastructure
+
+The static/deterministic #455 subject is the explicit true parent for the next program. Detailed machine/human routing is in [`WAVE3_LIVE_EVIDENCE.md`](WAVE3_LIVE_EVIDENCE.md); this parent trace only records the successor boundary.
+
+```text
+#455 / #379
+├─ #464 / PR #469  Codex live-acceptance carrier         TRUE_CHILD
+├─ #465 / PR #470  GitHub reversible dependency canary  TRUE_CHILD
+├─ #466 / PR #471  Herdr lifecycle carrier              TRUE_CHILD
+└─ #467 / PR #472  immutable source-claim compiler      TRUE_CHILD
+          ↓ selected exact bytes
+#468 / PR #473     CONVERGENCE
+```
+
+All four Wave-3 leaves consume #455 bytes and are therefore true children of #455, but they remain siblings of each other. #468 is the only shared writer for Wave-3 contracts, `run-all`, Agent routes, Shadow projection, Git Town Molecular index, traceability and Local Handoff Queue.
+
+Immutable Wave-3 integration checkpoint:
+
+```text
+691b342c44c9c6c4e61a9997e778ae4ed6e920d5
+parents:
+  847e56c3418fce920c42d983e84ee44fdc6e8971  #455
+  d239d17d1d718f3e5e8c1975307665cae43d3b09  #469
+  f4c3215b6c52c2e6106070eaa1121dee1dbd48e3  #470
+  9eb70b2b62193b62a28f243de91e51337f1906b3  #471
+  44d779a02e1749aa88a502d946646c22af38a026  #472
+```
+
+This successor exists to make future live receipts safely executable and admissible. It does not retroactively change #455's historical verdict and does not itself prove Codex, Herdr, GitHub mutation or external-source truth.

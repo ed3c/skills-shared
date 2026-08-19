@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ed3c/skills-shared/skills/agentic-tech-lead-orchestration/github-dag-live-canary-receipt.schema.json",
+  "title": "GitHub DAG Live Canary Receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version","repo","blocker_issue","blocked_issue","canary_label","preflight","before","applied","cleanup","execution","canary_state","semantic_authority","evidence_ceiling"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "repo": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+    "blocker_issue": {"type": "integer", "minimum": 1},
+    "blocked_issue": {"type": "integer", "minimum": 1},
+    "canary_label": {"type": "string", "minLength": 1},
+    "preflight": {"type": "object", "required": ["repository","issues"]},
+    "before": {"$ref": "#/$defs/readback"},
+    "applied": {"$ref": "#/$defs/readback"},
+    "cleanup": {"$ref": "#/$defs/readback"},
+    "execution": {"const": "EXERCISED"},
+    "canary_state": {"const": "LIVE_GITHUB_DEPENDENCY_CANARY_PASS"},
+    "semantic_authority": {"const": false},
+    "evidence_ceiling": {"const": "REMOTE_CANARY_EDGE_ONLY"}
+  },
+  "$defs": {
+    "readback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["blockedBy"],
+      "properties": {"blockedBy": {"type": "array", "items": {"type": "integer", "minimum": 1}, "uniqueItems": true}}
+    }
+  }
+}
