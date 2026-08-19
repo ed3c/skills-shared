@@ -14,7 +14,7 @@ python3 "$ROOT/scripts/check_trace_graph.py" \
 
 python3 "$ROOT/tests/mutation_proof.py"
 
-if [[ -n "${ITEKG_EXPECTED_SHA:-}" && -n "${ITEKG_REPOSITORY:-}" && -n "${ITEKG_REF:-}" && -n "${ITEKG_PR_NUMBER:-}" ]]; then
+if [[ -n "${ITEKG_EXPECTED_SHA:-}" && -n "${ITEKG_REPOSITORY:-}" && -n "${ITEKG_REF:-}" && -n "${ITEKG_PR_NUMBER:-}" && "${ITEKG_PR_NUMBER}" != "0" ]]; then
   evidence_dir="${ITEKG_EVIDENCE_DIR:-${RUNNER_TEMP:-/tmp}/intent-to-evidence-knowledge-graph}"
   mkdir -p "$evidence_dir"
 
