@@ -30,6 +30,41 @@ class Remote:
         self.cleanup_fail = False
         self.missing_label = False
         self.closed = False
+        self.blocked_shape = "valid"
+
+    def _blocked_connection(self):
+        nodes = [
+            {
+                "number": x,
+                "title": f"fixture {x}",
+                "url": f"https://github.com/ed3c/skills-shared/issues/{x}",
+                "state": "OPEN",
+                "repository": {"nameWithOwner": "ed3c/skills-shared"},
+            }
+            for x in self.blocked
+        ]
+        conn = {"nodes": nodes, "totalCount": len(nodes)}
+        if self.blocked_shape == "valid":
+            return conn
+        if self.blocked_shape == "legacy-list":
+            return nodes
+        if self.blocked_shape == "missing-total":
+            return {"nodes": nodes}
+        if self.blocked_shape == "extra-field":
+            return {"nodes": nodes, "totalCount": len(nodes), "pageInfo": {}}
+        if self.blocked_shape == "bad-total":
+            return {"nodes": nodes, "totalCount": len(nodes) + 1}
+        if self.blocked_shape == "bad-nodes":
+            return {"nodes": {}, "totalCount": len(nodes)}
+        if self.blocked_shape == "bad-number":
+            bad = copy.deepcopy(nodes)
+            bad[0]["number"] = str(bad[0]["number"])
+            return {"nodes": bad, "totalCount": len(bad)}
+        if self.blocked_shape == "cross-repo":
+            bad = copy.deepcopy(nodes)
+            bad[0]["repository"]["nameWithOwner"] = "other/repo"
+            return {"nodes": bad, "totalCount": len(bad)}
+        raise AssertionError(self.blocked_shape)
 
     def run(self, a):
         if a[:3] == ["gh", "repo", "view"]:
@@ -54,9 +89,7 @@ class Remote:
                     }
                 )
             if fields == "blockedBy":
-                return json.dumps(
-                    {"blockedBy": [{"number": x} for x in self.blocked]}
-                )
+                return json.dumps({"blockedBy": self._blocked_connection()})
         if a[:3] == ["gh", "issue", "edit"]:
             if "--add-blocked-by" in a:
                 n = int(a[a.index("--add-blocked-by") + 1])
@@ -103,6 +136,17 @@ fail(rm=lambda r: setattr(r, "blocked", [8998]))
 fail(rm=lambda r: setattr(r, "missing_label", True))
 fail(rm=lambda r: setattr(r, "closed", True))
 fail(rm=lambda r: setattr(r, "cleanup_fail", True))
+
+for shape in (
+    "legacy-list",
+    "missing-total",
+    "extra-field",
+    "bad-total",
+    "bad-nodes",
+    "bad-number",
+    "cross-repo",
+):
+    fail(rm=lambda r, shape=shape: setattr(r, "blocked_shape", shape))
 
 
 def assert_hosted_workflow_contract():
@@ -189,5 +233,5 @@ def assert_hosted_workflow_contract():
 assert_hosted_workflow_contract()
 print(
     "github-dag-live-canary selftest: PASS "
-    "(positive=1 mutations=6 hosted-workflow=1 live=NOT_EXERCISED)"
+    "(positive=1 mutations=13 hosted-workflow=1 live=NOT_EXERCISED)"
 )
