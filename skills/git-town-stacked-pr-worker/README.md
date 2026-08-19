@@ -18,6 +18,7 @@ Portable method for coordinating multiple Worker Agents with Git Town, isolated 
 12. [`../skill-refactor-proof-loop/README.md`](../skill-refactor-proof-loop/README.md) for proof-carrying Skill refactor contracts and the current golden Stack.
 13. [`../github-delivery-loop/README.md`](../github-delivery-loop/README.md) for GitHub publication and merge State Machines.
 14. [`../../docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md`](../../docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md) for closure roles and dated consumer snapshots.
+15. [`../../docs/traceability/CODEX_SDK_TECH_LEAD_CONTROL_PLANE.md`](../../docs/traceability/CODEX_SDK_TECH_LEAD_CONTROL_PLANE.md) for the current #375–#379 multi-parent convergence example.
 
 ## Directory map
 
@@ -184,7 +185,7 @@ Smallest reviewable behavior plus its tests and evidence. It does not absorb cen
 
 ### Convergence leaf
 
-One owner updates shared indexes, links, coverage and final traceability after prerequisite artifacts are stable. Verified side inputs may converge without becoming extra Git parents.
+One owner updates shared indexes, links, coverage and final traceability after prerequisite artifacts are stable. A convergence commit may have several sibling parents when it actually consumes their exact bytes. That multi-parent merge records causality without making the siblings parents of one another.
 
 ### Process dependency / external evidence
 
@@ -235,15 +236,7 @@ references/example-molecular-stack-index.json
 scripts/assert_molecular_stack_index.py
 ```
 
-Atoms are `C` contract/schema/interface lock, `K` deterministic core, `A` adapter/provider/substrate, `E` Eval/mutation/fault controls, `X` explicit multi-parent convergence/E2E, and `D` documentation/receipt/handoff. Each atom is classified `root`, `sibling`, `child`, `review-only` or `convergence`, declares one lane (`CLOUD`, `LOCAL`, `PRIVATE`, `HUMAN`), and carries its open `blockers`. `assert_molecular_stack_index.py` refuses a hidden multi-parent convergence, a path-disjoint sibling serialized as a child, a required atom missing from the index, overlapping writer leases, a self-embedded mutable open PR head, an atom that owns no paths, oracle or Gate, a Gate whose receipt came from another lane, private lineage consumed by a published atom, a review-only atom used as a parent or merged, and a merged atom that still carries a blocker or an unexercised Gate. Its selftest plants all nineteen controls.
-
-Proof-carrying Skill refactors bind the same shape through their own registry:
-
-```text
-skills/skill-refactor-proof-loop/references/refactor-proof-stack.schema.json
-skills/skill-refactor-proof-loop/references/refactor-proof-stack.json
-skills/skill-refactor-proof-loop/scripts/check_refactor_proof_stack.py
-```
+Atoms are `C` contract/schema/interface lock, `K` deterministic core, `A` adapter/provider/substrate, `E` Eval/mutation/fault controls, `X` explicit multi-parent convergence/E2E, and `D` documentation/receipt/handoff. Each atom is classified `root`, `sibling`, `child`, `review-only` or `convergence`, declares one lane (`CLOUD`, `LOCAL`, `PRIVATE`, `HUMAN`), and carries its open `blockers`. `assert_molecular_stack_index.py` refuses a hidden multi-parent convergence, a path-disjoint sibling serialized as a child, a required atom missing from the index, overlapping writer leases, a self-embedded mutable open PR head, an atom that owns no paths, oracle or Gate, a Gate whose receipt came from another lane, private lineage consumed by a published atom, a review-only atom used as a parent or merged, and a merged atom that still carries a blocker or an unexercised Gate.
 
 Required node fields:
 
@@ -251,7 +244,7 @@ Required node fields:
 |---|---|
 | `issues` | issue contract identities; one node owns each issue |
 | `pull_request` | publication identity or `null` before publication |
-| `branch` / `base_branch` | true-child base equals parent branch |
+| `branch` / `base_branch` | true-child base equals parent branch; sibling base remains common admitted base |
 | `stack_class` | root, child, sibling, convergence, planned follow-up, external evidence |
 | `owns_paths` | molecular path lease; external evidence owns no Stack paths |
 | `consumes_artifacts` / `provides_artifacts` | explicit data dependency |
@@ -263,6 +256,102 @@ Required node fields:
 | `rollback` / `human_admit` | recovery and authority boundary |
 
 The checker rejects missing child artifacts, child/base mismatch, fake serial siblings, multiple convergence owners, duplicate issue/PR ownership, stale self-embedded open heads, false merged state, external evidence owning paths, and widened semantic-conflict/force-push/ship/merge/release/promotion authority.
+
+## Codex control-plane Molecular terminal index — #375–#380
+
+This is the current concrete example of **parallel SIBLING atoms feeding one explicit multi-parent CONVERGENCE atom**. Current open PR heads should still be refreshed from GitHub before mutation; the exact heads below are frozen because they are also immutable parents of the convergence commit.
+
+Common admitted base for implementation siblings:
+
+```text
+main@ccef97dedd7ea8b1873e3afa130ca82b8eabb413
+```
+
+| Atom | Issue / PR | Class | Branch → base | Consumes | Provides | Writable lease | Gates / controls | Terminal / next |
+|---|---|---|---|---|---|---|---|---|
+| `A-CODEX` | `#375 / #451` | `SIBLING` | `ctl/375-codex-sdk-runtime-adapter-v2` → `main` | frozen Tech Lead task/session contract; existing Codex auth only on live path | Codex session/result schemas; bounded SDK runner; selftest | issue-owned Codex adapter/contracts/packet/script/test only | exact-head Skill Suites + Shared Skills Infra + Skill Eval Contract `SUCCESS`; Shadow `STATIC_ADMITTED`; lease/prompt/thread/credential mutations | static mechanism admitted; live SDK `NOT_EXERCISED`; successor `#379` |
+| `A-GH-DAG` | `#376 / #452` | `SIBLING` | `ctl/376-github-issue-dag-projection-v2` → `main` | asserted semantic dual DAG only | GitHub projection/ready-wave schemas; non-destructive projection/readback checker; selftest | issue-owned DAG module/contracts/packet/script/test only | same three exact-head gates `SUCCESS`; Shadow `STATIC_ADMITTED`; cycle/self/start-edge/digest/readback/destructive-extra mutations | static mechanism admitted; live mutation/readback `NOT_EXERCISED`; successor `#379` |
+| `A-HERDR` | `#377 / #453` | `SIBLING` | `ctl/377-herdr-runtime-observer-v2` → `main` | allocated worktree/attempt + optional Herdr target | observer receipt schema; host-neutral binding example; identity reducer/fallback; selftest | issue-owned Herdr module/contracts/example/packet/script/test only | same three exact-head gates `SUCCESS`; Shadow `STATIC_ADMITTED`; CWD/pane/session/credential/transcript controls | static mechanism admitted; live Herdr `NOT_EXERCISED`; successor `#379` |
+| `K-CLOSURE` | `#378 / #454` | `SIBLING` | `ctl/378-problem-closure-ledger-v2` → `main` | exact source claim + repo/task/DAG/issue/session/evidence identities | problem-closure schema/example/checker/renderer/selftest | issue-owned closure module/contracts/example/packet/scripts/test only | same three exact-head gates `SUCCESS`; Shadow `STATIC_ADMITTED`; missing receipt/local→live/N-A/superseded/merge-laundering controls | deterministic mechanism admitted; real source/provider closure `EVIDENCE_DEPENDENT`; successor `#379` |
+| `D-TRACE` | `#379 refs / #380` | `SIBLING / DOCUMENTATION` | `docs/codex-sdk-tech-lead-shadow-control-plane` → historical common base | program requirements only | nearest traceability Agent route + original control-plane design trace | docs/traceability two-file lease only | both non-merge commits carry valid commit-role trailers; navigation only | consumed by #379; no runtime evidence |
+| `X-CONVERGENCE` | `#379` | `CONVERGENCE` | `ctl/379-codex-control-plane-convergence` → `main` | exact heads of #451/#452/#453/#454 + PR #380 docs bytes | shared ATL test wiring/routes; Shadow relationship; Git Town/trace indexes | shared convergence surfaces only; no sibling implementation rewrite | all four dedicated selftests + six schemas + existing ATL suite + hosted exact-head workflows + independent Shadow denominator | target stage `READY_FOR_HUMAN_ADMIT` for static/deterministic scope only; live/merge/release remain open |
+
+Frozen sibling heads consumed by `X-CONVERGENCE`:
+
+```text
+#451 339ae874b070fb3a8a5fa89b0241d90434257e99
+#452 b5295df681d6471b19775db38860b2d151339879
+#453 5b6e58d1e7e9e127123dbb4a9189b98e5ff973cf
+#454 32c5425de1cf4f083bd998e81873a86af8771e1e
+#380 7a9d68fcd58b1ed78ed6d05595a8df7eae53f5a5
+```
+
+The first implementation convergence commit is immutable:
+
+```text
+c0f6979f80038394350aea724c598c8dba5ac338
+parents:
+  ccef97dedd7ea8b1873e3afa130ca82b8eabb413  main
+  339ae874b070fb3a8a5fa89b0241d90434257e99  #451
+  b5295df681d6471b19775db38860b2d151339879  #452
+  5b6e58d1e7e9e127123dbb4a9189b98e5ff973cf  #453
+  32c5425de1cf4f083bd998e81873a86af8771e1e  #454
+union tree:
+  37cb2c56e7dfc939cacaa0f65cf8f9b0f8318b22
+```
+
+Documentation is then admitted by immutable convergence-base commit:
+
+```text
+af427a13a7096df91d74a48c0a4ca6ce3f3e2ac9
+parents:
+  c0f6979f80038394350aea724c598c8dba5ac338
+  7a9d68fcd58b1ed78ed6d05595a8df7eae53f5a5  #380
+```
+
+The final mutable #379 branch head is **not** self-embedded here. Read it from GitHub PR/branch metadata after each shared convergence edit. This prevents the index from becoming stale in the commit that updates it.
+
+Rejected candidate lineage is retained:
+
+```text
+#444 → #451
+#445 → #452
+#446 → #453
+#447 → #454
+```
+
+Those first candidates were closed unmerged after the commit-role gate rejected their multi-commit Contents-API provenance. They are `HISTORICAL / REJECTED`, not alternate merge candidates.
+
+### Molecular data flow
+
+```text
+A-CODEX ─┐
+A-GH-DAG ├─ exact STATIC_ADMITTED bytes ─┐
+A-HERDR ─┤                               │
+K-CLOSURE┘                               ├→ X-CONVERGENCE (#379)
+D-TRACE ─── navigation sibling ──────────┘       │
+                                                  ├→ shared deterministic suite
+                                                  ├→ independent Shadow readback
+                                                  ├→ hosted exact-head workflows
+                                                  └→ Human Admit for static scope
+
+live Codex / live GitHub mutation / live Herdr / real source-provider closure
+  = EXTERNAL_EVIDENCE / PROCESS_DEPENDENCY lanes
+  ≠ Git children of X-CONVERGENCE
+```
+
+### Human-owned operations and rollback
+
+```text
+semantic conflict resolution       HUMAN
+force update / force push          HUMAN / repository policy
+unmanaged GitHub blocker deletion  HUMAN or separately admitted policy
+merge of convergence PR            HUMAN / repository merge authority
+release / promotion                HUMAN / repository release authority
+rollback                           return to exact pre-convergence main subject or reviewed revert
+```
+
+No hosted CI green state, Shadow agreement, issue close, or PR publication can substitute for these operations.
 
 ## Integration with `github-delivery-loop`
 
@@ -367,7 +456,7 @@ The historical Skill Eval implementation line was:
 
 The reusable publication policy was issue #43 / PR #44. Earlier independent documentation leaves were not forced into runtime ancestry when they consumed only merged bytes.
 
-The four-repository documentation change was a sibling set because each repository wrote only its own documentation. One of the four repositories' issue #38 became the convergence owner only after all four merged. Exact historical subjects (including which repository owned #38) remain in [`../../docs/traceability/TRACEABILITY_INDEX.md`](../../docs/traceability/TRACEABILITY_INDEX.md).
+The four-repository documentation change was a sibling set because each repository wrote only its own documentation. One of the four repositories' issue #38 became the convergence owner only after all four merged. Exact historical subjects remain in [`../../docs/traceability/TRACEABILITY_INDEX.md`](../../docs/traceability/TRACEABILITY_INDEX.md).
 
 ## Publication policy
 
@@ -418,6 +507,7 @@ ABSENT
 NOT_IMPLEMENTED
 NOT_EXERCISED
 SKIPPED_BY_POLICY
+EVIDENCE_DEPENDENT
 HUMAN_ADMIT_REQUIRED
 ```
 

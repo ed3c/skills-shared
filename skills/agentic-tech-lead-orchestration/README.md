@@ -1,20 +1,21 @@
 # `agentic-tech-lead-orchestration`
 
-Portable contract-first orchestration for turning one large coding request into a dependency-aware branch team and, when the current session reaches a real host/runtime boundary, a zero-context Local Handoff Execution Queue. `SKILL.md` owns the method; `references/` owns host-neutral contracts; `modules/` contains trigger-selected provider/runtime/delivery interpretations; `scripts/` and `tests/` own executable assertions and falsifiers.
+Portable contract-first orchestration for turning one large coding request into a dependency-aware branch team and, when the current session reaches a real host/runtime boundary, a zero-context Local Handoff Execution Queue. `SKILL.md` owns the provider-neutral method; `references/` owns host-neutral contracts; `modules/` contains trigger-selected runtime/projection/delivery interpretations; `scripts/` and `tests/` own executable assertions and falsifiers.
 
 ## Read order
 
 1. [`AGENTS.md`](AGENTS.md)
 2. [`SKILL.md`](SKILL.md)
 3. task, capability and scheduler schemas under [`references/`](references/README.md)
-4. when local/runtime-only evidence remains, `references/local-handoff-queue.schema.json` and the example queue
-5. when the work must run in a remote lane while the local one is disconnected, [`references/dual-agent-offload/OFFLOAD_METHOD.md`](references/dual-agent-offload/OFFLOAD_METHOD.md)
-6. [`modules/README.md`](modules/README.md), then only selected modules
-7. [`scripts/README.md`](scripts/README.md)
-8. [`tests/README.md`](tests/README.md)
-9. [`../skill-refactor-proof-loop/README.md`](../skill-refactor-proof-loop/README.md) and its golden registry
-10. exact issue, PR base/head, workflow and receipt subjects
-11. [`../../docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md`](../../docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md) before a global completion claim
+4. when issues #375–#379 or Codex control-plane execution is in scope, [`../../docs/traceability/CODEX_SDK_TECH_LEAD_CONTROL_PLANE.md`](../../docs/traceability/CODEX_SDK_TECH_LEAD_CONTROL_PLANE.md), the relevant execution packet under `references/execution-packets/`, and only the selected adapter modules
+5. when local/runtime-only evidence remains, `references/local-handoff-queue.schema.json` and the example queue
+6. when the work must run in a remote lane while the local one is disconnected, [`references/dual-agent-offload/OFFLOAD_METHOD.md`](references/dual-agent-offload/OFFLOAD_METHOD.md)
+7. [`modules/README.md`](modules/README.md), then only selected modules
+8. [`scripts/README.md`](scripts/README.md)
+9. [`tests/README.md`](tests/README.md)
+10. [`../skill-refactor-proof-loop/README.md`](../skill-refactor-proof-loop/README.md) and its golden registry
+11. exact issue, PR base/head, workflow and receipt subjects
+12. [`../../docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md`](../../docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md) before a global completion claim
 
 ## Directory map → State Machine ownership
 
@@ -27,43 +28,45 @@ skills/agentic-tech-lead-orchestration/
 ├── SKILL.md
 │   └── portable request → task → capability → Worker → convergence → handoff law
 ├── references/
-│   ├── task-contract.schema.json
-│   ├── capability-plan.schema.json
-│   ├── capability-receipts.schema.json
-│   ├── scheduler-lifecycle.schema.json
-│   ├── local-handoff-queue.schema.json
-│   ├── example-local-handoff-queue.json
+│   ├── task/capability/scheduler/closure contracts
+│   ├── contracts/
+│   │   ├── codex-session-manifest.schema.json             #375
+│   │   ├── codex-worker-result.schema.json                #375
+│   │   ├── github-issue-dag-receipt.schema.json           #376
+│   │   ├── github-ready-wave.schema.json                  #376
+│   │   ├── herdr-observer-receipt.schema.json             #377
+│   │   └── problem-closure.schema.json                    #378
+│   ├── examples/
+│   │   ├── herdr-runtime-binding.example.json             #377
+│   │   └── problem-closure.example.json                   #378
+│   ├── execution-packets/375-codex-sdk.md                 #375
+│   ├── execution-packets/376-github-issue-dag.md          #376
+│   ├── execution-packets/377-herdr-observer.md            #377
+│   ├── execution-packets/378-problem-closure.md           #378
 │   ├── dual-agent-offload/
-│   │     └── portable local/cloud offload method, contracts and controls
-│   ├── prompt/task examples and causal maps
 │   └── frozen contract and evidence vocabulary
 ├── modules/
-│   ├── domain-profile.md
-│   ├── deterministic-code-intelligence.md
-│   ├── semantic-intent-anchor.md
-│   ├── agent-executor.md
-│   ├── vector-store.md
-│   ├── tournament-mode.md
-│   └── stacked-delivery.md
+│   ├── provider-neutral / code-intelligence / delivery modules
+│   ├── codex-sdk-controller.md                            #375 runtime executor
+│   ├── github-issue-dag-projection.md                     #376 forge projection
+│   ├── herdr-runtime-observer.md                          #377 observer only
+│   └── problem-closure-ledger.md                          #378 reconciliation
 ├── scripts/
-│   ├── task shape and semantic gates
-│   ├── capability causal-DAG gate
-│   ├── reachability and core-boundary gates
-│   ├── scheduler lifecycle validation
-│   └── Local Handoff Queue shape/semantic assertion
+│   ├── existing task/capability/scheduler/queue gates
+│   ├── run_codex_sdk_worker.py                            #375
+│   ├── github_issue_dag_projection.py                     #376
+│   ├── herdr_runtime_observer.py                          #377
+│   ├── check_problem_closure.py                           #378
+│   └── render_problem_closure.py                          #378 human projection
 └── tests/
-    ├── structural/reachability A/B
-    ├── capability, scheduler and queue mutation controls
-    ├── frozen historical treatments
-    └── production-shaped matched real-task A/B
+    ├── existing structural/causal/matched-task controls
+    ├── codex_sdk_controller_selftest.py                   #375
+    ├── github_issue_dag_selftest.py                       #376
+    ├── herdr_observer_selftest.py                         #377
+    └── problem_closure_selftest.py                        #378
 ```
 
-The executable mechanism index is generated from current bytes:
-
-```bash
-python3 ../../scripts/check_skill_entry_routes.py \
-  --skill agentic-tech-lead-orchestration --print-index
-```
+`tests/run-all.sh` is the shared deterministic convergence gate. It validates the new schemas and executes all four dedicated selftests; it intentionally does **not** pass `--execute` to the Codex adapter, `--apply` to the GitHub projection, or invoke a live Herdr/provider lane.
 
 ## Primary orchestration State Machine
 
@@ -88,6 +91,60 @@ REQUEST_BOUND
 ```
 
 Failure/control states include stale attempts, lease expiry, retryable/terminal failure, cancellation, supersession, straggler detach, authority block, semantic conflict, non-decomposable task, and duplicate suppression. A state declared only in a schema or fixture is not runtime evidence.
+
+## Codex control-plane extension State Machine
+
+The provider-neutral State Machine above remains authoritative. The trigger-selected #375–#378 adapters refine only the execution/projection/evidence portions:
+
+```text
+TASK_DAG_ASSERTED
+→ GITHUB_PROJECTION_COMPILED                     #376
+→ REMOTE_READBACK_REQUIRED
+→ READY_WAVE_COMPUTED
+→ SESSION_PACKET_COMPILED                        #375
+→ ISOLATED_WORKTREE_BOUND
+→ CODEX_THREAD_STARTED | COMPATIBLE_THREAD_RESUMED
+→ ATTEMPT_EXECUTED
+→ STRUCTURED_RESULT_COLLECTED
+→ CONTROLLER_SOURCE_DIFF_TEST_READBACK_REQUIRED
+→ HERDR_OBSERVATION_OPTIONAL                     #377
+→ INDEPENDENT_SHADOW_REVIEW
+→ PROBLEM_CLOSURE_RECOMPUTED                     #378
+→ NEXT_WAVE | LOCAL_HANDOFF | HUMAN_ADMIT_REQUIRED
+```
+
+Authority stays separated:
+
+```text
+Tech Lead core       semantic decomposition, dual DAG, leases, convergence
+Codex SDK adapter    one bounded execution attempt; never acceptance/merge authority
+GitHub DAG adapter   durable completion-edge projection; never semantic truth alone
+Herdr adapter        process/worktree/session observation; DONE_CANDIDATE only
+closure ledger       typed source→problem→evidence reconciliation; no UI-state laundering
+Shadow               independent findings/evidence ceiling; never second writer
+Human/repo policy    semantic conflict, merge, release, promotion, rollback
+```
+
+## Control-plane DAG and convergence
+
+The current implementation program is a real sibling fan-out, not a serial Stack:
+
+```text
+main
+├── #375 / PR #451  Codex SDK runtime adapter         SIBLING
+├── #376 / PR #452  GitHub Issue DAG projection      SIBLING
+├── #377 / PR #453  Herdr runtime observer           SIBLING
+├── #378 / PR #454  problem-closure ledger           SIBLING
+└── PR #380         documentation foundation         SIBLING
+       ↓ exact STATIC_ADMITTED bytes only
+#379                 CONVERGENCE
+       ↓ shared run-all / README / AGENTS / Git Town / traceability
+independent Shadow + exact-head CI
+       ↓
+HUMAN_ADMIT_REQUIRED
+```
+
+The #379 integration subject is intentionally multi-parent: its Git ancestry records the exact sibling heads it consumes. That makes convergence causality inspectable without pretending one sibling is another sibling's parent. A later implementation may use `TRUE_CHILD` only when it actually consumes named unmerged parent bytes.
 
 ## Local Handoff Execution Queue State Machine
 
@@ -129,30 +186,46 @@ False edges are rejected. Path-disjoint work remains siblings. A dependent conve
 ## End-to-end data flow
 
 ```text
-Issue / PRD / PDF
+Issue / PRD / PDF / article
+→ source identity + exact location where applicable
 → task contract and immutable interface/test anchors
-→ optional semantic intent candidates
 → current-source readback
-→ admitted deterministic graph/structural context
-→ true task DAG + path/resource leases
-→ isolated worktree/process attempts
-→ bounded checkpoint/retry/self-heal
-→ independent local oracles
-→ tournament comparison with complete denominator
+→ true task DAG + start/completion readiness edges
+→ optional GitHub Issue Dependency projection + exact remote readback
+→ ready wave
+→ isolated worktree/session attempts
+→ Codex runtime result or another admitted executor result
+→ independent source/diff/test readback
+→ optional Herdr identity/state observation
+→ independent Shadow review
+→ typed implementation/verification receipts
+→ problem-closure recomputation
 → convergence from verified prerequisite bytes
 → frozen global-objective oracle
-→ delivery handoff
+→ delivery handoff / next wave
     ├── current runtime can continue
-    │     → optional Stack/delivery receipts
-    └── local/runtime-only evidence remains
-          → asserted Local Handoff Queue
-          → local/runtime lane
-          → durable receipt
-          → next queue item or blocked Human handoff
+    └── local/runtime-only evidence remains → asserted Local Handoff Queue
 → Human Admit
 ```
 
 `code-graph-rag` is intentionally not an active dependency. A consumer may retain old files for migration/audit, but the task contract assertion rejects it as a runtime provider.
+
+## Evidence ceilings for #375–#379
+
+```text
+Codex SDK adapter bytes + selftest          deterministic/static only
+Codex SDK live thread/turn                  NOT_EXERCISED until exact runtime receipt
+GitHub dependency projection checker        deterministic/static only
+GitHub remote dependency mutation/readback  NOT_EXERCISED until explicit live receipt
+Herdr observer checker/fallback              deterministic/static only
+Herdr live process/worktree observation      NOT_EXERCISED until runtime receipt
+problem-closure schema/checker/renderer       deterministic/local consistency only
+real article/PDF/provider claim closure       evidence-dependent
+#379 shared convergence docs/tests            route + deterministic convergence only
+merge/release                                HUMAN_ADMIT_REQUIRED
+```
+
+A workflow green state proves only the workflow's exact subject and denominator. It cannot convert a static adapter into live provider evidence.
 
 ## Golden refactor proof
 
@@ -208,7 +281,7 @@ The proof is registered by `skill-refactor-proof-loop`; its implementation remai
 Human merge/release admission
 ```
 
-These issues are separately owned evidence lanes, not artificial Stack children.
+The #375–#378 live lanes remain additional independent evidence work even after their static mechanisms converge. They are separately owned evidence lanes, not artificial Stack children.
 
 ## Tech Lead + Shadow closure responsibility
 
@@ -237,7 +310,7 @@ EXTERNAL_EVIDENCE   independent receipt lane, no Stack paths
 HISTORICAL          admitted/forensic prior subject, not current state authority
 ```
 
-The full portable audit and dated external-consumer example are in [`../../docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md`](../../docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md).
+The full portable audit is in [`../../docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md`](../../docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md). The current Codex control-plane trace is [`../../docs/traceability/CODEX_SDK_TECH_LEAD_CONTROL_PLANE.md`](../../docs/traceability/CODEX_SDK_TECH_LEAD_CONTROL_PLANE.md).
 
 ## Local verification
 
@@ -247,11 +320,13 @@ python3 scripts/assert_task_contract.py \
   --contract references/example-stack-contract.json \
   --receipt /tmp/agentic-tech-lead-receipt.json
 python3 scripts/assert_local_handoff_queue.py \
-  --queue references/example-local-handoff-queue.json
-python3 scripts/assert_local_handoff_queue.py \
   --queue references/example-local-handoff-queue.json --selftest
+python3 tests/codex_sdk_controller_selftest.py
+python3 tests/github_issue_dag_selftest.py
+python3 tests/herdr_observer_selftest.py
+python3 tests/problem_closure_selftest.py
 python3 tests/real_task_ab.py
 sh tests/run-all.sh
 ```
 
-A local or CI PASS validates only the named subject and evidence layer. Provider installation, index freshness, real model behavior, real queue execution, Git Town/Forgejo delivery, merge, release, and production remain separate.
+A local or CI PASS validates only the named subject and evidence layer. Provider installation, index freshness, live Codex/Herdr/GitHub mutation, real source closure, real queue execution, Git Town/Forgejo delivery, merge, release, and production remain separate.
