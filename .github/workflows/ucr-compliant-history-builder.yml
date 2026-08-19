@@ -1,0 +1,45 @@
+name: UCR Compliant History Builder
+
+on:
+  push:
+    branches:
+      - agent/406-ucr-convergence-docs
+    paths:
+      - '.github/workflows/ucr-compliant-history-builder.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    if: github.repository == 'ed3c/skills-shared'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Materialize one compliant UCR-X/D commit on a new branch
+        env:
+          BASE_SHA: ac924a66607310e3d0cc7e3c0278a341e18770f2
+          SOURCE_SHA: fe93fdec52005a18de0a0c52606691180829c9d2
+          DEST_BRANCH: agent/406-ucr-convergence-docs-v2
+        run: |
+          set -euo pipefail
+          if git ls-remote --exit-code --heads origin "refs/heads/${DEST_BRANCH}" >/dev/null 2>&1; then
+            echo "destination branch already exists; refusing to rewrite it" >&2
+            exit 2
+          fi
+          git cat-file -e "${BASE_SHA}^{commit}"
+          git cat-file -e "${SOURCE_SHA}^{commit}"
+          git diff --binary "${BASE_SHA}" "${SOURCE_SHA}" > "${RUNNER_TEMP}/ucr-xd.patch"
+          git switch --detach "${BASE_SHA}"
+          git apply --index "${RUNNER_TEMP}/ucr-xd.patch"
+          git config user.name "agent-macro"
+          git config user.email "agent-macro@ci.invalid"
+          git commit \
+            -m "feat(ucr): converge universal refactor controller" \
+            -m $'Driven-By: agent-macro\nDriven-On: ci'
+          test "$(git rev-list --count "${BASE_SHA}..HEAD")" -eq 1
+          git push origin "HEAD:refs/heads/${DEST_BRANCH}"
