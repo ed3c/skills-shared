@@ -16,7 +16,7 @@ PR #420 / #414 machine-contract branch
 provides: complete v7.2 prompt + projection schemas + Shadow design review
 ```
 
-Refresh mutable PR heads before decision-grade use. The values above are observations, not permanent truth.
+The PR #412 head above is a historical observation in this preflight note. Refresh every mutable PR head before decision-grade use; durable docs must not treat self-embedded open heads as current truth.
 
 ## Frozen terminal work packets
 
@@ -75,6 +75,7 @@ Before admitting a Worker:
 11. Does any Agent need to compose v7.1 + delta manually? If yes, prompt packaging is incomplete.
 12. Does any root/convergence document duplicate the full prompt instead of routing to one canonical artifact? If yes, BLOCK prompt divergence.
 13. If a deterministic checker proves a prompt contract defect, is the canonical prompt updated instead of hiding the failure in README prose? If no, BLOCK.
+14. Is a durable document treating a self-embedded open PR head as current truth? If yes, BLOCK until authority readback.
 
 ## Admission states
 
@@ -103,7 +104,7 @@ This stage is considered complete as a **design artifact stage** when:
 - Intent, ICPG bridge, Artifact Projection, authority, freshness, evidence ceiling, exact Stack relation semantics and bidirectional traversal are all normative parts of the prompt;
 - AGENTS/README/SKILL route to one canonical full prompt artifact;
 - Shadow review explicitly lists the remaining executable risks;
-- negative controls include prompt-authority divergence, incomplete standalone packaging and prose-only hiding of checker failure;
+- negative controls include prompt-authority divergence, incomplete standalone packaging, prose-only hiding of checker failure, and stale self-embedded open-head state;
 - #414–#418 retain distinct deterministic/live/Human evidence lanes.
 
 These conditions are now represented by repository bytes on the PR #420 candidate branch. File presence proves design packaging only.
