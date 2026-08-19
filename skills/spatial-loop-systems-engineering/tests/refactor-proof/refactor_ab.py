@@ -171,11 +171,14 @@ CRITERIA = [
         [["first_green is mandatory"], ["what did these tests not prove?"]],
         0,
     ),
+    # This criterion owns canonical route presence only. The executable
+    # system-contract suite owns 0/2/64 behavior so exit semantics are not
+    # duplicated as a prose-distance assertion here.
     (
         "contract_checker_route",
         SHARED,
         ["check_system_contract.py"],
-        [["check "], ["64"]],
+        [["check "]],
         1800,
     ),
     (
