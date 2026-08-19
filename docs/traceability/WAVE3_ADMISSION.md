@@ -2,7 +2,7 @@
 
 Status: `STATIC_DETERMINISTIC_LIVE_EVIDENCE_INFRASTRUCTURE_ADMITTED_ON_MAIN`.
 
-This record closes the public/static Wave‑3 infrastructure phase for issues #464–#468. It records the exact Human-admitted Git subjects and the post-merge reconciliation boundary. It does **not** claim that live Codex, GitHub dependency, Herdr, source/provider, release, promotion, or production effects occurred.
+This record closes the public/static Wave‑3 infrastructure phase for issues #464–#468. It records the exact Human-admitted Git subjects and the post-merge reconciliation boundary. The static admission itself does **not** prove live Codex, GitHub dependency, Herdr, source/provider, release, promotion, or production effects; later exact live receipts are appended below without rewriting the admission event.
 
 ## Admitted subjects
 
@@ -62,7 +62,7 @@ Wave 2 retained
 
 Wave 3 admitted infrastructure
   Codex live acceptance      1 positive / 12 mutations
-  GitHub DAG live canary     1 positive / 6 mutations
+  GitHub DAG live canary     1 positive / 6 mutations at initial admission
   Herdr lifecycle            2 positive / 7 mutations
   source claim compiler      4 source kinds / 11 mutations
 
@@ -71,6 +71,8 @@ Shared shape/integration
   source claims → existing problem-closure checker
   Wave‑3 Local Handoff Queue assertion
 ```
+
+Later #465 transport hardening moved the live GitHub dependency carrier to the versioned REST Issue Dependencies API and expanded its deterministic transport controls. That later repair is additive live-lane history; it does not change the Wave‑3 admission denominator above.
 
 ## Publication lineage
 
@@ -95,9 +97,7 @@ PR #480 predecessor / 1eae9b47...  HISTORICAL_AFTER_MAIN_DRIFT
   provenance-complete, but main advanced through admitted UCR work before final admission
 ```
 
-PR #479 is `SUPERSEDED_FORENSIC` and closed unmerged after #480/#484 established the admitted/current Wave‑3 route. It remains historical exact-head evidence only and is not an alternate convergence authority.
-
-No force rewrite erased any rejected or stale subject.
+No force rewrite erased either subject.
 
 ## Admission State Machine
 
@@ -113,43 +113,55 @@ WAVE3_CARRIERS_IMPLEMENTED
 → STATIC_DETERMINISTIC_WAVE3_PHASE_CLOSED
 ```
 
-## Sole live/evidence owners after Wave-3 admission
+## Post-admission live-evidence update
 
-Wave‑3 is the successor ownership layer for mutable live/evidence receipts. Wave‑2 parent issues retain immutable implementation lineage only, except for the explicitly untransferred #376 residual:
+Wave‑3 is the successor layer for mutable live/evidence ownership. Wave‑2 #375–#378 remain immutable mechanism lineage; they are not alternate live-receipt owners.
 
 ```text
 #464 live Codex SDK/controller acceptance       NOT_EXERCISED
-  predecessor lineage: #375
 
-#465 live GitHub add/readback/remove canary      NOT_EXERCISED
-  predecessor lineage: #376
+#465 bounded GitHub Issue Dependencies canary   LIVE_GITHUB_DEPENDENCY_CANARY_PASS
+  issue state                                   CLOSED / COMPLETED
+  executed base/main                            81041d1b88283fabdc1c4db05efaf8dd945e24df
+  event-only trigger PR                         #492 CLOSED / NOT_MERGED
+  trigger head                                  a977c21fd516cbd3a55bbd443da85206a22302bd
+  workflow run                                  32296935756 SUCCESS
+  receipt sha256                                da227e94215a1b28a9e550546242c8a482bd718f7b35d67f159ccaa95f23efe5
+  before.blockedBy                              []
+  applied.blockedBy                             [486]
+  cleanup.blockedBy                             []
+  execution                                     EXERCISED
+  semantic_authority                            false
+  evidence_ceiling                              REMOTE_CANARY_EDGE_ONLY
 
-#466 live Herdr lifecycle                        NOT_EXERCISED
-  predecessor lineage: #377
-
-#467 article/PDF/PRD truth                       SOURCE_PROPOSAL / EVIDENCE_DEPENDENT
-#467 real source/provider closure                EVIDENCE_DEPENDENT
-  predecessor lineage: #378
-
-#376 generic development-link ownership          RESIDUAL / NOT TRANSFERRED
-release / production promotion                   NOT_PERFORMED
+#466 live Herdr lifecycle                       NOT_EXERCISED
+#467 article/PDF/PRD truth                      SOURCE_PROPOSAL / EVIDENCE_DEPENDENT
+#467 real source/provider closure               EVIDENCE_DEPENDENT
+release / production promotion                  NOT_PERFORMED
 ```
 
-A live/evidence receipt has exactly one owning issue. Do not mirror current live state into both a Wave‑2 parent and its Wave‑3 successor. #375/#377/#378 are eligible to close as completed static-mechanism parents only after issue #485's ownership reconciliation is Human-admitted; #376 remains open while its generic development-link residual exists.
+The #465 PASS proves only the dedicated public fixture edge could be added, exactly read back, removed, and restored to the original denominator under the admitted permission-bounded workflow. It does **not** grant semantic DAG authority and does not close #376's generic development-link residual.
 
-The committed Wave‑3 Local Handoff Queue remains a continuation contract for those live lanes. Queue presence, static validation, PR merge, or this admission record cannot promote a live receipt.
+Historical live-attempt denominator is preserved:
+
+```text
+32295401831  FAIL  pre-mutation CLI blockedBy projection-shape mismatch
+32295854524  FAIL  same signature on unchanged old carrier
+#496              admitted versioned REST Issue Dependencies carrier
+32296935756  PASS  first valid remote add → readback → remove → restore receipt
+```
 
 ## Agent read order after admission
 
-For #464–#468 work after this admission:
+For #464–#468 or predecessor #375–#379 work:
 
-1. read this record for the immutable admitted static/deterministic subject and current live-owner routing;
+1. read this record for the immutable admitted Wave‑3 infrastructure and current successor ownership;
 2. re-read current `main`, issue/PR state, workflows, and runtime receipts from GitHub/runtime authority;
-3. use `CODEX_SDK_TECH_LEAD_CONTROL_PLANE_ADMISSION.md` for Wave‑2 implementation lineage, not current live-owner assignment;
-4. use `WAVE3_PARENT_ADMISSION.md` for fork/current-main transition history;
-5. use `WAVE3_LIVE_EVIDENCE.md` for carrier contracts, State Machine, deterministic denominator, and Local Handoff semantics;
-6. load the selected Agentic Tech Lead modules/scripts/contracts only when their trigger matches;
-7. route live receipts only to #464/#465/#466/#467 as declared above; keep #376's generic development-link residual in #376.
+3. use `WAVE3_PARENT_ADMISSION.md` for fork/current-main transition history;
+4. use `WAVE3_LIVE_EVIDENCE.md` for carrier contracts, State Machine, deterministic denominator, and Local Handoff semantics;
+5. load selected Agentic Tech Lead modules/scripts/contracts only when their trigger matches;
+6. route new live evidence to #464/#466/#467; #465 is a completed bounded canary subject unless a separately admitted new canary epoch is created;
+7. keep #376's generic development-link residual separate from #465's completed remote canary.
 
 If prose conflicts with current GitHub metadata, exact Git subjects, executable contracts, or runtime receipts, the machine/external subjects win.
 
