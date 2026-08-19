@@ -1,0 +1,44 @@
+{
+  "problems": [
+    {
+      "problem_id": "P-EXAMPLE-001",
+      "source": {
+        "kind": "PDF",
+        "identity": "sha256:source-document-digest",
+        "location": "page:22"
+      },
+      "claim": "An implementation claim must not be promoted beyond its verified evidence lane.",
+      "applicability": "APPLICABLE",
+      "repo_subject": {
+        "repo": "owner/example-repo",
+        "commit": "0123456789abcdef0123456789abcdef01234567",
+        "tree": "89abcdef0123456789abcdef0123456789abcdef"
+      },
+      "task_nodes": ["T1"],
+      "dag_nodes": ["DAG:T1"],
+      "issue_nodes": [123],
+      "session_attempts": [
+        {
+          "task_id": "T1",
+          "attempt_id": "a01",
+          "worktree": "/worktrees/example-123",
+          "thread_id": "codex-thread-id"
+        }
+      ],
+      "implementation_evidence": [
+        {"kind": "COMMIT", "subject": "0123456789abcdef0123456789abcdef01234567"},
+        {"kind": "PR", "subject": "owner/example-repo#456"}
+      ],
+      "verification_evidence": [
+        {"lane": "LOCAL", "subject": "selftest:problem-closure:pass"}
+      ],
+      "receipts": [
+        {"lane": "LOCAL", "subject": "selftest:problem-closure:pass"}
+      ],
+      "merge_subjects": [],
+      "shadow_verdict": "PASS",
+      "residual_gaps": [],
+      "closure": "VERIFIED_LOCAL"
+    }
+  ]
+}
