@@ -235,3 +235,81 @@ live Langfuse/OpenTelemetry production feedback        NOT_EXERCISED
 cross-model causal uplift                              NOT_EXERCISED
 actual sibling admission / abstraction promotion / merge / release  HUMAN_ADMIT_REQUIRED
 ```
+
+## Wave 3 live-evidence Shadow monitor — #464–#468
+
+Canonical trace: [`../../docs/traceability/WAVE3_LIVE_EVIDENCE.md`](../../docs/traceability/WAVE3_LIVE_EVIDENCE.md).
+
+Wave 3 adds carriers that contain words such as `live`, `EXERCISED`, or `PASS`. Shadow must treat those as **data vocabulary**, not evidence promotion. The current review graph is:
+
+```text
+#455 static/deterministic parent
+├─ #464/#469 Codex live acceptance carrier       TRUE_CHILD / SIBLING
+├─ #465/#470 GitHub DAG reversible canary        TRUE_CHILD / SIBLING
+├─ #466/#471 Herdr lifecycle carrier             TRUE_CHILD / SIBLING
+└─ #467/#472 source-claim compiler               TRUE_CHILD / SIBLING
+        ↓ exact consumed leaf bytes
+#468/#473 convergence
+        ↓
+Shadow same-subject review
+```
+
+Shadow must independently verify at least:
+
+```text
+#464
+  worker result really binds sdk_execution=EXERCISED
+  exact task/attempt/repo/base/tree and changed-file denominator agree
+  lease readback is PASS
+  controller source/diff/test readback and command digests are present
+  output is still SHADOW_PENDING, not final acceptance
+  no prompt/model prose/reasoning/auth/token/credential durability
+
+#465
+  both canary issues are explicitly owned and OPEN
+  original blockedBy denominator matches the plan
+  exactly one owned edge is added and exact-read back
+  cleanup removes only that edge and restores the original denominator
+  any unexpected drift or cleanup error is rejection, never partial PASS
+
+#466
+  all samples bind one task/attempt/repo/Git/worktree/target identity
+  pane/workspace/PID-start/native-session identity does not drift
+  timestamps do not regress
+  nonterminal samples have a live process
+  terminal state is clean with zero residue and no later sample exists
+  UNAVAILABLE_FALLBACK is not live evidence
+
+#467
+  complete problem/source denominator is preserved
+  GitHub issue identity is exact; external docs are immutable sha256 identities
+  exact locator + claim digest + manifest digest are present
+  output validates through the existing #378 closure checker
+  no verification/receipt/merge evidence is invented
+```
+
+#468 close gate additionally requires:
+
+```text
+four exact leaf heads are consumed by the multi-parent integration
+leaf relation is TRUE_CHILD of #455 and SIBLING among #464–#467
+shared run-all executes Wave 2 + Wave 3 tests without conditional skip
+10 schemas are Draft-2020-12 valid
+source example compiles into the existing closure model
+Wave-3 Local Handoff Queue validates and stays bound to immutable integration subject
+README/AGENTS/Shadow/Git Town/traceability routes agree
+hosted Skill Suites + Shared Skills Infra + Skill Eval Contract + Git Town gates are exact-head green
+```
+
+The only permissible static Wave-3 Shadow conclusion before real runtime receipts is a scoped infrastructure verdict such as `STATIC_LIVE_EVIDENCE_INFRASTRUCTURE_READY_FOR_RUNTIME_HANDOFF`. It must simultaneously retain:
+
+```text
+live Codex SDK/controller acceptance       NOT_EXERCISED
+live GitHub add/readback/remove canary      NOT_EXERCISED
+live Herdr lifecycle                       NOT_EXERCISED
+article/PDF/PRD truth                      SOURCE_PROPOSAL / EVIDENCE_DEPENDENT
+real source/provider closure               EVIDENCE_DEPENDENT
+Human Admit / merge / release              HUMAN_ADMIT_REQUIRED / NOT_PERFORMED
+```
+
+A deterministic fixture containing `sdk_execution=EXERCISED`, a canary function returning `PASS`, or a lifecycle fixture returning `DONE_CANDIDATE` cannot raise those lanes. Only exact external/runtime receipts plus the required independent readback can do so.
