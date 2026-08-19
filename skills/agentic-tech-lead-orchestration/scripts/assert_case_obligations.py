@@ -12,7 +12,10 @@ from pathlib import Path, PurePosixPath
 from typing import Any
 
 TASK_SCHEMA = "agentic-tech-lead/task-contract/v1"
+CASE_SCHEMA = "spatial-loop-case-graph/v1"
 SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
+REPO_ROOT = Path(__file__).resolve().parents[3]
+MAX_BYTES = 4 * 1024 * 1024
 
 
 class UsageError(Exception):
@@ -28,7 +31,7 @@ class Failure:
 def _read_json(path: Path) -> dict[str, Any]:
     if not path.is_file():
         raise UsageError(f"contract not found: {path}")
-    if path.stat().st_size > 4 * 1024 * 1024:
+    if path.stat().st_size > MAX_BYTES:
         raise UsageError("contract exceeds 4 MiB")
     try:
         value = json.loads(path.read_text(encoding="utf-8"))
@@ -49,11 +52,64 @@ def _canonical_digest(value: dict[str, Any]) -> str:
 def _safe_repo_path(value: Any) -> bool:
     if not isinstance(value, str) or not value or "\\" in value or value.startswith("/"):
         return False
-    return ".." not in PurePosixPath(value).parts
+    pure = PurePosixPath(value)
+    return ".." not in pure.parts and pure.parts[:1] != (".git",)
 
 
 def _list(value: Any) -> list[Any]:
     return value if isinstance(value, list) else []
+
+
+def _read_case_graph(ref: str, failures: list[Failure]) -> tuple[dict[str, Any] | None, str | None]:
+    path = (REPO_ROOT / ref).resolve()
+    try:
+        path.relative_to(REPO_ROOT.resolve())
+    except ValueError:
+        failures.append(Failure("CASE_GRAPH_BINDING", "case_graph_ref escapes repository"))
+        return None, None
+    if not path.is_file():
+        failures.append(Failure("CASE_GRAPH_ABSENT", f"case_graph_ref does not exist: {ref}"))
+        return None, None
+    try:
+        raw = path.read_bytes()
+    except OSError as exc:
+        failures.append(Failure("CASE_GRAPH_READBACK", f"cannot read case graph: {exc}"))
+        return None, None
+    if len(raw) > MAX_BYTES:
+        failures.append(Failure("CASE_GRAPH_READBACK", "case graph exceeds 4 MiB"))
+        return None, None
+    actual_digest = hashlib.sha256(raw).hexdigest()
+    try:
+        doc = json.loads(raw.decode("utf-8"))
+    except (UnicodeError, json.JSONDecodeError) as exc:
+        failures.append(Failure("CASE_GRAPH_READBACK", f"case graph is invalid JSON: {exc}"))
+        return None, actual_digest
+    if not isinstance(doc, dict) or doc.get("schema") != CASE_SCHEMA:
+        failures.append(Failure("CASE_GRAPH_READBACK", f"case graph must use {CASE_SCHEMA}"))
+        return None, actual_digest
+    return doc, actual_digest
+
+
+def _required_cases_from_graph(doc: dict[str, Any], failures: list[Failure]) -> set[str]:
+    raw_cases = doc.get("cases")
+    if not isinstance(raw_cases, list):
+        failures.append(Failure("CASE_GRAPH_READBACK", "case graph cases must be an array"))
+        return set()
+    required: set[str] = set()
+    for index, item in enumerate(raw_cases):
+        if not isinstance(item, dict):
+            failures.append(Failure("CASE_GRAPH_READBACK", f"case graph cases[{index}] must be an object"))
+            continue
+        if item.get("classification") != "REQUIRED_CASE":
+            continue
+        case_id = item.get("id")
+        if not isinstance(case_id, str) or not case_id:
+            failures.append(Failure("CASE_GRAPH_READBACK", f"required case at index {index} lacks id"))
+            continue
+        if case_id in required:
+            failures.append(Failure("CASE_GRAPH_READBACK", f"duplicate required case id in graph: {case_id}"))
+        required.add(case_id)
+    return required
 
 
 def validate(contract: dict[str, Any]) -> list[Failure]:
@@ -74,12 +130,21 @@ def validate(contract: dict[str, Any]) -> list[Failure]:
         return failures
 
     ref = sidecar.get("case_graph_ref")
-    if not _safe_repo_path(ref):
+    ref_valid = _safe_repo_path(ref)
+    if not ref_valid:
         fail("CASE_GRAPH_BINDING", "case_graph_ref must be a safe repo-relative path")
 
     digest = sidecar.get("case_graph_sha256")
-    if not isinstance(digest, str) or not SHA256_RE.fullmatch(digest):
+    digest_valid = isinstance(digest, str) and bool(SHA256_RE.fullmatch(digest))
+    if not digest_valid:
         fail("CASE_GRAPH_BINDING", "case_graph_sha256 must be immutable lowercase sha256")
+
+    graph: dict[str, Any] | None = None
+    actual_digest: str | None = None
+    if ref_valid:
+        graph, actual_digest = _read_case_graph(str(ref), failures)
+    if digest_valid and actual_digest is not None and digest != actual_digest:
+        fail("CASE_GRAPH_DIGEST_MISMATCH", f"case_graph_sha256 is stale for {ref}")
 
     branches = _list(contract.get("branches"))
     branch_names = {
@@ -89,12 +154,29 @@ def validate(contract: dict[str, Any]) -> list[Failure]:
     }
 
     required_cases = _list(sidecar.get("required_case_ids"))
-    if (
-        not required_cases
-        or any(not isinstance(case_id, str) or not case_id for case_id in required_cases)
-        or len(set(required_cases)) != len(required_cases)
-    ):
+    denominator_valid = (
+        bool(required_cases)
+        and all(isinstance(case_id, str) and bool(case_id) for case_id in required_cases)
+        and len(set(required_cases)) == len(required_cases)
+    )
+    if not denominator_valid:
         fail("CASE_DENOMINATOR", "required_case_ids must be non-empty, string, and unique")
+
+    if graph is not None and denominator_valid:
+        graph_required = _required_cases_from_graph(graph, failures)
+        packet_required = set(required_cases)
+        missing_from_packet = sorted(graph_required - packet_required)
+        invented_by_packet = sorted(packet_required - graph_required)
+        if missing_from_packet:
+            fail(
+                "CASE_DENOMINATOR_SHRINK",
+                f"task packet omits required graph cases: {', '.join(missing_from_packet)}",
+            )
+        if invented_by_packet:
+            fail(
+                "CASE_DENOMINATOR_DRIFT",
+                f"task packet invents required cases absent from graph: {', '.join(invented_by_packet)}",
+            )
 
     convergence = sidecar.get("convergence_owner")
     if not isinstance(convergence, str) or convergence not in branch_names:
@@ -172,7 +254,7 @@ def main(argv: list[str] | None = None) -> int:
             "verdict": "PASS" if not failures else "FAIL",
             "failures": [failure.__dict__ for failure in failures],
             "claims_not_proven": [
-                "truth or freshness of the referenced case-graph bytes",
+                "semantic completeness of the referenced ICPG beyond its owning checker",
                 "Worker execution",
                 "global case evidence closure",
                 "Git ancestry, publication, merge, release, promotion, or Human Admit",
