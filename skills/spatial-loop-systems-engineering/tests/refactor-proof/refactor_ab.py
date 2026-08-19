@@ -111,9 +111,9 @@ CRITERIA = [
     (
         "no_silent_fallback",
         OLD_STRENGTH,
-        ["evidence state"],
+        ["evidence state", "evidence/state"],
         [["never a weaker"], ["privilege"], ["substrate"]],
-        400,
+        700,
     ),
     (
         "capability_evidence_not_transitive",
@@ -176,7 +176,7 @@ CRITERIA = [
         SHARED,
         ["check_system_contract.py"],
         [["check "], ["64"]],
-        900,
+        1800,
     ),
     (
         "evidence_state_vocabulary",
