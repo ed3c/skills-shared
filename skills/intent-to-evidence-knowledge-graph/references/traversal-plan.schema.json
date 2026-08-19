@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "intent-to-evidence/traversal-plan/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "subject", "queries"],
+  "properties": {
+    "schema_version": {"const": "intent-to-evidence-traversal-plan/v1"},
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "ref", "sha"],
+      "properties": {
+        "repository": {"type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$"},
+        "ref": {"type": "string", "minLength": 1},
+        "sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+      }
+    },
+    "queries": {
+      "type": "array",
+      "minItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["query_id", "kind", "start_node", "expected_terminal", "decision_use", "claimed_evidence_ceiling", "max_hops"],
+        "properties": {
+          "query_id": {"type": "string", "minLength": 1},
+          "kind": {"enum": ["WHY_TO_PROOF", "IMPLEMENTATION_TO_WHY", "GAP_PROPAGATION", "AGENT_CONTEXT_ROUTE"]},
+          "start_node": {"type": "string", "minLength": 1},
+          "expected_terminal": {"type": "string", "minLength": 1},
+          "decision_use": {"type": "boolean"},
+          "claimed_evidence_ceiling": {"enum": ["L0", "L1", "L2", "L3", "L4", "L5"]},
+          "max_hops": {"type": "integer", "minimum": 1, "maximum": 16}
+        }
+      }
+    }
+  }
+}
