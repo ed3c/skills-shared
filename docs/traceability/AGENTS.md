@@ -67,14 +67,16 @@ shared tree     8a75271851f2e9dd47dd3a019c93e4a0f9272d24
 
 Historical closed-unmerged candidates remain part of the denominator. Human admission of #455 changes repository authority but does not convert any live Codex/GitHub/Herdr/source evidence lane into PASS.
 
-Wave‑2 deterministic denominator:
+Wave‑2 deterministic denominator at admission:
 
 ```text
 Codex SDK       4 positive / 14 mutations
-GitHub DAG      7 positive / 23 mutations (#497 live_readback producer controls)
+GitHub DAG      6 positive / 17 mutations
 Herdr           4 positive / 18 mutations
 problem closure 6 positive / 22 mutations
 ```
+
+Post-admission repair #497 (PR #504) extended the GitHub DAG projection selftest to 7 positive / 23 mutations with `live_readback` producer controls; the admitted-head figures above are unchanged history.
 
 ## Wave‑3 live-evidence infrastructure admission
 

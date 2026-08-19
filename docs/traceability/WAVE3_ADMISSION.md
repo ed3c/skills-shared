@@ -54,9 +54,9 @@ Git Town Stacked PR Worker    run 32286000382  SUCCESS
 ## Deterministic denominator
 
 ```text
-Wave 2 retained
+Wave 2 retained at admission
   Codex SDK adapter          4 positive / 14 mutations
-  GitHub DAG projection      7 positive / 23 mutations (#497 live_readback producer controls)
+  GitHub DAG projection      6 positive / 17 mutations
   Herdr observer             4 positive / 18 mutations
   problem closure            6 positive / 22 mutations
 
@@ -81,6 +81,8 @@ Shared shape/integration
 ```
 
 The extra GitHub live-canary controls were admitted after the original static Wave‑3 merge through the #465 hosted execution/repair line. They strengthen the same bounded mechanism and do not widen authority.
+
+Post-admission repair #497 (PR #504) extended the GitHub DAG projection selftest to 7 positive / 23 mutations with `live_readback` producer controls; the Wave‑2 at-admission figures above are unchanged history.
 
 ## Publication lineage
 
