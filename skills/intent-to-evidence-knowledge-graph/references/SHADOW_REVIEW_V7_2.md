@@ -52,6 +52,10 @@ Every edge must support a declared decision, causal, implementation, authority, 
 
 The prompt forbids presenting frozen ICPG coverage as universal all-edge-case completeness; live Shadow/runtime/incident feedback remains the unknown-unknown discovery lane.
 
+### PASS — prompt authority is singular at the repository-design layer
+
+Nearest AGENTS/README/SKILL route fresh Agents to one complete `SYSTEM_PROMPT_V7_2.md`. The delta file is explicitly maintenance-only, and prompt-divergence/incomplete-packaging cases are now part of the Shadow negative-control matrix.
+
 ## Remaining deterministic risks
 
 These are not prompt-design blockers; they belong to #414–#416 executable controls:
@@ -63,7 +67,8 @@ These are not prompt-design blockers; they belong to #414–#416 executable cont
 5. reverse-trace completeness needs a graph assertion;
 6. authority precedence and evidence-ceiling laundering need executable negative controls;
 7. Graph utility/no-connectivity-inflation needs a machine representation of edge purpose;
-8. live #418 GraphRAG/Shadow quality remains NOT_EXERCISED.
+8. prompt-authority divergence must become an executable check, not remain prose-only;
+9. live #418 GraphRAG/Shadow quality remains NOT_EXERCISED.
 
 ## Stage verdict
 
@@ -75,10 +80,11 @@ ICPG_NON_DUPLICATION                     SPECIFIED
 INTENT_TO_EVIDENCE_TRACE                 SPECIFIED
 AUTHORITY/FRESHNESS/EVIDENCE_CEILING     SPECIFIED
 BIDIRECTIONAL_GRAPH_TRAVERSAL            SPECIFIED
+PROMPT_DIVERGENCE_CONTROLS               SPECIFIED
 DETERMINISTIC_CHECKER                    NOT_IMPLEMENTED
 MUTATION_EXECUTION                       NOT_EXERCISED
 LIVE_GRAPHRAG_SHADOW                     NOT_EXERCISED
 HUMAN_ADMIT                              REQUIRED
 ```
 
-The prompt-design stage is complete. The next Tech Lead frontier is executable checker/tests, not another prompt rewrite unless a deterministic control proves the current prompt contract insufficient.
+The **prompt-design stage is complete**. The next Tech Lead frontier is executable checker/tests, not another prompt rewrite unless a deterministic control proves the current prompt contract insufficient.
