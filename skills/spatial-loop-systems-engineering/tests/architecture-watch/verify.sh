@@ -14,16 +14,16 @@ need() {
 
 watch_case_contract() {
   local file="$1"
-  grep -Fq -- 'INTENT_INTERPRETATION_DELTA' "$file" &&
-  grep -Fq -- 'SCOPE_REDUCTION_DELTA' "$file" &&
-  grep -Fq -- 'SEMANTIC_PARITY_DELTA' "$file" &&
-  grep -Fq -- 'SOURCE_BEHAVIOR_DISPOSITION_DELTA' "$file" &&
-  grep -Fq -- 'Which existing or new case covers it?' "$file" &&
-  grep -Fq -- 'Did this change silently narrow scope?' "$file" &&
-  grep -Fq -- 'Use when a required case/oracle is missing, source-behavior disposition changed, or prompt interpretation narrowed semantics without authority.' "$file" &&
-  grep -Fq -- 'source logic is being implicitly dropped' "$file" &&
-  grep -Fq -- 'Did compatibility remain green while semantic parity regressed?' "$file" &&
-  grep -Fq -- 'FIRST_GREEN` cannot erase an unresolved required case or `UNKNOWN_BLOCKING` member.' "$file"
+  grep -Fq -- 'INTENT_INTERPRETATION_DELTA' "$file" || return 2
+  grep -Fq -- 'SCOPE_REDUCTION_DELTA' "$file" || return 2
+  grep -Fq -- 'SEMANTIC_PARITY_DELTA' "$file" || return 2
+  grep -Fq -- 'SOURCE_BEHAVIOR_DISPOSITION_DELTA' "$file" || return 2
+  grep -Fq -- 'Which existing or new case covers it?' "$file" || return 2
+  grep -Fq -- 'Did this change silently narrow scope?' "$file" || return 2
+  grep -Fq -- 'Use when a required case/oracle is missing, source-behavior disposition changed, or prompt interpretation narrowed semantics without authority.' "$file" || return 2
+  grep -Fq -- 'source logic is being implicitly dropped' "$file" || return 2
+  grep -Fq -- 'Did compatibility remain green while semantic parity regressed?' "$file" || return 2
+  grep -Fq -- 'FIRST_GREEN` cannot erase an unresolved required case or `UNKNOWN_BLOCKING` member.' "$file" || return 2
 }
 
 need "$skill" 'default_mode: "MONITOR"'
