@@ -64,34 +64,70 @@ STATIC_MECHANISMS_IMPLEMENTED
 → HUMAN_ADMIT
 → MERGED_ON_MAIN
 → STATIC_DETERMINISTIC_PHASE_CLOSED
+→ LIVE_SUCCESSOR_OWNERSHIP_TRANSFERRED          #485
 ```
 
-The next phases are independent evidence/process lanes; they do not reopen or rewrite this admission record.
+The live successor phase does not reopen or rewrite this admission record's immutable Git subjects or deterministic denominators. It changes only which issue/lane owns future mutable evidence.
 
-## Remaining evidence owners
+## Successor ownership transfer — #485
+
+Wave‑2 issue numbers now represent immutable static/deterministic mechanism lineage unless a residual is explicitly retained below. Current live/evidence ownership is singular:
 
 ```text
-#375 live Codex SDK execution                      NOT_EXERCISED
-#376 live GitHub dependency mutation/readback      NOT_EXERCISED
-#376 generic development-link ownership            RESIDUAL
-#377 live Herdr observation                        NOT_EXERCISED
-#378 real article/PDF/provider closure             EVIDENCE_DEPENDENT
-release / production promotion                     NOT_PERFORMED
+Wave-2 static parent / mechanism          Current live/evidence owner
+#375 Codex SDK adapter                    #464 live Codex SDK/controller acceptance
+#376 GitHub dependency projection         #465 reversible GitHub dependency canary
+#377 Herdr observer                       #466 live Herdr lifecycle
+#378 problem-closure mechanism            #467 article/PDF/PRD + real source/provider evidence
 ```
 
-Issues #375–#378 remain the owners of those live/residual lanes. Closing or merging #455 does not convert them to PASS.
+Current evidence at the transfer boundary is intentionally asymmetric:
 
-## Agent read order after admission
+```text
+#464 live Codex SDK/controller acceptance       NOT_EXERCISED
+#465 GitHub dependency canary                    LIVE_GITHUB_DEPENDENCY_CANARY_PASS
+                                                  REMOTE_CANARY_EDGE_ONLY
+#466 live Herdr lifecycle                        NOT_EXERCISED
+#467 article/PDF/PRD truth                       SOURCE_PROPOSAL / EVIDENCE_DEPENDENT
+#467 real source/provider closure                EVIDENCE_DEPENDENT
+release / production promotion                   NOT_PERFORMED
+```
 
-For #375–#379 work after this merge:
+The #465 receipt is a later Wave‑3 runtime/evidence subject and does not retroactively turn #376's static projection into a live PASS. Its exact durable state is owned by `WAVE3_ADMISSION.md`, `WAVE3_LIVE_EVIDENCE.md`, current GitHub metadata, and the runtime receipt.
 
-1. read this admission record;
-2. read current `main` and GitHub issue/PR/workflow metadata;
-3. use `CODEX_SDK_TECH_LEAD_CONTROL_PLANE.md` for the pre-admission design, State Machine, denominator, failure history, and evidence ceilings;
-4. load the selected Agentic Tech Lead module/contracts only when their trigger matches;
-5. keep #375–#378 live evidence in their owning issue/runtime lane.
+One residual is **not** transferred:
 
-If prose conflicts with current GitHub metadata, exact Git subjects, executable contracts, or runtime receipts, those machine/external subjects win. A later live receipt appends evidence; it does not mutate this historical static/deterministic admission.
+```text
+#376 generic development-link ownership          RESIDUAL / #376 remains open
+```
+
+That residual is distinct from the admitted reversible Issue Dependencies fixture canary and must be closed by its own exact evidence/decision. Therefore #376 remains an active residual owner while #375, #377, and #378 may close as completed static mechanism parents once this ownership transfer is Human-admitted.
+
+## Historical residuals vs current evidence owners
+
+```text
+#375 static Codex mechanism                      COMPLETED_STATIC_PARENT → #464
+#376 static GitHub DAG mechanism                 COMPLETED_STATIC_PARENT
+#376 generic development-link residual           RESIDUAL / remains #376
+#377 static Herdr observer                       COMPLETED_STATIC_PARENT → #466
+#378 static problem-closure mechanism            COMPLETED_STATIC_PARENT → #467
+```
+
+No Wave‑2 static issue is allowed to compete with its Wave‑3 successor as mutable live-evidence authority. Closing a completed static parent does not promote the successor's evidence state, and a successor PASS does not rewrite the historical Wave‑2 admission.
+
+## Agent read order after ownership transfer
+
+For #375–#379 lineage or #464–#467 live work:
+
+1. read this record for immutable Wave‑2 admission facts, deterministic denominators, and the successor map;
+2. read `WAVE3_ADMISSION.md` for current live/evidence ownership and admitted Wave‑3 subjects;
+3. read `WAVE3_LIVE_EVIDENCE.md` for live carrier contracts, exact runtime receipts, and current evidence ceilings;
+4. re-read current `main` and GitHub issue/PR/workflow metadata;
+5. use `CODEX_SDK_TECH_LEAD_CONTROL_PLANE.md` for pre-admission design, failure history, and mechanism details;
+6. load the selected Agentic Tech Lead module/contracts only when their trigger matches;
+7. keep #376's generic development-link residual separate from #465's bounded Issue Dependencies canary.
+
+If prose conflicts with current GitHub metadata, exact Git subjects, executable contracts, or runtime receipts, those machine/external subjects win. A later live receipt appends evidence in its Wave‑3 owner lane; it does not mutate this historical static/deterministic admission.
 
 Driven-By: human
 Driven-On: chatgpt-github-connector

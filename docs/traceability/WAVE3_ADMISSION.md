@@ -158,9 +158,29 @@ semantic_authority            false
 evidence_ceiling              REMOTE_CANARY_EDGE_ONLY
 ```
 
-All mutation, receipt-validation, and evidence-publication workflow steps succeeded. The event PR was then closed unmerged by design. The two fixture issues remained OPEN with their ownership label after cleanup, independently confirming their state did not move during the canary.
+All mutation, receipt-validation, and evidence-publication workflow steps succeeded. The event PR was then closed unmerged by design. The two fixture issues remained OPEN with their ownership label after cleanup, independently confirming their state did not move during the canary; they were retired/closed only after #465 closure.
 
 This establishes one real reversible GitHub Issue Dependencies fixture edge and cleanup/readback contract. It does not establish semantic task-DAG truth, arbitrary issue-mutation safety, Codex/Herdr execution, source/provider closure, release, promotion, or production safety.
+
+## Successor ownership reconciliation — #485
+
+Wave‑3 is the sole mutable owner of the live/evidence lanes that extend the admitted Wave‑2 mechanisms. `CODEX_SDK_TECH_LEAD_CONTROL_PLANE_ADMISSION.md` retains immutable Wave‑2 Git history and deterministic denominators, but it no longer owns future live receipts except for the separately retained #376 residual below.
+
+```text
+Wave-2 mechanism lineage                     Wave-3 live/evidence successor
+#375 Codex SDK adapter                       #464 live Codex SDK/controller acceptance
+#376 GitHub Issue Dependencies projection    #465 reversible GitHub dependency canary
+#377 Herdr observer                          #466 live Herdr lifecycle
+#378 problem-closure mechanism               #467 article/PDF/PRD + source/provider evidence
+```
+
+This transfer does not promote evidence. The current successor states remain exactly those shown below. #375, #377, and #378 may close as completed static mechanism parents after #485 admission; #376 must remain open because generic development-link ownership was not transferred and remains a distinct residual.
+
+```text
+#376 generic development-link ownership      RESIDUAL / still owned by #376
+```
+
+A Wave‑3 successor receipt appends new evidence only in its successor lane. It never retroactively rewrites the Wave‑2 static admission or turns a different residual into PASS.
 
 ## Remaining evidence owners
 
@@ -171,6 +191,7 @@ This establishes one real reversible GitHub Issue Dependencies fixture edge and 
 #466 live Herdr lifecycle                        NOT_EXERCISED
 #467 article/PDF/PRD truth                       SOURCE_PROPOSAL / EVIDENCE_DEPENDENT
 #467 real source/provider closure                EVIDENCE_DEPENDENT
+#376 generic development-link residual           RESIDUAL
 release / production promotion                   NOT_PERFORMED
 ```
 
@@ -178,14 +199,15 @@ release / production promotion                   NOT_PERFORMED
 
 ## Agent read order after admission
 
-For #464–#468 work after this admission:
+For #375–#379 lineage or #464–#468 live work after this admission:
 
-1. read this record for the immutable admitted static/deterministic subject plus the bounded #465 remote receipt;
-2. re-read current `main`, issue/PR state, workflows, and runtime receipts from GitHub/runtime authority;
-3. use `WAVE3_PARENT_ADMISSION.md` for fork/current-main transition history;
-4. use `WAVE3_LIVE_EVIDENCE.md` for carrier contracts, State Machine, deterministic denominator, #465 receipt, and Local Handoff semantics;
-5. load the selected Agentic Tech Lead modules/scripts/contracts only when their trigger matches;
-6. keep live #464/#466 and source/provider #467 evidence in the owning runtime/evidence lane.
+1. read this record for the immutable admitted Wave‑3 subject, bounded #465 remote receipt, and current successor ownership;
+2. read `CODEX_SDK_TECH_LEAD_CONTROL_PLANE_ADMISSION.md` for immutable Wave‑2 admission facts and the same successor map;
+3. re-read current `main`, issue/PR state, workflows, and runtime receipts from GitHub/runtime authority;
+4. use `WAVE3_PARENT_ADMISSION.md` for fork/current-main transition history;
+5. use `WAVE3_LIVE_EVIDENCE.md` for carrier contracts, State Machine, deterministic denominator, #465 receipt, and Local Handoff semantics;
+6. load the selected Agentic Tech Lead modules/scripts/contracts only when their trigger matches;
+7. keep #376's generic development-link residual separate from #465's bounded Issue Dependencies canary.
 
 If prose conflicts with current GitHub metadata, exact Git subjects, executable contracts, or runtime receipts, the machine/external subjects win.
 
