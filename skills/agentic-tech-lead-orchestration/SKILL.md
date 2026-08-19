@@ -83,11 +83,11 @@ DELIVERY_HANDOFF
    Any non-zero result blocks dispatch.
 9. Admit parallel workers only when scopes are disjoint and prerequisites/capabilities are satisfied. A case relation alone is not a Git parent edge; use a true child only when unmerged parent bytes/contracts/state are consumed.
 10. Build each Worker packet from the frozen contract and `references/fanout-prompt.md`. Include owned case IDs and their acceptance/oracle obligations.
-11. Execute attempts with unique identities, observable artifacts, bounded retries, and no private-reasoning requirement.
+11. Before `ATTEMPTS_EXECUTED`, require the cumulative capability gate to close any selected executor transition. Execute attempts with unique identities, observable artifacts, bounded retries, and no private-reasoning requirement.
 12. Verify every result independently; stale/wrong-subject/out-of-lease results fail closed and remain in the denominator.
-13. Compare valid candidates on frozen correctness, case coverage, risk, cost, reviewability, and rollback criteria rather than model preference.
+13. Before `CANDIDATES_COMPARED`, close any selected tournament transition. Compare valid candidates on frozen correctness, case coverage, risk, cost, reviewability, and rollback criteria rather than model preference.
 14. Converge shared indexes/contracts/state through the one declared convergence owner after prerequisites are verified.
-15. Assert both local task oracles and the frozen global objective/case denominator. A terminal leaf PASS cannot hide an unowned, unverified, or failed required case.
+15. Before `DELIVERY_HANDOFF`, close any selected delivery transition. Assert both local task oracles and the frozen global objective/case denominator. A terminal leaf PASS cannot hide an unowned, unverified, or failed required case. Merge/release/promotion remain Human/repository authority.
 16. Classify every unresolved terminal item. Continue in-session when evidence can still be produced here; compile a Local Handoff Execution Queue only for a genuine physical-host, private-forge, signed-in carrier, provider-session, device, or Human-admission boundary.
 17. Validate any handoff queue before transfer and preserve exact subject, rollback identity, cleanup requirement, evidence ceiling, and Human-owned operations.
 
