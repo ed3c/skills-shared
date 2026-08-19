@@ -10,7 +10,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any
 
 TERMINAL_STATES = {"completed", "failed", "interrupted"}
@@ -37,6 +37,24 @@ def _walk_keys(value: Any, prefix: str = ""):
             yield from _walk_keys(item, f"{prefix}[{idx}]")
 
 
+def _repo_path(value: str) -> PurePosixPath:
+    raw = value.replace("\\", "/").strip()
+    path = PurePosixPath(raw)
+    if not raw or path.is_absolute() or ".." in path.parts:
+        raise ContractError(f"lease path must stay repository-relative: {value!r}")
+    parts = tuple(part for part in path.parts if part not in (".", ""))
+    if not parts:
+        raise ContractError(f"lease path must not be empty: {value!r}")
+    return PurePosixPath(*parts)
+
+
+def _paths_overlap(left: str, right: str) -> bool:
+    a = _repo_path(left).parts
+    b = _repo_path(right).parts
+    shorter = min(len(a), len(b))
+    return a[:shorter] == b[:shorter]
+
+
 def validate_manifest(data: dict[str, Any]) -> None:
     required = {
         "task_id", "attempt_id", "repo", "base_sha", "tree_sha", "worktree",
@@ -58,9 +76,16 @@ def validate_manifest(data: dict[str, Any]) -> None:
         if not isinstance(data[field], list) or not all(isinstance(x, str) and x for x in data[field]):
             raise ContractError(f"{field} must be a list of non-empty strings")
 
-    overlap = sorted(set(data["allowed_paths"]) & set(data["read_only_paths"]))
-    if overlap:
-        raise ContractError(f"writable/read-only lease overlap: {overlap}")
+    for path in [*data["allowed_paths"], *data["read_only_paths"]]:
+        _repo_path(path)
+    overlaps = sorted(
+        f"{allowed} <-> {readonly}"
+        for allowed in data["allowed_paths"]
+        for readonly in data["read_only_paths"]
+        if _paths_overlap(allowed, readonly)
+    )
+    if overlaps:
+        raise ContractError(f"writable/read-only lease overlap: {overlaps}")
 
     if data["prompt_digest"] != _digest(data["prompt"]):
         raise ContractError("prompt_digest does not match prompt bytes")
@@ -143,12 +168,7 @@ def execute(data: dict[str, Any]) -> dict[str, Any]:
             output_schema=data.get("output_schema"),
         )
         status = _status_value(result.status)
-        thread_id = getattr(thread, "id", None)
-        if not thread_id:
-            try:
-                thread_id = getattr(thread.read(), "id", None)
-            except Exception:
-                thread_id = None
+        thread_id = thread.id
 
     return {
         "schema_version": 1,
