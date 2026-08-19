@@ -4,7 +4,7 @@ Thin composition layer for capability-preserving complexity reduction across Ski
 
 ## Current evidence ceiling
 
-The method has bounded cross-domain evidence from one Skill canary and one ordinary-repository canary. That proves the same composition can survive two materially different target classes under the declared oracles. It does **not** prove universal correctness, unseen repositories, production safety, live-model uplift, merge, release, promotion, or rollback.
+The method has bounded cross-domain evidence from one Skill canary and one ordinary-repository canary. That proves the same composition can survive two materially different target classes under the declared oracles. It does **not** prove universal correctness, unseen repositories, production safety, live-model uplift, release, promotion, or rollback.
 
 Current durable states:
 
@@ -15,12 +15,14 @@ UCR-A target adapters                         STATIC_CONTRACT_VERIFIED
 Skill canary                                  REMOTE_SKILL_SUITE_VERIFIED
 ordinary-repository canary                    REMOTE_REPOSITORY_VERIFIED
 whole-subject Skill Suites / shared infra     REMOTE_REPOSITORY_CI_VERIFIED
+UCR-X/D shared convergence                    REMOTE_INTEGRATION_VERIFIED
+current-main landing / PR #477                PR_DRAFT / REVERIFY_CURRENT_MAIN
 Golden Refactor promotion                     HOLD_UNMERGED
 live provider / production                    NOT_EXERCISED
-merge / release / promotion                   HUMAN_ADMIT_REQUIRED
+release / promotion / rollback                HUMAN_ADMIT_REQUIRED
 ```
 
-The canary ledger under `evals/canaries/` records issue/PR/workflow identities without embedding mutable open PR head SHAs as durable truth.
+The canary ledger under `evals/canaries/` records issue/PR/workflow identities without embedding mutable open PR head SHAs as durable truth. Mutable landing state is read from GitHub; this README records only the stable routing identity.
 
 ## Read order
 
@@ -118,7 +120,11 @@ The current program is a fan-out/fan-in graph, not a fake linear Stack:
                                            │
                                            ├─ validation PR #461
                                            └─→ #406 / PR #463  UCR-X/D
+                                                   │
+                                                   └─→ #398 / PR #477  current-main landing
 ```
+
+PR #477 is deliberately rebuilt on the then-current admitted `main` rather than importing the stale UCR branch ancestry. The landing preserves the independently admitted #375–#379 Tech Lead/Shadow/Codex control-plane bytes and revalidates the combined exact subject before checked-head merge.
 
 Independent support/evidence leaves discovered by the canaries stay outside the semantic ancestry:
 
@@ -157,6 +163,8 @@ residue/regression search
 git-town-stacked-pr-worker delivery graph
         ↓
 remote receipts / Local Handoff / Human Admit
+        ↓
+current-main semantic union / exact-head revalidation / checked-head merge
 ```
 
 Adapters may add constraints or reduce authority. They never decide simplification, hide a consumer, turn missing/live evidence into PASS, or copy consumer mutable state into the portable core.
@@ -230,4 +238,4 @@ A handoff records exact subject, required command/oracle, expected receipt, bloc
 
 ## Completion rule
 
-A repository or Skill refactor is not closed because code became shorter or tests are green. Closure requires exact-subject capability preservation, admitted entropy/root-cause evidence, independent Shadow review, matched proof at the claimed layer, strict non-LOC Complexity Delta, residue/regression proof, and delivery state appropriate to the claim. Unseen domains, live production, merge and release remain separate claims.
+A repository or Skill refactor is not closed because code became shorter or tests are green. Closure requires exact-subject capability preservation, admitted entropy/root-cause evidence, independent Shadow review, matched proof at the claimed layer, strict non-LOC Complexity Delta, residue/regression proof, and delivery state appropriate to the claim. Unseen domains, live production, release and promotion remain separate claims; merge state is read from the forge rather than inferred from this document.
