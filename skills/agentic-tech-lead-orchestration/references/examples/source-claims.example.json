@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "repo_subject": {
+    "repo": "ed3c/skills-shared",
+    "commit": "847e56c3418fce920c42d983e84ee44fdc6e8971",
+    "tree": "8a75271851f2e9dd47dd3a019c93e4a0f9272d24"
+  },
+  "claims": [
+    {
+      "problem_id": "P-EXAMPLE",
+      "kind": "GITHUB_ISSUE",
+      "identity": "ed3c/skills-shared#378",
+      "location": "issue body / Goal",
+      "claim": "Issue or PR state must not be mistaken for real problem closure.",
+      "applicability": "APPLICABLE",
+      "task_nodes": ["source-compiler-example"],
+      "dag_nodes": ["D-SOURCE-EXAMPLE"],
+      "issue_nodes": [378]
+    }
+  ]
+}
