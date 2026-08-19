@@ -2,6 +2,12 @@
 
 Use this Skill when a task must connect evidence-rich knowledge cards or source analysis to implementation traceability across Spatial Loop ICPG, Tech Lead tasks/issues, Git Town Stack PRs, governed Agent documentation and exact-subject evidence.
 
+## Canonical runtime prompt
+
+Use [`references/SYSTEM_PROMPT_V7_2.md`](references/SYSTEM_PROMPT_V7_2.md) as the complete reusable Zettelkasten v7.2 system prompt.
+
+`references/SYSTEM_PROMPT_V7_2_DELTA.md` is maintenance/history only. Do not require an Agent to manually compose v7.1 + delta, and do not create a second full prompt copy in root docs or another Skill.
+
 ## Core law
 
 Never create a second truth graph when a lower-level authority already exists.
@@ -68,7 +74,7 @@ CURRENT_VERSION_OF
 HISTORICAL_VERSION_OF
 ```
 
-A semantic relation between cases, concepts or artifacts never creates Git parentage.
+A semantic relation between cases, concepts or artifacts never creates Git parentage. `TRUE_CHILD` requires an actual consumed unmerged artifact.
 
 ## Authority precedence
 
@@ -122,6 +128,10 @@ Use repository proof layers L0–L5. The graph answer must report the minimum re
 
 Do not optimize for graph degree. Keep an edge only if it supports at least one declared causal, implementation, authority, evidence, contradiction or retrieval traversal. If removing an edge changes no valid multi-hop answer, the edge is likely noise.
 
+## Prompt authority law
+
+`references/SYSTEM_PROMPT_V7_2.md` is the one complete prompt artifact. Root/consumer docs may route to it but must not maintain a divergent full copy. A deterministic control that proves the prompt insufficient may trigger an update to the canonical artifact; it must not create a parallel prompt authority.
+
 ## Shadow Architect questions
 
 At every material graph change ask:
@@ -134,6 +144,7 @@ At every material graph change ask:
 6. Can every required case trace forward to an owner, oracle and evidence state?
 7. Did a low proof layer get promoted by aggregation or prose?
 8. Did we add weak links only to make GraphRAG appear more connected?
+9. Did any root/convergence surface fork a second v7.2 prompt instead of routing to the canonical one?
 
 ## Completion boundary
 
