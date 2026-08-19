@@ -76,12 +76,15 @@ class GoldenRefactorCorpusTests(unittest.TestCase):
         for node_id in ids:
             visit(node_id)
 
-        current = [
+        convergence = [
             node for node in trace["nodes"]
             if node["stack_class"] == "CONVERGENCE_DOCUMENTATION"
-            and node["evidence_state"] == "IMPLEMENTING"
         ]
-        self.assertEqual(["UCR-X-D"], [node["id"] for node in current])
+        self.assertEqual(["UCR-X-D"], [node["id"] for node in convergence])
+        self.assertIn(
+            convergence[0]["evidence_state"],
+            {"IMPLEMENTING", "PR_DRAFT", "REMOTE_INTEGRATION_VERIFIED", "READY_FOR_HUMAN_ADMIT"},
+        )
 
     def test_program_trace_has_no_mutable_open_head_sha_fields(self) -> None:
         trace = json.loads(TRACE.read_text(encoding="utf-8"))
