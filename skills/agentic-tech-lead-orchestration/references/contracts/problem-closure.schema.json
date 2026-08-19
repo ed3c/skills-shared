@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ed3c/skills-shared/skills/agentic-tech-lead-orchestration/problem-closure.schema.json",
+  "title": "Problem Closure Ledger",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["problems"],
+  "properties": {
+    "problems": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/problem"}
+    }
+  },
+  "$defs": {
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repo", "commit", "tree"],
+      "properties": {
+        "repo": {"type": "string", "pattern": "^[^/]+/[^/]+$"},
+        "commit": {"type": "string", "minLength": 7},
+        "tree": {"type": "string", "minLength": 7}
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "identity", "location"],
+      "properties": {
+        "kind": {"type": "string", "minLength": 1},
+        "identity": {"type": "string", "minLength": 1},
+        "location": {"type": "string", "minLength": 1}
+      }
+    },
+    "sessionAttempt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["task_id", "attempt_id", "worktree"],
+      "properties": {
+        "task_id": {"type": "string", "minLength": 1},
+        "attempt_id": {"type": "string", "minLength": 1},
+        "worktree": {"type": "string", "minLength": 1},
+        "thread_id": {"type": ["string", "null"], "minLength": 1}
+      }
+    },
+    "implementationEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "subject"],
+      "properties": {
+        "kind": {"enum": ["COMMIT", "PR", "MERGE_SUBJECT", "SOURCE_DIFF", "GENERATED_ARTIFACT"]},
+        "subject": {"type": "string", "minLength": 1}
+      }
+    },
+    "verificationEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["lane", "subject"],
+      "properties": {
+        "lane": {"enum": ["LOCAL", "CI", "PROVIDER_LIVE", "HUMAN", "RELEASE"]},
+        "subject": {"type": "string", "minLength": 1}
+      }
+    },
+    "problem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "problem_id", "source", "claim", "applicability", "repo_subject",
+        "task_nodes", "dag_nodes", "issue_nodes", "session_attempts",
+        "implementation_evidence", "verification_evidence", "receipts",
+        "merge_subjects", "shadow_verdict", "residual_gaps", "closure"
+      ],
+      "properties": {
+        "problem_id": {"type": "string", "minLength": 1},
+        "source": {"$ref": "#/$defs/source"},
+        "claim": {"type": "string", "minLength": 1},
+        "applicability": {"enum": ["APPLICABLE", "NOT_APPLICABLE", "SUPERSEDED"]},
+        "applicability_rationale": {"type": "string", "minLength": 1},
+        "superseded_by": {"type": "string", "minLength": 1},
+        "repo_subject": {"$ref": "#/$defs/subject"},
+        "task_nodes": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+        "dag_nodes": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+        "issue_nodes": {"type": "array", "items": {"type": "integer", "minimum": 1}, "uniqueItems": true},
+        "session_attempts": {"type": "array", "items": {"$ref": "#/$defs/sessionAttempt"}},
+        "implementation_evidence": {"type": "array", "items": {"$ref": "#/$defs/implementationEvidence"}},
+        "verification_evidence": {"type": "array", "items": {"$ref": "#/$defs/verificationEvidence"}},
+        "receipts": {"type": "array", "items": {"$ref": "#/$defs/verificationEvidence"}},
+        "merge_subjects": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+        "shadow_verdict": {"enum": ["PASS", "FAIL", "PARTIAL", "NOT_REVIEWED"]},
+        "residual_gaps": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "requires_human": {"type": "boolean"},
+        "closure": {"enum": ["OPEN", "PARTIAL", "IMPLEMENTED_UNVERIFIED", "VERIFIED_LOCAL", "VERIFIED_LIVE", "NOT_APPLICABLE", "HUMAN_ADMIT_REQUIRED"]}
+      }
+    }
+  }
+}
