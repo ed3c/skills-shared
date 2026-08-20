@@ -1,0 +1,105 @@
+{
+  "authority": {
+    "automation_forbidden": [
+      "merge",
+      "force_push",
+      "issue_close",
+      "queue_advance",
+      "provider_activation",
+      "semantic_conflict_resolution"
+    ],
+    "human_owned": [
+      "merge",
+      "promotion",
+      "rollback",
+      "permission_change",
+      "semantic_conflict_resolution"
+    ]
+  },
+  "current": {
+    "active_item": "source-evidence-compile",
+    "state": "ACTIVE"
+  },
+  "items": [
+    {
+      "entry": {
+        "predecessor": null,
+        "required_capabilities": [
+          "immutable-source-bytes",
+          "exact-source-locator",
+          "caller-supplied-source-sha256",
+          "python3",
+          "exact-repository-commit-tree"
+        ],
+        "required_subject_commit": "249abc47847f8295b1c75c9d4c84457c5126fd89"
+      },
+      "exit": {
+        "cleanup_required": false,
+        "required_verdict": "PASS",
+        "requires_receipt": true
+      },
+      "id": "source-evidence-compile",
+      "next": null,
+      "receipt": {
+        "forbidden_promotions": [
+          "compiler_pass_to_source_truth",
+          "source_binding_to_applicability_pass",
+          "implemented_unverified_to_verified_without_receipt",
+          "article_pdf_prd_prose_to_provider_execution"
+        ],
+        "path": "data/handoff/source-evidence/problem-closure-ledger.json",
+        "required_states": [
+          "PASS",
+          "FAIL",
+          "ABSENT",
+          "HUMAN_ADMIT_REQUIRED"
+        ],
+        "schema": "agentic-tech-lead/problem-closure/v1"
+      },
+      "runtime_lane": {
+        "class": "LOCAL_RUNTIME",
+        "commands": [
+          {
+            "argv": [
+              "python3",
+              "skills/agentic-tech-lead-orchestration/scripts/compile_source_claims.py",
+              "data/handoff/source-evidence/source-claims.json",
+              "--output",
+              "data/handoff/source-evidence/problem-closure-ledger.json"
+            ],
+            "cwd": ".",
+            "environment_names": [],
+            "timeout_seconds": 120
+          },
+          {
+            "argv": [
+              "python3",
+              "skills/agentic-tech-lead-orchestration/scripts/check_problem_closure.py",
+              "data/handoff/source-evidence/problem-closure-ledger.json"
+            ],
+            "cwd": ".",
+            "environment_names": [],
+            "timeout_seconds": 120
+          }
+        ],
+        "live_evidence_required": false,
+        "unresolved_operations": [
+          {
+            "operation_id": "materialize-immutable-source-claims-packet",
+            "required_output": "CONCRETE_COMMAND_CONTRACT",
+            "resolver_source": "Issue #467, exact ARTICLE/PDF/PRD or GitHub Issue bytes, immutable identity, exact locator, claim text, applicability owner, and current repository subject"
+          }
+        ]
+      },
+      "state": "ACTIVE",
+      "task_ref": "issue-467-immutable-source-to-closure-ledger"
+    }
+  ],
+  "schema_version": "agentic-tech-lead/local-handoff-queue/v1",
+  "subject": {
+    "commit": "249abc47847f8295b1c75c9d4c84457c5126fd89",
+    "repository": "ed3c/skills-shared",
+    "rollback_commit": "d5993267e03b217dcdab9702dab0400ab03df860",
+    "tree": "a24b9b7ace6f4022967d41262ecdc704d5c11646"
+  }
+}
