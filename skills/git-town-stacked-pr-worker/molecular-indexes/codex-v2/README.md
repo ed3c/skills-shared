@@ -53,7 +53,7 @@ A source PR can be `CLOSED_UNMERGED / CONSUMED` while its exact bytes are presen
 | `C2-K` | #505/#507 | merged | deterministic result-tree binder, `1/16` |
 | `C2-DURABLE` | #508 | active | `NOT_IMPLEMENTED` until independent durable replay |
 
-The active local handoff queue is `../../agentic-tech-lead-orchestration/runtime-handoff/codex-v2-local-handoff-queue.json`. It ends after #508 because its output changes the subject required for #464.
+The active local handoff queue is [`codex-v2-local-handoff-queue.json`](../../../agentic-tech-lead-orchestration/runtime-handoff/codex-v2-local-handoff-queue.json). It ends after #508 because its output changes the subject required for #464.
 
 ## Repository entropy index
 
