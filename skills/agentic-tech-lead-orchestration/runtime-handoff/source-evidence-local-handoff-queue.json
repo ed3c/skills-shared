@@ -87,12 +87,12 @@
           {
             "operation_id": "materialize-immutable-source-claims-packet",
             "required_output": "CONCRETE_COMMAND_CONTRACT",
-            "resolver_source": "Issue #467, exact ARTICLE/PDF/PRD or GitHub Issue bytes, immutable identity, exact locator, claim text, applicability owner, and current repository subject"
+            "resolver_source": "Issue #512, exact ARTICLE/PDF/PRD or GitHub Issue bytes, immutable identity, exact locator, claim text, applicability owner, and current repository subject"
           }
         ]
       },
       "state": "ACTIVE",
-      "task_ref": "issue-467-immutable-source-to-closure-ledger"
+      "task_ref": "issue-512-immutable-source-to-closure-ledger"
     }
   ],
   "schema_version": "agentic-tech-lead/local-handoff-queue/v1",
