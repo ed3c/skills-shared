@@ -1,6 +1,6 @@
 # Agentic Tech Lead runtime handoff
 
-This directory turns the current Tech Lead/Shadow review into three independent Local Handoff Execution Queues. The queues are siblings because they own different runtime/source planes. They are not serialized for presentation convenience.
+This directory turns current Tech Lead/Shadow reviews into independent Local Handoff Execution Queues. Queue ordering is semantic: unrelated runtime/source planes stay siblings; a successor is serialized only when its exact subject depends on a predecessor.
 
 ## Directory map
 
@@ -14,11 +14,16 @@ runtime-handoff/
 │   └── #508 durable result carrier + executor provenance + strict result schema
 ├── herdr-local-handoff-queue.json
 │   └── #466 real managed Herdr lifecycle and clean terminal receipt
-└── source-evidence-local-handoff-queue.json
-    └── #512 immutable Issue/Article/PDF/PRD input → #467 compiler → existing closure ledger
+├── source-evidence-local-handoff-queue.json
+│   └── #512 immutable Issue/Article/PDF/PRD input → #467 compiler → existing closure ledger
+└── spatial-407-local-handoff-queue.json
+    ├── ACTIVE: #407/#408/#409/#410 provenance-compliant publication rebuild
+    └── BLOCKED_BY_PREDECESSOR: #411 independent live Shadow case-delta canary
 ```
 
-## Shared subject
+## Subject groups
+
+The original Wave-3 continuation queues bind:
 
 ```text
 repository  ed3c/skills-shared
@@ -27,7 +32,35 @@ tree        a24b9b7ace6f4022967d41262ecdc704d5c11646
 rollback    d5993267e03b217dcdab9702dab0400ab03df860
 ```
 
+The Spatial #407 publication queue is a separate mutable-program handoff and binds the semantic source candidate recorded inside `spatial-407-local-handoff-queue.json`. Its rollback is the admitted `main` observed when that queue was compiled. Before local execution, re-read current `main` and PR #412; if either required subject moved, recompile rather than applying a stale queue.
+
 ## State Machines
+
+### Spatial #407 publication → live Shadow
+
+```text
+#408/#409/#410_SOURCE_IMPLEMENTATION_GREEN
+→ CURRENT_MAIN_RECONCILED
+→ NORMAL_EXACT_HEAD_SUITES_GREEN
+→ SKILL_EVAL_COMMIT_PROVENANCE_RED
+→ LOCAL_PROVENANCE_REBUILD_ACTIVE
+→ COMPLIANT_MACHINE_IDENTITY_AND_TRAILERS
+→ EXACT_SEMANTIC_TREE_REBUILT_ON_CURRENT_MAIN
+→ SKILL_SUITES
+→ SHARED_SKILLS_INFRA
+→ SKILL_EVAL_CONTRACT
+→ GIT_TOWN_WORKER
+→ READY_FOR_HUMAN_MAIN_ADMIT
+→ MERGED_ON_MAIN
+→ STATIC_CHILD_ISSUES_CLOSEABLE
+→ RECOMPILE_OR_ADVANCE_LIVE_SUBJECT
+→ #411_INDEPENDENT_BUILDER_SHADOW_CANARY
+→ SEMANTIC_PARITY_DELTA_OBSERVED
+→ OWNING_ORACLE_READBACK
+→ LIVE_SHADOW_CANARY_PASS | HOLD | FAIL
+```
+
+The current GitHub connector history is retained as first-red provenance evidence. Do not add rewritable PR commits to `known_unclassified`, do not move `enforced_from`, do not relabel machine work as Human, and do not weaken `check_commit_roles.py`.
 
 ### Codex v2 hardening
 
@@ -48,7 +81,7 @@ rollback    d5993267e03b217dcdab9702dab0400ab03df860
 → VERIFIED_LIVE | HOLD | REJECT
 ```
 
-The current queue stops at #508 because #508 changes the subject required by #464.
+The current Codex queue stops at #508 because #508 changes the subject required by #464.
 
 ### Herdr lifecycle
 
@@ -88,6 +121,15 @@ Compiler PASS proves binding, not truth. #467 remains closed as the method owner
 ## Task/process DAG
 
 ```text
+#407 program
+├─ #408 static ICPG contract/checker/evals            SOURCE_IMPLEMENTATION_CLOSED
+├─ #409 static Shadow case-delta contract             SOURCE_IMPLEMENTATION_CLOSED
+├─ #410 Tech Lead + Molecular ownership gate          SOURCE_IMPLEMENTATION_CLOSED
+│        ↓ shared publication/provenance predecessor
+└─ Local queue: spatial-407-provenance-rebuild        ACTIVE
+         ↓ admitted main subject
+   #411 live independent Shadow canary                BLOCKED_BY_PREDECESSOR
+
 #507 MERGED
   ↓
 #508 ACTIVE ──subject changes──> new #464 queue
@@ -101,14 +143,16 @@ Compiler PASS proves binding, not truth. #467 remains closed as the method owner
 #465 COMPLETE historical remote receipt
 ```
 
+The Spatial static issues are not closed merely because source suites are green. They require equivalent bytes admitted on `main`. #411 is not a Git child of the static implementation unless a future harness literally consumes unmerged parent bytes; its current relationship is process/external evidence.
+
 ## Data flow and durable outputs
 
 ```text
-issue + exact admitted subject
+issue / source + exact subject
 → queue semantic assertion
 → capability/materialization preflight
 → bounded command contract
-→ execution
+→ execution or publication rebuild
 → durable reduced receipt
 → owning checker/controller
 → Shadow same-subject readback
@@ -116,11 +160,24 @@ issue + exact admitted subject
 → next queue or Human boundary
 ```
 
+For Spatial:
+
+```text
+Prompt / source behavior
+→ ICPG digest + REQUIRED_CASE denominator
+→ Tech Lead case ownership
+→ Molecular implementation atoms
+→ deterministic oracles
+→ publication provenance gate
+→ admitted main
+→ independent live Shadow #411
+```
+
 Receipt destinations are under `data/handoff/`; that path is a contract, not proof the file exists.
 
 ## Local invocation
 
-From a clean checkout of `249abc47847f8295b1c75c9d4c84457c5126fd89`:
+Validate only the queue whose exact subject is current:
 
 ```bash
 python3 skills/agentic-tech-lead-orchestration/scripts/assert_local_handoff_queue.py \
@@ -131,19 +188,27 @@ python3 skills/agentic-tech-lead-orchestration/scripts/assert_local_handoff_queu
 
 python3 skills/agentic-tech-lead-orchestration/scripts/assert_local_handoff_queue.py \
   --queue skills/agentic-tech-lead-orchestration/runtime-handoff/source-evidence-local-handoff-queue.json
+
+python3 skills/agentic-tech-lead-orchestration/scripts/assert_local_handoff_queue.py \
+  --queue skills/agentic-tech-lead-orchestration/runtime-handoff/spatial-407-local-handoff-queue.json
 ```
 
-Then execute only the ACTIVE item whose required capabilities are present. Do not advance another queue implicitly.
+Then execute only the `ACTIVE` item whose required capabilities and subject are present. Do not advance another queue implicitly.
 
 ## Current evidence
 
 ```text
-Codex result-tree binder             PASS / MERGED via #507
-Codex durable replay/provenance      NOT_IMPLEMENTED / #508
-fresh Codex v2 live acceptance       NOT_EXERCISED / #464
-Herdr real process detection         EXERCISED_PARTIALLY
-Herdr terminal clean lifecycle       NOT_EXERCISED / BLOCKED
-source compiler method               COMPLETED_DETERMINISTICALLY / #467 CLOSED
-Issue/Article/PDF/PRD truth          EVIDENCE_DEPENDENT / #512 OPEN
-merge/release/production             HUMAN / NOT_PERFORMED
+Spatial #408/#409/#410 source implementation    PASS / candidate only
+Spatial normal exact-head suites                PASS
+Spatial Skill Eval commit provenance            FAIL / LOCAL_HANDOFF_REQUIRED
+Spatial main admission                          NOT_PERFORMED
+Spatial #411 live independent Shadow             NOT_EXERCISED
+Codex result-tree binder                        PASS / MERGED via #507
+Codex durable replay/provenance                 NOT_IMPLEMENTED / #508
+fresh Codex v2 live acceptance                  NOT_EXERCISED / #464
+Herdr real process detection                    EXERCISED_PARTIALLY
+Herdr terminal clean lifecycle                  NOT_EXERCISED / BLOCKED
+source compiler method                          COMPLETED_DETERMINISTICALLY / #467 CLOSED
+Issue/Article/PDF/PRD truth                      EVIDENCE_DEPENDENT / #512 OPEN
+merge/release/production                        HUMAN / NOT_PERFORMED except separately admitted subjects
 ```
