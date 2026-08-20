@@ -30,7 +30,7 @@ A source PR can be `CLOSED_UNMERGED / CONSUMED` while its exact bytes are presen
 ├─ #464 / PR #469 Codex live carrier         CLOSED_UNMERGED / CONSUMED
 ├─ #465 / PR #470 GitHub canary carrier      CLOSED_UNMERGED / CONSUMED
 ├─ #466 / PR #471 Herdr lifecycle carrier    CLOSED_UNMERGED / CONSUMED
-└─ #467 / PR #472 source compiler            CLOSED_UNMERGED / CONSUMED
+└─ #467 / PR #472 source compiler            CLOSED_UNMERGED / CONSUMED; ISSUE COMPLETED
           ↓
 #468 / PR #480 Wave-3 convergence             MERGED / HUMAN_ADMITTED
           ↓
@@ -41,6 +41,9 @@ A source PR can be `CLOSED_UNMERGED / CONSUMED` while its exact bytes are presen
 #508 durable carrier/provenance/schema        ACTIVE ISSUE
           ↓ subject-mutation boundary
 #464 fresh signed-in v2 run                   PROCESS_DEPENDENCY / OPEN
+
+#512 immutable Issue/Article/PDF/PRD evidence EXTERNAL_EVIDENCE / OPEN
+  └─ consumes completed #467 compiler method; does not reopen #467
 ```
 
 | Atom | Issue/PR | State | Evidence ceiling |
@@ -48,12 +51,13 @@ A source PR can be `CLOSED_UNMERGED / CONSUMED` while its exact bytes are presen
 | `W3-CODEX` | #464/#469 | carrier consumed; issue open | first live run observed, Shadow partial |
 | `W3-GH` | #465/#470 | live lane complete | exact one-edge remote canary only; no semantic authority |
 | `W3-HERDR` | #466/#471 | open | real process detection partial; terminal clean receipt absent |
-| `W3-SOURCE` | #467/#472 | open | source binding works; truth/provider evidence separate |
+| `W3-SOURCE-COMPILER` | #467/#472 | issue completed; carrier consumed | deterministic source binding/compiler only |
+| `W3-SOURCE-EVIDENCE` | #512 | open external-evidence successor | Issue/Article/PDF/PRD truth/applicability/verification remain packet-specific |
 | `W3-X` | #468/#480 | merged | static/deterministic infrastructure admission |
 | `C2-K` | #505/#507 | merged | deterministic result-tree binder, `1/16` |
 | `C2-DURABLE` | #508 | active | `NOT_IMPLEMENTED` until independent durable replay |
 
-The active local handoff queue is [`codex-v2-local-handoff-queue.json`](../../../agentic-tech-lead-orchestration/runtime-handoff/codex-v2-local-handoff-queue.json). It ends after #508 because its output changes the subject required for #464.
+The active Codex handoff queue is [`codex-v2-local-handoff-queue.json`](../../../agentic-tech-lead-orchestration/runtime-handoff/codex-v2-local-handoff-queue.json). It ends after #508 because its output changes the subject required for #464. Source evidence uses [`source-evidence-local-handoff-queue.json`](../../../agentic-tech-lead-orchestration/runtime-handoff/source-evidence-local-handoff-queue.json) and is owned by #512.
 
 ## Repository entropy index
 
@@ -160,7 +164,8 @@ Issue/claim
 #465 live GitHub canary          VERIFIED_LIVE_REMOTE_CANARY_ONLY
 #464 Codex v2                    OPEN / predecessor #508
 #466 Herdr                       OPEN / host permission blocker
-#467 source truth                EVIDENCE_DEPENDENT
+#467 source compiler             COMPLETED_DETERMINISTICALLY
+#512 source truth execution      EVIDENCE_DEPENDENT / OPEN
 entropy shared method            ADMITTED
 open Draft stacks               HOLD
 merge/release for held stacks    NOT_PERFORMED
