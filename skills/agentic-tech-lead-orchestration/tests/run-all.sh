@@ -115,6 +115,7 @@ schemas = [
     "references/contracts/herdr-observer-receipt.schema.json",
     "references/contracts/problem-closure.schema.json",
     "references/contracts/codex-live-acceptance-receipt.schema.json",
+    "references/contracts/codex-live-acceptance-receipt-v2.schema.json",
     "references/contracts/github-dag-live-canary-receipt.schema.json",
     "references/contracts/herdr-lifecycle-receipt.schema.json",
     "references/contracts/source-claims-input.schema.json",
@@ -140,7 +141,7 @@ source_example = json.loads(
 )
 errors = list(Draft202012Validator(source_schema).iter_errors(source_example))
 assert not errors, [error.message for error in errors]
-print("CONTROL-PLANE-SHAPE-GREEN 10 schemas; closure/source examples validated")
+print("CONTROL-PLANE-SHAPE-GREEN 11 schemas; closure/source examples validated")
 PYCP
 python3 "$ROOT/tests/codex_sdk_controller_selftest.py"
 python3 "$ROOT/tests/github_issue_dag_selftest.py"

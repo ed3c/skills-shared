@@ -52,7 +52,7 @@ live provider/runtime effects      NOT_EXERCISED until exact receipts exist
 Human Admit / merge / release      separate authority lanes
 ```
 
-`tests/run-all.sh` validates all six new schemas as Draft 2020-12, validates the problem-closure example against its schema, and executes the four owning selftests. It intentionally does not execute Codex, mutate GitHub dependencies, invoke Herdr, or infer real source/provider closure.
+`tests/run-all.sh` validates all six Wave-2 schemas as Draft 2020-12, validates the problem-closure example against its schema, and executes the four owning selftests. It intentionally does not execute Codex, mutate GitHub dependencies, invoke Herdr, or infer real source/provider closure.
 
 Consumer repositories bind real commit/tree identities, issue/task references, path leases, commands, provider versions, indexes, budgets, branches, runtime capabilities, receipts, and Human admissions outside this shared directory. They consume these contracts without copying the shared `SKILL.md` body.
 
@@ -62,16 +62,19 @@ Wave 3 consumes the #455 static/deterministic control-plane bytes. Contract owne
 
 ```text
 contracts/
-├── codex-live-acceptance-receipt.schema.json   #464 output; controller + runtime candidate
-├── github-dag-live-canary-receipt.schema.json  #465 output; one reversible owned edge
-├── herdr-lifecycle-receipt.schema.json         #466 output; bounded reduced lifecycle
-└── source-claims-input.schema.json              #467 input; immutable claim/source shape
+├── codex-live-acceptance-receipt.schema.json      #464 historical v1 receipt shape
+├── codex-live-acceptance-receipt-v2.schema.json   #505 current result-tree-bound receipt shape
+├── github-dag-live-canary-receipt.schema.json     #465 output; one reversible owned edge
+├── herdr-lifecycle-receipt.schema.json            #466 output; bounded reduced lifecycle
+└── source-claims-input.schema.json                 #467 input; immutable claim/source shape
 
 examples/
-└── source-claims.example.json                   #468 input → compiler → existing #378 checker
+└── source-claims.example.json                      #468 input → compiler → existing #378 checker
 
-wave3-live-handoff-queue.json                    #468 immutable local/runtime continuation
+wave3-live-handoff-queue.json                       #468 immutable fork-time continuation packet
 ```
+
+`codex-live-acceptance-receipt.schema.json` is retained as historical v1 because the first real #464 run produced an internally consistent receipt before result-tree truth was enforced. v2 does not rewrite that history. It distinguishes `base_sha`, `base_tree_sha`, and the immutable post-turn `tree_sha`, and requires `result_tree_readback=PASS`; the binder independently recomputes the exact Git diff denominator before it can emit v2.
 
 State relation:
 
@@ -88,11 +91,12 @@ State relation:
 Shape and runtime evidence remain separate:
 
 ```text
-codex-live-acceptance receipt schema     shape for a real EXERCISED+controller-readback candidate
-GitHub canary receipt schema             shape for remote add/readback/remove proof
-Herdr lifecycle receipt schema           shape for live observation or explicit unavailable fallback
-source-claims input schema               source/input shape only; compiler + closure checker own semantics
-Wave-3 handoff queue                     continuation contract only; execution not implied
+Codex acceptance v1 schema             historical pre-#505 shape only
+Codex acceptance v2 schema             shape for EXERCISED + controller + Git result-tree candidate
+GitHub canary receipt schema            shape for remote add/readback/remove proof
+Herdr lifecycle receipt schema          shape for live observation or explicit unavailable fallback
+source-claims input schema              source/input shape only; compiler + closure checker own semantics
+Wave-3 handoff queue                    historical continuation contract only; execution not implied
 ```
 
-`tests/run-all.sh` validates ten control-plane Draft 2020-12 schemas, runs all Wave-2 and Wave-3 mutation selftests unconditionally, compiles the source example into the existing problem-closure ledger and rechecks it, and asserts the Wave-3 handoff queue. It does not create live receipts.
+`tests/run-all.sh` validates eleven control-plane Draft 2020-12 schemas, runs all Wave-2 and Wave-3 mutation selftests unconditionally, compiles the source example into the existing problem-closure ledger and rechecks it, and asserts the historical Wave-3 handoff queue. It does not create live receipts.

@@ -46,7 +46,7 @@ Shape is owned by `references/repository-closure-contract.schema.json` and `refe
 
 These scripts are trigger-selected implementation/evidence bindings. None owns the semantic Tech Lead core, merge, release, or Human Admit.
 
-### `run_codex_sdk_worker.py` — #375
+### `run_codex_sdk_worker.py` — #375 / #505 hardening
 
 ```text
 static invocation
@@ -54,13 +54,16 @@ static invocation
 
 --execute
   existing signed-in Codex auth
-  → start/resume compatible thread in exact worktree
-  → runtime result receipt
+  → start/resume compatible thread in exact clean worktree
+  → post-turn changed-path + lease readback
+  → private temporary index seeded from frozen base
+  → immutable detached post-turn Git tree
+  → exact base→result-tree denominator readback
   → RUNTIME_RESULT_ONLY
   → controller source/diff/test readback still required
 ```
 
-The adapter rejects unsafe/overlapping repository path leases, prompt-digest drift, incompatible thread reuse, credential-bearing durable fields, and full model/private-reasoning persistence. It never reads a repository API key. `--execute` is not used by the shared deterministic suite.
+The adapter rejects unsafe/overlapping repository path leases, prompt-digest drift, incompatible thread reuse, credential-bearing durable fields, and full model/private-reasoning persistence. After the live turn it does **not** commit, move a branch, or mutate the normal index. Instead it writes the post-turn bytes as a detached Git tree using `GIT_INDEX_FILE`, then verifies that `git diff --name-only --no-renames <base_sha> <tree_sha>` exactly matches its observed changed-file denominator. The runtime result carries both `base_tree_sha` and the post-turn `tree_sha` so the two phases cannot share one ambiguous tree identity. `--execute` is not used by the shared deterministic suite.
 
 ### `github_issue_dag_projection.py` — #376
 
@@ -93,19 +96,7 @@ The renderer emits deterministic Markdown **after** the JSON ledger passes. Its 
 
 ## Control-plane shared gate
 
-`../tests/run-all.sh` now:
-
-```text
-validate six control-plane JSON Schemas
-→ validate problem-closure example
-→ run codex_sdk_controller_selftest.py
-→ run github_issue_dag_selftest.py
-→ run herdr_observer_selftest.py
-→ run problem_closure_selftest.py
-→ run deterministic closure checker + renderer projection marker
-```
-
-This closes deterministic convergence coverage only. Live Codex, GitHub mutation, Herdr observation, real article/PDF/provider closure and Human/merge/release lanes stay separate.
+`../tests/run-all.sh` validates the Wave-2/Wave-3 control-plane schemas and executes the owning selftests. It intentionally does not execute Codex, mutate GitHub dependencies, invoke Herdr, or infer real source/provider closure.
 
 ## Behavioral A/B (spends real tokens only on explicit live invocation)
 
@@ -128,9 +119,21 @@ This closes deterministic convergence coverage only. Live Codex, GitHub mutation
 
 These scripts consume the Wave-2 adapters/checkers. They do not replace them and they do not own the Tech Lead semantic DAG.
 
-### `compile_codex_live_acceptance.py` — #464
+### `compile_codex_live_acceptance.py` — #464 / #505 hardening
 
-Binds an actual `run_codex_sdk_worker.py` runtime result to controller-owned source/diff/test readback. It accepts only `sdk_execution=EXERCISED`, `lease_readback=PASS`, a completed turn, exact task/attempt/repo/base/tree identities, exact changed-file denominator, and successful digest-bound controller verification commands. Output remains Shadow-pending.
+The historical v1 binder compared worker/controller document identity and digests but did not touch Git. The first real #464 run proved that this was insufficient: two internally consistent documents could bind the pre-turn tree while the claimed change existed only as an uncommitted worktree modification.
+
+The current binder emits receipt v2 only after all prior runtime/lease/controller checks **and** independent Git truth:
+
+```text
+base_sha resolves to base_tree_sha
+post-turn tree_sha resolves to a Git tree
+Git diff(base_sha, tree_sha) == exact changed_files denominator
+→ result_tree_readback=PASS
+→ LIVE_RUNTIME_AND_CONTROLLER_READBACK_CANDIDATE
+```
+
+A bound tree missing the claimed change, containing an undeclared extra change, resolving to no tree object, or disagreeing with `base_sha` now fails closed even when worker and controller repeat the same false values. Output remains Shadow-pending. This deterministic repair does not promote #464's live lane; the earlier run remains `LIVE_EXECUTION_OBSERVED / SHADOW_READBACK_PARTIAL` until a fresh signed-in run produces a v2-bound result and independent Shadow readback.
 
 Raw model prose, prompt bytes, private reasoning, auth material, tokens, credentials and API keys are forbidden durable input fields.
 
@@ -148,16 +151,8 @@ Reuses `herdr_runtime_observer.py` over a bounded sample window. Task/attempt/re
 
 Converts exact GitHub Issue / ARTICLE / PDF / PRD source records into the existing #378 problem-closure ledger. GitHub issues require `owner/repo#number`; external documents require immutable `sha256:<64hex>` identity plus exact locator. It computes per-claim and complete source-manifest digests, preserves NOT_APPLICABLE/SUPERSEDED rows, and emits no invented verification, receipt, or merge evidence.
 
-## Wave-3 shared gate — #468
+## Wave-3 shared gate — #468 / post-admission repair #505
 
-`../tests/run-all.sh` now extends the denominator to:
+Current deterministic denominator includes eleven Draft-2020-12 control-plane schemas: historical Codex live-acceptance v1 is retained and current v2 is added. The current Codex live acceptance selftest is `1 positive / 16 mutations`; the four new controls are result-tree truth controls and remain zero-provider/zero-network. The GitHub DAG live canary is currently `1/10`; Herdr lifecycle `2/7`; source compiler `4-source/11`.
 
-```text
-10 Draft-2020-12 control-plane schemas
-Wave 2 selftests: 4/14 + 6/17 + 4/18 + 6/22
-Wave 3 selftests: 1/12 + 1/6 + 2/7 + 4-source/11
-source-claims example → compile_source_claims.py → check_problem_closure.py
-wave3-live-handoff-queue.json → assert_local_handoff_queue.py
-```
-
-No Wave-3 deterministic command calls live Codex, live Herdr, or remote GitHub mutation. A green shared gate proves the carrier/checker integration only; it cannot raise the runtime evidence ceiling.
+No deterministic command calls live Codex, live Herdr, or remote GitHub mutation. A green shared gate proves the carrier/checker integration only; it cannot raise the runtime evidence ceiling.

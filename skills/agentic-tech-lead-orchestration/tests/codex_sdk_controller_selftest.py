@@ -50,6 +50,7 @@ r = mod.compile_static_receipt(m)
 assert r["sdk_execution"] == "NOT_EXERCISED"
 assert r["controller_readback_required"] is True
 assert r["lease_readback"] == "NOT_EXERCISED"
+assert r["base_tree_sha"] == m["tree_sha"] == r["tree_sha"]
 assert "final_response" not in r
 
 must_fail(lambda d: d.update(base_sha="85e6723"))
@@ -95,6 +96,17 @@ with tempfile.TemporaryDirectory() as td:
     subject["base_sha"] = subprocess.check_output(["git", "-C", str(repo), "rev-parse", "HEAD"], text=True).strip()
     subject["tree_sha"] = subprocess.check_output(["git", "-C", str(repo), "rev-parse", "HEAD^{tree}"], text=True).strip()
     mod._validate_worktree_subject(repo, subject)
+
+    # The live adapter snapshots post-turn bytes through a private temporary
+    # index. The normal branch/index remain untouched; only an immutable tree
+    # object is produced for later controller/binder readback.
+    (repo / "a.txt").write_text("b\n", encoding="utf-8")
+    result_tree = mod._materialize_result_tree(repo, subject["base_sha"], ["a.txt"])
+    assert result_tree != subject["tree_sha"]
+    assert mod._tree_changed_paths(repo, subject["base_sha"], result_tree) == ["a.txt"]
+    assert subprocess.check_output(["git", "-C", str(repo), "diff", "--cached", "--name-only"], text=True).strip() == ""
+
+    (repo / "a.txt").write_text("a\n", encoding="utf-8")
     (repo / "outside.txt").write_text("x\n", encoding="utf-8")
     try:
         mod._validate_worktree_subject(repo, subject)
