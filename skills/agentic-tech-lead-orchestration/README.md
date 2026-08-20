@@ -268,7 +268,7 @@ When Spatial Loop produced an ICPG, the entry stage of this flow is the ICPG →
 ```text
 Codex SDK adapter bytes + selftest          deterministic/static only; 4/14
 Codex SDK live thread/turn                  NOT_EXERCISED until exact runtime receipt
-GitHub dependency projection checker        deterministic/static only; 6/17
+GitHub dependency projection checker        deterministic/static only; 7/23
 GitHub remote dependency mutation/readback  NOT_EXERCISED until explicit live receipt
 Herdr observer checker/fallback              deterministic/static only; 4/18
 Herdr live process/worktree observation      NOT_EXERCISED until runtime receipt
@@ -365,7 +365,7 @@ The proof is registered by `skill-refactor-proof-loop`; its implementation remai
 Human merge/release admission
 ```
 
-The #375–#378 live lanes remain additional independent evidence work even after their deterministic mechanisms are integrated into #379. They are separately owned evidence/process lanes, not artificial Stack children.
+After the admitted #485 ownership transfer, live evidence for the #375–#378 mechanisms is owned solely by their Wave-3 successors #464–#467; #376 keeps only its generic development-link residual. The Wave-2 parents remain historical static-mechanism lineage, not artificial Stack children.
 
 ## Tech Lead + Shadow closure responsibility
 

@@ -4,22 +4,24 @@
 
 ## Codex control-plane denominator — #375–#378
 
-The convergence suite executes four required selftests unconditionally. Current frozen denominator for this convergence candidate:
+The convergence suite executes four required selftests unconditionally. The immutable Wave-2 admitted denominator remains:
 
 | Test | Positive denominator | Mutation denominator | Live lane |
 |---|---:|---:|---|
-| `codex_sdk_controller_selftest.py` | 4 | 14 | `NOT_EXERCISED` |
-| `github_issue_dag_selftest.py` | 6 | 17 | `NOT_EXERCISED` |
-| `herdr_observer_selftest.py` | 4 | 18 | `NOT_EXERCISED` |
-| `problem_closure_selftest.py` | 6 | 22 | `EVIDENCE_DEPENDENT` |
+| `codex_sdk_controller_selftest.py` | 4 | 14 | historical mechanism; live owned by #464 |
+| `github_issue_dag_selftest.py` | 6 | 17 | historical mechanism; live owned by #465 |
+| `herdr_observer_selftest.py` | 4 | 18 | historical mechanism; live owned by #466 |
+| `problem_closure_selftest.py` | 6 | 22 | historical mechanism; source/provider owned by #467 |
 
-The Codex denominator includes exact 40-hex subject checks, clean-worktree preflight, ancestor/descendant lease conflict, repository-path escape refusal, and post-turn changed-file readback that rejects read-only/out-of-lease mutations. The GitHub-DAG denominator includes repository visibility/default-branch binding, expected issue state, closing-PR reference ownership checks, graph/readback drift and destructive extra-edge refusal. Generic development-link ownership beyond the closing-reference surface remains a separate residual; the deterministic test does not claim broader GitHub linkage semantics than it exercises.
+The Codex denominator includes exact 40-hex subject checks, clean-worktree preflight, ancestor/descendant lease conflict, repository-path escape refusal, and post-turn changed-file readback that rejects read-only/out-of-lease mutations. Post-admission #505 additionally exercises detached result-tree materialization inside the same `4/14` high-level producer denominator; it does not rewrite the historical admitted count.
+
+The current GitHub-DAG projection has separately advanced under #497 to `7 positive / 23 mutations`, adding producer controls for the live `blockedBy` connection-shaped response. The Wave-2 admitted `6/17` row above remains history rather than being rewritten. Generic development-link ownership beyond the closing-reference surface remains a separate residual.
 
 The Herdr denominator binds exact Git subjects, worktree/pane/workspace/PID/native-session identity, PID start time, bounded observation freshness, nonterminal process liveness and terminal cleanup/residue before `DONE_CANDIDATE`. The problem-closure denominator binds a frozen source manifest and complete problem ID set, exact 40-hex repo subjects, portable worktree identity, current/historical implementation evidence, exact-subject verification receipts, supersession targets/cycles, residual gaps and deterministic Markdown projection.
 
-The suite also validates six control-plane JSON Schemas as Draft 2020-12, validates `references/examples/problem-closure.example.json`, runs the deterministic closure checker, renders its Markdown human projection, and asserts that the projection still declares machine JSON as authority.
+The suite also validates the control-plane JSON Schemas as Draft 2020-12, validates `references/examples/problem-closure.example.json`, runs the deterministic closure checker, renders its Markdown human projection, and asserts that the projection still declares machine JSON as authority.
 
-No required control uses an `if file exists` skip. The #379 convergence subject contains the exact selected sibling bytes first, then executes the shared gate. This keeps a green result from being green merely because a sibling file was absent.
+No required control uses an `if file exists` skip. A green result therefore cannot be green merely because an owning control was absent.
 
 The shared suite intentionally does **not**:
 
@@ -31,7 +33,7 @@ claim a real article/PDF/provider closure
 merge/release/promote anything
 ```
 
-Therefore a green suite proves deterministic integration on the exact checked subject, not live provider/runtime closure and not Human admission of the unmerged sibling candidates.
+Therefore a green suite proves deterministic integration on the exact checked subject, not live provider/runtime closure and not Human admission.
 
 ## Existing authority controls
 
@@ -52,17 +54,28 @@ The suite is offline and zero-network. It does not activate provider/model, GitH
 
 ## Wave 3 live-evidence denominator — #464–#468
 
-Wave 3 adds four required selftests. They are unconditionally invoked by `run-all.sh` after their exact leaf bytes are consumed by #468:
+Wave 3 retains its original admitted controls and may add post-admission falsifiers without rewriting the historical admission record. Current executable denominator:
 
 | Test | Positive denominator | Mutation denominator | Live lane |
 |---|---:|---:|---|
-| `codex_live_acceptance_selftest.py` | 1 | 12 | `NOT_EXERCISED` |
-| `github_issue_dag_live_canary_selftest.py` | 1 | 6 | `NOT_EXERCISED` |
+| `codex_live_acceptance_selftest.py` | 1 | 16 | `LIVE_EXECUTION_OBSERVED / SHADOW_READBACK_PARTIAL`; fresh v2 run required |
+| `github_issue_dag_live_canary_selftest.py` | 1 | 10 | remote canary already achieved separately; selftest remains deterministic |
 | `herdr_lifecycle_selftest.py` | 2 | 7 | `NOT_EXERCISED` |
 | `source_claim_compiler_selftest.py` | 4 source kinds | 11 | `EVIDENCE_DEPENDENT` |
 
-The shape denominator expands from six to ten Draft 2020-12 control-plane schemas. In addition, `references/examples/source-claims.example.json` is schema-validated, compiled through `compile_source_claims.py`, and then checked by the existing `check_problem_closure.py`; this prevents the source compiler from becoming a second ledger authority.
+The four #505 Codex acceptance mutations are specifically central-claim falsifiers:
 
-`references/wave3-live-handoff-queue.json` is asserted by the same shared suite. The queue is bound to immutable integration commit `691b342c44c9c6c4e61a9997e778ae4ed6e920d5` and carries the still-unexecuted live Codex, Herdr, and GitHub canary work into a local/runtime lane.
+```text
+worker/controller agree on unchanged pre-turn tree while claiming a changed path → FAIL
+bound result tree contains an undeclared extra path                           → FAIL
+syntactically valid but absent result tree object                            → FAIL
+base_sha and declared base_tree_sha disagree                                 → FAIL
+```
+
+The positive path uses a real temporary Git repository and an immutable result tree. This remains zero-provider: it does not invoke Codex. `run_codex_sdk_worker.py` separately proves that the producer can create the same kind of detached tree using a private index without staging the normal index.
+
+The shape denominator is now eleven Draft-2020-12 control-plane schemas because historical `codex-live-acceptance-receipt.schema.json` v1 is retained and `codex-live-acceptance-receipt-v2.schema.json` is added. v2 requires separate base/result tree identities and `result_tree_readback=PASS`.
+
+`references/wave3-live-handoff-queue.json` remains the immutable fork-time continuation packet; its historical v1 receipt route is not current mutable evidence authority. A fresh #464 runtime attempt must be rebound to current code/contracts rather than laundering the old queue state.
 
 Wave-3 controls intentionally do **not** call `--execute` on Codex or the GitHub canary and do not require Herdr. A test may contain expected output vocabulary such as `EXERCISED` only as deterministic fixture input; such fixture bytes never establish a live receipt. Hosted PASS proves the exact static carrier/checker subject only.

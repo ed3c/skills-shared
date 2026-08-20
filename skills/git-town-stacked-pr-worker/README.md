@@ -2,6 +2,8 @@
 
 Portable method for coordinating multiple Worker Agents with Git Town, isolated linked worktrees, eval-first task packets, bounded no-push synchronization, molecular issue/PR traceability, explicit multi-parent convergence, and Human Admit. This Skill does not own a consumer repository's branches, `.git-town.toml`, CI, remotes, receipts, merge, release, or promotion.
 
+Current terminal Molecular Stack projections are routed under [`molecular-indexes/`](molecular-indexes/codex-v2/README.md); the directory is a traceability index surface, not mutable forge authority.
+
 ## Read order
 
 1. [`SKILL.md`](SKILL.md) — portable operating law.

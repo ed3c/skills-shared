@@ -125,7 +125,7 @@ No branch, PR, terminal state, model prose, issue state, article/PDF prose, work
 ```text
 Wave 2 retained:
   Codex SDK adapter          4 positive / 14 mutations
-  GitHub DAG projection      6 positive / 17 mutations
+  GitHub DAG projection      7 positive / 23 mutations (#497 live_readback producer controls)
   Herdr observer             4 positive / 18 mutations
   problem closure            6 positive / 22 mutations
 
@@ -181,7 +181,13 @@ semantic_authority            false
 evidence_ceiling              REMOTE_CANARY_EDGE_ONLY
 ```
 
-Attempt `32295401831` is retained as fail-closed pre-mutation evidence for the earlier CLI response-shape mismatch. It is not a PASS and no edge had been added when it failed.
+Independent Shadow same-subject readback (2026-08-20, separate evaluation path): run `32296935756` conclusion re-read from the Actions API; the receipt sha256 above reproduced exactly over the JSON posted on issue #465; the live remote `blocked_by` denominator of #487 re-read as empty after cleanup; and PR #492 confirmed CLOSED and not merged. The PASS is Shadow-verified within the same `REMOTE_CANARY_EDGE_ONLY` ceiling.
+
+Attempts `32295401831` and `32295854524` are retained as fail-closed pre-mutation evidence for the earlier CLI response-shape mismatch; the second run repeated the identical `blockedBy malformed` signature on unchanged carrier bytes before the #496 repair landed. Neither is a PASS and no edge had been added when they failed. The same CLI `LinkedIssueConnection` shape defect survived in the #376 projection's `live_readback` until it was separately repaired with producer controls under #497.
+
+The workflow's complete run denominator also contains a second failure class: `push`-event runs that failed at workflow startup with an empty jobs array (no job was ever created, so no executor or permission was exercised). Those are workflow-authoring failures on non-trigger refs, not live canary attempts.
+
+Re-execution precondition: fixture issues #486/#487 were closed after the admitted PASS, the carrier's preflight hard-requires both fixtures OPEN with the ownership label, and the workflow deliberately has no `workflow_dispatch` lane. A future canary run therefore requires reopening #486/#487 first, then a fresh event-only PR draft→ready cycle; until then the hosted capability is intentionally dormant, not silently green.
 
 The successful canary proves only the reversible remote fixture edge and cleanup/readback contract. It never becomes semantic DAG authority and does not prove release or production readiness.
 

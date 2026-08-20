@@ -10,9 +10,11 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 from pathlib import Path, PurePosixPath
 import re
 import subprocess
+import tempfile
 from typing import Any
 
 TERMINAL_STATES = {"completed", "failed", "interrupted"}
@@ -64,12 +66,18 @@ def _path_within(candidate: str, lease: str) -> bool:
     return len(c) >= len(l) and c[: len(l)] == l
 
 
-def _git(worktree: Path, *args: str, check: bool = True) -> str:
+def _git(
+    worktree: Path,
+    *args: str,
+    check: bool = True,
+    env: dict[str, str] | None = None,
+) -> str:
     result = subprocess.run(
         ["git", "-C", str(worktree), *args],
         text=True,
         capture_output=True,
         check=False,
+        env=env,
     )
     if check and result.returncode:
         detail = (result.stderr or result.stdout).strip()
@@ -107,6 +115,51 @@ def _changed_paths(worktree: Path) -> list[str]:
             if path:
                 paths.add(_repo_path(path).as_posix())
     return sorted(paths)
+
+
+def _tree_changed_paths(worktree: Path, base_sha: str, tree_sha: str) -> list[str]:
+    raw = _git(
+        worktree,
+        "diff",
+        "--name-only",
+        "-z",
+        "--no-renames",
+        base_sha,
+        tree_sha,
+        "--",
+    )
+    return sorted(_repo_path(path).as_posix() for path in raw.split("\0") if path)
+
+
+def _materialize_result_tree(
+    worktree: Path,
+    base_sha: str,
+    expected_changed_paths: list[str],
+) -> str:
+    """Write post-turn worktree bytes as an immutable detached Git tree.
+
+    The normal branch and index are not changed. A private temporary index is
+    seeded from the frozen base commit, updated from the current worktree, and
+    written as a Git tree object. The resulting tree is independently diffed
+    against the base commit before it is returned.
+    """
+
+    with tempfile.TemporaryDirectory(prefix="codex-result-tree-") as temp_dir:
+        index_path = Path(temp_dir) / "index"
+        env = os.environ.copy()
+        env["GIT_INDEX_FILE"] = str(index_path)
+        _git(worktree, "read-tree", base_sha, env=env)
+        _git(worktree, "add", "-A", "--", ".", env=env)
+        tree_sha = _git(worktree, "write-tree", env=env)
+
+    if not EXACT_SHA.fullmatch(tree_sha):
+        raise ContractError("post-turn result tree must be exact 40-hex Git tree")
+    observed = _tree_changed_paths(worktree, base_sha, tree_sha)
+    if observed != sorted(expected_changed_paths):
+        raise ContractError(
+            f"post-turn result-tree denominator mismatch: expected {sorted(expected_changed_paths)} observed {observed}"
+        )
+    return tree_sha
 
 
 def _assert_lease_readback(data: dict[str, Any], changed_paths: list[str]) -> None:
@@ -178,6 +231,7 @@ def compile_static_receipt(data: dict[str, Any]) -> dict[str, Any]:
         "attempt_id": data["attempt_id"],
         "repo": data["repo"],
         "base_sha": data["base_sha"],
+        "base_tree_sha": data["tree_sha"],
         "tree_sha": data["tree_sha"],
         "worktree": data["worktree"],
         "prompt_digest": data["prompt_digest"],
@@ -234,6 +288,7 @@ def execute(data: dict[str, Any]) -> dict[str, Any]:
 
     changed_paths = _changed_paths(worktree)
     _assert_lease_readback(data, changed_paths)
+    result_tree_sha = _materialize_result_tree(worktree, data["base_sha"], changed_paths)
 
     return {
         "schema_version": 1,
@@ -241,7 +296,8 @@ def execute(data: dict[str, Any]) -> dict[str, Any]:
         "attempt_id": data["attempt_id"],
         "repo": data["repo"],
         "base_sha": data["base_sha"],
-        "tree_sha": data["tree_sha"],
+        "base_tree_sha": data["tree_sha"],
+        "tree_sha": result_tree_sha,
         "worktree": str(worktree),
         "prompt_digest": data["prompt_digest"],
         "thread_policy": data["thread_policy"],
