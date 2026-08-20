@@ -15,7 +15,7 @@ runtime-handoff/
 ├── herdr-local-handoff-queue.json
 │   └── #466 real managed Herdr lifecycle and clean terminal receipt
 └── source-evidence-local-handoff-queue.json
-    └── #467 immutable Issue/Article/PDF/PRD input → existing closure ledger
+    └── #512 immutable Issue/Article/PDF/PRD input → #467 compiler → existing closure ledger
 ```
 
 ## Shared subject
@@ -70,11 +70,12 @@ A manual `report-agent` fallback cannot manufacture the terminal branch. Host pe
 ### Source evidence
 
 ```text
-IMMUTABLE_SOURCE_IDENTITY_AND_LOCATION
+#467_COMPILER_METHOD_COMPLETED
+→ #512_IMMUTABLE_SOURCE_IDENTITY_AND_LOCATION
 → CLAIM_TEXT_AND_DIGEST
 → EXACT_REPOSITORY_COMMIT_TREE
 → COMPLETE_SOURCE_DENOMINATOR
-→ COMPILE_SOURCE_CLAIMS
+→ COMPILE_SOURCE_CLAIMS_WITH_#467
 → EXISTING_PROBLEM_CLOSURE_CHECKER
 → SOURCE_BOUND_RECEIPT
 → APPLICABILITY_AND_IMPLEMENTATION_EVIDENCE_SEPARATE
@@ -82,7 +83,7 @@ IMMUTABLE_SOURCE_IDENTITY_AND_LOCATION
 → OPEN | IMPLEMENTED_UNVERIFIED | VERIFIED_LOCAL | VERIFIED_LIVE | NOT_APPLICABLE
 ```
 
-Compiler PASS proves binding, not truth.
+Compiler PASS proves binding, not truth. #467 remains closed as the method owner; #512 owns real source packets.
 
 ## Task/process DAG
 
@@ -94,7 +95,9 @@ Compiler PASS proves binding, not truth.
                               #464 live v2
 
 #466 ACTIVE external runtime sibling
-#467 ACTIVE source-evidence sibling
+#467 COMPLETE source compiler method
+  ↓ method dependency only
+#512 ACTIVE source-evidence sibling
 #465 COMPLETE historical remote receipt
 ```
 
@@ -140,7 +143,7 @@ Codex durable replay/provenance      NOT_IMPLEMENTED / #508
 fresh Codex v2 live acceptance       NOT_EXERCISED / #464
 Herdr real process detection         EXERCISED_PARTIALLY
 Herdr terminal clean lifecycle       NOT_EXERCISED / BLOCKED
-source compiler real GitHub issue    EXERCISED_DETERMINISTICALLY
-Article/PDF/PRD truth                EVIDENCE_DEPENDENT
+source compiler method               COMPLETED_DETERMINISTICALLY / #467 CLOSED
+Issue/Article/PDF/PRD truth          EVIDENCE_DEPENDENT / #512 OPEN
 merge/release/production             HUMAN / NOT_PERFORMED
 ```
