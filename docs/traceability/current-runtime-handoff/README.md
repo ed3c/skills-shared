@@ -29,8 +29,8 @@ PR #507 was reviewed on its exact head, passed Skill Eval Contract, Shared Skill
 | Worker-result shape is defined by code arrival rather than a strict standalone receipt contract | `OPEN / #508` | needs committed Draft 2020-12 schema and semantic replay controls |
 | Real GitHub Issue Dependencies add/readback/remove/restore | `VERIFIED_LIVE / #465 CLOSED` | run `32296935756`, base `81041d1b88283fabdc1c4db05efaf8dd945e24df`, receipt SHA-256 `da227e94215a1b28a9e550546242c8a482bd718f7b35d67f159ccaa95f23efe5`; semantic authority remains false |
 | Real Herdr managed-agent lifecycle | `BLOCKED / #466 OPEN` | Herdr 0.8.0 process detection reached real states, but host permission denied the action/readback classes needed for a terminal clean receipt |
-| Real source compiler arrival | `DETERMINISTIC_REAL_SOURCE_BOUND / #467 OPEN` | GitHub issue #485 compiled and passed the existing closure checker; source truth and implementation verification were not promoted |
-| ARTICLE/PDF/PRD truth and applicability | `EVIDENCE_DEPENDENT` | no new immutable article/PDF/PRD source bundle was supplied in this audit epoch |
+| Source compiler/binding method | `COMPLETED / #467 CLOSED` | GitHub issue #485 compiled and passed the existing closure checker; this proves deterministic binding, not source truth |
+| ARTICLE/PDF/PRD or further Issue truth/applicability | `OPEN / #512 EVIDENCE_DEPENDENT` | successor evidence-execution issue owns immutable source packets; no new immutable article/PDF/PRD bundle was supplied in this audit epoch |
 | Repository entropy method + deterministic gate + domain ports + controls + CI/registry arrival | `HUMAN_ADMITTED_ON_MAIN` | rebuilt and landed through UCR admission PR #477; old C/K/A/E/X PRs remain closed-unmerged lineage |
 | Entropy nearest Agent/README routes and terminal Molecular index | `IMPLEMENTED_BY_THIS_AUDIT_CANDIDATE` | issue #403 / PR #404 is closed only after this exact candidate lands and hosted routing gates pass |
 
@@ -39,6 +39,9 @@ PR #507 was reviewed on its exact head, passed Skill Eval Contract, Shared Skill
 ```text
 #465  CLOSED / COMPLETED
       exact remote one-edge canary PASS with cleanup and denominator restoration
+
+#467  CLOSED / COMPLETED
+      deterministic source compiler/binding method complete; source truth is not implied
 
 #468  CLOSED / COMPLETED
       Wave-3 static/deterministic convergence only
@@ -52,12 +55,12 @@ PR #507 was reviewed on its exact head, passed Skill Eval Contract, Shared Skill
 #466  OPEN
       live Herdr lane attempted but blocked before terminal receipt
 
-#467  OPEN
-      compiler works; source truth/provider verification remains evidence-dependent
-
 #508  OPEN
       ACTIVE local hardening owner for durable result carrier, executor provenance,
       and strict worker-result schema
+
+#512  OPEN
+      immutable Issue/Article/PDF/PRD packet execution and truth/applicability/verification lane
 ```
 
 ## PR decisions
@@ -116,7 +119,8 @@ skills/git-town-stacked-pr-worker/molecular-indexes/codex-v2/
 #464             fresh signed-in Codex v2 execution + controller + Shadow
 
 #466             Herdr managed lifecycle receipt       SIBLING / EXTERNAL_RUNTIME
-#467             immutable source packet + closure     SIBLING / SOURCE_EVIDENCE
+#467             source compiler method                COMPLETE / HISTORICAL METHOD
+#512             immutable source packet + closure     SIBLING / SOURCE_EVIDENCE
 #465             remote GitHub canary                  COMPLETE / HISTORICAL RECEIPT
 ```
 
@@ -128,7 +132,7 @@ The Codex queue intentionally contains only #508. #508 changes the code/contract
 |---|---|---|
 | `codex-v2-local-handoff-queue.json` | #508 durable result carrier/provenance/schema | validated PASS receipt; compile a new #464 queue on the resulting admitted subject |
 | `herdr-local-handoff-queue.json` | #466 real managed-agent lifecycle | terminal clean lifecycle PASS or durable blocked receipt |
-| `source-evidence-local-handoff-queue.json` | #467 immutable source packet → existing closure ledger | deterministic binding PASS; truth/verification remains separately typed |
+| `source-evidence-local-handoff-queue.json` | #512 immutable source packet → existing closure ledger using #467 compiler | deterministic binding PASS; truth/verification remains separately typed |
 
 All queues bind `249abc47847f8295b1c75c9d4c84457c5126fd89` / `a24b9b7ace6f4022967d41262ecdc704d5c11646` and rollback `d5993267e03b217dcdab9702dab0400ab03df860`. Queue validation proves only the continuation contract.
 
@@ -153,8 +157,8 @@ current admitted implementation subject
 #508 durability + executor/result schema      NOT_IMPLEMENTED
 #464 fresh signed-in v2 acceptance            NOT_EXERCISED
 #466 terminal clean Herdr lifecycle           NOT_EXERCISED / BLOCKED_BY_HOST_PERMISSION
-#467 GitHub-issue source compilation          EXERCISED_DETERMINISTICALLY
-#467 ARTICLE/PDF/PRD truth                     EVIDENCE_DEPENDENT
+#467 source compiler/binding method            COMPLETED_DETERMINISTICALLY
+#512 Issue/Article/PDF/PRD truth execution     EVIDENCE_DEPENDENT / OPEN
 entropy method                                ADMITTED_ON_MAIN
 general cross-repository safe deletion        NOT_CLAIMED
 Draft knowledge/Productization/AE stacks      HOLD / NOT_MERGEABLE_BY_EVIDENCE
