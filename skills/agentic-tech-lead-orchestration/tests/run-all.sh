@@ -54,6 +54,16 @@ python3 "$ROOT/scripts/assert_local_handoff_queue.py" \
 python3 "$ROOT/scripts/assert_local_handoff_queue.py" \
   --queue "$ROOT/references/wave3-live-handoff-queue.json"
 
+# The current Tech Lead runtime/source handoff queues are load-bearing. Execute
+# their semantic gate unconditionally so a docs-only queue cannot look admitted.
+for queue in \
+  "$ROOT/runtime-handoff/codex-v2-local-handoff-queue.json" \
+  "$ROOT/runtime-handoff/herdr-local-handoff-queue.json" \
+  "$ROOT/runtime-handoff/source-evidence-local-handoff-queue.json"
+do
+  python3 "$ROOT/scripts/assert_local_handoff_queue.py" --queue "$queue"
+done
+
 # A schema-valid one-item queue epoch must validate and run its planted
 # controls (issue #317: the selftest used to crash on items[1]).
 python3 "$ROOT/scripts/assert_local_handoff_queue.py" \
