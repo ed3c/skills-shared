@@ -1,50 +1,95 @@
 # skills-shared — canonical cross-repository Skills
 
-`skills-shared` is the **Instruction / Method Plane** shared by Claude Code, Codex CLI and repository consumers. A shared Skill name has one canonical body and one Git history. Classification authority is [`registry.json`](registry.json); portable behavior lives in each `SKILL.md`; executable truth lives in contracts, scripts, tests, receipts, workflows and exact Git subjects.
+`skills-shared` is the canonical **Instruction / Method Plane** shared by Claude Code, Codex CLI and repository consumers. A shared Skill has one canonical body and one Git history. Classification authority is [`registry.json`](registry.json); portable behavior lives in each `SKILL.md`; executable truth lives in contracts, scripts, tests, receipts, workflows and exact Git subjects.
 
-> **Agent entry:** read [`AGENTS.md`](AGENTS.md), [`CONTEXT.md`](CONTEXT.md), [`ARCHITECTURE.md`](ARCHITECTURE.md), [`docs/INDEX.md`](docs/INDEX.md), [`docs/architecture/STATE_MACHINES.md`](docs/architecture/STATE_MACHINES.md), and [`docs/traceability/TRACEABILITY_INDEX.md`](docs/traceability/TRACEABILITY_INDEX.md).
+> **Agent entry:** read [`AGENTS.md`](AGENTS.md), [`CONTEXT.md`](CONTEXT.md), [`ARCHITECTURE.md`](ARCHITECTURE.md), [`docs/INDEX.md`](docs/INDEX.md), then [`docs/traceability/CURRENT_PUBLIC_REPOSITORY_STATE.md`](docs/traceability/CURRENT_PUBLIC_REPOSITORY_STATE.md) before historical programme snapshots.
 
-## Four-repository role
+## Repository role
 
 ```text
 skills-shared
-  procedural Skills, generic contracts, proof/eval/evolution truth
-        ↓ immutable requirements/releases
+  Instruction / Method Plane
+  portable procedures + contracts + deterministic proof/eval/evolution law
+
 runtime-env
-  secret-free variable/module/profile/workload/policy closure
-        ↓ exact bindings
-bettor-arena
-  module composition, proof/control/mutation, Context Capsules,
-  stateless MCP and consumer acceptance
-        ↓ admitted consumer contracts
-agent-shield-monorepo
-  domain product modules, provider adapters and product canaries
+  Runtime Contract Plane
+  secret-free runtime/profile/policy/wire-shape closure
+
+consumer repositories
+  domain composition + live runtime + product acceptance + mutable receipts
+
+external evidence / Human
+  source truth, provider/live effects, manual UI, merge, release, promotion
 ```
 
-The arrows represent immutable releases, requirements, locks and receipts—not mutable sibling imports. Local symlinks are development projections, not release identity. See [`docs/integration/CROSS_REPO_INTEGRATION.md`](docs/integration/CROSS_REPO_INTEGRATION.md).
+Cross-repository arrows represent immutable releases, requirements, locks and receipts—not mutable sibling imports. See [`docs/integration/CROSS_REPO_INTEGRATION.md`](docs/integration/CROSS_REPO_INTEGRATION.md) and [`docs/architecture/DOMAIN_DECOUPLING.md`](docs/architecture/DOMAIN_DECOUPLING.md).
+
+## Current public repository state
+
+Canonical human projection: [`docs/traceability/CURRENT_PUBLIC_REPOSITORY_STATE.md`](docs/traceability/CURRENT_PUBLIC_REPOSITORY_STATE.md).
+
+Current audit baseline after the #505 repair:
+
+```text
+main 249abc47847f8295b1c75c9d4c84457c5126fd89
+tree a24b9b7ace6f4022967d41262ecdc704d5c11646
+```
+
+The baseline is an immutable observation, not a floating alias. Re-read `main` before action.
+
+### Closed/admitted control-plane line
+
+```text
+Wave-2 #375/#376/#377/#378
+        ↓ selected sibling bytes
+#379 / PR #455                       MERGED
+        ↓
+Wave-3 #464/#465/#466/#467
+        ↓ selected sibling bytes
+#468 / PR #480 + #484                MERGED / POST-MERGE CLOSED
+        ↓
+#465 public Issue Dependencies canary LIVE_GITHUB_DEPENDENCY_CANARY_PASS
+#485 / PR #503                       live-owner transfer MERGED
+#497 / PR #504                       generic blockedBy producer repair MERGED
+#505 / PR #507                       Codex result-tree repair MERGED
+#366 external public consumer        hosted bootstrap + consumer CI + merge CLOSED
+```
+
+Important current evidence split:
+
+```text
+#376 Development sidebar generic link/unlink  RESIDUAL / MANUAL_OR_UNEXPOSED_API
+#464 signed-in Codex v2 acceptance            NOT_EXERCISED after #507
+#466 real Herdr lifecycle                     NOT_EXERCISED
+#467 article/PDF/PRD + provider truth         EVIDENCE_DEPENDENT
+release / production promotion                NOT_PERFORMED
+```
+
+A closed mechanism parent does not close its live successor. #465's bounded fixture-edge PASS does not grant semantic task-DAG authority and does not satisfy #376's manual Development-link residual.
 
 ## Document routing
 
 ```text
 task
-→ root AGENTS/current/stable context
-→ docs index and State Machines
-→ nearest AGENTS.md + README.md
+→ root AGENTS / CONTEXT / ARCHITECTURE
+→ docs/INDEX.md
+→ CURRENT_PUBLIC_REPOSITORY_STATE.md for current closure work
+→ nearest governed-directory AGENTS.md + README.md
 → machine authority
-→ exact evidence and traceability
+→ exact issue/PR/runtime/evidence subject
 ```
 
-Each hop leaves a local summary before linking away. Markdown is navigation, not a second registry, schema, verifier, receipt, workflow result or merge authority.
+Markdown is navigation and human projection, not a second registry, schema, verifier, receipt, workflow result or merge authority.
 
 ## Skill anatomy
 
 ```text
 skills/<name>/
-├── AGENTS.md          mandatory local read order and authority contract when needed
-├── README.md          directory ownership, State Machine, DAG, data flow, current handoff
+├── AGENTS.md          local read order, writer/authority law, completion packet
+├── README.md          directory ownership, State Machine, DAG, data flow, evidence ceiling
 ├── SKILL.md           portable workflow, laws and stop conditions
 ├── references/        reusable host-neutral contracts/templates
-├── modules/           trigger-selected domain/golden/provider instances
+├── modules/           trigger-selected instances/adapters
 ├── scripts/           executable mechanisms
 ├── tests/             positive, hollow, mutation and integration controls
 ├── evals.json         eval inventory when used
@@ -55,25 +100,24 @@ The separation is load-bearing. Consumer branches, paths, credentials, sessions,
 
 Worked patterns:
 
-- [`knowledge-continuity`](skills/knowledge-continuity/README.md) — procedural continuity and routed evidence.
-- [`forgejo-delivery-loop`](skills/forgejo-delivery-loop/README.md) — local forge contracts, deterministic router and consumer binding.
-- [`github-delivery-loop`](skills/github-delivery-loop/README.md) — GitHub publication and merge-preflight boundaries.
-- [`git-town-stacked-pr-worker`](skills/git-town-stacked-pr-worker/README.md) — molecular sibling/child/worktree/sync method.
-- [`agentic-tech-lead-orchestration`](skills/agentic-tech-lead-orchestration/README.md) — task/capability DAG, Workers, tournament and convergence.
+- [`agentic-tech-lead-orchestration`](skills/agentic-tech-lead-orchestration/README.md) — task/capability DAG, Workers, convergence, result-tree-bound Codex acceptance and Local Handoff.
+- [`git-town-stacked-pr-worker`](skills/git-town-stacked-pr-worker/README.md) — molecular sibling/child/convergence/worktree/sync method and terminal PR index.
 - [`skill-refactor-proof-loop`](skills/skill-refactor-proof-loop/README.md) — frozen treatments, old-strength retention, matched proof layers and golden registry.
+- [`github-delivery-loop`](skills/github-delivery-loop/README.md) — GitHub publication and merge-preflight boundaries.
+- [`forgejo-delivery-loop`](skills/forgejo-delivery-loop/README.md) — local forge contracts and recovery routing.
+- [`knowledge-continuity`](skills/knowledge-continuity/README.md) — procedural continuity and routed evidence.
 
 ## Repository topology → State Machine ownership
 
 ```text
 skills-shared/
-├── registry.json                   shared/repo-owned admission ledger
-├── skills/                         canonical methods, modules and proof owners
-├── evals/                          cases, holdouts, fixtures, verifiers, runtime identities,
-│                                   adapters, capability unlocks, releases and scorecards
+├── registry.json                   shared/repo-owned classification
+├── skills/                         canonical methods + module/proof owners
+├── evals/                          cases, holdouts, fixtures, verifier/release contracts
 ├── mutations/                      hypothesis/candidate/evidence/promotion lineage
 ├── scripts/                        deterministic control-plane transitions
 ├── tests/                          regression and mutation-kill proofs
-├── .github/workflows/              execution arrival; not semantic authority by itself
+├── .github/workflows/              execution arrival; never semantic authority by itself
 └── docs/                            routing, State Machines, current handoff and traceability
 ```
 
@@ -97,7 +141,7 @@ DISCOVERED
     └── regression / drift → ROLLBACK or new mutation
 ```
 
-Canonical distribution does not prove capability; an LLM judge does not create hard-gate truth; adaptive mutation cannot read holdout outcomes; ecosystem quality cannot compensate for failed capability gates; release requires deterministic evidence, rollback material and Human Admit.
+Canonical distribution does not prove capability; an LLM judge does not create hard-gate truth; adaptive mutation cannot read holdout outcomes; release requires deterministic evidence, rollback material and Human Admit.
 
 ## Proof-carrying Skill refactor State Machine
 
@@ -114,12 +158,12 @@ REFRACTOR_PROPOSED
 → DENOMINATOR_RECONCILED
 → GOLDEN_PROOF_REGISTERED
 → ADOPTION_READY
-→ LIVE_AB_PENDING / LIVE_AB_VERIFIED
+→ LIVE_AB_PENDING | LIVE_AB_VERIFIED
 → DELIVERY_EVIDENCE_BOUND
 → HUMAN_ADMIT_REQUIRED
 ```
 
-Proof layers:
+Proof layers remain separate:
 
 ```text
 L0 SOURCE_FREEZE
@@ -130,88 +174,69 @@ L4 MATCHED_LIVE_MODEL_RUNTIME
 L5 DELIVERY_AND_HUMAN_ADMIT
 ```
 
-A lower layer cannot be promoted by prose. A matched L3+ comparison uses the same base/tree/contracts/tests/budget/carrier and retains failed, stale, blocked, cancelled and superseded attempts. Eligible golden proofs are content-bound and reference their owner implementation without copying it.
+A lower layer cannot be promoted by prose. Failed, stale, blocked, cancelled and superseded attempts remain in the denominator.
 
-## Evidence data flow
-
-```text
-SKILL.md + implementation
-        ├── registry/shared-skills-infra → canonical projection/drift evidence
-        ├── refactor-proof contract      → frozen treatment and route evidence
-        └── cases + sealed holdout
-                    ↓
-        implementation-target validation + verifier calibration
-                    ↓
-        runtime / harness adapters or hermetic matched carrier
-                    ↓
-        canonical trace + deterministic receipts
-                    ↓
-        content-bound evidence bundle / golden registry
-             ┌──────┴───────────┐
-             ↓                  ↓
-       mutation lane      matched live/delivery lanes
-             ↓                  ↓
-       promotion gate      separate evidence owners
-             └────────────→ release receipt
-                               ├── separated scorecards
-                               ├── rollback artifact
-                               └── Human Admit
-```
-
-## Current implementation state — 2026-08-17
-
-The repository now carries the first proof-carrying Skill-refactor line:
+## Current Tech Lead / Shadow evidence flow
 
 ```text
-PR #308  deterministic Tech Lead reachability and receipt-gated causal repair
-└─ PR #315 production-shaped matched hermetic real-task A/B
-   └─ PR #323 canonical `skill-refactor-proof-loop` and golden registry
-      └─ Agent documentation / State Machine / DAG / data-flow leaf
+request / source
+→ exact repository subject
+→ contract + task/capability DAG
+→ path/resource/worktree/session leases
+→ deterministic mechanisms + negative controls
+→ isolated attempts
+→ source/diff/test/result-tree readback
+→ optional GitHub/Herdr/source evidence lanes
+→ independent Shadow same-subject review
+→ problem/closure recomputation
+→ convergence or Local Handoff
+→ Human Admit when required
 ```
 
-The matched deterministic carrier observed:
+The current signed-in Codex acceptance contract is v2: the Worker materializes an immutable result tree using a private Git index, the controller reads `base_sha^{tree}`, recomputes exact base→result-tree changed paths, then requires controller source/diff/test readback. A prior v1 live receipt cannot satisfy this v2 contract.
+
+## Source / article / PDF boundary
+
+Source documents are `SOURCE_PROPOSAL`. The current closure matrix is in [`CURRENT_PUBLIC_REPOSITORY_STATE.md`](docs/traceability/CURRENT_PUBLIC_REPOSITORY_STATE.md).
+
+Examples:
 
 ```text
-A_OLD_MONOLITH             PASS
-B0_REFACTOR_AS_LANDED      BLOCKED_DISPATCH_ROUTE_ABSENT
-B1_REACHABILITY_REPAIRED   PASS
-B2_CAUSAL_DAG_REPAIRED     PASS
-B3_CLOSURE_LAWS_BOUND      PASS
-B4_OFFLOAD_METHOD_BOUND    PASS
-A/B1/B2/B3/B4 final bytes   equivalent
+STE100 / CTL            method/deterministic architecture exists; official pack/Human/live A/B remain stronger lanes
+Dual-Agent              parent method closed; #362 local executable contract still open
+Parallel-Agent          individual adapters exist; one causal provider chain remains open
+Product Reverse         C/K/E/D programme not fully admitted
+Repository Entropy      PARTIALLY_INTERNALIZED / NOT_CLOSED; stale Stack needs current-main reconstruction
 ```
 
-Current proof ceiling:
-
-```text
-L0 source freeze              PASS
-L1 structural reachability    PASS
-L2 executable contract        PASS
-L3 hermetic real task         PASS
-L4 matched live model/runtime NOT_EXERCISED
-L5 delivery/Human Admit       HUMAN_ADMIT_REQUIRED
-```
-
-B2 improves causal and evidence closure, not live model quality. B3 binds the dual-DAG and lane-substitution closure laws into the same core and dominates B2 on the deterministic criteria. B4 is the live body: it routes the local/cloud offload method with its executable semantic authority named and its plane promotion refused, and dominates B3. Neither raises the proof ceiling above; every offload runtime lane remains NOT_IMPLEMENTED. Open evidence owners are #312 Phase 2, #231 scheduler, #232 independent Shadow, #234 Git Town/dual-forge, and #256 exact-subject code-intelligence/executor adapters. Merge, release and production remain outside Agent authority.
-
-Other landed control-plane mechanisms include implementation-target binding, verifier calibration, mutation admission, holdout isolation, capability/release schemas, isolated Shared Skills Infra CI, Intent-Bound Constraints, pinned Git Town canaries, Skill-suite arrival coverage, [controlled-language authority gates](docs/architecture/CONTROLLED_TECHNICAL_LANGUAGE_HARNESS.md), repository capability audits and procedural Shadow contracts. Current capability/release registries may still be empty; mechanism implementation does not imply the first physical unlock or release.
+Never turn package/license/performance/source prose into repository or legal truth without its own evidence.
 
 ## Git Town / molecular PR model
 
 Git Town is optional tooling; GitHub PR base/head metadata is publication truth.
 
 ```text
-independent path-disjoint work → sibling branches
-unmerged contract dependency  → true child branch
-smallest behavior + tests      → terminal leaf
-stable prerequisites + indexes → one convergence leaf
+independent path-disjoint work → SIBLING
+unmerged byte dependency      → TRUE_CHILD
+shared index/integration      → CONVERGENCE
+ordering without ancestry     → PROCESS_DEPENDENCY
+runtime/source/manual proof   → EXTERNAL_EVIDENCE
+prior immutable subject       → HISTORICAL
 ```
 
-A child must name the parent artifact/contracts it consumes. A branch, PR, issue close or green documentation check cannot substitute for implementation/evidence state. Semantic conflict, force push, ship, merge, release and rollback remain bounded Human/trusted-operator actions.
+Current terminal Molecular index is in [`skills/git-town-stacked-pr-worker/README.md`](skills/git-town-stacked-pr-worker/README.md). Old Spatial/Knowledge, Entropy, Kenn and other stale programme PRs must be reconstructed/revalidated on current main before publication; old green evidence is not carried forward by branch name.
+
+## Local Handoff
+
+Historical queue epochs stay immutable. Current local queue:
+
+[`skills/agentic-tech-lead-orchestration/references/public-main-local-handoff-queue-2026-08-20.json`](skills/agentic-tech-lead-orchestration/references/public-main-local-handoff-queue-2026-08-20.json)
+
+The serial ACTIVE item is #464 signed-in Codex v2 acceptance. Independent #376 manual UI, #466 Herdr and #467 source/provider evidence stay on their own issues rather than being falsely serialized.
 
 ## Local canonical projection
 
-The repository stores no machine-specific path in versioned contracts. Install/projection discovers the checkout and writes local path state only to ignored/host-owned surfaces.
+The repository stores no machine-specific checkout path in versioned portable contracts.
 
 ```bash
 python3 skills/shared-skills-infra/scripts/shared_skills.py install \
@@ -233,18 +258,19 @@ ABSENT
 NOT_IMPLEMENTED
 NOT_EXERCISED
 SKIPPED_BY_POLICY
+EVIDENCE_DEPENDENT
 HUMAN_ADMIT_REQUIRED
 ```
 
-A workflow skipped by policy is not execution evidence. A job that never receives a runner is not repository-test FAIL or PASS. Source prose, diagrams, package presence, an old SHA, another environment or a hermetic lower-layer proof cannot create current live/delivery truth.
+A skipped workflow is not execution evidence. A source proposal, historical SHA, issue closure or documentation check cannot create a stronger runtime/provider/user/release truth.
 
 ## Agent continuation checklist
 
-1. Read root routes, State Machines and traceability.
+1. Read root routes and current public-state trace.
 2. Inspect current `main`, exact open PR base/head and owning workflow arrival.
-3. Identify the transition, path owner and authority boundary.
-4. For a refactor, freeze A/B0/B1+ and protected old strengths before mutation.
-5. Select procedural core, references and triggered modules explicitly.
-6. Preserve holdout, verifier, optimizer, denominator, cleanup, release and Human authorities.
+3. Identify transition, path owner and authority boundary.
+4. Reconstruct stale Stack programmes on current main instead of reusing old green ancestry.
+5. For refactors, freeze A/B0/B1+ and protected old strengths before mutation.
+6. Preserve holdout, verifier, denominator, cleanup, release and Human authorities.
 7. Run owning positive/hollow/mutation/matched-task controls.
-8. Update nearest `AGENTS.md`, README, current handoff and traceability when topology changes.
+8. Update nearest `AGENTS.md`, README, current handoff and traceability only through one convergence owner.
