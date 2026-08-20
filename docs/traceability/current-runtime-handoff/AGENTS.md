@@ -52,7 +52,7 @@ SOURCE_PROPOSAL
 → RELEASED
 ```
 
-A completed issue may truthfully close a narrower method or canary lane while related live, durability, source-truth, release, or production lanes remain open in successor issues. State the exact ceiling.
+A completed issue may truthfully close a narrower method or canary lane while related live, durability, source-truth, release, or production lanes remain open in successor issues. State the exact ceiling. #467 is the canonical example: its source compiler method is completed, while #512 owns real Issue/Article/PDF/PRD evidence execution.
 
 ## PR terminal classification
 
@@ -72,10 +72,10 @@ An issue can close only when its own goal and close gate are satisfied. Do not c
 
 - #464 until a fresh v2 signed-in Codex run binds a durable result carrier and passes independent Shadow;
 - #466 until a real managed Herdr lifecycle produces a terminal, clean, content-bound receipt;
-- #467 merely because source compilation passes; source truth, applicability, implementation, and verification remain separate;
-- #508 until durable result-tree replay, exact executor provenance, and a strict worker-result schema pass their controls.
+- #508 until durable result-tree replay, exact executor provenance, and a strict worker-result schema pass their controls;
+- #512 merely because #467 compilation passes; source truth, applicability, implementation, and verification remain separately typed and require exact source packets.
 
-#465 is a valid closed live-canary lane because the owned remote edge was added, read back, removed, and the original denominator was restored on an exact hosted receipt.
+#467 is validly closed as the compiler/binding method owner. #465 is a valid closed live-canary lane because the owned remote edge was added, read back, removed, and the original denominator was restored on an exact hosted receipt.
 
 ## Writer and Shadow laws
 
