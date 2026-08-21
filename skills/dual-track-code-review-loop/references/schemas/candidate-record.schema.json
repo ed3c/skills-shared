@@ -1,0 +1,275 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dtcr-candidate-record.schema.json",
+  "title": "DTCR technology candidate record",
+  "description": "One external technology, library, service, model or body of prose that the method is considering using, depending on, importing, deriving from or re-implementing. The rights planes are separate required fields rather than one license field, because a permissive source-code license clears source-code copying and nothing else: employment and IP assignment, patent, trademark, service terms, model weights, SDK and store terms, privacy and release each keep their own admission state, and a record cannot satisfy one by satisfying another. Observation is a choice between an exact revision and a dated observation, so a candidate is never described as it is today by a reader consulting it next year. Applicability is closed at OBSERVED_ON_LISTED_TARGETS_ONLY, so the scope field itself cannot be widened. The target list refuses four exact lowercase spellings -- the bare asterisk, all, any, universal -- and nothing more: the list is anchored and case-sensitive, so 'Universal', 'all languages' and 'every runtime' are all accepted entries. The universal claim is therefore made awkward rather than impossible, and a reviewer still owns whether the listed targets are targets somebody actually ran.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "candidate_id", "locator", "observation", "rights", "relationship", "owner_atom", "replacement_path", "security_update_owner", "admission_state", "applicability"],
+  "properties": {
+    "schema": {"const": "dtcr/candidate-record/v1"},
+    "candidate_id": {"type": "string", "pattern": "^DTCR-TC-[0-9]{3}$"},
+    "locator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "identity"],
+      "properties": {
+        "kind": {"enum": ["REPOSITORY", "PUBLISHED_URL", "SPECIFICATION", "SOURCE_PACKET"]},
+        "identity": {
+          "type": "string",
+          "minLength": 4,
+          "not": {"pattern": "^(?:file:|/Users/|/home/|~/)"},
+          "description": "Public identity only. A machine-local path is not a locator anyone else can follow, and a private URL never enters a public record."
+        }
+      }
+    },
+    "observation": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["exact_revision"],
+          "properties": {"exact_revision": {"type": "string", "pattern": "^[0-9a-f]{40}$"}}
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["dated_observation"],
+          "properties": {"dated_observation": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"}}
+        }
+      ],
+      "description": "Exact revision when the candidate is versioned, a dated observation when it is a live surface that has no revision. There is no third form: an undated claim about a moving target decays into a false statement without ever changing."
+    },
+    "rights": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["declared_license", "notice_state", "planes"],
+      "properties": {
+        "declared_license": {
+          "oneOf": [
+            {"type": "null"},
+            {"type": "string", "minLength": 2}
+          ],
+          "description": "The identifier the candidate itself declares. null when the candidate declares none, which is not the same as permissive."
+        },
+        "notice_state": {"enum": ["NOTICE_PRESENT_AND_READ", "NOTICE_ABSENT", "NOT_EXERCISED"]},
+        "planes": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["source_code_license", "employment_and_ip", "patent", "trademark", "service_terms", "model_weights", "sdk_or_store_terms", "privacy", "release"],
+          "properties": {
+            "source_code_license": {"$ref": "#/$defs/clearance"},
+            "employment_and_ip": {"$ref": "#/$defs/clearance"},
+            "patent": {"$ref": "#/$defs/clearance"},
+            "trademark": {"$ref": "#/$defs/clearance"},
+            "service_terms": {"$ref": "#/$defs/clearance"},
+            "model_weights": {"$ref": "#/$defs/clearance"},
+            "sdk_or_store_terms": {"$ref": "#/$defs/clearance"},
+            "privacy": {"$ref": "#/$defs/clearance"},
+            "release": {"$ref": "#/$defs/clearance"}
+          },
+          "description": "Nine independent planes. Reading a permissive license sets exactly one of them and leaves the other eight where they were."
+        }
+      }
+    },
+    "relationship": {
+      "enum": ["REFERENCE_ONLY", "DEPENDENCY_ONLY", "VENDOR_IMPORT", "DERIVED", "CLEAN_ROOM_REIMPLEMENTATION"],
+      "description": "Closed. What is actually done with the candidate decides which rights planes must be cleared, so the relationship cannot be left implicit."
+    },
+    "owner_atom": {
+      "type": "string",
+      "minLength": 2,
+      "description": "The single atom accountable for this candidate. Shared ownership resolves to nobody at the moment a decision is needed."
+    },
+    "replacement_path": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "note"],
+      "properties": {
+        "state": {"enum": ["IDENTIFIED", "NONE_IDENTIFIED", "NOT_APPLICABLE"]},
+        "note": {"type": "string", "minLength": 8}
+      },
+      "description": "What happens when this candidate becomes unavailable, unaffordable or unacceptable. NONE_IDENTIFIED is an honest answer and reads as risk; omitting the field would read as safety."
+    },
+    "security_update_owner": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "atom"],
+      "properties": {
+        "state": {"enum": ["UPSTREAM_MAINTAINED", "LOCALLY_OWNED", "UNOWNED", "NOT_APPLICABLE"]},
+        "atom": {"oneOf": [{"type": "null"}, {"type": "string", "minLength": 2}]}
+      },
+      "description": "A vendored or derived candidate transfers the security-update duty to whoever vendored it. UNOWNED is the state that most often goes unrecorded and most often matters."
+    },
+    "admission_state": {
+      "enum": ["PROPOSED", "ADMITTED", "REFUSED", "BLOCKED", "NOT_APPLICABLE", "HUMAN_ADMIT_REQUIRED"]
+    },
+    "applicability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scope", "targets_observed"],
+      "properties": {
+        "scope": {
+          "const": "OBSERVED_ON_LISTED_TARGETS_ONLY",
+          "description": "The only scope this record can express. A candidate that worked on the targets someone ran it on has been observed on those targets; no count of them makes it universal."
+        },
+        "targets_observed": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "not": {"pattern": "^(?:\\*|all|any|universal)$"},
+            "description": "A named language, runtime, platform or stack. A wildcard is the universal claim wearing a list's clothing, so four exact lowercase spellings of one are refused. The pattern is anchored and case-sensitive and refuses nothing else: 'Universal', 'all languages' and 'every runtime' pass. Treat this as friction against the reflex, not as a guard that makes the claim unsayable."
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "clearance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "basis"],
+      "properties": {
+        "state": {"enum": ["ADMITTED", "NOT_ADMITTED", "NOT_APPLICABLE", "HUMAN_ADMIT_REQUIRED"]},
+        "basis": {
+          "oneOf": [
+            {"type": "null"},
+            {"type": "string", "minLength": 8}
+          ],
+          "description": "What was read or decided. null is only consistent with NOT_ADMITTED or NOT_APPLICABLE; an ADMITTED plane with no basis is an assumption wearing a verdict's label."
+        }
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"state": {"const": "ADMITTED"}}, "required": ["state"]},
+          "then": {"properties": {"basis": {"type": "string", "minLength": 8}}}
+        }
+      ]
+    }
+  },
+  "examples": [
+    {
+      "schema": "dtcr/candidate-record/v1",
+      "candidate_id": "DTCR-TC-001",
+      "locator": {"kind": "SPECIFICATION", "identity": "RFC 8452 AES-GCM-SIV misuse-resistant AEAD"},
+      "observation": {"dated_observation": "2026-08-21"},
+      "rights": {
+        "declared_license": null,
+        "notice_state": "NOT_EXERCISED",
+        "planes": {
+          "source_code_license": {"state": "NOT_APPLICABLE", "basis": null},
+          "employment_and_ip": {"state": "HUMAN_ADMIT_REQUIRED", "basis": null},
+          "patent": {"state": "HUMAN_ADMIT_REQUIRED", "basis": null},
+          "trademark": {"state": "NOT_APPLICABLE", "basis": null},
+          "service_terms": {"state": "NOT_APPLICABLE", "basis": null},
+          "model_weights": {"state": "NOT_APPLICABLE", "basis": null},
+          "sdk_or_store_terms": {"state": "NOT_APPLICABLE", "basis": null},
+          "privacy": {"state": "NOT_APPLICABLE", "basis": null},
+          "release": {"state": "NOT_ADMITTED", "basis": null}
+        }
+      },
+      "relationship": "REFERENCE_ONLY",
+      "owner_atom": "DTCR-C0",
+      "replacement_path": {"state": "NOT_APPLICABLE", "note": "A referenced specification is read, not depended on at runtime."},
+      "security_update_owner": {"state": "NOT_APPLICABLE", "atom": null},
+      "admission_state": "PROPOSED",
+      "applicability": {
+        "scope": "OBSERVED_ON_LISTED_TARGETS_ONLY",
+        "targets_observed": ["specification-text-only"]
+      }
+    }
+  ],
+  "x-refusal-controls": [
+    {
+      "case_id": "DTCR-XC-TC-001",
+      "refuses": "One permissive source-code license used as clearance for every plane at once.",
+      "refused_by": "properties.rights.properties.planes.required",
+      "instance": {
+        "schema": "dtcr/candidate-record/v1",
+        "candidate_id": "DTCR-TC-002",
+        "locator": {"kind": "REPOSITORY", "identity": "example-upstream/example-indexer"},
+        "observation": {"exact_revision": "0123456789abcdef0123456789abcdef01234567"},
+        "rights": {
+          "declared_license": "Apache-2.0",
+          "notice_state": "NOTICE_PRESENT_AND_READ",
+          "planes": {
+            "source_code_license": {"state": "ADMITTED", "basis": "Apache-2.0 permits use and modification with notice."}
+          }
+        },
+        "relationship": "VENDOR_IMPORT",
+        "owner_atom": "DTCR-C0",
+        "replacement_path": {"state": "NONE_IDENTIFIED", "note": "No equivalent identified."},
+        "security_update_owner": {"state": "LOCALLY_OWNED", "atom": "DTCR-C0"},
+        "admission_state": "ADMITTED",
+        "applicability": {"scope": "OBSERVED_ON_LISTED_TARGETS_ONLY", "targets_observed": ["go"]}
+      }
+    },
+    {
+      "case_id": "DTCR-XC-TC-002",
+      "refuses": "A stack promoted to universal best practice through a wildcard target list.",
+      "refused_by": "properties.applicability.properties.targets_observed.items.not",
+      "instance": {
+        "schema": "dtcr/candidate-record/v1",
+        "candidate_id": "DTCR-TC-003",
+        "locator": {"kind": "REPOSITORY", "identity": "example-upstream/example-runtime"},
+        "observation": {"dated_observation": "2026-08-21"},
+        "rights": {
+          "declared_license": "MIT",
+          "notice_state": "NOTICE_PRESENT_AND_READ",
+          "planes": {
+            "source_code_license": {"state": "ADMITTED", "basis": "MIT permits use with notice."},
+            "employment_and_ip": {"state": "HUMAN_ADMIT_REQUIRED", "basis": null},
+            "patent": {"state": "NOT_ADMITTED", "basis": null},
+            "trademark": {"state": "NOT_ADMITTED", "basis": null},
+            "service_terms": {"state": "NOT_APPLICABLE", "basis": null},
+            "model_weights": {"state": "NOT_APPLICABLE", "basis": null},
+            "sdk_or_store_terms": {"state": "NOT_APPLICABLE", "basis": null},
+            "privacy": {"state": "NOT_APPLICABLE", "basis": null},
+            "release": {"state": "NOT_ADMITTED", "basis": null}
+          }
+        },
+        "relationship": "DEPENDENCY_ONLY",
+        "owner_atom": "DTCR-C0",
+        "replacement_path": {"state": "IDENTIFIED", "note": "A second runtime covers the same surface."},
+        "security_update_owner": {"state": "UPSTREAM_MAINTAINED", "atom": "example-upstream"},
+        "admission_state": "PROPOSED",
+        "applicability": {"scope": "OBSERVED_ON_LISTED_TARGETS_ONLY", "targets_observed": ["*"]}
+      }
+    },
+    {
+      "case_id": "DTCR-XC-TC-003",
+      "refuses": "A plane marked ADMITTED with no basis recorded.",
+      "refused_by": "$defs.clearance.allOf[0].then",
+      "instance": {
+        "schema": "dtcr/candidate-record/v1",
+        "candidate_id": "DTCR-TC-004",
+        "locator": {"kind": "REPOSITORY", "identity": "example-upstream/example-indexer"},
+        "observation": {"exact_revision": "0123456789abcdef0123456789abcdef01234567"},
+        "rights": {
+          "declared_license": "Apache-2.0",
+          "notice_state": "NOTICE_PRESENT_AND_READ",
+          "planes": {
+            "source_code_license": {"state": "ADMITTED", "basis": "Apache-2.0 permits use and modification with notice."},
+            "employment_and_ip": {"state": "ADMITTED", "basis": null},
+            "patent": {"state": "NOT_ADMITTED", "basis": null},
+            "trademark": {"state": "NOT_ADMITTED", "basis": null},
+            "service_terms": {"state": "NOT_APPLICABLE", "basis": null},
+            "model_weights": {"state": "NOT_APPLICABLE", "basis": null},
+            "sdk_or_store_terms": {"state": "NOT_APPLICABLE", "basis": null},
+            "privacy": {"state": "NOT_APPLICABLE", "basis": null},
+            "release": {"state": "NOT_ADMITTED", "basis": null}
+          }
+        },
+        "relationship": "DERIVED",
+        "owner_atom": "DTCR-C0",
+        "replacement_path": {"state": "NONE_IDENTIFIED", "note": "No equivalent identified."},
+        "security_update_owner": {"state": "LOCALLY_OWNED", "atom": "DTCR-C0"},
+        "admission_state": "PROPOSED",
+        "applicability": {"scope": "OBSERVED_ON_LISTED_TARGETS_ONLY", "targets_observed": ["go"]}
+      }
+    }
+  ]
+}

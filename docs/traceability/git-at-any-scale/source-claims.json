@@ -1,0 +1,62 @@
+{
+  "schema": "git-at-any-scale-source-claims-pointer/v1",
+  "note": "This file intentionally does not duplicate the 28-claim denominator. It points at the merged, authoritative source-evidence packet under data/handoff/source-evidence/ and states this lease's exact-head triage over it. Do not re-derive claim text or state here; read the ssot paths.",
+  "ssot": {
+    "source_bytes": "data/handoff/source-evidence/sources/cursor-git-at-any-scale.html",
+    "source_provenance": "data/handoff/source-evidence/sources/cursor-git-at-any-scale.provenance.json",
+    "claims": "data/handoff/source-evidence/git-at-any-scale-claims.json",
+    "closure_ledger": "data/handoff/source-evidence/git-at-any-scale-closure-ledger.json"
+  },
+  "source": {
+    "kind": "ARTICLE",
+    "title": "Git at any scale",
+    "publisher": "Cursor",
+    "author": "Vicent Marti",
+    "published": "2026-08-18",
+    "canonical_url": "https://cursor.com/blog/git-at-any-scale",
+    "observed": "2026-08-21",
+    "authority": "SOURCE_PROPOSAL",
+    "immutable_bytes_count": 864322,
+    "sha256": "25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9"
+  },
+  "repository_subject": {
+    "repository": "ed3c/skills-shared",
+    "main": "174009203a3ff9bd6ebc4010bc6cab7232dd44a4",
+    "tree": "311052ecf5780f8d91c4d2429e8ce1a50a0361d8"
+  },
+  "claim_denominator": {
+    "total": 28,
+    "not_applicable": 2,
+    "applicable_open": 26
+  },
+  "triage": {
+    "narrative_not_independently_checkable": {
+      "count": 2,
+      "issue_nodes": [],
+      "problem_ids": ["gas-scene-setting-hosting-difficulty", "gas-packfile-transport-fundamentals"]
+    },
+    "addressed_by_existing_mechanism": {
+      "count": 1,
+      "issue_nodes": [531],
+      "problem_ids": ["gas-agent-coordination-framing"]
+    },
+    "owned_by_c1": {
+      "count": 6,
+      "issue_nodes": [531, 532],
+      "problem_ids": [
+        "gas-cont-gossip-non-authority-etag-validation",
+        "gas-cont-linearizable-push-visibility",
+        "gas-cont-no-consensus-cas-ref-update",
+        "gas-cont-stateless-no-routing-table",
+        "gas-cont-wal-forensic-replay",
+        "gas-cont-wal-source-of-truth"
+      ]
+    },
+    "requires_external_runtime": {
+      "count": 19,
+      "issue_nodes": [531, 534],
+      "note": "includes all performance-number claims (100-replica synthetic test, linear read-only scaling, S3 Standard/Express push throughput) and all Spokes/DHT/NFS/GFS/DRBD historical/continuation architecture claims"
+    }
+  },
+  "check": "python3 skills/agentic-tech-lead-orchestration/scripts/check_problem_closure.py data/handoff/source-evidence/git-at-any-scale-closure-ledger.json"
+}

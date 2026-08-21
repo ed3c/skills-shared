@@ -1,0 +1,211 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dtcr-coverage-ceiling.schema.json",
+  "title": "DTCR coverage ceiling",
+  "description": "How much of the subject one provider actually analysed, and what it did not reach. The shape follows the verification receipt on purpose: there is no field in which to write a bare percentage, because a ratio without a named denominator describes the set the reader invents, and the set the reader invents is always the whole repository. An omission list that is not empty forces the completeness value down to a lower bound, which is the structural form of PARTIAL_COVERAGE_PROMOTED_TO_COMPLETE: a pass that skipped four languages and one generated tree cannot also report itself as complete. An empty omission list is itself a claim -- that nothing was skipped -- and it is made explicitly rather than by leaving the key out.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "ceiling_id", "subject", "provider_binding_id", "analysed", "completeness", "omissions", "warnings", "authority_ceiling"],
+  "properties": {
+    "schema": {"const": "dtcr/coverage-ceiling/v1"},
+    "ceiling_id": {"type": "string", "pattern": "^DTCR-CC-[0-9]{3}$"},
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository_binding_id", "commit", "tree"],
+      "properties": {
+        "repository_binding_id": {"type": "string", "pattern": "^DTCR-RB-[0-9a-f]{16}$"},
+        "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "tree": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+      }
+    },
+    "provider_binding_id": {"type": "string", "pattern": "^DTCR-PB-[0-9a-f]{16}$"},
+    "analysed": {
+      "oneOf": [
+        {"const": "NOT_MEASURED"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["numerator", "denominator", "denominator_definition", "method"],
+          "properties": {
+            "numerator": {"type": "integer", "minimum": 0},
+            "denominator": {"type": "integer", "minimum": 1},
+            "denominator_definition": {
+              "type": "string",
+              "minLength": 12,
+              "description": "What was counted, written out. Files, blobs, symbols and edges are four different denominators and a ratio over one of them says nothing about the other three."
+            },
+            "method": {"type": "string", "minLength": 8}
+          }
+        }
+      ],
+      "description": "Either the literal NOT_MEASURED or a numerator over a denominator somebody named. There is no third form, and no key here holds a percentage."
+    },
+    "completeness": {
+      "enum": ["COMPLETE_FOR_ANALYSED_INPUTS", "PARTIAL_LOWER_BOUND", "UNKNOWN"],
+      "description": "COMPLETE_FOR_ANALYSED_INPUTS is a statement about the inputs this pass parsed. No value in this enum claims completeness over the repository, the language or the behaviour."
+    },
+    "omissions": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["omission_kind", "detail"],
+        "properties": {
+          "omission_kind": {
+            "enum": ["LANGUAGE_NOT_INSTALLED", "GRAMMAR_ABSENT", "GENERATED_CODE_SKIPPED", "VENDORED_OR_BINARY", "PARSE_FAILURE", "TIMEOUT", "PROVIDER_UNSUPPORTED_CONSTRUCT", "EXCLUDED_BY_CONFIG"]
+          },
+          "detail": {"type": "string", "minLength": 8}
+        }
+      },
+      "description": "Explicit and enumerated. An omission recorded nowhere is indistinguishable downstream from a region that was analysed and found clean."
+    },
+    "warnings": {"type": "array", "items": {"type": "string", "minLength": 2}},
+    "authority_ceiling": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["unanalysed_inputs_cleared", "semantic_completeness", "task_pass"],
+      "properties": {
+        "unanalysed_inputs_cleared": {
+          "const": false,
+          "description": "The single sentence this record exists to refuse: what was not analysed was not cleared."
+        },
+        "semantic_completeness": {"const": false},
+        "task_pass": {"const": false}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"omissions": {"minItems": 1}}, "required": ["omissions"]},
+      "then": {
+        "properties": {"completeness": {"enum": ["PARTIAL_LOWER_BOUND", "UNKNOWN"]}},
+        "description": "PARTIAL_COVERAGE_PROMOTED_TO_COMPLETE refused here. A pass with a non-empty omission list is a lower bound by construction."
+      }
+    }
+  ],
+  "examples": [
+    {
+      "schema": "dtcr/coverage-ceiling/v1",
+      "ceiling_id": "DTCR-CC-001",
+      "subject": {
+        "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+        "commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+        "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+      },
+      "provider_binding_id": "DTCR-PB-1a4c77d0be93f218",
+      "analysed": {
+        "numerator": 412,
+        "denominator": 587,
+        "denominator_definition": "the 587 text blobs reachable from this tree excluding the vendored dependency directory",
+        "method": "one parse per blob, counted from the provider run log"
+      },
+      "completeness": "PARTIAL_LOWER_BOUND",
+      "omissions": [
+        {"omission_kind": "GRAMMAR_ABSENT", "detail": "no grammar was installed for two of the six languages present in this tree"},
+        {"omission_kind": "GENERATED_CODE_SKIPPED", "detail": "the generated protocol stubs directory was excluded by configuration"}
+      ],
+      "warnings": [],
+      "authority_ceiling": {"unanalysed_inputs_cleared": false, "semantic_completeness": false, "task_pass": false}
+    }
+  ],
+  "x-refusal-controls": [
+    {
+      "case_id": "DTCR-XC-CC-001",
+      "refuses": "PARTIAL_COVERAGE_PROMOTED_TO_COMPLETE: a pass with recorded omissions reporting itself complete for the analysed inputs.",
+      "refused_by": "allOf[0].then",
+      "instance": {
+        "schema": "dtcr/coverage-ceiling/v1",
+        "ceiling_id": "DTCR-CC-002",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+          "commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+        },
+        "provider_binding_id": "DTCR-PB-1a4c77d0be93f218",
+        "analysed": {
+          "numerator": 412,
+          "denominator": 587,
+          "denominator_definition": "the 587 text blobs reachable from this tree excluding the vendored dependency directory",
+          "method": "one parse per blob, counted from the provider run log"
+        },
+        "completeness": "COMPLETE_FOR_ANALYSED_INPUTS",
+        "omissions": [
+          {"omission_kind": "GRAMMAR_ABSENT", "detail": "no grammar was installed for two of the six languages present in this tree"}
+        ],
+        "warnings": [],
+        "authority_ceiling": {"unanalysed_inputs_cleared": false, "semantic_completeness": false, "task_pass": false}
+      }
+    },
+    {
+      "case_id": "DTCR-XC-CC-002",
+      "refuses": "A bare percentage written where a numerator over a named denominator belongs.",
+      "refused_by": "properties.analysed.oneOf",
+      "instance": {
+        "schema": "dtcr/coverage-ceiling/v1",
+        "ceiling_id": "DTCR-CC-003",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+          "commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+        },
+        "provider_binding_id": "DTCR-PB-1a4c77d0be93f218",
+        "analysed": "94%",
+        "completeness": "PARTIAL_LOWER_BOUND",
+        "omissions": [
+          {"omission_kind": "TIMEOUT", "detail": "four blobs exceeded the per-blob parse timeout"}
+        ],
+        "warnings": [],
+        "authority_ceiling": {"unanalysed_inputs_cleared": false, "semantic_completeness": false, "task_pass": false}
+      }
+    },
+    {
+      "case_id": "DTCR-XC-CC-003",
+      "refuses": "A ratio whose denominator is named only as everything, which is the reader's imagination rather than a counted set.",
+      "refused_by": "properties.analysed.oneOf[1].properties.denominator_definition.minLength",
+      "instance": {
+        "schema": "dtcr/coverage-ceiling/v1",
+        "ceiling_id": "DTCR-CC-004",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+          "commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+        },
+        "provider_binding_id": "DTCR-PB-1a4c77d0be93f218",
+        "analysed": {
+          "numerator": 412,
+          "denominator": 587,
+          "denominator_definition": "all files",
+          "method": "one parse per blob, counted from the provider run log"
+        },
+        "completeness": "PARTIAL_LOWER_BOUND",
+        "omissions": [
+          {"omission_kind": "TIMEOUT", "detail": "four blobs exceeded the per-blob parse timeout"}
+        ],
+        "warnings": [],
+        "authority_ceiling": {"unanalysed_inputs_cleared": false, "semantic_completeness": false, "task_pass": false}
+      }
+    },
+    {
+      "case_id": "DTCR-XC-CC-004",
+      "refuses": "A ceiling recording that the inputs nobody analysed were nonetheless cleared.",
+      "refused_by": "properties.authority_ceiling.properties.unanalysed_inputs_cleared.const",
+      "instance": {
+        "schema": "dtcr/coverage-ceiling/v1",
+        "ceiling_id": "DTCR-CC-005",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+          "commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+        },
+        "provider_binding_id": "DTCR-PB-1a4c77d0be93f218",
+        "analysed": "NOT_MEASURED",
+        "completeness": "UNKNOWN",
+        "omissions": [],
+        "warnings": [],
+        "authority_ceiling": {"unanalysed_inputs_cleared": true, "semantic_completeness": false, "task_pass": false}
+      }
+    }
+  ]
+}

@@ -1,0 +1,457 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pol/commercial-lane/v1",
+  "title": "Commercial friction contract",
+  "description": "One COMMERCIAL-lane record: the buyer and payment trigger, the pricing model, the friction to buy, and the leading/decisive metric split, all as falsifiable hypotheses rather than one PAID_VALIDATED bit. Composes with `../productization-program.schema.json` (pol/productization-program/v1): this record is what a program's `lanes.commercial` object is produced from, and its own `authority.paid_truth` constant restates the parent's `authority.paid_truth: false` rather than redefining it. Every hypothesis-shaped field is closed with its own `falsifier`, so a claim without a stated way to prove it wrong cannot be represented at all. Six refusals are structural: a leading interest signal cannot stand in the decisive-metric slot; a claimed repeatable business requires at least two distinct payment events; a price cannot be reported without the buyer it binds to or without its delivery cost alongside it; a free-trial motion cannot leave post-trial friction unstated; and existing-subscription leverage is a closed pair of booleans with no room for a third key asserting one implies the other.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "subject_commit",
+    "buyer_and_payment_trigger",
+    "commercial_model",
+    "price_hypothesis",
+    "delivery_cost_hypothesis",
+    "sales_motion",
+    "integration_burden",
+    "existing_subscription_leverage",
+    "time_to_value_before_payment",
+    "implementation_support_burden",
+    "refund_cancellation_reversal_path",
+    "expansion_value",
+    "commercial_metrics",
+    "kill_iterate_threshold",
+    "repeatable_commercial_claim",
+    "authority"
+  ],
+  "properties": {
+    "schema": {"const": "pol/commercial-lane/v1"},
+    "subject_commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$",
+      "description": "The exact commit this commercial record is bound to. A branch or tag fails the pattern, for the same reason the parent program schema pins its own subject: a record bound to a moving name describes whatever that name points at when somebody next reads it."
+    },
+    "buyer_and_payment_trigger": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["buyer_ref", "payment_trigger", "falsifier"],
+      "description": "Who pays, and the exact event that starts the payment obligation. Kept as one object because a trigger with no bound buyer is a mechanism with no economic actor.",
+      "properties": {
+        "buyer_ref": {"type": "string", "minLength": 1, "maxLength": 200, "description": "The economic decision-maker, named as a role or account type, not a person."},
+        "payment_trigger": {"type": "string", "minLength": 1, "maxLength": 300, "description": "The exact event that starts the payment obligation (e.g. seat activation, first successful run, invoice threshold crossed)."},
+        "falsifier": {"type": "string", "minLength": 1, "maxLength": 400}
+      }
+    },
+    "commercial_model": {
+      "enum": ["ONE_TIME", "RECURRING", "USAGE", "SERVICE_ASSISTED"],
+      "description": "The four shapes this lane distinguishes. SERVICE_ASSISTED names a model where a person's labor is part of what is sold, not merely part of how it is delivered."
+    },
+    "price_hypothesis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["buyer_ref", "price_value_hypothesis", "evidence_class", "falsifier"],
+      "description": "A price is only a claim about a named buyer. `buyer_ref` is required here, independently of `buyer_and_payment_trigger`, so a price cannot be stated with the buyer left as an assumption carried over from elsewhere. x-refusal-control PRICE_WITHOUT_BUYER: refused_by properties.price_hypothesis.required.",
+      "properties": {
+        "buyer_ref": {"type": "string", "minLength": 1, "maxLength": 200},
+        "price_value_hypothesis": {"type": "string", "minLength": 1, "maxLength": 200, "description": "The hypothesised price point and unit, e.g. '$29/seat/month' or '$0.02/call above the free tier'."},
+        "evidence_class": {"$ref": "#/$defs/evidence_class"},
+        "falsifier": {"type": "string", "minLength": 1, "maxLength": 400}
+      }
+    },
+    "delivery_cost_hypothesis": {
+      "$ref": "#/$defs/hypothesis_value",
+      "description": "What it costs to actually deliver the priced unit. Required at the top level alongside `price_hypothesis` so a gross price cannot be reported with no companion cost figure next to it. x-refusal-control GROSS_VALUE_WITHOUT_DELIVERY_COST: refused_by required (top level, the `delivery_cost_hypothesis` entry)."
+    },
+    "sales_motion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["motion", "falsifier"],
+      "description": "How the sale actually happens. A FREE_TRIAL_LED motion carries a conditional requirement below: it may not omit `friction_after_trial_ends`. x-refusal-control FREE_TRIAL_AS_LOW_FRICTION_BY_DEFAULT: refused_by properties.sales_motion.allOf[0].then.required.",
+      "properties": {
+        "motion": {"enum": ["FREE_TRIAL_LED", "SELF_SERVE", "DIRECT_SALES", "PARTNER_LED", "PRODUCT_LED", "SERVICE_ASSISTED_SALES"]},
+        "friction_after_trial_ends": {"$ref": "#/$defs/hypothesis_value"},
+        "falsifier": {"type": "string", "minLength": 1, "maxLength": 400}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"motion": {"const": "FREE_TRIAL_LED"}}, "required": ["motion"]},
+          "then": {"required": ["friction_after_trial_ends"]}
+        }
+      ]
+    },
+    "integration_burden": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["new_account_required", "api_key_required", "integration_effort"],
+      "description": "The new-account, API-key and integration burden the buyer clears before the priced unit does anything for them.",
+      "properties": {
+        "new_account_required": {"type": "boolean"},
+        "api_key_required": {"type": "boolean"},
+        "integration_effort": {"$ref": "#/$defs/hypothesis_value"}
+      }
+    },
+    "existing_subscription_leverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["consumer_subscription_present", "api_or_integration_entitlement_present", "falsifier"],
+      "description": "A consumer subscription and an API/integration entitlement are two separate booleans, never merged into one. Closed with no third key, so no invented field can assert that one implies the other. x-refusal-control EXISTING_SUBSCRIPTION_ASSUMED_API_ENTITLEMENT: refused_by properties.existing_subscription_leverage.additionalProperties.",
+      "properties": {
+        "consumer_subscription_present": {"type": "boolean"},
+        "api_or_integration_entitlement_present": {"type": "boolean"},
+        "falsifier": {"type": "string", "minLength": 1, "maxLength": 400}
+      }
+    },
+    "time_to_value_before_payment": {"$ref": "#/$defs/hypothesis_value"},
+    "implementation_support_burden": {"$ref": "#/$defs/hypothesis_value"},
+    "refund_cancellation_reversal_path": {"$ref": "#/$defs/hypothesis_value"},
+    "expansion_value": {"$ref": "#/$defs/hypothesis_value"},
+    "commercial_metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["leading_metric", "decisive_metric"],
+      "description": "A leading metric and a decisive metric, reported separately so neither can be silently promoted into the other. x-refusal-control INTEREST_AS_PAYMENT: refused_by $defs.decisive_metric.properties.metric_class.enum, which excludes INTEREST_SIGNAL, USAGE_SIGNAL and CONVERSION_SIGNAL from the decisive slot.",
+      "properties": {
+        "leading_metric": {"$ref": "#/$defs/leading_metric"},
+        "decisive_metric": {"$ref": "#/$defs/decisive_metric"}
+      }
+    },
+    "kill_iterate_threshold": {"$ref": "#/$defs/hypothesis_value"},
+    "repeatable_commercial_claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["claimed", "falsifier"],
+      "description": "`claimed: true` names an assertion that this is a repeatable business, not a one-off payment. That assertion requires at least two distinct payment events below it. x-refusal-control ONE_PAYMENT_AS_REPEATABLE_BUSINESS: refused_by properties.repeatable_commercial_claim.allOf[0].then.properties.distinct_payment_events.minItems.",
+      "properties": {
+        "claimed": {"type": "boolean"},
+        "distinct_payment_events": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/payment_event"}
+        },
+        "falsifier": {"type": "string", "minLength": 1, "maxLength": 400}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"claimed": {"const": true}}, "required": ["claimed"]},
+          "then": {"properties": {"distinct_payment_events": {"minItems": 2}}, "required": ["distinct_payment_events"]}
+        }
+      ]
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["paid_truth"],
+      "description": "Restates, not redefines, the parent program's `authority.paid_truth` constant. This record can carry a payment hypothesis and a falsifier; it cannot itself be the thing that makes paid_truth true.",
+      "properties": {"paid_truth": {"const": false}}
+    }
+  },
+  "$defs": {
+    "evidence_class": {
+      "enum": ["HYPOTHESIS", "SOURCE_STATEMENT", "OBSERVED_TRANSACTION"],
+      "description": "HYPOTHESIS: authored by this method, not yet tested. SOURCE_STATEMENT: restated from an external artifact at its exact identity, per the SOURCE lane. OBSERVED_TRANSACTION: bound to a PAYMENT_RECORD or REPEATED_PAYMENT_SERIES receipt in the parent program's evidence ladder. A value of this class here is not itself that receipt."
+    },
+    "hypothesis_value": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "evidence_class", "falsifier"],
+      "properties": {
+        "value": {"type": "string", "minLength": 1, "maxLength": 400},
+        "evidence_class": {"$ref": "#/$defs/evidence_class"},
+        "falsifier": {"type": "string", "minLength": 1, "maxLength": 400, "description": "What observation would prove this value wrong. Required so the hypothesis and its falsifier are one unit; a value with no stated falsifier is not representable."}
+      }
+    },
+    "metric_class_full": {
+      "enum": ["INTEREST_SIGNAL", "USAGE_SIGNAL", "CONVERSION_SIGNAL", "TRANSACTION_SIGNAL", "REPEATED_TRANSACTION_SIGNAL"]
+    },
+    "leading_metric": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["metric_name", "metric_class", "falsifier"],
+      "properties": {
+        "metric_name": {"type": "string", "minLength": 1, "maxLength": 120},
+        "metric_class": {"$ref": "#/$defs/metric_class_full"},
+        "falsifier": {"type": "string", "minLength": 1, "maxLength": 400}
+      }
+    },
+    "decisive_metric": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["metric_name", "metric_class", "falsifier"],
+      "description": "The decisive slot's metric_class is narrower than the leading slot's: only TRANSACTION_SIGNAL and REPEATED_TRANSACTION_SIGNAL are admissible. An interest, usage or conversion signal cannot be filed here.",
+      "properties": {
+        "metric_name": {"type": "string", "minLength": 1, "maxLength": 120},
+        "metric_class": {"enum": ["TRANSACTION_SIGNAL", "REPEATED_TRANSACTION_SIGNAL"]},
+        "falsifier": {"type": "string", "minLength": 1, "maxLength": 400}
+      }
+    },
+    "payment_event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["event_id", "payer_ref"],
+      "properties": {
+        "event_id": {"type": "string", "minLength": 1, "maxLength": 120},
+        "payer_ref": {"type": "string", "minLength": 1, "maxLength": 120}
+      }
+    }
+  },
+  "examples": [
+    {
+      "schema": "pol/commercial-lane/v1",
+      "subject_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+      "buyer_and_payment_trigger": {
+        "buyer_ref": "solo operator on the free tier of a synthetic note-taking helper",
+        "payment_trigger": "monthly note volume crosses the free-tier cap for two consecutive months",
+        "falsifier": "if operators who cross the cap downgrade their usage rather than upgrade, the trigger does not convert and is not a payment trigger at all"
+      },
+      "commercial_model": "USAGE",
+      "price_hypothesis": {
+        "buyer_ref": "solo operator on the free tier of a synthetic note-taking helper",
+        "price_value_hypothesis": "$0.01 per note above 500 notes/month, billed monthly",
+        "evidence_class": "HYPOTHESIS",
+        "falsifier": "if fewer than one in twenty free-tier operators ever crosses 500 notes/month, the metered unit is priced on volume nobody reaches"
+      },
+      "delivery_cost_hypothesis": {
+        "value": "storage and embedding cost per note is hypothesised at $0.002, leaving a $0.008 margin per metered note",
+        "evidence_class": "HYPOTHESIS",
+        "falsifier": "if measured per-note infra cost exceeds $0.01, the metered price is sold below delivery cost"
+      },
+      "sales_motion": {
+        "motion": "FREE_TRIAL_LED",
+        "friction_after_trial_ends": {
+          "value": "at 500 notes the operator sees a blocking upgrade screen with no data export offered first",
+          "evidence_class": "HYPOTHESIS",
+          "falsifier": "if operators abandon at the blocking screen rather than upgrade, the trial converted attention, not payment"
+        },
+        "falsifier": "if operators self-serve past the cap without ever seeing anyone from the vendor, DIRECT_SALES is misclassified against actual behaviour"
+      },
+      "integration_burden": {
+        "new_account_required": true,
+        "api_key_required": false,
+        "integration_effort": {
+          "value": "signup plus one OAuth consent screen, no API key needed for the note-taking UI path",
+          "evidence_class": "HYPOTHESIS",
+          "falsifier": "if the OAuth consent screen has a measured abandonment rate above 40%, the burden is mis-stated as low"
+        }
+      },
+      "existing_subscription_leverage": {
+        "consumer_subscription_present": true,
+        "api_or_integration_entitlement_present": false,
+        "falsifier": "if a bundled consumer subscription is later found to include API quota for this integration, this pair must be re-read, not assumed unchanged"
+      },
+      "time_to_value_before_payment": {
+        "value": "first useful note-recall result inside 3 minutes of signup, hypothesised from the onboarding flow's step count",
+        "evidence_class": "HYPOTHESIS",
+        "falsifier": "if a timed session shows first useful recall taking longer than 10 minutes, the stated time-to-value is wrong"
+      },
+      "implementation_support_burden": {
+        "value": "zero-touch self-serve; no implementation call is scheduled into the onboarding path",
+        "evidence_class": "HYPOTHESIS",
+        "falsifier": "if a support ticket volume analysis shows most new accounts opening a ticket before first payment, the burden is mis-stated as zero-touch"
+      },
+      "refund_cancellation_reversal_path": {
+        "value": "self-serve cancellation inside account settings; pro-rated refund on annual plans within 14 days",
+        "evidence_class": "HYPOTHESIS",
+        "falsifier": "if cancellation requires an email round-trip in practice, the self-serve claim is wrong"
+      },
+      "expansion_value": {
+        "value": "a second workspace seat is hypothesised to add $0.01/note at the same metered rate, no separate seat fee",
+        "evidence_class": "HYPOTHESIS",
+        "falsifier": "if multi-seat accounts show materially different metered usage per seat, the flat per-note expansion assumption is wrong"
+      },
+      "commercial_metrics": {
+        "leading_metric": {
+          "metric_name": "free-tier accounts crossing 400 notes/month",
+          "metric_class": "USAGE_SIGNAL",
+          "falsifier": "if this count rises but the metered conversion rate below stays flat, the leading metric moved for reasons unrelated to payment"
+        },
+        "decisive_metric": {
+          "metric_name": "metered invoices paid in full within terms",
+          "metric_class": "TRANSACTION_SIGNAL",
+          "falsifier": "if paid invoices trend downward while the leading metric trends upward, the two have decoupled and the leading metric no longer predicts the decisive one"
+        }
+      },
+      "kill_iterate_threshold": {
+        "value": "iterate if metered conversion of capped accounts stays under 2% after 90 days; kill if under 0.5% after 180 days",
+        "evidence_class": "HYPOTHESIS",
+        "falsifier": "these thresholds are themselves a hypothesis about willingness to pay; a single cohort's result at one price point does not establish them as the right cutoffs"
+      },
+      "repeatable_commercial_claim": {
+        "claimed": false,
+        "falsifier": "no payment event has been observed yet for this synthetic subject; claimed stays false until at least two distinct payers are recorded"
+      },
+      "authority": {"paid_truth": false}
+    }
+  ],
+  "x-refusal-controls": [
+    {
+      "case_id": "POL-XC-CL-001",
+      "refuses": "INTEREST_AS_PAYMENT: an interest signal filed in the decisive-metric slot.",
+      "refused_by": "$defs.decisive_metric.properties.metric_class.enum",
+      "instance": {
+        "schema": "pol/commercial-lane/v1",
+        "subject_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "buyer_and_payment_trigger": {"buyer_ref": "solo operator", "payment_trigger": "cap crossed", "falsifier": "if operators downgrade instead of upgrading, no trigger exists"},
+        "commercial_model": "USAGE",
+        "price_hypothesis": {"buyer_ref": "solo operator", "price_value_hypothesis": "$0.01/note", "evidence_class": "HYPOTHESIS", "falsifier": "if usage never crosses the cap, the price is untested"},
+        "delivery_cost_hypothesis": {"value": "$0.002/note", "evidence_class": "HYPOTHESIS", "falsifier": "if measured cost exceeds price, margin is negative"},
+        "sales_motion": {"motion": "SELF_SERVE", "falsifier": "if a sales rep is observed closing deals, this is misclassified"},
+        "integration_burden": {"new_account_required": true, "api_key_required": false, "integration_effort": {"value": "signup only", "evidence_class": "HYPOTHESIS", "falsifier": "if signup abandonment is high, burden is understated"}},
+        "existing_subscription_leverage": {"consumer_subscription_present": true, "api_or_integration_entitlement_present": false, "falsifier": "if entitlement is later found bundled, re-read this pair"},
+        "time_to_value_before_payment": {"value": "3 minutes", "evidence_class": "HYPOTHESIS", "falsifier": "if a timed session exceeds 10 minutes, this is wrong"},
+        "implementation_support_burden": {"value": "zero-touch", "evidence_class": "HYPOTHESIS", "falsifier": "if most accounts open a ticket first, this is wrong"},
+        "refund_cancellation_reversal_path": {"value": "self-serve cancellation", "evidence_class": "HYPOTHESIS", "falsifier": "if cancellation needs an email round-trip, this is wrong"},
+        "expansion_value": {"value": "flat per-seat rate", "evidence_class": "HYPOTHESIS", "falsifier": "if per-seat usage varies materially, this is wrong"},
+        "commercial_metrics": {
+          "leading_metric": {"metric_name": "signups", "metric_class": "INTEREST_SIGNAL", "falsifier": "if signups rise with flat payment, the leading metric decoupled"},
+          "decisive_metric": {"metric_name": "waitlist signups", "metric_class": "INTEREST_SIGNAL", "falsifier": "if nobody who joins the waitlist ever pays, interest was never decisive"}
+        },
+        "kill_iterate_threshold": {"value": "iterate under 2%", "evidence_class": "HYPOTHESIS", "falsifier": "a single cohort does not establish this cutoff"},
+        "repeatable_commercial_claim": {"claimed": false, "falsifier": "no payment event observed yet"},
+        "authority": {"paid_truth": false}
+      }
+    },
+    {
+      "case_id": "POL-XC-CL-002",
+      "refuses": "ONE_PAYMENT_AS_REPEATABLE_BUSINESS: repeatable claimed true with fewer than two distinct payment events.",
+      "refused_by": "properties.repeatable_commercial_claim.allOf[0].then.properties.distinct_payment_events.minItems",
+      "instance": {
+        "schema": "pol/commercial-lane/v1",
+        "subject_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "buyer_and_payment_trigger": {"buyer_ref": "solo operator", "payment_trigger": "cap crossed", "falsifier": "if operators downgrade instead of upgrading, no trigger exists"},
+        "commercial_model": "USAGE",
+        "price_hypothesis": {"buyer_ref": "solo operator", "price_value_hypothesis": "$0.01/note", "evidence_class": "HYPOTHESIS", "falsifier": "if usage never crosses the cap, the price is untested"},
+        "delivery_cost_hypothesis": {"value": "$0.002/note", "evidence_class": "HYPOTHESIS", "falsifier": "if measured cost exceeds price, margin is negative"},
+        "sales_motion": {"motion": "SELF_SERVE", "falsifier": "if a sales rep is observed closing deals, this is misclassified"},
+        "integration_burden": {"new_account_required": true, "api_key_required": false, "integration_effort": {"value": "signup only", "evidence_class": "HYPOTHESIS", "falsifier": "if signup abandonment is high, burden is understated"}},
+        "existing_subscription_leverage": {"consumer_subscription_present": true, "api_or_integration_entitlement_present": false, "falsifier": "if entitlement is later found bundled, re-read this pair"},
+        "time_to_value_before_payment": {"value": "3 minutes", "evidence_class": "HYPOTHESIS", "falsifier": "if a timed session exceeds 10 minutes, this is wrong"},
+        "implementation_support_burden": {"value": "zero-touch", "evidence_class": "HYPOTHESIS", "falsifier": "if most accounts open a ticket first, this is wrong"},
+        "refund_cancellation_reversal_path": {"value": "self-serve cancellation", "evidence_class": "HYPOTHESIS", "falsifier": "if cancellation needs an email round-trip, this is wrong"},
+        "expansion_value": {"value": "flat per-seat rate", "evidence_class": "HYPOTHESIS", "falsifier": "if per-seat usage varies materially, this is wrong"},
+        "commercial_metrics": {
+          "leading_metric": {"metric_name": "capped accounts", "metric_class": "USAGE_SIGNAL", "falsifier": "if this decouples from paid invoices, it stops predicting them"},
+          "decisive_metric": {"metric_name": "paid invoices", "metric_class": "TRANSACTION_SIGNAL", "falsifier": "if paid invoices fall while the leading metric rises, the two decoupled"}
+        },
+        "kill_iterate_threshold": {"value": "iterate under 2%", "evidence_class": "HYPOTHESIS", "falsifier": "a single cohort does not establish this cutoff"},
+        "repeatable_commercial_claim": {
+          "claimed": true,
+          "distinct_payment_events": [{"event_id": "inv-0001", "payer_ref": "acct-solo-047"}],
+          "falsifier": "one payer paying once is not a repeatable business"
+        },
+        "authority": {"paid_truth": false}
+      }
+    },
+    {
+      "case_id": "POL-XC-CL-003",
+      "refuses": "PRICE_WITHOUT_BUYER: a price hypothesis with no bound buyer.",
+      "refused_by": "properties.price_hypothesis.required",
+      "instance": {
+        "schema": "pol/commercial-lane/v1",
+        "subject_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "buyer_and_payment_trigger": {"buyer_ref": "solo operator", "payment_trigger": "cap crossed", "falsifier": "if operators downgrade instead of upgrading, no trigger exists"},
+        "commercial_model": "USAGE",
+        "price_hypothesis": {"price_value_hypothesis": "$0.01/note", "evidence_class": "HYPOTHESIS", "falsifier": "if usage never crosses the cap, the price is untested"},
+        "delivery_cost_hypothesis": {"value": "$0.002/note", "evidence_class": "HYPOTHESIS", "falsifier": "if measured cost exceeds price, margin is negative"},
+        "sales_motion": {"motion": "SELF_SERVE", "falsifier": "if a sales rep is observed closing deals, this is misclassified"},
+        "integration_burden": {"new_account_required": true, "api_key_required": false, "integration_effort": {"value": "signup only", "evidence_class": "HYPOTHESIS", "falsifier": "if signup abandonment is high, burden is understated"}},
+        "existing_subscription_leverage": {"consumer_subscription_present": true, "api_or_integration_entitlement_present": false, "falsifier": "if entitlement is later found bundled, re-read this pair"},
+        "time_to_value_before_payment": {"value": "3 minutes", "evidence_class": "HYPOTHESIS", "falsifier": "if a timed session exceeds 10 minutes, this is wrong"},
+        "implementation_support_burden": {"value": "zero-touch", "evidence_class": "HYPOTHESIS", "falsifier": "if most accounts open a ticket first, this is wrong"},
+        "refund_cancellation_reversal_path": {"value": "self-serve cancellation", "evidence_class": "HYPOTHESIS", "falsifier": "if cancellation needs an email round-trip, this is wrong"},
+        "expansion_value": {"value": "flat per-seat rate", "evidence_class": "HYPOTHESIS", "falsifier": "if per-seat usage varies materially, this is wrong"},
+        "commercial_metrics": {
+          "leading_metric": {"metric_name": "capped accounts", "metric_class": "USAGE_SIGNAL", "falsifier": "if this decouples from paid invoices, it stops predicting them"},
+          "decisive_metric": {"metric_name": "paid invoices", "metric_class": "TRANSACTION_SIGNAL", "falsifier": "if paid invoices fall while the leading metric rises, the two decoupled"}
+        },
+        "kill_iterate_threshold": {"value": "iterate under 2%", "evidence_class": "HYPOTHESIS", "falsifier": "a single cohort does not establish this cutoff"},
+        "repeatable_commercial_claim": {"claimed": false, "falsifier": "no payment event observed yet"},
+        "authority": {"paid_truth": false}
+      }
+    },
+    {
+      "case_id": "POL-XC-CL-004",
+      "refuses": "FREE_TRIAL_AS_LOW_FRICTION_BY_DEFAULT: a FREE_TRIAL_LED motion with no stated post-trial friction.",
+      "refused_by": "properties.sales_motion.allOf[0].then.required",
+      "instance": {
+        "schema": "pol/commercial-lane/v1",
+        "subject_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "buyer_and_payment_trigger": {"buyer_ref": "solo operator", "payment_trigger": "cap crossed", "falsifier": "if operators downgrade instead of upgrading, no trigger exists"},
+        "commercial_model": "USAGE",
+        "price_hypothesis": {"buyer_ref": "solo operator", "price_value_hypothesis": "$0.01/note", "evidence_class": "HYPOTHESIS", "falsifier": "if usage never crosses the cap, the price is untested"},
+        "delivery_cost_hypothesis": {"value": "$0.002/note", "evidence_class": "HYPOTHESIS", "falsifier": "if measured cost exceeds price, margin is negative"},
+        "sales_motion": {"motion": "FREE_TRIAL_LED", "falsifier": "if operators self-serve past the cap without seeing a trial boundary, this is misclassified"},
+        "integration_burden": {"new_account_required": true, "api_key_required": false, "integration_effort": {"value": "signup only", "evidence_class": "HYPOTHESIS", "falsifier": "if signup abandonment is high, burden is understated"}},
+        "existing_subscription_leverage": {"consumer_subscription_present": true, "api_or_integration_entitlement_present": false, "falsifier": "if entitlement is later found bundled, re-read this pair"},
+        "time_to_value_before_payment": {"value": "3 minutes", "evidence_class": "HYPOTHESIS", "falsifier": "if a timed session exceeds 10 minutes, this is wrong"},
+        "implementation_support_burden": {"value": "zero-touch", "evidence_class": "HYPOTHESIS", "falsifier": "if most accounts open a ticket first, this is wrong"},
+        "refund_cancellation_reversal_path": {"value": "self-serve cancellation", "evidence_class": "HYPOTHESIS", "falsifier": "if cancellation needs an email round-trip, this is wrong"},
+        "expansion_value": {"value": "flat per-seat rate", "evidence_class": "HYPOTHESIS", "falsifier": "if per-seat usage varies materially, this is wrong"},
+        "commercial_metrics": {
+          "leading_metric": {"metric_name": "capped accounts", "metric_class": "USAGE_SIGNAL", "falsifier": "if this decouples from paid invoices, it stops predicting them"},
+          "decisive_metric": {"metric_name": "paid invoices", "metric_class": "TRANSACTION_SIGNAL", "falsifier": "if paid invoices fall while the leading metric rises, the two decoupled"}
+        },
+        "kill_iterate_threshold": {"value": "iterate under 2%", "evidence_class": "HYPOTHESIS", "falsifier": "a single cohort does not establish this cutoff"},
+        "repeatable_commercial_claim": {"claimed": false, "falsifier": "no payment event observed yet"},
+        "authority": {"paid_truth": false}
+      }
+    },
+    {
+      "case_id": "POL-XC-CL-005",
+      "refuses": "EXISTING_SUBSCRIPTION_ASSUMED_API_ENTITLEMENT: a third key asserting the subscription grants the API entitlement.",
+      "refused_by": "properties.existing_subscription_leverage.additionalProperties",
+      "instance": {
+        "schema": "pol/commercial-lane/v1",
+        "subject_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "buyer_and_payment_trigger": {"buyer_ref": "solo operator", "payment_trigger": "cap crossed", "falsifier": "if operators downgrade instead of upgrading, no trigger exists"},
+        "commercial_model": "USAGE",
+        "price_hypothesis": {"buyer_ref": "solo operator", "price_value_hypothesis": "$0.01/note", "evidence_class": "HYPOTHESIS", "falsifier": "if usage never crosses the cap, the price is untested"},
+        "delivery_cost_hypothesis": {"value": "$0.002/note", "evidence_class": "HYPOTHESIS", "falsifier": "if measured cost exceeds price, margin is negative"},
+        "sales_motion": {"motion": "SELF_SERVE", "falsifier": "if a sales rep is observed closing deals, this is misclassified"},
+        "integration_burden": {"new_account_required": true, "api_key_required": false, "integration_effort": {"value": "signup only", "evidence_class": "HYPOTHESIS", "falsifier": "if signup abandonment is high, burden is understated"}},
+        "existing_subscription_leverage": {
+          "consumer_subscription_present": true,
+          "api_or_integration_entitlement_present": true,
+          "subscription_implies_api_entitlement": true,
+          "falsifier": "if entitlement is later found bundled, re-read this pair"
+        },
+        "time_to_value_before_payment": {"value": "3 minutes", "evidence_class": "HYPOTHESIS", "falsifier": "if a timed session exceeds 10 minutes, this is wrong"},
+        "implementation_support_burden": {"value": "zero-touch", "evidence_class": "HYPOTHESIS", "falsifier": "if most accounts open a ticket first, this is wrong"},
+        "refund_cancellation_reversal_path": {"value": "self-serve cancellation", "evidence_class": "HYPOTHESIS", "falsifier": "if cancellation needs an email round-trip, this is wrong"},
+        "expansion_value": {"value": "flat per-seat rate", "evidence_class": "HYPOTHESIS", "falsifier": "if per-seat usage varies materially, this is wrong"},
+        "commercial_metrics": {
+          "leading_metric": {"metric_name": "capped accounts", "metric_class": "USAGE_SIGNAL", "falsifier": "if this decouples from paid invoices, it stops predicting them"},
+          "decisive_metric": {"metric_name": "paid invoices", "metric_class": "TRANSACTION_SIGNAL", "falsifier": "if paid invoices fall while the leading metric rises, the two decoupled"}
+        },
+        "kill_iterate_threshold": {"value": "iterate under 2%", "evidence_class": "HYPOTHESIS", "falsifier": "a single cohort does not establish this cutoff"},
+        "repeatable_commercial_claim": {"claimed": false, "falsifier": "no payment event observed yet"},
+        "authority": {"paid_truth": false}
+      }
+    },
+    {
+      "case_id": "POL-XC-CL-006",
+      "refuses": "GROSS_VALUE_WITHOUT_DELIVERY_COST: a price hypothesis reported with no delivery-cost hypothesis alongside it.",
+      "refused_by": "required",
+      "instance": {
+        "schema": "pol/commercial-lane/v1",
+        "subject_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "buyer_and_payment_trigger": {"buyer_ref": "solo operator", "payment_trigger": "cap crossed", "falsifier": "if operators downgrade instead of upgrading, no trigger exists"},
+        "commercial_model": "USAGE",
+        "price_hypothesis": {"buyer_ref": "solo operator", "price_value_hypothesis": "$0.01/note", "evidence_class": "HYPOTHESIS", "falsifier": "if usage never crosses the cap, the price is untested"},
+        "sales_motion": {"motion": "SELF_SERVE", "falsifier": "if a sales rep is observed closing deals, this is misclassified"},
+        "integration_burden": {"new_account_required": true, "api_key_required": false, "integration_effort": {"value": "signup only", "evidence_class": "HYPOTHESIS", "falsifier": "if signup abandonment is high, burden is understated"}},
+        "existing_subscription_leverage": {"consumer_subscription_present": true, "api_or_integration_entitlement_present": false, "falsifier": "if entitlement is later found bundled, re-read this pair"},
+        "time_to_value_before_payment": {"value": "3 minutes", "evidence_class": "HYPOTHESIS", "falsifier": "if a timed session exceeds 10 minutes, this is wrong"},
+        "implementation_support_burden": {"value": "zero-touch", "evidence_class": "HYPOTHESIS", "falsifier": "if most accounts open a ticket first, this is wrong"},
+        "refund_cancellation_reversal_path": {"value": "self-serve cancellation", "evidence_class": "HYPOTHESIS", "falsifier": "if cancellation needs an email round-trip, this is wrong"},
+        "expansion_value": {"value": "flat per-seat rate", "evidence_class": "HYPOTHESIS", "falsifier": "if per-seat usage varies materially, this is wrong"},
+        "commercial_metrics": {
+          "leading_metric": {"metric_name": "capped accounts", "metric_class": "USAGE_SIGNAL", "falsifier": "if this decouples from paid invoices, it stops predicting them"},
+          "decisive_metric": {"metric_name": "paid invoices", "metric_class": "TRANSACTION_SIGNAL", "falsifier": "if paid invoices fall while the leading metric rises, the two decoupled"}
+        },
+        "kill_iterate_threshold": {"value": "iterate under 2%", "evidence_class": "HYPOTHESIS", "falsifier": "a single cohort does not establish this cutoff"},
+        "repeatable_commercial_claim": {"claimed": false, "falsifier": "no payment event observed yet"},
+        "authority": {"paid_truth": false}
+      }
+    }
+  ]
+}

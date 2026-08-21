@@ -1,0 +1,74 @@
+{
+  "entries": [
+    {
+      "backlinks": [
+        "repository path skills/product-reverse-engineering-loop/references/problem-closure-matrix.schema.json at commit 1f2e3d4c5b6a70819283746556473829a0b1c2d3",
+        "repository path skills/product-reverse-engineering-loop/references/example-closure-matrix.json at commit 1f2e3d4c5b6a70819283746556473829a0b1c2d3"
+      ],
+      "canonical_subjects": [
+        {
+          "blob_digest": "a1b2c3d4e5f60718293a4b5c6d7e8f9012345678",
+          "commit": "1f2e3d4c5b6a70819283746556473829a0b1c2d3",
+          "path": "skills/product-reverse-engineering-loop/references/problem-closure-matrix.schema.json"
+        },
+        {
+          "blob_digest": "b2c3d4e5f60718293a4b5c6d7e8f90123456789a",
+          "commit": "1f2e3d4c5b6a70819283746556473829a0b1c2d3",
+          "path": "skills/product-reverse-engineering-loop/references/example-closure-matrix.json"
+        }
+      ],
+      "evidence_dispositions": [
+        {
+          "disposition": "CONFIRMED",
+          "subject": "skills/product-reverse-engineering-loop/references/problem-closure-matrix.schema.json"
+        },
+        {
+          "disposition": "CONTRADICTED",
+          "subject": "skills/product-reverse-engineering-loop/references/example-closure-matrix.json"
+        }
+      ],
+      "export_digest": "4f9c2a1b7d8e0c3f5a6b1d2e4c8f7a9b0d3e5c6a8b1f2d4e7c9a0b3d5e6f8c1a",
+      "external_id": "codexdoc-placeholder-0001",
+      "external_kind": "CODEX_DOC",
+      "id": "PRJ-001",
+      "observed_revision": "rev-0007",
+      "read_back": {
+        "compared_digest": "4f9c2a1b7d8e0c3f5a6b1d2e4c8f7a9b0d3e5c6a8b1f2d4e7c9a0b3d5e6f8c1a",
+        "compared_revision": "rev-0007",
+        "observed_at": "2026-08-21T00:00:00Z",
+        "state": "PASS"
+      }
+    },
+    {
+      "backlinks": [
+        "repository path skills/product-reverse-engineering-loop/references/example-handoff.json at commit 1f2e3d4c5b6a70819283746556473829a0b1c2d3"
+      ],
+      "canonical_subjects": [
+        {
+          "blob_digest": "c3d4e5f60718293a4b5c6d7e8f90123456789ab2",
+          "commit": "1f2e3d4c5b6a70819283746556473829a0b1c2d3",
+          "path": "skills/product-reverse-engineering-loop/references/example-handoff.json"
+        }
+      ],
+      "export_digest": "7c1d9e3a5b8f0246a1c3e5d7b9f0248a6c1e3d5b7f902468ac1e3d5b7f902468",
+      "external_id": "sheet-placeholder-0002",
+      "external_kind": "SPREADSHEET",
+      "id": "PRJ-002",
+      "observed_revision": "rev-0002",
+      "read_back": {
+        "compared_digest": null,
+        "compared_revision": null,
+        "observed_at": null,
+        "state": "NOT_EXERCISED"
+      }
+    }
+  ],
+  "human_owned_operations": [
+    "merge",
+    "permission or legal expansion",
+    "release or promotion",
+    "rollback",
+    "admission that a projection may be shared outside the repository"
+  ],
+  "schema": "prel/external-projection-input/v1"
+}

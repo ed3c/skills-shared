@@ -1,0 +1,355 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dtcr-syntax-match.schema.json",
+  "title": "DTCR syntax match and source range",
+  "description": "One region of one blob that a syntax query matched, and the range vocabulary every other fact reuses. The record is fixed at SYNTACTIC_CANDIDATE and states in constants that it establishes no binding, no call edge and no task outcome: a query match says these bytes have this shape, which is a different sentence from these bytes mean this. Grade is DETERMINISTIC_FACT because a named parser at an exact commit reproduces it, and that is the grade a violation candidate may cite it under; the grade is about reproducibility, not about semantics. The query digest and the grammar digest are both required, because a query nobody recorded and a grammar identified only by language name each make the match unreplayable while leaving it looking exact. Parse status is carried beside the match: a tree containing error nodes still yields matches, and a pass that hides them reports a floor as if it were the whole file.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "match_id", "subject", "blob", "range", "match_class", "grade", "provider", "parse_status", "error_node_count", "completeness", "output_digest", "warnings", "omissions", "establishes"],
+  "properties": {
+    "schema": {"const": "dtcr/syntax-match/v1"},
+    "match_id": {"type": "string", "pattern": "^DTCR-SM-[0-9]{3}$"},
+    "subject": {"$ref": "#/$defs/subject_ref"},
+    "blob": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "blob"],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "not": {"pattern": "^(/|~|[A-Za-z][A-Za-z0-9+.-]*://)|(^|/)\\.\\.(/|$)"}
+        },
+        "blob": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+      }
+    },
+    "range": {"$ref": "#/$defs/source_range"},
+    "match_class": {
+      "const": "SYNTACTIC_CANDIDATE",
+      "description": "Fixed. A query match is a candidate region for review; promoting it to a semantic finding is the single move that turns a grep with a parser into an authority."
+    },
+    "grade": {
+      "const": "DETERMINISTIC_FACT",
+      "description": "The basis grade a violation candidate may cite this under. It states that re-running the named parser on this commit reproduces the region, and nothing about what the region means."
+    },
+    "provider": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider_binding_id", "executable_name", "version", "executable_sha256", "config_digest", "grammar", "query_digest"],
+      "properties": {
+        "provider_binding_id": {"type": "string", "pattern": "^DTCR-PB-[0-9a-f]{16}$"},
+        "executable_name": {
+          "type": "string",
+          "minLength": 1,
+          "not": {"pattern": "[/\\\\]|^~"},
+          "description": "Bare name. The install path of a binary describes one machine."
+        },
+        "version": {"type": "string", "minLength": 1},
+        "executable_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "config_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "grammar": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["language", "grammar_digest", "abi_version"],
+          "properties": {
+            "language": {"type": "string", "minLength": 1},
+            "grammar_digest": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$",
+              "description": "Two builds of a grammar with the same language name parse differently often enough that the name is not the identity."
+            },
+            "abi_version": {"type": "integer", "minimum": 1}
+          }
+        },
+        "query_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "The exact query text that produced this match. Without it the match cannot be replayed, and an unreplayable match still reads as exact."
+        }
+      }
+    },
+    "parse_status": {"enum": ["CLEAN", "PARSE_ERRORS_PRESENT"]},
+    "error_node_count": {"type": "integer", "minimum": 0},
+    "completeness": {
+      "enum": ["COMPLETE_FOR_ANALYSED_INPUTS", "PARTIAL_LOWER_BOUND", "UNKNOWN"],
+      "description": "COMPLETE_FOR_ANALYSED_INPUTS claims completeness only over the blobs this pass parsed without error. Nothing here claims completeness over a language, a repository or a behaviour."
+    },
+    "output_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "warnings": {"type": "array", "items": {"type": "string", "minLength": 2}},
+    "omissions": {"type": "array", "items": {"type": "string", "minLength": 2}},
+    "establishes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["semantic_binding", "call_edge", "task_pass"],
+      "properties": {
+        "semantic_binding": {"const": false},
+        "call_edge": {"const": false},
+        "task_pass": {"const": false}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"parse_status": {"const": "PARSE_ERRORS_PRESENT"}}, "required": ["parse_status"]},
+      "then": {
+        "properties": {
+          "completeness": {"enum": ["PARTIAL_LOWER_BOUND", "UNKNOWN"]},
+          "error_node_count": {"minimum": 1}
+        },
+        "description": "A file the parser could not fully parse yields a lower bound. Recording it as complete for the analysed inputs is how a parse failure becomes an all-clear."
+      }
+    }
+  ],
+  "$defs": {
+    "subject_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository_binding_id", "commit", "tree"],
+      "properties": {
+        "repository_binding_id": {"type": "string", "pattern": "^DTCR-RB-[0-9a-f]{16}$"},
+        "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "tree": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+      }
+    },
+    "source_range": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["start_byte", "end_byte", "start_line", "start_column", "end_line", "end_column"],
+      "properties": {
+        "start_byte": {"type": "integer", "minimum": 0},
+        "end_byte": {"type": "integer", "minimum": 0},
+        "start_line": {"type": "integer", "minimum": 1},
+        "start_column": {"type": "integer", "minimum": 0},
+        "end_line": {"type": "integer", "minimum": 1},
+        "end_column": {"type": "integer", "minimum": 0}
+      },
+      "description": "Byte offsets and line/column together, because a line/column pair depends on an encoding and a tab width that this record does not carry. Ordering of start against end is not checked here; that is arithmetic a consumer does."
+    }
+  },
+  "examples": [
+    {
+      "schema": "dtcr/syntax-match/v1",
+      "match_id": "DTCR-SM-001",
+      "subject": {
+        "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+        "commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+        "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+      },
+      "blob": {"path": "domain/order/pricing.ext", "blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"},
+      "range": {"start_byte": 812, "end_byte": 964, "start_line": 41, "start_column": 2, "end_line": 47, "end_column": 3},
+      "match_class": "SYNTACTIC_CANDIDATE",
+      "grade": "DETERMINISTIC_FACT",
+      "provider": {
+        "provider_binding_id": "DTCR-PB-1a4c77d0be93f218",
+        "executable_name": "syntax-query-runner",
+        "version": "0.25.1",
+        "executable_sha256": "2819f62833d1867b24fdca003615107418018c5a9dc1864073940c4602c5d105",
+        "config_digest": "45dfa450d7e40c0cb9b5c6d3674a3d56e495152216517bcc1f7d8b6db1e5423a",
+        "grammar": {
+          "language": "example-language",
+          "grammar_digest": "802b1a8202117263eed6bc5f3f71c0067e003187fe9f4850b1c8f715f6824de8",
+          "abi_version": 14
+        },
+        "query_digest": "5403ee3a36ad14a5f73443a5780ea48acf61e489fef3f9ee319809c50433862f"
+      },
+      "parse_status": "CLEAN",
+      "error_node_count": 0,
+      "completeness": "COMPLETE_FOR_ANALYSED_INPUTS",
+      "output_digest": "6615c410e153c94d565173b3494fa40c6aedade2c8a5191e2276e1f38c9b04cd",
+      "warnings": [],
+      "omissions": ["generated sources under the build output directory were not parsed"],
+      "establishes": {"semantic_binding": false, "call_edge": false, "task_pass": false}
+    }
+  ],
+  "x-refusal-controls": [
+    {
+      "case_id": "DTCR-XC-SM-001",
+      "refuses": "TREE_SITTER_QUERY_DIGEST_ABSENT: a match whose query text was never recorded, leaving it exact-looking and unreplayable.",
+      "refused_by": "properties.provider.required",
+      "instance": {
+        "schema": "dtcr/syntax-match/v1",
+        "match_id": "DTCR-SM-002",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+          "commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+        },
+        "blob": {"path": "domain/order/pricing.ext", "blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"},
+        "range": {"start_byte": 812, "end_byte": 964, "start_line": 41, "start_column": 2, "end_line": 47, "end_column": 3},
+        "match_class": "SYNTACTIC_CANDIDATE",
+        "grade": "DETERMINISTIC_FACT",
+        "provider": {
+          "provider_binding_id": "DTCR-PB-1a4c77d0be93f218",
+          "executable_name": "syntax-query-runner",
+          "version": "0.25.1",
+          "executable_sha256": "2819f62833d1867b24fdca003615107418018c5a9dc1864073940c4602c5d105",
+          "config_digest": "45dfa450d7e40c0cb9b5c6d3674a3d56e495152216517bcc1f7d8b6db1e5423a",
+          "grammar": {
+            "language": "example-language",
+            "grammar_digest": "802b1a8202117263eed6bc5f3f71c0067e003187fe9f4850b1c8f715f6824de8",
+            "abi_version": 14
+          }
+        },
+        "parse_status": "CLEAN",
+        "error_node_count": 0,
+        "completeness": "COMPLETE_FOR_ANALYSED_INPUTS",
+        "output_digest": "6615c410e153c94d565173b3494fa40c6aedade2c8a5191e2276e1f38c9b04cd",
+        "warnings": [],
+        "omissions": [],
+        "establishes": {"semantic_binding": false, "call_edge": false, "task_pass": false}
+      }
+    },
+    {
+      "case_id": "DTCR-XC-SM-002",
+      "refuses": "WRONG_GRAMMAR: a grammar identified by language name rather than by digest, so two builds that parse differently record identically.",
+      "refused_by": "properties.provider.properties.grammar.properties.grammar_digest.pattern",
+      "instance": {
+        "schema": "dtcr/syntax-match/v1",
+        "match_id": "DTCR-SM-003",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+          "commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+        },
+        "blob": {"path": "domain/order/pricing.ext", "blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"},
+        "range": {"start_byte": 812, "end_byte": 964, "start_line": 41, "start_column": 2, "end_line": 47, "end_column": 3},
+        "match_class": "SYNTACTIC_CANDIDATE",
+        "grade": "DETERMINISTIC_FACT",
+        "provider": {
+          "provider_binding_id": "DTCR-PB-1a4c77d0be93f218",
+          "executable_name": "syntax-query-runner",
+          "version": "0.25.1",
+          "executable_sha256": "2819f62833d1867b24fdca003615107418018c5a9dc1864073940c4602c5d105",
+          "config_digest": "45dfa450d7e40c0cb9b5c6d3674a3d56e495152216517bcc1f7d8b6db1e5423a",
+          "grammar": {
+            "language": "example-language",
+            "grammar_digest": "example-language-grammar",
+            "abi_version": 14
+          },
+          "query_digest": "5403ee3a36ad14a5f73443a5780ea48acf61e489fef3f9ee319809c50433862f"
+        },
+        "parse_status": "CLEAN",
+        "error_node_count": 0,
+        "completeness": "COMPLETE_FOR_ANALYSED_INPUTS",
+        "output_digest": "6615c410e153c94d565173b3494fa40c6aedade2c8a5191e2276e1f38c9b04cd",
+        "warnings": [],
+        "omissions": [],
+        "establishes": {"semantic_binding": false, "call_edge": false, "task_pass": false}
+      }
+    },
+    {
+      "case_id": "DTCR-XC-SM-003",
+      "refuses": "PARSE_ERROR_HIDDEN: a file with error nodes reported as complete for the inputs analysed.",
+      "refused_by": "allOf[0].then",
+      "instance": {
+        "schema": "dtcr/syntax-match/v1",
+        "match_id": "DTCR-SM-004",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+          "commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+        },
+        "blob": {"path": "domain/order/pricing.ext", "blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"},
+        "range": {"start_byte": 812, "end_byte": 964, "start_line": 41, "start_column": 2, "end_line": 47, "end_column": 3},
+        "match_class": "SYNTACTIC_CANDIDATE",
+        "grade": "DETERMINISTIC_FACT",
+        "provider": {
+          "provider_binding_id": "DTCR-PB-1a4c77d0be93f218",
+          "executable_name": "syntax-query-runner",
+          "version": "0.25.1",
+          "executable_sha256": "2819f62833d1867b24fdca003615107418018c5a9dc1864073940c4602c5d105",
+          "config_digest": "45dfa450d7e40c0cb9b5c6d3674a3d56e495152216517bcc1f7d8b6db1e5423a",
+          "grammar": {
+            "language": "example-language",
+            "grammar_digest": "802b1a8202117263eed6bc5f3f71c0067e003187fe9f4850b1c8f715f6824de8",
+            "abi_version": 14
+          },
+          "query_digest": "5403ee3a36ad14a5f73443a5780ea48acf61e489fef3f9ee319809c50433862f"
+        },
+        "parse_status": "PARSE_ERRORS_PRESENT",
+        "error_node_count": 3,
+        "completeness": "COMPLETE_FOR_ANALYSED_INPUTS",
+        "output_digest": "6615c410e153c94d565173b3494fa40c6aedade2c8a5191e2276e1f38c9b04cd",
+        "warnings": ["three error nodes in the parsed tree"],
+        "omissions": [],
+        "establishes": {"semantic_binding": false, "call_edge": false, "task_pass": false}
+      }
+    },
+    {
+      "case_id": "DTCR-XC-SM-004",
+      "refuses": "A syntactic match recorded as having established a semantic binding.",
+      "refused_by": "properties.establishes.properties.semantic_binding.const",
+      "instance": {
+        "schema": "dtcr/syntax-match/v1",
+        "match_id": "DTCR-SM-005",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+          "commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+        },
+        "blob": {"path": "domain/order/pricing.ext", "blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"},
+        "range": {"start_byte": 812, "end_byte": 964, "start_line": 41, "start_column": 2, "end_line": 47, "end_column": 3},
+        "match_class": "SYNTACTIC_CANDIDATE",
+        "grade": "DETERMINISTIC_FACT",
+        "provider": {
+          "provider_binding_id": "DTCR-PB-1a4c77d0be93f218",
+          "executable_name": "syntax-query-runner",
+          "version": "0.25.1",
+          "executable_sha256": "2819f62833d1867b24fdca003615107418018c5a9dc1864073940c4602c5d105",
+          "config_digest": "45dfa450d7e40c0cb9b5c6d3674a3d56e495152216517bcc1f7d8b6db1e5423a",
+          "grammar": {
+            "language": "example-language",
+            "grammar_digest": "802b1a8202117263eed6bc5f3f71c0067e003187fe9f4850b1c8f715f6824de8",
+            "abi_version": 14
+          },
+          "query_digest": "5403ee3a36ad14a5f73443a5780ea48acf61e489fef3f9ee319809c50433862f"
+        },
+        "parse_status": "CLEAN",
+        "error_node_count": 0,
+        "completeness": "COMPLETE_FOR_ANALYSED_INPUTS",
+        "output_digest": "6615c410e153c94d565173b3494fa40c6aedade2c8a5191e2276e1f38c9b04cd",
+        "warnings": [],
+        "omissions": [],
+        "establishes": {"semantic_binding": true, "call_edge": false, "task_pass": false}
+      }
+    },
+    {
+      "case_id": "DTCR-XC-SM-005",
+      "refuses": "A query match reclassified as a semantic fact rather than a syntactic candidate.",
+      "refused_by": "properties.match_class.const",
+      "instance": {
+        "schema": "dtcr/syntax-match/v1",
+        "match_id": "DTCR-SM-006",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+          "commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+        },
+        "blob": {"path": "domain/order/pricing.ext", "blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"},
+        "range": {"start_byte": 812, "end_byte": 964, "start_line": 41, "start_column": 2, "end_line": 47, "end_column": 3},
+        "match_class": "SEMANTIC_FACT",
+        "grade": "DETERMINISTIC_FACT",
+        "provider": {
+          "provider_binding_id": "DTCR-PB-1a4c77d0be93f218",
+          "executable_name": "syntax-query-runner",
+          "version": "0.25.1",
+          "executable_sha256": "2819f62833d1867b24fdca003615107418018c5a9dc1864073940c4602c5d105",
+          "config_digest": "45dfa450d7e40c0cb9b5c6d3674a3d56e495152216517bcc1f7d8b6db1e5423a",
+          "grammar": {
+            "language": "example-language",
+            "grammar_digest": "802b1a8202117263eed6bc5f3f71c0067e003187fe9f4850b1c8f715f6824de8",
+            "abi_version": 14
+          },
+          "query_digest": "5403ee3a36ad14a5f73443a5780ea48acf61e489fef3f9ee319809c50433862f"
+        },
+        "parse_status": "CLEAN",
+        "error_node_count": 0,
+        "completeness": "COMPLETE_FOR_ANALYSED_INPUTS",
+        "output_digest": "6615c410e153c94d565173b3494fa40c6aedade2c8a5191e2276e1f38c9b04cd",
+        "warnings": [],
+        "omissions": [],
+        "establishes": {"semantic_binding": false, "call_edge": false, "task_pass": false}
+      }
+    }
+  ]
+}
