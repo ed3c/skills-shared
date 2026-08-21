@@ -1,0 +1,51 @@
+{
+  "schema_version": "agentic-tech-lead/issue-closure-contract/v1",
+  "issue": {
+    "repository": "ed3c/skills-shared",
+    "number": 403,
+    "github_state": "CLOSED",
+    "github_state_reason": "COMPLETED"
+  },
+  "disposition": "CONSUMED_BY_CONVERGENCE",
+  "acceptance": [
+    {
+      "id": "entropy-agent-routes-state-machine-dag-index",
+      "status": "SATISFIED",
+      "successor": null,
+      "rationale": null
+    }
+  ],
+  "implementation": {
+    "candidate_prs": [
+      {
+        "repository": "ed3c/skills-shared",
+        "number": 404,
+        "state": "CLOSED",
+        "merged": false,
+        "classification": "CONSUMED"
+      }
+    ],
+    "landing": {
+      "repository": "ed3c/skills-shared",
+      "via_pr": 511,
+      "commit": "88ce642a7f198d88019aa8ae19e63631ae4999c2",
+      "tree": "6e93d5b42a8c6d2fb9f56b089f8ffd46df98c569"
+    }
+  },
+  "residual": [
+    {
+      "id": "consumer-repository-safe-deletion",
+      "state": "NOT_EXERCISED",
+      "owner": "consumer evidence lane"
+    },
+    {
+      "id": "real-local-git-town-worktree-sync",
+      "state": "NOT_EXERCISED",
+      "owner": "local Git Town evidence lane"
+    }
+  ],
+  "evidence_ceiling": "DETERMINISTIC",
+  "shadow_review": {
+    "verdict": "PASS"
+  }
+}
