@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "portfolio-stub/v1",
+  "title": "Portfolio bootstrap stub",
+  "description": "Bootstrap-time-only placeholder shape for the four .agents/portfolio/*.json files a github-portfolio-control consumer bootstrap seeds. A stub carries zero observed items: it exists so the four files are present and schema-valid on the day of bootstrap, before any snapshot, acceptance, multigraph or dispatch run has ever produced real content. It is not the runtime schema for a populated file of the same name -- that contract is owned by whichever Skill first runs a real snapshot/acceptance/multigraph/dispatch cycle against this consumer, and is expected to be a stricter, non-empty shape.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "epoch_subject", "items", "digest"],
+  "properties": {
+    "schema": {"const": "portfolio-stub/v1"},
+    "kind": {
+      "enum": ["snapshot", "acceptance-ledger", "multigraph", "local-handoff-queue"]
+    },
+    "epoch_subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["main_commit", "tree"],
+      "description": "The consumer's own {main_commit, tree} at the moment the stub was seeded -- never the skills-shared subject, which lives in the sibling control-plane source/profile pins.",
+      "properties": {
+        "main_commit": {"$ref": "#/$defs/sha1"},
+        "tree": {"$ref": "#/$defs/sha1"}
+      }
+    },
+    "items": {
+      "type": "array",
+      "maxItems": 0,
+      "description": "Always empty in a bootstrap-seeded stub. A non-empty items array is real observed state and must be produced by the owning Skill's own runtime, never by this bootstrap."
+    },
+    "digest": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha1": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}
