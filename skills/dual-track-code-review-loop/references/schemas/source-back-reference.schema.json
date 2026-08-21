@@ -1,0 +1,154 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dtcr-source-back-reference.schema.json",
+  "title": "DTCR source back reference",
+  "description": "The exact thing a semantic row points back at: a blob range at a commit, a ledger event, or an admitted source packet. Three kinds, one required payload each, so a reference cannot name a kind and then carry nothing. The object is closed and has no key for another retrieval row: a stored row may cite source, ledger or packet, and it may never cite a second stored row, which is how a chain of similarity hits is stopped from becoming an authority edge. Paths are repository-relative and commits are exact, for the same reason they are everywhere else in this method -- a reference into a moving tree resolves differently for every later reader.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "back_reference_id", "reference_kind"],
+  "properties": {
+    "schema": {"const": "dtcr/source-back-reference/v1"},
+    "back_reference_id": {"type": "string", "pattern": "^DTCR-BK-[0-9]{3}$"},
+    "reference_kind": {"enum": ["REPOSITORY_BLOB", "LEDGER_EVENT", "SOURCE_PACKET"]},
+    "repository_blob": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository_binding_id", "commit", "path", "blob"],
+      "properties": {
+        "repository_binding_id": {"type": "string", "pattern": "^DTCR-RB-[0-9a-f]{16}$"},
+        "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "path": {"$ref": "#/$defs/repo_relative_path"},
+        "blob": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "range": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["start_line", "end_line"],
+          "properties": {
+            "start_line": {"type": "integer", "minimum": 1},
+            "end_line": {"type": "integer", "minimum": 1}
+          }
+        }
+      }
+    },
+    "ledger_event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["event_digest", "sequence"],
+      "properties": {
+        "event_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "sequence": {"type": "integer", "minimum": 1}
+      },
+      "description": "A citation of a ledger event. Citing one does not make the citing row an event: the ledger holds the task history, the store holds text somebody may find relevant."
+    },
+    "source_packet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["packet_id", "sha256", "byte_count"],
+      "properties": {
+        "packet_id": {"type": "string", "pattern": "^DTCR-SP-[0-9]{3}$"},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "byte_count": {"type": "integer", "minimum": 1}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"reference_kind": {"const": "REPOSITORY_BLOB"}}, "required": ["reference_kind"]},
+      "then": {"required": ["repository_blob"]}
+    },
+    {
+      "if": {"properties": {"reference_kind": {"const": "LEDGER_EVENT"}}, "required": ["reference_kind"]},
+      "then": {"required": ["ledger_event"]}
+    },
+    {
+      "if": {"properties": {"reference_kind": {"const": "SOURCE_PACKET"}}, "required": ["reference_kind"]},
+      "then": {"required": ["source_packet"]}
+    }
+  ],
+  "$defs": {
+    "repo_relative_path": {
+      "type": "string",
+      "minLength": 1,
+      "not": {"pattern": "^(/|~|[A-Za-z][A-Za-z0-9+.-]*://)|(^|/)\\.\\.(/|$)"}
+    }
+  },
+  "examples": [
+    {
+      "schema": "dtcr/source-back-reference/v1",
+      "back_reference_id": "DTCR-BK-001",
+      "reference_kind": "REPOSITORY_BLOB",
+      "repository_blob": {
+        "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+        "commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+        "path": "docs/decisions/domain-isolation.md",
+        "blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+        "range": {"start_line": 12, "end_line": 48}
+      }
+    }
+  ],
+  "x-refusal-controls": [
+    {
+      "case_id": "DTCR-XC-BK-001",
+      "refuses": "A back reference into a machine-local location instead of a repository-relative path.",
+      "refused_by": "$defs.repo_relative_path.not",
+      "instance": {
+        "schema": "dtcr/source-back-reference/v1",
+        "back_reference_id": "DTCR-BK-002",
+        "reference_kind": "REPOSITORY_BLOB",
+        "repository_blob": {
+          "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+          "commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "path": "file:///example-machine/decisions/domain-isolation.md",
+          "blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        }
+      }
+    },
+    {
+      "case_id": "DTCR-XC-BK-002",
+      "refuses": "A back reference pointing at another stored row, which is how a similarity chain becomes an authority edge.",
+      "refused_by": "additionalProperties",
+      "instance": {
+        "schema": "dtcr/source-back-reference/v1",
+        "back_reference_id": "DTCR-BK-003",
+        "reference_kind": "REPOSITORY_BLOB",
+        "repository_blob": {
+          "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+          "commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "path": "docs/decisions/domain-isolation.md",
+          "blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        },
+        "vector_row_ref": "row 3 of the previous hybrid query"
+      }
+    },
+    {
+      "case_id": "DTCR-XC-BK-003",
+      "refuses": "A reference naming a kind and carrying no payload for it.",
+      "refused_by": "allOf[0].then",
+      "instance": {
+        "schema": "dtcr/source-back-reference/v1",
+        "back_reference_id": "DTCR-BK-004",
+        "reference_kind": "REPOSITORY_BLOB",
+        "ledger_event": {
+          "event_digest": "0a1246ddebb5572c290cf4d4746afa4be1a45bd83536f0e092d35c0c1ed035fe",
+          "sequence": 412
+        }
+      }
+    },
+    {
+      "case_id": "DTCR-XC-BK-004",
+      "refuses": "A back reference into a branch rather than an exact commit, which resolves differently for every later reader.",
+      "refused_by": "properties.repository_blob.properties.commit.pattern",
+      "instance": {
+        "schema": "dtcr/source-back-reference/v1",
+        "back_reference_id": "DTCR-BK-005",
+        "reference_kind": "REPOSITORY_BLOB",
+        "repository_blob": {
+          "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+          "commit": "main",
+          "path": "docs/decisions/domain-isolation.md",
+          "blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        }
+      }
+    }
+  ]
+}
