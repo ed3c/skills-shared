@@ -1,0 +1,102 @@
+{
+  "schema": "agentic-tech-lead/local-handoff-queue/v1",
+  "program": "git-at-any-scale",
+  "repository": "ed3c/skills-shared",
+  "bound_main": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+  "bound_tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7",
+  "parent_issue": 531,
+  "law": {
+    "max_active": 1,
+    "queue_order_does_not_create_git_ancestry": true,
+    "completion_requires_content_bound_receipt": true,
+    "private_credentials_in_public_receipt": false
+  },
+  "items": [
+    {
+      "id": "GIT-SCALE-H0",
+      "state": "ACTIVE",
+      "owner_issue": 512,
+      "kind": "TRUSTED_LOCAL_SOURCE_MATERIALIZATION",
+      "objective": "Materialize the exact observed Cursor article bytes or a stable exported representation and bind byte count plus SHA-256 before source-truth advancement.",
+      "inputs": [
+        "https://cursor.com/blog/git-at-any-scale",
+        "docs/traceability/git-at-any-scale/source-claims.json"
+      ],
+      "required_receipt": [
+        "exact source locator",
+        "observed/exported bytes",
+        "byte count",
+        "sha256",
+        "retrieval/export timestamp",
+        "tool/runtime identity",
+        "claim denominator digest"
+      ],
+      "completion_effect": "May advance SOURCE_LOCATOR_BOUND to IMMUTABLE_SOURCE_PACKET_BOUND only; does not prove source claims true.",
+      "human_or_external_boundary": "Trusted local/runtime retrieval required because the GitHub connector cannot create immutable webpage evidence by itself."
+    },
+    {
+      "id": "GIT-SCALE-H1",
+      "state": "BLOCKED_BY_PREDECESSOR",
+      "owner_issue": 532,
+      "kind": "PORTABLE_CONTRACT_IMPLEMENTATION",
+      "objective": "Implement git-hosting-scale-assurance contracts, semantic refusal codes, fixtures and deterministic tests.",
+      "predecessor": "GIT-SCALE-H0 or explicit source-claim completion exclusion admitted by #531/#532",
+      "required_receipt": [
+        "exact branch/head/tree",
+        "schema IDs/digests",
+        "positive/hollow/mutation denominator",
+        "repository gates",
+        "exact-head hosted checks"
+      ]
+    },
+    {
+      "id": "GIT-SCALE-H2",
+      "state": "BLOCKED_BY_PREDECESSOR",
+      "owner_issue": 534,
+      "kind": "PHYSICAL_RUNTIME_CANARY",
+      "objective": "Run durability, linearizability, stale-cache, gossip-loss, cache-rebuild, compaction, corruption/restart and matched-scale experiments on one explicitly selected disposable hosting runtime.",
+      "predecessor": "admitted #532 interface and Human-approved runtime/provider scope",
+      "required_receipt": [
+        "runtime/storage/config subjects",
+        "operation history",
+        "fault schedule",
+        "raw and reduced metrics",
+        "cleanup/cost receipt",
+        "artifact SHA256SUMS"
+      ],
+      "human_or_external_boundary": "Provider/account activation, spend, production data and destructive non-disposable tests require explicit Human authority."
+    },
+    {
+      "id": "GIT-SCALE-H3",
+      "state": "BLOCKED_BY_PREDECESSOR",
+      "owner_issue": 535,
+      "kind": "INDEPENDENT_SHADOW",
+      "objective": "Run read-only same-subject adversarial admission over source, contracts and live receipts.",
+      "predecessor": "exact #532 and #534 subjects readable",
+      "required_receipt": [
+        "reviewed digests",
+        "GS-S01..S16 outcomes",
+        "first-red findings",
+        "bounded verdict",
+        "evidence ceilings"
+      ]
+    },
+    {
+      "id": "GIT-SCALE-H4",
+      "state": "BLOCKED_BY_PREDECESSOR",
+      "owner_issue": 536,
+      "kind": "SHARED_PATH_CONVERGENCE",
+      "objective": "After active writers are reconciled, update canonical root/shared indexes and git-town-stacked-pr-worker README with actual admitted subjects and final Stack state.",
+      "predecessor": "#412/#419 path-writer disposition plus selected #531/#532/#534/#535 subjects",
+      "required_receipt": [
+        "fresh open-PR changed-path inventory",
+        "selected writer/supersession decision",
+        "exact candidate head/tree",
+        "document-route gates",
+        "Molecular Stack checker",
+        "independent Shadow readback"
+      ],
+      "human_or_external_boundary": "Merge and final semantic admission remain Human/repository authority."
+    }
+  ]
+}
