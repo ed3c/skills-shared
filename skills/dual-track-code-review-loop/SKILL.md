@@ -186,8 +186,9 @@ Stop and return the item to its owner when:
 ```text
 two-track separation and grading      contract-level, enforced by schema
 refusal controls                      replayed against the shipped schemas
-concrete parser/index/graph binding   NOT_IMPLEMENTED
-concrete retrieval binding            NOT_IMPLEMENTED
+parser/syntax-match binding           LANDED (adapters/tree-sitter/, live receipt)
+graph-ledger binding                  LANDED (adapters/sqlite-ledger/, planted mutations)
+concrete retrieval/semantic binding   NOT_IMPLEMENTED (#550, open)
 applied refactor on a real codebase   NOT_EXERCISED
 cross-repository contract migration   NOT_EXERCISED
 live consumer canary                  NOT_EXERCISED
@@ -196,6 +197,7 @@ legal, employment and IP clearance    HUMAN_ADMIT_REQUIRED
 merge, release, production            HUMAN_ADMIT_REQUIRED
 ```
 
-This body defines how the method may speak. It has not yet been pointed at a
-codebase, and a contract that survives its own refusal controls has survived its
-own refusal controls.
+This body defines how the method may speak. Two of its capability classes are
+now filled by a landed adapter each; it has not yet been pointed at a real
+codebase to produce a proposal, and a contract that survives its own refusal
+controls has survived its own refusal controls.

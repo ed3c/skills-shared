@@ -1,0 +1,357 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pol/outcome-foldback-request/v1",
+  "title": "Outcome foldback request",
+  "description": "The request that a person read the outcome back and pick one of four dispositions. It is a stub by construction and stays one: `decision` is pinned to the empty string, `decided_by` is pinned to null, and `available_decisions` is pinned to the full four-value set in sorted order. A compiler that can fill in the decision field is a compiler that eventually fills it in with whichever disposition its inputs pointed at, and the input it would point at is the composition it produced itself. The questions carried here are the unresolved cells of the closure matrix, restated as things to look at rather than things that were settled: `unresolved_input` records what the matrix said, so a reader can tell a question raised by a contradiction from one raised by a lane nobody entered. What the schema cannot do is make somebody answer: it refuses a decision written by a machine, not a decision nobody makes.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "request_id",
+    "subject_commit",
+    "evidence_ceiling",
+    "decision",
+    "read_back_questions",
+    "authority",
+    "human_owned_operations"
+  ],
+  "properties": {
+    "schema": {"const": "pol/outcome-foldback-request/v1"},
+    "request_id": {"type": "string", "pattern": "^POL-FB-[0-9]{3}$"},
+    "subject_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "evidence_ceiling": {
+      "const": "DETERMINISTIC_COMPOSITION",
+      "description": "Assembling the questions proves that they were asked. It proves nothing about their answers, which is exactly why the answer field is empty."
+    },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["available_decisions", "decision", "decided_by", "decision_owner"],
+      "properties": {
+        "available_decisions": {
+          "const": ["ITERATE", "KILL", "NARROW", "PRESERVE"],
+          "description": "All four, always, in sorted order. Pinned as a constant rather than as an enum-valued array because a narrowed option set is the quietest way to make a decision: an outcome review whose only offered dispositions are PRESERVE and ITERATE has already ruled out killing the thing."
+        },
+        "decision": {
+          "const": "",
+          "description": "Empty, always. The four dispositions are read from `available_decisions`; this field is where a person writes one, and no instance produced by a compiler may arrive with it filled in."
+        },
+        "decided_by": {
+          "const": null,
+          "description": "Null until a person is recorded here by a process that is not this one. A machine name in this field is the widening the empty decision field was meant to prevent."
+        },
+        "decision_owner": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 200,
+          "description": "Who is being asked. Naming the owner is not recording an answer from them."
+        }
+      }
+    },
+    "read_back_questions": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/question"},
+      "description": "At least one. A foldback request with no question is a decision request with no subject."
+    },
+    "authority": {"$ref": "#/$defs/authority"},
+    "human_owned_operations": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 4}
+    }
+  },
+  "$defs": {
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "merge",
+        "release",
+        "product_truth",
+        "user_truth",
+        "paid_truth",
+        "rights_admission",
+        "provider_execution",
+        "production"
+      ],
+      "properties": {
+        "merge": {"const": false},
+        "release": {"const": false},
+        "product_truth": {"const": false},
+        "user_truth": {"const": false},
+        "paid_truth": {"const": false},
+        "rights_admission": {"const": false},
+        "provider_execution": {"const": false},
+        "production": {"const": false}
+      }
+    },
+    "question": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["question_id", "cell_id", "lane", "question", "unresolved_input"],
+      "properties": {
+        "question_id": {"type": "string", "pattern": "^POL-FBQ-[0-9]{3}$"},
+        "cell_id": {
+          "type": "string",
+          "pattern": "^POL-CELL-[0-9]{3}$",
+          "description": "The closure-matrix cell this question came from, so the reader can go back to the claims rather than to this restatement of them."
+        },
+        "lane": {
+          "enum": [
+            "SOURCE",
+            "MARKET",
+            "USER",
+            "MECHANISM",
+            "TECHNICAL",
+            "POLICY",
+            "RIGHTS",
+            "COMMERCIAL",
+            "RUNTIME",
+            "HUMAN_ADMIT",
+            "MERGE",
+            "RELEASE"
+          ]
+        },
+        "question": {"type": "string", "minLength": 8, "maxLength": 300},
+        "unresolved_input": {
+          "enum": ["BLOCKED", "CONTRADICTION", "HUMAN_ADMIT_REQUIRED", "NOT_EXERCISED", "UNKNOWN"],
+          "description": "Why this question survived composition, carried verbatim from the matrix cell. There is no value meaning resolved: a settled cell does not become a foldback question, so a resolved reading cannot be smuggled into the queue that gets read as open work."
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "schema": "pol/outcome-foldback-request/v1",
+      "request_id": "POL-FB-001",
+      "subject_commit": "174009203a3ff9bd6ebc4010bc6cab7232dd44a4",
+      "evidence_ceiling": "DETERMINISTIC_COMPOSITION",
+      "decision": {
+        "available_decisions": ["ITERATE", "KILL", "NARROW", "PRESERVE"],
+        "decision": "",
+        "decided_by": null,
+        "decision_owner": "the program owner named in the composition input"
+      },
+      "read_back_questions": [
+        {
+          "question_id": "POL-FBQ-001",
+          "cell_id": "POL-CELL-002",
+          "lane": "USER",
+          "question": "does the scenario reach first value without an account",
+          "unresolved_input": "CONTRADICTION"
+        },
+        {
+          "question_id": "POL-FBQ-002",
+          "cell_id": "POL-CELL-001",
+          "lane": "MARKET",
+          "question": "is the arena thin where the wedge is claimed",
+          "unresolved_input": "UNKNOWN"
+        }
+      ],
+      "authority": {
+        "merge": false,
+        "release": false,
+        "product_truth": false,
+        "user_truth": false,
+        "paid_truth": false,
+        "rights_admission": false,
+        "provider_execution": false,
+        "production": false
+      },
+      "human_owned_operations": [
+        "choosing one of the four dispositions",
+        "merge and release"
+      ]
+    }
+  ],
+  "x-refusal-controls": [
+    {
+      "case_id": "POL-XC-FB-001",
+      "refuses": "A disposition written by the compiler that assembled the questions.",
+      "refused_by": "properties.decision.properties.decision.const",
+      "instance": {
+        "schema": "pol/outcome-foldback-request/v1",
+        "request_id": "POL-FB-002",
+        "subject_commit": "174009203a3ff9bd6ebc4010bc6cab7232dd44a4",
+        "evidence_ceiling": "DETERMINISTIC_COMPOSITION",
+        "decision": {
+          "available_decisions": ["ITERATE", "KILL", "NARROW", "PRESERVE"],
+          "decision": "ITERATE",
+          "decided_by": null,
+          "decision_owner": "the program owner named in the composition input"
+        },
+        "read_back_questions": [
+          {
+            "question_id": "POL-FBQ-001",
+            "cell_id": "POL-CELL-001",
+            "lane": "MARKET",
+            "question": "is the arena thin where the wedge is claimed",
+            "unresolved_input": "UNKNOWN"
+          }
+        ],
+        "authority": {
+          "merge": false,
+          "release": false,
+          "product_truth": false,
+          "user_truth": false,
+          "paid_truth": false,
+          "rights_admission": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "POL-XC-FB-002",
+      "refuses": "A machine recorded as the party that decided.",
+      "refused_by": "properties.decision.properties.decided_by.const",
+      "instance": {
+        "schema": "pol/outcome-foldback-request/v1",
+        "request_id": "POL-FB-003",
+        "subject_commit": "174009203a3ff9bd6ebc4010bc6cab7232dd44a4",
+        "evidence_ceiling": "DETERMINISTIC_COMPOSITION",
+        "decision": {
+          "available_decisions": ["ITERATE", "KILL", "NARROW", "PRESERVE"],
+          "decision": "",
+          "decided_by": "compile_pol_composition.py",
+          "decision_owner": "the program owner named in the composition input"
+        },
+        "read_back_questions": [
+          {
+            "question_id": "POL-FBQ-001",
+            "cell_id": "POL-CELL-001",
+            "lane": "MARKET",
+            "question": "is the arena thin where the wedge is claimed",
+            "unresolved_input": "UNKNOWN"
+          }
+        ],
+        "authority": {
+          "merge": false,
+          "release": false,
+          "product_truth": false,
+          "user_truth": false,
+          "paid_truth": false,
+          "rights_admission": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "POL-XC-FB-003",
+      "refuses": "A narrowed option set, which decides against KILL without writing a decision.",
+      "refused_by": "properties.decision.properties.available_decisions.const",
+      "instance": {
+        "schema": "pol/outcome-foldback-request/v1",
+        "request_id": "POL-FB-004",
+        "subject_commit": "174009203a3ff9bd6ebc4010bc6cab7232dd44a4",
+        "evidence_ceiling": "DETERMINISTIC_COMPOSITION",
+        "decision": {
+          "available_decisions": ["ITERATE", "PRESERVE"],
+          "decision": "",
+          "decided_by": null,
+          "decision_owner": "the program owner named in the composition input"
+        },
+        "read_back_questions": [
+          {
+            "question_id": "POL-FBQ-001",
+            "cell_id": "POL-CELL-001",
+            "lane": "MARKET",
+            "question": "is the arena thin where the wedge is claimed",
+            "unresolved_input": "UNKNOWN"
+          }
+        ],
+        "authority": {
+          "merge": false,
+          "release": false,
+          "product_truth": false,
+          "user_truth": false,
+          "paid_truth": false,
+          "rights_admission": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "POL-XC-FB-004",
+      "refuses": "A settled cell entering the queue that is read as open work.",
+      "refused_by": "$defs.question.properties.unresolved_input.enum",
+      "instance": {
+        "schema": "pol/outcome-foldback-request/v1",
+        "request_id": "POL-FB-005",
+        "subject_commit": "174009203a3ff9bd6ebc4010bc6cab7232dd44a4",
+        "evidence_ceiling": "DETERMINISTIC_COMPOSITION",
+        "decision": {
+          "available_decisions": ["ITERATE", "KILL", "NARROW", "PRESERVE"],
+          "decision": "",
+          "decided_by": null,
+          "decision_owner": "the program owner named in the composition input"
+        },
+        "read_back_questions": [
+          {
+            "question_id": "POL-FBQ-001",
+            "cell_id": "POL-CELL-001",
+            "lane": "MARKET",
+            "question": "is the arena thin where the wedge is claimed",
+            "unresolved_input": "RESOLVED"
+          }
+        ],
+        "authority": {
+          "merge": false,
+          "release": false,
+          "product_truth": false,
+          "user_truth": false,
+          "paid_truth": false,
+          "rights_admission": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "POL-XC-FB-005",
+      "refuses": "Authority widening: a request for a decision granting itself the decision's consequence.",
+      "refused_by": "$defs.authority.properties.release.const",
+      "instance": {
+        "schema": "pol/outcome-foldback-request/v1",
+        "request_id": "POL-FB-006",
+        "subject_commit": "174009203a3ff9bd6ebc4010bc6cab7232dd44a4",
+        "evidence_ceiling": "DETERMINISTIC_COMPOSITION",
+        "decision": {
+          "available_decisions": ["ITERATE", "KILL", "NARROW", "PRESERVE"],
+          "decision": "",
+          "decided_by": null,
+          "decision_owner": "the program owner named in the composition input"
+        },
+        "read_back_questions": [
+          {
+            "question_id": "POL-FBQ-001",
+            "cell_id": "POL-CELL-001",
+            "lane": "MARKET",
+            "question": "is the arena thin where the wedge is claimed",
+            "unresolved_input": "UNKNOWN"
+          }
+        ],
+        "authority": {
+          "merge": false,
+          "release": true,
+          "product_truth": false,
+          "user_truth": false,
+          "paid_truth": false,
+          "rights_admission": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "human_owned_operations": ["merge and release"]
+      }
+    }
+  ]
+}
