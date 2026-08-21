@@ -1,0 +1,37 @@
+{
+  "schema": "git-at-any-scale-problem-closure-ledger/v1",
+  "repository_subject": {
+    "repository": "ed3c/skills-shared",
+    "main": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+    "tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7",
+    "observed": "2026-08-21"
+  },
+  "parent_issue": 531,
+  "problems": [
+    {"id":"GS-01","state":"PARTIALLY_CLOSED","method_owner":"existing Tech Lead/Git Town/Shadow","remaining_owner_issue":536,"live_evidence":"NOT_REQUIRED_FOR_METHOD_CLAIM","close_when":"current routes and Molecular index converge without active-writer conflict"},
+    {"id":"GS-02","state":"NOT_IMPLEMENTED_IN_THIS_REPOSITORY","method_owner":null,"remaining_owner_issue":534,"live_evidence":"NOT_EXERCISED","close_when":"bounded external hosting runtime selected and exercised or Human accepts explicit scope exclusion"},
+    {"id":"GS-03","state":"NOT_EXERCISED","method_owner":532,"remaining_owner_issue":534,"live_evidence":"REQUIRED","close_when":"matched synchronous-vs-selected architecture experiment has replayable receipts"},
+    {"id":"GS-04","state":"OPEN","method_owner":532,"remaining_owner_issue":534,"live_evidence":"REQUIRED","close_when":"portable durable-ack contract passes mutations and real runtime survives acknowledgement-boundary faults"},
+    {"id":"GS-05","state":"OPEN","method_owner":532,"remaining_owner_issue":534,"live_evidence":"REQUIRED","close_when":"transaction/CAS contract and concurrent-history linearizability oracle pass on exact runtime"},
+    {"id":"GS-06","state":"OPEN","method_owner":532,"remaining_owner_issue":534,"live_evidence":"REQUIRED","close_when":"stale-cache authority check plus destroy/rebuild canary passes"},
+    {"id":"GS-07","state":"OPEN","method_owner":532,"remaining_owner_issue":534,"live_evidence":"REQUIRED","close_when":"gossip drop/delay/reorder/duplicate changes convergence only, not correctness"},
+    {"id":"GS-08","state":"NOT_EXERCISED","method_owner":532,"remaining_owner_issue":534,"live_evidence":"REQUIRED","close_when":"compaction preserves reachability and reports CPU/network/storage denominator"},
+    {"id":"GS-09","state":"PARTIAL_GENERIC_METHOD","method_owner":532,"remaining_owner_issue":534,"live_evidence":"REQUIRED","close_when":"hosting-profile history plus corruption/partial-write/restart replay is verified"},
+    {"id":"GS-10","state":"SOURCE_PROPOSAL","method_owner":535,"remaining_owner_issue":534,"live_evidence":"REQUIRED","close_when":"matched benchmark subjects and independent readback bound each retained performance claim"}
+  ],
+  "program": {
+    "portable_contract_issue": 532,
+    "live_runtime_issue": 534,
+    "shadow_issue": 535,
+    "convergence_issue": 536,
+    "source_evidence_issue": 512,
+    "parent_close_allowed": false,
+    "blocking_reasons": [
+      "immutable article bytes/hash absent",
+      "portable Git-hosting assurance implementation not admitted",
+      "physical runtime canary not exercised",
+      "independent exact-subject Shadow receipt absent",
+      "shared README/Git Town convergence blocked by active writers #412/#419"
+    ]
+  }
+}
