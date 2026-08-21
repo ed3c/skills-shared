@@ -1,0 +1,1173 @@
+{
+  "denominator": {
+    "problem_ids": [
+      "gas-agent-coordination-framing",
+      "gas-cont-azure-devops-comparison",
+      "gas-cont-batched-single-node-sync",
+      "gas-cont-compaction-need",
+      "gas-cont-elastic-replica-count",
+      "gas-cont-gossip-non-authority-etag-validation",
+      "gas-cont-linearizable-push-visibility",
+      "gas-cont-no-consensus-cas-ref-update",
+      "gas-cont-nvme-local-cache",
+      "gas-cont-primary-only-compaction-amortization",
+      "gas-cont-rendezvous-hashing-routing",
+      "gas-cont-stateless-no-routing-table",
+      "gas-cont-udp-gossip-optimistic-replication",
+      "gas-cont-wal-forensic-replay",
+      "gas-cont-wal-source-of-truth",
+      "gas-hist-dht-object-level-distribution",
+      "gas-hist-github-rpc-fileserver-partial-fix",
+      "gas-hist-nfs-blockstorage-filesystem-distribution",
+      "gas-hist-spokes-3pc-consensus-mechanism",
+      "gas-hist-spokes-3pc-scalability-limit",
+      "gas-hist-spokes-operational-burden",
+      "gas-hist-spokes-three-choices",
+      "gas-packfile-transport-fundamentals",
+      "gas-perf-100-replica-synthetic-test",
+      "gas-perf-linear-readonly-scaling",
+      "gas-perf-s3-express-300-pushes",
+      "gas-perf-s3-standard-120-pushes",
+      "gas-scene-setting-hosting-difficulty"
+    ],
+    "source_manifest_sha256": "4a66a725c2113fb988b19e0738fbba7519f5ce5a13035cf51b37f1cdd111aba5"
+  },
+  "problems": [
+    {
+      "applicability": "APPLICABLE",
+      "claim": "Origin \u6bb5\u843d\u4e3b\u5f35\uff1aAgent \u5f9e\u6839\u672c\u4e0a\u6539\u8b8a\u4e86\u8edf\u9ad4\u4f7f\u7528\u65b9\u5f0f\u2014\u2014\u66f4\u591a\u7a0b\u5f0f\u78bc\u3001\u66f4\u591a PR\u3001\u66f4\u591a CI \u57f7\u884c\uff1b\u7248\u672c\u63a7\u5236\u662f\u9019\u4e00\u5207\u7684\u6838\u5fc3\uff0c\u4e5f\u6700\u96e3\u5728\u4e00\u5915\u4e4b\u9593\u6539\u8b8a\u3002",
+      "closure": "OPEN",
+      "dag_nodes": [
+        "github-issue-531",
+        "skills-agentic-tech-lead-orchestration-coordination-mechanism"
+      ],
+      "implementation_evidence": [],
+      "issue_nodes": [
+        531
+      ],
+      "merge_subjects": [],
+      "problem_id": "gas-agent-coordination-framing",
+      "receipts": [],
+      "repo_subject": {
+        "commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "repo": "ed3c/skills-shared",
+        "tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7"
+      },
+      "residual_gaps": [],
+      "session_attempts": [],
+      "shadow_verdict": "NOT_REVIEWED",
+      "source": {
+        "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+        "kind": "ARTICLE",
+        "location": "article:#Origin (Agent \u6bb5\u843d)"
+      },
+      "task_nodes": [
+        "gas-agent-coordination-framing-task"
+      ],
+      "verification_evidence": []
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "\u7b2c\u4e09\u65b9\u6bd4\u8f03\u4e3b\u5f35\uff1aAzure DevOps \u64c1\u6709\u4e00\u5957 Git \u5132\u5b58\u7cfb\u7d71\uff0c\u5c07 packfile \u5132\u5b58\u5728 blob \u5132\u5b58\u9ad4\u3001\u53c3\u8003\u8cc7\u6599\u5132\u5b58\u5728\u95dc\u806f\u5f0f\u8cc7\u6599\u5eab\uff08MS SQL Server\uff09\u4e2d\uff1b\u6b64\u67b6\u69cb\u7684\u53d6\u6368\u662f\u95dc\u806f\u5f0f\u8cc7\u6599\u5eab\u80fd\u826f\u597d\u64f4\u5c55\u5927\u578b\u53c3\u8003\u4ea4\u6613\uff0c\u4f46\u4ee3\u50f9\u662f\u5fc5\u9808\u81ea\u884c\u71df\u904b\u95dc\u806f\u5f0f\u8cc7\u6599\u5eab\u3002",
+      "closure": "OPEN",
+      "dag_nodes": [
+        "github-issue-531",
+        "gh-issue-534-physical-hosting-runtime-canary"
+      ],
+      "implementation_evidence": [],
+      "issue_nodes": [
+        531,
+        534
+      ],
+      "merge_subjects": [],
+      "problem_id": "gas-cont-azure-devops-comparison",
+      "receipts": [],
+      "repo_subject": {
+        "commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "repo": "ed3c/skills-shared",
+        "tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7"
+      },
+      "residual_gaps": [],
+      "session_attempts": [],
+      "shadow_verdict": "NOT_REVIEWED",
+      "source": {
+        "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+        "kind": "ARTICLE",
+        "location": "article:#WAL \u4f5c\u70ba\u771f\u76f8\u4f86\u6e90 > Azure DevOps \u6bd4\u8f03\u6bb5\u843d"
+      },
+      "task_nodes": [
+        "gas-cont-azure-devops-comparison-task"
+      ],
+      "verification_evidence": []
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "\u67b6\u69cb\u4e3b\u5f35\uff1a\u70ba\u907f\u514d\u6bcf\u6b21\u63a8\u9001\u50c5\u4e00\u6b21 S3 PUT \u9020\u6210\u7684\u5ef6\u9072\u786c\u6027\u4e0a\u9650\uff0cContinuity \u4ee5\u7d93\u8abf\u6821\u7684\u6279\u6b21\u8655\u7406\uff0c\u4e14\u53ea\u9700\u5c07 ref transaction \u8207\u55ae\u4e00\u672c\u6a5f\u5132\u5b58\u5eab\u540c\u6b65\uff08\u800c\u975e\u591a\u8907\u672c\u6cd5\u5b9a\u4eba\u6578\u540c\u6b65\uff09\uff0c\u4f7f\u7cfb\u7d71\u80fd\u4ee5\u78c1\u789f\u5141\u8a31\u7684\u901f\u5ea6\u63a5\u6536\u63a8\u9001\u3002",
+      "closure": "OPEN",
+      "dag_nodes": [
+        "github-issue-531",
+        "gh-issue-534-physical-hosting-runtime-canary"
+      ],
+      "implementation_evidence": [],
+      "issue_nodes": [
+        531,
+        534
+      ],
+      "merge_subjects": [],
+      "problem_id": "gas-cont-batched-single-node-sync",
+      "receipts": [],
+      "repo_subject": {
+        "commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "repo": "ed3c/skills-shared",
+        "tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7"
+      },
+      "residual_gaps": [],
+      "session_attempts": [],
+      "shadow_verdict": "NOT_REVIEWED",
+      "source": {
+        "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+        "kind": "ARTICLE",
+        "location": "article:#Continuity > \u6279\u6b21\u8655\u7406/\u55ae\u7bc0\u9ede\u540c\u6b65\u6bb5\u843d"
+      },
+      "task_nodes": [
+        "gas-cont-batched-single-node-sync-task"
+      ],
+      "verification_evidence": []
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "\u67b6\u69cb\u4e3b\u5f35\uff1aWAL \u9700\u8981\u5b9a\u671f\u58d3\u7e2e\uff0c\u5426\u5247\u5b8c\u6574\u9084\u539f\u9808\u91cd\u64ad\u6bcf\u7b46\u8a18\u9304\u3001\u8a18\u9304\u8d8a\u591a\u6210\u672c\u8d8a\u9ad8\uff1b\u6a19\u6e96 Git \u5132\u5b58\u5eab\u540c\u6a23\u9700\u8981\u5b9a\u671f\u58d3\u7e2e\uff0c\u56e0 packfile \u6578\u91cf\u589e\u52a0\u6703\u4f7f\u7269\u4ef6\u67e5\u627e\u9808\u9010\u4e00\u958b\u555f\u6bcf\u500b packfile \u7d22\u5f15\uff0c\u6548\u7387\u96a8 packfile \u6578\u91cf\u589e\u52a0\u800c\u964d\u4f4e\u3002",
+      "closure": "OPEN",
+      "dag_nodes": [
+        "github-issue-531",
+        "gh-issue-534-physical-hosting-runtime-canary"
+      ],
+      "implementation_evidence": [],
+      "issue_nodes": [
+        531,
+        534
+      ],
+      "merge_subjects": [],
+      "problem_id": "gas-cont-compaction-need",
+      "receipts": [],
+      "repo_subject": {
+        "commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "repo": "ed3c/skills-shared",
+        "tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7"
+      },
+      "residual_gaps": [],
+      "session_attempts": [],
+      "shadow_verdict": "NOT_REVIEWED",
+      "source": {
+        "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+        "kind": "ARTICLE",
+        "location": "article:#\u58d3\u7e2e > \u58d3\u7e2e\u5fc5\u8981\u6027\u6bb5\u843d"
+      },
+      "task_nodes": [
+        "gas-cont-compaction-need-task"
+      ],
+      "verification_evidence": []
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "\u67b6\u69cb\u4e3b\u5f35\uff1a\u7cfb\u7d71\u53ef\u96d9\u5411\u64f4\u5c55\u5f48\u6027\u8907\u672c\u6578\u2014\u2014\u5927\u578b monorepo \u53ef\u90e8\u7f72\u81f3\u6578\u767e\u8907\u672c\u627f\u64d4 CI \u8ca0\u8f09\uff1b\u4ee3\u7406\u5efa\u7acb\u7684\u6578\u767e\u842c\u5c0f\u578b\u5132\u5b58\u5eab\u6bcf\u500b\u53ea\u9700\u4e00\u8907\u672c\uff1b\u9592\u7f6e\u5132\u5b58\u5eab\u751a\u81f3\u53ef 0 \u8907\u672c\uff0c\u4e00\u6bb5\u6642\u9593\u672a\u6536\u6d41\u91cf\u6703\u88ab\u5783\u573e\u56de\u6536\uff0c\u4e0b\u6b21\u64f7\u53d6\u8acb\u6c42\u6642\u76f4\u63a5\u5f9e WAL \u518d\u6b21\u5177\u73fe\u5316\u3002",
+      "closure": "OPEN",
+      "dag_nodes": [
+        "github-issue-531",
+        "gh-issue-534-physical-hosting-runtime-canary"
+      ],
+      "implementation_evidence": [],
+      "issue_nodes": [
+        531,
+        534
+      ],
+      "merge_subjects": [],
+      "problem_id": "gas-cont-elastic-replica-count",
+      "receipts": [],
+      "repo_subject": {
+        "commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "repo": "ed3c/skills-shared",
+        "tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7"
+      },
+      "residual_gaps": [],
+      "session_attempts": [],
+      "shadow_verdict": "NOT_REVIEWED",
+      "source": {
+        "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+        "kind": "ARTICLE",
+        "location": "article:#\u8907\u5beb > \u96d9\u5411\u5f48\u6027\u8907\u672c\u6578\u6bb5\u843d"
+      },
+      "task_nodes": [
+        "gas-cont-elastic-replica-count-task"
+      ],
+      "verification_evidence": []
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "\u67b6\u69cb\u4e3b\u5f35\uff1aUDP \u4e0d\u53ef\u9760\u6c92\u95dc\u4fc2\u2014\u2014\u6bcf\u500b\u8907\u672c\u77e5\u9053\u81ea\u5df1\u8ffd\u4e0a\u7684 WAL \u7d22\u5f15\u6700\u5f8c\u7248\u672c ETag\uff0c\u8b80\u53d6\u6642\u4ee5\u9810\u671f ETag \u5411 S3 \u767c\u51fa\u689d\u4ef6\u5f0f GET\uff1b304 \u56de\u61c9\uff08\u5e73\u5747 <10ms\uff09\u4ee3\u8868\u8cc7\u6599\u5df2\u6700\u65b0\u53ef\u76f4\u63a5\u670d\u52d9\uff0c200 \u56de\u61c9\u5247\u5148\u8ffd\u4e0a\u9032\u5ea6\u518d\u670d\u52d9\u8b80\u53d6\uff1b\u5373\u4f7f\u8907\u5beb\u5c01\u5305\u907a\u5931\u6216\u9001\u932f\u4f3a\u670d\u5668\u4e5f\u7121\u95dc\u7dca\u8981\uff0c\u56e0\u6240\u6709\u8907\u672c\u7684\u8b80\u53d6\u7d50\u679c\u90fd\u6839\u64da S3 \u9a57\u8b49\u3001\u5b8c\u5168\u4e00\u81f4\u2014\u2014gossip \u53ea\u52a0\u901f\uff0cS3 \u624d\u662f\u6b63\u78ba\u6027\u6b0a\u5a01\u3002",
+      "closure": "OPEN",
+      "dag_nodes": [
+        "github-issue-531",
+        "gh-issue-532-portable-hosting-assurance-contract"
+      ],
+      "implementation_evidence": [],
+      "issue_nodes": [
+        531,
+        532
+      ],
+      "merge_subjects": [],
+      "problem_id": "gas-cont-gossip-non-authority-etag-validation",
+      "receipts": [],
+      "repo_subject": {
+        "commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "repo": "ed3c/skills-shared",
+        "tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7"
+      },
+      "residual_gaps": [],
+      "session_attempts": [],
+      "shadow_verdict": "NOT_REVIEWED",
+      "source": {
+        "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+        "kind": "ARTICLE",
+        "location": "article:#\u8907\u5beb > ETag \u689d\u4ef6\u5f0f GET \u6bb5\u843d"
+      },
+      "task_nodes": [
+        "gas-cont-gossip-non-authority-etag-validation-task"
+      ],
+      "verification_evidence": []
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "\u67b6\u69cb\u4e3b\u5f35\uff1a\u53ea\u6709\u5728\u5132\u5b58\u5eab\u672c\u6a5f\u526f\u672c\u6210\u529f\u6e96\u5099\u597d\u5176 ref transaction\uff0c\u4e26\u5728 WAL \u7d22\u5f15\u6a94\u4e2d\u8a18\u9304\u6307\u5411\u8a72 WAL \u9805\u76ee\u7684\u6307\u6a19\u5f8c\uff0c\u63a8\u9001\u624d\u6703\u53ef\u898b\uff1b\u6b64\u8a2d\u8a08\u78ba\u4fdd\u6240\u6709\u63a8\u9001\u7686\u53ef\u7dda\u6027\u5316\u3002",
+      "closure": "OPEN",
+      "dag_nodes": [
+        "github-issue-531",
+        "gh-issue-532-portable-hosting-assurance-contract"
+      ],
+      "implementation_evidence": [],
+      "issue_nodes": [
+        531,
+        532
+      ],
+      "merge_subjects": [],
+      "problem_id": "gas-cont-linearizable-push-visibility",
+      "receipts": [],
+      "repo_subject": {
+        "commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "repo": "ed3c/skills-shared",
+        "tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7"
+      },
+      "residual_gaps": [],
+      "session_attempts": [],
+      "shadow_verdict": "NOT_REVIEWED",
+      "source": {
+        "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+        "kind": "ARTICLE",
+        "location": "article:#Continuity > \u63a8\u9001\u53ef\u898b\u6027/\u7dda\u6027\u5316\u6bb5\u843d"
+      },
+      "task_nodes": [
+        "gas-cont-linearizable-push-visibility-task"
+      ],
+      "verification_evidence": []
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "\u67b6\u69cb\u4e3b\u5f35\uff1a\u4e0d\u9700\u8981\u5171\u8b58\u6216\u9078\u8209\uff0c\u4efb\u4f55\u4f3a\u670d\u5668\u90fd\u53ef\u4f5c\u70ba\u4e3b\u8981\u4f3a\u670d\u5668\uff1b\u6240\u6709\u5c0d WAL \u7684\u66f4\u65b0\u900f\u904e S3 \u4e0a\u7684\u539f\u5b50\u6bd4\u8f03\u4e26\u4ea4\u63db\uff08CAS\uff09\u64cd\u4f5c\u540c\u6b65\uff0c\u56e0\u6b64\u4efb\u4f55\u5132\u5b58\u5eab\u57f7\u884c\u500b\u9ad4\u63a5\u6536\u63a8\u9001\u7686\u5b89\u5168\uff1b\u5be6\u52d9\u4e0a\u4e00\u5f8b\u9078 rendezvous \u6392\u540d\u7b2c\u4e00\u7684\u4f3a\u670d\u5668\u70ba\u4e3b\u8981\u4f3a\u670d\u5668\u4ee5\u907f\u514d CAS \u91cd\u8a66\u5ef6\u9072\uff1b\u7cfb\u7d71\u8a2d\u8a08\u70ba\u300c\u964d\u7d1a\u6642\u59cb\u7d42\u6b63\u78ba\uff0c\u5065\u5eb7\u6642\u59cb\u7d42\u5feb\u901f\u300d\u3002",
+      "closure": "OPEN",
+      "dag_nodes": [
+        "github-issue-531",
+        "gh-issue-532-portable-hosting-assurance-contract"
+      ],
+      "implementation_evidence": [],
+      "issue_nodes": [
+        531,
+        532
+      ],
+      "merge_subjects": [],
+      "problem_id": "gas-cont-no-consensus-cas-ref-update",
+      "receipts": [],
+      "repo_subject": {
+        "commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "repo": "ed3c/skills-shared",
+        "tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7"
+      },
+      "residual_gaps": [],
+      "session_attempts": [],
+      "shadow_verdict": "NOT_REVIEWED",
+      "source": {
+        "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+        "kind": "ARTICLE",
+        "location": "article:#\u5171\u8b58 > \u7121\u5171\u8b58/CAS \u6bb5\u843d"
+      },
+      "task_nodes": [
+        "gas-cont-no-consensus-cas-ref-update-task"
+      ],
+      "verification_evidence": []
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "\u67b6\u69cb\u4e3b\u5f35\uff1a\u5132\u5b58\u5eab\u672c\u6a5f\u526f\u672c\u662f\u5132\u5b58\u5728\u9ad8\u901f NVMe \u78c1\u789f\u4e0a\u7684\u4e00\u822c Git \u5132\u5b58\u5eab\uff08\u6cbf\u7528 Spokes \u7684\u505a\u6cd5\uff09\uff0c\u53ef\u91cd\u8907\u5229\u7528\u4e0a\u6e38 Git \u7528\u6236\u7aef\u8207\u5176\u6548\u80fd\u6700\u4f73\u5316\u6210\u679c\u3002",
+      "closure": "OPEN",
+      "dag_nodes": [
+        "github-issue-531",
+        "gh-issue-534-physical-hosting-runtime-canary"
+      ],
+      "implementation_evidence": [],
+      "issue_nodes": [
+        531,
+        534
+      ],
+      "merge_subjects": [],
+      "problem_id": "gas-cont-nvme-local-cache",
+      "receipts": [],
+      "repo_subject": {
+        "commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "repo": "ed3c/skills-shared",
+        "tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7"
+      },
+      "residual_gaps": [],
+      "session_attempts": [],
+      "shadow_verdict": "NOT_REVIEWED",
+      "source": {
+        "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+        "kind": "ARTICLE",
+        "location": "article:#Continuity > \u672c\u6a5f NVMe \u526f\u672c\u6bb5\u843d"
+      },
+      "task_nodes": [
+        "gas-cont-nvme-local-cache-task"
+      ],
+      "verification_evidence": []
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "\u67b6\u69cb\u4e3b\u5f35\uff1a\u53ea\u6709\u4e3b\u8981\u4f3a\u670d\u5668\u57f7\u884c\u58d3\u7e2e\uff0c\u58d3\u7e2e\u7d50\u679c\u540c\u6642\u5957\u7528\u81f3\u78c1\u789f\u5132\u5b58\u5eab\u8207 WAL\uff1b\u6240\u6709\u526f\u672c\u8ddf\u96a8 WAL \u56e0\u6b64\u4e5f\u8ddf\u96a8\u58d3\u7e2e\u4e8b\u4ef6\uff0c\u526f\u672c\u4e0d\u91cd\u65b0\u5c01\u88dd\uff0c\u53ea\u9700\u5f9e S3 \u4e0b\u8f09\u5df2\u58d3\u7e2e\u7684 pack\uff0c\u4ee5\u983b\u5bec\u63db\u53d6 CPU \u8cc7\u6e90\u2014\u2014\u907f\u514d\u6bcf\u500b\u526f\u672c\u91cd\u8907\u57f7\u884c\u6602\u8cb4\u7684 CPU \u5bc6\u96c6\u91cd\u65b0\u5c01\u88dd\u5de5\u4f5c\u3002",
+      "closure": "OPEN",
+      "dag_nodes": [
+        "github-issue-531",
+        "gh-issue-534-physical-hosting-runtime-canary"
+      ],
+      "implementation_evidence": [],
+      "issue_nodes": [
+        531,
+        534
+      ],
+      "merge_subjects": [],
+      "problem_id": "gas-cont-primary-only-compaction-amortization",
+      "receipts": [],
+      "repo_subject": {
+        "commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "repo": "ed3c/skills-shared",
+        "tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7"
+      },
+      "residual_gaps": [],
+      "session_attempts": [],
+      "shadow_verdict": "NOT_REVIEWED",
+      "source": {
+        "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+        "kind": "ARTICLE",
+        "location": "article:#\u58d3\u7e2e > \u4e3b\u8981\u4f3a\u670d\u5668\u58d3\u7e2e\u6524\u63d0\u6bb5\u843d"
+      },
+      "task_nodes": [
+        "gas-cont-primary-only-compaction-amortization-task"
+      ],
+      "verification_evidence": []
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "\u67b6\u69cb\u4e3b\u5f35\uff1a\u6b63\u5f0f\u74b0\u5883\u4f7f\u7528 rendezvous hashing \u5c07\u5132\u5b58\u5eab ID \u5c0d\u61c9\u81f3\u9810\u671f\u5b58\u653e\u7bc0\u9ede\u6e05\u55ae\uff1b\u8def\u7531\u6240\u9700\u72c0\u614b\u50c5\u70ba\u5132\u5b58\u5eab ID \u8207\u53e2\u96c6\u76ee\u524d\u5065\u5eb7\u7bc0\u9ede\u96c6\u5408\uff1b\u5373\u4f7f\u6b64\u72c0\u614b\u4e0d\u540c\u6b65\uff08\u4f8b\u5982\u7bc0\u9ede\u8b8a\u5f97\u4e0d\u5065\u5eb7\uff09\u4e5f\u7121\u59a8\uff0c\u53ef\u5728\u4e0b\u4e00\u7bc0\u9ede\u4e0a\u5177\u73fe\u5316\u3002",
+      "closure": "OPEN",
+      "dag_nodes": [
+        "github-issue-531",
+        "gh-issue-534-physical-hosting-runtime-canary"
+      ],
+      "implementation_evidence": [],
+      "issue_nodes": [
+        531,
+        534
+      ],
+      "merge_subjects": [],
+      "problem_id": "gas-cont-rendezvous-hashing-routing",
+      "receipts": [],
+      "repo_subject": {
+        "commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "repo": "ed3c/skills-shared",
+        "tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7"
+      },
+      "residual_gaps": [],
+      "session_attempts": [],
+      "shadow_verdict": "NOT_REVIEWED",
+      "source": {
+        "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+        "kind": "ARTICLE",
+        "location": "article:#\u5171\u8b58 > rendezvous hashing \u6bb5\u843d"
+      },
+      "task_nodes": [
+        "gas-cont-rendezvous-hashing-routing-task"
+      ],
+      "verification_evidence": []
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "\u67b6\u69cb\u4e3b\u5f35\uff1aContinuity \u662f\u7121\u72c0\u614b\u7cfb\u7d71\uff0c\u6c92\u6709\u8def\u7531\u8868\u4e5f\u4e0d\u9700\u8981\u7dad\u904b\u95dc\u806f\u5f0f\u8cc7\u6599\u5eab\uff1b\u6bcf\u500b\u5132\u5b58\u5eab\u8996\u70ba\u78c1\u789f\u4e0a\u7684\u71b1\u5feb\u53d6\uff0c\u552f\u4e00\u6b0a\u5a01\u8cc7\u6599\u4f86\u6e90\u59cb\u7d42\u662f S3 \u4e2d\u7684 WAL\uff1b\u672c\u6a5f\u78c1\u789f\u6c92\u6709\u8a72\u5132\u5b58\u5eab\u6642\uff0c\u5373\u5f9e WAL \u5177\u73fe\u5316\u3002",
+      "closure": "OPEN",
+      "dag_nodes": [
+        "github-issue-531",
+        "gh-issue-532-portable-hosting-assurance-contract"
+      ],
+      "implementation_evidence": [],
+      "issue_nodes": [
+        531,
+        532
+      ],
+      "merge_subjects": [],
+      "problem_id": "gas-cont-stateless-no-routing-table",
+      "receipts": [],
+      "repo_subject": {
+        "commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "repo": "ed3c/skills-shared",
+        "tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7"
+      },
+      "residual_gaps": [],
+      "session_attempts": [],
+      "shadow_verdict": "NOT_REVIEWED",
+      "source": {
+        "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+        "kind": "ARTICLE",
+        "location": "article:#\u5171\u8b58 > \u7121\u72c0\u614b/\u7121\u8def\u7531\u8868\u6bb5\u843d"
+      },
+      "task_nodes": [
+        "gas-cont-stateless-no-routing-table-task"
+      ],
+      "verification_evidence": []
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "\u67b6\u69cb\u4e3b\u5f35\uff1aWAL \u5b58\u65bc S3 \u8b93\u8907\u672c\u6578\u91cf\u53ef\u7121\u9650\u64f4\u5145\uff1b\u900f\u904e\u53e2\u96c6\u4e2d\u50b3\u9001 UDP gossip \u5c01\u5305\u9032\u884c\u6a02\u89c0\u5f0f\u8907\u5beb\uff0c\u6bcf\u6b21\u63a8\u9001\u5f8c\u5c01\u5305\u651c\u5e36\u8b93\u5404\u8907\u672c\u5f9e S3 \u8ffd\u4e0a\u9032\u5ea6\u6240\u9700\u7684\u5168\u90e8\u4e2d\u7e7c\u8cc7\u6599\u3002",
+      "closure": "OPEN",
+      "dag_nodes": [
+        "github-issue-531",
+        "gh-issue-534-physical-hosting-runtime-canary"
+      ],
+      "implementation_evidence": [],
+      "issue_nodes": [
+        531,
+        534
+      ],
+      "merge_subjects": [],
+      "problem_id": "gas-cont-udp-gossip-optimistic-replication",
+      "receipts": [],
+      "repo_subject": {
+        "commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "repo": "ed3c/skills-shared",
+        "tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7"
+      },
+      "residual_gaps": [],
+      "session_attempts": [],
+      "shadow_verdict": "NOT_REVIEWED",
+      "source": {
+        "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+        "kind": "ARTICLE",
+        "location": "article:#\u8907\u5beb > UDP gossip \u6bb5\u843d"
+      },
+      "task_nodes": [
+        "gas-cont-udp-gossip-optimistic-replication-task"
+      ],
+      "verification_evidence": []
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "\u67b6\u69cb\u4e3b\u5f35\uff1a\u63a8\u9001\u5728\u5b8c\u5168\u6301\u4e45\u5316\u81f3 WAL \u524d\u7d55\u4e0d\u78ba\u8a8d\uff0c\u6240\u6709\u63a8\u9001\u7686\u7dda\u6027\u5316\uff0c\u6bcf\u500b\u5132\u5b58\u5eab\u7684\u6bcf\u500b\u6aa2\u8996\u59cb\u7d42\u5b8c\u5168\u4e00\u81f4\uff1b\u56e0\u6bcf\u6b21\u63a8\u9001\u8a18\u9304\u5728 WAL \u4e2d\uff0c\u53ef\u67e5\u770b\u5132\u5b58\u5eab\u66fe\u6b77\u7d93\u7684\u6bcf\u500b\u72c0\u614b\u3001\u64c1\u6709\u6240\u6709\u63a8\u9001\u8207\u91cd\u65b0\u5c01\u88dd\u4f5c\u696d\u7684\u5b8c\u6574\u4f86\u6e90\u8cc7\u6599\u3001\u53ef\u5c07\u4efb\u4e00\u8907\u672c\u5012\u8f49\u6216\u5feb\u8f49\uff1b\u9047\u5230 Git \u4e2d\u7684\u932f\u8aa4\u6642\u53ef\u7cbe\u78ba\u627e\u51fa\u4e26\u9084\u539f\uff0c\u4e14\u9664 Git \u65e2\u6709\u932f\u8aa4\u5916\uff0c\u56e0\u6240\u6709\u64cd\u4f5c\u7686\u7528\u73fe\u6210\u5de5\u5177\u5728\u78c1\u789f\u4e0a\u4e00\u822c Git \u5132\u5b58\u5eab\u57f7\u884c\uff0c\u5f15\u5165\u7684\u65b0\u932f\u8aa4\u6975\u5c11\u3002",
+      "closure": "OPEN",
+      "dag_nodes": [
+        "github-issue-531",
+        "gh-issue-532-portable-hosting-assurance-contract"
+      ],
+      "implementation_evidence": [],
+      "issue_nodes": [
+        531,
+        532
+      ],
+      "merge_subjects": [],
+      "problem_id": "gas-cont-wal-forensic-replay",
+      "receipts": [],
+      "repo_subject": {
+        "commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "repo": "ed3c/skills-shared",
+        "tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7"
+      },
+      "residual_gaps": [],
+      "session_attempts": [],
+      "shadow_verdict": "NOT_REVIEWED",
+      "source": {
+        "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+        "kind": "ARTICLE",
+        "location": "article:#WAL \u4f5c\u70ba\u771f\u76f8\u4f86\u6e90 > \u9451\u8b58/\u91cd\u64ad\u6bb5\u843d"
+      },
+      "task_nodes": [
+        "gas-cont-wal-forensic-replay-task"
+      ],
+      "verification_evidence": []
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "\u67b6\u69cb\u4e3b\u5f35\uff1aContinuity \u7684\u6838\u5fc3\u57fa\u790e\u5143\u4ef6\u662f\u9810\u5beb\u65e5\u8a8c\uff08WAL\uff09\uff0c\u5132\u5b58\u5728\u76f8\u5bb9 S3 \u7684\u7269\u4ef6\u5132\u5b58\u9ad4\u4e2d\uff08\u6b63\u5f0f\u74b0\u5883\u76f4\u63a5\u7528 S3\uff0c\u8a2d\u8a08\u4e0a\u53ef\u90e8\u7f72\u81f3\u4efb\u4f55\u96f2\u7aef\uff09\uff1b\u5728\u63a8\u9001\u5b8c\u5168\u6301\u4e45\u5316\u4e4b\u524d\u7d55\u4e0d\u78ba\u8a8d\u8a72\u63a8\u9001\uff0c\u6bcf\u6b21\u63a8\u9001\u7686\u5b58\u70ba\u7368\u7acb\u7269\u4ef6\u3002",
+      "closure": "OPEN",
+      "dag_nodes": [
+        "github-issue-531",
+        "gh-issue-532-portable-hosting-assurance-contract"
+      ],
+      "implementation_evidence": [],
+      "issue_nodes": [
+        531,
+        532
+      ],
+      "merge_subjects": [],
+      "problem_id": "gas-cont-wal-source-of-truth",
+      "receipts": [],
+      "repo_subject": {
+        "commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "repo": "ed3c/skills-shared",
+        "tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7"
+      },
+      "residual_gaps": [],
+      "session_attempts": [],
+      "shadow_verdict": "NOT_REVIEWED",
+      "source": {
+        "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+        "kind": "ARTICLE",
+        "location": "article:#Continuity > WAL \u6838\u5fc3\u5143\u4ef6\u6bb5\u843d"
+      },
+      "task_nodes": [
+        "gas-cont-wal-source-of-truth-task"
+      ],
+      "verification_evidence": []
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "\u6b77\u53f2\u4e3b\u5f35\uff1aShawn Pearce \u5728 Google \u7248\u672c\u63a7\u5236\u7cfb\u7d71\u5718\u968a\u5617\u8a66\u4ee5\u5206\u6563\u5f0f\u96dc\u6e4a\u8868\uff08DHT\uff09\u53d6\u4ee3\u78c1\u789f\u4e0a\u7684 packfile\uff08\u900f\u904e JGit \u5be6\u4f5c\uff09\u3002\u7cfb\u7d71\u53ef\u904b\u4f5c\u4e14\u4e00\u822c Git \u64cd\u4f5c\u6548\u80fd\u5df2\u8db3\u5920\u7406\u60f3\uff0c\u4f46 Git \u901a\u8a0a\u5354\u5b9a\u8981\u6c42\u4ecd\u5fc5\u9808\u900f\u904e\u7db2\u8def\u50b3\u9001 packfile\uff0c\u4f7f git clone \u6548\u80fd\u5dee\u5230\u6700\u7d42\u906d\u6368\u68c4\uff1b\u6839\u672c\u539f\u56e0\u662f Git \u7269\u4ef6\u5716\uff08DAG\uff09\u8d70\u8a2a\u7684\u6bcf\u4e00\u6b65\u90fd\u9808\u5148\u53d6\u5f97\u524d\u4e00\u500b\u6307\u6a19\u624d\u80fd\u5f97\u77e5\u4e0b\u4e00\u500b\u6307\u6a19\uff0c\u82e5\u6bcf\u6b21\u64f7\u53d6\u90fd\u8981\u5f80\u8fd4\u5206\u6563\u5f0f\u5132\u5b58\u5eab\uff0c\u6210\u672c\u6975\u9ad8\uff08round-trip \u554f\u984c\uff09\u3002",
+      "closure": "OPEN",
+      "dag_nodes": [
+        "github-issue-531",
+        "gh-issue-534-physical-hosting-runtime-canary"
+      ],
+      "implementation_evidence": [],
+      "issue_nodes": [
+        531,
+        534
+      ],
+      "merge_subjects": [],
+      "problem_id": "gas-hist-dht-object-level-distribution",
+      "receipts": [],
+      "repo_subject": {
+        "commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "repo": "ed3c/skills-shared",
+        "tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7"
+      },
+      "residual_gaps": [],
+      "session_attempts": [],
+      "shadow_verdict": "NOT_REVIEWED",
+      "source": {
+        "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+        "kind": "ARTICLE",
+        "location": "article:#\u4e0d\u4f7f\u7528 packfile \u7684 Git > DHT/JGit \u5617\u8a66"
+      },
+      "task_nodes": [
+        "gas-hist-dht-object-level-distribution-task"
+      ],
+      "verification_evidence": []
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "\u6b77\u53f2\u4e3b\u5f35\uff1aGitHub \u6700\u7d42\u653e\u68c4\u5206\u6563\u6a94\u6848\u7cfb\u7d71\uff0c\u6539\u958b\u767c RPC \u7cfb\u7d71\u8b93\u5132\u5b58\u5eab\u5b58\u653e\u5728\u5c08\u7528\u6a94\u6848\u4f3a\u670d\u5668\u4e0a\uff1b\u6b64\u6cd5\u5e36\u4f86\u4e00\u5b9a\u6c34\u5e73\u53ef\u64f4\u5145\u6027\uff0c\u4f46\u6c92\u6709\u89e3\u6c7a\u53ef\u7528\u6027\u554f\u984c\uff0c\u4e5f\u6c92\u6709\u6539\u5584\u6700\u7e41\u5fd9\u5132\u5b58\u5eab\u7684\u6548\u80fd\uff0c\u56e0\u70ba\u6bcf\u500b\u5132\u5b58\u5eab\u4ecd\u53ea\u5b58\u653e\u5728\u55ae\u4e00\u6a5f\u5668\u4e0a\u3002",
+      "closure": "OPEN",
+      "dag_nodes": [
+        "github-issue-531",
+        "gh-issue-534-physical-hosting-runtime-canary"
+      ],
+      "implementation_evidence": [],
+      "issue_nodes": [
+        531,
+        534
+      ],
+      "merge_subjects": [],
+      "problem_id": "gas-hist-github-rpc-fileserver-partial-fix",
+      "receipts": [],
+      "repo_subject": {
+        "commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "repo": "ed3c/skills-shared",
+        "tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7"
+      },
+      "residual_gaps": [],
+      "session_attempts": [],
+      "shadow_verdict": "NOT_REVIEWED",
+      "source": {
+        "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+        "kind": "ARTICLE",
+        "location": "article:#GitHub \u8207\u6a94\u6848\u7cfb\u7d71 > RPC \u7cfb\u7d71\u7d50\u5c3e"
+      },
+      "task_nodes": [
+        "gas-hist-github-rpc-fileserver-partial-fix-task"
+      ],
+      "verification_evidence": []
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "\u6b77\u53f2\u4e3b\u5f35\uff1aGitHub \u5617\u8a66\u4ee5\u5206\u6563\u5f0f\u6a94\u6848\u7cfb\u7d71\u6258\u7ba1 Git \u8cc7\u6599\u2014\u2014NFS \u56e0 Git \u9810\u8a2d\u5be6\u4f5c\u5c0d\u6a94\u6848\u7cfb\u7d71\u8a9e\u610f\uff08\u9396\u5b9a\u3001\u5beb\u5165\u6495\u88c2\u3001\u8b80\u53d6\u3001\u540c\u6b65\uff09\u7684\u5047\u8a2d\u53ea\u9069\u5408\u672c\u6a5f\u6162\u901f\u7b46\u96fb\u78c1\u789f\u3001\u5b8c\u5168\u672a\u8003\u616e\u7db2\u8def\u6a94\u6848\u7cfb\u7d71\u884c\u70ba\uff0c\u800c\u53c8\u6162\u53c8\u554f\u984c\u767e\u51fa\uff0c\u5f88\u5feb\u88ab\u6368\u68c4\uff1b\u5340\u584a\u5c64\u7d1a\u8907\u5beb\uff08\u66fe\u77ed\u66ab\u90e8\u7f72 GFS\u3001\u8f03\u9577\u671f\u63a1\u7528 DRBD\uff09\u4e5f\u5168\u90e8\u78b0\u58c1\uff0c\u65e5\u5e38\u71df\u904b\u7cdf\u7cd5\u4e14\u6548\u80fd\u4e0d\u8db3\u3002\u6839\u672c\u539f\u56e0\uff1apackfile \u7684\u96a8\u6a5f\u8b80\u53d6\u5b58\u53d6\u6a21\u5f0f\uff08DAG \u908f\u8f2f\u8df3\u8f49 + \u78c1\u789f\u683c\u5f0f\u5be6\u9ad4\u8df3\u8f49\u3001\u5dee\u7570\u58d3\u7e2e\u5132\u5b58\uff09\u8207\u7db2\u8def\u6a94\u6848\u7cfb\u7d71/\u5340\u584a\u8907\u5beb\u4e0d\u76f8\u5bb9\u3002",
+      "closure": "OPEN",
+      "dag_nodes": [
+        "github-issue-531",
+        "gh-issue-534-physical-hosting-runtime-canary"
+      ],
+      "implementation_evidence": [],
+      "issue_nodes": [
+        531,
+        534
+      ],
+      "merge_subjects": [],
+      "problem_id": "gas-hist-nfs-blockstorage-filesystem-distribution",
+      "receipts": [],
+      "repo_subject": {
+        "commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "repo": "ed3c/skills-shared",
+        "tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7"
+      },
+      "residual_gaps": [],
+      "session_attempts": [],
+      "shadow_verdict": "NOT_REVIEWED",
+      "source": {
+        "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+        "kind": "ARTICLE",
+        "location": "article:#GitHub \u8207\u6a94\u6848\u7cfb\u7d71 > NFS/GFS/DRBD \u5617\u8a66"
+      },
+      "task_nodes": [
+        "gas-hist-nfs-blockstorage-filesystem-distribution-task"
+      ],
+      "verification_evidence": []
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "\u6b77\u53f2\u4e3b\u5f35\uff1aSpokes \u662f\u4ee5\u5171\u8b58\u70ba\u57fa\u790e\u7684\u5206\u6563\u5f0f\u7cfb\u7d71\uff1b\u63a8\u9001\u6642\u5354\u8abf\u5668\u5c07 packfile \u6247\u51fa\u7d66\u6240\u6709\u526f\u672c\uff08\u7121\u9808\u540c\u6b65\uff09\uff0c\u50c5\u5c0d ref transaction \u57f7\u884c 3PC\uff08\u4e09\u968e\u6bb5\u63d0\u4ea4\uff09\uff0c\u9808\u591a\u6578\u7bc0\u9ede\u78ba\u8a8d\u624d\u88ab\u63a5\u53d7\uff1b\u56e0 ref \u66f4\u65b0\u524d\u63d0\u4ea4\u4e0d\u53ef\u9054/\u4e0d\u53ef\u898b\uff0c\u6b64\u5206\u96e2\u8b93 3PC \u53ea\u9700\u540c\u6b65\u9060\u5c0f\u65bc packfile \u7684 ref transaction\uff1b\u8b80\u53d6\u53ef\u5b89\u5168\u8def\u7531\u81f3\u4efb\u4e00\u526f\u672c\uff0c\u56e0\u6bcf\u500b\u526f\u672c\u59cb\u7d42\u6700\u65b0\u3002",
+      "closure": "OPEN",
+      "dag_nodes": [
+        "github-issue-531",
+        "gh-issue-534-physical-hosting-runtime-canary"
+      ],
+      "implementation_evidence": [],
+      "issue_nodes": [
+        531,
+        534
+      ],
+      "merge_subjects": [],
+      "problem_id": "gas-hist-spokes-3pc-consensus-mechanism",
+      "receipts": [],
+      "repo_subject": {
+        "commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "repo": "ed3c/skills-shared",
+        "tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7"
+      },
+      "residual_gaps": [],
+      "session_attempts": [],
+      "shadow_verdict": "NOT_REVIEWED",
+      "source": {
+        "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+        "kind": "ARTICLE",
+        "location": "article:#Spokes \u8207\u4e00\u81f4\u6027 > 3PC \u904b\u4f5c\u6a5f\u5236"
+      },
+      "task_nodes": [
+        "gas-hist-spokes-3pc-consensus-mechanism-task"
+      ],
+      "verification_evidence": []
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "\u6b77\u53f2\u4e3b\u5f35\uff1a3PC \u4f5c\u70ba\u5171\u8b58\u6f14\u7b97\u6cd5\uff0c\u5176\u6c34\u5e73\u53ef\u64f4\u5c55\u6027\u6709\u6839\u672c\u9650\u5236\u2014\u2014\u6bcf\u6b65\u9a5f\u5ef6\u9072\u53d6\u6c7a\u65bc\u53e2\u96c6\u6700\u6162\u4f3a\u670d\u5668\uff0c\u8907\u672c\u8d8a\u591a\u63a8\u9001\u541e\u5410\u91cf\u8d8a\u5dee\u30022026 \u5e74\u4f01\u696d monorepo \u898f\u6a21\u5df2\u5de8\u5927\uff0c3 \u500b\u8907\u672c\u4e0d\u8db3\u4ee5\u627f\u8f09\u5176 CI \u6d41\u91cf\uff1b\u53cd\u4e4b Agent \u5927\u91cf\u5efa\u7acb\u7684\u4e00\u6b21\u6027\u5c0f\u578b\u5132\u5b58\u5eab\u53c8\u7528\u4e0d\u5230 3 \u500b\u8907\u672c\u537b\u4e0d\u80fd\u7e2e\u6e1b\uff08\u5426\u5247\u55aa\u5931\u4e00\u81f4\u6027\u3001\u53ef\u80fd\u8cc7\u6599\u907a\u5931\uff09\u2014\u20143PC \u6a21\u578b\u4e0b\u300c\u4e0b\u9650\u7e3d\u662f\u592a\u9ad8\uff0c\u4e0a\u9650\u53c8\u592a\u4f4e\u300d\u3002",
+      "closure": "OPEN",
+      "dag_nodes": [
+        "github-issue-531",
+        "gh-issue-534-physical-hosting-runtime-canary"
+      ],
+      "implementation_evidence": [],
+      "issue_nodes": [
+        531,
+        534
+      ],
+      "merge_subjects": [],
+      "problem_id": "gas-hist-spokes-3pc-scalability-limit",
+      "receipts": [],
+      "repo_subject": {
+        "commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "repo": "ed3c/skills-shared",
+        "tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7"
+      },
+      "residual_gaps": [],
+      "session_attempts": [],
+      "shadow_verdict": "NOT_REVIEWED",
+      "source": {
+        "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+        "kind": "ARTICLE",
+        "location": "article:#Spokes \u8207\u4e00\u81f4\u6027 > 3PC \u53ef\u64f4\u5c55\u6027\u9650\u5236"
+      },
+      "task_nodes": [
+        "gas-hist-spokes-3pc-scalability-limit-task"
+      ],
+      "verification_evidence": []
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "\u6b77\u53f2\u4e3b\u5f35\uff1aSpokes \u5728\u5927\u898f\u6a21\u74b0\u5883\u4e0b\u96e3\u4ee5\u7dad\u904b\u2014\u2014\u78c1\u789f\u4e0a\u7684\u5132\u5b58\u5eab\u662f\u5171\u8b58\u7684\u6b0a\u5a01\u8cc7\u6599\u4f86\u6e90\uff0c\u6545\u6bcf\u500b\u5132\u5b58\u5eab\u7684\u6bcf\u500b\u8907\u672c\u90fd\u9808\u88ab\u7576\u6210\u300c\u5bf5\u7269\u300d\u7cbe\u78ba\u8ffd\u8e64\u4f4d\u7f6e\uff08\u4f9d\u8cf4\u5916\u90e8\u8def\u7531\u8cc7\u6599\u5eab\uff09\u3001\u6301\u7e8c\u8a08\u7b97\u4e26\u66f4\u65b0\u7e3d\u548c\u6aa2\u67e5\u78bc\u3001\u5075\u6e2c\u640d\u6bc0\u4e26\u5feb\u901f\u6392\u7a0b\u4fee\u5fa9\uff1b\u82e5\u4e09\u8907\u672c\u4e2d\u6709\u5169\u500b\u640d\u6bc0\u5373\u7121\u6cd5\u9054\u6210\u6cd5\u5b9a\u4eba\u6578\uff0c\u7cfb\u7d71\u5c07\u7121\u6cd5\u518d\u63a5\u53d7\u63a8\u9001\u3002",
+      "closure": "OPEN",
+      "dag_nodes": [
+        "github-issue-531",
+        "gh-issue-534-physical-hosting-runtime-canary"
+      ],
+      "implementation_evidence": [],
+      "issue_nodes": [
+        531,
+        534
+      ],
+      "merge_subjects": [],
+      "problem_id": "gas-hist-spokes-operational-burden",
+      "receipts": [],
+      "repo_subject": {
+        "commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "repo": "ed3c/skills-shared",
+        "tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7"
+      },
+      "residual_gaps": [],
+      "session_attempts": [],
+      "shadow_verdict": "NOT_REVIEWED",
+      "source": {
+        "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+        "kind": "ARTICLE",
+        "location": "article:#Spokes \u8207\u4e00\u81f4\u6027 > \u7dad\u904b\u8ca0\u64d4\u6bb5\u843d"
+      },
+      "task_nodes": [
+        "gas-hist-spokes-operational-burden-task"
+      ],
+      "verification_evidence": []
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "\u6b77\u53f2\u4e3b\u5f35\uff1aSpokes\uff08GitHub \u7d04 2013 \u5e74\u958b\u767c\uff0c\u73fe\u70ba\u696d\u754c\u6a19\u6e96\uff09\u505a\u51fa\u4e09\u9805\u6839\u672c\u9078\u64c7\uff1a\u4e0d\u5206\u6563 Git \u672c\u8eab\u800c\u5728 packfile \u5c64\u7d1a\u904b\u4f5c\uff1b\u6240\u6709\u8cc7\u6599\u4ee5\u771f\u6b63 Git \u5132\u5b58\u5eab\u5f62\u5f0f\u5b58\u65bc\u672c\u6a5f NVMe \u78c1\u789f\uff1b\u8907\u5beb Git \u8cc7\u6599\u4e26\u8b93\u6240\u6709\u526f\u672c\u6301\u7e8c\u4fdd\u6301\u4e00\u81f4\u540c\u6b65\u3002",
+      "closure": "OPEN",
+      "dag_nodes": [
+        "github-issue-531",
+        "gh-issue-534-physical-hosting-runtime-canary"
+      ],
+      "implementation_evidence": [],
+      "issue_nodes": [
+        531,
+        534
+      ],
+      "merge_subjects": [],
+      "problem_id": "gas-hist-spokes-three-choices",
+      "receipts": [],
+      "repo_subject": {
+        "commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "repo": "ed3c/skills-shared",
+        "tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7"
+      },
+      "residual_gaps": [],
+      "session_attempts": [],
+      "shadow_verdict": "NOT_REVIEWED",
+      "source": {
+        "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+        "kind": "ARTICLE",
+        "location": "article:#Spokes \u8207\u4e00\u81f4\u6027 > \u4e09\u9805\u6839\u672c\u9078\u64c7"
+      },
+      "task_nodes": [
+        "gas-hist-spokes-three-choices-task"
+      ],
+      "verification_evidence": []
+    },
+    {
+      "applicability": "NOT_APPLICABLE",
+      "applicability_rationale": "Git \u81ea\u8eab\u8a2d\u8a08\u7684\u5b9a\u7fa9\u6027\u80cc\u666f\u4e8b\u5be6\uff0c\u975e Cursor \u7279\u5b9a\u67b6\u69cb\u4e3b\u5f35\uff0c\u4e5f\u975e skills-shared \u9069\u7528\u6027\u5224\u65b7\u5c0d\u8c61\u3002",
+      "claim": "Git \u80cc\u666f\u4e8b\u5be6\uff1a\u7a0b\u5f0f\u78bc\u8207\u4e2d\u7e7c\u8cc7\u6599\u4ee5 packfile \u5f62\u5f0f\u58d3\u7e2e\u5132\u5b58\uff1bpush/fetch \u6642\u8cc7\u6599\u4e00\u5f8b\u4ee5 packfile \u5f62\u5f0f\u900f\u904e\u7db2\u8def\u50b3\u8f38\uff1b\u5927\u81f4\u6709\u4e09\u7a2e\u64f4\u5145\u8a17\u7ba1\u7684\u65b9\u6cd5\uff08\u5206\u6563\u6a94\u6848\u7cfb\u7d71\u3001\u5206\u6563 packfile\u3001\u5206\u6563 Git \u672c\u8eab\uff09\uff0c\u8907\u96dc\u5ea6\u905e\u589e\u3002",
+      "closure": "NOT_APPLICABLE",
+      "dag_nodes": [],
+      "implementation_evidence": [],
+      "issue_nodes": [],
+      "merge_subjects": [],
+      "problem_id": "gas-packfile-transport-fundamentals",
+      "receipts": [],
+      "repo_subject": {
+        "commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "repo": "ed3c/skills-shared",
+        "tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7"
+      },
+      "residual_gaps": [],
+      "session_attempts": [],
+      "shadow_verdict": "NOT_REVIEWED",
+      "source": {
+        "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+        "kind": "ARTICLE",
+        "location": "article:#Git \u6709\u4ec0\u9ebc\u96e3\u8655\uff1f (packfile \u5b9a\u7fa9\u6bb5\u843d)"
+      },
+      "task_nodes": [],
+      "verification_evidence": []
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "\u6548\u80fd\u4e3b\u5f35\uff1a\u5df2\u4f7f\u7528\u6700\u591a 100 \u500b\u526f\u672c\u9032\u884c\u5408\u6210\u58d3\u529b\u6e2c\u8a66\uff0c\u89c0\u5bdf\u5230\u8b80\u53d6\u4f5c\u696d\u7a69\u5b9a\u7dda\u6027\u64f4\u5c55\uff0c\u4e14\u63a8\u9001\u541e\u5410\u91cf\u6c92\u6709\u4efb\u4f55\u4e0b\u964d\u3002",
+      "closure": "OPEN",
+      "dag_nodes": [
+        "github-issue-531",
+        "gh-issue-534-physical-hosting-runtime-canary"
+      ],
+      "implementation_evidence": [],
+      "issue_nodes": [
+        531,
+        534
+      ],
+      "merge_subjects": [],
+      "problem_id": "gas-perf-100-replica-synthetic-test",
+      "receipts": [],
+      "repo_subject": {
+        "commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "repo": "ed3c/skills-shared",
+        "tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7"
+      },
+      "residual_gaps": [],
+      "session_attempts": [],
+      "shadow_verdict": "NOT_REVIEWED",
+      "source": {
+        "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+        "kind": "ARTICLE",
+        "location": "article:#\u64f4\u5c55 > 100 \u526f\u672c\u5408\u6210\u58d3\u529b\u6e2c\u8a66"
+      },
+      "task_nodes": [
+        "gas-perf-100-replica-synthetic-test-task"
+      ],
+      "verification_evidence": []
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "\u6548\u80fd\u4e3b\u5f35\uff1aContinuity \u63a1 WAL \u512a\u5148\u8a2d\u8a08\uff0c\u63d0\u4f9b\u5b8c\u5168\u4e00\u81f4\u7684\u6c34\u5e73\u53ef\u64f4\u5145\u6027\u2014\u2014\u53ef\u90e8\u7f72\u4efb\u610f\u6578\u91cf\u526f\u672c\uff0c\u552f\u8b80 Git \u64cd\u4f5c\u541e\u5410\u91cf\u96a8\u526f\u672c\u6578\u91cf\u7dda\u6027\u6210\u9577\uff0c\u4e26\u53ef\u64f4\u5c55\u81f3 Git \u5354\u5b9a\u64cd\u4f5c\u8207 Origin \u4e4b\u4e0a\u7684\u6240\u6709 RPC \u64cd\u4f5c\u3002",
+      "closure": "OPEN",
+      "dag_nodes": [
+        "github-issue-531",
+        "gh-issue-534-physical-hosting-runtime-canary"
+      ],
+      "implementation_evidence": [],
+      "issue_nodes": [
+        531,
+        534
+      ],
+      "merge_subjects": [],
+      "problem_id": "gas-perf-linear-readonly-scaling",
+      "receipts": [],
+      "repo_subject": {
+        "commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "repo": "ed3c/skills-shared",
+        "tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7"
+      },
+      "residual_gaps": [],
+      "session_attempts": [],
+      "shadow_verdict": "NOT_REVIEWED",
+      "source": {
+        "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+        "kind": "ARTICLE",
+        "location": "article:#\u64f4\u5c55 > \u7dda\u6027\u6c34\u5e73\u53ef\u64f4\u5c55\u6027\u4e3b\u5f35"
+      },
+      "task_nodes": [
+        "gas-perf-linear-readonly-scaling-task"
+      ],
+      "verification_evidence": []
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "\u6548\u80fd\u4e3b\u5f35\uff1a\u5728 S3 Express One Zone \u4e0a\u90e8\u7f72\u7684\u9ad8\u6548\u80fd\u53e2\u96c6\uff08PUT \u64cd\u4f5c\u5ef6\u9072\u4f4e\u5f97\u591a\uff09\u6bcf\u79d2\u53ef\u63a5\u6536\u8d85\u904e 300 \u6b21\u63a8\u9001\uff0c\u5be6\u969b\u74f6\u9838\u5728\u65bc Git \u58d3\u7e2e\u78c1\u789f\u4e0a\u8cc7\u6599\u7684\u901f\u5ea6\u3002",
+      "closure": "OPEN",
+      "dag_nodes": [
+        "github-issue-531",
+        "gh-issue-534-physical-hosting-runtime-canary"
+      ],
+      "implementation_evidence": [],
+      "issue_nodes": [
+        531,
+        534
+      ],
+      "merge_subjects": [],
+      "problem_id": "gas-perf-s3-express-300-pushes",
+      "receipts": [],
+      "repo_subject": {
+        "commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "repo": "ed3c/skills-shared",
+        "tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7"
+      },
+      "residual_gaps": [],
+      "session_attempts": [],
+      "shadow_verdict": "NOT_REVIEWED",
+      "source": {
+        "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+        "kind": "ARTICLE",
+        "location": "article:#\u64f4\u5c55 > S3 Express One Zone \u541e\u5410\u91cf\u6578\u5b57"
+      },
+      "task_nodes": [
+        "gas-perf-s3-express-300-pushes-task"
+      ],
+      "verification_evidence": []
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "\u6548\u80fd\u4e3b\u5f35\uff1a\u4f7f\u7528 S3 Standard \u6642\uff0c\u53ef\u5728\u58d3\u7e2e\u8cc7\u6599\u4e26\u5c07\u58d3\u7e2e\u5f8c\u8cc7\u6599\u8907\u5beb\u81f3\u6240\u6709\u5176\u4ed6\u7bc0\u9ede\u7684\u540c\u6642\uff0c\u7dad\u6301\u6700\u9ad8\u6bcf\u79d2 120 \u6b21\u63a8\u9001\u3002",
+      "closure": "OPEN",
+      "dag_nodes": [
+        "github-issue-531",
+        "gh-issue-534-physical-hosting-runtime-canary"
+      ],
+      "implementation_evidence": [],
+      "issue_nodes": [
+        531,
+        534
+      ],
+      "merge_subjects": [],
+      "problem_id": "gas-perf-s3-standard-120-pushes",
+      "receipts": [],
+      "repo_subject": {
+        "commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "repo": "ed3c/skills-shared",
+        "tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7"
+      },
+      "residual_gaps": [],
+      "session_attempts": [],
+      "shadow_verdict": "NOT_REVIEWED",
+      "source": {
+        "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+        "kind": "ARTICLE",
+        "location": "article:#\u64f4\u5c55 > S3 Standard \u541e\u5410\u91cf\u6578\u5b57"
+      },
+      "task_nodes": [
+        "gas-perf-s3-standard-120-pushes-task"
+      ],
+      "verification_evidence": []
+    },
+    {
+      "applicability": "NOT_APPLICABLE",
+      "applicability_rationale": "\u7d14\u6558\u4e8b\u92ea\u9673\uff0c\u4e0d\u662f\u53ef\u7368\u7acb\u67e5\u6838\u7684\u67b6\u69cb/\u6548\u80fd/\u6b77\u53f2\u6280\u8853\u4e3b\u5f35\uff0c\u672c\u8eab\u7121\u7368\u7acb\u5be6\u4f5c\u6216\u9a57\u8b49\u751f\u547d\u9031\u671f\u3002",
+      "claim": "\u958b\u5834\u6558\u4e8b\uff1aGit \u7684\u5206\u6563\u5f0f\u7279\u6027\u5f9e\u512a\u52e2\u8b8a\u6210\u963b\u7919\u2014\u2014\u4e00\u822c\u516c\u53f8\u9ad8\u5ea6\u4f9d\u8cf4\u96c6\u4e2d\u5f0f\u8a17\u7ba1\u670d\u52d9\uff0c\u4e14\u4e8b\u5be6\u8b49\u660e\u5927\u898f\u6a21\u8a17\u7ba1 Git \u5132\u5b58\u5eab\u6975\u5176\u56f0\u96e3\u3002",
+      "closure": "NOT_APPLICABLE",
+      "dag_nodes": [],
+      "implementation_evidence": [],
+      "issue_nodes": [],
+      "merge_subjects": [],
+      "problem_id": "gas-scene-setting-hosting-difficulty",
+      "receipts": [],
+      "repo_subject": {
+        "commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "repo": "ed3c/skills-shared",
+        "tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7"
+      },
+      "residual_gaps": [],
+      "session_attempts": [],
+      "shadow_verdict": "NOT_REVIEWED",
+      "source": {
+        "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+        "kind": "ARTICLE",
+        "location": "article:intro (before '#Git \u6709\u4ec0\u9ebc\u96e3\u8655\uff1f')"
+      },
+      "task_nodes": [],
+      "verification_evidence": []
+    }
+  ],
+  "schema_version": 1,
+  "source_manifest": [
+    {
+      "claim_sha256": "8b8911636bf9a02cda8380bc223ef2ff16ecb40f7d363fb5ba781a5be4ea6562",
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "kind": "ARTICLE",
+      "location": "article:#Origin (Agent \u6bb5\u843d)",
+      "problem_id": "gas-agent-coordination-framing"
+    },
+    {
+      "claim_sha256": "67ac022d0093caab57991d12b5c036f70193782e43aff7167a0f0fa4c3a4e04b",
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "kind": "ARTICLE",
+      "location": "article:#WAL \u4f5c\u70ba\u771f\u76f8\u4f86\u6e90 > Azure DevOps \u6bd4\u8f03\u6bb5\u843d",
+      "problem_id": "gas-cont-azure-devops-comparison"
+    },
+    {
+      "claim_sha256": "6c2c8579b9d320544e121b0c8ad628a8475c5c638a8d0d393a344509046fbb6d",
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "kind": "ARTICLE",
+      "location": "article:#Continuity > \u6279\u6b21\u8655\u7406/\u55ae\u7bc0\u9ede\u540c\u6b65\u6bb5\u843d",
+      "problem_id": "gas-cont-batched-single-node-sync"
+    },
+    {
+      "claim_sha256": "69dca17b9f2f34a0df8f4d4ad2e7d5286e5dcab1394ec5d38209888068f281ab",
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "kind": "ARTICLE",
+      "location": "article:#\u58d3\u7e2e > \u58d3\u7e2e\u5fc5\u8981\u6027\u6bb5\u843d",
+      "problem_id": "gas-cont-compaction-need"
+    },
+    {
+      "claim_sha256": "7dda216018bd801ce758d516d803ba98c357eaa8af86b99f96d24bb884375ea0",
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "kind": "ARTICLE",
+      "location": "article:#\u8907\u5beb > \u96d9\u5411\u5f48\u6027\u8907\u672c\u6578\u6bb5\u843d",
+      "problem_id": "gas-cont-elastic-replica-count"
+    },
+    {
+      "claim_sha256": "f09df718fc10021d4ccbd886614d5c193f7fdaf44328439cf7d4a4a133d869ba",
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "kind": "ARTICLE",
+      "location": "article:#\u8907\u5beb > ETag \u689d\u4ef6\u5f0f GET \u6bb5\u843d",
+      "problem_id": "gas-cont-gossip-non-authority-etag-validation"
+    },
+    {
+      "claim_sha256": "80d91f22fe53ffdd99a37709add9de222cd9c25d1d81e2db382b0ae9793f93dd",
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "kind": "ARTICLE",
+      "location": "article:#Continuity > \u63a8\u9001\u53ef\u898b\u6027/\u7dda\u6027\u5316\u6bb5\u843d",
+      "problem_id": "gas-cont-linearizable-push-visibility"
+    },
+    {
+      "claim_sha256": "d1b2cc813530b454a6958aed616b8579e6fc595d116070f8f9d8a97bc2744bb0",
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "kind": "ARTICLE",
+      "location": "article:#\u5171\u8b58 > \u7121\u5171\u8b58/CAS \u6bb5\u843d",
+      "problem_id": "gas-cont-no-consensus-cas-ref-update"
+    },
+    {
+      "claim_sha256": "0a3bcd084bb0b578ca2ce695a78a92dcd2089a9db01b10ae8bd78952008b764e",
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "kind": "ARTICLE",
+      "location": "article:#Continuity > \u672c\u6a5f NVMe \u526f\u672c\u6bb5\u843d",
+      "problem_id": "gas-cont-nvme-local-cache"
+    },
+    {
+      "claim_sha256": "917789da4e1c0a200251cd76f28ed47e0d03bdd02e763677fa8b0ddfd0009480",
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "kind": "ARTICLE",
+      "location": "article:#\u58d3\u7e2e > \u4e3b\u8981\u4f3a\u670d\u5668\u58d3\u7e2e\u6524\u63d0\u6bb5\u843d",
+      "problem_id": "gas-cont-primary-only-compaction-amortization"
+    },
+    {
+      "claim_sha256": "91015b1d116ea9dfba4638a57302d2ff6af0397816e737172e226153741ed2f2",
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "kind": "ARTICLE",
+      "location": "article:#\u5171\u8b58 > rendezvous hashing \u6bb5\u843d",
+      "problem_id": "gas-cont-rendezvous-hashing-routing"
+    },
+    {
+      "claim_sha256": "e711a31917eebb073fbab520f1b0eaf6823f6cc4520af7db2ccda97f11602ebf",
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "kind": "ARTICLE",
+      "location": "article:#\u5171\u8b58 > \u7121\u72c0\u614b/\u7121\u8def\u7531\u8868\u6bb5\u843d",
+      "problem_id": "gas-cont-stateless-no-routing-table"
+    },
+    {
+      "claim_sha256": "dbd65b11925cf0eaad1ddc6ec30f4c20acaf99ea4c20a2361998c07ab68ec007",
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "kind": "ARTICLE",
+      "location": "article:#\u8907\u5beb > UDP gossip \u6bb5\u843d",
+      "problem_id": "gas-cont-udp-gossip-optimistic-replication"
+    },
+    {
+      "claim_sha256": "d804d5cd1b8eeaee61cbf9ba947273cb5440520a2c12d45fce7402a1730ce0fa",
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "kind": "ARTICLE",
+      "location": "article:#WAL \u4f5c\u70ba\u771f\u76f8\u4f86\u6e90 > \u9451\u8b58/\u91cd\u64ad\u6bb5\u843d",
+      "problem_id": "gas-cont-wal-forensic-replay"
+    },
+    {
+      "claim_sha256": "709528e94df3a8283e98472e1cbc44b29456b94f3abd09ff57d1472075fde28d",
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "kind": "ARTICLE",
+      "location": "article:#Continuity > WAL \u6838\u5fc3\u5143\u4ef6\u6bb5\u843d",
+      "problem_id": "gas-cont-wal-source-of-truth"
+    },
+    {
+      "claim_sha256": "ec5e2b53252ef9764963158f1ad5400a9ab83d695de0c7ffcb89812746fbe056",
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "kind": "ARTICLE",
+      "location": "article:#\u4e0d\u4f7f\u7528 packfile \u7684 Git > DHT/JGit \u5617\u8a66",
+      "problem_id": "gas-hist-dht-object-level-distribution"
+    },
+    {
+      "claim_sha256": "da1998aab9cc1e685deed75b82c7439e5f5a61e675b0e47ca0a8da898f5f8a66",
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "kind": "ARTICLE",
+      "location": "article:#GitHub \u8207\u6a94\u6848\u7cfb\u7d71 > RPC \u7cfb\u7d71\u7d50\u5c3e",
+      "problem_id": "gas-hist-github-rpc-fileserver-partial-fix"
+    },
+    {
+      "claim_sha256": "abcc59a2067c2c065cdcc1a14693599197a24e75fc5b0c61aa5f4fd0d80ec736",
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "kind": "ARTICLE",
+      "location": "article:#GitHub \u8207\u6a94\u6848\u7cfb\u7d71 > NFS/GFS/DRBD \u5617\u8a66",
+      "problem_id": "gas-hist-nfs-blockstorage-filesystem-distribution"
+    },
+    {
+      "claim_sha256": "d10cce2a1d47ccfe5c6e15fe4d799a9a88cd5c8124c2d9ab9509d01ee907223e",
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "kind": "ARTICLE",
+      "location": "article:#Spokes \u8207\u4e00\u81f4\u6027 > 3PC \u904b\u4f5c\u6a5f\u5236",
+      "problem_id": "gas-hist-spokes-3pc-consensus-mechanism"
+    },
+    {
+      "claim_sha256": "a0bc0eb05769f4305c33e9b812271a5ae8efe1906dc76e3fc0d38f88c5f05b69",
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "kind": "ARTICLE",
+      "location": "article:#Spokes \u8207\u4e00\u81f4\u6027 > 3PC \u53ef\u64f4\u5c55\u6027\u9650\u5236",
+      "problem_id": "gas-hist-spokes-3pc-scalability-limit"
+    },
+    {
+      "claim_sha256": "da94ca0c76c4757e21e5571ed98a4cb564b374e8af5238315e332a5a36a179dc",
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "kind": "ARTICLE",
+      "location": "article:#Spokes \u8207\u4e00\u81f4\u6027 > \u7dad\u904b\u8ca0\u64d4\u6bb5\u843d",
+      "problem_id": "gas-hist-spokes-operational-burden"
+    },
+    {
+      "claim_sha256": "688d422b76363b30b8d97acb25c349f490bb569159997e00f972c8f22606ed34",
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "kind": "ARTICLE",
+      "location": "article:#Spokes \u8207\u4e00\u81f4\u6027 > \u4e09\u9805\u6839\u672c\u9078\u64c7",
+      "problem_id": "gas-hist-spokes-three-choices"
+    },
+    {
+      "claim_sha256": "a50220697713a7104d193903c46ddb0b741616f68c562d98a9b998d95775d597",
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "kind": "ARTICLE",
+      "location": "article:#Git \u6709\u4ec0\u9ebc\u96e3\u8655\uff1f (packfile \u5b9a\u7fa9\u6bb5\u843d)",
+      "problem_id": "gas-packfile-transport-fundamentals"
+    },
+    {
+      "claim_sha256": "62950062a862af9e19e57346a192abdde500f33de61a33a2f65311fcee3e5ec8",
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "kind": "ARTICLE",
+      "location": "article:#\u64f4\u5c55 > 100 \u526f\u672c\u5408\u6210\u58d3\u529b\u6e2c\u8a66",
+      "problem_id": "gas-perf-100-replica-synthetic-test"
+    },
+    {
+      "claim_sha256": "58adbbc0ce5e205b99468c6d4ba04a4da0b3999828ad5b0bb68977a077cd7953",
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "kind": "ARTICLE",
+      "location": "article:#\u64f4\u5c55 > \u7dda\u6027\u6c34\u5e73\u53ef\u64f4\u5c55\u6027\u4e3b\u5f35",
+      "problem_id": "gas-perf-linear-readonly-scaling"
+    },
+    {
+      "claim_sha256": "0dd726cd41ba3cb7993941d172430d780fbd9a23b894d50cdae39f59c7129b37",
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "kind": "ARTICLE",
+      "location": "article:#\u64f4\u5c55 > S3 Express One Zone \u541e\u5410\u91cf\u6578\u5b57",
+      "problem_id": "gas-perf-s3-express-300-pushes"
+    },
+    {
+      "claim_sha256": "939cdfbf95be4f924f89c85ba988005ec71d9bd5b810f5154e1ce3ae985eca2d",
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "kind": "ARTICLE",
+      "location": "article:#\u64f4\u5c55 > S3 Standard \u541e\u5410\u91cf\u6578\u5b57",
+      "problem_id": "gas-perf-s3-standard-120-pushes"
+    },
+    {
+      "claim_sha256": "a8b5ea0aac281d909a6d83ce871c2ce798b43d36b98951ec779a07fe5de45597",
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "kind": "ARTICLE",
+      "location": "article:intro (before '#Git \u6709\u4ec0\u9ebc\u96e3\u8655\uff1f')",
+      "problem_id": "gas-scene-setting-hosting-difficulty"
+    }
+  ]
+}
