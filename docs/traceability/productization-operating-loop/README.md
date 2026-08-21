@@ -70,14 +70,15 @@ REQUEST_BOUND
                                    #432 ─────────┴→ #429 POL-D
                                                      │
                                                      ├→ #430 POL-A bootstrap
-                                                     └→ KAW #135 carrier
+                                                     └→ external consumer registry
+                                                        (KAW #135 | ActionGate #21 | …)
                                                             │
-                                            #430 + KAW evidence + #366
+                                     #430 + selected consumer evidence + #366
                                                             ↓
                                                      #431 POL-LIVE
 ```
 
-`#432`, KAW `#135`, and `#431` are process/evidence dependencies, not Git parents unless future concrete branches consume unmerged bytes.
+`#432`, every registered external consumer, and `#431` are process/evidence dependencies, not Git parents unless future concrete branches consume unmerged bytes. Registered consumers are siblings of each other; neither KAW nor ActionGate is the other's parent, and neither is serialized behind the other.
 
 ## Completion-readiness DAG
 
@@ -90,7 +91,7 @@ C0 receipt
 → D route/prompt/trace convergence receipt
 → admitted method identity
 → A bootstrap-profile receipt
-+ KAW carrier receipt where selected
++ exact receipt from each external consumer instance that was actually selected
 + generic real-consumer bootstrap evidence (#366 or successor)
 → LIVE bounded user/payment experiment
 → outcome foldback
@@ -116,8 +117,46 @@ skills/productization-operating-loop/
 └── prompts/                                   # POL-D
 
 skills/shared-skills-infra/**                  # POL-A only after admission
-kotlin-auto-webview consumer paths             # KAW #135, external repo
+consumer-owned paths in each consumer repo     # external_consumers[], never a skills-shared lease
 ```
+
+## External consumer registry
+
+Stage 5 has no single named carrier. `implementation-preflight.json` carries an
+`external_consumers[]` registry whose entries are **program instances**:
+
+```text
+id
+owner
+repository
+role
+relation                      EXTERNAL_CONSUMER_ADAPTER | REFERENCE_CONSUMER | EXTERNAL_EVIDENCE
+state                         explicit registration state only, never an inferred PASS
+selected_for                  empty or task-bound
+exact_subject_requirement     commit + tree + visibility receipt, mutable refs refused
+start_dependencies
+completion_dependencies
+planned_consumer_paths        prefixed by the consumer repository; never a skills-shared path
+outputs
+negative_controls
+evidence_ceiling
+next_safe_transition
+```
+
+Current entries:
+
+```text
+KAW         ed3c/kotlin-auto-webview#135   optional observation/routing carrier
+ACTIONGATE  ed3c/ActionGate#21             first Productization reference execution-environment consumer
+```
+
+Registry laws enforced by `scripts/check_productization_preflight.py`:
+
+- no consumer identity is a required method atom, and no method atom may be owned by a consumer;
+- a consumer id may not appear anywhere in the atom graph;
+- adding a third consumer is a registry edit only — it changes no Productization core law;
+- consumer paths stay consumer-owned; portable core is never a consumer lease;
+- registration is not selection, bootstrap, execution, user, paid, merge or release evidence.
 
 ## Parallel Session division
 
@@ -146,7 +185,7 @@ Article / PDF / Repo / official docs / CodexDoc / GitHub
 → E independent Shadow/evals
 → D zero-context prompts + trace routes
 → Tech Lead molecular implementation / experiment packets
-→ consumer repo + KAW carrier + external providers
+→ selected external consumer instances + external providers
 → exact receipts
 → user / payment outcome
 → PRESERVE | NARROW | ITERATE | KILL
@@ -175,11 +214,12 @@ POL-E             BLOCKED_ON_K
 POL-D             BLOCKED_ON_C0/M/U/B/P/K/E/R
 POL-A             BLOCKED_ON_ADMITTED_METHOD_AND_BOOTSTRAP_WRITER
 POL-R #432        READY_TO_START
-KAW #135          PROCESS_DEPENDENCY / BLOCKED_ON_PORTABLE_INTERFACE
+KAW #135          REGISTERED_BLOCKED_ON_PORTABLE_INTERFACE / not selected
+ACTIONGATE #21    REGISTERED_BLOCKED_ON_PORTABLE_INTERFACE / not selected
 POL-LIVE #431     EXTERNAL_EVIDENCE / BLOCKED
 POL-T #433        PREP_VERIFIER
 ```
 
 ## Evidence ceiling
 
-Preparation artifacts can prove ownership, routing, dependency and refusal completeness. They cannot prove the new portable Skill exists, a market is attractive, a user will switch, anyone will pay, a policy is legally sufficient, KAW/provider/runtime behavior, merge/release or production readiness.
+Preparation artifacts can prove ownership, routing, dependency and refusal completeness. They cannot prove the new portable Skill exists, a market is attractive, a user will switch, anyone will pay, a policy is legally sufficient, any registered external consumer's provider/runtime behavior, merge/release or production readiness. Registering a consumer proves registration only.

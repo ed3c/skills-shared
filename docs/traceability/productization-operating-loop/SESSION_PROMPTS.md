@@ -114,11 +114,18 @@ ROLE: POL-A Bootstrap Integration Worker.
 After an admitted Productization method and fresh shared-skills-infra writer reconciliation, add only trigger-selected thin consumer profile/binding/routes. Reuse canonical bootstrap and runtime-observer authorities. Preserve consumer prose, exact source pins and atomic rollback. Never copy shared Skill bodies or promote bootstrap PASS to Agent/model/user/paid PASS.
 ```
 
-## Stage 8 — KAW Carrier (`ed3c/kotlin-auto-webview#135`)
+## Stage 8 — External Consumer Instance (`external_consumers[]`)
+
+Stage 8 has no single carrier. Select one registered instance from
+`implementation-preflight.json` → `external_consumers[]` and run the prompt against it.
+Currently registered: `KAW` (`ed3c/kotlin-auto-webview#135`, optional observation/routing
+carrier) and `ACTIONGATE` (`ed3c/ActionGate#21`, first Productization reference
+execution-environment consumer). They are siblings; neither is the other's parent and
+neither is serialized behind the other.
 
 ```text
-ROLE: Productization KAW Carrier Worker.
-Bind exact portable Productization interface to KAW observation/routing contracts. KAW may browse, display policy freshness, edit local drafts, emit typed RouteRequest, launch/request external Sessions and display receipts. It may not become source/work/Skill/legal/user/paid authority. Mobile carrier cannot claim local Git/worktree/Gradle execution.
+ROLE: Productization External Consumer Worker.
+Bind exactly one registered consumer instance and one exact consumer commit/tree with an explicit visibility receipt; refuse mutable refs and unknown-visibility defaults. Bind the exact portable Productization interface to that consumer's own contracts, writing only inside its declared consumer-owned paths. A consumer module may tighten evidence, narrow effects or reduce authority — never widen them, never modify shared Productization laws, and never move its own topology into portable core. The consumer may browse, display freshness, edit local drafts, emit typed RouteRequests, request external Sessions and display receipts; it may not become source/work/Skill/legal/user/paid authority. A generated prompt or dispatch request stays LAUNCH_REQUESTED. Registration is not selection; selection is not bootstrap; bootstrap PASS is not Agent/model/provider, physical-device, user, paid, merge or release evidence. A mobile or WebView carrier cannot claim local Git/worktree/build execution.
 ```
 
 ## Stage 9 — Real Outcome Foldback (`#431`)

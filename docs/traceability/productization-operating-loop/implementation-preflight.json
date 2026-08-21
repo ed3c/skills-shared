@@ -15,7 +15,9 @@
     "one payment != repeatable business",
     "policy visibility != legal or rights admission",
     "prompt packet != observed session",
-    "bootstrap or KAW routing PASS != Agent/model/provider/user/paid PASS",
+    "bootstrap or external-consumer routing PASS != Agent/model/provider/user/paid PASS",
+    "consumer registration != consumer selection or execution",
+    "consumer instance != portable method authority",
     "start dependency != completion dependency",
     "process dependency != Git ancestry"
   ],
@@ -135,7 +137,7 @@
       "outputs": ["zero-context read route", "pasteable stage prompts", "CodexDoc/GitHub trace contract", "current handoff"],
       "negative_controls": ["docs repair implementation", "consumer IDs in portable core", "prompt as session", "multiple convergence writers"],
       "evidence_ceiling": "ROUTING_PROMPT_TRACE_CONVERGENCE",
-      "next_safe_transition": "admission review then POL-A/KAW"
+      "next_safe_transition": "admission review then POL-A and any selected external consumer instance"
     },
     {
       "id": "POL-A",
@@ -151,24 +153,11 @@
       "next_safe_transition": "real consumer evidence"
     },
     {
-      "id": "POL-KAW",
-      "owner": "ed3c/kotlin-auto-webview#135",
-      "state": "BLOCKED_ON_PORTABLE_INTERFACE",
-      "relation": "EXTERNAL_CONSUMER_ADAPTER",
-      "start_dependencies": ["POL-C0 stable portable subject contract", "KAW federation contracts when required"],
-      "completion_dependencies": ["exact KAW adapter/runtime receipt for exercised lane"],
-      "planned_paths": ["consumer-owned KAW paths; no skills-shared writer lease"],
-      "outputs": ["observation/routing carrier", "typed RouteRequest", "receipt/outcome projection"],
-      "negative_controls": ["KAW as global authority", "WebView access as rights", "mobile carrier as local coding runtime", "private locator leak"],
-      "evidence_ceiling": "CONSUMER_CARRIER_ONLY",
-      "next_safe_transition": "combine with POL-A/real consumer when selected"
-    },
-    {
       "id": "POL-LIVE",
       "owner": "ed3c/skills-shared#431",
       "state": "BLOCKED_EXTERNAL_EVIDENCE",
       "relation": "EXTERNAL_EVIDENCE",
-      "start_dependencies": ["admitted Productization method", "POL-A consumer profile receipt", "real consumer subject", "KAW/provider receipts only if selected"],
+      "start_dependencies": ["admitted Productization method", "POL-A consumer profile receipt", "real consumer subject", "registered external-consumer/provider receipts only when that instance is selected"],
       "completion_dependencies": [],
       "planned_paths": ["consumer-owned experiment/outcome receipts"],
       "outputs": ["one real consumer", "one user experiment", "one payment/no-payment result", "outcome foldback"],
@@ -185,9 +174,55 @@
       "completion_dependencies": [],
       "planned_paths": ["scripts/check_productization_preflight.py", "tests/test_productization_preflight.py"],
       "outputs": ["deterministic prep-DAG verifier", "planted mutation controls"],
-      "negative_controls": ["missing owner", "false child ancestry", "premature completion", "path collision", "external evidence as executable authority"],
+      "negative_controls": ["missing owner", "false child ancestry", "premature completion", "path collision", "external evidence as executable authority", "consumer identity as required method atom"],
       "evidence_ceiling": "PREIMPLEMENTATION_GRAPH_CONSISTENCY",
       "next_safe_transition": "close #421 only after exact-head verifier/CI receipt"
+    }
+  ],
+  "external_consumers": [
+    {
+      "id": "KAW",
+      "owner": "ed3c/kotlin-auto-webview#135",
+      "repository": "ed3c/kotlin-auto-webview",
+      "role": "optional observation/routing carrier",
+      "relation": "EXTERNAL_CONSUMER_ADAPTER",
+      "state": "REGISTERED_BLOCKED_ON_PORTABLE_INTERFACE",
+      "selected_for": [],
+      "exact_subject_requirement": {
+        "commit": "REQUIRED_EXACT",
+        "tree": "REQUIRED_EXACT",
+        "visibility_receipt": "REQUIRED_EXPLICIT",
+        "mutable_ref_allowed": false
+      },
+      "start_dependencies": ["POL-C0 stable portable subject contract", "consumer federation contracts when required"],
+      "completion_dependencies": ["exact consumer adapter/runtime receipt for the exercised lane"],
+      "planned_consumer_paths": ["ed3c/kotlin-auto-webview:consumer-owned carrier/adapter/routing paths"],
+      "outputs": ["observation/routing carrier", "typed RouteRequest", "receipt/outcome projection"],
+      "negative_controls": ["carrier as global authority", "WebView access as content rights", "mobile carrier as local coding runtime", "private locator leak"],
+      "evidence_ceiling": "CONSUMER_CARRIER_ONLY",
+      "next_safe_transition": "combine with POL-A and real-consumer evidence only when this instance is selected"
+    },
+    {
+      "id": "ACTIONGATE",
+      "owner": "ed3c/ActionGate#21",
+      "repository": "ed3c/ActionGate",
+      "role": "first Productization reference execution-environment consumer",
+      "relation": "REFERENCE_CONSUMER",
+      "state": "REGISTERED_BLOCKED_ON_PORTABLE_INTERFACE",
+      "selected_for": [],
+      "exact_subject_requirement": {
+        "commit": "REQUIRED_EXACT",
+        "tree": "REQUIRED_EXACT",
+        "visibility_receipt": "REQUIRED_EXPLICIT",
+        "mutable_ref_allowed": false
+      },
+      "start_dependencies": ["ed3c/skills-shared#421 preimplementation subject admitted on current main", "POL-D portable routes/prompts/trace contract admitted", "POL-A generic safe bootstrap profile admitted", "one exact consumer control-plane subject selected for the canary", "zero overlapping writer lease on the consumer binding paths"],
+      "completion_dependencies": ["exact consumer bootstrap receipt with byte readback for the exercised lane"],
+      "planned_consumer_paths": ["ed3c/ActionGate:.agents/control-plane/**", "ed3c/ActionGate:.agents/bindings/**", "ed3c/ActionGate:.agents/prompt-packets/**", "ed3c/ActionGate:.agents/session-dispatch/**", "ed3c/ActionGate:.agents/handoffs/**", "ed3c/ActionGate:.agents/receipts/**", "ed3c/ActionGate:docs/traceability/productization/**", "ed3c/ActionGate:managed Productization blocks in AGENTS.md and README.md"],
+      "outputs": ["immutable thin binding", "managed consumer routes", "prompt/handoff projections", "deterministic bootstrap receipt"],
+      "negative_controls": ["consumer P0-P8 topology as universal Productization law", "Draft PR as admitted main", "unknown visibility defaulted public", "prompt packet as observed session", "bootstrap PASS as Agent/provider/physical PASS", "consumer prose overwritten outside managed blocks"],
+      "evidence_ceiling": "REFERENCE_CONSUMER_BINDING_AND_BOOTSTRAP_RECEIPT_ONLY",
+      "next_safe_transition": "one typed handoff to POL-LIVE when this instance is selected; no user or paid claim"
     }
   ],
   "human_external_authority": [
@@ -205,7 +240,8 @@
     "user willingness to switch",
     "payment or repeatable business",
     "current policy implies legal clearance",
-    "KAW/provider/session live execution",
+    "external consumer/provider/session live execution",
+    "any registered external consumer is selected, bootstrapped or executing",
     "merge/release/production readiness"
   ]
 }

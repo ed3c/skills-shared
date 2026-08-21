@@ -2,7 +2,9 @@
 """Validate the Productization Operating Loop implementation preflight.
 
 This gate proves preparation-graph consistency only. It does not execute product,
-market, user, payment, policy, provider, KAW, merge, release, or legal lanes.
+market, user, payment, policy, provider, external-consumer, merge, release, or
+legal lanes. External consumers are registry instances validated structurally;
+no consumer identity is a required method atom.
 """
 from __future__ import annotations
 
@@ -14,12 +16,37 @@ from typing import Any
 
 REQUIRED_IDS = {
     "POL-C0", "POL-M", "POL-U", "POL-B", "POL-P", "POL-R",
-    "POL-K", "POL-E", "POL-D", "POL-A", "POL-KAW", "POL-LIVE", "POL-T",
+    "POL-K", "POL-E", "POL-D", "POL-A", "POL-LIVE", "POL-T",
 }
 REQUIRED_FIELDS = {
     "owner", "state", "relation", "start_dependencies", "completion_dependencies",
     "planned_paths", "outputs", "negative_controls", "evidence_ceiling",
     "next_safe_transition",
+}
+# Method atoms are Productization method authority and are always owned here.
+METHOD_OWNER_PREFIX = "ed3c/skills-shared#"
+
+# External consumers are program instances, never portable core. Adding a third
+# consumer is a registry edit; it must never require editing the laws above.
+CONSUMER_REQUIRED_FIELDS = {
+    "id", "owner", "repository", "role", "relation", "state", "selected_for",
+    "exact_subject_requirement", "start_dependencies", "completion_dependencies",
+    "planned_consumer_paths", "outputs", "negative_controls", "evidence_ceiling",
+    "next_safe_transition",
+}
+CONSUMER_NON_EMPTY_FIELDS = (
+    "owner", "repository", "role", "start_dependencies", "completion_dependencies",
+    "planned_consumer_paths", "outputs", "negative_controls", "evidence_ceiling",
+    "next_safe_transition",
+)
+CONSUMER_RELATIONS = {"EXTERNAL_CONSUMER_ADAPTER", "REFERENCE_CONSUMER", "EXTERNAL_EVIDENCE"}
+# Explicit registration states only. No state may be inferred, and none of them is PASS.
+CONSUMER_STATES = {"REGISTERED_NOT_SELECTED", "REGISTERED_BLOCKED_ON_PORTABLE_INTERFACE"}
+CONSUMER_EXACT_SUBJECT = {
+    "commit": "REQUIRED_EXACT",
+    "tree": "REQUIRED_EXACT",
+    "visibility_receipt": "REQUIRED_EXPLICIT",
+    "mutable_ref_allowed": False,
 }
 
 
@@ -39,6 +66,55 @@ def _atom_map(value: dict[str, Any]) -> dict[str, dict[str, Any]]:
         for atom in atoms
         if isinstance(atom, dict) and isinstance(atom.get("id"), str)
     }
+
+
+def validate_external_consumers(value: dict[str, Any], atoms: Any) -> list[str]:
+    """Validate the external-consumer registry without naming any single carrier."""
+    errors: list[str] = []
+    consumers = value.get("external_consumers")
+    if not isinstance(consumers, list) or not consumers:
+        return ["external_consumers must be a non-empty list"]
+
+    ids = [c.get("id") for c in consumers if isinstance(c, dict)]
+    owners = [c.get("owner") for c in consumers if isinstance(c, dict)]
+    for label, seen in (("id", ids), ("owner", owners)):
+        duplicates = sorted(k for k, n in Counter(seen).items() if k and n > 1)
+        if duplicates:
+            errors.append(f"duplicate consumer {label}: {duplicates}")
+
+    atom_blob = json.dumps(atoms)
+    for consumer in consumers:
+        if not isinstance(consumer, dict):
+            errors.append("consumer entries must be objects")
+            continue
+        cid = consumer.get("id") or "<unnamed consumer>"
+        missing = sorted(CONSUMER_REQUIRED_FIELDS - set(consumer))
+        if missing:
+            errors.append(f"consumer {cid} missing fields: {missing}")
+            continue
+        for field in CONSUMER_NON_EMPTY_FIELDS:
+            if not consumer[field]:
+                errors.append(f"consumer {cid} missing {field}")
+        if consumer["relation"] not in CONSUMER_RELATIONS:
+            errors.append(f"consumer {cid} relation must stay external, not portable core authority")
+        if consumer["state"] not in CONSUMER_STATES:
+            errors.append(f"consumer {cid} state must be an explicit registration state, never inferred PASS")
+        if not isinstance(consumer["selected_for"], list):
+            errors.append(f"consumer {cid} selected_for must be an explicit list")
+        if consumer["exact_subject_requirement"] != CONSUMER_EXACT_SUBJECT:
+            errors.append(f"consumer {cid} must require an exact immutable subject and explicit visibility")
+        # Consumer paths stay consumer-owned; portable core is never a consumer lease.
+        prefix = f"{consumer['repository']}:"
+        for path in consumer["planned_consumer_paths"] or []:
+            if "ed3c/skills-shared" in path or not str(path).startswith(prefix):
+                errors.append(f"consumer {cid} planned path must stay consumer-owned: {path}")
+        if "://" in json.dumps(consumer):
+            errors.append(f"consumer {cid} must not persist a locator URL")
+        # Registration is not core: a consumer identity may never appear in the atom graph.
+        if isinstance(consumer.get("id"), str) and consumer["id"] in atom_blob:
+            errors.append(f"consumer {cid} is hard-coded into the method atom graph")
+
+    return errors
 
 
 def validate(value: dict[str, Any]) -> list[str]:
@@ -68,6 +144,8 @@ def validate(value: dict[str, Any]) -> list[str]:
             continue
         if not atom["owner"]:
             errors.append(f"{atom_id} missing owner")
+        elif not str(atom["owner"]).startswith(METHOD_OWNER_PREFIX):
+            errors.append(f"{atom_id} owner is a consumer identity promoted to method authority")
         if not atom["outputs"]:
             errors.append(f"{atom_id} missing outputs")
         if not atom["negative_controls"]:
@@ -115,11 +193,7 @@ def validate(value: dict[str, Any]) -> list[str]:
     if r.get("relation") != "PROCESS_EVIDENCE_SIBLING":
         errors.append("POL-R must remain a process/evidence sibling")
 
-    kaw = by_id.get("POL-KAW", {})
-    if kaw.get("relation") != "EXTERNAL_CONSUMER_ADAPTER":
-        errors.append("POL-KAW must remain an external consumer adapter")
-    if kaw.get("owner") != "ed3c/kotlin-auto-webview#135":
-        errors.append("POL-KAW owner drifted")
+    errors.extend(validate_external_consumers(value, atoms))
 
     live = by_id.get("POL-LIVE", {})
     if live.get("relation") != "EXTERNAL_EVIDENCE":
@@ -156,6 +230,7 @@ def validate(value: dict[str, Any]) -> list[str]:
             "market attention != demand",
             "prompt packet != observed session",
             "process dependency != Git ancestry",
+            "consumer registration != consumer selection or execution",
         }
         if not required_laws.issubset(set(laws)):
             errors.append("load-bearing productization law disappeared")
