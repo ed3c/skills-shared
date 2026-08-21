@@ -1,0 +1,106 @@
+{
+  "attempt_id": "466-live-2",
+  "blockers": [
+    {
+      "class": "CARRIER_RUNTIME_CONTRACT_MISMATCH",
+      "detail": "herdr 0.8.0 exposes no observation timestamp, no agent process id, no process liveness flag, no process start time and no cleanup/residue facts, so herdr_runtime_observer.reduce_observation can never produce a sample and collect_herdr_lifecycle can never emit the LIVE branch of herdr-lifecycle-receipt.schema.json.",
+      "missing_observer_inputs": [
+        "observed_at_unix|updated_at_unix|last_seen_at_unix",
+        "process_id|pid",
+        "process_alive",
+        "process_started_at_unix",
+        "cleanup_state",
+        "residue_count"
+      ],
+      "unblocking_lane": "herdr must publish these facts on its agent surface, or the frozen observer/lifecycle contract must be renegotiated against a real herdr capability set; neither is in this item's authority."
+    },
+    {
+      "class": "HOST_ISOLATION_DENIED",
+      "detail": "scratch-home-isolation is a required capability of this queue item, but every attempt to set HOME for the herdr client was refused by the worktree-isolation guard of this automated host, and herdr derives its socket path from HOME only.",
+      "denial_evidence": "worktree-isolation guard: refused a command that sets HOME because its effect on git writes cannot be verified",
+      "probe": "HERDR_CONFIG_PATH does not relocate the socket: with HERDR_CONFIG_PATH set to a scratch path, herdr status still reported socket /Users/neon/.config/herdr/herdr.sock",
+      "unblocking_lane": "human-attended terminal, or an explicit host permission rule admitting a scratch HOME for the herdr client"
+    }
+  ],
+  "cleanup": {
+    "managed_agent_started": false,
+    "real_user_session_state_touched": false,
+    "residue_count": 0,
+    "scratch_artifacts_removed": true,
+    "scratch_home_created": false,
+    "server_running_after": false,
+    "server_running_before": false,
+    "state": "CLEAN"
+  },
+  "controller_readback_required": true,
+  "evidence": [
+    {
+      "argv": ["herdr", "--version"],
+      "exit_code": 0,
+      "finding": "herdr 0.8.0 present at /opt/homebrew/bin/herdr"
+    },
+    {
+      "argv": ["herdr", "status"],
+      "exit_code": 0,
+      "finding": "no herdr server running before or after this attempt; socket path is HOME-derived"
+    },
+    {
+      "argv": ["herdr", "api", "schema", "--output", "<scratch>"],
+      "exit_code": 0,
+      "finding": "AgentInfo is a closed property set of agent, agent_session, agent_status, cwd, display_agent, focused, foreground_cwd, interactive_ready, launch_pending, name, pane_id, revision, screen_detection_skipped, state_change_seq, state_labels, tab_id, terminal_id, terminal_title, terminal_title_stripped, title, tokens, workspace_id; the success_response envelope is {id, result} only"
+    },
+    {
+      "argv": ["herdr", "agent", "explain", "--file", "<scratch>", "--agent", "claude", "--json"],
+      "exit_code": 0,
+      "finding": "real explain output carries no observation timestamp, process id, liveness, process start time, cleanup_state or residue_count key"
+    },
+    {
+      "argv": ["python3", "skills/agentic-tech-lead-orchestration/scripts/collect_herdr_lifecycle.py", "data/handoff/herdr-v2/herdr-plan.json", "--output", "data/handoff/herdr-v2/herdr-lifecycle-receipt.json"],
+      "exit_code": 1,
+      "finding": "ContractError from herdr_runtime_observer._run: server_not_running at the HOME-derived socket; no receipt was emitted by the carrier and none was fabricated"
+    },
+    {
+      "argv": ["python3", "<scratch>/probe_contract.py"],
+      "exit_code": 0,
+      "finding": "reduce_observation over a full AgentInfo payload plus the real explain payload raises ContractError 'Herdr source observation timestamp must be a positive integer'; every required liveness/cleanup lookup resolves to null"
+    },
+    {
+      "argv": ["python3", "skills/agentic-tech-lead-orchestration/tests/herdr_observer_selftest.py"],
+      "exit_code": 0,
+      "finding": "deterministic lane PASS (positive=4 mutations=18 live=NOT_EXERCISED)"
+    },
+    {
+      "argv": ["python3", "skills/agentic-tech-lead-orchestration/tests/herdr_lifecycle_selftest.py"],
+      "exit_code": 0,
+      "finding": "deterministic lane PASS (positive=2 mutations=7 live=NOT_EXERCISED)"
+    }
+  ],
+  "evidence_ceiling": "NO_HERDR_LIFECYCLE_SAMPLE",
+  "forbidden_promotions_respected": [
+    "process_detection_to_terminal_lifecycle_pass",
+    "done_candidate_to_controller_acceptance",
+    "manual_report_agent_to_clean_terminal_receipt",
+    "permission_denial_to_pass"
+  ],
+  "host": {
+    "class": "CLAUDE_CODE_LOCAL",
+    "herdr_path": "/opt/homebrew/bin/herdr",
+    "herdr_version": "0.8.0"
+  },
+  "lifecycle_state_reached": "EXACT_SCRATCH_HOME_AND_WORKTREE_BOUND_NOT_REACHED",
+  "plan": {
+    "path": "data/handoff/herdr-v2/herdr-plan.json",
+    "sha256": "354e9dd8c074f557ed3ccb338fbb8ba7438f6ccc8f4c27fc7a616f95c9e434c2"
+  },
+  "sample_count": 0,
+  "schema": "agentic-tech-lead/herdr-lifecycle/v1",
+  "schema_version": 1,
+  "shadow_review_required": true,
+  "state": "NOT_EXERCISED",
+  "subject": {
+    "commit": "249abc47847f8295b1c75c9d4c84457c5126fd89",
+    "repository": "ed3c/skills-shared",
+    "tree": "a24b9b7ace6f4022967d41262ecdc704d5c11646"
+  },
+  "task_ref": "issue-466-live-herdr-managed-lifecycle"
+}

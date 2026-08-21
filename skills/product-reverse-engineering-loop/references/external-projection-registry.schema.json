@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "prel-external-projection-registry.schema.json",
+  "title": "PREL external projection registry",
+  "description": "A registry of human-readable projections of Git-resident subjects into external documents. A projection entry names its external id, the revision that was observed, the digest of the export that was observed, the exact Git subjects it projects, the backlinks that let a reader return to those subjects, and the state of the read-back that compared the two. A projection is never implementation, completion, product-truth, merge or release authority: it is a rendering of a subject whose authority stays with the subject. Refusal class C08 is the named failure when a registry entry is used as machine authority; C01 is the named failure when a projected subject is a mutable alias rather than an exact object.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "authority", "evidence_ceiling", "entries", "human_owned_operations"],
+  "properties": {
+    "schema": {"const": "prel/external-projection-registry/v1"},
+    "authority": {"$ref": "#/$defs/authority"},
+    "evidence_ceiling": {"const": "HUMAN_PROJECTION"},
+    "entries": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/entry"}
+    },
+    "human_owned_operations": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 4}
+    }
+  },
+  "$defs": {
+    "state": {
+      "enum": [
+        "PASS",
+        "FAIL",
+        "ABSENT",
+        "NOT_IMPLEMENTED",
+        "NOT_EXERCISED",
+        "SKIPPED_BY_POLICY",
+        "HUMAN_ADMIT_REQUIRED"
+      ]
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["implementation", "completion", "product_truth", "merge", "release"],
+      "properties": {
+        "implementation": {"const": false},
+        "completion": {"const": false},
+        "product_truth": {"const": false},
+        "merge": {"const": false},
+        "release": {"const": false}
+      }
+    },
+    "git_subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "commit", "blob_digest"],
+      "properties": {
+        "path": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9._-]+(/[A-Za-z0-9._-]+)*$",
+          "description": "Repository-relative path. An absolute or machine-local path is refusal class C10."
+        },
+        "commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$",
+          "description": "Exact commit. A branch name, tag, main or latest is refusal class C01."
+        },
+        "blob_digest": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+      }
+    },
+    "entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "external_kind",
+        "external_id",
+        "observed_revision",
+        "export_digest",
+        "canonical_subjects",
+        "backlinks",
+        "read_back",
+        "authority"
+      ],
+      "properties": {
+        "id": {"type": "string", "pattern": "^PRJ-[0-9]{3}$"},
+        "external_kind": {"enum": ["DOCUMENT", "SPREADSHEET", "CODEX_DOC", "SLIDE_DECK", "WIKI_PAGE"]},
+        "external_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Opaque external identifier. It carries no credential and no access grant; possession of the id is not possession of the document."
+        },
+        "observed_revision": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The revision identifier of the external object at the moment it was read. A projection with no observed revision cannot be compared to anything later."
+        },
+        "export_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "sha256 of the exported bytes that were actually observed, not of the document the reader believes exists."
+        },
+        "canonical_subjects": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/git_subject"}
+        },
+        "backlinks": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 4},
+          "description": "How a reader of the projection returns to the canonical subject. A projection with no backlink becomes a second source of truth the moment it is copied."
+        },
+        "read_back": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["state", "compared_revision", "compared_digest", "observed_at"],
+          "properties": {
+            "state": {"$ref": "#/$defs/state"},
+            "compared_revision": {"oneOf": [{"type": "null"}, {"type": "string", "minLength": 1}]},
+            "compared_digest": {"oneOf": [{"type": "null"}, {"type": "string", "pattern": "^[0-9a-f]{64}$"}]},
+            "observed_at": {"oneOf": [{"type": "null"}, {"type": "string", "minLength": 10}]}
+          },
+          "description": "NOT_EXERCISED means nobody re-read the projection; ABSENT means the projection could not be read at all. The two are different queues and are not interchangeable."
+        },
+        "authority": {"$ref": "#/$defs/authority"}
+      }
+    }
+  }
+}

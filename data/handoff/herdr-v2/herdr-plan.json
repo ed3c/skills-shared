@@ -1,0 +1,18 @@
+{
+  "manifest": {
+    "attempt_id": "466-live-2",
+    "base_sha": "249abc47847f8295b1c75c9d4c84457c5126fd89",
+    "max_observation_age_seconds": 120,
+    "repo": "ed3c/skills-shared",
+    "require_clean_terminal": true,
+    "require_foreground_cwd": true,
+    "require_process_liveness": true,
+    "target": "herdr-466-managed-agent",
+    "task_id": "issue-466-live-herdr-managed-lifecycle",
+    "tree_sha": "a24b9b7ace6f4022967d41262ecdc704d5c11646",
+    "worktree": "/Users/neon/skills-shared/.claude/worktrees/wf_0ef9d145-3b2-2"
+  },
+  "max_samples": 12,
+  "poll_interval_seconds": 5,
+  "require_terminal": true
+}
