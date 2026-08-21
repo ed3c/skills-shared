@@ -11,15 +11,15 @@ This Skill does not replace Spatial Loop, Tech Lead, Git Town, GitHub/Git, verif
 3. `references/SYSTEM_PROMPT_V7_2.md` — canonical complete Zettelkasten v7.2 prompt
 4. `references/SHADOW_REVIEW_V7_2.md`
 5. `references/TRACE_GRAPH_CONTRACT.md`
-6. `references/intent-projection.schema.json`
-7. `references/artifact-projection.schema.json`
-8. `references/trace-graph.schema.json`
-9. `scripts/check_trace_graph.py`
-10. `tests/run-all.sh` and `tests/mutation_proof.py`
+6. `references/intent-projection.schema.json`, `artifact-projection.schema.json`, `trace-graph.schema.json`
+7. `scripts/check_trace_graph.py`
+8. `references/case-delivery-binding.schema.json`
+9. `scripts/check_case_delivery_binding.py`
+10. `tests/run-all.sh`, `tests/mutation_proof.py`, `tests/delivery_binding_mutation_proof.py`
 11. `references/IMPLEMENTATION_PREFLIGHT.md`
 12. `references/NEGATIVE_CONTROL_MATRIX.md`
 13. Spatial Loop ICPG reference/schema/checker
-14. Tech Lead case obligations/task DAG
+14. Tech Lead `case_obligations` task contract/checker
 15. Git Town Molecular Stack index
 16. exact current external artifact subjects and receipts before current-state decisions
 
@@ -42,26 +42,29 @@ skills/intent-to-evidence-knowledge-graph/
 │   ├── intent-projection.schema.json
 │   ├── artifact-projection.schema.json
 │   ├── trace-graph.schema.json
+│   ├── case-delivery-binding.schema.json
 │   ├── IMPLEMENTATION_PREFLIGHT.md
 │   └── NEGATIVE_CONTROL_MATRIX.md
 ├── scripts/
-│   └── check_trace_graph.py
-│       ├── Draft 2020-12 schema gates
-│       ├── Intent↔ICPG digest/case subset checks
-│       ├── external artifact identity checks
-│       ├── mutable authority-snapshot freshness checks
-│       ├── authority-class checks
-│       └── evidence-ceiling anti-laundering checks
+│   ├── check_trace_graph.py
+│   │   └── projection / authority / freshness / evidence-ceiling gate
+│   └── check_case_delivery_binding.py
+│       └── canonical case denominator → task/issue/Stack/doc ownership gate
 └── tests/
     ├── run-all.sh
     ├── mutation_proof.py
+    ├── delivery_binding_mutation_proof.py
     ├── build_exact_head_fixture.py
+    ├── build_exact_head_delivery_fixture.py
     └── fixtures/
         ├── valid-trace-graph.json
-        └── authority-snapshot.json
+        ├── authority-snapshot.json
+        ├── delivery-task-contract.json
+        ├── valid-case-delivery-binding.json
+        └── delivery-trace-graph.json
 
 .github/workflows/intent-to-evidence-knowledge-graph.yml
-└── dedicated exact-head deterministic CI arrival + replayable receipt upload
+└── dedicated exact-head deterministic CI arrival + replayable receipts
 ```
 
 ## Primary State Machine
@@ -75,24 +78,23 @@ SOURCE_OR_ARTIFACT_BOUND
 → ARTIFACT_PROJECTIONS_BOUND
 → AUTHORITY_CLASSES_ASSERTED
 → EXECUTION_EDGE_TYPES_ASSERTED
-→ BIDIRECTIONAL_TRACE_ASSERTED
-→ FRESHNESS_REQUIREMENTS_ASSERTED
-→ EVIDENCE_CEILING_PROPAGATED
-→ GRAPH_QUERY_ROUTES_READY
-→ SHADOW_GRAPH_REVIEW
-→ SYSTEM_PROMPT_V7_2_DESIGNED
-→ MACHINE_SCHEMAS_PRESENT
-→ DETERMINISTIC_CHECKER_IMPLEMENTED
-→ #414_MUTATION_CONTROLS_IMPLEMENTED
-→ EXACT_HEAD_CI_ROUTE_IMPLEMENTED
-→ WAIT_EXACT_HEAD_RECEIPT
-→ #415/#416_TERMINAL_LEAVES
+→ #414_PROJECTION_GATE_ASSERTED
+→ TECH_LEAD_CASE_OBLIGATIONS_BOUND
+→ REQUIRED_CASE_DENOMINATOR_FROZEN
+→ CASE_TO_TASK_BRANCH_OWNER_ASSERTED
+→ ISSUE_AND_STACK_NODE_BOUND
+→ PATH_LEASES_ASSERTED
+→ GOVERNED_DOCUMENTS_BOUND
+→ IMPLEMENTATION_REVERSE_TRACE_ASSERTED
+→ ONE_CONVERGENCE_OWNER_ASSERTED
+→ #415_DELIVERY_BINDING_GATE_ASSERTED
+→ BIDIRECTIONAL_TRAVERSAL_READY_FOR_#416
 → #417_CONVERGENCE
 → #418_LIVE_RETRIEVAL_NOT_EXERCISED
 → HUMAN_ADMIT_REQUIRED
 ```
 
-Failure states include duplicate case truth, fabricated artifact identity, stale mutable state, false Git ancestry, orphan implementation, broken reverse trace, authority inversion, evidence laundering, unresolved blocking case, connectivity inflation and divergent prompt authority.
+Failure states include duplicate case truth, fabricated artifact identity, stale mutable state, false Git ancestry, false serial dependency, duplicate/unowned case, path-lease overlap, missing convergence owner, orphan implementation, broken reverse trace, missing governed-document route, authority inversion, evidence laundering, unresolved blocking case, connectivity inflation and divergent prompt authority.
 
 ## Graph layers and authority
 
@@ -107,16 +109,16 @@ human desired outcome / non-goals / invariants / acceptance
         ▼
 Spatial Loop ICPG                         [CANONICAL CASE AUTHORITY]
 Intent Atom → Semantic Axis → Case → State Path/Invariant → Oracle
-        │ case ownership
+        │ exact case_obligations
         ▼
 Tech Lead Task / Issue DAG                [EXECUTION OWNERSHIP]
-required case denominator → task/branch owner → one convergence owner
-        │ implementation relation
+required case denominator → branch owner → path lease → one convergence owner
+        │ delivery binding
         ▼
 Git Town Molecular Stack                  [DELIVERY TOPOLOGY]
 SIBLING / TRUE_CHILD / CONVERGENCE / PROCESS_DEPENDENCY /
 EXTERNAL_EVIDENCE / HISTORICAL
-        │ touches / documents / verifies
+        │ touches / protects / documents / verifies
         ▼
 Repository Artifact Graph
 AGENTS / README / SKILL / schema / code / test / workflow
@@ -126,7 +128,7 @@ Evidence Graph                            [TRUTH CEILING]
 verifier → workflow → receipt → Shadow verdict → Human Admit
 ```
 
-Semantic relations never create Git ancestry. Retrieval relevance never grants execution authority.
+Semantic relations never create Git ancestry. Issue order never creates Git ancestry. Retrieval relevance never grants execution authority.
 
 ## Tech Lead + Issue DAG
 
@@ -137,36 +139,36 @@ Semantic relations never create Git ancestry. Retrieval relevance never grants e
       └─ #413 Knowledge Graph integration program
          └─ PR #419 portable method + trace contract
             └─ PR #420 #414 machine contracts + complete v7.2 prompt
-               ├─ #438 deterministic checker + #414 mutation subset
-               ├─ #437 dedicated exact-head CI arrival
-               ├─ #439 exact-head receipt publication after real run
-               ├─ #415 case→task→issue→Stack/document binding
-               ├─ #416 authority-aware traversal + reverse trace
-               └─ #417 one final routing/index convergence owner
+               ├─ #437/#438/#439 exact-head #414 deterministic evidence [CLOSED]
+               └─ #415 case→task→issue→Stack/document binding
+                  └─ PR #450 TRUE_CHILD of PR #420
+                     ├─ #448 exact-head #415 receipt lane
+                     └─ #449 durable docs / Git Town index convergence
 
+#416 authority-aware traversal + reverse-trace/evidence gate
+#417 one final routing/index convergence owner
 #411 live continuous Spatial Shadow       EXTERNAL_EVIDENCE / PROCESS_DEPENDENCY
 #418 live multi-hop GraphRAG/Shadow canary EXTERNAL_EVIDENCE / PROCESS_DEPENDENCY
 ```
 
-`#438`, `#437`, and `#439` are work/evidence ownership for #414; they do not create new semantic graph authority. #415/#416 become Git children only if they consume unmerged parent bytes. Issue order alone never creates ancestry.
+#416 is not automatically a child of #449. It becomes a Git child of the machine leaf whose unmerged contracts it actually consumes. Issue order is not ancestry.
 
 ## Molecular Stack decomposition
 
 ```text
 PR #412 ICPG contract/Shadow/Tech Lead ownership preparation
 └─ PR #419 KG-C1/D1 portable Knowledge Graph contract
-   └─ PR #420 KG-C2/P1 #414 machine schemas + v7.2 prompt
-      ├─ KG-E1 #438 checker + executable #414 mutations       [same PR leaf currently]
-      ├─ KG-CI #437 exact-head deterministic arrival          [evidence route]
-      ├─ KG-R1 #439 exact-head receipt                         [evidence route]
-      ├─ KG-K1/E2 #415 case→task/issue→Stack/AGENTS binding   [future terminal leaf]
-      ├─ KG-K2/E3 #416 traversal/authority/reverse trace      [future terminal leaf]
-      └─ KG-D2/X1 #417 one convergence owner
+   └─ PR #420 KG-C2/P1 #414 projection contracts + v7.2 prompt
+      └─ PR #450 KG-K1/E2 #415 case-delivery binding [TRUE_CHILD]
+         ├─ #448 exact-head receipt                 [EVIDENCE]
+         └─ #449 docs/index child                   [CONVERGENCE]
 
+#416 future traversal leaf should branch from the exact machine parent it consumes.
+#417 final program convergence remains separate.
 #418 live retrieval canary = EXTERNAL_EVIDENCE / PROCESS_DEPENDENCY.
 ```
 
-The current #438 implementation stays inside PR #420 because it is still #414 scope and directly modifies the same machine-contract leaf. A new Git child is unnecessary until a later task has an independent review/ownership boundary.
+PR #450 is a `TRUE_CHILD` because it consumes the unmerged Intent/Artifact/Trace projection contracts and deterministic checker from PR #420. The relation is caused by artifact consumption, not by issue numbering.
 
 ## End-to-end data flow
 
@@ -176,32 +178,34 @@ Article / PDF / code / issue / prompt
 → Intent projection
 → canonical Spatial Loop ICPG read
 → exact ICPG digest + admitted case IDs
-→ Tech Lead case_obligations + task/issue ownership
-→ Git Town Molecular Stack atoms
+→ Tech Lead case_obligations
+→ frozen required-case denominator
+→ exactly one branch owner per required case
+→ Issue identity + path lease
+→ Git Town Stack relation with provided/consumed artifacts
 → branch/commit/file/AGENTS/README/SKILL projections
-→ oracle/test/workflow/receipt projections
-→ deterministic schema + semantic gate
-→ authority snapshot freshness check
-→ evidence-ceiling propagation
-→ bidirectional traversal index
+→ case/invariant reverse trace
+→ one convergence owner
+→ deterministic #414 + #415 gates
+→ exact-head workflow receipts
+→ #416 authority/freshness/traversal gate
 → GraphRAG query
 → refresh mutable external artifacts before decision use
-→ answer with exact authority/evidence ceiling
 → Shadow review
 → Human Admit for promotion/merge/release
 ```
 
-## Deterministic #414 gate
+## Deterministic #414 projection gate
 
 `check_trace_graph.py` exits:
 
 ```text
 0   PASS
-2   BLOCK — contract/semantic violation
-64  INPUT_ERROR — invalid/missing runtime contract input
+2   BLOCK
+64  INPUT_ERROR
 ```
 
-Current executable mutation subset:
+Executable controls:
 
 ```text
 NC-01 duplicate ICPG authority       → DUPLICATE_ICPG_AUTHORITY
@@ -210,19 +214,55 @@ NC-03 prose over receipt             → PROSE_OVER_RECEIPT
 NC-17 fabricated artifact identity   → FABRICATED_ARTIFACT_IDENTITY
 ```
 
-The broader NC-04…NC-16 matrix remains owned by #415/#416/#417/#418 as documented in `NEGATIVE_CONTROL_MATRIX.md`.
+#414 is closed at its deterministic evidence lane. The immutable evidence details live on #414/#437/#438/#439; mutable PR state must still be refreshed before current-state decisions.
+
+## Deterministic #415 delivery-binding gate
+
+`check_case_delivery_binding.py` consumes three independent inputs rather than trusting one self-describing graph:
+
+```text
+case-delivery binding candidate
++ canonical Tech Lead task-contract/v1
++ Intent-to-Evidence Trace Graph
+→ deterministic ownership/Stack/reverse-trace verdict
+```
+
+It verifies:
+
+- task contract digest and task identity;
+- `case_obligations.case_graph_ref` + SHA-256 binding;
+- exact required-case denominator;
+- exactly one branch owner per required case;
+- no unknown/unowned case;
+- exact Tech Lead branch and write-lease binding;
+- issue ownership for each branch;
+- one convergence owner;
+- `TRUE_CHILD`/`CONVERGENCE` consumed artifacts come from the declared parent;
+- `SIBLING` does not consume parent artifacts;
+- parallel path leases are disjoint;
+- bound ArtifactProjections exist and reverse-trace to the exact Intent + case;
+- governed AGENTS/README/SKILL projections expose a protection/document-routing edge;
+- implementation-oriented artifacts are not orphaned from case ownership.
+
+Executable controls:
+
+```text
+NC-04              → FALSE_GIT_ANCESTRY
+NC-05              → FALSE_SERIAL_DEPENDENCY
+NC-06              → CASE_UNOWNED
+NC-07              → REVERSE_TRACE_INCOMPLETE
+CASE-DUPLICATE     → DUPLICATE_CASE_OWNER
+CASE-CONVERGENCE   → MISSING_CONVERGENCE_OWNER
+PATH-OVERLAP       → PATH_LEASE_OVERLAP
+```
+
+The exact-head receipt is owned by #448. A repository-wide workflow failure on the same head remains a blocker even if this dedicated gate is green.
 
 ## Exact-head deterministic arrival
 
-`.github/workflows/intent-to-evidence-knowledge-graph.yml` is dedicated to this Skill and checks out:
+`.github/workflows/intent-to-evidence-knowledge-graph.yml` checks out the exact PR head, runs the #414 and #415 positive/mutation gates, binds repository/ref/head/authority observation time, and uploads the evidence directory.
 
-```text
-${{ github.event.pull_request.head.sha || github.sha }}
-```
-
-On a non-draft PR it runs `tests/run-all.sh`, binds repository/ref/PR/head into a generated projection fixture, requires `receipt.subject.sha == expected PR head`, and uploads the generated evidence directory.
-
-A workflow definition or skipped draft job is not PASS. #439 closes only after a real runner executes the current head with non-empty steps.
+A workflow definition, skipped draft job, stale receipt or dedicated PASS beside a repository-wide FAIL is not enough for stage closure.
 
 ## Standard traversal contracts
 
@@ -233,7 +273,8 @@ Narrative/Concept
 → Intent
 → ICPG Case
 → Invariant
-→ Task/Issue
+→ Tech Lead task/branch owner
+→ Issue
 → Stack PR
 → File/AGENTS/README
 → Oracle
@@ -244,7 +285,8 @@ Narrative/Concept
 
 ```text
 File/PR
-→ Task/Issue
+→ owned case binding
+→ Tech Lead task/issue
 → ICPG Case
 → Invariant
 → Intent
@@ -287,21 +329,20 @@ Root docs and #417 convergence route here; they must not fork a second decision-
 
 ```text
 FULL_V7_2_SYSTEM_PROMPT                  PASS_AS_DESIGN_ARTIFACT
-STANDALONE_PROMPT_PACKAGING              PASS_AS_DESIGN_ARTIFACT
 V7_1_SEMANTIC_BASELINE                   PRESERVED
-ICPG_NON_DUPLICATION                     SPECIFIED + NC-01 EXECUTABLE
-INTENT_TO_EVIDENCE_TRACE                 SPECIFIED
-AUTHORITY/FRESHNESS/EVIDENCE_CEILING     PARTIALLY_EXECUTABLE_IN_#414
-ARTIFACT_IDENTITY                        EXECUTABLE_IN_#414
-DETERMINISTIC_CHECKER                    IMPLEMENTED_ON_PR_420
-#414_MUTATION_SUBSET                     IMPLEMENTED_ON_PR_420
-EXACT_HEAD_CI_ROUTE                      IMPLEMENTED_ON_PR_420
-EXACT_HEAD_RECEIPT                       PENDING_REAL_RUN / #439
-LIVE_GRAPHRAG_SHADOW                     NOT_EXERCISED / #418
-HUMAN_ADMIT                              REQUIRED
+ICPG_NON_DUPLICATION                     #414 DETERMINISTICALLY GUARDED
+PROJECTION_AUTHORITY/FRESHNESS            #414 DETERMINISTICALLY GUARDED
+CASE_DENOMINATOR/BRANCH_OWNERSHIP          #415 IMPLEMENTED
+STACK_ARTIFACT_CONSUMPTION                #415 IMPLEMENTED
+DOCUMENT→CASE / IMPLEMENTATION→INTENT      #415 IMPLEMENTED
+#415_EXACT_HEAD_DEDICATED_GATE             EXERCISED; CURRENT-HEAD RECHECK REQUIRED AFTER DOC ROUTING PATCH
+REPOSITORY_DOCUMENT_ROUTING                REPAIRED; CURRENT-HEAD WORKFLOWS MUST CONFIRM
+#416_TRAVERSAL/AUTHORITY_GRAPH             NOT_IMPLEMENTED
+#418_LIVE_GRAPHRAG_SHADOW                  NOT_EXERCISED
+HUMAN_ADMIT                                REQUIRED
 ```
 
-Implementation presence is not exact-head execution evidence.
+Implementation presence is not exact-head execution evidence. Current-state workflow conclusions are read from GitHub authority, not this README.
 
 ## Evidence ceiling
 
@@ -311,28 +352,30 @@ Spatial Shadow/static prompt projection            IMPLEMENTED_ON_PARENT_PR_412
 Tech Lead ICPG denominator/ownership gate          IMPLEMENTED_ON_PARENT_PR_412
 Knowledge Graph portable method/trace contract     IMPLEMENTED_ON_PR_419
 Complete Zettelkasten v7.2 system prompt           IMPLEMENTED_ON_PR_420
-Intent/Artifact/Trace machine schemas              IMPLEMENTED_ON_PR_420
-Deterministic #414 checker                          IMPLEMENTED_ON_PR_420
-NC-01/02/03/17 executable mutation code            IMPLEMENTED_ON_PR_420
-Dedicated exact-head CI route                      IMPLEMENTED_ON_PR_420
-Local hermetic authoring check                      PASS_FOR_AUTHORED_BYTES; NOT_GITHUB_HEAD_EVIDENCE
-GitHub exact-head deterministic receipt             PENDING / #439
-#415 delivery/reverse-trace controls                NOT_IMPLEMENTED
-#416 traversal/authority controls                   NOT_IMPLEMENTED
-#417 convergence                                    PLANNED
-#418 live GraphRAG multi-hop canary                  NOT_EXERCISED
-#411 live continuous Spatial Shadow                  NOT_EXERCISED
-merge/release/promotion                              HUMAN_ADMIT_REQUIRED
+#414 projection schemas/checker/mutations          DETERMINISTIC_EXACT_HEAD_EVIDENCE_RECORDED
+#415 case-delivery schema/checker/mutations        IMPLEMENTED_ON_PR_450
+#415 dedicated exact-head evidence                 EXERCISED_ON_PRIOR_HEAD; RECHECK_CURRENT_HEAD
+repository-wide route/guard contract               RECHECK_CURRENT_HEAD
+#449 durable Git Town/docs convergence             PLANNED
+#416 traversal/authority controls                  NOT_IMPLEMENTED
+#417 global convergence                            PLANNED
+#418 live GraphRAG multi-hop canary                NOT_EXERCISED
+#411 live continuous Spatial Shadow                NOT_EXERCISED
+merge/release/promotion                            HUMAN_ADMIT_REQUIRED
 ```
 
 ## Next frontier
 
 ```text
-mark PR #420 ready for one exact-head run
-→ inspect real job steps + uploaded receipt
-→ close #437/#438/#439 and parent #414 only if current head passes
-→ freeze #414 artifacts
-→ decompose #415/#416 from actual consumed bytes
+re-run current PR #450 head through:
+  Intent-to-Evidence exact-head gate
+  Shared Skills Infra
+  Skill Eval Contract
+→ require all relevant gates terminal green
+→ #448 evidence closure
+→ freeze PR #450 machine/docs bytes
+→ #449 Git Town canonical index child
+→ decompose #416 from actual consumed #415 bytes, sibling to #449 unless it consumes #449 docs
 → #417 convergence
 → #418 live GraphRAG/Shadow canary
 → Human Admit

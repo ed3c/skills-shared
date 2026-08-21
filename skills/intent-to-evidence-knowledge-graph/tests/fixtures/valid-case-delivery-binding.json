@@ -1,0 +1,60 @@
+{
+  "schema_version": "intent-to-evidence-case-delivery-binding/v1",
+  "subject": {
+    "repository": "ed3c/skills-shared",
+    "ref": "agent/test",
+    "sha": "1111111111111111111111111111111111111111"
+  },
+  "intent": {
+    "intent_id": "intent:example",
+    "icpg_graph_digest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+  },
+  "task_contract": {
+    "task_id": "example-stack",
+    "contract_digest": "sha256:f7303e85113f04092e16a3308981b8a6248aaead99747226d842f7534bf22dcb",
+    "case_graph_ref": "feature/case-graph.json",
+    "case_graph_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "required_case_ids": ["CASE-CONTRACT", "CASE-CORE"]
+  },
+  "case_bindings": [
+    {
+      "case_id": "CASE-CONTRACT",
+      "task_id": "example-stack",
+      "issue": "issue:ed3c/skills-shared#501",
+      "branch": "feature/contract",
+      "invariant_ids": ["INV-CONTRACT"],
+      "artifact_ids": ["pr-contract", "file-contract"],
+      "document_artifact_ids": ["agents-contract"]
+    },
+    {
+      "case_id": "CASE-CORE",
+      "task_id": "example-stack",
+      "issue": "issue:ed3c/skills-shared#502",
+      "branch": "feature/core",
+      "invariant_ids": ["INV-CORE"],
+      "artifact_ids": ["pr-core", "file-core"],
+      "document_artifact_ids": ["readme-core"]
+    }
+  ],
+  "stack_nodes": [
+    {
+      "branch": "feature/contract",
+      "parent": "main",
+      "issue": "issue:ed3c/skills-shared#501",
+      "relation": "SIBLING",
+      "owns_paths": ["feature/contracts.py", "tests/feature/test_contracts.py"],
+      "provided_artifacts": ["contract-schema"],
+      "consumed_artifacts": []
+    },
+    {
+      "branch": "feature/core",
+      "parent": "feature/contract",
+      "issue": "issue:ed3c/skills-shared#502",
+      "relation": "CONVERGENCE",
+      "owns_paths": ["feature/core.py", "tests/feature/test_core.py"],
+      "provided_artifacts": ["core-output"],
+      "consumed_artifacts": ["contract-schema"]
+    }
+  ],
+  "convergence_owner": "feature/core"
+}
