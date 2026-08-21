@@ -3,9 +3,9 @@
   "_authority": "tests/selftest.py counts every denominator from references/ on the run and fails on any difference between what it counted and what is listed here, in either direction. These lists are a readable index of the run, never its source of truth: adding a schema or a control changes the run first and this file second.",
   "_denominator_floors": "The two lists above are reconciled exactly, so a control that disappears is caught by name. The probe denominators cannot be: they are derived from the guards themselves, so removing a guard removes the probe that would have caught it and the lane reports the same green over a smaller set. These floors refuse that shrink. They are floors and not equalities because a sibling landing a ninth schema must make them grow without editing this file.",
   "denominator_floors": {
-    "mutable_subject_probes": 35,
-    "promotion_probes": 29,
-    "leak_scan_files": 12
+    "mutable_subject_probes": 50,
+    "promotion_probes": 95,
+    "leak_scan_files": 28
   },
   "positives": [
     "dtcr/architecture-invariant/v1#examples[0]",

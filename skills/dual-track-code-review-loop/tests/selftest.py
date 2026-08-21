@@ -95,7 +95,7 @@ PERMITTED_LOCATORS = (
     ("file:///example-machine/decisions/domain-isolation.md",
      "source-back-reference DTCR-XC-BK-001 probes that repo_relative_path refuses a file:// URI; the value is synthetic"),
     ("~/example-checkout/domain/order/pricing.ext",
-     "exact-source-subject control probes that repo_relative_path refuses a home-relative path; the value is synthetic"),
+     "exact-source-subject DTCR-XC-SS-004 probes that repo_relative_path refuses a home-relative path; the value is synthetic"),
 )
 
 MUTABLE_SUBJECTS = ("main", "HEAD", "latest", "refs/heads/main", "origin/main")
