@@ -94,6 +94,10 @@ scripts/
 tests/
 ├── selftest.py                     tree-derived suite: every schema, every
 │                                   control, per-control knockout
+├── evidence_plane.py               Shadow-side evidence plane: 19 planted
+│                                   cases, all 14 preregistered false
+│                                   promotions, reopen-first-green law
+├── fixtures/                       evidence-plane base composition
 └── run-all.sh                      CI entrypoint, routed by skill-suites.yml
 ```
 
@@ -122,8 +126,13 @@ is fixed and that eleven named refusals are refused by the keywords they
 cite. The compiler's own ceiling is `DETERMINISTIC_COMPOSITION` (six artifacts,
 byte-stable, eight K-code refusals — see [`SKILL.md`](SKILL.md)'s Evidence
 ceiling table). This convergence's own ceiling is
-`ROUTING_PROMPT_TRACE_CONVERGENCE` (see [`AGENTS.md`](AGENTS.md)). None of the
-three proves that the method exists end to end, that an arena is attractive,
+`ROUTING_PROMPT_TRACE_CONVERGENCE` (see [`AGENTS.md`](AGENTS.md)). The
+evidence plane ([`tests/evidence_plane.py`](tests/evidence_plane.py)) adds
+`DETERMINISTIC_FALSE_PROMOTION_REFUSAL`: nineteen planted cases covering all
+fourteen preregistered false promotions plus a hollow case, each refused by
+the exact guard it names, nine of them green to the admitted stack until the
+reopen pass. None of the
+four proves that the method exists end to end, that an arena is attractive,
 that a user would switch, that anyone would pay, that a rule permits
 anything, that any session actually ran, or that any of this may be merged or
 released. Those lanes are reported by this directory; they are not cleared by

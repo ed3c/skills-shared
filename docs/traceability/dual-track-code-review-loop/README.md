@@ -56,8 +56,8 @@ consumer closed, or merge/release occurred.
  │    └─ #549 D1-BUF adapter       BLOCKED_ON_PROVIDER
  ├─ #521 M1 semantic-context plane
  │    └─ #550 M1-C semantic adapter   BLOCKED
- ├─ #522 X1 synthesis/closure compiler   OPEN (landed in-tree this wave; pending closure receipt)
- ├─ #523 R1 single-repo refactor protocol   OPEN
+ ├─ #522 X1 synthesis/closure compiler   CLOSED (landed and closed via PR #563)
+ ├─ #523 R1 single-repo refactor protocol   OPEN (landed in-tree: refactor/ + four contracts, suite-counted; current issue state on GitHub)
  ├─ #524 R2 cross-repo expand & contract     OPEN
  ├─ #525 E1 independent Shadow / mutations / closure denominator   OPEN
  ├─ #526 D2 this convergence (README/AGENTS/prompts/routing/traceability)

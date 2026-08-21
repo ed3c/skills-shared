@@ -10,8 +10,8 @@
     {
       "id": 522,
       "title": "[DTCR-X1] dual-track review synthesis and problem-closure compiler",
-      "state": "OPEN",
-      "note": "landed this wave in synthesis/ with three schemas, suite-counted; issue open pending closure receipt",
+      "state": "CLOSED",
+      "note": "landed in synthesis/ with three schemas, suite-counted; closed via PR #563",
       "blocks": [523, 524, 525]
     },
     {
@@ -36,6 +36,7 @@
       "id": 523,
       "title": "[DTCR-R1] bounded single-repository architecture refactor protocol",
       "state": "OPEN",
+      "note": "landed in-tree (refactor/ plus four contracts, suite-counted); current issue state on GitHub",
       "start_dependency": 522,
       "blocks": [528]
     },

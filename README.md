@@ -61,6 +61,8 @@ Worked patterns:
 - [`git-town-stacked-pr-worker`](skills/git-town-stacked-pr-worker/README.md) — molecular sibling/child/worktree/sync method.
 - [`agentic-tech-lead-orchestration`](skills/agentic-tech-lead-orchestration/README.md) — task/capability DAG, Workers, tournament and convergence.
 - [`skill-refactor-proof-loop`](skills/skill-refactor-proof-loop/README.md) — frozen treatments, old-strength retention, matched proof layers and golden registry.
+- [`git-hosting-scale-assurance`](skills/git-hosting-scale-assurance/README.md) — Git-hosting durability, consistency, cache and recovery assurance contracts, with the sha256-bound source-evidence packet under [`data/handoff/source-evidence/`](data/handoff/source-evidence/) and the claim-closure projection under [`docs/traceability/git-at-any-scale/`](docs/traceability/git-at-any-scale/).
+- [`github-portfolio-control`](skills/github-portfolio-control/README.md) — portfolio epoch binding, subagent-join barrier, one-shot CI and authority-composition contracts.
 
 ## Repository topology → State Machine ownership
 
