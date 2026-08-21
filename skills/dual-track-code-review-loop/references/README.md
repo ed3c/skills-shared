@@ -53,6 +53,19 @@ no object in this group has a key for a locator, a body or a private identity.
 | [`schemas/semantic-freshness-ceiling.schema.json`](schemas/semantic-freshness-ceiling.schema.json) | how old one document is, what superseded it, and the four things it never becomes |
 | [`schemas/semantic-index-lifecycle-receipt.schema.json`](schemas/semantic-index-lifecycle-receipt.schema.json) | rebuild, delete and compact, and the task state none of them moves |
 
+### Synthesis plane
+
+The X1 output half. These three contracts are what
+[`../synthesis/compile_synthesis.py`](../synthesis/compile_synthesis.py)
+emits and refuses against; the compiler ships beside its own selftest and is
+routed through the suite entrypoint.
+
+| File | Owns |
+|---|---|
+| [`schemas/review-card.schema.json`](schemas/review-card.schema.json) | one synthesized review verdict, bound to the immutable result tree, with recommendation never promoted to decision |
+| [`schemas/synthesis-packet.schema.json`](schemas/synthesis-packet.schema.json) | the full dual-track projection over one exact subject, every measurement carrying its method and denominator |
+| [`schemas/problem-closure-row.schema.json`](schemas/problem-closure-row.schema.json) | one claim's closure state and the arrivals that support it, with the empty lanes still written out |
+
 ## Schema identity
 
 Two identifiers, doing different jobs. `$id` is the file, following the sibling
@@ -78,8 +91,9 @@ Both are ignored by validators, which is the point: they are data for whoever
 replays them, and they sit beside the constraint they exercise so that removing
 the constraint and leaving the control behind is visible in one diff.
 
-One hundred and five refusal controls ship here: ninety-eight inside the
-twenty-four schemas and seven in `refused-claims.json`. A refusal nobody replays
+One hundred and twenty-eight refusal controls ship here: one hundred and
+twenty-one inside the twenty-seven schemas and seven in `refused-claims.json`.
+A refusal nobody replays
 is prose, and prose does not survive the edit that removes the guard underneath
 it.
 

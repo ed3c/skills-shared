@@ -56,7 +56,7 @@ consumer closed, or merge/release occurred.
  │    └─ #549 D1-BUF adapter       BLOCKED_ON_PROVIDER
  ├─ #521 M1 semantic-context plane
  │    └─ #550 M1-C semantic adapter   BLOCKED
- ├─ #522 X1 synthesis/closure compiler   IN_FLIGHT / OPEN (this same wave)
+ ├─ #522 X1 synthesis/closure compiler   OPEN (landed in-tree this wave; pending closure receipt)
  ├─ #523 R1 single-repo refactor protocol   OPEN
  ├─ #524 R2 cross-repo expand & contract     OPEN
  ├─ #525 E1 independent Shadow / mutations / closure denominator   OPEN
@@ -75,7 +75,7 @@ directory map / State Machine / DAG accuracy    VERIFIED_AGAINST_TREE_AT_HEAD
 prompt catalogue (P0-P8) existence and routing   PRESENT (this convergence)
 schema/contract/vocabulary/refusal-control state  UNCHANGED — see Skill README
 adapter landing state (tree-sitter, sqlite-ledger) REPORTED_FROM_COMMITTED_SUITE
-open sibling lane state (#522/#525/#547/#549/#550) REPORTED_AS_OPEN, NOT PROMOTED
+open sibling lane state (#525/#547/#549/#550) REPORTED_AS_OPEN, NOT PROMOTED
 Molecular Stack index projection                 POINTER_ONLY, see referenced file
 private CodexDoc/Google projection routing        OPAQUE_BINDING_ONLY, no private URL
 registry admission                                ABSENT

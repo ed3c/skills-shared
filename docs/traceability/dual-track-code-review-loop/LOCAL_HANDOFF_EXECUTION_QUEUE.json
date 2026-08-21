@@ -10,8 +10,8 @@
     {
       "id": 522,
       "title": "[DTCR-X1] dual-track review synthesis and problem-closure compiler",
-      "state": "IN_FLIGHT",
-      "note": "separate implementation subdirectory, concurrent this wave; not this convergence's lease",
+      "state": "OPEN",
+      "note": "landed this wave in synthesis/ with three schemas, suite-counted; issue open pending closure receipt",
       "blocks": [523, 524, 525]
     },
     {

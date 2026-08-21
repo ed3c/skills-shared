@@ -35,8 +35,8 @@ the one most often reported as progress.
    — the fifteen closed terms and what each can never become.
 5. [`references/contracts/public-private-capability.md`](references/contracts/public-private-capability.md)
    — plane ownership and the locator laws.
-6. [`references/schemas/`](references/schemas/) — the machine half, 24 frozen
-   schemas (8 C0 contract + 16 D1/M1 interface).
+6. [`references/schemas/`](references/schemas/) — the machine half, 27 frozen
+   schemas (8 C0 contract + 16 D1/M1 interface + 3 X1 synthesis).
 7. [`references/source-disposition/refused-claims.json`](references/source-disposition/refused-claims.json)
    — the seven refused source claims and their replayable controls.
 8. [`adapters/`](adapters/) — the two landed deterministic-track adapters, each
@@ -88,7 +88,7 @@ skills/dual-track-code-review-loop/
     │   └── public-private-capability.md
     │       └── closed terms and plane ownership; the half a person reads
     ├── schemas/
-    │   └── 24 frozen JSON Schemas — 8 C0 contract schemas (source-packet,
+    │   └── 27 frozen JSON Schemas — 8 C0 contract schemas (source-packet,
     │       candidate-record, violation-candidate, refactor-proposal,
     │       change-unit, verification-receipt, closure-record,
     │       source-disposition) plus 16 D1/M1 interface schemas (syntax-match,
@@ -98,6 +98,8 @@ skills/dual-track-code-review-loop/
     │       architecture-invariant, blast-radius-path,
     │       contract-compatibility-result, consumed-context-row,
     │       exact-source-subject, projection-receipt, source-back-reference)
+    │       plus 3 X1 synthesis schemas (review-card, synthesis-packet,
+    │       problem-closure-row)
     │       └── the half a machine enforces, with positive and refusal controls
     ├── source-disposition/
     │   └── refused-claims.json
@@ -208,14 +210,16 @@ A committed test suite now exists at [`tests/run-all.sh`](tests/run-all.sh),
 routed by `skill-suites.yml` continuous integration. It replays the C0
 contract via `tests/selftest.py` — dynamic discovery over `references/`, no
 denominator hand-copied into the script — and then routes both landed
-adapters' own selftests (`adapters/tree-sitter/selftest.py`,
-`adapters/sqlite-ledger/selftest.py`) through the same CI arrival. On this
-worktree's exact head the suite prints:
+adapters' selftests (`adapters/tree-sitter/selftest.py`,
+`adapters/sqlite-ledger/selftest.py`) and the X1 synthesis selftest
+(`synthesis/selftest.py`) through the same CI arrival. On this worktree's
+exact head the suite prints:
 
 ```text
-schemas=24 positives=25 controls=105 knockouts=105/105 discriminating
+schemas=27 positives=31 controls=128 knockouts=128 discriminating
 tree-sitter:    fixtures=2 matches=5 schema_validations=9 falsifier_rows=14 live=EXERCISED
 sqlite-ledger:  fixtures=2 cases=46 planted_mutations=22 knockouts=5/5
+synthesis:      projections=3 emitted_artifacts=8 named_refusals=16 byte-stable
 ```
 
 `cases.json` reconciles the schema and control lists by name against what the

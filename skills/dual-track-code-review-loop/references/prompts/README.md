@@ -166,7 +166,7 @@ owner; Terminal Workers under this stage do not edit root docs/INDEX.md or
 other repositories' aggregate indexes. Route private-projection intent
 through opaque binding IDs and resolver-variable names only — never echo a
 private document, Sheet, folder or source URL into a public tracked file.
-Preserve every open lane's own status; do not promote #522, #547, #549, #550,
+Preserve every open lane's own status; do not promote #547, #549, #550,
 #525 or #528 by writing about them.
 ```
 

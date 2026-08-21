@@ -14,7 +14,7 @@
     {"id": 518, "title": "DTCR C0 contract", "role": "C0_CONTRACT", "state": "ADMITTED", "note": "receipted in implementation-preflight.json"},
     {"id": 519, "title": "[DTCR-D1] Implement deterministic syntax, symbol and graph fact-plane contracts", "role": "D1_CONTRACT", "state": "OPEN", "note": "24 schemas landed; two adapters landed under this contract's capability classes"},
     {"id": 521, "title": "[DTCR-M1] Implement optional semantic-context and organizational-memory plane", "role": "M1_CONTRACT", "state": "OPEN"},
-    {"id": 522, "title": "[DTCR-X1] Implement dual-track review synthesis and problem-closure compiler", "role": "X1_SYNTHESIS", "state": "OPEN", "note": "IN_FLIGHT this same wave, separate implementation subdirectory; not landed"},
+    {"id": 522, "title": "[DTCR-X1] Implement dual-track review synthesis and problem-closure compiler", "role": "X1_SYNTHESIS", "state": "OPEN", "note": "landed in-tree this wave (synthesis/ plus three schemas, suite-counted); issue open pending closure receipt"},
     {"id": 523, "title": "[DTCR-R1] Implement bounded single-repository architecture refactor protocol", "role": "R1_SINGLE_REPO", "state": "OPEN"},
     {"id": 524, "title": "[DTCR-R2] Implement cross-repository Expand & Contract refactor protocol", "role": "R2_CROSS_REPO", "state": "OPEN"},
     {"id": 525, "title": "[DTCR-E1] Implement independent Shadow, mutations and evidence-closure denominator", "role": "E1_SHADOW", "state": "OPEN"},
