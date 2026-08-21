@@ -12,15 +12,27 @@ import hashlib
 import json
 import os
 from pathlib import Path, PurePosixPath
+import platform
 import re
+import shutil
 import subprocess
+import sys
 import tempfile
 from typing import Any
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from codex_result_carrier import carrier_id_for, create_carrier  # noqa: E402
 
 TERMINAL_STATES = {"completed", "failed", "interrupted"}
 FORBIDDEN_KEY_FRAGMENTS = ("api_key", "apikey", "access_token", "refresh_token", "credential", "secret")
 THREAD_POLICIES = {"new", "resume-compatible"}
 EXACT_SHA = re.compile(r"^[0-9a-f]{40}$")
+ADAPTER_VERSION = "codex-sdk-worker/2"
+SDK_PACKAGE = "openai-codex"
+SANDBOX_POLICY = "workspace-write"
+# Config keys that change what the executor does. Auth/session material is
+# never read here, so it can never enter the identity digest.
+PROVENANCE_CONFIG_KEYS = ("model", "harness", "approval_policy", "thread_policy", "output_schema")
 
 
 class ContractError(ValueError):
@@ -249,14 +261,94 @@ def _status_value(status: Any) -> str:
     return str(getattr(status, "value", status)).lower()
 
 
-def execute(data: dict[str, Any]) -> dict[str, Any]:
+def _sha256_file(path: Path) -> str | None:
+    try:
+        digest = hashlib.sha256()
+        with path.open("rb") as handle:
+            for chunk in iter(lambda: handle.read(1 << 20), b""):
+                digest.update(chunk)
+        return digest.hexdigest()
+    except OSError:
+        return None
+
+
+def _resolve_codex_binary(module: Any) -> tuple[str, str | None]:
+    """Return (source, path) for the executable the SDK will actually run.
+
+    A bundled executable wins over PATH: if the package ships one, that is what
+    executed, and claiming the PATH copy would misname the executor.
+    """
+
+    module_file = getattr(module, "__file__", None)
+    if module_file:
+        package_dir = Path(module_file).resolve().parent
+        for candidate in (package_dir / "bin" / "codex", package_dir / "codex"):
+            if candidate.is_file():
+                return "SDK_BUNDLED", str(candidate)
+    for attr in ("CODEX_EXECUTABLE", "CODEX_BINARY_PATH", "codex_executable"):
+        value = getattr(module, attr, None)
+        if isinstance(value, (str, Path)) and Path(value).is_file():
+            resolved = Path(value).resolve()
+            module_dir = Path(module_file).resolve().parent if module_file else None
+            bundled = module_dir is not None and module_dir in resolved.parents
+            return ("SDK_BUNDLED" if bundled else "PATH"), str(resolved)
+    found = shutil.which("codex")
+    if found:
+        return "PATH", str(Path(found).resolve())
+    return "ABSENT", None
+
+
+def collect_executor_provenance(data: dict[str, Any], module: Any) -> dict[str, Any]:
+    """Bind the executable/runtime that performed the turn.
+
+    A signed-in session is not executable provenance and is deliberately absent
+    from this record, along with tokens, prompts, reasoning and model prose.
+    """
+
+    try:
+        from importlib.metadata import PackageNotFoundError, version
+
+        try:
+            sdk_version = version(SDK_PACKAGE)
+        except PackageNotFoundError:
+            sdk_version = str(getattr(module, "__version__", "") or "ABSENT")
+    except ImportError:  # pragma: no cover - stdlib always present
+        sdk_version = "ABSENT"
+
+    module_file = getattr(module, "__file__", None)
+    module_dir = str(Path(module_file).resolve().parent) if module_file else None
+    source, binary_path = _resolve_codex_binary(module)
+    config = {key: data.get(key) for key in PROVENANCE_CONFIG_KEYS}
+    return {
+        "adapter_version": ADAPTER_VERSION,
+        "adapter_blob_sha256": _sha256_file(Path(__file__).resolve()),
+        "sdk_package": SDK_PACKAGE,
+        "sdk_version": sdk_version or "ABSENT",
+        "sdk_module_dir": module_dir,
+        "codex_binary_source": source,
+        "codex_binary_path": binary_path,
+        "codex_binary_sha256": _sha256_file(Path(binary_path)) if binary_path else None,
+        "runtime_python": platform.python_version(),
+        "runtime_platform": f"{platform.system().lower()}-{platform.machine()}",
+        "harness": str(data.get("harness") or "codex-sdk-worker"),
+        "model": str(data.get("model") or "SDK_DEFAULT"),
+        "config_identity": _digest(json.dumps(config, sort_keys=True, separators=(",", ":"))),
+        "sandbox_policy": SANDBOX_POLICY,
+        "approval_policy": str(data.get("approval_policy") or "SDK_DEFAULT"),
+    }
+
+
+def execute(data: dict[str, Any], carrier_out_dir: Path) -> dict[str, Any]:
     validate_manifest(data)
 
     worktree = Path(data["worktree"]).resolve()
     _validate_worktree_subject(worktree, data)
 
     # Import only on the live path so static validation has no SDK dependency.
+    import openai_codex  # type: ignore
     from openai_codex import Codex, Sandbox  # type: ignore
+
+    provenance = collect_executor_provenance(data, openai_codex)
 
     with Codex() as codex:
         account = codex.account(refresh_token=False)
@@ -290,8 +382,21 @@ def execute(data: dict[str, Any]) -> dict[str, Any]:
     _assert_lease_readback(data, changed_paths)
     result_tree_sha = _materialize_result_tree(worktree, data["base_sha"], changed_paths)
 
+    # A detached tree is not a replayable receipt: bind it to one durable
+    # carrier before this worktree can disappear.
+    carrier = create_carrier(
+        worktree,
+        repo=data["repo"],
+        base_sha=data["base_sha"],
+        base_tree_sha=data["tree_sha"],
+        result_tree_sha=result_tree_sha,
+        changed_paths=changed_paths,
+        out_dir=Path(carrier_out_dir),
+        carrier_id=carrier_id_for(data["task_id"], data["attempt_id"]),
+    )
+
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "task_id": data["task_id"],
         "attempt_id": data["attempt_id"],
         "repo": data["repo"],
@@ -310,6 +415,8 @@ def execute(data: dict[str, Any]) -> dict[str, Any]:
         "lease_readback": "PASS",
         "changed_files": changed_paths,
         "final_response_digest": _digest(result.final_response) if result.final_response else None,
+        "executor_provenance": provenance,
+        "result_carrier": carrier,
         "evidence_ceiling": "RUNTIME_RESULT_ONLY",
     }
 
@@ -318,11 +425,18 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("manifest")
     parser.add_argument("--execute", action="store_true", help="invoke openai-codex using existing Codex auth")
+    parser.add_argument(
+        "--carrier-out-dir",
+        help="directory receiving the durable result-carrier bundle and manifest (required with --execute)",
+    )
     parser.add_argument("--output")
     args = parser.parse_args()
 
+    if args.execute and not args.carrier_out_dir:
+        parser.error("--execute requires --carrier-out-dir: a result tree without a durable carrier is not replayable")
+
     data = json.loads(Path(args.manifest).read_text(encoding="utf-8"))
-    receipt = execute(data) if args.execute else compile_static_receipt(data)
+    receipt = execute(data, Path(args.carrier_out_dir)) if args.execute else compile_static_receipt(data)
     encoded = json.dumps(receipt, indent=2, sort_keys=True) + "\n"
     if args.output:
         Path(args.output).write_text(encoded, encoding="utf-8")

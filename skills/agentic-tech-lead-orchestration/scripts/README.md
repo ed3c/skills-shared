@@ -63,7 +63,25 @@ static invocation
   → controller source/diff/test readback still required
 ```
 
+`--execute` additionally requires `--carrier-out-dir`: a result tree with no durable carrier is not a replayable receipt (#508). The live result is emitted as `schema_version: 2` and carries `executor_provenance` (adapter version/blob digest, `openai-codex` version, resolved binary identity and SHA-256, runtime/model/config identity, sandbox/approval policy) plus `result_carrier`. A signed-in session is never recorded as executable provenance, and auth values, tokens, prompts, private reasoning and model prose remain forbidden.
+
 The adapter rejects unsafe/overlapping repository path leases, prompt-digest drift, incompatible thread reuse, credential-bearing durable fields, and full model/private-reasoning persistence. After the live turn it does **not** commit, move a branch, or mutate the normal index. Instead it writes the post-turn bytes as a detached Git tree using `GIT_INDEX_FILE`, then verifies that `git diff --name-only --no-renames <base_sha> <tree_sha>` exactly matches its observed changed-file denominator. The runtime result carries both `base_tree_sha` and the post-turn `tree_sha` so the two phases cannot share one ambiguous tree identity. `--execute` is not used by the shared deterministic suite.
+
+### `codex_result_carrier.py` / `check_codex_worker_result.py` — #508
+
+```text
+POST_TURN_TREE_MATERIALIZED
+→ DURABLE_OBJECT_CARRIER_BOUND      refs/evidence/codex-v2/<id>/{base,result}
+→ CARRIER_MANIFEST_DIGEST_BOUND     manifest + content-addressed bundle SHA-256
+→ INDEPENDENT_CLONE_OR_BUNDLE_READBACK
+→ RESULT_TREE_REPLAY_PASS
+```
+
+`codex_result_carrier.py create` publishes the base and result trees as two **parentless** evidence commits under a hidden `refs/evidence/codex-v2/` namespace and packs exactly those two refs into a Git bundle with a sidecar manifest. Parentless is deliberate: the carrier transports the two trees under comparison, not the history behind them. The implementation branch is never moved and nothing depends on reflog or accidental object retention.
+
+`codex_result_carrier.py replay` resolves the result tree from bundle + manifest alone, in a bare scratch repository created outside the originating repository with every inherited `GIT_DIR`/alternates variable stripped, then recomputes the changed-path denominator. A tree that survives only in the originating object store cannot satisfy this readback.
+
+`check_codex_worker_result.py` is the shape + semantic gate for the live worker result. `references/contracts/codex-worker-result-v2.schema.json` owns the Draft 2020-12 shape (`additionalProperties: false`, `schema_version` pinned to `2` so a historical v1 receipt cannot arrive here). The script owns what a schema cannot express: the adapter blob digest is recomputed from the adapter that would actually execute, a recorded binary digest is recomputed from disk, `SDK_BUNDLED` and `PATH` must agree with where the executable actually lives, and the carrier manifest must name this exact task/attempt, repository, base and result tree. `--carrier-bundle` additionally performs the offline replay.
 
 ### `github_issue_dag_projection.py` — #376
 
@@ -133,7 +151,16 @@ Git diff(base_sha, tree_sha) == exact changed_files denominator
 → LIVE_RUNTIME_AND_CONTROLLER_READBACK_CANDIDATE
 ```
 
-A bound tree missing the claimed change, containing an undeclared extra change, resolving to no tree object, or disagreeing with `base_sha` now fails closed even when worker and controller repeat the same false values. Output remains Shadow-pending. This deterministic repair does not promote #464's live lane; the earlier run remains `LIVE_EXECUTION_OBSERVED / SHADOW_READBACK_PARTIAL` until a fresh signed-in run produces a v2-bound result and independent Shadow readback.
+Since #508 the binder no longer reads the originating worktree at all. It validates the worker result against `codex-worker-result-v2.schema.json` through `check_codex_worker_result.py`, then replays the durable carrier named in `carrier_bundle_path`:
+
+```text
+worker result validated against the committed schema
+carrier manifest names this repo/base/result tree and denominator
+bundle + manifest replay in a scratch repository
+→ result_tree_replay=PASS
+```
+
+A bound tree missing the claimed change, containing an undeclared extra change, resolving to no carried tree object, or disagreeing with `base_sha` now fails closed even when worker and controller repeat the same false values — and it fails closed after the originating worktree has been deleted. Output remains Shadow-pending. This deterministic repair does not promote #464's live lane; the earlier run remains `LIVE_EXECUTION_OBSERVED / SHADOW_READBACK_PARTIAL` until a fresh signed-in run produces a v2-bound result and independent Shadow readback.
 
 Raw model prose, prompt bytes, private reasoning, auth material, tokens, credentials and API keys are forbidden durable input fields.
 
