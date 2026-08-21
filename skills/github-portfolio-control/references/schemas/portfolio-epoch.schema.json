@@ -1,0 +1,769 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ghpc/portfolio-epoch/v1",
+  "title": "Repository portfolio snapshot epoch",
+  "description": "One epoch: the exact repository subject every control decision in this wave is bound to, the subjects that may carry that binding, the readbacks that may not, and the typed deltas that retired the epochs before it. The contract exists because the cheapest way to combine an Issue read on Monday with a PR read on Tuesday is to not mention when either was read: the combination looks like one picture and nothing in it records that it never existed. Four keywords stop that. `subject.main_commit` takes a forty-hex digest, so a moving name cannot be the subject. `durable_subjects[].subject_kind` is a closed list of content-addressed kinds, so a branch name cannot be promoted into the evidence position. `mutable_readbacks[].durable` is pinned false, so a provider verdict can be recorded without being trusted. And a superseded epoch must carry a typed delta, so an epoch cannot be retired by being overwritten. What the schema cannot do is notice that the digest it was handed is not the digest the reader is standing on: it refuses an epoch that admits its own drift badly, not an epoch that was never re-read.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "epoch_id",
+    "repository",
+    "subject",
+    "portfolio_state",
+    "runtime_admission",
+    "durable_subjects",
+    "mutable_readbacks",
+    "superseded_epochs",
+    "evidence_ceiling",
+    "authority",
+    "human_owned_operations"
+  ],
+  "properties": {
+    "schema": {"const": "ghpc/portfolio-epoch/v1"},
+    "epoch_id": {
+      "type": "string",
+      "pattern": "^GHPC-EPOCH-[0-9]{3}$",
+      "description": "Identifiers in the 900-999 block are reserved for shape-only instances inside `examples`; the checker refuses one inside a real bundle."
+    },
+    "repository": {"$ref": "#/$defs/repository"},
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["main_commit", "tree", "observed_on", "observed_lane"],
+      "properties": {
+        "main_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$",
+          "description": "The exact commit. `main`, `HEAD`, `origin/main` and a branch name all fail the pattern, because each of them names whatever it points at when somebody next reads it, and an epoch bound to that is an epoch with no subject."
+        },
+        "tree": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$",
+          "description": "The tree of that commit, carried separately so a re-read can be compared rather than trusted. Two commits with the same tree are the same bytes; a commit whose tree does not match the recorded one is a different subject regardless of its message."
+        },
+        "observed_on": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+        "observed_lane": {"$ref": "#/$defs/observation_lane"}
+      }
+    },
+    "portfolio_state": {"$ref": "#/$defs/portfolio_state"},
+    "runtime_admission": {"$ref": "#/$defs/runtime_admission"},
+    "durable_subjects": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/durable_subject"},
+      "description": "At least one. An epoch that names no content-addressed subject has recorded a moment, not a subject, and every decision it carries is unfalsifiable."
+    },
+    "mutable_readbacks": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/mutable_readback"},
+      "description": "May be empty. Recording a branch name or a mergeability verdict is useful; the list exists so those observations have somewhere to live that is not the evidence position."
+    },
+    "superseded_epochs": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/superseded_epoch"},
+      "description": "Every epoch this one retired, each with the typed delta that retired it. Empty only for the first epoch of a plane."
+    },
+    "evidence_ceiling": {
+      "const": "REPOSITORY_BYTES_AND_LOCAL_GIT_ONLY",
+      "description": "An epoch settles what a checkout and git can settle. It does not settle provider state, hosted execution, acceptance or merge."
+    },
+    "authority": {"$ref": "#/$defs/authority"},
+    "human_owned_operations": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 4}
+    }
+  },
+  "$defs": {
+    "repository": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["owner_repo", "visibility_class"],
+      "properties": {
+        "owner_repo": {"type": "string", "pattern": "^[A-Za-z0-9._-]+/[A-Za-z0-9._-]+$"},
+        "visibility_class": {
+          "enum": ["PUBLIC", "PRIVATE", "UNKNOWN"],
+          "description": "UNKNOWN is a state, not a default to be tidied away. Visibility is a provider readback; a local lane that never made one records UNKNOWN, and every rule downstream that depends on visibility fails closed on it."
+        }
+      }
+    },
+    "observation_lane": {
+      "enum": [
+        "LOCAL_GIT_OBJECT_STORE",
+        "GITHUB_PROVIDER_READBACK",
+        "CONNECTOR_READBACK",
+        "NOT_EXERCISED"
+      ],
+      "description": "Which lane produced the observation. The lanes are independent: one of them cannot fabricate a verification belonging to another, and an epoch that mixes them without saying so is the defect this field exists to make visible."
+    },
+    "portfolio_state": {
+      "enum": [
+        "REQUEST_BOUND",
+        "RUNTIME_AND_AUTHORITY_ADMITTED",
+        "REPOSITORY_SET_FROZEN",
+        "GITHUB_SNAPSHOT_EPOCH_BOUND",
+        "ISSUE_PR_DENOMINATOR_COMPLETE",
+        "ACCEPTANCE_CONTRACTS_COMPILED",
+        "ADVERSARIAL_DRIFT_AUDITED",
+        "MULTI_GRAPH_MODEL_ASSERTED",
+        "READY_WAVES_COMPUTED",
+        "SUBAGENTS_DISPATCHED",
+        "ALL_REQUIRED_AGENTS_TERMINAL",
+        "RESULTS_SCHEMA_VALIDATED",
+        "FINDINGS_CONSOLIDATED",
+        "LOCAL_WORKTREES_EXECUTED",
+        "EXACT_HEAD_LOCAL_GATES_PASS",
+        "DRAFT_PUBLICATION",
+        "ONE_SHOT_CI_EPOCH",
+        "CI_JOBS_STEPS_ARTIFACTS_READ_BACK",
+        "PR_ACCEPTANCE_RECONCILED",
+        "READY_FOR_HUMAN_ADMIT",
+        "MERGE_IN_TRUE_DEPENDENCY_ORDER",
+        "EXACT_MAIN_READBACK",
+        "ISSUE_CLOSURE_RECONCILED",
+        "PORTFOLIO_EPOCH_CLOSED"
+      ],
+      "description": "The twenty-four states owned by references/controlled-vocabulary.md, reused verbatim and ordered there."
+    },
+    "runtime_admission": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["classification", "local_checkout_present", "exercise_state", "exercise_receipt"],
+      "description": "Which runtime observed this epoch, and whether it was exercised or merely available. The distinction is the whole point: an installed binary, a generated prompt and a provider that answers are all availability, and availability reads exactly like execution in a summary.",
+      "properties": {
+        "classification": {
+          "enum": [
+            "CLAUDE_CODE_LOCAL",
+            "CODEX_CLI_LOCAL",
+            "GITHUB_ACTIONS",
+            "CHATGPT_DESKTOP_WORKTREE",
+            "CHATGPT_GITHUB_CONNECTOR",
+            "UNKNOWN"
+          ]
+        },
+        "local_checkout_present": {"type": "boolean"},
+        "exercise_state": {"enum": ["EXERCISED", "NOT_EXERCISED"]},
+        "exercise_receipt": {
+          "type": ["string", "null"],
+          "minLength": 12,
+          "description": "The command and its observed result, or null when the runtime was not exercised. Null is the honest value; a sentence describing what the runtime would do is not."
+        }
+      },
+      "allOf": [
+        {
+          "if": {"required": ["exercise_state"], "properties": {"exercise_state": {"const": "EXERCISED"}}},
+          "then": {
+            "properties": {
+              "exercise_receipt": {
+                "type": "string",
+                "description": "EXERCISED requires a receipt. Without this, `NOT_EXERCISED` and `EXERCISED` differ only in which word was typed."
+              }
+            }
+          },
+          "description": "The promotion this refuses is ENVIRONMENT_AVAILABLE_PROMOTED_TO_EXERCISED: the runtime existed, so the record says it ran."
+        }
+      ]
+    },
+    "durable_subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["subject_kind", "digest", "provides"],
+      "properties": {
+        "subject_kind": {
+          "enum": [
+            "MAIN_COMMIT",
+            "MAIN_TREE",
+            "PR_HEAD_COMMIT",
+            "PR_BASE_COMMIT",
+            "BLOB_DIGEST",
+            "AGENT_RESULT_DIGEST",
+            "WORKFLOW_RUN_TESTED_HEAD"
+          ],
+          "description": "Seven content-addressed kinds and nothing else. BRANCH_NAME, PR_MERGEABILITY, PR_STATE and MODEL_PROSE are absent on purpose: they belong in `mutable_readbacks`, and a plane that can file one here can bind a decision to a name."
+        },
+        "digest": {"type": "string", "pattern": "^([0-9a-f]{40}|sha256:[0-9a-f]{64})$"},
+        "provides": {"type": "string", "minLength": 8, "maxLength": 300}
+      }
+    },
+    "mutable_readback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["readback_kind", "observed_value", "durable", "recorded_because"],
+      "properties": {
+        "readback_kind": {
+          "enum": ["BRANCH_NAME", "PR_MERGEABILITY", "PR_STATE", "MODEL_PROSE", "ISSUE_TITLE", "QUEUE_ORDER"]
+        },
+        "observed_value": {"type": "string", "minLength": 1, "maxLength": 300},
+        "durable": {
+          "const": false,
+          "description": "Pinned. A readback that could set this true would be a readback that promotes itself into the evidence position by describing itself as one."
+        },
+        "recorded_because": {"type": "string", "minLength": 8, "maxLength": 300}
+      }
+    },
+    "typed_delta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["delta_kind", "from_digest", "to_digest", "invalidated_states", "reason"],
+      "description": "What moved, from which digest to which, and which states it returned to invalid. A delta is the only thing that retires an epoch.",
+      "properties": {
+        "delta_kind": {
+          "enum": [
+            "INTENT_DRIFT",
+            "SCOPE_DRIFT",
+            "ACCEPTANCE_DRIFT",
+            "BASE_MAIN_DRIFT",
+            "DEPENDENCY_DRIFT",
+            "GIT_ANCESTRY_DRIFT",
+            "PATH_WRITER_DRIFT",
+            "RESOURCE_LEASE_DRIFT",
+            "IMPLEMENTATION_DRIFT",
+            "EVIDENCE_DRIFT",
+            "RUNTIME_DRIFT",
+            "MODEL_IDENTITY_DRIFT",
+            "PROVENANCE_DRIFT",
+            "CI_EPOCH_DRIFT",
+            "ISSUE_PR_STATE_DRIFT",
+            "SECURITY_VISIBILITY_DRIFT",
+            "POST_MERGE_CLOSURE_DRIFT"
+          ],
+          "description": "The seventeen drift kinds from references/controlled-vocabulary.md. Free text here would make the delta a note, and a note does not invalidate anything."
+        },
+        "from_digest": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "to_digest": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "invalidated_states": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/portfolio_state"},
+          "description": "At least one. A delta that invalidates nothing is a delta that says the movement did not matter, which is the sentence this whole contract exists to stop somebody writing by accident."
+        },
+        "reason": {"type": "string", "minLength": 12, "maxLength": 400}
+      }
+    },
+    "superseded_epoch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["epoch_id", "main_commit", "tree", "observed_lane", "delta"],
+      "description": "A retired epoch, kept whole. The earlier subject is preserved rather than overwritten, so a reader can tell that the old numbers were counted against a real tree and are now superseded, rather than that they were wrong.",
+      "properties": {
+        "epoch_id": {"type": "string", "pattern": "^GHPC-EPOCH-[0-9]{3}$"},
+        "main_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "tree": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "observed_lane": {"$ref": "#/$defs/observation_lane"},
+        "delta": {"$ref": "#/$defs/typed_delta"}
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["merge", "release", "promotion", "provider_execution", "production"],
+      "description": "The five constants every artifact in this plane pins. An epoch is a description of a subject; a description that could grant merge would be a description that merges by being written.",
+      "properties": {
+        "merge": {"const": false},
+        "release": {"const": false},
+        "promotion": {"const": false},
+        "provider_execution": {"const": false},
+        "production": {"const": false}
+      }
+    }
+  },
+  "examples": [
+    {
+      "schema": "ghpc/portfolio-epoch/v1",
+      "epoch_id": "GHPC-EPOCH-001",
+      "repository": {"owner_repo": "ed3c/skills-shared", "visibility_class": "UNKNOWN"},
+      "subject": {
+        "main_commit": "3fc020414134999227aec6ba9304a08e86287033",
+        "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d",
+        "observed_on": "2026-08-21",
+        "observed_lane": "LOCAL_GIT_OBJECT_STORE"
+      },
+      "portfolio_state": "REPOSITORY_SET_FROZEN",
+      "runtime_admission": {
+        "classification": "CLAUDE_CODE_LOCAL",
+        "local_checkout_present": true,
+        "exercise_state": "EXERCISED",
+        "exercise_receipt": "git rev-parse HEAD returned 3fc020414134999227aec6ba9304a08e86287033 and git rev-parse HEAD^{tree} returned eea625614c233b7f42fd62c129aa21852cb36b9d in a local checkout"
+      },
+      "durable_subjects": [
+        {
+          "subject_kind": "MAIN_COMMIT",
+          "digest": "3fc020414134999227aec6ba9304a08e86287033",
+          "provides": "the exact repository state every control decision in this epoch is bound to"
+        },
+        {
+          "subject_kind": "MAIN_TREE",
+          "digest": "eea625614c233b7f42fd62c129aa21852cb36b9d",
+          "provides": "the bytes of that commit, so a later re-read is compared rather than trusted"
+        }
+      ],
+      "mutable_readbacks": [
+        {
+          "readback_kind": "BRANCH_NAME",
+          "observed_value": "main",
+          "durable": false,
+          "recorded_because": "the name that pointed at this commit when it was read, kept for navigation and never as the subject"
+        },
+        {
+          "readback_kind": "MODEL_PROSE",
+          "observed_value": "the executing build reports itself under the OPUS_5 routing alias",
+          "durable": false,
+          "recorded_because": "an alias is a routing policy label; the exact carrier and model identity are bound per agent in ghpc/subagent-join/v1"
+        }
+      ],
+      "superseded_epochs": [
+        {
+          "epoch_id": "GHPC-EPOCH-000",
+          "main_commit": "8818e80ae5e12d0328c7b95158e681471b04682e",
+          "tree": "d6a95737e7b254c0e89ed1f7fa518d0d43cb7512",
+          "observed_lane": "CONNECTOR_READBACK",
+          "delta": {
+            "delta_kind": "BASE_MAIN_DRIFT",
+            "from_digest": "8818e80ae5e12d0328c7b95158e681471b04682e",
+            "to_digest": "3fc020414134999227aec6ba9304a08e86287033",
+            "invalidated_states": [
+              "GITHUB_SNAPSHOT_EPOCH_BOUND",
+              "ISSUE_PR_DENOMINATOR_COMPLETE",
+              "ACCEPTANCE_CONTRACTS_COMPILED",
+              "READY_WAVES_COMPUTED"
+            ],
+            "reason": "main advanced from the connector-observed 8818e80 to 3fc0204; 8818e80 is an ancestor of the current subject, so every Issue, PR and changed-path count read at the older tree is superseded rather than merely older"
+          }
+        }
+      ],
+      "evidence_ceiling": "REPOSITORY_BYTES_AND_LOCAL_GIT_ONLY",
+      "authority": {
+        "merge": false,
+        "release": false,
+        "promotion": false,
+        "provider_execution": false,
+        "production": false
+      },
+      "human_owned_operations": [
+        "merge and release",
+        "closing an Issue against unresolved acceptance",
+        "admitting a provider data-egress boundary for private repository content"
+      ]
+    }
+  ],
+  "x-refusal-controls": [
+    {
+      "case_id": "GHPC-XC-EPOCH-001",
+      "refuses": "A mutable branch name standing where the content-bound subject belongs.",
+      "refused_by": "properties.subject.properties.main_commit.pattern",
+      "instance": {
+        "schema": "ghpc/portfolio-epoch/v1",
+        "epoch_id": "GHPC-EPOCH-101",
+        "repository": {"owner_repo": "ed3c/skills-shared", "visibility_class": "UNKNOWN"},
+        "subject": {
+          "main_commit": "main",
+          "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d",
+          "observed_on": "2026-08-21",
+          "observed_lane": "LOCAL_GIT_OBJECT_STORE"
+        },
+        "portfolio_state": "REPOSITORY_SET_FROZEN",
+        "runtime_admission": {
+          "classification": "CLAUDE_CODE_LOCAL",
+          "local_checkout_present": true,
+          "exercise_state": "NOT_EXERCISED",
+          "exercise_receipt": null
+        },
+        "durable_subjects": [
+          {
+            "subject_kind": "MAIN_TREE",
+            "digest": "eea625614c233b7f42fd62c129aa21852cb36b9d",
+            "provides": "the bytes the epoch claims to describe"
+          }
+        ],
+        "mutable_readbacks": [],
+        "superseded_epochs": [],
+        "evidence_ceiling": "REPOSITORY_BYTES_AND_LOCAL_GIT_ONLY",
+        "authority": {
+          "merge": false,
+          "release": false,
+          "promotion": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "GHPC-XC-EPOCH-002",
+      "refuses": "A branch name filed as a durable evidence subject.",
+      "refused_by": "$defs.durable_subject.properties.subject_kind.enum",
+      "instance": {
+        "schema": "ghpc/portfolio-epoch/v1",
+        "epoch_id": "GHPC-EPOCH-102",
+        "repository": {"owner_repo": "ed3c/skills-shared", "visibility_class": "UNKNOWN"},
+        "subject": {
+          "main_commit": "3fc020414134999227aec6ba9304a08e86287033",
+          "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d",
+          "observed_on": "2026-08-21",
+          "observed_lane": "LOCAL_GIT_OBJECT_STORE"
+        },
+        "portfolio_state": "REPOSITORY_SET_FROZEN",
+        "runtime_admission": {
+          "classification": "CLAUDE_CODE_LOCAL",
+          "local_checkout_present": true,
+          "exercise_state": "NOT_EXERCISED",
+          "exercise_receipt": null
+        },
+        "durable_subjects": [
+          {
+            "subject_kind": "BRANCH_NAME",
+            "digest": "3fc020414134999227aec6ba9304a08e86287033",
+            "provides": "the branch the wave was reading, treated as the subject of every decision"
+          }
+        ],
+        "mutable_readbacks": [],
+        "superseded_epochs": [],
+        "evidence_ceiling": "REPOSITORY_BYTES_AND_LOCAL_GIT_ONLY",
+        "authority": {
+          "merge": false,
+          "release": false,
+          "promotion": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "GHPC-XC-EPOCH-003",
+      "refuses": "A provider mergeability verdict marked durable.",
+      "refused_by": "$defs.mutable_readback.properties.durable.const",
+      "instance": {
+        "schema": "ghpc/portfolio-epoch/v1",
+        "epoch_id": "GHPC-EPOCH-103",
+        "repository": {"owner_repo": "ed3c/skills-shared", "visibility_class": "UNKNOWN"},
+        "subject": {
+          "main_commit": "3fc020414134999227aec6ba9304a08e86287033",
+          "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d",
+          "observed_on": "2026-08-21",
+          "observed_lane": "LOCAL_GIT_OBJECT_STORE"
+        },
+        "portfolio_state": "REPOSITORY_SET_FROZEN",
+        "runtime_admission": {
+          "classification": "CLAUDE_CODE_LOCAL",
+          "local_checkout_present": true,
+          "exercise_state": "NOT_EXERCISED",
+          "exercise_receipt": null
+        },
+        "durable_subjects": [
+          {
+            "subject_kind": "MAIN_COMMIT",
+            "digest": "3fc020414134999227aec6ba9304a08e86287033",
+            "provides": "the exact repository state this epoch is bound to"
+          }
+        ],
+        "mutable_readbacks": [
+          {
+            "readback_kind": "PR_MERGEABILITY",
+            "observed_value": "mergeable=true",
+            "durable": true,
+            "recorded_because": "the provider said the branch has no conflicts, so the wave treated it as acceptance"
+          }
+        ],
+        "superseded_epochs": [],
+        "evidence_ceiling": "REPOSITORY_BYTES_AND_LOCAL_GIT_ONLY",
+        "authority": {
+          "merge": false,
+          "release": false,
+          "promotion": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "GHPC-XC-EPOCH-004",
+      "refuses": "An epoch retired by overwriting: the earlier subject is listed with no typed delta.",
+      "refused_by": "$defs.superseded_epoch.required",
+      "instance": {
+        "schema": "ghpc/portfolio-epoch/v1",
+        "epoch_id": "GHPC-EPOCH-104",
+        "repository": {"owner_repo": "ed3c/skills-shared", "visibility_class": "UNKNOWN"},
+        "subject": {
+          "main_commit": "3fc020414134999227aec6ba9304a08e86287033",
+          "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d",
+          "observed_on": "2026-08-21",
+          "observed_lane": "LOCAL_GIT_OBJECT_STORE"
+        },
+        "portfolio_state": "REPOSITORY_SET_FROZEN",
+        "runtime_admission": {
+          "classification": "CLAUDE_CODE_LOCAL",
+          "local_checkout_present": true,
+          "exercise_state": "NOT_EXERCISED",
+          "exercise_receipt": null
+        },
+        "durable_subjects": [
+          {
+            "subject_kind": "MAIN_COMMIT",
+            "digest": "3fc020414134999227aec6ba9304a08e86287033",
+            "provides": "the exact repository state this epoch is bound to"
+          }
+        ],
+        "mutable_readbacks": [],
+        "superseded_epochs": [
+          {
+            "epoch_id": "GHPC-EPOCH-000",
+            "main_commit": "8818e80ae5e12d0328c7b95158e681471b04682e",
+            "tree": "d6a95737e7b254c0e89ed1f7fa518d0d43cb7512",
+            "observed_lane": "CONNECTOR_READBACK"
+          }
+        ],
+        "evidence_ceiling": "REPOSITORY_BYTES_AND_LOCAL_GIT_ONLY",
+        "authority": {
+          "merge": false,
+          "release": false,
+          "promotion": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "GHPC-XC-EPOCH-005",
+      "refuses": "A free-text delta kind, which turns an invalidation into a note.",
+      "refused_by": "$defs.typed_delta.properties.delta_kind.enum",
+      "instance": {
+        "schema": "ghpc/portfolio-epoch/v1",
+        "epoch_id": "GHPC-EPOCH-105",
+        "repository": {"owner_repo": "ed3c/skills-shared", "visibility_class": "UNKNOWN"},
+        "subject": {
+          "main_commit": "3fc020414134999227aec6ba9304a08e86287033",
+          "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d",
+          "observed_on": "2026-08-21",
+          "observed_lane": "LOCAL_GIT_OBJECT_STORE"
+        },
+        "portfolio_state": "REPOSITORY_SET_FROZEN",
+        "runtime_admission": {
+          "classification": "CLAUDE_CODE_LOCAL",
+          "local_checkout_present": true,
+          "exercise_state": "NOT_EXERCISED",
+          "exercise_receipt": null
+        },
+        "durable_subjects": [
+          {
+            "subject_kind": "MAIN_COMMIT",
+            "digest": "3fc020414134999227aec6ba9304a08e86287033",
+            "provides": "the exact repository state this epoch is bound to"
+          }
+        ],
+        "mutable_readbacks": [],
+        "superseded_epochs": [
+          {
+            "epoch_id": "GHPC-EPOCH-000",
+            "main_commit": "8818e80ae5e12d0328c7b95158e681471b04682e",
+            "tree": "d6a95737e7b254c0e89ed1f7fa518d0d43cb7512",
+            "observed_lane": "CONNECTOR_READBACK",
+            "delta": {
+              "delta_kind": "main moved a bit since we last looked",
+              "from_digest": "8818e80ae5e12d0328c7b95158e681471b04682e",
+              "to_digest": "3fc020414134999227aec6ba9304a08e86287033",
+              "invalidated_states": ["GITHUB_SNAPSHOT_EPOCH_BOUND"],
+              "reason": "the earlier reading was taken before several waves landed on main"
+            }
+          }
+        ],
+        "evidence_ceiling": "REPOSITORY_BYTES_AND_LOCAL_GIT_ONLY",
+        "authority": {
+          "merge": false,
+          "release": false,
+          "promotion": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "GHPC-XC-EPOCH-006",
+      "refuses": "A delta that invalidates nothing, which says the movement did not matter.",
+      "refused_by": "$defs.typed_delta.properties.invalidated_states.minItems",
+      "instance": {
+        "schema": "ghpc/portfolio-epoch/v1",
+        "epoch_id": "GHPC-EPOCH-106",
+        "repository": {"owner_repo": "ed3c/skills-shared", "visibility_class": "UNKNOWN"},
+        "subject": {
+          "main_commit": "3fc020414134999227aec6ba9304a08e86287033",
+          "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d",
+          "observed_on": "2026-08-21",
+          "observed_lane": "LOCAL_GIT_OBJECT_STORE"
+        },
+        "portfolio_state": "REPOSITORY_SET_FROZEN",
+        "runtime_admission": {
+          "classification": "CLAUDE_CODE_LOCAL",
+          "local_checkout_present": true,
+          "exercise_state": "NOT_EXERCISED",
+          "exercise_receipt": null
+        },
+        "durable_subjects": [
+          {
+            "subject_kind": "MAIN_COMMIT",
+            "digest": "3fc020414134999227aec6ba9304a08e86287033",
+            "provides": "the exact repository state this epoch is bound to"
+          }
+        ],
+        "mutable_readbacks": [],
+        "superseded_epochs": [
+          {
+            "epoch_id": "GHPC-EPOCH-000",
+            "main_commit": "8818e80ae5e12d0328c7b95158e681471b04682e",
+            "tree": "d6a95737e7b254c0e89ed1f7fa518d0d43cb7512",
+            "observed_lane": "CONNECTOR_READBACK",
+            "delta": {
+              "delta_kind": "BASE_MAIN_DRIFT",
+              "from_digest": "8818e80ae5e12d0328c7b95158e681471b04682e",
+              "to_digest": "3fc020414134999227aec6ba9304a08e86287033",
+              "invalidated_states": [],
+              "reason": "main moved but the wave decided the earlier Issue and PR readings still applied"
+            }
+          }
+        ],
+        "evidence_ceiling": "REPOSITORY_BYTES_AND_LOCAL_GIT_ONLY",
+        "authority": {
+          "merge": false,
+          "release": false,
+          "promotion": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "GHPC-XC-EPOCH-007",
+      "refuses": "Environment availability promoted to exercised: EXERCISED with no receipt.",
+      "refused_by": "$defs.runtime_admission.allOf[0].then.properties.exercise_receipt.type",
+      "instance": {
+        "schema": "ghpc/portfolio-epoch/v1",
+        "epoch_id": "GHPC-EPOCH-107",
+        "repository": {"owner_repo": "ed3c/skills-shared", "visibility_class": "UNKNOWN"},
+        "subject": {
+          "main_commit": "3fc020414134999227aec6ba9304a08e86287033",
+          "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d",
+          "observed_on": "2026-08-21",
+          "observed_lane": "LOCAL_GIT_OBJECT_STORE"
+        },
+        "portfolio_state": "RUNTIME_AND_AUTHORITY_ADMITTED",
+        "runtime_admission": {
+          "classification": "CODEX_CLI_LOCAL",
+          "local_checkout_present": true,
+          "exercise_state": "EXERCISED",
+          "exercise_receipt": null
+        },
+        "durable_subjects": [
+          {
+            "subject_kind": "MAIN_COMMIT",
+            "digest": "3fc020414134999227aec6ba9304a08e86287033",
+            "provides": "the exact repository state this epoch is bound to"
+          }
+        ],
+        "mutable_readbacks": [],
+        "superseded_epochs": [],
+        "evidence_ceiling": "REPOSITORY_BYTES_AND_LOCAL_GIT_ONLY",
+        "authority": {
+          "merge": false,
+          "release": false,
+          "promotion": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "GHPC-XC-EPOCH-008",
+      "refuses": "Authority widening: an epoch that grants itself merge by describing a subject.",
+      "refused_by": "$defs.authority.properties.merge.const",
+      "instance": {
+        "schema": "ghpc/portfolio-epoch/v1",
+        "epoch_id": "GHPC-EPOCH-108",
+        "repository": {"owner_repo": "ed3c/skills-shared", "visibility_class": "UNKNOWN"},
+        "subject": {
+          "main_commit": "3fc020414134999227aec6ba9304a08e86287033",
+          "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d",
+          "observed_on": "2026-08-21",
+          "observed_lane": "LOCAL_GIT_OBJECT_STORE"
+        },
+        "portfolio_state": "READY_FOR_HUMAN_ADMIT",
+        "runtime_admission": {
+          "classification": "CLAUDE_CODE_LOCAL",
+          "local_checkout_present": true,
+          "exercise_state": "NOT_EXERCISED",
+          "exercise_receipt": null
+        },
+        "durable_subjects": [
+          {
+            "subject_kind": "MAIN_COMMIT",
+            "digest": "3fc020414134999227aec6ba9304a08e86287033",
+            "provides": "the exact repository state this epoch is bound to"
+          }
+        ],
+        "mutable_readbacks": [],
+        "superseded_epochs": [],
+        "evidence_ceiling": "REPOSITORY_BYTES_AND_LOCAL_GIT_ONLY",
+        "authority": {
+          "merge": true,
+          "release": false,
+          "promotion": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "GHPC-XC-EPOCH-009",
+      "refuses": "An epoch that names no content-addressed subject at all, so nothing it decides is falsifiable.",
+      "refused_by": "properties.durable_subjects.minItems",
+      "instance": {
+        "schema": "ghpc/portfolio-epoch/v1",
+        "epoch_id": "GHPC-EPOCH-109",
+        "repository": {"owner_repo": "ed3c/skills-shared", "visibility_class": "UNKNOWN"},
+        "subject": {
+          "main_commit": "3fc020414134999227aec6ba9304a08e86287033",
+          "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d",
+          "observed_on": "2026-08-21",
+          "observed_lane": "LOCAL_GIT_OBJECT_STORE"
+        },
+        "portfolio_state": "REPOSITORY_SET_FROZEN",
+        "runtime_admission": {
+          "classification": "CLAUDE_CODE_LOCAL",
+          "local_checkout_present": true,
+          "exercise_state": "NOT_EXERCISED",
+          "exercise_receipt": null
+        },
+        "durable_subjects": [],
+        "mutable_readbacks": [
+          {
+            "readback_kind": "BRANCH_NAME",
+            "observed_value": "main",
+            "durable": false,
+            "recorded_because": "the only thing this epoch recorded about what it was reading"
+          }
+        ],
+        "superseded_epochs": [],
+        "evidence_ceiling": "REPOSITORY_BYTES_AND_LOCAL_GIT_ONLY",
+        "authority": {
+          "merge": false,
+          "release": false,
+          "promotion": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "human_owned_operations": ["merge and release"]
+      }
+    }
+  ]
+}

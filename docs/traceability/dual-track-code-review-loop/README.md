@@ -56,11 +56,11 @@ consumer closed, or merge/release occurred.
  │    └─ #549 D1-BUF adapter       BLOCKED_ON_PROVIDER
  ├─ #521 M1 semantic-context plane
  │    └─ #550 M1-C semantic adapter   BLOCKED
- ├─ #522 X1 synthesis/closure compiler   OPEN (landed in-tree this wave; pending closure receipt)
- ├─ #523 R1 single-repo refactor protocol   OPEN
+ ├─ #522 X1 synthesis/closure compiler   CLOSED (landed and closed via PR #563)
+ ├─ #523 R1 single-repo refactor protocol   OPEN (landed in-tree: refactor/ + four contracts, suite-counted; current issue state on GitHub)
  ├─ #524 R2 cross-repo expand & contract     OPEN
  ├─ #525 E1 independent Shadow / mutations / closure denominator   OPEN
- ├─ #526 D2 this convergence (README/AGENTS/prompts/routing/traceability)
+ ├─ #526 D2 this convergence (README/AGENTS/prompts/routing/traceability)   CLOSED via PR #563
  ├─ #527 B1 bootstrap profile for new repositories   OPEN
  └─ #528 L1 live consumer canary / Local Handoff / final admission   OPEN
 ```
@@ -87,8 +87,9 @@ merge, release, production, visibility            HUMAN_ADMIT_REQUIRED
 This convergence repairs the Skill's own README/AGENTS/SKILL directory map and
 evidence ceiling (previously stale by two landings: the 16 D1/M1 interface
 schemas and the two adapters), compiles the P0-P8 prompt catalogue, and writes
-this directory's traceability projections. It does not implement `#522`,
-`#525`, `#547`, `#549`, `#550`, `#527` or `#528` — those remain open, and their
-own Workers own their own evidence. The next owner after this convergence is
+this directory's traceability projections. It did not implement `#522`
+(landed separately and closed via PR #563) nor `#525`, `#547`, `#549`,
+`#550`, `#527` or `#528` — those remain open, and their own Workers own
+their own evidence. The next owner after this convergence is
 whichever of those lanes is picked up next, plus `#525`'s independent Shadow
 pass over the Skill contract and adapters this convergence only describes.

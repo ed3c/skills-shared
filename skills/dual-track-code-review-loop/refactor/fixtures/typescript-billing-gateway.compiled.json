@@ -1,0 +1,199 @@
+{
+  "changeset_lease": {
+    "behavior_tests": {
+      "frozen": [
+        {
+          "post_digest": "2c624232cdd221771294dfbb310aca000a0df6ac8b66b696d90ef06fdefb64a3",
+          "pre_digest": "2c624232cdd221771294dfbb310aca000a0df6ac8b66b696d90ef06fdefb64a3",
+          "test_ref": "src/application/billing/subscription-service.behavior.test.ts"
+        }
+      ],
+      "mutated_test_refs": []
+    },
+    "binding_id": "DTCR-CL-001",
+    "changed_paths": [
+      "src/application/billing/billing-port.ts",
+      "src/application/billing/subscription-service.ts",
+      "src/composition/container.ts"
+    ],
+    "composition_roots": [
+      {
+        "admitted": true,
+        "root_path": "src/composition/container.ts"
+      }
+    ],
+    "generated_paths_touched": [],
+    "lease": {
+      "escaped_paths": [],
+      "lease_paths": [
+        "src/application/billing/",
+        "src/composition/"
+      ],
+      "lease_writers": [
+        "the single admitted refactor writer for this changeset"
+      ]
+    },
+    "merge_admission": "HUMAN_ADMIT_REQUIRED",
+    "port_ref": "DTCR-PT-001",
+    "public_api": {
+      "changed": true,
+      "contract_owner_admission": "ADMITTED"
+    },
+    "schema": "dtcr/refactor-changeset-lease/v1",
+    "subject": {
+      "repository_binding_id": "DTCR-RB-1a2b3c4d5e6f7081",
+      "subject_commit": "7d2ef0a41c9b8e3f5a6d0c1b2e3f4a5b6c7d8e9f",
+      "subject_tree": "0a1b2c3d4e5f60718293a4b5c6d7e8f901234567"
+    }
+  },
+  "derived_from": "typescript-billing-gateway.json",
+  "minimal_port": {
+    "establishes": {
+      "applied": false,
+      "behavior_preserved": false
+    },
+    "injection": {
+      "concrete_imports_remaining": [],
+      "construction_sites_replaced": [
+        "src/application/billing/subscription-service.ts:SubscriptionService.constructor"
+      ]
+    },
+    "owning_layer": "APPLICATION",
+    "port_id": "DTCR-PT-001",
+    "port_members": [
+      {
+        "justified_by_call_site_refs": [
+          "CS-103"
+        ],
+        "member": "ChargeOutcome",
+        "member_kind": "TYPE"
+      },
+      {
+        "justified_by_call_site_refs": [
+          "CS-101"
+        ],
+        "member": "charge",
+        "member_kind": "METHOD"
+      },
+      {
+        "justified_by_call_site_refs": [
+          "CS-102"
+        ],
+        "member": "refund",
+        "member_kind": "METHOD"
+      }
+    ],
+    "schema": "dtcr/refactor-minimal-port/v1",
+    "signature_ref": "DTCR-US-001",
+    "subject": {
+      "repository_binding_id": "DTCR-RB-1a2b3c4d5e6f7081",
+      "subject_commit": "7d2ef0a41c9b8e3f5a6d0c1b2e3f4a5b6c7d8e9f",
+      "subject_tree": "0a1b2c3d4e5f60718293a4b5c6d7e8f901234567"
+    },
+    "unused_provider_members": []
+  },
+  "receipt": {
+    "authority": {
+      "merge": false,
+      "production": false,
+      "release": false
+    },
+    "blocked_on": [],
+    "changeset_ref": "DTCR-CL-001",
+    "establishes": {
+      "applied_on_real_codebase": false,
+      "behavior_equivalence_proven": false,
+      "protocol_ready": false
+    },
+    "readback": {
+      "behavior_tests": {
+        "passed": 128,
+        "state": "PASS",
+        "total": 128
+      },
+      "forbidden_edge_count": 0,
+      "new_cycles": 0,
+      "reindex_state": "REINDEXED",
+      "typecheck": "PASS"
+    },
+    "receipt_id": "DTCR-R1-001",
+    "schema": "dtcr/refactor-r1-receipt/v1",
+    "states_entered": [
+      "VIOLATION_BOUND",
+      "USAGE_SIGNATURE_EXTRACTED",
+      "MINIMAL_PORT_PROPOSED",
+      "CHANGESET_AND_LEASE_BOUND",
+      "DOMAIN_DEPENDENCY_INVERTED",
+      "COMPOSITION_ROOT_UPDATED",
+      "TYPECHECK_AND_TEST_READBACK",
+      "SCIP_REINDEXED",
+      "SQLITE_ARCHITECTURE_ASSERTED",
+      "GLOBAL_BEHAVIOR_ASSERTED"
+    ],
+    "subject": {
+      "repository_binding_id": "DTCR-RB-1a2b3c4d5e6f7081",
+      "subject_commit": "7d2ef0a41c9b8e3f5a6d0c1b2e3f4a5b6c7d8e9f",
+      "subject_tree": "0a1b2c3d4e5f60718293a4b5c6d7e8f901234567"
+    },
+    "terminal_state": "CANDIDATE_RECEIPT"
+  },
+  "schema": "dtcr/refactor-r1-projection/v1",
+  "usage_signature": {
+    "adapter": {
+      "adapter_binding_id": "DTCR-AD-7b2c3d4e5f607182",
+      "capability_class": "SYNTAX_TREE_REWRITE",
+      "language": "typescript",
+      "language_support": "SUPPORTED_BY_DECLARED_ADAPTER",
+      "pins": {
+        "formatter_behavior": "preserves trivia on untouched nodes; reprints the edited statement only",
+        "grammar_or_dialect": "typescript-5.4-strict",
+        "license_id": "MIT",
+        "tool_version": "0.0.0-declared-not-resolved"
+      },
+      "provider_state": "DECLARED_NOT_VENDORED",
+      "vendored": false
+    },
+    "consumed_members": [
+      {
+        "call_site_refs": [
+          "CS-103"
+        ],
+        "member": "ChargeOutcome",
+        "member_kind": "TYPE"
+      },
+      {
+        "call_site_refs": [
+          "CS-101"
+        ],
+        "member": "charge",
+        "member_kind": "METHOD"
+      },
+      {
+        "call_site_refs": [
+          "CS-102"
+        ],
+        "member": "refund",
+        "member_kind": "METHOD"
+      }
+    ],
+    "establishes": {
+      "provider_surface_complete": false,
+      "rewrite_applied": false
+    },
+    "extraction": {
+      "call_sites_declared": 3,
+      "call_sites_resolved": 3,
+      "completeness": "COMPLETE_FOR_RESOLVED_CALL_SITES",
+      "unresolved_call_site_refs": []
+    },
+    "provider_symbol": "StripeBillingClient",
+    "schema": "dtcr/refactor-usage-signature/v1",
+    "signature_id": "DTCR-US-001",
+    "subject": {
+      "repository_binding_id": "DTCR-RB-1a2b3c4d5e6f7081",
+      "subject_commit": "7d2ef0a41c9b8e3f5a6d0c1b2e3f4a5b6c7d8e9f",
+      "subject_tree": "0a1b2c3d4e5f60718293a4b5c6d7e8f901234567"
+    },
+    "violation_ref": "DTCR-VC-002"
+  }
+}

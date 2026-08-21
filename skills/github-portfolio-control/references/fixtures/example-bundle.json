@@ -1,0 +1,271 @@
+{
+  "ci_epoch": {
+    "authority": {
+      "merge": false,
+      "production": false,
+      "promotion": false,
+      "provider_execution": false,
+      "release": false
+    },
+    "candidate": {
+      "base_commit": "3fc020414134999227aec6ba9304a08e86287033",
+      "changed_path_denominator": [
+        "skills/github-portfolio-control/**"
+      ],
+      "frozen": true,
+      "head_commit": "3fc020414134999227aec6ba9304a08e86287033",
+      "pr_number": 560
+    },
+    "ci_epoch_id": "GHPC-CI-001",
+    "epoch_ref": {
+      "main_commit": "3fc020414134999227aec6ba9304a08e86287033",
+      "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d"
+    },
+    "evidence_ceiling": "HOSTED_EXECUTION_ONLY",
+    "hosted_run": {
+      "artifacts": [],
+      "conclusion": "NOT_EXERCISED",
+      "execution_state": "NOT_EXERCISED",
+      "hosted_evidence_grade": "NOT_EVIDENCE",
+      "jobs": [],
+      "non_empty_steps": 0,
+      "run_id": null,
+      "tested_head": null
+    },
+    "human_owned_operations": [
+      "publishing the candidate and marking it ready exactly once",
+      "merge and release"
+    ],
+    "merge_admission": "HUMAN_ADMIT_REQUIRED",
+    "publication": {
+      "draft_first_policy": true,
+      "draft_phase_pushes": 0,
+      "local_gates_pass_at_head": true,
+      "publication_state": "NOT_PUBLISHED",
+      "pushes_after_ready": 0,
+      "ready_marked_count": 0
+    },
+    "readback": {
+      "artifacts_read_back": false,
+      "jobs_read_back": false,
+      "steps_read_back": false,
+      "tested_head_equals_candidate_head": false
+    },
+    "rerun": {
+      "classifier": "NONE",
+      "code_head_config_unchanged": false,
+      "rerun_count": 0
+    },
+    "schema": "ghpc/one-shot-ci-epoch/v1",
+    "semantic_acceptance": false
+  },
+  "composition": {
+    "authority": {
+      "merge": false,
+      "production": false,
+      "promotion": false,
+      "provider_execution": false,
+      "release": false
+    },
+    "composed_authorities": [
+      {
+        "authority_kind": "TASK_DAG_AND_ISSUE_CLOSURE",
+        "body_copied": false,
+        "owner_route": "skills/agentic-tech-lead-orchestration/README.md",
+        "owns": "task and capability DAG, Issue closure, problem closure, Local Handoff and controller acceptance"
+      },
+      {
+        "authority_kind": "ADVERSARIAL_READ_ONLY_REVIEW",
+        "body_copied": false,
+        "owner_route": "skills/procedural-shadow-runtime/README.md",
+        "owns": "read-only adversarial review and the architecture, evidence and authority deltas it raises"
+      },
+      {
+        "authority_kind": "HOSTED_DELIVERY_EVIDENCE",
+        "body_copied": false,
+        "owner_route": "skills/github-delivery-loop/SKILL.md",
+        "owns": "the trusted provider snapshot and exact-head publication and workflow evidence"
+      },
+      {
+        "authority_kind": "GIT_ANCESTRY_AND_PATH_LEASES",
+        "body_copied": false,
+        "owner_route": "skills/git-town-stacked-pr-worker/README.md",
+        "owns": "real Git ancestry, worktree and path leases, and Stack delivery"
+      },
+      {
+        "authority_kind": "CONSUMER_BOOTSTRAP",
+        "body_copied": false,
+        "owner_route": "skills/shared-skills-infra/SKILL.md",
+        "owns": "thin immutable consumer binding and new-repository bootstrap, which this plane routes to and does not implement"
+      },
+      {
+        "authority_kind": "ISSUE_CLOSURE_CONTRACT",
+        "body_copied": false,
+        "owner_route": "skills/agentic-tech-lead-orchestration/references/ISSUE_CLOSURE_CONTRACT.md",
+        "owns": "post-landing Issue disposition and residual ownership, reused as the terminal state rather than forked"
+      }
+    ],
+    "composition_id": "GHPC-COMP-001",
+    "coordinator_instruction_route": "references/coordinator-instruction.json",
+    "evidence_ceiling": "DETERMINISTIC_COMPOSITION",
+    "human_owned_operations": [
+      "admitting a new composed authority kind",
+      "merge and release"
+    ],
+    "redefined_authority_kinds": [],
+    "schema": "ghpc/authority-composition/v1",
+    "subject_commit": "3fc020414134999227aec6ba9304a08e86287033",
+    "subject_tree": "eea625614c233b7f42fd62c129aa21852cb36b9d"
+  },
+  "epoch": {
+    "authority": {
+      "merge": false,
+      "production": false,
+      "promotion": false,
+      "provider_execution": false,
+      "release": false
+    },
+    "durable_subjects": [
+      {
+        "digest": "3fc020414134999227aec6ba9304a08e86287033",
+        "provides": "the exact repository state every control decision in this epoch is bound to",
+        "subject_kind": "MAIN_COMMIT"
+      },
+      {
+        "digest": "eea625614c233b7f42fd62c129aa21852cb36b9d",
+        "provides": "the bytes of that commit, so a later re-read is compared rather than trusted",
+        "subject_kind": "MAIN_TREE"
+      }
+    ],
+    "epoch_id": "GHPC-EPOCH-001",
+    "evidence_ceiling": "REPOSITORY_BYTES_AND_LOCAL_GIT_ONLY",
+    "human_owned_operations": [
+      "merge and release",
+      "closing an Issue against unresolved acceptance",
+      "admitting a provider data-egress boundary for private repository content"
+    ],
+    "mutable_readbacks": [
+      {
+        "durable": false,
+        "observed_value": "main",
+        "readback_kind": "BRANCH_NAME",
+        "recorded_because": "the name that pointed at this commit when it was read, kept for navigation and never as the subject"
+      },
+      {
+        "durable": false,
+        "observed_value": "the executing build reports itself under the OPUS_5 routing alias",
+        "readback_kind": "MODEL_PROSE",
+        "recorded_because": "an alias is a routing policy label; the exact carrier and model identity are bound per agent in ghpc/subagent-join/v1"
+      }
+    ],
+    "portfolio_state": "REPOSITORY_SET_FROZEN",
+    "repository": {
+      "owner_repo": "ed3c/skills-shared",
+      "visibility_class": "UNKNOWN"
+    },
+    "runtime_admission": {
+      "classification": "CLAUDE_CODE_LOCAL",
+      "exercise_receipt": "git rev-parse HEAD returned 3fc020414134999227aec6ba9304a08e86287033 and git rev-parse HEAD^{tree} returned eea625614c233b7f42fd62c129aa21852cb36b9d in a local checkout",
+      "exercise_state": "EXERCISED",
+      "local_checkout_present": true
+    },
+    "schema": "ghpc/portfolio-epoch/v1",
+    "subject": {
+      "main_commit": "3fc020414134999227aec6ba9304a08e86287033",
+      "observed_lane": "LOCAL_GIT_OBJECT_STORE",
+      "observed_on": "2026-08-21",
+      "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d"
+    },
+    "superseded_epochs": [
+      {
+        "delta": {
+          "delta_kind": "BASE_MAIN_DRIFT",
+          "from_digest": "8818e80ae5e12d0328c7b95158e681471b04682e",
+          "invalidated_states": [
+            "GITHUB_SNAPSHOT_EPOCH_BOUND",
+            "ISSUE_PR_DENOMINATOR_COMPLETE",
+            "ACCEPTANCE_CONTRACTS_COMPILED",
+            "READY_WAVES_COMPUTED"
+          ],
+          "reason": "main advanced from the connector-observed 8818e80 to 3fc0204; 8818e80 is an ancestor of the current subject, so every Issue, PR and changed-path count read at the older tree is superseded rather than merely older",
+          "to_digest": "3fc020414134999227aec6ba9304a08e86287033"
+        },
+        "epoch_id": "GHPC-EPOCH-000",
+        "main_commit": "8818e80ae5e12d0328c7b95158e681471b04682e",
+        "observed_lane": "CONNECTOR_READBACK",
+        "tree": "d6a95737e7b254c0e89ed1f7fa518d0d43cb7512"
+      }
+    ]
+  },
+  "join": {
+    "advanced_transitions": [],
+    "authority": {
+      "merge": false,
+      "production": false,
+      "promotion": false,
+      "provider_execution": false,
+      "release": false
+    },
+    "consolidation": {
+      "agreements": [],
+      "contradictions": [],
+      "omissions": [
+        "no acceptance-adversary, dependency-auditor or release-auditor was requested in this wave, so their findings are absent rather than negative"
+      ],
+      "unresolved_blockers": [
+        "the requested implementation-worker had not terminated when this record was written"
+      ]
+    },
+    "coordinator_instruction": "Use subagents. Wait for all agents and consolidate their findings.",
+    "epoch_ref": {
+      "main_commit": "3fc020414134999227aec6ba9304a08e86287033",
+      "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d"
+    },
+    "evidence_ceiling": "JOIN_DENOMINATOR_ONLY",
+    "human_owned_operations": [
+      "merge and release",
+      "admitting a provider data-egress boundary for private repository content"
+    ],
+    "join_id": "GHPC-JOIN-001",
+    "join_state": "JOIN_INCOMPLETE",
+    "requested_agents": [
+      {
+        "agent_id": "wf_187a4bb9-606-2",
+        "attempt": 1,
+        "base_commit": "3fc020414134999227aec6ba9304a08e86287033",
+        "data_boundary": {
+          "egress_admission": "NOT_REQUIRED",
+          "provider_boundary_crossed": false,
+          "repository_visibility": "UNKNOWN"
+        },
+        "host": "CLAUDE_CODE_LOCAL",
+        "in_denominator": true,
+        "lease": {
+          "mode": "EXCLUSIVE_WRITE",
+          "paths": [
+            "skills/github-portfolio-control/**"
+          ]
+        },
+        "model_binding": {
+          "alias": "OPUS_5",
+          "availability": "AVAILABLE",
+          "carrier": "claude-code",
+          "config_effort": null,
+          "exact_model": "claude-opus-5[1m]",
+          "identity_grade": "SELF_REPORTED",
+          "provider": "anthropic"
+        },
+        "result_digest": null,
+        "role": "implementation-worker",
+        "task_id": "GHPC-TASK-560",
+        "terminal_state": "RUNNING",
+        "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d"
+      }
+    ],
+    "required_roles": [
+      "implementation-worker"
+    ],
+    "schema": "ghpc/subagent-join/v1"
+  },
+  "schema": "ghpc/portfolio-bundle/v1"
+}

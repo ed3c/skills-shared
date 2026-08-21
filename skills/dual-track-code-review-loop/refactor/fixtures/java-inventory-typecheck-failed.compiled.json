@@ -1,0 +1,201 @@
+{
+  "changeset_lease": {
+    "behavior_tests": {
+      "frozen": [
+        {
+          "post_digest": "6b51d431df5d7f141cbececcf79edf3dd861c3b4069f0b11661a3eefacbba918",
+          "pre_digest": "6b51d431df5d7f141cbececcf79edf3dd861c3b4069f0b11661a3eefacbba918",
+          "test_ref": "domain/inventory/src/test/java/InventoryAllocatorBehaviorTest.java"
+        }
+      ],
+      "mutated_test_refs": []
+    },
+    "binding_id": "DTCR-CL-001",
+    "changed_paths": [
+      "app/wiring/src/main/java/CompositionRoot.java",
+      "domain/inventory/src/main/java/InventoryAllocator.java",
+      "domain/inventory/src/main/java/InventoryPort.java"
+    ],
+    "composition_roots": [
+      {
+        "admitted": true,
+        "root_path": "app/wiring/src/main/java/CompositionRoot.java"
+      }
+    ],
+    "generated_paths_touched": [],
+    "lease": {
+      "escaped_paths": [],
+      "lease_paths": [
+        "app/wiring/",
+        "domain/inventory/"
+      ],
+      "lease_writers": [
+        "the single admitted refactor writer for this changeset"
+      ]
+    },
+    "merge_admission": "HUMAN_ADMIT_REQUIRED",
+    "port_ref": "DTCR-PT-001",
+    "public_api": {
+      "changed": false,
+      "contract_owner_admission": "NOT_REQUIRED"
+    },
+    "schema": "dtcr/refactor-changeset-lease/v1",
+    "subject": {
+      "repository_binding_id": "DTCR-RB-3c4d5e6f70819203",
+      "subject_commit": "0123456789abcdef0123456789abcdef01234567",
+      "subject_tree": "fedcba9876543210fedcba9876543210fedcba98"
+    }
+  },
+  "derived_from": "java-inventory-typecheck-failed.json",
+  "minimal_port": {
+    "establishes": {
+      "applied": false,
+      "behavior_preserved": false
+    },
+    "injection": {
+      "concrete_imports_remaining": [],
+      "construction_sites_replaced": [
+        "domain/inventory/src/main/java/InventoryAllocator.java:InventoryAllocator"
+      ]
+    },
+    "owning_layer": "DOMAIN",
+    "port_id": "DTCR-PT-001",
+    "port_members": [
+      {
+        "justified_by_call_site_refs": [
+          "CS-303"
+        ],
+        "member": "DEFAULT_WAREHOUSE",
+        "member_kind": "FIELD"
+      },
+      {
+        "justified_by_call_site_refs": [
+          "CS-301"
+        ],
+        "member": "findBySku",
+        "member_kind": "METHOD"
+      },
+      {
+        "justified_by_call_site_refs": [
+          "CS-302"
+        ],
+        "member": "reserve",
+        "member_kind": "METHOD"
+      }
+    ],
+    "schema": "dtcr/refactor-minimal-port/v1",
+    "signature_ref": "DTCR-US-001",
+    "subject": {
+      "repository_binding_id": "DTCR-RB-3c4d5e6f70819203",
+      "subject_commit": "0123456789abcdef0123456789abcdef01234567",
+      "subject_tree": "fedcba9876543210fedcba9876543210fedcba98"
+    },
+    "unused_provider_members": []
+  },
+  "receipt": {
+    "authority": {
+      "merge": false,
+      "production": false,
+      "release": false
+    },
+    "blocked_on": [
+      "BEHAVIOR_ORACLE_NOT_RUN",
+      "TYPECHECK_FAILED"
+    ],
+    "changeset_ref": "DTCR-CL-001",
+    "establishes": {
+      "applied_on_real_codebase": false,
+      "behavior_equivalence_proven": false,
+      "protocol_ready": false
+    },
+    "readback": {
+      "behavior_tests": {
+        "passed": 0,
+        "state": "NOT_RUN",
+        "total": 64
+      },
+      "forbidden_edge_count": 0,
+      "new_cycles": 0,
+      "reindex_state": "REINDEXED",
+      "typecheck": "FAIL"
+    },
+    "receipt_id": "DTCR-R1-001",
+    "schema": "dtcr/refactor-r1-receipt/v1",
+    "states_entered": [
+      "VIOLATION_BOUND",
+      "USAGE_SIGNATURE_EXTRACTED",
+      "MINIMAL_PORT_PROPOSED",
+      "CHANGESET_AND_LEASE_BOUND",
+      "DOMAIN_DEPENDENCY_INVERTED",
+      "COMPOSITION_ROOT_UPDATED",
+      "TYPECHECK_AND_TEST_READBACK",
+      "SCIP_REINDEXED",
+      "SQLITE_ARCHITECTURE_ASSERTED"
+    ],
+    "subject": {
+      "repository_binding_id": "DTCR-RB-3c4d5e6f70819203",
+      "subject_commit": "0123456789abcdef0123456789abcdef01234567",
+      "subject_tree": "fedcba9876543210fedcba9876543210fedcba98"
+    },
+    "terminal_state": "BLOCKED"
+  },
+  "schema": "dtcr/refactor-r1-projection/v1",
+  "usage_signature": {
+    "adapter": {
+      "adapter_binding_id": "DTCR-AD-9d4e5f6071829304",
+      "capability_class": "SYNTAX_TREE_REWRITE",
+      "language": "java",
+      "language_support": "SUPPORTED_BY_DECLARED_ADAPTER",
+      "pins": {
+        "formatter_behavior": "recipe-scoped printing; import order normalized across the whole compilation unit",
+        "grammar_or_dialect": "java-21",
+        "license_id": "Apache-2.0",
+        "tool_version": "0.0.0-declared-not-resolved"
+      },
+      "provider_state": "DECLARED_NOT_VENDORED",
+      "vendored": false
+    },
+    "consumed_members": [
+      {
+        "call_site_refs": [
+          "CS-303"
+        ],
+        "member": "DEFAULT_WAREHOUSE",
+        "member_kind": "FIELD"
+      },
+      {
+        "call_site_refs": [
+          "CS-301"
+        ],
+        "member": "findBySku",
+        "member_kind": "METHOD"
+      },
+      {
+        "call_site_refs": [
+          "CS-302"
+        ],
+        "member": "reserve",
+        "member_kind": "METHOD"
+      }
+    ],
+    "establishes": {
+      "provider_surface_complete": false,
+      "rewrite_applied": false
+    },
+    "extraction": {
+      "call_sites_declared": 3,
+      "call_sites_resolved": 3,
+      "completeness": "COMPLETE_FOR_RESOLVED_CALL_SITES",
+      "unresolved_call_site_refs": []
+    },
+    "provider_symbol": "JdbcInventoryDao",
+    "schema": "dtcr/refactor-usage-signature/v1",
+    "signature_id": "DTCR-US-001",
+    "subject": {
+      "repository_binding_id": "DTCR-RB-3c4d5e6f70819203",
+      "subject_commit": "0123456789abcdef0123456789abcdef01234567",
+      "subject_tree": "fedcba9876543210fedcba9876543210fedcba98"
+    },
+    "violation_ref": "DTCR-VC-004"
+  }
+}
