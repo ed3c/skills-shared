@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skills-shared.invalid/git-hosting-scale-assurance/hosting-assurance/v1",
+  "title": "Git hosting assurance packet v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version","subject","storage","durability","refs","cache","gossip","compaction","recovery","benchmark","shadow","cleanup","claims"],
+  "properties": {
+    "schema_version": {"const": "git-hosting-assurance/v1"},
+    "subject": {
+      "type": "object", "additionalProperties": false,
+      "required": ["repository","commit","tree","runtime_digest","config_digest"],
+      "properties": {
+        "repository": {"type":"string","minLength":1},
+        "commit": {"type":"string","pattern":"^[0-9a-f]{40}$"},
+        "tree": {"type":"string","pattern":"^[0-9a-f]{40}$"},
+        "runtime_digest": {"type":"string","pattern":"^sha256:[0-9a-f]{64}$"},
+        "config_digest": {"type":"string","pattern":"^sha256:[0-9a-f]{64}$"}
+      }
+    },
+    "storage": {"type":"object","additionalProperties":false,"required":["authority","durability_class"],"properties":{"authority":{"type":"string","minLength":1},"durability_class":{"type":"string","minLength":1}}},
+    "durability": {"type":"object","additionalProperties":false,"required":["persisted_before_ack","durable_readback"],"properties":{"persisted_before_ack":{"type":"boolean"},"durable_readback":{"type":"boolean"}}},
+    "refs": {"type":"object","additionalProperties":false,"required":["transaction_committed_before_visibility","cas_precondition","multi_ref_atomic"],"properties":{"transaction_committed_before_visibility":{"type":"boolean"},"cas_precondition":{"type":"boolean"},"multi_ref_atomic":{"type":"boolean"}}},
+    "cache": {"type":"object","additionalProperties":false,"required":["source_of_truth","authority_validation_before_read","rebuild_reachability_proven"],"properties":{"source_of_truth":{"type":"boolean"},"authority_validation_before_read":{"type":"boolean"},"rebuild_reachability_proven":{"type":"boolean"}}},
+    "gossip": {"type":"object","additionalProperties":false,"required":["required_for_correctness"],"properties":{"required_for_correctness":{"type":"boolean"}}},
+    "compaction": {"type":"object","additionalProperties":false,"required":["reachable_objects_preserved","reachable_refs_preserved","per_replica_cost_reported"],"properties":{"reachable_objects_preserved":{"type":"boolean"},"reachable_refs_preserved":{"type":"boolean"},"per_replica_cost_reported":{"type":"boolean"}}},
+    "recovery": {"type":"object","additionalProperties":false,"required":["corruption_detected","partial_records_rejected","history_complete_ordered"],"properties":{"corruption_detected":{"type":"boolean"},"partial_records_rejected":{"type":"boolean"},"history_complete_ordered":{"type":"boolean"}}},
+    "benchmark": {"type":"object","additionalProperties":false,"required":["immutable_subject","matched_topology","durability_consistency_denominator","errors_in_denominator","scope"],"properties":{"immutable_subject":{"type":"boolean"},"matched_topology":{"type":"boolean"},"durability_consistency_denominator":{"type":"boolean"},"errors_in_denominator":{"type":"boolean"},"scope":{"enum":["BOUNDED_TOPOLOGY","ARBITRARY_SCALE"]}}},
+    "shadow": {"type":"object","additionalProperties":false,"required":["independent","human_admit"],"properties":{"independent":{"type":"boolean"},"human_admit":{"type":"boolean"}}},
+    "cleanup": {"type":"object","additionalProperties":false,"required":["complete","rollback_subject"],"properties":{"complete":{"type":"boolean"},"rollback_subject":{"type":"string","pattern":"^[0-9a-f]{40}$"}}},
+    "claims": {"type":"object","additionalProperties":false,"required":["source_performance_promoted","fixture_promoted_to_live"],"properties":{"source_performance_promoted":{"type":"boolean"},"fixture_promoted_to_live":{"type":"boolean"}}}
+  }
+}

@@ -19,6 +19,7 @@ on:
       - 'skills/controlled-technical-language-harness/**'
       - 'skills/dual-forge-repository-loop/**'
       - 'skills/dual-track-code-review-loop/**'
+      - 'skills/git-hosting-scale-assurance/**'
       - 'skills/github-delivery-loop/**'
       - 'skills/gitlab-delivery-loop/**'
       - 'skills/html-for-decisions/**'
@@ -40,6 +41,7 @@ on:
       - 'skills/controlled-technical-language-harness/**'
       - 'skills/dual-forge-repository-loop/**'
       - 'skills/dual-track-code-review-loop/**'
+      - 'skills/git-hosting-scale-assurance/**'
       - 'skills/github-delivery-loop/**'
       - 'skills/gitlab-delivery-loop/**'
       - 'skills/html-for-decisions/**'
@@ -93,6 +95,7 @@ jobs:
           - controlled-technical-language-harness
           - dual-forge-repository-loop
           - dual-track-code-review-loop
+          - git-hosting-scale-assurance
           - github-delivery-loop
           - gitlab-delivery-loop
           - html-for-decisions
