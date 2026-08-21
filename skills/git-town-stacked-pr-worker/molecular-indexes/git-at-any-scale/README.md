@@ -1,12 +1,12 @@
 # Git at any scale — Molecular Stack index
 
-This index records the actual delivery topology for the Cursor **Git at any scale** audit. It is a traceability projection owned by #536. GitHub/Git metadata remains authority for branch, PR and merge state.
+This index records actual delivery topology for the Cursor **Git at any scale** audit. It is a traceability projection owned by #536. GitHub metadata, Git identities and exact receipts remain authority.
 
 ## State vocabulary
 
 ```text
 ISSUE_ONLY
-BRANCH_CREATED
+IMPLEMENTATION_CANDIDATE
 PR_DRAFT
 PR_OPEN
 BLOCKED
@@ -16,75 +16,103 @@ EXTERNAL_OPEN
 HISTORICAL
 ```
 
-`ISSUE_ONLY / PR_ABSENT` is valid and required. Never invent a branch, PR, workflow run, receipt, or merge merely to complete the diagram.
+Never invent a branch, PR, workflow, receipt or merge. `PR_ABSENT` is valid when true.
 
-## Current Stack
+## Current implemented Stack
 
-| Atom | Issue | PR | Relation | Selected subject | Owns paths | Provides / consumes | Deterministic evidence | Live evidence | Terminal / next owner |
+| Atom | Issue | PR | Relation | Exact selected subject | Owns paths | Provides / consumes | Deterministic evidence | Live evidence | Terminal / next owner |
 |---|---:|---:|---|---|---|---|---|---|---|
-| `P0-SOURCE` | #531 | PR_ABSENT | parent source/problem contract | source locator + `main@988a4e790af6a8bee31fd14e00e52a6e944b9f17` | dedicated trace preparation | complete problem denominator; consumes article as `SOURCE_PROPOSAL` | trace/ledger bytes on #539 preparation only | immutable source bytes absent | OPEN → #532/#534/#535/#536 |
-| `C1-CONTRACT` | #532 | PR_ABSENT | planned implementation atom; TRUE_CHILD only if exact unmerged #531 bytes are consumed | ISSUE_ONLY | future `skills/git-hosting-scale-assurance/**` | portable durability/consistency/cache/recovery contracts | NOT_IMPLEMENTED | none | OPEN → #534 |
-| `L1-LIVE` | #534 | PR_ABSENT | PROCESS_DEPENDENCY + EXTERNAL_EVIDENCE | runtime subject ABSENT | external consumer/runtime only | durability, linearizability, stale-cache, rebuild, gossip, compaction, corruption, benchmark receipts | contract precondition pending | NOT_EXERCISED | OPEN → #535/#536 |
-| `S1-SHADOW` | #535 | PR_ABSENT | EXTERNAL_EVIDENCE / READ_ONLY | exact review subject ABSENT | no Builder paths | independent falsification/admission receipt | design issue exists; exact-subject receipt absent | NOT_EXERCISED | OPEN → #536 |
-| `D1-CONVERGE` | #536 | #539 / PR_DRAFT | CONVERGENCE preparation | `agent/git-at-any-scale-closure-prep`; exact mutable head must be read live from GitHub | dedicated trace + Molecular index + Local Handoff; canonical Git Town README deferred while #412/#419 active | zero-context navigation, current-state ledger, Stack index, Local Handoff | branch readback present; exact-head hosted checks pending | creates no new physical claim | PARTIAL → final shared-path convergence |
+| `P0-SOURCE` | #531 | #539 carries preparation projection | source/problem parent | `main@988a4e790af6a8bee31fd14e00e52a6e944b9f17`; immutable article packet still absent | dedicated trace preparation | claim denominator + authority split | preparation bytes only | none | OPEN → #512/#532/#536 |
+| `D0-PREP` | #536 | #539 `PR_DRAFT` | SIBLING preparation | `agent/git-at-any-scale-closure-prep`; read live before decision | dedicated trace/index/queue | zero-context route, problem ledger, queue | owning workflows not PASS | no physical claim | PARTIAL |
+| `C1-CONTRACT` | #532 | #542 `PR_DRAFT` | SIBLING implementation candidate | `196a75ac04f6ad2c9a6e50b0645d71fea9bf43e3` | `skills/git-hosting-scale-assurance/**` | aggregate schema/checker + GS-C01..C20 mutations | candidate exists; Shared Skills Infra workflow `SKIPPED`; full #532 denominator incomplete | none | OPEN / complete receipt+fixture families |
+| `C1-COMPLETE` | #532 | PR_ABSENT | planned terminal leaf or continuation of #542 after path-owner readback | not selected | same C1 path lease | separate receipt schemas, concurrent/hollow/fault/rebuild/benchmark fixtures, repository gates | NOT_IMPLEMENTED | none | OPEN → #534 |
+| `L1-LIVE` | #534 | PR_ABSENT / consumer-owned | PROCESS_DEPENDENCY + EXTERNAL_EVIDENCE | runtime subject ABSENT | external consumer/runtime | durability, linearizability, stale-cache, gossip, rebuild, compaction, corruption, benchmark receipts | waits for admitted C1 interface | NOT_EXERCISED | OPEN → #535/#536 |
+| `S1-SHADOW` | #535 | none | EXTERNAL_EVIDENCE / READ_ONLY | terminal exact review subject ABSENT | no Builder paths | GS-S01..S16 independent verdict | design/readback comments only | NOT_EXERCISED | OPEN → #536 |
+| `D1-CONVERGE` | #536 | PR_ABSENT for final shared-path leaf | CONVERGENCE | selected admitted prerequisites not yet available | root/shared routes + canonical Git Town README after writer reconciliation | current-main zero-context navigation and terminal index | blocked on prerequisites/writers | no new live claim | BLOCKED/PARTIAL → Human Admit |
 
-## Branch / issue / evidence DAG
+## Delivery / evidence DAG
 
 ```mermaid
 flowchart TD
-    P0[#531 P0-SOURCE]
-    C1[#532 C1-CONTRACT]
-    L1[#534 L1-LIVE]
-    S1[#535 S1-SHADOW]
-    D1[#536 D1-CONVERGE / PR #539]
+    SRC[#512 immutable source]
+    P0[#531 P0]
+    D0[#539 D0-PREP]
+    C1[#542 C1 candidate]
+    CC[C1 denominator completion]
+    L1[#534 L1 live]
+    S1[#535 S1 Shadow]
+    D1[#536 final convergence]
     H[Human Admit]
 
+    SRC --> P0
+    P0 --> D0
     P0 --> C1
-    C1 -. process/interface dependency .-> L1
-    P0 -. exact source review .-> S1
-    C1 -. exact contract review .-> S1
-    L1 -. live receipt review .-> S1
-    P0 --> D1
-    C1 --> D1
-    L1 -. evidence dependency .-> D1
-    S1 -. advisory evidence .-> D1
+    C1 --> CC
+    CC -. admitted Method interface .-> L1
+    SRC -. source evidence .-> S1
+    CC -. exact contract .-> S1
+    L1 -. exact live receipts .-> S1
+    D0 --> D1
+    CC --> D1
+    L1 --> D1
+    S1 --> D1
     D1 --> H
 ```
 
-### Git ancestry rule
-
-The diagram above is not a Git parent graph. Use these laws:
+### Git ancestry law
 
 ```text
-SIBLING       = path/resource-disjoint work on a common admitted base
+SIBLING       = path/resource-disjoint work consuming a common admitted base
 TRUE_CHILD    = child consumes named unmerged parent bytes/contracts
-CONVERGENCE   = one writer consumes selected prerequisites for shared routes/indexes
-PROCESS_DEPENDENCY = ordering/evidence dependency without Git ancestry
-EXTERNAL_EVIDENCE  = runtime/Shadow/provider evidence; not a Stack parent by default
+CONVERGENCE   = one writer consumes selected prerequisites for shared paths
+PROCESS_DEPENDENCY = ordering/interface dependency without Git ancestry
+EXTERNAL_EVIDENCE  = runtime/Shadow/provider evidence, not a Git parent by default
 ```
 
-At this audit epoch #532/#534/#535 have issues but no implementation PRs, so no serial Git Stack is claimed. PR #539 is the path-bounded D1 preparation candidate; it does not turn the other issue relations into Git ancestry.
+#539 and #542 are siblings: #542 consumes issue contracts and admitted `main`, not #539 unmerged bytes.
 
-## Current writer collision
+## #542 first-red / missing molecular leaves
 
-Observed 2026-08-21:
+The implemented candidate is useful but does not yet equal issue #532 closure. Missing molecular work includes:
+
+```text
+operation-history + linearizability contract/fixture
+separate durability/ref/read/cache/gossip/compaction/recovery receipt contracts
+hollow durable readback
+stale-cache catch-up
+cache destroy/rebuild
+gossip drop/delay/reorder/duplicate
+reachable compaction
+corruption/partial-record/restart
+benchmark denominator fixture
+hosting closure record
+repository-wide deterministic gates
+exact-head hosted PASS
+```
+
+These may remain one #542 continuation only while one-writer/path isolation stays true; otherwise Tech Lead must split path-disjoint terminal leaves and record real PRs here.
+
+## Shared writer collision
+
+Observed current blockers:
 
 ```text
 PR #412 -> skills/git-town-stacked-pr-worker/README.md
 PR #419 -> skills/git-town-stacked-pr-worker/README.md + docs/INDEX.md
 ```
 
-Therefore #539 does **not** modify the canonical Git Town README. #536 must later select one explicit convergence strategy: consume one writer as a true dependency, supersede with a Human-reviewed current-main convergence, or wait until the writer is terminal. Text mergeability alone is insufficient.
+Therefore neither #539 nor #542 owns canonical `skills/git-town-stacked-pr-worker/README.md`. #536 owns final shared-path convergence only after these writers are consumed, superseded or terminally resolved.
 
-## Molecular end-state required by #531
+## Admission end-state
 
 ```text
-P0 source packet immutable + denominator complete
-+ C1 portable assurance contracts admitted
-+ L1 real hosting canary verified or explicit Human scope exclusion
-+ S1 exact-subject independent Shadow verdict
-+ D1 current-main README/AGENTS/Stack/Local-Handoff convergence
+immutable source packet
++ complete/admitted C1 contract denominator
++ bounded real L1 canary or explicit Human scope exclusion
++ exact-subject independent S1 verdict
++ current-main D1 shared convergence
++ exact-head required gates
 → READY_FOR_HUMAN_ADMIT
 ```
 
-Merge, release, provider/account activation, production adoption, cost acceptance, and rollback remain Human/trusted-operator actions.
+Merge, release, provider/account activation, production adoption, cost acceptance and rollback remain Human/trusted-operator operations.
