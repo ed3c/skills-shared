@@ -1,0 +1,91 @@
+{
+  "skill_name": "productization-operating-loop",
+  "version": "1.0.0",
+  "_meta": {
+    "coverage_metric": "planted false-promotion refusal rate by named guard. A planted control counts only when the run produces the refusal code that owns it AND the guard it names -- the exact schema keyword path, the compiler's K-code, or the named reopen gate. A generic failure is not a detection: a plane that reports one failure for fourteen different promotions cannot tell a market-attention laundering from a dropped payment denominator, and would look identical to a working one at the exit status.",
+    "denominator_source": "Every denominator is counted on the run. tests/selftest.py globs references/**/*.schema.json and counts its own schemas, positives, controls and knockouts; tests/evidence_plane.py reconciles its cases against cases.json in both directions and its planted promotions against the fourteen preregistered in the issue. There is no filename list anywhere in the suite: adding a lane schema changes the printed numbers without changing a test file, and dropping a planted control turns the run red by name.",
+    "scope": "This plane records what skills/productization-operating-loop/tests/run-all.sh decides on current repository bytes. It is not the repository skill-eval plane and it is not evidence about any product.",
+    "uncovered_by_design": [
+      "whether the market, user, commercial or policy claims are true of the world -- the contracts refuse how a claim is filed, never whether it happened",
+      "whether the runtime lane would pass if anybody entered it -- the plane refuses hiding the lane, not the absence of the trace",
+      "whether a Human would admit the composition, which is the one cell no gate here is allowed to compute",
+      "whether the reopen pass asks every question a reader would; it asks six, and a seventh promotion nobody preregistered is not detected by construction"
+    ]
+  },
+  "runnable": [
+    {
+      "id": "POL-1",
+      "checker_script": "tests/selftest.py",
+      "test_verify": "tests/selftest.py",
+      "good_fixture": "references",
+      "hollow_fixture": null,
+      "hollow_mutations": "one in-process knockout per committed control: the exact keyword its own refused_by names is removed from a deep copy of the schema and the refused instance must then validate, with the two granularity traps handled -- a multi-keyword refused_by removes every path it names, and a guard reached through a not key loses the whole not-clause because not:{} refuses everything and would falsely credit the guard",
+      "covers": [
+        "every committed schema example validates against its own contract",
+        "every committed refusal control is actually refused",
+        "every control discriminates the single keyword it names rather than some other guard",
+        "a schema with no properties.schema.const, or two schemas claiming one identity, is refused"
+      ],
+      "expected": "the tree-derived denominators are printed and every control is discriminating; adding a schema moves the numbers without editing the suite, and weakening a guard turns it red by name"
+    },
+    {
+      "id": "POL-2",
+      "checker_script": "scripts/compile_pol_composition.py",
+      "test_verify": "tests/evidence_plane.py",
+      "good_fixture": "tests/fixtures/evidence-plane-base.json",
+      "hollow_fixture": null,
+      "hollow_mutations": "on the plane's own base composition, one edit each: a user lane claiming USER_VALIDATED with only a command exit under it, a projection entry asserting completion authority, and a policy record composed while its own terminal says SUPERSEDED",
+      "covers": [
+        "K01_STALE_LANE_ARTIFACT",
+        "K04_AUTHORITY_WIDENING",
+        "K08_RUNG_PROMOTED_ABOVE_RECEIPTS",
+        "the compiler's own --selftest: six artifacts byte-stable across two compilations and one reordering, validated against six committed contracts, all eight K-codes fired",
+        "the compiler admits a lane artifact its own contract refuses, which is why the plane validates the four lane artifacts before the compiler sees them"
+      ],
+      "expected": "each of the three composition-level promotions exits through the compiler's own named K-code rather than through a generic failure, and the compiler's selftest fires the remaining five codes"
+    },
+    {
+      "id": "POL-3",
+      "checker_script": "tests/evidence_plane.py",
+      "test_verify": "tests/evidence_plane.py",
+      "good_fixture": "tests/fixtures/evidence-plane-base.json",
+      "hollow_fixture": null,
+      "hollow_mutations": "nineteen single-edit copies of one honest composition: seven lane artifacts swapped for the refusal-control instances their own contracts froze, two compiled documents edited after compilation, three stale subjects, one skipped lane whose only record is removed, one blocked attempt whose cell is removed, one projection read back against nothing, one runtime lane cleared on a bootstrap, and one hollow composition carrying four lane artifacts, two method refs, one projection, five cells and no receipt at all",
+      "covers": [
+        "E01_LANE_CONTRACT_REFUSED_THE_ARTIFACT",
+        "E02_COMPILED_ARTIFACT_REFUSED_BY_ITS_CONTRACT",
+        "E03_PASS_CELL_WITHOUT_AN_EARNED_RUNG",
+        "E04_LANE_STATE_ABOVE_ITS_LADDER",
+        "E05_FIRST_GREEN_HID_A_SKIPPED_LANE",
+        "E06_ATTEMPT_DROPPED_FROM_DENOMINATOR",
+        "E07_STALE_SUBJECT_REUSED",
+        "E08_PROJECTION_READBACK_WITHOUT_COMPARISON",
+        "the base composition is green under every gate, so the plane is not a checker that fails everything",
+        "all fourteen preregistered false promotions have a planted case",
+        "cases.json planted_controls equals the cases that actually ran"
+      ],
+      "expected": "the base is green and every planted case is refused by the exact code and guard it names; nine of the nineteen were green to the lane contracts and the compiler and are caught only by the reopen pass, which is the number that says what the first green was worth"
+    }
+  ],
+  "evidence_ceiling": {
+    "portable_procedure": "NOT_IMPLEMENTED",
+    "deterministic_contract": "PASS",
+    "deterministic_composition": "PASS",
+    "mutation_sensitivity": "PASS",
+    "shadow_closure_semantics": "PASS",
+    "market_demand": "NOT_EXERCISED",
+    "user_or_paid_validation": "NOT_EXERCISED",
+    "rights_or_legal_clearance": "HUMAN_ADMIT_REQUIRED",
+    "live_provider_execution": "NOT_EXERCISED",
+    "ci_arrival_for_this_suite": "PASS",
+    "merge_release_and_rights": "HUMAN_ADMIT_REQUIRED"
+  },
+  "ceiling_owners": {
+    "portable_procedure": "no SKILL.md body exists in this directory yet; the contracts and the compiler are shapes later work must fit, not the method",
+    "market_demand": "no lane in this repository observes an arena; the market contract refuses how a signal is filed and says so in its own control prose",
+    "user_or_paid_validation": "consumer user and commercial evidence owners; the plane refuses the promotion, it cannot perform the observation",
+    "rights_or_legal_clearance": "a Human rights admission; the policy contract pins legal_clearance false and the plane replays that pin through a composition",
+    "live_provider_execution": "no runtime lane receipt exists at this head, which is exactly the lane the E05 control refuses to let anybody skip quietly",
+    "ci_arrival_for_this_suite": ".github/workflows/skill-suites.yml carries this Skill in its matrix and path filters and invokes tests/run-all.sh; scripts/check_suite_ci_coverage.py resolves the matrix to that job. Being named in a paths filter is not an arrival."
+  }
+}
