@@ -1,0 +1,269 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dtcr-fact-bundle.schema.json",
+  "title": "DTCR normalized deterministic fact bundle",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "bundle_id",
+    "subject",
+    "provider_observation_refs",
+    "facts",
+    "aggregate_coverage",
+    "blast_radius",
+    "authority"
+  ],
+  "properties": {
+    "schema": {"const": "dtcr/fact-bundle/v1"},
+    "bundle_id": {"type": "string", "pattern": "^DTCR-FB-[0-9]{3,}$"},
+    "subject": {"$ref": "#/$defs/subject"},
+    "provider_observation_refs": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^DTCR-PO-[0-9]{3,}$"}
+    },
+    "facts": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/fact"}
+    },
+    "aggregate_coverage": {"$ref": "#/$defs/coverage"},
+    "blast_radius": {
+      "oneOf": [
+        {"type": "null"},
+        {"$ref": "#/$defs/blast_radius"}
+      ]
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["semantic_truth", "task_pass", "merge", "release", "production"],
+      "properties": {
+        "semantic_truth": {"const": false},
+        "task_pass": {"const": false},
+        "merge": {"const": false},
+        "release": {"const": false},
+        "production": {"const": false}
+      }
+    }
+  },
+  "$defs": {
+    "repo_path": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9._-]+(/[A-Za-z0-9._-]+)*$"
+    },
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "commit", "tree"],
+      "properties": {
+        "repository": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+        "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "tree": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+      }
+    },
+    "range": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["start_line", "start_column", "end_line", "end_column"],
+      "properties": {
+        "start_line": {"type": "integer", "minimum": 1},
+        "start_column": {"type": "integer", "minimum": 0},
+        "end_line": {"type": "integer", "minimum": 1},
+        "end_column": {"type": "integer", "minimum": 0}
+      }
+    },
+    "location": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "blob", "range"],
+      "properties": {
+        "path": {"$ref": "#/$defs/repo_path"},
+        "blob": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "range": {"$ref": "#/$defs/range"}
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["completeness", "denominator_description", "warnings", "omissions"],
+      "properties": {
+        "completeness": {"enum": ["EXACT_FOR_DECLARED_DENOMINATOR", "PARTIAL", "UNKNOWN", "NOT_APPLICABLE"]},
+        "denominator_description": {"type": "string", "minLength": 8, "maxLength": 512},
+        "warnings": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+        "omissions": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true}
+      }
+    },
+    "fact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fact_id",
+        "kind",
+        "provider_observation_ref",
+        "provenance",
+        "completeness",
+        "identity",
+        "location",
+        "relationship"
+      ],
+      "properties": {
+        "fact_id": {"type": "string", "pattern": "^DTCR-FACT-[0-9]{3,}$"},
+        "kind": {"enum": ["SYNTAX_MATCH", "SYMBOL", "OCCURRENCE", "RELATIONSHIP", "DEPENDENCY_EDGE", "CONTRACT_RESULT"]},
+        "provider_observation_ref": {"type": "string", "pattern": "^DTCR-PO-[0-9]{3,}$"},
+        "provenance": {
+          "enum": [
+            "PARSER_QUERY",
+            "INDEX_SYMBOL",
+            "INDEX_RELATIONSHIP",
+            "COMPILER_RESOLUTION",
+            "CONTRACT_CHECKER",
+            "GRAPH_LEDGER_REPLAY",
+            "OCCURRENCE_ENCLOSING_RANGE_HEURISTIC"
+          ]
+        },
+        "completeness": {"enum": ["EXACT_FOR_DECLARED_DENOMINATOR", "PARTIAL", "UNKNOWN", "NOT_APPLICABLE"]},
+        "identity": {"type": "string", "minLength": 1, "maxLength": 1024},
+        "location": {
+          "oneOf": [
+            {"type": "null"},
+            {"$ref": "#/$defs/location"}
+          ]
+        },
+        "relationship": {
+          "oneOf": [
+            {"type": "null"},
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["from", "to", "kind"],
+              "properties": {
+                "from": {"type": "string", "minLength": 1, "maxLength": 1024},
+                "to": {"type": "string", "minLength": 1, "maxLength": 1024},
+                "kind": {"enum": ["CALL", "REFERENCE", "IMPORT", "IMPLEMENTS", "EXTENDS", "DEPENDS_ON", "CONTRACT_COMPATIBILITY"]}
+              }
+            }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {"provenance": {"const": "OCCURRENCE_ENCLOSING_RANGE_HEURISTIC"}},
+            "required": ["provenance"]
+          },
+          "then": {
+            "properties": {"completeness": {"enum": ["PARTIAL", "UNKNOWN"]}},
+            "required": ["completeness"]
+          }
+        }
+      ]
+    },
+    "blast_radius": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["seed_fact_ids", "edge_fact_ids", "max_depth", "cycle_policy", "visited_nodes", "coverage"],
+      "properties": {
+        "seed_fact_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^DTCR-FACT-[0-9]{3,}$"}
+        },
+        "edge_fact_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^DTCR-FACT-[0-9]{3,}$"}
+        },
+        "max_depth": {"type": "integer", "minimum": 1, "maximum": 128},
+        "cycle_policy": {"const": "VISIT_EACH_NORMALIZED_NODE_ONCE"},
+        "visited_nodes": {"type": "integer", "minimum": 1},
+        "coverage": {"$ref": "#/$defs/coverage"}
+      }
+    }
+  },
+  "examples": [
+    {
+      "schema": "dtcr/fact-bundle/v1",
+      "bundle_id": "DTCR-FB-001",
+      "subject": {
+        "repository": "example/project",
+        "commit": "0123456789abcdef0123456789abcdef01234567",
+        "tree": "89abcdef0123456789abcdef0123456789abcdef"
+      },
+      "provider_observation_refs": ["DTCR-PO-001"],
+      "facts": [
+        {
+          "fact_id": "DTCR-FACT-001",
+          "kind": "DEPENDENCY_EDGE",
+          "provider_observation_ref": "DTCR-PO-001",
+          "provenance": "COMPILER_RESOLUTION",
+          "completeness": "EXACT_FOR_DECLARED_DENOMINATOR",
+          "identity": "domain/order -> infra/store",
+          "location": {
+            "path": "domain/order.go",
+            "blob": "0123456789abcdef0123456789abcdef01234567",
+            "range": {"start_line": 10, "start_column": 0, "end_line": 10, "end_column": 12}
+          },
+          "relationship": {"from": "domain/order", "to": "infra/store", "kind": "DEPENDS_ON"}
+        }
+      ],
+      "aggregate_coverage": {
+        "completeness": "EXACT_FOR_DECLARED_DENOMINATOR",
+        "denominator_description": "one compiler-resolved import selected by the fixture",
+        "warnings": [],
+        "omissions": []
+      },
+      "blast_radius": null,
+      "authority": {"semantic_truth": false, "task_pass": false, "merge": false, "release": false, "production": false}
+    }
+  ],
+  "x-refusal-controls": [
+    {
+      "case_id": "DTCR-D1C-FACT-001",
+      "refuses": "Occurrence-range nesting promoted to exact completeness.",
+      "refused_by": "$defs.fact.allOf[0].then.properties.completeness.enum",
+      "instance": {
+        "schema": "dtcr/fact-bundle/v1",
+        "bundle_id": "DTCR-FB-101",
+        "subject": {"repository": "example/project", "commit": "0123456789abcdef0123456789abcdef01234567", "tree": "89abcdef0123456789abcdef0123456789abcdef"},
+        "provider_observation_refs": ["DTCR-PO-001"],
+        "facts": [{"fact_id": "DTCR-FACT-101", "kind": "RELATIONSHIP", "provider_observation_ref": "DTCR-PO-001", "provenance": "OCCURRENCE_ENCLOSING_RANGE_HEURISTIC", "completeness": "EXACT_FOR_DECLARED_DENOMINATOR", "identity": "caller->callee", "location": null, "relationship": {"from": "caller", "to": "callee", "kind": "CALL"}}],
+        "aggregate_coverage": {"completeness": "PARTIAL", "denominator_description": "only occurrences already resolved and located by the index", "warnings": [], "omissions": ["dynamic dispatch and unresolved calls"]},
+        "blast_radius": null,
+        "authority": {"semantic_truth": false, "task_pass": false, "merge": false, "release": false, "production": false}
+      }
+    },
+    {
+      "case_id": "DTCR-D1C-FACT-002",
+      "refuses": "A fact bundle granting itself task PASS.",
+      "refused_by": "properties.authority.properties.task_pass.const",
+      "instance": {
+        "schema": "dtcr/fact-bundle/v1",
+        "bundle_id": "DTCR-FB-102",
+        "subject": {"repository": "example/project", "commit": "0123456789abcdef0123456789abcdef01234567", "tree": "89abcdef0123456789abcdef0123456789abcdef"},
+        "provider_observation_refs": ["DTCR-PO-001"],
+        "facts": [],
+        "aggregate_coverage": {"completeness": "UNKNOWN", "denominator_description": "provider returned no normalized facts", "warnings": [], "omissions": []},
+        "blast_radius": null,
+        "authority": {"semantic_truth": false, "task_pass": true, "merge": false, "release": false, "production": false}
+      }
+    },
+    {
+      "case_id": "DTCR-D1C-FACT-003",
+      "refuses": "Unbounded recursive traversal represented as a blast radius.",
+      "refused_by": "$defs.blast_radius.properties.max_depth.maximum",
+      "instance": {
+        "schema": "dtcr/fact-bundle/v1",
+        "bundle_id": "DTCR-FB-103",
+        "subject": {"repository": "example/project", "commit": "0123456789abcdef0123456789abcdef01234567", "tree": "89abcdef0123456789abcdef0123456789abcdef"},
+        "provider_observation_refs": ["DTCR-PO-001"],
+        "facts": [],
+        "aggregate_coverage": {"completeness": "UNKNOWN", "denominator_description": "graph edge set with unspecified semantic completeness", "warnings": [], "omissions": []},
+        "blast_radius": {"seed_fact_ids": ["DTCR-FACT-001"], "edge_fact_ids": [], "max_depth": 9999, "cycle_policy": "VISIT_EACH_NORMALIZED_NODE_ONCE", "visited_nodes": 1, "coverage": {"completeness": "UNKNOWN", "denominator_description": "bounded only by normalized nodes observed in this bundle", "warnings": [], "omissions": []}},
+        "authority": {"semantic_truth": false, "task_pass": false, "merge": false, "release": false, "production": false}
+      }
+    }
+  ]
+}
