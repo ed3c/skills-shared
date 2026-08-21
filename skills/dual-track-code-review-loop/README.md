@@ -216,10 +216,10 @@ adapters' selftests (`adapters/tree-sitter/selftest.py`,
 exact head the suite prints:
 
 ```text
-schemas=27 positives=31 controls=128 knockouts=128 discriminating
+schemas=27 positives=31 controls=128 knockouts=128 leak_scan_files=32
 tree-sitter:    fixtures=2 matches=5 schema_validations=9 falsifier_rows=14 live=EXERCISED
 sqlite-ledger:  fixtures=2 cases=46 planted_mutations=22 knockouts=5/5
-synthesis:      projections=3 emitted_artifacts=8 named_refusals=16 byte-stable
+synthesis:      stability_checks=9 schema_compositions=8 refusal_codes=16 projections=3
 ```
 
 `cases.json` reconciles the schema and control lists by name against what the

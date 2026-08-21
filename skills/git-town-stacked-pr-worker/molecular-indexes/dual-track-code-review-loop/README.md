@@ -16,7 +16,7 @@ embed a mutable head SHA and is not GitHub's live state.
  │    └─ #549 D1-BUF adapter      BLOCKED_ON_PROVIDER
  ├─ #521  M1 semantic-context plane
  │    └─ #550 M1-C adapter        BLOCKED
- ├─ #522  X1 synthesis/closure compiler   IN_FLIGHT (concurrent this wave)
+ ├─ #522  X1 synthesis/closure compiler   OPEN (landed in-tree this wave; pending closure receipt)
  ├─ #523  R1 single-repo refactor protocol
  ├─ #524  R2 cross-repo Expand & Contract
  ├─ #525  E1 independent Shadow / mutations / closure denominator
@@ -38,7 +38,7 @@ concrete branch has actually consumed another branch's unmerged bytes.
 | `C0` | `#518` | `CONTRACT` | source-packet/candidate/violation/refactor/change-unit/verification/closure/disposition schemas | admitted |
 | `D1` | `#519` | `CONTRACT + TWO ADAPTERS` | 16 D1/M1 interface schemas; tree-sitter + sqlite-ledger adapters | schemas landed, adapters green in committed suite |
 | `M1` | `#521` | `CONTRACT` | optional semantic-context/organizational-memory plane | open, adapter (`#550`) blocked |
-| `X1` | `#522` | `SYNTHESIS` | dual-track synthesis + problem-closure compiler | in flight, concurrent, separate implementation subdirectory |
+| `X1` | `#522` | `SYNTHESIS` | dual-track synthesis + problem-closure compiler | landed in-tree (`synthesis/` + three schemas, suite-counted); issue open pending closure receipt |
 | `R1`/`R2` | `#523`/`#524` | `PROTOCOL` | bounded single-repo and cross-repo refactor protocols | open, start-dependent on `X1` |
 | `E1` | `#525` | `INDEPENDENT SHADOW` | mutations and evidence-closure denominator | open |
 | `D2` | `#526` | `CONVERGENCE` | README/AGENTS/SESSION-prompt/traceability navigation (this atom) | `DTCR_DOCS_PROMPTS_TRACE_READY` |
@@ -73,7 +73,7 @@ tree-sitter / sqlite-ledger adapters ──→ committed selftest.py, run-all.sh
      │
 D2 convergence (this atom) ──→ docs/traceability/dual-track-code-review-loop/*
      │
-X1 synthesis (in flight) → R1/R2 protocols → E1 Shadow → B1 bootstrap → L1 canary
+X1 synthesis (landed) → R1/R2 protocols → E1 Shadow → B1 bootstrap → L1 canary
 ```
 
 ## Evidence boundary
@@ -81,6 +81,6 @@ X1 synthesis (in flight) → R1/R2 protocols → E1 Shadow → B1 bootstrap → 
 An open child issue is not implementation evidence for the parent. A landed
 adapter's selftest is evidence for that adapter's own capability class only,
 never for the synthesis compiler, the refactor protocols, or Local Handoff. A
-concurrently in-flight issue (`#522`) is not promoted to landed by this index
-mentioning it. Merge, release, registry admission and Human legal/rights
+still-open issue (`#522` awaits its closure receipt) is not closed by this
+index mentioning its landed bytes. Merge, release, registry admission and Human legal/rights
 clearance remain separate Human-owned transitions this index cannot reach.
