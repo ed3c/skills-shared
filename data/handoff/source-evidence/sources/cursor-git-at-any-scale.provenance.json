@@ -1,0 +1,20 @@
+{
+  "kind": "ARTICLE",
+  "canonical_locator": "https://cursor.com/zh-Hant/blog/git-at-any-scale",
+  "article_title": "任何規模的 Git / Git at any scale",
+  "author": "Vicent Marti",
+  "published_date": "2026-08-18",
+  "observed_date": "2026-08-21",
+  "retrieval_method": "single read-only GET, trusted local runtime, user-admitted network prerequisite; article bytes were pre-materialized into the local scratchpad by the trusted runtime before this worker session started (no network access performed or permitted by this worker)",
+  "exact_bytes_file": "data/handoff/source-evidence/sources/cursor-git-at-any-scale.html",
+  "exact_bytes_count": 864322,
+  "exact_bytes_sha256": "25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+  "bytes_verified": "double-checked: once against the pre-materialized scratchpad source before copy, once again against the copied repository-tracked file after copy; both checks matched byte-for-byte and digest-for-digest",
+  "git_readback_repo_subject": {
+    "repo": "ed3c/skills-shared",
+    "commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+    "tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7"
+  },
+  "mutability_note": "A web page is a dated observation of a mutable resource. This digest binds THIS observation (2026-08-21) of the article at the stated canonical locator. Cursor may edit, retitle, or remove the live page at any later date without changing these bound bytes; any future re-observation requires a new exact subject, a new byte count, a new SHA-256, and a recompiled claim denominator per the #512 source-packet law. This provenance record does not assert the live page is unchanged at read time.",
+  "note": "This file is provenance/readback metadata only: no secrets, no raw prompts, no model prose beyond the deterministic retrieval/verification facts recorded above."
+}
