@@ -16,7 +16,7 @@ Do not use chat history, an old PR body, a branch name, issue state, model agree
 
 ## Current immutable implementation subject
 
-The queues in this directory are projections over the admitted implementation subject:
+The three existing queue JSON files in `skills/agentic-tech-lead-orchestration/runtime-handoff/` are projections over the subject they were compiled against and executed on (PR #516):
 
 ```text
 repository       ed3c/skills-shared
@@ -25,7 +25,7 @@ tree            a24b9b7ace6f4022967d41262ecdc704d5c11646
 rollback        d5993267e03b217dcdab9702dab0400ab03df860
 ```
 
-A later documentation merge does not rewrite this subject. Any implementation change to a queued lane makes the old queue stale and requires a newly compiled queue bound to the newly admitted commit and tree.
+Current admitted `main` has since advanced to `129f53c23a3ab15354763167b25bddc45f724c00` (docs-only PR #516 merge over the same implementation subject; empty diff against the owning scripts). A later documentation merge does not rewrite the receipt-bound subject above. Any implementation change to a queued lane makes the old queue stale and requires a newly compiled queue bound to the newly admitted commit and tree — this is now the case for #464: its predecessor #508 closed `PASS` on the subject above, so the next Codex v2 queue must be compiled fresh against `129f53c23a3ab15354763167b25bddc45f724c00`, not appended to the existing `codex-v2-local-handoff-queue.json`.
 
 ## Authority order
 
@@ -70,12 +70,11 @@ Before closing an unmerged PR as consumed, read at least one decisive file or Gi
 
 An issue can close only when its own goal and close gate are satisfied. Do not close:
 
-- #464 until a fresh v2 signed-in Codex run binds a durable result carrier and passes independent Shadow;
-- #466 until a real managed Herdr lifecycle produces a terminal, clean, content-bound receipt;
-- #508 until durable result-tree replay, exact executor provenance, and a strict worker-result schema pass their controls;
-- #512 merely because #467 compilation passes; source truth, applicability, implementation, and verification remain separately typed and require exact source packets.
+- #464 until a fresh v2 signed-in Codex run, on a queue freshly compiled against `129f53c23a3ab15354763167b25bddc45f724c00`, binds a durable result carrier and passes independent Shadow;
+- #466 until a real managed Herdr lifecycle produces a terminal, clean, content-bound receipt — PR #516's receipt is `NOT_EXERCISED` with `sample_count: 0`, and the blocker is now RECLASSIFIED from host-permission to a herdr-0.8.0 `AgentInfo` API-contract mismatch (no observation timestamp, process identity, or cleanup facts), so unblocking requires either herdr publishing those facts or the frozen observer/lifecycle contract being renegotiated;
+- #512 merely because #467 compilation passes; source truth, applicability, implementation, and verification remain separately typed and require exact source packets. PR #516 executed the first such packet (GitHub issue #435 bytes) with dispositions `OPEN`×2 / `NOT_APPLICABLE`×1 — the repair itself (classifying six unclassified commits in `evals/commit-roles.json`) has not yet been executed.
 
-#467 is validly closed as the compiler/binding method owner. #465 is a valid closed live-canary lane because the owned remote edge was added, read back, removed, and the original denominator was restored on an exact hosted receipt.
+#467 is validly closed as the compiler/binding method owner. #465 is a valid closed live-canary lane because the owned remote edge was added, read back, removed, and the original denominator was restored on an exact hosted receipt. #508 is validly closed `PASS` as the durable-carrier/provenance/schema owner (PR #516); it does not itself claim a live #464 acceptance.
 
 ## Writer and Shadow laws
 
