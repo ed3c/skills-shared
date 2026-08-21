@@ -1,0 +1,89 @@
+{
+  "schema": "dtcr/synthesis-request/v1",
+  "task": {
+    "task_ref": "review the task queue ordering change with no semantic index available",
+    "owner": "dual-track review worker",
+    "lease_paths": [
+      "skills/dual-track-code-review-loop/synthesis/"
+    ],
+    "task_state_writers": [
+      "dual-track review worker"
+    ]
+  },
+  "subject": {
+    "repository_binding_id": "DTCR-RB-0f1e2d3c4b5a6978",
+    "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+    "subject_tree": "e739d799dd8d44beb5414ed99a943ff3bacccab0"
+  },
+  "fact_bundle": {
+    "receipt_ref": "DTCR-FR-002",
+    "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+    "bundle_digest": "b5bb9d8014a0f9b1d61e21e796d78dccdf1352f23cd32812f4850b878ae4944c",
+    "graph_provenance": "OCCURRENCE_ENCLOSING_RANGE_HEURISTIC",
+    "graph_completeness": "PARTIAL_LOWER_BOUND",
+    "changed_symbol_refs": [
+      "DTCR-SF-003"
+    ],
+    "blast_radius_path_refs": [],
+    "coverage_ceiling": {
+      "ceiling_ref": "DTCR-CC-002",
+      "analysed": "NOT_MEASURED",
+      "completeness": "UNKNOWN",
+      "omissions": []
+    },
+    "observations": [
+      {
+        "observation_ref": "DTCR-VC-003",
+        "kind": "VIOLATION_CANDIDATE",
+        "invariant_ref": "DTCR-AI-002",
+        "state": "REFUTED"
+      }
+    ],
+    "measurements": []
+  },
+  "semantic_bundle": "NOT_APPLICABLE",
+  "invariants": [
+    {
+      "invariant_ref": "DTCR-AI-002",
+      "statement": "Task ordering must remain first-in-first-out.",
+      "admission": "ADMITTED"
+    }
+  ],
+  "claims": [
+    {
+      "claim_id": "SRC-03",
+      "claim": "The queue change leaves first-in-first-out ordering intact.",
+      "claim_class": "ARCHITECTURE_SOURCE_STATEMENT",
+      "claim_source_ref": "source packet DTCR-SP-PDF-001 section 3",
+      "observed_fact_refs": [
+        "DTCR-VC-003"
+      ]
+    }
+  ],
+  "assessments": {
+    "benefits": [
+      {
+        "statement": "the ordering invariant now has a case that fails when it is broken",
+        "basis_refs": [
+          "DTCR-VC-003"
+        ]
+      }
+    ],
+    "costs": [
+      {
+        "statement": "the heuristic edge set is a lower bound and cannot clear the paths it never resolved"
+      }
+    ],
+    "failure_modes": [
+      {
+        "statement": "a dynamically dispatched enqueue path is never seen by the occurrence heuristic"
+      }
+    ],
+    "unknowns": [
+      {
+        "statement": "how much of the queue package the unmeasured coverage ceiling actually reached",
+        "resolved_by": "record a numerator over a named denominator in the next fact-plane run"
+      }
+    ]
+  }
+}

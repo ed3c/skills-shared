@@ -16,3 +16,9 @@ python3 "$ROOT/tests/selftest.py"
 # them here gives every adapter the CI arrival its own lease could not add.
 python3 "$ROOT/adapters/tree-sitter/selftest.py"
 python3 "$ROOT/adapters/sqlite-ledger/selftest.py"
+
+# Same reason as the adapters: the synthesis compilers ship their own gate, and
+# a gate nobody runs reports the same green as one that passes. The schemas it
+# emits against are already counted by the selftest above; what this adds is
+# whether the compiler still produces them.
+python3 "$ROOT/synthesis/selftest.py"
