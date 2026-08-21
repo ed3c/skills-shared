@@ -18,6 +18,7 @@ on:
       - 'skills/agentic-tech-lead-orchestration/**'
       - 'skills/controlled-technical-language-harness/**'
       - 'skills/dual-forge-repository-loop/**'
+      - 'skills/dual-track-code-review-loop/**'
       - 'skills/github-delivery-loop/**'
       - 'skills/gitlab-delivery-loop/**'
       - 'skills/html-for-decisions/**'
@@ -38,6 +39,7 @@ on:
       - 'skills/agentic-tech-lead-orchestration/**'
       - 'skills/controlled-technical-language-harness/**'
       - 'skills/dual-forge-repository-loop/**'
+      - 'skills/dual-track-code-review-loop/**'
       - 'skills/github-delivery-loop/**'
       - 'skills/gitlab-delivery-loop/**'
       - 'skills/html-for-decisions/**'
@@ -90,6 +92,7 @@ jobs:
           - agentic-tech-lead-orchestration
           - controlled-technical-language-harness
           - dual-forge-repository-loop
+          - dual-track-code-review-loop
           - github-delivery-loop
           - gitlab-delivery-loop
           - html-for-decisions
