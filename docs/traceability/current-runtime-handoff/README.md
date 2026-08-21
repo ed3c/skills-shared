@@ -11,7 +11,7 @@ repository                 ed3c/skills-shared
 current admitted main      129f53c23a3ab15354763167b25bddc45f724c00
 current tree               d383769215a8a179bd9a8deb4f0118a61fab5aa3
 rollback / pre-#516 main   88ce642a7f198d88019aa8ae19e63631ae4999c2
-receipt-bound subject      249abc47847f8295b1c75c9d4c84457c5126fd89 (the #508/#466/#512 receipts and queues below still bind this exact commit/tree; #516 only integrated the docs-only delta)
+receipt-bound subject      249abc47847f8295b1c75c9d4c84457c5126fd89 (the #508/#466/#512 receipts and queues below still bind this exact commit/tree; #511 was the docs-only movement, and #516 landed the implementation on branches cut from this subject)
 
 #507 checked head          e306797fdbf4875bafd410fd415e6bcb3587ff9b
 #507 merge subject         249abc47847f8295b1c75c9d4c84457c5126fd89
@@ -126,7 +126,7 @@ skills/git-town-stacked-pr-worker/molecular-indexes/codex-v2/
 ```text
 #505 / PR #507  result-tree binder repair  MERGED
         ↓ process + implementation dependency
-#508 / PR #516  durable carrier + executor provenance + result schema  CLOSED_DETERMINISTICALLY (PASS)
+#508 / PR #516  durable carrier + executor provenance + result schema  PASS / ELIGIBLE_TO_CLOSE
         ↓ subject now admitted on 129f53c23a3ab15354763167b25bddc45f724c00; recompile queue
 #464             fresh signed-in Codex v2 execution + controller + Shadow  OPEN / QUEUE_RECOMPILE_REQUIRED
 
