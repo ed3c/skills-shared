@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skills-shared.local/intent-to-evidence/trace-graph.schema.json",
+  "title": "Intent-to-Evidence Trace Graph v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "subject", "intents", "artifacts", "edges", "required_traversals"],
+  "properties": {
+    "schema_version": {"const": "intent-to-evidence-trace-graph/v1"},
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "ref", "sha"],
+      "properties": {
+        "repository": {"type": "string", "minLength": 1},
+        "ref": {"type": "string", "minLength": 1},
+        "sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+      }
+    },
+    "intents": {"type": "array", "items": {"$ref": "intent-projection.schema.json"}, "minItems": 1},
+    "artifacts": {"type": "array", "items": {"$ref": "artifact-projection.schema.json"}},
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["from", "relation", "to", "utility"],
+        "properties": {
+          "from": {"type": "string", "minLength": 1},
+          "relation": {"enum": ["DERIVED_FROM", "DECOMPOSES_TO", "PROTECTS_CASE", "DOCUMENTS_INVARIANT", "TRACKED_BY", "OWNED_BY", "REALIZED_BY", "TOUCHES", "ROUTED_BY", "GOVERNED_BY", "VERIFIED_BY", "PRODUCES", "CONSUMES", "BLOCKED_BY", "UNBLOCKS", "SIBLING", "TRUE_CHILD", "CONVERGENCE", "PROCESS_DEPENDENCY", "EXTERNAL_EVIDENCE", "HISTORICAL", "SUPERSEDES"]},
+          "to": {"type": "string", "minLength": 1},
+          "utility": {"enum": ["DECISION", "CAUSAL", "IMPLEMENTATION", "AUTHORITY", "EVIDENCE", "RETRIEVAL"]},
+          "consumed_artifact": {"type": ["string", "null"]}
+        },
+        "allOf": [
+          {
+            "if": {"properties": {"relation": {"const": "TRUE_CHILD"}}},
+            "then": {"required": ["consumed_artifact"], "properties": {"consumed_artifact": {"type": "string", "minLength": 1}}}
+          }
+        ]
+      }
+    },
+    "required_traversals": {
+      "type": "array",
+      "items": {"enum": ["WHY_TO_PROOF", "IMPLEMENTATION_TO_WHY", "AGENT_CONTEXT_ROUTE", "GAP_PROPAGATION"]},
+      "minItems": 2,
+      "uniqueItems": true
+    }
+  }
+}

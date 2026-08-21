@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skills-shared.local/intent-to-evidence/intent-projection.schema.json",
+  "title": "Intent Projection v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "intent_id", "desired_outcome", "non_goals", "invariants", "acceptance_criteria", "authority_boundary", "icpg"],
+  "properties": {
+    "schema_version": {"const": "intent-projection/v1"},
+    "intent_id": {"type": "string", "minLength": 1},
+    "desired_outcome": {"type": "string", "minLength": 1},
+    "non_goals": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+    "invariants": {"type": "array", "items": {"type": "string", "minLength": 1}, "minItems": 1, "uniqueItems": true},
+    "acceptance_criteria": {"type": "array", "items": {"type": "string", "minLength": 1}, "minItems": 1, "uniqueItems": true},
+    "authority_boundary": {"type": "string", "minLength": 1},
+    "icpg": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["graph_digest", "case_ids"],
+      "properties": {
+        "graph_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "case_ids": {"type": "array", "items": {"type": "string", "minLength": 1}, "minItems": 1, "uniqueItems": true}
+      }
+    }
+  }
+}

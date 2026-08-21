@@ -1,5 +1,7 @@
 # 卡片盒記憶法知識編譯器 v7.2 — Intent-to-Evidence Graph Delta
 
+> Maintenance note: the complete reusable prompt now lives at `SYSTEM_PROMPT_V7_2.md`. A fresh Agent must use that file directly. This delta remains only to explain the v7.1 → v7.2 contract changes and must not become a second runtime prompt authority.
+
 Apply these additions to v7.1 without weakening Evidence-First, anti-fragmentation, narrative richness, action honesty or source-dependency rules.
 
 ## New Runtime fields

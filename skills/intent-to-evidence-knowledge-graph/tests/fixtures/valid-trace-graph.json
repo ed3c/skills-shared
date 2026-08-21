@@ -1,0 +1,117 @@
+{
+  "schema_version": "intent-to-evidence-trace-graph/v1",
+  "subject": {
+    "repository": "ed3c/skills-shared",
+    "ref": "agent/test",
+    "sha": "1111111111111111111111111111111111111111"
+  },
+  "intents": [
+    {
+      "schema_version": "intent-projection/v1",
+      "intent_id": "intent:kg",
+      "desired_outcome": "trace",
+      "non_goals": [],
+      "invariants": ["i1"],
+      "acceptance_criteria": ["a1"],
+      "authority_boundary": "human",
+      "icpg": {
+        "graph_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "case_ids": ["CASE-001", "CASE-002"]
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "schema_version": "artifact-projection/v1",
+      "artifact_id": "pr-420",
+      "artifact_type": "PR",
+      "authority_class": "DELIVERY_ARTIFACT",
+      "external_identity": "pr:ed3c/skills-shared#420",
+      "mutable": true,
+      "observed_subject": {
+        "repository": "ed3c/skills-shared",
+        "ref_or_identity": "agent/test",
+        "sha": "1111111111111111111111111111111111111111",
+        "observed_at": "2026-08-19T12:00:00Z",
+        "freshness_policy": "REFRESH_BEFORE_DECISION"
+      },
+      "evidence_ceiling": "L2",
+      "trace": {
+        "intent_id": "intent:kg",
+        "icpg_graph_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "case_ids": ["CASE-001"]
+      }
+    },
+    {
+      "schema_version": "artifact-projection/v1",
+      "artifact_id": "readme",
+      "artifact_type": "README",
+      "authority_class": "NAVIGATION",
+      "external_identity": "path:ed3c/skills-shared@1111111111111111111111111111111111111111:skills/intent-to-evidence-knowledge-graph/README.md",
+      "mutable": false,
+      "observed_subject": {
+        "repository": "ed3c/skills-shared",
+        "ref_or_identity": "agent/test",
+        "sha": "1111111111111111111111111111111111111111",
+        "observed_at": "2026-08-19T12:00:00Z",
+        "freshness_policy": "IMMUTABLE"
+      },
+      "evidence_ceiling": "L2",
+      "trace": {
+        "intent_id": "intent:kg",
+        "icpg_graph_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "case_ids": ["CASE-001"]
+      }
+    },
+    {
+      "schema_version": "artifact-projection/v1",
+      "artifact_id": "checker",
+      "artifact_type": "SCRIPT",
+      "authority_class": "VERIFIER",
+      "external_identity": "path:ed3c/skills-shared@1111111111111111111111111111111111111111:skills/intent-to-evidence-knowledge-graph/scripts/check_trace_graph.py",
+      "mutable": false,
+      "observed_subject": {
+        "repository": "ed3c/skills-shared",
+        "ref_or_identity": "agent/test",
+        "sha": "1111111111111111111111111111111111111111",
+        "observed_at": "2026-08-19T12:00:00Z",
+        "freshness_policy": "IMMUTABLE"
+      },
+      "evidence_ceiling": "L2",
+      "trace": {
+        "intent_id": "intent:kg",
+        "icpg_graph_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "case_ids": ["CASE-001"]
+      }
+    },
+    {
+      "schema_version": "artifact-projection/v1",
+      "artifact_id": "receipt",
+      "artifact_type": "RECEIPT",
+      "authority_class": "EVIDENCE_RECEIPT",
+      "external_identity": "receipt:ed3c/skills-shared#fixture",
+      "mutable": false,
+      "observed_subject": {
+        "repository": "ed3c/skills-shared",
+        "ref_or_identity": "fixture",
+        "sha": "1111111111111111111111111111111111111111",
+        "observed_at": "2026-08-19T12:00:00Z",
+        "freshness_policy": "IMMUTABLE"
+      },
+      "evidence_ceiling": "L2",
+      "trace": {
+        "intent_id": "intent:kg",
+        "icpg_graph_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "case_ids": ["CASE-001"]
+      }
+    }
+  ],
+  "edges": [
+    {"from": "intent:kg", "relation": "TRACKED_BY", "to": "pr-420", "utility": "IMPLEMENTATION"},
+    {"from": "pr-420", "relation": "TOUCHES", "to": "readme", "utility": "IMPLEMENTATION"},
+    {"from": "checker", "relation": "PRODUCES", "to": "receipt", "utility": "EVIDENCE"},
+    {"from": "readme", "relation": "VERIFIED_BY", "to": "receipt", "utility": "EVIDENCE"},
+    {"from": "pr-420", "relation": "VERIFIED_BY", "to": "receipt", "utility": "EVIDENCE"}
+  ],
+  "required_traversals": ["WHY_TO_PROOF", "IMPLEMENTATION_TO_WHY"]
+}

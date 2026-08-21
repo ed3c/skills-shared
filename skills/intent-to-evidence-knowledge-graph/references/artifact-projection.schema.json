@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skills-shared.local/intent-to-evidence/artifact-projection.schema.json",
+  "title": "Artifact Projection v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "artifact_id", "artifact_type", "authority_class", "external_identity", "mutable", "observed_subject", "evidence_ceiling", "trace"],
+  "properties": {
+    "schema_version": {"const": "artifact-projection/v1"},
+    "artifact_id": {"type": "string", "minLength": 1},
+    "artifact_type": {"enum": ["ISSUE", "TASK", "PR", "BRANCH", "COMMIT", "FILE", "AGENTS", "README", "SKILL", "SCHEMA", "SCRIPT", "TEST", "WORKFLOW", "RECEIPT", "HUMAN_ADMIT"]},
+    "authority_class": {"enum": ["NAVIGATION", "PROCEDURE", "PORTABLE_METHOD", "CONTRACT", "IMPLEMENTATION", "VERIFIER", "TEST", "EXECUTION_ARTIFACT", "EVIDENCE_RECEIPT", "DELIVERY_ARTIFACT", "HUMAN_AUTHORITY"]},
+    "external_identity": {"type": "string", "minLength": 1},
+    "mutable": {"type": "boolean"},
+    "observed_subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "ref_or_identity", "observed_at"],
+      "properties": {
+        "repository": {"type": "string", "minLength": 1},
+        "ref_or_identity": {"type": "string", "minLength": 1},
+        "sha": {"type": ["string", "null"], "pattern": "^[0-9a-f]{40}$"},
+        "observed_at": {"type": "string", "format": "date-time"},
+        "freshness_policy": {"enum": ["IMMUTABLE", "REFRESH_BEFORE_DECISION", "REFRESH_ON_QUERY"]}
+      }
+    },
+    "evidence_ceiling": {"enum": ["L0", "L1", "L2", "L3", "L4", "L5"]},
+    "trace": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["intent_id", "icpg_graph_digest", "case_ids"],
+      "properties": {
+        "intent_id": {"type": "string", "minLength": 1},
+        "icpg_graph_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "case_ids": {"type": "array", "items": {"type": "string", "minLength": 1}, "minItems": 1, "uniqueItems": true},
+        "invariant_ids": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"mutable": {"const": true}}},
+      "then": {"properties": {"observed_subject": {"required": ["repository", "ref_or_identity", "observed_at", "freshness_policy"]}}}
+    }
+  ]
+}
