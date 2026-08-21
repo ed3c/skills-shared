@@ -1,0 +1,554 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dtcr-refactor-usage-signature.schema.json",
+  "title": "DTCR refactor usage signature",
+  "description": "The set of provider members one bounded violation actually consumes, extracted from resolved call sites at an exact commit. The reason this artifact exists separately from the Port it feeds is that the cheap move -- copy the provider's whole surface into an interface and call it inverted -- produces a document that looks identical to a minimal extraction once it lands. Here it cannot: a member with no call site has no field to sit in, and a call site the adapter could not resolve forces the completeness value down to a lower bound rather than leaving the set looking closed. The adapter is a declared capability class with pinned version, license, grammar and formatter behavior; no adapter implementation is vendored by the tree that carries this contract, which is why `vendored` is pinned false rather than left to a reader to assume.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "signature_id",
+    "subject",
+    "violation_ref",
+    "provider_symbol",
+    "adapter",
+    "consumed_members",
+    "extraction",
+    "establishes"
+  ],
+  "properties": {
+    "schema": {
+      "const": "dtcr/refactor-usage-signature/v1"
+    },
+    "signature_id": {
+      "type": "string",
+      "pattern": "^DTCR-US-[0-9]{3}$"
+    },
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository_binding_id",
+        "subject_commit",
+        "subject_tree"
+      ],
+      "properties": {
+        "repository_binding_id": {
+          "type": "string",
+          "pattern": "^DTCR-RB-[0-9a-f]{16}$"
+        },
+        "subject_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$",
+          "description": "Exact commit. A usage set extracted from main is a usage set of whatever main was when somebody looked."
+        },
+        "subject_tree": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        }
+      }
+    },
+    "violation_ref": {
+      "type": "string",
+      "pattern": "^DTCR-VC-[0-9]{3}$",
+      "description": "The bounded violation this extraction serves. An extraction with no violation behind it is a refactor looking for a reason."
+    },
+    "provider_symbol": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The concrete low-level symbol the high-level module currently depends on."
+    },
+    "adapter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "adapter_binding_id",
+        "capability_class",
+        "language",
+        "language_support",
+        "provider_state",
+        "vendored",
+        "pins"
+      ],
+      "properties": {
+        "adapter_binding_id": {
+          "type": "string",
+          "pattern": "^DTCR-AD-[0-9a-f]{16}$"
+        },
+        "capability_class": {
+          "enum": [
+            "SYNTAX_TREE_REWRITE",
+            "TYPE_AWARE_REWRITE",
+            "COMPILER_DIAGNOSTIC"
+          ],
+          "description": "What class of tooling the language adapter belongs to, never which product implements it. No one adapter is mandatory for all languages."
+        },
+        "language": {
+          "enum": [
+            "python",
+            "typescript",
+            "java",
+            "kotlin",
+            "go",
+            "c",
+            "cpp",
+            "swift"
+          ],
+          "description": "The eight languages the adapter law declares a capability class for. A language outside this list has no declared adapter and cannot be reported as supported."
+        },
+        "language_support": {
+          "const": "SUPPORTED_BY_DECLARED_ADAPTER",
+          "description": "The only value. Support here means a capability class is declared for the language, never that an implementation ships; a signature claiming support by a vendored implementation is claiming a capability this tree does not have."
+        },
+        "provider_state": {
+          "enum": [
+            "DECLARED_NOT_VENDORED",
+            "BLOCKED_ON_PROVIDER"
+          ],
+          "description": "Two states and no third. There is no EXERCISED: an adapter that actually rewrote code would leave a provider receipt, and no such receipt exists behind this contract."
+        },
+        "vendored": {
+          "const": false,
+          "description": "Pinned. Naming a rewrite library in `pins` does not vendor it, and a signature that says otherwise is claiming an executed rewrite path."
+        },
+        "pins": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "tool_version",
+            "license_id",
+            "grammar_or_dialect",
+            "formatter_behavior"
+          ],
+          "properties": {
+            "tool_version": {
+              "type": "string",
+              "minLength": 1
+            },
+            "license_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "grammar_or_dialect": {
+              "type": "string",
+              "minLength": 1
+            },
+            "formatter_behavior": {
+              "type": "string",
+              "minLength": 4,
+              "description": "What the adapter does to bytes it did not mean to change. An unpinned formatter turns one bounded edit into a whole-file diff."
+            }
+          }
+        }
+      }
+    },
+    "consumed_members": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "Only members with at least one call site. This array is the denominator the Port may not exceed.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "member",
+          "member_kind",
+          "call_site_refs"
+        ],
+        "properties": {
+          "member": {
+            "type": "string",
+            "minLength": 1
+          },
+          "member_kind": {
+            "enum": [
+              "METHOD",
+              "TYPE",
+              "FIELD",
+              "CONSTRUCTOR"
+            ]
+          },
+          "call_site_refs": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 3
+            }
+          }
+        }
+      }
+    },
+    "extraction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "call_sites_declared",
+        "call_sites_resolved",
+        "unresolved_call_site_refs",
+        "completeness"
+      ],
+      "properties": {
+        "call_sites_declared": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "call_sites_resolved": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unresolved_call_site_refs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 3
+          }
+        },
+        "completeness": {
+          "enum": [
+            "COMPLETE_FOR_RESOLVED_CALL_SITES",
+            "PARTIAL_LOWER_BOUND"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "unresolved_call_site_refs"
+            ],
+            "properties": {
+              "unresolved_call_site_refs": {
+                "minItems": 1
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "completeness": {
+                "const": "PARTIAL_LOWER_BOUND"
+              }
+            }
+          },
+          "description": "A call site the adapter could not resolve may still consume a member nobody listed. Reporting that set as complete is USAGE_SET_INCOMPLETE wearing the word complete."
+        }
+      ]
+    },
+    "establishes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provider_surface_complete",
+        "rewrite_applied"
+      ],
+      "properties": {
+        "provider_surface_complete": {
+          "const": false,
+          "description": "An extraction bounds what is consumed. It never bounds what the provider offers."
+        },
+        "rewrite_applied": {
+          "const": false,
+          "description": "Extracting a signature edits nothing."
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "schema": "dtcr/refactor-usage-signature/v1",
+      "signature_id": "DTCR-US-001",
+      "subject": {
+        "repository_binding_id": "DTCR-RB-0f1e2d3c4b5a6978",
+        "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+        "subject_tree": "e739d799dd8d44beb5414ed99a943ff3bacccab0"
+      },
+      "violation_ref": "DTCR-VC-001",
+      "provider_symbol": "SqlOrderStore",
+      "adapter": {
+        "adapter_binding_id": "DTCR-AD-6a1b2c3d4e5f6071",
+        "capability_class": "TYPE_AWARE_REWRITE",
+        "language": "python",
+        "language_support": "SUPPORTED_BY_DECLARED_ADAPTER",
+        "provider_state": "DECLARED_NOT_VENDORED",
+        "vendored": false,
+        "pins": {
+          "tool_version": "0.0.0-declared-not-resolved",
+          "license_id": "MIT",
+          "grammar_or_dialect": "python-3.11",
+          "formatter_behavior": "reprints only the edited node, leaves sibling bytes untouched"
+        }
+      },
+      "consumed_members": [
+        {
+          "member": "load",
+          "member_kind": "METHOD",
+          "call_site_refs": [
+            "CS-001",
+            "CS-002"
+          ]
+        },
+        {
+          "member": "save",
+          "member_kind": "METHOD",
+          "call_site_refs": [
+            "CS-003"
+          ]
+        }
+      ],
+      "extraction": {
+        "call_sites_declared": 3,
+        "call_sites_resolved": 3,
+        "unresolved_call_site_refs": [],
+        "completeness": "COMPLETE_FOR_RESOLVED_CALL_SITES"
+      },
+      "establishes": {
+        "provider_surface_complete": false,
+        "rewrite_applied": false
+      }
+    }
+  ],
+  "x-refusal-controls": [
+    {
+      "case_id": "DTCR-XC-RU-001",
+      "refuses": "An extraction with an unresolved call site reported as a complete usage set.",
+      "refused_by": "properties.extraction.allOf[0].then.properties.completeness.const",
+      "instance": {
+        "schema": "dtcr/refactor-usage-signature/v1",
+        "signature_id": "DTCR-US-001",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-0f1e2d3c4b5a6978",
+          "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "subject_tree": "e739d799dd8d44beb5414ed99a943ff3bacccab0"
+        },
+        "violation_ref": "DTCR-VC-001",
+        "provider_symbol": "SqlOrderStore",
+        "adapter": {
+          "adapter_binding_id": "DTCR-AD-6a1b2c3d4e5f6071",
+          "capability_class": "TYPE_AWARE_REWRITE",
+          "language": "python",
+          "language_support": "SUPPORTED_BY_DECLARED_ADAPTER",
+          "provider_state": "DECLARED_NOT_VENDORED",
+          "vendored": false,
+          "pins": {
+            "tool_version": "0.0.0-declared-not-resolved",
+            "license_id": "MIT",
+            "grammar_or_dialect": "python-3.11",
+            "formatter_behavior": "reprints only the edited node, leaves sibling bytes untouched"
+          }
+        },
+        "consumed_members": [
+          {
+            "member": "load",
+            "member_kind": "METHOD",
+            "call_site_refs": [
+              "CS-001"
+            ]
+          }
+        ],
+        "extraction": {
+          "call_sites_declared": 3,
+          "call_sites_resolved": 1,
+          "unresolved_call_site_refs": [
+            "CS-002",
+            "CS-003"
+          ],
+          "completeness": "COMPLETE_FOR_RESOLVED_CALL_SITES"
+        },
+        "establishes": {
+          "provider_surface_complete": false,
+          "rewrite_applied": false
+        }
+      }
+    },
+    {
+      "case_id": "DTCR-XC-RU-002",
+      "refuses": "A usage signature dated to a branch name instead of an exact commit.",
+      "refused_by": "properties.subject.properties.subject_commit.pattern",
+      "instance": {
+        "schema": "dtcr/refactor-usage-signature/v1",
+        "signature_id": "DTCR-US-001",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-0f1e2d3c4b5a6978",
+          "subject_commit": "main",
+          "subject_tree": "e739d799dd8d44beb5414ed99a943ff3bacccab0"
+        },
+        "violation_ref": "DTCR-VC-001",
+        "provider_symbol": "SqlOrderStore",
+        "adapter": {
+          "adapter_binding_id": "DTCR-AD-6a1b2c3d4e5f6071",
+          "capability_class": "TYPE_AWARE_REWRITE",
+          "language": "python",
+          "language_support": "SUPPORTED_BY_DECLARED_ADAPTER",
+          "provider_state": "DECLARED_NOT_VENDORED",
+          "vendored": false,
+          "pins": {
+            "tool_version": "0.0.0-declared-not-resolved",
+            "license_id": "MIT",
+            "grammar_or_dialect": "python-3.11",
+            "formatter_behavior": "reprints only the edited node, leaves sibling bytes untouched"
+          }
+        },
+        "consumed_members": [
+          {
+            "member": "load",
+            "member_kind": "METHOD",
+            "call_site_refs": [
+              "CS-001"
+            ]
+          }
+        ],
+        "extraction": {
+          "call_sites_declared": 1,
+          "call_sites_resolved": 1,
+          "unresolved_call_site_refs": [],
+          "completeness": "COMPLETE_FOR_RESOLVED_CALL_SITES"
+        },
+        "establishes": {
+          "provider_surface_complete": false,
+          "rewrite_applied": false
+        }
+      }
+    },
+    {
+      "case_id": "DTCR-XC-RU-003",
+      "refuses": "A usage signature that consumes nothing, which would let a Port of any width call itself minimal.",
+      "refused_by": "properties.consumed_members.minItems",
+      "instance": {
+        "schema": "dtcr/refactor-usage-signature/v1",
+        "signature_id": "DTCR-US-001",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-0f1e2d3c4b5a6978",
+          "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "subject_tree": "e739d799dd8d44beb5414ed99a943ff3bacccab0"
+        },
+        "violation_ref": "DTCR-VC-001",
+        "provider_symbol": "SqlOrderStore",
+        "adapter": {
+          "adapter_binding_id": "DTCR-AD-6a1b2c3d4e5f6071",
+          "capability_class": "TYPE_AWARE_REWRITE",
+          "language": "python",
+          "language_support": "SUPPORTED_BY_DECLARED_ADAPTER",
+          "provider_state": "DECLARED_NOT_VENDORED",
+          "vendored": false,
+          "pins": {
+            "tool_version": "0.0.0-declared-not-resolved",
+            "license_id": "MIT",
+            "grammar_or_dialect": "python-3.11",
+            "formatter_behavior": "reprints only the edited node, leaves sibling bytes untouched"
+          }
+        },
+        "consumed_members": [],
+        "extraction": {
+          "call_sites_declared": 1,
+          "call_sites_resolved": 1,
+          "unresolved_call_site_refs": [],
+          "completeness": "COMPLETE_FOR_RESOLVED_CALL_SITES"
+        },
+        "establishes": {
+          "provider_surface_complete": false,
+          "rewrite_applied": false
+        }
+      }
+    },
+    {
+      "case_id": "DTCR-XC-RU-004",
+      "refuses": "An adapter recorded as vendored by the tree that carries this contract.",
+      "refused_by": "properties.adapter.properties.vendored.const",
+      "instance": {
+        "schema": "dtcr/refactor-usage-signature/v1",
+        "signature_id": "DTCR-US-001",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-0f1e2d3c4b5a6978",
+          "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "subject_tree": "e739d799dd8d44beb5414ed99a943ff3bacccab0"
+        },
+        "violation_ref": "DTCR-VC-001",
+        "provider_symbol": "SqlOrderStore",
+        "adapter": {
+          "adapter_binding_id": "DTCR-AD-6a1b2c3d4e5f6071",
+          "capability_class": "TYPE_AWARE_REWRITE",
+          "language": "python",
+          "language_support": "SUPPORTED_BY_DECLARED_ADAPTER",
+          "provider_state": "DECLARED_NOT_VENDORED",
+          "vendored": true,
+          "pins": {
+            "tool_version": "0.0.0-declared-not-resolved",
+            "license_id": "MIT",
+            "grammar_or_dialect": "python-3.11",
+            "formatter_behavior": "reprints only the edited node, leaves sibling bytes untouched"
+          }
+        },
+        "consumed_members": [
+          {
+            "member": "load",
+            "member_kind": "METHOD",
+            "call_site_refs": [
+              "CS-001"
+            ]
+          }
+        ],
+        "extraction": {
+          "call_sites_declared": 1,
+          "call_sites_resolved": 1,
+          "unresolved_call_site_refs": [],
+          "completeness": "COMPLETE_FOR_RESOLVED_CALL_SITES"
+        },
+        "establishes": {
+          "provider_surface_complete": false,
+          "rewrite_applied": false
+        }
+      }
+    },
+    {
+      "case_id": "DTCR-XC-RU-005",
+      "refuses": "A language with no declared adapter capability class, promoted to supported.",
+      "refused_by": "properties.adapter.properties.language.enum",
+      "instance": {
+        "schema": "dtcr/refactor-usage-signature/v1",
+        "signature_id": "DTCR-US-001",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-0f1e2d3c4b5a6978",
+          "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "subject_tree": "e739d799dd8d44beb5414ed99a943ff3bacccab0"
+        },
+        "violation_ref": "DTCR-VC-001",
+        "provider_symbol": "SqlOrderStore",
+        "adapter": {
+          "adapter_binding_id": "DTCR-AD-6a1b2c3d4e5f6071",
+          "capability_class": "TYPE_AWARE_REWRITE",
+          "language": "rust",
+          "language_support": "SUPPORTED_BY_DECLARED_ADAPTER",
+          "provider_state": "DECLARED_NOT_VENDORED",
+          "vendored": false,
+          "pins": {
+            "tool_version": "0.0.0-declared-not-resolved",
+            "license_id": "MIT",
+            "grammar_or_dialect": "rust-2021",
+            "formatter_behavior": "reprints only the edited node, leaves sibling bytes untouched"
+          }
+        },
+        "consumed_members": [
+          {
+            "member": "load",
+            "member_kind": "METHOD",
+            "call_site_refs": [
+              "CS-001"
+            ]
+          }
+        ],
+        "extraction": {
+          "call_sites_declared": 1,
+          "call_sites_resolved": 1,
+          "unresolved_call_site_refs": [],
+          "completeness": "COMPLETE_FOR_RESOLVED_CALL_SITES"
+        },
+        "establishes": {
+          "provider_surface_complete": false,
+          "rewrite_applied": false
+        }
+      }
+    }
+  ]
+}

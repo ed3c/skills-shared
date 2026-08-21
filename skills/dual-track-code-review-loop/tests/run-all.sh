@@ -22,3 +22,9 @@ python3 "$ROOT/adapters/sqlite-ledger/selftest.py"
 # emits against are already counted by the selftest above; what this adds is
 # whether the compiler still produces them.
 python3 "$ROOT/synthesis/selftest.py"
+
+# Same reason again for the R1 refactor protocol compiler: it ships its own
+# gate, and its state-coverage lane is the only thing in the tree that checks
+# every terminal the refactor contracts declare is reachable by compiling a
+# committed request rather than by a test constructing one.
+python3 "$ROOT/refactor/selftest.py"

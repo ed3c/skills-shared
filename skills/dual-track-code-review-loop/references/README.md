@@ -66,6 +66,24 @@ routed through the suite entrypoint.
 | [`schemas/synthesis-packet.schema.json`](schemas/synthesis-packet.schema.json) | the full dual-track projection over one exact subject, every measurement carrying its method and denominator |
 | [`schemas/problem-closure-row.schema.json`](schemas/problem-closure-row.schema.json) | one claim's closure state and the arrivals that support it, with the empty lanes still written out |
 
+### Bounded refactor plane
+
+The R1 output half. These four contracts are what
+[`../refactor/compile_r1.py`](../refactor/compile_r1.py) emits and refuses
+against, one per state group of the bounded single-repository refactor protocol.
+Nothing here names a rewrite library: a language adapter is a declared
+capability class with pinned version, license, grammar and formatter behavior,
+and `vendored` is const false because no adapter implementation ships behind
+this contract. The compiler ships beside its own selftest and is routed through
+the suite entrypoint.
+
+| File | Owns |
+|---|---|
+| [`schemas/refactor-usage-signature.schema.json`](schemas/refactor-usage-signature.schema.json) | the provider members one violation actually consumes, the call sites that justify each, and the completeness an unresolved call site forces down |
+| [`schemas/refactor-minimal-port.schema.json`](schemas/refactor-minimal-port.schema.json) | the Port the owning high-level module declares, with no field for a member no call site justifies |
+| [`schemas/refactor-changeset-lease.schema.json`](schemas/refactor-changeset-lease.schema.json) | what the change was allowed to touch and what it touched, the frozen oracles it is measured against, and its single-valued merge admission |
+| [`schemas/refactor-r1-receipt.schema.json`](schemas/refactor-r1-receipt.schema.json) | the states one run entered and its terminal, with `CANDIDATE_RECEIPT`, `BLOCKED` and `ROLLED_BACK` kept apart and applied-on-a-real-codebase pinned false |
+
 ## Schema identity
 
 Two identifiers, doing different jobs. `$id` is the file, following the sibling
@@ -91,8 +109,8 @@ Both are ignored by validators, which is the point: they are data for whoever
 replays them, and they sit beside the constraint they exercise so that removing
 the constraint and leaving the control behind is visible in one diff.
 
-One hundred and twenty-eight refusal controls ship here: one hundred and
-twenty-one inside the twenty-seven schemas and seven in `refused-claims.json`.
+One hundred and fifty-one refusal controls ship here: one hundred and forty-four
+inside the thirty-one schemas and seven in `refused-claims.json`.
 A refusal nobody replays
 is prose, and prose does not survive the edit that removes the guard underneath
 it.

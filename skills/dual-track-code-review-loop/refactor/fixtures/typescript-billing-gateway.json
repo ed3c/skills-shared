@@ -1,0 +1,102 @@
+{
+  "schema": "dtcr/refactor-r1-request/v1",
+  "_note": "Synthetic. Second language fixture: the same procedure with a different declared adapter capability class, an application-layer Port, a consumed type as well as consumed methods, and a published interface whose contract owner admitted the change.",
+  "subject": {
+    "repository_binding_id": "DTCR-RB-1a2b3c4d5e6f7081",
+    "subject_commit": "7d2ef0a41c9b8e3f5a6d0c1b2e3f4a5b6c7d8e9f",
+    "subject_tree": "0a1b2c3d4e5f60718293a4b5c6d7e8f901234567"
+  },
+  "violation_ref": "DTCR-VC-002",
+  "provider_symbol": "StripeBillingClient",
+  "adapter": {
+    "adapter_binding_id": "DTCR-AD-7b2c3d4e5f607182",
+    "capability_class": "SYNTAX_TREE_REWRITE",
+    "language": "typescript",
+    "provider_state": "DECLARED_NOT_VENDORED",
+    "pins": {
+      "tool_version": "0.0.0-declared-not-resolved",
+      "license_id": "MIT",
+      "grammar_or_dialect": "typescript-5.4-strict",
+      "formatter_behavior": "preserves trivia on untouched nodes; reprints the edited statement only"
+    }
+  },
+  "call_sites": [
+    {
+      "call_site_ref": "CS-101",
+      "member": "charge",
+      "member_kind": "METHOD",
+      "resolved": true
+    },
+    {
+      "call_site_ref": "CS-102",
+      "member": "refund",
+      "member_kind": "METHOD",
+      "resolved": true
+    },
+    {
+      "call_site_ref": "CS-103",
+      "member": "ChargeOutcome",
+      "member_kind": "TYPE",
+      "resolved": true
+    }
+  ],
+  "usage_extraction_claim": "COMPLETE_FOR_RESOLVED_CALL_SITES",
+  "port": {
+    "owning_layer": "APPLICATION",
+    "members": [
+      "ChargeOutcome",
+      "charge",
+      "refund"
+    ],
+    "construction_sites_replaced": [
+      "src/application/billing/subscription-service.ts:SubscriptionService.constructor"
+    ],
+    "concrete_imports_remaining": []
+  },
+  "changeset": {
+    "lease_paths": [
+      "src/application/billing/",
+      "src/composition/"
+    ],
+    "lease_writers": [
+      "the single admitted refactor writer for this changeset"
+    ],
+    "changed_paths": [
+      "src/application/billing/billing-port.ts",
+      "src/application/billing/subscription-service.ts",
+      "src/composition/container.ts"
+    ],
+    "generated_paths": [
+      "src/application/billing/generated/billing-api.d.ts"
+    ],
+    "behavior_tests": [
+      {
+        "test_ref": "src/application/billing/subscription-service.behavior.test.ts",
+        "pre_digest": "2c624232cdd221771294dfbb310aca000a0df6ac8b66b696d90ef06fdefb64a3",
+        "post_digest": "2c624232cdd221771294dfbb310aca000a0df6ac8b66b696d90ef06fdefb64a3"
+      }
+    ],
+    "composition_roots": [
+      {
+        "root_path": "src/composition/container.ts",
+        "admitted": true
+      }
+    ],
+    "public_api": {
+      "changed": true,
+      "contract_owner_admission": "ADMITTED"
+    },
+    "merge_admission": "HUMAN_ADMIT_REQUIRED"
+  },
+  "readback": {
+    "typecheck": "PASS",
+    "behavior_tests": {
+      "state": "PASS",
+      "passed": 128,
+      "total": 128
+    },
+    "reindex_state": "REINDEXED",
+    "forbidden_edge_count": 0,
+    "new_cycles": 0
+  }
+}

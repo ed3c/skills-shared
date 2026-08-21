@@ -1,0 +1,188 @@
+{
+  "changeset_lease": {
+    "behavior_tests": {
+      "frozen": [
+        {
+          "post_digest": "fcde2b2edba56bf408601fb721fe9b5c338d10ee429ea04fae5511b68fbf8fb9",
+          "pre_digest": "fcde2b2edba56bf408601fb721fe9b5c338d10ee429ea04fae5511b68fbf8fb9",
+          "test_ref": "internal/domain/ledger/service_behavior_test.go"
+        }
+      ],
+      "mutated_test_refs": []
+    },
+    "binding_id": "DTCR-CL-001",
+    "changed_paths": [
+      "cmd/ledgerd/main.go",
+      "internal/domain/ledger/repo_port.go",
+      "internal/domain/ledger/service.go"
+    ],
+    "composition_roots": [
+      {
+        "admitted": true,
+        "root_path": "cmd/ledgerd/main.go"
+      }
+    ],
+    "generated_paths_touched": [],
+    "lease": {
+      "escaped_paths": [],
+      "lease_paths": [
+        "cmd/ledgerd/",
+        "internal/domain/ledger/"
+      ],
+      "lease_writers": [
+        "the single admitted refactor writer for this changeset"
+      ]
+    },
+    "merge_admission": "HUMAN_ADMIT_REQUIRED",
+    "port_ref": "DTCR-PT-001",
+    "public_api": {
+      "changed": false,
+      "contract_owner_admission": "NOT_REQUIRED"
+    },
+    "schema": "dtcr/refactor-changeset-lease/v1",
+    "subject": {
+      "repository_binding_id": "DTCR-RB-2b3c4d5e6f708192",
+      "subject_commit": "9f8e7d6c5b4a39281706f5e4d3c2b1a09f8e7d6c",
+      "subject_tree": "1122334455667788990011223344556677889900"
+    }
+  },
+  "derived_from": "go-ledger-blocked-on-provider.json",
+  "minimal_port": {
+    "establishes": {
+      "applied": false,
+      "behavior_preserved": false
+    },
+    "injection": {
+      "concrete_imports_remaining": [],
+      "construction_sites_replaced": [
+        "internal/domain/ledger/service.go:NewLedgerService"
+      ]
+    },
+    "owning_layer": "DOMAIN",
+    "port_id": "DTCR-PT-001",
+    "port_members": [
+      {
+        "justified_by_call_site_refs": [
+          "CS-201"
+        ],
+        "member": "AppendEntry",
+        "member_kind": "METHOD"
+      },
+      {
+        "justified_by_call_site_refs": [
+          "CS-202"
+        ],
+        "member": "NewLedgerRepo",
+        "member_kind": "CONSTRUCTOR"
+      }
+    ],
+    "schema": "dtcr/refactor-minimal-port/v1",
+    "signature_ref": "DTCR-US-001",
+    "subject": {
+      "repository_binding_id": "DTCR-RB-2b3c4d5e6f708192",
+      "subject_commit": "9f8e7d6c5b4a39281706f5e4d3c2b1a09f8e7d6c",
+      "subject_tree": "1122334455667788990011223344556677889900"
+    },
+    "unused_provider_members": []
+  },
+  "receipt": {
+    "authority": {
+      "merge": false,
+      "production": false,
+      "release": false
+    },
+    "blocked_on": [
+      "ADAPTER_BLOCKED_ON_PROVIDER",
+      "BEHAVIOR_ORACLE_NOT_RUN",
+      "FORBIDDEN_EDGE_STILL_PRESENT",
+      "SEMANTIC_INDEX_NOT_REBUILT",
+      "TYPECHECK_NOT_RUN",
+      "USAGE_SET_PARTIAL"
+    ],
+    "changeset_ref": "DTCR-CL-001",
+    "establishes": {
+      "applied_on_real_codebase": false,
+      "behavior_equivalence_proven": false,
+      "protocol_ready": false
+    },
+    "readback": {
+      "behavior_tests": {
+        "passed": 0,
+        "state": "NOT_RUN",
+        "total": 17
+      },
+      "forbidden_edge_count": 1,
+      "new_cycles": 0,
+      "reindex_state": "NOT_REINDEXED",
+      "typecheck": "NOT_RUN"
+    },
+    "receipt_id": "DTCR-R1-001",
+    "schema": "dtcr/refactor-r1-receipt/v1",
+    "states_entered": [
+      "VIOLATION_BOUND",
+      "USAGE_SIGNATURE_EXTRACTED",
+      "MINIMAL_PORT_PROPOSED",
+      "CHANGESET_AND_LEASE_BOUND"
+    ],
+    "subject": {
+      "repository_binding_id": "DTCR-RB-2b3c4d5e6f708192",
+      "subject_commit": "9f8e7d6c5b4a39281706f5e4d3c2b1a09f8e7d6c",
+      "subject_tree": "1122334455667788990011223344556677889900"
+    },
+    "terminal_state": "BLOCKED"
+  },
+  "schema": "dtcr/refactor-r1-projection/v1",
+  "usage_signature": {
+    "adapter": {
+      "adapter_binding_id": "DTCR-AD-8c3d4e5f60718293",
+      "capability_class": "COMPILER_DIAGNOSTIC",
+      "language": "go",
+      "language_support": "SUPPORTED_BY_DECLARED_ADAPTER",
+      "pins": {
+        "formatter_behavior": "gofmt-equivalent whole-file normalization, which widens every edit to the file",
+        "grammar_or_dialect": "go-1.22",
+        "license_id": "BSD-3-Clause",
+        "tool_version": "0.0.0-declared-not-resolved"
+      },
+      "provider_state": "BLOCKED_ON_PROVIDER",
+      "vendored": false
+    },
+    "consumed_members": [
+      {
+        "call_site_refs": [
+          "CS-201"
+        ],
+        "member": "AppendEntry",
+        "member_kind": "METHOD"
+      },
+      {
+        "call_site_refs": [
+          "CS-202"
+        ],
+        "member": "NewLedgerRepo",
+        "member_kind": "CONSTRUCTOR"
+      }
+    ],
+    "establishes": {
+      "provider_surface_complete": false,
+      "rewrite_applied": false
+    },
+    "extraction": {
+      "call_sites_declared": 3,
+      "call_sites_resolved": 2,
+      "completeness": "PARTIAL_LOWER_BOUND",
+      "unresolved_call_site_refs": [
+        "CS-203"
+      ]
+    },
+    "provider_symbol": "PostgresLedgerRepo",
+    "schema": "dtcr/refactor-usage-signature/v1",
+    "signature_id": "DTCR-US-001",
+    "subject": {
+      "repository_binding_id": "DTCR-RB-2b3c4d5e6f708192",
+      "subject_commit": "9f8e7d6c5b4a39281706f5e4d3c2b1a09f8e7d6c",
+      "subject_tree": "1122334455667788990011223344556677889900"
+    },
+    "violation_ref": "DTCR-VC-003"
+  }
+}

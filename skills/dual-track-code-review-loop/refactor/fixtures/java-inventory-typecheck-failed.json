@@ -1,0 +1,102 @@
+{
+  "schema": "dtcr/refactor-r1-request/v1",
+  "_note": "Synthetic. The lane split the protocol exists for: the architecture readback is clean -- the forbidden edge is gone and no cycle appeared -- while the compiler refuses the tree. Nothing was rolled back and nothing regressed behaviourally, because the behavior suite never ran; a suite that cannot be compiled is NOT_RUN and not a pass.",
+  "subject": {
+    "repository_binding_id": "DTCR-RB-3c4d5e6f70819203",
+    "subject_commit": "0123456789abcdef0123456789abcdef01234567",
+    "subject_tree": "fedcba9876543210fedcba9876543210fedcba98"
+  },
+  "violation_ref": "DTCR-VC-004",
+  "provider_symbol": "JdbcInventoryDao",
+  "adapter": {
+    "adapter_binding_id": "DTCR-AD-9d4e5f6071829304",
+    "capability_class": "SYNTAX_TREE_REWRITE",
+    "language": "java",
+    "provider_state": "DECLARED_NOT_VENDORED",
+    "pins": {
+      "tool_version": "0.0.0-declared-not-resolved",
+      "license_id": "Apache-2.0",
+      "grammar_or_dialect": "java-21",
+      "formatter_behavior": "recipe-scoped printing; import order normalized across the whole compilation unit"
+    }
+  },
+  "call_sites": [
+    {
+      "call_site_ref": "CS-301",
+      "member": "findBySku",
+      "member_kind": "METHOD",
+      "resolved": true
+    },
+    {
+      "call_site_ref": "CS-302",
+      "member": "reserve",
+      "member_kind": "METHOD",
+      "resolved": true
+    },
+    {
+      "call_site_ref": "CS-303",
+      "member": "DEFAULT_WAREHOUSE",
+      "member_kind": "FIELD",
+      "resolved": true
+    }
+  ],
+  "usage_extraction_claim": "COMPLETE_FOR_RESOLVED_CALL_SITES",
+  "port": {
+    "owning_layer": "DOMAIN",
+    "members": [
+      "DEFAULT_WAREHOUSE",
+      "findBySku",
+      "reserve"
+    ],
+    "construction_sites_replaced": [
+      "domain/inventory/src/main/java/InventoryAllocator.java:InventoryAllocator"
+    ],
+    "concrete_imports_remaining": []
+  },
+  "changeset": {
+    "lease_paths": [
+      "app/wiring/",
+      "domain/inventory/"
+    ],
+    "lease_writers": [
+      "the single admitted refactor writer for this changeset"
+    ],
+    "changed_paths": [
+      "app/wiring/src/main/java/CompositionRoot.java",
+      "domain/inventory/src/main/java/InventoryAllocator.java",
+      "domain/inventory/src/main/java/InventoryPort.java"
+    ],
+    "generated_paths": [
+      "domain/inventory/src/generated/java/InventoryProto.java"
+    ],
+    "behavior_tests": [
+      {
+        "test_ref": "domain/inventory/src/test/java/InventoryAllocatorBehaviorTest.java",
+        "pre_digest": "6b51d431df5d7f141cbececcf79edf3dd861c3b4069f0b11661a3eefacbba918",
+        "post_digest": "6b51d431df5d7f141cbececcf79edf3dd861c3b4069f0b11661a3eefacbba918"
+      }
+    ],
+    "composition_roots": [
+      {
+        "root_path": "app/wiring/src/main/java/CompositionRoot.java",
+        "admitted": true
+      }
+    ],
+    "public_api": {
+      "changed": false,
+      "contract_owner_admission": "NOT_REQUIRED"
+    },
+    "merge_admission": "HUMAN_ADMIT_REQUIRED"
+  },
+  "readback": {
+    "typecheck": "FAIL",
+    "behavior_tests": {
+      "state": "NOT_RUN",
+      "passed": 0,
+      "total": 64
+    },
+    "reindex_state": "REINDEXED",
+    "forbidden_edge_count": 0,
+    "new_cycles": 0
+  }
+}
