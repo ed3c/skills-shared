@@ -1,0 +1,11 @@
+# Fixture source for the clean-parse recording. The extension is not .py on
+# purpose: this file is provider input, not repository code, and a tool that
+# collects *.py would otherwise import it. The grammar is selected by the
+# bundle, never by the extension.
+def alpha(value):
+    return value + 1
+
+
+class Beta:
+    def gamma(self):
+        return alpha(2)
