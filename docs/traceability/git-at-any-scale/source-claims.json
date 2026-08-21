@@ -1,0 +1,38 @@
+{
+  "schema": "git-at-any-scale-source-claims/v1",
+  "source": {
+    "kind": "ARTICLE",
+    "title": "Git at any scale",
+    "publisher": "Cursor",
+    "author": "Vicent Marti",
+    "published": "2026-08-18",
+    "canonical_url": "https://cursor.com/blog/git-at-any-scale",
+    "observed": "2026-08-21",
+    "authority": "SOURCE_PROPOSAL",
+    "immutable_bytes": "ABSENT",
+    "sha256": "ABSENT"
+  },
+  "repository_subject": {
+    "repository": "ed3c/skills-shared",
+    "main": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+    "tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7"
+  },
+  "claims": [
+    {"id":"GS-01","claim":"Agent-driven repository, branch, PR and CI volume increases coordination pressure.","class":"APPLICABILITY_CLAIM","state":"SUPPORTED_AS_SCOPE_PROBLEM","owner_issue":531},
+    {"id":"GS-02","claim":"Git packfile/local-filesystem semantics make naive remote/distributed storage difficult.","class":"ARCHITECTURE_SOURCE_STATEMENT","state":"SOURCE_PROPOSAL","owner_issue":531},
+    {"id":"GS-03","claim":"Synchronous multi-replica ref transactions suffer tail-latency and replica-floor scalability limits.","class":"ARCHITECTURE_SOURCE_STATEMENT","state":"SOURCE_PROPOSAL","owner_issue":534},
+    {"id":"GS-04","claim":"A push should not be acknowledged before durable authoritative persistence.","class":"PORTABLE_ASSURANCE_REQUIREMENT","state":"CONTRACT_OPEN","owner_issue":532},
+    {"id":"GS-05","claim":"Ref publication should be atomic/CAS-bound and operation history should be linearizable under the declared model.","class":"PORTABLE_ASSURANCE_REQUIREMENT","state":"CONTRACT_OPEN","owner_issue":532},
+    {"id":"GS-06","claim":"Serving repositories may be disposable caches only when authoritative freshness and rebuild are verified.","class":"PORTABLE_ASSURANCE_REQUIREMENT","state":"CONTRACT_OPEN","owner_issue":532},
+    {"id":"GS-07","claim":"Gossip may optimize propagation but must not be correctness authority.","class":"PORTABLE_ASSURANCE_REQUIREMENT","state":"CONTRACT_OPEN","owner_issue":532},
+    {"id":"GS-08","claim":"Primary-only compaction can trade bandwidth for reduced per-replica CPU work.","class":"ARCHITECTURE_SOURCE_STATEMENT","state":"SOURCE_PROPOSAL_NOT_EXERCISED","owner_issue":534},
+    {"id":"GS-09","claim":"Operation history can support corruption/race diagnosis, replay and recovery.","class":"PORTABLE_ASSURANCE_REQUIREMENT","state":"PARTIAL_GENERIC_METHOD_HOSTING_PROFILE_OPEN","owner_issue":532},
+    {"id":"GS-10","claim":"Read scaling and push-throughput numbers require exact topology, workload, durability, consistency and failure denominators.","class":"PERFORMANCE_CLAIM","state":"SOURCE_PROPOSAL_NOT_INDEPENDENTLY_VERIFIED","owner_issue":534}
+  ],
+  "evidence_law": {
+    "source_statement_is_not_runtime_truth": true,
+    "contract_pass_is_not_live_pass": true,
+    "one_topology_is_not_arbitrary_scale": true,
+    "immutable_source_packet_required_for_source_truth_advance": true
+  }
+}
