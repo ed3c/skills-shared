@@ -62,8 +62,8 @@ rollback remain Human or pre-authorized repository authority.
 
 ## Prompt and Codex routes
 
-- `../prompts/repository-portfolio-controller-v3.md`
-- `../prompts/repository-portfolio-role-prompts-v1.md`
+- `prompts/repository-portfolio-controller-v3.md`
+- `prompts/repository-portfolio-role-prompts-v1.md`
 - `repository-portfolio-control/codex-agent-templates.md`
 - `repository-portfolio-control/prompt-manifest.json`
 - `../scripts/check_repository_portfolio_prompt_pack.py`
