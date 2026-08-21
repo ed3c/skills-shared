@@ -1,0 +1,206 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dtcr-provider-observation.schema.json",
+  "title": "DTCR deterministic provider observation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "observation_id",
+    "subject_ref",
+    "provider",
+    "capability",
+    "input_identity",
+    "coverage",
+    "warnings",
+    "omissions",
+    "state",
+    "authority"
+  ],
+  "properties": {
+    "schema": {"const": "dtcr/provider-observation/v1"},
+    "observation_id": {"type": "string", "pattern": "^DTCR-PO-[0-9]{3,}$"},
+    "subject_ref": {"type": "string", "pattern": "^DTCR-SUBJECT-[0-9]{3,}$"},
+    "provider": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "capability_kind", "version", "executable_digest", "config_digest"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1, "maxLength": 128},
+        "capability_kind": {
+          "enum": ["SYNTAX_PARSER", "SYMBOL_INDEX", "COMPILER", "GRAPH_LEDGER", "CONTRACT_CHECKER", "CUSTOM_DETERMINISTIC"]
+        },
+        "version": {"type": "string", "minLength": 1, "maxLength": 128},
+        "executable_digest": {
+          "oneOf": [
+            {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+            {"const": "NOT_APPLICABLE"}
+          ]
+        },
+        "config_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "capability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operation", "declared_denominator"],
+      "properties": {
+        "operation": {
+          "enum": ["PARSE", "QUERY_SYNTAX", "INDEX_SYMBOLS", "RESOLVE_RELATIONSHIPS", "COMPILE", "STORE_EDGES", "TRAVERSE_EDGES", "CHECK_CONTRACT"]
+        },
+        "declared_denominator": {"type": "string", "minLength": 8, "maxLength": 512}
+      }
+    },
+    "input_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_digest", "provider_input_digest"],
+      "properties": {
+        "source_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "provider_input_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "grammar_or_index_digest": {
+          "oneOf": [
+            {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+            {"const": "NOT_APPLICABLE"}
+          ]
+        }
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["completeness", "processed", "denominator", "denominator_description"],
+      "properties": {
+        "completeness": {"$ref": "#/$defs/completeness"},
+        "processed": {"type": "integer", "minimum": 0},
+        "denominator": {"type": "integer", "minimum": 0},
+        "denominator_description": {"type": "string", "minLength": 8, "maxLength": 512}
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true
+    },
+    "omissions": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true
+    },
+    "state": {"enum": ["PASS", "FAIL", "BLOCKED", "NOT_APPLICABLE"]},
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["semantic_truth", "task_pass", "merge", "release", "production"],
+      "properties": {
+        "semantic_truth": {"const": false},
+        "task_pass": {"const": false},
+        "merge": {"const": false},
+        "release": {"const": false},
+        "production": {"const": false}
+      }
+    }
+  },
+  "$defs": {
+    "completeness": {
+      "enum": ["EXACT_FOR_DECLARED_DENOMINATOR", "PARTIAL", "UNKNOWN", "NOT_APPLICABLE"]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "coverage": {
+            "properties": {"completeness": {"const": "EXACT_FOR_DECLARED_DENOMINATOR"}},
+            "required": ["completeness"]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "coverage": {
+            "properties": {"denominator": {"minimum": 1}},
+            "required": ["denominator"]
+          }
+        }
+      }
+    }
+  ],
+  "examples": [
+    {
+      "schema": "dtcr/provider-observation/v1",
+      "observation_id": "DTCR-PO-001",
+      "subject_ref": "DTCR-SUBJECT-001",
+      "provider": {
+        "name": "example-parser",
+        "capability_kind": "SYNTAX_PARSER",
+        "version": "1.0.0",
+        "executable_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "config_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "capability": {
+        "operation": "QUERY_SYNTAX",
+        "declared_denominator": "three source files named by the exact task packet"
+      },
+      "input_identity": {
+        "source_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "provider_input_digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "grammar_or_index_digest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+      },
+      "coverage": {
+        "completeness": "EXACT_FOR_DECLARED_DENOMINATOR",
+        "processed": 3,
+        "denominator": 3,
+        "denominator_description": "three source files named by the exact task packet"
+      },
+      "warnings": [],
+      "omissions": [],
+      "state": "PASS",
+      "authority": {
+        "semantic_truth": false,
+        "task_pass": false,
+        "merge": false,
+        "release": false,
+        "production": false
+      }
+    }
+  ],
+  "x-refusal-controls": [
+    {
+      "case_id": "DTCR-D1C-PROVIDER-001",
+      "refuses": "A provider observation claiming it establishes task PASS.",
+      "refused_by": "properties.authority.properties.task_pass.const",
+      "instance": {
+        "schema": "dtcr/provider-observation/v1",
+        "observation_id": "DTCR-PO-101",
+        "subject_ref": "DTCR-SUBJECT-001",
+        "provider": {"name": "example-indexer", "capability_kind": "SYMBOL_INDEX", "version": "1", "executable_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "config_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"},
+        "capability": {"operation": "INDEX_SYMBOLS", "declared_denominator": "the exact files admitted by the task packet"},
+        "input_identity": {"source_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc", "provider_input_digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "grammar_or_index_digest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"},
+        "coverage": {"completeness": "PARTIAL", "processed": 9, "denominator": 12, "denominator_description": "twelve files requested; three unsupported"},
+        "warnings": ["unsupported generated source"],
+        "omissions": ["three generated files"],
+        "state": "PASS",
+        "authority": {"semantic_truth": false, "task_pass": true, "merge": false, "release": false, "production": false}
+      }
+    },
+    {
+      "case_id": "DTCR-D1C-PROVIDER-002",
+      "refuses": "Exact coverage with an empty denominator.",
+      "refused_by": "allOf[0].then.properties.coverage.properties.denominator.minimum",
+      "instance": {
+        "schema": "dtcr/provider-observation/v1",
+        "observation_id": "DTCR-PO-102",
+        "subject_ref": "DTCR-SUBJECT-001",
+        "provider": {"name": "example-parser", "capability_kind": "SYNTAX_PARSER", "version": "1", "executable_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "config_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"},
+        "capability": {"operation": "PARSE", "declared_denominator": "no files were actually presented"},
+        "input_identity": {"source_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc", "provider_input_digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "grammar_or_index_digest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"},
+        "coverage": {"completeness": "EXACT_FOR_DECLARED_DENOMINATOR", "processed": 0, "denominator": 0, "denominator_description": "no files were actually presented"},
+        "warnings": [],
+        "omissions": [],
+        "state": "PASS",
+        "authority": {"semantic_truth": false, "task_pass": false, "merge": false, "release": false, "production": false}
+      }
+    }
+  ]
+}
