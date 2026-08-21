@@ -1,0 +1,474 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pol/user-lane/v1",
+  "title": "POL user-adoption scenario",
+  "description": "One user-adoption scenario record for the USER lane named in `../productization-program.schema.json`. It carries the fourteen adoption dimensions from issue #424 as structured, separately evidenced fields, plus a required falsifier so a scenario without a way to be proven wrong is not representable. Evidence kind reuses the closed five-kind vocabulary from `../../../product-reverse-engineering-loop/references/evidence-vocabulary.md` (`OBSERVED_ARTIFACT`, `USER_INTERVIEW`, `THIRD_PARTY_REPORT`, `SOURCE_STATEMENT`, `INFERENCE`) rather than inventing a second one, and `lane_state` / `highest_rung_reached` reuse the exact enums from the C0 program schema's `$defs.lane_state` and `$defs.rung_name` so a scenario record slots into that lane without translation. This schema answers only the scenario/adoption-contract question the issue bounds it to: it never states that a real user validated anything, and `adoption_status.state` cannot reach `OBSERVED_ADOPTION` without an `OBSERVED_ARTIFACT` receipt.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "scenario_id",
+    "subject_commit",
+    "lane_state",
+    "highest_rung_reached",
+    "persona",
+    "trigger_event",
+    "current_tool_or_workaround",
+    "first_value_path",
+    "time_to_first_value",
+    "setup_burden",
+    "account_api_key_burden",
+    "permission_trust_burden",
+    "data_migration_burden",
+    "learning_cost",
+    "switching_cost",
+    "procurement_path",
+    "failure_recovery",
+    "retention_return_trigger",
+    "adoption_status",
+    "falsifier"
+  ],
+  "properties": {
+    "schema": {"const": "pol/user-lane/v1"},
+    "scenario_id": {
+      "type": "string",
+      "pattern": "^POL-USER-[0-9]{3}$",
+      "description": "One named scenario, not a persona archetype library. `docs/adoption steps` in the Zero-context prompt means this exact scenario's steps."
+    },
+    "subject_commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$",
+      "description": "The exact commit this scenario is bound to, written out rather than referenced, matching the C0 subject-binding law."
+    },
+    "program_ref": {
+      "type": "string",
+      "pattern": "^POL-PROG-[0-9]{3}$",
+      "description": "Optional pointer to the program record this scenario feeds the USER lane of. Absent when no program has been bound yet."
+    },
+    "lane_state": {
+      "enum": ["PASS", "FAIL", "UNKNOWN", "BLOCKED", "ABSENT", "NOT_IMPLEMENTED", "NOT_EXERCISED", "SKIPPED_BY_POLICY", "NOT_APPLICABLE", "HUMAN_ADMIT_REQUIRED"],
+      "description": "The exact ten-value set from `../productization-program.schema.json#/$defs/lane_state`, reused rather than re-specified so a program cannot receive a USER lane value this schema invented on its own."
+    },
+    "highest_rung_reached": {
+      "enum": ["NONE", "SOURCE_FOUND", "SOURCE_VERIFIED", "JOB_SUPPORTED", "WEDGE_SUPPORTED", "MECHANISM_REPRODUCED", "MVP_TECH_VERIFIED", "LIVE_WORKFLOW_VERIFIED", "USER_VALIDATED", "PAID_VALIDATED", "REPEATABLE_COMMERCIAL"],
+      "description": "The exact eleven-value set from `../productization-program.schema.json#/$defs/rung_name`. A scenario record built by this method alone caps here at `USER_VALIDATED`; anything past it needs the program's own receipt-bearing ladder, not this schema."
+    },
+    "persona": {"$ref": "#/$defs/persona"},
+    "trigger_event": {"$ref": "#/$defs/described_field"},
+    "current_tool_or_workaround": {"$ref": "#/$defs/described_field"},
+    "first_value_path": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["step", "evidence"],
+        "properties": {
+          "step": {"type": "string", "minLength": 4, "maxLength": 200},
+          "evidence": {"$ref": "#/$defs/evidence_ref"}
+        }
+      },
+      "description": "The ordered steps from trigger to first value. An empty path is refused by `minItems`: a scenario with no path is not a scenario."
+    },
+    "time_to_first_value": {"$ref": "#/$defs/time_to_first_value"},
+    "setup_burden": {"$ref": "#/$defs/friction_field"},
+    "account_api_key_burden": {"$ref": "#/$defs/friction_field"},
+    "permission_trust_burden": {"$ref": "#/$defs/permission_trust_burden"},
+    "data_migration_burden": {"$ref": "#/$defs/friction_field"},
+    "learning_cost": {"$ref": "#/$defs/friction_field"},
+    "switching_cost": {"$ref": "#/$defs/switching_cost"},
+    "procurement_path": {"$ref": "#/$defs/described_field"},
+    "failure_recovery": {"$ref": "#/$defs/described_field"},
+    "retention_return_trigger": {"$ref": "#/$defs/described_field"},
+    "adoption_status": {"$ref": "#/$defs/adoption_status"},
+    "falsifier": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["hypothesis", "would_be_refuted_by", "counterexample"],
+      "description": "Required at the top level, always. A hypothesis with no stated way to be wrong is not falsifiable, so it cannot be written down here without also writing down what would refute it.",
+      "properties": {
+        "hypothesis": {"type": "string", "minLength": 8, "maxLength": 400},
+        "would_be_refuted_by": {"type": "string", "minLength": 8, "maxLength": 400, "description": "The observation that would prove the hypothesis false, stated before the observation is made."},
+        "counterexample": {"type": "string", "minLength": 8, "maxLength": 400, "description": "A concrete instance of the refuting observation, even a synthetic one, so the falsifier is not left abstract."}
+      }
+    }
+  },
+  "$defs": {
+    "evidence_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "note"],
+      "description": "Reuses the five closed signal kinds from product-reverse-engineering-loop's evidence vocabulary. Grade is a function of kind alone, so no separate grade field exists to drift out of sync with it.",
+      "properties": {
+        "kind": {
+          "enum": ["OBSERVED_ARTIFACT", "USER_INTERVIEW", "THIRD_PARTY_REPORT", "SOURCE_STATEMENT", "INFERENCE"],
+          "description": "OBSERVED_ARTIFACT: someone drove the real surface and recorded what happened (grade OBSERVED). USER_INTERVIEW: a user said this about their own behaviour (grade REPORTED). THIRD_PARTY_REPORT: someone else reports having observed it (grade REPORTED). SOURCE_STATEMENT: a vendor, demo or marketing surface says so about itself (grade CLAIMED). INFERENCE: a reading of other signals with no observation of its own (grade INFERRED)."
+        },
+        "note": {"type": "string", "minLength": 4, "maxLength": 300}
+      }
+    },
+    "described_field": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["description", "evidence"],
+      "properties": {
+        "description": {"type": "string", "minLength": 4, "maxLength": 400},
+        "evidence": {"$ref": "#/$defs/evidence_ref"}
+      }
+    },
+    "friction_field": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "evidence"],
+      "properties": {
+        "state": {"enum": ["NOT_ASSESSED", "LOW", "MODERATE", "HIGH", "BLOCKING"]},
+        "evidence": {"$ref": "#/$defs/evidence_ref"}
+      }
+    },
+    "permission_trust_burden": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "evidence"],
+      "description": "A friction field with one extra law: a claimed LOW burden must carry evidence that somebody actually cleared the login/permission/trust step, not the default assumption that it is free.",
+      "properties": {
+        "state": {"enum": ["NOT_ASSESSED", "LOW", "MODERATE", "HIGH", "BLOCKING"]},
+        "evidence": {"$ref": "#/$defs/evidence_ref"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"state": {"const": "LOW"}}, "required": ["state"]},
+          "then": {
+            "properties": {
+              "evidence": {"properties": {"kind": {"enum": ["OBSERVED_ARTIFACT", "USER_INTERVIEW", "THIRD_PARTY_REPORT"]}}}
+            }
+          }
+        }
+      ]
+    },
+    "time_to_first_value": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "evidence"],
+      "description": "A `MEASURED` state is a claim that a real elapsed time was recorded. A demo walkthrough is a `SOURCE_STATEMENT`, and cannot promote the state past `ESTIMATED`.",
+      "properties": {
+        "state": {"enum": ["NOT_ASSESSED", "ESTIMATED", "MEASURED"]},
+        "value_seconds": {"type": "number", "minimum": 0},
+        "evidence": {"$ref": "#/$defs/evidence_ref"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"state": {"const": "MEASURED"}}, "required": ["state"]},
+          "then": {
+            "properties": {
+              "evidence": {"properties": {"kind": {"enum": ["OBSERVED_ARTIFACT", "USER_INTERVIEW", "THIRD_PARTY_REPORT"]}}}
+            }
+          }
+        }
+      ]
+    },
+    "switching_cost": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "willingness_to_switch", "evidence"],
+      "description": "Cost of switching and willingness to switch are two separate claims. `CONFIRMED_SWITCH` needs evidence of an actual move, not a report of pain about the incumbent tool.",
+      "properties": {
+        "state": {"enum": ["NOT_ASSESSED", "LOW", "MODERATE", "HIGH", "BLOCKING"]},
+        "willingness_to_switch": {"enum": ["NOT_ASSESSED", "PAIN_REPORTED_ONLY", "CONFIRMED_SWITCH"]},
+        "evidence": {"$ref": "#/$defs/evidence_ref"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"willingness_to_switch": {"const": "CONFIRMED_SWITCH"}}, "required": ["willingness_to_switch"]},
+          "then": {
+            "properties": {
+              "evidence": {"properties": {"kind": {"enum": ["OBSERVED_ARTIFACT", "THIRD_PARTY_REPORT"]}}}
+            }
+          }
+        }
+      ]
+    },
+    "adoption_status": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "evidence"],
+      "description": "`OBSERVED_ADOPTION` is a claim that somebody actually adopted, not that somebody expressed interest.",
+      "properties": {
+        "state": {"enum": ["NOT_ASSESSED", "EXPRESSED_INTEREST", "OBSERVED_ADOPTION"]},
+        "evidence": {"$ref": "#/$defs/evidence_ref"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"state": {"const": "OBSERVED_ADOPTION"}}, "required": ["state"]},
+          "then": {
+            "properties": {
+              "evidence": {"properties": {"kind": {"const": "OBSERVED_ARTIFACT"}}}
+            }
+          }
+        }
+      ]
+    },
+    "persona": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["buyer_persona_id", "user_persona_id", "relationship"],
+      "description": "Buyer and user are always named separately. Declaring them the SAME_PERSON is a claim, not the default, and needs its own evidence.",
+      "properties": {
+        "buyer_persona_id": {"type": "string", "minLength": 2, "maxLength": 80},
+        "user_persona_id": {"type": "string", "minLength": 2, "maxLength": 80},
+        "relationship": {"enum": ["SAME_PERSON", "DIFFERENT_PERSONS", "UNKNOWN"]},
+        "relationship_evidence": {"$ref": "#/$defs/evidence_ref"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"relationship": {"const": "SAME_PERSON"}}, "required": ["relationship"]},
+          "then": {
+            "required": ["relationship_evidence"],
+            "properties": {
+              "relationship_evidence": {"properties": {"kind": {"enum": ["OBSERVED_ARTIFACT", "USER_INTERVIEW", "THIRD_PARTY_REPORT"]}}}
+            }
+          }
+        }
+      ]
+    }
+  },
+  "examples": [
+    {
+      "schema": "pol/user-lane/v1",
+      "scenario_id": "POL-USER-001",
+      "subject_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+      "program_ref": "POL-PROG-001",
+      "lane_state": "PASS",
+      "highest_rung_reached": "USER_VALIDATED",
+      "persona": {
+        "buyer_persona_id": "eng-manager-synthetic-01",
+        "user_persona_id": "ic-engineer-synthetic-02",
+        "relationship": "DIFFERENT_PERSONS",
+        "relationship_evidence": {"kind": "USER_INTERVIEW", "note": "synthetic interview transcript: manager approves the seat, an IC engineer is the one who opens the tool daily"}
+      },
+      "trigger_event": {
+        "description": "a synthetic IC engineer's CI run fails a flaky test for the third time in a week",
+        "evidence": {"kind": "OBSERVED_ARTIFACT", "note": "synthetic session log shows the third failure inside seven days on the same suite"}
+      },
+      "current_tool_or_workaround": {
+        "description": "re-run the CI job manually and, if it fails again, comment it out with a TODO",
+        "evidence": {"kind": "USER_INTERVIEW", "note": "synthetic user states this is their current workaround"}
+      },
+      "first_value_path": [
+        {"step": "paste the failing test's stack trace into the tool", "evidence": {"kind": "OBSERVED_ARTIFACT", "note": "synthetic session recording, step 1"}},
+        {"step": "tool returns a synthetic flakiness classification with a suggested fix", "evidence": {"kind": "OBSERVED_ARTIFACT", "note": "synthetic session recording, step 2"}},
+        {"step": "user applies the suggested fix and the suite passes twice in a row", "evidence": {"kind": "OBSERVED_ARTIFACT", "note": "synthetic session recording, step 3"}}
+      ],
+      "time_to_first_value": {
+        "state": "MEASURED",
+        "value_seconds": 240,
+        "evidence": {"kind": "OBSERVED_ARTIFACT", "note": "synthetic session timer from paste to passing suite"}
+      },
+      "setup_burden": {
+        "state": "LOW",
+        "evidence": {"kind": "OBSERVED_ARTIFACT", "note": "synthetic session: no install step, browser tab only"}
+      },
+      "account_api_key_burden": {
+        "state": "MODERATE",
+        "evidence": {"kind": "USER_INTERVIEW", "note": "synthetic user reports needing to generate a CI-read-only token before first use"}
+      },
+      "permission_trust_burden": {
+        "state": "MODERATE",
+        "evidence": {"kind": "USER_INTERVIEW", "note": "synthetic user reports hesitating before granting read access to the CI log store"}
+      },
+      "data_migration_burden": {
+        "state": "NOT_ASSESSED",
+        "evidence": {"kind": "INFERENCE", "note": "no existing flaky-test history was migrated in this scenario; not exercised"}
+      },
+      "learning_cost": {
+        "state": "LOW",
+        "evidence": {"kind": "OBSERVED_ARTIFACT", "note": "synthetic session: no documentation was opened before first value"}
+      },
+      "switching_cost": {
+        "state": "LOW",
+        "willingness_to_switch": "PAIN_REPORTED_ONLY",
+        "evidence": {"kind": "USER_INTERVIEW", "note": "synthetic user says the manual re-run workaround is annoying; no actual switch away from it was observed in this scenario"}
+      },
+      "procurement_path": {
+        "description": "individual free-tier signup; no purchase order in this scenario",
+        "evidence": {"kind": "OBSERVED_ARTIFACT", "note": "synthetic session shows self-serve signup, no procurement step reached"}
+      },
+      "failure_recovery": {
+        "description": "if the suggested fix does not resolve the flake, the tool offers a synthetic rollback to the manual workaround with one click",
+        "evidence": {"kind": "OBSERVED_ARTIFACT", "note": "synthetic session recording of the rollback control"}
+      },
+      "retention_return_trigger": {
+        "description": "the next flaky-test failure in the same repository",
+        "evidence": {"kind": "INFERENCE", "note": "no second session was run in this synthetic scenario; the return trigger is inferred from the trigger event, not observed"}
+      },
+      "adoption_status": {
+        "state": "EXPRESSED_INTEREST",
+        "evidence": {"kind": "USER_INTERVIEW", "note": "synthetic user says they would keep using it; no second real session was observed, so adoption is not claimed as observed"}
+      },
+      "falsifier": {
+        "hypothesis": "an IC engineer facing a repeat CI flake will reach first value inside five minutes without reading documentation",
+        "would_be_refuted_by": "a synthetic session in which the user opens documentation, or the elapsed time from paste to passing suite exceeds five minutes",
+        "counterexample": "a synthetic session where the classification is wrong and the user spends twenty minutes reading the tool's help before giving up"
+      }
+    }
+  ],
+  "x-refusal-controls": [
+    {
+      "case_id": "POL-XC-USER-001",
+      "refuses": "PAIN_AS_WILLINGNESS_TO_SWITCH: a reported pain about the incumbent tool filed as a confirmed switch, with no observation of an actual move.",
+      "refused_by": "$defs.switching_cost.allOf[0].then.properties.evidence.properties.kind.enum",
+      "instance": {
+        "schema": "pol/user-lane/v1",
+        "scenario_id": "POL-USER-002",
+        "subject_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "lane_state": "PASS",
+        "highest_rung_reached": "USER_VALIDATED",
+        "persona": {"buyer_persona_id": "eng-manager-synthetic-01", "user_persona_id": "ic-engineer-synthetic-02", "relationship": "DIFFERENT_PERSONS", "relationship_evidence": {"kind": "USER_INTERVIEW", "note": "synthetic"}},
+        "trigger_event": {"description": "synthetic", "evidence": {"kind": "OBSERVED_ARTIFACT", "note": "synthetic"}},
+        "current_tool_or_workaround": {"description": "synthetic", "evidence": {"kind": "USER_INTERVIEW", "note": "synthetic"}},
+        "first_value_path": [{"step": "synthetic step", "evidence": {"kind": "OBSERVED_ARTIFACT", "note": "synthetic"}}],
+        "time_to_first_value": {"state": "ESTIMATED", "evidence": {"kind": "INFERENCE", "note": "synthetic"}},
+        "setup_burden": {"state": "LOW", "evidence": {"kind": "OBSERVED_ARTIFACT", "note": "synthetic"}},
+        "account_api_key_burden": {"state": "LOW", "evidence": {"kind": "OBSERVED_ARTIFACT", "note": "synthetic"}},
+        "permission_trust_burden": {"state": "NOT_ASSESSED", "evidence": {"kind": "INFERENCE", "note": "synthetic"}},
+        "data_migration_burden": {"state": "NOT_ASSESSED", "evidence": {"kind": "INFERENCE", "note": "synthetic"}},
+        "learning_cost": {"state": "LOW", "evidence": {"kind": "OBSERVED_ARTIFACT", "note": "synthetic"}},
+        "switching_cost": {
+          "state": "MODERATE",
+          "willingness_to_switch": "CONFIRMED_SWITCH",
+          "evidence": {"kind": "USER_INTERVIEW", "note": "synthetic user complains the incumbent tool is annoying; this is a pain report, not an observed switch, and the schema refuses it as evidence for CONFIRMED_SWITCH"}
+        },
+        "procurement_path": {"description": "synthetic", "evidence": {"kind": "OBSERVED_ARTIFACT", "note": "synthetic"}},
+        "failure_recovery": {"description": "synthetic", "evidence": {"kind": "OBSERVED_ARTIFACT", "note": "synthetic"}},
+        "retention_return_trigger": {"description": "synthetic", "evidence": {"kind": "INFERENCE", "note": "synthetic"}},
+        "adoption_status": {"state": "EXPRESSED_INTEREST", "evidence": {"kind": "USER_INTERVIEW", "note": "synthetic"}},
+        "falsifier": {"hypothesis": "synthetic hypothesis text long enough", "would_be_refuted_by": "synthetic refutation text long enough", "counterexample": "synthetic counterexample text long enough"}
+      }
+    },
+    {
+      "case_id": "POL-XC-USER-002",
+      "refuses": "INTEREST_AS_ADOPTION: an expressed-interest signal filed as observed adoption.",
+      "refused_by": "$defs.adoption_status.allOf[0].then.properties.evidence.properties.kind.const",
+      "instance": {
+        "schema": "pol/user-lane/v1",
+        "scenario_id": "POL-USER-003",
+        "subject_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "lane_state": "PASS",
+        "highest_rung_reached": "USER_VALIDATED",
+        "persona": {"buyer_persona_id": "eng-manager-synthetic-01", "user_persona_id": "ic-engineer-synthetic-02", "relationship": "DIFFERENT_PERSONS", "relationship_evidence": {"kind": "USER_INTERVIEW", "note": "synthetic"}},
+        "trigger_event": {"description": "synthetic", "evidence": {"kind": "OBSERVED_ARTIFACT", "note": "synthetic"}},
+        "current_tool_or_workaround": {"description": "synthetic", "evidence": {"kind": "USER_INTERVIEW", "note": "synthetic"}},
+        "first_value_path": [{"step": "synthetic step", "evidence": {"kind": "OBSERVED_ARTIFACT", "note": "synthetic"}}],
+        "time_to_first_value": {"state": "ESTIMATED", "evidence": {"kind": "INFERENCE", "note": "synthetic"}},
+        "setup_burden": {"state": "LOW", "evidence": {"kind": "OBSERVED_ARTIFACT", "note": "synthetic"}},
+        "account_api_key_burden": {"state": "LOW", "evidence": {"kind": "OBSERVED_ARTIFACT", "note": "synthetic"}},
+        "permission_trust_burden": {"state": "NOT_ASSESSED", "evidence": {"kind": "INFERENCE", "note": "synthetic"}},
+        "data_migration_burden": {"state": "NOT_ASSESSED", "evidence": {"kind": "INFERENCE", "note": "synthetic"}},
+        "learning_cost": {"state": "LOW", "evidence": {"kind": "OBSERVED_ARTIFACT", "note": "synthetic"}},
+        "switching_cost": {"state": "LOW", "willingness_to_switch": "NOT_ASSESSED", "evidence": {"kind": "INFERENCE", "note": "synthetic"}},
+        "procurement_path": {"description": "synthetic", "evidence": {"kind": "OBSERVED_ARTIFACT", "note": "synthetic"}},
+        "failure_recovery": {"description": "synthetic", "evidence": {"kind": "OBSERVED_ARTIFACT", "note": "synthetic"}},
+        "retention_return_trigger": {"description": "synthetic", "evidence": {"kind": "INFERENCE", "note": "synthetic"}},
+        "adoption_status": {
+          "state": "OBSERVED_ADOPTION",
+          "evidence": {"kind": "USER_INTERVIEW", "note": "synthetic user says they would use it again; this is expressed interest, not an observed second session, and the schema refuses it as evidence for OBSERVED_ADOPTION"}
+        },
+        "falsifier": {"hypothesis": "synthetic hypothesis text long enough", "would_be_refuted_by": "synthetic refutation text long enough", "counterexample": "synthetic counterexample text long enough"}
+      }
+    },
+    {
+      "case_id": "POL-XC-USER-003",
+      "refuses": "DEMO_AS_TIME_TO_VALUE: a vendor/demo walkthrough filed as a measured time-to-first-value.",
+      "refused_by": "$defs.time_to_first_value.allOf[0].then.properties.evidence.properties.kind.enum",
+      "instance": {
+        "schema": "pol/user-lane/v1",
+        "scenario_id": "POL-USER-004",
+        "subject_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "lane_state": "PASS",
+        "highest_rung_reached": "USER_VALIDATED",
+        "persona": {"buyer_persona_id": "eng-manager-synthetic-01", "user_persona_id": "ic-engineer-synthetic-02", "relationship": "DIFFERENT_PERSONS", "relationship_evidence": {"kind": "USER_INTERVIEW", "note": "synthetic"}},
+        "trigger_event": {"description": "synthetic", "evidence": {"kind": "OBSERVED_ARTIFACT", "note": "synthetic"}},
+        "current_tool_or_workaround": {"description": "synthetic", "evidence": {"kind": "USER_INTERVIEW", "note": "synthetic"}},
+        "first_value_path": [{"step": "synthetic step", "evidence": {"kind": "OBSERVED_ARTIFACT", "note": "synthetic"}}],
+        "time_to_first_value": {
+          "state": "MEASURED",
+          "value_seconds": 90,
+          "evidence": {"kind": "SOURCE_STATEMENT", "note": "synthetic marketing page claims '90 seconds to value' in a scripted demo video; this is a vendor claim, not a recorded session, and the schema refuses it as evidence for MEASURED"}
+        },
+        "setup_burden": {"state": "LOW", "evidence": {"kind": "OBSERVED_ARTIFACT", "note": "synthetic"}},
+        "account_api_key_burden": {"state": "LOW", "evidence": {"kind": "OBSERVED_ARTIFACT", "note": "synthetic"}},
+        "permission_trust_burden": {"state": "NOT_ASSESSED", "evidence": {"kind": "INFERENCE", "note": "synthetic"}},
+        "data_migration_burden": {"state": "NOT_ASSESSED", "evidence": {"kind": "INFERENCE", "note": "synthetic"}},
+        "learning_cost": {"state": "LOW", "evidence": {"kind": "OBSERVED_ARTIFACT", "note": "synthetic"}},
+        "switching_cost": {"state": "LOW", "willingness_to_switch": "NOT_ASSESSED", "evidence": {"kind": "INFERENCE", "note": "synthetic"}},
+        "procurement_path": {"description": "synthetic", "evidence": {"kind": "OBSERVED_ARTIFACT", "note": "synthetic"}},
+        "failure_recovery": {"description": "synthetic", "evidence": {"kind": "OBSERVED_ARTIFACT", "note": "synthetic"}},
+        "retention_return_trigger": {"description": "synthetic", "evidence": {"kind": "INFERENCE", "note": "synthetic"}},
+        "adoption_status": {"state": "EXPRESSED_INTEREST", "evidence": {"kind": "USER_INTERVIEW", "note": "synthetic"}},
+        "falsifier": {"hypothesis": "synthetic hypothesis text long enough", "would_be_refuted_by": "synthetic refutation text long enough", "counterexample": "synthetic counterexample text long enough"}
+      }
+    },
+    {
+      "case_id": "POL-XC-USER-004",
+      "refuses": "LOGIN_OR_PERMISSION_ASSUMED_FREE: a permission/trust burden defaulted to LOW on inference alone, with no evidence anybody actually cleared it.",
+      "refused_by": "$defs.permission_trust_burden.allOf[0].then.properties.evidence.properties.kind.enum",
+      "instance": {
+        "schema": "pol/user-lane/v1",
+        "scenario_id": "POL-USER-005",
+        "subject_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "lane_state": "PASS",
+        "highest_rung_reached": "USER_VALIDATED",
+        "persona": {"buyer_persona_id": "eng-manager-synthetic-01", "user_persona_id": "ic-engineer-synthetic-02", "relationship": "DIFFERENT_PERSONS", "relationship_evidence": {"kind": "USER_INTERVIEW", "note": "synthetic"}},
+        "trigger_event": {"description": "synthetic", "evidence": {"kind": "OBSERVED_ARTIFACT", "note": "synthetic"}},
+        "current_tool_or_workaround": {"description": "synthetic", "evidence": {"kind": "USER_INTERVIEW", "note": "synthetic"}},
+        "first_value_path": [{"step": "synthetic step", "evidence": {"kind": "OBSERVED_ARTIFACT", "note": "synthetic"}}],
+        "time_to_first_value": {"state": "ESTIMATED", "evidence": {"kind": "INFERENCE", "note": "synthetic"}},
+        "setup_burden": {"state": "LOW", "evidence": {"kind": "OBSERVED_ARTIFACT", "note": "synthetic"}},
+        "account_api_key_burden": {"state": "LOW", "evidence": {"kind": "OBSERVED_ARTIFACT", "note": "synthetic"}},
+        "permission_trust_burden": {
+          "state": "LOW",
+          "evidence": {"kind": "INFERENCE", "note": "synthetic author assumes granting CI read access is a non-issue because it seems minor; nobody was observed clearing it, and the schema refuses INFERENCE as evidence for LOW"}
+        },
+        "data_migration_burden": {"state": "NOT_ASSESSED", "evidence": {"kind": "INFERENCE", "note": "synthetic"}},
+        "learning_cost": {"state": "LOW", "evidence": {"kind": "OBSERVED_ARTIFACT", "note": "synthetic"}},
+        "switching_cost": {"state": "LOW", "willingness_to_switch": "NOT_ASSESSED", "evidence": {"kind": "INFERENCE", "note": "synthetic"}},
+        "procurement_path": {"description": "synthetic", "evidence": {"kind": "OBSERVED_ARTIFACT", "note": "synthetic"}},
+        "failure_recovery": {"description": "synthetic", "evidence": {"kind": "OBSERVED_ARTIFACT", "note": "synthetic"}},
+        "retention_return_trigger": {"description": "synthetic", "evidence": {"kind": "INFERENCE", "note": "synthetic"}},
+        "adoption_status": {"state": "EXPRESSED_INTEREST", "evidence": {"kind": "USER_INTERVIEW", "note": "synthetic"}},
+        "falsifier": {"hypothesis": "synthetic hypothesis text long enough", "would_be_refuted_by": "synthetic refutation text long enough", "counterexample": "synthetic counterexample text long enough"}
+      }
+    },
+    {
+      "case_id": "POL-XC-USER-005",
+      "refuses": "BUYER_EQUALS_USER_BY_DEFAULT: buyer and user declared the SAME_PERSON on inference alone, with no evidence anybody checked.",
+      "refused_by": "$defs.persona.allOf[0].then.required",
+      "instance": {
+        "schema": "pol/user-lane/v1",
+        "scenario_id": "POL-USER-006",
+        "subject_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "lane_state": "PASS",
+        "highest_rung_reached": "USER_VALIDATED",
+        "persona": {
+          "buyer_persona_id": "eng-manager-synthetic-01",
+          "user_persona_id": "eng-manager-synthetic-01",
+          "relationship": "SAME_PERSON"
+        },
+        "trigger_event": {"description": "synthetic", "evidence": {"kind": "OBSERVED_ARTIFACT", "note": "synthetic"}},
+        "current_tool_or_workaround": {"description": "synthetic", "evidence": {"kind": "USER_INTERVIEW", "note": "synthetic"}},
+        "first_value_path": [{"step": "synthetic step", "evidence": {"kind": "OBSERVED_ARTIFACT", "note": "synthetic"}}],
+        "time_to_first_value": {"state": "ESTIMATED", "evidence": {"kind": "INFERENCE", "note": "synthetic"}},
+        "setup_burden": {"state": "LOW", "evidence": {"kind": "OBSERVED_ARTIFACT", "note": "synthetic"}},
+        "account_api_key_burden": {"state": "LOW", "evidence": {"kind": "OBSERVED_ARTIFACT", "note": "synthetic"}},
+        "permission_trust_burden": {"state": "NOT_ASSESSED", "evidence": {"kind": "INFERENCE", "note": "synthetic"}},
+        "data_migration_burden": {"state": "NOT_ASSESSED", "evidence": {"kind": "INFERENCE", "note": "synthetic"}},
+        "learning_cost": {"state": "LOW", "evidence": {"kind": "OBSERVED_ARTIFACT", "note": "synthetic"}},
+        "switching_cost": {"state": "LOW", "willingness_to_switch": "NOT_ASSESSED", "evidence": {"kind": "INFERENCE", "note": "synthetic"}},
+        "procurement_path": {"description": "synthetic", "evidence": {"kind": "OBSERVED_ARTIFACT", "note": "synthetic"}},
+        "failure_recovery": {"description": "synthetic", "evidence": {"kind": "OBSERVED_ARTIFACT", "note": "synthetic"}},
+        "retention_return_trigger": {"description": "synthetic", "evidence": {"kind": "INFERENCE", "note": "synthetic"}},
+        "adoption_status": {"state": "EXPRESSED_INTEREST", "evidence": {"kind": "USER_INTERVIEW", "note": "synthetic"}},
+        "falsifier": {"hypothesis": "synthetic hypothesis text long enough", "would_be_refuted_by": "synthetic refutation text long enough", "counterexample": "synthetic counterexample text long enough"}
+      }
+    }
+  ]
+}

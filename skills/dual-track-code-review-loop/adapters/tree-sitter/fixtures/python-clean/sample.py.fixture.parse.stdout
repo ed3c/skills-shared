@@ -1,0 +1,27 @@
+(module [0, 0] - [11, 0]
+  (comment [0, 0] - [0, 75])
+  (comment [1, 0] - [1, 76])
+  (comment [2, 0] - [2, 73])
+  (comment [3, 0] - [3, 33])
+  (function_definition [4, 0] - [5, 20]
+    name: (identifier [4, 4] - [4, 9])
+    parameters: (parameters [4, 9] - [4, 16]
+      (identifier [4, 10] - [4, 15]))
+    body: (block [5, 4] - [5, 20]
+      (return_statement [5, 4] - [5, 20]
+        (binary_operator [5, 11] - [5, 20]
+          left: (identifier [5, 11] - [5, 16])
+          right: (integer [5, 19] - [5, 20])))))
+  (class_definition [8, 0] - [10, 23]
+    name: (identifier [8, 6] - [8, 10])
+    body: (block [9, 4] - [10, 23]
+      (function_definition [9, 4] - [10, 23]
+        name: (identifier [9, 8] - [9, 13])
+        parameters: (parameters [9, 13] - [9, 19]
+          (identifier [9, 14] - [9, 18]))
+        body: (block [10, 8] - [10, 23]
+          (return_statement [10, 8] - [10, 23]
+            (call [10, 15] - [10, 23]
+              function: (identifier [10, 15] - [10, 20])
+              arguments: (argument_list [10, 20] - [10, 23]
+                (integer [10, 21] - [10, 22])))))))))

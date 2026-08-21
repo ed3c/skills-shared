@@ -1,0 +1,212 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dtcr-violation-candidate.schema.json",
+  "title": "DTCR violation candidate",
+  "description": "One suspected breach of a named architecture invariant, produced by the deterministic track and optionally coloured by the semantic track. The word candidate is load-bearing: this record is what the analysis nominated, never what the repository owes. Basis is an array whose items each carry the grade their evidence supports, and at least one item must be a DETERMINISTIC_FACT, because a retrieval hit is a candidate for context and can never be the whole reason a violation is asserted. Graph evidence records how the edge was obtained, and an edge inferred by nesting a reference inside the smallest enclosing definition range is bound to PARTIAL_LOWER_BOUND: that inference misses dynamic dispatch, interface satisfaction, reflection, callbacks and generated code, and calling its output a call graph turns a floor into a ceiling.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "violation_id", "invariant_ref", "subject_commit", "basis", "graph_evidence", "state"],
+  "properties": {
+    "schema": {"const": "dtcr/violation-candidate/v1"},
+    "violation_id": {"type": "string", "pattern": "^DTCR-VC-[0-9]{3}$"},
+    "invariant_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["invariant_id", "statement"],
+      "properties": {
+        "invariant_id": {"type": "string", "pattern": "^DTCR-AI-[0-9]{3}$"},
+        "statement": {
+          "type": "string",
+          "minLength": 12,
+          "description": "The invariant written out. A rule referred to only by identifier is a rule nobody can disagree with."
+        }
+      }
+    },
+    "subject_commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$",
+      "description": "Exact commit the analysis ran against. A branch name, a tag, main or latest describes a moving tree and dates the finding to nothing."
+    },
+    "basis": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/basis_item"},
+      "contains": {
+        "type": "object",
+        "required": ["grade"],
+        "properties": {"grade": {"const": "DETERMINISTIC_FACT"}}
+      },
+      "description": "At least one deterministic fact. Retrieval, similarity and model agreement may add context to a violation; none of them may be the reason it exists."
+    },
+    "graph_evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provenance", "completeness", "tool"],
+      "properties": {
+        "provenance": {
+          "enum": ["COMPILER_RESOLVED_CALL", "OCCURRENCE_ENCLOSING_RANGE_HEURISTIC", "TEXTUAL_MATCH", "NOT_APPLICABLE"],
+          "description": "How the edge was obtained, not which tool printed it. A compiler that resolved the callee and a script that nested a reference inside a definition range produce records that look identical downstream."
+        },
+        "completeness": {
+          "enum": ["COMPLETE_FOR_RESOLVED_EDGES", "PARTIAL_LOWER_BOUND", "UNKNOWN"],
+          "description": "COMPLETE_FOR_RESOLVED_EDGES claims completeness only over edges the resolver actually resolved. Nothing in this vocabulary claims a complete call graph, because no static pass over a language with dynamic dispatch produces one."
+        },
+        "tool": {"type": "string", "minLength": 2}
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {"provenance": {"enum": ["OCCURRENCE_ENCLOSING_RANGE_HEURISTIC", "TEXTUAL_MATCH"]}},
+            "required": ["provenance"]
+          },
+          "then": {
+            "properties": {"completeness": {"enum": ["PARTIAL_LOWER_BOUND", "UNKNOWN"]}},
+            "description": "A heuristic edge set is a lower bound. Recording it as complete is the single move that turns a useful nomination into a false clearance."
+          }
+        }
+      ]
+    },
+    "state": {
+      "enum": ["OPEN", "CONFIRMED_AGAINST_DETERMINISTIC_FACT", "REFUTED", "NOT_APPLICABLE", "BLOCKED", "HUMAN_ADMIT_REQUIRED"]
+    },
+    "semantic_context": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/semantic_item"},
+      "description": "Retrieved decision records, incident write-ups, budgets and telemetry. Present to explain why a violation matters; never present to establish that it happened."
+    }
+  },
+  "$defs": {
+    "basis_item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["grade", "arrival", "reference"],
+      "properties": {
+        "grade": {"enum": ["DETERMINISTIC_FACT", "REPOSITORY_OBSERVATION", "OFFICIAL_PRIMARY_SOURCE", "SEMANTIC_CONTEXT_CANDIDATE"]},
+        "arrival": {
+          "enum": ["STATIC", "SANDBOX", "PROD"],
+          "description": "STATIC proves a thing is possible, SANDBOX proves it executes under synthetic input, PROD proves it ran with these values. None of the three implies either other."
+        },
+        "reference": {"type": "string", "minLength": 4}
+      }
+    },
+    "semantic_item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["authority", "retrieval_method", "reference"],
+      "properties": {
+        "authority": {
+          "const": "NON_AUTHORITATIVE_CANDIDATE",
+          "description": "Fixed. A nearest-neighbour hit is a suggestion that a document may be relevant; it is not a finding that the document is correct, current or binding."
+        },
+        "retrieval_method": {"type": "string", "minLength": 2},
+        "reference": {"type": "string", "minLength": 4}
+      }
+    }
+  },
+  "examples": [
+    {
+      "schema": "dtcr/violation-candidate/v1",
+      "violation_id": "DTCR-VC-001",
+      "invariant_ref": {
+        "invariant_id": "DTCR-AI-001",
+        "statement": "Domain modules must not import infrastructure modules."
+      },
+      "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+      "basis": [
+        {
+          "grade": "DETERMINISTIC_FACT",
+          "arrival": "STATIC",
+          "reference": "compiler-resolved import edge domain/order -> infrastructure/postgres"
+        }
+      ],
+      "graph_evidence": {
+        "provenance": "COMPILER_RESOLVED_CALL",
+        "completeness": "COMPLETE_FOR_RESOLVED_EDGES",
+        "tool": "compiler-backed index"
+      },
+      "state": "CONFIRMED_AGAINST_DETERMINISTIC_FACT",
+      "semantic_context": [
+        {
+          "authority": "NON_AUTHORITATIVE_CANDIDATE",
+          "retrieval_method": "hybrid keyword and vector retrieval",
+          "reference": "decision record on domain isolation"
+        }
+      ]
+    }
+  ],
+  "x-refusal-controls": [
+    {
+      "case_id": "DTCR-XC-VC-001",
+      "refuses": "Occurrence-nesting inference recorded as a complete call graph.",
+      "refused_by": "properties.graph_evidence.allOf[0].then",
+      "instance": {
+        "schema": "dtcr/violation-candidate/v1",
+        "violation_id": "DTCR-VC-002",
+        "invariant_ref": {"invariant_id": "DTCR-AI-001", "statement": "Domain modules must not import infrastructure modules."},
+        "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+        "basis": [
+          {"grade": "DETERMINISTIC_FACT", "arrival": "STATIC", "reference": "index occurrence set"}
+        ],
+        "graph_evidence": {
+          "provenance": "OCCURRENCE_ENCLOSING_RANGE_HEURISTIC",
+          "completeness": "COMPLETE_FOR_RESOLVED_EDGES",
+          "tool": "occurrence-to-edge importer"
+        },
+        "state": "CONFIRMED_AGAINST_DETERMINISTIC_FACT"
+      }
+    },
+    {
+      "case_id": "DTCR-XC-VC-002",
+      "refuses": "A violation asserted on retrieval hits alone.",
+      "refused_by": "properties.basis.contains",
+      "instance": {
+        "schema": "dtcr/violation-candidate/v1",
+        "violation_id": "DTCR-VC-003",
+        "invariant_ref": {"invariant_id": "DTCR-AI-002", "statement": "Task ordering must remain first-in-first-out."},
+        "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+        "basis": [
+          {"grade": "SEMANTIC_CONTEXT_CANDIDATE", "arrival": "STATIC", "reference": "top-ranked vector hit on a decision record"}
+        ],
+        "graph_evidence": {"provenance": "NOT_APPLICABLE", "completeness": "UNKNOWN", "tool": "retrieval only"},
+        "state": "CONFIRMED_AGAINST_DETERMINISTIC_FACT"
+      }
+    },
+    {
+      "case_id": "DTCR-XC-VC-003",
+      "refuses": "Retrieved context re-labelled as authoritative.",
+      "refused_by": "$defs.semantic_item.properties.authority.const",
+      "instance": {
+        "schema": "dtcr/violation-candidate/v1",
+        "violation_id": "DTCR-VC-004",
+        "invariant_ref": {"invariant_id": "DTCR-AI-002", "statement": "Task ordering must remain first-in-first-out."},
+        "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+        "basis": [
+          {"grade": "DETERMINISTIC_FACT", "arrival": "STATIC", "reference": "compiler-resolved type change"}
+        ],
+        "graph_evidence": {"provenance": "COMPILER_RESOLVED_CALL", "completeness": "COMPLETE_FOR_RESOLVED_EDGES", "tool": "compiler-backed index"},
+        "state": "OPEN",
+        "semantic_context": [
+          {"authority": "AUTHORITATIVE", "retrieval_method": "vector retrieval", "reference": "decision record"}
+        ]
+      }
+    },
+    {
+      "case_id": "DTCR-XC-VC-004",
+      "refuses": "A finding dated to a branch name instead of a commit.",
+      "refused_by": "properties.subject_commit.pattern",
+      "instance": {
+        "schema": "dtcr/violation-candidate/v1",
+        "violation_id": "DTCR-VC-005",
+        "invariant_ref": {"invariant_id": "DTCR-AI-001", "statement": "Domain modules must not import infrastructure modules."},
+        "subject_commit": "main",
+        "basis": [
+          {"grade": "DETERMINISTIC_FACT", "arrival": "STATIC", "reference": "compiler-resolved import edge"}
+        ],
+        "graph_evidence": {"provenance": "COMPILER_RESOLVED_CALL", "completeness": "COMPLETE_FOR_RESOLVED_EDGES", "tool": "compiler-backed index"},
+        "state": "OPEN"
+      }
+    }
+  ]
+}

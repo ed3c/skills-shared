@@ -1,0 +1,235 @@
+{
+  "schema": "dtcr/source-disposition/v1",
+  "source_ref": {
+    "packet_id": "DTCR-SP-001",
+    "file_name": "LLM 代碼審查的雙軌認知閉環.pdf",
+    "byte_count": 3251356,
+    "sha256": "be535f9a9d5d54a2c5cd2e9fc2be653d0123bfed7100e0acbcbe5662e0763caf"
+  },
+  "dispositions": [
+    {
+      "disposition_id": "DTCR-SD-001",
+      "claim_class": "SOURCE_STATEMENT",
+      "source_claim": "The dual-track architecture achieves complete coverage of the codebase boundary, eliminates dependency violations entirely, produces no false reports, and yields an audit chain that settles security and compliance obligations.",
+      "applicability": "APPLICABLE",
+      "applicability_rationale": "The method described does produce boundary findings, so the claim is about the same subject this Skill governs and cannot be set aside as out of scope.",
+      "closure": "REFUSED",
+      "correction": "A static pass covers the edges its resolver resolved, over a denominator someone can name. A numerator equal to that denominator is a fact about the denominator and says nothing about dynamic dispatch, reflection, generated code or anything the resolver could not see. Absolute coverage, absolute absence of false reports and settled compliance are not states any arrival in this method can reach, so no artifact here has a field in which to write them.",
+      "negative_control": {
+        "schema_id": "dtcr/verification-receipt/v1",
+        "case_id": "DTCR-NC-001",
+        "refused_by": "properties.coverage.oneOf and properties.summary.not.pattern",
+        "instance": {
+          "schema": "dtcr/verification-receipt/v1",
+          "receipt_id": "DTCR-VR-101",
+          "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "arrival": "STATIC",
+          "checks": [{"check_id": "boundary", "tool": "graph ledger", "exit_code": 0, "outcome": "PASS"}],
+          "coverage": "100%",
+          "summary": "Complete coverage of the architecture boundary with zero false positives, and the audit chain is fully compliant.",
+          "grants": {
+            "merge": false,
+            "permission": false,
+            "secret": false,
+            "production": false,
+            "user_value": false,
+            "paid_demand": false,
+            "release": false
+          }
+        }
+      }
+    },
+    {
+      "disposition_id": "DTCR-SD-002",
+      "claim_class": "SOURCE_PROPOSAL",
+      "source_claim": "When the graph query returns a count of zero illegal edges and the unit tests pass, the system opens a pull request and merges it automatically.",
+      "applicability": "APPLICABLE",
+      "applicability_rationale": "This method produces exactly those two signals, so the proposal is a live temptation here rather than a description of somebody else's pipeline.",
+      "closure": "REFUSED",
+      "correction": "A count of zero and a green suite are two arrivals of the static and sandbox kinds, and neither reaches the change's effect on anything real. They make a change eligible for a human to look at. Merge admission is a single-valued field in the change unit, so no evidence combination expressible in this method can set it to anything else.",
+      "negative_control": {
+        "schema_id": "dtcr/change-unit/v1",
+        "case_id": "DTCR-NC-002",
+        "refused_by": "properties.merge_admission.enum",
+        "instance": {
+          "schema": "dtcr/change-unit/v1",
+          "change_unit_id": "DTCR-CU-101",
+          "proposal_ref": "DTCR-RP-001",
+          "base_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "head_commit": "0123456789abcdef0123456789abcdef01234567",
+          "changed_paths": ["domain/order.go"],
+          "verification_refs": ["DTCR-VR-001"],
+          "merge_admission": "AUTOMATIC_WHEN_ILLEGAL_EDGES_ZERO_AND_TESTS_PASS",
+          "authority": {
+            "merge": false,
+            "permission": false,
+            "secret": false,
+            "production": false,
+            "user_value": false,
+            "paid_demand": false,
+            "release": false
+          },
+          "rollback": {"base_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f"}
+        }
+      }
+    },
+    {
+      "disposition_id": "DTCR-SD-003",
+      "claim_class": "SOURCE_PROPOSAL",
+      "source_claim": "Nonce reuse in authenticated encryption is repaired by adopting the deterministic nonce derivation defined for digital signatures, which prevents the nonce from ever repeating.",
+      "applicability": "APPLICABLE",
+      "applicability_rationale": "The source presents this as a concrete remediation a review agent should propose, which is precisely the artifact this method emits.",
+      "closure": "REFUSED",
+      "correction": "The referenced derivation removes the random-number generator from digital signature nonce generation, and reproducibility is the property it establishes. Authenticated-encryption nonce uniqueness is a different property with different remedies: a misuse-resistant construction, or a counter discipline whose state cannot roll back. Deriving an encryption nonce deterministically from the same key and message makes repetition certain rather than impossible. The remediation object refuses the mechanism and property pair structurally, because both halves read as competent cryptography until someone asks which property each one establishes.",
+      "negative_control": {
+        "schema_id": "dtcr/refactor-proposal/v1",
+        "case_id": "DTCR-NC-003",
+        "refused_by": "$defs.remediation.not",
+        "instance": {
+          "schema": "dtcr/refactor-proposal/v1",
+          "proposal_id": "DTCR-RP-101",
+          "violation_ref": "DTCR-VC-006",
+          "strategy": "LOCAL_CORRECTION",
+          "remediation": {
+            "mechanism": "RFC_6979_DETERMINISTIC_SIGNATURE_NONCE",
+            "target_property": "AEAD_NONCE_UNIQUENESS",
+            "rationale": "Deterministic derivation removes the generator, so the nonce can never repeat."
+          },
+          "bounded_scope": {
+            "paths": ["crypto/seal.go"],
+            "out_of_scope": ["key management"]
+          },
+          "expected_effect": "NOT_MEASURED",
+          "implementation_admission": "ELIGIBLE"
+        }
+      }
+    },
+    {
+      "disposition_id": "DTCR-SD-004",
+      "claim_class": "SOURCE_PROPOSAL",
+      "source_claim": "A caller-to-callee edge set built by nesting each index reference inside the smallest enclosing definition range is the project's call graph, and querying it transitively yields the complete blast radius of a change.",
+      "applicability": "APPLICABLE",
+      "applicability_rationale": "The deterministic track in this method consumes exactly this kind of index output, so the inference is available here to be over-read.",
+      "closure": "REFUSED",
+      "correction": "Range nesting recovers edges the index already resolved and located. It does not recover dynamic dispatch, interface satisfaction, callbacks, reflection, code generated after indexing, or any call whose target the resolver declined to resolve. The result is a lower bound on the true edge set, so the transitive closure is a lower bound on the blast radius. Graph evidence records how each edge was obtained, and any heuristic provenance is bound to a partial completeness value: the failure this refuses is not an inaccurate number, it is a floor being read as a ceiling by someone deciding a change is safe.",
+      "negative_control": {
+        "schema_id": "dtcr/violation-candidate/v1",
+        "case_id": "DTCR-NC-004",
+        "refused_by": "properties.graph_evidence.allOf[0].then",
+        "instance": {
+          "schema": "dtcr/violation-candidate/v1",
+          "violation_id": "DTCR-VC-101",
+          "invariant_ref": {"invariant_id": "DTCR-AI-001", "statement": "Domain modules must not import infrastructure modules."},
+          "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "basis": [{"grade": "DETERMINISTIC_FACT", "arrival": "STATIC", "reference": "occurrence range nesting over the index"}],
+          "graph_evidence": {
+            "provenance": "OCCURRENCE_ENCLOSING_RANGE_HEURISTIC",
+            "completeness": "COMPLETE_FOR_RESOLVED_EDGES",
+            "tool": "occurrence-to-edge importer"
+          },
+          "state": "CONFIRMED_AGAINST_DETERMINISTIC_FACT"
+        }
+      }
+    },
+    {
+      "disposition_id": "DTCR-SD-005",
+      "claim_class": "SOURCE_PROPOSAL",
+      "source_claim": "Retrieved decision records, incident write-ups and service budgets are consulted as the constraint a change is judged against, so a top-ranked hit stating an ordering requirement settles that the change violates it.",
+      "applicability": "APPLICABLE",
+      "applicability_rationale": "The semantic track in this method retrieves exactly these documents, and the synthesis step is where their status is decided.",
+      "closure": "REFUSED",
+      "correction": "Nearest-neighbour ranking answers which stored text resembles the query. It does not answer whether the retrieved document is current, whether it was superseded, whether it ever bound this subsystem, or whether the resemblance is about the same thing at all. Retrieved items carry a fixed non-authoritative marking and explain why a violation matters. At least one deterministic fact must be in a violation's basis, so retrieval can colour a finding and can never be the reason one exists.",
+      "negative_control": {
+        "schema_id": "dtcr/violation-candidate/v1",
+        "case_id": "DTCR-NC-005",
+        "refused_by": "properties.basis.contains",
+        "instance": {
+          "schema": "dtcr/violation-candidate/v1",
+          "violation_id": "DTCR-VC-102",
+          "invariant_ref": {"invariant_id": "DTCR-AI-002", "statement": "Task ordering must remain first-in-first-out."},
+          "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "basis": [{"grade": "SEMANTIC_CONTEXT_CANDIDATE", "arrival": "STATIC", "reference": "top-ranked retrieval hit on an ordering decision record"}],
+          "graph_evidence": {"provenance": "NOT_APPLICABLE", "completeness": "UNKNOWN", "tool": "retrieval only"},
+          "state": "CONFIRMED_AGAINST_DETERMINISTIC_FACT"
+        }
+      }
+    },
+    {
+      "disposition_id": "DTCR-SD-006",
+      "claim_class": "SOURCE_PROPOSAL",
+      "source_claim": "One named runtime and language stack is the primary choice for every service in the architecture, and the described methodology is the only deterministic solution for taking generated code into production.",
+      "applicability": "APPLICABLE",
+      "applicability_rationale": "The source states this as a portable architectural conclusion, and portability is what this Skill's body is for.",
+      "closure": "REFUSED",
+      "correction": "A stack that worked on the targets someone ran it on has been observed on those targets. The observation does not extend to targets nobody ran, and no count of successes converts into a universal recommendation or a uniqueness claim. Candidate applicability is fixed at observed-on-listed-targets-only, and the target list refuses four exact lowercase spellings of a wildcard: the bare asterisk, all, any, universal. That pattern is anchored and case-sensitive, so it refuses the reflex spelling and nothing else -- 'Universal', 'all languages' and 'every runtime' are accepted target entries. The record makes the general claim awkward to write, not impossible; whether a listed target was actually run stays with a reviewer. Language and provider specifics belong in domain modules and consumer bindings, never in a portable body.",
+      "negative_control": {
+        "schema_id": "dtcr/candidate-record/v1",
+        "case_id": "DTCR-NC-006",
+        "refused_by": "properties.applicability.properties.targets_observed.items.not",
+        "instance": {
+          "schema": "dtcr/candidate-record/v1",
+          "candidate_id": "DTCR-TC-101",
+          "locator": {"kind": "REPOSITORY", "identity": "example-upstream/example-runtime"},
+          "observation": {"dated_observation": "2026-08-21"},
+          "rights": {
+            "declared_license": "MIT",
+            "notice_state": "NOTICE_PRESENT_AND_READ",
+            "planes": {
+              "source_code_license": {"state": "ADMITTED", "basis": "MIT permits use with notice."},
+              "employment_and_ip": {"state": "HUMAN_ADMIT_REQUIRED", "basis": null},
+              "patent": {"state": "NOT_ADMITTED", "basis": null},
+              "trademark": {"state": "NOT_ADMITTED", "basis": null},
+              "service_terms": {"state": "NOT_APPLICABLE", "basis": null},
+              "model_weights": {"state": "NOT_APPLICABLE", "basis": null},
+              "sdk_or_store_terms": {"state": "NOT_APPLICABLE", "basis": null},
+              "privacy": {"state": "NOT_APPLICABLE", "basis": null},
+              "release": {"state": "NOT_ADMITTED", "basis": null}
+            }
+          },
+          "relationship": "DEPENDENCY_ONLY",
+          "owner_atom": "DTCR-C0",
+          "replacement_path": {"state": "NONE_IDENTIFIED", "note": "Treated as the universal default."},
+          "security_update_owner": {"state": "UPSTREAM_MAINTAINED", "atom": "example-upstream"},
+          "admission_state": "ADMITTED",
+          "applicability": {"scope": "OBSERVED_ON_LISTED_TARGETS_ONLY", "targets_observed": ["universal"]}
+        }
+      }
+    },
+    {
+      "disposition_id": "DTCR-SD-007",
+      "claim_class": "SOURCE_STATEMENT",
+      "source_claim": "Generation takes two seconds for a thousand lines, static graph and historical validation takes two hundred milliseconds, a human decision takes thirty seconds, retrieval latency stays within a few milliseconds at a stated recall, and the whole arrangement lifts engineering output by a fixed multiple.",
+      "applicability": "APPLICABLE",
+      "applicability_rationale": "These figures are the source's argument for adopting the method, so they arrive attached to the procedure this Skill distils.",
+      "closure": "REFUSED",
+      "correction": "None of these figures arrives with the method, the sample size, the environment or the commit that produced it, and a figure without its receipt survives every later change to the thing it described. Any number in this method is either a measurement object carrying all four, or the literal value meaning nothing was measured. There is no third form, so a bare improvement number cannot be written down here at all.",
+      "negative_control": {
+        "schema_id": "dtcr/refactor-proposal/v1",
+        "case_id": "DTCR-NC-007",
+        "refused_by": "properties.expected_effect.oneOf",
+        "instance": {
+          "schema": "dtcr/refactor-proposal/v1",
+          "proposal_id": "DTCR-RP-102",
+          "violation_ref": "DTCR-VC-001",
+          "strategy": "LOCAL_CORRECTION",
+          "remediation": {
+            "mechanism": "BOUNDED_LOCAL_EDIT",
+            "target_property": "ALLOCATION_BEHAVIOUR",
+            "rationale": "Adopting the described review loop across the team."
+          },
+          "bounded_scope": {
+            "paths": ["queue/task.go"],
+            "out_of_scope": ["the scheduler"]
+          },
+          "expected_effect": {
+            "generation_seconds_per_thousand_lines": 2,
+            "graph_validation_ms": 200,
+            "human_decision_seconds": 30,
+            "productivity_multiple": 10
+          },
+          "implementation_admission": "ELIGIBLE"
+        }
+      }
+    }
+  ]
+}

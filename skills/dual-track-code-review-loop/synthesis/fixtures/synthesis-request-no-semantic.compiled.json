@@ -1,0 +1,197 @@
+{
+  "derived_from": "synthesis-request-no-semantic.json",
+  "review_card": {
+    "admitted_invariants": [
+      {
+        "invariant_ref": "DTCR-AI-002",
+        "statement": "Task ordering must remain first-in-first-out.",
+        "unresolved_case_refs": [
+          "DTCR-VC-003"
+        ],
+        "violated_case_refs": []
+      }
+    ],
+    "authority": {
+      "merge": false,
+      "paid_demand": false,
+      "permission": false,
+      "production": false,
+      "release": false,
+      "secret": false,
+      "user_value": false
+    },
+    "benefits": [
+      {
+        "basis_refs": [
+          "DTCR-VC-003"
+        ],
+        "grade": "OBSERVED_FACT",
+        "statement": "the ordering invariant now has a case that fails when it is broken"
+      }
+    ],
+    "card_class": "MODEL_SUMMARY_RECOMMENDATION",
+    "card_id": "DTCR-RC-001",
+    "changed_symbols_and_blast_radius": {
+      "behavior_preserved": false,
+      "blast_radius_path_refs": [],
+      "changed_symbol_refs": [
+        "DTCR-SF-003"
+      ],
+      "edge_completeness": "PARTIAL_LOWER_BOUND",
+      "edge_provenance": "OCCURRENCE_ENCLOSING_RANGE_HEURISTIC"
+    },
+    "claim_vs_observed_fact": [
+      {
+        "benchmark_established": false,
+        "claim": "The queue change leaves first-in-first-out ordering intact.",
+        "claim_class": "ARCHITECTURE_SOURCE_STATEMENT",
+        "claim_id": "SRC-03",
+        "claim_source_ref": "source packet DTCR-SP-PDF-001 section 3",
+        "measurement_class": "STATIC_METRIC",
+        "observed_fact_refs": [
+          "DTCR-VC-003"
+        ],
+        "verdict": "OBSERVED_FACT_SUPPORTS"
+      }
+    ],
+    "claims_not_proven": [
+      {
+        "lane": "HUMAN_ADMIT",
+        "statement": "this change may be merged, released or run in production"
+      },
+      {
+        "lane": "PAID",
+        "statement": "anybody pays for this change"
+      },
+      {
+        "lane": "SEMANTIC",
+        "statement": "no decision record, incident write-up or budget was consulted for this review"
+      },
+      {
+        "lane": "USER",
+        "statement": "any user derives value from this change"
+      }
+    ],
+    "costs": [
+      {
+        "basis_refs": [],
+        "grade": "ANALYST_EXPECTATION",
+        "statement": "the heuristic edge set is a lower bound and cannot clear the paths it never resolved"
+      }
+    ],
+    "coverage_ceiling": {
+      "analysed": "NOT_MEASURED",
+      "ceiling_ref": "DTCR-CC-002",
+      "completeness": "UNKNOWN",
+      "omissions": [],
+      "unanalysed_inputs_cleared": false
+    },
+    "decision": {
+      "decided_by": "",
+      "decision_state": "HUMAN_ADMIT_REQUIRED",
+      "decision_text": ""
+    },
+    "failure_modes": [
+      {
+        "basis_refs": [],
+        "grade": "ANALYST_EXPECTATION",
+        "statement": "a dynamically dispatched enqueue path is never seen by the occurrence heuristic"
+      }
+    ],
+    "hard_laws": {
+      "model_summary_is_review_decision": false,
+      "no_illegal_graph_edge_is_behavior_preserved": false,
+      "one_green_test_is_full_denominator": false,
+      "retrieved_incident_is_current_failure": false,
+      "source_claim_rejected_is_problem_solved": false,
+      "static_metric_is_benchmark": false,
+      "technical_pass_is_user_or_paid_validation": false
+    },
+    "owner_and_lease": {
+      "lease_paths": [
+        "skills/dual-track-code-review-loop/synthesis/"
+      ],
+      "owner": "dual-track review worker",
+      "task_state_writer": "dual-track review worker",
+      "task_state_writer_count": 1
+    },
+    "packet_ref": "DTCR-SP-001",
+    "recommended_action": {
+      "action": "RECOMMEND_NO_CHANGE",
+      "binding": "RECOMMENDATION_ONLY",
+      "rationale": "every observation resolved and every claim is carried by an observed fact"
+    },
+    "required_negative_controls": [
+      {
+        "control_id": "NC-001",
+        "observed_if_absent": "the recommendation was produced by the summary rather than by the facts",
+        "refuses": "the recommended action staying the same after every deterministic observation is removed from the bundle"
+      }
+    ],
+    "retrieved_context": {
+      "rationale": "the request declared the literal NOT_APPLICABLE for the semantic context lane",
+      "rows": [],
+      "state": "NOT_APPLICABLE"
+    },
+    "schema": "dtcr/review-card/v1",
+    "subject": {
+      "repository_binding_id": "DTCR-RB-0f1e2d3c4b5a6978",
+      "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+      "subject_tree": "e739d799dd8d44beb5414ed99a943ff3bacccab0"
+    },
+    "unknowns": [
+      {
+        "resolved_by": "record a numerator over a named denominator in the next fact-plane run",
+        "statement": "how much of the queue package the unmeasured coverage ceiling actually reached"
+      }
+    ],
+    "verification_plan": [
+      {
+        "arrival": "SANDBOX",
+        "denominator_definition": "the coverage ceiling reports NOT_MEASURED, so the denominator of this step is unnamed and one green run says nothing about the rest",
+        "executed": false,
+        "negative_denominator": 1,
+        "oracle": "run the owning test suite at the head commit and record its exit code beside the count of cases it actually enumerated",
+        "positive_denominator": 1,
+        "step_id": "VP-001"
+      }
+    ]
+  },
+  "schema": "dtcr/synthesis-projection/v1",
+  "synthesis_packet": {
+    "authority": {
+      "merge": false,
+      "paid_demand": false,
+      "permission": false,
+      "production": false,
+      "release": false,
+      "secret": false,
+      "user_value": false
+    },
+    "fact_lane": {
+      "bundle_digest": "b5bb9d8014a0f9b1d61e21e796d78dccdf1352f23cd32812f4850b878ae4944c",
+      "coverage_ceiling_ref": "DTCR-CC-002",
+      "observation_refs": [
+        "DTCR-VC-003"
+      ],
+      "receipt_ref": "DTCR-FR-002",
+      "state": "PRESENT"
+    },
+    "invariant_refs": [
+      "DTCR-AI-002"
+    ],
+    "packet_id": "DTCR-SP-001",
+    "schema": "dtcr/synthesis-packet/v1",
+    "semantic_lane": {
+      "consumed_row_refs": [],
+      "rationale": "the request declared the literal NOT_APPLICABLE for the semantic context lane",
+      "state": "NOT_APPLICABLE"
+    },
+    "subject": {
+      "repository_binding_id": "DTCR-RB-0f1e2d3c4b5a6978",
+      "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+      "subject_tree": "e739d799dd8d44beb5414ed99a943ff3bacccab0"
+    },
+    "task_ref": "review the task queue ordering change with no semantic index available"
+  }
+}

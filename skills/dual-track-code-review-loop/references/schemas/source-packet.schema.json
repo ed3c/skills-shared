@@ -1,0 +1,185 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dtcr-source-packet.schema.json",
+  "title": "DTCR source packet",
+  "description": "One immutable external artifact admitted as raw material for the dual-track method. Identity is content, not location: the artifact object has no url, path or host field to fill in, so a packet cannot be bound to a copy that moved or changed. Classification is fixed at SOURCE_PROPOSAL because an article, transcript, slide deck or conversation export describes what someone proposed, and reading it produces no repository fact. The only promotion a packet admits is the per-claim split into SOURCE_STATEMENT, and even that carries no repository authority: a statement is what the source said, never what the tree does.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "packet_id", "artifact", "classification", "admissible_promotions", "never_promoted_into", "disposition_ref"],
+  "properties": {
+    "schema": {"const": "dtcr/source-packet/v1"},
+    "packet_id": {
+      "type": "string",
+      "pattern": "^DTCR-SP-[0-9]{3}$"
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file_name", "byte_count", "sha256", "media_type"],
+      "properties": {
+        "file_name": {
+          "type": "string",
+          "minLength": 1,
+          "not": {"pattern": "[/\\\\]|^~"},
+          "description": "Bare name only. A separator or a tilde would make this a location on one machine, and the local path of a source is never recorded in a public artifact."
+        },
+        "byte_count": {"type": "integer", "minimum": 1},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "media_type": {"type": "string", "minLength": 1}
+      },
+      "description": "Byte count and digest together are the identity. Two artifacts with the same name are the same packet only when both agree."
+    },
+    "classification": {
+      "const": "SOURCE_PROPOSAL",
+      "description": "Fixed. A source packet is a proposal about the world; it is not an observation of this repository and cannot be recorded as one."
+    },
+    "admissible_promotions": {
+      "type": "array",
+      "uniqueItems": true,
+      "minItems": 1,
+      "items": {"enum": ["SOURCE_STATEMENT"]},
+      "description": "The complete set. Splitting a packet into per-claim statements is the only move this packet licenses."
+    },
+    "never_promoted_into": {
+      "type": "array",
+      "uniqueItems": true,
+      "minItems": 5,
+      "items": {
+        "enum": [
+          "OFFICIAL_PRIMARY_SOURCE",
+          "REPOSITORY_OBSERVATION",
+          "DETERMINISTIC_FACT",
+          "ARCHITECTURE_INVARIANT",
+          "VERIFICATION_RECEIPT",
+          "CLOSURE_RECORD"
+        ]
+      },
+      "description": "Written out rather than implied. A reader who never sees the refused list fills it in with whatever the source sounded most confident about."
+    },
+    "disposition_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The source-disposition record set that judged this packet's claims. A packet with no disposition has been read but not adjudicated."
+    },
+    "retrieval_hint": {
+      "type": "object",
+      "description": "Named extension point. A consumer may carry private locator variable names here; it may never carry a resolved private URL or private content, and nothing downstream may treat a hint as identity.",
+      "additionalProperties": false,
+      "required": ["resolver_variable"],
+      "properties": {
+        "resolver_variable": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "description": "A variable name the consumer resolves locally, never the value it resolves to."
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "schema": "dtcr/source-packet/v1",
+      "packet_id": "DTCR-SP-001",
+      "artifact": {
+        "file_name": "LLM 代碼審查的雙軌認知閉環.pdf",
+        "byte_count": 3251356,
+        "sha256": "be535f9a9d5d54a2c5cd2e9fc2be653d0123bfed7100e0acbcbe5662e0763caf",
+        "media_type": "application/pdf"
+      },
+      "classification": "SOURCE_PROPOSAL",
+      "admissible_promotions": ["SOURCE_STATEMENT"],
+      "never_promoted_into": [
+        "OFFICIAL_PRIMARY_SOURCE",
+        "REPOSITORY_OBSERVATION",
+        "DETERMINISTIC_FACT",
+        "ARCHITECTURE_INVARIANT",
+        "VERIFICATION_RECEIPT",
+        "CLOSURE_RECORD"
+      ],
+      "disposition_ref": "dtcr/source-disposition/v1#DTCR-SD-001..DTCR-SD-007"
+    }
+  ],
+  "x-refusal-controls": [
+    {
+      "case_id": "DTCR-XC-SP-001",
+      "refuses": "A source packet re-labelled as a repository fact.",
+      "refused_by": "properties.classification.const",
+      "instance": {
+        "schema": "dtcr/source-packet/v1",
+        "packet_id": "DTCR-SP-001",
+        "artifact": {
+          "file_name": "LLM 代碼審查的雙軌認知閉環.pdf",
+          "byte_count": 3251356,
+          "sha256": "be535f9a9d5d54a2c5cd2e9fc2be653d0123bfed7100e0acbcbe5662e0763caf",
+          "media_type": "application/pdf"
+        },
+        "classification": "DETERMINISTIC_FACT",
+        "admissible_promotions": ["SOURCE_STATEMENT"],
+        "never_promoted_into": [
+          "OFFICIAL_PRIMARY_SOURCE",
+          "REPOSITORY_OBSERVATION",
+          "DETERMINISTIC_FACT",
+          "ARCHITECTURE_INVARIANT",
+          "VERIFICATION_RECEIPT",
+          "CLOSURE_RECORD"
+        ],
+        "disposition_ref": "dtcr/source-disposition/v1"
+      }
+    },
+    {
+      "case_id": "DTCR-XC-SP-002",
+      "refuses": "Identity given as a machine-local location instead of content.",
+      "refused_by": "properties.artifact.properties.file_name.not",
+      "instance": {
+        "schema": "dtcr/source-packet/v1",
+        "packet_id": "DTCR-SP-001",
+        "artifact": {
+          "file_name": "~/example-local-folder/example-source.pdf",
+          "byte_count": 3251356,
+          "sha256": "be535f9a9d5d54a2c5cd2e9fc2be653d0123bfed7100e0acbcbe5662e0763caf",
+          "media_type": "application/pdf"
+        },
+        "classification": "SOURCE_PROPOSAL",
+        "admissible_promotions": ["SOURCE_STATEMENT"],
+        "never_promoted_into": [
+          "OFFICIAL_PRIMARY_SOURCE",
+          "REPOSITORY_OBSERVATION",
+          "DETERMINISTIC_FACT",
+          "ARCHITECTURE_INVARIANT",
+          "VERIFICATION_RECEIPT",
+          "CLOSURE_RECORD"
+        ],
+        "disposition_ref": "dtcr/source-disposition/v1"
+      }
+    },
+    {
+      "case_id": "DTCR-XC-SP-003",
+      "refuses": "A packet that resolves a private locator into the public record.",
+      "refused_by": "properties.retrieval_hint.additionalProperties",
+      "instance": {
+        "schema": "dtcr/source-packet/v1",
+        "packet_id": "DTCR-SP-001",
+        "artifact": {
+          "file_name": "LLM 代碼審查的雙軌認知閉環.pdf",
+          "byte_count": 3251356,
+          "sha256": "be535f9a9d5d54a2c5cd2e9fc2be653d0123bfed7100e0acbcbe5662e0763caf",
+          "media_type": "application/pdf"
+        },
+        "classification": "SOURCE_PROPOSAL",
+        "admissible_promotions": ["SOURCE_STATEMENT"],
+        "never_promoted_into": [
+          "OFFICIAL_PRIMARY_SOURCE",
+          "REPOSITORY_OBSERVATION",
+          "DETERMINISTIC_FACT",
+          "ARCHITECTURE_INVARIANT",
+          "VERIFICATION_RECEIPT",
+          "CLOSURE_RECORD"
+        ],
+        "disposition_ref": "dtcr/source-disposition/v1",
+        "retrieval_hint": {
+          "resolver_variable": "DTCR_SOURCE_PACKET_ROOT",
+          "resolved_url": "https://example.invalid/private-doc"
+        }
+      }
+    }
+  ]
+}

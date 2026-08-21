@@ -158,6 +158,27 @@ def check_commit(
             )
         return problems
 
+    owner_roles = {
+        key.lower(): value
+        for key, value in rules.get("declared_owner_addresses", {}).items()
+    }
+    owner_role = owner_roles.get(record["author_email"].lower())
+    if (
+        owner_role is not None
+        and not found.get("Driven-By")
+        and not found.get("Driven-On")
+    ):
+        # The owner's non-agent endpoints (connector Contents-API writes, the web
+        # editor, bare direct pushes) cannot write trailers, and the commit is
+        # already attributed to the owner on the forge. A commit that does carry
+        # either trailer falls through to the full rules instead.
+        if owner_role not in vocabulary["driven_by"]:
+            problems.append(
+                f"{short}: author {record['author_email']!r} maps to role "
+                f"{owner_role!r}, which is not in the vocabulary"
+            )
+        return problems
+
     by = found.get("Driven-By") or []
     on = found.get("Driven-On") or []
 

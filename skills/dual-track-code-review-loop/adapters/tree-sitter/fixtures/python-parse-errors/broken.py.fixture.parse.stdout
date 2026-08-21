@@ -1,0 +1,25 @@
+(module [0, 0] - [9, 0]
+  (comment [0, 0] - [0, 75])
+  (comment [1, 0] - [1, 75])
+  (comment [2, 0] - [2, 74])
+  (ERROR [3, 0] - [8, 22]
+    (function_definition [3, 0] - [4, 18]
+      name: (identifier [3, 4] - [3, 9])
+      parameters: (parameters [3, 9] - [3, 16]
+        (identifier [3, 10] - [3, 15]))
+      (ERROR [4, 4] - [4, 18]
+        (identifier [4, 11] - [4, 16]))
+      body: (block [4, 18] - [4, 18]))
+    (class_definition [6, 0] - [8, 22]
+      (ERROR [6, 6] - [6, 8]
+        (ERROR [6, 6] - [6, 8]))
+      name: (identifier [6, 8] - [6, 12])
+      (ERROR [6, 13] - [7, 19]
+        (identifier [7, 8] - [7, 13])
+        (parameters [7, 13] - [7, 19]
+          (identifier [7, 14] - [7, 18])))
+      (ERROR [8, 8] - [8, 22]
+        (identifier [8, 15] - [8, 20])
+        (integer [8, 21] - [8, 22]))
+      body: (block [8, 22] - [8, 22]))))
+skills/dual-track-code-review-loop/adapters/tree-sitter/fixtures/python-parse-errors/broken.py.fixture	Parse:    0.41 ms	   787 bytes/ms	(ERROR [3, 0] - [8, 22])

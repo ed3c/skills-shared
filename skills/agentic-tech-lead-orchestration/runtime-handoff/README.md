@@ -203,12 +203,17 @@ Spatial normal exact-head suites                PASS
 Spatial Skill Eval commit provenance            FAIL / LOCAL_HANDOFF_REQUIRED
 Spatial main admission                          NOT_PERFORMED
 Spatial #411 live independent Shadow             NOT_EXERCISED
-Codex result-tree binder                        PASS / MERGED via #507
-Codex durable replay/provenance                 NOT_IMPLEMENTED / #508
-fresh Codex v2 live acceptance                  NOT_EXERCISED / #464
-Herdr real process detection                    EXERCISED_PARTIALLY
-Herdr terminal clean lifecycle                  NOT_EXERCISED / BLOCKED
-source compiler method                          COMPLETED_DETERMINISTICALLY / #467 CLOSED
-Issue/Article/PDF/PRD truth                      EVIDENCE_DEPENDENT / #512 OPEN
-merge/release/production                        HUMAN / NOT_PERFORMED except separately admitted subjects
+Codex result-tree binder             PASS / MERGED via #507
+Codex durable replay/provenance      PASS / CLOSED_DETERMINISTICALLY via #508 (PR #516);
+                                        receipt data/handoff/codex-v2/issue-508-result-carrier-receipt.json
+fresh Codex v2 live acceptance       NOT_EXERCISED / #464; queue recompile required against
+                                        129f53c23a3ab15354763167b25bddc45f724c00 (subject-mutation law)
+Herdr real process detection         EXERCISED_PARTIALLY
+Herdr terminal clean lifecycle       NOT_EXERCISED / blocker RECLASSIFIED (PR #516) from host-permission
+                                        to herdr-0.8.0 AgentInfo API-contract mismatch (no observation
+                                        timestamp/process identity/cleanup facts); sample_count 0
+source compiler method               COMPLETED_DETERMINISTICALLY / #467 CLOSED
+Issue/Article/PDF/PRD truth          EVIDENCE_DEPENDENT / #512 OPEN; first immutable packet (GitHub
+                                        issue #435) EXECUTED via PR #516, dispositions OPEN x2 / NOT_APPLICABLE x1
+merge/release/production             HUMAN / NOT_PERFORMED except separately admitted subjects
 ```

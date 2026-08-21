@@ -1,0 +1,337 @@
+{
+  "schema": "dtcr/implementation-preflight/v1",
+  "item": "DTCR-H0-002",
+  "issues": {
+    "program": 517,
+    "semantic_owner": 518,
+    "queue": 530
+  },
+  "runtime": "CLAUDE_CODE_LOCAL",
+  "predecessor_receipt": {
+    "item": "DTCR-H0-001",
+    "state": "PASS",
+    "runtime": "CLAUDE_CODE_LOCAL",
+    "main_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+    "main_tree": "e739d799dd8d44beb5414ed99a943ff3bacccab0",
+    "queue_recorded_main": "129f53c23a3ab15354763167b25bddc45f724c00",
+    "state_delta": "main advanced by PR #520 merge and governance-repair commit; source packet unaffected per queue law",
+    "commit_role_gate": "GREEN 325 commits classified",
+    "git_diff_check": "clean",
+    "git_status": "clean",
+    "source_file": "LLM 代碼審查的雙軌認知閉環.pdf",
+    "source_bytes": 3251356,
+    "source_sha256": "be535f9a9d5d54a2c5cd2e9fc2be653d0123bfed7100e0acbcbe5662e0763caf"
+  },
+  "subject": {
+    "base_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+    "base_tree": "e739d799dd8d44beb5414ed99a943ff3bacccab0",
+    "implementation_commit": "55d01ef3d6e06f469682d3ab67fb49089eef249c",
+    "implementation_tree": "2c6bdff0859a9394bfaae18ca91f997c3d574484",
+    "branch": "dtcr/518-c0-contract",
+    "subject_note": "Content identity is the owning_files digest map below, exact at authoring time and verifiable without git. The implementation commit and tree are bound by this receipt commit, which lands on top of the contract commit, because a receipt cannot carry the hash of the commit that carries it. The branch head is therefore this receipt; the subject it describes is the commit named here.",
+    "subject_rebuild": {
+      "reason": "SHADOW_FINDING_C_2_LOCATOR_IN_ANCESTOR_OBJECTS",
+      "superseded_chain": ["277ab7f1", "374848b3", "d4b2ff35", "ba04b14e", "6164e41"],
+      "superseded_branch": "worktree-agent-a2524489d6d83b5c8",
+      "detail": "Ancestors 277ab7f1 and 374848b3 carried a real home-relative locator in source-packet.schema.json. d4b2ff35 replaced it with a synthetic value at the tip, which does not help: every ancestor object stays reachable from the head, so the locator remained in the publication subject. The subject is therefore rebuilt from cb48fdc as a single contract commit whose ancestry contains no object that ever held the value.",
+      "publication_state_at_rebuild": "UNPUBLISHED. Verified before rebuilding: no remote-tracking ref of forgejo, github or origin contained ba04b14e, and the only ref containing 277ab7f1 was the local worktree branch. A rebuild is only available because nothing had been pushed; had it been published, the locator would have been disclosed and rotation, not rebuilding, would be the remedy.",
+      "superseded_chain_disposition": "LEFT_IN_PLACE_NOT_DELETED. The old branch still points at 6164e41 so the repair is auditable. It must never be pushed. Deleting it would remove the evidence that the rebuild was necessary; publishing it would defeat the rebuild."
+    }
+  },
+  "source_packet": {
+    "packet_id": "DTCR-SP-001",
+    "file_name": "LLM 代碼審查的雙軌認知閉環.pdf",
+    "byte_count": 3251356,
+    "sha256": "be535f9a9d5d54a2c5cd2e9fc2be653d0123bfed7100e0acbcbe5662e0763caf",
+    "read_denominator": "88 of 88 pages",
+    "classification": "SOURCE_PROPOSAL",
+    "local_path_recorded": false
+  },
+  "changed_path_denominator": {
+    "total": 17,
+    "within_lease": 15,
+    "lease_exceptions": 2,
+    "lease_definition": "Issue #530 leases three subtrees of this Skill's references directory: contracts/**, schemas/** and source-disposition/**. Every path below that is not under one of those three, and not this Skill's own root documents or this receipt, is a declared exception with its own entry in lease_exceptions.",
+    "correction_note": "An earlier revision of this receipt recorded within_lease 16 and one exception. That was wrong: references/README.md is not under contracts/**, schemas/** or source-disposition/**, and was counted as leased because it sits inside the references directory. It is now declared.",
+    "paths": [
+      "skills/dual-track-code-review-loop/AGENTS.md",
+      "skills/dual-track-code-review-loop/README.md",
+      "skills/dual-track-code-review-loop/SKILL.md",
+      "skills/dual-track-code-review-loop/references/README.md",
+      "skills/dual-track-code-review-loop/references/contracts/controlled-vocabulary.md",
+      "skills/dual-track-code-review-loop/references/contracts/public-private-capability.md",
+      "skills/dual-track-code-review-loop/references/schemas/candidate-record.schema.json",
+      "skills/dual-track-code-review-loop/references/schemas/change-unit.schema.json",
+      "skills/dual-track-code-review-loop/references/schemas/closure-record.schema.json",
+      "skills/dual-track-code-review-loop/references/schemas/refactor-proposal.schema.json",
+      "skills/dual-track-code-review-loop/references/schemas/source-disposition.schema.json",
+      "skills/dual-track-code-review-loop/references/schemas/source-packet.schema.json",
+      "skills/dual-track-code-review-loop/references/schemas/verification-receipt.schema.json",
+      "skills/dual-track-code-review-loop/references/schemas/violation-candidate.schema.json",
+      "skills/dual-track-code-review-loop/references/source-disposition/refused-claims.json",
+      "docs/traceability/dual-track-code-review-loop/implementation-preflight.json",
+      "docs/INDEX.md"
+    ]
+  },
+  "owning_files": {
+    "skills/dual-track-code-review-loop/AGENTS.md": "717cb8e65785d4edf009f97266b42fd362e4d2871a3008aee21e28592e1bf374",
+    "skills/dual-track-code-review-loop/README.md": "8890fa189be08d2d439b28f001a860a8d1473867640eab1fdc84267f89a8f0cc",
+    "skills/dual-track-code-review-loop/SKILL.md": "c9e801d613d77c5d5d7e2967af5d9279fd304854e8c83c937e18714ef7fc6f8b",
+    "skills/dual-track-code-review-loop/references/README.md": "9e424c4d29a370de456ddb0178676029179d839208a708a5ad0edf55709be19f",
+    "skills/dual-track-code-review-loop/references/contracts/controlled-vocabulary.md": "d4cd3c9c8afb872cd164cdce49b4082c8f8bad97e9b8e789a41c8ff15c9e1e03",
+    "skills/dual-track-code-review-loop/references/contracts/public-private-capability.md": "12f339d1a46533d8721898933c3283b34837d6f1e1d9d62ed2fcb3d237938283",
+    "skills/dual-track-code-review-loop/references/schemas/candidate-record.schema.json": "4893bd1565acdb90106e7daf3bb23dee4de608e918147454fa595e01e7ba64f8",
+    "skills/dual-track-code-review-loop/references/schemas/change-unit.schema.json": "476a8b89bf3dc898ee639c06622acc412fb18d3b33dfa46a80394039d0c19b19",
+    "skills/dual-track-code-review-loop/references/schemas/closure-record.schema.json": "bb46ec59ff3ec1fe70431392b7f77d79a0250d96ca87197b77e769d30b4981de",
+    "skills/dual-track-code-review-loop/references/schemas/refactor-proposal.schema.json": "2443a1ced1fff2ac5e4f107c38681794db8338247b5648c74d44bad2e58b0de5",
+    "skills/dual-track-code-review-loop/references/schemas/source-disposition.schema.json": "86e9df9e3413803655bc59164f69e0aade9e01716280d1b3010791391b4008c3",
+    "skills/dual-track-code-review-loop/references/schemas/source-packet.schema.json": "301faa0b31a1b5a5a612cd48e3bd7bf1aacd54ebd6f8fa6be1e66f0eb43b2fa7",
+    "skills/dual-track-code-review-loop/references/schemas/verification-receipt.schema.json": "10ca1b9eae1c3fab0dd33ba970bf002be32f4ce2cc878958b9f3b7bb06c5e8c6",
+    "skills/dual-track-code-review-loop/references/schemas/violation-candidate.schema.json": "7292f43c8c594089b91d62654b47a5e6d0c2f55b37e375a641e01caedad00f18",
+    "skills/dual-track-code-review-loop/references/source-disposition/refused-claims.json": "2c7fbbb9a9f411167904cc991a2e360a306668d12ed088f1d9c9ec7d3b17cd0b"
+  },
+  "owning_files_note": "Recomputed over the bytes at the implementation commit named in subject. Relative to the superseded chain, seven of the fifteen digests are unchanged and eight changed: README.md, references/README.md, public-private-capability.md, candidate-record, refactor-proposal, source-disposition, refused-claims.json and verification-receipt.schema.json (the H0-003 re-review found this file omitted from the prior list — Shadow residual R-1). The receipt-accuracy sweep then re-touched README.md and public-private-capability.md, whose digests above are the swept bytes.",
+  "lease_exceptions": [
+    {
+      "path": "docs/INDEX.md",
+      "class": "LEASE_EXCEEDED_TO_KEEP_A_GATE_GREEN",
+      "declared": true,
+      "detail": "The #530 lease does not include docs/INDEX.md, and no shape of new skills/<name>/ directory can be added without editing it. DR-13 in scripts/check_document_routes.py reconciles four stated counts in docs/INDEX.md against the tree inventory; a new directory changes the denominator whether or not it ships a README, and an unrouted README that is not named in the index is a second, independent DR-13 failure. Empirically verified against a mirror of the tree before the edit was made.",
+      "edit_made": "One line. 15 of 34 became 16 of 35; the three unrouted named skills became four with dual-track-code-review-loop added to the list. The routed count and the bare count were already correct and were not touched.",
+      "not_done": "No route was added for this Skill, no registry entry, no manifest entry, no other docs/ change.",
+      "unblocking_lane": "Human admission owns whether to keep this edit, extend the #530 lease to cover it, or revert it and accept a red document-routes gate on this head. This decision cannot be made on this branch alone, because two other open writers are editing the same line right now and the landing order changes the correct number.",
+      "concurrent_writers": [
+        {
+          "writer": "PR #419",
+          "conflict": "SAME_SENTENCE_SAME_COUNT",
+          "detail": "Edits the same sentence and also claims 16 of 35, because it too adds exactly one new skill directory to a tree it read at 15 of 34. The two edits are textually near-identical and will not necessarily conflict in git.",
+          "if_both_land": "The tree holds two new skill directories, so the truth is 17 of 36 and whichever number lands second is wrong. DR-13 in scripts/check_document_routes.py reconciles the stated counts against the tree inventory and goes RED on the merged result even though each branch was green on its own."
+        },
+        {
+          "writer": "PR #450",
+          "conflict": "SAME_LINE_OLDER_BASE",
+          "detail": "Edits the same line from a base older than cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f, so its stated counts were computed against a different tree inventory than either #419 or this branch."
+        }
+      ],
+      "sequencing_requirement": "The Human adjudicating this exception owns the landing order of this branch, PR #419 and PR #450, and owns re-deriving the docs/INDEX.md counts against the tree that exists after each landing. Landing any two of the three without re-deriving turns DR-13 RED. This branch does not attempt to resolve the ordering and must not be merged on the assumption that its own count survives the other two.",
+      "count_validity": "16 of 35 is correct against base cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f with only this branch applied. It is not correct against any tree that also carries #419 or #450."
+    },
+    {
+      "path": "skills/dual-track-code-review-loop/references/README.md",
+      "class": "LEASE_EXCEEDED_BY_MISCLASSIFICATION",
+      "declared": true,
+      "detail": "The #530 lease enumerates contracts/**, schemas/** and source-disposition/**. references/README.md is the index that sits above those three subtrees and is not itself inside any of them, so it was never leased. An earlier revision of this receipt counted it as within_lease on the reasoning that it lives under references/, which is not what the lease says.",
+      "edit_made": "The contract index row for refactor-proposal.schema.json now says three blacklisted pairs out of fifty-four rather than describing a general pairing check, and the extension-points section now states that closed-at-every-depth stops new keys and does not constrain existing free-text values, pointing at the plane contract for the leak-scan obligation. The file could not be left as it was, because it carried the same overclaim the Shadow blocked in the schemas it indexes.",
+      "not_done": "No row was added or removed, no file was renamed, and no route or registry fact was changed.",
+      "unblocking_lane": "Human admission owns whether to extend the #530 lease to cover this Skill's own reference index, accept this edit as a declared exception, or revert it and accept that the index contradicts the schemas it points at. Unlike the docs/INDEX.md exception there is no competing writer on this path and no gate turns red either way, so it can be adjudicated independently and in any order."
+    }
+  ],
+  "controls": [
+    {
+      "id": "C1",
+      "requirement": "Every shipped schema is a valid Draft 2020-12 document with a closed root and a schema-identity const.",
+      "result": "PASS",
+      "where": "scratch validator, 8 schemas"
+    },
+    {
+      "id": "C2",
+      "requirement": "Every positive instance validates against the schema that judges it. Eight instances, and they are not all the same kind: seven are in-schema examples arrays, one is an external positive instance, because source-disposition.schema.json carries no examples array and instead points x-positive-instance at references/source-disposition/refused-claims.json in the tree.",
+      "result": "PASS",
+      "where": "scratch validator, 7 in-schema examples + 1 external positive instance = 8 positive cases"
+    },
+    {
+      "id": "C3",
+      "requirement": "Every recorded refusal control is actually refused. Thirty-two, and they are not all the same kind: twenty-five are x-refusal-controls carried inside the eight schemas, and seven are the negative_control instances on the seven dispositions in refused-claims.json, each replayed against the schema its schema_id names.",
+      "result": "PASS",
+      "where": "scratch validator, 25 in-schema controls + 7 disposition controls = 32 negative probes"
+    },
+    {
+      "id": "C4",
+      "requirement": "Each control's named keyword is the keyword that actually refuses it. For every one of the thirty-two controls the validator removes exactly the keyword named in refused_by, changes nothing else, and requires the instance to validate afterwards. A control that stays refused after its named guard is gone is refused by something else and proves nothing about the guard it names.",
+      "result": "PASS",
+      "where": "scratch validator knockout pass, 32 knockouts, 32 discriminating, 0 surviving",
+      "prior_state": "FAIL_ON_TWO. DTCR-XC-SD-001 and DTCR-XC-SD-002 carried dispositions arrays of length 1 and 0, so both were refused by properties.dispositions.minItems before reaching $defs.disposition.required and properties.source_ref.required respectively. Both instances have been rebuilt with a complete seven-item dispositions array valid in every other respect and now discriminate on their named keyword. DTCR-XC-SD-001's refused_by additionally names $defs.disposition.allOf[0].then.required, because a REFUSED disposition missing its negative_control is refused by both keywords and naming only one would claim a discrimination the instance cannot show.",
+      "supersedes": "An earlier revision of this receipt recorded C4 as 'removing any one of the seven refusal guards turns the validator red, so no guard is decorative', evidenced by 'mutation harness, 8 planted defects, 8 killed'. That claim is withdrawn on three counts: the guard count and the defect count did not match each other, the eight defects were never recorded individually so the claim was not replayable, and the harness that produced them was uncommitted and is gone. The per-control knockout recorded above is what was actually run against these bytes and it covers all thirty-two controls rather than eight."
+    },
+    {
+      "id": "C5",
+      "requirement": "The seven source dispositions are present, all REFUSED, each with a replayable negative control naming both the schema that refuses it and the keyword inside that schema doing the refusing.",
+      "result": "PASS",
+      "where": "scratch validator disposition pass, 7 of 7 REFUSED, 7 of 7 replayed and refused, 7 of 7 discriminating under knockout"
+    },
+    {
+      "id": "C6",
+      "requirement": "No claim in the shipped prose asserts a refusal broader than the keyword behind it enforces.",
+      "result": "REPAIRED_THIS_REVISION",
+      "where": "Shadow BLOCK_C0 findings C-1 and the same-class prose sweep",
+      "detail": "The plane contract claimed the public schemas have no free-text field wide enough to hold a private locator. That is false and was re-derived here: thirty-six string fields across the eight schemas carry no pattern, enum, const or length ceiling, and two probes confirmed it -- a cloud-drive URL placed in candidate-record replacement_path.note validates, and a file:// URI placed in source-packet disposition_ref validates. The contract now states that identity fields are pattern-closed, that free-text fields are not shape-protected, and that a leak scan over every reachable object is a standing obligation rather than a courtesy. Three same-class overclaims were downgraded with them: the receipt summary refuses ten listed spellings and not a class, the candidate-record target list refuses four anchored case-sensitive spellings and not a class, and the remediation not-clause is a blacklist of three pairs out of fifty-four and not a check on the pairing. SKILL.md and AGENTS.md were swept for the same class and carry none of it."
+    }
+  ],
+  "tests_run": [
+    {
+      "command": "python3 scripts/check_document_routes.py --repo-root .",
+      "exit_code": 0,
+      "result": "PASS",
+      "denominator": "DR-01/02/03/06/13/14 across every tracked Markdown document"
+    },
+    {
+      "command": "python3 scripts/check_skill_core_boundaries.py --root .",
+      "exit_code": 0,
+      "result": "PASS",
+      "denominator": "24 manifest entries; this Skill is not in evals/skill-core-boundaries.json and was therefore not checked"
+    },
+    {
+      "command": "bash skills/shared-skills-infra/tests/verify.sh",
+      "exit_code": 0,
+      "result": "PASS",
+      "denominator": "synthetic fixture world; does not read the real skill tree"
+    },
+    {
+      "command": "python3 skills/shared-skills-infra/scripts/check_body_neutrality.py --repo-root .",
+      "exit_code": 0,
+      "result": "PASS",
+      "denominator": "portable-body default ownership over every new Markdown file in this change"
+    },
+    {
+      "command": "python3 scripts/check_commit_roles.py --repo-root . --range cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f..HEAD",
+      "exit_code": 0,
+      "result": "PASS",
+      "denominator": "every commit this branch adds above the admitted base"
+    },
+    {
+      "command": "scratch schema validator (uncommitted, jsonschema 4.26.0, Draft202012Validator)",
+      "exit_code": 0,
+      "result": "PASS",
+      "denominator": "schemas=8 positive_cases=8 negative_probes=32; the same run performs the C4 knockout, so knockouts=32 discriminating=32",
+      "provenance": "UNCOMMITTED_SCRATCH_HARNESS",
+      "provenance_note": "Written under the session scratch directory and never committed, because a suite under skills/<name>/tests/ must be routed by a continuous-integration job or scripts/check_suite_ci_coverage.py goes red, and neither the workflow matrix nor evals/ is inside the #530 lease. This is one arrival by one author. It is not independent of itself and must not be read as a committed check."
+    },
+    {
+      "command": "scratch free-text field census (uncommitted)",
+      "exit_code": 0,
+      "result": "PASS",
+      "denominator": "36 string fields with no pattern/enum/const/maxLength, 1 maxLength-capped, 33 pattern/enum/const-closed, across all 8 schemas",
+      "provenance": "UNCOMMITTED_SCRATCH_HARNESS"
+    },
+    {
+      "command": "scratch private-locator probe (uncommitted)",
+      "exit_code": 0,
+      "result": "LOCATOR_ACCEPTED_BY_BOTH_SCHEMAS",
+      "denominator": "2 probes: cloud-drive URL into candidate-record replacement_path.note, file:// URI into source-packet disposition_ref",
+      "provenance": "UNCOMMITTED_SCRATCH_HARNESS",
+      "provenance_note": "This probe re-derives the Shadow's C-1 finding from these bytes rather than restating it. Both instances validate, which is the evidence the plane contract's rewritten section rests on."
+    }
+  ],
+  "mutation_control_provenance": {
+    "state": "TWO_DERIVATIONS_NEITHER_COMMITTED",
+    "derivation_1": "Uncommitted scratch harness, this Builder, this session. Recorded above with its denominators.",
+    "derivation_2": "Independently re-derived from these bytes by the Shadow on the H0-003 review, which reported 32 of 32 controls refused and 23 of 25 in-schema guards load-bearing under its own knockout, without reusing derivation 1's code. The two source-disposition controls it found non-discriminating are the two repaired in C4, and the repair was re-verified by derivation 1.",
+    "committed_harness": "ABSENT",
+    "committed_harness_owner": "Whoever owns the workflow matrix and evals/. Until that owner routes a suite, no check in this tree replays any of this, and the ABSENT state is the honest one rather than a pending one.",
+    "why_recorded_here": "The README's evidence ceiling previously read 'mutation controls over the refusals VERIFIED_ON_THESE_BYTES', which reads as though a check in this tree produced it. It did not. Two independent uncommitted derivations agreeing is better than one, and is still not a committed harness."
+  },
+  "refusals_encoded": [
+    {"disposition": "DTCR-SD-001", "subject": "absolute coverage, zero false reports, settled compliance", "refused_by": "dtcr/verification-receipt/v1 coverage oneOf and summary not.pattern"},
+    {"disposition": "DTCR-SD-002", "subject": "automatic merge from one graph count plus a green suite", "refused_by": "dtcr/change-unit/v1 merge_admission enum"},
+    {"disposition": "DTCR-SD-003", "subject": "deterministic signature-nonce derivation aimed at AEAD nonce reuse", "refused_by": "dtcr/refactor-proposal/v1 $defs.remediation.not"},
+    {"disposition": "DTCR-SD-004", "subject": "occurrence nesting recorded as a complete call graph", "refused_by": "dtcr/violation-candidate/v1 graph_evidence allOf if-then"},
+    {"disposition": "DTCR-SD-005", "subject": "vector retrieval promoted to truth", "refused_by": "dtcr/violation-candidate/v1 basis.contains and semantic_item.authority const"},
+    {"disposition": "DTCR-SD-006", "subject": "one observed stack promoted to universal best practice", "refused_by": "dtcr/candidate-record/v1 applicability.scope const and targets_observed.items.not"},
+    {"disposition": "DTCR-SD-007", "subject": "fixed performance and productivity numbers without benchmark receipts", "refused_by": "dtcr/refactor-proposal/v1 expected_effect oneOf and $defs.measurement.required"}
+  ],
+  "named_extension_points": ["dtcr/source-packet/v1#retrieval_hint"],
+  "leak_scan": {
+    "method": "git rev-list --objects cb48fdc..HEAD, then git cat-file every added blob and grep each for /Users/, Downloads, drive.google and file://",
+    "denominator": "EVERY_OBJECT_REACHABLE_FROM_THE_NEW_HEAD, not the tip tree. The tip tree is the wrong denominator and is exactly what let finding C-2 through: d4b2ff35's tree was clean while two of its ancestors were not.",
+    "result": "ZERO_REAL_LOCATOR_RESIDUE",
+    "permitted_synthetic_values": [
+      {
+        "value": "~/example-local-folder/example-source.pdf",
+        "where": "references/schemas/source-packet.schema.json, control DTCR-XC-SP-002",
+        "why": "The control exists to show that file_name refuses a machine-local location, so it has to contain one. The value names no real user, no real machine and no real file."
+      },
+      {
+        "value": "/Users/example/checkout/domain/order.go",
+        "where": "references/schemas/change-unit.schema.json, control DTCR-XC-CU-003",
+        "why": "The control exists to show that changed_paths refuses an absolute path. Same reason, same synthetic form."
+      }
+    ],
+    "scan_law": "Anything matching the scan and not on the permitted list above is a leak until someone shows otherwise. The list is deliberately short and explicit so a future scan can distinguish a deliberate probe from a real value without asking the author.",
+    "self_scope_note": "The scan recorded here covers the contract commit this receipt binds as its subject. The receipt commit that carries this file is scanned by the same command in the reporting step, since a receipt cannot scan the commit that carries it any more than it can name its own hash."
+  },
+  "lanes": {
+    "deterministic_contract": "PASS",
+    "refusal_controls": "PASS",
+    "mutation_controls": "PASS_ON_UNCOMMITTED_HARNESS_TWICE_DERIVED",
+    "committed_mutation_harness": "ABSENT",
+    "prose_claim_audit": "REPAIRED_THIS_REVISION",
+    "leak_scan_over_reachable_objects": "PASS",
+    "parser_index_graph_adapter": "NOT_IMPLEMENTED",
+    "retrieval_adapter": "NOT_IMPLEMENTED",
+    "executable_mutation_machinery": "NOT_APPLICABLE",
+    "applied_refactor": "NOT_EXERCISED",
+    "live_consumer_canary": "NOT_EXERCISED",
+    "independent_shadow": "EXERCISED_ON_SUPERSEDED_HEAD_RETURNED_BLOCK_C0",
+    "independent_shadow_on_this_head": "NOT_EXERCISED",
+    "registry_admission": "ABSENT",
+    "private_carrier": "NOT_EXERCISED",
+    "legal_employment_ip": "HUMAN_ADMIT_REQUIRED",
+    "merge": "HUMAN_ADMIT_REQUIRED",
+    "release": "HUMAN_ADMIT_REQUIRED"
+  },
+  "residual_gaps": [
+    {
+      "subject": "committed test suite for these schemas",
+      "state": "ABSENT",
+      "note": "A suite under skills/<name>/tests/ must be routed by a continuous-integration job or scripts/check_suite_ci_coverage.py goes red, and neither the workflow matrix nor evals/ is inside the #530 lease. Validation for this stage was run from an uncommitted scratch harness and its denominators are recorded above."
+    },
+    {
+      "subject": "portable-core markers and CORE-LAW identifiers in SKILL.md",
+      "state": "NOT_IMPLEMENTED",
+      "note": "scripts/check_skill_core_boundaries.py checks only skills named in evals/skill-core-boundaries.json, and that manifest also requires a modules/ domain module. Shipping the markers without the manifest entry and without modules/ would be half a contract that breaks the moment somebody completes the other half. A sibling Skill on the tree ships neither, so both shapes are house-legal."
+    },
+    {
+      "subject": "registry.json entry",
+      "state": "ABSENT",
+      "note": "Outside the lease and outside this stage. Registry admission is a separate governance fact from directory presence."
+    }
+  ],
+  "evidence_ceiling": "DTCR_C0_CONTRACT_REPAIRED_AFTER_SHADOW_BLOCK, READY FOR RE-REVIEW. What is established on these exact bytes: eight closed Draft 2020-12 schemas exist; eight positive instances validate against the schema that judges each, seven of them in-schema examples and one an external file; all thirty-two recorded refusal controls were replayed and refused, twenty-five carried inside the schemas and seven carried by the dispositions; and for every one of the thirty-two, removing exactly the keyword its refused_by names -- and nothing else -- makes the instance validate, so each control discriminates on the guard it names. All seven source dispositions are REFUSED with such a control. What is established about the guards themselves, and is weaker than it previously read: four of the seven headline refusals are structural, and three rest partly on a finite list of spellings or pairs that a paraphrase passes, which is now stated wherever those refusals are described. What is not established: that the schemas contain a private locator by shape -- thirty-six free-text fields accept one, and two probes confirmed it, so the plane split is a rule people follow backed by a leak scan, not a shape that enforces itself; that any adapter exists; that the method has been pointed at a codebase; that a refactor was applied or verified; that a cross-repository migration works; that a consumer can bootstrap from this; or that model quality, runtime portability, production safety, legal clearance, merge or release follow. Every check above came from an uncommitted scratch harness; a committed, CI-routed harness is ABSENT. A contract that survives its own refusal controls has survived its own refusal controls.",
+  "shadow_history": [
+    {
+      "review": "H0-003 independent Shadow",
+      "subject": "ba04b14e on d4b2ff35",
+      "verdict": "BLOCK_C0",
+      "machine_half": "HELD. 32 of 32 controls refused; 23 of 25 in-schema guards load-bearing under independent knockout.",
+      "blocking_findings": {
+        "C-1": "Plane contract claimed no free-text field is wide enough to hold a private locator. False. REPAIRED and re-derived here.",
+        "C-2": "Ancestors 277ab7f1 and 374848b3 carry a real home-relative locator in source-packet.schema.json. REPAIRED by rebuilding the subject from cb48fdc as a fresh unpublished branch; the superseded chain is left in place, not deleted.",
+        "C-3": "references/README.md classified as within_lease when the #530 lease does not cover it. REPAIRED in changed_path_denominator and lease_exceptions.",
+        "C-4": "DTCR-XC-SD-001 and -002 did not discriminate their named keyword. REPAIRED and re-verified.",
+        "C-5": "docs/INDEX.md exception did not record its concurrent writers. REPAIRED in that exception's concurrent_writers and sequencing_requirement.",
+        "N-5_N-6_N-7": "Mutation-control provenance overstated, C2 positive-instance wording imprecise, planted-defect list unrecorded. REPAIRED in C2, C4 and mutation_control_provenance."
+      },
+      "not_repaired": "Nothing in the Shadow's list is left open. The findings it recorded as non-blocking observations about absent lanes -- no committed harness, no adapters, no registry entry -- are unchanged and stay ABSENT or NOT_IMPLEMENTED, because closing them is outside both this stage and the #530 lease.",
+      "next": "An independent Shadow on the new head. This receipt is written by the Builder who made the repairs and is not itself independent evidence that they are correct."
+    }
+  ],
+  "rollback": {
+    "base_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+    "base_tree": "e739d799dd8d44beb5414ed99a943ff3bacccab0",
+    "note": "Every path in the denominator is new except docs/INDEX.md, whose single edited line is restored by returning to the base.",
+    "shape": "Two commits on top of the base: one contract commit and this receipt. Rolling back is deleting the branch, which is why it was worth rebuilding the branch rather than repairing it in place."
+  },
+  "human_owned_operations": [
+    "merge, release, visibility and production",
+    "keeping, extending the lease for, or reverting the declared docs/INDEX.md exception",
+    "sequencing the landing of this branch against PR #419 and PR #450, and re-deriving the docs/INDEX.md counts after each landing",
+    "keeping, extending the lease for, or reverting the declared references/README.md exception",
+    "routing a committed mutation harness through the workflow matrix and evals/, which no lane here can do",
+    "registry admission",
+    "independent Shadow reviewer identity",
+    "legal, employment, intellectual-property and business-overlap decisions",
+    "private account and private carrier authorisation"
+  ],
+  "driven_by": "agent-subagent",
+  "driven_on": "claude-code"
+}

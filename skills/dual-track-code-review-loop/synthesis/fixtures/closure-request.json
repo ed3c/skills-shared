@@ -1,0 +1,123 @@
+{
+  "schema": "dtcr/problem-closure-request/v1",
+  "subject": {
+    "repository_binding_id": "DTCR-RB-0f1e2d3c4b5a6978",
+    "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+    "subject_tree": "e739d799dd8d44beb5414ed99a943ff3bacccab0"
+  },
+  "ledger_writers": [
+    "dual-track review worker"
+  ],
+  "denominator_floors": {
+    "GS-04": {
+      "positive": 2,
+      "negative": 2
+    }
+  },
+  "problems": [
+    {
+      "problem_id": "GS-01",
+      "source": {
+        "kind": "ARTICLE",
+        "identity": "Git at any scale",
+        "location": "source packet for the article, section 1"
+      },
+      "claim": "Agent-driven repository, branch, PR and CI volume increases coordination pressure.",
+      "claim_class": "APPLICABILITY_CLAIM",
+      "source_claim_state": "ACCEPTED_AS_REQUIREMENT",
+      "requirement": "one mutable branch has one active writer and every route converges without an active-writer conflict",
+      "mechanism": {
+        "statement": "the stacked-PR worker plus the Molecular index own branch and route convergence",
+        "mechanism_state": "IMPLEMENTED"
+      },
+      "owner": "git-town-stacked-pr-worker",
+      "oracle": {
+        "statement": "replay the route index against the tree and assert no two live routes claim one branch",
+        "arrival": "STATIC"
+      },
+      "denominators": {
+        "positive": 4,
+        "negative": 2,
+        "denominator_definition": "live routes named by the Molecular index at the subject commit"
+      },
+      "evidence_lane": {
+        "lane": "LOCAL",
+        "arrival": "STATIC"
+      }
+    },
+    {
+      "problem_id": "GS-02",
+      "source": {
+        "kind": "ARTICLE",
+        "identity": "Git at any scale",
+        "location": "source packet for the article, section 2"
+      },
+      "claim": "Git packfile and local-filesystem semantics make naive remote or distributed storage difficult.",
+      "claim_class": "ARCHITECTURE_SOURCE_STATEMENT",
+      "source_claim_state": "NOT_APPLICABLE",
+      "not_applicable_rationale": "this repository hosts no Git storage backend, so the problem has no mechanism here to implement or to refuse"
+    },
+    {
+      "problem_id": "GS-04",
+      "source": {
+        "kind": "ARTICLE",
+        "identity": "Git at any scale",
+        "location": "source packet for the article, section 4"
+      },
+      "claim": "A push should not be acknowledged before durable authoritative persistence.",
+      "claim_class": "PORTABLE_ASSURANCE_REQUIREMENT",
+      "source_claim_state": "ACCEPTED_AS_REQUIREMENT",
+      "requirement": "no delivery receipt is emitted before the artifact it names exists on the tree",
+      "mechanism": {
+        "statement": "the zero-network delivery receipt gate reads the tree before admitting the receipt",
+        "mechanism_state": "VERIFIED_BY_RECEIPT"
+      },
+      "owner": "github-delivery-loop",
+      "oracle": {
+        "statement": "plant a receipt whose artifact is absent and require the gate to exit non-zero",
+        "arrival": "SANDBOX"
+      },
+      "denominators": {
+        "positive": 6,
+        "negative": 3,
+        "denominator_definition": "receipt shapes the gate enumerates, planted absent-artifact cases counted separately"
+      },
+      "evidence_lane": {
+        "lane": "LOCAL",
+        "receipt_ref": "DTCR-VR-001",
+        "arrival": "SANDBOX"
+      },
+      "closure_record_ref": "DTCR-CR-001"
+    },
+    {
+      "problem_id": "GS-08",
+      "source": {
+        "kind": "ARTICLE",
+        "identity": "Git at any scale",
+        "location": "source packet for the article, section 8"
+      },
+      "claim": "Primary-only compaction reduces per-replica CPU work by a stated factor.",
+      "claim_class": "PERFORMANCE_CLAIM",
+      "source_claim_state": "REJECTED_OVERCLAIM",
+      "requirement": "compaction work is performed once and distributed rather than repeated per replica",
+      "mechanism": {
+        "statement": "the shared object store is written once per worktree set and read by every worktree",
+        "mechanism_state": "IMPLEMENTED"
+      },
+      "owner": "git-town-stacked-pr-worker",
+      "oracle": {
+        "statement": "count object-store writes per worktree creation and compare against the worktree count",
+        "arrival": "STATIC"
+      },
+      "denominators": {
+        "positive": 2,
+        "negative": 1,
+        "denominator_definition": "worktree creations observed at the subject commit"
+      },
+      "evidence_lane": {
+        "lane": "LOCAL",
+        "arrival": "STATIC"
+      }
+    }
+  ]
+}
