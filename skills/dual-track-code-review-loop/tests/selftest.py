@@ -92,6 +92,10 @@ PERMITTED_LOCATORS = (
      "public-private-capability.md: the elided probe that showed the guard was needed"),
     ("`file://` URIs",
      "public-private-capability.md: the leak-scan obligation naming the shape it scans for"),
+    ("file:///example-machine/decisions/domain-isolation.md",
+     "source-back-reference DTCR-XC-BK-001 probes that repo_relative_path refuses a file:// URI; the value is synthetic"),
+    ("~/example-checkout/domain/order/pricing.ext",
+     "exact-source-subject control probes that repo_relative_path refuses a home-relative path; the value is synthetic"),
 )
 
 MUTABLE_SUBJECTS = ("main", "HEAD", "latest", "refs/heads/main", "origin/main")

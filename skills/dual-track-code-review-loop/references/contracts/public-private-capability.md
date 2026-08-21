@@ -75,10 +75,12 @@ different populations of field live in them:
   matching `^[A-Z][A-Z0-9_]*$`, which cannot spell a locator.
 
 - **Free-text fields are not shape-protected at all.** Thirty-six string fields
-  across the eight schemas carry no `pattern`, `enum`, `const` or length
-  ceiling — rationales, corrections, notes, denominator definitions, tool names,
-  references, `out_of_scope` entries, measurement environments. Four of them
-  carry a `not` pattern that refuses one shape and leaves the rest of the string
+  across the eight original schemas carry no `pattern`, `enum`, `const` or
+  length ceiling — rationales, corrections, notes, denominator definitions,
+  tool names, references, `out_of_scope` entries, measurement environments —
+  and the sixteen interface schemas added by the D1/M1 freeze carry the same
+  class of field under the same obligation. Four of the original fields carry
+  a `not` pattern that refuses one shape and leaves the rest of the string
   space open. A locator pasted into any of these validates.
 
 This was probed rather than reasoned about. A drive URL placed in a candidate
