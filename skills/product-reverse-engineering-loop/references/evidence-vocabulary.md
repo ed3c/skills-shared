@@ -133,3 +133,38 @@ CEILING_OVERCLAIM
 HOLLOW_EVIDENCE
 STALE_SUBJECT
 ```
+
+## Pre-registered refusal classes
+
+The codes above are what `check_prel_contract.py` emits today. The classes below
+are the frozen identities for the failures a *dispatched session* can commit, and
+they are declared before the session runs rather than named afterwards. They are
+machine-readable in `session-dispatch-request.schema.json` (`refusal_classes`,
+which the request watches) and in `session-receipt.schema.json`
+(`refusals_observed`, which the receipt reports actually fired). Persisted
+mutation execution is owned elsewhere; what is frozen here is the id set and what
+each id means.
+
+```text
+C01_MUTABLE_SUBJECT                        a subject named by a branch, tag or latest rather than an exact object
+C02_SOURCE_STATEMENT_PROMOTED_TO_INTERNAL_FACT   a vendor claim reported as an observed internal
+C03_TECH_PASS_PROMOTED_TO_USER_OR_PAID_VALIDATION  a deterministic pass reported as demand
+C04_START_DEPENDENCY_USED_AS_COMPLETION_PROOF     a prerequisite for starting reported as evidence of finishing
+C05_MISSING_EXACT_RECEIPT                  a state asserted with no exact artifact, digest or exit behind it
+C06_OVERLAPPING_WRITER_LEASE               two concurrent writers holding the same path or resource
+C07_HIDDEN_MULTI_PARENT_CONVERGENCE        a request consuming more than one parent without an owner for the merge
+C08_PROJECTION_USED_AS_MACHINE_AUTHORITY   an external document read as implementation or completion truth
+C09_SESSION_REQUEST_PROMOTED_TO_RUNNING    a launch request reported as a running session
+C10_CONSUMER_STATE_LEAK_IN_PORTABLE_CORE   consumer topology or a machine-local path inside portable bytes
+C11_PROMPT_GRANTS_MERGE_SECRET_PERMISSION_OR_PRODUCTION_AUTHORITY   a packet widening reserved authority
+C12_PRIVATE_REASONING_FIELD                a field asking for or persisting private chain of thought
+C13_ROLLBACK_SUBJECT_ABSENT_OR_EQUAL_TO_MUTABLE_ALIAS   nothing exact to return to
+C14_SOURCE_OR_FIXTURE_USED_AS_LIVE_PASS    a fixture or a source statement reported as live evidence
+```
+
+`C04` and `C09` are the two the schemas enforce structurally rather than by
+convention: `start_dependencies` and `completion_dependencies` are separate
+arrays, and a dispatch request pins `lifecycle_state` to `LAUNCH_REQUESTED` with
+`running_session` pinned to `null`. The rest are declarations a consumer's
+checker binds to — a class with no producer is a class that exists in the
+vocabulary and nowhere else, and that is recorded here rather than repaired.

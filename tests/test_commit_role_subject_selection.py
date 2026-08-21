@@ -142,8 +142,8 @@ class SubjectSelectionTests(unittest.TestCase):
             feature = repo.commit(
                 "feature without trailers",
                 filename="feature.txt",
-                name="ed3c",
-                email="mcnum01@gmail.com",
+                name="dev",
+                email="dev@example.org",
             )
 
             selected = self.checker.select_rev_range(

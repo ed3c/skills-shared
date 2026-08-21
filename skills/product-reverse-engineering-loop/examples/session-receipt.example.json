@@ -1,0 +1,89 @@
+{
+  "schema": "prel/session-receipt/v1",
+  "request_ref": {
+    "request_id": "SDR-001",
+    "request_digest": "2b7f4c9a1d6e8035b2c4d6e8f0a2c4e60b8d1f3a5c7e9012b4d6f8a0c2e4f6a8",
+    "base_commit": "1f2e3d4c5b6a70819283746556473829a0b1c2d3"
+  },
+  "lifecycle": {
+    "LAUNCH_REQUESTED": {
+      "state": "PASS",
+      "evidence_ref": "dispatch request SDR-001 digest 2b7f4c9a1d6e8035b2c4d6e8f0a2c4e60b8d1f3a5c7e9012b4d6f8a0c2e4f6a8",
+      "observed_at": "2026-08-21T00:00:00Z"
+    },
+    "SESSION_OBSERVED": {
+      "state": "PASS",
+      "evidence_ref": "carrier observed one session bound to branch prel/sdr-001-contract-freeze",
+      "observed_at": "2026-08-21T00:02:00Z"
+    },
+    "RUNNING": {
+      "state": "PASS",
+      "evidence_ref": "carrier observed the session emit output while bound to the request base commit",
+      "observed_at": "2026-08-21T00:05:00Z"
+    },
+    "RESULT_RECEIVED": {
+      "state": "PASS",
+      "evidence_ref": "result payload digest 9f1c3e5a7b90d2f4a6c8e0b2d4f6a8c0e2b4d6f8a0c2e4b6d8f0a2c4e6b8d0f2",
+      "observed_at": "2026-08-21T00:31:00Z"
+    },
+    "ARTIFACTS_READ_BACK": {
+      "state": "NOT_EXERCISED",
+      "evidence_ref": null,
+      "observed_at": null
+    }
+  },
+  "lanes": {
+    "deterministic": {
+      "state": "PASS",
+      "note": "every committed example validated against the schema named by its schema constant"
+    },
+    "behavioral": {
+      "state": "NOT_EXERCISED",
+      "note": "no surface was driven during this session"
+    },
+    "runtime": {
+      "state": "NOT_IMPLEMENTED",
+      "note": "no runtime carrier exists in this lane, so nothing could be executed to observe"
+    },
+    "physical": {
+      "state": "NOT_IMPLEMENTED",
+      "note": "no physical device is reachable from this carrier and none is simulated in its place"
+    },
+    "user": {
+      "state": "ABSENT",
+      "note": "no user touched anything produced by this session"
+    },
+    "paid": {
+      "state": "ABSENT",
+      "note": "no money moved and no proxy is recorded as if it had"
+    },
+    "human_admit": {
+      "state": "HUMAN_ADMIT_REQUIRED",
+      "note": "merge, release and rollback remain with the Human owner"
+    }
+  },
+  "produced_artifacts": [
+    {
+      "path": "skills/product-reverse-engineering-loop/references/session-receipt.schema.json",
+      "digest": "6d8f0a2c4e6b8d0f2a4c6e8b0d2f4a6c8e0b2d4f6a8c0e2b4d6f8a0c2e4b6d8f"
+    }
+  ],
+  "refusals_observed": [
+    "C05_MISSING_EXACT_RECEIPT"
+  ],
+  "authority": {
+    "merge": false,
+    "permission": false,
+    "secret": false,
+    "production": false,
+    "user_value": false,
+    "paid_demand": false,
+    "release": false
+  },
+  "human_owned_operations": [
+    "merge",
+    "permission or legal expansion",
+    "release or promotion",
+    "rollback"
+  ]
+}

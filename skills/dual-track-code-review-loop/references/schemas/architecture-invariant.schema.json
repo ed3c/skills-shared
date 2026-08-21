@@ -1,0 +1,168 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dtcr-architecture-invariant.schema.json",
+  "title": "DTCR architecture invariant admission",
+  "description": "The admission record for one rule this repository has agreed to hold. It composes with the violation candidate rather than duplicating it: the candidate carries `invariant_ref` with the same `DTCR-AI-` identifier and the statement written out inline, so a reader of a finding never has to resolve a second document to know what rule was breached; this record is the ledger row that says who admitted that identifier, when, and against which commit. An invariant a retrieval pass surfaced is a candidate invariant and is bound here to CANDIDATE_NOT_ADMITTED, because an invariant is admitted rather than discovered: a document that says the domain layer must not import infrastructure is evidence that somebody once wrote that down, not evidence that it currently binds. Admission is a human act and the record has no field in which any accumulation of technical evidence can substitute for it.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "invariant_id", "statement", "origin", "status", "admission", "subsystem_scope", "authority_ceiling"],
+  "properties": {
+    "schema": {"const": "dtcr/architecture-invariant/v1"},
+    "invariant_id": {
+      "type": "string",
+      "pattern": "^DTCR-AI-[0-9]{3}$",
+      "description": "The same identifier space the violation candidate's invariant_ref uses. One rule, one identifier, two records with different jobs."
+    },
+    "statement": {
+      "type": "string",
+      "minLength": 12,
+      "description": "The rule written out. A rule referred to only by identifier is a rule nobody can disagree with, and a rule nobody can disagree with is never revised."
+    },
+    "origin": {
+      "enum": ["HUMAN_DECISION_RECORDED_IN_TREE", "SEMANTIC_RETRIEVAL_SUGGESTION", "EXTERNAL_SOURCE_PROPOSAL"],
+      "description": "Where the sentence came from. The last two are proposals about the world; only the first is a decision this repository made."
+    },
+    "status": {"enum": ["ADMITTED", "CANDIDATE_NOT_ADMITTED"]},
+    "admission": {
+      "oneOf": [
+        {"const": "NOT_ADMITTED"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["admitted_by", "decision_ref", "admitted_at", "admitted_against_commit"],
+          "properties": {
+            "admitted_by": {
+              "const": "HUMAN_ADMIT",
+              "description": "Fixed. Admission belongs to a person; no retrieval hit, static pass or green suite can be written in this field."
+            },
+            "decision_ref": {"type": "string", "minLength": 4},
+            "admitted_at": {"type": "string", "minLength": 10},
+            "admitted_against_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+          }
+        }
+      ]
+    },
+    "subsystem_scope": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 2},
+      "description": "Which subsystems the rule binds. An invariant with no stated scope is read as binding everything, which is how a local rule becomes a repository-wide false positive."
+    },
+    "authority_ceiling": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["self_establishing", "merge", "supersedes_newer_decision"],
+      "properties": {
+        "self_establishing": {"const": false},
+        "merge": {"const": false},
+        "supersedes_newer_decision": {"const": false}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"origin": {"enum": ["SEMANTIC_RETRIEVAL_SUGGESTION", "EXTERNAL_SOURCE_PROPOSAL"]}}, "required": ["origin"]},
+      "then": {
+        "properties": {"status": {"const": "CANDIDATE_NOT_ADMITTED"}},
+        "description": "An invariant a retrieval pass found, or one an outside document recommended, is a candidate. Promoting it here would let a stored sentence bind this tree without anybody agreeing to it."
+      }
+    },
+    {
+      "if": {"properties": {"status": {"const": "ADMITTED"}}, "required": ["status"]},
+      "then": {
+        "properties": {"admission": {"type": "object"}},
+        "description": "ADMITTED with the admission literal NOT_ADMITTED beside it is a rule that admitted itself."
+      }
+    }
+  ],
+  "examples": [
+    {
+      "schema": "dtcr/architecture-invariant/v1",
+      "invariant_id": "DTCR-AI-001",
+      "statement": "Domain modules must not import infrastructure modules.",
+      "origin": "HUMAN_DECISION_RECORDED_IN_TREE",
+      "status": "ADMITTED",
+      "admission": {
+        "admitted_by": "HUMAN_ADMIT",
+        "decision_ref": "decision record on domain isolation",
+        "admitted_at": "2026-08-21",
+        "admitted_against_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f"
+      },
+      "subsystem_scope": ["domain", "infrastructure"],
+      "authority_ceiling": {"self_establishing": false, "merge": false, "supersedes_newer_decision": false}
+    }
+  ],
+  "x-refusal-controls": [
+    {
+      "case_id": "DTCR-XC-AI-001",
+      "refuses": "An invariant a retrieval pass surfaced, recorded as admitted.",
+      "refused_by": "allOf[0].then",
+      "instance": {
+        "schema": "dtcr/architecture-invariant/v1",
+        "invariant_id": "DTCR-AI-002",
+        "statement": "Task ordering must remain first-in-first-out.",
+        "origin": "SEMANTIC_RETRIEVAL_SUGGESTION",
+        "status": "ADMITTED",
+        "admission": {
+          "admitted_by": "HUMAN_ADMIT",
+          "decision_ref": "top-ranked retrieval hit on an older decision record",
+          "admitted_at": "2026-08-21",
+          "admitted_against_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f"
+        },
+        "subsystem_scope": ["scheduler"],
+        "authority_ceiling": {"self_establishing": false, "merge": false, "supersedes_newer_decision": false}
+      }
+    },
+    {
+      "case_id": "DTCR-XC-AI-002",
+      "refuses": "An invariant marked admitted with no admission behind it.",
+      "refused_by": "allOf[1].then",
+      "instance": {
+        "schema": "dtcr/architecture-invariant/v1",
+        "invariant_id": "DTCR-AI-003",
+        "statement": "Every outbound request carries a deadline.",
+        "origin": "HUMAN_DECISION_RECORDED_IN_TREE",
+        "status": "ADMITTED",
+        "admission": "NOT_ADMITTED",
+        "subsystem_scope": ["gateway"],
+        "authority_ceiling": {"self_establishing": false, "merge": false, "supersedes_newer_decision": false}
+      }
+    },
+    {
+      "case_id": "DTCR-XC-AI-003",
+      "refuses": "A rule carried by identifier alone, with no sentence anybody could disagree with.",
+      "refused_by": "properties.statement.minLength",
+      "instance": {
+        "schema": "dtcr/architecture-invariant/v1",
+        "invariant_id": "DTCR-AI-004",
+        "statement": "see ADR",
+        "origin": "HUMAN_DECISION_RECORDED_IN_TREE",
+        "status": "CANDIDATE_NOT_ADMITTED",
+        "admission": "NOT_ADMITTED",
+        "subsystem_scope": ["gateway"],
+        "authority_ceiling": {"self_establishing": false, "merge": false, "supersedes_newer_decision": false}
+      }
+    },
+    {
+      "case_id": "DTCR-XC-AI-004",
+      "refuses": "An older invariant recorded as overriding a newer explicit decision.",
+      "refused_by": "properties.authority_ceiling.properties.supersedes_newer_decision.const",
+      "instance": {
+        "schema": "dtcr/architecture-invariant/v1",
+        "invariant_id": "DTCR-AI-005",
+        "statement": "All persistence goes through the legacy data access layer.",
+        "origin": "HUMAN_DECISION_RECORDED_IN_TREE",
+        "status": "ADMITTED",
+        "admission": {
+          "admitted_by": "HUMAN_ADMIT",
+          "decision_ref": "superseded decision record on persistence",
+          "admitted_at": "2024-02-11",
+          "admitted_against_commit": "3f4a1d9b0c7e2a58d61f8b4c3e9a70d215c6b8e4"
+        },
+        "subsystem_scope": ["persistence"],
+        "authority_ceiling": {"self_establishing": false, "merge": false, "supersedes_newer_decision": true}
+      }
+    }
+  ]
+}

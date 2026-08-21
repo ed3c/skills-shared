@@ -1,0 +1,192 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dtcr-retrieval-query.schema.json",
+  "title": "DTCR retrieval query",
+  "description": "One bounded query against the semantic store, recorded before its rows are read. The lane is closed and includes NOT_APPLICABLE, which is the point: a task for which stored context adds nothing records a query that was never run, with the reason written down, rather than a manufactured vector lane whose only job is to complete a diagram. A NOT_APPLICABLE lane cannot carry a result size, so the two cannot drift. `top_k` is an integer with a ceiling because an unbounded neighbourhood is not a query, it is the store; and the query states in constants that it decides nothing, since a ranking answers which stored text resembles this text and no k makes that into a verdict. The index binding names the projection receipts the index was built from, so a query over a stale or partially rebuilt index is traceable to the exact projections behind it.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "query_id", "lane", "query_digest", "top_k", "filters", "index_binding", "establishes"],
+  "properties": {
+    "schema": {"const": "dtcr/retrieval-query/v1"},
+    "query_id": {"type": "string", "pattern": "^DTCR-RQ-[0-9]{3}$"},
+    "lane": {
+      "enum": ["KEYWORD", "VECTOR", "HYBRID", "NOT_APPLICABLE"],
+      "description": "NOT_APPLICABLE is a first-class value. A lane that could not help this task is recorded as not entered, which is a different sentence from a lane that ran and found nothing."
+    },
+    "query_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "top_k": {
+      "oneOf": [
+        {"const": "NOT_APPLICABLE"},
+        {"type": "integer", "minimum": 1, "maximum": 200}
+      ]
+    },
+    "not_applicable_rationale": {"type": "string", "minLength": 12},
+    "filters": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["field", "value"],
+        "properties": {
+          "field": {"enum": ["subsystem_tag", "document_kind", "visibility_class", "observed_after", "owning_decision"]},
+          "value": {"type": "string", "minLength": 1}
+        }
+      },
+      "description": "Metadata filters over the closed registration vocabulary. A hybrid query whose filters are unrecorded cannot be replayed, and a query that cannot be replayed cannot be shown to have been narrow."
+    },
+    "index_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["index_digest", "index_schema_digest", "projection_receipt_refs"],
+      "properties": {
+        "index_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "index_schema_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "projection_receipt_refs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^DTCR-PR-[0-9]{3}$"}
+        }
+      }
+    },
+    "establishes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["decision", "technical_authority", "task_pass"],
+      "properties": {
+        "decision": {
+          "const": false,
+          "description": "The k nearest rows are the k nearest rows. Choosing among them is a decision somebody makes with deterministic facts in hand."
+        },
+        "technical_authority": {"const": false},
+        "task_pass": {"const": false}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"lane": {"const": "NOT_APPLICABLE"}}, "required": ["lane"]},
+      "then": {
+        "required": ["not_applicable_rationale"],
+        "properties": {"top_k": {"const": "NOT_APPLICABLE"}},
+        "description": "A lane recorded as not applicable while carrying a result size is a lane somebody intends to run anyway. The reason it was skipped is required beside it, because an unexplained skip reads as an empty result."
+      }
+    }
+  ],
+  "examples": [
+    {
+      "schema": "dtcr/retrieval-query/v1",
+      "query_id": "DTCR-RQ-001",
+      "lane": "HYBRID",
+      "query_digest": "5403ee3a36ad14a5f73443a5780ea48acf61e489fef3f9ee319809c50433862f",
+      "top_k": 8,
+      "filters": [
+        {"field": "subsystem_tag", "value": "persistence"},
+        {"field": "document_kind", "value": "DECISION_RECORD"}
+      ],
+      "index_binding": {
+        "index_digest": "6615c410e153c94d565173b3494fa40c6aedade2c8a5191e2276e1f38c9b04cd",
+        "index_schema_digest": "0c246a5dd73080b4665f823699e1f4d793460e2db01a45d8fda71ab100a3565c",
+        "projection_receipt_refs": ["DTCR-PR-001"]
+      },
+      "establishes": {"decision": false, "technical_authority": false, "task_pass": false}
+    }
+  ],
+  "x-refusal-controls": [
+    {
+      "case_id": "DTCR-XC-RQ-001",
+      "refuses": "An unbounded neighbourhood written where a bounded k belongs.",
+      "refused_by": "properties.top_k.oneOf",
+      "instance": {
+        "schema": "dtcr/retrieval-query/v1",
+        "query_id": "DTCR-RQ-002",
+        "lane": "VECTOR",
+        "query_digest": "5403ee3a36ad14a5f73443a5780ea48acf61e489fef3f9ee319809c50433862f",
+        "top_k": "all",
+        "filters": [],
+        "index_binding": {
+          "index_digest": "6615c410e153c94d565173b3494fa40c6aedade2c8a5191e2276e1f38c9b04cd",
+          "index_schema_digest": "0c246a5dd73080b4665f823699e1f4d793460e2db01a45d8fda71ab100a3565c",
+          "projection_receipt_refs": ["DTCR-PR-001"]
+        },
+        "establishes": {"decision": false, "technical_authority": false, "task_pass": false}
+      }
+    },
+    {
+      "case_id": "DTCR-XC-RQ-002",
+      "refuses": "A lane recorded as not applicable while carrying a result size, so a skipped lane runs anyway.",
+      "refused_by": "allOf[0].then",
+      "instance": {
+        "schema": "dtcr/retrieval-query/v1",
+        "query_id": "DTCR-RQ-003",
+        "lane": "NOT_APPLICABLE",
+        "query_digest": "5403ee3a36ad14a5f73443a5780ea48acf61e489fef3f9ee319809c50433862f",
+        "top_k": 8,
+        "filters": [],
+        "index_binding": {
+          "index_digest": "6615c410e153c94d565173b3494fa40c6aedade2c8a5191e2276e1f38c9b04cd",
+          "index_schema_digest": "0c246a5dd73080b4665f823699e1f4d793460e2db01a45d8fda71ab100a3565c",
+          "projection_receipt_refs": ["DTCR-PR-001"]
+        },
+        "establishes": {"decision": false, "technical_authority": false, "task_pass": false}
+      }
+    },
+    {
+      "case_id": "DTCR-XC-RQ-003",
+      "refuses": "TOP_K != DECISION: a query recorded as having decided something.",
+      "refused_by": "properties.establishes.properties.decision.const",
+      "instance": {
+        "schema": "dtcr/retrieval-query/v1",
+        "query_id": "DTCR-RQ-004",
+        "lane": "HYBRID",
+        "query_digest": "5403ee3a36ad14a5f73443a5780ea48acf61e489fef3f9ee319809c50433862f",
+        "top_k": 3,
+        "filters": [],
+        "index_binding": {
+          "index_digest": "6615c410e153c94d565173b3494fa40c6aedade2c8a5191e2276e1f38c9b04cd",
+          "index_schema_digest": "0c246a5dd73080b4665f823699e1f4d793460e2db01a45d8fda71ab100a3565c",
+          "projection_receipt_refs": ["DTCR-PR-001"]
+        },
+        "establishes": {"decision": true, "technical_authority": false, "task_pass": false}
+      }
+    },
+    {
+      "case_id": "DTCR-XC-RQ-004",
+      "refuses": "A query over an index with no projection receipts behind it, so staleness cannot be traced.",
+      "refused_by": "properties.index_binding.required",
+      "instance": {
+        "schema": "dtcr/retrieval-query/v1",
+        "query_id": "DTCR-RQ-005",
+        "lane": "VECTOR",
+        "query_digest": "5403ee3a36ad14a5f73443a5780ea48acf61e489fef3f9ee319809c50433862f",
+        "top_k": 8,
+        "filters": [],
+        "index_binding": {
+          "index_digest": "6615c410e153c94d565173b3494fa40c6aedade2c8a5191e2276e1f38c9b04cd",
+          "index_schema_digest": "0c246a5dd73080b4665f823699e1f4d793460e2db01a45d8fda71ab100a3565c"
+        },
+        "establishes": {"decision": false, "technical_authority": false, "task_pass": false}
+      }
+    },
+    {
+      "case_id": "DTCR-XC-RQ-005",
+      "refuses": "A filter over a field outside the registration vocabulary, which cannot be replayed against the store.",
+      "refused_by": "properties.filters.items.properties.field.enum",
+      "instance": {
+        "schema": "dtcr/retrieval-query/v1",
+        "query_id": "DTCR-RQ-006",
+        "lane": "HYBRID",
+        "query_digest": "5403ee3a36ad14a5f73443a5780ea48acf61e489fef3f9ee319809c50433862f",
+        "top_k": 8,
+        "filters": [{"field": "private_workspace", "value": "example-team-space"}],
+        "index_binding": {
+          "index_digest": "6615c410e153c94d565173b3494fa40c6aedade2c8a5191e2276e1f38c9b04cd",
+          "index_schema_digest": "0c246a5dd73080b4665f823699e1f4d793460e2db01a45d8fda71ab100a3565c",
+          "projection_receipt_refs": ["DTCR-PR-001"]
+        },
+        "establishes": {"decision": false, "technical_authority": false, "task_pass": false}
+      }
+    }
+  ]
+}

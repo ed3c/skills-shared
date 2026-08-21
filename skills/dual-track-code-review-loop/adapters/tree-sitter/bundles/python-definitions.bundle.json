@@ -1,0 +1,35 @@
+{
+  "abi_version": 15,
+  "bundle_digest": "1299ed3f055932f20c6a7d98ff2aa8a03549649045d778717bad5380bccac298",
+  "bundle_id": "python-definitions",
+  "cli_license": "MIT, held by the tree-sitter CLI project, separately from every grammar it builds.",
+  "grammar": {
+    "files": [
+      {
+        "path": "src/grammar.json",
+        "sha256": "2adc15e78f4dae293e85de1517c45bcee2f8b075fa30a083c658925b944afec4"
+      },
+      {
+        "path": "src/parser.c",
+        "sha256": "a895f10b3cf7b2608f3283b43cd5cfed70971c7ee4a0136abbaaccbc4a7a25e0"
+      },
+      {
+        "path": "src/scanner.c",
+        "sha256": "6db82134ac2d4c90a1a1475487a625cface02662ebda9b7478cad9c7147e9afe"
+      }
+    ],
+    "grammar_digest": "94ead290935e18cd938342612205e3ec29bcc27def409a3022a21e6a7457c8de",
+    "license": "MIT, held by the grammar project. The Tree-sitter framework's own licence does not admit it and does not cover it.",
+    "source": "tree-sitter-python 0.25.0, vendored grammar sources as published on crates.io"
+  },
+  "language": "python",
+  "queries": [
+    {
+      "path": "queries/python-definitions.scm",
+      "patterns": 2,
+      "sha256": "b654af47b88da389ffc06cb0dd20c008a8f747657b01417653e796e99e07328d"
+    }
+  ],
+  "query_digest": "b654af47b88da389ffc06cb0dd20c008a8f747657b01417653e796e99e07328d",
+  "schema": "dtcr/tree-sitter-bundle/v1"
+}

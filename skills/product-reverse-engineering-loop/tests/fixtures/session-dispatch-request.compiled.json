@@ -1,0 +1,244 @@
+{
+  "lifecycle_state": "LAUNCH_REQUESTED",
+  "refusal_classes": [
+    "C01_MUTABLE_SUBJECT",
+    "C04_START_DEPENDENCY_USED_AS_COMPLETION_PROOF",
+    "C05_MISSING_EXACT_RECEIPT",
+    "C06_OVERLAPPING_WRITER_LEASE",
+    "C07_HIDDEN_MULTI_PARENT_CONVERGENCE",
+    "C09_SESSION_REQUEST_PROMOTED_TO_RUNNING",
+    "C13_ROLLBACK_SUBJECT_ABSENT_OR_EQUAL_TO_MUTABLE_ALIAS"
+  ],
+  "requests": [
+    {
+      "authority": {
+        "merge": false,
+        "permission": false,
+        "production": false,
+        "secret": false
+      },
+      "base": {
+        "commit": "1f2e3d4c5b6a70819283746556473829a0b1c2d3",
+        "tree": "9a8b7c6d5e4f30211203948576657483920a1b2c"
+      },
+      "branch": "prel/sdr-001-contract-freeze",
+      "completion_dependencies": [
+        {
+          "digest": "b2c3d4e5f60718293a4b5c6d7e8f90123456789a",
+          "receipt": null,
+          "subject": "positive validation of every example against its schema"
+        }
+      ],
+      "consumer_binding": {
+        "tracker_item": "placeholder-tracker-item-a"
+      },
+      "evidence_ceiling": {
+        "cannot_establish": [
+          "live provider execution",
+          "merge or release",
+          "paid demand",
+          "user value"
+        ],
+        "highest_claimable_lane": "DETERMINISTIC"
+      },
+      "human_owned_operations": [
+        "merge",
+        "permission or legal expansion",
+        "release or promotion",
+        "rollback"
+      ],
+      "id": "SDR-001",
+      "lease": {
+        "paths": [
+          "skills/product-reverse-engineering-loop/references/"
+        ],
+        "resources": []
+      },
+      "negative_controls": [
+        "an example asserting a running session inside a dispatch request must fail validation",
+        "an example carrying a mutable ref where an exact commit is required must fail validation"
+      ],
+      "oracles": [
+        {
+          "id": "ORC-001",
+          "lane": "DETERMINISTIC",
+          "procedure": "validate each committed example against the schema named by its schema constant",
+          "refuted_by": "any example that fails validation against its own schema"
+        }
+      ],
+      "output_paths": [
+        "skills/product-reverse-engineering-loop/references/"
+      ],
+      "parent_request_id": null,
+      "relation": "SIBLING",
+      "requests_private_reasoning": false,
+      "rollback": {
+        "commit": "1f2e3d4c5b6a70819283746556473829a0b1c2d3",
+        "subject": "the bound base commit of this request"
+      },
+      "start_dependencies": [
+        {
+          "digest": "a1b2c3d4e5f60718293a4b5c6d7e8f9012345678",
+          "receipt": "schema present in the bound base tree 9a8b7c6d5e4f30211203948576657483920a1b2c",
+          "subject": "problem-closure-matrix.schema.json"
+        }
+      ],
+      "stop_states": [
+        "a path outside the lease is modified",
+        "base commit no longer resolves to the bound tree",
+        "three failures against the same invariant"
+      ]
+    },
+    {
+      "authority": {
+        "merge": false,
+        "permission": false,
+        "production": false,
+        "secret": false
+      },
+      "base": {
+        "commit": "1f2e3d4c5b6a70819283746556473829a0b1c2d3",
+        "tree": "9a8b7c6d5e4f30211203948576657483920a1b2c"
+      },
+      "branch": "prel/sdr-002-example-set",
+      "completion_dependencies": [],
+      "consumer_binding": {
+        "tracker_item": "placeholder-tracker-item-b"
+      },
+      "evidence_ceiling": {
+        "cannot_establish": [
+          "compiler correctness",
+          "paid demand",
+          "user value"
+        ],
+        "highest_claimable_lane": "DETERMINISTIC"
+      },
+      "human_owned_operations": [
+        "merge",
+        "release or promotion",
+        "rollback"
+      ],
+      "id": "SDR-002",
+      "lease": {
+        "paths": [
+          "skills/product-reverse-engineering-loop/examples/"
+        ],
+        "resources": []
+      },
+      "negative_controls": [
+        "an example with an unknown property must fail because additionalProperties is false"
+      ],
+      "oracles": [
+        {
+          "id": "ORC-002",
+          "lane": "DETERMINISTIC",
+          "procedure": "parse every example as JSON and validate it against its declared schema",
+          "refuted_by": "an example that parses but does not validate"
+        }
+      ],
+      "output_paths": [
+        "skills/product-reverse-engineering-loop/examples/"
+      ],
+      "parent_request_id": null,
+      "relation": "SIBLING",
+      "requests_private_reasoning": false,
+      "rollback": {
+        "commit": "1f2e3d4c5b6a70819283746556473829a0b1c2d3",
+        "subject": "the bound base commit of this request"
+      },
+      "start_dependencies": [
+        {
+          "digest": "9a8b7c6d5e4f30211203948576657483920a1b2c",
+          "receipt": "tree resolved before the worktree was created",
+          "subject": "the bound base tree"
+        }
+      ],
+      "stop_states": [
+        "an output path escapes the declared lease",
+        "the sibling lease is observed to overlap"
+      ]
+    },
+    {
+      "authority": {
+        "merge": false,
+        "permission": false,
+        "production": false,
+        "secret": false
+      },
+      "base": {
+        "commit": "3c4d5e6f708192a3b4c5d6e7f80912a3b4c5d6e7",
+        "tree": "5e6f708192a3b4c5d6e7f80912a3b4c5d6e7f809"
+      },
+      "branch": "prel/sdr-003-projection-compiler",
+      "completion_dependencies": [
+        {
+          "digest": "e5f60718293a4b5c6d7e8f90123456789ab2c3d4",
+          "receipt": null,
+          "subject": "compiler emits a registry entry whose read_back state is not asserted from the request"
+        }
+      ],
+      "consumer_binding": {
+        "tracker_item": "placeholder-tracker-item-c"
+      },
+      "evidence_ceiling": {
+        "cannot_establish": [
+          "paid demand",
+          "that any external document was actually read back",
+          "user value"
+        ],
+        "highest_claimable_lane": "DETERMINISTIC"
+      },
+      "human_owned_operations": [
+        "merge",
+        "permission or legal expansion",
+        "release or promotion",
+        "rollback"
+      ],
+      "id": "SDR-003",
+      "lease": {
+        "paths": [
+          "skills/product-reverse-engineering-loop/scripts/"
+        ],
+        "resources": [
+          "the compiler byte-stability fixture"
+        ]
+      },
+      "negative_controls": [
+        "a projection whose canonical subject names a branch instead of a commit must be refused as C01",
+        "a registry entry used as completion authority must be refused as C08"
+      ],
+      "oracles": [
+        {
+          "id": "ORC-003",
+          "lane": "DETERMINISTIC",
+          "procedure": "recompile the registry projection and byte-compare it against the committed artifact",
+          "refuted_by": "a recompiled projection whose bytes differ from the committed one"
+        }
+      ],
+      "output_paths": [
+        "skills/product-reverse-engineering-loop/scripts/"
+      ],
+      "parent_request_id": "SDR-001",
+      "relation": "CHILD",
+      "requests_private_reasoning": false,
+      "rollback": {
+        "commit": "3c4d5e6f708192a3b4c5d6e7f80912a3b4c5d6e7",
+        "subject": "the exact parent branch head this child was cut from"
+      },
+      "start_dependencies": [
+        {
+          "digest": "d4e5f60718293a4b5c6d7e8f90123456789ab2c3",
+          "receipt": "exact blob observed on the unmerged branch head 3c4d5e6f708192a3b4c5d6e7f80912a3b4c5d6e7",
+          "subject": "external-projection-registry.schema.json produced by SDR-001 and not yet merged"
+        }
+      ],
+      "stop_states": [
+        "the consumed parent subject digest changes",
+        "the parent request is abandoned",
+        "three failures against the same invariant"
+      ]
+    }
+  ],
+  "running_session": null,
+  "schema": "prel/session-dispatch-request/v1"
+}

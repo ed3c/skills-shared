@@ -1,0 +1,355 @@
+{
+  "fixture": "dtcr/sqlite-ledger-fixture/v1",
+  "note": "One acyclic impact graph over four normalized identities. The relationships read 'from CALLS to'; the ledger stores the impact direction, which is the reverse.",
+  "subject": {
+    "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+    "commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+    "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+  },
+  "observations": [
+    {
+      "schema": "dtcr/symbol-fact/v1",
+      "fact_id": "DTCR-SY-001",
+      "fact_kind": "SYMBOL",
+      "subject": {
+        "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+        "commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+        "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+      },
+      "index_binding": {
+        "indexer_name": "code-intelligence-indexer",
+        "version": "0.5.2",
+        "indexer_sha256": "70fa78e5ae55563976b332a6da662e9877dc6ed6965f676453d8f4a35ebdf483",
+        "config_digest": "6041f3e0319bbe072bb08ce9f945687edc3c092dd1447b1f92711c072ba3b578",
+        "index_digest": "33869142b3110b5c82e0199c14ebf64dad3220629ba8598155d4b3f241fe00a6",
+        "indexed_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f"
+      },
+      "output_digest": "bc129194d4e1daeabadc8302541d32aff616393d76682e9710be6ed0f702777b",
+      "warnings": [],
+      "omissions": [],
+      "establishes": {
+        "complete_call_graph": false,
+        "semantic_truth": false,
+        "task_pass": false
+      },
+      "symbol": {
+        "identity": {
+          "provider_scoped_id": "example-scheme example-package domain/order/Pricing#apply().",
+          "normalization": {
+            "scheme": "example interchange symbol grammar",
+            "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"
+          }
+        },
+        "symbol_kind": "METHOD",
+        "display_name": "Pricing.apply"
+      }
+    },
+    {
+      "schema": "dtcr/symbol-fact/v1",
+      "fact_id": "DTCR-SY-002",
+      "fact_kind": "SYMBOL",
+      "subject": {
+        "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+        "commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+        "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+      },
+      "index_binding": {
+        "indexer_name": "code-intelligence-indexer",
+        "version": "0.5.2",
+        "indexer_sha256": "70fa78e5ae55563976b332a6da662e9877dc6ed6965f676453d8f4a35ebdf483",
+        "config_digest": "6041f3e0319bbe072bb08ce9f945687edc3c092dd1447b1f92711c072ba3b578",
+        "index_digest": "33869142b3110b5c82e0199c14ebf64dad3220629ba8598155d4b3f241fe00a6",
+        "indexed_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f"
+      },
+      "output_digest": "141ad5e2410049db7036ec75237a9d488f865116f0628884433f1ae6fd46465b",
+      "warnings": [],
+      "omissions": [],
+      "establishes": {
+        "complete_call_graph": false,
+        "semantic_truth": false,
+        "task_pass": false
+      },
+      "symbol": {
+        "identity": {
+          "provider_scoped_id": "example-scheme example-package api/checkout/Handler#post().",
+          "normalization": {
+            "scheme": "example interchange symbol grammar",
+            "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"
+          }
+        },
+        "symbol_kind": "METHOD",
+        "display_name": "Handler.post"
+      }
+    },
+    {
+      "schema": "dtcr/symbol-fact/v1",
+      "fact_id": "DTCR-SY-003",
+      "fact_kind": "SYMBOL",
+      "subject": {
+        "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+        "commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+        "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+      },
+      "index_binding": {
+        "indexer_name": "code-intelligence-indexer",
+        "version": "0.5.2",
+        "indexer_sha256": "70fa78e5ae55563976b332a6da662e9877dc6ed6965f676453d8f4a35ebdf483",
+        "config_digest": "6041f3e0319bbe072bb08ce9f945687edc3c092dd1447b1f92711c072ba3b578",
+        "index_digest": "33869142b3110b5c82e0199c14ebf64dad3220629ba8598155d4b3f241fe00a6",
+        "indexed_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f"
+      },
+      "output_digest": "81a8fc2a46321a97aa1587c3364ac1fa7bdb33cf1f2e57cd7a0daac85eeb8426",
+      "warnings": [],
+      "omissions": [],
+      "establishes": {
+        "complete_call_graph": false,
+        "semantic_truth": false,
+        "task_pass": false
+      },
+      "symbol": {
+        "identity": {
+          "provider_scoped_id": "example-scheme example-package api/checkout/Session#run().",
+          "normalization": {
+            "scheme": "example interchange symbol grammar",
+            "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"
+          }
+        },
+        "symbol_kind": "METHOD",
+        "display_name": "Session.run"
+      }
+    },
+    {
+      "schema": "dtcr/symbol-fact/v1",
+      "fact_id": "DTCR-SY-004",
+      "fact_kind": "SYMBOL",
+      "subject": {
+        "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+        "commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+        "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+      },
+      "index_binding": {
+        "indexer_name": "code-intelligence-indexer",
+        "version": "0.5.2",
+        "indexer_sha256": "70fa78e5ae55563976b332a6da662e9877dc6ed6965f676453d8f4a35ebdf483",
+        "config_digest": "6041f3e0319bbe072bb08ce9f945687edc3c092dd1447b1f92711c072ba3b578",
+        "index_digest": "33869142b3110b5c82e0199c14ebf64dad3220629ba8598155d4b3f241fe00a6",
+        "indexed_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f"
+      },
+      "output_digest": "85e41c60f134f2c7051a0d6ed6676b7c2c82f25f74c40c2dd11a1ebe17eae4ea",
+      "warnings": [],
+      "omissions": [],
+      "establishes": {
+        "complete_call_graph": false,
+        "semantic_truth": false,
+        "task_pass": false
+      },
+      "symbol": {
+        "identity": {
+          "provider_scoped_id": "example-scheme example-package audit/Trail#record().",
+          "normalization": {
+            "scheme": "example interchange symbol grammar",
+            "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"
+          }
+        },
+        "symbol_kind": "METHOD",
+        "display_name": "Trail.record"
+      }
+    },
+    {
+      "schema": "dtcr/symbol-fact/v1",
+      "fact_id": "DTCR-SY-005",
+      "fact_kind": "OCCURRENCE",
+      "subject": {
+        "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+        "commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+        "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+      },
+      "index_binding": {
+        "indexer_name": "code-intelligence-indexer",
+        "version": "0.5.2",
+        "indexer_sha256": "70fa78e5ae55563976b332a6da662e9877dc6ed6965f676453d8f4a35ebdf483",
+        "config_digest": "6041f3e0319bbe072bb08ce9f945687edc3c092dd1447b1f92711c072ba3b578",
+        "index_digest": "33869142b3110b5c82e0199c14ebf64dad3220629ba8598155d4b3f241fe00a6",
+        "indexed_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f"
+      },
+      "output_digest": "54d18effda548547a83d3b2a50a20e6231d9a093342a40b26a9918b5fe4578ac",
+      "warnings": [],
+      "omissions": [],
+      "establishes": {
+        "complete_call_graph": false,
+        "semantic_truth": false,
+        "task_pass": false
+      },
+      "occurrence": {
+        "identity": {
+          "provider_scoped_id": "example-scheme example-package domain/order/Pricing#apply().",
+          "normalization": {
+            "scheme": "example interchange symbol grammar",
+            "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"
+          }
+        },
+        "blob": {
+          "path": "domain/order/pricing.ext",
+          "blob": "41b1f0baaeb91f83a2acf33c3b8e7f084b4e3c94"
+        },
+        "range": {
+          "start_byte": 480,
+          "end_byte": 1320,
+          "start_line": 12,
+          "start_column": 0,
+          "end_line": 20,
+          "end_column": 1
+        },
+        "roles": [
+          "DEFINITION"
+        ]
+      }
+    },
+    {
+      "schema": "dtcr/symbol-fact/v1",
+      "fact_id": "DTCR-SY-006",
+      "fact_kind": "RELATIONSHIP",
+      "subject": {
+        "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+        "commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+        "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+      },
+      "index_binding": {
+        "indexer_name": "code-intelligence-indexer",
+        "version": "0.5.2",
+        "indexer_sha256": "70fa78e5ae55563976b332a6da662e9877dc6ed6965f676453d8f4a35ebdf483",
+        "config_digest": "6041f3e0319bbe072bb08ce9f945687edc3c092dd1447b1f92711c072ba3b578",
+        "index_digest": "33869142b3110b5c82e0199c14ebf64dad3220629ba8598155d4b3f241fe00a6",
+        "indexed_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f"
+      },
+      "output_digest": "536c2643a48377cb4931c954af89f50f3711360df5c4775978d7aab2e9217ab0",
+      "warnings": [],
+      "omissions": [],
+      "establishes": {
+        "complete_call_graph": false,
+        "semantic_truth": false,
+        "task_pass": false
+      },
+      "relationship": {
+        "from": {
+          "provider_scoped_id": "example-scheme example-package api/checkout/Handler#post().",
+          "normalization": {
+            "scheme": "example interchange symbol grammar",
+            "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"
+          }
+        },
+        "to": {
+          "provider_scoped_id": "example-scheme example-package domain/order/Pricing#apply().",
+          "normalization": {
+            "scheme": "example interchange symbol grammar",
+            "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"
+          }
+        },
+        "relationship_kind": "CALLS",
+        "graph_evidence": {
+          "provenance": "COMPILER_RESOLVED_CALL",
+          "completeness": "COMPLETE_FOR_RESOLVED_EDGES",
+          "tool": "compiler-backed index"
+        }
+      }
+    },
+    {
+      "schema": "dtcr/symbol-fact/v1",
+      "fact_id": "DTCR-SY-007",
+      "fact_kind": "RELATIONSHIP",
+      "subject": {
+        "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+        "commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+        "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+      },
+      "index_binding": {
+        "indexer_name": "code-intelligence-indexer",
+        "version": "0.5.2",
+        "indexer_sha256": "70fa78e5ae55563976b332a6da662e9877dc6ed6965f676453d8f4a35ebdf483",
+        "config_digest": "6041f3e0319bbe072bb08ce9f945687edc3c092dd1447b1f92711c072ba3b578",
+        "index_digest": "33869142b3110b5c82e0199c14ebf64dad3220629ba8598155d4b3f241fe00a6",
+        "indexed_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f"
+      },
+      "output_digest": "a416f3435660953089cac9714c225bc314d401c06f713ed3db6404fcc6b8e38f",
+      "warnings": [],
+      "omissions": [],
+      "establishes": {
+        "complete_call_graph": false,
+        "semantic_truth": false,
+        "task_pass": false
+      },
+      "relationship": {
+        "from": {
+          "provider_scoped_id": "example-scheme example-package api/checkout/Session#run().",
+          "normalization": {
+            "scheme": "example interchange symbol grammar",
+            "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"
+          }
+        },
+        "to": {
+          "provider_scoped_id": "example-scheme example-package api/checkout/Handler#post().",
+          "normalization": {
+            "scheme": "example interchange symbol grammar",
+            "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"
+          }
+        },
+        "relationship_kind": "CALLS",
+        "graph_evidence": {
+          "provenance": "COMPILER_RESOLVED_CALL",
+          "completeness": "COMPLETE_FOR_RESOLVED_EDGES",
+          "tool": "compiler-backed index"
+        }
+      }
+    },
+    {
+      "schema": "dtcr/symbol-fact/v1",
+      "fact_id": "DTCR-SY-008",
+      "fact_kind": "RELATIONSHIP",
+      "subject": {
+        "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+        "commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+        "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+      },
+      "index_binding": {
+        "indexer_name": "code-intelligence-indexer",
+        "version": "0.5.2",
+        "indexer_sha256": "70fa78e5ae55563976b332a6da662e9877dc6ed6965f676453d8f4a35ebdf483",
+        "config_digest": "6041f3e0319bbe072bb08ce9f945687edc3c092dd1447b1f92711c072ba3b578",
+        "index_digest": "33869142b3110b5c82e0199c14ebf64dad3220629ba8598155d4b3f241fe00a6",
+        "indexed_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f"
+      },
+      "output_digest": "ab6564f7cf870238d979846c8afc95a34bf01d71578939b73fce98ce3482dfba",
+      "warnings": [],
+      "omissions": [
+        "the audit lane records one reference per changed field, not per call site"
+      ],
+      "establishes": {
+        "complete_call_graph": false,
+        "semantic_truth": false,
+        "task_pass": false
+      },
+      "relationship": {
+        "from": {
+          "provider_scoped_id": "example-scheme example-package audit/Trail#record().",
+          "normalization": {
+            "scheme": "example interchange symbol grammar",
+            "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"
+          }
+        },
+        "to": {
+          "provider_scoped_id": "example-scheme example-package domain/order/Pricing#apply().",
+          "normalization": {
+            "scheme": "example interchange symbol grammar",
+            "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"
+          }
+        },
+        "relationship_kind": "REFERENCES",
+        "graph_evidence": {
+          "provenance": "COMPILER_RESOLVED_CALL",
+          "completeness": "COMPLETE_FOR_RESOLVED_EDGES",
+          "tool": "compiler-backed index"
+        }
+      }
+    }
+  ]
+}

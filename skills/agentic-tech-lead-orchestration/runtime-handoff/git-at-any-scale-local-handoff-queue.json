@@ -1,0 +1,132 @@
+{
+  "schema": "agentic-tech-lead/local-handoff-queue/v1",
+  "program": "git-at-any-scale",
+  "repository": "ed3c/skills-shared",
+  "bound_main": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+  "bound_tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7",
+  "parent_issue": 531,
+  "last_reconciled": "2026-08-21",
+  "law": {
+    "max_active": 1,
+    "queue_order_does_not_create_git_ancestry": true,
+    "completion_requires_content_bound_receipt": true,
+    "private_credentials_in_public_receipt": false,
+    "mergeable_pr_is_not_admitted": true,
+    "skipped_workflow_is_not_pass": true
+  },
+  "items": [
+    {
+      "id": "GIT-SCALE-H0",
+      "state": "ACTIVE",
+      "owner_issue": 512,
+      "kind": "TRUSTED_LOCAL_SOURCE_MATERIALIZATION",
+      "objective": "Materialize the exact observed Cursor article bytes or a stable exported representation and bind byte count plus SHA-256 before article-source truth advances.",
+      "inputs": [
+        "https://cursor.com/blog/git-at-any-scale",
+        "docs/traceability/git-at-any-scale/source-claims.json"
+      ],
+      "required_receipt": [
+        "exact source locator",
+        "observed/exported bytes",
+        "byte count",
+        "sha256",
+        "retrieval/export timestamp",
+        "tool/runtime identity",
+        "claim denominator digest"
+      ],
+      "completion_effect": "May advance SOURCE_LOCATOR_BOUND to IMMUTABLE_SOURCE_PACKET_BOUND only; source claims remain proposals until independently verified.",
+      "human_or_external_boundary": "Trusted local/runtime retrieval required; current GitHub connector cannot create immutable webpage evidence."
+    },
+    {
+      "id": "GIT-SCALE-H1",
+      "state": "IMPLEMENTATION_CANDIDATE_BLOCKED_ON_DENOMINATOR",
+      "owner_issue": 532,
+      "kind": "PORTABLE_CONTRACT_IMPLEMENTATION",
+      "candidate_pr": 542,
+      "candidate_head": "196a75ac04f6ad2c9a6e50b0645d71fea9bf43e3",
+      "objective": "Complete the full #532 portable assurance denominator without widening into a hosting runtime.",
+      "already_present": [
+        "skills/git-hosting-scale-assurance AGENTS/README/SKILL",
+        "aggregate hosting-assurance/v1 schema",
+        "semantic checker",
+        "GS-C01..GS-C20 named mutation controls"
+      ],
+      "missing_before_issue_close": [
+        "hosting-subject schema",
+        "operation-history schema and concurrent valid-linearization fixture",
+        "durability receipt and hollow durable-readback fixture",
+        "ref-transaction receipt",
+        "read-freshness receipt and stale-cache catch-up fixture",
+        "cache-rebuild receipt and destroy/rebuild fixture",
+        "gossip observation receipt and drop/delay/reorder/duplicate fixtures",
+        "compaction receipt and reachable-object fixture",
+        "corruption-recovery receipt and partial-record/restart fixture",
+        "benchmark-run schema and full denominator fixture",
+        "hosting-closure-record schema",
+        "repository skill/eval/core/entry-route/commit-role gates",
+        "exact-head hosted PASS"
+      ],
+      "current_workflow_readback": "Shared Skills Infra SKIPPED on candidate head; not PASS",
+      "local_execution_note": "A network-isolated audit environment could not clone GitHub; run the repository-declared commands in a real local checkout and bind logs/exits to the exact candidate head.",
+      "required_receipt": [
+        "exact branch/head/tree",
+        "complete schema inventory and digests",
+        "positive/hollow/concurrent/fault/mutation denominator",
+        "repository gate commands and exits",
+        "exact-head hosted workflows",
+        "first-red and repair lineage"
+      ]
+    },
+    {
+      "id": "GIT-SCALE-H2",
+      "state": "BLOCKED_BY_PREDECESSOR",
+      "owner_issue": 534,
+      "kind": "PHYSICAL_RUNTIME_CANARY",
+      "objective": "Run durability, linearizability, stale-cache, gossip-loss, cache-rebuild, compaction, corruption/restart and matched-scale experiments on one explicitly selected disposable hosting runtime.",
+      "predecessor": "complete/admitted #532 interface plus Human-approved runtime/provider scope",
+      "required_receipt": [
+        "runtime/storage/config subjects",
+        "operation history",
+        "fault schedule",
+        "raw and reduced metrics",
+        "cleanup/cost receipt",
+        "artifact SHA256SUMS"
+      ],
+      "human_or_external_boundary": "Provider/account activation, spend, production data and destructive non-disposable tests require explicit Human authority."
+    },
+    {
+      "id": "GIT-SCALE-H3",
+      "state": "BLOCKED_BY_PREDECESSOR",
+      "owner_issue": 535,
+      "kind": "INDEPENDENT_SHADOW",
+      "objective": "Run read-only same-subject adversarial admission over immutable source, complete #532 contracts and #534 live receipts.",
+      "predecessor": "exact complete #532 and #534 subjects readable",
+      "required_receipt": [
+        "reviewed digests",
+        "GS-S01..S16 outcomes",
+        "first-red findings",
+        "bounded verdict",
+        "evidence ceilings"
+      ]
+    },
+    {
+      "id": "GIT-SCALE-H4",
+      "state": "BLOCKED_BY_PREDECESSOR_AND_PATH_WRITERS",
+      "owner_issue": 536,
+      "kind": "SHARED_PATH_CONVERGENCE",
+      "preparation_pr": 539,
+      "objective": "After prerequisites and active writers are reconciled, update canonical root/shared indexes and git-town-stacked-pr-worker README with admitted subjects and final Stack state.",
+      "predecessor": "#412/#419 path-writer disposition plus admitted #531/#532/#534/#535 subjects",
+      "required_receipt": [
+        "fresh open-PR changed-path inventory",
+        "selected writer/supersession decision",
+        "exact candidate head/tree",
+        "document-route gates",
+        "Molecular Stack checker",
+        "exact-head hosted PASS",
+        "independent Shadow readback"
+      ],
+      "human_or_external_boundary": "Merge and final semantic admission remain Human/repository authority."
+    }
+  ]
+}

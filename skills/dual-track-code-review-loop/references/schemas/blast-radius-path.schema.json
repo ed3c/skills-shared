@@ -1,0 +1,357 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dtcr-blast-radius-path.schema.json",
+  "title": "DTCR blast radius path",
+  "description": "One traversal from a changed seed through an admitted edge set, and the bounds that stopped it. A recursive traversal over a graph with cycles either carries its bounds or runs until something else stops it, so depth limit, row limit and the reason termination happened are required integers and a closed enum rather than notes: an unbounded traversal cannot be written down here. Visited nodes are unique, which is where a cycle stops being a path that revisits a node and becomes a refusal. The reachable set this path belongs to is bounded by the admitted edge set named in `edge_set`, and every hop declares which admitted kind it used; the schema cannot verify that the digest covers the kinds, so a consumer that trusts the reach without checking the edge set is trusting a number whose denominator it never read.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "path_id", "subject", "seed", "edge_set", "hops", "nodes_visited", "traversal_bounds", "authority_ceiling"],
+  "properties": {
+    "schema": {"const": "dtcr/blast-radius-path/v1"},
+    "path_id": {"type": "string", "pattern": "^DTCR-BR-[0-9]{3}$"},
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository_binding_id", "commit", "tree"],
+      "properties": {
+        "repository_binding_id": {"type": "string", "pattern": "^DTCR-RB-[0-9a-f]{16}$"},
+        "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "tree": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+      }
+    },
+    "seed": {"$ref": "#/$defs/node"},
+    "edge_set": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["edge_set_digest", "admitted_edge_kinds", "edge_provenance", "edge_completeness"],
+      "properties": {
+        "edge_set_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "admitted_edge_kinds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"enum": ["CALLS", "REFERENCES", "IMPLEMENTS", "INHERITS", "IMPORTS", "DEFINES"]},
+          "description": "The closed set this traversal was allowed to walk. Reach computed over one edge kind is not reach over another, and a reader who is not told which kinds were walked assumes all of them."
+        },
+        "edge_provenance": {"enum": ["COMPILER_RESOLVED_CALL", "OCCURRENCE_ENCLOSING_RANGE_HEURISTIC", "TEXTUAL_MATCH", "MIXED"]},
+        "edge_completeness": {"enum": ["COMPLETE_FOR_RESOLVED_EDGES", "PARTIAL_LOWER_BOUND", "UNKNOWN"]}
+      }
+    },
+    "hops": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["from", "to", "edge_kind"],
+        "properties": {
+          "from": {"$ref": "#/$defs/node"},
+          "to": {"$ref": "#/$defs/node"},
+          "edge_kind": {
+            "enum": ["CALLS", "REFERENCES", "IMPLEMENTS", "INHERITS", "IMPORTS", "DEFINES"],
+            "description": "Drawn from the same closed vocabulary as the admitted set. A hop over an edge kind outside the vocabulary is a traversal of a graph nobody admitted."
+          }
+        }
+      }
+    },
+    "nodes_visited": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/node"},
+      "description": "Unique by construction. A cycle walked twice inflates every count computed from this path, and the inflation is invisible once the rows are aggregated."
+    },
+    "traversal_bounds": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["depth", "depth_limit", "row_limit", "terminated_by"],
+      "properties": {
+        "depth": {"type": "integer", "minimum": 0},
+        "depth_limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 64,
+          "description": "An integer, always. There is no value here spelling unbounded, which is the structural form of UNBOUNDED_RECURSIVE_CTE."
+        },
+        "row_limit": {"type": "integer", "minimum": 1},
+        "terminated_by": {"enum": ["EDGE_SET_EXHAUSTED", "DEPTH_LIMIT_REACHED", "ROW_LIMIT_REACHED", "CYCLE_GUARD"]}
+      }
+    },
+    "authority_ceiling": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["complete_reachable_set", "semantic_truth", "task_pass"],
+      "properties": {
+        "complete_reachable_set": {
+          "const": false,
+          "description": "Reach over an admitted edge set is a lower bound on impact. Dynamic dispatch, configuration, generated code and runtime wiring all move impact along edges no static set contains."
+        },
+        "semantic_truth": {"const": false},
+        "task_pass": {"const": false}
+      }
+    }
+  },
+  "$defs": {
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider_scoped_id", "normalization"],
+      "properties": {
+        "provider_scoped_id": {"type": "string", "minLength": 1},
+        "normalization": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["scheme", "scheme_digest"],
+          "properties": {
+            "scheme": {"type": "string", "minLength": 2},
+            "scheme_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+          }
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "schema": "dtcr/blast-radius-path/v1",
+      "path_id": "DTCR-BR-001",
+      "subject": {
+        "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+        "commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+        "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+      },
+      "seed": {
+        "provider_scoped_id": "example-scheme example-package domain/order/Pricing#apply().",
+        "normalization": {"scheme": "example interchange symbol grammar", "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"}
+      },
+      "edge_set": {
+        "edge_set_digest": "69c56fd14abe6bf62dae8d22d573926a7008963cd7b45d21bbb88d2005fb1660",
+        "admitted_edge_kinds": ["CALLS", "IMPORTS"],
+        "edge_provenance": "COMPILER_RESOLVED_CALL",
+        "edge_completeness": "COMPLETE_FOR_RESOLVED_EDGES"
+      },
+      "hops": [
+        {
+          "from": {
+            "provider_scoped_id": "example-scheme example-package domain/order/Pricing#apply().",
+            "normalization": {"scheme": "example interchange symbol grammar", "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"}
+          },
+          "to": {
+            "provider_scoped_id": "example-scheme example-package api/checkout/Handler#post().",
+            "normalization": {"scheme": "example interchange symbol grammar", "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"}
+          },
+          "edge_kind": "CALLS"
+        }
+      ],
+      "nodes_visited": [
+        {
+          "provider_scoped_id": "example-scheme example-package domain/order/Pricing#apply().",
+          "normalization": {"scheme": "example interchange symbol grammar", "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"}
+        },
+        {
+          "provider_scoped_id": "example-scheme example-package api/checkout/Handler#post().",
+          "normalization": {"scheme": "example interchange symbol grammar", "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"}
+        }
+      ],
+      "traversal_bounds": {"depth": 1, "depth_limit": 8, "row_limit": 5000, "terminated_by": "EDGE_SET_EXHAUSTED"},
+      "authority_ceiling": {"complete_reachable_set": false, "semantic_truth": false, "task_pass": false}
+    }
+  ],
+  "x-refusal-controls": [
+    {
+      "case_id": "DTCR-XC-BR-001",
+      "refuses": "UNBOUNDED_RECURSIVE_CTE: a traversal whose depth limit is written as a word instead of an integer.",
+      "refused_by": "properties.traversal_bounds.properties.depth_limit.type",
+      "instance": {
+        "schema": "dtcr/blast-radius-path/v1",
+        "path_id": "DTCR-BR-002",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+          "commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+        },
+        "seed": {
+          "provider_scoped_id": "example-scheme example-package domain/order/Pricing#apply().",
+          "normalization": {"scheme": "example interchange symbol grammar", "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"}
+        },
+        "edge_set": {
+          "edge_set_digest": "69c56fd14abe6bf62dae8d22d573926a7008963cd7b45d21bbb88d2005fb1660",
+          "admitted_edge_kinds": ["CALLS"],
+          "edge_provenance": "COMPILER_RESOLVED_CALL",
+          "edge_completeness": "COMPLETE_FOR_RESOLVED_EDGES"
+        },
+        "hops": [
+          {
+            "from": {
+              "provider_scoped_id": "example-scheme example-package domain/order/Pricing#apply().",
+              "normalization": {"scheme": "example interchange symbol grammar", "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"}
+            },
+            "to": {
+              "provider_scoped_id": "example-scheme example-package api/checkout/Handler#post().",
+              "normalization": {"scheme": "example interchange symbol grammar", "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"}
+            },
+            "edge_kind": "CALLS"
+          }
+        ],
+        "nodes_visited": [
+          {
+            "provider_scoped_id": "example-scheme example-package domain/order/Pricing#apply().",
+            "normalization": {"scheme": "example interchange symbol grammar", "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"}
+          },
+          {
+            "provider_scoped_id": "example-scheme example-package api/checkout/Handler#post().",
+            "normalization": {"scheme": "example interchange symbol grammar", "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"}
+          }
+        ],
+        "traversal_bounds": {"depth": 1, "depth_limit": "UNBOUNDED", "row_limit": 5000, "terminated_by": "EDGE_SET_EXHAUSTED"},
+        "authority_ceiling": {"complete_reachable_set": false, "semantic_truth": false, "task_pass": false}
+      }
+    },
+    {
+      "case_id": "DTCR-XC-BR-002",
+      "refuses": "CYCLE_PATH_DUPLICATION: a visited set that walks the same node twice, inflating every count derived from it.",
+      "refused_by": "properties.nodes_visited.uniqueItems",
+      "instance": {
+        "schema": "dtcr/blast-radius-path/v1",
+        "path_id": "DTCR-BR-003",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+          "commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+        },
+        "seed": {
+          "provider_scoped_id": "example-scheme example-package domain/order/Pricing#apply().",
+          "normalization": {"scheme": "example interchange symbol grammar", "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"}
+        },
+        "edge_set": {
+          "edge_set_digest": "69c56fd14abe6bf62dae8d22d573926a7008963cd7b45d21bbb88d2005fb1660",
+          "admitted_edge_kinds": ["CALLS"],
+          "edge_provenance": "COMPILER_RESOLVED_CALL",
+          "edge_completeness": "COMPLETE_FOR_RESOLVED_EDGES"
+        },
+        "hops": [
+          {
+            "from": {
+              "provider_scoped_id": "example-scheme example-package domain/order/Pricing#apply().",
+              "normalization": {"scheme": "example interchange symbol grammar", "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"}
+            },
+            "to": {
+              "provider_scoped_id": "example-scheme example-package api/checkout/Handler#post().",
+              "normalization": {"scheme": "example interchange symbol grammar", "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"}
+            },
+            "edge_kind": "CALLS"
+          }
+        ],
+        "nodes_visited": [
+          {
+            "provider_scoped_id": "example-scheme example-package domain/order/Pricing#apply().",
+            "normalization": {"scheme": "example interchange symbol grammar", "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"}
+          },
+          {
+            "provider_scoped_id": "example-scheme example-package domain/order/Pricing#apply().",
+            "normalization": {"scheme": "example interchange symbol grammar", "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"}
+          }
+        ],
+        "traversal_bounds": {"depth": 2, "depth_limit": 8, "row_limit": 5000, "terminated_by": "CYCLE_GUARD"},
+        "authority_ceiling": {"complete_reachable_set": false, "semantic_truth": false, "task_pass": false}
+      }
+    },
+    {
+      "case_id": "DTCR-XC-BR-003",
+      "refuses": "A hop over an edge kind outside the admitted vocabulary, extending reach through a graph nobody admitted.",
+      "refused_by": "properties.hops.items.properties.edge_kind.enum",
+      "instance": {
+        "schema": "dtcr/blast-radius-path/v1",
+        "path_id": "DTCR-BR-004",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+          "commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+        },
+        "seed": {
+          "provider_scoped_id": "example-scheme example-package domain/order/Pricing#apply().",
+          "normalization": {"scheme": "example interchange symbol grammar", "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"}
+        },
+        "edge_set": {
+          "edge_set_digest": "69c56fd14abe6bf62dae8d22d573926a7008963cd7b45d21bbb88d2005fb1660",
+          "admitted_edge_kinds": ["CALLS"],
+          "edge_provenance": "COMPILER_RESOLVED_CALL",
+          "edge_completeness": "COMPLETE_FOR_RESOLVED_EDGES"
+        },
+        "hops": [
+          {
+            "from": {
+              "provider_scoped_id": "example-scheme example-package domain/order/Pricing#apply().",
+              "normalization": {"scheme": "example interchange symbol grammar", "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"}
+            },
+            "to": {
+              "provider_scoped_id": "example-scheme example-package api/checkout/Handler#post().",
+              "normalization": {"scheme": "example interchange symbol grammar", "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"}
+            },
+            "edge_kind": "SIMILAR_EMBEDDING"
+          }
+        ],
+        "nodes_visited": [
+          {
+            "provider_scoped_id": "example-scheme example-package domain/order/Pricing#apply().",
+            "normalization": {"scheme": "example interchange symbol grammar", "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"}
+          },
+          {
+            "provider_scoped_id": "example-scheme example-package api/checkout/Handler#post().",
+            "normalization": {"scheme": "example interchange symbol grammar", "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"}
+          }
+        ],
+        "traversal_bounds": {"depth": 1, "depth_limit": 8, "row_limit": 5000, "terminated_by": "EDGE_SET_EXHAUSTED"},
+        "authority_ceiling": {"complete_reachable_set": false, "semantic_truth": false, "task_pass": false}
+      }
+    },
+    {
+      "case_id": "DTCR-XC-BR-004",
+      "refuses": "A bounded traversal recorded as the complete reachable set for the change.",
+      "refused_by": "properties.authority_ceiling.properties.complete_reachable_set.const",
+      "instance": {
+        "schema": "dtcr/blast-radius-path/v1",
+        "path_id": "DTCR-BR-005",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+          "commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+        },
+        "seed": {
+          "provider_scoped_id": "example-scheme example-package domain/order/Pricing#apply().",
+          "normalization": {"scheme": "example interchange symbol grammar", "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"}
+        },
+        "edge_set": {
+          "edge_set_digest": "69c56fd14abe6bf62dae8d22d573926a7008963cd7b45d21bbb88d2005fb1660",
+          "admitted_edge_kinds": ["CALLS"],
+          "edge_provenance": "OCCURRENCE_ENCLOSING_RANGE_HEURISTIC",
+          "edge_completeness": "PARTIAL_LOWER_BOUND"
+        },
+        "hops": [
+          {
+            "from": {
+              "provider_scoped_id": "example-scheme example-package domain/order/Pricing#apply().",
+              "normalization": {"scheme": "example interchange symbol grammar", "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"}
+            },
+            "to": {
+              "provider_scoped_id": "example-scheme example-package api/checkout/Handler#post().",
+              "normalization": {"scheme": "example interchange symbol grammar", "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"}
+            },
+            "edge_kind": "CALLS"
+          }
+        ],
+        "nodes_visited": [
+          {
+            "provider_scoped_id": "example-scheme example-package domain/order/Pricing#apply().",
+            "normalization": {"scheme": "example interchange symbol grammar", "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"}
+          },
+          {
+            "provider_scoped_id": "example-scheme example-package api/checkout/Handler#post().",
+            "normalization": {"scheme": "example interchange symbol grammar", "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"}
+          }
+        ],
+        "traversal_bounds": {"depth": 1, "depth_limit": 8, "row_limit": 5000, "terminated_by": "DEPTH_LIMIT_REACHED"},
+        "authority_ceiling": {"complete_reachable_set": true, "semantic_truth": false, "task_pass": false}
+      }
+    }
+  ]
+}

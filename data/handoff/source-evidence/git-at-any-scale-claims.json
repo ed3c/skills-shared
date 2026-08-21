@@ -1,0 +1,527 @@
+{
+  "claims": [
+    {
+      "applicability": "NOT_APPLICABLE",
+      "applicability_rationale": "純敘事鋪陳，不是可獨立查核的架構/效能/歷史技術主張，本身無獨立實作或驗證生命週期。",
+      "claim": "開場敘事：Git 的分散式特性從優勢變成阻礙——一般公司高度依賴集中式託管服務，且事實證明大規模託管 Git 儲存庫極其困難。",
+      "dag_nodes": [],
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "issue_nodes": [],
+      "kind": "ARTICLE",
+      "location": "article:intro (before '#Git 有什麼難處？')",
+      "problem_id": "gas-scene-setting-hosting-difficulty",
+      "task_nodes": []
+    },
+    {
+      "applicability": "NOT_APPLICABLE",
+      "applicability_rationale": "Git 自身設計的定義性背景事實，非 Cursor 特定架構主張，也非 skills-shared 適用性判斷對象。",
+      "claim": "Git 背景事實：程式碼與中繼資料以 packfile 形式壓縮儲存；push/fetch 時資料一律以 packfile 形式透過網路傳輸；大致有三種擴充託管的方法（分散檔案系統、分散 packfile、分散 Git 本身），複雜度遞增。",
+      "dag_nodes": [],
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "issue_nodes": [],
+      "kind": "ARTICLE",
+      "location": "article:#Git 有什麼難處？ (packfile 定義段落)",
+      "problem_id": "gas-packfile-transport-fundamentals",
+      "task_nodes": []
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "Origin 段落主張：Agent 從根本上改變了軟體使用方式——更多程式碼、更多 PR、更多 CI 執行；版本控制是這一切的核心，也最難在一夕之間改變。",
+      "dag_nodes": [
+        "github-issue-531",
+        "skills-agentic-tech-lead-orchestration-coordination-mechanism"
+      ],
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "issue_nodes": [
+        531
+      ],
+      "kind": "ARTICLE",
+      "location": "article:#Origin (Agent 段落)",
+      "problem_id": "gas-agent-coordination-framing",
+      "task_nodes": [
+        "gas-agent-coordination-framing-task"
+      ]
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "歷史主張：Shawn Pearce 在 Google 版本控制系統團隊嘗試以分散式雜湊表（DHT）取代磁碟上的 packfile（透過 JGit 實作）。系統可運作且一般 Git 操作效能已足夠理想，但 Git 通訊協定要求仍必須透過網路傳送 packfile，使 git clone 效能差到最終遭捨棄；根本原因是 Git 物件圖（DAG）走訪的每一步都須先取得前一個指標才能得知下一個指標，若每次擷取都要往返分散式儲存庫，成本極高（round-trip 問題）。",
+      "dag_nodes": [
+        "github-issue-531",
+        "gh-issue-534-physical-hosting-runtime-canary"
+      ],
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "issue_nodes": [
+        531,
+        534
+      ],
+      "kind": "ARTICLE",
+      "location": "article:#不使用 packfile 的 Git > DHT/JGit 嘗試",
+      "problem_id": "gas-hist-dht-object-level-distribution",
+      "task_nodes": [
+        "gas-hist-dht-object-level-distribution-task"
+      ]
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "歷史主張：GitHub 嘗試以分散式檔案系統托管 Git 資料——NFS 因 Git 預設實作對檔案系統語意（鎖定、寫入撕裂、讀取、同步）的假設只適合本機慢速筆電磁碟、完全未考慮網路檔案系統行為，而又慢又問題百出，很快被捨棄；區塊層級複寫（曾短暫部署 GFS、較長期採用 DRBD）也全部碰壁，日常營運糟糕且效能不足。根本原因：packfile 的隨機讀取存取模式（DAG 邏輯跳轉 + 磁碟格式實體跳轉、差異壓縮儲存）與網路檔案系統/區塊複寫不相容。",
+      "dag_nodes": [
+        "github-issue-531",
+        "gh-issue-534-physical-hosting-runtime-canary"
+      ],
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "issue_nodes": [
+        531,
+        534
+      ],
+      "kind": "ARTICLE",
+      "location": "article:#GitHub 與檔案系統 > NFS/GFS/DRBD 嘗試",
+      "problem_id": "gas-hist-nfs-blockstorage-filesystem-distribution",
+      "task_nodes": [
+        "gas-hist-nfs-blockstorage-filesystem-distribution-task"
+      ]
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "歷史主張：GitHub 最終放棄分散檔案系統，改開發 RPC 系統讓儲存庫存放在專用檔案伺服器上；此法帶來一定水平可擴充性，但沒有解決可用性問題，也沒有改善最繁忙儲存庫的效能，因為每個儲存庫仍只存放在單一機器上。",
+      "dag_nodes": [
+        "github-issue-531",
+        "gh-issue-534-physical-hosting-runtime-canary"
+      ],
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "issue_nodes": [
+        531,
+        534
+      ],
+      "kind": "ARTICLE",
+      "location": "article:#GitHub 與檔案系統 > RPC 系統結尾",
+      "problem_id": "gas-hist-github-rpc-fileserver-partial-fix",
+      "task_nodes": [
+        "gas-hist-github-rpc-fileserver-partial-fix-task"
+      ]
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "歷史主張：Spokes（GitHub 約 2013 年開發，現為業界標準）做出三項根本選擇：不分散 Git 本身而在 packfile 層級運作；所有資料以真正 Git 儲存庫形式存於本機 NVMe 磁碟；複寫 Git 資料並讓所有副本持續保持一致同步。",
+      "dag_nodes": [
+        "github-issue-531",
+        "gh-issue-534-physical-hosting-runtime-canary"
+      ],
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "issue_nodes": [
+        531,
+        534
+      ],
+      "kind": "ARTICLE",
+      "location": "article:#Spokes 與一致性 > 三項根本選擇",
+      "problem_id": "gas-hist-spokes-three-choices",
+      "task_nodes": [
+        "gas-hist-spokes-three-choices-task"
+      ]
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "歷史主張：Spokes 是以共識為基礎的分散式系統；推送時協調器將 packfile 扇出給所有副本（無須同步），僅對 ref transaction 執行 3PC（三階段提交），須多數節點確認才被接受；因 ref 更新前提交不可達/不可見，此分離讓 3PC 只需同步遠小於 packfile 的 ref transaction；讀取可安全路由至任一副本，因每個副本始終最新。",
+      "dag_nodes": [
+        "github-issue-531",
+        "gh-issue-534-physical-hosting-runtime-canary"
+      ],
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "issue_nodes": [
+        531,
+        534
+      ],
+      "kind": "ARTICLE",
+      "location": "article:#Spokes 與一致性 > 3PC 運作機制",
+      "problem_id": "gas-hist-spokes-3pc-consensus-mechanism",
+      "task_nodes": [
+        "gas-hist-spokes-3pc-consensus-mechanism-task"
+      ]
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "歷史主張：3PC 作為共識演算法，其水平可擴展性有根本限制——每步驟延遲取決於叢集最慢伺服器，複本越多推送吞吐量越差。2026 年企業 monorepo 規模已巨大，3 個複本不足以承載其 CI 流量；反之 Agent 大量建立的一次性小型儲存庫又用不到 3 個複本卻不能縮減（否則喪失一致性、可能資料遺失）——3PC 模型下「下限總是太高，上限又太低」。",
+      "dag_nodes": [
+        "github-issue-531",
+        "gh-issue-534-physical-hosting-runtime-canary"
+      ],
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "issue_nodes": [
+        531,
+        534
+      ],
+      "kind": "ARTICLE",
+      "location": "article:#Spokes 與一致性 > 3PC 可擴展性限制",
+      "problem_id": "gas-hist-spokes-3pc-scalability-limit",
+      "task_nodes": [
+        "gas-hist-spokes-3pc-scalability-limit-task"
+      ]
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "歷史主張：Spokes 在大規模環境下難以維運——磁碟上的儲存庫是共識的權威資料來源，故每個儲存庫的每個複本都須被當成「寵物」精確追蹤位置（依賴外部路由資料庫）、持續計算並更新總和檢查碼、偵測損毀並快速排程修復；若三複本中有兩個損毀即無法達成法定人數，系統將無法再接受推送。",
+      "dag_nodes": [
+        "github-issue-531",
+        "gh-issue-534-physical-hosting-runtime-canary"
+      ],
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "issue_nodes": [
+        531,
+        534
+      ],
+      "kind": "ARTICLE",
+      "location": "article:#Spokes 與一致性 > 維運負擔段落",
+      "problem_id": "gas-hist-spokes-operational-burden",
+      "task_nodes": [
+        "gas-hist-spokes-operational-burden-task"
+      ]
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "架構主張：Continuity 的核心基礎元件是預寫日誌（WAL），儲存在相容 S3 的物件儲存體中（正式環境直接用 S3，設計上可部署至任何雲端）；在推送完全持久化之前絕不確認該推送，每次推送皆存為獨立物件。",
+      "dag_nodes": [
+        "github-issue-531",
+        "gh-issue-532-portable-hosting-assurance-contract"
+      ],
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "issue_nodes": [
+        531,
+        532
+      ],
+      "kind": "ARTICLE",
+      "location": "article:#Continuity > WAL 核心元件段落",
+      "problem_id": "gas-cont-wal-source-of-truth",
+      "task_nodes": [
+        "gas-cont-wal-source-of-truth-task"
+      ]
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "架構主張：只有在儲存庫本機副本成功準備好其 ref transaction，並在 WAL 索引檔中記錄指向該 WAL 項目的指標後，推送才會可見；此設計確保所有推送皆可線性化。",
+      "dag_nodes": [
+        "github-issue-531",
+        "gh-issue-532-portable-hosting-assurance-contract"
+      ],
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "issue_nodes": [
+        531,
+        532
+      ],
+      "kind": "ARTICLE",
+      "location": "article:#Continuity > 推送可見性/線性化段落",
+      "problem_id": "gas-cont-linearizable-push-visibility",
+      "task_nodes": [
+        "gas-cont-linearizable-push-visibility-task"
+      ]
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "架構主張：為避免每次推送僅一次 S3 PUT 造成的延遲硬性上限，Continuity 以經調校的批次處理，且只需將 ref transaction 與單一本機儲存庫同步（而非多複本法定人數同步），使系統能以磁碟允許的速度接收推送。",
+      "dag_nodes": [
+        "github-issue-531",
+        "gh-issue-534-physical-hosting-runtime-canary"
+      ],
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "issue_nodes": [
+        531,
+        534
+      ],
+      "kind": "ARTICLE",
+      "location": "article:#Continuity > 批次處理/單節點同步段落",
+      "problem_id": "gas-cont-batched-single-node-sync",
+      "task_nodes": [
+        "gas-cont-batched-single-node-sync-task"
+      ]
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "架構主張：儲存庫本機副本是儲存在高速 NVMe 磁碟上的一般 Git 儲存庫（沿用 Spokes 的做法），可重複利用上游 Git 用戶端與其效能最佳化成果。",
+      "dag_nodes": [
+        "github-issue-531",
+        "gh-issue-534-physical-hosting-runtime-canary"
+      ],
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "issue_nodes": [
+        531,
+        534
+      ],
+      "kind": "ARTICLE",
+      "location": "article:#Continuity > 本機 NVMe 副本段落",
+      "problem_id": "gas-cont-nvme-local-cache",
+      "task_nodes": [
+        "gas-cont-nvme-local-cache-task"
+      ]
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "架構主張：Continuity 是無狀態系統，沒有路由表也不需要維運關聯式資料庫；每個儲存庫視為磁碟上的熱快取，唯一權威資料來源始終是 S3 中的 WAL；本機磁碟沒有該儲存庫時，即從 WAL 具現化。",
+      "dag_nodes": [
+        "github-issue-531",
+        "gh-issue-532-portable-hosting-assurance-contract"
+      ],
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "issue_nodes": [
+        531,
+        532
+      ],
+      "kind": "ARTICLE",
+      "location": "article:#共識 > 無狀態/無路由表段落",
+      "problem_id": "gas-cont-stateless-no-routing-table",
+      "task_nodes": [
+        "gas-cont-stateless-no-routing-table-task"
+      ]
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "架構主張：正式環境使用 rendezvous hashing 將儲存庫 ID 對應至預期存放節點清單；路由所需狀態僅為儲存庫 ID 與叢集目前健康節點集合；即使此狀態不同步（例如節點變得不健康）也無妨，可在下一節點上具現化。",
+      "dag_nodes": [
+        "github-issue-531",
+        "gh-issue-534-physical-hosting-runtime-canary"
+      ],
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "issue_nodes": [
+        531,
+        534
+      ],
+      "kind": "ARTICLE",
+      "location": "article:#共識 > rendezvous hashing 段落",
+      "problem_id": "gas-cont-rendezvous-hashing-routing",
+      "task_nodes": [
+        "gas-cont-rendezvous-hashing-routing-task"
+      ]
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "架構主張：不需要共識或選舉，任何伺服器都可作為主要伺服器；所有對 WAL 的更新透過 S3 上的原子比較並交換（CAS）操作同步，因此任何儲存庫執行個體接收推送皆安全；實務上一律選 rendezvous 排名第一的伺服器為主要伺服器以避免 CAS 重試延遲；系統設計為「降級時始終正確，健康時始終快速」。",
+      "dag_nodes": [
+        "github-issue-531",
+        "gh-issue-532-portable-hosting-assurance-contract"
+      ],
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "issue_nodes": [
+        531,
+        532
+      ],
+      "kind": "ARTICLE",
+      "location": "article:#共識 > 無共識/CAS 段落",
+      "problem_id": "gas-cont-no-consensus-cas-ref-update",
+      "task_nodes": [
+        "gas-cont-no-consensus-cas-ref-update-task"
+      ]
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "架構主張：WAL 存於 S3 讓複本數量可無限擴充；透過叢集中傳送 UDP gossip 封包進行樂觀式複寫，每次推送後封包攜帶讓各複本從 S3 追上進度所需的全部中繼資料。",
+      "dag_nodes": [
+        "github-issue-531",
+        "gh-issue-534-physical-hosting-runtime-canary"
+      ],
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "issue_nodes": [
+        531,
+        534
+      ],
+      "kind": "ARTICLE",
+      "location": "article:#複寫 > UDP gossip 段落",
+      "problem_id": "gas-cont-udp-gossip-optimistic-replication",
+      "task_nodes": [
+        "gas-cont-udp-gossip-optimistic-replication-task"
+      ]
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "架構主張：UDP 不可靠沒關係——每個複本知道自己追上的 WAL 索引最後版本 ETag，讀取時以預期 ETag 向 S3 發出條件式 GET；304 回應（平均 <10ms）代表資料已最新可直接服務，200 回應則先追上進度再服務讀取；即使複寫封包遺失或送錯伺服器也無關緊要，因所有複本的讀取結果都根據 S3 驗證、完全一致——gossip 只加速，S3 才是正確性權威。",
+      "dag_nodes": [
+        "github-issue-531",
+        "gh-issue-532-portable-hosting-assurance-contract"
+      ],
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "issue_nodes": [
+        531,
+        532
+      ],
+      "kind": "ARTICLE",
+      "location": "article:#複寫 > ETag 條件式 GET 段落",
+      "problem_id": "gas-cont-gossip-non-authority-etag-validation",
+      "task_nodes": [
+        "gas-cont-gossip-non-authority-etag-validation-task"
+      ]
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "架構主張：系統可雙向擴展彈性複本數——大型 monorepo 可部署至數百複本承擔 CI 負載；代理建立的數百萬小型儲存庫每個只需一複本；閒置儲存庫甚至可 0 複本，一段時間未收流量會被垃圾回收，下次擷取請求時直接從 WAL 再次具現化。",
+      "dag_nodes": [
+        "github-issue-531",
+        "gh-issue-534-physical-hosting-runtime-canary"
+      ],
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "issue_nodes": [
+        531,
+        534
+      ],
+      "kind": "ARTICLE",
+      "location": "article:#複寫 > 雙向彈性複本數段落",
+      "problem_id": "gas-cont-elastic-replica-count",
+      "task_nodes": [
+        "gas-cont-elastic-replica-count-task"
+      ]
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "架構主張：WAL 需要定期壓縮，否則完整還原須重播每筆記錄、記錄越多成本越高；標準 Git 儲存庫同樣需要定期壓縮，因 packfile 數量增加會使物件查找須逐一開啟每個 packfile 索引，效率隨 packfile 數量增加而降低。",
+      "dag_nodes": [
+        "github-issue-531",
+        "gh-issue-534-physical-hosting-runtime-canary"
+      ],
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "issue_nodes": [
+        531,
+        534
+      ],
+      "kind": "ARTICLE",
+      "location": "article:#壓縮 > 壓縮必要性段落",
+      "problem_id": "gas-cont-compaction-need",
+      "task_nodes": [
+        "gas-cont-compaction-need-task"
+      ]
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "架構主張：只有主要伺服器執行壓縮，壓縮結果同時套用至磁碟儲存庫與 WAL；所有副本跟隨 WAL 因此也跟隨壓縮事件，副本不重新封裝，只需從 S3 下載已壓縮的 pack，以頻寬換取 CPU 資源——避免每個副本重複執行昂貴的 CPU 密集重新封裝工作。",
+      "dag_nodes": [
+        "github-issue-531",
+        "gh-issue-534-physical-hosting-runtime-canary"
+      ],
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "issue_nodes": [
+        531,
+        534
+      ],
+      "kind": "ARTICLE",
+      "location": "article:#壓縮 > 主要伺服器壓縮攤提段落",
+      "problem_id": "gas-cont-primary-only-compaction-amortization",
+      "task_nodes": [
+        "gas-cont-primary-only-compaction-amortization-task"
+      ]
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "架構主張：推送在完全持久化至 WAL 前絕不確認，所有推送皆線性化，每個儲存庫的每個檢視始終完全一致；因每次推送記錄在 WAL 中，可查看儲存庫曾歷經的每個狀態、擁有所有推送與重新封裝作業的完整來源資料、可將任一複本倒轉或快轉；遇到 Git 中的錯誤時可精確找出並還原，且除 Git 既有錯誤外，因所有操作皆用現成工具在磁碟上一般 Git 儲存庫執行，引入的新錯誤極少。",
+      "dag_nodes": [
+        "github-issue-531",
+        "gh-issue-532-portable-hosting-assurance-contract"
+      ],
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "issue_nodes": [
+        531,
+        532
+      ],
+      "kind": "ARTICLE",
+      "location": "article:#WAL 作為真相來源 > 鑑識/重播段落",
+      "problem_id": "gas-cont-wal-forensic-replay",
+      "task_nodes": [
+        "gas-cont-wal-forensic-replay-task"
+      ]
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "第三方比較主張：Azure DevOps 擁有一套 Git 儲存系統，將 packfile 儲存在 blob 儲存體、參考資料儲存在關聯式資料庫（MS SQL Server）中；此架構的取捨是關聯式資料庫能良好擴展大型參考交易，但代價是必須自行營運關聯式資料庫。",
+      "dag_nodes": [
+        "github-issue-531",
+        "gh-issue-534-physical-hosting-runtime-canary"
+      ],
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "issue_nodes": [
+        531,
+        534
+      ],
+      "kind": "ARTICLE",
+      "location": "article:#WAL 作為真相來源 > Azure DevOps 比較段落",
+      "problem_id": "gas-cont-azure-devops-comparison",
+      "task_nodes": [
+        "gas-cont-azure-devops-comparison-task"
+      ]
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "效能主張：Continuity 採 WAL 優先設計，提供完全一致的水平可擴充性——可部署任意數量副本，唯讀 Git 操作吞吐量隨副本數量線性成長，並可擴展至 Git 協定操作與 Origin 之上的所有 RPC 操作。",
+      "dag_nodes": [
+        "github-issue-531",
+        "gh-issue-534-physical-hosting-runtime-canary"
+      ],
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "issue_nodes": [
+        531,
+        534
+      ],
+      "kind": "ARTICLE",
+      "location": "article:#擴展 > 線性水平可擴展性主張",
+      "problem_id": "gas-perf-linear-readonly-scaling",
+      "task_nodes": [
+        "gas-perf-linear-readonly-scaling-task"
+      ]
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "效能主張：已使用最多 100 個副本進行合成壓力測試，觀察到讀取作業穩定線性擴展，且推送吞吐量沒有任何下降。",
+      "dag_nodes": [
+        "github-issue-531",
+        "gh-issue-534-physical-hosting-runtime-canary"
+      ],
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "issue_nodes": [
+        531,
+        534
+      ],
+      "kind": "ARTICLE",
+      "location": "article:#擴展 > 100 副本合成壓力測試",
+      "problem_id": "gas-perf-100-replica-synthetic-test",
+      "task_nodes": [
+        "gas-perf-100-replica-synthetic-test-task"
+      ]
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "效能主張：使用 S3 Standard 時，可在壓縮資料並將壓縮後資料複寫至所有其他節點的同時，維持最高每秒 120 次推送。",
+      "dag_nodes": [
+        "github-issue-531",
+        "gh-issue-534-physical-hosting-runtime-canary"
+      ],
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "issue_nodes": [
+        531,
+        534
+      ],
+      "kind": "ARTICLE",
+      "location": "article:#擴展 > S3 Standard 吞吐量數字",
+      "problem_id": "gas-perf-s3-standard-120-pushes",
+      "task_nodes": [
+        "gas-perf-s3-standard-120-pushes-task"
+      ]
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "效能主張：在 S3 Express One Zone 上部署的高效能叢集（PUT 操作延遲低得多）每秒可接收超過 300 次推送，實際瓶頸在於 Git 壓縮磁碟上資料的速度。",
+      "dag_nodes": [
+        "github-issue-531",
+        "gh-issue-534-physical-hosting-runtime-canary"
+      ],
+      "identity": "sha256:25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "issue_nodes": [
+        531,
+        534
+      ],
+      "kind": "ARTICLE",
+      "location": "article:#擴展 > S3 Express One Zone 吞吐量數字",
+      "problem_id": "gas-perf-s3-express-300-pushes",
+      "task_nodes": [
+        "gas-perf-s3-express-300-pushes-task"
+      ]
+    }
+  ],
+  "repo_subject": {
+    "commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+    "repo": "ed3c/skills-shared",
+    "tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7"
+  },
+  "schema_version": 1
+}

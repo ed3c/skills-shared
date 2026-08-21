@@ -12,8 +12,25 @@ the schema beside it — `tests/run-all.sh` proves both on current bytes.
 | [`product-closure-audit.schema.json`](product-closure-audit.schema.json) | the read-only Shadow audit: seven ordered levels over six lanes, exact-subject anchors, reopened obligations, the findings denominator, the issue delta and the public snapshot |
 | [`prompt-packet.schema.json`](prompt-packet.schema.json) | the envelope and the nine stage surfaces, with authority and private-reasoning both pinned false |
 | [`reverse-engineering-handoff.schema.json`](reverse-engineering-handoff.schema.json) | bounded implementation packets, real edges, disjoint leases, and remaining items with owners |
-| [`evidence-vocabulary.md`](evidence-vocabulary.md) | the four controlled vocabularies and every refusal code |
+| [`external-projection-registry.schema.json`](external-projection-registry.schema.json) | a projection of Git subjects into an external document: external id, observed revision, export digest, exact Git subjects, backlinks, read-back state — and no implementation, completion, product-truth, merge or release authority |
+| [`session-dispatch-request.schema.json`](session-dispatch-request.schema.json) | what would be launched: exact base commit/tree, branch and parent, disjoint lease, separate start and completion dependencies, oracles, negative controls, rollback, stop states, output paths. Pinned to `LAUNCH_REQUESTED` |
+| [`session-receipt.schema.json`](session-receipt.schema.json) | what a carrier observed: the five lifecycle states as separate fields, every evidence lane reported including the unavailable ones |
+| [`evidence-vocabulary.md`](evidence-vocabulary.md) | the four controlled vocabularies, every refusal code, and the pre-registered refusal classes |
 | [`prompt-catalogue.md`](prompt-catalogue.md) | what each prompt surface exists to refuse |
+
+## Contract index: required name → landed name
+
+The names in the originating contract issue and the names on disk are not
+identical. The landed names are the ones every consumer already imports by exact
+string — `check_prel_contract.py` maps a schema constant to a filename, so
+renaming a file to match the issue would break intake rather than document it.
+The mapping is recorded here instead.
+
+| Required name | Landed name | Why |
+|---|---|---|
+| `product-signal-compat.schema.json` | [`product-signal.schema.json`](product-signal.schema.json) | same contract: it carries the `compatibility` block that binds the producer and the consumed fields |
+| `evidence-and-closure-vocabulary.md` | [`evidence-vocabulary.md`](evidence-vocabulary.md) | same document: evidence states, signal grades, mechanism classes, closure states and oracle lanes |
+| `examples/*.json` | `references/example-*.json` and [`../examples/`](../examples/) | the compiled example chain stays beside the schemas it is byte-compared against; examples for the projection and session contracts live in `examples/` |
 
 ## Examples
 

@@ -35,6 +35,9 @@ SCHEMA_FILES = {
     "prel/product-closure-audit/v1": "product-closure-audit.schema.json",
     "prel/prompt-packet/v1": "prompt-packet.schema.json",
     "prel/reverse-engineering-handoff/v1": "reverse-engineering-handoff.schema.json",
+    "prel/session-dispatch-request/v1": "session-dispatch-request.schema.json",
+    "prel/session-receipt/v1": "session-receipt.schema.json",
+    "prel/external-projection-registry/v1": "external-projection-registry.schema.json",
 }
 
 # The closure ladder, in order. Two rungs share the IMPLEMENTATION lane because
@@ -750,6 +753,143 @@ def check_prompt_packet(artifact: dict) -> list[str]:
     return problems
 
 
+def check_session_dispatch(artifact: dict) -> list[str]:
+    """C06/C07/C13 controls the schema's per-field `const`s cannot see.
+
+    A `const` catches one field lying about itself; it cannot catch two
+    requests that are each individually well-formed but jointly claim the
+    same writer lease, or a CHILD whose declared parent does not exist among
+    the requests it was dispatched beside.
+    """
+    problems: list[str] = []
+    requests = [row for row in artifact.get("requests") or [] if isinstance(row, dict)]
+
+    leases: dict[str, tuple[list[str], list[str]]] = {}
+    for row in requests:
+        identifier = row.get("id")
+        if not identifier:
+            continue
+        lease = row.get("lease") or {}
+        leases[identifier] = (
+            list(lease.get("paths") or []),
+            list(lease.get("resources") or []),
+        )
+
+    identifiers = sorted(leases)
+    for index, left in enumerate(identifiers):
+        for right in identifiers[index + 1:]:
+            left_paths, left_resources = leases[left]
+            right_paths, right_resources = leases[right]
+            for one in left_paths:
+                for other in right_paths:
+                    if one == other or one.startswith(other) or other.startswith(one):
+                        problems.append(
+                            f"C06_OVERLAPPING_WRITER_LEASE {left} and {right} both "
+                            f"hold path {one!r}/{other!r}"
+                        )
+            shared = sorted(set(left_resources) & set(right_resources))
+            if shared:
+                problems.append(
+                    f"C06_OVERLAPPING_WRITER_LEASE {left} and {right} share "
+                    f"resource {shared}"
+                )
+
+    for row in requests:
+        identifier = row.get("id", "<unnamed>")
+        relation = row.get("relation")
+        parent = row.get("parent_request_id")
+        if relation == "CHILD":
+            if not parent:
+                problems.append(
+                    f"C07_HIDDEN_MULTI_PARENT_CONVERGENCE {identifier} is CHILD "
+                    f"with no parent_request_id"
+                )
+            elif parent == identifier:
+                problems.append(
+                    f"C07_HIDDEN_MULTI_PARENT_CONVERGENCE {identifier} names "
+                    f"itself as its own parent"
+                )
+        if relation == "SIBLING" and parent is not None:
+            problems.append(
+                f"C07_HIDDEN_MULTI_PARENT_CONVERGENCE {identifier} is SIBLING "
+                f"but names parent {parent!r}"
+            )
+        rollback = row.get("rollback") or {}
+        base = row.get("base") or {}
+        if not rollback.get("commit"):
+            problems.append(
+                f"C13_ROLLBACK_SUBJECT_ABSENT_OR_EQUAL_TO_MUTABLE_ALIAS "
+                f"{identifier} names no rollback commit"
+            )
+        if rollback.get("commit") and base.get("tree") and rollback.get("commit") == base.get("tree"):
+            problems.append(
+                f"C13_ROLLBACK_SUBJECT_ABSENT_OR_EQUAL_TO_MUTABLE_ALIAS "
+                f"{identifier} rollback commit equals the base tree object, not "
+                f"an exact commit to return to"
+            )
+    return problems
+
+
+def check_session_receipt(artifact: dict) -> list[str]:
+    problems: list[str] = []
+    lifecycle = artifact.get("lifecycle") or {}
+    order = (
+        "LAUNCH_REQUESTED",
+        "SESSION_OBSERVED",
+        "RUNNING",
+        "RESULT_RECEIVED",
+        "ARTIFACTS_READ_BACK",
+    )
+    for level in order:
+        observation = lifecycle.get(level) or {}
+        if observation.get("state") == "PASS" and not observation.get("evidence_ref"):
+            problems.append(
+                f"C05_MISSING_EXACT_RECEIPT {level} is PASS with no evidence_ref"
+            )
+    prefix = {level: (lifecycle.get(level) or {}).get("state") for level in order}
+    if prefix["RUNNING"] == "PASS" and prefix["SESSION_OBSERVED"] != "PASS":
+        problems.append(
+            "C09_SESSION_REQUEST_PROMOTED_TO_RUNNING RUNNING is PASS while "
+            "SESSION_OBSERVED is not"
+        )
+    if prefix["RESULT_RECEIVED"] == "PASS" and prefix["RUNNING"] != "PASS":
+        problems.append(
+            "C09_SESSION_REQUEST_PROMOTED_TO_RUNNING RESULT_RECEIVED is PASS "
+            "while RUNNING is not"
+        )
+    return problems
+
+
+def check_external_projection(artifact: dict) -> list[str]:
+    problems: list[str] = []
+    for entry in artifact.get("entries") or []:
+        if not isinstance(entry, dict):
+            continue
+        identifier = entry.get("id", "<unnamed>")
+        read_back = entry.get("read_back") or {}
+        if (
+            read_back.get("state") == "PASS"
+            and read_back.get("compared_digest") != entry.get("export_digest")
+        ):
+            problems.append(
+                f"C08_PROJECTION_USED_AS_MACHINE_AUTHORITY {identifier} read_back "
+                f"is PASS but compared_digest does not match the observed "
+                f"export_digest"
+            )
+        for subject in entry.get("canonical_subjects") or []:
+            if not isinstance(subject, dict):
+                continue
+            commit = subject.get("commit")
+            if commit in (None, "main", "HEAD", "latest") or not re.fullmatch(
+                r"[0-9a-f]{40}", commit or ""
+            ):
+                problems.append(
+                    f"C01_MUTABLE_SUBJECT {identifier} names a canonical subject "
+                    f"whose commit is not an exact object: {commit!r}"
+                )
+    return problems
+
+
 SEMANTIC = {
     "prel/product-signal/v1": check_product_signal,
     "prel/reverse-engineering-dossier/v1": check_dossier,
@@ -757,6 +897,9 @@ SEMANTIC = {
     "prel/product-closure-audit/v1": check_closure_audit,
     "prel/reverse-engineering-handoff/v1": check_handoff,
     "prel/prompt-packet/v1": check_prompt_packet,
+    "prel/session-dispatch-request/v1": check_session_dispatch,
+    "prel/session-receipt/v1": check_session_receipt,
+    "prel/external-projection-registry/v1": check_external_projection,
 }
 
 
