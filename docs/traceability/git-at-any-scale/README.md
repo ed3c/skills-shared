@@ -1,47 +1,73 @@
 # Git at any scale — Tech Lead + Shadow closure trace
 
-Source article: Cursor, **Git at any scale**, published 2026-08-18. The public article is an architectural source proposal. This repository records applicability, contracts, delivery topology, and evidence ceilings; it does not claim to reproduce Cursor's proprietary Continuity implementation.
+Source article: Cursor, **Git at any scale**, published 2026-08-18. The article remains `SOURCE_PROPOSAL` until the immutable source-packet lane is completed. This repository owns Method-Plane assurance and delivery traceability, not Cursor's proprietary hosting runtime.
 
-## Current verdict
+## Current admission verdict — 2026-08-21
 
 ```text
-skills-shared Method / Control Plane                 PARTIAL_CLOSURE
-portable Git-hosting assurance profile               OPEN / #532
-physical Git-hosting runtime                         OUT_OF_SCOPE_HERE / #534
-live durability / linearizability / recovery proof  NOT_EXERCISED / #534
-independent exact-subject Shadow                     OPEN / #535
-root/shared convergence                              OPEN / #536
-article performance and arbitrary-scale claims       SOURCE_PROPOSAL
-merge / release / infrastructure adoption            HUMAN_ADMIT_REQUIRED
+main                                      988a4e790af6a8bee31fd14e00e52a6e944b9f17
+P0 source/problem                         OPEN / #531
+D1 preparation                            PR #539 OPEN DRAFT mergeable-clean
+C1 aggregate assurance candidate          PR #542 OPEN DRAFT mergeable-clean
+C1 exact head                             196a75ac04f6ad2c9a6e50b0645d71fea9bf43e3
+C1 hosted workflow                        Shared Skills Infra = SKIPPED
+C1 issue-contract denominator             INCOMPLETE
+L1 physical hosting runtime               NOT_EXERCISED / #534
+S1 terminal independent Shadow            NOT_EXERCISED / #535
+final shared convergence                  BLOCKED/PARTIAL / #536
+article performance/arbitrary scale       SOURCE_PROPOSAL
+merge/release/infrastructure adoption     HUMAN_ADMIT_REQUIRED
 ```
 
-The repository already provides useful coordination machinery for Agent-driven Git pressure: immutable subject binding, task/issue DAG separation from Git ancestry, sibling/true-child/convergence vocabulary, one-writer leases, exact-head receipts, Local Handoff, evidence ceilings, and independent Shadow review. Those mechanisms do not implement object storage, WAL durability, linearizable ref publication, cache rebuild, gossip transport, pack/MIDX compaction, corruption replay, or measured hosting-scale behavior.
+**Merge audit:** neither #539 nor #542 is admitted for `main` in this epoch. `mergeable-clean` is transport state, not completion evidence. #542 still misses required #532 contract families and fixtures; #539 is a preparation projection whose owning workflows have not produced required exact-head PASS and whose final shared paths remain blocked by active writers.
 
-## Directory → owner → responsibility
+## Directory → owner → State Machine responsibility
 
-| Path | Owner | Responsibility | Evidence ceiling |
+| Path | Owner | Responsibility | Current ceiling |
 |---|---|---|---|
-| `docs/traceability/git-at-any-scale/` | #531 / #536 | source/problem closure ledger, navigation, current state | method/document trace only |
-| `skills/git-hosting-scale-assurance/` | #532 | portable host-neutral contracts/checkers/tests | deterministic contract evidence |
-| selected consumer/runtime | #534 | WAL/storage/ref/cache/gossip/compaction/recovery experiments | bounded physical/live evidence |
-| read-only Shadow session/receipt | #535 | independent exact-subject falsification | advisory admission evidence |
-| `skills/git-town-stacked-pr-worker/molecular-indexes/git-at-any-scale/` | #536 | actual issue/PR/branch/evidence delivery index | delivery projection only |
-| `skills/agentic-tech-lead-orchestration/runtime-handoff/` | #531/#534/#536 | unavailable local/provider/runtime/Human work | handoff state only |
+| `docs/traceability/git-at-any-scale/` | #531/#536 | source/problem denominator, current closure state, routing | trace only |
+| `skills/git-hosting-scale-assurance/**` | #532 / PR #542 | portable assurance schemas/checker/tests | implementation candidate |
+| selected disposable consumer/runtime | #534 | durability/linearizability/cache/gossip/compaction/recovery/benchmark experiments | not exercised |
+| independent read-only Shadow | #535 | same-subject falsification/admission | design/readback only |
+| `skills/git-town-stacked-pr-worker/molecular-indexes/git-at-any-scale/` | #536 | actual issue/PR/evidence topology | delivery projection |
+| `skills/agentic-tech-lead-orchestration/runtime-handoff/git-at-any-scale-local-handoff-queue.json` | #531/#536 | exactly-one-active local/external handoff | queue state |
 
 ## Real-problem denominator
 
 | ID | Problem | Current state | Closure owner |
 |---|---|---|---|
-| `GS-01` | Agent-created repo/branch/PR volume breaks coordination and traceability | `PARTIALLY_CLOSED` | existing Tech Lead + Git Town + Shadow mechanisms; #536 convergence |
-| `GS-02` | Git local-filesystem and packfile semantics resist remote/distributed storage | `NOT_IMPLEMENTED_IN_THIS_REPOSITORY` | #534 selected hosting runtime |
-| `GS-03` | synchronous multi-replica ref transactions hit tail latency and replica-floor limits | `NOT_EXERCISED` | #534 matched runtime experiment |
-| `GS-04` | push acknowledgement requires durable authoritative persistence | `CONTRACT_OPEN / PHYSICAL_OPEN` | #532 + #534 |
-| `GS-05` | ref publication requires atomic/CAS transaction and linearizable history | `CONTRACT_OPEN / PHYSICAL_OPEN` | #532 + #534 |
-| `GS-06` | local Git repos should be disposable caches with authoritative freshness/catch-up | `CONTRACT_OPEN / PHYSICAL_OPEN` | #532 + #534 |
-| `GS-07` | gossip may accelerate convergence but cannot own correctness | `CONTRACT_OPEN` | #532; live falsifier #534 |
-| `GS-08` | compaction/repack cost should not be multiplied blindly across replicas | `NOT_EXERCISED` | #534 |
-| `GS-09` | corruption/race recovery needs inspectable, replayable operation history | `PARTIAL_GENERIC_METHOD / HOSTING_PROFILE_OPEN` | #532 + #534 |
-| `GS-10` | scale/throughput claims require exact benchmark subjects and denominators | `SOURCE_PROPOSAL` | #534 + #535 |
+| `GS-01` | Agent repo/branch/PR volume breaks coordination/traceability | `PARTIALLY_CLOSED` | existing Tech Lead/Git Town/Shadow + #536 |
+| `GS-02` | local Git/pack semantics resist distributed storage | `NOT_IMPLEMENTED_IN_THIS_REPOSITORY` | #534 |
+| `GS-03` | synchronous multi-replica ref transactions impose tail/replica limits | `NOT_EXERCISED` | #534 |
+| `GS-04` | durable persistence must precede acknowledgement | `AGGREGATE_CONTRACT_CANDIDATE / PHYSICAL_OPEN` | #532/#534 |
+| `GS-05` | ref publication needs CAS/transaction-bound visibility and linearizable history | `AGGREGATE_CONTRACT_CANDIDATE / HISTORY_FIXTURES_MISSING` | #532/#534 |
+| `GS-06` | local repos are disposable caches with authoritative freshness/rebuild | `AGGREGATE_CONTRACT_CANDIDATE / PHYSICAL_OPEN` | #532/#534 |
+| `GS-07` | gossip may accelerate but cannot own correctness | `LAW_CANDIDATE / LIVE_FALSIFIER_OPEN` | #532/#534 |
+| `GS-08` | compaction must preserve reachability and account per-replica cost | `AGGREGATE_CONTRACT_CANDIDATE / NOT_EXERCISED` | #532/#534 |
+| `GS-09` | corruption/race recovery needs inspectable replay history | `PARTIAL_GENERIC_METHOD / RECEIPT_FAMILY_MISSING` | #532/#534 |
+| `GS-10` | scale/throughput claims need matched immutable benchmark subjects | `SOURCE_PROPOSAL / FIXTURE_FAMILY_MISSING` | #532/#534/#535 |
+
+## #532 first-red denominator gap
+
+PR #542 correctly adds a host-neutral Skill, aggregate `hosting-assurance/v1` schema, semantic checker and `GS-C01..GS-C20` named mutation controls. That does **not** satisfy the whole #532 issue contract. Remaining deterministic work includes at minimum:
+
+```text
+hosting-subject schema
+operation-history schema + concurrent valid linearization fixture
+separate durability receipt + hollow durable-readback fixture
+separate ref-transaction receipt
+read-freshness receipt + stale-cache catch-up fixture
+cache-rebuild receipt + destroy/rebuild fixture
+gossip observation receipt + drop/delay/reorder/duplicate fixtures
+compaction receipt + reachable-object fixture
+corruption-recovery receipt + partial-record/restart fixture
+benchmark-run schema + full denominator fixture
+hosting-closure-record schema
+repository-wide skill/eval/core/entry-route/commit-role gates
+exact-head hosted PASS
+```
+
+Until these exist and pass, #532 remains `OPEN`; #542 remains `DRAFT`.
 
 ## Closure State Machine
 
@@ -52,9 +78,10 @@ stateDiagram-v2
     IMMUTABLE_SOURCE_PACKET_BOUND --> CLAIM_DENOMINATOR_COMPLETE
     CLAIM_DENOMINATOR_COMPLETE --> APPLICABILITY_AND_AUTHORITY_SPLIT
     APPLICABILITY_AND_AUTHORITY_SPLIT --> EXISTING_METHOD_READBACK
-    EXISTING_METHOD_READBACK --> PORTABLE_ASSURANCE_CONTRACT_READY
-    PORTABLE_ASSURANCE_CONTRACT_READY --> DETERMINISTIC_CONTROLS_PASS
-    DETERMINISTIC_CONTROLS_PASS --> REAL_HOSTING_RUNTIME_SELECTED
+    EXISTING_METHOD_READBACK --> C1_IMPLEMENTATION_CANDIDATE
+    C1_IMPLEMENTATION_CANDIDATE --> C1_ISSUE_DENOMINATOR_COMPLETE
+    C1_ISSUE_DENOMINATOR_COMPLETE --> DETERMINISTIC_REPOSITORY_GATES_PASS
+    DETERMINISTIC_REPOSITORY_GATES_PASS --> REAL_HOSTING_RUNTIME_SELECTED
     REAL_HOSTING_RUNTIME_SELECTED --> LIVE_DURABILITY_CONSISTENCY_RECOVERY_CANARY
     LIVE_DURABILITY_CONSISTENCY_RECOVERY_CANARY --> INDEPENDENT_SHADOW_SAME_SUBJECT
     INDEPENDENT_SHADOW_SAME_SUBJECT --> DOCS_AGENTS_STACK_CONVERGED
@@ -62,96 +89,69 @@ stateDiagram-v2
     HUMAN_ADMIT --> [*]
 ```
 
-Current execution is before `PORTABLE_ASSURANCE_CONTRACT_READY`; #532/#534/#535/#536 remain open. A source URL, contract draft, open PR, green static test, or Shadow design review cannot skip a state.
+Current earned state is `C1_IMPLEMENTATION_CANDIDATE`; source-packet and C1-denominator lanes are both incomplete completion dependencies.
 
 ## Issue / execution DAG
 
 ```mermaid
 flowchart TD
-    SRC[Cursor article / immutable source packet] --> P0[#531 P0 source + problem contract]
-    P0 --> C1[#532 C1 portable assurance contracts]
-    C1 --> L1[#534 L1 real hosting canary]
-    P0 --> S1[#535 S1 independent Shadow]
-    C1 --> S1
-    L1 --> S1
-    P0 --> D1[#536 D1 docs + route + stack convergence]
-    C1 --> D1
+    SRC[#512 immutable source packet] --> P0[#531 P0 source/problem]
+    P0 --> PREP[PR #539 D1 preparation]
+    P0 --> C1[#532 / PR #542 C1 implementation]
+    C1 --> GAP[C1 denominator completion]
+    GAP -. admitted interface .-> L1[#534 physical canary]
+    SRC -. exact source .-> S1[#535 independent Shadow]
+    GAP -. exact Method subject .-> S1
+    L1 -. live receipts .-> S1
+    PREP --> D1[#536 final convergence]
+    GAP --> D1
     L1 --> D1
     S1 --> D1
     D1 --> H[Human Admit]
 ```
 
-Dependency meaning is typed:
-
-```text
-#531 → #532  contract dependency after exact source/problem binding
-#532 → #534  process/interface dependency; physical runtime remains external
-#532/#534 → #535  exact-subject read-only evidence dependency
-#531/#532/#534/#535 → #536  convergence dependency
-```
-
-Issue order alone does not manufacture Git ancestry. A `TRUE_CHILD` branch exists only when its bytes consume an unmerged parent artifact.
+PR #539 and PR #542 are path-disjoint **SIBLING** candidates from current `main`; issue chronology does not create Git ancestry. #534/#535 are process/external-evidence dependencies unless concrete branches consume exact unmerged bytes.
 
 ## Data flow
 
 ```text
-article / source packet
-→ source-claims.json
-→ problem-closure-ledger.json
-→ #531 applicability + authority split
-→ #532 portable contracts/checkers/fixtures
-→ #534 exact runtime/storage/workload/fault subjects
-→ durability/ref/read/cache/gossip/compaction/recovery receipts
+Cursor locator
+→ immutable source packet (#512)
+→ #531 claim/applicability denominator
+→ PR #542 Method-Plane schema/checker/fixture family
+→ repository deterministic + exact-head hosted gates
+→ #534 selected disposable runtime + operation/fault/benchmark receipts
 → #535 independent same-subject falsification
-→ #536 route + Molecular Stack + Local Handoff convergence
-→ Human Admit
+→ #536 current-main README/AGENTS/Molecular/Local-Handoff convergence
+→ Human merge/admit
 ```
 
-## Shadow Architect monitor
+## Writer reconciliation
 
-The Shadow role is read-only and adversarial. It independently checks at least:
+Current active shared-path writers observed for this program remain:
 
 ```text
-source immutability and claim denominator
-Method Plane vs physical storage-plane separation
-durable acknowledgement boundary
-ref visibility and object reachability
-operation-history completeness and linearizability oracle
-stale-cache authority validation
-gossip non-authority
-cache destroy/rebuild
-compaction reachability and cost accounting
-corruption/truncation/restart replay
-benchmark matching and scale ceiling
-current PR/path-writer state
-cleanup/rollback/Human gates
+PR #412 -> skills/git-town-stacked-pr-worker/README.md
+PR #419 -> skills/git-town-stacked-pr-worker/README.md + docs/INDEX.md
 ```
 
-A Builder conclusion is not Shadow evidence. Until #535 receives an exact-subject independent receipt, its state remains `OPEN`.
+Therefore PR #539 owns only its dedicated trace/index/queue surfaces. The canonical Git Town README and shared index remain #536 final-convergence paths after writer disposition. PR #542 owns only `skills/git-hosting-scale-assurance/**`.
 
-## Molecular delivery plan
+## Shadow Architect ruling
+
+The independent role must reject these promotions:
 
 ```text
-P0-SOURCE   #531  source/problem contract and closure denominator
-C1-CONTRACT #532  portable Git-hosting assurance Skill
-L1-LIVE     #534  real runtime/storage canary; external evidence
-S1-SHADOW   #535  independent read-only audit; external evidence
-D1-CONVERGE #536  README/AGENTS/trace/Molecular/Local-Handoff convergence
+mergeable PR -> admitted implementation
+skipped workflow -> PASS
+aggregate schema -> complete #532 receipt family
+20 semantic mutations -> complete #532 fixture denominator
+Method contract -> physical durability/linearizability
+fixture -> live canary
+Builder self-review -> independent Shadow
+bounded benchmark -> arbitrary scale/Cursor production
 ```
-
-The dedicated actual-state index is `skills/git-town-stacked-pr-worker/molecular-indexes/git-at-any-scale/README.md`. Do not invent PR numbers: `PR_ABSENT` is the required value until a real PR exists.
-
-## Current writer reconciliation
-
-Observed on 2026-08-21 against `main@988a4e790af6a8bee31fd14e00e52a6e944b9f17`:
-
-```text
-PR #412 writes skills/git-town-stacked-pr-worker/README.md
-PR #419 writes skills/git-town-stacked-pr-worker/README.md and docs/INDEX.md
-```
-
-Therefore this preparation branch writes only dedicated Git-at-any-scale paths plus root routing. Canonical shared-index/Git-Town-README convergence remains #536 and must consume, supersede, or wait for those writers explicitly.
 
 ## Evidence ceiling
 
-Even after all deterministic work passes, `skills-shared` can prove only the portable assurance method and the exact consumer/runtime experiments supplied to it. It cannot prove Cursor's private production implementation, S3/provider guarantees in general, arbitrary replica counts, universal linear scaling, production safety, or infrastructure adoption without separately admitted evidence.
+This program currently proves only that a traceable Method-Plane implementation candidate exists. It does not yet prove a complete #532 portable contract, any physical Git-hosting property, Cursor production behavior, arbitrary scale, production readiness, merge, release or infrastructure adoption.
