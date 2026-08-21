@@ -1,0 +1,29 @@
+{
+  "schema_version": "agentic-tech-lead/issue-closure-contract/v1",
+  "issue": {"repository": "ed3c/skills-shared", "number": 568, "github_state": "CLOSED", "github_state_reason": "COMPLETED"},
+  "disposition": "DIRECTLY_LANDED",
+  "acceptance": [
+    {"id": "fresh-snapshot-epoch-frozen", "status": "SATISFIED", "successor": null, "rationale": "epochs A (3fc0204) and B (28f3947) frozen with typed BASE_MAIN_DRIFT deltas; receipts committed"},
+    {"id": "g-graphs-and-leases-recomputed", "status": "SATISFIED", "successor": null, "rationale": "dependency audit + compiled multigraph.json over the 16-unit portfolio"},
+    {"id": "412-semantics-on-current-main-with-compliant-provenance", "status": "SATISFIED", "successor": null, "rationale": "the stated provenance blocker was falsified (988a4e7 carve-out, gate GREEN on PR 412's own range); bytes landed through the replayed #419 by merge-forward, superset proven per-path; branch preserved as forensic source"},
+    {"id": "true-children-replayed-against-admitted-predecessors", "status": "SATISFIED", "successor": null, "rationale": "419 -> 420 re-parent (restoring assert_case_obligations.py) -> 450; 395 -> 396; all merge-forward, all verified"},
+    {"id": "local-gates-pass-on-exact-candidate-heads", "status": "SATISFIED", "successor": null, "rationale": "per-head suite runs plus converged-head full runs, commit-roles range and full-history GREEN"},
+    {"id": "subagents-terminal-findings-consolidated-shadow-bound", "status": "SATISFIED", "successor": null, "rationale": "6-auditor join + consolidation; Shadow verdicts at epoch, ledger, candidate heads and final head"},
+    {"id": "supersession-cleanup-ownership", "status": "SATISFIED", "successor": null, "rationale": "PRs 562/564/565/412 closed SUPERSEDED, 396/419/420/450 closed CONSUMED, 395 auto-merged by reachability; branch retention recorded"}
+  ],
+  "implementation": {
+    "candidate_prs": [
+      {"repository": "ed3c/skills-shared", "number": 573, "state": "CLOSED", "merged": true, "classification": "DIRECT"},
+      {"repository": "ed3c/skills-shared", "number": 412, "state": "CLOSED", "merged": false, "classification": "SUPERSEDED"},
+      {"repository": "ed3c/skills-shared", "number": 419, "state": "CLOSED", "merged": false, "classification": "CONSUMED"},
+      {"repository": "ed3c/skills-shared", "number": 420, "state": "CLOSED", "merged": false, "classification": "CONSUMED"},
+      {"repository": "ed3c/skills-shared", "number": 450, "state": "CLOSED", "merged": false, "classification": "CONSUMED"},
+      {"repository": "ed3c/skills-shared", "number": 395, "state": "CLOSED", "merged": true, "classification": "HISTORICAL"},
+      {"repository": "ed3c/skills-shared", "number": 396, "state": "CLOSED", "merged": false, "classification": "CONSUMED"}
+    ],
+    "landing": {"repository": "ed3c/skills-shared", "via_pr": 573, "commit": "9fe3c6daf53dcdd61123d5d7a4eeedbdf37b5d7c", "tree": "c17678166cee2adba2f92f6099011ec52716ece7"}
+  },
+  "residual": [],
+  "evidence_ceiling": "DETERMINISTIC",
+  "shadow_review": {"verdict": "PASS"}
+}

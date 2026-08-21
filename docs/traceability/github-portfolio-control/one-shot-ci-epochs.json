@@ -1,0 +1,30 @@
+{
+  "protocol": "issue-560 one-shot GitHub Actions protocol; contract shape owned by ghpc/one-shot-ci-epoch/v1",
+  "pull_request": 573,
+  "draft_publications": 1,
+  "ready_toggles": 1,
+  "epochs": [
+    {
+      "epoch": 1,
+      "head_commit": "b500e25",
+      "trigger": "ready_for_review",
+      "result": "CODE_FAILURE",
+      "checks": {"total": 24, "pass": 23, "fail": 1, "skipped_by_policy": 2},
+      "failed_gate": "contract job / body-neutrality ratchet: skills/git-town-stacked-pr-worker/references/KENN_AGENTIC_ENGINEERING_STACK.md named a host repository on 2 lines (bytes inherited from PR #396)",
+      "failed_run": "https://github.com/ed3c/skills-shared/actions/runs/32516949051",
+      "disposition": "returned to a new local candidate epoch; no rerun of this head was requested"
+    },
+    {
+      "epoch": 2,
+      "head_commit": "b883093d53691227c00678e615b4574b4bb7625c",
+      "trigger": "synchronize (protocol-mandated new candidate after a code failure)",
+      "local_prevalidation": "full contract-job chain re-run locally green before push (body-neutrality, binding-stale, eval-plane, guard-controls)",
+      "result": "GREEN",
+      "checks": {"total": 23, "pass": 23, "fail": 0, "cancelled": 0},
+      "merge": {"method": "merge commit", "match_head_commit": "b883093d53691227c00678e615b4574b4bb7625c"},
+      "exact_main_readback": {"commit": "9fe3c6daf53dcdd61123d5d7a4eeedbdf37b5d7c", "tree": "c17678166cee2adba2f92f6099011ec52716ece7"}
+    }
+  ],
+  "semantic_acceptance": false,
+  "note": "hosted execution evidence only; semantic acceptance lived in the local gates, Shadow verdicts and Human directive recorded in decisions.json/epoch.json"
+}
