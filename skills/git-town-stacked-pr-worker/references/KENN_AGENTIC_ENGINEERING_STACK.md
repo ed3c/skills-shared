@@ -23,14 +23,15 @@ External evidence lanes
     #394 intent/observability providers         PROCESS_DEPENDENCY / OPEN
 
 Cross-repository consumer
-    bettor-arena #189                           PROCESS_DEPENDENCY / OPEN
+    integration-plane consumer issue #189       PROCESS_DEPENDENCY / OPEN
+    (exact consumer repository named in the closure trace binding)
 ```
 
 ## Laws
 
 - S2 is a true child only because its closure map references the S1 method artifact.
 - #232/#234/#393/#394 are not Git parents merely because the workflow waits on their evidence.
-- `bettor-arena` cannot be a Git child across repositories; it binds an immutable shared commit/release.
+- a cross-repository consumer cannot be a Git child across repositories; it binds an immutable shared commit/release.
 - provider implementation leaves are siblings when their writer paths/resources are disjoint.
 - one convergence owner updates shared indexes and aggregate consumer closure after prerequisites are stable.
 - no Agent owns merge, release, provider permission widening, repository visibility, or destructive rollback.
