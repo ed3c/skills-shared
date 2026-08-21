@@ -1,0 +1,127 @@
+{
+  "denominator": {
+    "problem_ids": [
+      "435-evidence-boundary-scope",
+      "435-incident-six-commits",
+      "435-required-repair-classify-commits"
+    ],
+    "source_manifest_sha256": "42cfbbda4cd0ae2a2b4116c65af7166fbdbd68ef60537f238f27ec82216909ee"
+  },
+  "problems": [
+    {
+      "applicability": "NOT_APPLICABLE",
+      "applicability_rationale": "Scope/policy constraint on how the required-repair claim (435-required-repair-classify-commits) must be executed once attempted; it names no independent action of its own and has no separate implementation/verification lifecycle to close.",
+      "claim": "## Evidence boundary\nThis only repairs provenance classification for already-published history. It does not admit the Productization PR, product truth, merge, release or runtime behavior.",
+      "closure": "NOT_APPLICABLE",
+      "dag_nodes": [],
+      "implementation_evidence": [],
+      "issue_nodes": [],
+      "merge_subjects": [],
+      "problem_id": "435-evidence-boundary-scope",
+      "receipts": [],
+      "repo_subject": {
+        "commit": "249abc47847f8295b1c75c9d4c84457c5126fd89",
+        "repo": "ed3c/skills-shared",
+        "tree": "a24b9b7ace6f4022967d41262ecdc704d5c11646"
+      },
+      "residual_gaps": [],
+      "session_attempts": [],
+      "shadow_verdict": "NOT_REVIEWED",
+      "source": {
+        "identity": "ed3c/skills-shared#435",
+        "kind": "GITHUB_ISSUE",
+        "location": "body:## Evidence boundary"
+      },
+      "task_nodes": [],
+      "verification_evidence": []
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "## Incident\nBefore the Productization branch was created, six GitHub connector commits had already reached `main` while creating and immediately deleting accidental placeholder files. Current tree is restored, but the published commits have no repository-required Driven-By / Driven-On trailers and the connector could not produce the required `.invalid` machine author identity.\n\nExact published commits:\n```text\n89c39f83314bee79226af5e081fc2013c41ccc13  add accidental root `x`\n55f926e22c13ce6212280819b1eea916d35cd384  remove `x`\n8e2c89d120ecb74fcffa4d708d0714ca8583036f  add accidental root `__never__`\n5417467f1416ced5a6ad0d1fabaa38f6d850d3e8  remove `__never__`\n957d7373a36ae78b6379c28625967090e5b296fc  add accidental root `stop`\nccef97dedd7ea8b1873e3afa130ca82b8eabb413  remove `stop`\n```",
+      "closure": "OPEN",
+      "dag_nodes": [
+        "github-issue-435"
+      ],
+      "implementation_evidence": [],
+      "issue_nodes": [
+        435
+      ],
+      "merge_subjects": [],
+      "problem_id": "435-incident-six-commits",
+      "receipts": [],
+      "repo_subject": {
+        "commit": "249abc47847f8295b1c75c9d4c84457c5126fd89",
+        "repo": "ed3c/skills-shared",
+        "tree": "a24b9b7ace6f4022967d41262ecdc704d5c11646"
+      },
+      "residual_gaps": [],
+      "session_attempts": [],
+      "shadow_verdict": "NOT_REVIEWED",
+      "source": {
+        "identity": "ed3c/skills-shared#435",
+        "kind": "GITHUB_ISSUE",
+        "location": "body:## Incident"
+      },
+      "task_nodes": [
+        "435-incident-facts"
+      ],
+      "verification_evidence": []
+    },
+    {
+      "applicability": "APPLICABLE",
+      "claim": "## Required repair\nUse a local/Forgejo/Codex/Claude lane that can author a compliant machine commit. Add exactly these six already-published SHAs to `evals/commit-roles.json::known_unclassified`, with one commit-specific reason each. Do not move `enforced_from`, widen a pattern, rewrite main, or falsely relabel the commits Human.\n\nRun:\n```text\npython3 scripts/check_commit_roles.py --repo-root .\npython3 -m unittest tests/test_commit_roles.py -v\n```\nand the current owning repository workflows on the exact candidate.",
+      "closure": "OPEN",
+      "dag_nodes": [
+        "github-issue-435"
+      ],
+      "implementation_evidence": [],
+      "issue_nodes": [
+        435
+      ],
+      "merge_subjects": [],
+      "problem_id": "435-required-repair-classify-commits",
+      "receipts": [],
+      "repo_subject": {
+        "commit": "249abc47847f8295b1c75c9d4c84457c5126fd89",
+        "repo": "ed3c/skills-shared",
+        "tree": "a24b9b7ace6f4022967d41262ecdc704d5c11646"
+      },
+      "residual_gaps": [],
+      "session_attempts": [],
+      "shadow_verdict": "NOT_REVIEWED",
+      "source": {
+        "identity": "ed3c/skills-shared#435",
+        "kind": "GITHUB_ISSUE",
+        "location": "body:## Required repair"
+      },
+      "task_nodes": [
+        "435-repair-classify-commits"
+      ],
+      "verification_evidence": []
+    }
+  ],
+  "schema_version": 1,
+  "source_manifest": [
+    {
+      "claim_sha256": "adf9f55a5334c9aa189d524c0b2a71bd208627dba19214a499c689b26992b9ac",
+      "identity": "ed3c/skills-shared#435",
+      "kind": "GITHUB_ISSUE",
+      "location": "body:## Evidence boundary",
+      "problem_id": "435-evidence-boundary-scope"
+    },
+    {
+      "claim_sha256": "df4b04295e95a4d57761a811c25b0fe6974039886be4388b9fa23e8f70c0034b",
+      "identity": "ed3c/skills-shared#435",
+      "kind": "GITHUB_ISSUE",
+      "location": "body:## Incident",
+      "problem_id": "435-incident-six-commits"
+    },
+    {
+      "claim_sha256": "1514c0baacd11fdbf07ad1b3b90f12c5c12864adde6662d7a43c773153e3d6c5",
+      "identity": "ed3c/skills-shared#435",
+      "kind": "GITHUB_ISSUE",
+      "location": "body:## Required repair",
+      "problem_id": "435-required-repair-classify-commits"
+    }
+  ]
+}
