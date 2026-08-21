@@ -25,8 +25,8 @@
   "subject": {
     "base_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
     "base_tree": "e739d799dd8d44beb5414ed99a943ff3bacccab0",
-    "implementation_commit": "7e8ce5db4815a3536d01064d19878c8db0fb57a5",
-    "implementation_tree": "9a08f30ca8e0d5f9add2385188bb2d9b97736d54",
+    "implementation_commit": "55d01ef3d6e06f469682d3ab67fb49089eef249c",
+    "implementation_tree": "2c6bdff0859a9394bfaae18ca91f997c3d574484",
     "branch": "dtcr/518-c0-contract",
     "subject_note": "Content identity is the owning_files digest map below, exact at authoring time and verifiable without git. The implementation commit and tree are bound by this receipt commit, which lands on top of the contract commit, because a receipt cannot carry the hash of the commit that carries it. The branch head is therefore this receipt; the subject it describes is the commit named here.",
     "subject_rebuild": {
@@ -75,11 +75,11 @@
   },
   "owning_files": {
     "skills/dual-track-code-review-loop/AGENTS.md": "717cb8e65785d4edf009f97266b42fd362e4d2871a3008aee21e28592e1bf374",
-    "skills/dual-track-code-review-loop/README.md": "4c3704bf8529789511936f1e1ffec6c64040c3a5494c5daa84ecb03d06dbbe58",
+    "skills/dual-track-code-review-loop/README.md": "8890fa189be08d2d439b28f001a860a8d1473867640eab1fdc84267f89a8f0cc",
     "skills/dual-track-code-review-loop/SKILL.md": "c9e801d613d77c5d5d7e2967af5d9279fd304854e8c83c937e18714ef7fc6f8b",
     "skills/dual-track-code-review-loop/references/README.md": "9e424c4d29a370de456ddb0178676029179d839208a708a5ad0edf55709be19f",
     "skills/dual-track-code-review-loop/references/contracts/controlled-vocabulary.md": "d4cd3c9c8afb872cd164cdce49b4082c8f8bad97e9b8e789a41c8ff15c9e1e03",
-    "skills/dual-track-code-review-loop/references/contracts/public-private-capability.md": "07fbc0d973e77bed483f5b9ccfcdcbaf063469ba8a4a992a305edb39820cd925",
+    "skills/dual-track-code-review-loop/references/contracts/public-private-capability.md": "12f339d1a46533d8721898933c3283b34837d6f1e1d9d62ed2fcb3d237938283",
     "skills/dual-track-code-review-loop/references/schemas/candidate-record.schema.json": "4893bd1565acdb90106e7daf3bb23dee4de608e918147454fa595e01e7ba64f8",
     "skills/dual-track-code-review-loop/references/schemas/change-unit.schema.json": "476a8b89bf3dc898ee639c06622acc412fb18d3b33dfa46a80394039d0c19b19",
     "skills/dual-track-code-review-loop/references/schemas/closure-record.schema.json": "bb46ec59ff3ec1fe70431392b7f77d79a0250d96ca87197b77e769d30b4981de",
@@ -90,7 +90,7 @@
     "skills/dual-track-code-review-loop/references/schemas/violation-candidate.schema.json": "7292f43c8c594089b91d62654b47a5e6d0c2f55b37e375a641e01caedad00f18",
     "skills/dual-track-code-review-loop/references/source-disposition/refused-claims.json": "2c7fbbb9a9f411167904cc991a2e360a306668d12ed088f1d9c9ec7d3b17cd0b"
   },
-  "owning_files_note": "Recomputed over the repaired bytes at the implementation commit named in subject. Eight of the fifteen digests are unchanged from the superseded chain because those files were not touched by the repair; the seven that changed are README.md, references/README.md, public-private-capability.md, candidate-record, refactor-proposal, source-disposition and refused-claims.json.",
+  "owning_files_note": "Recomputed over the bytes at the implementation commit named in subject. Relative to the superseded chain, seven of the fifteen digests are unchanged and eight changed: README.md, references/README.md, public-private-capability.md, candidate-record, refactor-proposal, source-disposition, refused-claims.json and verification-receipt.schema.json (the H0-003 re-review found this file omitted from the prior list — Shadow residual R-1). The receipt-accuracy sweep then re-touched README.md and public-private-capability.md, whose digests above are the swept bytes.",
   "lease_exceptions": [
     {
       "path": "docs/INDEX.md",
