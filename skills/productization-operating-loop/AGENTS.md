@@ -151,27 +151,22 @@ was collapsed twice in the prior wave. State both, always:
   printed: `POL-COMPILE-GREEN 6 artifacts byte-stable across two compilations
   and one reordering, validated against 6 committed contracts, 8 refusal
   codes fired by 12 crafted inputs`.
-- The evidence plane (`POL-E`, `#428`) exists in this repository at commit
-  `b7f69e0f9a2c5a0dcfb6a413f745d51a588315c3` — its own receipt claims
-  `tests/evidence_plane.py`, `cases.json`, `evals.json`, a widened
-  `tests/run-all.sh` (invoking the compiler and the plane in the same entry
-  point) and a 97→100 skill-eval-claim count, all verified against that
-  commit by its own worker. That commit is **not an ancestor of this
-  worktree's `HEAD`**: it landed on a sibling worktree branch that this
-  convergence's mandatory base merge did not include. Concretely, in
-  *this* tree: `tests/run-all.sh` still only calls `tests/selftest.py` and
-  prints only the `POL-SELFTEST-GREEN` line above; `tests/evidence_plane.py`
-  and `cases.json`/`evals.json` for this Skill do not exist on disk here at
-  all (the `POL-COMPILE-GREEN` line above came from invoking
-  `scripts/compile_pol_composition.py --selftest` directly, not from
-  `run-all.sh`, and no `POL-PLANE-GREEN` line can be produced in this tree
-  by any command); and `scripts/check_skill_eval_plane.py` prints the
-  pre-`#428` count, `97 runnable claim(s) across 12 skill(s)`.
-- Do not resolve this by pasting `#428`'s suite line into a transcript this
-  tree cannot reproduce. Resolve it by fast-forwarding or merging
-  `b7f69e0f9a2c5a0dcfb6a413f745d51a588315c3` into whatever branch admits this
-  convergence, then re-running `tests/run-all.sh` and replacing this note
-  with what that run actually prints.
+- The evidence plane (`POL-E`, `#428`, commit
+  `b7f69e0f9a2c5a0dcfb6a413f745d51a588315c3`) **is an ancestor of this
+  tree**: the wave-8 integrator merged it before this convergence, exactly
+  as the original note here demanded. `tests/run-all.sh` on the merged tree
+  invokes the selftest, the composer selftest and the plane in one entry
+  point and printed, on this run:
+  `subject=<worktree>/skills/productization-operating-loop
+  preregistered_promotions=14 other_promotions=1 planted_cases=19
+  first_green_reopened=9 plane_codes=8 compiler_codes=3 contracts=6
+  lane_contracts=4` followed by `POL-PLANE-GREEN the base composition passes
+  every gate, 19 planted cases covering all 14 preregistered false
+  promotions and 1 hollow case are each refused by the exact guard they
+  name, and 9 of them were green to the admitted stack until the reopen
+  pass`. `scripts/check_skill_eval_plane.py` printed `SKILL EVAL PLANE
+  GREEN: 100 runnable claim(s) across 13 skill(s), each attached to a test
+  that exercises it`.
 - [`../../docs/traceability/productization-operating-loop/README.md`](../../docs/traceability/productization-operating-loop/README.md)'s
   "Current states" table and method-composition list were frozen at `#421`
   prep time and now understate progress on `POL-C0` through `POL-E` (all

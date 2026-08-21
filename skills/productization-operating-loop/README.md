@@ -6,17 +6,17 @@ bounded implementation, by composing methods that already exist rather than
 restating them.
 
 Status: `CORE_CONTRACT_FROZEN / COMPILER_LANDED / ROUTING_PROMPT_TRACE_LANDED
-/ EVIDENCE_PLANE_PENDING_ANCESTRY`.
+/ EVIDENCE_PLANE_LANDED`.
 
 The twelve-lane contract is frozen and replayed by
 [`tests/run-all.sh`](tests/run-all.sh); the deterministic composer
 ([`scripts/compile_pol_composition.py`](scripts/compile_pol_composition.py))
 is landed and replays its own fixtures via `--selftest`; this convergence
 (`#429`) adds the zero-context read route, the pasteable per-stage prompts and
-the CodexDoc/GitHub trace law as prose. An independent evidence/Shadow plane
-over a composed program (`#428`) exists in this repository at a named commit;
-whether that commit is an ancestor of *this* tree is a separate fact, stated
-in [`AGENTS.md`](AGENTS.md)'s Ancestry note rather than assumed here. No
+the CodexDoc/GitHub trace law as prose. The independent evidence/Shadow
+plane (`#428`, [`tests/evidence_plane.py`](tests/evidence_plane.py)) is an
+ancestor of this tree and replayed by the same suite entry point; the run
+this tree produces is quoted in [`AGENTS.md`](AGENTS.md)'s Ancestry note. No
 market, user, mechanism, session, payment or release lane is cleared by any
 of this — a contract, a compiler and a prompt set are each a shape later
 evidence must fit, not evidence that the later work happened.

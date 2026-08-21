@@ -188,10 +188,10 @@ on a new isolated worktree.
 twelve-lane vocabulary + ladder + state machine   contract-level, schema-enforced
 four Stage-1 lane contracts (market/user/commercial/policy)  LANDED, schema + controls replayed
 deterministic composition compiler (program + 4 lanes → 6 artifacts)  LANDED, replayed via --selftest
-independent evidence/Shadow plane over a composed program   see AGENTS.md Evidence ceiling —
-                                                             ownership and current-branch ancestry
-                                                             are two different facts, stated
-                                                             separately there
+independent evidence/Shadow plane over a composed program   LANDED (ancestor of this tree),
+                                                             replayed by the same suite entry
+                                                             point — run quoted in AGENTS.md's
+                                                             Ancestry note
 zero-context read route, stage prompts, trace law (this file, AGENTS.md, prompts/)  LANDED
 an actual market read, user observed, mechanism reproduced, MVP built, session run,
 payment taken or released product                            NOT_EXERCISED
