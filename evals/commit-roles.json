@@ -38,6 +38,10 @@
     "forge-forgejo": {
       "meaning": "A Forgejo-side action.",
       "machine": true
+    },
+    "owner-endpoint": {
+      "meaning": "The repository owner acting through a non-agent endpoint that cannot write trailers: the ChatGPT GitHub connector's Contents-API writes, the GitHub web editor, or a bare direct push. The commit already appears under the owner's real identity on the forge, so nothing is miscounted; what is genuinely unobservable from the commit object is which of those endpoints produced it, and this value records exactly that ceiling instead of pretending to more.",
+      "machine": false
     }
   },
   "forge_values_stay_separate": "github, gitlab and forgejo are deliberately three values rather than one forge-*. This repository already treats github-delivery-loop, gitlab-delivery-loop and forgejo-delivery-loop as sister skills that must not be mixed; their APIs, permission models and merge-authority stacks differ. Collapsing them here would be the one place where the vocabulary contradicts the skill boundary, and 'some forge' does not answer which mechanism acted.",
@@ -70,15 +74,19 @@
       "noreply@github.com": "forge-github",
       "noreply@gitlab.com": "forge-gitlab",
       "noreply@forgejo.org": "forge-forgejo"
-    }
+    },
+    "declared_owner_addresses": {
+      "mcnum01@gmail.com": "owner-endpoint"
+    },
+    "declared_owner_note": "Root-cause repair for the connector class (issues #435/#436 and the 2026-08-18/19 direct pushes): the ChatGPT GitHub connector writes through the Contents API with the owner's real address as both author and committer, no trailers, and no forge committer signature, so the forge carve-out can never match it and the endpoint can never be taught to write trailers. A trailerless commit whose author is a declared owner address is therefore classified owner-endpoint instead of red. The carve-out applies ONLY when both trailers are absent: the moment a commit carries Driven-By or Driven-On it is judged by the full rules, so agent endpoints gain nothing by borrowing the owner's address alongside their trailers, and an agent that forges the owner's address without trailers was already lying to the previous rule too — a vocabulary constrains honest endpoints, it does not authenticate hostile ones. Additions to this list are Human admission."
   },
   "legacy_imports": [
     {
       "id": "forgejo-main-before-dual-origin-convergence-2026-08-14",
       "tip_sha": "e5c239cce2c4494de6167155030df819a8f346cb",
       "admitted_against_sha": "abb7b455b012c8aaa4701b32e470fcf758a06cb7",
-      "unclassified_commit_count": 33,
-      "unclassified_commits_sha256": "b66a3e798fe0dd88ad04e33390cea53b61e1cd1c1c1379273d721a562fc28a05",
+      "unclassified_commit_count": 32,
+      "unclassified_commits_sha256": "9c848cf0c656165829faa9004fe983118a0e4d2ddf1958729517ed074bf53a54",
       "note": "Exact frozen Forgejo-only non-merge history imported during dual-origin convergence. This does not move enforced_from and cannot admit any later commit."
     },
     {
