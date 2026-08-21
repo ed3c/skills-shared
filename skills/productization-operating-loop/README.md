@@ -5,46 +5,76 @@ source discovery through differentiated design, feasibility, monetization and
 bounded implementation, by composing methods that already exist rather than
 restating them.
 
-Status: `CORE_CONTRACT_FROZEN / METHOD_NOT_IMPLEMENTED`.
+Status: `CORE_CONTRACT_FROZEN / COMPILER_LANDED / ROUTING_PROMPT_TRACE_LANDED
+/ EVIDENCE_PLANE_PENDING_ANCESTRY`.
 
-This directory currently holds a contract and nothing else. There is no
-procedural body here yet, no compiler, no evals, no prompts and no consumer
-binding; those are separately owned atoms and each will arrive with its own
-receipt. A contract is a shape that later work must fit. It is not evidence
-that the later work exists.
+The twelve-lane contract is frozen and replayed by
+[`tests/run-all.sh`](tests/run-all.sh); the deterministic composer
+([`scripts/compile_pol_composition.py`](scripts/compile_pol_composition.py))
+is landed and replays its own fixtures via `--selftest`; this convergence
+(`#429`) adds the zero-context read route, the pasteable per-stage prompts and
+the CodexDoc/GitHub trace law as prose. An independent evidence/Shadow plane
+over a composed program (`#428`) exists in this repository at a named commit;
+whether that commit is an ancestor of *this* tree is a separate fact, stated
+in [`AGENTS.md`](AGENTS.md)'s Ancestry note rather than assumed here. No
+market, user, mechanism, session, payment or release lane is cleared by any
+of this — a contract, a compiler and a prompt set are each a shape later
+evidence must fit, not evidence that the later work happened.
 
 ## Read order
 
-1. [`references/core/controlled-vocabulary.md`](references/core/controlled-vocabulary.md)
+1. [`AGENTS.md`](AGENTS.md) — read order authority, agent roles, writer/lease
+   law, the CodexDoc/GitHub trace law, the Ancestry note, stop conditions and
+   the completion report.
+2. [`SKILL.md`](SKILL.md) — the portable state machine, the twelve stages, the
+   hard laws and the evidence ceiling.
+3. [`references/core/controlled-vocabulary.md`](references/core/controlled-vocabulary.md)
    — the twelve lanes, the ten lane states, the fifteen program states, and the
-   authority laws. Read this first; every other file assumes its words.
-2. [`references/core/evidence-ladder.md`](references/core/evidence-ladder.md)
+   authority laws. Read this first of the references/ files; every other file
+   assumes its words.
+4. [`references/core/evidence-ladder.md`](references/core/evidence-ladder.md)
    — the ten rungs, the receipt kind bound to each, and the substitution law.
-3. [`references/productization-program.schema.json`](references/productization-program.schema.json)
+5. [`references/productization-program.schema.json`](references/productization-program.schema.json)
    — the machine contract, with its positive example and its eleven refusal
    controls inline.
-4. [`references/composition-manifest.json`](references/composition-manifest.json)
+6. [`references/composition-manifest.json`](references/composition-manifest.json)
    — the ten composed methods, each by content digest and declared interface.
-5. [`references/core/source-proposal-audit.md`](references/core/source-proposal-audit.md)
+7. [`references/core/source-proposal-audit.md`](references/core/source-proposal-audit.md)
    — what the preparation branch contained, and what this freeze admitted and
    refused from it.
-6. The four Stage-1 lane contracts —
+8. The four Stage-1 lane contracts —
    [`references/market/market-lane.schema.json`](references/market/market-lane.schema.json),
    [`references/user/user-lane.schema.json`](references/user/user-lane.schema.json),
    [`references/commercial/commercial-lane.schema.json`](references/commercial/commercial-lane.schema.json),
    [`references/policy/policy-lane.schema.json`](references/policy/policy-lane.schema.json)
    — each beside its own vocabulary file.
-7. The three Stage-2 session contracts —
+9. The three Stage-2 session contracts —
    [`references/session/closure-matrix.schema.json`](references/session/closure-matrix.schema.json),
    [`references/session/session-dag.schema.json`](references/session/session-dag.schema.json),
    [`references/session/outcome-foldback-request.schema.json`](references/session/outcome-foldback-request.schema.json)
    — what [`scripts/compile_pol_composition.py`](scripts/compile_pol_composition.py)
    emits and refuses against: byte-stable canonical JSON, `--check`, and named
    K-code refusals with exit 2, never a silent downgrade.
+10. [`prompts/README.md`](prompts/README.md) — the common system envelope and
+    the twelve pasteable stage prompts, common-system-envelope through
+    stage-11-outcome-foldback.
+11. [`modules/README.md`](modules/README.md) — trigger-gated domain instances;
+    read only the module a concrete consumer binding actually requires.
 
 ## What is here
 
 ```text
+AGENTS.md                             zero-context read route, agent roles,
+                                       CodexDoc/GitHub trace law, Ancestry note
+SKILL.md                               portable state machine, twelve stages,
+                                       hard laws, evidence ceiling
+modules/
+├── README.md                          trigger-gated module index
+└── domain-profile.md                  what a concrete consumer must bind,
+                                       never who the consumer is
+prompts/
+└── README.md                          common system envelope + twelve
+                                       pasteable stage prompts
 references/
 ├── core/
 │   ├── controlled-vocabulary.md    lanes, lane states, program states, laws
@@ -87,9 +117,14 @@ it, which refuses the widening and not the intent behind it.
 
 ## Evidence ceiling
 
-`INTERFACE_LOCK_ONLY`. Freezing this contract proves that a shape is fixed and
-that eleven named refusals are refused by the keywords they cite. It does not
-prove that the method exists, that an arena is attractive, that a user would
-switch, that anyone would pay, that a rule permits anything, that any runtime
-executed, or that any of this may be merged or released. Those lanes are
-reported by this contract; they are not cleared by it.
+`INTERFACE_LOCK_ONLY` for the contract itself: freezing it proves that a shape
+is fixed and that eleven named refusals are refused by the keywords they
+cite. The compiler's own ceiling is `DETERMINISTIC_COMPOSITION` (six artifacts,
+byte-stable, eight K-code refusals — see [`SKILL.md`](SKILL.md)'s Evidence
+ceiling table). This convergence's own ceiling is
+`ROUTING_PROMPT_TRACE_CONVERGENCE` (see [`AGENTS.md`](AGENTS.md)). None of the
+three proves that the method exists end to end, that an arena is attractive,
+that a user would switch, that anyone would pay, that a rule permits
+anything, that any session actually ran, or that any of this may be merged or
+released. Those lanes are reported by this directory; they are not cleared by
+it.
