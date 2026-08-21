@@ -1,0 +1,1176 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pol/productization-program/v1",
+  "title": "Productization program",
+  "description": "One productization program record: the exact subject it is bound to, the twelve evidence lanes reported separately, the ten-rung ladder reported rung by rung, the composed methods named by content identity rather than copied, and the two dependency graphs kept apart. Three shapes are structural rather than advisory. Lanes are a closed object with all twelve required, so a program cannot report a merged lane or drop an unavailable one; the reader never has to guess whether an absent lane was clean or never entered. The ladder is monotone by construction: each rung above the first carries an `if/then` that pins its predecessor to REACHED, so a cheaper rung cannot stand in for a later one. Each rung also names the receipt kind that is the only admissible evidence for it, so a command exit cannot be filed as a payment. What the schema cannot do is judge the truth of a value somebody typed: it refuses a missing lane, a skipped rung and a receipt of the wrong kind, and it does not refuse a REACHED written next to a receipt that describes nothing. That is what independent review is for.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "program_id",
+    "subject_commit",
+    "subject_tree",
+    "program_state",
+    "evidence_ceiling",
+    "lanes",
+    "evidence_ladder",
+    "method_refs",
+    "start_dependencies",
+    "completion_dependencies",
+    "human_owned_operations",
+    "authority",
+    "rollback"
+  ],
+  "properties": {
+    "schema": {"const": "pol/productization-program/v1"},
+    "program_id": {"type": "string", "pattern": "^POL-PROG-[0-9]{3}$"},
+    "subject_commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$",
+      "description": "The exact commit this program describes. Written out here rather than referenced, so the keyword that refuses a mutable subject sits on the field it governs. A branch, tag or `HEAD` fails the pattern, because a program bound to a moving name describes whatever that name points at when somebody next reads it."
+    },
+    "subject_tree": {"$ref": "#/$defs/commit"},
+    "program_state": {
+      "enum": [
+        "REQUEST_BOUND",
+        "CONTROL_AND_AUTHORITY_BOUND",
+        "SOURCE_AND_POLICY_BOUND",
+        "MARKET_ARENA_BOUND",
+        "USER_SCENARIOS_BOUND",
+        "COMPARATOR_CASES_BOUND",
+        "DIFFERENTIATION_WEDGE_BOUND",
+        "COMMERCIAL_FRICTION_BOUND",
+        "CAPABILITY_AND_RIGHTS_BOUND",
+        "MVP_AND_STOP_LOSS_BOUND",
+        "SHADOW_CLOSURE_AUDITED",
+        "ISSUE_AND_SESSION_DAG_BOUND",
+        "BUILD_OR_EXPERIMENT_RUNNING",
+        "OUTCOME_READ_BACK",
+        "PRESERVE",
+        "NARROW",
+        "ITERATE",
+        "KILL",
+        "UNKNOWN",
+        "BLOCKED",
+        "NOT_EXERCISED",
+        "REPLAN_REQUIRED",
+        "HUMAN_ADMIT_REQUIRED"
+      ],
+      "description": "The fourteen progression states, the four outcome dispositions, and the five states a program reaches when it did not progress. There is no value meaning merged, released or in production: those are operations a person performs, not states this record reaches, so a program cannot be filed as the evidence for one."
+    },
+    "evidence_ceiling": {
+      "enum": [
+        "INTERFACE_LOCK_ONLY",
+        "MARKET_HYPOTHESIS_CONTRACT",
+        "USER_SCENARIO_CONTRACT",
+        "COMMERCIAL_HYPOTHESIS_CONTRACT",
+        "POLICY_PROVENANCE_AND_RETEST_ROUTING",
+        "DETERMINISTIC_COMPOSITION",
+        "DETERMINISTIC_EVAL_AND_SHADOW",
+        "BOUNDED_REAL_EXPERIMENT_ONLY"
+      ],
+      "description": "The most this program is allowed to prove. Stated once, at the top, because a ceiling written only in a closing paragraph is read after the conclusion it was supposed to bound."
+    },
+    "lanes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "market",
+        "user",
+        "mechanism",
+        "technical",
+        "policy",
+        "rights",
+        "commercial",
+        "runtime",
+        "human_admit",
+        "merge",
+        "release"
+      ],
+      "description": "Twelve independent lanes, every one reported. Closed and fully required in both directions: a lane cannot be dropped, and two lanes cannot be fused into one new key, so lane collapse is a validation error rather than a reading somebody has to notice.",
+      "properties": {
+        "source": {"$ref": "#/$defs/lane"},
+        "market": {"$ref": "#/$defs/lane"},
+        "user": {"$ref": "#/$defs/lane"},
+        "mechanism": {"$ref": "#/$defs/lane"},
+        "technical": {"$ref": "#/$defs/lane"},
+        "policy": {"$ref": "#/$defs/lane"},
+        "rights": {"$ref": "#/$defs/lane"},
+        "commercial": {"$ref": "#/$defs/lane"},
+        "runtime": {"$ref": "#/$defs/lane"},
+        "human_admit": {"$ref": "#/$defs/human_lane"},
+        "merge": {"$ref": "#/$defs/human_lane"},
+        "release": {"$ref": "#/$defs/human_lane"}
+      }
+    },
+    "evidence_ladder": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_found",
+        "source_verified",
+        "job_supported",
+        "wedge_supported",
+        "mechanism_reproduced",
+        "mvp_tech_verified",
+        "live_workflow_verified",
+        "user_validated",
+        "paid_validated",
+        "repeatable_commercial"
+      ],
+      "description": "All ten rungs, every one reported, in one closed object. The `allOf` below carries the substitution law: rung N REACHED requires rung N-1 REACHED and a receipt of rung N's own kind.",
+      "properties": {
+        "source_found": {"$ref": "#/$defs/rung"},
+        "source_verified": {"$ref": "#/$defs/rung"},
+        "job_supported": {"$ref": "#/$defs/rung"},
+        "wedge_supported": {"$ref": "#/$defs/rung"},
+        "mechanism_reproduced": {"$ref": "#/$defs/rung"},
+        "mvp_tech_verified": {"$ref": "#/$defs/rung"},
+        "live_workflow_verified": {"$ref": "#/$defs/rung"},
+        "user_validated": {"$ref": "#/$defs/rung"},
+        "paid_validated": {"$ref": "#/$defs/rung"},
+        "repeatable_commercial": {"$ref": "#/$defs/rung"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"source_found": {"properties": {"state": {"const": "REACHED"}}}}, "required": ["source_found"]},
+          "then": {
+            "properties": {
+              "source_found": {"properties": {"receipts": {"contains": {"properties": {"kind": {"const": "SOURCE_LOCATED"}}, "required": ["kind"]}}}}
+            }
+          }
+        },
+        {
+          "if": {"properties": {"source_verified": {"properties": {"state": {"const": "REACHED"}}}}, "required": ["source_verified"]},
+          "then": {
+            "properties": {
+              "source_verified": {"properties": {"receipts": {"contains": {"properties": {"kind": {"const": "INDEPENDENT_SOURCE_READBACK"}}, "required": ["kind"]}}}},
+              "source_found": {"properties": {"state": {"const": "REACHED"}}}
+            }
+          }
+        },
+        {
+          "if": {"properties": {"job_supported": {"properties": {"state": {"const": "REACHED"}}}}, "required": ["job_supported"]},
+          "then": {
+            "properties": {
+              "job_supported": {"properties": {"receipts": {"contains": {"properties": {"kind": {"const": "JOB_EVIDENCE_TRACE"}}, "required": ["kind"]}}}},
+              "source_verified": {"properties": {"state": {"const": "REACHED"}}}
+            }
+          }
+        },
+        {
+          "if": {"properties": {"wedge_supported": {"properties": {"state": {"const": "REACHED"}}}}, "required": ["wedge_supported"]},
+          "then": {
+            "properties": {
+              "wedge_supported": {"properties": {"receipts": {"contains": {"properties": {"kind": {"const": "COMPARATOR_CASE_TRACE"}}, "required": ["kind"]}}}},
+              "job_supported": {"properties": {"state": {"const": "REACHED"}}}
+            }
+          }
+        },
+        {
+          "if": {"properties": {"mechanism_reproduced": {"properties": {"state": {"const": "REACHED"}}}}, "required": ["mechanism_reproduced"]},
+          "then": {
+            "properties": {
+              "mechanism_reproduced": {"properties": {"receipts": {"contains": {"properties": {"kind": {"const": "MECHANISM_REPLAY"}}, "required": ["kind"]}}}},
+              "wedge_supported": {"properties": {"state": {"const": "REACHED"}}}
+            }
+          }
+        },
+        {
+          "if": {"properties": {"mvp_tech_verified": {"properties": {"state": {"const": "REACHED"}}}}, "required": ["mvp_tech_verified"]},
+          "then": {
+            "properties": {
+              "mvp_tech_verified": {"properties": {"receipts": {"contains": {"properties": {"kind": {"const": "DETERMINISTIC_COMMAND_EXIT"}}, "required": ["kind"]}}}},
+              "mechanism_reproduced": {"properties": {"state": {"const": "REACHED"}}}
+            }
+          }
+        },
+        {
+          "if": {"properties": {"live_workflow_verified": {"properties": {"state": {"const": "REACHED"}}}}, "required": ["live_workflow_verified"]},
+          "then": {
+            "properties": {
+              "live_workflow_verified": {"properties": {"receipts": {"contains": {"properties": {"kind": {"const": "LIVE_WORKFLOW_TRACE"}}, "required": ["kind"]}}}},
+              "mvp_tech_verified": {"properties": {"state": {"const": "REACHED"}}}
+            }
+          }
+        },
+        {
+          "if": {"properties": {"user_validated": {"properties": {"state": {"const": "REACHED"}}}}, "required": ["user_validated"]},
+          "then": {
+            "properties": {
+              "user_validated": {"properties": {"receipts": {"contains": {"properties": {"kind": {"const": "REAL_USER_OBSERVATION"}}, "required": ["kind"]}}}},
+              "live_workflow_verified": {"properties": {"state": {"const": "REACHED"}}}
+            }
+          }
+        },
+        {
+          "if": {"properties": {"paid_validated": {"properties": {"state": {"const": "REACHED"}}}}, "required": ["paid_validated"]},
+          "then": {
+            "properties": {
+              "paid_validated": {"properties": {"receipts": {"contains": {"properties": {"kind": {"const": "PAYMENT_RECORD"}}, "required": ["kind"]}}}},
+              "user_validated": {"properties": {"state": {"const": "REACHED"}}}
+            }
+          }
+        },
+        {
+          "if": {"properties": {"repeatable_commercial": {"properties": {"state": {"const": "REACHED"}}}}, "required": ["repeatable_commercial"]},
+          "then": {
+            "properties": {
+              "repeatable_commercial": {"properties": {"receipts": {"contains": {"properties": {"kind": {"const": "REPEATED_PAYMENT_SERIES"}}, "required": ["kind"]}}}},
+              "paid_validated": {"properties": {"state": {"const": "REACHED"}}}
+            }
+          }
+        }
+      ]
+    },
+    "method_refs": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/method_ref"},
+      "description": "The composed methods, each named by content identity and a short declared interface. The composition manifest holds the full inventory; a program names the subset it actually consumed."
+    },
+    "start_dependencies": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/start_dependency"},
+      "description": "What must be readable before this program may begin. May be empty."
+    },
+    "completion_dependencies": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/completion_dependency"},
+      "description": "What must have produced an admitted receipt before this program may be called complete. A separate field with a separate item shape, because the single most common way a program overstates itself is to satisfy a completion dependency by reading the interface of the thing it was supposed to wait for."
+    },
+    "human_owned_operations": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 4, "maxLength": 200},
+      "description": "At least one, always. A program that lists no Human-owned operation has either not looked or has quietly assigned itself merge."
+    },
+    "authority": {"$ref": "#/$defs/authority"},
+    "rollback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["base_commit"],
+      "properties": {"base_commit": {"$ref": "#/$defs/commit"}}
+    }
+  },
+  "$defs": {
+    "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "lane_state": {
+      "enum": [
+        "PASS",
+        "FAIL",
+        "UNKNOWN",
+        "BLOCKED",
+        "ABSENT",
+        "NOT_IMPLEMENTED",
+        "NOT_EXERCISED",
+        "SKIPPED_BY_POLICY",
+        "NOT_APPLICABLE",
+        "HUMAN_ADMIT_REQUIRED"
+      ],
+      "description": "Ten states, and eight of them are ways of not being PASS. UNKNOWN, BLOCKED and NOT_EXERCISED are separate on purpose: a lane nobody could enter, a lane nobody entered and a lane whose answer was never determined are three different facts, and collapsing them into one is how a gap becomes a pass."
+    },
+    "rung_name": {
+      "enum": [
+        "NONE",
+        "SOURCE_FOUND",
+        "SOURCE_VERIFIED",
+        "JOB_SUPPORTED",
+        "WEDGE_SUPPORTED",
+        "MECHANISM_REPRODUCED",
+        "MVP_TECH_VERIFIED",
+        "LIVE_WORKFLOW_VERIFIED",
+        "USER_VALIDATED",
+        "PAID_VALIDATED",
+        "REPEATABLE_COMMERCIAL"
+      ]
+    },
+    "lane": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "highest_rung_reached"],
+      "properties": {
+        "state": {"$ref": "#/$defs/lane_state"},
+        "highest_rung_reached": {"$ref": "#/$defs/rung_name"},
+        "note": {"type": "string", "maxLength": 300}
+      }
+    },
+    "human_lane": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "highest_rung_reached"],
+      "description": "The three lanes a person owns permanently. Their state vocabulary contains no PASS and no FAIL, and their rung is pinned to NONE, so no accumulation of evidence inside this record can report Human admission, merge or release as achieved. Widening is a validation error, not a judgement call.",
+      "properties": {
+        "state": {"enum": ["HUMAN_ADMIT_REQUIRED", "BLOCKED", "NOT_EXERCISED", "NOT_APPLICABLE"]},
+        "highest_rung_reached": {"const": "NONE"},
+        "note": {"type": "string", "maxLength": 300}
+      }
+    },
+    "receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "subject_commit"],
+      "properties": {
+        "kind": {
+          "enum": [
+            "SOURCE_LOCATED",
+            "INDEPENDENT_SOURCE_READBACK",
+            "JOB_EVIDENCE_TRACE",
+            "COMPARATOR_CASE_TRACE",
+            "MECHANISM_REPLAY",
+            "DETERMINISTIC_COMMAND_EXIT",
+            "LIVE_WORKFLOW_TRACE",
+            "REAL_USER_OBSERVATION",
+            "PAYMENT_RECORD",
+            "REPEATED_PAYMENT_SERIES"
+          ],
+          "description": "One kind per rung, closed. The mapping is what stops a cheap arrival being filed against an expensive rung: a green command exit is admissible evidence for MVP_TECH_VERIFIED and is not admissible evidence that anybody paid."
+        },
+        "subject_commit": {"$ref": "#/$defs/commit"},
+        "note": {"type": "string", "maxLength": 300}
+      }
+    },
+    "rung": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "receipts"],
+      "properties": {
+        "state": {"enum": ["REACHED", "NOT_REACHED", "BLOCKED", "UNKNOWN", "NOT_EXERCISED"]},
+        "receipts": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/receipt"}}
+      }
+    },
+    "method_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["skill_name", "skill_md_sha256", "skill_md_bytes", "observed_commit", "declared_interface"],
+      "description": "A reference, not a copy. Two keywords carry that: the object is closed, so no new key can hold a pasted body, and `declared_interface` is capped at 400 characters, which no procedural body fits inside. Neither keyword can detect a body compressed into 400 characters, so the manifest audit re-reads the digest rather than trusting this field.",
+      "properties": {
+        "skill_name": {"type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$", "maxLength": 64},
+        "skill_md_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "skill_md_bytes": {"type": "integer", "minimum": 1},
+        "observed_commit": {"$ref": "#/$defs/commit"},
+        "declared_interface": {"type": "string", "minLength": 8, "maxLength": 400}
+      }
+    },
+    "start_dependency": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["atom_id", "satisfied_by", "interface_ref"],
+      "properties": {
+        "atom_id": {"type": "string", "minLength": 2, "maxLength": 64},
+        "satisfied_by": {"const": "READABLE_INTERFACE"},
+        "interface_ref": {"type": "string", "minLength": 2, "maxLength": 200}
+      }
+    },
+    "completion_dependency": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["atom_id", "satisfied_by", "receipt_ref"],
+      "properties": {
+        "atom_id": {"type": "string", "minLength": 2, "maxLength": 64},
+        "satisfied_by": {"const": "ADMITTED_RECEIPT"},
+        "receipt_ref": {"type": "string", "minLength": 2, "maxLength": 200}
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "merge",
+        "release",
+        "product_truth",
+        "user_truth",
+        "paid_truth",
+        "rights_admission",
+        "provider_execution",
+        "production"
+      ],
+      "description": "Eight constants, all false. They are constants rather than booleans because a field that can be set to true is a field somebody eventually sets to true, and the point of writing them down is that no instance of this schema can claim any of them.",
+      "properties": {
+        "merge": {"const": false},
+        "release": {"const": false},
+        "product_truth": {"const": false},
+        "user_truth": {"const": false},
+        "paid_truth": {"const": false},
+        "rights_admission": {"const": false},
+        "provider_execution": {"const": false},
+        "production": {"const": false}
+      }
+    }
+  },
+  "examples": [
+    {
+      "schema": "pol/productization-program/v1",
+      "program_id": "POL-PROG-001",
+      "subject_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+      "subject_tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7",
+      "program_state": "CONTROL_AND_AUTHORITY_BOUND",
+      "evidence_ceiling": "INTERFACE_LOCK_ONLY",
+      "lanes": {
+        "source": {"state": "PASS", "highest_rung_reached": "SOURCE_VERIFIED", "note": "one source proposal located and read back at its exact commit"},
+        "market": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+        "user": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+        "mechanism": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+        "technical": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE", "note": "contract validation is not the MVP arrival this lane measures"},
+        "policy": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+        "rights": {"state": "UNKNOWN", "highest_rung_reached": "NONE", "note": "no rights question was asked, so the answer is not known rather than clear"},
+        "commercial": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+        "runtime": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+        "human_admit": {"state": "HUMAN_ADMIT_REQUIRED", "highest_rung_reached": "NONE"},
+        "merge": {"state": "HUMAN_ADMIT_REQUIRED", "highest_rung_reached": "NONE"},
+        "release": {"state": "HUMAN_ADMIT_REQUIRED", "highest_rung_reached": "NONE"}
+      },
+      "evidence_ladder": {
+        "source_found": {
+          "state": "REACHED",
+          "receipts": [{"kind": "SOURCE_LOCATED", "subject_commit": "0be0d4d37869a4fa6eb2fe136d471d40a5eaddad", "note": "preparation branch head enumerated"}]
+        },
+        "source_verified": {
+          "state": "REACHED",
+          "receipts": [{"kind": "INDEPENDENT_SOURCE_READBACK", "subject_commit": "0be0d4d37869a4fa6eb2fe136d471d40a5eaddad", "note": "every file on that head read from the object store, not from a summary"}]
+        },
+        "job_supported": {"state": "NOT_REACHED", "receipts": []},
+        "wedge_supported": {"state": "NOT_REACHED", "receipts": []},
+        "mechanism_reproduced": {"state": "NOT_REACHED", "receipts": []},
+        "mvp_tech_verified": {"state": "NOT_EXERCISED", "receipts": []},
+        "live_workflow_verified": {"state": "NOT_EXERCISED", "receipts": []},
+        "user_validated": {"state": "NOT_EXERCISED", "receipts": []},
+        "paid_validated": {"state": "NOT_EXERCISED", "receipts": []},
+        "repeatable_commercial": {"state": "NOT_EXERCISED", "receipts": []}
+      },
+      "method_refs": [
+        {
+          "skill_name": "product-reverse-engineering-loop",
+          "skill_md_sha256": "0e4aeff70b2dd68edc03a32c8857b96a2221cd20b8d98d2dbf8c40d7b14e6029",
+          "skill_md_bytes": 11236,
+          "observed_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+          "declared_interface": "in: one external product subject at an exact identity. out: job, pain and mechanism signals with a closure matrix. never: market demand, user validation or payment."
+        },
+        {
+          "skill_name": "procedural-shadow-runtime",
+          "skill_md_sha256": "6497cd54c5b4112f2662d181c512b9491f07bb1d66765cdf584ef4ea2bc4cb7c",
+          "skill_md_bytes": 13665,
+          "observed_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+          "declared_interface": "in: one closed subject and its claimed closure. out: read-only findings and planted-control results. never: a mutation, a repair, or admission of its own findings."
+        }
+      ],
+      "start_dependencies": [
+        {"atom_id": "POL-0", "satisfied_by": "READABLE_INTERFACE", "interface_ref": "preparation packet readable at an exact head"}
+      ],
+      "completion_dependencies": [
+        {"atom_id": "POL-0", "satisfied_by": "ADMITTED_RECEIPT", "receipt_ref": "preimplementation admission receipt recorded by the program owner"}
+      ],
+      "human_owned_operations": [
+        "merge and release",
+        "rights and licensing admission",
+        "real user and payment truth",
+        "provider or model execution authorisation"
+      ],
+      "authority": {
+        "merge": false,
+        "release": false,
+        "product_truth": false,
+        "user_truth": false,
+        "paid_truth": false,
+        "rights_admission": false,
+        "provider_execution": false,
+        "production": false
+      },
+      "rollback": {"base_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17"}
+    }
+  ],
+  "x-refusal-controls": [
+    {
+      "case_id": "POL-XC-PP-001",
+      "refuses": "A program that drops an evidence lane instead of reporting what happened in it.",
+      "refused_by": "properties.lanes.required",
+      "instance": {
+        "schema": "pol/productization-program/v1",
+        "program_id": "POL-PROG-002",
+        "subject_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "subject_tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7",
+        "program_state": "CONTROL_AND_AUTHORITY_BOUND",
+        "evidence_ceiling": "INTERFACE_LOCK_ONLY",
+        "lanes": {
+          "source": {"state": "PASS", "highest_rung_reached": "SOURCE_VERIFIED"},
+          "market": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "user": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "mechanism": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "technical": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "policy": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "commercial": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "runtime": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "human_admit": {"state": "HUMAN_ADMIT_REQUIRED", "highest_rung_reached": "NONE"},
+          "merge": {"state": "HUMAN_ADMIT_REQUIRED", "highest_rung_reached": "NONE"},
+          "release": {"state": "HUMAN_ADMIT_REQUIRED", "highest_rung_reached": "NONE"}
+        },
+        "evidence_ladder": {
+          "source_found": {"state": "NOT_EXERCISED", "receipts": []},
+          "source_verified": {"state": "NOT_EXERCISED", "receipts": []},
+          "job_supported": {"state": "NOT_EXERCISED", "receipts": []},
+          "wedge_supported": {"state": "NOT_EXERCISED", "receipts": []},
+          "mechanism_reproduced": {"state": "NOT_EXERCISED", "receipts": []},
+          "mvp_tech_verified": {"state": "NOT_EXERCISED", "receipts": []},
+          "live_workflow_verified": {"state": "NOT_EXERCISED", "receipts": []},
+          "user_validated": {"state": "NOT_EXERCISED", "receipts": []},
+          "paid_validated": {"state": "NOT_EXERCISED", "receipts": []},
+          "repeatable_commercial": {"state": "NOT_EXERCISED", "receipts": []}
+        },
+        "method_refs": [
+          {
+            "skill_name": "product-reverse-engineering-loop",
+            "skill_md_sha256": "0e4aeff70b2dd68edc03a32c8857b96a2221cd20b8d98d2dbf8c40d7b14e6029",
+            "skill_md_bytes": 11236,
+            "observed_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+            "declared_interface": "in: one external product subject. out: job, pain and mechanism signals."
+          }
+        ],
+        "start_dependencies": [],
+        "completion_dependencies": [],
+        "human_owned_operations": ["merge and release"],
+        "authority": {
+          "merge": false,
+          "release": false,
+          "product_truth": false,
+          "user_truth": false,
+          "paid_truth": false,
+          "rights_admission": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "rollback": {"base_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17"}
+      }
+    },
+    {
+      "case_id": "POL-XC-PP-002",
+      "refuses": "Two lanes fused into one invented key, which reads as a lane and answers for two.",
+      "refused_by": "properties.lanes.additionalProperties",
+      "instance": {
+        "schema": "pol/productization-program/v1",
+        "program_id": "POL-PROG-003",
+        "subject_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "subject_tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7",
+        "program_state": "MARKET_ARENA_BOUND",
+        "evidence_ceiling": "MARKET_HYPOTHESIS_CONTRACT",
+        "lanes": {
+          "source": {"state": "PASS", "highest_rung_reached": "SOURCE_VERIFIED"},
+          "market": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "user": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "mechanism": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "technical": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "policy": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "rights": {"state": "UNKNOWN", "highest_rung_reached": "NONE"},
+          "commercial": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "runtime": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "human_admit": {"state": "HUMAN_ADMIT_REQUIRED", "highest_rung_reached": "NONE"},
+          "merge": {"state": "HUMAN_ADMIT_REQUIRED", "highest_rung_reached": "NONE"},
+          "release": {"state": "HUMAN_ADMIT_REQUIRED", "highest_rung_reached": "NONE"},
+          "market_and_user": {"state": "PASS", "highest_rung_reached": "WEDGE_SUPPORTED"}
+        },
+        "evidence_ladder": {
+          "source_found": {"state": "NOT_EXERCISED", "receipts": []},
+          "source_verified": {"state": "NOT_EXERCISED", "receipts": []},
+          "job_supported": {"state": "NOT_EXERCISED", "receipts": []},
+          "wedge_supported": {"state": "NOT_EXERCISED", "receipts": []},
+          "mechanism_reproduced": {"state": "NOT_EXERCISED", "receipts": []},
+          "mvp_tech_verified": {"state": "NOT_EXERCISED", "receipts": []},
+          "live_workflow_verified": {"state": "NOT_EXERCISED", "receipts": []},
+          "user_validated": {"state": "NOT_EXERCISED", "receipts": []},
+          "paid_validated": {"state": "NOT_EXERCISED", "receipts": []},
+          "repeatable_commercial": {"state": "NOT_EXERCISED", "receipts": []}
+        },
+        "method_refs": [
+          {
+            "skill_name": "product-reverse-engineering-loop",
+            "skill_md_sha256": "0e4aeff70b2dd68edc03a32c8857b96a2221cd20b8d98d2dbf8c40d7b14e6029",
+            "skill_md_bytes": 11236,
+            "observed_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+            "declared_interface": "in: one external product subject. out: job, pain and mechanism signals."
+          }
+        ],
+        "start_dependencies": [],
+        "completion_dependencies": [],
+        "human_owned_operations": ["merge and release"],
+        "authority": {
+          "merge": false,
+          "release": false,
+          "product_truth": false,
+          "user_truth": false,
+          "paid_truth": false,
+          "rights_admission": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "rollback": {"base_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17"}
+      }
+    },
+    {
+      "case_id": "POL-XC-PP-003",
+      "refuses": "Rung skipping: a payment reported as reached while the user rung below it is not.",
+      "refused_by": "properties.evidence_ladder.allOf[8].then.properties.user_validated.properties.state.const",
+      "instance": {
+        "schema": "pol/productization-program/v1",
+        "program_id": "POL-PROG-004",
+        "subject_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "subject_tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7",
+        "program_state": "OUTCOME_READ_BACK",
+        "evidence_ceiling": "BOUNDED_REAL_EXPERIMENT_ONLY",
+        "lanes": {
+          "source": {"state": "PASS", "highest_rung_reached": "SOURCE_VERIFIED"},
+          "market": {"state": "PASS", "highest_rung_reached": "WEDGE_SUPPORTED"},
+          "user": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "mechanism": {"state": "PASS", "highest_rung_reached": "MECHANISM_REPRODUCED"},
+          "technical": {"state": "PASS", "highest_rung_reached": "MVP_TECH_VERIFIED"},
+          "policy": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "rights": {"state": "UNKNOWN", "highest_rung_reached": "NONE"},
+          "commercial": {"state": "PASS", "highest_rung_reached": "PAID_VALIDATED"},
+          "runtime": {"state": "PASS", "highest_rung_reached": "LIVE_WORKFLOW_VERIFIED"},
+          "human_admit": {"state": "HUMAN_ADMIT_REQUIRED", "highest_rung_reached": "NONE"},
+          "merge": {"state": "HUMAN_ADMIT_REQUIRED", "highest_rung_reached": "NONE"},
+          "release": {"state": "HUMAN_ADMIT_REQUIRED", "highest_rung_reached": "NONE"}
+        },
+        "evidence_ladder": {
+          "source_found": {"state": "REACHED", "receipts": [{"kind": "SOURCE_LOCATED", "subject_commit": "0be0d4d37869a4fa6eb2fe136d471d40a5eaddad"}]},
+          "source_verified": {"state": "REACHED", "receipts": [{"kind": "INDEPENDENT_SOURCE_READBACK", "subject_commit": "0be0d4d37869a4fa6eb2fe136d471d40a5eaddad"}]},
+          "job_supported": {"state": "REACHED", "receipts": [{"kind": "JOB_EVIDENCE_TRACE", "subject_commit": "0be0d4d37869a4fa6eb2fe136d471d40a5eaddad"}]},
+          "wedge_supported": {"state": "REACHED", "receipts": [{"kind": "COMPARATOR_CASE_TRACE", "subject_commit": "0be0d4d37869a4fa6eb2fe136d471d40a5eaddad"}]},
+          "mechanism_reproduced": {"state": "REACHED", "receipts": [{"kind": "MECHANISM_REPLAY", "subject_commit": "0be0d4d37869a4fa6eb2fe136d471d40a5eaddad"}]},
+          "mvp_tech_verified": {"state": "REACHED", "receipts": [{"kind": "DETERMINISTIC_COMMAND_EXIT", "subject_commit": "0be0d4d37869a4fa6eb2fe136d471d40a5eaddad"}]},
+          "live_workflow_verified": {"state": "REACHED", "receipts": [{"kind": "LIVE_WORKFLOW_TRACE", "subject_commit": "0be0d4d37869a4fa6eb2fe136d471d40a5eaddad"}]},
+          "user_validated": {"state": "NOT_EXERCISED", "receipts": []},
+          "paid_validated": {"state": "REACHED", "receipts": [{"kind": "PAYMENT_RECORD", "subject_commit": "0be0d4d37869a4fa6eb2fe136d471d40a5eaddad"}]},
+          "repeatable_commercial": {"state": "NOT_REACHED", "receipts": []}
+        },
+        "method_refs": [
+          {
+            "skill_name": "dr-to-mvp",
+            "skill_md_sha256": "1332f5ce132f55d9f3421d3fdb77633ba474759c4768349785435780cfc19993",
+            "skill_md_bytes": 3424,
+            "observed_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+            "declared_interface": "in: a verified corpus and a bounded question. out: a graduated minimum runtime with stop-loss. never: user or paid truth."
+          }
+        ],
+        "start_dependencies": [],
+        "completion_dependencies": [],
+        "human_owned_operations": ["merge and release"],
+        "authority": {
+          "merge": false,
+          "release": false,
+          "product_truth": false,
+          "user_truth": false,
+          "paid_truth": false,
+          "rights_admission": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "rollback": {"base_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17"}
+      }
+    },
+    {
+      "case_id": "POL-XC-PP-004",
+      "refuses": "Rung promotion: a green command exit filed as the evidence that somebody paid.",
+      "refused_by": "properties.evidence_ladder.allOf[8].then.properties.paid_validated.properties.receipts.contains",
+      "instance": {
+        "schema": "pol/productization-program/v1",
+        "program_id": "POL-PROG-005",
+        "subject_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "subject_tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7",
+        "program_state": "OUTCOME_READ_BACK",
+        "evidence_ceiling": "BOUNDED_REAL_EXPERIMENT_ONLY",
+        "lanes": {
+          "source": {"state": "PASS", "highest_rung_reached": "SOURCE_VERIFIED"},
+          "market": {"state": "PASS", "highest_rung_reached": "WEDGE_SUPPORTED"},
+          "user": {"state": "PASS", "highest_rung_reached": "USER_VALIDATED"},
+          "mechanism": {"state": "PASS", "highest_rung_reached": "MECHANISM_REPRODUCED"},
+          "technical": {"state": "PASS", "highest_rung_reached": "MVP_TECH_VERIFIED"},
+          "policy": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "rights": {"state": "UNKNOWN", "highest_rung_reached": "NONE"},
+          "commercial": {"state": "PASS", "highest_rung_reached": "PAID_VALIDATED"},
+          "runtime": {"state": "PASS", "highest_rung_reached": "LIVE_WORKFLOW_VERIFIED"},
+          "human_admit": {"state": "HUMAN_ADMIT_REQUIRED", "highest_rung_reached": "NONE"},
+          "merge": {"state": "HUMAN_ADMIT_REQUIRED", "highest_rung_reached": "NONE"},
+          "release": {"state": "HUMAN_ADMIT_REQUIRED", "highest_rung_reached": "NONE"}
+        },
+        "evidence_ladder": {
+          "source_found": {"state": "REACHED", "receipts": [{"kind": "SOURCE_LOCATED", "subject_commit": "0be0d4d37869a4fa6eb2fe136d471d40a5eaddad"}]},
+          "source_verified": {"state": "REACHED", "receipts": [{"kind": "INDEPENDENT_SOURCE_READBACK", "subject_commit": "0be0d4d37869a4fa6eb2fe136d471d40a5eaddad"}]},
+          "job_supported": {"state": "REACHED", "receipts": [{"kind": "JOB_EVIDENCE_TRACE", "subject_commit": "0be0d4d37869a4fa6eb2fe136d471d40a5eaddad"}]},
+          "wedge_supported": {"state": "REACHED", "receipts": [{"kind": "COMPARATOR_CASE_TRACE", "subject_commit": "0be0d4d37869a4fa6eb2fe136d471d40a5eaddad"}]},
+          "mechanism_reproduced": {"state": "REACHED", "receipts": [{"kind": "MECHANISM_REPLAY", "subject_commit": "0be0d4d37869a4fa6eb2fe136d471d40a5eaddad"}]},
+          "mvp_tech_verified": {"state": "REACHED", "receipts": [{"kind": "DETERMINISTIC_COMMAND_EXIT", "subject_commit": "0be0d4d37869a4fa6eb2fe136d471d40a5eaddad"}]},
+          "live_workflow_verified": {"state": "REACHED", "receipts": [{"kind": "LIVE_WORKFLOW_TRACE", "subject_commit": "0be0d4d37869a4fa6eb2fe136d471d40a5eaddad"}]},
+          "user_validated": {"state": "REACHED", "receipts": [{"kind": "REAL_USER_OBSERVATION", "subject_commit": "0be0d4d37869a4fa6eb2fe136d471d40a5eaddad"}]},
+          "paid_validated": {"state": "REACHED", "receipts": [{"kind": "DETERMINISTIC_COMMAND_EXIT", "subject_commit": "0be0d4d37869a4fa6eb2fe136d471d40a5eaddad", "note": "the checkout suite went green"}]},
+          "repeatable_commercial": {"state": "NOT_REACHED", "receipts": []}
+        },
+        "method_refs": [
+          {
+            "skill_name": "dr-to-mvp",
+            "skill_md_sha256": "1332f5ce132f55d9f3421d3fdb77633ba474759c4768349785435780cfc19993",
+            "skill_md_bytes": 3424,
+            "observed_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+            "declared_interface": "in: a verified corpus and a bounded question. out: a graduated minimum runtime with stop-loss. never: user or paid truth."
+          }
+        ],
+        "start_dependencies": [],
+        "completion_dependencies": [],
+        "human_owned_operations": ["merge and release"],
+        "authority": {
+          "merge": false,
+          "release": false,
+          "product_truth": false,
+          "user_truth": false,
+          "paid_truth": false,
+          "rights_admission": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "rollback": {"base_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17"}
+      }
+    },
+    {
+      "case_id": "POL-XC-PP-005",
+      "refuses": "A mutable subject: a branch name where a content-bound identity belongs.",
+      "refused_by": "properties.subject_commit.pattern",
+      "instance": {
+        "schema": "pol/productization-program/v1",
+        "program_id": "POL-PROG-006",
+        "subject_commit": "main",
+        "subject_tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7",
+        "program_state": "CONTROL_AND_AUTHORITY_BOUND",
+        "evidence_ceiling": "INTERFACE_LOCK_ONLY",
+        "lanes": {
+          "source": {"state": "PASS", "highest_rung_reached": "SOURCE_VERIFIED"},
+          "market": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "user": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "mechanism": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "technical": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "policy": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "rights": {"state": "UNKNOWN", "highest_rung_reached": "NONE"},
+          "commercial": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "runtime": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "human_admit": {"state": "HUMAN_ADMIT_REQUIRED", "highest_rung_reached": "NONE"},
+          "merge": {"state": "HUMAN_ADMIT_REQUIRED", "highest_rung_reached": "NONE"},
+          "release": {"state": "HUMAN_ADMIT_REQUIRED", "highest_rung_reached": "NONE"}
+        },
+        "evidence_ladder": {
+          "source_found": {"state": "NOT_EXERCISED", "receipts": []},
+          "source_verified": {"state": "NOT_EXERCISED", "receipts": []},
+          "job_supported": {"state": "NOT_EXERCISED", "receipts": []},
+          "wedge_supported": {"state": "NOT_EXERCISED", "receipts": []},
+          "mechanism_reproduced": {"state": "NOT_EXERCISED", "receipts": []},
+          "mvp_tech_verified": {"state": "NOT_EXERCISED", "receipts": []},
+          "live_workflow_verified": {"state": "NOT_EXERCISED", "receipts": []},
+          "user_validated": {"state": "NOT_EXERCISED", "receipts": []},
+          "paid_validated": {"state": "NOT_EXERCISED", "receipts": []},
+          "repeatable_commercial": {"state": "NOT_EXERCISED", "receipts": []}
+        },
+        "method_refs": [
+          {
+            "skill_name": "truth-verify-loop",
+            "skill_md_sha256": "842fc65f17418c7d508c4acdffa6cf2a0602e12eb113dcf91d1e10f7335baf1b",
+            "skill_md_bytes": 3232,
+            "observed_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+            "declared_interface": "in: a claim set. out: per-claim verification with an independent judge. never: admission of its own verdict."
+          }
+        ],
+        "start_dependencies": [],
+        "completion_dependencies": [],
+        "human_owned_operations": ["merge and release"],
+        "authority": {
+          "merge": false,
+          "release": false,
+          "product_truth": false,
+          "user_truth": false,
+          "paid_truth": false,
+          "rights_admission": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "rollback": {"base_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17"}
+      }
+    },
+    {
+      "case_id": "POL-XC-PP-006",
+      "refuses": "A duplicated Skill body: a method reference carrying the procedure it was supposed to reference.",
+      "refused_by": "$defs.method_ref.additionalProperties",
+      "instance": {
+        "schema": "pol/productization-program/v1",
+        "program_id": "POL-PROG-007",
+        "subject_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "subject_tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7",
+        "program_state": "CONTROL_AND_AUTHORITY_BOUND",
+        "evidence_ceiling": "INTERFACE_LOCK_ONLY",
+        "lanes": {
+          "source": {"state": "PASS", "highest_rung_reached": "SOURCE_VERIFIED"},
+          "market": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "user": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "mechanism": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "technical": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "policy": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "rights": {"state": "UNKNOWN", "highest_rung_reached": "NONE"},
+          "commercial": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "runtime": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "human_admit": {"state": "HUMAN_ADMIT_REQUIRED", "highest_rung_reached": "NONE"},
+          "merge": {"state": "HUMAN_ADMIT_REQUIRED", "highest_rung_reached": "NONE"},
+          "release": {"state": "HUMAN_ADMIT_REQUIRED", "highest_rung_reached": "NONE"}
+        },
+        "evidence_ladder": {
+          "source_found": {"state": "NOT_EXERCISED", "receipts": []},
+          "source_verified": {"state": "NOT_EXERCISED", "receipts": []},
+          "job_supported": {"state": "NOT_EXERCISED", "receipts": []},
+          "wedge_supported": {"state": "NOT_EXERCISED", "receipts": []},
+          "mechanism_reproduced": {"state": "NOT_EXERCISED", "receipts": []},
+          "mvp_tech_verified": {"state": "NOT_EXERCISED", "receipts": []},
+          "live_workflow_verified": {"state": "NOT_EXERCISED", "receipts": []},
+          "user_validated": {"state": "NOT_EXERCISED", "receipts": []},
+          "paid_validated": {"state": "NOT_EXERCISED", "receipts": []},
+          "repeatable_commercial": {"state": "NOT_EXERCISED", "receipts": []}
+        },
+        "method_refs": [
+          {
+            "skill_name": "unknown-discovery-composer",
+            "skill_md_sha256": "d6c71457a524f800882bb1dbcd8efeb88de1123c1323b8d643d71cf1d644555c",
+            "skill_md_bytes": 3469,
+            "observed_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+            "declared_interface": "in: a request whose unknowns are not enumerated. out: routed unknowns with an actor and a validator each.",
+            "skill_body": "## Step 1 ... the pasted procedural body of the referenced Skill ..."
+          }
+        ],
+        "start_dependencies": [],
+        "completion_dependencies": [],
+        "human_owned_operations": ["merge and release"],
+        "authority": {
+          "merge": false,
+          "release": false,
+          "product_truth": false,
+          "user_truth": false,
+          "paid_truth": false,
+          "rights_admission": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "rollback": {"base_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17"}
+      }
+    },
+    {
+      "case_id": "POL-XC-PP-007",
+      "refuses": "A body smuggled into the interface field, where no new key is needed to hold it.",
+      "refused_by": "$defs.method_ref.properties.declared_interface.maxLength",
+      "instance": {
+        "schema": "pol/productization-program/v1",
+        "program_id": "POL-PROG-008",
+        "subject_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "subject_tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7",
+        "program_state": "CONTROL_AND_AUTHORITY_BOUND",
+        "evidence_ceiling": "INTERFACE_LOCK_ONLY",
+        "lanes": {
+          "source": {"state": "PASS", "highest_rung_reached": "SOURCE_VERIFIED"},
+          "market": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "user": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "mechanism": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "technical": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "policy": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "rights": {"state": "UNKNOWN", "highest_rung_reached": "NONE"},
+          "commercial": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "runtime": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "human_admit": {"state": "HUMAN_ADMIT_REQUIRED", "highest_rung_reached": "NONE"},
+          "merge": {"state": "HUMAN_ADMIT_REQUIRED", "highest_rung_reached": "NONE"},
+          "release": {"state": "HUMAN_ADMIT_REQUIRED", "highest_rung_reached": "NONE"}
+        },
+        "evidence_ladder": {
+          "source_found": {"state": "NOT_EXERCISED", "receipts": []},
+          "source_verified": {"state": "NOT_EXERCISED", "receipts": []},
+          "job_supported": {"state": "NOT_EXERCISED", "receipts": []},
+          "wedge_supported": {"state": "NOT_EXERCISED", "receipts": []},
+          "mechanism_reproduced": {"state": "NOT_EXERCISED", "receipts": []},
+          "mvp_tech_verified": {"state": "NOT_EXERCISED", "receipts": []},
+          "live_workflow_verified": {"state": "NOT_EXERCISED", "receipts": []},
+          "user_validated": {"state": "NOT_EXERCISED", "receipts": []},
+          "paid_validated": {"state": "NOT_EXERCISED", "receipts": []},
+          "repeatable_commercial": {"state": "NOT_EXERCISED", "receipts": []}
+        },
+        "method_refs": [
+          {
+            "skill_name": "agentic-tech-lead-orchestration",
+            "skill_md_sha256": "8a295169f382a8a3df93458e8553d35b676d8078ac80f1c1bd56cb6dd15c3229",
+            "skill_md_bytes": 18032,
+            "observed_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+            "declared_interface": "Step one, bind the exact subject and read every nearest instruction file in order before writing anything at all. Step two, enumerate the atoms and give each one exactly one owner, one declared path lease and one writer, and never let two atoms share a mutable path. Step three, separate the start-dependency graph from the completion-dependency graph, because an atom whose predecessor is merely readable is not an atom whose predecessor has produced a receipt. Step four, dispatch one active writer at a time and collect a completion packet from each."
+          }
+        ],
+        "start_dependencies": [],
+        "completion_dependencies": [],
+        "human_owned_operations": ["merge and release"],
+        "authority": {
+          "merge": false,
+          "release": false,
+          "product_truth": false,
+          "user_truth": false,
+          "paid_truth": false,
+          "rights_admission": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "rollback": {"base_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17"}
+      }
+    },
+    {
+      "case_id": "POL-XC-PP-008",
+      "refuses": "Human-authority widening at the lane: merge reported as a lane this method cleared.",
+      "refused_by": "$defs.human_lane.properties.state.enum",
+      "instance": {
+        "schema": "pol/productization-program/v1",
+        "program_id": "POL-PROG-009",
+        "subject_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "subject_tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7",
+        "program_state": "SHADOW_CLOSURE_AUDITED",
+        "evidence_ceiling": "DETERMINISTIC_EVAL_AND_SHADOW",
+        "lanes": {
+          "source": {"state": "PASS", "highest_rung_reached": "SOURCE_VERIFIED"},
+          "market": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "user": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "mechanism": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "technical": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "policy": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "rights": {"state": "UNKNOWN", "highest_rung_reached": "NONE"},
+          "commercial": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "runtime": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "human_admit": {"state": "HUMAN_ADMIT_REQUIRED", "highest_rung_reached": "NONE"},
+          "merge": {"state": "PASS", "highest_rung_reached": "NONE"},
+          "release": {"state": "HUMAN_ADMIT_REQUIRED", "highest_rung_reached": "NONE"}
+        },
+        "evidence_ladder": {
+          "source_found": {"state": "NOT_EXERCISED", "receipts": []},
+          "source_verified": {"state": "NOT_EXERCISED", "receipts": []},
+          "job_supported": {"state": "NOT_EXERCISED", "receipts": []},
+          "wedge_supported": {"state": "NOT_EXERCISED", "receipts": []},
+          "mechanism_reproduced": {"state": "NOT_EXERCISED", "receipts": []},
+          "mvp_tech_verified": {"state": "NOT_EXERCISED", "receipts": []},
+          "live_workflow_verified": {"state": "NOT_EXERCISED", "receipts": []},
+          "user_validated": {"state": "NOT_EXERCISED", "receipts": []},
+          "paid_validated": {"state": "NOT_EXERCISED", "receipts": []},
+          "repeatable_commercial": {"state": "NOT_EXERCISED", "receipts": []}
+        },
+        "method_refs": [
+          {
+            "skill_name": "procedural-shadow-runtime",
+            "skill_md_sha256": "6497cd54c5b4112f2662d181c512b9491f07bb1d66765cdf584ef4ea2bc4cb7c",
+            "skill_md_bytes": 13665,
+            "observed_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+            "declared_interface": "in: one closed subject and its claimed closure. out: read-only findings. never: a mutation or admission."
+          }
+        ],
+        "start_dependencies": [],
+        "completion_dependencies": [],
+        "human_owned_operations": ["merge and release"],
+        "authority": {
+          "merge": false,
+          "release": false,
+          "product_truth": false,
+          "user_truth": false,
+          "paid_truth": false,
+          "rights_admission": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "rollback": {"base_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17"}
+      }
+    },
+    {
+      "case_id": "POL-XC-PP-009",
+      "refuses": "Human-authority widening at the top: a program asserting merge authority for itself.",
+      "refused_by": "$defs.authority.properties.merge.const",
+      "instance": {
+        "schema": "pol/productization-program/v1",
+        "program_id": "POL-PROG-010",
+        "subject_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "subject_tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7",
+        "program_state": "SHADOW_CLOSURE_AUDITED",
+        "evidence_ceiling": "DETERMINISTIC_EVAL_AND_SHADOW",
+        "lanes": {
+          "source": {"state": "PASS", "highest_rung_reached": "SOURCE_VERIFIED"},
+          "market": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "user": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "mechanism": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "technical": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "policy": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "rights": {"state": "UNKNOWN", "highest_rung_reached": "NONE"},
+          "commercial": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "runtime": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "human_admit": {"state": "HUMAN_ADMIT_REQUIRED", "highest_rung_reached": "NONE"},
+          "merge": {"state": "HUMAN_ADMIT_REQUIRED", "highest_rung_reached": "NONE"},
+          "release": {"state": "HUMAN_ADMIT_REQUIRED", "highest_rung_reached": "NONE"}
+        },
+        "evidence_ladder": {
+          "source_found": {"state": "NOT_EXERCISED", "receipts": []},
+          "source_verified": {"state": "NOT_EXERCISED", "receipts": []},
+          "job_supported": {"state": "NOT_EXERCISED", "receipts": []},
+          "wedge_supported": {"state": "NOT_EXERCISED", "receipts": []},
+          "mechanism_reproduced": {"state": "NOT_EXERCISED", "receipts": []},
+          "mvp_tech_verified": {"state": "NOT_EXERCISED", "receipts": []},
+          "live_workflow_verified": {"state": "NOT_EXERCISED", "receipts": []},
+          "user_validated": {"state": "NOT_EXERCISED", "receipts": []},
+          "paid_validated": {"state": "NOT_EXERCISED", "receipts": []},
+          "repeatable_commercial": {"state": "NOT_EXERCISED", "receipts": []}
+        },
+        "method_refs": [
+          {
+            "skill_name": "git-town-stacked-pr-worker",
+            "skill_md_sha256": "e1ca4939ee04cec59a667ee2a8b49f2179311fc61bbb428700159d9ab6ce4308",
+            "skill_md_bytes": 6920,
+            "observed_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+            "declared_interface": "in: an atom with one writer and one lease. out: a stacked branch and its delivery receipt. never: the merge itself."
+          }
+        ],
+        "start_dependencies": [],
+        "completion_dependencies": [],
+        "human_owned_operations": ["merge and release"],
+        "authority": {
+          "merge": true,
+          "release": false,
+          "product_truth": false,
+          "user_truth": false,
+          "paid_truth": false,
+          "rights_admission": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "rollback": {"base_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17"}
+      }
+    },
+    {
+      "case_id": "POL-XC-PP-010",
+      "refuses": "Dependency collapse: a readable interface offered where an admitted receipt is owed.",
+      "refused_by": "$defs.completion_dependency.properties.satisfied_by.const",
+      "instance": {
+        "schema": "pol/productization-program/v1",
+        "program_id": "POL-PROG-011",
+        "subject_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "subject_tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7",
+        "program_state": "ISSUE_AND_SESSION_DAG_BOUND",
+        "evidence_ceiling": "DETERMINISTIC_COMPOSITION",
+        "lanes": {
+          "source": {"state": "PASS", "highest_rung_reached": "SOURCE_VERIFIED"},
+          "market": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "user": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "mechanism": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "technical": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "policy": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "rights": {"state": "UNKNOWN", "highest_rung_reached": "NONE"},
+          "commercial": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "runtime": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "human_admit": {"state": "HUMAN_ADMIT_REQUIRED", "highest_rung_reached": "NONE"},
+          "merge": {"state": "HUMAN_ADMIT_REQUIRED", "highest_rung_reached": "NONE"},
+          "release": {"state": "HUMAN_ADMIT_REQUIRED", "highest_rung_reached": "NONE"}
+        },
+        "evidence_ladder": {
+          "source_found": {"state": "NOT_EXERCISED", "receipts": []},
+          "source_verified": {"state": "NOT_EXERCISED", "receipts": []},
+          "job_supported": {"state": "NOT_EXERCISED", "receipts": []},
+          "wedge_supported": {"state": "NOT_EXERCISED", "receipts": []},
+          "mechanism_reproduced": {"state": "NOT_EXERCISED", "receipts": []},
+          "mvp_tech_verified": {"state": "NOT_EXERCISED", "receipts": []},
+          "live_workflow_verified": {"state": "NOT_EXERCISED", "receipts": []},
+          "user_validated": {"state": "NOT_EXERCISED", "receipts": []},
+          "paid_validated": {"state": "NOT_EXERCISED", "receipts": []},
+          "repeatable_commercial": {"state": "NOT_EXERCISED", "receipts": []}
+        },
+        "method_refs": [
+          {
+            "skill_name": "agentic-tech-lead-orchestration",
+            "skill_md_sha256": "8a295169f382a8a3df93458e8553d35b676d8078ac80f1c1bd56cb6dd15c3229",
+            "skill_md_bytes": 18032,
+            "observed_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+            "declared_interface": "in: one admitted program. out: an atom DAG with one owner and one lease each. never: its own completion evidence."
+          }
+        ],
+        "start_dependencies": [
+          {"atom_id": "POL-M", "satisfied_by": "READABLE_INTERFACE", "interface_ref": "market lane contract readable"}
+        ],
+        "completion_dependencies": [
+          {"atom_id": "POL-M", "satisfied_by": "READABLE_INTERFACE", "receipt_ref": "market lane contract readable"}
+        ],
+        "human_owned_operations": ["merge and release"],
+        "authority": {
+          "merge": false,
+          "release": false,
+          "product_truth": false,
+          "user_truth": false,
+          "paid_truth": false,
+          "rights_admission": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "rollback": {"base_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17"}
+      }
+    },
+    {
+      "case_id": "POL-XC-PP-011",
+      "refuses": "A program filing itself as merged, which is an operation somebody performs and not a state this record reaches.",
+      "refused_by": "properties.program_state.enum",
+      "instance": {
+        "schema": "pol/productization-program/v1",
+        "program_id": "POL-PROG-012",
+        "subject_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "subject_tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7",
+        "program_state": "MERGED_AND_RELEASED",
+        "evidence_ceiling": "DETERMINISTIC_COMPOSITION",
+        "lanes": {
+          "source": {"state": "PASS", "highest_rung_reached": "SOURCE_VERIFIED"},
+          "market": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "user": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "mechanism": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "technical": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "policy": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "rights": {"state": "UNKNOWN", "highest_rung_reached": "NONE"},
+          "commercial": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "runtime": {"state": "NOT_EXERCISED", "highest_rung_reached": "NONE"},
+          "human_admit": {"state": "HUMAN_ADMIT_REQUIRED", "highest_rung_reached": "NONE"},
+          "merge": {"state": "HUMAN_ADMIT_REQUIRED", "highest_rung_reached": "NONE"},
+          "release": {"state": "HUMAN_ADMIT_REQUIRED", "highest_rung_reached": "NONE"}
+        },
+        "evidence_ladder": {
+          "source_found": {"state": "NOT_EXERCISED", "receipts": []},
+          "source_verified": {"state": "NOT_EXERCISED", "receipts": []},
+          "job_supported": {"state": "NOT_EXERCISED", "receipts": []},
+          "wedge_supported": {"state": "NOT_EXERCISED", "receipts": []},
+          "mechanism_reproduced": {"state": "NOT_EXERCISED", "receipts": []},
+          "mvp_tech_verified": {"state": "NOT_EXERCISED", "receipts": []},
+          "live_workflow_verified": {"state": "NOT_EXERCISED", "receipts": []},
+          "user_validated": {"state": "NOT_EXERCISED", "receipts": []},
+          "paid_validated": {"state": "NOT_EXERCISED", "receipts": []},
+          "repeatable_commercial": {"state": "NOT_EXERCISED", "receipts": []}
+        },
+        "method_refs": [
+          {
+            "skill_name": "dual-forge-repository-loop",
+            "skill_md_sha256": "68b24f148fd2911f7ae86aedbc908063a59051639bc357f8a061136b17d2c48b",
+            "skill_md_bytes": 6848,
+            "observed_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+            "declared_interface": "in: two forge planes and one exact subject. out: reconciled publication state by commit ancestry. never: the merge decision."
+          }
+        ],
+        "start_dependencies": [],
+        "completion_dependencies": [],
+        "human_owned_operations": ["merge and release"],
+        "authority": {
+          "merge": false,
+          "release": false,
+          "product_truth": false,
+          "user_truth": false,
+          "paid_truth": false,
+          "rights_admission": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "rollback": {"base_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17"}
+      }
+    }
+  ]
+}
