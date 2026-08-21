@@ -1,0 +1,38 @@
+{
+  "digest": "266afa0f90ac28bc9addfa3a3300f013f287303aa05f139d832700609c7bc777",
+  "epoch_id": "PORTFOLIO-EPOCH-20260822-B",
+  "observed_at": "2026-08-22T00:00:00Z",
+  "repositories": [
+    {
+      "default_branch": "main",
+      "full_name": "ed3c/skills-shared",
+      "issues": [
+        {
+          "number": 566,
+          "state": "OPEN",
+          "updated_at": "2026-08-22T00:00:00Z"
+        }
+      ],
+      "issues_observed_at": "2026-08-22T00:00:00Z",
+      "main_commit": "28f394785aa8b13c4e6d2f21ad74c5e32a6a6dc5",
+      "main_tree": "795de8e9ada4d0927f9a792760232ef75dda84e4",
+      "path_writers": [
+        "skills/agentic-tech-lead-orchestration/**"
+      ],
+      "prs_observed_at": "2026-08-22T00:00:00Z",
+      "pull_requests": [],
+      "visibility": "PUBLIC",
+      "workflows": [
+        "skill-suites.yml"
+      ],
+      "workflows_observed_at": "2026-08-22T00:00:00Z"
+    }
+  ],
+  "runtime": {
+    "authority_ceiling": "deterministic fixture",
+    "class": "CLAUDE_CODE_LOCAL",
+    "host": "wf_ad5dc8a8-d1d-1",
+    "local_checkout": "PASS"
+  },
+  "schema": "repository-portfolio-snapshot/v1"
+}
