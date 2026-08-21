@@ -10,7 +10,7 @@ This is the current cold-start route for issue/PR closure decisions after PR #51
 repository                 ed3c/skills-shared
 current admitted main      129f53c23a3ab15354763167b25bddc45f724c00
 current tree               d383769215a8a179bd9a8deb4f0118a61fab5aa3
-rollback / pre-#516 main   249abc47847f8295b1c75c9d4c84457c5126fd89
+rollback / pre-#516 main   88ce642a7f198d88019aa8ae19e63631ae4999c2
 receipt-bound subject      249abc47847f8295b1c75c9d4c84457c5126fd89 (the #508/#466/#512 receipts and queues below still bind this exact commit/tree; #516 only integrated the docs-only delta)
 
 #507 checked head          e306797fdbf4875bafd410fd415e6bcb3587ff9b
@@ -63,7 +63,7 @@ PR #516 executed the three ACTIVE Local Handoff Execution Queue items — #508, 
       to a herdr-0.8.0 API contract mismatch (no observation timestamp, process identity,
       or cleanup facts on AgentInfo); durable NOT_EXERCISED receipt landed, sample_count 0
 
-#508  CLOSED_DETERMINISTICALLY
+#508  ELIGIBLE_TO_CLOSE
       PR #516 landed durable result carrier, executor provenance, and strict
       worker-result schema; receipt data/handoff/codex-v2/issue-508-result-carrier-receipt.json,
       verdict PASS; live #464 acceptance of a fresh run remains a separate NOT_EXERCISED lane
@@ -89,10 +89,10 @@ PR #516 executed the three ACTIVE Local Handoff Execution Queue items — #508, 
 | #419 | `DRAFT / HOLD` | `MERGEABLE` per current readback; its `docs/INDEX.md` conflict against base `agent/spatial-intent-case-proof-graph-v1` was resolved by merge commit `94426ce` (unioned route-index prose, `check_document_routes.py` green); true child of #412, whose own close gates remain incomplete |
 | #420 | `DRAFT / HOLD` | `MERGEABLE` per current readback; design artifact only; deterministic/runtime close gates remain incomplete |
 | #450 | `DRAFT / HOLD` | `MERGEABLE` per current readback; #448 exact-head hosted receipt and later traversal/runtime lanes remain missing |
-| #434 | `DRAFT / BLOCKED` | `MERGEABLE` per current readback; repository-wide admission is blocked by #436 commit-provenance rebuild; Productization implementation is not present |
+| #434 | `CLOSED_UNMERGED (2026-08-21)` | closed on GitHub before this pass; Productization rebuild remains owned by #436 |
 | #395 → #396 | `DRAFT STACK / HOLD` | both `MERGEABLE` per current readback; human-led Agentic Engineering method + trace child have no current-main refresh and no current exact-head admission |
 
-All six Draft PRs above (#412, #419, #420, #450, #434, #396) read `MERGEABLE` against current main as of this pass; `MERGEABLE` on GitHub reports the absence of a text conflict, not readiness — Draft/HOLD stands until each PR's own close gate is satisfied. No other open PR was merged in this audit beyond #516. Old green runs do not follow a moving base.
+All five open Draft PRs above (#412, #419, #420, #450, #395/#396) read `MERGEABLE` on GitHub as of this pass — each against its own base branch (`main` only for #412 and #395; the stack children merge against their parent branches). `MERGEABLE` reports the absence of a text conflict against that base, not readiness and not a clean merge into main — Draft/HOLD stands until each PR's own close gate is satisfied. No other open PR was merged in this audit beyond #516. Old green runs do not follow a moving base.
 
 ## Directory → responsibility map
 
@@ -173,8 +173,8 @@ current admitted implementation subject
 #512 Issue/Article/PDF/PRD truth execution     EVIDENCE_DEPENDENT / OPEN; first packet (issue #435) EXECUTED, dispositions OPEN x2 / NOT_APPLICABLE x1
 entropy method                                ADMITTED_ON_MAIN
 general cross-repository safe deletion        NOT_CLAIMED
-Draft knowledge/Productization/AE stacks      HOLD / MERGEABLE_BUT_NOT_MERGEABLE_BY_EVIDENCE (all six read GitHub MERGEABLE; own close gates remain incomplete)
+Draft knowledge/AE stacks                     HOLD / MERGEABLE_BUT_NOT_MERGEABLE_BY_EVIDENCE (five open Drafts read GitHub MERGEABLE against their own bases; own close gates remain incomplete; #434 closed unmerged)
 release / production promotion                NOT_PERFORMED
 ```
 
-Rollback for the #507 implementation is `d5993267e03b217dcdab9702dab0400ab03df860`. Rollback for #516 is `249abc47847f8295b1c75c9d4c84457c5126fd89`. A future queue or documentation update must read current `main` again before acting.
+Rollback for the #507 implementation is `d5993267e03b217dcdab9702dab0400ab03df860`. Rollback for #516 is `88ce642a7f198d88019aa8ae19e63631ae4999c2` (the #511 merge; rolling back further would also revert the #511 admission). A future queue or documentation update must read current `main` again before acting.
