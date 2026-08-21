@@ -18,13 +18,17 @@ or a claim about coverage.
    being written;
 7. [`references/source-disposition/refused-claims.json`](references/source-disposition/refused-claims.json)
    before repeating anything the admitted source said;
-8. [`../agentic-tech-lead-orchestration/README.md`](../agentic-tech-lead-orchestration/README.md)
-   for the task and capability graph and for Local Handoff;
-9. [`../procedural-shadow-runtime/README.md`](../procedural-shadow-runtime/README.md)
-   for independent review;
-10. [`../git-town-stacked-pr-worker/README.md`](../git-town-stacked-pr-worker/README.md)
+8. [`adapters/`](adapters/), whichever adapter the change touches, and its own
+   `selftest.py` before editing landed adapter code;
+9. [`references/prompts/README.md`](references/prompts/README.md) before
+   authoring or dispatching a Session prompt for this Skill;
+10. [`../agentic-tech-lead-orchestration/README.md`](../agentic-tech-lead-orchestration/README.md)
+    for the task and capability graph and for Local Handoff;
+11. [`../procedural-shadow-runtime/README.md`](../procedural-shadow-runtime/README.md)
+    for independent review;
+12. [`../git-town-stacked-pr-worker/README.md`](../git-town-stacked-pr-worker/README.md)
     for branch and Stack publication;
-11. the exact issue, pull request, commit and tree subject.
+13. the exact issue, pull request, commit and tree subject.
 
 Chat history, a branch name, an issue title, a scanner's output and model
 agreement are not evidence substitutes.
@@ -77,6 +81,30 @@ role.
 - Domain modules and consumer bindings may only narrow this body: add evidence,
   strengthen a constraint, reduce authority. A module that relaxes a core law is
   a fork wearing an extension's name.
+
+### Adapter-lease pattern
+
+`adapters/` holds concrete implementations of this contract's capability
+classes, and each landed adapter is its own path lease:
+
+- one adapter directory is one lease; `tree-sitter/` and `sqlite-ledger/` are
+  disjoint and may be worked concurrently, and a third adapter (`#547` SCIP,
+  `#549` Buf, `#550` semantic-context) is a new disjoint lease, never an edit
+  inside an existing adapter's directory;
+- an adapter selftest is that adapter's own contract with `tests/run-all.sh`;
+  changing an adapter's public behaviour without updating its `selftest.py` in
+  the same change unit breaks that contract silently;
+- a doc-convergence change (this file, `README.md`, `references/prompts/`) may
+  describe a landed adapter's status and evidence ceiling and may never edit
+  `adapters/**`, `references/schemas/**` or an adapter's fixtures — those are a
+  disjoint lease from documentation convergence, held by whichever Worker is
+  implementing that capability class;
+- a live receipt (for example
+  [`adapters/tree-sitter/receipts/live-ac62c87f.json`](adapters/tree-sitter/receipts/live-ac62c87f.json))
+  is evidence for that one provider binary at that one commit; it is not
+  transferable to a different adapter or a different provider version, and
+  documentation may report it but never re-derive or restate its numbers from
+  memory.
 
 ## Required change packet
 

@@ -4,7 +4,16 @@ Portable method for reviewing code with a deterministic track and a semantic
 track that are structurally forbidden from standing in for each other, so that a
 finding always carries the grade its evidence supports.
 
-Status: `C0_CONTRACT_CANDIDATE / ADAPTERS_NOT_IMPLEMENTED / NOT_REGISTERED`.
+Status: `C0_CONTRACT_ADMITTED / TWO_DETERMINISTIC_ADAPTERS_LANDED / SEMANTIC_ADAPTER_NOT_IMPLEMENTED / NOT_REGISTERED`.
+
+Two deterministic-track adapters are landed and committed (`adapters/tree-sitter/`
+for parser/syntax-match facts, `adapters/sqlite-ledger/` for the queryable
+graph-ledger fact plane), each with its own selftest routed through
+[`tests/run-all.sh`](tests/run-all.sh). The provider-specific `#547` (SCIP) and
+`#549` (Buf) deterministic adapters and the `#550` semantic-context adapter are
+separate, still-open lanes; landing these two does not admit those. `#522`
+(dual-track synthesis and closure compiler) is open and in flight this same
+wave — read its issue directly rather than this file for its state.
 
 The failure this Skill exists to stop is not sloppiness. It is that both tracks
 produce output that reads identically once it lands in a report. A dependency
@@ -25,26 +34,51 @@ the one most often reported as progress.
    — the fifteen closed terms and what each can never become.
 5. [`references/contracts/public-private-capability.md`](references/contracts/public-private-capability.md)
    — plane ownership and the locator laws.
-6. [`references/schemas/`](references/schemas/) — the machine half.
+6. [`references/schemas/`](references/schemas/) — the machine half, 24 frozen
+   schemas (8 C0 contract + 16 D1/M1 interface).
 7. [`references/source-disposition/refused-claims.json`](references/source-disposition/refused-claims.json)
    — the seven refused source claims and their replayable controls.
-8. [`../agentic-tech-lead-orchestration/README.md`](../agentic-tech-lead-orchestration/README.md),
+8. [`adapters/`](adapters/) — the two landed deterministic-track adapters, each
+   with its own selftest and fixtures.
+9. [`references/prompts/README.md`](references/prompts/README.md) — the common
+   session envelope and the nine zero-context stage prompts, P0 through P8.
+10. [`../agentic-tech-lead-orchestration/README.md`](../agentic-tech-lead-orchestration/README.md),
    [`../procedural-shadow-runtime/README.md`](../procedural-shadow-runtime/README.md)
    and
    [`../git-town-stacked-pr-worker/README.md`](../git-town-stacked-pr-worker/README.md)
    for orchestration, independent review and delivery.
-9. The exact issue, pull request base and head, and evidence subject.
+11. The exact issue, pull request base and head, and evidence subject.
 
 ## Directory map → ownership
 
 ```text
 skills/dual-track-code-review-loop/
 ├── AGENTS.md
-│   └── read order, Builder and Shadow roles, writer laws, required change packet
+│   └── read order, Builder and Shadow roles, writer/adapter-lease laws, required change packet
 ├── README.md
 │   └── directory map, State Machine, DAG, data flow, evidence ceiling, handoff
 ├── SKILL.md
 │   └── the two-track separation, the ten-state procedure, the hard laws
+├── cases.json
+│   └── readable index of every denominator tests/selftest.py counts on the run
+├── evals.json
+│   └── local eval plane meta: what this suite decides and what it does not
+├── adapters/
+│   ├── tree-sitter/
+│   │   ├── adapter.py, selftest.py, bundles/, fixtures/
+│   │   └── receipts/live-ac62c87f.json
+│   │       └── landed parser/syntax-match capability class; live receipt binds
+│   │           digests to a real `tree-sitter` run over committed fixtures
+│   └── sqlite-ledger/
+│       ├── ledger.py, selftest.py, fixtures/
+│       │   └── landed queryable graph-ledger capability class; planted-mutation
+│       │       knockouts and a real ingested/traversed database file
+├── tests/
+│   ├── run-all.sh
+│   │   └── one entrypoint: replays the C0 contract, then routes both landed
+│   │       adapter selftests through the same CI arrival
+│   └── selftest.py
+│       └── dynamic discovery over references/; prints every denominator it counted
 └── references/
     ├── README.md
     │   └── contract index, schema identity convention, control-case convention
@@ -53,22 +87,30 @@ skills/dual-track-code-review-loop/
     │   └── public-private-capability.md
     │       └── closed terms and plane ownership; the half a person reads
     ├── schemas/
-    │   ├── source-packet.schema.json
-    │   ├── candidate-record.schema.json
-    │   ├── violation-candidate.schema.json
-    │   ├── refactor-proposal.schema.json
-    │   ├── change-unit.schema.json
-    │   ├── verification-receipt.schema.json
-    │   ├── closure-record.schema.json
-    │   └── source-disposition.schema.json
+    │   └── 24 frozen JSON Schemas — 8 C0 contract schemas (source-packet,
+    │       candidate-record, violation-candidate, refactor-proposal,
+    │       change-unit, verification-receipt, closure-record,
+    │       source-disposition) plus 16 D1/M1 interface schemas (syntax-match,
+    │       symbol-fact, fact-plane-receipt, coverage-ceiling,
+    │       semantic-document, retrieval-query/-result,
+    │       semantic-freshness-ceiling, semantic-index-lifecycle-receipt,
+    │       architecture-invariant, blast-radius-path,
+    │       contract-compatibility-result, consumed-context-row,
+    │       exact-source-subject, projection-receipt, source-back-reference)
     │       └── the half a machine enforces, with positive and refusal controls
-    └── source-disposition/
-        └── refused-claims.json
-            └── seven refused source claims, each bound to a control that refuses
+    ├── source-disposition/
+    │   └── refused-claims.json
+    │       └── seven refused source claims, each bound to a control that refuses
+    └── prompts/
+        └── README.md
+            └── common session envelope + nine zero-context stage prompts (P0–P8)
 ```
 
-Markdown routes. Schemas decide the deterministic contract state. Consumer
-repositories own actual code, tooling and runtime evidence.
+Markdown and JSON Schema route and enforce the contract. `adapters/` is
+concrete implementation against that contract — the first place in this tree
+where an external tool (`tree-sitter`) is actually invoked and a real database
+file is actually created. Consumer repositories still own applying a proposal
+to their own code; nothing here has ever done that.
 
 Registry admission is a separate governance fact from directory presence. This
 directory's registry classification is `ABSENT` until a human-admitted
@@ -161,53 +203,81 @@ the claim and the record.
 
 ## Local verification
 
-There is no committed test suite here yet, because a suite in this tree has to
-be routed by continuous integration before it means anything, and that routing
-is not this stage's to arrange. That routing belongs to whoever owns the
-workflow matrix and `evals/`, and until they take it the harness stays absent
-rather than pending.
+A committed test suite now exists at [`tests/run-all.sh`](tests/run-all.sh),
+routed by `skill-suites.yml` continuous integration. It replays the C0
+contract via `tests/selftest.py` — dynamic discovery over `references/`, no
+denominator hand-copied into the script — and then routes both landed
+adapters' own selftests (`adapters/tree-sitter/selftest.py`,
+`adapters/sqlite-ledger/selftest.py`) through the same CI arrival. On this
+worktree's exact head the suite prints:
 
-What was run against these bytes was run from an uncommitted scratch harness
-and is recorded in
-[`../../docs/traceability/dual-track-code-review-loop/implementation-preflight.json`](../../docs/traceability/dual-track-code-review-loop/implementation-preflight.json),
-including the per-control knockout denominators (32 knockouts, 32
-discriminating). An uncommitted harness is a claim about a run nobody else can
-repeat from this tree, which is why the refusal results here rest on a second,
-independent derivation rather than on that harness alone.
+```text
+schemas=24 positives=25 controls=105 knockouts=105/105 discriminating
+tree-sitter:    fixtures=2 matches=5 schema_validations=9 falsifier_rows=14 live=EXERCISED
+sqlite-ledger:  fixtures=2 cases=46 planted_mutations=22 knockouts=5/5
+```
+
+`cases.json` reconciles the schema and control lists by name against what the
+run counted and fails on any drift in either direction; the knockout and probe
+floors are read from the guards themselves rather than hand-maintained, so a
+guard that disappears removes its own floor and the CI arrival goes red rather
+than silently shrinking. This is what a Molecular Worker or CI run should
+invoke — do not hand-roll a narrower replay of it.
+
+An earlier, uncommitted scratch harness run against the C0 contract alone (32
+knockouts, 32 discriminating) is recorded in
+[`../../docs/traceability/dual-track-code-review-loop/implementation-preflight.json`](../../docs/traceability/dual-track-code-review-loop/implementation-preflight.json)
+as historical evidence from before this suite was committed. It is superseded
+by the committed suite above for anything the committed suite also covers, and
+kept only because the C0 refusal results were independently re-derived against
+it once, which the committed suite's own single derivation does not replace.
 
 ## Evidence ceiling
 
 ```text
 controlled vocabulary and plane contract     ADMITTED_AS_CANDIDATE
 schema shape and refusal controls            VERIFIED_ON_THESE_BYTES
-mutation controls over the refusals          VERIFIED_BY_UNCOMMITTED_SCRATCH_HARNESS
-                                             + INDEPENDENTLY_RE_DERIVED
-committed mutation harness                   ABSENT
-parser / index / graph adapter               NOT_IMPLEMENTED
-retrieval adapter                            NOT_IMPLEMENTED
+mutation controls over the refusals          VERIFIED_BY_COMMITTED_SUITE
+                                             + INDEPENDENTLY_RE_DERIVED_HISTORICALLY
+committed mutation harness                   PRESENT (tests/run-all.sh, CI-routed)
+parser/syntax-match adapter (tree-sitter)    LANDED, selftest + live receipt
+graph-ledger adapter (sqlite-ledger)         LANDED, selftest, planted mutations
+SCIP / Buf deterministic adapters (#547/#549) BLOCKED_ON_PROVIDER
+semantic-context adapter (#550)              NOT_IMPLEMENTED
+dual-track synthesis compiler (#522)         IN_FLIGHT / OPEN — read #522 directly
 applied refactor on a real codebase          NOT_EXERCISED
 cross-repository contract migration          NOT_EXERCISED
-live consumer canary                         NOT_EXERCISED
-independent Shadow                           NOT_EXERCISED
+live consumer canary (#528)                  NOT_EXERCISED
+independent Shadow (#525)                    NOT_EXERCISED
 registry admission                           ABSENT
 legal, employment and IP clearance           HUMAN_ADMIT_REQUIRED
 merge, release, production, visibility       HUMAN_ADMIT_REQUIRED
 ```
 
-`VERIFIED_BY_UNCOMMITTED_SCRATCH_HARNESS + INDEPENDENTLY_RE_DERIVED` is the
-whole provenance of the mutation line, written out because the shorter label it
-replaced read as though a suite in this tree had produced it. The mutation
-results were produced by a harness that was never committed, and were then
-re-derived from these bytes by the independent Shadow on the H0-003 review
-without reusing that harness. Two derivations that do not share code are what
-the line rests on. A committed harness, routed by continuous integration, is
-`ABSENT` and stays that way until the suite and workflow owner takes it.
+The mutation line changed shape because its evidence changed shape: a suite is
+now committed and CI-routed, so the line reads `VERIFIED_BY_COMMITTED_SUITE`
+rather than the uncommitted-scratch-harness label it replaced. The earlier,
+narrower C0-only harness was independently re-derived once by the Shadow on the
+H0-003 review before this suite existed; that historical fact is kept as a
+second derivation behind the C0 slice only, not as evidence for the two
+adapters, which have never been through an independent Shadow pass.
+`NOT_IMPLEMENTED`, `BLOCKED_ON_PROVIDER`, `NOT_EXERCISED` and `IN_FLIGHT` are
+distinct states here on purpose: a blocked provider dependency, an unbuilt
+adapter, a built-but-unexercised path, and another Worker's concurrent open
+issue are four different reasons a lane has not closed, and collapsing them
+would hide which one applies.
 
 ## Current handoff
 
-The next owner is an independent Shadow on this exact head, reading the audit
-list in [`AGENTS.md`](AGENTS.md) and returning `ADMIT_FOR_DOWNSTREAM`, `BLOCK` or
-`REPLAN_REQUIRED`. A same-context review may warn and cannot satisfy that role.
-Deterministic-fact and semantic-context adapters are path-disjoint sibling work
-and are released only after this contract is admitted and their shared interface
-is frozen.
+Two deterministic-track adapters landed and both selftests are green in the
+committed suite above. The next owner for *this contract* is still an
+independent Shadow on this exact head (`#525`, open), reading the audit list in
+[`AGENTS.md`](AGENTS.md) and returning `ADMIT_FOR_DOWNSTREAM`, `BLOCK` or
+`REPLAN_REQUIRED`; a same-context review may warn and cannot satisfy that role.
+Concurrently open, path-disjoint sibling lanes on this same head: `#522`
+(synthesis/closure compiler, in flight this wave), `#547`/`#549` (provider
+deterministic adapters, blocked on provider availability), `#550` (semantic
+adapter, blocked), `#527` (bootstrap profile) and `#528` (live consumer
+canary, the eventual Local Handoff owner). None of them is promoted by this
+file landing, and this file's landing does not promote any of them either —
+each closes only on its own issue's evidence.
