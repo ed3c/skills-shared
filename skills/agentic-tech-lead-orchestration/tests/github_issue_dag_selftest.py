@@ -232,4 +232,68 @@ finally:
     mod.live_readback = orig_readback
     mod._run = orig_run
 
-print("github-issue-dag selftest: PASS (positive=6 mutations=17 live=NOT_EXERCISED)")
+# live_readback producer controls (#497): the real parser must consume the
+# gh LinkedIssueConnection shape and fail closed on every other shape.
+def connection_payload(blocked_by):
+    return json.dumps({"blockedBy": blocked_by})
+
+def node(number, repo="ed3c/skills-shared"):
+    return {
+        "number": number,
+        "title": "t",
+        "url": f"https://github.com/{repo}/issues/{number}",
+        "state": "OPEN",
+        "repository": {"nameWithOwner": repo},
+    }
+
+def readback_with(payload):
+    def fake(argv):
+        assert argv[:3] == ["gh", "issue", "view"], argv
+        assert argv[-2:] == ["--json", "blockedBy"], argv
+        return payload
+    mod._run = fake
+    try:
+        return mod.live_readback("ed3c/skills-shared", [7])
+    finally:
+        mod._run = orig_run
+
+observed = readback_with(
+    connection_payload({"nodes": [node(6), node(5)], "totalCount": 2})
+)
+assert observed == {"7": {"blockedBy": [5, 6]}}, observed
+
+def readback_must_fail(payload, why):
+    try:
+        readback_with(payload)
+    except mod.ContractError:
+        return
+    raise AssertionError(why)
+
+readback_must_fail(
+    connection_payload([{"number": 5}]),
+    "legacy bare-list blockedBy shape accepted",
+)
+readback_must_fail(
+    connection_payload({"nodes": [node(5)], "totalCount": 2}),
+    "totalCount mismatch accepted",
+)
+readback_must_fail(
+    connection_payload({"nodes": [node(5, repo="other/repo")], "totalCount": 1}),
+    "cross-repository blockedBy node accepted",
+)
+readback_must_fail(
+    connection_payload({"nodes": [node(5), node(5)], "totalCount": 2}),
+    "duplicate blockedBy numbers accepted",
+)
+readback_must_fail(
+    connection_payload({"nodes": [{"number": "5"}], "totalCount": 1}),
+    "non-int blockedBy number accepted",
+)
+readback_must_fail(
+    connection_payload(
+        {"nodes": [node(5)], "totalCount": 1, "pageInfo": {}}
+    ),
+    "extra connection keys accepted",
+)
+
+print("github-issue-dag selftest: PASS (positive=7 mutations=23 live=NOT_EXERCISED)")

@@ -54,6 +54,16 @@ python3 "$ROOT/scripts/assert_local_handoff_queue.py" \
 python3 "$ROOT/scripts/assert_local_handoff_queue.py" \
   --queue "$ROOT/references/wave3-live-handoff-queue.json"
 
+# The current Tech Lead runtime/source handoff queues are load-bearing. Execute
+# their semantic gate unconditionally so a docs-only queue cannot look admitted.
+for queue in \
+  "$ROOT/runtime-handoff/codex-v2-local-handoff-queue.json" \
+  "$ROOT/runtime-handoff/herdr-local-handoff-queue.json" \
+  "$ROOT/runtime-handoff/source-evidence-local-handoff-queue.json"
+do
+  python3 "$ROOT/scripts/assert_local_handoff_queue.py" --queue "$queue"
+done
+
 # A schema-valid one-item queue epoch must validate and run its planted
 # controls (issue #317: the selftest used to crash on items[1]).
 python3 "$ROOT/scripts/assert_local_handoff_queue.py" \
@@ -115,6 +125,7 @@ schemas = [
     "references/contracts/herdr-observer-receipt.schema.json",
     "references/contracts/problem-closure.schema.json",
     "references/contracts/codex-live-acceptance-receipt.schema.json",
+    "references/contracts/codex-live-acceptance-receipt-v2.schema.json",
     "references/contracts/github-dag-live-canary-receipt.schema.json",
     "references/contracts/herdr-lifecycle-receipt.schema.json",
     "references/contracts/source-claims-input.schema.json",
@@ -140,7 +151,7 @@ source_example = json.loads(
 )
 errors = list(Draft202012Validator(source_schema).iter_errors(source_example))
 assert not errors, [error.message for error in errors]
-print("CONTROL-PLANE-SHAPE-GREEN 10 schemas; closure/source examples validated")
+print("CONTROL-PLANE-SHAPE-GREEN 11 schemas; closure/source examples validated")
 PYCP
 python3 "$ROOT/tests/codex_sdk_controller_selftest.py"
 python3 "$ROOT/tests/github_issue_dag_selftest.py"
