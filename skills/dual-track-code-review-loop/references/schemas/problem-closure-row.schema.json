@@ -1,0 +1,853 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dtcr-problem-closure-row.schema.json",
+  "title": "DTCR problem closure row",
+  "description": "One source problem carried through Problem -> Claim -> Requirement -> Mechanism -> Owner -> Oracle -> positive and negative denominator -> evidence lane, and landing on exactly one of ClosureRecord, BLOCKED, REJECTED_OVERCLAIM or NOT_APPLICABLE. The ledger vocabulary is the one agentic-tech-lead-orchestration already owns and this record points at it rather than restating it; what is added here is the one distinction that ledger has no term for. A rejected source claim and an implemented mechanism are two independent states on the same row: an article can be wrong about why something works while the mechanism it described is sitting in the tree, and an article can be right while nothing has been built. Collapsing them lets SOURCE_CLAIM_REJECTED read as TECHNICAL_PROBLEM_SOLVED, which closes a problem by disagreeing with the person who raised it.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "row_id",
+    "problem_id",
+    "subject_commit",
+    "vocabulary_ref",
+    "source",
+    "claim",
+    "requirement",
+    "mechanism",
+    "owner",
+    "oracle",
+    "denominators",
+    "evidence_lane",
+    "closure_state",
+    "closure_record_ref",
+    "blocked_on",
+    "separation",
+    "authority"
+  ],
+  "properties": {
+    "schema": {
+      "const": "dtcr/problem-closure-row/v1"
+    },
+    "row_id": {
+      "type": "string",
+      "pattern": "^DTCR-PC-[0-9]{3}$"
+    },
+    "problem_id": {
+      "type": "string",
+      "minLength": 2
+    },
+    "subject_commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "vocabulary_ref": {
+      "const": "skills/agentic-tech-lead-orchestration/references/contracts/problem-closure.schema.json",
+      "description": "The ledger this row composes with. Pinned so a second closure vocabulary cannot be introduced by writing a different path here."
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "identity",
+        "location"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "GITHUB_ISSUE",
+            "ARTICLE",
+            "PDF",
+            "PRD",
+            "REPOSITORY"
+          ]
+        },
+        "identity": {
+          "type": "string",
+          "minLength": 2
+        },
+        "location": {
+          "type": "string",
+          "minLength": 8
+        }
+      }
+    },
+    "claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "statement",
+        "claim_class",
+        "source_claim_state"
+      ],
+      "properties": {
+        "statement": {
+          "type": "string",
+          "minLength": 12
+        },
+        "claim_class": {
+          "type": "string",
+          "minLength": 4
+        },
+        "source_claim_state": {
+          "enum": [
+            "OPEN",
+            "ACCEPTED_AS_REQUIREMENT",
+            "REJECTED_OVERCLAIM",
+            "NOT_APPLICABLE"
+          ],
+          "description": "What happened to what the source said. Independent of what was built, which lives in mechanism_state."
+        }
+      }
+    },
+    "requirement": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 12
+    },
+    "mechanism": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "statement",
+            "mechanism_state"
+          ],
+          "properties": {
+            "statement": {
+              "type": "string",
+              "minLength": 12
+            },
+            "mechanism_state": {
+              "enum": [
+                "NOT_PROPOSED",
+                "PROPOSED",
+                "IMPLEMENTED",
+                "VERIFIED_BY_RECEIPT"
+              ],
+              "description": "IMPLEMENTED and VERIFIED_BY_RECEIPT are separate values on purpose. Code that exists is not code that was observed doing the thing."
+            }
+          }
+        }
+      ]
+    },
+    "owner": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 2
+    },
+    "oracle": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "statement",
+            "arrival"
+          ],
+          "properties": {
+            "statement": {
+              "type": "string",
+              "minLength": 12
+            },
+            "arrival": {
+              "enum": [
+                "STATIC",
+                "SANDBOX",
+                "PROD"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "denominators": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "positive",
+            "negative",
+            "denominator_definition"
+          ],
+          "properties": {
+            "positive": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "negative": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "ONE_GREEN_TEST != FULL_DENOMINATOR. A closure whose oracle has no case that would go red closed on a harness that ran."
+            },
+            "denominator_definition": {
+              "type": "string",
+              "minLength": 12
+            }
+          }
+        }
+      ]
+    },
+    "evidence_lane": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "lane",
+        "receipt_ref",
+        "arrival"
+      ],
+      "properties": {
+        "lane": {
+          "enum": [
+            "LOCAL",
+            "CI",
+            "PROVIDER_LIVE",
+            "HUMAN",
+            "RELEASE",
+            "NOT_EXERCISED"
+          ]
+        },
+        "receipt_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^DTCR-VR-[0-9]{3}$"
+        },
+        "arrival": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "enum": [
+                "STATIC",
+                "SANDBOX",
+                "PROD"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "closure_state": {
+      "enum": [
+        "CLOSURE_RECORD_EMITTED",
+        "BLOCKED",
+        "REJECTED_OVERCLAIM",
+        "NOT_APPLICABLE"
+      ],
+      "description": "The four terminals. There is no value meaning closed by inspection, and no value meaning merged or released."
+    },
+    "closure_record_ref": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^DTCR-CR-[0-9]{3}$"
+    },
+    "blocked_on": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "REQUIREMENT_ABSENT",
+          "MECHANISM_ABSENT",
+          "OWNER_ABSENT",
+          "ORACLE_ABSENT",
+          "DENOMINATOR_ABSENT",
+          "EVIDENCE_LANE_ABSENT",
+          "VERIFICATION_RECEIPT_ABSENT",
+          "MECHANISM_NOT_VERIFIED"
+        ]
+      },
+      "description": "Which link of the chain is missing, by name. A row that says only BLOCKED tells the owner to re-derive what the compiler already knew."
+    },
+    "not_applicable_rationale": {
+      "type": "string",
+      "minLength": 12
+    },
+    "separation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_claim_rejected_is_problem_solved",
+        "closed_by_this_compiler"
+      ],
+      "properties": {
+        "source_claim_rejected_is_problem_solved": {
+          "const": false,
+          "description": "SOURCE_CLAIM_REJECTED != TECHNICAL_PROBLEM_SOLVED, pinned. Disagreeing with the source is not fixing the thing the source was pointing at."
+        },
+        "closed_by_this_compiler": {
+          "const": false,
+          "description": "Compiling an oracle is not running one. The receipt this row points at was produced by a lane that executed, elsewhere."
+        }
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "merge",
+        "release",
+        "user_value",
+        "paid_demand"
+      ],
+      "properties": {
+        "merge": {
+          "const": false
+        },
+        "release": {
+          "const": false
+        },
+        "user_value": {
+          "const": false
+        },
+        "paid_demand": {
+          "const": false
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "closure_state": {
+            "const": "CLOSURE_RECORD_EMITTED"
+          }
+        },
+        "required": [
+          "closure_state"
+        ]
+      },
+      "then": {
+        "properties": {
+          "mechanism": {
+            "properties": {
+              "mechanism_state": {
+                "const": "VERIFIED_BY_RECEIPT"
+              }
+            }
+          },
+          "closure_record_ref": {
+            "type": "string"
+          },
+          "blocked_on": {
+            "maxItems": 0
+          }
+        },
+        "description": "A closure record exists only over a mechanism a receipt observed. An implemented mechanism with no receipt is the overclaim this refuses."
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "closure_state": {
+            "const": "REJECTED_OVERCLAIM"
+          }
+        },
+        "required": [
+          "closure_state"
+        ]
+      },
+      "then": {
+        "properties": {
+          "closure_record_ref": {
+            "const": null
+          }
+        },
+        "description": "Rejecting what the source claimed closes the claim, never the problem. A rejected row that points at a closure record has done both at once."
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "closure_state": {
+            "const": "BLOCKED"
+          }
+        },
+        "required": [
+          "closure_state"
+        ]
+      },
+      "then": {
+        "properties": {
+          "blocked_on": {
+            "minItems": 1
+          }
+        },
+        "description": "Blocked on nothing is not blocked."
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "closure_state": {
+            "const": "NOT_APPLICABLE"
+          }
+        },
+        "required": [
+          "closure_state"
+        ]
+      },
+      "then": {
+        "required": [
+          "not_applicable_rationale"
+        ],
+        "description": "An inapplicable problem with no rationale reads downstream as a problem nobody looked at."
+      }
+    }
+  ],
+  "examples": [
+    {
+      "authority": {
+        "merge": false,
+        "paid_demand": false,
+        "release": false,
+        "user_value": false
+      },
+      "blocked_on": [],
+      "claim": {
+        "claim_class": "PORTABLE_ASSURANCE_REQUIREMENT",
+        "source_claim_state": "ACCEPTED_AS_REQUIREMENT",
+        "statement": "A push should not be acknowledged before durable authoritative persistence."
+      },
+      "closure_record_ref": "DTCR-CR-001",
+      "closure_state": "CLOSURE_RECORD_EMITTED",
+      "denominators": {
+        "denominator_definition": "receipt shapes the gate enumerates, planted absent-artifact cases counted separately",
+        "negative": 3,
+        "positive": 6
+      },
+      "evidence_lane": {
+        "arrival": "SANDBOX",
+        "lane": "LOCAL",
+        "receipt_ref": "DTCR-VR-001"
+      },
+      "mechanism": {
+        "mechanism_state": "VERIFIED_BY_RECEIPT",
+        "statement": "the zero-network delivery receipt gate reads the tree before admitting the receipt"
+      },
+      "oracle": {
+        "arrival": "SANDBOX",
+        "statement": "plant a receipt whose artifact is absent and require the gate to exit non-zero"
+      },
+      "owner": "github-delivery-loop",
+      "problem_id": "GS-04",
+      "requirement": "no delivery receipt is emitted before the artifact it names exists on the tree",
+      "row_id": "DTCR-PC-003",
+      "schema": "dtcr/problem-closure-row/v1",
+      "separation": {
+        "closed_by_this_compiler": false,
+        "source_claim_rejected_is_problem_solved": false
+      },
+      "source": {
+        "identity": "Git at any scale",
+        "kind": "ARTICLE",
+        "location": "source packet for the article, section 4"
+      },
+      "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+      "vocabulary_ref": "skills/agentic-tech-lead-orchestration/references/contracts/problem-closure.schema.json"
+    },
+    {
+      "authority": {
+        "merge": false,
+        "paid_demand": false,
+        "release": false,
+        "user_value": false
+      },
+      "blocked_on": [],
+      "claim": {
+        "claim_class": "PERFORMANCE_CLAIM",
+        "source_claim_state": "REJECTED_OVERCLAIM",
+        "statement": "Primary-only compaction reduces per-replica CPU work by a stated factor."
+      },
+      "closure_record_ref": null,
+      "closure_state": "REJECTED_OVERCLAIM",
+      "denominators": {
+        "denominator_definition": "worktree creations observed at the subject commit",
+        "negative": 1,
+        "positive": 2
+      },
+      "evidence_lane": {
+        "arrival": "STATIC",
+        "lane": "LOCAL",
+        "receipt_ref": null
+      },
+      "mechanism": {
+        "mechanism_state": "IMPLEMENTED",
+        "statement": "the shared object store is written once per worktree set and read by every worktree"
+      },
+      "oracle": {
+        "arrival": "STATIC",
+        "statement": "count object-store writes per worktree creation and compare against the worktree count"
+      },
+      "owner": "git-town-stacked-pr-worker",
+      "problem_id": "GS-08",
+      "requirement": "compaction work is performed once and distributed rather than repeated per replica",
+      "row_id": "DTCR-PC-004",
+      "schema": "dtcr/problem-closure-row/v1",
+      "separation": {
+        "closed_by_this_compiler": false,
+        "source_claim_rejected_is_problem_solved": false
+      },
+      "source": {
+        "identity": "Git at any scale",
+        "kind": "ARTICLE",
+        "location": "source packet for the article, section 8"
+      },
+      "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+      "vocabulary_ref": "skills/agentic-tech-lead-orchestration/references/contracts/problem-closure.schema.json"
+    }
+  ],
+  "x-refusal-controls": [
+    {
+      "case_id": "DTCR-XC-PC-001",
+      "refuses": "A closure record emitted over a mechanism that exists but was never observed running.",
+      "refused_by": "allOf[0].then.properties.mechanism.properties.mechanism_state.const",
+      "instance": {
+        "authority": {
+          "merge": false,
+          "paid_demand": false,
+          "release": false,
+          "user_value": false
+        },
+        "blocked_on": [],
+        "claim": {
+          "claim_class": "PORTABLE_ASSURANCE_REQUIREMENT",
+          "source_claim_state": "ACCEPTED_AS_REQUIREMENT",
+          "statement": "A push should not be acknowledged before durable authoritative persistence."
+        },
+        "closure_record_ref": "DTCR-CR-001",
+        "closure_state": "CLOSURE_RECORD_EMITTED",
+        "denominators": {
+          "denominator_definition": "receipt shapes the gate enumerates, planted absent-artifact cases counted separately",
+          "negative": 3,
+          "positive": 6
+        },
+        "evidence_lane": {
+          "arrival": "SANDBOX",
+          "lane": "LOCAL",
+          "receipt_ref": "DTCR-VR-001"
+        },
+        "mechanism": {
+          "mechanism_state": "IMPLEMENTED",
+          "statement": "the zero-network delivery receipt gate reads the tree before admitting the receipt"
+        },
+        "oracle": {
+          "arrival": "SANDBOX",
+          "statement": "plant a receipt whose artifact is absent and require the gate to exit non-zero"
+        },
+        "owner": "github-delivery-loop",
+        "problem_id": "GS-04",
+        "requirement": "no delivery receipt is emitted before the artifact it names exists on the tree",
+        "row_id": "DTCR-PC-003",
+        "schema": "dtcr/problem-closure-row/v1",
+        "separation": {
+          "closed_by_this_compiler": false,
+          "source_claim_rejected_is_problem_solved": false
+        },
+        "source": {
+          "identity": "Git at any scale",
+          "kind": "ARTICLE",
+          "location": "source packet for the article, section 4"
+        },
+        "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+        "vocabulary_ref": "skills/agentic-tech-lead-orchestration/references/contracts/problem-closure.schema.json"
+      }
+    },
+    {
+      "case_id": "DTCR-XC-PC-002",
+      "refuses": "SOURCE_CLAIM_REJECTED != TECHNICAL_PROBLEM_SOLVED: a rejected overclaim carrying a closure record.",
+      "refused_by": "allOf[1].then.properties.closure_record_ref.const",
+      "instance": {
+        "authority": {
+          "merge": false,
+          "paid_demand": false,
+          "release": false,
+          "user_value": false
+        },
+        "blocked_on": [],
+        "claim": {
+          "claim_class": "PERFORMANCE_CLAIM",
+          "source_claim_state": "REJECTED_OVERCLAIM",
+          "statement": "Primary-only compaction reduces per-replica CPU work by a stated factor."
+        },
+        "closure_record_ref": "DTCR-CR-001",
+        "closure_state": "REJECTED_OVERCLAIM",
+        "denominators": {
+          "denominator_definition": "worktree creations observed at the subject commit",
+          "negative": 1,
+          "positive": 2
+        },
+        "evidence_lane": {
+          "arrival": "STATIC",
+          "lane": "LOCAL",
+          "receipt_ref": null
+        },
+        "mechanism": {
+          "mechanism_state": "IMPLEMENTED",
+          "statement": "the shared object store is written once per worktree set and read by every worktree"
+        },
+        "oracle": {
+          "arrival": "STATIC",
+          "statement": "count object-store writes per worktree creation and compare against the worktree count"
+        },
+        "owner": "git-town-stacked-pr-worker",
+        "problem_id": "GS-08",
+        "requirement": "compaction work is performed once and distributed rather than repeated per replica",
+        "row_id": "DTCR-PC-004",
+        "schema": "dtcr/problem-closure-row/v1",
+        "separation": {
+          "closed_by_this_compiler": false,
+          "source_claim_rejected_is_problem_solved": false
+        },
+        "source": {
+          "identity": "Git at any scale",
+          "kind": "ARTICLE",
+          "location": "source packet for the article, section 8"
+        },
+        "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+        "vocabulary_ref": "skills/agentic-tech-lead-orchestration/references/contracts/problem-closure.schema.json"
+      }
+    },
+    {
+      "case_id": "DTCR-XC-PC-003",
+      "refuses": "A row reported BLOCKED without naming the link of the chain that is missing.",
+      "refused_by": "allOf[2].then.properties.blocked_on.minItems",
+      "instance": {
+        "authority": {
+          "merge": false,
+          "paid_demand": false,
+          "release": false,
+          "user_value": false
+        },
+        "blocked_on": [],
+        "claim": {
+          "claim_class": "PORTABLE_ASSURANCE_REQUIREMENT",
+          "source_claim_state": "ACCEPTED_AS_REQUIREMENT",
+          "statement": "A push should not be acknowledged before durable authoritative persistence."
+        },
+        "closure_record_ref": null,
+        "closure_state": "BLOCKED",
+        "denominators": {
+          "denominator_definition": "receipt shapes the gate enumerates, planted absent-artifact cases counted separately",
+          "negative": 3,
+          "positive": 6
+        },
+        "evidence_lane": {
+          "arrival": "SANDBOX",
+          "lane": "LOCAL",
+          "receipt_ref": "DTCR-VR-001"
+        },
+        "mechanism": {
+          "mechanism_state": "VERIFIED_BY_RECEIPT",
+          "statement": "the zero-network delivery receipt gate reads the tree before admitting the receipt"
+        },
+        "oracle": {
+          "arrival": "SANDBOX",
+          "statement": "plant a receipt whose artifact is absent and require the gate to exit non-zero"
+        },
+        "owner": "github-delivery-loop",
+        "problem_id": "GS-04",
+        "requirement": "no delivery receipt is emitted before the artifact it names exists on the tree",
+        "row_id": "DTCR-PC-003",
+        "schema": "dtcr/problem-closure-row/v1",
+        "separation": {
+          "closed_by_this_compiler": false,
+          "source_claim_rejected_is_problem_solved": false
+        },
+        "source": {
+          "identity": "Git at any scale",
+          "kind": "ARTICLE",
+          "location": "source packet for the article, section 4"
+        },
+        "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+        "vocabulary_ref": "skills/agentic-tech-lead-orchestration/references/contracts/problem-closure.schema.json"
+      }
+    },
+    {
+      "case_id": "DTCR-XC-PC-004",
+      "refuses": "A problem declared inapplicable with no rationale.",
+      "refused_by": "allOf[3].then.required",
+      "instance": {
+        "authority": {
+          "merge": false,
+          "paid_demand": false,
+          "release": false,
+          "user_value": false
+        },
+        "blocked_on": [],
+        "claim": {
+          "claim_class": "PORTABLE_ASSURANCE_REQUIREMENT",
+          "source_claim_state": "ACCEPTED_AS_REQUIREMENT",
+          "statement": "A push should not be acknowledged before durable authoritative persistence."
+        },
+        "closure_record_ref": null,
+        "closure_state": "NOT_APPLICABLE",
+        "denominators": {
+          "denominator_definition": "receipt shapes the gate enumerates, planted absent-artifact cases counted separately",
+          "negative": 3,
+          "positive": 6
+        },
+        "evidence_lane": {
+          "arrival": "SANDBOX",
+          "lane": "LOCAL",
+          "receipt_ref": "DTCR-VR-001"
+        },
+        "mechanism": {
+          "mechanism_state": "VERIFIED_BY_RECEIPT",
+          "statement": "the zero-network delivery receipt gate reads the tree before admitting the receipt"
+        },
+        "oracle": {
+          "arrival": "SANDBOX",
+          "statement": "plant a receipt whose artifact is absent and require the gate to exit non-zero"
+        },
+        "owner": "github-delivery-loop",
+        "problem_id": "GS-04",
+        "requirement": "no delivery receipt is emitted before the artifact it names exists on the tree",
+        "row_id": "DTCR-PC-003",
+        "schema": "dtcr/problem-closure-row/v1",
+        "separation": {
+          "closed_by_this_compiler": false,
+          "source_claim_rejected_is_problem_solved": false
+        },
+        "source": {
+          "identity": "Git at any scale",
+          "kind": "ARTICLE",
+          "location": "source packet for the article, section 4"
+        },
+        "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+        "vocabulary_ref": "skills/agentic-tech-lead-orchestration/references/contracts/problem-closure.schema.json"
+      }
+    },
+    {
+      "case_id": "DTCR-XC-PC-005",
+      "refuses": "A closure whose oracle enumerates no case that could go red.",
+      "refused_by": "properties.denominators.oneOf[1].properties.negative.minimum",
+      "instance": {
+        "authority": {
+          "merge": false,
+          "paid_demand": false,
+          "release": false,
+          "user_value": false
+        },
+        "blocked_on": [],
+        "claim": {
+          "claim_class": "PORTABLE_ASSURANCE_REQUIREMENT",
+          "source_claim_state": "ACCEPTED_AS_REQUIREMENT",
+          "statement": "A push should not be acknowledged before durable authoritative persistence."
+        },
+        "closure_record_ref": "DTCR-CR-001",
+        "closure_state": "CLOSURE_RECORD_EMITTED",
+        "denominators": {
+          "denominator_definition": "receipt shapes the gate enumerates, planted absent-artifact cases counted separately",
+          "negative": 0,
+          "positive": 6
+        },
+        "evidence_lane": {
+          "arrival": "SANDBOX",
+          "lane": "LOCAL",
+          "receipt_ref": "DTCR-VR-001"
+        },
+        "mechanism": {
+          "mechanism_state": "VERIFIED_BY_RECEIPT",
+          "statement": "the zero-network delivery receipt gate reads the tree before admitting the receipt"
+        },
+        "oracle": {
+          "arrival": "SANDBOX",
+          "statement": "plant a receipt whose artifact is absent and require the gate to exit non-zero"
+        },
+        "owner": "github-delivery-loop",
+        "problem_id": "GS-04",
+        "requirement": "no delivery receipt is emitted before the artifact it names exists on the tree",
+        "row_id": "DTCR-PC-003",
+        "schema": "dtcr/problem-closure-row/v1",
+        "separation": {
+          "closed_by_this_compiler": false,
+          "source_claim_rejected_is_problem_solved": false
+        },
+        "source": {
+          "identity": "Git at any scale",
+          "kind": "ARTICLE",
+          "location": "source packet for the article, section 4"
+        },
+        "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+        "vocabulary_ref": "skills/agentic-tech-lead-orchestration/references/contracts/problem-closure.schema.json"
+      }
+    },
+    {
+      "case_id": "DTCR-XC-PC-006",
+      "refuses": "A second closure vocabulary introduced by pointing the row at a different contract.",
+      "refused_by": "properties.vocabulary_ref.const",
+      "instance": {
+        "authority": {
+          "merge": false,
+          "paid_demand": false,
+          "release": false,
+          "user_value": false
+        },
+        "blocked_on": [],
+        "claim": {
+          "claim_class": "PORTABLE_ASSURANCE_REQUIREMENT",
+          "source_claim_state": "ACCEPTED_AS_REQUIREMENT",
+          "statement": "A push should not be acknowledged before durable authoritative persistence."
+        },
+        "closure_record_ref": "DTCR-CR-001",
+        "closure_state": "CLOSURE_RECORD_EMITTED",
+        "denominators": {
+          "denominator_definition": "receipt shapes the gate enumerates, planted absent-artifact cases counted separately",
+          "negative": 3,
+          "positive": 6
+        },
+        "evidence_lane": {
+          "arrival": "SANDBOX",
+          "lane": "LOCAL",
+          "receipt_ref": "DTCR-VR-001"
+        },
+        "mechanism": {
+          "mechanism_state": "VERIFIED_BY_RECEIPT",
+          "statement": "the zero-network delivery receipt gate reads the tree before admitting the receipt"
+        },
+        "oracle": {
+          "arrival": "SANDBOX",
+          "statement": "plant a receipt whose artifact is absent and require the gate to exit non-zero"
+        },
+        "owner": "github-delivery-loop",
+        "problem_id": "GS-04",
+        "requirement": "no delivery receipt is emitted before the artifact it names exists on the tree",
+        "row_id": "DTCR-PC-003",
+        "schema": "dtcr/problem-closure-row/v1",
+        "separation": {
+          "closed_by_this_compiler": false,
+          "source_claim_rejected_is_problem_solved": false
+        },
+        "source": {
+          "identity": "Git at any scale",
+          "kind": "ARTICLE",
+          "location": "source packet for the article, section 4"
+        },
+        "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+        "vocabulary_ref": "skills/dual-track-code-review-loop/references/schemas/closure-record.schema.json"
+      }
+    }
+  ]
+}

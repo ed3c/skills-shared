@@ -1,0 +1,133 @@
+{
+  "schema": "dtcr/synthesis-request/v1",
+  "task": {
+    "task_ref": "review the persistence boundary of the order domain",
+    "owner": "dual-track review worker",
+    "lease_paths": [
+      "skills/dual-track-code-review-loop/synthesis/"
+    ],
+    "task_state_writers": [
+      "dual-track review worker"
+    ]
+  },
+  "subject": {
+    "repository_binding_id": "DTCR-RB-0f1e2d3c4b5a6978",
+    "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+    "subject_tree": "e739d799dd8d44beb5414ed99a943ff3bacccab0"
+  },
+  "fact_bundle": {
+    "receipt_ref": "DTCR-FR-001",
+    "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+    "bundle_digest": "3f786850e387550fdab836ed7e6dc881de23001b3f786850e387550fdab836ed",
+    "graph_provenance": "COMPILER_RESOLVED_CALL",
+    "graph_completeness": "COMPLETE_FOR_RESOLVED_EDGES",
+    "changed_symbol_refs": [
+      "DTCR-SF-002",
+      "DTCR-SF-001"
+    ],
+    "blast_radius_path_refs": [
+      "DTCR-BP-001"
+    ],
+    "coverage_ceiling": {
+      "ceiling_ref": "DTCR-CC-001",
+      "analysed": {
+        "numerator": 148,
+        "denominator": 173,
+        "denominator_definition": "source blobs declared by the change unit and reachable from the composition root",
+        "method": "parser run over every declared blob, omissions enumerated"
+      },
+      "completeness": "PARTIAL_LOWER_BOUND",
+      "omissions": [
+        "GENERATED_CODE_SKIPPED: 25 generated protobuf blobs were not parsed"
+      ]
+    },
+    "observations": [
+      {
+        "observation_ref": "DTCR-VC-001",
+        "kind": "VIOLATION_CANDIDATE",
+        "invariant_ref": "DTCR-AI-001",
+        "state": "CONFIRMED_AGAINST_DETERMINISTIC_FACT"
+      },
+      {
+        "observation_ref": "DTCR-VC-002",
+        "kind": "VIOLATION_CANDIDATE",
+        "invariant_ref": "DTCR-AI-002",
+        "state": "OPEN"
+      },
+      {
+        "observation_ref": "DTCR-SF-001",
+        "kind": "SYMBOL_FACT",
+        "symbol": "domain/order.Price"
+      }
+    ],
+    "measurements": []
+  },
+  "semantic_bundle": {
+    "result_ref": "DTCR-RR-001",
+    "rows": [
+      {
+        "row_rank": 1,
+        "document_ref": "DTCR-DOC-001",
+        "back_reference_ref": "DTCR-BK-001",
+        "freshness_ref": "DTCR-FC-001",
+        "freshness_state": "USABLE_AS_HISTORICAL_CONTEXT"
+      }
+    ]
+  },
+  "invariants": [
+    {
+      "invariant_ref": "DTCR-AI-001",
+      "statement": "Domain modules must not import infrastructure modules.",
+      "admission": "ADMITTED"
+    },
+    {
+      "invariant_ref": "DTCR-AI-002",
+      "statement": "Task ordering must remain first-in-first-out.",
+      "admission": "ADMITTED"
+    }
+  ],
+  "claims": [
+    {
+      "claim_id": "SRC-01",
+      "claim": "The order domain is isolated from the persistence layer.",
+      "claim_class": "ARCHITECTURE_SOURCE_STATEMENT",
+      "claim_source_ref": "source packet DTCR-SP-PDF-001 section 4",
+      "observed_fact_refs": [
+        "DTCR-VC-001"
+      ],
+      "contradicted_by_fact": true
+    },
+    {
+      "claim_id": "SRC-02",
+      "claim": "The refactor removes a measurable amount of query latency.",
+      "claim_class": "PERFORMANCE_CLAIM",
+      "claim_source_ref": "source packet DTCR-SP-PDF-001 section 6"
+    }
+  ],
+  "assessments": {
+    "benefits": [
+      {
+        "statement": "the domain package stops depending on a driver-specific type",
+        "basis_refs": [
+          "DTCR-VC-001"
+        ]
+      }
+    ],
+    "costs": [
+      {
+        "statement": "one port interface and one composition-root edit per consumer"
+      }
+    ],
+    "failure_modes": [
+      {
+        "statement": "the port is introduced and the old import survives on a path the parser skipped"
+      }
+    ],
+    "unknowns": [
+      {
+        "statement": "whether the 25 unparsed generated blobs contain the same import",
+        "resolved_by": "extend the parser denominator to generated code and re-run the fact plane"
+      }
+    ]
+  }
+}
