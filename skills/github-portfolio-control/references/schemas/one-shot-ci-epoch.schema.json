@@ -1,0 +1,804 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ghpc/one-shot-ci-epoch/v1",
+  "title": "One-shot hosted CI epoch",
+  "description": "One deliberate hosted run per candidate, and the record of what it did and did not establish. Hosted minutes are the one resource in this plane that is spent rather than described, and the two ways they get wasted look nothing alike: a candidate that pushes repair commits after asking for review buys a run per push, and a run that skipped every step reads in a summary exactly like one that passed. Four keywords hold the frugality. `pushes_after_ready` has a maximum of zero, so a repair is a new candidate rather than a second run. `ready_marked_count` has a maximum of one, so a draft/ready toggle cannot be used as a rerun button. A SUCCESS conclusion requires at least one non-empty step, so an empty workflow cannot be promoted. And `semantic_acceptance` is pinned false, so a green run stays hosted execution evidence and never becomes acceptance, merge, release or production readiness. What the schema cannot do is know whether the head it was handed is the head that was tested; that comparison is a bundle-level fact and the checker owns it as K06_CI_EPOCH_NOT_EXACT_HEAD.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "ci_epoch_id",
+    "epoch_ref",
+    "candidate",
+    "publication",
+    "hosted_run",
+    "readback",
+    "rerun",
+    "semantic_acceptance",
+    "merge_admission",
+    "evidence_ceiling",
+    "authority",
+    "human_owned_operations"
+  ],
+  "properties": {
+    "schema": {"const": "ghpc/one-shot-ci-epoch/v1"},
+    "ci_epoch_id": {
+      "type": "string",
+      "pattern": "^GHPC-CI-[0-9]{3}$",
+      "description": "Identifiers in the 900-999 block are reserved for shape-only instances inside `examples`; the checker refuses one inside a real bundle."
+    },
+    "epoch_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["main_commit", "tree"],
+      "properties": {
+        "main_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "tree": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+      }
+    },
+    "candidate": {"$ref": "#/$defs/candidate"},
+    "publication": {"$ref": "#/$defs/publication"},
+    "hosted_run": {"$ref": "#/$defs/hosted_run"},
+    "readback": {"$ref": "#/$defs/readback"},
+    "rerun": {"$ref": "#/$defs/rerun"},
+    "semantic_acceptance": {
+      "const": false,
+      "description": "Pinned. MERGEABLE_TRUE_PROMOTED_TO_SEMANTIC_PASS and a green workflow are the same promotion wearing two faces: the provider answered a question about conflicts or about execution, and neither question was whether the change is right."
+    },
+    "merge_admission": {
+      "const": "HUMAN_ADMIT_REQUIRED",
+      "description": "The only value. A hosted run cannot admit its own merge, and neither can the record of one."
+    },
+    "evidence_ceiling": {
+      "const": "HOSTED_EXECUTION_ONLY",
+      "description": "A workflow ran on a named head, and nothing more."
+    },
+    "authority": {"$ref": "#/$defs/authority"},
+    "human_owned_operations": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 4}
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "required": ["hosted_run"],
+        "properties": {
+          "hosted_run": {
+            "required": ["hosted_evidence_grade"],
+            "properties": {"hosted_evidence_grade": {"const": "EXECUTION_OBSERVED"}}
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "readback": {
+            "properties": {
+              "tested_head_equals_candidate_head": {
+                "const": true,
+                "description": "A receipt from another head is a receipt about another change."
+              }
+            }
+          }
+        }
+      },
+      "description": "OLD_HEAD_WORKFLOW_RECEIPT_REUSED. A run only counts as execution evidence for the head it actually tested, and the head it tested is compared to the candidate head by the checker as well, because an attestation is one arrival."
+    }
+  ],
+  "$defs": {
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pr_number", "base_commit", "head_commit", "changed_path_denominator", "frozen"],
+      "description": "What is being asked about, frozen before the single push. Freezing is what makes one run enough: an unfrozen candidate produces the next push while the first run is still going.",
+      "properties": {
+        "pr_number": {"type": "integer", "minimum": 1},
+        "base_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "head_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "changed_path_denominator": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1, "maxLength": 300},
+          "description": "Every path the candidate touches, listed. A candidate whose denominator is empty is a candidate nobody can check for an overlapping writer."
+        },
+        "frozen": {
+          "const": true,
+          "description": "Pinned. An epoch that describes an unfrozen candidate describes a moving target and buys a hosted run per movement."
+        }
+      }
+    },
+    "publication": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "publication_state",
+        "draft_first_policy",
+        "draft_phase_pushes",
+        "ready_marked_count",
+        "pushes_after_ready",
+        "local_gates_pass_at_head"
+      ],
+      "properties": {
+        "publication_state": {"enum": ["NOT_PUBLISHED", "DRAFT", "READY_FOR_REVIEW"]},
+        "draft_first_policy": {
+          "const": true,
+          "description": "Pinned. Publishing as Draft is what keeps the hosted lane unrequested while local convergence is still happening; an artifact that could turn it off could spend a run per intermediate push."
+        },
+        "draft_phase_pushes": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Pushes made while the candidate was still a draft. Any number is allowed; that is the point of the draft phase."
+        },
+        "ready_marked_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "DRAFT_OR_SYNCHRONIZE_CI_SPAM. Toggling ready is the cheapest way to buy another hosted run without admitting to a rerun, so the count is capped at the one deliberate request."
+        },
+        "pushes_after_ready": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 0,
+          "description": "Zero. A change after the request is a new candidate and a new epoch, not a correction to this one."
+        },
+        "local_gates_pass_at_head": {"type": "boolean"}
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": ["publication_state"],
+            "properties": {"publication_state": {"const": "READY_FOR_REVIEW"}}
+          },
+          "then": {
+            "properties": {
+              "local_gates_pass_at_head": {
+                "const": true,
+                "description": "The hosted lane is asked once, after the local lane is finished. Asking first is how one run becomes five."
+              }
+            }
+          },
+          "description": "Local convergence precedes the request, not the other way round."
+        },
+        {
+          "if": {
+            "required": ["publication_state"],
+            "properties": {"publication_state": {"const": "NOT_PUBLISHED"}}
+          },
+          "then": {
+            "properties": {
+              "ready_marked_count": {
+                "maximum": 0,
+                "description": "Nothing was published, so nothing was marked ready."
+              }
+            }
+          },
+          "description": "The unpublished state has to stay describable, and it has to stay honest about what it did not do."
+        }
+      ]
+    },
+    "hosted_run": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "execution_state",
+        "run_id",
+        "tested_head",
+        "conclusion",
+        "hosted_evidence_grade",
+        "jobs",
+        "non_empty_steps",
+        "artifacts"
+      ],
+      "properties": {
+        "execution_state": {"enum": ["EXERCISED", "NOT_EXERCISED"]},
+        "run_id": {"type": ["string", "null"], "minLength": 1, "maxLength": 80},
+        "tested_head": {
+          "type": ["string", "null"],
+          "pattern": "^[0-9a-f]{40}$",
+          "description": "The exact commit the hosted job checked out. A ref name fails the pattern: the run tested whatever the ref pointed at, and by the time the receipt is read that may be a different change."
+        },
+        "conclusion": {"enum": ["SUCCESS", "FAILURE", "CANCELLED", "SKIPPED", "NOT_EXERCISED"]},
+        "hosted_evidence_grade": {
+          "enum": ["EXECUTION_OBSERVED", "NOT_EVIDENCE"],
+          "description": "Whether anything actually executed. Kept separate from `conclusion` because a run that skipped every job still concludes."
+        },
+        "jobs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1, "maxLength": 200}
+        },
+        "non_empty_steps": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Steps that ran a command and produced output. Zero on a SUCCESS is EMPTY_OR_SKIPPED_WORKFLOW_PROMOTED_TO_PASS."
+        },
+        "artifacts": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1, "maxLength": 200}
+        }
+      },
+      "allOf": [
+        {
+          "if": {"required": ["execution_state"], "properties": {"execution_state": {"const": "EXERCISED"}}},
+          "then": {
+            "properties": {
+              "run_id": {
+                "type": "string",
+                "description": "An exercised run has an identity somebody else can fetch."
+              }
+            }
+          },
+          "description": "An exercised run with no id is a claim with no readback."
+        },
+        {
+          "if": {"required": ["conclusion"], "properties": {"conclusion": {"const": "SUCCESS"}}},
+          "then": {
+            "properties": {
+              "non_empty_steps": {
+                "minimum": 1,
+                "description": "Success with nothing executed is the shape of a workflow whose only job was filtered out by a paths rule."
+              }
+            }
+          },
+          "description": "EMPTY_OR_SKIPPED_WORKFLOW_PROMOTED_TO_PASS, step half."
+        },
+        {
+          "if": {"required": ["conclusion"], "properties": {"conclusion": {"const": "SUCCESS"}}},
+          "then": {
+            "properties": {
+              "jobs": {
+                "minItems": 1,
+                "description": "Success with no jobs is the same promotion one level up."
+              }
+            }
+          },
+          "description": "EMPTY_OR_SKIPPED_WORKFLOW_PROMOTED_TO_PASS, job half, kept separate so each half fails on its own keyword."
+        },
+        {
+          "if": {
+            "required": ["conclusion"],
+            "properties": {"conclusion": {"enum": ["SKIPPED", "CANCELLED", "NOT_EXERCISED"]}}
+          },
+          "then": {
+            "properties": {
+              "hosted_evidence_grade": {
+                "const": "NOT_EVIDENCE",
+                "description": "Nothing executed, so nothing was observed."
+              }
+            }
+          },
+          "description": "A skipped or cancelled run graded as execution evidence is the quietest of the CI promotions, because the summary line still says the workflow completed."
+        }
+      ]
+    },
+    "readback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tested_head_equals_candidate_head",
+        "jobs_read_back",
+        "steps_read_back",
+        "artifacts_read_back"
+      ],
+      "description": "What was actually fetched back after the run, as four separate facts. A single `read_back: true` would let one fetched field stand for four.",
+      "properties": {
+        "tested_head_equals_candidate_head": {"type": "boolean"},
+        "jobs_read_back": {"type": "boolean"},
+        "steps_read_back": {"type": "boolean"},
+        "artifacts_read_back": {"type": "boolean"}
+      }
+    },
+    "rerun": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rerun_count", "classifier", "code_head_config_unchanged"],
+      "properties": {
+        "rerun_count": {"type": "integer", "minimum": 0},
+        "classifier": {"enum": ["NONE", "INFRASTRUCTURE_FLAKE_PROVEN"]},
+        "code_head_config_unchanged": {"type": "boolean"}
+      },
+      "allOf": [
+        {
+          "if": {"required": ["rerun_count"], "properties": {"rerun_count": {"minimum": 1}}},
+          "then": {
+            "properties": {
+              "classifier": {
+                "enum": ["INFRASTRUCTURE_FLAKE_PROVEN"],
+                "description": "A rerun needs a reason that is not hope."
+              }
+            }
+          },
+          "description": "BLIND_RERUN_AFTER_CODE_FAILURE. A code or test failure returns to a new local candidate epoch; only a proven infrastructure flake earns the same head twice."
+        },
+        {
+          "if": {
+            "required": ["classifier"],
+            "properties": {"classifier": {"const": "INFRASTRUCTURE_FLAKE_PROVEN"}}
+          },
+          "then": {
+            "properties": {
+              "code_head_config_unchanged": {
+                "const": true,
+                "description": "The proof is that nothing about the subject changed. Without it the classifier is a label."
+              }
+            }
+          },
+          "description": "The classifier has to be earned by the one comparison that distinguishes a flake from a fix."
+        }
+      ]
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["merge", "release", "promotion", "provider_execution", "production"],
+      "properties": {
+        "merge": {"const": false},
+        "release": {"const": false},
+        "promotion": {"const": false},
+        "provider_execution": {"const": false},
+        "production": {"const": false}
+      }
+    }
+  },
+  "examples": [
+    {
+      "schema": "ghpc/one-shot-ci-epoch/v1",
+      "ci_epoch_id": "GHPC-CI-001",
+      "epoch_ref": {
+        "main_commit": "3fc020414134999227aec6ba9304a08e86287033",
+        "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d"
+      },
+      "candidate": {
+        "pr_number": 560,
+        "base_commit": "3fc020414134999227aec6ba9304a08e86287033",
+        "head_commit": "3fc020414134999227aec6ba9304a08e86287033",
+        "changed_path_denominator": ["skills/github-portfolio-control/**"],
+        "frozen": true
+      },
+      "publication": {
+        "publication_state": "NOT_PUBLISHED",
+        "draft_first_policy": true,
+        "draft_phase_pushes": 0,
+        "ready_marked_count": 0,
+        "pushes_after_ready": 0,
+        "local_gates_pass_at_head": true
+      },
+      "hosted_run": {
+        "execution_state": "NOT_EXERCISED",
+        "run_id": null,
+        "tested_head": null,
+        "conclusion": "NOT_EXERCISED",
+        "hosted_evidence_grade": "NOT_EVIDENCE",
+        "jobs": [],
+        "non_empty_steps": 0,
+        "artifacts": []
+      },
+      "readback": {
+        "tested_head_equals_candidate_head": false,
+        "jobs_read_back": false,
+        "steps_read_back": false,
+        "artifacts_read_back": false
+      },
+      "rerun": {
+        "rerun_count": 0,
+        "classifier": "NONE",
+        "code_head_config_unchanged": false
+      },
+      "semantic_acceptance": false,
+      "merge_admission": "HUMAN_ADMIT_REQUIRED",
+      "evidence_ceiling": "HOSTED_EXECUTION_ONLY",
+      "authority": {
+        "merge": false,
+        "release": false,
+        "promotion": false,
+        "provider_execution": false,
+        "production": false
+      },
+      "human_owned_operations": [
+        "publishing the candidate and marking it ready exactly once",
+        "merge and release"
+      ]
+    },
+    {
+      "schema": "ghpc/one-shot-ci-epoch/v1",
+      "ci_epoch_id": "GHPC-CI-900",
+      "epoch_ref": {
+        "main_commit": "3fc020414134999227aec6ba9304a08e86287033",
+        "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d"
+      },
+      "candidate": {
+        "pr_number": 900,
+        "base_commit": "3fc020414134999227aec6ba9304a08e86287033",
+        "head_commit": "8818e80ae5e12d0328c7b95158e681471b04682e",
+        "changed_path_denominator": ["shape-only/**"],
+        "frozen": true
+      },
+      "publication": {
+        "publication_state": "READY_FOR_REVIEW",
+        "draft_first_policy": true,
+        "draft_phase_pushes": 3,
+        "ready_marked_count": 1,
+        "pushes_after_ready": 0,
+        "local_gates_pass_at_head": true
+      },
+      "hosted_run": {
+        "execution_state": "EXERCISED",
+        "run_id": "shape-only-run",
+        "tested_head": "8818e80ae5e12d0328c7b95158e681471b04682e",
+        "conclusion": "SUCCESS",
+        "hosted_evidence_grade": "EXECUTION_OBSERVED",
+        "jobs": ["skill-suites"],
+        "non_empty_steps": 7,
+        "artifacts": []
+      },
+      "readback": {
+        "tested_head_equals_candidate_head": true,
+        "jobs_read_back": true,
+        "steps_read_back": true,
+        "artifacts_read_back": true
+      },
+      "rerun": {
+        "rerun_count": 0,
+        "classifier": "NONE",
+        "code_head_config_unchanged": false
+      },
+      "semantic_acceptance": false,
+      "merge_admission": "HUMAN_ADMIT_REQUIRED",
+      "evidence_ceiling": "HOSTED_EXECUTION_ONLY",
+      "authority": {
+        "merge": false,
+        "release": false,
+        "promotion": false,
+        "provider_execution": false,
+        "production": false
+      },
+      "human_owned_operations": ["merge and release"]
+    }
+  ],
+  "x-refusal-controls": [
+    {
+      "case_id": "GHPC-XC-CI-001",
+      "refuses": "A repair pushed after the single review request, which buys a second hosted run.",
+      "refused_by": "$defs.publication.properties.pushes_after_ready.maximum",
+      "instance": {
+        "schema": "ghpc/one-shot-ci-epoch/v1",
+        "ci_epoch_id": "GHPC-CI-101",
+        "epoch_ref": {"main_commit": "3fc020414134999227aec6ba9304a08e86287033", "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d"},
+        "candidate": {"pr_number": 101, "base_commit": "3fc020414134999227aec6ba9304a08e86287033", "head_commit": "8818e80ae5e12d0328c7b95158e681471b04682e", "changed_path_denominator": ["skills/example/**"], "frozen": true},
+        "publication": {"publication_state": "READY_FOR_REVIEW", "draft_first_policy": true, "draft_phase_pushes": 2, "ready_marked_count": 1, "pushes_after_ready": 2, "local_gates_pass_at_head": true},
+        "hosted_run": {"execution_state": "EXERCISED", "run_id": "101", "tested_head": "8818e80ae5e12d0328c7b95158e681471b04682e", "conclusion": "SUCCESS", "hosted_evidence_grade": "EXECUTION_OBSERVED", "jobs": ["suite"], "non_empty_steps": 5, "artifacts": []},
+        "readback": {"tested_head_equals_candidate_head": true, "jobs_read_back": true, "steps_read_back": true, "artifacts_read_back": true},
+        "rerun": {"rerun_count": 0, "classifier": "NONE", "code_head_config_unchanged": false},
+        "semantic_acceptance": false,
+        "merge_admission": "HUMAN_ADMIT_REQUIRED",
+        "evidence_ceiling": "HOSTED_EXECUTION_ONLY",
+        "authority": {"merge": false, "release": false, "promotion": false, "provider_execution": false, "production": false},
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "GHPC-XC-CI-002",
+      "refuses": "A draft/ready toggle used as a rerun button.",
+      "refused_by": "$defs.publication.properties.ready_marked_count.maximum",
+      "instance": {
+        "schema": "ghpc/one-shot-ci-epoch/v1",
+        "ci_epoch_id": "GHPC-CI-102",
+        "epoch_ref": {"main_commit": "3fc020414134999227aec6ba9304a08e86287033", "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d"},
+        "candidate": {"pr_number": 102, "base_commit": "3fc020414134999227aec6ba9304a08e86287033", "head_commit": "8818e80ae5e12d0328c7b95158e681471b04682e", "changed_path_denominator": ["skills/example/**"], "frozen": true},
+        "publication": {"publication_state": "READY_FOR_REVIEW", "draft_first_policy": true, "draft_phase_pushes": 2, "ready_marked_count": 3, "pushes_after_ready": 0, "local_gates_pass_at_head": true},
+        "hosted_run": {"execution_state": "EXERCISED", "run_id": "102", "tested_head": "8818e80ae5e12d0328c7b95158e681471b04682e", "conclusion": "SUCCESS", "hosted_evidence_grade": "EXECUTION_OBSERVED", "jobs": ["suite"], "non_empty_steps": 5, "artifacts": []},
+        "readback": {"tested_head_equals_candidate_head": true, "jobs_read_back": true, "steps_read_back": true, "artifacts_read_back": true},
+        "rerun": {"rerun_count": 0, "classifier": "NONE", "code_head_config_unchanged": false},
+        "semantic_acceptance": false,
+        "merge_admission": "HUMAN_ADMIT_REQUIRED",
+        "evidence_ceiling": "HOSTED_EXECUTION_ONLY",
+        "authority": {"merge": false, "release": false, "promotion": false, "provider_execution": false, "production": false},
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "GHPC-XC-CI-003",
+      "refuses": "An epoch that switches off draft-first publication, so every intermediate push buys a run.",
+      "refused_by": "$defs.publication.properties.draft_first_policy.const",
+      "instance": {
+        "schema": "ghpc/one-shot-ci-epoch/v1",
+        "ci_epoch_id": "GHPC-CI-103",
+        "epoch_ref": {"main_commit": "3fc020414134999227aec6ba9304a08e86287033", "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d"},
+        "candidate": {"pr_number": 103, "base_commit": "3fc020414134999227aec6ba9304a08e86287033", "head_commit": "8818e80ae5e12d0328c7b95158e681471b04682e", "changed_path_denominator": ["skills/example/**"], "frozen": true},
+        "publication": {"publication_state": "READY_FOR_REVIEW", "draft_first_policy": false, "draft_phase_pushes": 0, "ready_marked_count": 1, "pushes_after_ready": 0, "local_gates_pass_at_head": true},
+        "hosted_run": {"execution_state": "EXERCISED", "run_id": "103", "tested_head": "8818e80ae5e12d0328c7b95158e681471b04682e", "conclusion": "SUCCESS", "hosted_evidence_grade": "EXECUTION_OBSERVED", "jobs": ["suite"], "non_empty_steps": 5, "artifacts": []},
+        "readback": {"tested_head_equals_candidate_head": true, "jobs_read_back": true, "steps_read_back": true, "artifacts_read_back": true},
+        "rerun": {"rerun_count": 0, "classifier": "NONE", "code_head_config_unchanged": false},
+        "semantic_acceptance": false,
+        "merge_admission": "HUMAN_ADMIT_REQUIRED",
+        "evidence_ceiling": "HOSTED_EXECUTION_ONLY",
+        "authority": {"merge": false, "release": false, "promotion": false, "provider_execution": false, "production": false},
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "GHPC-XC-CI-004",
+      "refuses": "The hosted lane asked for before the local lane converged at that head.",
+      "refused_by": "$defs.publication.allOf[0].then.properties.local_gates_pass_at_head.const",
+      "instance": {
+        "schema": "ghpc/one-shot-ci-epoch/v1",
+        "ci_epoch_id": "GHPC-CI-104",
+        "epoch_ref": {"main_commit": "3fc020414134999227aec6ba9304a08e86287033", "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d"},
+        "candidate": {"pr_number": 104, "base_commit": "3fc020414134999227aec6ba9304a08e86287033", "head_commit": "8818e80ae5e12d0328c7b95158e681471b04682e", "changed_path_denominator": ["skills/example/**"], "frozen": true},
+        "publication": {"publication_state": "READY_FOR_REVIEW", "draft_first_policy": true, "draft_phase_pushes": 1, "ready_marked_count": 1, "pushes_after_ready": 0, "local_gates_pass_at_head": false},
+        "hosted_run": {"execution_state": "EXERCISED", "run_id": "104", "tested_head": "8818e80ae5e12d0328c7b95158e681471b04682e", "conclusion": "FAILURE", "hosted_evidence_grade": "EXECUTION_OBSERVED", "jobs": ["suite"], "non_empty_steps": 5, "artifacts": []},
+        "readback": {"tested_head_equals_candidate_head": true, "jobs_read_back": true, "steps_read_back": true, "artifacts_read_back": true},
+        "rerun": {"rerun_count": 0, "classifier": "NONE", "code_head_config_unchanged": false},
+        "semantic_acceptance": false,
+        "merge_admission": "HUMAN_ADMIT_REQUIRED",
+        "evidence_ceiling": "HOSTED_EXECUTION_ONLY",
+        "authority": {"merge": false, "release": false, "promotion": false, "provider_execution": false, "production": false},
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "GHPC-XC-CI-005",
+      "refuses": "A candidate that was never published, reporting that it was marked ready.",
+      "refused_by": "$defs.publication.allOf[1].then.properties.ready_marked_count.maximum",
+      "instance": {
+        "schema": "ghpc/one-shot-ci-epoch/v1",
+        "ci_epoch_id": "GHPC-CI-105",
+        "epoch_ref": {"main_commit": "3fc020414134999227aec6ba9304a08e86287033", "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d"},
+        "candidate": {"pr_number": 105, "base_commit": "3fc020414134999227aec6ba9304a08e86287033", "head_commit": "8818e80ae5e12d0328c7b95158e681471b04682e", "changed_path_denominator": ["skills/example/**"], "frozen": true},
+        "publication": {"publication_state": "NOT_PUBLISHED", "draft_first_policy": true, "draft_phase_pushes": 0, "ready_marked_count": 1, "pushes_after_ready": 0, "local_gates_pass_at_head": true},
+        "hosted_run": {"execution_state": "NOT_EXERCISED", "run_id": null, "tested_head": null, "conclusion": "NOT_EXERCISED", "hosted_evidence_grade": "NOT_EVIDENCE", "jobs": [], "non_empty_steps": 0, "artifacts": []},
+        "readback": {"tested_head_equals_candidate_head": false, "jobs_read_back": false, "steps_read_back": false, "artifacts_read_back": false},
+        "rerun": {"rerun_count": 0, "classifier": "NONE", "code_head_config_unchanged": false},
+        "semantic_acceptance": false,
+        "merge_admission": "HUMAN_ADMIT_REQUIRED",
+        "evidence_ceiling": "HOSTED_EXECUTION_ONLY",
+        "authority": {"merge": false, "release": false, "promotion": false, "provider_execution": false, "production": false},
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "GHPC-XC-CI-006",
+      "refuses": "A mutable ref recorded as the head the hosted job tested.",
+      "refused_by": "$defs.hosted_run.properties.tested_head.pattern",
+      "instance": {
+        "schema": "ghpc/one-shot-ci-epoch/v1",
+        "ci_epoch_id": "GHPC-CI-106",
+        "epoch_ref": {"main_commit": "3fc020414134999227aec6ba9304a08e86287033", "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d"},
+        "candidate": {"pr_number": 106, "base_commit": "3fc020414134999227aec6ba9304a08e86287033", "head_commit": "8818e80ae5e12d0328c7b95158e681471b04682e", "changed_path_denominator": ["skills/example/**"], "frozen": true},
+        "publication": {"publication_state": "READY_FOR_REVIEW", "draft_first_policy": true, "draft_phase_pushes": 1, "ready_marked_count": 1, "pushes_after_ready": 0, "local_gates_pass_at_head": true},
+        "hosted_run": {"execution_state": "EXERCISED", "run_id": "106", "tested_head": "refs/heads/agent/wave-7", "conclusion": "SUCCESS", "hosted_evidence_grade": "EXECUTION_OBSERVED", "jobs": ["suite"], "non_empty_steps": 5, "artifacts": []},
+        "readback": {"tested_head_equals_candidate_head": true, "jobs_read_back": true, "steps_read_back": true, "artifacts_read_back": true},
+        "rerun": {"rerun_count": 0, "classifier": "NONE", "code_head_config_unchanged": false},
+        "semantic_acceptance": false,
+        "merge_admission": "HUMAN_ADMIT_REQUIRED",
+        "evidence_ceiling": "HOSTED_EXECUTION_ONLY",
+        "authority": {"merge": false, "release": false, "promotion": false, "provider_execution": false, "production": false},
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "GHPC-XC-CI-007",
+      "refuses": "An exercised run with no run id, so nobody else can fetch it back.",
+      "refused_by": "$defs.hosted_run.allOf[0].then.properties.run_id.type",
+      "instance": {
+        "schema": "ghpc/one-shot-ci-epoch/v1",
+        "ci_epoch_id": "GHPC-CI-107",
+        "epoch_ref": {"main_commit": "3fc020414134999227aec6ba9304a08e86287033", "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d"},
+        "candidate": {"pr_number": 107, "base_commit": "3fc020414134999227aec6ba9304a08e86287033", "head_commit": "8818e80ae5e12d0328c7b95158e681471b04682e", "changed_path_denominator": ["skills/example/**"], "frozen": true},
+        "publication": {"publication_state": "READY_FOR_REVIEW", "draft_first_policy": true, "draft_phase_pushes": 1, "ready_marked_count": 1, "pushes_after_ready": 0, "local_gates_pass_at_head": true},
+        "hosted_run": {"execution_state": "EXERCISED", "run_id": null, "tested_head": "8818e80ae5e12d0328c7b95158e681471b04682e", "conclusion": "FAILURE", "hosted_evidence_grade": "EXECUTION_OBSERVED", "jobs": ["suite"], "non_empty_steps": 3, "artifacts": []},
+        "readback": {"tested_head_equals_candidate_head": true, "jobs_read_back": true, "steps_read_back": true, "artifacts_read_back": true},
+        "rerun": {"rerun_count": 0, "classifier": "NONE", "code_head_config_unchanged": false},
+        "semantic_acceptance": false,
+        "merge_admission": "HUMAN_ADMIT_REQUIRED",
+        "evidence_ceiling": "HOSTED_EXECUTION_ONLY",
+        "authority": {"merge": false, "release": false, "promotion": false, "provider_execution": false, "production": false},
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "GHPC-XC-CI-008",
+      "refuses": "A green run in which no step executed anything.",
+      "refused_by": "$defs.hosted_run.allOf[1].then.properties.non_empty_steps.minimum",
+      "instance": {
+        "schema": "ghpc/one-shot-ci-epoch/v1",
+        "ci_epoch_id": "GHPC-CI-108",
+        "epoch_ref": {"main_commit": "3fc020414134999227aec6ba9304a08e86287033", "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d"},
+        "candidate": {"pr_number": 108, "base_commit": "3fc020414134999227aec6ba9304a08e86287033", "head_commit": "8818e80ae5e12d0328c7b95158e681471b04682e", "changed_path_denominator": ["skills/example/**"], "frozen": true},
+        "publication": {"publication_state": "READY_FOR_REVIEW", "draft_first_policy": true, "draft_phase_pushes": 1, "ready_marked_count": 1, "pushes_after_ready": 0, "local_gates_pass_at_head": true},
+        "hosted_run": {"execution_state": "EXERCISED", "run_id": "108", "tested_head": "8818e80ae5e12d0328c7b95158e681471b04682e", "conclusion": "SUCCESS", "hosted_evidence_grade": "EXECUTION_OBSERVED", "jobs": ["suite"], "non_empty_steps": 0, "artifacts": []},
+        "readback": {"tested_head_equals_candidate_head": true, "jobs_read_back": true, "steps_read_back": true, "artifacts_read_back": true},
+        "rerun": {"rerun_count": 0, "classifier": "NONE", "code_head_config_unchanged": false},
+        "semantic_acceptance": false,
+        "merge_admission": "HUMAN_ADMIT_REQUIRED",
+        "evidence_ceiling": "HOSTED_EXECUTION_ONLY",
+        "authority": {"merge": false, "release": false, "promotion": false, "provider_execution": false, "production": false},
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "GHPC-XC-CI-009",
+      "refuses": "A green run with no jobs at all, which is what a paths filter produces.",
+      "refused_by": "$defs.hosted_run.allOf[2].then.properties.jobs.minItems",
+      "instance": {
+        "schema": "ghpc/one-shot-ci-epoch/v1",
+        "ci_epoch_id": "GHPC-CI-109",
+        "epoch_ref": {"main_commit": "3fc020414134999227aec6ba9304a08e86287033", "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d"},
+        "candidate": {"pr_number": 109, "base_commit": "3fc020414134999227aec6ba9304a08e86287033", "head_commit": "8818e80ae5e12d0328c7b95158e681471b04682e", "changed_path_denominator": ["skills/example/**"], "frozen": true},
+        "publication": {"publication_state": "READY_FOR_REVIEW", "draft_first_policy": true, "draft_phase_pushes": 1, "ready_marked_count": 1, "pushes_after_ready": 0, "local_gates_pass_at_head": true},
+        "hosted_run": {"execution_state": "EXERCISED", "run_id": "109", "tested_head": "8818e80ae5e12d0328c7b95158e681471b04682e", "conclusion": "SUCCESS", "hosted_evidence_grade": "EXECUTION_OBSERVED", "jobs": [], "non_empty_steps": 4, "artifacts": []},
+        "readback": {"tested_head_equals_candidate_head": true, "jobs_read_back": true, "steps_read_back": true, "artifacts_read_back": true},
+        "rerun": {"rerun_count": 0, "classifier": "NONE", "code_head_config_unchanged": false},
+        "semantic_acceptance": false,
+        "merge_admission": "HUMAN_ADMIT_REQUIRED",
+        "evidence_ceiling": "HOSTED_EXECUTION_ONLY",
+        "authority": {"merge": false, "release": false, "promotion": false, "provider_execution": false, "production": false},
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "GHPC-XC-CI-010",
+      "refuses": "A skipped run graded as execution evidence.",
+      "refused_by": "$defs.hosted_run.allOf[3].then.properties.hosted_evidence_grade.const",
+      "instance": {
+        "schema": "ghpc/one-shot-ci-epoch/v1",
+        "ci_epoch_id": "GHPC-CI-110",
+        "epoch_ref": {"main_commit": "3fc020414134999227aec6ba9304a08e86287033", "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d"},
+        "candidate": {"pr_number": 110, "base_commit": "3fc020414134999227aec6ba9304a08e86287033", "head_commit": "8818e80ae5e12d0328c7b95158e681471b04682e", "changed_path_denominator": ["skills/example/**"], "frozen": true},
+        "publication": {"publication_state": "READY_FOR_REVIEW", "draft_first_policy": true, "draft_phase_pushes": 1, "ready_marked_count": 1, "pushes_after_ready": 0, "local_gates_pass_at_head": true},
+        "hosted_run": {"execution_state": "EXERCISED", "run_id": "110", "tested_head": "8818e80ae5e12d0328c7b95158e681471b04682e", "conclusion": "SKIPPED", "hosted_evidence_grade": "EXECUTION_OBSERVED", "jobs": ["suite"], "non_empty_steps": 0, "artifacts": []},
+        "readback": {"tested_head_equals_candidate_head": true, "jobs_read_back": true, "steps_read_back": true, "artifacts_read_back": true},
+        "rerun": {"rerun_count": 0, "classifier": "NONE", "code_head_config_unchanged": false},
+        "semantic_acceptance": false,
+        "merge_admission": "HUMAN_ADMIT_REQUIRED",
+        "evidence_ceiling": "HOSTED_EXECUTION_ONLY",
+        "authority": {"merge": false, "release": false, "promotion": false, "provider_execution": false, "production": false},
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "GHPC-XC-CI-011",
+      "refuses": "A receipt from an earlier head reused as evidence for this candidate.",
+      "refused_by": "allOf[0].then.properties.readback.properties.tested_head_equals_candidate_head.const",
+      "instance": {
+        "schema": "ghpc/one-shot-ci-epoch/v1",
+        "ci_epoch_id": "GHPC-CI-111",
+        "epoch_ref": {"main_commit": "3fc020414134999227aec6ba9304a08e86287033", "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d"},
+        "candidate": {"pr_number": 111, "base_commit": "3fc020414134999227aec6ba9304a08e86287033", "head_commit": "8818e80ae5e12d0328c7b95158e681471b04682e", "changed_path_denominator": ["skills/example/**"], "frozen": true},
+        "publication": {"publication_state": "READY_FOR_REVIEW", "draft_first_policy": true, "draft_phase_pushes": 1, "ready_marked_count": 1, "pushes_after_ready": 0, "local_gates_pass_at_head": true},
+        "hosted_run": {"execution_state": "EXERCISED", "run_id": "111", "tested_head": "3fc020414134999227aec6ba9304a08e86287033", "conclusion": "SUCCESS", "hosted_evidence_grade": "EXECUTION_OBSERVED", "jobs": ["suite"], "non_empty_steps": 6, "artifacts": []},
+        "readback": {"tested_head_equals_candidate_head": false, "jobs_read_back": true, "steps_read_back": true, "artifacts_read_back": true},
+        "rerun": {"rerun_count": 0, "classifier": "NONE", "code_head_config_unchanged": false},
+        "semantic_acceptance": false,
+        "merge_admission": "HUMAN_ADMIT_REQUIRED",
+        "evidence_ceiling": "HOSTED_EXECUTION_ONLY",
+        "authority": {"merge": false, "release": false, "promotion": false, "provider_execution": false, "production": false},
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "GHPC-XC-CI-012",
+      "refuses": "A blind rerun on the same head after a code failure.",
+      "refused_by": "$defs.rerun.allOf[0].then.properties.classifier.enum",
+      "instance": {
+        "schema": "ghpc/one-shot-ci-epoch/v1",
+        "ci_epoch_id": "GHPC-CI-112",
+        "epoch_ref": {"main_commit": "3fc020414134999227aec6ba9304a08e86287033", "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d"},
+        "candidate": {"pr_number": 112, "base_commit": "3fc020414134999227aec6ba9304a08e86287033", "head_commit": "8818e80ae5e12d0328c7b95158e681471b04682e", "changed_path_denominator": ["skills/example/**"], "frozen": true},
+        "publication": {"publication_state": "READY_FOR_REVIEW", "draft_first_policy": true, "draft_phase_pushes": 1, "ready_marked_count": 1, "pushes_after_ready": 0, "local_gates_pass_at_head": true},
+        "hosted_run": {"execution_state": "EXERCISED", "run_id": "112", "tested_head": "8818e80ae5e12d0328c7b95158e681471b04682e", "conclusion": "FAILURE", "hosted_evidence_grade": "EXECUTION_OBSERVED", "jobs": ["suite"], "non_empty_steps": 6, "artifacts": []},
+        "readback": {"tested_head_equals_candidate_head": true, "jobs_read_back": true, "steps_read_back": true, "artifacts_read_back": true},
+        "rerun": {"rerun_count": 2, "classifier": "NONE", "code_head_config_unchanged": false},
+        "semantic_acceptance": false,
+        "merge_admission": "HUMAN_ADMIT_REQUIRED",
+        "evidence_ceiling": "HOSTED_EXECUTION_ONLY",
+        "authority": {"merge": false, "release": false, "promotion": false, "provider_execution": false, "production": false},
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "GHPC-XC-CI-013",
+      "refuses": "A flake classification that never proved the head and config unchanged.",
+      "refused_by": "$defs.rerun.allOf[1].then.properties.code_head_config_unchanged.const",
+      "instance": {
+        "schema": "ghpc/one-shot-ci-epoch/v1",
+        "ci_epoch_id": "GHPC-CI-113",
+        "epoch_ref": {"main_commit": "3fc020414134999227aec6ba9304a08e86287033", "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d"},
+        "candidate": {"pr_number": 113, "base_commit": "3fc020414134999227aec6ba9304a08e86287033", "head_commit": "8818e80ae5e12d0328c7b95158e681471b04682e", "changed_path_denominator": ["skills/example/**"], "frozen": true},
+        "publication": {"publication_state": "READY_FOR_REVIEW", "draft_first_policy": true, "draft_phase_pushes": 1, "ready_marked_count": 1, "pushes_after_ready": 0, "local_gates_pass_at_head": true},
+        "hosted_run": {"execution_state": "EXERCISED", "run_id": "113", "tested_head": "8818e80ae5e12d0328c7b95158e681471b04682e", "conclusion": "SUCCESS", "hosted_evidence_grade": "EXECUTION_OBSERVED", "jobs": ["suite"], "non_empty_steps": 6, "artifacts": []},
+        "readback": {"tested_head_equals_candidate_head": true, "jobs_read_back": true, "steps_read_back": true, "artifacts_read_back": true},
+        "rerun": {"rerun_count": 1, "classifier": "INFRASTRUCTURE_FLAKE_PROVEN", "code_head_config_unchanged": false},
+        "semantic_acceptance": false,
+        "merge_admission": "HUMAN_ADMIT_REQUIRED",
+        "evidence_ceiling": "HOSTED_EXECUTION_ONLY",
+        "authority": {"merge": false, "release": false, "promotion": false, "provider_execution": false, "production": false},
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "GHPC-XC-CI-014",
+      "refuses": "A green hosted run promoted to semantic acceptance.",
+      "refused_by": "properties.semantic_acceptance.const",
+      "instance": {
+        "schema": "ghpc/one-shot-ci-epoch/v1",
+        "ci_epoch_id": "GHPC-CI-114",
+        "epoch_ref": {"main_commit": "3fc020414134999227aec6ba9304a08e86287033", "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d"},
+        "candidate": {"pr_number": 114, "base_commit": "3fc020414134999227aec6ba9304a08e86287033", "head_commit": "8818e80ae5e12d0328c7b95158e681471b04682e", "changed_path_denominator": ["skills/example/**"], "frozen": true},
+        "publication": {"publication_state": "READY_FOR_REVIEW", "draft_first_policy": true, "draft_phase_pushes": 1, "ready_marked_count": 1, "pushes_after_ready": 0, "local_gates_pass_at_head": true},
+        "hosted_run": {"execution_state": "EXERCISED", "run_id": "114", "tested_head": "8818e80ae5e12d0328c7b95158e681471b04682e", "conclusion": "SUCCESS", "hosted_evidence_grade": "EXECUTION_OBSERVED", "jobs": ["suite"], "non_empty_steps": 6, "artifacts": []},
+        "readback": {"tested_head_equals_candidate_head": true, "jobs_read_back": true, "steps_read_back": true, "artifacts_read_back": true},
+        "rerun": {"rerun_count": 0, "classifier": "NONE", "code_head_config_unchanged": false},
+        "semantic_acceptance": true,
+        "merge_admission": "HUMAN_ADMIT_REQUIRED",
+        "evidence_ceiling": "HOSTED_EXECUTION_ONLY",
+        "authority": {"merge": false, "release": false, "promotion": false, "provider_execution": false, "production": false},
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "GHPC-XC-CI-015",
+      "refuses": "A candidate with no changed-path denominator, which no writer-conflict check can read.",
+      "refused_by": "$defs.candidate.properties.changed_path_denominator.minItems",
+      "instance": {
+        "schema": "ghpc/one-shot-ci-epoch/v1",
+        "ci_epoch_id": "GHPC-CI-115",
+        "epoch_ref": {"main_commit": "3fc020414134999227aec6ba9304a08e86287033", "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d"},
+        "candidate": {"pr_number": 115, "base_commit": "3fc020414134999227aec6ba9304a08e86287033", "head_commit": "8818e80ae5e12d0328c7b95158e681471b04682e", "changed_path_denominator": [], "frozen": true},
+        "publication": {"publication_state": "DRAFT", "draft_first_policy": true, "draft_phase_pushes": 1, "ready_marked_count": 0, "pushes_after_ready": 0, "local_gates_pass_at_head": true},
+        "hosted_run": {"execution_state": "NOT_EXERCISED", "run_id": null, "tested_head": null, "conclusion": "NOT_EXERCISED", "hosted_evidence_grade": "NOT_EVIDENCE", "jobs": [], "non_empty_steps": 0, "artifacts": []},
+        "readback": {"tested_head_equals_candidate_head": false, "jobs_read_back": false, "steps_read_back": false, "artifacts_read_back": false},
+        "rerun": {"rerun_count": 0, "classifier": "NONE", "code_head_config_unchanged": false},
+        "semantic_acceptance": false,
+        "merge_admission": "HUMAN_ADMIT_REQUIRED",
+        "evidence_ceiling": "HOSTED_EXECUTION_ONLY",
+        "authority": {"merge": false, "release": false, "promotion": false, "provider_execution": false, "production": false},
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "GHPC-XC-CI-016",
+      "refuses": "An unfrozen candidate, which buys a hosted run per movement.",
+      "refused_by": "$defs.candidate.properties.frozen.const",
+      "instance": {
+        "schema": "ghpc/one-shot-ci-epoch/v1",
+        "ci_epoch_id": "GHPC-CI-116",
+        "epoch_ref": {"main_commit": "3fc020414134999227aec6ba9304a08e86287033", "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d"},
+        "candidate": {"pr_number": 116, "base_commit": "3fc020414134999227aec6ba9304a08e86287033", "head_commit": "8818e80ae5e12d0328c7b95158e681471b04682e", "changed_path_denominator": ["skills/example/**"], "frozen": false},
+        "publication": {"publication_state": "DRAFT", "draft_first_policy": true, "draft_phase_pushes": 4, "ready_marked_count": 0, "pushes_after_ready": 0, "local_gates_pass_at_head": true},
+        "hosted_run": {"execution_state": "NOT_EXERCISED", "run_id": null, "tested_head": null, "conclusion": "NOT_EXERCISED", "hosted_evidence_grade": "NOT_EVIDENCE", "jobs": [], "non_empty_steps": 0, "artifacts": []},
+        "readback": {"tested_head_equals_candidate_head": false, "jobs_read_back": false, "steps_read_back": false, "artifacts_read_back": false},
+        "rerun": {"rerun_count": 0, "classifier": "NONE", "code_head_config_unchanged": false},
+        "semantic_acceptance": false,
+        "merge_admission": "HUMAN_ADMIT_REQUIRED",
+        "evidence_ceiling": "HOSTED_EXECUTION_ONLY",
+        "authority": {"merge": false, "release": false, "promotion": false, "provider_execution": false, "production": false},
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "GHPC-XC-CI-017",
+      "refuses": "Authority widening: a hosted receipt that grants itself merge.",
+      "refused_by": "$defs.authority.properties.merge.const",
+      "instance": {
+        "schema": "ghpc/one-shot-ci-epoch/v1",
+        "ci_epoch_id": "GHPC-CI-117",
+        "epoch_ref": {"main_commit": "3fc020414134999227aec6ba9304a08e86287033", "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d"},
+        "candidate": {"pr_number": 117, "base_commit": "3fc020414134999227aec6ba9304a08e86287033", "head_commit": "8818e80ae5e12d0328c7b95158e681471b04682e", "changed_path_denominator": ["skills/example/**"], "frozen": true},
+        "publication": {"publication_state": "READY_FOR_REVIEW", "draft_first_policy": true, "draft_phase_pushes": 1, "ready_marked_count": 1, "pushes_after_ready": 0, "local_gates_pass_at_head": true},
+        "hosted_run": {"execution_state": "EXERCISED", "run_id": "117", "tested_head": "8818e80ae5e12d0328c7b95158e681471b04682e", "conclusion": "SUCCESS", "hosted_evidence_grade": "EXECUTION_OBSERVED", "jobs": ["suite"], "non_empty_steps": 6, "artifacts": []},
+        "readback": {"tested_head_equals_candidate_head": true, "jobs_read_back": true, "steps_read_back": true, "artifacts_read_back": true},
+        "rerun": {"rerun_count": 0, "classifier": "NONE", "code_head_config_unchanged": false},
+        "semantic_acceptance": false,
+        "merge_admission": "HUMAN_ADMIT_REQUIRED",
+        "evidence_ceiling": "HOSTED_EXECUTION_ONLY",
+        "authority": {"merge": true, "release": false, "promotion": false, "provider_execution": false, "production": false},
+        "human_owned_operations": ["merge and release"]
+      }
+    }
+  ]
+}

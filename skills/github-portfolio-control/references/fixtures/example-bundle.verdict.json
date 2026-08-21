@@ -1,0 +1,69 @@
+{
+  "authority": {
+    "merge": false,
+    "production": false,
+    "promotion": false,
+    "provider_execution": false,
+    "release": false
+  },
+  "bundle_digest": "sha256:e45e9c3dff4e492a2795786265c729c3e4fdbb7e9778fa064d8023232dfe6592",
+  "checks": [
+    {
+      "code": "K01_MIXED_SNAPSHOT_EPOCH",
+      "state": "PASS"
+    },
+    {
+      "code": "K02_JOIN_INCOMPLETE_ADVANCE",
+      "state": "PASS"
+    },
+    {
+      "code": "K03_SUPERSEDED_EPOCH_NOT_SUPERSEDED",
+      "state": "PASS"
+    },
+    {
+      "code": "K04_AUTHORITY_ROUTE_ABSENT",
+      "state": "PASS"
+    },
+    {
+      "code": "K05_COORDINATOR_INSTRUCTION_ALTERED",
+      "state": "PASS"
+    },
+    {
+      "code": "K06_CI_EPOCH_NOT_EXACT_HEAD",
+      "state": "PASS"
+    },
+    {
+      "code": "K07_REQUIRED_ROLE_MISSING",
+      "state": "PASS"
+    },
+    {
+      "code": "K08_SHAPE_EXAMPLE_USED_AS_RECEIPT",
+      "state": "PASS"
+    },
+    {
+      "code": "K09_OVERLAPPING_EXCLUSIVE_LEASE",
+      "state": "PASS"
+    }
+  ],
+  "evidence_ceiling": "REPOSITORY_BYTES_AND_LOCAL_GIT_ONLY",
+  "hosted_evidence_grade": "NOT_EVIDENCE",
+  "human_owned_operations": [
+    "admitting a composed authority kind",
+    "closing an Issue against unresolved acceptance",
+    "merge and release"
+  ],
+  "join_state": "JOIN_INCOMPLETE",
+  "members_validated": [
+    "ghpc/authority-composition/v1",
+    "ghpc/one-shot-ci-epoch/v1",
+    "ghpc/portfolio-epoch/v1",
+    "ghpc/subagent-join/v1"
+  ],
+  "portfolio_state": "REPOSITORY_SET_FROZEN",
+  "schema": "ghpc/portfolio-control-verdict/v1",
+  "subject": {
+    "main_commit": "3fc020414134999227aec6ba9304a08e86287033",
+    "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d"
+  },
+  "verdict": "NO_CONTRADICTION_FOUND"
+}
