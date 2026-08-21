@@ -1,0 +1,224 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dtcr-retrieval-result.schema.json",
+  "title": "DTCR retrieval result",
+  "description": "The rows one bounded query returned, each carrying an exact back reference and the authority it will keep for the rest of the task. Every row is a SEMANTIC_ROW and a NON_AUTHORITATIVE_CANDIDATE by construction: a stored row is not a ledger event and does not become one by being cited beside one, and a row that arrives ranked first arrives as a suggestion that a document may be relevant rather than as a finding that it is correct, current or binding. A result recorded as NOT_APPLICABLE carries no rows and states why, which is where the manufactured lane is refused: rows cannot be produced for a lane that was never entered. Rows carry a score and the method that produced it, because a similarity number without its metric is a figure that survives every later change to the index it came from.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "result_id", "query_ref", "outcome", "rows", "establishes"],
+  "properties": {
+    "schema": {"const": "dtcr/retrieval-result/v1"},
+    "result_id": {"type": "string", "pattern": "^DTCR-RR-[0-9]{3}$"},
+    "query_ref": {"type": "string", "pattern": "^DTCR-RQ-[0-9]{3}$"},
+    "outcome": {"enum": ["ROWS_RETURNED", "EMPTY", "NOT_APPLICABLE"]},
+    "not_applicable_rationale": {"type": "string", "minLength": 12},
+    "rows": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["rank", "row_class", "authority", "document_ref", "back_reference_ref", "freshness_ref", "score", "score_method"],
+        "properties": {
+          "rank": {"type": "integer", "minimum": 1},
+          "row_class": {
+            "const": "SEMANTIC_ROW",
+            "description": "A stored row is not a ledger event. The two live in different stores with different truths, and a row relabelled as an event inherits an authority the store never had."
+          },
+          "authority": {
+            "const": "NON_AUTHORITATIVE_CANDIDATE",
+            "description": "The same constant the violation candidate's semantic items carry, so a row keeps its ceiling when it is cited there."
+          },
+          "document_ref": {"type": "string", "pattern": "^DTCR-DOC-[0-9]{3}$"},
+          "back_reference_ref": {
+            "type": "string",
+            "pattern": "^DTCR-BK-[0-9]{3}$",
+            "description": "The exact source behind the row. An orphan row is the mutation this field refuses: retrieval returns it, a reader reads it, and nothing says where it came from."
+          },
+          "freshness_ref": {"type": "string", "pattern": "^DTCR-FC-[0-9]{3}$"},
+          "score": {"type": "number"},
+          "score_method": {"type": "string", "minLength": 8}
+        }
+      }
+    },
+    "establishes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["deterministic_fact", "decision", "task_pass"],
+      "properties": {
+        "deterministic_fact": {"const": false},
+        "decision": {"const": false},
+        "task_pass": {"const": false}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"outcome": {"const": "NOT_APPLICABLE"}}, "required": ["outcome"]},
+      "then": {
+        "required": ["not_applicable_rationale"],
+        "properties": {"rows": {"maxItems": 0}},
+        "description": "No synthetic vector lane. A plane that could not help this task returns no rows and says why; rows attached to it are manufactured to complete a picture."
+      }
+    },
+    {
+      "if": {"properties": {"outcome": {"const": "ROWS_RETURNED"}}, "required": ["outcome"]},
+      "then": {
+        "properties": {"rows": {"minItems": 1}},
+        "description": "A result announcing rows and carrying none is an empty result wearing a fuller headline."
+      }
+    }
+  ],
+  "examples": [
+    {
+      "schema": "dtcr/retrieval-result/v1",
+      "result_id": "DTCR-RR-001",
+      "query_ref": "DTCR-RQ-001",
+      "outcome": "ROWS_RETURNED",
+      "rows": [
+        {
+          "rank": 1,
+          "row_class": "SEMANTIC_ROW",
+          "authority": "NON_AUTHORITATIVE_CANDIDATE",
+          "document_ref": "DTCR-DOC-001",
+          "back_reference_ref": "DTCR-BK-001",
+          "freshness_ref": "DTCR-FC-001",
+          "score": 0.82,
+          "score_method": "cosine similarity over the projection recorded in DTCR-PR-001, reranked by keyword overlap"
+        }
+      ],
+      "establishes": {"deterministic_fact": false, "decision": false, "task_pass": false}
+    },
+    {
+      "schema": "dtcr/retrieval-result/v1",
+      "result_id": "DTCR-RR-002",
+      "query_ref": "DTCR-RQ-003",
+      "outcome": "NOT_APPLICABLE",
+      "not_applicable_rationale": "this task is a mechanical rename with no decision, incident or objective that stored context could bear on",
+      "rows": [],
+      "establishes": {"deterministic_fact": false, "decision": false, "task_pass": false}
+    }
+  ],
+  "x-refusal-controls": [
+    {
+      "case_id": "DTCR-XC-RR-001",
+      "refuses": "A lane recorded as not applicable while returning rows, which is the synthetic lane manufactured to complete a diagram.",
+      "refused_by": "allOf[0].then",
+      "instance": {
+        "schema": "dtcr/retrieval-result/v1",
+        "result_id": "DTCR-RR-003",
+        "query_ref": "DTCR-RQ-003",
+        "outcome": "NOT_APPLICABLE",
+        "not_applicable_rationale": "this task is a mechanical rename with no decision or incident that stored context could bear on",
+        "rows": [
+          {
+            "rank": 1,
+            "row_class": "SEMANTIC_ROW",
+            "authority": "NON_AUTHORITATIVE_CANDIDATE",
+            "document_ref": "DTCR-DOC-001",
+            "back_reference_ref": "DTCR-BK-001",
+            "freshness_ref": "DTCR-FC-001",
+            "score": 0.11,
+            "score_method": "cosine similarity over the projection recorded in DTCR-PR-001"
+          }
+        ],
+        "establishes": {"deterministic_fact": false, "decision": false, "task_pass": false}
+      }
+    },
+    {
+      "case_id": "DTCR-XC-RR-002",
+      "refuses": "A returned row relabelled as authoritative.",
+      "refused_by": "properties.rows.items.properties.authority.const",
+      "instance": {
+        "schema": "dtcr/retrieval-result/v1",
+        "result_id": "DTCR-RR-004",
+        "query_ref": "DTCR-RQ-001",
+        "outcome": "ROWS_RETURNED",
+        "rows": [
+          {
+            "rank": 1,
+            "row_class": "SEMANTIC_ROW",
+            "authority": "AUTHORITATIVE",
+            "document_ref": "DTCR-DOC-001",
+            "back_reference_ref": "DTCR-BK-001",
+            "freshness_ref": "DTCR-FC-001",
+            "score": 0.82,
+            "score_method": "cosine similarity over the projection recorded in DTCR-PR-001"
+          }
+        ],
+        "establishes": {"deterministic_fact": false, "decision": false, "task_pass": false}
+      }
+    },
+    {
+      "case_id": "DTCR-XC-RR-003",
+      "refuses": "An orphan row with no back reference to source or ledger.",
+      "refused_by": "properties.rows.items.required",
+      "instance": {
+        "schema": "dtcr/retrieval-result/v1",
+        "result_id": "DTCR-RR-005",
+        "query_ref": "DTCR-RQ-001",
+        "outcome": "ROWS_RETURNED",
+        "rows": [
+          {
+            "rank": 1,
+            "row_class": "SEMANTIC_ROW",
+            "authority": "NON_AUTHORITATIVE_CANDIDATE",
+            "document_ref": "DTCR-DOC-001",
+            "freshness_ref": "DTCR-FC-001",
+            "score": 0.82,
+            "score_method": "cosine similarity over the projection recorded in DTCR-PR-001"
+          }
+        ],
+        "establishes": {"deterministic_fact": false, "decision": false, "task_pass": false}
+      }
+    },
+    {
+      "case_id": "DTCR-XC-RR-004",
+      "refuses": "LANCEDB_ROW != SQLITE_EVENT: a stored row reclassified as a ledger event.",
+      "refused_by": "properties.rows.items.properties.row_class.const",
+      "instance": {
+        "schema": "dtcr/retrieval-result/v1",
+        "result_id": "DTCR-RR-006",
+        "query_ref": "DTCR-RQ-001",
+        "outcome": "ROWS_RETURNED",
+        "rows": [
+          {
+            "rank": 1,
+            "row_class": "LEDGER_EVENT",
+            "authority": "NON_AUTHORITATIVE_CANDIDATE",
+            "document_ref": "DTCR-DOC-001",
+            "back_reference_ref": "DTCR-BK-001",
+            "freshness_ref": "DTCR-FC-001",
+            "score": 0.82,
+            "score_method": "cosine similarity over the projection recorded in DTCR-PR-001"
+          }
+        ],
+        "establishes": {"deterministic_fact": false, "decision": false, "task_pass": false}
+      }
+    },
+    {
+      "case_id": "DTCR-XC-RR-005",
+      "refuses": "VECTOR_SIMILARITY != FACT: a result recorded as having established a deterministic fact.",
+      "refused_by": "properties.establishes.properties.deterministic_fact.const",
+      "instance": {
+        "schema": "dtcr/retrieval-result/v1",
+        "result_id": "DTCR-RR-007",
+        "query_ref": "DTCR-RQ-001",
+        "outcome": "ROWS_RETURNED",
+        "rows": [
+          {
+            "rank": 1,
+            "row_class": "SEMANTIC_ROW",
+            "authority": "NON_AUTHORITATIVE_CANDIDATE",
+            "document_ref": "DTCR-DOC-001",
+            "back_reference_ref": "DTCR-BK-001",
+            "freshness_ref": "DTCR-FC-001",
+            "score": 0.94,
+            "score_method": "cosine similarity over the projection recorded in DTCR-PR-001"
+          }
+        ],
+        "establishes": {"deterministic_fact": true, "decision": false, "task_pass": false}
+      }
+    }
+  ]
+}

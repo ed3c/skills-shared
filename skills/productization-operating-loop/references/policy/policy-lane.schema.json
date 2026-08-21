@@ -1,0 +1,462 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pol/policy-lane/v1",
+  "title": "Policy drift record",
+  "description": "One record of the productization-program 'policy' lane: the exact official source this program depends on, what was last observed at it, whether that observation is fresh enough to still be filed as current, what changed since the previous observation if anything did, which capability/rights/adapter that change touches, and what is required before the change is admitted. This schema is provenance and routing only. It never carries a legal or platform rights verdict: the authority block is four constants, all false, so no instance can file itself as the rights or legal admission it routes toward. Composes with pol/productization-program/v1: a program's 'policy' lane state is read off this record's `terminal` (CURRENT/STALE maps to PASS, SUPERSEDED/REVOKED/BLOCKED maps to the matching lane_state), and this record never redefines the program's lane_state, rung or authority vocabulary.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "policy_record_id",
+    "subject_commit",
+    "policy_ref",
+    "provider_surface",
+    "observed_revision",
+    "timestamps",
+    "freshness",
+    "change",
+    "affected_impact",
+    "decision",
+    "required_tests_or_reopen",
+    "terminal",
+    "authority"
+  ],
+  "properties": {
+    "schema": {"const": "pol/policy-lane/v1"},
+    "policy_record_id": {
+      "type": "string",
+      "pattern": "^POL-POLICY-[0-9]{3}$",
+      "description": "This record's own identity, distinct from the program_id of the productization-program that consumes it."
+    },
+    "subject_commit": {
+      "$ref": "#/$defs/commit",
+      "description": "The exact commit of the consuming program this policy record is bound to. A branch or tag fails the pattern below, for the same reason a moving name fails it in pol/productization-program/v1."
+    },
+    "policy_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["canonical_url", "evidence_class"],
+      "properties": {
+        "canonical_url": {"type": "string", "format": "uri", "minLength": 8},
+        "evidence_class": {"$ref": "#/$defs/evidence_class"}
+      },
+      "description": "The one canonical source identity this record tracks. `evidence_class` names what kind of claim the URL itself is (almost always SOURCE_STATEMENT: a claim about where the source lives, not yet a claim about its content)."
+    },
+    "provider_surface": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider", "surface"],
+      "properties": {
+        "provider": {"type": "string", "minLength": 1, "maxLength": 100},
+        "surface": {"type": "string", "minLength": 1, "maxLength": 100}
+      }
+    },
+    "observed_revision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["digest_or_id", "observed_at", "receipt"],
+      "properties": {
+        "digest_or_id": {"type": "string", "minLength": 1, "maxLength": 200},
+        "observed_at": {"type": "string", "format": "date-time"},
+        "receipt": {"$ref": "#/$defs/policy_receipt"}
+      },
+      "description": "What was actually read at the canonical URL, and how it was read. A receipt of kind POLICY_URL_VISITED records only that the URL resolved; INDEPENDENT_POLICY_READBACK records that the content was read and diffed against the prior digest. Only the second kind is admissible evidence for a CURRENT terminal, per the allOf rule below."
+    },
+    "timestamps": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["observed_at", "effective_at"],
+      "properties": {
+        "observed_at": {"type": "string", "format": "date-time"},
+        "effective_at": {
+          "anyOf": [
+            {"type": "string", "format": "date-time"},
+            {"const": "UNKNOWN"}
+          ],
+          "description": "The policy's own stated effective date, or the literal string UNKNOWN when the source does not state one. UNKNOWN is a distinct value from an omitted field, so a policy that never states an effective date cannot be filed as though it does."
+        }
+      }
+    },
+    "freshness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["revalidate_after"],
+      "properties": {
+        "revalidate_after": {"type": "string", "format": "date-time"},
+        "note": {"type": "string", "maxLength": 300}
+      }
+    },
+    "change": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["changed"],
+      "properties": {
+        "changed": {"type": "boolean"},
+        "changed_section": {"$ref": "#/$defs/evidenced_string"},
+        "semantic_delta": {"$ref": "#/$defs/evidenced_string"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"changed": {"const": true}}},
+          "then": {"required": ["changed_section", "semantic_delta"]}
+        }
+      ],
+      "description": "changed=true requires both changed_section and semantic_delta filled in with their own evidence_class, so a detected change cannot be filed without saying what changed."
+    },
+    "affected_impact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["capability", "rights_note", "adapter", "capability_review"],
+      "properties": {
+        "capability": {"$ref": "#/$defs/evidenced_string"},
+        "rights_note": {"$ref": "#/$defs/evidenced_string"},
+        "adapter": {"$ref": "#/$defs/evidenced_string"},
+        "capability_review": {"enum": ["REVIEWED", "NOT_REVIEWED", "NOT_APPLICABLE"]}
+      }
+    },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["previous_decision", "new_decision"],
+      "properties": {
+        "previous_decision": {"$ref": "#/$defs/decision_record"},
+        "new_decision": {"$ref": "#/$defs/decision_record"}
+      },
+      "description": "Both subjects kept side by side rather than overwritten in place, so a superseding decision cannot erase what the original decision was."
+    },
+    "required_tests_or_reopen": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode"],
+      "properties": {
+        "mode": {"enum": ["TESTS_REQUIRED", "ISSUE_REOPEN_REQUIRED", "NONE"]},
+        "ref": {"type": "string", "minLength": 1, "maxLength": 200}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"mode": {"const": "TESTS_REQUIRED"}}},
+          "then": {"required": ["ref"]}
+        },
+        {
+          "if": {"properties": {"mode": {"const": "ISSUE_REOPEN_REQUIRED"}}},
+          "then": {"required": ["ref"]}
+        }
+      ]
+    },
+    "terminal": {
+      "enum": ["CURRENT", "STALE", "SUPERSEDED", "REVOKED", "BLOCKED"]
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rights_admission", "legal_clearance", "platform_feature_grants_rights", "affected_capability_admission"],
+      "description": "Four constants, all false, for the same reason pol/productization-program/v1's eight authority constants are all false: a field that can be set to true is a field somebody eventually sets to true. This record can route a change to the people who own rights, legal and capability admission; it can never file itself as their answer.",
+      "properties": {
+        "rights_admission": {"const": false},
+        "legal_clearance": {"const": false},
+        "platform_feature_grants_rights": {"const": false},
+        "affected_capability_admission": {"const": false}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"terminal": {"const": "CURRENT"}}, "required": ["terminal"]},
+      "then": {
+        "properties": {
+          "observed_revision": {
+            "properties": {
+              "receipt": {"properties": {"kind": {"const": "INDEPENDENT_POLICY_READBACK"}}, "required": ["kind"]}
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"change": {"properties": {"changed": {"const": true}}}}, "required": ["change"]},
+      "then": {
+        "properties": {
+          "decision": {
+            "properties": {
+              "previous_decision": {"properties": {"terminal": {"const": "SUPERSEDED"}}},
+              "new_decision": {"properties": {"receipt": {"properties": {"kind": {"const": "INDEPENDENT_POLICY_READBACK"}}, "required": ["kind"]}}}
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"change": {"properties": {"changed": {"const": true}}}}, "required": ["change"]},
+      "then": {
+        "properties": {
+          "affected_impact": {"properties": {"capability_review": {"const": "REVIEWED"}}}
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "evidence_class": {
+      "enum": ["HYPOTHESIS", "SOURCE_STATEMENT", "VERIFIED_READBACK"],
+      "description": "HYPOTHESIS: an unverified guess about the source. SOURCE_STATEMENT: a claim the source itself makes, read but not independently corroborated. VERIFIED_READBACK: read directly from the source at its exact identity and diffed against the prior observation. No value here is PASS/FAIL truth about rights or law; that judgment stays outside this schema entirely."
+    },
+    "evidenced_string": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "evidence_class"],
+      "properties": {
+        "value": {"type": "string", "minLength": 1, "maxLength": 500},
+        "evidence_class": {"$ref": "#/$defs/evidence_class"}
+      },
+      "description": "Every factual-looking free-text field in this schema is one of these instead of a bare string, so a claim about what changed cannot be filed without also saying how sure the record is that it is true."
+    },
+    "policy_receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "subject_commit"],
+      "properties": {
+        "kind": {"enum": ["POLICY_URL_VISITED", "INDEPENDENT_POLICY_READBACK"]},
+        "subject_commit": {"$ref": "#/$defs/commit"},
+        "note": {"type": "string", "maxLength": 300}
+      }
+    },
+    "decision_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["terminal", "receipt"],
+      "properties": {
+        "terminal": {"enum": ["CURRENT", "STALE", "SUPERSEDED", "REVOKED", "BLOCKED"]},
+        "receipt": {"$ref": "#/$defs/policy_receipt"},
+        "note": {"type": "string", "maxLength": 300}
+      }
+    }
+  },
+  "examples": [
+    {
+      "schema": "pol/policy-lane/v1",
+      "policy_record_id": "POL-POLICY-001",
+      "subject_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+      "policy_ref": {
+        "canonical_url": "https://example-provider.invalid/policies/data-use",
+        "evidence_class": "SOURCE_STATEMENT"
+      },
+      "provider_surface": {"provider": "example-provider", "surface": "developer-api-terms"},
+      "observed_revision": {
+        "digest_or_id": "rev-2026-07-01",
+        "observed_at": "2026-08-20T09:00:00Z",
+        "receipt": {"kind": "INDEPENDENT_POLICY_READBACK", "subject_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17", "note": "full text diffed against the previous stored copy"}
+      },
+      "timestamps": {"observed_at": "2026-08-20T09:00:00Z", "effective_at": "2026-07-01T00:00:00Z"},
+      "freshness": {"revalidate_after": "2026-11-20T00:00:00Z", "note": "90-day revalidation window, synthetic"},
+      "change": {
+        "changed": true,
+        "changed_section": {"value": "section 4.2, third-party model training use", "evidence_class": "VERIFIED_READBACK"},
+        "semantic_delta": {"value": "training-use clause narrowed from 'may use' to 'may use with opt-out', synthetic example only", "evidence_class": "VERIFIED_READBACK"}
+      },
+      "affected_impact": {
+        "capability": {"value": "synthetic capability: batch-export adapter", "evidence_class": "HYPOTHESIS"},
+        "rights_note": {"value": "synthetic note: opt-out clause may affect one adapter's default", "evidence_class": "HYPOTHESIS"},
+        "adapter": {"value": "synthetic-export-adapter", "evidence_class": "SOURCE_STATEMENT"},
+        "capability_review": "REVIEWED"
+      },
+      "decision": {
+        "previous_decision": {
+          "terminal": "SUPERSEDED",
+          "receipt": {"kind": "INDEPENDENT_POLICY_READBACK", "subject_commit": "0be0d4d37869a4fa6eb2fe136d471d40a5eaddad"},
+          "note": "prior revision rev-2026-01-01"
+        },
+        "new_decision": {
+          "terminal": "CURRENT",
+          "receipt": {"kind": "INDEPENDENT_POLICY_READBACK", "subject_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17"}
+        }
+      },
+      "required_tests_or_reopen": {"mode": "ISSUE_REOPEN_REQUIRED", "ref": "synthetic issue #999: revalidate export-adapter opt-out handling"},
+      "terminal": "CURRENT",
+      "authority": {
+        "rights_admission": false,
+        "legal_clearance": false,
+        "platform_feature_grants_rights": false,
+        "affected_capability_admission": false
+      }
+    }
+  ],
+  "x-refusal-controls": [
+    {
+      "case_id": "POL-XC-PL-001",
+      "refuses": "URL_VISIBILITY_AS_CURRENT_POLICY: a CURRENT terminal filed off a receipt that only recorded the canonical URL resolving, not its content being read.",
+      "refused_by": "allOf[0].then.properties.observed_revision.properties.receipt.properties.kind.const",
+      "instance": {
+        "schema": "pol/policy-lane/v1",
+        "policy_record_id": "POL-POLICY-002",
+        "subject_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "policy_ref": {"canonical_url": "https://example-provider.invalid/policies/data-use", "evidence_class": "SOURCE_STATEMENT"},
+        "provider_surface": {"provider": "example-provider", "surface": "developer-api-terms"},
+        "observed_revision": {
+          "digest_or_id": "rev-2026-07-01",
+          "observed_at": "2026-08-20T09:00:00Z",
+          "receipt": {"kind": "POLICY_URL_VISITED", "subject_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17", "note": "only the URL resolved 200; content not diffed"}
+        },
+        "timestamps": {"observed_at": "2026-08-20T09:00:00Z", "effective_at": "2026-07-01T00:00:00Z"},
+        "freshness": {"revalidate_after": "2026-11-20T00:00:00Z"},
+        "change": {
+          "changed": true,
+          "changed_section": {"value": "section 4.2, synthetic", "evidence_class": "VERIFIED_READBACK"},
+          "semantic_delta": {"value": "synthetic delta text", "evidence_class": "VERIFIED_READBACK"}
+        },
+        "affected_impact": {
+          "capability": {"value": "synthetic capability", "evidence_class": "HYPOTHESIS"},
+          "rights_note": {"value": "synthetic note", "evidence_class": "HYPOTHESIS"},
+          "adapter": {"value": "synthetic-adapter", "evidence_class": "SOURCE_STATEMENT"},
+          "capability_review": "REVIEWED"
+        },
+        "decision": {
+          "previous_decision": {"terminal": "SUPERSEDED", "receipt": {"kind": "INDEPENDENT_POLICY_READBACK", "subject_commit": "0be0d4d37869a4fa6eb2fe136d471d40a5eaddad"}},
+          "new_decision": {"terminal": "CURRENT", "receipt": {"kind": "INDEPENDENT_POLICY_READBACK", "subject_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17"}}
+        },
+        "required_tests_or_reopen": {"mode": "NONE"},
+        "terminal": "CURRENT",
+        "authority": {"rights_admission": false, "legal_clearance": false, "platform_feature_grants_rights": false, "affected_capability_admission": false}
+      }
+    },
+    {
+      "case_id": "POL-XC-PL-002",
+      "refuses": "OLD_POLICY_RECEIPT_REUSED_AFTER_CHANGE: a detected change filed while new_decision still rests on a weak, non-readback receipt instead of a fresh independent readback.",
+      "refused_by": "allOf[1].then.properties.decision.properties.new_decision.properties.receipt.properties.kind.const",
+      "instance": {
+        "schema": "pol/policy-lane/v1",
+        "policy_record_id": "POL-POLICY-003",
+        "subject_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "policy_ref": {"canonical_url": "https://example-provider.invalid/policies/data-use", "evidence_class": "SOURCE_STATEMENT"},
+        "provider_surface": {"provider": "example-provider", "surface": "developer-api-terms"},
+        "observed_revision": {
+          "digest_or_id": "rev-2026-07-01",
+          "observed_at": "2026-08-20T09:00:00Z",
+          "receipt": {"kind": "INDEPENDENT_POLICY_READBACK", "subject_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17"}
+        },
+        "timestamps": {"observed_at": "2026-08-20T09:00:00Z", "effective_at": "2026-07-01T00:00:00Z"},
+        "freshness": {"revalidate_after": "2026-11-20T00:00:00Z"},
+        "change": {
+          "changed": true,
+          "changed_section": {"value": "section 4.2, synthetic", "evidence_class": "VERIFIED_READBACK"},
+          "semantic_delta": {"value": "synthetic delta text", "evidence_class": "VERIFIED_READBACK"}
+        },
+        "affected_impact": {
+          "capability": {"value": "synthetic capability", "evidence_class": "HYPOTHESIS"},
+          "rights_note": {"value": "synthetic note", "evidence_class": "HYPOTHESIS"},
+          "adapter": {"value": "synthetic-adapter", "evidence_class": "SOURCE_STATEMENT"},
+          "capability_review": "REVIEWED"
+        },
+        "decision": {
+          "previous_decision": {"terminal": "SUPERSEDED", "receipt": {"kind": "INDEPENDENT_POLICY_READBACK", "subject_commit": "0be0d4d37869a4fa6eb2fe136d471d40a5eaddad"}},
+          "new_decision": {"terminal": "CURRENT", "receipt": {"kind": "POLICY_URL_VISITED", "subject_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17", "note": "carried the old visit receipt forward"}}
+        },
+        "required_tests_or_reopen": {"mode": "NONE"},
+        "terminal": "CURRENT",
+        "authority": {"rights_admission": false, "legal_clearance": false, "platform_feature_grants_rights": false, "affected_capability_admission": false}
+      }
+    },
+    {
+      "case_id": "POL-XC-PL-003",
+      "refuses": "TERMS_CHANGE_WITHOUT_AFFECTED_CAPABILITY_REVIEW: a detected change filed while affected_impact.capability_review is left NOT_REVIEWED.",
+      "refused_by": "allOf[2].then.properties.affected_impact.properties.capability_review.const",
+      "instance": {
+        "schema": "pol/policy-lane/v1",
+        "policy_record_id": "POL-POLICY-004",
+        "subject_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "policy_ref": {"canonical_url": "https://example-provider.invalid/policies/data-use", "evidence_class": "SOURCE_STATEMENT"},
+        "provider_surface": {"provider": "example-provider", "surface": "developer-api-terms"},
+        "observed_revision": {
+          "digest_or_id": "rev-2026-07-01",
+          "observed_at": "2026-08-20T09:00:00Z",
+          "receipt": {"kind": "INDEPENDENT_POLICY_READBACK", "subject_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17"}
+        },
+        "timestamps": {"observed_at": "2026-08-20T09:00:00Z", "effective_at": "2026-07-01T00:00:00Z"},
+        "freshness": {"revalidate_after": "2026-11-20T00:00:00Z"},
+        "change": {
+          "changed": true,
+          "changed_section": {"value": "section 4.2, synthetic", "evidence_class": "VERIFIED_READBACK"},
+          "semantic_delta": {"value": "synthetic delta text", "evidence_class": "VERIFIED_READBACK"}
+        },
+        "affected_impact": {
+          "capability": {"value": "synthetic capability", "evidence_class": "HYPOTHESIS"},
+          "rights_note": {"value": "synthetic note", "evidence_class": "HYPOTHESIS"},
+          "adapter": {"value": "synthetic-adapter", "evidence_class": "SOURCE_STATEMENT"},
+          "capability_review": "NOT_REVIEWED"
+        },
+        "decision": {
+          "previous_decision": {"terminal": "SUPERSEDED", "receipt": {"kind": "INDEPENDENT_POLICY_READBACK", "subject_commit": "0be0d4d37869a4fa6eb2fe136d471d40a5eaddad"}},
+          "new_decision": {"terminal": "CURRENT", "receipt": {"kind": "INDEPENDENT_POLICY_READBACK", "subject_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17"}}
+        },
+        "required_tests_or_reopen": {"mode": "NONE"},
+        "terminal": "CURRENT",
+        "authority": {"rights_admission": false, "legal_clearance": false, "platform_feature_grants_rights": false, "affected_capability_admission": false}
+      }
+    },
+    {
+      "case_id": "POL-XC-PL-004",
+      "refuses": "PLATFORM_FEATURE_AS_RIGHTS_ADMISSION: a record that files the presence of a platform feature as though it were a rights admission.",
+      "refused_by": "properties.authority.properties.platform_feature_grants_rights.const",
+      "instance": {
+        "schema": "pol/policy-lane/v1",
+        "policy_record_id": "POL-POLICY-005",
+        "subject_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "policy_ref": {"canonical_url": "https://example-provider.invalid/policies/data-use", "evidence_class": "SOURCE_STATEMENT"},
+        "provider_surface": {"provider": "example-provider", "surface": "developer-api-terms"},
+        "observed_revision": {
+          "digest_or_id": "rev-2026-07-01",
+          "observed_at": "2026-08-20T09:00:00Z",
+          "receipt": {"kind": "INDEPENDENT_POLICY_READBACK", "subject_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17"}
+        },
+        "timestamps": {"observed_at": "2026-08-20T09:00:00Z", "effective_at": "UNKNOWN"},
+        "freshness": {"revalidate_after": "2026-11-20T00:00:00Z"},
+        "change": {"changed": false},
+        "affected_impact": {
+          "capability": {"value": "synthetic capability", "evidence_class": "HYPOTHESIS"},
+          "rights_note": {"value": "synthetic note: an opt-in toggle exists in the dashboard", "evidence_class": "SOURCE_STATEMENT"},
+          "adapter": {"value": "synthetic-adapter", "evidence_class": "SOURCE_STATEMENT"},
+          "capability_review": "NOT_APPLICABLE"
+        },
+        "decision": {
+          "previous_decision": {"terminal": "CURRENT", "receipt": {"kind": "INDEPENDENT_POLICY_READBACK", "subject_commit": "0be0d4d37869a4fa6eb2fe136d471d40a5eaddad"}},
+          "new_decision": {"terminal": "CURRENT", "receipt": {"kind": "INDEPENDENT_POLICY_READBACK", "subject_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17"}}
+        },
+        "required_tests_or_reopen": {"mode": "NONE"},
+        "terminal": "CURRENT",
+        "authority": {"rights_admission": false, "legal_clearance": false, "platform_feature_grants_rights": true, "affected_capability_admission": false}
+      }
+    },
+    {
+      "case_id": "POL-XC-PL-005",
+      "refuses": "POLICY_DIFF_AS_LEGAL_CLEARANCE: a record that files the mechanical diff between two policy revisions as though it were a legal clearance.",
+      "refused_by": "properties.authority.properties.legal_clearance.const",
+      "instance": {
+        "schema": "pol/policy-lane/v1",
+        "policy_record_id": "POL-POLICY-006",
+        "subject_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "policy_ref": {"canonical_url": "https://example-provider.invalid/policies/data-use", "evidence_class": "SOURCE_STATEMENT"},
+        "provider_surface": {"provider": "example-provider", "surface": "developer-api-terms"},
+        "observed_revision": {
+          "digest_or_id": "rev-2026-07-01",
+          "observed_at": "2026-08-20T09:00:00Z",
+          "receipt": {"kind": "INDEPENDENT_POLICY_READBACK", "subject_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17"}
+        },
+        "timestamps": {"observed_at": "2026-08-20T09:00:00Z", "effective_at": "UNKNOWN"},
+        "freshness": {"revalidate_after": "2026-11-20T00:00:00Z"},
+        "change": {"changed": false},
+        "affected_impact": {
+          "capability": {"value": "synthetic capability", "evidence_class": "HYPOTHESIS"},
+          "rights_note": {"value": "synthetic note: the diff itself found no clause change", "evidence_class": "SOURCE_STATEMENT"},
+          "adapter": {"value": "synthetic-adapter", "evidence_class": "SOURCE_STATEMENT"},
+          "capability_review": "NOT_APPLICABLE"
+        },
+        "decision": {
+          "previous_decision": {"terminal": "CURRENT", "receipt": {"kind": "INDEPENDENT_POLICY_READBACK", "subject_commit": "0be0d4d37869a4fa6eb2fe136d471d40a5eaddad"}},
+          "new_decision": {"terminal": "CURRENT", "receipt": {"kind": "INDEPENDENT_POLICY_READBACK", "subject_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17"}}
+        },
+        "required_tests_or_reopen": {"mode": "NONE"},
+        "terminal": "CURRENT",
+        "authority": {"rights_admission": false, "legal_clearance": true, "platform_feature_grants_rights": false, "affected_capability_admission": false}
+      }
+    }
+  ]
+}

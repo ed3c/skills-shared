@@ -1,0 +1,101 @@
+{
+  "schema_version": "agentic-tech-lead/local-handoff-queue/v1",
+  "subject": {
+    "repository": "ed3c/skills-shared",
+    "commit": "691b342c44c9c6c4e61a9997e778ae4ed6e920d5",
+    "tree": "ba6ef27631546af466284f44af7c81cd347765dd",
+    "rollback_commit": "847e56c3418fce920c42d983e84ee44fdc6e8971"
+  },
+  "authority": {
+    "automation_forbidden": ["merge", "force_push", "issue_close", "queue_advance", "provider_activation", "semantic_conflict_resolution"],
+    "human_owned": ["merge", "promotion", "rollback", "permission_change", "semantic_conflict_resolution"]
+  },
+  "current": {"active_item": "codex-live-receipt", "state": "ACTIVE"},
+  "items": [
+    {
+      "id": "codex-live-receipt",
+      "task_ref": "issue-464-live-codex",
+      "state": "ACTIVE",
+      "entry": {
+        "predecessor": null,
+        "required_subject_commit": "691b342c44c9c6c4e61a9997e778ae4ed6e920d5",
+        "required_capabilities": ["signed-in-codex-runtime", "clean-git-worktree", "controller-source-diff-test-readback"]
+      },
+      "runtime_lane": {
+        "class": "LOCAL_RUNTIME",
+        "commands": [
+          {"argv": ["python3", "skills/agentic-tech-lead-orchestration/scripts/run_codex_sdk_worker.py", "data/handoff/wave3/codex-session.json", "--execute", "--output", "data/handoff/wave3/codex-worker-result.json"], "cwd": ".", "timeout_seconds": 1800, "environment_names": []},
+          {"argv": ["python3", "skills/agentic-tech-lead-orchestration/scripts/compile_codex_live_acceptance.py", "data/handoff/wave3/codex-acceptance-input.json", "--output", "data/handoff/wave3/codex-acceptance-receipt.json"], "cwd": ".", "timeout_seconds": 120, "environment_names": []}
+        ],
+        "unresolved_operations": [
+          {"operation_id": "materialize-codex-session-and-controller-readback", "resolver_source": "nearest AGENTS/README plus exact local worktree and existing ChatGPT/Codex sign-in; produce the exact session manifest and controller-readback input consumed by the declared commands", "required_output": "CONCRETE_COMMAND_CONTRACT"}
+        ],
+        "live_evidence_required": true
+      },
+      "receipt": {
+        "path": "data/handoff/wave3/codex-acceptance-receipt.json",
+        "schema": "agentic-tech-lead/codex-live-acceptance/v1",
+        "required_states": ["PASS", "FAIL", "NOT_EXERCISED", "HUMAN_ADMIT_REQUIRED"],
+        "forbidden_promotions": ["runtime_result_to_acceptance_without_controller_readback", "model_prose_to_pass", "static_adapter_to_live_pass"]
+      },
+      "exit": {"requires_receipt": true, "required_verdict": "PASS", "cleanup_required": true},
+      "next": "herdr-live-lifecycle"
+    },
+    {
+      "id": "herdr-live-lifecycle",
+      "task_ref": "issue-466-live-herdr",
+      "state": "BLOCKED_BY_PREDECESSOR",
+      "entry": {
+        "predecessor": "codex-live-receipt",
+        "required_subject_commit": "691b342c44c9c6c4e61a9997e778ae4ed6e920d5",
+        "required_capabilities": ["herdr-runtime", "bound-agent-target", "controller-source-diff-test-readback"]
+      },
+      "runtime_lane": {
+        "class": "LOCAL_RUNTIME",
+        "commands": [
+          {"argv": ["python3", "skills/agentic-tech-lead-orchestration/scripts/collect_herdr_lifecycle.py", "data/handoff/wave3/herdr-plan.json", "--output", "data/handoff/wave3/herdr-lifecycle-receipt.json"], "cwd": ".", "timeout_seconds": 1800, "environment_names": []}
+        ],
+        "unresolved_operations": [
+          {"operation_id": "materialize-herdr-target-plan", "resolver_source": "current Herdr agent target plus exact worktree/session/PID-start identity; produce the exact lifecycle plan consumed by the declared command", "required_output": "CONCRETE_COMMAND_CONTRACT"}
+        ],
+        "live_evidence_required": true
+      },
+      "receipt": {
+        "path": "data/handoff/wave3/herdr-lifecycle-receipt.json",
+        "schema": "agentic-tech-lead/herdr-lifecycle/v1",
+        "required_states": ["PASS", "FAIL", "NOT_EXERCISED", "HUMAN_ADMIT_REQUIRED"],
+        "forbidden_promotions": ["done_candidate_to_implementation_pass", "fallback_to_live_pass", "terminal_ui_to_acceptance"]
+      },
+      "exit": {"requires_receipt": true, "required_verdict": "PASS", "cleanup_required": true},
+      "next": "github-dag-live-canary"
+    },
+    {
+      "id": "github-dag-live-canary",
+      "task_ref": "issue-465-live-github-dag",
+      "state": "BLOCKED_BY_PREDECESSOR",
+      "entry": {
+        "predecessor": "herdr-live-lifecycle",
+        "required_subject_commit": "691b342c44c9c6c4e61a9997e778ae4ed6e920d5",
+        "required_capabilities": ["github-cli-write-auth", "two-owned-canary-issues", "canary-ownership-label"]
+      },
+      "runtime_lane": {
+        "class": "MIXED",
+        "commands": [
+          {"argv": ["python3", "skills/agentic-tech-lead-orchestration/scripts/github_issue_dag_live_canary.py", "data/handoff/wave3/github-dag-canary-plan.json", "--execute", "--output", "data/handoff/wave3/github-dag-canary-receipt.json"], "cwd": ".", "timeout_seconds": 300, "environment_names": []}
+        ],
+        "unresolved_operations": [
+          {"operation_id": "bind-owned-canary-issues", "resolver_source": "current GitHub fixture issues explicitly labeled for CTL live canary; produce the exact reversible canary plan consumed by the declared command", "required_output": "CONCRETE_COMMAND_CONTRACT"}
+        ],
+        "live_evidence_required": true
+      },
+      "receipt": {
+        "path": "data/handoff/wave3/github-dag-canary-receipt.json",
+        "schema": "agentic-tech-lead/github-dag-live-canary/v1",
+        "required_states": ["PASS", "FAIL", "NOT_EXERCISED", "HUMAN_ADMIT_REQUIRED"],
+        "forbidden_promotions": ["fixture_canary_to_semantic_dag_truth", "partial_cleanup_to_pass", "issue_ui_state_to_completion"]
+      },
+      "exit": {"requires_receipt": true, "required_verdict": "PASS", "cleanup_required": true},
+      "next": null
+    }
+  ]
+}

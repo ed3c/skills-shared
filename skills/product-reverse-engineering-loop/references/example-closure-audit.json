@@ -185,7 +185,7 @@
             {
               "exact_subject": {
                 "artifact": "evidence-vocabulary.md",
-                "digest": "f9ded499382fc55c7a9f93613d0a1092af10166f7c37d42dd3fabd1831ffd93c"
+                "digest": "81ceed303c49c3f060acb3dcd33f450cd3a8b18ae9476b26917b8ba42db66176"
               },
               "kind": "SOURCE_DOCUMENT",
               "locator": "the lane table",

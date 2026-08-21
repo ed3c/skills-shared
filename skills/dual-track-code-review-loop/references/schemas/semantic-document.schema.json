@@ -1,0 +1,182 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dtcr-semantic-document.schema.json",
+  "title": "DTCR semantic document",
+  "description": "One stored decision record, incident review, advisory, objective, telemetry baseline or prior refactor outcome, registered so that retrieval can rank it. Authority is fixed at NON_AUTHORITATIVE_CANDIDATE at the point of registration rather than at the point of retrieval, because a document that enters the store as context cannot later be re-read as a rule by whoever queries it. There is no body, excerpt, locator or URL key anywhere in this object: identity is a digest plus a back-reference identifier, so a private record is registered by reference from its own plane and its content is never copied into a public tree. A document whose visibility is private cannot declare the public tree as its storage plane, which is the ownership split written as a keyword rather than as a redaction step somebody performs on the way out. Free-text fields here are not shape-protected; they carry the leak-scan obligation in `contracts/public-private-capability.md` exactly as the other schemas' free text does.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "document_id", "document_kind", "document_digest", "authority", "visibility_class", "storage_plane", "observed_revision", "observed_at", "subsystem_tags", "owning_decision", "back_reference_ref", "authority_ceiling"],
+  "properties": {
+    "schema": {"const": "dtcr/semantic-document/v1"},
+    "document_id": {"type": "string", "pattern": "^DTCR-DOC-[0-9]{3}$"},
+    "document_kind": {"enum": ["DECISION_RECORD", "INCIDENT_REVIEW", "SECURITY_ADVISORY", "SERVICE_OBJECTIVE", "TELEMETRY_BASELINE", "PRIOR_REFACTOR_OUTCOME"]},
+    "document_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "Content identity. A document that changed under the same title is a different document, and a store keyed by title never notices."
+    },
+    "authority": {
+      "const": "NON_AUTHORITATIVE_CANDIDATE",
+      "description": "Fixed at registration. Ranking answers which stored text resembles a query; it does not answer whether that text is current, whether it was superseded, or whether it ever bound this subsystem."
+    },
+    "visibility_class": {"enum": ["PUBLIC_TREE", "PRIVATE_CARRIER", "CONSUMER_LOCAL"]},
+    "storage_plane": {"enum": ["PUBLIC_TREE", "PRIVATE_CARRIER", "CONSUMER_LOCAL"]},
+    "observed_revision": {"type": "string", "minLength": 1},
+    "observed_at": {"type": "string", "minLength": 10},
+    "subsystem_tags": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 2},
+      "description": "Which subsystems this document was about. Free text, and covered by the leak-scan obligation like every other free-text field here."
+    },
+    "owning_decision": {
+      "type": "string",
+      "minLength": 4,
+      "description": "The decision this document belongs to. Free text under the same leak-scan obligation: no private locator, account identity or private file name belongs in it."
+    },
+    "back_reference_ref": {
+      "type": "string",
+      "pattern": "^DTCR-BK-[0-9]{3}$",
+      "description": "The exact back reference that says where this document came from. Registration without one produces an orphan row that retrieval will still happily return."
+    },
+    "authority_ceiling": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["current_policy", "deterministic_fact", "task_pass"],
+      "properties": {
+        "current_policy": {"const": false},
+        "deterministic_fact": {"const": false},
+        "task_pass": {"const": false}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"visibility_class": {"enum": ["PRIVATE_CARRIER", "CONSUMER_LOCAL"]}}, "required": ["visibility_class"]},
+      "then": {
+        "properties": {"storage_plane": {"enum": ["PRIVATE_CARRIER", "CONSUMER_LOCAL"]}},
+        "description": "A private record stays in a private carrier or a consumer-local store. Registering it into the public tree is the copy this method exists to prevent, and it is prevented here rather than at publication time."
+      }
+    }
+  ],
+  "examples": [
+    {
+      "schema": "dtcr/semantic-document/v1",
+      "document_id": "DTCR-DOC-001",
+      "document_kind": "DECISION_RECORD",
+      "document_digest": "d4a3d8e212371f5c8fb5511e2c69b367a8069d9489f3bbf3e276526572f7329f",
+      "authority": "NON_AUTHORITATIVE_CANDIDATE",
+      "visibility_class": "PUBLIC_TREE",
+      "storage_plane": "PUBLIC_TREE",
+      "observed_revision": "4",
+      "observed_at": "2026-08-21",
+      "subsystem_tags": ["domain", "persistence"],
+      "owning_decision": "decision record on domain isolation",
+      "back_reference_ref": "DTCR-BK-001",
+      "authority_ceiling": {"current_policy": false, "deterministic_fact": false, "task_pass": false}
+    }
+  ],
+  "x-refusal-controls": [
+    {
+      "case_id": "DTCR-XC-DOC-001",
+      "refuses": "A stored document registered as authoritative rather than as a retrieval candidate.",
+      "refused_by": "properties.authority.const",
+      "instance": {
+        "schema": "dtcr/semantic-document/v1",
+        "document_id": "DTCR-DOC-002",
+        "document_kind": "DECISION_RECORD",
+        "document_digest": "d4a3d8e212371f5c8fb5511e2c69b367a8069d9489f3bbf3e276526572f7329f",
+        "authority": "AUTHORITATIVE",
+        "visibility_class": "PUBLIC_TREE",
+        "storage_plane": "PUBLIC_TREE",
+        "observed_revision": "4",
+        "observed_at": "2026-08-21",
+        "subsystem_tags": ["domain"],
+        "owning_decision": "decision record on domain isolation",
+        "back_reference_ref": "DTCR-BK-001",
+        "authority_ceiling": {"current_policy": false, "deterministic_fact": false, "task_pass": false}
+      }
+    },
+    {
+      "case_id": "DTCR-XC-DOC-002",
+      "refuses": "A registration extended with a resolved locator, copying a private address into the public record.",
+      "refused_by": "additionalProperties",
+      "instance": {
+        "schema": "dtcr/semantic-document/v1",
+        "document_id": "DTCR-DOC-003",
+        "document_kind": "INCIDENT_REVIEW",
+        "document_digest": "2819f62833d1867b24fdca003615107418018c5a9dc1864073940c4602c5d105",
+        "authority": "NON_AUTHORITATIVE_CANDIDATE",
+        "visibility_class": "PRIVATE_CARRIER",
+        "storage_plane": "PRIVATE_CARRIER",
+        "observed_revision": "1",
+        "observed_at": "2026-08-20",
+        "subsystem_tags": ["scheduler"],
+        "owning_decision": "incident review for the scheduler stall",
+        "back_reference_ref": "DTCR-BK-002",
+        "source_url": "https://example.invalid/private-incident-review",
+        "authority_ceiling": {"current_policy": false, "deterministic_fact": false, "task_pass": false}
+      }
+    },
+    {
+      "case_id": "DTCR-XC-DOC-003",
+      "refuses": "A private record declared as stored in the public tree.",
+      "refused_by": "allOf[0].then",
+      "instance": {
+        "schema": "dtcr/semantic-document/v1",
+        "document_id": "DTCR-DOC-004",
+        "document_kind": "INCIDENT_REVIEW",
+        "document_digest": "45dfa450d7e40c0cb9b5c6d3674a3d56e495152216517bcc1f7d8b6db1e5423a",
+        "authority": "NON_AUTHORITATIVE_CANDIDATE",
+        "visibility_class": "PRIVATE_CARRIER",
+        "storage_plane": "PUBLIC_TREE",
+        "observed_revision": "1",
+        "observed_at": "2026-08-20",
+        "subsystem_tags": ["scheduler"],
+        "owning_decision": "incident review for the scheduler stall",
+        "back_reference_ref": "DTCR-BK-002",
+        "authority_ceiling": {"current_policy": false, "deterministic_fact": false, "task_pass": false}
+      }
+    },
+    {
+      "case_id": "DTCR-XC-DOC-004",
+      "refuses": "An orphan registration with no back reference, which retrieval will still return.",
+      "refused_by": "required",
+      "instance": {
+        "schema": "dtcr/semantic-document/v1",
+        "document_id": "DTCR-DOC-005",
+        "document_kind": "SERVICE_OBJECTIVE",
+        "document_digest": "802b1a8202117263eed6bc5f3f71c0067e003187fe9f4850b1c8f715f6824de8",
+        "authority": "NON_AUTHORITATIVE_CANDIDATE",
+        "visibility_class": "PUBLIC_TREE",
+        "storage_plane": "PUBLIC_TREE",
+        "observed_revision": "2",
+        "observed_at": "2026-08-19",
+        "subsystem_tags": ["gateway"],
+        "owning_decision": "service objective for the checkout path",
+        "authority_ceiling": {"current_policy": false, "deterministic_fact": false, "task_pass": false}
+      }
+    },
+    {
+      "case_id": "DTCR-XC-DOC-005",
+      "refuses": "A retrieved decision record recorded as current policy.",
+      "refused_by": "properties.authority_ceiling.properties.current_policy.const",
+      "instance": {
+        "schema": "dtcr/semantic-document/v1",
+        "document_id": "DTCR-DOC-006",
+        "document_kind": "DECISION_RECORD",
+        "document_digest": "5403ee3a36ad14a5f73443a5780ea48acf61e489fef3f9ee319809c50433862f",
+        "authority": "NON_AUTHORITATIVE_CANDIDATE",
+        "visibility_class": "PUBLIC_TREE",
+        "storage_plane": "PUBLIC_TREE",
+        "observed_revision": "1",
+        "observed_at": "2024-02-11",
+        "subsystem_tags": ["persistence"],
+        "owning_decision": "superseded decision record on persistence",
+        "back_reference_ref": "DTCR-BK-003",
+        "authority_ceiling": {"current_policy": true, "deterministic_fact": false, "task_pass": false}
+      }
+    }
+  ]
+}

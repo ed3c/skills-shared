@@ -4,13 +4,15 @@ This directory owns the portable Constraint-First + Shadow Architecture method a
 
 ## Read order
 
-1. [`README.md`](README.md) — current topology, State Machine, DAG, data flow and evidence ceiling.
-2. [`SKILL.md`](SKILL.md) — universal procedure and hard laws.
-3. [`references/intent-case-proof-graph.md`](references/intent-case-proof-graph.md) — intent/use-case/edge-case/semantic-preservation contract.
-4. [`references/architecture-watch-loop.md`](references/architecture-watch-loop.md) — Shadow Architecture monitor.
-5. [`references/spec-packet-template.md`](references/spec-packet-template.md) and machine contracts.
-6. [`scripts/check_case_graph.py`](scripts/check_case_graph.py), [`scripts/check_system_contract.py`](scripts/check_system_contract.py), tests and `evals.json`.
-7. GitHub issues #407, #408, #409, #410 and #411 for the current closure program.
+1. [`integration/README.md`](integration/README.md) — current #407 closeout/admission state and remaining Local Handoff.
+2. [`README.md`](README.md) — portable topology, State Machine, DAG, data flow and evidence ceiling.
+3. [`SKILL.md`](SKILL.md) — universal procedure and hard laws.
+4. [`references/intent-case-proof-graph.md`](references/intent-case-proof-graph.md) — intent/use-case/edge-case/semantic-preservation contract.
+5. [`references/architecture-watch-loop.md`](references/architecture-watch-loop.md) — Shadow Architecture monitor.
+6. [`references/spec-packet-template.md`](references/spec-packet-template.md) and machine contracts.
+7. [`scripts/check_case_graph.py`](scripts/check_case_graph.py), [`scripts/check_system_contract.py`](scripts/check_system_contract.py), tests and `evals.json`.
+8. GitHub issues #407, #408, #409, #410 and #411 plus PR #412 and current exact-head workflows.
+9. [`integration/AGENTS.md`](integration/AGENTS.md) before close/merge/handoff work.
 
 ## Case-coverage law
 
@@ -100,13 +102,28 @@ Every required case has one implementation owner or one explicit convergence own
 └─ #411  X      live continuous Shadow runtime canary; external/live evidence lane
 ```
 
-Current implementation branch:
+Current source PR / implementation branch:
 
 ```text
+PR #412
 agent/spatial-intent-case-proof-graph-v1
 ```
 
+The exact head is mutable; read it from GitHub. PR #513 is a historical temporary current-main refresh carrier only and is not an implementation atom.
+
 Do not manufacture one serial Stack merely to mirror issue numbering. #408 is the contract/core leaf. #409 is a true child when it consumes that contract. #410 may be sibling/convergence by path ownership. #411 is live evidence and is not a Git child unless its harness code consumes unmerged parent bytes.
+
+## Current closeout law
+
+```text
+#408  STATIC_CLOSE_CANDIDATE after exact bytes land on main
+#409  STATIC_CLOSE_CANDIDATE after main admission; live scope remains #411
+#410  STATIC_CLOSE_CANDIDATE after main admission
+#411  KEEP_OPEN until an exact independent live Shadow receipt exists
+#407  KEEP_OPEN while #411 remains a declared blocking program lane
+```
+
+Candidate CI, a temporary branch merge, a compatibility-only PASS, or a Builder self-report cannot satisfy main/live admission. If repository provenance cannot be repaired by the current connector without weakening policy or fabricating identity, use the asserted Tech Lead Local Handoff Queue instead of bypassing the gate.
 
 ## Completion gate
 

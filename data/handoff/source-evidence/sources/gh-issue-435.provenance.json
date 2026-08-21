@@ -1,0 +1,69 @@
+{
+  "check_commit_roles_readback": {
+    "command": "python3 scripts/check_commit_roles.py --repo-root .",
+    "conclusion": "the '## Required repair' claim's action has NOT been performed yet; disposition OPEN is the true state, not a fudge",
+    "known_unclassified_membership": "none of the six SHAs present in evals/commit-roles.json::known_unclassified as of the bound commit",
+    "result": "all six named SHAs currently RED (no Driven-By/Driven-On trailer)"
+  },
+  "exact_bytes_file": "data/handoff/source-evidence/sources/gh-issue-435.json",
+  "exact_bytes_sha256": "64c7f1190bd376be0e7aac8c9b2cf8bcd74f87af588644a4144be715eaa26901",
+  "fetch_command": "gh issue view 435 --json number,title,body,url,id,updatedAt,createdAt,author,state",
+  "git_readback_repo_subject": {
+    "commit": "249abc47847f8295b1c75c9d4c84457c5126fd89",
+    "repo": "ed3c/skills-shared",
+    "tree": "a24b9b7ace6f4022967d41262ecdc704d5c11646"
+  },
+  "immutable_identity": {
+    "createdAt": "2026-08-19T11:22:09Z",
+    "issue_node_id": "I_kwDOTw0oAs8AAAABNXih0Q",
+    "issue_number": 435,
+    "issue_url": "https://github.com/ed3c/skills-shared/issues/435",
+    "repo": "ed3c/skills-shared",
+    "updatedAt": "2026-08-19T11:22:09Z"
+  },
+  "named_commit_readback": [
+    {
+      "ancestor_of_bound_commit": true,
+      "git_show_name_status": "A\tx",
+      "issue_says": "add accidental root `x`",
+      "sha": "89c39f83314bee79226af5e081fc2013c41ccc13"
+    },
+    {
+      "ancestor_of_bound_commit": true,
+      "git_show_name_status": "D\tx",
+      "issue_says": "remove `x`",
+      "sha": "55f926e22c13ce6212280819b1eea916d35cd384"
+    },
+    {
+      "ancestor_of_bound_commit": true,
+      "git_show_name_status": "A\t__never__",
+      "issue_says": "add accidental root `__never__`",
+      "sha": "8e2c89d120ecb74fcffa4d708d0714ca8583036f"
+    },
+    {
+      "ancestor_of_bound_commit": true,
+      "git_show_name_status": "D\t__never__",
+      "issue_says": "remove `__never__`",
+      "sha": "5417467f1416ced5a6ad0d1fabaa38f6d850d3e8"
+    },
+    {
+      "ancestor_of_bound_commit": true,
+      "git_show_name_status": "A\tstop",
+      "issue_says": "add accidental root `stop`",
+      "sha": "957d7373a36ae78b6379c28625967090e5b296fc"
+    },
+    {
+      "ancestor_of_bound_commit": true,
+      "git_show_name_status": "D\tstop",
+      "issue_says": "remove `stop`",
+      "sha": "ccef97dedd7ea8b1873e3afa130ca82b8eabb413"
+    }
+  ],
+  "note": "This file is provenance/readback metadata only: no secrets, no raw prompts, no model prose, no terminal transcripts beyond the exact deterministic command names and their pass/fail readback.",
+  "working_tree_readback": {
+    "__never___present": false,
+    "note": "matches issue claim 'Current tree is restored'",
+    "stop_present": false,
+    "x_present": false
+  }
+}

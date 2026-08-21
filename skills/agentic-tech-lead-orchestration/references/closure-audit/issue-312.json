@@ -1,0 +1,16 @@
+{
+  "schema_version": "agentic-tech-lead/issue-closure-contract/v1",
+  "issue": {"repository": "ed3c/skills-shared", "number": 312, "github_state": "CLOSED", "github_state_reason": "COMPLETED"},
+  "disposition": "SCOPE_TRANSFERRED",
+  "acceptance": [
+    {"id": "phase-1-hermetic-real-task", "status": "SATISFIED", "successor": null, "rationale": null},
+    {"id": "phase-2-matched-live-model-runtime", "status": "TRANSFERRED", "successor": "ed3c/skills-shared#231/#232/#234/#256", "rationale": null}
+  ],
+  "implementation": {
+    "candidate_prs": [{"repository": "ed3c/skills-shared", "number": 315, "state": "CLOSED", "merged": true, "classification": "DIRECT"}],
+    "landing": {"repository": "ed3c/skills-shared", "via_pr": 315, "commit": "8e14951ec047b31ce39b3df0ee0f95b405d41cf9", "tree": "e5c9a0518faa713a6a2ec5593e9319b3860ee8a5"}
+  },
+  "residual": [{"id": "matched-live-model-runtime", "state": "TRANSFERRED", "owner": "ed3c/skills-shared#231/#232/#234/#256"}],
+  "evidence_ceiling": "DETERMINISTIC",
+  "shadow_review": {"verdict": "PASS"}
+}

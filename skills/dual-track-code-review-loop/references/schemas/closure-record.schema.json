@@ -1,0 +1,244 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dtcr-closure-record.schema.json",
+  "title": "DTCR closure record",
+  "description": "The terminal statement for one dual-track pass: what was reached, by which independent arrivals, and which lanes were never entered. Arrivals is a set with at least two distinct members, because a load-bearing conclusion supported by one kind of reaching is supported by whatever that kind cannot see. Every lane is reported including the ones that were unavailable, since a lane omitted from a record is a lane the reader fills in with the lanes that passed. The terminal state vocabulary contains no value meaning merged, released or in production, so a closure record cannot become the evidence for an operation it never observed.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "closure_id", "subject_commit", "subject_tree", "change_unit_refs", "arrivals", "lanes", "terminal_state", "human_owned_operations", "rollback", "authority"],
+  "properties": {
+    "schema": {"const": "dtcr/closure-record/v1"},
+    "closure_id": {"type": "string", "pattern": "^DTCR-CR-[0-9]{3}$"},
+    "subject_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "subject_tree": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "change_unit_refs": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^DTCR-CU-[0-9]{3}$"},
+      "description": "May be empty. A pass that concluded no change was warranted is a closed pass."
+    },
+    "arrivals": {
+      "type": "array",
+      "minItems": 2,
+      "uniqueItems": true,
+      "items": {"enum": ["STATIC", "SANDBOX", "PROD"]},
+      "description": "At least two distinct kinds. Independence is the point: two arrivals that the same mistake would fool are one arrival counted twice."
+    },
+    "lanes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["deterministic", "semantic", "runtime", "provider", "physical", "private_carrier", "independent_review", "legal", "user", "paid", "merge", "release"],
+      "properties": {
+        "deterministic": {"$ref": "#/$defs/lane_state"},
+        "semantic": {"$ref": "#/$defs/lane_state"},
+        "runtime": {"$ref": "#/$defs/lane_state"},
+        "provider": {"$ref": "#/$defs/lane_state"},
+        "physical": {"$ref": "#/$defs/lane_state"},
+        "private_carrier": {"$ref": "#/$defs/lane_state"},
+        "independent_review": {"$ref": "#/$defs/lane_state"},
+        "legal": {"$ref": "#/$defs/lane_state"},
+        "user": {"$ref": "#/$defs/lane_state"},
+        "paid": {"$ref": "#/$defs/lane_state"},
+        "merge": {"$ref": "#/$defs/lane_state"},
+        "release": {"$ref": "#/$defs/lane_state"}
+      }
+    },
+    "terminal_state": {
+      "enum": [
+        "DTCR_C0_CONTRACT_READY_FOR_INDEPENDENT_REVIEW",
+        "PASS_WITH_STATED_CEILING",
+        "NO_CHANGE_WARRANTED",
+        "BLOCKED",
+        "REPLAN_REQUIRED",
+        "HUMAN_ADMIT_REQUIRED"
+      ],
+      "description": "Closed, and deliberately without a merged, released or in-production value. Those are operations somebody performs, not states a record reaches."
+    },
+    "human_owned_operations": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 4}
+    },
+    "rollback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["base_commit"],
+      "properties": {"base_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"}}
+    },
+    "authority": {"$ref": "#/$defs/authority"}
+  },
+  "$defs": {
+    "lane_state": {
+      "enum": ["PASS", "FAIL", "ABSENT", "NOT_IMPLEMENTED", "NOT_EXERCISED", "SKIPPED_BY_POLICY", "NOT_APPLICABLE", "HUMAN_ADMIT_REQUIRED"],
+      "description": "The seven repository evidence states plus NOT_APPLICABLE, which a lane needs and a check does not: a hardware lane that this change could not possibly enter is not the same as one that was available and skipped."
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["merge", "permission", "secret", "production", "user_value", "paid_demand", "release"],
+      "properties": {
+        "merge": {"const": false},
+        "permission": {"const": false},
+        "secret": {"const": false},
+        "production": {"const": false},
+        "user_value": {"const": false},
+        "paid_demand": {"const": false},
+        "release": {"const": false}
+      }
+    }
+  },
+  "examples": [
+    {
+      "schema": "dtcr/closure-record/v1",
+      "closure_id": "DTCR-CR-001",
+      "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+      "subject_tree": "e739d799dd8d44beb5414ed99a943ff3bacccab0",
+      "change_unit_refs": [],
+      "arrivals": ["STATIC", "SANDBOX"],
+      "lanes": {
+        "deterministic": "PASS",
+        "semantic": "NOT_EXERCISED",
+        "runtime": "NOT_EXERCISED",
+        "provider": "NOT_EXERCISED",
+        "physical": "NOT_APPLICABLE",
+        "private_carrier": "NOT_EXERCISED",
+        "independent_review": "NOT_EXERCISED",
+        "legal": "HUMAN_ADMIT_REQUIRED",
+        "user": "NOT_EXERCISED",
+        "paid": "NOT_EXERCISED",
+        "merge": "HUMAN_ADMIT_REQUIRED",
+        "release": "HUMAN_ADMIT_REQUIRED"
+      },
+      "terminal_state": "DTCR_C0_CONTRACT_READY_FOR_INDEPENDENT_REVIEW",
+      "human_owned_operations": [
+        "merge and release",
+        "legal and employment or intellectual-property clearance",
+        "independent review identity",
+        "private account and private carrier authorisation"
+      ],
+      "rollback": {"base_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f"},
+      "authority": {
+        "merge": false,
+        "permission": false,
+        "secret": false,
+        "production": false,
+        "user_value": false,
+        "paid_demand": false,
+        "release": false
+      }
+    }
+  ],
+  "x-refusal-controls": [
+    {
+      "case_id": "DTCR-XC-CR-001",
+      "refuses": "A closure resting on a single kind of arrival.",
+      "refused_by": "properties.arrivals.minItems",
+      "instance": {
+        "schema": "dtcr/closure-record/v1",
+        "closure_id": "DTCR-CR-002",
+        "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+        "subject_tree": "e739d799dd8d44beb5414ed99a943ff3bacccab0",
+        "change_unit_refs": ["DTCR-CU-001"],
+        "arrivals": ["STATIC"],
+        "lanes": {
+          "deterministic": "PASS",
+          "semantic": "NOT_EXERCISED",
+          "runtime": "NOT_EXERCISED",
+          "provider": "NOT_EXERCISED",
+          "physical": "NOT_APPLICABLE",
+          "private_carrier": "NOT_EXERCISED",
+          "independent_review": "NOT_EXERCISED",
+          "legal": "HUMAN_ADMIT_REQUIRED",
+          "user": "NOT_EXERCISED",
+          "paid": "NOT_EXERCISED",
+          "merge": "HUMAN_ADMIT_REQUIRED",
+          "release": "HUMAN_ADMIT_REQUIRED"
+        },
+        "terminal_state": "PASS_WITH_STATED_CEILING",
+        "human_owned_operations": ["merge and release"],
+        "rollback": {"base_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f"},
+        "authority": {
+          "merge": false,
+          "permission": false,
+          "secret": false,
+          "production": false,
+          "user_value": false,
+          "paid_demand": false,
+          "release": false
+        }
+      }
+    },
+    {
+      "case_id": "DTCR-XC-CR-002",
+      "refuses": "A closure record reporting itself as merged or released.",
+      "refused_by": "properties.terminal_state.enum",
+      "instance": {
+        "schema": "dtcr/closure-record/v1",
+        "closure_id": "DTCR-CR-003",
+        "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+        "subject_tree": "e739d799dd8d44beb5414ed99a943ff3bacccab0",
+        "change_unit_refs": ["DTCR-CU-001"],
+        "arrivals": ["STATIC", "SANDBOX"],
+        "lanes": {
+          "deterministic": "PASS",
+          "semantic": "PASS",
+          "runtime": "NOT_EXERCISED",
+          "provider": "NOT_EXERCISED",
+          "physical": "NOT_APPLICABLE",
+          "private_carrier": "NOT_EXERCISED",
+          "independent_review": "NOT_EXERCISED",
+          "legal": "PASS",
+          "user": "NOT_EXERCISED",
+          "paid": "NOT_EXERCISED",
+          "merge": "PASS",
+          "release": "PASS"
+        },
+        "terminal_state": "MERGED_AND_RELEASED",
+        "human_owned_operations": ["none"],
+        "rollback": {"base_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f"},
+        "authority": {
+          "merge": false,
+          "permission": false,
+          "secret": false,
+          "production": false,
+          "user_value": false,
+          "paid_demand": false,
+          "release": false
+        }
+      }
+    },
+    {
+      "case_id": "DTCR-XC-CR-003",
+      "refuses": "A closure that omits an unavailable lane instead of reporting it.",
+      "refused_by": "properties.lanes.required",
+      "instance": {
+        "schema": "dtcr/closure-record/v1",
+        "closure_id": "DTCR-CR-004",
+        "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+        "subject_tree": "e739d799dd8d44beb5414ed99a943ff3bacccab0",
+        "change_unit_refs": [],
+        "arrivals": ["STATIC", "SANDBOX"],
+        "lanes": {
+          "deterministic": "PASS",
+          "semantic": "PASS",
+          "runtime": "PASS",
+          "merge": "HUMAN_ADMIT_REQUIRED",
+          "release": "HUMAN_ADMIT_REQUIRED"
+        },
+        "terminal_state": "PASS_WITH_STATED_CEILING",
+        "human_owned_operations": ["merge and release"],
+        "rollback": {"base_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f"},
+        "authority": {
+          "merge": false,
+          "permission": false,
+          "secret": false,
+          "production": false,
+          "user_value": false,
+          "paid_demand": false,
+          "release": false
+        }
+      }
+    }
+  ]
+}

@@ -56,10 +56,12 @@ control live-body-loses-authority-law refactor_ab.py SKILL.md \
   's/never outrank an executed deterministic oracle/may outweigh an executed deterministic oracle/' \
   'never outrank an executed deterministic oracle'
 
-# The live body keeps the word "qualifying" but loses the rule that decides it.
+# The live body keeps the word "qualifying" but loses the exclusion rule that
+# decides whether ABSENT / NOT_EXERCISED / SKIPPED_BY_POLICY count as repairs.
+# Match the semantic sentence rather than a historical Markdown line wrap.
 control live-body-loses-qualifying-rule real_task_ab.py SKILL.md \
-  's/`ABSENT`, `NOT_EXERCISED`, and\n`SKIPPED_BY_POLICY` are not failed repairs\./Other results are not failed repairs./' \
-  'SKIPPED_BY_POLICY` are not failed repairs.'
+  's/`ABSENT`, `NOT_EXERCISED`, and `SKIPPED_BY_POLICY` are not failed repairs\./Other results are not failed repairs./' \
+  '`ABSENT`, `NOT_EXERCISED`, and `SKIPPED_BY_POLICY` are not failed repairs.'
 
 # The checker stops refusing a gate promoted above its capability evidence.
 control checker-admits-promoted-gate real_task_ab.py \

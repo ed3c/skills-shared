@@ -20,41 +20,17 @@ import sys
 from pathlib import Path
 from typing import Any
 
-try:
-    from jsonschema import Draft202012Validator
-except ImportError:  # pragma: no cover - environment guard
-    print(
-        "CANARY-RECEIPT-RED validator-unavailable: jsonschema is required; "
-        "the checker refuses to skip schema validation",
-        file=sys.stderr,
-    )
-    raise SystemExit(70)
+from _json_schema_validation import (
+    load_json_document,
+    require_draft202012_validator,
+    schema_errors as shared_schema_errors,
+)
 
 SCHEMA_INVALID = 64
 SEMANTIC_FAIL = 2
 SCHEMA_NAME = "canary-receipt.schema.json"
-
-
-def load_json(path: Path) -> Any:
-    import json
-
-    try:
-        return json.loads(path.read_text(encoding="utf-8"))
-    except FileNotFoundError:
-        print(f"CANARY-RECEIPT-INVALID absent-input: {path}", file=sys.stderr)
-        raise SystemExit(SCHEMA_INVALID)
-    except (OSError, UnicodeError, ValueError) as exc:
-        print(f"CANARY-RECEIPT-INVALID unreadable-input: {path}: {exc}", file=sys.stderr)
-        raise SystemExit(SCHEMA_INVALID)
-
-
-def validate_schema(document: Any, schema: Any) -> list[str]:
-    validator = Draft202012Validator(schema)
-    errors = sorted(validator.iter_errors(document), key=lambda item: list(item.absolute_path))
-    return [
-        f"schema-invalid at {'/'.join(str(part) for part in error.absolute_path) or '$'}: {error.message}"
-        for error in errors
-    ]
+PREFIX = "CANARY-RECEIPT"
+Draft202012Validator = require_draft202012_validator(PREFIX)
 
 
 def semantic_errors(receipt: dict[str, Any]) -> list[str]:
@@ -113,19 +89,21 @@ def semantic_errors(receipt: dict[str, Any]) -> list[str]:
 
 
 def check(path: Path, schema_root: Path) -> int:
-    receipt = load_json(path)
-    schema = load_json(schema_root / SCHEMA_NAME)
+    receipt = load_json_document(path, prefix=PREFIX, invalid_exit=SCHEMA_INVALID)
+    schema = load_json_document(
+        schema_root / SCHEMA_NAME, prefix=PREFIX, invalid_exit=SCHEMA_INVALID
+    )
 
-    schema_errors = validate_schema(receipt, schema)
+    schema_errors = shared_schema_errors(receipt, schema, Draft202012Validator)
     if schema_errors:
         for error in schema_errors:
-            print(f"CANARY-RECEIPT-INVALID {error}", file=sys.stderr)
+            print(f"{PREFIX}-INVALID {error}", file=sys.stderr)
         return SCHEMA_INVALID
 
     errors = semantic_errors(receipt)
     if errors:
         for error in errors:
-            print(f"CANARY-RECEIPT-RED {error}", file=sys.stderr)
+            print(f"{PREFIX}-RED {error}", file=sys.stderr)
         return SEMANTIC_FAIL
 
     print(

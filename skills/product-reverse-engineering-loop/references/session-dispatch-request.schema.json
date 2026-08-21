@@ -1,0 +1,229 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "prel-session-dispatch-request.schema.json",
+  "title": "PREL session dispatch request",
+  "description": "A request to launch one or more Worker sessions. The whole document is pinned to LAUNCH_REQUESTED: it records what would be launched, never that anything is running. SESSION_OBSERVED, RUNNING, RESULT_RECEIVED and ARTIFACTS_READ_BACK belong to prel/session-receipt/v1 and cannot be asserted here — that is refusal class C09. Each request binds an exact base commit and tree, its branch and parent, its disjoint path and resource lease, its evidence ceiling, its oracles, its negative controls, its rollback subject, its stop states and its output paths. start_dependencies and completion_dependencies are separate arrays because a prerequisite that must exist before work starts is not evidence that the work finished — conflating them is refusal class C04.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "lifecycle_state", "running_session", "refusal_classes", "requests"],
+  "properties": {
+    "schema": {"const": "prel/session-dispatch-request/v1"},
+    "lifecycle_state": {"const": "LAUNCH_REQUESTED"},
+    "running_session": {
+      "const": null,
+      "description": "A dispatch request has no session. A carrier that observed one records it in a session receipt, not by editing this field."
+    },
+    "refusal_classes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/refusal_class"},
+      "description": "The pre-registered classes this dispatch fails closed on. Naming them here is what makes an expected failure distinguishable from an unexpected one."
+    },
+    "requests": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/request"}
+    }
+  },
+  "$defs": {
+    "refusal_class": {
+      "enum": [
+        "C01_MUTABLE_SUBJECT",
+        "C02_SOURCE_STATEMENT_PROMOTED_TO_INTERNAL_FACT",
+        "C03_TECH_PASS_PROMOTED_TO_USER_OR_PAID_VALIDATION",
+        "C04_START_DEPENDENCY_USED_AS_COMPLETION_PROOF",
+        "C05_MISSING_EXACT_RECEIPT",
+        "C06_OVERLAPPING_WRITER_LEASE",
+        "C07_HIDDEN_MULTI_PARENT_CONVERGENCE",
+        "C08_PROJECTION_USED_AS_MACHINE_AUTHORITY",
+        "C09_SESSION_REQUEST_PROMOTED_TO_RUNNING",
+        "C10_CONSUMER_STATE_LEAK_IN_PORTABLE_CORE",
+        "C11_PROMPT_GRANTS_MERGE_SECRET_PERMISSION_OR_PRODUCTION_AUTHORITY",
+        "C12_PRIVATE_REASONING_FIELD",
+        "C13_ROLLBACK_SUBJECT_ABSENT_OR_EQUAL_TO_MUTABLE_ALIAS",
+        "C14_SOURCE_OR_FIXTURE_USED_AS_LIVE_PASS"
+      ]
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["merge", "permission", "secret", "production"],
+      "properties": {
+        "merge": {"const": false},
+        "permission": {"const": false},
+        "secret": {"const": false},
+        "production": {"const": false}
+      }
+    },
+    "repo_path": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9._-]+(/[A-Za-z0-9._-]+)*/?$",
+      "description": "Repository-relative path. An absolute or machine-local path is refusal class C10."
+    },
+    "prerequisite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["subject", "digest", "receipt"],
+      "properties": {
+        "subject": {"type": "string", "minLength": 1},
+        "digest": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "receipt": {
+          "oneOf": [{"type": "null"}, {"type": "string", "minLength": 4}],
+          "description": "The exact receipt that shows this prerequisite holds. null in completion_dependencies means the obligation is open, which is refusal class C05 the moment it is reported as met."
+        }
+      }
+    },
+    "oracle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "lane", "procedure", "refuted_by"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^ORC-[0-9]{3}$"},
+        "lane": {"enum": ["DETERMINISTIC", "BEHAVIORAL", "USER", "PAID", "HUMAN_ADMIT"]},
+        "procedure": {"type": "string", "minLength": 12},
+        "refuted_by": {"type": "string", "minLength": 12}
+      }
+    },
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "relation",
+        "parent_request_id",
+        "base",
+        "branch",
+        "lease",
+        "start_dependencies",
+        "completion_dependencies",
+        "evidence_ceiling",
+        "oracles",
+        "negative_controls",
+        "rollback",
+        "stop_states",
+        "output_paths",
+        "human_owned_operations",
+        "requests_private_reasoning",
+        "authority",
+        "consumer_binding"
+      ],
+      "properties": {
+        "id": {"type": "string", "pattern": "^SDR-[0-9]{3}$"},
+        "relation": {
+          "enum": ["SIBLING", "CHILD"],
+          "description": "SIBLING requests may run in parallel and must hold disjoint leases. A CHILD consumes an exact subject its parent produces; more than one parent for one request is refusal class C07."
+        },
+        "parent_request_id": {
+          "oneOf": [{"type": "null"}, {"type": "string", "pattern": "^SDR-[0-9]{3}$"}],
+          "description": "null for a SIBLING root. Exactly one parent for a CHILD."
+        },
+        "base": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["commit", "tree"],
+          "properties": {
+            "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+            "tree": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+          },
+          "description": "The exact object the request is bound to. A mutable alias here is refusal class C01."
+        },
+        "branch": {"type": "string", "minLength": 1},
+        "lease": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["paths", "resources"],
+          "properties": {
+            "paths": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {"$ref": "#/$defs/repo_path"}
+            },
+            "resources": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {"type": "string", "minLength": 1},
+              "description": "Shared mutable resources outside the path lease. Each one needs a single owner; two sibling requests naming the same resource is refusal class C06."
+            }
+          }
+        },
+        "start_dependencies": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/prerequisite"}
+        },
+        "completion_dependencies": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/prerequisite"}
+        },
+        "evidence_ceiling": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["highest_claimable_lane", "cannot_establish"],
+          "properties": {
+            "highest_claimable_lane": {"enum": ["DETERMINISTIC", "BEHAVIORAL", "USER", "PAID", "HUMAN_ADMIT"]},
+            "cannot_establish": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {"type": "string", "minLength": 4}
+            }
+          }
+        },
+        "oracles": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/oracle"}
+        },
+        "negative_controls": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 4}
+        },
+        "rollback": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["subject", "commit"],
+          "properties": {
+            "subject": {"type": "string", "minLength": 1},
+            "commit": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$",
+              "description": "An exact object to return to. Absent, or equal to a mutable alias, is refusal class C13."
+            }
+          }
+        },
+        "stop_states": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 4},
+          "description": "Conditions under which the Worker stops instead of repairing. A request with no stop state has no bound on how long a failing repair loop may run."
+        },
+        "output_paths": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/repo_path"}
+        },
+        "human_owned_operations": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 4}
+        },
+        "requests_private_reasoning": {"const": false},
+        "authority": {"$ref": "#/$defs/authority"},
+        "consumer_binding": {
+          "type": "object",
+          "additionalProperties": {"type": "string"},
+          "description": "The only place a consumer issue, remote or tracker id may appear. Everything outside it is portable core text."
+        }
+      }
+    }
+  }
+}

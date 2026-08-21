@@ -1,0 +1,39 @@
+{
+  "schema": "git-at-any-scale-problem-closure-ledger-pointer/v1",
+  "note": "This file intentionally does not restate the 28-problem denominator. The authoritative, deterministically-checked ledger lives at data/handoff/source-evidence/git-at-any-scale-closure-ledger.json; this file states this lease's program-level status over it.",
+  "ssot_ledger": "data/handoff/source-evidence/git-at-any-scale-closure-ledger.json",
+  "repository_subject": {
+    "repository": "ed3c/skills-shared",
+    "main": "174009203a3ff9bd6ebc4010bc6cab7232dd44a4",
+    "tree": "311052ecf5780f8d91c4d2429e8ce1a50a0361d8",
+    "observed": "2026-08-21"
+  },
+  "parent_issue": 531,
+  "last_check": {
+    "command": "python3 skills/agentic-tech-lead-orchestration/scripts/check_problem_closure.py data/handoff/source-evidence/git-at-any-scale-closure-ledger.json",
+    "exit_code": 0,
+    "problem_count": 28,
+    "counts": {"OPEN": 26, "NOT_APPLICABLE": 2, "PARTIAL": 0, "IMPLEMENTED_UNVERIFIED": 0, "VERIFIED_LOCAL": 0, "VERIFIED_LIVE": 0, "HUMAN_ADMIT_REQUIRED": 0}
+  },
+  "program": {
+    "source_evidence_issue": 531,
+    "portable_contract_issue": 532,
+    "live_runtime_issue": 534,
+    "shadow_issue": 535,
+    "convergence_issue": 536,
+    "issue_pr_state": {
+      "531": "OPEN issue; source packet + 28-claim ledger MERGED",
+      "532": "OPEN issue; PR #542 MERGED (contract-only ceiling, see triage below)",
+      "534": "OPEN issue; NOT_EXERCISED",
+      "535": "OPEN issue; NOT_EXERCISED, blocked on #534",
+      "536": "OPEN issue; this lease (traceability + molecular index) is PARTIAL — root README/AGENTS/docs/INDEX.md convergence is separate, not-yet-done writer's work"
+    },
+    "parent_close_allowed": false,
+    "blocking_reasons": [
+      "19 of 28 claims require an external hosting runtime that has not been selected or exercised (#534)",
+      "6 of 28 claims are targeted by the merged C1 contract but #532's full receipt/fixture denominator (durability/ref/cache/gossip/compaction/recovery/benchmark) is still incomplete",
+      "independent exact-subject Shadow receipt absent (#535, blocked on #534)",
+      "root README/AGENTS/docs/INDEX.md shared convergence not attempted by this lease; active writers #412/#419 on skills/git-town-stacked-pr-worker/README.md remain unreconciled"
+    ]
+  }
+}
