@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skills-shared.dev/contracts/portfolio-multigraph/v1",
+  "title": "Repository Portfolio Multi-Graph",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "epoch_digest", "nodes", "graphs", "ready_waves", "convergence_owners", "digest"],
+  "properties": {
+    "schema": {"const": "portfolio-multigraph/v1"},
+    "epoch_digest": {"$ref": "#/$defs/sha256"},
+    "nodes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "acceptance_digest", "state"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "acceptance_digest": {"$ref": "#/$defs/sha256"},
+          "state": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "graphs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["G1", "G2", "G3", "G4", "G5", "G6", "G7"],
+      "properties": {
+        "G1": {"$ref": "#/$defs/edges"},
+        "G2": {"$ref": "#/$defs/edges"},
+        "G3": {"$ref": "#/$defs/edges"},
+        "G4": {"$ref": "#/$defs/edges"},
+        "G5": {"$ref": "#/$defs/edges"},
+        "G6": {"$ref": "#/$defs/edges"},
+        "G7": {"$ref": "#/$defs/edges"}
+      }
+    },
+    "ready_waves": {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "minItems": 1,
+        "uniqueItems": true,
+        "items": {"type": "string", "minLength": 1}
+      }
+    },
+    "convergence_owners": {
+      "type": "object",
+      "additionalProperties": {"type": "string", "minLength": 1}
+    },
+    "digest": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "edges": {"type": "array", "items": {"$ref": "#/$defs/edge"}},
+    "edge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from", "to", "relation", "reason", "subject_digest"],
+      "properties": {
+        "from": {"type": "string", "minLength": 1},
+        "to": {"type": "string", "minLength": 1},
+        "relation": {"enum": ["START_DEPENDENCY", "COMPLETION_DEPENDENCY", "SIBLING", "TRUE_CHILD", "CONVERGENCE", "PATH_CONFLICT", "RESOURCE_CONFLICT", "EVIDENCE_DEPENDENCY", "AUTHORITY_BOUNDARY", "PUBLICATION_DEPENDENCY", "EXTERNAL_EVIDENCE", "HISTORICAL"]},
+        "reason": {"type": "string", "minLength": 1},
+        "subject_digest": {"$ref": "#/$defs/sha256"}
+      }
+    }
+  }
+}
