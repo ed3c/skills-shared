@@ -170,10 +170,10 @@ rather than pending.
 What was run against these bytes was run from an uncommitted scratch harness
 and is recorded in
 [`../../docs/traceability/dual-track-code-review-loop/implementation-preflight.json`](../../docs/traceability/dual-track-code-review-loop/implementation-preflight.json),
-including the planted defects and which of them turned the checks red. An
-uncommitted harness is a claim about a run nobody else can repeat from this
-tree, which is why the refusal results here rest on a second, independent
-derivation rather than on that harness alone.
+including the per-control knockout denominators (32 knockouts, 32
+discriminating). An uncommitted harness is a claim about a run nobody else can
+repeat from this tree, which is why the refusal results here rest on a second,
+independent derivation rather than on that harness alone.
 
 ## Evidence ceiling
 

@@ -77,7 +77,7 @@ different populations of field live in them:
 - **Free-text fields are not shape-protected at all.** Thirty-six string fields
   across the eight schemas carry no `pattern`, `enum`, `const` or length
   ceiling — rationales, corrections, notes, denominator definitions, tool names,
-  references, `out_of_scope` entries, measurement environments. Three of them
+  references, `out_of_scope` entries, measurement environments. Four of them
   carry a `not` pattern that refuses one shape and leaves the rest of the string
   space open. A locator pasted into any of these validates.
 
