@@ -1,0 +1,57 @@
+{
+  "schema_version": "agentic-tech-lead/issue-closure-contract/v1",
+  "issue": {
+    "repository": "ed3c/skills-shared",
+    "number": 505,
+    "github_state": "CLOSED",
+    "github_state_reason": "COMPLETED"
+  },
+  "disposition": "DIRECTLY_LANDED",
+  "acceptance": [
+    {
+      "id": "immutable-result-tree-readback",
+      "status": "SATISFIED",
+      "successor": null,
+      "rationale": null
+    },
+    {
+      "id": "false-pass-mutation",
+      "status": "SATISFIED",
+      "successor": null,
+      "rationale": null
+    }
+  ],
+  "implementation": {
+    "candidate_prs": [
+      {
+        "repository": "ed3c/skills-shared",
+        "number": 507,
+        "state": "CLOSED",
+        "merged": true,
+        "classification": "DIRECT"
+      }
+    ],
+    "landing": {
+      "repository": "ed3c/skills-shared",
+      "via_pr": 507,
+      "commit": "249abc47847f8295b1c75c9d4c84457c5126fd89",
+      "tree": "a24b9b7ace6f4022967d41262ecdc704d5c11646"
+    }
+  },
+  "residual": [
+    {
+      "id": "fresh-signed-in-v2-acceptance",
+      "state": "TRANSFERRED",
+      "owner": "ed3c/skills-shared#464"
+    },
+    {
+      "id": "durable-result-carrier-provenance",
+      "state": "TRANSFERRED",
+      "owner": "ed3c/skills-shared#508"
+    }
+  ],
+  "evidence_ceiling": "DETERMINISTIC",
+  "shadow_review": {
+    "verdict": "PASS"
+  }
+}
