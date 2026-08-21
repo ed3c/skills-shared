@@ -1,0 +1,135 @@
+{
+  "schema_version": "agentic-tech-lead/repository-portfolio-prompt-manifest/v1",
+  "required_coordinator_instruction": "Use subagents. Wait for all agents and consolidate their findings.",
+  "prompts": [
+    {
+      "id": "repository-portfolio-controller-v3",
+      "role": "portable-controller",
+      "path": "references/prompts/repository-portfolio-controller-v3.md",
+      "sha256": "1ed6ab4de72b9e9443348b71f6c991a190b20927470ee1a1f33049d6bbc4e1fc",
+      "must_contain_coordinator_instruction": true
+    },
+    {
+      "id": "common-system-envelope-v1",
+      "role": "common-envelope",
+      "path": "references/prompts/repository-portfolio-control/common-system-envelope.md",
+      "sha256": "827cdd045d990369fd7c0a9c2cf5439c1135bf168ead4f54dd022eba58b2d3f1",
+      "must_contain_coordinator_instruction": true
+    },
+    {
+      "id": "shadow-architect-monitor-v1",
+      "role": "shadow-monitor",
+      "path": "references/prompts/repository-portfolio-control/shadow-architect-monitor-v1.md",
+      "sha256": "c9a66ce722ddf74869efdd86402a9f53e60cdfa83d8288309180fad314fa5796",
+      "must_contain_coordinator_instruction": false
+    },
+    {
+      "id": "tech-lead-controller-v1",
+      "role": "tech-lead-controller",
+      "path": "references/prompts/repository-portfolio-control/tech-lead-controller-v1.md",
+      "sha256": "e5f33c3f5ffbba5b321427cf909bd35af2bb0ee0245f2b8fd3785eca8e7c6fab",
+      "must_contain_coordinator_instruction": true
+    },
+    {
+      "id": "portfolio-explorer-v1",
+      "role": "subagent",
+      "path": "references/prompts/repository-portfolio-control/portfolio-explorer-v1.md",
+      "sha256": "9860acb36ce90d02185a2cfdd6723ebd0e682bf1f0f42c91f567c6b72c72910a",
+      "must_contain_coordinator_instruction": false
+    },
+    {
+      "id": "acceptance-adversary-v1",
+      "role": "subagent",
+      "path": "references/prompts/repository-portfolio-control/acceptance-adversary-v1.md",
+      "sha256": "03b761dcd4d169d10f650fd4fde073154340b0ab147117ba0163ee7647bdf2cf",
+      "must_contain_coordinator_instruction": false
+    },
+    {
+      "id": "dependency-auditor-v1",
+      "role": "subagent",
+      "path": "references/prompts/repository-portfolio-control/dependency-auditor-v1.md",
+      "sha256": "9210b9e7e14266f81558cd3f3adac035e06d37a08a48429defca4f4b8a9b0917",
+      "must_contain_coordinator_instruction": false
+    },
+    {
+      "id": "runtime-admission-auditor-v1",
+      "role": "subagent",
+      "path": "references/prompts/repository-portfolio-control/runtime-admission-auditor-v1.md",
+      "sha256": "f58156162e90fd9c74b5aa7e2461cac369e38d1a6edff1f3c554d45c78c36381",
+      "must_contain_coordinator_instruction": false
+    },
+    {
+      "id": "implementation-worker-v1",
+      "role": "subagent",
+      "path": "references/prompts/repository-portfolio-control/implementation-worker-v1.md",
+      "sha256": "5a1ccbf01613d1810b79cf7a7872f56fd066d91181179c209b1131abdef6f580",
+      "must_contain_coordinator_instruction": false
+    },
+    {
+      "id": "consolidation-verifier-v1",
+      "role": "subagent",
+      "path": "references/prompts/repository-portfolio-control/consolidation-verifier-v1.md",
+      "sha256": "9c35f94b08a5d5760d0471340f2b2af1717256a1883a47f61093bfd3cfc32413",
+      "must_contain_coordinator_instruction": false
+    },
+    {
+      "id": "release-auditor-v1",
+      "role": "subagent",
+      "path": "references/prompts/repository-portfolio-control/release-auditor-v1.md",
+      "sha256": "6f8a6899ac2c429a77268c9d1ca77b3aaca03c18fdf328a645142ec673918a67",
+      "must_contain_coordinator_instruction": false
+    },
+    {
+      "id": "skills-shared-overlay-v1",
+      "role": "consumer-overlay",
+      "path": "references/prompts/repository-portfolio-control/skills-shared-overlay-v1.md",
+      "sha256": "04b54e69bef492b635aa5c6db78d21e5c4c08d72c091add17b3033f8fdbbc3dc",
+      "must_contain_coordinator_instruction": true
+    }
+  ],
+  "codex_agents": [
+    {
+      "name": "portfolio-explorer",
+      "path": "references/repository-portfolio-control/codex-agents/portfolio-explorer.toml.template",
+      "sha256": "072ac7582761d6539a70aa9b916967b01612a8a7064c7c5f9b6a647cdcc1c8ed",
+      "sandbox_mode": "read-only"
+    },
+    {
+      "name": "acceptance-adversary",
+      "path": "references/repository-portfolio-control/codex-agents/acceptance-adversary.toml.template",
+      "sha256": "7ccf8d223f9ce906da3b6a8fea62cc13f3b59289be665a624410770d8673c726",
+      "sandbox_mode": "read-only"
+    },
+    {
+      "name": "dependency-auditor",
+      "path": "references/repository-portfolio-control/codex-agents/dependency-auditor.toml.template",
+      "sha256": "98fa313fe7ccc6658c7c9e8e6d175c031fb2d8dbe01c97f7c6948fbd35b7a1a3",
+      "sandbox_mode": "read-only"
+    },
+    {
+      "name": "runtime-admission-auditor",
+      "path": "references/repository-portfolio-control/codex-agents/runtime-admission-auditor.toml.template",
+      "sha256": "0aa3df0e85257d1a39e3bbe5b1d5983784f1b7abcf06b404fc3c256db0b1caa8",
+      "sandbox_mode": "read-only"
+    },
+    {
+      "name": "implementation-worker",
+      "path": "references/repository-portfolio-control/codex-agents/implementation-worker.toml.template",
+      "sha256": "14243a455c959743202c5a69d7f525e5dc100bc579803973836beb39f3f6ad5a",
+      "sandbox_mode": "workspace-write"
+    },
+    {
+      "name": "consolidation-verifier",
+      "path": "references/repository-portfolio-control/codex-agents/consolidation-verifier.toml.template",
+      "sha256": "28d4b2f33728b797e0616370f42128da5fec014e9599927ade14d4aa849426a6",
+      "sandbox_mode": "read-only"
+    },
+    {
+      "name": "release-auditor",
+      "path": "references/repository-portfolio-control/codex-agents/release-auditor.toml.template",
+      "sha256": "2b9d12911415da7b2b326b76862aebaeb58253fa63b7544acf36942767b34899",
+      "sandbox_mode": "read-only"
+    }
+  ],
+  "manifest_digest": "6d9ef44f008e9c11c2e0403ef103ee2f747e6d45c731cc70e115c779d269eb37"
+}

@@ -1,0 +1,119 @@
+[
+  {
+    "schema_version": "agentic-tech-lead/subagent-dispatch/v1",
+    "epoch_id": "epoch-example-001",
+    "task_id": "task-1",
+    "attempt_id": "attempt-1",
+    "role": "portfolio-explorer",
+    "agent": {
+      "host": "codex-cli",
+      "model": "gpt-5.6-terra",
+      "reasoning_effort": "medium",
+      "sandbox_mode": "read-only",
+      "data_boundary": "PUBLIC_ONLY",
+      "private_egress_admitted": false,
+      "provider_alias": "FABLE_5"
+    },
+    "subject": {
+      "repository": "ed3c/skills-shared",
+      "commit": "0000000000000000000000000000000000000000",
+      "tree": "1111111111111111111111111111111111111111",
+      "visibility": "PUBLIC"
+    },
+    "leases": {
+      "exclusive_paths": [],
+      "read_only_paths": [
+        "**"
+      ],
+      "forbidden_paths": [
+        "**/*"
+      ],
+      "exclusive_resources": []
+    },
+    "budgets": {
+      "wall_clock_seconds": 600,
+      "max_retries": 0,
+      "max_output_bytes": 65536
+    },
+    "expected_output": "subagent-result/v1",
+    "dispatch_digest": "78e0e00d703bb586407c0059ea205c9356269c197fdc4bc1c73ba8644d9db6b3"
+  },
+  {
+    "schema_version": "agentic-tech-lead/subagent-dispatch/v1",
+    "epoch_id": "epoch-example-001",
+    "task_id": "task-2",
+    "attempt_id": "attempt-2",
+    "role": "acceptance-adversary",
+    "agent": {
+      "host": "codex-cli",
+      "model": "gpt-5.6",
+      "reasoning_effort": "high",
+      "sandbox_mode": "read-only",
+      "data_boundary": "PUBLIC_ONLY",
+      "private_egress_admitted": false,
+      "provider_alias": "OPUS_5"
+    },
+    "subject": {
+      "repository": "ed3c/skills-shared",
+      "commit": "0000000000000000000000000000000000000000",
+      "tree": "1111111111111111111111111111111111111111",
+      "visibility": "PUBLIC"
+    },
+    "leases": {
+      "exclusive_paths": [],
+      "read_only_paths": [
+        "**"
+      ],
+      "forbidden_paths": [
+        "**/*"
+      ],
+      "exclusive_resources": []
+    },
+    "budgets": {
+      "wall_clock_seconds": 600,
+      "max_retries": 0,
+      "max_output_bytes": 65536
+    },
+    "expected_output": "subagent-result/v1",
+    "dispatch_digest": "430294e357e24b3c478054fc0558c9cf19de8073caccfb7a0f9a008bcf1ad2ff"
+  },
+  {
+    "schema_version": "agentic-tech-lead/subagent-dispatch/v1",
+    "epoch_id": "epoch-example-001",
+    "task_id": "task-3",
+    "attempt_id": "attempt-3",
+    "role": "dependency-auditor",
+    "agent": {
+      "host": "codex-cli",
+      "model": "gpt-5.6",
+      "reasoning_effort": "high",
+      "sandbox_mode": "read-only",
+      "data_boundary": "PUBLIC_ONLY",
+      "private_egress_admitted": false,
+      "provider_alias": "OPUS_5"
+    },
+    "subject": {
+      "repository": "ed3c/skills-shared",
+      "commit": "0000000000000000000000000000000000000000",
+      "tree": "1111111111111111111111111111111111111111",
+      "visibility": "PUBLIC"
+    },
+    "leases": {
+      "exclusive_paths": [],
+      "read_only_paths": [
+        "**"
+      ],
+      "forbidden_paths": [
+        "**/*"
+      ],
+      "exclusive_resources": []
+    },
+    "budgets": {
+      "wall_clock_seconds": 600,
+      "max_retries": 0,
+      "max_output_bytes": 65536
+    },
+    "expected_output": "subagent-result/v1",
+    "dispatch_digest": "1c13b65e827af8268ae8a6183d8aefad10db78ec7c2be3f8d6ab772b2e6f1edf"
+  }
+]

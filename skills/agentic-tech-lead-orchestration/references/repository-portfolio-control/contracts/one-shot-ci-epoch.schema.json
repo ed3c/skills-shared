@@ -1,0 +1,185 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skills-shared.dev/schemas/one-shot-ci-epoch/v1",
+  "title": "One-shot CI Epoch",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "epoch_id",
+    "repository",
+    "candidate",
+    "local_gate",
+    "publication",
+    "workflow_runs",
+    "verdict",
+    "digest",
+    "evidence_ceiling"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "github-delivery/one-shot-ci-epoch/v1"
+    },
+    "epoch_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "repository": {
+      "type": "string",
+      "pattern": "^[^/]+/[^/]+$"
+    },
+    "candidate": {
+      "type": "object",
+      "required": [
+        "commit",
+        "tree",
+        "changed_paths_digest"
+      ],
+      "properties": {
+        "commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "tree": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "changed_paths_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "local_gate": {
+      "type": "object",
+      "required": [
+        "state",
+        "receipt_digest"
+      ],
+      "properties": {
+        "state": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "ABSENT",
+            "NOT_IMPLEMENTED",
+            "NOT_EXERCISED",
+            "SKIPPED_BY_POLICY",
+            "BLOCKED",
+            "HUMAN_ADMIT_REQUIRED"
+          ]
+        },
+        "receipt_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "publication": {
+      "type": "object",
+      "required": [
+        "draft_first",
+        "code_push_count",
+        "ready_transition_count",
+        "code_push_after_ready",
+        "rerun_count",
+        "rerun_classification"
+      ],
+      "properties": {
+        "draft_first": {
+          "type": "boolean"
+        },
+        "code_push_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ready_transition_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "code_push_after_ready": {
+          "type": "boolean"
+        },
+        "rerun_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "rerun_classification": {
+          "enum": [
+            "NONE",
+            "INFRASTRUCTURE_FLAKE",
+            "CODE_OR_CONFIG_CHANGED",
+            "UNKNOWN"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "workflow_runs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "run_id",
+          "head_sha",
+          "state",
+          "jobs",
+          "steps"
+        ],
+        "properties": {
+          "run_id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "head_sha": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{40}$"
+          },
+          "state": {
+            "enum": [
+              "SUCCESS",
+              "FAILURE",
+              "CANCELLED",
+              "SKIPPED",
+              "IN_PROGRESS",
+              "QUEUED"
+            ]
+          },
+          "jobs": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "steps": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "artifact_digests": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "verdict": {
+      "enum": [
+        "PASS",
+        "HOLD",
+        "REJECT",
+        "NOT_EXERCISED"
+      ]
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "evidence_ceiling": {
+      "const": "EXACT_HEAD_HOSTED_EXECUTION_ONLY"
+    }
+  },
+  "additionalProperties": false
+}

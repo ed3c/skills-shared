@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skills-shared.dev/schemas/subagent-join-receipt/v1",
+  "title": "Subagent Join Receipt",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "epoch_id",
+    "requested_attempts",
+    "results",
+    "missing_attempts",
+    "join_state",
+    "denominator",
+    "consolidated_findings",
+    "join_digest",
+    "evidence_ceiling"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "agentic-tech-lead/subagent-join-receipt/v1"
+    },
+    "epoch_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "requested_attempts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "results": {
+      "type": "array",
+      "items": {
+        "$ref": "subagent-result.schema.json"
+      }
+    },
+    "missing_attempts": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "join_state": {
+      "enum": [
+        "PASS",
+        "JOIN_COMPLETE_WITH_BLOCKERS",
+        "JOIN_INCOMPLETE",
+        "REJECTED"
+      ]
+    },
+    "denominator": {
+      "type": "object",
+      "required": [
+        "requested",
+        "terminal",
+        "pass",
+        "non_pass"
+      ],
+      "properties": {
+        "requested": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "terminal": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "pass": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "non_pass": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "consolidated_findings": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "join_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "evidence_ceiling": {
+      "const": "SUBAGENT_JOIN_CONSISTENCY_ONLY"
+    }
+  },
+  "additionalProperties": false
+}

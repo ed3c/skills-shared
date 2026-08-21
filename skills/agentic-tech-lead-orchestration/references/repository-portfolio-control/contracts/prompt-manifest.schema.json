@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skills-shared.dev/schemas/repository-portfolio-prompt-manifest/v1",
+  "title": "Repository Portfolio Prompt Manifest",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "required_coordinator_instruction",
+    "prompts",
+    "codex_agents",
+    "manifest_digest"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "agentic-tech-lead/repository-portfolio-prompt-manifest/v1"
+    },
+    "required_coordinator_instruction": {
+      "const": "Use subagents. Wait for all agents and consolidate their findings."
+    },
+    "prompts": {
+      "type": "array",
+      "minItems": 10,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "role",
+          "path",
+          "sha256"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "role": {
+            "type": "string",
+            "minLength": 1
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "must_contain_coordinator_instruction": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "codex_agents": {
+      "type": "array",
+      "minItems": 7,
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "path",
+          "sha256",
+          "sandbox_mode"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "sandbox_mode": {
+            "enum": [
+              "read-only",
+              "workspace-write"
+            ]
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "manifest_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  },
+  "additionalProperties": false
+}

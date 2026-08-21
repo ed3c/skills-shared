@@ -1,0 +1,176 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skills-shared.dev/schemas/subagent-result/v1",
+  "title": "Subagent Result",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "epoch_id",
+    "task_id",
+    "attempt_id",
+    "role",
+    "dispatch_digest",
+    "subject",
+    "state",
+    "changed_paths",
+    "commands",
+    "findings",
+    "lease_readback",
+    "cleanup",
+    "result_digest"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "agentic-tech-lead/subagent-result/v1"
+    },
+    "epoch_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "task_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "attempt_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "role": {
+      "enum": [
+        "portfolio-explorer",
+        "acceptance-adversary",
+        "dependency-auditor",
+        "runtime-admission-auditor",
+        "implementation-worker",
+        "consolidation-verifier",
+        "release-auditor"
+      ]
+    },
+    "dispatch_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "subject": {
+      "type": "object",
+      "required": [
+        "repository",
+        "base_commit",
+        "base_tree",
+        "visibility"
+      ],
+      "properties": {
+        "repository": {
+          "type": "string",
+          "pattern": "^[^/]+/[^/]+$"
+        },
+        "base_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "base_tree": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "result_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "result_tree": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "visibility": {
+          "enum": [
+            "PUBLIC",
+            "PRIVATE",
+            "INTERNAL"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "state": {
+      "enum": [
+        "PASS",
+        "FAIL",
+        "BLOCKED",
+        "CANCELLED",
+        "STALE",
+        "ABSENT",
+        "TIMEOUT",
+        "NOT_EXERCISED"
+      ]
+    },
+    "changed_paths": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "commands": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "argv",
+          "exit_code"
+        ],
+        "properties": {
+          "argv": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            }
+          },
+          "exit_code": {
+            "type": "integer"
+          },
+          "output_digest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "lease_readback": {
+      "type": "object",
+      "required": [
+        "exclusive_paths_respected",
+        "resources_released"
+      ],
+      "properties": {
+        "exclusive_paths_respected": {
+          "type": "boolean"
+        },
+        "resources_released": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "cleanup": {
+      "enum": [
+        "CLEAN",
+        "RESIDUE",
+        "NOT_APPLICABLE",
+        "UNKNOWN"
+      ]
+    },
+    "result_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  },
+  "additionalProperties": false
+}

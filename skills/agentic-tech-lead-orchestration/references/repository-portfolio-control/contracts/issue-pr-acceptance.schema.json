@@ -1,0 +1,274 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skills-shared.dev/schemas/issue-pr-acceptance/v1",
+  "title": "Issue or PR Acceptance Contract",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "epoch_id",
+    "repository",
+    "item",
+    "objective",
+    "non_goals",
+    "start_dependencies",
+    "completion_dependencies",
+    "leases",
+    "runtime_requirements",
+    "oracles",
+    "negative_controls",
+    "evidence",
+    "rollback",
+    "allowed_terminal_states",
+    "residual_owner",
+    "contract_digest"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "agentic-tech-lead/issue-pr-acceptance/v1"
+    },
+    "epoch_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "repository": {
+      "type": "string",
+      "pattern": "^[^/]+/[^/]+$"
+    },
+    "item": {
+      "type": "object",
+      "required": [
+        "kind",
+        "number",
+        "observed_state"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "ISSUE",
+            "PULL_REQUEST"
+          ]
+        },
+        "number": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "observed_state": {
+          "type": "string",
+          "minLength": 1
+        },
+        "base_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "base_tree": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "head_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "head_tree": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "objective": {
+      "type": "string",
+      "minLength": 20
+    },
+    "non_goals": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 3
+      }
+    },
+    "start_dependencies": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "completion_dependencies": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "leases": {
+      "type": "object",
+      "required": [
+        "exclusive_paths",
+        "read_only_paths",
+        "forbidden_paths",
+        "exclusive_resources"
+      ],
+      "properties": {
+        "exclusive_paths": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "read_only_paths": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "forbidden_paths": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "exclusive_resources": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "runtime_requirements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "capability",
+          "state",
+          "owner",
+          "unblock_condition"
+        ],
+        "properties": {
+          "capability": {
+            "type": "string",
+            "minLength": 1
+          },
+          "state": {
+            "enum": [
+              "PASS",
+              "FAIL",
+              "ABSENT",
+              "NOT_IMPLEMENTED",
+              "NOT_EXERCISED",
+              "SKIPPED_BY_POLICY",
+              "BLOCKED",
+              "HUMAN_ADMIT_REQUIRED"
+            ]
+          },
+          "owner": {
+            "type": "string",
+            "minLength": 1
+          },
+          "unblock_condition": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "oracles": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 3
+      }
+    },
+    "negative_controls": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 3
+      },
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "object",
+      "required": [
+        "required_lanes",
+        "ceiling"
+      ],
+      "properties": {
+        "required_lanes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "enum": [
+              "SOURCE",
+              "DETERMINISTIC",
+              "LOCAL",
+              "HOSTED_CI",
+              "PROVIDER",
+              "PRIVATE",
+              "HUMAN",
+              "PRODUCTION"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "ceiling": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "rollback": {
+      "type": "object",
+      "required": [
+        "commit",
+        "strategy"
+      ],
+      "properties": {
+        "commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "strategy": {
+          "type": "string",
+          "minLength": 3
+        }
+      },
+      "additionalProperties": false
+    },
+    "allowed_terminal_states": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "residual_owner": {
+      "type": "string",
+      "minLength": 1
+    },
+    "contract_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  },
+  "additionalProperties": false
+}

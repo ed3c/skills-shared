@@ -1,0 +1,205 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skills-shared.dev/schemas/subagent-dispatch/v1",
+  "title": "Subagent Dispatch",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "epoch_id",
+    "task_id",
+    "attempt_id",
+    "role",
+    "agent",
+    "subject",
+    "leases",
+    "budgets",
+    "expected_output",
+    "dispatch_digest"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "agentic-tech-lead/subagent-dispatch/v1"
+    },
+    "epoch_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "task_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "attempt_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "role": {
+      "enum": [
+        "portfolio-explorer",
+        "acceptance-adversary",
+        "dependency-auditor",
+        "runtime-admission-auditor",
+        "implementation-worker",
+        "consolidation-verifier",
+        "release-auditor"
+      ]
+    },
+    "agent": {
+      "type": "object",
+      "required": [
+        "host",
+        "model",
+        "reasoning_effort",
+        "sandbox_mode",
+        "data_boundary",
+        "private_egress_admitted"
+      ],
+      "properties": {
+        "host": {
+          "type": "string",
+          "minLength": 1
+        },
+        "model": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reasoning_effort": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sandbox_mode": {
+          "enum": [
+            "read-only",
+            "workspace-write",
+            "danger-full-access"
+          ]
+        },
+        "provider_alias": {
+          "enum": [
+            "FABLE_5",
+            "OPUS_5",
+            "SONNET_5"
+          ]
+        },
+        "data_boundary": {
+          "enum": [
+            "PUBLIC_ONLY",
+            "PRIVATE_ADMITTED",
+            "LOCAL_ONLY"
+          ]
+        },
+        "private_egress_admitted": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "subject": {
+      "type": "object",
+      "required": [
+        "repository",
+        "commit",
+        "tree",
+        "visibility"
+      ],
+      "properties": {
+        "repository": {
+          "type": "string",
+          "pattern": "^[^/]+/[^/]+$"
+        },
+        "commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "tree": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "visibility": {
+          "enum": [
+            "PUBLIC",
+            "PRIVATE",
+            "INTERNAL"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "leases": {
+      "type": "object",
+      "required": [
+        "exclusive_paths",
+        "read_only_paths",
+        "forbidden_paths",
+        "exclusive_resources"
+      ],
+      "properties": {
+        "exclusive_paths": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "read_only_paths": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "forbidden_paths": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "exclusive_resources": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "budgets": {
+      "type": "object",
+      "required": [
+        "wall_clock_seconds",
+        "max_retries",
+        "max_output_bytes"
+      ],
+      "properties": {
+        "wall_clock_seconds": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "max_retries": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "max_output_bytes": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "expected_output": {
+      "type": "string",
+      "minLength": 1
+    },
+    "dispatch_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  },
+  "additionalProperties": false
+}

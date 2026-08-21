@@ -1,0 +1,25 @@
+{
+  "schema_version": "agentic-tech-lead/repository-portfolio-snapshot/v1",
+  "epoch_id": "epoch-example-001",
+  "observed_at": "2026-08-21T14:00:00Z",
+  "producer": {
+    "runtime": "CODEX_CLI_LOCAL",
+    "identity": "agent-macro@codex-cli.invalid"
+  },
+  "repositories": [
+    {
+      "repository": "ed3c/skills-shared",
+      "visibility": "PUBLIC",
+      "default_branch": "main",
+      "commit": "0000000000000000000000000000000000000000",
+      "tree": "1111111111111111111111111111111111111111",
+      "issues_observed_at": "2026-08-21T14:00:00Z",
+      "prs_observed_at": "2026-08-21T14:00:00Z",
+      "workflows_observed_at": "2026-08-21T14:00:00Z",
+      "dirty_state": "CLEAN",
+      "runtime_state": "PASS"
+    }
+  ],
+  "epoch_digest": "3f818ecc20a3eeedca78ca257aefe53d2de6163f8d5987207ae7207187abc7be",
+  "evidence_ceiling": "PROVIDER_AND_LOCAL_READBACK_ONLY"
+}

@@ -1,0 +1,102 @@
+{
+  "schema_version": "agentic-tech-lead/subagent-join-receipt/v1",
+  "epoch_id": "epoch-example-001",
+  "requested_attempts": [
+    "attempt-1",
+    "attempt-2",
+    "attempt-3"
+  ],
+  "results": [
+    {
+      "schema_version": "agentic-tech-lead/subagent-result/v1",
+      "epoch_id": "epoch-example-001",
+      "task_id": "task-1",
+      "attempt_id": "attempt-1",
+      "role": "portfolio-explorer",
+      "dispatch_digest": "78e0e00d703bb586407c0059ea205c9356269c197fdc4bc1c73ba8644d9db6b3",
+      "subject": {
+        "repository": "ed3c/skills-shared",
+        "base_commit": "0000000000000000000000000000000000000000",
+        "base_tree": "1111111111111111111111111111111111111111",
+        "visibility": "PUBLIC"
+      },
+      "state": "PASS",
+      "changed_paths": [],
+      "commands": [],
+      "findings": [
+        "portfolio-explorer completed"
+      ],
+      "lease_readback": {
+        "exclusive_paths_respected": true,
+        "resources_released": true
+      },
+      "cleanup": "NOT_APPLICABLE",
+      "result_digest": "8fc749b33f413abb7f5c903e408782f4dd86db1ab3a7839d0050d77935db6223"
+    },
+    {
+      "schema_version": "agentic-tech-lead/subagent-result/v1",
+      "epoch_id": "epoch-example-001",
+      "task_id": "task-2",
+      "attempt_id": "attempt-2",
+      "role": "acceptance-adversary",
+      "dispatch_digest": "430294e357e24b3c478054fc0558c9cf19de8073caccfb7a0f9a008bcf1ad2ff",
+      "subject": {
+        "repository": "ed3c/skills-shared",
+        "base_commit": "0000000000000000000000000000000000000000",
+        "base_tree": "1111111111111111111111111111111111111111",
+        "visibility": "PUBLIC"
+      },
+      "state": "PASS",
+      "changed_paths": [],
+      "commands": [],
+      "findings": [
+        "acceptance-adversary completed"
+      ],
+      "lease_readback": {
+        "exclusive_paths_respected": true,
+        "resources_released": true
+      },
+      "cleanup": "NOT_APPLICABLE",
+      "result_digest": "1e611910119614b98b10aa9898d847a688298a331be4248d28955f7416348068"
+    },
+    {
+      "schema_version": "agentic-tech-lead/subagent-result/v1",
+      "epoch_id": "epoch-example-001",
+      "task_id": "task-3",
+      "attempt_id": "attempt-3",
+      "role": "dependency-auditor",
+      "dispatch_digest": "1c13b65e827af8268ae8a6183d8aefad10db78ec7c2be3f8d6ab772b2e6f1edf",
+      "subject": {
+        "repository": "ed3c/skills-shared",
+        "base_commit": "0000000000000000000000000000000000000000",
+        "base_tree": "1111111111111111111111111111111111111111",
+        "visibility": "PUBLIC"
+      },
+      "state": "PASS",
+      "changed_paths": [],
+      "commands": [],
+      "findings": [
+        "dependency-auditor completed"
+      ],
+      "lease_readback": {
+        "exclusive_paths_respected": true,
+        "resources_released": true
+      },
+      "cleanup": "NOT_APPLICABLE",
+      "result_digest": "74c95a26167ec18c80b30f712815731583885d097b96228a5132f14f8374d8a5"
+    }
+  ],
+  "missing_attempts": [],
+  "join_state": "PASS",
+  "denominator": {
+    "requested": 3,
+    "terminal": 3,
+    "pass": 3,
+    "non_pass": 0
+  },
+  "consolidated_findings": [
+    "All requested read-only auditors returned terminal PASS"
+  ],
+  "join_digest": "5410f7a7cbd5662ae1268c49084f77b94e1988763f41a75bcbccd5b4dba1e0c5",
+  "evidence_ceiling": "SUBAGENT_JOIN_CONSISTENCY_ONLY"
+}

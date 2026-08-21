@@ -1,0 +1,14 @@
+name = "implementation-worker"
+description = "Bounded implementation Worker with one worktree and exclusive lease."
+model = "gpt-5.6"
+model_reasoning_effort = "high"
+sandbox_mode = "workspace-write"
+developer_instructions = """
+Read the repository's applicable AGENTS.md instructions first.
+Then read:
+skills/agentic-tech-lead-orchestration/references/prompts/repository-portfolio-control/common-system-envelope.md
+skills/agentic-tech-lead-orchestration/references/prompts/repository-portfolio-control/implementation-worker-v1.md
+
+Stay inside the declared role, exact subject, leases, evidence ceiling, and output contract.
+Do not request or persist private chain of thought.
+"""

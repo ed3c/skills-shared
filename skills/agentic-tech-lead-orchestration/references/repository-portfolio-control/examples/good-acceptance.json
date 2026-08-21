@@ -1,0 +1,62 @@
+{
+  "schema_version": "agentic-tech-lead/issue-pr-acceptance/v1",
+  "epoch_id": "epoch-example-001",
+  "repository": "ed3c/skills-shared",
+  "item": {
+    "kind": "ISSUE",
+    "number": 560,
+    "observed_state": "OPEN",
+    "base_commit": "0000000000000000000000000000000000000000",
+    "base_tree": "1111111111111111111111111111111111111111"
+  },
+  "objective": "Implement a portable repository portfolio control foundation with executable acceptance gates.",
+  "non_goals": [
+    "No live provider claim",
+    "No merge or release authority"
+  ],
+  "start_dependencies": [],
+  "completion_dependencies": [],
+  "leases": {
+    "exclusive_paths": [
+      "skills/agentic-tech-lead-orchestration/references/repository-portfolio-control/**"
+    ],
+    "read_only_paths": [
+      "AGENTS.md"
+    ],
+    "forbidden_paths": [
+      ".github/workflows/**"
+    ],
+    "exclusive_resources": []
+  },
+  "runtime_requirements": [
+    {
+      "capability": "python3",
+      "state": "PASS",
+      "owner": "local runtime",
+      "unblock_condition": "python3 executable observed"
+    }
+  ],
+  "oracles": [
+    "All prompt, schema, multigraph, join and CI selftests pass"
+  ],
+  "negative_controls": [
+    "SUBAGENT_RESULT_ACCEPTED_BEFORE_JOIN",
+    "OLD_HEAD_WORKFLOW_RECEIPT_REUSED"
+  ],
+  "evidence": {
+    "required_lanes": [
+      "DETERMINISTIC"
+    ],
+    "ceiling": "DETERMINISTIC_CONTRACT_ONLY"
+  },
+  "rollback": {
+    "commit": "0000000000000000000000000000000000000000",
+    "strategy": "Delete the isolated foundation subtree and restore the parent subject"
+  },
+  "allowed_terminal_states": [
+    "PORTFOLIO_PROMPT_AND_CONTRACT_FOUNDATION_READY",
+    "BLOCKED"
+  ],
+  "residual_owner": "Issue #560 next compiler/runtime atom",
+  "contract_digest": "e3bed14bc2f0c379528b046407d0277a253bec779b747d165a93e84778d631ee"
+}

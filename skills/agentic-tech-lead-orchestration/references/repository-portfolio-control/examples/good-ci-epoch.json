@@ -1,0 +1,37 @@
+{
+  "schema_version": "github-delivery/one-shot-ci-epoch/v1",
+  "epoch_id": "epoch-example-001",
+  "repository": "ed3c/skills-shared",
+  "candidate": {
+    "commit": "2222222222222222222222222222222222222222",
+    "tree": "3333333333333333333333333333333333333333",
+    "changed_paths_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "local_gate": {
+    "state": "PASS",
+    "receipt_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  },
+  "publication": {
+    "draft_first": true,
+    "code_push_count": 1,
+    "ready_transition_count": 1,
+    "code_push_after_ready": false,
+    "rerun_count": 0,
+    "rerun_classification": "NONE"
+  },
+  "workflow_runs": [
+    {
+      "run_id": 123,
+      "head_sha": "2222222222222222222222222222222222222222",
+      "state": "SUCCESS",
+      "jobs": 2,
+      "steps": 8,
+      "artifact_digests": [
+        "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "digest": "7f07cfbc67ea73b32882647b4af272e0aaa09dda9470d76dda361ba60b673e34",
+  "evidence_ceiling": "EXACT_HEAD_HOSTED_EXECUTION_ONLY"
+}

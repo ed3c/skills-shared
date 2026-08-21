@@ -1,0 +1,69 @@
+{
+  "schema_version": "agentic-tech-lead/portfolio-multigraph/v1",
+  "epoch_id": "epoch-example-001",
+  "nodes": [
+    {
+      "id": "A",
+      "repository": "ed3c/skills-shared",
+      "exclusive_paths": [
+        "path/a/**"
+      ],
+      "exclusive_resources": [],
+      "acceptance_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    },
+    {
+      "id": "B",
+      "repository": "ed3c/skills-shared",
+      "exclusive_paths": [
+        "path/b/**"
+      ],
+      "exclusive_resources": [],
+      "acceptance_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+    }
+  ],
+  "graphs": [
+    {
+      "id": "G1",
+      "directed": true,
+      "edges": []
+    },
+    {
+      "id": "G2",
+      "directed": true,
+      "edges": []
+    },
+    {
+      "id": "G3",
+      "directed": true,
+      "edges": []
+    },
+    {
+      "id": "G4",
+      "directed": false,
+      "edges": []
+    },
+    {
+      "id": "G5",
+      "directed": false,
+      "edges": []
+    },
+    {
+      "id": "G6",
+      "directed": true,
+      "edges": []
+    },
+    {
+      "id": "G7",
+      "directed": true,
+      "edges": []
+    }
+  ],
+  "ready_waves": [
+    [
+      "A",
+      "B"
+    ]
+  ],
+  "digest": "65d184c115e4656a386bcd0999bc913180fd28d97b3c3e5bd57298d3c96b23cc",
+  "evidence_ceiling": "DETERMINISTIC_GRAPH_CONSISTENCY_ONLY"
+}
