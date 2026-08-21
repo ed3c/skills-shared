@@ -1,0 +1,169 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dtcr-fact-plane-receipt.schema.json",
+  "title": "DTCR deterministic fact-plane receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "receipt_id",
+    "subject",
+    "provider_observations",
+    "fact_bundle_id",
+    "fact_bundle_sha256",
+    "checks",
+    "evidence_state",
+    "coverage_ceiling",
+    "claims_not_proven",
+    "authority"
+  ],
+  "properties": {
+    "schema": {"const": "dtcr/fact-plane-receipt/v1"},
+    "receipt_id": {"type": "string", "pattern": "^DTCR-FPR-[0-9]{3,}$"},
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "commit", "tree"],
+      "properties": {
+        "repository": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+        "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "tree": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+      }
+    },
+    "provider_observations": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^DTCR-PO-[0-9]{3,}$"}
+    },
+    "fact_bundle_id": {"type": "string", "pattern": "^DTCR-FB-[0-9]{3,}$"},
+    "fact_bundle_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "checks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["check_id", "command_or_oracle", "exit_code", "state"],
+        "properties": {
+          "check_id": {"type": "string", "pattern": "^DTCR-D1-[A-Za-z0-9._-]+$"},
+          "command_or_oracle": {"type": "string", "minLength": 4, "maxLength": 1024},
+          "exit_code": {"type": "integer", "minimum": 0, "maximum": 255},
+          "state": {"enum": ["PASS", "FAIL", "BLOCKED", "NOT_APPLICABLE"]}
+        }
+      }
+    },
+    "evidence_state": {"enum": ["PASS", "FAIL", "BLOCKED", "NOT_APPLICABLE"]},
+    "coverage_ceiling": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["completeness", "denominator_description", "warnings", "omissions"],
+      "properties": {
+        "completeness": {"enum": ["EXACT_FOR_DECLARED_DENOMINATOR", "PARTIAL", "UNKNOWN", "NOT_APPLICABLE"]},
+        "denominator_description": {"type": "string", "minLength": 8, "maxLength": 512},
+        "warnings": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+        "omissions": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true}
+      }
+    },
+    "claims_not_proven": {
+      "type": "array",
+      "minItems": 5,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "SEMANTIC_COMPLETENESS",
+          "TASK_PASS",
+          "BEHAVIOR_PRESERVED",
+          "USER_VALUE",
+          "LEGAL_CLEARANCE",
+          "MERGE_SAFETY",
+          "RELEASE_READINESS",
+          "PRODUCTION_READINESS"
+        ]
+      },
+      "allOf": [
+        {"contains": {"const": "SEMANTIC_COMPLETENESS"}},
+        {"contains": {"const": "TASK_PASS"}},
+        {"contains": {"const": "MERGE_SAFETY"}},
+        {"contains": {"const": "RELEASE_READINESS"}},
+        {"contains": {"const": "PRODUCTION_READINESS"}}
+      ]
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["merge", "permission", "secret", "release", "production"],
+      "properties": {
+        "merge": {"const": false},
+        "permission": {"const": false},
+        "secret": {"const": false},
+        "release": {"const": false},
+        "production": {"const": false}
+      }
+    }
+  },
+  "examples": [
+    {
+      "schema": "dtcr/fact-plane-receipt/v1",
+      "receipt_id": "DTCR-FPR-001",
+      "subject": {
+        "repository": "example/project",
+        "commit": "0123456789abcdef0123456789abcdef01234567",
+        "tree": "89abcdef0123456789abcdef0123456789abcdef"
+      },
+      "provider_observations": ["DTCR-PO-001"],
+      "fact_bundle_id": "DTCR-FB-001",
+      "fact_bundle_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "checks": [
+        {"check_id": "DTCR-D1-schema", "command_or_oracle": "validate normalized fact bundle against frozen D1-C schema", "exit_code": 0, "state": "PASS"}
+      ],
+      "evidence_state": "PASS",
+      "coverage_ceiling": {
+        "completeness": "PARTIAL",
+        "denominator_description": "only facts emitted by the selected deterministic provider over its admitted input",
+        "warnings": [],
+        "omissions": ["semantic completeness is not asserted"]
+      },
+      "claims_not_proven": ["SEMANTIC_COMPLETENESS", "TASK_PASS", "BEHAVIOR_PRESERVED", "MERGE_SAFETY", "RELEASE_READINESS", "PRODUCTION_READINESS"],
+      "authority": {"merge": false, "permission": false, "secret": false, "release": false, "production": false}
+    }
+  ],
+  "x-refusal-controls": [
+    {
+      "case_id": "DTCR-D1C-RECEIPT-001",
+      "refuses": "A deterministic provider receipt granting merge authority.",
+      "refused_by": "properties.authority.properties.merge.const",
+      "instance": {
+        "schema": "dtcr/fact-plane-receipt/v1",
+        "receipt_id": "DTCR-FPR-101",
+        "subject": {"repository": "example/project", "commit": "0123456789abcdef0123456789abcdef01234567", "tree": "89abcdef0123456789abcdef0123456789abcdef"},
+        "provider_observations": ["DTCR-PO-001"],
+        "fact_bundle_id": "DTCR-FB-001",
+        "fact_bundle_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "checks": [{"check_id": "DTCR-D1-schema", "command_or_oracle": "schema validation", "exit_code": 0, "state": "PASS"}],
+        "evidence_state": "PASS",
+        "coverage_ceiling": {"completeness": "PARTIAL", "denominator_description": "only provider-observed facts", "warnings": [], "omissions": []},
+        "claims_not_proven": ["SEMANTIC_COMPLETENESS", "TASK_PASS", "MERGE_SAFETY", "RELEASE_READINESS", "PRODUCTION_READINESS"],
+        "authority": {"merge": true, "permission": false, "secret": false, "release": false, "production": false}
+      }
+    },
+    {
+      "case_id": "DTCR-D1C-RECEIPT-002",
+      "refuses": "A receipt that omits the explicit task-pass non-claim.",
+      "refused_by": "properties.claims_not_proven.allOf[1].contains",
+      "instance": {
+        "schema": "dtcr/fact-plane-receipt/v1",
+        "receipt_id": "DTCR-FPR-102",
+        "subject": {"repository": "example/project", "commit": "0123456789abcdef0123456789abcdef01234567", "tree": "89abcdef0123456789abcdef0123456789abcdef"},
+        "provider_observations": ["DTCR-PO-001"],
+        "fact_bundle_id": "DTCR-FB-001",
+        "fact_bundle_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "checks": [{"check_id": "DTCR-D1-schema", "command_or_oracle": "schema validation", "exit_code": 0, "state": "PASS"}],
+        "evidence_state": "PASS",
+        "coverage_ceiling": {"completeness": "PARTIAL", "denominator_description": "only provider-observed facts", "warnings": [], "omissions": []},
+        "claims_not_proven": ["SEMANTIC_COMPLETENESS", "BEHAVIOR_PRESERVED", "USER_VALUE", "LEGAL_CLEARANCE", "MERGE_SAFETY", "RELEASE_READINESS", "PRODUCTION_READINESS"],
+        "authority": {"merge": false, "permission": false, "secret": false, "release": false, "production": false}
+      }
+    }
+  ]
+}
