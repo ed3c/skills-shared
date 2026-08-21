@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skills-shared.invalid/agentic-tech-lead-orchestration/issue-closure-contract.schema.json",
+  "title": "Issue Closure Contract",
+  "description": "Binds one GitHub Issue closure to acceptance resolution, implementation lineage, immutable landing, residual ownership, and evidence ceiling.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "issue", "disposition", "acceptance", "implementation", "residual", "evidence_ceiling", "shadow_review"],
+  "properties": {
+    "schema_version": {"const": "agentic-tech-lead/issue-closure-contract/v1"},
+    "issue": {
+      "type": "object", "additionalProperties": false,
+      "required": ["repository", "number", "github_state", "github_state_reason"],
+      "properties": {
+        "repository": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+        "number": {"type": "integer", "minimum": 1},
+        "github_state": {"enum": ["OPEN", "CLOSED"]},
+        "github_state_reason": {"enum": ["COMPLETED", "NOT_PLANNED", "REOPENED"]}
+      }
+    },
+    "disposition": {"enum": ["DIRECTLY_LANDED", "CONSUMED_BY_CONVERGENCE", "SCOPE_TRANSFERRED", "SUPERSEDED", "NOT_PLANNED"]},
+    "acceptance": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id", "status"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "status": {"enum": ["SATISFIED", "TRANSFERRED", "NOT_APPLICABLE", "SUPERSEDED", "UNRESOLVED"]},
+          "successor": {"type": ["string", "null"]},
+          "rationale": {"type": ["string", "null"]}
+        }
+      }
+    },
+    "implementation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["candidate_prs", "landing"],
+      "properties": {
+        "candidate_prs": {
+          "type": "array",
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["number", "state", "merged"],
+            "properties": {
+              "number": {"type": "integer", "minimum": 1},
+              "state": {"enum": ["OPEN", "CLOSED"]},
+              "merged": {"type": "boolean"},
+              "classification": {"enum": ["DIRECT", "CONSUMED", "SUPERSEDED", "REJECTED", "HISTORICAL"]}
+            }
+          }
+        },
+        "landing": {
+          "oneOf": [
+            {"type": "null"},
+            {
+              "type": "object", "additionalProperties": false,
+              "required": ["via_pr", "commit", "tree"],
+              "properties": {
+                "via_pr": {"type": "integer", "minimum": 1},
+                "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+                "tree": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+              }
+            }
+          ]
+        }
+      }
+    },
+    "residual": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id", "state", "owner"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "state": {"enum": ["ABSENT", "NOT_IMPLEMENTED", "NOT_EXERCISED", "SKIPPED_BY_POLICY", "HUMAN_ADMIT_REQUIRED", "TRANSFERRED"]},
+          "owner": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "evidence_ceiling": {"enum": ["SOURCE_ONLY", "STATIC", "DETERMINISTIC", "LIVE", "HUMAN_ADMITTED", "RELEASED"]},
+    "shadow_review": {
+      "type": "object", "additionalProperties": false,
+      "required": ["verdict"],
+      "properties": {"verdict": {"enum": ["PASS", "HOLD", "REJECT", "HUMAN_ADMIT_REQUIRED"]}}
+    }
+  }
+}
