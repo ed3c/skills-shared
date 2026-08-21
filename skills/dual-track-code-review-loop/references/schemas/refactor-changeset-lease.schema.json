@@ -1,0 +1,578 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dtcr-refactor-changeset-lease.schema.json",
+  "title": "DTCR refactor changeset and lease binding",
+  "description": "What the bounded refactor is allowed to touch, what it did touch, and the frozen oracles it is measured against. The lease and the changeset are one object on purpose: held apart, a run reports the paths it edited and the paths it was allowed to edit in two places nobody compares, and the escape is only visible to whoever reads both. Two further collapses are refused here rather than described. A behavior test edited by the same change is not an oracle -- it is a mirror, and `pre_digest` differing from `post_digest` is that edit with a name. A merge admitted by the artifact that proposes the merge is the AUTOMATIC_MERGE blocker, so the field has exactly one value and it is the one that hands the decision back to a person.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "binding_id",
+    "port_ref",
+    "subject",
+    "lease",
+    "changed_paths",
+    "generated_paths_touched",
+    "behavior_tests",
+    "composition_roots",
+    "public_api",
+    "merge_admission"
+  ],
+  "properties": {
+    "schema": {
+      "const": "dtcr/refactor-changeset-lease/v1"
+    },
+    "binding_id": {
+      "type": "string",
+      "pattern": "^DTCR-CL-[0-9]{3}$"
+    },
+    "port_ref": {
+      "type": "string",
+      "pattern": "^DTCR-PT-[0-9]{3}$"
+    },
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository_binding_id",
+        "subject_commit",
+        "subject_tree"
+      ],
+      "properties": {
+        "repository_binding_id": {
+          "type": "string",
+          "pattern": "^DTCR-RB-[0-9a-f]{16}$"
+        },
+        "subject_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "subject_tree": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        }
+      }
+    },
+    "lease": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "lease_paths",
+        "lease_writers",
+        "escaped_paths"
+      ],
+      "properties": {
+        "lease_paths": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_][A-Za-z0-9_./-]*$"
+          }
+        },
+        "lease_writers": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 3
+          },
+          "description": "One lease, one writer. Two writers make the changeset a record of whoever wrote last, and the blast radius of the second one is invisible to the first."
+        },
+        "escaped_paths": {
+          "type": "array",
+          "maxItems": 0,
+          "items": {
+            "type": "string"
+          },
+          "description": "Structurally empty. A path outside the lease has a field to be refused in rather than a sentence to be explained in."
+        }
+      }
+    },
+    "changed_paths": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Za-z0-9_][A-Za-z0-9_./-]*$",
+        "description": "Repository-relative. This pattern refuses the shapes -- absolute, home-relative, parent-relative -- and the compiler that emits this object separately refuses a normalized path that resolves outside the declared lease. Neither half covers the other."
+      }
+    },
+    "generated_paths_touched": {
+      "type": "array",
+      "maxItems": 0,
+      "items": {
+        "type": "string"
+      },
+      "description": "Structurally empty. Editing a generated artifact produces a diff that the next generation silently reverts, and a green suite in between."
+    },
+    "behavior_tests": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "frozen",
+        "mutated_test_refs"
+      ],
+      "properties": {
+        "frozen": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "test_ref",
+              "pre_digest",
+              "post_digest"
+            ],
+            "properties": {
+              "test_ref": {
+                "type": "string",
+                "minLength": 3
+              },
+              "pre_digest": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "post_digest": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            }
+          }
+        },
+        "mutated_test_refs": {
+          "type": "array",
+          "maxItems": 0,
+          "items": {
+            "type": "string"
+          },
+          "description": "Structurally empty. A test the change rewrote measures the change."
+        }
+      }
+    },
+    "composition_roots": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "root_path",
+          "admitted"
+        ],
+        "properties": {
+          "root_path": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_][A-Za-z0-9_./-]*$"
+          },
+          "admitted": {
+            "const": true,
+            "description": "Only admitted roots appear. A root discovered by the run and wired anyway is a composition root somebody else owns."
+          }
+        }
+      }
+    },
+    "public_api": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "changed",
+        "contract_owner_admission"
+      ],
+      "properties": {
+        "changed": {
+          "type": "boolean"
+        },
+        "contract_owner_admission": {
+          "enum": [
+            "NOT_REQUIRED",
+            "ADMITTED"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "changed"
+            ],
+            "properties": {
+              "changed": {
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "contract_owner_admission": {
+                "const": "ADMITTED"
+              }
+            }
+          },
+          "description": "A public interface changed without its contract owner is a downstream break scheduled for whenever the downstream next builds."
+        }
+      ]
+    },
+    "merge_admission": {
+      "const": "HUMAN_ADMIT_REQUIRED",
+      "description": "Single-valued. The protocol proposes a merge candidate; merge is repository and Human authority and no green lane moves it."
+    }
+  },
+  "examples": [
+    {
+      "schema": "dtcr/refactor-changeset-lease/v1",
+      "binding_id": "DTCR-CL-001",
+      "port_ref": "DTCR-PT-001",
+      "subject": {
+        "repository_binding_id": "DTCR-RB-0f1e2d3c4b5a6978",
+        "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+        "subject_tree": "e739d799dd8d44beb5414ed99a943ff3bacccab0"
+      },
+      "lease": {
+        "lease_paths": [
+          "app/composition/",
+          "domain/order/"
+        ],
+        "lease_writers": [
+          "the single admitted refactor writer for this changeset"
+        ],
+        "escaped_paths": []
+      },
+      "changed_paths": [
+        "app/composition/wiring.py",
+        "domain/order/order_store_port.py",
+        "domain/order/pricing.py"
+      ],
+      "generated_paths_touched": [],
+      "behavior_tests": {
+        "frozen": [
+          {
+            "test_ref": "tests/order/test_pricing_behavior.py",
+            "pre_digest": "b5bb9d8014a0f9b1d61e21e796d78dccdf1352f23cd32812f4850b878ae4944c",
+            "post_digest": "b5bb9d8014a0f9b1d61e21e796d78dccdf1352f23cd32812f4850b878ae4944c"
+          }
+        ],
+        "mutated_test_refs": []
+      },
+      "composition_roots": [
+        {
+          "root_path": "app/composition/wiring.py",
+          "admitted": true
+        }
+      ],
+      "public_api": {
+        "changed": false,
+        "contract_owner_admission": "NOT_REQUIRED"
+      },
+      "merge_admission": "HUMAN_ADMIT_REQUIRED"
+    }
+  ],
+  "x-refusal-controls": [
+    {
+      "case_id": "DTCR-XC-CL-001",
+      "refuses": "A changed path that is not repository-relative, which is a lease escape written as a location.",
+      "refused_by": "properties.changed_paths.items.pattern",
+      "instance": {
+        "schema": "dtcr/refactor-changeset-lease/v1",
+        "binding_id": "DTCR-CL-001",
+        "port_ref": "DTCR-PT-001",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-0f1e2d3c4b5a6978",
+          "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "subject_tree": "e739d799dd8d44beb5414ed99a943ff3bacccab0"
+        },
+        "lease": {
+          "lease_paths": [
+            "domain/order/"
+          ],
+          "lease_writers": [
+            "the single admitted refactor writer for this changeset"
+          ],
+          "escaped_paths": []
+        },
+        "changed_paths": [
+          "../sibling-checkout/domain/order/pricing.py"
+        ],
+        "generated_paths_touched": [],
+        "behavior_tests": {
+          "frozen": [
+            {
+              "test_ref": "tests/order/test_pricing_behavior.py",
+              "pre_digest": "b5bb9d8014a0f9b1d61e21e796d78dccdf1352f23cd32812f4850b878ae4944c",
+              "post_digest": "b5bb9d8014a0f9b1d61e21e796d78dccdf1352f23cd32812f4850b878ae4944c"
+            }
+          ],
+          "mutated_test_refs": []
+        },
+        "composition_roots": [
+          {
+            "root_path": "app/composition/wiring.py",
+            "admitted": true
+          }
+        ],
+        "public_api": {
+          "changed": false,
+          "contract_owner_admission": "NOT_REQUIRED"
+        },
+        "merge_admission": "HUMAN_ADMIT_REQUIRED"
+      }
+    },
+    {
+      "case_id": "DTCR-XC-CL-002",
+      "refuses": "A generated artifact edited directly, whose diff the next generation reverts without a failure.",
+      "refused_by": "properties.generated_paths_touched.maxItems",
+      "instance": {
+        "schema": "dtcr/refactor-changeset-lease/v1",
+        "binding_id": "DTCR-CL-001",
+        "port_ref": "DTCR-PT-001",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-0f1e2d3c4b5a6978",
+          "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "subject_tree": "e739d799dd8d44beb5414ed99a943ff3bacccab0"
+        },
+        "lease": {
+          "lease_paths": [
+            "domain/order/"
+          ],
+          "lease_writers": [
+            "the single admitted refactor writer for this changeset"
+          ],
+          "escaped_paths": []
+        },
+        "changed_paths": [
+          "domain/order/pricing.py"
+        ],
+        "generated_paths_touched": [
+          "domain/order/generated/order_pb2.py"
+        ],
+        "behavior_tests": {
+          "frozen": [
+            {
+              "test_ref": "tests/order/test_pricing_behavior.py",
+              "pre_digest": "b5bb9d8014a0f9b1d61e21e796d78dccdf1352f23cd32812f4850b878ae4944c",
+              "post_digest": "b5bb9d8014a0f9b1d61e21e796d78dccdf1352f23cd32812f4850b878ae4944c"
+            }
+          ],
+          "mutated_test_refs": []
+        },
+        "composition_roots": [
+          {
+            "root_path": "app/composition/wiring.py",
+            "admitted": true
+          }
+        ],
+        "public_api": {
+          "changed": false,
+          "contract_owner_admission": "NOT_REQUIRED"
+        },
+        "merge_admission": "HUMAN_ADMIT_REQUIRED"
+      }
+    },
+    {
+      "case_id": "DTCR-XC-CL-003",
+      "refuses": "A frozen behavior test the same change rewrote, which measures the change rather than the behavior.",
+      "refused_by": "properties.behavior_tests.properties.mutated_test_refs.maxItems",
+      "instance": {
+        "schema": "dtcr/refactor-changeset-lease/v1",
+        "binding_id": "DTCR-CL-001",
+        "port_ref": "DTCR-PT-001",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-0f1e2d3c4b5a6978",
+          "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "subject_tree": "e739d799dd8d44beb5414ed99a943ff3bacccab0"
+        },
+        "lease": {
+          "lease_paths": [
+            "domain/order/"
+          ],
+          "lease_writers": [
+            "the single admitted refactor writer for this changeset"
+          ],
+          "escaped_paths": []
+        },
+        "changed_paths": [
+          "domain/order/pricing.py"
+        ],
+        "generated_paths_touched": [],
+        "behavior_tests": {
+          "frozen": [
+            {
+              "test_ref": "tests/order/test_pricing_behavior.py",
+              "pre_digest": "b5bb9d8014a0f9b1d61e21e796d78dccdf1352f23cd32812f4850b878ae4944c",
+              "post_digest": "b5bb9d8014a0f9b1d61e21e796d78dccdf1352f23cd32812f4850b878ae4944c"
+            }
+          ],
+          "mutated_test_refs": [
+            "tests/order/test_pricing_behavior.py"
+          ]
+        },
+        "composition_roots": [
+          {
+            "root_path": "app/composition/wiring.py",
+            "admitted": true
+          }
+        ],
+        "public_api": {
+          "changed": false,
+          "contract_owner_admission": "NOT_REQUIRED"
+        },
+        "merge_admission": "HUMAN_ADMIT_REQUIRED"
+      }
+    },
+    {
+      "case_id": "DTCR-XC-CL-004",
+      "refuses": "A public interface changed with no contract owner behind it.",
+      "refused_by": "properties.public_api.allOf[0].then.properties.contract_owner_admission.const",
+      "instance": {
+        "schema": "dtcr/refactor-changeset-lease/v1",
+        "binding_id": "DTCR-CL-001",
+        "port_ref": "DTCR-PT-001",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-0f1e2d3c4b5a6978",
+          "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "subject_tree": "e739d799dd8d44beb5414ed99a943ff3bacccab0"
+        },
+        "lease": {
+          "lease_paths": [
+            "domain/order/"
+          ],
+          "lease_writers": [
+            "the single admitted refactor writer for this changeset"
+          ],
+          "escaped_paths": []
+        },
+        "changed_paths": [
+          "domain/order/pricing.py"
+        ],
+        "generated_paths_touched": [],
+        "behavior_tests": {
+          "frozen": [
+            {
+              "test_ref": "tests/order/test_pricing_behavior.py",
+              "pre_digest": "b5bb9d8014a0f9b1d61e21e796d78dccdf1352f23cd32812f4850b878ae4944c",
+              "post_digest": "b5bb9d8014a0f9b1d61e21e796d78dccdf1352f23cd32812f4850b878ae4944c"
+            }
+          ],
+          "mutated_test_refs": []
+        },
+        "composition_roots": [
+          {
+            "root_path": "app/composition/wiring.py",
+            "admitted": true
+          }
+        ],
+        "public_api": {
+          "changed": true,
+          "contract_owner_admission": "NOT_REQUIRED"
+        },
+        "merge_admission": "HUMAN_ADMIT_REQUIRED"
+      }
+    },
+    {
+      "case_id": "DTCR-XC-CL-005",
+      "refuses": "A changeset that admits its own merge.",
+      "refused_by": "properties.merge_admission.const",
+      "instance": {
+        "schema": "dtcr/refactor-changeset-lease/v1",
+        "binding_id": "DTCR-CL-001",
+        "port_ref": "DTCR-PT-001",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-0f1e2d3c4b5a6978",
+          "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "subject_tree": "e739d799dd8d44beb5414ed99a943ff3bacccab0"
+        },
+        "lease": {
+          "lease_paths": [
+            "domain/order/"
+          ],
+          "lease_writers": [
+            "the single admitted refactor writer for this changeset"
+          ],
+          "escaped_paths": []
+        },
+        "changed_paths": [
+          "domain/order/pricing.py"
+        ],
+        "generated_paths_touched": [],
+        "behavior_tests": {
+          "frozen": [
+            {
+              "test_ref": "tests/order/test_pricing_behavior.py",
+              "pre_digest": "b5bb9d8014a0f9b1d61e21e796d78dccdf1352f23cd32812f4850b878ae4944c",
+              "post_digest": "b5bb9d8014a0f9b1d61e21e796d78dccdf1352f23cd32812f4850b878ae4944c"
+            }
+          ],
+          "mutated_test_refs": []
+        },
+        "composition_roots": [
+          {
+            "root_path": "app/composition/wiring.py",
+            "admitted": true
+          }
+        ],
+        "public_api": {
+          "changed": false,
+          "contract_owner_admission": "NOT_REQUIRED"
+        },
+        "merge_admission": "AUTO_MERGE_ON_GREEN_SUITE"
+      }
+    },
+    {
+      "case_id": "DTCR-XC-CL-006",
+      "refuses": "Two writers holding one lease, which makes the changeset a record of whoever wrote last.",
+      "refused_by": "properties.lease.properties.lease_writers.maxItems",
+      "instance": {
+        "schema": "dtcr/refactor-changeset-lease/v1",
+        "binding_id": "DTCR-CL-001",
+        "port_ref": "DTCR-PT-001",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-0f1e2d3c4b5a6978",
+          "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "subject_tree": "e739d799dd8d44beb5414ed99a943ff3bacccab0"
+        },
+        "lease": {
+          "lease_paths": [
+            "domain/order/"
+          ],
+          "lease_writers": [
+            "the single admitted refactor writer for this changeset",
+            "a second writer who also holds this lease"
+          ],
+          "escaped_paths": []
+        },
+        "changed_paths": [
+          "domain/order/pricing.py"
+        ],
+        "generated_paths_touched": [],
+        "behavior_tests": {
+          "frozen": [
+            {
+              "test_ref": "tests/order/test_pricing_behavior.py",
+              "pre_digest": "b5bb9d8014a0f9b1d61e21e796d78dccdf1352f23cd32812f4850b878ae4944c",
+              "post_digest": "b5bb9d8014a0f9b1d61e21e796d78dccdf1352f23cd32812f4850b878ae4944c"
+            }
+          ],
+          "mutated_test_refs": []
+        },
+        "composition_roots": [
+          {
+            "root_path": "app/composition/wiring.py",
+            "admitted": true
+          }
+        ],
+        "public_api": {
+          "changed": false,
+          "contract_owner_admission": "NOT_REQUIRED"
+        },
+        "merge_admission": "HUMAN_ADMIT_REQUIRED"
+      }
+    }
+  ]
+}

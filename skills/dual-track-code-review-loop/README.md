@@ -14,7 +14,14 @@ graph-ledger fact plane), each with its own selftest routed through
 separate, still-open lanes; landing these two does not admit those. The `#522`
 synthesis and problem-closure compilers landed in the same wave under
 [`synthesis/`](synthesis/), with their three contracts under
-`references/schemas/` counted by the committed harness.
+`references/schemas/` counted by the committed harness. The `#523` bounded
+single-repository refactor protocol landed the same way under
+[`refactor/`](refactor/) with four more contracts. Its terminal
+`DTCR_SINGLE_REPO_REFACTOR_PROTOCOL_READY` is **not** claimed here: that
+admission belongs to a person reading the issue's exit criteria, and one of
+those criteria is a real bounded consumer canary, which no lane in this tree has
+exercised. Every receipt the compiler emits pins `protocol_ready` and
+`applied_on_real_codebase` false for exactly that reason.
 
 The failure this Skill exists to stop is not sloppiness. It is that both tracks
 produce output that reads identically once it lands in a report. A dependency
@@ -35,8 +42,9 @@ the one most often reported as progress.
    — the fifteen closed terms and what each can never become.
 5. [`references/contracts/public-private-capability.md`](references/contracts/public-private-capability.md)
    — plane ownership and the locator laws.
-6. [`references/schemas/`](references/schemas/) — the machine half, 27 frozen
-   schemas (8 C0 contract + 16 D1/M1 interface + 3 X1 synthesis).
+6. [`references/schemas/`](references/schemas/) — the machine half, 31 frozen
+   schemas (8 C0 contract + 16 D1/M1 interface + 3 X1 synthesis + 4 R1 bounded
+   refactor).
 7. [`references/source-disposition/refused-claims.json`](references/source-disposition/refused-claims.json)
    — the seven refused source claims and their replayable controls.
 8. [`adapters/`](adapters/) — the two landed deterministic-track adapters, each
@@ -74,10 +82,20 @@ skills/dual-track-code-review-loop/
 │       ├── ledger.py, selftest.py, fixtures/
 │       │   └── landed queryable graph-ledger capability class; planted-mutation
 │       │       knockouts and a real ingested/traversed database file
+├── synthesis/
+│   ├── compile_synthesis.py, selftest.py, fixtures/
+│   │   └── the X1 review-synthesis and problem-closure compilers
+├── refactor/
+│   ├── compile_r1.py, selftest.py, fixtures/
+│   │   └── the R1 bounded single-repository refactor protocol: one compiler
+│   │       walking VIOLATION_BOUND through CANDIDATE_RECEIPT | BLOCKED |
+│   │       ROLLED_BACK over five synthetic requests, four of the adapter law's
+│   │       eight declared languages, and no vendored adapter implementation
 ├── tests/
 │   ├── run-all.sh
-│   │   └── one entrypoint: replays the C0 contract, then routes both landed
-│   │       adapter selftests through the same CI arrival
+│   │   └── one entrypoint: replays the C0 contract, then routes the two adapter
+│   │       selftests, the X1 synthesis selftest and the R1 refactor selftest
+│   │       through the same CI arrival — five lanes
 │   └── selftest.py
 │       └── dynamic discovery over references/; prints every denominator it counted
 └── references/
@@ -99,7 +117,9 @@ skills/dual-track-code-review-loop/
     │       contract-compatibility-result, consumed-context-row,
     │       exact-source-subject, projection-receipt, source-back-reference)
     │       plus 3 X1 synthesis schemas (review-card, synthesis-packet,
-    │       problem-closure-row)
+    │       problem-closure-row) plus 4 R1 bounded-refactor schemas
+    │       (refactor-usage-signature, refactor-minimal-port,
+    │       refactor-changeset-lease, refactor-r1-receipt)
     │       └── the half a machine enforces, with positive and refusal controls
     ├── source-disposition/
     │   └── refused-claims.json
@@ -211,16 +231,24 @@ routed by `skill-suites.yml` continuous integration. It replays the C0
 contract via `tests/selftest.py` — dynamic discovery over `references/`, no
 denominator hand-copied into the script — and then routes both landed
 adapters' selftests (`adapters/tree-sitter/selftest.py`,
-`adapters/sqlite-ledger/selftest.py`) and the X1 synthesis selftest
-(`synthesis/selftest.py`) through the same CI arrival. On this worktree's
-exact head the suite prints:
+`adapters/sqlite-ledger/selftest.py`), the X1 synthesis selftest
+(`synthesis/selftest.py`) and the R1 bounded-refactor selftest
+(`refactor/selftest.py`) through the same CI arrival — five lanes. On this
+worktree's exact head each lane's denominator line reads:
 
 ```text
-schemas=27 positives=31 controls=128 knockouts=128 leak_scan_files=32
+schemas=31 positives=37 controls=151 knockouts=151 leak_scan_files=36 mutable_subject_probes=115 promotion_probes=184
 tree-sitter:    fixtures=2 matches=5 schema_validations=9 falsifier_rows=14 live=EXERCISED
 sqlite-ledger:  fixtures=2 cases=46 planted_mutations=22 knockouts=5/5
 synthesis:      stability_checks=9 schema_compositions=8 refusal_codes=16 projections=3
+refactor:       requests=5 stability_checks=15 schema_compositions=20 state_values_covered=44 refusal_codes=26 languages_exercised=4/8 applied_on_real_codebase=NOT_EXERCISED
 ```
+
+Those are the five denominator lines the run prints, with two host-specific
+fragments elided so this file stays machine-neutral: the first line's
+`subject=<absolute path>` and the tail of the sqlite line, which carries three
+per-host digests and a row-count map. Nothing else is reworded — run the suite
+and the tokens above appear in its output.
 
 `cases.json` reconciles the schema and control lists by name against what the
 run counted and fails on any drift in either direction; the knockout and probe
@@ -250,6 +278,9 @@ graph-ledger adapter (sqlite-ledger)         LANDED, selftest, planted mutations
 SCIP / Buf deterministic adapters (#547/#549) BLOCKED_ON_PROVIDER
 semantic-context adapter (#550)              NOT_IMPLEMENTED
 dual-track synthesis compiler (#522)         LANDED — synthesis/ + three schemas, suite-counted
+bounded R1 refactor protocol (#523)          LANDED — refactor/ + four schemas, suite-counted
+R1 language adapter implementations          BLOCKED_ON_PROVIDER (declared capability classes only)
+R1 live consumer canary (#523 exit)          NOT_EXERCISED
 applied refactor on a real codebase          NOT_EXERCISED
 cross-repository contract migration          NOT_EXERCISED
 live consumer canary (#528)                  NOT_EXERCISED

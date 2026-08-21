@@ -1,0 +1,99 @@
+{
+  "schema": "dtcr/refactor-r1-request/v1",
+  "_note": "Synthetic. The same bounded change as python-order-domain, run against a tree where the frozen behavior suite disagrees afterwards. The architecture lane is clean -- zero forbidden edges, no new cycles -- which is exactly the pair the protocol refuses to report as a candidate. With the applied change reverted this terminates ROLLED_BACK; without a rollback record it is refused by name instead.",
+  "subject": {
+    "repository_binding_id": "DTCR-RB-0f1e2d3c4b5a6978",
+    "subject_commit": "4d5e6f708192a3b4c5d6e7f80912a3b4c5d6e7f8",
+    "subject_tree": "aabbccddeeff00112233445566778899aabbccdd"
+  },
+  "violation_ref": "DTCR-VC-001",
+  "provider_symbol": "SqlOrderStore",
+  "adapter": {
+    "adapter_binding_id": "DTCR-AD-6a1b2c3d4e5f6071",
+    "capability_class": "TYPE_AWARE_REWRITE",
+    "language": "python",
+    "provider_state": "DECLARED_NOT_VENDORED",
+    "pins": {
+      "tool_version": "0.0.0-declared-not-resolved",
+      "license_id": "MIT",
+      "grammar_or_dialect": "python-3.11",
+      "formatter_behavior": "reprints only the edited node, leaves sibling bytes untouched"
+    }
+  },
+  "call_sites": [
+    {
+      "call_site_ref": "CS-001",
+      "member": "load",
+      "member_kind": "METHOD",
+      "resolved": true
+    },
+    {
+      "call_site_ref": "CS-003",
+      "member": "save",
+      "member_kind": "METHOD",
+      "resolved": true
+    }
+  ],
+  "usage_extraction_claim": "COMPLETE_FOR_RESOLVED_CALL_SITES",
+  "port": {
+    "owning_layer": "DOMAIN",
+    "members": [
+      "load",
+      "save"
+    ],
+    "construction_sites_replaced": [
+      "domain/order/pricing.py:OrderPricing.__init__"
+    ],
+    "concrete_imports_remaining": []
+  },
+  "changeset": {
+    "lease_paths": [
+      "app/composition/",
+      "domain/order/"
+    ],
+    "lease_writers": [
+      "the single admitted refactor writer for this changeset"
+    ],
+    "changed_paths": [
+      "app/composition/wiring.py",
+      "domain/order/order_store_port.py",
+      "domain/order/pricing.py"
+    ],
+    "generated_paths": [
+      "domain/order/generated/order_pb2.py"
+    ],
+    "behavior_tests": [
+      {
+        "test_ref": "tests/order/test_pricing_behavior.py",
+        "pre_digest": "b5bb9d8014a0f9b1d61e21e796d78dccdf1352f23cd32812f4850b878ae4944c",
+        "post_digest": "b5bb9d8014a0f9b1d61e21e796d78dccdf1352f23cd32812f4850b878ae4944c"
+      }
+    ],
+    "composition_roots": [
+      {
+        "root_path": "app/composition/wiring.py",
+        "admitted": true
+      }
+    ],
+    "public_api": {
+      "changed": false,
+      "contract_owner_admission": "NOT_REQUIRED"
+    },
+    "merge_admission": "HUMAN_ADMIT_REQUIRED"
+  },
+  "readback": {
+    "typecheck": "PASS",
+    "behavior_tests": {
+      "state": "FAIL",
+      "passed": 39,
+      "total": 41
+    },
+    "reindex_state": "REINDEXED",
+    "forbidden_edge_count": 0,
+    "new_cycles": 0
+  },
+  "rollback": {
+    "restored_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+    "applied_change_reverted": true
+  }
+}

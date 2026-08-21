@@ -1,0 +1,191 @@
+{
+  "changeset_lease": {
+    "behavior_tests": {
+      "frozen": [
+        {
+          "post_digest": "b5bb9d8014a0f9b1d61e21e796d78dccdf1352f23cd32812f4850b878ae4944c",
+          "pre_digest": "b5bb9d8014a0f9b1d61e21e796d78dccdf1352f23cd32812f4850b878ae4944c",
+          "test_ref": "tests/order/test_pricing_behavior.py"
+        }
+      ],
+      "mutated_test_refs": []
+    },
+    "binding_id": "DTCR-CL-001",
+    "changed_paths": [
+      "app/composition/wiring.py",
+      "domain/order/order_store_port.py",
+      "domain/order/pricing.py"
+    ],
+    "composition_roots": [
+      {
+        "admitted": true,
+        "root_path": "app/composition/wiring.py"
+      }
+    ],
+    "generated_paths_touched": [],
+    "lease": {
+      "escaped_paths": [],
+      "lease_paths": [
+        "app/composition/",
+        "domain/order/"
+      ],
+      "lease_writers": [
+        "the single admitted refactor writer for this changeset"
+      ]
+    },
+    "merge_admission": "HUMAN_ADMIT_REQUIRED",
+    "port_ref": "DTCR-PT-001",
+    "public_api": {
+      "changed": false,
+      "contract_owner_admission": "NOT_REQUIRED"
+    },
+    "schema": "dtcr/refactor-changeset-lease/v1",
+    "subject": {
+      "repository_binding_id": "DTCR-RB-0f1e2d3c4b5a6978",
+      "subject_commit": "4d5e6f708192a3b4c5d6e7f80912a3b4c5d6e7f8",
+      "subject_tree": "aabbccddeeff00112233445566778899aabbccdd"
+    }
+  },
+  "derived_from": "python-order-domain-rolled-back.json",
+  "minimal_port": {
+    "establishes": {
+      "applied": false,
+      "behavior_preserved": false
+    },
+    "injection": {
+      "concrete_imports_remaining": [],
+      "construction_sites_replaced": [
+        "domain/order/pricing.py:OrderPricing.__init__"
+      ]
+    },
+    "owning_layer": "DOMAIN",
+    "port_id": "DTCR-PT-001",
+    "port_members": [
+      {
+        "justified_by_call_site_refs": [
+          "CS-001"
+        ],
+        "member": "load",
+        "member_kind": "METHOD"
+      },
+      {
+        "justified_by_call_site_refs": [
+          "CS-003"
+        ],
+        "member": "save",
+        "member_kind": "METHOD"
+      }
+    ],
+    "schema": "dtcr/refactor-minimal-port/v1",
+    "signature_ref": "DTCR-US-001",
+    "subject": {
+      "repository_binding_id": "DTCR-RB-0f1e2d3c4b5a6978",
+      "subject_commit": "4d5e6f708192a3b4c5d6e7f80912a3b4c5d6e7f8",
+      "subject_tree": "aabbccddeeff00112233445566778899aabbccdd"
+    },
+    "unused_provider_members": []
+  },
+  "receipt": {
+    "authority": {
+      "merge": false,
+      "production": false,
+      "release": false
+    },
+    "blocked_on": [
+      "BEHAVIOR_ORACLE_FAILED"
+    ],
+    "changeset_ref": "DTCR-CL-001",
+    "establishes": {
+      "applied_on_real_codebase": false,
+      "behavior_equivalence_proven": false,
+      "protocol_ready": false
+    },
+    "readback": {
+      "behavior_tests": {
+        "passed": 39,
+        "state": "FAIL",
+        "total": 41
+      },
+      "forbidden_edge_count": 0,
+      "new_cycles": 0,
+      "reindex_state": "REINDEXED",
+      "typecheck": "PASS"
+    },
+    "receipt_id": "DTCR-R1-001",
+    "rollback": {
+      "applied_change_reverted": true,
+      "restored_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f"
+    },
+    "schema": "dtcr/refactor-r1-receipt/v1",
+    "states_entered": [
+      "VIOLATION_BOUND",
+      "USAGE_SIGNATURE_EXTRACTED",
+      "MINIMAL_PORT_PROPOSED",
+      "CHANGESET_AND_LEASE_BOUND",
+      "DOMAIN_DEPENDENCY_INVERTED",
+      "COMPOSITION_ROOT_UPDATED",
+      "TYPECHECK_AND_TEST_READBACK",
+      "SCIP_REINDEXED",
+      "SQLITE_ARCHITECTURE_ASSERTED",
+      "GLOBAL_BEHAVIOR_ASSERTED"
+    ],
+    "subject": {
+      "repository_binding_id": "DTCR-RB-0f1e2d3c4b5a6978",
+      "subject_commit": "4d5e6f708192a3b4c5d6e7f80912a3b4c5d6e7f8",
+      "subject_tree": "aabbccddeeff00112233445566778899aabbccdd"
+    },
+    "terminal_state": "ROLLED_BACK"
+  },
+  "schema": "dtcr/refactor-r1-projection/v1",
+  "usage_signature": {
+    "adapter": {
+      "adapter_binding_id": "DTCR-AD-6a1b2c3d4e5f6071",
+      "capability_class": "TYPE_AWARE_REWRITE",
+      "language": "python",
+      "language_support": "SUPPORTED_BY_DECLARED_ADAPTER",
+      "pins": {
+        "formatter_behavior": "reprints only the edited node, leaves sibling bytes untouched",
+        "grammar_or_dialect": "python-3.11",
+        "license_id": "MIT",
+        "tool_version": "0.0.0-declared-not-resolved"
+      },
+      "provider_state": "DECLARED_NOT_VENDORED",
+      "vendored": false
+    },
+    "consumed_members": [
+      {
+        "call_site_refs": [
+          "CS-001"
+        ],
+        "member": "load",
+        "member_kind": "METHOD"
+      },
+      {
+        "call_site_refs": [
+          "CS-003"
+        ],
+        "member": "save",
+        "member_kind": "METHOD"
+      }
+    ],
+    "establishes": {
+      "provider_surface_complete": false,
+      "rewrite_applied": false
+    },
+    "extraction": {
+      "call_sites_declared": 2,
+      "call_sites_resolved": 2,
+      "completeness": "COMPLETE_FOR_RESOLVED_CALL_SITES",
+      "unresolved_call_site_refs": []
+    },
+    "provider_symbol": "SqlOrderStore",
+    "schema": "dtcr/refactor-usage-signature/v1",
+    "signature_id": "DTCR-US-001",
+    "subject": {
+      "repository_binding_id": "DTCR-RB-0f1e2d3c4b5a6978",
+      "subject_commit": "4d5e6f708192a3b4c5d6e7f80912a3b4c5d6e7f8",
+      "subject_tree": "aabbccddeeff00112233445566778899aabbccdd"
+    },
+    "violation_ref": "DTCR-VC-001"
+  }
+}

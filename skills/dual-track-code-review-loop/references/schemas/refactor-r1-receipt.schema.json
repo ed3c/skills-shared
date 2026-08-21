@@ -1,0 +1,805 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dtcr-refactor-r1-receipt.schema.json",
+  "title": "DTCR bounded refactor (R1) receipt",
+  "description": "The terminal statement of one bounded single-repository refactor run: which states of the protocol were actually entered, what each readback lane observed, and which of the three terminals the run reached. The three terminals are kept apart because they are three different facts that a summary flattens into one word. CANDIDATE_RECEIPT means every lane ran and agreed; BLOCKED means a named link of the chain was never reached, most often because a declared language adapter has no implementation to run; ROLLED_BACK means the change was applied, a readback lane disagreed, and the tree was put back. A receipt with a clean architecture graph and a failed behavior oracle is not a candidate in any of those three senses, which is why the CANDIDATE_RECEIPT branch pins the behavior lane rather than reporting it. Nothing here establishes that a refactor was applied to a real codebase; that lane belongs to a consumer canary and has never been exercised by the tree that carries this contract.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "receipt_id",
+    "changeset_ref",
+    "subject",
+    "states_entered",
+    "terminal_state",
+    "readback",
+    "blocked_on",
+    "establishes",
+    "authority"
+  ],
+  "properties": {
+    "schema": {
+      "const": "dtcr/refactor-r1-receipt/v1"
+    },
+    "receipt_id": {
+      "type": "string",
+      "pattern": "^DTCR-R1-[0-9]{3}$"
+    },
+    "changeset_ref": {
+      "type": "string",
+      "pattern": "^DTCR-CL-[0-9]{3}$"
+    },
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository_binding_id",
+        "subject_commit",
+        "subject_tree"
+      ],
+      "properties": {
+        "repository_binding_id": {
+          "type": "string",
+          "pattern": "^DTCR-RB-[0-9a-f]{16}$"
+        },
+        "subject_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "subject_tree": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        }
+      }
+    },
+    "states_entered": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "VIOLATION_BOUND",
+          "USAGE_SIGNATURE_EXTRACTED",
+          "MINIMAL_PORT_PROPOSED",
+          "CHANGESET_AND_LEASE_BOUND",
+          "DOMAIN_DEPENDENCY_INVERTED",
+          "COMPOSITION_ROOT_UPDATED",
+          "TYPECHECK_AND_TEST_READBACK",
+          "SCIP_REINDEXED",
+          "SQLITE_ARCHITECTURE_ASSERTED",
+          "GLOBAL_BEHAVIOR_ASSERTED"
+        ]
+      },
+      "description": "The states this run actually entered, not the states the protocol declares. A run that stopped at the readback and lists every state is reporting the diagram."
+    },
+    "terminal_state": {
+      "enum": [
+        "CANDIDATE_RECEIPT",
+        "BLOCKED",
+        "ROLLED_BACK"
+      ]
+    },
+    "readback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "typecheck",
+        "behavior_tests",
+        "reindex_state",
+        "forbidden_edge_count",
+        "new_cycles"
+      ],
+      "properties": {
+        "typecheck": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "NOT_RUN"
+          ]
+        },
+        "behavior_tests": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "state",
+            "passed",
+            "total"
+          ],
+          "properties": {
+            "state": {
+              "enum": [
+                "PASS",
+                "FAIL",
+                "NOT_RUN"
+              ]
+            },
+            "passed": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "total": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "The denominator. A passed count with no total is a green with no set behind it."
+            }
+          }
+        },
+        "reindex_state": {
+          "enum": [
+            "REINDEXED",
+            "NOT_REINDEXED"
+          ],
+          "description": "Whether the semantic index was rebuilt at the head being asserted. A forbidden-edge count read out of a stale index is a count about an earlier tree."
+        },
+        "forbidden_edge_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "new_cycles": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "blocked_on": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "ADAPTER_BLOCKED_ON_PROVIDER",
+          "USAGE_SET_PARTIAL",
+          "TYPECHECK_NOT_RUN",
+          "TYPECHECK_FAILED",
+          "BEHAVIOR_ORACLE_NOT_RUN",
+          "BEHAVIOR_ORACLE_FAILED",
+          "SEMANTIC_INDEX_NOT_REBUILT",
+          "FORBIDDEN_EDGE_STILL_PRESENT"
+        ]
+      },
+      "description": "A closed list. An open string here would let a run block on a sentence, and a sentence cannot be counted across runs."
+    },
+    "rollback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "restored_commit",
+        "applied_change_reverted"
+      ],
+      "description": "The restored tree and the fact that it was restored. There is deliberately no reason field: which lane failed is already in `readback` and in `blocked_on`, and a second copy of that fact is a copy that can disagree with the first.",
+      "properties": {
+        "restored_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "applied_change_reverted": {
+          "const": true,
+          "description": "A rollback that did not revert is a failed run with a reassuring name."
+        }
+      }
+    },
+    "establishes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "applied_on_real_codebase",
+        "behavior_equivalence_proven",
+        "protocol_ready"
+      ],
+      "properties": {
+        "applied_on_real_codebase": {
+          "const": false,
+          "description": "Pinned. This protocol has run over fixtures; a consumer canary is a separate lane and has not been exercised."
+        },
+        "behavior_equivalence_proven": {
+          "const": false,
+          "description": "A frozen suite passing bounds the behavior it covers. Equivalence is a claim about behavior it does not."
+        },
+        "protocol_ready": {
+          "const": false,
+          "description": "DTCR_SINGLE_REPO_REFACTOR_PROTOCOL_READY is admitted against this issue's exit criteria by a person, never asserted by a run of the thing being admitted."
+        }
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "merge",
+        "release",
+        "production"
+      ],
+      "properties": {
+        "merge": {
+          "const": false
+        },
+        "release": {
+          "const": false
+        },
+        "production": {
+          "const": false
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "required": [
+          "terminal_state"
+        ],
+        "properties": {
+          "terminal_state": {
+            "const": "CANDIDATE_RECEIPT"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "readback": {
+            "properties": {
+              "behavior_tests": {
+                "properties": {
+                  "state": {
+                    "const": "PASS"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "description": "FORBIDDEN_EDGE_ZERO_BUT_BEHAVIOR_FAILED, refused rather than described. A graph query that finds no illegal edge says nothing about whether the program still does what it did."
+    },
+    {
+      "if": {
+        "required": [
+          "terminal_state"
+        ],
+        "properties": {
+          "terminal_state": {
+            "const": "CANDIDATE_RECEIPT"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "readback": {
+            "properties": {
+              "forbidden_edge_count": {
+                "const": 0
+              }
+            }
+          }
+        }
+      },
+      "description": "A candidate that still carries the edge it was raised to remove."
+    },
+    {
+      "if": {
+        "required": [
+          "terminal_state"
+        ],
+        "properties": {
+          "terminal_state": {
+            "const": "CANDIDATE_RECEIPT"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "readback": {
+            "properties": {
+              "new_cycles": {
+                "const": 0
+              }
+            }
+          }
+        }
+      },
+      "description": "NEW_CYCLE_OR_LAYER_VIOLATION. Removing one illegal edge by adding a cycle trades a named violation for an unnamed one."
+    },
+    {
+      "if": {
+        "required": [
+          "terminal_state"
+        ],
+        "properties": {
+          "terminal_state": {
+            "const": "CANDIDATE_RECEIPT"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "blocked_on": {
+            "maxItems": 0
+          }
+        }
+      },
+      "description": "A candidate that names what it is blocked on is a blocked run reported as a candidate."
+    },
+    {
+      "if": {
+        "required": [
+          "terminal_state"
+        ],
+        "properties": {
+          "terminal_state": {
+            "const": "BLOCKED"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "blocked_on": {
+            "minItems": 1
+          }
+        }
+      },
+      "description": "BLOCKED with nothing named is indistinguishable downstream from a run nobody started."
+    },
+    {
+      "if": {
+        "required": [
+          "terminal_state"
+        ],
+        "properties": {
+          "terminal_state": {
+            "const": "ROLLED_BACK"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "rollback"
+        ]
+      },
+      "description": "ROLLED_BACK with no rollback record does not say which commit the tree was restored to, so nobody can check that it was."
+    }
+  ],
+  "examples": [
+    {
+      "schema": "dtcr/refactor-r1-receipt/v1",
+      "receipt_id": "DTCR-R1-001",
+      "changeset_ref": "DTCR-CL-001",
+      "subject": {
+        "repository_binding_id": "DTCR-RB-0f1e2d3c4b5a6978",
+        "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+        "subject_tree": "e739d799dd8d44beb5414ed99a943ff3bacccab0"
+      },
+      "states_entered": [
+        "VIOLATION_BOUND",
+        "USAGE_SIGNATURE_EXTRACTED",
+        "MINIMAL_PORT_PROPOSED",
+        "CHANGESET_AND_LEASE_BOUND",
+        "DOMAIN_DEPENDENCY_INVERTED",
+        "COMPOSITION_ROOT_UPDATED",
+        "TYPECHECK_AND_TEST_READBACK",
+        "SCIP_REINDEXED",
+        "SQLITE_ARCHITECTURE_ASSERTED",
+        "GLOBAL_BEHAVIOR_ASSERTED"
+      ],
+      "terminal_state": "CANDIDATE_RECEIPT",
+      "readback": {
+        "typecheck": "PASS",
+        "behavior_tests": {
+          "state": "PASS",
+          "passed": 41,
+          "total": 41
+        },
+        "reindex_state": "REINDEXED",
+        "forbidden_edge_count": 0,
+        "new_cycles": 0
+      },
+      "blocked_on": [],
+      "establishes": {
+        "applied_on_real_codebase": false,
+        "behavior_equivalence_proven": false,
+        "protocol_ready": false
+      },
+      "authority": {
+        "merge": false,
+        "release": false,
+        "production": false
+      }
+    },
+    {
+      "schema": "dtcr/refactor-r1-receipt/v1",
+      "receipt_id": "DTCR-R1-001",
+      "changeset_ref": "DTCR-CL-001",
+      "subject": {
+        "repository_binding_id": "DTCR-RB-0f1e2d3c4b5a6978",
+        "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+        "subject_tree": "e739d799dd8d44beb5414ed99a943ff3bacccab0"
+      },
+      "states_entered": [
+        "VIOLATION_BOUND",
+        "USAGE_SIGNATURE_EXTRACTED",
+        "MINIMAL_PORT_PROPOSED",
+        "CHANGESET_AND_LEASE_BOUND"
+      ],
+      "terminal_state": "BLOCKED",
+      "readback": {
+        "typecheck": "NOT_RUN",
+        "behavior_tests": {
+          "state": "NOT_RUN",
+          "passed": 0,
+          "total": 17
+        },
+        "reindex_state": "NOT_REINDEXED",
+        "forbidden_edge_count": 1,
+        "new_cycles": 0
+      },
+      "blocked_on": [
+        "ADAPTER_BLOCKED_ON_PROVIDER",
+        "BEHAVIOR_ORACLE_NOT_RUN",
+        "FORBIDDEN_EDGE_STILL_PRESENT",
+        "SEMANTIC_INDEX_NOT_REBUILT",
+        "TYPECHECK_NOT_RUN"
+      ],
+      "establishes": {
+        "applied_on_real_codebase": false,
+        "behavior_equivalence_proven": false,
+        "protocol_ready": false
+      },
+      "authority": {
+        "merge": false,
+        "release": false,
+        "production": false
+      }
+    },
+    {
+      "schema": "dtcr/refactor-r1-receipt/v1",
+      "receipt_id": "DTCR-R1-001",
+      "changeset_ref": "DTCR-CL-001",
+      "subject": {
+        "repository_binding_id": "DTCR-RB-0f1e2d3c4b5a6978",
+        "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+        "subject_tree": "e739d799dd8d44beb5414ed99a943ff3bacccab0"
+      },
+      "states_entered": [
+        "VIOLATION_BOUND",
+        "USAGE_SIGNATURE_EXTRACTED",
+        "MINIMAL_PORT_PROPOSED",
+        "CHANGESET_AND_LEASE_BOUND",
+        "DOMAIN_DEPENDENCY_INVERTED",
+        "COMPOSITION_ROOT_UPDATED",
+        "TYPECHECK_AND_TEST_READBACK",
+        "SCIP_REINDEXED",
+        "SQLITE_ARCHITECTURE_ASSERTED",
+        "GLOBAL_BEHAVIOR_ASSERTED"
+      ],
+      "terminal_state": "ROLLED_BACK",
+      "readback": {
+        "typecheck": "PASS",
+        "behavior_tests": {
+          "state": "FAIL",
+          "passed": 39,
+          "total": 41
+        },
+        "reindex_state": "REINDEXED",
+        "forbidden_edge_count": 0,
+        "new_cycles": 0
+      },
+      "blocked_on": [
+        "BEHAVIOR_ORACLE_FAILED"
+      ],
+      "rollback": {
+        "restored_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+        "applied_change_reverted": true
+      },
+      "establishes": {
+        "applied_on_real_codebase": false,
+        "behavior_equivalence_proven": false,
+        "protocol_ready": false
+      },
+      "authority": {
+        "merge": false,
+        "release": false,
+        "production": false
+      }
+    }
+  ],
+  "x-refusal-controls": [
+    {
+      "case_id": "DTCR-XC-R1-001",
+      "refuses": "A candidate receipt whose architecture graph is clean and whose behavior oracle failed.",
+      "refused_by": "allOf[0].then.properties.readback.properties.behavior_tests.properties.state.const",
+      "instance": {
+        "schema": "dtcr/refactor-r1-receipt/v1",
+        "receipt_id": "DTCR-R1-001",
+        "changeset_ref": "DTCR-CL-001",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-0f1e2d3c4b5a6978",
+          "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "subject_tree": "e739d799dd8d44beb5414ed99a943ff3bacccab0"
+        },
+        "states_entered": [
+          "VIOLATION_BOUND",
+          "GLOBAL_BEHAVIOR_ASSERTED"
+        ],
+        "terminal_state": "CANDIDATE_RECEIPT",
+        "readback": {
+          "typecheck": "PASS",
+          "behavior_tests": {
+            "state": "FAIL",
+            "passed": 39,
+            "total": 41
+          },
+          "reindex_state": "REINDEXED",
+          "forbidden_edge_count": 0,
+          "new_cycles": 0
+        },
+        "blocked_on": [],
+        "establishes": {
+          "applied_on_real_codebase": false,
+          "behavior_equivalence_proven": false,
+          "protocol_ready": false
+        },
+        "authority": {
+          "merge": false,
+          "release": false,
+          "production": false
+        }
+      }
+    },
+    {
+      "case_id": "DTCR-XC-R1-002",
+      "refuses": "A candidate receipt that removed the illegal edge by introducing a cycle.",
+      "refused_by": "allOf[2].then.properties.readback.properties.new_cycles.const",
+      "instance": {
+        "schema": "dtcr/refactor-r1-receipt/v1",
+        "receipt_id": "DTCR-R1-001",
+        "changeset_ref": "DTCR-CL-001",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-0f1e2d3c4b5a6978",
+          "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "subject_tree": "e739d799dd8d44beb5414ed99a943ff3bacccab0"
+        },
+        "states_entered": [
+          "VIOLATION_BOUND",
+          "GLOBAL_BEHAVIOR_ASSERTED"
+        ],
+        "terminal_state": "CANDIDATE_RECEIPT",
+        "readback": {
+          "typecheck": "PASS",
+          "behavior_tests": {
+            "state": "PASS",
+            "passed": 41,
+            "total": 41
+          },
+          "reindex_state": "REINDEXED",
+          "forbidden_edge_count": 0,
+          "new_cycles": 2
+        },
+        "blocked_on": [],
+        "establishes": {
+          "applied_on_real_codebase": false,
+          "behavior_equivalence_proven": false,
+          "protocol_ready": false
+        },
+        "authority": {
+          "merge": false,
+          "release": false,
+          "production": false
+        }
+      }
+    },
+    {
+      "case_id": "DTCR-XC-R1-003",
+      "refuses": "A blocked run that names nothing it is blocked on.",
+      "refused_by": "allOf[4].then.properties.blocked_on.minItems",
+      "instance": {
+        "schema": "dtcr/refactor-r1-receipt/v1",
+        "receipt_id": "DTCR-R1-001",
+        "changeset_ref": "DTCR-CL-001",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-0f1e2d3c4b5a6978",
+          "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "subject_tree": "e739d799dd8d44beb5414ed99a943ff3bacccab0"
+        },
+        "states_entered": [
+          "VIOLATION_BOUND",
+          "CHANGESET_AND_LEASE_BOUND"
+        ],
+        "terminal_state": "BLOCKED",
+        "readback": {
+          "typecheck": "NOT_RUN",
+          "behavior_tests": {
+            "state": "NOT_RUN",
+            "passed": 0,
+            "total": 17
+          },
+          "reindex_state": "NOT_REINDEXED",
+          "forbidden_edge_count": 1,
+          "new_cycles": 0
+        },
+        "blocked_on": [],
+        "establishes": {
+          "applied_on_real_codebase": false,
+          "behavior_equivalence_proven": false,
+          "protocol_ready": false
+        },
+        "authority": {
+          "merge": false,
+          "release": false,
+          "production": false
+        }
+      }
+    },
+    {
+      "case_id": "DTCR-XC-R1-004",
+      "refuses": "A rolled-back run with no rollback record, so nobody can check what the tree was restored to.",
+      "refused_by": "allOf[5].then.required",
+      "instance": {
+        "schema": "dtcr/refactor-r1-receipt/v1",
+        "receipt_id": "DTCR-R1-001",
+        "changeset_ref": "DTCR-CL-001",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-0f1e2d3c4b5a6978",
+          "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "subject_tree": "e739d799dd8d44beb5414ed99a943ff3bacccab0"
+        },
+        "states_entered": [
+          "VIOLATION_BOUND",
+          "GLOBAL_BEHAVIOR_ASSERTED"
+        ],
+        "terminal_state": "ROLLED_BACK",
+        "readback": {
+          "typecheck": "PASS",
+          "behavior_tests": {
+            "state": "FAIL",
+            "passed": 39,
+            "total": 41
+          },
+          "reindex_state": "REINDEXED",
+          "forbidden_edge_count": 0,
+          "new_cycles": 0
+        },
+        "blocked_on": [],
+        "establishes": {
+          "applied_on_real_codebase": false,
+          "behavior_equivalence_proven": false,
+          "protocol_ready": false
+        },
+        "authority": {
+          "merge": false,
+          "release": false,
+          "production": false
+        }
+      }
+    },
+    {
+      "case_id": "DTCR-XC-R1-005",
+      "refuses": "A receipt recording that the refactor was applied on a real codebase.",
+      "refused_by": "properties.establishes.properties.applied_on_real_codebase.const",
+      "instance": {
+        "schema": "dtcr/refactor-r1-receipt/v1",
+        "receipt_id": "DTCR-R1-001",
+        "changeset_ref": "DTCR-CL-001",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-0f1e2d3c4b5a6978",
+          "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "subject_tree": "e739d799dd8d44beb5414ed99a943ff3bacccab0"
+        },
+        "states_entered": [
+          "VIOLATION_BOUND",
+          "GLOBAL_BEHAVIOR_ASSERTED"
+        ],
+        "terminal_state": "CANDIDATE_RECEIPT",
+        "readback": {
+          "typecheck": "PASS",
+          "behavior_tests": {
+            "state": "PASS",
+            "passed": 41,
+            "total": 41
+          },
+          "reindex_state": "REINDEXED",
+          "forbidden_edge_count": 0,
+          "new_cycles": 0
+        },
+        "blocked_on": [],
+        "establishes": {
+          "applied_on_real_codebase": true,
+          "behavior_equivalence_proven": false,
+          "protocol_ready": false
+        },
+        "authority": {
+          "merge": false,
+          "release": false,
+          "production": false
+        }
+      }
+    },
+    {
+      "case_id": "DTCR-XC-R1-006",
+      "refuses": "A receipt dated to a moving label instead of the exact commit it read.",
+      "refused_by": "properties.subject.properties.subject_commit.pattern",
+      "instance": {
+        "schema": "dtcr/refactor-r1-receipt/v1",
+        "receipt_id": "DTCR-R1-001",
+        "changeset_ref": "DTCR-CL-001",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-0f1e2d3c4b5a6978",
+          "subject_commit": "HEAD",
+          "subject_tree": "e739d799dd8d44beb5414ed99a943ff3bacccab0"
+        },
+        "states_entered": [
+          "VIOLATION_BOUND",
+          "GLOBAL_BEHAVIOR_ASSERTED"
+        ],
+        "terminal_state": "CANDIDATE_RECEIPT",
+        "readback": {
+          "typecheck": "PASS",
+          "behavior_tests": {
+            "state": "PASS",
+            "passed": 41,
+            "total": 41
+          },
+          "reindex_state": "REINDEXED",
+          "forbidden_edge_count": 0,
+          "new_cycles": 0
+        },
+        "blocked_on": [],
+        "establishes": {
+          "applied_on_real_codebase": false,
+          "behavior_equivalence_proven": false,
+          "protocol_ready": false
+        },
+        "authority": {
+          "merge": false,
+          "release": false,
+          "production": false
+        }
+      }
+    },
+    {
+      "case_id": "DTCR-XC-R1-007",
+      "refuses": "A rollback that records itself as not having reverted the applied change.",
+      "refused_by": "properties.rollback.properties.applied_change_reverted.const",
+      "instance": {
+        "schema": "dtcr/refactor-r1-receipt/v1",
+        "receipt_id": "DTCR-R1-001",
+        "changeset_ref": "DTCR-CL-001",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-0f1e2d3c4b5a6978",
+          "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "subject_tree": "e739d799dd8d44beb5414ed99a943ff3bacccab0"
+        },
+        "states_entered": [
+          "VIOLATION_BOUND",
+          "GLOBAL_BEHAVIOR_ASSERTED"
+        ],
+        "terminal_state": "ROLLED_BACK",
+        "readback": {
+          "typecheck": "PASS",
+          "behavior_tests": {
+            "state": "FAIL",
+            "passed": 39,
+            "total": 41
+          },
+          "reindex_state": "REINDEXED",
+          "forbidden_edge_count": 0,
+          "new_cycles": 0
+        },
+        "blocked_on": [
+          "BEHAVIOR_ORACLE_FAILED"
+        ],
+        "rollback": {
+          "restored_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "applied_change_reverted": false
+        },
+        "establishes": {
+          "applied_on_real_codebase": false,
+          "behavior_equivalence_proven": false,
+          "protocol_ready": false
+        },
+        "authority": {
+          "merge": false,
+          "release": false,
+          "production": false
+        }
+      }
+    }
+  ]
+}

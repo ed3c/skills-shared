@@ -1,0 +1,386 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dtcr-refactor-minimal-port.schema.json",
+  "title": "DTCR minimal port proposal",
+  "description": "The Port the owning high-level module would declare, and the injection that replaces concrete construction with it. Every member here has to name the call sites that justify it, because the failure this artifact is shaped against is not a wrong interface -- it is a right-looking one. Cloning the provider's surface into the domain and injecting it produces a diagram that satisfies the dependency rule and a domain that still knows every method the database driver has. A member with no call site behind it is that clone, one member at a time, and it has nowhere to sit in this object. Nothing here is applied: the proposal establishes no behavior property, which is what the later readback lanes are for.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "port_id",
+    "signature_ref",
+    "subject",
+    "owning_layer",
+    "port_members",
+    "unused_provider_members",
+    "injection",
+    "establishes"
+  ],
+  "properties": {
+    "schema": {
+      "const": "dtcr/refactor-minimal-port/v1"
+    },
+    "port_id": {
+      "type": "string",
+      "pattern": "^DTCR-PT-[0-9]{3}$"
+    },
+    "signature_ref": {
+      "type": "string",
+      "pattern": "^DTCR-US-[0-9]{3}$",
+      "description": "The usage signature this Port may not exceed."
+    },
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository_binding_id",
+        "subject_commit",
+        "subject_tree"
+      ],
+      "properties": {
+        "repository_binding_id": {
+          "type": "string",
+          "pattern": "^DTCR-RB-[0-9a-f]{16}$"
+        },
+        "subject_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "subject_tree": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        }
+      }
+    },
+    "owning_layer": {
+      "enum": [
+        "DOMAIN",
+        "APPLICATION"
+      ],
+      "description": "The Port belongs to the module that consumes it. A Port declared in the infrastructure layer inverts nothing: the high-level module still imports downward to reach it."
+    },
+    "port_members": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "member",
+          "member_kind",
+          "justified_by_call_site_refs"
+        ],
+        "properties": {
+          "member": {
+            "type": "string",
+            "minLength": 1
+          },
+          "member_kind": {
+            "enum": [
+              "METHOD",
+              "TYPE",
+              "FIELD",
+              "CONSTRUCTOR"
+            ]
+          },
+          "justified_by_call_site_refs": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 3
+            },
+            "description": "The call sites that make this member consumed. Empty is the whole failure: a member nobody calls is provider surface that walked into the domain."
+          }
+        }
+      }
+    },
+    "unused_provider_members": {
+      "type": "array",
+      "maxItems": 0,
+      "items": {
+        "type": "string"
+      },
+      "description": "Structurally empty. The key exists so that a Port carrying unused provider surface has a field to be refused in, rather than being expressed as a longer member list nobody counts."
+    },
+    "injection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "construction_sites_replaced",
+        "concrete_imports_remaining"
+      ],
+      "properties": {
+        "construction_sites_replaced": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 3
+          }
+        },
+        "concrete_imports_remaining": {
+          "type": "array",
+          "maxItems": 0,
+          "items": {
+            "type": "string"
+          },
+          "description": "One surviving concrete import keeps the forbidden edge alive while every diagram says it is gone."
+        }
+      }
+    },
+    "establishes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "behavior_preserved",
+        "applied"
+      ],
+      "properties": {
+        "behavior_preserved": {
+          "const": false,
+          "description": "A proposal is a shape. Behavior is established by the frozen tests in the readback lane or not at all."
+        },
+        "applied": {
+          "const": false
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "schema": "dtcr/refactor-minimal-port/v1",
+      "port_id": "DTCR-PT-001",
+      "signature_ref": "DTCR-US-001",
+      "subject": {
+        "repository_binding_id": "DTCR-RB-0f1e2d3c4b5a6978",
+        "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+        "subject_tree": "e739d799dd8d44beb5414ed99a943ff3bacccab0"
+      },
+      "owning_layer": "DOMAIN",
+      "port_members": [
+        {
+          "member": "load",
+          "member_kind": "METHOD",
+          "justified_by_call_site_refs": [
+            "CS-001",
+            "CS-002"
+          ]
+        },
+        {
+          "member": "save",
+          "member_kind": "METHOD",
+          "justified_by_call_site_refs": [
+            "CS-003"
+          ]
+        }
+      ],
+      "unused_provider_members": [],
+      "injection": {
+        "construction_sites_replaced": [
+          "domain/order/pricing.py:OrderPricing.__init__"
+        ],
+        "concrete_imports_remaining": []
+      },
+      "establishes": {
+        "behavior_preserved": false,
+        "applied": false
+      }
+    }
+  ],
+  "x-refusal-controls": [
+    {
+      "case_id": "DTCR-XC-MP-001",
+      "refuses": "A Port member no call site justifies, which is provider surface cloned into the domain one method at a time.",
+      "refused_by": "properties.port_members.items.properties.justified_by_call_site_refs.minItems",
+      "instance": {
+        "schema": "dtcr/refactor-minimal-port/v1",
+        "port_id": "DTCR-PT-001",
+        "signature_ref": "DTCR-US-001",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-0f1e2d3c4b5a6978",
+          "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "subject_tree": "e739d799dd8d44beb5414ed99a943ff3bacccab0"
+        },
+        "owning_layer": "DOMAIN",
+        "port_members": [
+          {
+            "member": "load",
+            "member_kind": "METHOD",
+            "justified_by_call_site_refs": [
+              "CS-001"
+            ]
+          },
+          {
+            "member": "vacuum",
+            "member_kind": "METHOD",
+            "justified_by_call_site_refs": []
+          }
+        ],
+        "unused_provider_members": [],
+        "injection": {
+          "construction_sites_replaced": [
+            "domain/order/pricing.py:OrderPricing.__init__"
+          ],
+          "concrete_imports_remaining": []
+        },
+        "establishes": {
+          "behavior_preserved": false,
+          "applied": false
+        }
+      }
+    },
+    {
+      "case_id": "DTCR-XC-MP-002",
+      "refuses": "A Port that admits it carries unused provider surface and reports it as a note.",
+      "refused_by": "properties.unused_provider_members.maxItems",
+      "instance": {
+        "schema": "dtcr/refactor-minimal-port/v1",
+        "port_id": "DTCR-PT-001",
+        "signature_ref": "DTCR-US-001",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-0f1e2d3c4b5a6978",
+          "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "subject_tree": "e739d799dd8d44beb5414ed99a943ff3bacccab0"
+        },
+        "owning_layer": "DOMAIN",
+        "port_members": [
+          {
+            "member": "load",
+            "member_kind": "METHOD",
+            "justified_by_call_site_refs": [
+              "CS-001"
+            ]
+          }
+        ],
+        "unused_provider_members": [
+          "vacuum",
+          "begin_transaction"
+        ],
+        "injection": {
+          "construction_sites_replaced": [
+            "domain/order/pricing.py:OrderPricing.__init__"
+          ],
+          "concrete_imports_remaining": []
+        },
+        "establishes": {
+          "behavior_preserved": false,
+          "applied": false
+        }
+      }
+    },
+    {
+      "case_id": "DTCR-XC-MP-003",
+      "refuses": "A Port declared in the infrastructure layer, which leaves the high-level module importing downward to reach it.",
+      "refused_by": "properties.owning_layer.enum",
+      "instance": {
+        "schema": "dtcr/refactor-minimal-port/v1",
+        "port_id": "DTCR-PT-001",
+        "signature_ref": "DTCR-US-001",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-0f1e2d3c4b5a6978",
+          "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "subject_tree": "e739d799dd8d44beb5414ed99a943ff3bacccab0"
+        },
+        "owning_layer": "INFRASTRUCTURE",
+        "port_members": [
+          {
+            "member": "load",
+            "member_kind": "METHOD",
+            "justified_by_call_site_refs": [
+              "CS-001"
+            ]
+          }
+        ],
+        "unused_provider_members": [],
+        "injection": {
+          "construction_sites_replaced": [
+            "domain/order/pricing.py:OrderPricing.__init__"
+          ],
+          "concrete_imports_remaining": []
+        },
+        "establishes": {
+          "behavior_preserved": false,
+          "applied": false
+        }
+      }
+    },
+    {
+      "case_id": "DTCR-XC-MP-004",
+      "refuses": "An injection that left one concrete import standing, so the forbidden edge survives the refactor that reports removing it.",
+      "refused_by": "properties.injection.properties.concrete_imports_remaining.maxItems",
+      "instance": {
+        "schema": "dtcr/refactor-minimal-port/v1",
+        "port_id": "DTCR-PT-001",
+        "signature_ref": "DTCR-US-001",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-0f1e2d3c4b5a6978",
+          "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "subject_tree": "e739d799dd8d44beb5414ed99a943ff3bacccab0"
+        },
+        "owning_layer": "DOMAIN",
+        "port_members": [
+          {
+            "member": "load",
+            "member_kind": "METHOD",
+            "justified_by_call_site_refs": [
+              "CS-001"
+            ]
+          }
+        ],
+        "unused_provider_members": [],
+        "injection": {
+          "construction_sites_replaced": [
+            "domain/order/pricing.py:OrderPricing.__init__"
+          ],
+          "concrete_imports_remaining": [
+            "domain/order/pricing.py:from infrastructure.sql import SqlOrderStore"
+          ]
+        },
+        "establishes": {
+          "behavior_preserved": false,
+          "applied": false
+        }
+      }
+    },
+    {
+      "case_id": "DTCR-XC-MP-005",
+      "refuses": "A proposal that records itself as having preserved behavior, before any frozen test has run.",
+      "refused_by": "properties.establishes.properties.behavior_preserved.const",
+      "instance": {
+        "schema": "dtcr/refactor-minimal-port/v1",
+        "port_id": "DTCR-PT-001",
+        "signature_ref": "DTCR-US-001",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-0f1e2d3c4b5a6978",
+          "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "subject_tree": "e739d799dd8d44beb5414ed99a943ff3bacccab0"
+        },
+        "owning_layer": "DOMAIN",
+        "port_members": [
+          {
+            "member": "load",
+            "member_kind": "METHOD",
+            "justified_by_call_site_refs": [
+              "CS-001"
+            ]
+          }
+        ],
+        "unused_provider_members": [],
+        "injection": {
+          "construction_sites_replaced": [
+            "domain/order/pricing.py:OrderPricing.__init__"
+          ],
+          "concrete_imports_remaining": []
+        },
+        "establishes": {
+          "behavior_preserved": true,
+          "applied": false
+        }
+      }
+    }
+  ]
+}
