@@ -46,6 +46,12 @@ residual/successor owners ──────┘                                 
 
 The checker is deterministic and zero-network. A green result proves only that the supplied closure packet is internally consistent with these laws. It does not query GitHub, prove that a claimed SHA is on current `main`, execute a consumer/runtime, perform Human admission, merge, release or production promotion. Provider metadata and immutable Git subjects must be read independently before constructing the packet.
 
+## Executable admission boundary
+
+The dedicated `Issue Closure Contract` GitHub workflow validates the Draft-2020-12 schema, every audited `closure-audit/issue-*.json` packet, the unit mutation controls and every semantic packet gate. The repository's existing `Skill Suites` remains the broader owner of the full `agentic-tech-lead-orchestration/tests/run-all.sh` denominator once a PR is ready for review.
+
+Neither workflow may reuse a green result after the PR head changes.
+
 ## Local Handoff Execution Queue
 
 ```text
