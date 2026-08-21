@@ -17,7 +17,8 @@ model of a repository.
 6. `provider-observation.schema.json`
 7. `fact-bundle.schema.json`
 8. `fact-plane-receipt.schema.json`
-9. exact Issue/PR/head/receipt
+9. `contract-cases.json` and `check_contract.py`
+10. exact Issue/PR/head/receipt
 
 ## Contract flow
 
@@ -67,6 +68,37 @@ NOT_APPLICABLE
 `EXACT_FOR_DECLARED_DENOMINATOR` means only that every item in the named
 *declared denominator* was processed. It never means universal semantic
 coverage. Heuristic provenance may not use that value.
+
+## Deterministic contract verifier
+
+`check_contract.py` owns the cross-field invariants that Draft 2020-12 schemas
+cannot compare directly. Its committed denominator is in `contract-cases.json`:
+
+```text
+4 schema files
+4 positive examples
+9 schema refusal controls
+9 own-guard knockout checks
+4 schema-valid semantic mutations
+```
+
+The semantic mutations refuse at least:
+
+```text
+EXACT_COVERAGE_COUNT_MISMATCH
+PASS_WITH_NONZERO_EXIT
+PASS_RECEIPT_WITH_FAILED_CHECK
+BLAST_RADIUS_EXCEEDS_BUNDLE_COVERAGE
+```
+
+Run from a checkout that already has the pinned JSON Schema validator:
+
+```bash
+python3 skills/dual-track-code-review-loop/references/fact-plane/check_contract.py
+```
+
+A local green run is not hosted CI arrival and does not release provider
+siblings. #537 owns the common DTCR suite/CI arrival; #519 owns D1-C admission.
 
 ## Adapter siblings after D1-C freeze
 
