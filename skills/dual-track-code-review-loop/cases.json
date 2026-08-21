@@ -1,0 +1,37 @@
+{
+  "schema": "dual-track-code-review-loop/cases/v1",
+  "_authority": "tests/selftest.py derives the live denominator from committed C0 schemas and compares it to this frozen baseline. Any schema/control addition or removal is a visible contract delta, not silently absorbed.",
+  "expected_denominator": {
+    "schemas": 8,
+    "positive_instances": 8,
+    "refusal_controls": 32,
+    "knockout_discriminating": 32
+  },
+  "cases": [
+    {
+      "id": "c0-positive-schema-set",
+      "subject": "references/schemas/*.schema.json",
+      "expected": "8_VALID_DRAFT_2020_12_SCHEMAS"
+    },
+    {
+      "id": "c0-positive-instances",
+      "subject": "references/schemas + references/source-disposition/refused-claims.json",
+      "expected": "8_POSITIVE_INSTANCES_PASS"
+    },
+    {
+      "id": "c0-refusal-controls",
+      "subject": "references/schemas + references/source-disposition/refused-claims.json",
+      "expected": "32_PLANTED_CONTROLS_REFUSED"
+    },
+    {
+      "id": "c0-knockout-discrimination",
+      "subject": "tests/selftest.py",
+      "expected": "32_OF_32_OWN_GUARD_KNOCKOUTS_GREEN"
+    },
+    {
+      "id": "private-locator-scan",
+      "subject": "portable C0 Skill tree excluding tests",
+      "expected": "NO_RESOLVED_GOOGLE_DRIVE_OR_HOME_LOCATOR"
+    }
+  ]
+}
