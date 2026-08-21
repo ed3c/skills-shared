@@ -1,0 +1,9 @@
+# Fixture source for the parse-error recording. It is invalid on purpose: a
+# tree with ERROR nodes still yields query matches, and a pass that reports
+# those matches without the error state reports a floor as the whole file.
+def alpha(value):
+    return value +
+
+class ??Beta:
+    def gamma(self)
+        return alpha(2

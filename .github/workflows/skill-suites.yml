@@ -26,6 +26,7 @@ on:
       - 'skills/knowledge-continuity/**'
       - 'skills/procedural-shadow-runtime/**'
       - 'skills/product-reverse-engineering-loop/**'
+      - 'skills/productization-operating-loop/**'
       - 'skills/repository-capability-audit/**'
       - 'skills/repository-entropy-reclamation/**'
       - 'skills/skill-refactor-proof-loop/**'
@@ -48,6 +49,7 @@ on:
       - 'skills/knowledge-continuity/**'
       - 'skills/procedural-shadow-runtime/**'
       - 'skills/product-reverse-engineering-loop/**'
+      - 'skills/productization-operating-loop/**'
       - 'skills/repository-capability-audit/**'
       - 'skills/repository-entropy-reclamation/**'
       - 'skills/skill-refactor-proof-loop/**'
@@ -102,6 +104,7 @@ jobs:
           - knowledge-continuity
           - procedural-shadow-runtime
           - product-reverse-engineering-loop
+          - productization-operating-loop
           - repository-capability-audit
           - repository-entropy-reclamation
           - skill-refactor-proof-loop

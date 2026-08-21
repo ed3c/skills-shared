@@ -10,3 +10,9 @@ ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 # DTCR_REFERENCES overrides the subject for a planted-defect run. It is
 # deliberately not set here, so a normal invocation always reads the tree.
 python3 "$ROOT/tests/selftest.py"
+
+# Provider adapter selftests are fixture-deterministic (their live lanes
+# self-report NOT_EXERCISED when the provider binary is absent), so routing
+# them here gives every adapter the CI arrival its own lease could not add.
+python3 "$ROOT/adapters/tree-sitter/selftest.py"
+python3 "$ROOT/adapters/sqlite-ledger/selftest.py"
