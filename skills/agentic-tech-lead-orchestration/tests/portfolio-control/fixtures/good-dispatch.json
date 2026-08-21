@@ -1,0 +1,61 @@
+{
+  "agent_config_digest": "2222222222222222222222222222222222222222222222222222222222222222",
+  "attempt_id": "attempt-1",
+  "base": {
+    "commit": "28f394785aa8b13c4e6d2f21ad74c5e32a6a6dc5",
+    "repository": "ed3c/skills-shared",
+    "tree": "795de8e9ada4d0927f9a792760232ef75dda84e4"
+  },
+  "budgets": {
+    "max_output_bytes": 1000000,
+    "max_processes": 4,
+    "max_retries": 0,
+    "wall_seconds": 600
+  },
+  "commands": [
+    [
+      "git",
+      "status",
+      "--short"
+    ]
+  ],
+  "coordinator_instruction": "Use subagents. Wait for all agents and consolidate their findings.",
+  "digest": "f7a34ec2208fbcc9ac12d3e1732bf72192768d73fdb33867f28f4b4df8ff1eb2",
+  "dispatch_id": "dispatch-566-1",
+  "epoch_digest": "266afa0f90ac28bc9addfa3a3300f013f287303aa05f139d832700609c7bc777",
+  "expected_outputs": [
+    "repository-portfolio-snapshot/v1"
+  ],
+  "host": "codex-cli",
+  "leases": {
+    "exclusive": [],
+    "forbidden": [
+      "secrets/**"
+    ],
+    "read_only": [
+      "**"
+    ]
+  },
+  "model": {
+    "alias": "OPUS_5",
+    "carrier": "codex-cli",
+    "config_digest": "3333333333333333333333333333333333333333333333333333333333333333",
+    "egress_state": "PASS",
+    "model_id": "exact-model-id-observed",
+    "provider": "provider-observed",
+    "version": "2026-08-21"
+  },
+  "role": "portfolio-explorer",
+  "sandbox_mode": "read-only",
+  "schema": "subagent-dispatch/v1",
+  "task_id": "ISSUE-566",
+  "terminal_states": [
+    "ABSENT",
+    "BLOCKED",
+    "CANCELLED",
+    "FAIL",
+    "PASS",
+    "STALE",
+    "TIMEOUT"
+  ]
+}

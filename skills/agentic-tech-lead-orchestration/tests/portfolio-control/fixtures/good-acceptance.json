@@ -1,0 +1,61 @@
+{
+  "allowed_terminal_states": [
+    "READY",
+    "BLOCKED",
+    "REJECTED"
+  ],
+  "completion_dependencies": [],
+  "digest": "2a065f0abed4bd48a2abbb18c5bed7eb37f701dd5ea3a57e79662070f0157368",
+  "epoch_id": "PORTFOLIO-EPOCH-20260822-B",
+  "evidence": {
+    "ceiling": "fixture-only deterministic mechanics",
+    "required_lanes": [
+      "DETERMINISTIC"
+    ]
+  },
+  "item": {
+    "kind": "ISSUE",
+    "number": 566,
+    "observed_state": "OPEN"
+  },
+  "leases": {
+    "exclusive_paths": [
+      "skills/agentic-tech-lead-orchestration/scripts/**"
+    ],
+    "exclusive_resources": [],
+    "forbidden_paths": [
+      "secrets/**"
+    ],
+    "read_only_paths": [
+      "AGENTS.md"
+    ]
+  },
+  "negative_controls": [
+    "a planted mutation makes the same checker exit non-zero"
+  ],
+  "non_goals": [
+    "merge, release and production",
+    "one-shot CI or subagent-join checkers (owned by ghpc)"
+  ],
+  "objective": "Land the repository-portfolio-control C1 core under agentic-tech-lead-orchestration.",
+  "oracles": [
+    "tests/portfolio-control/run-all.sh exits zero"
+  ],
+  "repository": "ed3c/skills-shared",
+  "residual_owner": "issue-560",
+  "rollback": {
+    "commit": "0000000000000000000000000000000000000000",
+    "strategy": "revert the #566 commits"
+  },
+  "runtime_requirements": [
+    {
+      "capability": "runtime",
+      "owner": "agent-subagent",
+      "state": "PASS",
+      "unblock_condition": "already admitted"
+    }
+  ],
+  "schema_version": "agentic-tech-lead/issue-pr-acceptance/v1",
+  "start_dependencies": [],
+  "unit_id": "ISSUE-566"
+}
