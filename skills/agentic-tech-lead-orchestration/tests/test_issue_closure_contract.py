@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import copy
 import importlib.util
 from pathlib import Path
 import unittest
@@ -20,8 +19,11 @@ def base():
         "issue": {"repository": "ed3c/skills-shared", "number": 505, "github_state": "CLOSED", "github_state_reason": "COMPLETED"},
         "disposition": "DIRECTLY_LANDED",
         "acceptance": [{"id": "tree-truth", "status": "SATISFIED", "successor": None, "rationale": None}],
-        "implementation": {"candidate_prs": [{"number": 507, "state": "CLOSED", "merged": True, "classification": "DIRECT"}], "landing": {"via_pr": 507, "commit": SHA_A, "tree": SHA_B}},
-        "residual": [{"id": "fresh-live-v2", "state": "TRANSFERRED", "owner": "#464"}],
+        "implementation": {
+            "candidate_prs": [{"repository": "ed3c/skills-shared", "number": 507, "state": "CLOSED", "merged": True, "classification": "DIRECT"}],
+            "landing": {"repository": "ed3c/skills-shared", "via_pr": 507, "commit": SHA_A, "tree": SHA_B},
+        },
+        "residual": [{"id": "fresh-live-v2", "state": "TRANSFERRED", "owner": "ed3c/skills-shared#464"}],
         "evidence_ceiling": "DETERMINISTIC",
         "shadow_review": {"verdict": "PASS"},
     }
@@ -43,21 +45,43 @@ class IssueClosureContractTest(unittest.TestCase):
 
     def test_scope_transfer_positive(self):
         d = base(); d["disposition"] = "SCOPE_TRANSFERRED"; d["implementation"]["landing"] = None
-        d["acceptance"] = [{"id": "phase1", "status": "SATISFIED", "successor": None, "rationale": None}, {"id": "phase2", "status": "TRANSFERRED", "successor": "#231/#232/#234/#256", "rationale": None}]
+        d["acceptance"] = [
+            {"id": "phase1", "status": "SATISFIED", "successor": None, "rationale": None},
+            {"id": "phase2", "status": "TRANSFERRED", "successor": "ed3c/skills-shared#231/#232/#234/#256", "rationale": None},
+        ]
         self.assertEqual([], closure.validate(d))
 
     def test_403_consumed_without_landing_fails(self):
         d = base(); d["issue"]["number"] = 403; d["disposition"] = "CONSUMED_BY_CONVERGENCE"
-        d["implementation"] = {"candidate_prs": [{"number": 404, "state": "CLOSED", "merged": False, "classification": "CONSUMED"}], "landing": None}
+        d["implementation"] = {"candidate_prs": [{"repository": "ed3c/skills-shared", "number": 404, "state": "CLOSED", "merged": False, "classification": "CONSUMED"}], "landing": None}
         self.assertTrue(any("immutable landed_via" in e for e in closure.validate(d)))
 
     def test_consumed_with_immutable_landing_passes(self):
         d = base(); d["disposition"] = "CONSUMED_BY_CONVERGENCE"
-        d["implementation"] = {"candidate_prs": [{"number": 404, "state": "CLOSED", "merged": False, "classification": "CONSUMED"}], "landing": {"via_pr": 511, "commit": SHA_A, "tree": SHA_B}}
+        d["implementation"] = {
+            "candidate_prs": [{"repository": "ed3c/skills-shared", "number": 404, "state": "CLOSED", "merged": False, "classification": "CONSUMED"}],
+            "landing": {"repository": "ed3c/skills-shared", "via_pr": 511, "commit": SHA_A, "tree": SHA_B},
+        }
         self.assertEqual([], closure.validate(d))
 
+    def test_cross_repo_direct_landing_is_unambiguous(self):
+        d = base(); d["issue"]["number"] = 366
+        d["implementation"] = {
+            "candidate_prs": [{"repository": "ed3c/website-design-compiler", "number": 53, "state": "CLOSED", "merged": True, "classification": "DIRECT"}],
+            "landing": {"repository": "ed3c/website-design-compiler", "via_pr": 53, "commit": SHA_A, "tree": SHA_B},
+        }
+        self.assertEqual([], closure.validate(d))
+
+    def test_direct_landing_must_match_repository_and_pr(self):
+        d = base(); d["implementation"]["landing"]["repository"] = "ed3c/website-design-compiler"
+        self.assertTrue(any("does not identify" in e for e in closure.validate(d)))
+
+    def test_candidate_without_repository_fails(self):
+        d = base(); del d["implementation"]["candidate_prs"][0]["repository"]
+        self.assertTrue(any("repository is ambiguous" in e for e in closure.validate(d)))
+
     def test_released_ceiling_cannot_hide_unexercised_residual(self):
-        d = base(); d["evidence_ceiling"] = "RELEASED"; d["residual"] = [{"id": "live", "state": "NOT_EXERCISED", "owner": "#464"}]
+        d = base(); d["evidence_ceiling"] = "RELEASED"; d["residual"] = [{"id": "live", "state": "NOT_EXERCISED", "owner": "ed3c/skills-shared#464"}]
         self.assertTrue(any("promoted to RELEASED" in e for e in closure.validate(d)))
 
     def test_closed_requires_shadow(self):
