@@ -21,8 +21,8 @@ DOC_ROUTES = (
 )
 
 
-def managed(content: str) -> str:
-    return f"{BEGIN}\n{content.strip()}\n{END}"
+def managed(content: str, begin: str = BEGIN, end: str = END) -> str:
+    return f"{begin}\n{content.strip()}\n{end}"
 
 
 def route_blocks(repository_id: str) -> dict[Path, str]:
@@ -177,31 +177,31 @@ JSON files in this directory are machine authorities. Do not edit generated file
     }
 
 
-def split_block(text: str, path: Path) -> tuple[str, str, str] | None:
-    starts, ends = text.count(BEGIN), text.count(END)
+def split_block(text: str, path: Path, begin: str = BEGIN, end: str = END) -> tuple[str, str, str] | None:
+    starts, ends = text.count(begin), text.count(end)
     if starts == ends == 0:
         return None
     if starts != 1 or ends != 1:
         raise BootstrapError(f"malformed or duplicate managed block: {path}")
-    start = text.index(BEGIN)
-    finish = text.index(END, start) + len(END)
+    start = text.index(begin)
+    finish = text.index(end, start) + len(end)
     return text[:start], text[start:finish], text[finish:]
 
 
-def merge_block(current: str | None, block: str, path: Path) -> str:
+def merge_block(current: str | None, block: str, path: Path, begin: str = BEGIN, end: str = END) -> str:
     if current is None:
         return block + "\n"
-    parts = split_block(current, path)
+    parts = split_block(current, path, begin, end)
     if parts is None:
         separator = "" if current.endswith("\n\n") else ("\n" if current.endswith("\n") else "\n\n")
         return current + separator + block + "\n"
     return parts[0] + block + parts[2]
 
 
-def observed_block(path: Path) -> str:
+def observed_block(path: Path, begin: str = BEGIN, end: str = END) -> str:
     if not path.is_file() or path.is_symlink():
         raise BootstrapError(f"managed route missing or non-regular: {path}")
-    parts = split_block(path.read_text(encoding="utf-8"), path)
+    parts = split_block(path.read_text(encoding="utf-8"), path, begin, end)
     if parts is None:
         raise BootstrapError(f"managed route block absent: {path}")
     return parts[1]

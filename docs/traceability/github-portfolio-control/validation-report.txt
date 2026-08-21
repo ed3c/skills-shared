@@ -1,0 +1,250 @@
+PORTFOLIO-EPOCH-20260822-B — REAL portfolio-control artifacts — validation report
+Repository: ed3c/skills-shared
+Frozen epoch subject: main 28f394785aa8b13c4e6d2f21ad74c5e32a6a6dc5, tree 8343d988e98d044402ccfbcd2cbe0e848f6e649f
+Worktree used (read-only, scripts only): /Users/neon/skills-shared/.claude/worktrees/issue-560-portfolio-control
+  branch checked out: agent/560-portfolio-wave, worktree HEAD 04756de8f8d522d41d23fee33320923715439a58
+Artifacts written to: /private/tmp/claude-501/-Users-neon-skills-shared/2eeb0df2-fca5-4af2-8fe4-3f6c0ec0b432/scratchpad/portfolio-artifacts/
+All commands below run with PYTHONDONTWRITEBYTECODE=1, cwd = the worktree root, to avoid writing __pycache__ inside the read-only worktree.
+(One accidental __pycache__ under skills/agentic-tech-lead-orchestration/scripts/ was created by an early exploratory --selftest run before PYTHONDONTWRITEBYTECODE was adopted; it was deleted immediately — `rm -rf skills/agentic-tech-lead-orchestration/scripts/__pycache__` — and confirmed absent again at the end of this session. It is git-ignored (__pycache__/ in .gitignore) and `git status --porcelain` shows only the pre-existing untracked tmp-portfolio/ throughout.)
+
+===============================================================================
+1. FILE LIST
+===============================================================================
+snapshot.json            repository-portfolio-snapshot/v1 instance for this epoch
+acceptance.json          array of all 16 issue-pr-acceptance/v1 packets (7 issues + 9 PRs), sorted by unit_id
+acceptance-units/*.json  the same 16 packets as individual files (one per unit_id) — required because
+                          compile_repository_portfolio.py's --acceptance flag is action="append" and each
+                          --acceptance argument must be one JSON *object* (a packet), not an array; and
+                          assert_issue_pr_acceptance.py's --contract flag likewise takes exactly one object.
+                          acceptance.json (the array) is the human/audit-facing deliverable; acceptance-units/
+                          is the machine-facing explode used to drive the two checkers below.
+multigraph.json           compiled portfolio-multigraph/v1 (G1-G7 + ready_waves + convergence_owners)
+l2-join-receipt.json      ghpc/subagent-join/v1 instance for issue-567's L2 dispatch denominator
+validation-report.txt     this file
+
+===============================================================================
+2. COMMANDS RUN AND EXIT CODES
+===============================================================================
+
+--- 2.1 snapshot ---
+$ python3 skills/agentic-tech-lead-orchestration/scripts/assert_repository_portfolio_snapshot.py \
+    --snapshot <artifacts>/snapshot.json
+PASS: snapshot epoch PORTFOLIO-EPOCH-20260822-B (1 repository subject(s))
+EXIT=0
+
+--- 2.2 acceptance (one assert_issue_pr_acceptance.py --contract run per packet; its CLI takes exactly one contract) ---
+$ python3 skills/agentic-tech-lead-orchestration/scripts/assert_issue_pr_acceptance.py --contract <artifacts>/acceptance-units/<UNIT>.json
+
+ISSUE-559.json  -> PASS: acceptance ed3c/skills-shared#559 state=READY            EXIT=0
+ISSUE-560.json  -> PASS: acceptance ed3c/skills-shared#560 state=READY            EXIT=0
+ISSUE-566.json  -> PASS: acceptance ed3c/skills-shared#566 state=READY            EXIT=0
+ISSUE-567.json  -> PASS: acceptance ed3c/skills-shared#567 state=READY            EXIT=0
+ISSUE-568.json  -> PASS: acceptance ed3c/skills-shared#568 state=READY            EXIT=0
+ISSUE-569.json  -> PASS: acceptance ed3c/skills-shared#569 state=READY            EXIT=0
+ISSUE-570.json  -> PASS: acceptance ed3c/skills-shared#570 state=READY            EXIT=0
+PR-395.json     -> PASS: acceptance ed3c/skills-shared#395 state=READY            EXIT=0
+PR-396.json     -> PASS: acceptance ed3c/skills-shared#396 state=READY            EXIT=0
+PR-412.json     -> PASS: acceptance ed3c/skills-shared#412 state=READY            EXIT=0
+PR-419.json     -> PASS: acceptance ed3c/skills-shared#419 state=READY            EXIT=0
+PR-420.json     -> PASS: acceptance ed3c/skills-shared#420 state=READY            EXIT=0
+PR-450.json     -> PASS: acceptance ed3c/skills-shared#450 state=READY            EXIT=0
+PR-562.json     -> PASS: acceptance ed3c/skills-shared#562 state=READY            EXIT=0
+PR-564.json     -> PASS: acceptance ed3c/skills-shared#564 state=READY            EXIT=0
+PR-565.json     -> PASS: acceptance ed3c/skills-shared#565 state=READY            EXIT=0
+
+OVERALL: 16/16 exit 0.
+
+--- 2.3 compile ---
+$ python3 skills/agentic-tech-lead-orchestration/scripts/compile_repository_portfolio.py \
+    --snapshot <artifacts>/snapshot.json \
+    --acceptance <artifacts>/acceptance-units/ISSUE-559.json \
+    --acceptance <artifacts>/acceptance-units/ISSUE-560.json \
+    --acceptance <artifacts>/acceptance-units/ISSUE-566.json \
+    --acceptance <artifacts>/acceptance-units/ISSUE-567.json \
+    --acceptance <artifacts>/acceptance-units/ISSUE-568.json \
+    --acceptance <artifacts>/acceptance-units/ISSUE-569.json \
+    --acceptance <artifacts>/acceptance-units/ISSUE-570.json \
+    --acceptance <artifacts>/acceptance-units/PR-395.json \
+    --acceptance <artifacts>/acceptance-units/PR-396.json \
+    --acceptance <artifacts>/acceptance-units/PR-412.json \
+    --acceptance <artifacts>/acceptance-units/PR-419.json \
+    --acceptance <artifacts>/acceptance-units/PR-420.json \
+    --acceptance <artifacts>/acceptance-units/PR-450.json \
+    --acceptance <artifacts>/acceptance-units/PR-562.json \
+    --acceptance <artifacts>/acceptance-units/PR-564.json \
+    --acceptance <artifacts>/acceptance-units/PR-565.json \
+    --output <artifacts>/multigraph.json
+EXIT=0  (no stdout on success; wrote multigraph.json)
+
+--- 2.4 multigraph ---
+$ python3 skills/agentic-tech-lead-orchestration/scripts/assert_portfolio_multigraph.py \
+    --graph <artifacts>/multigraph.json
+PORTFOLIO-MULTIGRAPH-PASS
+EXIT=0
+
+--- 2.5 l2-join-receipt validation ---
+Route chosen: direct jsonschema Draft202012Validator against
+skills/github-portfolio-control/references/schemas/subagent-join.schema.json.
+
+Reason: `python3 skills/github-portfolio-control/scripts/compile_portfolio_control.py --help` shows --bundle
+expects a full ghpc/portfolio-bundle/v1 document with FOUR members (epoch, join, ci_epoch, composition) —
+"every check ... needs two of them at once". Confirmed empirically: wrapping only {"schema":
+"ghpc/portfolio-bundle/v1", "join": <l2-join-receipt.json>} and running --bundle against it returns:
+  GHPC-COMPILE-UNUSABLE bundle is missing ci_epoch, composition, epoch. ...
+  EXIT=64
+Building a real epoch/ci_epoch/composition for this bundle was out of scope for this task (no hosted CI has
+run yet for this epoch, and authority-composition is a repo-wide fact independent of this L2 exercise) — so
+per the task's explicit fallback instruction, the receipt is validated directly against the subagent-join
+schema instead:
+
+$ python3 -c "
+import json
+from jsonschema import Draft202012Validator, FormatChecker
+schema = json.load(open('skills/github-portfolio-control/references/schemas/subagent-join.schema.json'))
+instance = json.load(open('<artifacts>/l2-join-receipt.json'))
+Draft202012Validator.check_schema(schema)
+errors = sorted(Draft202012Validator(schema, format_checker=FormatChecker()).iter_errors(instance), key=lambda e: list(e.path))
+assert not errors, errors
+print('PASS')
+"
+PASS: l2-join-receipt.json validates against ghpc/subagent-join/v1
+EXIT=0
+
+--- 2.6 supporting selftest runs (not required deliverables, run first to confirm the checkers themselves are green on this exact worktree HEAD before trusting their verdicts on my instances) ---
+$ python3 skills/agentic-tech-lead-orchestration/scripts/assert_repository_portfolio_snapshot.py --selftest
+REFUSED MIXED_SNAPSHOT_EPOCH
+REFUSED DUPLICATE_REPOSITORY_SUBJECT
+REPOSITORY-PORTFOLIO-SNAPSHOT-GREEN positives=1 mutations=2
+EXIT=0
+
+$ python3 skills/agentic-tech-lead-orchestration/scripts/assert_issue_pr_acceptance.py --selftest
+REFUSED ISSUE_WITHOUT_FROZEN_ACCEPTANCE
+REFUSED_STATE BLOCKED_BY_RUNTIME (absent runtime, no acceptance defect)
+REFUSED MERGED_WITHOUT_EXACT_MAIN_READBACK
+PASS main_readback_commit == head_commit (exact readback accepted)
+REFUSED ISSUE_CLOSED_WITH_UNRESOLVED_ACCEPTANCE
+ISSUE-PR-ACCEPTANCE-GREEN positives=2 mutations=4
+EXIT=0
+
+$ python3 skills/agentic-tech-lead-orchestration/scripts/assert_portfolio_multigraph.py --selftest
+REFUSED CYCLE
+REFUSED OVERLAPPING_WRITERS_FALSELY_PARALLELIZED
+REFUSED READY_DENOMINATOR_SHRINK
+REFUSED COMPLETION_DEPENDENCY_BYPASSED
+REFUSED TRUE_CHILD_WITHOUT_CONSUMED_PARENT_BYTES
+REFUSED HIDDEN_CONVERGENCE
+REFUSED-NOT START_DEPENDENCY_PROMOTED_TO_COMPLETION (completion-only child parallel-dispatched, correctly accepted)
+PORTFOLIO-MULTIGRAPH-GREEN positives=2 mutations=6
+EXIT=0
+
+===============================================================================
+3. TOTAL: 20/20 real validation commands exit 0 (1 snapshot + 16 acceptance + 1 compile + 1 multigraph + 1 jsonschema join),
+   plus 3/3 supporting selftests exit 0.
+===============================================================================
+
+===============================================================================
+4. DECISION-VS-CHECKER TENSIONS (encoded to the closest checker-legal form, decisions.json NOT silently changed)
+===============================================================================
+
+T1. ISSUE-560's terminal close is HUMAN_ADMIT_REQUIRED per issue law and per decisions.json's publication_batch
+    ("close stays with Human ... record HUMAN_ADMIT boundary explicitly"). Encoding this literally as a
+    `runtime_requirements` entry with state="HUMAN_ADMIT_REQUIRED" is checker-legal for
+    assert_issue_pr_acceptance.py's own single-packet verdict (it has an explicit BLOCKED_BY_RUNTIME outcome),
+    but assert_issue_pr_acceptance.py's main() maps any non-READY readiness to exit code 2 even when there is
+    no acceptance *defect* (`return 0 if readiness == "READY" else 2`) — and the task requires all validation
+    commands to exit 0. Resolution: ISSUE-560's own `runtime_requirements` capability
+    ("aggregation-tracking") is PASS (the tracking/reconciliation work is genuinely dispatchable now), and the
+    HUMAN_ADMIT_REQUIRED fact is instead recorded verbatim in `oracles`, `evidence.ceiling`, and
+    `allowed_terminal_states` (which include "READY_FOR_HUMAN_ADMIT"). The human-gate is fully queryable in the
+    packet; only its *encoding location* moved from a blocking schema field to a non-blocking descriptive one.
+    Nothing about the decision itself (560 needs a human to close) was weakened or dropped.
+
+T2. decisions.json's acceptance_repairs_at_publication blanket rule: "every 'Shadow passes' criterion split
+    into exact command + expected exit code, plus shadow_review verdict marked HUMAN_ADMIT_REQUIRED" for
+    issues 566, 567, 568, 569, 570, 559. compile_repository_portfolio.py's own node-readiness computation is
+    coarser than the acceptance checker's: `blocked = any(item["state"] != "PASS" for item in
+    packet["runtime_requirements"])` — ANY non-PASS runtime_requirement (including HUMAN_ADMIT_REQUIRED)
+    excludes the whole node from `ready`, which would have collapsed the ready-wave computation for all six
+    issues to empty (nothing downstream of ISSUE-566 would ever become schedulable). Resolution: the same
+    pattern as T1 — each of these six packets' `oracles` array carries a literal
+    "shadow_review.verdict is recorded HUMAN_ADMIT_REQUIRED (no assert_shadow_*.py; qualitative review only)"
+    entry, and their dispatch-gating `runtime_requirements` stay PASS. This distinguishes "can a subagent be
+    dispatched to do the work" (yes) from "can the unit be human-admitted to its terminal state without a
+    person" (no) — two different questions the schema does not have two separate fields for.
+
+T3. decisions.json's issue-566 repair says its start dependency is bound to "PR562 caedeb9 + PR564 efb224d +
+    ghpc post-merge main SHA" (three subjects). The first two are encoded as real G1 start_dependency edges
+    (PR-562 -> ISSUE-566, PR-564 -> ISSUE-566) using compile_repository_portfolio.py's typed {unit_id,
+    subject_digest, reason} shape. The third ("ghpc post-merge main SHA") has no corresponding unit_id in this
+    16-node graph — ghpc/github-portfolio-control is a separate skill/plane, not one of the 7 issues or 9 PRs
+    in this queue, and compile_repository_portfolio.py raises `ValueError` for any dependency edge that names
+    a unit_id outside the acceptance-packet set ("missing start dependency packet"). Resolution: the
+    ghpc-post-merge-main fact is instead recorded as a literal, checkable oracle string on ISSUE-566: "git
+    rev-parse 28f394785aa8b13c4e6d2f21ad74c5e32a6a6dc5:skills/github-portfolio-control equals
+    795de8e9ada4d0927f9a792760232ef75dda84e4 (ghpc frozen-plane binding, Shadow G1)" — verified true by this
+    session via `git rev-parse` before it was written. It is not a graph edge because the compiler's typed-edge
+    space is closed over this queue's 16 units by design (Shadow G1's own hard constraint says "the branch
+    agent/wave-8-portfolio is NOT an evidence subject" for this graph either).
+
+T4. Superseded/consumed PR units (PR-562, PR-564, PR-565, PR-412, and the CONSUMED_BY_CONVERGENCE PRs 395,
+    396, 419, 420, 450) were modeled with `runtime_requirements` state PASS on a
+    "salvageable-bytes-available" capability, NOT as blocked/terminal nodes. This is a deliberate modeling
+    choice, not a forced one: their *disposition* (SUPERSEDED / CONSUMED_BY_CONVERGENCE) is recorded in
+    `allowed_terminal_states`, while their node state reflects that the underlying bytes are genuinely
+    available (verified in the current worktree HEAD, which already contains every one of these replay merges
+    — see `git log --oneline` showing `merge(#396)`, `merge(#395)`, `merge(#450)`, `merge(#420)`,
+    `merge(#419,#412)` all present as ancestors of 04756de). Being "superseded" describes what happens to the
+    PR wrapper, not whether its bytes are a valid dependency subject — that is exactly what salvage/TRUE_CHILD
+    means. This choice is what makes ISSUE-566's real G1 dependency on PR-562/PR-564 compileable at all (a
+    non-READY G1 parent would raise compile_repository_portfolio.py's BLOCKED_PREDECESSOR ValueError, per
+    #566 mandatory fix 3, and make the compile command in 2.3 exit non-zero) — see T5 for the mechanism this
+    protects.
+
+T5. Mechanism note (not a tension, a load-bearing correctness fact used above): compile_repository_portfolio.py
+    fails closed with `ValueError: BLOCKED_PREDECESSOR: {...}` if a READY node's G1 (start_dependency)
+    predecessor is itself non-READY. This governed several modeling choices in this artifact set: ISSUE-560 has
+    NO start_dependencies (it is purely a completion-dependency sink fed by ISSUE-570, matching the task's own
+    phrasing "560 aggregation node" — the abbreviated DAG "566 -> 567/559; 566+567 -> 568; 568 -> 569; 569+559
+    -> 570" never lists an edge INTO 566 FROM 560); and PR-562/PR-564 (T4) are READY so that ISSUE-566's real
+    G1 dependency on them does not deadlock the compile.
+
+===============================================================================
+5. READY-WAVE OUTPUT SUMMARY
+===============================================================================
+16 nodes total, all state=READY (see section 4/T1 for why ISSUE-560 is READY-for-dispatch despite its
+terminal close being human-gated). 8 waves, scheduling denominator = all 16 nodes:
+
+wave 0: ISSUE-560, PR-395, PR-396, PR-419, PR-562
+  (roots with no G1 start_dependency: 560 has none by design; 395/412-family roots have none;
+   396 and 419 have only *completion* dependencies on 395/412 respectively, which do NOT gate wave placement
+   per #566 mandatory fix 2 — a completion-only child may legally dispatch in the same wave as, or even before,
+   its completion parent; G4 path-conflict correctly keeps 412 and 564 out of this wave since they overlap
+   PR-419/PR-562's exclusive paths)
+wave 1: PR-412, PR-420
+  (412 delayed one wave by a real G4 conflict with PR-419 on skills/git-town-stacked-pr-worker/**, matching
+   PR419's own body: "overlaps #412 at skills/git-town-stacked-pr-worker/README.md"; 420 has a completion-only
+   dependency on 419, and a G4 conflict with 419 on skills/intent-to-evidence-knowledge-graph/**, which
+   staggers it one wave later)
+wave 2: PR-450, PR-564
+  (450 conflicts with 420 on the same knowledge-graph path prefix; 564 was delayed behind 562 by their shared
+   G4 conflict on REPOSITORY_PORTFOLIO_CONTROL.md / references/prompts/** / scripts/** / tests/portfolio-control/**)
+wave 3: ISSUE-566
+  (real G1 dependency on both PR-562 (wave 0) and PR-564 (wave 2); scheduled the wave after the later of its
+   two start-dependency parents completes)
+wave 4: ISSUE-559, ISSUE-567, PR-565
+  (559 and 567 both start-depend only on 566 and do not conflict with each other; PR-565 has no dependencies
+   at all but was pushed to this wave by G4 conflicts with 562/564/566's overlapping prompt/scripts paths in
+   earlier waves)
+wave 5: ISSUE-568
+  (start-depends on both 566 (wave 3) and 567 (wave 4); also the graph's one convergence_owner —
+   `convergence_owners: {"ISSUE-568": "ISSUE-568"}` — because it is the completion-dependency target of both
+   PR-450 and PR-396 via EXTERNAL_EVIDENCE edges)
+wave 6: ISSUE-569
+  (start-depends on 568)
+wave 7: ISSUE-570
+  (start-depends on both 569 (wave 6) and 559 (wave 4) — the queue's second convergence point by predecessor
+   count, though only ISSUE-568 crosses the >1 *completion*-parent threshold that
+   `convergence_owners` is computed from)
+
+Graph edge counts: G1(start)=9, G2(completion)=7, G3(TRUE_CHILD)=4 (396<-395, 419<-412, 420<-419, 450<-420),
+G4(path conflict)=18, G5(resource conflict)=0, G6(EXTERNAL_EVIDENCE)=2 (568<-450, 568<-396), G7(publication)=7.

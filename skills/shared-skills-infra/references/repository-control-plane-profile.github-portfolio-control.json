@@ -1,0 +1,35 @@
+{
+  "schema": "repository-control-plane-profile/v1",
+  "profile": "github-portfolio-control",
+  "skills": [
+    "agentic-tech-lead-orchestration",
+    "git-town-stacked-pr-worker",
+    "github-delivery-loop",
+    "procedural-shadow-runtime",
+    "shared-skills-infra"
+  ],
+  "runtime_capabilities": {
+    "git_town": {
+      "scope": "user",
+      "installer_state": "NOT_IMPLEMENTED"
+    },
+    "forgejo": {
+      "scope": "host",
+      "service_state": "NOT_EXERCISED"
+    }
+  },
+  "authority": {
+    "automatic_merge": false,
+    "automatic_conflict_resolution": false,
+    "visibility_change": false,
+    "credential_values": false
+  },
+  "subject_pin": {
+    "main_commit": "28f394785aa8b13c4e6d2f21ad74c5e32a6a6dc5",
+    "owned_tree_path": "skills/github-portfolio-control",
+    "owned_tree": "795de8e9ada4d0927f9a792760232ef75dda84e4",
+    "candidate_commit": "aad3ff0728b9519615b63be80c225389005bfc1d",
+    "candidate_source_path": "skills/agentic-tech-lead-orchestration/references/codex-agents",
+    "candidate_repin_policy": "candidate_commit is a not-yet-merged portfolio-core build branch used only to source the seven codex-agent prompt templates. It carries no merge, release or promotion authority, and MUST be re-bound to the exact merged skills-shared main commit that lands the portfolio-core work before this profile is published to any consumer; until then this profile is bootstrap-eligible in HUMAN_ADMIT_REQUIRED review only."
+  }
+}

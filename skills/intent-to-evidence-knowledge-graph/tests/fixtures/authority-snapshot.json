@@ -1,0 +1,10 @@
+{
+  "schema_version": "authority-snapshot/v1",
+  "artifacts": {
+    "pr-420": {
+      "external_identity": "pr:ed3c/skills-shared#420",
+      "sha": "1111111111111111111111111111111111111111",
+      "state": "open"
+    }
+  }
+}

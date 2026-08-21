@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "intent-to-evidence/case-delivery-binding/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "subject", "intent", "task_contract", "case_bindings", "stack_nodes", "convergence_owner"],
+  "properties": {
+    "schema_version": {"const": "intent-to-evidence-case-delivery-binding/v1"},
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "ref", "sha"],
+      "properties": {
+        "repository": {"type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$"},
+        "ref": {"type": "string", "minLength": 1},
+        "sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+      }
+    },
+    "intent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["intent_id", "icpg_graph_digest"],
+      "properties": {
+        "intent_id": {"type": "string", "minLength": 1},
+        "icpg_graph_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+      }
+    },
+    "task_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["task_id", "contract_digest", "case_graph_ref", "case_graph_sha256", "required_case_ids"],
+      "properties": {
+        "task_id": {"type": "string", "minLength": 1},
+        "contract_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "case_graph_ref": {"type": "string", "minLength": 1},
+        "case_graph_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "required_case_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "case_bindings": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["case_id", "task_id", "issue", "branch", "invariant_ids", "artifact_ids", "document_artifact_ids"],
+        "properties": {
+          "case_id": {"type": "string", "minLength": 1},
+          "task_id": {"type": "string", "minLength": 1},
+          "issue": {"type": "string", "pattern": "^issue:[^/\\s]+/[^#\\s]+#[1-9][0-9]*$"},
+          "branch": {"type": "string", "minLength": 1},
+          "invariant_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+          "artifact_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+          "document_artifact_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+        }
+      }
+    },
+    "stack_nodes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["branch", "parent", "issue", "relation", "owns_paths", "provided_artifacts", "consumed_artifacts"],
+        "properties": {
+          "branch": {"type": "string", "minLength": 1},
+          "parent": {"type": "string", "minLength": 1},
+          "issue": {"type": "string", "pattern": "^issue:[^/\\s]+/[^#\\s]+#[1-9][0-9]*$"},
+          "relation": {"enum": ["SIBLING", "TRUE_CHILD", "CONVERGENCE", "PROCESS_DEPENDENCY", "EXTERNAL_EVIDENCE", "HISTORICAL"]},
+          "owns_paths": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+          "provided_artifacts": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+          "consumed_artifacts": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+        }
+      }
+    },
+    "convergence_owner": {"type": "string", "minLength": 1}
+  }
+}

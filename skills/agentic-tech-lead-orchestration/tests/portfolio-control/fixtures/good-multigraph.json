@@ -1,0 +1,31 @@
+{
+  "convergence_owners": {},
+  "digest": "462dce225c905a0e9268f5ec102822bd40f1bbaac7d22ad46cdf9e8464b42f03",
+  "epoch_digest": "266afa0f90ac28bc9addfa3a3300f013f287303aa05f139d832700609c7bc777",
+  "epoch_subject": {
+    "main_commit": "28f394785aa8b13c4e6d2f21ad74c5e32a6a6dc5",
+    "tree": "795de8e9ada4d0927f9a792760232ef75dda84e4"
+  },
+  "graphs": {
+    "G1": [],
+    "G2": [],
+    "G3": [],
+    "G4": [],
+    "G5": [],
+    "G6": [],
+    "G7": []
+  },
+  "nodes": [
+    {
+      "acceptance_digest": "2a065f0abed4bd48a2abbb18c5bed7eb37f701dd5ea3a57e79662070f0157368",
+      "id": "ISSUE-566",
+      "state": "READY"
+    }
+  ],
+  "ready_waves": [
+    [
+      "ISSUE-566"
+    ]
+  ],
+  "schema": "portfolio-multigraph/v1"
+}

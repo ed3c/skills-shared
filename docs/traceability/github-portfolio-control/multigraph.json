@@ -1,0 +1,472 @@
+{
+  "convergence_owners": {
+    "ISSUE-568": "ISSUE-568"
+  },
+  "digest": "bb13426b18d21506eb340a20c48ec068349a5d2ff950a85653be643df7aaca2e",
+  "epoch_digest": "c3d9925bf1427fc15063045bcd0bdeb108ce9d1f5c02652af0fceb70dc36ffc0",
+  "epoch_subject": {
+    "main_commit": "28f394785aa8b13c4e6d2f21ad74c5e32a6a6dc5",
+    "tree": "8343d988e98d044402ccfbcd2cbe0e848f6e649f"
+  },
+  "graphs": {
+    "G1": [
+      {
+        "from": "ISSUE-559",
+        "reason": "start: bootstrap canary lane must complete before final convergence",
+        "relation": "START_DEPENDENCY",
+        "subject_digest": "2f0e85388a74bdc8da1ee03f9d9795fdc4998f39e18c5ceab8cad9814dab9626",
+        "to": "ISSUE-570"
+      },
+      {
+        "from": "ISSUE-566",
+        "reason": "start: #566 exact admitted portfolio-core subject, per the corrected dependency 566 -> 559 -> 570 (issue-559 circular-dependency repair)",
+        "relation": "START_DEPENDENCY",
+        "subject_digest": "ad694208dcd356153749cbb80ec81e792999da98a3fe745ab6d679235c28a615",
+        "to": "ISSUE-559"
+      },
+      {
+        "from": "ISSUE-566",
+        "reason": "start: portfolio-explorer/acceptance-adversary/dependency-auditor/runtime-admission-auditor/consolidation-verifier/release-auditor roles read the contracts #566 admits",
+        "relation": "START_DEPENDENCY",
+        "subject_digest": "ad694208dcd356153749cbb80ec81e792999da98a3fe745ab6d679235c28a615",
+        "to": "ISSUE-567"
+      },
+      {
+        "from": "ISSUE-566",
+        "reason": "start: G1-G7 compiler and acceptance schema must exist before the PR stacks can be recompiled against them",
+        "relation": "START_DEPENDENCY",
+        "subject_digest": "ad694208dcd356153749cbb80ec81e792999da98a3fe745ab6d679235c28a615",
+        "to": "ISSUE-568"
+      },
+      {
+        "from": "ISSUE-567",
+        "reason": "start: dependency-auditor/consolidation-verifier runtime/model admission receipts must exist before this reconciliation is dispatched",
+        "relation": "START_DEPENDENCY",
+        "subject_digest": "019730c3b818d22aac04a6d10ec3fc453d92e1f4d6cf52296adfe8e5ad559251",
+        "to": "ISSUE-568"
+      },
+      {
+        "from": "ISSUE-568",
+        "reason": "start: #568's exact converged candidate (the convergence branch) must exist before it can be pushed and published",
+        "relation": "START_DEPENDENCY",
+        "subject_digest": "48e8fa2504f8f509779bc0d4742ecdf918716e102eca3fba07c5802e73be30d0",
+        "to": "ISSUE-569"
+      },
+      {
+        "from": "ISSUE-569",
+        "reason": "start: exact-main closure lane (hosted CI + readback) must complete before final convergence",
+        "relation": "START_DEPENDENCY",
+        "subject_digest": "1b48e5ab35caa0ed036a1c76b8124780b383a54c68784171cfa95df0f46e4640",
+        "to": "ISSUE-570"
+      },
+      {
+        "from": "PR-562",
+        "reason": "start: salvage compile_repository_portfolio.py, assert_portfolio_multigraph.py, assert_subagent_dispatch.py, codex-agents/*.toml.template (7 roles) and the typed dependency-edge shape from PR562 caedeb9",
+        "relation": "START_DEPENDENCY",
+        "subject_digest": "a3dce917cebb6dd3f1af1f4bf74ce95e27d9ba34ecb5618bea8a91f9fa47d101",
+        "to": "ISSUE-566"
+      },
+      {
+        "from": "PR-564",
+        "reason": "start: salvage the issue-pr-acceptance schema/checker, assert_repository_portfolio_snapshot.py skew fix, and normalize_lease path-overlap fix from PR564 efb224d",
+        "relation": "START_DEPENDENCY",
+        "subject_digest": "d25c24ea9a57959cdaa4d8b1ee787f36f7cf55b9d033b8f1e2b150998a9d20dc",
+        "to": "ISSUE-566"
+      }
+    ],
+    "G2": [
+      {
+        "from": "ISSUE-570",
+        "reason": "560 aggregation: this P0 closes only after #570 is CLOSED_VERIFIED per the Issue Closure Contract (issue-570 body: '#560 may close only after this issue is CLOSED_VERIFIED')",
+        "relation": "COMPLETION_DEPENDENCY",
+        "subject_digest": "b9f4a93774cb97773835ebefa19497905f6c806342048b131d6c7a5234182d9d",
+        "to": "ISSUE-560"
+      },
+      {
+        "from": "PR-395",
+        "reason": "TRUE_CHILD: docs/traceability/KENN_AGENTIC_ENGINEERING_CLOSURE.md and the Stack reference cite the human-led-agentic-engineering method bytes #395 introduces",
+        "relation": "COMPLETION_DEPENDENCY",
+        "subject_digest": "2d6de70a7d6bb4c1d4deacbb4cc410d3c7a4a7b741f91830e4f3f973e3497af0",
+        "to": "PR-396"
+      },
+      {
+        "from": "PR-396",
+        "reason": "EXTERNAL_EVIDENCE: Stack K's reconciliation is evidenced by the landed replay tip (replay/396-shared-index-trace on the convergence branch), not by a Git-ancestry claim of #568 itself",
+        "relation": "COMPLETION_DEPENDENCY",
+        "subject_digest": "66537b7c6966c004fef84e2c62580df266863be5196da7bd805d96fb8f839312",
+        "to": "ISSUE-568"
+      },
+      {
+        "from": "PR-412",
+        "reason": "TRUE_CHILD: consumes the unmerged Spatial Loop ICPG / Tech Lead case-obligations contract from #412; Shadow G4 oracle requires replayed-419-final to be a strict superset of all 34 of #412's declared paths at blob identity",
+        "relation": "COMPLETION_DEPENDENCY",
+        "subject_digest": "09316dc3513cd7a02743b0bb0ae5e4f6181ea1d4fa3c965db2c37c7c1abd0f27",
+        "to": "PR-419"
+      },
+      {
+        "from": "PR-419",
+        "reason": "TRUE_CHILD: consumes the unmerged Knowledge Graph projection/trace contract introduced in #419; fork point 05bfb9ed29b62adfaf8a451d117b41d3b0f825aa predates #419's absorption of #412 (decisions.json stack_plan wave2 note)",
+        "relation": "COMPLETION_DEPENDENCY",
+        "subject_digest": "e2d7995bb4fdd519a05836428fe6a50f6e72914d724ae7c55772597ad9294c99",
+        "to": "PR-420"
+      },
+      {
+        "from": "PR-420",
+        "reason": "TRUE_CHILD: directly consumes the unmerged Intent/Artifact/Trace projection contracts and deterministic checker frozen in #420",
+        "relation": "COMPLETION_DEPENDENCY",
+        "subject_digest": "0d8b7e061d10802b53193bf98d0ab70ddc3ff63614fd1a9ab2e5b3731c880d92",
+        "to": "PR-450"
+      },
+      {
+        "from": "PR-450",
+        "reason": "EXTERNAL_EVIDENCE: Stack S's reconciliation is evidenced by the landed replay tip (replay/450-case-delivery-binding on the convergence branch), not by a Git-ancestry claim of #568 itself",
+        "relation": "COMPLETION_DEPENDENCY",
+        "subject_digest": "70efd4efb581f972e6eb206994207f77c9571e6a3734e206d7776fa4636f7487",
+        "to": "ISSUE-568"
+      }
+    ],
+    "G3": [
+      {
+        "from": "PR-395",
+        "reason": "TRUE_CHILD: docs/traceability/KENN_AGENTIC_ENGINEERING_CLOSURE.md and the Stack reference cite the human-led-agentic-engineering method bytes #395 introduces",
+        "relation": "TRUE_CHILD",
+        "subject_digest": "2d6de70a7d6bb4c1d4deacbb4cc410d3c7a4a7b741f91830e4f3f973e3497af0",
+        "to": "PR-396"
+      },
+      {
+        "from": "PR-412",
+        "reason": "TRUE_CHILD: consumes the unmerged Spatial Loop ICPG / Tech Lead case-obligations contract from #412; Shadow G4 oracle requires replayed-419-final to be a strict superset of all 34 of #412's declared paths at blob identity",
+        "relation": "TRUE_CHILD",
+        "subject_digest": "09316dc3513cd7a02743b0bb0ae5e4f6181ea1d4fa3c965db2c37c7c1abd0f27",
+        "to": "PR-419"
+      },
+      {
+        "from": "PR-419",
+        "reason": "TRUE_CHILD: consumes the unmerged Knowledge Graph projection/trace contract introduced in #419; fork point 05bfb9ed29b62adfaf8a451d117b41d3b0f825aa predates #419's absorption of #412 (decisions.json stack_plan wave2 note)",
+        "relation": "TRUE_CHILD",
+        "subject_digest": "e2d7995bb4fdd519a05836428fe6a50f6e72914d724ae7c55772597ad9294c99",
+        "to": "PR-420"
+      },
+      {
+        "from": "PR-420",
+        "reason": "TRUE_CHILD: directly consumes the unmerged Intent/Artifact/Trace projection contracts and deterministic checker frozen in #420",
+        "relation": "TRUE_CHILD",
+        "subject_digest": "0d8b7e061d10802b53193bf98d0ab70ddc3ff63614fd1a9ab2e5b3731c880d92",
+        "to": "PR-450"
+      }
+    ],
+    "G4": [
+      {
+        "from": "ISSUE-566",
+        "reason": "exclusive writer overlap: skills/agentic-tech-lead-orchestration/references/REPOSITORY_PORTFOLIO_CONTROL.md <> skills/agentic-tech-lead-orchestration/**; skills/agentic-tech-lead-orchestration/references/codex-agents/** <> skills/agentic-tech-lead-orchestration/**; skills/agentic-tech-lead-orchestration/references/contracts/** <> skills/agentic-tech-lead-orchestration/**; skills/agentic-tech-lead-orchestration/references/prompts/** <> skills/agentic-tech-lead-orchestration/**; skills/agentic-tech-lead-orchestration/scripts/** <> skills/agentic-tech-lead-orchestration/**; skills/agentic-tech-lead-orchestration/tests/portfolio-control/** <> skills/agentic-tech-lead-orchestration/**",
+        "relation": "PATH_CONFLICT",
+        "subject_digest": "574a79c9432345c0bc7b5724f23191116bf71e5b4bfc9ba63e6b2f9b18d6f1b2",
+        "to": "PR-412"
+      },
+      {
+        "from": "ISSUE-566",
+        "reason": "exclusive writer overlap: skills/agentic-tech-lead-orchestration/references/REPOSITORY_PORTFOLIO_CONTROL.md <> skills/agentic-tech-lead-orchestration/references/REPOSITORY_PORTFOLIO_CONTROL.md; skills/agentic-tech-lead-orchestration/references/codex-agents/** <> skills/agentic-tech-lead-orchestration/references/codex-agents/**; skills/agentic-tech-lead-orchestration/references/contracts/** <> skills/agentic-tech-lead-orchestration/references/contracts/**; skills/agentic-tech-lead-orchestration/references/prompts/** <> skills/agentic-tech-lead-orchestration/references/prompts/**; skills/agentic-tech-lead-orchestration/scripts/** <> skills/agentic-tech-lead-orchestration/scripts/**; skills/agentic-tech-lead-orchestration/tests/portfolio-control/** <> skills/agentic-tech-lead-orchestration/tests/portfolio-control/**",
+        "relation": "PATH_CONFLICT",
+        "subject_digest": "8a295a85a9edfc16adb281860e92cc57d7e5254ff4e811f27e9c5c7403bfeb8a",
+        "to": "PR-562"
+      },
+      {
+        "from": "ISSUE-566",
+        "reason": "exclusive writer overlap: skills/agentic-tech-lead-orchestration/references/REPOSITORY_PORTFOLIO_CONTROL.md <> skills/agentic-tech-lead-orchestration/references/REPOSITORY_PORTFOLIO_CONTROL.md; skills/agentic-tech-lead-orchestration/references/prompts/** <> skills/agentic-tech-lead-orchestration/references/prompts/**; skills/agentic-tech-lead-orchestration/scripts/** <> skills/agentic-tech-lead-orchestration/scripts/**; skills/agentic-tech-lead-orchestration/tests/portfolio-control/** <> skills/agentic-tech-lead-orchestration/tests/portfolio-control/**",
+        "relation": "PATH_CONFLICT",
+        "subject_digest": "998c84e631e464915f3bd3e8ba934b97061ce60787ee62fbba84f5e9dac6aab4",
+        "to": "PR-564"
+      },
+      {
+        "from": "ISSUE-566",
+        "reason": "exclusive writer overlap: skills/agentic-tech-lead-orchestration/references/REPOSITORY_PORTFOLIO_CONTROL.md <> skills/agentic-tech-lead-orchestration/references/REPOSITORY_PORTFOLIO_CONTROL.md; skills/agentic-tech-lead-orchestration/references/prompts/** <> skills/agentic-tech-lead-orchestration/references/prompts/**; skills/agentic-tech-lead-orchestration/scripts/** <> skills/agentic-tech-lead-orchestration/scripts/check_repository_portfolio_prompt_pack.py; skills/agentic-tech-lead-orchestration/tests/portfolio-control/** <> skills/agentic-tech-lead-orchestration/tests/portfolio-control/**",
+        "relation": "PATH_CONFLICT",
+        "subject_digest": "872bd298ab53de6a2e4c86f575873f9f1b07b6651305141a3109b061615e5ef4",
+        "to": "PR-565"
+      },
+      {
+        "from": "ISSUE-570",
+        "reason": "exclusive writer overlap: docs/traceability/** <> docs/traceability/KENN_AGENTIC_ENGINEERING_CLOSURE.md",
+        "relation": "PATH_CONFLICT",
+        "subject_digest": "3501aa17f7c04fe1512e0e0822c4004e10eae53259c5220f673160b8d64d66a3",
+        "to": "PR-396"
+      },
+      {
+        "from": "ISSUE-570",
+        "reason": "exclusive writer overlap: docs/traceability/** <> docs/traceability/KNOWLEDGE_GRAPH_ICPG_CLOSURE.md",
+        "relation": "PATH_CONFLICT",
+        "subject_digest": "a17548f05bb88fedf137c779b6e6014b5185f0b465c421398885018bf5eeece0",
+        "to": "PR-419"
+      },
+      {
+        "from": "ISSUE-570",
+        "reason": "exclusive writer overlap: docs/traceability/** <> docs/traceability/REPOSITORY_PORTFOLIO_CONTROL_C0.md",
+        "relation": "PATH_CONFLICT",
+        "subject_digest": "f33e1f0a2979c1339f0eb36a49bb43f4c7c7e9339df68221055fe1eacc315754",
+        "to": "PR-562"
+      },
+      {
+        "from": "PR-396",
+        "reason": "exclusive writer overlap: skills/git-town-stacked-pr-worker/references/KENN_AGENTIC_ENGINEERING_STACK.md <> skills/git-town-stacked-pr-worker/**",
+        "relation": "PATH_CONFLICT",
+        "subject_digest": "4a88573b3b9cba4a7c2fbe1db5395d7175763deef3a04090d98a62595e6b6f8b",
+        "to": "PR-412"
+      },
+      {
+        "from": "PR-412",
+        "reason": "exclusive writer overlap: skills/git-town-stacked-pr-worker/** <> skills/git-town-stacked-pr-worker/README.md",
+        "relation": "PATH_CONFLICT",
+        "subject_digest": "7051dc6e3630dfa14ba892e24aa4c80d05f9b6f674cb1bf856c53dad7474a167",
+        "to": "PR-419"
+      },
+      {
+        "from": "PR-412",
+        "reason": "exclusive writer overlap: skills/agentic-tech-lead-orchestration/** <> skills/agentic-tech-lead-orchestration/references/REPOSITORY_PORTFOLIO_CONTROL.md; skills/agentic-tech-lead-orchestration/** <> skills/agentic-tech-lead-orchestration/references/codex-agents/**; skills/agentic-tech-lead-orchestration/** <> skills/agentic-tech-lead-orchestration/references/contracts/**; skills/agentic-tech-lead-orchestration/** <> skills/agentic-tech-lead-orchestration/references/prompts/**; skills/agentic-tech-lead-orchestration/** <> skills/agentic-tech-lead-orchestration/scripts/**; skills/agentic-tech-lead-orchestration/** <> skills/agentic-tech-lead-orchestration/tests/portfolio-control/**",
+        "relation": "PATH_CONFLICT",
+        "subject_digest": "971bf0c20dc36c7394fdce9d4a5045b1ec9712506693e874a0f63dc48e6f9b3a",
+        "to": "PR-562"
+      },
+      {
+        "from": "PR-412",
+        "reason": "exclusive writer overlap: skills/agentic-tech-lead-orchestration/** <> skills/agentic-tech-lead-orchestration/references/REPOSITORY_PORTFOLIO_CONTROL.md; skills/agentic-tech-lead-orchestration/** <> skills/agentic-tech-lead-orchestration/references/prompts/**; skills/agentic-tech-lead-orchestration/** <> skills/agentic-tech-lead-orchestration/references/repository-portfolio-control/**; skills/agentic-tech-lead-orchestration/** <> skills/agentic-tech-lead-orchestration/scripts/**; skills/agentic-tech-lead-orchestration/** <> skills/agentic-tech-lead-orchestration/tests/portfolio-control/**",
+        "relation": "PATH_CONFLICT",
+        "subject_digest": "8d1e10d3a2f675a3a8d6847af8d13f8747b081e08a9c5c9681146b666e53f2c4",
+        "to": "PR-564"
+      },
+      {
+        "from": "PR-412",
+        "reason": "exclusive writer overlap: skills/agentic-tech-lead-orchestration/** <> skills/agentic-tech-lead-orchestration/references/REPOSITORY_PORTFOLIO_CONTROL.md; skills/agentic-tech-lead-orchestration/** <> skills/agentic-tech-lead-orchestration/references/prompts/**; skills/agentic-tech-lead-orchestration/** <> skills/agentic-tech-lead-orchestration/references/repository-portfolio-control/**; skills/agentic-tech-lead-orchestration/** <> skills/agentic-tech-lead-orchestration/scripts/check_repository_portfolio_prompt_pack.py; skills/agentic-tech-lead-orchestration/** <> skills/agentic-tech-lead-orchestration/tests/portfolio-control/**",
+        "relation": "PATH_CONFLICT",
+        "subject_digest": "229189d5b6132c006376d015336c362367a5c43a93cadd682790c3215d80013d",
+        "to": "PR-565"
+      },
+      {
+        "from": "PR-419",
+        "reason": "exclusive writer overlap: skills/intent-to-evidence-knowledge-graph/** <> skills/intent-to-evidence-knowledge-graph/**",
+        "relation": "PATH_CONFLICT",
+        "subject_digest": "979eae05f61b1f5ffc7350a23ba87ee58190b9e5f09ce6b0614419a197315139",
+        "to": "PR-420"
+      },
+      {
+        "from": "PR-419",
+        "reason": "exclusive writer overlap: docs/INDEX.md <> docs/INDEX.md; skills/intent-to-evidence-knowledge-graph/** <> skills/intent-to-evidence-knowledge-graph/**",
+        "relation": "PATH_CONFLICT",
+        "subject_digest": "b2288e82f6afb401c536ec9adfb7820ef73832b16b0e6b883f5590251e7396ff",
+        "to": "PR-450"
+      },
+      {
+        "from": "PR-420",
+        "reason": "exclusive writer overlap: skills/intent-to-evidence-knowledge-graph/** <> skills/intent-to-evidence-knowledge-graph/**",
+        "relation": "PATH_CONFLICT",
+        "subject_digest": "1a30d5193be9bfebca3837af6715466765c9a9302b28e9642fe9341a3dc85602",
+        "to": "PR-450"
+      },
+      {
+        "from": "PR-562",
+        "reason": "exclusive writer overlap: skills/agentic-tech-lead-orchestration/references/REPOSITORY_PORTFOLIO_CONTROL.md <> skills/agentic-tech-lead-orchestration/references/REPOSITORY_PORTFOLIO_CONTROL.md; skills/agentic-tech-lead-orchestration/references/prompts/** <> skills/agentic-tech-lead-orchestration/references/prompts/**; skills/agentic-tech-lead-orchestration/scripts/** <> skills/agentic-tech-lead-orchestration/scripts/**; skills/agentic-tech-lead-orchestration/tests/portfolio-control/** <> skills/agentic-tech-lead-orchestration/tests/portfolio-control/**",
+        "relation": "PATH_CONFLICT",
+        "subject_digest": "f2b194d58c9cab49138002e9fce242342435f0e866dbc4b43e0fa3340af59dd2",
+        "to": "PR-564"
+      },
+      {
+        "from": "PR-562",
+        "reason": "exclusive writer overlap: skills/agentic-tech-lead-orchestration/references/REPOSITORY_PORTFOLIO_CONTROL.md <> skills/agentic-tech-lead-orchestration/references/REPOSITORY_PORTFOLIO_CONTROL.md; skills/agentic-tech-lead-orchestration/references/prompts/** <> skills/agentic-tech-lead-orchestration/references/prompts/**; skills/agentic-tech-lead-orchestration/scripts/** <> skills/agentic-tech-lead-orchestration/scripts/check_repository_portfolio_prompt_pack.py; skills/agentic-tech-lead-orchestration/tests/portfolio-control/** <> skills/agentic-tech-lead-orchestration/tests/portfolio-control/**",
+        "relation": "PATH_CONFLICT",
+        "subject_digest": "16fa6720b5a74fbff8cfc604fa2cd739f998a13140a2a1ebc6ee61bade2defeb",
+        "to": "PR-565"
+      },
+      {
+        "from": "PR-564",
+        "reason": "exclusive writer overlap: skills/agentic-tech-lead-orchestration/references/REPOSITORY_PORTFOLIO_CONTROL.md <> skills/agentic-tech-lead-orchestration/references/REPOSITORY_PORTFOLIO_CONTROL.md; skills/agentic-tech-lead-orchestration/references/prompts/** <> skills/agentic-tech-lead-orchestration/references/prompts/**; skills/agentic-tech-lead-orchestration/references/repository-portfolio-control/** <> skills/agentic-tech-lead-orchestration/references/repository-portfolio-control/**; skills/agentic-tech-lead-orchestration/scripts/** <> skills/agentic-tech-lead-orchestration/scripts/check_repository_portfolio_prompt_pack.py; skills/agentic-tech-lead-orchestration/tests/portfolio-control/** <> skills/agentic-tech-lead-orchestration/tests/portfolio-control/**",
+        "relation": "PATH_CONFLICT",
+        "subject_digest": "f375ec9c2bb1a0ebfc5af4a1e1027fef99d4a18dd61462faae8baa4fdbf75dc1",
+        "to": "PR-565"
+      }
+    ],
+    "G5": [],
+    "G6": [
+      {
+        "from": "PR-396",
+        "reason": "EXTERNAL_EVIDENCE: Stack K's reconciliation is evidenced by the landed replay tip (replay/396-shared-index-trace on the convergence branch), not by a Git-ancestry claim of #568 itself",
+        "relation": "EXTERNAL_EVIDENCE",
+        "subject_digest": "66537b7c6966c004fef84e2c62580df266863be5196da7bd805d96fb8f839312",
+        "to": "ISSUE-568"
+      },
+      {
+        "from": "PR-450",
+        "reason": "EXTERNAL_EVIDENCE: Stack S's reconciliation is evidenced by the landed replay tip (replay/450-case-delivery-binding on the convergence branch), not by a Git-ancestry claim of #568 itself",
+        "relation": "EXTERNAL_EVIDENCE",
+        "subject_digest": "70efd4efb581f972e6eb206994207f77c9571e6a3734e206d7776fa4636f7487",
+        "to": "ISSUE-568"
+      }
+    ],
+    "G7": [
+      {
+        "from": "ISSUE-570",
+        "reason": "completion admission precedes publication",
+        "relation": "PUBLICATION_DEPENDENCY",
+        "subject_digest": "b9f4a93774cb97773835ebefa19497905f6c806342048b131d6c7a5234182d9d",
+        "to": "ISSUE-560"
+      },
+      {
+        "from": "PR-395",
+        "reason": "completion admission precedes publication",
+        "relation": "PUBLICATION_DEPENDENCY",
+        "subject_digest": "2d6de70a7d6bb4c1d4deacbb4cc410d3c7a4a7b741f91830e4f3f973e3497af0",
+        "to": "PR-396"
+      },
+      {
+        "from": "PR-396",
+        "reason": "completion admission precedes publication",
+        "relation": "PUBLICATION_DEPENDENCY",
+        "subject_digest": "66537b7c6966c004fef84e2c62580df266863be5196da7bd805d96fb8f839312",
+        "to": "ISSUE-568"
+      },
+      {
+        "from": "PR-412",
+        "reason": "completion admission precedes publication",
+        "relation": "PUBLICATION_DEPENDENCY",
+        "subject_digest": "09316dc3513cd7a02743b0bb0ae5e4f6181ea1d4fa3c965db2c37c7c1abd0f27",
+        "to": "PR-419"
+      },
+      {
+        "from": "PR-419",
+        "reason": "completion admission precedes publication",
+        "relation": "PUBLICATION_DEPENDENCY",
+        "subject_digest": "e2d7995bb4fdd519a05836428fe6a50f6e72914d724ae7c55772597ad9294c99",
+        "to": "PR-420"
+      },
+      {
+        "from": "PR-420",
+        "reason": "completion admission precedes publication",
+        "relation": "PUBLICATION_DEPENDENCY",
+        "subject_digest": "0d8b7e061d10802b53193bf98d0ab70ddc3ff63614fd1a9ab2e5b3731c880d92",
+        "to": "PR-450"
+      },
+      {
+        "from": "PR-450",
+        "reason": "completion admission precedes publication",
+        "relation": "PUBLICATION_DEPENDENCY",
+        "subject_digest": "70efd4efb581f972e6eb206994207f77c9571e6a3734e206d7776fa4636f7487",
+        "to": "ISSUE-568"
+      }
+    ]
+  },
+  "nodes": [
+    {
+      "acceptance_digest": "2f0e85388a74bdc8da1ee03f9d9795fdc4998f39e18c5ceab8cad9814dab9626",
+      "id": "ISSUE-559",
+      "state": "READY"
+    },
+    {
+      "acceptance_digest": "030b5f5107977da1b4ccf048262a094a0043264904f44f5b87d49421e994eed3",
+      "id": "ISSUE-560",
+      "state": "READY"
+    },
+    {
+      "acceptance_digest": "ad694208dcd356153749cbb80ec81e792999da98a3fe745ab6d679235c28a615",
+      "id": "ISSUE-566",
+      "state": "READY"
+    },
+    {
+      "acceptance_digest": "019730c3b818d22aac04a6d10ec3fc453d92e1f4d6cf52296adfe8e5ad559251",
+      "id": "ISSUE-567",
+      "state": "READY"
+    },
+    {
+      "acceptance_digest": "48e8fa2504f8f509779bc0d4742ecdf918716e102eca3fba07c5802e73be30d0",
+      "id": "ISSUE-568",
+      "state": "READY"
+    },
+    {
+      "acceptance_digest": "1b48e5ab35caa0ed036a1c76b8124780b383a54c68784171cfa95df0f46e4640",
+      "id": "ISSUE-569",
+      "state": "READY"
+    },
+    {
+      "acceptance_digest": "b9f4a93774cb97773835ebefa19497905f6c806342048b131d6c7a5234182d9d",
+      "id": "ISSUE-570",
+      "state": "READY"
+    },
+    {
+      "acceptance_digest": "2d6de70a7d6bb4c1d4deacbb4cc410d3c7a4a7b741f91830e4f3f973e3497af0",
+      "id": "PR-395",
+      "state": "READY"
+    },
+    {
+      "acceptance_digest": "66537b7c6966c004fef84e2c62580df266863be5196da7bd805d96fb8f839312",
+      "id": "PR-396",
+      "state": "READY"
+    },
+    {
+      "acceptance_digest": "09316dc3513cd7a02743b0bb0ae5e4f6181ea1d4fa3c965db2c37c7c1abd0f27",
+      "id": "PR-412",
+      "state": "READY"
+    },
+    {
+      "acceptance_digest": "e2d7995bb4fdd519a05836428fe6a50f6e72914d724ae7c55772597ad9294c99",
+      "id": "PR-419",
+      "state": "READY"
+    },
+    {
+      "acceptance_digest": "0d8b7e061d10802b53193bf98d0ab70ddc3ff63614fd1a9ab2e5b3731c880d92",
+      "id": "PR-420",
+      "state": "READY"
+    },
+    {
+      "acceptance_digest": "70efd4efb581f972e6eb206994207f77c9571e6a3734e206d7776fa4636f7487",
+      "id": "PR-450",
+      "state": "READY"
+    },
+    {
+      "acceptance_digest": "a3dce917cebb6dd3f1af1f4bf74ce95e27d9ba34ecb5618bea8a91f9fa47d101",
+      "id": "PR-562",
+      "state": "READY"
+    },
+    {
+      "acceptance_digest": "d25c24ea9a57959cdaa4d8b1ee787f36f7cf55b9d033b8f1e2b150998a9d20dc",
+      "id": "PR-564",
+      "state": "READY"
+    },
+    {
+      "acceptance_digest": "61a734233f517805e73446f5ea100c4237b921218ab4ad413e8380c21ab05f5a",
+      "id": "PR-565",
+      "state": "READY"
+    }
+  ],
+  "ready_waves": [
+    [
+      "ISSUE-560",
+      "PR-395",
+      "PR-396",
+      "PR-419",
+      "PR-562"
+    ],
+    [
+      "PR-412",
+      "PR-420"
+    ],
+    [
+      "PR-450",
+      "PR-564"
+    ],
+    [
+      "ISSUE-566"
+    ],
+    [
+      "ISSUE-559",
+      "ISSUE-567",
+      "PR-565"
+    ],
+    [
+      "ISSUE-568"
+    ],
+    [
+      "ISSUE-569"
+    ],
+    [
+      "ISSUE-570"
+    ]
+  ],
+  "schema": "portfolio-multigraph/v1"
+}

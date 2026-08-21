@@ -6,6 +6,20 @@
   "required": ["schema", "profile", "skills", "runtime_capabilities", "authority"],
   "properties": {
     "schema": {"const": "repository-control-plane-profile/v1"},
+    "subject_pin": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Additive, optional. Records the exact skills-shared subjects a profile was authored against, so a bootstrap can refuse a stale or substituted pin instead of trusting whatever HEAD happens to be checked out. Absent on profiles (like the default) that do not pin a cross-directory subject.",
+      "required": ["main_commit", "owned_tree_path", "owned_tree", "candidate_commit", "candidate_source_path", "candidate_repin_policy"],
+      "properties": {
+        "main_commit": {"$ref": "#/$defs/sha1"},
+        "owned_tree_path": {"type": "string", "minLength": 1},
+        "owned_tree": {"$ref": "#/$defs/sha1"},
+        "candidate_commit": {"$ref": "#/$defs/sha1"},
+        "candidate_source_path": {"type": "string", "minLength": 1},
+        "candidate_repin_policy": {"type": "string", "minLength": 1}
+      }
+    },
     "profile": {"type": "string", "pattern": "^[a-z0-9-]+$"},
     "skills": {
       "type": "array",
@@ -49,5 +63,8 @@
         "credential_values": {"const": false}
       }
     }
+  },
+  "$defs": {
+    "sha1": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
   }
 }

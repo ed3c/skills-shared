@@ -1,0 +1,148 @@
+{
+  "digest": "c3d9925bf1427fc15063045bcd0bdeb108ce9d1f5c02652af0fceb70dc36ffc0",
+  "epoch_id": "PORTFOLIO-EPOCH-20260822-B",
+  "observed_at": "2026-08-22T00:00:00Z",
+  "repositories": [
+    {
+      "default_branch": "main",
+      "full_name": "ed3c/skills-shared",
+      "issues": [
+        {
+          "number": 560,
+          "state": "OPEN",
+          "updated_at": "2026-08-22T00:00:00Z"
+        },
+        {
+          "number": 566,
+          "state": "OPEN",
+          "updated_at": "2026-08-22T00:00:00Z"
+        },
+        {
+          "number": 559,
+          "state": "OPEN",
+          "updated_at": "2026-08-22T00:00:00Z"
+        },
+        {
+          "number": 567,
+          "state": "OPEN",
+          "updated_at": "2026-08-22T00:00:00Z"
+        },
+        {
+          "number": 568,
+          "state": "OPEN",
+          "updated_at": "2026-08-22T00:00:00Z"
+        },
+        {
+          "number": 569,
+          "state": "OPEN",
+          "updated_at": "2026-08-22T00:00:00Z"
+        },
+        {
+          "number": 570,
+          "state": "OPEN",
+          "updated_at": "2026-08-22T00:00:00Z"
+        }
+      ],
+      "issues_observed_at": "2026-08-22T00:00:00Z",
+      "main_commit": "28f394785aa8b13c4e6d2f21ad74c5e32a6a6dc5",
+      "main_tree": "8343d988e98d044402ccfbcd2cbe0e848f6e649f",
+      "path_writers": [
+        "main@ed3c/skills-shared: no branch switching allowed (local_writers[0])",
+        "worktree .claude/worktrees/integration-w8 branch agent/wave-8-portfolio head 75cd5a5: ACTIVE PEER SESSION skills-shared-97, DO NOT WRITE",
+        "worktree .claude/worktrees/issue-560-portfolio-control branch worktree-issue-560-portfolio-control (checked out as agent/560-portfolio-wave): THIS session, Tech Lead, exclusive lease until waves declared",
+        "worktree .claude/worktrees/wf_187a4bb9-606-* (1..4): residual workflow worktrees feeding wave-8, frozen inputs",
+        "worktree .claude/worktrees/agent-a2524489d6d83b5c8 branch dtcr/518-c0-contract: out of queue scope"
+      ],
+      "prs_observed_at": "2026-08-22T00:00:00Z",
+      "pull_requests": [
+        {
+          "base_commit": "3fc020414134999227aec6ba9304a08e86287033",
+          "head_commit": "bcafebe3399f971e490bf7fa861189db0415a8ea",
+          "number": 565,
+          "state": "DRAFT",
+          "updated_at": "2026-08-22T00:00:00Z"
+        },
+        {
+          "base_commit": "3fc020414134999227aec6ba9304a08e86287033",
+          "head_commit": "efb224dd97304136ef5c29a86ca812099aca8c9b",
+          "number": 564,
+          "state": "DRAFT",
+          "updated_at": "2026-08-22T00:00:00Z"
+        },
+        {
+          "base_commit": "174009203a3ff9bd6ebc4010bc6cab7232dd44a4",
+          "head_commit": "caedeb9e1dfb4fc149445c621f150740f3cdac91",
+          "number": 562,
+          "state": "DRAFT",
+          "updated_at": "2026-08-22T00:00:00Z"
+        },
+        {
+          "base_commit": "206ee94ff5c165b1af4f1c97c5206404916f8e37",
+          "head_commit": "6f0a96f488728dfd03f127a0575aaee37a1745d2",
+          "number": 450,
+          "state": "DRAFT",
+          "updated_at": "2026-08-22T00:00:00Z"
+        },
+        {
+          "base_commit": "05bfb9ed29b62adfaf8a451d117b41d3b0f825aa",
+          "head_commit": "206ee94ff5c165b1af4f1c97c5206404916f8e37",
+          "number": 420,
+          "state": "DRAFT",
+          "updated_at": "2026-08-22T00:00:00Z"
+        },
+        {
+          "base_commit": "01067581efa2b611c5d4bb8358ae568147eece40",
+          "head_commit": "94426ceeb6011af15e86b571bdcc7bd40bebf06f",
+          "number": 419,
+          "state": "DRAFT",
+          "updated_at": "2026-08-22T00:00:00Z"
+        },
+        {
+          "base_commit": "88ce642a7f198d88019aa8ae19e63631ae4999c2",
+          "head_commit": "01067581efa2b611c5d4bb8358ae568147eece40",
+          "number": 412,
+          "state": "DRAFT",
+          "updated_at": "2026-08-22T00:00:00Z"
+        },
+        {
+          "base_commit": "d411d2a9826aa8bb602a00db9c27d09f603e3538",
+          "head_commit": "98a6c53ca6aaf2bd562878648f774d6ad53ad6b5",
+          "number": 396,
+          "state": "DRAFT",
+          "updated_at": "2026-08-22T00:00:00Z"
+        },
+        {
+          "base_commit": "129f53c23a3ab15354763167b25bddc45f724c00",
+          "head_commit": "d411d2a9826aa8bb602a00db9c27d09f603e3538",
+          "number": 395,
+          "state": "DRAFT",
+          "updated_at": "2026-08-22T00:00:00Z"
+        }
+      ],
+      "visibility": "PUBLIC",
+      "workflows": [
+        "commit-role-subject-selection.yml",
+        "forgejo-delivery-loop.yml",
+        "git-town-stacked-pr-worker.yml",
+        "intent-promotion-authority.yml",
+        "issue-closure-contract.yml",
+        "productization-preflight.yml",
+        "repo-agent-native-contract.yml",
+        "shared-skills-infra.yml",
+        "skill-eval-contract.yml",
+        "skill-eval-physical-skill-up.yml",
+        "skill-suites.yml",
+        "wave3-github-dependency-live-canary-governance.yml",
+        "wave3-github-dependency-live-canary.yml"
+      ],
+      "workflows_observed_at": "2026-08-22T00:00:00Z"
+    }
+  ],
+  "runtime": {
+    "authority_ceiling": "read-only artifact authoring; no merge, release, gh call, or worktree git-state mutation authority in this session",
+    "class": "CLAUDE_CODE_LOCAL",
+    "host": "issue-560-portfolio-control worktree (portfolio-artifact authoring session)",
+    "local_checkout": "PASS"
+  },
+  "schema": "repository-portfolio-snapshot/v1"
+}

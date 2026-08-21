@@ -1,0 +1,86 @@
+{
+  "schema": "spatial-loop-case-graph/v1",
+  "subject": {
+    "id": "migration-copy-canary",
+    "revision": "fixture-v1",
+    "digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "intent_atoms": [
+    {"id": "INT-001", "statement": "Preserve target interface compatibility."},
+    {"id": "INT-002", "statement": "Copy source decision logic and observable branch behavior."}
+  ],
+  "semantic_axes": [
+    {"id": "AXIS-001", "name": "INTERFACE_COMPATIBILITY", "state": "APPLICABLE"},
+    {"id": "AXIS-002", "name": "CONTROL_FLOW_AND_DECISION_LOGIC", "state": "APPLICABLE"}
+  ],
+  "source_behaviors": [
+    {"id": "SRC-001", "statement": "Legacy-compatible request shape is accepted.", "disposition": "PRESERVE_OBSERVABLE", "decision_id": null},
+    {"id": "SRC-002", "statement": "Decision branch B returns the source-specific result for condition X.", "disposition": "PRESERVE_EXACT", "decision_id": null}
+  ],
+  "cases": [
+    {
+      "id": "CASE-001",
+      "classification": "REQUIRED_CASE",
+      "intent_ids": ["INT-001"],
+      "axis_ids": ["AXIS-001"],
+      "invariant_or_state_refs": ["INV-COMPAT"],
+      "implementation_ids": ["IMPL-001"],
+      "oracle_ids": ["ORACLE-001"],
+      "evidence_ids": ["EVID-001"],
+      "decision_id": null,
+      "evidence_state": "PASS"
+    },
+    {
+      "id": "CASE-002",
+      "classification": "REQUIRED_CASE",
+      "intent_ids": ["INT-002"],
+      "axis_ids": ["AXIS-002"],
+      "invariant_or_state_refs": ["INV-BRANCH-B"],
+      "implementation_ids": ["IMPL-002"],
+      "oracle_ids": ["ORACLE-002"],
+      "evidence_ids": ["EVID-002"],
+      "decision_id": null,
+      "evidence_state": "PASS"
+    }
+  ],
+  "implementations": [
+    {"id": "IMPL-001", "owner": "migration-worker", "subject_ref": "src/compat.py@fixture-v1", "subject_revision": "fixture-v1", "subject_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000", "convergence_owner": false},
+    {"id": "IMPL-002", "owner": "migration-worker", "subject_ref": "src/decision.py@fixture-v1", "subject_revision": "fixture-v1", "subject_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000", "convergence_owner": false}
+  ],
+  "oracles": [
+    {"id": "ORACLE-001", "procedure": "run compatibility contract test", "pass_condition": "legacy request remains accepted", "negative_control": "break request mapping and require red"},
+    {"id": "ORACLE-002", "procedure": "run differential source/target decision test", "pass_condition": "condition X preserves branch B result", "negative_control": "remove branch B while compatibility remains green; this oracle must turn red"}
+  ],
+  "evidence": [
+    {"id": "EVID-001", "state": "PASS", "subject_ref": "fixture://compat", "subject_revision": "fixture-v1", "subject_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000"},
+    {"id": "EVID-002", "state": "PASS", "subject_ref": "fixture://semantic-parity", "subject_revision": "fixture-v1", "subject_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000"}
+  ],
+  "decisions": [],
+  "edges": [
+    {"from": "INT-001", "to": "CASE-001", "kind": "REQUIRES"},
+    {"from": "AXIS-001", "to": "CASE-001", "kind": "COVERS"},
+    {"from": "SRC-001", "to": "CASE-001", "kind": "PRESERVED_BY"},
+    {"from": "CASE-001", "to": "IMPL-001", "kind": "IMPLEMENTED_BY"},
+    {"from": "CASE-001", "to": "ORACLE-001", "kind": "PROVED_BY"},
+    {"from": "ORACLE-001", "to": "EVID-001", "kind": "EMITS"},
+    {"from": "INT-002", "to": "CASE-002", "kind": "REQUIRES"},
+    {"from": "AXIS-002", "to": "CASE-002", "kind": "COVERS"},
+    {"from": "SRC-002", "to": "CASE-002", "kind": "PRESERVED_BY"},
+    {"from": "CASE-002", "to": "IMPL-002", "kind": "IMPLEMENTED_BY"},
+    {"from": "CASE-002", "to": "ORACLE-002", "kind": "PROVED_BY"},
+    {"from": "ORACLE-002", "to": "EVID-002", "kind": "EMITS"}
+  ],
+  "coverage": {
+    "intent": 1.0,
+    "source_behavior_disposition": 1.0,
+    "required_case": 1.0,
+    "implementation_binding": 1.0,
+    "oracle": 1.0,
+    "executed_evidence": 1.0,
+    "unknown_blocking_count": 0
+  },
+  "gate": {
+    "status": "READY_FOR_PUBLICATION_REVIEW",
+    "rationale": "All declared fixture intents, source behaviors, required cases, exact-subject implementation bindings, oracles and evidence references are closed."
+  }
+}

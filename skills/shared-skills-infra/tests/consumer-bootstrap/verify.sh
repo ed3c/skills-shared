@@ -17,3 +17,8 @@ python3 skills/shared-skills-infra/tests/consumer-bootstrap/verify.py
 # repository_control_plane.attach() -> shared_skills.py sync seam it stands
 # in for actually agrees with what consumer_bootstrap_receipt expects.
 python3 skills/shared-skills-infra/tests/consumer-bootstrap/verify_real_attach.py
+
+# #559: the github-portfolio-control profile is a second, profile-namespaced
+# bootstrap sharing this module family's primitives -- unconditional, no
+# existence guard, so it cannot silently fall out of this already-CI-wired step.
+bash "$(dirname "${BASH_SOURCE[0]}")/../consumer-bootstrap-ghpc/verify.sh"

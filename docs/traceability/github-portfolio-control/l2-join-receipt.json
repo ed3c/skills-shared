@@ -1,0 +1,880 @@
+{
+  "advanced_transitions": [
+    "ALL_REQUIRED_AGENTS_TERMINAL",
+    "RESULTS_SCHEMA_VALIDATED",
+    "FINDINGS_CONSOLIDATED"
+  ],
+  "authority": {
+    "merge": false,
+    "production": false,
+    "promotion": false,
+    "provider_execution": false,
+    "release": false
+  },
+  "consolidation": {
+    "agreements": [
+      "every claude-carrier read-only role reports the same four contract schemas parse cleanly against skills/agentic-tech-lead-orchestration/references/contracts/*.schema.json",
+      "the codex release-auditor's schema-parse and ghpc-routing findings match the claude-carrier portfolio-explorer's independent foundation-comparator read",
+      "all seven codex-agents/*.toml.template roles are confirmed present by both the claude dependency-auditor and the codex release-auditor"
+    ],
+    "contradictions": [],
+    "omissions": [
+      "codex-cli was not exercised in the portfolio-explorer, acceptance-adversary, dependency-auditor, runtime-admission-auditor, consolidation-verifier or implementation-worker roles this epoch; those six lanes are AVAILABLE_NOT_EXERCISED, never ABSENT",
+      "the shadow-architect adversarial review (claude-opus-5[1m], self-reported) is a separate composed authority owned by procedural-shadow-runtime, outside the seven ghpc/subagent-join/v1 dispatch roles, and is not represented as a requested_agents entry here"
+    ],
+    "unresolved_blockers": [
+      "merge, release and human-admit of the #560 portfolio wave remain outside this join's authority per the pinned authority block"
+    ]
+  },
+  "coordinator_instruction": "Use subagents. Wait for all agents and consolidate their findings.",
+  "epoch_ref": {
+    "main_commit": "28f394785aa8b13c4e6d2f21ad74c5e32a6a6dc5",
+    "tree": "8343d988e98d044402ccfbcd2cbe0e848f6e649f"
+  },
+  "evidence_ceiling": "JOIN_DENOMINATOR_ONLY",
+  "human_owned_operations": [
+    "merge and release",
+    "admitting a provider data-egress boundary for private repository content",
+    "closing an Issue against unresolved acceptance"
+  ],
+  "join_id": "GHPC-JOIN-002",
+  "join_state": "FINDINGS_CONSOLIDATED",
+  "requested_agents": [
+    {
+      "agent_id": "claude-portfolio-explorer-foundation-comparator",
+      "attempt": 1,
+      "base_commit": "04756de8f8d522d41d23fee33320923715439a58",
+      "data_boundary": {
+        "egress_admission": "NOT_REQUIRED",
+        "provider_boundary_crossed": false,
+        "repository_visibility": "PUBLIC"
+      },
+      "host": "CLAUDE_CODE_LOCAL",
+      "in_denominator": true,
+      "lease": {
+        "mode": "READ_ONLY",
+        "paths": []
+      },
+      "model_binding": {
+        "alias": "OPUS_5",
+        "availability": "AVAILABLE",
+        "carrier": "claude-code Workflow/Agent subagent",
+        "config_effort": null,
+        "exact_model": null,
+        "identity_grade": "ALIAS_ONLY",
+        "provider": "anthropic"
+      },
+      "result_digest": "sha256:8e1c7293e99ccc0ecaef4e06da25e20b2f42d0dafb2ec997122f384abe8e9952",
+      "role": "portfolio-explorer",
+      "task_id": "GHPC-TASK-001",
+      "terminal_state": "COMPLETED",
+      "tree": "9627d4adf777f42972d723084947d539520a23de"
+    },
+    {
+      "agent_id": "claude-acceptance-adversary-1",
+      "attempt": 1,
+      "base_commit": "04756de8f8d522d41d23fee33320923715439a58",
+      "data_boundary": {
+        "egress_admission": "NOT_REQUIRED",
+        "provider_boundary_crossed": false,
+        "repository_visibility": "PUBLIC"
+      },
+      "host": "CLAUDE_CODE_LOCAL",
+      "in_denominator": true,
+      "lease": {
+        "mode": "READ_ONLY",
+        "paths": []
+      },
+      "model_binding": {
+        "alias": "OPUS_5",
+        "availability": "AVAILABLE",
+        "carrier": "claude-code Workflow/Agent subagent",
+        "config_effort": null,
+        "exact_model": null,
+        "identity_grade": "ALIAS_ONLY",
+        "provider": "anthropic"
+      },
+      "result_digest": "sha256:4f3f7d86f807e1c873332cf33ce5862f797529f83fcf747bcbfe33c062774504",
+      "role": "acceptance-adversary",
+      "task_id": "GHPC-TASK-002",
+      "terminal_state": "COMPLETED",
+      "tree": "9627d4adf777f42972d723084947d539520a23de"
+    },
+    {
+      "agent_id": "claude-acceptance-adversary-2",
+      "attempt": 1,
+      "base_commit": "04756de8f8d522d41d23fee33320923715439a58",
+      "data_boundary": {
+        "egress_admission": "NOT_REQUIRED",
+        "provider_boundary_crossed": false,
+        "repository_visibility": "PUBLIC"
+      },
+      "host": "CLAUDE_CODE_LOCAL",
+      "in_denominator": true,
+      "lease": {
+        "mode": "READ_ONLY",
+        "paths": []
+      },
+      "model_binding": {
+        "alias": "OPUS_5",
+        "availability": "AVAILABLE",
+        "carrier": "claude-code Workflow/Agent subagent",
+        "config_effort": null,
+        "exact_model": null,
+        "identity_grade": "ALIAS_ONLY",
+        "provider": "anthropic"
+      },
+      "result_digest": "sha256:6a3d7e24252b3c0deb118a2c254864db74b4b8a8e57fab6136db3158f6d59ce6",
+      "role": "acceptance-adversary",
+      "task_id": "GHPC-TASK-003",
+      "terminal_state": "COMPLETED",
+      "tree": "9627d4adf777f42972d723084947d539520a23de"
+    },
+    {
+      "agent_id": "claude-dependency-auditor",
+      "attempt": 1,
+      "base_commit": "04756de8f8d522d41d23fee33320923715439a58",
+      "data_boundary": {
+        "egress_admission": "NOT_REQUIRED",
+        "provider_boundary_crossed": false,
+        "repository_visibility": "PUBLIC"
+      },
+      "host": "CLAUDE_CODE_LOCAL",
+      "in_denominator": true,
+      "lease": {
+        "mode": "READ_ONLY",
+        "paths": []
+      },
+      "model_binding": {
+        "alias": "SONNET_5",
+        "availability": "AVAILABLE",
+        "carrier": "claude-code Workflow/Agent subagent",
+        "config_effort": null,
+        "exact_model": null,
+        "identity_grade": "ALIAS_ONLY",
+        "provider": "anthropic"
+      },
+      "result_digest": "sha256:eeb83ba0c33d7d1de446f7371b4dbcf4445edf357bd6842ac57964571df369a4",
+      "role": "dependency-auditor",
+      "task_id": "GHPC-TASK-004",
+      "terminal_state": "COMPLETED",
+      "tree": "9627d4adf777f42972d723084947d539520a23de"
+    },
+    {
+      "agent_id": "claude-runtime-admission-auditor",
+      "attempt": 1,
+      "base_commit": "04756de8f8d522d41d23fee33320923715439a58",
+      "data_boundary": {
+        "egress_admission": "NOT_REQUIRED",
+        "provider_boundary_crossed": false,
+        "repository_visibility": "PUBLIC"
+      },
+      "host": "CLAUDE_CODE_LOCAL",
+      "in_denominator": true,
+      "lease": {
+        "mode": "READ_ONLY",
+        "paths": []
+      },
+      "model_binding": {
+        "alias": "SONNET_5",
+        "availability": "AVAILABLE",
+        "carrier": "claude-code Workflow/Agent subagent",
+        "config_effort": null,
+        "exact_model": null,
+        "identity_grade": "ALIAS_ONLY",
+        "provider": "anthropic"
+      },
+      "result_digest": "sha256:f2a466d3ddf7ee723592b78a6027d5509c2fcbdf94b314e4c734e33caf446d0d",
+      "role": "runtime-admission-auditor",
+      "task_id": "GHPC-TASK-005",
+      "terminal_state": "COMPLETED",
+      "tree": "9627d4adf777f42972d723084947d539520a23de"
+    },
+    {
+      "agent_id": "claude-consolidation-verifier",
+      "attempt": 1,
+      "base_commit": "04756de8f8d522d41d23fee33320923715439a58",
+      "data_boundary": {
+        "egress_admission": "NOT_REQUIRED",
+        "provider_boundary_crossed": false,
+        "repository_visibility": "PUBLIC"
+      },
+      "host": "CLAUDE_CODE_LOCAL",
+      "in_denominator": true,
+      "lease": {
+        "mode": "READ_ONLY",
+        "paths": []
+      },
+      "model_binding": {
+        "alias": "OPUS_5",
+        "availability": "AVAILABLE",
+        "carrier": "claude-code Workflow/Agent subagent",
+        "config_effort": null,
+        "exact_model": null,
+        "identity_grade": "ALIAS_ONLY",
+        "provider": "anthropic"
+      },
+      "result_digest": "sha256:44720fab26f30c90cf1e4268805ff274ea3162dd51f7d86d5ebd8cb1f5f19750",
+      "role": "consolidation-verifier",
+      "task_id": "GHPC-TASK-006",
+      "terminal_state": "COMPLETED",
+      "tree": "9627d4adf777f42972d723084947d539520a23de"
+    },
+    {
+      "agent_id": "claude-release-auditor-analog-1",
+      "attempt": 1,
+      "base_commit": "04756de8f8d522d41d23fee33320923715439a58",
+      "data_boundary": {
+        "egress_admission": "NOT_REQUIRED",
+        "provider_boundary_crossed": false,
+        "repository_visibility": "PUBLIC"
+      },
+      "host": "CLAUDE_CODE_LOCAL",
+      "in_denominator": true,
+      "lease": {
+        "mode": "READ_ONLY",
+        "paths": []
+      },
+      "model_binding": {
+        "alias": "OPUS_5",
+        "availability": "AVAILABLE",
+        "carrier": "claude-code Workflow/Agent subagent",
+        "config_effort": null,
+        "exact_model": null,
+        "identity_grade": "ALIAS_ONLY",
+        "provider": "anthropic"
+      },
+      "result_digest": "sha256:a2bb08cfe3f95f69a90c69c995be108adab296c8ccc18e4e842bf788f1fc40fd",
+      "role": "release-auditor",
+      "task_id": "GHPC-TASK-007",
+      "terminal_state": "COMPLETED",
+      "tree": "9627d4adf777f42972d723084947d539520a23de"
+    },
+    {
+      "agent_id": "claude-release-auditor-analog-2",
+      "attempt": 1,
+      "base_commit": "04756de8f8d522d41d23fee33320923715439a58",
+      "data_boundary": {
+        "egress_admission": "NOT_REQUIRED",
+        "provider_boundary_crossed": false,
+        "repository_visibility": "PUBLIC"
+      },
+      "host": "CLAUDE_CODE_LOCAL",
+      "in_denominator": true,
+      "lease": {
+        "mode": "READ_ONLY",
+        "paths": []
+      },
+      "model_binding": {
+        "alias": "OPUS_5",
+        "availability": "AVAILABLE",
+        "carrier": "claude-code Workflow/Agent subagent",
+        "config_effort": null,
+        "exact_model": null,
+        "identity_grade": "ALIAS_ONLY",
+        "provider": "anthropic"
+      },
+      "result_digest": "sha256:7daf6f62de722bc0e41ee44c7aefdb689030f689d1316ef10b981427b2ad623c",
+      "role": "release-auditor",
+      "task_id": "GHPC-TASK-008",
+      "terminal_state": "COMPLETED",
+      "tree": "9627d4adf777f42972d723084947d539520a23de"
+    },
+    {
+      "agent_id": "claude-release-auditor-analog-3",
+      "attempt": 1,
+      "base_commit": "04756de8f8d522d41d23fee33320923715439a58",
+      "data_boundary": {
+        "egress_admission": "NOT_REQUIRED",
+        "provider_boundary_crossed": false,
+        "repository_visibility": "PUBLIC"
+      },
+      "host": "CLAUDE_CODE_LOCAL",
+      "in_denominator": true,
+      "lease": {
+        "mode": "READ_ONLY",
+        "paths": []
+      },
+      "model_binding": {
+        "alias": "OPUS_5",
+        "availability": "AVAILABLE",
+        "carrier": "claude-code Workflow/Agent subagent",
+        "config_effort": null,
+        "exact_model": null,
+        "identity_grade": "ALIAS_ONLY",
+        "provider": "anthropic"
+      },
+      "result_digest": "sha256:552f5f76e24d2ab270432caa537556f786198e2ca6ad98c48ade93d9337056d4",
+      "role": "release-auditor",
+      "task_id": "GHPC-TASK-009",
+      "terminal_state": "COMPLETED",
+      "tree": "9627d4adf777f42972d723084947d539520a23de"
+    },
+    {
+      "agent_id": "claude-release-auditor-analog-4",
+      "attempt": 1,
+      "base_commit": "04756de8f8d522d41d23fee33320923715439a58",
+      "data_boundary": {
+        "egress_admission": "NOT_REQUIRED",
+        "provider_boundary_crossed": false,
+        "repository_visibility": "PUBLIC"
+      },
+      "host": "CLAUDE_CODE_LOCAL",
+      "in_denominator": true,
+      "lease": {
+        "mode": "READ_ONLY",
+        "paths": []
+      },
+      "model_binding": {
+        "alias": "OPUS_5",
+        "availability": "AVAILABLE",
+        "carrier": "claude-code Workflow/Agent subagent",
+        "config_effort": null,
+        "exact_model": null,
+        "identity_grade": "ALIAS_ONLY",
+        "provider": "anthropic"
+      },
+      "result_digest": "sha256:8605157f0d389d421dc9d9200e9cf036ceba74ae99f4dc0a327800e4b7e8f9f3",
+      "role": "release-auditor",
+      "task_id": "GHPC-TASK-010",
+      "terminal_state": "COMPLETED",
+      "tree": "9627d4adf777f42972d723084947d539520a23de"
+    },
+    {
+      "agent_id": "claude-release-auditor-analog-5",
+      "attempt": 1,
+      "base_commit": "04756de8f8d522d41d23fee33320923715439a58",
+      "data_boundary": {
+        "egress_admission": "NOT_REQUIRED",
+        "provider_boundary_crossed": false,
+        "repository_visibility": "PUBLIC"
+      },
+      "host": "CLAUDE_CODE_LOCAL",
+      "in_denominator": true,
+      "lease": {
+        "mode": "READ_ONLY",
+        "paths": []
+      },
+      "model_binding": {
+        "alias": "OPUS_5",
+        "availability": "AVAILABLE",
+        "carrier": "claude-code Workflow/Agent subagent",
+        "config_effort": null,
+        "exact_model": null,
+        "identity_grade": "ALIAS_ONLY",
+        "provider": "anthropic"
+      },
+      "result_digest": "sha256:44567c92089e251c430a01a6ec13782ce8071374fd6086c2c941017a9facb2ae",
+      "role": "release-auditor",
+      "task_id": "GHPC-TASK-011",
+      "terminal_state": "COMPLETED",
+      "tree": "9627d4adf777f42972d723084947d539520a23de"
+    },
+    {
+      "agent_id": "claude-release-auditor-analog-6",
+      "attempt": 1,
+      "base_commit": "04756de8f8d522d41d23fee33320923715439a58",
+      "data_boundary": {
+        "egress_admission": "NOT_REQUIRED",
+        "provider_boundary_crossed": false,
+        "repository_visibility": "PUBLIC"
+      },
+      "host": "CLAUDE_CODE_LOCAL",
+      "in_denominator": true,
+      "lease": {
+        "mode": "READ_ONLY",
+        "paths": []
+      },
+      "model_binding": {
+        "alias": "OPUS_5",
+        "availability": "AVAILABLE",
+        "carrier": "claude-code Workflow/Agent subagent",
+        "config_effort": null,
+        "exact_model": null,
+        "identity_grade": "ALIAS_ONLY",
+        "provider": "anthropic"
+      },
+      "result_digest": "sha256:8e41e097f072b605e8eaae6b489fe98b055edbc70a08e5819f289ac9e0fee9b6",
+      "role": "release-auditor",
+      "task_id": "GHPC-TASK-012",
+      "terminal_state": "COMPLETED",
+      "tree": "9627d4adf777f42972d723084947d539520a23de"
+    },
+    {
+      "agent_id": "claude-release-auditor-analog-7",
+      "attempt": 1,
+      "base_commit": "04756de8f8d522d41d23fee33320923715439a58",
+      "data_boundary": {
+        "egress_admission": "NOT_REQUIRED",
+        "provider_boundary_crossed": false,
+        "repository_visibility": "PUBLIC"
+      },
+      "host": "CLAUDE_CODE_LOCAL",
+      "in_denominator": true,
+      "lease": {
+        "mode": "READ_ONLY",
+        "paths": []
+      },
+      "model_binding": {
+        "alias": "OPUS_5",
+        "availability": "AVAILABLE",
+        "carrier": "claude-code Workflow/Agent subagent",
+        "config_effort": null,
+        "exact_model": null,
+        "identity_grade": "ALIAS_ONLY",
+        "provider": "anthropic"
+      },
+      "result_digest": "sha256:407e495f1651f345a2c309fd5f623a1549ca043eb75842d839d2b0b28c8f9434",
+      "role": "release-auditor",
+      "task_id": "GHPC-TASK-013",
+      "terminal_state": "COMPLETED",
+      "tree": "9627d4adf777f42972d723084947d539520a23de"
+    },
+    {
+      "agent_id": "claude-worker-l1-portfolio-core",
+      "attempt": 1,
+      "base_commit": "aad3ff0728b9519615b63be80c225389005bfc1d",
+      "data_boundary": {
+        "egress_admission": "NOT_REQUIRED",
+        "provider_boundary_crossed": false,
+        "repository_visibility": "PUBLIC"
+      },
+      "host": "CLAUDE_CODE_LOCAL",
+      "in_denominator": true,
+      "lease": {
+        "mode": "EXCLUSIVE_WRITE",
+        "paths": [
+          "skills/agentic-tech-lead-orchestration/scripts/**",
+          "skills/agentic-tech-lead-orchestration/references/contracts/**"
+        ]
+      },
+      "model_binding": {
+        "alias": "SONNET_5",
+        "availability": "AVAILABLE",
+        "carrier": "claude-code Workflow/Agent subagent",
+        "config_effort": null,
+        "exact_model": null,
+        "identity_grade": "ALIAS_ONLY",
+        "provider": "anthropic"
+      },
+      "result_digest": "sha256:6529b35c779b70e1327120ed5192a5a6af846ce1c9a3c2839f609786f5202478",
+      "role": "implementation-worker",
+      "task_id": "GHPC-TASK-014",
+      "terminal_state": "COMPLETED",
+      "tree": "4d3e438cd468badf817548b34c1769dcb394001d"
+    },
+    {
+      "agent_id": "claude-worker-b1-bootstrap",
+      "attempt": 1,
+      "base_commit": "3fc020414134999227aec6ba9304a08e86287033",
+      "data_boundary": {
+        "egress_admission": "NOT_REQUIRED",
+        "provider_boundary_crossed": false,
+        "repository_visibility": "PUBLIC"
+      },
+      "host": "CLAUDE_CODE_LOCAL",
+      "in_denominator": true,
+      "lease": {
+        "mode": "EXCLUSIVE_WRITE",
+        "paths": [
+          "skills/shared-skills-infra/**"
+        ]
+      },
+      "model_binding": {
+        "alias": "SONNET_5",
+        "availability": "AVAILABLE",
+        "carrier": "claude-code Workflow/Agent subagent",
+        "config_effort": null,
+        "exact_model": null,
+        "identity_grade": "ALIAS_ONLY",
+        "provider": "anthropic"
+      },
+      "result_digest": "sha256:76a508306c679f54fd1c20e0bd3820f6de55368c87d66d82be8bfb3803451c38",
+      "role": "implementation-worker",
+      "task_id": "GHPC-TASK-015",
+      "terminal_state": "COMPLETED",
+      "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d"
+    },
+    {
+      "agent_id": "claude-worker-replay-395",
+      "attempt": 1,
+      "base_commit": "abeeeae37b44d3a2094301bf5a1b8250b2675432",
+      "data_boundary": {
+        "egress_admission": "NOT_REQUIRED",
+        "provider_boundary_crossed": false,
+        "repository_visibility": "PUBLIC"
+      },
+      "host": "CLAUDE_CODE_LOCAL",
+      "in_denominator": true,
+      "lease": {
+        "mode": "EXCLUSIVE_WRITE",
+        "paths": [
+          "skills/human-led-agentic-engineering/**"
+        ]
+      },
+      "model_binding": {
+        "alias": "SONNET_5",
+        "availability": "AVAILABLE",
+        "carrier": "claude-code Workflow/Agent subagent",
+        "config_effort": null,
+        "exact_model": null,
+        "identity_grade": "ALIAS_ONLY",
+        "provider": "anthropic"
+      },
+      "result_digest": "sha256:7f004f3bea1958211374d7bf8ff72e07e7b4448d6f4a2f102182ef1ea5e3d517",
+      "role": "implementation-worker",
+      "task_id": "GHPC-TASK-016",
+      "terminal_state": "COMPLETED",
+      "tree": "d2ee3f436641f371754e8f28e5f9b45b35945ba7"
+    },
+    {
+      "agent_id": "claude-worker-replay-396",
+      "attempt": 1,
+      "base_commit": "97570c753c0fc85fe479eb912d74ba8c02d0940a",
+      "data_boundary": {
+        "egress_admission": "NOT_REQUIRED",
+        "provider_boundary_crossed": false,
+        "repository_visibility": "PUBLIC"
+      },
+      "host": "CLAUDE_CODE_LOCAL",
+      "in_denominator": true,
+      "lease": {
+        "mode": "EXCLUSIVE_WRITE",
+        "paths": [
+          "docs/traceability/KENN_AGENTIC_ENGINEERING_CLOSURE.md",
+          "skills/git-town-stacked-pr-worker/references/KENN_AGENTIC_ENGINEERING_STACK.md"
+        ]
+      },
+      "model_binding": {
+        "alias": "SONNET_5",
+        "availability": "AVAILABLE",
+        "carrier": "claude-code Workflow/Agent subagent",
+        "config_effort": null,
+        "exact_model": null,
+        "identity_grade": "ALIAS_ONLY",
+        "provider": "anthropic"
+      },
+      "result_digest": "sha256:25aeca4e86aa99a81e20e0ee3b513c3b89c0a63b867842b54b042ad68d12e22a",
+      "role": "implementation-worker",
+      "task_id": "GHPC-TASK-017",
+      "terminal_state": "COMPLETED",
+      "tree": "d06af746b77a9ebc98b5821f54b1e01664aedf7e"
+    },
+    {
+      "agent_id": "claude-worker-replay-419-412",
+      "attempt": 1,
+      "base_commit": "c27f8c3b75b4eea1d8cff77684a1fd276d78b079",
+      "data_boundary": {
+        "egress_admission": "NOT_REQUIRED",
+        "provider_boundary_crossed": false,
+        "repository_visibility": "PUBLIC"
+      },
+      "host": "CLAUDE_CODE_LOCAL",
+      "in_denominator": true,
+      "lease": {
+        "mode": "EXCLUSIVE_WRITE",
+        "paths": [
+          "skills/intent-to-evidence-knowledge-graph/**"
+        ]
+      },
+      "model_binding": {
+        "alias": "SONNET_5",
+        "availability": "AVAILABLE",
+        "carrier": "claude-code Workflow/Agent subagent",
+        "config_effort": null,
+        "exact_model": null,
+        "identity_grade": "ALIAS_ONLY",
+        "provider": "anthropic"
+      },
+      "result_digest": "sha256:881acf7c65b5d57d959757ed24c01d63eecc85ead2101beee8bf346d626a277c",
+      "role": "implementation-worker",
+      "task_id": "GHPC-TASK-018",
+      "terminal_state": "COMPLETED",
+      "tree": "452b5f015396dc688c9f83aa2a01dfffd21efbbb"
+    },
+    {
+      "agent_id": "claude-worker-replay-420",
+      "attempt": 1,
+      "base_commit": "6685da6baf948889ddb52de23b59873af1e0c727",
+      "data_boundary": {
+        "egress_admission": "NOT_REQUIRED",
+        "provider_boundary_crossed": false,
+        "repository_visibility": "PUBLIC"
+      },
+      "host": "CLAUDE_CODE_LOCAL",
+      "in_denominator": true,
+      "lease": {
+        "mode": "EXCLUSIVE_WRITE",
+        "paths": [
+          "skills/intent-to-evidence-knowledge-graph/**"
+        ]
+      },
+      "model_binding": {
+        "alias": "SONNET_5",
+        "availability": "AVAILABLE",
+        "carrier": "claude-code Workflow/Agent subagent",
+        "config_effort": null,
+        "exact_model": null,
+        "identity_grade": "ALIAS_ONLY",
+        "provider": "anthropic"
+      },
+      "result_digest": "sha256:d7c33fe1c638b8171734b4e9600ad35024cb6e27ffffb9b6f3781198a235b1dc",
+      "role": "implementation-worker",
+      "task_id": "GHPC-TASK-019",
+      "terminal_state": "COMPLETED",
+      "tree": "9bb6e9bfde3539e8302a9974a5e768f9c8728465"
+    },
+    {
+      "agent_id": "claude-worker-replay-450",
+      "attempt": 1,
+      "base_commit": "f6103e3bdadee3545d8a6320b735c8a6da79cc78",
+      "data_boundary": {
+        "egress_admission": "NOT_REQUIRED",
+        "provider_boundary_crossed": false,
+        "repository_visibility": "PUBLIC"
+      },
+      "host": "CLAUDE_CODE_LOCAL",
+      "in_denominator": true,
+      "lease": {
+        "mode": "EXCLUSIVE_WRITE",
+        "paths": [
+          "skills/intent-to-evidence-knowledge-graph/**"
+        ]
+      },
+      "model_binding": {
+        "alias": "SONNET_5",
+        "availability": "AVAILABLE",
+        "carrier": "claude-code Workflow/Agent subagent",
+        "config_effort": null,
+        "exact_model": null,
+        "identity_grade": "ALIAS_ONLY",
+        "provider": "anthropic"
+      },
+      "result_digest": "sha256:924c188b25682ba7306e7f33ce45c5ed066d32a3e1970e048ce6c83f4f872986",
+      "role": "implementation-worker",
+      "task_id": "GHPC-TASK-020",
+      "terminal_state": "COMPLETED",
+      "tree": "65ac3d0a42ebdf430261c2a423d12fb74902cf11"
+    },
+    {
+      "agent_id": "codex-release-auditor-l2-exercise",
+      "attempt": 1,
+      "base_commit": "aad3ff0728b9519615b63be80c225389005bfc1d",
+      "data_boundary": {
+        "egress_admission": "NOT_REQUIRED",
+        "provider_boundary_crossed": false,
+        "repository_visibility": "PUBLIC"
+      },
+      "host": "CODEX_CLI_LOCAL",
+      "in_denominator": true,
+      "lease": {
+        "mode": "READ_ONLY",
+        "paths": []
+      },
+      "model_binding": {
+        "alias": "OPUS_5",
+        "availability": "AVAILABLE",
+        "carrier": "codex-cli",
+        "config_effort": null,
+        "exact_model": "GPT-5",
+        "identity_grade": "SELF_REPORTED",
+        "provider": "openai"
+      },
+      "result_digest": "sha256:78f94c1ca285120b096b37415c28d2143b9b710e40f25b0961c6906ff1ac5447",
+      "role": "release-auditor",
+      "task_id": "GHPC-TASK-021",
+      "terminal_state": "COMPLETED",
+      "tree": "4d3e438cd468badf817548b34c1769dcb394001d"
+    },
+    {
+      "agent_id": "codex-portfolio-explorer-not-exercised-01",
+      "attempt": 1,
+      "base_commit": "28f394785aa8b13c4e6d2f21ad74c5e32a6a6dc5",
+      "data_boundary": {
+        "egress_admission": "NOT_REQUIRED",
+        "provider_boundary_crossed": false,
+        "repository_visibility": "PUBLIC"
+      },
+      "host": "CODEX_CLI_LOCAL",
+      "in_denominator": true,
+      "lease": {
+        "mode": "NONE",
+        "paths": []
+      },
+      "model_binding": {
+        "alias": "OPUS_5",
+        "availability": "ABSENT",
+        "carrier": "codex-cli",
+        "config_effort": null,
+        "exact_model": null,
+        "identity_grade": "ALIAS_ONLY",
+        "provider": "openai"
+      },
+      "result_digest": null,
+      "role": "portfolio-explorer",
+      "task_id": "GHPC-TASK-022",
+      "terminal_state": "UNAVAILABLE",
+      "tree": "8343d988e98d044402ccfbcd2cbe0e848f6e649f"
+    },
+    {
+      "agent_id": "codex-acceptance-adversary-not-exercised-02",
+      "attempt": 1,
+      "base_commit": "28f394785aa8b13c4e6d2f21ad74c5e32a6a6dc5",
+      "data_boundary": {
+        "egress_admission": "NOT_REQUIRED",
+        "provider_boundary_crossed": false,
+        "repository_visibility": "PUBLIC"
+      },
+      "host": "CODEX_CLI_LOCAL",
+      "in_denominator": true,
+      "lease": {
+        "mode": "NONE",
+        "paths": []
+      },
+      "model_binding": {
+        "alias": "OPUS_5",
+        "availability": "ABSENT",
+        "carrier": "codex-cli",
+        "config_effort": null,
+        "exact_model": null,
+        "identity_grade": "ALIAS_ONLY",
+        "provider": "openai"
+      },
+      "result_digest": null,
+      "role": "acceptance-adversary",
+      "task_id": "GHPC-TASK-023",
+      "terminal_state": "UNAVAILABLE",
+      "tree": "8343d988e98d044402ccfbcd2cbe0e848f6e649f"
+    },
+    {
+      "agent_id": "codex-dependency-auditor-not-exercised-03",
+      "attempt": 1,
+      "base_commit": "28f394785aa8b13c4e6d2f21ad74c5e32a6a6dc5",
+      "data_boundary": {
+        "egress_admission": "NOT_REQUIRED",
+        "provider_boundary_crossed": false,
+        "repository_visibility": "PUBLIC"
+      },
+      "host": "CODEX_CLI_LOCAL",
+      "in_denominator": true,
+      "lease": {
+        "mode": "NONE",
+        "paths": []
+      },
+      "model_binding": {
+        "alias": "SONNET_5",
+        "availability": "ABSENT",
+        "carrier": "codex-cli",
+        "config_effort": null,
+        "exact_model": null,
+        "identity_grade": "ALIAS_ONLY",
+        "provider": "openai"
+      },
+      "result_digest": null,
+      "role": "dependency-auditor",
+      "task_id": "GHPC-TASK-024",
+      "terminal_state": "UNAVAILABLE",
+      "tree": "8343d988e98d044402ccfbcd2cbe0e848f6e649f"
+    },
+    {
+      "agent_id": "codex-runtime-admission-auditor-not-exercised-04",
+      "attempt": 1,
+      "base_commit": "28f394785aa8b13c4e6d2f21ad74c5e32a6a6dc5",
+      "data_boundary": {
+        "egress_admission": "NOT_REQUIRED",
+        "provider_boundary_crossed": false,
+        "repository_visibility": "PUBLIC"
+      },
+      "host": "CODEX_CLI_LOCAL",
+      "in_denominator": true,
+      "lease": {
+        "mode": "NONE",
+        "paths": []
+      },
+      "model_binding": {
+        "alias": "SONNET_5",
+        "availability": "ABSENT",
+        "carrier": "codex-cli",
+        "config_effort": null,
+        "exact_model": null,
+        "identity_grade": "ALIAS_ONLY",
+        "provider": "openai"
+      },
+      "result_digest": null,
+      "role": "runtime-admission-auditor",
+      "task_id": "GHPC-TASK-025",
+      "terminal_state": "UNAVAILABLE",
+      "tree": "8343d988e98d044402ccfbcd2cbe0e848f6e649f"
+    },
+    {
+      "agent_id": "codex-consolidation-verifier-not-exercised-05",
+      "attempt": 1,
+      "base_commit": "28f394785aa8b13c4e6d2f21ad74c5e32a6a6dc5",
+      "data_boundary": {
+        "egress_admission": "NOT_REQUIRED",
+        "provider_boundary_crossed": false,
+        "repository_visibility": "PUBLIC"
+      },
+      "host": "CODEX_CLI_LOCAL",
+      "in_denominator": true,
+      "lease": {
+        "mode": "NONE",
+        "paths": []
+      },
+      "model_binding": {
+        "alias": "OPUS_5",
+        "availability": "ABSENT",
+        "carrier": "codex-cli",
+        "config_effort": null,
+        "exact_model": null,
+        "identity_grade": "ALIAS_ONLY",
+        "provider": "openai"
+      },
+      "result_digest": null,
+      "role": "consolidation-verifier",
+      "task_id": "GHPC-TASK-026",
+      "terminal_state": "UNAVAILABLE",
+      "tree": "8343d988e98d044402ccfbcd2cbe0e848f6e649f"
+    },
+    {
+      "agent_id": "codex-implementation-worker-not-exercised-06",
+      "attempt": 1,
+      "base_commit": "28f394785aa8b13c4e6d2f21ad74c5e32a6a6dc5",
+      "data_boundary": {
+        "egress_admission": "NOT_REQUIRED",
+        "provider_boundary_crossed": false,
+        "repository_visibility": "PUBLIC"
+      },
+      "host": "CODEX_CLI_LOCAL",
+      "in_denominator": true,
+      "lease": {
+        "mode": "NONE",
+        "paths": []
+      },
+      "model_binding": {
+        "alias": "SONNET_5",
+        "availability": "ABSENT",
+        "carrier": "codex-cli",
+        "config_effort": null,
+        "exact_model": null,
+        "identity_grade": "ALIAS_ONLY",
+        "provider": "openai"
+      },
+      "result_digest": null,
+      "role": "implementation-worker",
+      "task_id": "GHPC-TASK-027",
+      "terminal_state": "UNAVAILABLE",
+      "tree": "8343d988e98d044402ccfbcd2cbe0e848f6e649f"
+    }
+  ],
+  "required_roles": [
+    "portfolio-explorer",
+    "acceptance-adversary",
+    "dependency-auditor",
+    "runtime-admission-auditor",
+    "implementation-worker",
+    "consolidation-verifier",
+    "release-auditor"
+  ],
+  "schema": "ghpc/subagent-join/v1"
+}

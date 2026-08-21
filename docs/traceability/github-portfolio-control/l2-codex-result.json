@@ -1,0 +1,37 @@
+{
+  "exercise": "issue-567 L2 real Codex CLI subagent, read-only release-auditor role",
+  "observed": "2026-08-22",
+  "carrier": {
+    "binary": "/Users/neon/.local/bin/codex",
+    "version_receipt": "codex-cli 0.148.0 (captured via --version in this session)",
+    "invocation_path": "Claude Code codex plugin 1.0.6 -> codex:codex-rescue forwarder -> codex-companion.mjs task (read-only requested)"
+  },
+  "self_reported_identity": {"model": "GPT-5", "sandbox": "read-only", "note": "model string is the agent's self-report; exact dated model version not resolved — record as SELF_REPORTED, never EXACT_BOUND"},
+  "subject": {"branch": "agent/566-portfolio-core", "head": "aad3ff0728b9519615b63be80c225389005bfc1d", "tree": "4d3e438cd468badf817548b34c1769dcb394001d"},
+  "result": {
+    "head_matches_tech_lead_record": true,
+    "schemas": [
+      {"path": "skills/agentic-tech-lead-orchestration/references/contracts/repository-portfolio-snapshot.schema.json", "parses": true, "id": "https://skills-shared.dev/contracts/repository-portfolio-snapshot/v1"},
+      {"path": "skills/agentic-tech-lead-orchestration/references/contracts/issue-pr-acceptance.schema.json", "parses": true, "id": "https://skills-shared.dev/contracts/issue-pr-acceptance/v1"},
+      {"path": "skills/agentic-tech-lead-orchestration/references/contracts/portfolio-multigraph.schema.json", "parses": true, "id": "https://skills-shared.dev/contracts/portfolio-multigraph/v1"},
+      {"path": "skills/agentic-tech-lead-orchestration/references/contracts/subagent-dispatch.schema.json", "parses": true, "id": "https://skills-shared.dev/contracts/subagent-dispatch/v1"}
+    ],
+    "ghpc_routing_confirmed": ["one-shot-ci-epoch -> ghpc/one-shot-ci-epoch/v1 (release-auditor reconciles, never re-derives)", "subagent-join -> ghpc/subagent-join/v1 (consolidation-verifier composes; shape lives in ghpc)"],
+    "codex_agent_templates_confirmed": ["acceptance-adversary", "consolidation-verifier", "dependency-auditor", "implementation-worker", "portfolio-explorer", "release-auditor", "runtime-admission-auditor"]
+  },
+  "role_denominator_this_epoch": {
+    "claude_carrier_exercised": [
+      {"role": "acceptance-adversary", "instances": 2, "model_requested": "claude-opus-5"},
+      {"role": "dependency-auditor", "instances": 1, "model_requested": "claude-sonnet-5"},
+      {"role": "portfolio-explorer/foundation-comparator", "instances": 1, "model_requested": "claude-opus-5"},
+      {"role": "runtime-admission-auditor", "instances": 1, "model_requested": "claude-sonnet-5"},
+      {"role": "consolidation-verifier", "instances": 1, "model_requested": "claude-opus-5"},
+      {"role": "shadow-architect", "instances": 1, "model_self_reported": "claude-opus-5[1m]"},
+      {"role": "implementation-worker", "instances": "L1 + B1 + 5 replay workers, each one isolated worktree + one exclusive lease", "model_requested": "claude-sonnet-5"},
+      {"role": "release-auditor-analog (verifiers)", "instances": 7, "model_requested": "claude-opus-5"}
+    ],
+    "codex_carrier_exercised": [{"role": "release-auditor", "instances": 1, "this_file": true}],
+    "codex_carrier_not_exercised": ["portfolio-explorer", "acceptance-adversary", "dependency-auditor", "runtime-admission-auditor", "consolidation-verifier", "implementation-worker"],
+    "honesty_rule": "codex lanes beyond release-auditor are AVAILABLE_NOT_EXERCISED (binary present, not run in those roles); Claude-carrier read-only enforcement is PROMPT_ONLY (no tool-lockdown receipt)"
+  }
+}

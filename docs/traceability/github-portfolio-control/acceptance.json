@@ -1,0 +1,1146 @@
+[
+  {
+    "allowed_terminal_states": [
+      "READY",
+      "BLOCKED",
+      "TWO_STAGE_CLOSURE_PENDING_569",
+      "CLOSED_VERIFIED"
+    ],
+    "completion_dependencies": [],
+    "digest": "2f0e85388a74bdc8da1ee03f9d9795fdc4998f39e18c5ceab8cad9814dab9626",
+    "epoch_id": "PORTFOLIO-EPOCH-20260822-B",
+    "evidence": {
+      "ceiling": "LOCAL_FIXTURE visibility class only; hosted-evidence clause explicitly NOT_EXERCISED until #569's CI epoch; two-stage closure #559 -> #569 -> #559-close recorded",
+      "required_lanes": [
+        "SOURCE",
+        "DETERMINISTIC",
+        "LOCAL"
+      ]
+    },
+    "item": {
+      "kind": "ISSUE",
+      "number": 559,
+      "observed_state": "OPEN"
+    },
+    "leases": {
+      "exclusive_paths": [
+        "skills/shared-skills-infra/**"
+      ],
+      "exclusive_resources": [],
+      "forbidden_paths": [
+        "secrets/**"
+      ],
+      "read_only_paths": []
+    },
+    "negative_controls": [
+      "the hosted-evidence clause is claimed EXERCISED before #569's CI epoch runs"
+    ],
+    "non_goals": [
+      "requiring all of #560 to be closed before starting (circular-dependency repair)",
+      "copying canonical Skill bodies"
+    ],
+    "objective": "Internalize github-portfolio-control into shared-skills-infra's bootstrap authority so a new repository receives thin pinned routes/bindings without copying canonical Skill bodies.",
+    "oracles": [
+      "one hermetic LOCAL_FIXTURE consumer-repo canary is locally verified end to end",
+      "positive/hollow/mutation/stale-pin/rollback/authority-widening tests pass"
+    ],
+    "repository": "ed3c/skills-shared",
+    "residual_owner": "issue-570",
+    "rollback": {
+      "commit": "3fc020414134999227aec6ba9304a08e86287033",
+      "strategy": "bootstrap rollback receipt is atomic per issue-559's own completion criteria"
+    },
+    "runtime_requirements": [
+      {
+        "capability": "local-fixture-canary-dispatch",
+        "owner": "issue-560-portfolio-control-worktree",
+        "state": "PASS",
+        "unblock_condition": "566 core landed; lease shared-skills-infra/** granted after conflict readback"
+      }
+    ],
+    "schema_version": "agentic-tech-lead/issue-pr-acceptance/v1",
+    "start_dependencies": [
+      {
+        "reason": "start: #566 exact admitted portfolio-core subject, per the corrected dependency 566 -> 559 -> 570 (issue-559 circular-dependency repair)",
+        "subject_digest": "ad694208dcd356153749cbb80ec81e792999da98a3fe745ab6d679235c28a615",
+        "unit_id": "ISSUE-566"
+      }
+    ],
+    "unit_id": "ISSUE-559"
+  },
+  {
+    "allowed_terminal_states": [
+      "BLOCKED",
+      "READY_FOR_HUMAN_ADMIT",
+      "CLOSED_VERIFIED"
+    ],
+    "completion_dependencies": [
+      {
+        "reason": "560 aggregation: this P0 closes only after #570 is CLOSED_VERIFIED per the Issue Closure Contract (issue-570 body: '#560 may close only after this issue is CLOSED_VERIFIED')",
+        "subject_digest": "b9f4a93774cb97773835ebefa19497905f6c806342048b131d6c7a5234182d9d",
+        "unit_id": "ISSUE-570"
+      }
+    ],
+    "digest": "030b5f5107977da1b4ccf048262a094a0043264904f44f5b87d49421e994eed3",
+    "epoch_id": "PORTFOLIO-EPOCH-20260822-B",
+    "evidence": {
+      "ceiling": "creating this Issue proves only that the control problem and implementation contract are recorded; it does not itself prove merge, release or production readiness; the terminal close is HUMAN_ADMIT_REQUIRED",
+      "required_lanes": [
+        "SOURCE",
+        "DETERMINISTIC",
+        "LOCAL",
+        "HOSTED_CI",
+        "HUMAN"
+      ]
+    },
+    "item": {
+      "kind": "ISSUE",
+      "number": 560,
+      "observed_state": "OPEN"
+    },
+    "leases": {
+      "exclusive_paths": [],
+      "exclusive_resources": [],
+      "forbidden_paths": [
+        "skills/**"
+      ],
+      "read_only_paths": [
+        "AGENTS.md",
+        "docs/INDEX.md"
+      ]
+    },
+    "negative_controls": [
+      "#560 closes while #570 is not yet CLOSED_VERIFIED"
+    ],
+    "non_goals": [
+      "creating a second Tech Lead, Shadow, Git Town, GitHub delivery, closure or bootstrap authority",
+      "a mega-Skill or copying owner bodies into consumer repositories"
+    ],
+    "objective": "Add one portable Repository Portfolio Control Plane that reconciles Issues, PRs, local implementation, acceptance evidence, runtime prerequisites, publication, merge and post-merge closure, composing existing owners rather than duplicating them.",
+    "oracles": [
+      "portable portfolio contracts/checkers/tests are admitted on exact main",
+      "the current nine-PR portfolio is reclassified against this fresh exact epoch (this artifact set)",
+      "independent same-subject Shadow verdict is recorded",
+      "final close command/actor is HUMAN_ADMIT_REQUIRED: a human (or preauthorized automation the goal directive names) performs the close, never a subagent"
+    ],
+    "repository": "ed3c/skills-shared",
+    "residual_owner": "human (repository owner)",
+    "rollback": {
+      "commit": "3fc020414134999227aec6ba9304a08e86287033",
+      "strategy": "no direct rollback; #560 is the aggregation node and closes only once, gated on #570"
+    },
+    "runtime_requirements": [
+      {
+        "capability": "aggregation-tracking",
+        "owner": "issue-560-portfolio-control-worktree",
+        "state": "PASS",
+        "unblock_condition": "tracking/reconciliation work is dispatchable now; the terminal CLOSE action itself is HUMAN_ADMIT_REQUIRED, recorded in evidence.ceiling and allowed_terminal_states rather than as a blocking runtime_requirement (assert_issue_pr_acceptance.py's BLOCKING_RUNTIME set would otherwise force exit 2 on a legitimately-dispatchable tracking node)"
+      }
+    ],
+    "schema_version": "agentic-tech-lead/issue-pr-acceptance/v1",
+    "start_dependencies": [],
+    "unit_id": "ISSUE-560"
+  },
+  {
+    "allowed_terminal_states": [
+      "READY",
+      "BLOCKED",
+      "REJECTED",
+      "CLOSED_VERIFIED"
+    ],
+    "completion_dependencies": [],
+    "digest": "ad694208dcd356153749cbb80ec81e792999da98a3fe745ab6d679235c28a615",
+    "epoch_id": "PORTFOLIO-EPOCH-20260822-B",
+    "evidence": {
+      "ceiling": "deterministic local denominator only; live Codex subagent dispatch/join, hosted CI and merge/release remain out of scope for this unit (owned by #567/#569/#560)",
+      "required_lanes": [
+        "SOURCE",
+        "DETERMINISTIC",
+        "LOCAL"
+      ]
+    },
+    "item": {
+      "kind": "ISSUE",
+      "number": 566,
+      "observed_state": "OPEN"
+    },
+    "leases": {
+      "exclusive_paths": [
+        "skills/agentic-tech-lead-orchestration/references/contracts/**",
+        "skills/agentic-tech-lead-orchestration/references/prompts/**",
+        "skills/agentic-tech-lead-orchestration/references/codex-agents/**",
+        "skills/agentic-tech-lead-orchestration/references/REPOSITORY_PORTFOLIO_CONTROL.md",
+        "skills/agentic-tech-lead-orchestration/scripts/**",
+        "skills/agentic-tech-lead-orchestration/tests/portfolio-control/**"
+      ],
+      "exclusive_resources": [
+        "exclusive-resource:agentic-tech-lead-orchestration-serialized-writer"
+      ],
+      "forbidden_paths": [
+        "secrets/**",
+        "skills/github-portfolio-control/**"
+      ],
+      "read_only_paths": [
+        "AGENTS.md"
+      ]
+    },
+    "negative_controls": [
+      "a planted MIXED_SNAPSHOT_EPOCH, ISSUE_WITHOUT_FROZEN_ACCEPTANCE, CYCLE, OVERLAPPING_WRITERS_FALSELY_PARALLELIZED, READY_DENOMINATOR_SHRINK, COMPLETION_DEPENDENCY_BYPASSED, TRUE_CHILD_WITHOUT_CONSUMED_PARENT_BYTES or HIDDEN_CONVERGENCE mutation makes the corresponding checker exit non-zero"
+    ],
+    "non_goals": [
+      "one-shot-CI checker (routes to ghpc/one-shot-ci-epoch/v1)",
+      "subagent join contract (routes to ghpc/subagent-join/v1)",
+      "a second .github/workflows/repository-portfolio-control.yml (skill-suites.yml matrix already covers the skill)"
+    ],
+    "objective": "Finish the machine-executable core: portfolio snapshot/acceptance contracts, G1-G7 compiler, ready-wave computation, dispatch/join contracts, deterministic mutations, Local Handoff queue binding.",
+    "oracles": [
+      "bash skills/agentic-tech-lead-orchestration/tests/portfolio-control/run-all.sh exits 0",
+      "python3 skills/agentic-tech-lead-orchestration/scripts/assert_repository_portfolio_snapshot.py --selftest exits 0",
+      "python3 skills/agentic-tech-lead-orchestration/scripts/assert_issue_pr_acceptance.py --selftest exits 0",
+      "python3 skills/agentic-tech-lead-orchestration/scripts/assert_portfolio_multigraph.py --selftest exits 0",
+      "git rev-parse 28f394785aa8b13c4e6d2f21ad74c5e32a6a6dc5:skills/github-portfolio-control equals 795de8e9ada4d0927f9a792760232ef75dda84e4 (ghpc frozen-plane binding, Shadow G1; one-shot-CI/subagent-join delegate there rather than being rebuilt here)",
+      "shadow_review.verdict is recorded HUMAN_ADMIT_REQUIRED (no assert_shadow_*.py; qualitative review only, per decisions.json acceptance_repairs)"
+    ],
+    "repository": "ed3c/skills-shared",
+    "residual_owner": "issue-560",
+    "rollback": {
+      "commit": "3fc020414134999227aec6ba9304a08e86287033",
+      "strategy": "revert the #566 commits back to pre-wave main 3fc0204"
+    },
+    "runtime_requirements": [
+      {
+        "capability": "runtime",
+        "owner": "agent-subagent",
+        "state": "PASS",
+        "unblock_condition": "already admitted"
+      }
+    ],
+    "schema_version": "agentic-tech-lead/issue-pr-acceptance/v1",
+    "start_dependencies": [
+      {
+        "reason": "start: salvage compile_repository_portfolio.py, assert_portfolio_multigraph.py, assert_subagent_dispatch.py, codex-agents/*.toml.template (7 roles) and the typed dependency-edge shape from PR562 caedeb9",
+        "subject_digest": "a3dce917cebb6dd3f1af1f4bf74ce95e27d9ba34ecb5618bea8a91f9fa47d101",
+        "unit_id": "PR-562"
+      },
+      {
+        "reason": "start: salvage the issue-pr-acceptance schema/checker, assert_repository_portfolio_snapshot.py skew fix, and normalize_lease path-overlap fix from PR564 efb224d",
+        "subject_digest": "d25c24ea9a57959cdaa4d8b1ee787f36f7cf55b9d033b8f1e2b150998a9d20dc",
+        "unit_id": "PR-564"
+      }
+    ],
+    "unit_id": "ISSUE-566"
+  },
+  {
+    "allowed_terminal_states": [
+      "READY",
+      "BLOCKED",
+      "CLOSED_VERIFIED"
+    ],
+    "completion_dependencies": [],
+    "digest": "019730c3b818d22aac04a6d10ec3fc453d92e1f4d6cf52296adfe8e5ad559251",
+    "epoch_id": "PORTFOLIO-EPOCH-20260822-B",
+    "evidence": {
+      "ceiling": "one real Codex CLI release-auditor run bound with SELF_REPORTED (never EXACT_BOUND) identity grade; the other six roles are AVAILABLE_NOT_EXERCISED on the Codex carrier; Claude-carrier read-only enforcement is PROMPT_ONLY (no tool-lockdown receipt)",
+      "required_lanes": [
+        "SOURCE",
+        "DETERMINISTIC",
+        "LOCAL",
+        "PROVIDER"
+      ]
+    },
+    "item": {
+      "kind": "ISSUE",
+      "number": 567,
+      "observed_state": "OPEN"
+    },
+    "leases": {
+      "exclusive_paths": [],
+      "exclusive_resources": [],
+      "forbidden_paths": [
+        "secrets/**"
+      ],
+      "read_only_paths": [
+        "skills/agentic-tech-lead-orchestration/references/contracts/**"
+      ]
+    },
+    "negative_controls": [
+      "an unexercised codex role recorded as ABSENT instead of AVAILABLE_NOT_EXERCISED is a MODEL_ALIAS_REPORTED_AS_EXACT_IDENTITY-class laundering and is refused"
+    ],
+    "non_goals": [
+      "authorizing merge or hosted CI by itself"
+    ],
+    "objective": "Exercise the repository-portfolio controller with real Codex CLI subagents on an exact local subject and bind runtime/model/carrier/lease/result identities without laundering aliases or availability into PASS.",
+    "oracles": [
+      "l2-codex-result.json's carrier.version_receipt records a real --version capture, not a generated prompt",
+      "every codex role not exercised this epoch is recorded AVAILABLE_NOT_EXERCISED in l2-join-receipt.json, never ABSENT",
+      "shadow_review.verdict is recorded HUMAN_ADMIT_REQUIRED (no assert_shadow_*.py; qualitative review only)"
+    ],
+    "repository": "ed3c/skills-shared",
+    "residual_owner": "issue-560",
+    "rollback": {
+      "commit": "3fc020414134999227aec6ba9304a08e86287033",
+      "strategy": "no repo bytes to revert; rollback is re-running the join with a corrected denominator"
+    },
+    "runtime_requirements": [
+      {
+        "capability": "runtime",
+        "owner": "agent-subagent",
+        "state": "PASS",
+        "unblock_condition": "codex-cli 0.148.0 at /Users/neon/.local/bin/codex actually exercised in the release-auditor role this epoch (l2-codex-result.json)"
+      }
+    ],
+    "schema_version": "agentic-tech-lead/issue-pr-acceptance/v1",
+    "start_dependencies": [
+      {
+        "reason": "start: portfolio-explorer/acceptance-adversary/dependency-auditor/runtime-admission-auditor/consolidation-verifier/release-auditor roles read the contracts #566 admits",
+        "subject_digest": "ad694208dcd356153749cbb80ec81e792999da98a3fe745ab6d679235c28a615",
+        "unit_id": "ISSUE-566"
+      }
+    ],
+    "unit_id": "ISSUE-567"
+  },
+  {
+    "allowed_terminal_states": [
+      "READY",
+      "BLOCKED",
+      "CLOSED_VERIFIED"
+    ],
+    "completion_dependencies": [
+      {
+        "reason": "EXTERNAL_EVIDENCE: Stack S's reconciliation is evidenced by the landed replay tip (replay/450-case-delivery-binding on the convergence branch), not by a Git-ancestry claim of #568 itself",
+        "subject_digest": "70efd4efb581f972e6eb206994207f77c9571e6a3734e206d7776fa4636f7487",
+        "unit_id": "PR-450"
+      },
+      {
+        "reason": "EXTERNAL_EVIDENCE: Stack K's reconciliation is evidenced by the landed replay tip (replay/396-shared-index-trace on the convergence branch), not by a Git-ancestry claim of #568 itself",
+        "subject_digest": "66537b7c6966c004fef84e2c62580df266863be5196da7bd805d96fb8f839312",
+        "unit_id": "PR-396"
+      }
+    ],
+    "digest": "48e8fa2504f8f509779bc0d4742ecdf918716e102eca3fba07c5802e73be30d0",
+    "epoch_id": "PORTFOLIO-EPOCH-20260822-B",
+    "evidence": {
+      "ceiling": "local merge-forward replay only; no hosted CI rerun loop; publication remains the successor gate (#569)",
+      "required_lanes": [
+        "SOURCE",
+        "DETERMINISTIC",
+        "LOCAL"
+      ]
+    },
+    "item": {
+      "kind": "ISSUE",
+      "number": 568,
+      "observed_state": "OPEN"
+    },
+    "leases": {
+      "exclusive_paths": [],
+      "exclusive_resources": [
+        "exclusive-resource:agentic-tech-lead-orchestration-serialized-writer"
+      ],
+      "forbidden_paths": [],
+      "read_only_paths": [
+        "docs/INDEX.md",
+        "skills/agentic-tech-lead-orchestration/tests/run-all.sh"
+      ]
+    },
+    "negative_controls": [
+      "a rebase/cherry-pick/tree-rebuild replay is refused: MERGE_FORWARD_ONLY is the only admitted replay strategy (hard_constraint #1)"
+    ],
+    "non_goals": [
+      "hosted CI rerun loop (owned by #569)",
+      "publication (owned by #569 successor gate)"
+    ],
+    "objective": "Reclassify the current open PR portfolio on one fresh epoch, repair stale/provenance-broken branches locally, and replay only true children in dependency order (Stack K: 395->396; Stack S: 412(reconstruct)->419->420->450).",
+    "oracles": [
+      "git ls-tree <replayed head> -- skills/agentic-tech-lead-orchestration/references/issue-closure-contract.schema.json .github/workflows/issue-closure-contract.yml is non-empty (existence assertion, hard_constraint #2)",
+      "git diff --name-status <replayed-419-final> origin/agent/spatial-intent-case-proof-graph-v1 -- <412's 34 paths> exits 0 with empty output (G4 oracle)",
+      "git ls-tree replay/420-machine-contracts -- skills/git-town-stacked-pr-worker/scripts/assert_case_obligations.py is non-empty (G6 producer oracle)",
+      "shadow_review.verdict is recorded HUMAN_ADMIT_REQUIRED (no assert_shadow_*.py; qualitative review only)"
+    ],
+    "repository": "ed3c/skills-shared",
+    "residual_owner": "issue-569",
+    "rollback": {
+      "commit": "3fc020414134999227aec6ba9304a08e86287033",
+      "strategy": "the convergence branch agent/560-portfolio-wave is disposable and can be re-cut from 28f3947"
+    },
+    "runtime_requirements": [
+      {
+        "capability": "runtime",
+        "owner": "agent-subagent",
+        "state": "PASS",
+        "unblock_condition": "already admitted"
+      }
+    ],
+    "schema_version": "agentic-tech-lead/issue-pr-acceptance/v1",
+    "start_dependencies": [
+      {
+        "reason": "start: G1-G7 compiler and acceptance schema must exist before the PR stacks can be recompiled against them",
+        "subject_digest": "ad694208dcd356153749cbb80ec81e792999da98a3fe745ab6d679235c28a615",
+        "unit_id": "ISSUE-566"
+      },
+      {
+        "reason": "start: dependency-auditor/consolidation-verifier runtime/model admission receipts must exist before this reconciliation is dispatched",
+        "subject_digest": "019730c3b818d22aac04a6d10ec3fc453d92e1f4d6cf52296adfe8e5ad559251",
+        "unit_id": "ISSUE-567"
+      }
+    ],
+    "unit_id": "ISSUE-568"
+  },
+  {
+    "allowed_terminal_states": [
+      "READY",
+      "BLOCKED",
+      "CLOSED_VERIFIED"
+    ],
+    "completion_dependencies": [],
+    "digest": "1b48e5ab35caa0ed036a1c76b8124780b383a54c68784171cfa95df0f46e4640",
+    "epoch_id": "PORTFOLIO-EPOCH-20260822-B",
+    "evidence": {
+      "ceiling": "hosted exact-head CI epoch and exact-main readback have NOT yet been exercised as of this snapshot (no push to origin has occurred for the convergence branch)",
+      "required_lanes": [
+        "SOURCE",
+        "DETERMINISTIC",
+        "LOCAL",
+        "HOSTED_CI"
+      ]
+    },
+    "item": {
+      "kind": "ISSUE",
+      "number": 569,
+      "observed_state": "OPEN"
+    },
+    "leases": {
+      "exclusive_paths": [],
+      "exclusive_resources": [],
+      "forbidden_paths": [],
+      "read_only_paths": [
+        "skills/agentic-tech-lead-orchestration/references/issue-closure-contract.schema.json"
+      ]
+    },
+    "negative_controls": [
+      "a blind rerun after a code/test failure is refused; only an explicit infrastructure-flake classifier with unchanged code/head/config may rerun"
+    ],
+    "non_goals": [
+      "closing #560 by itself (also requires #559's bootstrap canary)"
+    ],
+    "objective": "Freeze the locally converged portfolio candidate, publish once, execute one meaningful exact-head hosted CI epoch, then perform exact-main readback and Issue Closure reconciliation.",
+    "oracles": [
+      "push occurs exactly once for the frozen candidate",
+      "Ready is marked exactly once",
+      "hosted workflow run/jobs/non-empty steps/artifacts are read back against the exact candidate head SHA",
+      "exact remote main commit/tree is read back after the admitted merge and compared byte-for-byte to the pre-merge candidate head",
+      "shadow_review.verdict is recorded HUMAN_ADMIT_REQUIRED (no assert_shadow_*.py; qualitative review only)"
+    ],
+    "repository": "ed3c/skills-shared",
+    "residual_owner": "issue-570",
+    "rollback": {
+      "commit": "3fc020414134999227aec6ba9304a08e86287033",
+      "strategy": "a failed hosted epoch returns to a new local candidate epoch, never a blind rerun"
+    },
+    "runtime_requirements": [
+      {
+        "capability": "runtime",
+        "owner": "agent-subagent",
+        "state": "PASS",
+        "unblock_condition": "Draft first; no code push after Ready; no blind rerun"
+      }
+    ],
+    "schema_version": "agentic-tech-lead/issue-pr-acceptance/v1",
+    "start_dependencies": [
+      {
+        "reason": "start: #568's exact converged candidate (the convergence branch) must exist before it can be pushed and published",
+        "subject_digest": "48e8fa2504f8f509779bc0d4742ecdf918716e102eca3fba07c5802e73be30d0",
+        "unit_id": "ISSUE-568"
+      }
+    ],
+    "unit_id": "ISSUE-569"
+  },
+  {
+    "allowed_terminal_states": [
+      "READY",
+      "BLOCKED",
+      "CLOSED_VERIFIED"
+    ],
+    "completion_dependencies": [],
+    "digest": "b9f4a93774cb97773835ebefa19497905f6c806342048b131d6c7a5234182d9d",
+    "epoch_id": "PORTFOLIO-EPOCH-20260822-B",
+    "evidence": {
+      "ceiling": "disposition=DIRECTLY_LANDED; evidence_ceiling=HUMAN_ADMITTED; shadow_review.verdict recorded HUMAN_ADMIT_REQUIRED (decisions.json acceptance_repairs #570 repair: CLOSED_VERIFIED terminal-state substitution)",
+      "required_lanes": [
+        "SOURCE",
+        "DETERMINISTIC",
+        "LOCAL",
+        "HUMAN"
+      ]
+    },
+    "item": {
+      "kind": "ISSUE",
+      "number": 570,
+      "observed_state": "OPEN"
+    },
+    "leases": {
+      "exclusive_paths": [
+        "docs/traceability/**"
+      ],
+      "exclusive_resources": [],
+      "forbidden_paths": [],
+      "read_only_paths": [
+        "docs/INDEX.md",
+        "AGENTS.md"
+      ]
+    },
+    "negative_controls": [
+      "#560 is closed before #570 reaches CLOSED_VERIFIED is refused by issue-570's own body"
+    ],
+    "non_goals": [
+      "closing #560 itself (residual authority stays with #560)"
+    ],
+    "objective": "Converge the repository-portfolio control plane after both the delivery/closure lane (#569) and the bootstrap lane (#559) are complete, and prove internalization on exact main.",
+    "oracles": [
+      "python3 skills/agentic-tech-lead-orchestration/scripts/assert_issue_closure_contract.py exits 0 against the convergence branch head (script exists on main per git ls-tree)",
+      "all required subagents are terminal and consolidated on the same exact subject",
+      "independent Shadow reports no unresolved L3 blocker"
+    ],
+    "repository": "ed3c/skills-shared",
+    "residual_owner": "issue-560",
+    "rollback": {
+      "commit": "3fc020414134999227aec6ba9304a08e86287033",
+      "strategy": "Issue Closure Contract reconciliation is re-run against a corrected denominator, not reverted"
+    },
+    "runtime_requirements": [
+      {
+        "capability": "runtime",
+        "owner": "agent-subagent",
+        "state": "PASS",
+        "unblock_condition": "already admitted"
+      }
+    ],
+    "schema_version": "agentic-tech-lead/issue-pr-acceptance/v1",
+    "start_dependencies": [
+      {
+        "reason": "start: exact-main closure lane (hosted CI + readback) must complete before final convergence",
+        "subject_digest": "1b48e5ab35caa0ed036a1c76b8124780b383a54c68784171cfa95df0f46e4640",
+        "unit_id": "ISSUE-569"
+      },
+      {
+        "reason": "start: bootstrap canary lane must complete before final convergence",
+        "subject_digest": "2f0e85388a74bdc8da1ee03f9d9795fdc4998f39e18c5ceab8cad9814dab9626",
+        "unit_id": "ISSUE-559"
+      }
+    ],
+    "unit_id": "ISSUE-570"
+  },
+  {
+    "allowed_terminal_states": [
+      "CONSUMED_BY_CONVERGENCE"
+    ],
+    "completion_dependencies": [],
+    "digest": "2d6de70a7d6bb4c1d4deacbb4cc410d3c7a4a7b741f91830e4f3f973e3497af0",
+    "epoch_id": "PORTFOLIO-EPOCH-20260822-B",
+    "evidence": {
+      "ceiling": "design-stage artifact; bytes consumed into the convergence branch replay/395-design-control-plane, PR itself never GitHub-merged",
+      "required_lanes": [
+        "SOURCE",
+        "DETERMINISTIC"
+      ]
+    },
+    "item": {
+      "base_commit": "129f53c23a3ab15354763167b25bddc45f724c00",
+      "base_tree": "d383769215a8a179bd9a8deb4f0118a61fab5aa3",
+      "head_commit": "d411d2a9826aa8bb602a00db9c27d09f603e3538",
+      "head_tree": "77a670e951b22307f23ee1afa905f3b4042548d0",
+      "kind": "PULL_REQUEST",
+      "number": 395,
+      "observed_state": "DRAFT"
+    },
+    "leases": {
+      "exclusive_paths": [
+        "skills/human-led-agentic-engineering/**"
+      ],
+      "exclusive_resources": [],
+      "forbidden_paths": [
+        "main"
+      ],
+      "read_only_paths": []
+    },
+    "negative_controls": [
+      "current-main rebase and acceptance audit required before admission (issue-560 PR audit)"
+    ],
+    "non_goals": [
+      "merge (remains Human authority per body)",
+      "Stack docs/traceability (owned by true child #396)"
+    ],
+    "objective": "Add the portable human-led Agentic Engineering design control plane: Human Design Admission schema and deterministic checker.",
+    "oracles": [
+      "python3 skills/human-led-agentic-engineering/scripts/check_design_admission.py exits 0 against its fixtures"
+    ],
+    "repository": "ed3c/skills-shared",
+    "residual_owner": "issue-568",
+    "rollback": {
+      "commit": "129f53c23a3ab15354763167b25bddc45f724c00",
+      "strategy": "close CONSUMED_BY_CONVERGENCE; convergence branch is the merge vehicle, not this PR"
+    },
+    "runtime_requirements": [
+      {
+        "capability": "salvageable-bytes-available",
+        "owner": "issue-560-portfolio-control-worktree",
+        "state": "PASS",
+        "unblock_condition": "already admitted"
+      }
+    ],
+    "schema_version": "agentic-tech-lead/issue-pr-acceptance/v1",
+    "start_dependencies": [],
+    "unit_id": "PR-395"
+  },
+  {
+    "allowed_terminal_states": [
+      "CONSUMED_BY_CONVERGENCE"
+    ],
+    "completion_dependencies": [
+      {
+        "reason": "TRUE_CHILD: docs/traceability/KENN_AGENTIC_ENGINEERING_CLOSURE.md and the Stack reference cite the human-led-agentic-engineering method bytes #395 introduces",
+        "subject_digest": "2d6de70a7d6bb4c1d4deacbb4cc410d3c7a4a7b741f91830e4f3f973e3497af0",
+        "unit_id": "PR-395"
+      }
+    ],
+    "digest": "66537b7c6966c004fef84e2c62580df266863be5196da7bd805d96fb8f839312",
+    "epoch_id": "PORTFOLIO-EPOCH-20260822-B",
+    "evidence": {
+      "ceiling": "doc-trace artifact; bytes consumed into the convergence branch replay/396-shared-index-trace, PR itself never GitHub-merged",
+      "required_lanes": [
+        "SOURCE",
+        "DETERMINISTIC"
+      ]
+    },
+    "item": {
+      "base_commit": "d411d2a9826aa8bb602a00db9c27d09f603e3538",
+      "base_tree": "77a670e951b22307f23ee1afa905f3b4042548d0",
+      "head_commit": "98a6c53ca6aaf2bd562878648f774d6ad53ad6b5",
+      "head_tree": "10eaca8f62d62e0309156e367599bda50fb1a186",
+      "kind": "PULL_REQUEST",
+      "number": 396,
+      "observed_state": "DRAFT"
+    },
+    "leases": {
+      "exclusive_paths": [
+        "docs/traceability/KENN_AGENTIC_ENGINEERING_CLOSURE.md",
+        "skills/git-town-stacked-pr-worker/references/KENN_AGENTIC_ENGINEERING_STACK.md"
+      ],
+      "exclusive_resources": [],
+      "forbidden_paths": [
+        "main"
+      ],
+      "read_only_paths": [
+        "skills/human-led-agentic-engineering/**"
+      ]
+    },
+    "negative_controls": [
+      "cannot be admitted before #395's exact subject per issue-560 PR audit"
+    ],
+    "non_goals": [
+      "merge (remains Human authority)",
+      "re-deriving #395's method bytes"
+    ],
+    "objective": "Add the source-problem closure audit and Kenn-specific molecular Stack reference, as a true child of #395's method bytes.",
+    "oracles": [
+      "git diff --name-status shows #396's two files consuming #395's admitted method vocabulary (no independent redefinition)"
+    ],
+    "repository": "ed3c/skills-shared",
+    "residual_owner": "issue-568",
+    "rollback": {
+      "commit": "d411d2a9826aa8bb602a00db9c27d09f603e3538",
+      "strategy": "close CONSUMED_BY_CONVERGENCE; convergence branch is the merge vehicle, not this PR"
+    },
+    "runtime_requirements": [
+      {
+        "capability": "salvageable-bytes-available",
+        "owner": "issue-560-portfolio-control-worktree",
+        "state": "PASS",
+        "unblock_condition": "already admitted"
+      }
+    ],
+    "schema_version": "agentic-tech-lead/issue-pr-acceptance/v1",
+    "start_dependencies": [],
+    "unit_id": "PR-396"
+  },
+  {
+    "allowed_terminal_states": [
+      "SUPERSEDED_BY_419",
+      "PRESERVED_FORENSIC_SOURCE"
+    ],
+    "completion_dependencies": [],
+    "digest": "09316dc3513cd7a02743b0bb0ae5e4f6181ea1d4fa3c965db2c37c7c1abd0f27",
+    "epoch_id": "PORTFOLIO-EPOCH-20260822-B",
+    "evidence": {
+      "ceiling": "BLOCKED_BY_PROVENANCE per PR body: check_commit_roles.py FAIL, 120 trailer violations since 88ce642a; bytes admitted only via replay, never via this PR's own commits",
+      "required_lanes": [
+        "SOURCE",
+        "DETERMINISTIC"
+      ]
+    },
+    "item": {
+      "base_commit": "88ce642a7f198d88019aa8ae19e63631ae4999c2",
+      "base_tree": "6e93d5b42a8c6d2fb9f56b089f8ffd46df98c569",
+      "head_commit": "01067581efa2b611c5d4bb8358ae568147eece40",
+      "head_tree": "ab9a1a8a20b9ddfdbf89d99c6580f2d5b93a7fd1",
+      "kind": "PULL_REQUEST",
+      "number": 412,
+      "observed_state": "DRAFT"
+    },
+    "leases": {
+      "exclusive_paths": [
+        "skills/agentic-tech-lead-orchestration/**",
+        "skills/git-town-stacked-pr-worker/**",
+        "skills/skill-refactor-proof-loop/references/golden-proof-registry.json",
+        "skills/spatial-loop-systems-engineering/**"
+      ],
+      "exclusive_resources": [],
+      "forbidden_paths": [
+        "main"
+      ],
+      "read_only_paths": []
+    },
+    "negative_controls": [
+      "a rebase/tree-rebuild replacement that drops Issue Closure Contract files is refused by the existence assertion"
+    ],
+    "non_goals": [
+      "direct merge to main (body says DO NOT MERGE DIRECTLY)",
+      "repairing check_commit_roles.py or enforced_from"
+    ],
+    "objective": "Preserve the Spatial ICPG / case-graph / Tech Lead case-obligations bytes as forensic semantic source pending a provenance-compliant reconstruction.",
+    "oracles": [
+      "git diff --name-status <replayed-419-final> origin/agent/spatial-intent-case-proof-graph-v1 -- <412's 34 paths> exits 0 with empty output (Shadow G4 oracle)"
+    ],
+    "repository": "ed3c/skills-shared",
+    "residual_owner": "issue-568",
+    "rollback": {
+      "commit": "88ce642a7f198d88019aa8ae19e63631ae4999c2",
+      "strategy": "branch remains undeleted as forensic source; no revert needed since never merged"
+    },
+    "runtime_requirements": [
+      {
+        "capability": "salvageable-bytes-available",
+        "owner": "issue-560-portfolio-control-worktree",
+        "state": "PASS",
+        "unblock_condition": "already admitted"
+      }
+    ],
+    "schema_version": "agentic-tech-lead/issue-pr-acceptance/v1",
+    "start_dependencies": [],
+    "unit_id": "PR-412"
+  },
+  {
+    "allowed_terminal_states": [
+      "CONSUMED_BY_CONVERGENCE"
+    ],
+    "completion_dependencies": [
+      {
+        "reason": "TRUE_CHILD: consumes the unmerged Spatial Loop ICPG / Tech Lead case-obligations contract from #412; Shadow G4 oracle requires replayed-419-final to be a strict superset of all 34 of #412's declared paths at blob identity",
+        "subject_digest": "09316dc3513cd7a02743b0bb0ae5e4f6181ea1d4fa3c965db2c37c7c1abd0f27",
+        "unit_id": "PR-412"
+      }
+    ],
+    "digest": "e2d7995bb4fdd519a05836428fe6a50f6e72914d724ae7c55772597ad9294c99",
+    "epoch_id": "PORTFOLIO-EPOCH-20260822-B",
+    "evidence": {
+      "ceiling": "PROMPT_DESIGN_STAGE = COMPLETE_AS_DESIGN_ARTIFACT; not runtime-correctness evidence; bytes consumed into replay/419 on the convergence branch (supersedes #412 bytes), PR itself never GitHub-merged",
+      "required_lanes": [
+        "SOURCE",
+        "DETERMINISTIC"
+      ]
+    },
+    "item": {
+      "base_commit": "01067581efa2b611c5d4bb8358ae568147eece40",
+      "base_tree": "ab9a1a8a20b9ddfdbf89d99c6580f2d5b93a7fd1",
+      "head_commit": "94426ceeb6011af15e86b571bdcc7bd40bebf06f",
+      "head_tree": "83b1b500cf4cbfc7f4f4cfa136aa405c1b7acbc9",
+      "kind": "PULL_REQUEST",
+      "number": 419,
+      "observed_state": "DRAFT"
+    },
+    "leases": {
+      "exclusive_paths": [
+        "docs/INDEX.md",
+        "docs/traceability/KNOWLEDGE_GRAPH_ICPG_CLOSURE.md",
+        "skills/git-town-stacked-pr-worker/README.md",
+        "skills/intent-to-evidence-knowledge-graph/**"
+      ],
+      "exclusive_resources": [],
+      "forbidden_paths": [
+        "main"
+      ],
+      "read_only_paths": []
+    },
+    "negative_controls": [
+      "overlaps #412 at skills/git-town-stacked-pr-worker/README.md per PR419 body (real G4 path conflict, not a false-parallel claim)"
+    ],
+    "non_goals": [
+      "deterministic checker PASS (design-stage only per body)",
+      "live GraphRAG retrieval",
+      "merge or release"
+    ],
+    "objective": "Bridge Zettelkasten v7.2 to the Spatial ICPG and delivery trace: new intent-to-evidence-knowledge-graph Skill, trace graph contract and preparation slice.",
+    "oracles": [
+      "git diff --name-status <replayed-419-final> origin/agent/spatial-intent-case-proof-graph-v1 -- <412's 34 paths> exits 0 with empty output"
+    ],
+    "repository": "ed3c/skills-shared",
+    "residual_owner": "issue-568",
+    "rollback": {
+      "commit": "01067581efa2b611c5d4bb8358ae568147eece40",
+      "strategy": "close SUPERSEDED_BY_419-replay-outcome is not applicable to itself; convergence branch is the merge vehicle for the #412 lineage, not this PR"
+    },
+    "runtime_requirements": [
+      {
+        "capability": "salvageable-bytes-available",
+        "owner": "issue-560-portfolio-control-worktree",
+        "state": "PASS",
+        "unblock_condition": "already admitted"
+      }
+    ],
+    "schema_version": "agentic-tech-lead/issue-pr-acceptance/v1",
+    "start_dependencies": [],
+    "unit_id": "PR-419"
+  },
+  {
+    "allowed_terminal_states": [
+      "CONSUMED_BY_CONVERGENCE"
+    ],
+    "completion_dependencies": [
+      {
+        "reason": "TRUE_CHILD: consumes the unmerged Knowledge Graph projection/trace contract introduced in #419; fork point 05bfb9ed29b62adfaf8a451d117b41d3b0f825aa predates #419's absorption of #412 (decisions.json stack_plan wave2 note)",
+        "subject_digest": "e2d7995bb4fdd519a05836428fe6a50f6e72914d724ae7c55772597ad9294c99",
+        "unit_id": "PR-419"
+      }
+    ],
+    "digest": "0d8b7e061d10802b53193bf98d0ab70ddc3ff63614fd1a9ab2e5b3731c880d92",
+    "epoch_id": "PORTFOLIO-EPOCH-20260822-B",
+    "evidence": {
+      "ceiling": "FULL_V7_2_SYSTEM_PROMPT = PASS_AS_DESIGN_ARTIFACT; not runtime-correctness evidence; bytes consumed into replay/420 on the convergence branch (re-parented onto replayed #419), PR itself never GitHub-merged",
+      "required_lanes": [
+        "SOURCE",
+        "DETERMINISTIC"
+      ]
+    },
+    "item": {
+      "base_commit": "05bfb9ed29b62adfaf8a451d117b41d3b0f825aa",
+      "base_tree": "12dfc584b1411c2fdb4b13f6b3ff8ceb2a554bab",
+      "head_commit": "206ee94ff5c165b1af4f1c97c5206404916f8e37",
+      "head_tree": "12addac6c8455ceadf3d4f44c93326eb1f528adc",
+      "kind": "PULL_REQUEST",
+      "number": 420,
+      "observed_state": "DRAFT"
+    },
+    "leases": {
+      "exclusive_paths": [
+        ".github/workflows/intent-to-evidence-knowledge-graph.yml",
+        "skills/intent-to-evidence-knowledge-graph/**"
+      ],
+      "exclusive_resources": [],
+      "forbidden_paths": [
+        "main"
+      ],
+      "read_only_paths": []
+    },
+    "negative_controls": [
+      "overlaps #419 on Skill AGENTS/README/SKILL and prompt delta per PR420 body (real G4 path conflict)"
+    ],
+    "non_goals": [
+      "#415/#416 traversal and delivery-binding scope (owned downstream)",
+      "merge or release"
+    ],
+    "objective": "Prepare machine projection contracts (Intent/Artifact/Trace schemas), a standalone v7.2 system prompt, and Shadow negative controls, as a true child of #419.",
+    "oracles": [
+      "git ls-tree replay/420-machine-contracts -- skills/git-town-stacked-pr-worker/scripts/assert_case_obligations.py is non-empty (Shadow G6 producer oracle)"
+    ],
+    "repository": "ed3c/skills-shared",
+    "residual_owner": "issue-568",
+    "rollback": {
+      "commit": "05bfb9ed29b62adfaf8a451d117b41d3b0f825aa",
+      "strategy": "close CONSUMED_BY_CONVERGENCE; convergence branch is the merge vehicle, not this PR"
+    },
+    "runtime_requirements": [
+      {
+        "capability": "salvageable-bytes-available",
+        "owner": "issue-560-portfolio-control-worktree",
+        "state": "PASS",
+        "unblock_condition": "already admitted"
+      }
+    ],
+    "schema_version": "agentic-tech-lead/issue-pr-acceptance/v1",
+    "start_dependencies": [],
+    "unit_id": "PR-420"
+  },
+  {
+    "allowed_terminal_states": [
+      "CONSUMED_BY_CONVERGENCE"
+    ],
+    "completion_dependencies": [
+      {
+        "reason": "TRUE_CHILD: directly consumes the unmerged Intent/Artifact/Trace projection contracts and deterministic checker frozen in #420",
+        "subject_digest": "0d8b7e061d10802b53193bf98d0ab70ddc3ff63614fd1a9ab2e5b3731c880d92",
+        "unit_id": "PR-420"
+      }
+    ],
+    "digest": "70efd4efb581f972e6eb206994207f77c9571e6a3734e206d7776fa4636f7487",
+    "epoch_id": "PORTFOLIO-EPOCH-20260822-B",
+    "evidence": {
+      "ceiling": "hermetic authoring checks only; hosted exact-head evidence remains a separate live lane (#448), not claimed here; bytes consumed into replay/450 on the convergence branch, PR itself never GitHub-merged",
+      "required_lanes": [
+        "SOURCE",
+        "DETERMINISTIC"
+      ]
+    },
+    "item": {
+      "base_commit": "206ee94ff5c165b1af4f1c97c5206404916f8e37",
+      "base_tree": "12addac6c8455ceadf3d4f44c93326eb1f528adc",
+      "head_commit": "6f0a96f488728dfd03f127a0575aaee37a1745d2",
+      "head_tree": "e904dfced7788684de536ce1fa36c918f0f59401",
+      "kind": "PULL_REQUEST",
+      "number": 450,
+      "observed_state": "DRAFT"
+    },
+    "leases": {
+      "exclusive_paths": [
+        "docs/INDEX.md",
+        "skills/intent-to-evidence-knowledge-graph/**"
+      ],
+      "exclusive_resources": [],
+      "forbidden_paths": [
+        "main"
+      ],
+      "read_only_paths": []
+    },
+    "negative_controls": [
+      "overlaps #420 on AGENTS/README and tests/run-all.sh per PR450 body (real G4 path conflict); mergeStateStatus observed UNSTABLE"
+    ],
+    "non_goals": [
+      "#416 traversal/runtime semantics",
+      "#418 live GraphRAG",
+      "hosted exact-head evidence (owned by #448 per body)"
+    ],
+    "objective": "Bind ICPG cases to delivery ownership: case-delivery-binding schema, deterministic checker, and the canonical Tech Lead case_obligations denominator, as a true child of #420.",
+    "oracles": [
+      "hermetic authoring checks pass; #448 hosted exact-head receipt with non-empty steps and mutation PASS remains the separate live-evidence lane"
+    ],
+    "repository": "ed3c/skills-shared",
+    "residual_owner": "issue-568",
+    "rollback": {
+      "commit": "206ee94ff5c165b1af4f1c97c5206404916f8e37",
+      "strategy": "close CONSUMED_BY_CONVERGENCE; convergence branch is the merge vehicle, not this PR"
+    },
+    "runtime_requirements": [
+      {
+        "capability": "salvageable-bytes-available",
+        "owner": "issue-560-portfolio-control-worktree",
+        "state": "PASS",
+        "unblock_condition": "already admitted"
+      }
+    ],
+    "schema_version": "agentic-tech-lead/issue-pr-acceptance/v1",
+    "start_dependencies": [],
+    "unit_id": "PR-450"
+  },
+  {
+    "allowed_terminal_states": [
+      "SUPERSEDED"
+    ],
+    "completion_dependencies": [],
+    "digest": "a3dce917cebb6dd3f1af1f4bf74ce95e27d9ba34ecb5618bea8a91f9fa47d101",
+    "epoch_id": "PORTFOLIO-EPOCH-20260822-B",
+    "evidence": {
+      "ceiling": "compiler/multigraph/dispatch lines salvaged into ISSUE-566; PR itself never lands (stale-base, no declared subject)",
+      "required_lanes": [
+        "SOURCE",
+        "DETERMINISTIC",
+        "LOCAL"
+      ]
+    },
+    "item": {
+      "base_commit": "174009203a3ff9bd6ebc4010bc6cab7232dd44a4",
+      "base_tree": "311052ecf5780f8d91c4d2429e8ce1a50a0361d8",
+      "head_commit": "caedeb9e1dfb4fc149445c621f150740f3cdac91",
+      "head_tree": "0b28f70f46cacc4917dd3f4422df4b846285445a",
+      "kind": "PULL_REQUEST",
+      "number": 562,
+      "observed_state": "DRAFT"
+    },
+    "leases": {
+      "exclusive_paths": [
+        "skills/agentic-tech-lead-orchestration/references/REPOSITORY_PORTFOLIO_CONTROL.md",
+        "skills/agentic-tech-lead-orchestration/references/codex-agents/**",
+        "skills/agentic-tech-lead-orchestration/references/contracts/**",
+        "skills/agentic-tech-lead-orchestration/references/prompts/**",
+        "skills/agentic-tech-lead-orchestration/scripts/**",
+        "skills/agentic-tech-lead-orchestration/tests/portfolio-control/**",
+        ".github/workflows/repository-portfolio-control.yml",
+        "docs/traceability/REPOSITORY_PORTFOLIO_CONTROL_C0.md"
+      ],
+      "exclusive_resources": [],
+      "forbidden_paths": [
+        "main"
+      ],
+      "read_only_paths": []
+    },
+    "negative_controls": [
+      "PR body publishes no base/head subject; its head tested a stale base 174009203a3ff9bd6ebc4010bc6cab7232dd44a4 (computed merge-base with 3fc0204), not current main"
+    ],
+    "non_goals": [
+      "merge, release and production",
+      "editing shared-skills-infra or root routes"
+    ],
+    "objective": "Provide the C0 repository-portfolio-control foundation: compiler, multigraph checker, subagent dispatch checker, codex-agent templates and selftest.",
+    "oracles": [
+      "bash skills/agentic-tech-lead-orchestration/tests/portfolio-control/run-all.sh exits 0 on the candidate head"
+    ],
+    "repository": "ed3c/skills-shared",
+    "residual_owner": "issue-566",
+    "rollback": {
+      "commit": "3fc020414134999227aec6ba9304a08e86287033",
+      "strategy": "close as SUPERSEDED, no revert needed (never merged)"
+    },
+    "runtime_requirements": [
+      {
+        "capability": "salvageable-bytes-available",
+        "owner": "issue-560-portfolio-control-worktree",
+        "state": "PASS",
+        "unblock_condition": "already admitted"
+      }
+    ],
+    "schema_version": "agentic-tech-lead/issue-pr-acceptance/v1",
+    "start_dependencies": [],
+    "unit_id": "PR-562"
+  },
+  {
+    "allowed_terminal_states": [
+      "SUPERSEDED"
+    ],
+    "completion_dependencies": [],
+    "digest": "d25c24ea9a57959cdaa4d8b1ee787f36f7cf55b9d033b8f1e2b150998a9d20dc",
+    "epoch_id": "PORTFOLIO-EPOCH-20260822-B",
+    "evidence": {
+      "ceiling": "acceptance schema/checker line salvaged into ISSUE-566; PR itself never lands, kept Draft per its own body",
+      "required_lanes": [
+        "SOURCE",
+        "DETERMINISTIC",
+        "LOCAL"
+      ]
+    },
+    "item": {
+      "base_commit": "3fc020414134999227aec6ba9304a08e86287033",
+      "base_tree": "eea625614c233b7f42fd62c129aa21852cb36b9d",
+      "head_commit": "efb224dd97304136ef5c29a86ca812099aca8c9b",
+      "head_tree": "8585e9c0cbab030f1e7750170c93875bede3f34f",
+      "kind": "PULL_REQUEST",
+      "number": 564,
+      "observed_state": "DRAFT"
+    },
+    "leases": {
+      "exclusive_paths": [
+        "skills/agentic-tech-lead-orchestration/references/REPOSITORY_PORTFOLIO_CONTROL.md",
+        "skills/agentic-tech-lead-orchestration/references/prompts/**",
+        "skills/agentic-tech-lead-orchestration/references/repository-portfolio-control/**",
+        "skills/agentic-tech-lead-orchestration/scripts/**",
+        "skills/agentic-tech-lead-orchestration/tests/portfolio-control/**"
+      ],
+      "exclusive_resources": [],
+      "forbidden_paths": [
+        "main"
+      ],
+      "read_only_paths": []
+    },
+    "negative_controls": [
+      "a private/internal repo dispatch that omits private_egress_admitted is refused by this PR's own dispatch/join contracts"
+    ],
+    "non_goals": [
+      "merge, release and production",
+      "live Codex subagent dispatch"
+    ],
+    "objective": "Provide the acceptance-contract line: issue-pr-acceptance schema/checker, snapshot skew fix, normalize_lease path-overlap fix, and the full prompt/codex-agent pack.",
+    "oracles": [
+      "bash skills/agentic-tech-lead-orchestration/tests/portfolio-control/run-all.sh exits 0 on the candidate head efb224d"
+    ],
+    "repository": "ed3c/skills-shared",
+    "residual_owner": "issue-566",
+    "rollback": {
+      "commit": "3fc020414134999227aec6ba9304a08e86287033",
+      "strategy": "close SUPERSEDED after salvage lands, no revert needed (never merged)"
+    },
+    "runtime_requirements": [
+      {
+        "capability": "salvageable-bytes-available",
+        "owner": "issue-560-portfolio-control-worktree",
+        "state": "PASS",
+        "unblock_condition": "already admitted"
+      }
+    ],
+    "schema_version": "agentic-tech-lead/issue-pr-acceptance/v1",
+    "start_dependencies": [],
+    "unit_id": "PR-564"
+  },
+  {
+    "allowed_terminal_states": [
+      "SUPERSEDED"
+    ],
+    "completion_dependencies": [],
+    "digest": "61a734233f517805e73446f5ea100c4237b921218ab4ad413e8380c21ab05f5a",
+    "epoch_id": "PORTFOLIO-EPOCH-20260822-B",
+    "evidence": {
+      "ceiling": "redundant with PR564 at lower depth and with a leaked local path; contributes nothing PR564 does not already provide",
+      "required_lanes": [
+        "SOURCE",
+        "LOCAL"
+      ]
+    },
+    "item": {
+      "base_commit": "3fc020414134999227aec6ba9304a08e86287033",
+      "base_tree": "eea625614c233b7f42fd62c129aa21852cb36b9d",
+      "head_commit": "bcafebe3399f971e490bf7fa861189db0415a8ea",
+      "head_tree": "6e2bc6aafd81620cc6f81d7859a8e7512d459060",
+      "kind": "PULL_REQUEST",
+      "number": 565,
+      "observed_state": "DRAFT"
+    },
+    "leases": {
+      "exclusive_paths": [
+        "skills/agentic-tech-lead-orchestration/references/REPOSITORY_PORTFOLIO_CONTROL.md",
+        "skills/agentic-tech-lead-orchestration/references/prompts/**",
+        "skills/agentic-tech-lead-orchestration/references/repository-portfolio-control/**",
+        "skills/agentic-tech-lead-orchestration/scripts/check_repository_portfolio_prompt_pack.py",
+        "skills/agentic-tech-lead-orchestration/tests/portfolio-control/**"
+      ],
+      "exclusive_resources": [],
+      "forbidden_paths": [
+        "main"
+      ],
+      "read_only_paths": []
+    },
+    "negative_controls": [
+      "strict subset of PR564 at lower depth; head fails its own gate: /Users/neon leak at REPOSITORY_PORTFOLIO_CONTROL.md line 73"
+    ],
+    "non_goals": [
+      "merge, release and production",
+      "G1-G7 compiler or ready-wave generation (explicitly NOT_IMPLEMENTED per body)"
+    ],
+    "objective": "Provide the prompt-only foundation atom (system prompt v3, role prompts, prompt-pack gate) as the smallest path-disjoint slice of #560.",
+    "oracles": [
+      "bash skills/agentic-tech-lead-orchestration/tests/portfolio-control/run-all.sh exits 0 on the candidate head bcafebe"
+    ],
+    "repository": "ed3c/skills-shared",
+    "residual_owner": "issue-566",
+    "rollback": {
+      "commit": "3fc020414134999227aec6ba9304a08e86287033",
+      "strategy": "close SUPERSEDED, no revert needed (never merged)"
+    },
+    "runtime_requirements": [
+      {
+        "capability": "salvageable-bytes-available",
+        "owner": "issue-560-portfolio-control-worktree",
+        "state": "PASS",
+        "unblock_condition": "already admitted"
+      }
+    ],
+    "schema_version": "agentic-tech-lead/issue-pr-acceptance/v1",
+    "start_dependencies": [],
+    "unit_id": "PR-565"
+  }
+]

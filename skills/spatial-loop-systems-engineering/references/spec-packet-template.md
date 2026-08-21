@@ -31,7 +31,45 @@ Human acceptance authority:
 | ID | Type | Statement | Owner | Falsifier/discovery method | Impact | State | Evidence |
 |---|---|---|---|---|---|---|---|
 
-## 4. Spatial topography
+## 4. Intent–Case–Proof sidecar
+
+For copy/migrate/port/replace/sync/merge/refactor/rewrite work, and whenever behavior preservation or scope completeness is material, bind a `spatial-loop-case-graph/v1` sidecar. Short prompt wording does not authorize semantic reduction.
+
+```text
+Prompt / source behavior
+→ Intent Atom
+→ Semantic Axis
+→ Use / Edge Case
+→ Invariant or State Path
+→ Implementation Binding
+→ Oracle / Negative Control
+→ Exact-subject Evidence
+```
+
+Record at least:
+
+| ID | Kind | Statement / classification | Disposition / owner | Case / implementation | Oracle | Evidence state |
+|---|---|---|---|---|---|---|
+
+Required semantic axes for migration-like work are considered explicitly and either marked applicable or explicitly not applicable with rationale: interface compatibility, control/decision logic, data/state semantics, failure/recovery, lifecycle/concurrency, side effects/idempotency, authority/permission, observability/error contract, and resource/performance behavior where material.
+
+Every source behavior has exactly one disposition:
+
+```text
+PRESERVE_EXACT
+PRESERVE_OBSERVABLE
+ADAPT_WITH_COMPATIBILITY
+INTENTIONAL_CHANGE
+DEFER_EXPLICIT
+DROP_EXPLICIT
+UNKNOWN_BLOCKING
+```
+
+`INTENTIONAL_CHANGE`, `DEFER_EXPLICIT`, `DROP_EXPLICIT`, and explicit scope reduction require a named authority decision. `UNKNOWN_BLOCKING` blocks the dependent material transition. Runtime state machines may cycle; the ICPG provenance graph may not.
+
+Machine authority: [`case-graph.schema.json`](case-graph.schema.json) plus [`../scripts/check_case_graph.py`](../scripts/check_case_graph.py). This section is navigation only.
+
+## 5. Spatial topography
 
 ### Realms
 
@@ -48,7 +86,7 @@ Human acceptance authority:
 | ID | From | To | Payload/ownership | Transport | Ordering | Backpressure | Failure semantics |
 |---|---|---|---|---|---|---|---|
 
-## 5. Lifecycle state machine
+## 6. Lifecycle state machine
 
 ```text
 Initial state:
@@ -62,7 +100,7 @@ Recovery path:
 | Transition ID | From | To | Trigger | Preconditions | Postconditions | Evidence |
 |---|---|---|---|---|---|---|
 
-## 6. Hard invariants
+## 7. Hard invariants
 
 | ID | Statement | Scope | Owner | Enforcement | Oracle | Failure state |
 |---|---|---|---|---|---|---|
@@ -70,44 +108,58 @@ Recovery path:
 For concurrent systems also record ownership, synchronization order, memory
 visibility, cancellation semantics, and race/deadlock oracle.
 
-## 7. Capability matrix
+## 8. Capability matrix
 
 | ID | Capability | Required | Probe | State | Evidence | Consequence if absent |
 |---|---|---|---|---|---|---|
 
-## 8. Resource envelope
+## 9. Resource envelope
 
 | ID | Realm | Kind | Limit | Unit | Enforcement | Observation | Exceed action | Lifecycle-owned |
 |---|---|---|---|---|---|---|---|---|
 
-## 9. Failure/collision matrix
+## 10. Failure/collision matrix
 
 | ID | Fault | Collision window | Detection | Containment | Reconciliation | Oracle |
 |---|---|---|---|---|---|---|
 
-## 10. Teardown symmetry
+## 11. Teardown symmetry
 
 | Resource | Acquire transition | Release transition | Crash path | Leak oracle |
 |---|---|---|---|---|
 
-## 11. Reconciliation loops
+## 12. Reconciliation loops
 
 | ID | Observes | Desired state | Diff | Actuator | Convergence | Stop condition |
 |---|---|---|---|---|---|---|
 
-## 12. Performance budgets
+## 13. Performance budgets
 
 | Metric | Target | Unit | Percentile | Load model | Environment identity | Measurement | Repetitions |
 |---|---|---|---|---|---|---|---|
 
 Leave the table empty only when the objective contains no performance claim.
 
-## 13. Verification lanes
+## 14. Verification lanes
 
 | ID | Required | Lane | Preconditions | Stimulus | Oracle | Negative control | Status | Evidence |
 |---|---|---|---|---|---|---|---|---|
 
-## 14. Implementation gate
+When an ICPG sidecar is required, report its independent coverage values rather than one aggregate score:
+
+```text
+Intent Coverage
+Source Behavior Disposition Coverage
+Required Case Coverage
+Implementation Binding Coverage
+Oracle Coverage
+Executed Evidence Coverage
+Unknown Blocking Count
+```
+
+Execution coverage is not correctness. `READY_FOR_PUBLICATION_REVIEW` requires every required case to have subject-bound `PASS` evidence.
+
+## 15. Implementation gate
 
 ```text
 Status: BLOCKED | READY_FOR_PROTOTYPE | READY_FOR_IMPLEMENTATION
@@ -169,6 +221,6 @@ until every required array, reference, oracle, and gate field is populated.
 }
 ```
 
-The complete field rules are enforced by
-`../scripts/check_system_contract.py`; this Markdown template is navigation, not
-a second schema authority.
+The complete system-contract field rules are enforced by
+`../scripts/check_system_contract.py`; ICPG sidecar rules are enforced by
+`../scripts/check_case_graph.py`. Markdown is navigation, not a second schema authority.

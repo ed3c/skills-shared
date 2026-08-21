@@ -201,3 +201,6 @@ assert receipt["verdict"] == "PASS", receipt
 assert receipt["claims_not_proven"], receipt
 print("agentic-tech-lead receipt control: PASS")
 PY2
+
+# #566: repository-portfolio control core (snapshot/acceptance/multigraph/waves/dispatch).
+sh "$ROOT/tests/portfolio-control/run-all.sh"

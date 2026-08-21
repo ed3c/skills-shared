@@ -1,75 +1,162 @@
 # spatial-loop-systems-engineering
 
-A portable **Constraint-First Spatial Systems Engineering** method with a monitor-first **Shadow Architecture Control Loop**.
+Portable **Constraint-First Spatial Systems Engineering** with a monitor-first **Shadow Architecture Control Loop** and an explicit **Intent–Case–Proof Graph (ICPG)** for use-case/edge-case/semantic-preservation closure.
 
-The default operating mode is `MONITOR`: the Builder may explore, design, implement, test, and refactor normally while a separate Shadow Architect watches material System Design deltas, hidden assumptions, evidence drift, and—when Agent Skills are material—procedural grounding drift. `PRECHECK` is reserved for high-risk or irreversible transitions. `POSTMORTEM` reverse-engineers the actual architecture after failure or first-green.
+`MONITOR` remains the default: the Builder may explore, design, implement, test and refactor while Shadow Architect observes material architecture, intent, case, evidence and procedural-grounding deltas. `PRECHECK` gates high-risk/irreversible transitions; `POSTMORTEM` reconstructs implicit architecture after failure or first-green.
 
-The Skill still classifies work from Level A local deterministic changes through Level D substrate-sensitive systems. Level C/D work may never silently degrade into ordinary feature-generation behavior.
+## Read order
+
+1. [`AGENTS.md`](AGENTS.md) — local Agent obligations and current #407 program.
+2. [`SKILL.md`](SKILL.md) — universal method and hard laws.
+3. [`references/intent-case-proof-graph.md`](references/intent-case-proof-graph.md) — prompt intent → cases → implementation → proof contract.
+4. [`references/architecture-watch-loop.md`](references/architecture-watch-loop.md) — live-monitor semantics and L0–L3 intervention.
+5. [`references/spec-packet-template.md`](references/spec-packet-template.md) and machine contracts.
+6. `scripts/`, `tests/`, and [`evals.json`](evals.json).
 
 ## Canonical flow
 
 ```text
-Universal Constraint-First System Prompt
-        ↓
-User Prompt / PDF / PRD / Diagram / Repo
+User Prompt / PDF / PRD / Diagram / Repo / Source Behavior
         ↓
 Constraint Compiler
-   ┌────┼────────┐
-   ↓    ↓        ↓
-Domain Unknown   Hard laws
-module probes
-   └────┼────────┘
+        ├── domain expansion
+        ├── unknown probes
+        └── hard laws
+        ↓
+Intent–Case–Proof Graph
+        ├── Intent Atoms
+        ├── Semantic Axes
+        ├── Use / Edge Cases
+        ├── Source Behavior Dispositions
+        ├── State Paths / Invariants
+        ├── Implementation Owners
+        └── Oracles / Evidence
         ↓
 Executable Spec
+        ↓
+Tech Lead Task DAG when composed
         ↓
 Builder implementation
         ↕
 Shadow Architecture Watch Loop
         ├── architecture/evidence deltas
+        ├── intent/case/semantic-parity deltas
         └── optional Procedural Grounding Shadow Plane
-                    ↓
-             Harness / Evals
+        ↓
+Harness / Evals
+        ↓
+FIRST_GREEN + BEFORE_PR reconciliation
 ```
 
-The core transformation remains:
+The governing transformation is:
 
 ```text
 WHAT THE USER WANTS
 → WHAT MUST ALWAYS REMAIN TRUE
-→ HOW WE CAN KNOW IT REMAINS TRUE
+→ WHICH CASES WOULD FALSIFY THAT
+→ WHO IMPLEMENTS EACH CASE OBLIGATION
+→ HOW WE KNOW IT REMAINS TRUE
 
 Intent
 → Boundary
 → State
 → Invariant
+→ Case
 → Failure
+→ Implementation Binding
 → Oracle
 → Evidence
-→ Implementation
 ```
 
-Under `MONITOR`, that transformation can be applied incrementally as implementation reveals architecture deltas instead of blocking harmless exploration up front.
+A short prompt may reduce wording. It may not reduce semantic obligations.
 
-## Operating modes
+## Runtime State Machine vs provenance DAG
 
-| Mode | Default? | Purpose |
-|---|---:|---|
-| [`MONITOR`](modes/monitor.md) | yes | preserve Builder exploration while watching architecture/evidence/procedural drift |
-| [`PRECHECK`](modes/precheck.md) | no | gate high-risk or irreversible material transitions before they occur |
-| [`POSTMORTEM`](modes/postmortem.md) | no | reconstruct implicit architecture from actual code/runtime/failure evidence |
-
-The monitor contract is [`references/architecture-watch-loop.md`](references/architecture-watch-loop.md). A compact copyable prompt overlay is [`references/system-prompt-monitor-overlay.md`](references/system-prompt-monitor-overlay.md).
-
-## Shadow Architecture intervention
+Runtime/state behavior may cycle:
 
 ```text
-L0 OBSERVE
-→ L1 WARN
-→ L2 REVIEW
-→ L3 BLOCK
+OBSERVE
+→ DIFF
+→ RECONCILE
+→ VERIFY
+├─ PASS → next checkpoint
+└─ FAIL → bounded retry / postmortem / escalation
+          ↘ may return to OBSERVE
 ```
 
-The Shadow Architect monitors these material deltas:
+ICPG provenance must be acyclic:
+
+```text
+Prompt / Source Behavior
+→ Intent Atom
+→ Semantic Axis
+→ Case
+→ State Path / Invariant
+→ Implementation Binding
+→ Oracle
+→ Evidence Receipt
+```
+
+Do not force retry/rollback/reconciliation into a DAG. Do not permit provenance cycles that make an obligation depend on its own proof.
+
+## Prompt-brevity and semantic-preservation law
+
+For copy/migrate/port/replace/sync/merge/refactor/rewrite work, explicitly classify every applicable axis:
+
+```text
+INTERFACE_COMPATIBILITY
+DATA_AND_STATE_SEMANTICS
+CONTROL_FLOW_AND_DECISION_LOGIC
+FAILURE_AND_RECOVERY_SEMANTICS
+LIFECYCLE_AND_CONCURRENCY
+SIDE_EFFECT_AND_IDEMPOTENCY
+AUTHORITY_AND_PERMISSION
+OBSERVABILITY_AND_ERROR_CONTRACT
+PERFORMANCE_AND_RESOURCE_BEHAVIOR
+```
+
+Compatibility cannot silently substitute for the remaining applicable axes.
+
+Every material source behavior has exactly one disposition:
+
+```text
+PRESERVE_EXACT
+PRESERVE_OBSERVABLE
+ADAPT_WITH_COMPATIBILITY
+INTENTIONAL_CHANGE
+DEFER_EXPLICIT
+DROP_EXPLICIT
+UNKNOWN_BLOCKING
+```
+
+`UNMAPPED`, implicit drop and assumed-irrelevant are forbidden terminal states. `INTENTIONAL_CHANGE`, `DEFER_EXPLICIT`, `DROP_EXPLICIT`, and explicit scope reduction require a decision record from an admitted authority/source.
+
+## Case-basis enumeration
+
+Where relevant enumerate over:
+
+```text
+Actor × Entry Point × Preconditions × Lifecycle State × Input Class × Authority
+× Ordering/Timing × Concurrency × Dependency State × Resource Pressure
+× Source Version × Target Version × Side-Effect Outcome × Recovery Path
+```
+
+Retain every generated member as one of:
+
+```text
+REQUIRED_CASE
+INVALID_INPUT_CASE
+IMPOSSIBLE_BY_INVARIANT
+OUT_OF_SCOPE_EXPLICIT
+DUPLICATE_EQUIVALENCE_CLASS
+UNKNOWN_BLOCKING
+```
+
+Use exhaustive enumeration for critical bounded spaces. Large spaces may use declared pairwise/covering-array, property-based, fuzz, model-based, fault-injection, differential or mutation strategies; denominator accounting remains explicit.
+
+## Shadow Architecture monitor
+
+Base delta classes remain:
 
 ```text
 ASSUMPTION_DELTA
@@ -85,69 +172,41 @@ EVIDENCE_DELTA
 PROCEDURAL_GROUNDING_DELTA
 ```
 
-It asks:
+ICPG adds:
+
+```text
+INTENT_INTERPRETATION_DELTA
+SCOPE_REDUCTION_DELTA
+USE_CASE_DELTA
+EDGE_CASE_DELTA
+SEMANTIC_PARITY_DELTA
+CASE_COVERAGE_DELTA
+CASE_ORACLE_DELTA
+SOURCE_BEHAVIOR_DISPOSITION_DELTA
+```
+
+At each material delta ask:
 
 ```text
 What became newly possible?
 What must now remain true?
 How would we know it is false?
+Which intent/source behavior made this path necessary?
+Which case covers it?
+Which semantic axis changed?
+Did the implementation silently narrow scope?
 ```
 
-The Shadow Architect is not a second implementation writer.
-
-## Procedural Grounding Shadow Plane
-
-When searched, installed, or repository-local Agent Skills materially affect the
-task, compose
-[`references/procedural-grounding-shadow-plane.md`](references/procedural-grounding-shadow-plane.md).
-
-The plane keeps these states separate:
+Intervention remains:
 
 ```text
-Skill discovered
-≠ procedure mentioned
-≠ procedure planned
-≠ procedure encoded in the Harness
-≠ procedure executed
-≠ expected runtime behavior observed
-≠ negative control passed
+L0 OBSERVE
+→ L1 WARN
+→ L2 REVIEW
+→ L3 BLOCK
 ```
 
-It normalizes relevant `SKILL.md` content into source-bound procedure atoms,
-computes weighted mention/Harness/execution/evidence coverage, admits bounded
-context forks at named checkpoints, and returns only a compact actionable
-**Context Capsule** to the parent runtime. Raw private reasoning traces are not a
-capsule payload.
-
-```text
-Skill search / local discovery
-→ source/ref/path/blob/content hashes + trust/rights review
-→ procedure atoms + proof modes
-→ current uptake observations
-→ bounded abstraction fork when useful
-→ Context Capsule injection gate
-→ assertion/probe/negative-control obligation
-→ exact-subject runtime receipt
-→ recomputed coverage
-```
-
-A critical `EXECUTION_REQUIRED` or `NEGATIVE_CONTROL_REQUIRED` atom cannot pass
-through model prose. Unknown or Skill-specific critical procedures require the
-smallest satisfied assertion/probe obligation before receipt-level `PASS`.
-
-The machine schema is
-[`references/procedural-grounding-receipt.schema.json`](references/procedural-grounding-receipt.schema.json),
-and the checker is
-[`scripts/check_procedural_grounding.py`](scripts/check_procedural_grounding.py).
-Provider/host mappings for skills.sh, Skillsmith, Claude Code, VS Code, Codex, and
-Gemini CLI are isolated in
-[`modules/agent-host-procedural-grounding.md`](modules/agent-host-procedural-grounding.md).
-
-The plane measures observable behavioral uptake. It does not claim direct access
-to model training membership, weights, hidden activations, or private chain of
-thought. Attribution requires repeated clean-context trials across
-`NO_SKILL`, `METADATA_ONLY`, `FULL_SKILL`, and
-`FULL_SKILL_PLUS_GROUNDING`.
+Use L2 for missing required case/oracle or unauthorized semantic narrowing. Use L3 at a material boundary for unresolved `UNKNOWN_BLOCKING`, implicit source-logic drop, critical case without oracle, authority widening, destructive/security-sensitive unbound behavior, or false coverage/evidence promotion.
 
 ## Mandatory checkpoints
 
@@ -160,70 +219,109 @@ ASYNC_OR_CONCURRENCY_INTRODUCED
 EXTERNAL_INTEGRATION_INTRODUCED
 NOVELTY_OR_DIVERGENCE
 FIRST_GREEN
-BEFORE_COMMIT when critical procedure proof owns eligibility
+BEFORE_COMMIT when critical procedure/case proof owns eligibility
 BEFORE_PR_OR_PUBLICATION
 CI_OR_RUNTIME_FAILURE_WITH_DESIGN_IMPACT
 ```
 
-`FIRST_GREEN` is intentionally special: passing tests may prove a coded path while leaving implicit assumptions, unexercised runtime behavior, failure states, unreconciled side effects, or ungrounded Skill procedures. Green remains green for its exact evidence subject; it does not automatically mean done.
+At `FIRST_GREEN`, green code paths remain green for their bound subject but do not erase untested failure states, missing source behaviors, orphan cases, unexercised runtime lanes or case-oracle gaps. `BEFORE_PR_OR_PUBLICATION` recomputes ICPG coverage against current implementation/evidence.
 
-## Document authority
+## Machine contracts
 
-| Question | Route |
-|---|---|
-| Universal compiler, modes, complexity, hard laws, gates, anti-drift | [`SKILL.md`](SKILL.md) |
-| Base universal System / Spec Prompt | [`references/system-prompt.md`](references/system-prompt.md) |
-| MONITOR-mode copyable overlay | [`references/system-prompt-monitor-overlay.md`](references/system-prompt-monitor-overlay.md) |
-| Shadow Architecture watch loop | [`references/architecture-watch-loop.md`](references/architecture-watch-loop.md) |
-| Procedural uptake/fork/capsule/assertion contract | [`references/procedural-grounding-shadow-plane.md`](references/procedural-grounding-shadow-plane.md) |
-| Procedural grounding machine schema | [`references/procedural-grounding-receipt.schema.json`](references/procedural-grounding-receipt.schema.json) |
-| Claude/Codex/VS Code/Gemini and discovery-service mapping | [`modules/agent-host-procedural-grounding.md`](modules/agent-host-procedural-grounding.md) |
-| Repeated-failure System Prompt overlay | [`references/system-prompt-recovery-overlay.md`](references/system-prompt-recovery-overlay.md) |
-| Three-failure issue/fresh-diagnosis/worktree contract | [`references/three-failure-escalation.md`](references/three-failure-escalation.md) |
-| Human-readable and JSON spec packet | [`references/spec-packet-template.md`](references/spec-packet-template.md) |
-| Triggered domain expansion policy | [`modules/README.md`](modules/README.md) |
-| Linux isolation specialization | [`modules/linux-isolation-runtime.md`](modules/linux-isolation-runtime.md) |
-| Deterministic system-contract checker | [`scripts/check_system_contract.py`](scripts/check_system_contract.py) |
-| Deterministic procedural-grounding checker | [`scripts/check_procedural_grounding.py`](scripts/check_procedural_grounding.py) |
-| Regression controls | [`evals.json`](evals.json), [`tests/`](tests/) |
+System contract:
 
-## Owned state and data flow
-
-```text
-source intent / candidate architecture
-        ↓
-complexity A/B/C/D + operating mode
-        ↓
-Builder exploration / implementation
-        ↕
-Shadow Architect observes material deltas
-        ├── assumptions/state/authority/lifecycle/evidence ledgers
-        └── Skill procedure atoms/coverage/fork/capsule ledgers when triggered
-        ↓
-constraint compiler / domain expansion / unknown probes
-        ↓
-material-boundary gate when required
-        ↓
-Harness / Evals
-        ↓
-checkpoint review, especially FIRST_GREEN and BEFORE_PR
-        ↓
-PASS / bounded repair / postmortem / three-failure escalation
+```bash
+python3 skills/spatial-loop-systems-engineering/scripts/check_system_contract.py \
+  check path/to/system-contract.json
 ```
 
-## Domain decoupling
+Case graph:
 
-The universal method stays in `SKILL.md`. Host-neutral contracts stay in
-`references/`. Domain/provider/host mappings stay in `modules/` and are loaded
-only when triggered. Domain modules may extend the core method; they may not
-replace it, downgrade complexity, redefine evidence states, bypass a
-material-boundary gate, disable architecture monitoring, or manufacture host
-capabilities.
+```bash
+python3 skills/spatial-loop-systems-engineering/scripts/check_case_graph.py \
+  check path/to/case-graph.json
+```
+
+Both use `0` for admitted contract closure, `2` for checked semantic/contract failure and `64` for missing/malformed input where supported. A checker does not prove referenced external evidence is truthful.
+
+## Migration semantic-loss canary
+
+The #408 fixture requires this defect to turn red:
+
+```text
+source decision branch B exists
+→ candidate removes B
+→ interface compatibility remains green
+→ semantic-parity / case-graph oracle turns red
+```
+
+If this defect cannot be distinguished, migration completeness is not proven.
+
+## Tech Lead and data-flow composition
+
+When `agentic-tech-lead-orchestration` is selected:
+
+```text
+ICPG exact subject + digest
+→ architecture invariants + required-case obligations
+→ typed task contracts
+→ true dependency DAG
+→ path/resource/interface leases
+→ bounded Workers
+→ independent result oracles
+→ one convergence owner
+→ global objective + case coverage reconciliation
+```
+
+Every required case has one implementation owner or one explicit convergence owner. A Worker/task PASS cannot close global case coverage by itself.
+
+Case dependency is not automatically Git ancestry. A true Git Town child exists only when it consumes a parent's unmerged bytes/contracts. Path-disjoint work remains sibling work.
+
+## #407 issue / implementation DAG
+
+```text
+#407  P0 global objective: Intent–Case–Proof closure
+│
+├─ #408  CONTRACT/CORE/EVAL
+│    case schema + checker + semantic-loss canary
+│
+├─ #409  MONITOR
+│    Shadow intent/case/semantic delta integration
+│    consumes #408 contract vocabulary
+│
+├─ #410  TECH-LEAD / STACK TRACEABILITY
+│    case obligations → task DAG → molecular Stack index
+│    path ownership determines sibling/child/convergence topology
+│
+└─ #411  LIVE EVIDENCE
+     exact-subject continuous Shadow canary
+     not a Git child merely because it is later in process order
+```
+
+Current implementation branch:
+
+```text
+agent/spatial-intent-case-proof-graph-v1
+```
+
+## Molecular terminal implementation plan
+
+| Atom | Issue | Type | Owned responsibility | Stack relation | Proof ceiling now |
+|---|---:|---|---|---|---|
+| `ICPG-C1` | #408 | `C` | schema/reference contract | root | IMPLEMENTED on branch |
+| `ICPG-K1` | #408 | `K` | deterministic semantic checker | same terminal leaf | IMPLEMENTED on branch |
+| `ICPG-E1` | #408 | `E` | migration positive + planted mutations | same terminal leaf | IMPLEMENTED, execution pending |
+| `ICPG-M1` | #409 | `K/E` | Shadow case-delta monitor | true child of contract semantics | IMPLEMENTED contract text; runtime pending |
+| `ICPG-D1` | #410 | `D/K` | Tech Lead/DAG/Molecular Stack integration | sibling or convergence by path lease | PARTIAL |
+| `ICPG-X1` | #411 | `X` | live independent Shadow canary | external/live evidence lane | NOT_EXERCISED |
+
+The canonical portable molecular vocabulary and branch laws remain owned by [`../git-town-stacked-pr-worker/references/MOLECULAR_STACK_INDEX.md`](../git-town-stacked-pr-worker/references/MOLECULAR_STACK_INDEX.md).
 
 ## Directory map
 
 ```text
 skills/spatial-loop-systems-engineering/
+├── AGENTS.md
 ├── README.md
 ├── SKILL.md
 ├── evals.json
@@ -234,6 +332,8 @@ skills/spatial-loop-systems-engineering/
 ├── references/
 │   ├── README.md
 │   ├── architecture-watch-loop.md
+│   ├── intent-case-proof-graph.md
+│   ├── case-graph.schema.json
 │   ├── procedural-grounding-shadow-plane.md
 │   ├── procedural-grounding-receipt.schema.json
 │   ├── system-prompt.md
@@ -247,75 +347,59 @@ skills/spatial-loop-systems-engineering/
 │   └── linux-isolation-runtime.md
 ├── scripts/
 │   ├── README.md
+│   ├── check_case_graph.py
 │   ├── check_procedural_grounding.py
 │   └── check_system_contract.py
 └── tests/
-    ├── README.md
     ├── run-all.sh
     ├── architecture-watch/verify.sh
-    ├── procedural-grounding/
-    │   ├── README.md
+    ├── case-graph/
     │   ├── verify.py
     │   ├── verify.sh
-    │   └── fixtures/valid.json
+    │   └── fixtures/good.json
+    ├── procedural-grounding/**
     ├── universal-entry/verify.sh
     ├── recovery-escalation/verify.sh
-    ├── refactor-proof/
-    │   ├── verify.sh
-    │   ├── refactor_ab.py
-    │   ├── real_task_ab.py
-    │   └── fixtures/
-    │       ├── pre-refactor-SKILL.txt
-    │       ├── refactor-as-landed-SKILL.txt
-    │       ├── escalation-restored-SKILL.txt
-    │       └── attempts.json
-    └── system-contract/
-        ├── verify.sh
-        └── fixtures/good.json
+    ├── refactor-proof/**
+    └── system-contract/**
 ```
 
-## Evidence boundary
+## Coverage and evidence boundary
+
+Report these separately:
+
+```text
+Intent Coverage
+Source Behavior Disposition Coverage
+Required Case Coverage
+Implementation Binding Coverage
+Oracle Coverage
+Executed Evidence Coverage
+Unknown Blocking Count
+```
+
+Current repository/branch evidence classes:
 
 ```text
 monitor-first operating contract                   IMPLEMENTED
-Shadow Architecture delta/intervention contract    IMPLEMENTED
-FIRST_GREEN meta-review                             IMPLEMENTED
-PRECHECK / POSTMORTEM mode contracts               IMPLEMENTED
-universal Constraint-First entry method            IMPLEMENTED
-A/B/C/D anti-degradation law                       IMPLEMENTED
-domain-extension/decoupling contract               IMPLEMENTED
-machine system-contract structure/gate consistency IMPLEMENTED
-three-failure escalation routing                   IMPLEMENTED
-procedural atom/coverage/fork/capsule contract      IMPLEMENTED
-procedural-grounding schema/checker                 IMPLEMENTED
-procedural positive/hollow/mutation controls        IMPLEMENTED
-blob-frozen refactor treatments A/B0/B1/B2         IMPLEMENTED
-old-strength preservation scoring                  IMPLEMENTED
-matched hermetic escalation-gate task              IMPLEMENTED
-matched live model/runtime refactor A/B            NOT_IMPLEMENTED
-live continuous Shadow Architect runtime           NOT_EXERCISED
-live external Skill search adapter                  NOT_EXERCISED
-live Claude/Codex separate context                  NOT_EXERCISED
-live separate-model grounding fork                  NOT_EXERCISED
-live multimodal browser/device observer             NOT_EXERCISED
-four-condition cross-harness attribution            NOT_EXERCISED
-fresh ChatGPT Desktop session execution             HOST_OPERATOR_BOUND
-physical Linux isolation behavior                  NOT_EXERCISED
-real hardware performance                          NOT_EXERCISED
+Shadow Architecture architecture deltas            IMPLEMENTED
+Intent–Case–Proof reference/schema/checker          IMPLEMENTED_ON_BRANCH
+migration semantic-loss mutation controls           IMPLEMENTED_ON_BRANCH / NOT_EXERCISED_BY_CI_YET
+Shadow intent/case delta contract                    IMPLEMENTED_ON_BRANCH
+Tech Lead case-DAG consumption                      PARTIAL / #410
+Git Town README/index integration                    PARTIAL / #410
+live continuous Shadow Architect runtime             NOT_EXERCISED / #411
+matched live model/runtime refactor A/B              NOT_IMPLEMENTED
+physical Linux isolation behavior                   NOT_EXERCISED
+real hardware performance                           NOT_EXERCISED
 model-weight/private-reasoning introspection        OUT_OF_SCOPE
-security or production acceptance                  HUMAN_ADMIT_REQUIRED
+security or production acceptance                   HUMAN_ADMIT_REQUIRED
 ```
 
-## Run the controls
+Run all owning deterministic controls with:
 
 ```bash
 bash skills/spatial-loop-systems-engineering/tests/run-all.sh
 ```
 
-A green suite proves the checked repository bytes retain the monitor-first laws,
-universal entry, machine-contract closure, procedural-grounding fail-closed
-rules, and recovery routing. It does not prove that a live agent host continuously
-monitored another agent, searched an external Skill registry, created an
-independent model context, executed a browser/device observer, ran a real
-four-condition eval matrix, exercised an external provider or physical
-substrate, or produced a production-safe system.
+A green suite proves only the checked repository bytes and declared deterministic fixtures. It does not establish universal edge-case discovery, all real-world unknown unknowns, continuous live Shadow monitoring, external provider behavior, physical substrate behavior, production safety or Human acceptance.
