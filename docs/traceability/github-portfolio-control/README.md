@@ -23,7 +23,8 @@ Frozen contract plane: `skills/github-portfolio-control` at tree
 | `multigraph.json` | compiled G1–G7 + 8 ready waves over the 16 units | `scripts/assert_portfolio_multigraph.py` |
 | `l2-join-receipt.json` | #567 subagent join denominator: 27 requested agents — 20 Claude-carrier exercised, 1 Codex-carrier (codex-cli 0.148.0, self-reported model "GPT-5", read-only) exercised, 6 Codex-carrier AVAILABLE_NOT_EXERCISED | `jsonschema` against `ghpc/subagent-join/v1` |
 | `l2-codex-result.json` | the raw Codex CLI exercise result and identity receipts | cross-checked against candidate refs |
-| `validation-report.txt` | exact commands + exit codes (20/20 exit 0) and 5 decision-vs-checker tensions | itself |
+| `validation-report.txt` | exact commands + exit codes (20/20 exit 0, deterministic lane; carries 5 disclosed decision-vs-checker tensions — read them with the number) | itself |
+| `one-shot-ci-epochs.json` | the real hosted epochs: epoch 1 CODE_FAILURE (body-neutrality) honestly closed, epoch 2 green 23/23, single Ready toggle, match-head merge, exact-main readback 9fe3c6d | ghpc/one-shot-ci-epoch/v1 vocabulary |
 
 Checker scripts live in `skills/agentic-tech-lead-orchestration/scripts/`; the
 join/one-shot-CI contract shapes live in `skills/github-portfolio-control` and

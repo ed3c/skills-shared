@@ -1,0 +1,31 @@
+{
+  "schema_version": "agentic-tech-lead/issue-closure-contract/v1",
+  "issue": {"repository": "ed3c/skills-shared", "number": 560, "github_state": "CLOSED", "github_state_reason": "COMPLETED"},
+  "disposition": "DIRECTLY_LANDED",
+  "acceptance": [
+    {"id": "portable-contracts-checkers-tests-on-exact-main", "status": "SATISFIED", "successor": null, "rationale": "landed at 9fe3c6d via PR #573"},
+    {"id": "codex-subagent-dispatch-join-consolidation-controls", "status": "SATISFIED", "successor": null, "rationale": "ghpc join contract composed; dispatch schema + join receipt with full denominator; deterministic controls pass"},
+    {"id": "six-pr-portfolio-reclassified-fresh-epoch", "status": "SATISFIED", "successor": null, "rationale": "every open PR dispositioned on epochs A/B with receipts"},
+    {"id": "412-reconstructed-or-superseded", "status": "SATISFIED", "successor": null, "rationale": "superseded through the replayed #419; provenance premise falsified; forensic branch preserved"},
+    {"id": "one-shot-ci-proven-real-epoch", "status": "SATISFIED", "successor": null, "rationale": "epoch 1 CODE_FAILURE honestly closed, epoch 2 green 23/23 at exact head b883093, single Ready toggle, match-head merge, exact-main readback"},
+    {"id": "issue-closure-contract-records-dispositions", "status": "SATISFIED", "successor": null, "rationale": "packets issue-566/567/568/559/560 in this directory"},
+    {"id": "bootstrap-canary-without-copied-bodies", "status": "SATISFIED", "successor": null, "rationale": "hermetic + hosted canary green; copied-body refusal adversarially proven"},
+    {"id": "independent-same-subject-shadow-verdict", "status": "SATISFIED", "successor": null, "rationale": "Shadow verdicts at epoch bind, decision ledger, candidate heads, final head; no unresolved L3"},
+    {"id": "human-admit-for-merge", "status": "SATISFIED", "successor": null, "rationale": "Human goal directive 2026-08-22 authorized the merge lane (itemized in epoch.json admitted_substitutions); merge executed with match-head"}
+  ],
+  "implementation": {
+    "candidate_prs": [
+      {"repository": "ed3c/skills-shared", "number": 573, "state": "CLOSED", "merged": true, "classification": "DIRECT"},
+      {"repository": "ed3c/skills-shared", "number": 571, "state": "CLOSED", "merged": true, "classification": "HISTORICAL"},
+      {"repository": "ed3c/skills-shared", "number": 562, "state": "CLOSED", "merged": false, "classification": "SUPERSEDED"},
+      {"repository": "ed3c/skills-shared", "number": 564, "state": "CLOSED", "merged": false, "classification": "SUPERSEDED"},
+      {"repository": "ed3c/skills-shared", "number": 565, "state": "CLOSED", "merged": false, "classification": "SUPERSEDED"}
+    ],
+    "landing": {"repository": "ed3c/skills-shared", "via_pr": 573, "commit": "9fe3c6daf53dcdd61123d5d7a4eeedbdf37b5d7c", "tree": "c17678166cee2adba2f92f6099011ec52716ece7"}
+  },
+  "residual": [
+    {"id": "codex-carrier-lanes-beyond-release-auditor", "state": "NOT_EXERCISED", "owner": "ed3c/skills-shared#464"}
+  ],
+  "evidence_ceiling": "DETERMINISTIC",
+  "shadow_review": {"verdict": "PASS"}
+}
