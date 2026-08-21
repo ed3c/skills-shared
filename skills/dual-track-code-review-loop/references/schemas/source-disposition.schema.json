@@ -1,0 +1,262 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dtcr-source-disposition.schema.json",
+  "title": "DTCR source disposition set",
+  "description": "The adjudication of one source packet's claims, one record per claim. Each record separates what the source said from whether it applies here and from what this method does with it, because a claim can be true of the world the source described and still be refused here, and collapsing the three into one verdict loses the reason. A REFUSED disposition carries a negative control: a concrete instance that a named schema must reject, and the keyword that rejects it. Prose refusals decay into prose; a refusal with a replayable control stays a refusal after everyone who wrote it has forgotten it.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "source_ref", "dispositions"],
+  "properties": {
+    "schema": {"const": "dtcr/source-disposition/v1"},
+    "source_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["packet_id", "file_name", "byte_count", "sha256"],
+      "properties": {
+        "packet_id": {"type": "string", "pattern": "^DTCR-SP-[0-9]{3}$"},
+        "file_name": {"type": "string", "minLength": 1, "not": {"pattern": "[/\\\\]|^~"}},
+        "byte_count": {"type": "integer", "minimum": 1},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      },
+      "description": "The exact bytes adjudicated. A disposition set that does not name its subject's digest adjudicates whichever revision the reader happens to hold."
+    },
+    "dispositions": {
+      "type": "array",
+      "minItems": 7,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/disposition"}
+    }
+  },
+  "$defs": {
+    "disposition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["disposition_id", "claim_class", "source_claim", "applicability", "applicability_rationale", "closure", "correction", "negative_control"],
+      "properties": {
+        "disposition_id": {"type": "string", "pattern": "^DTCR-SD-[0-9]{3}$"},
+        "claim_class": {
+          "enum": ["SOURCE_STATEMENT", "SOURCE_PROPOSAL"],
+          "description": "A statement is what the source asserted about the world; a proposal is what it recommended doing. Both stay source-graded here."
+        },
+        "source_claim": {
+          "type": "string",
+          "minLength": 12,
+          "description": "The claim restated in the method's own words. Quoting at length would carry the source's framing along with its content."
+        },
+        "applicability": {"enum": ["APPLICABLE", "NOT_APPLICABLE"]},
+        "applicability_rationale": {"type": "string", "minLength": 12},
+        "closure": {
+          "enum": ["REFUSED", "ADMITTED_AS_CANDIDATE_PROCEDURE", "OPEN", "HUMAN_ADMIT_REQUIRED"],
+          "description": "REFUSED means this method will not carry the claim in any artifact. It does not mean the source was dishonest; it means the claim outruns what any evidence in this method can support."
+        },
+        "correction": {
+          "type": "string",
+          "minLength": 20,
+          "description": "What replaces the refused claim. A refusal with no replacement leaves the next reader with the original."
+        },
+        "negative_control": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["schema_id", "case_id", "refused_by", "instance"],
+          "properties": {
+            "schema_id": {
+              "type": "string",
+              "pattern": "^dtcr/[a-z-]+/v1$",
+              "description": "The schema identity that must reject the instance."
+            },
+            "case_id": {"type": "string", "pattern": "^DTCR-NC-[0-9]{3}$"},
+            "refused_by": {
+              "type": "string",
+              "minLength": 4,
+              "description": "The keyword path that does the rejecting. Naming it means a later edit that quietly removes the constraint also breaks this record."
+            },
+            "instance": {
+              "description": "Arbitrary JSON, deliberately unconstrained here. It is the thing the other schema must refuse, so constraining its shape in this schema would refuse it twice and prove nothing."
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"closure": {"const": "REFUSED"}}, "required": ["closure"]},
+          "then": {"required": ["correction", "negative_control"]}
+        }
+      ]
+    }
+  },
+  "x-positive-instance": "../source-disposition/refused-claims.json",
+  "x-control-note": "Each control instance below is a complete disposition set, valid in every other respect, carrying exactly one defect. An instance that is short of the seven dispositions is refused by minItems before it ever reaches the keyword the control is about, which makes the control unable to show that its named keyword does anything.",
+  "x-refusal-controls": [
+    {
+      "case_id": "DTCR-XC-SD-001",
+      "refuses": "A refusal recorded as prose, with no replayable control behind it. The set is otherwise complete and valid; DTCR-SD-001 alone is missing its negative_control.",
+      "refused_by": "$defs.disposition.required and $defs.disposition.allOf[0].then.required",
+      "refused_by_note": "Both keywords refuse this instance: negative_control is unconditionally required, and the REFUSED branch requires it again. Naming only one would claim a discrimination the instance cannot show.",
+      "instance": {
+        "schema": "dtcr/source-disposition/v1",
+        "source_ref": {
+          "packet_id": "DTCR-SP-001",
+          "file_name": "LLM 代碼審查的雙軌認知閉環.pdf",
+          "byte_count": 3251356,
+          "sha256": "be535f9a9d5d54a2c5cd2e9fc2be653d0123bfed7100e0acbcbe5662e0763caf"
+        },
+        "dispositions": [
+          {
+            "disposition_id": "DTCR-SD-001",
+            "claim_class": "SOURCE_STATEMENT",
+            "source_claim": "The architecture achieves complete coverage of the codebase boundary.",
+            "applicability": "APPLICABLE",
+            "applicability_rationale": "The claim is about the subject this Skill governs.",
+            "closure": "REFUSED",
+            "correction": "A static pass covers the edges its resolver resolved, over a nameable denominator."
+          },
+          {
+            "disposition_id": "DTCR-SD-002",
+            "claim_class": "SOURCE_PROPOSAL",
+            "source_claim": "A green suite plus one graph count admits a change to merge automatically.",
+            "applicability": "APPLICABLE",
+            "applicability_rationale": "Merge admission is a state this method writes down.",
+            "closure": "REFUSED",
+            "correction": "Merge admission is single-valued and no accumulation of checks changes it.",
+            "negative_control": {"schema_id": "dtcr/change-unit/v1", "case_id": "DTCR-NC-002", "refused_by": "properties.merge_admission.enum", "instance": "carried in full by references/source-disposition/refused-claims.json"}
+          },
+          {
+            "disposition_id": "DTCR-SD-003",
+            "claim_class": "SOURCE_PROPOSAL",
+            "source_claim": "Deterministic signature-nonce derivation remedies authenticated-encryption nonce reuse.",
+            "applicability": "APPLICABLE",
+            "applicability_rationale": "The remedy shape is one this method records.",
+            "closure": "REFUSED",
+            "correction": "The mechanism establishes reproducible signing and says nothing about AEAD nonce uniqueness.",
+            "negative_control": {"schema_id": "dtcr/refactor-proposal/v1", "case_id": "DTCR-NC-003", "refused_by": "$defs.remediation.not", "instance": "carried in full by references/source-disposition/refused-claims.json"}
+          },
+          {
+            "disposition_id": "DTCR-SD-004",
+            "claim_class": "SOURCE_PROPOSAL",
+            "source_claim": "Occurrence nesting is recorded as a complete call graph.",
+            "applicability": "APPLICABLE",
+            "applicability_rationale": "Graph provenance is a field this method carries.",
+            "closure": "REFUSED",
+            "correction": "Heuristic provenance is bound to a partial completeness value and cannot report itself complete.",
+            "negative_control": {"schema_id": "dtcr/violation-candidate/v1", "case_id": "DTCR-NC-004", "refused_by": "properties.graph_evidence.allOf[0].then", "instance": "carried in full by references/source-disposition/refused-claims.json"}
+          },
+          {
+            "disposition_id": "DTCR-SD-005",
+            "claim_class": "SOURCE_PROPOSAL",
+            "source_claim": "A top-ranked retrieval hit settles whether a change violates an invariant.",
+            "applicability": "APPLICABLE",
+            "applicability_rationale": "The semantic track retrieves exactly these documents.",
+            "closure": "REFUSED",
+            "correction": "Retrieved items stay non-authoritative and a violation's basis must contain a deterministic fact.",
+            "negative_control": {"schema_id": "dtcr/violation-candidate/v1", "case_id": "DTCR-NC-005", "refused_by": "properties.basis.contains", "instance": "carried in full by references/source-disposition/refused-claims.json"}
+          },
+          {
+            "disposition_id": "DTCR-SD-006",
+            "claim_class": "SOURCE_PROPOSAL",
+            "source_claim": "One observed stack is the universal choice for every service in the architecture.",
+            "applicability": "APPLICABLE",
+            "applicability_rationale": "Portability is what this Skill's body is for.",
+            "closure": "REFUSED",
+            "correction": "Applicability is fixed at observed-on-listed-targets-only and the target list refuses wildcards.",
+            "negative_control": {"schema_id": "dtcr/candidate-record/v1", "case_id": "DTCR-NC-006", "refused_by": "properties.applicability.properties.targets_observed.items.not", "instance": "carried in full by references/source-disposition/refused-claims.json"}
+          },
+          {
+            "disposition_id": "DTCR-SD-007",
+            "claim_class": "SOURCE_STATEMENT",
+            "source_claim": "The arrangement lifts engineering output by a fixed multiple.",
+            "applicability": "APPLICABLE",
+            "applicability_rationale": "These figures are the source's argument for adopting the method.",
+            "closure": "REFUSED",
+            "correction": "Any figure is a measurement object carrying method, sample size, environment and commit, or it is the literal unmeasured value.",
+            "negative_control": {"schema_id": "dtcr/refactor-proposal/v1", "case_id": "DTCR-NC-007", "refused_by": "properties.expected_effect.oneOf", "instance": "carried in full by references/source-disposition/refused-claims.json"}
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "DTCR-XC-SD-002",
+      "refuses": "A disposition set that adjudicates a source it does not identify by digest. The seven dispositions are complete and valid; source_ref alone is missing its sha256.",
+      "refused_by": "properties.source_ref.required",
+      "instance": {
+        "schema": "dtcr/source-disposition/v1",
+        "source_ref": {
+          "packet_id": "DTCR-SP-001",
+          "file_name": "LLM 代碼審查的雙軌認知閉環.pdf",
+          "byte_count": 3251356
+        },
+        "dispositions": [
+          {
+            "disposition_id": "DTCR-SD-001",
+            "claim_class": "SOURCE_STATEMENT",
+            "source_claim": "The architecture achieves complete coverage of the codebase boundary.",
+            "applicability": "APPLICABLE",
+            "applicability_rationale": "The claim is about the subject this Skill governs.",
+            "closure": "REFUSED",
+            "correction": "A static pass covers the edges its resolver resolved, over a nameable denominator.",
+            "negative_control": {"schema_id": "dtcr/verification-receipt/v1", "case_id": "DTCR-NC-001", "refused_by": "properties.coverage.oneOf and properties.summary.not.pattern", "instance": "carried in full by references/source-disposition/refused-claims.json"}
+          },
+          {
+            "disposition_id": "DTCR-SD-002",
+            "claim_class": "SOURCE_PROPOSAL",
+            "source_claim": "A green suite plus one graph count admits a change to merge automatically.",
+            "applicability": "APPLICABLE",
+            "applicability_rationale": "Merge admission is a state this method writes down.",
+            "closure": "REFUSED",
+            "correction": "Merge admission is single-valued and no accumulation of checks changes it.",
+            "negative_control": {"schema_id": "dtcr/change-unit/v1", "case_id": "DTCR-NC-002", "refused_by": "properties.merge_admission.enum", "instance": "carried in full by references/source-disposition/refused-claims.json"}
+          },
+          {
+            "disposition_id": "DTCR-SD-003",
+            "claim_class": "SOURCE_PROPOSAL",
+            "source_claim": "Deterministic signature-nonce derivation remedies authenticated-encryption nonce reuse.",
+            "applicability": "APPLICABLE",
+            "applicability_rationale": "The remedy shape is one this method records.",
+            "closure": "REFUSED",
+            "correction": "The mechanism establishes reproducible signing and says nothing about AEAD nonce uniqueness.",
+            "negative_control": {"schema_id": "dtcr/refactor-proposal/v1", "case_id": "DTCR-NC-003", "refused_by": "$defs.remediation.not", "instance": "carried in full by references/source-disposition/refused-claims.json"}
+          },
+          {
+            "disposition_id": "DTCR-SD-004",
+            "claim_class": "SOURCE_PROPOSAL",
+            "source_claim": "Occurrence nesting is recorded as a complete call graph.",
+            "applicability": "APPLICABLE",
+            "applicability_rationale": "Graph provenance is a field this method carries.",
+            "closure": "REFUSED",
+            "correction": "Heuristic provenance is bound to a partial completeness value and cannot report itself complete.",
+            "negative_control": {"schema_id": "dtcr/violation-candidate/v1", "case_id": "DTCR-NC-004", "refused_by": "properties.graph_evidence.allOf[0].then", "instance": "carried in full by references/source-disposition/refused-claims.json"}
+          },
+          {
+            "disposition_id": "DTCR-SD-005",
+            "claim_class": "SOURCE_PROPOSAL",
+            "source_claim": "A top-ranked retrieval hit settles whether a change violates an invariant.",
+            "applicability": "APPLICABLE",
+            "applicability_rationale": "The semantic track retrieves exactly these documents.",
+            "closure": "REFUSED",
+            "correction": "Retrieved items stay non-authoritative and a violation's basis must contain a deterministic fact.",
+            "negative_control": {"schema_id": "dtcr/violation-candidate/v1", "case_id": "DTCR-NC-005", "refused_by": "properties.basis.contains", "instance": "carried in full by references/source-disposition/refused-claims.json"}
+          },
+          {
+            "disposition_id": "DTCR-SD-006",
+            "claim_class": "SOURCE_PROPOSAL",
+            "source_claim": "One observed stack is the universal choice for every service in the architecture.",
+            "applicability": "APPLICABLE",
+            "applicability_rationale": "Portability is what this Skill's body is for.",
+            "closure": "REFUSED",
+            "correction": "Applicability is fixed at observed-on-listed-targets-only and the target list refuses wildcards.",
+            "negative_control": {"schema_id": "dtcr/candidate-record/v1", "case_id": "DTCR-NC-006", "refused_by": "properties.applicability.properties.targets_observed.items.not", "instance": "carried in full by references/source-disposition/refused-claims.json"}
+          },
+          {
+            "disposition_id": "DTCR-SD-007",
+            "claim_class": "SOURCE_STATEMENT",
+            "source_claim": "The arrangement lifts engineering output by a fixed multiple.",
+            "applicability": "APPLICABLE",
+            "applicability_rationale": "These figures are the source's argument for adopting the method.",
+            "closure": "REFUSED",
+            "correction": "Any figure is a measurement object carrying method, sample size, environment and commit, or it is the literal unmeasured value.",
+            "negative_control": {"schema_id": "dtcr/refactor-proposal/v1", "case_id": "DTCR-NC-007", "refused_by": "properties.expected_effect.oneOf", "instance": "carried in full by references/source-disposition/refused-claims.json"}
+          }
+        ]
+      }
+    }
+  ]
+}
