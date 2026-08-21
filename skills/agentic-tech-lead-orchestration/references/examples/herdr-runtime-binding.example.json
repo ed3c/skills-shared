@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "consumer_repo": "owner/example-repo",
+  "runtime_contract": {
+    "provider": "herdr",
+    "optional": true,
+    "fallback": "codex-sdk+git-worktree",
+    "requirements": [
+      "herdr binary available on host",
+      "worktree already allocated by controller",
+      "agent target bound to the same foreground_cwd",
+      "fresh observation timestamp and process liveness are readable",
+      "terminal cleanup/residue state is readable before DONE_CANDIDATE",
+      "no repository-stored credentials"
+    ]
+  },
+  "observer_manifest": {
+    "task_id": "issue-123/T1",
+    "attempt_id": "a01",
+    "repo": "owner/example-repo",
+    "base_sha": "0123456789abcdef0123456789abcdef01234567",
+    "tree_sha": "89abcdef0123456789abcdef0123456789abcdef",
+    "worktree": "/worktrees/example-123",
+    "target": "worker-123",
+    "max_observation_age_seconds": 120,
+    "expected_pane_id": "w1:p2",
+    "expected_workspace_id": "w1",
+    "expected_process_id": 123,
+    "expected_process_started_at_unix": 1999999000,
+    "expected_agent_session_id": "codex-thread-id",
+    "require_foreground_cwd": true,
+    "require_process_liveness": true,
+    "require_clean_terminal": true
+  },
+  "authority": {
+    "semantic_dag": "tech-lead-controller",
+    "acceptance": "independent-controller-readback+shadow",
+    "merge_release": "repository-policy/human-admit",
+    "herdr": "observer-only"
+  }
+}
