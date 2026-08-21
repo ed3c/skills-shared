@@ -1,0 +1,68 @@
+{
+  "epoch_id": "PORTFOLIO-EPOCH-20260822-B",
+  "observed": "2026-08-22",
+  "repository": "ed3c/skills-shared",
+  "origin_main": "28f394785aa8b13c4e6d2f21ad74c5e32a6a6dc5",
+  "origin_main_tree": "8343d988e98d044402ccfbcd2cbe0e848f6e649f",
+  "worktree": {
+    "path": "/Users/neon/skills-shared/.claude/worktrees/issue-560-portfolio-control",
+    "branch": "worktree-issue-560-portfolio-control",
+    "head": "28f394785aa8b13c4e6d2f21ad74c5e32a6a6dc5",
+    "base_alignment": "ff bc69a51->3fc0204 at session start; ff 3fc0204->28f3947 after wave-8 landed"
+  },
+  "superseded_epochs": [
+    {
+      "epoch_id": "PORTFOLIO-EPOCH-20260822-A",
+      "delta_kind": "BASE_MAIN_DRIFT",
+      "from": "main 3fc0204 / tree eea62561",
+      "to": "main 28f3947 / tree 8343d988",
+      "relation": "fast-forward via PR #571 merge (agent/wave-8-portfolio); verified by local readback",
+      "content": "ghpc skills/github-portfolio-control/** landed (4 contracts/48 controls/9 codes); DTCR #523 R1; POL #428/#429; root README + docs/INDEX.md DR-13; skill-suites.yml +github-portfolio-control",
+      "writer_release": "peer session skills-shared-97 released all leases and stopped; root README/docs/INDEX.md/skill-suites.yml now free",
+      "issue_state_skew": "peer closed #523/#428/#429, left landing-receipt comment on #560, opened #572 (prose-status truth gate); tmp-portfolio issue/PR dumps remain epoch-A observations — refresh required before publication epoch",
+      "finding_impact": "no epoch-A audit finding content-invalidated (fast-forward); wave-1 replay branches based on 3fc0204 require final re-merge onto 28f3947 before publication"
+    }
+  ],
+  "runtime_delta": {
+    "issue_declared_lane": "CODEX_CLI_LOCAL at /Users/neon/skills-shared, identity agent-macro@codex-cli.invalid",
+    "actual_runtime": "CLAUDE_CODE_LOCAL (Claude Code session, isolated git worktree, executable git+shell, gh authenticated)",
+    "admitted_substitutions": [
+      "runtime lane: CODEX_CLI_LOCAL -> CLAUDE_CODE_LOCAL",
+      "commit author: agent-macro@codex-cli.invalid -> agent-macro@claude-code.invalid",
+      "trailer: Driven-On: codex-cli -> Driven-On: claude-code",
+      "subagent carrier: codex CLI subagents -> Claude Code Workflow/Agent subagents; literal Codex-CLI exercise lane in #567 stays NOT_EXERCISED unless codex binary is actually run"
+    ],
+    "admission_source": "Human user message 2026-08-22 (goal directive); any substitution NOT in this list requires a new admission",
+    "commit_identity": "agent-macro@claude-code.invalid with Driven-By: agent-macro / Driven-On: claude-code trailers per scripts/check_commit_roles.py"
+  },
+  "model_alias_resolution": {
+    "columns": "alias -> provider -> carrier -> exact model/version -> config/effort -> data boundary -> availability",
+    "FABLE_5": {"provider": "anthropic", "carrier": "claude-code main loop", "model": "claude-fable-5", "config": "session default effort", "data_boundary": "local repo + GitHub dumps", "availability": "EXERCISED (this session)", "role": "portfolio orchestrator / Tech Lead"},
+    "OPUS_5": {"provider": "anthropic", "carrier": "claude-code Workflow/Agent subagent", "model": "claude-opus-5 (self-reported claude-opus-5[1m] by Shadow instance)", "config": "per-dispatch", "data_boundary": "local repo + GitHub dumps", "availability": "EXERCISED (Shadow run completed)", "role": "adversarial architect / independent verifier, read-only; read_only_enforcement: PROMPT_ONLY"},
+    "SONNET_5": {"provider": "anthropic", "carrier": "claude-code Workflow subagent", "model": "claude-sonnet-5", "config": "per-dispatch", "data_boundary": "local repo + GitHub dumps", "availability": "UNVERIFIED until first worker self-reports", "role": "bounded implementation worker, one exclusive lease"},
+    "rule": "never dispatch role-bound agents via subagent_type fork (fork ignores model override); join receipts bind self-reported model, not requested model"
+  },
+  "local_writers": [
+    {"worktree": "/Users/neon/skills-shared", "branch": "main", "head": "3fc0204", "note": "main checkout; no branch switching allowed"},
+    {"worktree": ".claude/worktrees/integration-w8", "branch": "agent/wave-8-portfolio", "head": "75cd5a5", "ahead_of_main": 9, "note": "ACTIVE PEER SESSION skills-shared-97 (busy, started ~00:40 2026-08-22); contains 4th #560 candidate skills/github-portfolio-control/** + POL #428/#429 + DTCR #523 + root README/docs/INDEX/skill-suites.yml edits; DO NOT WRITE; supersession decision pending peer reply"},
+    {"worktree": ".claude/worktrees/issue-560-portfolio-control", "branch": "worktree-issue-560-portfolio-control", "head": "3fc0204", "note": "THIS session (Tech Lead); exclusive lease on this branch only until waves are declared"},
+    {"worktree": ".claude/worktrees/wf_187a4bb9-606-*", "branch": "worktree-wf_187a4bb9-606-1..4", "head": "5dfdbac/38fee35/b7f69e0/90dd2f4", "note": "residual workflow worktrees feeding wave-8; treat as frozen inputs, not writers"},
+    {"worktree": ".claude/worktrees/agent-a2524489d6d83b5c8", "branch": "dtcr/518-c0-contract", "head": "a3992f2", "note": "out of queue scope; not a portfolio-path writer"},
+    {"worktree": ".claude/worktrees/goal-244-29-37 and others", "branch": "various", "head": "various", "note": "stale prior-session worktrees; none hold portfolio-control paths per Shadow F1 scan"}
+  ],
+  "scope": "Local Handoff Execution Queue only: issues 560,566,559,567,568,569,570; PRs 565,564,562,450,420,419,412,396,395",
+  "issue_dumps": "tmp-portfolio/issue-<n>.json",
+  "pr_dumps": "tmp-portfolio/pr-<n>.json",
+  "pr_heads": {
+    "565": "agent/560-portfolio-prompt-foundation",
+    "564": "agent/560-portfolio-prompt-contract-foundation",
+    "562": "agent/560-repository-portfolio-control-c0-20260821f",
+    "450": "agent/415-knowledge-graph-delivery-binding",
+    "420": "agent/414-knowledge-graph-machine-contracts",
+    "419": "agent/413-knowledge-graph-icpg-bridge",
+    "412": "agent/spatial-intent-case-proof-graph-v1",
+    "396": "kenn-ae/shared-index-trace",
+    "395": "kenn-ae/design-control-plane"
+  },
+  "network_policy": "GitHub facts for this epoch come ONLY from tmp-portfolio dumps + already-fetched origin refs; agents must not call gh"
+}
