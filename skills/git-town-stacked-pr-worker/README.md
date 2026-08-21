@@ -350,6 +350,127 @@ Full current authority transition and State Machine:
 - [`../../docs/traceability/WAVE3_PARENT_ADMISSION.md`](../../docs/traceability/WAVE3_PARENT_ADMISSION.md)
 - [`../../docs/traceability/WAVE3_LIVE_EVIDENCE.md`](../../docs/traceability/WAVE3_LIVE_EVIDENCE.md)
 
+## Current Spatial Loop ICPG molecular Stack — #407
+
+This index tracks the terminal implementation slices for `spatial-loop-systems-engineering` Intent–Case–Proof Graph work. It is a traceability projection, not a substitute for the canonical machine molecular Stack schema or exact PR metadata.
+
+```text
+#407  global objective / program issue
+│
+├─ ICPG-C1/K1/E1  #408  contract + checker + migration semantic-loss controls
+│      branch: agent/spatial-intent-case-proof-graph-v1
+│      relation: root terminal implementation leaf
+│
+├─ ICPG-M1        #409  Shadow intent/case/semantic-parity monitor
+│      relation: true child when consuming #408 unmerged contract vocabulary
+│
+├─ ICPG-D1        #410  Tech Lead task-DAG + Stack/index convergence
+│      relation: sibling or convergence according to path ownership;
+│                do not serialize merely because issue number is later
+│
+└─ ICPG-X1        #411  live continuous Shadow runtime canary
+       relation: EXTERNAL_EVIDENCE / PROCESS_DEPENDENCY unless harness bytes
+                 actually consume an unmerged parent implementation
+```
+
+Data flow:
+
+```text
+Prompt / source behavior
+→ ICPG exact subject + digest
+→ required-case ownership
+→ Tech Lead task contracts
+→ true dependency DAG
+→ path/resource leases
+→ molecular terminal Workers
+→ independent case/oracle receipts
+→ one convergence owner
+→ global intent/case reconciliation
+→ publication review
+```
+
+| Atom | Issue | Type | Owns | Stack class | Current state |
+|---|---:|---|---|---|---|
+| `ICPG-C1` | #408 | `C` | case graph reference/schema | root | implemented on candidate branch |
+| `ICPG-K1` | #408 | `K` | deterministic semantic checker | same terminal leaf | implemented on candidate branch |
+| `ICPG-E1` | #408 | `E` | positive + semantic-loss/mutation controls | same terminal leaf | implemented; CI/execution receipt pending |
+| `ICPG-M1` | #409 | `K/E` | Shadow case-delta contract | child of #408 semantics | implemented contract; live runtime pending |
+| `ICPG-D1` | #410 | `D/K` | README/AGENTS/Tech Lead/Stack traceability | convergence by shared-file ownership | partial until full Tech Lead machine binding lands |
+| `ICPG-X1` | #411 | `X` | exact-subject independent live Shadow canary | external evidence | `NOT_EXERCISED` |
+
+Hard laws for this Stack:
+
+- every required case has one terminal implementation owner or one explicit convergence owner;
+- case dependency does not create a Git child by itself;
+- a Git child must name the unmerged parent artifact it consumes;
+- path-disjoint case work remains sibling work;
+- shared case/index files have one convergence owner;
+- terminal Worker PASS cannot close global intent/case coverage;
+- live #411 evidence cannot be manufactured from static #408/#409 fixtures;
+- merge, release, promotion and semantic conflict remain outside Worker authority.
+
+## Current Intent-to-Evidence Knowledge Graph molecular Stack — #413
+
+This program consumes the unmerged Spatial Loop ICPG contract on draft PR #412. The first implementation branch therefore is a true child of PR #412 by bytes/contracts, not merely because #413 was opened later.
+
+```text
+PR #412  Spatial ICPG + Shadow/static projection + Tech Lead case ownership
+└─ KG-C1/D1  #414/#413  branch agent/413-knowledge-graph-icpg-bridge
+      consumes: spatial-loop-case-graph/v1 contract and Tech Lead case obligations
+      provides: Knowledge Graph AGENTS/README/SKILL + trace/prompt contracts
+      relation: TRUE_CHILD of PR #412
+
+Planned terminal atoms after contract freeze:
+├─ KG-C2/E1  #414  Intent/Artifact projection schemas + deterministic mutations
+├─ KG-K1/E2  #415  ICPG case→task/issue→Stack/AGENTS bridge + reverse-trace controls
+├─ KG-K2/E3  #416  authority/freshness/traversal checker + GraphRAG query contracts
+└─ KG-D2/X1  #417  one system-prompt/docs/Molecular convergence owner
+
+#418 live multi-hop GraphRAG/Shadow canary
+  relation: EXTERNAL_EVIDENCE / PROCESS_DEPENDENCY
+  owns no Stack paths unless a later repair issue explicitly leases them
+```
+
+Data flow:
+
+```text
+semantic knowledge card
+→ Intent projection
+→ exact ICPG digest + case IDs
+→ Tech Lead case_obligations
+→ task/issue owner
+→ Molecular Stack atom / PR
+→ file + AGENTS/README/SKILL route
+→ oracle/test/workflow/receipt
+→ authority + freshness + evidence ceiling
+→ bidirectional GraphRAG traversal
+→ Shadow review
+→ Human Admit
+```
+
+| Atom | Issue | Type | Owns | Stack class | Current state |
+|---|---:|---|---|---|---|
+| `KG-C1` | #413/#414 | `C` | semantic projection/ICPG bridge contract | true child of PR #412 | implemented on candidate branch |
+| `KG-D1` | #413/#417 | `D` | nearest AGENTS/README/SKILL + current topology | same preparation leaf | implemented on candidate branch |
+| `KG-C2` | #414 | `C/E` | machine Intent/Artifact schemas + authority/freshness controls | planned terminal leaf | `NOT_IMPLEMENTED` |
+| `KG-K1` | #415 | `K/E` | case→task/issue/Stack/document bindings + reverse trace | planned terminal leaf | `NOT_IMPLEMENTED` |
+| `KG-K2` | #416 | `K/E` | authority-aware traversal + evidence-ceiling checker | planned terminal leaf | `NOT_IMPLEMENTED` |
+| `KG-D2` | #417 | `D/X` | v7.2 prompt/root routing/final indexes | one convergence owner | `PLANNED` |
+| `KG-X1` | #418 | `X` | exact-subject live GraphRAG/Shadow retrieval canary | external evidence | `NOT_EXERCISED` |
+
+Hard laws for this Stack:
+
+- ICPG remains the only canonical case denominator; Knowledge Graph nodes reference digest/case IDs only;
+- knowledge/semantic dependencies do not create Git parents;
+- #414–#416 become siblings unless one consumes another's unmerged machine contract;
+- only #417 owns shared convergence/index updates after terminal artifact identities stabilize;
+- mutable GitHub/branch/workflow projections must refresh before decision-grade use;
+- cards/README/AGENTS cannot override exact Git/verifier/receipt authority;
+- forward trace without reverse implementation→case→Intent trace is incomplete;
+- #418 live evidence cannot be manufactured from static/deterministic fixtures;
+- merge, release and promotion remain Human/repository authority.
+
+## Integration with `github-delivery-loop`
 ## Universal refactor controller admission — Epic #398
 
 This is a durable traceability projection, not mutable PR-state authority. Read current GitHub metadata before acting on an open subject.

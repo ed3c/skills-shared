@@ -25,8 +25,12 @@ require "$skill" "WHAT MUST ALWAYS REMAIN TRUE"
 require "$skill" "HOW WE CAN KNOW IT REMAINS TRUE"
 require "$skill" "Domain modules extend the core method. They never replace it"
 require "$skill" "A. **Intent Digest**"
-require "$skill" "K. **Implementation Gate**"
-require "$skill" "L. **Implementation Plan / Implemented Delta**"
+# Letters are presentation order, not behavior. Preserve the semantic output
+# contract while admitting the new ICPG section without pretending a heading
+# renumbering is a lost implementation gate.
+require "$skill" "**Intent–Case–Proof Graph**"
+require "$skill" "**Implementation Gate**"
+require "$skill" "**Implementation Plan / Implemented Delta**"
 require "$skill" "reduce the reachable invalid state space"
 
 require "$prompt" "Universal Constraint-First System Prompt"

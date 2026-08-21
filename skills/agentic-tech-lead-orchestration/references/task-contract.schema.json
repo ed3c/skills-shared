@@ -53,13 +53,7 @@
     "architecture": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "interface_locks",
-        "dependency_policy",
-        "allowed_dependencies",
-        "state_policy",
-        "no_double_graph"
-      ],
+      "required": ["interface_locks", "dependency_policy", "allowed_dependencies", "state_policy", "no_double_graph"],
       "properties": {
         "interface_locks": {
           "type": "array",
@@ -78,6 +72,31 @@
         "allowed_dependencies": {"type": "array", "items": {"type": "string"}},
         "state_policy": {"type": "string", "minLength": 1},
         "no_double_graph": {"const": true}
+      }
+    },
+    "case_obligations": {
+      "description": "Optional additive ICPG sidecar. Required by orchestration when an admitted spatial-loop-case-graph/v1 is supplied upstream; legacy/non-ICPG v1 packets may omit it.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["case_graph_ref", "case_graph_sha256", "required_case_ids", "branch_case_owners", "convergence_owner"],
+      "properties": {
+        "case_graph_ref": {"type": "string", "minLength": 1},
+        "case_graph_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "required_case_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "branch_case_owners": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["branch", "case_ids"],
+            "properties": {
+              "branch": {"type": "string", "minLength": 1},
+              "case_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+            }
+          }
+        },
+        "convergence_owner": {"type": "string", "minLength": 1}
       }
     },
     "providers": {
@@ -126,20 +145,8 @@
       "additionalProperties": false,
       "required": ["commands", "immutable_assertions"],
       "properties": {
-        "commands": {
-          "type": "array",
-          "minItems": 1,
-          "items": {
-            "type": "array",
-            "minItems": 1,
-            "items": {"type": "string", "minLength": 1}
-          }
-        },
-        "immutable_assertions": {
-          "type": "array",
-          "minItems": 1,
-          "items": {"type": "string", "minLength": 1}
-        }
+        "commands": {"type": "array", "minItems": 1, "items": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}},
+        "immutable_assertions": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
       }
     },
     "budgets": {
@@ -154,13 +161,7 @@
     "automation": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "git_town_admitted",
-        "auto_restack",
-        "auto_publish",
-        "auto_resolve_conflicts",
-        "auto_merge"
-      ],
+      "required": ["git_town_admitted", "auto_restack", "auto_publish", "auto_resolve_conflicts", "auto_merge"],
       "properties": {
         "git_town_admitted": {"type": "boolean"},
         "auto_restack": {"type": "boolean"},

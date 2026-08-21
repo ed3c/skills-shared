@@ -1,21 +1,22 @@
 # `agentic-tech-lead-orchestration`
 
-Portable contract-first orchestration for turning one large coding request into a dependency-aware branch team and, when the current session reaches a real host/runtime boundary, a zero-context Local Handoff Execution Queue. `SKILL.md` owns the provider-neutral method; `references/` owns host-neutral contracts; `modules/` contains trigger-selected runtime/projection/delivery interpretations; `scripts/` and `tests/` own executable assertions and falsifiers.
+Portable contract-first orchestration for turning one large coding request or an admitted system/case contract into a dependency-aware branch team and, when the current session reaches a real host/runtime boundary, a zero-context Local Handoff Execution Queue. `SKILL.md` owns the provider-neutral method; `references/` owns host-neutral contracts; `modules/` contains trigger-selected runtime/projection/delivery interpretations; `scripts/` and `tests/` own executable assertions and falsifiers.
 
 ## Read order
 
 1. [`AGENTS.md`](AGENTS.md)
 2. [`SKILL.md`](SKILL.md)
 3. task, capability and scheduler schemas under [`references/`](references/README.md)
-4. when issues #375–#379 or Codex control-plane execution is in scope, [`../../docs/traceability/CODEX_SDK_TECH_LEAD_CONTROL_PLANE.md`](../../docs/traceability/CODEX_SDK_TECH_LEAD_CONTROL_PLANE.md), the relevant execution packet under `references/execution-packets/`, and only the selected adapter modules
-5. when local/runtime-only evidence remains, `references/local-handoff-queue.schema.json` and the example queue
-6. when the work must run in a remote lane while the local one is disconnected, [`references/dual-agent-offload/OFFLOAD_METHOD.md`](references/dual-agent-offload/OFFLOAD_METHOD.md)
-7. [`modules/README.md`](modules/README.md), then only selected modules
-8. [`scripts/README.md`](scripts/README.md)
-9. [`tests/README.md`](tests/README.md)
-10. [`../skill-refactor-proof-loop/README.md`](../skill-refactor-proof-loop/README.md) and its golden registry
-11. exact issue, PR base/head, workflow and receipt subjects
-12. [`../../docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md`](../../docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md) before a global completion claim
+4. when Spatial Loop produced an ICPG, read `../spatial-loop-systems-engineering/references/intent-case-proof-graph.md` and bind its exact digest/required-case denominator into the task contract
+5. when issues #375–#379 or Codex control-plane execution is in scope, [`../../docs/traceability/CODEX_SDK_TECH_LEAD_CONTROL_PLANE.md`](../../docs/traceability/CODEX_SDK_TECH_LEAD_CONTROL_PLANE.md), the relevant execution packet under `references/execution-packets/`, and only the selected adapter modules
+6. when local/runtime-only evidence remains, `references/local-handoff-queue.schema.json` and the example queue
+7. when the work must run in a remote lane while the local one is disconnected, [`references/dual-agent-offload/OFFLOAD_METHOD.md`](references/dual-agent-offload/OFFLOAD_METHOD.md)
+8. [`modules/README.md`](modules/README.md), then only selected modules
+9. [`scripts/README.md`](scripts/README.md)
+10. [`tests/README.md`](tests/README.md)
+11. [`../skill-refactor-proof-loop/README.md`](../skill-refactor-proof-loop/README.md) and its golden registry
+12. exact issue, PR base/head, workflow and receipt subjects
+13. [`../../docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md`](../../docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md) before a global completion claim
 
 ## Directory map → State Machine ownership
 
@@ -28,6 +29,9 @@ skills/agentic-tech-lead-orchestration/
 ├── SKILL.md
 │   └── portable request → task → capability → Worker → convergence → handoff law
 ├── references/
+│   ├── task-contract.schema.json
+│   │     └── exact subject + case_obligations + branch ownership + acceptance
+│   ├── example-stack-contract.json
 │   ├── task/capability/scheduler/closure contracts
 │   ├── contracts/
 │   │   ├── codex-session-manifest.schema.json             #375
@@ -53,12 +57,15 @@ skills/agentic-tech-lead-orchestration/
 │   └── problem-closure-ledger.md                          #378 reconciliation
 ├── scripts/
 │   ├── existing task/capability/scheduler/queue gates
+│   ├── assert_task_contract.py                            ← case denominator/ownership hard gate
+│   ├── assert_case_obligations.py                         ← ICPG case-obligations sidecar gate
 │   ├── run_codex_sdk_worker.py                            #375
 │   ├── github_issue_dag_projection.py                     #376
 │   ├── herdr_runtime_observer.py                          #377
 │   ├── check_problem_closure.py                           #378
 │   └── render_problem_closure.py                          #378 human projection
 └── tests/
+    ├── selftest.py                                        ← orphan/duplicate/stale case controls
     ├── existing structural/causal/matched-task controls
     ├── codex_sdk_controller_selftest.py                   #375
     ├── github_issue_dag_selftest.py                       #376
@@ -73,24 +80,64 @@ skills/agentic-tech-lead-orchestration/
 ```text
 REQUEST_BOUND
 → SYSTEM_CONTRACT_EXTRACTED
+→ CASE_GRAPH_BOUND_OR_EXPLICITLY_NOT_APPLICABLE
+→ CASE_OBLIGATIONS_FROZEN
 → CAPABILITY_PLAN_COMPILED
 → CAPABILITY_PLAN_ASSERTED
 → CONTEXT_ADMITTED
 → TASK_DAG_COMPILED
 → TASK_SCHEMA_ASSERTED
 → TASK_SEMANTICS_ASSERTED
+→ CASE_OWNERSHIP_ASSERTED
 → WORKERS_ADMITTED
 → LEASES_BOUND
 → ATTEMPTS_EXECUTED
 → RESULTS_VERIFIED
 → CANDIDATES_COMPARED
 → CONVERGENCE_APPLIED
-→ GLOBAL_OBJECTIVE_ASSERTED
+→ GLOBAL_OBJECTIVE_AND_CASE_COVERAGE_ASSERTED
 → DELIVERY_HANDOFF
 → HUMAN_ADMIT_REQUIRED
 ```
 
 Failure/control states include stale attempts, lease expiry, retryable/terminal failure, cancellation, supersession, straggler detach, authority block, semantic conflict, non-decomposable task, duplicate suppression, stale consumed sibling head and historical convergence invalidation. A state declared only in a schema or fixture is not runtime evidence.
+
+## ICPG → Tech Lead DAG
+
+The Tech Lead does not decompose directly from a short prompt when an admitted ICPG exists.
+
+```text
+User prompt / source behavior
+→ Spatial Loop ICPG
+   ├── frozen graph digest
+   ├── required-case denominator
+   └── invariants / oracles
+→ task-contract.case_obligations
+   ├── required_case_ids
+   ├── branch_case_owners
+   └── convergence_owner
+→ true task DAG
+   ├── path-disjoint sibling Workers
+   ├── true child only when unmerged bytes/contracts are consumed
+   └── one convergence owner
+→ independent result/oracle verification
+→ global case-denominator reconciliation
+→ delivery / Local Handoff / Human Admit
+```
+
+Hard failures before Worker admission:
+
+```text
+stale/non-sha case graph identity
+required case without owner
+required case with multiple owners
+owner names an undeclared branch
+ownership map invents a case outside denominator
+missing/invalid convergence owner
+local task success presented as global case closure
+```
+
+Case dependencies and Git ancestry are separate. A semantic relation between two cases does not make their implementation branches parent/child. Git parentage exists only when the child consumes unmerged parent bytes/contracts/state.
 
 ## Codex control-plane extension State Machine
 
@@ -212,7 +259,9 @@ Issue / PRD / PDF / article
 → Human Admit
 ```
 
-`code-graph-rag` is intentionally not an active dependency. A consumer may retain old files for migration/audit, but the task contract assertion rejects it as a runtime provider.
+When Spatial Loop produced an ICPG, the entry stage of this flow is the ICPG → Tech Lead DAG above: the task contract binds `case_obligations` from the frozen graph digest before the true task DAG is compiled.
+
+`code-graph-rag` remains intentionally inactive. A consumer may retain historical files for migration/audit, but the task contract rejects it as a runtime provider.
 
 ## Evidence ceilings for #375–#379
 
@@ -230,6 +279,37 @@ sibling admission / merge / release          HUMAN_ADMIT_REQUIRED
 ```
 
 A workflow green state proves only the workflow's exact subject and denominator. It cannot convert static adapter bytes or a convergence ancestry edge into live provider evidence or Human admission.
+
+## #407 ICPG preparation line
+
+```text
+#408 / PR #412   Spatial case contract + checker + semantic-loss mutations
+        ↓ consumes case contract
+#410            Tech Lead task contract gains exact ICPG denominator/ownership
+        ├── task-contract schema
+        ├── semantic assertion
+        ├── orphan/duplicate/stale controls
+        └── README route
+
+#409            Shadow monitor/system-prompt/spec-packet projection
+#411            live continuous Shadow canary (external evidence lane)
+```
+
+#409 is not automatically a Git child of #410; #411 is a live evidence/process dependency, not a source-code ancestry edge.
+
+## Evidence boundary
+
+```text
+ICPG task-contract shape                         IMPLEMENTED_ON_PR_412
+required-case denominator/owner semantic gate    IMPLEMENTED_ON_PR_412
+orphan/duplicate/stale ownership controls         IMPLEMENTED_ON_PR_412
+live Worker execution using ICPG                  NOT_EXERCISED
+live continuous Shadow case monitoring            NOT_EXERCISED / #411
+Git Town physical stack execution                 NOT_EXERCISED
+merge/release/promotion                           HUMAN_ADMIT_REQUIRED
+```
+
+A fixture PASS proves the gate can discriminate its planted defects. It does not prove a live Worker consumed the ICPG or that all real-world unknown cases were discovered.
 
 ## Golden refactor proof
 
