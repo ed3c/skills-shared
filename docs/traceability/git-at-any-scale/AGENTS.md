@@ -8,8 +8,8 @@ This directory is the zero-context entry for the Cursor **Git at any scale** aud
 2. This file.
 3. `README.md` in this directory.
 4. Issue #531 and the exact child issue being executed: #532, #534, #535, or #536.
-5. For C1, read Draft PR #542 and `skills/git-hosting-scale-assurance/{AGENTS.md,README.md,SKILL.md}` on its exact head.
-6. `source-claims.json` and `problem-closure-ledger.json`.
+5. For C1, read merged `skills/git-hosting-scale-assurance/{AGENTS.md,README.md,SKILL.md}` on current `main`.
+6. `source-claims.json` and `problem-closure-ledger.json` (pointers to the authoritative `data/handoff/source-evidence/` ledger — do not treat them as a second copy of the claim denominator).
 7. `skills/git-town-stacked-pr-worker/molecular-indexes/git-at-any-scale/README.md`.
 8. `skills/agentic-tech-lead-orchestration/runtime-handoff/git-at-any-scale-local-handoff-queue.json`.
 9. Current GitHub PR/open-writer state and exact workflow receipts before any state transition.
@@ -17,17 +17,17 @@ This directory is the zero-context entry for the Cursor **Git at any scale** aud
 ## Current admission epoch — 2026-08-21
 
 ```text
-main                                   988a4e790af6a8bee31fd14e00e52a6e944b9f17
-D1 preparation                         PR #539 / OPEN / DRAFT / mergeable-clean
-C1 implementation candidate            PR #542 / OPEN / DRAFT / mergeable-clean
-C1 exact head                           196a75ac04f6ad2c9a6e50b0645d71fea9bf43e3
-C1 hosted workflow arrival              Shared Skills Infra = SKIPPED
-C1 issue-contract denominator           INCOMPLETE
-L1 physical runtime                     NOT_EXERCISED
-S1 terminal independent Shadow          NOT_EXERCISED
+main                                    174009203a3ff9bd6ebc4010bc6cab7232dd44a4
+D1 preparation                          PR #539 / MERGED
+C1 implementation                       PR #542 / MERGED — #532 issue stays OPEN
+C1 exact head (as merged)               196a75ac04f6ad2c9a6e50b0645d71fea9bf43e3
+C1 deterministic gate                   tests/run-all.sh -> PASS positive=1 mutations=20/20 (real run, this head)
+C1 issue-contract denominator           still INCOMPLETE (operation-history/durability/ref/cache/gossip/compaction/recovery/benchmark receipt families remain unbuilt)
+L1 physical runtime                     NOT_EXERCISED / #534 OPEN
+S1 terminal independent Shadow          NOT_EXERCISED / #535 OPEN, blocked on #534
 ```
 
-Do not close #532 or merge #542 merely because the branch is mergeable. #532 requires separate operation-history/durability/ref/read/cache/gossip/compaction/recovery/benchmark contracts and the positive/hollow/concurrent/fault fixture denominator stated in the issue. The current candidate supplies a useful aggregate schema/checker and 20 named mutations, but it has not earned the issue terminal.
+Do not close #532 because PR #542 merged. A merged branch closes its own path lease, not the issue's contract denominator. #532 requires separate operation-history/durability/ref/read/cache/gossip/compaction/recovery/benchmark contracts and the positive/hollow/concurrent/fault fixture denominator stated in the issue. The merged candidate supplies a real, tested aggregate schema/checker and 20 named mutations, but it has not earned the issue terminal.
 
 ## Authority boundary
 
@@ -59,6 +59,7 @@ local repository cache presented as source of truth
 gossip delivery presented as correctness authority
 benchmark claim lacks exact topology/workload/failure denominator
 open/mergeable PR presented as merged/admitted implementation
+merged implementation PR presented as its parent issue's contract closed
 skipped workflow presented as PASS
 Stack relation inferred from issue order rather than consumed bytes
 shared path has another active writer
@@ -68,9 +69,9 @@ merge/release/provider/account action inferred without Human Admit
 
 ## Writer law
 
-Current convergence must obey one writer per mutable shared path. At the 2026-08-21 audit, open Draft PRs #412 and #419 both write `skills/git-town-stacked-pr-worker/README.md`; therefore this Git-at-any-scale preparation branch owns only the dedicated molecular-index README, not the canonical Git Town README. Issue #536 owns final shared-path convergence after those writers are reconciled.
+Current convergence must obey one writer per mutable shared path. At the 2026-08-21 readback, open Draft PRs #412 and #419 still both write `skills/git-town-stacked-pr-worker/README.md`; therefore this Git-at-any-scale lease owns only the dedicated molecular-index README, not the canonical Git Town README, and does not touch root `README.md`/`AGENTS.md`/`docs/INDEX.md`. Issue #536's final shared-path convergence at those root paths remains a separate, not-yet-done writer's work after #412/#419 are reconciled.
 
-PR #542 is path-disjoint and owns only `skills/git-hosting-scale-assurance/**`. It is a sibling implementation atom, not a true Git child of #539.
+PR #542 was path-disjoint and owned only `skills/git-hosting-scale-assurance/**`; it merged as a sibling implementation atom, not as a Git child of #539. Both are now merged, but merging does not retroactively create ancestry between them.
 
 ## Completion packet
 

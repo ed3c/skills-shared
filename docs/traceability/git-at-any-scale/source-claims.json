@@ -1,5 +1,12 @@
 {
-  "schema": "git-at-any-scale-source-claims/v1",
+  "schema": "git-at-any-scale-source-claims-pointer/v1",
+  "note": "This file intentionally does not duplicate the 28-claim denominator. It points at the merged, authoritative source-evidence packet under data/handoff/source-evidence/ and states this lease's exact-head triage over it. Do not re-derive claim text or state here; read the ssot paths.",
+  "ssot": {
+    "source_bytes": "data/handoff/source-evidence/sources/cursor-git-at-any-scale.html",
+    "source_provenance": "data/handoff/source-evidence/sources/cursor-git-at-any-scale.provenance.json",
+    "claims": "data/handoff/source-evidence/git-at-any-scale-claims.json",
+    "closure_ledger": "data/handoff/source-evidence/git-at-any-scale-closure-ledger.json"
+  },
   "source": {
     "kind": "ARTICLE",
     "title": "Git at any scale",
@@ -9,30 +16,47 @@
     "canonical_url": "https://cursor.com/blog/git-at-any-scale",
     "observed": "2026-08-21",
     "authority": "SOURCE_PROPOSAL",
-    "immutable_bytes": "ABSENT",
-    "sha256": "ABSENT"
+    "immutable_bytes_count": 864322,
+    "sha256": "25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9"
   },
   "repository_subject": {
     "repository": "ed3c/skills-shared",
-    "main": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
-    "tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7"
+    "main": "174009203a3ff9bd6ebc4010bc6cab7232dd44a4",
+    "tree": "311052ecf5780f8d91c4d2429e8ce1a50a0361d8"
   },
-  "claims": [
-    {"id":"GS-01","claim":"Agent-driven repository, branch, PR and CI volume increases coordination pressure.","class":"APPLICABILITY_CLAIM","state":"SUPPORTED_AS_SCOPE_PROBLEM","owner_issue":531},
-    {"id":"GS-02","claim":"Git packfile/local-filesystem semantics make naive remote/distributed storage difficult.","class":"ARCHITECTURE_SOURCE_STATEMENT","state":"SOURCE_PROPOSAL","owner_issue":531},
-    {"id":"GS-03","claim":"Synchronous multi-replica ref transactions suffer tail-latency and replica-floor scalability limits.","class":"ARCHITECTURE_SOURCE_STATEMENT","state":"SOURCE_PROPOSAL","owner_issue":534},
-    {"id":"GS-04","claim":"A push should not be acknowledged before durable authoritative persistence.","class":"PORTABLE_ASSURANCE_REQUIREMENT","state":"CONTRACT_OPEN","owner_issue":532},
-    {"id":"GS-05","claim":"Ref publication should be atomic/CAS-bound and operation history should be linearizable under the declared model.","class":"PORTABLE_ASSURANCE_REQUIREMENT","state":"CONTRACT_OPEN","owner_issue":532},
-    {"id":"GS-06","claim":"Serving repositories may be disposable caches only when authoritative freshness and rebuild are verified.","class":"PORTABLE_ASSURANCE_REQUIREMENT","state":"CONTRACT_OPEN","owner_issue":532},
-    {"id":"GS-07","claim":"Gossip may optimize propagation but must not be correctness authority.","class":"PORTABLE_ASSURANCE_REQUIREMENT","state":"CONTRACT_OPEN","owner_issue":532},
-    {"id":"GS-08","claim":"Primary-only compaction can trade bandwidth for reduced per-replica CPU work.","class":"ARCHITECTURE_SOURCE_STATEMENT","state":"SOURCE_PROPOSAL_NOT_EXERCISED","owner_issue":534},
-    {"id":"GS-09","claim":"Operation history can support corruption/race diagnosis, replay and recovery.","class":"PORTABLE_ASSURANCE_REQUIREMENT","state":"PARTIAL_GENERIC_METHOD_HOSTING_PROFILE_OPEN","owner_issue":532},
-    {"id":"GS-10","claim":"Read scaling and push-throughput numbers require exact topology, workload, durability, consistency and failure denominators.","class":"PERFORMANCE_CLAIM","state":"SOURCE_PROPOSAL_NOT_INDEPENDENTLY_VERIFIED","owner_issue":534}
-  ],
-  "evidence_law": {
-    "source_statement_is_not_runtime_truth": true,
-    "contract_pass_is_not_live_pass": true,
-    "one_topology_is_not_arbitrary_scale": true,
-    "immutable_source_packet_required_for_source_truth_advance": true
-  }
+  "claim_denominator": {
+    "total": 28,
+    "not_applicable": 2,
+    "applicable_open": 26
+  },
+  "triage": {
+    "narrative_not_independently_checkable": {
+      "count": 2,
+      "issue_nodes": [],
+      "problem_ids": ["gas-scene-setting-hosting-difficulty", "gas-packfile-transport-fundamentals"]
+    },
+    "addressed_by_existing_mechanism": {
+      "count": 1,
+      "issue_nodes": [531],
+      "problem_ids": ["gas-agent-coordination-framing"]
+    },
+    "owned_by_c1": {
+      "count": 6,
+      "issue_nodes": [531, 532],
+      "problem_ids": [
+        "gas-cont-gossip-non-authority-etag-validation",
+        "gas-cont-linearizable-push-visibility",
+        "gas-cont-no-consensus-cas-ref-update",
+        "gas-cont-stateless-no-routing-table",
+        "gas-cont-wal-forensic-replay",
+        "gas-cont-wal-source-of-truth"
+      ]
+    },
+    "requires_external_runtime": {
+      "count": 19,
+      "issue_nodes": [531, 534],
+      "note": "includes all performance-number claims (100-replica synthetic test, linear read-only scaling, S3 Standard/Express push throughput) and all Spokes/DHT/NFS/GFS/DRBD historical/continuation architecture claims"
+    }
+  },
+  "check": "python3 skills/agentic-tech-lead-orchestration/scripts/check_problem_closure.py data/handoff/source-evidence/git-at-any-scale-closure-ledger.json"
 }
