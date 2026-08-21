@@ -58,7 +58,9 @@ Wave 3 retains its original admitted controls and may add post-admission falsifi
 
 | Test | Positive denominator | Mutation denominator | Live lane |
 |---|---:|---:|---|
-| `codex_live_acceptance_selftest.py` | 1 | 16 | `LIVE_EXECUTION_OBSERVED / SHADOW_READBACK_PARTIAL`; fresh v2 run required |
+| `codex_live_acceptance_selftest.py` | 1 | 26 | `LIVE_EXECUTION_OBSERVED / SHADOW_READBACK_PARTIAL`; fresh v2 run required |
+| `codex_result_carrier_selftest.py` | 2 | 13 | `NOT_EXERCISED`; deterministic carrier mechanics only |
+| `codex_worker_result_selftest.py` | 2 | 22 | `NOT_EXERCISED`; shape/binding/offline replay only |
 | `github_issue_dag_live_canary_selftest.py` | 1 | 10 | remote canary already achieved separately; selftest remains deterministic |
 | `herdr_lifecycle_selftest.py` | 2 | 7 | `NOT_EXERCISED` |
 | `source_claim_compiler_selftest.py` | 4 source kinds | 11 | `EVIDENCE_DEPENDENT` |
@@ -74,7 +76,23 @@ base_sha and declared base_tree_sha disagree                                 →
 
 The positive path uses a real temporary Git repository and an immutable result tree. This remains zero-provider: it does not invoke Codex. `run_codex_sdk_worker.py` separately proves that the producer can create the same kind of detached tree using a private index without staging the normal index.
 
-The shape denominator is now eleven Draft-2020-12 control-plane schemas because historical `codex-live-acceptance-receipt.schema.json` v1 is retained and `codex-live-acceptance-receipt-v2.schema.json` is added. v2 requires separate base/result tree identities and `result_tree_readback=PASS`.
+The #508 controls add durability and executable provenance on top. `codex_v2_fixture.py` builds one real throwaway repository, materializes the post-turn tree, and publishes the durable carrier; the carrier and live-acceptance selftests then **delete the originating repository** before any replay or acceptance work happens, so a green result cannot come from the originating object store. Their planted controls are:
+
+```text
+result tree existed at execution time but was never carried            → FAIL
+syntactically valid tree SHA absent from the bundle                    → FAIL
+manifest names the wrong tree / evidence commit / refs / repository    → FAIL
+hidden extra path omitted from the replayed denominator                → FAIL
+bundle bytes or digest drift from the manifest                         → FAIL
+adapter blob or codex binary digest differs from the bound receipt     → FAIL
+PATH codex claimed while the SDK-bundled executable was used, or vice versa → FAIL
+unschematized worker field, or missing required executor provenance    → FAIL
+historical v1 worker result promoted into the v2 replay path           → FAIL
+```
+
+The shape denominator is now twelve Draft-2020-12 control-plane schemas: historical `codex-live-acceptance-receipt.schema.json` v1 is retained, `codex-live-acceptance-receipt-v2.schema.json` now also requires `result_tree_replay=PASS` plus carrier/executor identity, and `codex-worker-result-v2.schema.json` owns the strict worker-result shape the acceptance binder consumes.
+
+These are deterministic mechanics. A green fixture or selftest is never live #464 completion, and merge remains separate repository authority.
 
 `references/wave3-live-handoff-queue.json` remains the immutable fork-time continuation packet; its historical v1 receipt route is not current mutable evidence authority. A fresh #464 runtime attempt must be rebound to current code/contracts rather than laundering the old queue state.
 

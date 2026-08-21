@@ -6,6 +6,7 @@ import hashlib
 import importlib.util
 from pathlib import Path
 import subprocess
+import sys
 import tempfile
 
 HERE = Path(__file__).resolve().parent
@@ -115,4 +116,55 @@ with tempfile.TemporaryDirectory() as td:
     else:
         raise AssertionError("dirty worktree unexpectedly passed")
 
-print("codex-sdk-controller selftest: PASS (positive=4 mutations=14 live=NOT_EXERCISED)")
+
+# Executor provenance is collected without a live SDK: a stub module standing in
+# for `openai_codex` is enough to prove which executable identity gets recorded.
+class _StubSdk:
+    pass
+
+
+with tempfile.TemporaryDirectory(prefix="codex-provenance-") as td:
+    package = Path(td) / "site-packages" / "openai_codex"
+    (package / "bin").mkdir(parents=True)
+    (package / "__init__.py").write_text("", encoding="utf-8")
+    binary = package / "bin" / "codex"
+    binary.write_bytes(b"#!/bin/sh\nexit 0\n")
+    binary.chmod(0o755)
+
+    stub = _StubSdk()
+    stub.__file__ = str(package / "__init__.py")
+    provenance = mod.collect_executor_provenance(m, stub)
+    assert provenance["codex_binary_source"] == "SDK_BUNDLED", provenance
+    assert provenance["codex_binary_path"] == str(binary.resolve())
+    assert provenance["codex_binary_sha256"] == hashlib.sha256(binary.read_bytes()).hexdigest()
+    assert provenance["sdk_module_dir"] == str(package.resolve())
+    assert provenance["adapter_version"] == "codex-sdk-worker/2"
+    assert provenance["adapter_blob_sha256"] == hashlib.sha256(SCRIPT.read_bytes()).hexdigest()
+    assert provenance["sandbox_policy"] == "workspace-write"
+    # A signed-in session is not executable provenance and must never be recorded.
+    for key in provenance:
+        assert not any(f in key for f in ("auth", "token", "session", "credential", "secret", "prompt")), key
+
+    # No bundled executable: the record must fall back honestly, never claim one.
+    bare = Path(td) / "bare" / "openai_codex"
+    bare.mkdir(parents=True)
+    (bare / "__init__.py").write_text("", encoding="utf-8")
+    other = _StubSdk()
+    other.__file__ = str(bare / "__init__.py")
+    fallback = mod.collect_executor_provenance(m, other)
+    assert fallback["codex_binary_source"] in {"PATH", "ABSENT"}, fallback
+    if fallback["codex_binary_source"] == "ABSENT":
+        assert fallback["codex_binary_path"] is None and fallback["codex_binary_sha256"] is None
+    else:
+        assert not str(fallback["codex_binary_path"]).startswith(str(bare.resolve()))
+
+# A live turn without a durable carrier destination fails closed at the CLI.
+refused = subprocess.run(
+    [sys.executable, str(SCRIPT), "/nonexistent-manifest.json", "--execute"],
+    capture_output=True,
+    text=True,
+)
+assert refused.returncode != 0
+assert "--carrier-out-dir" in refused.stderr, refused.stderr
+
+print("codex-sdk-controller selftest: PASS (positive=8 mutations=15 live=NOT_EXERCISED)")

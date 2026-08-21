@@ -110,6 +110,7 @@ root = Path(sys.argv[1])
 schemas = [
     "references/contracts/codex-session-manifest.schema.json",
     "references/contracts/codex-worker-result.schema.json",
+    "references/contracts/codex-worker-result-v2.schema.json",
     "references/contracts/github-issue-dag-receipt.schema.json",
     "references/contracts/github-ready-wave.schema.json",
     "references/contracts/herdr-observer-receipt.schema.json",
@@ -141,12 +142,19 @@ source_example = json.loads(
 )
 errors = list(Draft202012Validator(source_schema).iter_errors(source_example))
 assert not errors, [error.message for error in errors]
-print("CONTROL-PLANE-SHAPE-GREEN 11 schemas; closure/source examples validated")
+print("CONTROL-PLANE-SHAPE-GREEN 12 schemas; closure/source examples validated")
 PYCP
 python3 "$ROOT/tests/codex_sdk_controller_selftest.py"
 python3 "$ROOT/tests/github_issue_dag_selftest.py"
 python3 "$ROOT/tests/herdr_observer_selftest.py"
 python3 "$ROOT/tests/problem_closure_selftest.py"
+
+# #508: the durable result carrier and the strict worker-result contract. Both
+# selftests build a real throwaway repository, publish the carrier, delete the
+# originating object store, and then replay. They are deterministic mechanics:
+# a green run never promotes #464's live lane.
+python3 "$ROOT/tests/codex_result_carrier_selftest.py"
+python3 "$ROOT/tests/codex_worker_result_selftest.py"
 python3 "$ROOT/tests/codex_live_acceptance_selftest.py"
 python3 "$ROOT/tests/github_issue_dag_live_canary_selftest.py"
 python3 "$ROOT/tests/herdr_lifecycle_selftest.py"
