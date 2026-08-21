@@ -1,0 +1,65 @@
+{
+  "schema": "productization-operating-loop/cases/v1",
+  "_authority": "tests/evidence_plane.py reconciles planted_controls against the cases it actually ran and fails on any difference in either direction, so this inventory cannot drift from the suite. It also reconciles the fourteen preregistered false promotions in tests/evidence_plane.py::PREREGISTERED against the cases that plant them: a promotion with no case is red, and a case planting a promotion nobody preregistered is red.",
+  "_positive_discovery": "The positive cases below are documentation, not the denominator. tests/selftest.py discovers every schema under references/ from the tree and counts its own positives, controls and knockouts on the run; tests/evidence_plane.py resolves the four lane artifacts of its base composition from those schemas' committed examples at run time. Adding a lane schema is therefore not an edit here.",
+  "_evidence_ceiling": "DETERMINISTIC_EVAL_AND_SHADOW. Every case below is decided by committed bytes and an exit code. None of them observes a user, a payment, a market, a rights holder or a live provider, and no green here is evidence that the product is wanted, permitted or paid for.",
+  "cases": [
+    {"id": "lane-and-core-contract-positives", "subject": "references", "expected": "PASS_EVERY_SCHEMA_EXAMPLE_VALIDATES"},
+    {"id": "lane-and-core-control-knockouts", "subject": "references", "expected": "PASS_EVERY_CONTROL_DISCRIMINATES_ITS_OWN_KEYWORD"},
+    {"id": "composition-compiler-selftest", "subject": "scripts/compile_pol_composition.py", "expected": "PASS_BYTE_STABLE_AND_EVERY_K_CODE_FIRES"},
+    {"id": "evidence-plane-base-green", "subject": "tests/fixtures/evidence-plane-base.json", "expected": "PASS_UNDER_EVERY_GATE_INCLUDING_THE_REOPEN_PASS"},
+    {"id": "evidence-plane-compiled-artifacts", "subject": "tests/fixtures/evidence-plane-base.json", "expected": "PASS_ALL_SIX_COMPILED_ARTIFACTS_VALIDATE"},
+    {"id": "evidence-plane-preregistration-reconciled", "subject": "tests/evidence_plane.py", "expected": "PASS_EVERY_PREREGISTERED_PROMOTION_HAS_A_PLANTED_CASE"},
+    {"id": "evidence-plane-inventory-reconciled", "subject": "cases.json", "expected": "PASS_PLANTED_CONTROLS_EQUALS_THE_CASES_THAT_RAN"}
+  ],
+  "planted_controls": [
+    "blocked-attempt-removed-from-matrix",
+    "bootstrap-exit-as-provider-execution",
+    "command-exit-as-payment-receipt",
+    "consumer-subscription-as-api-entitlement",
+    "dispatch-graph-claims-observed-sessions",
+    "feature-difference-as-wedge",
+    "hollow-providers-no-receipts",
+    "interest-as-adoption",
+    "market-attention-as-demand",
+    "one-payment-as-repeatable-business",
+    "pain-as-willingness-to-switch",
+    "policy-diff-as-legal-clearance",
+    "projection-claims-completion-authority",
+    "projection-read-back-without-comparison",
+    "skipped-runtime-lane-unrecorded",
+    "stale-policy-terminal-reused",
+    "stale-projection-subject-reused",
+    "stale-source-receipt-reused",
+    "technical-exit-as-user-validation"
+  ],
+  "_control_routing": {
+    "market attention -> demand": "market-attention-as-demand",
+    "feature delta -> differentiation wedge": "feature-difference-as-wedge",
+    "pain -> willingness to switch": "pain-as-willingness-to-switch",
+    "interest -> user validation": "interest-as-adoption",
+    "one payment -> repeatable business": "one-payment-as-repeatable-business",
+    "consumer subscription -> API entitlement": "consumer-subscription-as-api-entitlement",
+    "policy page -> legal/rights clearance": "policy-diff-as-legal-clearance",
+    "technical PASS -> user/paid PASS": "technical-exit-as-user-validation, command-exit-as-payment-receipt",
+    "projection write -> canonical completion": "projection-claims-completion-authority, projection-read-back-without-comparison",
+    "prompt packet -> Session observed": "dispatch-graph-claims-observed-sessions",
+    "bootstrap PASS -> Agent/provider PASS": "bootstrap-exit-as-provider-execution",
+    "first green hides skipped lanes": "skipped-runtime-lane-unrecorded",
+    "stale policy/source/PR receipt reused": "stale-policy-terminal-reused, stale-source-receipt-reused, stale-projection-subject-reused",
+    "failed/blocked attempt removed from denominator": "blocked-attempt-removed-from-matrix",
+    "hollow evidence (not preregistered, required alongside)": "hollow-providers-no-receipts"
+  },
+  "_refusal_owners": {
+    "the four lane contracts": "E01_LANE_CONTRACT_REFUSED_THE_ARTIFACT, seven cases. The compiler reads a lane artifact's schema string and its subject_commit and nothing else, so a lane artifact its own contract refuses composes today; the plane validates them before the compiler sees them.",
+    "the six output contracts": "E02_COMPILED_ARTIFACT_REFUSED_BY_ITS_CONTRACT, two cases. Nothing in the stack re-reads a compiled document after somebody edits it, which is the whole laundering path these two cases walk.",
+    "scripts/compile_pol_composition.py": "K01_STALE_LANE_ARTIFACT, K04_AUTHORITY_WIDENING, K08_RUNG_PROMOTED_ABOVE_RECEIPTS, three cases. The remaining five K-codes are fired by the compiler's own --selftest, which tests/run-all.sh now runs.",
+    "the reopen pass": "E03 through E08, seven cases. These six gates own the promotions the frozen stack admits: a cleared cell with no rung under it, a lane cleared above its ladder, a skipped lane nobody recorded, a dropped failed attempt, a stale receipt or canonical subject, and a projection read back against nothing."
+  },
+  "_uncovered_by_design": [
+    "whether the market arena described is the real one -- the contracts refuse the filing, never the truth of the row",
+    "whether a comparator case that cites a source reference cites a real one",
+    "whether the runtime lane would pass if anybody ran it -- the plane refuses hiding the lane, not entering it",
+    "whether a Human would admit this composition, which is the one cell no gate here may compute"
+  ]
+}

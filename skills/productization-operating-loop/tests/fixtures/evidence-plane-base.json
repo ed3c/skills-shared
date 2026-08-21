@@ -1,0 +1,228 @@
+{
+  "_what_this_is": "One honest composition, used by tests/evidence_plane.py as the green twin of every planted control. It is not a compiler fixture: the compiler's own fixture clears a TECHNICAL cell on a rung the receipts do not reach, which this plane refuses, so the plane owns a base that survives its own gates. Every planted control is this composition with exactly one edit.",
+  "_lane_bytes": "lane_examples resolves at run time to the committed examples[0] of each lane schema, so a lane contract edit moves this fixture without this file changing. The patches are named here rather than baked in, because a patched field is a claim about the base and has to be readable.",
+  "subject_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+  "stale_commit": "bc69a51a644dae3f76aa50cee8b27407951c3968",
+  "lane_examples": {
+    "commercial": {"schema_path": "commercial/commercial-lane.schema.json", "patch": {}},
+    "market": {
+      "schema_path": "market/market-lane.schema.json",
+      "patch": {"subject_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17"},
+      "why": "the committed market example is bound to an older head; rebinding it is the only edit, and the market claims themselves are the admitted bytes"
+    },
+    "policy": {"schema_path": "policy/policy-lane.schema.json", "patch": {}},
+    "user": {
+      "schema_path": "user/user-lane.schema.json",
+      "patch": {"lane_state": "UNKNOWN", "highest_rung_reached": "NONE"},
+      "why": "the committed user example claims USER_VALIDATED, and no receipt in this composition earns it; the honest base reports the lane as unsettled rather than promoting it"
+    }
+  },
+  "prior_attempts": [
+    {
+      "attempt_id": "POL-ATT-001",
+      "state": "FAILED",
+      "cell_id": "POL-CELL-002",
+      "note": "the first-value scenario contradicted the payment trigger and the disagreement was never settled"
+    },
+    {
+      "attempt_id": "POL-ATT-002",
+      "state": "BLOCKED",
+      "cell_id": "POL-CELL-005",
+      "note": "the commercial question is blocked on a payment nobody has made"
+    }
+  ],
+  "composition": {
+    "schema": "pol/composition-input/v1",
+    "program_id": "POL-PROG-428",
+    "matrix_id": "POL-CLM-428",
+    "dag_id": "POL-DAG-428",
+    "foldback_id": "POL-FB-428",
+    "subject": {
+      "commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+      "tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7"
+    },
+    "rollback_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+    "decision_owner": "the productization program owner",
+    "dispatch_request_path": "skills/productization-operating-loop/references/session/dispatch-request.json",
+    "receipts": [
+      {"kind": "SOURCE_LOCATED", "subject_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17", "note": "the four lane contracts were enumerated at this head"},
+      {"kind": "INDEPENDENT_SOURCE_READBACK", "subject_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17", "note": "a second reader resolved the same bytes"},
+      {"kind": "JOB_EVIDENCE_TRACE", "subject_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17"},
+      {"kind": "COMPARATOR_CASE_TRACE", "subject_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17"},
+      {"kind": "MECHANISM_REPLAY", "subject_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17"},
+      {"kind": "DETERMINISTIC_COMMAND_EXIT", "subject_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17", "note": "the POL suite exited zero at this head"}
+    ],
+    "method_refs": [
+      {
+        "skill_name": "product-reverse-engineering-loop",
+        "skill_md_sha256": "0e4aeff70b2dd68edc03a32c8857b96a2221cd20b8d98d2dbf8c40d7b14e6029",
+        "skill_md_bytes": 11236,
+        "observed_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "declared_interface": "in: one external product subject at an exact identity. out: job, pain and mechanism signals. never: market, user or paid truth."
+      },
+      {
+        "skill_name": "agentic-tech-lead-orchestration",
+        "skill_md_sha256": "8a295169f382a8a3df93458e8553d35b676d8078ac80f1c1bd56cb6dd15c3229",
+        "skill_md_bytes": 18032,
+        "observed_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+        "declared_interface": "in: one admitted program. out: an atom DAG with one owner, one lease and one writer each. never: a session from a packet."
+      }
+    ],
+    "closure_cells": [
+      {
+        "cell_id": "POL-CELL-001",
+        "lane": "MARKET",
+        "question": "is a comparator case bound to a source in the named segment",
+        "evidence_ceiling": "MARKET_HYPOTHESIS_CONTRACT",
+        "claims": [
+          {"source_record": "POL-MKT-001", "statement": "a comparator case is bound to a source reference at this head", "disposition": "CONFIRMED"}
+        ]
+      },
+      {
+        "cell_id": "POL-CELL-002",
+        "lane": "USER",
+        "question": "does the scenario reach first value without an account",
+        "evidence_ceiling": "USER_SCENARIO_CONTRACT",
+        "claims": [
+          {"source_record": "POL-USER-001", "statement": "first value is reached with no account and no key", "disposition": "CONFIRMED"},
+          {"source_record": "POL-CMRC-001", "statement": "the payment trigger requires an account before value", "disposition": "CONTRADICTED"}
+        ]
+      },
+      {
+        "cell_id": "POL-CELL-003",
+        "lane": "TECHNICAL",
+        "question": "does the committed suite exit zero at this commit",
+        "evidence_ceiling": "DETERMINISTIC_COMPOSITION",
+        "claims": [
+          {"source_record": "POL-PROG-428", "statement": "the committed POL suite exited zero at this commit", "disposition": "CONFIRMED"}
+        ]
+      },
+      {
+        "cell_id": "POL-CELL-004",
+        "lane": "RUNTIME",
+        "question": "has any live workflow been traced end to end on this subject",
+        "evidence_ceiling": "DETERMINISTIC_EVAL_AND_SHADOW",
+        "claims": [
+          {"source_record": "POL-PROG-428", "statement": "no live workflow trace was taken, so the runtime lane was not entered", "disposition": "UNKNOWN"}
+        ]
+      },
+      {
+        "cell_id": "POL-CELL-005",
+        "lane": "COMMERCIAL",
+        "question": "has anybody paid for this subject more than once",
+        "evidence_ceiling": "COMMERCIAL_HYPOTHESIS_CONTRACT",
+        "claims": [
+          {"source_record": "POL-CMRC-001", "statement": "the commercial question is blocked behind a payment nobody has made", "disposition": "UNKNOWN"}
+        ]
+      }
+    ],
+    "atoms": [
+      {
+        "atom_id": "POL-ATOM-001",
+        "request_id": "SDR-001",
+        "relation": "SIBLING",
+        "parent_atom_id": null,
+        "branch": "agent/pol-k-composition",
+        "lease_paths": [
+          "skills/productization-operating-loop/scripts",
+          "skills/productization-operating-loop/references/session"
+        ],
+        "evidence_ceiling": "DETERMINISTIC_COMPOSITION",
+        "highest_claimable_lane": "DETERMINISTIC",
+        "cannot_establish": ["market demand", "user adoption", "payment", "provider execution"],
+        "oracles": [
+          {
+            "id": "ORC-001",
+            "lane": "DETERMINISTIC",
+            "procedure": "compile twice and byte-compare the two renderings",
+            "refuted_by": "two renderings of one input that differ in any byte"
+          }
+        ],
+        "negative_controls": ["each refusal code must fire on its own crafted input"],
+        "stop_states": ["a lane artifact bound to another commit"],
+        "output_paths": ["skills/productization-operating-loop/scripts"],
+        "interface_ref": "the composition compiler CLI at this head",
+        "receipt_ref": "compiler selftest exit code"
+      },
+      {
+        "atom_id": "POL-ATOM-002",
+        "request_id": "SDR-002",
+        "relation": "SIBLING",
+        "parent_atom_id": null,
+        "branch": "agent/pol-e-eval-plane",
+        "lease_paths": ["skills/productization-operating-loop/tests"],
+        "evidence_ceiling": "DETERMINISTIC_EVAL_AND_SHADOW",
+        "highest_claimable_lane": "DETERMINISTIC",
+        "cannot_establish": ["user adoption", "payment"],
+        "oracles": [
+          {
+            "id": "ORC-002",
+            "lane": "DETERMINISTIC",
+            "procedure": "run the evidence plane and read its exit code",
+            "refuted_by": "a green run with a planted false promotion in place"
+          }
+        ],
+        "negative_controls": ["every preregistered false promotion must turn the plane red by name"],
+        "stop_states": ["three qualifying failures against one acceptance target"],
+        "output_paths": ["skills/productization-operating-loop/tests"],
+        "interface_ref": "the evidence plane contract at this head",
+        "receipt_ref": "evidence plane replay receipt"
+      },
+      {
+        "atom_id": "POL-ATOM-003",
+        "request_id": "SDR-003",
+        "relation": "CHILD",
+        "parent_atom_id": "POL-ATOM-001",
+        "branch": "agent/pol-d-consumer-binding",
+        "lease_paths": ["skills/productization-operating-loop/modules"],
+        "evidence_ceiling": "DETERMINISTIC_COMPOSITION",
+        "highest_claimable_lane": "DETERMINISTIC",
+        "cannot_establish": ["merge", "release"],
+        "oracles": [
+          {
+            "id": "ORC-003",
+            "lane": "DETERMINISTIC",
+            "procedure": "validate the consumer binding against the portable core",
+            "refuted_by": "a consumer identity inside the portable core"
+          }
+        ],
+        "negative_controls": ["a consumer name in portable text must turn it red"],
+        "stop_states": ["the portable interface is not readable at this head"],
+        "output_paths": ["skills/productization-operating-loop/modules"],
+        "start_after": ["POL-ATOM-001"],
+        "complete_after": ["POL-ATOM-002"],
+        "interface_ref": "the composed program contract at this head",
+        "receipt_ref": "consumer binding receipt"
+      }
+    ],
+    "refusal_classes": [
+      "C01_MUTABLE_SUBJECT",
+      "C04_START_DEPENDENCY_USED_AS_COMPLETION_PROOF",
+      "C06_OVERLAPPING_WRITER_LEASE",
+      "C09_SESSION_REQUEST_PROMOTED_TO_RUNNING"
+    ],
+    "projections": [
+      {
+        "id": "PRJ-001",
+        "external_kind": "DOCUMENT",
+        "external_id": "pol-composition-readout",
+        "observed_revision": "rev-1",
+        "export_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+        "canonical_subjects": [
+          {
+            "path": "skills/productization-operating-loop/references/productization-program.schema.json",
+            "commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+            "blob_digest": "0000000000000000000000000000000000000000"
+          }
+        ],
+        "backlinks": ["skills/productization-operating-loop/README.md"]
+      }
+    ],
+    "human_owned_operations": [
+      "choosing one of the four outcome dispositions",
+      "launching any session named in the DAG",
+      "merge and release",
+      "rights and licensing admission"
+    ]
+  }
+}
