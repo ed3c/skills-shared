@@ -76,9 +76,10 @@
       "noreply@forgejo.org": "forge-forgejo"
     },
     "declared_owner_addresses": {
-      "mcnum01@gmail.com": "owner-endpoint"
+      "mcnum01@gmail.com": "owner-endpoint",
+      "30064024+ed3c@users.noreply.github.com": "owner-endpoint"
     },
-    "declared_owner_note": "Root-cause repair for the connector class (issues #435/#436 and the 2026-08-18/19 direct pushes): the ChatGPT GitHub connector writes through the Contents API with the owner's real address as both author and committer, no trailers, and no forge committer signature, so the forge carve-out can never match it and the endpoint can never be taught to write trailers. A trailerless commit whose author is a declared owner address is therefore classified owner-endpoint instead of red. The carve-out applies ONLY when both trailers are absent: the moment a commit carries Driven-By or Driven-On it is judged by the full rules, so agent endpoints gain nothing by borrowing the owner's address alongside their trailers, and an agent that forges the owner's address without trailers was already lying to the previous rule too — a vocabulary constrains honest endpoints, it does not authenticate hostile ones. Additions to this list are Human admission."
+    "declared_owner_note": "Root-cause repair for the connector class (issues #435/#436 and the 2026-08-18/19 direct pushes): the ChatGPT GitHub connector writes through the Contents API with the owner's real address as both author and committer, no trailers, and no forge committer signature, so the forge carve-out can never match it and the endpoint can never be taught to write trailers. A trailerless commit whose author is a declared owner address is therefore classified owner-endpoint instead of red. The carve-out applies ONLY when both trailers are absent: the moment a commit carries Driven-By or Driven-On it is judged by the full rules, so agent endpoints gain nothing by borrowing the owner's address alongside their trailers, and an agent that forges the owner's address without trailers was already lying to the previous rule too — a vocabulary constrains honest endpoints, it does not authenticate hostile ones. Additions to this list are Human admission. The second entry is the owner's GitHub-generated noreply alias (account id 30064024): connector commits observed on the #539/#542 Draft branches carry it as author instead of the real address, and GitHub's account-id prefix makes the ownership mechanically attributable to the same account."
   },
   "legacy_imports": [
     {
