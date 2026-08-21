@@ -56,3 +56,22 @@ Observed on a real macOS host with herdr 0.8.0 while attempting the #466 live li
 - Under the Claude Code Bash sandbox, `~/.config/herdr/herdr.sock` is outside the write allowlist; every socket call needs the sandbox disabled. The failure otherwise surfaces as `PermissionDenied` on the socket, not as a herdr defect.
 - The manual `herdr pane report-agent --state <idle|working|blocked|unknown>` fallback structurally cannot produce `DONE_CANDIDATE`: its state enum has no terminal value and it carries no `cleanup_state`/`residue_count`. Only a real managed agent lifecycle can reach the terminal branch of `herdr-lifecycle-receipt.schema.json`.
 - An unattended automated session may be unable to drive a nested managed agent at all (send-keys into its pane, spawning it under real credentials, and even read-only `pane process-info` can each be refused by host permission policy). In that case the live leg stays truthfully `NOT_EXERCISED`; a human-attended terminal is the unblocking lane.
+
+## Carrier/runtime contract mismatch (2026-08-21, #466 attempt 2)
+
+Host permission is not the innermost blocker. Herdr 0.8.0's own bundled API schema (`herdr api schema --output <path>`) and its real `agent explain --json` output together show that the agent surface publishes none of the facts this observer requires:
+
+```text
+AgentInfo (closed set)  agent, agent_session, agent_status, cwd, display_agent, focused,
+                        foreground_cwd, interactive_ready, launch_pending, name, pane_id,
+                        revision, screen_detection_skipped, state_change_seq, state_labels,
+                        tab_id, terminal_id, terminal_title, terminal_title_stripped, title,
+                        tokens, workspace_id
+success envelope        {id, result}
+absent everywhere       observed_at_unix/updated_at_unix/last_seen_at_unix, process_id/pid,
+                        process_alive, process_started_at_unix, cleanup_state, residue_count
+```
+
+Consequence: `reduce_observation` fails at `_observed_at` (`Herdr source observation timestamp must be a positive integer`) on **every** sample, however healthy the managed agent is, and the `LIVE_HERDR_LIFECYCLE_OBSERVED_CANDIDATE` branch of `../references/contracts/herdr-lifecycle-receipt.schema.json` additionally requires `process_id` and `process_started_at_unix`, which no herdr 0.8.0 response can supply. `AgentStatus` does carry `done`, so the terminal *state* exists; the terminal *receipt* does not.
+
+Signal → action: before spending another attempt on host permission for a managed-agent lifecycle, run `herdr api schema` and diff its agent surface against the observer's required field names. If the facts are absent, the correct outcome is a blocked receipt naming the missing fields, not a permission escalation. Unblocking lane is upstream herdr publishing those facts, or an admitted renegotiation of the observer/lifecycle contract against a real herdr capability set.
