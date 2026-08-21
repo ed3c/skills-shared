@@ -1,0 +1,23 @@
+{
+  "schema_version": "agentic-tech-lead/repository-portfolio-prompt-manifest/v1",
+  "required_coordinator_instruction": "Use subagents. Wait for all agents and consolidate their findings.",
+  "files": [
+    {"path": "references/REPOSITORY_PORTFOLIO_CONTROL.md", "kind": "contract"},
+    {"path": "references/prompts/repository-portfolio-controller-v3.md", "kind": "controller"},
+    {"path": "references/prompts/repository-portfolio-role-prompts-v1.md", "kind": "roles"},
+    {"path": "references/repository-portfolio-control/codex-agent-templates.md", "kind": "codex-agents"},
+    {"path": "references/repository-portfolio-control/README.md", "kind": "readme"},
+    {"path": "references/repository-portfolio-control/AGENTS.md", "kind": "agents-route"}
+  ],
+  "required_roles": [
+    "portfolio-explorer",
+    "acceptance-adversary",
+    "dependency-auditor",
+    "runtime-admission-auditor",
+    "implementation-worker",
+    "consolidation-verifier",
+    "release-auditor"
+  ],
+  "expected_sandbox_counts": {"read-only": 6, "workspace-write": 1},
+  "evidence_ceiling": "DETERMINISTIC_PROMPT_PACKAGING_ONLY"
+}
