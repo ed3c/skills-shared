@@ -1,0 +1,48 @@
+{
+  "bundle_digest": "085f737189ede28e457811855aede1038a53956c03ccf9ba29ef548b8232c646",
+  "bundle_id": "python-definitions",
+  "completeness": "PARTIAL_LOWER_BOUND",
+  "coverage": {
+    "denominator": 2,
+    "denominator_definition": "source blobs declared by the exact source subject and offered to this pass",
+    "method": "one tree-sitter parse and one tree-sitter query invocation per declared blob at the pinned bundle digest",
+    "numerator": 2
+  },
+  "establishes": {
+    "language_coverage": false,
+    "merge": false,
+    "provider_available_elsewhere": false,
+    "semantic_truth": false,
+    "task_pass": false
+  },
+  "exit_codes": {
+    "parse": 1,
+    "query": 0
+  },
+  "manifest_digest": "1299ed3f055932f20c6a7d98ff2aa8a03549649045d778717bad5380bccac298",
+  "matches": 5,
+  "paths": [
+    "skills/dual-track-code-review-loop/adapters/tree-sitter/fixtures/python-clean/sample.py.fixture",
+    "skills/dual-track-code-review-loop/adapters/tree-sitter/fixtures/python-parse-errors/broken.py.fixture"
+  ],
+  "provider": {
+    "abi_version": 15,
+    "config_digest": "5633dcc18a56c8d5af8fd89af8a9de3b4cd42eb4202c1bc9f1b28216f2ec1f0a",
+    "executable_location": "resolved from DTCR_TS_BIN or PATH; the install path is one machine and is not part of the identity",
+    "executable_name": "tree-sitter",
+    "executable_sha256": "002b151eb3aee02c453b3feacb73e672a6b11aa7b6a14d028afb98f27b40a7aa",
+    "grammar_digest": "94ead290935e18cd938342612205e3ec29bcc27def409a3022a21e6a7457c8de",
+    "grammar_license": "MIT, held by the grammar project. The Tree-sitter framework's own licence does not admit it and does not cover it.",
+    "grammar_source": "tree-sitter-python 0.25.0, vendored grammar sources as published on crates.io",
+    "language": "python",
+    "provider_binding_id": "DTCR-PB-549d4e258f0b1cef",
+    "query_digest": "b654af47b88da389ffc06cb0dd20c008a8f747657b01417653e796e99e07328d",
+    "version": "0.26.3"
+  },
+  "schema": "dtcr/tree-sitter-live-receipt/v1",
+  "subject": {
+    "commit": "1681cebaeffb78fd39fcb77d7dec76ea2ae292e0",
+    "repository_binding_id": "DTCR-RB-3749864dfe3e2f36",
+    "tree": "5647f54d78ec7c711785f3d04ff46917f656fd9a"
+  }
+}
