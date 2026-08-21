@@ -27,10 +27,14 @@ SCHEMA_DIR = SKILL / "references" / "schemas"
 DISPOSITION_FILE = SKILL / "references" / "source-disposition" / "refused-claims.json"
 CASES_FILE = SKILL / "cases.json"
 
+# The one `/Users/example/checkout/` value is an explicit C0 synthetic negative
+# control (DTCR-XC-CU-003) whose purpose is to prove repo-path rejection. The
+# scanner exempts only that exact synthetic prefix; all other home locators,
+# including other `/Users/example/` paths, remain fail-closed.
 PRIVATE_LOCATOR_PATTERNS = (
     re.compile(r"https?://docs\.google\.com/", re.I),
     re.compile(r"https?://drive\.google\.com/", re.I),
-    re.compile(r"(?<![A-Za-z0-9_])/Users/[A-Za-z0-9._-]+/"),
+    re.compile(r"(?<![A-Za-z0-9_])/Users/(?!example/checkout/)[A-Za-z0-9._-]+/"),
     re.compile(r"(?<![A-Za-z0-9_])/home/[A-Za-z0-9._-]+/"),
 )
 TOKEN_RE = re.compile(r"([^.\[\]]+)|\[(\d+)\]")
