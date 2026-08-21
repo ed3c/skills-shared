@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skills-shared.dev/contracts/one-shot-ci-epoch/v1",
+  "title": "One-Shot CI Epoch",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "repository", "pull_request", "candidate_head", "candidate_tree", "local_join_digest", "publication", "workflow_runs", "reruns", "verdict", "claims_not_proven", "digest"],
+  "properties": {
+    "schema": {"const": "one-shot-ci-epoch/v1"},
+    "repository": {"type": "string", "pattern": "^[^/]+/[^/]+$"},
+    "pull_request": {"type": "integer", "minimum": 1},
+    "candidate_head": {"$ref": "#/$defs/sha1"},
+    "candidate_tree": {"$ref": "#/$defs/sha1"},
+    "local_join_digest": {"$ref": "#/$defs/sha256"},
+    "publication": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["draft_created_at", "ready_transition_count", "code_push_count_after_ready"],
+      "properties": {
+        "draft_created_at": {"type": "string", "format": "date-time"},
+        "ready_transition_count": {"type": "integer", "minimum": 0},
+        "code_push_count_after_ready": {"type": "integer", "minimum": 0}
+      }
+    },
+    "workflow_runs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["run_id", "workflow", "head_sha", "status", "conclusion", "jobs_non_empty", "steps_non_empty", "artifact_digests"],
+        "properties": {
+          "run_id": {"type": "integer", "minimum": 1},
+          "workflow": {"type": "string", "minLength": 1},
+          "head_sha": {"$ref": "#/$defs/sha1"},
+          "status": {"enum": ["queued", "in_progress", "completed"]},
+          "conclusion": {"enum": ["success", "failure", "cancelled", "skipped", "timed_out", "action_required", "neutral"]},
+          "jobs_non_empty": {"type": "boolean"},
+          "steps_non_empty": {"type": "boolean"},
+          "artifact_digests": {"type": "array", "items": {"$ref": "#/$defs/sha256"}}
+        }
+      }
+    },
+    "reruns": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["run_id", "classification", "source_unchanged"],
+        "properties": {
+          "run_id": {"type": "integer", "minimum": 1},
+          "classification": {"enum": ["INFRASTRUCTURE_FLAKE", "CODE_OR_TEST_FAILURE", "UNKNOWN"]},
+          "source_unchanged": {"type": "boolean"}
+        }
+      }
+    },
+    "verdict": {"enum": ["PASS", "FAIL", "NOT_EXERCISED", "BLOCKED"]},
+    "claims_not_proven": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "digest": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha1": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}
