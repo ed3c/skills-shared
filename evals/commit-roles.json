@@ -513,6 +513,36 @@
         "commit_sha": "6079a8980544101744b76d8b797b2770976852ad",
         "subject": "fix(license): make Apache-2.0 SPDX-detectable",
         "reason": "second trailerless push from the same concurrent writer session on this host (2026-08-18); published history cannot be rewritten; the producing endpoint still writes no trailers"
+      },
+      {
+        "commit_sha": "89c39f83314bee79226af5e081fc2013c41ccc13",
+        "subject": "x",
+        "reason": "one of six accidental connector placeholder commits classified by governance repair issue #435; a GitHub connector session added the root file 'x' straight to main with no trailers, and the driver cannot be observed from the commit"
+      },
+      {
+        "commit_sha": "55f926e22c13ce6212280819b1eea916d35cd384",
+        "subject": "revert: remove accidental placeholder file",
+        "reason": "one of six accidental connector placeholder commits classified by governance repair issue #435; reverts the root file 'x' added by 89c39f83, itself pushed with no trailers by the same connector session"
+      },
+      {
+        "commit_sha": "8e2c89d120ecb74fcffa4d708d0714ca8583036f",
+        "subject": "(empty subject)",
+        "reason": "one of six accidental connector placeholder commits classified by governance repair issue #435; a GitHub connector session added the root file '__never__' straight to main with no trailers, and the driver cannot be observed from the commit"
+      },
+      {
+        "commit_sha": "5417467f1416ced5a6ad0d1fabaa38f6d850d3e8",
+        "subject": "revert: remove accidental empty placeholder",
+        "reason": "one of six accidental connector placeholder commits classified by governance repair issue #435; reverts the root file '__never__' added by 8e2c89d1, itself pushed with no trailers by the same connector session"
+      },
+      {
+        "commit_sha": "957d7373a36ae78b6379c28625967090e5b296fc",
+        "subject": "stop",
+        "reason": "one of six accidental connector placeholder commits classified by governance repair issue #435; a GitHub connector session added the root file 'stop' straight to main with no trailers, and the driver cannot be observed from the commit"
+      },
+      {
+        "commit_sha": "ccef97dedd7ea8b1873e3afa130ca82b8eabb413",
+        "subject": "revert: remove accidental stop placeholder",
+        "reason": "one of six accidental connector placeholder commits classified by governance repair issue #435; reverts the root file 'stop' added by 957d7373, itself pushed with no trailers by the same connector session"
       }
     ]
   }
