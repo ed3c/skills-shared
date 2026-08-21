@@ -11,9 +11,10 @@ for parser/syntax-match facts, `adapters/sqlite-ledger/` for the queryable
 graph-ledger fact plane), each with its own selftest routed through
 [`tests/run-all.sh`](tests/run-all.sh). The provider-specific `#547` (SCIP) and
 `#549` (Buf) deterministic adapters and the `#550` semantic-context adapter are
-separate, still-open lanes; landing these two does not admit those. `#522`
-(dual-track synthesis and closure compiler) is open and in flight this same
-wave — read its issue directly rather than this file for its state.
+separate, still-open lanes; landing these two does not admit those. The `#522`
+synthesis and problem-closure compilers landed in the same wave under
+[`synthesis/`](synthesis/), with their three contracts under
+`references/schemas/` counted by the committed harness.
 
 The failure this Skill exists to stop is not sloppiness. It is that both tracks
 produce output that reads identically once it lands in a report. A dependency
@@ -244,7 +245,7 @@ parser/syntax-match adapter (tree-sitter)    LANDED, selftest + live receipt
 graph-ledger adapter (sqlite-ledger)         LANDED, selftest, planted mutations
 SCIP / Buf deterministic adapters (#547/#549) BLOCKED_ON_PROVIDER
 semantic-context adapter (#550)              NOT_IMPLEMENTED
-dual-track synthesis compiler (#522)         IN_FLIGHT / OPEN — read #522 directly
+dual-track synthesis compiler (#522)         LANDED — synthesis/ + three schemas, suite-counted
 applied refactor on a real codebase          NOT_EXERCISED
 cross-repository contract migration          NOT_EXERCISED
 live consumer canary (#528)                  NOT_EXERCISED
@@ -274,8 +275,7 @@ committed suite above. The next owner for *this contract* is still an
 independent Shadow on this exact head (`#525`, open), reading the audit list in
 [`AGENTS.md`](AGENTS.md) and returning `ADMIT_FOR_DOWNSTREAM`, `BLOCK` or
 `REPLAN_REQUIRED`; a same-context review may warn and cannot satisfy that role.
-Concurrently open, path-disjoint sibling lanes on this same head: `#522`
-(synthesis/closure compiler, in flight this wave), `#547`/`#549` (provider
+Concurrently open, path-disjoint sibling lanes on this same head: `#547`/`#549` (provider
 deterministic adapters, blocked on provider availability), `#550` (semantic
 adapter, blocked), `#527` (bootstrap profile) and `#528` (live consumer
 canary, the eventual Local Handoff owner). None of them is promoted by this
