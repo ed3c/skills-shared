@@ -1,0 +1,134 @@
+{
+  "schema": "pol/composition-manifest/v1",
+  "manifest_id": "POL-CM-001",
+  "observed_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+  "observed_tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7",
+  "law": [
+    "A composed method is named here by content identity and by a declared interface. Its body stays in its own SKILL.md and is never copied into this method.",
+    "Identity is the SKILL.md digest at an exact commit. A digest that no longer matches the tree means the referenced method moved, which is a re-audit, not an automatic upgrade: the interface this program relied on may or may not have survived the edit.",
+    "A declared interface states what the method takes, what it returns, and what it can never be promoted into. It is capped at 400 characters so it cannot quietly become a second copy of the procedure.",
+    "Being listed here is not admission that the referenced method is correct, current, or appropriate for a given subject. It records only that the interface was read at that digest."
+  ],
+  "composed_methods": [
+    {
+      "skill_name": "unknown-discovery-composer",
+      "skill_md_sha256": "d6c71457a524f800882bb1dbcd8efeb88de1123c1323b8d643d71cf1d644555c",
+      "skill_md_bytes": 3469,
+      "observed_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+      "lane": "SOURCE",
+      "declared_interface": "in: a request whose unknowns are not enumerated. out: routed unknowns, each with an actor, a validator and a failure edge. never: a resolved unknown; routing is not an answer.",
+      "consumed_at_states": ["REQUEST_BOUND", "SOURCE_AND_POLICY_BOUND"],
+      "can_raise_rungs": []
+    },
+    {
+      "skill_name": "dr-research-loop",
+      "skill_md_sha256": "9e647b3dd23e5a8a75bee3b5560998798a620c1f432274a0db74aee4a4275261",
+      "skill_md_bytes": 3311,
+      "observed_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+      "lane": "SOURCE",
+      "declared_interface": "in: one research topic. out: a proposal with located sources and gate results. never: MARKET truth; a proposal is a set of located claims, not a measured arena.",
+      "consumed_at_states": ["SOURCE_AND_POLICY_BOUND"],
+      "can_raise_rungs": ["SOURCE_FOUND"]
+    },
+    {
+      "skill_name": "truth-verify-loop",
+      "skill_md_sha256": "842fc65f17418c7d508c4acdffa6cf2a0602e12eb113dcf91d1e10f7335baf1b",
+      "skill_md_bytes": 3232,
+      "observed_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+      "lane": "SOURCE",
+      "declared_interface": "in: a claim set. out: per-claim verification with an independent judge and a score. never: admission of its own verdict, and never a claim about this tree from a claim about a source.",
+      "consumed_at_states": ["SOURCE_AND_POLICY_BOUND"],
+      "can_raise_rungs": ["SOURCE_VERIFIED"]
+    },
+    {
+      "skill_name": "product-reverse-engineering-loop",
+      "skill_md_sha256": "0e4aeff70b2dd68edc03a32c8857b96a2221cd20b8d98d2dbf8c40d7b14e6029",
+      "skill_md_bytes": 11236,
+      "observed_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+      "lane": "MECHANISM",
+      "declared_interface": "in: one external product subject at an exact identity. out: job, pain and mechanism signals with a closure matrix. never: MARKET demand, USER validation or COMMERCIAL payment.",
+      "consumed_at_states": ["COMPARATOR_CASES_BOUND", "DIFFERENTIATION_WEDGE_BOUND"],
+      "can_raise_rungs": ["JOB_SUPPORTED", "MECHANISM_REPRODUCED"]
+    },
+    {
+      "skill_name": "procedural-shadow-runtime",
+      "skill_md_sha256": "6497cd54c5b4112f2662d181c512b9491f07bb1d66765cdf584ef4ea2bc4cb7c",
+      "skill_md_bytes": 13665,
+      "observed_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+      "lane": "MECHANISM",
+      "declared_interface": "in: one closed subject and its claimed closure. out: read-only findings and planted-control results. never: a mutation, a repair, or admission of the findings it produced.",
+      "consumed_at_states": ["SHADOW_CLOSURE_AUDITED"],
+      "can_raise_rungs": []
+    },
+    {
+      "skill_name": "dr-to-mvp",
+      "skill_md_sha256": "1332f5ce132f55d9f3421d3fdb77633ba474759c4768349785435780cfc19993",
+      "skill_md_bytes": 3424,
+      "observed_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+      "lane": "TECHNICAL",
+      "declared_interface": "in: a verified corpus and a bounded question. out: a graduated minimum runtime with a stop-loss. never: USER or COMMERCIAL truth; a runtime that works is not a runtime anyone wanted.",
+      "consumed_at_states": ["MVP_AND_STOP_LOSS_BOUND"],
+      "can_raise_rungs": ["MVP_TECH_VERIFIED"]
+    },
+    {
+      "skill_name": "agentic-tech-lead-orchestration",
+      "skill_md_sha256": "8a295169f382a8a3df93458e8553d35b676d8078ac80f1c1bd56cb6dd15c3229",
+      "skill_md_bytes": 18032,
+      "observed_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+      "lane": "RUNTIME",
+      "declared_interface": "in: one admitted program. out: an atom DAG with one owner, one lease and one writer each, plus dispatch packets. never: its own completion evidence, and never a session from a packet.",
+      "consumed_at_states": ["ISSUE_AND_SESSION_DAG_BOUND", "BUILD_OR_EXPERIMENT_RUNNING"],
+      "can_raise_rungs": []
+    },
+    {
+      "skill_name": "git-town-stacked-pr-worker",
+      "skill_md_sha256": "e1ca4939ee04cec59a667ee2a8b49f2179311fc61bbb428700159d9ab6ce4308",
+      "skill_md_bytes": 6920,
+      "observed_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+      "lane": "MERGE",
+      "declared_interface": "in: one atom with one writer and one declared lease. out: a stacked branch and its delivery receipt. never: the merge itself, which stays with a person.",
+      "consumed_at_states": ["BUILD_OR_EXPERIMENT_RUNNING"],
+      "can_raise_rungs": []
+    },
+    {
+      "skill_name": "dual-forge-repository-loop",
+      "skill_md_sha256": "68b24f148fd2911f7ae86aedbc908063a59051639bc357f8a061136b17d2c48b",
+      "skill_md_bytes": 6848,
+      "observed_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+      "lane": "MERGE",
+      "declared_interface": "in: two forge planes and one exact subject. out: reconciled publication state established by commit ancestry rather than by either plane's prose. never: the merge or release decision.",
+      "consumed_at_states": ["BUILD_OR_EXPERIMENT_RUNNING", "OUTCOME_READ_BACK"],
+      "can_raise_rungs": []
+    },
+    {
+      "skill_name": "shared-skills-infra",
+      "skill_md_sha256": "8de22ffb08626a94be2b0db8fe965980b1a6be973290ceff1371aae313814dda",
+      "skill_md_bytes": 4064,
+      "observed_commit": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
+      "lane": "RUNTIME",
+      "declared_interface": "in: a consumer that needs a shared method. out: one shared body plus a thin binding, with same-name shadowing refused. never: evidence that the bound method executed anywhere.",
+      "consumed_at_states": ["BUILD_OR_EXPERIMENT_RUNNING"],
+      "can_raise_rungs": []
+    }
+  ],
+  "not_composed": [
+    {
+      "subject": "any named external consumer, carrier application or runtime host",
+      "reason": "The portable core carries no consumer identity. A consumer binds this method from its own repository; naming one here would make every other consumer a special case of the first."
+    },
+    {
+      "subject": "market, user, commercial and policy lane contracts",
+      "reason": "Separately owned by the four Stage-1 sibling lanes. They consume this contract; freezing their content here would make them children of it rather than siblings."
+    }
+  ],
+  "authority": {
+    "merge": false,
+    "release": false,
+    "product_truth": false,
+    "user_truth": false,
+    "paid_truth": false,
+    "rights_admission": false,
+    "provider_execution": false,
+    "production": false
+  }
+}
