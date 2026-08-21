@@ -1,0 +1,60 @@
+{
+  "schema": "dtcr/fact-plane-contract-cases/v1",
+  "expected": {
+    "schema_files": 4,
+    "positive_examples": 4,
+    "schema_refusal_controls": 9,
+    "semantic_mutations": 4
+  },
+  "semantic_mutations": [
+    {
+      "id": "DTCR-D1C-SEM-001",
+      "target_schema": "dtcr/provider-observation/v1",
+      "patches": [
+        {"path": "coverage.processed", "value": 2},
+        {"path": "coverage.denominator", "value": 3}
+      ],
+      "refusal": "EXACT_COVERAGE_COUNT_MISMATCH"
+    },
+    {
+      "id": "DTCR-D1C-SEM-002",
+      "target_schema": "dtcr/fact-plane-receipt/v1",
+      "patches": [
+        {"path": "checks[0].exit_code", "value": 7},
+        {"path": "checks[0].state", "value": "PASS"}
+      ],
+      "refusal": "PASS_WITH_NONZERO_EXIT"
+    },
+    {
+      "id": "DTCR-D1C-SEM-003",
+      "target_schema": "dtcr/fact-plane-receipt/v1",
+      "patches": [
+        {"path": "checks[0].exit_code", "value": 1},
+        {"path": "checks[0].state", "value": "FAIL"},
+        {"path": "evidence_state", "value": "PASS"}
+      ],
+      "refusal": "PASS_RECEIPT_WITH_FAILED_CHECK"
+    },
+    {
+      "id": "DTCR-D1C-SEM-004",
+      "target_schema": "dtcr/fact-bundle/v1",
+      "patches": [
+        {"path": "aggregate_coverage.completeness", "value": "PARTIAL"},
+        {"path": "blast_radius", "value": {
+          "seed_fact_ids": ["DTCR-FACT-001"],
+          "edge_fact_ids": ["DTCR-FACT-001"],
+          "max_depth": 2,
+          "cycle_policy": "VISIT_EACH_NORMALIZED_NODE_ONCE",
+          "visited_nodes": 1,
+          "coverage": {
+            "completeness": "EXACT_FOR_DECLARED_DENOMINATOR",
+            "denominator_description": "the observed edge set only",
+            "warnings": [],
+            "omissions": []
+          }
+        }}
+      ],
+      "refusal": "BLAST_RADIUS_EXCEEDS_BUNDLE_COVERAGE"
+    }
+  ]
+}
