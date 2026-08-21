@@ -22,8 +22,11 @@ report a green it did not measure:
                describes a bundle that is no longer here and reads exactly like
                one that still matches. Then, if the CLI and a matching grammar
                are on the host, the adapter runs for real against the current
-               HEAD and its observed provider identity is compared with the
-               receipt. A missing provider is start-readiness, not a failure:
+               HEAD, its observed provider identity is compared with the
+               receipt, and it must reproduce what the receipt recorded over
+               the same blobs once the subject commit is factored out -- which
+               is the part of an emission a second host can be held to.
+               A missing provider is start-readiness, not a failure:
                the lane prints NOT_EXERCISED and stays green, and says plainly
                that what it could not check is whether the run reproduces.
 
@@ -393,6 +396,10 @@ def check_receipt_offline(receipt: dict[str, Any], name: str) -> None:
     digests drifted from the manifest describes a bundle that is no longer
     here, and it reads exactly like one that still matches."""
     manifest = A.load_bundle(BUNDLE)
+    for key in ("subject_blobs", "matches_digest_modulo_subject", "bundle_digest", "establishes"):
+        if key not in receipt:
+            fail(f"{name}: no {key}; a receipt this suite cannot compare against a run is not evidence")
+            return
     for key, expected in (
         ("manifest_digest", manifest["bundle_digest"]),
         ("query_digest", manifest["query_digest"]),
@@ -463,12 +470,20 @@ def lane_live() -> str:
         ):
             if receipt["provider"][key] != observed:
                 fail(f"live: {receipt_path.name} records {key}={receipt['provider'][key]}, this host observed {observed}")
+        observed_blobs = {match["blob"]["path"]: match["blob"]["blob"] for match in emitted["matches"]}
+        if receipt["subject_blobs"] != observed_blobs:
+            fail(f"live: {receipt_path.name} records different subject blobs than this run read")
+        elif receipt["matches_digest_modulo_subject"] != A.matches_digest_modulo_subject(emitted["matches"]):
+            fail(
+                f"live: {receipt_path.name} and this host disagree on what the same binary, grammar, "
+                "query and bytes determine; one of the two identities is not what it says"
+            )
+        else:
+            print(f"  {receipt_path.name}: this host reproduces the recorded emission over the same blobs")
         if receipt["subject"]["commit"] == emitted["receipt"]["subject"]["commit"]:
             if receipt["bundle_digest"] != emitted["receipt"]["bundle_digest"]:
                 fail(f"live: {receipt_path.name} is at this commit but its bundle digest differs from this run")
-            print(f"  {receipt_path.name}: replayed at its own subject commit, bundle digest agrees")
-        else:
-            print(f"  {receipt_path.name}: recorded at an earlier commit; provider identity agrees, digest not comparable")
+            print(f"  {receipt_path.name}: replayed at its own subject commit, whole-bundle digest agrees")
     return "EXERCISED"
 
 

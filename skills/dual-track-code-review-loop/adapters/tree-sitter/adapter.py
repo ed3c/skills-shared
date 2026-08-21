@@ -505,6 +505,20 @@ def emit_bundle(
             )
 
     complete = not omissions and parse_errors_total == 0
+    # A second denominator, in bytes, written out beside the blob one. The
+    # frozen ceiling has exactly one typed numerator over one typed
+    # denominator, and blobs and bytes are two different denominators: a pass
+    # that read nine small files and skipped the large one is nine tenths by
+    # blob and a fraction by byte. Naming both keeps the reader from picking
+    # whichever one the number sounded like.
+    parsed_bytes = sum(len(run["source"]) for run in runs if run["path"] in declared)
+    declared_bytes = sum(entry.get("byte_count", 0) for entry in declared_blobs)
+    matched_bytes = sum(m["range"]["end_byte"] - m["range"]["start_byte"] for m in matches)
+    byte_denominator = (
+        f"{matched_bytes} bytes lie inside the {len(matches)} matched ranges, over {parsed_bytes} bytes "
+        f"parsed, over {declared_bytes} bytes declared by the subject; the numerator beside this "
+        "warning counts blobs and says nothing about either byte count"
+    )
     ceiling = {
         "schema": CEILING_SCHEMA,
         "ceiling_id": "DTCR-CC-001",
@@ -518,7 +532,7 @@ def emit_bundle(
         },
         "completeness": "COMPLETE_FOR_ANALYSED_INPUTS" if complete else "PARTIAL_LOWER_BOUND",
         "omissions": [dict(entry) for entry in omissions],
-        "warnings": sorted(set(warnings)),
+        "warnings": sorted(set(warnings) | {byte_denominator}),
         "authority_ceiling": {
             "unanalysed_inputs_cleared": False,
             "semantic_completeness": False,
@@ -772,6 +786,18 @@ def run_live(
     return bundle
 
 
+def matches_digest_modulo_subject(matches: list[dict[str, Any]]) -> str:
+    """The part of an emission that a second host can reproduce.
+
+    The subject commit is in every match and in every output digest, so two
+    honest runs over the same blobs at two commits disagree on the whole-bundle
+    digest and agree on nothing checkable. Stripping the subject leaves what the
+    provider actually determined: the same binary, the same grammar, the same
+    query and the same bytes produce this digest anywhere."""
+    stripped = [{key: value for key, value in match.items() if key not in ("subject", "output_digest")} for match in matches]
+    return sha256_hex(canonical(stripped))
+
+
 def write_live_receipt(receipt_path: Path, bundle: dict[str, Any], manifest: dict[str, Any], paths: list[str]) -> None:
     """What one real execution on one host observed.
 
@@ -803,6 +829,8 @@ def write_live_receipt(receipt_path: Path, bundle: dict[str, Any], manifest: dic
         "bundle_id": manifest["bundle_id"],
         "manifest_digest": manifest["bundle_digest"],
         "bundle_digest": bundle["receipt"]["bundle_digest"],
+        "subject_blobs": {match["blob"]["path"]: match["blob"]["blob"] for match in bundle["matches"]},
+        "matches_digest_modulo_subject": matches_digest_modulo_subject(bundle["matches"]),
         "matches": len(bundle["matches"]),
         "coverage": bundle["coverage_ceiling"]["analysed"],
         "completeness": bundle["coverage_ceiling"]["completeness"],

@@ -1,5 +1,5 @@
 {
-  "bundle_digest": "085f737189ede28e457811855aede1038a53956c03ccf9ba29ef548b8232c646",
+  "bundle_digest": "f3764eb1774959a57fdec09a24eb6e709cb74ac5f6a315d45f7c52c9eba0247c",
   "bundle_id": "python-definitions",
   "completeness": "PARTIAL_LOWER_BOUND",
   "coverage": {
@@ -21,6 +21,7 @@
   },
   "manifest_digest": "1299ed3f055932f20c6a7d98ff2aa8a03549649045d778717bad5380bccac298",
   "matches": 5,
+  "matches_digest_modulo_subject": "a8c35c579a7cf0c0e60dc8f6dbde7d8013570180429cc27d4b0d824bfff1be24",
   "paths": [
     "skills/dual-track-code-review-loop/adapters/tree-sitter/fixtures/python-clean/sample.py.fixture",
     "skills/dual-track-code-review-loop/adapters/tree-sitter/fixtures/python-parse-errors/broken.py.fixture"
@@ -41,8 +42,12 @@
   },
   "schema": "dtcr/tree-sitter-live-receipt/v1",
   "subject": {
-    "commit": "1681cebaeffb78fd39fcb77d7dec76ea2ae292e0",
+    "commit": "ac62c87f7e20d1a2c00d4cf0aa7cd7c18c0fd7fd",
     "repository_binding_id": "DTCR-RB-3749864dfe3e2f36",
-    "tree": "5647f54d78ec7c711785f3d04ff46917f656fd9a"
+    "tree": "b66fdd8bfc098a844279dee284979daea74a82c2"
+  },
+  "subject_blobs": {
+    "skills/dual-track-code-review-loop/adapters/tree-sitter/fixtures/python-clean/sample.py.fixture": "054d78eee9126dd0209db438cb30812f127c8d42",
+    "skills/dual-track-code-review-loop/adapters/tree-sitter/fixtures/python-parse-errors/broken.py.fixture": "08cab187be62110c7f67491181227865f4847428"
   }
 }
