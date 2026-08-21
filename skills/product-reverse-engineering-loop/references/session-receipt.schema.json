@@ -1,0 +1,152 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "prel-session-receipt.schema.json",
+  "title": "PREL session receipt",
+  "description": "What a carrier observed about one dispatched session. The five lifecycle states are separate fields rather than one status, so a receipt cannot say RUNNING because a launch was requested: LAUNCH_REQUESTED, SESSION_OBSERVED, RUNNING, RESULT_RECEIVED and ARTIFACTS_READ_BACK each carry their own evidence state and their own evidence reference. NOT_EXERCISED is the honest value for a state nobody reached, and it never reads as PASS. The receipt records carrier observation only: it grants no merge, permission, secret, production, user, paid or release authority, and a lane that was unavailable stays unavailable rather than being covered by a lane that was.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "request_ref", "lifecycle", "lanes", "produced_artifacts", "refusals_observed", "authority", "human_owned_operations"],
+  "properties": {
+    "schema": {"const": "prel/session-receipt/v1"},
+    "request_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["request_id", "request_digest", "base_commit"],
+      "properties": {
+        "request_id": {"type": "string", "pattern": "^SDR-[0-9]{3}$"},
+        "request_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "base_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+      },
+      "description": "The exact dispatch request bytes this receipt answers. A receipt bound to a request that has since changed is a receipt about something else."
+    },
+    "lifecycle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "LAUNCH_REQUESTED",
+        "SESSION_OBSERVED",
+        "RUNNING",
+        "RESULT_RECEIVED",
+        "ARTIFACTS_READ_BACK"
+      ],
+      "properties": {
+        "LAUNCH_REQUESTED": {"$ref": "#/$defs/observation"},
+        "SESSION_OBSERVED": {"$ref": "#/$defs/observation"},
+        "RUNNING": {"$ref": "#/$defs/observation"},
+        "RESULT_RECEIVED": {"$ref": "#/$defs/observation"},
+        "ARTIFACTS_READ_BACK": {"$ref": "#/$defs/observation"}
+      }
+    },
+    "lanes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["deterministic", "behavioral", "runtime", "physical", "user", "paid", "human_admit"],
+      "properties": {
+        "deterministic": {"$ref": "#/$defs/lane"},
+        "behavioral": {"$ref": "#/$defs/lane"},
+        "runtime": {"$ref": "#/$defs/lane"},
+        "physical": {"$ref": "#/$defs/lane"},
+        "user": {"$ref": "#/$defs/lane"},
+        "paid": {"$ref": "#/$defs/lane"},
+        "human_admit": {"$ref": "#/$defs/lane"}
+      },
+      "description": "Every lane is reported, including the ones that were never available. A lane omitted from a receipt is a lane the reader silently fills in with the lanes that passed."
+    },
+    "produced_artifacts": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "digest"],
+        "properties": {
+          "path": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9._-]+(/[A-Za-z0-9._-]+)*$"
+          },
+          "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        }
+      }
+    },
+    "refusals_observed": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/refusal_class"},
+      "description": "Pre-registered classes that actually fired. An empty array means none fired, not that none were watched."
+    },
+    "authority": {"$ref": "#/$defs/authority"},
+    "human_owned_operations": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 4}
+    }
+  },
+  "$defs": {
+    "state": {
+      "enum": [
+        "PASS",
+        "FAIL",
+        "ABSENT",
+        "NOT_IMPLEMENTED",
+        "NOT_EXERCISED",
+        "SKIPPED_BY_POLICY",
+        "HUMAN_ADMIT_REQUIRED"
+      ]
+    },
+    "refusal_class": {
+      "enum": [
+        "C01_MUTABLE_SUBJECT",
+        "C02_SOURCE_STATEMENT_PROMOTED_TO_INTERNAL_FACT",
+        "C03_TECH_PASS_PROMOTED_TO_USER_OR_PAID_VALIDATION",
+        "C04_START_DEPENDENCY_USED_AS_COMPLETION_PROOF",
+        "C05_MISSING_EXACT_RECEIPT",
+        "C06_OVERLAPPING_WRITER_LEASE",
+        "C07_HIDDEN_MULTI_PARENT_CONVERGENCE",
+        "C08_PROJECTION_USED_AS_MACHINE_AUTHORITY",
+        "C09_SESSION_REQUEST_PROMOTED_TO_RUNNING",
+        "C10_CONSUMER_STATE_LEAK_IN_PORTABLE_CORE",
+        "C11_PROMPT_GRANTS_MERGE_SECRET_PERMISSION_OR_PRODUCTION_AUTHORITY",
+        "C12_PRIVATE_REASONING_FIELD",
+        "C13_ROLLBACK_SUBJECT_ABSENT_OR_EQUAL_TO_MUTABLE_ALIAS",
+        "C14_SOURCE_OR_FIXTURE_USED_AS_LIVE_PASS"
+      ]
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["merge", "permission", "secret", "production", "user_value", "paid_demand", "release"],
+      "properties": {
+        "merge": {"const": false},
+        "permission": {"const": false},
+        "secret": {"const": false},
+        "production": {"const": false},
+        "user_value": {"const": false},
+        "paid_demand": {"const": false},
+        "release": {"const": false}
+      }
+    },
+    "observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "evidence_ref", "observed_at"],
+      "properties": {
+        "state": {"$ref": "#/$defs/state"},
+        "evidence_ref": {
+          "oneOf": [{"type": "null"}, {"type": "string", "minLength": 4}],
+          "description": "The exact artifact, digest or command exit that was observed. null is only consistent with a state that claims no observation."
+        },
+        "observed_at": {"oneOf": [{"type": "null"}, {"type": "string", "minLength": 10}]}
+      }
+    },
+    "lane": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "note"],
+      "properties": {
+        "state": {"$ref": "#/$defs/state"},
+        "note": {"type": "string", "minLength": 8}
+      }
+    }
+  }
+}
