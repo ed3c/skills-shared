@@ -1,0 +1,151 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ed3c/skills-shared/skills/agentic-tech-lead-orchestration/codex-worker-result-v2.schema.json",
+  "title": "Agentic Tech Lead Codex v2 Worker Result",
+  "description": "Adapter-produced live worker result for run_codex_sdk_worker.py --execute (issue #508). It keeps base commit, base tree, post-turn result tree, changed-file denominator, lease readback, turn state, thread/turn identity, executor provenance, durable result carrier identity, controller-readback requirement and evidence ceiling as separate named facts. Shape only: a schema-valid document is a claim, never acceptance proof, and never a live #464 completion.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "task_id",
+    "attempt_id",
+    "repo",
+    "base_sha",
+    "base_tree_sha",
+    "tree_sha",
+    "worktree",
+    "prompt_digest",
+    "thread_policy",
+    "thread_id",
+    "turn_id",
+    "turn_status",
+    "adapter_state",
+    "sdk_execution",
+    "controller_readback_required",
+    "lease_readback",
+    "changed_files",
+    "final_response_digest",
+    "executor_provenance",
+    "result_carrier",
+    "evidence_ceiling"
+  ],
+  "$defs": {
+    "sha1": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "nullable_sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+    "repo_path": {"type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*(^|/)\\.\\.(/|$)).+$"},
+    "nonempty": {"type": "string", "minLength": 1}
+  },
+  "properties": {
+    "schema_version": {
+      "const": 2,
+      "description": "Historical v1 receipts are a different subject and are never promoted to a v2 replay PASS."
+    },
+    "task_id": {"$ref": "#/$defs/nonempty"},
+    "attempt_id": {"$ref": "#/$defs/nonempty"},
+    "repo": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+    "base_sha": {"$ref": "#/$defs/sha1", "description": "Frozen pre-turn commit."},
+    "base_tree_sha": {"$ref": "#/$defs/sha1", "description": "Tree of the frozen pre-turn commit."},
+    "tree_sha": {"$ref": "#/$defs/sha1", "description": "Post-turn result tree materialized from worktree bytes."},
+    "worktree": {"$ref": "#/$defs/nonempty", "description": "Originating worktree path. Recorded provenance only; replay must not depend on it."},
+    "prompt_digest": {"$ref": "#/$defs/sha256"},
+    "thread_policy": {"enum": ["new", "resume-compatible"]},
+    "thread_id": {"type": ["string", "null"], "minLength": 1},
+    "turn_id": {"type": ["string", "null"], "minLength": 1},
+    "turn_status": {"$ref": "#/$defs/nonempty"},
+    "adapter_state": {"enum": ["RUNTIME_RETURNED", "RUNTIME_NONTERMINAL"]},
+    "sdk_execution": {"const": "EXERCISED"},
+    "controller_readback_required": {"const": true},
+    "lease_readback": {"enum": ["PASS", "FAIL", "NOT_EXERCISED"]},
+    "changed_files": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/repo_path"},
+      "description": "Changed-file denominator observed in the worktree and re-derived from base_tree_sha -> tree_sha."
+    },
+    "final_response_digest": {"$ref": "#/$defs/nullable_sha256"},
+    "executor_provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Identity of the executable/runtime that actually performed the turn. A signed-in session is not executable provenance and must never appear here.",
+      "required": [
+        "adapter_version",
+        "adapter_blob_sha256",
+        "sdk_package",
+        "sdk_version",
+        "sdk_module_dir",
+        "codex_binary_source",
+        "codex_binary_path",
+        "codex_binary_sha256",
+        "runtime_python",
+        "runtime_platform",
+        "harness",
+        "model",
+        "config_identity",
+        "sandbox_policy",
+        "approval_policy"
+      ],
+      "properties": {
+        "adapter_version": {"$ref": "#/$defs/nonempty"},
+        "adapter_blob_sha256": {"$ref": "#/$defs/sha256", "description": "SHA-256 of the adapter source blob that executed."},
+        "sdk_package": {"$ref": "#/$defs/nonempty"},
+        "sdk_version": {"$ref": "#/$defs/nonempty", "description": "Distribution version, or ABSENT when the package exposes none."},
+        "sdk_module_dir": {"type": ["string", "null"], "minLength": 1},
+        "codex_binary_source": {
+          "enum": ["SDK_BUNDLED", "PATH", "ABSENT"],
+          "description": "SDK_BUNDLED means the executable ships inside the SDK package tree; PATH means a resolved PATH executable outside it."
+        },
+        "codex_binary_path": {"type": ["string", "null"], "minLength": 1},
+        "codex_binary_sha256": {"$ref": "#/$defs/nullable_sha256"},
+        "runtime_python": {"$ref": "#/$defs/nonempty"},
+        "runtime_platform": {"$ref": "#/$defs/nonempty"},
+        "harness": {"$ref": "#/$defs/nonempty"},
+        "model": {"$ref": "#/$defs/nonempty"},
+        "config_identity": {"$ref": "#/$defs/sha256"},
+        "sandbox_policy": {"$ref": "#/$defs/nonempty"},
+        "approval_policy": {"$ref": "#/$defs/nonempty"}
+      }
+    },
+    "result_carrier": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Durable carrier identity for the post-turn result tree. Same shape as the manifest written next to the bundle.",
+      "required": [
+        "carrier_kind",
+        "carrier_id",
+        "repo",
+        "base_sha",
+        "base_tree_sha",
+        "result_tree_sha",
+        "changed_paths",
+        "base_ref",
+        "result_ref",
+        "base_evidence_commit",
+        "result_evidence_commit",
+        "bundle_filename",
+        "bundle_sha256",
+        "bundle_bytes"
+      ],
+      "properties": {
+        "carrier_kind": {"const": "GIT_BUNDLE_V2"},
+        "carrier_id": {"type": "string", "pattern": "^[A-Za-z0-9._-]+$"},
+        "repo": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+        "base_sha": {"$ref": "#/$defs/sha1"},
+        "base_tree_sha": {"$ref": "#/$defs/sha1"},
+        "result_tree_sha": {"$ref": "#/$defs/sha1"},
+        "changed_paths": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/repo_path"}},
+        "base_ref": {"type": "string", "pattern": "^refs/evidence/codex-v2/[A-Za-z0-9._-]+/base$"},
+        "result_ref": {"type": "string", "pattern": "^refs/evidence/codex-v2/[A-Za-z0-9._-]+/result$"},
+        "base_evidence_commit": {"$ref": "#/$defs/sha1"},
+        "result_evidence_commit": {"$ref": "#/$defs/sha1"},
+        "bundle_filename": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*\\.bundle$"},
+        "bundle_sha256": {"$ref": "#/$defs/sha256"},
+        "bundle_bytes": {"type": "integer", "minimum": 1}
+      }
+    },
+    "evidence_ceiling": {
+      "const": "RUNTIME_RESULT_ONLY",
+      "description": "Runtime observation of one turn. Not controller acceptance, not Shadow readback, not #464 live completion, not merge."
+    }
+  }
+}
