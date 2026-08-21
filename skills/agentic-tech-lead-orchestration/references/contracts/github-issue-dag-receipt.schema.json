@@ -1,0 +1,134 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ed3c/skills-shared/skills/agentic-tech-lead-orchestration/github-issue-dag-receipt.schema.json",
+  "title": "GitHub Issue DAG Projection Receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "repo",
+    "graph_digest",
+    "desired",
+    "ready_wave",
+    "evidence_ceiling"
+  ],
+  "properties": {
+    "repo": {
+      "type": "string",
+      "pattern": "^[^/]+/[^/]+$"
+    },
+    "graph_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "desired": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "uniqueItems": true
+      }
+    },
+    "preflight": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository",
+        "issues"
+      ],
+      "properties": {
+        "repository": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "nameWithOwner",
+            "visibility",
+            "default_branch"
+          ],
+          "properties": {
+            "nameWithOwner": {
+              "type": "string",
+              "pattern": "^[^/]+/[^/]+$"
+            },
+            "visibility": {
+              "enum": [
+                "PUBLIC",
+                "PRIVATE",
+                "INTERNAL"
+              ]
+            },
+            "default_branch": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "issues": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "state",
+              "linked_prs"
+            ],
+            "properties": {
+              "state": {
+                "enum": [
+                  "OPEN",
+                  "CLOSED"
+                ]
+              },
+              "linked_prs": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "number",
+                    "state"
+                  ],
+                  "properties": {
+                    "number": {
+                      "type": "integer",
+                      "minimum": 1
+                    },
+                    "state": {
+                      "enum": [
+                        "OPEN",
+                        "CLOSED",
+                        "MERGED"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "before": {
+      "type": "object"
+    },
+    "after": {
+      "type": "object"
+    },
+    "ready_wave": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "uniqueItems": true
+    },
+    "evidence_ceiling": {
+      "enum": [
+        "STATIC_PROJECTION_ONLY",
+        "REMOTE_PROJECTION_READBACK_ONLY"
+      ]
+    }
+  }
+}

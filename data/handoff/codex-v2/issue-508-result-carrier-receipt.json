@@ -1,0 +1,148 @@
+{
+  "schema": "agentic-tech-lead/codex-v2-result-carrier/v1",
+  "issue": 508,
+  "title": "[CTL-LIVE-CODEX-V2] Anchor result-tree evidence and bind executor/worker receipt provenance",
+  "subject": {
+    "repo": "ed3c/skills-shared",
+    "branch": "worktree-wf_0ef9d145-3b2-1",
+    "implementation_commit": "243635885f7bcff64c606dffe7fcbe09ada9c5b2",
+    "implementation_tree": "cc28514b02494f3f4b75a33c10c8580b08e4ee50",
+    "parent_commit": "249abc47847f8295b1c75c9d4c84457c5126fd89",
+    "subject_note": "This receipt binds the implementation commit above. The receipt file itself lands in a following commit on the same branch and does not change the bound implementation subject."
+  },
+  "owning_files": {
+    "skills/agentic-tech-lead-orchestration/scripts/codex_result_carrier.py": "aa54a58b2e51087c07ea4410b3e286ff1e023e61d6f73ba607eeacbefcbaf148",
+    "skills/agentic-tech-lead-orchestration/scripts/check_codex_worker_result.py": "0f844c6a42a2b053b1240b56a92869ff94d202a2bd8d36dbe0de36336cf36b35",
+    "skills/agentic-tech-lead-orchestration/scripts/run_codex_sdk_worker.py": "dcf171a0b91ac4b187d7c5307396c1e6ae29cdbed706df26d86205baca1b98a2",
+    "skills/agentic-tech-lead-orchestration/scripts/compile_codex_live_acceptance.py": "8fad94886606bf070a137ee53c41534c78f50fdb3eede8d49b5a596c4aad531d",
+    "skills/agentic-tech-lead-orchestration/references/contracts/codex-worker-result-v2.schema.json": "913ca413cee66dc0a2f6857c67b0a79f18d0bbad5e97ad612eda4b1d5de58a3c"
+  },
+  "required_outcomes": {
+    "durable_result_carrier": {
+      "state": "PASS",
+      "carrier_kind": "GIT_BUNDLE_V2",
+      "mechanism": "Base and result trees are published as two parentless evidence commits under refs/evidence/codex-v2/<carrier-id>/{base,result} and packed into a content-addressed Git bundle with a sidecar manifest naming repository, base sha, base tree, result tree, changed-path denominator, evidence commits, bundle SHA-256 and bundle byte length.",
+      "transition": "POST_TURN_TREE_MATERIALIZED -> DURABLE_OBJECT_CARRIER_BOUND -> CARRIER_MANIFEST_DIGEST_BOUND -> INDEPENDENT_CLONE_OR_BUNDLE_READBACK -> RESULT_TREE_REPLAY_PASS",
+      "isolation": "Replay creates a bare scratch repository outside the originating repository with GIT_DIR, GIT_WORK_TREE, GIT_INDEX_FILE, GIT_OBJECT_DIRECTORY, GIT_ALTERNATE_OBJECT_DIRECTORIES, GIT_COMMON_DIR and GIT_CEILING_DIRECTORIES stripped from the environment. No reflog or accidental object retention is relied on and no implementation branch is moved."
+    },
+    "executor_provenance": {
+      "state": "PASS",
+      "bound_fields": [
+        "adapter_version",
+        "adapter_blob_sha256",
+        "sdk_package",
+        "sdk_version",
+        "sdk_module_dir",
+        "codex_binary_source",
+        "codex_binary_path",
+        "codex_binary_sha256",
+        "runtime_python",
+        "runtime_platform",
+        "harness",
+        "model",
+        "config_identity",
+        "sandbox_policy",
+        "approval_policy"
+      ],
+      "recomputable": "adapter_blob_sha256 is recomputed from the adapter that would actually execute; codex_binary_sha256 is recomputed from the recorded path when that file is present.",
+      "never_persisted": "auth or session values, tokens, subscription material, raw prompts, private reasoning, final model prose, terminal transcripts. A signed-in session is explicitly not treated as executable provenance."
+    },
+    "strict_worker_result_schema": {
+      "state": "PASS",
+      "schema_path": "skills/agentic-tech-lead-orchestration/references/contracts/codex-worker-result-v2.schema.json",
+      "dialect": "https://json-schema.org/draft/2020-12/schema",
+      "additional_properties": false,
+      "named_extension_points": [],
+      "distinguished_facts": [
+        "base_sha (base commit)",
+        "base_tree_sha (base tree)",
+        "tree_sha (post-turn result tree)",
+        "changed_files (changed-file denominator)",
+        "lease_readback",
+        "turn_status / adapter_state (turn state)",
+        "thread_id / turn_id (thread and turn identity)",
+        "executor_provenance",
+        "result_carrier (durable result carrier identity)",
+        "controller_readback_required",
+        "evidence_ceiling"
+      ],
+      "binder_consumption": "compile_codex_live_acceptance.py calls check_codex_worker_result.check_result() before any acceptance logic and then replays the durable carrier. It no longer defines the worker-result shape in code and no longer reads the originating worktree."
+    }
+  },
+  "command_contract": {
+    "cwd": "repository root",
+    "carrier_creation": "python3 skills/agentic-tech-lead-orchestration/scripts/codex_result_carrier.py create --worktree <WORKTREE> --repo ed3c/skills-shared --base-sha <BASE_SHA> --base-tree-sha <BASE_TREE> --result-tree-sha <RESULT_TREE> --changed-path <PATH> --out-dir <CARRIER_DIR> --carrier-id <TASK-ATTEMPT>",
+    "independent_replay": "python3 skills/agentic-tech-lead-orchestration/scripts/codex_result_carrier.py replay --manifest <CARRIER_DIR>/<BUNDLE>.manifest.json --bundle <CARRIER_DIR>/<BUNDLE>",
+    "worker_result_gate": "python3 skills/agentic-tech-lead-orchestration/scripts/check_codex_worker_result.py <WORKER_RESULT_JSON> --carrier-bundle <CARRIER_DIR>/<BUNDLE>",
+    "acceptance_binder": "python3 skills/agentic-tech-lead-orchestration/scripts/compile_codex_live_acceptance.py <ACCEPTANCE_INPUT_JSON> --output <RECEIPT_JSON>   # input keys: worker_result, controller, carrier_bundle_path",
+    "live_worker": "python3 skills/agentic-tech-lead-orchestration/scripts/run_codex_sdk_worker.py <SESSION_MANIFEST> --execute --carrier-out-dir <CARRIER_DIR> --output <WORKER_RESULT_JSON>   # NOT_EXERCISED here; owned by #464",
+    "deterministic_suite": "bash skills/agentic-tech-lead-orchestration/tests/run-all.sh",
+    "commit_role_gate": "python3 scripts/check_commit_roles.py --repo-root . --range github/main..HEAD"
+  },
+  "controls": [
+    {"id": "C1", "requirement": "result tree exists during worker execution but is unreachable/missing during independent replay", "result": "RED_FOR_REASON", "reason": "result_tree_sha <sha> is absent from the carrier bundle object store", "where": "tests/codex_result_carrier_selftest.py"},
+    {"id": "C2", "requirement": "tree SHA is syntactically valid but absent from the supplied bundle/ref/object store", "result": "RED_FOR_REASON", "reason": "result_tree_sha 1111...1111 is absent from the carrier bundle object store", "where": "tests/codex_result_carrier_selftest.py; tests/codex_live_acceptance_selftest.py M15"},
+    {"id": "C3", "requirement": "carrier manifest names the wrong tree or wrong repository/base", "result": "RED_FOR_REASON", "reason": "ref carries tree <x>, manifest names <y> (wrong base tree / wrong evidence commit); bundle does not carry the declared evidence refs (wrong carrier id); carrier manifest repo|base_sha|result_tree_sha does not name the worker value", "where": "tests/codex_result_carrier_selftest.py C3a-C3c; tests/codex_worker_result_selftest.py B1-B4; tests/codex_live_acceptance_selftest.py M16, M20"},
+    {"id": "C4", "requirement": "hidden extra object/path is omitted from the denominator", "result": "RED_FOR_REASON", "reason": "carrier denominator mismatch at creation; replayed denominator mismatch at replay; carrier denominator does not match worker changed_files", "where": "tests/codex_result_carrier_selftest.py C4a-C4b; tests/codex_worker_result_selftest.py B5; tests/codex_live_acceptance_selftest.py M14"},
+    {"id": "C5", "requirement": "executor path/version/build differs from the bound receipt", "result": "RED_FOR_REASON", "reason": "adapter_blob_sha256 does not match the adapter that would execute; codex_binary_sha256 drift for <path>", "where": "tests/codex_worker_result_selftest.py E1-E2; tests/codex_live_acceptance_selftest.py M24"},
+    {"id": "C6", "requirement": "PATH Codex is claimed while the SDK used a bundled binary, or vice versa", "result": "RED_FOR_REASON", "reason": "PATH codex claimed but <path> is the executable bundled inside <sdk_module_dir>; SDK_BUNDLED claimed but <path> is outside the SDK package tree", "where": "tests/codex_worker_result_selftest.py E3-E4; tests/codex_live_acceptance_selftest.py M25"},
+    {"id": "C7", "requirement": "worker result contains an unschematized field or omits required provenance", "result": "RED_FOR_REASON", "reason": "Additional properties are not allowed ('session_signed_in'/'auth_mode' was unexpected); 'executor_provenance'|'codex_binary_sha256'|'result_carrier' is a required property", "where": "tests/codex_worker_result_selftest.py S1-S6; tests/codex_result_carrier_selftest.py C7a-C7b; tests/codex_live_acceptance_selftest.py M17, M22, M23, M26"},
+    {"id": "C8", "requirement": "historical v1 receipt is promoted to current v2 replay PASS", "result": "RED_FOR_REASON", "reason": "worker result violates codex-worker-result-v2 schema: schema_version: 2 was expected", "where": "tests/codex_worker_result_selftest.py S3; tests/codex_live_acceptance_selftest.py M21"},
+    {"id": "C9", "requirement": "local fixture or deterministic selftest is promoted to live #464 completion", "result": "RED_FOR_REASON", "reason": "evidence_ceiling and sdk_execution are const-pinned, so a fixture cannot declare LIVE_464_COMPLETE and a NOT_EXERCISED static receipt cannot pose as a live result; the strongest verdict this lane emits is SHAPE_BINDING_AND_OFFLINE_REPLAY_ONLY, and acceptance output stays LIVE_RUNTIME_AND_CONTROLLER_READBACK_CANDIDATE with shadow_review_required=true", "where": "tests/codex_worker_result_selftest.py S7-S8 and closing assertion; tests/codex_live_acceptance_selftest.py M1, M3"},
+    {"id": "C10", "requirement": "the carrier artifact itself is not the content-addressed object the manifest names", "result": "RED_FOR_REASON", "reason": "carrier bundle size drift; carrier bundle digest drift at identical size; carrier bundle is absent", "where": "tests/codex_result_carrier_selftest.py C5, C5b, C6"}
+  ],
+  "self_demo": {
+    "description": "One real end-to-end round trip outside the test suite: scratch repository created, post-turn tree materialized through a private index, carrier published, originating repository deleted with shutil.rmtree, result tree then resolved from bundle + manifest alone and its post-turn bytes read back.",
+    "origin_deleted_before_replay": true,
+    "base_sha": "1cc141cf780688522135ec7c3673f8e9acae8715",
+    "base_tree_sha": "7ccaf038935ab124271cd8af685e846745276f1d",
+    "result_tree_sha": "b2dd12758c49dc4f157f250ad59cc342b388e78c",
+    "base_evidence_commit": "b6f6c066ab1b5f31fd229e2882115a9a5eddc160",
+    "result_evidence_commit": "b209c2bf5214b4ffd89e6696aeb63d438899d75e",
+    "result_ref": "refs/evidence/codex-v2/issue-508-demo-a01/result",
+    "bundle_filename": "codex-v2-issue-508-demo-a01.bundle",
+    "bundle_sha256": "33d7bf92d24671a041bb8990c754c834f227426dd8983112dc708c2b5d6614ba",
+    "bundle_bytes": 647,
+    "replay": {
+      "carrier_kind": "GIT_BUNDLE_V2",
+      "carrier_id": "issue-508-demo-a01",
+      "replay_source": "BUNDLE_ONLY_SCRATCH_REPOSITORY",
+      "result_tree_replay": "PASS",
+      "result_tree_sha": "b2dd12758c49dc4f157f250ad59cc342b388e78c",
+      "base_tree_sha": "7ccaf038935ab124271cd8af685e846745276f1d",
+      "changed_paths": ["src/a.py"]
+    },
+    "replayed_blob_readback": {"path": "src/a.py", "content": "VALUE = 1", "pre_turn_content": "VALUE = 0"},
+    "scratch_removed": true
+  },
+  "tests_run": [
+    {"command": "python3 skills/agentic-tech-lead-orchestration/tests/codex_result_carrier_selftest.py", "result": "PASS", "denominator": "positive=2 controls=13 origin_deleted=True live=NOT_EXERCISED"},
+    {"command": "python3 skills/agentic-tech-lead-orchestration/tests/codex_worker_result_selftest.py", "result": "PASS", "denominator": "positive=2 controls=22 live=NOT_EXERCISED"},
+    {"command": "python3 skills/agentic-tech-lead-orchestration/tests/codex_live_acceptance_selftest.py", "result": "PASS", "denominator": "positive=1 mutations=26 origin_deleted=True live=NOT_EXERCISED"},
+    {"command": "python3 skills/agentic-tech-lead-orchestration/tests/codex_sdk_controller_selftest.py", "result": "PASS", "denominator": "positive=8 mutations=15 live=NOT_EXERCISED"},
+    {"command": "bash skills/agentic-tech-lead-orchestration/tests/run-all.sh", "result": "PASS", "denominator": "full deterministic suite green, including CONTROL-PLANE-SHAPE-GREEN over 12 schemas"},
+    {"command": "python3 scripts/check_commit_roles.py --repo-root . --range github/main..HEAD", "result": "PASS", "denominator": "commit-role trailers over the branch subject range"}
+  ],
+  "lanes": {
+    "live_codex_execution": "NOT_EXERCISED",
+    "controller_acceptance_of_a_live_turn": "NOT_EXERCISED",
+    "shadow_readback": "NOT_EXERCISED",
+    "github_actions_exact_head": "NOT_EXERCISED",
+    "merge": "HUMAN_ADMIT_REQUIRED"
+  },
+  "residual_gaps": [
+    {"subject": "skills/agentic-tech-lead-orchestration/references/wave3-live-handoff-queue.json", "state": "ABSENT", "note": "Its Wave-3 live command still invokes run_codex_sdk_worker.py --execute without --carrier-out-dir. That invocation now fails closed at argument parsing rather than producing an uncarried result. The queue is #464's continuation packet and was deliberately not modified by this issue."},
+    {"subject": "skills/agentic-tech-lead-orchestration/runtime-handoff/{AGENTS.md,README.md,codex-v2-local-handoff-queue.json}", "state": "ABSENT", "note": "These paths named in the build brief do not exist at this subject. Implementation proceeded from the owning scripts, their tests and issue #508's body."},
+    {"subject": "live #464 v2 run", "state": "NOT_EXERCISED", "note": "No fresh signed-in Codex turn was performed. The executor-provenance collector was exercised only against a stub SDK module, so real openai-codex version and binary identity remain unobserved."}
+  ],
+  "verdict": "PASS",
+  "verdict_basis": [
+    "offline replay resolves the exact result tree after the originating temporary worktree and object directory are deleted (self_demo and two selftests)",
+    "all planted controls turn red for their intended reason",
+    "the schema positive case validates and the acceptance binder consumes the validated result",
+    "bash skills/agentic-tech-lead-orchestration/tests/run-all.sh is green"
+  ],
+  "evidence_ceiling": "Deterministic mechanics only. This receipt proves durable result-carrier replay, executable provenance binding, and strict worker-result shape for the exact implementation subject named above. It does not prove a fresh signed-in Codex v2 run, controller acceptance of a live turn, Shadow readback, model quality, general runtime portability, production safety, release, or promotion. No live #464 promotion is claimed. Merge remains separate repository authority.",
+  "driven_by": "agent-subagent",
+  "driven_on": "claude-code"
+}

@@ -1,0 +1,33 @@
+{
+  "schema_version": "wave3-admission-projection/v1",
+  "authoritative": false,
+  "canonical_route": "docs/traceability/WAVE3_ADMISSION.md",
+  "repository": "ed3c/skills-shared",
+  "convergence_issue": 468,
+  "admitted_pull_request": 480,
+  "checked_candidate": {
+    "commit": "8a33b9b3994a39e4ebb220a06fe17e33812661f0",
+    "tree": "b2347bf0af8e0bb768abcf2fe847e8844caed228"
+  },
+  "merge": {
+    "commit": "dd86861972f41f6d36c3de7ac156358ed5fae9d5",
+    "tree": "b05ead21c60cfc459dac5f823bd3ce1ca17ff318",
+    "actual_first_parent": "36932ca9f8266f17cfd15ee20fb2621f6ef0e437"
+  },
+  "checked_head_workflows": {
+    "skill_suites": 32286000465,
+    "shared_skills_infra": 32286000451,
+    "skill_eval_contract": 32286000416,
+    "git_town_stacked_pr_worker": 32286000382
+  },
+  "state": "STATIC_DETERMINISTIC_LIVE_EVIDENCE_INFRASTRUCTURE_ADMITTED",
+  "evidence_ceiling": "STATIC_DETERMINISTIC_INFRASTRUCTURE_PLUS_REMOTE_GITHUB_CANARY_EDGE_ONLY",
+  "live_lanes": {
+    "codex_sdk_controller_acceptance": "NOT_EXERCISED",
+    "github_dependency_canary": "LIVE_GITHUB_DEPENDENCY_CANARY_PASS / REMOTE_CANARY_EDGE_ONLY",
+    "herdr_lifecycle": "NOT_EXERCISED",
+    "source_provider_closure": "EVIDENCE_DEPENDENT",
+    "release_production": "NOT_PERFORMED"
+  },
+  "note": "Projection only. Current GitHub metadata, Git ancestry, executable contracts, runtime receipts, and the canonical admission route remain authority. GitHub dependency receipt: run 32296935756 on base 81041d1b88283fabdc1c4db05efaf8dd945e24df via closed-unmerged event PR #492, sha256 da227e94215a1b28a9e550546242c8a482bd718f7b35d67f159ccaa95f23efe5; before=[], applied=[486], cleanup=[], semantic_authority=false."
+}
