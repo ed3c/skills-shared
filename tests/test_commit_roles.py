@@ -221,12 +221,40 @@ class GateTests(unittest.TestCase):
     def test_a_listed_commit_is_exempt(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
             repo = RepoFixture(Path(raw))
-            sha = repo.commit("chore: no trailers\n", name="ed3c",
-                              email="mcnum01@gmail.com", filename="x.txt")
+            sha = repo.commit("chore: no trailers\n", name="dev",
+                              email="dev@example.org", filename="x.txt")
             vocabulary = copy.deepcopy(self.vocabulary)
             vocabulary["known_unclassified"] = {"commits": [{"commit_sha": sha}]}
             _, problems = self.run_gate(repo, vocabulary)
             self.assertEqual(problems, [])
+
+    def test_a_trailerless_declared_owner_commit_is_owner_endpoint(self) -> None:
+        """The connector class: owner's real address, no trailers, both fields."""
+        with tempfile.TemporaryDirectory() as raw:
+            repo = RepoFixture(Path(raw))
+            repo.commit("x\n", name="ed3c",
+                        email="mcnum01@gmail.com", filename="x.txt")
+            _, problems = self.run_gate(repo)
+            self.assertEqual(problems, [])
+
+    def test_owner_address_with_machine_trailers_is_still_refused(self) -> None:
+        """The carve-out is trailer-gated: an agent borrowing the owner's real
+        address alongside its trailers still hits the contribution-graph rule."""
+        with tempfile.TemporaryDirectory() as raw:
+            repo = RepoFixture(Path(raw))
+            repo.commit(GOOD_MESSAGE, name="ed3c",
+                        email="mcnum01@gmail.com", filename="g.txt")
+            _, problems = self.run_gate(repo)
+            self.assertTrue(
+                any("contribution graph" in p for p in problems), problems)
+
+    def test_an_undeclared_real_address_without_trailers_stays_red(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            repo = RepoFixture(Path(raw))
+            repo.commit("chore: no trailers\n", name="dev",
+                        email="dev@example.org", filename="u.txt")
+            _, problems = self.run_gate(repo)
+            self.assertTrue(any("no Driven-By" in p for p in problems), problems)
 
     def test_listing_a_commit_that_has_trailers_is_refused(self) -> None:
         """The list is for commits that cannot be fixed, not a way to skip one."""
@@ -242,8 +270,8 @@ class GateTests(unittest.TestCase):
     def test_an_unlisted_untrailed_commit_is_still_refused(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
             repo = RepoFixture(Path(raw))
-            repo.commit("chore: no trailers\n", name="ed3c",
-                        email="mcnum01@gmail.com", filename="z.txt")
+            repo.commit("chore: no trailers\n", name="dev",
+                        email="dev@example.org", filename="z.txt")
             vocabulary = copy.deepcopy(self.vocabulary)
             vocabulary["known_unclassified"] = {"commits": [{"commit_sha": "0" * 40}]}
             _, problems = self.run_gate(repo, vocabulary)
@@ -254,8 +282,8 @@ class GateTests(unittest.TestCase):
             repo = RepoFixture(Path(raw))
             imported = repo.commit(
                 "legacy without trailers\n",
-                name="ed3c",
-                email="mcnum01@gmail.com",
+                name="dev",
+                email="dev@example.org",
                 filename="legacy.txt",
             )
             payload = f"{imported}\n".encode("ascii")
@@ -276,8 +304,8 @@ class GateTests(unittest.TestCase):
 
             repo.commit(
                 "new untrailed commit\n",
-                name="ed3c",
-                email="mcnum01@gmail.com",
+                name="dev",
+                email="dev@example.org",
                 filename="new.txt",
             )
             _, problems = self.checker.evaluate(
@@ -290,8 +318,8 @@ class GateTests(unittest.TestCase):
             repo = RepoFixture(Path(raw))
             imported = repo.commit(
                 "legacy without trailers\n",
-                name="ed3c",
-                email="mcnum01@gmail.com",
+                name="dev",
+                email="dev@example.org",
                 filename="legacy.txt",
             )
             vocabulary = copy.deepcopy(self.vocabulary)
@@ -401,7 +429,7 @@ class VocabularyTests(unittest.TestCase):
     def test_human_is_the_only_non_machine_role(self) -> None:
         body = json.loads(VOCABULARY.read_text(encoding="utf-8"))
         non_machine = [k for k, v in body["driven_by"].items() if not v["machine"]]
-        self.assertEqual(non_machine, ["human"])
+        self.assertEqual(sorted(non_machine), ["human", "owner-endpoint"])
 
     def test_machine_pattern_rejects_a_deliverable_domain(self) -> None:
         body = json.loads(VOCABULARY.read_text(encoding="utf-8"))
