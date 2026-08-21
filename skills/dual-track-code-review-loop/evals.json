@@ -1,0 +1,38 @@
+{
+  "skill_name": "dual-track-code-review-loop",
+  "version": "0.1.0-c0",
+  "_meta": {
+    "scope": "C0 contract replay only. Provider adapters, applied refactors, live consumer execution, registry admission, legal clearance, merge, release and production remain separate lanes.",
+    "coverage_metric": "committed C0 denominator: schema positives + planted refusals + per-control own-guard knockout discrimination + portable-tree private-locator scan"
+  },
+  "runnable": [
+    {
+      "id": "DTCR-C0-1",
+      "checker_script": "tests/selftest.py",
+      "test_verify": "tests/selftest.py",
+      "good_fixture": "references/schemas",
+      "hollow_fixture": null,
+      "hollow_mutations": "Each x-refusal-control and each source-disposition negative_control is a committed planted defect; the suite additionally removes the named schema guard and requires that exact instance to become valid.",
+      "covers": [
+        "SCHEMA_DENOMINATOR_DRIFT",
+        "POSITIVE_INSTANCE_INVALID",
+        "PLANTED_CONTROL_NOT_REFUSED",
+        "CONTROL_REJECTED_BY_WRONG_KEYWORD",
+        "KNOCKOUT_STILL_RED_AFTER_OWN_GUARD_REMOVED",
+        "PRIVATE_LOCATOR_LEAK"
+      ],
+      "expected": "8 schemas and 8 positive instances validate; 32 controls are refused; all 32 become valid when only their named guard(s) are neutralized; no resolved private Google/home locator exists in the portable C0 tree"
+    }
+  ],
+  "evidence_ceiling": {
+    "c0_contract_replay": "PASS only after tests/run-all.sh executes on the exact subject",
+    "ci_arrival": "NOT_EXERCISED until an owning hosted workflow executes non-empty on the exact PR head",
+    "deterministic_fact_plane": "NOT_IMPLEMENTED",
+    "semantic_context_plane": "NOT_IMPLEMENTED",
+    "applied_refactor": "NOT_EXERCISED",
+    "real_consumer_canary": "NOT_EXERCISED",
+    "registry_admission": "ABSENT",
+    "legal_employment_ip": "HUMAN_ADMIT_REQUIRED",
+    "merge_release_production": "HUMAN_ADMIT_REQUIRED"
+  }
+}
