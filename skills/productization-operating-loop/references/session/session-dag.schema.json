@@ -1,0 +1,488 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pol/session-dag/v1",
+  "title": "Productization parallel Session DAG",
+  "description": "The graph over the bounded Tech Lead packets a composed program would launch, and nothing more. It carries no packet bodies: the packets themselves are one prel/session-dispatch-request/v1 document, named here by path and digest, because a second dispatch contract would be a second place for the LAUNCH_REQUESTED law to be forgotten. Three shapes are structural. The document is pinned to LAUNCH_REQUESTED with `observed_sessions` pinned to null, so a graph of what would be launched can never be read as a graph of what ran -- a carrier that observed a session records that in its own receipt, never by editing this file. Start edges and completion edges are separate arrays with separate item shapes whose `satisfied_by` constants differ, so an edge meaning \"this had to be readable first\" cannot be counted as an edge meaning \"this produced a receipt\". And every node declares a non-empty path lease. What the schema cannot do is compare two leases: disjointness is a relation between nodes, and the compiler that emits this file refuses an overlap rather than encoding it here.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "dag_id",
+    "subject_commit",
+    "lifecycle_state",
+    "observed_sessions",
+    "dispatch_request_ref",
+    "nodes",
+    "start_edges",
+    "completion_edges",
+    "authority",
+    "human_owned_operations"
+  ],
+  "properties": {
+    "schema": {"const": "pol/session-dag/v1"},
+    "dag_id": {"type": "string", "pattern": "^POL-DAG-[0-9]{3}$"},
+    "subject_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "lifecycle_state": {
+      "const": "LAUNCH_REQUESTED",
+      "description": "The same pin prel/session-dispatch-request/v1 carries, restated on the graph because the graph is the document a reader opens first. A graph is a plan for sessions; it is never evidence that one exists."
+    },
+    "observed_sessions": {
+      "const": null,
+      "description": "Pinned to null, not to an empty array, because an empty array is a container somebody eventually appends to."
+    },
+    "dispatch_request_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema", "path", "sha256"],
+      "description": "The packets, by reference. Composing the merged PREL contract rather than restating it is what keeps one dispatch law in one place; the digest is what makes the reference falsifiable when that file changes.",
+      "properties": {
+        "schema": {"const": "prel/session-dispatch-request/v1"},
+        "path": {"$ref": "#/$defs/repo_path"},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "nodes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/node"}
+    },
+    "start_edges": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/start_edge"},
+      "description": "What must be readable before a node may begin. May be empty."
+    },
+    "completion_edges": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/completion_edge"},
+      "description": "What must have produced an admitted receipt before a node may be called complete. Separate from start_edges by array and by item shape, because the cheapest way to overstate a graph is to satisfy a completion edge by reading the interface of the thing it was supposed to wait for."
+    },
+    "authority": {"$ref": "#/$defs/authority"},
+    "human_owned_operations": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 4}
+    }
+  },
+  "$defs": {
+    "repo_path": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9._*-]+(/[A-Za-z0-9._*-]+)*/?$",
+      "description": "Repository-relative path or path glob. An absolute or machine-local path is a consumer state leak."
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "merge",
+        "release",
+        "product_truth",
+        "user_truth",
+        "paid_truth",
+        "rights_admission",
+        "provider_execution",
+        "production"
+      ],
+      "properties": {
+        "merge": {"const": false},
+        "release": {"const": false},
+        "product_truth": {"const": false},
+        "user_truth": {"const": false},
+        "paid_truth": {"const": false},
+        "rights_admission": {"const": false},
+        "provider_execution": {"const": false},
+        "production": {"const": false}
+      }
+    },
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["node_id", "request_id", "relation", "parent_node_id", "lease_paths", "evidence_ceiling"],
+      "description": "One bounded packet: one atom, one dispatch request, one writer, one lease. The body of the packet is in the referenced dispatch request, not here.",
+      "properties": {
+        "node_id": {"type": "string", "pattern": "^POL-ATOM-[0-9]{3}$"},
+        "request_id": {
+          "type": "string",
+          "pattern": "^SDR-[0-9]{3}$",
+          "description": "The request in the referenced prel/session-dispatch-request/v1 document that carries this node's packet."
+        },
+        "relation": {
+          "enum": ["SIBLING", "CHILD"],
+          "description": "SIBLING nodes may run in parallel and must hold disjoint leases. A CHILD consumes an exact subject one parent produces; more than one parent is a hidden convergence."
+        },
+        "parent_node_id": {
+          "oneOf": [{"type": "null"}, {"type": "string", "pattern": "^POL-ATOM-[0-9]{3}$"}]
+        },
+        "lease_paths": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/repo_path"},
+          "description": "The paths this node is the only writer of. A node with no lease has no bound on what it may touch, which makes every parallel sibling a guess."
+        },
+        "evidence_ceiling": {
+          "enum": [
+            "INTERFACE_LOCK_ONLY",
+            "MARKET_HYPOTHESIS_CONTRACT",
+            "USER_SCENARIO_CONTRACT",
+            "COMMERCIAL_HYPOTHESIS_CONTRACT",
+            "POLICY_PROVENANCE_AND_RETEST_ROUTING",
+            "DETERMINISTIC_COMPOSITION",
+            "DETERMINISTIC_EVAL_AND_SHADOW",
+            "BOUNDED_REAL_EXPERIMENT_ONLY"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {"required": ["relation"], "properties": {"relation": {"const": "CHILD"}}},
+          "then": {"properties": {"parent_node_id": {"type": "string"}}},
+          "description": "A CHILD names exactly one parent. A child with a null parent is a dependency that exists in the world and not in the graph."
+        },
+        {
+          "if": {"required": ["relation"], "properties": {"relation": {"const": "SIBLING"}}},
+          "then": {"properties": {"parent_node_id": {"const": null}}},
+          "description": "A SIBLING that names a parent is a CHILD wearing a label that says it may run in parallel."
+        }
+      ]
+    },
+    "start_edge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from_node_id", "to_node_id", "satisfied_by"],
+      "properties": {
+        "from_node_id": {"type": "string", "pattern": "^POL-ATOM-[0-9]{3}$"},
+        "to_node_id": {"type": "string", "pattern": "^POL-ATOM-[0-9]{3}$"},
+        "satisfied_by": {"const": "READABLE_INTERFACE"}
+      }
+    },
+    "completion_edge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from_node_id", "to_node_id", "satisfied_by"],
+      "properties": {
+        "from_node_id": {"type": "string", "pattern": "^POL-ATOM-[0-9]{3}$"},
+        "to_node_id": {"type": "string", "pattern": "^POL-ATOM-[0-9]{3}$"},
+        "satisfied_by": {
+          "const": "ADMITTED_RECEIPT",
+          "description": "The one keyword that keeps the two graphs apart. A completion edge satisfied by a readable interface is a start edge that has been promoted into evidence of finishing."
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "schema": "pol/session-dag/v1",
+      "dag_id": "POL-DAG-001",
+      "subject_commit": "174009203a3ff9bd6ebc4010bc6cab7232dd44a4",
+      "lifecycle_state": "LAUNCH_REQUESTED",
+      "observed_sessions": null,
+      "dispatch_request_ref": {
+        "schema": "prel/session-dispatch-request/v1",
+        "path": "skills/productization-operating-loop/references/session/dispatch-request.json",
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "nodes": [
+        {
+          "node_id": "POL-ATOM-001",
+          "request_id": "SDR-001",
+          "relation": "SIBLING",
+          "parent_node_id": null,
+          "lease_paths": ["skills/productization-operating-loop/references/market"],
+          "evidence_ceiling": "MARKET_HYPOTHESIS_CONTRACT"
+        },
+        {
+          "node_id": "POL-ATOM-002",
+          "request_id": "SDR-002",
+          "relation": "SIBLING",
+          "parent_node_id": null,
+          "lease_paths": ["skills/productization-operating-loop/references/user"],
+          "evidence_ceiling": "USER_SCENARIO_CONTRACT"
+        },
+        {
+          "node_id": "POL-ATOM-003",
+          "request_id": "SDR-003",
+          "relation": "CHILD",
+          "parent_node_id": "POL-ATOM-001",
+          "lease_paths": ["skills/productization-operating-loop/scripts"],
+          "evidence_ceiling": "DETERMINISTIC_COMPOSITION"
+        }
+      ],
+      "start_edges": [
+        {"from_node_id": "POL-ATOM-001", "to_node_id": "POL-ATOM-003", "satisfied_by": "READABLE_INTERFACE"}
+      ],
+      "completion_edges": [
+        {"from_node_id": "POL-ATOM-002", "to_node_id": "POL-ATOM-003", "satisfied_by": "ADMITTED_RECEIPT"}
+      ],
+      "authority": {
+        "merge": false,
+        "release": false,
+        "product_truth": false,
+        "user_truth": false,
+        "paid_truth": false,
+        "rights_admission": false,
+        "provider_execution": false,
+        "production": false
+      },
+      "human_owned_operations": [
+        "launching any session named here",
+        "merge and release"
+      ]
+    }
+  ],
+  "x-refusal-controls": [
+    {
+      "case_id": "POL-XC-DAG-001",
+      "refuses": "A completion edge satisfied by a readable interface, which is a start edge promoted into evidence of finishing.",
+      "refused_by": "$defs.completion_edge.properties.satisfied_by.const",
+      "instance": {
+        "schema": "pol/session-dag/v1",
+        "dag_id": "POL-DAG-002",
+        "subject_commit": "174009203a3ff9bd6ebc4010bc6cab7232dd44a4",
+        "lifecycle_state": "LAUNCH_REQUESTED",
+        "observed_sessions": null,
+        "dispatch_request_ref": {
+          "schema": "prel/session-dispatch-request/v1",
+          "path": "skills/productization-operating-loop/references/session/dispatch-request.json",
+          "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "nodes": [
+          {
+            "node_id": "POL-ATOM-001",
+            "request_id": "SDR-001",
+            "relation": "SIBLING",
+            "parent_node_id": null,
+            "lease_paths": ["skills/productization-operating-loop/references/market"],
+            "evidence_ceiling": "MARKET_HYPOTHESIS_CONTRACT"
+          },
+          {
+            "node_id": "POL-ATOM-002",
+            "request_id": "SDR-002",
+            "relation": "SIBLING",
+            "parent_node_id": null,
+            "lease_paths": ["skills/productization-operating-loop/references/user"],
+            "evidence_ceiling": "USER_SCENARIO_CONTRACT"
+          }
+        ],
+        "start_edges": [],
+        "completion_edges": [
+          {"from_node_id": "POL-ATOM-001", "to_node_id": "POL-ATOM-002", "satisfied_by": "READABLE_INTERFACE"}
+        ],
+        "authority": {
+          "merge": false,
+          "release": false,
+          "product_truth": false,
+          "user_truth": false,
+          "paid_truth": false,
+          "rights_admission": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "POL-XC-DAG-002",
+      "refuses": "A dispatch graph reporting that its sessions are running.",
+      "refused_by": "properties.lifecycle_state.const",
+      "instance": {
+        "schema": "pol/session-dag/v1",
+        "dag_id": "POL-DAG-003",
+        "subject_commit": "174009203a3ff9bd6ebc4010bc6cab7232dd44a4",
+        "lifecycle_state": "RUNNING",
+        "observed_sessions": null,
+        "dispatch_request_ref": {
+          "schema": "prel/session-dispatch-request/v1",
+          "path": "skills/productization-operating-loop/references/session/dispatch-request.json",
+          "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "nodes": [
+          {
+            "node_id": "POL-ATOM-001",
+            "request_id": "SDR-001",
+            "relation": "SIBLING",
+            "parent_node_id": null,
+            "lease_paths": ["skills/productization-operating-loop/references/market"],
+            "evidence_ceiling": "MARKET_HYPOTHESIS_CONTRACT"
+          }
+        ],
+        "start_edges": [],
+        "completion_edges": [],
+        "authority": {
+          "merge": false,
+          "release": false,
+          "product_truth": false,
+          "user_truth": false,
+          "paid_truth": false,
+          "rights_admission": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "POL-XC-DAG-003",
+      "refuses": "An observed session recorded on the request side, where no carrier receipt exists.",
+      "refused_by": "properties.observed_sessions.const",
+      "instance": {
+        "schema": "pol/session-dag/v1",
+        "dag_id": "POL-DAG-004",
+        "subject_commit": "174009203a3ff9bd6ebc4010bc6cab7232dd44a4",
+        "lifecycle_state": "LAUNCH_REQUESTED",
+        "observed_sessions": [{"node_id": "POL-ATOM-001", "state": "RESULT_RECEIVED"}],
+        "dispatch_request_ref": {
+          "schema": "prel/session-dispatch-request/v1",
+          "path": "skills/productization-operating-loop/references/session/dispatch-request.json",
+          "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "nodes": [
+          {
+            "node_id": "POL-ATOM-001",
+            "request_id": "SDR-001",
+            "relation": "SIBLING",
+            "parent_node_id": null,
+            "lease_paths": ["skills/productization-operating-loop/references/market"],
+            "evidence_ceiling": "MARKET_HYPOTHESIS_CONTRACT"
+          }
+        ],
+        "start_edges": [],
+        "completion_edges": [],
+        "authority": {
+          "merge": false,
+          "release": false,
+          "product_truth": false,
+          "user_truth": false,
+          "paid_truth": false,
+          "rights_admission": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "POL-XC-DAG-004",
+      "refuses": "An unbounded packet: a node with no declared path lease.",
+      "refused_by": "$defs.node.properties.lease_paths.minItems",
+      "instance": {
+        "schema": "pol/session-dag/v1",
+        "dag_id": "POL-DAG-005",
+        "subject_commit": "174009203a3ff9bd6ebc4010bc6cab7232dd44a4",
+        "lifecycle_state": "LAUNCH_REQUESTED",
+        "observed_sessions": null,
+        "dispatch_request_ref": {
+          "schema": "prel/session-dispatch-request/v1",
+          "path": "skills/productization-operating-loop/references/session/dispatch-request.json",
+          "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "nodes": [
+          {
+            "node_id": "POL-ATOM-001",
+            "request_id": "SDR-001",
+            "relation": "SIBLING",
+            "parent_node_id": null,
+            "lease_paths": [],
+            "evidence_ceiling": "MARKET_HYPOTHESIS_CONTRACT"
+          }
+        ],
+        "start_edges": [],
+        "completion_edges": [],
+        "authority": {
+          "merge": false,
+          "release": false,
+          "product_truth": false,
+          "user_truth": false,
+          "paid_truth": false,
+          "rights_admission": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "POL-XC-DAG-005",
+      "refuses": "A hidden dependency: a CHILD node whose parent is not in the graph.",
+      "refused_by": "$defs.node.allOf[0].then.properties.parent_node_id.type",
+      "instance": {
+        "schema": "pol/session-dag/v1",
+        "dag_id": "POL-DAG-006",
+        "subject_commit": "174009203a3ff9bd6ebc4010bc6cab7232dd44a4",
+        "lifecycle_state": "LAUNCH_REQUESTED",
+        "observed_sessions": null,
+        "dispatch_request_ref": {
+          "schema": "prel/session-dispatch-request/v1",
+          "path": "skills/productization-operating-loop/references/session/dispatch-request.json",
+          "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "nodes": [
+          {
+            "node_id": "POL-ATOM-001",
+            "request_id": "SDR-001",
+            "relation": "CHILD",
+            "parent_node_id": null,
+            "lease_paths": ["skills/productization-operating-loop/scripts"],
+            "evidence_ceiling": "DETERMINISTIC_COMPOSITION"
+          }
+        ],
+        "start_edges": [],
+        "completion_edges": [],
+        "authority": {
+          "merge": false,
+          "release": false,
+          "product_truth": false,
+          "user_truth": false,
+          "paid_truth": false,
+          "rights_admission": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "POL-XC-DAG-006",
+      "refuses": "Authority widening: a graph of requested packets granting itself merge.",
+      "refused_by": "$defs.authority.properties.merge.const",
+      "instance": {
+        "schema": "pol/session-dag/v1",
+        "dag_id": "POL-DAG-007",
+        "subject_commit": "174009203a3ff9bd6ebc4010bc6cab7232dd44a4",
+        "lifecycle_state": "LAUNCH_REQUESTED",
+        "observed_sessions": null,
+        "dispatch_request_ref": {
+          "schema": "prel/session-dispatch-request/v1",
+          "path": "skills/productization-operating-loop/references/session/dispatch-request.json",
+          "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "nodes": [
+          {
+            "node_id": "POL-ATOM-001",
+            "request_id": "SDR-001",
+            "relation": "SIBLING",
+            "parent_node_id": null,
+            "lease_paths": ["skills/productization-operating-loop/scripts"],
+            "evidence_ceiling": "DETERMINISTIC_COMPOSITION"
+          }
+        ],
+        "start_edges": [],
+        "completion_edges": [],
+        "authority": {
+          "merge": true,
+          "release": false,
+          "product_truth": false,
+          "user_truth": false,
+          "paid_truth": false,
+          "rights_admission": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "human_owned_operations": ["merge and release"]
+      }
+    }
+  ]
+}
