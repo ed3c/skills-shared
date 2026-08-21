@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skills-shared.dev/contracts/issue-pr-acceptance/v1",
+  "title": "Issue or PR Acceptance Contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "unit_id", "kind", "repository", "number", "objective", "non_goals", "subjects", "start_dependencies", "completion_dependencies", "leases", "prerequisites", "oracles", "negative_controls", "evidence_lanes", "evidence_ceiling", "rollback_subject", "allowed_terminals", "residual_owner", "digest"],
+  "properties": {
+    "schema": {"const": "issue-pr-acceptance/v1"},
+    "unit_id": {"type": "string", "minLength": 1},
+    "kind": {"enum": ["ISSUE", "PULL_REQUEST"]},
+    "repository": {"type": "string", "pattern": "^[^/]+/[^/]+$"},
+    "number": {"type": "integer", "minimum": 1},
+    "objective": {"type": "string", "minLength": 1},
+    "non_goals": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "subjects": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["base_commit", "base_tree"],
+      "properties": {
+        "base_commit": {"$ref": "#/$defs/sha1"},
+        "base_tree": {"$ref": "#/$defs/sha1"},
+        "head_commit": {"$ref": "#/$defs/sha1"},
+        "head_tree": {"$ref": "#/$defs/sha1"}
+      }
+    },
+    "start_dependencies": {"type": "array", "items": {"$ref": "#/$defs/dependency"}},
+    "completion_dependencies": {"type": "array", "items": {"$ref": "#/$defs/dependency"}},
+    "leases": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["exclusive", "read_only", "forbidden"],
+      "properties": {
+        "exclusive": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "read_only": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "forbidden": {"type": "array", "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "prerequisites": {"type": "array", "items": {"$ref": "#/$defs/prerequisite"}},
+    "oracles": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "negative_controls": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "evidence_lanes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["STATIC", "DETERMINISTIC", "LOCAL", "GITHUB_ACTIONS", "PRIVATE", "PROVIDER", "USER", "PAID", "PRODUCTION", "HUMAN"]}},
+    "evidence_ceiling": {"type": "string", "minLength": 1},
+    "rollback_subject": {"$ref": "#/$defs/sha1"},
+    "allowed_terminals": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "human_operations": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "residual_owner": {"type": "string", "minLength": 1},
+    "digest": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha1": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "dependency": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["unit_id", "subject_digest", "reason"],
+      "properties": {
+        "unit_id": {"type": "string", "minLength": 1},
+        "subject_digest": {"$ref": "#/$defs/sha256"},
+        "reason": {"type": "string", "minLength": 1}
+      }
+    },
+    "prerequisite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "state", "owner", "unblock_condition"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "state": {"enum": ["PASS", "FAIL", "ABSENT", "NOT_IMPLEMENTED", "NOT_EXERCISED", "SKIPPED_BY_POLICY", "BLOCKED", "HUMAN_ADMIT_REQUIRED"]},
+        "owner": {"type": "string", "minLength": 1},
+        "unblock_condition": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}
