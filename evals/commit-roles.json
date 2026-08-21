@@ -86,16 +86,16 @@
       "id": "forgejo-main-before-dual-origin-convergence-2026-08-14",
       "tip_sha": "e5c239cce2c4494de6167155030df819a8f346cb",
       "admitted_against_sha": "abb7b455b012c8aaa4701b32e470fcf758a06cb7",
-      "unclassified_commit_count": 32,
-      "unclassified_commits_sha256": "9c848cf0c656165829faa9004fe983118a0e4d2ddf1958729517ed074bf53a54",
+      "unclassified_commit_count": 23,
+      "unclassified_commits_sha256": "71b6197c94228a2de1a14986c6bb9967b6af3c6451af34405d7f01cc27b2021a",
       "note": "Exact frozen Forgejo-only non-merge history imported during dual-origin convergence. This does not move enforced_from and cannot admit any later commit."
     },
     {
       "id": "canonical-local-main-before-dual-origin-convergence-2026-08-15",
       "tip_sha": "00543da877734a923b85d9423dee609fabf79d9d",
       "admitted_against_sha": "d53cb97da37e08bcd9cf93b2f08ae5d81972a6f0",
-      "unclassified_commit_count": 9,
-      "unclassified_commits_sha256": "fa3c746d55f62bc416faf018597a23469a7b7fed1a1a826b6b0f30dc7a51fe2f",
+      "unclassified_commit_count": 1,
+      "unclassified_commits_sha256": "1da256dff232743bdba47ed565553e00fa0888e7a755ebd77544d838a00a67ae",
       "note": "Exact frozen canonical-local-only non-merge tail imported during dual-origin convergence. This preserves published commit identities, does not move enforced_from, and cannot admit any later commit."
     }
   ],
