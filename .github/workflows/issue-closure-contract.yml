@@ -4,18 +4,22 @@ on:
   pull_request:
     types: [opened, reopened, synchronize, ready_for_review]
     paths:
+      - 'skills/agentic-tech-lead-orchestration/references/ISSUE_CLOSURE_CONTRACT.md'
       - 'skills/agentic-tech-lead-orchestration/references/issue-closure-contract.schema.json'
       - 'skills/agentic-tech-lead-orchestration/references/closure-audit/**'
       - 'skills/agentic-tech-lead-orchestration/scripts/assert_issue_closure_contract.py'
       - 'skills/agentic-tech-lead-orchestration/tests/test_issue_closure_contract.py'
+      - 'skills/git-town-stacked-pr-worker/molecular-indexes/closure-drift/**'
       - '.github/workflows/issue-closure-contract.yml'
   push:
     branches: [main]
     paths:
+      - 'skills/agentic-tech-lead-orchestration/references/ISSUE_CLOSURE_CONTRACT.md'
       - 'skills/agentic-tech-lead-orchestration/references/issue-closure-contract.schema.json'
       - 'skills/agentic-tech-lead-orchestration/references/closure-audit/**'
       - 'skills/agentic-tech-lead-orchestration/scripts/assert_issue_closure_contract.py'
       - 'skills/agentic-tech-lead-orchestration/tests/test_issue_closure_contract.py'
+      - 'skills/git-town-stacked-pr-worker/molecular-indexes/closure-drift/**'
       - '.github/workflows/issue-closure-contract.yml'
   workflow_dispatch:
 
