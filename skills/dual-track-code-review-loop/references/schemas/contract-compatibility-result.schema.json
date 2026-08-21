@@ -1,0 +1,300 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dtcr-contract-compatibility-result.schema.json",
+  "title": "DTCR contract compatibility result",
+  "description": "What a compatibility checker found between one baseline interface artifact and one candidate, and nothing else. The baseline is pinned to an exact commit and an artifact digest, because a checker run against a moving baseline reports the difference between the candidate and whatever the branch happened to hold that morning; the same run against a pinned baseline reports the difference somebody can reproduce. A clean outcome cannot coexist with a breaking finding, so the summary line and the finding list cannot drift apart. What the checker never decides is written as constants: flagging a breaking change is a technical observation about an interface, and deployment, release, merge and task admission are decisions people make with that observation in hand.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "result_id", "subject", "baseline", "candidate", "provider", "outcome", "findings", "grants"],
+  "properties": {
+    "schema": {"const": "dtcr/contract-compatibility-result/v1"},
+    "result_id": {"type": "string", "pattern": "^DTCR-CK-[0-9]{3}$"},
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository_binding_id", "commit", "tree"],
+      "properties": {
+        "repository_binding_id": {"type": "string", "pattern": "^DTCR-RB-[0-9a-f]{16}$"},
+        "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "tree": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+      }
+    },
+    "baseline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["commit", "artifact_name", "artifact_digest"],
+      "properties": {
+        "commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$",
+          "description": "BUF_WRONG_BASELINE refused here. A baseline named as a branch is a baseline that moves, and a compatibility verdict against a moving baseline is not reproducible."
+        },
+        "artifact_name": {"type": "string", "minLength": 1, "not": {"pattern": "[/\\\\]|^~"}},
+        "artifact_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifact_name", "artifact_digest"],
+      "properties": {
+        "artifact_name": {"type": "string", "minLength": 1, "not": {"pattern": "[/\\\\]|^~"}},
+        "artifact_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      },
+      "description": "The candidate side takes its commit from the subject above; there is no second commit key here for it to disagree with."
+    },
+    "provider": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider_binding_id", "executable_name", "version", "executable_sha256", "config_digest", "ruleset_digest"],
+      "properties": {
+        "provider_binding_id": {"type": "string", "pattern": "^DTCR-PB-[0-9a-f]{16}$"},
+        "executable_name": {"type": "string", "minLength": 1, "not": {"pattern": "[/\\\\]|^~"}},
+        "version": {"type": "string", "minLength": 1},
+        "executable_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "config_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "ruleset_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "Which rules were enabled. The same artifacts under a narrower ruleset produce a cleaner verdict, and a verdict quoted without its ruleset survives every later change to it."
+        }
+      }
+    },
+    "outcome": {"enum": ["NO_BREAKING_CHANGE_DETECTED", "BREAKING_CHANGE_DETECTED", "NOT_APPLICABLE", "PROVIDER_UNAVAILABLE"]},
+    "rationale": {"type": "string", "minLength": 12},
+    "findings": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["finding_kind", "rule_id", "location", "detail"],
+        "properties": {
+          "finding_kind": {"enum": ["BREAKING", "POSSIBLY_BREAKING", "COMPATIBLE_CHANGE"]},
+          "rule_id": {"type": "string", "minLength": 2},
+          "location": {"type": "string", "minLength": 2},
+          "detail": {"type": "string", "minLength": 8}
+        }
+      }
+    },
+    "grants": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["deployment", "merge", "release", "task_pass"],
+      "properties": {
+        "deployment": {"const": false},
+        "merge": {"const": false},
+        "release": {"const": false},
+        "task_pass": {"const": false}
+      },
+      "description": "A compatibility checker reports what changed in an interface. Whether that change ships is a decision with consumers, deprecation windows and owners in it, none of which appear in this record."
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"outcome": {"const": "NO_BREAKING_CHANGE_DETECTED"}}, "required": ["outcome"]},
+      "then": {
+        "properties": {"findings": {"items": {"properties": {"finding_kind": {"not": {"const": "BREAKING"}}}}}},
+        "description": "A clean verdict carrying a breaking finding is the one shape where the headline and the evidence contradict each other, and the headline is what gets quoted."
+      }
+    },
+    {
+      "if": {"properties": {"outcome": {"enum": ["NOT_APPLICABLE", "PROVIDER_UNAVAILABLE"]}}, "required": ["outcome"]},
+      "then": {
+        "required": ["rationale"],
+        "properties": {"findings": {"maxItems": 0}},
+        "description": "A lane nobody entered has no findings and owes a reason. Recorded without one it reads as a lane that was available and clean."
+      }
+    }
+  ],
+  "examples": [
+    {
+      "schema": "dtcr/contract-compatibility-result/v1",
+      "result_id": "DTCR-CK-001",
+      "subject": {
+        "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+        "commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+        "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+      },
+      "baseline": {
+        "commit": "3f4a1d9b0c7e2a58d61f8b4c3e9a70d215c6b8e4",
+        "artifact_name": "order-service.interface",
+        "artifact_digest": "7e9020312b61a4ef5f69f9ab2305747eb8d0225927a79aa15001dc4a5430eaf0"
+      },
+      "candidate": {
+        "artifact_name": "order-service.interface",
+        "artifact_digest": "69371c73bcd19ac4abbe6b7dcba053fb54a913499d8f68817e300d4c15866bca"
+      },
+      "provider": {
+        "provider_binding_id": "DTCR-PB-6b0e93d2a7c14f58",
+        "executable_name": "interface-compatibility-checker",
+        "version": "1.47.2",
+        "executable_sha256": "d4a3d8e212371f5c8fb5511e2c69b367a8069d9489f3bbf3e276526572f7329f",
+        "config_digest": "2819f62833d1867b24fdca003615107418018c5a9dc1864073940c4602c5d105",
+        "ruleset_digest": "45dfa450d7e40c0cb9b5c6d3674a3d56e495152216517bcc1f7d8b6db1e5423a"
+      },
+      "outcome": "BREAKING_CHANGE_DETECTED",
+      "findings": [
+        {
+          "finding_kind": "BREAKING",
+          "rule_id": "FIELD_REMOVED",
+          "location": "OrderCreated.currency",
+          "detail": "a field present in the baseline message is absent from the candidate"
+        }
+      ],
+      "grants": {"deployment": false, "merge": false, "release": false, "task_pass": false}
+    }
+  ],
+  "x-refusal-controls": [
+    {
+      "case_id": "DTCR-XC-CK-001",
+      "refuses": "BUF_WRONG_BASELINE: a compatibility verdict computed against a branch name rather than a pinned baseline commit.",
+      "refused_by": "properties.baseline.properties.commit.pattern",
+      "instance": {
+        "schema": "dtcr/contract-compatibility-result/v1",
+        "result_id": "DTCR-CK-002",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+          "commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+        },
+        "baseline": {
+          "commit": "main",
+          "artifact_name": "order-service.interface",
+          "artifact_digest": "7e9020312b61a4ef5f69f9ab2305747eb8d0225927a79aa15001dc4a5430eaf0"
+        },
+        "candidate": {
+          "artifact_name": "order-service.interface",
+          "artifact_digest": "69371c73bcd19ac4abbe6b7dcba053fb54a913499d8f68817e300d4c15866bca"
+        },
+        "provider": {
+          "provider_binding_id": "DTCR-PB-6b0e93d2a7c14f58",
+          "executable_name": "interface-compatibility-checker",
+          "version": "1.47.2",
+          "executable_sha256": "d4a3d8e212371f5c8fb5511e2c69b367a8069d9489f3bbf3e276526572f7329f",
+          "config_digest": "2819f62833d1867b24fdca003615107418018c5a9dc1864073940c4602c5d105",
+          "ruleset_digest": "45dfa450d7e40c0cb9b5c6d3674a3d56e495152216517bcc1f7d8b6db1e5423a"
+        },
+        "outcome": "NO_BREAKING_CHANGE_DETECTED",
+        "findings": [],
+        "grants": {"deployment": false, "merge": false, "release": false, "task_pass": false}
+      }
+    },
+    {
+      "case_id": "DTCR-XC-CK-002",
+      "refuses": "A clean headline verdict carrying a breaking finding underneath it.",
+      "refused_by": "allOf[0].then",
+      "instance": {
+        "schema": "dtcr/contract-compatibility-result/v1",
+        "result_id": "DTCR-CK-003",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+          "commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+        },
+        "baseline": {
+          "commit": "3f4a1d9b0c7e2a58d61f8b4c3e9a70d215c6b8e4",
+          "artifact_name": "order-service.interface",
+          "artifact_digest": "7e9020312b61a4ef5f69f9ab2305747eb8d0225927a79aa15001dc4a5430eaf0"
+        },
+        "candidate": {
+          "artifact_name": "order-service.interface",
+          "artifact_digest": "69371c73bcd19ac4abbe6b7dcba053fb54a913499d8f68817e300d4c15866bca"
+        },
+        "provider": {
+          "provider_binding_id": "DTCR-PB-6b0e93d2a7c14f58",
+          "executable_name": "interface-compatibility-checker",
+          "version": "1.47.2",
+          "executable_sha256": "d4a3d8e212371f5c8fb5511e2c69b367a8069d9489f3bbf3e276526572f7329f",
+          "config_digest": "2819f62833d1867b24fdca003615107418018c5a9dc1864073940c4602c5d105",
+          "ruleset_digest": "45dfa450d7e40c0cb9b5c6d3674a3d56e495152216517bcc1f7d8b6db1e5423a"
+        },
+        "outcome": "NO_BREAKING_CHANGE_DETECTED",
+        "findings": [
+          {
+            "finding_kind": "BREAKING",
+            "rule_id": "FIELD_REMOVED",
+            "location": "OrderCreated.currency",
+            "detail": "a field present in the baseline message is absent from the candidate"
+          }
+        ],
+        "grants": {"deployment": false, "merge": false, "release": false, "task_pass": false}
+      }
+    },
+    {
+      "case_id": "DTCR-XC-CK-003",
+      "refuses": "A compatibility verdict recorded as clearing deployment.",
+      "refused_by": "properties.grants.properties.deployment.const",
+      "instance": {
+        "schema": "dtcr/contract-compatibility-result/v1",
+        "result_id": "DTCR-CK-004",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+          "commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+        },
+        "baseline": {
+          "commit": "3f4a1d9b0c7e2a58d61f8b4c3e9a70d215c6b8e4",
+          "artifact_name": "order-service.interface",
+          "artifact_digest": "7e9020312b61a4ef5f69f9ab2305747eb8d0225927a79aa15001dc4a5430eaf0"
+        },
+        "candidate": {
+          "artifact_name": "order-service.interface",
+          "artifact_digest": "69371c73bcd19ac4abbe6b7dcba053fb54a913499d8f68817e300d4c15866bca"
+        },
+        "provider": {
+          "provider_binding_id": "DTCR-PB-6b0e93d2a7c14f58",
+          "executable_name": "interface-compatibility-checker",
+          "version": "1.47.2",
+          "executable_sha256": "d4a3d8e212371f5c8fb5511e2c69b367a8069d9489f3bbf3e276526572f7329f",
+          "config_digest": "2819f62833d1867b24fdca003615107418018c5a9dc1864073940c4602c5d105",
+          "ruleset_digest": "45dfa450d7e40c0cb9b5c6d3674a3d56e495152216517bcc1f7d8b6db1e5423a"
+        },
+        "outcome": "NO_BREAKING_CHANGE_DETECTED",
+        "findings": [],
+        "grants": {"deployment": true, "merge": false, "release": false, "task_pass": false}
+      }
+    },
+    {
+      "case_id": "DTCR-XC-CK-004",
+      "refuses": "A lane recorded as not applicable while carrying findings and no reason it was skipped.",
+      "refused_by": "allOf[1].then",
+      "instance": {
+        "schema": "dtcr/contract-compatibility-result/v1",
+        "result_id": "DTCR-CK-005",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+          "commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+        },
+        "baseline": {
+          "commit": "3f4a1d9b0c7e2a58d61f8b4c3e9a70d215c6b8e4",
+          "artifact_name": "order-service.interface",
+          "artifact_digest": "7e9020312b61a4ef5f69f9ab2305747eb8d0225927a79aa15001dc4a5430eaf0"
+        },
+        "candidate": {
+          "artifact_name": "order-service.interface",
+          "artifact_digest": "69371c73bcd19ac4abbe6b7dcba053fb54a913499d8f68817e300d4c15866bca"
+        },
+        "provider": {
+          "provider_binding_id": "DTCR-PB-6b0e93d2a7c14f58",
+          "executable_name": "interface-compatibility-checker",
+          "version": "1.47.2",
+          "executable_sha256": "d4a3d8e212371f5c8fb5511e2c69b367a8069d9489f3bbf3e276526572f7329f",
+          "config_digest": "2819f62833d1867b24fdca003615107418018c5a9dc1864073940c4602c5d105",
+          "ruleset_digest": "45dfa450d7e40c0cb9b5c6d3674a3d56e495152216517bcc1f7d8b6db1e5423a"
+        },
+        "outcome": "NOT_APPLICABLE",
+        "findings": [
+          {
+            "finding_kind": "COMPATIBLE_CHANGE",
+            "rule_id": "FIELD_ADDED",
+            "location": "OrderCreated.locale",
+            "detail": "an optional field was added to the candidate message"
+          }
+        ],
+        "grants": {"deployment": false, "merge": false, "release": false, "task_pass": false}
+      }
+    }
+  ]
+}

@@ -1,0 +1,236 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dtcr-projection-receipt.schema.json",
+  "title": "DTCR projection receipt",
+  "description": "What one embedding provider was given, what it returned, and what that exchange did not establish. A successful call is a transport fact: bytes went out, a vector of a stated dimension came back, and the call exited zero. Whether the resulting neighbourhood is semantically right, whether retrieval over it will be useful, and whether any of it carries technical authority are three separate questions this receipt answers with constants rather than leaving open. The model is identified by identifier plus digest, and where a hosted provider publishes no digest that absence is written as the explicit literal rather than left out, so a model that silently changed under a stable name is visible as an unpinned model instead of invisible. Sending content to a provider is a data-handling act: which plane the content came from is recorded, and the provider's terms remain a human admission that no receipt can grant.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "projection_receipt_id", "document_ref", "input_document_digest", "chunk", "embedding_provider", "output_projection_digest", "transport", "data_handling", "establishes"],
+  "properties": {
+    "schema": {"const": "dtcr/projection-receipt/v1"},
+    "projection_receipt_id": {"type": "string", "pattern": "^DTCR-PR-[0-9]{3}$"},
+    "document_ref": {"type": "string", "pattern": "^DTCR-DOC-[0-9]{3}$"},
+    "input_document_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "chunk": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["chunk_index", "chunk_digest", "chunk_byte_count"],
+      "properties": {
+        "chunk_index": {"type": "integer", "minimum": 0},
+        "chunk_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "chunk_byte_count": {"type": "integer", "minimum": 1}
+      },
+      "description": "The projection is of this chunk, not of the document. A row that cites the document while embedding one paragraph of it overstates what was compared."
+    },
+    "embedding_provider": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider_binding_id", "provider_name", "model_id", "model_digest", "dimension", "config_digest"],
+      "properties": {
+        "provider_binding_id": {"type": "string", "pattern": "^DTCR-PB-[0-9a-f]{16}$"},
+        "provider_name": {"type": "string", "minLength": 1, "not": {"pattern": "[/\\\\]|^~"}},
+        "model_id": {"type": "string", "minLength": 1},
+        "model_digest": {
+          "oneOf": [
+            {"const": "NOT_PUBLISHED_BY_PROVIDER"},
+            {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+          ],
+          "description": "A digest, or the explicit statement that the provider publishes none. Written out, an unpinned hosted model reads as unpinned; left out, it reads as nothing at all."
+        },
+        "dimension": {"type": "integer", "minimum": 1},
+        "config_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "output_projection_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "transport": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["outcome", "exit_code"],
+      "properties": {
+        "outcome": {"enum": ["PASS", "FAIL", "ABSENT", "NOT_EXERCISED", "SKIPPED_BY_POLICY"]},
+        "exit_code": {"oneOf": [{"type": "null"}, {"type": "integer"}]}
+      }
+    },
+    "data_handling": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["content_plane", "provider_terms_admission"],
+      "properties": {
+        "content_plane": {"enum": ["PUBLIC_TREE", "PRIVATE_CARRIER", "CONSUMER_LOCAL"]},
+        "provider_terms_admission": {
+          "const": "HUMAN_ADMIT_REQUIRED",
+          "description": "Fixed. Whether this content may be sent to this provider under its terms and privacy rules is a human decision, and no volume of successful calls converts into it."
+        }
+      }
+    },
+    "establishes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["semantic_correctness", "retrieval_quality", "technical_authority"],
+      "properties": {
+        "semantic_correctness": {
+          "const": false,
+          "description": "The mutation this constant refuses: embedding-provider transport success promoted to semantic correctness."
+        },
+        "retrieval_quality": {"const": false},
+        "technical_authority": {"const": false}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"transport": {"properties": {"outcome": {"enum": ["PASS", "FAIL"]}}, "required": ["outcome"]}}, "required": ["transport"]},
+      "then": {
+        "properties": {"transport": {"properties": {"exit_code": {"type": "integer"}}}},
+        "description": "A transport outcome with no exit code behind it is a claim about a call nobody made."
+      }
+    }
+  ],
+  "examples": [
+    {
+      "schema": "dtcr/projection-receipt/v1",
+      "projection_receipt_id": "DTCR-PR-001",
+      "document_ref": "DTCR-DOC-001",
+      "input_document_digest": "d4a3d8e212371f5c8fb5511e2c69b367a8069d9489f3bbf3e276526572f7329f",
+      "chunk": {
+        "chunk_index": 0,
+        "chunk_digest": "2819f62833d1867b24fdca003615107418018c5a9dc1864073940c4602c5d105",
+        "chunk_byte_count": 1840
+      },
+      "embedding_provider": {
+        "provider_binding_id": "DTCR-PB-3d51ea90c8b26f47",
+        "provider_name": "embedding-service",
+        "model_id": "example-embedding-model-v2",
+        "model_digest": "NOT_PUBLISHED_BY_PROVIDER",
+        "dimension": 768,
+        "config_digest": "45dfa450d7e40c0cb9b5c6d3674a3d56e495152216517bcc1f7d8b6db1e5423a"
+      },
+      "output_projection_digest": "802b1a8202117263eed6bc5f3f71c0067e003187fe9f4850b1c8f715f6824de8",
+      "transport": {"outcome": "PASS", "exit_code": 0},
+      "data_handling": {"content_plane": "PUBLIC_TREE", "provider_terms_admission": "HUMAN_ADMIT_REQUIRED"},
+      "establishes": {"semantic_correctness": false, "retrieval_quality": false, "technical_authority": false}
+    }
+  ],
+  "x-refusal-controls": [
+    {
+      "case_id": "DTCR-XC-PR-001",
+      "refuses": "Embedding-provider transport success promoted to semantic correctness.",
+      "refused_by": "properties.establishes.properties.semantic_correctness.const",
+      "instance": {
+        "schema": "dtcr/projection-receipt/v1",
+        "projection_receipt_id": "DTCR-PR-002",
+        "document_ref": "DTCR-DOC-001",
+        "input_document_digest": "d4a3d8e212371f5c8fb5511e2c69b367a8069d9489f3bbf3e276526572f7329f",
+        "chunk": {"chunk_index": 0, "chunk_digest": "2819f62833d1867b24fdca003615107418018c5a9dc1864073940c4602c5d105", "chunk_byte_count": 1840},
+        "embedding_provider": {
+          "provider_binding_id": "DTCR-PB-3d51ea90c8b26f47",
+          "provider_name": "embedding-service",
+          "model_id": "example-embedding-model-v2",
+          "model_digest": "NOT_PUBLISHED_BY_PROVIDER",
+          "dimension": 768,
+          "config_digest": "45dfa450d7e40c0cb9b5c6d3674a3d56e495152216517bcc1f7d8b6db1e5423a"
+        },
+        "output_projection_digest": "802b1a8202117263eed6bc5f3f71c0067e003187fe9f4850b1c8f715f6824de8",
+        "transport": {"outcome": "PASS", "exit_code": 0},
+        "data_handling": {"content_plane": "PUBLIC_TREE", "provider_terms_admission": "HUMAN_ADMIT_REQUIRED"},
+        "establishes": {"semantic_correctness": true, "retrieval_quality": false, "technical_authority": false}
+      }
+    },
+    {
+      "case_id": "DTCR-XC-PR-002",
+      "refuses": "A model carried by name with no digest and no statement that the provider publishes none.",
+      "refused_by": "properties.embedding_provider.required",
+      "instance": {
+        "schema": "dtcr/projection-receipt/v1",
+        "projection_receipt_id": "DTCR-PR-003",
+        "document_ref": "DTCR-DOC-001",
+        "input_document_digest": "d4a3d8e212371f5c8fb5511e2c69b367a8069d9489f3bbf3e276526572f7329f",
+        "chunk": {"chunk_index": 0, "chunk_digest": "2819f62833d1867b24fdca003615107418018c5a9dc1864073940c4602c5d105", "chunk_byte_count": 1840},
+        "embedding_provider": {
+          "provider_binding_id": "DTCR-PB-3d51ea90c8b26f47",
+          "provider_name": "embedding-service",
+          "model_id": "example-embedding-model-v2",
+          "dimension": 768,
+          "config_digest": "45dfa450d7e40c0cb9b5c6d3674a3d56e495152216517bcc1f7d8b6db1e5423a"
+        },
+        "output_projection_digest": "802b1a8202117263eed6bc5f3f71c0067e003187fe9f4850b1c8f715f6824de8",
+        "transport": {"outcome": "PASS", "exit_code": 0},
+        "data_handling": {"content_plane": "PUBLIC_TREE", "provider_terms_admission": "HUMAN_ADMIT_REQUIRED"},
+        "establishes": {"semantic_correctness": false, "retrieval_quality": false, "technical_authority": false}
+      }
+    },
+    {
+      "case_id": "DTCR-XC-PR-003",
+      "refuses": "A receipt clearing the provider's terms for the private content it sent.",
+      "refused_by": "properties.data_handling.properties.provider_terms_admission.const",
+      "instance": {
+        "schema": "dtcr/projection-receipt/v1",
+        "projection_receipt_id": "DTCR-PR-004",
+        "document_ref": "DTCR-DOC-003",
+        "input_document_digest": "45dfa450d7e40c0cb9b5c6d3674a3d56e495152216517bcc1f7d8b6db1e5423a",
+        "chunk": {"chunk_index": 2, "chunk_digest": "5403ee3a36ad14a5f73443a5780ea48acf61e489fef3f9ee319809c50433862f", "chunk_byte_count": 940},
+        "embedding_provider": {
+          "provider_binding_id": "DTCR-PB-3d51ea90c8b26f47",
+          "provider_name": "embedding-service",
+          "model_id": "example-embedding-model-v2",
+          "model_digest": "NOT_PUBLISHED_BY_PROVIDER",
+          "dimension": 768,
+          "config_digest": "45dfa450d7e40c0cb9b5c6d3674a3d56e495152216517bcc1f7d8b6db1e5423a"
+        },
+        "output_projection_digest": "6615c410e153c94d565173b3494fa40c6aedade2c8a5191e2276e1f38c9b04cd",
+        "transport": {"outcome": "PASS", "exit_code": 0},
+        "data_handling": {"content_plane": "PRIVATE_CARRIER", "provider_terms_admission": "CLEARED_BY_SUCCESSFUL_CALL"},
+        "establishes": {"semantic_correctness": false, "retrieval_quality": false, "technical_authority": false}
+      }
+    },
+    {
+      "case_id": "DTCR-XC-PR-004",
+      "refuses": "A provider record extended with a resolved endpoint, putting an account-specific address in a public receipt.",
+      "refused_by": "properties.embedding_provider.additionalProperties",
+      "instance": {
+        "schema": "dtcr/projection-receipt/v1",
+        "projection_receipt_id": "DTCR-PR-005",
+        "document_ref": "DTCR-DOC-001",
+        "input_document_digest": "d4a3d8e212371f5c8fb5511e2c69b367a8069d9489f3bbf3e276526572f7329f",
+        "chunk": {"chunk_index": 0, "chunk_digest": "2819f62833d1867b24fdca003615107418018c5a9dc1864073940c4602c5d105", "chunk_byte_count": 1840},
+        "embedding_provider": {
+          "provider_binding_id": "DTCR-PB-3d51ea90c8b26f47",
+          "provider_name": "embedding-service",
+          "model_id": "example-embedding-model-v2",
+          "model_digest": "NOT_PUBLISHED_BY_PROVIDER",
+          "dimension": 768,
+          "config_digest": "45dfa450d7e40c0cb9b5c6d3674a3d56e495152216517bcc1f7d8b6db1e5423a",
+          "endpoint": "https://example.invalid/tenant/embeddings"
+        },
+        "output_projection_digest": "802b1a8202117263eed6bc5f3f71c0067e003187fe9f4850b1c8f715f6824de8",
+        "transport": {"outcome": "PASS", "exit_code": 0},
+        "data_handling": {"content_plane": "PUBLIC_TREE", "provider_terms_admission": "HUMAN_ADMIT_REQUIRED"},
+        "establishes": {"semantic_correctness": false, "retrieval_quality": false, "technical_authority": false}
+      }
+    },
+    {
+      "case_id": "DTCR-XC-PR-005",
+      "refuses": "A projection call reported as passing with no exit code behind it.",
+      "refused_by": "allOf[0].then",
+      "instance": {
+        "schema": "dtcr/projection-receipt/v1",
+        "projection_receipt_id": "DTCR-PR-006",
+        "document_ref": "DTCR-DOC-001",
+        "input_document_digest": "d4a3d8e212371f5c8fb5511e2c69b367a8069d9489f3bbf3e276526572f7329f",
+        "chunk": {"chunk_index": 0, "chunk_digest": "2819f62833d1867b24fdca003615107418018c5a9dc1864073940c4602c5d105", "chunk_byte_count": 1840},
+        "embedding_provider": {
+          "provider_binding_id": "DTCR-PB-3d51ea90c8b26f47",
+          "provider_name": "embedding-service",
+          "model_id": "example-embedding-model-v2",
+          "model_digest": "NOT_PUBLISHED_BY_PROVIDER",
+          "dimension": 768,
+          "config_digest": "45dfa450d7e40c0cb9b5c6d3674a3d56e495152216517bcc1f7d8b6db1e5423a"
+        },
+        "output_projection_digest": "802b1a8202117263eed6bc5f3f71c0067e003187fe9f4850b1c8f715f6824de8",
+        "transport": {"outcome": "PASS", "exit_code": null},
+        "data_handling": {"content_plane": "PUBLIC_TREE", "provider_terms_admission": "HUMAN_ADMIT_REQUIRED"},
+        "establishes": {"semantic_correctness": false, "retrieval_quality": false, "technical_authority": false}
+      }
+    }
+  ]
+}

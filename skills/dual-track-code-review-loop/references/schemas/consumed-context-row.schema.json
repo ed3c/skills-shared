@@ -1,0 +1,127 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dtcr-consumed-context-row.schema.json",
+  "title": "DTCR consumed context row",
+  "description": "One manifest entry saying that a specific retrieved row was actually read while doing a specific task. It exists because the expensive failure in a retrieval lane is not a bad row, it is a row that influenced the work and appears in no list: the reader cannot audit context they were never told was used. Each entry pins the result, the rank inside it, the document, and the exact back reference, so the manifest resolves to sources rather than to scores. Two constants carry the laws: the basis grade is SEMANTIC_CONTEXT_CANDIDATE, which keeps a consumed row out of the evidence basis of any finding, and influence is CONTEXT_ONLY, which keeps a top-ranked hit from being recorded as the thing that decided the outcome. The manifest cannot enforce its own completeness -- nothing in this document can prove that every consumed row was listed -- so the reconciliation between rows returned and rows listed stays a consumer check, and the schema only guarantees that a listed row is exact.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "consumed_row_id", "manifest_ref", "result_ref", "row_rank", "document_ref", "back_reference_ref", "freshness_ref", "basis_grade", "influence", "consuming_task_ref", "consumed_at"],
+  "properties": {
+    "schema": {"const": "dtcr/consumed-context-row/v1"},
+    "consumed_row_id": {"type": "string", "pattern": "^DTCR-CX-[0-9]{3}$"},
+    "manifest_ref": {"type": "string", "minLength": 4},
+    "result_ref": {"type": "string", "pattern": "^DTCR-RR-[0-9]{3}$"},
+    "row_rank": {"type": "integer", "minimum": 1},
+    "document_ref": {"type": "string", "pattern": "^DTCR-DOC-[0-9]{3}$"},
+    "back_reference_ref": {
+      "type": "string",
+      "pattern": "^DTCR-BK-[0-9]{3}$",
+      "description": "The exact source, carried through from the row. A manifest of scores and ranks tells a reader that context was used and not which context."
+    },
+    "freshness_ref": {"type": "string", "pattern": "^DTCR-FC-[0-9]{3}$"},
+    "basis_grade": {
+      "const": "SEMANTIC_CONTEXT_CANDIDATE",
+      "description": "Fixed, and the same term the violation candidate's basis vocabulary uses. A consumed row may explain why a finding matters; it may never be part of why the finding exists."
+    },
+    "influence": {
+      "const": "CONTEXT_ONLY",
+      "description": "The only value. A retrieved row that is recorded as having determined an outcome has been promoted from suggestion to verdict inside the manifest that was supposed to make it auditable."
+    },
+    "consuming_task_ref": {"type": "string", "minLength": 4},
+    "consumed_at": {"type": "string", "minLength": 10}
+  },
+  "examples": [
+    {
+      "schema": "dtcr/consumed-context-row/v1",
+      "consumed_row_id": "DTCR-CX-001",
+      "manifest_ref": "context manifest for the persistence boundary review",
+      "result_ref": "DTCR-RR-001",
+      "row_rank": 1,
+      "document_ref": "DTCR-DOC-001",
+      "back_reference_ref": "DTCR-BK-001",
+      "freshness_ref": "DTCR-FC-001",
+      "basis_grade": "SEMANTIC_CONTEXT_CANDIDATE",
+      "influence": "CONTEXT_ONLY",
+      "consuming_task_ref": "review of the domain isolation violation candidate",
+      "consumed_at": "2026-08-21"
+    }
+  ],
+  "x-refusal-controls": [
+    {
+      "case_id": "DTCR-XC-CX-001",
+      "refuses": "A consumed retrieval row recorded as a deterministic basis for the finding it accompanied.",
+      "refused_by": "properties.basis_grade.const",
+      "instance": {
+        "schema": "dtcr/consumed-context-row/v1",
+        "consumed_row_id": "DTCR-CX-002",
+        "manifest_ref": "context manifest for the persistence boundary review",
+        "result_ref": "DTCR-RR-001",
+        "row_rank": 1,
+        "document_ref": "DTCR-DOC-001",
+        "back_reference_ref": "DTCR-BK-001",
+        "freshness_ref": "DTCR-FC-001",
+        "basis_grade": "DETERMINISTIC_FACT",
+        "influence": "CONTEXT_ONLY",
+        "consuming_task_ref": "review of the domain isolation violation candidate",
+        "consumed_at": "2026-08-21"
+      }
+    },
+    {
+      "case_id": "DTCR-XC-CX-002",
+      "refuses": "TOP_K != DECISION: a top-ranked row recorded as having decided the outcome.",
+      "refused_by": "properties.influence.const",
+      "instance": {
+        "schema": "dtcr/consumed-context-row/v1",
+        "consumed_row_id": "DTCR-CX-003",
+        "manifest_ref": "context manifest for the persistence boundary review",
+        "result_ref": "DTCR-RR-001",
+        "row_rank": 1,
+        "document_ref": "DTCR-DOC-001",
+        "back_reference_ref": "DTCR-BK-001",
+        "freshness_ref": "DTCR-FC-001",
+        "basis_grade": "SEMANTIC_CONTEXT_CANDIDATE",
+        "influence": "DETERMINED_OUTCOME",
+        "consuming_task_ref": "review of the domain isolation violation candidate",
+        "consumed_at": "2026-08-21"
+      }
+    },
+    {
+      "case_id": "DTCR-XC-CX-003",
+      "refuses": "A manifest entry sourced from another retrieval row instead of from an exact back reference.",
+      "refused_by": "additionalProperties",
+      "instance": {
+        "schema": "dtcr/consumed-context-row/v1",
+        "consumed_row_id": "DTCR-CX-004",
+        "manifest_ref": "context manifest for the persistence boundary review",
+        "result_ref": "DTCR-RR-001",
+        "row_rank": 2,
+        "document_ref": "DTCR-DOC-001",
+        "back_reference_ref": "DTCR-BK-001",
+        "freshness_ref": "DTCR-FC-001",
+        "basis_grade": "SEMANTIC_CONTEXT_CANDIDATE",
+        "influence": "CONTEXT_ONLY",
+        "derived_from_row": "DTCR-RR-001 rank 1",
+        "consuming_task_ref": "review of the domain isolation violation candidate",
+        "consumed_at": "2026-08-21"
+      }
+    },
+    {
+      "case_id": "DTCR-XC-CX-004",
+      "refuses": "A manifest entry that records a score but no exact source, leaving the reader unable to audit what was read.",
+      "refused_by": "required",
+      "instance": {
+        "schema": "dtcr/consumed-context-row/v1",
+        "consumed_row_id": "DTCR-CX-005",
+        "manifest_ref": "context manifest for the persistence boundary review",
+        "result_ref": "DTCR-RR-001",
+        "row_rank": 3,
+        "document_ref": "DTCR-DOC-001",
+        "freshness_ref": "DTCR-FC-001",
+        "basis_grade": "SEMANTIC_CONTEXT_CANDIDATE",
+        "influence": "CONTEXT_ONLY",
+        "consuming_task_ref": "review of the domain isolation violation candidate",
+        "consumed_at": "2026-08-21"
+      }
+    }
+  ]
+}

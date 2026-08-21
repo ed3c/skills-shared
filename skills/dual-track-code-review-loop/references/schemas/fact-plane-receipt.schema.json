@@ -1,0 +1,408 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dtcr-fact-plane-receipt.schema.json",
+  "title": "DTCR fact plane receipt",
+  "description": "One normalized bundle of provider runs against one exact subject, and the ledger row that records it happened. It is the fact plane's counterpart to the verification receipt and keeps the same laws: one arrival per receipt, an exit code behind every outcome that claims to have run, and a grants block whose constants make overclaiming unrepresentable rather than discouraged. The addition is `task_pass`, because a fact-plane bundle is where provider greenness most wants to become task greenness: four adapters exiting zero is a statement about four processes, and the task they were run for is closed by a closure record that reads this receipt rather than by the receipt itself. The ledger reference is a digest and a monotonic sequence with no room for a mutable label, so a row cannot be re-pointed at a different event while keeping its identifier.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "receipt_id", "subject", "arrival", "provider_runs", "ledger_event", "bundle_digest", "coverage_ceiling_ref", "summary", "grants"],
+  "properties": {
+    "schema": {"const": "dtcr/fact-plane-receipt/v1"},
+    "receipt_id": {"type": "string", "pattern": "^DTCR-FR-[0-9]{3}$"},
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository_binding_id", "commit", "tree"],
+      "properties": {
+        "repository_binding_id": {"type": "string", "pattern": "^DTCR-RB-[0-9a-f]{16}$"},
+        "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "tree": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+      }
+    },
+    "arrival": {
+      "enum": ["STATIC", "SANDBOX"],
+      "description": "A parser, an index and a graph query all report that something is the case in the tree; none of them reports that it ran in production. PROD is absent from this enum because no fact-plane provider can produce it."
+    },
+    "provider_runs": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/provider_run"}
+    },
+    "ledger_event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["event_digest", "sequence", "ledger_schema_digest"],
+      "properties": {
+        "event_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "sequence": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "SQLITE_EVENT_ID_DRIFT refused here. A monotonic integer beside a content digest; there is no key in this object for a mutable label such as latest or current, and none can be added."
+        },
+        "ledger_schema_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      },
+      "description": "The canonical ledger stores the task and event history. It does not store the truth about the source, the tests or the history of the repository, each of which is read from its own authority."
+    },
+    "bundle_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "coverage_ceiling_ref": {
+      "type": "string",
+      "pattern": "^DTCR-CC-[0-9]{3}$",
+      "description": "The ceiling that says how much of the subject these runs reached. A bundle with no ceiling reads as a bundle over everything."
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 12,
+      "maxLength": 800,
+      "not": {
+        "pattern": "(?i)(100\\s*%|zero false positives|zero errors|fully compliant|no false negatives|guarantee|guaranteed|guarantees|bulletproof|unbreakable)"
+      },
+      "description": "The same ten literal spellings the verification receipt refuses, refused here for the same reason and with the same limit: it is a word filter over habitual phrasings, not a check on meaning, and a paraphrase that avoids all ten passes and stays a reviewer's problem."
+    },
+    "grants": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["task_pass", "merge", "permission", "secret", "production", "release", "semantic_truth"],
+      "properties": {
+        "task_pass": {
+          "const": false,
+          "description": "PROVIDER_PASS_PROMOTED_TO_TASK_PASS refused here. Every adapter exiting zero is a fact about the adapters."
+        },
+        "merge": {"const": false},
+        "permission": {"const": false},
+        "secret": {"const": false},
+        "production": {"const": false},
+        "release": {"const": false},
+        "semantic_truth": {"const": false}
+      }
+    }
+  },
+  "$defs": {
+    "provider_run": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider_binding_id", "executable_name", "version", "executable_sha256", "config_digest", "input_digest", "output_digest", "exit_code", "outcome", "warnings", "omissions"],
+      "properties": {
+        "provider_binding_id": {"type": "string", "pattern": "^DTCR-PB-[0-9a-f]{16}$"},
+        "executable_name": {"type": "string", "minLength": 1, "not": {"pattern": "[/\\\\]|^~"}},
+        "version": {"type": "string", "minLength": 1},
+        "executable_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "config_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "input_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "The index, grammar or query set this run consumed. Without it a rerun that disagrees cannot be told from a rerun over different inputs."
+        },
+        "output_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "exit_code": {"oneOf": [{"type": "null"}, {"type": "integer"}]},
+        "outcome": {"enum": ["PASS", "FAIL", "ABSENT", "NOT_IMPLEMENTED", "NOT_EXERCISED", "SKIPPED_BY_POLICY", "HUMAN_ADMIT_REQUIRED"]},
+        "warnings": {"type": "array", "items": {"type": "string", "minLength": 2}},
+        "omissions": {"type": "array", "items": {"type": "string", "minLength": 2}}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"outcome": {"enum": ["PASS", "FAIL"]}}, "required": ["outcome"]},
+          "then": {
+            "properties": {"exit_code": {"type": "integer"}},
+            "description": "A provider outcome with no exit code behind it is a claim about a process nobody started."
+          }
+        }
+      ]
+    }
+  },
+  "examples": [
+    {
+      "schema": "dtcr/fact-plane-receipt/v1",
+      "receipt_id": "DTCR-FR-001",
+      "subject": {
+        "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+        "commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+        "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+      },
+      "arrival": "STATIC",
+      "provider_runs": [
+        {
+          "provider_binding_id": "DTCR-PB-1a4c77d0be93f218",
+          "executable_name": "syntax-query-runner",
+          "version": "0.25.1",
+          "executable_sha256": "2819f62833d1867b24fdca003615107418018c5a9dc1864073940c4602c5d105",
+          "config_digest": "45dfa450d7e40c0cb9b5c6d3674a3d56e495152216517bcc1f7d8b6db1e5423a",
+          "input_digest": "5403ee3a36ad14a5f73443a5780ea48acf61e489fef3f9ee319809c50433862f",
+          "output_digest": "6615c410e153c94d565173b3494fa40c6aedade2c8a5191e2276e1f38c9b04cd",
+          "exit_code": 0,
+          "outcome": "PASS",
+          "warnings": [],
+          "omissions": ["two of six languages had no grammar installed"]
+        },
+        {
+          "provider_binding_id": "DTCR-PB-6b0e93d2a7c14f58",
+          "executable_name": "interface-compatibility-checker",
+          "version": "1.47.2",
+          "executable_sha256": "d4a3d8e212371f5c8fb5511e2c69b367a8069d9489f3bbf3e276526572f7329f",
+          "config_digest": "2819f62833d1867b24fdca003615107418018c5a9dc1864073940c4602c5d105",
+          "input_digest": "7e9020312b61a4ef5f69f9ab2305747eb8d0225927a79aa15001dc4a5430eaf0",
+          "output_digest": "69371c73bcd19ac4abbe6b7dcba053fb54a913499d8f68817e300d4c15866bca",
+          "exit_code": null,
+          "outcome": "NOT_EXERCISED",
+          "warnings": [],
+          "omissions": ["no interface artifact changed in this diff"]
+        }
+      ],
+      "ledger_event": {
+        "event_digest": "0a1246ddebb5572c290cf4d4746afa4be1a45bd83536f0e092d35c0c1ed035fe",
+        "sequence": 412,
+        "ledger_schema_digest": "69c56fd14abe6bf62dae8d22d573926a7008963cd7b45d21bbb88d2005fb1660"
+      },
+      "bundle_digest": "c450c1e5766c65f3633da2642b5b7ae12ecbb06f78a85a2918128d7fe7d0d218",
+      "coverage_ceiling_ref": "DTCR-CC-001",
+      "summary": "Two adapters ran against this commit; the syntax lane exited zero over the blobs the installed grammars covered and the interface lane was not exercised.",
+      "grants": {
+        "task_pass": false,
+        "merge": false,
+        "permission": false,
+        "secret": false,
+        "production": false,
+        "release": false,
+        "semantic_truth": false
+      }
+    }
+  ],
+  "x-refusal-controls": [
+    {
+      "case_id": "DTCR-XC-FR-001",
+      "refuses": "PROVIDER_PASS_PROMOTED_TO_TASK_PASS: every adapter exiting zero recorded as the task passing.",
+      "refused_by": "properties.grants.properties.task_pass.const",
+      "instance": {
+        "schema": "dtcr/fact-plane-receipt/v1",
+        "receipt_id": "DTCR-FR-002",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+          "commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+        },
+        "arrival": "STATIC",
+        "provider_runs": [
+          {
+            "provider_binding_id": "DTCR-PB-1a4c77d0be93f218",
+            "executable_name": "syntax-query-runner",
+            "version": "0.25.1",
+            "executable_sha256": "2819f62833d1867b24fdca003615107418018c5a9dc1864073940c4602c5d105",
+            "config_digest": "45dfa450d7e40c0cb9b5c6d3674a3d56e495152216517bcc1f7d8b6db1e5423a",
+            "input_digest": "5403ee3a36ad14a5f73443a5780ea48acf61e489fef3f9ee319809c50433862f",
+            "output_digest": "6615c410e153c94d565173b3494fa40c6aedade2c8a5191e2276e1f38c9b04cd",
+            "exit_code": 0,
+            "outcome": "PASS",
+            "warnings": [],
+            "omissions": []
+          }
+        ],
+        "ledger_event": {
+          "event_digest": "0a1246ddebb5572c290cf4d4746afa4be1a45bd83536f0e092d35c0c1ed035fe",
+          "sequence": 413,
+          "ledger_schema_digest": "69c56fd14abe6bf62dae8d22d573926a7008963cd7b45d21bbb88d2005fb1660"
+        },
+        "bundle_digest": "c450c1e5766c65f3633da2642b5b7ae12ecbb06f78a85a2918128d7fe7d0d218",
+        "coverage_ceiling_ref": "DTCR-CC-001",
+        "summary": "All configured adapters exited zero against this commit.",
+        "grants": {
+          "task_pass": true,
+          "merge": false,
+          "permission": false,
+          "secret": false,
+          "production": false,
+          "release": false,
+          "semantic_truth": false
+        }
+      }
+    },
+    {
+      "case_id": "DTCR-XC-FR-002",
+      "refuses": "SQLITE_EVENT_ID_DRIFT: a ledger reference pointed at a mutable label instead of a fixed sequence.",
+      "refused_by": "properties.ledger_event.properties.sequence.type",
+      "instance": {
+        "schema": "dtcr/fact-plane-receipt/v1",
+        "receipt_id": "DTCR-FR-003",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+          "commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+        },
+        "arrival": "STATIC",
+        "provider_runs": [
+          {
+            "provider_binding_id": "DTCR-PB-1a4c77d0be93f218",
+            "executable_name": "syntax-query-runner",
+            "version": "0.25.1",
+            "executable_sha256": "2819f62833d1867b24fdca003615107418018c5a9dc1864073940c4602c5d105",
+            "config_digest": "45dfa450d7e40c0cb9b5c6d3674a3d56e495152216517bcc1f7d8b6db1e5423a",
+            "input_digest": "5403ee3a36ad14a5f73443a5780ea48acf61e489fef3f9ee319809c50433862f",
+            "output_digest": "6615c410e153c94d565173b3494fa40c6aedade2c8a5191e2276e1f38c9b04cd",
+            "exit_code": 0,
+            "outcome": "PASS",
+            "warnings": [],
+            "omissions": []
+          }
+        ],
+        "ledger_event": {
+          "event_digest": "0a1246ddebb5572c290cf4d4746afa4be1a45bd83536f0e092d35c0c1ed035fe",
+          "sequence": "latest",
+          "ledger_schema_digest": "69c56fd14abe6bf62dae8d22d573926a7008963cd7b45d21bbb88d2005fb1660"
+        },
+        "bundle_digest": "c450c1e5766c65f3633da2642b5b7ae12ecbb06f78a85a2918128d7fe7d0d218",
+        "coverage_ceiling_ref": "DTCR-CC-001",
+        "summary": "The syntax lane exited zero and the run was written to the ledger.",
+        "grants": {
+          "task_pass": false,
+          "merge": false,
+          "permission": false,
+          "secret": false,
+          "production": false,
+          "release": false,
+          "semantic_truth": false
+        }
+      }
+    },
+    {
+      "case_id": "DTCR-XC-FR-003",
+      "refuses": "A provider run reported as passing with no exit code behind it.",
+      "refused_by": "$defs.provider_run.allOf[0].then",
+      "instance": {
+        "schema": "dtcr/fact-plane-receipt/v1",
+        "receipt_id": "DTCR-FR-004",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+          "commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+        },
+        "arrival": "SANDBOX",
+        "provider_runs": [
+          {
+            "provider_binding_id": "DTCR-PB-1a4c77d0be93f218",
+            "executable_name": "syntax-query-runner",
+            "version": "0.25.1",
+            "executable_sha256": "2819f62833d1867b24fdca003615107418018c5a9dc1864073940c4602c5d105",
+            "config_digest": "45dfa450d7e40c0cb9b5c6d3674a3d56e495152216517bcc1f7d8b6db1e5423a",
+            "input_digest": "5403ee3a36ad14a5f73443a5780ea48acf61e489fef3f9ee319809c50433862f",
+            "output_digest": "6615c410e153c94d565173b3494fa40c6aedade2c8a5191e2276e1f38c9b04cd",
+            "exit_code": null,
+            "outcome": "PASS",
+            "warnings": [],
+            "omissions": []
+          }
+        ],
+        "ledger_event": {
+          "event_digest": "0a1246ddebb5572c290cf4d4746afa4be1a45bd83536f0e092d35c0c1ed035fe",
+          "sequence": 414,
+          "ledger_schema_digest": "69c56fd14abe6bf62dae8d22d573926a7008963cd7b45d21bbb88d2005fb1660"
+        },
+        "bundle_digest": "c450c1e5766c65f3633da2642b5b7ae12ecbb06f78a85a2918128d7fe7d0d218",
+        "coverage_ceiling_ref": "DTCR-CC-001",
+        "summary": "The syntax lane was reported as passing for this commit.",
+        "grants": {
+          "task_pass": false,
+          "merge": false,
+          "permission": false,
+          "secret": false,
+          "production": false,
+          "release": false,
+          "semantic_truth": false
+        }
+      }
+    },
+    {
+      "case_id": "DTCR-XC-FR-004",
+      "refuses": "An absolute coverage claim written into the receipt prose.",
+      "refused_by": "properties.summary.not",
+      "instance": {
+        "schema": "dtcr/fact-plane-receipt/v1",
+        "receipt_id": "DTCR-FR-005",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+          "commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+        },
+        "arrival": "STATIC",
+        "provider_runs": [
+          {
+            "provider_binding_id": "DTCR-PB-1a4c77d0be93f218",
+            "executable_name": "syntax-query-runner",
+            "version": "0.25.1",
+            "executable_sha256": "2819f62833d1867b24fdca003615107418018c5a9dc1864073940c4602c5d105",
+            "config_digest": "45dfa450d7e40c0cb9b5c6d3674a3d56e495152216517bcc1f7d8b6db1e5423a",
+            "input_digest": "5403ee3a36ad14a5f73443a5780ea48acf61e489fef3f9ee319809c50433862f",
+            "output_digest": "6615c410e153c94d565173b3494fa40c6aedade2c8a5191e2276e1f38c9b04cd",
+            "exit_code": 0,
+            "outcome": "PASS",
+            "warnings": [],
+            "omissions": []
+          }
+        ],
+        "ledger_event": {
+          "event_digest": "0a1246ddebb5572c290cf4d4746afa4be1a45bd83536f0e092d35c0c1ed035fe",
+          "sequence": 415,
+          "ledger_schema_digest": "69c56fd14abe6bf62dae8d22d573926a7008963cd7b45d21bbb88d2005fb1660"
+        },
+        "bundle_digest": "c450c1e5766c65f3633da2642b5b7ae12ecbb06f78a85a2918128d7fe7d0d218",
+        "coverage_ceiling_ref": "DTCR-CC-001",
+        "summary": "The fact plane reached 100% of the repository with zero false positives on this commit.",
+        "grants": {
+          "task_pass": false,
+          "merge": false,
+          "permission": false,
+          "secret": false,
+          "production": false,
+          "release": false,
+          "semantic_truth": false
+        }
+      }
+    },
+    {
+      "case_id": "DTCR-XC-FR-005",
+      "refuses": "A ledger reference extended with a mutable pointer key so the row can be re-aimed later.",
+      "refused_by": "properties.ledger_event.additionalProperties",
+      "instance": {
+        "schema": "dtcr/fact-plane-receipt/v1",
+        "receipt_id": "DTCR-FR-006",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+          "commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+        },
+        "arrival": "STATIC",
+        "provider_runs": [
+          {
+            "provider_binding_id": "DTCR-PB-1a4c77d0be93f218",
+            "executable_name": "syntax-query-runner",
+            "version": "0.25.1",
+            "executable_sha256": "2819f62833d1867b24fdca003615107418018c5a9dc1864073940c4602c5d105",
+            "config_digest": "45dfa450d7e40c0cb9b5c6d3674a3d56e495152216517bcc1f7d8b6db1e5423a",
+            "input_digest": "5403ee3a36ad14a5f73443a5780ea48acf61e489fef3f9ee319809c50433862f",
+            "output_digest": "6615c410e153c94d565173b3494fa40c6aedade2c8a5191e2276e1f38c9b04cd",
+            "exit_code": 0,
+            "outcome": "PASS",
+            "warnings": [],
+            "omissions": []
+          }
+        ],
+        "ledger_event": {
+          "event_digest": "0a1246ddebb5572c290cf4d4746afa4be1a45bd83536f0e092d35c0c1ed035fe",
+          "sequence": 416,
+          "ledger_schema_digest": "69c56fd14abe6bf62dae8d22d573926a7008963cd7b45d21bbb88d2005fb1660",
+          "current_event_alias": "head"
+        },
+        "bundle_digest": "c450c1e5766c65f3633da2642b5b7ae12ecbb06f78a85a2918128d7fe7d0d218",
+        "coverage_ceiling_ref": "DTCR-CC-001",
+        "summary": "The syntax lane exited zero and the run was written to the ledger.",
+        "grants": {
+          "task_pass": false,
+          "merge": false,
+          "permission": false,
+          "secret": false,
+          "production": false,
+          "release": false,
+          "semantic_truth": false
+        }
+      }
+    }
+  ]
+}
