@@ -2,7 +2,8 @@
   "skill_name": "product-reverse-engineering-loop",
   "version": "1.0.0",
   "_meta": {
-    "coverage_metric": "planted-defect refusal rate by refusal code. A defect counts only when the checker exits non-zero AND names the code that owns it; a generic failure is not detection, because a checker that fails everything for one reason is indistinguishable from a working one at the exit status.",
+    "coverage_metric": "planted-defect refusal rate by refusal code. A defect counts only when the checker exits at the status that owns it AND names the code that owns it; a generic failure is not detection, because a checker that fails everything for one reason is indistinguishable from a working one at the exit status. Compiler controls assert the true exit code, captured from the process rather than through a pipeline, because 2 is a refusal and 64 is a tool that could not run and a suite that accepts either cannot tell them apart.",
+    "denominator_source": "tests/selftest.py derives its subjects from the tree: every artifact under references/, examples/ and tests/fixtures/ that declares a schema, reconciled in both directions against the schema registry inside scripts/check_prel_contract.py. There is no filename list. A schema registered with no committed artifact is red, an artifact whose schema is unregistered is red, and a control that runs without being declared in cases.json is red.",
     "scope": "This plane records what the local suite decides. It is not the repository skill-eval plane (evals/cases + evals/coverage.json); a claim here is closed by tests/run-all.sh on current repository bytes and by nothing else.",
     "consumer_canaries": "evals/receipts/canary-2026-08-18.receipt.json records Shadow closure audits of two external repositories at named revisions, plus the refused false-PASS attempts. Those lanes are consumer evidence and deliberately outside tests/run-all.sh: they resolve against checkouts this repository does not own, so running them in the suite would make somebody else's commit turn this suite red.",
     "uncovered_by_design": [
@@ -150,6 +151,92 @@
         "STALE_SUBJECT"
       ],
       "expected": "the committed audit is green; the earned level is recomputed from the rung states rather than read, and every planted promotion, authority, obligation and denominator defect is refused by its own code"
+    },
+    {
+      "id": "PREL-9",
+      "checker_script": "scripts/check_prel_contract.py",
+      "test_verify": "tests/selftest.py",
+      "good_fixture": "examples/session-dispatch-request.example.json",
+      "hollow_fixture": null,
+      "hollow_mutations": "two sibling requests holding the same path lease, two holding the same mutable resource, a CHILD naming itself as its own parent, a SIBLING that names a parent, a rollback commit set to the base tree object, and two disjoint sibling directories that record the checker's current bare-prefix lease comparison rather than the wanted one",
+      "covers": [
+        "C06_OVERLAPPING_WRITER_LEASE",
+        "C07_HIDDEN_MULTI_PARENT_CONVERGENCE",
+        "C13_ROLLBACK_SUBJECT_ABSENT_OR_EQUAL_TO_MUTABLE_ALIAS"
+      ],
+      "expected": "the committed dispatch request is green; every invalid DAG and lease shape is refused by its own class, and the known bare-prefix over-refusal is recorded as the behavior that exists rather than asserted as the behavior that is wanted"
+    },
+    {
+      "id": "PREL-10",
+      "checker_script": "scripts/check_prel_contract.py",
+      "test_verify": "tests/selftest.py",
+      "good_fixture": "examples/session-receipt.example.json",
+      "hollow_fixture": null,
+      "hollow_mutations": "RUNNING left PASS while SESSION_OBSERVED drops to NOT_EXERCISED, RESULT_RECEIVED left PASS while RUNNING drops, and a lifecycle state promoted to PASS with a null evidence_ref",
+      "covers": [
+        "C05_MISSING_EXACT_RECEIPT",
+        "C09_SESSION_REQUEST_PROMOTED_TO_RUNNING"
+      ],
+      "expected": "a receipt may claim a lifecycle state only when the state under it was observed and only with an exact evidence reference; a session nobody watched cannot be reported as one that ran"
+    },
+    {
+      "id": "PREL-11",
+      "checker_script": "scripts/check_prel_contract.py",
+      "test_verify": "tests/selftest.py",
+      "good_fixture": "examples/external-projection-registry.example.json",
+      "hollow_fixture": null,
+      "hollow_mutations": "a read_back left PASS while the compared digest moves away from the observed export digest, and a canonical subject whose commit is the mutable alias main",
+      "covers": [
+        "C08_PROJECTION_USED_AS_MACHINE_AUTHORITY",
+        "C01_MUTABLE_SUBJECT"
+      ],
+      "expected": "an external document whose revision or export digest has drifted from the compared one is stale rather than PASS, and a projection of a branch name is refused because a mutable alias names different bytes tomorrow"
+    },
+    {
+      "id": "PREL-12",
+      "checker_script": "scripts/compile_session_dispatch.py",
+      "test_verify": "tests/selftest.py",
+      "good_fixture": "tests/fixtures/session-dispatch-input.json",
+      "hollow_fixture": null,
+      "hollow_mutations": "a draft claiming one subject both CONFIRMED and CONTRADICTED, a draft with a request stripped of its lease, a compiled artifact fed back in as a draft, a hand-edited committed projection, and an adversarial draft asserting RUNNING with a pid and every authority true",
+      "covers": [
+        "byte-stable session dispatch compilation",
+        "K09_CONTRADICTION_DROPPED",
+        "PREL-COMPILE-UNUSABLE at exit 64 on a malformed draft",
+        "PREL-COMPILE-RED on a hand-edited projection",
+        "LAUNCH_REQUESTED / null running_session / all-false authority pinned against an adversarial draft"
+      ],
+      "expected": "the committed projection is byte-identical on recompilation; a dropped contradiction exits 2 by name, a malformed draft exits 64 rather than being refused, and a draft claiming a running session compiles to the same pinned bytes as an honest one"
+    },
+    {
+      "id": "PREL-13",
+      "checker_script": "scripts/compile_external_projection.py",
+      "test_verify": "tests/selftest.py",
+      "good_fixture": "tests/fixtures/external-projection-input.json",
+      "hollow_fixture": null,
+      "hollow_mutations": "a draft claiming one canonical subject both CONFIRMED and CONTRADICTED, an entry stripped of its read_back block, an empty entry set, a hand-edited committed registry, and a draft asserting MACHINE_AUTHORITY with every authority true",
+      "covers": [
+        "byte-stable external projection compilation",
+        "K09_CONTRADICTION_DROPPED",
+        "PREL-COMPILE-UNUSABLE at exit 64 on a malformed draft",
+        "PREL-COMPILE-RED on an empty registry and on a hand-edited projection",
+        "HUMAN_PROJECTION ceiling and all-false authority pinned against an adversarial draft"
+      ],
+      "expected": "the committed registry is byte-identical on recompilation; a projection cannot be compiled into implementation, completion, product-truth, merge or release authority no matter what the draft asserts"
+    },
+    {
+      "id": "PREL-14",
+      "checker_script": "tests/selftest.py",
+      "test_verify": "tests/selftest.py",
+      "good_fixture": "tests/fixtures",
+      "hollow_fixture": null,
+      "hollow_mutations": "on a throwaway copy of the Skill: one committed artifact deleted, so a registered schema loses its only exercising instance; one artifact added whose schema the checker does not register; and one semantic control removed from the checker, so a planted defect survives",
+      "covers": [
+        "every schema registered in check_prel_contract.py has a committed artifact that exercises it",
+        "every committed artifact declares a schema the checker registers",
+        "the planted-control inventory in cases.json equals the controls that actually ran"
+      ],
+      "expected": "the suite counts its own denominators from the tree rather than from a list of filenames; deleting an artifact, adding an unregistered one, or weakening a control each turn it red by name"
     }
   ],
   "evidence_ceiling": {
@@ -160,7 +247,7 @@
     "user_or_paid_validation": "NOT_EXERCISED",
     "product_market_fit": "ABSENT",
     "live_provider_execution": "NOT_EXERCISED",
-    "ci_arrival_for_this_suite": "ABSENT",
+    "ci_arrival_for_this_suite": "PASS",
     "registry_classification": "ABSENT",
     "merge_release_and_rights": "HUMAN_ADMIT_REQUIRED"
   },
@@ -169,7 +256,7 @@
     "mechanism_reproduction_on_a_real_product": "consumer capture adapter, bound through modules/domain-profile.md",
     "user_or_paid_validation": "consumer user and commercial evidence owners",
     "product_market_fit": "outside this Skill's boundary entirely",
-    "ci_arrival_for_this_suite": "the lane that owns .github/workflows/ must add this Skill to the Skill Suites matrix and its path filters",
+    "ci_arrival_for_this_suite": ".github/workflows/skill-suites.yml carries this Skill in the matrix and in its path filters, and scripts/check_suite_ci_coverage.py resolves the matrix to the job that invokes tests/run-all.sh. This lane is closed by that gate and by nothing weaker: being named in a paths filter is not an arrival.",
     "registry_classification": "a Human-admitted registry.json governance change"
   }
 }

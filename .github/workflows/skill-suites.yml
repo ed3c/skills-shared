@@ -18,15 +18,20 @@ on:
       - 'skills/agentic-tech-lead-orchestration/**'
       - 'skills/controlled-technical-language-harness/**'
       - 'skills/dual-forge-repository-loop/**'
+      - 'skills/dual-track-code-review-loop/**'
+      - 'skills/git-hosting-scale-assurance/**'
       - 'skills/github-delivery-loop/**'
       - 'skills/gitlab-delivery-loop/**'
       - 'skills/html-for-decisions/**'
       - 'skills/knowledge-continuity/**'
       - 'skills/procedural-shadow-runtime/**'
       - 'skills/product-reverse-engineering-loop/**'
+      - 'skills/productization-operating-loop/**'
       - 'skills/repository-capability-audit/**'
+      - 'skills/repository-entropy-reclamation/**'
       - 'skills/skill-refactor-proof-loop/**'
       - 'skills/spatial-loop-systems-engineering/**'
+      - 'skills/universal-refactor-controller/**'
       - 'scripts/check_intent_bound_constraints.py'
       - 'scripts/check_suite_ci_coverage.py'
       - '.github/workflows/skill-suites.yml'
@@ -36,15 +41,20 @@ on:
       - 'skills/agentic-tech-lead-orchestration/**'
       - 'skills/controlled-technical-language-harness/**'
       - 'skills/dual-forge-repository-loop/**'
+      - 'skills/dual-track-code-review-loop/**'
+      - 'skills/git-hosting-scale-assurance/**'
       - 'skills/github-delivery-loop/**'
       - 'skills/gitlab-delivery-loop/**'
       - 'skills/html-for-decisions/**'
       - 'skills/knowledge-continuity/**'
       - 'skills/procedural-shadow-runtime/**'
       - 'skills/product-reverse-engineering-loop/**'
+      - 'skills/productization-operating-loop/**'
       - 'skills/repository-capability-audit/**'
+      - 'skills/repository-entropy-reclamation/**'
       - 'skills/skill-refactor-proof-loop/**'
       - 'skills/spatial-loop-systems-engineering/**'
+      - 'skills/universal-refactor-controller/**'
       - 'scripts/check_intent_bound_constraints.py'
       - 'scripts/check_suite_ci_coverage.py'
       - '.github/workflows/skill-suites.yml'
@@ -86,15 +96,20 @@ jobs:
           - agentic-tech-lead-orchestration
           - controlled-technical-language-harness
           - dual-forge-repository-loop
+          - dual-track-code-review-loop
+          - git-hosting-scale-assurance
           - github-delivery-loop
           - gitlab-delivery-loop
           - html-for-decisions
           - knowledge-continuity
           - procedural-shadow-runtime
           - product-reverse-engineering-loop
+          - productization-operating-loop
           - repository-capability-audit
+          - repository-entropy-reclamation
           - skill-refactor-proof-loop
           - spatial-loop-systems-engineering
+          - universal-refactor-controller
     name: ${{ matrix.skill }}
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2

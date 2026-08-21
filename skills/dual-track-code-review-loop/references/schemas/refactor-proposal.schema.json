@@ -1,0 +1,227 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dtcr-refactor-proposal.schema.json",
+  "title": "DTCR refactor proposal",
+  "description": "A bounded remedy for one confirmed violation candidate, written before any file is touched. The remedy names both the mechanism it applies and the property that mechanism actually establishes, and three specific pairs are refused by name, because a mechanism that is correct in its own domain becomes a category error when pointed at a different property: deterministic signature-nonce derivation establishes reproducible signing and establishes nothing at all about authenticated-encryption nonce uniqueness, whose remedies are a misuse-resistant construction or a counter discipline that cannot repeat. The refusal is a blacklist of three pairs out of fifty-four, not a check over the pairing in general; the other fifty-one pairs are accepted and a reviewer still owns whether they make sense. Expected effect is either a full measurement or the literal NOT_MEASURED, so a proposal has no shape in which to carry a bare improvement number.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "proposal_id", "violation_ref", "strategy", "remediation", "bounded_scope", "expected_effect", "implementation_admission"],
+  "properties": {
+    "schema": {"const": "dtcr/refactor-proposal/v1"},
+    "proposal_id": {"type": "string", "pattern": "^DTCR-RP-[0-9]{3}$"},
+    "violation_ref": {"type": "string", "pattern": "^DTCR-VC-[0-9]{3}$"},
+    "strategy": {
+      "enum": ["SINGLE_REPO_DEPENDENCY_INVERSION", "CROSS_REPO_EXPAND_AND_CONTRACT", "LOCAL_CORRECTION", "NO_CHANGE"],
+      "description": "Closed. NO_CHANGE is a real outcome: a confirmed violation whose remedy costs more than the violation is a finding, not an obligation."
+    },
+    "remediation": {"$ref": "#/$defs/remediation"},
+    "bounded_scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["paths", "out_of_scope"],
+      "properties": {
+        "paths": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/repo_path"}
+        },
+        "out_of_scope": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 4},
+          "description": "Written out, because an unbounded refactor is discovered only after it has already grown."
+        }
+      }
+    },
+    "expected_effect": {
+      "oneOf": [
+        {
+          "const": "NOT_MEASURED",
+          "description": "The honest value before anything has been run. It reads as absent, which is what it is."
+        },
+        {"$ref": "#/$defs/measurement"}
+      ]
+    },
+    "implementation_admission": {
+      "enum": ["ELIGIBLE", "HOLD", "REFUSED", "HUMAN_ADMIT_REQUIRED"]
+    }
+  },
+  "$defs": {
+    "repo_path": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9._-]+(/[A-Za-z0-9._-]+)*$",
+      "description": "Repository-relative path. An absolute or machine-local path is a route that exists on one checkout."
+    },
+    "measurement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "unit", "method", "sample_size", "environment_id", "subject_commit", "measured_at"],
+      "properties": {
+        "value": {"type": "number"},
+        "unit": {"type": "string", "minLength": 1},
+        "method": {"type": "string", "minLength": 8},
+        "sample_size": {"type": "integer", "minimum": 1},
+        "environment_id": {"type": "string", "minLength": 2},
+        "subject_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "measured_at": {"type": "string", "minLength": 10}
+      },
+      "description": "A number is admissible only with the method, the sample size, the environment and the exact commit that produced it. A figure quoted without its receipt survives every later change to the thing it described."
+    },
+    "remediation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mechanism", "target_property", "rationale"],
+      "properties": {
+        "mechanism": {
+          "enum": [
+            "CONSTRUCTOR_INJECTION_PORT",
+            "COMPOSITION_ROOT_UPDATE",
+            "CONTRACT_EXPANSION",
+            "CONSUMER_ADAPTER_MIGRATION",
+            "OLD_DEPENDENCY_CONTRACTION",
+            "RFC_6979_DETERMINISTIC_SIGNATURE_NONCE",
+            "MISUSE_RESISTANT_AEAD_CONSTRUCTION",
+            "UNIQUE_NONCE_COUNTER_DISCIPLINE",
+            "BOUNDED_LOCAL_EDIT"
+          ]
+        },
+        "target_property": {
+          "enum": [
+            "DEPENDENCY_DIRECTION",
+            "CONTRACT_COMPATIBILITY",
+            "SIGNATURE_NONCE_DETERMINISM",
+            "AEAD_NONCE_UNIQUENESS",
+            "ORDERING_GUARANTEE",
+            "ALLOCATION_BEHAVIOUR"
+          ]
+        },
+        "rationale": {"type": "string", "minLength": 12}
+      },
+      "not": {
+        "anyOf": [
+          {
+            "type": "object",
+            "required": ["mechanism", "target_property"],
+            "properties": {
+              "mechanism": {"const": "RFC_6979_DETERMINISTIC_SIGNATURE_NONCE"},
+              "target_property": {"const": "AEAD_NONCE_UNIQUENESS"}
+            }
+          },
+          {
+            "type": "object",
+            "required": ["mechanism", "target_property"],
+            "properties": {
+              "mechanism": {"const": "BOUNDED_LOCAL_EDIT"},
+              "target_property": {"const": "AEAD_NONCE_UNIQUENESS"}
+            }
+          },
+          {
+            "type": "object",
+            "required": ["mechanism", "target_property"],
+            "properties": {
+              "mechanism": {"const": "MISUSE_RESISTANT_AEAD_CONSTRUCTION"},
+              "target_property": {"const": "SIGNATURE_NONCE_DETERMINISM"}
+            }
+          }
+        ]
+      },
+      "description": "An enumerated blacklist of mechanism-to-property pairs, not a check over the pairing in general. Nine mechanisms and six properties make fifty-four pairs; three of them are named here and the other fifty-one are accepted whether or not they make sense. The three: deterministic signature-nonce derivation aimed at authenticated-encryption nonce uniqueness, which derives a signing nonce from the private key and the message and has no bearing on encryption nonce reuse; a bounded local edit aimed at the same property, which is the same category error with the mechanism left vague; and a misuse-resistant AEAD construction aimed at signature-nonce determinism, the error run backwards. Each reads as correct cryptography to anyone who has not asked which property it establishes, which is why they are refused structurally. Judging an unlisted pair remains a reviewer's job, and this keyword does not do it."
+    }
+  },
+  "examples": [
+    {
+      "schema": "dtcr/refactor-proposal/v1",
+      "proposal_id": "DTCR-RP-001",
+      "violation_ref": "DTCR-VC-001",
+      "strategy": "SINGLE_REPO_DEPENDENCY_INVERSION",
+      "remediation": {
+        "mechanism": "CONSTRUCTOR_INJECTION_PORT",
+        "target_property": "DEPENDENCY_DIRECTION",
+        "rationale": "The domain module names the method set it actually uses and receives an implementation from the composition root."
+      },
+      "bounded_scope": {
+        "paths": ["domain/order.go", "cmd/server/main.go"],
+        "out_of_scope": ["every other domain module", "the transport layer", "the persistence schema"]
+      },
+      "expected_effect": "NOT_MEASURED",
+      "implementation_admission": "HUMAN_ADMIT_REQUIRED"
+    }
+  ],
+  "x-refusal-controls": [
+    {
+      "case_id": "DTCR-XC-RP-001",
+      "refuses": "Deterministic signature-nonce derivation offered as a remedy for authenticated-encryption nonce reuse.",
+      "refused_by": "$defs.remediation.not",
+      "instance": {
+        "schema": "dtcr/refactor-proposal/v1",
+        "proposal_id": "DTCR-RP-002",
+        "violation_ref": "DTCR-VC-006",
+        "strategy": "LOCAL_CORRECTION",
+        "remediation": {
+          "mechanism": "RFC_6979_DETERMINISTIC_SIGNATURE_NONCE",
+          "target_property": "AEAD_NONCE_UNIQUENESS",
+          "rationale": "Derive the nonce deterministically so it can never repeat."
+        },
+        "bounded_scope": {
+          "paths": ["crypto/seal.go"],
+          "out_of_scope": ["key management"]
+        },
+        "expected_effect": "NOT_MEASURED",
+        "implementation_admission": "ELIGIBLE"
+      }
+    },
+    {
+      "case_id": "DTCR-XC-RP-002",
+      "refuses": "A bare productivity or throughput number with no benchmark receipt.",
+      "refused_by": "properties.expected_effect.oneOf",
+      "instance": {
+        "schema": "dtcr/refactor-proposal/v1",
+        "proposal_id": "DTCR-RP-003",
+        "violation_ref": "DTCR-VC-001",
+        "strategy": "LOCAL_CORRECTION",
+        "remediation": {
+          "mechanism": "BOUNDED_LOCAL_EDIT",
+          "target_property": "ALLOCATION_BEHAVIOUR",
+          "rationale": "Remove an allocation on the hot path."
+        },
+        "bounded_scope": {
+          "paths": ["queue/task.go"],
+          "out_of_scope": ["the scheduler"]
+        },
+        "expected_effect": {"throughput_gain_percent": 40},
+        "implementation_admission": "ELIGIBLE"
+      }
+    },
+    {
+      "case_id": "DTCR-XC-RP-003",
+      "refuses": "A measurement quoted without the commit it was measured on.",
+      "refused_by": "$defs.measurement.required",
+      "instance": {
+        "schema": "dtcr/refactor-proposal/v1",
+        "proposal_id": "DTCR-RP-004",
+        "violation_ref": "DTCR-VC-001",
+        "strategy": "LOCAL_CORRECTION",
+        "remediation": {
+          "mechanism": "BOUNDED_LOCAL_EDIT",
+          "target_property": "ALLOCATION_BEHAVIOUR",
+          "rationale": "Remove an allocation on the hot path."
+        },
+        "bounded_scope": {
+          "paths": ["queue/task.go"],
+          "out_of_scope": ["the scheduler"]
+        },
+        "expected_effect": {
+          "value": 40,
+          "unit": "percent",
+          "method": "microbenchmark on the hot path",
+          "sample_size": 20,
+          "environment_id": "local-workstation",
+          "measured_at": "2026-08-21"
+        },
+        "implementation_admission": "ELIGIBLE"
+      }
+    }
+  ]
+}

@@ -1,0 +1,186 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dtcr-semantic-freshness-ceiling.schema.json",
+  "title": "DTCR semantic freshness and authority ceiling",
+  "description": "How old one registered document is, whether anything has superseded it, and the four things it never becomes. A document that has been superseded is bound here to HISTORICAL_CONTEXT_ONLY, which is the structural form of the failure where a stale decision record silently outranks a newer explicit decision: the newer decision is a fact somebody recorded, the older document is text that happens to resemble the query, and similarity has no opinion about which came last. The ceiling is stated as constants rather than as advice because each of them is a sentence somebody will otherwise write: a retrieved decision record is not current policy, a retrieved incident review is not a reproduced failure, retrieved prose is not a deterministic fact, and none of them moves the state of a task. Revalidation is recorded explicitly, including the literal for never, so an unrevalidated document reads as unrevalidated rather than as fresh.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "ceiling_id", "document_ref", "observed_at", "observed_revision", "revalidated_at", "supersession", "usable_as", "authority_ceiling"],
+  "properties": {
+    "schema": {"const": "dtcr/semantic-freshness-ceiling/v1"},
+    "ceiling_id": {"type": "string", "pattern": "^DTCR-FC-[0-9]{3}$"},
+    "document_ref": {"type": "string", "pattern": "^DTCR-DOC-[0-9]{3}$"},
+    "observed_at": {"type": "string", "minLength": 10},
+    "observed_revision": {"type": "string", "minLength": 1},
+    "revalidated_at": {
+      "anyOf": [
+        {"const": "NEVER_REVALIDATED"},
+        {"type": "string", "minLength": 10}
+      ],
+      "description": "Explicit either way. A missing revalidation date and a document nobody has rechecked look identical to a reader unless one of them is written down. The branches are anyOf rather than oneOf because the literal is itself a string long enough to satisfy the date branch, and under oneOf the accepted absence value would be refused for matching twice."
+    },
+    "supersession": {
+      "oneOf": [
+        {"const": "NOT_SUPERSEDED"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["superseding_decision_ref", "superseded_at"],
+          "properties": {
+            "superseding_decision_ref": {"type": "string", "minLength": 4},
+            "superseded_at": {"type": "string", "minLength": 10}
+          }
+        }
+      ]
+    },
+    "usable_as": {"enum": ["CONTEXT_CANDIDATE", "HISTORICAL_CONTEXT_ONLY"]},
+    "authority_ceiling": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["current_policy", "reproduced_failure", "deterministic_fact", "task_state_change"],
+      "properties": {
+        "current_policy": {"const": false},
+        "reproduced_failure": {"const": false},
+        "deterministic_fact": {"const": false},
+        "task_state_change": {"const": false}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"supersession": {"type": "object"}}, "required": ["supersession"]},
+      "then": {
+        "properties": {"usable_as": {"const": "HISTORICAL_CONTEXT_ONLY"}},
+        "description": "A superseded document offered as a current context candidate is how an old decision quietly outranks the newer one that replaced it."
+      }
+    }
+  ],
+  "examples": [
+    {
+      "schema": "dtcr/semantic-freshness-ceiling/v1",
+      "ceiling_id": "DTCR-FC-001",
+      "document_ref": "DTCR-DOC-001",
+      "observed_at": "2026-08-21",
+      "observed_revision": "4",
+      "revalidated_at": "2026-08-21",
+      "supersession": "NOT_SUPERSEDED",
+      "usable_as": "CONTEXT_CANDIDATE",
+      "authority_ceiling": {
+        "current_policy": false,
+        "reproduced_failure": false,
+        "deterministic_fact": false,
+        "task_state_change": false
+      }
+    }
+  ],
+  "x-refusal-controls": [
+    {
+      "case_id": "DTCR-XC-FC-001",
+      "refuses": "A superseded document still offered as a current context candidate.",
+      "refused_by": "allOf[0].then",
+      "instance": {
+        "schema": "dtcr/semantic-freshness-ceiling/v1",
+        "ceiling_id": "DTCR-FC-002",
+        "document_ref": "DTCR-DOC-006",
+        "observed_at": "2024-02-11",
+        "observed_revision": "1",
+        "revalidated_at": "NEVER_REVALIDATED",
+        "supersession": {
+          "superseding_decision_ref": "later decision record replacing the legacy persistence rule",
+          "superseded_at": "2025-11-03"
+        },
+        "usable_as": "CONTEXT_CANDIDATE",
+        "authority_ceiling": {
+          "current_policy": false,
+          "reproduced_failure": false,
+          "deterministic_fact": false,
+          "task_state_change": false
+        }
+      }
+    },
+    {
+      "case_id": "DTCR-XC-FC-002",
+      "refuses": "RETRIEVED_ADR != CURRENT_POLICY: a retrieved decision record recorded as the policy in force.",
+      "refused_by": "properties.authority_ceiling.properties.current_policy.const",
+      "instance": {
+        "schema": "dtcr/semantic-freshness-ceiling/v1",
+        "ceiling_id": "DTCR-FC-003",
+        "document_ref": "DTCR-DOC-001",
+        "observed_at": "2026-08-21",
+        "observed_revision": "4",
+        "revalidated_at": "2026-08-21",
+        "supersession": "NOT_SUPERSEDED",
+        "usable_as": "CONTEXT_CANDIDATE",
+        "authority_ceiling": {
+          "current_policy": true,
+          "reproduced_failure": false,
+          "deterministic_fact": false,
+          "task_state_change": false
+        }
+      }
+    },
+    {
+      "case_id": "DTCR-XC-FC-003",
+      "refuses": "RETRIEVED_RCA != REPRODUCED_FAILURE: a retrieved incident review recorded as a reproduction of the failure.",
+      "refused_by": "properties.authority_ceiling.properties.reproduced_failure.const",
+      "instance": {
+        "schema": "dtcr/semantic-freshness-ceiling/v1",
+        "ceiling_id": "DTCR-FC-004",
+        "document_ref": "DTCR-DOC-003",
+        "observed_at": "2026-08-20",
+        "observed_revision": "1",
+        "revalidated_at": "NEVER_REVALIDATED",
+        "supersession": "NOT_SUPERSEDED",
+        "usable_as": "CONTEXT_CANDIDATE",
+        "authority_ceiling": {
+          "current_policy": false,
+          "reproduced_failure": true,
+          "deterministic_fact": false,
+          "task_state_change": false
+        }
+      }
+    },
+    {
+      "case_id": "DTCR-XC-FC-004",
+      "refuses": "A freshness record that moves the state of the task it was consulted for.",
+      "refused_by": "properties.authority_ceiling.properties.task_state_change.const",
+      "instance": {
+        "schema": "dtcr/semantic-freshness-ceiling/v1",
+        "ceiling_id": "DTCR-FC-005",
+        "document_ref": "DTCR-DOC-001",
+        "observed_at": "2026-08-21",
+        "observed_revision": "4",
+        "revalidated_at": "2026-08-21",
+        "supersession": "NOT_SUPERSEDED",
+        "usable_as": "CONTEXT_CANDIDATE",
+        "authority_ceiling": {
+          "current_policy": false,
+          "reproduced_failure": false,
+          "deterministic_fact": false,
+          "task_state_change": true
+        }
+      }
+    },
+    {
+      "case_id": "DTCR-XC-FC-005",
+      "refuses": "A revalidation state left as an unwritten absence rather than the explicit never.",
+      "refused_by": "properties.revalidated_at.anyOf",
+      "instance": {
+        "schema": "dtcr/semantic-freshness-ceiling/v1",
+        "ceiling_id": "DTCR-FC-006",
+        "document_ref": "DTCR-DOC-001",
+        "observed_at": "2026-08-21",
+        "observed_revision": "4",
+        "revalidated_at": null,
+        "supersession": "NOT_SUPERSEDED",
+        "usable_as": "CONTEXT_CANDIDATE",
+        "authority_ceiling": {
+          "current_policy": false,
+          "reproduced_failure": false,
+          "deterministic_fact": false,
+          "task_state_change": false
+        }
+      }
+    }
+  ]
+}

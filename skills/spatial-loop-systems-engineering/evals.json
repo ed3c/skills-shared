@@ -1,9 +1,9 @@
 {
   "skill_name": "spatial-loop-systems-engineering",
-  "version": "2.2.0",
+  "version": "2.4.0",
   "_meta": {
-    "coverage_metric": "monitor-first Shadow Architecture control, universal Constraint-First entry topology, A/B/C/D complexity classification, anti-degradation, source-claim separation, domain decoupling, exact-subject binding, realm/boundary/flow closure, state and invariant references, required-capability gating, teardown symmetry, performance measurement closure, evidence-state separation, repeated-failure recovery routing, searched-Skill provenance, procedure-atom uptake, bounded abstraction forks, Context Capsule admission, assertion/probe obligations, and four-condition behavioral attribution boundaries",
-    "purpose": "Prove that useful Builder exploration remains allowed under MONITOR while material System Design drift, first-green overclaim, Level C/D degradation, hollow system contracts, repeated blind repairs, mention-only Skill adoption, unbounded context forks, stale capsules, false procedure coverage, and unexecuted critical procedures cannot remain silent."
+    "coverage_metric": "monitor-first Shadow Architecture control, universal Constraint-First entry topology, A/B/C/D complexity classification, anti-degradation, source-claim separation, domain decoupling, exact-subject binding, realm/boundary/flow closure, state and invariant references, required-capability gating, teardown symmetry, performance measurement closure, evidence-state separation, repeated-failure recovery routing, searched-Skill provenance, procedure-atom uptake, bounded abstraction forks, Context Capsule admission, assertion/probe obligations, four-condition behavioral attribution boundaries, Intent–Case–Proof Graph closure, exact-subject case evidence, and implementation-time semantic-delta falsification",
+    "purpose": "Prove that useful Builder exploration remains allowed under MONITOR while material System Design drift, first-green overclaim, Level C/D degradation, hollow system contracts, repeated blind repairs, mention-only Skill adoption, unbounded context forks, stale capsules, false procedure coverage, unexecuted critical procedures, prompt-intent suppression, silent source-logic loss, orphan cases, stale case evidence, ambiguous provenance identities, and evidence laundering cannot remain silent."
   },
   "runnable": [
     {
@@ -13,18 +13,19 @@
       "good_fixture": null,
       "good_evidence": "SKILL.md plus modes/ and references/architecture-watch-loop.md",
       "hollow_fixture": null,
-      "hollow_mutations": "remove default MONITOR, prohibit normal Builder exploration, let Shadow Architect become a second writer, remove an intervention level, remove FIRST_GREEN review, remove a material delta class, or remove procedural-grounding delta routing",
+      "hollow_mutations": "remove default MONITOR, prohibit normal Builder exploration, let Shadow Architect become a second writer, remove an intervention level, remove FIRST_GREEN review, remove a material delta class, remove procedural-grounding delta routing, allow unauthorized semantic narrowing to remain L0, or let compatibility green suppress FIRST_GREEN semantic-parity review",
       "covers": [
         "MONITOR is the default mode",
         "the Builder may explore and implement normally before a material boundary requires reconciliation",
         "the Shadow Architect observes architecture deltas and does not silently become a second implementation writer",
-        "architecture deltas include assumptions, state, authority, ownership, lifecycle, concurrency, resources, external side effects, failure surface, evidence, and procedural grounding when Agent Skills are material",
+        "architecture deltas include assumptions, state, authority, ownership, lifecycle, concurrency, resources, external side effects, failure surface, evidence, procedural grounding, intent interpretation, case coverage, and semantic parity when material",
         "intervention levels are L0 OBSERVE, L1 WARN, L2 REVIEW, and L3 BLOCK",
-        "FIRST_GREEN is a mandatory meta-review checkpoint and cannot directly mean done",
+        "unauthorized semantic narrowing cannot remain L0 merely because compatibility remains green",
+        "FIRST_GREEN is a mandatory meta-review checkpoint and rechecks semantic parity rather than erasing unresolved cases",
         "PRECHECK remains available for high-risk or irreversible material transitions",
         "POSTMORTEM reconstructs implicit architecture from observed implementation and evidence"
       ],
-      "expected": "monitor-first exploration remains admitted while material architecture, evidence, and procedural-grounding drift plus first-green overclaim remain observable and bounded"
+      "expected": "monitor-first exploration remains admitted while architecture, evidence, intent/case drift, unauthorized semantic narrowing, and FIRST_GREEN semantic-parity loss remain observable and falsifiable"
     },
     {
       "id": "SLS-UNIVERSAL-ENTRY-1",
@@ -39,7 +40,7 @@
         "the canonical topology reaches domain/unknown/hard-law expansion before evidence-sensitive implementation claims",
         "Level A/B/C/D complexity classes are explicit",
         "Level C/D work cannot silently degrade into Level A implementation behavior",
-        "the universal transformation is intent to boundary to state to invariant to failure to oracle to evidence to implementation",
+        "the universal transformation preserves intent, invariant, case, oracle, evidence, and implementation-plan semantics without relying on Markdown letter numbering",
         "domain modules extend the core method and may not replace or bypass it"
       ],
       "expected": "canonical universal entry admitted; planted anti-degradation and domain-replacement regressions are distinguishable"
@@ -123,10 +124,33 @@
         "model-weight and private-reasoning introspection are not claimed"
       ],
       "expected": "one complete procedural-grounding receipt is admitted; planted source, proof, fork, capsule, observation, metric, attribution, and authority defects are refused with stable 0/2/64 semantics"
+    },
+    {
+      "id": "SLS-INTENT-CASE-PROOF-1",
+      "checker_script": "scripts/check_case_graph.py",
+      "test_verify": "tests/case-graph/verify.sh",
+      "good_fixture": "tests/case-graph/fixtures/good.json",
+      "hollow_fixture": null,
+      "hollow_mutations": "remove a required intent/case binding, orphan a required case, duplicate a node id across provenance node families, silently drop a preserved source branch, omit authority from an explicit decision, stale an implementation or evidence subject revision/digest, launder PASS without subject-bound evidence, leave a required oracle or implementation unbound, add a provenance cycle, hide an UNKNOWN_BLOCKING case, or promote publication while a required case is FAIL or NOT_EXERCISED",
+      "covers": [
+        "short prompts cannot silently reduce declared semantic obligations",
+        "provenance node IDs are globally unique across intent, semantic-axis, source-behavior, case, implementation, oracle, evidence, and decision families",
+        "source behavior dispositions must be explicit and preservation dispositions require case edges",
+        "authority-bearing decision records require non-empty authority and rationale",
+        "required cases bind intent, semantic axis, invariant/state references, implementation owner, and oracle",
+        "implementation bindings and evidence receipts bind the exact top-level subject revision and digest",
+        "coverage denominators are recomputed rather than accepted from model prose",
+        "PASS or FAIL case state requires referenced evidence with the same state",
+        "READY_FOR_PUBLICATION_REVIEW requires every required case to have subject-bound PASS evidence",
+        "the provenance graph remains acyclic while the runtime state graph may remain cyclic",
+        "migration compatibility cannot substitute for source decision-logic preservation"
+      ],
+      "expected": "one exact-subject migration-copy fixture and one non-laundering prototype template are admitted; planted semantic-loss, global-ID collision, stale-subject, hollow-authority, orphan, evidence-laundering, cycle, blocking-unknown, and failed-publication mutations turn red"
     }
   ],
   "evidence_boundary": {
     "monitor_first_shadow_architecture": "IMPLEMENTED",
+    "shadow_case_delta_negative_controls": "IMPLEMENTED",
     "first_green_meta_review": "IMPLEMENTED",
     "precheck_postmortem_modes": "IMPLEMENTED",
     "universal_constraint_first_entry": "IMPLEMENTED",
@@ -146,6 +170,13 @@
     "matched_hermetic_escalation_task": "IMPLEMENTED",
     "matched_live_model_refactor_ab": "NOT_IMPLEMENTED",
     "agent_host_adapter_guidance": "IMPLEMENTED",
+    "intent_case_proof_contract": "IMPLEMENTED",
+    "intent_case_proof_checker": "IMPLEMENTED",
+    "intent_case_proof_mutation_controls": "IMPLEMENTED",
+    "intent_case_proof_exact_subject_binding": "IMPLEMENTED",
+    "tech_lead_icpg_admission_contract": "IMPLEMENTED",
+    "tech_lead_icpg_exact_byte_readback": "IMPLEMENTED",
+    "live_worker_icpg_consumption": "NOT_EXERCISED",
     "live_shadow_monitor_runtime": "NOT_EXERCISED",
     "live_external_skill_search": "NOT_EXERCISED",
     "live_claude_context_fork": "NOT_EXERCISED",

@@ -1,0 +1,459 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dtcr-synthesis-packet.schema.json",
+  "title": "DTCR synthesis packet",
+  "description": "What one exact task, one deterministic fact bundle, one optional semantic context bundle and one admitted invariant set compiled to, before any of it is written up for a reader. The two lanes are deliberately asymmetric: the fact lane's state is pinned PRESENT because a review with no deterministic observation is not a review with a weak one, while the semantic lane may be the literal NOT_APPLICABLE and must then say why and carry no result. That asymmetry is the whole point of the packet -- an absent semantic lane and a quiet one look identical downstream unless the absence is typed here.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "packet_id",
+    "task_ref",
+    "subject",
+    "fact_lane",
+    "semantic_lane",
+    "invariant_refs",
+    "authority"
+  ],
+  "properties": {
+    "schema": {
+      "const": "dtcr/synthesis-packet/v1"
+    },
+    "packet_id": {
+      "type": "string",
+      "pattern": "^DTCR-SP-[0-9]{3}$"
+    },
+    "task_ref": {
+      "type": "string",
+      "minLength": 8
+    },
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository_binding_id",
+        "subject_commit",
+        "subject_tree"
+      ],
+      "properties": {
+        "repository_binding_id": {
+          "type": "string",
+          "pattern": "^DTCR-RB-[0-9a-f]{16}$"
+        },
+        "subject_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$",
+          "description": "Exact commit. A branch, a tag, main or latest names a moving tree and dates the packet to nothing."
+        },
+        "subject_tree": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        }
+      }
+    },
+    "fact_lane": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "receipt_ref",
+        "bundle_digest",
+        "coverage_ceiling_ref",
+        "observation_refs"
+      ],
+      "properties": {
+        "state": {
+          "const": "PRESENT",
+          "description": "The only value. The deterministic lane has no NOT_APPLICABLE: a synthesis with nothing observed is refused at the compiler, not recorded here as an empty lane."
+        },
+        "receipt_ref": {
+          "type": "string",
+          "pattern": "^DTCR-FR-[0-9]{3}$"
+        },
+        "bundle_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "coverage_ceiling_ref": {
+          "type": "string",
+          "pattern": "^DTCR-CC-[0-9]{3}$",
+          "description": "The ceiling the bundle was produced under. A packet with no ceiling reads as a packet over everything."
+        },
+        "observation_refs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 4
+          },
+          "description": "Every deterministic observation carried forward. A fact dropped here because retrieved context disagreed with it is the mutation the compiler refuses by name."
+        }
+      }
+    },
+    "semantic_lane": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "consumed_row_refs"
+      ],
+      "properties": {
+        "state": {
+          "enum": [
+            "PRESENT",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 12
+        },
+        "result_ref": {
+          "type": "string",
+          "pattern": "^DTCR-RR-[0-9]{3}$"
+        },
+        "consumed_row_refs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^DTCR-BK-[0-9]{3}$"
+          },
+          "description": "Exact back references, not scores. A manifest of ranks tells a reader that context was used and not which context."
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "NOT_APPLICABLE"
+              }
+            },
+            "required": [
+              "state"
+            ]
+          },
+          "then": {
+            "required": [
+              "rationale"
+            ],
+            "not": {
+              "required": [
+                "result_ref"
+              ]
+            },
+            "description": "A lane declared inapplicable that still points at a retrieval result was applicable and is being reported as absent."
+          }
+        }
+      ]
+    },
+    "invariant_refs": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^DTCR-AI-[0-9]{3}$"
+      },
+      "description": "Admitted invariants only. An invariant nobody admitted is a preference, and a violation of a preference is an opinion with an identifier."
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "merge",
+        "permission",
+        "secret",
+        "production",
+        "user_value",
+        "paid_demand",
+        "release"
+      ],
+      "properties": {
+        "merge": {
+          "const": false
+        },
+        "permission": {
+          "const": false
+        },
+        "secret": {
+          "const": false
+        },
+        "production": {
+          "const": false
+        },
+        "user_value": {
+          "const": false
+        },
+        "paid_demand": {
+          "const": false
+        },
+        "release": {
+          "const": false
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "authority": {
+        "merge": false,
+        "paid_demand": false,
+        "permission": false,
+        "production": false,
+        "release": false,
+        "secret": false,
+        "user_value": false
+      },
+      "fact_lane": {
+        "bundle_digest": "3f786850e387550fdab836ed7e6dc881de23001b3f786850e387550fdab836ed",
+        "coverage_ceiling_ref": "DTCR-CC-001",
+        "observation_refs": [
+          "DTCR-SF-001",
+          "DTCR-VC-001",
+          "DTCR-VC-002"
+        ],
+        "receipt_ref": "DTCR-FR-001",
+        "state": "PRESENT"
+      },
+      "invariant_refs": [
+        "DTCR-AI-001",
+        "DTCR-AI-002"
+      ],
+      "packet_id": "DTCR-SP-001",
+      "schema": "dtcr/synthesis-packet/v1",
+      "semantic_lane": {
+        "consumed_row_refs": [
+          "DTCR-BK-001"
+        ],
+        "result_ref": "DTCR-RR-001",
+        "state": "PRESENT"
+      },
+      "subject": {
+        "repository_binding_id": "DTCR-RB-0f1e2d3c4b5a6978",
+        "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+        "subject_tree": "e739d799dd8d44beb5414ed99a943ff3bacccab0"
+      },
+      "task_ref": "review the persistence boundary of the order domain"
+    },
+    {
+      "authority": {
+        "merge": false,
+        "paid_demand": false,
+        "permission": false,
+        "production": false,
+        "release": false,
+        "secret": false,
+        "user_value": false
+      },
+      "fact_lane": {
+        "bundle_digest": "b5bb9d8014a0f9b1d61e21e796d78dccdf1352f23cd32812f4850b878ae4944c",
+        "coverage_ceiling_ref": "DTCR-CC-002",
+        "observation_refs": [
+          "DTCR-VC-003"
+        ],
+        "receipt_ref": "DTCR-FR-002",
+        "state": "PRESENT"
+      },
+      "invariant_refs": [
+        "DTCR-AI-002"
+      ],
+      "packet_id": "DTCR-SP-001",
+      "schema": "dtcr/synthesis-packet/v1",
+      "semantic_lane": {
+        "consumed_row_refs": [],
+        "rationale": "the request declared the literal NOT_APPLICABLE for the semantic context lane",
+        "state": "NOT_APPLICABLE"
+      },
+      "subject": {
+        "repository_binding_id": "DTCR-RB-0f1e2d3c4b5a6978",
+        "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+        "subject_tree": "e739d799dd8d44beb5414ed99a943ff3bacccab0"
+      },
+      "task_ref": "review the task queue ordering change with no semantic index available"
+    }
+  ],
+  "x-refusal-controls": [
+    {
+      "case_id": "DTCR-XC-SY-001",
+      "refuses": "A synthesis whose deterministic lane is reported as not applicable.",
+      "refused_by": "properties.fact_lane.properties.state.const",
+      "instance": {
+        "authority": {
+          "merge": false,
+          "paid_demand": false,
+          "permission": false,
+          "production": false,
+          "release": false,
+          "secret": false,
+          "user_value": false
+        },
+        "fact_lane": {
+          "bundle_digest": "3f786850e387550fdab836ed7e6dc881de23001b3f786850e387550fdab836ed",
+          "coverage_ceiling_ref": "DTCR-CC-001",
+          "observation_refs": [
+            "DTCR-SF-001",
+            "DTCR-VC-001",
+            "DTCR-VC-002"
+          ],
+          "receipt_ref": "DTCR-FR-001",
+          "state": "NOT_APPLICABLE"
+        },
+        "invariant_refs": [
+          "DTCR-AI-001",
+          "DTCR-AI-002"
+        ],
+        "packet_id": "DTCR-SP-001",
+        "schema": "dtcr/synthesis-packet/v1",
+        "semantic_lane": {
+          "consumed_row_refs": [
+            "DTCR-BK-001"
+          ],
+          "result_ref": "DTCR-RR-001",
+          "state": "PRESENT"
+        },
+        "subject": {
+          "repository_binding_id": "DTCR-RB-0f1e2d3c4b5a6978",
+          "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "subject_tree": "e739d799dd8d44beb5414ed99a943ff3bacccab0"
+        },
+        "task_ref": "review the persistence boundary of the order domain"
+      }
+    },
+    {
+      "case_id": "DTCR-XC-SY-002",
+      "refuses": "A semantic lane declared NOT_APPLICABLE that still carries the retrieval result it read.",
+      "refused_by": "properties.semantic_lane.allOf[0].then.not",
+      "instance": {
+        "authority": {
+          "merge": false,
+          "paid_demand": false,
+          "permission": false,
+          "production": false,
+          "release": false,
+          "secret": false,
+          "user_value": false
+        },
+        "fact_lane": {
+          "bundle_digest": "3f786850e387550fdab836ed7e6dc881de23001b3f786850e387550fdab836ed",
+          "coverage_ceiling_ref": "DTCR-CC-001",
+          "observation_refs": [
+            "DTCR-SF-001",
+            "DTCR-VC-001",
+            "DTCR-VC-002"
+          ],
+          "receipt_ref": "DTCR-FR-001",
+          "state": "PRESENT"
+        },
+        "invariant_refs": [
+          "DTCR-AI-001",
+          "DTCR-AI-002"
+        ],
+        "packet_id": "DTCR-SP-001",
+        "schema": "dtcr/synthesis-packet/v1",
+        "semantic_lane": {
+          "state": "NOT_APPLICABLE",
+          "rationale": "the request declared the literal NOT_APPLICABLE for the semantic context lane",
+          "result_ref": "DTCR-RR-001",
+          "consumed_row_refs": []
+        },
+        "subject": {
+          "repository_binding_id": "DTCR-RB-0f1e2d3c4b5a6978",
+          "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "subject_tree": "e739d799dd8d44beb5414ed99a943ff3bacccab0"
+        },
+        "task_ref": "review the persistence boundary of the order domain"
+      }
+    },
+    {
+      "case_id": "DTCR-XC-SY-003",
+      "refuses": "A packet dated to a branch name instead of an exact commit.",
+      "refused_by": "properties.subject.properties.subject_commit.pattern",
+      "instance": {
+        "authority": {
+          "merge": false,
+          "paid_demand": false,
+          "permission": false,
+          "production": false,
+          "release": false,
+          "secret": false,
+          "user_value": false
+        },
+        "fact_lane": {
+          "bundle_digest": "3f786850e387550fdab836ed7e6dc881de23001b3f786850e387550fdab836ed",
+          "coverage_ceiling_ref": "DTCR-CC-001",
+          "observation_refs": [
+            "DTCR-SF-001",
+            "DTCR-VC-001",
+            "DTCR-VC-002"
+          ],
+          "receipt_ref": "DTCR-FR-001",
+          "state": "PRESENT"
+        },
+        "invariant_refs": [
+          "DTCR-AI-001",
+          "DTCR-AI-002"
+        ],
+        "packet_id": "DTCR-SP-001",
+        "schema": "dtcr/synthesis-packet/v1",
+        "semantic_lane": {
+          "consumed_row_refs": [
+            "DTCR-BK-001"
+          ],
+          "result_ref": "DTCR-RR-001",
+          "state": "PRESENT"
+        },
+        "subject": {
+          "repository_binding_id": "DTCR-RB-0f1e2d3c4b5a6978",
+          "subject_commit": "main",
+          "subject_tree": "e739d799dd8d44beb5414ed99a943ff3bacccab0"
+        },
+        "task_ref": "review the persistence boundary of the order domain"
+      }
+    },
+    {
+      "case_id": "DTCR-XC-SY-004",
+      "refuses": "A packet that carries no deterministic observation at all.",
+      "refused_by": "properties.fact_lane.properties.observation_refs.minItems",
+      "instance": {
+        "authority": {
+          "merge": false,
+          "paid_demand": false,
+          "permission": false,
+          "production": false,
+          "release": false,
+          "secret": false,
+          "user_value": false
+        },
+        "fact_lane": {
+          "bundle_digest": "3f786850e387550fdab836ed7e6dc881de23001b3f786850e387550fdab836ed",
+          "coverage_ceiling_ref": "DTCR-CC-001",
+          "observation_refs": [],
+          "receipt_ref": "DTCR-FR-001",
+          "state": "PRESENT"
+        },
+        "invariant_refs": [
+          "DTCR-AI-001",
+          "DTCR-AI-002"
+        ],
+        "packet_id": "DTCR-SP-001",
+        "schema": "dtcr/synthesis-packet/v1",
+        "semantic_lane": {
+          "consumed_row_refs": [
+            "DTCR-BK-001"
+          ],
+          "result_ref": "DTCR-RR-001",
+          "state": "PRESENT"
+        },
+        "subject": {
+          "repository_binding_id": "DTCR-RB-0f1e2d3c4b5a6978",
+          "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "subject_tree": "e739d799dd8d44beb5414ed99a943ff3bacccab0"
+        },
+        "task_ref": "review the persistence boundary of the order domain"
+      }
+    }
+  ]
+}

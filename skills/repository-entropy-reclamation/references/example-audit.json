@@ -1,0 +1,208 @@
+{
+  "schema_version": "repository-entropy-audit/v1",
+  "mode": "APPLY",
+  "subject": {
+    "repository": "example/service",
+    "commit": "1111111111111111111111111111111111111111",
+    "tree": "2222222222222222222222222222222222222222",
+    "dirty": false,
+    "source_digest": "sha256:3333333333333333333333333333333333333333333333333333333333333333"
+  },
+  "instructions_read": [
+    "AGENTS.md",
+    "README.md",
+    "docs/architecture.md"
+  ],
+  "survey_areas": [
+    "src/session",
+    "tests/session",
+    "docs/session"
+  ],
+  "contract_boundaries": [
+    {
+      "id": "BOUNDARY_INTERNAL_READY",
+      "kind": "INTERNAL",
+      "locator": "src/session/legacy_ready.py:legacy_ready",
+      "owner": "session lifecycle controller",
+      "mutation_policy": "AUTO_ALLOWED",
+      "decisive_observation": "the surviving controller reaches ready exactly once and all callers observe it",
+      "evidence": [
+        {
+          "kind": "SOURCE",
+          "locator": "src/session/legacy_ready.py",
+          "digest": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+        },
+        {
+          "kind": "CALLSITE",
+          "locator": "src/session/controller.py",
+          "digest": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+        }
+      ]
+    },
+    {
+      "id": "BOUNDARY_RESOURCE_STOP",
+      "kind": "RESOURCE_QUIESCENCE",
+      "locator": "src/session/controller.py:stop",
+      "owner": "session lifecycle controller",
+      "mutation_policy": "PROTECTED",
+      "decisive_observation": "all worker tasks terminate before stop returns",
+      "evidence": [
+        {
+          "kind": "TEST",
+          "locator": "tests/session/test_stop.py",
+          "digest": "sha256:6666666666666666666666666666666666666666666666666666666666666666"
+        }
+      ]
+    }
+  ],
+  "candidates": [
+    {
+      "id": "CAND_READY_MIRROR",
+      "class": "LIFECYCLE_DUPLICATION",
+      "action": "COLLAPSE",
+      "targets": [
+        "src/session/legacy_ready.py",
+        "tests/session/test_legacy_ready.py"
+      ],
+      "boundary_ids": [
+        "BOUNDARY_INTERNAL_READY"
+      ],
+      "ownership_boundary": "session readiness transition",
+      "confidence": "HIGH",
+      "risk": "LOW",
+      "consumers": {
+        "production": [],
+        "non_production": [
+          {
+            "locator": "tests/session/test_legacy_ready.py",
+            "reason": "pins the redundant flag rather than a surviving public contract",
+            "evidence": {
+              "kind": "TEST",
+              "locator": "tests/session/test_legacy_ready.py",
+              "digest": "sha256:7777777777777777777777777777777777777777777777777777777777777777"
+            }
+          }
+        ],
+        "ambiguous": []
+      },
+      "checks": {
+        "public_contract": "NOT_APPLICABLE",
+        "dynamic_reachability": "PASS",
+        "persisted_compatibility": "NOT_APPLICABLE",
+        "trust_safety": "PASS",
+        "history_rationale": "PASS",
+        "ownership_model": "PASS"
+      },
+      "capability_effect": "NONE_OBSERVABLE",
+      "reduction": {
+        "lines_removed": 24,
+        "lines_added": 3,
+        "concepts_removed": [
+          "mirrored readiness truth"
+        ],
+        "concepts_added": [],
+        "contracts_removed": [],
+        "states_removed": [
+          "legacy_ready flag"
+        ],
+        "dependencies_removed": []
+      },
+      "decisive_check": {
+        "argv": [
+          "python3",
+          "-m",
+          "pytest",
+          "tests/session/test_controller.py",
+          "-q"
+        ],
+        "cwd": ".",
+        "expected": "controller readiness and stop tests pass; legacy flag is absent"
+      },
+      "evidence": [
+        {
+          "kind": "SEARCH",
+          "locator": "rg legacy_ready",
+          "digest": "sha256:8888888888888888888888888888888888888888888888888888888888888888"
+        },
+        {
+          "kind": "HISTORY",
+          "locator": "git log -- src/session/legacy_ready.py",
+          "digest": "sha256:9999999999999999999999999999999999999999999999999999999999999999"
+        },
+        {
+          "kind": "DIFF",
+          "locator": "candidate diff",
+          "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+      ],
+      "rationale": "The flag mirrors the controller's readiness future, has no production or dynamic consumer, and removing it leaves one lifecycle owner."
+    }
+  ],
+  "selected_candidate_ids": [
+    "CAND_READY_MIRROR"
+  ],
+  "shadow_review": {
+    "subject_commit": "1111111111111111111111111111111111111111",
+    "evaluator_id": "procedural-shadow-runtime/example-pass",
+    "independent": true,
+    "writes_target": false,
+    "verdict": "ELIGIBLE_FOR_IMPLEMENTATION",
+    "findings": [],
+    "evidence": [
+      {
+        "kind": "RECEIPT",
+        "locator": "shadow/example-pass.json",
+        "digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      }
+    ]
+  },
+  "delivery": {
+    "required": true,
+    "state": "ASSERTED",
+    "task_dag_digest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "stack_index": "docs/entropy/molecular-stack-index.json",
+    "convergence_owner": "ATOM-X"
+  },
+  "verification": {
+    "baseline": "PASS",
+    "decisive": "PASS",
+    "narrow": "PASS",
+    "broad": "PASS",
+    "residue_search": "PASS",
+    "global_objective": "PASS",
+    "commands": [
+      [
+        "python3",
+        "-m",
+          "pytest",
+          "tests/session/test_controller.py",
+          "-q"
+      ],
+      [
+        "rg",
+        "legacy_ready",
+        "src",
+        "tests",
+        "docs"
+      ]
+    ],
+    "evidence": [
+      {
+        "kind": "TEST",
+        "locator": "pytest session controller",
+        "digest": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+      },
+      {
+        "kind": "SEARCH",
+        "locator": "post-cut residue search",
+        "digest": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+      }
+    ]
+  },
+  "local_handoff": {
+    "required": false,
+    "queue_subject": null,
+    "reason": "all declared verification lanes were available in the current exact-subject sandbox"
+  },
+  "verdict": "IMPLEMENTATION_VERIFIED"
+}

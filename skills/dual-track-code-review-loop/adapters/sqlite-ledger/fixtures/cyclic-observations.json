@@ -1,0 +1,266 @@
+{
+  "fixture": "dtcr/sqlite-ledger-fixture/v1",
+  "note": "A three-node call cycle, so the traversal's cycle guard has something to stop.",
+  "subject": {
+    "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+    "commit": "7f3b1d0c9e5a24681bd0f43a97c6e1520d8ab34e",
+    "tree": "5c1e4a92f0b7d3681ac4e59d2f60b3178e4c02a9"
+  },
+  "observations": [
+    {
+      "schema": "dtcr/symbol-fact/v1",
+      "fact_id": "DTCR-SY-001",
+      "fact_kind": "SYMBOL",
+      "subject": {
+        "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+        "commit": "7f3b1d0c9e5a24681bd0f43a97c6e1520d8ab34e",
+        "tree": "5c1e4a92f0b7d3681ac4e59d2f60b3178e4c02a9"
+      },
+      "index_binding": {
+        "indexer_name": "code-intelligence-indexer",
+        "version": "0.5.2",
+        "indexer_sha256": "70fa78e5ae55563976b332a6da662e9877dc6ed6965f676453d8f4a35ebdf483",
+        "config_digest": "6041f3e0319bbe072bb08ce9f945687edc3c092dd1447b1f92711c072ba3b578",
+        "index_digest": "09e98e24fb99ac29f183cebfdc3035aa38cb7249d42347b162c4cdff0962e5e6",
+        "indexed_commit": "7f3b1d0c9e5a24681bd0f43a97c6e1520d8ab34e"
+      },
+      "output_digest": "7cd72447d1ddbf54388b1c82b5bdae0757282b873b457c76bf4eb2bc80047b88",
+      "warnings": [],
+      "omissions": [],
+      "establishes": {
+        "complete_call_graph": false,
+        "semantic_truth": false,
+        "task_pass": false
+      },
+      "symbol": {
+        "identity": {
+          "provider_scoped_id": "example-scheme example-package runtime/scheduler/Loop#tick().",
+          "normalization": {
+            "scheme": "example interchange symbol grammar",
+            "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"
+          }
+        },
+        "symbol_kind": "METHOD",
+        "display_name": "Loop.tick"
+      }
+    },
+    {
+      "schema": "dtcr/symbol-fact/v1",
+      "fact_id": "DTCR-SY-002",
+      "fact_kind": "SYMBOL",
+      "subject": {
+        "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+        "commit": "7f3b1d0c9e5a24681bd0f43a97c6e1520d8ab34e",
+        "tree": "5c1e4a92f0b7d3681ac4e59d2f60b3178e4c02a9"
+      },
+      "index_binding": {
+        "indexer_name": "code-intelligence-indexer",
+        "version": "0.5.2",
+        "indexer_sha256": "70fa78e5ae55563976b332a6da662e9877dc6ed6965f676453d8f4a35ebdf483",
+        "config_digest": "6041f3e0319bbe072bb08ce9f945687edc3c092dd1447b1f92711c072ba3b578",
+        "index_digest": "09e98e24fb99ac29f183cebfdc3035aa38cb7249d42347b162c4cdff0962e5e6",
+        "indexed_commit": "7f3b1d0c9e5a24681bd0f43a97c6e1520d8ab34e"
+      },
+      "output_digest": "48f8526e4ce31d2dd02b07280ad537fa88eb4f7a771f0d1cff01834fec20052c",
+      "warnings": [],
+      "omissions": [],
+      "establishes": {
+        "complete_call_graph": false,
+        "semantic_truth": false,
+        "task_pass": false
+      },
+      "symbol": {
+        "identity": {
+          "provider_scoped_id": "example-scheme example-package runtime/scheduler/Queue#drain().",
+          "normalization": {
+            "scheme": "example interchange symbol grammar",
+            "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"
+          }
+        },
+        "symbol_kind": "METHOD",
+        "display_name": "Queue.drain"
+      }
+    },
+    {
+      "schema": "dtcr/symbol-fact/v1",
+      "fact_id": "DTCR-SY-003",
+      "fact_kind": "SYMBOL",
+      "subject": {
+        "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+        "commit": "7f3b1d0c9e5a24681bd0f43a97c6e1520d8ab34e",
+        "tree": "5c1e4a92f0b7d3681ac4e59d2f60b3178e4c02a9"
+      },
+      "index_binding": {
+        "indexer_name": "code-intelligence-indexer",
+        "version": "0.5.2",
+        "indexer_sha256": "70fa78e5ae55563976b332a6da662e9877dc6ed6965f676453d8f4a35ebdf483",
+        "config_digest": "6041f3e0319bbe072bb08ce9f945687edc3c092dd1447b1f92711c072ba3b578",
+        "index_digest": "09e98e24fb99ac29f183cebfdc3035aa38cb7249d42347b162c4cdff0962e5e6",
+        "indexed_commit": "7f3b1d0c9e5a24681bd0f43a97c6e1520d8ab34e"
+      },
+      "output_digest": "64f8114ebb6f7baec2db013ecb7a39d8c7a281ce7c583d577da9414703dbaade",
+      "warnings": [],
+      "omissions": [],
+      "establishes": {
+        "complete_call_graph": false,
+        "semantic_truth": false,
+        "task_pass": false
+      },
+      "symbol": {
+        "identity": {
+          "provider_scoped_id": "example-scheme example-package runtime/scheduler/Worker#step().",
+          "normalization": {
+            "scheme": "example interchange symbol grammar",
+            "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"
+          }
+        },
+        "symbol_kind": "METHOD",
+        "display_name": "Worker.step"
+      }
+    },
+    {
+      "schema": "dtcr/symbol-fact/v1",
+      "fact_id": "DTCR-SY-004",
+      "fact_kind": "RELATIONSHIP",
+      "subject": {
+        "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+        "commit": "7f3b1d0c9e5a24681bd0f43a97c6e1520d8ab34e",
+        "tree": "5c1e4a92f0b7d3681ac4e59d2f60b3178e4c02a9"
+      },
+      "index_binding": {
+        "indexer_name": "code-intelligence-indexer",
+        "version": "0.5.2",
+        "indexer_sha256": "70fa78e5ae55563976b332a6da662e9877dc6ed6965f676453d8f4a35ebdf483",
+        "config_digest": "6041f3e0319bbe072bb08ce9f945687edc3c092dd1447b1f92711c072ba3b578",
+        "index_digest": "09e98e24fb99ac29f183cebfdc3035aa38cb7249d42347b162c4cdff0962e5e6",
+        "indexed_commit": "7f3b1d0c9e5a24681bd0f43a97c6e1520d8ab34e"
+      },
+      "output_digest": "3b8464c5979bd5837ab7572f60bb116ee41f9dc10037b4f8aebe81969e6eae94",
+      "warnings": [],
+      "omissions": [],
+      "establishes": {
+        "complete_call_graph": false,
+        "semantic_truth": false,
+        "task_pass": false
+      },
+      "relationship": {
+        "from": {
+          "provider_scoped_id": "example-scheme example-package runtime/scheduler/Queue#drain().",
+          "normalization": {
+            "scheme": "example interchange symbol grammar",
+            "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"
+          }
+        },
+        "to": {
+          "provider_scoped_id": "example-scheme example-package runtime/scheduler/Loop#tick().",
+          "normalization": {
+            "scheme": "example interchange symbol grammar",
+            "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"
+          }
+        },
+        "relationship_kind": "CALLS",
+        "graph_evidence": {
+          "provenance": "COMPILER_RESOLVED_CALL",
+          "completeness": "COMPLETE_FOR_RESOLVED_EDGES",
+          "tool": "compiler-backed index"
+        }
+      }
+    },
+    {
+      "schema": "dtcr/symbol-fact/v1",
+      "fact_id": "DTCR-SY-005",
+      "fact_kind": "RELATIONSHIP",
+      "subject": {
+        "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+        "commit": "7f3b1d0c9e5a24681bd0f43a97c6e1520d8ab34e",
+        "tree": "5c1e4a92f0b7d3681ac4e59d2f60b3178e4c02a9"
+      },
+      "index_binding": {
+        "indexer_name": "code-intelligence-indexer",
+        "version": "0.5.2",
+        "indexer_sha256": "70fa78e5ae55563976b332a6da662e9877dc6ed6965f676453d8f4a35ebdf483",
+        "config_digest": "6041f3e0319bbe072bb08ce9f945687edc3c092dd1447b1f92711c072ba3b578",
+        "index_digest": "09e98e24fb99ac29f183cebfdc3035aa38cb7249d42347b162c4cdff0962e5e6",
+        "indexed_commit": "7f3b1d0c9e5a24681bd0f43a97c6e1520d8ab34e"
+      },
+      "output_digest": "535da63fbd9a7cd8c15f238fbf33a0472c8fc4a48d08db6162e7a11136599636",
+      "warnings": [],
+      "omissions": [],
+      "establishes": {
+        "complete_call_graph": false,
+        "semantic_truth": false,
+        "task_pass": false
+      },
+      "relationship": {
+        "from": {
+          "provider_scoped_id": "example-scheme example-package runtime/scheduler/Worker#step().",
+          "normalization": {
+            "scheme": "example interchange symbol grammar",
+            "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"
+          }
+        },
+        "to": {
+          "provider_scoped_id": "example-scheme example-package runtime/scheduler/Queue#drain().",
+          "normalization": {
+            "scheme": "example interchange symbol grammar",
+            "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"
+          }
+        },
+        "relationship_kind": "CALLS",
+        "graph_evidence": {
+          "provenance": "OCCURRENCE_ENCLOSING_RANGE_HEURISTIC",
+          "completeness": "PARTIAL_LOWER_BOUND",
+          "tool": "compiler-backed index"
+        }
+      }
+    },
+    {
+      "schema": "dtcr/symbol-fact/v1",
+      "fact_id": "DTCR-SY-006",
+      "fact_kind": "RELATIONSHIP",
+      "subject": {
+        "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+        "commit": "7f3b1d0c9e5a24681bd0f43a97c6e1520d8ab34e",
+        "tree": "5c1e4a92f0b7d3681ac4e59d2f60b3178e4c02a9"
+      },
+      "index_binding": {
+        "indexer_name": "code-intelligence-indexer",
+        "version": "0.5.2",
+        "indexer_sha256": "70fa78e5ae55563976b332a6da662e9877dc6ed6965f676453d8f4a35ebdf483",
+        "config_digest": "6041f3e0319bbe072bb08ce9f945687edc3c092dd1447b1f92711c072ba3b578",
+        "index_digest": "09e98e24fb99ac29f183cebfdc3035aa38cb7249d42347b162c4cdff0962e5e6",
+        "indexed_commit": "7f3b1d0c9e5a24681bd0f43a97c6e1520d8ab34e"
+      },
+      "output_digest": "ba695fddf336ac6a74b1761b5d3e75d86dbad0fb88435a621d2dd7243e6b167f",
+      "warnings": [],
+      "omissions": [],
+      "establishes": {
+        "complete_call_graph": false,
+        "semantic_truth": false,
+        "task_pass": false
+      },
+      "relationship": {
+        "from": {
+          "provider_scoped_id": "example-scheme example-package runtime/scheduler/Loop#tick().",
+          "normalization": {
+            "scheme": "example interchange symbol grammar",
+            "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"
+          }
+        },
+        "to": {
+          "provider_scoped_id": "example-scheme example-package runtime/scheduler/Worker#step().",
+          "normalization": {
+            "scheme": "example interchange symbol grammar",
+            "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"
+          }
+        },
+        "relationship_kind": "CALLS",
+        "graph_evidence": {
+          "provenance": "COMPILER_RESOLVED_CALL",
+          "completeness": "COMPLETE_FOR_RESOLVED_EDGES",
+          "tool": "compiler-backed index"
+        }
+      }
+    }
+  ]
+}

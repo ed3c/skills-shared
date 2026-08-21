@@ -84,12 +84,12 @@
       "properties": {
         "id": {"type": "string", "minLength": 1},
         "classification": {"enum": ["REQUIRED_CASE", "INVALID_INPUT_CASE", "IMPOSSIBLE_BY_INVARIANT", "OUT_OF_SCOPE_EXPLICIT", "DUPLICATE_EQUIVALENCE_CLASS", "UNKNOWN_BLOCKING"]},
-        "intent_ids": {"type": "array", "items": {"type": "string"}},
-        "axis_ids": {"type": "array", "items": {"type": "string"}},
-        "invariant_or_state_refs": {"type": "array", "items": {"type": "string"}},
-        "implementation_ids": {"type": "array", "items": {"type": "string"}},
-        "oracle_ids": {"type": "array", "items": {"type": "string"}},
-        "evidence_ids": {"type": "array", "items": {"type": "string"}},
+        "intent_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+        "axis_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+        "invariant_or_state_refs": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+        "implementation_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+        "oracle_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+        "evidence_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
         "decision_id": {"type": ["string", "null"]},
         "evidence_state": {"enum": ["PASS", "FAIL", "ABSENT", "NOT_IMPLEMENTED", "NOT_EXERCISED", "SKIPPED_BY_POLICY", "HUMAN_ADMIT_REQUIRED"]}
       },
@@ -97,32 +97,58 @@
     },
     "implementation": {
       "type": "object",
-      "required": ["id", "owner", "subject_ref"],
-      "properties": {"id": {"type": "string"}, "owner": {"type": "string"}, "subject_ref": {"type": "string"}, "convergence_owner": {"type": "boolean"}},
+      "required": ["id", "owner", "subject_ref", "subject_revision", "subject_digest"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "owner": {"type": "string", "minLength": 1},
+        "subject_ref": {"type": "string", "minLength": 1},
+        "subject_revision": {"type": "string", "minLength": 1},
+        "subject_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "convergence_owner": {"type": "boolean"}
+      },
       "additionalProperties": true
     },
     "oracle": {
       "type": "object",
       "required": ["id", "procedure", "pass_condition"],
-      "properties": {"id": {"type": "string"}, "procedure": {"type": "string"}, "pass_condition": {"type": "string"}, "negative_control": {"type": "string"}},
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "procedure": {"type": "string", "minLength": 1},
+        "pass_condition": {"type": "string", "minLength": 1},
+        "negative_control": {"type": "string"}
+      },
       "additionalProperties": true
     },
     "evidence": {
       "type": "object",
-      "required": ["id", "state", "subject_ref"],
-      "properties": {"id": {"type": "string"}, "state": {"enum": ["PASS", "FAIL", "ABSENT", "NOT_IMPLEMENTED", "NOT_EXERCISED", "SKIPPED_BY_POLICY", "HUMAN_ADMIT_REQUIRED"]}, "subject_ref": {"type": "string"}},
+      "required": ["id", "state", "subject_ref", "subject_revision", "subject_digest"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "state": {"enum": ["PASS", "FAIL", "ABSENT", "NOT_IMPLEMENTED", "NOT_EXERCISED", "SKIPPED_BY_POLICY", "HUMAN_ADMIT_REQUIRED"]},
+        "subject_ref": {"type": "string", "minLength": 1},
+        "subject_revision": {"type": "string", "minLength": 1},
+        "subject_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+      },
       "additionalProperties": true
     },
     "decision": {
       "type": "object",
       "required": ["id", "authority", "rationale"],
-      "properties": {"id": {"type": "string"}, "authority": {"type": "string"}, "rationale": {"type": "string"}},
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "authority": {"type": "string", "minLength": 1},
+        "rationale": {"type": "string", "minLength": 1}
+      },
       "additionalProperties": true
     },
     "edge": {
       "type": "object",
       "required": ["from", "to", "kind"],
-      "properties": {"from": {"type": "string"}, "to": {"type": "string"}, "kind": {"type": "string", "minLength": 1}},
+      "properties": {
+        "from": {"type": "string", "minLength": 1},
+        "to": {"type": "string", "minLength": 1},
+        "kind": {"type": "string", "minLength": 1}
+      },
       "additionalProperties": false
     }
   },

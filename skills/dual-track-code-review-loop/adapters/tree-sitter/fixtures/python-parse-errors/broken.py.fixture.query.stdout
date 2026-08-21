@@ -1,0 +1,5 @@
+skills/dual-track-code-review-loop/adapters/tree-sitter/fixtures/python-parse-errors/broken.py.fixture
+  pattern: 0
+    capture: 0 - definition.function.name, start: (3, 4), end: (3, 9), text: `alpha`
+  pattern: 1
+    capture: 1 - definition.class.name, start: (6, 8), end: (6, 12), text: `Beta`

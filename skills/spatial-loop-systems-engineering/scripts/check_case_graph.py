@@ -50,10 +50,23 @@ def index_nodes(values: list[Any], label: str, errors: list[str]) -> dict[str, d
             errors.append(f"{label}[{i}].id must be non-empty")
             continue
         if node_id in out:
-            errors.append(f"duplicate id {node_id}")
+            errors.append(f"duplicate id {node_id} within {label}")
         else:
             out[node_id] = raw
     return out
+
+
+def reject_cross_category_ids(
+    categories: list[tuple[str, dict[str, dict[str, Any]]]], errors: list[str]
+) -> None:
+    owner: dict[str, str] = {}
+    for category, nodes in categories:
+        for node_id in nodes:
+            prior = owner.get(node_id)
+            if prior is not None and prior != category:
+                errors.append(f"duplicate id {node_id} across {prior} and {category}")
+            else:
+                owner[node_id] = category
 
 
 def ratio(num: int, den: int) -> float:
@@ -61,7 +74,7 @@ def ratio(num: int, den: int) -> float:
 
 
 def close_enough(a: Any, b: float) -> bool:
-    return isinstance(a, (int, float)) and abs(float(a) - b) <= 1e-9
+    return isinstance(a, (int, float)) and not isinstance(a, bool) and abs(float(a) - b) <= 1e-9
 
 
 def detect_cycle(nodes: set[str], edges: list[tuple[str, str]]) -> bool:
@@ -97,6 +110,7 @@ def validate(doc: Any) -> list[str]:
     for field in ("id", "revision", "digest"):
         if not isinstance(subject.get(field), str) or not subject.get(field):
             errors.append(f"subject.{field} must be non-empty")
+    revision = subject.get("revision")
     digest = subject.get("digest")
     if isinstance(digest, str) and digest and not DIGEST_RE.fullmatch(digest):
         errors.append("subject.digest must be sha256:<64 lowercase hex>")
@@ -109,6 +123,16 @@ def validate(doc: Any) -> list[str]:
     oracles = index_nodes(as_list(doc.get("oracles"), "oracles", errors), "oracles", errors)
     evidence = index_nodes(as_list(doc.get("evidence"), "evidence", errors), "evidence", errors)
     decisions = index_nodes(as_list(doc.get("decisions", []), "decisions", errors), "decisions", errors)
+
+    reject_cross_category_ids(
+        [
+            ("intent_atoms", intents), ("semantic_axes", axes),
+            ("source_behaviors", behaviors), ("cases", cases),
+            ("implementations", impls), ("oracles", oracles),
+            ("evidence", evidence), ("decisions", decisions),
+        ],
+        errors,
+    )
 
     if not intents:
         errors.append("intent_atoms must be non-empty")
@@ -123,6 +147,12 @@ def validate(doc: Any) -> list[str]:
             errors.append(f"semantic axis {axis_id} has invalid state")
         if state == "NOT_APPLICABLE" and not str(axis.get("reason", "")).strip():
             errors.append(f"semantic axis {axis_id} NOT_APPLICABLE requires reason")
+
+    for decision_id, decision in decisions.items():
+        if not str(decision.get("authority", "")).strip():
+            errors.append(f"decision {decision_id} requires authority")
+        if not str(decision.get("rationale", "")).strip():
+            errors.append(f"decision {decision_id} requires rationale")
 
     behavior_dispositions: dict[str, str] = {}
     blocking_behavior_count = 0
@@ -224,6 +254,10 @@ def validate(doc: Any) -> list[str]:
             errors.append(f"implementation {impl_id} requires owner")
         if not str(impl.get("subject_ref", "")).strip():
             errors.append(f"implementation {impl_id} requires subject_ref")
+        if impl.get("subject_revision") != revision:
+            errors.append(f"implementation {impl_id} subject_revision must equal exact subject revision")
+        if impl.get("subject_digest") != digest:
+            errors.append(f"implementation {impl_id} subject_digest must equal exact subject digest")
 
     for oracle_id, oracle in oracles.items():
         if not str(oracle.get("procedure", "")).strip():
@@ -236,6 +270,10 @@ def validate(doc: Any) -> list[str]:
             errors.append(f"evidence {evidence_id} has invalid state")
         if not str(item.get("subject_ref", "")).strip():
             errors.append(f"evidence {evidence_id} requires subject_ref")
+        if item.get("subject_revision") != revision:
+            errors.append(f"evidence {evidence_id} subject_revision must equal exact subject revision")
+        if item.get("subject_digest") != digest:
+            errors.append(f"evidence {evidence_id} subject_digest must equal exact subject digest")
 
     all_ids = set(intents) | set(axes) | set(behaviors) | set(cases) | set(impls) | set(oracles) | set(evidence) | set(decisions)
     graph_edges: list[tuple[str, str]] = []

@@ -1,0 +1,159 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dtcr-semantic-index-lifecycle-receipt.schema.json",
+  "title": "DTCR semantic index lifecycle receipt",
+  "description": "What happened to the vector index -- rebuilt, deleted or compacted -- and what that did not change. The whole plane is designed to be disposable, and a disposable store has one dangerous property: operating on it feels like progress. So the three things a lifecycle operation never moves are constants here. Deleting the index does not advance, close or reopen a task; rebuilding it does not produce new technical evidence, because the same documents projected again are the same documents; and neither touches a closure state that was reached by arrivals in another plane. A rebuild names the projection receipts it was built from, which is what makes the store reconstructible rather than merely present, and a delete records the absence of an index afterwards as an explicit literal rather than as a digest of nothing.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "lifecycle_receipt_id", "operation", "performed_at", "index_digest_before", "index_digest_after", "projection_receipt_refs", "changes"],
+  "properties": {
+    "schema": {"const": "dtcr/semantic-index-lifecycle-receipt/v1"},
+    "lifecycle_receipt_id": {"type": "string", "pattern": "^DTCR-LC-[0-9]{3}$"},
+    "operation": {"enum": ["REBUILD", "DELETE", "COMPACT"]},
+    "performed_at": {"type": "string", "minLength": 10},
+    "index_digest_before": {
+      "oneOf": [
+        {"const": "NO_PRIOR_INDEX"},
+        {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      ]
+    },
+    "index_digest_after": {
+      "oneOf": [
+        {"const": "INDEX_ABSENT_AFTER_DELETE"},
+        {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      ]
+    },
+    "projection_receipt_refs": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^DTCR-PR-[0-9]{3}$"},
+      "description": "The projections the index was built from. A rebuild that cannot name them produced a store nobody can reconstruct, which is the state the plane's disposability was supposed to rule out."
+    },
+    "changes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["task_admission", "technical_evidence", "closure_state"],
+      "properties": {
+        "task_admission": {
+          "const": "UNCHANGED",
+          "description": "DELETING_VECTOR_INDEX != TASK_STATE_CHANGE. Removing a store removes retrievable context and nothing else."
+        },
+        "technical_evidence": {
+          "const": "NO_NEW_EVIDENCE",
+          "description": "REBUILDING_VECTOR_INDEX != NEW_TECHNICAL_EVIDENCE. The same documents projected a second time are the same documents."
+        },
+        "closure_state": {"const": "UNCHANGED"}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"operation": {"const": "DELETE"}}, "required": ["operation"]},
+      "then": {
+        "properties": {"index_digest_after": {"const": "INDEX_ABSENT_AFTER_DELETE"}},
+        "description": "A delete that leaves a digest behind describes an index that still exists."
+      }
+    },
+    {
+      "if": {"properties": {"operation": {"const": "REBUILD"}}, "required": ["operation"]},
+      "then": {
+        "properties": {"projection_receipt_refs": {"minItems": 1}},
+        "description": "A rebuild with no projection receipts is an index whose contents have no recorded origin."
+      }
+    }
+  ],
+  "examples": [
+    {
+      "schema": "dtcr/semantic-index-lifecycle-receipt/v1",
+      "lifecycle_receipt_id": "DTCR-LC-001",
+      "operation": "REBUILD",
+      "performed_at": "2026-08-21",
+      "index_digest_before": "6615c410e153c94d565173b3494fa40c6aedade2c8a5191e2276e1f38c9b04cd",
+      "index_digest_after": "0c246a5dd73080b4665f823699e1f4d793460e2db01a45d8fda71ab100a3565c",
+      "projection_receipt_refs": ["DTCR-PR-001"],
+      "changes": {
+        "task_admission": "UNCHANGED",
+        "technical_evidence": "NO_NEW_EVIDENCE",
+        "closure_state": "UNCHANGED"
+      }
+    }
+  ],
+  "x-refusal-controls": [
+    {
+      "case_id": "DTCR-XC-LC-001",
+      "refuses": "DELETING_VECTOR_INDEX != TASK_STATE_CHANGE: an index deletion recorded as advancing the task.",
+      "refused_by": "properties.changes.properties.task_admission.const",
+      "instance": {
+        "schema": "dtcr/semantic-index-lifecycle-receipt/v1",
+        "lifecycle_receipt_id": "DTCR-LC-002",
+        "operation": "DELETE",
+        "performed_at": "2026-08-21",
+        "index_digest_before": "6615c410e153c94d565173b3494fa40c6aedade2c8a5191e2276e1f38c9b04cd",
+        "index_digest_after": "INDEX_ABSENT_AFTER_DELETE",
+        "projection_receipt_refs": [],
+        "changes": {
+          "task_admission": "ADVANCED",
+          "technical_evidence": "NO_NEW_EVIDENCE",
+          "closure_state": "UNCHANGED"
+        }
+      }
+    },
+    {
+      "case_id": "DTCR-XC-LC-002",
+      "refuses": "REBUILDING_VECTOR_INDEX != NEW_TECHNICAL_EVIDENCE: a rebuild recorded as producing fresh evidence.",
+      "refused_by": "properties.changes.properties.technical_evidence.const",
+      "instance": {
+        "schema": "dtcr/semantic-index-lifecycle-receipt/v1",
+        "lifecycle_receipt_id": "DTCR-LC-003",
+        "operation": "REBUILD",
+        "performed_at": "2026-08-21",
+        "index_digest_before": "6615c410e153c94d565173b3494fa40c6aedade2c8a5191e2276e1f38c9b04cd",
+        "index_digest_after": "0c246a5dd73080b4665f823699e1f4d793460e2db01a45d8fda71ab100a3565c",
+        "projection_receipt_refs": ["DTCR-PR-001"],
+        "changes": {
+          "task_admission": "UNCHANGED",
+          "technical_evidence": "NEW_EVIDENCE_PRODUCED",
+          "closure_state": "UNCHANGED"
+        }
+      }
+    },
+    {
+      "case_id": "DTCR-XC-LC-003",
+      "refuses": "A deletion that leaves an index digest behind, describing a store that still exists.",
+      "refused_by": "allOf[0].then",
+      "instance": {
+        "schema": "dtcr/semantic-index-lifecycle-receipt/v1",
+        "lifecycle_receipt_id": "DTCR-LC-004",
+        "operation": "DELETE",
+        "performed_at": "2026-08-21",
+        "index_digest_before": "6615c410e153c94d565173b3494fa40c6aedade2c8a5191e2276e1f38c9b04cd",
+        "index_digest_after": "0c246a5dd73080b4665f823699e1f4d793460e2db01a45d8fda71ab100a3565c",
+        "projection_receipt_refs": [],
+        "changes": {
+          "task_admission": "UNCHANGED",
+          "technical_evidence": "NO_NEW_EVIDENCE",
+          "closure_state": "UNCHANGED"
+        }
+      }
+    },
+    {
+      "case_id": "DTCR-XC-LC-004",
+      "refuses": "A rebuild whose contents have no recorded projection origin, leaving the store unreconstructible.",
+      "refused_by": "allOf[1].then",
+      "instance": {
+        "schema": "dtcr/semantic-index-lifecycle-receipt/v1",
+        "lifecycle_receipt_id": "DTCR-LC-005",
+        "operation": "REBUILD",
+        "performed_at": "2026-08-21",
+        "index_digest_before": "NO_PRIOR_INDEX",
+        "index_digest_after": "0c246a5dd73080b4665f823699e1f4d793460e2db01a45d8fda71ab100a3565c",
+        "projection_receipt_refs": [],
+        "changes": {
+          "task_admission": "UNCHANGED",
+          "technical_evidence": "NO_NEW_EVIDENCE",
+          "closure_state": "UNCHANGED"
+        }
+      }
+    }
+  ]
+}

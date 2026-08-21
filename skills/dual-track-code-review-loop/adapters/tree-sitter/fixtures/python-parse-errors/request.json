@@ -1,0 +1,33 @@
+{
+  "bundle": "../../bundles/python-definitions.bundle.json",
+  "declared_blobs": [
+    {
+      "blob": "08cab187be62110c7f67491181227865f4847428",
+      "byte_count": 322,
+      "path": "skills/dual-track-code-review-loop/adapters/tree-sitter/fixtures/python-parse-errors/broken.py.fixture"
+    }
+  ],
+  "omissions": [],
+  "provider": {
+    "executable_sha256": "002b151eb3aee02c453b3feacb73e672a6b11aa7b6a14d028afb98f27b40a7aa",
+    "version": "0.26.3"
+  },
+  "recorded": {
+    "skills/dual-track-code-review-loop/adapters/tree-sitter/fixtures/python-parse-errors/broken.py.fixture": {
+      "parse_exit": 1,
+      "parse_stdout": "broken.py.fixture.parse.stdout",
+      "query_exit": 0,
+      "query_stdout": "broken.py.fixture.query.stdout",
+      "source": "broken.py.fixture"
+    }
+  },
+  "schema": "dtcr/tree-sitter-run-request/v1",
+  "subject": {
+    "commit": "1681cebaeffb78fd39fcb77d7dec76ea2ae292e0",
+    "repository_binding_id": "DTCR-RB-3749864dfe3e2f36",
+    "tree": "5647f54d78ec7c711785f3d04ff46917f656fd9a"
+  },
+  "warnings": [
+    "recorded-output replay: the provider did not run in this pass; the stdout was captured from a real run against the subject commit named above"
+  ]
+}

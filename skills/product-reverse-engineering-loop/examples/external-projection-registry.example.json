@@ -1,0 +1,86 @@
+{
+  "schema": "prel/external-projection-registry/v1",
+  "authority": {
+    "implementation": false,
+    "completion": false,
+    "product_truth": false,
+    "merge": false,
+    "release": false
+  },
+  "evidence_ceiling": "HUMAN_PROJECTION",
+  "human_owned_operations": [
+    "merge",
+    "permission or legal expansion",
+    "release or promotion",
+    "rollback",
+    "admission that a projection may be shared outside the repository"
+  ],
+  "entries": [
+    {
+      "id": "PRJ-001",
+      "external_kind": "CODEX_DOC",
+      "external_id": "codexdoc-placeholder-0001",
+      "observed_revision": "rev-0007",
+      "export_digest": "4f9c2a1b7d8e0c3f5a6b1d2e4c8f7a9b0d3e5c6a8b1f2d4e7c9a0b3d5e6f8c1a",
+      "canonical_subjects": [
+        {
+          "path": "skills/product-reverse-engineering-loop/references/problem-closure-matrix.schema.json",
+          "commit": "1f2e3d4c5b6a70819283746556473829a0b1c2d3",
+          "blob_digest": "a1b2c3d4e5f60718293a4b5c6d7e8f9012345678"
+        },
+        {
+          "path": "skills/product-reverse-engineering-loop/references/example-closure-matrix.json",
+          "commit": "1f2e3d4c5b6a70819283746556473829a0b1c2d3",
+          "blob_digest": "b2c3d4e5f60718293a4b5c6d7e8f90123456789a"
+        }
+      ],
+      "backlinks": [
+        "repository path skills/product-reverse-engineering-loop/references/problem-closure-matrix.schema.json at commit 1f2e3d4c5b6a70819283746556473829a0b1c2d3",
+        "repository path skills/product-reverse-engineering-loop/references/example-closure-matrix.json at commit 1f2e3d4c5b6a70819283746556473829a0b1c2d3"
+      ],
+      "read_back": {
+        "state": "PASS",
+        "compared_revision": "rev-0007",
+        "compared_digest": "4f9c2a1b7d8e0c3f5a6b1d2e4c8f7a9b0d3e5c6a8b1f2d4e7c9a0b3d5e6f8c1a",
+        "observed_at": "2026-08-21T00:00:00Z"
+      },
+      "authority": {
+        "implementation": false,
+        "completion": false,
+        "product_truth": false,
+        "merge": false,
+        "release": false
+      }
+    },
+    {
+      "id": "PRJ-002",
+      "external_kind": "SPREADSHEET",
+      "external_id": "sheet-placeholder-0002",
+      "observed_revision": "rev-0002",
+      "export_digest": "7c1d9e3a5b8f0246a1c3e5d7b9f0248a6c1e3d5b7f902468ac1e3d5b7f902468",
+      "canonical_subjects": [
+        {
+          "path": "skills/product-reverse-engineering-loop/references/example-handoff.json",
+          "commit": "1f2e3d4c5b6a70819283746556473829a0b1c2d3",
+          "blob_digest": "c3d4e5f60718293a4b5c6d7e8f90123456789ab2"
+        }
+      ],
+      "backlinks": [
+        "repository path skills/product-reverse-engineering-loop/references/example-handoff.json at commit 1f2e3d4c5b6a70819283746556473829a0b1c2d3"
+      ],
+      "read_back": {
+        "state": "NOT_EXERCISED",
+        "compared_revision": null,
+        "compared_digest": null,
+        "observed_at": null
+      },
+      "authority": {
+        "implementation": false,
+        "completion": false,
+        "product_truth": false,
+        "merge": false,
+        "release": false
+      }
+    }
+  ]
+}

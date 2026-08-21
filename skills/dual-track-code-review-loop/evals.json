@@ -1,0 +1,116 @@
+{
+  "skill_name": "dual-track-code-review-loop",
+  "version": "1.0.0",
+  "_meta": {
+    "coverage_metric": "Denominators counted from references/ on the run, never carried in this file. tests/selftest.py prints schemas, positives, controls, knockouts, leak-scan files and probe counts, and fails when a control it ran is absent from cases.json or a control cases.json declares did not run. A number here would be a fourth place for the same fact to drift.",
+    "scope": "This plane records what the local suite decides about the committed C0 contract bytes. It is not the repository skill-eval plane (evals/cases + evals/coverage.json), and it closes nothing about a parser, an index, a retrieval adapter, an applied refactor or a consumer.",
+    "why_this_exists": "The C0 merge recorded refusal and knockout results from an uncommitted scratch harness that is gone. Two independent derivations agreeing is better than one and is still not a committed check. This plane exists so the same denominators are decided by something in the tree.",
+    "uncovered_by_design": [
+      "whether a refused source claim is false of the world the source described -- the controls decide what this method will carry, never what is true elsewhere",
+      "whether a paraphrase that avoids all ten refused spellings means the same thing as one of them -- the summary guard is a word filter and the schema says so",
+      "whether a free-text field holds a private locator by shape -- thirty-six of them accept one, which is why the leak scan is a byte scan over the tree and not a schema keyword",
+      "whether a listed target in a candidate record was actually run -- the target list refuses four wildcard spellings and cannot check an observation"
+    ]
+  },
+  "runnable": [
+    {
+      "id": "DTCR-E0-schemas-valid",
+      "checker_script": "tests/selftest.py",
+      "test_verify": "tests/selftest.py",
+      "good_fixture": "references/schemas",
+      "hollow_fixture": null,
+      "hollow_mutations": "a schema file that is not a valid Draft 2020-12 document, or that carries no properties.schema.const, fails discovery before any control runs, because a control refused by an unreadable schema is refused for the wrong reason",
+      "covers": [
+        "every references/schemas/*.json in the tree is a valid Draft 2020-12 document",
+        "every schema declares a unique schema identity that a control can name"
+      ],
+      "expected": "PASS_WITH_SCHEMA_COUNT_DERIVED_FROM_THE_TREE"
+    },
+    {
+      "id": "DTCR-E0-positive-instances",
+      "checker_script": "tests/selftest.py",
+      "test_verify": "tests/selftest.py",
+      "good_fixture": "references/source-disposition/refused-claims.json",
+      "hollow_fixture": null,
+      "hollow_mutations": "an in-schema examples entry or an x-positive-instance file that its own schema refuses turns the run red before the negative controls are credited; a suite that counted only examples arrays would report seven positives where the tree holds eight",
+      "covers": [
+        "every in-schema examples entry validates against the schema that carries it",
+        "every x-positive-instance file validates against the schema that points at it"
+      ],
+      "expected": "PASS_WITH_POSITIVE_COUNT_DERIVED_FROM_THE_TREE"
+    },
+    {
+      "id": "DTCR-E0-refusal-controls",
+      "checker_script": "tests/selftest.py",
+      "test_verify": "tests/selftest.py",
+      "good_fixture": null,
+      "good_evidence": "the controls are the negative half by construction: each one is an instance the named schema must reject, so there is no passing fixture for this claim and the positive lane above is what proves the schemas are not simply refusing everything",
+      "hollow_fixture": null,
+      "hollow_mutations": "each x-refusal-control instance and each disposition negative_control instance is replayed against the schema its own record names; a control the schema accepts is reported by its case id",
+      "covers": [
+        "every x-refusal-control carried by a schema is refused by that schema",
+        "every negative_control on a source-disposition instance is refused by the schema its schema_id names",
+        "cases.json cannot drift from the controls that actually ran, in either direction"
+      ],
+      "expected": "PASS_WITH_CONTROL_COUNT_DERIVED_FROM_THE_TREE"
+    },
+    {
+      "id": "DTCR-E0-knockout-discrimination",
+      "checker_script": "tests/selftest.py",
+      "test_verify": "tests/selftest.py",
+      "good_fixture": null,
+      "good_evidence": "the passing state is the mutated schema accepting the instance: removing exactly the keyword refused_by names, and nothing else, must make the control validate",
+      "hollow_fixture": null,
+      "hollow_mutations": "one knockout per control, removing every keyword path in a multi-keyword refused_by and removing a whole not-clause rather than the pattern inside it; a control still refused after its own guard is gone is refused by something else and is reported as non-discriminating rather than counted",
+      "covers": [
+        "each control discriminates the keyword its refused_by names, not some other guard",
+        "a multi-keyword refused_by removes every keyword it names",
+        "a not/pattern guard loses the whole not-clause, so an emptied not does not refuse everything and credit the guard falsely"
+      ],
+      "expected": "PASS_WITH_KNOCKOUTS_EQUAL_TO_CONTROLS"
+    },
+    {
+      "id": "DTCR-E0-private-locator-leak-scan",
+      "checker_script": "tests/selftest.py",
+      "test_verify": "tests/selftest.py",
+      "good_fixture": "references/contracts/public-private-capability.md",
+      "hollow_fixture": null,
+      "hollow_mutations": "every reachable byte under references/ is scanned for absolute home paths, home-relative paths, cloud-drive hosts and file:// URIs; only the exact literals on the declared list are subtracted, so a real locator embedded anywhere, including in a description field no keyword constrains, is reported with its file and line",
+      "covers": [
+        "the C0 receipt's leak-scan law is executable rather than recorded",
+        "the permitted synthetic values are exact literals, so an exemption cannot widen into a class",
+        "the scan denominator is every reference file, not the schemas alone"
+      ],
+      "expected": "PASS_WITH_ZERO_UNDECLARED_LOCATOR_RESIDUE"
+    },
+    {
+      "id": "DTCR-E0-mutable-subject",
+      "checker_script": "tests/selftest.py",
+      "test_verify": "tests/selftest.py",
+      "good_fixture": null,
+      "good_evidence": "the exact-commit values already in the in-schema examples are the passing side; the probe replaces them one at a time",
+      "hollow_fixture": null,
+      "hollow_mutations": "every exact-commit field found in an in-schema example is replaced with main, HEAD, latest, refs/heads/main and origin/main in turn, and each must be refused; a branch name as a subject names whichever revision the reader happens to hold",
+      "covers": [
+        "no exact-commit field in a shipped example accepts a mutable or symbolic subject",
+        "the probe denominator is derived from the examples in the tree, so a commit field a sibling adds is probed on the run it lands"
+      ],
+      "expected": "PASS_WITH_EVERY_MUTABLE_SUBJECT_REFUSED"
+    },
+    {
+      "id": "DTCR-E0-lane-authority-promotion",
+      "checker_script": "tests/selftest.py",
+      "test_verify": "tests/selftest.py",
+      "good_fixture": null,
+      "good_evidence": "the pinned values already in the in-schema examples are the passing side; the probe promotes them one at a time",
+      "hollow_fixture": null,
+      "hollow_mutations": "every const-pinned field is discovered by walking the schema rather than from a list, and each pinned value in an example is promoted -- a pinned false authority lane to true, a pinned string to a different string -- and must be refused",
+      "covers": [
+        "every const-pinned authority lane, admission value and schema identity refuses promotion",
+        "the pinned set is derived from the schema, so a lane a sibling adds is probed without editing this suite",
+        "the probe denominator is non-zero, so this lane cannot report green having probed nothing"
+      ],
+      "expected": "PASS_WITH_EVERY_PROMOTION_REFUSED"
+    }
+  ]
+}

@@ -1,0 +1,101 @@
+{
+  "schema_version": "agentic-tech-lead/issue-closure-contract/v1",
+  "issue": {
+    "repository": "ed3c/skills-shared",
+    "number": 551,
+    "github_state": "CLOSED",
+    "github_state_reason": "COMPLETED"
+  },
+  "disposition": "DIRECTLY_LANDED",
+  "acceptance": [
+    {
+      "id": "host-neutral-closure-contract-schema",
+      "status": "SATISFIED",
+      "successor": null,
+      "rationale": null
+    },
+    {
+      "id": "deterministic-semantic-checker",
+      "status": "SATISFIED",
+      "successor": null,
+      "rationale": null
+    },
+    {
+      "id": "positive-and-mutation-controls",
+      "status": "SATISFIED",
+      "successor": null,
+      "rationale": null
+    },
+    {
+      "id": "audited-current-ledger",
+      "status": "SATISFIED",
+      "successor": null,
+      "rationale": null
+    },
+    {
+      "id": "owning-ci-governance-wiring",
+      "status": "SATISFIED",
+      "successor": null,
+      "rationale": null
+    },
+    {
+      "id": "agents-readme-molecular-index",
+      "status": "SATISFIED",
+      "successor": null,
+      "rationale": null
+    },
+    {
+      "id": "same-subject-shadow-admission",
+      "status": "SATISFIED",
+      "successor": null,
+      "rationale": null
+    }
+  ],
+  "implementation": {
+    "candidate_prs": [
+      {
+        "repository": "ed3c/skills-shared",
+        "number": 552,
+        "state": "CLOSED",
+        "merged": false,
+        "classification": "HISTORICAL"
+      },
+      {
+        "repository": "ed3c/skills-shared",
+        "number": 555,
+        "state": "CLOSED",
+        "merged": false,
+        "classification": "SUPERSEDED"
+      },
+      {
+        "repository": "ed3c/skills-shared",
+        "number": 556,
+        "state": "CLOSED",
+        "merged": true,
+        "classification": "DIRECT"
+      }
+    ],
+    "landing": {
+      "repository": "ed3c/skills-shared",
+      "via_pr": 556,
+      "commit": "8818e80ae5e12d0328c7b95158e681471b04682e",
+      "tree": "d6a95737e7b254c0e89ed1f7fa518d0d43cb7512"
+    }
+  },
+  "residual": [
+    {
+      "id": "local-git-town-forgejo-execution",
+      "state": "NOT_EXERCISED",
+      "owner": "local handoff; outside #551 acceptance"
+    },
+    {
+      "id": "release-production-promotion",
+      "state": "NOT_EXERCISED",
+      "owner": "release authority; outside #551 acceptance"
+    }
+  ],
+  "evidence_ceiling": "HUMAN_ADMITTED",
+  "shadow_review": {
+    "verdict": "PASS"
+  }
+}

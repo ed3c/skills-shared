@@ -1,0 +1,1875 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pol/market-lane/v1",
+  "title": "Productization market lane record",
+  "description": "One MARKET lane record for a productization program: the arena and its boundary, who already occupies it, the comparator cases a later claim is measured against, the segment nobody is serving, the trigger that would make somebody move, the wedge hypothesis, the path by which it would reach anyone, what of it would travel to another case and what would not, and the two fields that make the hypothesis falsifiable. It composes with `../productization-program.schema.json`: the lane name, the lane states, the rung names and the program states are that contract's, reused here rather than redefined, and this record fills exactly the `market` lane and the three program states between MARKET_ARENA_BOUND and DIFFERENTIATION_WEDGE_BOUND. Its ceiling is MARKET_HYPOTHESIS_CONTRACT and the ceiling is structural: `highest_rung_reached` stops at WEDGE_SUPPORTED, `wedge_state` has no pass value, and every authority constant is pinned false, so no instance of this schema can report demand, product-market fit, user truth, payment truth or a product choice. `counterexample` and `falsifier` are required, which makes a wedge hypothesis with nothing that would refute it unrepresentable rather than discouraged. What none of this reaches is whether a value somebody typed describes anything real: the schema refuses an attention signal filed as switching, a feature difference carried as a live wedge, a single case claiming a case class, a comparator with no source and a policy claim with no policy. It does not refuse a well-formed record that is simply wrong, and that is what independent review and the USER and COMMERCIAL lanes are for.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "record_id",
+    "subject_commit",
+    "lane",
+    "lane_state",
+    "highest_rung_reached",
+    "program_state",
+    "evidence_ceiling",
+    "market_arena",
+    "incumbents_and_alternatives",
+    "comparator_cases",
+    "underserved_segment",
+    "switching_trigger",
+    "wedge_hypothesis",
+    "distribution_hypothesis",
+    "transferability",
+    "counterexample",
+    "falsifier",
+    "authority"
+  ],
+  "properties": {
+    "schema": {
+      "const": "pol/market-lane/v1"
+    },
+    "record_id": {
+      "type": "string",
+      "pattern": "^POL-MKT-[0-9]{3}$"
+    },
+    "subject_commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$",
+      "description": "The exact commit this record was written against. A branch, a tag or HEAD fails the pattern, because a market reading bound to a moving name describes whatever that name points at when somebody next opens it."
+    },
+    "lane": {
+      "const": "MARKET",
+      "description": "Pinned. This record is one lane's worth of claim and cannot answer for USER, MECHANISM or COMMERCIAL, which is the collapse the twelve-lane contract exists to refuse."
+    },
+    "lane_state": {
+      "enum": [
+        "PASS",
+        "FAIL",
+        "UNKNOWN",
+        "BLOCKED",
+        "ABSENT",
+        "NOT_IMPLEMENTED",
+        "NOT_EXERCISED",
+        "SKIPPED_BY_POLICY",
+        "NOT_APPLICABLE",
+        "HUMAN_ADMIT_REQUIRED"
+      ],
+      "description": "The ten lane states owned by `references/core/controlled-vocabulary.md`, reused verbatim. PASS here means the market lane was entered and cleared at its stated rung; it does not mean demand, and the rung ceiling below is what stops it being read that way."
+    },
+    "highest_rung_reached": {
+      "enum": [
+        "NONE",
+        "SOURCE_FOUND",
+        "SOURCE_VERIFIED",
+        "JOB_SUPPORTED",
+        "WEDGE_SUPPORTED"
+      ],
+      "description": "The ladder in `references/core/evidence-ladder.md`, truncated at the highest rung this lane can raise. MECHANISM_REPRODUCED and everything above it are absent from this enum rather than merely discouraged: a comparator trace raises WEDGE_SUPPORTED and raises nothing in USER, no matter how convincing the comparison is."
+    },
+    "program_state": {
+      "enum": [
+        "MARKET_ARENA_BOUND",
+        "COMPARATOR_CASES_BOUND",
+        "DIFFERENTIATION_WEDGE_BOUND"
+      ],
+      "description": "The three program states this lane produces, from the fifteen the program contract owns. A record cannot file itself against a state this lane does not reach."
+    },
+    "evidence_ceiling": {
+      "const": "MARKET_HYPOTHESIS_CONTRACT",
+      "description": "Stated at the top rather than in a closing paragraph, because a ceiling read after the conclusion it was supposed to bound is a ceiling nobody applied."
+    },
+    "market_arena": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "arena_statement",
+        "boundary_definition",
+        "arena_signals"
+      ],
+      "description": "The arena and what counts as being in it. `boundary_definition` is required because an arena with no boundary is the set the reader imagines, and the set the reader imagines is always the whole market.",
+      "properties": {
+        "arena_statement": {
+          "type": "string",
+          "minLength": 12
+        },
+        "boundary_definition": {
+          "type": "string",
+          "minLength": 24
+        },
+        "arena_signals": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/market_signal"
+          }
+        }
+      }
+    },
+    "incumbents_and_alternatives": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "Who is already doing this job, in one list with a kind on each row, because the incumbent that actually wins a segment is frequently the mailbox rota rather than any product. NONCONSUMPTION is a kind here for the same reason: nobody doing the job at all is a state of the arena, not an absence of data.",
+      "items": {
+        "$ref": "#/$defs/occupant"
+      }
+    },
+    "comparator_cases": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "The named cases the wedge is measured against. One case is admissible and does not generalise; the `allOf` at the root is what holds that line.",
+      "items": {
+        "$ref": "#/$defs/comparator_case"
+      }
+    },
+    "underserved_segment": {
+      "$ref": "#/$defs/underserved_segment"
+    },
+    "switching_trigger": {
+      "$ref": "#/$defs/switching_trigger"
+    },
+    "wedge_hypothesis": {
+      "$ref": "#/$defs/wedge_hypothesis"
+    },
+    "distribution_hypothesis": {
+      "$ref": "#/$defs/distribution_hypothesis"
+    },
+    "transferability": {
+      "$ref": "#/$defs/transferability"
+    },
+    "counterexample": {
+      "$ref": "#/$defs/counterexample"
+    },
+    "falsifier": {
+      "$ref": "#/$defs/falsifier"
+    },
+    "authority": {
+      "$ref": "#/$defs/authority"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "comparator_cases": {
+            "maxItems": 1
+          }
+        },
+        "required": [
+          "comparator_cases"
+        ]
+      },
+      "then": {
+        "properties": {
+          "transferability": {
+            "properties": {
+              "generalization_scope": {
+                "const": "SINGLE_CASE_ONLY"
+              }
+            }
+          }
+        }
+      },
+      "description": "ONE_SUCCESS_CASE_AS_GENERAL_LAW refused here. A record standing on one comparator case may say what happened in that case. It may not file itself as a case class, because the conditions that separate the one case from the class are exactly what a single case cannot show."
+    }
+  ],
+  "$defs": {
+    "evidence_class": {
+      "enum": [
+        "OBSERVED_ARTIFACT",
+        "PAID_CONVERSION",
+        "USER_INTERVIEW",
+        "THIRD_PARTY_REPORT",
+        "SOURCE_STATEMENT",
+        "MARKET_ATTENTION",
+        "INFERENCE"
+      ],
+      "description": "The seven signal kinds this method already owns, reused rather than restated: they are the kinds named in `product-reverse-engineering-loop/references/evidence-vocabulary.md`. The grade is a function of the kind alone and is therefore not a field here. Storing the grade beside the kind would let a record carry a kind of MARKET_ATTENTION and a grade of OBSERVED, and the contradiction would have to be noticed by a reader rather than refused by a keyword. Only OBSERVED_ARTIFACT and PAID_CONVERSION are observations; the other five are things somebody said."
+    },
+    "source_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_kind",
+        "locator",
+        "read_at"
+      ],
+      "description": "Where a statement came from, at the identity it was read at. SYNTHETIC_EXAMPLE is in the kind set on purpose: a record built to demonstrate the shape has to be able to say that its sources are constructed, because the alternative is an illustration that reads as a market.",
+      "properties": {
+        "source_kind": {
+          "enum": [
+            "PUBLISHED_DOCUMENT",
+            "VENDOR_PAGE",
+            "PRICING_PAGE",
+            "PUBLIC_DISCUSSION",
+            "REPOSITORY",
+            "DATASET",
+            "INTERVIEW_NOTE",
+            "TRANSACTION_RECORD",
+            "SYNTHETIC_EXAMPLE"
+          ]
+        },
+        "locator": {
+          "type": "string",
+          "minLength": 8
+        },
+        "read_at": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "note": {
+          "type": "string",
+          "maxLength": 300
+        }
+      }
+    },
+    "market_signal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "statement",
+        "evidence_class",
+        "supports",
+        "source_ref"
+      ],
+      "description": "One thing somebody can say about this arena, bound to the class of evidence it came from and to the claim it is being filed against. The pair is the point: the same sentence about search volume is admissible evidence that a category is discussed and inadmissible evidence that anybody moved.",
+      "properties": {
+        "statement": {
+          "type": "string",
+          "minLength": 12
+        },
+        "evidence_class": {
+          "$ref": "#/$defs/evidence_class"
+        },
+        "supports": {
+          "enum": [
+            "ARENA_EXISTS",
+            "ARENA_IS_CONTESTED",
+            "CATEGORY_IS_DISCUSSED",
+            "ALTERNATIVE_IS_IN_USE",
+            "WORKAROUND_IS_IN_USE",
+            "SWITCHING_OBSERVED",
+            "PAYMENT_OBSERVED"
+          ],
+          "description": "What this signal is being offered as evidence for. The set stops short of demand: there is no value here meaning the arena wants this, because no signal available to this lane measures that. SWITCHING_OBSERVED and PAYMENT_OBSERVED are the two behavioural slots, and the `allOf` below fixes which classes may fill them."
+        },
+        "source_ref": {
+          "$ref": "#/$defs/source_ref"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "evidence_class": {
+                "enum": [
+                  "USER_INTERVIEW",
+                  "THIRD_PARTY_REPORT",
+                  "SOURCE_STATEMENT",
+                  "MARKET_ATTENTION",
+                  "INFERENCE"
+                ]
+              }
+            },
+            "required": [
+              "evidence_class"
+            ]
+          },
+          "then": {
+            "properties": {
+              "supports": {
+                "enum": [
+                  "ARENA_EXISTS",
+                  "ARENA_IS_CONTESTED",
+                  "CATEGORY_IS_DISCUSSED",
+                  "ALTERNATIVE_IS_IN_USE",
+                  "WORKAROUND_IS_IN_USE"
+                ]
+              }
+            }
+          },
+          "description": "MARKET_ATTENTION_AS_DEMAND refused here. Attention, a vendor's own statement, somebody else's report, an interview and a reading of other signals all establish that an arena exists and is contested. None of them is an observation that a person left what they were using."
+        }
+      ]
+    },
+    "comparator_case": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "case_id",
+        "comparator_name",
+        "comparator_identity",
+        "claim",
+        "evidence_class",
+        "source_ref"
+      ],
+      "description": "One named case a later claim can be measured against. `source_ref` is required rather than optional because a comparator with no source is the form in which a memory of a product becomes a fact about a market.",
+      "properties": {
+        "case_id": {
+          "type": "string",
+          "pattern": "^POL-MKT-CASE-[0-9]{3}$"
+        },
+        "comparator_name": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 120
+        },
+        "comparator_identity": {
+          "type": "string",
+          "minLength": 12,
+          "description": "Which version, revision or page of the comparator was read. A comparator named without an identity is whatever that product is on the day somebody reads this record."
+        },
+        "claim": {
+          "type": "string",
+          "minLength": 12
+        },
+        "evidence_class": {
+          "$ref": "#/$defs/evidence_class"
+        },
+        "source_ref": {
+          "$ref": "#/$defs/source_ref"
+        }
+      }
+    },
+    "occupant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "occupant_kind",
+        "job_it_is_used_for",
+        "evidence_class",
+        "source_ref"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 120
+        },
+        "occupant_kind": {
+          "enum": [
+            "INCUMBENT",
+            "ALTERNATIVE",
+            "MANUAL_WORKAROUND",
+            "NONCONSUMPTION"
+          ]
+        },
+        "job_it_is_used_for": {
+          "type": "string",
+          "minLength": 12
+        },
+        "evidence_class": {
+          "$ref": "#/$defs/evidence_class"
+        },
+        "source_ref": {
+          "$ref": "#/$defs/source_ref"
+        }
+      }
+    },
+    "underserved_segment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "segment_statement",
+        "why_underserved",
+        "customer_relation",
+        "evidence_class",
+        "source_ref"
+      ],
+      "description": "One segment and its relation to the arena's existing customers. NONCUSTOMER is a separate value from EXISTING_CUSTOMER_UNDERSERVED because the two are different hypotheses with different failure modes: one says the arena serves them badly, the other says the arena has never had them.",
+      "properties": {
+        "segment_statement": {
+          "type": "string",
+          "minLength": 12
+        },
+        "why_underserved": {
+          "type": "string",
+          "minLength": 12
+        },
+        "customer_relation": {
+          "enum": [
+            "EXISTING_CUSTOMER_UNDERSERVED",
+            "NONCUSTOMER",
+            "FORMER_CUSTOMER",
+            "UNKNOWN"
+          ]
+        },
+        "evidence_class": {
+          "$ref": "#/$defs/evidence_class"
+        },
+        "source_ref": {
+          "$ref": "#/$defs/source_ref"
+        }
+      }
+    },
+    "switching_trigger": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "trigger_statement",
+        "from_occupant",
+        "switching_cost",
+        "evidence"
+      ],
+      "description": "What would have to happen before somebody pays the cost of leaving. The cost is a required sub-object rather than a sentence in the trigger, because the cost is the quantity the wedge is later measured against, and a wedge measured against nothing is a feature list.",
+      "properties": {
+        "trigger_statement": {
+          "type": "string",
+          "minLength": 12
+        },
+        "from_occupant": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 120
+        },
+        "switching_cost": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "cost_statement",
+            "cost_kind",
+            "who_pays"
+          ],
+          "properties": {
+            "cost_statement": {
+              "type": "string",
+              "minLength": 12
+            },
+            "cost_kind": {
+              "enum": [
+                "DATA_MIGRATION",
+                "RETRAINING",
+                "CONTRACT_LOCK_IN",
+                "INTEGRATION_REWIRING",
+                "HABIT_AND_WORKFLOW",
+                "APPROVAL_AND_PROCUREMENT",
+                "NONE_IDENTIFIED"
+              ]
+            },
+            "who_pays": {
+              "type": "string",
+              "minLength": 4,
+              "description": "Named separately from the cost because the person who pays the switching cost is routinely not the person who chooses the tool, and a wedge aimed at the chooser does not reduce the cost the payer bears."
+            }
+          }
+        },
+        "evidence": {
+          "$ref": "#/$defs/market_signal"
+        }
+      }
+    },
+    "wedge_hypothesis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "wedge_statement",
+        "wedge_basis",
+        "wedge_state",
+        "measured_against_case_id",
+        "switching_cost_addressed"
+      ],
+      "description": "One stated reason somebody would move, measured against a named comparator case and a named switching cost. `wedge_state` has no PASS value in it at any point: the wedge is the hypothesis the USER and COMMERCIAL lanes exist to test, so nothing that can be written here is evidence that it holds.",
+      "properties": {
+        "wedge_statement": {
+          "type": "string",
+          "minLength": 12
+        },
+        "wedge_basis": {
+          "enum": [
+            "SWITCHING_COST_REDUCED",
+            "UNSERVED_SEGMENT_ACCESS",
+            "WORKAROUND_ELIMINATED",
+            "FEATURE_DIFFERENCE_ONLY"
+          ],
+          "description": "FEATURE_DIFFERENCE_ONLY is in the set so that a difference measured against a product can be written down and then classified, rather than being silently renamed into one of the other three. What it cannot do is stay a live hypothesis; the `allOf` below pins it."
+        },
+        "wedge_state": {
+          "enum": [
+            "CANDIDATE_HYPOTHESIS",
+            "REFUSED_NOT_A_WEDGE"
+          ],
+          "description": "Two values, and neither is a pass. A wedge that survived comparison is a hypothesis nobody has yet had to pay to falsify."
+        },
+        "measured_against_case_id": {
+          "type": "string",
+          "pattern": "^POL-MKT-CASE-[0-9]{3}$"
+        },
+        "switching_cost_addressed": {
+          "type": "string",
+          "minLength": 12,
+          "description": "Which of the named switching costs this wedge is claimed to remove or reduce. A wedge that cannot name one is a difference."
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "wedge_basis": {
+                "const": "FEATURE_DIFFERENCE_ONLY"
+              }
+            },
+            "required": [
+              "wedge_basis"
+            ]
+          },
+          "then": {
+            "properties": {
+              "wedge_state": {
+                "const": "REFUSED_NOT_A_WEDGE"
+              }
+            }
+          },
+          "description": "FEATURE_DIFFERENCE_AS_WEDGE refused here. Difference is measured against a product; a wedge is measured against the cost of leaving the one somebody already has. A basis of feature difference may be recorded, and it may only be recorded as refused."
+        }
+      ]
+    },
+    "distribution_hypothesis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "access_path",
+        "access_state",
+        "gatekeeper"
+      ],
+      "description": "How this wedge would reach the segment, and how far the answer to whether that path is open has actually been established. The default state is a hypothesis, because a channel is a thing somebody else controls.",
+      "properties": {
+        "access_path": {
+          "type": "string",
+          "minLength": 12
+        },
+        "access_state": {
+          "enum": [
+            "UNVERIFIED_HYPOTHESIS",
+            "POLICY_READ_AT_REVISION",
+            "BLOCKED_BY_POLICY",
+            "UNKNOWN"
+          ],
+          "description": "Four states and none of them is permission. POLICY_READ_AT_REVISION says a published rule was read at a stated revision; it does not say that anybody was granted the access the rule describes, which is a RIGHTS admission a person owns."
+        },
+        "gatekeeper": {
+          "type": "string",
+          "minLength": 2,
+          "description": "Who can close this path. A channel with no named gatekeeper is a channel nobody has checked."
+        },
+        "policy_ref": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "rule_locator",
+            "revision",
+            "read_at"
+          ],
+          "properties": {
+            "rule_locator": {
+              "type": "string",
+              "minLength": 8
+            },
+            "revision": {
+              "type": "string",
+              "minLength": 1
+            },
+            "read_at": {
+              "type": "string",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+            }
+          }
+        },
+        "what_would_make_it_available": {
+          "type": "string",
+          "maxLength": 400
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "access_state": {
+                "const": "POLICY_READ_AT_REVISION"
+              }
+            },
+            "required": [
+              "access_state"
+            ]
+          },
+          "then": {
+            "required": [
+              "policy_ref"
+            ]
+          },
+          "description": "DISTRIBUTION_ASSUMED_AVAILABLE refused here. A record may say the path is unverified. What it may not do is claim the governing rule was read while carrying nothing that says which rule, at which revision, on which day."
+        }
+      ]
+    },
+    "transferability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "copyable_mechanisms",
+        "non_transferable_conditions",
+        "generalization_scope"
+      ],
+      "description": "What of the comparator cases would travel to this subject and what would not. `non_transferable_conditions` requires at least one entry: a case study with nothing recorded that would not travel is a case study that was read as a recipe.",
+      "properties": {
+        "copyable_mechanisms": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "statement",
+              "transfer_basis"
+            ],
+            "properties": {
+              "statement": {
+                "type": "string",
+                "minLength": 12
+              },
+              "transfer_basis": {
+                "enum": [
+                  "PUBLICLY_DOCUMENTED_MECHANISM",
+                  "OBSERVED_AND_REPRODUCIBLE_MECHANISM",
+                  "VENDOR_CLAIMED_MECHANISM"
+                ],
+                "description": "The mechanism classifications this method already uses. A VENDOR_CLAIMED_MECHANISM is recorded rather than deleted, and recording it is not evidence that it works."
+              }
+            }
+          }
+        },
+        "non_transferable_conditions": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "condition_statement",
+              "condition_kind"
+            ],
+            "properties": {
+              "condition_statement": {
+                "type": "string",
+                "minLength": 12
+              },
+              "condition_kind": {
+                "enum": [
+                  "TIMING_WINDOW",
+                  "EXISTING_DISTRIBUTION",
+                  "BRAND_OR_TRUST",
+                  "CAPITAL",
+                  "REGULATORY_POSITION",
+                  "FOUNDER_OR_TEAM_SPECIFIC",
+                  "DATA_ASSET",
+                  "LUCK_OR_UNEXPLAINED"
+                ],
+                "description": "LUCK_OR_UNEXPLAINED is in the set because the alternative to recording an unexplained condition is attributing it to the mechanism that happens to be written down next to it."
+              }
+            }
+          }
+        },
+        "generalization_scope": {
+          "enum": [
+            "SINGLE_CASE_ONLY",
+            "CASE_CLASS_WITH_STATED_CONDITIONS"
+          ],
+          "description": "How far this record claims its reading goes. The root `allOf` pins it to SINGLE_CASE_ONLY when only one comparator case is present."
+        }
+      }
+    },
+    "counterexample": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "counterexample_statement",
+        "comparator_or_case",
+        "outcome",
+        "evidence_class",
+        "source_ref"
+      ],
+      "description": "A case where this wedge, or one shaped like it, did not produce the movement claimed. Required at the root, so a record cannot be written that never looked for one. WEDGE_UNTESTED_HERE is an admissible outcome: the honest answer that nobody has tried it is a finding, and it is a different finding from having tried and failed.",
+      "properties": {
+        "counterexample_statement": {
+          "type": "string",
+          "minLength": 12
+        },
+        "comparator_or_case": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 200
+        },
+        "outcome": {
+          "enum": [
+            "SAME_WEDGE_DID_NOT_TRAVEL",
+            "INCUMBENT_RETAINED_USERS",
+            "SEGMENT_DID_NOT_MOVE",
+            "WEDGE_UNTESTED_HERE"
+          ]
+        },
+        "evidence_class": {
+          "$ref": "#/$defs/evidence_class"
+        },
+        "source_ref": {
+          "$ref": "#/$defs/source_ref"
+        }
+      }
+    },
+    "falsifier": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "falsifier_statement",
+        "observation_that_would_refute",
+        "oracle_lane",
+        "who_would_observe"
+      ],
+      "description": "What observation would show this wedge false, and in which lane it would have to be made. Required at the root: a wedge hypothesis with no falsifier is unrepresentable in this contract rather than merely poor practice. DETERMINISTIC is absent from `oracle_lane` on purpose -- a market claim does not close in the technical lane, and a green suite offered as refutation of a wedge is the cheapest laundering path in the whole method.",
+      "properties": {
+        "falsifier_statement": {
+          "type": "string",
+          "minLength": 12
+        },
+        "observation_that_would_refute": {
+          "type": "string",
+          "minLength": 12
+        },
+        "oracle_lane": {
+          "enum": [
+            "BEHAVIORAL",
+            "USER",
+            "PAID",
+            "HUMAN_ADMIT"
+          ]
+        },
+        "who_would_observe": {
+          "type": "string",
+          "minLength": 4,
+          "description": "Named because the author of a wedge is the one reader who cannot falsify it."
+        },
+        "by_when": {
+          "type": "string",
+          "maxLength": 120
+        }
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "demand_established",
+        "pmf_established",
+        "user_truth",
+        "paid_truth",
+        "product_choice",
+        "product_truth",
+        "rights_admission",
+        "merge",
+        "release"
+      ],
+      "description": "Nine constants, all false, extending the program contract's authority block with the three this lane is most often read as having granted. They are constants rather than booleans because a field that can be set to true is a field somebody eventually sets to true.",
+      "properties": {
+        "demand_established": {
+          "const": false
+        },
+        "pmf_established": {
+          "const": false
+        },
+        "user_truth": {
+          "const": false
+        },
+        "paid_truth": {
+          "const": false
+        },
+        "product_choice": {
+          "const": false
+        },
+        "product_truth": {
+          "const": false
+        },
+        "rights_admission": {
+          "const": false
+        },
+        "merge": {
+          "const": false
+        },
+        "release": {
+          "const": false
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "schema": "pol/market-lane/v1",
+      "record_id": "POL-MKT-001",
+      "subject_commit": "bc69a51a644dae3f76aa50cee8b27407951c3968",
+      "lane": "MARKET",
+      "lane_state": "UNKNOWN",
+      "highest_rung_reached": "NONE",
+      "program_state": "DIFFERENTIATION_WEDGE_BOUND",
+      "evidence_ceiling": "MARKET_HYPOTHESIS_CONTRACT",
+      "market_arena": {
+        "arena_statement": "tools that triage an inbound support queue into owner-assigned tickets, for teams of five to fifty, in this synthetic illustration",
+        "boundary_definition": "counted as inside the arena: anything a synthetic team could put between the inbox and the ticket owner, including a shared mailbox rule and a spreadsheet rota; excluded: anything that only reports on tickets after assignment",
+        "arena_signals": [
+          {
+            "statement": "the category is discussed often enough that a synthetic reader would recognise the phrase inbound triage",
+            "evidence_class": "MARKET_ATTENTION",
+            "supports": "CATEGORY_IS_DISCUSSED",
+            "source_ref": {
+              "source_kind": "SYNTHETIC_EXAMPLE",
+              "locator": "synthetic illustration, no document was read: a discussion volume nobody counted",
+              "read_at": "2026-08-21"
+            }
+          },
+          {
+            "statement": "two synthetic vendors describe themselves as competing for the same triage step",
+            "evidence_class": "SOURCE_STATEMENT",
+            "supports": "ARENA_IS_CONTESTED",
+            "source_ref": {
+              "source_kind": "SYNTHETIC_EXAMPLE",
+              "locator": "synthetic illustration, no document was read: two vendor self-descriptions",
+              "read_at": "2026-08-21"
+            }
+          }
+        ]
+      },
+      "incumbents_and_alternatives": [
+        {
+          "name": "Comparator A (synthetic)",
+          "occupant_kind": "INCUMBENT",
+          "job_it_is_used_for": "routing an inbound message to the person who owns that customer",
+          "evidence_class": "SOURCE_STATEMENT",
+          "source_ref": {
+            "source_kind": "SYNTHETIC_EXAMPLE",
+            "locator": "synthetic illustration, no document was read: the comparator's own description of itself",
+            "read_at": "2026-08-21"
+          }
+        },
+        {
+          "name": "a shared mailbox with colour labels (synthetic)",
+          "occupant_kind": "MANUAL_WORKAROUND",
+          "job_it_is_used_for": "the same routing, done by whoever opens the mailbox first",
+          "evidence_class": "INFERENCE",
+          "source_ref": {
+            "source_kind": "SYNTHETIC_EXAMPLE",
+            "locator": "synthetic illustration, no document was read: read off the shape of the other two occupants, observed by nobody",
+            "read_at": "2026-08-21"
+          }
+        }
+      ],
+      "comparator_cases": [
+        {
+          "case_id": "POL-MKT-CASE-001",
+          "comparator_name": "Comparator A (synthetic)",
+          "comparator_identity": "synthetic comparator A as described on its pricing page revision of this illustration",
+          "claim": "assignment happens inside the mail client, so nobody learns a second surface",
+          "evidence_class": "SOURCE_STATEMENT",
+          "source_ref": {
+            "source_kind": "SYNTHETIC_EXAMPLE",
+            "locator": "synthetic illustration, no document was read: comparator A self-description",
+            "read_at": "2026-08-21"
+          }
+        },
+        {
+          "case_id": "POL-MKT-CASE-002",
+          "comparator_name": "Comparator B (synthetic)",
+          "comparator_identity": "synthetic comparator B at the feature list revision of this illustration",
+          "claim": "assignment is automatic once a rule set is written, and writing the rule set is a project",
+          "evidence_class": "SOURCE_STATEMENT",
+          "source_ref": {
+            "source_kind": "SYNTHETIC_EXAMPLE",
+            "locator": "synthetic illustration, no document was read: comparator B self-description",
+            "read_at": "2026-08-21"
+          }
+        }
+      ],
+      "underserved_segment": {
+        "segment_statement": "synthetic teams that route fewer than thirty messages a day and have never written a rule set",
+        "why_underserved": "both comparators price and onboard for a volume this segment does not have, so the cheapest correct answer for them is still the mailbox",
+        "customer_relation": "NONCUSTOMER",
+        "evidence_class": "INFERENCE",
+        "source_ref": {
+          "source_kind": "SYNTHETIC_EXAMPLE",
+          "locator": "synthetic illustration, no document was read: a reading of the two comparator claims, with no member of the segment asked",
+          "read_at": "2026-08-21"
+        }
+      },
+      "switching_trigger": {
+        "trigger_statement": "a synthetic team misses a message during a handover week and decides the mailbox rota is the cause",
+        "from_occupant": "a shared mailbox with colour labels (synthetic)",
+        "switching_cost": {
+          "cost_statement": "everybody has to stop reading the mailbox they already have open all day and read a second surface instead",
+          "cost_kind": "HABIT_AND_WORKFLOW",
+          "who_pays": "every member of the team, not the person who chose the tool"
+        },
+        "evidence": {
+          "statement": "the trigger is stated as a hypothesis about when a synthetic team would reconsider, and nobody has been observed reconsidering",
+          "evidence_class": "INFERENCE",
+          "supports": "WORKAROUND_IS_IN_USE",
+          "source_ref": {
+            "source_kind": "SYNTHETIC_EXAMPLE",
+            "locator": "synthetic illustration, no document was read: constructed for this illustration",
+            "read_at": "2026-08-21"
+          }
+        }
+      },
+      "wedge_hypothesis": {
+        "wedge_statement": "assignment stays in the mailbox the team already has open, so the switching cost the team actually pays is the one this removes",
+        "wedge_basis": "SWITCHING_COST_REDUCED",
+        "wedge_state": "CANDIDATE_HYPOTHESIS",
+        "measured_against_case_id": "POL-MKT-CASE-002",
+        "switching_cost_addressed": "the habit cost named in switching_trigger.switching_cost, which comparator B charges as a rule-writing project"
+      },
+      "distribution_hypothesis": {
+        "access_path": "a mail client add-in surface, reached through that client's marketplace listing",
+        "access_state": "UNVERIFIED_HYPOTHESIS",
+        "gatekeeper": "whoever reviews listings for that marketplace",
+        "what_would_make_it_available": "reading the current marketplace rule at its revision and recording whether this add-in class is admitted at all"
+      },
+      "transferability": {
+        "copyable_mechanisms": [
+          {
+            "statement": "assignment performed through the mail client's own extension surface rather than in a separate application",
+            "transfer_basis": "PUBLICLY_DOCUMENTED_MECHANISM"
+          }
+        ],
+        "non_transferable_conditions": [
+          {
+            "condition_statement": "comparator A reached this segment through a partner list it had before the product existed",
+            "condition_kind": "EXISTING_DISTRIBUTION"
+          },
+          {
+            "condition_statement": "the synthetic case sits inside a window in which the mail client permitted this extension class",
+            "condition_kind": "TIMING_WINDOW"
+          }
+        ],
+        "generalization_scope": "CASE_CLASS_WITH_STATED_CONDITIONS"
+      },
+      "counterexample": {
+        "counterexample_statement": "a third synthetic tool shipped the same in-mailbox assignment and the segment stayed on the shared mailbox",
+        "comparator_or_case": "Comparator C (synthetic), not enumerated as a comparator case in this record",
+        "outcome": "SEGMENT_DID_NOT_MOVE",
+        "evidence_class": "INFERENCE",
+        "source_ref": {
+          "source_kind": "SYNTHETIC_EXAMPLE",
+          "locator": "synthetic illustration, no document was read: constructed as the negative control for this illustration",
+          "read_at": "2026-08-21"
+        }
+      },
+      "falsifier": {
+        "falsifier_statement": "if teams offered in-mailbox assignment keep routing through the mailbox rota, the switching cost this wedge removes was not the cost that was holding them",
+        "observation_that_would_refute": "a named synthetic team using the in-mailbox assignment for two weeks and continuing to route through the rota, observed rather than reported",
+        "oracle_lane": "USER",
+        "who_would_observe": "whoever runs the bounded user experiment, who is not the author of this record"
+      },
+      "authority": {
+        "demand_established": false,
+        "pmf_established": false,
+        "user_truth": false,
+        "paid_truth": false,
+        "product_choice": false,
+        "product_truth": false,
+        "rights_admission": false,
+        "merge": false,
+        "release": false
+      }
+    }
+  ],
+  "x-refusal-controls": [
+    {
+      "case_id": "POL-XC-MKT-001",
+      "refuses": "MARKET_ATTENTION_AS_DEMAND: a signal whose class is attention, vendor statement, third-party report, interview or inference, filed against a slot that says somebody was observed switching or paying. The keyword refuses the filing, not the truth of the row: an OBSERVED_ARTIFACT that describes no observation still validates.",
+      "refused_by": "$defs.market_signal.allOf[0].then",
+      "instance": {
+        "schema": "pol/market-lane/v1",
+        "record_id": "POL-MKT-002",
+        "subject_commit": "bc69a51a644dae3f76aa50cee8b27407951c3968",
+        "lane": "MARKET",
+        "lane_state": "UNKNOWN",
+        "highest_rung_reached": "NONE",
+        "program_state": "DIFFERENTIATION_WEDGE_BOUND",
+        "evidence_ceiling": "MARKET_HYPOTHESIS_CONTRACT",
+        "market_arena": {
+          "arena_statement": "tools that triage an inbound support queue into owner-assigned tickets, for teams of five to fifty, in this synthetic illustration",
+          "boundary_definition": "counted as inside the arena: anything a synthetic team could put between the inbox and the ticket owner, including a shared mailbox rule and a spreadsheet rota; excluded: anything that only reports on tickets after assignment",
+          "arena_signals": [
+            {
+              "statement": "the category is discussed constantly, so the segment is clearly moving off the mailbox",
+              "evidence_class": "MARKET_ATTENTION",
+              "supports": "SWITCHING_OBSERVED",
+              "source_ref": {
+                "source_kind": "SYNTHETIC_EXAMPLE",
+                "locator": "synthetic illustration, no document was read: a discussion volume nobody counted",
+                "read_at": "2026-08-21"
+              }
+            },
+            {
+              "statement": "two synthetic vendors describe themselves as competing for the same triage step",
+              "evidence_class": "SOURCE_STATEMENT",
+              "supports": "ARENA_IS_CONTESTED",
+              "source_ref": {
+                "source_kind": "SYNTHETIC_EXAMPLE",
+                "locator": "synthetic illustration, no document was read: two vendor self-descriptions",
+                "read_at": "2026-08-21"
+              }
+            }
+          ]
+        },
+        "incumbents_and_alternatives": [
+          {
+            "name": "Comparator A (synthetic)",
+            "occupant_kind": "INCUMBENT",
+            "job_it_is_used_for": "routing an inbound message to the person who owns that customer",
+            "evidence_class": "SOURCE_STATEMENT",
+            "source_ref": {
+              "source_kind": "SYNTHETIC_EXAMPLE",
+              "locator": "synthetic illustration, no document was read: the comparator's own description of itself",
+              "read_at": "2026-08-21"
+            }
+          },
+          {
+            "name": "a shared mailbox with colour labels (synthetic)",
+            "occupant_kind": "MANUAL_WORKAROUND",
+            "job_it_is_used_for": "the same routing, done by whoever opens the mailbox first",
+            "evidence_class": "INFERENCE",
+            "source_ref": {
+              "source_kind": "SYNTHETIC_EXAMPLE",
+              "locator": "synthetic illustration, no document was read: read off the shape of the other two occupants, observed by nobody",
+              "read_at": "2026-08-21"
+            }
+          }
+        ],
+        "comparator_cases": [
+          {
+            "case_id": "POL-MKT-CASE-001",
+            "comparator_name": "Comparator A (synthetic)",
+            "comparator_identity": "synthetic comparator A as described on its pricing page revision of this illustration",
+            "claim": "assignment happens inside the mail client, so nobody learns a second surface",
+            "evidence_class": "SOURCE_STATEMENT",
+            "source_ref": {
+              "source_kind": "SYNTHETIC_EXAMPLE",
+              "locator": "synthetic illustration, no document was read: comparator A self-description",
+              "read_at": "2026-08-21"
+            }
+          },
+          {
+            "case_id": "POL-MKT-CASE-002",
+            "comparator_name": "Comparator B (synthetic)",
+            "comparator_identity": "synthetic comparator B at the feature list revision of this illustration",
+            "claim": "assignment is automatic once a rule set is written, and writing the rule set is a project",
+            "evidence_class": "SOURCE_STATEMENT",
+            "source_ref": {
+              "source_kind": "SYNTHETIC_EXAMPLE",
+              "locator": "synthetic illustration, no document was read: comparator B self-description",
+              "read_at": "2026-08-21"
+            }
+          }
+        ],
+        "underserved_segment": {
+          "segment_statement": "synthetic teams that route fewer than thirty messages a day and have never written a rule set",
+          "why_underserved": "both comparators price and onboard for a volume this segment does not have, so the cheapest correct answer for them is still the mailbox",
+          "customer_relation": "NONCUSTOMER",
+          "evidence_class": "INFERENCE",
+          "source_ref": {
+            "source_kind": "SYNTHETIC_EXAMPLE",
+            "locator": "synthetic illustration, no document was read: a reading of the two comparator claims, with no member of the segment asked",
+            "read_at": "2026-08-21"
+          }
+        },
+        "switching_trigger": {
+          "trigger_statement": "a synthetic team misses a message during a handover week and decides the mailbox rota is the cause",
+          "from_occupant": "a shared mailbox with colour labels (synthetic)",
+          "switching_cost": {
+            "cost_statement": "everybody has to stop reading the mailbox they already have open all day and read a second surface instead",
+            "cost_kind": "HABIT_AND_WORKFLOW",
+            "who_pays": "every member of the team, not the person who chose the tool"
+          },
+          "evidence": {
+            "statement": "the trigger is stated as a hypothesis about when a synthetic team would reconsider, and nobody has been observed reconsidering",
+            "evidence_class": "INFERENCE",
+            "supports": "WORKAROUND_IS_IN_USE",
+            "source_ref": {
+              "source_kind": "SYNTHETIC_EXAMPLE",
+              "locator": "synthetic illustration, no document was read: constructed for this illustration",
+              "read_at": "2026-08-21"
+            }
+          }
+        },
+        "wedge_hypothesis": {
+          "wedge_statement": "assignment stays in the mailbox the team already has open, so the switching cost the team actually pays is the one this removes",
+          "wedge_basis": "SWITCHING_COST_REDUCED",
+          "wedge_state": "CANDIDATE_HYPOTHESIS",
+          "measured_against_case_id": "POL-MKT-CASE-002",
+          "switching_cost_addressed": "the habit cost named in switching_trigger.switching_cost, which comparator B charges as a rule-writing project"
+        },
+        "distribution_hypothesis": {
+          "access_path": "a mail client add-in surface, reached through that client's marketplace listing",
+          "access_state": "UNVERIFIED_HYPOTHESIS",
+          "gatekeeper": "whoever reviews listings for that marketplace",
+          "what_would_make_it_available": "reading the current marketplace rule at its revision and recording whether this add-in class is admitted at all"
+        },
+        "transferability": {
+          "copyable_mechanisms": [
+            {
+              "statement": "assignment performed through the mail client's own extension surface rather than in a separate application",
+              "transfer_basis": "PUBLICLY_DOCUMENTED_MECHANISM"
+            }
+          ],
+          "non_transferable_conditions": [
+            {
+              "condition_statement": "comparator A reached this segment through a partner list it had before the product existed",
+              "condition_kind": "EXISTING_DISTRIBUTION"
+            },
+            {
+              "condition_statement": "the synthetic case sits inside a window in which the mail client permitted this extension class",
+              "condition_kind": "TIMING_WINDOW"
+            }
+          ],
+          "generalization_scope": "CASE_CLASS_WITH_STATED_CONDITIONS"
+        },
+        "counterexample": {
+          "counterexample_statement": "a third synthetic tool shipped the same in-mailbox assignment and the segment stayed on the shared mailbox",
+          "comparator_or_case": "Comparator C (synthetic), not enumerated as a comparator case in this record",
+          "outcome": "SEGMENT_DID_NOT_MOVE",
+          "evidence_class": "INFERENCE",
+          "source_ref": {
+            "source_kind": "SYNTHETIC_EXAMPLE",
+            "locator": "synthetic illustration, no document was read: constructed as the negative control for this illustration",
+            "read_at": "2026-08-21"
+          }
+        },
+        "falsifier": {
+          "falsifier_statement": "if teams offered in-mailbox assignment keep routing through the mailbox rota, the switching cost this wedge removes was not the cost that was holding them",
+          "observation_that_would_refute": "a named synthetic team using the in-mailbox assignment for two weeks and continuing to route through the rota, observed rather than reported",
+          "oracle_lane": "USER",
+          "who_would_observe": "whoever runs the bounded user experiment, who is not the author of this record"
+        },
+        "authority": {
+          "demand_established": false,
+          "pmf_established": false,
+          "user_truth": false,
+          "paid_truth": false,
+          "product_choice": false,
+          "product_truth": false,
+          "rights_admission": false,
+          "merge": false,
+          "release": false
+        }
+      }
+    },
+    {
+      "case_id": "POL-XC-MKT-002",
+      "refuses": "FEATURE_DIFFERENCE_AS_WEDGE: a difference measured against a product rather than against the cost of leaving one, carried as a live wedge hypothesis. The keyword refuses only the combination that is written down; a feature difference relabelled as a switching-cost reduction passes this schema and is what independent review is for.",
+      "refused_by": "$defs.wedge_hypothesis.allOf[0].then",
+      "instance": {
+        "schema": "pol/market-lane/v1",
+        "record_id": "POL-MKT-003",
+        "subject_commit": "bc69a51a644dae3f76aa50cee8b27407951c3968",
+        "lane": "MARKET",
+        "lane_state": "UNKNOWN",
+        "highest_rung_reached": "NONE",
+        "program_state": "DIFFERENTIATION_WEDGE_BOUND",
+        "evidence_ceiling": "MARKET_HYPOTHESIS_CONTRACT",
+        "market_arena": {
+          "arena_statement": "tools that triage an inbound support queue into owner-assigned tickets, for teams of five to fifty, in this synthetic illustration",
+          "boundary_definition": "counted as inside the arena: anything a synthetic team could put between the inbox and the ticket owner, including a shared mailbox rule and a spreadsheet rota; excluded: anything that only reports on tickets after assignment",
+          "arena_signals": [
+            {
+              "statement": "the category is discussed often enough that a synthetic reader would recognise the phrase inbound triage",
+              "evidence_class": "MARKET_ATTENTION",
+              "supports": "CATEGORY_IS_DISCUSSED",
+              "source_ref": {
+                "source_kind": "SYNTHETIC_EXAMPLE",
+                "locator": "synthetic illustration, no document was read: a discussion volume nobody counted",
+                "read_at": "2026-08-21"
+              }
+            },
+            {
+              "statement": "two synthetic vendors describe themselves as competing for the same triage step",
+              "evidence_class": "SOURCE_STATEMENT",
+              "supports": "ARENA_IS_CONTESTED",
+              "source_ref": {
+                "source_kind": "SYNTHETIC_EXAMPLE",
+                "locator": "synthetic illustration, no document was read: two vendor self-descriptions",
+                "read_at": "2026-08-21"
+              }
+            }
+          ]
+        },
+        "incumbents_and_alternatives": [
+          {
+            "name": "Comparator A (synthetic)",
+            "occupant_kind": "INCUMBENT",
+            "job_it_is_used_for": "routing an inbound message to the person who owns that customer",
+            "evidence_class": "SOURCE_STATEMENT",
+            "source_ref": {
+              "source_kind": "SYNTHETIC_EXAMPLE",
+              "locator": "synthetic illustration, no document was read: the comparator's own description of itself",
+              "read_at": "2026-08-21"
+            }
+          },
+          {
+            "name": "a shared mailbox with colour labels (synthetic)",
+            "occupant_kind": "MANUAL_WORKAROUND",
+            "job_it_is_used_for": "the same routing, done by whoever opens the mailbox first",
+            "evidence_class": "INFERENCE",
+            "source_ref": {
+              "source_kind": "SYNTHETIC_EXAMPLE",
+              "locator": "synthetic illustration, no document was read: read off the shape of the other two occupants, observed by nobody",
+              "read_at": "2026-08-21"
+            }
+          }
+        ],
+        "comparator_cases": [
+          {
+            "case_id": "POL-MKT-CASE-001",
+            "comparator_name": "Comparator A (synthetic)",
+            "comparator_identity": "synthetic comparator A as described on its pricing page revision of this illustration",
+            "claim": "assignment happens inside the mail client, so nobody learns a second surface",
+            "evidence_class": "SOURCE_STATEMENT",
+            "source_ref": {
+              "source_kind": "SYNTHETIC_EXAMPLE",
+              "locator": "synthetic illustration, no document was read: comparator A self-description",
+              "read_at": "2026-08-21"
+            }
+          },
+          {
+            "case_id": "POL-MKT-CASE-002",
+            "comparator_name": "Comparator B (synthetic)",
+            "comparator_identity": "synthetic comparator B at the feature list revision of this illustration",
+            "claim": "assignment is automatic once a rule set is written, and writing the rule set is a project",
+            "evidence_class": "SOURCE_STATEMENT",
+            "source_ref": {
+              "source_kind": "SYNTHETIC_EXAMPLE",
+              "locator": "synthetic illustration, no document was read: comparator B self-description",
+              "read_at": "2026-08-21"
+            }
+          }
+        ],
+        "underserved_segment": {
+          "segment_statement": "synthetic teams that route fewer than thirty messages a day and have never written a rule set",
+          "why_underserved": "both comparators price and onboard for a volume this segment does not have, so the cheapest correct answer for them is still the mailbox",
+          "customer_relation": "NONCUSTOMER",
+          "evidence_class": "INFERENCE",
+          "source_ref": {
+            "source_kind": "SYNTHETIC_EXAMPLE",
+            "locator": "synthetic illustration, no document was read: a reading of the two comparator claims, with no member of the segment asked",
+            "read_at": "2026-08-21"
+          }
+        },
+        "switching_trigger": {
+          "trigger_statement": "a synthetic team misses a message during a handover week and decides the mailbox rota is the cause",
+          "from_occupant": "a shared mailbox with colour labels (synthetic)",
+          "switching_cost": {
+            "cost_statement": "everybody has to stop reading the mailbox they already have open all day and read a second surface instead",
+            "cost_kind": "HABIT_AND_WORKFLOW",
+            "who_pays": "every member of the team, not the person who chose the tool"
+          },
+          "evidence": {
+            "statement": "the trigger is stated as a hypothesis about when a synthetic team would reconsider, and nobody has been observed reconsidering",
+            "evidence_class": "INFERENCE",
+            "supports": "WORKAROUND_IS_IN_USE",
+            "source_ref": {
+              "source_kind": "SYNTHETIC_EXAMPLE",
+              "locator": "synthetic illustration, no document was read: constructed for this illustration",
+              "read_at": "2026-08-21"
+            }
+          }
+        },
+        "wedge_hypothesis": {
+          "wedge_statement": "this one has keyboard shortcuts and a dark theme and comparator B has neither",
+          "wedge_basis": "FEATURE_DIFFERENCE_ONLY",
+          "wedge_state": "CANDIDATE_HYPOTHESIS",
+          "measured_against_case_id": "POL-MKT-CASE-002",
+          "switching_cost_addressed": "the habit cost named in switching_trigger.switching_cost, which comparator B charges as a rule-writing project"
+        },
+        "distribution_hypothesis": {
+          "access_path": "a mail client add-in surface, reached through that client's marketplace listing",
+          "access_state": "UNVERIFIED_HYPOTHESIS",
+          "gatekeeper": "whoever reviews listings for that marketplace",
+          "what_would_make_it_available": "reading the current marketplace rule at its revision and recording whether this add-in class is admitted at all"
+        },
+        "transferability": {
+          "copyable_mechanisms": [
+            {
+              "statement": "assignment performed through the mail client's own extension surface rather than in a separate application",
+              "transfer_basis": "PUBLICLY_DOCUMENTED_MECHANISM"
+            }
+          ],
+          "non_transferable_conditions": [
+            {
+              "condition_statement": "comparator A reached this segment through a partner list it had before the product existed",
+              "condition_kind": "EXISTING_DISTRIBUTION"
+            },
+            {
+              "condition_statement": "the synthetic case sits inside a window in which the mail client permitted this extension class",
+              "condition_kind": "TIMING_WINDOW"
+            }
+          ],
+          "generalization_scope": "CASE_CLASS_WITH_STATED_CONDITIONS"
+        },
+        "counterexample": {
+          "counterexample_statement": "a third synthetic tool shipped the same in-mailbox assignment and the segment stayed on the shared mailbox",
+          "comparator_or_case": "Comparator C (synthetic), not enumerated as a comparator case in this record",
+          "outcome": "SEGMENT_DID_NOT_MOVE",
+          "evidence_class": "INFERENCE",
+          "source_ref": {
+            "source_kind": "SYNTHETIC_EXAMPLE",
+            "locator": "synthetic illustration, no document was read: constructed as the negative control for this illustration",
+            "read_at": "2026-08-21"
+          }
+        },
+        "falsifier": {
+          "falsifier_statement": "if teams offered in-mailbox assignment keep routing through the mailbox rota, the switching cost this wedge removes was not the cost that was holding them",
+          "observation_that_would_refute": "a named synthetic team using the in-mailbox assignment for two weeks and continuing to route through the rota, observed rather than reported",
+          "oracle_lane": "USER",
+          "who_would_observe": "whoever runs the bounded user experiment, who is not the author of this record"
+        },
+        "authority": {
+          "demand_established": false,
+          "pmf_established": false,
+          "user_truth": false,
+          "paid_truth": false,
+          "product_choice": false,
+          "product_truth": false,
+          "rights_admission": false,
+          "merge": false,
+          "release": false
+        }
+      }
+    },
+    {
+      "case_id": "POL-XC-MKT-003",
+      "refuses": "ONE_SUCCESS_CASE_AS_GENERAL_LAW: a record holding a single comparator case while claiming a case class with stated conditions. The keyword refuses the scope value, and cannot judge whether the conditions listed beside two cases are the ones that actually carried them.",
+      "refused_by": "allOf[0].then",
+      "instance": {
+        "schema": "pol/market-lane/v1",
+        "record_id": "POL-MKT-004",
+        "subject_commit": "bc69a51a644dae3f76aa50cee8b27407951c3968",
+        "lane": "MARKET",
+        "lane_state": "UNKNOWN",
+        "highest_rung_reached": "NONE",
+        "program_state": "DIFFERENTIATION_WEDGE_BOUND",
+        "evidence_ceiling": "MARKET_HYPOTHESIS_CONTRACT",
+        "market_arena": {
+          "arena_statement": "tools that triage an inbound support queue into owner-assigned tickets, for teams of five to fifty, in this synthetic illustration",
+          "boundary_definition": "counted as inside the arena: anything a synthetic team could put between the inbox and the ticket owner, including a shared mailbox rule and a spreadsheet rota; excluded: anything that only reports on tickets after assignment",
+          "arena_signals": [
+            {
+              "statement": "the category is discussed often enough that a synthetic reader would recognise the phrase inbound triage",
+              "evidence_class": "MARKET_ATTENTION",
+              "supports": "CATEGORY_IS_DISCUSSED",
+              "source_ref": {
+                "source_kind": "SYNTHETIC_EXAMPLE",
+                "locator": "synthetic illustration, no document was read: a discussion volume nobody counted",
+                "read_at": "2026-08-21"
+              }
+            },
+            {
+              "statement": "two synthetic vendors describe themselves as competing for the same triage step",
+              "evidence_class": "SOURCE_STATEMENT",
+              "supports": "ARENA_IS_CONTESTED",
+              "source_ref": {
+                "source_kind": "SYNTHETIC_EXAMPLE",
+                "locator": "synthetic illustration, no document was read: two vendor self-descriptions",
+                "read_at": "2026-08-21"
+              }
+            }
+          ]
+        },
+        "incumbents_and_alternatives": [
+          {
+            "name": "Comparator A (synthetic)",
+            "occupant_kind": "INCUMBENT",
+            "job_it_is_used_for": "routing an inbound message to the person who owns that customer",
+            "evidence_class": "SOURCE_STATEMENT",
+            "source_ref": {
+              "source_kind": "SYNTHETIC_EXAMPLE",
+              "locator": "synthetic illustration, no document was read: the comparator's own description of itself",
+              "read_at": "2026-08-21"
+            }
+          },
+          {
+            "name": "a shared mailbox with colour labels (synthetic)",
+            "occupant_kind": "MANUAL_WORKAROUND",
+            "job_it_is_used_for": "the same routing, done by whoever opens the mailbox first",
+            "evidence_class": "INFERENCE",
+            "source_ref": {
+              "source_kind": "SYNTHETIC_EXAMPLE",
+              "locator": "synthetic illustration, no document was read: read off the shape of the other two occupants, observed by nobody",
+              "read_at": "2026-08-21"
+            }
+          }
+        ],
+        "comparator_cases": [
+          {
+            "case_id": "POL-MKT-CASE-001",
+            "comparator_name": "Comparator A (synthetic)",
+            "comparator_identity": "synthetic comparator A as described on its pricing page revision of this illustration",
+            "claim": "assignment happens inside the mail client, so nobody learns a second surface",
+            "evidence_class": "SOURCE_STATEMENT",
+            "source_ref": {
+              "source_kind": "SYNTHETIC_EXAMPLE",
+              "locator": "synthetic illustration, no document was read: comparator A self-description",
+              "read_at": "2026-08-21"
+            }
+          }
+        ],
+        "underserved_segment": {
+          "segment_statement": "synthetic teams that route fewer than thirty messages a day and have never written a rule set",
+          "why_underserved": "both comparators price and onboard for a volume this segment does not have, so the cheapest correct answer for them is still the mailbox",
+          "customer_relation": "NONCUSTOMER",
+          "evidence_class": "INFERENCE",
+          "source_ref": {
+            "source_kind": "SYNTHETIC_EXAMPLE",
+            "locator": "synthetic illustration, no document was read: a reading of the two comparator claims, with no member of the segment asked",
+            "read_at": "2026-08-21"
+          }
+        },
+        "switching_trigger": {
+          "trigger_statement": "a synthetic team misses a message during a handover week and decides the mailbox rota is the cause",
+          "from_occupant": "a shared mailbox with colour labels (synthetic)",
+          "switching_cost": {
+            "cost_statement": "everybody has to stop reading the mailbox they already have open all day and read a second surface instead",
+            "cost_kind": "HABIT_AND_WORKFLOW",
+            "who_pays": "every member of the team, not the person who chose the tool"
+          },
+          "evidence": {
+            "statement": "the trigger is stated as a hypothesis about when a synthetic team would reconsider, and nobody has been observed reconsidering",
+            "evidence_class": "INFERENCE",
+            "supports": "WORKAROUND_IS_IN_USE",
+            "source_ref": {
+              "source_kind": "SYNTHETIC_EXAMPLE",
+              "locator": "synthetic illustration, no document was read: constructed for this illustration",
+              "read_at": "2026-08-21"
+            }
+          }
+        },
+        "wedge_hypothesis": {
+          "wedge_statement": "assignment stays in the mailbox the team already has open, so the switching cost the team actually pays is the one this removes",
+          "wedge_basis": "SWITCHING_COST_REDUCED",
+          "wedge_state": "CANDIDATE_HYPOTHESIS",
+          "measured_against_case_id": "POL-MKT-CASE-001",
+          "switching_cost_addressed": "the habit cost named in switching_trigger.switching_cost, which comparator B charges as a rule-writing project"
+        },
+        "distribution_hypothesis": {
+          "access_path": "a mail client add-in surface, reached through that client's marketplace listing",
+          "access_state": "UNVERIFIED_HYPOTHESIS",
+          "gatekeeper": "whoever reviews listings for that marketplace",
+          "what_would_make_it_available": "reading the current marketplace rule at its revision and recording whether this add-in class is admitted at all"
+        },
+        "transferability": {
+          "copyable_mechanisms": [
+            {
+              "statement": "assignment performed through the mail client's own extension surface rather than in a separate application",
+              "transfer_basis": "PUBLICLY_DOCUMENTED_MECHANISM"
+            }
+          ],
+          "non_transferable_conditions": [
+            {
+              "condition_statement": "comparator A reached this segment through a partner list it had before the product existed",
+              "condition_kind": "EXISTING_DISTRIBUTION"
+            },
+            {
+              "condition_statement": "the synthetic case sits inside a window in which the mail client permitted this extension class",
+              "condition_kind": "TIMING_WINDOW"
+            }
+          ],
+          "generalization_scope": "CASE_CLASS_WITH_STATED_CONDITIONS"
+        },
+        "counterexample": {
+          "counterexample_statement": "a third synthetic tool shipped the same in-mailbox assignment and the segment stayed on the shared mailbox",
+          "comparator_or_case": "Comparator C (synthetic), not enumerated as a comparator case in this record",
+          "outcome": "SEGMENT_DID_NOT_MOVE",
+          "evidence_class": "INFERENCE",
+          "source_ref": {
+            "source_kind": "SYNTHETIC_EXAMPLE",
+            "locator": "synthetic illustration, no document was read: constructed as the negative control for this illustration",
+            "read_at": "2026-08-21"
+          }
+        },
+        "falsifier": {
+          "falsifier_statement": "if teams offered in-mailbox assignment keep routing through the mailbox rota, the switching cost this wedge removes was not the cost that was holding them",
+          "observation_that_would_refute": "a named synthetic team using the in-mailbox assignment for two weeks and continuing to route through the rota, observed rather than reported",
+          "oracle_lane": "USER",
+          "who_would_observe": "whoever runs the bounded user experiment, who is not the author of this record"
+        },
+        "authority": {
+          "demand_established": false,
+          "pmf_established": false,
+          "user_truth": false,
+          "paid_truth": false,
+          "product_choice": false,
+          "product_truth": false,
+          "rights_admission": false,
+          "merge": false,
+          "release": false
+        }
+      }
+    },
+    {
+      "case_id": "POL-XC-MKT-004",
+      "refuses": "COMPARATOR_WITHOUT_SOURCE: a comparator case with no source reference at all. The keyword refuses the absent key; it does not check that the locator beside a present key leads anywhere.",
+      "refused_by": "$defs.comparator_case.required",
+      "instance": {
+        "schema": "pol/market-lane/v1",
+        "record_id": "POL-MKT-005",
+        "subject_commit": "bc69a51a644dae3f76aa50cee8b27407951c3968",
+        "lane": "MARKET",
+        "lane_state": "UNKNOWN",
+        "highest_rung_reached": "NONE",
+        "program_state": "DIFFERENTIATION_WEDGE_BOUND",
+        "evidence_ceiling": "MARKET_HYPOTHESIS_CONTRACT",
+        "market_arena": {
+          "arena_statement": "tools that triage an inbound support queue into owner-assigned tickets, for teams of five to fifty, in this synthetic illustration",
+          "boundary_definition": "counted as inside the arena: anything a synthetic team could put between the inbox and the ticket owner, including a shared mailbox rule and a spreadsheet rota; excluded: anything that only reports on tickets after assignment",
+          "arena_signals": [
+            {
+              "statement": "the category is discussed often enough that a synthetic reader would recognise the phrase inbound triage",
+              "evidence_class": "MARKET_ATTENTION",
+              "supports": "CATEGORY_IS_DISCUSSED",
+              "source_ref": {
+                "source_kind": "SYNTHETIC_EXAMPLE",
+                "locator": "synthetic illustration, no document was read: a discussion volume nobody counted",
+                "read_at": "2026-08-21"
+              }
+            },
+            {
+              "statement": "two synthetic vendors describe themselves as competing for the same triage step",
+              "evidence_class": "SOURCE_STATEMENT",
+              "supports": "ARENA_IS_CONTESTED",
+              "source_ref": {
+                "source_kind": "SYNTHETIC_EXAMPLE",
+                "locator": "synthetic illustration, no document was read: two vendor self-descriptions",
+                "read_at": "2026-08-21"
+              }
+            }
+          ]
+        },
+        "incumbents_and_alternatives": [
+          {
+            "name": "Comparator A (synthetic)",
+            "occupant_kind": "INCUMBENT",
+            "job_it_is_used_for": "routing an inbound message to the person who owns that customer",
+            "evidence_class": "SOURCE_STATEMENT",
+            "source_ref": {
+              "source_kind": "SYNTHETIC_EXAMPLE",
+              "locator": "synthetic illustration, no document was read: the comparator's own description of itself",
+              "read_at": "2026-08-21"
+            }
+          },
+          {
+            "name": "a shared mailbox with colour labels (synthetic)",
+            "occupant_kind": "MANUAL_WORKAROUND",
+            "job_it_is_used_for": "the same routing, done by whoever opens the mailbox first",
+            "evidence_class": "INFERENCE",
+            "source_ref": {
+              "source_kind": "SYNTHETIC_EXAMPLE",
+              "locator": "synthetic illustration, no document was read: read off the shape of the other two occupants, observed by nobody",
+              "read_at": "2026-08-21"
+            }
+          }
+        ],
+        "comparator_cases": [
+          {
+            "case_id": "POL-MKT-CASE-001",
+            "comparator_name": "Comparator A (synthetic)",
+            "comparator_identity": "synthetic comparator A as described on its pricing page revision of this illustration",
+            "claim": "assignment happens inside the mail client, so nobody learns a second surface",
+            "evidence_class": "SOURCE_STATEMENT"
+          },
+          {
+            "case_id": "POL-MKT-CASE-002",
+            "comparator_name": "Comparator B (synthetic)",
+            "comparator_identity": "synthetic comparator B at the feature list revision of this illustration",
+            "claim": "assignment is automatic once a rule set is written, and writing the rule set is a project",
+            "evidence_class": "SOURCE_STATEMENT",
+            "source_ref": {
+              "source_kind": "SYNTHETIC_EXAMPLE",
+              "locator": "synthetic illustration, no document was read: comparator B self-description",
+              "read_at": "2026-08-21"
+            }
+          }
+        ],
+        "underserved_segment": {
+          "segment_statement": "synthetic teams that route fewer than thirty messages a day and have never written a rule set",
+          "why_underserved": "both comparators price and onboard for a volume this segment does not have, so the cheapest correct answer for them is still the mailbox",
+          "customer_relation": "NONCUSTOMER",
+          "evidence_class": "INFERENCE",
+          "source_ref": {
+            "source_kind": "SYNTHETIC_EXAMPLE",
+            "locator": "synthetic illustration, no document was read: a reading of the two comparator claims, with no member of the segment asked",
+            "read_at": "2026-08-21"
+          }
+        },
+        "switching_trigger": {
+          "trigger_statement": "a synthetic team misses a message during a handover week and decides the mailbox rota is the cause",
+          "from_occupant": "a shared mailbox with colour labels (synthetic)",
+          "switching_cost": {
+            "cost_statement": "everybody has to stop reading the mailbox they already have open all day and read a second surface instead",
+            "cost_kind": "HABIT_AND_WORKFLOW",
+            "who_pays": "every member of the team, not the person who chose the tool"
+          },
+          "evidence": {
+            "statement": "the trigger is stated as a hypothesis about when a synthetic team would reconsider, and nobody has been observed reconsidering",
+            "evidence_class": "INFERENCE",
+            "supports": "WORKAROUND_IS_IN_USE",
+            "source_ref": {
+              "source_kind": "SYNTHETIC_EXAMPLE",
+              "locator": "synthetic illustration, no document was read: constructed for this illustration",
+              "read_at": "2026-08-21"
+            }
+          }
+        },
+        "wedge_hypothesis": {
+          "wedge_statement": "assignment stays in the mailbox the team already has open, so the switching cost the team actually pays is the one this removes",
+          "wedge_basis": "SWITCHING_COST_REDUCED",
+          "wedge_state": "CANDIDATE_HYPOTHESIS",
+          "measured_against_case_id": "POL-MKT-CASE-002",
+          "switching_cost_addressed": "the habit cost named in switching_trigger.switching_cost, which comparator B charges as a rule-writing project"
+        },
+        "distribution_hypothesis": {
+          "access_path": "a mail client add-in surface, reached through that client's marketplace listing",
+          "access_state": "UNVERIFIED_HYPOTHESIS",
+          "gatekeeper": "whoever reviews listings for that marketplace",
+          "what_would_make_it_available": "reading the current marketplace rule at its revision and recording whether this add-in class is admitted at all"
+        },
+        "transferability": {
+          "copyable_mechanisms": [
+            {
+              "statement": "assignment performed through the mail client's own extension surface rather than in a separate application",
+              "transfer_basis": "PUBLICLY_DOCUMENTED_MECHANISM"
+            }
+          ],
+          "non_transferable_conditions": [
+            {
+              "condition_statement": "comparator A reached this segment through a partner list it had before the product existed",
+              "condition_kind": "EXISTING_DISTRIBUTION"
+            },
+            {
+              "condition_statement": "the synthetic case sits inside a window in which the mail client permitted this extension class",
+              "condition_kind": "TIMING_WINDOW"
+            }
+          ],
+          "generalization_scope": "CASE_CLASS_WITH_STATED_CONDITIONS"
+        },
+        "counterexample": {
+          "counterexample_statement": "a third synthetic tool shipped the same in-mailbox assignment and the segment stayed on the shared mailbox",
+          "comparator_or_case": "Comparator C (synthetic), not enumerated as a comparator case in this record",
+          "outcome": "SEGMENT_DID_NOT_MOVE",
+          "evidence_class": "INFERENCE",
+          "source_ref": {
+            "source_kind": "SYNTHETIC_EXAMPLE",
+            "locator": "synthetic illustration, no document was read: constructed as the negative control for this illustration",
+            "read_at": "2026-08-21"
+          }
+        },
+        "falsifier": {
+          "falsifier_statement": "if teams offered in-mailbox assignment keep routing through the mailbox rota, the switching cost this wedge removes was not the cost that was holding them",
+          "observation_that_would_refute": "a named synthetic team using the in-mailbox assignment for two weeks and continuing to route through the rota, observed rather than reported",
+          "oracle_lane": "USER",
+          "who_would_observe": "whoever runs the bounded user experiment, who is not the author of this record"
+        },
+        "authority": {
+          "demand_established": false,
+          "pmf_established": false,
+          "user_truth": false,
+          "paid_truth": false,
+          "product_choice": false,
+          "product_truth": false,
+          "rights_admission": false,
+          "merge": false,
+          "release": false
+        }
+      }
+    },
+    {
+      "case_id": "POL-XC-MKT-005",
+      "refuses": "DISTRIBUTION_ASSUMED_AVAILABLE: an access path reported as read against a published rule while carrying no rule locator, revision or read date. The keyword refuses the missing policy reference; a policy reference that was read at an older revision than the one live today still validates, which is why POLICY never becomes RIGHTS in this method.",
+      "refused_by": "$defs.distribution_hypothesis.allOf[0].then",
+      "instance": {
+        "schema": "pol/market-lane/v1",
+        "record_id": "POL-MKT-006",
+        "subject_commit": "bc69a51a644dae3f76aa50cee8b27407951c3968",
+        "lane": "MARKET",
+        "lane_state": "UNKNOWN",
+        "highest_rung_reached": "NONE",
+        "program_state": "DIFFERENTIATION_WEDGE_BOUND",
+        "evidence_ceiling": "MARKET_HYPOTHESIS_CONTRACT",
+        "market_arena": {
+          "arena_statement": "tools that triage an inbound support queue into owner-assigned tickets, for teams of five to fifty, in this synthetic illustration",
+          "boundary_definition": "counted as inside the arena: anything a synthetic team could put between the inbox and the ticket owner, including a shared mailbox rule and a spreadsheet rota; excluded: anything that only reports on tickets after assignment",
+          "arena_signals": [
+            {
+              "statement": "the category is discussed often enough that a synthetic reader would recognise the phrase inbound triage",
+              "evidence_class": "MARKET_ATTENTION",
+              "supports": "CATEGORY_IS_DISCUSSED",
+              "source_ref": {
+                "source_kind": "SYNTHETIC_EXAMPLE",
+                "locator": "synthetic illustration, no document was read: a discussion volume nobody counted",
+                "read_at": "2026-08-21"
+              }
+            },
+            {
+              "statement": "two synthetic vendors describe themselves as competing for the same triage step",
+              "evidence_class": "SOURCE_STATEMENT",
+              "supports": "ARENA_IS_CONTESTED",
+              "source_ref": {
+                "source_kind": "SYNTHETIC_EXAMPLE",
+                "locator": "synthetic illustration, no document was read: two vendor self-descriptions",
+                "read_at": "2026-08-21"
+              }
+            }
+          ]
+        },
+        "incumbents_and_alternatives": [
+          {
+            "name": "Comparator A (synthetic)",
+            "occupant_kind": "INCUMBENT",
+            "job_it_is_used_for": "routing an inbound message to the person who owns that customer",
+            "evidence_class": "SOURCE_STATEMENT",
+            "source_ref": {
+              "source_kind": "SYNTHETIC_EXAMPLE",
+              "locator": "synthetic illustration, no document was read: the comparator's own description of itself",
+              "read_at": "2026-08-21"
+            }
+          },
+          {
+            "name": "a shared mailbox with colour labels (synthetic)",
+            "occupant_kind": "MANUAL_WORKAROUND",
+            "job_it_is_used_for": "the same routing, done by whoever opens the mailbox first",
+            "evidence_class": "INFERENCE",
+            "source_ref": {
+              "source_kind": "SYNTHETIC_EXAMPLE",
+              "locator": "synthetic illustration, no document was read: read off the shape of the other two occupants, observed by nobody",
+              "read_at": "2026-08-21"
+            }
+          }
+        ],
+        "comparator_cases": [
+          {
+            "case_id": "POL-MKT-CASE-001",
+            "comparator_name": "Comparator A (synthetic)",
+            "comparator_identity": "synthetic comparator A as described on its pricing page revision of this illustration",
+            "claim": "assignment happens inside the mail client, so nobody learns a second surface",
+            "evidence_class": "SOURCE_STATEMENT",
+            "source_ref": {
+              "source_kind": "SYNTHETIC_EXAMPLE",
+              "locator": "synthetic illustration, no document was read: comparator A self-description",
+              "read_at": "2026-08-21"
+            }
+          },
+          {
+            "case_id": "POL-MKT-CASE-002",
+            "comparator_name": "Comparator B (synthetic)",
+            "comparator_identity": "synthetic comparator B at the feature list revision of this illustration",
+            "claim": "assignment is automatic once a rule set is written, and writing the rule set is a project",
+            "evidence_class": "SOURCE_STATEMENT",
+            "source_ref": {
+              "source_kind": "SYNTHETIC_EXAMPLE",
+              "locator": "synthetic illustration, no document was read: comparator B self-description",
+              "read_at": "2026-08-21"
+            }
+          }
+        ],
+        "underserved_segment": {
+          "segment_statement": "synthetic teams that route fewer than thirty messages a day and have never written a rule set",
+          "why_underserved": "both comparators price and onboard for a volume this segment does not have, so the cheapest correct answer for them is still the mailbox",
+          "customer_relation": "NONCUSTOMER",
+          "evidence_class": "INFERENCE",
+          "source_ref": {
+            "source_kind": "SYNTHETIC_EXAMPLE",
+            "locator": "synthetic illustration, no document was read: a reading of the two comparator claims, with no member of the segment asked",
+            "read_at": "2026-08-21"
+          }
+        },
+        "switching_trigger": {
+          "trigger_statement": "a synthetic team misses a message during a handover week and decides the mailbox rota is the cause",
+          "from_occupant": "a shared mailbox with colour labels (synthetic)",
+          "switching_cost": {
+            "cost_statement": "everybody has to stop reading the mailbox they already have open all day and read a second surface instead",
+            "cost_kind": "HABIT_AND_WORKFLOW",
+            "who_pays": "every member of the team, not the person who chose the tool"
+          },
+          "evidence": {
+            "statement": "the trigger is stated as a hypothesis about when a synthetic team would reconsider, and nobody has been observed reconsidering",
+            "evidence_class": "INFERENCE",
+            "supports": "WORKAROUND_IS_IN_USE",
+            "source_ref": {
+              "source_kind": "SYNTHETIC_EXAMPLE",
+              "locator": "synthetic illustration, no document was read: constructed for this illustration",
+              "read_at": "2026-08-21"
+            }
+          }
+        },
+        "wedge_hypothesis": {
+          "wedge_statement": "assignment stays in the mailbox the team already has open, so the switching cost the team actually pays is the one this removes",
+          "wedge_basis": "SWITCHING_COST_REDUCED",
+          "wedge_state": "CANDIDATE_HYPOTHESIS",
+          "measured_against_case_id": "POL-MKT-CASE-002",
+          "switching_cost_addressed": "the habit cost named in switching_trigger.switching_cost, which comparator B charges as a rule-writing project"
+        },
+        "distribution_hypothesis": {
+          "access_path": "a mail client add-in surface, reached through that client's marketplace listing",
+          "access_state": "POLICY_READ_AT_REVISION",
+          "gatekeeper": "whoever reviews listings for that marketplace",
+          "what_would_make_it_available": "reading the current marketplace rule at its revision and recording whether this add-in class is admitted at all"
+        },
+        "transferability": {
+          "copyable_mechanisms": [
+            {
+              "statement": "assignment performed through the mail client's own extension surface rather than in a separate application",
+              "transfer_basis": "PUBLICLY_DOCUMENTED_MECHANISM"
+            }
+          ],
+          "non_transferable_conditions": [
+            {
+              "condition_statement": "comparator A reached this segment through a partner list it had before the product existed",
+              "condition_kind": "EXISTING_DISTRIBUTION"
+            },
+            {
+              "condition_statement": "the synthetic case sits inside a window in which the mail client permitted this extension class",
+              "condition_kind": "TIMING_WINDOW"
+            }
+          ],
+          "generalization_scope": "CASE_CLASS_WITH_STATED_CONDITIONS"
+        },
+        "counterexample": {
+          "counterexample_statement": "a third synthetic tool shipped the same in-mailbox assignment and the segment stayed on the shared mailbox",
+          "comparator_or_case": "Comparator C (synthetic), not enumerated as a comparator case in this record",
+          "outcome": "SEGMENT_DID_NOT_MOVE",
+          "evidence_class": "INFERENCE",
+          "source_ref": {
+            "source_kind": "SYNTHETIC_EXAMPLE",
+            "locator": "synthetic illustration, no document was read: constructed as the negative control for this illustration",
+            "read_at": "2026-08-21"
+          }
+        },
+        "falsifier": {
+          "falsifier_statement": "if teams offered in-mailbox assignment keep routing through the mailbox rota, the switching cost this wedge removes was not the cost that was holding them",
+          "observation_that_would_refute": "a named synthetic team using the in-mailbox assignment for two weeks and continuing to route through the rota, observed rather than reported",
+          "oracle_lane": "USER",
+          "who_would_observe": "whoever runs the bounded user experiment, who is not the author of this record"
+        },
+        "authority": {
+          "demand_established": false,
+          "pmf_established": false,
+          "user_truth": false,
+          "paid_truth": false,
+          "product_choice": false,
+          "product_truth": false,
+          "rights_admission": false,
+          "merge": false,
+          "release": false
+        }
+      }
+    }
+  ]
+}

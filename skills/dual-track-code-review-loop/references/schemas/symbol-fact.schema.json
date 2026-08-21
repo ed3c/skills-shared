@@ -1,0 +1,398 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dtcr-symbol-fact.schema.json",
+  "title": "DTCR symbol, occurrence and relationship fact",
+  "description": "One row from a code-intelligence index: a symbol, an occurrence of one, or a relationship between two. Three shapes share one record because they share one ceiling and one binding, and splitting them into three documents would have produced three places to forget the index binding. Two structural rules carry the laws this record exists for. A symbol identity is an object, never a bare string, because a provider's own identifier is scoped to that provider's naming scheme, and a scheme recorded nowhere makes two indexers' rows look like the same node. Relationship evidence reuses the provenance and completeness vocabulary of the violation candidate, so an edge inferred by nesting a reference inside the smallest enclosing definition range is bound to a lower bound: that inference misses dynamic dispatch, interface satisfaction, reflection, callbacks and generated code, and calling its output a call graph turns a floor into a ceiling. The index binding records the commit the index was built from beside the commit the fact is about. The schema requires both to be written down; it cannot compare them, and a consumer that skips that comparison is the one who accepts a fact from an index of a different tree.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "fact_id", "fact_kind", "subject", "index_binding", "output_digest", "warnings", "omissions", "establishes"],
+  "properties": {
+    "schema": {"const": "dtcr/symbol-fact/v1"},
+    "fact_id": {"type": "string", "pattern": "^DTCR-SY-[0-9]{3}$"},
+    "fact_kind": {"enum": ["SYMBOL", "OCCURRENCE", "RELATIONSHIP"]},
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository_binding_id", "commit", "tree"],
+      "properties": {
+        "repository_binding_id": {"type": "string", "pattern": "^DTCR-RB-[0-9a-f]{16}$"},
+        "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "tree": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+      }
+    },
+    "index_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["indexer_name", "version", "indexer_sha256", "config_digest", "index_digest", "indexed_commit"],
+      "properties": {
+        "indexer_name": {"type": "string", "minLength": 1, "not": {"pattern": "[/\\\\]|^~"}},
+        "version": {"type": "string", "minLength": 1},
+        "indexer_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "config_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "index_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "indexed_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$",
+          "description": "The commit the index was built from, written beside the commit the fact is about. Required so the two are comparable; the comparison itself is the consumer's, since a schema cannot equate two fields."
+        }
+      }
+    },
+    "symbol": {"$ref": "#/$defs/symbol_record"},
+    "occurrence": {"$ref": "#/$defs/occurrence_record"},
+    "relationship": {"$ref": "#/$defs/relationship_record"},
+    "output_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "warnings": {"type": "array", "items": {"type": "string", "minLength": 2}},
+    "omissions": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 2},
+      "description": "What this indexer did not index and why. An indexer's omissions stay explicit; a row set with an empty omission list is a claim that nothing was skipped."
+    },
+    "establishes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["complete_call_graph", "semantic_truth", "task_pass"],
+      "properties": {
+        "complete_call_graph": {"const": false},
+        "semantic_truth": {"const": false},
+        "task_pass": {"const": false}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"fact_kind": {"const": "SYMBOL"}}, "required": ["fact_kind"]},
+      "then": {"required": ["symbol"]}
+    },
+    {
+      "if": {"properties": {"fact_kind": {"const": "OCCURRENCE"}}, "required": ["fact_kind"]},
+      "then": {"required": ["occurrence"]}
+    },
+    {
+      "if": {"properties": {"fact_kind": {"const": "RELATIONSHIP"}}, "required": ["fact_kind"]},
+      "then": {
+        "required": ["relationship"],
+        "description": "A relationship row without a relationship payload is an edge asserted with no ends."
+      }
+    }
+  ],
+  "$defs": {
+    "provider_scoped_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider_scoped_id", "normalization"],
+      "properties": {
+        "provider_scoped_id": {"type": "string", "minLength": 1},
+        "normalization": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["scheme", "scheme_digest"],
+          "properties": {
+            "scheme": {"type": "string", "minLength": 2},
+            "scheme_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+          }
+        }
+      },
+      "description": "A provider identifier plus the normalization scheme under which it is read. A bare string cannot be expressed here, which is what stops one indexer's identifier from becoming the universal identity of a node."
+    },
+    "symbol_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["identity", "symbol_kind"],
+      "properties": {
+        "identity": {"$ref": "#/$defs/provider_scoped_identity"},
+        "symbol_kind": {"enum": ["FUNCTION", "METHOD", "TYPE", "MODULE", "FIELD", "OTHER"]},
+        "display_name": {"type": "string", "minLength": 1}
+      }
+    },
+    "occurrence_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["identity", "blob", "range", "roles"],
+      "properties": {
+        "identity": {"$ref": "#/$defs/provider_scoped_identity"},
+        "blob": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["path", "blob"],
+          "properties": {
+            "path": {"type": "string", "minLength": 1, "not": {"pattern": "^(/|~|[A-Za-z][A-Za-z0-9+.-]*://)|(^|/)\\.\\.(/|$)"}},
+            "blob": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+          }
+        },
+        "range": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["start_byte", "end_byte", "start_line", "start_column", "end_line", "end_column"],
+          "properties": {
+            "start_byte": {"type": "integer", "minimum": 0},
+            "end_byte": {"type": "integer", "minimum": 0},
+            "start_line": {"type": "integer", "minimum": 1},
+            "start_column": {"type": "integer", "minimum": 0},
+            "end_line": {"type": "integer", "minimum": 1},
+            "end_column": {"type": "integer", "minimum": 0}
+          }
+        },
+        "roles": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"enum": ["DEFINITION", "REFERENCE", "IMPORT", "WRITE_ACCESS", "READ_ACCESS"]}
+        }
+      }
+    },
+    "relationship_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from", "to", "relationship_kind", "graph_evidence"],
+      "properties": {
+        "from": {"$ref": "#/$defs/provider_scoped_identity"},
+        "to": {"$ref": "#/$defs/provider_scoped_identity"},
+        "relationship_kind": {"enum": ["CALLS", "REFERENCES", "IMPLEMENTS", "INHERITS", "IMPORTS", "DEFINES"]},
+        "graph_evidence": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["provenance", "completeness", "tool"],
+          "properties": {
+            "provenance": {
+              "enum": ["COMPILER_RESOLVED_CALL", "OCCURRENCE_ENCLOSING_RANGE_HEURISTIC", "TEXTUAL_MATCH", "NOT_APPLICABLE"],
+              "description": "How the edge was obtained, not which tool printed it. The same vocabulary the violation candidate uses, so an edge keeps its provenance when it is cited there."
+            },
+            "completeness": {"enum": ["COMPLETE_FOR_RESOLVED_EDGES", "PARTIAL_LOWER_BOUND", "UNKNOWN"]},
+            "tool": {"type": "string", "minLength": 2}
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {"graph_evidence": {"properties": {"provenance": {"enum": ["OCCURRENCE_ENCLOSING_RANGE_HEURISTIC", "TEXTUAL_MATCH"]}}, "required": ["provenance"]}},
+            "required": ["graph_evidence"]
+          },
+          "then": {
+            "properties": {"graph_evidence": {"properties": {"completeness": {"enum": ["PARTIAL_LOWER_BOUND", "UNKNOWN"]}}}},
+            "description": "OCCURRENCE_NESTING_PROMOTED_TO_CALL_GRAPH refused here. Nesting a reference inside the smallest enclosing definition range yields a lower bound on edges; recorded as complete it becomes a false clearance."
+          }
+        }
+      ]
+    }
+  },
+  "examples": [
+    {
+      "schema": "dtcr/symbol-fact/v1",
+      "fact_id": "DTCR-SY-001",
+      "fact_kind": "RELATIONSHIP",
+      "subject": {
+        "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+        "commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+        "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+      },
+      "index_binding": {
+        "indexer_name": "code-intelligence-indexer",
+        "version": "0.5.2",
+        "indexer_sha256": "0c246a5dd73080b4665f823699e1f4d793460e2db01a45d8fda71ab100a3565c",
+        "config_digest": "d4953c11ee2f0436387b29ede9ccea9540d0c6008a685cc1abb39845f3083837",
+        "index_digest": "c450c1e5766c65f3633da2642b5b7ae12ecbb06f78a85a2918128d7fe7d0d218",
+        "indexed_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f"
+      },
+      "relationship": {
+        "from": {
+          "provider_scoped_id": "example-scheme example-package domain/order/Pricing#apply().",
+          "normalization": {"scheme": "example interchange symbol grammar", "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"}
+        },
+        "to": {
+          "provider_scoped_id": "example-scheme example-package infrastructure/postgres/Client#query().",
+          "normalization": {"scheme": "example interchange symbol grammar", "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"}
+        },
+        "relationship_kind": "CALLS",
+        "graph_evidence": {
+          "provenance": "COMPILER_RESOLVED_CALL",
+          "completeness": "COMPLETE_FOR_RESOLVED_EDGES",
+          "tool": "compiler-backed index"
+        }
+      },
+      "output_digest": "0a1246ddebb5572c290cf4d4746afa4be1a45bd83536f0e092d35c0c1ed035fe",
+      "warnings": [],
+      "omissions": ["generated protocol stubs are not in this index"],
+      "establishes": {"complete_call_graph": false, "semantic_truth": false, "task_pass": false}
+    }
+  ],
+  "x-refusal-controls": [
+    {
+      "case_id": "DTCR-XC-SY-001",
+      "refuses": "A provider identifier used as a universal node identity, with no normalization scheme recorded.",
+      "refused_by": "$defs.provider_scoped_identity.type",
+      "instance": {
+        "schema": "dtcr/symbol-fact/v1",
+        "fact_id": "DTCR-SY-002",
+        "fact_kind": "SYMBOL",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+          "commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+        },
+        "index_binding": {
+          "indexer_name": "code-intelligence-indexer",
+          "version": "0.5.2",
+          "indexer_sha256": "0c246a5dd73080b4665f823699e1f4d793460e2db01a45d8fda71ab100a3565c",
+          "config_digest": "d4953c11ee2f0436387b29ede9ccea9540d0c6008a685cc1abb39845f3083837",
+          "index_digest": "c450c1e5766c65f3633da2642b5b7ae12ecbb06f78a85a2918128d7fe7d0d218",
+          "indexed_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f"
+        },
+        "symbol": {
+          "identity": "example-scheme example-package domain/order/Pricing#apply().",
+          "symbol_kind": "METHOD"
+        },
+        "output_digest": "0a1246ddebb5572c290cf4d4746afa4be1a45bd83536f0e092d35c0c1ed035fe",
+        "warnings": [],
+        "omissions": [],
+        "establishes": {"complete_call_graph": false, "semantic_truth": false, "task_pass": false}
+      }
+    },
+    {
+      "case_id": "DTCR-XC-SY-002",
+      "refuses": "SCIP_INDEX_WRONG_SUBJECT: an index binding that never records the commit the index was built from.",
+      "refused_by": "properties.index_binding.required",
+      "instance": {
+        "schema": "dtcr/symbol-fact/v1",
+        "fact_id": "DTCR-SY-003",
+        "fact_kind": "SYMBOL",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+          "commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+        },
+        "index_binding": {
+          "indexer_name": "code-intelligence-indexer",
+          "version": "0.5.2",
+          "indexer_sha256": "0c246a5dd73080b4665f823699e1f4d793460e2db01a45d8fda71ab100a3565c",
+          "config_digest": "d4953c11ee2f0436387b29ede9ccea9540d0c6008a685cc1abb39845f3083837",
+          "index_digest": "c450c1e5766c65f3633da2642b5b7ae12ecbb06f78a85a2918128d7fe7d0d218"
+        },
+        "symbol": {
+          "identity": {
+            "provider_scoped_id": "example-scheme example-package domain/order/Pricing#apply().",
+            "normalization": {"scheme": "example interchange symbol grammar", "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"}
+          },
+          "symbol_kind": "METHOD"
+        },
+        "output_digest": "0a1246ddebb5572c290cf4d4746afa4be1a45bd83536f0e092d35c0c1ed035fe",
+        "warnings": [],
+        "omissions": [],
+        "establishes": {"complete_call_graph": false, "semantic_truth": false, "task_pass": false}
+      }
+    },
+    {
+      "case_id": "DTCR-XC-SY-003",
+      "refuses": "OCCURRENCE_NESTING_PROMOTED_TO_CALL_GRAPH: a range-nesting heuristic edge recorded as complete.",
+      "refused_by": "$defs.relationship_record.allOf[0].then",
+      "instance": {
+        "schema": "dtcr/symbol-fact/v1",
+        "fact_id": "DTCR-SY-004",
+        "fact_kind": "RELATIONSHIP",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+          "commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+        },
+        "index_binding": {
+          "indexer_name": "code-intelligence-indexer",
+          "version": "0.5.2",
+          "indexer_sha256": "0c246a5dd73080b4665f823699e1f4d793460e2db01a45d8fda71ab100a3565c",
+          "config_digest": "d4953c11ee2f0436387b29ede9ccea9540d0c6008a685cc1abb39845f3083837",
+          "index_digest": "c450c1e5766c65f3633da2642b5b7ae12ecbb06f78a85a2918128d7fe7d0d218",
+          "indexed_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f"
+        },
+        "relationship": {
+          "from": {
+            "provider_scoped_id": "example-scheme example-package domain/order/Pricing#apply().",
+            "normalization": {"scheme": "example interchange symbol grammar", "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"}
+          },
+          "to": {
+            "provider_scoped_id": "example-scheme example-package infrastructure/postgres/Client#query().",
+            "normalization": {"scheme": "example interchange symbol grammar", "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"}
+          },
+          "relationship_kind": "CALLS",
+          "graph_evidence": {
+            "provenance": "OCCURRENCE_ENCLOSING_RANGE_HEURISTIC",
+            "completeness": "COMPLETE_FOR_RESOLVED_EDGES",
+            "tool": "occurrence-to-edge importer"
+          }
+        },
+        "output_digest": "0a1246ddebb5572c290cf4d4746afa4be1a45bd83536f0e092d35c0c1ed035fe",
+        "warnings": [],
+        "omissions": [],
+        "establishes": {"complete_call_graph": false, "semantic_truth": false, "task_pass": false}
+      }
+    },
+    {
+      "case_id": "DTCR-XC-SY-004",
+      "refuses": "A row filed as a relationship while carrying only an occurrence, so an edge is asserted with no ends.",
+      "refused_by": "allOf[2].then",
+      "instance": {
+        "schema": "dtcr/symbol-fact/v1",
+        "fact_id": "DTCR-SY-005",
+        "fact_kind": "RELATIONSHIP",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+          "commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+        },
+        "index_binding": {
+          "indexer_name": "code-intelligence-indexer",
+          "version": "0.5.2",
+          "indexer_sha256": "0c246a5dd73080b4665f823699e1f4d793460e2db01a45d8fda71ab100a3565c",
+          "config_digest": "d4953c11ee2f0436387b29ede9ccea9540d0c6008a685cc1abb39845f3083837",
+          "index_digest": "c450c1e5766c65f3633da2642b5b7ae12ecbb06f78a85a2918128d7fe7d0d218",
+          "indexed_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f"
+        },
+        "occurrence": {
+          "identity": {
+            "provider_scoped_id": "example-scheme example-package infrastructure/postgres/Client#query().",
+            "normalization": {"scheme": "example interchange symbol grammar", "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"}
+          },
+          "blob": {"path": "domain/order/pricing.ext", "blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"},
+          "range": {"start_byte": 812, "end_byte": 830, "start_line": 41, "start_column": 2, "end_line": 41, "end_column": 20},
+          "roles": ["REFERENCE"]
+        },
+        "output_digest": "0a1246ddebb5572c290cf4d4746afa4be1a45bd83536f0e092d35c0c1ed035fe",
+        "warnings": [],
+        "omissions": [],
+        "establishes": {"complete_call_graph": false, "semantic_truth": false, "task_pass": false}
+      }
+    },
+    {
+      "case_id": "DTCR-XC-SY-005",
+      "refuses": "An index row claiming to establish a complete call graph.",
+      "refused_by": "properties.establishes.properties.complete_call_graph.const",
+      "instance": {
+        "schema": "dtcr/symbol-fact/v1",
+        "fact_id": "DTCR-SY-006",
+        "fact_kind": "SYMBOL",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-9f2c41ab8d0e7c65",
+          "commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+          "tree": "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+        },
+        "index_binding": {
+          "indexer_name": "code-intelligence-indexer",
+          "version": "0.5.2",
+          "indexer_sha256": "0c246a5dd73080b4665f823699e1f4d793460e2db01a45d8fda71ab100a3565c",
+          "config_digest": "d4953c11ee2f0436387b29ede9ccea9540d0c6008a685cc1abb39845f3083837",
+          "index_digest": "c450c1e5766c65f3633da2642b5b7ae12ecbb06f78a85a2918128d7fe7d0d218",
+          "indexed_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f"
+        },
+        "symbol": {
+          "identity": {
+            "provider_scoped_id": "example-scheme example-package domain/order/Pricing#apply().",
+            "normalization": {"scheme": "example interchange symbol grammar", "scheme_digest": "1082cb1b87407d4cfed6b40aed10b17431a0f4084d61b9d88586aded7b34472a"}
+          },
+          "symbol_kind": "METHOD"
+        },
+        "output_digest": "0a1246ddebb5572c290cf4d4746afa4be1a45bd83536f0e092d35c0c1ed035fe",
+        "warnings": [],
+        "omissions": [],
+        "establishes": {"complete_call_graph": true, "semantic_truth": false, "task_pass": false}
+      }
+    }
+  ]
+}

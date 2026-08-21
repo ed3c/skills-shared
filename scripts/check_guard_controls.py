@@ -75,20 +75,24 @@ def neutralise(anchor: str) -> str:
     for keyword in ("elif", "if", "while"):
         if stripped.startswith(keyword + " ") or stripped.startswith(keyword + "("):
             return f"{indent}{keyword} False:"
-    # Not a condition: a bare statement such as a validate() call or a raise.
     return f"{indent}pass"
 
 
-def run(argv: list[str], cwd: Path, timeout: int) -> int:
+def run(argv: list[str], cwd: Path, timeout: int) -> tuple[int, str]:
     try:
         result = subprocess.run(
             argv, cwd=cwd, capture_output=True, text=True, check=False, timeout=timeout,
         )
-    except subprocess.TimeoutExpired:
-        return 124
+    except subprocess.TimeoutExpired as error:
+        output = "\n".join(
+            part.decode(errors="replace") if isinstance(part, bytes) else (part or "")
+            for part in (error.stdout, error.stderr)
+        ).strip()
+        return 124, output[-2000:]
     except OSError as error:
         raise Unusable(f"cannot execute {argv[0]!r}: {error}") from error
-    return result.returncode
+    output = "\n".join(part for part in (result.stdout, result.stderr) if part).strip()
+    return result.returncode, output[-2000:]
 
 
 def check_guard(repo_root: Path, guard: dict[str, Any], timeout: int) -> list[str]:
@@ -117,29 +121,25 @@ def check_guard(repo_root: Path, guard: dict[str, Any], timeout: int) -> list[st
     if mutated == original:
         return [f"{label}: neutralising the anchor changed nothing"]
 
-    # Work on a copy: the real tree must stay byte-identical, both because
-    # local verification requires a clean worktree and because a crash here
-    # must not leave a guard removed.
     with tempfile.TemporaryDirectory(prefix="guard-control.") as raw:
         work = Path(raw) / "repo"
         shutil.copytree(repo_root, work, symlinks=True, ignore=shutil.ignore_patterns(
             ".git", "__pycache__", "node_modules", ".claude"))
 
-        baseline = run(verify, work, timeout)
+        baseline, baseline_output = run(verify, work, timeout)
         if baseline != 0:
-            # Shape C: the assertions behind this verify never run, so nothing
-            # can be concluded about the guard.
+            detail = f"; verifier output: {baseline_output}" if baseline_output else ""
             return [
                 f"{label}: baseline verify exits {baseline} before any mutation; "
                 f"its assertions are unreachable, so this guard is unproven "
-                f"rather than uncontrolled"
+                f"rather than uncontrolled{detail}"
             ]
 
         (work / target_rel).write_text(mutated, encoding="utf-8")
         if (work / target_rel).read_text(encoding="utf-8") == original:
             return [f"{label}: the mutation did not reach the file under test"]
 
-        mutated_code = run(verify, work, timeout)
+        mutated_code, _ = run(verify, work, timeout)
         if mutated_code == 0:
             problems.append(
                 f"{label}: removing the guard in {target_rel} left the verify "
@@ -149,11 +149,12 @@ def check_guard(repo_root: Path, guard: dict[str, Any], timeout: int) -> list[st
             problems.append(f"{label}: verify timed out under mutation")
 
         (work / target_rel).write_text(original, encoding="utf-8")
-        restored = run(verify, work, timeout)
+        restored, restored_output = run(verify, work, timeout)
         if restored != 0:
+            detail = f"; verifier output: {restored_output}" if restored_output else ""
             problems.append(
                 f"{label}: verify does not return to green after restoring the "
-                f"guard, so the mutation result is not attributable to it"
+                f"guard, so the mutation result is not attributable to it{detail}"
             )
 
     return problems

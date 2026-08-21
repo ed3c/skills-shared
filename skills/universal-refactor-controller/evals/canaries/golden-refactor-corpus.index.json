@@ -1,0 +1,78 @@
+{
+  "schema_version": "universal-refactor/golden-refactor-corpus/v1",
+  "evidence_boundary": "Two remotely verified open-PR canaries establish bounded cross-domain transfer only. They remain HOLD_UNMERGED and are not Golden Refactors until an immutable admitted delivery state exists.",
+  "cases": [
+    {
+      "id": "skill-repository-capability-audit-json-schema-plumbing",
+      "target_kind": "SKILL",
+      "repository": "ed3c/skills-shared",
+      "baseline": {
+        "commit": "4ca9417b1da5ff32f1d4d3e7af64a15908749024",
+        "tree": "58545c4807b774a364be9ac7cd20a97ae0b1d669"
+      },
+      "issue_refs": ["ed3c/skills-shared#402"],
+      "pull_request_refs": ["ed3c/skills-shared#458", "ed3c/skills-shared#461"],
+      "verification": {
+        "lane": "REMOTE_SKILL_SUITE_VERIFIED",
+        "workflow_run_ids": [32271692229, 32272500891],
+        "state": "PASS"
+      },
+      "complexity_delta": {
+        "dimension": "sources_of_truth",
+        "before": 2,
+        "after": 1,
+        "protected_non_regression": [
+          "checker semantic rules",
+          "CLI and exit codes",
+          "schema behavior",
+          "policy authority",
+          "runtime dependencies"
+        ]
+      },
+      "promotion_state": "HOLD_UNMERGED",
+      "unproven_claims": [
+        "unseen Skill targets",
+        "live model uplift",
+        "production safety",
+        "merge",
+        "release"
+      ]
+    },
+    {
+      "id": "repository-blackbox-content-addressing",
+      "target_kind": "REPOSITORY",
+      "repository": "ed3c/blackbox-auto-research",
+      "baseline": {
+        "commit": "54b5f3413baf349b2c1444d48dad2802a26d1782",
+        "tree": "28433fe25e67343e3aea51a1e250619e39d3752b"
+      },
+      "issue_refs": ["ed3c/blackbox-auto-research#62"],
+      "pull_request_refs": ["ed3c/blackbox-auto-research#63", "ed3c/blackbox-auto-research#66"],
+      "verification": {
+        "lane": "REMOTE_REPOSITORY_VERIFIED",
+        "workflow_run_ids": [32271506908],
+        "state": "PASS"
+      },
+      "complexity_delta": {
+        "dimension": "sources_of_truth",
+        "before": 2,
+        "after": 1,
+        "protected_non_regression": [
+          "canonical JSON bytes",
+          "sha256 digest format",
+          "EvidenceChain verification semantics",
+          "counter runtime semantics",
+          "public API authority",
+          "runtime dependencies"
+        ]
+      },
+      "promotion_state": "HOLD_UNMERGED",
+      "unproven_claims": [
+        "unseen repository targets",
+        "production safety",
+        "merge",
+        "release"
+      ]
+    }
+  ]
+}
