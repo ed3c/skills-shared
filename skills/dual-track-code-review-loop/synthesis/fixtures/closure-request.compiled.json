@@ -1,0 +1,221 @@
+{
+  "denominator": {
+    "closure_states": {
+      "BLOCKED": 1,
+      "CLOSURE_RECORD_EMITTED": 1,
+      "NOT_APPLICABLE": 1,
+      "REJECTED_OVERCLAIM": 1
+    },
+    "problem_ids": [
+      "GS-01",
+      "GS-02",
+      "GS-04",
+      "GS-08"
+    ]
+  },
+  "derived_from": "closure-request.json",
+  "ledger_writer": "dual-track review worker",
+  "rows": [
+    {
+      "authority": {
+        "merge": false,
+        "paid_demand": false,
+        "release": false,
+        "user_value": false
+      },
+      "blocked_on": [
+        "MECHANISM_NOT_VERIFIED",
+        "VERIFICATION_RECEIPT_ABSENT"
+      ],
+      "claim": {
+        "claim_class": "APPLICABILITY_CLAIM",
+        "source_claim_state": "ACCEPTED_AS_REQUIREMENT",
+        "statement": "Agent-driven repository, branch, PR and CI volume increases coordination pressure."
+      },
+      "closure_record_ref": null,
+      "closure_state": "BLOCKED",
+      "denominators": {
+        "denominator_definition": "live routes named by the Molecular index at the subject commit",
+        "negative": 2,
+        "positive": 4
+      },
+      "evidence_lane": {
+        "arrival": "STATIC",
+        "lane": "LOCAL",
+        "receipt_ref": null
+      },
+      "mechanism": {
+        "mechanism_state": "IMPLEMENTED",
+        "statement": "the stacked-PR worker plus the Molecular index own branch and route convergence"
+      },
+      "oracle": {
+        "arrival": "STATIC",
+        "statement": "replay the route index against the tree and assert no two live routes claim one branch"
+      },
+      "owner": "git-town-stacked-pr-worker",
+      "problem_id": "GS-01",
+      "requirement": "one mutable branch has one active writer and every route converges without an active-writer conflict",
+      "row_id": "DTCR-PC-001",
+      "schema": "dtcr/problem-closure-row/v1",
+      "separation": {
+        "closed_by_this_compiler": false,
+        "source_claim_rejected_is_problem_solved": false
+      },
+      "source": {
+        "identity": "Git at any scale",
+        "kind": "ARTICLE",
+        "location": "source packet for the article, section 1"
+      },
+      "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+      "vocabulary_ref": "skills/agentic-tech-lead-orchestration/references/contracts/problem-closure.schema.json"
+    },
+    {
+      "authority": {
+        "merge": false,
+        "paid_demand": false,
+        "release": false,
+        "user_value": false
+      },
+      "blocked_on": [],
+      "claim": {
+        "claim_class": "ARCHITECTURE_SOURCE_STATEMENT",
+        "source_claim_state": "NOT_APPLICABLE",
+        "statement": "Git packfile and local-filesystem semantics make naive remote or distributed storage difficult."
+      },
+      "closure_record_ref": null,
+      "closure_state": "NOT_APPLICABLE",
+      "denominators": null,
+      "evidence_lane": {
+        "arrival": null,
+        "lane": "NOT_EXERCISED",
+        "receipt_ref": null
+      },
+      "mechanism": null,
+      "not_applicable_rationale": "this repository hosts no Git storage backend, so the problem has no mechanism here to implement or to refuse",
+      "oracle": null,
+      "owner": null,
+      "problem_id": "GS-02",
+      "requirement": null,
+      "row_id": "DTCR-PC-002",
+      "schema": "dtcr/problem-closure-row/v1",
+      "separation": {
+        "closed_by_this_compiler": false,
+        "source_claim_rejected_is_problem_solved": false
+      },
+      "source": {
+        "identity": "Git at any scale",
+        "kind": "ARTICLE",
+        "location": "source packet for the article, section 2"
+      },
+      "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+      "vocabulary_ref": "skills/agentic-tech-lead-orchestration/references/contracts/problem-closure.schema.json"
+    },
+    {
+      "authority": {
+        "merge": false,
+        "paid_demand": false,
+        "release": false,
+        "user_value": false
+      },
+      "blocked_on": [],
+      "claim": {
+        "claim_class": "PORTABLE_ASSURANCE_REQUIREMENT",
+        "source_claim_state": "ACCEPTED_AS_REQUIREMENT",
+        "statement": "A push should not be acknowledged before durable authoritative persistence."
+      },
+      "closure_record_ref": "DTCR-CR-001",
+      "closure_state": "CLOSURE_RECORD_EMITTED",
+      "denominators": {
+        "denominator_definition": "receipt shapes the gate enumerates, planted absent-artifact cases counted separately",
+        "negative": 3,
+        "positive": 6
+      },
+      "evidence_lane": {
+        "arrival": "SANDBOX",
+        "lane": "LOCAL",
+        "receipt_ref": "DTCR-VR-001"
+      },
+      "mechanism": {
+        "mechanism_state": "VERIFIED_BY_RECEIPT",
+        "statement": "the zero-network delivery receipt gate reads the tree before admitting the receipt"
+      },
+      "oracle": {
+        "arrival": "SANDBOX",
+        "statement": "plant a receipt whose artifact is absent and require the gate to exit non-zero"
+      },
+      "owner": "github-delivery-loop",
+      "problem_id": "GS-04",
+      "requirement": "no delivery receipt is emitted before the artifact it names exists on the tree",
+      "row_id": "DTCR-PC-003",
+      "schema": "dtcr/problem-closure-row/v1",
+      "separation": {
+        "closed_by_this_compiler": false,
+        "source_claim_rejected_is_problem_solved": false
+      },
+      "source": {
+        "identity": "Git at any scale",
+        "kind": "ARTICLE",
+        "location": "source packet for the article, section 4"
+      },
+      "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+      "vocabulary_ref": "skills/agentic-tech-lead-orchestration/references/contracts/problem-closure.schema.json"
+    },
+    {
+      "authority": {
+        "merge": false,
+        "paid_demand": false,
+        "release": false,
+        "user_value": false
+      },
+      "blocked_on": [],
+      "claim": {
+        "claim_class": "PERFORMANCE_CLAIM",
+        "source_claim_state": "REJECTED_OVERCLAIM",
+        "statement": "Primary-only compaction reduces per-replica CPU work by a stated factor."
+      },
+      "closure_record_ref": null,
+      "closure_state": "REJECTED_OVERCLAIM",
+      "denominators": {
+        "denominator_definition": "worktree creations observed at the subject commit",
+        "negative": 1,
+        "positive": 2
+      },
+      "evidence_lane": {
+        "arrival": "STATIC",
+        "lane": "LOCAL",
+        "receipt_ref": null
+      },
+      "mechanism": {
+        "mechanism_state": "IMPLEMENTED",
+        "statement": "the shared object store is written once per worktree set and read by every worktree"
+      },
+      "oracle": {
+        "arrival": "STATIC",
+        "statement": "count object-store writes per worktree creation and compare against the worktree count"
+      },
+      "owner": "git-town-stacked-pr-worker",
+      "problem_id": "GS-08",
+      "requirement": "compaction work is performed once and distributed rather than repeated per replica",
+      "row_id": "DTCR-PC-004",
+      "schema": "dtcr/problem-closure-row/v1",
+      "separation": {
+        "closed_by_this_compiler": false,
+        "source_claim_rejected_is_problem_solved": false
+      },
+      "source": {
+        "identity": "Git at any scale",
+        "kind": "ARTICLE",
+        "location": "source packet for the article, section 8"
+      },
+      "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+      "vocabulary_ref": "skills/agentic-tech-lead-orchestration/references/contracts/problem-closure.schema.json"
+    }
+  ],
+  "schema": "dtcr/problem-closure-projection/v1",
+  "subject": {
+    "repository_binding_id": "DTCR-RB-0f1e2d3c4b5a6978",
+    "subject_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
+    "subject_tree": "e739d799dd8d44beb5414ed99a943ff3bacccab0"
+  },
+  "vocabulary_ref": "skills/agentic-tech-lead-orchestration/references/contracts/problem-closure.schema.json"
+}

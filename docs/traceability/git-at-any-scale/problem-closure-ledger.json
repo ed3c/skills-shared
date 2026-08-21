@@ -1,37 +1,39 @@
 {
-  "schema": "git-at-any-scale-problem-closure-ledger/v1",
+  "schema": "git-at-any-scale-problem-closure-ledger-pointer/v1",
+  "note": "This file intentionally does not restate the 28-problem denominator. The authoritative, deterministically-checked ledger lives at data/handoff/source-evidence/git-at-any-scale-closure-ledger.json; this file states this lease's program-level status over it.",
+  "ssot_ledger": "data/handoff/source-evidence/git-at-any-scale-closure-ledger.json",
   "repository_subject": {
     "repository": "ed3c/skills-shared",
-    "main": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
-    "tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7",
+    "main": "174009203a3ff9bd6ebc4010bc6cab7232dd44a4",
+    "tree": "311052ecf5780f8d91c4d2429e8ce1a50a0361d8",
     "observed": "2026-08-21"
   },
   "parent_issue": 531,
-  "problems": [
-    {"id":"GS-01","state":"PARTIALLY_CLOSED","method_owner":"existing Tech Lead/Git Town/Shadow","remaining_owner_issue":536,"live_evidence":"NOT_REQUIRED_FOR_METHOD_CLAIM","close_when":"current routes and Molecular index converge without active-writer conflict"},
-    {"id":"GS-02","state":"NOT_IMPLEMENTED_IN_THIS_REPOSITORY","method_owner":null,"remaining_owner_issue":534,"live_evidence":"NOT_EXERCISED","close_when":"bounded external hosting runtime selected and exercised or Human accepts explicit scope exclusion"},
-    {"id":"GS-03","state":"NOT_EXERCISED","method_owner":532,"remaining_owner_issue":534,"live_evidence":"REQUIRED","close_when":"matched synchronous-vs-selected architecture experiment has replayable receipts"},
-    {"id":"GS-04","state":"OPEN","method_owner":532,"remaining_owner_issue":534,"live_evidence":"REQUIRED","close_when":"portable durable-ack contract passes mutations and real runtime survives acknowledgement-boundary faults"},
-    {"id":"GS-05","state":"OPEN","method_owner":532,"remaining_owner_issue":534,"live_evidence":"REQUIRED","close_when":"transaction/CAS contract and concurrent-history linearizability oracle pass on exact runtime"},
-    {"id":"GS-06","state":"OPEN","method_owner":532,"remaining_owner_issue":534,"live_evidence":"REQUIRED","close_when":"stale-cache authority check plus destroy/rebuild canary passes"},
-    {"id":"GS-07","state":"OPEN","method_owner":532,"remaining_owner_issue":534,"live_evidence":"REQUIRED","close_when":"gossip drop/delay/reorder/duplicate changes convergence only, not correctness"},
-    {"id":"GS-08","state":"NOT_EXERCISED","method_owner":532,"remaining_owner_issue":534,"live_evidence":"REQUIRED","close_when":"compaction preserves reachability and reports CPU/network/storage denominator"},
-    {"id":"GS-09","state":"PARTIAL_GENERIC_METHOD","method_owner":532,"remaining_owner_issue":534,"live_evidence":"REQUIRED","close_when":"hosting-profile history plus corruption/partial-write/restart replay is verified"},
-    {"id":"GS-10","state":"SOURCE_PROPOSAL","method_owner":535,"remaining_owner_issue":534,"live_evidence":"REQUIRED","close_when":"matched benchmark subjects and independent readback bound each retained performance claim"}
-  ],
+  "last_check": {
+    "command": "python3 skills/agentic-tech-lead-orchestration/scripts/check_problem_closure.py data/handoff/source-evidence/git-at-any-scale-closure-ledger.json",
+    "exit_code": 0,
+    "problem_count": 28,
+    "counts": {"OPEN": 26, "NOT_APPLICABLE": 2, "PARTIAL": 0, "IMPLEMENTED_UNVERIFIED": 0, "VERIFIED_LOCAL": 0, "VERIFIED_LIVE": 0, "HUMAN_ADMIT_REQUIRED": 0}
+  },
   "program": {
+    "source_evidence_issue": 531,
     "portable_contract_issue": 532,
     "live_runtime_issue": 534,
     "shadow_issue": 535,
     "convergence_issue": 536,
-    "source_evidence_issue": 512,
+    "issue_pr_state": {
+      "531": "OPEN issue; source packet + 28-claim ledger MERGED",
+      "532": "OPEN issue; PR #542 MERGED (contract-only ceiling, see triage below)",
+      "534": "OPEN issue; NOT_EXERCISED",
+      "535": "OPEN issue; NOT_EXERCISED, blocked on #534",
+      "536": "OPEN issue; this lease (traceability + molecular index) is PARTIAL — root README/AGENTS/docs/INDEX.md convergence is separate, not-yet-done writer's work"
+    },
     "parent_close_allowed": false,
     "blocking_reasons": [
-      "immutable article bytes/hash absent",
-      "portable Git-hosting assurance implementation not admitted",
-      "physical runtime canary not exercised",
-      "independent exact-subject Shadow receipt absent",
-      "shared README/Git Town convergence blocked by active writers #412/#419"
+      "19 of 28 claims require an external hosting runtime that has not been selected or exercised (#534)",
+      "6 of 28 claims are targeted by the merged C1 contract but #532's full receipt/fixture denominator (durability/ref/cache/gossip/compaction/recovery/benchmark) is still incomplete",
+      "independent exact-subject Shadow receipt absent (#535, blocked on #534)",
+      "root README/AGENTS/docs/INDEX.md shared convergence not attempted by this lease; active writers #412/#419 on skills/git-town-stacked-pr-worker/README.md remain unreconciled"
     ]
   }
 }

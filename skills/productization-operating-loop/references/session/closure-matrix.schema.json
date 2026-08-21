@@ -1,0 +1,483 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pol/closure-matrix/v1",
+  "title": "Productization closure matrix",
+  "description": "One cell per question the composition was asked, each carrying the lane it belongs to, the ceiling of the evidence that answered it, and every claim that was made about it. The matrix exists because composition is the step where an unknown is cheapest to lose: four lane artifacts arrive with partial answers, and the shortest way to produce a tidy program is to keep whichever claim arrived last. Three keywords stop that. `claims` is required and non-empty, so a cell cannot summarise evidence it does not carry. A cell whose claims disagree is pinned to CONTRADICTION by an `if/then`, so the disagreement cannot be filed as a pass. And CONTRADICTION itself requires both halves to still be present, so the state cannot be worn by a cell that kept only one side. What the schema cannot do is judge whether the claims are true, or notice that a claim nobody wrote down is missing: it refuses a contradiction that was reconciled inside this document, not one that was reconciled before the document was written.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "matrix_id",
+    "subject_commit",
+    "evidence_ceiling",
+    "cells",
+    "unresolved_cell_ids",
+    "authority",
+    "human_owned_operations"
+  ],
+  "properties": {
+    "schema": {"const": "pol/closure-matrix/v1"},
+    "matrix_id": {"type": "string", "pattern": "^POL-CLM-[0-9]{3}$"},
+    "subject_commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$",
+      "description": "The exact commit the composed program is bound to. A branch, tag or HEAD fails the pattern, for the same reason it fails in pol/productization-program/v1: a matrix bound to a moving name describes whatever that name points at when somebody next reads it."
+    },
+    "evidence_ceiling": {
+      "const": "DETERMINISTIC_COMPOSITION",
+      "description": "A matrix is the arrangement of claims that were handed to the compiler. Arranging them proves nothing about the market, the user, the payment or the rule that produced them."
+    },
+    "cells": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/cell"}
+    },
+    "unresolved_cell_ids": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^POL-CELL-[0-9]{3}$"},
+      "description": "Every cell whose state is CONTRADICTION, UNKNOWN or BLOCKED, listed once at the top. A reader who has to count them from the body is a reader who reads the conclusion first."
+    },
+    "authority": {"$ref": "#/$defs/authority"},
+    "human_owned_operations": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 4}
+    }
+  },
+  "$defs": {
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "merge",
+        "release",
+        "product_truth",
+        "user_truth",
+        "paid_truth",
+        "rights_admission",
+        "provider_execution",
+        "production"
+      ],
+      "description": "The same eight constants pol/productization-program/v1 pins, restated rather than redefined. A matrix that could set one of them to true would be a matrix that could close a lane by arranging it.",
+      "properties": {
+        "merge": {"const": false},
+        "release": {"const": false},
+        "product_truth": {"const": false},
+        "user_truth": {"const": false},
+        "paid_truth": {"const": false},
+        "rights_admission": {"const": false},
+        "provider_execution": {"const": false},
+        "production": {"const": false}
+      }
+    },
+    "lane": {
+      "enum": [
+        "SOURCE",
+        "MARKET",
+        "USER",
+        "MECHANISM",
+        "TECHNICAL",
+        "POLICY",
+        "RIGHTS",
+        "COMMERCIAL",
+        "RUNTIME",
+        "HUMAN_ADMIT",
+        "MERGE",
+        "RELEASE"
+      ],
+      "description": "The twelve lanes owned by references/core/controlled-vocabulary.md, reused verbatim."
+    },
+    "claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_record", "statement", "disposition"],
+      "description": "One thing one lane artifact said about one cell, kept whole. Closed, so a claim cannot grow a field that quietly outranks its neighbours.",
+      "properties": {
+        "source_record": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 64,
+          "description": "The record id of the lane artifact that made this claim, so a reader can go back to the document rather than to this summary of it."
+        },
+        "statement": {"type": "string", "minLength": 8, "maxLength": 300},
+        "disposition": {
+          "enum": ["CONFIRMED", "CONTRADICTED", "UNKNOWN"],
+          "description": "UNKNOWN is a disposition, not an absence. A claim that was made and could not be settled is a different fact from a claim nobody made, and only the first one can be written here."
+        }
+      }
+    },
+    "cell": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cell_id", "lane", "question", "state", "evidence_ceiling", "claims"],
+      "properties": {
+        "cell_id": {"type": "string", "pattern": "^POL-CELL-[0-9]{3}$"},
+        "lane": {"$ref": "#/$defs/lane"},
+        "question": {"type": "string", "minLength": 8, "maxLength": 300},
+        "state": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "UNKNOWN",
+            "BLOCKED",
+            "ABSENT",
+            "NOT_IMPLEMENTED",
+            "NOT_EXERCISED",
+            "SKIPPED_BY_POLICY",
+            "NOT_APPLICABLE",
+            "HUMAN_ADMIT_REQUIRED",
+            "CONTRADICTION"
+          ],
+          "description": "The ten lane states from the core vocabulary, plus CONTRADICTION, which the program contract has no room for because a program reports one state per lane and a matrix reports one per question. CONTRADICTION is a terminal reading here: the compiler that wrote this file is not allowed to decide which of two lane artifacts was right."
+        },
+        "evidence_ceiling": {
+          "enum": [
+            "INTERFACE_LOCK_ONLY",
+            "MARKET_HYPOTHESIS_CONTRACT",
+            "USER_SCENARIO_CONTRACT",
+            "COMMERCIAL_HYPOTHESIS_CONTRACT",
+            "POLICY_PROVENANCE_AND_RETEST_ROUTING",
+            "DETERMINISTIC_COMPOSITION",
+            "DETERMINISTIC_EVAL_AND_SHADOW",
+            "BOUNDED_REAL_EXPERIMENT_ONLY"
+          ],
+          "description": "The ceiling of the evidence that produced this cell, carried per cell rather than once per document, because a matrix mixes lanes and the weakest cell is the one a reader most needs the ceiling of."
+        },
+        "claims": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/claim"}
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": ["claims"],
+            "properties": {
+              "claims": {
+                "allOf": [
+                  {"contains": {"required": ["disposition"], "properties": {"disposition": {"const": "CONFIRMED"}}}},
+                  {"contains": {"required": ["disposition"], "properties": {"disposition": {"const": "CONTRADICTED"}}}}
+                ]
+              }
+            }
+          },
+          "then": {"properties": {"state": {"const": "CONTRADICTION"}}},
+          "description": "Both dispositions present means two artifacts disagreed. The state is pinned, so the disagreement cannot be filed as PASS by whoever composed last."
+        },
+        {
+          "if": {"required": ["state"], "properties": {"state": {"const": "CONTRADICTION"}}},
+          "then": {
+            "properties": {
+              "claims": {
+                "allOf": [
+                  {"contains": {"required": ["disposition"], "properties": {"disposition": {"const": "CONFIRMED"}}}},
+                  {"contains": {"required": ["disposition"], "properties": {"disposition": {"const": "CONTRADICTED"}}}}
+                ]
+              }
+            }
+          },
+          "description": "The reverse direction, and the one that catches the tidier failure: a cell that keeps the CONTRADICTION label while dropping the half somebody disagreed with."
+        },
+        {
+          "if": {
+            "required": ["claims"],
+            "properties": {
+              "claims": {"contains": {"required": ["disposition"], "properties": {"disposition": {"const": "UNKNOWN"}}}}
+            }
+          },
+          "then": {"properties": {"state": {"not": {"enum": ["PASS"]}}}},
+          "description": "An unsettled claim cannot sit inside a cleared cell. Every other non-PASS state stays available, because an unknown alongside a blocked lane is still blocked."
+        }
+      ]
+    }
+  },
+  "examples": [
+    {
+      "schema": "pol/closure-matrix/v1",
+      "matrix_id": "POL-CLM-001",
+      "subject_commit": "174009203a3ff9bd6ebc4010bc6cab7232dd44a4",
+      "evidence_ceiling": "DETERMINISTIC_COMPOSITION",
+      "cells": [
+        {
+          "cell_id": "POL-CELL-001",
+          "lane": "MARKET",
+          "question": "is the arena thin where the wedge is claimed",
+          "state": "UNKNOWN",
+          "evidence_ceiling": "MARKET_HYPOTHESIS_CONTRACT",
+          "claims": [
+            {
+              "source_record": "POL-MKT-001",
+              "statement": "comparator enumeration located four incumbents and no case in the named segment",
+              "disposition": "UNKNOWN"
+            }
+          ]
+        },
+        {
+          "cell_id": "POL-CELL-002",
+          "lane": "USER",
+          "question": "does the scenario reach first value without an account",
+          "state": "CONTRADICTION",
+          "evidence_ceiling": "USER_SCENARIO_CONTRACT",
+          "claims": [
+            {
+              "source_record": "POL-USER-001",
+              "statement": "the scenario reaches first value with no account and no key",
+              "disposition": "CONFIRMED"
+            },
+            {
+              "source_record": "POL-CMRC-001",
+              "statement": "the payment trigger requires an account before any value is delivered",
+              "disposition": "CONTRADICTED"
+            }
+          ]
+        },
+        {
+          "cell_id": "POL-CELL-003",
+          "lane": "POLICY",
+          "question": "is the provider rule current at the observed revision",
+          "state": "HUMAN_ADMIT_REQUIRED",
+          "evidence_ceiling": "POLICY_PROVENANCE_AND_RETEST_ROUTING",
+          "claims": [
+            {
+              "source_record": "POL-POLICY-001",
+              "statement": "the observed revision changed a section this program depends on",
+              "disposition": "CONFIRMED"
+            }
+          ]
+        }
+      ],
+      "unresolved_cell_ids": ["POL-CELL-001", "POL-CELL-002"],
+      "authority": {
+        "merge": false,
+        "release": false,
+        "product_truth": false,
+        "user_truth": false,
+        "paid_truth": false,
+        "rights_admission": false,
+        "provider_execution": false,
+        "production": false
+      },
+      "human_owned_operations": [
+        "deciding which side of a CONTRADICTION cell is right",
+        "rights and licensing admission",
+        "merge and release"
+      ]
+    }
+  ],
+  "x-refusal-controls": [
+    {
+      "case_id": "POL-XC-CLM-001",
+      "refuses": "Two lane artifacts that disagree, filed as a cleared cell.",
+      "refused_by": "$defs.cell.allOf[0].then.properties.state.const",
+      "instance": {
+        "schema": "pol/closure-matrix/v1",
+        "matrix_id": "POL-CLM-002",
+        "subject_commit": "174009203a3ff9bd6ebc4010bc6cab7232dd44a4",
+        "evidence_ceiling": "DETERMINISTIC_COMPOSITION",
+        "cells": [
+          {
+            "cell_id": "POL-CELL-001",
+            "lane": "USER",
+            "question": "does the scenario reach first value without an account",
+            "state": "PASS",
+            "evidence_ceiling": "USER_SCENARIO_CONTRACT",
+            "claims": [
+              {"source_record": "POL-USER-001", "statement": "first value is reached with no account", "disposition": "CONFIRMED"},
+              {"source_record": "POL-CMRC-001", "statement": "an account is required before any value", "disposition": "CONTRADICTED"}
+            ]
+          }
+        ],
+        "unresolved_cell_ids": [],
+        "authority": {
+          "merge": false,
+          "release": false,
+          "product_truth": false,
+          "user_truth": false,
+          "paid_truth": false,
+          "rights_admission": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "POL-XC-CLM-002",
+      "refuses": "A CONTRADICTION cell that kept the label and dropped the half somebody disagreed with.",
+      "refused_by": "$defs.cell.allOf[1].then.properties.claims.allOf[1].contains",
+      "instance": {
+        "schema": "pol/closure-matrix/v1",
+        "matrix_id": "POL-CLM-003",
+        "subject_commit": "174009203a3ff9bd6ebc4010bc6cab7232dd44a4",
+        "evidence_ceiling": "DETERMINISTIC_COMPOSITION",
+        "cells": [
+          {
+            "cell_id": "POL-CELL-001",
+            "lane": "USER",
+            "question": "does the scenario reach first value without an account",
+            "state": "CONTRADICTION",
+            "evidence_ceiling": "USER_SCENARIO_CONTRACT",
+            "claims": [
+              {"source_record": "POL-USER-001", "statement": "first value is reached with no account", "disposition": "CONFIRMED"}
+            ]
+          }
+        ],
+        "unresolved_cell_ids": ["POL-CELL-001"],
+        "authority": {
+          "merge": false,
+          "release": false,
+          "product_truth": false,
+          "user_truth": false,
+          "paid_truth": false,
+          "rights_admission": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "POL-XC-CLM-003",
+      "refuses": "An unsettled claim filed inside a cleared cell.",
+      "refused_by": "$defs.cell.allOf[2].then.properties.state.not",
+      "instance": {
+        "schema": "pol/closure-matrix/v1",
+        "matrix_id": "POL-CLM-004",
+        "subject_commit": "174009203a3ff9bd6ebc4010bc6cab7232dd44a4",
+        "evidence_ceiling": "DETERMINISTIC_COMPOSITION",
+        "cells": [
+          {
+            "cell_id": "POL-CELL-001",
+            "lane": "MARKET",
+            "question": "is the arena thin where the wedge is claimed",
+            "state": "PASS",
+            "evidence_ceiling": "MARKET_HYPOTHESIS_CONTRACT",
+            "claims": [
+              {"source_record": "POL-MKT-001", "statement": "no comparator case was located in the named segment", "disposition": "UNKNOWN"}
+            ]
+          }
+        ],
+        "unresolved_cell_ids": ["POL-CELL-001"],
+        "authority": {
+          "merge": false,
+          "release": false,
+          "product_truth": false,
+          "user_truth": false,
+          "paid_truth": false,
+          "rights_admission": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "POL-XC-CLM-004",
+      "refuses": "A cell that reports a state while carrying none of the claims it summarises.",
+      "refused_by": "$defs.cell.properties.claims.minItems",
+      "instance": {
+        "schema": "pol/closure-matrix/v1",
+        "matrix_id": "POL-CLM-005",
+        "subject_commit": "174009203a3ff9bd6ebc4010bc6cab7232dd44a4",
+        "evidence_ceiling": "DETERMINISTIC_COMPOSITION",
+        "cells": [
+          {
+            "cell_id": "POL-CELL-001",
+            "lane": "COMMERCIAL",
+            "question": "would the named buyer pay at the hypothesised price",
+            "state": "UNKNOWN",
+            "evidence_ceiling": "COMMERCIAL_HYPOTHESIS_CONTRACT",
+            "claims": []
+          }
+        ],
+        "unresolved_cell_ids": ["POL-CELL-001"],
+        "authority": {
+          "merge": false,
+          "release": false,
+          "product_truth": false,
+          "user_truth": false,
+          "paid_truth": false,
+          "rights_admission": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "POL-XC-CLM-005",
+      "refuses": "Authority widening: a matrix that grants itself merge by arranging the claims that reached it.",
+      "refused_by": "$defs.authority.properties.merge.const",
+      "instance": {
+        "schema": "pol/closure-matrix/v1",
+        "matrix_id": "POL-CLM-006",
+        "subject_commit": "174009203a3ff9bd6ebc4010bc6cab7232dd44a4",
+        "evidence_ceiling": "DETERMINISTIC_COMPOSITION",
+        "cells": [
+          {
+            "cell_id": "POL-CELL-001",
+            "lane": "TECHNICAL",
+            "question": "does the named command exit zero at this commit",
+            "state": "PASS",
+            "evidence_ceiling": "DETERMINISTIC_COMPOSITION",
+            "claims": [
+              {"source_record": "POL-PROG-010", "statement": "the committed suite exited zero at this commit", "disposition": "CONFIRMED"}
+            ]
+          }
+        ],
+        "unresolved_cell_ids": [],
+        "authority": {
+          "merge": true,
+          "release": false,
+          "product_truth": false,
+          "user_truth": false,
+          "paid_truth": false,
+          "rights_admission": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "POL-XC-CLM-006",
+      "refuses": "A mutable subject: a branch name where a content-bound identity belongs.",
+      "refused_by": "properties.subject_commit.pattern",
+      "instance": {
+        "schema": "pol/closure-matrix/v1",
+        "matrix_id": "POL-CLM-007",
+        "subject_commit": "main",
+        "evidence_ceiling": "DETERMINISTIC_COMPOSITION",
+        "cells": [
+          {
+            "cell_id": "POL-CELL-001",
+            "lane": "SOURCE",
+            "question": "was the source read back independently",
+            "state": "PASS",
+            "evidence_ceiling": "INTERFACE_LOCK_ONLY",
+            "claims": [
+              {"source_record": "POL-PROG-010", "statement": "every file on that head was read from the object store", "disposition": "CONFIRMED"}
+            ]
+          }
+        ],
+        "unresolved_cell_ids": [],
+        "authority": {
+          "merge": false,
+          "release": false,
+          "product_truth": false,
+          "user_truth": false,
+          "paid_truth": false,
+          "rights_admission": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "human_owned_operations": ["merge and release"]
+      }
+    }
+  ]
+}

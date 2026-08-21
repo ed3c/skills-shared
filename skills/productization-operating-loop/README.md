@@ -28,6 +28,19 @@ that the later work exists.
 5. [`references/core/source-proposal-audit.md`](references/core/source-proposal-audit.md)
    — what the preparation branch contained, and what this freeze admitted and
    refused from it.
+6. The four Stage-1 lane contracts —
+   [`references/market/market-lane.schema.json`](references/market/market-lane.schema.json),
+   [`references/user/user-lane.schema.json`](references/user/user-lane.schema.json),
+   [`references/commercial/commercial-lane.schema.json`](references/commercial/commercial-lane.schema.json),
+   [`references/policy/policy-lane.schema.json`](references/policy/policy-lane.schema.json)
+   — each beside its own vocabulary file.
+7. The three Stage-2 session contracts —
+   [`references/session/closure-matrix.schema.json`](references/session/closure-matrix.schema.json),
+   [`references/session/session-dag.schema.json`](references/session/session-dag.schema.json),
+   [`references/session/outcome-foldback-request.schema.json`](references/session/outcome-foldback-request.schema.json)
+   — what [`scripts/compile_pol_composition.py`](scripts/compile_pol_composition.py)
+   emits and refuses against: byte-stable canonical JSON, `--check`, and named
+   K-code refusals with exit 2, never a silent downgrade.
 
 ## What is here
 
@@ -37,9 +50,21 @@ references/
 │   ├── controlled-vocabulary.md    lanes, lane states, program states, laws
 │   ├── evidence-ladder.md          the ten rungs and the substitution law
 │   └── source-proposal-audit.md    what the source proposal contributed
+├── market/                         market-lane.schema.json + vocabulary
+├── user/                           user-lane.schema.json + vocabulary
+├── commercial/                     commercial-lane.schema.json + vocabulary
+├── policy/                         policy-lane.schema.json + vocabulary
+├── session/                        closure-matrix, session-dag,
+│                                   outcome-foldback-request (Stage-2 outputs)
 ├── productization-program.schema.json
 │                                   pol/productization-program/v1
 └── composition-manifest.json       pol/composition-manifest/v1
+scripts/
+└── compile_pol_composition.py      deterministic Stage-2 composition compiler
+tests/
+├── selftest.py                     tree-derived suite: every schema, every
+│                                   control, per-control knockout
+└── run-all.sh                      CI entrypoint, routed by skill-suites.yml
 ```
 
 ## What the contract makes structurally impossible
