@@ -1,0 +1,1430 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ghpc/subagent-join/v1",
+  "title": "Subagent dispatch and join barrier",
+  "description": "The barrier between dispatching agents and being allowed to act on what they said. Dispatch is not completion: the failure this contract exists to stop is a coordinator that receives one useful answer, finds it sufficient, and advances an Issue, a lease, an epoch, a merge or a closure while other requested agents are still running or have already failed quietly. Four keywords hold the barrier. `coordinator_instruction` is a const, so the one sentence this plane may not paraphrase arrives byte-identical. A non-terminal agent anywhere in `requested_agents` pins `join_state` to JOIN_INCOMPLETE. A non-empty `advanced_transitions` pins it to FINDINGS_CONSOLIDATED, so nothing advances between terminal and consolidated. And `in_denominator` is pinned true on every result, so a cancelled or failed agent stays counted instead of becoming an absence that reads as agreement. What the schema cannot do is know which agents should have been requested: it refuses a join that under-reports the agents it names, not a join that never named them.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "join_id",
+    "epoch_ref",
+    "coordinator_instruction",
+    "required_roles",
+    "requested_agents",
+    "join_state",
+    "advanced_transitions",
+    "consolidation",
+    "evidence_ceiling",
+    "authority",
+    "human_owned_operations"
+  ],
+  "properties": {
+    "schema": {"const": "ghpc/subagent-join/v1"},
+    "join_id": {
+      "type": "string",
+      "pattern": "^GHPC-JOIN-[0-9]{3}$",
+      "description": "Identifiers in the 900-999 block are reserved for shape-only instances inside `examples`; the checker refuses one inside a real bundle."
+    },
+    "epoch_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["main_commit", "tree"],
+      "description": "The epoch this join belongs to, by content. The checker refuses a bundle whose join and epoch disagree here, because two members bound to different subjects describe a picture that never existed.",
+      "properties": {
+        "main_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "tree": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+      }
+    },
+    "coordinator_instruction": {
+      "const": "Use subagents. Wait for all agents and consolidate their findings.",
+      "description": "Preserved verbatim as data. The second half of the sentence is the half that gets dropped when a coordinator paraphrases, and dropping it is exactly the failure the rest of this schema is built around, so the string is pinned rather than described. references/coordinator-instruction.json carries the same bytes as an independent arrival."
+    },
+    "required_roles": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/role"},
+      "description": "What this wave decided it needs. The checker refuses a bundle where a required role has no requested agent; the schema cannot, because the two lists are not comparable inside one document."
+    },
+    "requested_agents": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/agent_result"},
+      "description": "Every agent this join is waiting on, whatever happened to it. Not the agents that returned something usable."
+    },
+    "join_state": {
+      "enum": [
+        "JOIN_INCOMPLETE",
+        "ALL_REQUIRED_AGENTS_TERMINAL",
+        "RESULTS_SCHEMA_VALIDATED",
+        "FINDINGS_CONSOLIDATED"
+      ]
+    },
+    "advanced_transitions": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/portfolio_state"},
+      "description": "The portfolio states this join permitted the plane to enter. Empty is the normal value; a non-empty list is a claim that the barrier was cleared, and it is pinned to the consolidated state below."
+    },
+    "consolidation": {"$ref": "#/$defs/consolidation"},
+    "evidence_ceiling": {
+      "const": "JOIN_DENOMINATOR_ONLY",
+      "description": "A join settles that every requested agent is accounted for. It settles nothing about whether any of them was right."
+    },
+    "authority": {"$ref": "#/$defs/authority"},
+    "human_owned_operations": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 4}
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "required": ["requested_agents"],
+        "properties": {
+          "requested_agents": {
+            "contains": {
+              "type": "object",
+              "required": ["terminal_state"],
+              "properties": {"terminal_state": {"enum": ["DISPATCHED", "RUNNING"]}}
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "join_state": {
+            "const": "JOIN_INCOMPLETE",
+            "description": "One agent still in flight is the whole join still in flight."
+          }
+        }
+      },
+      "description": "SUBAGENT_RESULT_ACCEPTED_BEFORE_JOIN. A coordinator that has one good answer and one running agent has an incomplete join, not a majority."
+    },
+    {
+      "if": {
+        "required": ["advanced_transitions"],
+        "properties": {"advanced_transitions": {"minItems": 1}}
+      },
+      "then": {
+        "properties": {
+          "join_state": {
+            "const": "FINDINGS_CONSOLIDATED",
+            "description": "Terminal is not consolidated. Advancing between the two is how a contradiction between two terminal agents gets skipped."
+          }
+        }
+      },
+      "description": "Nothing advances on a join that has not consolidated. Together with the rule above, this is the barrier: non-terminal pins the state to incomplete, and incomplete cannot advance."
+    }
+  ],
+  "$defs": {
+    "role": {
+      "enum": [
+        "portfolio-explorer",
+        "acceptance-adversary",
+        "dependency-auditor",
+        "runtime-admission-auditor",
+        "implementation-worker",
+        "consolidation-verifier",
+        "release-auditor"
+      ],
+      "description": "The seven roles owned by references/controlled-vocabulary.md. Read-only roles come first by convention; only implementation-worker may hold an exclusive write lease."
+    },
+    "portfolio_state": {
+      "enum": [
+        "REQUEST_BOUND",
+        "RUNTIME_AND_AUTHORITY_ADMITTED",
+        "REPOSITORY_SET_FROZEN",
+        "GITHUB_SNAPSHOT_EPOCH_BOUND",
+        "ISSUE_PR_DENOMINATOR_COMPLETE",
+        "ACCEPTANCE_CONTRACTS_COMPILED",
+        "ADVERSARIAL_DRIFT_AUDITED",
+        "MULTI_GRAPH_MODEL_ASSERTED",
+        "READY_WAVES_COMPUTED",
+        "SUBAGENTS_DISPATCHED",
+        "ALL_REQUIRED_AGENTS_TERMINAL",
+        "RESULTS_SCHEMA_VALIDATED",
+        "FINDINGS_CONSOLIDATED",
+        "LOCAL_WORKTREES_EXECUTED",
+        "EXACT_HEAD_LOCAL_GATES_PASS",
+        "DRAFT_PUBLICATION",
+        "ONE_SHOT_CI_EPOCH",
+        "CI_JOBS_STEPS_ARTIFACTS_READ_BACK",
+        "PR_ACCEPTANCE_RECONCILED",
+        "READY_FOR_HUMAN_ADMIT",
+        "MERGE_IN_TRUE_DEPENDENCY_ORDER",
+        "EXACT_MAIN_READBACK",
+        "ISSUE_CLOSURE_RECONCILED",
+        "PORTFOLIO_EPOCH_CLOSED"
+      ]
+    },
+    "lease": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "paths"],
+      "description": "What this agent was allowed to touch. Parallel writers are admitted only when their exclusive path sets are disjoint, which the checker compares across the bundle.",
+      "properties": {
+        "mode": {"enum": ["EXCLUSIVE_WRITE", "READ_ONLY", "NONE"]},
+        "paths": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1, "maxLength": 300}
+        }
+      },
+      "allOf": [
+        {
+          "if": {"required": ["mode"], "properties": {"mode": {"const": "EXCLUSIVE_WRITE"}}},
+          "then": {
+            "properties": {
+              "paths": {
+                "minItems": 1,
+                "description": "An exclusive lease over nothing excludes nobody, and two of them look disjoint."
+              }
+            }
+          },
+          "description": "OVERLAPPING_WRITERS_FALSELY_PARALLELIZED begins with a writer whose lease names no paths."
+        }
+      ]
+    },
+    "model_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["alias", "provider", "carrier", "exact_model", "config_effort", "availability", "identity_grade"],
+      "description": "The alias a policy asked for, and what actually answered. FABLE_5, OPUS_5 and SONNET_5 are routing labels; treating one as an executable identity is MODEL_ALIAS_REPORTED_AS_EXACT_IDENTITY, and the two rules below are what stop it.",
+      "properties": {
+        "alias": {"enum": ["FABLE_5", "OPUS_5", "SONNET_5"]},
+        "provider": {"type": "string", "minLength": 2, "maxLength": 80},
+        "carrier": {"type": "string", "minLength": 2, "maxLength": 80},
+        "exact_model": {
+          "type": ["string", "null"],
+          "minLength": 1,
+          "maxLength": 120,
+          "description": "Null when nothing answered. A string here is only as strong as `identity_grade` says it is."
+        },
+        "config_effort": {"type": ["string", "null"], "maxLength": 80},
+        "availability": {"enum": ["AVAILABLE", "ABSENT"]},
+        "identity_grade": {
+          "enum": ["EXACT_BOUND", "SELF_REPORTED", "ALIAS_ONLY"],
+          "description": "EXACT_BOUND means the identity was read from the carrier's own provenance. SELF_REPORTED means the running model said so, which is prompt text and not provenance. ALIAS_ONLY means only the policy label is known. The three are not interchangeable and the distinction is the whole reason this object exists."
+        }
+      },
+      "allOf": [
+        {
+          "if": {"required": ["availability"], "properties": {"availability": {"const": "ABSENT"}}},
+          "then": {
+            "properties": {
+              "exact_model": {
+                "const": null,
+                "description": "Nothing answered, so there is no model to name."
+              }
+            }
+          },
+          "description": "An absent alias with a model name attached is the report that Fable 5 ran when Fable 5 was unavailable."
+        },
+        {
+          "if": {"required": ["availability"], "properties": {"availability": {"const": "ABSENT"}}},
+          "then": {
+            "properties": {
+              "identity_grade": {
+                "const": "ALIAS_ONLY",
+                "description": "An absent alias can be graded no higher than the label itself."
+              }
+            }
+          },
+          "description": "The grade half of the same promotion, kept separate so each half fails on its own keyword."
+        },
+        {
+          "if": {
+            "required": ["identity_grade", "availability"],
+            "properties": {
+              "identity_grade": {"const": "EXACT_BOUND"},
+              "availability": {"const": "AVAILABLE"}
+            }
+          },
+          "then": {
+            "properties": {
+              "exact_model": {
+                "type": "string",
+                "description": "A binding exact enough to be graded EXACT_BOUND is exact enough to name."
+              }
+            }
+          },
+          "description": "EXACT_BOUND bound to nothing is a grade wearing no subject. The condition also requires AVAILABLE so that an absent alias is judged by the two rules above and by exactly one of them at a time; overlapping guards would make each of them unfalsifiable."
+        }
+      ]
+    },
+    "data_boundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository_visibility", "provider_boundary_crossed", "egress_admission"],
+      "properties": {
+        "repository_visibility": {"enum": ["PUBLIC", "PRIVATE", "UNKNOWN"]},
+        "provider_boundary_crossed": {
+          "type": "boolean",
+          "description": "True when repository content reached a provider other than the one named in this agent's own `model_binding.provider`. Dispatching an agent onto its own admitted carrier is the dispatch; sending the same bytes somewhere else is an egress."
+        },
+        "egress_admission": {"enum": ["ADMITTED", "DENIED", "NOT_REQUIRED"]}
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": ["repository_visibility", "provider_boundary_crossed"],
+            "properties": {
+              "repository_visibility": {"enum": ["PRIVATE", "UNKNOWN"]},
+              "provider_boundary_crossed": {"const": true}
+            }
+          },
+          "then": {
+            "properties": {
+              "egress_admission": {
+                "enum": ["ADMITTED"],
+                "description": "Deny by default, and UNKNOWN fails closed with PRIVATE. A visibility nobody read is not a visibility that cleared."
+              }
+            }
+          },
+          "description": "PRIVATE_REPO_DISPATCH_WITHOUT_EGRESS_ADMISSION, with UNKNOWN treated as private because that is what failing closed means."
+        }
+      ]
+    },
+    "agent_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "role",
+        "task_id",
+        "attempt",
+        "agent_id",
+        "host",
+        "base_commit",
+        "tree",
+        "lease",
+        "model_binding",
+        "data_boundary",
+        "terminal_state",
+        "in_denominator",
+        "result_digest"
+      ],
+      "description": "One requested agent, identity-bound. Closed at this level on purpose: the field somebody would add here is the transcript, and persisting private chain of thought is the one storage decision this plane forbids outright. Findings, evidence, commands, receipts and bounded rationale belong in the result the digest points at.",
+      "properties": {
+        "role": {"$ref": "#/$defs/role"},
+        "task_id": {"type": "string", "pattern": "^GHPC-TASK-[0-9]{3}$"},
+        "attempt": {"type": "integer", "minimum": 1},
+        "agent_id": {"type": "string", "minLength": 3, "maxLength": 120},
+        "host": {
+          "enum": [
+            "CLAUDE_CODE_LOCAL",
+            "CODEX_CLI_LOCAL",
+            "GITHUB_ACTIONS",
+            "CHATGPT_DESKTOP_WORKTREE",
+            "CHATGPT_GITHUB_CONNECTOR",
+            "UNKNOWN"
+          ]
+        },
+        "base_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "tree": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "lease": {"$ref": "#/$defs/lease"},
+        "model_binding": {"$ref": "#/$defs/model_binding"},
+        "data_boundary": {"$ref": "#/$defs/data_boundary"},
+        "terminal_state": {
+          "enum": [
+            "DISPATCHED",
+            "RUNNING",
+            "COMPLETED",
+            "FAILED",
+            "CANCELLED",
+            "BLOCKED",
+            "STALE",
+            "UNAVAILABLE"
+          ],
+          "description": "DISPATCHED and RUNNING are the two non-terminal values. The other six are outcomes, and every one of them stays in the denominator."
+        },
+        "in_denominator": {
+          "const": true,
+          "description": "Pinned. FAILED_OR_CANCELLED_AGENT_DROPPED_FROM_DENOMINATOR is not usually a deletion; it is a quiet reclassification of an agent as one that was never really requested."
+        },
+        "result_digest": {
+          "type": ["string", "null"],
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "description": "The content digest of the result this agent produced, or null when it produced none. A summary of a result is not a result."
+        }
+      },
+      "allOf": [
+        {
+          "if": {"required": ["terminal_state"], "properties": {"terminal_state": {"const": "COMPLETED"}}},
+          "then": {
+            "properties": {
+              "result_digest": {
+                "type": "string",
+                "description": "A completed agent produced something, and the something is what the join consolidates."
+              }
+            }
+          },
+          "description": "COMPLETED with no result is a state nobody can consolidate and everybody can count."
+        }
+      ]
+    },
+    "consolidation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["agreements", "contradictions", "omissions", "unresolved_blockers"],
+      "description": "All four lists, always. Any of them may be empty; none of them may be missing, because a consolidation that reports only agreements reports agreement by omission.",
+      "properties": {
+        "agreements": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 8}},
+        "contradictions": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 8}},
+        "omissions": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 8}},
+        "unresolved_blockers": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 8}}
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["merge", "release", "promotion", "provider_execution", "production"],
+      "properties": {
+        "merge": {"const": false},
+        "release": {"const": false},
+        "promotion": {"const": false},
+        "provider_execution": {"const": false},
+        "production": {"const": false}
+      }
+    }
+  },
+  "examples": [
+    {
+      "schema": "ghpc/subagent-join/v1",
+      "join_id": "GHPC-JOIN-001",
+      "epoch_ref": {
+        "main_commit": "3fc020414134999227aec6ba9304a08e86287033",
+        "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d"
+      },
+      "coordinator_instruction": "Use subagents. Wait for all agents and consolidate their findings.",
+      "required_roles": ["implementation-worker"],
+      "requested_agents": [
+        {
+          "role": "implementation-worker",
+          "task_id": "GHPC-TASK-560",
+          "attempt": 1,
+          "agent_id": "wf_187a4bb9-606-2",
+          "host": "CLAUDE_CODE_LOCAL",
+          "base_commit": "3fc020414134999227aec6ba9304a08e86287033",
+          "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d",
+          "lease": {
+            "mode": "EXCLUSIVE_WRITE",
+            "paths": ["skills/github-portfolio-control/**"]
+          },
+          "model_binding": {
+            "alias": "OPUS_5",
+            "provider": "anthropic",
+            "carrier": "claude-code",
+            "exact_model": "claude-opus-5[1m]",
+            "config_effort": null,
+            "availability": "AVAILABLE",
+            "identity_grade": "SELF_REPORTED"
+          },
+          "data_boundary": {
+            "repository_visibility": "UNKNOWN",
+            "provider_boundary_crossed": false,
+            "egress_admission": "NOT_REQUIRED"
+          },
+          "terminal_state": "RUNNING",
+          "in_denominator": true,
+          "result_digest": null
+        }
+      ],
+      "join_state": "JOIN_INCOMPLETE",
+      "advanced_transitions": [],
+      "consolidation": {
+        "agreements": [],
+        "contradictions": [],
+        "omissions": [
+          "no acceptance-adversary, dependency-auditor or release-auditor was requested in this wave, so their findings are absent rather than negative"
+        ],
+        "unresolved_blockers": [
+          "the requested implementation-worker had not terminated when this record was written"
+        ]
+      },
+      "evidence_ceiling": "JOIN_DENOMINATOR_ONLY",
+      "authority": {
+        "merge": false,
+        "release": false,
+        "promotion": false,
+        "provider_execution": false,
+        "production": false
+      },
+      "human_owned_operations": [
+        "merge and release",
+        "admitting a provider data-egress boundary for private repository content"
+      ]
+    },
+    {
+      "schema": "ghpc/subagent-join/v1",
+      "join_id": "GHPC-JOIN-900",
+      "epoch_ref": {
+        "main_commit": "3fc020414134999227aec6ba9304a08e86287033",
+        "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d"
+      },
+      "coordinator_instruction": "Use subagents. Wait for all agents and consolidate their findings.",
+      "required_roles": ["acceptance-adversary", "dependency-auditor", "implementation-worker"],
+      "requested_agents": [
+        {
+          "role": "acceptance-adversary",
+          "task_id": "GHPC-TASK-901",
+          "attempt": 1,
+          "agent_id": "shape-only-adversary",
+          "host": "CODEX_CLI_LOCAL",
+          "base_commit": "3fc020414134999227aec6ba9304a08e86287033",
+          "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d",
+          "lease": {"mode": "READ_ONLY", "paths": []},
+          "model_binding": {
+            "alias": "OPUS_5",
+            "provider": "shape-only",
+            "carrier": "shape-only",
+            "exact_model": null,
+            "config_effort": null,
+            "availability": "ABSENT",
+            "identity_grade": "ALIAS_ONLY"
+          },
+          "data_boundary": {
+            "repository_visibility": "PRIVATE",
+            "provider_boundary_crossed": false,
+            "egress_admission": "DENIED"
+          },
+          "terminal_state": "UNAVAILABLE",
+          "in_denominator": true,
+          "result_digest": null
+        },
+        {
+          "role": "dependency-auditor",
+          "task_id": "GHPC-TASK-902",
+          "attempt": 2,
+          "agent_id": "shape-only-dependency",
+          "host": "CODEX_CLI_LOCAL",
+          "base_commit": "3fc020414134999227aec6ba9304a08e86287033",
+          "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d",
+          "lease": {"mode": "READ_ONLY", "paths": []},
+          "model_binding": {
+            "alias": "FABLE_5",
+            "provider": "shape-only",
+            "carrier": "shape-only",
+            "exact_model": null,
+            "config_effort": null,
+            "availability": "ABSENT",
+            "identity_grade": "ALIAS_ONLY"
+          },
+          "data_boundary": {
+            "repository_visibility": "PRIVATE",
+            "provider_boundary_crossed": false,
+            "egress_admission": "DENIED"
+          },
+          "terminal_state": "CANCELLED",
+          "in_denominator": true,
+          "result_digest": null
+        },
+        {
+          "role": "implementation-worker",
+          "task_id": "GHPC-TASK-903",
+          "attempt": 1,
+          "agent_id": "shape-only-worker",
+          "host": "CODEX_CLI_LOCAL",
+          "base_commit": "3fc020414134999227aec6ba9304a08e86287033",
+          "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d",
+          "lease": {"mode": "EXCLUSIVE_WRITE", "paths": ["shape-only/**"]},
+          "model_binding": {
+            "alias": "SONNET_5",
+            "provider": "shape-only",
+            "carrier": "shape-only",
+            "exact_model": null,
+            "config_effort": null,
+            "availability": "ABSENT",
+            "identity_grade": "ALIAS_ONLY"
+          },
+          "data_boundary": {
+            "repository_visibility": "PRIVATE",
+            "provider_boundary_crossed": false,
+            "egress_admission": "DENIED"
+          },
+          "terminal_state": "BLOCKED",
+          "in_denominator": true,
+          "result_digest": null
+        }
+      ],
+      "join_state": "FINDINGS_CONSOLIDATED",
+      "advanced_transitions": ["ALL_REQUIRED_AGENTS_TERMINAL", "FINDINGS_CONSOLIDATED"],
+      "consolidation": {
+        "agreements": [],
+        "contradictions": [],
+        "omissions": ["no agent produced a result, so every finding this wave has is an absence"],
+        "unresolved_blockers": [
+          "every requested agent reached a terminal state without producing a result, so the join is complete and the wave is not"
+        ]
+      },
+      "evidence_ceiling": "JOIN_DENOMINATOR_ONLY",
+      "authority": {
+        "merge": false,
+        "release": false,
+        "promotion": false,
+        "provider_execution": false,
+        "production": false
+      },
+      "human_owned_operations": ["merge and release"]
+    }
+  ],
+  "x-refusal-controls": [
+    {
+      "case_id": "GHPC-XC-JOIN-001",
+      "refuses": "A paraphrased coordinator instruction, which is how the waiting half gets dropped.",
+      "refused_by": "properties.coordinator_instruction.const",
+      "instance": {
+        "schema": "ghpc/subagent-join/v1",
+        "join_id": "GHPC-JOIN-101",
+        "epoch_ref": {
+          "main_commit": "3fc020414134999227aec6ba9304a08e86287033",
+          "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d"
+        },
+        "coordinator_instruction": "Use subagents and consolidate their findings.",
+        "required_roles": ["implementation-worker"],
+        "requested_agents": [
+          {
+            "role": "implementation-worker",
+            "task_id": "GHPC-TASK-101",
+            "attempt": 1,
+            "agent_id": "worker-a",
+            "host": "CODEX_CLI_LOCAL",
+            "base_commit": "3fc020414134999227aec6ba9304a08e86287033",
+            "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d",
+            "lease": {"mode": "EXCLUSIVE_WRITE", "paths": ["skills/example/**"]},
+            "model_binding": {
+              "alias": "SONNET_5",
+              "provider": "example",
+              "carrier": "example",
+              "exact_model": null,
+              "config_effort": null,
+              "availability": "ABSENT",
+              "identity_grade": "ALIAS_ONLY"
+            },
+            "data_boundary": {
+              "repository_visibility": "UNKNOWN",
+              "provider_boundary_crossed": false,
+              "egress_admission": "NOT_REQUIRED"
+            },
+            "terminal_state": "UNAVAILABLE",
+            "in_denominator": true,
+            "result_digest": null
+          }
+        ],
+        "join_state": "JOIN_INCOMPLETE",
+        "advanced_transitions": [],
+        "consolidation": {
+          "agreements": [],
+          "contradictions": [],
+          "omissions": [],
+          "unresolved_blockers": ["the only requested agent was unavailable"]
+        },
+        "evidence_ceiling": "JOIN_DENOMINATOR_ONLY",
+        "authority": {
+          "merge": false,
+          "release": false,
+          "promotion": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "GHPC-XC-JOIN-002",
+      "refuses": "A join declared consolidated while one requested agent is still running.",
+      "refused_by": "allOf[0].then.properties.join_state.const",
+      "instance": {
+        "schema": "ghpc/subagent-join/v1",
+        "join_id": "GHPC-JOIN-102",
+        "epoch_ref": {
+          "main_commit": "3fc020414134999227aec6ba9304a08e86287033",
+          "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d"
+        },
+        "coordinator_instruction": "Use subagents. Wait for all agents and consolidate their findings.",
+        "required_roles": ["implementation-worker", "consolidation-verifier"],
+        "requested_agents": [
+          {
+            "role": "implementation-worker",
+            "task_id": "GHPC-TASK-102",
+            "attempt": 1,
+            "agent_id": "worker-a",
+            "host": "CODEX_CLI_LOCAL",
+            "base_commit": "3fc020414134999227aec6ba9304a08e86287033",
+            "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d",
+            "lease": {"mode": "EXCLUSIVE_WRITE", "paths": ["skills/example/**"]},
+            "model_binding": {
+              "alias": "SONNET_5",
+              "provider": "example",
+              "carrier": "example",
+              "exact_model": "example-model-1",
+              "config_effort": null,
+              "availability": "AVAILABLE",
+              "identity_grade": "EXACT_BOUND"
+            },
+            "data_boundary": {
+              "repository_visibility": "UNKNOWN",
+              "provider_boundary_crossed": false,
+              "egress_admission": "NOT_REQUIRED"
+            },
+            "terminal_state": "COMPLETED",
+            "in_denominator": true,
+            "result_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000001"
+          },
+          {
+            "role": "consolidation-verifier",
+            "task_id": "GHPC-TASK-103",
+            "attempt": 1,
+            "agent_id": "verifier-a",
+            "host": "CODEX_CLI_LOCAL",
+            "base_commit": "3fc020414134999227aec6ba9304a08e86287033",
+            "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d",
+            "lease": {"mode": "READ_ONLY", "paths": []},
+            "model_binding": {
+              "alias": "OPUS_5",
+              "provider": "example",
+              "carrier": "example",
+              "exact_model": "example-model-2",
+              "config_effort": null,
+              "availability": "AVAILABLE",
+              "identity_grade": "EXACT_BOUND"
+            },
+            "data_boundary": {
+              "repository_visibility": "UNKNOWN",
+              "provider_boundary_crossed": false,
+              "egress_admission": "NOT_REQUIRED"
+            },
+            "terminal_state": "RUNNING",
+            "in_denominator": true,
+            "result_digest": null
+          }
+        ],
+        "join_state": "FINDINGS_CONSOLIDATED",
+        "advanced_transitions": [],
+        "consolidation": {
+          "agreements": ["the worker reported its lease was disjoint from every other lease"],
+          "contradictions": [],
+          "omissions": [],
+          "unresolved_blockers": []
+        },
+        "evidence_ceiling": "JOIN_DENOMINATOR_ONLY",
+        "authority": {
+          "merge": false,
+          "release": false,
+          "promotion": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "GHPC-XC-JOIN-003",
+      "refuses": "A plane advanced at terminal rather than at consolidated, skipping the step where contradictions surface.",
+      "refused_by": "allOf[1].then.properties.join_state.const",
+      "instance": {
+        "schema": "ghpc/subagent-join/v1",
+        "join_id": "GHPC-JOIN-103",
+        "epoch_ref": {
+          "main_commit": "3fc020414134999227aec6ba9304a08e86287033",
+          "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d"
+        },
+        "coordinator_instruction": "Use subagents. Wait for all agents and consolidate their findings.",
+        "required_roles": ["implementation-worker"],
+        "requested_agents": [
+          {
+            "role": "implementation-worker",
+            "task_id": "GHPC-TASK-104",
+            "attempt": 1,
+            "agent_id": "worker-a",
+            "host": "CODEX_CLI_LOCAL",
+            "base_commit": "3fc020414134999227aec6ba9304a08e86287033",
+            "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d",
+            "lease": {"mode": "EXCLUSIVE_WRITE", "paths": ["skills/example/**"]},
+            "model_binding": {
+              "alias": "SONNET_5",
+              "provider": "example",
+              "carrier": "example",
+              "exact_model": "example-model-1",
+              "config_effort": null,
+              "availability": "AVAILABLE",
+              "identity_grade": "EXACT_BOUND"
+            },
+            "data_boundary": {
+              "repository_visibility": "UNKNOWN",
+              "provider_boundary_crossed": false,
+              "egress_admission": "NOT_REQUIRED"
+            },
+            "terminal_state": "COMPLETED",
+            "in_denominator": true,
+            "result_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        ],
+        "join_state": "ALL_REQUIRED_AGENTS_TERMINAL",
+        "advanced_transitions": ["LOCAL_WORKTREES_EXECUTED"],
+        "consolidation": {
+          "agreements": [],
+          "contradictions": [],
+          "omissions": [],
+          "unresolved_blockers": []
+        },
+        "evidence_ceiling": "JOIN_DENOMINATOR_ONLY",
+        "authority": {
+          "merge": false,
+          "release": false,
+          "promotion": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "GHPC-XC-JOIN-004",
+      "refuses": "A cancelled agent reclassified out of the denominator, so the join reads as complete.",
+      "refused_by": "$defs.agent_result.properties.in_denominator.const",
+      "instance": {
+        "schema": "ghpc/subagent-join/v1",
+        "join_id": "GHPC-JOIN-104",
+        "epoch_ref": {
+          "main_commit": "3fc020414134999227aec6ba9304a08e86287033",
+          "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d"
+        },
+        "coordinator_instruction": "Use subagents. Wait for all agents and consolidate their findings.",
+        "required_roles": ["acceptance-adversary"],
+        "requested_agents": [
+          {
+            "role": "acceptance-adversary",
+            "task_id": "GHPC-TASK-105",
+            "attempt": 1,
+            "agent_id": "adversary-a",
+            "host": "CODEX_CLI_LOCAL",
+            "base_commit": "3fc020414134999227aec6ba9304a08e86287033",
+            "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d",
+            "lease": {"mode": "READ_ONLY", "paths": []},
+            "model_binding": {
+              "alias": "OPUS_5",
+              "provider": "example",
+              "carrier": "example",
+              "exact_model": null,
+              "config_effort": null,
+              "availability": "ABSENT",
+              "identity_grade": "ALIAS_ONLY"
+            },
+            "data_boundary": {
+              "repository_visibility": "UNKNOWN",
+              "provider_boundary_crossed": false,
+              "egress_admission": "NOT_REQUIRED"
+            },
+            "terminal_state": "CANCELLED",
+            "in_denominator": false,
+            "result_digest": null
+          }
+        ],
+        "join_state": "FINDINGS_CONSOLIDATED",
+        "advanced_transitions": [],
+        "consolidation": {
+          "agreements": [],
+          "contradictions": [],
+          "omissions": [],
+          "unresolved_blockers": []
+        },
+        "evidence_ceiling": "JOIN_DENOMINATOR_ONLY",
+        "authority": {
+          "merge": false,
+          "release": false,
+          "promotion": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "GHPC-XC-JOIN-005",
+      "refuses": "An absent alias carrying a model name, which is the report that Fable 5 ran when nothing did.",
+      "refused_by": "$defs.model_binding.allOf[0].then.properties.exact_model.const",
+      "instance": {
+        "schema": "ghpc/subagent-join/v1",
+        "join_id": "GHPC-JOIN-105",
+        "epoch_ref": {
+          "main_commit": "3fc020414134999227aec6ba9304a08e86287033",
+          "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d"
+        },
+        "coordinator_instruction": "Use subagents. Wait for all agents and consolidate their findings.",
+        "required_roles": ["portfolio-explorer"],
+        "requested_agents": [
+          {
+            "role": "portfolio-explorer",
+            "task_id": "GHPC-TASK-106",
+            "attempt": 1,
+            "agent_id": "explorer-a",
+            "host": "CODEX_CLI_LOCAL",
+            "base_commit": "3fc020414134999227aec6ba9304a08e86287033",
+            "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d",
+            "lease": {"mode": "READ_ONLY", "paths": []},
+            "model_binding": {
+              "alias": "FABLE_5",
+              "provider": "example",
+              "carrier": "example",
+              "exact_model": "example-model-9",
+              "config_effort": "high",
+              "availability": "ABSENT",
+              "identity_grade": "ALIAS_ONLY"
+            },
+            "data_boundary": {
+              "repository_visibility": "UNKNOWN",
+              "provider_boundary_crossed": false,
+              "egress_admission": "NOT_REQUIRED"
+            },
+            "terminal_state": "UNAVAILABLE",
+            "in_denominator": true,
+            "result_digest": null
+          }
+        ],
+        "join_state": "JOIN_INCOMPLETE",
+        "advanced_transitions": [],
+        "consolidation": {
+          "agreements": [],
+          "contradictions": [],
+          "omissions": [],
+          "unresolved_blockers": ["the only requested alias was unavailable"]
+        },
+        "evidence_ceiling": "JOIN_DENOMINATOR_ONLY",
+        "authority": {
+          "merge": false,
+          "release": false,
+          "promotion": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "GHPC-XC-JOIN-006",
+      "refuses": "An absent alias graded as an exactly bound identity.",
+      "refused_by": "$defs.model_binding.allOf[1].then.properties.identity_grade.const",
+      "instance": {
+        "schema": "ghpc/subagent-join/v1",
+        "join_id": "GHPC-JOIN-106",
+        "epoch_ref": {
+          "main_commit": "3fc020414134999227aec6ba9304a08e86287033",
+          "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d"
+        },
+        "coordinator_instruction": "Use subagents. Wait for all agents and consolidate their findings.",
+        "required_roles": ["portfolio-explorer"],
+        "requested_agents": [
+          {
+            "role": "portfolio-explorer",
+            "task_id": "GHPC-TASK-107",
+            "attempt": 1,
+            "agent_id": "explorer-a",
+            "host": "CODEX_CLI_LOCAL",
+            "base_commit": "3fc020414134999227aec6ba9304a08e86287033",
+            "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d",
+            "lease": {"mode": "READ_ONLY", "paths": []},
+            "model_binding": {
+              "alias": "FABLE_5",
+              "provider": "example",
+              "carrier": "example",
+              "exact_model": null,
+              "config_effort": null,
+              "availability": "ABSENT",
+              "identity_grade": "EXACT_BOUND"
+            },
+            "data_boundary": {
+              "repository_visibility": "UNKNOWN",
+              "provider_boundary_crossed": false,
+              "egress_admission": "NOT_REQUIRED"
+            },
+            "terminal_state": "UNAVAILABLE",
+            "in_denominator": true,
+            "result_digest": null
+          }
+        ],
+        "join_state": "JOIN_INCOMPLETE",
+        "advanced_transitions": [],
+        "consolidation": {
+          "agreements": [],
+          "contradictions": [],
+          "omissions": [],
+          "unresolved_blockers": ["the only requested alias was unavailable"]
+        },
+        "evidence_ceiling": "JOIN_DENOMINATOR_ONLY",
+        "authority": {
+          "merge": false,
+          "release": false,
+          "promotion": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "GHPC-XC-JOIN-007",
+      "refuses": "An EXACT_BOUND grade bound to no model at all.",
+      "refused_by": "$defs.model_binding.allOf[2].then.properties.exact_model.type",
+      "instance": {
+        "schema": "ghpc/subagent-join/v1",
+        "join_id": "GHPC-JOIN-107",
+        "epoch_ref": {
+          "main_commit": "3fc020414134999227aec6ba9304a08e86287033",
+          "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d"
+        },
+        "coordinator_instruction": "Use subagents. Wait for all agents and consolidate their findings.",
+        "required_roles": ["portfolio-explorer"],
+        "requested_agents": [
+          {
+            "role": "portfolio-explorer",
+            "task_id": "GHPC-TASK-108",
+            "attempt": 1,
+            "agent_id": "explorer-a",
+            "host": "CODEX_CLI_LOCAL",
+            "base_commit": "3fc020414134999227aec6ba9304a08e86287033",
+            "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d",
+            "lease": {"mode": "READ_ONLY", "paths": []},
+            "model_binding": {
+              "alias": "FABLE_5",
+              "provider": "example",
+              "carrier": "example",
+              "exact_model": null,
+              "config_effort": null,
+              "availability": "AVAILABLE",
+              "identity_grade": "EXACT_BOUND"
+            },
+            "data_boundary": {
+              "repository_visibility": "UNKNOWN",
+              "provider_boundary_crossed": false,
+              "egress_admission": "NOT_REQUIRED"
+            },
+            "terminal_state": "COMPLETED",
+            "in_denominator": true,
+            "result_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000002"
+          }
+        ],
+        "join_state": "FINDINGS_CONSOLIDATED",
+        "advanced_transitions": [],
+        "consolidation": {
+          "agreements": [],
+          "contradictions": [],
+          "omissions": [],
+          "unresolved_blockers": []
+        },
+        "evidence_ceiling": "JOIN_DENOMINATOR_ONLY",
+        "authority": {
+          "merge": false,
+          "release": false,
+          "promotion": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "GHPC-XC-JOIN-008",
+      "refuses": "Repository content dispatched across a provider boundary with visibility unknown and no egress admission.",
+      "refused_by": "$defs.data_boundary.allOf[0].then.properties.egress_admission.enum",
+      "instance": {
+        "schema": "ghpc/subagent-join/v1",
+        "join_id": "GHPC-JOIN-108",
+        "epoch_ref": {
+          "main_commit": "3fc020414134999227aec6ba9304a08e86287033",
+          "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d"
+        },
+        "coordinator_instruction": "Use subagents. Wait for all agents and consolidate their findings.",
+        "required_roles": ["acceptance-adversary"],
+        "requested_agents": [
+          {
+            "role": "acceptance-adversary",
+            "task_id": "GHPC-TASK-109",
+            "attempt": 1,
+            "agent_id": "adversary-a",
+            "host": "CODEX_CLI_LOCAL",
+            "base_commit": "3fc020414134999227aec6ba9304a08e86287033",
+            "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d",
+            "lease": {"mode": "READ_ONLY", "paths": []},
+            "model_binding": {
+              "alias": "OPUS_5",
+              "provider": "example",
+              "carrier": "example",
+              "exact_model": "example-model-3",
+              "config_effort": null,
+              "availability": "AVAILABLE",
+              "identity_grade": "EXACT_BOUND"
+            },
+            "data_boundary": {
+              "repository_visibility": "UNKNOWN",
+              "provider_boundary_crossed": true,
+              "egress_admission": "NOT_REQUIRED"
+            },
+            "terminal_state": "COMPLETED",
+            "in_denominator": true,
+            "result_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000003"
+          }
+        ],
+        "join_state": "FINDINGS_CONSOLIDATED",
+        "advanced_transitions": [],
+        "consolidation": {
+          "agreements": [],
+          "contradictions": [],
+          "omissions": [],
+          "unresolved_blockers": []
+        },
+        "evidence_ceiling": "JOIN_DENOMINATOR_ONLY",
+        "authority": {
+          "merge": false,
+          "release": false,
+          "promotion": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "GHPC-XC-JOIN-009",
+      "refuses": "A private chain of thought persisted onto a result record.",
+      "refused_by": "$defs.agent_result.additionalProperties",
+      "instance": {
+        "schema": "ghpc/subagent-join/v1",
+        "join_id": "GHPC-JOIN-109",
+        "epoch_ref": {
+          "main_commit": "3fc020414134999227aec6ba9304a08e86287033",
+          "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d"
+        },
+        "coordinator_instruction": "Use subagents. Wait for all agents and consolidate their findings.",
+        "required_roles": ["acceptance-adversary"],
+        "requested_agents": [
+          {
+            "role": "acceptance-adversary",
+            "task_id": "GHPC-TASK-110",
+            "attempt": 1,
+            "agent_id": "adversary-a",
+            "host": "CODEX_CLI_LOCAL",
+            "base_commit": "3fc020414134999227aec6ba9304a08e86287033",
+            "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d",
+            "lease": {"mode": "READ_ONLY", "paths": []},
+            "model_binding": {
+              "alias": "OPUS_5",
+              "provider": "example",
+              "carrier": "example",
+              "exact_model": "example-model-3",
+              "config_effort": null,
+              "availability": "AVAILABLE",
+              "identity_grade": "EXACT_BOUND"
+            },
+            "data_boundary": {
+              "repository_visibility": "UNKNOWN",
+              "provider_boundary_crossed": false,
+              "egress_admission": "NOT_REQUIRED"
+            },
+            "terminal_state": "COMPLETED",
+            "in_denominator": true,
+            "result_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000004",
+            "chain_of_thought": "the full private reasoning transcript the agent produced on its way to the finding"
+          }
+        ],
+        "join_state": "FINDINGS_CONSOLIDATED",
+        "advanced_transitions": [],
+        "consolidation": {
+          "agreements": [],
+          "contradictions": [],
+          "omissions": [],
+          "unresolved_blockers": []
+        },
+        "evidence_ceiling": "JOIN_DENOMINATOR_ONLY",
+        "authority": {
+          "merge": false,
+          "release": false,
+          "promotion": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "GHPC-XC-JOIN-010",
+      "refuses": "A consolidation that reports agreement by omission, with no contradictions list at all.",
+      "refused_by": "$defs.consolidation.required",
+      "instance": {
+        "schema": "ghpc/subagent-join/v1",
+        "join_id": "GHPC-JOIN-110",
+        "epoch_ref": {
+          "main_commit": "3fc020414134999227aec6ba9304a08e86287033",
+          "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d"
+        },
+        "coordinator_instruction": "Use subagents. Wait for all agents and consolidate their findings.",
+        "required_roles": ["acceptance-adversary"],
+        "requested_agents": [
+          {
+            "role": "acceptance-adversary",
+            "task_id": "GHPC-TASK-111",
+            "attempt": 1,
+            "agent_id": "adversary-a",
+            "host": "CODEX_CLI_LOCAL",
+            "base_commit": "3fc020414134999227aec6ba9304a08e86287033",
+            "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d",
+            "lease": {"mode": "READ_ONLY", "paths": []},
+            "model_binding": {
+              "alias": "OPUS_5",
+              "provider": "example",
+              "carrier": "example",
+              "exact_model": "example-model-3",
+              "config_effort": null,
+              "availability": "AVAILABLE",
+              "identity_grade": "EXACT_BOUND"
+            },
+            "data_boundary": {
+              "repository_visibility": "UNKNOWN",
+              "provider_boundary_crossed": false,
+              "egress_admission": "NOT_REQUIRED"
+            },
+            "terminal_state": "COMPLETED",
+            "in_denominator": true,
+            "result_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000005"
+          }
+        ],
+        "join_state": "FINDINGS_CONSOLIDATED",
+        "advanced_transitions": [],
+        "consolidation": {
+          "agreements": ["every requested agent reported the same changed-path denominator"],
+          "omissions": [],
+          "unresolved_blockers": []
+        },
+        "evidence_ceiling": "JOIN_DENOMINATOR_ONLY",
+        "authority": {
+          "merge": false,
+          "release": false,
+          "promotion": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "GHPC-XC-JOIN-011",
+      "refuses": "An exclusive write lease that names no paths, so two of them look disjoint.",
+      "refused_by": "$defs.lease.allOf[0].then.properties.paths.minItems",
+      "instance": {
+        "schema": "ghpc/subagent-join/v1",
+        "join_id": "GHPC-JOIN-111",
+        "epoch_ref": {
+          "main_commit": "3fc020414134999227aec6ba9304a08e86287033",
+          "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d"
+        },
+        "coordinator_instruction": "Use subagents. Wait for all agents and consolidate their findings.",
+        "required_roles": ["implementation-worker"],
+        "requested_agents": [
+          {
+            "role": "implementation-worker",
+            "task_id": "GHPC-TASK-112",
+            "attempt": 1,
+            "agent_id": "worker-a",
+            "host": "CODEX_CLI_LOCAL",
+            "base_commit": "3fc020414134999227aec6ba9304a08e86287033",
+            "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d",
+            "lease": {"mode": "EXCLUSIVE_WRITE", "paths": []},
+            "model_binding": {
+              "alias": "SONNET_5",
+              "provider": "example",
+              "carrier": "example",
+              "exact_model": "example-model-1",
+              "config_effort": null,
+              "availability": "AVAILABLE",
+              "identity_grade": "EXACT_BOUND"
+            },
+            "data_boundary": {
+              "repository_visibility": "UNKNOWN",
+              "provider_boundary_crossed": false,
+              "egress_admission": "NOT_REQUIRED"
+            },
+            "terminal_state": "COMPLETED",
+            "in_denominator": true,
+            "result_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000006"
+          }
+        ],
+        "join_state": "FINDINGS_CONSOLIDATED",
+        "advanced_transitions": [],
+        "consolidation": {
+          "agreements": [],
+          "contradictions": [],
+          "omissions": [],
+          "unresolved_blockers": []
+        },
+        "evidence_ceiling": "JOIN_DENOMINATOR_ONLY",
+        "authority": {
+          "merge": false,
+          "release": false,
+          "promotion": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "GHPC-XC-JOIN-012",
+      "refuses": "A completed agent with no result for the join to consolidate.",
+      "refused_by": "$defs.agent_result.allOf[0].then.properties.result_digest.type",
+      "instance": {
+        "schema": "ghpc/subagent-join/v1",
+        "join_id": "GHPC-JOIN-112",
+        "epoch_ref": {
+          "main_commit": "3fc020414134999227aec6ba9304a08e86287033",
+          "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d"
+        },
+        "coordinator_instruction": "Use subagents. Wait for all agents and consolidate their findings.",
+        "required_roles": ["release-auditor"],
+        "requested_agents": [
+          {
+            "role": "release-auditor",
+            "task_id": "GHPC-TASK-113",
+            "attempt": 1,
+            "agent_id": "auditor-a",
+            "host": "CODEX_CLI_LOCAL",
+            "base_commit": "3fc020414134999227aec6ba9304a08e86287033",
+            "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d",
+            "lease": {"mode": "READ_ONLY", "paths": []},
+            "model_binding": {
+              "alias": "OPUS_5",
+              "provider": "example",
+              "carrier": "example",
+              "exact_model": "example-model-3",
+              "config_effort": null,
+              "availability": "AVAILABLE",
+              "identity_grade": "EXACT_BOUND"
+            },
+            "data_boundary": {
+              "repository_visibility": "UNKNOWN",
+              "provider_boundary_crossed": false,
+              "egress_admission": "NOT_REQUIRED"
+            },
+            "terminal_state": "COMPLETED",
+            "in_denominator": true,
+            "result_digest": null
+          }
+        ],
+        "join_state": "FINDINGS_CONSOLIDATED",
+        "advanced_transitions": [],
+        "consolidation": {
+          "agreements": [],
+          "contradictions": [],
+          "omissions": [],
+          "unresolved_blockers": []
+        },
+        "evidence_ceiling": "JOIN_DENOMINATOR_ONLY",
+        "authority": {
+          "merge": false,
+          "release": false,
+          "promotion": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "GHPC-XC-JOIN-013",
+      "refuses": "A join with no requested agents, which is complete by construction.",
+      "refused_by": "properties.requested_agents.minItems",
+      "instance": {
+        "schema": "ghpc/subagent-join/v1",
+        "join_id": "GHPC-JOIN-113",
+        "epoch_ref": {
+          "main_commit": "3fc020414134999227aec6ba9304a08e86287033",
+          "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d"
+        },
+        "coordinator_instruction": "Use subagents. Wait for all agents and consolidate their findings.",
+        "required_roles": ["implementation-worker"],
+        "requested_agents": [],
+        "join_state": "FINDINGS_CONSOLIDATED",
+        "advanced_transitions": [],
+        "consolidation": {
+          "agreements": ["nothing disagreed"],
+          "contradictions": [],
+          "omissions": [],
+          "unresolved_blockers": []
+        },
+        "evidence_ceiling": "JOIN_DENOMINATOR_ONLY",
+        "authority": {
+          "merge": false,
+          "release": false,
+          "promotion": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "GHPC-XC-JOIN-014",
+      "refuses": "Authority widening: a join that grants itself merge by counting its own agents.",
+      "refused_by": "$defs.authority.properties.merge.const",
+      "instance": {
+        "schema": "ghpc/subagent-join/v1",
+        "join_id": "GHPC-JOIN-114",
+        "epoch_ref": {
+          "main_commit": "3fc020414134999227aec6ba9304a08e86287033",
+          "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d"
+        },
+        "coordinator_instruction": "Use subagents. Wait for all agents and consolidate their findings.",
+        "required_roles": ["release-auditor"],
+        "requested_agents": [
+          {
+            "role": "release-auditor",
+            "task_id": "GHPC-TASK-114",
+            "attempt": 1,
+            "agent_id": "auditor-a",
+            "host": "CODEX_CLI_LOCAL",
+            "base_commit": "3fc020414134999227aec6ba9304a08e86287033",
+            "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d",
+            "lease": {"mode": "READ_ONLY", "paths": []},
+            "model_binding": {
+              "alias": "OPUS_5",
+              "provider": "example",
+              "carrier": "example",
+              "exact_model": "example-model-3",
+              "config_effort": null,
+              "availability": "AVAILABLE",
+              "identity_grade": "EXACT_BOUND"
+            },
+            "data_boundary": {
+              "repository_visibility": "UNKNOWN",
+              "provider_boundary_crossed": false,
+              "egress_admission": "NOT_REQUIRED"
+            },
+            "terminal_state": "COMPLETED",
+            "in_denominator": true,
+            "result_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000007"
+          }
+        ],
+        "join_state": "FINDINGS_CONSOLIDATED",
+        "advanced_transitions": [],
+        "consolidation": {
+          "agreements": ["every requested agent terminated"],
+          "contradictions": [],
+          "omissions": [],
+          "unresolved_blockers": []
+        },
+        "evidence_ceiling": "JOIN_DENOMINATOR_ONLY",
+        "authority": {
+          "merge": true,
+          "release": false,
+          "promotion": false,
+          "provider_execution": false,
+          "production": false
+        },
+        "human_owned_operations": ["merge and release"]
+      }
+    }
+  ]
+}

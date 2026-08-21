@@ -1,0 +1,18 @@
+{
+  "schema": "ghpc/coordinator-instruction/v1",
+  "instruction": "Use subagents. Wait for all agents and consolidate their findings.",
+  "status": "NON_OPTIONAL",
+  "preserved_verbatim": true,
+  "why_verbatim": "The sentence has two halves and only one of them is a dispatch. A coordinator that keeps 'use subagents' and drops 'wait for all agents and consolidate their findings' has kept the half that produces work and dropped the half that makes the work joinable, which is the exact shape of every premature-advance failure this plane exists to refuse. It is stored as data, pinned as a const in ghpc/subagent-join/v1, and routed by const from ghpc/authority-composition/v1, so a paraphrase has to survive three independent arrivals instead of one memory.",
+  "arrivals": [
+    "references/coordinator-instruction.json (these bytes)",
+    "references/schemas/subagent-join.schema.json properties.coordinator_instruction.const",
+    "references/schemas/authority-composition.schema.json properties.coordinator_instruction_route.const"
+  ],
+  "not_evidence_of": [
+    "that any subagent was dispatched",
+    "that any subagent terminated",
+    "that any finding was consolidated",
+    "that any provider, carrier or model was available"
+  ]
+}

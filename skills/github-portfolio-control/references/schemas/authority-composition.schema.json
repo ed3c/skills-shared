@@ -1,0 +1,420 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ghpc/authority-composition/v1",
+  "title": "Composed authority declaration",
+  "description": "Which existing authority owns which question, declared by route rather than restated. The plane this contract belongs to is a join protocol, not a method: the task graph, the adversarial review, the hosted delivery evidence, the Git ancestry and path leases, the consumer bootstrap and the Issue closure contract all already have owners, and a portfolio controller that carries its own copy of any of them becomes the second one. Two keywords hold that. Each of the six kinds is pinned by a `contains` clause with `maxContains: 1`, so a declaration can neither drop an authority nor grow a second one of the same kind; and `body_copied` is pinned false on every entry, so composing is routing and never duplicating. What the schema cannot do is verify that the route it was handed points at anything: the checker resolves every `owner_route` against the tree and refuses an absent one as K04_AUTHORITY_ROUTE_ABSENT, because a route to a file that does not exist reads exactly like a route to one that does.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "composition_id",
+    "subject_commit",
+    "subject_tree",
+    "composed_authorities",
+    "redefined_authority_kinds",
+    "coordinator_instruction_route",
+    "evidence_ceiling",
+    "authority",
+    "human_owned_operations"
+  ],
+  "properties": {
+    "schema": {"const": "ghpc/authority-composition/v1"},
+    "composition_id": {
+      "type": "string",
+      "pattern": "^GHPC-COMP-[0-9]{3}$",
+      "description": "Identifiers in the 900-999 block are reserved for shape-only instances inside `examples`; the checker refuses one inside a real bundle."
+    },
+    "subject_commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$",
+      "description": "The commit the routes were resolved against. A composition bound to a branch name is a composition whose routes were checked against a tree nobody can name."
+    },
+    "subject_tree": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "composed_authorities": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/composed_authority"},
+      "description": "One entry per authority kind, six kinds, exactly one each. The six `contains` clauses below are the denominator: a kind that is missing has no owner, and a kind that appears twice has two.",
+      "allOf": [
+        {
+          "contains": {
+            "type": "object",
+            "required": ["authority_kind"],
+            "properties": {"authority_kind": {"const": "TASK_DAG_AND_ISSUE_CLOSURE"}}
+          },
+          "minContains": 1,
+          "maxContains": 1,
+          "description": "The task and capability DAG, Issue closure, problem closure, Local Handoff and controller acceptance."
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": ["authority_kind"],
+            "properties": {"authority_kind": {"const": "ADVERSARIAL_READ_ONLY_REVIEW"}}
+          },
+          "minContains": 1,
+          "maxContains": 1,
+          "description": "Read-only adversarial review and the architecture, evidence and authority deltas it produces. A second one of these is the failure this whole schema exists to name: a controller that reviews itself."
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": ["authority_kind"],
+            "properties": {"authority_kind": {"const": "HOSTED_DELIVERY_EVIDENCE"}}
+          },
+          "minContains": 1,
+          "maxContains": 1,
+          "description": "The trusted provider snapshot and exact-head publication and workflow evidence."
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": ["authority_kind"],
+            "properties": {"authority_kind": {"const": "GIT_ANCESTRY_AND_PATH_LEASES"}}
+          },
+          "minContains": 1,
+          "maxContains": 1,
+          "description": "Real Git ancestry, worktree and path leases, Stack delivery."
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": ["authority_kind"],
+            "properties": {"authority_kind": {"const": "CONSUMER_BOOTSTRAP"}}
+          },
+          "minContains": 1,
+          "maxContains": 1,
+          "description": "Thin immutable consumer binding and new-repository bootstrap. This plane routes to it and does not implement it."
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": ["authority_kind"],
+            "properties": {"authority_kind": {"const": "ISSUE_CLOSURE_CONTRACT"}}
+          },
+          "minContains": 1,
+          "maxContains": 1,
+          "description": "Post-landing Issue disposition and residual ownership, reused for the terminal state rather than forked into a second closure vocabulary."
+        }
+      ]
+    },
+    "redefined_authority_kinds": {
+      "type": "array",
+      "maxItems": 0,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/authority_kind"},
+      "description": "Always empty. The field exists so that redefining an authority is something a document has to write down rather than something it can do by accident, and writing it down is refused."
+    },
+    "coordinator_instruction_route": {
+      "const": "references/coordinator-instruction.json",
+      "description": "Where the one non-optional coordinator instruction lives, as a route rather than a restatement. Pinning the route is what stops a composition from carrying its own paraphrase of the sentence beside a link to the real one."
+    },
+    "evidence_ceiling": {
+      "const": "DETERMINISTIC_COMPOSITION",
+      "description": "A composition settles who owns what. It settles nothing about whether any of those owners is correct."
+    },
+    "authority": {"$ref": "#/$defs/authority"},
+    "human_owned_operations": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 4}
+    }
+  },
+  "$defs": {
+    "authority_kind": {
+      "enum": [
+        "TASK_DAG_AND_ISSUE_CLOSURE",
+        "ADVERSARIAL_READ_ONLY_REVIEW",
+        "HOSTED_DELIVERY_EVIDENCE",
+        "GIT_ANCESTRY_AND_PATH_LEASES",
+        "CONSUMER_BOOTSTRAP",
+        "ISSUE_CLOSURE_CONTRACT"
+      ]
+    },
+    "composed_authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["authority_kind", "owner_route", "owns", "body_copied"],
+      "properties": {
+        "authority_kind": {"$ref": "#/$defs/authority_kind"},
+        "owner_route": {
+          "type": "string",
+          "pattern": "^skills/[A-Za-z0-9._/-]+$",
+          "description": "A repository-relative route to the owner on this tree. A URL, a branch reference or a prose name would let a composition point at something that cannot be resolved and cannot be refused."
+        },
+        "owns": {"type": "string", "minLength": 12, "maxLength": 400},
+        "body_copied": {
+          "const": false,
+          "description": "Pinned. BOOTSTRAP_COPIES_CANONICAL_SKILL_BODY starts here: a copy is a second authority whose drift from the first is invisible until the two disagree."
+        }
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["merge", "release", "promotion", "provider_execution", "production"],
+      "properties": {
+        "merge": {"const": false},
+        "release": {"const": false},
+        "promotion": {"const": false},
+        "provider_execution": {"const": false},
+        "production": {"const": false}
+      }
+    }
+  },
+  "examples": [
+    {
+      "schema": "ghpc/authority-composition/v1",
+      "composition_id": "GHPC-COMP-001",
+      "subject_commit": "3fc020414134999227aec6ba9304a08e86287033",
+      "subject_tree": "eea625614c233b7f42fd62c129aa21852cb36b9d",
+      "composed_authorities": [
+        {
+          "authority_kind": "TASK_DAG_AND_ISSUE_CLOSURE",
+          "owner_route": "skills/agentic-tech-lead-orchestration/README.md",
+          "owns": "task and capability DAG, Issue closure, problem closure, Local Handoff and controller acceptance",
+          "body_copied": false
+        },
+        {
+          "authority_kind": "ADVERSARIAL_READ_ONLY_REVIEW",
+          "owner_route": "skills/procedural-shadow-runtime/README.md",
+          "owns": "read-only adversarial review and the architecture, evidence and authority deltas it raises",
+          "body_copied": false
+        },
+        {
+          "authority_kind": "HOSTED_DELIVERY_EVIDENCE",
+          "owner_route": "skills/github-delivery-loop/SKILL.md",
+          "owns": "the trusted provider snapshot and exact-head publication and workflow evidence",
+          "body_copied": false
+        },
+        {
+          "authority_kind": "GIT_ANCESTRY_AND_PATH_LEASES",
+          "owner_route": "skills/git-town-stacked-pr-worker/README.md",
+          "owns": "real Git ancestry, worktree and path leases, and Stack delivery",
+          "body_copied": false
+        },
+        {
+          "authority_kind": "CONSUMER_BOOTSTRAP",
+          "owner_route": "skills/shared-skills-infra/SKILL.md",
+          "owns": "thin immutable consumer binding and new-repository bootstrap, which this plane routes to and does not implement",
+          "body_copied": false
+        },
+        {
+          "authority_kind": "ISSUE_CLOSURE_CONTRACT",
+          "owner_route": "skills/agentic-tech-lead-orchestration/references/ISSUE_CLOSURE_CONTRACT.md",
+          "owns": "post-landing Issue disposition and residual ownership, reused as the terminal state rather than forked",
+          "body_copied": false
+        }
+      ],
+      "redefined_authority_kinds": [],
+      "coordinator_instruction_route": "references/coordinator-instruction.json",
+      "evidence_ceiling": "DETERMINISTIC_COMPOSITION",
+      "authority": {
+        "merge": false,
+        "release": false,
+        "promotion": false,
+        "provider_execution": false,
+        "production": false
+      },
+      "human_owned_operations": [
+        "admitting a new composed authority kind",
+        "merge and release"
+      ]
+    }
+  ],
+  "x-refusal-controls": [
+    {
+      "case_id": "GHPC-XC-COMP-001",
+      "refuses": "A second adversarial-review authority: the controller reviewing itself alongside the independent Shadow.",
+      "refused_by": "properties.composed_authorities.allOf[1].maxContains",
+      "instance": {
+        "schema": "ghpc/authority-composition/v1",
+        "composition_id": "GHPC-COMP-101",
+        "subject_commit": "3fc020414134999227aec6ba9304a08e86287033",
+        "subject_tree": "eea625614c233b7f42fd62c129aa21852cb36b9d",
+        "composed_authorities": [
+          {"authority_kind": "TASK_DAG_AND_ISSUE_CLOSURE", "owner_route": "skills/agentic-tech-lead-orchestration/README.md", "owns": "task and capability DAG and Issue closure", "body_copied": false},
+          {"authority_kind": "ADVERSARIAL_READ_ONLY_REVIEW", "owner_route": "skills/procedural-shadow-runtime/README.md", "owns": "read-only adversarial review", "body_copied": false},
+          {"authority_kind": "ADVERSARIAL_READ_ONLY_REVIEW", "owner_route": "skills/github-portfolio-control/README.md", "owns": "the controller's own drift review of the work it just produced", "body_copied": false},
+          {"authority_kind": "HOSTED_DELIVERY_EVIDENCE", "owner_route": "skills/github-delivery-loop/SKILL.md", "owns": "exact-head publication and workflow evidence", "body_copied": false},
+          {"authority_kind": "GIT_ANCESTRY_AND_PATH_LEASES", "owner_route": "skills/git-town-stacked-pr-worker/README.md", "owns": "Git ancestry and path leases", "body_copied": false},
+          {"authority_kind": "CONSUMER_BOOTSTRAP", "owner_route": "skills/shared-skills-infra/SKILL.md", "owns": "thin consumer binding and bootstrap", "body_copied": false},
+          {"authority_kind": "ISSUE_CLOSURE_CONTRACT", "owner_route": "skills/agentic-tech-lead-orchestration/references/ISSUE_CLOSURE_CONTRACT.md", "owns": "post-landing Issue disposition", "body_copied": false}
+        ],
+        "redefined_authority_kinds": [],
+        "coordinator_instruction_route": "references/coordinator-instruction.json",
+        "evidence_ceiling": "DETERMINISTIC_COMPOSITION",
+        "authority": {"merge": false, "release": false, "promotion": false, "provider_execution": false, "production": false},
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "GHPC-XC-COMP-002",
+      "refuses": "A composition that quietly drops an authority kind, leaving the question with no owner.",
+      "refused_by": "properties.composed_authorities.allOf[0].contains",
+      "instance": {
+        "schema": "ghpc/authority-composition/v1",
+        "composition_id": "GHPC-COMP-102",
+        "subject_commit": "3fc020414134999227aec6ba9304a08e86287033",
+        "subject_tree": "eea625614c233b7f42fd62c129aa21852cb36b9d",
+        "composed_authorities": [
+          {"authority_kind": "ADVERSARIAL_READ_ONLY_REVIEW", "owner_route": "skills/procedural-shadow-runtime/README.md", "owns": "read-only adversarial review", "body_copied": false},
+          {"authority_kind": "HOSTED_DELIVERY_EVIDENCE", "owner_route": "skills/github-delivery-loop/SKILL.md", "owns": "exact-head publication and workflow evidence", "body_copied": false},
+          {"authority_kind": "GIT_ANCESTRY_AND_PATH_LEASES", "owner_route": "skills/git-town-stacked-pr-worker/README.md", "owns": "Git ancestry and path leases", "body_copied": false},
+          {"authority_kind": "CONSUMER_BOOTSTRAP", "owner_route": "skills/shared-skills-infra/SKILL.md", "owns": "thin consumer binding and bootstrap", "body_copied": false},
+          {"authority_kind": "ISSUE_CLOSURE_CONTRACT", "owner_route": "skills/agentic-tech-lead-orchestration/references/ISSUE_CLOSURE_CONTRACT.md", "owns": "post-landing Issue disposition", "body_copied": false}
+        ],
+        "redefined_authority_kinds": [],
+        "coordinator_instruction_route": "references/coordinator-instruction.json",
+        "evidence_ceiling": "DETERMINISTIC_COMPOSITION",
+        "authority": {"merge": false, "release": false, "promotion": false, "provider_execution": false, "production": false},
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "GHPC-XC-COMP-003",
+      "refuses": "A canonical Skill body copied into the consumer instead of routed.",
+      "refused_by": "$defs.composed_authority.properties.body_copied.const",
+      "instance": {
+        "schema": "ghpc/authority-composition/v1",
+        "composition_id": "GHPC-COMP-103",
+        "subject_commit": "3fc020414134999227aec6ba9304a08e86287033",
+        "subject_tree": "eea625614c233b7f42fd62c129aa21852cb36b9d",
+        "composed_authorities": [
+          {"authority_kind": "TASK_DAG_AND_ISSUE_CLOSURE", "owner_route": "skills/agentic-tech-lead-orchestration/README.md", "owns": "task and capability DAG and Issue closure", "body_copied": false},
+          {"authority_kind": "ADVERSARIAL_READ_ONLY_REVIEW", "owner_route": "skills/procedural-shadow-runtime/README.md", "owns": "read-only adversarial review", "body_copied": false},
+          {"authority_kind": "HOSTED_DELIVERY_EVIDENCE", "owner_route": "skills/github-delivery-loop/SKILL.md", "owns": "exact-head publication and workflow evidence", "body_copied": false},
+          {"authority_kind": "GIT_ANCESTRY_AND_PATH_LEASES", "owner_route": "skills/git-town-stacked-pr-worker/README.md", "owns": "Git ancestry and path leases", "body_copied": false},
+          {"authority_kind": "CONSUMER_BOOTSTRAP", "owner_route": "skills/shared-skills-infra/SKILL.md", "owns": "the bootstrap procedure, pasted into the consumer so it keeps working when the canonical body moves", "body_copied": true},
+          {"authority_kind": "ISSUE_CLOSURE_CONTRACT", "owner_route": "skills/agentic-tech-lead-orchestration/references/ISSUE_CLOSURE_CONTRACT.md", "owns": "post-landing Issue disposition", "body_copied": false}
+        ],
+        "redefined_authority_kinds": [],
+        "coordinator_instruction_route": "references/coordinator-instruction.json",
+        "evidence_ceiling": "DETERMINISTIC_COMPOSITION",
+        "authority": {"merge": false, "release": false, "promotion": false, "provider_execution": false, "production": false},
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "GHPC-XC-COMP-004",
+      "refuses": "An authority redefined locally, which is a second authority admitting to being one.",
+      "refused_by": "properties.redefined_authority_kinds.maxItems",
+      "instance": {
+        "schema": "ghpc/authority-composition/v1",
+        "composition_id": "GHPC-COMP-104",
+        "subject_commit": "3fc020414134999227aec6ba9304a08e86287033",
+        "subject_tree": "eea625614c233b7f42fd62c129aa21852cb36b9d",
+        "composed_authorities": [
+          {"authority_kind": "TASK_DAG_AND_ISSUE_CLOSURE", "owner_route": "skills/agentic-tech-lead-orchestration/README.md", "owns": "task and capability DAG and Issue closure", "body_copied": false},
+          {"authority_kind": "ADVERSARIAL_READ_ONLY_REVIEW", "owner_route": "skills/procedural-shadow-runtime/README.md", "owns": "read-only adversarial review", "body_copied": false},
+          {"authority_kind": "HOSTED_DELIVERY_EVIDENCE", "owner_route": "skills/github-delivery-loop/SKILL.md", "owns": "exact-head publication and workflow evidence", "body_copied": false},
+          {"authority_kind": "GIT_ANCESTRY_AND_PATH_LEASES", "owner_route": "skills/git-town-stacked-pr-worker/README.md", "owns": "Git ancestry and path leases", "body_copied": false},
+          {"authority_kind": "CONSUMER_BOOTSTRAP", "owner_route": "skills/shared-skills-infra/SKILL.md", "owns": "thin consumer binding and bootstrap", "body_copied": false},
+          {"authority_kind": "ISSUE_CLOSURE_CONTRACT", "owner_route": "skills/agentic-tech-lead-orchestration/references/ISSUE_CLOSURE_CONTRACT.md", "owns": "post-landing Issue disposition", "body_copied": false}
+        ],
+        "redefined_authority_kinds": ["GIT_ANCESTRY_AND_PATH_LEASES"],
+        "coordinator_instruction_route": "references/coordinator-instruction.json",
+        "evidence_ceiling": "DETERMINISTIC_COMPOSITION",
+        "authority": {"merge": false, "release": false, "promotion": false, "provider_execution": false, "production": false},
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "GHPC-XC-COMP-005",
+      "refuses": "An owner named by a URL rather than by a route that resolves on this tree.",
+      "refused_by": "$defs.composed_authority.properties.owner_route.pattern",
+      "instance": {
+        "schema": "ghpc/authority-composition/v1",
+        "composition_id": "GHPC-COMP-105",
+        "subject_commit": "3fc020414134999227aec6ba9304a08e86287033",
+        "subject_tree": "eea625614c233b7f42fd62c129aa21852cb36b9d",
+        "composed_authorities": [
+          {"authority_kind": "TASK_DAG_AND_ISSUE_CLOSURE", "owner_route": "skills/agentic-tech-lead-orchestration/README.md", "owns": "task and capability DAG and Issue closure", "body_copied": false},
+          {"authority_kind": "ADVERSARIAL_READ_ONLY_REVIEW", "owner_route": "skills/procedural-shadow-runtime/README.md", "owns": "read-only adversarial review", "body_copied": false},
+          {"authority_kind": "HOSTED_DELIVERY_EVIDENCE", "owner_route": "https://example.invalid/delivery-authority", "owns": "exact-head publication and workflow evidence, wherever that page currently redirects to", "body_copied": false},
+          {"authority_kind": "GIT_ANCESTRY_AND_PATH_LEASES", "owner_route": "skills/git-town-stacked-pr-worker/README.md", "owns": "Git ancestry and path leases", "body_copied": false},
+          {"authority_kind": "CONSUMER_BOOTSTRAP", "owner_route": "skills/shared-skills-infra/SKILL.md", "owns": "thin consumer binding and bootstrap", "body_copied": false},
+          {"authority_kind": "ISSUE_CLOSURE_CONTRACT", "owner_route": "skills/agentic-tech-lead-orchestration/references/ISSUE_CLOSURE_CONTRACT.md", "owns": "post-landing Issue disposition", "body_copied": false}
+        ],
+        "redefined_authority_kinds": [],
+        "coordinator_instruction_route": "references/coordinator-instruction.json",
+        "evidence_ceiling": "DETERMINISTIC_COMPOSITION",
+        "authority": {"merge": false, "release": false, "promotion": false, "provider_execution": false, "production": false},
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "GHPC-XC-COMP-006",
+      "refuses": "A composition whose routes were resolved against a branch name rather than a commit.",
+      "refused_by": "properties.subject_commit.pattern",
+      "instance": {
+        "schema": "ghpc/authority-composition/v1",
+        "composition_id": "GHPC-COMP-106",
+        "subject_commit": "origin/main",
+        "subject_tree": "eea625614c233b7f42fd62c129aa21852cb36b9d",
+        "composed_authorities": [
+          {"authority_kind": "TASK_DAG_AND_ISSUE_CLOSURE", "owner_route": "skills/agentic-tech-lead-orchestration/README.md", "owns": "task and capability DAG and Issue closure", "body_copied": false},
+          {"authority_kind": "ADVERSARIAL_READ_ONLY_REVIEW", "owner_route": "skills/procedural-shadow-runtime/README.md", "owns": "read-only adversarial review", "body_copied": false},
+          {"authority_kind": "HOSTED_DELIVERY_EVIDENCE", "owner_route": "skills/github-delivery-loop/SKILL.md", "owns": "exact-head publication and workflow evidence", "body_copied": false},
+          {"authority_kind": "GIT_ANCESTRY_AND_PATH_LEASES", "owner_route": "skills/git-town-stacked-pr-worker/README.md", "owns": "Git ancestry and path leases", "body_copied": false},
+          {"authority_kind": "CONSUMER_BOOTSTRAP", "owner_route": "skills/shared-skills-infra/SKILL.md", "owns": "thin consumer binding and bootstrap", "body_copied": false},
+          {"authority_kind": "ISSUE_CLOSURE_CONTRACT", "owner_route": "skills/agentic-tech-lead-orchestration/references/ISSUE_CLOSURE_CONTRACT.md", "owns": "post-landing Issue disposition", "body_copied": false}
+        ],
+        "redefined_authority_kinds": [],
+        "coordinator_instruction_route": "references/coordinator-instruction.json",
+        "evidence_ceiling": "DETERMINISTIC_COMPOSITION",
+        "authority": {"merge": false, "release": false, "promotion": false, "provider_execution": false, "production": false},
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "GHPC-XC-COMP-007",
+      "refuses": "A composition carrying its own paraphrase of the coordinator instruction instead of routing to the pinned bytes.",
+      "refused_by": "properties.coordinator_instruction_route.const",
+      "instance": {
+        "schema": "ghpc/authority-composition/v1",
+        "composition_id": "GHPC-COMP-107",
+        "subject_commit": "3fc020414134999227aec6ba9304a08e86287033",
+        "subject_tree": "eea625614c233b7f42fd62c129aa21852cb36b9d",
+        "composed_authorities": [
+          {"authority_kind": "TASK_DAG_AND_ISSUE_CLOSURE", "owner_route": "skills/agentic-tech-lead-orchestration/README.md", "owns": "task and capability DAG and Issue closure", "body_copied": false},
+          {"authority_kind": "ADVERSARIAL_READ_ONLY_REVIEW", "owner_route": "skills/procedural-shadow-runtime/README.md", "owns": "read-only adversarial review", "body_copied": false},
+          {"authority_kind": "HOSTED_DELIVERY_EVIDENCE", "owner_route": "skills/github-delivery-loop/SKILL.md", "owns": "exact-head publication and workflow evidence", "body_copied": false},
+          {"authority_kind": "GIT_ANCESTRY_AND_PATH_LEASES", "owner_route": "skills/git-town-stacked-pr-worker/README.md", "owns": "Git ancestry and path leases", "body_copied": false},
+          {"authority_kind": "CONSUMER_BOOTSTRAP", "owner_route": "skills/shared-skills-infra/SKILL.md", "owns": "thin consumer binding and bootstrap", "body_copied": false},
+          {"authority_kind": "ISSUE_CLOSURE_CONTRACT", "owner_route": "skills/agentic-tech-lead-orchestration/references/ISSUE_CLOSURE_CONTRACT.md", "owns": "post-landing Issue disposition", "body_copied": false}
+        ],
+        "redefined_authority_kinds": [],
+        "coordinator_instruction_route": "references/prompts/coordinator-instruction-rewritten.md",
+        "evidence_ceiling": "DETERMINISTIC_COMPOSITION",
+        "authority": {"merge": false, "release": false, "promotion": false, "provider_execution": false, "production": false},
+        "human_owned_operations": ["merge and release"]
+      }
+    },
+    {
+      "case_id": "GHPC-XC-COMP-008",
+      "refuses": "Authority widening: a composition that grants itself merge by listing who owns what.",
+      "refused_by": "$defs.authority.properties.merge.const",
+      "instance": {
+        "schema": "ghpc/authority-composition/v1",
+        "composition_id": "GHPC-COMP-108",
+        "subject_commit": "3fc020414134999227aec6ba9304a08e86287033",
+        "subject_tree": "eea625614c233b7f42fd62c129aa21852cb36b9d",
+        "composed_authorities": [
+          {"authority_kind": "TASK_DAG_AND_ISSUE_CLOSURE", "owner_route": "skills/agentic-tech-lead-orchestration/README.md", "owns": "task and capability DAG and Issue closure", "body_copied": false},
+          {"authority_kind": "ADVERSARIAL_READ_ONLY_REVIEW", "owner_route": "skills/procedural-shadow-runtime/README.md", "owns": "read-only adversarial review", "body_copied": false},
+          {"authority_kind": "HOSTED_DELIVERY_EVIDENCE", "owner_route": "skills/github-delivery-loop/SKILL.md", "owns": "exact-head publication and workflow evidence", "body_copied": false},
+          {"authority_kind": "GIT_ANCESTRY_AND_PATH_LEASES", "owner_route": "skills/git-town-stacked-pr-worker/README.md", "owns": "Git ancestry and path leases", "body_copied": false},
+          {"authority_kind": "CONSUMER_BOOTSTRAP", "owner_route": "skills/shared-skills-infra/SKILL.md", "owns": "thin consumer binding and bootstrap", "body_copied": false},
+          {"authority_kind": "ISSUE_CLOSURE_CONTRACT", "owner_route": "skills/agentic-tech-lead-orchestration/references/ISSUE_CLOSURE_CONTRACT.md", "owns": "post-landing Issue disposition", "body_copied": false}
+        ],
+        "redefined_authority_kinds": [],
+        "coordinator_instruction_route": "references/coordinator-instruction.json",
+        "evidence_ceiling": "DETERMINISTIC_COMPOSITION",
+        "authority": {"merge": true, "release": false, "promotion": false, "provider_execution": false, "production": false},
+        "human_owned_operations": ["merge and release"]
+      }
+    }
+  ]
+}
