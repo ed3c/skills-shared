@@ -13,6 +13,7 @@ mutation is never credited to a suite that was already failing.
 from __future__ import annotations
 
 import copy
+import importlib.util
 import json
 import shutil
 import subprocess
@@ -23,8 +24,12 @@ from typing import Any, Callable
 
 ROOT = Path(__file__).resolve().parents[1]
 REFERENCES = ROOT / "references"
+EXAMPLES = ROOT / "examples"
+FIXTURES = Path(__file__).resolve().parent / "fixtures"
 CHECK = ROOT / "scripts/check_prel_contract.py"
 COMPILE = ROOT / "scripts/compile_prel.py"
+COMPILE_SESSION = ROOT / "scripts/compile_session_dispatch.py"
+COMPILE_PROJECTION = ROOT / "scripts/compile_external_projection.py"
 
 SIGNALS = "example-product-signal.json"
 DOSSIER = "example-dossier.json"
@@ -33,6 +38,43 @@ AUDIT = "example-closure-audit.json"
 HANDOFF = "example-handoff.json"
 PACKET = "example-prompt-packet.json"
 CATALOGUE = "prompt-catalogue.md"
+
+DISPATCH = "session-dispatch-request.example.json"
+RECEIPT = "session-receipt.example.json"
+REGISTRY = "external-projection-registry.example.json"
+
+DISPATCH_DRAFT = "session-dispatch-input.json"
+DISPATCH_COMPILED = "session-dispatch-request.compiled.json"
+REGISTRY_DRAFT = "external-projection-input.json"
+REGISTRY_COMPILED = "external-projection-registry.compiled.json"
+
+# Every directory that may hold a committed artifact. Discovery reads these; no
+# list of filenames exists anywhere in this suite, so an artifact added to the
+# tree enters the denominator without an edit here, and one that is deleted
+# takes its schema's coverage with it.
+ARTIFACT_ROOTS = (REFERENCES, EXAMPLES, FIXTURES)
+
+# Compiler-input schemas. These are staging documents, not contracts: they are
+# consumed by a compiler and never validated against a frozen schema, so
+# discovery records them as drafts rather than reporting them as unregistered.
+DRAFT_SCHEMAS = {
+    "prel/session-dispatch-input/v1",
+    "prel/external-projection-input/v1",
+}
+
+# The artifact each projection was compiled from, for the stale-subject control.
+UPSTREAM = {DOSSIER: SIGNALS, MATRIX: DOSSIER, HANDOFF: MATRIX}
+
+# (compiler, draft, committed projection). Byte-stability is asserted on every
+# entry, so a compiler whose output drifts from what is committed is red before
+# any mutation runs.
+PROJECTIONS = (
+    (COMPILE, ["--stage", "dossier"], REFERENCES / SIGNALS, REFERENCES / DOSSIER),
+    (COMPILE, ["--stage", "closure"], REFERENCES / DOSSIER, REFERENCES / MATRIX),
+    (COMPILE, ["--stage", "handoff"], REFERENCES / MATRIX, REFERENCES / HANDOFF),
+    (COMPILE_SESSION, [], FIXTURES / DISPATCH_DRAFT, FIXTURES / DISPATCH_COMPILED),
+    (COMPILE_PROJECTION, [], FIXTURES / REGISTRY_DRAFT, FIXTURES / REGISTRY_COMPILED),
+)
 
 
 def run(argv: list[str]) -> tuple[int, str]:
@@ -51,27 +93,90 @@ def write(path: Path, value: Any) -> None:
     )
 
 
-def positive_control() -> list[str]:
+def registered_schemas() -> dict[str, str]:
+    """The checker's own schema registry, read from the checker.
+
+    Copying the list into this file would let the two drift apart in the one
+    direction that matters: a schema registered in production and exercised by
+    nothing here would still look covered. There is one registry and this reads
+    it.
+    """
+    spec = importlib.util.spec_from_file_location("prel_checker", CHECK)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return dict(module.SCHEMA_FILES)
+
+
+def discover() -> tuple[list[tuple[Path, Path, str]], list[str]]:
+    """Every committed artifact in the tree, as (root, path, schema id).
+
+    Nothing is enumerated by name. A JSON file carrying a top-level `schema`
+    string is an artifact and is validated; one carrying a compiler-input schema
+    is a draft; one carrying anything else is reported rather than skipped,
+    because a file the suite silently ignores is exactly how an unregistered
+    schema arrives with no coverage.
+    """
+    found: list[tuple[Path, Path, str]] = []
+    problems: list[str] = []
+    known = set(registered_schemas())
+    for root in ARTIFACT_ROOTS:
+        if not root.is_dir():
+            problems.append(f"artifact root {root} does not exist")
+            continue
+        for path in sorted(root.glob("*.json")):
+            try:
+                document = read(path)
+            except json.JSONDecodeError as error:
+                problems.append(f"{path.name} is not readable JSON: {error}")
+                continue
+            identity = document.get("schema") if isinstance(document, dict) else None
+            if identity is None:
+                continue  # a schema file or other non-artifact document
+            if not isinstance(identity, str):
+                problems.append(f"{path.name} carries a non-string schema {identity!r}")
+                continue
+            if identity in DRAFT_SCHEMAS:
+                continue
+            if identity not in known:
+                problems.append(
+                    f"{path.name} declares schema {identity!r}, which "
+                    f"check_prel_contract.py does not register; an artifact whose "
+                    f"schema is unknown to the checker is validated by nothing"
+                )
+                continue
+            found.append((root, path, identity))
+    return found, problems
+
+
+def positive_control() -> tuple[list[str], dict[str, int]]:
+    """Validate every discovered artifact and reconcile it against the registry."""
     failures: list[str] = []
-    checks = [
-        [SIGNALS, None],
-        [DOSSIER, SIGNALS],
-        [MATRIX, DOSSIER],
-        [AUDIT, None],
-        [HANDOFF, MATRIX],
-        [PACKET, None],
-    ]
-    for artifact, upstream in checks:
+    registered = registered_schemas()
+    artifacts, failures_from_discovery = discover()
+    failures.extend(failures_from_discovery)
+
+    for root, path, _identity in artifacts:
         argv = [
             sys.executable, str(CHECK),
-            "--artifact", str(REFERENCES / artifact),
-            "--resolve-subjects", str(REFERENCES),
+            "--artifact", str(path),
+            "--resolve-subjects", str(root),
         ]
+        upstream = UPSTREAM.get(path.name)
         if upstream:
-            argv += ["--input", str(REFERENCES / upstream)]
+            argv += ["--input", str(root / upstream)]
         code, output = run(argv)
         if code != 0:
-            failures.append(f"positive control red for {artifact}: {output.strip()}")
+            failures.append(f"positive control red for {path.name}: {output.strip()}")
+
+    # Both directions. A registered schema nothing exercises is the failure the
+    # #371 audit found by hand: three schemas landed, CI reached none of them,
+    # and the suite stayed green because it enumerated six filenames.
+    exercised = {identity for _root, _path, identity in artifacts}
+    for identity in sorted(set(registered) - exercised):
+        failures.append(
+            f"registered schema {identity} has no committed artifact in "
+            f"{[root.name for root in ARTIFACT_ROOTS]}, so no test exercises it"
+        )
 
     code, output = run(
         [sys.executable, str(CHECK), "--catalogue", str(REFERENCES / CATALOGUE)]
@@ -79,21 +184,25 @@ def positive_control() -> list[str]:
     if code != 0:
         failures.append(f"positive control red for the catalogue: {output.strip()}")
 
-    for stage, source, target in (
-        ("dossier", SIGNALS, DOSSIER),
-        ("closure", DOSSIER, MATRIX),
-        ("handoff", MATRIX, HANDOFF),
-    ):
+    for compiler, stage, source, target in PROJECTIONS:
         code, output = run([
-            sys.executable, str(COMPILE),
-            "--stage", stage,
-            "--input", str(REFERENCES / source),
-            "--out", str(REFERENCES / target),
+            sys.executable, str(compiler), *stage,
+            "--input", str(source),
+            "--out", str(target),
             "--check",
         ])
         if code != 0:
-            failures.append(f"committed {stage} projection is not current: {output.strip()}")
-    return failures
+            failures.append(
+                f"committed projection {target.name} is not what {source.name} "
+                f"compiles to: {output.strip()}"
+            )
+
+    counts = {
+        "schemas": len(registered),
+        "artifacts": len(artifacts),
+        "projections": len(PROJECTIONS),
+    }
+    return failures, counts
 
 
 class Controls:
@@ -101,12 +210,67 @@ class Controls:
         self.workspace = workspace
         self.results: dict[str, bool] = {}
 
-    def _copy(self, name: str) -> Path:
+    def _copy(self, name: str, source: Path = REFERENCES) -> Path:
         target = self.workspace / name
         if target.exists():
             shutil.rmtree(target)
-        shutil.copytree(REFERENCES, target)
+        shutil.copytree(source, target)
         return target
+
+    def stage(
+        self,
+        name: str,
+        source: Path,
+        mutations: tuple[tuple[str, Callable[[Any], None]], ...] = (),
+    ) -> Path:
+        """A disposable copy of one artifact root carrying the planted defects."""
+        root = self._copy(name, source)
+        for filename, mutate in mutations:
+            document = read(root / filename)
+            mutate(document)
+            write(root / filename, document)
+        return root
+
+    def expect(
+        self,
+        name: str,
+        argv: list[str],
+        code: str,
+        *,
+        status: int | None = None,
+    ) -> None:
+        """Record whether a command refused by its own code at its own status.
+
+        `status` is the true exit code of the process, captured directly rather
+        than through a pipeline: 2 is a refusal and 64 is "the tool could not
+        run", and a suite that accepts any non-zero cannot tell a refused
+        mutation from a crashed checker. Passing None keeps the weaker
+        "non-zero" assertion for controls where either is honest.
+        """
+        got, output = run(argv)
+        matched = got != 0 if status is None else got == status
+        self.results[name] = matched and code in output
+
+    def refuse_artifact(
+        self,
+        name: str,
+        source: Path,
+        filename: str,
+        mutate: Callable[[Any], None],
+        code: str,
+    ) -> None:
+        """Plant one defect in an artifact and require the checker to name it."""
+        root = self.stage(name, source, ((filename, mutate),))
+        self.expect(
+            name,
+            [
+                sys.executable, str(CHECK),
+                "--artifact", str(root / filename),
+                "--resolve-subjects", str(root),
+            ],
+            code,
+            status=2,
+        )
 
     def refuse(
         self,
@@ -178,6 +342,71 @@ class Controls:
             "--input", str(root / source),
         ])
         self.results[name] = status != 0 and code in output
+
+    def refuse_draft(
+        self, name: str, compiler: Path, draft: str,
+        mutate: Callable[[Any], None], code: str, *, status: int,
+    ) -> None:
+        """Plant one defect in a compiler draft and require the named refusal."""
+        root = self.stage(name, FIXTURES, ((draft, mutate),))
+        self.expect(
+            name,
+            [sys.executable, str(compiler), "--input", str(root / draft)],
+            code,
+            status=status,
+        )
+
+    def refuse_projection(
+        self, name: str, compiler: Path, draft: str, target: str,
+        mutate: Callable[[Any], None], code: str,
+    ) -> None:
+        """Hand-edit a committed projection; `--check` must refuse to bless it."""
+        root = self.stage(name, FIXTURES, ((target, mutate),))
+        self.expect(
+            name,
+            [
+                sys.executable, str(compiler),
+                "--input", str(root / draft),
+                "--out", str(root / target),
+                "--check",
+            ],
+            code,
+            status=2,
+        )
+
+    def pin(
+        self, name: str, compiler: Path, draft: str,
+        mutate: Callable[[Any], None], holds: Callable[[Any], bool],
+    ) -> None:
+        """A draft that claims more than it earned must compile to the pin anyway.
+
+        This is the other half of a refusal: the compiler does not read these
+        fields from the draft at all, so an adversarial draft asserting a
+        running session or machine authority produces the same pinned bytes as
+        an honest one. Asserting it here is what keeps that a property rather
+        than an implementation detail nobody re-reads.
+        """
+        root = self.stage(name, FIXTURES, ((draft, mutate),))
+        status, output = run(
+            [sys.executable, str(compiler), "--input", str(root / draft)]
+        )
+        if status != 0:
+            self.results[name] = False
+            return
+        try:
+            compiled = json.loads(output)
+        except json.JSONDecodeError:
+            self.results[name] = False
+            return
+        self.results[name] = holds(compiled)
+
+
+def request(document: Any, identifier: str) -> dict:
+    return next(row for row in document["requests"] if row["id"] == identifier)
+
+
+def entry(document: Any, identifier: str) -> dict:
+    return next(row for row in document["entries"] if row["id"] == identifier)
 
 
 def signal(document: Any, identifier: str) -> dict:
@@ -600,9 +829,217 @@ def plant(controls: Controls) -> None:
         "PREL-COMPILE-RED",
     )
 
+    # --- session dispatch: DAG and lease shape ----------------------------
+    def share_a_lease(doc: Any) -> None:
+        request(doc, "SDR-002")["lease"]["paths"] = copy.deepcopy(
+            request(doc, "SDR-001")["lease"]["paths"]
+        )
+
+    controls.refuse_artifact(
+        "session_dispatch_overlapping_writer_lease", EXAMPLES, DISPATCH,
+        share_a_lease, "C06_OVERLAPPING_WRITER_LEASE",
+    )
+
+    def share_a_resource(doc: Any) -> None:
+        request(doc, "SDR-001")["lease"]["resources"] = [
+            "the compiler byte-stability fixture"
+        ]
+
+    controls.refuse_artifact(
+        "session_dispatch_shared_mutable_resource", EXAMPLES, DISPATCH,
+        share_a_resource, "C06_OVERLAPPING_WRITER_LEASE",
+    )
+
+    def sibling_directories(doc: Any) -> None:
+        """Two disjoint sibling directories, recorded as they behave today.
+
+        `check_session_dispatch` compares lease paths with a bare `startswith`
+        and no separator boundary, so `skills/example` and `skills/example-two`
+        are reported as an overlap although neither contains the other. This
+        control asserts the behavior that exists, not the behavior that is
+        wanted: the checker lives in the read-only `scripts/` lease, and a
+        control asserting the ideal would be red on arrival and tell nobody
+        anything. It is fail-closed -- it over-refuses rather than
+        under-refuses -- so the defect is noise, and this is the record that
+        the noise is known and measured rather than undiscovered.
+        """
+        request(doc, "SDR-001")["lease"]["paths"] = ["skills/example"]
+        request(doc, "SDR-002")["lease"]["paths"] = ["skills/example-two"]
+
+    controls.refuse_artifact(
+        "session_dispatch_lease_prefix_known_limitation", EXAMPLES, DISPATCH,
+        sibling_directories, "C06_OVERLAPPING_WRITER_LEASE",
+    )
+    controls.refuse_artifact(
+        "session_dispatch_child_is_its_own_parent", EXAMPLES, DISPATCH,
+        lambda doc: request(doc, "SDR-003").__setitem__(
+            "parent_request_id", "SDR-003"
+        ),
+        "C07_HIDDEN_MULTI_PARENT_CONVERGENCE",
+    )
+    controls.refuse_artifact(
+        "session_dispatch_sibling_names_a_parent", EXAMPLES, DISPATCH,
+        lambda doc: request(doc, "SDR-002").__setitem__(
+            "parent_request_id", "SDR-001"
+        ),
+        "C07_HIDDEN_MULTI_PARENT_CONVERGENCE",
+    )
+    controls.refuse_artifact(
+        "session_dispatch_rollback_equals_base_tree", EXAMPLES, DISPATCH,
+        lambda doc: request(doc, "SDR-001")["rollback"].__setitem__(
+            "commit", request(doc, "SDR-001")["base"]["tree"]
+        ),
+        "C13_ROLLBACK_SUBJECT_ABSENT_OR_EQUAL_TO_MUTABLE_ALIAS",
+    )
+
+    # --- session receipt: invented session state --------------------------
+    controls.refuse_artifact(
+        "session_receipt_running_without_session_observed", EXAMPLES, RECEIPT,
+        lambda doc: doc["lifecycle"]["SESSION_OBSERVED"].__setitem__(
+            "state", "NOT_EXERCISED"
+        ),
+        "C09_SESSION_REQUEST_PROMOTED_TO_RUNNING",
+    )
+    controls.refuse_artifact(
+        "session_receipt_result_without_running", EXAMPLES, RECEIPT,
+        lambda doc: doc["lifecycle"]["RUNNING"].__setitem__("state", "NOT_EXERCISED"),
+        "C09_SESSION_REQUEST_PROMOTED_TO_RUNNING",
+    )
+    controls.refuse_artifact(
+        "session_receipt_pass_without_evidence_ref", EXAMPLES, RECEIPT,
+        lambda doc: doc["lifecycle"]["ARTIFACTS_READ_BACK"].__setitem__("state", "PASS"),
+        "C05_MISSING_EXACT_RECEIPT",
+    )
+
+    # --- external projection: drift and widened authority -----------------
+    controls.refuse_artifact(
+        "projection_read_back_pass_on_digest_drift", EXAMPLES, REGISTRY,
+        lambda doc: entry(doc, "PRJ-001")["read_back"].__setitem__(
+            "compared_digest",
+            "0" * 63 + "1",
+        ),
+        "C08_PROJECTION_USED_AS_MACHINE_AUTHORITY",
+    )
+    controls.refuse_artifact(
+        "projection_subject_is_a_mutable_alias", EXAMPLES, REGISTRY,
+        lambda doc: entry(doc, "PRJ-002")["canonical_subjects"][0].__setitem__(
+            "commit", "main"
+        ),
+        "C01_MUTABLE_SUBJECT",
+    )
+
+    # --- the two compilers ------------------------------------------------
+    def contradict_dispatch(doc: Any) -> None:
+        request(doc, "SDR-001")["evidence_dispositions"].append(
+            {
+                "subject": "problem-closure-matrix.schema.json",
+                "disposition": "CONTRADICTED",
+            }
+        )
+
+    controls.refuse_draft(
+        "session_dispatch_compiler_drops_contradiction", COMPILE_SESSION,
+        DISPATCH_DRAFT, contradict_dispatch, "K09_CONTRADICTION_DROPPED", status=2,
+    )
+
+    def contradict_projection(doc: Any) -> None:
+        entry(doc, "PRJ-001")["evidence_dispositions"].append(
+            {
+                "subject": "skills/product-reverse-engineering-loop/references/"
+                           "example-closure-matrix.json",
+                "disposition": "CONFIRMED",
+            }
+        )
+
+    controls.refuse_draft(
+        "external_projection_compiler_drops_contradiction", COMPILE_PROJECTION,
+        REGISTRY_DRAFT, contradict_projection, "K09_CONTRADICTION_DROPPED", status=2,
+    )
+    controls.refuse_draft(
+        "session_dispatch_compiler_refuses_malformed_draft", COMPILE_SESSION,
+        DISPATCH_DRAFT, lambda doc: request(doc, "SDR-002").pop("lease"),
+        "PREL-COMPILE-UNUSABLE", status=64,
+    )
+    controls.refuse_draft(
+        "external_projection_compiler_refuses_malformed_draft", COMPILE_PROJECTION,
+        REGISTRY_DRAFT, lambda doc: entry(doc, "PRJ-002").pop("read_back"),
+        "PREL-COMPILE-UNUSABLE", status=64,
+    )
+    controls.refuse_draft(
+        "session_dispatch_compiler_refuses_compiled_input", COMPILE_SESSION,
+        DISPATCH_DRAFT,
+        lambda doc: doc.__setitem__("schema", "prel/session-dispatch-request/v1"),
+        "PREL-COMPILE-RED", status=2,
+    )
+    controls.refuse_draft(
+        "external_projection_compiler_refuses_empty_registry", COMPILE_PROJECTION,
+        REGISTRY_DRAFT, lambda doc: doc.__setitem__("entries", []),
+        "PREL-COMPILE-RED", status=2,
+    )
+    controls.refuse_projection(
+        "session_dispatch_hand_edited_projection", COMPILE_SESSION,
+        DISPATCH_DRAFT, DISPATCH_COMPILED,
+        lambda doc: request(doc, "SDR-001")["lease"]["paths"].append(
+            "skills/product-reverse-engineering-loop/scripts/"
+        ),
+        "PREL-COMPILE-RED",
+    )
+    controls.refuse_projection(
+        "external_projection_hand_edited_projection", COMPILE_PROJECTION,
+        REGISTRY_DRAFT, REGISTRY_COMPILED,
+        lambda doc: entry(doc, "PRJ-002")["read_back"].__setitem__("state", "PASS"),
+        "PREL-COMPILE-RED",
+    )
+
+    def claim_a_running_session(doc: Any) -> None:
+        doc["lifecycle_state"] = "RUNNING"
+        doc["running_session"] = {"pid": 4242, "host": "a carrier nobody observed"}
+        for row in doc["requests"]:
+            row["requests_private_reasoning"] = True
+            row["authority"] = {
+                "merge": True, "permission": True, "secret": True, "production": True
+            }
+
+    def stayed_a_request(compiled: Any) -> bool:
+        return (
+            compiled["lifecycle_state"] == "LAUNCH_REQUESTED"
+            and compiled["running_session"] is None
+            and all(
+                row["requests_private_reasoning"] is False
+                and not any(row["authority"].values())
+                for row in compiled["requests"]
+            )
+        )
+
+    controls.pin(
+        "session_dispatch_compiler_pins_launch_requested", COMPILE_SESSION,
+        DISPATCH_DRAFT, claim_a_running_session, stayed_a_request,
+    )
+
+    def claim_machine_authority(doc: Any) -> None:
+        doc["evidence_ceiling"] = "MACHINE_AUTHORITY"
+        doc["authority"] = {
+            "implementation": True, "completion": True, "product_truth": True,
+            "merge": True, "release": True,
+        }
+        for row in doc["entries"]:
+            row["authority"] = copy.deepcopy(doc["authority"])
+
+    def stayed_a_projection(compiled: Any) -> bool:
+        return (
+            compiled["evidence_ceiling"] == "HUMAN_PROJECTION"
+            and not any(compiled["authority"].values())
+            and all(not any(row["authority"].values()) for row in compiled["entries"])
+        )
+
+    controls.pin(
+        "external_projection_compiler_pins_human_projection", COMPILE_PROJECTION,
+        REGISTRY_DRAFT, claim_machine_authority, stayed_a_projection,
+    )
+
 
 def main() -> int:
-    failures = positive_control()
+    failures, counts = positive_control()
     if failures:
         for failure in failures:
             print(f"PREL-SELFTEST-RED {failure}", file=sys.stderr)
@@ -630,7 +1067,9 @@ def main() -> int:
             print(f"PREL-SELFTEST-RED control is unregistered in cases.json: {name}", file=sys.stderr)
         return 2
     print(
-        f"PREL-SELFTEST-GREEN positive control clean, "
+        f"PREL-SELFTEST-GREEN {counts['artifacts']} committed artifact(s) covering "
+        f"{counts['schemas']} registered schema(s), {counts['projections']} "
+        f"byte-stable projection(s), "
         f"{len(controls.results)} planted defects refused by their own code"
     )
     return 0
