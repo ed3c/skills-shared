@@ -36,3 +36,8 @@ python3 "$ROOT/refactor/selftest.py"
 # committed requests, byte-stable projections, every declared state emitted by
 # a real compilation, refusals fired from single-field deltas.
 python3 "$ROOT/expand-contract/selftest.py"
+
+# The consumer-bootstrap profile gate reconciles the committed thin-binding
+# artifact against the tree in both directions; nothing else routes it, so a
+# regression in it would otherwise be invisible.
+python3 "$ROOT/bootstrap/check_bootstrap_profile.py" --selftest

@@ -58,10 +58,10 @@
       "id": 527,
       "title": "[DTCR-B1] immutable thin-binding bootstrap profile for new repositories",
       "github_state": "OPEN",
-      "evidence": "NOT_IMPLEMENTED",
+      "evidence": "bootstrap profile artifact LANDED and gate-reconciled; attach REFUSED on two explicit preconditions",
       "start_dependency": 526,
       "completion_dependency": 525,
-      "note": "start dependency #526 satisfied (CLOSED via PR #563); completion dependency per #527's own 2026-08-21 comment",
+      "note": "bootstrap/ landed (profile + schema + gate, 14 planted mutations); registry admission stays HUMAN_ADMIT_REQUIRED and REQUIRED_ORDER closure NOT_IMPLEMENTED (shared-skills-infra lane) - both are first-class refused preconditions, not papered over; real consumer application NOT_EXERCISED (#528)",
       "blocks": [528]
     },
     {
