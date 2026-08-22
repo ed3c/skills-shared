@@ -1,0 +1,275 @@
+{
+  "as_of": "2026-08-22",
+  "corpus_id": "dtcr-semantic-context-public-corpus/v1",
+  "note": "Synthetic public content only. The private record carries no text: it is registered by digest and by a ledger-event reference from the plane that holds it, which is what keeps a private record retrievable without copying it into the public tree.",
+  "records": [
+    {
+      "back_reference": {
+        "back_reference_id": "DTCR-BK-001",
+        "reference_kind": "REPOSITORY_BLOB",
+        "repository_blob": {
+          "blob": "33cfaed0d09d3f7e06b3c6ff4c37300c658bf362",
+          "commit": "b599059bebf4903e063ba2812df642a3542eba5b",
+          "path": "docs/decisions/domain-isolation.md",
+          "range": {
+            "end_line": 10,
+            "start_line": 1
+          },
+          "repository_binding_id": "DTCR-RB-39d18c5c5ccdd16e"
+        },
+        "schema": "dtcr/source-back-reference/v1"
+      },
+      "document": {
+        "authority": "NON_AUTHORITATIVE_CANDIDATE",
+        "authority_ceiling": {
+          "current_policy": false,
+          "deterministic_fact": false,
+          "task_pass": false
+        },
+        "back_reference_ref": "DTCR-BK-001",
+        "document_digest": "3e48f3da15c0c354e46a1f44e4fdaba6dc57ac0dca617feaee4fb5eabef84033",
+        "document_id": "DTCR-DOC-001",
+        "document_kind": "DECISION_RECORD",
+        "observed_at": "2026-08-19",
+        "observed_revision": "3",
+        "owning_decision": "decision record 12 on the domain isolation boundary",
+        "schema": "dtcr/semantic-document/v1",
+        "storage_plane": "PUBLIC_TREE",
+        "subsystem_tags": [
+          "domain",
+          "persistence"
+        ],
+        "visibility_class": "PUBLIC_TREE"
+      },
+      "freshness_ceiling": {
+        "authority_ceiling": {
+          "current_policy": false,
+          "deterministic_fact": false,
+          "reproduced_failure": false,
+          "task_state_change": false
+        },
+        "ceiling_id": "DTCR-FC-001",
+        "document_ref": "DTCR-DOC-001",
+        "observed_at": "2026-08-19",
+        "observed_revision": "3",
+        "revalidated_at": "2026-08-19",
+        "schema": "dtcr/semantic-freshness-ceiling/v1",
+        "supersession": "NOT_SUPERSEDED",
+        "usable_as": "CONTEXT_CANDIDATE"
+      },
+      "text": "Decision record 12 supersedes the legacy persistence rule and fixes the\ndomain isolation boundary for every service in this program.\n\nThe domain layer owns its own invariants. A persistence adapter may read a\ndomain object and may never construct one from a row, because a row that\nconstructs a domain object has moved the boundary without saying so.\n\nThis decision is current as of the revision recorded beside it. It replaces\ndecision record 4, whose persistence boundary rule is retained only as history.\n"
+    },
+    {
+      "back_reference": {
+        "back_reference_id": "DTCR-BK-002",
+        "reference_kind": "REPOSITORY_BLOB",
+        "repository_blob": {
+          "blob": "72fcbdec7fe7dc8b4e10f53611be5dce6d4e4790",
+          "commit": "b599059bebf4903e063ba2812df642a3542eba5b",
+          "path": "docs/decisions/legacy-persistence-rule.md",
+          "range": {
+            "end_line": 10,
+            "start_line": 1
+          },
+          "repository_binding_id": "DTCR-RB-39d18c5c5ccdd16e"
+        },
+        "schema": "dtcr/source-back-reference/v1"
+      },
+      "document": {
+        "authority": "NON_AUTHORITATIVE_CANDIDATE",
+        "authority_ceiling": {
+          "current_policy": false,
+          "deterministic_fact": false,
+          "task_pass": false
+        },
+        "back_reference_ref": "DTCR-BK-002",
+        "document_digest": "d5a26185a05ed50857b9a7100c33056ca3e9fbbfc520f6456bf1c3caf50ae1c0",
+        "document_id": "DTCR-DOC-002",
+        "document_kind": "DECISION_RECORD",
+        "observed_at": "2024-02-11",
+        "observed_revision": "1",
+        "owning_decision": "decision record 4 on the legacy persistence rule",
+        "schema": "dtcr/semantic-document/v1",
+        "storage_plane": "PUBLIC_TREE",
+        "subsystem_tags": [
+          "persistence"
+        ],
+        "visibility_class": "PUBLIC_TREE"
+      },
+      "freshness_ceiling": {
+        "authority_ceiling": {
+          "current_policy": false,
+          "deterministic_fact": false,
+          "reproduced_failure": false,
+          "task_state_change": false
+        },
+        "ceiling_id": "DTCR-FC-002",
+        "document_ref": "DTCR-DOC-002",
+        "observed_at": "2024-02-11",
+        "observed_revision": "1",
+        "revalidated_at": "NEVER_REVALIDATED",
+        "schema": "dtcr/semantic-freshness-ceiling/v1",
+        "supersession": {
+          "superseded_at": "2026-05-04",
+          "superseding_decision_ref": "decision record 12 on the domain isolation boundary"
+        },
+        "usable_as": "HISTORICAL_CONTEXT_ONLY"
+      },
+      "text": "Decision record 4 on the legacy persistence rule. The persistence\nboundary here is the table, and the domain isolation rule follows the schema.\n\nA persistence row is a domain object. The persistence boundary is drawn at the\nquery, and a domain module reads the persistence rows it needs directly, so the\ndomain isolation boundary and the persistence boundary are the same boundary.\n\nPersistence, persistence boundary, domain isolation: this record was the\ndecision in force before decision record 12 replaced it.\n"
+    },
+    {
+      "back_reference": {
+        "back_reference_id": "DTCR-BK-003",
+        "reference_kind": "SOURCE_PACKET",
+        "schema": "dtcr/source-back-reference/v1",
+        "source_packet": {
+          "byte_count": 347,
+          "packet_id": "DTCR-SP-001",
+          "sha256": "481bf7aea78f8b77d62ebadb3c4c069a69e1e5c247cd85cc4b1ef4a82d83ab8d"
+        }
+      },
+      "document": {
+        "authority": "NON_AUTHORITATIVE_CANDIDATE",
+        "authority_ceiling": {
+          "current_policy": false,
+          "deterministic_fact": false,
+          "task_pass": false
+        },
+        "back_reference_ref": "DTCR-BK-003",
+        "document_digest": "481bf7aea78f8b77d62ebadb3c4c069a69e1e5c247cd85cc4b1ef4a82d83ab8d",
+        "document_id": "DTCR-DOC-003",
+        "document_kind": "INCIDENT_REVIEW",
+        "observed_at": "2026-08-20",
+        "observed_revision": "1",
+        "owning_decision": "incident review for the scheduler stall",
+        "schema": "dtcr/semantic-document/v1",
+        "storage_plane": "PUBLIC_TREE",
+        "subsystem_tags": [
+          "scheduler"
+        ],
+        "visibility_class": "PUBLIC_TREE"
+      },
+      "freshness_ceiling": {
+        "authority_ceiling": {
+          "current_policy": false,
+          "deterministic_fact": false,
+          "reproduced_failure": false,
+          "task_state_change": false
+        },
+        "ceiling_id": "DTCR-FC-003",
+        "document_ref": "DTCR-DOC-003",
+        "observed_at": "2026-08-20",
+        "observed_revision": "1",
+        "revalidated_at": "NEVER_REVALIDATED",
+        "schema": "dtcr/semantic-freshness-ceiling/v1",
+        "supersession": "NOT_SUPERSEDED",
+        "usable_as": "CONTEXT_CANDIDATE"
+      },
+      "text": "Incident review for the scheduler stall observed during the checkout\nwindow.\n\nThe scheduler stopped draining its queue for eleven minutes. The trigger was a\nlock held across a retry, and the retry was itself scheduled by the lock holder.\n\nThis review records what was observed. It is not a reproduction of the failure,\nand nothing here was rerun.\n"
+    },
+    {
+      "back_reference": {
+        "back_reference_id": "DTCR-BK-004",
+        "ledger_event": {
+          "event_digest": "6891eab8cdca60b5214b7127394ada2062f3633ea0ed0e15042a1873e960f07e",
+          "sequence": 412
+        },
+        "reference_kind": "LEDGER_EVENT",
+        "schema": "dtcr/source-back-reference/v1"
+      },
+      "document": {
+        "authority": "NON_AUTHORITATIVE_CANDIDATE",
+        "authority_ceiling": {
+          "current_policy": false,
+          "deterministic_fact": false,
+          "task_pass": false
+        },
+        "back_reference_ref": "DTCR-BK-004",
+        "document_digest": "2c34cf803ba742eb3c3388d2826156b7509842cfe7146721af101c4e1d520ee0",
+        "document_id": "DTCR-DOC-004",
+        "document_kind": "SECURITY_ADVISORY",
+        "observed_at": "2026-08-17",
+        "observed_revision": "1",
+        "owning_decision": "advisory tracked in the private carrier",
+        "schema": "dtcr/semantic-document/v1",
+        "storage_plane": "PRIVATE_CARRIER",
+        "subsystem_tags": [
+          "gateway"
+        ],
+        "visibility_class": "PRIVATE_CARRIER"
+      },
+      "freshness_ceiling": {
+        "authority_ceiling": {
+          "current_policy": false,
+          "deterministic_fact": false,
+          "reproduced_failure": false,
+          "task_state_change": false
+        },
+        "ceiling_id": "DTCR-FC-004",
+        "document_ref": "DTCR-DOC-004",
+        "observed_at": "2026-08-17",
+        "observed_revision": "1",
+        "revalidated_at": "NEVER_REVALIDATED",
+        "schema": "dtcr/semantic-freshness-ceiling/v1",
+        "supersession": "NOT_SUPERSEDED",
+        "usable_as": "CONTEXT_CANDIDATE"
+      }
+    },
+    {
+      "back_reference": {
+        "back_reference_id": "DTCR-BK-005",
+        "reference_kind": "REPOSITORY_BLOB",
+        "repository_blob": {
+          "blob": "37e598ac4aa780b198ce0e9e2ba9163579b3d644",
+          "commit": "b599059bebf4903e063ba2812df642a3542eba5b",
+          "path": "docs/objectives/checkout-path.md",
+          "range": {
+            "end_line": 8,
+            "start_line": 1
+          },
+          "repository_binding_id": "DTCR-RB-39d18c5c5ccdd16e"
+        },
+        "schema": "dtcr/source-back-reference/v1"
+      },
+      "document": {
+        "authority": "NON_AUTHORITATIVE_CANDIDATE",
+        "authority_ceiling": {
+          "current_policy": false,
+          "deterministic_fact": false,
+          "task_pass": false
+        },
+        "back_reference_ref": "DTCR-BK-005",
+        "document_digest": "1315add57ee1911b28400460f5bff60835f74285b41d96f0d089e1e14d67aa5f",
+        "document_id": "DTCR-DOC-005",
+        "document_kind": "SERVICE_OBJECTIVE",
+        "observed_at": "2026-08-18",
+        "observed_revision": "2",
+        "owning_decision": "service objective for the checkout path",
+        "schema": "dtcr/semantic-document/v1",
+        "storage_plane": "PUBLIC_TREE",
+        "subsystem_tags": [
+          "gateway",
+          "latency"
+        ],
+        "visibility_class": "PUBLIC_TREE"
+      },
+      "freshness_ceiling": {
+        "authority_ceiling": {
+          "current_policy": false,
+          "deterministic_fact": false,
+          "reproduced_failure": false,
+          "task_state_change": false
+        },
+        "ceiling_id": "DTCR-FC-005",
+        "document_ref": "DTCR-DOC-005",
+        "observed_at": "2026-08-18",
+        "observed_revision": "2",
+        "revalidated_at": "2026-08-18",
+        "schema": "dtcr/semantic-freshness-ceiling/v1",
+        "supersession": "NOT_SUPERSEDED",
+        "usable_as": "CONTEXT_CANDIDATE"
+      },
+      "text": "Service objective for the checkout path.\n\nThe gateway answers a checkout request within the stated latency budget for the\nstated share of requests, measured over a rolling window.\n\nThe objective is a target somebody agreed to. It is not a measurement, and this\nrecord carries none.\n"
+    }
+  ]
+}

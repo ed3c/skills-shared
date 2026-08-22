@@ -1,0 +1,59 @@
+{
+  "adapter": {
+    "name": "dtcr-semantic-context",
+    "version": "1.0.0"
+  },
+  "attempts": [
+    {
+      "executable_sha256": "01ae36c38b5c824af906dac099d35ca97d5926017f7d0dbe4b4431903646b059",
+      "exit_code": 0,
+      "interpreter": "~/.local/state/skills-shared-runs/recapture-venv/bin/python",
+      "state": "PASS",
+      "stderr_bytes": 0,
+      "stdout": "0.37.1",
+      "stdout_sha256": "3411f5146da8828f70e7af84f3805ba32da8d4545b463f83267689c48cce6219"
+    }
+  ],
+  "establishes": {
+    "retrieval_quality": false,
+    "semantic_correctness": false,
+    "task_pass": false,
+    "technical_authority": false,
+    "vector_lane_available": false
+  },
+  "lanes": {
+    "embedding_provider": {
+      "state": "BLOCKED_ON_PROVIDER",
+      "why": "a vector store holds vectors somebody else computed. No embedding provider is bound on this runtime, so there is nothing to store and no query to project"
+    },
+    "keyword_reference_backend": {
+      "state": "PASS",
+      "why": "the frozen retrieval-query lane enum admits KEYWORD, and no schema in the M1 set requires an embedding provider; this lane is exercised by selftest.py on every run with no provider on the host"
+    },
+    "provider_terms_model_rights_and_privacy": {
+      "state": "HUMAN_ADMIT_REQUIRED",
+      "why": "fixed by projection-receipt.schema.json's provider_terms_admission constant; no volume of successful calls converts into it"
+    },
+    "vector_retrieval_lane": {
+      "state": "BLOCKED_ON_PROVIDER",
+      "why": "blocked on the embedding provider above, not on the store: open_port refuses VECTOR and HYBRID with VECTOR_LANE_CLAIMED_WITHOUT_EMBEDDING_PROVIDER rather than answering them from the keyword index"
+    },
+    "vector_store_import": {
+      "state": "PASS",
+      "why": "an importable embedded vector store is a transport fact about one pinned interpreter on one host; it is not a retrieval lane"
+    }
+  },
+  "omissions": [
+    "the interpreter is recorded home-relative and by content digest; this receipt is evidence for that one interpreter on that one host and transfers to no other",
+    "library licence and NOTICE state were not read by this probe and remain HUMAN_ADMIT_REQUIRED"
+  ],
+  "probe": {
+    "argv_tail": [
+      "-c",
+      "import lancedb; print(lancedb.__version__)"
+    ],
+    "network": "NONE",
+    "timeout_seconds": 120
+  },
+  "receipt": "dtcr/semantic-context-provider-probe/v1"
+}
