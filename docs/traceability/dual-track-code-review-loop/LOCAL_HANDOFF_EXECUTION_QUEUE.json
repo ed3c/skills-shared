@@ -15,19 +15,19 @@
         "id": 525,
         "kind": "COMPLETION_DEPENDENCY",
         "source": "body-named",
-        "note": "#528 body: Requires #525 admission"
+        "note": "#528 body: Requires #525 admission — SATISFIED 2026-08-22: E1 executed, final ADMIT_FOR_DOWNSTREAM on f2e3edf, independence Human-admitted; closed with packet issue-525.json"
       },
       {
         "id": 526,
         "kind": "START_DEPENDENCY",
         "source": "body-named",
-        "note": "#528 body: Requires #526 convergence; github_state CLOSED (satisfied for start), full admission still rides #525"
+        "note": "#528 body: Requires #526 convergence — SATISFIED: CLOSED, and its residual #525 admission is now also satisfied"
       },
       {
         "id": 527,
         "kind": "START_DEPENDENCY",
         "source": "body-named",
-        "note": "#528 body: Requires #527 generic bootstrap readiness"
+        "note": "#528 body: Requires #527 generic bootstrap readiness — SATISFIED 2026-08-22: DTCR_GENERIC_CONSUMER_BOOTSTRAP_READY recorded at its deterministic ceiling; closed with packet issue-527.json"
       },
       {
         "id": 523,
@@ -50,9 +50,7 @@
       "github_state": "OPEN",
       "evidence": "all four adapter lanes landed (#546/#548 earlier waves, #547/#549 closed 2026-08-22); convergence reconciliation and the hosted exact-head arrival on the wave's push head remain with this owner",
       "note": "16 D1/M1 interface schemas (33 total on the DTCR surface) and four deterministic adapters landed under this contract's capability classes",
-      "blocks": [
-        525
-      ]
+      "blocks": []
     },
     {
       "id": 521,
@@ -64,29 +62,12 @@
       "blocks": []
     },
     {
-      "id": 525,
-      "title": "[DTCR-E1] independent Shadow, mutations and evidence-closure denominator",
+      "id": 528,
+      "title": "[DTCR-L1] real consumer canary / typed Local Handoff / final admission",
       "github_state": "OPEN",
-      "evidence": "fresh-context E1 audit executed 2026-08-22 on 8d99f2d -> BLOCK (five blockers, each dispositioned same day; records under docs/traceability/dual-track-code-review-loop/shadow-audit/); independence adjudication permanently HUMAN_ADMIT_REQUIRED",
-      "start_dependency": 519,
-      "blocks": [
-        526,
-        527,
-        528
-      ],
-      "note": "full admission of #526's convergence names #525 as a completion dependency; #526's own DTCR_DOCS_PROMPTS_TRACE_READY terminal does not require it. #527's own comment also names '#525 admission' as its completion dependency"
-    },
-    {
-      "id": 527,
-      "title": "[DTCR-B1] immutable thin-binding bootstrap profile for new repositories",
-      "github_state": "OPEN",
-      "evidence": "LANDED_AWAITING_COMPLETION_DEPENDENCY: consumer_bootstrap_dtcr.py sibling profile plus tests/consumer-bootstrap-dtcr/ landed 2026-08-22 (publication commit 81f2f20d; worktree-local merges retained on the local forensic branch), CI-chained, 17 mutation controls red; receipt records completion_dependency_525 OPEN, composition_target_430 ABSENT, terminal NOT_EMITTED",
-      "start_dependency": 526,
-      "completion_dependency": 525,
-      "note": "does not close on green tests: DTCR_GENERIC_CONSUMER_BOOTSTRAP_READY waits on #525 admission per its own comment",
-      "blocks": [
-        528
-      ]
+      "evidence": "every start dependency satisfied and prerequisites Human-admitted 2026-08-22 (recorded in the issue's admission comment); remaining before execution: the R9 consumer-selection record, the S4 narrowing sibling schema, and this lane's own R6/R7 typed-queue and canary-receipt schemas",
+      "note": "the program terminal; stays open until its own canary receipts exist",
+      "blocks": []
     }
   ],
   "closed_lanes": [
@@ -200,6 +181,28 @@
       ],
       "closure_packet": "skills/agentic-tech-lead-orchestration/references/closure-audit/issue-524.json",
       "note": "expand-contract/ compiler plus two R2 contracts landed over a two-repository fixture; dual-run NOT_OBSERVED, real-codebase application NOT_EXERCISED, live lanes transferred to #528"
+    },
+    {
+      "id": 525,
+      "title": "[DTCR-E1] independent Shadow, mutations and evidence-closure denominator",
+      "github_state": "CLOSED",
+      "exit_terminal": "ADMIT_FOR_DOWNSTREAM (E1 final pass on f2e3edf; independence Human-admitted at its stated ceiling)",
+      "residual_owner": [517],
+      "closure_packet": "skills/agentic-tech-lead-orchestration/references/closure-audit/issue-525.json",
+      "note": "three E1 passes recorded under docs/traceability/dual-track-code-review-loop/shadow-audit/: BLOCK on 8d99f2d, re-verification on 723c302, final ADMIT_FOR_DOWNSTREAM on f2e3edf; a genuinely foreign-dispatch second Shadow transfers to #517"
+    },
+    {
+      "id": 527,
+      "title": "[DTCR-B1] immutable thin-binding bootstrap profile for new repositories",
+      "github_state": "CLOSED",
+      "exit_terminal": "DTCR_GENERIC_CONSUMER_BOOTSTRAP_READY (deterministic ceiling; runtime NOT_EXERCISED, registry_admission ABSENT)",
+      "landing": {
+        "commit": "81f2f20d63d39849502dfe8cea463a80a5613095",
+        "note": "publication commit (no PR: Human-admitted 2026-08-22 single-push wave)"
+      },
+      "residual_owner": [528, 517],
+      "closure_packet": "skills/agentic-tech-lead-orchestration/references/closure-audit/issue-527.json",
+      "note": "closed once its recorded completion dependency (#525 admission) was satisfied; real-consumer runtime exercise transfers to #528, registry admission to #517"
     }
   ]
 }

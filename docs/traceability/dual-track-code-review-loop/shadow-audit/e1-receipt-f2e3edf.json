@@ -1,0 +1,191 @@
+{
+  "document": "dtcr/e1-shadow-audit-wrapper/v1",
+  "_note": "closure-record.schema.json is additionalProperties:false at its root, so the session_identity / dissent sidecars the repaired #525 requires cannot live inside the closure-record instance. This wrapper keeps the record schema-valid and holds the sidecars beside it. Same convention as receipt.json (8d99f2d).",
+  "closure_record": {
+    "schema": "dtcr/closure-record/v1",
+    "closure_id": "DTCR-CR-525",
+    "subject_commit": "f2e3edf8bf10cfa43ef7a0917de4bb8180af29b6",
+    "subject_tree": "b9bc76f635fdd73a7a9cdada9489d3ba790b2360",
+    "change_unit_refs": [],
+    "arrivals": [
+      "STATIC",
+      "SANDBOX"
+    ],
+    "lanes": {
+      "deterministic": "PASS",
+      "semantic": "PASS",
+      "runtime": "NOT_EXERCISED",
+      "provider": "PASS",
+      "physical": "NOT_APPLICABLE",
+      "private_carrier": "NOT_EXERCISED",
+      "independent_review": "HUMAN_ADMIT_REQUIRED",
+      "legal": "HUMAN_ADMIT_REQUIRED",
+      "user": "NOT_EXERCISED",
+      "paid": "NOT_EXERCISED",
+      "merge": "HUMAN_ADMIT_REQUIRED",
+      "release": "HUMAN_ADMIT_REQUIRED"
+    },
+    "terminal_state": "PASS_WITH_STATED_CEILING",
+    "human_owned_operations": [
+      "independent review identity: whether a fresh-context subagent dispatched by the authoring session satisfies the independent Shadow role",
+      "recording any pre-admission of prerequisite requirements \u2014 the Tech Lead's and the Human's act, not this auditor's",
+      "registry admission",
+      "merge and release",
+      "legal, employment and intellectual-property clearance",
+      "provider service-terms clearance (no machine oracle in any environment)"
+    ],
+    "rollback": {
+      "base_commit": "674cfe1435c4bd1c29e8f07308266fe5c6284973"
+    },
+    "authority": {
+      "merge": false,
+      "permission": false,
+      "secret": false,
+      "production": false,
+      "user_value": false,
+      "paid_demand": false,
+      "release": false
+    }
+  },
+  "closure_record_validation": {
+    "validator": "python3 jsonschema Draft202012Validator",
+    "schema": "skills/dual-track-code-review-loop/references/schemas/closure-record.schema.json",
+    "result": "VALID"
+  },
+  "verdict": {
+    "human_level_token": "ADMIT_FOR_DOWNSTREAM",
+    "issue_525_equivalent": "ADMIT_PORTABLE_METHOD",
+    "machine_terminal_state": "PASS_WITH_STATED_CEILING",
+    "mapping_source": "issue #525 Adversarial audit reconciliation 2026-08-22, repair 5",
+    "scope": "Admits the portable method for registry/bootstrap CONSIDERATION at this exact head. It does not close live consumer, user, paid, legal, merge, release, production or registry lanes, and it is not itself an admission \u2014 the admission is a Human transition recorded in human_owned_operations.",
+    "audit_history": [
+      {
+        "head": "8d99f2d95f06e18c4725fd506535f39d939fe679",
+        "verdict": "BLOCK",
+        "blockers": [
+          "F-01",
+          "F-02",
+          "F-03",
+          "F-04",
+          "F-05"
+        ]
+      },
+      {
+        "head": "723c30238cf00839e6935b5358c7f844baf2124b",
+        "verdict": "BLOCK_REMAINS",
+        "resolved": [
+          "F-01",
+          "F-02",
+          "F-05"
+        ],
+        "residual": [
+          "F-03 landing pointers unreachable",
+          "F-04 locator republished in the audit record"
+        ]
+      },
+      {
+        "head": "f2e3edf8bf10cfa43ef7a0917de4bb8180af29b6",
+        "verdict": "ADMIT_FOR_DOWNSTREAM",
+        "residual": []
+      }
+    ]
+  },
+  "blocker_disposition": {
+    "F-01_clean_checkout_replay": {
+      "status": "RESOLVED",
+      "evidence": "export tree-sitter selftest exit 0 (typed NOT_EXERCISED, no checkout); scip exit 0; in-worktree suite exit 0"
+    },
+    "F-02_falsifier_identity_unverified": {
+      "status": "RESOLVED",
+      "evidence": "all-23-codes-collapsed knockout exit 2, red for its named reason; was exit 0 at 8d99f2d"
+    },
+    "F-03_traceability_graph_and_packets": {
+      "status": "RESOLVED",
+      "evidence": "four packets committed, assert_issue_closure_contract.py exit 0 each, all schema-VALID; every landing.commit in the queue resolves (a3f87ac ancestor_of_head=True); zero unresolved landing pointers; the four pre-rebuild SHAs are not ancestors and survive only as prose forensic notes inside the packets"
+    },
+    "F-04_private_url_in_public_artifact": {
+      "status": "RESOLVED",
+      "evidence": "index.scip at this head: /Users/=0, .claude/worktrees=0, wf_=0, neon=0, project_root=file:///dtcr-fixture/...; wf_5779055d occurs 0 times repo-wide; the redaction plus its note is in place at e1-findings-8d99f2d.md:192-198; leak_scan gutted -> exit 2 for its named reason"
+    },
+    "F-05_concurrent_writer": {
+      "status": "RESOLVED",
+      "evidence": "git status --porcelain empty at start and end; HEAD stable at f2e3edf throughout"
+    }
+  },
+  "real_machine_local_locator_scan": {
+    "oracle": "bytes grep over the full `git ls-files` denominator (2320 tracked files) at this head",
+    "real_value_definition": "the auditing account path /Users/neon and the builder worktree id wf_5779055d; synthetic examples (/Users/example, /Users/<user>, /Users/nn) and scanner pattern literals are excluded",
+    "audited_subject_skills_dual_track_code_review_loop": {
+      "files": 132,
+      "real_locator_hits": 0
+    },
+    "builder_worktree_id_wf_5779055d": {
+      "repo_wide_occurrences": 0
+    },
+    "dtcr_traceability_plane": {
+      "files": 11,
+      "hits": 3,
+      "detail": "e1-findings-8d99f2d.md:5 and :470 and e1-receipt-8d99f2d.json:76 \u2014 all three are the AUDITOR's own session worktree_path, which repaired #525 repair 3 explicitly REQUIRES in session_identity so a person can adjudicate independence. Contract-mandated, not a leak."
+    },
+    "out_of_scope_observation": {
+      "paths": [
+        "data/handoff/codex-v2/issue-464-live-run-receipt.json",
+        "data/handoff/herdr-v2/herdr-lifecycle-receipt.json",
+        "data/handoff/herdr-v3/herdr-lifecycle-receipt.json",
+        "data/handoff/herdr-v3/herdr-plan.json"
+      ],
+      "note": "Real machine-local locators in tracked bytes, arriving with the concurrently merged #599 lane. Outside the #525 denominator and not produced by any DTCR lane; reported to the Human as an observation, not scored against this verdict. Wider pre-existing occurrences live under migration/superseded/** and docs/traceability/github-portfolio-control/**."
+    },
+    "conclusion": "No real machine-local locator remains in the audited subject, and none was introduced by any DTCR lane. The only real locators in DTCR-owned paths are the contract-mandated auditor session worktree_path."
+  },
+  "denominator": {
+    "sh skills/dual-track-code-review-loop/tests/run-all.sh (in-worktree)": 0,
+    "nine lanes green": true,
+    "adapters/tree-sitter/selftest.py (clean export, no .git)": 0,
+    "adapters/scip/selftest.py (clean export, no .git)": 0,
+    "assert_issue_closure_contract.py issue-524/547/549/550.json": 0,
+    "issue-closure-contract.schema.json validation of all four": "VALID",
+    "knockout: semantic-context all falsifier codes collapsed": 2,
+    "knockout: scip leak_scan() gutted": 2,
+    "git status --porcelain": "empty",
+    "evidence_ceiling_classes": {
+      "syntax": "PASS \u2014 tree-sitter, live receipt; live lane typed NOT_EXERCISED outside a checkout",
+      "symbol": "PASS \u2014 scip on a real scip-python 0.6.6 round-trip; python scope only, non-python indexer scopes ride #519",
+      "graph": "PASS \u2014 sqlite-ledger, real database created and traversed",
+      "context": "PASS \u2014 semantic-context zero-network reference backend; LanceDB provider lane NOT_EXERCISED (PROVIDER_ABSENT)",
+      "contract_compatibility": "PASS \u2014 buf on committed landing-run outputs; live buf lane NOT_EXERCISED (provider absent on this host)",
+      "review": "PASS \u2014 X1 synthesis compilers at fixture level",
+      "refactor": "PASS \u2014 R1 compiler; every request self-declared synthetic, applied_on_real_codebase pinned false",
+      "expand-contract": "PASS \u2014 R2 over a two-repository git fixture; dual_run_observation NOT_OBSERVED, live_canary NOT_EXERCISED, contraction_authorization HUMAN_ADMIT_REQUIRED",
+      "closure": "PASS \u2014 closure rows and the four Issue Closure Contract packets, gate exit 0 and schema-VALID"
+    }
+  },
+  "session_identity": {
+    "host": "claude-code",
+    "role": "fresh-context subagent commissioned via the Agent tool by the session that authored the repairs",
+    "model": "claude-opus-5[1m]",
+    "base_sha": "f2e3edf8bf10cfa43ef7a0917de4bb8180af29b6",
+    "head_sha": "f2e3edf8bf10cfa43ef7a0917de4bb8180af29b6",
+    "subject_tree": "b9bc76f635fdd73a7a9cdada9489d3ba790b2360",
+    "worktree_path": "/Users/neon/skills-shared/.claude/worktrees/dtcr-queue-tech-lead",
+    "replay_path": "git archive f2e3edf export outside the repository, plus per-knockout throwaway copies",
+    "dirty_before": "clean",
+    "dirty_after": "clean",
+    "no_audited_artifact_authored_by_this_session": true,
+    "writes_performed": "scratchpad e1-audit/ only; zero writes inside the repository",
+    "independence_determination": "HUMAN_ADMIT_REQUIRED",
+    "independence_note": "Unchanged across all three passes. Not machine-decidable; controlled-vocabulary.md:170-181 places independent review identity permanently under HUMAN_ADMIT_REQUIRED. The dispatch relationship is the weakest form of the property: this session shares the authoring session's worktree and was commissioned by it. E1 records the evidence and does not record any pre-admission \u2014 that transition belongs to the Tech Lead and the Human.",
+    "prior_passes": [
+      "8d99f2d BLOCK",
+      "723c302 BLOCK_REMAINS",
+      "f2e3edf ADMIT_FOR_DOWNSTREAM"
+    ]
+  },
+  "dissent": [],
+  "dissent_note": "Empty because exactly one Shadow ran across all three passes. Stated explicitly: an empty dissent list is not evidence of agreement, it is evidence that agreement was never tested.",
+  "findings_documents": [
+    "findings.md (8d99f2d)",
+    "e1-verify-723c302.md",
+    "e1-final-f2e3edf.md"
+  ]
+}
