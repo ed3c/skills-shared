@@ -1,0 +1,155 @@
+name: CADG PR Admission
+
+on:
+  workflow_call:
+    inputs:
+      skills_shared_ref:
+        description: Immutable skills-shared commit containing the CADG contracts and adapter.
+        required: true
+        type: string
+      packet_path:
+        description: Optional consumer-relative packet path; empty discovers exactly zero or one packet.
+        required: false
+        default: ''
+        type: string
+      policy_path:
+        description: Optional consumer-relative materiality policy override.
+        required: false
+        default: ''
+        type: string
+      shadow_receipt_path:
+        description: Optional consumer-relative independent Shadow receipt.
+        required: false
+        default: ''
+        type: string
+      human_admission_ref:
+        description: Optional opaque Human design-admission receipt reference.
+        required: false
+        default: ''
+        type: string
+  pull_request:
+    types: [ready_for_review]
+    paths:
+      - '.github/workflows/cadg-pr-admission.yml'
+      - 'skills/human-led-agentic-engineering/modules/github-pr-cadg/**'
+      - 'skills/human-led-agentic-engineering/scripts/check_cadg_packet.py'
+      - 'skills/human-led-agentic-engineering/references/cadg/**'
+      - 'skills/human-led-agentic-engineering/examples/cadg/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cadg-pr-admission-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  adapter-selftest:
+    if: inputs.skills_shared_ref == ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.12'
+      - name: Run exact-subject adapter controls
+        run: bash skills/human-led-agentic-engineering/modules/github-pr-cadg/tests/verify.sh
+
+  consumer-admission:
+    if: inputs.skills_shared_ref != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout consumer exact PR head
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+          path: consumer
+      - name: Checkout immutable CADG implementation
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          repository: ed3c/skills-shared
+          ref: ${{ inputs.skills_shared_ref }}
+          fetch-depth: 1
+          persist-credentials: false
+          path: shared
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.12'
+      - name: Bind shared and consumer exact subjects
+        id: bind
+        shell: bash
+        env:
+          EXPECTED_SHARED: ${{ inputs.skills_shared_ref }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          test "$(git -C shared rev-parse HEAD)" = "${EXPECTED_SHARED}"
+          test "$(git -C consumer rev-parse HEAD)" = "${HEAD_SHA}"
+          printf 'base_tree=%s\n' "$(git -C consumer rev-parse "${BASE_SHA}^{tree}")" >> "${GITHUB_OUTPUT}"
+          printf 'head_tree=%s\n' "$(git -C consumer rev-parse "${HEAD_SHA}^{tree}")" >> "${GITHUB_OUTPUT}"
+          mkdir -p "${RUNNER_TEMP}/cadg"
+          git -C consumer diff --name-only "${BASE_SHA}" "${HEAD_SHA}" > "${RUNNER_TEMP}/cadg/changed-files.txt"
+      - name: Validate packet and compile exact-PR receipt
+        shell: bash
+        env:
+          INPUT_PACKET: ${{ inputs.packet_path }}
+          INPUT_POLICY: ${{ inputs.policy_path }}
+          INPUT_SHADOW: ${{ inputs.shadow_receipt_path }}
+          INPUT_HUMAN: ${{ inputs.human_admission_ref }}
+          REPOSITORY: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          HEAD_BRANCH: ${{ github.event.pull_request.head.ref }}
+          BASE_TREE: ${{ steps.bind.outputs.base_tree }}
+          HEAD_TREE: ${{ steps.bind.outputs.head_tree }}
+        run: |
+          set -euo pipefail
+          packet_args=()
+          if [[ -n "${INPUT_PACKET}" ]]; then
+            packet_args=(--packet "consumer/${INPUT_PACKET}")
+          elif [[ -d consumer/.agents/cadg/packets ]]; then
+            mapfile -t packets < <(find consumer/.agents/cadg/packets -maxdepth 1 -type f -name '*.json' | sort)
+            if (( ${#packets[@]} > 1 )); then
+              printf 'CADG-PR-RED CADG014 ambiguous packet set: %s\n' "${packets[*]}" >&2
+              exit 2
+            elif (( ${#packets[@]} == 1 )); then
+              packet_args=(--packet "${packets[0]}")
+            fi
+          fi
+          policy="shared/skills/human-led-agentic-engineering/modules/github-pr-cadg/policy.default.json"
+          if [[ -n "${INPUT_POLICY}" ]]; then policy="consumer/${INPUT_POLICY}"; fi
+          shadow_args=()
+          if [[ -n "${INPUT_SHADOW}" ]]; then shadow_args=(--shadow-receipt "consumer/${INPUT_SHADOW}"); fi
+          human_args=()
+          if [[ -n "${INPUT_HUMAN}" ]]; then human_args=(--human-admission-ref "${INPUT_HUMAN}"); fi
+          python3 shared/skills/human-led-agentic-engineering/modules/github-pr-cadg/cadg_pr_admission.py \
+            --repo-root consumer \
+            --policy "${policy}" \
+            --changed-files "${RUNNER_TEMP}/cadg/changed-files.txt" \
+            --checker shared/skills/human-led-agentic-engineering/scripts/check_cadg_packet.py \
+            "${packet_args[@]}" "${shadow_args[@]}" "${human_args[@]}" \
+            --repository "${REPOSITORY}" --pr-number "${PR_NUMBER}" \
+            --base-commit "${BASE_SHA}" --base-tree "${BASE_TREE}" \
+            --head-commit "${HEAD_SHA}" --head-tree "${HEAD_TREE}" --head-branch "${HEAD_BRANCH}" \
+            --code-state NOT_EXERCISED \
+            --receipt-out "${RUNNER_TEMP}/cadg/admission-receipt.json" \
+            | tee "${RUNNER_TEMP}/cadg/admission.log"
+      - name: Upload exact-head CADG receipt
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: cadg-pr-${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.sha }}
+          path: ${{ runner.temp }}/cadg
+          if-no-files-found: error
+          include-hidden-files: true
