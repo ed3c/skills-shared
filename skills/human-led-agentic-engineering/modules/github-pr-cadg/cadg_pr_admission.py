@@ -22,12 +22,12 @@ HEX40 = __import__("re").compile(r"^[0-9a-f]{40}$")
 DIGEST = __import__("re").compile(r"^sha256:[0-9a-f]{64}$")
 OPERATING_MODES = {"OFF", "OBSERVE", "WARN", "GATE"}
 FI_BLOCKER_MAP = {
-    "CADG001": "CADG-FI-001",  # stale/wrong immutable subject
+    "CADG001": "CADG-FI-001",
     "CADG013": "CADG-FI-001",
     "CADG014": "CADG-FI-001",
-    "CADG008": "CADG-FI-002",  # duplicate canonical writer
-    "CADG009": "CADG-FI-003",  # authority/effect widening
-    "CADG003": "CADG-FI-004",  # blocking assumption unresolved
+    "CADG008": "CADG-FI-002",
+    "CADG009": "CADG-FI-003",
+    "CADG003": "CADG-FI-004",
 }
 
 
@@ -235,8 +235,6 @@ def admit(args: argparse.Namespace) -> dict[str, Any] | None:
         "subject": exact,
         "code_manifest_digest": current_manifest,
         "validator": {"path": str(args.checker), "content_digest": file_digest(args.checker), "exit_code": 0},
-        "operating_mode": operating_mode(policy),
-        "transition_boundary": transition_boundary(args, policy),
         "code": args.code_state,
         "cadg": "PASS",
         "shadow": shadow_state,
@@ -251,7 +249,7 @@ def admit(args: argparse.Namespace) -> dict[str, Any] | None:
         receipt["human_admission_ref"] = args.human_admission_ref
     args.receipt_out.parent.mkdir(parents=True, exist_ok=True)
     args.receipt_out.write_bytes(canonical_bytes(receipt) + b"\n")
-    print(f"CADG-PR-GREEN packet={packet['packet_id']} head={args.head_commit} mode={operating_mode(policy)} code={args.code_state} shadow={shadow_state} human={human_state}")
+    print(f"CADG-PR-GREEN packet={packet['packet_id']} head={args.head_commit} mode={operating_mode(policy)} boundary={transition_boundary(args, policy)} code={args.code_state} shadow={shadow_state} human={human_state}")
     return receipt
 
 
