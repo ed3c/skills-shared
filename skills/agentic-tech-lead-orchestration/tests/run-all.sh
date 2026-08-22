@@ -75,6 +75,51 @@ for queue in "$ROOT"/runtime-handoff/*-local-handoff-queue.json; do
   python3 "$ROOT/scripts/assert_local_handoff_queue.py" --queue "$queue"
 done
 
+# Close the receipt paper gate (#466): a queue item whose exit requires a
+# receipt must have that receipt actually exist and actually validate — the
+# queue gate above only checks the path and schema id are DECLARED. A
+# blocked/NOT_EXERCISED attempt receipt is a different document class and must
+# say so explicitly instead of silently failing the lifecycle contract.
+python3 - "$ROOT" <<'PYRC'
+import json, sys
+from pathlib import Path
+from jsonschema import Draft202012Validator
+
+SKILL = Path(sys.argv[1])
+ROOT = SKILL.parents[1]
+SCHEMA_BY_ID = {
+    "agentic-tech-lead/herdr-lifecycle/v1": SKILL / "references/contracts/herdr-lifecycle-receipt.schema.json",
+}
+queue = json.loads((SKILL / "runtime-handoff/herdr-local-handoff-queue.json").read_text())
+failed = []
+for item in queue["items"]:
+    if item.get("exit", {}).get("requires_receipt") is not True:
+        continue
+    schema_id = item["receipt"]["schema"]
+    schema_file = SCHEMA_BY_ID.get(schema_id)
+    if schema_file is None:
+        failed.append(f"{item['id']}: receipt.schema {schema_id!r} resolves to no contract file")
+        continue
+    receipt_path = ROOT / item["receipt"]["path"]
+    if not receipt_path.exists():
+        # An ACTIVE item may legitimately have no receipt yet; a COMPLETE one may not.
+        if item.get("state") == "COMPLETE":
+            failed.append(f"{item['id']}: COMPLETE with no receipt at {receipt_path}")
+        continue
+    instance = json.loads(receipt_path.read_text())
+    if instance.get("state") in {"NOT_EXERCISED", "FAIL", "HUMAN_ADMIT_REQUIRED"}:
+        for key in ("state", "evidence_ceiling", "sample_count", "blockers"):
+            if key not in instance:
+                failed.append(f"{item['id']}: blocked receipt missing {key}")
+        continue
+    errors = list(Draft202012Validator(json.loads(schema_file.read_text())).iter_errors(instance))
+    if errors:
+        failed.append(f"{item['id']}: receipt fails {schema_file.name}: {errors[0].message[:120]}")
+if failed:
+    print("RECEIPT-GATE-RED"); [print(" -", f) for f in failed]; sys.exit(1)
+print("RECEIPT-GATE-GREEN local handoff receipts bound to their declared contract")
+PYRC
+
 # A schema-valid one-item queue epoch must validate and run its planted
 # controls (issue #317: the selftest used to crash on items[1]).
 python3 "$ROOT/scripts/assert_local_handoff_queue.py" \
@@ -168,6 +213,7 @@ PYCP
 python3 "$ROOT/tests/codex_sdk_controller_selftest.py"
 python3 "$ROOT/tests/github_issue_dag_selftest.py"
 python3 "$ROOT/tests/herdr_observer_selftest.py"
+python3 "$ROOT/tests/herdr_surface_conformance_selftest.py"
 python3 "$ROOT/tests/problem_closure_selftest.py"
 
 # #508: the durable result carrier and the strict worker-result contract. Both
@@ -176,6 +222,7 @@ python3 "$ROOT/tests/problem_closure_selftest.py"
 # a green run never promotes #464's live lane.
 python3 "$ROOT/tests/codex_result_carrier_selftest.py"
 python3 "$ROOT/tests/codex_worker_result_selftest.py"
+python3 "$ROOT/tests/codex_pinned_runtime_selftest.py"
 python3 "$ROOT/tests/codex_live_acceptance_selftest.py"
 python3 "$ROOT/tests/github_issue_dag_live_canary_selftest.py"
 python3 "$ROOT/tests/herdr_lifecycle_selftest.py"
