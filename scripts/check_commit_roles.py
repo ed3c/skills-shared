@@ -115,7 +115,7 @@ def check_machine_identity(record: dict[str, str], by_value: str, on_value: str 
 
     if execution_domain(on_value, vocabulary) == "LOCAL":
         problems.append(
-            f"{short}: Driven-By {by_value} runs on local host {on_value!r} but author {record['author_email']!r} is not <role>@<host>.invalid; local machine provenance must not depend on a person's identity"
+            f"{short}: Driven-By {by_value} runs on local host {on_value!r} but author {record['author_email']!r} is not <role>@<host>.invalid; local machine provenance must not depend on a person's identity or count machine work toward a person's contribution graph"
         )
         return problems
 
