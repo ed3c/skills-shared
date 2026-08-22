@@ -124,6 +124,19 @@ The renderer emits deterministic Markdown **after** the JSON ledger passes. Its 
 
 `check_skill_core_boundaries.py --skill agentic-tech-lead-orchestration` verifies portable-core/domain-module separation. It does not admit tasks, capabilities, scheduler results, control-plane runtime results, or handoff execution.
 
+## Gate preservation — #605
+
+Every other script here judges the tree in front of it, so none of them can see a gate that is no longer there: when a merge deletes a check, the suite goes green *because* the check vanished. Shadow-proven twice on this repository — the #466 receipt paper gate was deleted by a merge, and two per-queue selftest invocations were dropped.
+
+`check_gate_preservation.py` takes the range, not the tree, as its subject. It reports a gate file (`assert_*`/`check_*`, `run-all.sh`, `verify.sh`, `*selftest*.py`, workflow) that existed at the base and is gone at HEAD, and an invocation line that a shell runner or workflow carried at the base and no longer carries. A deleted invocation whose exact text reappears anywhere in the same range is a move, not a deletion. An intended retirement must be named with `--allow <substring>` at the call site; there is no heuristic that decides a deletion was meant.
+
+The base is `--base`, else `GITHUB_BASE_REF` through `merge-base` (the suite's CI job checks out with `fetch-depth: 0` for exactly this reason), else the first parent of HEAD — which is the pre-merge base of a merge commit. A shallow checkout, a root commit, a non-git tree, or a base that resolves to HEAD itself prints `GATE-PRESERVATION-SKIPPED_BY_POLICY` with the reason. An unreadable base is never reported as an audited green (#576 class).
+
+```bash
+python3 scripts/check_gate_preservation.py --selftest
+python3 scripts/check_gate_preservation.py [--base <rev>] [--allow <substring>]
+```
+
 ## Exit contract
 
 ```text

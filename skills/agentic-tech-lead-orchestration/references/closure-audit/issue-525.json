@@ -1,74 +1,74 @@
 {
- "schema_version": "agentic-tech-lead/issue-closure-contract/v1",
- "issue": {
-  "repository": "ed3c/skills-shared",
-  "number": 525,
-  "github_state": "CLOSED",
-  "github_state_reason": "COMPLETED"
- },
- "disposition": "SCOPE_TRANSFERRED",
- "acceptance": [
-  {
-   "id": "audit-denominator-executed-read-only",
-   "status": "SATISFIED",
-   "successor": null,
-   "rationale": "three fresh-context E1 passes over frozen subjects (8d99f2d BLOCK; 723c302 re-verification; f2e3edf final), each replaying the committed suites, gates and closure packets against out-of-repository exports with per-knockout throwaway copies; zero repository writes, zero git/gh mutations; records under docs/traceability/dual-track-code-review-loop/shadow-audit/"
+  "schema_version": "agentic-tech-lead/issue-closure-contract/v1",
+  "issue": {
+    "repository": "ed3c/skills-shared",
+    "number": 525,
+    "github_state": "CLOSED",
+    "github_state_reason": "COMPLETED"
   },
-  {
-   "id": "falsifiers-and-mutation-review",
-   "status": "SATISFIED",
-   "successor": null,
-   "rationale": "the first pass proved a falsifier-identity collapse (all 23 semantic-context codes to one constant, still green) and an offline-replay crash; both were repaired with mechanised red proofs and the Shadow's own knockouts now exit 2 for their named reasons, re-confirmed on 723c302 and f2e3edf"
+  "disposition": "SCOPE_TRANSFERRED",
+  "acceptance": [
+    {
+      "id": "audit-denominator-executed-read-only",
+      "status": "SATISFIED",
+      "successor": null,
+      "rationale": "three fresh-context E1 passes over frozen subjects (8d99f2d BLOCK; 723c302 re-verification; f2e3edf final), each replaying the committed suites, gates and closure packets against out-of-repository exports with per-knockout throwaway copies; zero repository writes, zero git/gh mutations; records under docs/traceability/dual-track-code-review-loop/shadow-audit/"
+    },
+    {
+      "id": "falsifiers-and-mutation-review",
+      "status": "SATISFIED",
+      "successor": null,
+      "rationale": "the first pass proved a falsifier-identity collapse (all 23 semantic-context codes to one constant, still green) and an offline-replay crash; both were repaired with mechanised red proofs and the Shadow's own knockouts now exit 2 for their named reasons, re-confirmed on 723c302 and f2e3edf"
+    },
+    {
+      "id": "stale-subject-and-receipt-review",
+      "status": "SATISFIED",
+      "successor": null,
+      "rationale": "STALE_BASE_OR_RECEIPT found live twice (an R2 build note bound to a foreign subject; pre-rebuild landing pointers unresolvable on a fresh clone) and repaired both times; final pass confirms zero unresolved landing pointers on f2e3edf"
+    },
+    {
+      "id": "leak-and-authority-widening-scan",
+      "status": "SATISFIED",
+      "successor": null,
+      "rationale": "PRIVATE_URL_IN_PUBLIC_ARTIFACT found live twice (committed SCIP fixture bytes; then the audit record's own evidence quote as a new carrier) and repaired both times; final pass bytes-grep over all 2320 tracked files finds zero real machine-local locators in DTCR-owned paths beyond the contract-mandated session-identity fields; out-of-scope locators in other programs' lanes are flagged in the final record, not repaired under this lease"
+    },
+    {
+      "id": "verdict-emitted-with-machine-receipt",
+      "status": "SATISFIED",
+      "successor": null,
+      "rationale": "final verdict ADMIT_FOR_DOWNSTREAM on f2e3edf; e1-receipt-f2e3edf.json wrapper's closure_record member validates against the frozen closure-record schema (Draft 2020-12)"
+    },
+    {
+      "id": "independence-adjudication",
+      "status": "SATISFIED",
+      "successor": null,
+      "rationale": "the receipts record the adverse evidence verbatim and never self-certify; the Human's standing wave directive pre-admitting the issues' prerequisite requirements is recorded as the admission of this prerequisite at its stated ceiling (fresh-context artifact-blind session with out-of-repository replay, dispatched by the builder's own session) in the 2026-08-22 closing comment"
+    },
+    {
+      "id": "second-shadow-dissent-lane",
+      "status": "TRANSFERRED",
+      "successor": "ed3c/skills-shared#517",
+      "rationale": "exactly one Shadow ran; the empty dissent list is recorded as agreement-never-tested, and a genuinely foreign-dispatch second Shadow with a real dissent lane transfers to the parent program"
+    }
+  ],
+  "implementation": {
+    "candidate_prs": [],
+    "landing": null
   },
-  {
-   "id": "stale-subject-and-receipt-review",
-   "status": "SATISFIED",
-   "successor": null,
-   "rationale": "STALE_BASE_OR_RECEIPT found live twice (an R2 build note bound to a foreign subject; pre-rebuild landing pointers unresolvable on a fresh clone) and repaired both times; final pass confirms zero unresolved landing pointers on f2e3edf"
-  },
-  {
-   "id": "leak-and-authority-widening-scan",
-   "status": "SATISFIED",
-   "successor": null,
-   "rationale": "PRIVATE_URL_IN_PUBLIC_ARTIFACT found live twice (committed SCIP fixture bytes; then the audit record's own evidence quote as a new carrier) and repaired both times; final pass bytes-grep over all 2320 tracked files finds zero real machine-local locators in DTCR-owned paths beyond the contract-mandated session-identity fields; out-of-scope locators in other programs' lanes are flagged in the final record, not repaired under this lease"
-  },
-  {
-   "id": "verdict-emitted-with-machine-receipt",
-   "status": "SATISFIED",
-   "successor": null,
-   "rationale": "final verdict ADMIT_FOR_DOWNSTREAM on f2e3edf; e1-receipt-f2e3edf.json wrapper's closure_record member validates against the frozen closure-record schema (Draft 2020-12)"
-  },
-  {
-   "id": "independence-adjudication",
-   "status": "SATISFIED",
-   "successor": null,
-   "rationale": "the receipts record the adverse evidence verbatim and never self-certify; the Human's standing wave directive pre-admitting the issues' prerequisite requirements is recorded as the admission of this prerequisite at its stated ceiling (fresh-context artifact-blind session with out-of-repository replay, dispatched by the builder's own session) in the 2026-08-22 closing comment"
-  },
-  {
-   "id": "second-shadow-dissent-lane",
-   "status": "TRANSFERRED",
-   "successor": "ed3c/skills-shared#517",
-   "rationale": "exactly one Shadow ran; the empty dissent list is recorded as agreement-never-tested, and a genuinely foreign-dispatch second Shadow with a real dissent lane transfers to the parent program"
+  "residual": [
+    {
+      "id": "foreign-dispatch-second-shadow",
+      "state": "NOT_EXERCISED",
+      "owner": "ed3c/skills-shared#517"
+    },
+    {
+      "id": "out-of-scope-locators-in-other-lanes",
+      "state": "NOT_EXERCISED",
+      "owner": "ed3c/skills-shared#517"
+    }
+  ],
+  "evidence_ceiling": "DETERMINISTIC",
+  "shadow_review": {
+    "verdict": "HUMAN_ADMIT_REQUIRED"
   }
- ],
- "implementation": {
-  "candidate_prs": [],
-  "landing": null
- },
- "residual": [
-  {
-   "id": "foreign-dispatch-second-shadow",
-   "state": "NOT_EXERCISED",
-   "owner": "ed3c/skills-shared#517"
-  },
-  {
-   "id": "out-of-scope-locators-in-other-lanes",
-   "state": "NOT_EXERCISED",
-   "owner": "ed3c/skills-shared#517"
-  }
- ],
- "evidence_ceiling": "DETERMINISTIC",
- "shadow_review": {
-  "verdict": "PASS"
- }
 }

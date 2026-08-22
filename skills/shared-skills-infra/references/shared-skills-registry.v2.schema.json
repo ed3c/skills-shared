@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "shared-skills-registry/v2",
+  "title": "Shared skills registry (v2)",
+  "description": "Minimal binding contract for the root registry.json, authored 2026-08-22 when the dtcr typed queue began naming 'shared-skills-registry/v2' as a receipt schema with no contract file shipping for it (the #607 dangling-label class). Constrains the identity and the load-bearing shape the registry rule describes: a skill name appears in exactly one of the two rulings lists. Deliberately minimal — it binds what the queue's receipt claim relies on, not the registry's prose.",
+  "type": "object",
+  "required": ["schema", "canonical_root", "shared", "repo_owned"],
+  "properties": {
+    "schema": { "const": "shared-skills-registry/v2" },
+    "_ssot": { "type": "string" },
+    "_rule": { "type": "string" },
+    "canonical_root": { "type": "string", "minLength": 1 },
+    "shared": { "$ref": "#/$defs/ruling_list" },
+    "repo_owned": { "$ref": "#/$defs/ruling_list" }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "ruling_list": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}
