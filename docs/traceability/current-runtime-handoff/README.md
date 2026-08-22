@@ -92,7 +92,7 @@ PR #516 executed the three ACTIVE Local Handoff Execution Queue items — #508, 
 | #434 | `CLOSED_UNMERGED (2026-08-21)` | closed on GitHub before this pass; Productization rebuild remains owned by #436 |
 | #395 → #396 | `DRAFT STACK / HOLD` | both `MERGEABLE` per current readback; human-led Agentic Engineering method + trace child have no current-main refresh and no current exact-head admission |
 
-All five open Draft PRs above (#412, #419, #420, #450, #395/#396) read `MERGEABLE` on GitHub as of this pass — each against its own base branch (`main` only for #412 and #395; the stack children merge against their parent branches). `MERGEABLE` reports the absence of a text conflict against that base, not readiness and not a clean merge into main — Draft/HOLD stands until each PR's own close gate is satisfied. No other open PR was merged in this audit beyond #516. Old green runs do not follow a moving base.
+Of the Draft PRs this pass audited, only #395/#396 remain open (Draft stack, `MERGEABLE` per that readback — a report of no text conflict against their bases, not readiness). #412/#419/#420/#450 are `CLOSED_UNMERGED / SUPERSEDED` as the rows above record (2026-08-22 reconciliation); their Draft/HOLD language in this paragraph is historical. No other open PR was merged in this audit beyond #516. Old green runs do not follow a moving base.
 
 ## Directory → responsibility map
 

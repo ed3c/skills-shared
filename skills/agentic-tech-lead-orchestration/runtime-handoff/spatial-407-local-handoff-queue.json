@@ -98,7 +98,9 @@
           "same_context_to_independent_shadow_without_provenance",
           "compatibility_green_to_semantic_parity_pass",
           "one_host_canary_to_universal_continuous_monitor_proof",
-          "static_fixture_to_live_runtime_receipt"
+          "static_fixture_to_live_runtime_receipt",
+          "stale_case_graph_after_code_movement_to_current_subject_binding",
+          "shadow_implementation_write_to_independent_shadow_observation"
         ],
         "path": "data/handoff/spatial-407/live-shadow-case-delta-receipt.json",
         "required_states": [

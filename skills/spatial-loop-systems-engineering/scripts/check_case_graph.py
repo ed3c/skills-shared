@@ -15,6 +15,9 @@ from typing import Any
 
 SCHEMA = "spatial-loop-case-graph/v1"
 DIGEST_RE = re.compile(r"^sha256:[0-9a-f]{64}$")
+# An `invariant_or_state_refs` entry shaped like this is a declared-invariant
+# reference; anything else stays a free-form state path and is not resolved.
+INVARIANT_ID_RE = re.compile(r"^INV-[A-Za-z0-9][A-Za-z0-9._-]*$")
 DECISION_REQUIRED = {"INTENTIONAL_CHANGE", "DEFER_EXPLICIT", "DROP_EXPLICIT"}
 PRESERVATION_DISPOSITIONS = {"PRESERVE_EXACT", "PRESERVE_OBSERVABLE", "ADAPT_WITH_COMPATIBILITY"}
 CASE_CLASSES = {
@@ -123,6 +126,7 @@ def validate(doc: Any) -> list[str]:
     oracles = index_nodes(as_list(doc.get("oracles"), "oracles", errors), "oracles", errors)
     evidence = index_nodes(as_list(doc.get("evidence"), "evidence", errors), "evidence", errors)
     decisions = index_nodes(as_list(doc.get("decisions", []), "decisions", errors), "decisions", errors)
+    invariants = index_nodes(as_list(doc.get("invariants", []), "invariants", errors), "invariants", errors)
 
     reject_cross_category_ids(
         [
@@ -130,6 +134,7 @@ def validate(doc: Any) -> list[str]:
             ("source_behaviors", behaviors), ("cases", cases),
             ("implementations", impls), ("oracles", oracles),
             ("evidence", evidence), ("decisions", decisions),
+            ("invariants", invariants),
         ],
         errors,
     )
@@ -170,6 +175,11 @@ def validate(doc: Any) -> list[str]:
             if not isinstance(decision_id, str) or decision_id not in decisions:
                 errors.append(f"source behavior {behavior_id} disposition {disposition} requires decision_id")
 
+    # Closure is enforced only when the graph declares the node array, so
+    # pre-invariant v1 graphs with free-form refs keep validating.
+    invariants_declared = isinstance(doc, dict) and "invariants" in doc
+    invariant_referenced: set[str] = set()
+
     required_cases = [c for c in cases.values() if c.get("classification") == "REQUIRED_CASE"]
     blocking_cases = [c for c in cases.values() if c.get("classification") == "UNKNOWN_BLOCKING"]
     case_impl_closed = 0
@@ -205,6 +215,13 @@ def validate(doc: Any) -> list[str]:
         for ref in oracle_ids:
             if ref not in oracles:
                 errors.append(f"case {case_id} references unknown oracle {ref}")
+        if invariants_declared:
+            for ref in inv_refs:
+                if INVARIANT_ID_RE.match(str(ref)):
+                    if ref not in invariants:
+                        errors.append(f"case {case_id} references undeclared invariant {ref}")
+                    else:
+                        invariant_referenced.add(str(ref))
 
         referenced_evidence_states: list[str] = []
         for ref in evidence_ids:
@@ -248,6 +265,13 @@ def validate(doc: Any) -> list[str]:
             decision_id = case.get("decision_id")
             if not isinstance(decision_id, str) or decision_id not in decisions:
                 errors.append(f"out-of-scope case {case_id} requires decision_id")
+
+    if invariants_declared:
+        for invariant_id, invariant in invariants.items():
+            if not str(invariant.get("statement", "")).strip():
+                errors.append(f"invariant {invariant_id} requires statement")
+            if invariant_id not in invariant_referenced:
+                errors.append(f"invariant {invariant_id} is referenced by no case")
 
     for impl_id, impl in impls.items():
         if not str(impl.get("owner", "")).strip():

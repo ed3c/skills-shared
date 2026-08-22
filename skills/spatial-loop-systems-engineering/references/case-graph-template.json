@@ -12,6 +12,9 @@
     {"id": "AXIS-001", "name": "REPLACE_WITH_APPLICABLE_SEMANTIC_AXIS", "state": "APPLICABLE"}
   ],
   "source_behaviors": [],
+  "invariants": [
+    {"id": "INV-001", "statement": "REPLACE_WITH_THE_INVARIANT_THIS_CASE_MUST_HOLD"}
+  ],
   "cases": [
     {
       "id": "CASE-001",

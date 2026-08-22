@@ -84,7 +84,7 @@ C #387
 
 The method and CI/registry routes are on main. General safe deletion, unseen-domain coverage, real Git Town execution, release, and production remain separate evidence lanes.
 
-## Held open Draft stacks
+## Held open Draft stacks (historical — dissolved 2026-08-22, see reconciliation note below)
 
 ### Spatial ICPG → knowledge graph
 

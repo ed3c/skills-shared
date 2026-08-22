@@ -102,14 +102,15 @@ Every required case has one implementation owner or one explicit convergence own
 └─ #411  X      live continuous Shadow runtime canary; external/live evidence lane
 ```
 
-Current source PR / implementation branch:
+Historical source PR / implementation branch:
 
 ```text
-PR #412
-agent/spatial-intent-case-proof-graph-v1
+PR #412   CLOSED_NOT_MERGED (2026-08-21); preserved as first-red provenance evidence
+agent/spatial-intent-case-proof-graph-v1 — final head e679aed9, not reachable from main
+admitted publication: superseding replayed carrier, terminal merge c27f8c3
 ```
 
-The exact head is mutable; read it from GitHub. PR #513 is a historical temporary current-main refresh carrier only and is not an implementation atom.
+PR #513 is a historical temporary current-main refresh carrier only and is not an implementation atom. Read current subjects from GitHub before any decision.
 
 Do not manufacture one serial Stack merely to mirror issue numbering. #408 is the contract/core leaf. #409 is a true child when it consumes that contract. #410 may be sibling/convergence by path ownership. #411 is live evidence and is not a Git child unless its harness code consumes unmerged parent bytes.
 

@@ -46,7 +46,7 @@
   "forbidden_promotions_absent": {
     "source_tree_green_to_main_admitted_without_provenance_gate": "ABSENT — main admission is claimed only together with the exact-head Skill Eval Contract success and the local full-history commit-role green.",
     "connector_commit_to_human_or_local_machine_identity": "ABSENT — no connector commit was relabeled by this receipt; classification comes from the pre-existing declared_owner_addresses rule admitted on main, under which the owner's connector writes are the owner's own human writes.",
-    "rewritable_branch_commit_to_known_unclassified_history": "ABSENT — evals/commit-roles.json known_unclassified holds 3 entries, none of which is a #412-lineage commit; the lineage classifies via declared owner addresses, not via known_unclassified.",
+    "rewritable_branch_commit_to_known_unclassified_history": "ABSENT — verified by SHA membership, not by count: none of 01067581, 5ac05420, 32c049ca or e679aed9 appears anywhere in evals/commit-roles.json known_unclassified; the lineage classifies via declared owner addresses, not via known_unclassified.",
     "skill_suites_green_to_skill_eval_contract_pass": "ABSENT — the two workflows are cited as separate exact-head runs (597 and 341).",
     "candidate_main_compatibility_to_merged_on_main": "ABSENT — lineage reachability from main was verified with git merge-base --is-ancestor, not inferred from integration-branch compatibility; the final candidate head e679aed9 is explicitly recorded as NOT reachable."
   },
@@ -58,14 +58,20 @@
       "#409 acceptance surfaces: spec-packet-template gained the case-delta obligations section; system-prompt overlay gained the literal 8 delta-class tokens; README gained the missing oracle question",
       "#410 index binding: spatial-407 molecular index gained exact relation tokens and the issue/case/branch-class/parent/paths/produced-state/oracle/evidence-ceiling/rollback stack-binding block"
     ],
-    "confirmed_residuals_not_fixed_here": [
-      { "issue": 408, "finding": "invariant IDs are presence-checked but not indexed/uniqueness-checked/cross-reference-closed (invariant_or_state_refs is a bare string array); enforcing it is a schema-evolution decision", "severity": "MAJOR" },
-      { "issue": 408, "finding": "OUT_OF_SCOPE_EXPLICIT silent-scope-reduction guard (check_case_graph.py:247-250) has no red test exercising it", "severity": "MAJOR" },
-      { "issue": 408, "finding": "a required case citing subject-bound FAIL evidence is refused only at READY_FOR_PUBLICATION_REVIEW; earlier gates accept it — whether that is intended needs an owner decision", "severity": "MAJOR" },
-      { "issue": 408, "finding": "references/case-graph.schema.json is exercised only by the test harness; the shipped checker does structural checks in code and never applies the JSON schema", "severity": "MAJOR" },
-      { "issue": 409, "finding": "the two #409 falsifiers are literal-deletion detectors (str.replace of exact lines), not semantic falsifiers; only 4 of 8 delta classes and 2 of 5 monitor questions are literal-asserted by the suite, and system-prompt-monitor-overlay.md is read by zero deterministic checks", "severity": "MAJOR" },
-      { "issue": 410, "finding": "no planted-defect test turns red for 'task PASS with global case gap'; PATH_LEASE_OVERLAP has zero red-test coverage; no machine-readable molecular-stack index exists for spatial-407 (assert_molecular_stack_index.py defaults elsewhere)", "severity": "MAJOR" },
-      { "issue": 411, "finding": "queue item 2 receipt schema id spatial-loop/live-shadow-case-delta-receipt/v1 resolves to no schema file (name-only convention, same as this receipt's id); its forbidden_promotions cover 4 of the issue's 6 control bullets; both queue items pin required_subject_commit 5ac05420, so item 2 requires recompilation against the post-receipt admitted main before execution (subject-mutation law)", "severity": "MAJOR" }
+    "fixed_in_residual_implementation_commit": [
+      "#408 invariant closure: optional invariants node array with global-id uniqueness, INV- reference closure, non-empty statements and no-orphan enforcement (additive by key presence); schema/template/fixture/reference doc aligned; exemplar-lock asserts the fixture and template keep declaring the array; fixture digest repinned in example-stack-contract.json",
+      "#408 scope-reduction guard gained its first red test (OUT_OF_SCOPE_EXPLICIT without decision_id)",
+      "#408 schema-checker parity: enum vocabularies (dispositions/classifications/gates/evidence states) and structural required-key lists are now drift-tested against the checker constants",
+      "#409 architecture-watch falsifiers assert their mutations actually applied, and all four monitor surfaces are literal-asserted for the 8 delta classes and 5 monitor questions (52 per-surface drift probes)",
+      "#410 global-case-gap: CASE_DENOMINATOR_SHRINK proven as the detector with planted-defect selftest coverage; PATH_LEASE_OVERLAP gained red + positive tests",
+      "#411 queue item 2 forbidden_promotions now cover stale-case-graph-after-code-movement and shadow-implementation-write"
+    ],
+    "confirmed_residuals_still_open": [
+      { "issue": 408, "finding": "a required case citing subject-bound FAIL evidence is refused only at READY_FOR_PUBLICATION_REVIEW; earlier gates accept it — whether that is intended needs an owner decision (an attempted test-pin of the current behavior was withdrawn by Shadow review as owner-reserved)", "severity": "MAJOR" },
+      { "issue": 408, "finding": "the shipped checker still does not itself apply references/case-graph.schema.json; the new parity tests guard vocabulary drift, but runtime schema enforcement remains a design decision", "severity": "MINOR" },
+      { "issue": 409, "finding": "the falsifiers remain literal-grep class (now guarded against vacuous no-op mutations and extended to all four surfaces); semantic falsification of prose surfaces has no mechanical form", "severity": "MINOR" },
+      { "issue": 410, "finding": "no machine-readable molecular-stack index exists for spatial-407: assert_molecular_stack_index.py vocabulary (unique per-atom branches, PR_STATES without a closed-unmerged/carrier-landing state) cannot truthfully represent the superseded-carrier publication; a drafted index was withdrawn by Shadow review for encoding MERGED atoms and nonexistent branch refs — needs a vocabulary extension first", "severity": "MAJOR" },
+      { "issue": 411, "finding": "queue item 2 receipt schema id spatial-loop/live-shadow-case-delta-receipt/v1 resolves to no schema file (name-only convention, same as this receipt's id); both queue items pin required_subject_commit 5ac05420, so item 2 requires recompilation against the post-receipt admitted main before execution (subject-mutation law)", "severity": "MAJOR" }
     ]
   },
   "issue_state_reconciliation": {
