@@ -1,0 +1,103 @@
+{
+  "schema": "dtcr/refactor-r2-request/v1",
+  "_note": "Synthetic. No repository was read, parsed or edited to produce this request, and no registry was contacted; the paths, digests, commits and binding ids are fixture values that exercise the protocol, not a record of a run against real code.",
+  "contract": {
+    "repository_binding_id": "DTCR-RB-00c0ffee0c0ffee0",
+    "subject_commit": "3aa1c0de5f2b47e8a90c1d6b8f43e27059bc1d84",
+    "subject_tree": "7d2e91b4a05c63f8d17e4a29c8b5f60e3a1d97c2",
+    "contract_version_old": "events.v4",
+    "contract_version_new": "events.v5",
+    "declared_parent_commits": []
+  },
+  "adapter": {
+    "adapter_binding_id": "DTCR-AD-9c8b7a6d5e4f3021",
+    "capability_class": "WIRE_COMPATIBILITY_CHECK",
+    "contract_format": "avro",
+    "provider_state": "DECLARED_NOT_VENDORED",
+    "pins": {
+      "tool_version": "0.0.0-declared-not-resolved",
+      "license_id": "Apache-2.0",
+      "rule_set_or_dialect": "avro-breaking-rules-declared-not-resolved",
+      "codegen_determinism": "same contract commit and same pins produce byte-identical stubs; no timestamp, host name or absolute path is emitted into generated code"
+    }
+  },
+  "compatibility": {
+    "baseline_commit": "1f0b7c3d92a45e68b1c0d7f4a3e29b586c0d1a73",
+    "baseline_rule_category": "FILE",
+    "run_rule_category": "WIRE",
+    "excluded_paths": [
+      "schemas/events/legacy/deprecated.avsc"
+    ],
+    "result": "FAIL"
+  },
+  "generated_artifacts": [
+    {
+      "artifact_path": "gen/java/events/v5/EventRecord.java",
+      "digest": "09d896594b10166c8c734512592171ebadafaddb3bb1c56a3e68448e6727198f",
+      "generated_from_commit": "3aa1c0de5f2b47e8a90c1d6b8f43e27059bc1d84"
+    }
+  ],
+  "publication": {
+    "intent": "NONE",
+    "account_access": "ABSENT",
+    "content_rights": "HUMAN_ADMIT_REQUIRED"
+  },
+  "provider": {
+    "repository_binding_id": "DTCR-RB-a1a1a1a1a1a1a1a1",
+    "subject_commit": "5c9d2e71a3b04f86c2d719e5b8a4f03d6e1c8b92",
+    "subject_tree": "9e4f1a83c72d06b5e8a3d1f97c4b25e60d8a3f11",
+    "legacy_surface_present": true,
+    "new_surface_present": true,
+    "coexistence_window_state": "OBSERVED",
+    "declared_parent_commits": []
+  },
+  "consumers": [
+    {
+      "consumer_binding_id": "DTCR-RB-b1b1b1b1b1b1b1b1",
+      "subject_commit": "2b8e46c19d05a73f8c1e2d94b6a07f53e9c1d820",
+      "subject_tree": "6d3a95f28c10b74e9a2d5c83f61b04e7d2a95c38",
+      "client_adapter_ref": "adapter/events/EventV5Consumer",
+      "migration_state": "NOT_STARTED",
+      "fallback_state": "ABSENT",
+      "traffic_on_new_percent": 0,
+      "port_bound": false,
+      "generated_artifact_digest": "09d896594b10166c8c734512592171ebadafaddb3bb1c56a3e68448e6727198f",
+      "verification": {
+        "state": "NOT_RUN",
+        "passed": 0,
+        "total": 31
+      },
+      "declared_parent_commits": []
+    }
+  ],
+  "observation": {
+    "dual_run": "NOT_EXERCISED",
+    "idempotency_key_bound": false,
+    "window_verdict": "NOT_OBSERVED",
+    "telemetry": {
+      "state": "ABSENT",
+      "samples": 0
+    }
+  },
+  "downstream": {
+    "inventory_completeness": "COMPLETE_FOR_ADMITTED_INDEX",
+    "remaining_legacy_callers": 2,
+    "deprecation_notice_ref": "DTCR-DN-events-v4-sunset"
+  },
+  "contraction": {
+    "legacy_surface_removal_requested": false,
+    "authorization": "HUMAN_ADMIT_REQUIRED"
+  },
+  "rollback_subjects": [
+    {
+      "phase": "C1_CONTRACT_EXPANSION",
+      "repository_binding_id": "DTCR-RB-00c0ffee0c0ffee0",
+      "restored_commit": "0d5b8e1a92c74f36b0e2a9d47c15f83b6a0e2d91"
+    },
+    {
+      "phase": "A1_PROVIDER_EXPANSION",
+      "repository_binding_id": "DTCR-RB-a1a1a1a1a1a1a1a1",
+      "restored_commit": "e12c4a97f35b806d2e9a1c74b0f35d8a6c92e401"
+    }
+  ]
+}
