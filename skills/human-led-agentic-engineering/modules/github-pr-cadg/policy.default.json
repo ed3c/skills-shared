@@ -1,0 +1,28 @@
+{
+  "schema": "cadg-materiality-policy/v1",
+  "operating_mode": "OBSERVE",
+  "transition_boundary": "PR_IMPLEMENTATION_REVERSIBLE",
+  "gate_boundaries": [
+    "MIGRATION_CONTRACTION",
+    "DESTRUCTIVE_DELETION",
+    "SECURITY_PRIVACY_BOUNDARY",
+    "RELEASE",
+    "PRODUCTION"
+  ],
+  "strict_missing_packet": false,
+  "metadata_globs": [".agents/cadg/**"],
+  "material_path_globs": [
+    "AGENTS.md",
+    "**/AGENTS.md",
+    "ARCHITECTURE.md",
+    "**/ARCHITECTURE.md",
+    "docs/architecture/**",
+    "**/contracts/**",
+    "**/schemas/**",
+    "**/migrations/**",
+    "**/providers/**",
+    "**/runtime/**",
+    "**/security/**",
+    ".github/workflows/**"
+  ]
+}
