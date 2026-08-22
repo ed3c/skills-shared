@@ -51,6 +51,21 @@ The refactor-proof suite proves (issue #352):
   admitting a gate promoted above its capability evidence, and task-fixture
   drift — each turn the owning entrypoint red with a named reason.
 
+The migration-copy-canary suite proves (issue #411 prerequisites):
+
+- `references/case-graph-local-handoff-wave1.json` is bound to main commit
+  `a9db0bd9`: every pinned path is re-read with `git cat-file` at that
+  revision, reproduces its recorded blob name and sha256, and recomputes to
+  `subject.digest`;
+- every recorded readback pointer resolves inside those committed bytes, so no
+  wave-1 receipt has promoted an executed lane to a Shadow observation;
+- a migration that keeps its interface and drops one source decision branch
+  leaves the legacy compatibility oracle green and turns the differential
+  parity oracle red on the same bytes;
+- three planted mutations — the branch removal, a drifted content digest, and a
+  graph claiming the #464 Shadow lane executed — each turn the owning
+  entrypoint red with a named reason.
+
 The procedural-grounding suite proves:
 
 - a critical execution procedure cannot pass through mention or planning alone;

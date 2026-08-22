@@ -2,6 +2,12 @@
 
 `run-all.sh` is the shared deterministic convergence entrypoint. It executes the positive examples and independent mutation cases for provider role/subject separation, active code-graph-rag rejection, path leases, DAG cycles, Git Town admission, semantic-conflict blocking, evidence ceilings, Human Admit, scheduler lifecycle, the matched real-task A/B, and the Codex control-plane adapters/closure contracts.
 
+## Gate preservation — #605
+
+`run-all.sh` opens with `../scripts/check_gate_preservation.py`, whose subject is the range `base..HEAD` rather than the tree: no other control in this suite can see a gate that is no longer there, so a merge that deletes a check makes everything below it green *because* the check vanished. Both instances are shadow-proven here — the #466 receipt paper gate was deleted by a merge, and two per-queue selftest invocations were dropped.
+
+Retiring a gate is legal and must be *named*: `--allow <substring>` at the call site, never a heuristic. When the base itself is unreadable — shallow CI checkout, root commit, or a base ref that resolves to HEAD — the run prints `GATE-PRESERVATION-SKIPPED_BY_POLICY` with the reason. That is a printed policy skip over an absent subject, not an `if file exists` skip over a present one, and it never reports an empty range as audited.
+
 ## Codex control-plane denominator — #375–#378
 
 The convergence suite executes four required selftests unconditionally. The immutable Wave-2 admitted denominator remains:
