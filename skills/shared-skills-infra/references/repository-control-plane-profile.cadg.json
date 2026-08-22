@@ -1,0 +1,30 @@
+{
+  "schema": "repository-control-plane-profile/v1",
+  "profile": "cadg-domain-decoupling",
+  "skills": [
+    "shared-skills-infra",
+    "human-led-agentic-engineering",
+    "procedural-shadow-runtime",
+    "spatial-loop-systems-engineering",
+    "agentic-tech-lead-orchestration",
+    "git-town-stacked-pr-worker",
+    "github-delivery-loop"
+  ],
+  "cadg": {
+    "default_mode": "OBSERVE",
+    "allowed_modes": ["OBSERVE", "WARN", "GATE"],
+    "packet_schema": "skills/human-led-agentic-engineering/references/cadg/cadg-packet.schema.json",
+    "checker": "skills/human-led-agentic-engineering/modules/github-pr-cadg/cadg_pr_admission.py",
+    "history_rule": "RECONSTRUCTED_HISTORY_IS_NOT_ORIGINAL_REASONING"
+  },
+  "authority": {
+    "automatic_merge": false,
+    "automatic_conflict_resolution": false,
+    "visibility_change": false,
+    "credential_values": false,
+    "agent_execution": false,
+    "shadow_admission": false,
+    "release": false,
+    "production": false
+  }
+}
