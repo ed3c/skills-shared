@@ -12,7 +12,7 @@ current admitted main      674cfe1435c4bd1c29e8f07308266fe5c6284973 (PR #577; ch
 current tree               217bf950a57701235f761223e9466b9774aa6194
 rollback / pre-#577 main   5341885f26b5e8e7baf5087a4d661e324f878242
 rollback / pre-#516 main   88ce642a7f198d88019aa8ae19e63631ae4999c2
-receipt-bound subject      249abc47847f8295b1c75c9d4c84457c5126fd89 (the #508/#466/#512 receipts and queues below still bind this exact commit/tree; #511 was the docs-only movement, and #516 landed the implementation on branches cut from this subject)
+Wave-3 queue subject       249abc47847f8295b1c75c9d4c84457c5126fd89 (the subject the #508/#466/#512 continuation queues were compiled against and executed on under PR #516; #511 was the docs-only movement. It is the #508 receipt's `parent_commit` — the receipt binds its implementation to `2436358…` — and later waves rebound or superseded several queues, so read each queue's own `subject` field rather than assuming this one)
 
 #507 checked head          e306797fdbf4875bafd410fd415e6bcb3587ff9b
 #507 merge subject         249abc47847f8295b1c75c9d4c84457c5126fd89
@@ -38,7 +38,7 @@ PR #516 executed the three ACTIVE Local Handoff Execution Queue items — #508, 
 | ARTICLE/PDF/PRD or further Issue truth/applicability | `EVIDENCE_DEPENDENT / #512 OPEN (first packet executed via PR #516)` | first immutable source packet executed: GitHub issue #435 bytes + provenance + claim packet compiled against `#467`'s method into `data/handoff/source-evidence/problem-closure-ledger.json`; compiler/closure-checker exit 0 (binding PASS only); dispositions `OPEN` (six unclassified commits still need `evals/commit-roles.json` repair), `OPEN` (repair not yet executed), `NOT_APPLICABLE` (scope-only evidence-boundary claim); compiler PASS is not source truth |
 | Repository entropy method + deterministic gate + domain ports + controls + CI/registry arrival | `HUMAN_ADMITTED_ON_MAIN` | rebuilt and landed through UCR admission PR #477; old C/K/A/E/X PRs remain closed-unmerged lineage |
 | Entropy nearest Agent/README routes and terminal Molecular index | `IMPLEMENTED_BY_THIS_AUDIT_CANDIDATE` | issue #403 / PR #404 is closed only after this exact candidate lands and hosted routing gates pass |
-| codex-v2 queue's ACTIVE item is complete on an admitted subject | `RECOMPILE_REQUIRED` | per the subject-mutation law, the next step is compiling a NEW #464 queue against current `main` (re-derive via `git rev-parse main`; `129f53c` is stale — main has since advanced to `28f3947` then `5341885` then `674cfe1`, PR #577); `references/wave3-live-handoff-queue.json` still invokes `run_codex_sdk_worker.py --execute` without `--carrier-out-dir` and needs that flag added when the new queue is compiled (owned by #464, not by this document) |
+| codex-v2 queue's ACTIVE item is complete on an admitted subject | `RECOMPILED_AND_EXECUTED (2026-08-22)` | per the subject-mutation law the NEW #464 queue was compiled fresh as `runtime-handoff/codex-v2-live-464-local-handoff-queue.json` against its own merged implementation head (never the stale `129f53c` — always re-derive current `main` via `git rev-parse`); its live run executed with receipt verdict `PASS`, Shadow pending. `references/wave3-live-handoff-queue.json` used to invoke `run_codex_sdk_worker.py --execute` without `--carrier-out-dir` and died at argparse; the flag has since been added, so that argparse death is historical |
 
 ## Issue decisions
 

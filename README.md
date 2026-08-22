@@ -198,6 +198,46 @@ B2 improves causal and evidence closure, not live model quality. B3 binds the du
 
 Other landed control-plane mechanisms include implementation-target binding, verifier calibration, mutation admission, holdout isolation, capability/release schemas, isolated Shared Skills Infra CI, Intent-Bound Constraints, pinned Git Town canaries, Skill-suite arrival coverage, [controlled-language authority gates](docs/architecture/CONTROLLED_TECHNICAL_LANGUAGE_HARNESS.md), repository capability audits and procedural Shadow contracts. Current capability/release registries may still be empty; mechanism implementation does not imply the first physical unlock or release.
 
+## Current Git-at-any-scale audit state — 2026-08-22
+
+The Cursor **Git at any scale** article is a `SOURCE_PROPOSAL`. This repository audits it on the Method Plane; it does not implement, host or operate a distributed Git-hosting service.
+
+```text
+subject   main 5341885f26b5e8e7baf5087a4d661e324f878242
+tree      a18e12507f9e621efd5354f58384eded1f1e2a9a
+rollback  9fe3c6daf53dcdd61123d5d7a4eeedbdf37b5d7c
+```
+
+| Lane | State |
+|---|---|
+| Method-Plane coordination/traceability | `PARTIAL_CLOSURE` |
+| portable Git-hosting assurance profile (#532) | `OPEN` — `skills/git-hosting-scale-assurance` landed via PR #542 (MERGED); `tests/run-all.sh` → `PASS positive=1 mutations=20/20` at this subject; registered in `evals/skill-entry-routes.json` and `evals/skill-core-boundaries.json` on 2026-08-22, so `check_skill_entry_routes.py --skill git-hosting-scale-assurance` and `check_skill_core_boundaries.py --skill git-hosting-scale-assurance` both exit 0. Its own receipt `data/handoff/git-at-any-scale/issue-532-portable-contract-receipt.json` is `ABSENT`, the per-family receipt/history/benchmark schemas and their fault/concurrent/hollow fixtures are `NOT_IMPLEMENTED`, and the only hosted readback on record for this suite is `SKIPPED_BY_POLICY` — never a PASS |
+| physical Git-hosting runtime (#534) | `OUT_OF_SCOPE_FOR_THIS_REPO`. A bounded **CLEAN_ROOM single-node** canary ran on 2026-08-22 against a disposable subject that is deliberately not committed (`refcore`, sha256 `4ea664cc…`, private scratchpad); its receipts are under [`data/handoff/git-at-any-scale/`](data/handoff/git-at-any-scale/). Ceiling: 1 authority process, 0 replicas, 1 cache, no socket layer, one local filesystem, one monotonic clock, SIGKILL-only fault injection, unpinned benchmark host, two workload classes at one repetition each. Gossip loss, matched-scale matrix and independent Shadow replay are `NOT_EXERCISED`. **This is not a distributed-hosting claim, not a scale claim, and proves nothing about Cursor or any commercial product** |
+| source article truth/performance claims | `SOURCE_PROPOSAL` — 28-claim ledger at 26 `OPEN` / 2 `NOT_APPLICABLE`, 0 `VERIFIED_LOCAL`, 0 `VERIFIED_LIVE`; every performance number stays with #534 |
+| independent Shadow (#535) | `OPEN` — receipt `data/handoff/git-at-any-scale/issue-535-shadow-receipt.json`, verdict `HOLD`, `HUMAN_ADMIT_REQUIRED`. The reviewer was a fresh-context session dispatched by the same Tech Lead on the same host, so Shadow **identity** independence is unmet and the verdict is advisory |
+| current Local Handoff | `GIT-SCALE-H1` (#532) `ACTIVE` in [`skills/agentic-tech-lead-orchestration/runtime-handoff/git-at-any-scale-local-handoff-queue.json`](skills/agentic-tech-lead-orchestration/runtime-handoff/git-at-any-scale-local-handoff-queue.json), bound to the subject above |
+| merge / release / infrastructure adoption | `HUMAN_OWNED` |
+
+Directory → owner → State Machine → DAG → data flow:
+
+```text
+data/handoff/source-evidence/sources/    #512/#531  immutable article packet
+        ↓ 864322 bytes, sha256 25f59fc6…f00447cab9
+data/handoff/source-evidence/*-ledger    #531       28-claim applicability/closure denominator
+        ↓ claim → owning issue
+skills/git-hosting-scale-assurance/      #532       portable assurance schema/checker/mutations
+        ↓ CONTRACT_READY → LIVE_CANARY_REQUIRED
+data/handoff/git-at-any-scale/           #534       bounded clean-room canary receipts
+        ↓ same exact subjects, read-only
+data/handoff/git-at-any-scale/issue-535-shadow-receipt.json  #535  advisory verdict
+        ↓
+this section + docs routes + terminal index  #536  zero-context navigation
+        ↓
+Human Admit
+```
+
+One authoritative detailed trace: [`docs/traceability/git-at-any-scale/README.md`](docs/traceability/git-at-any-scale/README.md) (nearest rules in its [`AGENTS.md`](docs/traceability/git-at-any-scale/AGENTS.md)). Terminal delivery topology: [`skills/git-town-stacked-pr-worker/molecular-indexes/git-at-any-scale/README.md`](skills/git-town-stacked-pr-worker/molecular-indexes/git-at-any-scale/README.md). Registries, ledgers and receipts are not copied here; the machine files above stay authoritative, and where the detailed trace's `L1`/`S1` rows still read `NOT_EXERCISED` they are stamped to the 2026-08-21 compile and the receipts under `data/handoff/git-at-any-scale/` are the later evidence.
+
 ## Git Town / molecular PR model
 
 Git Town is optional tooling; GitHub PR base/head metadata is publication truth.

@@ -1,0 +1,282 @@
+{
+  "benchmark_gates": {
+    "durability_and_consistency_declared": true,
+    "excluded_repetitions": 0,
+    "operations_fully_accounted": true,
+    "single_matched_topology": true,
+    "subject_digest_unchanged": true
+  },
+  "ceilings": [
+    "SIGKILL exercises process loss only. Page-cache-surviving writes cannot be distinguished from fsynced writes by process kill alone; power loss, media failure and fsync-lying hardware are NOT_EXERCISED.",
+    "Single-node register semantics over one ref, in-process clients on one host. Cross-node or cross-region linearizability is NOT_EXERCISED.",
+    "One cache process on the same host as the authority. Network partition, clock skew and multi-region routing are NOT_EXERCISED.",
+    "One replica repacks. Fan-out repack cost across replicas is NOT_EXERCISED.",
+    "Benchmark host is not pinned: numbers are INDICATIVE for this one host and window, and support no comparative or scale claim.",
+    "This is a CLEAN_ROOM reference core. It proves nothing about Cursor, any commercial hosting product, or any object store.",
+    "REPLAY CEILING: the subject is deliberately not committed, so an independent Shadow can re-check this bundle's internal consistency, the recorded operation history and the linearizability verdict, but cannot re-execute the canary from repository bytes alone. Re-execution requires the subject at the recorded runtime digest."
+  ],
+  "consumer_subject": {
+    "bytes": 19872,
+    "committed_to_repository": false,
+    "implementation_relationship": "CLEAN_ROOM",
+    "implementation_sha256": "4ea664cc6bae1d3a999bf4293ad65136821c3a611a498894d428448a1610d127",
+    "name": "refcore (disposable single-node Git-hosting reference core)",
+    "path_outside_repository": "/private/tmp/claude-501/-Users-neon-skills-shared/ba0ee313-3387-4cd5-8e1e-eea11e6f3419/scratchpad/canary-subject/refcore.py",
+    "visibility": "PRIVATE_DISPOSABLE_SCRATCHPAD"
+  },
+  "epoch_subject": {
+    "commit": "5341885f26b5e8e7baf5087a4d661e324f878242",
+    "repository": "ed3c/skills-shared",
+    "rollback_commit": "9fe3c6daf53dcdd61123d5d7a4eeedbdf37b5d7c",
+    "tree": "a18e12507f9e621efd5354f58384eded1f1e2a9a"
+  },
+  "execution_provenance": {
+    "cloud_provider": "NONE",
+    "cost_usd": 0.0,
+    "cpu_count": 10,
+    "git_version": "git version 2.50.1 (Apple Git-155)",
+    "machine": "arm64",
+    "network_used": false,
+    "observed_worktree_dirty_paths": 39,
+    "observed_worktree_head": "bca08001c416108f9b83e9325e7bf07149a9281f",
+    "os": "macOS-26.4-arm64-arm-64bit-Mach-O",
+    "pinned_benchmark_host": false,
+    "python": "3.14.6"
+  },
+  "forbidden_promotions_refused": [
+    "LOCAL_CANARY_PROMOTED_TO_CURSOR_PRODUCTION_PROOF",
+    "ONE_TOPOLOGY_PROMOTED_TO_ARBITRARY_SCALE",
+    "FAILED_RUN_DROPPED_FROM_DENOMINATOR",
+    "LOWER_DURABILITY_MODE_USED_FOR_HIGHER_THROUGHPUT_CLAIM",
+    "fixture_pass_promoted_to_live_hosting_pass",
+    "builder_self_report_promoted_to_independent_shadow"
+  ],
+  "issue": 534,
+  "metrics_reduced": {
+    "accepted_operations": 428,
+    "acknowledged_operation_denominator": 18,
+    "acknowledged_operation_loss_count": 0,
+    "benchmark_runs": [
+      {
+        "latency_ms": {
+          "cas_ref": {
+            "n": 200,
+            "p50": 0.0559,
+            "p95": 0.0886,
+            "p99": 0.1517
+          },
+          "put_obj": {
+            "n": 200,
+            "p50": 0.0621,
+            "p95": 0.0967,
+            "p99": 0.2229
+          }
+        },
+        "run": "small-frequent-commits",
+        "throughput_ops_per_second": 4622.4
+      },
+      {
+        "latency_ms": {
+          "cas_ref": {
+            "n": 8,
+            "p50": 0.1475,
+            "p95": 0.1729,
+            "p99": 0.1729
+          },
+          "put_obj": {
+            "n": 8,
+            "p50": 14.6584,
+            "p95": 15.2902,
+            "p99": 15.2902
+          }
+        },
+        "run": "large-object-transfer",
+        "throughput_ops_per_second": 27.6
+      }
+    ],
+    "cache_rebuild_bytes_transferred": 10886,
+    "cache_rebuild_seconds": 0.0592,
+    "cas_conflicts": 36,
+    "compaction_amplification": 1.0,
+    "cost_usd": 0.0,
+    "excluded_repetitions": 0,
+    "invalid_histories": 0,
+    "kill_injections": 8,
+    "linearizability_verdict": "LINEARIZABLE",
+    "operator_interventions": 1,
+    "rejected_operations": 36,
+    "stale_read_count": 0,
+    "stale_read_opportunity_denominator": 5,
+    "timed_out_operations": 0
+  },
+  "not_exercised": [
+    {
+      "experiment": "L1-D",
+      "reason": "The declared architecture has NO_GOSSIP_SUBSYSTEM_EXISTS and zero replicas, so there is no gossip message to drop, delay, reorder or duplicate. `required_for_correctness=false` is therefore vacuously true by absence of the subsystem, not by an executed fault schedule.",
+      "stage": "GOSSIP_LOSS_CANARY",
+      "state": "NOT_EXERCISED"
+    },
+    {
+      "experiment": "L1-H",
+      "reason": "Only the smallest topology (1 authority, 0 replicas, 1 cache) exists at this subject. No multi-node topology and no elasticity transition were run, so no scale, fanout-versus-durable-authority or replica-count claim is made.",
+      "stage": "MATCHED_SCALE_MATRIX",
+      "state": "NOT_EXERCISED"
+    },
+    {
+      "reason": "#535 read-only Shadow has not replayed this bundle. Builder self-report only.",
+      "stage": "INDEPENDENT_SHADOW",
+      "state": "NOT_EXERCISED"
+    },
+    {
+      "reason": "SIGKILL exercises process loss only.",
+      "stage": "POWER_LOSS_AND_MEDIA_FAILURE",
+      "state": "NOT_EXERCISED"
+    },
+    {
+      "reason": "No provider activated; Human owns provider/account/spend.",
+      "stage": "CLOUD_OBJECT_STORE_AND_SPEND",
+      "state": "NOT_EXERCISED"
+    }
+  ],
+  "raw_evidence_digests": {
+    "architecture-declaration.json": "sha256:249a80b415e38a0333fc5bae11612063f139cb8e9c82cb94e68d04335ac5ed9d",
+    "benchmark-runs/large-object-transfer.json": "sha256:a3d8e0cfd83d77f9fdfee0be1cd411eb48c87f160849e19a916c2dc08abc86e4",
+    "benchmark-runs/small-frequent-commits.json": "sha256:38c38d1e4346bc2a1173fc7285e676ea5bd6315c8c0afb0481c18e7d0c05f8a7",
+    "cache-rebuild-receipt.json": "sha256:330a1eabf21a1225c09b8a9a9477df94d45db9fe5e209df8029742a550da38f9",
+    "cleanup-and-cost-receipt.json": "sha256:8d7762fef3a9b45c0562a76953d3d954279fbc5b65d69e6ed05450bdaab8a1c1",
+    "compaction-receipt.json": "sha256:caca9553997346dbec174302b9ce7f5d5cff9e7418e61d986f3206e30a1bb365",
+    "corruption-recovery-receipt.json": "sha256:888215ae181d1c592300789e2241b58bed3231cabacc33da972c3e5ac43955b9",
+    "durability-receipt.json": "sha256:70c67ae362fbaef99f6dbd1402c53d0b15e985f3d9c49556875d6a485f68d21b",
+    "gossip-observation-receipt.json": "sha256:949bc0f6ce1dbfc899fcfe60892d388c39753ca64324a03c41cddc1242aef875",
+    "hosting-subject.json": "sha256:48808811a46d169f27716bb71f204ccf53d2dbc40f90d72066417df1a26a1608",
+    "issue-534-hosting-canary-receipt.json": "sha256:233ed3c51f1e37481062e8f5a809cf757cda6f19c230f43d10d72a1c28192252",
+    "operation-history.jsonl": "sha256:32eddd5d0f763951f591b6fbc39db7da16244708389e841d63f2eac99bc29cc0",
+    "raw/benchmark-raw-latencies.json": "sha256:5ef1b29b15f83f6b1e6a6e4776b21c08e28d0ef58aeea035063d90fc10bdaa46",
+    "raw/corpus-baseline.json": "sha256:35f954eb086c78f9e4db354d68a033685de87063d7cff113361f93b82cfc6839",
+    "raw/corruption-first-red-log.digest": "sha256:08f385709845cbf791192dd2db8664bfc206f5f51503d38f389839b3ae77fd7b",
+    "raw/corruption-pristine-log.digest": "sha256:1985894a94ab84f8d7ff4d2b140276def40ea0f1a1093ae7c4977632373dd96a",
+    "raw/l1a-kill-cases.json": "sha256:71cb139e1eb70e62d10dbac4e31badd46a67ce35d110c2b6e5e8fffcdb2f4685",
+    "read-freshness-receipt.json": "sha256:fba1b7a91ab8589d34338e6191d11fdf6de9391b25c85ad4457422628cb9a74a",
+    "ref-transaction-receipt.json": "sha256:8b69c382ff47ba5185a5584376cc9389ed5a5b8303dd583254aec254545fbeb3",
+    "source-and-rights-disposition.json": "sha256:d81406583477d3688b22e592f823d5953dc22c6b014e39e19e8c6b10ae01cc04"
+  },
+  "red_when_red_control": {
+    "checked_operations_under_plant": 95,
+    "checker_argv": [
+      "python3",
+      "skills/git-hosting-scale-assurance/scripts/check_hosting_assurance.py",
+      "<planted packet>"
+    ],
+    "checker_exit": 2,
+    "checker_stdout": "{\"code\": \"GS-C05\", \"detail\": \"CAS/expected-value precondition absent\", \"state\": \"REFUSED\"}",
+    "control": "PLANTED_DEFECT_DROP_ONE_ACKNOWLEDGED_WRITE_FROM_RECORDED_HISTORY",
+    "driver_argv_tail": [
+      "--plant-defect",
+      "drop_acked_op"
+    ],
+    "driver_exit": 1,
+    "driver_stdout_last_line": "{\"packet\": \"/private/tmp/claude-501/-Users-neon-skills-shared/ba0ee313-3387-4cd5-8e1e-eea11e6f3419/scratchpad/out-planted/issue-534-hosting-canary-receipt.json\", \"planted_defect\": \"drop_acked_op\", \"state\": \"FAILED_WITH_REPLAYABLE_EVIDENCE\", \"verdicts\": [\"PASS\", \"FAIL\", \"PASS\", \"PASS\", \"PASS\"]}",
+    "dropped_operation": {
+      "actual": null,
+      "invoke": 0.0019987499981652945,
+      "kind": "cas",
+      "new": "v-1-7",
+      "old": "v-1-6",
+      "proc": 1,
+      "response": 0.00213049998274073,
+      "ret": "ok"
+    },
+    "executed_utc": "2026-08-22T10:52:28Z",
+    "green_run_note": "the committed bundle is produced by the same driver with the plant removed",
+    "linearizability_verdict_under_plant": "NON_LINEARIZABLE",
+    "operations_recorded": 96,
+    "planted_bundle_location": "session scratchpad only; never committed",
+    "purpose": "prove the linearizability check and the contract checker go red when red"
+  },
+  "runtime": {
+    "clock_model": "single host monotonic clock, no distributed clock",
+    "cloud_provider": "NONE",
+    "cost_usd": 0.0,
+    "cpu_count": 10,
+    "git_version": "git version 2.50.1 (Apple Git-155)",
+    "machine": "arm64",
+    "network_used": false,
+    "observed_worktree_dirty_paths": 39,
+    "observed_worktree_head": "bca08001c416108f9b83e9325e7bf07149a9281f",
+    "os": "macOS-26.4-arm64-arm-64bit-Mach-O",
+    "pinned_benchmark_host": false,
+    "process_model": "python3 subprocesses; line-JSON over anonymous pipes inherited at spawn; no socket, no listening port",
+    "python": "3.14.6"
+  },
+  "state_machine": [
+    {
+      "result": "CLEAN_ROOM",
+      "state": "CONSUMER_SELECTED"
+    },
+    {
+      "result": "BOUND",
+      "state": "EXACT_RUNTIME_AND_STORAGE_SUBJECT_BOUND"
+    },
+    {
+      "result": "PASS",
+      "state": "EMPTY_SYSTEM_BASELINE"
+    },
+    {
+      "result": "PASS",
+      "state": "REPOSITORY_CORPUS_LOADED"
+    },
+    {
+      "result": "PASS",
+      "state": "DURABLE_ACK_CANARY"
+    },
+    {
+      "result": "PASS",
+      "state": "CONCURRENT_REF_HISTORY_CANARY"
+    },
+    {
+      "result": "PASS",
+      "state": "STALE_CACHE_AND_CATCHUP_CANARY"
+    },
+    {
+      "result": "NOT_EXERCISED",
+      "state": "GOSSIP_LOSS_CANARY"
+    },
+    {
+      "result": "PASS",
+      "state": "CACHE_DESTROY_REBUILD_CANARY"
+    },
+    {
+      "result": "PASS",
+      "state": "COMPACTION_REACHABILITY_CANARY"
+    },
+    {
+      "result": "PASS",
+      "state": "CORRUPTION_PARTIAL_WRITE_RESTART_CANARY"
+    },
+    {
+      "result": "NOT_EXERCISED",
+      "state": "MATCHED_SCALE_MATRIX"
+    },
+    {
+      "result": "PASS",
+      "state": "CLEANUP_AND_COST_READBACK"
+    },
+    {
+      "result": "PASS",
+      "state": "EXACT_RECEIPT_BUNDLE"
+    },
+    {
+      "result": "NOT_EXERCISED",
+      "state": "INDEPENDENT_SHADOW"
+    }
+  ],
+  "terminal": "GIT_HOSTING_LIVE_CANARY_VERIFIED_BOUNDED",
+  "verdicts": {
+    "cache": "PASS",
+    "compaction": "PASS",
+    "corruption": "PASS",
+    "durability": "PASS",
+    "rebuild": "PASS",
+    "refs": "PASS"
+  }
+}

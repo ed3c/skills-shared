@@ -24,7 +24,7 @@
       "runtime_lane": {
         "class": "LOCAL_RUNTIME",
         "commands": [
-          {"argv": ["python3", "skills/agentic-tech-lead-orchestration/scripts/run_codex_sdk_worker.py", "data/handoff/wave3/codex-session.json", "--execute", "--output", "data/handoff/wave3/codex-worker-result.json"], "cwd": ".", "timeout_seconds": 1800, "environment_names": []},
+          {"argv": ["python3", "skills/agentic-tech-lead-orchestration/scripts/run_codex_sdk_worker.py", "data/handoff/wave3/codex-session.json", "--execute", "--carrier-out-dir", "data/handoff/wave3/carrier", "--output", "data/handoff/wave3/codex-worker-result.json"], "cwd": ".", "timeout_seconds": 1800, "environment_names": []},
           {"argv": ["python3", "skills/agentic-tech-lead-orchestration/scripts/compile_codex_live_acceptance.py", "data/handoff/wave3/codex-acceptance-input.json", "--output", "data/handoff/wave3/codex-acceptance-receipt.json"], "cwd": ".", "timeout_seconds": 120, "environment_names": []}
         ],
         "unresolved_operations": [

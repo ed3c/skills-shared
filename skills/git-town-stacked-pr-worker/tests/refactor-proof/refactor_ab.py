@@ -245,6 +245,12 @@ def build_matched_root(scratch: Path, arm: Arm) -> Path:
     """One scratch repository per arm: identical inputs, only SKILL.md differs."""
     skill_root = scratch / "skills" / SKILL_NAME
     skill_root.mkdir(parents=True)
+    # check_skill_core_boundaries.py refuses a subject root without AGENTS.md
+    # (the #576 off-root vacuous-green repair); the scratch subject must carry one.
+    (scratch / "AGENTS.md").write_text(
+        "# Scratch subject for the #270 refactor proof; see tests/refactor-proof/.\n",
+        encoding="utf-8",
+    )
     for relative in MATCHED_INPUTS:
         source = SKILL_ROOT / relative
         if not source.exists():

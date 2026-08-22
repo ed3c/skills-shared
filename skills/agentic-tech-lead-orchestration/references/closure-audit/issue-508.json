@@ -1,0 +1,70 @@
+{
+ "schema_version": "agentic-tech-lead/issue-closure-contract/v1",
+ "issue": {
+  "repository": "ed3c/skills-shared",
+  "number": 508,
+  "github_state": "CLOSED",
+  "github_state_reason": "COMPLETED"
+ },
+ "disposition": "DIRECTLY_LANDED",
+ "acceptance": [
+  {
+   "id": "durable-result-carrier-bound",
+   "status": "SATISFIED",
+   "successor": null,
+   "rationale": "scripts/codex_result_carrier.py publishes base and result trees as two parentless evidence commits under refs/evidence/codex-v2/<id>/{base,result} and packs them into a bundle with a sidecar manifest; receipt data/handoff/codex-v2/issue-508-result-carrier-receipt.json records required_outcomes.durable_result_carrier PASS for implementation commit 243635885f7bcff64c606dffe7fcbe09ada9c5b2"
+  },
+  {
+   "id": "executor-provenance-bound",
+   "status": "SATISFIED",
+   "successor": null,
+   "rationale": "worker result v2 carries executor_provenance (adapter version/blob digest, codex binary identity and SHA-256, runtime/model/config identity, sandbox/approval policy), recomputed from the adapter and binary on disk by scripts/check_codex_worker_result.py; a signed-in session is explicitly not recorded as executable provenance"
+  },
+  {
+   "id": "strict-worker-result-schema",
+   "status": "SATISFIED",
+   "successor": null,
+   "rationale": "references/contracts/codex-worker-result-v2.schema.json (Draft 2020-12, additionalProperties false, schema_version pinned to 2) owns the shape; scripts/check_codex_worker_result.py owns the semantics and compile_codex_live_acceptance.py consumes it instead of defining the shape in code"
+  },
+  {
+   "id": "independent-replay-after-origin-cleanup",
+   "status": "SATISFIED",
+   "successor": null,
+   "rationale": "codex_result_carrier.py replay resolves the result tree from bundle + manifest alone in a bare scratch repository created outside the originating repository with inherited GIT_DIR/alternates variables stripped; controls C1-C4 in tests/codex_result_carrier_selftest.py prove the checker goes RED_FOR_REASON when the tree survives only in the originating object store"
+  },
+  {
+   "id": "fresh-signed-in-codex-v2-live-run",
+   "status": "TRANSFERRED",
+   "successor": "ed3c/skills-shared#464",
+   "rationale": "the deterministic lane is the ceiling this issue reached; skills/agentic-tech-lead-orchestration/runtime-handoff/README.md records 'fresh Codex v2 live acceptance NOT_EXERCISED / #464' and states the Codex queue stops at #508 because #508 changes the subject #464 must bind; #464 is OPEN"
+  }
+ ],
+ "implementation": {
+  "candidate_prs": [
+   {
+    "repository": "ed3c/skills-shared",
+    "number": 516,
+    "state": "CLOSED",
+    "merged": true,
+    "classification": "DIRECT"
+   }
+  ],
+  "landing": {
+   "repository": "ed3c/skills-shared",
+   "via_pr": 516,
+   "commit": "129f53c23a3ab15354763167b25bddc45f724c00",
+   "tree": "d383769215a8a179bd9a8deb4f0118a61fab5aa3"
+  }
+ },
+ "residual": [
+  {
+   "id": "fresh-signed-in-codex-v2-live-run",
+   "state": "NOT_EXERCISED",
+   "owner": "ed3c/skills-shared#464"
+  }
+ ],
+ "evidence_ceiling": "DETERMINISTIC",
+ "shadow_review": {
+  "verdict": "HUMAN_ADMIT_REQUIRED"
+ }
+}

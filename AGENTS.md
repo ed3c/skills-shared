@@ -202,6 +202,35 @@ A, B1 and B2 produce equivalent deterministic output; B0 is blocked by its absen
 
 User-supplied architecture documents are `SOURCE_PROPOSAL`. Their provider, cost, latency, security, licensing, synchronization, mobile, wallet, sandbox, conflict-repair and production claims require independent verification and exact-subject receipts before becoming repository truth.
 
+## Git-hosting durability topic route
+
+When a request concerns Git hosting durability, consistency, object storage, packfiles, ref transactions, replicas, gossip, compaction, corruption, replay, benchmark scale or the Cursor **Git at any scale** article, read:
+
+```text
+1. root AGENTS.md and current GitHub subject
+2. docs/traceability/git-at-any-scale/AGENTS.md
+3. docs/traceability/git-at-any-scale/README.md
+4. issue #531 and the exact child issue/PR/receipt subjects
+5. git-hosting-scale-assurance nearest AGENTS/README/SKILL when admitted
+6. git-at-any-scale Molecular Stack index
+7. exact Local Handoff queue and live receipts
+```
+
+Routes: [`docs/traceability/git-at-any-scale/AGENTS.md`](docs/traceability/git-at-any-scale/AGENTS.md), [`docs/traceability/git-at-any-scale/README.md`](docs/traceability/git-at-any-scale/README.md), [`skills/git-hosting-scale-assurance/AGENTS.md`](skills/git-hosting-scale-assurance/AGENTS.md), [`skills/git-town-stacked-pr-worker/molecular-indexes/git-at-any-scale/README.md`](skills/git-town-stacked-pr-worker/molecular-indexes/git-at-any-scale/README.md), [`skills/agentic-tech-lead-orchestration/runtime-handoff/git-at-any-scale-local-handoff-queue.json`](skills/agentic-tech-lead-orchestration/runtime-handoff/git-at-any-scale-local-handoff-queue.json). Current lane states are in [`README.md`](README.md); do not restate them from memory.
+
+Agent stop laws for this topic:
+
+```text
+method DAG           != Git object-storage DAG
+contract PASS        != live hosting PASS
+source statement     != independent benchmark
+open/mergeable PR    != admitted implementation
+queue order          != Git ancestry
+Shadow agreement     != Human Admit
+```
+
+A clean-room single-node canary is not a distributed-hosting result, and no receipt produced here describes Cursor's or any commercial product's runtime.
+
 ## Repository-wide completion review
 
 A completion review starts from the tree, not from the index that describes it. Read in this order:
