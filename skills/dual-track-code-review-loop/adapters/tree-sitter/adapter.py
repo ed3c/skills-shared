@@ -827,7 +827,16 @@ def write_live_receipt(receipt_path: Path, bundle: dict[str, Any], manifest: dic
             "query_digest": block["query_digest"],
         },
         "bundle_id": manifest["bundle_id"],
-        "manifest_digest": manifest["bundle_digest"],
+        # #575: this used to be named `manifest_digest`, which collided with
+        # the sibling `bundle_digest` key below -- one name (`bundle_digest`,
+        # the manifest schema's own field for its identity digest) carrying
+        # two different values on one receipt. `bundle_manifest_digest` names
+        # what it actually is: the digest of the bundle *manifest* (grammar +
+        # query pin), not of this run's emitted output.
+        "bundle_manifest_digest": manifest["bundle_digest"],
+        # The digest of this emission's own output body (matches +
+        # coverage_ceiling), computed in `emit_bundle`. A different digest,
+        # over different bytes, from `bundle_manifest_digest` above.
         "bundle_digest": bundle["receipt"]["bundle_digest"],
         "subject_blobs": {match["blob"]["path"]: match["blob"]["blob"] for match in bundle["matches"]},
         "matches_digest_modulo_subject": matches_digest_modulo_subject(bundle["matches"]),
