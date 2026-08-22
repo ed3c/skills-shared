@@ -55,9 +55,9 @@ consumer closed, or merge/release occurred.
  │    ├─ #547 D1-SCIP adapter      BLOCKED_ON_PROVIDER
  │    └─ #549 D1-BUF adapter       BLOCKED_ON_PROVIDER
  ├─ #521 M1 semantic-context plane
- │    └─ #550 M1-C semantic adapter   BLOCKED
+ │    └─ #550 M1-C semantic adapter   NOT_IMPLEMENTED (KEYWORD lane open; LanceDB lane BLOCKED_ON_PROVIDER)
  ├─ #522 X1 synthesis/closure compiler   CLOSED (landed and closed via PR #563)
- ├─ #523 R1 single-repo refactor protocol   OPEN (landed in-tree: refactor/ + four contracts, suite-counted; current issue state on GitHub)
+ ├─ #523 R1 single-repo refactor protocol   CLOSED via PR #571 (refactor/ + four contracts, suite-counted; exit terminal NOT_ADMITTED — live canary rides #528)
  ├─ #524 R2 cross-repo expand & contract     OPEN
  ├─ #525 E1 independent Shadow / mutations / closure denominator   OPEN
  ├─ #526 D2 this convergence (README/AGENTS/prompts/routing/traceability)   CLOSED via PR #563

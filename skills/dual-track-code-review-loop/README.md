@@ -106,7 +106,7 @@ skills/dual-track-code-review-loop/
     │   └── public-private-capability.md
     │       └── closed terms and plane ownership; the half a person reads
     ├── schemas/
-    │   └── 27 frozen JSON Schemas — 8 C0 contract schemas (source-packet,
+    │   └── 31 frozen JSON Schemas — 8 C0 contract schemas (source-packet,
     │       candidate-record, violation-candidate, refactor-proposal,
     │       change-unit, verification-receipt, closure-record,
     │       source-disposition) plus 16 D1/M1 interface schemas (syntax-match,

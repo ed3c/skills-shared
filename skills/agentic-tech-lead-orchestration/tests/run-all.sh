@@ -55,12 +55,23 @@ python3 "$ROOT/scripts/assert_local_handoff_queue.py" \
   --queue "$ROOT/references/wave3-live-handoff-queue.json"
 
 # The current Tech Lead runtime/source handoff queues are load-bearing. Execute
-# their semantic gate unconditionally so a docs-only queue cannot look admitted.
-for queue in \
-  "$ROOT/runtime-handoff/codex-v2-local-handoff-queue.json" \
-  "$ROOT/runtime-handoff/herdr-local-handoff-queue.json" \
-  "$ROOT/runtime-handoff/source-evidence-local-handoff-queue.json"
-do
+# their semantic gate over every queue in runtime-handoff/ so a docs-only or
+# newly added queue cannot look admitted by omission. One named exemption:
+# git-at-any-scale predates the v1 shape (36 gate FAILs) and its repair is
+# owned by ed3c/skills-shared#531/#536 — printed as SKIPPED_BY_POLICY, not hidden.
+for queue in "$ROOT"/runtime-handoff/*-local-handoff-queue.json; do
+  case "$(basename "$queue")" in
+    git-at-any-scale-local-handoff-queue.json)
+      # Self-retiring exemption: the moment the file passes its gate, this
+      # carve-out must be removed, so a green run under the skip turns the suite red.
+      if python3 "$ROOT/scripts/assert_local_handoff_queue.py" --queue "$queue" >/dev/null 2>&1; then
+        echo "EXEMPTION STALE: $(basename "$queue") now passes its gate; remove this SKIPPED_BY_POLICY carve-out" >&2
+        exit 1
+      fi
+      echo "SKIPPED_BY_POLICY: $(basename "$queue") pre-v1 shape; repair owned by #531/#536"
+      continue
+      ;;
+  esac
   python3 "$ROOT/scripts/assert_local_handoff_queue.py" --queue "$queue"
 done
 

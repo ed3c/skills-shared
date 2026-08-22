@@ -337,7 +337,12 @@ def select_rev_range(
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--repo-root", type=Path, default=Path.cwd())
+    parser.add_argument(
+        "--repo-root",
+        type=Path,
+        default=None,
+        help="repository to audit; defaults to the checkout owning this script, never the caller's cwd",
+    )
     parser.add_argument("--vocabulary", type=Path, default=None)
     parser.add_argument(
         "--range",
@@ -347,10 +352,15 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    repo = args.repo_root.resolve()
+    default_root = args.repo_root is None
+    repo = (Path(__file__).resolve().parent.parent if default_root else args.repo_root).resolve()
     vocabulary_path = args.vocabulary or (repo / DEFAULT_VOCABULARY)
 
     try:
+        # Only the silent default carries the wrong-subject risk; an explicit
+        # --repo-root is the caller's choice.
+        if default_root and not (repo / "AGENTS.md").is_file():
+            raise Unusable(f"default subject root {repo} does not contain AGENTS.md")
         vocabulary = load_vocabulary(vocabulary_path)
         rev_range = select_rev_range(repo, vocabulary, args.rev_range)
         legacy_unclassified = resolve_legacy_imports(repo, vocabulary)

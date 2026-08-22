@@ -1,0 +1,69 @@
+{
+ "schema_version": "agentic-tech-lead/issue-closure-contract/v1",
+ "issue": {
+  "repository": "ed3c/skills-shared",
+  "number": 522,
+  "github_state": "CLOSED",
+  "github_state_reason": "COMPLETED"
+ },
+ "disposition": "DIRECTLY_LANDED",
+ "acceptance": [
+  {
+   "id": "deterministic-synthesis-and-closure-compilers-landed",
+   "status": "SATISFIED",
+   "successor": null,
+   "rationale": "synthesis/compile_synthesis.py plus three frozen schemas landed via PR #563 (feature e89cc3b), suite-counted by tests/run-all.sh"
+  },
+  {
+   "id": "mutation-rejection-controls",
+   "status": "SATISFIED",
+   "successor": null,
+   "rationale": "planted mutations rejected in the committed suite; suite green at observed main 5341885f26b5e8e7baf5087a4d661e324f878242"
+  },
+  {
+   "id": "authority-evidence-ceilings-preserved",
+   "status": "SATISFIED",
+   "successor": null,
+   "rationale": "packets carry ceilings; DTCR_REVIEW_AND_CLOSURE_COMPILER_READY claims deterministic compiler readiness only, no source edits, refactor admission, merge or release"
+  },
+  {
+   "id": "semantic-completion-path",
+   "status": "TRANSFERRED",
+   "successor": "ed3c/skills-shared#550",
+   "rationale": "per #550's 2026-08-21 comment the semantic-context adapter blocks #522's terminal semantic completion path and was BLOCKED_ON_PROVIDER at closure time; the issue closed with this path explicitly unsatisfied (X1 shipped semantic_bundle NOT_APPLICABLE)"
+  }
+ ],
+ "implementation": {
+  "candidate_prs": [
+   {
+    "repository": "ed3c/skills-shared",
+    "number": 563,
+    "state": "CLOSED",
+    "merged": true,
+    "classification": "DIRECT"
+   }
+  ],
+  "landing": {
+   "repository": "ed3c/skills-shared",
+   "via_pr": 563,
+   "commit": "3fc020414134999227aec6ba9304a08e86287033",
+   "tree": "eea625614c233b7f42fd62c129aa21852cb36b9d"
+  }
+ },
+ "residual": [
+  {
+   "id": "semantic-completion-path-adapter",
+   "state": "NOT_IMPLEMENTED",
+   "owner": "ed3c/skills-shared#550"
+  },
+  {
+   "id": "semantic-completion-path-convergence-wiring",
+   "state": "NOT_EXERCISED",
+   "owner": "ed3c/skills-shared#521"
+  }
+ ],
+ "evidence_ceiling": "DETERMINISTIC",
+ "shadow_review": {
+  "verdict": "HUMAN_ADMIT_REQUIRED"
+ }
+}
