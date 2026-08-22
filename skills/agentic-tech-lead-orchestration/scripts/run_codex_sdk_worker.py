@@ -272,13 +272,57 @@ def _sha256_file(path: Path) -> str | None:
         return None
 
 
+def _pinned_runtime() -> tuple[str, str] | None:
+    """Return (runtime package dir, binary path) for the SDK's own executable.
+
+    `openai-codex` resolves its executable through
+    `codex_cli_bin.bundled_codex_path()` and never consults PATH, and that
+    binary ships in the sibling distribution `openai-codex-cli-bin` rather than
+    inside the `openai_codex` package tree. Mirroring that resolution is the
+    only way the recorded identity is the thing that actually ran; probing the
+    SDK package or PATH answers a different question.
+    """
+
+    try:
+        import codex_cli_bin  # type: ignore
+
+        binary = Path(codex_cli_bin.bundled_codex_path()).resolve()
+        package_dir = Path(codex_cli_bin.__file__).resolve().parent
+        if binary.is_file():
+            return str(package_dir), str(binary)
+    except Exception:
+        pass
+    try:
+        from importlib.metadata import distribution
+
+        dist = distribution("openai-codex-cli-bin")
+        for entry in dist.files or ():
+            if entry.name not in ("codex", "codex.exe"):
+                continue
+            binary = Path(dist.locate_file(entry)).resolve()
+            package_dir = binary.parent.parent
+            # The same marker `codex_cli_bin.bundled_package_dir()` checks, so
+            # the containment claim is anchored to a real runtime package.
+            if binary.is_file() and (package_dir / "codex-package.json").is_file():
+                return str(package_dir), str(binary)
+    except Exception:
+        pass
+    return None
+
+
 def _resolve_codex_binary(module: Any) -> tuple[str, str | None]:
     """Return (source, path) for the executable the SDK will actually run.
 
-    A bundled executable wins over PATH: if the package ships one, that is what
-    executed, and claiming the PATH copy would misname the executor.
+    The SDK's own pinned runtime wins over everything: it is what executes. A
+    bundled executable then wins over PATH, and a PATH hit is recorded as PATH
+    and never promoted to an SDK claim — the receipt must be able to say "this
+    is the first codex on PATH" rather than assert an executor identity it did
+    not resolve.
     """
 
+    pinned = _pinned_runtime()
+    if pinned:
+        return "SDK_PINNED_RUNTIME", pinned[1]
     module_file = getattr(module, "__file__", None)
     if module_file:
         package_dir = Path(module_file).resolve().parent
@@ -318,6 +362,7 @@ def collect_executor_provenance(data: dict[str, Any], module: Any) -> dict[str, 
     module_file = getattr(module, "__file__", None)
     module_dir = str(Path(module_file).resolve().parent) if module_file else None
     source, binary_path = _resolve_codex_binary(module)
+    pinned = _pinned_runtime()
     config = {key: data.get(key) for key in PROVENANCE_CONFIG_KEYS}
     return {
         "adapter_version": ADAPTER_VERSION,
@@ -325,6 +370,7 @@ def collect_executor_provenance(data: dict[str, Any], module: Any) -> dict[str, 
         "sdk_package": SDK_PACKAGE,
         "sdk_version": sdk_version or "ABSENT",
         "sdk_module_dir": module_dir,
+        "runtime_module_dir": pinned[0] if pinned else None,
         "codex_binary_source": source,
         "codex_binary_path": binary_path,
         "codex_binary_sha256": _sha256_file(Path(binary_path)) if binary_path else None,

@@ -61,8 +61,12 @@ def compile_receipt(data:dict[str,Any])->dict[str,Any]:
     if not isinstance(data,dict) or set(data)!={"worker_result","controller","carrier_bundle_path"}: raise ContractError("input must contain worker_result/controller/carrier_bundle_path only")
     _no_sensitive(data); w=data["worker_result"]; c=data["controller"]
     if not isinstance(w,dict) or not isinstance(c,dict): raise ContractError("worker/controller must be objects")
-    try: check_result(w)
+    try: _v=check_result(w)
     except ResultContractError as error: raise ContractError(str(error)) from error
+    # A live acceptance receipt may only be compiled where the executing binary
+    # still is: NOT_RECOMPUTED/UNVERIFIABLE_BINARY_ABSENT are observations, not
+    # executor identity, and must never be promoted into one.
+    if _v["executor_provenance"]!="PASS": raise ContractError(f"executor provenance not recomputable: {_v['executor_provenance']}")
     if w["adapter_state"]!="RUNTIME_RETURNED" or w["sdk_execution"]!="EXERCISED" or w["lease_readback"]!="PASS" or w["controller_readback_required"] is not True: raise ContractError("worker runtime/lease state not admissible")
     if str(w["turn_status"]).lower()!="completed": raise ContractError("Codex turn must be completed")
     if not REPO.fullmatch(str(w["repo"])): raise ContractError("repo must be owner/name")

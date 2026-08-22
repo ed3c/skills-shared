@@ -23,7 +23,10 @@
     "predecessor_receipts": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
     "thread_policy": {"enum": ["new", "resume-compatible"]},
     "resume_thread_id": {"type": "string", "minLength": 1},
-    "output_schema": {"type": "object"}
+    "output_schema": {"type": "object"},
+    "model": {"type": "string", "minLength": 1},
+    "harness": {"type": "string", "minLength": 1},
+    "approval_policy": {"type": "string", "minLength": 1}
   },
   "allOf": [
     {
