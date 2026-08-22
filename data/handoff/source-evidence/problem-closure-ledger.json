@@ -56,7 +56,16 @@
       },
       "residual_gaps": [],
       "session_attempts": [],
-      "shadow_verdict": "NOT_REVIEWED",
+      "shadow_review": {
+        "repo_subject": {
+          "commit": "674cfe1435c4bd1c29e8f07308266fe5c6284973",
+          "repo": "ed3c/skills-shared",
+          "tree": "217bf950a57701235f761223e9466b9774aa6194"
+        },
+        "reviewer_attempt_id": "shadow-a01",
+        "reviewer_task_id": "shadow-512/T1"
+      },
+      "shadow_verdict": "PASS",
       "source": {
         "identity": "ed3c/skills-shared#435",
         "kind": "GITHUB_ISSUE",
@@ -106,7 +115,16 @@
           "worktree": "local-handoff-queue-audit"
         }
       ],
-      "shadow_verdict": "NOT_REVIEWED",
+      "shadow_review": {
+        "repo_subject": {
+          "commit": "674cfe1435c4bd1c29e8f07308266fe5c6284973",
+          "repo": "ed3c/skills-shared",
+          "tree": "217bf950a57701235f761223e9466b9774aa6194"
+        },
+        "reviewer_attempt_id": "shadow-a01",
+        "reviewer_task_id": "shadow-512/T1"
+      },
+      "shadow_verdict": "PASS",
       "source": {
         "identity": "ed3c/skills-shared#435",
         "kind": "GITHUB_ISSUE",

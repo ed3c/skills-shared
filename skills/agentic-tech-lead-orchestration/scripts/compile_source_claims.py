@@ -13,7 +13,8 @@ GITHUB_REF=re.compile(r"^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+#[1-9][0-9]*$")
 SHA256_ID=re.compile(r"^sha256:[0-9a-f]{64}$")
 WORKTREE=re.compile(r"^[A-Za-z0-9_.:@-]+$")
 CLAIM_REQUIRED={"problem_id","kind","identity","location","claim","applicability","task_nodes","dag_nodes","issue_nodes"}
-CLAIM_OPTIONAL={"claim_sha256","applicability_rationale","superseded_by","requires_human","session_attempts","implementation_evidence","shadow_review"}
+CLAIM_OPTIONAL={"claim_sha256","applicability_rationale","superseded_by","requires_human","session_attempts","implementation_evidence","shadow_review","shadow_verdict"}
+SHADOW_VERDICTS={"PASS","FAIL","PARTIAL","NOT_REVIEWED"}
 IMPL_KINDS={"COMMIT","PR","MERGE_SUBJECT","SOURCE_DIFF","GENERATED_ARTIFACT"}
 IMPL_STATUS={"CURRENT","HISTORICAL","SUPERSEDED"}
 SHADOW_REVIEW_FIELDS={"repo_subject","reviewer_task_id","reviewer_attempt_id"}
@@ -75,12 +76,10 @@ def _impls(v:Any,current:dict[str,str])->list[dict[str,Any]]:
     return out
 def _shadow_review(v:Any,current:dict[str,str],attempt_keys:set[tuple[str,str]])->dict[str,Any]|None:
     # Mirrors check_problem_closure.py's shadow_review binding (same-subject + reviewer
-    # independent of every implementer attempt). Note: compile_claims() always emits
-    # shadow_verdict="NOT_REVIEWED" below, so the checker's "required when verdict is not
-    # NOT_REVIEWED" gate can never fire through this path -- a hand-authored ledger is
-    # where shadow_review actually becomes load-bearing. This still validates shape/
-    # subject/independence unconditionally whenever a caller supplies shadow_review, so a
-    # source-claims.json can carry a pre-validated review through compilation.
+    # independent of every implementer attempt). A caller may also supply shadow_verdict
+    # (validated in compile_claims): any verdict other than NOT_REVIEWED requires this
+    # shadow_review to be present, so a hand-authored source-claims.json can carry a real
+    # Shadow verdict through compilation without the checker's gate ever being dead code.
     if v is None:return None
     if not isinstance(v,dict) or set(v)!=SHADOW_REVIEW_FIELDS:raise ContractError("shadow_review fields invalid")
     rs=_subject(v["repo_subject"])
@@ -119,12 +118,15 @@ def compile_claims(data:dict[str,Any])->dict[str,Any]:
         if any(x["status"]=="CURRENT" for x in impls) and not attempts:raise ContractError("current implementation evidence requires session lineage")
         attempt_keys={(a["task_id"],a["attempt_id"]) for a in attempts}
         shadow_review=_shadow_review(raw.get("shadow_review"),subject,attempt_keys)
-        normalized.append((raw,digest,tasks,dags,issues,attempts,impls,shadow_review))
+        shadow_verdict=raw.get("shadow_verdict","NOT_REVIEWED")
+        if shadow_verdict not in SHADOW_VERDICTS:raise ContractError("shadow_verdict invalid")
+        if shadow_verdict!="NOT_REVIEWED" and shadow_review is None:raise ContractError("shadow_verdict without shadow_review is an unverifiable claim")
+        normalized.append((raw,digest,tasks,dags,issues,attempts,impls,shadow_review,shadow_verdict))
     idset=set(ids)
     for raw,*_ in normalized:
         if raw["applicability"]=="SUPERSEDED" and raw["superseded_by"] not in idset:raise ContractError("SUPERSEDED target absent from denominator")
     manifest=[];problems=[]
-    for raw,digest,tasks,dags,issues,attempts,impls,shadow_review in normalized:
+    for raw,digest,tasks,dags,issues,attempts,impls,shadow_review,shadow_verdict in normalized:
         manifest.append({"problem_id":raw["problem_id"],"kind":raw["kind"],"identity":raw["identity"],"location":raw["location"],"claim_sha256":digest})
         current=any(x["status"]=="CURRENT" for x in impls)
         if raw["applicability"]=="NOT_APPLICABLE":closure="NOT_APPLICABLE"
@@ -132,7 +134,7 @@ def compile_claims(data:dict[str,Any])->dict[str,Any]:
         elif raw.get("requires_human") is True:closure="HUMAN_ADMIT_REQUIRED"
         elif current:closure="IMPLEMENTED_UNVERIFIED"
         else:closure="OPEN"
-        p={"problem_id":raw["problem_id"],"source":{"kind":raw["kind"],"identity":raw["identity"],"location":raw["location"]},"claim":raw["claim"],"applicability":raw["applicability"],"repo_subject":dict(subject),"task_nodes":tasks,"dag_nodes":dags,"issue_nodes":issues,"session_attempts":attempts,"implementation_evidence":impls,"verification_evidence":[],"receipts":[],"merge_subjects":[],"shadow_verdict":"NOT_REVIEWED","residual_gaps":[],"closure":closure}
+        p={"problem_id":raw["problem_id"],"source":{"kind":raw["kind"],"identity":raw["identity"],"location":raw["location"]},"claim":raw["claim"],"applicability":raw["applicability"],"repo_subject":dict(subject),"task_nodes":tasks,"dag_nodes":dags,"issue_nodes":issues,"session_attempts":attempts,"implementation_evidence":impls,"verification_evidence":[],"receipts":[],"merge_subjects":[],"shadow_verdict":shadow_verdict,"residual_gaps":[],"closure":closure}
         if shadow_review is not None:p["shadow_review"]=shadow_review
         for f in("applicability_rationale","superseded_by","requires_human"):
             if f in raw:p[f]=raw[f]
