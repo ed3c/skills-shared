@@ -2,7 +2,14 @@
 
 Portable method for coordinating multiple Worker Agents with Git Town, isolated linked worktrees, eval-first task packets, bounded no-push synchronization, molecular issue/PR traceability, explicit multi-parent convergence, and Human Admit. This Skill does not own a consumer repository's branches, `.git-town.toml`, CI, remotes, receipts, merge, release, or promotion.
 
-Current terminal Molecular Stack projections are routed under [`molecular-indexes/`](molecular-indexes/codex-v2/README.md); the directory is a traceability index surface, not mutable forge authority.
+Current terminal Molecular Stack projections are routed under `molecular-indexes/`; the directory is a traceability index surface, not mutable forge authority:
+
+- [`molecular-indexes/codex-v2/README.md`](molecular-indexes/codex-v2/README.md) — Wave-3/Codex v2, entropy and the formerly held Draft stacks; carries the reconciled `#412 → #419 → #420 → #450` terminal chain.
+- [`molecular-indexes/spatial-407/README.md`](molecular-indexes/spatial-407/README.md) — Spatial Loop ICPG program #407–#411.
+- [`molecular-indexes/git-at-any-scale/README.md`](molecular-indexes/git-at-any-scale/README.md) — Git-at-any-scale audit #531/#532/#534/#535/#536; detailed trace [`docs/traceability/git-at-any-scale/README.md`](../../docs/traceability/git-at-any-scale/README.md).
+- [`molecular-indexes/dual-track-code-review-loop/README.md`](molecular-indexes/dual-track-code-review-loop/README.md) and [`molecular-indexes/closure-drift/README.md`](molecular-indexes/closure-drift/README.md).
+
+None of these indexes has a machine counterpart: `scripts/assert_molecular_stack_index.py` has no `index.json` to read in any of the five directories, so every row below carries `DOCUMENTATION_PROJECTION` authority only. Exact GitHub metadata, Git subjects and receipts remain authority over all of it.
 
 ## Read order
 
@@ -411,14 +418,16 @@ Hard laws for this Stack:
 
 ## Current Intent-to-Evidence Knowledge Graph molecular Stack — #413
 
-This program consumes the unmerged Spatial Loop ICPG contract on draft PR #412. The first implementation branch therefore is a true child of PR #412 by bytes/contracts, not merely because #413 was opened later.
+This program consumed the then-unmerged Spatial Loop ICPG contract carried on PR #412, which is why the first implementation branch is a true child of PR #412 by bytes/contracts rather than because #413 was opened later. At the 2026-08-22 readback PR #412 is `CLOSED_UNMERGED / SUPERSEDED_BY_#419` and PR #419 is `CLOSED_UNMERGED / CONSUMED`; the `TRUE_CHILD` relation is retained as history, and neither PR is a live carrier or a path writer any more. The reconciled terminal chain is in [`molecular-indexes/codex-v2/README.md`](molecular-indexes/codex-v2/README.md).
 
 ```text
 PR #412  Spatial ICPG + Shadow/static projection + Tech Lead case ownership
+         CLOSED_UNMERGED / SUPERSEDED_BY_#419  (2026-08-22)
 └─ KG-C1/D1  #414/#413  branch agent/413-knowledge-graph-icpg-bridge
+      carried by PR #419 — CLOSED_UNMERGED / CONSUMED (2026-08-22)
       consumes: spatial-loop-case-graph/v1 contract and Tech Lead case obligations
       provides: Knowledge Graph AGENTS/README/SKILL + trace/prompt contracts
-      relation: TRUE_CHILD of PR #412
+      relation: TRUE_CHILD of PR #412 (relation retained; carrier terminal)
 
 Planned terminal atoms after contract freeze:
 ├─ KG-C2/E1  #414  Intent/Artifact projection schemas + deterministic mutations
@@ -450,8 +459,8 @@ semantic knowledge card
 
 | Atom | Issue | Type | Owns | Stack class | Current state |
 |---|---:|---|---|---|---|
-| `KG-C1` | #413/#414 | `C` | semantic projection/ICPG bridge contract | true child of PR #412 | implemented on candidate branch |
-| `KG-D1` | #413/#417 | `D` | nearest AGENTS/README/SKILL + current topology | same preparation leaf | implemented on candidate branch |
+| `KG-C1` | #413/#414 | `C` | semantic projection/ICPG bridge contract | true child of PR #412 (relation retained; both carriers `CLOSED_UNMERGED`) | implemented on the closed candidate branch |
+| `KG-D1` | #413/#417 | `D` | nearest AGENTS/README/SKILL + current topology | same preparation leaf | implemented on the closed candidate branch |
 | `KG-C2` | #414 | `C/E` | machine Intent/Artifact schemas + authority/freshness controls | planned terminal leaf | `NOT_IMPLEMENTED` |
 | `KG-K1` | #415 | `K/E` | case→task/issue/Stack/document bindings + reverse trace | planned terminal leaf | `NOT_IMPLEMENTED` |
 | `KG-K2` | #416 | `K/E` | authority-aware traversal + evidence-ceiling checker | planned terminal leaf | `NOT_IMPLEMENTED` |

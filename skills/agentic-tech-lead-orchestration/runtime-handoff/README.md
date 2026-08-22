@@ -11,28 +11,34 @@ runtime-handoff/
 ├── README.md
 │   └── current State Machines, DAG, data flow, commands, and evidence ceilings
 ├── codex-v2-local-handoff-queue.json
-│   └── #508 durable result carrier + executor provenance + strict result schema
+│   ├── COMPLETE: #508 durable result carrier + executor provenance + strict result schema
+│   └── ACTIVE: #464 fresh signed-in Codex v2 live execution
+├── git-at-any-scale-local-handoff-queue.json
+│   ├── COMPLETE: GIT-SCALE-H0 immutable article source packet (#512)
+│   ├── ACTIVE: GIT-SCALE-H1 portable hosting-assurance contract denominator (#532)
+│   └── BLOCKED_BY_PREDECESSOR: H2 runtime canary (#534), H3 Shadow (#535), H4 path convergence (#536)
 ├── herdr-local-handoff-queue.json
-│   └── #466 real managed Herdr lifecycle and clean terminal receipt
+│   └── ACTIVE: #466 real managed Herdr lifecycle and clean terminal receipt
 ├── source-evidence-local-handoff-queue.json
-│   └── #512 immutable Issue/Article/PDF/PRD input → #467 compiler → existing closure ledger
+│   ├── COMPLETE: #512 GITHUB_ISSUE packet (issue #435) and ARTICLE packet (Cursor git-at-any-scale)
+│   └── ACTIVE: #512 next unexecuted source kind (PDF or PRD)
 └── spatial-407-local-handoff-queue.json
-    ├── ACTIVE: #407/#408/#409/#410 provenance-compliant publication rebuild
-    └── BLOCKED_BY_PREDECESSOR: #411 independent live Shadow case-delta canary
+    ├── COMPLETE: #407/#408/#409/#410 publication, achieved by an alternate route (PR #412 CLOSED unmerged)
+    └── ACTIVE: #411 independent live Shadow case-delta canary
 ```
 
 ## Subject groups
 
-The original Wave-3 continuation queues bind:
+All five queues in this directory now bind one admitted subject:
 
 ```text
 repository  ed3c/skills-shared
-commit      249abc47847f8295b1c75c9d4c84457c5126fd89
-tree        a24b9b7ace6f4022967d41262ecdc704d5c11646
-rollback    d5993267e03b217dcdab9702dab0400ab03df860
+commit      5341885f26b5e8e7baf5087a4d661e324f878242
+tree        a18e12507f9e621efd5354f58384eded1f1e2a9a
+rollback    9fe3c6daf53dcdd61123d5d7a4eeedbdf37b5d7c
 ```
 
-The Spatial #407 publication queue is a separate mutable-program handoff and binds the semantic source candidate recorded inside `spatial-407-local-handoff-queue.json`. Its rollback is the admitted `main` observed when that queue was compiled. Before local execution, re-read current `main` and PR #412; if either required subject moved, recompile rather than applying a stale queue.
+They were previously split across `249abc47…` (Wave-3 continuation queues), `5ac05420…` (the Spatial publication candidate) and `988a4e79…` (git-at-any-scale). Those bindings are historical: the Spatial publication bytes landed by an alternate route, and the queues were recompiled against the admitted subject above. Before local execution, re-read current `main`; if the required subject moved, recompile rather than applying a stale queue.
 
 ## State Machines
 
@@ -40,27 +46,32 @@ The Spatial #407 publication queue is a separate mutable-program handoff and bin
 
 ```text
 #408/#409/#410_SOURCE_IMPLEMENTATION_GREEN
-→ CURRENT_MAIN_RECONCILED
-→ NORMAL_EXACT_HEAD_SUITES_GREEN
-→ SKILL_EVAL_COMMIT_PROVENANCE_RED
-→ LOCAL_PROVENANCE_REBUILD_ACTIVE
-→ COMPLIANT_MACHINE_IDENTITY_AND_TRAILERS
-→ EXACT_SEMANTIC_TREE_REBUILT_ON_CURRENT_MAIN
-→ SKILL_SUITES
-→ SHARED_SKILLS_INFRA
-→ SKILL_EVAL_CONTRACT
-→ GIT_TOWN_WORKER
-→ READY_FOR_HUMAN_MAIN_ADMIT
-→ MERGED_ON_MAIN
+→ SKILL_EVAL_COMMIT_PROVENANCE_RED_ON_PR_412
+→ PROVENANCE_BLOCKER_FALSIFIED           (988a4e7 carve-out; gate GREEN on PR 412's own range)
+→ BYTES_LANDED_VIA_REPLAYED_#419         (PR #412 CLOSED unmerged, retained as forensic source)
+→ MERGED_ON_MAIN                         (45dfac8 is an ancestor of the admitted subject)
 → STATIC_CHILD_ISSUES_CLOSEABLE
 → RECOMPILE_OR_ADVANCE_LIVE_SUBJECT
-→ #411_INDEPENDENT_BUILDER_SHADOW_CANARY
+→ #411_INDEPENDENT_BUILDER_SHADOW_CANARY  ACTIVE / NOT_EXERCISED
 → SEMANTIC_PARITY_DELTA_OBSERVED
 → OWNING_ORACLE_READBACK
 → LIVE_SHADOW_CANARY_PASS | HOLD | FAIL
 ```
 
-The current GitHub connector history is retained as first-red provenance evidence. Do not add rewritable PR commits to `known_unclassified`, do not move `enforced_from`, do not relabel machine work as Human, and do not weaken `check_commit_roles.py`.
+The provenance-rebuild segment is historical, not pending: its receipt is `../references/closure-audit/issue-568.json`, acceptance item `412-semantics-on-current-main-with-compliant-provenance` SATISFIED, landing PR #573 commit `9fe3c6daf53dcdd61123d5d7a4eeedbdf37b5d7c`. The GitHub connector history is retained as first-red provenance evidence. Do not add rewritable PR commits to `known_unclassified`, do not move `enforced_from`, do not relabel machine work as Human, and do not weaken `check_commit_roles.py`.
+
+### git-at-any-scale portable hosting assurance
+
+```text
+#512_IMMUTABLE_ARTICLE_PACKET_BOUND      COMPLETE (864322 bytes, sha256 25f59fc6…447cab9)
+→ #532_PORTABLE_CONTRACT_DENOMINATOR      ACTIVE / eleven contracts + repository registration
+                                          + exact-head hosted PASS still open
+→ #534_PHYSICAL_HOSTING_RUNTIME_CANARY    BLOCKED / no runtime, storage or benchmark host admitted
+→ #535_INDEPENDENT_SHADOW                 BLOCKED / both review subjects absent
+→ #536_SHARED_PATH_CONVERGENCE            BLOCKED / #531/#532/#534/#535 subjects not admitted
+```
+
+The `#412/#419 path-writer disposition` that used to gate #536 is discharged: both PRs are CLOSED unmerged and their bytes landed by an alternate route. A SKIPPED workflow is still not a PASS.
 
 ### Codex v2 hardening
 
@@ -126,24 +137,33 @@ Compiler PASS proves binding, not truth. #467 remains closed as the method owner
 ├─ #409 static Shadow case-delta contract             SOURCE_IMPLEMENTATION_CLOSED
 ├─ #410 Tech Lead + Molecular ownership gate          SOURCE_IMPLEMENTATION_CLOSED
 │        ↓ shared publication/provenance predecessor
-└─ Local queue: spatial-407-provenance-rebuild        ACTIVE
+└─ Local queue: spatial-407-provenance-superseded      COMPLETE (bytes landed via replayed #419)
          ↓ admitted main subject
-   #411 live independent Shadow canary                BLOCKED_BY_PREDECESSOR
+   #411 live independent Shadow canary                ACTIVE / NOT_EXERCISED
 
 #507 MERGED
   ↓
-#508 ACTIVE ──subject changes──> new #464 queue
-                                 ↓
-                              #464 live v2
+#508 COMPLETE ──subject changed, queue recompiled──> #464 live v2   ACTIVE
 
 #466 ACTIVE external runtime sibling
 #467 COMPLETE source compiler method
   ↓ method dependency only
-#512 ACTIVE source-evidence sibling
+#512 ACTIVE source-evidence sibling (GITHUB_ISSUE + ARTICLE kinds COMPLETE)
 #465 COMPLETE historical remote receipt
+
+#531 git-at-any-scale program
+├─ GIT-SCALE-H0 / #512 immutable article packet    COMPLETE
+│        ↓
+├─ GIT-SCALE-H1 / #532 portable contracts          ACTIVE
+│        ↓
+├─ GIT-SCALE-H2 / #534 physical runtime canary     BLOCKED_BY_PREDECESSOR
+│        ↓
+├─ GIT-SCALE-H3 / #535 independent Shadow          BLOCKED_BY_PREDECESSOR
+│        ↓
+└─ GIT-SCALE-H4 / #536 shared path convergence     BLOCKED_BY_PREDECESSOR
 ```
 
-The Spatial static issues are not closed merely because source suites are green. They require equivalent bytes admitted on `main`. #411 is not a Git child of the static implementation unless a future harness literally consumes unmerged parent bytes; its current relationship is process/external evidence.
+The Spatial static issues are not closed merely because source suites are green; they require equivalent bytes admitted on `main`, which is now satisfied. #411 is not a Git child of the static implementation unless a future harness literally consumes unmerged parent bytes; its current relationship is process/external evidence.
 
 ## Data flow and durable outputs
 
@@ -177,20 +197,15 @@ Receipt destinations are under `data/handoff/`; that path is a contract, not pro
 
 ## Local invocation
 
-Validate only the queue whose exact subject is current:
+Validate every queue in this directory (the same glob `tests/run-all.sh` uses, so
+this list cannot drift out of step with the files on disk), then execute only the
+one whose exact subject is current:
 
 ```bash
-python3 skills/agentic-tech-lead-orchestration/scripts/assert_local_handoff_queue.py \
-  --queue skills/agentic-tech-lead-orchestration/runtime-handoff/codex-v2-local-handoff-queue.json
-
-python3 skills/agentic-tech-lead-orchestration/scripts/assert_local_handoff_queue.py \
-  --queue skills/agentic-tech-lead-orchestration/runtime-handoff/herdr-local-handoff-queue.json
-
-python3 skills/agentic-tech-lead-orchestration/scripts/assert_local_handoff_queue.py \
-  --queue skills/agentic-tech-lead-orchestration/runtime-handoff/source-evidence-local-handoff-queue.json
-
-python3 skills/agentic-tech-lead-orchestration/scripts/assert_local_handoff_queue.py \
-  --queue skills/agentic-tech-lead-orchestration/runtime-handoff/spatial-407-local-handoff-queue.json
+for queue in skills/agentic-tech-lead-orchestration/runtime-handoff/*-local-handoff-queue.json; do
+  python3 skills/agentic-tech-lead-orchestration/scripts/assert_local_handoff_queue.py --queue "$queue"
+  python3 skills/agentic-tech-lead-orchestration/scripts/assert_local_handoff_queue.py --queue "$queue" --selftest
+done
 ```
 
 Then execute only the `ACTIVE` item whose required capabilities and subject are present. Do not advance another queue implicitly.
@@ -198,16 +213,21 @@ Then execute only the `ACTIVE` item whose required capabilities and subject are 
 ## Current evidence
 
 ```text
-Spatial #408/#409/#410 source implementation    PASS / candidate only
+Spatial #408/#409/#410 source implementation    PASS / bytes admitted on main
 Spatial normal exact-head suites                PASS
-Spatial Skill Eval commit provenance            FAIL / LOCAL_HANDOFF_REQUIRED
-Spatial main admission                          NOT_PERFORMED
+Spatial Skill Eval commit provenance            BLOCKER_FALSIFIED (988a4e7 carve-out; gate GREEN on
+                                                PR #412's own range) — PR #412 CLOSED unmerged
+Spatial main admission                          PERFORMED / 45dfac8 and 91df786 are ancestors of
+                                                5341885f, first contained by 9fe3c6d (PR #573)
 Spatial #411 live independent Shadow             NOT_EXERCISED
 Codex result-tree binder             PASS / MERGED via #507
 Codex durable replay/provenance      PASS / CLOSED_DETERMINISTICALLY via #508 (PR #516);
                                         receipt data/handoff/codex-v2/issue-508-result-carrier-receipt.json
-fresh Codex v2 live acceptance       NOT_EXERCISED / #464; queue recompile required against
-                                        129f53c23a3ab15354763167b25bddc45f724c00 (subject-mutation law)
+fresh Codex v2 live acceptance       NOT_EXERCISED / #464; queue recompiled onto the admitted subject
+                                        5341885f26b5e8e7baf5087a4d661e324f878242 (2026-08-22 readback).
+                                        129f53c23a3ab15354763167b25bddc45f724c00 is #508's historical
+                                        landing subject (PR #516), 284 commits behind — do not re-bind
+                                        #464 to it (subject-mutation law)
 Herdr real process detection         EXERCISED_PARTIALLY
 Herdr terminal clean lifecycle       NOT_EXERCISED / blocker RECLASSIFIED (PR #516) from host-permission
                                         to herdr-0.8.0 AgentInfo API-contract mismatch (no observation

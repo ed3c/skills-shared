@@ -16,16 +16,11 @@ Do not use chat history, an old PR body, a branch name, issue state, model agree
 
 ## Current immutable implementation subject
 
-The three existing queue JSON files in `skills/agentic-tech-lead-orchestration/runtime-handoff/` are projections over the subject they were compiled against and executed on (PR #516):
+Every queue JSON in `skills/agentic-tech-lead-orchestration/runtime-handoff/` is a projection over the subject **it** was compiled against. There is no single shared subject and no fixed number of queues: read the `subject` field of the exact queue you are acting on, and never infer it from a sibling queue or from a documentation projection such as this one (`../../../skills/agentic-tech-lead-orchestration/runtime-handoff/AGENTS.md:28` states the rule for the Spatial queue explicitly).
 
-```text
-repository       ed3c/skills-shared
-implementation  249abc47847f8295b1c75c9d4c84457c5126fd89
-tree            a24b9b7ace6f4022967d41262ecdc704d5c11646
-rollback        d5993267e03b217dcdab9702dab0400ab03df860
-```
+The Wave-3 continuation queues (`codex-v2`, `herdr`, `source-evidence`) were compiled against and executed on the PR #516 subject `249abc47847f8295b1c75c9d4c84457c5126fd89` / tree `a24b9b7ace6f4022967d41262ecdc704d5c11646` / rollback `d5993267e03b217dcdab9702dab0400ab03df860`. That commit is also the `parent_commit` of the #508 result-carrier receipt, whose own `implementation_commit` is `243635885f7bcff64c606dffe7fcbe09ada9c5b2` — the two are not interchangeable, and neither is "the receipt-bound subject" of the other.
 
-Current admitted `main` has since advanced to `129f53c23a3ab15354763167b25bddc45f724c00` (PR #511 was the docs-only merge with an empty diff against the owning scripts; PR #516 then landed the #508 implementation on branches cut from the receipt-bound subject). A later documentation merge does not rewrite the receipt-bound subject above. Any implementation change to a queued lane makes the old queue stale and requires a newly compiled queue bound to the newly admitted commit and tree — this is now the case for #464: its predecessor #508 closed `PASS` on the subject above, so the next Codex v2 queue must be compiled fresh against `129f53c23a3ab15354763167b25bddc45f724c00`, not appended to the existing `codex-v2-local-handoff-queue.json`.
+Current admitted `main` at the 2026-08-22 readback is `5341885f26b5e8e7baf5087a4d661e324f878242` (tree `a18e12507f9e621efd5354f58384eded1f1e2a9a`, rollback `9fe3c6daf53dcdd61123d5d7a4eeedbdf37b5d7c`); `129f53c23a3ab15354763167b25bddc45f724c00` was the #516 merge subject and is now historical. A later documentation merge does not rewrite the queue subject above. Any implementation change to a queued lane makes the old queue stale and requires a newly compiled queue bound to the newly admitted commit and tree — this is the case for #464: its predecessor #508 closed `PASS` on the queue subject above and the issue is now CLOSED/COMPLETED, so the Codex v2 successor queue must bind `5341885f26b5e8e7baf5087a4d661e324f878242` — compiled fresh, not appended to the #508 item, and never bound to the stale `129f53c2…`.
 
 ## Authority order
 
@@ -70,11 +65,11 @@ Before closing an unmerged PR as consumed, read at least one decisive file or Gi
 
 An issue can close only when its own goal and close gate are satisfied. Do not close:
 
-- #464 until a fresh v2 signed-in Codex run, on a queue freshly compiled against `129f53c23a3ab15354763167b25bddc45f724c00`, binds a durable result carrier and passes independent Shadow;
+- #464 until a fresh v2 signed-in Codex run, on a queue freshly compiled against the current admitted subject `5341885f26b5e8e7baf5087a4d661e324f878242`, binds a durable result carrier and passes independent Shadow;
 - #466 until a real managed Herdr lifecycle produces a terminal, clean, content-bound receipt — PR #516's receipt is `NOT_EXERCISED` with `sample_count: 0`, and the blocker is now RECLASSIFIED from host-permission to a herdr-0.8.0 `AgentInfo` API-contract mismatch (no observation timestamp, process identity, or cleanup facts), so unblocking requires either herdr publishing those facts or the frozen observer/lifecycle contract being renegotiated;
 - #512 merely because #467 compilation passes; source truth, applicability, implementation, and verification remain separately typed and require exact source packets. PR #516 executed the first such packet (GitHub issue #435 bytes) with dispositions `OPEN`×2 / `NOT_APPLICABLE`×1 — the repair itself (classifying six unclassified commits in `evals/commit-roles.json`) has not yet been executed.
 
-#467 is validly closed as the compiler/binding method owner. #465 is a valid closed live-canary lane because the owned remote edge was added, read back, removed, and the original denominator was restored on an exact hosted receipt. #508 is `ELIGIBLE_TO_CLOSE` with a validated `PASS` receipt as the durable-carrier/provenance/schema owner (PR #516); the GitHub issue remains open until the repository closes it, and it does not itself claim a live #464 acceptance.
+#467 is validly closed as the compiler/binding method owner. #465 is a valid closed live-canary lane because the owned remote edge was added, read back, removed, and the original denominator was restored on an exact hosted receipt. #508 is `CLOSED / COMPLETED` at the 2026-08-22 readback, with a validated `PASS` receipt as the durable-carrier/provenance/schema owner (PR #516); its closure does not claim a live #464 acceptance, which remains a separate `NOT_EXERCISED` lane.
 
 ## Writer and Shadow laws
 

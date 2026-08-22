@@ -1,0 +1,60 @@
+{
+  "benchmark": {
+    "durability_consistency_denominator": true,
+    "errors_in_denominator": true,
+    "immutable_subject": true,
+    "matched_topology": true,
+    "scope": "BOUNDED_TOPOLOGY"
+  },
+  "cache": {
+    "authority_validation_before_read": true,
+    "rebuild_reachability_proven": true,
+    "source_of_truth": false
+  },
+  "claims": {
+    "fixture_promoted_to_live": false,
+    "source_performance_promoted": false
+  },
+  "cleanup": {
+    "complete": true,
+    "rollback_subject": "9fe3c6daf53dcdd61123d5d7a4eeedbdf37b5d7c"
+  },
+  "compaction": {
+    "per_replica_cost_reported": true,
+    "reachable_objects_preserved": true,
+    "reachable_refs_preserved": true
+  },
+  "durability": {
+    "durable_readback": true,
+    "persisted_before_ack": true
+  },
+  "gossip": {
+    "required_for_correctness": false
+  },
+  "recovery": {
+    "corruption_detected": true,
+    "history_complete_ordered": true,
+    "partial_records_rejected": true
+  },
+  "refs": {
+    "cas_precondition": true,
+    "multi_ref_atomic": true,
+    "transaction_committed_before_visibility": true
+  },
+  "schema_version": "git-hosting-assurance/v1",
+  "shadow": {
+    "human_admit": false,
+    "independent": false
+  },
+  "storage": {
+    "authority": "single-node append-only fsync-durable log + CAS ref store",
+    "durability_class": "fsync-per-record before acknowledgement on one local filesystem; process-kill tested; power-loss, media failure and multi-node durability NOT_EXERCISED"
+  },
+  "subject": {
+    "commit": "5341885f26b5e8e7baf5087a4d661e324f878242",
+    "config_digest": "sha256:249a80b415e38a0333fc5bae11612063f139cb8e9c82cb94e68d04335ac5ed9d",
+    "repository": "ed3c/skills-shared",
+    "runtime_digest": "sha256:4ea664cc6bae1d3a999bf4293ad65136821c3a611a498894d428448a1610d127",
+    "tree": "a18e12507f9e621efd5354f58384eded1f1e2a9a"
+  }
+}

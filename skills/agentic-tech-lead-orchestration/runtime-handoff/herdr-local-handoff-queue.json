@@ -28,11 +28,12 @@
           "herdr-runtime",
           "scratch-home-isolation",
           "managed-agent-target",
-          "human-attended-terminal-or-explicit-host-permission",
+          "herdr-agentinfo-observation-facts-or-observer-contract-renegotiation",
+          "human-attended-terminal-or-explicit-host-permission-INSUFFICIENT-ALONE-per-attempt-466-live-2",
           "stable-workspace-pane-pid-start-session-identity",
           "controller-source-diff-test-readback"
         ],
-        "required_subject_commit": "249abc47847f8295b1c75c9d4c84457c5126fd89"
+        "required_subject_commit": "5341885f26b5e8e7baf5087a4d661e324f878242"
       },
       "exit": {
         "cleanup_required": true,
@@ -79,6 +80,11 @@
             "operation_id": "materialize-exact-herdr-managed-agent-plan",
             "required_output": "CONCRETE_COMMAND_CONTRACT",
             "resolver_source": "Issue #466 current blocker record, nearest AGENTS/README, scratch HOME, admitted Herdr binary, exact worktree, and human-attended or explicitly permitted host session"
+          },
+          {
+            "operation_id": "resolve-herdr-agentinfo-observation-contract-mismatch",
+            "required_output": "CONCRETE_COMMAND_CONTRACT",
+            "resolver_source": "Attempt 466-live-2 (data/handoff/herdr-v2/herdr-lifecycle-receipt.json, state NOT_EXERCISED, sample_count 0) recorded CARRIER_RUNTIME_CONTRACT_MISMATCH as the primary blocker: herdr 0.8.0's AgentInfo surface publishes no observation timestamp, process id, liveness flag, process start time, cleanup_state or residue_count, so herdr_runtime_observer.reduce_observation can never produce a sample. Host permission alone was confirmed insufficient. Unblocking requires either upstream herdr publishing those facts, or human-admitted renegotiation of references/contracts/herdr-observer-receipt.schema.json against a real herdr capability set. Do not re-spend a live-lane cycle on host-permission escalation before re-checking herdr's AgentInfo surface."
           }
         ]
       },
@@ -88,9 +94,9 @@
   ],
   "schema_version": "agentic-tech-lead/local-handoff-queue/v1",
   "subject": {
-    "commit": "249abc47847f8295b1c75c9d4c84457c5126fd89",
+    "commit": "5341885f26b5e8e7baf5087a4d661e324f878242",
     "repository": "ed3c/skills-shared",
-    "rollback_commit": "d5993267e03b217dcdab9702dab0400ab03df860",
-    "tree": "a24b9b7ace6f4022967d41262ecdc704d5c11646"
+    "rollback_commit": "9fe3c6daf53dcdd61123d5d7a4eeedbdf37b5d7c",
+    "tree": "a18e12507f9e621efd5354f58384eded1f1e2a9a"
   }
 }

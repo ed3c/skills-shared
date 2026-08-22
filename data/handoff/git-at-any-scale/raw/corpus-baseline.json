@@ -1,0 +1,16 @@
+{
+  "authority_digest": "fc5a6c69af9e1a0c1d54e46914013cd504862e29f3b28f06a6cb94116e448292",
+  "blobs": 24,
+  "commits": 24,
+  "empty_baseline_log_bytes": 0,
+  "log_bytes": 31135,
+  "multi_ref_atomic_record": true,
+  "multi_ref_updates_in_one_record": 3,
+  "objects": 48,
+  "refs": {
+    "refs/heads/b0": "432d77243ade4af3d051e2123f8fa859f5e8022ffe36c51a95a9067df14afa9f",
+    "refs/heads/b1": "928aadac12ab309b89da8c007a03a59301d3f4aaea9b55fb09beb855adc0cf01",
+    "refs/heads/b2": "780ea80b096fb9593a6893510a49a9fd82a7b0262f621d770413cc383b98cc5e"
+  },
+  "stage": "REPOSITORY_CORPUS_LOADED"
+}

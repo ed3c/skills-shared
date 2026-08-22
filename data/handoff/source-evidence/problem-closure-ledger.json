@@ -20,9 +20,9 @@
       "problem_id": "435-evidence-boundary-scope",
       "receipts": [],
       "repo_subject": {
-        "commit": "249abc47847f8295b1c75c9d4c84457c5126fd89",
+        "commit": "5341885f26b5e8e7baf5087a4d661e324f878242",
         "repo": "ed3c/skills-shared",
-        "tree": "a24b9b7ace6f4022967d41262ecdc704d5c11646"
+        "tree": "a18e12507f9e621efd5354f58384eded1f1e2a9a"
       },
       "residual_gaps": [],
       "session_attempts": [],
@@ -38,24 +38,59 @@
     {
       "applicability": "APPLICABLE",
       "claim": "## Incident\nBefore the Productization branch was created, six GitHub connector commits had already reached `main` while creating and immediately deleting accidental placeholder files. Current tree is restored, but the published commits have no repository-required Driven-By / Driven-On trailers and the connector could not produce the required `.invalid` machine author identity.\n\nExact published commits:\n```text\n89c39f83314bee79226af5e081fc2013c41ccc13  add accidental root `x`\n55f926e22c13ce6212280819b1eea916d35cd384  remove `x`\n8e2c89d120ecb74fcffa4d708d0714ca8583036f  add accidental root `__never__`\n5417467f1416ced5a6ad0d1fabaa38f6d850d3e8  remove `__never__`\n957d7373a36ae78b6379c28625967090e5b296fc  add accidental root `stop`\nccef97dedd7ea8b1873e3afa130ca82b8eabb413  remove `stop`\n```",
-      "closure": "OPEN",
+      "closure": "PARTIAL",
       "dag_nodes": [
         "github-issue-435"
       ],
-      "implementation_evidence": [],
+      "implementation_evidence": [
+        {
+          "kind": "COMMIT",
+          "repo_subject": {
+            "commit": "5341885f26b5e8e7baf5087a4d661e324f878242",
+            "repo": "ed3c/skills-shared",
+            "tree": "a18e12507f9e621efd5354f58384eded1f1e2a9a"
+          },
+          "status": "CURRENT",
+          "subject": "a2761542ec3b3385e763fbf1122150234fbb20a5"
+        },
+        {
+          "kind": "MERGE_SUBJECT",
+          "repo_subject": {
+            "commit": "5341885f26b5e8e7baf5087a4d661e324f878242",
+            "repo": "ed3c/skills-shared",
+            "tree": "a18e12507f9e621efd5354f58384eded1f1e2a9a"
+          },
+          "status": "CURRENT",
+          "subject": "8075877e148d12e44b20cf7bcf6521390a8fbd44"
+        }
+      ],
       "issue_nodes": [
         435
       ],
-      "merge_subjects": [],
+      "merge_subjects": [
+        {
+          "commit": "5341885f26b5e8e7baf5087a4d661e324f878242",
+          "repo": "ed3c/skills-shared",
+          "tree": "a18e12507f9e621efd5354f58384eded1f1e2a9a"
+        }
+      ],
       "problem_id": "435-incident-six-commits",
       "receipts": [],
       "repo_subject": {
-        "commit": "249abc47847f8295b1c75c9d4c84457c5126fd89",
+        "commit": "5341885f26b5e8e7baf5087a4d661e324f878242",
         "repo": "ed3c/skills-shared",
-        "tree": "a24b9b7ace6f4022967d41262ecdc704d5c11646"
+        "tree": "a18e12507f9e621efd5354f58384eded1f1e2a9a"
       },
-      "residual_gaps": [],
-      "session_attempts": [],
+      "residual_gaps": [
+        "the six already-published commits still carry no Driven-By/Driven-On trailers and no .invalid machine author identity; published main history is not rewritten, so the incident is discharged by classification in evals/commit-roles.json::known_unclassified only"
+      ],
+      "session_attempts": [
+        {
+          "attempt_id": "a2761542ec3b3385e763fbf1122150234fbb20a5",
+          "task_id": "435-repair-classify-commits",
+          "worktree": "worktree:agent-local-now-wave-2"
+        }
+      ],
       "shadow_verdict": "NOT_REVIEWED",
       "source": {
         "identity": "ed3c/skills-shared#435",
@@ -70,24 +105,57 @@
     {
       "applicability": "APPLICABLE",
       "claim": "## Required repair\nUse a local/Forgejo/Codex/Claude lane that can author a compliant machine commit. Add exactly these six already-published SHAs to `evals/commit-roles.json::known_unclassified`, with one commit-specific reason each. Do not move `enforced_from`, widen a pattern, rewrite main, or falsely relabel the commits Human.\n\nRun:\n```text\npython3 scripts/check_commit_roles.py --repo-root .\npython3 -m unittest tests/test_commit_roles.py -v\n```\nand the current owning repository workflows on the exact candidate.",
-      "closure": "OPEN",
+      "closure": "IMPLEMENTED_UNVERIFIED",
       "dag_nodes": [
         "github-issue-435"
       ],
-      "implementation_evidence": [],
+      "implementation_evidence": [
+        {
+          "kind": "COMMIT",
+          "repo_subject": {
+            "commit": "5341885f26b5e8e7baf5087a4d661e324f878242",
+            "repo": "ed3c/skills-shared",
+            "tree": "a18e12507f9e621efd5354f58384eded1f1e2a9a"
+          },
+          "status": "CURRENT",
+          "subject": "a2761542ec3b3385e763fbf1122150234fbb20a5"
+        },
+        {
+          "kind": "MERGE_SUBJECT",
+          "repo_subject": {
+            "commit": "5341885f26b5e8e7baf5087a4d661e324f878242",
+            "repo": "ed3c/skills-shared",
+            "tree": "a18e12507f9e621efd5354f58384eded1f1e2a9a"
+          },
+          "status": "CURRENT",
+          "subject": "8075877e148d12e44b20cf7bcf6521390a8fbd44"
+        }
+      ],
       "issue_nodes": [
         435
       ],
-      "merge_subjects": [],
+      "merge_subjects": [
+        {
+          "commit": "5341885f26b5e8e7baf5087a4d661e324f878242",
+          "repo": "ed3c/skills-shared",
+          "tree": "a18e12507f9e621efd5354f58384eded1f1e2a9a"
+        }
+      ],
       "problem_id": "435-required-repair-classify-commits",
       "receipts": [],
       "repo_subject": {
-        "commit": "249abc47847f8295b1c75c9d4c84457c5126fd89",
+        "commit": "5341885f26b5e8e7baf5087a4d661e324f878242",
         "repo": "ed3c/skills-shared",
-        "tree": "a24b9b7ace6f4022967d41262ecdc704d5c11646"
+        "tree": "a18e12507f9e621efd5354f58384eded1f1e2a9a"
       },
       "residual_gaps": [],
-      "session_attempts": [],
+      "session_attempts": [
+        {
+          "attempt_id": "a2761542ec3b3385e763fbf1122150234fbb20a5",
+          "task_id": "435-repair-classify-commits",
+          "worktree": "worktree:agent-local-now-wave-2"
+        }
+      ],
       "shadow_verdict": "NOT_REVIEWED",
       "source": {
         "identity": "ed3c/skills-shared#435",

@@ -118,6 +118,7 @@ Shared Skills may reference another method, but consumer selection remains expli
 | [`github-delivery-loop`](github-delivery-loop/README.md) | artifact/receipt binding, remote observation, publication, merge preflight | implementation correctness, stack graph, Human merge |
 | [`forgejo-delivery-loop`](forgejo-delivery-loop/README.md) | local forge routing, line/receipt binding, deterministic outbox/recovery, safe operation boundaries | consumer registry values, credentials, arbitrary remote changes, Human merge |
 | [`git-town-stacked-pr-worker`](git-town-stacked-pr-worker/README.md) | portable branch/worktree/sync method | consumer config, branches, CI, push/merge/promotion |
+| [`git-hosting-scale-assurance`](git-hosting-scale-assurance/README.md) | host-neutral Git-hosting durability/consistency/cache/recovery assurance contract and canary harness | physical hosting runtimes, cloud accounts/spend, scale claims, Human admission |
 
 ## Evidence boundary
 
