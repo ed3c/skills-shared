@@ -7,6 +7,15 @@
     "queue": 530
   },
   "runtime": "CLAUDE_CODE_LOCAL",
+  "epoch_subject": {
+    "status": "CURRENT",
+    "role": "admitted main at the 2026-08-22 readback, stated so no reader mistakes a subject below for current main",
+    "main": "5341885f26b5e8e7baf5087a4d661e324f878242",
+    "tree": "a18e12507f9e621efd5354f58384eded1f1e2a9a",
+    "rollback": "9fe3c6daf53dcdd61123d5d7a4eeedbdf37b5d7c",
+    "recompiled": false,
+    "recompile_note": "Nothing in this receipt was recompiled against this subject. Every base, tree, digest, count, gate result and lane state below was computed at base cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f (an ancestor of the epoch subject, 274 commits behind, verified 2026-08-22). The receipt stays a frozen dated observation of that subject."
+  },
   "predecessor_receipt": {
     "item": "DTCR-H0-001",
     "state": "PASS",
@@ -14,6 +23,7 @@
     "main_commit": "cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f",
     "main_tree": "e739d799dd8d44beb5414ed99a943ff3bacccab0",
     "queue_recorded_main": "129f53c23a3ab15354763167b25bddc45f724c00",
+    "queue_recorded_main_status": "HISTORICAL. This is what the Local Handoff queue recorded as main when DTCR-H0-001 ran; it is an ancestor of this receipt's own base cb48fdc7e8c6bd6db2ff32188047eab9a5340c9f, and 284 commits behind the 2026-08-22 epoch subject. It is not a subject anything here may be rebound to.",
     "state_delta": "main advanced by PR #520 merge and governance-repair commit; source packet unaffected per queue law",
     "commit_role_gate": "GREEN 325 commits classified",
     "git_diff_check": "clean",

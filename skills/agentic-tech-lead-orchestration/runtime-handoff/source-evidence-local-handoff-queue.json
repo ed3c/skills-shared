@@ -1,105 +1,104 @@
 {
+  "schema_version": "agentic-tech-lead/local-handoff-queue/v1",
+  "subject": {
+    "repository": "ed3c/skills-shared",
+    "commit": "5341885f26b5e8e7baf5087a4d661e324f878242",
+    "tree": "a18e12507f9e621efd5354f58384eded1f1e2a9a",
+    "rollback_commit": "9fe3c6daf53dcdd61123d5d7a4eeedbdf37b5d7c"
+  },
   "authority": {
-    "automation_forbidden": [
-      "merge",
-      "force_push",
-      "issue_close",
-      "queue_advance",
-      "provider_activation",
-      "semantic_conflict_resolution"
-    ],
-    "human_owned": [
-      "merge",
-      "promotion",
-      "rollback",
-      "permission_change",
-      "semantic_conflict_resolution"
-    ]
+    "automation_forbidden": ["merge", "force_push", "issue_close", "queue_advance", "provider_activation", "semantic_conflict_resolution"],
+    "human_owned": ["merge", "promotion", "rollback", "permission_change", "semantic_conflict_resolution", "outbound_network_egress_admission"]
   },
-  "current": {
-    "active_item": "source-evidence-compile",
-    "state": "ACTIVE"
-  },
+  "current": {"active_item": "source-evidence-pdf-prd-packet", "state": "ACTIVE"},
   "items": [
     {
+      "id": "source-evidence-github-issue-packet",
+      "task_ref": "issue-512-source-kind-GITHUB_ISSUE-issue-435-packet",
+      "state": "COMPLETE",
       "entry": {
         "predecessor": null,
-        "required_capabilities": [
-          "immutable-source-bytes",
-          "exact-source-locator",
-          "caller-supplied-source-sha256",
-          "python3",
-          "exact-repository-commit-tree"
-        ],
-        "required_subject_commit": "674cfe1435c4bd1c29e8f07308266fe5c6284973"
-      },
-      "exit": {
-        "cleanup_required": false,
-        "required_verdict": "PASS",
-        "requires_receipt": true
-      },
-      "id": "source-evidence-compile",
-      "next": null,
-      "receipt": {
-        "forbidden_promotions": [
-          "compiler_pass_to_source_truth",
-          "source_binding_to_applicability_pass",
-          "implemented_unverified_to_verified_without_receipt",
-          "article_pdf_prd_prose_to_provider_execution"
-        ],
-        "path": "data/handoff/source-evidence/problem-closure-ledger.json",
-        "required_states": [
-          "PASS",
-          "FAIL",
-          "ABSENT",
-          "HUMAN_ADMIT_REQUIRED"
-        ],
-        "schema": "agentic-tech-lead/problem-closure/v1"
+        "required_subject_commit": "5341885f26b5e8e7baf5087a4d661e324f878242",
+        "required_capabilities": ["immutable-source-bytes", "exact-source-locator", "caller-supplied-source-sha256", "python3", "exact-repository-commit-tree"]
       },
       "runtime_lane": {
         "class": "LOCAL_RUNTIME",
         "commands": [
-          {
-            "argv": [
-              "python3",
-              "skills/agentic-tech-lead-orchestration/scripts/compile_source_claims.py",
-              "data/handoff/source-evidence/source-claims.json",
-              "--output",
-              "data/handoff/source-evidence/problem-closure-ledger.json"
-            ],
-            "cwd": ".",
-            "environment_names": [],
-            "timeout_seconds": 120
-          },
-          {
-            "argv": [
-              "python3",
-              "skills/agentic-tech-lead-orchestration/scripts/check_problem_closure.py",
-              "data/handoff/source-evidence/problem-closure-ledger.json"
-            ],
-            "cwd": ".",
-            "environment_names": [],
-            "timeout_seconds": 120
-          }
+          {"argv": ["python3", "skills/agentic-tech-lead-orchestration/scripts/compile_source_claims.py", "data/handoff/source-evidence/source-claims.json", "--output", "data/handoff/source-evidence/problem-closure-ledger.json"], "cwd": ".", "timeout_seconds": 120, "environment_names": []},
+          {"argv": ["python3", "skills/agentic-tech-lead-orchestration/scripts/check_problem_closure.py", "data/handoff/source-evidence/problem-closure-ledger.json"], "cwd": ".", "timeout_seconds": 120, "environment_names": []}
         ],
-        "live_evidence_required": false,
+        "unresolved_operations": [],
+        "live_evidence_required": false
+      },
+      "receipt": {
+        "path": "data/handoff/source-evidence/problem-closure-ledger.json",
+        "schema": "agentic-tech-lead/problem-closure/v1",
+        "required_states": ["PASS", "FAIL", "ABSENT", "HUMAN_ADMIT_REQUIRED"],
+        "forbidden_promotions": ["compiler_pass_to_source_truth", "source_binding_to_applicability_pass", "implemented_unverified_to_verified_without_receipt", "issue_ui_state_to_completion"]
+      },
+      "exit": {"requires_receipt": true, "required_verdict": "PASS", "cleanup_required": false},
+      "next": "source-evidence-article-packet"
+    },
+    {
+      "id": "source-evidence-article-packet",
+      "task_ref": "issue-512-source-kind-ARTICLE-cursor-git-at-any-scale-packet",
+      "state": "COMPLETE",
+      "entry": {
+        "predecessor": "source-evidence-github-issue-packet",
+        "required_subject_commit": "5341885f26b5e8e7baf5087a4d661e324f878242",
+        "required_capabilities": ["immutable-source-bytes", "exact-source-locator", "caller-supplied-source-sha256", "python3", "exact-repository-commit-tree"]
+      },
+      "runtime_lane": {
+        "class": "LOCAL_RUNTIME",
+        "commands": [
+          {"argv": ["shasum", "-a", "256", "data/handoff/source-evidence/sources/cursor-git-at-any-scale.html"], "cwd": ".", "timeout_seconds": 60, "environment_names": []},
+          {"argv": ["python3", "skills/agentic-tech-lead-orchestration/scripts/compile_source_claims.py", "data/handoff/source-evidence/git-at-any-scale-claims.json", "--output", "data/handoff/source-evidence/git-at-any-scale-closure-ledger.json"], "cwd": ".", "timeout_seconds": 120, "environment_names": []},
+          {"argv": ["python3", "skills/agentic-tech-lead-orchestration/scripts/check_problem_closure.py", "data/handoff/source-evidence/git-at-any-scale-closure-ledger.json"], "cwd": ".", "timeout_seconds": 120, "environment_names": []}
+        ],
+        "unresolved_operations": [],
+        "live_evidence_required": false
+      },
+      "receipt": {
+        "path": "data/handoff/source-evidence/git-at-any-scale-closure-ledger.json",
+        "schema": "agentic-tech-lead/problem-closure/v1",
+        "required_states": ["PASS", "FAIL", "ABSENT", "HUMAN_ADMIT_REQUIRED"],
+        "forbidden_promotions": ["compiler_pass_to_source_truth", "source_binding_to_applicability_pass", "implemented_unverified_to_verified_without_receipt", "article_pdf_prd_prose_to_provider_execution", "dated_web_observation_to_immutable_upstream_truth"]
+      },
+      "exit": {"requires_receipt": true, "required_verdict": "PASS", "cleanup_required": false},
+      "next": "source-evidence-pdf-prd-packet"
+    },
+    {
+      "id": "source-evidence-pdf-prd-packet",
+      "task_ref": "issue-512-source-kind-PDF-or-PRD-next-unexecuted-packet",
+      "state": "ACTIVE",
+      "entry": {
+        "predecessor": "source-evidence-article-packet",
+        "required_subject_commit": "5341885f26b5e8e7baf5087a4d661e324f878242",
+        "required_capabilities": ["immutable-source-bytes", "exact-source-locator", "caller-supplied-source-sha256", "python3", "trusted-local-runtime-with-admitted-egress"]
+      },
+      "runtime_lane": {
+        "class": "LOCAL_RUNTIME",
+        "commands": [
+          {"argv": ["python3", "skills/agentic-tech-lead-orchestration/scripts/compile_source_claims.py", "data/handoff/source-evidence/pdf-prd-claims.json", "--output", "data/handoff/source-evidence/pdf-prd-closure-ledger.json"], "cwd": ".", "timeout_seconds": 120, "environment_names": []},
+          {"argv": ["python3", "skills/agentic-tech-lead-orchestration/scripts/check_problem_closure.py", "data/handoff/source-evidence/pdf-prd-closure-ledger.json"], "cwd": ".", "timeout_seconds": 120, "environment_names": []}
+        ],
         "unresolved_operations": [
           {
-            "operation_id": "materialize-immutable-source-claims-packet",
-            "required_output": "CONCRETE_COMMAND_CONTRACT",
-            "resolver_source": "Issue #512, exact ARTICLE/PDF/PRD or GitHub Issue bytes, immutable identity, exact locator, claim text, applicability owner, and current repository subject"
+            "operation_id": "materialize-immutable-pdf-or-prd-source-packet",
+            "resolver_source": "Issue #512. The GITHUB_ISSUE and ARTICLE kinds are executed and digest-bound; no PDF or PRD source has been selected, retrieved or digest-bound at this subject, so data/handoff/source-evidence/pdf-prd-claims.json does not exist and the declared commands have no input. Requires exact bytes, immutable identity, exact locator, claim text, applicability owner and a trusted local runtime with Human-admitted outbound egress.",
+            "required_output": "CONCRETE_COMMAND_CONTRACT"
           }
-        ]
+        ],
+        "live_evidence_required": false
       },
-      "state": "ACTIVE",
-      "task_ref": "issue-512-immutable-source-to-closure-ledger"
+      "receipt": {
+        "path": "data/handoff/source-evidence/pdf-prd-closure-ledger.json",
+        "schema": "agentic-tech-lead/problem-closure/v1",
+        "required_states": ["PASS", "FAIL", "ABSENT", "NOT_EXERCISED", "HUMAN_ADMIT_REQUIRED"],
+        "forbidden_promotions": ["compiler_pass_to_source_truth", "source_binding_to_applicability_pass", "implemented_unverified_to_verified_without_receipt", "article_pdf_prd_prose_to_provider_execution"]
+      },
+      "exit": {"requires_receipt": true, "required_verdict": "PASS", "cleanup_required": false},
+      "next": null
     }
-  ],
-  "schema_version": "agentic-tech-lead/local-handoff-queue/v1",
-  "subject": {
-    "commit": "674cfe1435c4bd1c29e8f07308266fe5c6284973",
-    "repository": "ed3c/skills-shared",
-    "rollback_commit": "5341885f26b5e8e7baf5087a4d661e324f878242",
-    "tree": "217bf950a57701235f761223e9466b9774aa6194"
-  }
+  ]
 }

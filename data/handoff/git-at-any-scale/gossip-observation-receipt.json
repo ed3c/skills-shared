@@ -1,0 +1,43 @@
+{
+  "consumer_subject": {
+    "bytes": 19872,
+    "committed_to_repository": false,
+    "implementation_relationship": "CLEAN_ROOM",
+    "implementation_sha256": "4ea664cc6bae1d3a999bf4293ad65136821c3a611a498894d428448a1610d127",
+    "name": "refcore (disposable single-node Git-hosting reference core)",
+    "path_outside_repository": "/private/tmp/claude-501/-Users-neon-skills-shared/ba0ee313-3387-4cd5-8e1e-eea11e6f3419/scratchpad/canary-subject/refcore.py",
+    "visibility": "PRIVATE_DISPOSABLE_SCRATCHPAD"
+  },
+  "contract_reason": "The declared architecture has NO_GOSSIP_SUBSYSTEM_EXISTS and zero replicas, so there is no gossip message to drop, delay, reorder or duplicate. `required_for_correctness=false` is therefore vacuously true by absence of the subsystem, not by an executed fault schedule.",
+  "disposition": "NOT_EXERCISED",
+  "epoch_subject": {
+    "commit": "5341885f26b5e8e7baf5087a4d661e324f878242",
+    "repository": "ed3c/skills-shared",
+    "rollback_commit": "9fe3c6daf53dcdd61123d5d7a4eeedbdf37b5d7c",
+    "tree": "a18e12507f9e621efd5354f58384eded1f1e2a9a"
+  },
+  "experiment": "L1-D",
+  "falsifier_status": {
+    "GOSSIP_LOSS_CAUSES_CORRECTNESS_CHANGE": "NOT_TESTABLE_AT_THIS_SUBJECT"
+  },
+  "issue": 534,
+  "required_for_correctness": false,
+  "runtime": {
+    "clock_model": "single host monotonic clock, no distributed clock",
+    "cloud_provider": "NONE",
+    "cost_usd": 0.0,
+    "cpu_count": 10,
+    "git_version": "git version 2.50.1 (Apple Git-155)",
+    "machine": "arm64",
+    "network_used": false,
+    "observed_worktree_dirty_paths": 39,
+    "observed_worktree_head": "bca08001c416108f9b83e9325e7bf07149a9281f",
+    "os": "macOS-26.4-arm64-arm-64bit-Mach-O",
+    "pinned_benchmark_host": false,
+    "process_model": "python3 subprocesses; line-JSON over anonymous pipes inherited at spawn; no socket, no listening port",
+    "python": "3.14.6"
+  },
+  "stage": "GOSSIP_LOSS_CANARY",
+  "vacuity": "VACUOUS_TRUE_NO_GOSSIP_SUBSYSTEM",
+  "verdict": "NOT_EXERCISED"
+}

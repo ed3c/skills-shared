@@ -21,15 +21,17 @@ A queue file in this directory MUST be named `<lane>-local-handoff-queue.json`. 
 
 Queues in this directory do not necessarily share one Git subject. The `subject` object inside the selected queue is the continuation contract for that queue, and current Git/GitHub readback decides whether it is still fresh.
 
-The Wave-3/Codex/Herdr/source queues were originally compiled against:
+As of the 2026-08-22 readback all five queues in this directory were recompiled onto one admitted subject — commit `5341885f26b5e8e7baf5087a4d661e324f878242`, tree `a18e12507f9e621efd5354f58384eded1f1e2a9a`, rollback `9fe3c6daf53dcdd61123d5d7a4eeedbdf37b5d7c`. Read the `subject` object in the selected queue; never restate it from this file.
+
+The Wave-3/Codex/Herdr/source queues were originally compiled against a different, now HISTORICAL subject:
 
 ```text
-commit    249abc47847f8295b1c75c9d4c84457c5126fd89
-tree      a24b9b7ace6f4022967d41262ecdc704d5c11646
-rollback  d5993267e03b217dcdab9702dab0400ab03df860
+commit    249abc47847f8295b1c75c9d4c84457c5126fd89   HISTORICAL
+tree      a24b9b7ace6f4022967d41262ecdc704d5c11646   HISTORICAL
+rollback  d5993267e03b217dcdab9702dab0400ab03df860   HISTORICAL
 ```
 
-`spatial-407-local-handoff-queue.json` binds its own #407 candidate subject and rollback. Do not substitute the older shared subject above for the Spatial queue.
+`spatial-407-local-handoff-queue.json` previously bound its own #407 publication-candidate subject; that candidate was superseded when the Spatial bytes landed by an alternate route, and the queue now binds the same admitted subject as its siblings. Neither the historical shared subject above nor the retired #407 candidate may be substituted for a queue's own `subject` object.
 
 Any change to an owning script/schema, required semantic tree, admitted main, or predecessor result may invalidate a queue. Recompile rather than running a stale queue.
 
@@ -67,21 +69,21 @@ For a rewritable PR branch that fails the repository commit-role gate:
 - do not weaken `check_commit_roles.py` or any admission workflow;
 - preserve the red run and original source tree as forensic/semantic evidence.
 
-This is the active rule for Spatial #407/#412.
+This rule stays in force for any future rewritable branch that fails the gate. For Spatial #407/#412 it is now HISTORICAL: the provenance blocker was falsified (the `988a4e7` carve-out left the gate GREEN on PR #412's own range), PR #412 is CLOSED unmerged and retained as forensic source, and the bytes landed through the replayed #419. The receipt is `../references/closure-audit/issue-568.json`.
 
 ## Subject-mutation law
 
 If an ACTIVE item changes implementation bytes or contracts, the queue normally ends after that item and a successor is rebound to the admitted result. A multi-item queue is valid only when the later item explicitly declares `BLOCKED_BY_PREDECESSOR` and its subject is revalidated/recompiled before execution.
 
-For Spatial #407:
+For Spatial #407, as of the 2026-08-22 readback:
 
 ```text
-provenance-compliant publication rebuild  ACTIVE
-→ admitted main / exact-main receipts
-→ #411 live independent Shadow canary      currently BLOCKED_BY_PREDECESSOR
+provenance rebuild superseded by the 419 replay  COMPLETE
+→ admitted main (45dfac8 / 91df786 are ancestors of 5341885f)
+→ #411 live independent Shadow canary            ACTIVE / NOT_EXERCISED
 ```
 
-The #411 item cannot reuse a stale pre-admission subject merely because it is already present in the JSON queue.
+The #411 item was rebound to the admitted subject when its predecessor completed; it cannot reuse a stale pre-admission subject merely because it is already present in the JSON queue. Its two `unresolved_operations` (materialize the canary, admit two independent runtime identities) still gate execution — an ACTIVE state is not a runnable command contract.
 
 ## Exit law
 

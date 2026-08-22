@@ -19,7 +19,7 @@
       "relation": "fast-forward via PR #571 merge (agent/wave-8-portfolio); verified by local readback",
       "content": "ghpc skills/github-portfolio-control/** landed (4 contracts/48 controls/9 codes); DTCR #523 R1; POL #428/#429; root README + docs/INDEX.md DR-13; skill-suites.yml +github-portfolio-control",
       "writer_release": "peer session skills-shared-97 released all leases and stopped; root README/docs/INDEX.md/skill-suites.yml now free",
-      "issue_state_skew": "peer closed #523/#428/#429, left landing-receipt comment on #560, opened #572 (prose-status truth gate); tmp-portfolio issue/PR dumps remain epoch-A observations — refresh required before publication epoch",
+      "issue_state_skew": "peer closed #523/#428/#429, left landing-receipt comment on #560, opened #572 (prose-status truth gate); tmp-portfolio issue/PR dumps remained epoch-A observations at the time this delta was written. That refresh was PERFORMED on 2026-08-22 and is recorded in this file's top-level observation_refresh block; it refreshed the observation lane only and did not compile an epoch-C snapshot.",
       "finding_impact": "no epoch-A audit finding content-invalidated (fast-forward); wave-1 replay branches based on 3fc0204 require final re-merge onto 28f3947 before publication"
     }
   ],
@@ -64,5 +64,61 @@
     "396": "kenn-ae/shared-index-trace",
     "395": "kenn-ae/design-control-plane"
   },
-  "network_policy": "GitHub facts for this epoch come ONLY from tmp-portfolio dumps + already-fetched origin refs; agents must not call gh"
+  "network_policy": "GitHub facts for this epoch come ONLY from tmp-portfolio dumps + already-fetched origin refs; agents must not call gh",
+  "observation_refresh": {
+    "refresh_id": "PORTFOLIO-OBSERVATION-REFRESH-20260822",
+    "performed": "2026-08-22",
+    "lane": "OBSERVATION_ONLY",
+    "discharges": "superseded_epochs[0].issue_state_skew — the refresh that delta said was 'required before publication epoch'",
+    "what_this_is": "A dated readback of the 16 tracked units, recorded beside the epoch-B receipts rather than written into them. It refreshes what is OBSERVED. It does not refresh what was ADMITTED: publication, merge and issue closure remain their own later-stage subjects with their own receipts.",
+    "readback_window": {
+      "from": "2026-08-22T05:22Z",
+      "to": "2026-08-22T06:02Z",
+      "kind": "COMPOSED_WINDOW_NOT_SINGLE_INSTANT",
+      "sources": [
+        "frozen gh issue/PR state dumps taken during the DTCR handoff-queue convergence",
+        "local git object readback (git cat-file -t, git merge-base --is-ancestor, git rev-list --count) against admitted main"
+      ]
+    },
+    "why_no_epoch_c_snapshot": "assert_repository_portfolio_snapshot.py refuses MIXED_SNAPSHOT_EPOCH when observed_at and the per-source issues/prs/workflows timestamps span more than --max-skew-seconds (default 300). This readback spans ~2400 s, so it cannot honestly become a snapshot.json epoch. A publication epoch needs one single-instant readback of issues + PRs + workflows before epoch C may be compiled.",
+    "why_the_epoch_b_rows_were_not_rewritten": "acceptance.json's per-packet digest is the frozen subject identity that every start_dependency/completion_dependency edge cites, and compile_repository_portfolio.py fails closed on any drift (verified 2026-08-22: mutating one packet's evidence.ceiling makes the compiler exit 1 with 'acceptance:ISSUE-559: digest mismatch'). Editing an observed_state in place would re-point every admitted dependency edge at a subject that did not exist at admission time. snapshot.json and acceptance.json therefore stay byte-frozen epoch-B observations, and the later truth lives here.",
+    "internal_consistency_control": "multigraph.json reproduces byte-for-byte (digest bb13426b18d21506eb340a20c48ec068349a5d2ff950a85653be643df7aaca2e) when recompiled from snapshot.json plus the 16 acceptance packets; the same recompile goes red under a one-character mutation to any packet. Green here proves epoch-B internal consistency only, never current provider truth.",
+    "denominator": {
+      "scope": "EXACTLY the epoch.json scope line: issues 560,566,559,567,568,569,570 and PRs 565,564,562,450,420,419,412,396,395 — 16 units",
+      "widened": false,
+      "not_a_repository_denominator": "the same readback shows 65 open issues in ed3c/skills-shared; this receipt set audits none of them. Repository-wide state must be compiled elsewhere.",
+      "open_issue_denominator_size": 65
+    },
+    "issues": [
+      {"number": 559, "epoch_b_observed_state": "OPEN", "readback_state": "CLOSED", "state_reason": "COMPLETED", "evidence_grade": "DIRECT_READBACK"},
+      {"number": 560, "epoch_b_observed_state": "OPEN", "readback_state": "CLOSED", "state_reason": "COMPLETED", "evidence_grade": "DIRECT_READBACK"},
+      {"number": 566, "epoch_b_observed_state": "OPEN", "readback_state": "CLOSED", "state_reason": "COMPLETED", "evidence_grade": "DIRECT_READBACK"},
+      {"number": 567, "epoch_b_observed_state": "OPEN", "readback_state": "CLOSED", "state_reason": "COMPLETED", "evidence_grade": "DIRECT_READBACK"},
+      {"number": 568, "epoch_b_observed_state": "OPEN", "readback_state": "CLOSED", "state_reason": "COMPLETED", "evidence_grade": "DIRECT_READBACK"},
+      {"number": 569, "epoch_b_observed_state": "OPEN", "readback_state": "NOT_OPEN", "state_reason": "NOT_READ", "evidence_grade": "DERIVED_FROM_OPEN_DENOMINATOR_ABSENCE", "note": "absent from the complete 65-number open-issue denominator; neither CLOSED nor its stateReason was read directly, so closure is derived, not observed"},
+      {"number": 570, "epoch_b_observed_state": "OPEN", "readback_state": "NOT_OPEN", "state_reason": "NOT_READ", "evidence_grade": "DERIVED_FROM_OPEN_DENOMINATOR_ABSENCE", "note": "same derivation as #569"}
+    ],
+    "pull_requests": [
+      {"number": 395, "epoch_b_observed_state": "DRAFT", "readback_state": "MERGED", "head_commit": "d411d2a9826aa8bb602a00db9c27d09f603e3538", "head_is_ancestor_of_admitted_main": true, "exact_main_readback": "NOT_PERFORMED", "evidence_grade": "PROVIDER_STATE_PLUS_LOCAL_ANCESTRY", "note": "GitHub reports MERGED and the head is an ancestor of 5341885f, but admitted main's tip is not equal to this head, so no MERGED_WITH_EXACT_MAIN_READBACK claim is available. acceptance.json's PR-395 packet allows only CONSUMED_BY_CONVERGENCE; closure-audit/issue-568.json is the outcome authority and records merged: true / HISTORICAL."},
+      {"number": 396, "epoch_b_observed_state": "DRAFT", "readback_state": "CLOSED_NOT_MERGED", "head_commit": "98a6c53ca6aaf2bd562878648f774d6ad53ad6b5", "head_is_ancestor_of_admitted_main": true, "evidence_grade": "PROVIDER_STATE_PLUS_LOCAL_ANCESTRY", "note": "bytes landed by replay, not by merging the PR"},
+      {"number": 412, "epoch_b_observed_state": "DRAFT", "readback_state": "CLOSED_NOT_MERGED", "head_commit": "01067581efa2b611c5d4bb8358ae568147eece40", "head_is_ancestor_of_admitted_main": true, "evidence_grade": "PROVIDER_STATE_PLUS_LOCAL_ANCESTRY", "note": "bytes landed by replay; branch retained as forensic source"},
+      {"number": 419, "epoch_b_observed_state": "DRAFT", "readback_state": "CLOSED_NOT_MERGED", "head_commit": "94426ceeb6011af15e86b571bdcc7bd40bebf06f", "head_is_ancestor_of_admitted_main": true, "evidence_grade": "PROVIDER_STATE_PLUS_LOCAL_ANCESTRY", "note": "bytes landed by replay, not by merging the PR"},
+      {"number": 420, "epoch_b_observed_state": "DRAFT", "readback_state": "CLOSED_NOT_MERGED", "head_commit": "206ee94ff5c165b1af4f1c97c5206404916f8e37", "head_is_ancestor_of_admitted_main": true, "evidence_grade": "PROVIDER_STATE_PLUS_LOCAL_ANCESTRY", "note": "bytes landed by replay, not by merging the PR"},
+      {"number": 450, "epoch_b_observed_state": "DRAFT", "readback_state": "CLOSED_NOT_MERGED", "head_commit": "6f0a96f488728dfd03f127a0575aaee37a1745d2", "head_is_ancestor_of_admitted_main": true, "evidence_grade": "PROVIDER_STATE_PLUS_LOCAL_ANCESTRY", "note": "bytes landed by replay, not by merging the PR"},
+      {"number": 562, "epoch_b_observed_state": "DRAFT", "readback_state": "NOT_OPEN_MERGED_VS_CLOSED_NOT_READ", "head_commit": "caedeb9e1dfb4fc149445c621f150740f3cdac91", "head_is_ancestor_of_admitted_main": false, "evidence_grade": "PARTIAL", "note": "head is NOT an ancestor of admitted main, so no merged-bytes claim exists. decisions.json planned close SUPERSEDED and records the compiler line absorbed into #566; the provider terminal itself was not read back."},
+      {"number": 564, "epoch_b_observed_state": "DRAFT", "readback_state": "NOT_OPEN_MERGED_VS_CLOSED_NOT_READ", "head_commit": "efb224dd97304136ef5c29a86ca812099aca8c9b", "head_is_ancestor_of_admitted_main": false, "evidence_grade": "PARTIAL", "note": "same as #562; acceptance line absorbed into #566"},
+      {"number": 565, "epoch_b_observed_state": "DRAFT", "readback_state": "NOT_OPEN_MERGED_VS_CLOSED_NOT_READ", "head_commit": "bcafebe3399f971e490bf7fa861189db0415a8ea", "head_is_ancestor_of_admitted_main": false, "evidence_grade": "PARTIAL", "note": "same as #562; strict subset of #564"}
+    ],
+    "open_pr_set_at_readback": {
+      "numbers": [577],
+      "note": "#577 only — draft agent/dtcr-handoff-audit, head bca08001, admitted main is its ancestor, consumed by the DTCR handoff-queue convergence. Nothing else in ed3c/skills-shared was open. #577 is NOT in this receipt set's 16-unit denominator."
+    },
+    "subject_at_readback": {
+      "admitted_main": "5341885f26b5e8e7baf5087a4d661e324f878242",
+      "admitted_tree": "a18e12507f9e621efd5354f58384eded1f1e2a9a",
+      "rollback": "9fe3c6daf53dcdd61123d5d7a4eeedbdf37b5d7c",
+      "relation_to_epoch_b_base": "epoch B's base 28f394785aa8b13c4e6d2f21ad74c5e32a6a6dc5 is 158 commits and two first-parent merges behind (9fe3c6d = PR #573, 5341885 = PR #574)"
+    },
+    "evidence_ceiling": "DETERMINISTIC observation lane. This block records what was read, not what was admitted. No checker in this repository re-reads provider state, so no green gate here can promote a readback row into an admission, a merge, a closure or a publication."
+  }
 }

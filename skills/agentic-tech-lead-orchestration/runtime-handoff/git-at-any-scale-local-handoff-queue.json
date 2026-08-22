@@ -1,132 +1,185 @@
 {
-  "schema": "agentic-tech-lead/local-handoff-queue/v1",
-  "program": "git-at-any-scale",
-  "repository": "ed3c/skills-shared",
-  "bound_main": "988a4e790af6a8bee31fd14e00e52a6e944b9f17",
-  "bound_tree": "f8fe691090e4edd6a2aa40196430051ec05d11a7",
-  "parent_issue": 531,
-  "last_reconciled": "2026-08-21",
-  "law": {
-    "max_active": 1,
-    "queue_order_does_not_create_git_ancestry": true,
-    "completion_requires_content_bound_receipt": true,
-    "private_credentials_in_public_receipt": false,
-    "mergeable_pr_is_not_admitted": true,
-    "skipped_workflow_is_not_pass": true
+  "schema_version": "agentic-tech-lead/local-handoff-queue/v1",
+  "subject": {
+    "repository": "ed3c/skills-shared",
+    "commit": "5341885f26b5e8e7baf5087a4d661e324f878242",
+    "tree": "a18e12507f9e621efd5354f58384eded1f1e2a9a",
+    "rollback_commit": "9fe3c6daf53dcdd61123d5d7a4eeedbdf37b5d7c"
   },
+  "authority": {
+    "automation_forbidden": ["merge", "force_push", "issue_close", "queue_advance", "provider_activation", "semantic_conflict_resolution"],
+    "human_owned": ["merge", "promotion", "rollback", "permission_change", "semantic_conflict_resolution", "provider_account_and_spend", "disposable_hosting_runtime_selection"]
+  },
+  "current": {"active_item": "GIT-SCALE-H1", "state": "ACTIVE"},
   "items": [
     {
       "id": "GIT-SCALE-H0",
-      "state": "ACTIVE",
-      "owner_issue": 512,
-      "kind": "TRUSTED_LOCAL_SOURCE_MATERIALIZATION",
-      "objective": "Materialize the exact observed Cursor article bytes or a stable exported representation and bind byte count plus SHA-256 before article-source truth advances.",
-      "inputs": [
-        "https://cursor.com/blog/git-at-any-scale",
-        "docs/traceability/git-at-any-scale/source-claims.json"
-      ],
-      "required_receipt": [
-        "exact source locator",
-        "observed/exported bytes",
-        "byte count",
-        "sha256",
-        "retrieval/export timestamp",
-        "tool/runtime identity",
-        "claim denominator digest"
-      ],
-      "completion_effect": "May advance SOURCE_LOCATOR_BOUND to IMMUTABLE_SOURCE_PACKET_BOUND only; source claims remain proposals until independently verified.",
-      "human_or_external_boundary": "Trusted local/runtime retrieval required; current GitHub connector cannot create immutable webpage evidence."
+      "task_ref": "issue-512-git-at-any-scale-immutable-article-source-packet",
+      "state": "COMPLETE",
+      "entry": {
+        "predecessor": null,
+        "required_subject_commit": "5341885f26b5e8e7baf5087a4d661e324f878242",
+        "required_capabilities": ["immutable-source-bytes", "exact-source-locator", "caller-supplied-source-sha256", "python3"]
+      },
+      "runtime_lane": {
+        "class": "LOCAL_RUNTIME",
+        "commands": [
+          {"argv": ["shasum", "-a", "256", "data/handoff/source-evidence/sources/cursor-git-at-any-scale.html"], "cwd": ".", "timeout_seconds": 60, "environment_names": []},
+          {"argv": ["python3", "skills/agentic-tech-lead-orchestration/scripts/check_problem_closure.py", "data/handoff/source-evidence/git-at-any-scale-closure-ledger.json"], "cwd": ".", "timeout_seconds": 120, "environment_names": []}
+        ],
+        "unresolved_operations": [],
+        "live_evidence_required": false
+      },
+      "receipt": {
+        "path": "data/handoff/source-evidence/git-at-any-scale-closure-ledger.json",
+        "schema": "agentic-tech-lead/problem-closure/v1",
+        "required_states": ["PASS", "FAIL", "ABSENT", "HUMAN_ADMIT_REQUIRED"],
+        "forbidden_promotions": ["compiler_pass_to_source_truth", "source_binding_to_applicability_pass", "article_prose_to_implementation_evidence", "dated_web_observation_to_immutable_upstream_truth"]
+      },
+      "exit": {"requires_receipt": true, "required_verdict": "PASS", "cleanup_required": false},
+      "next": "GIT-SCALE-H1"
     },
     {
       "id": "GIT-SCALE-H1",
-      "state": "IMPLEMENTATION_CANDIDATE_BLOCKED_ON_DENOMINATOR",
-      "owner_issue": 532,
-      "kind": "PORTABLE_CONTRACT_IMPLEMENTATION",
-      "candidate_pr": 542,
-      "candidate_head": "196a75ac04f6ad2c9a6e50b0645d71fea9bf43e3",
-      "objective": "Complete the full #532 portable assurance denominator without widening into a hosting runtime.",
-      "already_present": [
-        "skills/git-hosting-scale-assurance AGENTS/README/SKILL",
-        "aggregate hosting-assurance/v1 schema",
-        "semantic checker",
-        "GS-C01..GS-C20 named mutation controls"
-      ],
-      "missing_before_issue_close": [
-        "hosting-subject schema",
-        "operation-history schema and concurrent valid-linearization fixture",
-        "durability receipt and hollow durable-readback fixture",
-        "ref-transaction receipt",
-        "read-freshness receipt and stale-cache catch-up fixture",
-        "cache-rebuild receipt and destroy/rebuild fixture",
-        "gossip observation receipt and drop/delay/reorder/duplicate fixtures",
-        "compaction receipt and reachable-object fixture",
-        "corruption-recovery receipt and partial-record/restart fixture",
-        "benchmark-run schema and full denominator fixture",
-        "hosting-closure-record schema",
-        "repository skill/eval/core/entry-route/commit-role gates",
-        "exact-head hosted PASS"
-      ],
-      "current_workflow_readback": "Shared Skills Infra SKIPPED on candidate head; not PASS",
-      "local_execution_note": "A network-isolated audit environment could not clone GitHub; run the repository-declared commands in a real local checkout and bind logs/exits to the exact candidate head.",
-      "required_receipt": [
-        "exact branch/head/tree",
-        "complete schema inventory and digests",
-        "positive/hollow/concurrent/fault/mutation denominator",
-        "repository gate commands and exits",
-        "exact-head hosted workflows",
-        "first-red and repair lineage"
-      ]
+      "task_ref": "issue-532-portable-hosting-assurance-contract-denominator",
+      "state": "ACTIVE",
+      "entry": {
+        "predecessor": "GIT-SCALE-H0",
+        "required_subject_commit": "5341885f26b5e8e7baf5087a4d661e324f878242",
+        "required_capabilities": ["python3", "local-checkout-at-exact-subject", "repository-required-machine-author-identity", "github-exact-head-workflow-readback"]
+      },
+      "runtime_lane": {
+        "class": "LOCAL_RUNTIME",
+        "commands": [
+          {"argv": ["sh", "skills/git-hosting-scale-assurance/tests/run-all.sh"], "cwd": ".", "timeout_seconds": 900, "environment_names": []},
+          {"argv": ["python3", "scripts/check_skill_entry_routes.py", "--skill", "git-hosting-scale-assurance"], "cwd": ".", "timeout_seconds": 120, "environment_names": []},
+          {"argv": ["python3", "scripts/check_skill_core_boundaries.py", "--skill", "git-hosting-scale-assurance"], "cwd": ".", "timeout_seconds": 120, "environment_names": []}
+        ],
+        "unresolved_operations": [
+          {
+            "operation_id": "implement-remaining-hosting-assurance-contracts",
+            "resolver_source": "Issue #532 required-contracts list and skills/git-hosting-scale-assurance/references/hosting-assurance.schema.json. Registration in evals/skill-entry-routes.json and evals/skill-core-boundaries.json landed on 2026-08-22, so the three commands above now execute and exit 0; that resolved the manifest blocker and nothing else. Still absent at this subject: hosting-subject schema; operation-history schema plus concurrent valid-linearization fixture; durability receipt plus hollow durable-readback fixture; ref-transaction receipt; read-freshness receipt plus stale-cache catch-up fixture; cache-rebuild receipt plus destroy/rebuild fixture; gossip observation receipt plus drop/delay/reorder/duplicate fixtures; compaction receipt plus reachable-object fixture; corruption-recovery receipt plus partial-record/restart fixture; benchmark-run schema plus full denominator fixture; hosting-closure-record schema. The #534 bundle now writes files in twelve of those thirteen families with no schema, no checker and no mutation control behind them (only issue-534-hosting-canary-receipt.json is gated), so the aggregate-versus-file-per-family decision must be made here rather than inferred from the bundle's shape.",
+            "required_output": "CONCRETE_COMMAND_CONTRACT"
+          },
+          {
+            "operation_id": "obtain-exact-head-hosted-workflow-pass",
+            "resolver_source": ".github/workflows/skill-suites.yml git-hosting-scale-assurance matrix leg on the exact publication head. The only hosted readback on record for this lane is SKIPPED, which repository law forbids treating as PASS; a real exact-head run requires GitHub Actions authority outside this queue. Local green on tests/run-all.sh does not substitute.",
+            "required_output": "CONCRETE_COMMAND_CONTRACT"
+          }
+        ],
+        "live_evidence_required": false
+      },
+      "receipt": {
+        "path": "data/handoff/git-at-any-scale/issue-532-portable-contract-receipt.json",
+        "schema": "git-hosting-assurance/v1",
+        "required_states": ["PASS", "FAIL", "NOT_IMPLEMENTED", "SKIPPED_BY_POLICY", "HUMAN_ADMIT_REQUIRED"],
+        "forbidden_promotions": ["skipped_workflow_to_exact_head_pass", "mergeable_pr_to_admitted_on_main", "contract_shape_green_to_hosting_runtime_evidence", "partial_schema_inventory_to_complete_denominator"]
+      },
+      "exit": {"requires_receipt": true, "required_verdict": "PASS", "cleanup_required": false},
+      "next": "GIT-SCALE-H2"
     },
     {
       "id": "GIT-SCALE-H2",
+      "task_ref": "issue-534-physical-hosting-runtime-canary",
       "state": "BLOCKED_BY_PREDECESSOR",
-      "owner_issue": 534,
-      "kind": "PHYSICAL_RUNTIME_CANARY",
-      "objective": "Run durability, linearizability, stale-cache, gossip-loss, cache-rebuild, compaction, corruption/restart and matched-scale experiments on one explicitly selected disposable hosting runtime.",
-      "predecessor": "complete/admitted #532 interface plus Human-approved runtime/provider scope",
-      "required_receipt": [
-        "runtime/storage/config subjects",
-        "operation history",
-        "fault schedule",
-        "raw and reduced metrics",
-        "cleanup/cost receipt",
-        "artifact SHA256SUMS"
-      ],
-      "human_or_external_boundary": "Provider/account activation, spend, production data and destructive non-disposable tests require explicit Human authority."
+      "entry": {
+        "predecessor": "GIT-SCALE-H1",
+        "required_subject_commit": "5341885f26b5e8e7baf5087a4d661e324f878242",
+        "required_capabilities": ["human-admitted-disposable-hosting-runtime", "cloud-object-store-with-spend-ceiling", "multi-process-fault-injection-host", "pinned-benchmark-host"]
+      },
+      "runtime_lane": {
+        "class": "MIXED",
+        "commands": [
+          {"argv": ["python3", "skills/git-hosting-scale-assurance/scripts/run_hosting_canary.py", "--selftest"], "cwd": ".", "timeout_seconds": 300, "environment_names": []},
+          {"argv": ["python3", "skills/git-hosting-scale-assurance/scripts/check_hosting_assurance.py", "data/handoff/git-at-any-scale/issue-534-hosting-canary-receipt.json"], "cwd": ".", "timeout_seconds": 120, "environment_names": []}
+        ],
+        "unresolved_operations": [
+          {
+            "operation_id": "admit-a-hosting-grade-runtime-subject",
+            "resolver_source": "Issue #534 output bundle. A bounded CLEAN_ROOM canary ran on 2026-08-22 against a disposable single-node core (refcore, sha256 4ea664cc6bae1d3a999bf4293ad65136821c3a611a498894d428448a1610d127) that is deliberately not committed, with provider_activation NOT_PERFORMED and cost 0.00 USD; its receipts are the bundle under data/handoff/git-at-any-scale/. That run does not select or admit a hosting-grade runtime: it has one authority process, zero replicas, one cache, no socket layer, one local filesystem, one monotonic clock and SIGKILL-only fault injection, so power loss, media failure, network partition, clock skew, replica fan-out, elasticity and gossip have no fault surface to exercise. Human authority still owns provider activation, account, spend ceiling, service terms, data location, a pinned benchmark host and teardown, and only an admitted non-clean-room subject gives the durability/linearizability/stale-cache/gossip-loss/compaction/corruption/matched-scale experiments a hosting-grade command contract. The two commands above are the harness controls that survive without such a subject; neither replays the canary, because the recorded runtime digest lives only in the disposable scratchpad.",
+            "required_output": "CONCRETE_COMMAND_CONTRACT"
+          },
+          {
+            "operation_id": "complete-the-534-workload-and-metric-denominator",
+            "resolver_source": "Independent Shadow finding SR-01 in data/handoff/git-at-any-scale/issue-535-shadow-receipt.json. The bundle's own law is to record absent lanes as NOT_EXERCISED rather than infer them, and it lists five such entries; eight further required items are absent from the bundle with no entry at all. Absent workload classes: concurrent pushes to disjoint refs; clone/fetch/read during writes; idle repository scaled down then reactivated; compaction during normal traffic. Absent metrics: memory; retries (cas_conflicts is recorded, retries is not); disk/network/object-store request counts (bytes are recorded, requests are not); fault recovery time. Each must be executed or given an explicit NOT_EXERCISED entry before this item can claim a complete denominator, and the negative control must be bound to the committed history rather than to a sibling run.",
+            "required_output": "CONCRETE_COMMAND_CONTRACT"
+          }
+        ],
+        "live_evidence_required": true
+      },
+      "receipt": {
+        "path": "data/handoff/git-at-any-scale/issue-534-hosting-canary-receipt.json",
+        "schema": "git-hosting-assurance/v1",
+        "required_states": ["PASS", "FAIL", "NOT_EXERCISED", "HUMAN_ADMIT_REQUIRED"],
+        "forbidden_promotions": ["synthetic_fixture_to_live_hosting_runtime_pass", "single_run_to_matched_scale_claim", "absent_fault_schedule_to_durability_proof", "provider_activation_by_automation"]
+      },
+      "exit": {"requires_receipt": true, "required_verdict": "PASS", "cleanup_required": true},
+      "next": "GIT-SCALE-H3"
     },
     {
       "id": "GIT-SCALE-H3",
+      "task_ref": "issue-535-independent-shadow-over-532-and-534-subjects",
       "state": "BLOCKED_BY_PREDECESSOR",
-      "owner_issue": 535,
-      "kind": "INDEPENDENT_SHADOW",
-      "objective": "Run read-only same-subject adversarial admission over immutable source, complete #532 contracts and #534 live receipts.",
-      "predecessor": "exact complete #532 and #534 subjects readable",
-      "required_receipt": [
-        "reviewed digests",
-        "GS-S01..S16 outcomes",
-        "first-red findings",
-        "bounded verdict",
-        "evidence ceilings"
-      ]
+      "entry": {
+        "predecessor": "GIT-SCALE-H2",
+        "required_subject_commit": "5341885f26b5e8e7baf5087a4d661e324f878242",
+        "required_capabilities": ["independent-read-only-shadow-session", "separate-worktree-without-builder-context", "read-access-to-534-receipt-bundle-and-raw-operation-history"]
+      },
+      "runtime_lane": {
+        "class": "LOCAL_HOST",
+        "commands": [],
+        "unresolved_operations": [
+          {
+            "operation_id": "obtain-an-identity-independent-shadow-reviewer",
+            "resolver_source": "Issue #535 GS-S01..GS-S16 denominator. A fresh-context read-only review of the exact epoch subject ran on 2026-08-22 and its receipt is data/handoff/git-at-any-scale/issue-535-shadow-receipt.json (verdict HOLD, human_admit HUMAN_ADMIT_REQUIRED). It re-derived the source digest and byte count by hand, verified shasum -c SHA256SUMS 21/21, and confirmed the committed operation history with a Shadow-authored linearizability oracle plus two planted-defect negative controls that both went red. Its own independence_declaration records why it does not satisfy the close gate: same dispatching Tech Lead, same host, same scratchpad, Builder driver re-used for replay, separate_worktree_from_builder false. Fresh context is not organisational independence, so this item needs a reviewer that is separate in identity and worktree, not another fresh session on this host.",
+            "required_output": "CONCRETE_COMMAND_CONTRACT"
+          },
+          {
+            "operation_id": "resolve-the-shadow-receipt-schema-binding",
+            "resolver_source": "This item's receipt.schema names agentic-tech-lead/issue-closure-contract/v1, and the produced artifact refuses to conform: that schema is an issue-CLOSURE contract requiring a disposition and a github_state_reason, and #535 is OPEN, so every admissible enum value would be a false statement; it is additionalProperties:false with no field for reviewed-subject digests, per-stage findings, first-red preservation, falsifier outcomes or evidence ceilings. The Shadow recorded the real jsonschema 4.26.0 Draft202012Validator errors (9 of them) instead of reshaping the truth to fit. Either bind a Shadow-receipt schema that can carry an open-issue review, or re-scope this item's receipt to a genuine closure artifact. Reshaping the artifact to satisfy the current enum is a forbidden promotion, not a fix.",
+            "required_output": "CONCRETE_COMMAND_CONTRACT"
+          }
+        ],
+        "live_evidence_required": false
+      },
+      "receipt": {
+        "path": "data/handoff/git-at-any-scale/issue-535-shadow-receipt.json",
+        "schema": "agentic-tech-lead/issue-closure-contract/v1",
+        "required_states": ["PASS", "FAIL", "NOT_EXERCISED", "HUMAN_ADMIT_REQUIRED"],
+        "forbidden_promotions": ["builder_self_report_to_independent_shadow_observation", "same_context_to_independent_shadow_without_provenance", "absent_subject_to_reviewed_subject"]
+      },
+      "exit": {"requires_receipt": true, "required_verdict": "PASS", "cleanup_required": false},
+      "next": "GIT-SCALE-H4"
     },
     {
       "id": "GIT-SCALE-H4",
-      "state": "BLOCKED_BY_PREDECESSOR_AND_PATH_WRITERS",
-      "owner_issue": 536,
-      "kind": "SHARED_PATH_CONVERGENCE",
-      "preparation_pr": 539,
-      "objective": "After prerequisites and active writers are reconciled, update canonical root/shared indexes and git-town-stacked-pr-worker README with admitted subjects and final Stack state.",
-      "predecessor": "#412/#419 path-writer disposition plus admitted #531/#532/#534/#535 subjects",
-      "required_receipt": [
-        "fresh open-PR changed-path inventory",
-        "selected writer/supersession decision",
-        "exact candidate head/tree",
-        "document-route gates",
-        "Molecular Stack checker",
-        "exact-head hosted PASS",
-        "independent Shadow readback"
-      ],
-      "human_or_external_boundary": "Merge and final semantic admission remain Human/repository authority."
+      "task_ref": "issue-536-shared-path-and-index-convergence",
+      "state": "BLOCKED_BY_PREDECESSOR",
+      "entry": {
+        "predecessor": "GIT-SCALE-H3",
+        "required_subject_commit": "5341885f26b5e8e7baf5087a4d661e324f878242",
+        "required_capabilities": ["python3", "live-github-issue-pr-branch-workflow-readback", "repository-required-machine-author-identity"]
+      },
+      "runtime_lane": {
+        "class": "LOCAL_FORGE",
+        "commands": [],
+        "unresolved_operations": [
+          {
+            "operation_id": "admit-the-shared-path-convergence-subject",
+            "resolver_source": "Issue #536 required root/shared index updates. The '#412/#419 path-writer disposition' predecessor is discharged: both PRs are CLOSED unmerged and their bytes landed by an alternate route recorded in skills/agentic-tech-lead-orchestration/references/closure-audit/issue-568.json. The shared-path lease then transferred to #536 and the convergence write executed on 2026-08-22 across README.md, AGENTS.md, docs/INDEX.md, docs/traceability/TRACEABILITY_INDEX.md, docs/traceability/TECH_LEAD_SHADOW_CLOSURE.md, skills/git-town-stacked-pr-worker/README.md, skills/git-town-stacked-pr-worker/molecular-indexes/spatial-407/README.md, skills/git-town-stacked-pr-worker/molecular-indexes/git-at-any-scale/README.md and this queue, with check_document_routes.py, check_skill_entry_routes.py and assert_local_handoff_queue.py green on that working subject. What remains is admission, not authorship: #532's own receipt is ABSENT, #534's hosting-grade lane is NOT_EXERCISED, #535's verdict is HOLD with identity independence unmet, and no exact-head hosted workflow PASS exists for the convergence head. A convergence that is written is not a convergence that is admitted.",
+            "required_output": "CONCRETE_COMMAND_CONTRACT"
+          }
+        ],
+        "live_evidence_required": false
+      },
+      "receipt": {
+        "path": "data/handoff/git-at-any-scale/issue-536-path-convergence-receipt.json",
+        "schema": "agentic-tech-lead/issue-closure-contract/v1",
+        "required_states": ["PASS", "FAIL", "NOT_EXERCISED", "HUMAN_ADMIT_REQUIRED"],
+        "forbidden_promotions": ["stale_open_pr_inventory_to_current_writer_lease", "document_route_green_to_semantic_index_truth", "skipped_workflow_to_exact_head_pass"]
+      },
+      "exit": {"requires_receipt": true, "required_verdict": "PASS", "cleanup_required": false},
+      "next": null
     }
   ]
 }
