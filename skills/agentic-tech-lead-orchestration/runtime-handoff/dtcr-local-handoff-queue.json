@@ -1,0 +1,218 @@
+{
+  "schema_version": "agentic-tech-lead/local-handoff-queue/v1",
+  "subject": {
+    "repository": "ed3c/skills-shared",
+    "commit": "befd5424746b5477b3ef2b6f02cfd5e32f57e497",
+    "tree": "ad3837c6bbe2bdff93d224005022168c60c8d08f",
+    "rollback_commit": "674cfe1435c4bd1c29e8f07308266fe5c6284973"
+  },
+  "authority": {
+    "automation_forbidden": [
+      "merge",
+      "force_push",
+      "issue_close",
+      "queue_advance",
+      "provider_activation",
+      "registry_admission",
+      "semantic_conflict_resolution"
+    ],
+    "human_owned": [
+      "merge",
+      "promotion",
+      "rollback",
+      "permission_change",
+      "registry_admission",
+      "semantic_conflict_resolution"
+    ]
+  },
+  "current": {
+    "active_item": "dtcr-registry-admission",
+    "state": "ACTIVE"
+  },
+  "items": [
+    {
+      "id": "dtcr-registry-admission",
+      "task_ref": "issue-527-registry-and-required-order-admission",
+      "state": "ACTIVE",
+      "entry": {
+        "predecessor": null,
+        "required_subject_commit": "befd5424746b5477b3ef2b6f02cfd5e32f57e497",
+        "required_capabilities": [
+          "human-owner-terminal",
+          "registry-json-write-authority",
+          "shared-skills-infra-required-order-closure"
+        ]
+      },
+      "runtime_lane": {
+        "class": "LOCAL_HOST",
+        "commands": [],
+        "unresolved_operations": [
+          {
+            "operation_id": "admit-dtcr-into-registry-and-required-order",
+            "resolver_source": "registry.json entry shape, skills/shared-skills-infra/scripts/repository_control_plane.py REQUIRED_ORDER, and skills/dual-track-code-review-loop/bootstrap/dtcr-consumer-bootstrap-profile.json - a Human admits the shared classification and the engine-order closure, then re-derives the bootstrap artifact so its two refused preconditions flip by observation, not by edit",
+            "required_output": "CONCRETE_COMMAND_CONTRACT"
+          }
+        ],
+        "live_evidence_required": false
+      },
+      "receipt": {
+        "path": "skills/dual-track-code-review-loop/bootstrap/dtcr-consumer-bootstrap-profile.json",
+        "schema": "dtcr/consumer-bootstrap-profile/v1",
+        "required_states": [
+          "PASS",
+          "HUMAN_ADMIT_REQUIRED"
+        ],
+        "forbidden_promotions": [
+          "goal_directive_to_specific_registry_admission",
+          "profile_committed_to_consumer_bootstrap_executed",
+          "gate_green_to_attach_accepted"
+        ]
+      },
+      "exit": {
+        "requires_receipt": true,
+        "required_verdict": "PASS",
+        "cleanup_required": false
+      },
+      "next": "dtcr-independent-shadow"
+    },
+    {
+      "id": "dtcr-independent-shadow",
+      "task_ref": "issue-525-independent-shadow-admission",
+      "state": "BLOCKED_BY_PREDECESSOR",
+      "entry": {
+        "predecessor": "dtcr-registry-admission",
+        "required_subject_commit": "befd5424746b5477b3ef2b6f02cfd5e32f57e497",
+        "required_capabilities": [
+          "fresh-context-session-distinct-from-every-builder-lane",
+          "read-only-enforcement-stronger-than-prompt-only-or-declared-ceiling",
+          "clean-checkout-offline-replay"
+        ]
+      },
+      "runtime_lane": {
+        "class": "LOCAL_RUNTIME",
+        "commands": [],
+        "unresolved_operations": [
+          {
+            "operation_id": "run-independent-shadow-over-exact-landed-head",
+            "resolver_source": "issue #525 body and its falsifier table (SAME_CONTEXT_SHADOW_PROMOTED_TO_INDEPENDENT is fatal), skills/procedural-shadow-runtime/references/ receipt contracts, and the landed wave head - the Shadow is not any session that built or converged these lanes",
+            "required_output": "CONCRETE_COMMAND_CONTRACT"
+          }
+        ],
+        "live_evidence_required": false
+      },
+      "receipt": {
+        "path": "skills/dual-track-code-review-loop/receipts/shadow-audit.json",
+        "schema": "procedural-shadow-runtime/runtime-receipt/v1",
+        "required_states": [
+          "PASS",
+          "FAIL",
+          "NOT_EXERCISED",
+          "HUMAN_ADMIT_REQUIRED"
+        ],
+        "forbidden_promotions": [
+          "tech_lead_self_audit_to_independent_shadow",
+          "same_context_shadow_to_independent",
+          "shadow_agreement_to_human_admit"
+        ]
+      },
+      "exit": {
+        "requires_receipt": true,
+        "required_verdict": "PASS",
+        "cleanup_required": false
+      },
+      "next": "dtcr-provider-unblocks"
+    },
+    {
+      "id": "dtcr-provider-unblocks",
+      "task_ref": "issues-547-549-550-provider-blocked-sub-lanes",
+      "state": "BLOCKED_BY_PREDECESSOR",
+      "entry": {
+        "predecessor": "dtcr-independent-shadow",
+        "required_subject_commit": "befd5424746b5477b3ef2b6f02cfd5e32f57e497",
+        "required_capabilities": [
+          "human-admitted-provider-installation",
+          "provider-exact-identity-binding-version-and-sha256",
+          "scip-crash-repair-issue-595"
+        ]
+      },
+      "runtime_lane": {
+        "class": "LOCAL_PROVIDER",
+        "commands": [],
+        "unresolved_operations": [
+          {
+            "operation_id": "unblock-or-formally-descope-provider-sub-lanes",
+            "resolver_source": "cross-language scip indexers, the buf CLI, and an embedding provider are absent from this runtime; a Human either admits their installation (each lane then produces its own live receipt through its landed adapter, after #595's repair for scip) or formally descopes them in #519's convergence receipt",
+            "required_output": "CONCRETE_COMMAND_CONTRACT"
+          }
+        ],
+        "live_evidence_required": true
+      },
+      "receipt": {
+        "path": "skills/dual-track-code-review-loop/adapters/",
+        "schema": "dtcr/fact-plane-receipt/v1",
+        "required_states": [
+          "PASS",
+          "NOT_EXERCISED",
+          "SKIPPED_BY_POLICY",
+          "HUMAN_ADMIT_REQUIRED"
+        ],
+        "forbidden_promotions": [
+          "fixture_receipt_to_live_provider_receipt",
+          "admission_record_to_installed_provider",
+          "python_scope_receipt_to_cross_language_coverage"
+        ]
+      },
+      "exit": {
+        "requires_receipt": true,
+        "required_verdict": "PASS",
+        "cleanup_required": false
+      },
+      "next": "dtcr-final-admission"
+    },
+    {
+      "id": "dtcr-final-admission",
+      "task_ref": "issue-528-final-local-handoff-admission",
+      "state": "BLOCKED_BY_PREDECESSOR",
+      "entry": {
+        "predecessor": "dtcr-provider-unblocks",
+        "required_subject_commit": "befd5424746b5477b3ef2b6f02cfd5e32f57e497",
+        "required_capabilities": [
+          "human-admit-for-merge-release-registry",
+          "closure-packets-for-landed-lanes",
+          "canary-receipt-schema-freeze"
+        ]
+      },
+      "runtime_lane": {
+        "class": "MIXED",
+        "commands": [],
+        "unresolved_operations": [
+          {
+            "operation_id": "freeze-canary-receipt-schema-and-admit-528-exit",
+            "resolver_source": "docs/traceability/dual-track-code-review-loop/canary-528/canary-receipt.json is dtcr/consumer-canary-receipt/v0-draft because no frozen in-tree receipt type carries a canary result; freezing that schema, binding the receipt, writing the closure packets for the landed lanes and admitting #528's exit terminal are Human-gated final admission work",
+            "required_output": "CONCRETE_COMMAND_CONTRACT"
+          }
+        ],
+        "live_evidence_required": true
+      },
+      "receipt": {
+        "path": "skills/agentic-tech-lead-orchestration/references/closure-audit/issue-528.json",
+        "schema": "agentic-tech-lead/issue-closure-contract/v1",
+        "required_states": [
+          "PASS",
+          "HUMAN_ADMIT_REQUIRED"
+        ],
+        "forbidden_promotions": [
+          "draft_receipt_to_frozen_schema_receipt",
+          "bounded_canary_to_full_consumer_admission",
+          "queue_compiled_to_queue_executed"
+        ]
+      },
+      "exit": {
+        "requires_receipt": true,
+        "required_verdict": "PASS",
+        "cleanup_required": true
+      },
+      "next": null
+    }
+  ]
+}

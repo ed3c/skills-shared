@@ -1,0 +1,67 @@
+{
+  "bundle_digest": "16c79a1fd3984556ea45f381f3dacbbd6426c64232fe236e82376becf17568ed",
+  "bundle_id": "python-definitions",
+  "bundle_manifest_digest": "1299ed3f055932f20c6a7d98ff2aa8a03549649045d778717bad5380bccac298",
+  "completeness": "COMPLETE_FOR_ANALYSED_INPUTS",
+  "coverage": {
+    "denominator": 9,
+    "denominator_definition": "source blobs declared by the exact source subject and offered to this pass",
+    "method": "one tree-sitter parse and one tree-sitter query invocation per declared blob at the pinned bundle digest",
+    "numerator": 9
+  },
+  "establishes": {
+    "language_coverage": false,
+    "merge": false,
+    "provider_available_elsewhere": false,
+    "semantic_truth": false,
+    "task_pass": false
+  },
+  "exit_codes": {
+    "parse": 0,
+    "query": 0
+  },
+  "matches": 60,
+  "matches_digest_modulo_subject": "55d13407728afd6eb5829ad87bde5a4c2a142b09bdb652fcb6e820b96bf6e32e",
+  "paths": [
+    "scripts/delivery_status.py",
+    "scripts/delivery_sync.py",
+    "scripts/gates/_gate_common.py",
+    "scripts/gates/check_credential_hygiene.py",
+    "scripts/gates/check_delivery_receipt.py",
+    "scripts/gates/check_placement.py",
+    "scripts/gates/check_root_coupling.py",
+    "scripts/gates/check_runtime_env_binding.py",
+    "scripts/gates/check_skill_pointers.py"
+  ],
+  "provider": {
+    "abi_version": 15,
+    "config_digest": "5633dcc18a56c8d5af8fd89af8a9de3b4cd42eb4202c1bc9f1b28216f2ec1f0a",
+    "executable_location": "resolved from DTCR_TS_BIN or PATH; the install path is one machine and is not part of the identity",
+    "executable_name": "tree-sitter",
+    "executable_sha256": "002b151eb3aee02c453b3feacb73e672a6b11aa7b6a14d028afb98f27b40a7aa",
+    "grammar_digest": "94ead290935e18cd938342612205e3ec29bcc27def409a3022a21e6a7457c8de",
+    "grammar_license": "MIT, held by the grammar project. The Tree-sitter framework's own licence does not admit it and does not cover it.",
+    "grammar_source": "tree-sitter-python 0.25.0, vendored grammar sources as published on crates.io",
+    "language": "python",
+    "provider_binding_id": "DTCR-PB-549d4e258f0b1cef",
+    "query_digest": "b654af47b88da389ffc06cb0dd20c008a8f747657b01417653e796e99e07328d",
+    "version": "0.26.3"
+  },
+  "schema": "dtcr/tree-sitter-live-receipt/v1",
+  "subject": {
+    "commit": "8a21426751c0fec3c99450cdb00294e843a9d950",
+    "repository_binding_id": "DTCR-RB-6be7b56b680c0cc5",
+    "tree": "3f56b60423ba936659e255b447e3d5c2a1e7fd65"
+  },
+  "subject_blobs": {
+    "scripts/delivery_status.py": "d0aed5e4b310e02c5d6aa3030c3142c15da668cb",
+    "scripts/delivery_sync.py": "bfc9bf49e1fe2d8097bd444526fdaf79366c2beb",
+    "scripts/gates/_gate_common.py": "b1c447a3a78522f15439c4258a7272397f57e537",
+    "scripts/gates/check_credential_hygiene.py": "b65bed4b1d7382f39030fcc42676be59bdb9a7f4",
+    "scripts/gates/check_delivery_receipt.py": "30e3f8b6c072d320aefdcc70824bb5c819ae4588",
+    "scripts/gates/check_placement.py": "c138bd07bdceb2844811a87d3fdf133b4f72df00",
+    "scripts/gates/check_root_coupling.py": "5103c17e12286bf46babf2cff30af0f9146bd8c9",
+    "scripts/gates/check_runtime_env_binding.py": "6b670a03e4f9613283a818af107fef01915e621a",
+    "scripts/gates/check_skill_pointers.py": "75af489365e329037f36d932a6d87e399ce2566c"
+  }
+}

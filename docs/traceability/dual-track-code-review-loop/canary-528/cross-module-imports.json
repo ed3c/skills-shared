@@ -1,0 +1,2624 @@
+[
+  {
+    "cross_arena_module": false,
+    "imported_name": "_gate_common",
+    "importer": "scripts/delivery_status.py",
+    "importer_module": "arena-core",
+    "line": 34,
+    "private_target": true,
+    "resolves_to": "scripts/gates/_gate_common.py",
+    "same_directory": false,
+    "sys_path_injected_at": [
+      33
+    ],
+    "target_module": "arena-core"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "_gate_common",
+    "importer": "scripts/delivery_sync.py",
+    "importer_module": "arena-core",
+    "line": 32,
+    "private_target": true,
+    "resolves_to": "scripts/gates/_gate_common.py",
+    "same_directory": false,
+    "sys_path_injected_at": [
+      31
+    ],
+    "target_module": "arena-core"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "hc_vocab",
+    "importer": "apps/harness-console/hc_views.py",
+    "importer_module": "harness-console",
+    "line": 27,
+    "private_target": false,
+    "resolves_to": "packages/harness-console-contracts/hc_vocab.py",
+    "same_directory": false,
+    "sys_path_injected_at": [
+      23
+    ],
+    "target_module": "harness-console"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "hc_vocab",
+    "importer": "apps/harness-console/hc_views.py",
+    "importer_module": "harness-console",
+    "line": 131,
+    "private_target": false,
+    "resolves_to": "packages/harness-console-contracts/hc_vocab.py",
+    "same_directory": false,
+    "sys_path_injected_at": [
+      23
+    ],
+    "target_module": "harness-console"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "equivalence",
+    "importer": "loop_wiki/evolve-technical-equivalence-research/legacy_compare.py",
+    "importer_module": "technical-equivalence",
+    "line": 35,
+    "private_target": false,
+    "resolves_to": "loop_wiki/evolve-technical-equivalence-research/equivalence.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      34
+    ],
+    "target_module": "technical-equivalence"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "equivalence",
+    "importer": "loop_wiki/evolve-technical-equivalence-research/tests/test_cli.py",
+    "importer_module": "technical-equivalence",
+    "line": 19,
+    "private_target": false,
+    "resolves_to": "loop_wiki/evolve-technical-equivalence-research/equivalence.py",
+    "same_directory": false,
+    "sys_path_injected_at": [
+      18
+    ],
+    "target_module": "technical-equivalence"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "profile_validator",
+    "importer": "loop_wiki/evolve-technical-equivalence-research/tests/test_cli.py",
+    "importer_module": "technical-equivalence",
+    "line": 32,
+    "private_target": false,
+    "resolves_to": "loop_wiki/evolve-technical-equivalence-research/profile_validator.py",
+    "same_directory": false,
+    "sys_path_injected_at": [
+      18
+    ],
+    "target_module": "technical-equivalence"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "drift",
+    "importer": "loop_wiki/evolve-technical-equivalence-research/tests/test_drift.py",
+    "importer_module": "technical-equivalence",
+    "line": 14,
+    "private_target": false,
+    "resolves_to": "loop_wiki/evolve-technical-equivalence-research/drift.py",
+    "same_directory": false,
+    "sys_path_injected_at": [
+      13
+    ],
+    "target_module": "technical-equivalence"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "selftest",
+    "importer": "loop_wiki/evolve-technical-equivalence-research/tests/test_drift.py",
+    "importer_module": "technical-equivalence",
+    "line": 15,
+    "private_target": false,
+    "resolves_to": "loop_wiki/evolve-technical-equivalence-research/selftest.py",
+    "same_directory": false,
+    "sys_path_injected_at": [
+      13
+    ],
+    "target_module": "technical-equivalence"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "bm_common",
+    "importer": "loop_wiki/loopx-benchmark/scripts/control_loopxbench.py",
+    "importer_module": "loopx-benchmark",
+    "line": 33,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-benchmark/scripts/bm_common.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      31
+    ],
+    "target_module": "loopx-benchmark"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "bm_report",
+    "importer": "loop_wiki/loopx-benchmark/scripts/control_loopxbench.py",
+    "importer_module": "loopx-benchmark",
+    "line": 34,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-benchmark/scripts/bm_report.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      31
+    ],
+    "target_module": "loopx-benchmark"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "bm_run",
+    "importer": "loop_wiki/loopx-benchmark/scripts/control_loopxbench.py",
+    "importer_module": "loopx-benchmark",
+    "line": 35,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-benchmark/scripts/bm_run.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      31
+    ],
+    "target_module": "loopx-benchmark"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "bm_selftest",
+    "importer": "loop_wiki/loopx-benchmark/scripts/control_loopxbench.py",
+    "importer_module": "loopx-benchmark",
+    "line": 36,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-benchmark/scripts/bm_selftest.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      31
+    ],
+    "target_module": "loopx-benchmark"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "loopxbench",
+    "importer": "loop_wiki/loopx-benchmark/scripts/control_loopxbench.py",
+    "importer_module": "loopx-benchmark",
+    "line": 37,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-benchmark/scripts/loopxbench.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      31
+    ],
+    "target_module": "loopx-benchmark"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "bm_claim",
+    "importer": "loop_wiki/loopx-benchmark/scripts/loopxbench.py",
+    "importer_module": "loopx-benchmark",
+    "line": 29,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-benchmark/scripts/bm_claim.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      27
+    ],
+    "target_module": "loopx-benchmark"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "bm_common",
+    "importer": "loop_wiki/loopx-benchmark/scripts/loopxbench.py",
+    "importer_module": "loopx-benchmark",
+    "line": 30,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-benchmark/scripts/bm_common.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      27
+    ],
+    "target_module": "loopx-benchmark"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "bm_contract",
+    "importer": "loop_wiki/loopx-benchmark/scripts/loopxbench.py",
+    "importer_module": "loopx-benchmark",
+    "line": 31,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-benchmark/scripts/bm_contract.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      27
+    ],
+    "target_module": "loopx-benchmark"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "bm_report",
+    "importer": "loop_wiki/loopx-benchmark/scripts/loopxbench.py",
+    "importer_module": "loopx-benchmark",
+    "line": 32,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-benchmark/scripts/bm_report.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      27
+    ],
+    "target_module": "loopx-benchmark"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "bm_run",
+    "importer": "loop_wiki/loopx-benchmark/scripts/loopxbench.py",
+    "importer_module": "loopx-benchmark",
+    "line": 33,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-benchmark/scripts/bm_run.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      27
+    ],
+    "target_module": "loopx-benchmark"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "bm_selftest",
+    "importer": "loop_wiki/loopx-benchmark/scripts/loopxbench.py",
+    "importer_module": "loopx-benchmark",
+    "line": 34,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-benchmark/scripts/bm_selftest.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      27
+    ],
+    "target_module": "loopx-benchmark"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "ca_common",
+    "importer": "loop_wiki/loopx-context-assembly/scripts/contextasm.py",
+    "importer_module": "loopx-context-assembly",
+    "line": 23,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-context-assembly/scripts/ca_common.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      21
+    ],
+    "target_module": "loopx-context-assembly"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "ca_contract",
+    "importer": "loop_wiki/loopx-context-assembly/scripts/contextasm.py",
+    "importer_module": "loopx-context-assembly",
+    "line": 34,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-context-assembly/scripts/ca_contract.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      21
+    ],
+    "target_module": "loopx-context-assembly"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "ca_pipeline",
+    "importer": "loop_wiki/loopx-context-assembly/scripts/contextasm.py",
+    "importer_module": "loopx-context-assembly",
+    "line": 35,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-context-assembly/scripts/ca_pipeline.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      21
+    ],
+    "target_module": "loopx-context-assembly"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "ca_project",
+    "importer": "loop_wiki/loopx-context-assembly/scripts/contextasm.py",
+    "importer_module": "loopx-context-assembly",
+    "line": 36,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-context-assembly/scripts/ca_project.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      21
+    ],
+    "target_module": "loopx-context-assembly"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "ca_selftest",
+    "importer": "loop_wiki/loopx-context-assembly/scripts/contextasm.py",
+    "importer_module": "loopx-context-assembly",
+    "line": 37,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-context-assembly/scripts/ca_selftest.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      21
+    ],
+    "target_module": "loopx-context-assembly"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "ca_common",
+    "importer": "loop_wiki/loopx-context-assembly/scripts/control_contextasm.py",
+    "importer_module": "loopx-context-assembly",
+    "line": 33,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-context-assembly/scripts/ca_common.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      31
+    ],
+    "target_module": "loopx-context-assembly"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "memory",
+    "importer": "loop_wiki/loopx-decision-memory/providers/mem0/control_mem0.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 46,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/scripts/memory.py",
+    "same_directory": false,
+    "sys_path_injected_at": [
+      42,
+      44
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "dmr_pipeline",
+    "importer": "loop_wiki/loopx-decision-memory/providers/mem0/control_mem0.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 48,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/runtime/dmr_pipeline.py",
+    "same_directory": false,
+    "sys_path_injected_at": [
+      42,
+      44
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "mem0_projection",
+    "importer": "loop_wiki/loopx-decision-memory/providers/mem0/control_mem0.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 49,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/providers/mem0/mem0_projection.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      42,
+      44
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "memory",
+    "importer": "loop_wiki/loopx-decision-memory/providers/mem0/mem0.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 25,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/scripts/memory.py",
+    "same_directory": false,
+    "sys_path_injected_at": [
+      21,
+      23
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "dmr_pipeline",
+    "importer": "loop_wiki/loopx-decision-memory/providers/mem0/mem0.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 27,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/runtime/dmr_pipeline.py",
+    "same_directory": false,
+    "sys_path_injected_at": [
+      21,
+      23
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "mem0_authority",
+    "importer": "loop_wiki/loopx-decision-memory/providers/mem0/mem0.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 28,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/providers/mem0/mem0_authority.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      21,
+      23
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "mem0_contract",
+    "importer": "loop_wiki/loopx-decision-memory/providers/mem0/mem0.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 29,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/providers/mem0/mem0_contract.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      21,
+      23
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "mem0_projection",
+    "importer": "loop_wiki/loopx-decision-memory/providers/mem0/mem0.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 30,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/providers/mem0/mem0_projection.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      21,
+      23
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "mem0_selftest",
+    "importer": "loop_wiki/loopx-decision-memory/providers/mem0/mem0.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 31,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/providers/mem0/mem0_selftest.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      21,
+      23
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "memory",
+    "importer": "loop_wiki/loopx-decision-memory/providers/mem0/mem0_authority.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 29,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/scripts/memory.py",
+    "same_directory": false,
+    "sys_path_injected_at": [
+      26,
+      27
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "dmr_authority",
+    "importer": "loop_wiki/loopx-decision-memory/providers/mem0/mem0_authority.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 31,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/runtime/dmr_authority.py",
+    "same_directory": false,
+    "sys_path_injected_at": [
+      26,
+      27
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "memory",
+    "importer": "loop_wiki/loopx-decision-memory/providers/mem0/mem0_contract.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 16,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/scripts/memory.py",
+    "same_directory": false,
+    "sys_path_injected_at": [
+      14
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "mem0_authority",
+    "importer": "loop_wiki/loopx-decision-memory/providers/mem0/mem0_contract.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 18,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/providers/mem0/mem0_authority.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      14
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "mem0_identity",
+    "importer": "loop_wiki/loopx-decision-memory/providers/mem0/mem0_contract.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 19,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/providers/mem0/mem0_identity.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      14
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "memory",
+    "importer": "loop_wiki/loopx-decision-memory/providers/mem0/mem0_identity.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 27,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/scripts/memory.py",
+    "same_directory": false,
+    "sys_path_injected_at": [
+      25
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "memory",
+    "importer": "loop_wiki/loopx-decision-memory/providers/mem0/mem0_lifecycle.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 23,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/scripts/memory.py",
+    "same_directory": false,
+    "sys_path_injected_at": [
+      21
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "mem0_projection",
+    "importer": "loop_wiki/loopx-decision-memory/providers/mem0/mem0_lifecycle.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 25,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/providers/mem0/mem0_projection.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      21
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "memory",
+    "importer": "loop_wiki/loopx-decision-memory/providers/mem0/mem0_projection.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 30,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/scripts/memory.py",
+    "same_directory": false,
+    "sys_path_injected_at": [
+      27,
+      28
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "dmr_event",
+    "importer": "loop_wiki/loopx-decision-memory/providers/mem0/mem0_projection.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 32,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/runtime/dmr_event.py",
+    "same_directory": false,
+    "sys_path_injected_at": [
+      27,
+      28
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "mem0_identity",
+    "importer": "loop_wiki/loopx-decision-memory/providers/mem0/mem0_projection.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 33,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/providers/mem0/mem0_identity.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      27,
+      28
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "memory",
+    "importer": "loop_wiki/loopx-decision-memory/providers/mem0/mem0_selftest.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 14,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/scripts/memory.py",
+    "same_directory": false,
+    "sys_path_injected_at": [
+      12
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "dmr_pipeline",
+    "importer": "loop_wiki/loopx-decision-memory/providers/mem0/mem0_selftest.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 16,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/runtime/dmr_pipeline.py",
+    "same_directory": false,
+    "sys_path_injected_at": [
+      12
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "mem0_authority",
+    "importer": "loop_wiki/loopx-decision-memory/providers/mem0/mem0_selftest.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 17,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/providers/mem0/mem0_authority.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      12
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "mem0_identity",
+    "importer": "loop_wiki/loopx-decision-memory/providers/mem0/mem0_selftest.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 25,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/providers/mem0/mem0_identity.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      12
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "mem0_lifecycle",
+    "importer": "loop_wiki/loopx-decision-memory/providers/mem0/mem0_selftest.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 31,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/providers/mem0/mem0_lifecycle.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      12
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "mem0_projection",
+    "importer": "loop_wiki/loopx-decision-memory/providers/mem0/mem0_selftest.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 37,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/providers/mem0/mem0_projection.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      12
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "memory",
+    "importer": "loop_wiki/loopx-decision-memory/runtime/control_memory_runtime.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 42,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/scripts/memory.py",
+    "same_directory": false,
+    "sys_path_injected_at": [
+      39,
+      40
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "dmr_pipeline",
+    "importer": "loop_wiki/loopx-decision-memory/runtime/control_memory_runtime.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 44,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/runtime/dmr_pipeline.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      39,
+      40
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "dmr_projection",
+    "importer": "loop_wiki/loopx-decision-memory/runtime/control_memory_runtime.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 45,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/runtime/dmr_projection.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      39,
+      40
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "memory",
+    "importer": "loop_wiki/loopx-decision-memory/runtime/dmr_authority.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 32,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/scripts/memory.py",
+    "same_directory": false,
+    "sys_path_injected_at": [
+      30
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "memory",
+    "importer": "loop_wiki/loopx-decision-memory/runtime/dmr_contract.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 20,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/scripts/memory.py",
+    "same_directory": false,
+    "sys_path_injected_at": [
+      18
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "dmr_authority",
+    "importer": "loop_wiki/loopx-decision-memory/runtime/dmr_contract.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 22,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/runtime/dmr_authority.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      18
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "dmr_event",
+    "importer": "loop_wiki/loopx-decision-memory/runtime/dmr_contract.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 23,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/runtime/dmr_event.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      18
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "memory",
+    "importer": "loop_wiki/loopx-decision-memory/runtime/dmr_event.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 36,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/scripts/memory.py",
+    "same_directory": false,
+    "sys_path_injected_at": [
+      34
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "memory",
+    "importer": "loop_wiki/loopx-decision-memory/runtime/dmr_lifecycle.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 26,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/scripts/memory.py",
+    "same_directory": false,
+    "sys_path_injected_at": [
+      24
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "dmr_event",
+    "importer": "loop_wiki/loopx-decision-memory/runtime/dmr_lifecycle.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 33,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/runtime/dmr_event.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      24
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "memory",
+    "importer": "loop_wiki/loopx-decision-memory/runtime/dmr_pipeline.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 30,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/scripts/memory.py",
+    "same_directory": false,
+    "sys_path_injected_at": [
+      28
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "dmr_authority",
+    "importer": "loop_wiki/loopx-decision-memory/runtime/dmr_pipeline.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 32,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/runtime/dmr_authority.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      28
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "dmr_event",
+    "importer": "loop_wiki/loopx-decision-memory/runtime/dmr_pipeline.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 33,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/runtime/dmr_event.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      28
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "dmr_lifecycle",
+    "importer": "loop_wiki/loopx-decision-memory/runtime/dmr_pipeline.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 34,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/runtime/dmr_lifecycle.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      28
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "dmr_projection",
+    "importer": "loop_wiki/loopx-decision-memory/runtime/dmr_pipeline.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 36,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/runtime/dmr_projection.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      28
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "memory",
+    "importer": "loop_wiki/loopx-decision-memory/runtime/dmr_projection.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 27,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/scripts/memory.py",
+    "same_directory": false,
+    "sys_path_injected_at": [
+      25
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "dmr_event",
+    "importer": "loop_wiki/loopx-decision-memory/runtime/dmr_projection.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 29,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/runtime/dmr_event.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      25
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "memory",
+    "importer": "loop_wiki/loopx-decision-memory/runtime/dmr_selftest.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 18,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/scripts/memory.py",
+    "same_directory": false,
+    "sys_path_injected_at": [
+      16
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "dmr_authority",
+    "importer": "loop_wiki/loopx-decision-memory/runtime/dmr_selftest.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 20,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/runtime/dmr_authority.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      16
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "dmr_event",
+    "importer": "loop_wiki/loopx-decision-memory/runtime/dmr_selftest.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 21,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/runtime/dmr_event.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      16
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "dmr_lifecycle",
+    "importer": "loop_wiki/loopx-decision-memory/runtime/dmr_selftest.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 22,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/runtime/dmr_lifecycle.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      16
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "dmr_pipeline",
+    "importer": "loop_wiki/loopx-decision-memory/runtime/dmr_selftest.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 23,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/runtime/dmr_pipeline.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      16
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "dmr_projection",
+    "importer": "loop_wiki/loopx-decision-memory/runtime/dmr_selftest.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 24,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/runtime/dmr_projection.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      16
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "dmr_event",
+    "importer": "loop_wiki/loopx-decision-memory/runtime/dmr_selftest.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 278,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/runtime/dmr_event.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      16
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "dmr_lifecycle",
+    "importer": "loop_wiki/loopx-decision-memory/runtime/dmr_selftest.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 313,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/runtime/dmr_lifecycle.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      16
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "memory",
+    "importer": "loop_wiki/loopx-decision-memory/runtime/memory_runtime.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 23,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/scripts/memory.py",
+    "same_directory": false,
+    "sys_path_injected_at": [
+      20,
+      21
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "dmr_contract",
+    "importer": "loop_wiki/loopx-decision-memory/runtime/memory_runtime.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 25,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/runtime/dmr_contract.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      20,
+      21
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "dmr_pipeline",
+    "importer": "loop_wiki/loopx-decision-memory/runtime/memory_runtime.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 26,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/runtime/dmr_pipeline.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      20,
+      21
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "dmr_projection",
+    "importer": "loop_wiki/loopx-decision-memory/runtime/memory_runtime.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 27,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/runtime/dmr_projection.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      20,
+      21
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "dmr_selftest",
+    "importer": "loop_wiki/loopx-decision-memory/runtime/memory_runtime.py",
+    "importer_module": "loopx-decision-memory",
+    "line": 28,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-decision-memory/runtime/dmr_selftest.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      20,
+      21
+    ],
+    "target_module": "loopx-decision-memory"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "kc_common",
+    "importer": "loop_wiki/loopx-knowledge-compiler/scripts/control_knowledge.py",
+    "importer_module": "loopx-knowledge-compiler",
+    "line": 39,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-knowledge-compiler/scripts/kc_common.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      37
+    ],
+    "target_module": "loopx-knowledge-compiler"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "kc_scaffold",
+    "importer": "loop_wiki/loopx-knowledge-compiler/scripts/control_knowledge.py",
+    "importer_module": "loopx-knowledge-compiler",
+    "line": 40,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-knowledge-compiler/scripts/kc_scaffold.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      37
+    ],
+    "target_module": "loopx-knowledge-compiler"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "kc_common",
+    "importer": "loop_wiki/loopx-knowledge-compiler/scripts/knowledge.py",
+    "importer_module": "loopx-knowledge-compiler",
+    "line": 19,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-knowledge-compiler/scripts/kc_common.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      17
+    ],
+    "target_module": "loopx-knowledge-compiler"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "kc_compile",
+    "importer": "loop_wiki/loopx-knowledge-compiler/scripts/knowledge.py",
+    "importer_module": "loopx-knowledge-compiler",
+    "line": 27,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-knowledge-compiler/scripts/kc_compile.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      17
+    ],
+    "target_module": "loopx-knowledge-compiler"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "kc_contract",
+    "importer": "loop_wiki/loopx-knowledge-compiler/scripts/knowledge.py",
+    "importer_module": "loopx-knowledge-compiler",
+    "line": 28,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-knowledge-compiler/scripts/kc_contract.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      17
+    ],
+    "target_module": "loopx-knowledge-compiler"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "kc_scaffold",
+    "importer": "loop_wiki/loopx-knowledge-compiler/scripts/knowledge.py",
+    "importer_module": "loopx-knowledge-compiler",
+    "line": 29,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-knowledge-compiler/scripts/kc_scaffold.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      17
+    ],
+    "target_module": "loopx-knowledge-compiler"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "kc_selftest",
+    "importer": "loop_wiki/loopx-knowledge-compiler/scripts/knowledge.py",
+    "importer_module": "loopx-knowledge-compiler",
+    "line": 30,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-knowledge-compiler/scripts/kc_selftest.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      17
+    ],
+    "target_module": "loopx-knowledge-compiler"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "fb_anchor",
+    "importer": "loop_wiki/loopx-knowledge-foldback/scripts/control_foldback.py",
+    "importer_module": "loopx-knowledge-foldback",
+    "line": 37,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-knowledge-foldback/scripts/fb_anchor.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      35
+    ],
+    "target_module": "loopx-knowledge-foldback"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "fb_common",
+    "importer": "loop_wiki/loopx-knowledge-foldback/scripts/control_foldback.py",
+    "importer_module": "loopx-knowledge-foldback",
+    "line": 38,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-knowledge-foldback/scripts/fb_common.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      35
+    ],
+    "target_module": "loopx-knowledge-foldback"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "fb_bundle",
+    "importer": "loop_wiki/loopx-knowledge-foldback/scripts/foldback.py",
+    "importer_module": "loopx-knowledge-foldback",
+    "line": 19,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-knowledge-foldback/scripts/fb_bundle.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      17
+    ],
+    "target_module": "loopx-knowledge-foldback"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "fb_common",
+    "importer": "loop_wiki/loopx-knowledge-foldback/scripts/foldback.py",
+    "importer_module": "loopx-knowledge-foldback",
+    "line": 20,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-knowledge-foldback/scripts/fb_common.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      17
+    ],
+    "target_module": "loopx-knowledge-foldback"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "fb_contract",
+    "importer": "loop_wiki/loopx-knowledge-foldback/scripts/foldback.py",
+    "importer_module": "loopx-knowledge-foldback",
+    "line": 28,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-knowledge-foldback/scripts/fb_contract.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      17
+    ],
+    "target_module": "loopx-knowledge-foldback"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "fb_history",
+    "importer": "loop_wiki/loopx-knowledge-foldback/scripts/foldback.py",
+    "importer_module": "loopx-knowledge-foldback",
+    "line": 29,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-knowledge-foldback/scripts/fb_history.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      17
+    ],
+    "target_module": "loopx-knowledge-foldback"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "fb_pipeline",
+    "importer": "loop_wiki/loopx-knowledge-foldback/scripts/foldback.py",
+    "importer_module": "loopx-knowledge-foldback",
+    "line": 30,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-knowledge-foldback/scripts/fb_pipeline.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      17
+    ],
+    "target_module": "loopx-knowledge-foldback"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "fb_selftest",
+    "importer": "loop_wiki/loopx-knowledge-foldback/scripts/foldback.py",
+    "importer_module": "loopx-knowledge-foldback",
+    "line": 31,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-knowledge-foldback/scripts/fb_selftest.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      17
+    ],
+    "target_module": "loopx-knowledge-foldback"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "nr_common",
+    "importer": "loop_wiki/loopx-notes-retrieval/scripts/control_notesretrieval.py",
+    "importer_module": "loopx-notes-retrieval",
+    "line": 32,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-notes-retrieval/scripts/nr_common.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      30
+    ],
+    "target_module": "loopx-notes-retrieval"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "nr_index",
+    "importer": "loop_wiki/loopx-notes-retrieval/scripts/control_notesretrieval.py",
+    "importer_module": "loopx-notes-retrieval",
+    "line": 33,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-notes-retrieval/scripts/nr_index.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      30
+    ],
+    "target_module": "loopx-notes-retrieval"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "nr_openwiki",
+    "importer": "loop_wiki/loopx-notes-retrieval/scripts/control_notesretrieval.py",
+    "importer_module": "loopx-notes-retrieval",
+    "line": 34,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-notes-retrieval/scripts/nr_openwiki.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      30
+    ],
+    "target_module": "loopx-notes-retrieval"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "nr_pipeline",
+    "importer": "loop_wiki/loopx-notes-retrieval/scripts/control_notesretrieval.py",
+    "importer_module": "loopx-notes-retrieval",
+    "line": 35,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-notes-retrieval/scripts/nr_pipeline.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      30
+    ],
+    "target_module": "loopx-notes-retrieval"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "nr_common",
+    "importer": "loop_wiki/loopx-notes-retrieval/scripts/notesretrieval.py",
+    "importer_module": "loopx-notes-retrieval",
+    "line": 21,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-notes-retrieval/scripts/nr_common.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      19
+    ],
+    "target_module": "loopx-notes-retrieval"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "nr_contract",
+    "importer": "loop_wiki/loopx-notes-retrieval/scripts/notesretrieval.py",
+    "importer_module": "loopx-notes-retrieval",
+    "line": 22,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-notes-retrieval/scripts/nr_contract.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      19
+    ],
+    "target_module": "loopx-notes-retrieval"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "nr_pipeline",
+    "importer": "loop_wiki/loopx-notes-retrieval/scripts/notesretrieval.py",
+    "importer_module": "loopx-notes-retrieval",
+    "line": 23,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-notes-retrieval/scripts/nr_pipeline.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      19
+    ],
+    "target_module": "loopx-notes-retrieval"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "nr_selftest",
+    "importer": "loop_wiki/loopx-notes-retrieval/scripts/notesretrieval.py",
+    "importer_module": "loopx-notes-retrieval",
+    "line": 24,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-notes-retrieval/scripts/nr_selftest.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      19
+    ],
+    "target_module": "loopx-notes-retrieval"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "rgc_common",
+    "importer": "loop_wiki/loopx-resource-gc/scripts/control_resourcegc.py",
+    "importer_module": "loopx-resource-gc",
+    "line": 41,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-resource-gc/scripts/rgc_common.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      39
+    ],
+    "target_module": "loopx-resource-gc"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "rgc_fixtures",
+    "importer": "loop_wiki/loopx-resource-gc/scripts/control_resourcegc.py",
+    "importer_module": "loopx-resource-gc",
+    "line": 42,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-resource-gc/scripts/rgc_fixtures.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      39
+    ],
+    "target_module": "loopx-resource-gc"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "rgc_pipeline",
+    "importer": "loop_wiki/loopx-resource-gc/scripts/control_resourcegc.py",
+    "importer_module": "loopx-resource-gc",
+    "line": 43,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-resource-gc/scripts/rgc_pipeline.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      39
+    ],
+    "target_module": "loopx-resource-gc"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "rgc_rebuild",
+    "importer": "loop_wiki/loopx-resource-gc/scripts/control_resourcegc.py",
+    "importer_module": "loopx-resource-gc",
+    "line": 44,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-resource-gc/scripts/rgc_rebuild.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      39
+    ],
+    "target_module": "loopx-resource-gc"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "rgc_common",
+    "importer": "loop_wiki/loopx-resource-gc/scripts/resourcegc.py",
+    "importer_module": "loopx-resource-gc",
+    "line": 24,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-resource-gc/scripts/rgc_common.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      22
+    ],
+    "target_module": "loopx-resource-gc"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "rgc_contract",
+    "importer": "loop_wiki/loopx-resource-gc/scripts/resourcegc.py",
+    "importer_module": "loopx-resource-gc",
+    "line": 33,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-resource-gc/scripts/rgc_contract.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      22
+    ],
+    "target_module": "loopx-resource-gc"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "rgc_execute",
+    "importer": "loop_wiki/loopx-resource-gc/scripts/resourcegc.py",
+    "importer_module": "loopx-resource-gc",
+    "line": 34,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-resource-gc/scripts/rgc_execute.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      22
+    ],
+    "target_module": "loopx-resource-gc"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "rgc_fixtures",
+    "importer": "loop_wiki/loopx-resource-gc/scripts/resourcegc.py",
+    "importer_module": "loopx-resource-gc",
+    "line": 35,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-resource-gc/scripts/rgc_fixtures.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      22
+    ],
+    "target_module": "loopx-resource-gc"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "rgc_pipeline",
+    "importer": "loop_wiki/loopx-resource-gc/scripts/resourcegc.py",
+    "importer_module": "loopx-resource-gc",
+    "line": 36,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-resource-gc/scripts/rgc_pipeline.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      22
+    ],
+    "target_module": "loopx-resource-gc"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "rgc_selftest",
+    "importer": "loop_wiki/loopx-resource-gc/scripts/resourcegc.py",
+    "importer_module": "loopx-resource-gc",
+    "line": 37,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-resource-gc/scripts/rgc_selftest.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      22
+    ],
+    "target_module": "loopx-resource-gc"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "fabric_common",
+    "importer": "loop_wiki/loopx-runtime-fabric/scripts/control_fabric.py",
+    "importer_module": "loopx-runtime-fabric",
+    "line": 35,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-runtime-fabric/scripts/fabric_common.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      33
+    ],
+    "target_module": "loopx-runtime-fabric"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "fabric_local",
+    "importer": "loop_wiki/loopx-runtime-fabric/scripts/control_fabric.py",
+    "importer_module": "loopx-runtime-fabric",
+    "line": 36,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-runtime-fabric/scripts/fabric_local.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      33
+    ],
+    "target_module": "loopx-runtime-fabric"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "fabric_lease",
+    "importer": "loop_wiki/loopx-runtime-fabric/scripts/control_fabric.py",
+    "importer_module": "loopx-runtime-fabric",
+    "line": 37,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-runtime-fabric/scripts/fabric_lease.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      33
+    ],
+    "target_module": "loopx-runtime-fabric"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "se_cases",
+    "importer": "loop_wiki/loopx-skill-evolution/scripts/control_skillevo.py",
+    "importer_module": "loopx-skill-evolution",
+    "line": 41,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-skill-evolution/scripts/se_cases.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      39
+    ],
+    "target_module": "loopx-skill-evolution"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "se_common",
+    "importer": "loop_wiki/loopx-skill-evolution/scripts/control_skillevo.py",
+    "importer_module": "loopx-skill-evolution",
+    "line": 46,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-skill-evolution/scripts/se_common.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      39
+    ],
+    "target_module": "loopx-skill-evolution"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "se_common",
+    "importer": "loop_wiki/loopx-skill-evolution/scripts/skillevo.py",
+    "importer_module": "loopx-skill-evolution",
+    "line": 19,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-skill-evolution/scripts/se_common.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      17
+    ],
+    "target_module": "loopx-skill-evolution"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "se_contract",
+    "importer": "loop_wiki/loopx-skill-evolution/scripts/skillevo.py",
+    "importer_module": "loopx-skill-evolution",
+    "line": 27,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-skill-evolution/scripts/se_contract.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      17
+    ],
+    "target_module": "loopx-skill-evolution"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "se_pipeline",
+    "importer": "loop_wiki/loopx-skill-evolution/scripts/skillevo.py",
+    "importer_module": "loopx-skill-evolution",
+    "line": 28,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-skill-evolution/scripts/se_pipeline.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      17
+    ],
+    "target_module": "loopx-skill-evolution"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "se_release",
+    "importer": "loop_wiki/loopx-skill-evolution/scripts/skillevo.py",
+    "importer_module": "loopx-skill-evolution",
+    "line": 29,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-skill-evolution/scripts/se_release.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      17
+    ],
+    "target_module": "loopx-skill-evolution"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "se_selftest",
+    "importer": "loop_wiki/loopx-skill-evolution/scripts/skillevo.py",
+    "importer_module": "loopx-skill-evolution",
+    "line": 30,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-skill-evolution/scripts/se_selftest.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      17
+    ],
+    "target_module": "loopx-skill-evolution"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "si_common",
+    "importer": "loop_wiki/loopx-source-ingest/scripts/control_ingest.py",
+    "importer_module": "loopx-source-ingest",
+    "line": 35,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-source-ingest/scripts/si_common.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      33
+    ],
+    "target_module": "loopx-source-ingest"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "si_injection",
+    "importer": "loop_wiki/loopx-source-ingest/scripts/control_ingest.py",
+    "importer_module": "loopx-source-ingest",
+    "line": 36,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-source-ingest/scripts/si_injection.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      33
+    ],
+    "target_module": "loopx-source-ingest"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "si_locator",
+    "importer": "loop_wiki/loopx-source-ingest/scripts/control_ingest.py",
+    "importer_module": "loopx-source-ingest",
+    "line": 37,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-source-ingest/scripts/si_locator.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      33
+    ],
+    "target_module": "loopx-source-ingest"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "si_pipeline",
+    "importer": "loop_wiki/loopx-source-ingest/scripts/control_ingest.py",
+    "importer_module": "loopx-source-ingest",
+    "line": 38,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-source-ingest/scripts/si_pipeline.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      33
+    ],
+    "target_module": "loopx-source-ingest"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "si_common",
+    "importer": "loop_wiki/loopx-source-ingest/scripts/ingest.py",
+    "importer_module": "loopx-source-ingest",
+    "line": 22,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-source-ingest/scripts/si_common.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      20
+    ],
+    "target_module": "loopx-source-ingest"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "si_contract",
+    "importer": "loop_wiki/loopx-source-ingest/scripts/ingest.py",
+    "importer_module": "loopx-source-ingest",
+    "line": 29,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-source-ingest/scripts/si_contract.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      20
+    ],
+    "target_module": "loopx-source-ingest"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "si_manifest",
+    "importer": "loop_wiki/loopx-source-ingest/scripts/ingest.py",
+    "importer_module": "loopx-source-ingest",
+    "line": 30,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-source-ingest/scripts/si_manifest.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      20
+    ],
+    "target_module": "loopx-source-ingest"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "si_pipeline",
+    "importer": "loop_wiki/loopx-source-ingest/scripts/ingest.py",
+    "importer_module": "loopx-source-ingest",
+    "line": 31,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-source-ingest/scripts/si_pipeline.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      20
+    ],
+    "target_module": "loopx-source-ingest"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "si_selftest",
+    "importer": "loop_wiki/loopx-source-ingest/scripts/ingest.py",
+    "importer_module": "loopx-source-ingest",
+    "line": 32,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-source-ingest/scripts/si_selftest.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      20
+    ],
+    "target_module": "loopx-source-ingest"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "si_common",
+    "importer": "loop_wiki/loopx-source-ingest/scripts/ingest.py",
+    "importer_module": "loopx-source-ingest",
+    "line": 101,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-source-ingest/scripts/si_common.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      20
+    ],
+    "target_module": "loopx-source-ingest"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "wf_cleanup",
+    "importer": "loop_wiki/loopx-worker-fleet/scripts/control_fleet.py",
+    "importer_module": "loopx-worker-fleet",
+    "line": 44,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-worker-fleet/scripts/wf_cleanup.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      42
+    ],
+    "target_module": "loopx-worker-fleet"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "wf_common",
+    "importer": "loop_wiki/loopx-worker-fleet/scripts/control_fleet.py",
+    "importer_module": "loopx-worker-fleet",
+    "line": 45,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-worker-fleet/scripts/wf_common.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      42
+    ],
+    "target_module": "loopx-worker-fleet"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "wf_cleanup",
+    "importer": "loop_wiki/loopx-worker-fleet/scripts/fleet.py",
+    "importer_module": "loopx-worker-fleet",
+    "line": 23,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-worker-fleet/scripts/wf_cleanup.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      21
+    ],
+    "target_module": "loopx-worker-fleet"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "wf_common",
+    "importer": "loop_wiki/loopx-worker-fleet/scripts/fleet.py",
+    "importer_module": "loopx-worker-fleet",
+    "line": 24,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-worker-fleet/scripts/wf_common.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      21
+    ],
+    "target_module": "loopx-worker-fleet"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "wf_contract",
+    "importer": "loop_wiki/loopx-worker-fleet/scripts/fleet.py",
+    "importer_module": "loopx-worker-fleet",
+    "line": 32,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-worker-fleet/scripts/wf_contract.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      21
+    ],
+    "target_module": "loopx-worker-fleet"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "wf_pipeline",
+    "importer": "loop_wiki/loopx-worker-fleet/scripts/fleet.py",
+    "importer_module": "loopx-worker-fleet",
+    "line": 33,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-worker-fleet/scripts/wf_pipeline.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      21
+    ],
+    "target_module": "loopx-worker-fleet"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "wf_receipt",
+    "importer": "loop_wiki/loopx-worker-fleet/scripts/fleet.py",
+    "importer_module": "loopx-worker-fleet",
+    "line": 34,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-worker-fleet/scripts/wf_receipt.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      21
+    ],
+    "target_module": "loopx-worker-fleet"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "wf_selftest",
+    "importer": "loop_wiki/loopx-worker-fleet/scripts/fleet.py",
+    "importer_module": "loopx-worker-fleet",
+    "line": 35,
+    "private_target": false,
+    "resolves_to": "loop_wiki/loopx-worker-fleet/scripts/wf_selftest.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      21
+    ],
+    "target_module": "loopx-worker-fleet"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "lsp_common",
+    "importer": "loop_wiki/lsp-pool/scripts/control_lsppool.py",
+    "importer_module": "lsp-pool",
+    "line": 37,
+    "private_target": false,
+    "resolves_to": "loop_wiki/lsp-pool/scripts/lsp_common.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      35
+    ],
+    "target_module": "lsp-pool"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "lsp_pipeline",
+    "importer": "loop_wiki/lsp-pool/scripts/control_lsppool.py",
+    "importer_module": "lsp-pool",
+    "line": 38,
+    "private_target": false,
+    "resolves_to": "loop_wiki/lsp-pool/scripts/lsp_pipeline.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      35
+    ],
+    "target_module": "lsp-pool"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "lsp_selftest",
+    "importer": "loop_wiki/lsp-pool/scripts/control_lsppool.py",
+    "importer_module": "lsp-pool",
+    "line": 39,
+    "private_target": false,
+    "resolves_to": "loop_wiki/lsp-pool/scripts/lsp_selftest.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      35
+    ],
+    "target_module": "lsp-pool"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "lsp_common",
+    "importer": "loop_wiki/lsp-pool/scripts/lsppool.py",
+    "importer_module": "lsp-pool",
+    "line": 20,
+    "private_target": false,
+    "resolves_to": "loop_wiki/lsp-pool/scripts/lsp_common.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      18
+    ],
+    "target_module": "lsp-pool"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "lsp_contract",
+    "importer": "loop_wiki/lsp-pool/scripts/lsppool.py",
+    "importer_module": "lsp-pool",
+    "line": 29,
+    "private_target": false,
+    "resolves_to": "loop_wiki/lsp-pool/scripts/lsp_contract.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      18
+    ],
+    "target_module": "lsp-pool"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "lsp_pipeline",
+    "importer": "loop_wiki/lsp-pool/scripts/lsppool.py",
+    "importer_module": "lsp-pool",
+    "line": 30,
+    "private_target": false,
+    "resolves_to": "loop_wiki/lsp-pool/scripts/lsp_pipeline.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      18
+    ],
+    "target_module": "lsp-pool"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "lsp_query",
+    "importer": "loop_wiki/lsp-pool/scripts/lsppool.py",
+    "importer_module": "lsp-pool",
+    "line": 31,
+    "private_target": false,
+    "resolves_to": "loop_wiki/lsp-pool/scripts/lsp_query.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      18
+    ],
+    "target_module": "lsp-pool"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "lsp_selftest",
+    "importer": "loop_wiki/lsp-pool/scripts/lsppool.py",
+    "importer_module": "lsp-pool",
+    "line": 32,
+    "private_target": false,
+    "resolves_to": "loop_wiki/lsp-pool/scripts/lsp_selftest.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      18
+    ],
+    "target_module": "lsp-pool"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "cp_common",
+    "importer": "scripts/gates/ci_parity/ci_parity.py",
+    "importer_module": "arena-core",
+    "line": 24,
+    "private_target": false,
+    "resolves_to": "scripts/gates/ci_parity/cp_common.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      22
+    ],
+    "target_module": "arena-core"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "cp_contract",
+    "importer": "scripts/gates/ci_parity/ci_parity.py",
+    "importer_module": "arena-core",
+    "line": 25,
+    "private_target": false,
+    "resolves_to": "scripts/gates/ci_parity/cp_contract.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      22
+    ],
+    "target_module": "arena-core"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "cp_index",
+    "importer": "scripts/gates/ci_parity/ci_parity.py",
+    "importer_module": "arena-core",
+    "line": 26,
+    "private_target": false,
+    "resolves_to": "scripts/gates/ci_parity/cp_index.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      22
+    ],
+    "target_module": "arena-core"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "cp_parity",
+    "importer": "scripts/gates/ci_parity/ci_parity.py",
+    "importer_module": "arena-core",
+    "line": 27,
+    "private_target": false,
+    "resolves_to": "scripts/gates/ci_parity/cp_parity.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      22
+    ],
+    "target_module": "arena-core"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "cp_selftest",
+    "importer": "scripts/gates/ci_parity/ci_parity.py",
+    "importer_module": "arena-core",
+    "line": 28,
+    "private_target": false,
+    "resolves_to": "scripts/gates/ci_parity/cp_selftest.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      22
+    ],
+    "target_module": "arena-core"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "cp_common",
+    "importer": "scripts/gates/ci_parity/control_ci_parity.py",
+    "importer_module": "arena-core",
+    "line": 32,
+    "private_target": false,
+    "resolves_to": "scripts/gates/ci_parity/cp_common.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      30
+    ],
+    "target_module": "arena-core"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "cp_index",
+    "importer": "scripts/gates/ci_parity/control_ci_parity.py",
+    "importer_module": "arena-core",
+    "line": 33,
+    "private_target": false,
+    "resolves_to": "scripts/gates/ci_parity/cp_index.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      30
+    ],
+    "target_module": "arena-core"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "cp_parity",
+    "importer": "scripts/gates/ci_parity/control_ci_parity.py",
+    "importer_module": "arena-core",
+    "line": 34,
+    "private_target": false,
+    "resolves_to": "scripts/gates/ci_parity/cp_parity.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      30
+    ],
+    "target_module": "arena-core"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "gt_admit",
+    "importer": "scripts/git-town/control_git_town.py",
+    "importer_module": "git-town-runtime",
+    "line": 36,
+    "private_target": false,
+    "resolves_to": "scripts/git-town/gt_admit.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      34
+    ],
+    "target_module": "git-town-runtime"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "gt_common",
+    "importer": "scripts/git-town/control_git_town.py",
+    "importer_module": "git-town-runtime",
+    "line": 37,
+    "private_target": false,
+    "resolves_to": "scripts/git-town/gt_common.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      34
+    ],
+    "target_module": "git-town-runtime"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "gt_fixture",
+    "importer": "scripts/git-town/control_git_town.py",
+    "importer_module": "git-town-runtime",
+    "line": 38,
+    "private_target": false,
+    "resolves_to": "scripts/git-town/gt_fixture.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      34
+    ],
+    "target_module": "git-town-runtime"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "gt_invariants",
+    "importer": "scripts/git-town/control_git_town.py",
+    "importer_module": "git-town-runtime",
+    "line": 39,
+    "private_target": false,
+    "resolves_to": "scripts/git-town/gt_invariants.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      34
+    ],
+    "target_module": "git-town-runtime"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "gt_admit",
+    "importer": "scripts/git-town/gittownctl.py",
+    "importer_module": "git-town-runtime",
+    "line": 28,
+    "private_target": false,
+    "resolves_to": "scripts/git-town/gt_admit.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      26
+    ],
+    "target_module": "git-town-runtime"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "gt_common",
+    "importer": "scripts/git-town/gittownctl.py",
+    "importer_module": "git-town-runtime",
+    "line": 33,
+    "private_target": false,
+    "resolves_to": "scripts/git-town/gt_common.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      26
+    ],
+    "target_module": "git-town-runtime"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "gt_contract",
+    "importer": "scripts/git-town/gittownctl.py",
+    "importer_module": "git-town-runtime",
+    "line": 42,
+    "private_target": false,
+    "resolves_to": "scripts/git-town/gt_contract.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      26
+    ],
+    "target_module": "git-town-runtime"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "gt_publish",
+    "importer": "scripts/git-town/gittownctl.py",
+    "importer_module": "git-town-runtime",
+    "line": 43,
+    "private_target": false,
+    "resolves_to": "scripts/git-town/gt_publish.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      26
+    ],
+    "target_module": "git-town-runtime"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "gt_selftest",
+    "importer": "scripts/git-town/gittownctl.py",
+    "importer_module": "git-town-runtime",
+    "line": 44,
+    "private_target": false,
+    "resolves_to": "scripts/git-town/gt_selftest.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      26
+    ],
+    "target_module": "git-town-runtime"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "hc_vocab",
+    "importer": "services/hitl-api/control_hitl.py",
+    "importer_module": "harness-console",
+    "line": 38,
+    "private_target": false,
+    "resolves_to": "packages/harness-console-contracts/hc_vocab.py",
+    "same_directory": false,
+    "sys_path_injected_at": [
+      35,
+      36
+    ],
+    "target_module": "harness-console"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "hitl_selftest",
+    "importer": "services/hitl-api/control_hitl.py",
+    "importer_module": "harness-console",
+    "line": 39,
+    "private_target": false,
+    "resolves_to": "services/hitl-api/hitl_selftest.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      35,
+      36
+    ],
+    "target_module": "harness-console"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "hc_vocab",
+    "importer": "services/hitl-api/hitl_reducer.py",
+    "importer_module": "harness-console",
+    "line": 26,
+    "private_target": false,
+    "resolves_to": "packages/harness-console-contracts/hc_vocab.py",
+    "same_directory": false,
+    "sys_path_injected_at": [
+      22
+    ],
+    "target_module": "harness-console"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "hc_vocab",
+    "importer": "services/hitl-api/hitl_request.py",
+    "importer_module": "harness-console",
+    "line": 30,
+    "private_target": false,
+    "resolves_to": "packages/harness-console-contracts/hc_vocab.py",
+    "same_directory": false,
+    "sys_path_injected_at": [
+      26
+    ],
+    "target_module": "harness-console"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "hc_vocab",
+    "importer": "services/hitl-api/hitl_request.py",
+    "importer_module": "harness-console",
+    "line": 127,
+    "private_target": false,
+    "resolves_to": "packages/harness-console-contracts/hc_vocab.py",
+    "same_directory": false,
+    "sys_path_injected_at": [
+      26
+    ],
+    "target_module": "harness-console"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "hc_vocab",
+    "importer": "services/hitl-api/hitl_selftest.py",
+    "importer_module": "harness-console",
+    "line": 21,
+    "private_target": false,
+    "resolves_to": "packages/harness-console-contracts/hc_vocab.py",
+    "same_directory": false,
+    "sys_path_injected_at": [
+      17,
+      18,
+      19
+    ],
+    "target_module": "harness-console"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "hc_views",
+    "importer": "services/hitl-api/hitl_selftest.py",
+    "importer_module": "harness-console",
+    "line": 31,
+    "private_target": false,
+    "resolves_to": "apps/harness-console/hc_views.py",
+    "same_directory": false,
+    "sys_path_injected_at": [
+      17,
+      18,
+      19
+    ],
+    "target_module": "harness-console"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "hitl_reducer",
+    "importer": "services/hitl-api/hitl_selftest.py",
+    "importer_module": "harness-console",
+    "line": 32,
+    "private_target": false,
+    "resolves_to": "services/hitl-api/hitl_reducer.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      17,
+      18,
+      19
+    ],
+    "target_module": "harness-console"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "hitl_request",
+    "importer": "services/hitl-api/hitl_selftest.py",
+    "importer_module": "harness-console",
+    "line": 33,
+    "private_target": false,
+    "resolves_to": "services/hitl-api/hitl_request.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      17,
+      18,
+      19
+    ],
+    "target_module": "harness-console"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "hitl_reducer",
+    "importer": "services/hitl-api/hitl_selftest.py",
+    "importer_module": "harness-console",
+    "line": 518,
+    "private_target": false,
+    "resolves_to": "services/hitl-api/hitl_reducer.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      17,
+      18,
+      19
+    ],
+    "target_module": "harness-console"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "hc_contract",
+    "importer": "services/hitl-api/hitlapi.py",
+    "importer_module": "harness-console",
+    "line": 32,
+    "private_target": false,
+    "resolves_to": "packages/harness-console-contracts/hc_contract.py",
+    "same_directory": false,
+    "sys_path_injected_at": [
+      28,
+      29,
+      30
+    ],
+    "target_module": "harness-console"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "hc_vocab",
+    "importer": "services/hitl-api/hitlapi.py",
+    "importer_module": "harness-console",
+    "line": 33,
+    "private_target": false,
+    "resolves_to": "packages/harness-console-contracts/hc_vocab.py",
+    "same_directory": false,
+    "sys_path_injected_at": [
+      28,
+      29,
+      30
+    ],
+    "target_module": "harness-console"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "hc_views",
+    "importer": "services/hitl-api/hitlapi.py",
+    "importer_module": "harness-console",
+    "line": 34,
+    "private_target": false,
+    "resolves_to": "apps/harness-console/hc_views.py",
+    "same_directory": false,
+    "sys_path_injected_at": [
+      28,
+      29,
+      30
+    ],
+    "target_module": "harness-console"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "hitl_reducer",
+    "importer": "services/hitl-api/hitlapi.py",
+    "importer_module": "harness-console",
+    "line": 35,
+    "private_target": false,
+    "resolves_to": "services/hitl-api/hitl_reducer.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      28,
+      29,
+      30
+    ],
+    "target_module": "harness-console"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "hitl_request",
+    "importer": "services/hitl-api/hitlapi.py",
+    "importer_module": "harness-console",
+    "line": 36,
+    "private_target": false,
+    "resolves_to": "services/hitl-api/hitl_request.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      28,
+      29,
+      30
+    ],
+    "target_module": "harness-console"
+  },
+  {
+    "cross_arena_module": false,
+    "imported_name": "hitl_selftest",
+    "importer": "services/hitl-api/hitlapi.py",
+    "importer_module": "harness-console",
+    "line": 37,
+    "private_target": false,
+    "resolves_to": "services/hitl-api/hitl_selftest.py",
+    "same_directory": true,
+    "sys_path_injected_at": [
+      28,
+      29,
+      30
+    ],
+    "target_module": "harness-console"
+  }
+]

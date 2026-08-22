@@ -1,0 +1,427 @@
+{
+  "artifact_validation": {
+    "exit_code": 0,
+    "result": "20/20 artifacts validate against their frozen schema",
+    "script": "/private/tmp/claude-501/-Users-neon-skills-shared/d4ad227a-6352-4bfb-8ddc-f80eec30efaf/scratchpad/canary-528/validate_artifacts.py"
+  },
+  "consumer_selection": {
+    "admission_source": "Human goal directive 2026-08-22",
+    "clone_path": "/private/tmp/claude-501/-Users-neon-skills-shared/d4ad227a-6352-4bfb-8ddc-f80eec30efaf/scratchpad/canary-528/consumer",
+    "consumer": "bettor-arena",
+    "origin_access": "READ_ONLY: cloned, never written",
+    "origin_path": "/Users/neon/bettor-arena",
+    "publication": "HUMAN_ADMIT_REQUIRED",
+    "rationale": "bettor-arena is the four-repository system's designated Integration/Acceptance Plane (skills-shared CONTEXT.md), public, owner-controlled."
+  },
+  "evidence_ceiling": "One canary, one consumer, one host, one bounded violation, one session. It shows that the tree-sitter live lane, the SQLite ledger and the KEYWORD semantic lane run against a real external checkout and that the R1 protocol compiles over a change that was really applied. It shows nothing about cross-language accuracy, false-positive rate, provider reliability, production safety, or whether this change should be merged.",
+  "exit_tokens": {
+    "DTCR_REAL_CONSUMER_CANARY_VERIFIED": "NOT_CLAIMED - no canary checker exists in the tree to print it, and this receipt is not that checker",
+    "FINAL_HUMAN_ADMISSION_PACKET_READY": "NOT_CLAIMED - a Human comment naming the exact consumer commit is the only thing that may say this"
+  },
+  "fact_planes": {
+    "buf_contract_compatibility": {
+      "reason": "the canary slice contains no protobuf or service contract; #549 remains BLOCKED_ON_PROVIDER upstream",
+      "state": "NOT_APPLICABLE"
+    },
+    "scip_live": {
+      "attempt_command": "adapters/scip/adapter.py live --package consumer/scripts/gates/controlled_language_binding --repo consumer",
+      "attempt_evidence": "/private/tmp/claude-501/-Users-neon-skills-shared/d4ad227a-6352-4bfb-8ddc-f80eec30efaf/scratchpad/canary-528/facts/scip-live.stderr",
+      "attempt_exit_code": 1,
+      "attempted": true,
+      "defect_nominated": "the missing pyrightconfig.json produces an uncaught FileNotFoundError and exit 1, not one of the adapter's three contracted exits (0/2/70) and not a named Refusal. A consumer that does not use pyright gets a traceback where it should get PROVIDER_ABSENT-class refusal.",
+      "provider_available": "scip-python 0.6.6 at /Users/neon/.nvm/versions/node/v22.17.1/bin/scip-python",
+      "reason": "adapters/scip/adapter.py run_live reads <package>/pyrightconfig.json unconditionally (adapter.py:1252) and live_subject then requires that file to be a committed blob of the subject. bettor-arena ships no pyrightconfig.json anywhere at 13ff9840fc5683b33670fa191591035bc96292dc, so the lane cannot be entered without first committing a file into the consumer outside the refactor lease and moving the exact subject the canary is about.",
+      "state": "NOT_EXERCISED"
+    },
+    "sqlite_ledger": {
+      "adapter": "skills/dual-track-code-review-loop/adapters/sqlite-ledger/ledger.py",
+      "after": {
+        "cycle_guard_fired": false,
+        "database_sha256": "2571dc1df02d1a4c1a2374918953d9265caaff019c9844db8b794dfa3996e232",
+        "edge_denominator": 6,
+        "nodes_visited": [
+          {
+            "normalization": {
+              "scheme": "dtcr canary repo-relative python module path",
+              "scheme_digest": "56f493468484422954cc607dff4086602ca3e344d89b595ec004391d5caa59d2"
+            },
+            "provider_scoped_id": "scripts/gates/_gate_common.py"
+          },
+          {
+            "normalization": {
+              "scheme": "dtcr canary repo-relative python module path",
+              "scheme_digest": "56f493468484422954cc607dff4086602ca3e344d89b595ec004391d5caa59d2"
+            },
+            "provider_scoped_id": "scripts/gates/check_placement.py"
+          },
+          {
+            "normalization": {
+              "scheme": "dtcr canary repo-relative python module path",
+              "scheme_digest": "56f493468484422954cc607dff4086602ca3e344d89b595ec004391d5caa59d2"
+            },
+            "provider_scoped_id": "scripts/gates/check_runtime_env_binding.py"
+          },
+          {
+            "normalization": {
+              "scheme": "dtcr canary repo-relative python module path",
+              "scheme_digest": "56f493468484422954cc607dff4086602ca3e344d89b595ec004391d5caa59d2"
+            },
+            "provider_scoped_id": "scripts/gates/check_skill_pointers.py"
+          },
+          {
+            "normalization": {
+              "scheme": "dtcr canary repo-relative python module path",
+              "scheme_digest": "56f493468484422954cc607dff4086602ca3e344d89b595ec004391d5caa59d2"
+            },
+            "provider_scoped_id": "scripts/gates/check_credential_hygiene.py"
+          },
+          {
+            "normalization": {
+              "scheme": "dtcr canary repo-relative python module path",
+              "scheme_digest": "56f493468484422954cc607dff4086602ca3e344d89b595ec004391d5caa59d2"
+            },
+            "provider_scoped_id": "scripts/gates/check_delivery_receipt.py"
+          },
+          {
+            "normalization": {
+              "scheme": "dtcr canary repo-relative python module path",
+              "scheme_digest": "56f493468484422954cc607dff4086602ca3e344d89b595ec004391d5caa59d2"
+            },
+            "provider_scoped_id": "scripts/gates/check_root_coupling.py"
+          }
+        ],
+        "receipt": "/private/tmp/claude-501/-Users-neon-skills-shared/d4ad227a-6352-4bfb-8ddc-f80eec30efaf/scratchpad/canary-528/facts/ledger-receipt-after.json",
+        "receipt_sha256": "918b5db43f5399866f671295dfbf74da85ef6fb821c710b3d69e1d788b0c0068",
+        "row_counts": {
+          "edge": 6,
+          "event": 16,
+          "fact": 15,
+          "node": 9
+        }
+      },
+      "before": {
+        "cycle_guard_fired": false,
+        "database_sha256": "ae922cb321a8cd505f37e1a1b2e00f824655ffa1e4868507e0d04cc58aaf2108",
+        "edge_denominator": 8,
+        "nodes_visited": [
+          {
+            "normalization": {
+              "scheme": "dtcr canary repo-relative python module path",
+              "scheme_digest": "56f493468484422954cc607dff4086602ca3e344d89b595ec004391d5caa59d2"
+            },
+            "provider_scoped_id": "scripts/gates/_gate_common.py"
+          },
+          {
+            "normalization": {
+              "scheme": "dtcr canary repo-relative python module path",
+              "scheme_digest": "56f493468484422954cc607dff4086602ca3e344d89b595ec004391d5caa59d2"
+            },
+            "provider_scoped_id": "scripts/gates/check_placement.py"
+          },
+          {
+            "normalization": {
+              "scheme": "dtcr canary repo-relative python module path",
+              "scheme_digest": "56f493468484422954cc607dff4086602ca3e344d89b595ec004391d5caa59d2"
+            },
+            "provider_scoped_id": "scripts/delivery_status.py"
+          },
+          {
+            "normalization": {
+              "scheme": "dtcr canary repo-relative python module path",
+              "scheme_digest": "56f493468484422954cc607dff4086602ca3e344d89b595ec004391d5caa59d2"
+            },
+            "provider_scoped_id": "scripts/gates/check_runtime_env_binding.py"
+          },
+          {
+            "normalization": {
+              "scheme": "dtcr canary repo-relative python module path",
+              "scheme_digest": "56f493468484422954cc607dff4086602ca3e344d89b595ec004391d5caa59d2"
+            },
+            "provider_scoped_id": "scripts/gates/check_skill_pointers.py"
+          },
+          {
+            "normalization": {
+              "scheme": "dtcr canary repo-relative python module path",
+              "scheme_digest": "56f493468484422954cc607dff4086602ca3e344d89b595ec004391d5caa59d2"
+            },
+            "provider_scoped_id": "scripts/gates/check_credential_hygiene.py"
+          },
+          {
+            "normalization": {
+              "scheme": "dtcr canary repo-relative python module path",
+              "scheme_digest": "56f493468484422954cc607dff4086602ca3e344d89b595ec004391d5caa59d2"
+            },
+            "provider_scoped_id": "scripts/delivery_sync.py"
+          },
+          {
+            "normalization": {
+              "scheme": "dtcr canary repo-relative python module path",
+              "scheme_digest": "56f493468484422954cc607dff4086602ca3e344d89b595ec004391d5caa59d2"
+            },
+            "provider_scoped_id": "scripts/gates/check_delivery_receipt.py"
+          },
+          {
+            "normalization": {
+              "scheme": "dtcr canary repo-relative python module path",
+              "scheme_digest": "56f493468484422954cc607dff4086602ca3e344d89b595ec004391d5caa59d2"
+            },
+            "provider_scoped_id": "scripts/gates/check_root_coupling.py"
+          }
+        ],
+        "receipt": "/private/tmp/claude-501/-Users-neon-skills-shared/d4ad227a-6352-4bfb-8ddc-f80eec30efaf/scratchpad/canary-528/facts/ledger-receipt-before.json",
+        "receipt_sha256": "6ce6a1a97ad3344e841718acc997fb647701b87c0f3aff9f45e8ce2e6c177e94",
+        "row_counts": {
+          "edge": 8,
+          "event": 18,
+          "fact": 17,
+          "node": 9
+        }
+      },
+      "state": "EXERCISED",
+      "upstream_producer": {
+        "edge_completeness": "PARTIAL_LOWER_BOUND",
+        "edge_provenance": "TEXTUAL_MATCH",
+        "name": "dtcr-canary-python-import-scan",
+        "script": "/private/tmp/claude-501/-Users-neon-skills-shared/d4ad227a-6352-4bfb-8ddc-f80eec30efaf/scratchpad/canary-528/emit_observations.py",
+        "state": "CANARY_LOCAL_NOT_AN_ADMITTED_DTCR_ADAPTER",
+        "why": "the ledger ingests dtcr/symbol-fact/v1 rows and the only in-tree producer of those is the SCIP adapter, whose live lane this consumer cannot satisfy (see scip_live)."
+      }
+    },
+    "tree_sitter_live": {
+      "adapter": "skills/dual-track-code-review-loop/adapters/tree-sitter/adapter.py live",
+      "after": {
+        "completeness": "COMPLETE_FOR_ANALYSED_INPUTS",
+        "coverage": {
+          "denominator": 9,
+          "denominator_definition": "source blobs declared by the exact source subject and offered to this pass",
+          "method": "one tree-sitter parse and one tree-sitter query invocation per declared blob at the pinned bundle digest",
+          "numerator": 9
+        },
+        "matches": 60,
+        "receipt": "/private/tmp/claude-501/-Users-neon-skills-shared/d4ad227a-6352-4bfb-8ddc-f80eec30efaf/scratchpad/canary-528/facts/tree-sitter-receipt-after.json",
+        "subject_commit": "8a21426751c0fec3c99450cdb00294e843a9d950"
+      },
+      "before": {
+        "completeness": "COMPLETE_FOR_ANALYSED_INPUTS",
+        "coverage": {
+          "denominator": 9,
+          "denominator_definition": "source blobs declared by the exact source subject and offered to this pass",
+          "method": "one tree-sitter parse and one tree-sitter query invocation per declared blob at the pinned bundle digest",
+          "numerator": 9
+        },
+        "matches": 60,
+        "receipt": "/private/tmp/claude-501/-Users-neon-skills-shared/d4ad227a-6352-4bfb-8ddc-f80eec30efaf/scratchpad/canary-528/facts/tree-sitter-receipt-before.json",
+        "subject_commit": "13ff9840fc5683b33670fa191591035bc96292dc"
+      },
+      "provider": {
+        "abi_version": 15,
+        "config_digest": "5633dcc18a56c8d5af8fd89af8a9de3b4cd42eb4202c1bc9f1b28216f2ec1f0a",
+        "executable_location": "resolved from DTCR_TS_BIN or PATH; the install path is one machine and is not part of the identity",
+        "executable_name": "tree-sitter",
+        "executable_sha256": "002b151eb3aee02c453b3feacb73e672a6b11aa7b6a14d028afb98f27b40a7aa",
+        "grammar_digest": "94ead290935e18cd938342612205e3ec29bcc27def409a3022a21e6a7457c8de",
+        "grammar_license": "MIT, held by the grammar project. The Tree-sitter framework's own licence does not admit it and does not cover it.",
+        "grammar_source": "tree-sitter-python 0.25.0, vendored grammar sources as published on crates.io",
+        "language": "python",
+        "provider_binding_id": "DTCR-PB-549d4e258f0b1cef",
+        "query_digest": "b654af47b88da389ffc06cb0dd20c008a8f747657b01417653e796e99e07328d",
+        "version": "0.26.3"
+      },
+      "state": "EXERCISED"
+    }
+  },
+  "issue": "ed3c/skills-shared#528",
+  "lease": {
+    "diff_name_only": [
+      "scripts/delivery_status.py",
+      "scripts/delivery_sync.py"
+    ],
+    "frozen_oracle_digests_pre_post_equal": {
+      "scripts/gates/_gate_common.py": "108afba547eb5374aab7eedf04ee3cbf8dd84a041797e01fdee5c22b5c005b11",
+      "scripts/gates/check_delivery_receipt.py": "d57325a2d94e73be23cb9f5473062e5da1ed807841e18d3d37d21b132f25530f",
+      "tests/test_delivery_command.sh": "93d7dc7b12bf5fb477ecf01fb5c79f40f578510e768cf265a17577fc205ccb06"
+    },
+    "paths": [
+      "scripts/delivery_status.py",
+      "scripts/delivery_sync.py"
+    ],
+    "within_lease": true,
+    "writers": [
+      "agent-subagent"
+    ]
+  },
+  "method_plane": {
+    "access": "READ_ONLY: no file in the method plane was written, staged or committed by this canary",
+    "checkout": "/Users/neon/skills-shared/.claude/worktrees/agent+dtcr-impl-wave",
+    "skill_path": "skills/dual-track-code-review-loop"
+  },
+  "oracle": {
+    "first_oracle_was_vacuous": "The first oracle used tests/test_delivery_command.sh alone on the assumption it ran each operator's --selftest. Planted control m1 stayed green, which is how the assumption was caught: that test extracts script paths from .claude/commands/delivery.md, and the forwarder names none. The lanes were rebuilt on commands that load the changed files.",
+    "independent_arrivals": {
+      "PROD_ADJACENT": "python3 scripts/delivery_status.py with no arguments, run at the pre and the post state: both exit 2 with the identical stdout line and empty stderr, i.e. both resolve the root, read the registry, find the same line and stop only at the network. Evidence: oracle/live-before-status.* and oracle/live-after-status.*",
+      "SANDBOX": "each operator's own --selftest battery plus the gates lane's check_delivery_receipt --selftest",
+      "STATIC": "scripts/gates/fast_quality.sh on both changed files: ruff format --check + ruff check, exit 0"
+    },
+    "logs": [
+      "/private/tmp/claude-501/-Users-neon-skills-shared/d4ad227a-6352-4bfb-8ddc-f80eec30efaf/scratchpad/canary-528/oracle/oracle-before.log",
+      "/private/tmp/claude-501/-Users-neon-skills-shared/d4ad227a-6352-4bfb-8ddc-f80eec30efaf/scratchpad/canary-528/oracle/oracle-after.log",
+      "/private/tmp/claude-501/-Users-neon-skills-shared/d4ad227a-6352-4bfb-8ddc-f80eec30efaf/scratchpad/canary-528/oracle/red-controls.txt"
+    ],
+    "note": "Every lane is a control the consumer already ships at the rollback subject. No lane was written for this canary and no lane was edited by it.",
+    "runs": {
+      "after": {
+        "exit_code": 0,
+        "lanes": {
+          "delivery_command_contract": 0,
+          "delivery_receipt_gate": 0,
+          "delivery_status_selftest": 0,
+          "delivery_sync_selftest": 0
+        }
+      },
+      "before": {
+        "exit_code": 0,
+        "lanes": {
+          "delivery_command_contract": 0,
+          "delivery_receipt_gate": 0,
+          "delivery_status_selftest": 0,
+          "delivery_sync_selftest": 0
+        }
+      },
+      "deliberately_broken": {
+        "m1_render_missing_default": {
+          "frozen_oracle_exit_code": 1,
+          "target": "scripts/delivery_status.py render()'s MISSING assertion",
+          "verdict": "RED as required"
+        },
+        "m2_repo_root_off_by_one": {
+          "frozen_oracle_exit_code": 0,
+          "live_probe_exit_code": 64,
+          "target": "the REPO_ROOT line this refactor introduced (parents[1] -> parents[0])",
+          "verdict": "the live no-argument probe goes RED (64, 'not inside a git work tree'); the frozen selftests stay GREEN. That blindness is measured, not assumed, and it is this canary's coverage ceiling."
+        }
+      }
+    },
+    "three_exit_codes": {
+      "after": 0,
+      "before": 0,
+      "deliberately_broken": 1
+    }
+  },
+  "r1_protocol": {
+    "application_note": "compile_r1.py applies nothing by contract (module docstring: 'It does not apply anything. No file in any repository is read, written or parsed here') and pins establishes.applied_on_real_codebase false on every receipt it emits (compile_r1.py:619-622). The change units were therefore written by hand following the R1 phases, and each phase's artifact was bound to its frozen schema. Nothing is claimed through the compiler that the compiler refuses.",
+    "application_path": "HAND_APPLIED",
+    "blocked_on": [
+      "SEMANTIC_INDEX_NOT_REBUILT",
+      "TYPECHECK_NOT_RUN"
+    ],
+    "check_exit_code": 0,
+    "compile_exit_code": 0,
+    "compiler": "skills/dual-track-code-review-loop/refactor/compile_r1.py",
+    "compiler_defects_nominated": [
+      "compile_r1.py accepts a violation_ref and an adapter_binding_id that the frozen schemas refuse (^DTCR-VC-[0-9]{3}$ and ^DTCR-AD-[0-9a-f]{16}$), so a request can compile DTCR-R1-GREEN and still emit artifacts refused by references/schemas/. Both were hit on the first real request and both are fixed here by editing the request, not the schema."
+    ],
+    "honest_understatement": "reindex_state is NOT_REINDEXED because no SCIP index was rebuilt. The SQLite architecture assertion WAS performed (ledger-traverse-after.json, forbidden edges 0) but compile_r1.py gates SQLITE_ARCHITECTURE_ASSERTED behind the same flag as SCIP_REINDEXED, so a run with a working graph ledger and no SCIP provider cannot record its architecture assertion without also claiming a reindex that did not happen. Understating was chosen over overstating.",
+    "projection": "/private/tmp/claude-501/-Users-neon-skills-shared/d4ad227a-6352-4bfb-8ddc-f80eec30efaf/scratchpad/canary-528/r1/r1-projection.json",
+    "request": "/private/tmp/claude-501/-Users-neon-skills-shared/d4ad227a-6352-4bfb-8ddc-f80eec30efaf/scratchpad/canary-528/r1/r1-request.json",
+    "states_entered": [
+      "VIOLATION_BOUND",
+      "USAGE_SIGNATURE_EXTRACTED",
+      "MINIMAL_PORT_PROPOSED",
+      "CHANGESET_AND_LEASE_BOUND",
+      "DOMAIN_DEPENDENCY_INVERTED",
+      "COMPOSITION_ROOT_UPDATED",
+      "TYPECHECK_AND_TEST_READBACK",
+      "GLOBAL_BEHAVIOR_ASSERTED"
+    ],
+    "terminal_state": "BLOCKED"
+  },
+  "residuals": {
+    "consumer_upstream_admission": "HUMAN_ADMIT_REQUIRED - bettor-arena's owner has not admitted this change",
+    "cross_repo_r2_migration": "NOT_EXERCISED - this canary selected SINGLE_REPO_DEPENDENCY_INVERSION; no cross-repository contraction was attempted and none is claimed",
+    "harness_scaffolding": "bin/mktemp is a sandbox shim supplying an explicit template because BSD mktemp ignores TMPDIR; TMPDIR is redirected into scratch. Neither touches any file in the consumer.",
+    "independent_shadow": "NOT_EXERCISED - one session, one provider; no second provider replayed this subject and no shadow-canary receipt exists",
+    "legal_employment_ip": "HUMAN_ADMIT_REQUIRED",
+    "merge_publication": "HUMAN_ADMIT_REQUIRED - the canary commit lives only in a local clone, was never pushed, and no remote of any kind was contacted",
+    "physical_device_real_user_payment": "NOT_EXERCISED - no lane in this canary touches any of them",
+    "scip_fact_plane": "NOT_EXERCISED - see fact_planes.scip_live.reason",
+    "typecheck_lane": "NOT_RUN - no mypy or pyright on this host; ruff is a linter and was not reported as a typecheck",
+    "vector_semantic_lane": "BLOCKED_ON_PROVIDER - no embedding provider bound"
+  },
+  "role": "CONSUMER_CANARY_WORKER",
+  "runtime": "CLAUDE_CODE_LOCAL",
+  "schema": "dtcr/consumer-canary-receipt/v0-draft",
+  "schema_note": "No frozen DTCR schema fits this artifact. references/schemas/refactor-r1-receipt.schema.json pins establishes.applied_on_real_codebase to const false by design, so no committed receipt type in the tree can carry a refactor that was actually applied to a consumer. This document is emitted as a draft rather than forced into a schema it does not satisfy; every artifact it cites that DOES have a frozen schema was validated against it (see artifact_validation).",
+  "semantic_plane": {
+    "adapter": "skills/dual-track-code-review-loop/adapters/semantic-context/semantic_context.py query --lane KEYWORD",
+    "asymmetry_held": "every returned row is NON_AUTHORITATIVE_CANDIDATE and carries a source back reference; the violation's basis is the deterministic import edge, and retrieval only names the recorded decision that makes the edge matter.",
+    "candidate_denominator": 3,
+    "consumed_rows": [
+      {
+        "authority": "NON_AUTHORITATIVE_CANDIDATE",
+        "back_reference_ref": "DTCR-BK-002",
+        "document_ref": "DTCR-DOC-002",
+        "rank": 1
+      },
+      {
+        "authority": "NON_AUTHORITATIVE_CANDIDATE",
+        "back_reference_ref": "DTCR-BK-003",
+        "document_ref": "DTCR-DOC-003",
+        "rank": 2
+      },
+      {
+        "authority": "NON_AUTHORITATIVE_CANDIDATE",
+        "back_reference_ref": "DTCR-BK-001",
+        "document_ref": "DTCR-DOC-001",
+        "rank": 3
+      }
+    ],
+    "corpus": "/private/tmp/claude-501/-Users-neon-skills-shared/d4ad227a-6352-4bfb-8ddc-f80eec30efaf/scratchpad/canary-528/semantic/corpus.json",
+    "corpus_note": "three whole committed blobs of the consumer at the canary commit, each with a repository-blob back reference",
+    "lane_requires_provider": false,
+    "registered_documents": 3,
+    "returned_denominator": 3,
+    "state": "EXERCISED_KEYWORD_LANE",
+    "vector_lane": "BLOCKED_ON_PROVIDER (no embedding provider bound; #550/#521 upstream)"
+  },
+  "subject": {
+    "branch": "main",
+    "canary_commit": "8a21426751c0fec3c99450cdb00294e843a9d950",
+    "canary_tree": "3f56b60423ba936659e255b447e3d5c2a1e7fd65",
+    "clean_read_back": {
+      "empty": true,
+      "git_status_porcelain": ""
+    },
+    "repository_binding_id": "DTCR-RB-6be7b56b680c0cc5",
+    "rollback_subject_commit": "13ff9840fc5683b33670fa191591035bc96292dc",
+    "rollback_subject_tree": "947ba9a2c19268b95414a2918b88283d23a0ce2c",
+    "thin_binding": {
+      "copied_shared_skill_count": 0,
+      "copied_shared_skill_paths": ""
+    }
+  },
+  "violation": {
+    "evidence": [
+      "scripts/delivery_status.py:33-34 (sys.path.insert then `from _gate_common import repo_root`)",
+      "scripts/delivery_sync.py:31-32 (same shape)",
+      "scripts/delivery_status.py:212 and scripts/delivery_sync.py:306 (the single consuming call site in each)"
+    ],
+    "fact_plane_rows": {
+      "after_forbidden_edges": [],
+      "after_total_import_edges": 6,
+      "before_forbidden_edges": [
+        "scripts/delivery_status.py:34 -> scripts/gates/_gate_common.py",
+        "scripts/delivery_sync.py:32 -> scripts/gates/_gate_common.py"
+      ],
+      "before_total_import_edges": 8,
+      "legitimate_same_directory_gate_imports_preserved": 6
+    },
+    "id": "DTCR-VC-001",
+    "invariants_breached": [
+      "docs/architecture/DOMAIN_DECOUPLING.md:199-206 - Forbidden: relative import of another module's private script",
+      "scripts/gates/_gate_common.py:1-9 - the provider's own declared consumer set ('the scripts/gates/ checkers') and resolution contract ('sys.path[0] is this directory when a gate runs as a script')"
+    ],
+    "scan": "/private/tmp/claude-501/-Users-neon-skills-shared/d4ad227a-6352-4bfb-8ddc-f80eec30efaf/scratchpad/canary-528/cross-module-imports.json",
+    "scope_ceiling": "arena-core owns both scripts/gates and scripts/delivery_*.py (.arena/modules/arena-core/module.json roots), so this is a component-boundary crossing INSIDE one .arena module, not a cross-module one. A repo-wide scan of 354 python files found zero cross-.arena-module imports and exactly these two private-module imports from outside the owning directory.",
+    "title": "delivery operators import the gates lane's private plumbing through an injected sys.path"
+  }
+}
