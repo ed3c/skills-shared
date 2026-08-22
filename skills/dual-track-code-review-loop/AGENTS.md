@@ -139,10 +139,12 @@ stop blind repair and open a fresh diagnosis on a new isolated worktree.
 
 Preserve the states `PASS`, `FAIL`, `ABSENT`, `NOT_IMPLEMENTED`,
 `NOT_EXERCISED`, `SKIPPED_BY_POLICY`, `NOT_APPLICABLE` and
-`HUMAN_ADMIT_REQUIRED`. This directory currently establishes contract and schema
-evidence only. It does not establish a working adapter, an applied refactor, a
-live consumer, an independent review, legal clearance, merge, release or
-production, and no accumulation of contract evidence reaches any of them.
+`HUMAN_ADMIT_REQUIRED`. This directory currently establishes contract, schema and
+deterministic adapter evidence (tree-sitter with a live receipt, sqlite-ledger
+with planted mutations). It does not establish a SCIP, Buf or semantic-context
+adapter, an applied refactor on a real codebase, a live consumer, an
+independent review, legal clearance, merge, release or production, and no
+accumulation of deterministic evidence reaches any of them.
 
 ## Completion report
 

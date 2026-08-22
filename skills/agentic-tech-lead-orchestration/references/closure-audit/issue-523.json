@@ -1,0 +1,69 @@
+{
+ "schema_version": "agentic-tech-lead/issue-closure-contract/v1",
+ "issue": {
+  "repository": "ed3c/skills-shared",
+  "number": 523,
+  "github_state": "CLOSED",
+  "github_state_reason": "COMPLETED"
+ },
+ "disposition": "DIRECTLY_LANDED",
+ "acceptance": [
+  {
+   "id": "r1-protocol-compiler-contracts-landed",
+   "status": "SATISFIED",
+   "successor": null,
+   "rationale": "refactor/compile_r1.py, selftest.py and four frozen R1 contracts landed via PR #571 (feature 5dfdbac35248124eaa58f30737de617bc0232c4b), suite-counted by tests/run-all.sh"
+  },
+  {
+   "id": "at-least-two-language-fixtures",
+   "status": "SATISFIED",
+   "successor": null,
+   "rationale": "five committed fixture pairs across four languages (go, java, python, typescript) under refactor/fixtures/, including blocked/typecheck-failed/rolled-back negative paths; ceiling: language rewrite adapters are DECLARED_NOT_VENDORED, so this satisfies the fixture half of the exit only, not language-adapter availability"
+  },
+  {
+   "id": "one-real-bounded-consumer-canary",
+   "status": "TRANSFERRED",
+   "successor": "ed3c/skills-shared#528",
+   "rationale": "per the closing comment (2026-08-21T17:16:37Z) the five committed requests are synthetic and applied_on_real_codebase is contract-pinned false; the real bounded consumer canary is #528's deliverable"
+  },
+  {
+   "id": "exit-terminal-DTCR_SINGLE_REPO_REFACTOR_PROTOCOL_READY",
+   "status": "TRANSFERRED",
+   "successor": "ed3c/skills-shared#528",
+   "rationale": "the closing comment states the terminal is NOT admitted; closure records landed deterministic bytes only, not the protocol-ready terminal"
+  }
+ ],
+ "implementation": {
+  "candidate_prs": [
+   {
+    "repository": "ed3c/skills-shared",
+    "number": 571,
+    "state": "CLOSED",
+    "merged": true,
+    "classification": "DIRECT"
+   }
+  ],
+  "landing": {
+   "repository": "ed3c/skills-shared",
+   "via_pr": 571,
+   "commit": "28f394785aa8b13c4e6d2f21ad74c5e32a6a6dc5",
+   "tree": "8343d988e98d044402ccfbcd2cbe0e848f6e649f"
+  }
+ },
+ "residual": [
+  {
+   "id": "real-codebase-application",
+   "state": "NOT_EXERCISED",
+   "owner": "ed3c/skills-shared#528"
+  },
+  {
+   "id": "independent-shadow-review",
+   "state": "NOT_EXERCISED",
+   "owner": "ed3c/skills-shared#525"
+  }
+ ],
+ "evidence_ceiling": "DETERMINISTIC",
+ "shadow_review": {
+  "verdict": "HUMAN_ADMIT_REQUIRED"
+ }
+}
