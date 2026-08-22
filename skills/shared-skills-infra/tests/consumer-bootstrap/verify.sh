@@ -22,3 +22,8 @@ python3 skills/shared-skills-infra/tests/consumer-bootstrap/verify_real_attach.p
 # bootstrap sharing this module family's primitives -- unconditional, no
 # existence guard, so it cannot silently fall out of this already-CI-wired step.
 bash "$(dirname "${BASH_SOURCE[0]}")/../consumer-bootstrap-ghpc/verify.sh"
+
+# #527: the dual-track-code-review-loop profile is the third profile-namespaced
+# bootstrap on the same primitives -- chained unconditionally for the same
+# reason: the hosted workflow enumerates sub-suites by name.
+bash "$(dirname "${BASH_SOURCE[0]}")/../consumer-bootstrap-dtcr/verify.sh"
