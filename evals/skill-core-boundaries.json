@@ -25,6 +25,7 @@
     {"name":"git-town-stacked-pr-worker","domain_module":"modules/domain-profile.md","forbidden_core_tokens":["github","actions","forgejo","glab"]},
     {"name":"dual-forge-repository-loop","domain_module":"modules/domain-profile.md","forbidden_core_tokens":["github","forgejo","actions","codex","claude"]},
     {"name":"agentic-tech-lead-orchestration","domain_module":"modules/domain-profile.md","forbidden_core_tokens":["grepai","scip","tree-sitter","serena","lancedb"]},
-    {"name":"product-reverse-engineering-loop","domain_module":"modules/domain-profile.md","forbidden_core_tokens":["refs/heads/","/users/","origin/","github.com","gitlab.com"]}
+    {"name":"product-reverse-engineering-loop","domain_module":"modules/domain-profile.md","forbidden_core_tokens":["refs/heads/","/users/","origin/","github.com","gitlab.com"]},
+    {"name":"human-led-agentic-engineering","domain_module":"modules/domain-profile.md","forbidden_core_tokens":["claude","codex","gemini","github","gitlab","forgejo","openai"]}
   ]
 }
