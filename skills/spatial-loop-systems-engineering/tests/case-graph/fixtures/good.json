@@ -17,6 +17,10 @@
     {"id": "SRC-001", "statement": "Legacy-compatible request shape is accepted.", "disposition": "PRESERVE_OBSERVABLE", "decision_id": null},
     {"id": "SRC-002", "statement": "Decision branch B returns the source-specific result for condition X.", "disposition": "PRESERVE_EXACT", "decision_id": null}
   ],
+  "invariants": [
+    {"id": "INV-COMPAT", "statement": "The migrated interface stays observably compatible with the legacy request shape."},
+    {"id": "INV-BRANCH-B", "statement": "Decision branch B still returns the source-specific result for condition X."}
+  ],
   "cases": [
     {
       "id": "CASE-001",

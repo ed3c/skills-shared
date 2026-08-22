@@ -24,6 +24,7 @@
     "oracles": {"type": "array", "items": {"$ref": "#/$defs/oracle"}},
     "evidence": {"type": "array", "items": {"$ref": "#/$defs/evidence"}},
     "decisions": {"type": "array", "items": {"$ref": "#/$defs/decision"}},
+    "invariants": {"type": "array", "items": {"$ref": "#/$defs/invariant"}},
     "edges": {"type": "array", "items": {"$ref": "#/$defs/edge"}},
     "coverage": {
       "type": "object",
@@ -138,6 +139,15 @@
         "id": {"type": "string", "minLength": 1},
         "authority": {"type": "string", "minLength": 1},
         "rationale": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": true
+    },
+    "invariant": {
+      "type": "object",
+      "required": ["id", "statement"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "statement": {"type": "string", "minLength": 1}
       },
       "additionalProperties": true
     },

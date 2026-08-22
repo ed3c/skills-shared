@@ -8,9 +8,9 @@ It records the current program shape; it is not a substitute for exact issue/PR/
 
 | Real problem | Canonical owner | Current deterministic state | Higher evidence still required |
 |---|---|---|---|
-| Short prompts can suppress source behavior / use cases / edge cases | Spatial Loop #407/#408 | implemented on draft PR #412 candidate | exact-head deterministic execution; unknown-unknown/live runtime remains separate |
-| Shadow must notice intent/case/semantic-parity drift during implementation | #409 | static monitor/system-prompt/spec projection implemented on PR #412 | #411 continuous live Shadow canary |
-| Tech Lead can silently decompose without the full case denominator | #410 | case obligations/branch ownership gate implemented on PR #412 | live Worker consuming ICPG not exercised |
+| Short prompts can suppress source behavior / use cases / edge cases | Spatial Loop #407/#408 | admitted on main `5341885f` (PR #412 CLOSED, superseded by carrier merge `c27f8c3`) | exact-head deterministic execution; unknown-unknown/live runtime remains separate |
+| Shadow must notice intent/case/semantic-parity drift during implementation | #409 | static monitor/system-prompt/spec projection admitted on main `5341885f` | #411 continuous live Shadow canary |
+| Tech Lead can silently decompose without the full case denominator | #410 | case obligations/branch ownership gate admitted on main `5341885f` | live Worker consuming ICPG not exercised |
 | Knowledge cards can mention implementation artifacts without machine trace | #413/#414 | portable method + projection contract on draft PR #419 | machine schemas/checker/mutations |
 | Semantic dependency can be mistaken for Git ancestry | #415 | law/index prepared on PR #419 | deterministic false-ancestry gate |
 | AGENTS/README rules cannot explain which Intent/Case they protect | #415/#417 | route/edge contract prepared | artifact projection + final routing convergence |
@@ -29,8 +29,8 @@ It records the current program shape; it is not a substitute for exact issue/PR/
 ├─ #410 Tech Lead case ownership gate
 └─ #411 live continuous Shadow evidence
       │
-      └─ PR #412 draft candidate owns #408/#409/#410 preparation bytes
-             │ TRUE_CHILD by consumed unmerged ICPG contract
+      └─ PR #412 candidate owned #408/#409/#410 preparation bytes (CLOSED_UNMERGED; bytes now on main)
+             │ TRUE_CHILD by consumed then-unmerged ICPG contract
              ▼
           #413 Knowledge Graph global objective
           └─ PR #419 preparation contract/docs leaf
@@ -93,8 +93,8 @@ article / PDF / prompt / code / issue
 #416 machine traversal/authority/freshness checker   NOT_IMPLEMENTED
 #417 final routing/convergence                       PLANNED
 #418 live GraphRAG/Shadow retrieval canary            NOT_EXERCISED
-PR #412                                               DRAFT / HUMAN_ADMIT_REQUIRED
-PR #419                                               DRAFT / HUMAN_ADMIT_REQUIRED
+PR #412                                               CLOSED_UNMERGED / SUPERSEDED (bytes admitted on main via c27f8c3)
+PR #419                                               CLOSED_UNMERGED / SUPERSEDED (replayed carrier landed via 4f8d55b)
 merge/release/promotion                               HUMAN_ADMIT_REQUIRED
 ```
 

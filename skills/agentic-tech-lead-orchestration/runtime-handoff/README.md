@@ -80,6 +80,8 @@ The provenance-rebuild segment is historical, not pending: its receipt is `../re
 
 The `#412/#419 path-writer disposition` that used to gate #536 is discharged: both PRs are CLOSED unmerged and their bytes landed by an alternate route. A SKIPPED workflow is still not a PASS.
 
+Actual admitted path (2026-08-22 reconciliation): the states from `SKILL_EVAL_COMMIT_PROVENANCE_RED` through `MERGED_ON_MAIN` were fulfilled by a superseding path rather than a history rewrite. Replayed carrier waves (terminal publication merge `c27f8c3`, committer `agent-macro@claude-code.invalid`) landed the #412 semantic content on `main`; the connector lineage commits (`01067581`, `5ac05420`, `32c049ca`) reached `main` as declared-owner human writes under `evals/commit-roles.json` identity rules, and the exact-head Skill Eval Contract (run 341 at `5341885f`) is green. No rewritable commit was added to `known_unclassified`, `enforced_from` did not move, and no gate was weakened. The reconciled item's exit receipt is `../references/closure-audit/issue-568.json`; `data/handoff/spatial-407/publication-provenance-receipt.json` preserves the supplementary plan-vs-actual, forbidden-promotion and adversarial-audit record. The queue has since been advanced to the #411 item by the reconciliation wave; its live canary remains `NOT_EXERCISED` and still needs a resolved command contract plus independently admitted Builder/Shadow identities.
+
 ### Codex v2 hardening
 
 ```text
@@ -220,12 +222,15 @@ Then execute only the `ACTIVE` item whose required capabilities and subject are 
 ## Current evidence
 
 ```text
-Spatial #408/#409/#410 source implementation    PASS / bytes admitted on main
-Spatial normal exact-head suites                PASS
+Spatial #408/#409/#410 source implementation    PASS / bytes admitted on main 5341885f
+Spatial normal exact-head suites                PASS / Skill Suites run 597 on that exact head
 Spatial Skill Eval commit provenance            BLOCKER_FALSIFIED (988a4e7 carve-out; gate GREEN on
-                                                PR #412's own range) — PR #412 CLOSED unmerged
+                                                PR #412's own range) — PR #412 CLOSED unmerged;
+                                                Skill Eval Contract run 341 GREEN on 5341885f
 Spatial main admission                          PERFORMED / 45dfac8 and 91df786 are ancestors of
-                                                5341885f, first contained by 9fe3c6d (PR #573)
+                                                5341885f, first contained by 9fe3c6d (PR #573);
+                                                supplementary receipt
+                                                data/handoff/spatial-407/publication-provenance-receipt.json
 Spatial #411 live independent Shadow             NOT_EXERCISED
 Codex result-tree binder             PASS / MERGED via #507
 Codex durable replay/provenance      PASS / CLOSED_DETERMINISTICALLY via #508 (PR #516);

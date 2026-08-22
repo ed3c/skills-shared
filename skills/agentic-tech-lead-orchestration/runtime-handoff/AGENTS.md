@@ -69,7 +69,7 @@ For a rewritable PR branch that fails the repository commit-role gate:
 - do not weaken `check_commit_roles.py` or any admission workflow;
 - preserve the red run and original source tree as forensic/semantic evidence.
 
-This rule stays in force for any future rewritable branch that fails the gate. For Spatial #407/#412 it is now HISTORICAL: the provenance blocker was falsified (the `988a4e7` carve-out left the gate GREEN on PR #412's own range), PR #412 is CLOSED unmerged and retained as forensic source, and the bytes landed through the replayed #419. The receipt is `../references/closure-audit/issue-568.json`.
+This rule stays in force for any future rewritable branch that fails the gate. For Spatial #407/#412 it is now HISTORICAL: the provenance blocker was falsified (the `988a4e7` carve-out left the gate GREEN on PR #412's own range), PR #412 is CLOSED unmerged and retained as forensic source, and the bytes landed through the replayed #419. The receipt is `../references/closure-audit/issue-568.json`; a supplementary publication-provenance evidence file (plan-vs-actual, forbidden-promotion checks, adversarial-audit residuals) is `data/handoff/spatial-407/publication-provenance-receipt.json` at the repository root.
 
 ## Subject-mutation law
 

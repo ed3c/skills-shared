@@ -24,7 +24,8 @@ Implementation carrier — terminal at the 2026-08-22 readback:
 ```text
 PR #412
 branch   agent/spatial-intent-case-proof-graph-v1
-state    CLOSED_UNMERGED / SUPERSEDED_BY_#419
+state    CLOSED_UNMERGED / SUPERSEDED_BY_#419; final head e679aed9 not reachable from main
+supplementary receipt  data/handoff/spatial-407/publication-provenance-receipt.json
 ```
 
 PR #412 is not an open Draft and not a live path writer. Its bytes reached `main` through the replayed #419 route rather than through its own merge, so it closes no atom by itself: an atom advances only on its own receipt at an admitted subject. The reconciled `#412 → #419 → #420 → #450` chain is in [`../codex-v2/README.md`](../codex-v2/README.md).
@@ -42,12 +43,31 @@ not an implementation atom; terminal with its base
 
 | Atom | Issue | Type | Implementation surface | Relation | Deterministic state | Remaining evidence |
 |---|---:|---|---|---|---|---|
-| `ICPG-C1` | #408 | C | `intent-case-proof-graph.md`, case schema/template | root contract atom | bytes admitted on `main` `5341885f…` | none |
-| `ICPG-K1` | #408 | K | `check_case_graph.py` | same #408 terminal leaf | bytes admitted on `main`; owning Spatial suite green | none |
-| `ICPG-E1` | #408 | E | case-graph positive/mutation suite | same #408 terminal leaf | semantic-loss and stale/evidence/coverage controls admitted on `main` | none |
-| `ICPG-M1` | #409 | K/E | architecture-watch + monitor prompt/spec packet + falsifiers | consumes #408 vocabulary | static monitor contract admitted on `main`; owning Spatial suite green | live independent #411 |
-| `ICPG-D1` | #410 | D/K | Tech Lead task contract/gates/readme + this Stack projection | convergence/shared-route atom | Tech Lead owning suite green; denominator/owner gate admitted on `main` | live Worker receipt separate |
+| `ICPG-C1` | #408 | C | `intent-case-proof-graph.md`, case schema/template | `SIBLING` (root contract atom) | admitted on main `5341885f` | residual checker hardening tracked on #408; close = human |
+| `ICPG-K1` | #408 | K | `check_case_graph.py` | `SIBLING` (same #408 terminal leaf) | admitted on main `5341885f`; owning suite green | residual checker hardening tracked on #408; close = human |
+| `ICPG-E1` | #408 | E | case-graph positive/mutation suite | `SIBLING` (same #408 terminal leaf) | admitted on main `5341885f`; empty-denominator control added 2026-08-22 | residual control gaps tracked on #408; close = human |
+| `ICPG-M1` | #409 | K/E | architecture-watch + monitor prompt/spec packet + falsifiers | `TRUE_CHILD` (consumed #408 vocabulary) | admitted on main `5341885f`; owning suite green | falsifier-strength residuals tracked on #409; live independent #411 |
+| `ICPG-D1` | #410 | D/K | Tech Lead task contract/gates/readme + this Stack projection | `CONVERGENCE` (shared-route atom) | admitted on main `5341885f`; denominator/owner gate green | index/lease-control residuals tracked on #410; live Worker receipt separate |
 | `ICPG-X1` | #411 | X | live Builder/Shadow canary receipt | `EXTERNAL_EVIDENCE` | `NOT_EXERCISED` | exact host/runtime/model/task canary |
+
+Stack binding for the admitted static atom set (2026-08-22 reconciliation):
+
+```text
+issues            #408 #409 #410 static; #411 live
+case IDs          NOT_APPLICABLE_WITH_EVIDENCE — no frozen program-level case-graph digest exists;
+                  the case vocabulary ships as schema/template/fixture bytes, consumed per task at
+                  Tech Lead admission time
+branch class      single historical candidate branch agent/spatial-intent-case-proof-graph-v1
+parent            main 88ce642a at branch time; admitted via superseding carrier through c27f8c3
+owned paths       skills/spatial-loop-systems-engineering/**,
+                  skills/agentic-tech-lead-orchestration/** (task-contract/case-obligation surfaces),
+                  skills/git-town-stacked-pr-worker/molecular-indexes/spatial-407/**
+produced state    MAIN_ADMITTED (static set) / NOT_EXERCISED (ICPG-X1)
+oracle            per-atom owning suites + exact-head workflows (Skill Suites 597, Skill Eval Contract 341)
+evidence ceiling  deterministic exact-head only; live lanes remain #411
+rollback subject  revert of the superseding carrier merges on current main; the queue's compile-time
+                  rollback_commit 88ce642a is historical — do not hard-reset to it (see receipt)
+```
 
 ## State Machine
 
@@ -128,6 +148,6 @@ Repository provenance is load-bearing. A connector-authored source tree may be d
 
 The next execution subject is owned by:
 
-`../../agentic-tech-lead-orchestration/runtime-handoff/spatial-407-local-handoff-queue.json`
+`../../../agentic-tech-lead-orchestration/runtime-handoff/spatial-407-local-handoff-queue.json`
 
 That queue contains the publication/provenance item and the dependent live #411 item. Queue state is not execution evidence.

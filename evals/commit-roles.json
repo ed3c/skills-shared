@@ -42,6 +42,10 @@
     "owner-endpoint": {
       "meaning": "The repository owner acting through a non-agent endpoint that cannot write trailers: the ChatGPT GitHub connector's Contents-API writes, the GitHub web editor, or a bare direct push. The commit already appears under the owner's real identity on the forge, so nothing is miscounted; what is genuinely unobservable from the commit object is which of those endpoints produced it, and this value records exactly that ceiling instead of pretending to more.",
       "machine": false
+    },
+    "chatgpt-tech-lead": {
+      "meaning": "The repository owner's ChatGPT tech-lead session writing through the GitHub connector's Contents-API. Added when the #597 wave arrived carrying this value on five commits already immutable on main: the endpoint is real and self-described, so the honest repair is to name it here rather than to relabel the commits — the same doctrine that admitted driven_on chatgpt-github-connector for PR #341. The author address is the owner's declared alias, so attribution follows the owner exactly as with owner-endpoint; what this value adds over owner-endpoint is the endpoint's own declaration of which session class produced the write, and no more.",
+      "machine": false
     }
   },
   "forge_values_stay_separate": "github, gitlab and forgejo are deliberately three values rather than one forge-*. This repository already treats github-delivery-loop, gitlab-delivery-loop and forgejo-delivery-loop as sister skills that must not be mixed; their APIs, permission models and merge-authority stacks differ. Collapsing them here would be the one place where the vocabulary contradicts the skill boundary, and 'some forge' does not answer which mechanism acted.",

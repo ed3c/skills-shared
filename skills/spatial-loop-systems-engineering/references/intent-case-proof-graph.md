@@ -123,6 +123,10 @@ its current evidence state
 
 A case may exist before implementation. It may not be called implemented or verified until its exact-subject binding and owning evidence lane exist.
 
+## Declared invariants
+
+The optional top-level `invariants` array turns state obligations into first-class nodes: each entry is `{id, statement}` with a non-empty statement, and its id shares the one global id space with every other node family. Declaring the array switches on reference closure — an `invariant_or_state_refs` entry shaped `INV-<name>` must resolve to a declared invariant, and every declared invariant must be referenced by at least one case, so neither a dangling obligation nor an orphaned decoration survives. Refs that are not `INV-`-shaped stay free-form state paths, and a graph that omits the array keeps validating exactly as before.
+
 ## Shadow Architecture integration
 
 During implementation the Shadow Architect watches these additional material deltas:

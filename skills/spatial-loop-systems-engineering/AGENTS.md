@@ -102,14 +102,15 @@ Every required case has one implementation owner or one explicit convergence own
 └─ #411  X      live continuous Shadow runtime canary; external/live evidence lane
 ```
 
-Current source PR / implementation branch:
+Historical source PR / implementation branch:
 
 ```text
-PR #412
-agent/spatial-intent-case-proof-graph-v1
+PR #412   CLOSED_NOT_MERGED (2026-08-21); preserved as first-red provenance evidence
+agent/spatial-intent-case-proof-graph-v1 — final head e679aed9, not reachable from main
+admitted publication: superseding replayed carrier, terminal merge c27f8c3
 ```
 
-The exact head is mutable; read it from GitHub. PR #513 is a historical temporary current-main refresh carrier only and is not an implementation atom.
+PR #513 is a historical temporary current-main refresh carrier only and is not an implementation atom. Read current subjects from GitHub before any decision.
 
 Do not manufacture one serial Stack merely to mirror issue numbering. #408 is the contract/core leaf. #409 is a true child when it consumes that contract. #410 may be sibling/convergence by path ownership. #411 is live evidence and is not a Git child unless its harness code consumes unmerged parent bytes.
 
@@ -120,10 +121,13 @@ Do not manufacture one serial Stack merely to mirror issue numbering. #408 is th
 #409  STATIC_CLOSE_CANDIDATE after main admission; live scope remains #411
 #410  STATIC_CLOSE_CANDIDATE after main admission
 #411  KEEP_OPEN until an exact independent live Shadow receipt exists
-#407  KEEP_OPEN while #411 remains a declared blocking program lane
+#407  CLOSED per closure packet (closure-audit/issue-407.json): a program issue may close with a
+      named residual owner; #411 stays the NOT_EXERCISED residual owner until its own receipt exists
 ```
 
 Candidate CI, a temporary branch merge, a compatibility-only PASS, or a Builder self-report cannot satisfy main/live admission. If repository provenance cannot be repaired by the current connector without weakening policy or fabricating identity, use the asserted Tech Lead Local Handoff Queue instead of bypassing the gate.
+
+2026-08-22 state note: the `STATIC_CLOSE_CANDIDATE` condition for #408/#409/#410 is met — bytes admitted on main `5341885f`, supplementary receipt `data/handoff/spatial-407/publication-provenance-receipt.json`; closes stay human-owned. #407 was auto-closed on 2026-08-21 (commit-reference), briefly reopened for lacking a closure record, then closed again under the landed closure packet `closure-audit/issue-407.json`, which names #411 as the program's NOT_EXERCISED residual owner.
 
 ## Completion gate
 

@@ -21,7 +21,7 @@ This directory is a status/handoff projection for issues #407–#411. It does no
 - GitHub/Git exact subjects, executable contracts and receipts beat this prose on mutable state.
 - Do not close #408/#409/#410 from candidate evidence alone; main landing and exact-main readback are required.
 - Do not close #411 from static tests, Builder self-report, same-context prose, or compatibility-only green.
-- Do not close #407 while #411 remains a declared blocking program lane.
+- #407 closed under closure packet `closure-audit/issue-407.json` with #411 as its named residual owner; do not treat that closure as evidence that #411's live obligation is discharged — it stays `NOT_EXERCISED` until its own receipt exists.
 - Do not convert case dependencies into Git parentage unless unmerged parent bytes/contracts are actually consumed.
 - Do not weaken golden-proof, commit-role, evidence, or provenance gates to make PR #412 green.
 
@@ -44,6 +44,8 @@ Any red load-bearing gate returns the subject to `HOLD`, records the exact failu
 ## Current stop condition
 
 The current connector may continue writing public source candidate bytes and GitHub issue/PR state, but it must stop before claiming repository admission if the repository-required provenance gate cannot be satisfied by the connector-authored history. In that state, preserve the exact candidate tree and hand off a provenance-compliant rebuild rather than adding rewritable connector commits to historical exception lists or weakening the gate.
+
+Resolution (2026-08-22): this stop condition was honored and is now discharged for #407/#412 — the candidate tree is preserved on the closed PR #412 (head `e679aed9`), admission happened through a superseding replayed carrier (terminal merge `c27f8c3`) whose exact-head provenance gate is green, and no exception list or gate was touched. Receipt: `data/handoff/spatial-407/publication-provenance-receipt.json`. The law above remains in force for any future connector candidate in the same state.
 
 ## Evidence vocabulary
 

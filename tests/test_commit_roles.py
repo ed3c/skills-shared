@@ -427,9 +427,11 @@ class VocabularyTests(unittest.TestCase):
         self.assertNotIn("forge", body["driven_by"])
 
     def test_human_is_the_only_non_machine_role(self) -> None:
+        # The pinned list is the deliberation point: every non-machine role is an
+        # owner-attributed endpoint that cannot or does not write machine identity.
         body = json.loads(VOCABULARY.read_text(encoding="utf-8"))
         non_machine = [k for k, v in body["driven_by"].items() if not v["machine"]]
-        self.assertEqual(sorted(non_machine), ["human", "owner-endpoint"])
+        self.assertEqual(sorted(non_machine), ["chatgpt-tech-lead", "human", "owner-endpoint"])
 
     def test_machine_pattern_rejects_a_deliverable_domain(self) -> None:
         body = json.loads(VOCABULARY.read_text(encoding="utf-8"))

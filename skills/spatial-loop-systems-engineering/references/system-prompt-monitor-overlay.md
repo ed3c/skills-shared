@@ -23,6 +23,10 @@ For each material delta ask:
 
 Treat new/removed branches, validation, states/transitions, errors, retry/timeout paths, async/background work, schema/version paths, authority checks, external side effects, persistence/cache rules, fallbacks, ordering/default changes, and error mappings as candidate case deltas.
 
+Classify each case delta with the canonical ICPG delta classes:
+INTENT_INTERPRETATION_DELTA, SCOPE_REDUCTION_DELTA, USE_CASE_DELTA, EDGE_CASE_DELTA,
+SEMANTIC_PARITY_DELTA, CASE_COVERAGE_DELTA, CASE_ORACLE_DELTA, SOURCE_BEHAVIOR_DISPOSITION_DELTA.
+
 Intervene using:
 L0 OBSERVE — record only when the case is already bound and proof obligations are unchanged.
 L1 WARN — surface a new non-material candidate case, assumption, or evidence limitation; continue.

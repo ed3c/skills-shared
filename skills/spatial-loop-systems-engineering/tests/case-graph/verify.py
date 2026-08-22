@@ -52,6 +52,12 @@ def expect_red(name: str, doc: dict, needle: str) -> None:
 expect_green("positive migration-copy graph", base)
 expect_green("non-laundering prototype template", template)
 
+# Closure is opt-in by key presence (pre-invariant graphs stay valid), so the
+# exemplar itself must keep the array — losing it would silently switch the
+# whole closure lane off for everything cloned from this fixture.
+assert "invariants" in base, "fixture must declare invariants; closure is key-presence-gated"
+assert "invariants" in template, "template must declare invariants; closure is key-presence-gated"
+
 m = copy.deepcopy(base)
 m["cases"][1]["implementation_ids"] = []
 m["coverage"]["required_case"] = 0.5
@@ -82,7 +88,14 @@ m["cases"][1]["oracle_ids"] = []
 m["coverage"]["required_case"] = 0.5
 m["coverage"]["oracle"] = 0.5
 m["gate"]["status"] = "READY_FOR_PROTOTYPE"
-expect_red("compatibility-only migration", m, "requires oracle_ids")
+expect_red("required case without oracle", m, "requires oracle_ids")
+
+# An empty REQUIRED_CASE denominator makes every ratio vacuously 1.0; a READY
+# gate must refuse it instead of admitting a graph that proves nothing.
+m = copy.deepcopy(base)
+for case in m["cases"]:
+    case["classification"] = "DUPLICATE_EQUIVALENCE_CLASS"
+expect_red("empty required-case denominator", m, "non-empty REQUIRED_CASE denominator")
 
 m = copy.deepcopy(base)
 m["cases"][1]["evidence_ids"] = []
@@ -149,4 +162,90 @@ m["source_behaviors"][1]["decision_id"] = "DEC-001"
 m["decisions"] = [{"id": "DEC-001", "authority": "", "rationale": "explicit test mutation"}]
 expect_red("hollow authority decision", m, "decision DEC-001 requires authority")
 
-print("CASE-GRAPH-MUTATIONS-GREEN exact-subject + global-id controls")
+# Reclassifying a required case out of scope is the cheapest silent scope
+# reduction available; it needs the same decision record as an explicit drop.
+m = copy.deepcopy(base)
+m["cases"][1]["classification"] = "OUT_OF_SCOPE_EXPLICIT"
+expect_red("undecided scope reduction", m, "out-of-scope case CASE-002 requires decision_id")
+
+# Declared invariants live in the one global id space and must close in both
+# directions: no case may reference an undeclared one, and no declared one may
+# sit unreferenced as decoration.
+m = copy.deepcopy(base)
+m["invariants"].append({"id": "INV-COMPAT", "statement": "Second declaration of the same invariant id."})
+expect_red("duplicate invariant id", m, "duplicate id INV-COMPAT within invariants")
+
+m = copy.deepcopy(base)
+m["invariants"] = [inv for inv in m["invariants"] if inv["id"] != "INV-BRANCH-B"]
+expect_red("dangling invariant reference", m, "case CASE-002 references undeclared invariant INV-BRANCH-B")
+
+m = copy.deepcopy(base)
+m["invariants"].append({"id": "INV-ORPHANED", "statement": "Declared but bound to no case."})
+expect_red("unreferenced declared invariant", m, "invariant INV-ORPHANED is referenced by no case")
+
+m = copy.deepcopy(base)
+m["invariants"][0]["statement"] = "   "
+expect_red("hollow invariant statement", m, "invariant INV-COMPAT requires statement")
+
+# The schema and the checker are two independent enforcement surfaces. A term
+# added to one and not the other silently stops being enforced on the way in.
+vocabularies = {
+    "source behavior disposition": (
+        set(schema["$defs"]["sourceBehavior"]["properties"]["disposition"]["enum"]),
+        mod.PRESERVATION_DISPOSITIONS | mod.DECISION_REQUIRED | {"UNKNOWN_BLOCKING"},
+    ),
+    "case classification": (
+        set(schema["$defs"]["caseNode"]["properties"]["classification"]["enum"]),
+        mod.CASE_CLASSES,
+    ),
+    "gate status": (
+        set(schema["properties"]["gate"]["properties"]["status"]["enum"]),
+        mod.GATES,
+    ),
+    "case evidence_state": (
+        set(schema["$defs"]["caseNode"]["properties"]["evidence_state"]["enum"]),
+        mod.EVIDENCE_STATES,
+    ),
+    "evidence state": (
+        set(schema["$defs"]["evidence"]["properties"]["state"]["enum"]),
+        mod.EVIDENCE_STATES,
+    ),
+}
+for vocabulary, (from_schema, from_checker) in vocabularies.items():
+    if from_schema != from_checker:
+        raise AssertionError(
+            f"{vocabulary} vocabulary drifted: schema-only={sorted(from_schema - from_checker)}, "
+            f"checker-only={sorted(from_checker - from_schema)}"
+        )
+
+# Structural required-key parity: the shipped fixture and template must satisfy
+# the schema's own required lists node-by-node, not merely validate as a whole.
+NODE_DEFS = {
+    "intent_atoms": "idNode",
+    "semantic_axes": "axisNode",
+    "source_behaviors": "sourceBehavior",
+    "cases": "caseNode",
+    "implementations": "implementation",
+    "oracles": "oracle",
+    "evidence": "evidence",
+    "decisions": "decision",
+    "invariants": "invariant",
+    "edges": "edge",
+}
+for label, doc in (("fixture good.json", base), ("template case-graph-template.json", template)):
+    missing = [key for key in schema["required"] if key not in doc]
+    if missing:
+        raise AssertionError(f"{label} missing schema-required top-level keys {missing}")
+    for member, def_name in NODE_DEFS.items():
+        required = schema["$defs"][def_name]["required"]
+        for i, node in enumerate(doc.get(member, [])):
+            absent = [field for field in required if field not in node]
+            if absent:
+                raise AssertionError(f"{label} {member}[{i}] missing schema-required keys {absent}")
+    for member in ("subject", "coverage", "gate"):
+        required = schema["properties"][member]["required"]
+        absent = [field for field in required if field not in doc.get(member, {})]
+        if absent:
+            raise AssertionError(f"{label} {member} missing schema-required keys {absent}")
+
+print("CASE-GRAPH-MUTATIONS-GREEN exact-subject + global-id + invariant-closure + schema-parity controls")
