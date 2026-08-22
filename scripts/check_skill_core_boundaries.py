@@ -148,13 +148,20 @@ def selftest(root: Path, manifest: dict) -> list[str]:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--root", default=".")
+    parser.add_argument(
+        "--root",
+        default=str(Path(__file__).resolve().parent.parent),
+        help="repository to audit; defaults to the checkout owning this script, never the caller's cwd",
+    )
     parser.add_argument("--manifest", default="evals/skill-core-boundaries.json")
     parser.add_argument("--skill")
     parser.add_argument("--selftest", action="store_true")
     args = parser.parse_args()
 
     root = Path(args.root).resolve()
+    if not (root / "AGENTS.md").is_file():
+        print(f"SKILL-CORE-RED subject root {root} does not contain AGENTS.md")
+        return 2
     manifest = load_manifest(root, Path(args.manifest))
     errors = run(root, manifest, args.skill)
     if args.selftest and not errors:
