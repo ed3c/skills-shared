@@ -3,9 +3,9 @@
   "_authority": "Non-authoritative navigation projection of the DTCR lanes around #528 Local Handoff. It is NOT an executable Local Handoff queue: the typed-queue contract is skills/agentic-tech-lead-orchestration/references/local-handoff-queue.schema.json enforced by scripts/assert_local_handoff_queue.py, and no DTCR typed queue exists yet - compiling one is #528's own deliverable. Re-query gh before treating any entry as current. Presence in this index is not evidence of readiness; each lane closes only on its own issue's own receipt.",
   "state_law": "github_state mirrors GitHub issue state only. evidence uses the directory vocabulary (AGENTS.md) and is never merged with github_state: a CLOSED issue can carry a NOT_ADMITTED exit terminal, and an OPEN issue can have landed bytes.",
   "as_of": {
-    "observed_main": "5341885f26b5e8e7baf5087a4d661e324f878242",
-    "github_queried": "2026-08-22",
-    "queried_via": "gh api REST per-issue reads (not list endpoints)"
+    "observed_main": "674cfe1435c4bd1c29e8f07308266fe5c6284973",
+    "github_queried": "2026-08-22 (re-queried after the 2026-08-22 wave closures)",
+    "queried_via": "gh issue view / gh issue close per-issue (not list endpoints)"
   },
   "terminal": {
     "id": 528,
@@ -15,7 +15,7 @@
       {"id": 526, "kind": "START_DEPENDENCY", "source": "body-named", "note": "#528 body: Requires #526 convergence; github_state CLOSED (satisfied for start), full admission still rides #525"},
       {"id": 527, "kind": "START_DEPENDENCY", "source": "body-named", "note": "#528 body: Requires #527 generic bootstrap readiness"},
       {"id": 523, "kind": "START_DEPENDENCY", "source": "index-inferred", "note": "not named by #528's body; R1 protocol interface landed and #523 is CLOSED, but its own exit terminal is NOT_ADMITTED and its live-canary residual rides #528 itself; a completion edge here would deadlock both lanes"},
-      {"id": 524, "kind": "COMPLETION_DEPENDENCY_IF_CROSS_REPO_MODE_SELECTED", "source": "index-inferred", "note": "#528's body requires one bounded single-repo OR cross-repo execution; R2 completes #528 only if the cross-repo mode is selected"}
+      {"id": 524, "kind": "COMPLETION_DEPENDENCY_IF_CROSS_REPO_MODE_SELECTED", "source": "index-inferred", "note": "#528's body requires one bounded single-repo OR cross-repo execution; R2's deterministic lane landed and closed 2026-08-22 with its live lanes transferred to #528, so either mode now has landed protocol bytes"}
     ]
   },
   "queue": [
@@ -23,33 +23,24 @@
       "id": 519,
       "title": "[DTCR-D1] deterministic fact-plane convergence owner",
       "github_state": "OPEN",
-      "evidence": "convergence open: #547 NOT_IMPLEMENTED (scip-python present), #549 live lane BLOCKED_ON_PROVIDER (buf absent)",
-      "note": "16 D1/M1 interface schemas (31 total on the DTCR surface) and two adapters landed under this contract (#546 at 66dfdb4, #548 at 458ea28); per its own 2026-08-21 comment the issue stays open as convergence owner until #547/#549 resolve or are formally descoped",
+      "evidence": "all four adapter lanes landed (#546/#548 earlier waves, #547/#549 closed 2026-08-22); convergence reconciliation and the hosted exact-head arrival on the wave's push head remain with this owner",
+      "note": "16 D1/M1 interface schemas (33 total on the DTCR surface) and four deterministic adapters landed under this contract's capability classes",
       "blocks": [525]
     },
     {
       "id": 521,
       "title": "[DTCR-M1] semantic-context and organizational-memory plane",
       "github_state": "OPEN",
-      "evidence": "interface schemas landed; adapter lane #550 NOT_IMPLEMENTED",
+      "evidence": "interface schemas landed; adapter lane #550 landed and closed 2026-08-22; aggregate-route wiring NOT_IMPLEMENTED",
       "start_dependency": 518,
-      "note": "convergence owner that wires a finished #550 adapter into aggregate routes",
+      "note": "convergence owner that wires the landed #550 adapter into aggregate routes",
       "blocks": []
-    },
-    {
-      "id": 524,
-      "title": "[DTCR-R2] cross-repository Expand & Contract refactor protocol",
-      "github_state": "OPEN",
-      "evidence": "NOT_IMPLEMENTED",
-      "start_dependency": 522,
-      "note": "start dependency #522 satisfied (CLOSED via PR #563); no expand-contract bytes exist in-tree",
-      "blocks": [528]
     },
     {
       "id": 525,
       "title": "[DTCR-E1] independent Shadow, mutations and evidence-closure denominator",
       "github_state": "OPEN",
-      "evidence": "mutation/denominator mechanism landed by sibling lanes; independence lane ABSENT (no fresh-context Shadow run exists)",
+      "evidence": "fresh-context E1 audit executed 2026-08-22 on 8d99f2d -> BLOCK (five blockers, each dispositioned same day; records under docs/traceability/dual-track-code-review-loop/shadow-audit/); independence adjudication permanently HUMAN_ADMIT_REQUIRED",
       "start_dependency": 519,
       "blocks": [526, 527, 528],
       "note": "full admission of #526's convergence names #525 as a completion dependency; #526's own DTCR_DOCS_PROMPTS_TRACE_READY terminal does not require it. #527's own comment also names '#525 admission' as its completion dependency"
@@ -58,39 +49,11 @@
       "id": 527,
       "title": "[DTCR-B1] immutable thin-binding bootstrap profile for new repositories",
       "github_state": "OPEN",
-      "evidence": "NOT_IMPLEMENTED",
+      "evidence": "LANDED_AWAITING_COMPLETION_DEPENDENCY: consumer_bootstrap_dtcr.py sibling profile plus tests/consumer-bootstrap-dtcr/ landed 2026-08-22 (merges 908efc0/0faa9f1), CI-chained, 17 mutation controls red; receipt records completion_dependency_525 OPEN, composition_target_430 ABSENT, terminal NOT_EMITTED",
       "start_dependency": 526,
       "completion_dependency": 525,
-      "note": "start dependency #526 satisfied (CLOSED via PR #563); completion dependency per #527's own 2026-08-21 comment",
+      "note": "does not close on green tests: DTCR_GENERIC_CONSUMER_BOOTSTRAP_READY waits on #525 admission per its own comment",
       "blocks": [528]
-    },
-    {
-      "id": 547,
-      "title": "[DTCR-D1-SCIP] SCIP symbol/relationship adapter",
-      "github_state": "OPEN",
-      "evidence": "NOT_IMPLEMENTED (python scope executable)",
-      "note": "the Go scip CLI is absent (which scip empty) but scip-python 0.6.6 is present on the trusted local runtime, so the python-scope lane is executable; fixture-only SCIP-shaped JSON stays refused by the issue's own comment; exact provider identity (version+sha256+license) binds in the lane's own receipt",
-      "disagrees_with_issue_comment": true,
-      "blocks": []
-    },
-    {
-      "id": 549,
-      "title": "[DTCR-D1-BUF] Buf/contract compatibility adapter",
-      "github_state": "OPEN",
-      "evidence": "BLOCKED_ON_PROVIDER",
-      "note": "live/VERIFIED lane blocked (buf CLI absent on the admitted host, which buf empty); the explicit NOT_APPLICABLE lane is executable without the provider",
-      "disagrees_with_issue_comment": true,
-      "blocks": []
-    },
-    {
-      "id": 550,
-      "title": "[DTCR-M1-C] rebuildable non-authoritative semantic-context adapter",
-      "github_state": "OPEN",
-      "evidence": "NOT_IMPLEMENTED",
-      "note": "deterministic KEYWORD lane is not provider-blocked (schema anchor: references/schemas/retrieval-query.schema.json lane enum [KEYWORD,VECTOR,HYBRID,NOT_APPLICABLE]); optional LanceDB lane BLOCKED_ON_PROVIDER (lancedb not importable); convergence wiring owner is #521",
-      "disagrees_with_issue_comment": true,
-      "unsatisfied_completion_dependency_at_closure_of": [522],
-      "blocks": []
     }
   ],
   "closed_lanes": [
@@ -126,6 +89,46 @@
       "landing": {"via_pr": 563, "commit": "3fc020414134999227aec6ba9304a08e86287033"},
       "closure_packet": "skills/agentic-tech-lead-orchestration/references/closure-audit/issue-526.json",
       "note": "DTCR_DOCS_PROMPTS_TRACE_READY reached; full admission still names #525 as completion dependency"
+    },
+    {
+      "id": 547,
+      "title": "[DTCR-D1-SCIP] SCIP symbol/relationship adapter",
+      "github_state": "CLOSED",
+      "exit_terminal": "DTCR_SCIP_ADAPTER_VERIFIED (exercised python scope)",
+      "landing": {"commit": "fc12a3457b5d6d8222353b4e2bc7c4421d785837", "note": "no PR: Human-admitted 2026-08-22 single-push wave"},
+      "residual_owner": [519, 525],
+      "closure_packet": "skills/agentic-tech-lead-orchestration/references/closure-audit/issue-547.json",
+      "note": "adapters/scip/ landed on a real scip-python 0.6.6 round-trip with live receipt live-ee9afe43.json; non-python indexer scopes and the hosted exact-head arrival ride #519"
+    },
+    {
+      "id": 549,
+      "title": "[DTCR-D1-BUF] Buf/contract compatibility adapter",
+      "github_state": "CLOSED",
+      "exit_terminal": "DTCR_BUF_ADAPTER_VERIFIED (exact fixture scope) + typed NOT_APPLICABLE lane",
+      "landing": {"commit": "e1d867f70b97d375ff1a7b0c2d6a68a485636e21", "note": "no PR: Human-admitted 2026-08-22 single-push wave"},
+      "residual_owner": [519, 525],
+      "closure_packet": "skills/agentic-tech-lead-orchestration/references/closure-audit/issue-549.json",
+      "note": "adapters/buf/ landed with landing-run buf 1.72.0 outputs committed; live lane self-reports NOT_EXERCISED where buf is absent"
+    },
+    {
+      "id": 550,
+      "title": "[DTCR-M1-C] rebuildable non-authoritative semantic-context adapter",
+      "github_state": "CLOSED",
+      "exit_terminal": "DTCR_SEMANTIC_CONTEXT_ADAPTER_VERIFIED",
+      "landing": {"commit": "8972c788eb7a01d2818cd4d448db6a34a2886719", "note": "no PR: Human-admitted 2026-08-22 single-push wave"},
+      "residual_owner": [521, 368, 525],
+      "closure_packet": "skills/agentic-tech-lead-orchestration/references/closure-audit/issue-550.json",
+      "note": "adapters/semantic-context/ landed with a zero-network reference backend; LanceDB lane typed NOT_EXERCISED; aggregate-route wiring stays with #521, live causal canary with #368"
+    },
+    {
+      "id": 524,
+      "title": "[DTCR-R2] cross-repository Expand & Contract refactor protocol",
+      "github_state": "CLOSED",
+      "exit_terminal": "DTCR_CROSS_REPO_EXPAND_CONTRACT_READY: NOT_ADMITTED (protocol_ready pinned false)",
+      "landing": {"commit": "9b59e55f6b8643fd1abf6a2d80a2ba1bb8bf1336", "note": "no PR: Human-admitted 2026-08-22 single-push wave"},
+      "residual_owner": [528, 525],
+      "closure_packet": "skills/agentic-tech-lead-orchestration/references/closure-audit/issue-524.json",
+      "note": "expand-contract/ compiler plus two R2 contracts landed over a two-repository fixture; dual-run NOT_OBSERVED, real-codebase application NOT_EXERCISED, live lanes transferred to #528"
     }
   ]
 }

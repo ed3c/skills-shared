@@ -164,6 +164,10 @@ Parent programme `#115`; architecture/evidence law remains [`../architecture/CON
 
 Issue #128 / PR #136 remains an independent terminal leaf for the substrate-bound method. Static/deterministic contracts do not prove privileged root/KVM/cgroup/seccomp/network/hardware/chaos/security execution. Destructive testing, security acceptance, merge, promotion and rollback remain Human/trusted-operator boundaries.
 
+## Dual-track code-review loop (DTCR) line
+
+Parent #517 fans out over C0/D1/M1 contract issues, five adapter lanes, X1 synthesis, R1/R2 refactor protocols, D2 documentation convergence, E1 independent Shadow, B1 bootstrap and the L1 live-canary terminal. The lineage authority is [`dual-track-code-review-loop/`](dual-track-code-review-loop/) (README, `ISSUE_DAG.json`, `LOCAL_HANDOFF_EXECUTION_QUEUE.json`, `SESSION_PROMPTS.md`), with closure packets under `skills/agentic-tech-lead-orchestration/references/closure-audit/`. As of 2026-08-22, nine deterministic suite lanes are committed and CI-routed; #524/#547/#549/#550 closed at their exercised-scope terminals under the Issue Closure Contract; #525/#527/#528 remain open, and every live/real-consumer lane is `NOT_EXERCISED`.
+
 ## Method lineage
 
 - `knowledge-continuity` — every hop leaves in-place summaries; no unexplained redirect-only evidence.
