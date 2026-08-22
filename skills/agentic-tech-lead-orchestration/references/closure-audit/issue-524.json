@@ -47,12 +47,7 @@
  ],
  "implementation": {
   "candidate_prs": [],
-  "landing": {
-   "repository": "ed3c/skills-shared",
-   "commit": "9b59e55f6b8643fd1abf6a2d80a2ba1bb8bf1336",
-   "tree": "7db3e7e36566f50cfe0b92dcbcd42c3924083723",
-   "note": "no PR: Human-admitted 2026-08-22 single-push wave; local convergence merge, one push to main"
-  }
+  "landing": null
  },
  "residual": [
   {

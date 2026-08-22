@@ -772,7 +772,12 @@ def prove_falsifier_identity_is_load_bearing() -> None:
     record the falsifier-identity failure -- and has to leave the row out of the
     planted set. If this row is green, a renamed code in the real adapter is red.
     """
-    work = Path(tempfile.mkdtemp(prefix="dtcr-semantic-context-"))
+    # The copy must sit at least two directory levels below the temp root:
+    # adapter.py computes REPO_ROOT = SKILL_DIR.parents[1] at import time, and a
+    # shallow /tmp/<dir>/adapter.py has no parents[1] (IndexError on hosted
+    # runners whose TMPDIR is /tmp, invisible on hosts with deep temp paths).
+    work = Path(tempfile.mkdtemp(prefix="dtcr-semantic-context-")) / "skills" / "adapter-copy"
+    work.mkdir(parents=True)
     try:
         source = (ADAPTER_DIR / "adapter.py").read_text(encoding="utf-8")
         anchor = (
@@ -831,7 +836,7 @@ def prove_falsifier_identity_is_load_bearing() -> None:
             f"{len(plants) - planted_before} planted rows -- the code half is load-bearing"
         )
     finally:
-        shutil.rmtree(work, ignore_errors=True)
+        shutil.rmtree(work.parents[1], ignore_errors=True)
 
 
 REQUIRED_FALSIFIERS = (
