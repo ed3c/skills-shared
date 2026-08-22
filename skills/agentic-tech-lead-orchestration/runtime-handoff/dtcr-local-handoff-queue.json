@@ -26,7 +26,7 @@
     ]
   },
   "current": {
-    "active_item": "dtcr-registry-admission",
+    "active_item": "dtcr-provider-unblocks",
     "state": "ACTIVE"
   },
   "items": [
@@ -80,32 +80,35 @@
     },
     {
       "id": "dtcr-registry-admission",
-      "task_ref": "issue-527-registry-and-required-order-admission",
-      "state": "ACTIVE",
+      "task_ref": "issue-527-registry-admission-residual-on-517",
+      "state": "COMPLETE",
       "entry": {
         "predecessor": "dtcr-independent-shadow",
         "required_subject_commit": "8c9d8cae63c0d63d14077e568331cb8f95a993dc",
         "required_capabilities": [
           "human-owner-terminal",
-          "registry-json-write-authority",
-          "shared-skills-infra-required-order-closure"
+          "registry-json-write-authority"
         ]
       },
       "runtime_lane": {
         "class": "LOCAL_HOST",
-        "commands": [],
-        "unresolved_operations": [
+        "commands": [
           {
-            "operation_id": "admit-dtcr-into-registry-and-required-order",
-            "resolver_source": "registry.json entry shape, skills/shared-skills-infra/scripts/repository_control_plane.py REQUIRED_ORDER, and the landed shared-skills-infra sibling profile (repository-control-plane-profile.dual-track-code-review-loop.json with consumer_bootstrap_dtcr.py, publication 81f2f20d) - a Human admits the shared classification and the engine-order closure; registry.json still carries no dual-track-code-review-loop entry",
-            "required_output": "CONCRETE_COMMAND_CONTRACT"
+            "argv": [
+              "python3",
+              "-c",
+              "import json,sys; sys.exit(0 if any(r['name']=='dual-track-code-review-loop' for r in json.load(open('registry.json'))['shared']) else 2)"
+            ],
+            "cwd": ".",
+            "timeout_seconds": 60
           }
         ],
+        "unresolved_operations": [],
         "live_evidence_required": false
       },
       "receipt": {
-        "path": "skills/shared-skills-infra/references/repository-control-plane-profile.dual-track-code-review-loop.json",
-        "schema": "shared-skills-infra/repository-control-plane-profile/v1",
+        "path": "registry.json",
+        "schema": "shared-skills-registry/v2",
         "required_states": [
           "PASS",
           "HUMAN_ADMIT_REQUIRED"
@@ -126,7 +129,7 @@
     {
       "id": "dtcr-provider-unblocks",
       "task_ref": "issues-547-550-provider-blocked-sub-lanes",
-      "state": "BLOCKED_BY_PREDECESSOR",
+      "state": "ACTIVE",
       "entry": {
         "predecessor": "dtcr-registry-admission",
         "required_subject_commit": "8c9d8cae63c0d63d14077e568331cb8f95a993dc",
