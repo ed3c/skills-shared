@@ -74,6 +74,8 @@ jobs:
         run: bash skills/shared-skills-infra/tests/control-plane/verify.sh
       - name: Verify fresh consumer Domain Decoupling bootstrap
         run: bash skills/shared-skills-infra/tests/consumer-bootstrap/verify.sh
+      - name: Verify thin CADG consumer bootstrap
+        run: bash skills/shared-skills-infra/tests/consumer-bootstrap-cadg/verify.sh
       - name: Verify task-bound GitHub Actions runtime admission
         run: bash skills/shared-skills-infra/tests/runtime-observer/verify.sh
       - name: Verify procedural core and domain boundaries
