@@ -6,10 +6,13 @@ import json
 from pathlib import Path
 import shutil
 import subprocess
+import sys
 import tempfile
 
 ROOT = Path(__file__).resolve().parents[4]
-SCRIPT = ROOT / "skills/shared-skills-infra/scripts/consumer_bootstrap_cadg.py"
+SCRIPTS = ROOT / "skills/shared-skills-infra/scripts"
+sys.path.insert(0, str(SCRIPTS))
+SCRIPT = SCRIPTS / "consumer_bootstrap_cadg.py"
 spec = importlib.util.spec_from_file_location("consumer_bootstrap_cadg", SCRIPT)
 assert spec and spec.loader
 mod = importlib.util.module_from_spec(spec)
