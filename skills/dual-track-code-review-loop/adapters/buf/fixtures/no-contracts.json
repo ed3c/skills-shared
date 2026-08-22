@@ -1,0 +1,17 @@
+{
+  "_comment": "A real subject (this repo's commit/tree/root-derived binding id at the SUBJECT BASE this lane was implemented against) with a declared path list of real, currently-tracked files that carry no Protobuf/Buf contract artifact. detect_applicability never opens these files; only the path strings are read.",
+  "subject": {
+    "repository_binding_id": "DTCR-RB-3749864dfe3e2f36",
+    "commit": "674cfe1435c4bd1c29e8f07308266fe5c6284973",
+    "tree": "217bf950a57701235f761223e9466b9774aa6194"
+  },
+  "declared_paths": [
+    "AGENTS.md",
+    "scripts/check_commit_roles.py",
+    "skills/dual-track-code-review-loop/AGENTS.md",
+    "skills/dual-track-code-review-loop/README.md",
+    "skills/dual-track-code-review-loop/adapters/tree-sitter/adapter.py",
+    "skills/dual-track-code-review-loop/adapters/sqlite-ledger/ledger.py",
+    "skills/dual-track-code-review-loop/references/schemas/contract-compatibility-result.schema.json"
+  ]
+}

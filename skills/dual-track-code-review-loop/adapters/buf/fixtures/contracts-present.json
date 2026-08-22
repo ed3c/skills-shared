@@ -1,0 +1,14 @@
+{
+  "_comment": "A synthetic subject: same real repo/commit/tree binding as no-contracts.json, but the declared path list adds path STRINGS that are not files present in this tree (api/order.proto, buf.yaml) to demonstrate applicability detection over a hypothetical consumer repo that does carry Protobuf/Buf artifacts. detect_applicability matches by name only and never opens these paths, so no such files need to exist on disk for this fixture to be honest about what it tests.",
+  "subject": {
+    "repository_binding_id": "DTCR-RB-3749864dfe3e2f36",
+    "commit": "674cfe1435c4bd1c29e8f07308266fe5c6284973",
+    "tree": "217bf950a57701235f761223e9466b9774aa6194"
+  },
+  "declared_paths": [
+    "AGENTS.md",
+    "scripts/check_commit_roles.py",
+    "api/order.proto",
+    "buf.yaml"
+  ]
+}
