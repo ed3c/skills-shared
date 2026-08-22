@@ -7,6 +7,21 @@ CONTROL_TMP=${TMPDIR:-/tmp}/agentic-tech-lead-control-plane-$$.md
 SOURCE_TMP=${TMPDIR:-/tmp}/agentic-tech-lead-source-ledger-$$.json
 trap 'rm -f "$TMP" "$QUEUE_TMP" "$CONTROL_TMP" "$SOURCE_TMP"' EXIT HUP INT TERM
 
+# #605: every gate below judges the tree in front of it, so none of them can see
+# a gate that is no longer there — a merge that deletes a check makes this suite
+# green *because* the check vanished (proven twice: the #466 receipt paper gate,
+# and two per-queue selftest invocations). This runs first: the range base..HEAD
+# must still carry every gate file and invocation its own base carried.
+# The one named retirement is a9db0bd's: the git-at-any-scale SKIPPED_BY_POLICY
+# carve-out documented below retired itself once the queue was recompiled. Once
+# main advances past a9db0bd that deletion leaves every range, the run prints
+# GATE-PRESERVATION-NOTE for the unused pattern, and the --allow line below is
+# to be deleted. An unused pattern is a note rather than a red because the PR
+# that lands a retirement is judged against a base that no longer contains it.
+python3 "$ROOT/scripts/check_gate_preservation.py" --selftest
+python3 "$ROOT/scripts/check_gate_preservation.py" \
+  --allow 'assert_local_handoff_queue.py" --queue "$queue" >/dev/null'
+
 # Prove the routing itself, including planted disconnections.
 python3 "$ROOT/scripts/check_runtime_reachability.py" --selftest
 
@@ -78,37 +93,75 @@ from jsonschema import Draft202012Validator
 
 SKILL = Path(sys.argv[1])
 ROOT = SKILL.parents[1]
+# #607: every receipt.schema id a runtime-handoff queue names must resolve to a
+# contract file that declares that identity. An id with no entry here is red the
+# moment its receipt exists, so a new queue cannot ship an unbindable label.
 SCHEMA_BY_ID = {
     "agentic-tech-lead/herdr-lifecycle/v1": SKILL / "references/contracts/herdr-lifecycle-receipt.schema.json",
+    "agentic-tech-lead/problem-closure/v1": SKILL / "references/contracts/problem-closure.schema.json",
+    "agentic-tech-lead/codex-v2-result-carrier/v1": SKILL / "references/contracts/codex-v2-result-carrier-receipt.schema.json",
+    "agentic-tech-lead/codex-v2-live-run/v1": SKILL / "references/contracts/codex-v2-live-run-receipt.schema.json",
+    "agentic-tech-lead/codex-v2-live-run-shadow/v1": SKILL / "references/contracts/codex-v2-live-run-shadow-receipt.schema.json",
+    "agentic-tech-lead/issue-closure-contract/v1": SKILL / "references/issue-closure-contract.schema.json",
+    "spatial-loop/live-shadow-case-delta-receipt/v1": SKILL / "references/contracts/live-shadow-case-delta-receipt.schema.json",
+    "git-hosting-assurance/v1": SKILL.parent / "git-hosting-scale-assurance/references/hosting-assurance.schema.json",
+    "shared-skills-infra/repository-control-plane-profile/v1": SKILL.parent / "shared-skills-infra/references/repository-control-plane-profile.v1.schema.json",
+    "shared-skills-registry/v2": SKILL.parent / "shared-skills-infra/references/shared-skills-registry.v2.schema.json",
 }
-queue = json.loads((SKILL / "runtime-handoff/herdr-local-handoff-queue.json").read_text())
 failed = []
-for item in queue["items"]:
-    if item.get("exit", {}).get("requires_receipt") is not True:
-        continue
-    schema_id = item["receipt"]["schema"]
-    schema_file = SCHEMA_BY_ID.get(schema_id)
-    if schema_file is None:
-        failed.append(f"{item['id']}: receipt.schema {schema_id!r} resolves to no contract file")
-        continue
-    receipt_path = ROOT / item["receipt"]["path"]
-    if not receipt_path.exists():
-        # An ACTIVE item may legitimately have no receipt yet; a COMPLETE one may not.
-        if item.get("state") == "COMPLETE":
-            failed.append(f"{item['id']}: COMPLETE with no receipt at {receipt_path}")
-        continue
-    instance = json.loads(receipt_path.read_text())
-    if instance.get("state") in {"NOT_EXERCISED", "FAIL", "HUMAN_ADMIT_REQUIRED"}:
-        for key in ("state", "evidence_ceiling", "sample_count", "blockers"):
-            if key not in instance:
-                failed.append(f"{item['id']}: blocked receipt missing {key}")
-        continue
-    errors = list(Draft202012Validator(json.loads(schema_file.read_text())).iter_errors(instance))
-    if errors:
-        failed.append(f"{item['id']}: receipt fails {schema_file.name}: {errors[0].message[:120]}")
+checked = 0
+for queue_path in sorted((SKILL / "runtime-handoff").glob("*-local-handoff-queue.json")):
+    for item in json.loads(queue_path.read_text())["items"]:
+        if item.get("exit", {}).get("requires_receipt") is not True:
+            continue
+        label = f"{queue_path.name}:{item['id']}"
+        schema_id = item["receipt"]["schema"]
+        receipt_path = ROOT / item["receipt"]["path"]
+        # A directory is a workspace, not a receipt instance: only a FILE at the
+        # declared path counts as an arrived receipt (the dtcr queue points one
+        # BLOCKED item at its adapters/ directory while no receipt exists yet).
+        if not receipt_path.is_file():
+            # An ACTIVE/BLOCKED item may legitimately have no receipt yet; a
+            # COMPLETE one may not. An id whose family has shipped no receipt at
+            # all is checked the day one appears, not answered with a guessed schema.
+            if item.get("state") == "COMPLETE":
+                failed.append(f"{label}: COMPLETE with no receipt at {receipt_path}")
+            continue
+        schema_file = SCHEMA_BY_ID.get(schema_id)
+        if schema_file is None:
+            failed.append(f"{label}: receipt.schema {schema_id!r} resolves to no contract file")
+            continue
+        checked += 1
+        instance = json.loads(receipt_path.read_text())
+        if instance.get("state") in {"NOT_EXERCISED", "FAIL", "HUMAN_ADMIT_REQUIRED"}:
+            for key in ("state", "evidence_ceiling", "sample_count", "blockers"):
+                if key not in instance:
+                    failed.append(f"{label}: blocked receipt missing {key}")
+            continue
+        errors = list(Draft202012Validator(json.loads(schema_file.read_text())).iter_errors(instance))
+        binding = instance.get("schema_binding", {})
+        if binding.get("state") == "SCHEMA_MISMATCH_DECLARED":
+            # #532/#535: a receipt may refuse the schema its queue names, but only
+            # out loud -- naming that exact id, holding for Human Admit, and
+            # recording a validator readback this gate reproduces error for error.
+            # A silent non-conformance and a lie about the readback stay red.
+            readback = instance.get("schema_validation_readback", {})
+            if (binding.get("queue_named_schema") != schema_id
+                    or instance.get("human_admit") != "HUMAN_ADMIT_REQUIRED"
+                    or readback.get("conforms") is not False
+                    or readback.get("error_count") != len(errors)):
+                failed.append(
+                    f"{label}: schema mismatch against {schema_id} is misdeclared "
+                    f"(observed {len(errors)} validator errors)"
+                )
+            continue
+        if errors:
+            failed.append(f"{label}: receipt fails {schema_file.name}: {errors[0].message[:120]}")
+if checked == 0:
+    failed.append("no receipt was validated: this gate would be vacuously green")
 if failed:
     print("RECEIPT-GATE-RED"); [print(" -", f) for f in failed]; sys.exit(1)
-print("RECEIPT-GATE-GREEN local handoff receipts bound to their declared contract")
+print(f"RECEIPT-GATE-GREEN {checked} local handoff receipts bound to their declared contract")
 PYRC
 
 
@@ -175,6 +228,8 @@ schemas = [
     "references/contracts/problem-closure.schema.json",
     "references/contracts/codex-live-acceptance-receipt.schema.json",
     "references/contracts/codex-live-acceptance-receipt-v2.schema.json",
+    "references/contracts/codex-v2-result-carrier-receipt.schema.json",
+    "references/contracts/codex-v2-live-run-shadow-receipt.schema.json",
     "references/contracts/github-dag-live-canary-receipt.schema.json",
     "references/contracts/herdr-lifecycle-receipt.schema.json",
     "references/contracts/live-shadow-case-delta-receipt.schema.json",
@@ -232,7 +287,7 @@ source_example = json.loads(
 )
 errors = list(Draft202012Validator(source_schema).iter_errors(source_example))
 assert not errors, [error.message for error in errors]
-print("CONTROL-PLANE-SHAPE-GREEN 13 schemas; closure/source examples validated")
+print("CONTROL-PLANE-SHAPE-GREEN 15 schemas; closure/source examples validated")
 PYCP
 python3 "$ROOT/tests/codex_sdk_controller_selftest.py"
 python3 "$ROOT/tests/github_issue_dag_selftest.py"
@@ -286,3 +341,64 @@ PY2
 
 # #566: repository-portfolio control core (snapshot/acceptance/multigraph/waves/dispatch).
 sh "$ROOT/tests/portfolio-control/run-all.sh"
+
+# #606: the Issue closure ledger. The dedicated workflow owns the same denominator,
+# but it only fires on its own paths, so the local suite runs shape, unit controls
+# and the semantic gate over every audited packet here as well.
+python3 - "$ROOT" <<'PYIC'
+import json, sys
+from pathlib import Path
+from jsonschema import Draft202012Validator
+
+root = Path(sys.argv[1])
+schema = json.loads((root / "references/issue-closure-contract.schema.json").read_text(encoding="utf-8"))
+Draft202012Validator.check_schema(schema)
+packets = sorted((root / "references/closure-audit").glob("issue-*.json"))
+assert packets, "closure-audit ledger is empty"
+for packet in packets:
+    errors = list(Draft202012Validator(schema).iter_errors(json.loads(packet.read_text(encoding="utf-8"))))
+    assert not errors, (packet.name, [error.message for error in errors])
+
+# Every packet in the ledger is unbound or grandfathered, so nothing on disk yet
+# proves the schema ADMITS a bound PASS. A shape that rejected the binding would
+# make the #606 law unreachable and no packet would notice until the first one.
+bound = json.loads((root / "references/closure-audit/issue-568.json").read_text(encoding="utf-8"))
+bound["shadow_review"] = {
+    "verdict": "PASS",
+    "packet_author": {"host_class": "CLAUDE_CODE_LOCAL", "session_id": "writer", "worktree": "w"},
+    "shadow_identity": {"host_class": "CLAUDE_CODE_LOCAL", "session_id": "shadow", "worktree": "s"},
+    "receipt": {"path": "docs/traceability/shadow.json", "sha256": "0" * 64},
+}
+assert not list(Draft202012Validator(schema).iter_errors(bound)), "schema refuses a bound PASS"
+bound["shadow_review"]["reviewer"] = "some prose"
+assert list(Draft202012Validator(schema).iter_errors(bound)), "shadow_review must stay closed to invented fields"
+print(f"ISSUE-CLOSURE-SHAPE-GREEN {len(packets)} audited packets; bound PASS admitted, prose reviewer refused")
+PYIC
+python3 "$ROOT/tests/test_issue_closure_contract.py"
+for packet in "$ROOT"/references/closure-audit/issue-*.json; do
+  python3 "$ROOT/scripts/assert_issue_closure_contract.py" "$packet" >/dev/null
+done
+
+# Permanent planted control for #606: flipping a self-authored HUMAN_ADMIT_REQUIRED
+# packet to PASS without naming a Shadow and its receipt must turn the shipped gate
+# red at the process boundary, not only inside the unit suite.
+python3 - "$ROOT" <<'PYSS'
+import json, subprocess, sys, tempfile
+from pathlib import Path
+
+root = Path(sys.argv[1])
+for name in ("issue-407.json", "issue-508.json"):
+    packet = json.loads((root / "references/closure-audit" / name).read_text(encoding="utf-8"))
+    assert packet["shadow_review"]["verdict"] == "HUMAN_ADMIT_REQUIRED", (name, packet["shadow_review"])
+    packet["shadow_review"]["verdict"] = "PASS"
+    with tempfile.TemporaryDirectory() as tmp:
+        flipped = Path(tmp) / name
+        flipped.write_text(json.dumps(packet), encoding="utf-8")
+        run = subprocess.run(
+            [sys.executable, str(root / "scripts/assert_issue_closure_contract.py"), str(flipped)],
+            capture_output=True, text=True,
+        )
+    assert run.returncode == 2, (name, run.returncode, run.stdout, run.stderr)
+    assert "self-authored packet is HUMAN_ADMIT_REQUIRED" in run.stdout, (name, run.stdout)
+print("CLOSURE-SELFSIGN-CONTROL-RED unbound PASS refused on issue-407/issue-508")
+PYSS

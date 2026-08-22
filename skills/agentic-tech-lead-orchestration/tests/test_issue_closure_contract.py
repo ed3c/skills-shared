@@ -1,9 +1,14 @@
 #!/usr/bin/env python3
+import hashlib
 import importlib.util
+import json
 from pathlib import Path
+import shutil
+import tempfile
 import unittest
 
 SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "assert_issue_closure_contract.py"
+CLOSURE_AUDIT = Path(__file__).resolve().parents[1] / "references" / "closure-audit"
 spec = importlib.util.spec_from_file_location("closure", SCRIPT)
 closure = importlib.util.module_from_spec(spec)
 assert spec and spec.loader
@@ -25,7 +30,9 @@ def base():
         },
         "residual": [{"id": "fresh-live-v2", "state": "TRANSFERRED", "owner": "ed3c/skills-shared#464"}],
         "evidence_ceiling": "DETERMINISTIC",
-        "shadow_review": {"verdict": "PASS"},
+        # A synthetic fixture has no independent reviewer, so it carries the honest
+        # self-authored terminal; the bound-PASS path is exercised below.
+        "shadow_review": {"verdict": "HUMAN_ADMIT_REQUIRED"},
     }
 
 
@@ -61,5 +68,66 @@ class IssueClosureContractTest(unittest.TestCase):
     def test_closed_requires_shadow(self):
         d=base(); d["shadow_review"]["verdict"]="HOLD"
         self.assertTrue(any("Shadow verdict" in e for e in closure.validate(d)))
+
+
+class ShadowBindingTest(unittest.TestCase):
+    """#606: a PASS verdict must name a Shadow distinct from the packet author."""
+
+    def setUp(self):
+        self.root = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, self.root)
+        receipt = self.root / "docs/traceability/shadow-receipt.json"
+        receipt.parent.mkdir(parents=True)
+        receipt.write_text('{"verdict": "PASS"}\n', encoding="utf-8")
+        self.receipt = {"path": "docs/traceability/shadow-receipt.json", "sha256": hashlib.sha256(receipt.read_bytes()).hexdigest()}
+
+    def bound(self):
+        d = base()
+        d["shadow_review"] = {
+            "verdict": "PASS",
+            "packet_author": {"host_class": "CLAUDE_CODE_LOCAL", "session_id": "writer-1", "worktree": "handoff-queue-audit"},
+            "shadow_identity": {"host_class": "CLAUDE_CODE_LOCAL", "session_id": "shadow-2", "worktree": "shadow-audit"},
+            "receipt": dict(self.receipt),
+        }
+        return d
+
+    def test_bound_pass_positive(self): self.assertEqual([], closure.validate(self.bound(), root=self.root))
+    def test_unbound_pass_is_refused(self):
+        d=base(); d["shadow_review"]={"verdict":"PASS"}
+        self.assertTrue(any("self-authored packet is HUMAN_ADMIT_REQUIRED" in e for e in closure.validate(d, root=self.root)))
+    def test_self_signed_shadow_is_refused(self):
+        d=self.bound(); d["shadow_review"]["shadow_identity"]=dict(d["shadow_review"]["packet_author"])
+        self.assertTrue(any("distinct from the packet author" in e for e in closure.validate(d, root=self.root)))
+    def test_anonymous_shadow_is_refused(self):
+        d=self.bound(); d["shadow_review"]["shadow_identity"]["session_id"]=None
+        self.assertTrue(any("named Shadow session_id" in e for e in closure.validate(d, root=self.root)))
+    def test_absent_receipt_file_is_refused(self):
+        d=self.bound(); d["shadow_review"]["receipt"]["path"]="docs/traceability/never-written.json"
+        self.assertTrue(any("absent at its bound path" in e for e in closure.validate(d, root=self.root)))
+    def test_receipt_digest_mismatch_is_refused(self):
+        d=self.bound(); d["shadow_review"]["receipt"]["sha256"]="0"*64
+        self.assertTrue(any("does not match its bound sha256" in e for e in closure.validate(d, root=self.root)))
+    def test_historical_unbound_pass_stays_green(self):
+        d=base(); d["shadow_review"]={"verdict":"PASS"}
+        self.assertEqual([], closure.validate(d, historical=True, root=self.root))
+    def test_human_admit_required_needs_no_binding(self): self.assertEqual([], closure.validate(base(), root=self.root))
+
+    def test_planted_flip_of_a_historical_packet_is_refused(self):
+        """Permanent control: HUMAN_ADMIT_REQUIRED -> PASS on the real ledger packets #606 was proven on."""
+        for name in ("issue-407.json", "issue-508.json"):
+            packet = CLOSURE_AUDIT / name
+            d = json.loads(packet.read_text(encoding="utf-8"))
+            self.assertEqual("HUMAN_ADMIT_REQUIRED", d["shadow_review"]["verdict"], name)
+            d["shadow_review"]["verdict"] = "PASS"
+            self.assertIs(False, closure.is_historical(name, d), name)
+            self.assertTrue(any("self-authored packet is HUMAN_ADMIT_REQUIRED" in e for e in closure.validate(d)), name)
+
+    def test_grandfathered_packets_are_named_one_by_one(self):
+        ledger = json.loads((CLOSURE_AUDIT / "enforced-from.json").read_text(encoding="utf-8"))
+        for entry in ledger["grandfathered_unbound_pass"]:
+            d = json.loads((CLOSURE_AUDIT / entry["file"]).read_text(encoding="utf-8"))
+            self.assertEqual(entry["issue"], d["issue"]["number"], entry["file"])
+            self.assertEqual(entry["shadow_verdict"], d["shadow_review"]["verdict"], entry["file"])
+            self.assertIs(True, closure.is_historical(entry["file"], d))
 
 if __name__ == "__main__": unittest.main()

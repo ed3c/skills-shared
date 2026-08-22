@@ -1,0 +1,26 @@
+{
+  "schema": "agentic-tech-lead/issue-closure-shadow-binding/enforced-from/v1",
+  "_meta": {
+    "purpose": "Machine-readable start point for the #606 Shadow-binding law: a closure packet whose shadow_review.verdict is PASS must name a Shadow identity distinct from the packet author and a receipt that exists at its bound sha256. This file lists the packets that were already green under the unbound rule, so history stays honest and every new packet is bound.",
+    "why_not_backfill": "The Shadow that reviewed these packets left no recorded identity or receipt. Writing one now would be invention, and inventing a reviewer is exactly the promotion #606 exists to stop. Flipping their verdicts to HUMAN_ADMIT_REQUIRED would be the opposite invention: it would claim we know the review did not happen.",
+    "why_a_list_and_not_a_date": "A closure packet has no intrinsic ordering the gate can read, unlike a commit. Listing the grandfathered packets one by one keeps the gate blocking for everything else, and the length of this list is the honest measure of how many PASS verdicts in the ledger are still self-signed.",
+    "how_to_stop_adding_to_this": "Nothing may be added. A new packet binds its Shadow, or it records HUMAN_ADMIT_REQUIRED. An entry here admits one exact file name at one exact Issue number with one exact verdict; changing any of the three drops the packet out of the grandfathered set and the binding is required again."
+  },
+  "enforced_from": {
+    "subject_commit": "a9db0bd95a04923e6c1599808d022dfc7ea90b1c",
+    "issue": "ed3c/skills-shared#606",
+    "note": "Wave-1 admitted main of the Local Handoff convergence. Packets present in closure-audit/ at this subject with an unbound PASS are listed below; every packet added after it is judged by the binding rule."
+  },
+  "grandfathered_unbound_pass": [
+    {"file": "issue-312.json", "issue": 312, "shadow_verdict": "PASS", "reason": "initial audited denominator (semantic drift control); reviewed before shadow_review carried an identity field"},
+    {"file": "issue-366.json", "issue": 366, "shadow_verdict": "PASS", "reason": "initial audited denominator (cross-repository closure); reviewed before shadow_review carried an identity field"},
+    {"file": "issue-403.json", "issue": 403, "shadow_verdict": "PASS", "reason": "initial audited denominator (indirection control); reviewed before shadow_review carried an identity field"},
+    {"file": "issue-505.json", "issue": 505, "shadow_verdict": "PASS", "reason": "initial audited denominator (positive direct landing); reviewed before shadow_review carried an identity field"},
+    {"file": "issue-551.json", "issue": 551, "shadow_verdict": "PASS", "reason": "closed under the unbound rule; no Shadow identity or receipt was recorded at review time"},
+    {"file": "issue-559.json", "issue": 559, "shadow_verdict": "PASS", "reason": "closed under the unbound rule; no Shadow identity or receipt was recorded at review time"},
+    {"file": "issue-560.json", "issue": 560, "shadow_verdict": "PASS", "reason": "closed under the unbound rule; no Shadow identity or receipt was recorded at review time"},
+    {"file": "issue-566.json", "issue": 566, "shadow_verdict": "PASS", "reason": "closed under the unbound rule; no Shadow identity or receipt was recorded at review time"},
+    {"file": "issue-567.json", "issue": 567, "shadow_verdict": "PASS", "reason": "closed under the unbound rule; no Shadow identity or receipt was recorded at review time"},
+    {"file": "issue-568.json", "issue": 568, "shadow_verdict": "PASS", "reason": "portfolio-wave closure; the packet cites Shadow verdicts at four heads in prose but binds no reviewer identity or receipt file"}
+  ]
+}

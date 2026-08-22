@@ -68,6 +68,30 @@ def validate(contract: dict[str, Any]) -> tuple[list[str], str]:
     return errors, readiness
 
 
+def validate_set(packets: list[Any]) -> list[str]:
+    """Validate a committed acceptance *set* -- the array shape `acceptance.json` is stored in.
+
+    Every packet is judged by `validate`, plus the one law a single packet cannot
+    see: two packets may not claim the same unit_id, or the set silently carries
+    two different acceptance contracts for one Issue/PR.
+    """
+    errors: list[str] = []
+    seen: set[str] = set()
+    for index, packet in enumerate(packets):
+        if not isinstance(packet, dict):
+            errors.append(f"[{index}]: acceptance packet is not an object")
+            continue
+        unit = str(packet.get("unit_id") or f"[{index}]")
+        if unit in seen:
+            errors.append(f"{unit}: duplicate unit_id in acceptance set")
+        seen.add(unit)
+        packet_errors, readiness = validate(packet)
+        errors.extend(f"{unit}: {error}" for error in packet_errors)
+        if readiness != "READY":
+            errors.append(f"{unit}: {readiness}")
+    return errors
+
+
 def positive_fixture() -> dict[str, Any]:
     contract = {
         "schema_version": "agentic-tech-lead/issue-pr-acceptance/v1",
@@ -144,23 +168,61 @@ def selftest() -> None:
     assert "ISSUE_CLOSED_WITH_UNRESOLVED_ACCEPTANCE" in errors, errors
     print("REFUSED ISSUE_CLOSED_WITH_UNRESOLVED_ACCEPTANCE")
 
-    print("ISSUE-PR-ACCEPTANCE-GREEN positives=2 mutations=4")
+    # Set mode (#607): the committed acceptance.json is an array, and --contract
+    # used to crash on it with an AttributeError instead of judging it.
+    pair = [base, bind_digest(dict(copy.deepcopy(base), unit_id="ISSUE-567"))]
+    assert validate_set(pair) == [], validate_set(pair)
+    print("SET PASS two distinct packets")
+
+    duplicated = [base, copy.deepcopy(base)]
+    assert any("duplicate unit_id" in error for error in validate_set(duplicated)), validate_set(duplicated)
+    print("REFUSED duplicate unit_id in acceptance set")
+
+    planted = [base, stripped]
+    errors = validate_set(planted)
+    assert any("ISSUE_WITHOUT_FROZEN_ACCEPTANCE" in error for error in errors), errors
+    print("REFUSED planted set member without frozen acceptance")
+
+    assert any("not an object" in error for error in validate_set(["ISSUE-566"])), "non-object packet accepted"
+    print("REFUSED non-object acceptance packet")
+
+    print("ISSUE-PR-ACCEPTANCE-GREEN positives=3 mutations=7")
 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--contract", type=Path)
+    parser.add_argument("--contract", type=Path, help="one acceptance packet (object)")
+    parser.add_argument("--contract-set", type=Path, help="a committed acceptance array, e.g. docs/traceability/github-portfolio-control/acceptance.json")
     parser.add_argument("--selftest", action="store_true")
     args = parser.parse_args()
     if args.selftest:
         selftest()
         return 0
-    if not args.contract:
-        parser.error("--contract is required without --selftest")
+    if not args.contract and not args.contract_set:
+        parser.error("--contract or --contract-set is required without --selftest")
+    source = args.contract_set or args.contract
     try:
-        contract = load_json(args.contract)
+        loaded = load_json(source)
     except Exception as exc:
         print(f"FATAL: {exc}", file=sys.stderr)
+        return 64
+    if args.contract_set:
+        if not isinstance(loaded, list) or not loaded:
+            print(f"FATAL: --contract-set expects a non-empty JSON array, got {type(loaded).__name__}", file=sys.stderr)
+            return 64
+        errors = validate_set(loaded)
+        if errors:
+            for error in errors:
+                print(f"FAIL: {error}")
+            print(f"STATE: BLOCKED_BY_MISSING_ACCEPTANCE packets={len(loaded)}")
+            return 2
+        print(f"PASS: acceptance set {source} packets={len(loaded)} all READY")
+        return 0
+    contract = loaded
+    if not isinstance(contract, dict):
+        # The committed acceptance ledger is an array; --contract used to crash
+        # on it with an AttributeError deep inside validate() (#607).
+        print(f"FATAL: --contract expects one acceptance object; {source} holds a {type(contract).__name__} -- use --contract-set", file=sys.stderr)
         return 64
     errors, readiness = validate(contract)
     if errors:

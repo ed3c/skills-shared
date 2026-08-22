@@ -1,0 +1,183 @@
+{
+  "artifact": "Issue #466 herdr-v3 fresh-context Shadow readback receipt",
+  "issue": 466,
+  "queue_item": "herdr-live-lifecycle",
+  "reviewed_worktree_head": "a9db0bd95a04923e6c1599808d022dfc7ea90b1c",
+  "produced_utc": "2026-08-22T12:48:32Z",
+  "verdict": "HOLD",
+  "verdict_basis": "The reviewed receipt schema-validates cleanly and is internally consistent, but the receipt shape silently drops the per-sample provenance disclosure (observation_time_source / process_facts_source / cleanup_source) the observer was amended on 2026-08-22 to compute, agent_session_id is null with no plan-side pin rejecting a manual-reporter session, and the receipt's own base_sha/tree_sha are unreachable from admitted main. None of these rises to a proven forbidden-promotion violation, but none can be waved through either.",
+  "human_admit": "HUMAN_ADMIT_REQUIRED",
+  "independence_declaration": {
+    "role": "TECH_LEAD_DISPATCHED_FRESH_CONTEXT",
+    "carrier": "claude-code",
+    "zero_builder_conversation_context": true,
+    "separate_session": true,
+    "separate_worktree_from_builder": true,
+    "worktree": "/Users/neon/skills-shared/.claude/worktrees/handoff-queue-audit",
+    "builder_worktree_named_in_plan": "/Users/neon/skills-shared/.claude/worktrees/local-handoff-queue",
+    "satisfies_truly_independent_shadow_close_gate": false,
+    "why_not": [
+      "Dispatched by the same Tech Lead orchestration that dispatched the #466 live-run Builder, on the same host, under the same session scratchpad root (ba0ee313-3387-4cd5-8e1e-eea11e6f3419) a prior wave-2 Shadow writer (#535) also used. Fresh context and a separate worktree are not organisational independence.",
+      "This review re-ran the Builder's own collector/observer/selftest scripts rather than re-implementing them; it did not write an independent oracle. That is appropriate here (collect_herdr_lifecycle.py/herdr_runtime_observer.py are deterministic, already-gated mechanical reducers, not a judgment mechanism), but it means code-level trust in those scripts is inherited, not re-derived.",
+      "Per the queue's own O5/GS-C20-class law used by sibling reviews: advisory evidence only. Never Human Admit, merge or release."
+    ]
+  },
+  "schema_binding": {
+    "queue_named_schema": "agentic-tech-lead/herdr-lifecycle/v1",
+    "queue_named_schema_path": "skills/agentic-tech-lead-orchestration/references/contracts/herdr-lifecycle-receipt.schema.json",
+    "note_on_path": "The queue's receipt.schema/path pair names a repo-root-relative path that is actually relative to the owning skill directory (skills/agentic-tech-lead-orchestration/references/contracts/..., not references/contracts/... off repo root). Low-severity path-hygiene note, not acted on here (out of this lane's single-path write lease); folded into findings as SR-04.",
+    "validator": "jsonschema 4.26.0 Draft202012Validator (matches the version .github/workflows/issue-closure-contract.yml, skill-eval-contract.yml, skill-suites.yml and others pin; confirmed installed in this environment)",
+    "result": "CONFORMS",
+    "detail": "0 schema errors against the full schema (oneOf resolved). Explicitly confirmed the instance matches oneOf[1] (LIVE_HERDR_LIFECYCLE_OBSERVED_CANDIDATE, 0 errors) and correctly fails oneOf[0]/UNAVAILABLE_FALLBACK (4 errors) and oneOf[2]/queue-level PASS-FAIL-envelope (13 errors) — i.e. the file is genuinely the raw collector candidate shape, not a mis-shaped queue-level envelope wearing the same path.",
+    "caveat": "The instance itself carries no top-level `schema` field naming which contract id it conforms to (that key is optional in the schema and simply absent here) — the binding above is asserted by the queue and independently confirmed by this review, not self-declared by the artifact."
+  },
+  "reviewed_artifacts": {
+    "receipt": {"path": "data/handoff/herdr-v3/herdr-lifecycle-receipt.json", "sha256": "af214458374d1ca0ce436a2c0c00ee445d6e3881dbfeb9babf4463bb929adb15"},
+    "plan": {"path": "data/handoff/herdr-v3/herdr-plan.json", "sha256": "7a46fe00bbf68f491244cb593b5d00fb713fc591ed6ec3fa957dce8f6d4fee8e"},
+    "schema": {"path": "skills/agentic-tech-lead-orchestration/references/contracts/herdr-lifecycle-receipt.schema.json", "sha256": "a9cd95ca727da5470ef1026e0b58fb737f2bf26b451df594f58f2a10be9f0db4"},
+    "frozen_surface_snapshot": {"path": "skills/agentic-tech-lead-orchestration/references/contracts/herdr-agent-surface.observed.json", "sha256": "fde8f11fc5d47119b2feebd4e4feaf22fda73fcb44032b5a96369c61427f8ae3"},
+    "observer_module": "skills/agentic-tech-lead-orchestration/modules/herdr-runtime-observer.md",
+    "observer_code": "skills/agentic-tech-lead-orchestration/scripts/herdr_runtime_observer.py",
+    "collector_code": "skills/agentic-tech-lead-orchestration/scripts/collect_herdr_lifecycle.py"
+  },
+  "bound_subjects": {
+    "receipt_declared": {"repo": "ed3c/skills-shared", "base_sha": "752b676d939d4633e0b8721f10873fc094288b2f", "tree_sha": "5b957e100579b38a56817a0409db6f193c5d6ced", "worktree": "/Users/neon/skills-shared/.claude/worktrees/local-handoff-queue", "target": "live466codex", "attempt_id": "466-live-3", "task_id": "issue-466/T1"},
+    "plan_manifest_cross_check": "Every field above (base_sha, tree_sha, repo, target, worktree, task_id) verified byte-equal between herdr-lifecycle-receipt.json and herdr-plan.json's manifest.",
+    "base_sha_git_reachability": {
+      "exists_as_object": true,
+      "commit_message": "feat(#464): land the live-run receipt binding landing commit 59c88c5",
+      "reachable_from_admitted_HEAD": false,
+      "only_reachable_via": ["backup-pre-trailer-fix (local branch)", "remotes/github/forensic/599-pre-trailer-fix", "remotes/origin/forensic/599-pre-trailer-fix"],
+      "root_cause": "PR #599 was rewritten for commit-trailer conformance (Driven-By/Driven-On). This base_sha is the pre-rewrite state, preserved only on forensic/backup branches; the trailer-fixed same-message twin (52dc788f, different tree 2ccf85db) is ALSO not on admitted HEAD, and the codex-v2 sibling receipt's own self-declared subject (receipt_landing_commit 218a82407337335fe263b5d8e3b9dfc4c5924962, queue_subject_commit 08a7d3c8098b3710adc040924781ee615dec287f) is not on admitted HEAD either.",
+      "verification_commands": [
+        {"argv": ["git", "cat-file", "-e", "752b676d939d4633e0b8721f10873fc094288b2f"], "exit": 0},
+        {"argv": ["git", "merge-base", "--is-ancestor", "752b676d939d4633e0b8721f10873fc094288b2f", "HEAD"], "exit": 1, "meaning": "NOT an ancestor of admitted HEAD"},
+        {"argv": ["git", "branch", "--all", "--contains", "752b676d939d4633e0b8721f10873fc094288b2f"], "exit": 0, "stdout": "backup-pre-trailer-fix, remotes/github/forensic/599-pre-trailer-fix, remotes/origin/forensic/599-pre-trailer-fix"},
+        {"argv": ["git", "log", "HEAD", "--format=%H %T"], "grep": "5b957e100579b38a56817a0409db6f193c5d6ced", "exit": 1, "meaning": "this tree never landed on admitted main"}
+      ]
+    },
+    "herdr_binary_and_session": {
+      "installed_version": "0.8.0 at /opt/homebrew/bin/herdr",
+      "matches_frozen_provenance": true,
+      "session_named_in_plan": "live466",
+      "session_confirmed_present": true,
+      "session_status_now": "stopped",
+      "verification_command": {"argv": ["herdr", "session", "list"], "exit": 0, "found_row": "live466  stopped  /Users/neon/.config/herdr/sessions/live466  .../sessions/live466/herdr.sock"}
+    },
+    "timestamp_sanity": {
+      "process_started_at_unix": "1787396532 -> 2026-08-22 19:02:12 CST",
+      "first_source_observed_at_unix": "1787397327 -> 2026-08-22 19:15:27 CST",
+      "last_source_observed_at_unix": "1787397385 -> 2026-08-22 19:16:25 CST",
+      "ordering": "process_started < first_observed <= last_observed, all same host-day: PASS",
+      "process_id_liveness_now": "NOT_EXERCISED — checking pid 77848 liveness now is moot (herdr session live466 already reports stopped) and was denied by the sandbox's ps restriction; not pursued further since it cannot speak to the state at collection time, which the collector's own validate_sequence already gates (see forbidden_promotions table)."
+    }
+  },
+  "adversarial_questions": {
+    "Q1_do_the_20_samples_carry_the_facts_the_old_AgentInfo_blocker_said_were_unobtainable": {
+      "answer": "Cannot be verified from the artifact — and that is itself the finding, not a shrug. collect_herdr_lifecycle.py's collect() reduces each full sample (which DOES carry observation_time_source/process_facts_source/cleanup_source per herdr_runtime_observer.reduce_observation) down to a SHA256 digest only (sample_digests); the raw per-sample JSON is never written anywhere on disk. Confirmed by code read (both scripts) plus `find data/handoff/herdr-v3 data/handoff/herdr-v2 -type f` returning only plan.json + lifecycle-receipt.json in each directory — no raw-sample file exists to recompute a digest against.",
+      "what_can_be_determined_independently": "For herdr 0.8.0 specifically (the exact binary installed on this host, confirmed byte-identical to the frozen capture — see herdr_api_schema_reverify below), herdr-agent-surface.observed.json's own typed_substitutions/receipt_source_values_unreachable_against_captured_version tables prove observation_time_source can ONLY ever be OBSERVER_LOCAL_CLOCK and cleanup_source can ONLY ever be HERDR_PUBLISHED=false (i.e. OBSERVER_DERIVED or NOT_OBSERVED) at this herdr version — HERDR_SOURCE_CLOCK and cleanup_source=HERDR_PUBLISHED are both listed as unreachable. So first_source_observed_at_unix/last_source_observed_at_unix in this receipt are, with certainty derived from code + a live-reverified frozen contract (not from the receipt itself), the OBSERVER's own wall clock stamped at each poll — not any clock herdr published.",
+      "is_that_a_forbidden_promotion_(observer_local_clock_to_herdr_source_clock)": "NOT LITERALLY TRIGGERED — no field in the receipt asserts HERDR_SOURCE_CLOCK. But the receipt names the fields `first_source_observed_at_unix`/`last_source_observed_at_unix` without carrying the `observation_time_source` tag that would let a reader tell the difference, which is exactly the 'silently invented' shape the observer module's own prose warns against for typed substitutions. See SR-01."
+    },
+    "Q2_is_cleanup_residue_content_bound_or_derived": {
+      "answer": "Neither — cleanup/residue are ENTIRELY ABSENT from this receipt, and correctly so. final_observer_state is IDLE (nonterminal); herdr_runtime_observer._derive_cleanup is only invoked when mapped==DONE_CANDIDATE, and collect_herdr_lifecycle.validate_sequence only requires cleanup_state=CLEAN/residue_count=0 for TERMINAL samples. Confirmed by direct field enumeration of the receipt JSON (cross_checks.py): no cleanup/cleanup_state/residue_count/state/blockers key present at all. This is the correct, honest shape for a run that stopped at IDLE — not a gap."
+    },
+    "Q3_is_any_state_promoted_beyond_SHADOW_PENDING": {
+      "answer": "No, in the receipt itself: evidence_ceiling stays LIVE_OBSERVER_LIFECYCLE_SHADOW_PENDING, lifecycle_state is the CANDIDATE label (not e.g. VERIFIED), and there is no `state` field claiming PASS/FAIL/NOT_EXERCISED/HUMAN_ADMIT_REQUIRED anywhere in this file. Also checked the wider repo for a premature #466 closure claim: docs/traceability/current-runtime-handoff/AGENTS.md:69 and README.md describe #466 as still OPEN with 'the remaining gate is Shadow readback plus the clean terminal state' — consistent with this receipt, no contradiction found (unlike the #535 sibling review's SR-03 finding against a different queue)."
+    }
+  },
+  "forbidden_promotions_checked": {
+    "process_detection_to_terminal_lifecycle_pass": {"outcome": "NOT_TRIGGERED", "evidence": "No terminal claim exists; final_observer_state=IDLE, no `state` field."},
+    "done_candidate_to_controller_acceptance": {"outcome": "NOT_TRIGGERED", "evidence": "final_observer_state never reaches DONE_CANDIDATE in this receipt."},
+    "manual_report_agent_to_clean_terminal_receipt": {"outcome": "NOT_TRIGGERED_BUT_PRECONDITION_UNRESOLVED", "evidence": "No clean-terminal claim is made (letter of the promotion not reached), but agent_session_id is null throughout and herdr-plan.json's manifest never sets expected_agent_session_source — the one field herdr_runtime_observer.md names as the discriminator between a real herdr-managed agent and the `herdr pane report-agent` manual fallback. AgentSessionInfo.value/source/agent/kind are ALL schema-required strings (confirmed via live `herdr api schema --json`), so a populated agent_session cannot itself be empty-valued; null most plausibly means AgentInfo.agent_session was absent for this pane. That is consistent with either (a) a genuine managed agent whose session simply had not linked at sample time, or (b) a manual report-agent placeholder, since `herdr pane report-agent-session` (which would populate it for a manual reporter) is a separate, optional API call. This artifact cannot distinguish (a) from (b); see SR-02."},
+    "permission_denial_to_pass": {"outcome": "NOT_TRIGGERED", "evidence": "No permission denial appears anywhere in this receipt or plan; herdr calls succeeded live (lifecycle_state=LIVE_HERDR_LIFECYCLE_OBSERVED_CANDIDATE, not UNAVAILABLE_FALLBACK)."},
+    "observer_local_clock_to_herdr_source_clock": {"outcome": "NOT_ASSERTED_BUT_UNDISCLOSED", "evidence": "See Q1 above and SR-01. Independently determined (not receipt-stated) to be OBSERVER_LOCAL_CLOCK."},
+    "derived_cleanup_to_herdr_published_cleanup": {"outcome": "NOT_TRIGGERED", "evidence": "See Q2 above — no cleanup claim of any kind exists in this receipt."},
+    "unexercised_read_only_surface_to_blocked_by_upstream_api": {"outcome": "NOT_TRIGGERED", "evidence": "This receipt records a genuine live run (herdr available, 20 samples collected), not a blocked/unexercised surface mislabeled as upstream-blocked; contrast with the honest herdr-v2 receipt's explicit `blockers[]` array, which this v3 receipt correctly does not carry."}
+  },
+  "findings": [
+    {
+      "id": "SR-01",
+      "severity": "HIGH",
+      "summary": "collect_herdr_lifecycle.py and the shape-2 schema both silently drop the observation_time_source/process_facts_source/cleanup_source disclosure tags that herdr_runtime_observer.py was amended on 2026-08-22 to compute for exactly this purpose.",
+      "detail": [
+        "herdr_runtime_observer.reduce_observation() returns these three tags per sample specifically so a reader can tell HERDR_PUBLISHED facts from OBSERVER_LOCAL/OBSERVER_DERIVED/OS_AUXILIARY substitutions (see herdr-agent-surface.observed.json's typed_substitutions table).",
+        "collect_herdr_lifecycle.collect()'s return dict (grep-confirmed: 0 matches for observation_time_source|process_facts_source|cleanup_source in that file) keeps only first_source_observed_at_unix/last_source_observed_at_unix/process_id/process_started_at_unix — the VALUES, not their provenance tags.",
+        "The schema's oneOf[1] branch has additionalProperties:false at the top level and defines no property named observation_time_source, process_facts_source or cleanup_source anywhere (grep-confirmed 0 matches) — so even a maximally honest collector could not add these fields back without a schema change.",
+        "Net effect: sample_digests (the only per-sample record retained) are opaque SHA256 hashes with no raw file backing them anywhere in the tree, so this specific, load-bearing disclosure is unrecoverable from the committed artifact, permanently, for this attempt."
+      ],
+      "owner": "collector/schema owner (agentic-tech-lead-orchestration skill)"
+    },
+    {
+      "id": "SR-02",
+      "severity": "MEDIUM",
+      "summary": "agent_session_id is null throughout, and the plan never pins expected_agent_session_source, so this artifact cannot prove the 20 samples came from a herdr-managed agent rather than the `herdr pane report-agent` manual fallback.",
+      "detail": [
+        "herdr-runtime-observer.md states explicitly: '(bind agent_session.source to reject manual reporters)'. herdr-plan.json's manifest has no expected_agent_session_source key, so reduce_observation() never asserted on it for this run.",
+        "IDLE (the state this run ends on) is in BOTH AgentStatus's real enum and report_agent_state_enum, so a manual reporter repeatedly invoking `herdr pane report-agent --state idle` would be indistinguishable from a real managed agent at this state, using only what survives in the final receipt.",
+        "Not resolved by process_id/process_started_at_unix being populated: those come from pane.process_info/ps, a separate herdr surface that reports the pane's real shell process regardless of whether the AGENT inside it is herdr-managed or manually reported."
+      ],
+      "owner": "issue 466 (next attempt should set expected_agent_session_source in herdr-plan.json before collecting)"
+    },
+    {
+      "id": "SR-03",
+      "severity": "HIGH",
+      "summary": "The receipt's base_sha/tree_sha are unreachable from admitted main; they exist only on forensic/backup branches left over from a PR #599 commit-trailer-conformance rewrite, and the codex-v2 sibling receipt's own self-declared subject has the identical problem.",
+      "detail": [
+        "git merge-base --is-ancestor 752b676d...HEAD exits 1. The commit is reachable only via backup-pre-trailer-fix / forensic/599-pre-trailer-fix.",
+        "Its same-message trailer-fixed twin 52dc788f (tree 2ccf85db, different from 752b676d's tree 5b957e10) is ALSO not an ancestor of HEAD.",
+        "data/handoff/codex-v2/issue-464-live-run-receipt.json self-declares subject.receipt_landing_commit=218a8240... and subject.queue_subject_commit=08a7d3c8... — both independently confirmed NOT ancestors of HEAD either.",
+        "No commit reachable from HEAD carries tree 5b957e10... or 2ccf85db... at all (grep over `git log HEAD --format=%H %T` is empty for both), so this is not a rename/no-op question: whatever the trailer-conformance rebuild finally landed on main has different bytes than what either forensic generation recorded.",
+        "Consequence for THIS item: the queue's own required_capability 'controller-source-diff-test-readback' cannot be run against admitted main using this base_sha as the anchor without first resolving which admitted commit (if any) actually supersedes it."
+      ],
+      "owner": "queue writer + issue 464/466 (rebind subject fields to an admitted-main-reachable commit, or record explicitly why a forensic-branch-only subject is acceptable evidence)"
+    },
+    {
+      "id": "SR-04",
+      "severity": "LOW",
+      "summary": "The queue's receipt.path/schema pointer is repo-root-relative in spelling but is actually skill-relative on disk.",
+      "detail": "herdr-local-handoff-queue.json entry.receipt.schema names 'agentic-tech-lead/herdr-lifecycle/v1' with no path field pointing at it directly by that route; the schema file itself lives at skills/agentic-tech-lead-orchestration/references/contracts/herdr-lifecycle-receipt.schema.json, not references/contracts/herdr-lifecycle-receipt.schema.json off repo root. This cost real time to locate during this review (first `find` at the literal path failed) but did not block validation once found.",
+      "owner": "queue writer (cosmetic; not blocking)"
+    }
+  ],
+  "verdicts": {
+    "schema_conformance": "PASS",
+    "internal_consistency": "PASS (sample_count==len(sample_digests)==20, all 20 digests unique 64-hex, timestamps monotonic non-decreasing and process_started<=first_observed<=last_observed, plan/receipt manifest fields byte-identical)",
+    "disclosure_provenance": "GAP (SR-01) — undisclosed but independently determined to be OBSERVER_LOCAL_CLOCK, not asserted as HERDR_SOURCE_CLOCK",
+    "agent_identity_certainty": "UNRESOLVED (SR-02)",
+    "subject_commit_lineage": "STALE (SR-03) — orphaned from admitted main",
+    "lifecycle_completeness": "NOT_TERMINAL by design (final_observer_state=IDLE, require_terminal=false in the plan) — correctly labeled CANDIDATE, not a defect, but means #466 cannot close on this receipt alone regardless of this Shadow verdict",
+    "forbidden_promotions": "0 of 7 literally triggered; 2 of 7 (manual_report_agent_to_clean_terminal_receipt, observer_local_clock_to_herdr_source_clock) have their preconditions left undisclosed rather than falsely asserted"
+  },
+  "independent_readbacks": {
+    "note": "Every command below was run read-only from the worktree root with explicit paths; exit codes are the real ones. Ad-hoc scripts ran from an isolated scratchpad subdirectory (herdr-shadow/) after a stray inspect.py elsewhere in the shared scratchpad shadowed the stdlib module for the first attempt.",
+    "schema_validation": {"argv": ["python3", "<scratchpad>/herdr-shadow/validate_herdr_receipt.py"], "exit": 0, "result": "error_count 0, RESULT VALID, oneOf[1] (LIVE_HERDR_LIFECYCLE_OBSERVED_CANDIDATE) matches with 0 errors, oneOf[0]/oneOf[2] correctly fail with 4/13 errors"},
+    "cross_checks": {"argv": ["python3", "<scratchpad>/herdr-shadow/cross_checks.py"], "exit": 0, "result": "all counts/uniqueness/ordering/absent-field checks PASS as reported in bound_subjects/adversarial_questions above"},
+    "herdr_observer_selftest": {"argv": ["python3", "skills/agentic-tech-lead-orchestration/tests/herdr_observer_selftest.py"], "exit": 0, "stdout": "herdr-observer selftest: PASS (positive=5 mutations=21 contract_input_controls=2 live=NOT_EXERCISED)"},
+    "herdr_surface_conformance_selftest": {"argv": ["python3", "skills/agentic-tech-lead-orchestration/tests/herdr_surface_conformance_selftest.py"], "exit": 0, "stdout": "herdr-surface-conformance: PASS (observer_call_sites=28 observer_names=68 fixture_keys=18 substitutions=6 live=NOT_EXERCISED)"},
+    "skill_full_suite": {"argv": ["sh", "skills/agentic-tech-lead-orchestration/tests/run-all.sh"], "exit": 0, "note": "874 lines of output, includes 'PASS: Local Handoff Execution Queue (1 item(s), active=herdr-live-lifecycle)' and 'herdr-lifecycle selftest: PASS (positive=3 mutations=10 live=NOT_EXERCISED)'"},
+    "queue_structural_assert": {"argv": ["python3", "skills/agentic-tech-lead-orchestration/scripts/assert_local_handoff_queue.py", "--queue", "skills/agentic-tech-lead-orchestration/runtime-handoff/herdr-local-handoff-queue.json"], "exit": 0, "stdout": "PASS: Local Handoff Execution Queue (1 item(s), active=herdr-live-lifecycle)"},
+    "herdr_session_list": {"argv": ["herdr", "session", "list"], "exit": 0, "stdout_contains": "live466  stopped  /Users/neon/.config/herdr/sessions/live466"},
+    "herdr_api_schema_reverify": {"argv": ["herdr", "api", "schema", "--json"], "exit": 0, "byte_length": 251527, "sha256": "88ff414aa996e390c2db05a37b95d28dbe4e81b98329f6ed7f7a2cc5c6ebf51a", "matches_frozen_provenance_exactly": true, "note": "Live re-capture on this host is byte-identical to the 2026-08-22 frozen snapshot's capture_sha256/capture_byte_length, so the typed_substitutions table's HERDR_SOURCE_CLOCK-unreachable claim is current, not stale documentation."},
+    "agent_session_schema_check": {"note": "Inspected AgentSessionInfo and PaneReportAgentSessionParams definitions in the live-recaptured schema.json directly (source for SR-02): AgentSessionInfo requires all of source/agent/kind/value as non-null strings; PaneReportAgentSessionParams (the manual report-agent-session API) makes agent_session_id/agent_session_path/session_start_source all optional."},
+    "git_lineage_checks": {"argv_family": ["git cat-file -e <sha>", "git merge-base --is-ancestor <sha> HEAD", "git branch --all --contains <sha>", "git log HEAD --format=\"%H %T\" | grep <tree>"], "exits": "0/1/0/1 respectively per SR-03's four verification_commands entries above"},
+    "timestamp_decode": {"argv": ["date", "-r", "<unix>"], "exit": 0, "result": "see bound_subjects.timestamp_sanity"}
+  },
+  "ceilings": {
+    "reexecution": "Not attempted. Session live466 is now 'stopped'; materializing a fresh herdr session/plan to re-collect would be a new live attempt, not a readback of the existing candidate, and is outside this lane's single-artifact write lease and READ-ONLY mandate.",
+    "raw_sample_recovery": "Impossible from committed state — collect_herdr_lifecycle.py only ever persists SHA256 digests of samples, never the samples themselves, and no raw-sample file exists anywhere under data/handoff/herdr-v2 or herdr-v3.",
+    "network": "None used (hard rule). GitHub issue/PR live state for #466/#599 was not read; all git-lineage findings above come from the local repository's own object store and refs.",
+    "independence": "TECH_LEAD_DISPATCHED_FRESH_CONTEXT on carrier claude-code, separate worktree from the Builder's, but same host/dispatcher/scratchpad lineage. Advisory EXTERNAL_EVIDENCE only — never Human Admit, merge, promotion or rollback."
+  },
+  "not_performed": [
+    {"item": "Re-execution of the herdr live lifecycle to reach a terminal DONE_CANDIDATE state", "state": "NOT_EXERCISED", "blocker": "session live466 already stopped; a new attempt is a new live run, not a readback"},
+    {"item": "Recovery/inspection of the 20 raw per-sample JSON payloads behind sample_digests", "state": "ABSENT", "blocker": "never persisted by the collector; only digests survive"},
+    {"item": "Live GitHub readback on issue #466 / PR #599's actual current state", "state": "BLOCKED", "blocker": "no network in this lane"},
+    {"item": "Resolution of SR-02 (managed agent vs. manual report-agent)", "state": "NOT_EXERCISED", "blocker": "requires either the missing per-sample agent_session_source disclosure (SR-01) or a fresh run with expected_agent_session_source pinned in the plan; neither is reconstructable from the committed artifact"}
+  ],
+  "required_owners_and_next_subject": {
+    "issue_466": "Own SR-02: pin expected_agent_session_source in the next herdr-plan.json manifest so the collector rejects a manual-reporter session outright, and re-run to reach a terminal DONE_CANDIDATE before claiming the managed-lifecycle capability satisfied.",
+    "collector_schema_owner": "Own SR-01: add observation_time_source/process_facts_source/cleanup_source (or an equivalent summary of them across the sample sequence) to the LIVE_HERDR_LIFECYCLE_OBSERVED_CANDIDATE schema branch and to collect_herdr_lifecycle.collect()'s output, so the disclosure the observer computes per-sample is not lost at aggregation.",
+    "queue_writer": "Own SR-03: rebind base_sha/tree_sha (here and in the codex-v2 sibling receipt) to a commit reachable from admitted main, or explicitly document why a forensic/backup-branch-only subject is acceptable evidence for this queue.",
+    "human": "Own the HOLD/HUMAN_ADMIT_REQUIRED verdict above and every ceiling in this receipt."
+  }
+}

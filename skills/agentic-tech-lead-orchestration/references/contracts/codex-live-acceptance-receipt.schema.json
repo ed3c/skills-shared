@@ -7,6 +7,7 @@
   "required": ["schema_version","task_id","attempt_id","repo","base_sha","tree_sha","prompt_digest","worker_result_sha256","changed_files","controller_commands","sdk_execution","lease_readback","source_diff_readback","tests_readback","acceptance_state","shadow_review_required","evidence_ceiling"],
   "properties": {
     "schema_version": {"const": 1},
+    "schema": {"const": "agentic-tech-lead/codex-live-acceptance/v1"},
     "task_id": {"type": "string", "minLength": 1},
     "attempt_id": {"type": "string", "minLength": 1},
     "repo": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},

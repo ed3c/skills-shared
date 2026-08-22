@@ -81,9 +81,35 @@
     },
     "evidence_ceiling": {"enum": ["SOURCE_ONLY", "STATIC", "DETERMINISTIC", "LIVE", "HUMAN_ADMITTED", "RELEASED"]},
     "shadow_review": {
+      "description": "A PASS verdict is a claim about a second identity, so it must name that identity and the receipt it left behind; the semantic gate refuses an unbound PASS for every packet not listed in closure-audit/enforced-from.json. HUMAN_ADMIT_REQUIRED stays the honest self-authored terminal and needs no binding.",
       "type": "object", "additionalProperties": false,
       "required": ["verdict"],
-      "properties": {"verdict": {"enum": ["PASS", "HOLD", "REJECT", "HUMAN_ADMIT_REQUIRED"]}}
+      "properties": {
+        "verdict": {"enum": ["PASS", "HOLD", "REJECT", "HUMAN_ADMIT_REQUIRED"]},
+        "packet_author": {"$ref": "#/$defs/identity"},
+        "shadow_identity": {"$ref": "#/$defs/identity"},
+        "receipt": {
+          "type": "object", "additionalProperties": false,
+          "required": ["path", "sha256"],
+          "properties": {
+            "path": {"type": "string", "minLength": 1},
+            "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "identity": {
+      "description": "Same shape as live-shadow-case-delta-receipt.schema.json's identity, so builder!=shadow and author!=shadow are one rule expressed twice rather than two dialects.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["host_class", "session_id"],
+      "properties": {
+        "host_class": {"type": "string", "minLength": 1},
+        "session_id": {"type": ["string", "null"]},
+        "worktree": {"type": ["string", "null"]}
+      }
     }
   }
 }

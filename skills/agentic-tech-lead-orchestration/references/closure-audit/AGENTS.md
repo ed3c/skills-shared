@@ -19,4 +19,6 @@ A packet is a projection of independently read provider facts, never a replaceme
 
 Independent Shadow checks the same immutable provider subjects and rejects unresolved acceptance hidden by `completed`, closed-unmerged candidates presented as landed, ambiguous PR identities, evidence promotion, erased rejected history, or prose-only successor transfer.
 
+A `PASS` verdict names the Shadow that produced it: `shadow_identity` distinct from `packet_author`, plus a `receipt` path that exists and matches its `sha256` (see the README's Shadow binding section). A packet the writer reviewed alone records `HUMAN_ADMIT_REQUIRED`. Do not invent a reviewer to reach `PASS`, and do not edit the verdict of a packet grandfathered in `enforced-from.json`.
+
 A green deterministic packet proves closure-contract consistency only. It does not execute live/provider/production lanes or authorize merge/release.

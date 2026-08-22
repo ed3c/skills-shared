@@ -1,0 +1,297 @@
+{
+  "schema": "spatial-loop-case-graph/v1",
+  "subject": {
+    "id": "local-handoff-wave1",
+    "revision": "a9db0bd95a04923e6c1599808d022dfc7ea90b1c",
+    "digest": "sha256:ff70b752d325e5ca1f70c4eb78cd63460b45fe825049c692e0a86b7305d43ccd",
+    "repository": "ed3c/skills-shared",
+    "tree": "b527d0049ebb416cdf81d80fa03fe09ca808d6f1",
+    "rollback_commit": "f2e3edf8bf10cfa43ef7a0917de4bb8180af29b6",
+    "statement": "The wave-1 Local Handoff landing: recompiled queues, the #534/#535 git-at-any-scale bundle, the #464 codex-v2 live-run receipts, the herdr-v3 lifecycle receipt, and the case-graph contract they are all read through.",
+    "manifest_digest_recipe": "sha256 over sorted UTF-8 lines '<sha256>  <path>\\n'",
+    "manifest": [
+      {"path": "skills/spatial-loop-systems-engineering/scripts/check_case_graph.py", "git_blob_sha1": "5b3e1fa0b3614d6326c72263d0c688c76017c46f", "sha256": "980fabaf8fd64d71fbc7bd5d94144568ece21c03f222b346a20c4573259f385e"},
+      {"path": "skills/spatial-loop-systems-engineering/references/case-graph.schema.json", "git_blob_sha1": "89bcee639ec1ada0df14e1726fff1ae0b0cb2f80", "sha256": "ed82f0722a9aeeced7051452f622b8a3922c0ddf3f7ea9ce883d9ed2e04bf016"},
+      {"path": "skills/agentic-tech-lead-orchestration/runtime-handoff/spatial-407-local-handoff-queue.json", "git_blob_sha1": "d8725b43bf290ebd1d92c0fdc72973dc95532082", "sha256": "0d0bfd94f6c1a5e8b9493d707d6bb119bf13aeb4b98a865c58cd05d2607ceee9"},
+      {"path": "data/handoff/codex-v2/issue-464-live-run-receipt.json", "git_blob_sha1": "874e08a4ac31d4b1cf85a99633780cccc6c6492c", "sha256": "63ebca205cad06f9da03bbe157cbe7cc9e00df690b826379abf3b794a46358c5"},
+      {"path": "data/handoff/herdr-v3/herdr-lifecycle-receipt.json", "git_blob_sha1": "acd684a9b5099fdd47891df800fc5f7ae900bf08", "sha256": "af214458374d1ca0ce436a2c0c00ee445d6e3881dbfeb9babf4463bb929adb15"},
+      {"path": "data/handoff/git-at-any-scale/issue-535-shadow-receipt.json", "git_blob_sha1": "86c787e90b3e2ae5dad8cf34cff70912f45e2014", "sha256": "cd9f7ea27684174f9f4b42faa8f0a3a276ba7e64d891f1c6fb6d150b058dadc6"},
+      {"path": "data/handoff/git-at-any-scale/issue-534-hosting-canary-receipt.json", "git_blob_sha1": "b5fa722c1099bdb21948e703c28adf86a683b675", "sha256": "233ed3c51f1e37481062e8f5a809cf757cda6f19c230f43d10d72a1c28192252"}
+    ]
+  },
+  "intent_atoms": [
+    {"id": "INT-001", "statement": "Every obligation this graph carries is bound to bytes that can be read back at the exact committed subject, not to a path-looking reference."},
+    {"id": "INT-002", "statement": "An interface-compatible migration or copy must not silently drop a source decision branch."},
+    {"id": "INT-003", "statement": "Executed-lane evidence is never promoted to independent Shadow observation."},
+    {"id": "INT-004", "statement": "Issue #411's live Shadow canary consumes a committed case graph and a planted semantic-loss task fixture; it is not attempted from the prompt alone."}
+  ],
+  "semantic_axes": [
+    {"id": "AXIS-001", "name": "INTERFACE_COMPATIBILITY", "state": "APPLICABLE"},
+    {"id": "AXIS-002", "name": "CONTROL_FLOW_AND_DECISION_LOGIC", "state": "APPLICABLE"},
+    {"id": "AXIS-003", "name": "EVIDENCE_PROVENANCE_AND_FRESHNESS", "state": "APPLICABLE"},
+    {"id": "AXIS-004", "name": "CONCURRENCY_AND_ORDERING", "state": "NOT_APPLICABLE", "reason": "The bound subject is a committed document/receipt set plus deterministic checkers with no concurrent writer path of their own. The one-writer-per-mutable-branch obligation is owned by the Local Handoff queue and its lease policy, not by these bytes."}
+  ],
+  "source_behaviors": [
+    {"id": "SRC-001", "statement": "The source router returns HOLD_FOR_POLICY_REVIEW for SKIPPED_BY_POLICY instead of falling through to BLOCK.", "disposition": "PRESERVE_EXACT", "decision_id": null},
+    {"id": "SRC-002", "statement": "The legacy caller surface exercises only PASS/FAIL/ABSENT plus the human-admit override, so the policy branch is invisible to it.", "disposition": "PRESERVE_OBSERVABLE", "decision_id": null},
+    {"id": "SRC-003", "statement": "data/handoff/codex-v2/issue-464-live-run-receipt.json declares lanes.shadow_readback NOT_EXERCISED under evidence ceiling LIVE_EXECUTION_OBSERVED_SHADOW_PENDING, and the herdr-v3, #534 and #535 receipts declare the same separation.", "disposition": "PRESERVE_EXACT", "decision_id": null},
+    {"id": "SRC-004", "statement": "Queue item spatial-411-live-shadow-canary is ACTIVE with live_evidence_required true, an empty commands array, and two unresolved operations.", "disposition": "PRESERVE_EXACT", "decision_id": null},
+    {"id": "SRC-005", "statement": "The #411 receipt contract requires two independent Builder and Shadow runtime identities on separate sessions or hosts.", "disposition": "DEFER_EXPLICIT", "decision_id": "DEC-001"}
+  ],
+  "cases": [
+    {
+      "id": "CASE-001",
+      "classification": "REQUIRED_CASE",
+      "intent_ids": ["INT-001"],
+      "axis_ids": ["AXIS-003"],
+      "invariant_or_state_refs": ["INV-EXACT-SUBJECT-DIGEST"],
+      "implementation_ids": ["IMPL-CASE-GRAPH-CHECKER", "IMPL-SUBJECT-READBACK"],
+      "oracle_ids": ["ORACLE-SUBJECT-READBACK"],
+      "evidence_ids": ["EVID-SUBJECT-READBACK"],
+      "decision_id": null,
+      "evidence_state": "PASS"
+    },
+    {
+      "id": "CASE-002",
+      "classification": "REQUIRED_CASE",
+      "intent_ids": ["INT-002", "INT-004"],
+      "axis_ids": ["AXIS-002"],
+      "invariant_or_state_refs": ["INV-BRANCH-B-SKIPPED-BY-POLICY"],
+      "implementation_ids": ["IMPL-MIGRATION-CANARY"],
+      "oracle_ids": ["ORACLE-SEMANTIC-PARITY"],
+      "evidence_ids": ["EVID-SEMANTIC-PARITY"],
+      "decision_id": null,
+      "evidence_state": "PASS"
+    },
+    {
+      "id": "CASE-003",
+      "classification": "REQUIRED_CASE",
+      "intent_ids": ["INT-002"],
+      "axis_ids": ["AXIS-001"],
+      "invariant_or_state_refs": ["INV-LEGACY-COMPAT-SURFACE-IS-BLIND"],
+      "implementation_ids": ["IMPL-MIGRATION-CANARY"],
+      "oracle_ids": ["ORACLE-COMPAT-BLINDNESS"],
+      "evidence_ids": ["EVID-COMPAT-BLINDNESS"],
+      "decision_id": null,
+      "evidence_state": "PASS"
+    },
+    {
+      "id": "CASE-004",
+      "classification": "REQUIRED_CASE",
+      "intent_ids": ["INT-003"],
+      "axis_ids": ["AXIS-003"],
+      "invariant_or_state_refs": ["INV-NO-EXECUTED-TO-SHADOW-PROMOTION"],
+      "implementation_ids": ["IMPL-SUBJECT-READBACK"],
+      "oracle_ids": ["ORACLE-RECEIPT-LANES"],
+      "evidence_ids": ["EVID-RECEIPT-LANES"],
+      "decision_id": null,
+      "evidence_state": "PASS"
+    },
+    {
+      "id": "CASE-005",
+      "classification": "REQUIRED_CASE",
+      "intent_ids": ["INT-004", "INT-002"],
+      "axis_ids": ["AXIS-002", "AXIS-003"],
+      "invariant_or_state_refs": ["INV-INDEPENDENT-SHADOW-OBSERVATION"],
+      "implementation_ids": ["IMPL-QUEUE-ITEM-411"],
+      "oracle_ids": ["ORACLE-LIVE-SHADOW"],
+      "evidence_ids": ["EVID-LIVE-SHADOW"],
+      "decision_id": null,
+      "evidence_state": "HUMAN_ADMIT_REQUIRED"
+    }
+  ],
+  "implementations": [
+    {
+      "id": "IMPL-CASE-GRAPH-CHECKER",
+      "owner": "skills/spatial-loop-systems-engineering",
+      "subject_ref": "skills/spatial-loop-systems-engineering/scripts/check_case_graph.py",
+      "subject_revision": "a9db0bd95a04923e6c1599808d022dfc7ea90b1c",
+      "subject_digest": "sha256:ff70b752d325e5ca1f70c4eb78cd63460b45fe825049c692e0a86b7305d43ccd",
+      "convergence_owner": false,
+      "landing": "PRESENT_AT_SUBJECT"
+    },
+    {
+      "id": "IMPL-SUBJECT-READBACK",
+      "owner": "wave-2 worker issue-411-prerequisites",
+      "subject_ref": "skills/spatial-loop-systems-engineering/tests/migration-copy-canary/case_graph_evidence.py",
+      "subject_revision": "a9db0bd95a04923e6c1599808d022dfc7ea90b1c",
+      "subject_digest": "sha256:ff70b752d325e5ca1f70c4eb78cd63460b45fe825049c692e0a86b7305d43ccd",
+      "convergence_owner": false,
+      "landing": "ADDED_ON_TOP_OF_SUBJECT"
+    },
+    {
+      "id": "IMPL-MIGRATION-CANARY",
+      "owner": "wave-2 worker issue-411-prerequisites",
+      "subject_ref": "skills/spatial-loop-systems-engineering/tests/migration-copy-canary/migration_canary.py",
+      "subject_revision": "a9db0bd95a04923e6c1599808d022dfc7ea90b1c",
+      "subject_digest": "sha256:ff70b752d325e5ca1f70c4eb78cd63460b45fe825049c692e0a86b7305d43ccd",
+      "convergence_owner": false,
+      "landing": "ADDED_ON_TOP_OF_SUBJECT"
+    },
+    {
+      "id": "IMPL-QUEUE-ITEM-411",
+      "owner": "Tech Lead, skills/agentic-tech-lead-orchestration",
+      "subject_ref": "skills/agentic-tech-lead-orchestration/runtime-handoff/spatial-407-local-handoff-queue.json#/items/1",
+      "subject_revision": "a9db0bd95a04923e6c1599808d022dfc7ea90b1c",
+      "subject_digest": "sha256:ff70b752d325e5ca1f70c4eb78cd63460b45fe825049c692e0a86b7305d43ccd",
+      "convergence_owner": true,
+      "landing": "PRESENT_AT_SUBJECT"
+    }
+  ],
+  "oracles": [
+    {
+      "id": "ORACLE-SUBJECT-READBACK",
+      "procedure": "python3 skills/spatial-loop-systems-engineering/tests/migration-copy-canary/case_graph_evidence.py --graph skills/spatial-loop-systems-engineering/references/case-graph-local-handoff-wave1.json; then python3 skills/spatial-loop-systems-engineering/scripts/check_case_graph.py check <the same graph>",
+      "pass_condition": "Every manifest path read back with git cat-file at subject.revision reproduces its recorded git_blob_sha1 and sha256, the manifest recomputes to subject.digest, the graph validates against references/case-graph.schema.json, and the checker exits 0.",
+      "negative_control": "Alter one recorded sha256 in a throwaway copy of the graph; the readback must exit 2 with SUBJECT_DIGEST_DRIFT and CONTENT_DIGEST_DRIFT rather than accepting the copy."
+    },
+    {
+      "id": "ORACLE-SEMANTIC-PARITY",
+      "procedure": "python3 skills/spatial-loop-systems-engineering/tests/migration-copy-canary/migration_canary.py --oracle parity",
+      "pass_condition": "Source and target return the same observation for every declared evidence state crossed with human_admit_required, and both reject an undeclared state the same way.",
+      "negative_control": "Delete the SKIPPED_BY_POLICY row from a throwaway copy of fixtures/target_decide.py; this oracle must exit 2 naming the input and both outputs."
+    },
+    {
+      "id": "ORACLE-COMPAT-BLINDNESS",
+      "procedure": "python3 skills/spatial-loop-systems-engineering/tests/migration-copy-canary/migration_canary.py --oracle compat --target <the branch-removed copy>",
+      "pass_condition": "The legacy compatibility surface still exits 0 on the branch-removed target, so a compatibility-only PASS is proven insufficient to close a semantic-copy obligation.",
+      "negative_control": "Run the same bytes under --oracle parity; it must exit 2. If both oracles agree on the branch-removed target, the compatibility surface is not the blind one and this case's claim is false."
+    },
+    {
+      "id": "ORACLE-RECEIPT-LANES",
+      "procedure": "python3 skills/spatial-loop-systems-engineering/tests/migration-copy-canary/case_graph_evidence.py --graph skills/spatial-loop-systems-engineering/references/case-graph-local-handoff-wave1.json (readback_assertions lane)",
+      "pass_condition": "Every JSON pointer below resolves inside the pinned committed bytes and equals the recorded value, so no wave-1 receipt has promoted an executed lane to an independent Shadow observation.",
+      "negative_control": "Record lanes/shadow_readback as PASS in a throwaway copy of the graph; the readback must exit 2 with READBACK_MISMATCH.",
+      "readback_assertions": [
+        {"path": "data/handoff/codex-v2/issue-464-live-run-receipt.json", "pointer": "/lanes/live_codex_execution", "equals": "PASS"},
+        {"path": "data/handoff/codex-v2/issue-464-live-run-receipt.json", "pointer": "/lanes/shadow_readback", "equals": "NOT_EXERCISED"},
+        {"path": "data/handoff/codex-v2/issue-464-live-run-receipt.json", "pointer": "/evidence_ceiling", "equals": "LIVE_EXECUTION_OBSERVED_SHADOW_PENDING"},
+        {"path": "data/handoff/herdr-v3/herdr-lifecycle-receipt.json", "pointer": "/evidence_ceiling", "equals": "LIVE_OBSERVER_LIFECYCLE_SHADOW_PENDING"},
+        {"path": "data/handoff/herdr-v3/herdr-lifecycle-receipt.json", "pointer": "/sample_count", "equals": 20},
+        {"path": "data/handoff/git-at-any-scale/issue-535-shadow-receipt.json", "pointer": "/verdict", "equals": "HOLD"},
+        {"path": "data/handoff/git-at-any-scale/issue-535-shadow-receipt.json", "pointer": "/human_admit", "equals": "HUMAN_ADMIT_REQUIRED"},
+        {"path": "data/handoff/git-at-any-scale/issue-534-hosting-canary-receipt.json", "pointer": "/shadow/independent", "equals": false},
+        {"path": "data/handoff/git-at-any-scale/issue-534-hosting-canary-receipt.json", "pointer": "/shadow/human_admit", "equals": false},
+        {"path": "skills/agentic-tech-lead-orchestration/runtime-handoff/spatial-407-local-handoff-queue.json", "pointer": "/items/1/id", "equals": "spatial-411-live-shadow-canary"},
+        {"path": "skills/agentic-tech-lead-orchestration/runtime-handoff/spatial-407-local-handoff-queue.json", "pointer": "/items/1/state", "equals": "ACTIVE"},
+        {"path": "skills/agentic-tech-lead-orchestration/runtime-handoff/spatial-407-local-handoff-queue.json", "pointer": "/items/1/runtime_lane/live_evidence_required", "equals": true}
+      ]
+    },
+    {
+      "id": "ORACLE-LIVE-SHADOW",
+      "procedure": "Run the #411 live canary: a Shadow identity on a session and host distinct from the Builder's observes the branch removal that ORACLE-SEMANTIC-PARITY's negative control plants, and must emit SEMANTIC_PARITY_DELTA or CASE_COVERAGE_DELTA against this graph before publication eligibility, without writing Builder implementation bytes.",
+      "pass_condition": "An exact-subject live receipt at data/handoff/spatial-407/live-shadow-case-delta-receipt.json records the delta under admitted builder-not-equal-shadow identities.",
+      "negative_control": "A Builder self-report, or an observation made in the Builder's own context, must be refused by the queue item's forbidden_promotions rather than counted as an independent Shadow observation."
+    }
+  ],
+  "evidence": [
+    {
+      "id": "EVID-SUBJECT-READBACK",
+      "state": "PASS",
+      "subject_ref": "skills/spatial-loop-systems-engineering/tests/migration-copy-canary/verify.sh",
+      "subject_revision": "a9db0bd95a04923e6c1599808d022dfc7ea90b1c",
+      "subject_digest": "sha256:ff70b752d325e5ca1f70c4eb78cd63460b45fe825049c692e0a86b7305d43ccd",
+      "observation": "CASE-GRAPH-EVIDENCE-GREEN with 7 pinned blobs re-read at the subject revision, plus CASE-GRAPH-GREEN from scripts/check_case_graph.py.",
+      "executed_by": "wave-2 worker issue-411-prerequisites, local, no network"
+    },
+    {
+      "id": "EVID-SEMANTIC-PARITY",
+      "state": "PASS",
+      "subject_ref": "skills/spatial-loop-systems-engineering/tests/migration-copy-canary/verify.sh",
+      "subject_revision": "a9db0bd95a04923e6c1599808d022dfc7ea90b1c",
+      "subject_digest": "sha256:ff70b752d325e5ca1f70c4eb78cd63460b45fe825049c692e0a86b7305d43ccd",
+      "observation": "PARITY GREEN on the faithful target over 15 observations, and PARITY red with a named mismatch on the planted branch-removed copy.",
+      "executed_by": "wave-2 worker issue-411-prerequisites, local, no network"
+    },
+    {
+      "id": "EVID-COMPAT-BLINDNESS",
+      "state": "PASS",
+      "subject_ref": "skills/spatial-loop-systems-engineering/tests/migration-copy-canary/verify.sh",
+      "subject_revision": "a9db0bd95a04923e6c1599808d022dfc7ea90b1c",
+      "subject_digest": "sha256:ff70b752d325e5ca1f70c4eb78cd63460b45fe825049c692e0a86b7305d43ccd",
+      "observation": "COMPAT GREEN on the same planted branch-removed copy that turns PARITY red; the two oracles disagree on one set of bytes.",
+      "executed_by": "wave-2 worker issue-411-prerequisites, local, no network"
+    },
+    {
+      "id": "EVID-RECEIPT-LANES",
+      "state": "PASS",
+      "subject_ref": "skills/spatial-loop-systems-engineering/tests/migration-copy-canary/verify.sh",
+      "subject_revision": "a9db0bd95a04923e6c1599808d022dfc7ea90b1c",
+      "subject_digest": "sha256:ff70b752d325e5ca1f70c4eb78cd63460b45fe825049c692e0a86b7305d43ccd",
+      "observation": "12 recorded pointer claims resolved inside the pinned committed bytes and matched; a planted lanes/shadow_readback=PASS claim was refused.",
+      "executed_by": "wave-2 worker issue-411-prerequisites, local, no network"
+    },
+    {
+      "id": "EVID-LIVE-SHADOW",
+      "state": "HUMAN_ADMIT_REQUIRED",
+      "subject_ref": "data/handoff/spatial-407/live-shadow-case-delta-receipt.json",
+      "subject_revision": "a9db0bd95a04923e6c1599808d022dfc7ea90b1c",
+      "subject_digest": "sha256:ff70b752d325e5ca1f70c4eb78cd63460b45fe825049c692e0a86b7305d43ccd",
+      "artifact_state": "ABSENT",
+      "observation": "The queue declares this receipt path; no bytes exist at or after the subject. No pair of independent Builder and Shadow runtime identities is admitted, so the live lane is unexercised rather than judged."
+    }
+  ],
+  "decisions": [
+    {
+      "id": "DEC-001",
+      "authority": "Human Admit, per the spatial-407 queue authority.automation_forbidden list and the #411 receipt forbidden_promotions",
+      "rationale": "No admitted pair of independent Builder and Shadow runtime identities exists at this subject. Wave-2 worker issue-411-prerequisites is scoped to prerequisites (a) the committed case graph and (b) the planted semantic-loss task fixture, and holds no authority to weaken the identity requirement, so the obligation is deferred with this record rather than dropped or self-satisfied."
+    }
+  ],
+  "edges": [
+    {"from": "INT-001", "to": "CASE-001", "kind": "REQUIRES"},
+    {"from": "AXIS-003", "to": "CASE-001", "kind": "COVERS"},
+    {"from": "CASE-001", "to": "IMPL-CASE-GRAPH-CHECKER", "kind": "IMPLEMENTED_BY"},
+    {"from": "CASE-001", "to": "IMPL-SUBJECT-READBACK", "kind": "IMPLEMENTED_BY"},
+    {"from": "CASE-001", "to": "ORACLE-SUBJECT-READBACK", "kind": "PROVED_BY"},
+    {"from": "ORACLE-SUBJECT-READBACK", "to": "EVID-SUBJECT-READBACK", "kind": "EMITS"},
+
+    {"from": "INT-002", "to": "CASE-002", "kind": "REQUIRES"},
+    {"from": "INT-004", "to": "CASE-002", "kind": "REQUIRES"},
+    {"from": "AXIS-002", "to": "CASE-002", "kind": "COVERS"},
+    {"from": "SRC-001", "to": "CASE-002", "kind": "PRESERVED_BY"},
+    {"from": "CASE-002", "to": "IMPL-MIGRATION-CANARY", "kind": "IMPLEMENTED_BY"},
+    {"from": "CASE-002", "to": "ORACLE-SEMANTIC-PARITY", "kind": "PROVED_BY"},
+    {"from": "ORACLE-SEMANTIC-PARITY", "to": "EVID-SEMANTIC-PARITY", "kind": "EMITS"},
+
+    {"from": "INT-002", "to": "CASE-003", "kind": "REQUIRES"},
+    {"from": "AXIS-001", "to": "CASE-003", "kind": "COVERS"},
+    {"from": "SRC-002", "to": "CASE-003", "kind": "PRESERVED_BY"},
+    {"from": "CASE-003", "to": "IMPL-MIGRATION-CANARY", "kind": "IMPLEMENTED_BY"},
+    {"from": "CASE-003", "to": "ORACLE-COMPAT-BLINDNESS", "kind": "PROVED_BY"},
+    {"from": "ORACLE-COMPAT-BLINDNESS", "to": "EVID-COMPAT-BLINDNESS", "kind": "EMITS"},
+
+    {"from": "INT-003", "to": "CASE-004", "kind": "REQUIRES"},
+    {"from": "AXIS-003", "to": "CASE-004", "kind": "COVERS"},
+    {"from": "SRC-003", "to": "CASE-004", "kind": "PRESERVED_BY"},
+    {"from": "CASE-004", "to": "IMPL-SUBJECT-READBACK", "kind": "IMPLEMENTED_BY"},
+    {"from": "CASE-004", "to": "ORACLE-RECEIPT-LANES", "kind": "PROVED_BY"},
+    {"from": "ORACLE-RECEIPT-LANES", "to": "EVID-RECEIPT-LANES", "kind": "EMITS"},
+
+    {"from": "INT-004", "to": "CASE-005", "kind": "REQUIRES"},
+    {"from": "INT-002", "to": "CASE-005", "kind": "REQUIRES"},
+    {"from": "AXIS-002", "to": "CASE-005", "kind": "COVERS"},
+    {"from": "AXIS-003", "to": "CASE-005", "kind": "COVERS"},
+    {"from": "SRC-004", "to": "CASE-005", "kind": "PRESERVED_BY"},
+    {"from": "SRC-005", "to": "DEC-001", "kind": "DEFERRED_BY"},
+    {"from": "CASE-005", "to": "IMPL-QUEUE-ITEM-411", "kind": "IMPLEMENTED_BY"},
+    {"from": "CASE-005", "to": "ORACLE-LIVE-SHADOW", "kind": "PROVED_BY"},
+    {"from": "ORACLE-LIVE-SHADOW", "to": "EVID-LIVE-SHADOW", "kind": "EMITS"},
+
+    {"from": "CASE-002", "to": "CASE-005", "kind": "SUPPLIES_PLANTED_DELTA_TO"},
+    {"from": "CASE-003", "to": "CASE-005", "kind": "SUPPLIES_BLINDNESS_CONTROL_TO"}
+  ],
+  "coverage": {
+    "intent": 1.0,
+    "source_behavior_disposition": 1.0,
+    "required_case": 1.0,
+    "implementation_binding": 1.0,
+    "oracle": 1.0,
+    "executed_evidence": 0.8,
+    "unknown_blocking_count": 0
+  },
+  "gate": {
+    "status": "READY_FOR_IMPLEMENTATION",
+    "rationale": "Intent, source-behavior disposition, required-case, implementation-binding and oracle coverage are closed against exact committed bytes at a9db0bd9, and four of five required cases carry executed local evidence. CASE-005, the live independent Shadow observation, is HUMAN_ADMIT_REQUIRED: no admitted Builder/Shadow identity pair exists, its receipt is ABSENT, and executed_evidence is therefore 0.8. This graph is the denominator #411's canary consumes; it is not itself live evidence and cannot be promoted to READY_FOR_PUBLICATION_REVIEW without that receipt."
+  }
+}

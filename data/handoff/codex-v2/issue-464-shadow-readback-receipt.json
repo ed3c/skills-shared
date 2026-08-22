@@ -1,0 +1,520 @@
+{
+  "artifact": "Issue #464 fresh-context Shadow readback receipt for the live Codex SDK v2 run",
+  "issue": 464,
+  "queue_item": "codex-v2-live-464-shadow",
+  "queue": "skills/agentic-tech-lead-orchestration/runtime-handoff/codex-v2-live-464-local-handoff-queue.json",
+  "produced_utc": "2026-08-22T12:44:02Z",
+  "verdict": "HOLD",
+  "verdict_vocabulary": "ADMIT_BOUNDED / HOLD / REJECT (Tech Lead dispatch vocabulary)",
+  "verdict_law_clause": "No claim I could test was contradicted: the entire byte-verifiable digest chain holds and the RED-to-GREEN transition is real and independently re-derived. HOLD, not ADMIT_BOUNDED, because one of the two lanes the run receipt marks PASS — controller_readback — is carried only by digests that no independent party can recompute, and a receipt built from fabricated digests compiles to a byte-equivalent, schema-valid artifact (falsifier F5, exit 0). HOLD, not REJECT, because nothing observed is false and the run receipt's own evidence_ceiling already refuses the promotion.",
+  "human_admit": "HUMAN_ADMIT_REQUIRED",
+  "queue_state_mapping": {
+    "note": "The queue item's receipt.required_states are PASS/FAIL/NOT_EXERCISED/HUMAN_ADMIT_REQUIRED; the dispatched review vocabulary is ADMIT_BOUNDED/HOLD/REJECT. Both are recorded rather than one silently rewritten into the other.",
+    "shadow_lane_state_in_queue_vocabulary": "HUMAN_ADMIT_REQUIRED",
+    "exit_required_verdict": "PASS",
+    "exit_met": false,
+    "queue_advance_performed": false,
+    "why": "queue_advance is listed in the queue's authority.automation_forbidden, and this lane is read-only apart from this artifact. The run item remains ACTIVE and this shadow item remains BLOCKED_BY_PREDECESSOR exactly as committed."
+  },
+  "independence_declaration": {
+    "role": "TECH_LEAD_DISPATCHED_FRESH_CONTEXT",
+    "carrier": "claude-code",
+    "zero_builder_conversation_context": true,
+    "separate_session_from_the_producing_run": true,
+    "worktree": "/Users/neon/skills-shared/.claude/worktrees/handoff-queue-audit",
+    "satisfies_the_queue_capability_independent_checkout_of_the_receipt_landing_commit": false,
+    "satisfies_organisational_independence": false,
+    "lane_actually_satisfied": "ADVISORY_EXTERNAL_EVIDENCE",
+    "why_not": [
+      "The queue's shadow item requires 'independent-checkout-of-the-receipt-landing-commit' and a checkout 'that did not produce them'. This checkout did not produce them, but it is NOT the receipt landing commit: the receipt names receipt_landing_commit 218a82407337335fe263b5d8e3b9dfc4c5924962, and `git merge-base --is-ancestor 218a8240 a9db0bd9` exits 1. See finding SH-02.",
+      "Same host, same user, same machine as the producing session. The executor binary digest recomputed to PASS only because the producing session's scratchpad venv is still present on this disk; on a genuinely separate machine that lane would read UNVERIFIABLE_BINARY_ABSENT. A same-host recompute is not independent executor identity. This is the queue's own forbidden promotion 'binder_exit_zero_to_independent_shadow_pass', declared rather than taken.",
+      "Dispatched by the same Tech Lead orchestration wave that dispatched the Builder. Fresh context is context isolation, not organisational independence.",
+      "This artifact is advisory evidence only. It is never Human Admit, never merge, never issue close, and never a queue advance."
+    ],
+    "forbidden_promotions_this_artifact_declines": [
+      "same-session-readback-to-independent-shadow",
+      "document-agreement-to-executor-identity",
+      "shadow-admit-to-issue-close"
+    ]
+  },
+  "schema_binding": {
+    "queue_named_schema": "agentic-tech-lead/codex-v2-live-run-shadow/v1",
+    "state": "CONFORMS",
+    "validated_against_named_schema": false,
+    "evidence": "`grep -rn 'codex-v2-live-run-shadow' <worktree>` returns exactly one hit — line 107 of the queue file that names it. No such file exists under references/contracts/ (19 schemas present, none of them this one).",
+    "shadow_action": "Emitted well-formed JSON in the shape of the committed sibling Shadow receipt data/handoff/git-at-any-scale/issue-535-shadow-receipt.json rather than inventing a schema. Authoring the missing schema is queue-writer work outside this lane's single-path write lease.",
+    "self_readback": {
+      "argv": [
+        "python3",
+        "-c",
+        "json.load(open(<this file>))"
+      ],
+      "parses_as_json": true
+    },
+    "refreshed_at": "2026-08-22"
+  },
+  "bound_subjects": {
+    "repository": "ed3c/skills-shared",
+    "read_subject_commit": "a9db0bd95a04923e6c1599808d022dfc7ea90b1c",
+    "read_subject_tree": "b527d0049ebb416cdf81d80fa03fe09ca808d6f1",
+    "rollback_commit": "f2e3edf8bf10cfa43ef7a0917de4bb8180af29b6",
+    "worktree_state_at_review": "1 modified path (skills/agentic-tech-lead-orchestration/references/issue-closure-contract.schema.json) from a concurrent wave-2 writer. None of the #464 artifacts under review were dirty; all nine were read at their committed blob SHAs.",
+    "queue_subject_commit": "08a7d3c8098b3710adc040924781ee615dec287f",
+    "receipt_declared_landing_commit": "218a82407337335fe263b5d8e3b9dfc4c5924962",
+    "ancestry_rederived": {
+      "queue_subject_is_ancestor_of_declared_landing_commit": true,
+      "declared_landing_commit_is_ancestor_of_read_subject": false,
+      "queue_subject_is_ancestor_of_read_subject": false,
+      "merge_base_landing_and_read_subject": "674cfe1435c4bd1c29e8f07308266fe5c6284973",
+      "branches_containing_declared_landing_commit": [
+        "worktree-local-handoff-queue",
+        "remotes/origin/agent/local-handoff-queue-live"
+      ],
+      "note": "The receipt's own STALE_SUBJECT condition, as the schema states it ('a receipt whose queue subject is not an ancestor of its landing commit'), is correctly NONE. The staleness is a different one: the landing commit itself is off the current admitted line. See SH-02."
+    },
+    "artifact_bytes_identical_across_landing_commit_and_read_subject": {
+      "state": "ALL_NINE_IDENTICAL",
+      "method": "git rev-parse <commit>:<path> at 218a8240 and at a9db0bd9, blob SHAs compared",
+      "paths": {
+        "data/handoff/codex-v2/carrier/codex-v2-issue-464-T1-a01.bundle": "5461c1c576793a8d7599f3e702d281c4d94281c2",
+        "data/handoff/codex-v2/carrier/codex-v2-issue-464-T1-a01.bundle.manifest.json": "ea3683e5d23c18ccefece1d0d085bf3ef592c94f",
+        "data/handoff/codex-v2/issue-464-acceptance-input.json": "bb9474163db6264dc758633a5a90ab22f9913c22",
+        "data/handoff/codex-v2/issue-464-live-acceptance-receipt.json": "d4e075f5dc9fc4b2744992845b9caf0c211efa10",
+        "data/handoff/codex-v2/issue-464-session-manifest.json": "dbf442a07d0153e4b2757e6407832d1effb750ed",
+        "data/handoff/codex-v2/issue-464-static-receipt.json": "4028a03e8da3a5f877b431b09efae34b13d13a89",
+        "data/handoff/codex-v2/issue-464-worker-result.json": "a414dfbdfc7b08b8b506f20e229bc1c7334bd436",
+        "skills/agentic-tech-lead-orchestration/scripts/run_codex_sdk_worker.py": "ecd08a79416e0a270322f26999913a3b52af01b6",
+        "skills/agentic-tech-lead-orchestration/runtime-handoff/codex-v2-live-464-local-handoff-queue.json": "cd6d04e1e938d58bf46b83d689536f5a3466c779"
+      },
+      "consequence": "The review denominator is byte-for-byte the same content the declared landing commit carried, even though the two commits sit on divergent lines. SH-02 is therefore a provenance-record defect, not an evidence-content defect."
+    },
+    "review_denominator_sha256": {
+      "carrier/codex-v2-issue-464-T1-a01.bundle": "e1ee8bd2db1a0130aac96869a149d2e81a32d6b43122ea02dc1b9ac8cf9eda94",
+      "carrier/codex-v2-issue-464-T1-a01.bundle.manifest.json": "9a9c361faf03191dc450a10f5cdcf0556d58bc0327f52363b0fed6303d3eb1a8",
+      "issue-464-live-acceptance-receipt.json": "573b77512053ecdcbd934fef40807e5a108bb94b460d17c87514704d9d58ae88",
+      "issue-464-worker-result.json": "ccc7a8d07dd74358f2a398ef90d1f2007b1b204db566869c35d110f01201ec41",
+      "issue-464-live-run-receipt.json": "63ebca205cad06f9da03bbe157cbe7cc9e00df690b826379abf3b794a46358c5",
+      "issue-464-session-manifest.json": "b25f3df431ec6eec6e6efe10930d4e07251783d0d66a7acf129b9d7e596b07c7",
+      "issue-464-static-receipt.json": "adaf3c9fcc483e220d3c93fc2f9d5a376dcf69c2fffe9c736196b17fab3c5f5b",
+      "issue-464-acceptance-input.json": "12cd7b7254ec61b8ae09d80a18c20e3c0d6375c6368c1c76b7b12839ef2354b4",
+      "scripts/run_codex_sdk_worker.py": "c3e4b5a9c8c6b788ef74adc9891c25d608cd115367971a5ffc8846d6b0bc5633"
+    }
+  },
+  "toolchain": {
+    "python": "3.14.6",
+    "jsonschema": "4.26.0",
+    "digest_tool": "shasum -a 256 (BSD) cross-checked against python3 hashlib.sha256"
+  },
+  "adversarial_questions": [
+    {
+      "question": "Does the receipt's claimed subject / carrier / digest chain hold byte-for-byte?",
+      "answer": "YES for every link that is recomputable from committed bytes — 12 of 12 recomputations matched. NO for the two controller command digests, which are recomputable from nothing at all. See SH-01.",
+      "state": "PASS_WITH_ONE_UNRECOMPUTABLE_LINK"
+    },
+    {
+      "question": "Does the worker result validate against codex-worker-result-v2.schema.json?",
+      "answer": "YES. jsonschema 4.26.0 Draft2020-12, exit 0, zero errors. The stricter semantic gate check_codex_worker_result.py also exits 0 with carrier_binding PASS, carrier_replay PASS, worker_result_shape PASS.",
+      "state": "PASS"
+    },
+    {
+      "question": "Is any state promoted beyond LIVE_EXECUTION_OBSERVED_SHADOW_PENDING?",
+      "answer": "NO. Both the acceptance receipt and the live-run receipt carry evidence_ceiling LIVE_EXECUTION_OBSERVED_SHADOW_PENDING; acceptance_state is the CANDIDATE value, shadow_review_required is true, and lanes.shadow_readback and lanes.merge are both NOT_EXERCISED. The producing session did not promote its own shadow lane.",
+      "state": "PASS"
+    }
+  ],
+  "independent_readbacks": [
+    {
+      "id": "RB-01",
+      "check": "Carrier bundle replayed from bundle + manifest alone into a scratch bare repository with no alternates",
+      "argv": [
+        "python3",
+        "skills/agentic-tech-lead-orchestration/scripts/codex_result_carrier.py",
+        "replay",
+        "--manifest",
+        "data/handoff/codex-v2/carrier/codex-v2-issue-464-T1-a01.bundle.manifest.json",
+        "--bundle",
+        "data/handoff/codex-v2/carrier/codex-v2-issue-464-T1-a01.bundle"
+      ],
+      "exit": 0,
+      "result": "result_tree_replay PASS, replay_source BUNDLE_ONLY_SCRATCH_REPOSITORY, result_tree_sha 63bf10e25799b23efea342853bff8f2320cbe47d, changed_paths ['src/calc.py']",
+      "state": "PASS"
+    },
+    {
+      "id": "RB-02",
+      "check": "Worker result semantic gate WITH on-disk executor digest recomputation",
+      "argv": [
+        "python3",
+        "skills/agentic-tech-lead-orchestration/scripts/check_codex_worker_result.py",
+        "data/handoff/codex-v2/issue-464-worker-result.json",
+        "--carrier-bundle",
+        "data/handoff/codex-v2/carrier/codex-v2-issue-464-T1-a01.bundle"
+      ],
+      "exit": 0,
+      "result": "executor_provenance PASS, carrier_binding PASS, carrier_replay PASS, worker_result_shape PASS, evidence_ceiling SHAPE_BINDING_AND_OFFLINE_REPLAY_ONLY",
+      "state": "PASS_BUT_SAME_HOST",
+      "caveat": "executor_provenance reads PASS only because the producing session's venv still exists on this machine. The same command on an independent host returns UNVERIFIABLE_BINARY_ABSENT by design (check_codex_worker_result.py line 139). This lane is not independent evidence."
+    },
+    {
+      "id": "RB-03",
+      "check": "Same gate with executor recomputation disabled, isolating the non-host-dependent half",
+      "argv": [
+        "python3",
+        "skills/agentic-tech-lead-orchestration/scripts/check_codex_worker_result.py",
+        "data/handoff/codex-v2/issue-464-worker-result.json",
+        "--carrier-bundle",
+        "data/handoff/codex-v2/carrier/codex-v2-issue-464-T1-a01.bundle",
+        "--no-recompute-executor"
+      ],
+      "exit": 0,
+      "result": "executor_provenance NOT_RECOMPUTED, everything else PASS",
+      "state": "PASS",
+      "note": "The checker keeps NOT_RECOMPUTED distinct from PASS rather than collapsing both to a boolean. That distinction is what makes RB-02's caveat expressible at all."
+    },
+    {
+      "id": "RB-04",
+      "check": "Acceptance receipt recompiled from the committed acceptance input and diffed against the committed receipt",
+      "argv": [
+        "python3",
+        "skills/agentic-tech-lead-orchestration/scripts/compile_codex_live_acceptance.py",
+        "data/handoff/codex-v2/issue-464-acceptance-input.json",
+        "--output",
+        "<scratchpad>/recompiled-464-acceptance.json"
+      ],
+      "exit": 0,
+      "result": "diff -u against the committed receipt: exit 0, zero bytes of difference. Recompiled sha256 573b77512053ecdcbd934fef40807e5a108bb94b460d17c87514704d9d58ae88 equals the committed file's sha256 and equals the live-run receipt's acceptance_receipt.sha256.",
+      "state": "PASS"
+    },
+    {
+      "id": "RB-05",
+      "check": "All four jsonschema validations",
+      "argv": [
+        "python3",
+        "-m",
+        "jsonschema",
+        "-i",
+        "<artifact>",
+        "<schema>"
+      ],
+      "exit": 0,
+      "result": "worker result vs codex-worker-result-v2 exit 0; acceptance receipt vs codex-live-acceptance-receipt-v2 exit 0; live-run receipt vs codex-v2-live-run-receipt exit 0; session manifest vs codex-session-manifest exit 0",
+      "state": "PASS"
+    },
+    {
+      "id": "RB-06",
+      "check": "Every digest the receipts assert, recomputed from committed bytes",
+      "exit": 1,
+      "result": "12 MATCH, 2 NO_MATCH. Matched: worker_result_sha256 (from both the committed worker result and the acceptance input, identical objects); prompt_digest (sha256 of the session manifest prompt bytes, 1aac71b0...); adapter_blob_sha256 (on-disk run_codex_sdk_worker.py, c3e4b5a9...); carrier bundle_sha256 and bundle_bytes; the live-run receipt's carrier fields against the manifest; the acceptance receipt's result_carrier.bundle_sha256; the live-run receipt's acceptance_receipt.sha256 over the acceptance receipt file bytes; codex_binary_sha256 against the on-disk binary. Not matched: both controller command_sha256 values — see SH-01. The nonzero exit is this recomputation script reporting those two, not a checker failure.",
+      "state": "PASS_EXCEPT_SH_01"
+    },
+    {
+      "id": "RB-07",
+      "check": "What the carrier bundle actually carries — the live-versus-fixture discriminator the queue's unresolved_operation demands be named",
+      "result": "Eleven objects: 2 parentless evidence commits, 4 trees, 3 blobs (a .gitignore blob 7a60b85e shared by both trees, tests/test_calc.py blob bd18e6ac shared by both trees, and two distinct src/calc.py blobs 643fa8c2 -> 4693ad3c). The base->result diff is exactly one hunk in src/calc.py: `-    raise NotImplementedError` / `+    return a + b`.",
+      "discriminator_observed": "A REAL RED-TO-GREEN TREE TRANSITION, transported outside the originating object store. The result blob 4693ad3c is not derivable from the manifest's JSON claims; it had to be produced. A fixture receipt asserting a tree_sha with no retained objects cannot survive this readback — codex_result_carrier.replay_carrier builds a bare repo with no alternates and would raise 'is absent from the carrier bundle object store'.",
+      "state": "PASS"
+    },
+    {
+      "id": "RB-08",
+      "check": "Read-only path lease actually held, re-derived from the carrier trees rather than from the receipt's claim",
+      "result": "`diff -r` of the two pristine archived trees: the ONLY difference is src/calc.py. tests/ is byte-identical across base and result (same blob bd18e6ac). The session manifest declared allowed_paths ['src'] and read_only_paths ['tests']; the transported trees confirm the worker honoured both.",
+      "state": "PASS"
+    },
+    {
+      "id": "RB-09",
+      "check": "Substance of the controller's unverifiable tests_readback:PASS, re-derived by executing the test myself against both carrier trees",
+      "result": "Runner-dependent. `python3 -m unittest tests/test_calc.py` from the tree root: base exit 1, result exit 0. `python3 -m pytest -q`: base exit 1, result exit 0. Both discriminate correctly, so the RED-to-GREEN claim is TRUE and independently confirmed. However `python3 tests/test_calc.py` exits 0 on BOTH trees (the file defines a TestCase but has no unittest.main()), and `python3 -m unittest discover -s . -p test_*.py` exits 5 on both (collects nothing).",
+      "state": "PASS_WITH_FINDING",
+      "note": "This is a stronger result than the receipt itself carries: the receipt asserts tests_readback PASS behind an unrecomputable digest; I re-derived the underlying fact by execution. See SH-05 for why the runner ambiguity still matters."
+    },
+    {
+      "id": "RB-10",
+      "check": "Queue file's own shape gate",
+      "argv": [
+        "python3",
+        "skills/agentic-tech-lead-orchestration/scripts/assert_local_handoff_queue.py",
+        "--queue",
+        "skills/agentic-tech-lead-orchestration/runtime-handoff/codex-v2-live-464-local-handoff-queue.json"
+      ],
+      "exit": 0,
+      "result": "PASS: Local Handoff Execution Queue (2 item(s), active=codex-v2-live-464-run). Selftest also exit 0: SELFTEST GREEN.",
+      "state": "PASS",
+      "note": "Shape only. This gate never compares queue state against disk, and never checks any receipt's landing-commit ancestry."
+    }
+  ],
+  "falsifier_lane": {
+    "note": "A green checker is a single arrival unless it is shown to turn red. Each control below plants one defect and records the real exit.",
+    "controls": [
+      {
+        "id": "F1",
+        "planted": "one byte appended to a copy of the carrier bundle",
+        "expected": "RED",
+        "observed_exit": 2,
+        "observed": "CARRIER-FAIL carrier bundle size drift: manifest 1049 observed 1050",
+        "state": "RED_AS_REQUIRED"
+      },
+      {
+        "id": "F2",
+        "planted": "worker result tree_sha forced back to base_tree_sha while changed_files stays populated",
+        "expected": "RED",
+        "observed_exit": 2,
+        "observed": "WORKER-RESULT-FAIL changed files were claimed but the result tree is the unchanged base tree",
+        "state": "RED_AS_REQUIRED"
+      },
+      {
+        "id": "F3",
+        "planted": "adapter_blob_sha256 zeroed",
+        "expected": "RED",
+        "observed_exit": 2,
+        "observed": "WORKER-RESULT-FAIL adapter_blob_sha256 does not match the adapter that would execute",
+        "state": "RED_AS_REQUIRED"
+      },
+      {
+        "id": "F4",
+        "planted": "controller command exit_code set to 1",
+        "expected": "RED",
+        "observed_exit": 2,
+        "observed": "LIVE-ACCEPTANCE-FAIL controller verification command failed",
+        "state": "RED_AS_REQUIRED"
+      },
+      {
+        "id": "F5",
+        "planted": "both controller command_sha256 and output_sha256 of the first row replaced with fabricated hex (dede.../adad...)",
+        "expected": "RED",
+        "observed_exit": 0,
+        "observed": "compile_codex_live_acceptance.py exit 0. It wrote a 2058-byte receipt — identical byte count to the real one — differing from the committed receipt in exactly the two fabricated hex strings, and that fabricated receipt validates against codex-live-acceptance-receipt-v2.schema.json with exit 0.",
+        "state": "STAYED_GREEN_ON_A_PLANTED_DEFECT",
+        "consequence": "This is finding SH-01. The controller-readback lane is forge-equivalent: nothing in the committed mechanism can distinguish a real controller readback from an invented one."
+      },
+      {
+        "id": "F6",
+        "planted": "live-run receipt keeps verdict PASS but sets failure_state STALE_SUBJECT",
+        "expected": "RED",
+        "observed_exit": 1,
+        "observed": "STALE_SUBJECT: 'NONE' was expected",
+        "state": "RED_AS_REQUIRED",
+        "note": "The schema's verdict/failure_state coupling is real and enforced. What it does NOT enforce is the ancestry rule its own description states — see SH-02."
+      }
+    ]
+  },
+  "findings": [
+    {
+      "id": "SH-01",
+      "severity": "HIGH",
+      "summary": "Both controller command digests are unrecomputable by any independent party, and fabricated digests compile to a schema-valid receipt. The controller_readback PASS lane is unfalsifiable.",
+      "detail": [
+        "The queue item's own unresolved_operation 'materialize-controller-readback-input-with-reproducible-command-digests' states the requirement verbatim: command_sha256 'must be taken over the canonical JSON bytes of the argv array recorded in this queue item' and output_sha256 'over the captured stdout+stderr bytes, so an independent Shadow can recompute both digests'.",
+        "I computed the canonical-JSON sha256 of every argv array recorded in the queue (both items, 12 commands). Neither 1168b2a3059a38dc53c851df268c031ea9c67a87c6a9019bda074a2cd3b25da6 nor 8982ada51ceb5138b6d29eb9adf02329e0a4beddc6472cc96a4d2353bb56e6ad matches any of them.",
+        "Repository-wide grep for either digest returns exactly two files: issue-464-acceptance-input.json and the receipt compiled from it. The argv arrays are recorded nowhere. The captured stdout+stderr bytes behind output_sha256 fb184ea5... and 544738fd... are committed nowhere.",
+        "compile_codex_live_acceptance.py::_command validates only that the two values are 64 hex characters and that exit_code is integer zero. It never recomputes either digest against anything.",
+        "Falsifier F5 confirms the consequence by execution, not inference: fabricated digests produce a receipt that is byte-identical to the real one apart from the fabricated strings, and that receipt passes its schema with exit 0.",
+        "This is precisely the run item's declared forbidden promotion 'self_declared_controller_readback_to_verified_test_pass'. The run receipt nevertheless records lanes.controller_readback = PASS and verdict = PASS, and the run item's exit.required_verdict is PASS — so an unfalsifiable lane is load-bearing for a queue advance."
+      ],
+      "mitigating_evidence": "RB-09 re-derived the underlying fact by execution: the base tree really is red and the result tree really is green under two independent runners. The controller's claim is TRUE. The defect is in the mechanism carrying it, not in the fact.",
+      "owner": "issue 464 / queue writer",
+      "remedy_not_performed_here": "Record the two controller argv arrays (and the captured output bytes, or a committed transcript digest over them) in the queue item or a committed controller-readback artifact, so command_sha256 and output_sha256 become recomputable. Then teach compile_codex_live_acceptance.py to recompute command_sha256 from the recorded argv rather than shape-checking it."
+    },
+    {
+      "id": "SH-06",
+      "severity": "HIGH",
+      "summary": "The shadow queue item is unsatisfiable as written: its exit requires a receipt, and producing that receipt necessarily turns the repository receipt gate red, because the schema id it names exists nowhere.",
+      "detail": [
+        "The item declares receipt.schema 'agentic-tech-lead/codex-v2-live-run-shadow/v1' and exit.requires_receipt true.",
+        "No such schema file exists. Repository-wide grep for the id returns exactly one hit: line 107 of the queue that names it. references/contracts/ holds 19 schemas, none of them this one.",
+        "tests/run-all.sh's SCHEMA_BY_ID table has no entry for the id, so the gate's resolution step appends a failure and continues — red.",
+        "The gate skips any item whose receipt file is absent unless the item is COMPLETE (line 117-123). This item is BLOCKED_BY_PREDECESSOR, so while no receipt existed the whole defect was invisible behind a green suite.",
+        "The one-variable experiment in gate_impact_of_this_artifact proves the coupling: gate exit 0 with the receipt absent, exit 1 with it present, nothing else changed.",
+        "Consequence: any honest Shadow that satisfies exit.requires_receipt breaks the suite, and the only way to keep the suite green is to never produce the receipt the queue demands. That is a contradiction in the queue/gate pair, not a defect in the receipt.",
+        "The SCHEMA_MISMATCH_DECLARED escape hatch the gate offers (line 137, used by the #535 sibling receipt) cannot help here: it is evaluated only AFTER schema_file resolves, and resolution is what fails. A declared mismatch can survive this gate; an absent schema cannot."
+      ],
+      "owner": "queue writer / issue 464",
+      "remedy_not_performed_here": "Either author references/contracts/codex-v2-live-run-shadow-receipt.schema.json and register the id in SCHEMA_BY_ID, or point the item's receipt.schema at an existing contract. Both are outside this lane's write lease."
+    },
+    {
+      "id": "SH-02",
+      "severity": "MEDIUM",
+      "summary": "The live-run receipt's receipt_landing_commit names a commit that is not an ancestor of the current admitted main, so the receipt's own provenance field is stale.",
+      "detail": [
+        "The receipt declares subject.receipt_landing_commit = 218a82407337335fe263b5d8e3b9dfc4c5924962.",
+        "`git merge-base --is-ancestor 218a8240 a9db0bd9` exits 1. `git merge-base --is-ancestor 08a7d3c8 a9db0bd9` also exits 1. The merge-base of the declared landing commit and the current subject is 674cfe1435c4bd1c29e8f07308266fe5c6284973.",
+        "218a8240 lives on branches worktree-local-handoff-queue and origin/agent/local-handoff-queue-live, and its own tree does not contain issue-464-live-run-receipt.json at all — the receipt that names it landed afterwards, on a divergent line.",
+        "The declared STALE_SUBJECT failure state is nevertheless correctly NONE: the schema defines it as 'queue subject is not an ancestor of its landing commit', and `git merge-base --is-ancestor 08a7d3c8 218a8240` exits 0. The defect is that the receipt's landing-commit record was carried across a re-landing without being updated, not that the stated rule was broken.",
+        "Materially this is a record defect only, not an evidence defect: all nine reviewed artifacts have identical blob SHAs at 218a8240 and at a9db0bd9 (see bound_subjects.artifact_bytes_identical_across_landing_commit_and_read_subject)."
+      ],
+      "owner": "queue writer",
+      "remedy_not_performed_here": "Update subject.receipt_landing_commit to the commit that actually lands the receipt on the admitted line, as part of whatever re-lands it. Out of this lane's write lease."
+    },
+    {
+      "id": "SH-03",
+      "severity": "MEDIUM",
+      "summary": "Six of the seven failure_state values have zero producers. The failure enum is effectively unary.",
+      "detail": [
+        "`grep -rn 'STALE_SUBJECT|SDK_RETURNED_WITHOUT_CONTROLLER_ACCEPTANCE|CHANGED_FILE_DRIFT|CONTROLLER_TEST_FAILURE|INCOMPATIBLE_RETRY_LINEAGE|MALFORMED_RESULT' skills/agentic-tech-lead-orchestration/scripts skills/agentic-tech-lead-orchestration/tests -l` exits 1 — no file matched.",
+        "No script and no test in the skill ever emits any non-NONE failure_state. The only value any artifact has ever carried is NONE, hand-authored.",
+        "The schema's stated purpose is that '#464 requires the run's failure states to remain expressible after the fact'. They are expressible in the schema and unreachable in production: a state that only a human can type is not a state the system can enter.",
+        "The schema does enforce the verdict/failure_state coupling (falsifier F6 goes red), so the enum is not decorative — but nothing produces its members."
+      ],
+      "owner": "issue 464",
+      "remedy_not_performed_here": "Give at least the mechanically detectable members a producer — STALE_SUBJECT from the ancestry check the schema description already specifies, CHANGED_FILE_DRIFT and MALFORMED_RESULT from check_codex_worker_result.py's existing raise sites — so a failed run emits its own failure state instead of relying on hand authorship."
+    },
+    {
+      "id": "SH-04",
+      "severity": "LOW",
+      "summary": "No gate anywhere checks the ancestry invariant that the receipt schema's own description states.",
+      "detail": [
+        "codex-v2-live-run-receipt.schema.json documents the rule in prose ('A receipt whose queue subject is not an ancestor of its landing commit is the STALE_SUBJECT failure state') but encodes only the verdict/failure_state coupling in its allOf. JSON Schema cannot express git ancestry, which is fine — but nothing else expresses it either.",
+        "tests/run-all.sh mentions #464 exactly once, in a comment at line 246, and its control-plane block validates schema shapes only. It never resolves a commit.",
+        "assert_local_handoff_queue.py validates queue shape and exits 0 on the committed queue; it never compares any declared commit against the repository.",
+        "SH-02 is a live instance of this hole: the record is stale and every gate in the repository is green."
+      ],
+      "owner": "queue writer",
+      "remedy_not_performed_here": "One `git merge-base --is-ancestor` assertion in the receipt paper gate would close it, and would have caught SH-02 mechanically."
+    },
+    {
+      "id": "SH-05",
+      "severity": "LOW",
+      "summary": "The throwaway repository's RED test is only red under some runners; the naive invocation is green on the unfixed base tree.",
+      "detail": [
+        "tests/test_calc.py defines `class T(unittest.TestCase)` with no `unittest.main()` entrypoint.",
+        "Measured on the pristine base tree: `python3 tests/test_calc.py` exits 0 (no-op), `python3 -m unittest discover -s . -p test_*.py` exits 5 (nothing collected). Both are green on code that raises NotImplementedError.",
+        "`python3 -m unittest tests/test_calc.py` and `python3 -m pytest -q` do discriminate: base 1, result 0.",
+        "The queue's required_capabilities include 'throwaway-run-repository-with-red-then-green-test'. Because SH-01 makes command_sha256 unrecomputable, an independent reviewer cannot determine which runner the controller used — and two of the five plausible runners would have produced a green that proves nothing.",
+        "This does not make the run's claim false: RB-09 confirms a real red-to-green under discriminating runners. It makes the recorded evidence unable to show which case occurred."
+      ],
+      "owner": "issue 464",
+      "remedy_not_performed_here": "Give the canary test an explicit entrypoint, and record the runner argv (which SH-01's remedy already requires)."
+    }
+  ],
+  "gate_impact_of_this_artifact": {
+    "state": "THIS_ARTIFACT_TURNS_THE_REPOSITORY_RECEIPT_GATE_RED",
+    "disclosed_deliberately": "Writing this receipt makes `bash skills/agentic-tech-lead-orchestration/tests/run-all.sh` exit nonzero. That is reported here rather than avoided by withholding the artifact or by editing the gate, both of which would be worse answers.",
+    "controlled_experiment": {
+      "method": "One variable. The receipt-gate block was extracted verbatim from tests/run-all.sh and run twice against the same tree, differing only in whether this artifact exists.",
+      "arm_a_artifact_absent": {
+        "exit": 0,
+        "output": "silent"
+      },
+      "arm_b_artifact_present": {
+        "exit": 1,
+        "output": "RECEIPT-GATE-RED — codex-v2-live-464-local-handoff-queue.json:codex-v2-live-464-shadow: receipt.schema 'agentic-tech-lead/codex-v2-live-run-shadow/v1' resolves to no contract file"
+      },
+      "conclusion": "Causation established, not inferred. The artifact is the sole variable.",
+      "harness_note": "The first attempt at this experiment was invalid — a stray inspect.py in the scratchpad shadowed the stdlib via sys.path[0] and both arms died identically on import. Re-run from an isolated directory. Recorded because a failed measurement that looks like a result is exactly what this lane exists to catch."
+    },
+    "why_the_gate_is_right": "tests/run-all.sh states the intent in its own comment: 'every receipt.schema id a runtime-handoff queue names must resolve to a contract file that declares that identity. An id with no entry here is red the moment its receipt exists, so a new queue cannot ship an unbindable label.' The gate is working. The queue shipped an unbindable label, and until now no receipt existed to expose it — the gate's absent-receipt branch (line 117) skips any non-COMPLETE item, so the defect sat latent behind a green suite.",
+    "not_remedied_here": "Authoring references/contracts/codex-v2-live-run-shadow-receipt.schema.json and registering the id in SCHEMA_BY_ID are both outside this lane's single-path write lease, and tests/run-all.sh is currently held by a concurrent wave-2 writer."
+  },
+  "verified_holds": [
+    "Every recomputable digest in the receipt chain matches: 12 of 12.",
+    "worker_result_sha256 782db01c... is the canonical-JSON digest of the committed worker result AND of the acceptance input's embedded copy; the two objects are equal.",
+    "prompt_digest 1aac71b0... is the sha256 of the session manifest's prompt bytes, recomputed independently.",
+    "adapter_blob_sha256 c3e4b5a9... equals the on-disk run_codex_sdk_worker.py, which is byte-identical at the declared landing commit and at the read subject.",
+    "The carrier bundle is 1049 bytes with sha256 e1ee8bd2..., matching the manifest, the worker result, the acceptance receipt and the live-run receipt — four independent assertions of the same value, all correct.",
+    "The acceptance receipt reproduces byte-for-byte from the committed acceptance input (diff exit 0).",
+    "The carrier replays from bundle alone into a repository with no access to the originating object store, resolving result tree 63bf10e2 with denominator ['src/calc.py'].",
+    "The transported diff is a genuine RED-to-GREEN: `raise NotImplementedError` -> `return a + b`.",
+    "The read-only lease held: tests/ is byte-identical across both carrier trees.",
+    "Nothing is promoted beyond LIVE_EXECUTION_OBSERVED_SHADOW_PENDING; shadow_readback and merge are both NOT_EXERCISED."
+  ],
+  "evidence_ceilings": {
+    "digest_chain": "BYTE_VERIFIED_EXCEPT_THE_TWO_CONTROLLER_COMMAND_DIGESTS",
+    "result_tree": "OFFLINE_BUNDLE_REPLAY_VERIFIED",
+    "red_to_green_transition": "INDEPENDENTLY_RE_EXECUTED_BY_THIS_REVIEWER",
+    "controller_readback": "SELF_DECLARED_AND_FORGE_EQUIVALENT — substance re-derived, mechanism unfalsifiable",
+    "executor_identity": "SAME_HOST_RECOMPUTE_ONLY — not independent; would read UNVERIFIABLE_BINARY_ABSENT elsewhere",
+    "which_binary_executed_this_turn": "NOT_ESTABLISHED — the binary at the recorded path exists and matches its digest, which proves the SDK runtime is installed, not that this executable served this turn",
+    "sdk_turn_authenticity": "RUNTIME_RESULT_ONLY — thread_id/turn_id/final_response_digest are opaque and unrecomputable by design (prompt, transcript and final_response are on compile_codex_live_acceptance.py's FORBIDDEN durable-field list)",
+    "independence": "ADVISORY_EXTERNAL_EVIDENCE — fresh context on the producing host, not an independent checkout of the landing commit",
+    "merge_and_close": "HUMAN_ADMIT_REQUIRED"
+  },
+  "not_performed": [
+    {
+      "item": "readback in a checkout of the declared receipt_landing_commit 218a8240",
+      "state": "ABSENT",
+      "blocker": "that commit is not an ancestor of the admitted subject this reviewer was dispatched against; checking it out would require a branch operation this read-only lane forbids. Blob-level byte identity across the two commits was established instead."
+    },
+    {
+      "item": "readback on a host that never held the producing session",
+      "state": "ABSENT",
+      "blocker": "no such host in this lane. This is why executor_provenance PASS is declared as same-host and not counted as independent."
+    },
+    {
+      "item": "re-execution of the Codex SDK turn itself",
+      "state": "NOT_EXERCISED",
+      "blocker": "live_evidence_required is false for this shadow item, and a second live turn would be a new run, not a readback of this one."
+    },
+    {
+      "item": "recomputation of the two controller command digests",
+      "state": "IMPOSSIBLE_FROM_COMMITTED_BYTES",
+      "blocker": "the argv arrays and captured output bytes exist nowhere in the repository. See SH-01."
+    },
+    {
+      "item": "validation against the queue-named schema agentic-tech-lead/codex-v2-live-run-shadow/v1",
+      "state": "ABSENT",
+      "blocker": "no such schema file exists; only the queue references the name. Authoring it is outside this write lease."
+    },
+    {
+      "item": "advancing the queue or marking lanes.shadow_readback",
+      "state": "REFUSED",
+      "blocker": "queue_advance is in authority.automation_forbidden, and this lane is read-only apart from this artifact."
+    },
+    {
+      "item": "any network, GitHub, issue or PR readback",
+      "state": "ABSENT",
+      "blocker": "no network in this lane."
+    }
+  ],
+  "concurrent_drift_reverification": {
+    "why": "Concurrent wave-2 writers landed changes to this skill while the review was running. Measurements taken against one tree state do not prove anything about another, so every load-bearing check was re-run against the tree as it stood after the drift.",
+    "drift_observed_at_reverification": {
+      "modified_paths": 11,
+      "untracked_paths": 8,
+      "relevant_change": "references/contracts/codex-live-acceptance-receipt-v2.schema.json gained one optional property: \"schema\": {\"const\": \"agentic-tech-lead/codex-live-acceptance/v2\"}. It was NOT added to the required list, and compile_codex_live_acceptance.py does not emit the field, so the committed receipt still validates. Another writer's lease; noted, not acted on.",
+      "reviewed_464_artifacts_touched_by_the_drift": "NONE — `git status --porcelain data/handoff/codex-v2/` reports only this artifact as untracked, and the four load-bearing sha256 values re-read identical to the review denominator."
+    },
+    "rerun_results": [
+      {
+        "check": "RB-02 worker result gate with executor recompute",
+        "exit": 0,
+        "unchanged": true
+      },
+      {
+        "check": "RB-04 acceptance receipt recompile + diff against committed",
+        "exit": 0,
+        "unchanged": true,
+        "note": "diff exit 0, still byte-for-byte"
+      },
+      {
+        "check": "RB-05 acceptance receipt and live-run receipt schema validation",
+        "exit": 0,
+        "unchanged": true
+      },
+      {
+        "check": "F5 fabricated controller digests",
+        "exit": 0,
+        "unchanged": true,
+        "note": "still compiles green and still validates against the amended schema — SH-01 survives the drift"
+      },
+      {
+        "check": "SH-03 grep for any non-NONE failure_state producer",
+        "exit": 1,
+        "unchanged": true,
+        "note": "still zero producers"
+      },
+      {
+        "check": "SH-04 grep for an ancestry assertion in run-all.sh",
+        "exit": 1,
+        "unchanged": true,
+        "note": "still zero occurrences of merge-base / is-ancestor / receipt_landing_commit"
+      }
+    ],
+    "conclusion": "All five findings hold against the post-drift tree. No finding rests on a stale measurement."
+  },
+  "required_owners_and_next_subject": {
+    "issue_464": "SH-01 (make the controller digests recomputable), SH-03 (give the failure states producers), SH-05 (give the canary test an entrypoint)",
+    "queue_writer": "SH-06 (bind the shadow item's schema id to a real contract — blocking, the suite is red until then), SH-02 (refresh receipt_landing_commit on re-landing), SH-04 (assert the ancestry invariant in the paper gate)",
+    "human": "HUMAN_ADMIT_REQUIRED for merge, promotion, issue close and any queue advance. This artifact is advisory only.",
+    "next_subject_for_re_review": "the commit that lands this Shadow receipt on the admitted line, at which point SH-02's remedy can be verified in the same pass"
+  },
+  "driven_by": "agent-macro",
+  "driven_on": "claude-code"
+}
