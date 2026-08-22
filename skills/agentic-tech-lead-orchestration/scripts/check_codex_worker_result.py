@@ -23,6 +23,9 @@ from typing import Any
 HERE = Path(__file__).resolve().parent
 SCHEMA_PATH = HERE.parent / "references" / "contracts" / "codex-worker-result-v2.schema.json"
 ADAPTER_PATH = HERE / "run_codex_sdk_worker.py"
+# Executor sources that name an actual executable. Anything else (UNRESOLVED,
+# or a state added later) is an observation, not an identity, and fails closed.
+RESOLVED_BINARY_SOURCES = {"SDK_PINNED_RUNTIME", "SDK_BUNDLED", "PATH", "ABSENT"}
 
 sys.path.insert(0, str(HERE))
 from codex_result_carrier import (  # noqa: E402
@@ -53,7 +56,8 @@ def validate_shape(result: Any) -> None:
     try:
         from jsonschema import Draft202012Validator
     except ImportError as error:  # pragma: no cover - environment failure
-        raise SystemExit(f"jsonschema unavailable: {error}")
+        print(f"WORKER-RESULT-MECHANISM-UNAVAILABLE {error}")
+        raise SystemExit(70)
     schema = _load_schema()
     Draft202012Validator.check_schema(schema)
     errors = [
@@ -70,12 +74,26 @@ def _inside(child: str, parent: str) -> bool:
     return len(c) > len(p) and c[: len(p)] == p
 
 
-def validate_executor_provenance(provenance: dict[str, Any], *, recompute: bool = True) -> None:
+def validate_executor_provenance(provenance: dict[str, Any], *, recompute: bool = True) -> str:
+    """Return the executor-provenance verdict, or raise on a contract violation.
+
+    The verdict is a state, not a boolean: an absent binary is not the same
+    observation as a recomputed one. Returning "PASS" for both is how a Shadow
+    machine that no longer holds the executable silently inherits the executing
+    machine's claim about it.
+    """
+
     source = provenance["codex_binary_source"]
     path = provenance["codex_binary_path"]
     sha = provenance["codex_binary_sha256"]
     module_dir = provenance["sdk_module_dir"]
 
+    if source not in RESOLVED_BINARY_SOURCES:
+        # UNRESOLVED and any future non-identity state fail closed here rather
+        # than reaching the containment checks, which would pass them silently.
+        raise ResultContractError(
+            f"codex_binary_source={source} is not a resolved executor identity"
+        )
     if source == "ABSENT":
         if path is not None or sha is not None:
             raise ResultContractError("codex_binary_source=ABSENT cannot carry a binary path or digest")
@@ -89,13 +107,25 @@ def validate_executor_provenance(provenance: dict[str, Any], *, recompute: bool 
             raise ResultContractError(
                 f"SDK_BUNDLED claimed but {path} is outside the SDK package tree {module_dir}"
             )
+        if source == "SDK_PINNED_RUNTIME":
+            # The SDK runs codex_cli_bin.bundled_codex_path(), which lives in a
+            # sibling distribution, not inside the openai_codex package tree.
+            runtime_dir = provenance.get("runtime_module_dir")
+            if not runtime_dir:
+                raise ResultContractError(
+                    "codex_binary_source=SDK_PINNED_RUNTIME requires a resolved runtime_module_dir"
+                )
+            if not _inside(path, runtime_dir):
+                raise ResultContractError(
+                    f"SDK_PINNED_RUNTIME claimed but {path} is outside the pinned runtime tree {runtime_dir}"
+                )
         if source == "PATH" and bundled:
             raise ResultContractError(
                 f"PATH codex claimed but {path} is the executable bundled inside {module_dir}"
             )
 
     if not recompute:
-        return
+        return "NOT_RECOMPUTED"
 
     observed_adapter = _sha256_file(ADAPTER_PATH)
     if provenance["adapter_blob_sha256"] != observed_adapter:
@@ -105,12 +135,14 @@ def validate_executor_provenance(provenance: dict[str, Any], *, recompute: bool 
         )
     if path and sha:
         binary = Path(path)
-        if binary.is_file():
-            observed_binary = _sha256_file(binary)
-            if observed_binary != sha:
-                raise ResultContractError(
-                    f"codex_binary_sha256 drift for {path}: receipt {sha} observed {observed_binary}"
-                )
+        if not binary.is_file():
+            return "UNVERIFIABLE_BINARY_ABSENT"
+        observed_binary = _sha256_file(binary)
+        if observed_binary != sha:
+            raise ResultContractError(
+                f"codex_binary_sha256 drift for {path}: receipt {sha} observed {observed_binary}"
+            )
+    return "PASS"
 
 
 def validate_carrier_binding(result: dict[str, Any]) -> None:
@@ -143,11 +175,13 @@ def check_result(result: Any, *, recompute_executor: bool = True) -> dict[str, A
     validate_shape(result)
     if result["changed_files"] and result["tree_sha"] == result["base_tree_sha"]:
         raise ResultContractError("changed files were claimed but the result tree is the unchanged base tree")
-    validate_executor_provenance(result["executor_provenance"], recompute=recompute_executor)
+    executor_provenance = validate_executor_provenance(
+        result["executor_provenance"], recompute=recompute_executor
+    )
     validate_carrier_binding(result)
     return {
         "worker_result_shape": "PASS",
-        "executor_provenance": "PASS",
+        "executor_provenance": executor_provenance,
         "carrier_binding": "PASS",
         "carrier_replay": "NOT_EXERCISED",
         "evidence_ceiling": "SHAPE_AND_BINDING_ONLY",

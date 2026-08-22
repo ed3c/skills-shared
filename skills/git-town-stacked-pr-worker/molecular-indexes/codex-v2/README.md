@@ -1,6 +1,8 @@
 # Molecular terminal index — Tech Lead + Shadow review 2026-08-20
 
-This README is the durable molecular index for the current closure audit. Current GitHub metadata remains authoritative for mutable PRs.
+**STALE as of 2026-08-22**: this index was last reviewed 2026-08-20, before PR #516 (Codex v2 handoff) and before the #560 Repository Portfolio Control wave (main advanced `249abc4` → `129f53c` → `28f3947` → `5341885` → `674cfe1`, PR #577). Every PR under "Held open Draft stacks" below has since closed or merged — see `docs/traceability/current-runtime-handoff/README.md` and `docs/traceability/github-portfolio-control/README.md` for the current epoch before treating anything below as live.
+
+This README is the durable molecular index for the 2026-08-20 closure audit. Current GitHub metadata remains authoritative for mutable PRs.
 
 ## Exact current repository subject
 
@@ -38,7 +40,7 @@ A source PR can be `CLOSED_UNMERGED / CONSUMED` while its exact bytes are presen
           ↓
 #505 / PR #507 result-tree false-PASS repair  MERGED
           ↓
-#508 durable carrier/provenance/schema        ACTIVE ISSUE
+#508 durable carrier/provenance/schema        CLOSED / PASS via PR #516 (issue closed 2026-08-21T07:19:45Z)
           ↓ subject-mutation boundary
 #464 fresh signed-in v2 run                   PROCESS_DEPENDENCY / OPEN
 
@@ -55,7 +57,7 @@ A source PR can be `CLOSED_UNMERGED / CONSUMED` while its exact bytes are presen
 | `W3-SOURCE-EVIDENCE` | #512 | open external-evidence successor | Issue/Article/PDF/PRD truth/applicability/verification remain packet-specific |
 | `W3-X` | #468/#480 | merged | static/deterministic infrastructure admission |
 | `C2-K` | #505/#507 | merged | deterministic result-tree binder, `1/16` |
-| `C2-DURABLE` | #508 | active | `NOT_IMPLEMENTED` until independent durable replay |
+| `C2-DURABLE` | #508 | `CLOSED` (PASS via PR #516) | durable carrier + executor provenance + strict worker-result schema landed; independent Shadow `ADMIT` on the candidate |
 
 The active Codex handoff queue is [`codex-v2-local-handoff-queue.json`](../../../agentic-tech-lead-orchestration/runtime-handoff/codex-v2-local-handoff-queue.json). It ends after #508 because its output changes the subject required for #464. Source evidence uses [`source-evidence-local-handoff-queue.json`](../../../agentic-tech-lead-orchestration/runtime-handoff/source-evidence-local-handoff-queue.json) and is owned by #512.
 
@@ -85,6 +87,8 @@ C #387
 The method and CI/registry routes are on main. General safe deletion, unseen-domain coverage, real Git Town execution, release, and production remain separate evidence lanes.
 
 ## Held open Draft stacks
+
+**Superseded 2026-08-22**: every stack below closed or merged via the #560 Repository Portfolio Control wave. `#412`/`#419`/`#420`/`#450`/`#396` are GitHub `CLOSED` (consumed/superseded — see commits `c27f8c3`, `6685da6`, `f6103e3`, `04756de` on main); `#395` is GitHub `MERGED` (`mergedAt 2026-08-21T20:00:23Z`, commit `1621b2f`). `prs-open.json` reports zero open PRs on this repository. The diagrams below describe the 2026-08-20 state only.
 
 ### Spatial ICPG → knowledge graph
 
