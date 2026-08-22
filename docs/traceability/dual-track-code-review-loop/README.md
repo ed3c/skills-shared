@@ -49,10 +49,10 @@ consumer closed, or merge/release occurred.
 ```text
 #517 DTCR (parent)
  ├─ #518 C0 contract ── admitted (implementation-preflight.json)
- ├─ #519 D1 deterministic fact-plane contracts ── schemas landed; two adapters landed
+ ├─ #519 D1 deterministic fact-plane contracts ── schemas landed; four adapters landed
  │    ├─ adapters/tree-sitter/     LANDED, live receipt
  │    ├─ adapters/sqlite-ledger/   LANDED, planted mutations
- │    ├─ #547 D1-SCIP adapter      LANDED python scope (live receipt); cross-language BLOCKED_ON_PROVIDER
+ │    ├─ #547 D1-SCIP adapter      LANDED python scope (live receipt); cross-language BLOCKED_ON_PROVIDER; #595 crash open
  │    └─ #549 D1-BUF adapter       LANDED NOT_APPLICABLE lane; live VERIFIED lane BLOCKED_ON_PROVIDER
  ├─ #521 M1 semantic-context plane
  │    └─ #550 M1-C semantic adapter   LANDED KEYWORD lane; VECTOR lane BLOCKED_ON_PROVIDER
@@ -86,7 +86,7 @@ merge, release, production, visibility            HUMAN_ADMIT_REQUIRED
 
 This convergence repairs the Skill's own README/AGENTS/SKILL directory map and
 evidence ceiling (previously stale by two landings: the 16 D1/M1 interface
-schemas and the two adapters), compiles the P0-P8 prompt catalogue, and writes
+schemas and the two adapters landed at that time), compiles the P0-P8 prompt catalogue, and writes
 this directory's traceability projections. It did not implement `#522`
 (landed separately and closed via PR #563) nor `#525`, `#547`, `#549`,
 `#550`, `#527` or `#528` — those remain open, and their own Workers own

@@ -12,7 +12,7 @@ embed a mutable head SHA and is not GitHub's live state.
  ├─ #519  D1 deterministic fact-plane contracts ── schemas landed
  │    ├─ adapters/tree-sitter/    LANDED (live receipt)
  │    ├─ adapters/sqlite-ledger/  LANDED (planted mutations)
- │    ├─ #547 D1-SCIP adapter     LANDED python scope (live receipt); cross-language BLOCKED_ON_PROVIDER
+ │    ├─ #547 D1-SCIP adapter     LANDED python scope (live receipt); cross-language BLOCKED_ON_PROVIDER; #595 crash open
  │    └─ #549 D1-BUF adapter      LANDED NOT_APPLICABLE lane; live VERIFIED lane BLOCKED_ON_PROVIDER
  ├─ #521  M1 semantic-context plane
  │    └─ #550 M1-C adapter        LANDED KEYWORD lane; VECTOR lane BLOCKED_ON_PROVIDER
@@ -21,8 +21,8 @@ embed a mutable head SHA and is not GitHub's live state.
  ├─ #524  R2 cross-repo Expand & Contract   LANDED compiler; real migration rides #528
  ├─ #525  E1 independent Shadow / mutations / closure denominator
  ├─ #526  D2 docs/AGENTS/prompts/routing convergence (this convergence)   CLOSED via PR #563
- ├─ #527  B1 bootstrap profile
- └─ #528  L1 live consumer canary / Local Handoff
+ ├─ #527  B1 bootstrap profile   LANDED artifact; attach refused on two explicit preconditions
+ └─ #528  L1 live consumer canary / Local Handoff   one bounded canary EXERCISED (receipt v0-draft); typed queue compiled; final admission open
         ↓
 docs/traceability/dual-track-code-review-loop/{README,AGENTS,ISSUE_DAG.json,
 LOCAL_HANDOFF_EXECUTION_QUEUE.json}
@@ -53,7 +53,7 @@ adapter lanes that do not gate `D2`'s own doc convergence.
 
 ```text
 CONTRACTS_ADMITTED (C0, D1 schemas, M1 schema)
-→ DETERMINISTIC_ADAPTERS_LANDED (tree-sitter, sqlite-ledger)
+→ DETERMINISTIC_ADAPTERS_LANDED (tree-sitter, sqlite-ledger, scip, buf, semantic-context)
 → DOCS_AND_ROUTES_CONVERGED (D2, this atom)
 → SYNTHESIS_COMPILED (X1)
 → PROTOCOLS_IMPLEMENTED (R1, R2)
@@ -69,7 +69,7 @@ Issue #517 fan-out
      │
 C0/D1/M1 schemas + refused-claims.json
      │
-tree-sitter / sqlite-ledger adapters ──→ committed selftest.py, run-all.sh
+five deterministic adapters ──→ committed selftest.py each, run-all.sh
      │
 D2 convergence (this atom) ──→ docs/traceability/dual-track-code-review-loop/*
      │

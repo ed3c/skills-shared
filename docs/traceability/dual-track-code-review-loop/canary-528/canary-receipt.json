@@ -2,11 +2,11 @@
   "artifact_validation": {
     "exit_code": 0,
     "result": "20/20 artifacts validate against their frozen schema",
-    "script": "/private/tmp/claude-501/-Users-neon-skills-shared/d4ad227a-6352-4bfb-8ddc-f80eec30efaf/scratchpad/canary-528/validate_artifacts.py"
+    "script": "validate_artifacts.py"
   },
   "consumer_selection": {
     "admission_source": "Human goal directive 2026-08-22",
-    "clone_path": "/private/tmp/claude-501/-Users-neon-skills-shared/d4ad227a-6352-4bfb-8ddc-f80eec30efaf/scratchpad/canary-528/consumer",
+    "clone_path": "consumer",
     "consumer": "bettor-arena",
     "origin_access": "READ_ONLY: cloned, never written",
     "origin_path": "/Users/neon/bettor-arena",
@@ -25,7 +25,7 @@
     },
     "scip_live": {
       "attempt_command": "adapters/scip/adapter.py live --package consumer/scripts/gates/controlled_language_binding --repo consumer",
-      "attempt_evidence": "/private/tmp/claude-501/-Users-neon-skills-shared/d4ad227a-6352-4bfb-8ddc-f80eec30efaf/scratchpad/canary-528/facts/scip-live.stderr",
+      "attempt_evidence": "facts/scip-live.stderr",
       "attempt_exit_code": 1,
       "attempted": true,
       "defect_nominated": "the missing pyrightconfig.json produces an uncaught FileNotFoundError and exit 1, not one of the adapter's three contracted exits (0/2/70) and not a named Refusal. A consumer that does not use pyright gets a traceback where it should get PROVIDER_ABSENT-class refusal.",
@@ -90,7 +90,7 @@
             "provider_scoped_id": "scripts/gates/check_root_coupling.py"
           }
         ],
-        "receipt": "/private/tmp/claude-501/-Users-neon-skills-shared/d4ad227a-6352-4bfb-8ddc-f80eec30efaf/scratchpad/canary-528/facts/ledger-receipt-after.json",
+        "receipt": "facts/ledger-receipt-after.json",
         "receipt_sha256": "918b5db43f5399866f671295dfbf74da85ef6fb821c710b3d69e1d788b0c0068",
         "row_counts": {
           "edge": 6,
@@ -168,7 +168,7 @@
             "provider_scoped_id": "scripts/gates/check_root_coupling.py"
           }
         ],
-        "receipt": "/private/tmp/claude-501/-Users-neon-skills-shared/d4ad227a-6352-4bfb-8ddc-f80eec30efaf/scratchpad/canary-528/facts/ledger-receipt-before.json",
+        "receipt": "facts/ledger-receipt-before.json",
         "receipt_sha256": "6ce6a1a97ad3344e841718acc997fb647701b87c0f3aff9f45e8ce2e6c177e94",
         "row_counts": {
           "edge": 8,
@@ -182,7 +182,7 @@
         "edge_completeness": "PARTIAL_LOWER_BOUND",
         "edge_provenance": "TEXTUAL_MATCH",
         "name": "dtcr-canary-python-import-scan",
-        "script": "/private/tmp/claude-501/-Users-neon-skills-shared/d4ad227a-6352-4bfb-8ddc-f80eec30efaf/scratchpad/canary-528/emit_observations.py",
+        "script": "emit_observations.py",
         "state": "CANARY_LOCAL_NOT_AN_ADMITTED_DTCR_ADAPTER",
         "why": "the ledger ingests dtcr/symbol-fact/v1 rows and the only in-tree producer of those is the SCIP adapter, whose live lane this consumer cannot satisfy (see scip_live)."
       }
@@ -198,7 +198,7 @@
           "numerator": 9
         },
         "matches": 60,
-        "receipt": "/private/tmp/claude-501/-Users-neon-skills-shared/d4ad227a-6352-4bfb-8ddc-f80eec30efaf/scratchpad/canary-528/facts/tree-sitter-receipt-after.json",
+        "receipt": "facts/tree-sitter-receipt-after.json",
         "subject_commit": "8a21426751c0fec3c99450cdb00294e843a9d950"
       },
       "before": {
@@ -210,7 +210,7 @@
           "numerator": 9
         },
         "matches": 60,
-        "receipt": "/private/tmp/claude-501/-Users-neon-skills-shared/d4ad227a-6352-4bfb-8ddc-f80eec30efaf/scratchpad/canary-528/facts/tree-sitter-receipt-before.json",
+        "receipt": "facts/tree-sitter-receipt-before.json",
         "subject_commit": "13ff9840fc5683b33670fa191591035bc96292dc"
       },
       "provider": {
@@ -263,9 +263,9 @@
       "STATIC": "scripts/gates/fast_quality.sh on both changed files: ruff format --check + ruff check, exit 0"
     },
     "logs": [
-      "/private/tmp/claude-501/-Users-neon-skills-shared/d4ad227a-6352-4bfb-8ddc-f80eec30efaf/scratchpad/canary-528/oracle/oracle-before.log",
-      "/private/tmp/claude-501/-Users-neon-skills-shared/d4ad227a-6352-4bfb-8ddc-f80eec30efaf/scratchpad/canary-528/oracle/oracle-after.log",
-      "/private/tmp/claude-501/-Users-neon-skills-shared/d4ad227a-6352-4bfb-8ddc-f80eec30efaf/scratchpad/canary-528/oracle/red-controls.txt"
+      "oracle/oracle-before.lanes",
+      "oracle/oracle-after.lanes",
+      "oracle/red-controls.txt"
     ],
     "note": "Every lane is a control the consumer already ships at the rollback subject. No lane was written for this canary and no lane was edited by it.",
     "runs": {
@@ -321,8 +321,8 @@
       "compile_r1.py accepts a violation_ref and an adapter_binding_id that the frozen schemas refuse (^DTCR-VC-[0-9]{3}$ and ^DTCR-AD-[0-9a-f]{16}$), so a request can compile DTCR-R1-GREEN and still emit artifacts refused by references/schemas/. Both were hit on the first real request and both are fixed here by editing the request, not the schema."
     ],
     "honest_understatement": "reindex_state is NOT_REINDEXED because no SCIP index was rebuilt. The SQLite architecture assertion WAS performed (ledger-traverse-after.json, forbidden edges 0) but compile_r1.py gates SQLITE_ARCHITECTURE_ASSERTED behind the same flag as SCIP_REINDEXED, so a run with a working graph ledger and no SCIP provider cannot record its architecture assertion without also claiming a reindex that did not happen. Understating was chosen over overstating.",
-    "projection": "/private/tmp/claude-501/-Users-neon-skills-shared/d4ad227a-6352-4bfb-8ddc-f80eec30efaf/scratchpad/canary-528/r1/r1-projection.json",
-    "request": "/private/tmp/claude-501/-Users-neon-skills-shared/d4ad227a-6352-4bfb-8ddc-f80eec30efaf/scratchpad/canary-528/r1/r1-request.json",
+    "projection": "r1/r1-projection.json",
+    "request": "r1/r1-request.json",
     "states_entered": [
       "VIOLATION_BOUND",
       "USAGE_SIGNATURE_EXTRACTED",
@@ -375,7 +375,7 @@
         "rank": 3
       }
     ],
-    "corpus": "/private/tmp/claude-501/-Users-neon-skills-shared/d4ad227a-6352-4bfb-8ddc-f80eec30efaf/scratchpad/canary-528/semantic/corpus.json",
+    "corpus": "semantic/corpus.json",
     "corpus_note": "three whole committed blobs of the consumer at the canary commit, each with a repository-blob back reference",
     "lane_requires_provider": false,
     "registered_documents": 3,
@@ -420,7 +420,7 @@
       "docs/architecture/DOMAIN_DECOUPLING.md:199-206 - Forbidden: relative import of another module's private script",
       "scripts/gates/_gate_common.py:1-9 - the provider's own declared consumer set ('the scripts/gates/ checkers') and resolution contract ('sys.path[0] is this directory when a gate runs as a script')"
     ],
-    "scan": "/private/tmp/claude-501/-Users-neon-skills-shared/d4ad227a-6352-4bfb-8ddc-f80eec30efaf/scratchpad/canary-528/cross-module-imports.json",
+    "scan": "cross-module-imports.json",
     "scope_ceiling": "arena-core owns both scripts/gates and scripts/delivery_*.py (.arena/modules/arena-core/module.json roots), so this is a component-boundary crossing INSIDE one .arena module, not a cross-module one. A repo-wide scan of 354 python files found zero cross-.arena-module imports and exactly these two private-module imports from outside the owning directory.",
     "title": "delivery operators import the gates lane's private plumbing through an injected sys.path"
   }

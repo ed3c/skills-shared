@@ -54,9 +54,13 @@ HUMAN_ADMIT_REQUIRED.
 
 ## Files here
 
-`canary-receipt.json` (sha256 ba4344fb7d9c81bf…) is the binding artifact;
-`artifact-validation.txt`, `r1/`, `oracle/`, `facts/` and
-`cross-module-imports.json` are its named evidence. The full working set
-(consumer clone, sqlite databases, raw observation dumps, runner scripts)
-lived in the Worker session's scratch area and is reproducible from the
-receipt's pinned subjects; only the durable core is committed.
+`canary-receipt.json` is the binding artifact (its sha256 is recorded in
+`canary-receipt.sha256`, regenerated whenever the receipt's evidence paths are
+re-rooted); `artifact-validation.txt`, `r1/`, `oracle/`, `facts/`,
+`semantic/` and `cross-module-imports.json` are its named evidence, and
+`check_paths.py` asserts every relative evidence path the receipt cites
+resolves against the committed set. The full working set (consumer clone,
+sqlite databases, raw observation dumps, runner scripts) lived in the Worker
+session's scratch area and is NOT reproducible: the canary commit
+`8a214267…` was never pushed and exists only in that clone — only the durable
+core committed here survives.

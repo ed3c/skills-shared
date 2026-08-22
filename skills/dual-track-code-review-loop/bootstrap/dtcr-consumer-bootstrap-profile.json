@@ -138,7 +138,7 @@
       "id": "INDEPENDENT_SHADOW_REVIEW",
       "state": "NOT_EXERCISED",
       "owner_issue": 525,
-      "note": "This artifact was authored and checked inside the implementing lane. Whether #525 is a completion dependency of this issue is itself disputed: the issue body and its Tech Lead comment both say it is, and neither ISSUE_DAG.json nor LOCAL_HANDOFF_EXECUTION_QUEUE.json encodes that edge. A human ruling reconciles them; this artifact records the disagreement rather than picking a side."
+      "note": "This artifact was authored and checked inside the implementing lane. #525 is recorded as a completion dependency of this issue by the issue body, its Tech Lead comment, and both machine indexes (ISSUE_DAG.json edge 525->527 COMPLETION_DEPENDENCY; LOCAL_HANDOFF_EXECUTION_QUEUE.json completion_dependency: 525); it stands as recorded and remains unmet until #525 produces its own receipt."
     }
   ],
   "authority": {

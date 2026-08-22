@@ -85,7 +85,7 @@
       "title": "[DTCR-M1-C] rebuildable non-authoritative semantic-context adapter",
       "github_state": "OPEN",
       "evidence": "KEYWORD lane LANDED; VECTOR/HYBRID lanes BLOCKED_ON_PROVIDER",
-      "note": "adapters/semantic-context/ landed: rebuildable deterministic keyword index with back-references, 14/14 falsifiers, rebuild-determinism receipt; VECTOR/HYBRID refuse structurally while no embedding provider is bound (lancedb not importable); convergence wiring owner is #521",
+      "note": "adapters/semantic-context/ landed: rebuildable deterministic keyword index with back-references, 14/14 falsifiers, rebuild-determinism receipt; VECTOR/HYBRID refuse structurally while no embedding provider is bound (the lancedb store itself imports at 0.37.1 per the committed provider receipt; the blocker is the embedding provider and its HUMAN_ADMIT_REQUIRED terms); convergence wiring owner is #521",
       "unsatisfied_completion_dependency_at_closure_of": [522],
       "blocks": []
     }

@@ -48,10 +48,10 @@ the one most often reported as progress.
    — plane ownership and the locator laws.
 6. [`references/schemas/`](references/schemas/) — the machine half, 34 frozen
    schemas (8 C0 contract + 16 D1/M1 interface + 3 X1 synthesis + 4 R1 bounded
-   refactor).
+   refactor + 3 R2 cross-repository).
 7. [`references/source-disposition/refused-claims.json`](references/source-disposition/refused-claims.json)
    — the seven refused source claims and their replayable controls.
-8. [`adapters/`](adapters/) — the two landed deterministic-track adapters, each
+8. [`adapters/`](adapters/) — the five landed deterministic-track adapters, each
    with its own selftest and fixtures.
 9. [`references/prompts/README.md`](references/prompts/README.md) — the common
    session envelope and the nine zero-context stage prompts, P0 through P8.
@@ -97,9 +97,9 @@ skills/dual-track-code-review-loop/
 │   │       eight declared languages, and no vendored adapter implementation
 ├── tests/
 │   ├── run-all.sh
-│   │   └── one entrypoint: replays the C0 contract, then routes the two adapter
-│   │       selftests, the X1 synthesis selftest and the R1 refactor selftest
-│   │       through the same CI arrival — five lanes
+│   │   └── one entrypoint: replays the C0 contract, then routes the five adapter
+│   │       selftests, the X1 synthesis, R1 and R2 refactor selftests and the
+│   │       bootstrap-profile gate through the same CI arrival — nine lanes
 │   └── selftest.py
 │       └── dynamic discovery over references/; prints every denominator it counted
 └── references/
@@ -235,26 +235,32 @@ the claim and the record.
 A committed test suite now exists at [`tests/run-all.sh`](tests/run-all.sh),
 routed by `skill-suites.yml` continuous integration. It replays the C0
 contract via `tests/selftest.py` — dynamic discovery over `references/`, no
-denominator hand-copied into the script — and then routes both landed
-adapters' selftests (`adapters/tree-sitter/selftest.py`,
-`adapters/sqlite-ledger/selftest.py`), the X1 synthesis selftest
-(`synthesis/selftest.py`) and the R1 bounded-refactor selftest
-(`refactor/selftest.py`) through the same CI arrival — five lanes. On this
-worktree's exact head each lane's denominator line reads:
+denominator hand-copied into the script — and then routes the five landed
+adapters' selftests (`adapters/{tree-sitter,sqlite-ledger,scip,buf,semantic-context}/selftest.py`),
+the X1 synthesis selftest (`synthesis/selftest.py`), the R1 and R2 refactor
+selftests (`refactor/selftest.py`, `expand-contract/selftest.py`) and the
+bootstrap-profile gate (`bootstrap/check_bootstrap_profile.py --selftest`)
+through the same CI arrival — nine lanes. On this worktree's exact head each
+lane's denominator line reads:
 
 ```text
-schemas=31 positives=37 controls=151 knockouts=151 leak_scan_files=36 mutable_subject_probes=115 promotion_probes=184
-tree-sitter:    fixtures=2 matches=5 schema_validations=9 falsifier_rows=14 live=EXERCISED
-sqlite-ledger:  fixtures=2 cases=46 planted_mutations=22 knockouts=5/5
-synthesis:      stability_checks=9 schema_compositions=8 refusal_codes=16 projections=3
-refactor:       requests=5 stability_checks=15 schema_compositions=20 state_values_covered=44 refusal_codes=26 languages_exercised=4/8 applied_on_real_codebase=NOT_EXERCISED
+schemas=34 positives=44 controls=184 knockouts=184 leak_scan_files=39 mutable_subject_probes=275 promotion_probes=303
+tree-sitter:       fixtures=2 matches=5 schema_validations=9 falsifier_rows=14 live=EXERCISED
+sqlite-ledger:     fixtures=2 cases=46 planted_mutations=22 knockouts=5/5
+scip:              fixtures=1 facts=87 schema_validations=90 falsifier_rows=20 live=EXERCISED
+buf:               cases=12 schema_rows=10 required_falsifiers_covered=10/10 extra_falsifiers_covered=3/3 live=NOT_EXERCISED (buf absent)
+semantic-context:  registered=5 projected=4 chunks=12 tokens=100 projection_receipts=12 positives_checks=67 schema_validations=37 planted_mutations=38 falsifiers=14/14 provider=EXERCISED (store import 0.37.1, vector lane BLOCKED_ON_PROVIDER)
+synthesis:         stability_checks=9 schema_compositions=8 refusal_codes=16 projections=3
+refactor (R1):     requests=5 stability_checks=15 schema_compositions=20 state_values_covered=44 refusal_codes=26 languages_exercised=4/8 applied_on_real_codebase=NOT_EXERCISED
+expand-contract:   requests=6 stability_checks=18 schema_compositions=22 state_values_covered=70 refusal_codes=36 contract_formats_exercised=5/6 applied_on_real_codebase=NOT_EXERCISED consumer_canary=NOT_EXERCISED
+bootstrap:         selftest cases=16 failures=0 (14 planted mutations refused)
 ```
 
-Those are the five denominator lines the run prints, with two host-specific
-fragments elided so this file stays machine-neutral: the first line's
-`subject=<absolute path>` and the tail of the sqlite line, which carries three
-per-host digests and a row-count map. Nothing else is reworded — run the suite
-and the tokens above appear in its output.
+Those are the denominator lines the run prints, with host-specific fragments
+elided so this file stays machine-neutral: the first line's
+`subject=<absolute path>`, the tail of the sqlite line (three per-host digests
+and a row-count map), and the semantic line's corpus digests. Nothing else is
+reworded — run the suite and the tokens above appear in its output.
 
 `cases.json` reconciles the schema and control lists by name against what the
 run counted and fails on any drift in either direction; the knockout and probe
@@ -281,19 +287,19 @@ mutation controls over the refusals          VERIFIED_BY_COMMITTED_SUITE
 committed mutation harness                   PRESENT (tests/run-all.sh, CI-routed)
 parser/syntax-match adapter (tree-sitter)    LANDED, selftest + live receipt
 graph-ledger adapter (sqlite-ledger)         LANDED, selftest, planted mutations
-SCIP adapter, python scope (#547)            LANDED — live receipt from scip-python 0.6.6; cross-language BLOCKED_ON_PROVIDER
+SCIP adapter, python scope (#547)            LANDED — live receipt from scip-python 0.6.6; cross-language BLOCKED_ON_PROVIDER; live lane crashes uncontracted without pyrightconfig.json (#595)
 Buf adapter NOT_APPLICABLE lane (#549)       LANDED — live VERIFIED lane BLOCKED_ON_PROVIDER (buf absent)
 semantic-context KEYWORD lane (#550)         LANDED — VECTOR/HYBRID BLOCKED_ON_PROVIDER (no embedding provider)
 dual-track synthesis compiler (#522)         LANDED — synthesis/ + three schemas, suite-counted
 bounded R1 refactor protocol (#523)          LANDED — refactor/ + four schemas, suite-counted
 R1 language adapter implementations          BLOCKED_ON_PROVIDER (declared capability classes only)
-R1 live consumer canary (#523 exit)          NOT_EXERCISED
-applied refactor on a real codebase          NOT_EXERCISED
+R1 live consumer canary (#523 exit)          EXERCISED (bounded, one consumer, hand-applied per the compiler's own refusal — canary-528/)
+applied refactor on a real codebase          EXERCISED (bounded, +18/-8 on bettor-arena clone, oracle 0/0/1; receipt v0-draft, exit tokens NOT_CLAIMED)
 R2 cross-repo protocol compiler (#524)       LANDED — expand-contract/ + three schemas, suite-counted
 cross-repository contract migration (real)   NOT_EXERCISED (rides #528)
-live consumer canary (#528)                  NOT_EXERCISED
+live consumer canary (#528)                  EXERCISED (bounded, one consumer, receipt v0-draft, exit tokens NOT_CLAIMED — canary-528/)
 independent Shadow (#525)                    NOT_EXERCISED
-registry admission                           ABSENT
+registry admission                           HUMAN_ADMIT_REQUIRED
 legal, employment and IP clearance           HUMAN_ADMIT_REQUIRED
 merge, release, production, visibility       HUMAN_ADMIT_REQUIRED
 ```
@@ -303,7 +309,7 @@ now committed and CI-routed, so the line reads `VERIFIED_BY_COMMITTED_SUITE`
 rather than the uncommitted-scratch-harness label it replaced. The earlier,
 narrower C0-only harness was independently re-derived once by the Shadow on the
 H0-003 review before this suite existed; that historical fact is kept as a
-second derivation behind the C0 slice only, not as evidence for the two
+second derivation behind the C0 slice only, not as evidence for the
 adapters, which have never been through an independent Shadow pass.
 `NOT_IMPLEMENTED`, `BLOCKED_ON_PROVIDER`, `NOT_EXERCISED` and `IN_FLIGHT` are
 distinct states here on purpose: a blocked provider dependency, an unbuilt
@@ -313,14 +319,16 @@ would hide which one applies.
 
 ## Current handoff
 
-Two deterministic-track adapters landed and both selftests are green in the
-committed suite above. The next owner for *this contract* is still an
+Five deterministic-track adapters landed and every routed selftest is green in
+the committed suite above. The next owner for *this contract* is still an
 independent Shadow on this exact head (`#525`, open), reading the audit list in
 [`AGENTS.md`](AGENTS.md) and returning `ADMIT_FOR_DOWNSTREAM`, `BLOCK` or
 `REPLAN_REQUIRED`; a same-context review may warn and cannot satisfy that role.
-Concurrently open, path-disjoint sibling lanes on this same head: `#547`/`#549` (provider
-deterministic adapters, blocked on provider availability), `#550` (semantic
-adapter, blocked), `#527` (bootstrap profile) and `#528` (live consumer
-canary, the eventual Local Handoff owner). None of them is promoted by this
-file landing, and this file's landing does not promote any of them either —
-each closes only on its own issue's evidence.
+Open, path-disjoint sibling lanes on this same head: `#547`/`#549` (adapters
+landed at their declared ceilings; cross-language and live-buf sub-lanes stay
+provider-blocked), `#550` (KEYWORD lane landed; vector lane provider-blocked),
+`#527` (bootstrap profile landed; attach refused on two explicit
+preconditions) and `#528` (one bounded consumer canary exercised, receipt
+v0-draft; final Local Handoff admission open). None of them is promoted by
+this file landing, and this file's landing does not promote any of them
+either — each closes only on its own issue's evidence.

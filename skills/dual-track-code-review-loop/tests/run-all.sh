@@ -41,3 +41,9 @@ python3 "$ROOT/expand-contract/selftest.py"
 # artifact against the tree in both directions; nothing else routes it, so a
 # regression in it would otherwise be invisible.
 python3 "$ROOT/bootstrap/check_bootstrap_profile.py" --selftest
+
+# The #528 canary receipt is a v0-draft with no frozen schema, so this is the
+# only thing standing between it and citing evidence that was never committed.
+# It lives beside the receipt on the traceability plane; this suite is the
+# DTCR evidence owner and therefore its arrival.
+python3 "$ROOT/../../docs/traceability/dual-track-code-review-loop/canary-528/check_paths.py" --selftest

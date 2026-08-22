@@ -188,8 +188,10 @@ two-track separation and grading      contract-level, enforced by schema
 refusal controls                      replayed against the shipped schemas
 parser/syntax-match binding           LANDED (adapters/tree-sitter/, live receipt)
 graph-ledger binding                  LANDED (adapters/sqlite-ledger/, planted mutations)
+symbol-index binding                  LANDED python scope (adapters/scip/, live receipt); cross-language BLOCKED_ON_PROVIDER (#595 open)
+contract-compatibility binding        LANDED NOT_APPLICABLE lane (adapters/buf/); live lane BLOCKED_ON_PROVIDER
 concrete retrieval/semantic binding   LANDED KEYWORD lane (adapters/semantic-context/); VECTOR BLOCKED_ON_PROVIDER
-applied refactor on a real codebase   NOT_EXERCISED
+applied refactor on a real codebase   EXERCISED (bounded, one consumer, receipt v0-draft — canary-528/)
 cross-repository contract migration   R2 compiler LANDED (expand-contract/); real migration NOT_EXERCISED
 live consumer canary                  NOT_EXERCISED
 independent review                    NOT_EXERCISED
@@ -197,7 +199,8 @@ legal, employment and IP clearance    HUMAN_ADMIT_REQUIRED
 merge, release, production            HUMAN_ADMIT_REQUIRED
 ```
 
-This body defines how the method may speak. Two of its capability classes are
-now filled by a landed adapter each; it has not yet been pointed at a real
-codebase to produce a proposal, and a contract that survives its own refusal
-controls has survived its own refusal controls.
+This body defines how the method may speak. Five of its capability classes are
+now filled by a landed adapter each, and it has been pointed at one real
+codebase exactly once — a bounded consumer canary whose receipt stays a
+v0-draft with its exit tokens NOT_CLAIMED; a contract that survives its own
+refusal controls has survived its own refusal controls.
