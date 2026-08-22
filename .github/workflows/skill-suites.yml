@@ -122,14 +122,26 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           persist-credentials: false
+          # dual-forge prompt-baseline resolves preregistered prompt pins
+          # (e.g. 1295cdd:references/system-prompt.md) from git history; a
+          # depth-1 checkout cannot name those objects and fails the suite.
           fetch-depth: 0
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: '3.12'
       - name: Install the pinned Draft 2020-12 validator
+        # The controlled-language authority composition executes the committed
+        # schemas as deciding gates and exits 70 rather than skipping when the
+        # validator is absent. Installing it here is what lets that gate run at
+        # all in this job; without it the suite fails on an environment gap
+        # rather than on a defect.
         run: python3 -m pip install --disable-pip-version-check 'jsonschema==4.26.0'
       - name: Run ${{ matrix.skill }} suite
         env:
+          # repository-capability-audit deletes its generated run tree on exit
+          # unless this names a directory. #222 needs the observations, the
+          # effectiveness report and the nested runtime packet to survive the
+          # script, so they can be uploaded rather than described.
           RCA_EVIDENCE_DIR: ${{ matrix.skill == 'repository-capability-audit' && format('{0}/evidence/run-all', runner.temp) || '' }}
         run: |
           set -o pipefail
@@ -137,6 +149,10 @@ jobs:
           bash "skills/${{ matrix.skill }}/tests/run-all.sh" 2>&1 \
             | tee "${RUNNER_TEMP}/evidence/suite.log"
 
+      # Only the skills whose Issues are waiting on a replayable artifact: #212
+      # for procedural-shadow-runtime, #222 for repository-capability-audit.
+      # Collecting a bundle from every matrix leg would spend upload on jobs
+      # whose evidence nothing is waiting for.
       - name: Collect exact-head evidence bundle
         if: always() && (matrix.skill == 'procedural-shadow-runtime' || matrix.skill == 'repository-capability-audit')
         run: |
@@ -145,6 +161,8 @@ jobs:
           python3 scripts/evidence_bundle.py collect "${RUNNER_TEMP}/evidence" \
             --output "${RUNNER_TEMP}/bundle" \
             --tree-sha "$(git rev-parse 'HEAD^{tree}')"
+          # Verify here as well as on download: a bundle that cannot be replayed
+          # in the job that produced it will not become replayable later.
           python3 scripts/evidence_bundle.py verify "${RUNNER_TEMP}/bundle"
 
       - name: Upload exact-head evidence bundle
