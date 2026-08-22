@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """Compile an exact-PR CADG admission receipt from a durable PR template.
 
-The durable packet binds analyzed code through a content manifest over its
-explicit delta paths. `.agents/cadg/**` metadata is excluded, so committing the
-packet does not create a self-referential Git-head fixed point. CI binds the
-actual PR base/head/tree in the separate receipt.
+CADG is causal observability, not an execution graph. The default OBSERVE mode
+never blocks a reversible material PR merely because its full causal packet is
+late or absent. WARN surfaces that omission without creating an execution edge.
+GATE requires a complete packet only at a named transition boundary; the legacy
+strict-material policy remains an explicit opt-in profile.
 """
 from __future__ import annotations
 
@@ -19,6 +20,15 @@ from typing import Any
 
 HEX40 = __import__("re").compile(r"^[0-9a-f]{40}$")
 DIGEST = __import__("re").compile(r"^sha256:[0-9a-f]{64}$")
+OPERATING_MODES = {"OFF", "OBSERVE", "WARN", "GATE"}
+FI_BLOCKER_MAP = {
+    "CADG001": "CADG-FI-001",  # stale/wrong immutable subject
+    "CADG013": "CADG-FI-001",
+    "CADG014": "CADG-FI-001",
+    "CADG008": "CADG-FI-002",  # duplicate canonical writer
+    "CADG009": "CADG-FI-003",  # authority/effect widening
+    "CADG003": "CADG-FI-004",  # blocking assumption unresolved
+}
 
 
 class AdmissionError(RuntimeError):
@@ -97,11 +107,50 @@ def material_paths(paths: list[str], policy: dict[str, Any]) -> list[str]:
     return [path for path in paths if not matches(path, metadata) and matches(path, probes)]
 
 
+def operating_mode(policy: dict[str, Any]) -> str:
+    mode = str(policy.get("operating_mode", "OBSERVE")).upper()
+    if mode not in OPERATING_MODES:
+        raise AdmissionError("CADG016", f"unknown CADG operating mode: {mode}")
+    return mode
+
+
+def transition_boundary(args: argparse.Namespace, policy: dict[str, Any]) -> str:
+    return args.transition_boundary or str(policy.get("transition_boundary", "PR_IMPLEMENTATION_REVERSIBLE"))
+
+
+def missing_packet_action(args: argparse.Namespace, policy: dict[str, Any], material_hits: list[str]) -> None:
+    mode = operating_mode(policy)
+    boundary = transition_boundary(args, policy)
+    strict = bool(policy.get("strict_missing_packet", False))
+    gate_boundaries = {str(x) for x in policy.get("gate_boundaries", [])}
+    details = ", ".join(material_hits)
+
+    if mode == "OFF":
+        print(f"CADG-PR-OFF boundary={boundary} material={details}")
+        return
+    if mode == "OBSERVE":
+        print(f"CADG-PR-OBSERVE PARTIAL_CAUSAL_CHAIN boundary={boundary} material={details}")
+        return
+    if mode == "WARN":
+        print(f"CADG-PR-WARN PARTIAL_CAUSAL_CHAIN boundary={boundary} material={details}", file=sys.stderr)
+        return
+    if strict or boundary in gate_boundaries:
+        raise AdmissionError("CADG018", f"GATE boundary {boundary} requires a CADG packet: {details}")
+    print(f"CADG-PR-GATE-NOT-AT-BOUNDARY boundary={boundary} material={details}")
+
+
+def map_checker_failure(detail: str) -> str:
+    for cadg_code, fi_code in FI_BLOCKER_MAP.items():
+        if cadg_code in detail:
+            return fi_code
+    return "CADG016"
+
+
 def run_checker(checker: Path, packet: Path) -> None:
     run = subprocess.run([sys.executable, str(checker), "--packet", str(packet)], text=True, capture_output=True)
     if run.returncode:
         detail = "\n".join(line for line in (run.stdout + run.stderr).splitlines() if line.strip())
-        raise AdmissionError("CADG016", f"CADG checker rejected packet: {detail}")
+        raise AdmissionError(map_checker_failure(detail), f"CADG checker rejected packet: {detail}")
 
 
 def validate_shadow(path: Path, exact: dict[str, str]) -> dict[str, Any]:
@@ -109,7 +158,7 @@ def validate_shadow(path: Path, exact: dict[str, str]) -> dict[str, Any]:
     if shadow.get("builder_identity") == shadow.get("reviewer_identity"):
         raise AdmissionError("CADG016", "Builder self-review cannot become independent Shadow")
     if shadow.get("subject") != exact:
-        raise AdmissionError("CADG014", "Shadow receipt is bound to another PR subject")
+        raise AdmissionError("CADG-FI-001", "Shadow receipt is bound to another PR subject")
     if not DIGEST.fullmatch(str(shadow.get("receipt_digest", ""))):
         raise AdmissionError("CADG010", "Shadow receipt digest is absent")
     return shadow
@@ -124,7 +173,8 @@ def admit(args: argparse.Namespace) -> dict[str, Any] | None:
     material_hits = material_paths(changed, policy)
     if args.packet is None:
         if material_hits:
-            raise AdmissionError("CADG018", "material PR has no CADG packet: " + ", ".join(material_hits))
+            missing_packet_action(args, policy, material_hits)
+            return None
         print("CADG-PR-NOT-APPLICABLE no material trigger and no packet")
         return None
 
@@ -135,20 +185,20 @@ def admit(args: argparse.Namespace) -> dict[str, Any] | None:
     if packet.get("mode") != "FORWARD_PROVENANCE" or packet.get("stage") != "PR_TEMPLATE":
         raise AdmissionError("CADG002", "PR admission requires FORWARD_PROVENANCE/PR_TEMPLATE")
     if subject.get("repository") != args.repository or subject.get("base_commit") != args.base_commit or subject.get("base_tree") != args.base_tree:
-        raise AdmissionError("CADG014", "packet repository/base does not match PR event")
+        raise AdmissionError("CADG-FI-001", "packet repository/base does not match PR event")
     if pr.get("repository") != args.repository or pr.get("number") != args.pr_number or pr.get("head_branch") != args.head_branch:
-        raise AdmissionError("CADG014", "packet PR identity does not match event")
+        raise AdmissionError("CADG-FI-001", "packet PR identity does not match event")
 
     declared = sorted(set(str(x) for x in packet.get("delta", {}).get("paths", [])))
     undeclared = sorted(set(changed_code) - set(declared))
     stale_declared = sorted(set(declared) - set(changed_code))
     if undeclared or stale_declared:
-        raise AdmissionError("CADG013", f"delta paths differ from PR code paths; undeclared={undeclared} stale={stale_declared}")
+        raise AdmissionError("CADG-FI-001", f"delta paths differ from PR code paths; undeclared={undeclared} stale={stale_declared}")
     excluded = [str(x) for x in subject.get("binding", {}).get("excluded_paths", [])]
     current_manifest, records = manifest(root, declared, excluded)
     expected_manifest = subject.get("binding", {}).get("code_manifest_digest")
     if current_manifest != expected_manifest:
-        raise AdmissionError("CADG013", f"code manifest stale: expected={expected_manifest} actual={current_manifest}")
+        raise AdmissionError("CADG-FI-001", f"code manifest stale: expected={expected_manifest} actual={current_manifest}")
 
     for value, label in ((args.base_commit, "base commit"), (args.base_tree, "base tree"),
                          (args.head_commit, "head commit"), (args.head_tree, "head tree")):
@@ -156,7 +206,7 @@ def admit(args: argparse.Namespace) -> dict[str, Any] | None:
     observed_head = git(root, "rev-parse", "HEAD")
     observed_tree = git(root, "rev-parse", "HEAD^{tree}")
     if (observed_head, observed_tree) != (args.head_commit, args.head_tree):
-        raise AdmissionError("CADG014", "checked-out HEAD/tree differs from PR event")
+        raise AdmissionError("CADG-FI-001", "checked-out HEAD/tree differs from PR event")
 
     exact = {"repository": args.repository, "base_commit": args.base_commit, "base_tree": args.base_tree,
              "branch": args.head_branch, "head_commit": args.head_commit, "head_tree": args.head_tree}
@@ -185,6 +235,8 @@ def admit(args: argparse.Namespace) -> dict[str, Any] | None:
         "subject": exact,
         "code_manifest_digest": current_manifest,
         "validator": {"path": str(args.checker), "content_digest": file_digest(args.checker), "exit_code": 0},
+        "operating_mode": operating_mode(policy),
+        "transition_boundary": transition_boundary(args, policy),
         "code": args.code_state,
         "cadg": "PASS",
         "shadow": shadow_state,
@@ -199,7 +251,7 @@ def admit(args: argparse.Namespace) -> dict[str, Any] | None:
         receipt["human_admission_ref"] = args.human_admission_ref
     args.receipt_out.parent.mkdir(parents=True, exist_ok=True)
     args.receipt_out.write_bytes(canonical_bytes(receipt) + b"\n")
-    print(f"CADG-PR-GREEN packet={packet['packet_id']} head={args.head_commit} code={args.code_state} shadow={shadow_state} human={human_state}")
+    print(f"CADG-PR-GREEN packet={packet['packet_id']} head={args.head_commit} mode={operating_mode(policy)} code={args.code_state} shadow={shadow_state} human={human_state}")
     return receipt
 
 
@@ -212,6 +264,7 @@ def parser() -> argparse.ArgumentParser:
     p.add_argument("--packet", type=Path)
     p.add_argument("--shadow-receipt", type=Path)
     p.add_argument("--human-admission-ref")
+    p.add_argument("--transition-boundary")
     p.add_argument("--repository", required=True)
     p.add_argument("--pr-number", type=int, required=True)
     p.add_argument("--base-commit", required=True)
