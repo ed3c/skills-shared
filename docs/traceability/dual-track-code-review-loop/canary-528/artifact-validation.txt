@@ -1,0 +1,22 @@
+green r1.usage_signature vs refactor-usage-signature
+green r1.minimal_port vs refactor-minimal-port
+green r1.changeset_lease vs refactor-changeset-lease
+green r1.receipt vs refactor-r1-receipt
+green ledger.blast_radius_path vs blast-radius-path
+green observation[0] DTCR-SY-001 vs symbol-fact
+green observation[1] DTCR-SY-002 vs symbol-fact
+green observation[2] DTCR-SY-003 vs symbol-fact
+green observation[3] DTCR-SY-004 vs symbol-fact
+green observation[4] DTCR-SY-005 vs symbol-fact
+green observation[5] DTCR-SY-006 vs symbol-fact
+green observation[6] DTCR-SY-007 vs symbol-fact
+green observation[7] DTCR-SY-008 vs symbol-fact
+green observation[8] DTCR-SY-009 vs symbol-fact
+green observation[9] DTCR-SY-010 vs symbol-fact
+green observation[10] DTCR-SY-011 vs symbol-fact
+green observation[11] DTCR-SY-012 vs symbol-fact
+green observation[12] DTCR-SY-013 vs symbol-fact
+green observation[13] DTCR-SY-014 vs symbol-fact
+green observation[14] DTCR-SY-015 vs symbol-fact
+
+20/20 artifacts validate against their frozen schema

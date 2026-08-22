@@ -1,12 +1,13 @@
 {
   "attempt_id": "466-live-2",
+  "base_sha": "249abc47847f8295b1c75c9d4c84457c5126fd89",
   "blockers": [
     {
       "class": "CARRIER_RUNTIME_CONTRACT_MISMATCH",
-      "detail": "herdr 0.8.0 exposes no observation timestamp, no agent process id, no process liveness flag, no process start time and no cleanup/residue facts, so herdr_runtime_observer.reduce_observation can never produce a sample and collect_herdr_lifecycle can never emit the LIVE branch of herdr-lifecycle-receipt.schema.json.",
+      "detail": "herdr 0.8.0 exposes no observation timestamp, no agent process id, no process liveness flag, no process start time and no cleanup/residue facts on its agent surface, so herdr_runtime_observer.reduce_observation can never produce a sample and collect_herdr_lifecycle can never emit the LIVE branch of herdr-lifecycle-receipt.schema.json.",
       "missing_observer_inputs": [
         "observed_at_unix|updated_at_unix|last_seen_at_unix",
-        "process_id|pid",
+        "process_id|pid (absent from AgentInfo; pid exists only on PaneProcessInfoProcess, which the observer never reads)",
         "process_alive",
         "process_started_at_unix",
         "cleanup_state",
@@ -16,8 +17,8 @@
     },
     {
       "class": "HOST_ISOLATION_DENIED",
-      "detail": "scratch-home-isolation is a required capability of this queue item, but every attempt to set HOME for the herdr client was refused by the worktree-isolation guard of this automated host, and herdr derives its socket path from HOME only.",
       "denial_evidence": "worktree-isolation guard: refused a command that sets HOME because its effect on git writes cannot be verified",
+      "detail": "scratch-home-isolation is a required capability of this queue item, but every attempt to set HOME for the herdr client was refused by the worktree-isolation guard of this automated host, and herdr derives its socket path from HOME only.",
       "probe": "HERDR_CONFIG_PATH does not relocate the socket: with HERDR_CONFIG_PATH set to a scratch path, herdr status still reported socket /Users/neon/.config/herdr/herdr.sock",
       "unblocking_lane": "human-attended terminal, or an explicit host permission rule admitting a scratch HOME for the herdr client"
     }
@@ -70,7 +71,7 @@
     {
       "argv": ["herdr", "api", "schema", "--output", "<scratch>"],
       "exit_code": 0,
-      "finding": "AgentInfo is a closed property set of agent, agent_session, agent_status, cwd, display_agent, focused, foreground_cwd, interactive_ready, launch_pending, name, pane_id, revision, screen_detection_skipped, state_change_seq, state_labels, tab_id, terminal_id, terminal_title, terminal_title_stripped, title, tokens, workspace_id; the success_response envelope is {id, result} only"
+      "finding": "AgentInfo publishes exactly agent, agent_session, agent_status, cwd, display_agent, focused, foreground_cwd, interactive_ready, launch_pending, name, pane_id, revision, screen_detection_skipped, state_change_seq, state_labels, tab_id, terminal_id, terminal_title, terminal_title_stripped, title, tokens, workspace_id; it declares no additionalProperties, so this is the published property set rather than a formally closed one. The success_response envelope is {id, result} only"
     },
     {
       "argv": ["herdr", "agent", "explain", "--file", "<scratch>", "--agent", "claude", "--json"],
@@ -95,7 +96,12 @@
     {
       "argv": ["python3", "skills/agentic-tech-lead-orchestration/tests/herdr_lifecycle_selftest.py"],
       "exit_code": 0,
-      "finding": "deterministic lane PASS (positive=2 mutations=7 live=NOT_EXERCISED)"
+      "finding": "deterministic lane PASS; the fixture fabricates the six fields herdr 0.8.0 never emits, so this green carries zero information about live feasibility and must never be cited toward the live gate"
+    },
+    {
+      "argv": ["herdr", "api", "schema", "--json"],
+      "exit_code": 0,
+      "finding": "third independent arrival, 2026-08-22, at repository commit 674cfe1435c4bd1c29e8f07308266fe5c6284973: 251527 bytes, sha256 88ff414aa996e390c2db05a37b95d28dbe4e81b98329f6ed7f7a2cc5c6ebf51a. Whole-schema occurrence counts are 0 for observed_at_unix, updated_at_unix, last_seen_at_unix, process_alive, process_started_at_unix, process_id, cleanup_state, residue_count, start_time, uptime, alive, and the substring _at. AgentInfo carries exactly 22 properties and no additionalProperties keyword; PaneProcessInfoProcess carries pid with required [pid, name]; AgentStatus is [idle, working, blocked, done, unknown], so the terminal state exists while the terminal receipt cannot"
     }
   ],
   "evidence_ceiling": "NO_HERDR_LIFECYCLE_SAMPLE",
@@ -103,27 +109,35 @@
     "process_detection_to_terminal_lifecycle_pass",
     "done_candidate_to_controller_acceptance",
     "manual_report_agent_to_clean_terminal_receipt",
-    "permission_denial_to_pass"
+    "permission_denial_to_pass",
+    "blocked_no_sample_or_unavailable_fallback_receipt_to_pass_verdict"
   ],
   "host": {
     "class": "CLAUDE_CODE_LOCAL",
     "herdr_path": "/opt/homebrew/bin/herdr",
     "herdr_version": "0.8.0"
   },
-  "lifecycle_state_reached": "EXACT_SCRATCH_HOME_AND_WORKTREE_BOUND_NOT_REACHED",
+  "lifecycle_state": "BLOCKED_NO_SAMPLE",
   "plan": {
     "path": "data/handoff/herdr-v2/herdr-plan.json",
     "sha256": "354e9dd8c074f557ed3ccb338fbb8ba7438f6ccc8f4c27fc7a616f95c9e434c2"
   },
+  "provider": {
+    "api_schema_bytes": 251527,
+    "api_schema_observed_at_commit": "674cfe1435c4bd1c29e8f07308266fe5c6284973",
+    "api_schema_observed_on": "2026-08-22",
+    "api_schema_sha256": "88ff414aa996e390c2db05a37b95d28dbe4e81b98329f6ed7f7a2cc5c6ebf51a",
+    "name": "herdr",
+    "path": "/opt/homebrew/bin/herdr",
+    "version": "0.8.0"
+  },
+  "repo": "ed3c/skills-shared",
   "sample_count": 0,
-  "schema": "agentic-tech-lead/herdr-lifecycle/v1",
+  "sample_digests": [],
   "schema_version": 1,
   "shadow_review_required": true,
-  "state": "NOT_EXERCISED",
-  "subject": {
-    "commit": "249abc47847f8295b1c75c9d4c84457c5126fd89",
-    "repository": "ed3c/skills-shared",
-    "tree": "a24b9b7ace6f4022967d41262ecdc704d5c11646"
-  },
-  "task_ref": "issue-466-live-herdr-managed-lifecycle"
+  "target": "herdr-466-managed-agent",
+  "task_id": "issue-466-live-herdr-managed-lifecycle",
+  "tree_sha": "a24b9b7ace6f4022967d41262ecdc704d5c11646",
+  "worktree": "/Users/neon/skills-shared/.claude/worktrees/wf_0ef9d145-3b2-2"
 }

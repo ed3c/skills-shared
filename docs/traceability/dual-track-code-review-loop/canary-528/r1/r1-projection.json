@@ -1,0 +1,187 @@
+{
+  "changeset_lease": {
+    "behavior_tests": {
+      "frozen": [
+        {
+          "post_digest": "d57325a2d94e73be23cb9f5473062e5da1ed807841e18d3d37d21b132f25530f",
+          "pre_digest": "d57325a2d94e73be23cb9f5473062e5da1ed807841e18d3d37d21b132f25530f",
+          "test_ref": "scripts/gates/check_delivery_receipt.py --selftest"
+        },
+        {
+          "post_digest": "93d7dc7b12bf5fb477ecf01fb5c79f40f578510e768cf265a17577fc205ccb06",
+          "pre_digest": "93d7dc7b12bf5fb477ecf01fb5c79f40f578510e768cf265a17577fc205ccb06",
+          "test_ref": "tests/test_delivery_command.sh"
+        }
+      ],
+      "mutated_test_refs": []
+    },
+    "binding_id": "DTCR-CL-001",
+    "changed_paths": [
+      "scripts/delivery_status.py",
+      "scripts/delivery_sync.py"
+    ],
+    "composition_roots": [
+      {
+        "admitted": true,
+        "root_path": "scripts/delivery_status.py"
+      },
+      {
+        "admitted": true,
+        "root_path": "scripts/delivery_sync.py"
+      }
+    ],
+    "generated_paths_touched": [],
+    "lease": {
+      "escaped_paths": [],
+      "lease_paths": [
+        "scripts/delivery_status.py",
+        "scripts/delivery_sync.py"
+      ],
+      "lease_writers": [
+        "agent-subagent"
+      ]
+    },
+    "merge_admission": "HUMAN_ADMIT_REQUIRED",
+    "port_ref": "DTCR-PT-001",
+    "public_api": {
+      "changed": false,
+      "contract_owner_admission": "NOT_REQUIRED"
+    },
+    "schema": "dtcr/refactor-changeset-lease/v1",
+    "subject": {
+      "repository_binding_id": "DTCR-RB-6be7b56b680c0cc5",
+      "subject_commit": "13ff9840fc5683b33670fa191591035bc96292dc",
+      "subject_tree": "947ba9a2c19268b95414a2918b88283d23a0ce2c"
+    }
+  },
+  "derived_from": "r1-request.json",
+  "minimal_port": {
+    "establishes": {
+      "applied": false,
+      "behavior_preserved": false
+    },
+    "injection": {
+      "concrete_imports_remaining": [],
+      "construction_sites_replaced": [
+        "scripts/delivery_status.py:33 sys.path.insert(0, .../gates)",
+        "scripts/delivery_sync.py:31 sys.path.insert(0, .../gates)"
+      ]
+    },
+    "owning_layer": "APPLICATION",
+    "port_id": "DTCR-PT-001",
+    "port_members": [
+      {
+        "justified_by_call_site_refs": [
+          "scripts/delivery_status.py:212",
+          "scripts/delivery_status.py:34",
+          "scripts/delivery_sync.py:306",
+          "scripts/delivery_sync.py:32"
+        ],
+        "member": "repo_root",
+        "member_kind": "METHOD"
+      }
+    ],
+    "schema": "dtcr/refactor-minimal-port/v1",
+    "signature_ref": "DTCR-US-001",
+    "subject": {
+      "repository_binding_id": "DTCR-RB-6be7b56b680c0cc5",
+      "subject_commit": "13ff9840fc5683b33670fa191591035bc96292dc",
+      "subject_tree": "947ba9a2c19268b95414a2918b88283d23a0ce2c"
+    },
+    "unused_provider_members": []
+  },
+  "receipt": {
+    "authority": {
+      "merge": false,
+      "production": false,
+      "release": false
+    },
+    "blocked_on": [
+      "SEMANTIC_INDEX_NOT_REBUILT",
+      "TYPECHECK_NOT_RUN"
+    ],
+    "changeset_ref": "DTCR-CL-001",
+    "establishes": {
+      "applied_on_real_codebase": false,
+      "behavior_equivalence_proven": false,
+      "protocol_ready": false
+    },
+    "readback": {
+      "behavior_tests": {
+        "passed": 2,
+        "state": "PASS",
+        "total": 2
+      },
+      "forbidden_edge_count": 0,
+      "new_cycles": 0,
+      "reindex_state": "NOT_REINDEXED",
+      "typecheck": "NOT_RUN"
+    },
+    "receipt_id": "DTCR-R1-001",
+    "schema": "dtcr/refactor-r1-receipt/v1",
+    "states_entered": [
+      "VIOLATION_BOUND",
+      "USAGE_SIGNATURE_EXTRACTED",
+      "MINIMAL_PORT_PROPOSED",
+      "CHANGESET_AND_LEASE_BOUND",
+      "DOMAIN_DEPENDENCY_INVERTED",
+      "COMPOSITION_ROOT_UPDATED",
+      "TYPECHECK_AND_TEST_READBACK",
+      "GLOBAL_BEHAVIOR_ASSERTED"
+    ],
+    "subject": {
+      "repository_binding_id": "DTCR-RB-6be7b56b680c0cc5",
+      "subject_commit": "13ff9840fc5683b33670fa191591035bc96292dc",
+      "subject_tree": "947ba9a2c19268b95414a2918b88283d23a0ce2c"
+    },
+    "terminal_state": "BLOCKED"
+  },
+  "schema": "dtcr/refactor-r1-projection/v1",
+  "usage_signature": {
+    "adapter": {
+      "adapter_binding_id": "DTCR-AD-22729a301b5be291",
+      "capability_class": "SYNTAX_TREE_REWRITE",
+      "language": "python",
+      "language_support": "SUPPORTED_BY_DECLARED_ADAPTER",
+      "pins": {
+        "formatter_behavior": "no formatter ran; the consumer's own ruff format --check accepted the result unchanged (scripts/gates/fast_quality.sh, exit 0)",
+        "grammar_or_dialect": "python as accepted by CPython 3.14.6 ast.parse, which is what read the call sites",
+        "license_id": "NOT_APPLICABLE-no-rewrite-tool-was-run",
+        "tool_version": "none: no rewrite implementation was vendored or executed; both change units were written by hand"
+      },
+      "provider_state": "DECLARED_NOT_VENDORED",
+      "vendored": false
+    },
+    "consumed_members": [
+      {
+        "call_site_refs": [
+          "scripts/delivery_status.py:212",
+          "scripts/delivery_status.py:34",
+          "scripts/delivery_sync.py:306",
+          "scripts/delivery_sync.py:32"
+        ],
+        "member": "repo_root",
+        "member_kind": "METHOD"
+      }
+    ],
+    "establishes": {
+      "provider_surface_complete": false,
+      "rewrite_applied": false
+    },
+    "extraction": {
+      "call_sites_declared": 4,
+      "call_sites_resolved": 4,
+      "completeness": "COMPLETE_FOR_RESOLVED_CALL_SITES",
+      "unresolved_call_site_refs": []
+    },
+    "provider_symbol": "scripts/gates/_gate_common.py",
+    "schema": "dtcr/refactor-usage-signature/v1",
+    "signature_id": "DTCR-US-001",
+    "subject": {
+      "repository_binding_id": "DTCR-RB-6be7b56b680c0cc5",
+      "subject_commit": "13ff9840fc5683b33670fa191591035bc96292dc",
+      "subject_tree": "947ba9a2c19268b95414a2918b88283d23a0ce2c"
+    },
+    "violation_ref": "DTCR-VC-001"
+  }
+}

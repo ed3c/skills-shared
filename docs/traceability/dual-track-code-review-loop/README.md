@@ -90,8 +90,15 @@ evidence ceiling (previously stale by two landings: the 16 D1/M1 interface
 schemas and the first two adapters), compiles the P0-P8 prompt catalogue, and writes
 this directory's traceability projections. The 2026-08-22 wave then landed and
 closed `#547`, `#549`, `#550` and `#524` under Human-admitted provider
-prerequisites and the admitted single-push delivery mode, and landed `#527`'s
-lane without closing it (completion-dependent on `#525`). Remaining open:
-`#525` (independent Shadow pass over the contract and the landed adapters),
-`#527` (awaiting `#525` admission) and `#528` (live consumer canary and the
-typed Local Handoff queue). Each closes only on its own issue's evidence.
+prerequisites and the admitted single-push delivery mode; `#525` then closed
+on its final E1 `ADMIT_FOR_DOWNSTREAM` (packet issue-525.json) and `#527`
+closed once that completion dependency was satisfied (packet issue-527.json).
+A concurrent sibling wave contributed the `#575` tree-sitter digest repair
+with a regenerated live receipt, one real bounded `#528` consumer canary on
+bettor-arena (`canary-528/`, receipt v0-draft, exit tokens NOT_CLAIMED) and
+the compiled typed Local Handoff queue
+(`skills/agentic-tech-lead-orchestration/runtime-handoff/dtcr-local-handoff-queue.json`,
+gate-verified, ACTIVE item = the Human registry admission). Remaining open:
+`#519`/`#521` (convergence receipts), `#528` (final admission; canary-receipt
+schema freeze) and `#595`-class re-verification. Each closes only on its own
+issue's evidence.

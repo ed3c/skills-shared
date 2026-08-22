@@ -43,7 +43,7 @@
     },
     {
       "id": "herdr-live-lifecycle",
-      "task_ref": "issue-466-live-herdr",
+      "task_ref": "issue-466-live-herdr-SUPERSEDED_BY-runtime-handoff/herdr-local-handoff-queue.json",
       "state": "BLOCKED_BY_PREDECESSOR",
       "entry": {
         "predecessor": "codex-live-receipt",
@@ -56,7 +56,7 @@
           {"argv": ["python3", "skills/agentic-tech-lead-orchestration/scripts/collect_herdr_lifecycle.py", "data/handoff/wave3/herdr-plan.json", "--output", "data/handoff/wave3/herdr-lifecycle-receipt.json"], "cwd": ".", "timeout_seconds": 1800, "environment_names": []}
         ],
         "unresolved_operations": [
-          {"operation_id": "materialize-herdr-target-plan", "resolver_source": "current Herdr agent target plus exact worktree/session/PID-start identity; produce the exact lifecycle plan consumed by the declared command", "required_output": "CONCRETE_COMMAND_CONTRACT"}
+          {"operation_id": "materialize-herdr-target-plan", "resolver_source": "SUPERSEDED, NOT EXECUTABLE: the live #466 lane is owned by skills/agentic-tech-lead-orchestration/runtime-handoff/herdr-local-handoff-queue.json. This item is retained only so the Wave-3 ordering stays readable. Its predecessor codex-live-receipt encodes the #464 -> #466 ordering voided on 2026-08-20, its required_subject_commit 691b342c is not an ancestor of main, and every data/handoff/wave3/ path it names has never existed. The materialized plan is data/handoff/herdr-v2/herdr-plan.json and the blocked receipt is data/handoff/herdr-v2/herdr-lifecycle-receipt.json.", "required_output": "CONCRETE_COMMAND_CONTRACT"}
         ],
         "live_evidence_required": true
       },

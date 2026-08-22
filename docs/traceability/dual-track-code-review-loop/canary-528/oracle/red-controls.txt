@@ -1,0 +1,3 @@
+m1-render-missing-default--frozen-oracle 1
+m2-repo-root-off-by-one--live-probe 64
+m2-repo-root-off-by-one--frozen-oracle 0
