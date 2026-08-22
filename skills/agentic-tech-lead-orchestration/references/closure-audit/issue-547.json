@@ -12,7 +12,7 @@
    "id": "scip-importer-normalizer-against-frozen-schemas",
    "status": "SATISFIED",
    "successor": null,
-   "rationale": "adapters/scip/adapter.py + selftest.py landed at merge fc12a3457b5d6d8222353b4e2bc7c4421d785837; 76 facts and 78 schema validations against the frozen exact-source-subject/symbol-fact/coverage-ceiling/fact-plane contracts, suite-wired as one of the nine tests/run-all.sh lanes"
+   "rationale": "adapters/scip/adapter.py + selftest.py landed in publication commit a3f87ac724ab56e78c6fe40967397f64038afffa (history rebuilt before first push; the worktree-local lane merge fc12a345 resolves only on the local forensic branch); 76 facts and 78 schema validations against the frozen exact-source-subject/symbol-fact/coverage-ceiling/fact-plane contracts, suite-wired as one of the nine tests/run-all.sh lanes"
   },
   {
    "id": "actual-index-producer-bound-with-digests",

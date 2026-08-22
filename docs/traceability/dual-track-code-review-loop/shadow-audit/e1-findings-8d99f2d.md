@@ -189,8 +189,14 @@ terminals and the closure packets belong in the commit - or they are open, in wh
 **Evidence** (`git show 8d99f2d:<path> | strings`):
 
 ```
-file:///Users/neon/skills-shared/.claude/worktrees/wf_5779055d-520-6/skills/dual-track-code-review-loop/adapters/scip/fixtures/python-subject/src
+file:///[MACHINE-LOCAL-PREFIX-REDACTED-AT-PUBLICATION]/skills/dual-track-code-review-loop/adapters/scip/fixtures/python-subject/src
 ```
+
+*(Redaction note: the machine-local prefix — an absolute home path with the account
+name and the builder worktree id — was redacted from this published record on
+2026-08-22 after the re-verification found the verbatim quote had become a new
+carrier of the very locator it evidences; the unredacted record is retained on
+the local forensic branch.)*
 
 A `file://` URI carrying an absolute home path, the account name, the host repository name and the
 builder's worktree identifier, in a committed public artifact.

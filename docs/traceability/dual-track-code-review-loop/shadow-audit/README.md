@@ -11,6 +11,7 @@ here promotes any lane.
 | Subject | Artifacts | Verdict |
 |---|---|---|
 | `8d99f2d95f06e18c4725fd506535f39d939fe679` (tree `4725c00693a146eba3c5084fe3b81f9f9c3967b1`) | [`e1-findings-8d99f2d.md`](e1-findings-8d99f2d.md), [`e1-receipt-8d99f2d.json`](e1-receipt-8d99f2d.json) | `BLOCK` — five blockers F-01..F-05 |
+| `723c30238cf00839e6935b5358c7f844baf2124b` (published head, 24/24 hosted checks green) | [`e1-verify-723c302.md`](e1-verify-723c302.md) | `BLOCK_REMAINS` at check time — F-01/F-02/F-05 RESOLVED with re-run knockouts; F-03/F-04 PARTIALLY on two traceability residuals (pre-rebuild SHA pointers; the excised locator republished verbatim inside the first-round findings record). Both residuals repaired in the same change unit that lands this row: SHA pointers repointed at the publication commits, and the locator redacted from both published audit records at tip. The historical blob on the remote (pushed in `6690a5d..723c302` before the redaction) can only be excised by a Human-authorized remote history rewrite — recorded as HUMAN_ADMIT_REQUIRED, not performed. |
 
 The receipt is a wrapper document whose `closure_record` member validates
 against `references/schemas/closure-record.schema.json` (the schema's closed
