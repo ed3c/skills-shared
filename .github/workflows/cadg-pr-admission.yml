@@ -17,6 +17,11 @@ on:
         required: false
         default: ''
         type: string
+      transition_boundary:
+        description: Named transition being evaluated; reversible PR work is the default.
+        required: false
+        default: 'PR_IMPLEMENTATION_REVERSIBLE'
+        type: string
       shadow_receipt_path:
         description: Optional consumer-relative independent Shadow receipt.
         required: false
@@ -104,6 +109,7 @@ jobs:
         env:
           INPUT_PACKET: ${{ inputs.packet_path }}
           INPUT_POLICY: ${{ inputs.policy_path }}
+          INPUT_BOUNDARY: ${{ inputs.transition_boundary }}
           INPUT_SHADOW: ${{ inputs.shadow_receipt_path }}
           INPUT_HUMAN: ${{ inputs.human_admission_ref }}
           REPOSITORY: ${{ github.repository }}
@@ -136,6 +142,7 @@ jobs:
           python3 shared/skills/human-led-agentic-engineering/modules/github-pr-cadg/cadg_pr_admission.py \
             --repo-root consumer \
             --policy "${policy}" \
+            --transition-boundary "${INPUT_BOUNDARY}" \
             --changed-files "${RUNNER_TEMP}/cadg/changed-files.txt" \
             --checker shared/skills/human-led-agentic-engineering/scripts/check_cadg_packet.py \
             "${packet_args[@]}" "${shadow_args[@]}" "${human_args[@]}" \
