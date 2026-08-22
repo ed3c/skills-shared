@@ -1,0 +1,73 @@
+{
+ "schema_version": "agentic-tech-lead/issue-closure-contract/v1",
+ "issue": {
+  "repository": "ed3c/skills-shared",
+  "number": 524,
+  "github_state": "CLOSED",
+  "github_state_reason": "COMPLETED"
+ },
+ "disposition": "SCOPE_TRANSFERRED",
+ "acceptance": [
+  {
+   "id": "r2-compiler-and-contracts-landed",
+   "status": "SATISFIED",
+   "successor": null,
+   "rationale": "expand-contract/compile_r2.py plus refactor-r2-binding and refactor-r2-receipt schemas landed in publication commit a3f87ac724ab56e78c6fe40967397f64038afffa (history rebuilt before first push; the worktree-local lane merge 9b59e55f resolves only on the local forensic branch); 56 declared state values emitted by a real compilation (15 recorded unreachable at this head), 29 named refusals, 28/28 schema-control knockouts, suite-wired"
+  },
+  {
+   "id": "disposable-multi-repo-fixture-completes-phases",
+   "status": "SATISFIED",
+   "successor": null,
+   "rationale": "a two-repository disposable git fixture is built at selftest runtime and walked C1→A1→A2→E1→C2; two_repository_fixture=EXERCISED with per-binding subjects and rollback identities"
+  },
+  {
+   "id": "truthful-stop-with-rollback-and-exact-receipts",
+   "status": "SATISFIED",
+   "successor": null,
+   "rationale": "STOPPED_WITH_ROLLBACK terminal reachable with one rollback row per repository binding and per-row dispositions; the dual-run lane is a closed enum and the fixture run records NOT_OBSERVED, so telemetry absence can never read as success"
+  },
+  {
+   "id": "one-real-bounded-consumer-canary",
+   "status": "TRANSFERRED",
+   "successor": "ed3c/skills-shared#528",
+   "rationale": "per the Human-admitted reconciliation the real bounded consumer canary is #528's lane; every R2 receipt pins applied_on_real_codebase and protocol_ready false, mirroring the #523 R1 precedent"
+  },
+  {
+   "id": "exit-terminal-DTCR_CROSS_REPO_EXPAND_CONTRACT_READY",
+   "status": "TRANSFERRED",
+   "successor": "ed3c/skills-shared#528",
+   "rationale": "the terminal is a Human admission against this issue's exit criteria, never a run output; it waits on the live lanes owned by #528"
+  },
+  {
+   "id": "legacy-contraction-authorization",
+   "status": "TRANSFERRED",
+   "successor": "ed3c/skills-shared#528",
+   "rationale": "contraction requires a recorded Human authorization and a digest-pinned zero-caller denominator; recorded HUMAN_ADMIT_REQUIRED in the receipts, never exercised on a fixture"
+  }
+ ],
+ "implementation": {
+  "candidate_prs": [],
+  "landing": null
+ },
+ "residual": [
+  {
+   "id": "dual-run-telemetry-observation",
+   "state": "NOT_EXERCISED",
+   "owner": "ed3c/skills-shared#528"
+  },
+  {
+   "id": "real-codebase-application",
+   "state": "NOT_EXERCISED",
+   "owner": "ed3c/skills-shared#528"
+  },
+  {
+   "id": "independent-shadow-review",
+   "state": "NOT_EXERCISED",
+   "owner": "ed3c/skills-shared#525"
+  }
+ ],
+ "evidence_ceiling": "DETERMINISTIC",
+ "shadow_review": {
+  "verdict": "HUMAN_ADMIT_REQUIRED"
+ }
+}

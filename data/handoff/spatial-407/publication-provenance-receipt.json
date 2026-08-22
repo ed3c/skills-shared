@@ -2,6 +2,8 @@
   "schema": "agentic-tech-lead/spatial-407-publication-provenance/v1",
   "queue": "skills/agentic-tech-lead-orchestration/runtime-handoff/spatial-407-local-handoff-queue.json",
   "queue_item": "spatial-407-provenance-rebuild",
+  "queue_item_reconciled_id": "spatial-407-provenance-superseded-by-419-replay",
+  "role": "SUPPLEMENTARY_EVIDENCE — the reconciled queue's exit receipt is skills/agentic-tech-lead-orchestration/references/closure-audit/issue-568.json; this file additionally preserves the plan-vs-actual record, the forbidden-promotion verification and the adversarial-audit residual ledger for the same completed item.",
   "task_ref": "issues-407-408-409-410-pr-412-main-admission",
   "compiled_at": "2026-08-22",
   "subject": {
@@ -75,18 +77,17 @@
     ]
   },
   "issue_state_reconciliation": {
-    "407": "Auto-closed by GitHub on 2026-08-21T20:00:25Z (stateReason COMPLETED, commit-reference close via 32c049ca reaching main) with no closure-audit record; program law keeps #407 open until #411 completes; reopened 2026-08-22 in this reconciliation wave.",
-    "408": "OPEN; MAIN_ADMITTED by this receipt; close-eligible for static scope with the residuals above; close is human-owned.",
-    "409": "OPEN; MAIN_ADMITTED by this receipt; close-eligible for static scope with the residuals above; live responsibility remains #411; close is human-owned.",
-    "410": "OPEN; MAIN_ADMITTED by this receipt; close-eligible for static scope with the residuals above; close is human-owned.",
-    "411": "OPEN; predecessor queue item fulfilled by this receipt; queue advance and item-2 recompile are human-owned."
+    "407": "Auto-closed 2026-08-21T20:00:25Z (commit-reference via 32c049ca) with no closure record at that time; reopened 2026-08-22T06:10Z for that reason; closed again 2026-08-22T12:30Z when commit a9db0bd landed the closure packet references/closure-audit/issue-407.json (disposition CONSUMED_BY_CONVERGENCE, #411 named as the NOT_EXERCISED residual owner). This receipt accepts the packeted closure as the standing state.",
+    "408": "OPEN; MAIN_ADMITTED; close-eligible for static scope with the residuals above; close is human-owned.",
+    "409": "OPEN; MAIN_ADMITTED; close-eligible for static scope with the residuals above; live responsibility remains #411; close is human-owned.",
+    "410": "OPEN; MAIN_ADMITTED; close-eligible for static scope with the residuals above; close is human-owned.",
+    "411": "OPEN and ACTIVE in the reconciled queue (advance performed by the #604 wave); the live canary itself remains NOT_EXERCISED and its item-2 command contract still needs resolution."
   },
   "lanes": {
     "publication_provenance": "PASS",
     "main_admission_of_spatial_407_static_bytes": "PASS",
-    "queue_advance": "HUMAN_ADMIT_REQUIRED",
+    "queue_advance": "PASS",
     "issue_close_408_409_410": "HUMAN_ADMIT_REQUIRED",
-    "issue_407_final_close_after_411": "HUMAN_ADMIT_REQUIRED",
     "live_shadow_canary_411": "SKIPPED_BY_POLICY"
   },
   "verdict": "PASS",

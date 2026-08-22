@@ -1,0 +1,4 @@
+delivery_status_selftest 1
+delivery_sync_selftest 0
+delivery_receipt_gate 0
+delivery_command_contract 0

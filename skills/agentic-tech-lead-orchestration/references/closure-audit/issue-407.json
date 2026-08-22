@@ -1,0 +1,71 @@
+{
+ "schema_version": "agentic-tech-lead/issue-closure-contract/v1",
+ "issue": {
+  "repository": "ed3c/skills-shared",
+  "number": 407,
+  "github_state": "CLOSED",
+  "github_state_reason": "COMPLETED"
+ },
+ "disposition": "CONSUMED_BY_CONVERGENCE",
+ "acceptance": [
+  {
+   "id": "intent-case-proof-graph-contract-and-case-graph-schema",
+   "status": "SATISFIED",
+   "successor": null,
+   "rationale": "skills/spatial-loop-systems-engineering/references/intent-case-proof-graph.md, references/case-graph.schema.json, references/case-graph-template.json and scripts/check_case_graph.py are present in the admitted-main tree a18e12507f9e621efd5354f58384eded1f1e2a9a (commit 5341885f26b5e8e7baf5087a4d661e324f878242)"
+  },
+  {
+   "id": "bounded-exhaustive-case-coverage-closure",
+   "status": "SATISFIED",
+   "successor": null,
+   "rationale": "case-graph positive/mutation suite skills/spatial-loop-systems-engineering/tests/case-graph/{verify.sh,verify.py} and the Tech Lead case-denominator/ownership gate skills/agentic-tech-lead-orchestration/scripts/assert_case_obligations.py are present at the same admitted-main subject; closure-audit/issue-568.json records the 419 -> 420 re-parent that restored assert_case_obligations.py"
+  },
+  {
+   "id": "spatial-implementation-bytes-admitted-on-main",
+   "status": "SATISFIED",
+   "successor": null,
+   "rationale": "the Spatial Molecular index (skills/git-town-stacked-pr-worker/molecular-indexes/spatial-407/README.md) listed 'main admission' as the remaining evidence for atoms ICPG-C1/K1/E1/D1; commits 91df7863d300e2580c4137c3b8627443ef984a09 and 45dfac83c377ce2e3df0ff5fc7d9e005173b1d43 are ancestors of admitted main 5341885f26b5e8e7baf5087a4d661e324f878242 and are first contained by the first-parent merge 9fe3c6daf53dcdd61123d5d7a4eeedbdf37b5d7c (PR #573)"
+  },
+  {
+   "id": "live-continuous-shadow-case-delta-canary",
+   "status": "TRANSFERRED",
+   "successor": "ed3c/skills-shared#411",
+   "rationale": "atom ICPG-X1 is typed EXTERNAL_EVIDENCE / NOT_EXERCISED in the Spatial Molecular index and docs/traceability/KNOWLEDGE_GRAPH_ICPG_CLOSURE.md records '#411 continuous live Spatial Shadow NOT_EXERCISED'; #411 is OPEN and owns the live canary receipt"
+  }
+ ],
+ "implementation": {
+  "candidate_prs": [
+   {
+    "repository": "ed3c/skills-shared",
+    "number": 412,
+    "state": "CLOSED",
+    "merged": false,
+    "classification": "SUPERSEDED"
+   },
+   {
+    "repository": "ed3c/skills-shared",
+    "number": 419,
+    "state": "CLOSED",
+    "merged": false,
+    "classification": "CONSUMED"
+   }
+  ],
+  "landing": {
+   "repository": "ed3c/skills-shared",
+   "via_pr": 573,
+   "commit": "9fe3c6daf53dcdd61123d5d7a4eeedbdf37b5d7c",
+   "tree": "c17678166cee2adba2f92f6099011ec52716ece7"
+  }
+ },
+ "residual": [
+  {
+   "id": "live-independent-shadow-case-delta-canary",
+   "state": "NOT_EXERCISED",
+   "owner": "ed3c/skills-shared#411"
+  }
+ ],
+ "evidence_ceiling": "DETERMINISTIC",
+ "shadow_review": {
+  "verdict": "HUMAN_ADMIT_REQUIRED"
+ }
+}

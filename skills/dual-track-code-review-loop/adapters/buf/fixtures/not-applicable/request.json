@@ -1,0 +1,21 @@
+{
+  "baseline_commit": "674cfe1435c4bd1c29e8f07308266fe5c6284973",
+  "identity": {
+    "executable_sha256": "5176f23a6118b9978de1340c3e3301a4ed0d48e16a669510be44b4c355170d57",
+    "probe_exit_code": 0,
+    "version": "1.72.0"
+  },
+  "kind": "not_applicable",
+  "probe": {
+    "digest": "7c4bb10fcd35ed67c48247fee835d699ded686b45fb7028dd153700bc61ff077",
+    "exit_code": 1,
+    "stderr": "Failure: image contains no files\n",
+    "stdout": ""
+  },
+  "schema": "dtcr/buf-run-request/v1",
+  "subject": {
+    "commit": "674cfe1435c4bd1c29e8f07308266fe5c6284973",
+    "repository_binding_id": "DTCR-RB-3749864dfe3e2f36",
+    "tree": "217bf950a57701235f761223e9466b9774aa6194"
+  }
+}

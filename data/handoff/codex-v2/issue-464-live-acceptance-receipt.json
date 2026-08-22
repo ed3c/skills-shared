@@ -1,0 +1,51 @@
+{
+  "acceptance_state": "LIVE_RUNTIME_AND_CONTROLLER_READBACK_CANDIDATE",
+  "attempt_id": "a01",
+  "base_sha": "5af72fb3a2fc073d2b36da5dbbc2cb9b12c8a842",
+  "base_tree_sha": "eaefc42d34dcf917e420121a38d5eef12de70b4c",
+  "changed_files": [
+    "src/calc.py"
+  ],
+  "controller_commands": [
+    {
+      "command_sha256": "1168b2a3059a38dc53c851df268c031ea9c67a87c6a9019bda074a2cd3b25da6",
+      "exit_code": 0,
+      "output_sha256": "fb184ea57734512b1f088f9181209901b9cd46df3eb7eaa2500ea9e48dde20b5"
+    },
+    {
+      "command_sha256": "8982ada51ceb5138b6d29eb9adf02329e0a4beddc6472cc96a4d2353bb56e6ad",
+      "exit_code": 0,
+      "output_sha256": "544738fd9352fa6ebc9945bb307a1db3b767534ebe25c6e04bce43fde603cbb5"
+    }
+  ],
+  "evidence_ceiling": "LIVE_EXECUTION_OBSERVED_SHADOW_PENDING",
+  "executor_identity": {
+    "adapter_blob_sha256": "c3e4b5a9c8c6b788ef74adc9891c25d608cd115367971a5ffc8846d6b0bc5633",
+    "adapter_version": "codex-sdk-worker/2",
+    "codex_binary_sha256": "19c4f144c5226a9f17c58e6f0fa854843b0f77a6eb420f40e2745a12f10f5d37",
+    "codex_binary_source": "SDK_PINNED_RUNTIME",
+    "sdk_package": "openai-codex",
+    "sdk_version": "0.147.0"
+  },
+  "lease_readback": "PASS",
+  "prompt_digest": "1aac71b0ec2b4f2965dc2940ab57effcbc71f4e9ce993132731c3a0116c3a4a1",
+  "repo": "ed3c/live-464-calc",
+  "result_carrier": {
+    "bundle_bytes": 1049,
+    "bundle_filename": "codex-v2-issue-464-T1-a01.bundle",
+    "bundle_sha256": "e1ee8bd2db1a0130aac96869a149d2e81a32d6b43122ea02dc1b9ac8cf9eda94",
+    "carrier_id": "issue-464-T1-a01",
+    "carrier_kind": "GIT_BUNDLE_V2",
+    "result_ref": "refs/evidence/codex-v2/issue-464-T1-a01/result"
+  },
+  "result_tree_readback": "PASS",
+  "result_tree_replay": "PASS",
+  "schema_version": 2,
+  "sdk_execution": "EXERCISED",
+  "shadow_review_required": true,
+  "source_diff_readback": "PASS",
+  "task_id": "issue-464/T1",
+  "tests_readback": "PASS",
+  "tree_sha": "63bf10e25799b23efea342853bff8f2320cbe47d",
+  "worker_result_sha256": "782db01c5f95b9cd0c62f9431d446f7951eeec920dff6d9979ac34c9ae8de290"
+}

@@ -1,0 +1,40 @@
+{
+  "_note": "One host, one run. This records that the two disposable repositories were actually built here and that neither head resolves as an object of the other, which is the arrival under FALSE_CROSS_REPO_GIT_PARENT. It is not transferable to another host or another git version, and nothing reads it as an input: the selftest rebuilds the repositories and compares them against fixtures/two-repo-git-subject.json on every run. It is a build note, not a schema-bound receipt: it validates against no schema in references/schemas/ and no consumer may bind it.",
+  "generated_on": {
+    "worktree_base_commit": "670a3853b5f9b72617630b9d45a8587f52c634b0",
+    "note": "generated pre-commit inside the #524 worker's worktree, whose branch head at generation time was the #550 lane commit above (a reused branch); the expand-contract sources this note accompanies were uncommitted at generation time and published in commit a3f87ac724ab56e78c6fe40967397f64038afffa (the worktree-local lane merge 9b59e55f resolves only on the local forensic branch). The filename keeps the original stamp for traceability; an independent Shadow (E1, 2026-08-22) flagged the earlier 'subject' framing as a foreign-subject binding, and this record supersedes it."
+  },
+  "consumer": {
+    "base_commit": "3db7160c61851924b7dbb2778389da6bca6b8edd",
+    "base_tree": "9a0f2c75c14f48fdd88a8541f2d59cf8e76dd841",
+    "head_commit": "80aad7defedadfc2006767ec83f05b1be9dbed69",
+    "head_tree": "959cdc2b382f20372525476addfe9cd83dfd5b6e"
+  },
+  "cross_repository_object_absence": {
+    "consumer_head_absent_in_provider": true,
+    "provider_head_absent_in_consumer": true
+  },
+  "determinism": {
+    "host_git_configuration_excluded": true,
+    "network_access": "NONE",
+    "pinned_author_and_committer": true,
+    "pinned_dates": "1700000000 +0000 for both author and committer"
+  },
+  "establishes": {
+    "applied_on_real_codebase": "NOT_EXERCISED",
+    "deployment_observed": false,
+    "task_pass": false,
+    "traffic_observed": false
+  },
+  "provider": {
+    "base_commit": "c72cf1065daa2d05182569419a9d1ea8968219c3",
+    "base_tree": "82efe8ed0c21bd4a0b3a189603fbf81b23afa320",
+    "head_commit": "01c4af034718c3ee98ee038cf41fa37af57ffd41",
+    "head_tree": "15fb5b9e05c2e0ba858d7c247ead55141eb2484c"
+  },
+  "provider_binary": {
+    "executable_location": "resolved from PATH; the install path is one machine and is not part of the identity",
+    "executable_name": "git",
+    "version_string": "git version 2.50.1 (Apple Git-155)"
+  }
+}

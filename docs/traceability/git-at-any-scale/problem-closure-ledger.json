@@ -4,9 +4,16 @@
   "ssot_ledger": "data/handoff/source-evidence/git-at-any-scale-closure-ledger.json",
   "repository_subject": {
     "repository": "ed3c/skills-shared",
+    "main": "5341885f26b5e8e7baf5087a4d661e324f878242",
+    "tree": "a18e12507f9e621efd5354f58384eded1f1e2a9a",
+    "rollback": "9fe3c6daf53dcdd61123d5d7a4eeedbdf37b5d7c",
+    "observed": "2026-08-22"
+  },
+  "historical_subject": {
     "main": "174009203a3ff9bd6ebc4010bc6cab7232dd44a4",
     "tree": "311052ecf5780f8d91c4d2429e8ce1a50a0361d8",
-    "observed": "2026-08-21"
+    "observed": "2026-08-21",
+    "note": "compile subject of the 2026-08-21 pass; 182 commits behind the subject above"
   },
   "parent_issue": 531,
   "last_check": {
@@ -24,16 +31,17 @@
     "issue_pr_state": {
       "531": "OPEN issue; source packet + 28-claim ledger MERGED",
       "532": "OPEN issue; PR #542 MERGED (contract-only ceiling, see triage below)",
-      "534": "OPEN issue; NOT_EXERCISED",
-      "535": "OPEN issue; NOT_EXERCISED, blocked on #534",
-      "536": "OPEN issue; this lease (traceability + molecular index) is PARTIAL — root README/AGENTS/docs/INDEX.md convergence is separate, not-yet-done writer's work"
+      "534": "OPEN issue; clean-room single-node canary EXECUTED (data/handoff/git-at-any-scale/, checker PASS/CONTRACT_READY); hosting-grade external runtime NOT_EXERCISED",
+      "535": "OPEN issue; fresh-context Shadow receipt HOLD / HUMAN_ADMIT_REQUIRED (issue-535-shadow-receipt.json); identity-independent review NOT_EXERCISED",
+      "536": "OPEN issue; root README/AGENTS/docs/INDEX.md convergence landed in this convergence; hosted exact-head readback pending"
     },
     "parent_close_allowed": false,
     "blocking_reasons": [
       "19 of 28 claims require an external hosting runtime that has not been selected or exercised (#534)",
       "6 of 28 claims are targeted by the merged C1 contract but #532's full receipt/fixture denominator (durability/ref/cache/gossip/compaction/recovery/benchmark) is still incomplete",
       "independent exact-subject Shadow receipt absent (#535, blocked on #534)",
-      "root README/AGENTS/docs/INDEX.md shared convergence not attempted by this lease; the former #412/#419 writer contention on skills/git-town-stacked-pr-worker/README.md dissolved on 2026-08-21/22 (both PRs CLOSED, not merged; their content landed via replayed carriers on main), leaving that convergence as ordinary single-writer follow-up"
+      "root README/AGENTS/docs/INDEX.md shared convergence not attempted by this lease; the #412/#419 writer collision on skills/git-town-stacked-pr-worker/README.md is cleared as of the 2026-08-22 readback (both CLOSED unmerged, landed via PR #573 commit 9fe3c6d), so the convergence is unblocked but has no named writer",
+      "check_problem_closure.py exits 0 without opening the persisted source bytes: it has no --source-dir readback, so its digest chain closes inside the ledger file and 'compiler PASS is not source truth' has no deterministic checker at this epoch (#512 owns the repair)"
     ]
   }
 }

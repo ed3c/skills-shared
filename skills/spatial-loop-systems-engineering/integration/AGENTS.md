@@ -21,7 +21,7 @@ This directory is a status/handoff projection for issues #407–#411. It does no
 - GitHub/Git exact subjects, executable contracts and receipts beat this prose on mutable state.
 - Do not close #408/#409/#410 from candidate evidence alone; main landing and exact-main readback are required.
 - Do not close #411 from static tests, Builder self-report, same-context prose, or compatibility-only green.
-- Do not close #407 while #411 remains a declared blocking program lane.
+- #407 closed under closure packet `closure-audit/issue-407.json` with #411 as its named residual owner; do not treat that closure as evidence that #411's live obligation is discharged — it stays `NOT_EXERCISED` until its own receipt exists.
 - Do not convert case dependencies into Git parentage unless unmerged parent bytes/contracts are actually consumed.
 - Do not weaken golden-proof, commit-role, evidence, or provenance gates to make PR #412 green.
 

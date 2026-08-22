@@ -1,25 +1,26 @@
 # Codex SDK Tech Lead Control Plane — Shadow-monitored trace
 
-Status: `STATIC_DETERMINISTIC_CONVERGENCE_FINAL_GATE`.
+Status: `HISTORICAL / PRE-ADMISSION TRACE` — the #455 convergence it gates was admitted and merged (`ca31e0b1e640f0dba2c3d94da9d9786fbed32f2c`). Admitted-subject authority is [`CODEX_SDK_TECH_LEAD_CONTROL_PLANE_ADMISSION.md`](CODEX_SDK_TECH_LEAD_CONTROL_PLANE_ADMISSION.md); [`docs/INDEX.md`](../INDEX.md) already routes this file as the pre-admission trace.
 
 This is the human trace for issues #375–#379. Machine/runtime authority remains exact Git ancestry, schemas/checkers, current GitHub metadata, exact-head workflow runs, runtime/provider receipts, and Human repository policy. A convergence branch may consume unmerged candidate bytes for integration proof; that consumption is not admission or merge.
 
-## Current convergence epoch
+## Convergence epoch (HISTORICAL — superseded by the #455 admission)
 
-Repository base observed for this family:
+Repository base observed for this family at compile time — historical, 364 commits behind the current admitted `main` `5341885f26b5e8e7baf5087a4d661e324f878242` (2026-08-22 readback):
 
 ```text
 main@4ca9417b1da5ff32f1d4d3e7af64a15908749024
 ```
 
-Selected sibling candidates:
+Selected sibling candidates, with the terminal state each reached (see [`AGENTS.md`](AGENTS.md), Wave-2 control-plane admission):
 
 ```text
-#375 / PR #451  86f9e8d940b76cb71b713c098ff09cb68eb4e0c1  SIBLING / UNMERGED CANDIDATE
-#376 / PR #452  426fb6f6f548f71572d4402e73e0b05ecf6f8aa8  SIBLING / UNMERGED CANDIDATE
-#377 / PR #456  6a2ebcbe87078cecaf67f82f3c9c10643bcc9123  SIBLING / UNMERGED CANDIDATE
-#378 / PR #457  ac5ddc0287eb4e4156a7c7eef178b7be8bbd1d34  SIBLING / UNMERGED CANDIDATE
-PR #380            7a9d68fcd58b1ed78ed6d05595a8df7eae53f5a5  DOCUMENTATION SIBLING
+#375 / PR #451  86f9e8d940b76cb71b713c098ff09cb68eb4e0c1  SIBLING / CLOSED_UNMERGED / CONSUMED by #455
+#376 / PR #452  426fb6f6f548f71572d4402e73e0b05ecf6f8aa8  SIBLING / CLOSED_UNMERGED / CONSUMED by #455
+#377 / PR #456  6a2ebcbe87078cecaf67f82f3c9c10643bcc9123  SIBLING / CLOSED_UNMERGED / CONSUMED by #455
+#378 / PR #457  ac5ddc0287eb4e4156a7c7eef178b7be8bbd1d34  SIBLING / CLOSED_UNMERGED / CONSUMED by #455
+PR #380            7a9d68fcd58b1ed78ed6d05595a8df7eae53f5a5  DOCUMENTATION SIBLING / CLOSED_UNMERGED / CONSUMED
+#379 / PR #455     847e56c3418fce920c42d983e84ee44fdc6e8971  MERGED / HUMAN_ADMITTED, merge ca31e0b1e640f0dba2c3d94da9d9786fbed32f2c
 ```
 
 The fixed #377 reconciliation ancestor is:
@@ -31,7 +32,7 @@ parents:
   6a2ebcbe87078cecaf67f82f3c9c10643bcc9123  repaired #456 candidate
 ```
 
-The final mutable PR #455 head is deliberately not self-embedded. Read it from GitHub after every convergence edit. The checkpoint proves exact byte consumption only; #451/#452/#456/#457 remain unmerged candidates.
+The final PR #455 head was deliberately not self-embedded while #455 was mutable. It has since merged as `ca31e0b1e640f0dba2c3d94da9d9786fbed32f2c`. The checkpoint above proves exact byte consumption only; #451/#452/#456/#457 were never merged individually — they closed unmerged as consumed siblings.
 
 ## Historical denominator
 
@@ -255,12 +256,12 @@ Every selected sibling head move supersedes earlier convergence workflow and Sha
 ## Molecular relations
 
 ```text
-#375 SIBLING / unmerged candidate
-#376 SIBLING / unmerged candidate
-#377 SIBLING / unmerged candidate
-#378 SIBLING / unmerged candidate
-#380 DOCUMENTATION SIBLING
-#379 CONVERGENCE CANDIDATE consuming exact selected heads
+#375 SIBLING / closed unmerged, consumed by #455
+#376 SIBLING / closed unmerged, consumed by #455
+#377 SIBLING / closed unmerged, consumed by #455
+#378 SIBLING / closed unmerged, consumed by #455
+#380 DOCUMENTATION SIBLING / closed unmerged, consumed by #455
+#379 CONVERGENCE OWNER, merged ca31e0b1…, consuming exact selected heads
 Shadow EXTERNAL_EVIDENCE / PROCESS_DEPENDENCY
 live Codex / GitHub mutation / Herdr / real source closure EXTERNAL_EVIDENCE
 ```
@@ -300,11 +301,12 @@ Live-lane ownership has since transferred to the Wave-3 successors #464–#467 t
 #378 deterministic closure candidate v3            IMPLEMENTED / shared suite PASS
 #378 real article/PDF/provider closure             EVIDENCE_DEPENDENT
 #379 route/test/index convergence                  FINAL GOVERNANCE REVALIDATION
-#451/#452/#456/#457 admission/merge                HUMAN_ADMIT_REQUIRED
-#455 merge/release                                 HUMAN_ADMIT_REQUIRED
+#451/#452/#456/#457 admission/merge                RESOLVED: closed unmerged / consumed by #455
+#455 merge                                         MERGED / HUMAN_ADMITTED (ca31e0b1…)
+#455 release                                       NOT_PERFORMED
 ```
 
-Only after the final current #455 head passes the complete hosted denominator and independent Shadow readback may this static/deterministic convergence become `READY_FOR_HUMAN_ADMIT`. That verdict still does not admit or merge any sibling and does not prove any live lane.
+The pre-admission gate read: only after the final #455 head passes the complete hosted denominator and independent Shadow readback may this static/deterministic convergence become `READY_FOR_HUMAN_ADMIT`. That gate was satisfied and #455 was admitted; the admission still merged no sibling individually and proved no live lane.
 
 ## Successor: Wave-3 live-evidence infrastructure
 

@@ -128,31 +128,68 @@ def validate(queue: dict[str, Any]) -> list[str]:
     return errors
 
 
+def _victim_index(items: list[Any]) -> int | None:
+    """Index of a non-ACTIVE item whose declared predecessor has not completed.
+
+    The two-ACTIVE and successor-early controls have to poison exactly this kind
+    of item. Anything else is a silent no-op: flipping an already-ACTIVE item to
+    ACTIVE changes nothing, and flipping an item whose predecessor is COMPLETE
+    produces no early-execution error.
+    """
+    by_id = {str(item.get("id")): item for item in items if isinstance(item, dict)}
+    for index, item in enumerate(items):
+        if not isinstance(item, dict) or item.get("state") == "ACTIVE":
+            continue
+        predecessor = by_id.get(str((item.get("entry") or {}).get("predecessor")))
+        if predecessor is not None and predecessor.get("state") != "COMPLETE":
+            return index
+    return None
+
+
 def selftest(queue: dict[str, Any]) -> list[str]:
     failures: list[str] = []
     base = copy.deepcopy(queue)
     items = base.get("items")
-    if isinstance(items, list) and len(items) == 1 and isinstance(items[0], dict):
-        # A schema-valid queue may hold a single item (one-item epochs occur when
-        # the active handoff mutates the subject before the next queue can be
-        # compiled). The two-active and successor-early controls need a second
-        # item, so synthesize a bounded successor inside the selftest only.
-        first = items[0]
-        successor = copy.deepcopy(first)
-        successor["id"] = f"{first.get('id')}-selftest-successor"
+    if not isinstance(items, list) or not items or not all(isinstance(item, dict) for item in items):
+        return ["selftest needs a non-empty array of item objects"]
+
+    # A schema-valid item may carry only an unresolved-operation lane and no
+    # command at all (issue #576: the placeholder control used to crash with
+    # IndexError on exactly those queues, so the red-when-red proof was
+    # unrunnable for every queue holding unresolved operations). Synthesize a
+    # bounded command inside the selftest only, so the control has something to
+    # poison.
+    lane = items[0].setdefault("runtime_lane", {})
+    if not lane.get("commands"):
+        lane["commands"] = [{"argv": ["true"], "cwd": ".", "timeout_seconds": 60, "environment_names": []}]
+
+    if _victim_index(items) is None:
+        # No item can carry the two-ACTIVE / successor-early controls: either the
+        # queue holds a single item (one-item epochs occur when the active handoff
+        # mutates the subject before the next queue can be compiled), or every
+        # predecessor is already COMPLETE and the ACTIVE item is the tail — the
+        # shape every recompiled queue takes. Synthesize a bounded successor
+        # inside the selftest only.
+        last = items[-1]
+        successor = copy.deepcopy(last)
+        successor["id"] = f"{last.get('id')}-selftest-successor"
         successor["state"] = "BLOCKED_BY_PREDECESSOR"
-        successor.setdefault("entry", {})["predecessor"] = first.get("id")
+        successor.setdefault("entry", {})["predecessor"] = last.get("id")
         successor["next"] = None
-        first["next"] = successor["id"]
+        last["next"] = successor["id"]
         items.append(successor)
         sanity = validate(base)
         if sanity:
             return [f"selftest successor synthesis broke queue validity: {e}" for e in sanity]
+
+    victim = _victim_index(items)
+    if victim is None:
+        return ["selftest successor synthesis produced no poisonable item"]
     cases = []
     def add(name: str, mutate, needle: str) -> None: cases.append((name, mutate, needle))
-    add("two active", lambda q: q["items"][1].__setitem__("state", "ACTIVE"), "one ACTIVE")
+    add("two active", lambda q: q["items"][victim].__setitem__("state", "ACTIVE"), "one ACTIVE")
     add("stale subject", lambda q: q["items"][0]["entry"].__setitem__("required_subject_commit", "f" * 40), "stale required subject")
-    add("successor early", lambda q: q["items"][1].__setitem__("state", "ACTIVE"), "predecessor COMPLETE")
+    add("successor early", lambda q: q["items"][victim].__setitem__("state", "ACTIVE"), "predecessor COMPLETE")
     add("missing lane", lambda q: (q["items"][0]["runtime_lane"].__setitem__("commands", []), q["items"][0]["runtime_lane"].__setitem__("unresolved_operations", [])), "no command or unresolved")
     add("placeholder", lambda q: q["items"][0]["runtime_lane"]["commands"][0].__setitem__("argv", ["REPLACE_WITH_COMMAND"]), "placeholder")
     add("authority widened", lambda q: q["authority"].__setitem__("automation_forbidden", ["merge"]), "authority widened")

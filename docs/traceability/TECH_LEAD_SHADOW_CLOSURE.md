@@ -157,6 +157,34 @@ Human Admit where required
 merge / release / rollback authority
 ```
 
+## Internal program snapshot — Git at any scale (#531)
+
+Observed `2026-08-22` at `main 5341885f26b5e8e7baf5087a4d661e324f878242` / tree `a18e12507f9e621efd5354f58384eded1f1e2a9a`. Detailed trace: [`git-at-any-scale/README.md`](git-at-any-scale/README.md). Lineage and per-atom evidence: [`TRACEABILITY_INDEX.md`](TRACEABILITY_INDEX.md). This snapshot names states; it is not a receipt.
+
+```text
+SOURCE_PROPOSAL                      BOUND      immutable article packet, 28-claim denominator
+METHOD_IMPLEMENTED                   PARTIAL    #532 aggregate contract merged; per-family
+                                                receipt/history/benchmark schemas NOT_IMPLEMENTED
+CONSUMER_MECHANISM_IMPLEMENTED       PARTIAL    #534 clean-room disposable subject only; the
+                                                subject is deliberately not committed
+DETERMINISTIC_EVIDENCE_VERIFIED      PARTIAL    contract suite PASS 1/20-of-20; hosted exact-head
+                                                readback SKIPPED_BY_POLICY, never PASS
+LIVE_OR_PHYSICAL_EVIDENCE_VERIFIED   NOT_EXERCISED for hosting-grade durability/consistency;
+                                                a bounded single-node canary is not that lane
+HUMAN_ADMITTED                       HUMAN_ADMIT_REQUIRED
+RELEASED                             ABSENT
+```
+
+The #535 receipt (`data/handoff/git-at-any-scale/issue-535-shadow-receipt.json`, verdict `HOLD`) is a worked instance of the Shadow role's own boundary: the reviewer used the same immutable subject and a separately authored oracle, and refused every Builder conclusion it could not re-derive — but it was dispatched by the same Tech Lead, on the same host, reading the same scratchpad. Fresh context is not organisational independence. Under this document's rules that receipt is advisory `EXTERNAL_EVIDENCE`, and the Shadow-independence close gate stays unmet.
+
+```text
+separate session          satisfied
+zero Builder conversation satisfied
+separate worktree         NOT satisfied
+separate dispatcher/host  NOT satisfied
+→ independent Shadow close gate  UNMET
+```
+
 ## External consumer snapshot — Bettor order 13
 
 Observed: `2026-08-17`. This is `EXTERNAL_CONSUMER_SNAPSHOT`, not Bettor state

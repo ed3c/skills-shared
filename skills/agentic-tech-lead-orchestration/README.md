@@ -178,17 +178,17 @@ Human/repo policy    semantic conflict, sibling admission, merge, release, promo
 
 ## Control-plane DAG and convergence
 
-The current implementation program is a real sibling fan-out, not a serial Stack. Current selected candidate heads are read from GitHub and recorded in the trace document rather than duplicated here:
+The Wave-2 implementation program was a real sibling fan-out, not a serial Stack. It has reached its terminal states (2026-08-22 readback); exact heads live in the trace document rather than being duplicated here:
 
 ```text
 main
-├── #375 / PR #451  Codex SDK runtime adapter         SIBLING / UNMERGED CANDIDATE
-├── #376 / PR #452  GitHub Issue DAG projection      SIBLING / UNMERGED CANDIDATE
-├── #377 / PR #456  Herdr runtime observer v3        SIBLING / UNMERGED CANDIDATE
-├── #378 / PR #457  problem-closure ledger v3        SIBLING / UNMERGED CANDIDATE
-└── PR #380         documentation foundation         DOCUMENTATION SIBLING
+├── #375 / PR #451  Codex SDK runtime adapter         SIBLING / CLOSED_UNMERGED / CONSUMED
+├── #376 / PR #452  GitHub Issue DAG projection      SIBLING / CLOSED_UNMERGED / CONSUMED
+├── #377 / PR #456  Herdr runtime observer v3        SIBLING / CLOSED_UNMERGED / CONSUMED
+├── #378 / PR #457  problem-closure ledger v3        SIBLING / CLOSED_UNMERGED / CONSUMED
+└── PR #380         documentation foundation         DOCUMENTATION SIBLING / CLOSED_UNMERGED / CONSUMED
        ↓ exact selected candidate bytes
-#379 / PR #455      CONVERGENCE CANDIDATE
+#379 / PR #455      MERGED / HUMAN_ADMITTED (ca31e0b1…)
        ↓ shared run-all / README / AGENTS / Git Town / traceability
 independent Shadow + exact-head CI
        ↓

@@ -4,15 +4,19 @@ Portable method for reviewing code with a deterministic track and a semantic
 track that are structurally forbidden from standing in for each other, so that a
 finding always carries the grade its evidence supports.
 
-Status: `C0_CONTRACT_ADMITTED / TWO_DETERMINISTIC_ADAPTERS_LANDED / SEMANTIC_ADAPTER_NOT_IMPLEMENTED / NOT_REGISTERED`.
+Status: `C0_CONTRACT_ADMITTED / FIVE_ADAPTERS_LANDED / R1_R2_COMPILERS_LANDED / NOT_REGISTERED`.
 
-Two deterministic-track adapters are landed and committed (`adapters/tree-sitter/`
-for parser/syntax-match facts, `adapters/sqlite-ledger/` for the queryable
-graph-ledger fact plane), each with its own selftest routed through
-[`tests/run-all.sh`](tests/run-all.sh). The provider-specific `#547` (SCIP) and
-`#549` (Buf) deterministic adapters and the `#550` semantic-context adapter are
-separate, still-open lanes; landing these two does not admit those. The `#522`
-synthesis and problem-closure compilers landed in the same wave under
+Five adapters are landed and committed, each with its own selftest routed
+through [`tests/run-all.sh`](tests/run-all.sh): `adapters/tree-sitter/`
+(parser/syntax-match facts), `adapters/sqlite-ledger/` (queryable graph-ledger
+fact plane), and — landed in the 2026-08-22 wave under Human-admitted provider
+prerequisites — `adapters/scip/` (symbol/relationship facts on a real
+scip-python round-trip), `adapters/buf/` (contract compatibility with a typed
+`NOT_APPLICABLE` lane) and `adapters/semantic-context/` (zero-network,
+structurally non-authoritative retrieval). The same wave landed the `#524` R2
+Expand & Contract compiler under [`expand-contract/`](expand-contract/) with
+two more contracts; its live lanes stay `NOT_EXERCISED`/`NOT_OBSERVED`. The `#522`
+synthesis and problem-closure compilers landed in an earlier wave under
 [`synthesis/`](synthesis/), with their three contracts under
 `references/schemas/` counted by the committed harness. The `#523` bounded
 single-repository refactor protocol landed the same way under
@@ -42,13 +46,13 @@ the one most often reported as progress.
    — the fifteen closed terms and what each can never become.
 5. [`references/contracts/public-private-capability.md`](references/contracts/public-private-capability.md)
    — plane ownership and the locator laws.
-6. [`references/schemas/`](references/schemas/) — the machine half, 31 frozen
+6. [`references/schemas/`](references/schemas/) — the machine half, 33 frozen
    schemas (8 C0 contract + 16 D1/M1 interface + 3 X1 synthesis + 4 R1 bounded
-   refactor).
+   refactor + 2 R2 cross-repository).
 7. [`references/source-disposition/refused-claims.json`](references/source-disposition/refused-claims.json)
    — the seven refused source claims and their replayable controls.
-8. [`adapters/`](adapters/) — the two landed deterministic-track adapters, each
-   with its own selftest and fixtures.
+8. [`adapters/`](adapters/) — the five landed adapters, each with its own
+   selftest and fixtures.
 9. [`references/prompts/README.md`](references/prompts/README.md) — the common
    session envelope and the nine zero-context stage prompts, P0 through P8.
 10. [`../agentic-tech-lead-orchestration/README.md`](../agentic-tech-lead-orchestration/README.md),
@@ -75,13 +79,28 @@ skills/dual-track-code-review-loop/
 ├── adapters/
 │   ├── tree-sitter/
 │   │   ├── adapter.py, selftest.py, bundles/, fixtures/
-│   │   └── receipts/live-ac62c87f.json
+│   │   └── receipts/live-05c56c37.json
 │   │       └── landed parser/syntax-match capability class; live receipt binds
 │   │           digests to a real `tree-sitter` run over committed fixtures
-│   └── sqlite-ledger/
-│       ├── ledger.py, selftest.py, fixtures/
-│       │   └── landed queryable graph-ledger capability class; planted-mutation
-│       │       knockouts and a real ingested/traversed database file
+│   ├── sqlite-ledger/
+│   │   ├── ledger.py, selftest.py, fixtures/
+│   │   │   └── landed queryable graph-ledger capability class; planted-mutation
+│   │   │       knockouts and a real ingested/traversed database file
+│   ├── scip/
+│   │   ├── adapter.py, selftest.py, normalization/, bindings/, fixtures/
+│   │   └── receipts/live-ee9afe43.json
+│   │       └── landed symbol/relationship capability class on a real
+│   │           scip-python index round-trip; coverage ceilings and unresolved
+│   │           denominators preserved, nesting never promoted to a call graph
+│   ├── buf/
+│   │   ├── adapter.py, selftest.py, fixtures/
+│   │   │   └── landed contract-compatibility capability class: a real breaking
+│   │   │       finding on a committed .proto pair plus the typed NOT_APPLICABLE
+│   │   │       lane; live lane self-reports NOT_EXERCISED where buf is absent
+│   └── semantic-context/
+│       ├── adapter.py, selftest.py, fixtures/, receipts/
+│       │   └── landed SemanticContextPort with a deterministic zero-network
+│       │       reference backend; LanceDB lane typed NOT_EXERCISED
 ├── synthesis/
 │   ├── compile_synthesis.py, selftest.py, fixtures/
 │   │   └── the X1 review-synthesis and problem-closure compilers
@@ -91,11 +110,18 @@ skills/dual-track-code-review-loop/
 │   │       walking VIOLATION_BOUND through CANDIDATE_RECEIPT | BLOCKED |
 │   │       ROLLED_BACK over five synthetic requests, four of the adapter law's
 │   │       eight declared languages, and no vendored adapter implementation
+├── expand-contract/
+│   ├── compile_r2.py, fixture_repos.py, selftest.py, fixtures/, receipts/
+│   │   └── the R2 cross-repository Expand & Contract compiler over a
+│   │       two-repository disposable git fixture: multi-binding subject,
+│   │       dual-run lane closed over OBSERVED/NOT_OBSERVED/NOT_EXERCISED,
+│   │       STOPPED_WITH_ROLLBACK truthful-stop terminal, protocol_ready
+│   │       pinned false
 ├── tests/
 │   ├── run-all.sh
-│   │   └── one entrypoint: replays the C0 contract, then routes the two adapter
-│   │       selftests, the X1 synthesis selftest and the R1 refactor selftest
-│   │       through the same CI arrival — five lanes
+│   │   └── one entrypoint: replays the C0 contract, then routes the five
+│   │       adapter selftests, the X1 synthesis selftest and the R1 and R2
+│   │       compiler selftests through the same CI arrival — nine lanes
 │   └── selftest.py
 │       └── dynamic discovery over references/; prints every denominator it counted
 └── references/
@@ -106,7 +132,7 @@ skills/dual-track-code-review-loop/
     │   └── public-private-capability.md
     │       └── closed terms and plane ownership; the half a person reads
     ├── schemas/
-    │   └── 31 frozen JSON Schemas — 8 C0 contract schemas (source-packet,
+    │   └── 33 frozen JSON Schemas — 8 C0 contract schemas (source-packet,
     │       candidate-record, violation-candidate, refactor-proposal,
     │       change-unit, verification-receipt, closure-record,
     │       source-disposition) plus 16 D1/M1 interface schemas (syntax-match,
@@ -119,7 +145,8 @@ skills/dual-track-code-review-loop/
     │       plus 3 X1 synthesis schemas (review-card, synthesis-packet,
     │       problem-closure-row) plus 4 R1 bounded-refactor schemas
     │       (refactor-usage-signature, refactor-minimal-port,
-    │       refactor-changeset-lease, refactor-r1-receipt)
+    │       refactor-changeset-lease, refactor-r1-receipt) plus 2 R2
+    │       cross-repository schemas (refactor-r2-binding, refactor-r2-receipt)
     │       └── the half a machine enforces, with positive and refusal controls
     ├── source-disposition/
     │   └── refused-claims.json
@@ -130,10 +157,10 @@ skills/dual-track-code-review-loop/
 ```
 
 Markdown and JSON Schema route and enforce the contract. `adapters/` is
-concrete implementation against that contract — the first place in this tree
-where an external tool (`tree-sitter`) is actually invoked and a real database
-file is actually created. Consumer repositories still own applying a proposal
-to their own code; nothing here has ever done that.
+concrete implementation against that contract — where external tools
+(`tree-sitter`, `scip-python`, `buf`, `git`) are actually invoked and real
+database and index files are actually created. Consumer repositories still own
+applying a proposal to their own code; nothing here has ever done that.
 
 Registry admission is a separate governance fact from directory presence. This
 directory's registry classification is `ABSENT` until a human-admitted
@@ -229,26 +256,34 @@ the claim and the record.
 A committed test suite now exists at [`tests/run-all.sh`](tests/run-all.sh),
 routed by `skill-suites.yml` continuous integration. It replays the C0
 contract via `tests/selftest.py` — dynamic discovery over `references/`, no
-denominator hand-copied into the script — and then routes both landed
-adapters' selftests (`adapters/tree-sitter/selftest.py`,
-`adapters/sqlite-ledger/selftest.py`), the X1 synthesis selftest
-(`synthesis/selftest.py`) and the R1 bounded-refactor selftest
-(`refactor/selftest.py`) through the same CI arrival — five lanes. On this
-worktree's exact head each lane's denominator line reads:
+denominator hand-copied into the script — and then routes the five landed
+adapters' selftests, the X1 synthesis selftest (`synthesis/selftest.py`), the
+R1 bounded-refactor selftest (`refactor/selftest.py`) and the R2
+expand-contract selftest (`expand-contract/selftest.py`) through the same CI
+arrival — nine lanes. On this worktree's exact head each lane's denominator
+line reads:
 
 ```text
-schemas=31 positives=37 controls=151 knockouts=151 leak_scan_files=36 mutable_subject_probes=115 promotion_probes=184
-tree-sitter:    fixtures=2 matches=5 schema_validations=9 falsifier_rows=14 live=EXERCISED
-sqlite-ledger:  fixtures=2 cases=46 planted_mutations=22 knockouts=5/5
-synthesis:      stability_checks=9 schema_compositions=8 refusal_codes=16 projections=3
-refactor:       requests=5 stability_checks=15 schema_compositions=20 state_values_covered=44 refusal_codes=26 languages_exercised=4/8 applied_on_real_codebase=NOT_EXERCISED
+schemas=33 positives=37 controls=151 knockouts=151 leak_scan_files=38 mutable_subject_probes=115 promotion_probes=184
+tree-sitter:      fixtures=2 matches=5 schema_validations=9 falsifier_rows=14 live=EXERCISED
+sqlite-ledger:    fixtures=2 cases=46 planted_mutations=22 knockouts=5/5
+scip:             fixtures=1 facts=76 schema_validations=78 falsifier_rows=17 crosscheck=EXERCISED live=EXERCISED
+buf:              fixtures=2 falsifier_rows=16 live=NOT_EXERCISED
+semantic-context: 90 cases, 41 planted falsifiers refused, 12 required falsifiers all planted, zero network, LanceDB NOT_EXERCISED (PROVIDER_ABSENT)
+synthesis:        stability_checks=9 schema_compositions=8 refusal_codes=16 projections=3
+refactor:         requests=5 stability_checks=15 schema_compositions=20 state_values_covered=44 refusal_codes=26 languages_exercised=4/8 applied_on_real_codebase=NOT_EXERCISED
+expand-contract:  requests=4 stability_checks=12 consumed_verdicts=8 state_values_covered=56 unreachable_at_this_head=15 refusal_deltas=29 knockouts=28 two_repository_fixture=EXERCISED applied_on_real_codebase=NOT_EXERCISED dual_run_observation=NOT_OBSERVED contraction_authorization=HUMAN_ADMIT_REQUIRED
 ```
 
-Those are the five denominator lines the run prints, with two host-specific
+`buf` reads `live=NOT_EXERCISED` on a host without the buf executable; the
+landing run's real buf 1.72.0 outputs are committed as fixtures and the lane
+replays them deterministically. Those are the nine denominator lines the run
+prints, with host-specific
 fragments elided so this file stays machine-neutral: the first line's
-`subject=<absolute path>` and the tail of the sqlite line, which carries three
-per-host digests and a row-count map. Nothing else is reworded — run the suite
-and the tokens above appear in its output.
+`subject=<absolute path>`, the tail of the sqlite line (three per-host digests
+and a row-count map), and some trailing `failures=0`-class tokens. Every token
+quoted above appears verbatim in the run's output; the block is a trimmed
+quotation, not a transcript.
 
 `cases.json` reconciles the schema and control lists by name against what the
 run counted and fails on any drift in either direction; the knockout and probe
@@ -275,14 +310,17 @@ mutation controls over the refusals          VERIFIED_BY_COMMITTED_SUITE
 committed mutation harness                   PRESENT (tests/run-all.sh, CI-routed)
 parser/syntax-match adapter (tree-sitter)    LANDED, selftest + live receipt
 graph-ledger adapter (sqlite-ledger)         LANDED, selftest, planted mutations
-SCIP / Buf deterministic adapters (#547/#549) BLOCKED_ON_PROVIDER
-semantic-context adapter (#550)              NOT_IMPLEMENTED
+SCIP adapter (#547)                          LANDED — selftest + live scip-python receipt (live-ee9afe43)
+Buf adapter (#549)                           LANDED — selftest; landing-run buf 1.72.0 outputs committed, live lane NOT_EXERCISED where buf absent
+semantic-context adapter (#550)              LANDED — zero-network reference backend; LanceDB lane NOT_EXERCISED
 dual-track synthesis compiler (#522)         LANDED — synthesis/ + three schemas, suite-counted
 bounded R1 refactor protocol (#523)          LANDED — refactor/ + four schemas, suite-counted
+R2 expand-contract compiler (#524)           LANDED — expand-contract/ + two schemas, suite-counted; two-repository fixture EXERCISED
+R2 dual-run / telemetry observation          NOT_OBSERVED (fixture serves no traffic)
 R1 language adapter implementations          BLOCKED_ON_PROVIDER (declared capability classes only)
 R1 live consumer canary (#523 exit)          NOT_EXERCISED
 applied refactor on a real codebase          NOT_EXERCISED
-cross-repository contract migration          NOT_EXERCISED
+cross-repository contract migration          NOT_EXERCISED (fixture only)
 live consumer canary (#528)                  NOT_EXERCISED
 independent Shadow (#525)                    NOT_EXERCISED
 registry admission                           ABSENT
@@ -295,7 +333,7 @@ now committed and CI-routed, so the line reads `VERIFIED_BY_COMMITTED_SUITE`
 rather than the uncommitted-scratch-harness label it replaced. The earlier,
 narrower C0-only harness was independently re-derived once by the Shadow on the
 H0-003 review before this suite existed; that historical fact is kept as a
-second derivation behind the C0 slice only, not as evidence for the two
+second derivation behind the C0 slice only, not as evidence for the
 adapters, which have never been through an independent Shadow pass.
 `NOT_IMPLEMENTED`, `BLOCKED_ON_PROVIDER`, `NOT_EXERCISED` and `IN_FLIGHT` are
 distinct states here on purpose: a blocked provider dependency, an unbuilt
@@ -305,14 +343,16 @@ would hide which one applies.
 
 ## Current handoff
 
-Two deterministic-track adapters landed and both selftests are green in the
-committed suite above. The next owner for *this contract* is still an
+Five adapters, the X1 synthesis compilers and the R1 and R2 protocol compilers
+are landed with all nine selftests green in the committed suite above; the
+2026-08-22 wave landed `#547`/`#549`/`#550`/`#524` under Human-admitted
+provider prerequisites. The next owner for *this contract* is still an
 independent Shadow on this exact head (`#525`, open), reading the audit list in
 [`AGENTS.md`](AGENTS.md) and returning `ADMIT_FOR_DOWNSTREAM`, `BLOCK` or
 `REPLAN_REQUIRED`; a same-context review may warn and cannot satisfy that role.
-Concurrently open, path-disjoint sibling lanes on this same head: `#547`/`#549` (provider
-deterministic adapters, blocked on provider availability), `#550` (semantic
-adapter, blocked), `#527` (bootstrap profile) and `#528` (live consumer
-canary, the eventual Local Handoff owner). None of them is promoted by this
-file landing, and this file's landing does not promote any of them either —
-each closes only on its own issue's evidence.
+Remaining open, path-disjoint lanes on this same head: `#525` (independent
+Shadow), `#527` (bootstrap profile — landed as a `shared-skills-infra` sibling
+profile with its own suite, completion-dependent on `#525` admission) and
+`#528` (live consumer canary, the eventual Local Handoff owner). None of them
+is promoted by this file landing, and this file's landing does not promote any
+of them either — each closes only on its own issue's evidence.

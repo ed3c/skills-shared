@@ -1,0 +1,96 @@
+{"invoke": 0.0002272500132676214, "kind": "read", "new": null, "old": null, "proc": 0, "response": 0.00044554201303981245, "ret": null}
+{"invoke": 0.00040254200575873256, "kind": "read", "new": null, "old": null, "proc": 1, "response": 0.00047183301649056375, "ret": null}
+{"actual": null, "invoke": 0.0004532500170171261, "kind": "cas", "new": "v-0-0", "old": null, "proc": 0, "response": 0.0007447919924743474, "ret": "ok"}
+{"actual": "v-0-0", "invoke": 0.0004735830007120967, "kind": "cas", "new": "v-1-0", "old": null, "proc": 1, "response": 0.0007782920147292316, "ret": "conflict"}
+{"invoke": 0.0005306670209392905, "kind": "read", "new": null, "old": null, "proc": 2, "response": 0.0006494169938378036, "ret": null}
+{"invoke": 0.0006105420179665089, "kind": "read", "new": null, "old": null, "proc": 3, "response": 0.0007062499935273081, "ret": null}
+{"actual": "v-0-0", "invoke": 0.0006514580163639039, "kind": "cas", "new": "v-2-0", "old": null, "proc": 2, "response": 0.0008592499943915755, "ret": "conflict"}
+{"actual": "v-0-0", "invoke": 0.0007092500163707882, "kind": "cas", "new": "v-3-0", "old": null, "proc": 3, "response": 0.0007997080101631582, "ret": "conflict"}
+{"invoke": 0.0007477920153178275, "kind": "read", "new": null, "old": null, "proc": 0, "response": 0.0008166670158971101, "ret": "v-0-0"}
+{"invoke": 0.0007804580091033131, "kind": "read", "new": null, "old": null, "proc": 1, "response": 0.0008337920007761568, "ret": "v-0-0"}
+{"invoke": 0.0008006250136531889, "kind": "read", "new": null, "old": null, "proc": 3, "response": 0.0008504580182489008, "ret": "v-0-0"}
+{"actual": null, "invoke": 0.0008188330102711916, "kind": "cas", "new": "v-0-1", "old": "v-0-0", "proc": 0, "response": 0.0010271250212099403, "ret": "ok"}
+{"actual": "v-0-1", "invoke": 0.0008348750125151128, "kind": "cas", "new": "v-1-1", "old": "v-0-0", "proc": 1, "response": 0.0010400000028312206, "ret": "conflict"}
+{"actual": "v-0-1", "invoke": 0.0008511250198353082, "kind": "cas", "new": "v-3-1", "old": "v-0-0", "proc": 3, "response": 0.001048583013471216, "ret": "conflict"}
+{"invoke": 0.0008602080051787198, "kind": "read", "new": null, "old": null, "proc": 2, "response": 0.0009350000182166696, "ret": "v-0-0"}
+{"actual": "v-0-1", "invoke": 0.0009362919954583049, "kind": "cas", "new": "v-2-1", "old": "v-0-0", "proc": 2, "response": 0.0011340829951222986, "ret": "conflict"}
+{"invoke": 0.0010282080038450658, "kind": "read", "new": null, "old": null, "proc": 0, "response": 0.001068832993041724, "ret": "v-0-1"}
+{"invoke": 0.001041375013301149, "kind": "read", "new": null, "old": null, "proc": 1, "response": 0.0011080419935751706, "ret": "v-0-1"}
+{"invoke": 0.0010490420099813491, "kind": "read", "new": null, "old": null, "proc": 3, "response": 0.0011208750074729323, "ret": "v-0-1"}
+{"actual": null, "invoke": 0.0010710000060498714, "kind": "cas", "new": "v-0-2", "old": "v-0-1", "proc": 0, "response": 0.0013100829964969307, "ret": "ok"}
+{"actual": "v-0-2", "invoke": 0.00110937500721775, "kind": "cas", "new": "v-1-2", "old": "v-0-1", "proc": 1, "response": 0.0012866250181104988, "ret": "conflict"}
+{"actual": "v-0-2", "invoke": 0.0011240830062888563, "kind": "cas", "new": "v-3-2", "old": "v-0-1", "proc": 3, "response": 0.0013263750006444752, "ret": "conflict"}
+{"invoke": 0.0011355830065440387, "kind": "read", "new": null, "old": null, "proc": 2, "response": 0.001261750003322959, "ret": "v-0-1"}
+{"actual": "v-0-2", "invoke": 0.0012633330188691616, "kind": "cas", "new": "v-2-2", "old": "v-0-1", "proc": 2, "response": 0.0013464170042425394, "ret": "conflict"}
+{"invoke": 0.0012884580064564943, "kind": "read", "new": null, "old": null, "proc": 1, "response": 0.0013585420092567801, "ret": "v-0-2"}
+{"invoke": 0.0013112080050632358, "kind": "read", "new": null, "old": null, "proc": 0, "response": 0.0014012080209795386, "ret": "v-0-2"}
+{"invoke": 0.001326917001279071, "kind": "read", "new": null, "old": null, "proc": 3, "response": 0.0013735420070588589, "ret": "v-0-2"}
+{"invoke": 0.001347250014077872, "kind": "read", "new": null, "old": null, "proc": 2, "response": 0.0014298330061137676, "ret": "v-0-2"}
+{"actual": null, "invoke": 0.0013595829950645566, "kind": "cas", "new": "v-1-3", "old": "v-0-2", "proc": 1, "response": 0.0015652920119464397, "ret": "ok"}
+{"actual": "v-1-3", "invoke": 0.0013747500197496265, "kind": "cas", "new": "v-3-3", "old": "v-0-2", "proc": 3, "response": 0.0015901250008028, "ret": "conflict"}
+{"actual": "v-1-3", "invoke": 0.001401917019393295, "kind": "cas", "new": "v-0-3", "old": "v-0-2", "proc": 0, "response": 0.0015509999939240515, "ret": "conflict"}
+{"actual": "v-1-3", "invoke": 0.0014310830156318843, "kind": "cas", "new": "v-2-3", "old": "v-0-2", "proc": 2, "response": 0.0015770420141052455, "ret": "conflict"}
+{"invoke": 0.001552041998365894, "kind": "read", "new": null, "old": null, "proc": 0, "response": 0.0016189580201171339, "ret": "v-1-3"}
+{"invoke": 0.0015659579948987812, "kind": "read", "new": null, "old": null, "proc": 1, "response": 0.0016598750080447644, "ret": "v-1-3"}
+{"invoke": 0.001577707997057587, "kind": "read", "new": null, "old": null, "proc": 2, "response": 0.0016973330057226121, "ret": "v-1-3"}
+{"invoke": 0.0015907500055618584, "kind": "read", "new": null, "old": null, "proc": 3, "response": 0.001638667017687112, "ret": "v-1-3"}
+{"actual": null, "invoke": 0.0016203749983105808, "kind": "cas", "new": "v-0-4", "old": "v-1-3", "proc": 0, "response": 0.0017354169976897538, "ret": "ok"}
+{"actual": "v-0-4", "invoke": 0.0016398750012740493, "kind": "cas", "new": "v-3-4", "old": "v-1-3", "proc": 3, "response": 0.001750082999933511, "ret": "conflict"}
+{"actual": "v-0-4", "invoke": 0.0016605000128038228, "kind": "cas", "new": "v-1-4", "old": "v-1-3", "proc": 1, "response": 0.0017962499987334013, "ret": "conflict"}
+{"actual": "v-0-4", "invoke": 0.0016980000073090196, "kind": "cas", "new": "v-2-4", "old": "v-1-3", "proc": 2, "response": 0.001818499993532896, "ret": "conflict"}
+{"invoke": 0.0017360830097459257, "kind": "read", "new": null, "old": null, "proc": 0, "response": 0.0017785420059226453, "ret": "v-0-4"}
+{"invoke": 0.0017514170031063259, "kind": "read", "new": null, "old": null, "proc": 3, "response": 0.0018604579963721335, "ret": "v-0-4"}
+{"actual": null, "invoke": 0.0017802079964894801, "kind": "cas", "new": "v-0-5", "old": "v-0-4", "proc": 0, "response": 0.001917707995744422, "ret": "ok"}
+{"invoke": 0.0017969580076169223, "kind": "read", "new": null, "old": null, "proc": 1, "response": 0.0018423750007059425, "ret": "v-0-4"}
+{"invoke": 0.0018231669964734465, "kind": "read", "new": null, "old": null, "proc": 2, "response": 0.001899249997222796, "ret": "v-0-4"}
+{"actual": "v-0-5", "invoke": 0.0018432080105412751, "kind": "cas", "new": "v-1-5", "old": "v-0-4", "proc": 1, "response": 0.002011375006986782, "ret": "conflict"}
+{"actual": "v-0-5", "invoke": 0.001862292003352195, "kind": "cas", "new": "v-3-5", "old": "v-0-4", "proc": 3, "response": 0.001945875003002584, "ret": "conflict"}
+{"actual": "v-0-5", "invoke": 0.0019006670045200735, "kind": "cas", "new": "v-2-5", "old": "v-0-4", "proc": 2, "response": 0.001998082996578887, "ret": "conflict"}
+{"invoke": 0.001918666996061802, "kind": "read", "new": null, "old": null, "proc": 0, "response": 0.001979791995836422, "ret": "v-0-5"}
+{"invoke": 0.0019482079951558262, "kind": "read", "new": null, "old": null, "proc": 3, "response": 0.0020354580192361027, "ret": "v-0-5"}
+{"actual": "v-3-6", "invoke": 0.0019811670063063502, "kind": "cas", "new": "v-0-6", "old": "v-0-5", "proc": 0, "response": 0.0022374580148607492, "ret": "conflict"}
+{"invoke": 0.0019987080013379455, "kind": "read", "new": null, "old": null, "proc": 2, "response": 0.0020516670192591846, "ret": "v-0-5"}
+{"invoke": 0.0020118330139666796, "kind": "read", "new": null, "old": null, "proc": 1, "response": 0.002068375004455447, "ret": "v-0-5"}
+{"actual": null, "invoke": 0.0020364579977467656, "kind": "cas", "new": "v-3-6", "old": "v-0-5", "proc": 3, "response": 0.0021952500101178885, "ret": "ok"}
+{"actual": "v-3-6", "invoke": 0.0020524999999906868, "kind": "cas", "new": "v-2-6", "old": "v-0-5", "proc": 2, "response": 0.0022120420180726796, "ret": "conflict"}
+{"actual": "v-3-6", "invoke": 0.0020689580123871565, "kind": "cas", "new": "v-1-6", "old": "v-0-5", "proc": 1, "response": 0.002224374999059364, "ret": "conflict"}
+{"invoke": 0.002196707995608449, "kind": "read", "new": null, "old": null, "proc": 3, "response": 0.002294750011060387, "ret": "v-3-6"}
+{"invoke": 0.0022126669937279075, "kind": "read", "new": null, "old": null, "proc": 2, "response": 0.0022607080172747374, "ret": "v-3-6"}
+{"invoke": 0.0022250000038184226, "kind": "read", "new": null, "old": null, "proc": 1, "response": 0.00227912500849925, "ret": "v-3-6"}
+{"invoke": 0.0022379170113708824, "kind": "read", "new": null, "old": null, "proc": 0, "response": 0.0023645829933229834, "ret": "v-3-6"}
+{"actual": "v-1-7", "invoke": 0.0022625419951509684, "kind": "cas", "new": "v-2-7", "old": "v-3-6", "proc": 2, "response": 0.002449666993925348, "ret": "conflict"}
+{"actual": null, "invoke": 0.0022800000151619315, "kind": "cas", "new": "v-1-7", "old": "v-3-6", "proc": 1, "response": 0.002416833012830466, "ret": "ok"}
+{"actual": "v-1-7", "invoke": 0.0022960000205785036, "kind": "cas", "new": "v-3-7", "old": "v-3-6", "proc": 3, "response": 0.002437999995891005, "ret": "conflict"}
+{"actual": "v-1-7", "invoke": 0.0023657080018892884, "kind": "cas", "new": "v-0-7", "old": "v-3-6", "proc": 0, "response": 0.002458708011545241, "ret": "conflict"}
+{"invoke": 0.0024175000144168735, "kind": "read", "new": null, "old": null, "proc": 1, "response": 0.002481667004758492, "ret": "v-1-7"}
+{"invoke": 0.0024388330057263374, "kind": "read", "new": null, "old": null, "proc": 3, "response": 0.0025276250089518726, "ret": "v-1-7"}
+{"invoke": 0.002450750005664304, "kind": "read", "new": null, "old": null, "proc": 2, "response": 0.002512125007342547, "ret": "v-1-7"}
+{"invoke": 0.002459458017256111, "kind": "read", "new": null, "old": null, "proc": 0, "response": 0.002540457993745804, "ret": "v-1-7"}
+{"actual": null, "invoke": 0.002485792007064447, "kind": "cas", "new": "v-1-8", "old": "v-1-7", "proc": 1, "response": 0.0025923330103978515, "ret": "ok"}
+{"actual": "v-1-8", "invoke": 0.002513417013688013, "kind": "cas", "new": "v-2-8", "old": "v-1-7", "proc": 2, "response": 0.0026097499940078706, "ret": "conflict"}
+{"actual": "v-1-8", "invoke": 0.002528625016566366, "kind": "cas", "new": "v-3-8", "old": "v-1-7", "proc": 3, "response": 0.002630333008710295, "ret": "conflict"}
+{"actual": "v-1-8", "invoke": 0.0025414169940631837, "kind": "cas", "new": "v-0-8", "old": "v-1-7", "proc": 0, "response": 0.0026424580137245357, "ret": "conflict"}
+{"invoke": 0.002593208017060533, "kind": "read", "new": null, "old": null, "proc": 1, "response": 0.0026677919959183782, "ret": "v-1-8"}
+{"invoke": 0.0026102919946424663, "kind": "read", "new": null, "old": null, "proc": 2, "response": 0.0026518749946262687, "ret": "v-1-8"}
+{"invoke": 0.0026310000102967024, "kind": "read", "new": null, "old": null, "proc": 3, "response": 0.0026888750144280493, "ret": "v-1-8"}
+{"invoke": 0.0026429580175317824, "kind": "read", "new": null, "old": null, "proc": 0, "response": 0.002678958000615239, "ret": "v-1-8"}
+{"actual": "v-1-9", "invoke": 0.0026529580063652247, "kind": "cas", "new": "v-2-9", "old": "v-1-8", "proc": 2, "response": 0.0028195000195410103, "ret": "conflict"}
+{"actual": null, "invoke": 0.002668500004801899, "kind": "cas", "new": "v-1-9", "old": "v-1-8", "proc": 1, "response": 0.0028106670069973916, "ret": "ok"}
+{"actual": "v-1-9", "invoke": 0.002680083009181544, "kind": "cas", "new": "v-0-9", "old": "v-1-8", "proc": 0, "response": 0.002834582992363721, "ret": "conflict"}
+{"actual": "v-1-9", "invoke": 0.0026895000191871077, "kind": "cas", "new": "v-3-9", "old": "v-1-8", "proc": 3, "response": 0.00284904200816527, "ret": "conflict"}
+{"invoke": 0.002812457998516038, "kind": "read", "new": null, "old": null, "proc": 1, "response": 0.002956625015940517, "ret": "v-1-9"}
+{"invoke": 0.0028199170192237943, "kind": "read", "new": null, "old": null, "proc": 2, "response": 0.00292979201185517, "ret": "v-1-9"}
+{"invoke": 0.0028350000211503357, "kind": "read", "new": null, "old": null, "proc": 0, "response": 0.002865792019292712, "ret": "v-1-9"}
+{"invoke": 0.002850167016731575, "kind": "read", "new": null, "old": null, "proc": 3, "response": 0.0029025830153841525, "ret": "v-1-9"}
+{"actual": null, "invoke": 0.002866708004148677, "kind": "cas", "new": "v-0-10", "old": "v-1-9", "proc": 0, "response": 0.0030067500192672014, "ret": "ok"}
+{"actual": "v-0-10", "invoke": 0.0029037500207778066, "kind": "cas", "new": "v-3-10", "old": "v-1-9", "proc": 3, "response": 0.0030702920048497617, "ret": "conflict"}
+{"actual": "v-0-10", "invoke": 0.0029312080005183816, "kind": "cas", "new": "v-2-10", "old": "v-1-9", "proc": 2, "response": 0.003085375006776303, "ret": "conflict"}
+{"actual": "v-0-10", "invoke": 0.00295762499445118, "kind": "cas", "new": "v-1-10", "old": "v-1-9", "proc": 1, "response": 0.0030264999950304627, "ret": "conflict"}
+{"invoke": 0.0030073329980950803, "kind": "read", "new": null, "old": null, "proc": 0, "response": 0.003049624996492639, "ret": "v-0-10"}
+{"invoke": 0.0030274169985204935, "kind": "read", "new": null, "old": null, "proc": 1, "response": 0.0031094170117285103, "ret": "v-0-10"}
+{"actual": null, "invoke": 0.003050917002838105, "kind": "cas", "new": "v-0-11", "old": "v-0-10", "proc": 0, "response": 0.0031961250060703605, "ret": "ok"}
+{"invoke": 0.003071292012464255, "kind": "read", "new": null, "old": null, "proc": 3, "response": 0.0031282500131055713, "ret": "v-0-10"}
+{"invoke": 0.0030863750143907964, "kind": "read", "new": null, "old": null, "proc": 2, "response": 0.003179082996211946, "ret": "v-0-10"}
+{"actual": "v-0-11", "invoke": 0.0031100829946808517, "kind": "cas", "new": "v-1-11", "old": "v-0-10", "proc": 1, "response": 0.003272792004281655, "ret": "conflict"}
+{"actual": "v-0-11", "invoke": 0.003128792013740167, "kind": "cas", "new": "v-3-11", "old": "v-0-10", "proc": 3, "response": 0.003250292007578537, "ret": "conflict"}
+{"actual": "v-0-11", "invoke": 0.003180375002557412, "kind": "cas", "new": "v-2-11", "old": "v-0-10", "proc": 2, "response": 0.0032265830086544156, "ret": "conflict"}

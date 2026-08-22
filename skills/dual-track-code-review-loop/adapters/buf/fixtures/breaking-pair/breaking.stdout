@@ -1,0 +1,1 @@
+{"path":"skills/dual-track-code-review-loop/adapters/buf/fixtures/breaking-pair/candidate/order.proto","start_line":5,"start_column":1,"end_line":7,"end_column":2,"type":"FIELD_NO_DELETE","message":"Previously present field \"2\" with name \"currency\" on message \"Order\" was deleted."}

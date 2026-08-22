@@ -24,6 +24,7 @@ on:
       - 'skills/gitlab-delivery-loop/**'
       - 'skills/html-for-decisions/**'
       - 'skills/github-portfolio-control/**'
+      - 'skills/human-led-agentic-engineering/**'
       - 'skills/knowledge-continuity/**'
       - 'skills/procedural-shadow-runtime/**'
       - 'skills/product-reverse-engineering-loop/**'
@@ -48,6 +49,7 @@ on:
       - 'skills/gitlab-delivery-loop/**'
       - 'skills/html-for-decisions/**'
       - 'skills/github-portfolio-control/**'
+      - 'skills/human-led-agentic-engineering/**'
       - 'skills/knowledge-continuity/**'
       - 'skills/procedural-shadow-runtime/**'
       - 'skills/product-reverse-engineering-loop/**'
@@ -104,6 +106,7 @@ jobs:
           - gitlab-delivery-loop
           - html-for-decisions
           - github-portfolio-control
+          - human-led-agentic-engineering
           - knowledge-continuity
           - procedural-shadow-runtime
           - product-reverse-engineering-loop

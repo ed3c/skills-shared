@@ -1,0 +1,1102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dtcr-refactor-r2-receipt.schema.json",
+  "title": "DTCR cross-repository Expand and Contract (R2) receipt",
+  "description": "The terminal statement of one cross-repository Expand and Contract run over the phases C1 CONTRACT_EXPANSION, A1 PROVIDER_EXPANSION, A2 CONSUMER_INVERSION, E1 DUAL_RUN_AND_TELEMETRY and C2 LEGACY_CONTRACTION. Four terminals, and the fourth is the one R1's shape cannot express: STOPPED_WITH_ROLLBACK is a stop in which the repositories ended in different states, because an Expand and Contract run routinely leaves the provider expansion standing while the consumer inversion is reverted, and a deployed provider surface is frequently not rollbackable at all. That is why rollback is an array with one row per repository binding and a per-row disposition rather than a single restored_commit. Three lanes here record absence rather than a value and each names the absence explicitly: the dual-run observation, because a fixture serves no traffic; the idempotency lane, because the idempotency of a write path is a runtime property that a declared boolean does not establish; and the contraction authorization, because removing a legacy surface is a Human decision taken against a caller count whose index is partial. None of them is promoted to a pass. `protocol_ready` is pinned false: DTCR_CROSS_REPO_EXPAND_CONTRACT_READY is admitted by a person against this issue's exit criteria and is never emitted by a run of the protocol being admitted. This schema carries no `examples` and no `x-refusal-controls`: its positive instances are the projections `expand-contract/compile_r2.py` emits and its refusal controls live in `expand-contract/fixtures/schema-controls.json`, both executed by `expand-contract/selftest.py`, because the inventory in `cases.json` that would otherwise have to declare them is outside this lane's write lease.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "receipt_id",
+    "binding_ref",
+    "phases_entered",
+    "terminal_state",
+    "contract",
+    "provider_coexistence",
+    "consumer",
+    "observation",
+    "idempotency",
+    "contraction",
+    "blocked_on",
+    "establishes",
+    "authority"
+  ],
+  "properties": {
+    "schema": {
+      "const": "dtcr/refactor-r2-receipt/v1"
+    },
+    "receipt_id": {
+      "type": "string",
+      "pattern": "^DTCR-R2-[0-9]{3}$"
+    },
+    "binding_ref": {
+      "type": "string",
+      "pattern": "^DTCR-XR-[0-9]{3}$"
+    },
+    "phases_entered": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "The phases this run actually entered. A phase is entered when its lane produced the evidence that phase exists to produce, not when the run reached the point where it would have. E1 is entered only when traffic was observed and C2 only when a Human authorized the contraction, so a run that evaluated both lanes and recorded their absence lists neither.",
+      "items": {
+        "enum": [
+          "C1_CONTRACT_EXPANSION",
+          "A1_PROVIDER_EXPANSION",
+          "A2_CONSUMER_INVERSION",
+          "E1_DUAL_RUN_AND_TELEMETRY",
+          "C2_LEGACY_CONTRACTION"
+        ]
+      }
+    },
+    "last_phase_entered": {
+      "enum": [
+        "C1_CONTRACT_EXPANSION",
+        "A1_PROVIDER_EXPANSION",
+        "A2_CONSUMER_INVERSION",
+        "E1_DUAL_RUN_AND_TELEMETRY",
+        "C2_LEGACY_CONTRACTION"
+      ],
+      "description": "Where the run stopped. Required for a stop, because a truthful stop that does not say how far it got is a stop nobody can resume or audit."
+    },
+    "terminal_state": {
+      "enum": [
+        "CANDIDATE_RECEIPT",
+        "BLOCKED",
+        "STOPPED_WITH_ROLLBACK",
+        "ROLLED_BACK"
+      ],
+      "description": "STOPPED_WITH_ROLLBACK and ROLLED_BACK are two different facts. ROLLED_BACK means every repository was restored; STOPPED_WITH_ROLLBACK means the run stopped and the repositories ended in different states, which is the ordinary outcome of stopping a migration whose whole point is that its sides land separately."
+    },
+    "contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository_binding_id",
+        "adapter",
+        "baseline_commit",
+        "outcome",
+        "runs",
+        "generated_artifacts",
+        "regeneration_comparison",
+        "publication"
+      ],
+      "properties": {
+        "repository_binding_id": {
+          "type": "string",
+          "pattern": "^DTCR-RB-[0-9a-f]{16}$"
+        },
+        "adapter": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "capability_class",
+            "vendored"
+          ],
+          "description": "The contract-adapter capability class this run selected, declared and not vendored. Protobuf is the preferred candidate where it applies and is not universal, so the method admits interface-description classes beside it; a class absent from this list is not a class the method supports, whatever could be written for it.",
+          "properties": {
+            "capability_class": {
+              "enum": [
+                "PROTOBUF",
+                "OPENAPI",
+                "JSON_SCHEMA",
+                "ASYNCAPI"
+              ]
+            },
+            "vendored": {
+              "const": false,
+              "description": "Pinned. No compatibility checker ships behind this protocol; a verdict is an input it consumes."
+            }
+          }
+        },
+        "baseline_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$",
+          "description": "The exact commit the compatibility verdict was taken against. A baseline named as a branch moves, and a verdict against a moving baseline is not reproducible."
+        },
+        "outcome": {
+          "enum": [
+            "NO_BREAKING_CHANGE_DETECTED",
+            "BREAKING_CHANGE_DETECTED",
+            "NOT_APPLICABLE",
+            "PROVIDER_UNAVAILABLE"
+          ],
+          "description": "The last run's outcome, mirrored from the consumed dtcr/contract-compatibility-result/v1 record. PROVIDER_UNAVAILABLE is a legal input and never a clean verdict."
+        },
+        "runs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "description": "Every compatibility run consumed by this record, in order. More than one exists so the ruleset can be compared across them: the same artifacts under a narrower ruleset produce a cleaner verdict, and a verdict quoted without its ruleset survives every later change to it.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "result_id",
+              "outcome",
+              "config_digest",
+              "ruleset_digest"
+            ],
+            "properties": {
+              "result_id": {
+                "type": "string",
+                "pattern": "^DTCR-CK-[0-9]{3}$"
+              },
+              "outcome": {
+                "enum": [
+                  "NO_BREAKING_CHANGE_DETECTED",
+                  "BREAKING_CHANGE_DETECTED",
+                  "NOT_APPLICABLE",
+                  "PROVIDER_UNAVAILABLE"
+                ]
+              },
+              "config_digest": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "ruleset_digest": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            }
+          }
+        },
+        "generated_artifacts": {
+          "type": "array",
+          "uniqueItems": true,
+          "description": "The generated stubs each repository declares, with the digest it declares for them. Two repositories generating from one contract must declare the same digest for the same artifact; disagreement is GENERATED_STUB_DRIFT and is visible inside this record without regenerating anything.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "repository_binding_id",
+              "artifact_name",
+              "declared_digest"
+            ],
+            "properties": {
+              "repository_binding_id": {
+                "type": "string",
+                "pattern": "^DTCR-RB-[0-9a-f]{16}$"
+              },
+              "artifact_name": {
+                "type": "string",
+                "minLength": 1,
+                "not": {
+                  "pattern": "[/\\\\]|^~"
+                }
+              },
+              "declared_digest": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            }
+          }
+        },
+        "regeneration_comparison": {
+          "const": "NOT_EXERCISED",
+          "description": "Pinned. Declared digests agreeing with each other is a statement about this record. Whether either matches what a pinned codegen plugin actually produces needs that plugin, which does not ship behind this protocol."
+        },
+        "publication": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "intent",
+            "rights"
+          ],
+          "properties": {
+            "intent": {
+              "enum": [
+                "NOT_PUBLISHED",
+                "PUBLISHED"
+              ]
+            },
+            "registry": {
+              "type": "string",
+              "minLength": 2
+            },
+            "source_commit": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            },
+            "artifact_digest": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "rights": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "account_access",
+                "content_rights_admission"
+              ],
+              "properties": {
+                "account_access": {
+                  "type": "boolean",
+                  "description": "Whether an account can push to the registry. This is a capability, and the plane below is a permission; they are two planes and one never clears the other."
+                },
+                "content_rights_admission": {
+                  "enum": [
+                    "HUMAN_ADMIT_REQUIRED",
+                    "ADMITTED"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "provider_coexistence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository_binding_id",
+        "legacy_symbol",
+        "new_symbol",
+        "removal_changeset_absent",
+        "runtime"
+      ],
+      "description": "Three facts kept apart on purpose. Two of them are static -- both handlers resolve at the provider's exact commit, and no removal changeset at that commit names either -- and the third is runtime. Static resolution of two symbols says nothing about two surfaces being served at once, and deriving the third from the first two is the shape this record exists to refuse.",
+      "properties": {
+        "repository_binding_id": {
+          "type": "string",
+          "pattern": "^DTCR-RB-[0-9a-f]{16}$"
+        },
+        "legacy_symbol": {
+          "$ref": "#/$defs/symbol_resolution"
+        },
+        "new_symbol": {
+          "$ref": "#/$defs/symbol_resolution"
+        },
+        "removal_changeset_absent": {
+          "const": true,
+          "description": "PROVIDER_REMOVES_LEGACY_BEFORE_CONSUMER_MIGRATION. A run in which a change unit at this head removes the legacy symbol is refused upstream, so this record can only ever carry the absence."
+        },
+        "runtime": {
+          "enum": [
+            "OBSERVED",
+            "NOT_OBSERVED"
+          ],
+          "description": "Whether both surfaces were seen serving. OBSERVED requires a consumer canary receipt bound to an exact deployment; without one the only truthful value is NOT_OBSERVED, however completely both symbols resolve."
+        },
+        "canary_receipt_ref": {
+          "type": "string",
+          "minLength": 2
+        }
+      }
+    },
+    "consumer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository_binding_id",
+        "port_ref",
+        "migration_state"
+      ],
+      "properties": {
+        "repository_binding_id": {
+          "type": "string",
+          "pattern": "^DTCR-RB-[0-9a-f]{16}$"
+        },
+        "port_ref": {
+          "type": "string",
+          "pattern": "^DTCR-PT-[0-9]{3}$"
+        },
+        "migration_state": {
+          "enum": [
+            "MIGRATED",
+            "REVERTED",
+            "NOT_ENTERED"
+          ]
+        },
+        "fallback": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "trigger",
+            "implementing_path",
+            "arrival_state",
+            "arrival_detail"
+          ],
+          "description": "CONSUMER_SWITCH_WITHOUT_FALLBACK. A consumer that switched with no path back turns a provider incident into a consumer outage, and a fallback nothing ever ran is a branch that has never executed.",
+          "properties": {
+            "trigger": {
+              "type": "string",
+              "minLength": 8
+            },
+            "implementing_path": {
+              "type": "string",
+              "minLength": 3,
+              "not": {
+                "pattern": "^(?:file:|/|~)"
+              }
+            },
+            "arrival_state": {
+              "enum": [
+                "EXERCISED",
+                "NOT_EXERCISED"
+              ]
+            },
+            "arrival_detail": {
+              "type": "string",
+              "minLength": 12
+            }
+          }
+        }
+      }
+    },
+    "observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state"
+      ],
+      "description": "The dual-run lane. Three values and no fourth: OBSERVED carries its split, its denominator, its environment, both exact commits and its window; NOT_OBSERVED means the lane was reached and there was nothing to observe; NOT_EXERCISED means the run never reached it. Neither absence may carry a continuity statement, which is TELEMETRY_ABSENCE_PROMOTED_TO_SUCCESS refused at the shape rather than described in prose.",
+      "properties": {
+        "state": {
+          "enum": [
+            "OBSERVED",
+            "NOT_OBSERVED",
+            "NOT_EXERCISED"
+          ]
+        },
+        "split_ratio": {
+          "type": "string",
+          "minLength": 3
+        },
+        "request_denominator": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "environment_id": {
+          "type": "string",
+          "minLength": 2
+        },
+        "provider_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "consumer_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "observation_window": {
+          "type": "string",
+          "minLength": 4
+        },
+        "service_continuity": {
+          "type": "string",
+          "minLength": 4,
+          "description": "Only under OBSERVED. A continuity statement is a claim about a service that served requests, and a lane with no denominator has no requests to have served."
+        }
+      }
+    },
+    "idempotency": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "writes_state",
+        "mechanism",
+        "state"
+      ],
+      "description": "DUAL_RUN_WITHOUT_IDEMPOTENCY. Running two implementations against one arrival duplicates every write the second one makes unless something deduplicates them, and a declared boolean is a claim rather than evidence, so the lane records which mechanism and which arrival exercised it.",
+      "properties": {
+        "writes_state": {
+          "type": "boolean"
+        },
+        "mechanism": {
+          "type": "string",
+          "minLength": 12,
+          "description": "Key derivation, dedupe store, or documented read-only-ness. Written out, because 'idempotent' names a property and not the thing that provides it."
+        },
+        "state": {
+          "enum": [
+            "EXERCISED",
+            "IDEMPOTENCY_DECLARED_NOT_EXERCISED",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "arrival": {
+          "type": "string",
+          "minLength": 8
+        }
+      }
+    },
+    "contraction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "authorization",
+        "no_remaining_callers_proven"
+      ],
+      "description": "`remaining_callers` is optional because a run that stopped before the contraction lane never counted anything, and a required count would have to be filled with a number nobody measured. Present, it drags its denominator in with it.",
+      "properties": {
+        "authorization": {
+          "enum": [
+            "HUMAN_ADMIT_REQUIRED",
+            "ADMITTED"
+          ],
+          "description": "AUTOMATIC_CONTRACTION_OR_MERGE. Two values, and the second one names a person and the exact head they authorized. A caller count of zero is an input to that decision and is never the decision."
+        },
+        "admitter": {
+          "type": "string",
+          "minLength": 2
+        },
+        "authorized_head": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "remaining_callers": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "caller_index": {
+          "$ref": "#/$defs/index_provenance"
+        },
+        "no_remaining_callers_proven": {
+          "const": false,
+          "description": "NO_REMAINING_CALLERS_IN_PARTIAL_INDEX. Zero callers over an index that does not cover every repository is a lower bound on remaining consumers. Absence of evidence is recorded here as exactly that, permanently."
+        }
+      }
+    },
+    "rollback": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "One row per repository binding. A single restored_commit cannot describe a stop that reverted one repository and left the other expanded, which is the ordinary shape of stopping this protocol.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "repository_binding_id",
+          "restored_commit",
+          "disposition",
+          "reason"
+        ],
+        "properties": {
+          "repository_binding_id": {
+            "type": "string",
+            "pattern": "^DTCR-RB-[0-9a-f]{16}$"
+          },
+          "restored_commit": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{40}$",
+            "description": "The commit this repository's tree stands at after the stop. Under NOT_ROLLBACKABLE_DEPLOYED_SURFACE that is the expanded head which was not restored, which is why the commit and the disposition are two fields: one commit with no disposition reads as a restore that never happened."
+          },
+          "disposition": {
+            "enum": [
+              "REVERTED",
+              "NOT_ROLLBACKABLE_DEPLOYED_SURFACE",
+              "NOT_ENTERED"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 12
+          }
+        }
+      }
+    },
+    "blocked_on": {
+      "type": "array",
+      "uniqueItems": true,
+      "description": "A closed list. An open string would let a run block on a sentence, and a sentence cannot be counted across runs.",
+      "items": {
+        "enum": [
+          "CONTRACT_VERDICT_ABSENT",
+          "CONTRACT_BASELINE_BREAKING",
+          "GENERATED_ARTIFACT_REGENERATION_NOT_EXERCISED",
+          "CONSUMER_MIGRATION_INCOMPLETE",
+          "FALLBACK_NOT_EXERCISED",
+          "OBSERVATION_ABSENT",
+          "IDEMPOTENCY_NOT_EXERCISED",
+          "CALLER_INDEX_PARTIAL",
+          "CONTRACTION_NOT_AUTHORIZED"
+        ]
+      }
+    },
+    "establishes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "applied_on_real_codebase",
+        "cross_repository_behavior_equivalence_proven",
+        "service_interruption_absence_proven",
+        "protocol_ready"
+      ],
+      "properties": {
+        "applied_on_real_codebase": {
+          "enum": [
+            "EXERCISED",
+            "NOT_EXERCISED"
+          ],
+          "description": "A state, not a pin. The bounded consumer canary that would move it belongs to the live-canary lane and has never run; typing it as a state rather than a constant false lets that lane record its result without re-cutting this contract, and leaves the value it has today saying exactly what happened."
+        },
+        "cross_repository_behavior_equivalence_proven": {
+          "const": false,
+          "description": "A frozen suite passing on each side bounds the behavior it covers. Equivalence across a transport boundary is a claim about behavior it does not."
+        },
+        "service_interruption_absence_proven": {
+          "const": false,
+          "description": "Pinned. No run of this protocol has watched a service through the change, so no run of it can say the service was not interrupted."
+        },
+        "protocol_ready": {
+          "const": false,
+          "description": "DTCR_CROSS_REPO_EXPAND_CONTRACT_READY is admitted against this issue's exit criteria by a person, naming the exact head and every lane that was absent at it. A compiler able to print its own readiness is a defect."
+        }
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "merge",
+        "release",
+        "production",
+        "contraction",
+        "schema_publication"
+      ],
+      "properties": {
+        "merge": {
+          "const": false
+        },
+        "release": {
+          "const": false
+        },
+        "production": {
+          "const": false
+        },
+        "contraction": {
+          "const": false
+        },
+        "schema_publication": {
+          "const": false
+        }
+      }
+    }
+  },
+  "$defs": {
+    "symbol_resolution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "symbol",
+        "index_id",
+        "index_digest",
+        "completeness"
+      ],
+      "properties": {
+        "symbol": {
+          "type": "string",
+          "minLength": 1
+        },
+        "index_id": {
+          "type": "string",
+          "minLength": 2
+        },
+        "index_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "completeness": {
+          "enum": [
+            "COMPLETE_FOR_ANALYSED_INPUTS",
+            "PARTIAL_LOWER_BOUND"
+          ],
+          "description": "Two values, where the coverage-ceiling vocabulary carries three. UNKNOWN is absent because every index this record names is also digest-pinned, so an index nobody characterised is refused upstream rather than recorded here."
+        }
+      }
+    },
+    "index_provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "index_id",
+        "index_digest",
+        "completeness",
+        "unresolved_symbols",
+        "out_of_index_repositories"
+      ],
+      "description": "The denominator behind a caller count. Named, digest-pinned, with what it failed to resolve and which repositories it never looked at, because a count of zero over an index nobody described is a count over an unknown set.",
+      "properties": {
+        "index_id": {
+          "type": "string",
+          "minLength": 2
+        },
+        "index_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "completeness": {
+          "enum": [
+            "COMPLETE_FOR_ANALYSED_INPUTS",
+            "PARTIAL_LOWER_BOUND"
+          ]
+        },
+        "unresolved_symbols": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "out_of_index_repositories": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "required": [
+          "observation"
+        ],
+        "properties": {
+          "observation": {
+            "required": [
+              "state"
+            ],
+            "properties": {
+              "state": {
+                "const": "OBSERVED"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "observation": {
+            "required": [
+              "split_ratio",
+              "request_denominator",
+              "environment_id",
+              "provider_commit",
+              "consumer_commit",
+              "observation_window"
+            ]
+          }
+        }
+      },
+      "description": "An observation with no split, no denominator, no environment and no window is a sentence about traffic rather than a measurement of it."
+    },
+    {
+      "if": {
+        "required": [
+          "observation"
+        ],
+        "properties": {
+          "observation": {
+            "required": [
+              "state"
+            ],
+            "properties": {
+              "state": {
+                "enum": [
+                  "NOT_OBSERVED",
+                  "NOT_EXERCISED"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "observation": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "service_continuity"
+                  ]
+                },
+                {
+                  "required": [
+                    "request_denominator"
+                  ]
+                },
+                {
+                  "required": [
+                    "split_ratio"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      },
+      "description": "TELEMETRY_ABSENCE_PROMOTED_TO_SUCCESS. An absent lane that carries a continuity statement or a denominator is the exact sentence the blocker names, and it is the sentence that gets quoted downstream."
+    },
+    {
+      "if": {
+        "required": [
+          "terminal_state"
+        ],
+        "properties": {
+          "terminal_state": {
+            "const": "CANDIDATE_RECEIPT"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "observation": {
+            "properties": {
+              "state": {
+                "const": "OBSERVED"
+              }
+            }
+          }
+        }
+      },
+      "description": "A candidate for contraction rests on the dual-run lane having run. With that lane absent the run is blocked, whatever every other lane says."
+    },
+    {
+      "if": {
+        "required": [
+          "terminal_state"
+        ],
+        "properties": {
+          "terminal_state": {
+            "const": "CANDIDATE_RECEIPT"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "blocked_on": {
+            "maxItems": 0
+          }
+        }
+      },
+      "description": "A candidate that names what it is blocked on is a blocked run reported as a candidate."
+    },
+    {
+      "if": {
+        "required": [
+          "terminal_state"
+        ],
+        "properties": {
+          "terminal_state": {
+            "const": "STOPPED_WITH_ROLLBACK"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "rollback",
+          "last_phase_entered"
+        ],
+        "properties": {
+          "blocked_on": {
+            "minItems": 1
+          },
+          "observation": {
+            "properties": {
+              "state": {
+                "enum": [
+                  "NOT_OBSERVED",
+                  "NOT_EXERCISED"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "description": "The truthful stop, typed. It names how far it got, what stopped it, and what state every repository was left in; and it may not claim an observation, because a run that stopped did not finish watching."
+    },
+    {
+      "if": {
+        "required": [
+          "terminal_state"
+        ],
+        "properties": {
+          "terminal_state": {
+            "const": "ROLLED_BACK"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "rollback"
+        ],
+        "properties": {
+          "rollback": {
+            "items": {
+              "properties": {
+                "disposition": {
+                  "const": "REVERTED"
+                }
+              }
+            }
+          }
+        }
+      },
+      "description": "ROLLED_BACK means every repository was restored. A row that was not restored makes it a partial stop, which is a different terminal with a different name."
+    },
+    {
+      "if": {
+        "required": [
+          "terminal_state"
+        ],
+        "properties": {
+          "terminal_state": {
+            "const": "BLOCKED"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "blocked_on": {
+            "minItems": 1
+          }
+        }
+      },
+      "description": "BLOCKED with nothing named is indistinguishable downstream from a run nobody started."
+    },
+    {
+      "if": {
+        "required": [
+          "provider_coexistence"
+        ],
+        "properties": {
+          "provider_coexistence": {
+            "required": [
+              "runtime"
+            ],
+            "properties": {
+              "runtime": {
+                "const": "OBSERVED"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "provider_coexistence": {
+            "required": [
+              "canary_receipt_ref"
+            ]
+          }
+        }
+      },
+      "description": "Runtime coexistence with no canary receipt behind it is the static resolution of two symbols wearing a runtime word."
+    },
+    {
+      "if": {
+        "required": [
+          "consumer"
+        ],
+        "properties": {
+          "consumer": {
+            "required": [
+              "migration_state"
+            ],
+            "properties": {
+              "migration_state": {
+                "const": "MIGRATED"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "consumer": {
+            "required": [
+              "fallback"
+            ]
+          }
+        }
+      },
+      "description": "CONSUMER_SWITCH_WITHOUT_FALLBACK, refused at the shape."
+    },
+    {
+      "if": {
+        "required": [
+          "idempotency"
+        ],
+        "properties": {
+          "idempotency": {
+            "required": [
+              "state"
+            ],
+            "properties": {
+              "state": {
+                "const": "EXERCISED"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "idempotency": {
+            "required": [
+              "arrival"
+            ]
+          }
+        }
+      },
+      "description": "An idempotency lane recorded as exercised with no arrival naming what exercised it is a declaration reported as a run."
+    },
+    {
+      "if": {
+        "required": [
+          "contraction"
+        ],
+        "properties": {
+          "contraction": {
+            "required": [
+              "authorization"
+            ],
+            "properties": {
+              "authorization": {
+                "const": "ADMITTED"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "contraction": {
+            "required": [
+              "admitter",
+              "authorized_head"
+            ]
+          }
+        }
+      },
+      "description": "An admission with no admitter and no exact head is an authorization nobody gave against a tree nobody named."
+    },
+    {
+      "if": {
+        "required": [
+          "contraction"
+        ],
+        "properties": {
+          "contraction": {
+            "required": [
+              "remaining_callers"
+            ],
+            "properties": {
+              "remaining_callers": {
+                "const": 0
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "contraction": {
+            "required": [
+              "caller_index"
+            ]
+          }
+        }
+      },
+      "description": "NO_REMAINING_CALLERS_IN_PARTIAL_INDEX. Zero is the one count that needs its denominator most, because it is the count that reads as proof."
+    },
+    {
+      "if": {
+        "required": [
+          "contract"
+        ],
+        "properties": {
+          "contract": {
+            "required": [
+              "publication"
+            ],
+            "properties": {
+              "publication": {
+                "required": [
+                  "intent"
+                ],
+                "properties": {
+                  "intent": {
+                    "const": "PUBLISHED"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "contract": {
+            "properties": {
+              "publication": {
+                "required": [
+                  "registry",
+                  "source_commit",
+                  "artifact_digest"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "description": "SCHEMA_PUBLISHED_WITHOUT_EXACT_SOURCE. A published schema that cannot be traced to the commit and the bytes it came from is a schema everyone builds against and nobody can reproduce."
+    },
+    {
+      "if": {
+        "required": [
+          "contract"
+        ],
+        "properties": {
+          "contract": {
+            "required": [
+              "publication"
+            ],
+            "properties": {
+              "publication": {
+                "required": [
+                  "rights"
+                ],
+                "properties": {
+                  "rights": {
+                    "required": [
+                      "account_access"
+                    ],
+                    "properties": {
+                      "account_access": {
+                        "const": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "contract": {
+            "properties": {
+              "publication": {
+                "properties": {
+                  "rights": {
+                    "properties": {
+                      "content_rights_admission": {
+                        "const": "ADMITTED"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "description": "BSR_ACCOUNT_ACCESS_PROMOTED_TO_CONTENT_RIGHTS. Being able to push is a capability plane; being allowed to publish the content is a permission plane, and one has never cleared the other."
+    }
+  ]
+}

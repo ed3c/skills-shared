@@ -34,18 +34,18 @@ PR #308 task/schema/semantic/capability reachability + Local Handoff contract
 The Codex control-plane extension is a separate sibling/convergence program:
 
 ```text
-#375 / PR #451  Codex SDK controller/session adapter      SIBLING / UNMERGED CANDIDATE
-#376 / PR #452  GitHub Issue DAG projection              SIBLING / UNMERGED CANDIDATE
-#377 / PR #456  Herdr runtime observer v3                SIBLING / UNMERGED CANDIDATE
-#378 / PR #457  problem-closure ledger v3                SIBLING / UNMERGED CANDIDATE
-PR #380         traceability/document routing foundation  DOCUMENTATION SIBLING
+#375 / PR #451  Codex SDK controller/session adapter      SIBLING / CLOSED_UNMERGED / CONSUMED
+#376 / PR #452  GitHub Issue DAG projection              SIBLING / CLOSED_UNMERGED / CONSUMED
+#377 / PR #456  Herdr runtime observer v3                SIBLING / CLOSED_UNMERGED / CONSUMED
+#378 / PR #457  problem-closure ledger v3                SIBLING / CLOSED_UNMERGED / CONSUMED
+PR #380         traceability/document routing foundation  DOCUMENTATION SIBLING / CLOSED_UNMERGED / CONSUMED
        ↓ exact consumed candidate bytes
-#379 / PR #455  one multi-parent convergence owner       CONVERGENCE CANDIDATE
+#379 / PR #455  one multi-parent convergence owner       MERGED / HUMAN_ADMITTED (ca31e0b1…)
 ```
 
 `#379` may consume exact unmerged sibling bytes because convergence is its job. That does **not** admit or merge those siblings and does not make #375→#376→#377→#378 a serial Stack. A `TRUE_CHILD` edge requires a named byte/contract dependency between the actual child and parent.
 
-Current selected sibling heads are read from GitHub immediately before convergence decisions. The current epoch is documented in `../../docs/traceability/CODEX_SDK_TECH_LEAD_CONTROL_PLANE.md`; this router does not duplicate mutable head SHAs.
+Sibling heads are read from GitHub immediately before any convergence decision. This Wave-2 epoch is now terminal and is documented in `../../docs/traceability/CODEX_SDK_TECH_LEAD_CONTROL_PLANE.md` (pre-admission trace) and `../../docs/traceability/CODEX_SDK_TECH_LEAD_CONTROL_PLANE_ADMISSION.md` (admitted subject); this router does not duplicate mutable head SHAs.
 
 Current mechanism/evidence split:
 

@@ -1,0 +1,59 @@
+{
+  "schema": "dtcr/semantic-context-lane-completion/v1",
+  "issue": 550,
+  "terminal": "DTCR_SEMANTIC_CONTEXT_ADAPTER_VERIFIED",
+  "terminal_scope": "This lane's adapter lease only. It is not the #521 program terminal, and it is not evidence for any live organisational retrieval, any embedding provider, any private carrier, or the end-to-end context-to-Serena causal canary.",
+  "lease": "skills/dual-track-code-review-loop/adapters/semantic-context/**",
+  "base_commit": "5341885f26b5e8e7baf5087a4d661e324f878242",
+  "delivery_mode": "Human-admitted single-push wave: this lane lands locally in an isolated worktree and converges into local main through the Tech Lead session. No per-lane Draft PR, no per-lane hosted gate, no gh call and no push was performed from this worktree. Hosted exact-head gates run once, on the final pushed head, and are owned by the convergence step rather than by this receipt.",
+  "issue_368_state": "NOT_OBSERVED",
+  "issue_368_note": "#368 has zero trace in this checkout and gh calls are prohibited this wave, so non-duplication with its live causal-canary ownership was not confirmed by this worker. This lane proceeds on #550's own stated boundary: it does not claim the end-to-end context-to-Serena causal canary. Live reconciliation is deferred to the Tech Lead or the Human after the final push.",
+  "convergence_handoff": "Directed at #521; #521's live state is not reconfirmed by this worker (gh calls are prohibited under the admitted single-push delivery mode this wave, and the repo-local ISSUE_DAG.json is 182 commits behind current main and internally inconsistent about its own freshness). #521 convergence later wires this adapter's entrypoint into the aggregate route; this lane did not edit tests/run-all.sh, registry.json, docs/INDEX.md or any sibling lease.",
+  "suite_entrypoint": "python3 skills/dual-track-code-review-loop/adapters/semantic-context/selftest.py",
+  "gates": [
+    {"command": "python3 skills/dual-track-code-review-loop/adapters/semantic-context/selftest.py", "exit": 0},
+    {"command": "sh skills/dual-track-code-review-loop/tests/run-all.sh", "exit": 0},
+    {"command": "python3 scripts/check_document_routes.py", "exit": 0},
+    {"command": "python3 scripts/check_guard_controls.py", "exit": 0},
+    {"command": "python3 scripts/check_suite_ci_coverage.py", "exit": 0},
+    {"command": "git diff --check", "exit": 0},
+    {"command": "python3 scripts/check_commit_roles.py --repo-root . --range 5341885f26b5e8e7baf5087a4d661e324f878242..HEAD", "exit": 0}
+  ],
+  "provider_lanes": {
+    "lancedb": "NOT_EXERCISED",
+    "lancedb_reason": "PROVIDER_ABSENT on this host at this commit; import of lancedb raises ModuleNotFoundError. pypi is reachable and the install is an admitted prerequisite, but no install was performed and no LanceDB store has ever been exercised through this port.",
+    "embedding_service": "NOT_EXERCISED",
+    "embedding_service_reason": "The deterministic reference projection is a local pure function. No embedding provider was contacted, no API key exists in this lane, and every projection receipt records transport NOT_EXERCISED with a null exit code."
+  },
+  "network": "NONE, and enforced rather than asserted: selftest.py replaces socket.socket and socket.create_connection with a refusal before it imports the adapter, and its first case proves that guard is armed by trying to open a socket. The default suite requires no key, no service and no socket.",
+  "planted_falsifiers": {
+    "required_by_the_issue": 12,
+    "planted_cases": 41,
+    "how_each_is_proven": "Every planted case names the mechanism it expects, and selftest.py credits the refusal only when the mechanism that actually fired contains that name. Schema-side plants are single-field deltas from an artifact the run itself emitted, or the frozen schema's own x-refusal-controls instance; adapter-side plants are calls the adapter's own guards refuse.",
+    "harness_knockouts": {
+      "observation": "One-time, at this commit, by temporarily mutating the working tree and restoring it. Recorded here because a suite that cannot go red reports the same green as one that passes.",
+      "cases": [
+        {"knockout": "a fixture document's text edited without its digest", "observed_exit": 2, "red_reason": "WRONG_OR_STALE_SOURCE_DIGEST refused by document_digest must be the digest of the registered content"},
+        {"knockout": "the committed deterministic receipt edited", "observed_exit": 2, "red_reason": "the committed deterministic receipt reproduces from this tree, byte for byte"},
+        {"knockout": "issue_368_state removed from this receipt", "observed_exit": 2, "red_reason": "the completion receipt records #368's live state as not observed"},
+        {"knockout": "a resolved address planted in a public receipt", "observed_exit": 2, "red_reason": "PRIVATE_URL_OR_PRIVATE_VALUE_IN_PUBLIC_RECEIPT refused by scan_for_leaks URI scheme"}
+      ]
+    }
+  },
+  "ceilings": [
+    "The reference backend proves the adapter's laws; it does not prove retrieval quality. A hashed-token cosine is a deterministic ranker, not a good one, and nothing here measures whether the rows a real store would return are useful.",
+    "Every document, digest, path, commit and blob in fixtures/public-context-store.json is synthetic and public. The adapter verifies its internal digest binding, not that any named commit, blob or packet exists in any repository.",
+    "No private carrier was read. The private-carrier registration is exercised by reference only, and its content absence is typed CONSUMER_LOCAL_CONTENT_ABSENT rather than proven empty.",
+    "The LanceDB lane binds capability and refuses to answer. No retrieval implementation exists behind it, because no run has ever exercised one; a written-but-unrun implementation would be a state only a test could reach.",
+    "This lane establishes no task pass, no closure, no current policy, no reproduced failure and no deterministic fact. It is not an independent review and not a merge."
+  ],
+  "rollback": "Delete skills/dual-track-code-review-loop/adapters/semantic-context/. Nothing outside that directory was written by this lane, so removing it returns the tree to the base commit.",
+  "establishes": {
+    "adapter_laws_under_the_reference_backend": true,
+    "retrieval_quality": false,
+    "live_organisational_retrieval": false,
+    "provider_lane_exercised": false,
+    "independent_review": false,
+    "task_pass": false
+  }
+}

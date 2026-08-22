@@ -1,0 +1,22 @@
+{
+  "schema": "cadg-materiality-policy/v1",
+  "operating_mode": "GATE",
+  "transition_boundary": "ANY_MATERIAL_PR",
+  "gate_boundaries": ["ANY_MATERIAL_PR"],
+  "strict_missing_packet": true,
+  "metadata_globs": [".agents/cadg/**"],
+  "material_path_globs": [
+    "AGENTS.md",
+    "**/AGENTS.md",
+    "ARCHITECTURE.md",
+    "**/ARCHITECTURE.md",
+    "docs/architecture/**",
+    "**/contracts/**",
+    "**/schemas/**",
+    "**/migrations/**",
+    "**/providers/**",
+    "**/runtime/**",
+    "**/security/**",
+    ".github/workflows/**"
+  ]
+}

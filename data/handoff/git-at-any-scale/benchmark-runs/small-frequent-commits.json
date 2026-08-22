@@ -1,0 +1,69 @@
+{
+  "accepted": 400,
+  "child_cpu_seconds": 0.0614,
+  "consistency_mode": "linearizable_single_node_cas",
+  "consumer_subject": {
+    "bytes": 19872,
+    "committed_to_repository": false,
+    "implementation_relationship": "CLEAN_ROOM",
+    "implementation_sha256": "4ea664cc6bae1d3a999bf4293ad65136821c3a611a498894d428448a1610d127",
+    "name": "refcore (disposable single-node Git-hosting reference core)",
+    "path_outside_repository": "/private/tmp/claude-501/-Users-neon-skills-shared/ba0ee313-3387-4cd5-8e1e-eea11e6f3419/scratchpad/canary-subject/refcore.py",
+    "visibility": "PRIVATE_DISPOSABLE_SCRATCHPAD"
+  },
+  "durability_mode": "fsync_per_record_before_ack",
+  "epoch_subject": {
+    "commit": "5341885f26b5e8e7baf5087a4d661e324f878242",
+    "repository": "ed3c/skills-shared",
+    "rollback_commit": "9fe3c6daf53dcdd61123d5d7a4eeedbdf37b5d7c",
+    "tree": "a18e12507f9e621efd5354f58384eded1f1e2a9a"
+  },
+  "errors_in_denominator": true,
+  "excluded_repetitions": 0,
+  "issue": 534,
+  "latency_ms": {
+    "cas_ref": {
+      "n": 200,
+      "p50": 0.0559,
+      "p95": 0.0886,
+      "p99": 0.1517
+    },
+    "put_obj": {
+      "n": 200,
+      "p50": 0.0621,
+      "p95": 0.0967,
+      "p99": 0.2229
+    }
+  },
+  "log_bytes_written": 138028,
+  "object_bytes": 256,
+  "operations_attempted": 400,
+  "rejected": 0,
+  "repetitions": 1,
+  "run": "small-frequent-commits",
+  "runtime": {
+    "clock_model": "single host monotonic clock, no distributed clock",
+    "cloud_provider": "NONE",
+    "cost_usd": 0.0,
+    "cpu_count": 10,
+    "git_version": "git version 2.50.1 (Apple Git-155)",
+    "machine": "arm64",
+    "network_used": false,
+    "observed_worktree_dirty_paths": 39,
+    "observed_worktree_head": "bca08001c416108f9b83e9325e7bf07149a9281f",
+    "os": "macOS-26.4-arm64-arm-64bit-Mach-O",
+    "pinned_benchmark_host": false,
+    "process_model": "python3 subprocesses; line-JSON over anonymous pipes inherited at spawn; no socket, no listening port",
+    "python": "3.14.6"
+  },
+  "scope": "BOUNDED_TOPOLOGY",
+  "server_stats": {
+    "accepted": 400,
+    "cas_conflicts": 0,
+    "rejected": 0
+  },
+  "throughput_ops_per_second": 4622.4,
+  "timed_out": 0,
+  "topology": "single-node-1-authority-0-replicas",
+  "wall_seconds": 0.0865
+}

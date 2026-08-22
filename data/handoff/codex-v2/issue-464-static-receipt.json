@@ -1,0 +1,18 @@
+{
+  "adapter_state": "STATIC_VALIDATED",
+  "attempt_id": "a01",
+  "base_sha": "5af72fb3a2fc073d2b36da5dbbc2cb9b12c8a842",
+  "base_tree_sha": "eaefc42d34dcf917e420121a38d5eef12de70b4c",
+  "controller_readback_required": true,
+  "evidence_ceiling": "STATIC_CONTRACT_ONLY",
+  "lease_readback": "NOT_EXERCISED",
+  "prompt_digest": "1aac71b0ec2b4f2965dc2940ab57effcbc71f4e9ce993132731c3a0116c3a4a1",
+  "repo": "ed3c/live-464-calc",
+  "schema_version": 1,
+  "sdk_execution": "NOT_EXERCISED",
+  "task_id": "issue-464/T1",
+  "thread_id": null,
+  "thread_policy": "new",
+  "tree_sha": "eaefc42d34dcf917e420121a38d5eef12de70b4c",
+  "worktree": "/private/tmp/claude-501/-Users-neon-skills-shared/6fabfecc-0194-4b92-9f3e-e1d643e57ffd/scratchpad/live-464-calc"
+}

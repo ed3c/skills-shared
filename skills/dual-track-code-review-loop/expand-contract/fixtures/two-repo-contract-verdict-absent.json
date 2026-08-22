@@ -1,0 +1,165 @@
+{
+  "schema": "dtcr/refactor-r2-request/v1",
+  "_note": "No verdict was produced at all, which is a different fact from a clean one. The OpenAPI capability class does not apply to this contract and the checker that would apply is not installed here; the Buf adapter is another issue's path lease, so this run consumes an absence rather than landing one. Nothing after C1 was entered, and both rollback rows say so.",
+  "binding": {
+    "repositories": [
+      {
+        "repository_binding_id": "DTCR-RB-01c4af034718c3ee",
+        "role": "PROVIDER",
+        "subject_commit": "01c4af034718c3ee98ee038cf41fa37af57ffd41",
+        "subject_tree": "15fb5b9e05c2e0ba858d7c247ead55141eb2484c",
+        "ancestry_within_repository": [
+          "c72cf1065daa2d05182569419a9d1ea8968219c3"
+        ]
+      },
+      {
+        "repository_binding_id": "DTCR-RB-80aad7defedadfc2",
+        "role": "CONSUMER",
+        "subject_commit": "80aad7defedadfc2006767ec83f05b1be9dbed69",
+        "subject_tree": "959cdc2b382f20372525476addfe9cd83dfd5b6e",
+        "ancestry_within_repository": [
+          "3db7160c61851924b7dbb2778389da6bca6b8edd"
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "from_repository_binding_id": "DTCR-RB-01c4af034718c3ee",
+        "to_repository_binding_id": "DTCR-RB-80aad7defedadfc2"
+      }
+    ]
+  },
+  "contract": {
+    "repository_binding_id": "DTCR-RB-01c4af034718c3ee",
+    "adapter": {
+      "capability_class": "OPENAPI"
+    },
+    "baseline_commit": "c72cf1065daa2d05182569419a9d1ea8968219c3",
+    "compatibility_runs": [
+      {
+        "schema": "dtcr/contract-compatibility-result/v1",
+        "result_id": "DTCR-CK-003",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-01c4af034718c3ee",
+          "commit": "01c4af034718c3ee98ee038cf41fa37af57ffd41",
+          "tree": "15fb5b9e05c2e0ba858d7c247ead55141eb2484c"
+        },
+        "baseline": {
+          "commit": "c72cf1065daa2d05182569419a9d1ea8968219c3",
+          "artifact_name": "order_service.openapi",
+          "artifact_digest": "6da03eb1f4a4325c437f8a45021b00ab2c0341e2294836fd09d9f198aa5e14c2"
+        },
+        "candidate": {
+          "artifact_name": "order_service.openapi",
+          "artifact_digest": "d123458d0919a5716135432d77c1ef2752a54e7df98dcee52fc3f8fb5f8405e7"
+        },
+        "provider": {
+          "provider_binding_id": "DTCR-PB-eddd1b75784b4267",
+          "executable_name": "interface-compatibility-checker",
+          "version": "0.0.0-fixture-not-resolved",
+          "executable_sha256": "04587cece0b49c8ff8487cad3ba827aabbdb4d5798d3f5f34246c845b7b14039",
+          "config_digest": "1317b9fea80604757b5a0f103bda20fe1407e603bc38650e54afffe0d0faf63c",
+          "ruleset_digest": "eddd1b75784b42672f2a2faf6c1a470a3736e6fd26c66e215826ff120b498956"
+        },
+        "outcome": "NOT_APPLICABLE",
+        "findings": [],
+        "grants": {
+          "deployment": false,
+          "merge": false,
+          "release": false,
+          "task_pass": false
+        },
+        "rationale": "the declared OpenAPI capability class does not describe a Protobuf service contract, so no rule in its ruleset has anything to judge"
+      },
+      {
+        "schema": "dtcr/contract-compatibility-result/v1",
+        "result_id": "DTCR-CK-004",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-01c4af034718c3ee",
+          "commit": "01c4af034718c3ee98ee038cf41fa37af57ffd41",
+          "tree": "15fb5b9e05c2e0ba858d7c247ead55141eb2484c"
+        },
+        "baseline": {
+          "commit": "c72cf1065daa2d05182569419a9d1ea8968219c3",
+          "artifact_name": "order_service.openapi",
+          "artifact_digest": "6da03eb1f4a4325c437f8a45021b00ab2c0341e2294836fd09d9f198aa5e14c2"
+        },
+        "candidate": {
+          "artifact_name": "order_service.openapi",
+          "artifact_digest": "d123458d0919a5716135432d77c1ef2752a54e7df98dcee52fc3f8fb5f8405e7"
+        },
+        "provider": {
+          "provider_binding_id": "DTCR-PB-eddd1b75784b4267",
+          "executable_name": "interface-compatibility-checker",
+          "version": "0.0.0-fixture-not-resolved",
+          "executable_sha256": "04587cece0b49c8ff8487cad3ba827aabbdb4d5798d3f5f34246c845b7b14039",
+          "config_digest": "1317b9fea80604757b5a0f103bda20fe1407e603bc38650e54afffe0d0faf63c",
+          "ruleset_digest": "eddd1b75784b42672f2a2faf6c1a470a3736e6fd26c66e215826ff120b498956"
+        },
+        "outcome": "PROVIDER_UNAVAILABLE",
+        "findings": [],
+        "grants": {
+          "deployment": false,
+          "merge": false,
+          "release": false,
+          "task_pass": false
+        },
+        "rationale": "no compatibility checker executable resolves on this host, so the lane produced no verdict; an absent provider is never a clean verdict"
+      }
+    ],
+    "generated_artifacts": [],
+    "publication": {
+      "intent": "NOT_PUBLISHED",
+      "rights": {
+        "account_access": false,
+        "content_rights_admission": "HUMAN_ADMIT_REQUIRED"
+      }
+    }
+  },
+  "provider": {
+    "repository_binding_id": "DTCR-RB-01c4af034718c3ee",
+    "legacy_symbol": {
+      "symbol": "OrderService.GetOrder",
+      "index_id": "fixture-provider-symbol-index",
+      "index_digest": "39fc7c57823ed3393f25694903d25a426ef3c93d43f0cdc5d7198c153b141197",
+      "completeness": "PARTIAL_LOWER_BOUND"
+    },
+    "new_symbol": {
+      "symbol": "OrderService.GetOrderDetail",
+      "index_id": "fixture-provider-symbol-index",
+      "index_digest": "39fc7c57823ed3393f25694903d25a426ef3c93d43f0cdc5d7198c153b141197",
+      "completeness": "PARTIAL_LOWER_BOUND"
+    },
+    "removal_changesets": [],
+    "runtime": "NOT_OBSERVED"
+  },
+  "consumer": {
+    "repository_binding_id": "DTCR-RB-80aad7defedadfc2",
+    "port_ref": "DTCR-PT-001",
+    "migration_state": "NOT_ENTERED"
+  },
+  "observation": {
+    "state": "NOT_EXERCISED"
+  },
+  "idempotency": {
+    "writes_state": false,
+    "mechanism": "the dual-run lane was never entered and the only path this run would have doubled is a read; documented read-only-ness, not a dedupe store"
+  },
+  "contraction": {
+    "authorization": "HUMAN_ADMIT_REQUIRED"
+  },
+  "rollback": [
+    {
+      "repository_binding_id": "DTCR-RB-01c4af034718c3ee",
+      "restored_commit": "01c4af034718c3ee98ee038cf41fa37af57ffd41",
+      "disposition": "NOT_ENTERED",
+      "reason": "no phase after the contract binding touched this repository; its tree stands where the run found it"
+    },
+    {
+      "repository_binding_id": "DTCR-RB-80aad7defedadfc2",
+      "restored_commit": "80aad7defedadfc2006767ec83f05b1be9dbed69",
+      "disposition": "NOT_ENTERED",
+      "reason": "the consumer was never entered, so there is nothing here to revert and nothing to leave standing"
+    }
+  ]
+}

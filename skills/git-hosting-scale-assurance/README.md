@@ -6,7 +6,8 @@ Portable Method-Plane verifier for Git-hosting evidence. Parent problem contract
 
 | Path | Owner | Output | Ceiling |
 |---|---|---|---|
-| `SKILL.md` | #532 | portable procedure and stop laws | method only |
+| `SKILL.md` | #532 | portable procedure, `CORE-LAW-001..005`, stop laws | method only |
+| `modules/domain-profile.md` | #532 | backend/runtime/source-proposal binding and lane owners | binding only |
 | `references/hosting-assurance.schema.json` | #532 | closed evidence-packet interface | contract only |
 | `scripts/check_hosting_assurance.py` | #532 | stable semantic refusal result | deterministic only |
 | `tests/` | #532 | positive/hollow/mutation denominator | fixture evidence only |

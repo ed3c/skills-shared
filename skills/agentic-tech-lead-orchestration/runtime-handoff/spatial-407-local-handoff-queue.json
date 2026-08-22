@@ -1,4 +1,11 @@
 {
+  "schema_version": "agentic-tech-lead/local-handoff-queue/v1",
+  "subject": {
+    "repository": "ed3c/skills-shared",
+    "commit": "5341885f26b5e8e7baf5087a4d661e324f878242",
+    "tree": "a18e12507f9e621efd5354f58384eded1f1e2a9a",
+    "rollback_commit": "9fe3c6daf53dcdd61123d5d7a4eeedbdf37b5d7c"
+  },
   "authority": {
     "automation_forbidden": [
       "merge",
@@ -13,86 +20,122 @@
       "promotion",
       "rollback",
       "permission_change",
-      "semantic_conflict_resolution"
+      "semantic_conflict_resolution",
+      "independent_shadow_identity_admission"
     ]
   },
   "current": {
-    "active_item": "spatial-407-provenance-rebuild",
+    "active_item": "spatial-411-live-shadow-canary",
     "state": "ACTIVE"
   },
   "items": [
     {
+      "id": "spatial-407-provenance-superseded-by-419-replay",
+      "task_ref": "issues-407-408-409-410-main-admission-ACHIEVED-BY-ALTERNATE-ROUTE-pr-412-CLOSED-unmerged",
+      "state": "COMPLETE",
       "entry": {
         "predecessor": null,
+        "required_subject_commit": "5341885f26b5e8e7baf5087a4d661e324f878242",
         "required_capabilities": [
-          "clean-local-clone-or-trusted-local-git",
-          "repository-required-machine-author-identity",
-          "git-history-rebuild-or-squash",
-          "python3",
           "exact-main-and-source-tree-readback",
-          "github-exact-head-workflow-readback"
+          "git-ancestry-readback"
+        ]
+      },
+      "runtime_lane": {
+        "class": "LOCAL_FORGE",
+        "commands": [
+          {
+            "argv": [
+              "git",
+              "merge-base",
+              "--is-ancestor",
+              "45dfac83c377ce2e3df0ff5fc7d9e005173b1d43",
+              "5341885f26b5e8e7baf5087a4d661e324f878242"
+            ],
+            "cwd": ".",
+            "timeout_seconds": 60,
+            "environment_names": []
+          },
+          {
+            "argv": [
+              "python3",
+              "skills/agentic-tech-lead-orchestration/scripts/assert_issue_closure_contract.py",
+              "skills/agentic-tech-lead-orchestration/references/closure-audit/issue-568.json"
+            ],
+            "cwd": ".",
+            "timeout_seconds": 120,
+            "environment_names": []
+          }
         ],
-        "required_subject_commit": "5ac05420dec16ca9c7999ea18c9e061980ef334a"
+        "unresolved_operations": [],
+        "live_evidence_required": false
       },
-      "exit": {
-        "cleanup_required": true,
-        "required_verdict": "PASS",
-        "requires_receipt": true
-      },
-      "id": "spatial-407-provenance-rebuild",
-      "next": "spatial-411-live-shadow-canary",
       "receipt": {
+        "path": "skills/agentic-tech-lead-orchestration/references/closure-audit/issue-568.json",
+        "schema": "agentic-tech-lead/issue-closure-contract/v1",
+        "required_states": [
+          "PASS",
+          "FAIL",
+          "ABSENT",
+          "HUMAN_ADMIT_REQUIRED"
+        ],
         "forbidden_promotions": [
           "source_tree_green_to_main_admitted_without_provenance_gate",
           "connector_commit_to_human_or_local_machine_identity",
           "rewritable_branch_commit_to_known_unclassified_history",
           "skill_suites_green_to_skill_eval_contract_pass",
-          "candidate_main_compatibility_to_merged_on_main"
-        ],
-        "path": "data/handoff/spatial-407/publication-provenance-receipt.json",
-        "required_states": [
-          "PASS",
-          "FAIL",
-          "SKIPPED_BY_POLICY",
-          "HUMAN_ADMIT_REQUIRED"
-        ],
-        "schema": "agentic-tech-lead/spatial-407-publication-provenance/v1"
-      },
-      "runtime_lane": {
-        "class": "LOCAL_FORGE",
-        "commands": [],
-        "live_evidence_required": false,
-        "unresolved_operations": [
-          {
-            "operation_id": "rebuild-pr-412-on-current-main-with-compliant-machine-provenance",
-            "required_output": "CONCRETE_COMMAND_CONTRACT",
-            "resolver_source": "Current main, PR #412 exact source tree, root and nearest AGENTS/README, evals/commit-roles.json, scripts/check_commit_roles.py, current Skill Eval Contract workflow, and Git Town publication rules. Preserve the exact intended #407 tree, rebind if main moved, use the actual local host identity and trailers, then obtain exact-head Skill Suites + Shared Skills Infra + Skill Eval Contract + Git Town receipts. Do not add rewritable connector commits to known_unclassified and do not weaken or move provenance gates."
-          }
+          "candidate_main_compatibility_to_merged_on_main",
+          "closed_unmerged_pr_to_rebuild_still_required"
         ]
       },
-      "state": "ACTIVE",
-      "task_ref": "issues-407-408-409-410-pr-412-main-admission"
+      "exit": {
+        "requires_receipt": true,
+        "required_verdict": "PASS",
+        "cleanup_required": false
+      },
+      "next": "spatial-411-live-shadow-canary"
     },
     {
+      "id": "spatial-411-live-shadow-canary",
+      "task_ref": "issue-411-live-independent-shadow-case-delta-canary",
+      "state": "ACTIVE",
       "entry": {
-        "predecessor": "spatial-407-provenance-rebuild",
+        "predecessor": "spatial-407-provenance-superseded-by-419-replay",
+        "required_subject_commit": "5341885f26b5e8e7baf5087a4d661e324f878242",
         "required_capabilities": [
           "admitted-main-containing-spatial-407-static-bytes",
           "independent-builder-and-shadow-runtime-identities",
           "exact-case-graph-digest-binding",
           "migration-copy-semantic-loss-canary",
           "timestamped-freshness-and-oracle-readback"
+        ]
+      },
+      "runtime_lane": {
+        "class": "MIXED",
+        "commands": [],
+        "unresolved_operations": [
+          {
+            "operation_id": "materialize-independent-builder-shadow-canary",
+            "resolver_source": "Issue #411, this queue's subject, spatial integration README/AGENTS, architecture-watch-loop, ICPG case graph/checker, Tech Lead case-obligation gate, exact Builder/Shadow host capabilities, and repository evidence policy. Plant interface-compatible source decision-branch loss; the Shadow must surface SEMANTIC_PARITY_DELTA or CASE_COVERAGE_DELTA before publication eligibility without writing Builder implementation bytes.",
+            "required_output": "CONCRETE_COMMAND_CONTRACT"
+          },
+          {
+            "operation_id": "admit-independent-builder-and-shadow-identities",
+            "resolver_source": "Human admission of two distinct runtime identities on separate sessions/hosts, since the item declares live_evidence_required and a Builder self-report cannot stand in for an independent Shadow observation. No such pair is admitted at this subject, so the live canary remains NOT_EXERCISED and no command can be bound.",
+            "required_output": "CONCRETE_COMMAND_CONTRACT"
+          }
         ],
-        "required_subject_commit": "5ac05420dec16ca9c7999ea18c9e061980ef334a"
+        "live_evidence_required": true
       },
-      "exit": {
-        "cleanup_required": true,
-        "required_verdict": "PASS",
-        "requires_receipt": true
-      },
-      "id": "spatial-411-live-shadow-canary",
-      "next": null,
       "receipt": {
+        "path": "data/handoff/spatial-407/live-shadow-case-delta-receipt.json",
+        "schema": "spatial-loop/live-shadow-case-delta-receipt/v1",
+        "required_states": [
+          "PASS",
+          "FAIL",
+          "NOT_EXERCISED",
+          "HUMAN_ADMIT_REQUIRED"
+        ],
         "forbidden_promotions": [
           "builder_self_report_to_independent_shadow_observation",
           "same_context_to_independent_shadow_without_provenance",
@@ -101,37 +144,14 @@
           "static_fixture_to_live_runtime_receipt",
           "stale_case_graph_after_code_movement_to_current_subject_binding",
           "shadow_implementation_write_to_independent_shadow_observation"
-        ],
-        "path": "data/handoff/spatial-407/live-shadow-case-delta-receipt.json",
-        "required_states": [
-          "PASS",
-          "FAIL",
-          "NOT_EXERCISED",
-          "HUMAN_ADMIT_REQUIRED"
-        ],
-        "schema": "spatial-loop/live-shadow-case-delta-receipt/v1"
-      },
-      "runtime_lane": {
-        "class": "MIXED",
-        "commands": [],
-        "live_evidence_required": true,
-        "unresolved_operations": [
-          {
-            "operation_id": "materialize-independent-builder-shadow-canary",
-            "required_output": "CONCRETE_COMMAND_CONTRACT",
-            "resolver_source": "Issue #411, current admitted main, spatial integration README/AGENTS, architecture-watch-loop, ICPG case graph/checker, Tech Lead case-obligation gate, exact Builder/Shadow host capabilities, and repository evidence policy. Plant interface-compatible source decision-branch loss; Shadow must surface SEMANTIC_PARITY_DELTA or CASE_COVERAGE_DELTA before publication eligibility without writing Builder implementation bytes."
-          }
         ]
       },
-      "state": "BLOCKED_BY_PREDECESSOR",
-      "task_ref": "issue-411-live-independent-shadow-case-delta-canary"
+      "exit": {
+        "requires_receipt": true,
+        "required_verdict": "PASS",
+        "cleanup_required": true
+      },
+      "next": null
     }
-  ],
-  "schema_version": "agentic-tech-lead/local-handoff-queue/v1",
-  "subject": {
-    "commit": "5ac05420dec16ca9c7999ea18c9e061980ef334a",
-    "repository": "ed3c/skills-shared",
-    "rollback_commit": "88ce642a7f198d88019aa8ae19e63631ae4999c2",
-    "tree": "35440bda2378a821eed2957066610c38100e4cf2"
-  }
+  ]
 }

@@ -14,17 +14,20 @@ This directory is the zero-context entry for the Cursor **Git at any scale** aud
 8. `skills/agentic-tech-lead-orchestration/runtime-handoff/git-at-any-scale-local-handoff-queue.json`.
 9. Current GitHub PR/open-writer state and exact workflow receipts before any state transition.
 
-## Current admission epoch — 2026-08-21
+## Current admission epoch — restamped 2026-08-22
 
 ```text
-main                                    174009203a3ff9bd6ebc4010bc6cab7232dd44a4
+main                                    5341885f26b5e8e7baf5087a4d661e324f878242
+tree                                    a18e12507f9e621efd5354f58384eded1f1e2a9a
+rollback                                9fe3c6daf53dcdd61123d5d7a4eeedbdf37b5d7c
+main (2026-08-21 compile subject)       174009203a3ff9bd6ebc4010bc6cab7232dd44a4  HISTORICAL, 182 behind
 D1 preparation                          PR #539 / MERGED
 C1 implementation                       PR #542 / MERGED — #532 issue stays OPEN
 C1 exact head (as merged)               196a75ac04f6ad2c9a6e50b0645d71fea9bf43e3
 C1 deterministic gate                   tests/run-all.sh -> PASS positive=1 mutations=20/20 (real run, this head)
 C1 issue-contract denominator           still INCOMPLETE (operation-history/durability/ref/cache/gossip/compaction/recovery/benchmark receipt families remain unbuilt)
-L1 physical runtime                     NOT_EXERCISED / #534 OPEN
-S1 terminal independent Shadow          NOT_EXERCISED / #535 OPEN, blocked on #534
+L1 physical runtime                     EXECUTED_AT_CLEAN_ROOM_CEILING / #534 OPEN (single-node canary receipts under data/handoff/git-at-any-scale/; external-runtime claims stay NOT_EXERCISED)
+S1 terminal independent Shadow          FRESH_CONTEXT_HOLD / #535 OPEN (issue-535-shadow-receipt.json, HUMAN_ADMIT_REQUIRED; identity independence unmet)
 ```
 
 Do not close #532 because PR #542 merged. A merged branch closes its own path lease, not the issue's contract denominator. #532 requires separate operation-history/durability/ref/read/cache/gossip/compaction/recovery/benchmark contracts and the positive/hollow/concurrent/fault fixture denominator stated in the issue. The merged candidate supplies a real, tested aggregate schema/checker and 20 named mutations, but it has not earned the issue terminal.
@@ -69,7 +72,9 @@ merge/release/provider/account action inferred without Human Admit
 
 ## Writer law
 
-Current convergence must obey one writer per mutable shared path. At the 2026-08-21 readback, open Draft PRs #412 and #419 still both wrote `skills/git-town-stacked-pr-worker/README.md`; therefore this Git-at-any-scale lease owns only the dedicated molecular-index README, not the canonical Git Town README, and does not touch root `README.md`/`AGENTS.md`/`docs/INDEX.md`. (2026-08-22 reconciliation: PRs #412 and #419 are CLOSED, not merged — their content landed via replayed carriers on `main`, so that writer contention no longer exists.) Issue #536's final shared-path convergence at those root paths remains a separate, not-yet-done writer's work.
+Current convergence must obey one writer per mutable shared path. At the 2026-08-22 readback (main `5341885f`) PRs #412 and #419 are both CLOSED unmerged — #412 `SUPERSEDED_BY_#419`, #419 `CONSUMED`, both landed via PR #573 (commit `9fe3c6d`), per `skills/agentic-tech-lead-orchestration/references/closure-audit/issue-568.json:17-18,24`. The path-writer conflict at `skills/git-town-stacked-pr-worker/README.md` is therefore cleared, and #536's shared-path convergence at root `README.md`/`AGENTS.md`/`docs/INDEX.md` is unblocked and currently **unowned** — assign a named writer before the next convergence wave. This lease still owns only the dedicated molecular-index README and this directory; the block is lifted, the lease is not widened by default.
+
+The earlier reading — open Draft PRs #412/#419 contending for that path at the 2026-08-21 readback — is retained here as the dated observation it was; it is no longer current.
 
 PR #542 was path-disjoint and owned only `skills/git-hosting-scale-assurance/**`; it merged as a sibling implementation atom, not as a Git child of #539. Both are now merged, but merging does not retroactively create ancestry between them.
 

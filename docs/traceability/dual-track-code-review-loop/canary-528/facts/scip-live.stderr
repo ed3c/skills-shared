@@ -1,0 +1,19 @@
+Traceback (most recent call last):
+  File [35m"/Users/neon/skills-shared/.claude/worktrees/agent+dtcr-impl-wave/skills/dual-track-code-review-loop/adapters/scip/adapter.py"[0m, line [35m1503[0m, in [35m<module>[0m
+    raise SystemExit([31mmain[0m[1;31m()[0m)
+                     [31m~~~~[0m[1;31m^^[0m
+  File [35m"/Users/neon/skills-shared/.claude/worktrees/agent+dtcr-impl-wave/skills/dual-track-code-review-loop/adapters/scip/adapter.py"[0m, line [35m1480[0m, in [35mmain[0m
+    bundle = run_live(
+        repo=args.repo.resolve(),
+    ...<4 lines>...
+        receipt_path=args.receipt.resolve() if args.receipt else None,
+    )
+  File [35m"/Users/neon/skills-shared/.claude/worktrees/agent+dtcr-impl-wave/skills/dual-track-code-review-loop/adapters/scip/adapter.py"[0m, line [35m1252[0m, in [35mrun_live[0m
+    config_bytes = (package_dir / "pyrightconfig.json").read_bytes()
+  File [35m"/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/pathlib/__init__.py"[0m, line [35m777[0m, in [35mread_bytes[0m
+    with [31mself.open[0m[1;31m(mode='rb', buffering=0)[0m as f:
+         [31m~~~~~~~~~[0m[1;31m^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  File [35m"/opt/homebrew/Cellar/python@3.14/3.14.6/Frameworks/Python.framework/Versions/3.14/lib/python3.14/pathlib/__init__.py"[0m, line [35m771[0m, in [35mopen[0m
+    return [31mio.open[0m[1;31m(self, mode, buffering, encoding, errors, newline)[0m
+           [31m~~~~~~~[0m[1;31m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[1;35mFileNotFoundError[0m: [35m[Errno 2] No such file or directory: '/private/tmp/claude-501/-Users-neon-skills-shared/d4ad227a-6352-4bfb-8ddc-f80eec30efaf/scratchpad/canary-528/consumer/scripts/gates/controlled_language_binding/pyrightconfig.json'[0m

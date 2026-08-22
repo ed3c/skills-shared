@@ -1,0 +1,201 @@
+{
+  "absences": {
+    "DTCR-DOC-006": "CONSUMER_LOCAL_CONTENT_ABSENT"
+  },
+  "adapter": {
+    "backend": "REFERENCE_IN_MEMORY",
+    "name": "dtcr-semantic-context",
+    "version": "1.0.0"
+  },
+  "consumed_rows": 5,
+  "consumed_schemas": [
+    "semantic-document",
+    "source-back-reference",
+    "projection-receipt",
+    "retrieval-query",
+    "retrieval-result",
+    "consumed-context-row",
+    "semantic-freshness-ceiling",
+    "semantic-index-lifecycle-receipt"
+  ],
+  "coverage": {
+    "document_kinds": [
+      "DECISION_RECORD",
+      "INCIDENT_REVIEW",
+      "PRIOR_REFACTOR_OUTCOME",
+      "SECURITY_ADVISORY",
+      "SERVICE_OBJECTIVE",
+      "TELEMETRY_BASELINE"
+    ],
+    "lanes": [
+      "HYBRID",
+      "KEYWORD",
+      "NOT_APPLICABLE",
+      "VECTOR"
+    ],
+    "reference_kinds": [
+      "LEDGER_EVENT",
+      "REPOSITORY_BLOB",
+      "SOURCE_PACKET"
+    ],
+    "visibility_classes": [
+      "PRIVATE_CARRIER",
+      "PUBLIC_TREE"
+    ]
+  },
+  "establishes": {
+    "current_policy": false,
+    "deterministic_fact": false,
+    "provider_lane_exercised": false,
+    "reproduced_failure": false,
+    "retrieval_quality": false,
+    "semantic_correctness": false,
+    "task_pass": false
+  },
+  "fixture": {
+    "back_references": 9,
+    "digest": "18c3b238df10a1f6b697a6a9573aed4051d06abf43e3a221ec48c5b7b01eb035",
+    "documents": 9,
+    "freshness_ceilings": 9,
+    "path": "skills/dual-track-code-review-loop/adapters/semantic-context/fixtures/public-context-store.json"
+  },
+  "index": {
+    "index_digest": "521c979cff9d42ab4992428b865d653f1e8ea75a426f7d1a79a257e293ebb4cf",
+    "index_schema_digest": "387b6e0b80a0cfed5b5ede12742c6372b2df27d1d346f92ae4e857ee50bd864d",
+    "projection_receipts": 16,
+    "rows": 16
+  },
+  "lifecycle": [
+    {
+      "changes": {
+        "closure_state": "UNCHANGED",
+        "task_admission": "UNCHANGED",
+        "technical_evidence": "NO_NEW_EVIDENCE"
+      },
+      "index_digest_after": "521c979cff9d42ab4992428b865d653f1e8ea75a426f7d1a79a257e293ebb4cf",
+      "index_digest_before": "521c979cff9d42ab4992428b865d653f1e8ea75a426f7d1a79a257e293ebb4cf",
+      "lifecycle_receipt_id": "DTCR-LC-001",
+      "operation": "REBUILD"
+    },
+    {
+      "changes": {
+        "closure_state": "UNCHANGED",
+        "task_admission": "UNCHANGED",
+        "technical_evidence": "NO_NEW_EVIDENCE"
+      },
+      "index_digest_after": "INDEX_ABSENT_AFTER_DELETE",
+      "index_digest_before": "521c979cff9d42ab4992428b865d653f1e8ea75a426f7d1a79a257e293ebb4cf",
+      "lifecycle_receipt_id": "DTCR-LC-002",
+      "operation": "DELETE"
+    }
+  ],
+  "network": "NONE. The reference backend is a pure function of the committed fixture; no socket, no API key and no embedding service is involved in this lane.",
+  "projection": {
+    "algorithm": "dtcr-reference-token-hash-v1: lowercase ascii word tokens of the chunk, each token hashed with sha256 and folded into DIMENSION buckets by the first four bytes of its digest, one count per occurrence, L2-normalised, components rounded to 9 decimals",
+    "dimension": 64,
+    "model_digest": "64ce19d60042bf07d4ac78903d18211323fd64abd34b0bf896241f17229cf50e",
+    "model_id": "dtcr-reference-token-hash-v1",
+    "provider_binding_id": "DTCR-PB-6ad2f1c40be95837",
+    "transport": "NOT_EXERCISED"
+  },
+  "queries": [
+    {
+      "consumed_ranks": [
+        1,
+        2
+      ],
+      "demoted_by_supersession": [],
+      "lane": "HYBRID",
+      "name": "domain-isolation",
+      "outcome": "ROWS_RETURNED",
+      "query_id": "DTCR-RQ-001",
+      "result_digest": "4fb6a07052090eaf04d69eb9eb36d76d032b6e46bdd517ba445f57d69977fc07",
+      "result_id": "DTCR-RR-001",
+      "rows": [
+        {
+          "document_ref": "DTCR-DOC-001",
+          "rank": 1,
+          "score": 0.694341
+        },
+        {
+          "document_ref": "DTCR-DOC-009",
+          "rank": 2,
+          "score": 0.666667
+        }
+      ],
+      "top_k": 3
+    },
+    {
+      "consumed_ranks": [
+        1,
+        2
+      ],
+      "demoted_by_supersession": [
+        "DTCR-DOC-002"
+      ],
+      "lane": "VECTOR",
+      "name": "checkout-persistence",
+      "outcome": "ROWS_RETURNED",
+      "query_id": "DTCR-RQ-002",
+      "result_digest": "ab33c4adaa3e2b01e8e9cba17c08197e58ea4894b1d9a1e6480406fb2bc8deeb",
+      "result_id": "DTCR-RR-002",
+      "rows": [
+        {
+          "document_ref": "DTCR-DOC-003",
+          "rank": 1,
+          "score": 0.635001
+        },
+        {
+          "document_ref": "DTCR-DOC-005",
+          "rank": 2,
+          "score": 0.359573
+        },
+        {
+          "document_ref": "DTCR-DOC-002",
+          "rank": 3,
+          "score": 0.788263
+        },
+        {
+          "document_ref": "DTCR-DOC-008",
+          "rank": 4,
+          "score": 0.281718
+        }
+      ],
+      "top_k": 4
+    },
+    {
+      "consumed_ranks": [
+        1
+      ],
+      "demoted_by_supersession": [],
+      "lane": "KEYWORD",
+      "name": "scheduler-stall",
+      "outcome": "ROWS_RETURNED",
+      "query_id": "DTCR-RQ-003",
+      "result_digest": "19b60b060bddca2ac3ac0afeed34f16f8aafbbc6cca6d5ca129354a7167dfe42",
+      "result_id": "DTCR-RR-003",
+      "rows": [
+        {
+          "document_ref": "DTCR-DOC-004",
+          "rank": 1,
+          "score": 0.719147
+        }
+      ],
+      "top_k": 2
+    },
+    {
+      "consumed_ranks": [],
+      "demoted_by_supersession": [],
+      "lane": "NOT_APPLICABLE",
+      "name": "mechanical-rename",
+      "outcome": "NOT_APPLICABLE",
+      "query_id": "DTCR-RQ-004",
+      "result_digest": "3859f2d7b2a43d0d52ad01d6c48a45083ec792c774b47621b7d3bfccaec61ce0",
+      "result_id": "DTCR-RR-004",
+      "rows": [],
+      "top_k": "NOT_APPLICABLE"
+    }
+  ],
+  "schema": "dtcr/semantic-context-reference-receipt/v1",
+  "task_admission_digest_after_lifecycle": "188c8ffaf4b3ee8f9177bcacf587f5a96c5d846b75bff770a5d45aec6bcf637b"
+}

@@ -1,0 +1,165 @@
+{
+  "acked_baseline_loss_count": 0,
+  "acknowledged_baseline_operations_replayed": 16,
+  "acknowledged_operation_loss_count": 0,
+  "acknowledged_operations_at_the_kill_boundary": 2,
+  "acknowledged_operations_total_denominator": 18,
+  "boundaries": [
+    "pre_write",
+    "post_write_pre_fsync",
+    "post_fsync_pre_ack",
+    "post_ack"
+  ],
+  "cases": [
+    {
+      "acked_baseline_survived": true,
+      "acked_before_kill": false,
+      "baseline_log_bytes": 308,
+      "boundary": "pre_write",
+      "kill_signal": "SIGKILL",
+      "killed_returncode": -9,
+      "op": "put_obj",
+      "replay_repaired_bytes": 0,
+      "replay_status_after_restart": "OK",
+      "survived_restart": false,
+      "visible_to_concurrent_reader_at_boundary": false
+    },
+    {
+      "acked_baseline_survived": true,
+      "acked_before_kill": false,
+      "baseline_log_bytes": 308,
+      "boundary": "post_write_pre_fsync",
+      "kill_signal": "SIGKILL",
+      "killed_returncode": -9,
+      "op": "put_obj",
+      "replay_repaired_bytes": 0,
+      "replay_status_after_restart": "OK",
+      "survived_restart": true,
+      "visible_to_concurrent_reader_at_boundary": false
+    },
+    {
+      "acked_baseline_survived": true,
+      "acked_before_kill": false,
+      "baseline_log_bytes": 308,
+      "boundary": "post_fsync_pre_ack",
+      "kill_signal": "SIGKILL",
+      "killed_returncode": -9,
+      "op": "put_obj",
+      "replay_repaired_bytes": 0,
+      "replay_status_after_restart": "OK",
+      "survived_restart": true,
+      "visible_to_concurrent_reader_at_boundary": true
+    },
+    {
+      "acked_baseline_survived": true,
+      "acked_before_kill": true,
+      "baseline_log_bytes": 308,
+      "boundary": "post_ack",
+      "kill_signal": "SIGKILL",
+      "killed_returncode": -9,
+      "op": "put_obj",
+      "replay_repaired_bytes": 0,
+      "replay_status_after_restart": "OK",
+      "survived_restart": true,
+      "visible_to_concurrent_reader_at_boundary": true
+    },
+    {
+      "acked_baseline_survived": true,
+      "acked_before_kill": false,
+      "baseline_log_bytes": 308,
+      "boundary": "pre_write",
+      "kill_signal": "SIGKILL",
+      "killed_returncode": -9,
+      "op": "cas_ref",
+      "replay_repaired_bytes": 0,
+      "replay_status_after_restart": "OK",
+      "survived_restart": false,
+      "visible_to_concurrent_reader_at_boundary": false
+    },
+    {
+      "acked_baseline_survived": true,
+      "acked_before_kill": false,
+      "baseline_log_bytes": 308,
+      "boundary": "post_write_pre_fsync",
+      "kill_signal": "SIGKILL",
+      "killed_returncode": -9,
+      "op": "cas_ref",
+      "replay_repaired_bytes": 0,
+      "replay_status_after_restart": "OK",
+      "survived_restart": true,
+      "visible_to_concurrent_reader_at_boundary": false
+    },
+    {
+      "acked_baseline_survived": true,
+      "acked_before_kill": false,
+      "baseline_log_bytes": 308,
+      "boundary": "post_fsync_pre_ack",
+      "kill_signal": "SIGKILL",
+      "killed_returncode": -9,
+      "op": "cas_ref",
+      "replay_repaired_bytes": 0,
+      "replay_status_after_restart": "OK",
+      "survived_restart": true,
+      "visible_to_concurrent_reader_at_boundary": true
+    },
+    {
+      "acked_baseline_survived": true,
+      "acked_before_kill": true,
+      "baseline_log_bytes": 308,
+      "boundary": "post_ack",
+      "kill_signal": "SIGKILL",
+      "killed_returncode": -9,
+      "op": "cas_ref",
+      "replay_repaired_bytes": 0,
+      "replay_status_after_restart": "OK",
+      "survived_restart": true,
+      "visible_to_concurrent_reader_at_boundary": true
+    }
+  ],
+  "ceiling": "SIGKILL exercises process loss only. Page-cache-surviving writes cannot be distinguished from fsynced writes by process kill alone; power loss, media failure and fsync-lying hardware are NOT_EXERCISED.",
+  "consumer_subject": {
+    "bytes": 19872,
+    "committed_to_repository": false,
+    "implementation_relationship": "CLEAN_ROOM",
+    "implementation_sha256": "4ea664cc6bae1d3a999bf4293ad65136821c3a611a498894d428448a1610d127",
+    "name": "refcore (disposable single-node Git-hosting reference core)",
+    "path_outside_repository": "/private/tmp/claude-501/-Users-neon-skills-shared/ba0ee313-3387-4cd5-8e1e-eea11e6f3419/scratchpad/canary-subject/refcore.py",
+    "visibility": "PRIVATE_DISPOSABLE_SCRATCHPAD"
+  },
+  "epoch_subject": {
+    "commit": "5341885f26b5e8e7baf5087a4d661e324f878242",
+    "repository": "ed3c/skills-shared",
+    "rollback_commit": "9fe3c6daf53dcdd61123d5d7a4eeedbdf37b5d7c",
+    "tree": "a18e12507f9e621efd5354f58384eded1f1e2a9a"
+  },
+  "experiment": "L1-A",
+  "falsifiers_not_triggered": [
+    "ACK_RETURNED_BEFORE_DURABLE_READBACK",
+    "ACKNOWLEDGED_PUSH_LOST_AFTER_RESTART",
+    "REF_VISIBLE_WITH_MISSING_OBJECTS"
+  ],
+  "issue": 534,
+  "kills": 8,
+  "ops": [
+    "put_obj",
+    "cas_ref"
+  ],
+  "runtime": {
+    "clock_model": "single host monotonic clock, no distributed clock",
+    "cloud_provider": "NONE",
+    "cost_usd": 0.0,
+    "cpu_count": 10,
+    "git_version": "git version 2.50.1 (Apple Git-155)",
+    "machine": "arm64",
+    "network_used": false,
+    "observed_worktree_dirty_paths": 39,
+    "observed_worktree_head": "bca08001c416108f9b83e9325e7bf07149a9281f",
+    "os": "macOS-26.4-arm64-arm-64bit-Mach-O",
+    "pinned_benchmark_host": false,
+    "process_model": "python3 subprocesses; line-JSON over anonymous pipes inherited at spawn; no socket, no listening port",
+    "python": "3.14.6"
+  },
+  "stage": "DURABLE_ACK_CANARY",
+  "verdict": "PASS",
+  "visible_before_commit_count": 0
+}

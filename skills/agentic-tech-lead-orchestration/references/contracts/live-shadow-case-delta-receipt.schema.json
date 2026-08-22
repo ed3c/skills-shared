@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ed3c/skills-shared/skills/agentic-tech-lead-orchestration/live-shadow-case-delta-receipt.schema.json",
+  "title": "Spatial Loop Live Shadow Case-Delta Receipt",
+  "description": "Receipt contract named by the #411 item of spatial-407-local-handoff-queue.json. A Builder and a Shadow must be distinct runtime identities; a receipt whose builder_identity equals its shadow_identity is rejected, because a self-report is the exact promotion this lane forbids.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "state", "subject", "case_graph_digest", "builder_identity", "shadow_identity", "checkpoints", "observed_deltas", "disposition", "oracle_readback", "negative_control", "observed_at_unix", "unresolved_case_count", "evidence_ceiling"],
+  "properties": {
+    "schema_version": {"const": "spatial-loop/live-shadow-case-delta-receipt/v1"},
+    "state": {"enum": ["PASS", "FAIL", "NOT_EXERCISED", "HUMAN_ADMIT_REQUIRED"]},
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "commit", "tree"],
+      "properties": {
+        "repository": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+        "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "tree": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+      }
+    },
+    "task_ref": {"type": "string", "minLength": 1},
+    "case_graph_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "builder_identity": {"$ref": "#/$defs/identity"},
+    "shadow_identity": {"$ref": "#/$defs/identity"},
+    "checkpoints": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["sequence", "label", "observed_at_unix"],
+        "properties": {
+          "sequence": {"type": "integer", "minimum": 0},
+          "label": {"type": "string", "minLength": 1},
+          "observed_at_unix": {"type": "integer", "minimum": 1}
+        }
+      }
+    },
+    "observed_deltas": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["delta_id", "class"],
+        "properties": {
+          "delta_id": {"type": "string", "minLength": 1},
+          "class": {"enum": ["SEMANTIC_PARITY_DELTA", "CASE_COVERAGE_DELTA", "NO_DELTA"]},
+          "detail": {"type": "string"}
+        }
+      }
+    },
+    "disposition": {"enum": ["L0", "L1", "L2", "L3"]},
+    "oracle_readback": {"$ref": "#/$defs/control"},
+    "negative_control": {"$ref": "#/$defs/control"},
+    "observed_at_unix": {"type": "integer", "minimum": 1},
+    "unresolved_case_count": {"type": "integer", "minimum": 0},
+    "blockers": {"type": "array", "items": {"type": "object"}},
+    "evidence_ceiling": {"enum": ["NO_LIVE_CANARY_OBSERVATION", "ONE_HOST_LIVE_CANARY_SHADOW_BOUND"]}
+  },
+  "$defs": {
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["host_class", "session_id"],
+      "properties": {
+        "host_class": {"type": "string", "minLength": 1},
+        "session_id": {"type": ["string", "null"]},
+        "worktree": {"type": ["string", "null"]}
+      }
+    },
+    "control": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["result"],
+      "properties": {
+        "result": {"enum": ["PASS", "FAIL", "NOT_EXERCISED"]},
+        "detail": {"type": "string"}
+      }
+    }
+  },
+  "oneOf": [
+    {
+      "properties": {
+        "state": {"enum": ["NOT_EXERCISED", "HUMAN_ADMIT_REQUIRED"]},
+        "checkpoints": {"maxItems": 0},
+        "observed_deltas": {"maxItems": 0},
+        "evidence_ceiling": {"const": "NO_LIVE_CANARY_OBSERVATION"}
+      }
+    },
+    {
+      "properties": {
+        "state": {"enum": ["PASS", "FAIL"]},
+        "checkpoints": {"minItems": 1},
+        "observed_deltas": {"minItems": 1},
+        "evidence_ceiling": {"const": "ONE_HOST_LIVE_CANARY_SHADOW_BOUND"}
+      }
+    }
+  ]
+}

@@ -201,6 +201,28 @@
         }
       }
     },
+    "shadowReview": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repo_subject",
+        "reviewer_task_id",
+        "reviewer_attempt_id"
+      ],
+      "properties": {
+        "repo_subject": {
+          "$ref": "#/$defs/subject"
+        },
+        "reviewer_task_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reviewer_attempt_id": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
     "verificationEvidence": {
       "type": "object",
       "additionalProperties": false,
@@ -340,6 +362,9 @@
             "PARTIAL",
             "NOT_REVIEWED"
           ]
+        },
+        "shadow_review": {
+          "$ref": "#/$defs/shadowReview"
         },
         "residual_gaps": {
           "type": "array",

@@ -121,12 +121,13 @@ Do not manufacture one serial Stack merely to mirror issue numbering. #408 is th
 #409  STATIC_CLOSE_CANDIDATE after main admission; live scope remains #411
 #410  STATIC_CLOSE_CANDIDATE after main admission
 #411  KEEP_OPEN until an exact independent live Shadow receipt exists
-#407  KEEP_OPEN while #411 remains a declared blocking program lane
+#407  CLOSED per closure packet (closure-audit/issue-407.json): a program issue may close with a
+      named residual owner; #411 stays the NOT_EXERCISED residual owner until its own receipt exists
 ```
 
 Candidate CI, a temporary branch merge, a compatibility-only PASS, or a Builder self-report cannot satisfy main/live admission. If repository provenance cannot be repaired by the current connector without weakening policy or fabricating identity, use the asserted Tech Lead Local Handoff Queue instead of bypassing the gate.
 
-2026-08-22 state note: the `STATIC_CLOSE_CANDIDATE` condition for #408/#409/#410 is met — bytes admitted on main `5341885f`, receipt `data/handoff/spatial-407/publication-provenance-receipt.json`; closes stay human-owned. #407 was auto-closed by GitHub on 2026-08-21 via a commit-reference close, contrary to the `KEEP_OPEN` law above, and was reopened in the same reconciliation wave; it closes only after #411.
+2026-08-22 state note: the `STATIC_CLOSE_CANDIDATE` condition for #408/#409/#410 is met — bytes admitted on main `5341885f`, supplementary receipt `data/handoff/spatial-407/publication-provenance-receipt.json`; closes stay human-owned. #407 was auto-closed on 2026-08-21 (commit-reference), briefly reopened for lacking a closure record, then closed again under the landed closure packet `closure-audit/issue-407.json`, which names #411 as the program's NOT_EXERCISED residual owner.
 
 ## Completion gate
 

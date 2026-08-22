@@ -388,6 +388,43 @@ def resolve_grammar() -> Path | None:
     return None
 
 
+def receipt_shape_errors(receipt: dict[str, Any], manifest: dict[str, Any]) -> list[str]:
+    """Every reason `receipt` is not usable evidence, checked with no provider
+    on the machine. Returned rather than raised or appended to the global
+    `failures` list, so the #575 collision falsifier below can run a planted
+    defect through this exact function without polluting the suite's own
+    failure count.
+
+    `manifest_digest` is refused outright: issue #575 found that name binding
+    a `manifest["bundle_digest"]` value while a sibling `bundle_digest` key on
+    the same receipt bound a different digest (this run's own emitted-output
+    digest) -- one name, two values. `bundle_manifest_digest` is the only
+    spelling this suite accepts for the manifest's own identity digest now."""
+    for key in ("subject_blobs", "matches_digest_modulo_subject", "bundle_digest", "establishes"):
+        if key not in receipt:
+            return [f"no {key}; a receipt this suite cannot compare against a run is not evidence"]
+    errors: list[str] = []
+    if "manifest_digest" in receipt:
+        errors.append(
+            "manifest_digest is present; #575 retired that name because it collided with "
+            "bundle_digest on the same receipt (one name bound two different digests) -- "
+            "the manifest's own identity digest is bundle_manifest_digest now"
+        )
+    for key, expected in (
+        ("bundle_manifest_digest", manifest["bundle_digest"]),
+        ("query_digest", manifest["query_digest"]),
+        ("grammar_digest", manifest["grammar"]["grammar_digest"]),
+    ):
+        observed = receipt.get(key) or receipt["provider"].get(key)
+        if observed != expected:
+            errors.append(f"{key}={observed} is not the {expected} this tree's bundle pins")
+    if not A.HEX40.match(receipt["subject"]["commit"]):
+        errors.append("subject.commit is not an exact commit")
+    if any(receipt["establishes"].values()):
+        errors.append("a live provider run recorded itself as establishing something")
+    return errors
+
+
 def check_receipt_offline(receipt: dict[str, Any], name: str) -> None:
     """What a committed live receipt must hold with no provider on the machine.
 
@@ -396,22 +433,8 @@ def check_receipt_offline(receipt: dict[str, Any], name: str) -> None:
     digests drifted from the manifest describes a bundle that is no longer
     here, and it reads exactly like one that still matches."""
     manifest = A.load_bundle(BUNDLE)
-    for key in ("subject_blobs", "matches_digest_modulo_subject", "bundle_digest", "establishes"):
-        if key not in receipt:
-            fail(f"{name}: no {key}; a receipt this suite cannot compare against a run is not evidence")
-            return
-    for key, expected in (
-        ("manifest_digest", manifest["bundle_digest"]),
-        ("query_digest", manifest["query_digest"]),
-        ("grammar_digest", manifest["grammar"]["grammar_digest"]),
-    ):
-        observed = receipt.get(key) or receipt["provider"].get(key)
-        if observed != expected:
-            fail(f"{name}: {key}={observed} is not the {expected} this tree's bundle pins")
-    if not A.HEX40.match(receipt["subject"]["commit"]):
-        fail(f"{name}: subject.commit is not an exact commit")
-    if any(receipt["establishes"].values()):
-        fail(f"{name}: a live provider run recorded itself as establishing something")
+    for error in receipt_shape_errors(receipt, manifest):
+        fail(f"{name}: {error}")
 
 
 def lane_live() -> str:
@@ -420,6 +443,24 @@ def lane_live() -> str:
     for receipt_path in receipts:
         check_receipt_offline(json.loads(receipt_path.read_text(encoding="utf-8")), receipt_path.name)
         print(f"  {receipt_path.name}: digests bind the committed bundle (checked without the provider)")
+
+    # #575 falsifier: revert a real, currently-passing receipt to the retired
+    # `manifest_digest` shape and require `receipt_shape_errors` to refuse it.
+    # Proves the guard fires on the exact collision that shipped, not just
+    # that the new key happens to be present in today's fixture.
+    if receipts:
+        manifest = A.load_bundle(BUNDLE)
+        collided = json.loads(receipts[0].read_text(encoding="utf-8"))
+        collided["manifest_digest"] = collided.pop("bundle_manifest_digest")
+        errors = receipt_shape_errors(collided, manifest)
+        if not errors:
+            fail(
+                "DTCR-TS-RECEIPT-KEY-COLLISION: a receipt reverted to the retired manifest_digest "
+                "key was accepted with no shape errors; the #575 guard that refuses it is gone"
+            )
+        else:
+            print(f"  DTCR-TS-RECEIPT-KEY-COLLISION: refused ({errors[0]})")
+
     binary = A.find_cli()
     grammar = resolve_grammar()
     if binary is None or grammar is None:
@@ -432,7 +473,14 @@ def lane_live() -> str:
         print(f"  NOT_EXERCISED: {missing} is absent. A missing provider is start-readiness, not a failure.")
         return "NOT_EXERCISED"
 
-    repo = Path(A.git(ADAPTER_DIR, "rev-parse", "--show-toplevel"))
+    try:
+        repo = Path(A.git(ADAPTER_DIR, "rev-parse", "--show-toplevel"))
+    except subprocess.CalledProcessError:
+        # A copy of this adapter outside a checkout has no subject commit to be
+        # about. That is an absent input, not a passing run, and it is typed
+        # here rather than crashing the suite two lanes after the fact.
+        print("  NOT_EXERCISED: this adapter is not inside a git checkout, so there is no exact subject to analyse")
+        return "NOT_EXERCISED (no checkout)"
     paths = [
         str(path.relative_to(repo))
         for path in sorted(FIXTURES.glob("*/*.fixture"))

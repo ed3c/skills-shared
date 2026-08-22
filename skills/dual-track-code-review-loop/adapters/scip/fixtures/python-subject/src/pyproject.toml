@@ -1,0 +1,15 @@
+# Pins the indexer's project root to this directory.
+#
+# Without it scip-python walks upward until it finds some pyproject.toml -- on
+# the host that produced the committed index it found one in the user's home
+# directory -- and the module names it then writes into every symbol string
+# carry the absolute path from that root down. A symbol string that encodes one
+# machine's checkout path is not reproducible anywhere else, and an index digest
+# over such strings binds the receipt to one directory rather than to one tree.
+#
+# The [tool.pyright] section is what stops the walk; its contents pin the
+# analysis surface so two hosts running the same command index the same files.
+[tool.pyright]
+include = ["."]
+exclude = ["**/__pycache__"]
+pythonVersion = "3.11"

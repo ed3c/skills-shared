@@ -1,0 +1,116 @@
+{
+  "bundle_digest": "1d4ff267ab415ee342ff64fd1848ea545269693b131f480ae0a8a2e89f97abff",
+  "completeness": "PARTIAL_LOWER_BOUND",
+  "coverage": {
+    "denominator": 4,
+    "denominator_definition": "source blobs declared by the exact source subject inside the directory this index was built over",
+    "method": "one scip-python invocation over the declared index root, decoded from the index bytes named by index_digest",
+    "numerator": 2
+  },
+  "decoder": {
+    "cross_check": {
+      "binding_file": "bindings/binding.json",
+      "binding_file_sha256": "517d5d971e4c0acb82c309ec6f973570b1177c466f4ae5b3bfd7e5d210247901",
+      "descriptor_set_sha256": "6783df4d1883fac2e5eafb2bb9fe5e6ea83f46baa17db08d632bab191298721c",
+      "produced_by": "libprotoc 29.3",
+      "proto_revision": "v0.5.2",
+      "proto_sha256": "b855eb9abdb3fe7f07600ee92f24a6c40f75fceef37136ccdc6844b300936a31",
+      "proto_url": "https://raw.githubusercontent.com/sourcegraph/scip/v0.5.2/scip.proto",
+      "role": "a second decode of these same bytes through the schema author's field numbers; it is not what produced the facts above"
+    },
+    "primary": "in-tree SCIP wire-format reader in adapter.py; there is no scip CLI on this host and the scip in Homebrew is an integer-programming solver"
+  },
+  "emitted": {
+    "OCCURRENCE": 40,
+    "RELATIONSHIP": 16,
+    "SYMBOL": 20
+  },
+  "establishes": {
+    "complete_call_graph": false,
+    "cross_provider_identity": false,
+    "language_coverage": false,
+    "merge": false,
+    "provider_available_elsewhere": false,
+    "semantic_truth": false,
+    "task_pass": false
+  },
+  "exit_codes": {
+    "index": 0
+  },
+  "facts_digest_modulo_project_root": "7718ca60fb72d2f59ddd625f5503cfaeaf0e488883ded627e8adcde2724ed866",
+  "index": {
+    "byte_count": 6777,
+    "documents": 2,
+    "external_symbols": 1,
+    "neutralization": {
+      "byte_count_after": 6727,
+      "changed_fields": [
+        "Metadata.project_root"
+      ],
+      "checked": "both decodes were compared field by field and agree on tool identity, document paths, symbol strings, ranges, roles and external symbols; facts_digest_modulo_project_root is the same for both",
+      "downstream_digests": "bundle_digest here and the provider_runs digests are this run's, computed with index_digest_before inside every fact row; replaying the committed fixture reproduces every fact except that one field and therefore lands on a different bundle_digest, which is arithmetic and not a disagreement",
+      "fixture_digest_after_declared_neutralization": "4631b0164216cca6a0ec073eb77d504df9d29ad5ca3aa5cf18e817ec8719894a",
+      "index_digest_before": "d6c9b4708efded16119ee87f91a459a52c89ae39461c964f48f142dceeed349c",
+      "project_root_after": "file:///dtcr-fixture/skills/dual-track-code-review-loop/adapters/scip/fixtures/python-subject/src",
+      "why": "Metadata.project_root is the absolute path of the directory the indexer ran in and carries the account name and checkout id of one host; a committed fixture publishes it to every reader of this repository"
+    },
+    "occurrences": 40,
+    "project_root_is_machine_local": true,
+    "project_root_tail": "fixtures/python-subject/src",
+    "sha256": "d6c9b4708efded16119ee87f91a459a52c89ae39461c964f48f142dceeed349c",
+    "tool_info": {
+      "name": "scip-python",
+      "version": "0.6.6"
+    }
+  },
+  "index_root": "skills/dual-track-code-review-loop/adapters/scip/fixtures/python-subject/src",
+  "normalization": {
+    "scheme": "scip-symbol-grammar",
+    "scheme_digest": "3a45dff42b8854465b9996227ad11f8b60e65e443f8eeb53c6aad88e56065ebf"
+  },
+  "paths": [
+    "skills/dual-track-code-review-loop/adapters/scip/fixtures/python-subject/src/NOTES.md",
+    "skills/dual-track-code-review-loop/adapters/scip/fixtures/python-subject/src/client.py",
+    "skills/dual-track-code-review-loop/adapters/scip/fixtures/python-subject/src/pricing.py",
+    "skills/dual-track-code-review-loop/adapters/scip/fixtures/python-subject/src/pyproject.toml"
+  ],
+  "provider": {
+    "argv_template": [
+      "scip-python",
+      "index",
+      "--cwd",
+      "<INDEX_ROOT>",
+      "--project-name",
+      "dtcr-scip-fixture",
+      "--project-version",
+      "1",
+      "--output",
+      "<INDEX_OUT>",
+      "--quiet"
+    ],
+    "config_digest": "a9aae15ccd732099fa3e152ac0763cb76db34fff6cb5610bedf789cd28b42431",
+    "executable_location": "resolved from DTCR_SCIP_PYTHON_BIN or PATH; the install path is one machine and is not part of the identity",
+    "executable_name": "scip-python",
+    "executable_sha256": "ce60dd39157c8f52d8f9de8f060743e1135b697c52253de65521a19b84e19d2a",
+    "project_name": "dtcr-scip-fixture",
+    "project_version": "1",
+    "provider_binding_id": "DTCR-PB-28c8f46a47fb06fa",
+    "version": "0.6.6"
+  },
+  "readback": {
+    "checked": 34,
+    "not_applicable": 6
+  },
+  "resolution": {
+    "DOCUMENT_LOCAL": 4,
+    "EXTERNAL_DECLARED": 1,
+    "PROJECT_DEFINED": 32,
+    "UNRESOLVED_IN_INDEX": 3
+  },
+  "schema": "dtcr/scip-live-receipt/v1",
+  "subject": {
+    "commit": "ee9afe431d052dda0b23b7fcf53de80be67a4242",
+    "repository_binding_id": "DTCR-RB-3749864dfe3e2f36",
+    "tree": "bd8aeaa57a449449a073468913b23ed47e1e56bf"
+  }
+}

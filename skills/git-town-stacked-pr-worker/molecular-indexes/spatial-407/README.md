@@ -19,22 +19,24 @@ This is the durable terminal-atom projection for the Spatial Loop Intent–Case�
                       EXTERNAL_EVIDENCE / PROCESS_DEPENDENCY
 ```
 
-Implementation carrier:
+Implementation carrier — terminal at the 2026-08-22 readback:
 
 ```text
-PR #412               CLOSED_NOT_MERGED (2026-08-21); preserved as first-red provenance evidence
-branch                agent/spatial-intent-case-proof-graph-v1; final head e679aed9 NOT reachable from main
-admitted publication  superseding replayed carrier — terminal merge c27f8c3 → main 5341885f
-receipt               data/handoff/spatial-407/publication-provenance-receipt.json
+PR #412
+branch   agent/spatial-intent-case-proof-graph-v1
+state    CLOSED_UNMERGED / SUPERSEDED_BY_#419; final head e679aed9 not reachable from main
+supplementary receipt  data/handoff/spatial-407/publication-provenance-receipt.json
 ```
+
+PR #412 is not an open Draft and not a live path writer. Its bytes reached `main` through the replayed #419 route rather than through its own merge, so it closes no atom by itself: an atom advances only on its own receipt at an admitted subject. The reconciled `#412 → #419 → #420 → #450` chain is in [`../codex-v2/README.md`](../codex-v2/README.md).
 
 Historical current-main refresh carrier:
 
 ```text
 PR #513
 relation TRANSPORT_REFRESH / HISTORICAL
-purpose  merge current main into the #412 candidate without modifying main
-not an implementation atom
+purpose  merged current main into the #412 candidate without modifying main
+not an implementation atom; terminal with its base
 ```
 
 ## Atom index
@@ -126,17 +128,21 @@ Case dependency never creates a Git child by itself. PR #513 is explicitly `HIST
 
 ## Closeout boundary
 
+At the 2026-08-22 readback:
+
 ```text
-#408 static atom set    closeable only after equivalent bytes are admitted on main
-#409 static atom set    closeable after main admission; live responsibility remains #411
-#410 static atom set    closeable after main admission
-#411                    remains OPEN / NOT_EXERCISED
-#407                    remains OPEN while #411 is a blocking program lane
+#408 static atom set    bytes admitted on main 5341885f…
+#409 static atom set    bytes admitted on main; live responsibility remains #411
+#410 static atom set    bytes admitted on main
+#411                    OPEN / NOT_EXERCISED — live independent Shadow case-delta canary
+#407                    CLOSED / COMPLETED, disposition CONSUMED_BY_CONVERGENCE
+                        landed via PR #573 commit 9fe3c6daf53dcdd61123d5d7a4eeedbdf37b5d7c
+                        evidence ceiling DETERMINISTIC; residual owner #411
 ```
 
-2026-08-22 state note: GitHub auto-closed #407 on 2026-08-21T20:00:25Z when commit `32c049ca` reached `main` (a commit-reference close with no closure-audit record). The boundary above remains law — #407 was reopened in the same reconciliation wave and closes only after #411. The `admitted on main` condition for #408/#409/#410 is now met; receipt: `data/handoff/spatial-407/publication-provenance-receipt.json`. Issue closes stay human-owned.
+Closure packet: [`../../../agentic-tech-lead-orchestration/references/closure-audit/issue-407.json`](../../../agentic-tech-lead-orchestration/references/closure-audit/issue-407.json). #407 closing did not exercise #411: a program issue may close with a named residual owner, and that residual stays `NOT_EXERCISED` until its own receipt exists.
 
-Repository provenance is load-bearing. A connector-authored source tree may be deterministically correct while still ineligible for main until a provenance-compliant publication subject is built and the repository-wide admission gate passes.
+Repository provenance is load-bearing. A connector-authored source tree may be deterministically correct while still ineligible for main until a provenance-compliant publication subject is built and the repository-wide admission gate passes. That is what happened here: PR #412's own provenance blocked it, and the equivalent bytes reached `main` through the replayed #419 route instead.
 
 ## Local Handoff
 

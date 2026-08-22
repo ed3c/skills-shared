@@ -1,0 +1,32 @@
+{
+  "schema": "repository-control-plane-profile/v1",
+  "profile": "dual-track-code-review-loop",
+  "skills": [
+    "dual-track-code-review-loop",
+    "shared-skills-infra"
+  ],
+  "runtime_capabilities": {
+    "git_town": {
+      "scope": "user",
+      "installer_state": "NOT_IMPLEMENTED"
+    },
+    "forgejo": {
+      "scope": "host",
+      "service_state": "NOT_EXERCISED"
+    }
+  },
+  "authority": {
+    "automatic_merge": false,
+    "automatic_conflict_resolution": false,
+    "visibility_change": false,
+    "credential_values": false
+  },
+  "subject_pin": {
+    "main_commit": "5341885f26b5e8e7baf5087a4d661e324f878242",
+    "owned_tree_path": "skills/dual-track-code-review-loop",
+    "owned_tree": "02ffa0a6f7645c9ba22d6a0178628e7b1184dc17",
+    "candidate_commit": "5341885f26b5e8e7baf5087a4d661e324f878242",
+    "candidate_source_path": "skills/dual-track-code-review-loop",
+    "candidate_repin_policy": "This profile declares NO unmerged candidate source: candidate_commit is pinned equal to main_commit and candidate_source_path is the owned tree itself, so there is nothing to re-pin at publication. subject_pin is all-or-nothing in repository-control-plane-profile/v1, which is why all six keys are present. The github-portfolio-control publish-time re-pin obligation is NOT inherited here. If a future revision ever sources bytes from an unmerged commit, that revision must re-introduce a real candidate and its own re-pin policy."
+  }
+}

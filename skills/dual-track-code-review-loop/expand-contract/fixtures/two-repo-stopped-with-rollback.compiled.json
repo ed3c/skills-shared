@@ -1,0 +1,160 @@
+{
+  "derived_from": "two-repo-stopped-with-rollback.json",
+  "receipt": {
+    "authority": {
+      "contraction": false,
+      "merge": false,
+      "production": false,
+      "release": false,
+      "schema_publication": false
+    },
+    "binding_ref": "DTCR-XR-001",
+    "blocked_on": [
+      "CONSUMER_MIGRATION_INCOMPLETE",
+      "CONTRACTION_NOT_AUTHORIZED",
+      "GENERATED_ARTIFACT_REGENERATION_NOT_EXERCISED",
+      "IDEMPOTENCY_NOT_EXERCISED",
+      "OBSERVATION_ABSENT"
+    ],
+    "consumer": {
+      "migration_state": "REVERTED",
+      "port_ref": "DTCR-PT-001",
+      "repository_binding_id": "DTCR-RB-80aad7defedadfc2"
+    },
+    "contract": {
+      "adapter": {
+        "capability_class": "PROTOBUF",
+        "vendored": false
+      },
+      "baseline_commit": "c72cf1065daa2d05182569419a9d1ea8968219c3",
+      "generated_artifacts": [
+        {
+          "artifact_name": "order_service.connect.stub",
+          "declared_digest": "b5b35bbfc28aad10c748c319a26fa430f148ee2f5b922f46cc22df4dce035bf0",
+          "repository_binding_id": "DTCR-RB-01c4af034718c3ee"
+        },
+        {
+          "artifact_name": "order_service.connect.stub",
+          "declared_digest": "b5b35bbfc28aad10c748c319a26fa430f148ee2f5b922f46cc22df4dce035bf0",
+          "repository_binding_id": "DTCR-RB-80aad7defedadfc2"
+        }
+      ],
+      "outcome": "NO_BREAKING_CHANGE_DETECTED",
+      "publication": {
+        "intent": "NOT_PUBLISHED",
+        "rights": {
+          "account_access": false,
+          "content_rights_admission": "HUMAN_ADMIT_REQUIRED"
+        }
+      },
+      "regeneration_comparison": "NOT_EXERCISED",
+      "repository_binding_id": "DTCR-RB-01c4af034718c3ee",
+      "runs": [
+        {
+          "config_digest": "2a41f8d4ae1f86403788094e644e9099044a472e1a0b3955f2178233098b758d",
+          "outcome": "BREAKING_CHANGE_DETECTED",
+          "result_id": "DTCR-CK-001",
+          "ruleset_digest": "2989d541bdd55dfe384dd20682518ea637d5b01bac0201cd6007a129bfa9e1ea"
+        },
+        {
+          "config_digest": "2a41f8d4ae1f86403788094e644e9099044a472e1a0b3955f2178233098b758d",
+          "outcome": "NO_BREAKING_CHANGE_DETECTED",
+          "result_id": "DTCR-CK-002",
+          "ruleset_digest": "2989d541bdd55dfe384dd20682518ea637d5b01bac0201cd6007a129bfa9e1ea"
+        }
+      ]
+    },
+    "contraction": {
+      "authorization": "HUMAN_ADMIT_REQUIRED",
+      "no_remaining_callers_proven": false
+    },
+    "establishes": {
+      "applied_on_real_codebase": "NOT_EXERCISED",
+      "cross_repository_behavior_equivalence_proven": false,
+      "protocol_ready": false,
+      "service_interruption_absence_proven": false
+    },
+    "idempotency": {
+      "mechanism": "the request carries an idempotency key derived from the order id and the arrival timestamp, and the provider stores it in a dedupe table before applying the write",
+      "state": "IDEMPOTENCY_DECLARED_NOT_EXERCISED",
+      "writes_state": true
+    },
+    "last_phase_entered": "A1_PROVIDER_EXPANSION",
+    "observation": {
+      "state": "NOT_OBSERVED"
+    },
+    "phases_entered": [
+      "C1_CONTRACT_EXPANSION",
+      "A1_PROVIDER_EXPANSION"
+    ],
+    "provider_coexistence": {
+      "legacy_symbol": {
+        "completeness": "PARTIAL_LOWER_BOUND",
+        "index_digest": "39fc7c57823ed3393f25694903d25a426ef3c93d43f0cdc5d7198c153b141197",
+        "index_id": "fixture-provider-symbol-index",
+        "symbol": "OrderService.GetOrder"
+      },
+      "new_symbol": {
+        "completeness": "PARTIAL_LOWER_BOUND",
+        "index_digest": "39fc7c57823ed3393f25694903d25a426ef3c93d43f0cdc5d7198c153b141197",
+        "index_id": "fixture-provider-symbol-index",
+        "symbol": "OrderService.GetOrderDetail"
+      },
+      "removal_changeset_absent": true,
+      "repository_binding_id": "DTCR-RB-01c4af034718c3ee",
+      "runtime": "NOT_OBSERVED"
+    },
+    "receipt_id": "DTCR-R2-001",
+    "rollback": [
+      {
+        "disposition": "NOT_ROLLBACKABLE_DEPLOYED_SURFACE",
+        "reason": "the expanded surface is already serving; withdrawing it would break every consumer that has moved to it, so the repository stays at the expansion head",
+        "repository_binding_id": "DTCR-RB-01c4af034718c3ee",
+        "restored_commit": "01c4af034718c3ee98ee038cf41fa37af57ffd41"
+      },
+      {
+        "disposition": "REVERTED",
+        "reason": "the inversion was reverted to the commit the consumer stood at before this run",
+        "repository_binding_id": "DTCR-RB-80aad7defedadfc2",
+        "restored_commit": "3db7160c61851924b7dbb2778389da6bca6b8edd"
+      }
+    ],
+    "schema": "dtcr/refactor-r2-receipt/v1",
+    "terminal_state": "STOPPED_WITH_ROLLBACK"
+  },
+  "repository_binding": {
+    "binding_id": "DTCR-XR-001",
+    "edges": [
+      {
+        "edge_kind": "PROCESS_DEPENDENCY_NOT_GIT_PARENT",
+        "from_repository_binding_id": "DTCR-RB-01c4af034718c3ee",
+        "to_repository_binding_id": "DTCR-RB-80aad7defedadfc2"
+      }
+    ],
+    "establishes": {
+      "git_ancestry_across_repositories": false,
+      "simultaneous_deployment": false,
+      "single_atomic_commit": false
+    },
+    "repositories": [
+      {
+        "ancestry_within_repository": [
+          "c72cf1065daa2d05182569419a9d1ea8968219c3"
+        ],
+        "repository_binding_id": "DTCR-RB-01c4af034718c3ee",
+        "role": "PROVIDER",
+        "subject_commit": "01c4af034718c3ee98ee038cf41fa37af57ffd41",
+        "subject_tree": "15fb5b9e05c2e0ba858d7c247ead55141eb2484c"
+      },
+      {
+        "ancestry_within_repository": [],
+        "repository_binding_id": "DTCR-RB-80aad7defedadfc2",
+        "role": "CONSUMER",
+        "subject_commit": "3db7160c61851924b7dbb2778389da6bca6b8edd",
+        "subject_tree": "9a0f2c75c14f48fdd88a8541f2d59cf8e76dd841"
+      }
+    ],
+    "schema": "dtcr/refactor-r2-binding/v1"
+  },
+  "schema": "dtcr/refactor-r2-projection/v1"
+}

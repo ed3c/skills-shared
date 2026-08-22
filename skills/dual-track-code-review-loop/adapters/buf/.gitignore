@@ -1,0 +1,6 @@
+# The buf CLI is installed here for local exercise (issue #549); the binary
+# is a real platform-specific download and is never committed. Only
+# .tools/package.json (and its lockfile, once present) are tracked so the
+# pinned version is reproducible.
+.tools/node_modules/
+__pycache__/

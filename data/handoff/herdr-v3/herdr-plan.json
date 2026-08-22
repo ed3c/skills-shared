@@ -1,0 +1,16 @@
+{
+  "manifest": {
+    "attempt_id": "466-live-3",
+    "base_sha": "752b676d939d4633e0b8721f10873fc094288b2f",
+    "herdr_session": "live466",
+    "max_observation_age_seconds": 600,
+    "repo": "ed3c/skills-shared",
+    "target": "live466codex",
+    "task_id": "issue-466/T1",
+    "tree_sha": "5b957e100579b38a56817a0409db6f193c5d6ced",
+    "worktree": "/Users/neon/skills-shared/.claude/worktrees/local-handoff-queue"
+  },
+  "max_samples": 20,
+  "poll_interval_seconds": 3,
+  "require_terminal": false
+}
