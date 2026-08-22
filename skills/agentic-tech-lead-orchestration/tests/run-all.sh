@@ -106,6 +106,7 @@ SCHEMA_BY_ID = {
     "spatial-loop/live-shadow-case-delta-receipt/v1": SKILL / "references/contracts/live-shadow-case-delta-receipt.schema.json",
     "git-hosting-assurance/v1": SKILL.parent / "git-hosting-scale-assurance/references/hosting-assurance.schema.json",
     "shared-skills-infra/repository-control-plane-profile/v1": SKILL.parent / "shared-skills-infra/references/repository-control-plane-profile.v1.schema.json",
+    "shared-skills-registry/v2": SKILL.parent / "shared-skills-infra/references/shared-skills-registry.v2.schema.json",
 }
 failed = []
 checked = 0
