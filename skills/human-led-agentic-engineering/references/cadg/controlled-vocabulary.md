@@ -141,7 +141,12 @@ These statuses describe the bounded reconstruction only. They do not authorize c
 | `CADG016` | `CI_OR_MERGE_PROMOTED_TO_LATER_LANE` |
 | `CADG017` | `CAUSAL_EDGE_REFERENCES_UNKNOWN_NODE` |
 | `CADG018` | `MATERIAL_CHANGE_BYPASSED` |
+| `CADG019` | `SELF_REFERENTIAL_HEAD_BINDING` |
 
 ## Evidence ceiling
 
 A schema-valid packet or deterministic checker PASS proves only contract compliance for the exact bytes supplied. It cannot establish that a live Agent read the context, that an independent Shadow ran, that a Human admitted a design, or that a PR was merged/released/observed in production. Preserve `NOT_EXERCISED`, `HUMAN_ADMIT_REQUIRED` and `NOT_RELEASED` explicitly.
+
+## Two-subject PR binding
+
+A durable forward packet cannot contain the final commit/tree that contains the packet itself. Forward provenance therefore binds `analyzed_commit`/`analyzed_tree` plus a content-addressed code manifest excluding `.agents/cadg/**`. The exact PR event head/tree appears only in the admission receipt produced after checkout. The PR gate recomputes the same manifest and refuses stale or metadata-laundered code. `EXACT_GIT_SUBJECT` is reserved for bounded historical reconstruction.
