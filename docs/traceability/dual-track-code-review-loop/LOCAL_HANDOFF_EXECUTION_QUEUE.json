@@ -23,26 +23,26 @@
       "id": 519,
       "title": "[DTCR-D1] deterministic fact-plane convergence owner",
       "github_state": "OPEN",
-      "evidence": "convergence open: #547 NOT_IMPLEMENTED (scip-python present), #549 live lane BLOCKED_ON_PROVIDER (buf absent)",
-      "note": "16 D1/M1 interface schemas (31 total on the DTCR surface) and two adapters landed under this contract (#546 at 66dfdb4, #548 at 458ea28); per its own 2026-08-21 comment the issue stays open as convergence owner until #547/#549 resolve or are formally descoped",
+      "evidence": "convergence open: all four adapter lanes landed at their declared ceilings; #547 cross-language and #549 live VERIFIED remain BLOCKED_ON_PROVIDER",
+      "note": "16 D1/M1 interface schemas (34 total on the DTCR surface) and four adapters landed under this contract (#546 at 66dfdb4, #548 at 458ea28, #547 and #549 in the implementation wave); the convergence decision - resolve or formally descope the provider-blocked sub-lanes - remains this issue's own receipt",
       "blocks": [525]
     },
     {
       "id": 521,
       "title": "[DTCR-M1] semantic-context and organizational-memory plane",
       "github_state": "OPEN",
-      "evidence": "interface schemas landed; adapter lane #550 NOT_IMPLEMENTED",
+      "evidence": "interface schemas landed; #550 KEYWORD lane LANDED, VECTOR lane BLOCKED_ON_PROVIDER",
       "start_dependency": 518,
-      "note": "convergence owner that wires a finished #550 adapter into aggregate routes",
+      "note": "convergence owner that wires the landed #550 adapter into aggregate routes; that wiring admission is this issue's own receipt",
       "blocks": []
     },
     {
       "id": 524,
       "title": "[DTCR-R2] cross-repository Expand & Contract refactor protocol",
       "github_state": "OPEN",
-      "evidence": "NOT_IMPLEMENTED",
+      "evidence": "R2 protocol compiler LANDED; real cross-repo migration NOT_EXERCISED",
       "start_dependency": 522,
-      "note": "start dependency #522 satisfied (CLOSED via PR #563); no expand-contract bytes exist in-tree",
+      "note": "expand-contract/ landed with three frozen R2 schemas, six committed requests, 70 declared states all emitted, 36 refusals; applied_on_real_codebase and consumer_canary stay contract-pinned false - the real migration rides #528",
       "blocks": [528]
     },
     {
@@ -68,27 +68,24 @@
       "id": 547,
       "title": "[DTCR-D1-SCIP] SCIP symbol/relationship adapter",
       "github_state": "OPEN",
-      "evidence": "NOT_IMPLEMENTED (python scope executable)",
-      "note": "the Go scip CLI is absent (which scip empty) but scip-python 0.6.6 is present on the trusted local runtime, so the python-scope lane is executable; fixture-only SCIP-shaped JSON stays refused by the issue's own comment; exact provider identity (version+sha256+license) binds in the lane's own receipt",
-      "disagrees_with_issue_comment": true,
+      "evidence": "python-scope adapter LANDED with live receipt; cross-language lanes BLOCKED_ON_PROVIDER",
+      "note": "adapters/scip/ landed with a real scip-python 0.6.6 run (receipts/live-739a0696.json, provider identity bound); the Go scip CLI and non-python indexers remain absent, and every emitted row carries the structural python-only coverage ceiling",
       "blocks": []
     },
     {
       "id": 549,
       "title": "[DTCR-D1-BUF] Buf/contract compatibility adapter",
       "github_state": "OPEN",
-      "evidence": "BLOCKED_ON_PROVIDER",
-      "note": "live/VERIFIED lane blocked (buf CLI absent on the admitted host, which buf empty); the explicit NOT_APPLICABLE lane is executable without the provider",
-      "disagrees_with_issue_comment": true,
+      "evidence": "NOT_APPLICABLE and PROVIDER_UNAVAILABLE lanes LANDED; live VERIFIED lane BLOCKED_ON_PROVIDER",
+      "note": "adapters/buf/ landed with deterministic applicability detection and 10/10 planted falsifiers; the live VERIFIED lane stays blocked while the buf CLI is absent (which buf empty)",
       "blocks": []
     },
     {
       "id": 550,
       "title": "[DTCR-M1-C] rebuildable non-authoritative semantic-context adapter",
       "github_state": "OPEN",
-      "evidence": "NOT_IMPLEMENTED",
-      "note": "deterministic KEYWORD lane is not provider-blocked (schema anchor: references/schemas/retrieval-query.schema.json lane enum [KEYWORD,VECTOR,HYBRID,NOT_APPLICABLE]); optional LanceDB lane BLOCKED_ON_PROVIDER (lancedb not importable); convergence wiring owner is #521",
-      "disagrees_with_issue_comment": true,
+      "evidence": "KEYWORD lane LANDED; VECTOR/HYBRID lanes BLOCKED_ON_PROVIDER",
+      "note": "adapters/semantic-context/ landed: rebuildable deterministic keyword index with back-references, 14/14 falsifiers, rebuild-determinism receipt; VECTOR/HYBRID refuse structurally while no embedding provider is bound (lancedb not importable); convergence wiring owner is #521",
       "unsatisfied_completion_dependency_at_closure_of": [522],
       "blocks": []
     }

@@ -16,6 +16,9 @@ python3 "$ROOT/tests/selftest.py"
 # them here gives every adapter the CI arrival its own lease could not add.
 python3 "$ROOT/adapters/tree-sitter/selftest.py"
 python3 "$ROOT/adapters/sqlite-ledger/selftest.py"
+python3 "$ROOT/adapters/scip/selftest.py"
+python3 "$ROOT/adapters/buf/selftest.py"
+python3 "$ROOT/adapters/semantic-context/selftest.py"
 
 # Same reason as the adapters: the synthesis compilers ship their own gate, and
 # a gate nobody runs reports the same green as one that passes. The schemas it
@@ -28,3 +31,8 @@ python3 "$ROOT/synthesis/selftest.py"
 # every terminal the refactor contracts declare is reachable by compiling a
 # committed request rather than by a test constructing one.
 python3 "$ROOT/refactor/selftest.py"
+
+# And for the R2 cross-repository Expand & Contract compiler, same contract:
+# committed requests, byte-stable projections, every declared state emitted by
+# a real compilation, refusals fired from single-field deltas.
+python3 "$ROOT/expand-contract/selftest.py"

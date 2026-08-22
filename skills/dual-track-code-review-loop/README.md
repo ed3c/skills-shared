@@ -4,15 +4,19 @@ Portable method for reviewing code with a deterministic track and a semantic
 track that are structurally forbidden from standing in for each other, so that a
 finding always carries the grade its evidence supports.
 
-Status: `C0_CONTRACT_ADMITTED / TWO_DETERMINISTIC_ADAPTERS_LANDED / SEMANTIC_ADAPTER_NOT_IMPLEMENTED / NOT_REGISTERED`.
+Status: `C0_CONTRACT_ADMITTED / FIVE_DETERMINISTIC_ADAPTERS_LANDED / NOT_REGISTERED`.
 
-Two deterministic-track adapters are landed and committed (`adapters/tree-sitter/`
-for parser/syntax-match facts, `adapters/sqlite-ledger/` for the queryable
-graph-ledger fact plane), each with its own selftest routed through
-[`tests/run-all.sh`](tests/run-all.sh). The provider-specific `#547` (SCIP) and
-`#549` (Buf) deterministic adapters and the `#550` semantic-context adapter are
-separate, still-open lanes; landing these two does not admit those. The `#522`
-synthesis and problem-closure compilers landed in the same wave under
+Five deterministic-track adapters are landed and committed, each with its own
+selftest routed through [`tests/run-all.sh`](tests/run-all.sh):
+`adapters/tree-sitter/` (parser/syntax-match facts, live receipt),
+`adapters/sqlite-ledger/` (queryable graph-ledger fact plane),
+`adapters/scip/` (`#547`, python-scope live receipt from scip-python 0.6.6;
+cross-language lanes stay BLOCKED_ON_PROVIDER), `adapters/buf/` (`#549`,
+deterministic NOT_APPLICABLE / PROVIDER_UNAVAILABLE lanes; the live VERIFIED
+lane stays BLOCKED_ON_PROVIDER while `buf` is absent), and
+`adapters/semantic-context/` (`#550`, rebuildable KEYWORD lane; VECTOR/HYBRID
+stay BLOCKED_ON_PROVIDER with no embedding provider bound). The `#522`
+synthesis and problem-closure compilers landed earlier under
 [`synthesis/`](synthesis/), with their three contracts under
 `references/schemas/` counted by the committed harness. The `#523` bounded
 single-repository refactor protocol landed the same way under
@@ -42,7 +46,7 @@ the one most often reported as progress.
    — the fifteen closed terms and what each can never become.
 5. [`references/contracts/public-private-capability.md`](references/contracts/public-private-capability.md)
    — plane ownership and the locator laws.
-6. [`references/schemas/`](references/schemas/) — the machine half, 31 frozen
+6. [`references/schemas/`](references/schemas/) — the machine half, 34 frozen
    schemas (8 C0 contract + 16 D1/M1 interface + 3 X1 synthesis + 4 R1 bounded
    refactor).
 7. [`references/source-disposition/refused-claims.json`](references/source-disposition/refused-claims.json)
@@ -106,7 +110,7 @@ skills/dual-track-code-review-loop/
     │   └── public-private-capability.md
     │       └── closed terms and plane ownership; the half a person reads
     ├── schemas/
-    │   └── 31 frozen JSON Schemas — 8 C0 contract schemas (source-packet,
+    │   └── 34 frozen JSON Schemas — 8 C0 contract schemas (source-packet,
     │       candidate-record, violation-candidate, refactor-proposal,
     │       change-unit, verification-receipt, closure-record,
     │       source-disposition) plus 16 D1/M1 interface schemas (syntax-match,
@@ -119,7 +123,9 @@ skills/dual-track-code-review-loop/
     │       plus 3 X1 synthesis schemas (review-card, synthesis-packet,
     │       problem-closure-row) plus 4 R1 bounded-refactor schemas
     │       (refactor-usage-signature, refactor-minimal-port,
-    │       refactor-changeset-lease, refactor-r1-receipt)
+    │       refactor-changeset-lease, refactor-r1-receipt) plus 3 R2
+    │       cross-repository schemas (refactor-r2-contract-expansion,
+    │       refactor-r2-consumer-migration, refactor-r2-receipt)
     │       └── the half a machine enforces, with positive and refusal controls
     ├── source-disposition/
     │   └── refused-claims.json
@@ -275,14 +281,16 @@ mutation controls over the refusals          VERIFIED_BY_COMMITTED_SUITE
 committed mutation harness                   PRESENT (tests/run-all.sh, CI-routed)
 parser/syntax-match adapter (tree-sitter)    LANDED, selftest + live receipt
 graph-ledger adapter (sqlite-ledger)         LANDED, selftest, planted mutations
-SCIP / Buf deterministic adapters (#547/#549) BLOCKED_ON_PROVIDER
-semantic-context adapter (#550)              NOT_IMPLEMENTED
+SCIP adapter, python scope (#547)            LANDED — live receipt from scip-python 0.6.6; cross-language BLOCKED_ON_PROVIDER
+Buf adapter NOT_APPLICABLE lane (#549)       LANDED — live VERIFIED lane BLOCKED_ON_PROVIDER (buf absent)
+semantic-context KEYWORD lane (#550)         LANDED — VECTOR/HYBRID BLOCKED_ON_PROVIDER (no embedding provider)
 dual-track synthesis compiler (#522)         LANDED — synthesis/ + three schemas, suite-counted
 bounded R1 refactor protocol (#523)          LANDED — refactor/ + four schemas, suite-counted
 R1 language adapter implementations          BLOCKED_ON_PROVIDER (declared capability classes only)
 R1 live consumer canary (#523 exit)          NOT_EXERCISED
 applied refactor on a real codebase          NOT_EXERCISED
-cross-repository contract migration          NOT_EXERCISED
+R2 cross-repo protocol compiler (#524)       LANDED — expand-contract/ + three schemas, suite-counted
+cross-repository contract migration (real)   NOT_EXERCISED (rides #528)
 live consumer canary (#528)                  NOT_EXERCISED
 independent Shadow (#525)                    NOT_EXERCISED
 registry admission                           ABSENT

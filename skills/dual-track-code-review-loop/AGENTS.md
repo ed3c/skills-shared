@@ -140,11 +140,13 @@ stop blind repair and open a fresh diagnosis on a new isolated worktree.
 Preserve the states `PASS`, `FAIL`, `ABSENT`, `NOT_IMPLEMENTED`,
 `NOT_EXERCISED`, `SKIPPED_BY_POLICY`, `NOT_APPLICABLE` and
 `HUMAN_ADMIT_REQUIRED`. This directory currently establishes contract, schema and
-deterministic adapter evidence (tree-sitter with a live receipt, sqlite-ledger
-with planted mutations). It does not establish a SCIP, Buf or semantic-context
-adapter, an applied refactor on a real codebase, a live consumer, an
-independent review, legal clearance, merge, release or production, and no
-accumulation of deterministic evidence reaches any of them.
+deterministic adapter evidence (tree-sitter and scip with live receipts,
+sqlite-ledger with planted mutations, buf's NOT_APPLICABLE lane,
+semantic-context's KEYWORD lane, and the R1/R2 protocol compilers). It does
+not establish a live buf VERIFIED run, a VECTOR retrieval lane, an applied
+refactor on a real codebase, a live consumer, an independent review, legal
+clearance, merge, release or production, and no accumulation of deterministic
+evidence reaches any of them.
 
 ## Completion report
 

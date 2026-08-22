@@ -188,9 +188,9 @@ two-track separation and grading      contract-level, enforced by schema
 refusal controls                      replayed against the shipped schemas
 parser/syntax-match binding           LANDED (adapters/tree-sitter/, live receipt)
 graph-ledger binding                  LANDED (adapters/sqlite-ledger/, planted mutations)
-concrete retrieval/semantic binding   NOT_IMPLEMENTED (#550, open)
+concrete retrieval/semantic binding   LANDED KEYWORD lane (adapters/semantic-context/); VECTOR BLOCKED_ON_PROVIDER
 applied refactor on a real codebase   NOT_EXERCISED
-cross-repository contract migration   NOT_EXERCISED
+cross-repository contract migration   R2 compiler LANDED (expand-contract/); real migration NOT_EXERCISED
 live consumer canary                  NOT_EXERCISED
 independent review                    NOT_EXERCISED
 legal, employment and IP clearance    HUMAN_ADMIT_REQUIRED
