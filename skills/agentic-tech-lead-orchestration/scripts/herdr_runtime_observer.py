@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -204,7 +205,11 @@ def _state_change_seq(agent: dict[str, Any]) -> int:
 
 def _ps_process(pid: int) -> tuple[bool, int | None]:
     """OS_AUXILIARY. herdr 0.8.0 publishes no liveness flag and no process start time."""
-    proc = subprocess.run(["ps", "-o", "lstart=", "-p", str(pid)], text=True, capture_output=True)
+    # LC_ALL=C pins lstart to English day/month names; without it a non-English
+    # host locale (observed live 2026-08-22: '六  8月/22 19:04:12 2026') breaks
+    # the strptime contract below. Pin the emitter, do not parse locale variants.
+    env = dict(os.environ, LC_ALL="C")
+    proc = subprocess.run(["ps", "-o", "lstart=", "-p", str(pid)], text=True, capture_output=True, env=env)
     text = proc.stdout.strip()
     if proc.returncode or not text:
         return False, None
@@ -279,7 +284,33 @@ def reduce_observation(
     process = _find(agent, "process_id", "processId", "pid")
     process_facts_source = "HERDR_AGENT_SURFACE" if process not in (None, "") else "NOT_OBSERVED"
     if process in (None, ""):
-        process = _find(process_info, "pid") if process_info else None
+        # Identity must anchor on the pane's SHELL process, not the agent's own
+        # or any foreground child: live observation 2026-08-22 (codex 0.149,
+        # herdr 0.8.0) showed the agent process replaces ITSELF between turns
+        # (pid 46063 -> 54844 across one idle->working->idle cycle) and spawns
+        # children in the foreground group while working, so every agent-side
+        # pid churns by the agent's own design. PaneProcessInfo.shell_pid is
+        # the anchor herdr itself keeps stable for the pane's whole life —
+        # a shell_pid change means the pane was replaced, which IS identity
+        # drift. Fall back to a kind-matched foreground pid only when herdr
+        # publishes no shell_pid.
+        process = None
+        if process_info:
+            process = _find(process_info, "shell_pid", "shellPid")
+            if process in (None, ""):
+                kind = _find(agent, "agent")
+                entries = _find(process_info, "foreground_processes") or []
+                if isinstance(entries, list) and isinstance(kind, str) and kind:
+                    for entry in entries:
+                        if not isinstance(entry, dict):
+                            continue
+                        name = str(entry.get("name") or "")
+                        argv0 = str(entry.get("argv0") or "").rsplit("/", 1)[-1]
+                        if kind in (name, argv0):
+                            process = entry.get("pid")
+                            break
+            if process in (None, ""):
+                process = _find(process_info, "pid")
         if process not in (None, ""):
             process_facts_source = "HERDR_PANE_PROCESS_INFO_PLUS_OS_PS"
     foreground_cwd = _find(agent, "foreground_cwd", "foregroundCwd")
