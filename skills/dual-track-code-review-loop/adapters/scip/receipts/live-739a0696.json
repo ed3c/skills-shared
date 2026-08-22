@@ -47,9 +47,9 @@
   "facts_digest_modulo_subject": "739a06963ce17adf46a937cd598bd55d8a873739cc952c65cb88d71189b43db1",
   "index": {
     "external_symbols": 1,
-    "index_digest": "78aa6a526b09fe5b0d90c6697db48bce6c2e8c1161c8c5623e7483a4e59a34a6",
+    "index_digest": "7062b6b841499f19e3dc55cb81d86f55e383700a1bbeba6f79f4d1fe58a186e0",
     "index_digest_is_host_local": "Index.metadata.project_root is an absolute file:// URL of the directory the indexer ran in, so this digest identifies one run on one machine and two honest runs over the same bytes disagree on it. facts_digest_modulo_subject is the comparable one.",
-    "indexed_commit": "d31cb65afb1f7c66ee2e79b8f7ebbe1299a9c9aa",
+    "indexed_commit": "05c56c37f2d0ef07634cf90021389d98bdc3e3fd",
     "provider_emitted_relationships": 0
   },
   "provider": {
@@ -66,9 +66,9 @@
   },
   "schema": "dtcr/scip-live-receipt/v1",
   "subject": {
-    "commit": "d31cb65afb1f7c66ee2e79b8f7ebbe1299a9c9aa",
+    "commit": "05c56c37f2d0ef07634cf90021389d98bdc3e3fd",
     "repository_binding_id": "DTCR-RB-3749864dfe3e2f36",
-    "tree": "26678d187e1816d5522d0e496e66301980352be7"
+    "tree": "5aa184b83cb06cc26ad5cd3a78969932a9dcd610"
   },
   "subject_blobs": {
     "skills/dual-track-code-review-loop/adapters/scip/fixtures/python-package/dtcr_fixture/__init__.py": "29b7e14504712e65d71e232cd6469e1d0d6989fc",

@@ -1,5 +1,5 @@
 {
-  "bundle_digest": "b465efde2f422aa48b896fb2c437e67a04d039bfa5f7da62d1f7bc201cb1d78a",
+  "bundle_digest": "d47375764d6ef03bfd45f05d7d136049a6d945630d8a9fe5567208f2d3cd9e4f",
   "bundle_id": "python-definitions",
   "bundle_manifest_digest": "1299ed3f055932f20c6a7d98ff2aa8a03549649045d778717bad5380bccac298",
   "completeness": "PARTIAL_LOWER_BOUND",
@@ -42,9 +42,9 @@
   },
   "schema": "dtcr/tree-sitter-live-receipt/v1",
   "subject": {
-    "commit": "12ccfaf96347a38d0faea47980ed4150a58bb940",
+    "commit": "05c56c37f2d0ef07634cf90021389d98bdc3e3fd",
     "repository_binding_id": "DTCR-RB-3749864dfe3e2f36",
-    "tree": "4ab1fbe7cb0889300323ede60c51b46f03872276"
+    "tree": "5aa184b83cb06cc26ad5cd3a78969932a9dcd610"
   },
   "subject_blobs": {
     "skills/dual-track-code-review-loop/adapters/tree-sitter/fixtures/python-clean/sample.py.fixture": "054d78eee9126dd0209db438cb30812f127c8d42",

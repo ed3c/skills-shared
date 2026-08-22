@@ -35,7 +35,7 @@
       "under_contract": 519,
       "issue": 546,
       "landing_commit": "66dfdb42816fb581f3e25b4df164a662dd172795",
-      "evidence": "committed selftest.py + live receipt adapters/tree-sitter/receipts/live-12ccfaf9.json (regenerated through the adapter after the #575 digest-key repair)"
+      "evidence": "committed selftest.py + live receipt adapters/tree-sitter/receipts/live-05c56c37.json (regenerated through the adapter at a wave-branch subject that is an ancestor of HEAD)"
     },
     {
       "capability": "queryable graph-ledger fact plane",
