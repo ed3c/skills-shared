@@ -506,6 +506,12 @@ def project(corpus: dict[str, Any]) -> dict[str, Any]:
                 f"{document_id} declares the public tree as its plane and carries no source "
                 f"text, so nothing here can be projected or recomputed for it.",
             )
+        # The emitted artifacts are scanned by `enforce`, and the source text is
+        # not one of them -- no schema here has a body key. But this text is
+        # committed in the public tree beside the registration, so the same
+        # obligation covers it, and the scan has to be spelled out here because
+        # nothing downstream will ever look at it.
+        scan_public(text, f"records[{index}].text")
         _verify_source_binding(record, text)
 
         for chunk_index, chunk in enumerate(chunks_of(text)):

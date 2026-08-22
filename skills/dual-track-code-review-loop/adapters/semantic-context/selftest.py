@@ -523,6 +523,28 @@ def lane_falsifiers(baseline: dict[str, Any]) -> None:
         resolved_locator_in_a_public_field,
     )
 
+    def resolved_locator_in_the_source_text() -> None:
+        # Every digest the added paragraph moves is moved with it, so the only
+        # thing wrong with this corpus is the locator. A plant that also breaks
+        # the document digest would be refused by the digest check and would
+        # credit the scan with a refusal the scan never performed.
+        def mutate(data: dict[str, Any]) -> None:
+            record = record_of(data, "DTCR-DOC-003")
+            record["text"] += (
+                "\n\nThe full incident record is at https://example.invalid/private-space/incidents.\n"
+            )
+            raw = record["text"].encode("utf-8")
+            record["document"]["document_digest"] = S.sha256_hex(raw)
+            record["back_reference"]["source_packet"]["sha256"] = S.sha256_hex(raw)
+            record["back_reference"]["source_packet"]["byte_count"] = len(raw)
+        S.open_port(lane="KEYWORD", source=corpus_copy(mutate))
+
+    expect_adapter_refusal(
+        "PRIVATE_URL_OR_PRIVATE_VALUE_IN_PUBLIC_RECEIPT",
+        "the source text is committed in this tree too, so the same scan covers it",
+        resolved_locator_in_the_source_text,
+    )
+
     # -- authority edges ---------------------------------------------------
 
     def reference_naming_a_retrieval_row() -> None:
