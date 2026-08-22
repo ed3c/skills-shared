@@ -1,0 +1,22 @@
+{
+  "adapter": {
+    "name": "dtcr-semantic-context",
+    "version": "1.0.0"
+  },
+  "binding": null,
+  "establishes": {
+    "provider_available_elsewhere": false,
+    "retrieval_quality": false,
+    "semantic_correctness": false,
+    "task_pass": false
+  },
+  "lane": "LANCEDB",
+  "observed": {
+    "import_error_class": "ModuleNotFoundError",
+    "import_module": "lancedb"
+  },
+  "policy": "LanceDB is a candidate adapter behind SemanticContextPort, not portable core authority. Entering the lane requires binding the exact installed library revision and its licence/NOTICE state, which is a human admission. Until a run has actually exercised it, the honest state is NOT_EXERCISED; the deterministic reference backend proves the adapter laws on its own.",
+  "reason": "PROVIDER_ABSENT",
+  "schema": "dtcr/semantic-context-provider-lane/v1",
+  "state": "NOT_EXERCISED"
+}

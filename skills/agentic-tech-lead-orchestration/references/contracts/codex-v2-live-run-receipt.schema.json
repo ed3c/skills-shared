@@ -1,0 +1,134 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ed3c/skills-shared/skills/agentic-tech-lead-orchestration/codex-v2-live-run-receipt.schema.json",
+  "title": "Codex v2 Live Run Receipt (issue #464)",
+  "description": "Durable ledger receipt for the one live Codex v2 run admitted by issue #464. Issue #464 requires the run's failure states to remain expressible after the fact; the hand-authored receipt was previously unschematized, so every state below PASS could only be described in prose. This schema makes verdict, failure_state and per-lane state machine-checkable, and couples them so a PASS cannot carry a failure and a FAIL cannot claim none.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "issue",
+    "subject",
+    "verdict",
+    "failure_state",
+    "lanes",
+    "acceptance_receipt",
+    "carrier",
+    "executor_observation",
+    "evidence_ceiling",
+    "driven_by",
+    "driven_on"
+  ],
+  "$defs": {
+    "sha40": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "nonempty": {"type": "string", "minLength": 1},
+    "lane_state": {"enum": ["PASS", "FAIL", "NOT_EXERCISED", "HUMAN_ADMIT_REQUIRED"]}
+  },
+  "properties": {
+    "schema": {"const": "agentic-tech-lead/codex-v2-live-run/v1"},
+    "issue": {"const": 464},
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repo", "queue_subject_commit", "receipt_landing_commit"],
+      "description": "The queue subject the run was authorized against, and the commit this receipt lands on. A receipt whose queue subject is not an ancestor of its landing commit is the STALE_SUBJECT failure state.",
+      "properties": {
+        "repo": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+        "queue_subject_commit": {"$ref": "#/$defs/sha40"},
+        "receipt_landing_commit": {"$ref": "#/$defs/sha40"}
+      }
+    },
+    "verdict": {"$ref": "#/$defs/lane_state"},
+    "failure_state": {
+      "enum": [
+        "NONE",
+        "SDK_RETURNED_WITHOUT_CONTROLLER_ACCEPTANCE",
+        "CHANGED_FILE_DRIFT",
+        "STALE_SUBJECT",
+        "MALFORMED_RESULT",
+        "CONTROLLER_TEST_FAILURE",
+        "INCOMPATIBLE_RETRY_LINEAGE"
+      ],
+      "description": "The six non-NONE names are verbatim from the issue #464 body. Recording one is what keeps a failed live turn distinguishable from a turn that was never spent."
+    },
+    "lanes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["live_codex_execution", "controller_readback", "shadow_readback", "merge"],
+      "properties": {
+        "live_codex_execution": {"$ref": "#/$defs/lane_state"},
+        "controller_readback": {"$ref": "#/$defs/lane_state"},
+        "shadow_readback": {"$ref": "#/$defs/lane_state"},
+        "merge": {"$ref": "#/$defs/lane_state"}
+      }
+    },
+    "acceptance_receipt": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "description": "The compiled codex-live-acceptance-receipt-v2 this run produced. Null is only admissible below PASS: compile_codex_live_acceptance.py writes no file at all on failure.",
+      "properties": {
+        "path": {"$ref": "#/$defs/nonempty"},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "carrier": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["bundle_filename", "bundle_sha256", "bundle_bytes", "committed"],
+      "properties": {
+        "bundle_filename": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*\\.bundle$"},
+        "bundle_sha256": {"$ref": "#/$defs/sha256"},
+        "bundle_bytes": {"type": "integer", "minimum": 1},
+        "committed": {"type": "boolean"}
+      }
+    },
+    "executor_observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sdk_version",
+        "codex_binary_source",
+        "codex_binary_path",
+        "codex_binary_sha256",
+        "which_codex_before_run",
+        "binary_verified_at_readback"
+      ],
+      "description": "What executed, observed on the machine that ran it. binary_verified_at_readback is the durable record of whether the digest was recomputable at readback time: an independent Shadow machine no longer holds the binary, so the recomputation fails open there unless this flag says it already happened here.",
+      "properties": {
+        "sdk_version": {"$ref": "#/$defs/nonempty"},
+        "codex_binary_source": {
+          "enum": ["SDK_PINNED_RUNTIME", "SDK_BUNDLED", "PATH", "ABSENT", "UNRESOLVED"],
+          "description": "SDK_PINNED_RUNTIME is what the openai-codex SDK actually runs: codex_cli_bin.bundled_codex_path(), a sibling distribution of openai_codex in site-packages, not an executable inside the openai_codex package tree."
+        },
+        "codex_binary_path": {"type": ["string", "null"], "minLength": 1},
+        "codex_binary_sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+        "which_codex_before_run": {
+          "type": ["string", "null"],
+          "minLength": 1,
+          "description": "`which codex` captured before the turn. Recorded so a PATH copy can be told apart from the executable the SDK pinned; it is never itself executor identity."
+        },
+        "binary_verified_at_readback": {"type": "boolean"}
+      }
+    },
+    "evidence_ceiling": {"$ref": "#/$defs/nonempty"},
+    "driven_by": {"$ref": "#/$defs/nonempty"},
+    "driven_on": {"$ref": "#/$defs/nonempty"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"verdict": {"const": "PASS"}}, "required": ["verdict"]},
+      "then": {
+        "properties": {
+          "failure_state": {"const": "NONE"},
+          "acceptance_receipt": {"type": "object"}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"verdict": {"const": "FAIL"}}, "required": ["verdict"]},
+      "then": {"properties": {"failure_state": {"not": {"const": "NONE"}}}}
+    }
+  ]
+}

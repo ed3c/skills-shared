@@ -13,7 +13,7 @@
         "cleanup_state",
         "residue_count"
       ],
-      "unblocking_lane": "herdr must publish these facts on its agent surface, or the frozen observer/lifecycle contract must be renegotiated against a real herdr capability set; neither is in this item's authority."
+      "unblocking_lane": "herdr must publish these facts on its agent surface, or the frozen observer/lifecycle contract must be renegotiated against a real herdr capability set; neither is in this item's authority. SUPERSEDED 2026-08-22: see corrections[]; the contract renegotiation is now scoped and owned by this issue."
     },
     {
       "class": "HOST_ISOLATION_DENIED",
@@ -34,6 +34,29 @@
     "state": "CLEAN"
   },
   "controller_readback_required": true,
+  "corrections": [
+    {
+      "believed_because": "The 2026-08-21 pass enumerated only AgentInfo's property set and never checked the sibling API objects of the same schema for a complement, so a contract was frozen against one object of a larger surface. PaneProcessInfoProcess was present in the very same `herdr api schema --json` document the pass read.",
+      "corrected_on": "2026-08-22",
+      "corrects": "blockers[0].missing_observer_inputs contains 'process_id|pid'",
+      "finding": "FALSIFIED. herdr 0.8.0 publishes process ids via PaneProcessInfo (API method pane.process_info, CLI 'herdr pane process-info --pane <ID>'): pane_id, tty, shell_pid, foreground_process_group_id, foreground_processes[]{pid,name,argv,argv0,cmdline,cwd}. Only AgentInfo lacks a pid.",
+      "probe": "herdr api schema --json | jq -c '{ppi:(.schemas.success_response.\"$defs\".PaneProcessInfo.properties|keys), proc:(.schemas.success_response.\"$defs\".PaneProcessInfoProcess.properties|keys)}'"
+    },
+    {
+      "believed_because": "The 2026-08-21 pass probed exactly one relocation mechanism (HERDR_CONFIG_PATH), observed it did not move the socket, and generalised that single negative observation into 'the socket path is HOME-derived only'. `herdr --session` was never invoked, so its own isolation lane was never in the observed set — the same one-object-of-a-larger-surface error as the correction above.",
+      "corrected_on": "2026-08-22",
+      "corrects": "blockers[1] class HOST_ISOLATION_DENIED and its 'socket path is HOME-derived only' detail",
+      "finding": "FALSIFIED as a blocker. 'herdr --session <name>' relocates the socket to ~/.config/herdr/sessions/<name>/herdr.sock with no HOME manipulation. HERDR_CONFIG_PATH indeed does not relocate the socket, but --session does. 'herdr session list' prints the per-session directory and socket columns for every session.",
+      "probe": "herdr --session probe466audit status  # -> socket: /Users/neon/.config/herdr/sessions/probe466audit/herdr.sock"
+    },
+    {
+      "believed_because": "Having frozen the contract against AgentInfo alone, every field the observer needed looked upstream-absent, so NO_HERDR_LIFECYCLE_SAMPLE was read as a terminal upstream blocker. The pass never asked which of the missing facts were obtainable from another published surface or as an explicitly typed substitution — it treated 'AgentInfo does not publish X' as 'herdr 0.8.0 does not publish X'.",
+      "corrected_on": "2026-08-22",
+      "corrects": "evidence_ceiling NO_HERDR_LIFECYCLE_SAMPLE read as BLOCKED_BY_UPSTREAM_API",
+      "finding": "The remaining genuinely-unpublished facts are exactly three: any wall-clock observation timestamp, process_alive, and process start time, plus cleanup_state/residue_count. All are obtainable as explicitly typed substitutions (observer local clock + state_change_seq for ordering; ps -o lstart=; post-terminal pane.process_info foreground_processes emptiness). BLOCKED_BY_UPSTREAM_API is not yet earned.",
+      "probe": "herdr api schema --json | jq -r '[paths|.[]|tostring]|unique|.[]' | grep -Ei 'observ|alive|clean|residue'"
+    }
+  ],
   "evidence": [
     {
       "argv": ["herdr", "--version"],

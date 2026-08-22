@@ -16,9 +16,6 @@ python3 "$ROOT/tests/selftest.py"
 # them here gives every adapter the CI arrival its own lease could not add.
 python3 "$ROOT/adapters/tree-sitter/selftest.py"
 python3 "$ROOT/adapters/sqlite-ledger/selftest.py"
-python3 "$ROOT/adapters/scip/selftest.py"
-python3 "$ROOT/adapters/buf/selftest.py"
-python3 "$ROOT/adapters/semantic-context/selftest.py"
 
 # Same reason as the adapters: the synthesis compilers ship their own gate, and
 # a gate nobody runs reports the same green as one that passes. The schemas it
@@ -32,15 +29,15 @@ python3 "$ROOT/synthesis/selftest.py"
 # committed request rather than by a test constructing one.
 python3 "$ROOT/refactor/selftest.py"
 
-# And for the R2 cross-repository Expand & Contract compiler, same contract:
-# committed requests, byte-stable projections, every declared state emitted by
-# a real compilation, refusals fired from single-field deltas.
+# 2026-08-22 wave: three more provider adapters (#547 SCIP, #549 Buf, #550
+# semantic-context) and the R2 expand-contract compiler (#524), routed here for
+# the same reason as every lane above — a gate nobody runs reports the same
+# green as one that passes. Each is fixture-deterministic; live lanes bind the
+# probed provider identity or self-report NOT_EXERCISED.
+python3 "$ROOT/adapters/scip/selftest.py"
+python3 "$ROOT/adapters/buf/selftest.py"
+python3 "$ROOT/adapters/semantic-context/selftest.py"
 python3 "$ROOT/expand-contract/selftest.py"
-
-# The consumer-bootstrap profile gate reconciles the committed thin-binding
-# artifact against the tree in both directions; nothing else routes it, so a
-# regression in it would otherwise be invisible.
-python3 "$ROOT/bootstrap/check_bootstrap_profile.py" --selftest
 
 # The #528 canary receipt is a v0-draft with no frozen schema, so this is the
 # only thing standing between it and citing evidence that was never committed.

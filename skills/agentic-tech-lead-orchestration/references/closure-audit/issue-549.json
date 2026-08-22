@@ -1,0 +1,67 @@
+{
+ "schema_version": "agentic-tech-lead/issue-closure-contract/v1",
+ "issue": {
+  "repository": "ed3c/skills-shared",
+  "number": 549,
+  "github_state": "CLOSED",
+  "github_state_reason": "COMPLETED"
+ },
+ "disposition": "SCOPE_TRANSFERRED",
+ "acceptance": [
+  {
+   "id": "compatibility-adapter-with-both-terminals",
+   "status": "SATISFIED",
+   "successor": null,
+   "rationale": "adapters/buf/ landed in publication commit a3f87ac724ab56e78c6fe40967397f64038afffa (history rebuilt before first push; the worktree-local lane merge e1d867f7 resolves only on the local forensic branch): a real buf 1.72.0 (npm @bufbuild/buf, Human-admitted prerequisite) breaking exercise with a genuine FIELD_NO_DELETE finding on a committed baseline/candidate .proto pair, and the typed NOT_APPLICABLE receipt for the zero-Protobuf task under the frozen contract-compatibility-result schema"
+  },
+  {
+   "id": "provider-identity-bound-when-exercised",
+   "status": "SATISFIED",
+   "successor": null,
+   "rationale": "landing-run buf executable version and digest bound in the committed fixtures/receipts; on hosts without buf the live lane self-reports NOT_EXERCISED instead of promoting fixture replay to a runtime pass"
+  },
+  {
+   "id": "required-falsifiers-planted-and-red",
+   "status": "SATISFIED",
+   "successor": null,
+   "rationale": "all ten named falsifiers planted with 16 falsifier rows, each red for its named reason; breaking rules were never weakened to make a fixture green"
+  },
+  {
+   "id": "exact-head-hosted-gates-on-draft-pr",
+   "status": "TRANSFERRED",
+   "successor": "ed3c/skills-shared#519",
+   "rationale": "per the Human-admitted 2026-08-22 delivery mode hosted gates run once on the final consolidated push head; per-lane Draft-PR clause superseded by the issue's reconciliation section"
+  },
+  {
+   "id": "convergence-packet-to-519",
+   "status": "TRANSFERRED",
+   "successor": "ed3c/skills-shared#519",
+   "rationale": "#519 stays open as convergence owner and decides whether Buf is required for any convergence task; this terminal lane never decided its siblings' applicability"
+  }
+ ],
+ "implementation": {
+  "candidate_prs": [],
+  "landing": null
+ },
+ "residual": [
+  {
+   "id": "hosted-exact-head-arrival",
+   "state": "NOT_EXERCISED",
+   "owner": "ed3c/skills-shared#519"
+  },
+  {
+   "id": "bsr-network-publication",
+   "state": "NOT_EXERCISED",
+   "owner": "ed3c/skills-shared#519"
+  },
+  {
+   "id": "independent-shadow-review",
+   "state": "NOT_EXERCISED",
+   "owner": "ed3c/skills-shared#525"
+  }
+ ],
+ "evidence_ceiling": "DETERMINISTIC",
+ "shadow_review": {
+  "verdict": "HUMAN_ADMIT_REQUIRED"
+ }
+}

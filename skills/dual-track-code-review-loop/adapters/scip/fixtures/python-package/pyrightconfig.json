@@ -1,7 +1,0 @@
-{
-  "include": ["dtcr_fixture"],
-  "exclude": [],
-  "typeCheckingMode": "basic",
-  "useLibraryCodeForTypes": false,
-  "pythonVersion": "3.11"
-}

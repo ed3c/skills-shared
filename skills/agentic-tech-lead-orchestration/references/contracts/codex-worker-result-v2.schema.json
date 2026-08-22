@@ -91,9 +91,14 @@
         "sdk_package": {"$ref": "#/$defs/nonempty"},
         "sdk_version": {"$ref": "#/$defs/nonempty", "description": "Distribution version, or ABSENT when the package exposes none."},
         "sdk_module_dir": {"type": ["string", "null"], "minLength": 1},
+        "runtime_module_dir": {
+          "type": ["string", "null"],
+          "minLength": 1,
+          "description": "Package directory of the SDK's pinned runtime (codex_cli_bin), a sibling of the SDK package. Required to be the containing tree when codex_binary_source is SDK_PINNED_RUNTIME."
+        },
         "codex_binary_source": {
-          "enum": ["SDK_BUNDLED", "PATH", "ABSENT"],
-          "description": "SDK_BUNDLED means the executable ships inside the SDK package tree; PATH means a resolved PATH executable outside it."
+          "enum": ["SDK_PINNED_RUNTIME", "SDK_BUNDLED", "PATH", "ABSENT"],
+          "description": "SDK_PINNED_RUNTIME means the executable the SDK itself resolves via codex_cli_bin.bundled_codex_path(), which lives in the sibling openai-codex-cli-bin distribution; SDK_BUNDLED means an executable inside the SDK package tree; PATH means a resolved PATH executable outside both, which is a guess about identity and never an SDK claim."
         },
         "codex_binary_path": {"type": ["string", "null"], "minLength": 1},
         "codex_binary_sha256": {"$ref": "#/$defs/nullable_sha256"},

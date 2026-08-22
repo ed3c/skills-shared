@@ -1,0 +1,58 @@
+{
+  "accepted": 12,
+  "cas_conflicts_observed": 36,
+  "ceiling": "Single-node register semantics over one ref, in-process clients on one host. Cross-node or cross-region linearizability is NOT_EXERCISED.",
+  "checked_operations": 96,
+  "checker_detail": {
+    "operations": 96,
+    "states_explored": 25
+  },
+  "clients": 4,
+  "concurrent_overlapping_pairs": 278,
+  "consumer_subject": {
+    "bytes": 19872,
+    "committed_to_repository": false,
+    "implementation_relationship": "CLEAN_ROOM",
+    "implementation_sha256": "4ea664cc6bae1d3a999bf4293ad65136821c3a611a498894d428448a1610d127",
+    "name": "refcore (disposable single-node Git-hosting reference core)",
+    "path_outside_repository": "/private/tmp/claude-501/-Users-neon-skills-shared/ba0ee313-3387-4cd5-8e1e-eea11e6f3419/scratchpad/canary-subject/refcore.py",
+    "visibility": "PRIVATE_DISPOSABLE_SCRATCHPAD"
+  },
+  "epoch_subject": {
+    "commit": "5341885f26b5e8e7baf5087a4d661e324f878242",
+    "repository": "ed3c/skills-shared",
+    "rollback_commit": "9fe3c6daf53dcdd61123d5d7a4eeedbdf37b5d7c",
+    "tree": "a18e12507f9e621efd5354f58384eded1f1e2a9a"
+  },
+  "experiment": "L1-B",
+  "falsifiers_not_triggered": [
+    "CAS_CONFLICT_SILENTLY_OVERWRITTEN",
+    "NON_LINEARIZABLE_HISTORY_ACCEPTED"
+  ],
+  "final_value": "v-0-11",
+  "issue": 534,
+  "linearizable": true,
+  "multi_ref_atomic_record": true,
+  "multi_ref_updates_in_one_record": 3,
+  "operations": 96,
+  "planted_defect": null,
+  "rejected": 36,
+  "runtime": {
+    "clock_model": "single host monotonic clock, no distributed clock",
+    "cloud_provider": "NONE",
+    "cost_usd": 0.0,
+    "cpu_count": 10,
+    "git_version": "git version 2.50.1 (Apple Git-155)",
+    "machine": "arm64",
+    "network_used": false,
+    "observed_worktree_dirty_paths": 39,
+    "observed_worktree_head": "bca08001c416108f9b83e9325e7bf07149a9281f",
+    "os": "macOS-26.4-arm64-arm-64bit-Mach-O",
+    "pinned_benchmark_host": false,
+    "process_model": "python3 subprocesses; line-JSON over anonymous pipes inherited at spawn; no socket, no listening port",
+    "python": "3.14.6"
+  },
+  "stage": "CONCURRENT_REF_HISTORY_CANARY",
+  "timed_out": 0,
+  "verdict": "PASS"
+}

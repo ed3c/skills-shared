@@ -1,0 +1,73 @@
+{
+  "ceiling": "One replica repacks. Fan-out repack cost across replicas is NOT_EXERCISED.",
+  "compaction_amplification_bytes_written_over_live_bytes": 1.0,
+  "consumer_subject": {
+    "bytes": 19872,
+    "committed_to_repository": false,
+    "implementation_relationship": "CLEAN_ROOM",
+    "implementation_sha256": "4ea664cc6bae1d3a999bf4293ad65136821c3a611a498894d428448a1610d127",
+    "name": "refcore (disposable single-node Git-hosting reference core)",
+    "path_outside_repository": "/private/tmp/claude-501/-Users-neon-skills-shared/ba0ee313-3387-4cd5-8e1e-eea11e6f3419/scratchpad/canary-subject/refcore.py",
+    "visibility": "PRIVATE_DISPOSABLE_SCRATCHPAD"
+  },
+  "cost": {
+    "bytes_read": 34239,
+    "bytes_transferred": 0,
+    "bytes_written": 21026,
+    "child_cpu_delta_seconds": 0.0,
+    "in_process_cpu_seconds": 0.000643,
+    "replica_count_in_topology": 1,
+    "replicas_repacked": 1,
+    "wall_seconds": 0.00066
+  },
+  "epoch_subject": {
+    "commit": "5341885f26b5e8e7baf5087a4d661e324f878242",
+    "repository": "ed3c/skills-shared",
+    "rollback_commit": "9fe3c6daf53dcdd61123d5d7a4eeedbdf37b5d7c",
+    "tree": "a18e12507f9e621efd5354f58384eded1f1e2a9a"
+  },
+  "experiment": "L1-F",
+  "falsifiers_not_triggered": [
+    "COMPACTION_DROPS_REACHABLE_OBJECT"
+  ],
+  "issue": 534,
+  "log_bytes_after": 21026,
+  "log_bytes_before": 34239,
+  "reachable_after": 33,
+  "reachable_before": 33,
+  "reachable_objects_missing_after_compaction": [],
+  "reachable_objects_readable_after_compaction": 33,
+  "reachable_objects_readable_after_restart": 33,
+  "refs_after": {
+    "refs/heads/b0": "da5dd0039f4e877df2693ac5528a5d61c427968ebd09c74c3baaf5d4d6705f0f",
+    "refs/heads/b1": "928aadac12ab309b89da8c007a03a59301d3f4aaea9b55fb09beb855adc0cf01",
+    "refs/heads/b2": "780ea80b096fb9593a6893510a49a9fd82a7b0262f621d770413cc383b98cc5e"
+  },
+  "refs_before": {
+    "refs/heads/b0": "da5dd0039f4e877df2693ac5528a5d61c427968ebd09c74c3baaf5d4d6705f0f",
+    "refs/heads/b1": "928aadac12ab309b89da8c007a03a59301d3f4aaea9b55fb09beb855adc0cf01",
+    "refs/heads/b2": "780ea80b096fb9593a6893510a49a9fd82a7b0262f621d770413cc383b98cc5e"
+  },
+  "refs_preserved": true,
+  "replay_status_after_restart": "OK",
+  "runtime": {
+    "clock_model": "single host monotonic clock, no distributed clock",
+    "cloud_provider": "NONE",
+    "cost_usd": 0.0,
+    "cpu_count": 10,
+    "git_version": "git version 2.50.1 (Apple Git-155)",
+    "machine": "arm64",
+    "network_used": false,
+    "observed_worktree_dirty_paths": 39,
+    "observed_worktree_head": "bca08001c416108f9b83e9325e7bf07149a9281f",
+    "os": "macOS-26.4-arm64-arm-64bit-Mach-O",
+    "pinned_benchmark_host": false,
+    "process_model": "python3 subprocesses; line-JSON over anonymous pipes inherited at spawn; no socket, no listening port",
+    "python": "3.14.6"
+  },
+  "stage": "COMPACTION_REACHABILITY_CANARY",
+  "unreachable_objects_planted": 7,
+  "unreachable_objects_surviving": 0,
+  "unreachable_policy": "DROP_IMMEDIATELY",
+  "verdict": "PASS"
+}

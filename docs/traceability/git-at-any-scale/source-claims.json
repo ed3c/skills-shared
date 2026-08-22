@@ -21,8 +21,21 @@
   },
   "repository_subject": {
     "repository": "ed3c/skills-shared",
+    "status": "HISTORICAL",
+    "role": "compile subject — the exact head the 2026-08-21 triage below was computed against",
     "main": "174009203a3ff9bd6ebc4010bc6cab7232dd44a4",
     "tree": "311052ecf5780f8d91c4d2429e8ce1a50a0361d8"
+  },
+  "epoch_subject": {
+    "repository": "ed3c/skills-shared",
+    "status": "CURRENT",
+    "role": "admitted main at the 2026-08-22 readback; matches docs/traceability/git-at-any-scale/README.md",
+    "main": "5341885f26b5e8e7baf5087a4d661e324f878242",
+    "tree": "a18e12507f9e621efd5354f58384eded1f1e2a9a",
+    "rollback": "9fe3c6daf53dcdd61123d5d7a4eeedbdf37b5d7c",
+    "relation_to_compile_subject": "174009203a3ff9bd6ebc4010bc6cab7232dd44a4 is an ancestor of this subject, 182 commits behind (git merge-base --is-ancestor, git rev-list --count, 2026-08-22)",
+    "recompiled": false,
+    "recompile_note": "The claim_denominator and triage below were NOT recompiled against this subject. They remain the 2026-08-21 observation at the historical compile subject; re-derive them from the ssot paths before treating any count here as current."
   },
   "claim_denominator": {
     "total": 28,

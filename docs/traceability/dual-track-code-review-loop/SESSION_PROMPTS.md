@@ -52,16 +52,20 @@ advanced.
 ## Stage index (see the Skill file for the full text of each)
 
 ```text
-P0  control/authority binder                      #517, #518
+P0  control/authority binder                      #517 (OPEN), #518 (CLOSED)
 P1  source/claim/rights auditor
 P2  contract/schema compiler
-P3  deterministic fact-plane Worker                #519, #547, #549
-P4  semantic-context Worker                        #521, #550
-P5  bounded execution controller                   #523 (single-repo) | #524 (cross-repo)
-P6  independent Shadow auditor                     #525
-P7  convergence/bootstrap controller               #526, #527
-P8  live-canary/Local-Handoff controller            #528
+P3  deterministic fact-plane Worker                #519 (OPEN), #547 (OPEN), #549 (OPEN)
+P4  semantic-context Worker                        #521 (OPEN), #550 (OPEN)
+P5  bounded execution controller                   #523 (single-repo, CLOSED) | #524 (cross-repo, OPEN)
+P6  independent Shadow auditor                     #525 (OPEN)
+P7  convergence/bootstrap controller               #526 (CLOSED), #527 (OPEN)
+P8  live-canary/Local-Handoff controller            #528 (OPEN)
 ```
+
+The `(OPEN|CLOSED)` tags are the live GitHub states re-queried per issue on
+2026-08-22; re-query gh before trusting them, exactly as `ISSUE_DAG.json`'s
+authority note requires.
 
 P5 compiles two mode-specific variants under one stage contract
 (`SINGLE_REPO_REFACTOR` and `CROSS_REPO_EXPAND_CONTRACT`); it is not a tenth

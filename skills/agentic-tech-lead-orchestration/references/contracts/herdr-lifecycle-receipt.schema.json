@@ -2,16 +2,29 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/ed3c/skills-shared/skills/agentic-tech-lead-orchestration/herdr-lifecycle-receipt.schema.json",
   "title": "Herdr Lifecycle Receipt",
+  "description": "One id, three legal shapes. The first two are emitted by collect_herdr_lifecycle.py. The third is the queue-level envelope that herdr-local-handoff-queue.json names as its receipt: without it the queue's own required_states (PASS/FAIL/NOT_EXERCISED/HUMAN_ADMIT_REQUIRED) named a vocabulary no legal instance could ever carry, so no honest blocked run and no successful future run could be recorded against this id.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version","task_id","attempt_id","repo","base_sha","tree_sha","worktree","target","sample_count","sample_digests","lifecycle_state","controller_readback_required","shadow_review_required","evidence_ceiling"],
+  "required": ["schema_version","attempt_id","sample_count","controller_readback_required","shadow_review_required","evidence_ceiling"],
   "properties": {
     "schema_version": {"const": 1},
+    "schema": {"const": "agentic-tech-lead/herdr-lifecycle/v1"},
     "task_id": {"type": "string", "minLength": 1},
+    "task_ref": {"type": "string", "minLength": 1},
     "attempt_id": {"type": "string", "minLength": 1},
     "repo": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
     "base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
     "tree_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository","commit","tree"],
+      "properties": {
+        "repository": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+        "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "tree": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+      }
+    },
     "worktree": {"type": "string", "minLength": 1},
     "target": {"type": "string", "minLength": 1},
     "pane_id": {"type": ["string","null"]},
@@ -20,77 +33,51 @@
     "process_started_at_unix": {"type": ["integer","null"], "minimum": 1},
     "agent_session_id": {"type": ["string","null"]},
     "sample_count": {"type": "integer", "minimum": 0, "maximum": 100},
-    "sample_digests": {"type": "array", "minItems": 0, "maxItems": 100, "items": {"type": "string", "pattern": "^[0-9a-f]{64}$"}},
+    "sample_digests": {"type": "array", "minItems": 1, "maxItems": 100, "items": {"type": "string", "pattern": "^[0-9a-f]{64}$"}},
     "first_source_observed_at_unix": {"type": "integer", "minimum": 1},
     "last_source_observed_at_unix": {"type": "integer", "minimum": 1},
     "final_observer_state": {"enum": ["RUNNING","BLOCKED","IDLE","UNKNOWN","DONE_CANDIDATE"]},
-    "lifecycle_state": {
-      "description": "Receipt-plane vocabulary. Only LIVE_HERDR_LIFECYCLE_OBSERVED_CANDIDATE may be read as the queue-plane PASS verdict of runtime-handoff/herdr-local-handoff-queue.json; UNAVAILABLE_FALLBACK and BLOCKED_NO_SAMPLE never are. The queue records that mapping as an explicit forbidden promotion because its own required_states/required_verdict are the repository evidence vocabulary enforced by scripts/assert_local_handoff_queue.py, not these values.",
-      "enum": ["UNAVAILABLE_FALLBACK","LIVE_HERDR_LIFECYCLE_OBSERVED_CANDIDATE","BLOCKED_NO_SAMPLE"]
-    },
-    "controller_readback_required": {"const": true},
-    "shadow_review_required": {"const": true},
-    "evidence_ceiling": {"enum": ["NO_HERDR_OBSERVATION","LIVE_OBSERVER_LIFECYCLE_SHADOW_PENDING","NO_HERDR_LIFECYCLE_SAMPLE"]},
+    "lifecycle_state": {"enum": ["UNAVAILABLE_FALLBACK","LIVE_HERDR_LIFECYCLE_OBSERVED_CANDIDATE"]},
+    "lifecycle_state_reached": {"type": "string", "minLength": 1},
+    "state": {"enum": ["PASS","FAIL","NOT_EXERCISED","HUMAN_ADMIT_REQUIRED"]},
     "blockers": {
-      "description": "Why zero samples exist. Required by the BLOCKED_NO_SAMPLE branch so a blocked attempt cannot be recorded as an empty success.",
       "type": "array",
       "minItems": 1,
-      "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": ["class","detail","unblocking_lane"],
-        "properties": {
-          "class": {"type": "string", "minLength": 1},
-          "detail": {"type": "string", "minLength": 1},
-          "unblocking_lane": {"type": "string", "minLength": 1},
-          "missing_observer_inputs": {"type": "array", "items": {"type": "string", "minLength": 1}},
-          "denial_evidence": {"type": "string", "minLength": 1},
-          "probe": {"type": "string", "minLength": 1}
-        }
-      }
+      "items": {"type": "object", "required": ["class","detail","unblocking_lane"], "properties": {"class": {"type": "string", "minLength": 1}, "detail": {"type": "string", "minLength": 1}, "unblocking_lane": {"type": "string", "minLength": 1}}}
     },
-    "cleanup": {"type": "object"},
+    "cleanup": {"type": "object", "required": ["state","residue_count"], "properties": {"state": {"enum": ["CLEAN","RESIDUE","UNKNOWN"]}, "residue_count": {"type": "integer", "minimum": 0}}},
     "evidence": {
       "type": "array",
-      "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": ["argv","exit_code","finding"],
-        "properties": {
-          "argv": {"type": "array", "minItems": 1, "items": {"type": "string"}},
-          "exit_code": {"type": "integer"},
-          "finding": {"type": "string", "minLength": 1}
-        }
-      }
+      "minItems": 1,
+      "items": {"type": "object", "required": ["argv","exit_code","finding"], "properties": {"argv": {"type": "array", "minItems": 1, "items": {"type": "string"}}, "exit_code": {"type": "integer"}, "finding": {"type": "string", "minLength": 1}}}
     },
-    "forbidden_promotions_respected": {"type": "array", "items": {"type": "string", "minLength": 1}},
-    "host": {"type": "object"},
-    "plan": {
-      "description": "The frozen observer plan this attempt ran against. sha256 binds the receipt to exact plan bytes, so a receipt cannot silently describe a different subject than the plan it names.",
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["path","sha256"],
-      "properties": {"path": {"type": "string", "minLength": 1}, "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}
-    },
-    "provider": {
-      "description": "The runtime actually probed. api_schema_sha256 is the digest of `herdr api schema --json` produced in the recorded run, so a provider-capability claim is falsifiable against a reinstalled binary.",
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["name","version"],
-      "properties": {
-        "name": {"type": "string", "minLength": 1},
-        "version": {"type": "string", "minLength": 1},
-        "path": {"type": "string", "minLength": 1},
-        "api_schema_bytes": {"type": "integer", "minimum": 1},
-        "api_schema_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-        "api_schema_observed_on": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
-        "api_schema_observed_at_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
-      }
-    }
+    "host": {"type": "object", "required": ["class"], "properties": {"class": {"type": "string", "minLength": 1}}},
+    "plan": {"type": "object", "additionalProperties": false, "required": ["path","sha256"], "properties": {"path": {"type": "string", "minLength": 1}, "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}},
+    "forbidden_promotions_respected": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+    "controller_readback_required": {"const": true},
+    "shadow_review_required": {"const": true},
+    "evidence_ceiling": {"enum": ["NO_HERDR_OBSERVATION","LIVE_OBSERVER_LIFECYCLE_SHADOW_PENDING","NO_HERDR_LIFECYCLE_SAMPLE"]}
   },
   "oneOf": [
-    {"properties": {"lifecycle_state": {"const": "UNAVAILABLE_FALLBACK"}, "sample_count": {"const": 1}, "sample_digests": {"minItems": 1}, "evidence_ceiling": {"const": "NO_HERDR_OBSERVATION"}}},
-    {"required": ["pane_id","workspace_id","process_id","process_started_at_unix","agent_session_id","first_source_observed_at_unix","last_source_observed_at_unix","final_observer_state"], "properties": {"lifecycle_state": {"const": "LIVE_HERDR_LIFECYCLE_OBSERVED_CANDIDATE"}, "sample_count": {"minimum": 1}, "sample_digests": {"minItems": 1}, "evidence_ceiling": {"const": "LIVE_OBSERVER_LIFECYCLE_SHADOW_PENDING"}}},
-    {"required": ["blockers"], "properties": {"lifecycle_state": {"const": "BLOCKED_NO_SAMPLE"}, "sample_count": {"const": 0}, "sample_digests": {"maxItems": 0}, "evidence_ceiling": {"const": "NO_HERDR_LIFECYCLE_SAMPLE"}}}
+    {
+      "required": ["task_id","repo","base_sha","tree_sha","worktree","target","sample_digests","lifecycle_state"],
+      "properties": {"lifecycle_state": {"const": "UNAVAILABLE_FALLBACK"}, "sample_count": {"const": 1}, "evidence_ceiling": {"const": "NO_HERDR_OBSERVATION"}}
+    },
+    {
+      "required": ["task_id","repo","base_sha","tree_sha","worktree","target","sample_digests","lifecycle_state","pane_id","workspace_id","process_id","process_started_at_unix","agent_session_id","first_source_observed_at_unix","last_source_observed_at_unix","final_observer_state"],
+      "properties": {"lifecycle_state": {"const": "LIVE_HERDR_LIFECYCLE_OBSERVED_CANDIDATE"}, "sample_count": {"minimum": 1}, "evidence_ceiling": {"const": "LIVE_OBSERVER_LIFECYCLE_SHADOW_PENDING"}}
+    },
+    {
+      "required": ["schema","state","task_ref","subject","cleanup","evidence","host","plan","forbidden_promotions_respected","lifecycle_state_reached"],
+      "if": {"required": ["state"], "properties": {"state": {"const": "PASS"}}},
+      "then": {
+        "required": ["sample_digests"],
+        "properties": {"sample_count": {"minimum": 1}, "evidence_ceiling": {"const": "LIVE_OBSERVER_LIFECYCLE_SHADOW_PENDING"}}
+      },
+      "else": {
+        "required": ["blockers"],
+        "properties": {"sample_count": {"const": 0}, "evidence_ceiling": {"const": "NO_HERDR_LIFECYCLE_SAMPLE"}}
+      }
+    }
   ]
 }

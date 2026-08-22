@@ -35,7 +35,11 @@ method plane         skills/dual-track-code-review-loop at this repository's wav
   symbol producer, `PARTIAL_LOWER_BOUND`), semantic-context KEYWORD EXERCISED
   (`NON_AUTHORITATIVE_CANDIDATE` rows only), buf NOT_APPLICABLE (no contract
   surface), scip NOT_EXERCISED — the attempt crashed uncontracted, defect
-  filed as `#595` (`facts/scip-live.stderr`).
+  filed as `#595` (`facts/scip-live.stderr`). Note: that crash and #595 were
+  against the adapter implementation this canary ran, which has since been
+  superseded by the canonical `adapters/scip/` landed via PR #604; the
+  canonical adapter has no pyrightconfig.json dependency, and the fact-plane
+  receipts under `facts/` bind the superseded implementation's run.
 - **R1 protocol**: `compile_r1.py` compile + check exit 0, terminal `BLOCKED`
   (`SEMANTIC_INDEX_NOT_REBUILT`, `TYPECHECK_NOT_RUN`); the change was applied
   by hand per the compiler's own refusal — `applied_on_real_codebase` stays

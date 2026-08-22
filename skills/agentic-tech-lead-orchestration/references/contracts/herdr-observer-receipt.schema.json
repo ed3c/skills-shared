@@ -24,7 +24,12 @@
     "process_started_at_unix": {"type": ["integer", "null"], "minimum": 1},
     "process_alive": {"type": ["boolean", "null"]},
     "agent_session_id": {"type": ["string", "null"]},
+    "agent_session_source": {"type": ["string", "null"]},
     "foreground_cwd": {"type": ["string", "null"]},
+    "state_change_seq": {"type": "integer", "minimum": 0},
+    "observation_time_source": {"enum": ["HERDR_SOURCE_CLOCK", "OBSERVER_LOCAL_CLOCK"]},
+    "process_facts_source": {"enum": ["HERDR_AGENT_SURFACE", "HERDR_PANE_PROCESS_INFO_PLUS_OS_PS", "NOT_OBSERVED"]},
+    "cleanup_source": {"enum": ["HERDR_PUBLISHED", "OBSERVER_DERIVED_PANE_PROCESS_INFO", "NOT_OBSERVED"]},
     "source_observed_at_unix": {"type": "integer", "minimum": 1},
     "observed_at_unix": {"type": "integer", "minimum": 1},
     "observation_age_seconds": {"type": "integer", "minimum": 0},
@@ -35,6 +40,12 @@
     "herdr_available": {"type": "boolean"},
     "authoritative": {"const": false},
     "controller_readback_required": {"const": true},
-    "evidence_ceiling": {"enum": ["NO_HERDR_OBSERVATION", "OBSERVER_IDENTITY_FRESHNESS_CLEANUP_ONLY"]}
-  }
+    "evidence_ceiling": {"enum": ["NO_HERDR_OBSERVATION", "OBSERVER_IDENTITY_FRESHNESS_CLEANUP_ONLY", "OBSERVER_IDENTITY_FRESHNESS_CLEANUP_WITH_TYPED_AUXILIARY"]}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"herdr_available": {"const": true}}, "required": ["herdr_available"]},
+      "then": {"required": ["state_change_seq", "observation_time_source", "process_facts_source", "cleanup_source"]}
+    }
+  ]
 }

@@ -12,17 +12,17 @@ embed a mutable head SHA and is not GitHub's live state.
  ├─ #519  D1 deterministic fact-plane contracts ── schemas landed
  │    ├─ adapters/tree-sitter/    LANDED (live receipt)
  │    ├─ adapters/sqlite-ledger/  LANDED (planted mutations)
- │    ├─ #547 D1-SCIP adapter     LANDED python scope (live receipt); cross-language BLOCKED_ON_PROVIDER; #595 crash open
- │    └─ #549 D1-BUF adapter      LANDED NOT_APPLICABLE lane; live VERIFIED lane BLOCKED_ON_PROVIDER
+ │    ├─ #547 D1-SCIP adapter     CLOSED 2026-08-22 (real scip-python round-trip, live receipt)
+ │    └─ #549 D1-BUF adapter      CLOSED 2026-08-22 (landing-run buf 1.72.0 + typed NOT_APPLICABLE)
  ├─ #521  M1 semantic-context plane
- │    └─ #550 M1-C adapter        LANDED KEYWORD lane; VECTOR lane BLOCKED_ON_PROVIDER
+ │    └─ #550 M1-C adapter        CLOSED 2026-08-22 (zero-network reference backend; LanceDB lane NOT_EXERCISED)
  ├─ #522  X1 synthesis/closure compiler   CLOSED (landed and closed via PR #563)
  ├─ #523  R1 single-repo refactor protocol   CLOSED via PR #571 (exit terminal NOT_ADMITTED — live canary rides #528)
- ├─ #524  R2 cross-repo Expand & Contract   LANDED compiler; real migration rides #528
+ ├─ #524  R2 cross-repo Expand & Contract
  ├─ #525  E1 independent Shadow / mutations / closure denominator
  ├─ #526  D2 docs/AGENTS/prompts/routing convergence (this convergence)   CLOSED via PR #563
- ├─ #527  B1 bootstrap profile   LANDED artifact; attach refused on two explicit preconditions
- └─ #528  L1 live consumer canary / Local Handoff   one bounded canary EXERCISED (receipt v0-draft); typed queue compiled; final admission open
+ ├─ #527  B1 bootstrap profile
+ └─ #528  L1 live consumer canary / Local Handoff
         ↓
 docs/traceability/dual-track-code-review-loop/{README,AGENTS,ISSUE_DAG.json,
 LOCAL_HANDOFF_EXECUTION_QUEUE.json}
@@ -36,24 +36,24 @@ concrete branch has actually consumed another branch's unmerged bytes.
 | Atom | Issue / publication | Relation | Owns | Current ceiling |
 |---|---|---|---|---|
 | `C0` | `#518` | `CONTRACT` | source-packet/candidate/violation/refactor/change-unit/verification/closure/disposition schemas | admitted |
-| `D1` | `#519` | `CONTRACT + FOUR ADAPTERS` | 16 D1/M1 interface schemas; tree-sitter, sqlite-ledger, scip (python scope, live receipt) and buf (NOT_APPLICABLE lane) adapters | schemas landed, adapters green in committed suite; provider-blocked sub-lanes explicit |
-| `M1` | `#521` | `CONTRACT` | optional semantic-context/organizational-memory plane | open; adapter (`#550`) KEYWORD lane landed, VECTOR lane provider-blocked |
+| `D1` | `#519` | `CONTRACT + TWO ADAPTERS` | 16 D1/M1 interface schemas; tree-sitter + sqlite-ledger adapters | schemas landed, adapters green in committed suite |
+| `M1` | `#521` | `CONTRACT` | optional semantic-context/organizational-memory plane | open, adapter (`#550`) landed and closed 2026-08-22; aggregate-route wiring stays here |
 | `X1` | `#522` | `SYNTHESIS` | dual-track synthesis + problem-closure compiler | landed (`synthesis/` + three schemas, suite-counted); closed via PR #563 |
-| `R1`/`R2` | `#523`/`#524` | `PROTOCOL` | bounded single-repo and cross-repo refactor protocols | R1 landed and closed via PR #571 (`refactor/` + four contracts, suite-counted; exit terminal NOT_ADMITTED — live canary rides `#528`); R2 compiler landed (`expand-contract/` + three schemas, suite-counted; real migration rides `#528`) |
+| `R1`/`R2` | `#523`/`#524` | `PROTOCOL` | bounded single-repo and cross-repo refactor protocols | R1 landed and closed via PR #571 (`refactor/` + four contracts, suite-counted; exit terminal NOT_ADMITTED — live canary rides `#528`); R2 landed and closed 2026-08-22 (`expand-contract/` + two contracts over a two-repository fixture; exit terminal NOT_ADMITTED — live lanes ride `#528`) |
 | `E1` | `#525` | `INDEPENDENT SHADOW` | mutations and evidence-closure denominator | open |
 | `D2` | `#526` | `CONVERGENCE` | README/AGENTS/SESSION-prompt/traceability navigation (this atom) | `DTCR_DOCS_PROMPTS_TRACE_READY`; closed via PR #563 |
 | `B1` | `#527` | `BOOTSTRAP` | immutable thin-binding profile for new repositories | open, start-dependent on `D2` |
 | `L1` | `#528` | `LIVE CANARY` | real consumer canary and final Local Handoff admission | open; start-dependent on `R1`/`B1`, completion-dependent on `E1` (and `R2` only if the cross-repo mode is selected) |
 
 This is a wide sibling fan-out under one parent rather than a serial chain:
-`M1`/`D1` are siblings after `C0`, and `#547`/`#549`/`#550` are provider-bound
+`M1`/`D1` are siblings after `C0`, and `#547`/`#549`/`#550` were provider-bound
 adapter lanes that do not gate `D2`'s own doc convergence.
 
 ## Closure State Machine (parent `#517`)
 
 ```text
 CONTRACTS_ADMITTED (C0, D1 schemas, M1 schema)
-→ DETERMINISTIC_ADAPTERS_LANDED (tree-sitter, sqlite-ledger, scip, buf, semantic-context)
+→ DETERMINISTIC_ADAPTERS_LANDED (tree-sitter, sqlite-ledger)
 → DOCS_AND_ROUTES_CONVERGED (D2, this atom)
 → SYNTHESIS_COMPILED (X1)
 → PROTOCOLS_IMPLEMENTED (R1, R2)
@@ -69,7 +69,7 @@ Issue #517 fan-out
      │
 C0/D1/M1 schemas + refused-claims.json
      │
-five deterministic adapters ──→ committed selftest.py each, run-all.sh
+tree-sitter / sqlite-ledger adapters ──→ committed selftest.py, run-all.sh
      │
 D2 convergence (this atom) ──→ docs/traceability/dual-track-code-review-loop/*
      │

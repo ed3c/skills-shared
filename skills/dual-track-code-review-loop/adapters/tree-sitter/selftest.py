@@ -473,7 +473,14 @@ def lane_live() -> str:
         print(f"  NOT_EXERCISED: {missing} is absent. A missing provider is start-readiness, not a failure.")
         return "NOT_EXERCISED"
 
-    repo = Path(A.git(ADAPTER_DIR, "rev-parse", "--show-toplevel"))
+    try:
+        repo = Path(A.git(ADAPTER_DIR, "rev-parse", "--show-toplevel"))
+    except subprocess.CalledProcessError:
+        # A copy of this adapter outside a checkout has no subject commit to be
+        # about. That is an absent input, not a passing run, and it is typed
+        # here rather than crashing the suite two lanes after the fact.
+        print("  NOT_EXERCISED: this adapter is not inside a git checkout, so there is no exact subject to analyse")
+        return "NOT_EXERCISED (no checkout)"
     paths = [
         str(path.relative_to(repo))
         for path in sorted(FIXTURES.glob("*/*.fixture"))

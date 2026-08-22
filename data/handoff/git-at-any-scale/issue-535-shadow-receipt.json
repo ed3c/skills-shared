@@ -1,0 +1,748 @@
+{
+  "artifact": "GIT-SCALE-S1 independent Shadow admission receipt",
+  "issue": 535,
+  "queue_item": "GIT-SCALE-H3",
+  "produced_utc": "2026-08-22T11:05:00Z",
+  "verdict": "HOLD",
+  "verdict_law_clause": "#535 Decision law: evidence or subject is incomplete/stale but no contradiction proves rejection.",
+  "human_admit": "HUMAN_ADMIT_REQUIRED",
+  "schema_binding": {
+    "queue_named_schema": "agentic-tech-lead/issue-closure-contract/v1",
+    "queue_named_schema_path": "skills/agentic-tech-lead-orchestration/references/issue-closure-contract.schema.json",
+    "state": "SCHEMA_MISMATCH_DECLARED",
+    "validated_against_named_schema": true,
+    "validator": "jsonschema 4.26.0 Draft202012Validator (the same pinned validator .github/workflows/issue-closure-contract.yml installs)",
+    "result": "REFUSED — see schema_validation_readback",
+    "why_the_named_schema_cannot_carry_this_artifact": [
+      "It is an Issue *closure* contract. It requires `disposition` from {DIRECTLY_LANDED, CONSUMED_BY_CONVERGENCE, SCOPE_TRANSFERRED, SUPERSEDED, NOT_PLANNED}; #535 is OPEN, nothing landed, nothing was transferred or superseded, and it is not NOT_PLANNED. Every admissible value is a false statement about this issue.",
+      "It requires `issue.github_state_reason` from {COMPLETED, NOT_PLANNED, REOPENED}. #535 is OPEN. There is no truthful value, and writing COMPLETED to satisfy the enum is exactly the evidence promotion this review exists to refuse.",
+      "It is `additionalProperties: false` and has no field for reviewed-subject digests, per-stage findings, first-red preservation, falsifier outcomes, Builder-assertion→evidence mapping, or evidence ceilings — every one of which #535's Output section mandates.",
+      "No repository gate reads this path: .github/workflows/issue-closure-contract.yml globs only skills/agentic-tech-lead-orchestration/references/closure-audit/issue-*.json, so emitting a truthful non-conforming artifact here breaks no green gate."
+    ],
+    "shadow_action": "Emitted well-formed JSON in a Shadow-receipt shape, with the mismatch named and the real validator errors recorded rather than papered over. Reshaping this artifact to the closure schema is issue work for the queue writer, not for this read-only lane."
+  },
+  "independence_declaration": {
+    "role": "TECH_LEAD_DISPATCHED_FRESH_CONTEXT",
+    "carrier": "claude-code",
+    "zero_builder_conversation_context": true,
+    "separate_session": true,
+    "separate_worktree_from_builder": false,
+    "worktree": "/Users/neon/skills-shared/.claude/worktrees/handoff-queue-audit",
+    "satisfies_truly_independent_shadow_close_gate": false,
+    "why_not": [
+      "Dispatched by the same Tech Lead orchestration that dispatched the Builder, on the same host, reading the same session scratchpad. Fresh context is not organisational independence.",
+      "The canary subject refcore.py lives only in that shared scratchpad, so this Shadow re-executed the Builder's own driver against the Builder's own subject; it did not re-implement either.",
+      "The Builder reports named for cross-examination were NOT delivered: the dispatch prompt carried the literal unsubstituted template `${JSON.stringify(implDone, null, 1)}`. Every Builder assertion below was therefore re-derived from committed artifacts alone, and the Builder's own report text is ABSENT.",
+      "GS-C20 / #535 law: two agreeing models are still advisory. This artifact is advisory evidence, never Human Admit, merge or release."
+    ],
+    "falsifier_GS_S05_at_review_level": "TRIGGERED_AND_DECLARED"
+  },
+  "bound_subjects": {
+    "epoch": {
+      "repository": "ed3c/skills-shared",
+      "commit": "5341885f26b5e8e7baf5087a4d661e324f878242",
+      "tree": "a18e12507f9e621efd5354f58384eded1f1e2a9a",
+      "rollback_commit": "9fe3c6daf53dcdd61123d5d7a4eeedbdf37b5d7c",
+      "bound_explicitly_not_inherited_from_any_in_tree_artifact": true
+    },
+    "review_worktree_head": "bca08001c416108f9b83e9325e7bf07149a9281f",
+    "worktree_state": "DIRTY — 33 modified + 5 untracked paths at review time; the reviewed #534 bundle and the #532 registration are uncommitted working-tree bytes, not landed bytes.",
+    "immutable_source": {
+      "path": "data/handoff/source-evidence/sources/cursor-git-at-any-scale.html",
+      "sha256_declared": "25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "sha256_independently_rederived": "25f59fc637a3ba719b327716385f9e30c3b9327d87cb6d7e148240f00447cab9",
+      "bytes_declared": 864322,
+      "bytes_independently_counted": 864322,
+      "match": true
+    },
+    "contract_subject_532": {
+      "schema": "skills/git-hosting-scale-assurance/references/hosting-assurance.schema.json",
+      "checker": "skills/git-hosting-scale-assurance/scripts/check_hosting_assurance.py",
+      "schema_and_tests_byte_identical_to_worktree_head": true,
+      "registration_landed_in_working_tree": [
+        "evals/skill-entry-routes.json",
+        "evals/skill-core-boundaries.json"
+      ],
+      "fixtures_present": [
+        "skills/git-hosting-scale-assurance/tests/fixtures/good.json"
+      ]
+    },
+    "runtime_subject_534": {
+      "name": "refcore (disposable single-node Git-hosting reference core)",
+      "relationship": "CLEAN_ROOM",
+      "path_outside_repository": "/private/tmp/claude-501/-Users-neon-skills-shared/ba0ee313-3387-4cd5-8e1e-eea11e6f3419/scratchpad/canary-subject/refcore.py",
+      "committed_to_repository": false,
+      "sha256_declared": "4ea664cc6bae1d3a999bf4293ad65136821c3a611a498894d428448a1610d127",
+      "sha256_independently_rederived": "4ea664cc6bae1d3a999bf4293ad65136821c3a611a498894d428448a1610d127",
+      "bytes_declared": 19872,
+      "bytes_independently_counted": 19872,
+      "match": true,
+      "architecture_as_declared": "1 authority process, 0 replicas, 1 cache, NO_GOSSIP_SUBSYSTEM_EXISTS, no socket layer, one local filesystem, single monotonic clock"
+    },
+    "receipt_bundle": {
+      "path": "data/handoff/git-at-any-scale/",
+      "files": 21,
+      "SHA256SUMS_independently_verified": "shasum -a 256 -c SHA256SUMS -> exit 0, 21/21 OK",
+      "coverage_gap": "SHA256SUMS does not cover itself; every other bundle file is covered.",
+      "raw_evidence_digests_in_hosting-closure-record_match_disk": true
+    }
+  },
+  "shadow_state_machine": [
+    {
+      "state": "OBSERVE_EXACT_SUBJECTS",
+      "result": "PASS",
+      "note": "Source, contract and runtime digests re-derived by hand; all three match the declared values."
+    },
+    {
+      "state": "SOURCE_APPLICABILITY_AND_AUTHORITY",
+      "result": "PASS_WITH_GATE_HOLE",
+      "note": "Source bytes are truly bound, but no checker re-derives the digest from the bytes: grep -c 'source_dir|source-dir' check_problem_closure.py = 0. The digest chain closes inside the ledger file. STATIC-grade gate only."
+    },
+    {
+      "state": "METHOD_PLANE_VS_STORAGE_PLANE_BOUNDARY",
+      "result": "PASS_WITH_FINDING",
+      "note": "No Method-Plane result is promoted to a storage result. But SKILL.md states the checker 'validates a closure record against references/hosting-assurance.schema.json'; the checker never opens that file. Declared mechanism != executed mechanism."
+    },
+    {
+      "state": "CLAIM_DENOMINATOR_COMPLETENESS",
+      "result": "FAIL",
+      "note": "First red. 4 of #534's 8 required workload classes and 4 of its required metrics are absent with no NOT_EXERCISED entry, violating the bundle's own stated law."
+    },
+    {
+      "state": "CONTRACT_REACHABILITY",
+      "result": "FAIL",
+      "note": "12 of the 13 bundle artifact families have no schema, no checker and no mutation control in the repository. Only issue-534-hosting-canary-receipt.json is gated."
+    },
+    {
+      "state": "OPERATION_HISTORY_AND_LINEARIZABILITY",
+      "result": "PASS",
+      "note": "Independently confirmed by a Shadow-authored Wing-Gong oracle, plus two Shadow-authored negative controls on the exact committed history."
+    },
+    {
+      "state": "DURABILITY_ACK_AND_REF_VISIBILITY",
+      "result": "PASS_BOUNDED",
+      "note": "0 acknowledged operations lost over 18; 0 refs visible before commit. Ceiling: only 2 of 8 kill cases were acked-before-kill, and SIGKILL cannot separate page-cache survival from fsync."
+    },
+    {
+      "state": "READ_FRESHNESS_CACHE_AND_GOSSIP_AUTHORITY",
+      "result": "MIXED",
+      "note": "Stale-cache lane genuinely exercised (5/5 opportunities detected, 0 stale served, fail-closed reproduced). Gossip lane is vacuous by construction and the gated packet cannot say so."
+    },
+    {
+      "state": "COMPACTION_REACHABILITY_AND_COST",
+      "result": "PASS_BOUNDED",
+      "note": "33 reachable objects preserved, 0 missing, refs byte-identical, 7 planted unreachable objects dropped per the declared DROP_IMMEDIATELY policy. per_replica cost is vacuous at replica_count 1."
+    },
+    {
+      "state": "CORRUPTION_REPLAY_AND_ROLLBACK",
+      "result": "PASS",
+      "note": "First red preserved verbatim (FAIL_CLOSED, exit 70, valid_bytes 0); pristine and byte-flipped digests differ; the restored digest equals the pristine digest."
+    },
+    {
+      "state": "BENCHMARK_MATCHING_AND_SCALE_CEILING",
+      "result": "PASS_BOUNDED",
+      "note": "Reduction independently recomputed from raw samples and reproduces exactly. Single repetition, unpinned host, one topology, no baseline/candidate pair — INDICATIVE only, and the record says so."
+    },
+    {
+      "state": "CLEANUP_RESIDUE_AND_HUMAN_BOUNDARY",
+      "result": "FAIL",
+      "note": "Cleanup and rollback are clean and independently verified. The Human gate is not: automation performed a runtime selection the queue reserves to Human."
+    },
+    {
+      "state": "GLOBAL_OBJECTIVE_RECHECK",
+      "result": "FAIL",
+      "note": "#531's ledger is untouched by this work: 26 OPEN / 2 NOT_APPLICABLE, shadow_verdict NOT_REVIEWED 28/28, evidence arrays empty 28/28, zero references to the bundle."
+    }
+  ],
+  "first_red": {
+    "id": "SR-01",
+    "preserved": true,
+    "state": "CLAIM_DENOMINATOR_COMPLETENESS",
+    "falsifier": "GS-S02 INCOMPLETE_CLAIM_DENOMINATOR",
+    "severity": "HIGH",
+    "statement": "The #534 bundle declares the law 'records absent lanes as NOT_EXERCISED rather than inferring them' (run_hosting_canary.py module docstring) and lists 5 NOT_EXERCISED entries in hosting-closure-record.json. Eight further required items are absent from the bundle with no NOT_EXERCISED entry at all.",
+    "absent_required_workload_classes": [
+      "concurrent pushes to disjoint refs",
+      "clone/fetch/read during writes",
+      "idle repository scaled down then reactivated",
+      "compaction during normal traffic"
+    ],
+    "absent_required_metrics": [
+      "memory",
+      "retries (cas_conflicts is recorded; retries is not)",
+      "disk/network/object-store request counts (bytes are recorded; requests are not)",
+      "fault recovery time"
+    ],
+    "how_derived": "run_hosting_canary.py:682-683 implements exactly two benchmark classes ('small-frequent-commits', 'large-object-transfer'); grep -ril over the whole bundle for memory|rss|retries|recovery_time|fault_recovery|requests|disjoint|clone|idle returns 0 files for each; hosting-closure-record.metrics_reduced carries 18 keys, none of them these four.",
+    "why_it_matters": "A bundle whose only defence against silent closure is an explicit NOT_EXERCISED list is defeated by items that never reach the list. These eight read as 'not required' rather than 'not run'."
+  },
+  "findings": [
+    {
+      "id": "SR-01",
+      "severity": "HIGH",
+      "falsifier": "GS-S02",
+      "summary": "Four required workload classes and four required metrics are absent from the #534 bundle with no NOT_EXERCISED entry.",
+      "owner": "issue 534"
+    },
+    {
+      "id": "SR-02",
+      "severity": "HIGH",
+      "falsifier": "GS-S15",
+      "summary": "The git-at-any-scale queue is stale against the bundle it is supposed to govern, and its own ordering law was bypassed.",
+      "detail": [
+        "Queue mtime 2026-08-22 14:15:16; bundle mtime 2026-08-22 18:48-18:54.",
+        "Queue still declares current.active_item = GIT-SCALE-H1 / ACTIVE, with GIT-SCALE-H2 (#534) and GIT-SCALE-H3 (#535) BLOCKED_BY_PREDECESSOR.",
+        "GIT-SCALE-H1's own receipt data/handoff/git-at-any-scale/issue-532-portable-contract-receipt.json is ABSENT, so H1's exit.required_verdict PASS is unmet — yet H2's canary ran and produced its full receipt bundle.",
+        "`python3 skills/agentic-tech-lead-orchestration/scripts/assert_local_handoff_queue.py --queue skills/agentic-tech-lead-orchestration/runtime-handoff/git-at-any-scale-local-handoff-queue.json` still exits 0 ('PASS: 5 item(s), active=GIT-SCALE-H1'): the gate validates shape, never state-vs-disk.",
+        "H2's receipt required_states include NOT_EXERCISED. Given three NOT_EXERCISED stages in the bundle's own state machine (GOSSIP_LOSS_CANARY, MATCHED_SCALE_MATRIX, INDEPENDENT_SHADOW), the honest H2 verdict is NOT_EXERCISED-partial, not the PASS its exit demands."
+      ],
+      "owner": "queue writer / issue 531"
+    },
+    {
+      "id": "SR-03",
+      "severity": "HIGH",
+      "falsifier": "GS-S15",
+      "summary": "docs/traceability/git-at-any-scale/README.md (mtime 14:20:35) contradicts the bundle on disk.",
+      "detail": [
+        "Line 20: 'L1 physical hosting runtime NOT_EXERCISED / #534 OPEN'. Line 21: 'S1 terminal independent Shadow NOT_EXERCISED'. Lines 35-36, 99-100, 120-121 repeat NOT_EXERCISED.",
+        "Line 63 lists 'a benchmark-run schema and a hosting-closure-record' among the artifacts still missing — while data/handoff/git-at-any-scale/hosting-closure-record.json and benchmark-runs/*.json exist.",
+        "Line 147: 'It does not yet prove ... any physical Git-hosting property'.",
+        "Either the doc is stale or the bundle is unrecognised scratch. Both readings cannot be true of one convergence subject."
+      ],
+      "owner": "issue 531 / docs lane"
+    },
+    {
+      "id": "SR-04",
+      "severity": "HIGH",
+      "falsifier": "GS-S09",
+      "summary": "The gated contract packet cannot express NOT_EXERCISED, so vacuous absence and executed proof are byte-identical in the only artifact the checker reads.",
+      "detail": [
+        "gossip-observation-receipt.json is explicit: disposition NOT_EXERCISED, vacuity VACUOUS_TRUE_NO_GOSSIP_SUBSYSTEM, falsifier NOT_TESTABLE_AT_THIS_SUBJECT.",
+        "issue-534-hosting-canary-receipt.json encodes that same lane as gossip.required_for_correctness = false, which passes GS-C08 identically to a lane that survived a real drop/delay/reorder/duplicate schedule.",
+        "Same structural defect: benchmark.matched_topology = true where exactly one topology exists and there is no baseline/candidate pair to match; compaction.per_replica_cost_reported = true at replica_count_in_topology = 1; cache fields at zero replicas.",
+        "hosting-assurance.schema.json is additionalProperties:false with boolean-only leaves, so this cannot be fixed inside the packet without a schema change."
+      ],
+      "owner": "issue 532"
+    },
+    {
+      "id": "SR-05",
+      "severity": "HIGH",
+      "falsifier": "GS-S16",
+      "summary": "Automation performed a runtime selection the queue reserves to Human.",
+      "detail": [
+        "git-at-any-scale-local-handoff-queue.json authority.human_owned includes 'disposable_hosting_runtime_selection'; GIT-SCALE-H2 entry.required_capabilities names 'human-admitted-disposable-hosting-runtime'.",
+        "hosting-subject.json records selection.state CONSUMER_SELECTED with human_owned_operations_outstanding still listing 'admission of any non-clean-room hosting subject' and 'independent Shadow (#535) session'. No Human admission receipt for selecting refcore exists anywhere in the tree.",
+        "Blast radius is nil — provider_activation NOT_PERFORMED, cloud_provider NONE, cost_usd 0.0, network_used false, no residue — but the authority boundary was crossed, not merely approached."
+      ],
+      "owner": "Human"
+    },
+    {
+      "id": "SR-06",
+      "severity": "MEDIUM",
+      "falsifier": "GS-S04 neighbourhood",
+      "summary": "Twelve of the thirteen bundle artifact families are ungated assertions.",
+      "detail": [
+        "skills/git-hosting-scale-assurance/references/ and tests/ are byte-identical to the worktree HEAD; tests/fixtures holds exactly one file, good.json.",
+        "Only issue-534-hosting-canary-receipt.json has a schema, a checker and mutation controls. hosting-subject, operation-history, durability, ref-transaction, read-freshness, cache-rebuild, gossip-observation, compaction, corruption-recovery, benchmark-run, hosting-closure-record and cleanup-and-cost have none.",
+        "This is precisely GIT-SCALE-H1's unresolved operation 'implement-remaining-hosting-assurance-contracts', still unresolved. #532's denominator did not move."
+      ],
+      "owner": "issue 532"
+    },
+    {
+      "id": "SR-07",
+      "severity": "MEDIUM",
+      "falsifier": "GS-S08",
+      "summary": "The recorded red-when-red control was executed on a sibling run, not on the committed history.",
+      "detail": [
+        "hosting-closure-record.red_when_red_control.dropped_operation names a CAS with old 'v-1-6', new 'v-1-7', proc 1, ret ok. Zero rows in the committed data/handoff/git-at-any-scale/operation-history.jsonl match it; it is row 55 of the separate out-planted history.",
+        "The committed history's round-6 winner is v-3-6, so its round-7 CAS expects old 'v-3-6'. The two files are different executions, not one execution with an operation removed.",
+        "The control therefore proves the oracle mechanism goes red, but leaves the committed history's own LINEARIZABLE verdict without a matched negative control.",
+        "This Shadow supplied the missing matched control (see independent_readbacks.linearizability)."
+      ],
+      "owner": "issue 534"
+    },
+    {
+      "id": "SR-08",
+      "severity": "MEDIUM",
+      "falsifier": "GS-S06",
+      "summary": "The durable-ack boundary is disclosed but not resolvable at this subject.",
+      "detail": [
+        "durability-receipt case post_write_pre_fsync records survived_restart true for a write that had not been fsynced: SIGKILL leaves the page cache intact, so process-kill cannot separate fsynced from merely written.",
+        "Only 2 of 8 kill cases were acked_before_kill; acknowledged_operations_at_the_kill_boundary is 2 against a total denominator of 18.",
+        "The receipt's own ceiling states this. The gated packet's durability.persisted_before_ack = true carries none of it."
+      ],
+      "owner": "issue 534"
+    },
+    {
+      "id": "SR-09",
+      "severity": "MEDIUM",
+      "falsifier": "GS-S03 neighbourhood",
+      "summary": "SKILL.md describes a mechanism the checker does not execute.",
+      "detail": [
+        "SKILL.md: 'scripts/check_hosting_assurance.py validates a closure record against references/hosting-assurance.schema.json and then against the refusal vocabulary'.",
+        "check_hosting_assurance.py never opens that file: the only occurrences of 'schema' in it are the hand-rolled required-key set at lines 25-26. No JSON Schema library is imported.",
+        "Effect is small — the hand-rolled check covers the same required keys — but a Skill whose entire purpose is refusing mechanism-to-proof promotion must not misdescribe its own mechanism."
+      ],
+      "owner": "issue 532"
+    },
+    {
+      "id": "SR-10",
+      "severity": "LOW",
+      "falsifier": "GS-S01 neighbourhood",
+      "summary": "The source digest chain is true but ungated.",
+      "detail": [
+        "This Shadow re-derived the digest and byte count from the persisted bytes by hand and both match.",
+        "No checker does: grep -c 'source_dir|source-dir' on check_problem_closure.py returns 0, so the manifest digests are never re-derived from the source file. STATIC-grade only."
+      ],
+      "owner": "issue 512"
+    },
+    {
+      "id": "SR-11",
+      "severity": "INFO",
+      "falsifier": "GS-S13 self-correction",
+      "summary": "This Shadow's own first benchmark pass produced a false red; it is recorded rather than deleted.",
+      "detail": [
+        "A nearest-rank p99 estimator gave cas_ref 0.1378 and put_obj 0.1568 against reported 0.1517 and 0.2229, which looked like a 10-42% reduction mismatch.",
+        "Re-derivation from the sorted raw samples shows the bundle uses sorted[int(q*n)]: sorted[198] is exactly 0.1517 and 0.2229. Both reported values are present verbatim in the raw arrays. The estimator was mine, the numbers are theirs, and they reproduce.",
+        "Recorded so the correction is auditable and the finding count is not inflated."
+      ],
+      "owner": "none"
+    }
+  ],
+  "falsifiers": {
+    "GS-S01_MUTABLE_SOURCE_PRESENTED_AS_IMMUTABLE": {
+      "outcome": "NOT_TRIGGERED",
+      "evidence": "sha256 and byte count independently re-derived from data/handoff/source-evidence/sources/cursor-git-at-any-scale.html: 25f59fc6...447cab9 / 864322, both matching source-claims.json and all 28 source_manifest entries. Residual gate hole recorded as SR-10."
+    },
+    "GS-S02_INCOMPLETE_CLAIM_DENOMINATOR": {
+      "outcome": "TRIGGERED",
+      "severity": "HIGH",
+      "evidence": "SR-01 (first red)."
+    },
+    "GS-S03_METHOD_PLANE_PRESENTED_AS_STORAGE_IMPLEMENTATION": {
+      "outcome": "NOT_TRIGGERED",
+      "evidence": "No DAG, Stacked-PR or generic receipt is promoted to a physical result. architecture-declaration.json states the physical model without borrowing from the Method Plane. Adjacent misdescription recorded as SR-09."
+    },
+    "GS-S04_CONTRACT_PASS_PRESENTED_AS_LIVE_PASS": {
+      "outcome": "NOT_TRIGGERED",
+      "evidence": "check_hosting_assurance.py emits {'state':'CONTRACT_READY','next':'LIVE_CANARY_REQUIRED'}; claims.fixture_promoted_to_live is false; hosting-closure-record separates lanes explicitly. Ungated-receipt residual recorded as SR-06."
+    },
+    "GS-S05_BUILDER_SELF_REPORT_PRESENTED_AS_INDEPENDENT": {
+      "outcome": "TRIGGERED_AT_REVIEW_LEVEL_AND_DECLARED",
+      "evidence": "The bundle itself is clean: shadow.independent false, shadow.human_admit false, not_exercised carries {'stage':'INDEPENDENT_SHADOW','reason':'#535 read-only Shadow has not replayed this bundle. Builder self-report only.'}. The trigger is this reviewer's own provenance — see independence_declaration."
+    },
+    "GS-S06_DURABLE_ACK_BOUNDARY_AMBIGUOUS": {
+      "outcome": "TRIGGERED",
+      "severity": "MEDIUM",
+      "evidence": "SR-08. Disclosed in the receipt ceiling; not resolvable without power-loss or media-failure injection."
+    },
+    "GS-S07_REF_VISIBILITY_WITH_MISSING_OBJECT_OR_RECORD": {
+      "outcome": "NOT_TRIGGERED",
+      "evidence": "durability-receipt.visible_before_commit_count = 0 across all 8 kill cases; independently reproduced as 0 in this Shadow's own replay."
+    },
+    "GS-S08_LINEARIZABILITY_ORACLE_OR_HISTORY_INCOMPLETE": {
+      "outcome": "TRIGGERED_ON_CONTROL_BINDING_ONLY",
+      "severity": "MEDIUM",
+      "evidence": "SR-07. The verdict itself is independently CONFIRMED — see independent_readbacks.linearizability."
+    },
+    "GS-S09_STALE_CACHE_OR_GOSSIP_AUTHORITY_HIDDEN": {
+      "outcome": "TRIGGERED_FOR_GOSSIP",
+      "severity": "HIGH",
+      "evidence": "SR-04. Stale cache is genuinely exercised and clean: 5/5 stale opportunities detected and validated against authority, 0 stale reads served, fail-closed on unreachable authority (BrokenPipeError) independently reproduced."
+    },
+    "GS-S10_CACHE_REBUILD_NOT_EXERCISED": {
+      "outcome": "NOT_TRIGGERED",
+      "evidence": "Cache directory destroyed after acknowledged writes, replacement rebuilt 33/33 reachable objects and 3/3 refs matching authority; independently reproduced at 33/33."
+    },
+    "GS-S11_COMPACTION_REACHABILITY_OR_COST_GAP": {
+      "outcome": "NOT_TRIGGERED",
+      "evidence": "reachable_before 33 = reachable_after 33, reachable_objects_missing_after_compaction [], refs_before == refs_after byte-for-byte, 7 planted unreachable objects dropped under the declared DROP_IMMEDIATELY policy, log 34239 -> 21026 bytes, readable after restart. Cost is reported but per_replica is vacuous at N=1 (folded into SR-04)."
+    },
+    "GS-S12_CORRUPTION_OR_FAILED_RUN_DROPPED": {
+      "outcome": "NOT_TRIGGERED",
+      "evidence": "Three injections all detected. MIDSTREAM_BYTE_FLIP first-red preserved verbatim: {'state':'FAIL_CLOSED','reason':'CORRUPT_MIDSTREAM','valid_bytes':0,'records_before_corruption':0}, process_exit 70, served false. raw/corruption-pristine-log.digest 23a73130... != raw/corruption-first-red-log.digest 2935a38c..., and authority_digest_after_restore == authority_digest_before == 23a73130.... excluded_repetitions 0 and errors_in_denominator true in both benchmark runs."
+    },
+    "GS-S13_MISMATCHED_BENCHMARK": {
+      "outcome": "NOT_TRIGGERED",
+      "evidence": "Reduction independently recomputed from raw/benchmark-raw-latencies.json — see independent_readbacks.benchmark and SR-11."
+    },
+    "GS-S14_SCALE_OR_PRODUCTION_CLAIM_OVERREACH": {
+      "outcome": "NOT_TRIGGERED",
+      "evidence": "benchmark.scope BOUNDED_TOPOLOGY (GS-C18 would refuse ARBITRARY_SCALE); source-and-rights-disposition.cursor_parity_claim NONE; forbidden_promotions_refused lists LOCAL_CANARY_PROMOTED_TO_CURSOR_PRODUCTION_PROOF and ONE_TOPOLOGY_PROMOTED_TO_ARBITRARY_SCALE; L1-H MATCHED_SCALE_MATRIX declared NOT_EXERCISED; ceilings state the benchmark host is unpinned and the numbers are INDICATIVE."
+    },
+    "GS-S15_CURRENT_GITHUB_OR_PATH_WRITER_STATE_STALE": {
+      "outcome": "TRIGGERED",
+      "severity": "HIGH",
+      "evidence": "SR-02 and SR-03. Live GitHub readback is BLOCKED in this lane — no network — so GitHub state is taken only from the frozen 2026-08-22 inputs, which show #512/#531/#532/#534/#535/#536 all OPEN and no open PR other than #577."
+    },
+    "GS-S16_CLEANUP_ROLLBACK_OR_HUMAN_GATE_MISSING": {
+      "outcome": "TRIGGERED_ON_HUMAN_GATE",
+      "severity": "HIGH",
+      "evidence": "SR-05. Cleanup and rollback are clean and independently verified: residue_paths_after_cleanup [], the declared workspace .../scratchpad/canary-run confirmed absent on disk, artifacts_removed 107, rollback_subject 9fe3c6da... bound, cost_usd 0.0, network_bytes 0. This Shadow's own two replay workspaces were likewise removed by the driver."
+    }
+  },
+  "independent_readbacks": {
+    "note": "Executed by this Shadow, read-only against Builder paths. Every command below was run from the worktree root with explicit paths; exit codes are the real ones.",
+    "digest_verification": {
+      "command": "shasum -a 256 -c SHA256SUMS (cwd = data/handoff/git-at-any-scale)",
+      "exit": 0,
+      "result": "21/21 OK. hosting-closure-record.raw_evidence_digests also match disk for all 20 entries it names."
+    },
+    "linearizability": {
+      "oracle": "Shadow-authored Wing & Gong search over a single CAS register with real-time constraints from (invoke, response), memoised on (linearised-set, state). Written before reading the Builder's own oracle; no Builder module imported.",
+      "committed_history": {
+        "operations": 96,
+        "verdict": "LINEARIZABLE",
+        "states_explored": 122
+      },
+      "shadow_negative_control_1": {
+        "mutation": "drop the acknowledged CAS at index 53 (old v-0-5 -> new v-3-6, proc 3) from the exact committed history",
+        "operations": 95,
+        "verdict": "NON_LINEARIZABLE",
+        "max_prefix_linearised": 52
+      },
+      "shadow_negative_control_2": {
+        "mutation": "forge one read return value (index 92, v-0-10 -> v-NEVER-WRITTEN) in the exact committed history",
+        "operations": 96,
+        "verdict": "NON_LINEARIZABLE",
+        "max_prefix_linearised": 94
+      },
+      "conclusion": "The committed history is linearizable under an independently written oracle, and that oracle demonstrably goes red on the exact committed subject when a real defect is planted. This supplies the matched control SR-07 found missing.",
+      "history_ceiling": "One register, 4 in-process clients, 96 operations across 12 lockstep rounds, 12 accepted and 36 rejected CAS, 278 overlapping pairs. Cross-node and cross-region linearizability are NOT_EXERCISED."
+    },
+    "contract_checker": [
+      {
+        "argv": [
+          "python3",
+          "skills/git-hosting-scale-assurance/scripts/check_hosting_assurance.py",
+          "data/handoff/git-at-any-scale/issue-534-hosting-canary-receipt.json"
+        ],
+        "exit": 0,
+        "stdout": "{\"code\": \"PASS\", \"next\": \"LIVE_CANARY_REQUIRED\", \"state\": \"CONTRACT_READY\"}"
+      },
+      {
+        "argv": [
+          "python3",
+          "skills/git-hosting-scale-assurance/scripts/check_hosting_assurance.py",
+          "<the Builder's planted packet in the session scratchpad>"
+        ],
+        "exit": 2,
+        "stdout": "{\"code\": \"GS-C05\", \"detail\": \"CAS/expected-value precondition absent\", \"state\": \"REFUSED\"}",
+        "note": "Reproduces hosting-closure-record.red_when_red_control.checker_stdout exactly. Flat diff of the two packets shows exactly one differing leaf: refs.cas_precondition true -> false."
+      }
+    ],
+    "live_replay": {
+      "note": "This Shadow re-executed the Builder's driver against the same runtime digest, into Shadow-owned output directories. No Builder path was written.",
+      "selftest": {
+        "argv": [
+          "python3",
+          "skills/git-hosting-scale-assurance/scripts/run_hosting_canary.py",
+          "--selftest"
+        ],
+        "exit": 0,
+        "stdout": "PASS run_hosting_canary selftest linearizability=4/4"
+      },
+      "dry_run": {
+        "exit": 0,
+        "stdout_state": "DRY_RUN_READY",
+        "subject_selftest": "PASS refcore selftest framing=5"
+      },
+      "green_replay": {
+        "exit": 0,
+        "state": "GIT_HOSTING_LIVE_CANARY_VERIFIED_BOUNDED",
+        "verdicts": [
+          "PASS",
+          "PASS",
+          "PASS",
+          "PASS",
+          "PASS"
+        ]
+      },
+      "planted_replay": {
+        "exit": 1,
+        "state": "FAILED_WITH_REPLAYABLE_EVIDENCE",
+        "verdicts": [
+          "PASS",
+          "FAIL",
+          "PASS",
+          "PASS",
+          "PASS"
+        ],
+        "checker_exit": 2,
+        "checker_code": "GS-C05"
+      },
+      "structural_comparison": "17/17 bundle filenames identical. 18 of 19 sampled structural invariants identical to the committed bundle (durability verdict/loss 0/denominator 18/kills 8/visible-before-commit 0; refs verdict/linearizable/operations 96; stale_reads_served 0; fail_closed true; rebuild 33/33; compaction 0 missing / 0 unreachable surviving; corruption detected + partial rejected; gossip NOT_EXERCISED; terminal string; residue []). The single difference is cas_conflicts_observed 36 vs 34, which is expected scheduling nondeterminism.",
+      "replay_shadow_history_verdict": "LINEARIZABLE under the Shadow oracle (96 operations, 129 states explored).",
+      "committed_bundle_untouched_after_replay": "shasum -a 256 -c SHA256SUMS -> exit 0"
+    },
+    "gates_532": [
+      {
+        "argv": [
+          "sh",
+          "skills/git-hosting-scale-assurance/tests/run-all.sh"
+        ],
+        "exit": 0,
+        "stdout": "PASS positive=1 mutations=20/20 / PASS git-hosting-scale-assurance"
+      },
+      {
+        "argv": [
+          "python3",
+          "scripts/check_skill_entry_routes.py",
+          "--skill",
+          "git-hosting-scale-assurance"
+        ],
+        "exit": 0,
+        "stdout": "SKILL-ENTRY-GREEN checked=1"
+      },
+      {
+        "argv": [
+          "python3",
+          "scripts/check_skill_core_boundaries.py",
+          "--skill",
+          "git-hosting-scale-assurance"
+        ],
+        "exit": 0,
+        "stdout": "SKILL-CORE-GREEN scope=git-hosting-scale-assurance checked=1"
+      }
+    ],
+    "gates_queue_and_ledger": [
+      {
+        "argv": [
+          "python3",
+          "skills/agentic-tech-lead-orchestration/scripts/assert_local_handoff_queue.py",
+          "--selftest"
+        ],
+        "exit": 0,
+        "stdout": "SELFTEST GREEN: Local Handoff Execution Queue controls"
+      },
+      {
+        "argv": [
+          "python3",
+          "skills/agentic-tech-lead-orchestration/scripts/assert_local_handoff_queue.py",
+          "--queue",
+          "skills/agentic-tech-lead-orchestration/runtime-handoff/git-at-any-scale-local-handoff-queue.json"
+        ],
+        "exit": 0,
+        "stdout": "PASS: Local Handoff Execution Queue (5 item(s), active=GIT-SCALE-H1)",
+        "shadow_note": "Green while the state it declares is contradicted by disk — see SR-02."
+      },
+      {
+        "argv": [
+          "python3",
+          "skills/agentic-tech-lead-orchestration/scripts/check_problem_closure.py",
+          "data/handoff/source-evidence/git-at-any-scale-closure-ledger.json"
+        ],
+        "exit": 0,
+        "stdout_counts": {
+          "OPEN": 26,
+          "NOT_APPLICABLE": 2,
+          "VERIFIED_LOCAL": 0,
+          "VERIFIED_LIVE": 0,
+          "PARTIAL": 0,
+          "IMPLEMENTED_UNVERIFIED": 0,
+          "HUMAN_ADMIT_REQUIRED": 0
+        },
+        "evidence_ceiling": "LEDGER_DETERMINISTIC_CHECKED"
+      }
+    ],
+    "benchmark": {
+      "method": "Recomputed n, percentiles and throughput from raw/benchmark-raw-latencies.json and compared against benchmark-runs/*.json.",
+      "small-frequent-commits": {
+        "n_match": "200/200 for both cas_ref and put_obj",
+        "reported_p50_p95_p99_cas": [
+          0.0559,
+          0.0886,
+          0.1517
+        ],
+        "reported_p50_p95_p99_put": [
+          0.0621,
+          0.0967,
+          0.2229
+        ],
+        "estimator_identified": "sorted[int(q*n)]",
+        "all_reported_values_present_verbatim_in_raw": true,
+        "throughput_reported": 4622.4,
+        "throughput_recomputed_attempted_over_wall": 4624.3,
+        "delta_cause": "wall_seconds rounded to 4 decimal places"
+      },
+      "large-object-transfer": {
+        "n_match": "8/8",
+        "throughput_reported": 27.6,
+        "throughput_recomputed": 27.6
+      },
+      "denominator": {
+        "repetitions": 1,
+        "excluded_repetitions": 0,
+        "errors_in_denominator": true,
+        "timed_out": 0,
+        "rejected": 0,
+        "pinned_benchmark_host": false
+      }
+    },
+    "raw_evidence_consistency": {
+      "l1a_kill_cases": "raw/l1a-kill-cases.json is element-for-element identical to durability-receipt.cases (8 == 8).",
+      "corpus_baseline": "raw/corpus-baseline.json authority_digest fc5a6c69... equals read-freshness-receipt.snapshot_before_authority_write.",
+      "corruption_digests": "pristine 23a73130... vs first-red 2935a38c... differ; corruption-recovery-receipt.authority_digest_after_restore == pristine."
+    }
+  },
+  "builder_assertion_to_evidence_map": {
+    "note": "The Builder's own report was ABSENT from the dispatch (unsubstituted template). These are the assertions the committed artifacts make, re-derived independently, not copied verdicts.",
+    "rows": [
+      {
+        "assertion": "hosting-closure-record.terminal = GIT_HOSTING_LIVE_CANARY_VERIFIED_BOUNDED",
+        "shadow": "CONFIRMED_BOUNDED",
+        "basis": "Independent replay reproduced the same terminal and the same five stage verdicts."
+      },
+      {
+        "assertion": "ref-transaction-receipt.linearizable = true",
+        "shadow": "CONFIRMED",
+        "basis": "Shadow-authored oracle, plus two Shadow-authored negative controls on the exact committed history."
+      },
+      {
+        "assertion": "durability-receipt: 0 acknowledged operations lost over 18",
+        "shadow": "CONFIRMED_BOUNDED",
+        "basis": "raw/l1a-kill-cases.json matches the receipt; only 2 of 8 cases were acked before the kill; SIGKILL-only ceiling (SR-08)."
+      },
+      {
+        "assertion": "read-freshness-receipt: 0 stale reads served over 5 opportunities, fail-closed on unreachable authority",
+        "shadow": "CONFIRMED",
+        "basis": "5 recorded observations each carry snapshot_behind_authority true, detected_stale true, validated true, returned_current_value true; replay reproduced stale_reads_served 0 and fail_closed true."
+      },
+      {
+        "assertion": "cache-rebuild-receipt: destroyed cache rebuilt with 33/33 reachable objects",
+        "shadow": "CONFIRMED",
+        "basis": "Replay reproduced 33/33 and refs matching authority."
+      },
+      {
+        "assertion": "compaction-receipt: no reachable object or ref lost",
+        "shadow": "CONFIRMED",
+        "basis": "reachable 33 -> 33, missing [], refs identical, 7 planted unreachable dropped per declared policy."
+      },
+      {
+        "assertion": "corruption-recovery-receipt: corruption detected, partial records rejected, first red preserved",
+        "shadow": "CONFIRMED",
+        "basis": "First-red JSON preserved verbatim; digests differ before/after flip; restore digest equals pristine."
+      },
+      {
+        "assertion": "cleanup-and-cost-receipt: cleanup complete, no residue",
+        "shadow": "CONFIRMED",
+        "basis": "Declared workspace independently confirmed absent; the Shadow's own two replay workspaces were also removed."
+      },
+      {
+        "assertion": "red_when_red_control proves the checks go red when red",
+        "shadow": "PARTIALLY_CONFIRMED",
+        "basis": "Checker refusal reproduced exactly (GS-C05, exit 2), and an independent planted replay reproduced FAILED_WITH_REPLAYABLE_EVIDENCE. But the named dropped operation is absent from the committed history — SR-07."
+      },
+      {
+        "assertion": "gossip.required_for_correctness = false",
+        "shadow": "VACUOUS_NOT_PROVEN",
+        "basis": "NO_GOSSIP_SUBSYSTEM_EXISTS; the separate receipt says so, the gated packet cannot — SR-04."
+      },
+      {
+        "assertion": "benchmark.matched_topology = true",
+        "shadow": "VACUOUS_NOT_PROVEN",
+        "basis": "One topology, one repetition, unpinned host, no baseline/candidate pair. The numbers themselves reproduce exactly from raw."
+      },
+      {
+        "assertion": "This canary discharges #534",
+        "shadow": "REFUTED",
+        "basis": "Three of the state machine's own stages are NOT_EXERCISED, two of them (GOSSIP_LOSS_CANARY, MATCHED_SCALE_MATRIX) mandatory in #534's body; four required workload classes and four required metrics are absent without a NOT_EXERCISED entry (SR-01)."
+      }
+    ]
+  },
+  "verdicts": {
+    "local": {
+      "L1-A durable ack": "PASS_BOUNDED",
+      "L1-B concurrent ref linearizability": "PASS_BOUNDED",
+      "L1-C stale cache and catch-up": "PASS_BOUNDED",
+      "L1-D gossip non-authority": "NOT_EXERCISED_VACUOUS",
+      "L1-E cache destroy and rebuild": "PASS_BOUNDED",
+      "L1-F compaction reachability": "PASS_BOUNDED",
+      "L1-G corruption and partial records": "PASS_BOUNDED",
+      "L1-H matched scale matrix": "NOT_EXERCISED",
+      "cleanup and cost": "PASS",
+      "receipt bundle integrity": "PASS"
+    },
+    "queue_items": {
+      "GIT-SCALE-H1 (#532)": "NOT_COMPLETE — receipt path issue-532-portable-contract-receipt.json ABSENT; unresolved operation 'implement-remaining-hosting-assurance-contracts' still unresolved (SR-06); 'obtain-exact-head-hosted-workflow-pass' BLOCKED (no network in this lane); registration operation RESOLVED.",
+      "GIT-SCALE-H2 (#534)": "NOT_EXERCISED_PARTIAL — a real bounded canary ran and its receipts survive independent replay, but three state-machine stages are NOT_EXERCISED and SR-01/SR-05 stand. Not the PASS its exit demands.",
+      "GIT-SCALE-H3 (#535)": "NOT_COMPLETE — this receipt is exact-subject and independent of Builder conclusions, but its author is not a truly-independent Shadow identity. HUMAN_ADMIT_REQUIRED."
+    },
+    "global_531": {
+      "verdict": "NOT_CLOSED",
+      "basis": [
+        "data/handoff/source-evidence/git-at-any-scale-closure-ledger.json: 26 OPEN, 2 NOT_APPLICABLE, 0 VERIFIED_LOCAL, 0 VERIFIED_LIVE.",
+        "All 28 problems carry shadow_verdict NOT_REVIEWED with empty implementation_evidence, verification_evidence and receipts arrays.",
+        "The ledger contains zero references to the #534 bundle: 'hosting-closure-record' 0, 'refcore' 0, 'git-at-any-scale/' 0.",
+        "19 of the 28 problems are REQUIRES_EXTERNAL_RUNTIME — every performance number in the article plus the Spokes/DHT/NFS/GFS historical claims. A clean-room single-node core with zero replicas, no gossip subsystem and no network layer closes none of them, and the bundle's own source-and-rights-disposition sets cursor_parity_claim to NONE."
+      ]
+    }
+  },
+  "ceilings": {
+    "method_plane": "One aggregate hosting-assurance/v1 packet is internally consistent with the portable contract, and 20/20 named mutations are refused. That is a contract result, not a hosting result — the checker itself says next: LIVE_CANARY_REQUIRED.",
+    "physical_runtime": "One clean-room single-node core: 1 authority process, 0 replicas, 1 cache, no socket layer, one local filesystem, one monotonic clock, SIGKILL-only fault injection. Power loss, media failure, fsync-lying hardware, network partition, clock skew, multi-region routing, replica fan-out, elasticity transitions and gossip are all NOT_EXERCISED.",
+    "performance_and_scale": "Two workload classes, one repetition each, unpinned benchmark host, one topology, no baseline/candidate pair. INDICATIVE for this host and window only. Supports no comparative, scale or production claim.",
+    "source": "Article bytes are immutable and digest-bound; no checker re-derives that digest from the bytes.",
+    "independence": "TECH_LEAD_DISPATCHED_FRESH_CONTEXT on carrier claude-code, same host, same scratchpad, Builder driver re-used for replay. Advisory evidence only.",
+    "cleanup_rollback_human_boundary": "Cleanup and rollback are complete and independently verified; cost is zero and no provider was activated. Merge, promotion, rollback execution, permission change, provider activation and spend, semantic conflict resolution and disposable hosting runtime selection remain Human-owned — and the last of those was already crossed by automation (SR-05)."
+  },
+  "required_owners_and_next_subject": {
+    "issue_531": "Own SR-03 (traceability README contradicts disk) and the global closure ledger. Decide whether the #534 bundle is admitted evidence or unrecognised scratch, and make the ledger and the README say the same thing.",
+    "issue_532": "Own SR-04, SR-06, SR-09. The eleven missing receipt/history/benchmark schemas plus their fault/concurrent/hollow/benchmark fixtures remain the open denominator, and the aggregate-vs-file-per-family decision named in the audit plan is still undecided.",
+    "issue_534": "Own SR-01, SR-07, SR-08. Add the four absent workload classes and four absent metrics or give each an explicit NOT_EXERCISED entry; bind a matched negative control to the committed history rather than a sibling run.",
+    "issue_535": "Stays OPEN. This receipt is exact-subject and independent of Builder conclusions, but Shadow identity independence is unmet.",
+    "issue_536": "Unblocked only after #531/#532/#534/#535 have admitted subjects.",
+    "queue_writer": "Own SR-02. Recompile git-at-any-scale-local-handoff-queue.json against the epoch subject so H1/H2/H3 states match disk, and close the gate hole where assert_local_handoff_queue.py exits 0 on a queue whose declared state disk contradicts.",
+    "human": "Own SR-05 and every ceiling in this receipt.",
+    "next_immutable_subject": "The convergence commit that lands the currently uncommitted #534 bundle and #532 registration. Nothing reviewed here is on main: the review worktree HEAD is bca08001c416108f9b83e9325e7bf07149a9281f with 33 modified and 5 untracked paths."
+  },
+  "schema_validation_readback": {
+    "argv": [
+      "python3",
+      "jsonschema==4.26.0 Draft202012Validator",
+      "skills/agentic-tech-lead-orchestration/references/issue-closure-contract.schema.json",
+      "data/handoff/git-at-any-scale/issue-535-shadow-receipt.json"
+    ],
+    "conforms": false,
+    "error_count": 9,
+    "errors": [
+      "<root>: Additional properties are not allowed ('artifact', 'bound_subjects', 'builder_assertion_to_evidence_map', 'ceilings', 'falsifiers', 'findings', 'first_red', 'human_admit', 'independence_declaration', 'independent_readbacks', 'not_performed', 'produced_utc', 'queue_item', 'required_owners_and_next_subject', 'schema_binding', 'schema_validation_readback', 'shadow_state_machine', 'verdict', 'verdict_law_clause', 'verdicts' were unexpected)",
+      "<root>: 'schema_version' is a required property",
+      "<root>: 'disposition' is a required property",
+      "<root>: 'acceptance' is a required property",
+      "<root>: 'implementation' is a required property",
+      "<root>: 'residual' is a required property",
+      "<root>: 'evidence_ceiling' is a required property",
+      "<root>: 'shadow_review' is a required property",
+      "issue: 535 is not of type 'object'"
+    ],
+    "note": "Real validator output, not a claim. Conformance is impossible without asserting a false `disposition` and a false `issue.github_state_reason` for an OPEN issue, and the schema is additionalProperties:false with no field for findings, falsifier outcomes, first-red or reviewed digests. See schema_binding."
+  },
+  "not_performed": [
+    {
+      "item": "live GitHub issue/PR/branch/workflow readback at exact head",
+      "state": "BLOCKED",
+      "blocker": "no network in this lane; GitHub facts taken only from the frozen 2026-08-22 inputs"
+    },
+    {
+      "item": "exact-head hosted workflow PASS for the git-hosting-scale-assurance suite",
+      "state": "ABSENT",
+      "blocker": "GitHub Actions authority is outside this lane; the only hosted readback on record for this suite is SKIPPED, which repository law forbids treating as PASS"
+    },
+    {
+      "item": "human-readable Shadow receipt (the second artifact #535's Output requires)",
+      "state": "ABSENT",
+      "blocker": "outside this lane's single-path write lease"
+    },
+    {
+      "item": "re-implementation of the canary subject independent of the Builder",
+      "state": "NOT_EXERCISED",
+      "blocker": "refcore.py is deliberately uncommitted; the bundle's own REPLAY CEILING states re-execution requires the subject at the recorded runtime digest, which only the shared scratchpad holds"
+    },
+    {
+      "item": "power-loss, media-failure and multi-node durability injection",
+      "state": "NOT_EXERCISED",
+      "blocker": "no such host is admitted at this subject"
+    }
+  ]
+}

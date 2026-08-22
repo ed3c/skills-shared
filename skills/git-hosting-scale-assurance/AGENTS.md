@@ -7,13 +7,14 @@ This directory owns the portable deterministic assurance contract for Git-hostin
 1. repository root `AGENTS.md` and exact current Git subject;
 2. this file;
 3. `README.md`;
-4. `SKILL.md`;
-5. `references/hosting-assurance.schema.json`;
-6. `scripts/check_hosting_assurance.py`;
-7. `tests/run-all.sh` and fixtures;
-8. issue #531 then implementation owner #532;
-9. physical owner #534 and independent Shadow #535 before any live claim;
-10. current PR/head/workflow state.
+4. `SKILL.md` — the portable core between the `PORTABLE_CORE` markers;
+5. `modules/domain-profile.md` — only when a concrete backend, runtime, source proposal or lane owner must be bound;
+6. `references/hosting-assurance.schema.json`;
+7. `scripts/check_hosting_assurance.py`;
+8. `tests/run-all.sh` and fixtures;
+9. issue #531 then implementation owner #532;
+10. physical owner #534 and independent Shadow #535 before any live claim;
+11. current PR/head/workflow state.
 
 ## Writer and authority law
 

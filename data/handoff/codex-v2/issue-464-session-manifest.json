@@ -1,0 +1,18 @@
+{
+  "allowed_paths": [
+    "src"
+  ],
+  "attempt_id": "a01",
+  "base_sha": "5af72fb3a2fc073d2b36da5dbbc2cb9b12c8a842",
+  "predecessor_receipts": [],
+  "prompt": "You are working in a small Python repository. The test suite is currently RED: tests/test_calc.py expects add(2, 3) == 5 but src/calc.py raises NotImplementedError. Implement the add function in src/calc.py so the test passes. Only modify files under src/. Do not modify tests/. Keep the change minimal.",
+  "prompt_digest": "1aac71b0ec2b4f2965dc2940ab57effcbc71f4e9ce993132731c3a0116c3a4a1",
+  "read_only_paths": [
+    "tests"
+  ],
+  "repo": "ed3c/live-464-calc",
+  "task_id": "issue-464/T1",
+  "thread_policy": "new",
+  "tree_sha": "eaefc42d34dcf917e420121a38d5eef12de70b4c",
+  "worktree": "/private/tmp/claude-501/-Users-neon-skills-shared/6fabfecc-0194-4b92-9f3e-e1d643e57ffd/scratchpad/live-464-calc"
+}

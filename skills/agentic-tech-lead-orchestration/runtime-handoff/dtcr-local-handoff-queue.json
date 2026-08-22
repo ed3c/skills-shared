@@ -31,11 +31,59 @@
   },
   "items": [
     {
+      "id": "dtcr-independent-shadow",
+      "task_ref": "issue-525-independent-shadow-admission",
+      "state": "COMPLETE",
+      "entry": {
+        "predecessor": null,
+        "required_subject_commit": "8c9d8cae63c0d63d14077e568331cb8f95a993dc",
+        "required_capabilities": [
+          "fresh-context-session-distinct-from-every-builder-lane",
+          "clean-checkout-offline-replay"
+        ]
+      },
+      "runtime_lane": {
+        "class": "LOCAL_RUNTIME",
+        "commands": [
+          {
+            "argv": [
+              "python3",
+              "skills/agentic-tech-lead-orchestration/scripts/assert_issue_closure_contract.py",
+              "skills/agentic-tech-lead-orchestration/references/closure-audit/issue-525.json"
+            ],
+            "cwd": ".",
+            "timeout_seconds": 120
+          }
+        ],
+        "unresolved_operations": [],
+        "live_evidence_required": false
+      },
+      "receipt": {
+        "path": "skills/agentic-tech-lead-orchestration/references/closure-audit/issue-525.json",
+        "schema": "agentic-tech-lead/issue-closure-contract/v1",
+        "required_states": [
+          "PASS",
+          "HUMAN_ADMIT_REQUIRED"
+        ],
+        "forbidden_promotions": [
+          "tech_lead_self_audit_to_independent_shadow",
+          "same_context_shadow_to_independent",
+          "shadow_agreement_to_human_admit"
+        ]
+      },
+      "exit": {
+        "requires_receipt": true,
+        "required_verdict": "PASS",
+        "cleanup_required": false
+      },
+      "next": "dtcr-registry-admission"
+    },
+    {
       "id": "dtcr-registry-admission",
       "task_ref": "issue-527-registry-and-required-order-admission",
       "state": "ACTIVE",
       "entry": {
-        "predecessor": null,
+        "predecessor": "dtcr-independent-shadow",
         "required_subject_commit": "8c9d8cae63c0d63d14077e568331cb8f95a993dc",
         "required_capabilities": [
           "human-owner-terminal",
@@ -49,15 +97,15 @@
         "unresolved_operations": [
           {
             "operation_id": "admit-dtcr-into-registry-and-required-order",
-            "resolver_source": "registry.json entry shape, skills/shared-skills-infra/scripts/repository_control_plane.py REQUIRED_ORDER, and skills/dual-track-code-review-loop/bootstrap/dtcr-consumer-bootstrap-profile.json - a Human admits the shared classification and the engine-order closure, then re-derives the bootstrap artifact so its two refused preconditions flip by observation, not by edit",
+            "resolver_source": "registry.json entry shape, skills/shared-skills-infra/scripts/repository_control_plane.py REQUIRED_ORDER, and the landed shared-skills-infra sibling profile (repository-control-plane-profile.dual-track-code-review-loop.json with consumer_bootstrap_dtcr.py, publication 81f2f20d) - a Human admits the shared classification and the engine-order closure; registry.json still carries no dual-track-code-review-loop entry",
             "required_output": "CONCRETE_COMMAND_CONTRACT"
           }
         ],
         "live_evidence_required": false
       },
       "receipt": {
-        "path": "skills/dual-track-code-review-loop/bootstrap/dtcr-consumer-bootstrap-profile.json",
-        "schema": "dtcr/consumer-bootstrap-profile/v1",
+        "path": "skills/shared-skills-infra/references/repository-control-plane-profile.dual-track-code-review-loop.json",
+        "schema": "shared-skills-infra/repository-control-plane-profile/v1",
         "required_states": [
           "PASS",
           "HUMAN_ADMIT_REQUIRED"
@@ -73,66 +121,18 @@
         "required_verdict": "PASS",
         "cleanup_required": false
       },
-      "next": "dtcr-independent-shadow"
+      "next": "dtcr-provider-unblocks"
     },
     {
-      "id": "dtcr-independent-shadow",
-      "task_ref": "issue-525-independent-shadow-admission",
+      "id": "dtcr-provider-unblocks",
+      "task_ref": "issues-547-550-provider-blocked-sub-lanes",
       "state": "BLOCKED_BY_PREDECESSOR",
       "entry": {
         "predecessor": "dtcr-registry-admission",
         "required_subject_commit": "8c9d8cae63c0d63d14077e568331cb8f95a993dc",
         "required_capabilities": [
-          "fresh-context-session-distinct-from-every-builder-lane",
-          "read-only-enforcement-stronger-than-prompt-only-or-declared-ceiling",
-          "clean-checkout-offline-replay"
-        ]
-      },
-      "runtime_lane": {
-        "class": "LOCAL_RUNTIME",
-        "commands": [],
-        "unresolved_operations": [
-          {
-            "operation_id": "run-independent-shadow-over-exact-landed-head",
-            "resolver_source": "issue #525 body and its falsifier table (SAME_CONTEXT_SHADOW_PROMOTED_TO_INDEPENDENT is fatal), skills/procedural-shadow-runtime/references/ receipt contracts, and the landed wave head - the Shadow is not any session that built or converged these lanes",
-            "required_output": "CONCRETE_COMMAND_CONTRACT"
-          }
-        ],
-        "live_evidence_required": false
-      },
-      "receipt": {
-        "path": "skills/dual-track-code-review-loop/receipts/shadow-audit.json",
-        "schema": "procedural-shadow-runtime/runtime-receipt/v1",
-        "required_states": [
-          "PASS",
-          "FAIL",
-          "NOT_EXERCISED",
-          "HUMAN_ADMIT_REQUIRED"
-        ],
-        "forbidden_promotions": [
-          "tech_lead_self_audit_to_independent_shadow",
-          "same_context_shadow_to_independent",
-          "shadow_agreement_to_human_admit"
-        ]
-      },
-      "exit": {
-        "requires_receipt": true,
-        "required_verdict": "PASS",
-        "cleanup_required": false
-      },
-      "next": "dtcr-provider-unblocks"
-    },
-    {
-      "id": "dtcr-provider-unblocks",
-      "task_ref": "issues-547-549-550-provider-blocked-sub-lanes",
-      "state": "BLOCKED_BY_PREDECESSOR",
-      "entry": {
-        "predecessor": "dtcr-independent-shadow",
-        "required_subject_commit": "8c9d8cae63c0d63d14077e568331cb8f95a993dc",
-        "required_capabilities": [
           "human-admitted-provider-installation",
-          "provider-exact-identity-binding-version-and-sha256",
-          "scip-crash-repair-issue-595"
+          "provider-exact-identity-binding-version-and-sha256"
         ]
       },
       "runtime_lane": {
@@ -141,7 +141,7 @@
         "unresolved_operations": [
           {
             "operation_id": "unblock-or-formally-descope-provider-sub-lanes",
-            "resolver_source": "cross-language scip indexers, the buf CLI, and an embedding provider are absent from this runtime; a Human either admits their installation (each lane then produces its own live receipt through its landed adapter, after #595's repair for scip) or formally descopes them in #519's convergence receipt",
+            "resolver_source": "cross-language scip indexers and an embedding provider are absent from this runtime (the buf live lane was already exercised once at its landing under buf 1.72.0, packet issue-549.json); a Human either admits installing the remaining providers (each lane then produces its own live receipt through the canonical adapter) or formally descopes them in #519's convergence receipt",
             "required_output": "CONCRETE_COMMAND_CONTRACT"
           }
         ],
@@ -178,7 +178,7 @@
         "required_subject_commit": "8c9d8cae63c0d63d14077e568331cb8f95a993dc",
         "required_capabilities": [
           "human-admit-for-merge-release-registry",
-          "closure-packets-for-landed-lanes",
+          "closure-packets-for-remaining-lanes",
           "canary-receipt-schema-freeze"
         ]
       },
@@ -188,7 +188,7 @@
         "unresolved_operations": [
           {
             "operation_id": "freeze-canary-receipt-schema-and-admit-528-exit",
-            "resolver_source": "docs/traceability/dual-track-code-review-loop/canary-528/canary-receipt.json is dtcr/consumer-canary-receipt/v0-draft because no frozen in-tree receipt type carries a canary result; freezing that schema, binding the receipt, writing the closure packets for the landed lanes and admitting #528's exit terminal are Human-gated final admission work",
+            "resolver_source": "docs/traceability/dual-track-code-review-loop/canary-528/canary-receipt.json is dtcr/consumer-canary-receipt/v0-draft because no frozen in-tree receipt type carries a canary result; freezing that schema, binding the receipt, writing the remaining closure packets and admitting #528's exit terminal are Human-gated final admission work",
             "required_output": "CONCRETE_COMMAND_CONTRACT"
           }
         ],

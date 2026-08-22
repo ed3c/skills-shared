@@ -1,0 +1,35 @@
+{
+  "baseline_artifact_name": "baseline",
+  "baseline_build": "baseline_build.binpb",
+  "baseline_cached_digest": null,
+  "baseline_commit": "674cfe1435c4bd1c29e8f07308266fe5c6284973",
+  "breaking_config": {
+    "breaking": {
+      "use": [
+        "FILE"
+      ]
+    },
+    "version": "v2"
+  },
+  "breaking_exit_code": 100,
+  "breaking_stdout": "breaking.stdout",
+  "candidate_artifact_name": "candidate",
+  "candidate_build": "candidate_build.binpb",
+  "declared_blobs": [
+    "skills/dual-track-code-review-loop/adapters/buf/fixtures/breaking-pair/candidate/order.proto"
+  ],
+  "identity": {
+    "executable_sha256": "5176f23a6118b9978de1340c3e3301a4ed0d48e16a669510be44b4c355170d57",
+    "probe_exit_code": 0,
+    "version": "1.72.0"
+  },
+  "kind": "applicable",
+  "lint_exit_code": 100,
+  "lint_stdout": "lint.stdout",
+  "schema": "dtcr/buf-run-request/v1",
+  "subject": {
+    "commit": "674cfe1435c4bd1c29e8f07308266fe5c6284973",
+    "repository_binding_id": "DTCR-RB-3749864dfe3e2f36",
+    "tree": "217bf950a57701235f761223e9466b9774aa6194"
+  }
+}

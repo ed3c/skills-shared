@@ -1,0 +1,127 @@
+{
+  "authority_unreachable_read": {
+    "detail": "BrokenPipeError: [Errno 32] Broken pipe",
+    "error": "FAIL_CLOSED_AUTHORITY_UNREACHABLE",
+    "ok": false,
+    "served_stale": false
+  },
+  "cache_stats_after_authority_kill": {
+    "bytes_transferred": 16392,
+    "catchups": 6,
+    "fail_closed": 1,
+    "objects_fetched": 53,
+    "stale_served": 0,
+    "validations": 6
+  },
+  "cache_stats_before_authority_kill": {
+    "bytes_transferred": 16392,
+    "catchups": 6,
+    "fail_closed": 0,
+    "objects_fetched": 53,
+    "stale_served": 0,
+    "validations": 6
+  },
+  "cache_was_behind_authority": true,
+  "ceiling": "One cache process on the same host as the authority. Network partition, clock skew and multi-region routing are NOT_EXERCISED.",
+  "consumer_subject": {
+    "bytes": 19872,
+    "committed_to_repository": false,
+    "implementation_relationship": "CLEAN_ROOM",
+    "implementation_sha256": "4ea664cc6bae1d3a999bf4293ad65136821c3a611a498894d428448a1610d127",
+    "name": "refcore (disposable single-node Git-hosting reference core)",
+    "path_outside_repository": "/private/tmp/claude-501/-Users-neon-skills-shared/ba0ee313-3387-4cd5-8e1e-eea11e6f3419/scratchpad/canary-subject/refcore.py",
+    "visibility": "PRIVATE_DISPOSABLE_SCRATCHPAD"
+  },
+  "epoch_subject": {
+    "commit": "5341885f26b5e8e7baf5087a4d661e324f878242",
+    "repository": "ed3c/skills-shared",
+    "rollback_commit": "9fe3c6daf53dcdd61123d5d7a4eeedbdf37b5d7c",
+    "tree": "a18e12507f9e621efd5354f58384eded1f1e2a9a"
+  },
+  "experiment": "L1-C+L1-E",
+  "fail_closed_on_unreachable_authority": true,
+  "falsifiers_not_triggered": [
+    "STALE_CACHE_SERVED_WITHOUT_AUTHORITY_CHECK",
+    "DESTROYED_CACHE_CANNOT_REBUILD_FROM_DECLARED_AUTHORITY"
+  ],
+  "first_rebuild": {
+    "bytes_transferred": 16302,
+    "objects": 48,
+    "objects_fetched": 48,
+    "ok": true,
+    "refs": 3,
+    "was_stale": true
+  },
+  "issue": 534,
+  "read_detected_staleness": true,
+  "read_returned_current_value": true,
+  "read_validated_against_authority": true,
+  "runtime": {
+    "clock_model": "single host monotonic clock, no distributed clock",
+    "cloud_provider": "NONE",
+    "cost_usd": 0.0,
+    "cpu_count": 10,
+    "git_version": "git version 2.50.1 (Apple Git-155)",
+    "machine": "arm64",
+    "network_used": false,
+    "observed_worktree_dirty_paths": 39,
+    "observed_worktree_head": "bca08001c416108f9b83e9325e7bf07149a9281f",
+    "os": "macOS-26.4-arm64-arm-64bit-Mach-O",
+    "pinned_benchmark_host": false,
+    "process_model": "python3 subprocesses; line-JSON over anonymous pipes inherited at spawn; no socket, no listening port",
+    "python": "3.14.6"
+  },
+  "snapshot_before_authority_write": "fc5a6c69af9e1a0c1d54e46914013cd504862e29f3b28f06a6cb94116e448292",
+  "stage": "STALE_CACHE_AND_CATCHUP_CANARY",
+  "stale_opportunities_where_snapshot_was_behind": 5,
+  "stale_opportunity_denominator": 5,
+  "stale_read_observations": [
+    {
+      "authority_digest": "a716319ed6809cba29554aadd3c663382b0fd9f02e0bd0d5d02e1869e8dba8ae",
+      "detected_stale": true,
+      "opportunity": 0,
+      "returned_current_value": true,
+      "snapshot_behind_authority": true,
+      "snapshot_digest_before_read": "fc5a6c69af9e1a0c1d54e46914013cd504862e29f3b28f06a6cb94116e448292",
+      "validated": true
+    },
+    {
+      "authority_digest": "4b6e1bd204e19a6fc697670d5d2f71e8d5173284e2ba5d75cbe8bb32d76bb120",
+      "detected_stale": true,
+      "opportunity": 1,
+      "returned_current_value": true,
+      "snapshot_behind_authority": true,
+      "snapshot_digest_before_read": "a716319ed6809cba29554aadd3c663382b0fd9f02e0bd0d5d02e1869e8dba8ae",
+      "validated": true
+    },
+    {
+      "authority_digest": "c53bae3337767d328bd5a279dcfc4a7cbd25d827369e6693bf57a3e4a12d1f44",
+      "detected_stale": true,
+      "opportunity": 2,
+      "returned_current_value": true,
+      "snapshot_behind_authority": true,
+      "snapshot_digest_before_read": "4b6e1bd204e19a6fc697670d5d2f71e8d5173284e2ba5d75cbe8bb32d76bb120",
+      "validated": true
+    },
+    {
+      "authority_digest": "1d7ac2d65857007ad398e211c1f1232605143bac82a94979a9ffc75c9d4a8865",
+      "detected_stale": true,
+      "opportunity": 3,
+      "returned_current_value": true,
+      "snapshot_behind_authority": true,
+      "snapshot_digest_before_read": "c53bae3337767d328bd5a279dcfc4a7cbd25d827369e6693bf57a3e4a12d1f44",
+      "validated": true
+    },
+    {
+      "authority_digest": "749f352708c5fb0bbcd5b061e70a4008a8d78eb8f6ccd1e3d1e52cb51f6233db",
+      "detected_stale": true,
+      "opportunity": 4,
+      "returned_current_value": true,
+      "snapshot_behind_authority": true,
+      "snapshot_digest_before_read": "1d7ac2d65857007ad398e211c1f1232605143bac82a94979a9ffc75c9d4a8865",
+      "validated": true
+    }
+  ],
+  "stale_reads_served": 0,
+  "verdict": "PASS"
+}

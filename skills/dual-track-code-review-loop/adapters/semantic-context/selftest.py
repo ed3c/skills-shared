@@ -1,72 +1,844 @@
 #!/usr/bin/env python3
-"""Execute the semantic-context adapter against the frozen DTCR schemas.
+"""Run the semantic-context adapter against its fixture, and plant every falsifier.
 
-Three lanes, and the numbers each one counts are printed, so a run can never
-report a green it did not measure:
+Five lanes, in this order, because a refusal credited to a harness that was
+already red proves nothing about the guard it names:
 
-    positives   the committed corpus is projected with no provider on the
-                machine, queried, consumed, reconciled and rebuilt, and every
-                emitted artifact is validated against the read-only schemas in
-                `../../references/schemas/`. The lane also measures the raw
-                ranking *before* the freshness demotion, because a demotion that
-                never had to move anything is decoration that a later reader
-                would read as a guard.
-    falsifiers  every falsifier named by issue #550 is run through the code path
-                that owns it and must be refused *by that guard*. A defect that
-                dies on an unrelated `required` proves nothing about the guard it
-                was written for, so a schema-side row also performs a knockout:
-                delete exactly the keyword the row names from a copy of the
-                schema, change nothing else, and require the mutated instance to
-                validate. A control still refused after its own guard is gone is
-                refused by something else and the row naming it is wrong.
-    provider    the committed provider receipt is checked without any provider,
-                because a receipt whose own digests drifted describes a host that
-                is no longer there and reads exactly like one that still matches.
-                Then the pinned interpreter is tried for real. An importable
-                vector store is a transport fact about one interpreter on one
-                host; it is not a VECTOR retrieval lane, which stays
-                BLOCKED_ON_PROVIDER on an embedding provider this runtime does
-                not have. A missing interpreter is start-readiness, not a
-                failure: the lane prints NOT_EXERCISED and stays green.
+    positives   the deterministic run: register, project, index, query,
+                consume, rebuild, delete, over the committed public fixture,
+                with the denominators printed rather than described
+    plants      the twelve named falsifiers, each planted as a single-field
+                delta from a green artifact or as a call the adapter refuses,
+                and each recorded under the code and mechanism that actually
+                fired -- with one code renamed in a copy of the adapter to show
+                the code half of that comparison goes red on demand
+    receipts    the committed receipts are reproduced from this tree; the
+                deterministic one has to match byte for byte, and the provider
+                lane one is checked for shape without needing the provider
+    leaks       every committed file in this subtree is scanned for a resolved
+                address or a private locator, and the scanner is shown to bite
+    provider    the LanceDB lane's state on this host, typed, never faked
 
-Exit 0 green, 2 a lane failed, 70 the validator is absent.
+Every planted case names the mechanism it expects. A case that starts passing
+for a different reason is visible as a changed mechanism rather than as a still
+green run.
+
+Exit 0 green, 2 a case failed, 70 the validator is absent.
 """
 from __future__ import annotations
 
 import copy
+import importlib.util
 import json
 import shutil
+import socket
 import sys
 import tempfile
 from pathlib import Path
 from typing import Any, Callable
 
-try:
-    from jsonschema import Draft202012Validator
-except ImportError:  # pragma: no cover - environment guard
-    print(
-        "DTCR-SEMANTIC-CONTEXT-SELFTEST-UNUSABLE: jsonschema is required. This suite executes "
-        "the frozen schemas as deciding gates; skipping them would report the same green as "
-        "running them.",
-        file=sys.stderr,
+
+class NetworkRefused(AssertionError):
+    """The default suite is zero-network. Opening a socket is a failed run."""
+
+
+def _refuse_socket(*args: Any, **kwargs: Any):
+    raise NetworkRefused(
+        "the default semantic-context suite is zero-network and something tried to open a socket"
     )
-    raise SystemExit(70)
+
+
+# Armed before the adapter is imported, so an import-time call is caught too.
+# "No network" written in a docstring is a claim; this is the arrival.
+socket.socket = _refuse_socket  # type: ignore[assignment]
+socket.create_connection = _refuse_socket  # type: ignore[assignment]
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+import adapter as A  # noqa: E402
+from adapter import ProviderUnavailable, Refusal  # noqa: E402
 
 ADAPTER_DIR = Path(__file__).resolve().parent
-sys.path.insert(0, str(ADAPTER_DIR))
-import semantic_context as S  # noqa: E402
+FIXTURE = A.load_fixture()
+CEILINGS = {item["document_ref"]: item for item in FIXTURE["freshness_ceilings"]}
+DOCUMENTS = {entry["document"]["document_id"]: entry for entry in FIXTURE["documents"]}
 
-CORPUS = ADAPTER_DIR / "fixtures" / "public-corpus.json"
-PROVIDER_RECEIPT = ADAPTER_DIR / "receipts" / "lancedb-provider.receipt.json"
+failures: list[str] = []
+cases = 0
+plants: list[tuple[str, str]] = []
 
-# The query the positives lane rides. It is phrased the way the *superseded*
-# record phrases it, which is why this corpus can measure the demotion at all.
-QUERY = "persistence boundary domain isolation decision"
 
-# The falsifiers issue #550 requires, plus the two this lane's own brief adds.
-# Every one of them must be refused by at least one row below, and the table at
-# the end prints the count per falsifier rather than a single total, so a
-# falsifier that quietly lost its row is visible as a zero.
+def check(name: str, condition: bool, detail: str = "") -> None:
+    global cases
+    cases += 1
+    if not condition:
+        failures.append(f"{name}: {detail or 'the assertion did not hold'}")
+
+
+def refuses(falsifier: str, mechanism: str, thunk: Callable[[], Any]) -> None:
+    """The planted case has to go red, for the mechanism *and* the code it names.
+
+    Reading only `refusal.mechanism` left the falsifier half of every row
+    unverified: renaming a code in the adapter, or collapsing all of them to one
+    constant, kept this suite green. So both halves are compared, and the row is
+    recorded from the refusal the adapter actually raised rather than from the
+    literal argued above -- which is what makes the REQUIRED_FALSIFIERS
+    accounting below an observation instead of a tautology.
+    """
+    global cases
+    cases += 1
+    try:
+        thunk()
+    except Refusal as refusal:
+        if mechanism not in refusal.mechanism:
+            failures.append(
+                f"{falsifier} was refused by {refusal.mechanism!r}, not by the {mechanism!r} it names"
+            )
+            return
+        if refusal.falsifier != falsifier:
+            failures.append(
+                f"{falsifier} was refused under the falsifier code {refusal.falsifier!r}, "
+                f"not the {falsifier!r} it names"
+            )
+            return
+        plants.append((refusal.falsifier, refusal.mechanism))
+        return
+    failures.append(f"{falsifier} was not refused ({mechanism} did not fire)")
+
+
+def control(schema: str, case_id: str) -> dict:
+    """One planted instance from a frozen schema's own refusal controls.
+
+    Reading the instance from the contract rather than writing it here keeps the
+    planted private address out of this subtree entirely, and keeps the plant
+    bound to the control the schema says it kills.
+    """
+    document = json.loads((A.SCHEMA_DIR / f"{schema}.schema.json").read_text(encoding="utf-8"))
+    for item in document.get("x-refusal-controls", []):
+        if item["case_id"] == case_id:
+            return copy.deepcopy(item["instance"])
+    raise AssertionError(f"{case_id} is not a refusal control of {schema}")
+
+
+def with_value(document: dict, value: Any, *path: str) -> dict:
+    mutated = copy.deepcopy(document)
+    cursor = mutated
+    for key in path[:-1]:
+        cursor = cursor[key]
+    cursor[path[-1]] = value
+    return mutated
+
+
+def without(document: dict, *path: str) -> dict:
+    mutated = copy.deepcopy(document)
+    cursor = mutated
+    for key in path[:-1]:
+        cursor = cursor[key]
+    del cursor[path[-1]]
+    return mutated
+
+
+def loaded(skip: str | None = None, freshness_for: Callable[[str], dict | None] | None = None) -> A.ReferenceBackend:
+    """A store loaded from the committed fixture, projected and indexed."""
+    store = A.ReferenceBackend(A.TASK_ADMISSION)
+    for reference in FIXTURE["back_references"]:
+        store.register_back_reference(reference)
+    for entry in FIXTURE["documents"]:
+        document = entry["document"]
+        if document["document_id"] == skip:
+            continue
+        ceiling = freshness_for(document["document_id"]) if freshness_for else CEILINGS.get(document["document_id"])
+        store.register(document, ceiling, entry["content"])
+    store.project_all()
+    store.build_index()
+    return store
+
+
+CHECKOUT = {
+    "text": "checkout ledger client write path persistence rule",
+    "lane": "VECTOR",
+    "top_k": 4,
+    "filters": [{"field": "subsystem_tag", "value": "checkout"}],
+}
+
+
+# ---------------------------------------------------------------------------
+# lane 1: positives
+# ---------------------------------------------------------------------------
+
+def positives() -> dict[str, Any]:
+    print("positives")
+    # The zero-network guard is checked for teeth before anything leans on it:
+    # a guard that silently stopped being armed reports the same green.
+    try:
+        socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        check("the zero-network guard is armed", False, "a socket was opened without refusal")
+    except NetworkRefused:
+        check("the zero-network guard is armed", True)
+
+    for name in A.CONSUMED_SCHEMAS:
+        check(
+            f"frozen schema {name} is present",
+            (A.SCHEMA_DIR / f"{name}.schema.json").is_file(),
+            "the adapter consumes it and cannot validate without it",
+        )
+
+    run = A.deterministic_run(FIXTURE)
+    store: A.ReferenceBackend = run["store"]
+    check("every fixture document registered", len(store.documents) == 9, str(len(store.documents)))
+    check("every back reference registered", len(store.back_references) == 9, str(len(store.back_references)))
+    check(
+        "all six document kinds and all three reference kinds are exercised",
+        len({entry["document"]["document_kind"] for entry in FIXTURE["documents"]}) == 6
+        and len({item["reference_kind"] for item in FIXTURE["back_references"]}) == 3,
+    )
+
+    # The private-carrier record is registrable by digest and back reference and
+    # is not projectable here. Its absence is typed, and it appears in no result.
+    check(
+        "the private-carrier record is registered and its content absence is typed",
+        store.absences == {"DTCR-DOC-006": "CONSUMER_LOCAL_CONTENT_ABSENT"},
+        str(store.absences),
+    )
+    returned = {row["document_ref"] for query in run["queries"] for row in query["rows"]}
+    check("no private-carrier row was ever returned", "DTCR-DOC-006" not in returned, str(sorted(returned)))
+    check(
+        "no projection was made from a private plane",
+        all(
+            receipt["data_handling"]["content_plane"] == "PUBLIC_TREE"
+            for receipt in store.projections.values()
+        ),
+    )
+
+    checkout = next(query for query in run["queries"] if query["name"] == "checkout-persistence")
+    check("top_k bounds the result", len(checkout["rows"]) <= checkout["top_k"], str(len(checkout["rows"])))
+    positions = {row["document_ref"]: row["rank"] for row in checkout["rows"]}
+    check(
+        "the superseded record sits below the record that replaced it",
+        positions["DTCR-DOC-002"] > positions["DTCR-DOC-003"],
+        str(positions),
+    )
+    check(
+        "and it sat there despite scoring higher, which is the whole point",
+        checkout["demoted_by_supersession"] == ["DTCR-DOC-002"]
+        and next(row for row in checkout["rows"] if row["document_ref"] == "DTCR-DOC-002")["score"]
+        > next(row for row in checkout["rows"] if row["document_ref"] == "DTCR-DOC-003")["score"],
+        str(checkout["rows"]),
+    )
+
+    not_applicable = next(query for query in run["queries"] if query["lane"] == "NOT_APPLICABLE")
+    check(
+        "the not-applicable lane carries no rows and no result size",
+        not_applicable["rows"] == [] and not_applicable["top_k"] == "NOT_APPLICABLE",
+        str(not_applicable),
+    )
+    check("consumed rows were listed for every rank read", run["consumed_total"] == 5, str(run["consumed_total"]))
+
+    rebuild, delete = run["lifecycle"]
+    check(
+        "a rebuild reproduces the same index from the same projections",
+        rebuild["index_digest_after"] == rebuild["index_digest_before"],
+        str(rebuild),
+    )
+    check(
+        "a delete leaves no digest behind",
+        delete["index_digest_after"] == "INDEX_ABSENT_AFTER_DELETE" and delete["projection_receipt_refs"] == [],
+        str(delete),
+    )
+    check(
+        "neither moved task admission",
+        run["admission_digest"] == A.digest_of(dict(A.TASK_ADMISSION))
+        and all(item["changes"]["task_admission"] == "UNCHANGED" for item in run["lifecycle"]),
+    )
+
+    # The structural half of the same law: the port holds a read-only view, so
+    # there is no write path to the admission mapping to begin with.
+    try:
+        store.task_admission["DTCR-TASK-001"] = "CLOSED"  # type: ignore[index]
+        check("the port's view of task admission is read-only", False, "the assignment was accepted")
+    except TypeError:
+        check("the port's view of task admission is read-only", True)
+
+    ceilings = [
+        artifact["establishes"]
+        for artifact in list(store.projections.values())
+    ]
+    check(
+        "no projection receipt establishes anything",
+        all(set(item.values()) == {False} for item in ceilings),
+    )
+
+    replay = A.build_receipt(FIXTURE)
+    again = A.build_receipt(FIXTURE)
+    check(
+        "the deterministic lane is deterministic",
+        A.digest_of(replay) == A.digest_of(again),
+        "two runs over the same fixture disagreed",
+    )
+    print(
+        f"  documents={len(store.documents)} projections={replay['index']['projection_receipts']} "
+        f"index_rows={replay['index']['rows']} queries={len(run['queries'])} "
+        f"consumed_rows={run['consumed_total']} lifecycle={len(run['lifecycle'])}"
+    )
+    return replay
+
+
+# ---------------------------------------------------------------------------
+# lane 2: the twelve falsifiers
+# ---------------------------------------------------------------------------
+
+def planted() -> None:
+    print("plants")
+    store = loaded()
+    query, result = store.query(**CHECKOUT)
+    manifest = store.consume(
+        result,
+        [1, 2],
+        manifest_ref="context manifest for the planted review",
+        task_ref="planted review",
+        consumed_at="2026-08-22",
+    )
+    projection = store.projections["DTCR-PR-001"]
+    _, not_applicable = store.query(
+        "rename a local variable",
+        "NOT_APPLICABLE",
+        "NOT_APPLICABLE",
+        [],
+        "this task is a mechanical rename with no decision or incident that stored context could bear on",
+    )
+
+    # 1. ORPHAN_CONTEXT_ROW_WITHOUT_SOURCE_BACK_REFERENCE
+    #
+    # A registration with no `back_reference_ref` at all never reaches the
+    # adapter's orphan guard: the frozen schema refuses it at the door, under
+    # the one code that gate raises for every document it turns away. The row
+    # is named for the code that is actually raised, because a row named for a
+    # falsifier the adapter never utters is what F-02 was.
+    entry = DOCUMENTS["DTCR-DOC-001"]
+    refuses(
+        "FROZEN_SCHEMA_REFUSED_THE_REGISTRATION",
+        "semantic-document.schema.json required",
+        lambda: A.ReferenceBackend(A.TASK_ADMISSION).register(
+            without(entry["document"], "back_reference_ref"), None, entry["content"]
+        ),
+    )
+    refuses(
+        "ORPHAN_CONTEXT_ROW_WITHOUT_SOURCE_BACK_REFERENCE",
+        "the back reference must be registered before the document",
+        lambda: A.ReferenceBackend(A.TASK_ADMISSION).register(
+            entry["document"], CEILINGS["DTCR-DOC-001"], entry["content"]
+        ),
+    )
+    refuses(
+        "ORPHAN_CONTEXT_ROW_WITHOUT_SOURCE_BACK_REFERENCE",
+        "retrieval-result.schema.json properties/rows/items/required",
+        lambda: A.enforce(
+            "retrieval-result",
+            {**result, "rows": [without(result["rows"][0], "back_reference_ref")]},
+            "ORPHAN_CONTEXT_ROW_WITHOUT_SOURCE_BACK_REFERENCE",
+            "the planted result",
+        ),
+    )
+
+    # 2. WRONG_OR_STALE_SOURCE_DIGEST
+    def tampered_digest() -> None:
+        fresh = A.ReferenceBackend(A.TASK_ADMISSION)
+        for reference in FIXTURE["back_references"]:
+            fresh.register_back_reference(reference)
+        fresh.register(with_value(entry["document"], "0" * 64, "document_digest"), None, entry["content"])
+
+    refuses(
+        "WRONG_OR_STALE_SOURCE_DIGEST",
+        "document_digest must be the digest of the registered content",
+        tampered_digest,
+    )
+
+    def digest_moved_under_the_index() -> None:
+        drifting = loaded()
+        drifting.documents["DTCR-DOC-001"] = with_value(
+            drifting.documents["DTCR-DOC-001"], "f" * 64, "document_digest"
+        )
+        drifting.build_index()
+
+    refuses(
+        "WRONG_OR_STALE_SOURCE_DIGEST",
+        "every projection is rebound to its document digest at build time",
+        digest_moved_under_the_index,
+    )
+
+    # 3. PRIVATE_URL_OR_PRIVATE_VALUE_IN_PUBLIC_RECEIPT
+    leaked = control("semantic-document", "DTCR-XC-DOC-002")["source_url"]
+    refuses(
+        "PRIVATE_URL_OR_PRIVATE_VALUE_IN_PUBLIC_RECEIPT",
+        "scan_for_leaks URI scheme",
+        lambda: A.scan_for_leaks({"fixture": {"path": leaked}}, "planted receipt"),
+    )
+    refuses(
+        "PRIVATE_URL_OR_PRIVATE_VALUE_IN_PUBLIC_RECEIPT",
+        "scan_for_leaks absolute path",
+        lambda: A.scan_for_leaks({"fixture": {"path": "/private-carrier/incident-review.md"}}, "planted receipt"),
+    )
+    # The private locator planted in a back reference is refused by the frozen
+    # schema before `register_back_reference` reaches any adapter law, so this
+    # row carries that gate's code; the pointer is what names the law. The two
+    # rows above are the ones that establish the falsifier itself.
+    refuses(
+        "FROZEN_SCHEMA_REFUSED_THE_BACK_REFERENCE",
+        "source-back-reference.schema.json properties/repository_blob/properties/path/not",
+        lambda: A.ReferenceBackend(A.TASK_ADMISSION).register_back_reference(
+            control("source-back-reference", "DTCR-XC-BK-001")
+        ),
+    )
+
+    # 4. VECTOR_TO_VECTOR_AUTHORITY_EDGE
+    refuses(
+        "FROZEN_SCHEMA_REFUSED_THE_BACK_REFERENCE",
+        "source-back-reference.schema.json additionalProperties",
+        lambda: A.ReferenceBackend(A.TASK_ADMISSION).register_back_reference(
+            control("source-back-reference", "DTCR-XC-BK-002")
+        ),
+    )
+    refuses(
+        "VECTOR_TO_VECTOR_AUTHORITY_EDGE",
+        "consumed-context-row.schema.json additionalProperties",
+        lambda: A.enforce(
+            "consumed-context-row",
+            control("consumed-context-row", "DTCR-XC-CX-003"),
+            "VECTOR_TO_VECTOR_AUTHORITY_EDGE",
+            "the planted manifest entry",
+        ),
+    )
+
+    # 5. RETRIEVED_ROW_NOT_LISTED_AS_CONSUMED
+    refuses(
+        "RETRIEVED_ROW_NOT_LISTED_AS_CONSUMED",
+        "reconcile_manifest compares the ranks read against the ranks listed",
+        lambda: A.reconcile_manifest(result, manifest[:1], [1, 2]),
+    )
+    refuses(
+        "RETRIEVED_ROW_NOT_LISTED_AS_CONSUMED",
+        "reconcile_manifest compares the ranks listed against the rows returned",
+        lambda: A.reconcile_manifest(
+            {**result, "rows": result["rows"][:1]}, manifest, [1]
+        ),
+    )
+
+    # 6. STALE_ADR_OVERRIDES_NEWER_EXPLICIT_DECISION
+    def ordering_not_enforced() -> None:
+        drifting = loaded()
+        drifting.enforce_supersession_order = lambda rows: rows  # type: ignore[assignment]
+        drifting.query(**CHECKOUT)
+
+    refuses(
+        "STALE_ADR_OVERRIDES_NEWER_EXPLICIT_DECISION",
+        "assert_supersession_order compares the emitted order against supersession",
+        ordering_not_enforced,
+    )
+
+    def superseded_offered_as_current() -> None:
+        fresh = A.ReferenceBackend(A.TASK_ADMISSION)
+        for reference in FIXTURE["back_references"]:
+            fresh.register_back_reference(reference)
+        stale = DOCUMENTS["DTCR-DOC-002"]
+        fresh.register(
+            stale["document"],
+            with_value(CEILINGS["DTCR-DOC-002"], "CONTEXT_CANDIDATE", "usable_as"),
+            stale["content"],
+        )
+
+    refuses(
+        "FROZEN_SCHEMA_REFUSED_THE_FRESHNESS_CEILING",
+        "semantic-freshness-ceiling.schema.json allOf/0/then",
+        superseded_offered_as_current,
+    )
+
+    # 7. REBUILD_OR_DELETE_CHANGES_TASK_ADMISSION
+    def rebuild_moves_admission() -> None:
+        drifting = loaded()
+        original = A.ReferenceBackend.build_index
+
+        def moving(self):  # the planted lifecycle operation writes into admission
+            self._admission_source["DTCR-TASK-001"] = "CLOSED_BY_REBUILD"
+            return original(self)
+
+        A.ReferenceBackend.build_index = moving  # type: ignore[assignment]
+        try:
+            drifting.lifecycle("REBUILD", "2026-08-22")
+        finally:
+            A.ReferenceBackend.build_index = original  # type: ignore[assignment]
+            A.TASK_ADMISSION["DTCR-TASK-001"] = "OPEN"
+
+    refuses(
+        "REBUILD_OR_DELETE_CHANGES_TASK_ADMISSION",
+        "the admission mapping is digested before and after every lifecycle operation",
+        rebuild_moves_admission,
+    )
+    refuses(
+        "REBUILD_OR_DELETE_CHANGES_TASK_ADMISSION",
+        "semantic-index-lifecycle-receipt.schema.json properties/changes/properties/task_admission/const",
+        lambda: A.enforce(
+            "semantic-index-lifecycle-receipt",
+            control("semantic-index-lifecycle-receipt", "DTCR-XC-LC-001"),
+            "REBUILD_OR_DELETE_CHANGES_TASK_ADMISSION",
+            "the planted lifecycle receipt",
+        ),
+    )
+    refuses(
+        "REBUILD_OR_DELETE_CHANGES_TASK_ADMISSION",
+        "semantic-index-lifecycle-receipt.schema.json properties/changes/properties/technical_evidence/const",
+        lambda: A.enforce(
+            "semantic-index-lifecycle-receipt",
+            control("semantic-index-lifecycle-receipt", "DTCR-XC-LC-002"),
+            "REBUILD_OR_DELETE_CHANGES_TASK_ADMISSION",
+            "the planted lifecycle receipt",
+        ),
+    )
+
+    # 8. EMBEDDING_TRANSPORT_PASS_PROMOTED_TO_SEMANTIC_PASS
+    refuses(
+        "EMBEDDING_TRANSPORT_PASS_PROMOTED_TO_SEMANTIC_PASS",
+        "projection-receipt.schema.json properties/establishes/properties/semantic_correctness/const",
+        lambda: A.enforce(
+            "projection-receipt",
+            with_value(projection, True, "establishes", "semantic_correctness"),
+            "EMBEDDING_TRANSPORT_PASS_PROMOTED_TO_SEMANTIC_PASS",
+            "the planted projection receipt",
+        ),
+    )
+    refuses(
+        "EMBEDDING_TRANSPORT_PASS_PROMOTED_TO_SEMANTIC_PASS",
+        "projection-receipt.schema.json allOf/0/then",
+        lambda: A.enforce(
+            "projection-receipt",
+            with_value(projection, "PASS", "transport", "outcome"),
+            "EMBEDDING_TRANSPORT_PASS_PROMOTED_TO_SEMANTIC_PASS",
+            "the planted projection receipt",
+        ),
+    )
+    refuses(
+        "EMBEDDING_TRANSPORT_PASS_PROMOTED_TO_SEMANTIC_PASS",
+        "projection-receipt.schema.json properties/data_handling/properties/provider_terms_admission/const",
+        lambda: A.enforce(
+            "projection-receipt",
+            control("projection-receipt", "DTCR-XC-PR-003"),
+            "EMBEDDING_TRANSPORT_PASS_PROMOTED_TO_SEMANTIC_PASS",
+            "the planted projection receipt",
+        ),
+    )
+
+    # 9. MUTABLE_INDEX_OR_MODEL_IDENTITY
+    def model_moved_under_the_index() -> None:
+        drifting = loaded()
+        original = A.PROJECTION_ALGORITHM
+        A.PROJECTION_ALGORITHM = original + " with an edited scorer"
+        try:
+            drifting.query(**CHECKOUT)
+        finally:
+            A.PROJECTION_ALGORITHM = original
+
+    refuses(
+        "MUTABLE_INDEX_OR_MODEL_IDENTITY",
+        "index_schema_digest is recomputed before every query",
+        model_moved_under_the_index,
+    )
+
+    def rows_moved_under_the_index() -> None:
+        drifting = loaded()
+        drifting.projections.pop("DTCR-PR-001")
+        drifting.query(**CHECKOUT)
+
+    refuses(
+        "MUTABLE_INDEX_OR_MODEL_IDENTITY",
+        "index_digest is recomputed before every query",
+        rows_moved_under_the_index,
+    )
+    refuses(
+        "MUTABLE_INDEX_OR_MODEL_IDENTITY",
+        "projection-receipt.schema.json properties/embedding_provider/required",
+        lambda: A.enforce(
+            "projection-receipt",
+            without(projection, "embedding_provider", "model_digest"),
+            "MUTABLE_INDEX_OR_MODEL_IDENTITY",
+            "the planted projection receipt",
+        ),
+    )
+
+    # 10. TOP_K_RESULT_PROMOTED_TO_VIOLATION_BASIS
+    refuses(
+        "TOP_K_RESULT_PROMOTED_TO_VIOLATION_BASIS",
+        "consumed-context-row.schema.json properties/basis_grade/const",
+        lambda: A.enforce(
+            "consumed-context-row",
+            with_value(manifest[0], "DETERMINISTIC_FACT", "basis_grade"),
+            "TOP_K_RESULT_PROMOTED_TO_VIOLATION_BASIS",
+            "the planted manifest entry",
+        ),
+    )
+    refuses(
+        "TOP_K_RESULT_PROMOTED_TO_VIOLATION_BASIS",
+        "consumed-context-row.schema.json properties/influence/const",
+        lambda: A.enforce(
+            "consumed-context-row",
+            with_value(manifest[0], "DETERMINED_OUTCOME", "influence"),
+            "TOP_K_RESULT_PROMOTED_TO_VIOLATION_BASIS",
+            "the planted manifest entry",
+        ),
+    )
+    refuses(
+        "TOP_K_RESULT_PROMOTED_TO_VIOLATION_BASIS",
+        "retrieval-query.schema.json properties/establishes/properties/decision/const",
+        lambda: A.enforce(
+            "retrieval-query",
+            with_value(query, True, "establishes", "decision"),
+            "TOP_K_RESULT_PROMOTED_TO_VIOLATION_BASIS",
+            "the planted query",
+        ),
+    )
+    refuses(
+        "TOP_K_RESULT_PROMOTED_TO_VIOLATION_BASIS",
+        "retrieval-result.schema.json properties/establishes/properties/deterministic_fact/const",
+        lambda: A.enforce(
+            "retrieval-result",
+            with_value(result, True, "establishes", "deterministic_fact"),
+            "TOP_K_RESULT_PROMOTED_TO_VIOLATION_BASIS",
+            "the planted result",
+        ),
+    )
+
+    # 11. UNKNOWN_FRESHNESS_SILENTLY_TREATED_CURRENT
+    def freshness_absent() -> None:
+        blind = loaded(freshness_for=lambda document_id: None if document_id == "DTCR-DOC-003" else CEILINGS.get(document_id))
+        blind.query(**CHECKOUT)
+
+    refuses(
+        "UNKNOWN_FRESHNESS_SILENTLY_TREATED_CURRENT",
+        "a candidate with no registered freshness ceiling is refused, not returned",
+        freshness_absent,
+    )
+    refuses(
+        "UNKNOWN_FRESHNESS_SILENTLY_TREATED_CURRENT",
+        "semantic-freshness-ceiling.schema.json properties/revalidated_at/anyOf",
+        lambda: A.enforce(
+            "semantic-freshness-ceiling",
+            control("semantic-freshness-ceiling", "DTCR-XC-FC-005"),
+            "UNKNOWN_FRESHNESS_SILENTLY_TREATED_CURRENT",
+            "the planted freshness ceiling",
+        ),
+    )
+
+    # 12. NOT_APPLICABLE_FORCED_TO_SYNTHETIC_PASS
+    refuses(
+        "NOT_APPLICABLE_FORCED_TO_SYNTHETIC_PASS",
+        "retrieval-result.schema.json allOf/0/then",
+        lambda: A.enforce(
+            "retrieval-result",
+            {**not_applicable, "rows": [result["rows"][0]]},
+            "NOT_APPLICABLE_FORCED_TO_SYNTHETIC_PASS",
+            "the planted not-applicable result",
+        ),
+    )
+    refuses(
+        "FROZEN_SCHEMA_REFUSED_THE_QUERY",
+        "retrieval-query.schema.json allOf/0/then",
+        lambda: store.query(
+            "rename a local variable",
+            "NOT_APPLICABLE",
+            8,
+            [],
+            "this task is a mechanical rename with no decision or incident that stored context could bear on",
+        ),
+    )
+
+    # The remaining hard laws, planted the same way: a single field moved on an
+    # artifact this run actually emitted.
+    refuses(
+        "LANCEDB_ROW_PROMOTED_TO_SQLITE_EVENT",
+        "retrieval-result.schema.json properties/rows/items/properties/row_class/const",
+        lambda: A.enforce(
+            "retrieval-result",
+            {**result, "rows": [with_value(result["rows"][0], "LEDGER_EVENT", "row_class")]},
+            "LANCEDB_ROW_PROMOTED_TO_SQLITE_EVENT",
+            "the planted result",
+        ),
+    )
+    refuses(
+        "RETRIEVED_ROW_PROMOTED_TO_AUTHORITY",
+        "retrieval-result.schema.json properties/rows/items/properties/authority/const",
+        lambda: A.enforce(
+            "retrieval-result",
+            {**result, "rows": [with_value(result["rows"][0], "AUTHORITATIVE", "authority")]},
+            "RETRIEVED_ROW_PROMOTED_TO_AUTHORITY",
+            "the planted result",
+        ),
+    )
+    refuses(
+        "RETRIEVED_ADR_PROMOTED_TO_CURRENT_POLICY",
+        "semantic-freshness-ceiling.schema.json properties/authority_ceiling/properties/current_policy/const",
+        lambda: A.enforce(
+            "semantic-freshness-ceiling",
+            with_value(CEILINGS["DTCR-DOC-001"], True, "authority_ceiling", "current_policy"),
+            "RETRIEVED_ADR_PROMOTED_TO_CURRENT_POLICY",
+            "the planted freshness ceiling",
+        ),
+    )
+    refuses(
+        "RETRIEVED_RCA_PROMOTED_TO_REPRODUCED_FAILURE",
+        "semantic-freshness-ceiling.schema.json properties/authority_ceiling/properties/reproduced_failure/const",
+        lambda: A.enforce(
+            "semantic-freshness-ceiling",
+            with_value(CEILINGS["DTCR-DOC-004"], True, "authority_ceiling", "reproduced_failure"),
+            "RETRIEVED_RCA_PROMOTED_TO_REPRODUCED_FAILURE",
+            "the planted freshness ceiling",
+        ),
+    )
+    # The adapter spells this law `PRIVATE_CONTEXT_NOT_PUBLIC_PROMPT` at both
+    # guards. One vocabulary, and it is the adapter's -- the code the guard
+    # raises is the fact; a second spelling here is what made the identity
+    # comparison impossible to satisfy honestly.
+    refuses(
+        "PRIVATE_CONTEXT_NOT_PUBLIC_PROMPT",
+        "content plane must equal the declared storage plane",
+        lambda: loaded(skip="DTCR-DOC-006").register(
+            DOCUMENTS["DTCR-DOC-006"]["document"],
+            CEILINGS["DTCR-DOC-006"],
+            {"plane": "PUBLIC_TREE", "text": "a private record pasted into the public tree"},
+        ),
+    )
+    refuses(
+        "PRIVATE_CONTEXT_NOT_PUBLIC_PROMPT",
+        "content held in a private or consumer-local carrier is not projected in the public plane",
+        lambda: store.project("DTCR-DOC-006"),
+    )
+    refuses(
+        "PRIVATE_RECORD_STORED_IN_THE_PUBLIC_TREE",
+        "semantic-document.schema.json allOf/0/then",
+        lambda: A.enforce(
+            "semantic-document",
+            control("semantic-document", "DTCR-XC-DOC-003"),
+            "PRIVATE_RECORD_STORED_IN_THE_PUBLIC_TREE",
+            "the planted registration",
+        ),
+    )
+    refuses(
+        "STORED_DOCUMENT_REGISTERED_AS_AUTHORITATIVE",
+        "semantic-document.schema.json properties/authority/const",
+        lambda: A.enforce(
+            "semantic-document",
+            control("semantic-document", "DTCR-XC-DOC-001"),
+            "STORED_DOCUMENT_REGISTERED_AS_AUTHORITATIVE",
+            "the planted registration",
+        ),
+    )
+    refuses(
+        "UNBOUNDED_NEIGHBOURHOOD_WRITTEN_AS_A_QUERY",
+        "retrieval-query.schema.json properties/top_k/oneOf",
+        lambda: A.enforce(
+            "retrieval-query",
+            control("retrieval-query", "DTCR-XC-RQ-001"),
+            "UNBOUNDED_NEIGHBOURHOOD_WRITTEN_AS_A_QUERY",
+            "the planted query",
+        ),
+    )
+    # The frozen schema admits the NOT_APPLICABLE literal for any lane, so a
+    # reading lane carrying it is the adapter's own refusal rather than the
+    # schema's -- and it is a refusal rather than a conversion crash.
+    refuses(
+        "AN_UNBOUNDED_NEIGHBOURHOOD_IS_NOT_A_QUERY",
+        "a lane that reads rows carries an integer top_k",
+        lambda: store.query("checkout ledger", "VECTOR", "NOT_APPLICABLE", []),
+    )
+
+    prove_falsifier_identity_is_load_bearing()
+
+    # `plants` holds the codes the adapter raised and this suite verified, not
+    # the codes this suite asked for, so a code drift in the adapter drops the
+    # required row rather than answering it from this file's own literals.
+    named = {falsifier for falsifier, _ in plants}
+    for required in REQUIRED_FALSIFIERS:
+        check(
+            f"{required} is planted and was raised under that code",
+            required in named,
+            "the issue requires it and no case had it raised and verified",
+        )
+
+
+def prove_falsifier_identity_is_load_bearing() -> None:
+    """A control that fires proves nothing until it is shown to fail on demand.
+
+    The falsifier half of `refuses` is exercised the way the buf lane exercises
+    its zero-source guard: one code literal is renamed at a verified source
+    anchor in a throwaway copy of `adapter.py`, the same planted case is run
+    against that copy through the real `refuses` path, and the harness has to
+    record the falsifier-identity failure -- and has to leave the row out of the
+    planted set. If this row is green, a renamed code in the real adapter is red.
+    """
+    # The copy must sit at least two directory levels below the temp root:
+    # adapter.py computes REPO_ROOT = SKILL_DIR.parents[1] at import time, and a
+    # shallow /tmp/<dir>/adapter.py has no parents[1] (IndexError on hosted
+    # runners whose TMPDIR is /tmp, invisible on hosts with deep temp paths).
+    work = Path(tempfile.mkdtemp(prefix="dtcr-semantic-context-")) / "skills" / "adapter-copy"
+    work.mkdir(parents=True)
+    try:
+        source = (ADAPTER_DIR / "adapter.py").read_text(encoding="utf-8")
+        anchor = (
+            "        if URI_SCHEME.search(value):\n"
+            "            raise Refusal(\n"
+            '                "PRIVATE_URL_OR_PRIVATE_VALUE_IN_PUBLIC_RECEIPT",\n'
+            '                "scan_for_leaks URI scheme",\n'
+        )
+        if anchor not in source:
+            check(
+                "the falsifier-identity red proof still targets a raised code (red proof)",
+                False,
+                "the source anchor moved; the mutation no longer renames a real falsifier code",
+            )
+            return
+        drifted_path = work / "adapter.py"
+        drifted_path.write_text(
+            source.replace(
+                anchor,
+                anchor.replace(
+                    '"PRIVATE_URL_OR_PRIVATE_VALUE_IN_PUBLIC_RECEIPT"',
+                    '"A_FOREIGN_FALSIFIER_CODE"',
+                ),
+                1,
+            ),
+            encoding="utf-8",
+        )
+        spec = importlib.util.spec_from_file_location("adapter_drifted_code", drifted_path)
+        assert spec is not None and spec.loader is not None
+        drifted = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(drifted)
+        # The copy defines its own `Refusal` class, which `refuses` would not
+        # catch; point it back at the real one so the mutation under test is the
+        # renamed code and nothing else.
+        drifted.Refusal = Refusal
+
+        leaked = control("semantic-document", "DTCR-XC-DOC-002")["source_url"]
+        before, planted_before = len(failures), len(plants)
+        refuses(
+            "PRIVATE_URL_OR_PRIVATE_VALUE_IN_PUBLIC_RECEIPT",
+            "scan_for_leaks URI scheme",
+            lambda: drifted.scan_for_leaks({"fixture": {"path": leaked}}, "planted receipt"),
+        )
+        observed = failures[before:]
+        del failures[before:]  # this red was planted here; it is not the run's red
+        check(
+            "renaming one falsifier code in the adapter turns its planted case red (red proof)",
+            len(observed) == 1
+            and "A_FOREIGN_FALSIFIER_CODE" in observed[0]
+            and len(plants) == planted_before,
+            f"observed={observed!r} planted_rows_added={len(plants) - planted_before}",
+        )
+        print(
+            "  (red proof) the copied adapter raised 'A_FOREIGN_FALSIFIER_CODE' for the same "
+            f"mechanism; the harness recorded {len(observed)} falsifier-identity failure and "
+            f"{len(plants) - planted_before} planted rows -- the code half is load-bearing"
+        )
+    finally:
+        shutil.rmtree(work.parents[1], ignore_errors=True)
+
+
 REQUIRED_FALSIFIERS = (
     "ORPHAN_CONTEXT_ROW_WITHOUT_SOURCE_BACK_REFERENCE",
     "WRONG_OR_STALE_SOURCE_DIGEST",
@@ -80,881 +852,145 @@ REQUIRED_FALSIFIERS = (
     "TOP_K_RESULT_PROMOTED_TO_VIOLATION_BASIS",
     "UNKNOWN_FRESHNESS_SILENTLY_TREATED_CURRENT",
     "NOT_APPLICABLE_FORCED_TO_SYNTHETIC_PASS",
-    "VECTOR_LANE_CLAIMED_WITHOUT_EMBEDDING_PROVIDER",
-    "REBUILD_NON_DETERMINISTIC",
 )
 
-failures: list[str] = []
-refused: dict[str, int] = {name: 0 for name in REQUIRED_FALSIFIERS}
-checks = 0
-validations = 0
-workspaces: list[Path] = []
 
-
-def fail(message: str) -> None:
-    failures.append(message)
-    print(f"  FAIL {message}")
-
-
-def check(name: str, condition: bool, detail: str = "") -> None:
-    global checks
-    checks += 1
-    if not condition:
-        fail(f"{name}: {detail or 'the assertion did not hold'}")
-
-
-def load_schema(name: str) -> dict[str, Any]:
-    return json.loads((S.SCHEMA_DIR / f"{name}.schema.json").read_text(encoding="utf-8"))
-
-
-def validate(instance: Any, schema: dict[str, Any]) -> list[Any]:
-    global validations
-    validations += 1
-    return sorted(Draft202012Validator(schema).iter_errors(instance), key=str)
-
-
-def schema_path_of(error: Any) -> str:
-    out = ""
-    for part in error.absolute_schema_path:
-        out += f"[{part}]" if isinstance(part, int) else (f".{part}" if out else str(part))
-    return out
-
-
-def knockout(schema: dict[str, Any], path: str) -> dict[str, Any]:
-    """Delete exactly the keyword `path` names from a copy of `schema`."""
-    node: Any = copy.deepcopy(schema)
-    parts: list[Any] = []
-    for chunk in path.split("."):
-        while "[" in chunk:
-            head, _, rest = chunk.partition("[")
-            index, _, chunk = rest.partition("]")
-            if head:
-                parts.append(head)
-            parts.append(int(index))
-        if chunk:
-            parts.append(chunk)
-    root = node
-    for part in parts[:-1]:
-        node = node[part]
-    del node[parts[-1]]
-    return root
-
-
-def corpus_copy(mutate: Callable[[dict[str, Any]], None] | None = None) -> Path:
-    """A writable corpus in a temporary directory, optionally mutated first."""
-    work = Path(tempfile.mkdtemp(prefix="dtcr-sc-"))
-    workspaces.append(work)
-    data = json.loads(CORPUS.read_text(encoding="utf-8"))
-    if mutate is not None:
-        mutate(data)
-    target = work / "public-corpus.json"
-    target.write_text(json.dumps(data, indent=2, ensure_ascii=False, sort_keys=True) + "\n", encoding="utf-8")
-    return target
-
-
-def record_of(corpus: dict[str, Any], document_id: str) -> dict[str, Any]:
-    for record in corpus["records"]:
-        if record["document"]["document_id"] == document_id:
-            return record
-    raise AssertionError(f"{document_id} is not in the fixture; the plant has nothing to mutate")
-
-
-# --------------------------------------------------------------------------
-# lane 1: positives
-# --------------------------------------------------------------------------
-
-def lane_positives() -> dict[str, Any]:
-    print("positives")
-    backend = S.open_port(lane="KEYWORD", source=CORPUS)
-
-    check("registered documents", len(backend.documents) == 5, str(len(backend.documents)))
-    check("projected documents", backend.index["document_count"] == 4, str(backend.index["document_count"]))
-    check(
-        "the private record is registered and not projected",
-        backend.unprojected == [{"document_id": "DTCR-DOC-004", "state": "NOT_PROJECTED_PRIVATE_PLANE"}],
-        str(backend.unprojected),
-    )
-    check(
-        "one projection receipt per projected chunk",
-        len(backend.projection_receipts) == backend.index["chunk_count"],
-        f"{len(backend.projection_receipts)} receipts against {backend.index['chunk_count']} chunks",
-    )
-    for receipt in backend.projection_receipts:
-        if validate(receipt, load_schema("projection-receipt")):
-            fail(f"{receipt['projection_receipt_id']} does not validate against the frozen schema")
-    check(
-        "no projection claims a provider call nobody placed",
-        {receipt["transport"]["outcome"] for receipt in backend.projection_receipts} == {"SKIPPED_BY_POLICY"}
-        and {receipt["transport"]["exit_code"] for receipt in backend.projection_receipts} == {None},
-        str({receipt["transport"]["outcome"] for receipt in backend.projection_receipts}),
-    )
-    check(
-        "the projector is pinned by digest rather than named",
-        {receipt["embedding_provider"]["model_digest"] for receipt in backend.projection_receipts}
-        == {S.NORMALIZER_DIGEST},
-    )
-
-    # The demotion has to move something, or the guard behind it is untested.
-    raw = backend._matches(S.normalize(QUERY), ())
-    check(
-        "the superseded record outranks the newer one before the demotion",
-        [document_id for _score, document_id in raw][:2] == ["DTCR-DOC-002", "DTCR-DOC-001"],
-        str(raw),
-    )
-
-    answer = backend.retrieve(lane="KEYWORD", query_text=QUERY, top_k=5)
-    result, binding = answer["retrieval_result"], answer["retrieval_binding"]
-    if validate(answer["retrieval_query"], load_schema("retrieval-query")):
-        fail("the emitted query does not validate against the frozen schema")
-    if validate(result, load_schema("retrieval-result")):
-        fail("the emitted result does not validate against the frozen schema")
-    check(
-        "the newer decision is returned above the record it superseded",
-        [row["document_ref"] for row in result["rows"]] == ["DTCR-DOC-001", "DTCR-DOC-002"],
-        str([row["document_ref"] for row in result["rows"]]),
-    )
-    check(
-        "every returned row resolves to an exact source",
-        all(row["back_reference_ref"] in backend.back_references for row in result["rows"]),
-    )
-    check(
-        "every returned row carries its freshness ceiling",
-        all(row["freshness_ref"] == backend.ceilings[row["document_ref"]]["ceiling_id"] for row in result["rows"]),
-    )
-    check(
-        "the rows that nobody revalidated are counted beside the result",
-        binding["never_revalidated_ranks"] == [2] and binding["historical_context_only_ranks"] == [2],
-        str(binding),
-    )
-    check(
-        "the result grants nothing",
-        set(result["establishes"].values()) == {False}
-        and set(binding["authority_ceiling"].values()) == {False},
-    )
-
-    kinds = {
-        backend.back_references[row["back_reference_ref"]]["reference_kind"]
-        for row in result["rows"]
-    }
-    check("a returned reference names a kind and carries its payload", kinds <= {
-        "REPOSITORY_BLOB", "LEDGER_EVENT", "SOURCE_PACKET"}, str(kinds))
-
-    narrowed = backend.retrieve(
-        lane="KEYWORD",
-        query_text="scheduler stall queue",
-        top_k=5,
-        filters=[{"field": "subsystem_tag", "value": "scheduler"}],
-        query_id="DTCR-RQ-002",
-        result_id="DTCR-RR-002",
-    )
-    check(
-        "a metadata filter narrows to the subsystem it names",
-        [row["document_ref"] for row in narrowed["retrieval_result"]["rows"]] == ["DTCR-DOC-003"],
-        str([row["document_ref"] for row in narrowed["retrieval_result"]["rows"]]),
-    )
-
-    empty = backend.retrieve(
-        lane="KEYWORD",
-        query_text="thermostat firmware calibration",
-        top_k=5,
-        query_id="DTCR-RQ-003",
-        result_id="DTCR-RR-003",
-    )
-    check(
-        "a lane that ran and found nothing says EMPTY, not NOT_APPLICABLE",
-        empty["retrieval_result"]["outcome"] == "EMPTY" and empty["retrieval_result"]["rows"] == [],
-        str(empty["retrieval_result"]["outcome"]),
-    )
-
-    skipped = backend.retrieve(
-        lane="NOT_APPLICABLE",
-        query_text="rename one private helper across three call sites",
-        top_k="NOT_APPLICABLE",
-        query_id="DTCR-RQ-004",
-        result_id="DTCR-RR-004",
-        not_applicable_rationale=(
-            "this task is a mechanical rename with no decision, incident or objective that stored "
-            "context could bear on"
-        ),
-    )
-    check(
-        "a lane nobody entered carries no rows and states why",
-        skipped["retrieval_result"]["outcome"] == "NOT_APPLICABLE"
-        and skipped["retrieval_result"]["rows"] == []
-        and skipped["retrieval_query"]["top_k"] == "NOT_APPLICABLE",
-        str(skipped["retrieval_query"]["top_k"]),
-    )
-
-    manifest = backend.consume(
-        result,
-        ranks=[1, 2],
-        manifest_ref="context manifest for the persistence boundary review",
-        consuming_task_ref="review of the domain isolation violation candidate",
-    )
-    for row in manifest:
-        if validate(row, load_schema("consumed-context-row")):
-            fail(f"{row['consumed_row_id']} does not validate against the frozen schema")
-    check(
-        "every returned row is listed as consumed",
-        S.reconcile_consumed(result, manifest) == {"returned": 2, "listed": 2},
-    )
-    check(
-        "a consumed row carries the source, not only the score",
-        all(row["back_reference_ref"] in backend.back_references for row in manifest),
-    )
-
-    rebuild = backend.lifecycle_receipt(operation="REBUILD")
-    receipt = rebuild["semantic_index_lifecycle_receipt"]
-    if validate(receipt, load_schema("semantic-index-lifecycle-receipt")):
-        fail("the lifecycle receipt does not validate against the frozen schema")
-    check(
-        "a rebuild from the same source bytes derives the same index digest",
-        receipt["index_digest_after"] == backend.index_digest
-        and rebuild["lifecycle_binding"]["rebuilt_index_digest"] == backend.index_digest,
-        f"{receipt['index_digest_after']} against {backend.index_digest}",
-    )
-    check(
-        "a rebuild names the projections it was built from",
-        len(receipt["projection_receipt_refs"]) == len(backend.projection_receipts),
-    )
-    deleted = backend.lifecycle_receipt(operation="DELETE", receipt_id="DTCR-LC-002",
-                                        index_digest_before=backend.index_digest)
-    check(
-        "a delete leaves no digest behind and moves no admission",
-        deleted["semantic_index_lifecycle_receipt"]["index_digest_after"] == "INDEX_ABSENT_AFTER_DELETE"
-        and deleted["semantic_index_lifecycle_receipt"]["changes"]
-        == {"task_admission": "UNCHANGED", "technical_evidence": "NO_NEW_EVIDENCE", "closure_state": "UNCHANGED"},
-        str(deleted["semantic_index_lifecycle_receipt"]["changes"]),
-    )
-
-    # Rebuildability is a property of the input bytes, not of where they sit. A
-    # byte-identical corpus at another path has to derive the same identity, or
-    # the digest is binding something about this checkout.
-    elsewhere = S.open_port(lane="KEYWORD", source=corpus_copy())
-    check(
-        "the same bytes at another path derive the same index and corpus digests",
-        elsewhere.index_digest == backend.index_digest
-        and elsewhere.corpus_digest == backend.corpus_digest,
-        f"{elsewhere.index_digest} against {backend.index_digest}",
-    )
-
-    return {
-        "registered": len(backend.documents),
-        "projected": backend.index["document_count"],
-        "chunks": backend.index["chunk_count"],
-        "tokens": backend.index["token_count"],
-        "projection_receipts": len(backend.projection_receipts),
-        "corpus_digest": backend.corpus_digest,
-        "index_digest": backend.index_digest,
-        "normalizer_digest": S.NORMALIZER_DIGEST,
-        "index_schema_digest": S.INDEX_SCHEMA_DIGEST,
-    }
-
-
-# --------------------------------------------------------------------------
-# lane 2: falsifiers
-# --------------------------------------------------------------------------
-
-def expect_adapter_refusal(falsifier: str, mechanism: str, thunk: Callable[[], Any]) -> None:
-    """The planted case has to go red, and by the guard the row names."""
-    global checks
-    checks += 1
-    try:
-        thunk()
-    except S.Refusal as refusal:
-        if refusal.reason != falsifier:
-            fail(
-                f"{falsifier}: refused by {refusal.reason} instead -- the planted defect never "
-                f"reached the guard this row names"
-            )
-            return
-        refused[falsifier] = refused.get(falsifier, 0) + 1
-        print(f"  {falsifier}: refused by adapter guard, {mechanism}")
-        return
-    except Exception as error:  # noqa: BLE001 - anything else is still not the named guard
-        fail(f"{falsifier}: raised {type(error).__name__} rather than its named refusal")
-        return
-    fail(f"{falsifier}: the planted defect was accepted ({mechanism} did not fire)")
-
-
-def expect_schema_refusal(
-    falsifier: str,
-    schema_name: str,
-    instance: dict[str, Any],
-    keyword: str,
-    knockout_at: str | None = None,
-) -> None:
-    """`keyword` is the guard as the validator reports it, and it must be the only one."""
-    global checks
-    checks += 1
-    schema = load_schema(schema_name)
-    errors = validate(instance, schema)
-    if not errors:
-        fail(f"{falsifier}: the frozen {schema_name} schema admitted the planted defect")
-        return
-    paths = {schema_path_of(error) for error in errors}
-    if keyword not in paths:
-        fail(f"{falsifier}: refused by {sorted(paths)}, not by the named guard {keyword}")
-        return
-    if len(paths) > 1:
-        fail(f"{falsifier}: refused by more than the named guard ({sorted(paths)}); the row is not discriminating")
-        return
-    where = knockout_at or keyword
-    if validate(instance, knockout(schema, where)):
-        fail(f"{falsifier}: still refused after {where} was removed, so that keyword is not what refuses it")
-        return
-    refused[falsifier] = refused.get(falsifier, 0) + 1
-    print(f"  {falsifier}: refused by {schema_name}#{keyword}, admitted once {where} is knocked out")
-
-
-def lane_falsifiers(baseline: dict[str, Any]) -> None:
-    print("falsifiers")
-    clean = S.open_port(lane="KEYWORD", source=CORPUS)
-    answer = clean.retrieve(lane="KEYWORD", query_text=QUERY, top_k=5)
-    result = answer["retrieval_result"]
-
-    # -- the source binding ------------------------------------------------
-
-    def drifted_document_digest() -> None:
-        def mutate(data: dict[str, Any]) -> None:
-            document = record_of(data, "DTCR-DOC-001")["document"]
-            document["document_digest"] = "0" * 63 + "1"
-        S.open_port(lane="KEYWORD", source=corpus_copy(mutate))
-
-    expect_adapter_refusal(
-        "WRONG_OR_STALE_SOURCE_DIGEST",
-        "the projector recomputes every declared digest from the bytes it read",
-        drifted_document_digest,
-    )
-
-    def drifted_blob() -> None:
-        def mutate(data: dict[str, Any]) -> None:
-            blob = record_of(data, "DTCR-DOC-001")["back_reference"]["repository_blob"]
-            blob["blob"] = blob["blob"][:-1] + ("0" if blob["blob"][-1] != "0" else "1")
-        S.open_port(lane="KEYWORD", source=corpus_copy(mutate))
-
-    expect_adapter_refusal(
-        "WRONG_OR_STALE_SOURCE_DIGEST",
-        "the Git object name of the projected bytes is derived and compared",
-        drifted_blob,
-    )
-
-    def drifted_packet_size() -> None:
-        def mutate(data: dict[str, Any]) -> None:
-            record_of(data, "DTCR-DOC-003")["back_reference"]["source_packet"]["byte_count"] += 1
-        S.open_port(lane="KEYWORD", source=corpus_copy(mutate))
-
-    expect_adapter_refusal(
-        "WRONG_OR_STALE_SOURCE_DIGEST",
-        "the cited packet's byte count is measured, not read back",
-        drifted_packet_size,
-    )
-
-    def source_moved_under_the_index() -> None:
-        source = corpus_copy()
-        stale = S.open_port(lane="KEYWORD", source=source)
-        moved = json.loads(source.read_text(encoding="utf-8"))
-        record_of(moved, "DTCR-DOC-001")["text"] += "\n\nA paragraph added after the index was built.\n"
-        source.write_text(json.dumps(moved, indent=2, ensure_ascii=False, sort_keys=True) + "\n", encoding="utf-8")
-        stale.retrieve(lane="KEYWORD", query_text=QUERY, top_k=5)
-
-    expect_adapter_refusal(
-        "WRONG_OR_STALE_SOURCE_DIGEST",
-        "a query re-derives the corpus digest before it answers",
-        source_moved_under_the_index,
-    )
-
-    # -- back references ---------------------------------------------------
-
-    def mismatched_back_reference() -> None:
-        def mutate(data: dict[str, Any]) -> None:
-            record_of(data, "DTCR-DOC-005")["document"]["back_reference_ref"] = "DTCR-BK-009"
-        S.open_port(lane="KEYWORD", source=corpus_copy(mutate))
-
-    expect_adapter_refusal(
-        "ORPHAN_CONTEXT_ROW_WITHOUT_SOURCE_BACK_REFERENCE",
-        "a registration's reference must be the reference the record carries",
-        mismatched_back_reference,
-    )
-
-    def row_with_an_unresolvable_reference() -> None:
-        orphaned = S.open_port(lane="KEYWORD", source=CORPUS)
-        del orphaned.back_references["DTCR-BK-001"]
-        orphaned.retrieve(lane="KEYWORD", query_text=QUERY, top_k=5)
-
-    expect_adapter_refusal(
-        "ORPHAN_CONTEXT_ROW_WITHOUT_SOURCE_BACK_REFERENCE",
-        "a row is built only from a reference that resolves in this store",
-        row_with_an_unresolvable_reference,
-    )
-
-    orphan_result = copy.deepcopy(result)
-    del orphan_result["rows"][0]["back_reference_ref"]
-    expect_schema_refusal(
-        "ORPHAN_CONTEXT_ROW_WITHOUT_SOURCE_BACK_REFERENCE",
-        "retrieval-result",
-        orphan_result,
-        "properties.rows.items.required",
-    )
-
-    # -- the private plane -------------------------------------------------
-
-    def private_text_in_the_public_fixture() -> None:
-        def mutate(data: dict[str, Any]) -> None:
-            record_of(data, "DTCR-DOC-004")["text"] = "the advisory's own text, copied out of its carrier"
-        S.open_port(lane="KEYWORD", source=corpus_copy(mutate))
-
-    expect_adapter_refusal(
-        "PRIVATE_URL_OR_PRIVATE_VALUE_IN_PUBLIC_RECEIPT",
-        "a record on a private plane is registered by reference and never carries content here",
-        private_text_in_the_public_fixture,
-    )
-
-    def resolved_locator_in_a_public_field() -> None:
-        def mutate(data: dict[str, Any]) -> None:
-            record_of(data, "DTCR-DOC-005")["document"]["owning_decision"] = (
-                "service objective tracked at https://example.invalid/private-space/objectives"
-            )
-        S.open_port(lane="KEYWORD", source=corpus_copy(mutate))
-
-    expect_adapter_refusal(
-        "PRIVATE_URL_OR_PRIVATE_VALUE_IN_PUBLIC_RECEIPT",
-        "the leak scan runs over every free-text field the frozen schemas leave unshaped",
-        resolved_locator_in_a_public_field,
-    )
-
-    def resolved_locator_in_the_source_text() -> None:
-        # Every digest the added paragraph moves is moved with it, so the only
-        # thing wrong with this corpus is the locator. A plant that also breaks
-        # the document digest would be refused by the digest check and would
-        # credit the scan with a refusal the scan never performed.
-        def mutate(data: dict[str, Any]) -> None:
-            record = record_of(data, "DTCR-DOC-003")
-            record["text"] += (
-                "\n\nThe full incident record is at https://example.invalid/private-space/incidents.\n"
-            )
-            raw = record["text"].encode("utf-8")
-            record["document"]["document_digest"] = S.sha256_hex(raw)
-            record["back_reference"]["source_packet"]["sha256"] = S.sha256_hex(raw)
-            record["back_reference"]["source_packet"]["byte_count"] = len(raw)
-        S.open_port(lane="KEYWORD", source=corpus_copy(mutate))
-
-    expect_adapter_refusal(
-        "PRIVATE_URL_OR_PRIVATE_VALUE_IN_PUBLIC_RECEIPT",
-        "the source text is committed in this tree too, so the same scan covers it",
-        resolved_locator_in_the_source_text,
-    )
-
-    # -- authority edges ---------------------------------------------------
-
-    def reference_naming_a_retrieval_row() -> None:
-        def mutate(data: dict[str, Any]) -> None:
-            record_of(data, "DTCR-DOC-001")["back_reference"]["repository_blob"]["path"] = (
-                "docs/decisions/DTCR-RR-001-rank-1.md"
-            )
-        S.open_port(lane="KEYWORD", source=corpus_copy(mutate))
-
-    expect_adapter_refusal(
-        "VECTOR_TO_VECTOR_AUTHORITY_EDGE",
-        "a back reference may cite source, ledger or packet, never another stored row",
-        reference_naming_a_retrieval_row,
-    )
-
-    chained = copy.deepcopy(json.loads(CORPUS.read_text(encoding="utf-8")))
-    chained_reference = record_of(chained, "DTCR-DOC-001")["back_reference"]
-    chained_reference["vector_row_ref"] = "row 1 of the previous keyword query"
-    expect_schema_refusal(
-        "VECTOR_TO_VECTOR_AUTHORITY_EDGE",
-        "source-back-reference",
-        chained_reference,
-        "additionalProperties",
-    )
-
-    # -- the consumed manifest ---------------------------------------------
-
-    def a_read_row_in_no_list() -> None:
-        partial = clean.consume(
-            result,
-            ranks=[1],
-            manifest_ref="context manifest for the persistence boundary review",
-            consuming_task_ref="review of the domain isolation violation candidate",
-        )
-        S.reconcile_consumed(result, partial)
-
-    expect_adapter_refusal(
-        "RETRIEVED_ROW_NOT_LISTED_AS_CONSUMED",
-        "reconciliation compares the returned ranks against the listed ones",
-        a_read_row_in_no_list,
-    )
-
-    def a_listed_row_the_query_never_returned() -> None:
-        clean.consume(
-            result,
-            ranks=[1, 9],
-            manifest_ref="context manifest for the persistence boundary review",
-            consuming_task_ref="review of the domain isolation violation candidate",
-        )
-
-    expect_adapter_refusal(
-        "RETRIEVED_ROW_NOT_LISTED_AS_CONSUMED",
-        "a manifest entry is built only from a rank this result produced",
-        a_listed_row_the_query_never_returned,
-    )
-
-    # -- freshness ---------------------------------------------------------
-
-    def stale_record_left_on_top() -> None:
-        S.DEMOTE_SUPERSEDED = False
-        try:
-            S.open_port(lane="KEYWORD", source=CORPUS).retrieve(
-                lane="KEYWORD", query_text=QUERY, top_k=5
-            )
-        finally:
-            S.DEMOTE_SUPERSEDED = True
-
-    expect_adapter_refusal(
-        "STALE_ADR_OVERRIDES_NEWER_EXPLICIT_DECISION",
-        "with the demotion removed, the ordering assertion catches the reinstated record",
-        stale_record_left_on_top,
-    )
-
-    def registration_without_a_ceiling() -> None:
-        def mutate(data: dict[str, Any]) -> None:
-            del record_of(data, "DTCR-DOC-003")["freshness_ceiling"]
-        S.open_port(lane="KEYWORD", source=corpus_copy(mutate))
-
-    expect_adapter_refusal(
-        "UNKNOWN_FRESHNESS_SILENTLY_TREATED_CURRENT",
-        "a document with no recorded age is refused at registration",
-        registration_without_a_ceiling,
-    )
-
-    def two_ages_for_one_document() -> None:
-        def mutate(data: dict[str, Any]) -> None:
-            record_of(data, "DTCR-DOC-005")["freshness_ceiling"]["observed_at"] = "2019-01-01"
-        S.open_port(lane="KEYWORD", source=corpus_copy(mutate))
-
-    expect_adapter_refusal(
-        "UNKNOWN_FRESHNESS_SILENTLY_TREATED_CURRENT",
-        "the ceiling's age must be the age the registration recorded",
-        two_ages_for_one_document,
-    )
-
-    reinstated = copy.deepcopy(
-        record_of(json.loads(CORPUS.read_text(encoding="utf-8")), "DTCR-DOC-002")["freshness_ceiling"]
-    )
-    reinstated["usable_as"] = "CONTEXT_CANDIDATE"
-    expect_schema_refusal(
-        "STALE_ADR_OVERRIDES_NEWER_EXPLICIT_DECISION",
-        "semantic-freshness-ceiling",
-        reinstated,
-        "allOf[0].then.properties.usable_as.const",
-        knockout_at="allOf[0].then",
-    )
-
-    # -- the store is not a task -------------------------------------------
-
-    def a_store_operation_that_moved_an_admission() -> None:
-        moved = S.open_port(lane="KEYWORD", source=CORPUS)
-        moved.task_admission = "ADVANCED"
-        moved.lifecycle_receipt(operation="DELETE")
-
-    expect_adapter_refusal(
-        "REBUILD_OR_DELETE_CHANGES_TASK_ADMISSION",
-        "the admission is compared against the literal, before and after the operation",
-        a_store_operation_that_moved_an_admission,
-    )
-
-    advanced = copy.deepcopy(
-        S.open_port(lane="KEYWORD", source=CORPUS).lifecycle_receipt(operation="REBUILD")
-    )["semantic_index_lifecycle_receipt"]
-    advanced["changes"]["task_admission"] = "ADVANCED"
-    expect_schema_refusal(
-        "REBUILD_OR_DELETE_CHANGES_TASK_ADMISSION",
-        "semantic-index-lifecycle-receipt",
-        advanced,
-        "properties.changes.properties.task_admission.const",
-    )
-
-    def a_rebuild_that_does_not_reproduce() -> None:
-        drifting = S.open_port(lane="KEYWORD", source=CORPUS)
-        original = S.build_index
-        state = {"n": 0}
-
-        def nondeterministic(postings: Any) -> dict[str, Any]:
-            state["n"] += 1
-            index = original(postings)
-            index["reading"] = state["n"]
-            return index
-
-        S.build_index = nondeterministic
-        try:
-            drifting.lifecycle_receipt(operation="REBUILD")
-        finally:
-            S.build_index = original
-
-    expect_adapter_refusal(
-        "REBUILD_NON_DETERMINISTIC",
-        "the receipt rebuilds the whole store and compares the two index digests",
-        a_rebuild_that_does_not_reproduce,
-    )
-
-    # -- identity ----------------------------------------------------------
-
-    def one_identity_two_contents() -> None:
-        def mutate(data: dict[str, Any]) -> None:
-            duplicate = copy.deepcopy(record_of(data, "DTCR-DOC-005"))
-            duplicate["text"] = duplicate["text"] + "\n\nA second content under the same identity.\n"
-            duplicate["document"]["document_digest"] = S.sha256_hex(duplicate["text"].encode("utf-8"))
-            data["records"].append(duplicate)
-        S.open_port(lane="KEYWORD", source=corpus_copy(mutate))
-
-    expect_adapter_refusal(
-        "MUTABLE_INDEX_OR_MODEL_IDENTITY",
-        "a document identity is registered once or not at all",
-        one_identity_two_contents,
-    )
-
-    def an_index_that_outlived_its_projector() -> None:
-        drifted = S.open_port(lane="KEYWORD", source=CORPUS)
-        drifted.index["normalizer_digest"] = "0" * 64
-        drifted.retrieve(lane="KEYWORD", query_text=QUERY, top_k=5)
-
-    expect_adapter_refusal(
-        "MUTABLE_INDEX_OR_MODEL_IDENTITY",
-        "a query checks the index was built by the projector now loaded",
-        an_index_that_outlived_its_projector,
-    )
-
-    unpinned = copy.deepcopy(clean.projection_receipts[0])
-    del unpinned["embedding_provider"]["model_digest"]
-    expect_schema_refusal(
-        "MUTABLE_INDEX_OR_MODEL_IDENTITY",
-        "projection-receipt",
-        unpinned,
-        "properties.embedding_provider.required",
-    )
-
-    # -- the bound on a query ----------------------------------------------
-
-    for planted, mechanism in (
-        ("all", "there is no value here spelling unbounded"),
-        (0, "a neighbourhood of nothing is not a bounded query"),
-        (S.MAX_TOP_K + 1, "the frozen ceiling of 200 is checked before the query runs"),
-    ):
-        expect_adapter_refusal(
-            "TOP_K_RESULT_PROMOTED_TO_VIOLATION_BASIS",
-            mechanism,
-            lambda value=planted: clean.retrieve(lane="KEYWORD", query_text=QUERY, top_k=value),
-        )
-
-    promoted = copy.deepcopy(
-        clean.consume(
-            result,
-            ranks=[1, 2],
-            manifest_ref="context manifest for the persistence boundary review",
-            consuming_task_ref="review of the domain isolation violation candidate",
-        )[0]
-    )
-    promoted["basis_grade"] = "DETERMINISTIC_FACT"
-    expect_schema_refusal(
-        "TOP_K_RESULT_PROMOTED_TO_VIOLATION_BASIS",
-        "consumed-context-row",
-        promoted,
-        "properties.basis_grade.const",
-    )
-
-    decided = copy.deepcopy(result)
-    decided["establishes"]["decision"] = True
-    expect_schema_refusal(
-        "TOP_K_RESULT_PROMOTED_TO_VIOLATION_BASIS",
-        "retrieval-result",
-        decided,
-        "properties.establishes.properties.decision.const",
-    )
-
-    # -- the lane nobody entered -------------------------------------------
-
-    def a_skipped_lane_asked_for_rows() -> None:
-        clean.retrieve(
-            lane="NOT_APPLICABLE",
-            query_text="a mechanical rename",
-            top_k=5,
-            not_applicable_rationale="stored context could not bear on a mechanical rename",
-        )
-
-    expect_adapter_refusal(
-        "NOT_APPLICABLE_FORCED_TO_SYNTHETIC_PASS",
-        "a lane recorded as not entered may not carry a result size",
-        a_skipped_lane_asked_for_rows,
-    )
-
-    def a_skipped_lane_with_no_reason() -> None:
-        clean.retrieve(
-            lane="NOT_APPLICABLE",
-            query_text="a mechanical rename",
-            top_k="NOT_APPLICABLE",
-        )
-
-    expect_adapter_refusal(
-        "NOT_APPLICABLE_FORCED_TO_SYNTHETIC_PASS",
-        "an unexplained skip reads as an empty result",
-        a_skipped_lane_with_no_reason,
-    )
-
-    manufactured = copy.deepcopy(result)
-    manufactured["outcome"] = "NOT_APPLICABLE"
-    manufactured["not_applicable_rationale"] = "stored context could not bear on a mechanical rename"
-    expect_schema_refusal(
-        "NOT_APPLICABLE_FORCED_TO_SYNTHETIC_PASS",
-        "retrieval-result",
-        manufactured,
-        "allOf[0].then.properties.rows.maxItems",
-        knockout_at="allOf[0].then",
-    )
-
-    # -- the provider plane ------------------------------------------------
-
-    for lane in ("VECTOR", "HYBRID"):
-        expect_adapter_refusal(
-            "VECTOR_LANE_CLAIMED_WITHOUT_EMBEDDING_PROVIDER",
-            f"the port refuses {lane} rather than answering it from the keyword index",
-            lambda value=lane: S.open_port(lane=value, source=CORPUS),
-        )
-    expect_adapter_refusal(
-        "VECTOR_LANE_CLAIMED_WITHOUT_EMBEDDING_PROVIDER",
-        "an already-open keyword backend refuses a vector query for the same reason",
-        lambda: clean.retrieve(lane="VECTOR", query_text=QUERY, top_k=5),
-    )
-
-    expect_adapter_refusal(
-        "EMBEDDING_TRANSPORT_PASS_PROMOTED_TO_SEMANTIC_PASS",
-        "a provider binding presented to the port is not the human admission its terms need",
-        lambda: S.open_port(
-            lane="VECTOR",
-            source=CORPUS,
-            embedding_provider={"provider_name": "example-embedding-service", "dimension": 768},
-        ),
-    )
-
-    transport_pass = copy.deepcopy(clean.projection_receipts[0])
-    transport_pass["transport"] = {"outcome": "PASS", "exit_code": 0}
-    transport_pass["establishes"]["semantic_correctness"] = True
-    expect_schema_refusal(
-        "EMBEDDING_TRANSPORT_PASS_PROMOTED_TO_SEMANTIC_PASS",
-        "projection-receipt",
-        transport_pass,
-        "properties.establishes.properties.semantic_correctness.const",
-    )
-
-    cleared = copy.deepcopy(clean.projection_receipts[0])
-    cleared["data_handling"]["provider_terms_admission"] = "CLEARED_BY_SUCCESSFUL_CALL"
-    expect_schema_refusal(
-        "EMBEDDING_TRANSPORT_PASS_PROMOTED_TO_SEMANTIC_PASS",
-        "projection-receipt",
-        cleared,
-        "properties.data_handling.properties.provider_terms_admission.const",
-    )
-
-
-# --------------------------------------------------------------------------
-# lane 3: provider
-# --------------------------------------------------------------------------
-
-def lane_provider() -> str:
-    print("provider")
-    if not PROVIDER_RECEIPT.is_file():
-        fail(f"{PROVIDER_RECEIPT.name} is absent; the probe lane has nothing to check")
-        return "ABSENT"
-    committed = json.loads(PROVIDER_RECEIPT.read_text(encoding="utf-8"))
-    check(
-        "the committed provider receipt grants nothing",
-        set(committed["establishes"].values()) == {False},
-        str(committed["establishes"]),
-    )
-    check(
-        "the vector retrieval lane and its provider are recorded as blocked, not absent",
-        committed["lanes"]["vector_retrieval_lane"]["state"] == "BLOCKED_ON_PROVIDER"
-        and committed["lanes"]["embedding_provider"]["state"] == "BLOCKED_ON_PROVIDER"
-        and committed["lanes"]["provider_terms_model_rights_and_privacy"]["state"] == "HUMAN_ADMIT_REQUIRED",
-        str({name: lane["state"] for name, lane in committed["lanes"].items()}),
-    )
-    try:
-        S.scan_public(committed, "the committed provider receipt")
-    except S.Refusal as refusal:
-        fail(f"the committed provider receipt carries a private value: {refusal.detail}")
-
-    observed = S.probe_lancedb()
-    passing = next((attempt for attempt in observed["attempts"] if attempt["state"] == "PASS"), None)
-    if passing is None:
-        print(
-            "  NOT_EXERCISED: no pinned interpreter on this host imports the vector store. "
-            "A missing provider is start-readiness, not a failure."
-        )
-        return "NOT_EXERCISED (no pinned interpreter with the store)"
-
-    recorded = next(
-        (attempt for attempt in committed["attempts"] if attempt["state"] == "PASS"), None
-    )
-    if recorded is None:
-        fail("this host imports the vector store and the committed receipt records no passing attempt")
-        return "DISAGREES"
-    for key in ("interpreter", "stdout", "stdout_sha256", "executable_sha256", "exit_code"):
+# ---------------------------------------------------------------------------
+# lane 3: receipts
+# ---------------------------------------------------------------------------
+
+def receipts(fresh: dict[str, Any]) -> None:
+    print("receipts")
+    committed = A.RECEIPTS / "reference-backend.json"
+    check("the deterministic receipt is committed", committed.is_file(), str(committed.name))
+    if committed.is_file():
         check(
-            f"the committed receipt and this host agree on {key}",
-            recorded[key] == passing[key],
-            f"{recorded[key]!r} against {passing[key]!r}",
+            "the committed deterministic receipt reproduces from this tree, byte for byte",
+            committed.read_text(encoding="utf-8") == json.dumps(fresh, indent=2, sort_keys=True) + "\n",
+            "re-run `python3 adapter.py receipt` and commit the result",
         )
-    print(
-        f"  {PROVIDER_RECEIPT.name}: this host reproduces the recorded import "
-        f"({passing['stdout']}) through {passing['interpreter']}"
+
+    lane_path = A.RECEIPTS / "lancedb-lane.json"
+    check("the provider lane receipt is committed", lane_path.is_file(), str(lane_path.name))
+    if lane_path.is_file():
+        lane = json.loads(lane_path.read_text(encoding="utf-8"))
+        check(
+            "the provider lane receipt records a typed absence, not a pass",
+            lane["state"] in {"NOT_EXERCISED", "PROVIDER_UNAVAILABLE", "NOT_APPLICABLE"},
+            str(lane.get("state")),
+        )
+        check(
+            "the provider lane receipt establishes nothing",
+            set(lane["establishes"].values()) == {False},
+            str(lane["establishes"]),
+        )
+
+    completion = A.RECEIPTS / "lane-completion.json"
+    check("the lane completion receipt is committed", completion.is_file(), str(completion.name))
+    if completion.is_file():
+        packet = json.loads(completion.read_text(encoding="utf-8"))
+        check(
+            "the completion receipt records #368's live state as not observed",
+            packet.get("issue_368_state") == "NOT_OBSERVED",
+            str(packet.get("issue_368_state")),
+        )
+        check(
+            "the completion receipt hedges #521's live state rather than asserting it",
+            "not reconfirmed" in packet.get("convergence_handoff", ""),
+            packet.get("convergence_handoff", ""),
+        )
+        check(
+            "every recorded gate carries an exit code",
+            all("exit" in item for item in packet.get("gates", [])) and packet.get("gates"),
+            str(packet.get("gates")),
+        )
+
+
+# ---------------------------------------------------------------------------
+# lane 4: leaks
+# ---------------------------------------------------------------------------
+
+def leaks() -> int:
+    print("leaks")
+    scanned = 0
+    # Committed text only. Build products are not in the tree this scan is
+    # about, and reading one as text is how this lane first went red for a
+    # reason that had nothing to do with a leak.
+    for path in sorted(ADAPTER_DIR.rglob("*")):
+        if not path.is_file() or path.suffix not in {".py", ".json", ".md"}:
+            continue
+        if "__pycache__" in path.parts or path.name == "adapter.py":
+            # adapter.py holds the patterns themselves; a scanner that reports
+            # its own definitions reports nothing useful.
+            continue
+        text = path.read_text(encoding="utf-8")
+        scanned += 1
+        try:
+            if path.suffix == ".json":
+                A.scan_for_leaks(json.loads(text), path.name)
+            else:
+                for number, line in enumerate(text.splitlines(), start=1):
+                    A.scan_for_leaks(line.strip(), f"{path.name}:{number}")
+        except Refusal as refusal:
+            failures.append(f"leak scan: {refusal}")
+    check("the leak scan covered the committed subtree", scanned >= 4, str(scanned))
+    print(f"  scanned={scanned} files (adapter.py excluded: it defines the patterns)")
+    return scanned
+
+
+# ---------------------------------------------------------------------------
+# lane 5: the provider lane
+# ---------------------------------------------------------------------------
+
+def provider() -> str:
+    print("provider")
+    lane = A.probe_lancedb_lane()
+    check(
+        "the provider lane never reports a pass",
+        lane["state"] == "NOT_EXERCISED",
+        str(lane["state"]),
     )
-    return f"EXERCISED (store import {passing['stdout']}, vector lane BLOCKED_ON_PROVIDER)"
+    try:
+        backend = A.LanceDBBackend()
+    except ProviderUnavailable as absence:
+        print(f"  NOT_EXERCISED: {absence.reason}. A missing provider is start-readiness, not a failure.")
+        return f"NOT_EXERCISED ({absence.reason})"
+    try:
+        backend.query("anything", "VECTOR", 3, [])
+        check("a bound but unexercised LanceDB lane refuses to answer", False, "it answered")
+    except ProviderUnavailable as absence:
+        check("a bound but unexercised LanceDB lane refuses to answer", absence.reason == "LANCEDB_RUNTIME_NOT_EXERCISED")
+    print(f"  NOT_EXERCISED: bound {backend.binding['library']} {backend.binding['version']}, runtime lane never entered")
+    return "NOT_EXERCISED (bound, runtime lane never entered)"
 
 
 def main() -> int:
-    # A guard firing inside the positives lane is a red run, not a traceback: the
-    # exit code is this file's whole contract with `tests/run-all.sh`, and an
-    # uncaught refusal would leave it at 1, outside the 0/2/70 the caller reads.
     try:
-        numbers = lane_positives()
-        lane_falsifiers(numbers)
-        provider = lane_provider()
-    except S.Refusal as refusal:
-        print(f"  FAIL the positives lane was refused by its own adapter: {refusal}")
-        print("\nDTCR-SEMANTIC-CONTEXT SELFTEST RED")
+        fresh = positives()
+        planted()
+        receipts(fresh)
+        scanned = leaks()
+        lane = provider()
+    except (Refusal, A.Unusable) as stopped:
+        # A refusal escaping the positives lane is this suite's own red, and it
+        # exits 2 like every other red rather than as an untyped traceback.
+        print(f"DTCR-SEMANTIC-CONTEXT-RED the run stopped: {stopped}", file=sys.stderr)
         return 2
-    finally:
-        for workspace in workspaces:
-            shutil.rmtree(workspace, ignore_errors=True)
-
-    print("\nfalsifier coverage")
-    for name in REQUIRED_FALSIFIERS:
-        count = refused.get(name, 0)
-        state = "PASS" if count else "FAIL"
-        if not count:
-            failures.append(f"{name}: no planted mutation was refused by it")
-        print(f"  {state} {count:>2} {name}")
-
     print(
-        "\nDTCR-SEMANTIC-CONTEXT denominators: "
-        f"registered={numbers['registered']} projected={numbers['projected']} "
-        f"chunks={numbers['chunks']} tokens={numbers['tokens']} "
-        f"projection_receipts={numbers['projection_receipts']} "
-        f"positives_checks={checks} schema_validations={validations} "
-        f"planted_mutations={sum(refused.values())} "
-        f"falsifiers={sum(1 for name in REQUIRED_FALSIFIERS if refused.get(name))}/"
-        f"{len(REQUIRED_FALSIFIERS)} provider={provider} failures={len(failures)}"
-    )
-    print(
-        f"corpus_digest={numbers['corpus_digest'][:16]} index_digest={numbers['index_digest'][:16]} "
-        f"normalizer_digest={numbers['normalizer_digest'][:16]} "
-        f"index_schema_digest={numbers['index_schema_digest'][:16]}"
+        f"documents=9 cases={cases} planted_falsifiers={len(plants)} "
+        f"required_falsifiers={len(REQUIRED_FALSIFIERS)} scanned_files={scanned} "
+        f"index_digest={fresh['index']['index_digest'][:16]} "
+        f"model_digest={fresh['projection']['model_digest'][:16]} lancedb={lane}"
     )
     if failures:
-        print("DTCR-SEMANTIC-CONTEXT SELFTEST RED")
+        for failure in failures:
+            print(f"DTCR-SEMANTIC-CONTEXT-RED {failure}", file=sys.stderr)
         return 2
-    print("DTCR-SEMANTIC-CONTEXT SELFTEST GREEN")
+    print(
+        f"DTCR-SEMANTIC-CONTEXT-GREEN {cases} cases, {len(plants)} planted falsifiers refused under the "
+        f"code and by the mechanism each names, {len(REQUIRED_FALSIFIERS)} required falsifiers all raised, "
+        f"zero network, LanceDB {lane}"
+    )
     return 0
 
 

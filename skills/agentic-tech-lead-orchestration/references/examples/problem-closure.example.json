@@ -1,90 +1,99 @@
 {
-  "schema_version": 1,
   "denominator": {
     "problem_ids": [
       "P-EXAMPLE-001"
     ],
     "source_manifest_sha256": "f37c10388a86133eddef76c935008fdff7b06a3fc467bb183c875cd363f83f21"
   },
-  "source_manifest": [
-    {
-      "problem_id": "P-EXAMPLE-001",
-      "kind": "PDF",
-      "identity": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-      "location": "page:22",
-      "claim_sha256": "bfd51c1f90b86fa2d6be1982a7a101db3a970d20b98d44aa4a8b6b6d68263bbd"
-    }
-  ],
   "problems": [
     {
-      "problem_id": "P-EXAMPLE-001",
-      "source": {
-        "kind": "PDF",
-        "identity": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-        "location": "page:22"
-      },
-      "claim": "An implementation claim must not be promoted beyond its verified evidence lane.",
       "applicability": "APPLICABLE",
-      "repo_subject": {
-        "repo": "owner/example-repo",
-        "commit": "0123456789abcdef0123456789abcdef01234567",
-        "tree": "89abcdef0123456789abcdef0123456789abcdef"
-      },
-      "task_nodes": [
-        "T1"
-      ],
+      "claim": "An implementation claim must not be promoted beyond its verified evidence lane.",
+      "closure": "VERIFIED_LOCAL",
       "dag_nodes": [
         "DAG:T1"
-      ],
-      "issue_nodes": [
-        123
-      ],
-      "session_attempts": [
-        {
-          "task_id": "T1",
-          "attempt_id": "a01",
-          "worktree": "worktree:T1:a01",
-          "thread_id": "codex-thread-id"
-        }
       ],
       "implementation_evidence": [
         {
           "kind": "COMMIT",
-          "subject": "0123456789abcdef0123456789abcdef01234567",
           "repo_subject": {
-            "repo": "owner/example-repo",
             "commit": "0123456789abcdef0123456789abcdef01234567",
+            "repo": "owner/example-repo",
             "tree": "89abcdef0123456789abcdef0123456789abcdef"
           },
-          "status": "CURRENT"
+          "status": "CURRENT",
+          "subject": "0123456789abcdef0123456789abcdef01234567"
         }
+      ],
+      "issue_nodes": [
+        123
+      ],
+      "merge_subjects": [],
+      "problem_id": "P-EXAMPLE-001",
+      "receipts": [
+        {
+          "lane": "LOCAL",
+          "repo_subject": {
+            "commit": "0123456789abcdef0123456789abcdef01234567",
+            "repo": "owner/example-repo",
+            "tree": "89abcdef0123456789abcdef0123456789abcdef"
+          },
+          "subject": "receipt:local:example"
+        }
+      ],
+      "repo_subject": {
+        "commit": "0123456789abcdef0123456789abcdef01234567",
+        "repo": "owner/example-repo",
+        "tree": "89abcdef0123456789abcdef0123456789abcdef"
+      },
+      "residual_gaps": [],
+      "session_attempts": [
+        {
+          "attempt_id": "a01",
+          "task_id": "T1",
+          "thread_id": "codex-thread-id",
+          "worktree": "worktree:T1:a01"
+        }
+      ],
+      "shadow_review": {
+        "repo_subject": {
+          "commit": "0123456789abcdef0123456789abcdef01234567",
+          "repo": "owner/example-repo",
+          "tree": "89abcdef0123456789abcdef0123456789abcdef"
+        },
+        "reviewer_attempt_id": "s01",
+        "reviewer_task_id": "T1-shadow"
+      },
+      "shadow_verdict": "PASS",
+      "source": {
+        "identity": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "kind": "PDF",
+        "location": "page:22"
+      },
+      "task_nodes": [
+        "T1"
       ],
       "verification_evidence": [
         {
           "lane": "LOCAL",
-          "subject": "receipt:local:example",
           "repo_subject": {
-            "repo": "owner/example-repo",
             "commit": "0123456789abcdef0123456789abcdef01234567",
-            "tree": "89abcdef0123456789abcdef0123456789abcdef"
-          }
-        }
-      ],
-      "receipts": [
-        {
-          "lane": "LOCAL",
-          "subject": "receipt:local:example",
-          "repo_subject": {
             "repo": "owner/example-repo",
-            "commit": "0123456789abcdef0123456789abcdef01234567",
             "tree": "89abcdef0123456789abcdef0123456789abcdef"
-          }
+          },
+          "subject": "receipt:local:example"
         }
-      ],
-      "merge_subjects": [],
-      "shadow_verdict": "PASS",
-      "residual_gaps": [],
-      "closure": "VERIFIED_LOCAL"
+      ]
+    }
+  ],
+  "schema_version": 1,
+  "source_manifest": [
+    {
+      "claim_sha256": "bfd51c1f90b86fa2d6be1982a7a101db3a970d20b98d44aa4a8b6b6d68263bbd",
+      "identity": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "kind": "PDF",
+      "location": "page:22",
+      "problem_id": "P-EXAMPLE-001"
     }
   ]
 }

@@ -1,0 +1,63 @@
+{
+  "provenance": {
+    "captured_on": "2026-08-22",
+    "herdr_version": "0.8.0",
+    "herdr_path": "/opt/homebrew/bin/herdr",
+    "protocol": 19,
+    "schema_version": 1,
+    "capture_command": "herdr api schema --json",
+    "capture_sha256": "88ff414aa996e390c2db05a37b95d28dbe4e81b98329f6ed7f7a2cc5c6ebf51a",
+    "capture_byte_length": 251527,
+    "explain_capture_command": "herdr agent explain --file <any text file> --agent claude --json",
+    "host_class": "CLAUDE_CODE_LOCAL",
+    "read_only": true,
+    "note": "Captured with no herdr server running. No agent was started, sent keys, or killed; `herdr api schema`, `herdr agent explain --file`, `herdr status`, `herdr session list` and `herdr pane report-agent --help` are all read-only."
+  },
+  "agent_info_properties": ["agent","agent_session","agent_status","cwd","display_agent","focused","foreground_cwd","interactive_ready","launch_pending","name","pane_id","revision","screen_detection_skipped","state_change_seq","state_labels","tab_id","terminal_id","terminal_title","terminal_title_stripped","title","tokens","workspace_id"],
+  "agent_info_required": ["terminal_id","agent_status","workspace_id","tab_id","pane_id","focused","revision"],
+  "agent_status_enum": ["idle","working","blocked","done","unknown"],
+  "success_envelope_properties": ["id", "result", "error"],
+  "error_envelope_codes_observed": ["server_not_running"],
+  "error_envelope_channel": "stderr with a NON-zero exit code (herdr 0.8.0: `herdr agent get <missing>` -> exit 1)",
+  "agent_session_info_properties": ["agent","kind","source","value"],
+  "pane_process_info_properties": ["foreground_process_group_id","foreground_processes","pane_id","shell_pid","tty"],
+  "pane_process_info_process_properties": ["argv","argv0","cmdline","cwd","name","pid"],
+  "agent_explain_root_keys": ["agent","cached_remote_version","evaluated_rules","fallback_reason","local_override_shadowing_remote","manifest_source","manifest_version","matched_rule","remote_update_error","remote_update_status","screen_detection_skipped","skip_state_update","skipped_update_reason","state","visible_blocker","visible_idle","visible_working","warning"],
+  "agent_explain_capture_command": "herdr agent explain --file <any text file> --agent claude --json",
+  "agent_explain_is_schema_typed": false,
+  "report_agent_state_enum": ["idle","working","blocked","unknown"],
+  "named_session_socket_pattern": "~/.config/herdr/sessions/<name>/herdr.sock",
+  "absent_from_every_surface": ["observed_at_unix","updated_at_unix","last_seen_at_unix","process_alive","process_started_at_unix","cleanup_state","residue_count"],
+  "absent_from_agent_info_but_published_elsewhere": {
+    "process_id": "PaneProcessInfoProcess.pid, reached via API method pane.process_info / CLI `herdr pane process-info --pane <ID>`. Do NOT re-add process_id or pid to absent_from_every_surface: that false entry is what froze the 2026-08-21 contract against fiction, and herdr_surface_conformance_selftest.py asserts against it."
+  },
+  "typed_substitutions": {
+    "observed_at_unix": {"type": "OBSERVER_LOCAL", "receipt_field": "observation_time_source", "value": "OBSERVER_LOCAL_CLOCK", "ordering_anchor": "state_change_seq"},
+    "process_id": {"type": "HERDR_PUBLISHED_OTHER_SURFACE", "receipt_field": "process_facts_source", "value": "HERDR_PANE_PROCESS_INFO_PLUS_OS_PS", "source": "pane.process_info -> foreground_processes[].pid"},
+    "process_alive": {"type": "OS_AUXILIARY", "receipt_field": "process_facts_source", "value": "HERDR_PANE_PROCESS_INFO_PLUS_OS_PS", "source": "ps -o lstart= -p <pid> exit status"},
+    "process_started_at_unix": {"type": "OS_AUXILIARY", "receipt_field": "process_facts_source", "value": "HERDR_PANE_PROCESS_INFO_PLUS_OS_PS", "source": "ps -o lstart= -p <pid>"},
+    "cleanup_state": {"type": "OBSERVER_DERIVED", "receipt_field": "cleanup_source", "value": "OBSERVER_DERIVED_PANE_PROCESS_INFO", "source": "post-terminal pane.process_info foreground_processes emptiness"},
+    "residue_count": {"type": "OBSERVER_DERIVED", "receipt_field": "cleanup_source", "value": "OBSERVER_DERIVED_PANE_PROCESS_INFO", "source": "len(pane.process_info.foreground_processes)"}
+  },
+  "receipt_source_enums": {
+    "observation_time_source": {
+      "herdr_published": ["HERDR_SOURCE_CLOCK"],
+      "substituted": ["OBSERVER_LOCAL_CLOCK"],
+      "not_observed": []
+    },
+    "process_facts_source": {
+      "herdr_published": ["HERDR_AGENT_SURFACE"],
+      "substituted": ["HERDR_PANE_PROCESS_INFO_PLUS_OS_PS"],
+      "not_observed": ["NOT_OBSERVED"]
+    },
+    "cleanup_source": {
+      "herdr_published": ["HERDR_PUBLISHED"],
+      "substituted": ["OBSERVER_DERIVED_PANE_PROCESS_INFO"],
+      "not_observed": ["NOT_OBSERVED"]
+    }
+  },
+  "receipt_source_values_unreachable_against_captured_version": {
+    "observation_time_source": ["HERDR_SOURCE_CLOCK"],
+    "cleanup_source": ["HERDR_PUBLISHED"]
+  }
+}

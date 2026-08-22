@@ -188,8 +188,8 @@ two-track separation and grading      contract-level, enforced by schema
 refusal controls                      replayed against the shipped schemas
 parser/syntax-match binding           LANDED (adapters/tree-sitter/, live receipt)
 graph-ledger binding                  LANDED (adapters/sqlite-ledger/, planted mutations)
-symbol-index binding                  LANDED python scope (adapters/scip/, live receipt); cross-language BLOCKED_ON_PROVIDER (#595 open)
-contract-compatibility binding        LANDED NOT_APPLICABLE lane (adapters/buf/); live lane BLOCKED_ON_PROVIDER
+symbol-index binding                  LANDED python scope (adapters/scip/, live receipt); cross-language BLOCKED_ON_PROVIDER
+contract-compatibility binding        LANDED (adapters/buf/); live lane exercised once at landing (buf 1.72.0, packet issue-549.json), provider currently absent
 concrete retrieval/semantic binding   LANDED KEYWORD lane (adapters/semantic-context/); VECTOR BLOCKED_ON_PROVIDER
 applied refactor on a real codebase   EXERCISED (bounded, one consumer, receipt v0-draft — canary-528/)
 cross-repository contract migration   R2 compiler LANDED (expand-contract/); real migration NOT_EXERCISED
