@@ -1,0 +1,80 @@
+{
+  "declared_blobs": [
+    {
+      "blob": "2233a27b54f54b2eeec570bf6387a6f31d3efab4",
+      "byte_count": 536,
+      "local": "src/NOTES.md",
+      "path": "skills/dual-track-code-review-loop/adapters/scip/fixtures/python-subject/src/NOTES.md"
+    },
+    {
+      "blob": "1dc5b653a17d5ac46247f5c8d1853661d252efd2",
+      "byte_count": 361,
+      "local": "src/client.py",
+      "path": "skills/dual-track-code-review-loop/adapters/scip/fixtures/python-subject/src/client.py"
+    },
+    {
+      "blob": "5d496b80bee472237b520e29237586702445eb03",
+      "byte_count": 1522,
+      "local": "src/pricing.py",
+      "path": "skills/dual-track-code-review-loop/adapters/scip/fixtures/python-subject/src/pricing.py"
+    },
+    {
+      "blob": "a405d8ebc64c7cf88b075ebe2f6ebb93d2b1b676",
+      "byte_count": 766,
+      "local": "src/pyproject.toml",
+      "path": "skills/dual-track-code-review-loop/adapters/scip/fixtures/python-subject/src/pyproject.toml"
+    }
+  ],
+  "index": "index.scip",
+  "index_binding": {
+    "config_digest": "a9aae15ccd732099fa3e152ac0763cb76db34fff6cb5610bedf789cd28b42431",
+    "index_digest": "4631b0164216cca6a0ec073eb77d504df9d29ad5ca3aa5cf18e817ec8719894a",
+    "indexed_blobs": {
+      "skills/dual-track-code-review-loop/adapters/scip/fixtures/python-subject/src/NOTES.md": "2233a27b54f54b2eeec570bf6387a6f31d3efab4",
+      "skills/dual-track-code-review-loop/adapters/scip/fixtures/python-subject/src/client.py": "1dc5b653a17d5ac46247f5c8d1853661d252efd2",
+      "skills/dual-track-code-review-loop/adapters/scip/fixtures/python-subject/src/pricing.py": "5d496b80bee472237b520e29237586702445eb03",
+      "skills/dual-track-code-review-loop/adapters/scip/fixtures/python-subject/src/pyproject.toml": "a405d8ebc64c7cf88b075ebe2f6ebb93d2b1b676"
+    },
+    "indexed_commit": "ee9afe431d052dda0b23b7fcf53de80be67a4242",
+    "indexer_name": "scip-python",
+    "indexer_sha256": "ce60dd39157c8f52d8f9de8f060743e1135b697c52253de65521a19b84e19d2a",
+    "version": "0.6.6"
+  },
+  "index_root": "skills/dual-track-code-review-loop/adapters/scip/fixtures/python-subject/src",
+  "normalization_digest": "3a45dff42b8854465b9996227ad11f8b60e65e443f8eeb53c6aad88e56065ebf",
+  "omissions": [
+    {
+      "detail": "NOTES.md is Markdown and this indexer covers Python only; it was never opened by the indexer",
+      "omission_kind": "LANGUAGE_NOT_INSTALLED"
+    },
+    {
+      "detail": "pyproject.toml is the indexer configuration for this root, not a source blob the indexer parses",
+      "omission_kind": "EXCLUDED_BY_CONFIG"
+    }
+  ],
+  "provider": {
+    "argv_template": [
+      "scip-python",
+      "index",
+      "--cwd",
+      "<INDEX_ROOT>",
+      "--project-name",
+      "dtcr-scip-fixture",
+      "--project-version",
+      "1",
+      "--output",
+      "<INDEX_OUT>",
+      "--quiet"
+    ],
+    "exit_code": 0
+  },
+  "schema": "dtcr/scip-run-request/v1",
+  "subject": {
+    "commit": "ee9afe431d052dda0b23b7fcf53de80be67a4242",
+    "repository_binding_id": "DTCR-RB-3749864dfe3e2f36",
+    "tree": "bd8aeaa57a449449a073468913b23ed47e1e56bf"
+  },
+  "warnings": [
+    "recorded-index replay: the indexer did not run in this pass; index.scip beside this request is the output of a real run against the subject commit named above, with Metadata.project_root and nothing else rewritten to file:///dtcr-fixture/skills/dual-track-code-review-loop/adapters/scip/fixtures/python-subject/src so that a committed artifact carries no account name and no checkout id"
+  ]
+}

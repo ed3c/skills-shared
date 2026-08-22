@@ -84,6 +84,19 @@ the suite entrypoint.
 | [`schemas/refactor-changeset-lease.schema.json`](schemas/refactor-changeset-lease.schema.json) | what the change was allowed to touch and what it touched, the frozen oracles it is measured against, and its single-valued merge admission |
 | [`schemas/refactor-r1-receipt.schema.json`](schemas/refactor-r1-receipt.schema.json) | the states one run entered and its terminal, with `CANDIDATE_RECEIPT`, `BLOCKED` and `ROLLED_BACK` kept apart and applied-on-a-real-codebase pinned false |
 
+### Cross-repository expand-contract plane
+
+The R2 output half, landed 2026-08-22. These two contracts are what
+[`../expand-contract/compile_r2.py`](../expand-contract/compile_r2.py) emits
+and refuses against; their twenty-eight refusal controls are replayed by
+[`../expand-contract/selftest.py`](../expand-contract/selftest.py) rather than
+by the C0 harness.
+
+| File | Owns |
+|---|---|
+| [`schemas/refactor-r2-binding.schema.json`](schemas/refactor-r2-binding.schema.json) | one repository binding of a multi-repository subject, with its own rollback identity and per-binding disposition |
+| [`schemas/refactor-r2-receipt.schema.json`](schemas/refactor-r2-receipt.schema.json) | the C1→A1→A2→E1→C2 states one run entered, the dual-run lane closed over OBSERVED/NOT_OBSERVED/NOT_EXERCISED, the STOPPED_WITH_ROLLBACK truthful stop, and protocol_ready pinned false |
+
 ## Schema identity
 
 Two identifiers, doing different jobs. `$id` is the file, following the sibling
@@ -109,8 +122,10 @@ Both are ignored by validators, which is the point: they are data for whoever
 replays them, and they sit beside the constraint they exercise so that removing
 the constraint and leaving the control behind is visible in one diff.
 
-One hundred and fifty-one refusal controls ship here: one hundred and forty-four
-inside the thirty-one schemas and seven in `refused-claims.json`.
+One hundred and fifty-one refusal controls ship in the C0-counted surface: one
+hundred and forty-four inside thirty-one of the thirty-three schemas and seven
+in `refused-claims.json`; the two R2 schemas carry twenty-eight more, replayed
+by `../expand-contract/selftest.py`.
 A refusal nobody replays
 is prose, and prose does not survive the edit that removes the guard underneath
 it.

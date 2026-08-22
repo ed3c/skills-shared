@@ -1,0 +1,8 @@
+{
+  "name": "dtcr-buf-adapter-tools",
+  "private": true,
+  "description": "Scratch install of the buf CLI for the DTCR buf adapter (#549). Not published, not part of any DTCR package graph. node_modules is gitignored; only this manifest and the lockfile are committed so the pinned version is reproducible.",
+  "dependencies": {
+    "@bufbuild/buf": "1.72.0"
+  }
+}

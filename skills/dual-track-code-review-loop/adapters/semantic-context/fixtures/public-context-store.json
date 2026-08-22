@@ -1,0 +1,522 @@
+{
+  "fixture": "dtcr/semantic-context-public-store/v1",
+  "note": "Synthetic public content only. Every record here was written for this test; none of it is a real organisational document, and no private locator, private value or resolved address appears anywhere in it. Each document_digest is the sha256 of the `content.text` beside it (for the private-carrier entry, of the stated substitute string), so editing the text without editing the digest turns the adapter's digest binding red.",
+  "back_references": [
+    {
+      "schema": "dtcr/source-back-reference/v1",
+      "back_reference_id": "DTCR-BK-001",
+      "reference_kind": "REPOSITORY_BLOB",
+      "repository_blob": {
+        "repository_binding_id": "DTCR-RB-0123456789abcdef",
+        "commit": "0123456789abcdef0123456789abcdef01234567",
+        "path": "docs/decisions/domain-isolation.md",
+        "blob": "bc6cbe97e4a277434a175bcb6c41cfb22e2353d5",
+        "range": {
+          "start_line": 12,
+          "end_line": 48
+        }
+      }
+    },
+    {
+      "schema": "dtcr/source-back-reference/v1",
+      "back_reference_id": "DTCR-BK-002",
+      "reference_kind": "REPOSITORY_BLOB",
+      "repository_blob": {
+        "repository_binding_id": "DTCR-RB-0123456789abcdef",
+        "commit": "0123456789abcdef0123456789abcdef01234567",
+        "path": "docs/decisions/legacy-checkout-ledger-rule.md",
+        "blob": "24b41697cbb460908b7cf512a30731deb2f8ec7a",
+        "range": {
+          "start_line": 1,
+          "end_line": 26
+        }
+      }
+    },
+    {
+      "schema": "dtcr/source-back-reference/v1",
+      "back_reference_id": "DTCR-BK-003",
+      "reference_kind": "REPOSITORY_BLOB",
+      "repository_blob": {
+        "repository_binding_id": "DTCR-RB-0123456789abcdef",
+        "commit": "0123456789abcdef0123456789abcdef01234567",
+        "path": "docs/decisions/checkout-persistence-port.md",
+        "blob": "e80c97a5806300635bbf1953f227f115ac735306",
+        "range": {
+          "start_line": 1,
+          "end_line": 31
+        }
+      }
+    },
+    {
+      "schema": "dtcr/source-back-reference/v1",
+      "back_reference_id": "DTCR-BK-004",
+      "reference_kind": "LEDGER_EVENT",
+      "ledger_event": {
+        "event_digest": "8e3e5e27773d846159fc0457716e4f8f7b66d3ff980189c07327c7f9712b707e",
+        "sequence": 412
+      }
+    },
+    {
+      "schema": "dtcr/source-back-reference/v1",
+      "back_reference_id": "DTCR-BK-005",
+      "reference_kind": "SOURCE_PACKET",
+      "source_packet": {
+        "packet_id": "DTCR-SP-001",
+        "sha256": "80bfdfc6409455b3e8d2e36b9a28ce3605dadd72875e3dfdbe165fd613fdadce",
+        "byte_count": 1840
+      }
+    },
+    {
+      "schema": "dtcr/source-back-reference/v1",
+      "back_reference_id": "DTCR-BK-006",
+      "reference_kind": "SOURCE_PACKET",
+      "source_packet": {
+        "packet_id": "DTCR-SP-002",
+        "sha256": "2291af11868bb802a15f50c55ca67de604fd66f5dbff04a2efa7c12ffa58e630",
+        "byte_count": 940
+      }
+    },
+    {
+      "schema": "dtcr/source-back-reference/v1",
+      "back_reference_id": "DTCR-BK-007",
+      "reference_kind": "REPOSITORY_BLOB",
+      "repository_blob": {
+        "repository_binding_id": "DTCR-RB-0123456789abcdef",
+        "commit": "0123456789abcdef0123456789abcdef01234567",
+        "path": "docs/advisories/archive-parser.md",
+        "blob": "6fa72e9cb14e5d9425039144edbcadb363b1fa19",
+        "range": {
+          "start_line": 4,
+          "end_line": 22
+        }
+      }
+    },
+    {
+      "schema": "dtcr/source-back-reference/v1",
+      "back_reference_id": "DTCR-BK-008",
+      "reference_kind": "LEDGER_EVENT",
+      "ledger_event": {
+        "event_digest": "2ec15e5dd009bce902edecc1b3246342a21df639a88e55538697cce3c49d334e",
+        "sequence": 913
+      }
+    },
+    {
+      "schema": "dtcr/source-back-reference/v1",
+      "back_reference_id": "DTCR-BK-009",
+      "reference_kind": "REPOSITORY_BLOB",
+      "repository_blob": {
+        "repository_binding_id": "DTCR-RB-0123456789abcdef",
+        "commit": "0123456789abcdef0123456789abcdef01234567",
+        "path": "docs/refactors/domain-isolation-outcome.md",
+        "blob": "684065714f0c70175c001163e730d0e4a64c6f60",
+        "range": {
+          "start_line": 1,
+          "end_line": 40
+        }
+      }
+    }
+  ],
+  "documents": [
+    {
+      "document": {
+        "schema": "dtcr/semantic-document/v1",
+        "document_id": "DTCR-DOC-001",
+        "document_kind": "DECISION_RECORD",
+        "document_digest": "adb18e1f1a62a5cd1a0253d304ad6ef929c1443351c9cb60e86e9f38de0d99fd",
+        "authority": "NON_AUTHORITATIVE_CANDIDATE",
+        "visibility_class": "PUBLIC_TREE",
+        "storage_plane": "PUBLIC_TREE",
+        "observed_revision": "4",
+        "observed_at": "2026-08-21",
+        "subsystem_tags": [
+          "domain",
+          "persistence"
+        ],
+        "owning_decision": "decision record on domain isolation",
+        "back_reference_ref": "DTCR-BK-001",
+        "authority_ceiling": {
+          "current_policy": false,
+          "deterministic_fact": false,
+          "task_pass": false
+        }
+      },
+      "content": {
+        "plane": "PUBLIC_TREE",
+        "text": "Domain isolation decision. The domain layer holds no persistence types and no transport types. Adapters translate at the boundary and the domain never imports them.\n\nConsequence. A domain module that imports a persistence client is a boundary violation and is reviewed as one."
+      }
+    },
+    {
+      "document": {
+        "schema": "dtcr/semantic-document/v1",
+        "document_id": "DTCR-DOC-002",
+        "document_kind": "DECISION_RECORD",
+        "document_digest": "c7b0b2f209510999cf71ee5c1b5c61b1800b12ce1f159bb800a2204dfbe1329f",
+        "authority": "NON_AUTHORITATIVE_CANDIDATE",
+        "visibility_class": "PUBLIC_TREE",
+        "storage_plane": "PUBLIC_TREE",
+        "observed_revision": "1",
+        "observed_at": "2024-02-11",
+        "subsystem_tags": [
+          "checkout",
+          "persistence"
+        ],
+        "owning_decision": "legacy persistence rule for the checkout ledger",
+        "back_reference_ref": "DTCR-BK-002",
+        "authority_ceiling": {
+          "current_policy": false,
+          "deterministic_fact": false,
+          "task_pass": false
+        }
+      },
+      "content": {
+        "plane": "PUBLIC_TREE",
+        "text": "Legacy persistence rule for the checkout ledger. Every checkout ledger write goes through the shared checkout ledger client directly, because the checkout ledger path needs the lowest write latency and the checkout ledger client is already loaded.\n\nConsequence. Checkout ledger modules import the checkout ledger client and call the checkout ledger client inline. Persistence review of the checkout ledger write path stops at the checkout ledger client call."
+      }
+    },
+    {
+      "document": {
+        "schema": "dtcr/semantic-document/v1",
+        "document_id": "DTCR-DOC-003",
+        "document_kind": "DECISION_RECORD",
+        "document_digest": "1c2a9b739026c8183ec9aa51af8e4971942584abba3a32668cbe116507912718",
+        "authority": "NON_AUTHORITATIVE_CANDIDATE",
+        "visibility_class": "PUBLIC_TREE",
+        "storage_plane": "PUBLIC_TREE",
+        "observed_revision": "2",
+        "observed_at": "2025-11-03",
+        "subsystem_tags": [
+          "checkout",
+          "persistence"
+        ],
+        "owning_decision": "replacement persistence rule for the checkout ledger",
+        "back_reference_ref": "DTCR-BK-003",
+        "authority_ceiling": {
+          "current_policy": false,
+          "deterministic_fact": false,
+          "task_pass": false
+        }
+      },
+      "content": {
+        "plane": "PUBLIC_TREE",
+        "text": "Replacement persistence rule for the checkout ledger. Checkout ledger writes go through the persistence port. The direct client call is removed from the checkout write path.\n\nConsequence. The legacy persistence rule no longer holds and checkout persistence review reads the port contract."
+      }
+    },
+    {
+      "document": {
+        "schema": "dtcr/semantic-document/v1",
+        "document_id": "DTCR-DOC-004",
+        "document_kind": "INCIDENT_REVIEW",
+        "document_digest": "f439b1927f99d581d374e633fe73de1415086f695571666ef1de54b5730ef786",
+        "authority": "NON_AUTHORITATIVE_CANDIDATE",
+        "visibility_class": "PUBLIC_TREE",
+        "storage_plane": "PUBLIC_TREE",
+        "observed_revision": "1",
+        "observed_at": "2026-08-20",
+        "subsystem_tags": [
+          "scheduler"
+        ],
+        "owning_decision": "incident review for the scheduler stall",
+        "back_reference_ref": "DTCR-BK-004",
+        "authority_ceiling": {
+          "current_policy": false,
+          "deterministic_fact": false,
+          "task_pass": false
+        }
+      },
+      "content": {
+        "plane": "PUBLIC_TREE",
+        "text": "Scheduler stall incident review. The scheduler queue stopped draining after a worker lease expired without being renewed, and the stall was cleared by restarting the worker pool.\n\nFollow up. The lease renewal path has no timeout and no observation of its own; this review records the stall, it does not reproduce it."
+      }
+    },
+    {
+      "document": {
+        "schema": "dtcr/semantic-document/v1",
+        "document_id": "DTCR-DOC-005",
+        "document_kind": "SERVICE_OBJECTIVE",
+        "document_digest": "56b598a6fb42f71e9953d4fc8a904ac5e14b258142065540914ffdceef3a6265",
+        "authority": "NON_AUTHORITATIVE_CANDIDATE",
+        "visibility_class": "PUBLIC_TREE",
+        "storage_plane": "PUBLIC_TREE",
+        "observed_revision": "3",
+        "observed_at": "2026-06-01",
+        "subsystem_tags": [
+          "checkout",
+          "gateway"
+        ],
+        "owning_decision": "service objective for the checkout path",
+        "back_reference_ref": "DTCR-BK-005",
+        "authority_ceiling": {
+          "current_policy": false,
+          "deterministic_fact": false,
+          "task_pass": false
+        }
+      },
+      "content": {
+        "plane": "PUBLIC_TREE",
+        "text": "Checkout path service objective. The gateway serves the checkout read path within the stated latency budget over a rolling window, measured at the gateway edge.\n\nScope. The objective covers the gateway edge only and says nothing about the persistence layer behind it."
+      }
+    },
+    {
+      "document": {
+        "schema": "dtcr/semantic-document/v1",
+        "document_id": "DTCR-DOC-006",
+        "document_kind": "INCIDENT_REVIEW",
+        "document_digest": "5d9f04e255c8281b65572df14b35b82f1800fc6063ae3282c33bc1ad6807c2a4",
+        "authority": "NON_AUTHORITATIVE_CANDIDATE",
+        "visibility_class": "PRIVATE_CARRIER",
+        "storage_plane": "PRIVATE_CARRIER",
+        "observed_revision": "1",
+        "observed_at": "2026-08-19",
+        "subsystem_tags": [
+          "scheduler"
+        ],
+        "owning_decision": "incident review held in a private carrier",
+        "back_reference_ref": "DTCR-BK-006",
+        "authority_ceiling": {
+          "current_policy": false,
+          "deterministic_fact": false,
+          "task_pass": false
+        }
+      },
+      "content": {
+        "plane": "PRIVATE_CARRIER",
+        "text": null
+      }
+    },
+    {
+      "document": {
+        "schema": "dtcr/semantic-document/v1",
+        "document_id": "DTCR-DOC-007",
+        "document_kind": "SECURITY_ADVISORY",
+        "document_digest": "49b9a27c8adfe1752aa4e55a0548213dbab63ffb60d611ef67f0837b70554e2f",
+        "authority": "NON_AUTHORITATIVE_CANDIDATE",
+        "visibility_class": "PUBLIC_TREE",
+        "storage_plane": "PUBLIC_TREE",
+        "observed_revision": "2",
+        "observed_at": "2026-07-14",
+        "subsystem_tags": [
+          "archive",
+          "parser"
+        ],
+        "owning_decision": "security advisory for the archive parser",
+        "back_reference_ref": "DTCR-BK-007",
+        "authority_ceiling": {
+          "current_policy": false,
+          "deterministic_fact": false,
+          "task_pass": false
+        }
+      },
+      "content": {
+        "plane": "PUBLIC_TREE",
+        "text": "Archive parser advisory. A crafted archive entry drives the parser into unbounded allocation, and the fixed version rejects the entry before allocating.\n\nApplicability. Whether this repository is affected is a question about this repository, which the advisory does not answer."
+      }
+    },
+    {
+      "document": {
+        "schema": "dtcr/semantic-document/v1",
+        "document_id": "DTCR-DOC-008",
+        "document_kind": "TELEMETRY_BASELINE",
+        "document_digest": "1ad5df5ee86de95cbbf960fe81f432eb4cad36f7f57ccb937d1f1e5077670984",
+        "authority": "NON_AUTHORITATIVE_CANDIDATE",
+        "visibility_class": "PUBLIC_TREE",
+        "storage_plane": "PUBLIC_TREE",
+        "observed_revision": "7",
+        "observed_at": "2026-08-02",
+        "subsystem_tags": [
+          "checkout",
+          "telemetry"
+        ],
+        "owning_decision": "telemetry baseline for the checkout path",
+        "back_reference_ref": "DTCR-BK-008",
+        "authority_ceiling": {
+          "current_policy": false,
+          "deterministic_fact": false,
+          "task_pass": false
+        }
+      },
+      "content": {
+        "plane": "PUBLIC_TREE",
+        "text": "Checkout telemetry baseline. The recorded baseline covers request counts and error counts for the checkout read path over one observation window.\n\nCeiling. A baseline is what was measured in that window, not what the system does now."
+      }
+    },
+    {
+      "document": {
+        "schema": "dtcr/semantic-document/v1",
+        "document_id": "DTCR-DOC-009",
+        "document_kind": "PRIOR_REFACTOR_OUTCOME",
+        "document_digest": "5459db5ba9b264481516c50a046c614e7d5d30d466eefc2bc0bcc89bfb078b26",
+        "authority": "NON_AUTHORITATIVE_CANDIDATE",
+        "visibility_class": "PUBLIC_TREE",
+        "storage_plane": "PUBLIC_TREE",
+        "observed_revision": "1",
+        "observed_at": "2026-05-30",
+        "subsystem_tags": [
+          "domain"
+        ],
+        "owning_decision": "prior refactor outcome for the domain isolation change",
+        "back_reference_ref": "DTCR-BK-009",
+        "authority_ceiling": {
+          "current_policy": false,
+          "deterministic_fact": false,
+          "task_pass": false
+        }
+      },
+      "content": {
+        "plane": "PUBLIC_TREE",
+        "text": "Domain isolation refactor outcome. The persistence imports were moved behind an adapter and the domain modules stopped importing the client.\n\nResidue. Two call sites were left on the old path and are recorded here as residue, not as completed work."
+      }
+    }
+  ],
+  "freshness_ceilings": [
+    {
+      "schema": "dtcr/semantic-freshness-ceiling/v1",
+      "ceiling_id": "DTCR-FC-001",
+      "document_ref": "DTCR-DOC-001",
+      "observed_at": "2026-08-21",
+      "observed_revision": "4",
+      "revalidated_at": "2026-08-21",
+      "supersession": "NOT_SUPERSEDED",
+      "usable_as": "CONTEXT_CANDIDATE",
+      "authority_ceiling": {
+        "current_policy": false,
+        "reproduced_failure": false,
+        "deterministic_fact": false,
+        "task_state_change": false
+      }
+    },
+    {
+      "schema": "dtcr/semantic-freshness-ceiling/v1",
+      "ceiling_id": "DTCR-FC-002",
+      "document_ref": "DTCR-DOC-002",
+      "observed_at": "2024-02-11",
+      "observed_revision": "1",
+      "revalidated_at": "NEVER_REVALIDATED",
+      "supersession": {
+        "superseding_decision_ref": "replacement persistence rule for the checkout ledger",
+        "superseded_at": "2025-11-03"
+      },
+      "usable_as": "HISTORICAL_CONTEXT_ONLY",
+      "authority_ceiling": {
+        "current_policy": false,
+        "reproduced_failure": false,
+        "deterministic_fact": false,
+        "task_state_change": false
+      }
+    },
+    {
+      "schema": "dtcr/semantic-freshness-ceiling/v1",
+      "ceiling_id": "DTCR-FC-003",
+      "document_ref": "DTCR-DOC-003",
+      "observed_at": "2025-11-03",
+      "observed_revision": "2",
+      "revalidated_at": "2026-08-20",
+      "supersession": "NOT_SUPERSEDED",
+      "usable_as": "CONTEXT_CANDIDATE",
+      "authority_ceiling": {
+        "current_policy": false,
+        "reproduced_failure": false,
+        "deterministic_fact": false,
+        "task_state_change": false
+      }
+    },
+    {
+      "schema": "dtcr/semantic-freshness-ceiling/v1",
+      "ceiling_id": "DTCR-FC-004",
+      "document_ref": "DTCR-DOC-004",
+      "observed_at": "2026-08-20",
+      "observed_revision": "1",
+      "revalidated_at": "NEVER_REVALIDATED",
+      "supersession": "NOT_SUPERSEDED",
+      "usable_as": "CONTEXT_CANDIDATE",
+      "authority_ceiling": {
+        "current_policy": false,
+        "reproduced_failure": false,
+        "deterministic_fact": false,
+        "task_state_change": false
+      }
+    },
+    {
+      "schema": "dtcr/semantic-freshness-ceiling/v1",
+      "ceiling_id": "DTCR-FC-005",
+      "document_ref": "DTCR-DOC-005",
+      "observed_at": "2026-06-01",
+      "observed_revision": "3",
+      "revalidated_at": "2026-08-01",
+      "supersession": "NOT_SUPERSEDED",
+      "usable_as": "CONTEXT_CANDIDATE",
+      "authority_ceiling": {
+        "current_policy": false,
+        "reproduced_failure": false,
+        "deterministic_fact": false,
+        "task_state_change": false
+      }
+    },
+    {
+      "schema": "dtcr/semantic-freshness-ceiling/v1",
+      "ceiling_id": "DTCR-FC-006",
+      "document_ref": "DTCR-DOC-006",
+      "observed_at": "2026-08-19",
+      "observed_revision": "1",
+      "revalidated_at": "NEVER_REVALIDATED",
+      "supersession": "NOT_SUPERSEDED",
+      "usable_as": "CONTEXT_CANDIDATE",
+      "authority_ceiling": {
+        "current_policy": false,
+        "reproduced_failure": false,
+        "deterministic_fact": false,
+        "task_state_change": false
+      }
+    },
+    {
+      "schema": "dtcr/semantic-freshness-ceiling/v1",
+      "ceiling_id": "DTCR-FC-007",
+      "document_ref": "DTCR-DOC-007",
+      "observed_at": "2026-07-14",
+      "observed_revision": "2",
+      "revalidated_at": "2026-08-14",
+      "supersession": "NOT_SUPERSEDED",
+      "usable_as": "CONTEXT_CANDIDATE",
+      "authority_ceiling": {
+        "current_policy": false,
+        "reproduced_failure": false,
+        "deterministic_fact": false,
+        "task_state_change": false
+      }
+    },
+    {
+      "schema": "dtcr/semantic-freshness-ceiling/v1",
+      "ceiling_id": "DTCR-FC-008",
+      "document_ref": "DTCR-DOC-008",
+      "observed_at": "2026-08-02",
+      "observed_revision": "7",
+      "revalidated_at": "2026-08-02",
+      "supersession": "NOT_SUPERSEDED",
+      "usable_as": "CONTEXT_CANDIDATE",
+      "authority_ceiling": {
+        "current_policy": false,
+        "reproduced_failure": false,
+        "deterministic_fact": false,
+        "task_state_change": false
+      }
+    },
+    {
+      "schema": "dtcr/semantic-freshness-ceiling/v1",
+      "ceiling_id": "DTCR-FC-009",
+      "document_ref": "DTCR-DOC-009",
+      "observed_at": "2026-05-30",
+      "observed_revision": "1",
+      "revalidated_at": "NEVER_REVALIDATED",
+      "supersession": "NOT_SUPERSEDED",
+      "usable_as": "CONTEXT_CANDIDATE",
+      "authority_ceiling": {
+        "current_policy": false,
+        "reproduced_failure": false,
+        "deterministic_fact": false,
+        "task_state_change": false
+      }
+    }
+  ],
+  "private_carrier_digest_source": {
+    "DTCR-DOC-006": "private-carrier record: registered by digest and back reference only"
+  }
+}

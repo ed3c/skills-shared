@@ -1,0 +1,6 @@
+# The selftest builds its two disposable repositories in a temporary directory
+# under this one, so a run that is killed between mkdir and cleanup leaves a
+# checkout behind -- with its own .git inside a repository, which `git add -A`
+# would stage. The cleanup is a context manager and normally runs; this is for
+# the run that never gets there.
+.r2-scratch-*/

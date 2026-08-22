@@ -1,0 +1,66 @@
+{
+  "schema": "dtcr/scip-normalization-rule/v1",
+  "rule_id": "scip-symbol-grammar",
+  "title": "How a SCIP symbol string is read, and what reading it does not make it",
+  "why": "A SCIP symbol string is a provider identifier. It is unique inside one index produced by one indexer at one package name and version, and it is not a universal identity for the node it points at: this index alone gives the module client.py two different strings, `dtcr-scip-fixture 1 client/__init__:` where it is defined and the same descriptor under a different package prefix where it is imported. Reading such a string as a cross-provider node id merges two nodes that were never compared. This file is the mediating rule the frozen symbol-fact schema demands beside every identifier, and its sha256 over the canonical form below is the scheme_digest each emitted identity carries. Change any mapping here and every identity emitted afterwards is under a different scheme, which is the point: the mapping is part of the identity, not a comment about it.",
+  "grammar": {
+    "source": "sourcegraph/scip scip.proto, the Symbol message's documented string syntax",
+    "revision": "v0.5.2",
+    "descriptor_suffixes": {
+      "/": "Namespace",
+      "#": "Type",
+      ".": "Term",
+      ":": "Meta",
+      "!": "Macro",
+      "().": "Method",
+      "(name)": "Parameter",
+      "[name]": "TypeParameter"
+    },
+    "local_symbol_form": "local <simple-identifier>, scoped to one document and addressable from nowhere else",
+    "space_escape": "a single space separates scheme, manager, package name and version; a double space is one literal space inside a token",
+    "name_escape": "a name wrapped in backticks may hold any UTF-8; a doubled backtick is one literal backtick"
+  },
+  "symbol_kind_from_last_descriptor": {
+    "Type": "TYPE",
+    "Method": "METHOD_IF_ENCLOSED_BY_TYPE_ELSE_FUNCTION",
+    "Term": "FIELD",
+    "Namespace": "MODULE",
+    "Meta": "MODULE",
+    "Macro": "OTHER",
+    "Parameter": "OTHER",
+    "TypeParameter": "OTHER",
+    "None": "OTHER"
+  },
+  "occurrence_roles_from_symbol_roles_bitset": {
+    "1": "DEFINITION",
+    "2": "IMPORT",
+    "4": "WRITE_ACCESS",
+    "8": "READ_ACCESS",
+    "16": "UNMAPPED_Generated",
+    "32": "UNMAPPED_Test",
+    "64": "UNMAPPED_ForwardDefinition",
+    "no_definition_bit_adds": "REFERENCE"
+  },
+  "resolution_classes": {
+    "PROJECT_DEFINED": "a SymbolInformation for this symbol exists in some document of this index",
+    "EXTERNAL_DECLARED": "no document defines it, but Index.external_symbols declares it",
+    "DOCUMENT_LOCAL": "a local <id> symbol, addressable only inside its own document",
+    "UNRESOLVED_IN_INDEX": "an occurrence names a symbol that neither a document nor external_symbols declares; the indexer saw the reference and did not carry its definition into this index"
+  },
+  "relationship_kind_from_occurrence": {
+    "DEFINITION": "DEFINES",
+    "IMPORT": "IMPORTS",
+    "REFERENCE": "REFERENCES",
+    "CALLS": "NEVER_DERIVED_FROM_AN_OCCURRENCE",
+    "why_calls_is_absent": "A SCIP occurrence records that a symbol appears at a range and, through symbol_roles, whether the appearance defines, imports, reads or writes it. None of those bits says a call happened: in this subject the identifier Client at pricing.py line 35 is a type annotation and the identifier format_total at line 40 is a call, and the index gives them the same read-access role. An importer that labelled either one CALLS would be reporting its own guess as the indexer's finding. CALLS is emitted only from a relationship the indexer itself resolved and marked, and this indexer emitted none.",
+    "edge_provenance": "OCCURRENCE_ENCLOSING_RANGE_HEURISTIC",
+    "edge_completeness": "PARTIAL_LOWER_BOUND",
+    "why_lower_bound": "The from-end of every edge here is the smallest enclosing_range the indexer attached to a definition occurrence that contains the reference. That attribution misses dynamic dispatch, reflection, callbacks, generated code and every reference the indexer did not resolve, so the edge set is a floor on what exists and never a ceiling."
+  },
+  "establishes": {
+    "universal_identity": false,
+    "cross_provider_equality": false,
+    "complete_call_graph": false,
+    "semantic_truth": false
+  }
+}

@@ -87,8 +87,9 @@ spelling.
 ```text
 ROLE: DTCR Contract Compiler.
 Write each architecture invariant out in full; an invariant referred to only
-by identifier is a rule nobody can disagree with. Compile or amend the 24
-frozen schemas (8 C0 contract + 16 D1/M1 interface) so that every refusal is a
+by identifier is a rule nobody can disagree with. Compile or amend the
+frozen schema surface (8 C0 contract + 16 D1/M1 interface + 3 X1 synthesis +
+4 R1 + 2 R2 = 33 at this head) so that every refusal is a
 schema keyword with a replayable control, never advice in prose. A schema
 change that only tightens is a narrowing; one that loosens a refusal control
 needs a written reason and is the rare exception, not the default edit.
