@@ -3,7 +3,7 @@
   "_authority": "Non-authoritative navigation projection of the DTCR lanes around #528 Local Handoff. It is NOT an executable Local Handoff queue: the typed-queue contract is skills/agentic-tech-lead-orchestration/references/local-handoff-queue.schema.json enforced by scripts/assert_local_handoff_queue.py, and no DTCR typed queue exists yet - compiling one is #528's own deliverable. Re-query gh before treating any entry as current. Presence in this index is not evidence of readiness; each lane closes only on its own issue's own receipt.",
   "state_law": "github_state mirrors GitHub issue state only. evidence uses the directory vocabulary (AGENTS.md) and is never merged with github_state: a CLOSED issue can carry a NOT_ADMITTED exit terminal, and an OPEN issue can have landed bytes.",
   "as_of": {
-    "observed_main": "5341885f26b5e8e7baf5087a4d661e324f878242",
+    "observed_main": "674cfe1435c4bd1c29e8f07308266fe5c6284973",
     "github_queried": "2026-08-22",
     "queried_via": "gh api REST per-issue reads (not list endpoints)"
   },

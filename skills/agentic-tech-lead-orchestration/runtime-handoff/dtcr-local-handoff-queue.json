@@ -2,8 +2,8 @@
   "schema_version": "agentic-tech-lead/local-handoff-queue/v1",
   "subject": {
     "repository": "ed3c/skills-shared",
-    "commit": "befd5424746b5477b3ef2b6f02cfd5e32f57e497",
-    "tree": "ad3837c6bbe2bdff93d224005022168c60c8d08f",
+    "commit": "8c9d8cae63c0d63d14077e568331cb8f95a993dc",
+    "tree": "93b2fbe6a08c0d2a9970615b568486415917edc9",
     "rollback_commit": "674cfe1435c4bd1c29e8f07308266fe5c6284973"
   },
   "authority": {
@@ -36,7 +36,7 @@
       "state": "ACTIVE",
       "entry": {
         "predecessor": null,
-        "required_subject_commit": "befd5424746b5477b3ef2b6f02cfd5e32f57e497",
+        "required_subject_commit": "8c9d8cae63c0d63d14077e568331cb8f95a993dc",
         "required_capabilities": [
           "human-owner-terminal",
           "registry-json-write-authority",
@@ -81,7 +81,7 @@
       "state": "BLOCKED_BY_PREDECESSOR",
       "entry": {
         "predecessor": "dtcr-registry-admission",
-        "required_subject_commit": "befd5424746b5477b3ef2b6f02cfd5e32f57e497",
+        "required_subject_commit": "8c9d8cae63c0d63d14077e568331cb8f95a993dc",
         "required_capabilities": [
           "fresh-context-session-distinct-from-every-builder-lane",
           "read-only-enforcement-stronger-than-prompt-only-or-declared-ceiling",
@@ -128,7 +128,7 @@
       "state": "BLOCKED_BY_PREDECESSOR",
       "entry": {
         "predecessor": "dtcr-independent-shadow",
-        "required_subject_commit": "befd5424746b5477b3ef2b6f02cfd5e32f57e497",
+        "required_subject_commit": "8c9d8cae63c0d63d14077e568331cb8f95a993dc",
         "required_capabilities": [
           "human-admitted-provider-installation",
           "provider-exact-identity-binding-version-and-sha256",
@@ -175,7 +175,7 @@
       "state": "BLOCKED_BY_PREDECESSOR",
       "entry": {
         "predecessor": "dtcr-provider-unblocks",
-        "required_subject_commit": "befd5424746b5477b3ef2b6f02cfd5e32f57e497",
+        "required_subject_commit": "8c9d8cae63c0d63d14077e568331cb8f95a993dc",
         "required_capabilities": [
           "human-admit-for-merge-release-registry",
           "closure-packets-for-landed-lanes",

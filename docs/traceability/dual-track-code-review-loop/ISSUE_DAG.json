@@ -2,7 +2,7 @@
   "schema": "dtcr/issue-dag/v2",
   "_authority": "This file is a readable index of the Issue/PR graph as observed by gh at authoring time. It is not GitHub's live state; re-query gh before treating any status here as current. No status in this file is evidence that a lane landed - each lane closes only on its own issue's own receipt. github_state mirrors GitHub only and is never merged with evidence: a CLOSED issue can carry a NOT_ADMITTED exit terminal.",
   "as_of": {
-    "observed_main": "5341885f26b5e8e7baf5087a4d661e324f878242",
+    "observed_main": "674cfe1435c4bd1c29e8f07308266fe5c6284973",
     "github_queried": "2026-08-22",
     "queried_via": "gh api REST per-issue reads (not list endpoints)"
   },
