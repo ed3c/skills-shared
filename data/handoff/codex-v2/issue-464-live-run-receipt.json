@@ -1,0 +1,38 @@
+{
+  "acceptance_receipt": {
+    "path": "data/handoff/codex-v2/issue-464-live-acceptance-receipt.json",
+    "sha256": "573b77512053ecdcbd934fef40807e5a108bb94b460d17c87514704d9d58ae88"
+  },
+  "carrier": {
+    "bundle_bytes": 1049,
+    "bundle_filename": "codex-v2-issue-464-T1-a01.bundle",
+    "bundle_sha256": "e1ee8bd2db1a0130aac96869a149d2e81a32d6b43122ea02dc1b9ac8cf9eda94",
+    "committed": true
+  },
+  "driven_by": "agent-macro",
+  "driven_on": "claude-code",
+  "evidence_ceiling": "LIVE_EXECUTION_OBSERVED_SHADOW_PENDING",
+  "executor_observation": {
+    "binary_verified_at_readback": true,
+    "codex_binary_path": "/private/tmp/claude-501/-Users-neon-skills-shared/6fabfecc-0194-4b92-9f3e-e1d643e57ffd/scratchpad/codex-v2-464-venv/lib/python3.14/site-packages/codex_cli_bin/bin/codex",
+    "codex_binary_sha256": "19c4f144c5226a9f17c58e6f0fa854843b0f77a6eb420f40e2745a12f10f5d37",
+    "codex_binary_source": "SDK_PINNED_RUNTIME",
+    "sdk_version": "0.147.0",
+    "which_codex_before_run": "/Users/neon/.local/bin/codex"
+  },
+  "failure_state": "NONE",
+  "issue": 464,
+  "lanes": {
+    "controller_readback": "PASS",
+    "live_codex_execution": "PASS",
+    "merge": "NOT_EXERCISED",
+    "shadow_readback": "NOT_EXERCISED"
+  },
+  "schema": "agentic-tech-lead/codex-v2-live-run/v1",
+  "subject": {
+    "queue_subject_commit": "753002d21ef37b3c4f0fffa2c4b36323f342acd7",
+    "receipt_landing_commit": "59c88c5a0666fcae27963caf1c23636499584196",
+    "repo": "ed3c/skills-shared"
+  },
+  "verdict": "PASS"
+}
