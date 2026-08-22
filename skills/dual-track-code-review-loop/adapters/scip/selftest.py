@@ -176,6 +176,14 @@ def lane_replay() -> tuple[dict[str, dict[str, Any]], int, int]:
                     fail(f"{name}: {fact['fact_id']} is an inferred edge recorded as {evidence['completeness']}")
                 if fact["relationship"]["relationship_kind"] == "CALLS":
                     fail(f"{name}: {fact['fact_id']} calls a range-nesting edge a call")
+        # One row per symbol. The de-duplication this asserts fires only for a
+        # symbol declared in more than one document -- a re-export, which this
+        # fixture does not contain -- so the branch itself is NOT_EXERCISED
+        # here. The invariant is checkable either way, and it is the invariant
+        # rather than the branch that downstream depends on.
+        identities = [fact["symbol"]["identity"]["provider_scoped_id"] for fact in emitted["facts"] if fact["fact_kind"] == "SYMBOL"]
+        if len(identities) != len(set(identities)):
+            fail(f"{name}: two SYMBOL rows carry one provider_scoped_id; the symbol count means declarations, not symbols")
         if emitted["index_summary"]["provider_relationships"]:
             fail(f"{name}: the provider emitted relationships this adapter never reads")
         if not emitted["index_summary"]["unresolved_symbols"]:
