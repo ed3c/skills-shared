@@ -26,6 +26,7 @@
         "predecessor": null,
         "required_capabilities": [
           "herdr-runtime",
+          "herdr-provider-publishes-observation-and-process-facts",
           "scratch-home-isolation",
           "managed-agent-target",
           "human-attended-terminal-or-explicit-host-permission",
@@ -46,7 +47,8 @@
           "process_detection_to_terminal_lifecycle_pass",
           "done_candidate_to_controller_acceptance",
           "manual_report_agent_to_clean_terminal_receipt",
-          "permission_denial_to_pass"
+          "permission_denial_to_pass",
+          "blocked_no_sample_or_unavailable_fallback_receipt_to_pass_verdict"
         ],
         "path": "data/handoff/herdr-v2/herdr-lifecycle-receipt.json",
         "required_states": [
@@ -55,7 +57,7 @@
           "NOT_EXERCISED",
           "HUMAN_ADMIT_REQUIRED"
         ],
-        "schema": "agentic-tech-lead/herdr-lifecycle/v1"
+        "schema": "skills/agentic-tech-lead-orchestration/references/contracts/herdr-lifecycle-receipt.schema.json"
       },
       "runtime_lane": {
         "class": "LOCAL_RUNTIME",
