@@ -20,9 +20,9 @@
       "problem_id": "435-evidence-boundary-scope",
       "receipts": [],
       "repo_subject": {
-        "commit": "249abc47847f8295b1c75c9d4c84457c5126fd89",
+        "commit": "674cfe1435c4bd1c29e8f07308266fe5c6284973",
         "repo": "ed3c/skills-shared",
-        "tree": "a24b9b7ace6f4022967d41262ecdc704d5c11646"
+        "tree": "217bf950a57701235f761223e9466b9774aa6194"
       },
       "residual_gaps": [],
       "session_attempts": [],
@@ -50,9 +50,9 @@
       "problem_id": "435-incident-six-commits",
       "receipts": [],
       "repo_subject": {
-        "commit": "249abc47847f8295b1c75c9d4c84457c5126fd89",
+        "commit": "674cfe1435c4bd1c29e8f07308266fe5c6284973",
         "repo": "ed3c/skills-shared",
-        "tree": "a24b9b7ace6f4022967d41262ecdc704d5c11646"
+        "tree": "217bf950a57701235f761223e9466b9774aa6194"
       },
       "residual_gaps": [],
       "session_attempts": [],
@@ -69,12 +69,24 @@
     },
     {
       "applicability": "APPLICABLE",
+      "applicability_rationale": "Shadow O8 binding: the six SHAs filed under evals/commit-roles.json::known_unclassified by commit a2761542ec3b3385e763fbf1122150234fbb20a5 are already-published, immutable connector-placeholder commits on main history -- they cannot be rebuilt, squashed, or rewritten to add Driven-By/Driven-On trailers without rewriting shared main, which runtime-handoff/AGENTS.md's provenance law forbids. That law's 'do not add rewritable commits to known_unclassified' rule targets commits still on a rewritable PR branch that could instead receive proper trailers via rebuild/squash; these six are the opposite case -- non-rewritable, already-merged main-history commits -- so known_unclassified is their correct terminal disposition, not a bypass of the commit-role gate.",
       "claim": "## Required repair\nUse a local/Forgejo/Codex/Claude lane that can author a compliant machine commit. Add exactly these six already-published SHAs to `evals/commit-roles.json::known_unclassified`, with one commit-specific reason each. Do not move `enforced_from`, widen a pattern, rewrite main, or falsely relabel the commits Human.\n\nRun:\n```text\npython3 scripts/check_commit_roles.py --repo-root .\npython3 -m unittest tests/test_commit_roles.py -v\n```\nand the current owning repository workflows on the exact candidate.",
-      "closure": "OPEN",
+      "closure": "IMPLEMENTED_UNVERIFIED",
       "dag_nodes": [
         "github-issue-435"
       ],
-      "implementation_evidence": [],
+      "implementation_evidence": [
+        {
+          "kind": "COMMIT",
+          "repo_subject": {
+            "commit": "674cfe1435c4bd1c29e8f07308266fe5c6284973",
+            "repo": "ed3c/skills-shared",
+            "tree": "217bf950a57701235f761223e9466b9774aa6194"
+          },
+          "status": "CURRENT",
+          "subject": "a2761542ec3b3385e763fbf1122150234fbb20a5"
+        }
+      ],
       "issue_nodes": [
         435
       ],
@@ -82,12 +94,18 @@
       "problem_id": "435-required-repair-classify-commits",
       "receipts": [],
       "repo_subject": {
-        "commit": "249abc47847f8295b1c75c9d4c84457c5126fd89",
+        "commit": "674cfe1435c4bd1c29e8f07308266fe5c6284973",
         "repo": "ed3c/skills-shared",
-        "tree": "a24b9b7ace6f4022967d41262ecdc704d5c11646"
+        "tree": "217bf950a57701235f761223e9466b9774aa6194"
       },
       "residual_gaps": [],
-      "session_attempts": [],
+      "session_attempts": [
+        {
+          "attempt_id": "1",
+          "task_id": "435-repair-classify-commits",
+          "worktree": "local-handoff-queue-audit"
+        }
+      ],
       "shadow_verdict": "NOT_REVIEWED",
       "source": {
         "identity": "ed3c/skills-shared#435",

@@ -31,7 +31,7 @@
           "python3",
           "exact-repository-commit-tree"
         ],
-        "required_subject_commit": "249abc47847f8295b1c75c9d4c84457c5126fd89"
+        "required_subject_commit": "674cfe1435c4bd1c29e8f07308266fe5c6284973"
       },
       "exit": {
         "cleanup_required": false,
@@ -97,9 +97,9 @@
   ],
   "schema_version": "agentic-tech-lead/local-handoff-queue/v1",
   "subject": {
-    "commit": "249abc47847f8295b1c75c9d4c84457c5126fd89",
+    "commit": "674cfe1435c4bd1c29e8f07308266fe5c6284973",
     "repository": "ed3c/skills-shared",
-    "rollback_commit": "d5993267e03b217dcdab9702dab0400ab03df860",
-    "tree": "a24b9b7ace6f4022967d41262ecdc704d5c11646"
+    "rollback_commit": "5341885f26b5e8e7baf5087a4d661e324f878242",
+    "tree": "217bf950a57701235f761223e9466b9774aa6194"
   }
 }

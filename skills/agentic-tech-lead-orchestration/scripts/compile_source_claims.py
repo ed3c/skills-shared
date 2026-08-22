@@ -13,9 +13,10 @@ GITHUB_REF=re.compile(r"^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+#[1-9][0-9]*$")
 SHA256_ID=re.compile(r"^sha256:[0-9a-f]{64}$")
 WORKTREE=re.compile(r"^[A-Za-z0-9_.:@-]+$")
 CLAIM_REQUIRED={"problem_id","kind","identity","location","claim","applicability","task_nodes","dag_nodes","issue_nodes"}
-CLAIM_OPTIONAL={"claim_sha256","applicability_rationale","superseded_by","requires_human","session_attempts","implementation_evidence"}
+CLAIM_OPTIONAL={"claim_sha256","applicability_rationale","superseded_by","requires_human","session_attempts","implementation_evidence","shadow_review"}
 IMPL_KINDS={"COMMIT","PR","MERGE_SUBJECT","SOURCE_DIFF","GENERATED_ARTIFACT"}
 IMPL_STATUS={"CURRENT","HISTORICAL","SUPERSEDED"}
+SHADOW_REVIEW_FIELDS={"repo_subject","reviewer_task_id","reviewer_attempt_id"}
 class ContractError(ValueError): pass
 
 def _canonical(v:Any)->bytes:return json.dumps(v,ensure_ascii=False,sort_keys=True,separators=(",",":")).encode("utf-8")
@@ -72,6 +73,22 @@ def _impls(v:Any,current:dict[str,str])->list[dict[str,Any]]:
         if k in seen:raise ContractError("duplicate implementation evidence")
         seen.add(k);out.append({"kind":r["kind"],"subject":r["subject"],"repo_subject":rs,"status":r["status"]})
     return out
+def _shadow_review(v:Any,current:dict[str,str],attempt_keys:set[tuple[str,str]])->dict[str,Any]|None:
+    # Mirrors check_problem_closure.py's shadow_review binding (same-subject + reviewer
+    # independent of every implementer attempt). Note: compile_claims() always emits
+    # shadow_verdict="NOT_REVIEWED" below, so the checker's "required when verdict is not
+    # NOT_REVIEWED" gate can never fire through this path -- a hand-authored ledger is
+    # where shadow_review actually becomes load-bearing. This still validates shape/
+    # subject/independence unconditionally whenever a caller supplies shadow_review, so a
+    # source-claims.json can carry a pre-validated review through compilation.
+    if v is None:return None
+    if not isinstance(v,dict) or set(v)!=SHADOW_REVIEW_FIELDS:raise ContractError("shadow_review fields invalid")
+    rs=_subject(v["repo_subject"])
+    if rs!=current:raise ContractError("shadow_review is stale for current repo subject")
+    if not _nonempty(v["reviewer_task_id"]) or not _nonempty(v["reviewer_attempt_id"]):raise ContractError("shadow_review reviewer identity required")
+    key=(v["reviewer_task_id"],v["reviewer_attempt_id"])
+    if key in attempt_keys:raise ContractError("shadow_review reviewer attempt is not independent of implementer attempts")
+    return {"repo_subject":rs,"reviewer_task_id":v["reviewer_task_id"],"reviewer_attempt_id":v["reviewer_attempt_id"]}
 
 def compile_claims(data:dict[str,Any])->dict[str,Any]:
     if not isinstance(data,dict) or set(data)!={"schema_version","repo_subject","claims"} or data["schema_version"]!=1:raise ContractError("input fields/schema invalid")
@@ -100,12 +117,14 @@ def compile_claims(data:dict[str,Any])->dict[str,Any]:
         if app=="SUPERSEDED" and not _nonempty(raw.get("superseded_by")):raise ContractError("SUPERSEDED requires target")
         attempts=_attempts(raw.get("session_attempts")); impls=_impls(raw.get("implementation_evidence"),subject)
         if any(x["status"]=="CURRENT" for x in impls) and not attempts:raise ContractError("current implementation evidence requires session lineage")
-        normalized.append((raw,digest,tasks,dags,issues,attempts,impls))
+        attempt_keys={(a["task_id"],a["attempt_id"]) for a in attempts}
+        shadow_review=_shadow_review(raw.get("shadow_review"),subject,attempt_keys)
+        normalized.append((raw,digest,tasks,dags,issues,attempts,impls,shadow_review))
     idset=set(ids)
     for raw,*_ in normalized:
         if raw["applicability"]=="SUPERSEDED" and raw["superseded_by"] not in idset:raise ContractError("SUPERSEDED target absent from denominator")
     manifest=[];problems=[]
-    for raw,digest,tasks,dags,issues,attempts,impls in normalized:
+    for raw,digest,tasks,dags,issues,attempts,impls,shadow_review in normalized:
         manifest.append({"problem_id":raw["problem_id"],"kind":raw["kind"],"identity":raw["identity"],"location":raw["location"],"claim_sha256":digest})
         current=any(x["status"]=="CURRENT" for x in impls)
         if raw["applicability"]=="NOT_APPLICABLE":closure="NOT_APPLICABLE"
@@ -114,6 +133,7 @@ def compile_claims(data:dict[str,Any])->dict[str,Any]:
         elif current:closure="IMPLEMENTED_UNVERIFIED"
         else:closure="OPEN"
         p={"problem_id":raw["problem_id"],"source":{"kind":raw["kind"],"identity":raw["identity"],"location":raw["location"]},"claim":raw["claim"],"applicability":raw["applicability"],"repo_subject":dict(subject),"task_nodes":tasks,"dag_nodes":dags,"issue_nodes":issues,"session_attempts":attempts,"implementation_evidence":impls,"verification_evidence":[],"receipts":[],"merge_subjects":[],"shadow_verdict":"NOT_REVIEWED","residual_gaps":[],"closure":closure}
+        if shadow_review is not None:p["shadow_review"]=shadow_review
         for f in("applicability_rationale","superseded_by","requires_human"):
             if f in raw:p[f]=raw[f]
         problems.append(p)
