@@ -932,6 +932,13 @@ def emit_facts(
     facts.sort(key=lambda f: f["fact_id"])
 
     unresolved = sorted(referenced - defined)
+    # The provider, not the run. The index digest is deliberately NOT in this
+    # material: it moves with the absolute project root scip-python records, so
+    # folding it in gave the same indexer at the same config a different
+    # binding id on every invocation, and a binding that changes when nothing
+    # about the provider changed cannot be compared across hosts -- which is
+    # the only thing a binding id is for. The index digest is recorded where it
+    # belongs, on index_binding and on the run's output_digest.
     provider_binding = binding_id(
         "DTCR-PB",
         canonical(
@@ -940,7 +947,6 @@ def emit_facts(
                 provider["version"],
                 provider["indexer_sha256"],
                 provider["config_digest"],
-                index_binding["index_digest"],
                 SYMBOL_SCHEME_DIGEST,
             ]
         ),
@@ -1096,15 +1102,34 @@ def emit_facts(
 def facts_digest_modulo_subject(facts: list[dict[str, Any]]) -> str:
     """The part of an emission a second host can reproduce.
 
-    The subject commit and the index digest are in every row, and the index
-    digest moves with the absolute project root the indexer recorded, so two
-    honest runs over the same bytes at two checkouts agree on nothing
-    whole-record. Stripping both leaves what the indexer actually determined:
-    the same bundle, the same config and the same sources produce this digest
-    anywhere."""
+    Four things are stripped, each because it moves for a reason that is not a
+    disagreement about the code:
+
+        subject, indexed_commit   the same sources sit at different commits in
+                                  two checkouts.
+        index_digest              `Index.metadata.project_root` is an absolute
+                                  `file://` URL of the directory the indexer
+                                  ran in, so the index bytes differ between two
+                                  honest runs over identical sources.
+        output_digest             covers the row including the above.
+        warnings                  this adapter's own narration of how the pass
+                                  was reached -- live, or replayed from a
+                                  recorded index. Leaving it in would make the
+                                  two modes disagree by construction and would
+                                  have made this digest measure the sentence
+                                  rather than the index.
+
+    What is left is what the indexer determined: the same provider at the same
+    config over the same bytes produces this digest anywhere, in either mode.
+    The omissions stay in, because they are measured off the decoded index and
+    a run that omitted more is a run that determined less."""
     stripped = []
     for fact in facts:
-        copied = {key: value for key, value in fact.items() if key not in ("subject", "output_digest")}
+        copied = {
+            key: value
+            for key, value in fact.items()
+            if key not in ("subject", "output_digest", "warnings")
+        }
         binding = dict(copied["index_binding"])
         binding.pop("index_digest", None)
         binding.pop("indexed_commit", None)
@@ -1367,6 +1392,10 @@ def write_live_receipt(
         },
         "coverage": bundle["coverage_ceiling"]["analysed"],
         "completeness": bundle["coverage_ceiling"]["completeness"],
+        # Carried verbatim rather than referenced. A receipt read on its own is
+        # the document somebody quotes as "SCIP passed", and the two sentences
+        # that bound what passed have to travel in the same file as the number.
+        "coverage_ceiling_omissions": bundle["coverage_ceiling"]["omissions"],
         "exit_codes": {"index": provider["exit_code"]},
         "establishes": {
             "complete_call_graph": False,

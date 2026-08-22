@@ -1,0 +1,40 @@
+{
+  "documents": {
+    "dtcr_fixture/__init__.py": {
+      "blob": "29b7e14504712e65d71e232cd6469e1d0d6989fc",
+      "source": "../python-package/dtcr_fixture/__init__.py"
+    },
+    "dtcr_fixture/core.py": {
+      "blob": "ec463333745b892f09d80eab8a8af4ee0f0d5827",
+      "source": "../python-package/dtcr_fixture/core.py"
+    },
+    "dtcr_fixture/dynamic.py": {
+      "blob": "edf70e5e468ce0f4b72eef13d6af63d7049227ac",
+      "source": "../python-package/dtcr_fixture/dynamic.py"
+    },
+    "dtcr_fixture/entry.py": {
+      "blob": "eb52b01e09fe22fd2adb66f5ea801f75141985b5",
+      "source": "../python-package/dtcr_fixture/entry.py"
+    }
+  },
+  "index": "index.scip",
+  "omissions": [],
+  "project_root_prefix": "skills/dual-track-code-review-loop/adapters/scip/fixtures/python-package",
+  "provider": {
+    "config_digest": "da08a739a25bb030283e0b34aa6221e20f778bb00ec3bc1deac45defb033f578",
+    "exit_code": 0,
+    "index_sha256": "78aa6a526b09fe5b0d90c6697db48bce6c2e8c1161c8c5623e7483a4e59a34a6",
+    "indexed_commit": "d31cb65afb1f7c66ee2e79b8f7ebbe1299a9c9aa",
+    "indexer_sha256": "e6f13b391f513f843e87e082e36a99e51064ed0dcfa1a384cf1c412ad2a38cf3",
+    "version": "0.6.6"
+  },
+  "schema": "dtcr/scip-run-request/v1",
+  "subject": {
+    "commit": "d31cb65afb1f7c66ee2e79b8f7ebbe1299a9c9aa",
+    "repository_binding_id": "DTCR-RB-3749864dfe3e2f36",
+    "tree": "26678d187e1816d5522d0e496e66301980352be7"
+  },
+  "warnings": [
+    "recorded-index replay: the indexer did not run in this pass; these are the bytes a real scip-python run wrote against the subject commit named above, and the absolute project_root inside them is the recording host's scratch directory, excluded from every digest this adapter compares across hosts"
+  ]
+}
