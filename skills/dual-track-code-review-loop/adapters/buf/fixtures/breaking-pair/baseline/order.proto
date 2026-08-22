@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+package dtcr.fixtures.order.v1;
+
+message Order {
+  string id = 1;
+  string currency = 2;
+}

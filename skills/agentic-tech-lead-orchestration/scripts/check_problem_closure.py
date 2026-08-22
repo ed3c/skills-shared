@@ -31,8 +31,9 @@ SUBJECT_FIELDS={"repo","commit","tree"}
 SESSION_BASE_FIELDS={"task_id","attempt_id","worktree"}
 IMPLEMENTATION_FIELDS={"kind","subject","repo_subject","status"}
 VERIFICATION_FIELDS={"lane","subject","repo_subject"}
+SHADOW_REVIEW_FIELDS={"repo_subject","reviewer_task_id","reviewer_attempt_id"}
 PROBLEM_REQUIRED={"problem_id","source","claim","applicability","repo_subject","task_nodes","dag_nodes","issue_nodes","session_attempts","implementation_evidence","verification_evidence","receipts","merge_subjects","shadow_verdict","residual_gaps","closure"}
-PROBLEM_OPTIONAL={"applicability_rationale","superseded_by","requires_human"}
+PROBLEM_OPTIONAL={"applicability_rationale","superseded_by","requires_human","shadow_review"}
 
 class ContractError(ValueError):
     pass
@@ -164,6 +165,25 @@ def validate_problem(problem:Any,manifest_entry:dict[str,Any])->None:
         if key in attempts:
             raise ContractError(f"{pid}: duplicate task/attempt identity {key}")
         attempts.add(key)
+
+    # Shadow O8: shadow_verdict is a bare enum with no receipt of its own, so any
+    # non-NOT_REVIEWED verdict must carry a shadow_review binding the same exact
+    # repo subject and a reviewer attempt identity distinct from every implementer
+    # attempt -- otherwise "Shadow agreement" degenerates into an unverifiable
+    # hand-written string (the forbidden substitution TECH_LEAD_SHADOW_CLOSURE.md warns against).
+    if problem["shadow_verdict"]!="NOT_REVIEWED":
+        if "shadow_review" not in problem:
+            raise ContractError(f"{pid}: shadow_review required when shadow_verdict is not NOT_REVIEWED")
+        review=problem["shadow_review"]
+        _exact_fields(review,SHADOW_REVIEW_FIELDS,f"{pid}.shadow_review")
+        review_subject=_validate_subject(review["repo_subject"],f"{pid}.shadow_review.repo_subject")
+        if review_subject!=current_subject:
+            raise ContractError(f"{pid}: shadow_review is stale for current repo subject")
+        if not _nonempty(review["reviewer_task_id"]) or not _nonempty(review["reviewer_attempt_id"]):
+            raise ContractError(f"{pid}: shadow_review reviewer identity required")
+        reviewer_key=(review["reviewer_task_id"],review["reviewer_attempt_id"])
+        if reviewer_key in attempts:
+            raise ContractError(f"{pid}: shadow_review reviewer attempt is not independent of implementer attempts")
 
     merge_keys=set()
     for i,subject in enumerate(problem["merge_subjects"]):

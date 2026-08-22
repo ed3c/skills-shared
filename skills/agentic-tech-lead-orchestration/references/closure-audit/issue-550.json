@@ -1,0 +1,84 @@
+{
+ "schema_version": "agentic-tech-lead/issue-closure-contract/v1",
+ "issue": {
+  "repository": "ed3c/skills-shared",
+  "number": 550,
+  "github_state": "CLOSED",
+  "github_state_reason": "COMPLETED"
+ },
+ "disposition": "SCOPE_TRANSFERRED",
+ "acceptance": [
+  {
+   "id": "semantic-context-port-with-reference-backend",
+   "status": "SATISFIED",
+   "successor": null,
+   "rationale": "adapters/semantic-context/ landed at merge 8972c788eb7a01d2818cd4d448db6a34a2886719: SemanticContextPort plus a deterministic zero-network reference backend consuming the eight frozen semantic schemas; 90 cases green in the suite-wired selftest"
+  },
+  {
+   "id": "back-references-consumed-rows-freshness-authority",
+   "status": "SATISFIED",
+   "successor": null,
+   "rationale": "every result carries exact source back-references and a consumed-row manifest reconciled both directions; unknown freshness is refused, never silently current; retrieval stays structurally non-authoritative via schema consts"
+  },
+  {
+   "id": "rebuild-delete-observational-only",
+   "status": "SATISFIED",
+   "successor": null,
+   "rationale": "rebuild/delete are storage operations digested before and after; the admission mapping is held behind an immutable view and any mutation attempt is refused"
+  },
+  {
+   "id": "required-falsifiers-planted-and-red",
+   "status": "SATISFIED",
+   "successor": null,
+   "rationale": "all twelve required falsifiers planted among 41 planted falsifiers, each refused by the mechanism it names"
+  },
+  {
+   "id": "optional-lancedb-lane",
+   "status": "SATISFIED",
+   "successor": null,
+   "rationale": "typed NOT_EXERCISED receipt (receipts/lancedb-lane.json, PROVIDER_ABSENT) rather than a faked run; the port boundary is proven by the reference backend"
+  },
+  {
+   "id": "exact-head-hosted-gates-on-draft-pr",
+   "status": "TRANSFERRED",
+   "successor": "ed3c/skills-shared#521",
+   "rationale": "per the Human-admitted 2026-08-22 delivery mode hosted gates run once on the final consolidated push head; per-lane Draft-PR clause superseded by the issue's reconciliation section"
+  },
+  {
+   "id": "aggregate-route-wiring",
+   "status": "TRANSFERRED",
+   "successor": "ed3c/skills-shared#521",
+   "rationale": "#521 convergence owns wiring the adapter into aggregate routes; this lane is not the #521 program terminal"
+  }
+ ],
+ "implementation": {
+  "candidate_prs": [],
+  "landing": {
+   "repository": "ed3c/skills-shared",
+   "commit": "8972c788eb7a01d2818cd4d448db6a34a2886719",
+   "tree": "edfe2908c3bfbf5c8e5c3d3156419b09260256f7",
+   "note": "no PR: Human-admitted 2026-08-22 single-push wave; local convergence merge, one push to main"
+  }
+ },
+ "residual": [
+  {
+   "id": "live-organizational-retrieval-quality",
+   "state": "NOT_EXERCISED",
+   "owner": "ed3c/skills-shared#368"
+  },
+  {
+   "id": "aggregate-route-wiring",
+   "state": "NOT_IMPLEMENTED",
+   "owner": "ed3c/skills-shared#521"
+  },
+  {
+   "id": "independent-shadow-review",
+   "state": "NOT_EXERCISED",
+   "owner": "ed3c/skills-shared#525"
+  }
+ ],
+ "evidence_ceiling": "DETERMINISTIC",
+ "shadow_review": {
+  "verdict": "HUMAN_ADMIT_REQUIRED"
+ }
+}

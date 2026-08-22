@@ -150,7 +150,7 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--root",
-        default=str(Path(__file__).resolve().parent.parent),
+        default=None,
         help="repository to audit; defaults to the checkout owning this script, never the caller's cwd",
     )
     parser.add_argument("--manifest", default="evals/skill-core-boundaries.json")
@@ -158,10 +158,15 @@ def main() -> int:
     parser.add_argument("--selftest", action="store_true")
     args = parser.parse_args()
 
-    root = Path(args.root).resolve()
-    if not (root / "AGENTS.md").is_file():
-        print(f"SKILL-CORE-RED subject root {root} does not contain AGENTS.md")
-        return 2
+    if args.root is None:
+        # Only the silent default carries the wrong-subject risk; an explicit
+        # --root (e.g. a hermetic reconstruction arm) is the caller's choice.
+        root = Path(__file__).resolve().parent.parent
+        if not (root / "AGENTS.md").is_file():
+            print(f"SKILL-CORE-RED default subject root {root} does not contain AGENTS.md")
+            return 2
+    else:
+        root = Path(args.root).resolve()
     manifest = load_manifest(root, Path(args.manifest))
     errors = run(root, manifest, args.skill)
     if args.selftest and not errors:

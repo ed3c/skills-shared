@@ -1,0 +1,18 @@
+{
+  "base_evidence_commit": "076c6bcf65160987c40456a30c34b5d7d4c9f55e",
+  "base_ref": "refs/evidence/codex-v2/issue-464-T1-a01/base",
+  "base_sha": "5af72fb3a2fc073d2b36da5dbbc2cb9b12c8a842",
+  "base_tree_sha": "eaefc42d34dcf917e420121a38d5eef12de70b4c",
+  "bundle_bytes": 1049,
+  "bundle_filename": "codex-v2-issue-464-T1-a01.bundle",
+  "bundle_sha256": "e1ee8bd2db1a0130aac96869a149d2e81a32d6b43122ea02dc1b9ac8cf9eda94",
+  "carrier_id": "issue-464-T1-a01",
+  "carrier_kind": "GIT_BUNDLE_V2",
+  "changed_paths": [
+    "src/calc.py"
+  ],
+  "repo": "ed3c/live-464-calc",
+  "result_evidence_commit": "6f75427c55f95c0f6bce41c8877b1975566958b4",
+  "result_ref": "refs/evidence/codex-v2/issue-464-T1-a01/result",
+  "result_tree_sha": "63bf10e25799b23efea342853bff8f2320cbe47d"
+}

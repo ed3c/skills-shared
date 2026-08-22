@@ -53,12 +53,12 @@ main@4ca9417b1da5ff32f1d4d3e7af64a15908749024
 |---|---|---|---|---|---|
 | Codex SDK controller/session | `#375 / #451` | `SIBLING / CLOSED_UNMERGED / CONSUMED` by #379 / PR #455 | `86f9e8d940b76cb71b713c098ff09cb68eb4e0c1` | exact worktree HEAD/tree/clean preflight + post-turn path-lease readback; selftest `4/14` | live SDK `NOT_EXERCISED`; independent source/diff/test acceptance still required |
 | GitHub Issue DAG projection | `#376 / #452` | `SIBLING / CLOSED_UNMERGED / CONSUMED` by #379 / PR #455 | `426fb6f6f548f71572d4402e73e0b05ecf6f8aa8` | completion-edge projection + repo/default-branch/visibility + issue-state + closing-PR-reference preflight; selftest `6/17` | live mutation/readback `NOT_EXERCISED`; generic development-link ownership beyond closing refs residual |
-| Herdr observer | `#377 / #456` | `SIBLING / CLOSED_UNMERGED / CONSUMED` by #379 / PR #455 | `6a2ebcbe87078cecaf67f82f3c9c10643bcc9123` | exact Git/worktree/process/session identity + PID-start/freshness/liveness + cleanup/residue; selftest `4/18` | live Herdr `NOT_EXERCISED`; `DONE_CANDIDATE` remains advisory |
-| Problem closure | `#378 / #457` | `SIBLING / CLOSED_UNMERGED / CONSUMED` by #379 / PR #455 | `ac5ddc0287eb4e4156a7c7eef178b7be8bbd1d34` | frozen denominator/source manifest + exact repo/evidence subjects + supersession validation; selftest `6/22` | real source/provider closure `EVIDENCE_DEPENDENT` |
+| Herdr observer | `#377 / #456` | `SIBLING / CLOSED_UNMERGED / CONSUMED` by #379 / PR #455 | `6a2ebcbe87078cecaf67f82f3c9c10643bcc9123` | exact Git/worktree/process/session identity + PID-start/freshness/liveness + cleanup/residue; selftest `4/18` | live Herdr `NOT_EXERCISED`; `DONE_CANDIDATE` remains advisory; the live lane advanced 2026-08-22 (herdr-v3 receipt, Shadow pending — see the herdr Local Handoff queue) |
+| Problem closure | `#378 / #457` → `#467` (method) → `#512` (live) | `HISTORICAL / COMPLETED_STATIC_PARENT` → `SIBLING / OPEN` | `ac5ddc0287eb4e4156a7c7eef178b7be8bbd1d34` | #378 closed COMPLETED_STATIC_PARENT after the #485 ownership reconciliation (admitted via `5e883a25446763af0875cfa1db2e726c77f46098`, "docs(#485): admit Wave-2 to Wave-3 live ownership transfer"); #467 closed COMPLETED as the deterministic compiler/binding method; #512 is the live successor owning real Issue/Article/PDF/PRD evidence execution; selftest `6/22` | real source/provider closure `EVIDENCE_DEPENDENT` (owned by #512, not #378) |
 | Documentation foundation | `#379 refs / #380` | `DOCUMENTATION SIBLING / CLOSED_UNMERGED / CONSUMED` | `7a9d68fcd58b1ed78ed6d05595a8df7eae53f5a5` | original traceability design bytes | navigation only |
 | Shared convergence | `#379 / #455` | `MERGED / HUMAN_ADMITTED` — merge `ca31e0b1e640f0dba2c3d94da9d9786fbed32f2c` | candidate `847e56c3418fce920c42d983e84ee44fdc6e8971` | selected sibling bytes + shared tests/routes/Shadow/Git Town/trace | admission of #455 did not raise any live evidence lane |
 
-The terminal classifications above are the ones recorded in [`AGENTS.md`](AGENTS.md) (Wave-2 control-plane admission block). Consumption through the #455 convergence is not an individual merge of any sibling.
+The terminal classifications above are the ones recorded in [`AGENTS.md`](AGENTS.md) (Wave-2 control-plane admission block), refreshed to the 2026-08-22 readback. Consumption through the #455 convergence is not an individual merge of any sibling.
 
 ### Current dependency integration
 
@@ -205,6 +205,10 @@ Parent programme `#115`; architecture/evidence law remains [`../architecture/CON
 ## Spatial-loop systems engineering
 
 Issue #128 / PR #136 remains an independent terminal leaf for the substrate-bound method. Static/deterministic contracts do not prove privileged root/KVM/cgroup/seccomp/network/hardware/chaos/security execution. Destructive testing, security acceptance, merge, promotion and rollback remain Human/trusted-operator boundaries.
+
+## Dual-track code-review loop (DTCR) line
+
+Parent #517 fans out over C0/D1/M1 contract issues, five adapter lanes, X1 synthesis, R1/R2 refactor protocols, D2 documentation convergence, E1 independent Shadow, B1 bootstrap and the L1 live-canary terminal. The lineage authority is [`dual-track-code-review-loop/`](dual-track-code-review-loop/) (README, `ISSUE_DAG.json`, `LOCAL_HANDOFF_EXECUTION_QUEUE.json`, `SESSION_PROMPTS.md`), with closure packets under `skills/agentic-tech-lead-orchestration/references/closure-audit/`. As of 2026-08-22, nine deterministic suite lanes are committed and CI-routed; #524/#547/#549/#550 closed at their exercised-scope terminals under the Issue Closure Contract; #525/#527/#528 remain open, and every live/real-consumer lane is `NOT_EXERCISED`.
 
 ## Method lineage
 

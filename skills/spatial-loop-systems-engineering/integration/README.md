@@ -8,7 +8,7 @@ This directory is the current zero-context closeout route for the `#407` Intentâ
 program issue           #407
 static implementation   #408 / #409 / #410
 live evidence           #411
-source PR               #412
+source PR               #412 (GitHub `CLOSED`; superseded by #419 per the #560 portfolio wave, commit `c27f8c3` on main â€” see docs/traceability/github-portfolio-control/decisions.json)
 refresh carrier         #513  HISTORICAL / merged only into a temporary branch
 main observed           88ce642a7f198d88019aa8ae19e63631ae4999c2
 integration checkpoint  32c049ca11d741e81023857aaf77b46cddce925e
@@ -16,7 +16,7 @@ integration checkpoint  32c049ca11d741e81023857aaf77b46cddce925e
 
 `#513` exists only to consume current `main` into the #412 candidate without mutating `main`. It is not an implementation atom and must not be counted as feature evidence.
 
-The #412 branch is mutable until final admission. Always re-read its exact head before a decision. The integration checkpoint above proved that current-main bytes and the #407 implementation can coexist; subsequent closeout commits may move the head.
+The #412 branch is no longer an open candidate: GitHub reports `state=CLOSED`, and main commit `c27f8c3` ("merge(#419,#412): land the replayed ICPG bridge carrier (supersedes #412 bytes)") shows its content landed via #419 instead. Re-read #419's/main's exact head before citing this program as live. The integration checkpoint above proved that main-observed-at-`88ce642` bytes and the #407 implementation could coexist at that point; it does not describe current main.
 
 ## Closure State Machine
 

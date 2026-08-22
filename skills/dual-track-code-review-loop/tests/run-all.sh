@@ -28,3 +28,13 @@ python3 "$ROOT/synthesis/selftest.py"
 # every terminal the refactor contracts declare is reachable by compiling a
 # committed request rather than by a test constructing one.
 python3 "$ROOT/refactor/selftest.py"
+
+# 2026-08-22 wave: three more provider adapters (#547 SCIP, #549 Buf, #550
+# semantic-context) and the R2 expand-contract compiler (#524), routed here for
+# the same reason as every lane above — a gate nobody runs reports the same
+# green as one that passes. Each is fixture-deterministic; live lanes bind the
+# probed provider identity or self-report NOT_EXERCISED.
+python3 "$ROOT/adapters/scip/selftest.py"
+python3 "$ROOT/adapters/buf/selftest.py"
+python3 "$ROOT/adapters/semantic-context/selftest.py"
+python3 "$ROOT/expand-contract/selftest.py"

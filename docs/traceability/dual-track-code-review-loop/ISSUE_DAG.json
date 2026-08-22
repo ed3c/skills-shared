@@ -2,9 +2,9 @@
   "schema": "dtcr/issue-dag/v2",
   "_authority": "This file is a readable index of the Issue/PR graph as observed by gh at authoring time. It is not GitHub's live state; re-query gh before treating any status here as current. No status in this file is evidence that a lane landed - each lane closes only on its own issue's own receipt. github_state mirrors GitHub only and is never merged with evidence: a CLOSED issue can carry a NOT_ADMITTED exit terminal.",
   "as_of": {
-    "observed_main": "5341885f26b5e8e7baf5087a4d661e324f878242",
-    "github_queried": "2026-08-22",
-    "queried_via": "gh api REST per-issue reads (not list endpoints)"
+    "observed_main": "674cfe1435c4bd1c29e8f07308266fe5c6284973",
+    "github_queried": "2026-08-22 (re-queried after the 2026-08-22 wave closures)",
+    "queried_via": "gh issue view / gh issue close per-issue (not list endpoints)"
   },
   "parent": {
     "id": 517,
@@ -13,20 +13,20 @@
   },
   "nodes": [
     {"id": 518, "title": "DTCR C0 contract", "role": "C0_CONTRACT", "github_state": "CLOSED", "note": "ADMITTED; receipted in implementation-preflight.json"},
-    {"id": 519, "title": "[DTCR-D1] Implement deterministic syntax, symbol and graph fact-plane contracts", "role": "D1_CONTRACT", "github_state": "OPEN", "note": "16 D1/M1 interface schemas landed (31 total on the DTCR surface); two adapters landed under this contract's capability classes; stays open as convergence owner until #547/#549 resolve or are formally descoped"},
-    {"id": 521, "title": "[DTCR-M1] Implement optional semantic-context and organizational-memory plane", "role": "M1_CONTRACT", "github_state": "OPEN"},
+    {"id": 519, "title": "[DTCR-D1] Implement deterministic syntax, symbol and graph fact-plane contracts", "role": "D1_CONTRACT", "github_state": "OPEN", "note": "16 D1/M1 interface schemas landed (33 total on the DTCR surface); all four deterministic adapters landed under this contract's capability classes (#546/#548 earlier waves, #547/#549 closed 2026-08-22); convergence reconciliation and the hosted exact-head arrival on the wave's push head remain with this owner"},
+    {"id": 521, "title": "[DTCR-M1] Implement optional semantic-context and organizational-memory plane", "role": "M1_CONTRACT", "github_state": "OPEN", "note": "adapter lane #550 landed and closed 2026-08-22; aggregate-route wiring NOT_IMPLEMENTED and stays with this convergence owner"},
     {"id": 522, "title": "[DTCR-X1] Implement dual-track review synthesis and problem-closure compiler", "role": "X1_SYNTHESIS", "github_state": "CLOSED", "note": "landed (synthesis/ plus three schemas, suite-counted) and closed via PR #563; #550's semantic completion path was BLOCKED_ON_PROVIDER at closure - residual in closure packet issue-522.json"},
     {"id": 523, "title": "[DTCR-R1] Implement bounded single-repository architecture refactor protocol", "role": "R1_SINGLE_REPO", "github_state": "CLOSED", "exit_terminal": "DTCR_SINGLE_REPO_REFACTOR_PROTOCOL_READY: NOT_ADMITTED", "note": "closed 2026-08-21; refactor/ plus four contracts landed via PR #571 (feature 5dfdbac); per its own closing comment the committed requests are synthetic and applied_on_real_codebase is contract-pinned false - live-canary residual rides #528; closure packet issue-523.json"},
-    {"id": 524, "title": "[DTCR-R2] Implement cross-repository Expand & Contract refactor protocol", "role": "R2_CROSS_REPO", "github_state": "OPEN", "note": "NOT_IMPLEMENTED; start dependency #522 satisfied"},
-    {"id": 525, "title": "[DTCR-E1] Implement independent Shadow, mutations and evidence-closure denominator", "role": "E1_SHADOW", "github_state": "OPEN", "note": "mechanism landed by sibling lanes; independence lane ABSENT"},
+    {"id": 524, "title": "[DTCR-R2] Implement cross-repository Expand & Contract refactor protocol", "role": "R2_CROSS_REPO", "github_state": "CLOSED", "exit_terminal": "DTCR_CROSS_REPO_EXPAND_CONTRACT_READY: NOT_ADMITTED (protocol_ready pinned false)", "note": "expand-contract/ compiler plus two R2 contracts landed 2026-08-22 over a two-repository fixture (merge 9b59e55f); dual-run NOT_OBSERVED and real-codebase application NOT_EXERCISED transfer to #528; closure packet issue-524.json"},
+    {"id": 525, "title": "[DTCR-E1] Implement independent Shadow, mutations and evidence-closure denominator", "role": "E1_SHADOW", "github_state": "OPEN", "note": "fresh-context E1 audit executed 2026-08-22 on 8d99f2d -> BLOCK, five blockers dispositioned same day (records in shadow-audit/); independence adjudication permanently HUMAN_ADMIT_REQUIRED"},
     {"id": 526, "title": "[DTCR-D2] Converge README, AGENTS, Session prompts, CodexDoc routing and Stack index", "role": "D2_CONVERGENCE", "github_state": "CLOSED", "note": "closed via PR #563; full admission names #525 as completion dependency; closure packet issue-526.json"},
     {"id": 527, "title": "[DTCR-B1] Add immutable thin-binding bootstrap profile for new repositories", "role": "B1_BOOTSTRAP", "github_state": "OPEN", "note": "NOT_IMPLEMENTED; start dependency #526 satisfied; completion dependency #525 per its own comment"},
     {"id": 528, "title": "[DTCR-L1] Execute a real consumer canary and compile Local Handoff / final admission", "role": "L1_LOCAL_HANDOFF", "github_state": "OPEN"},
     {"id": 546, "title": "[DTCR-D1-TS] Implement Tree-sitter syntax/query adapter against the frozen fact interface", "role": "D1_ADAPTER_TREE_SITTER", "github_state": "CLOSED", "note": "landed at 66dfdb42816fb581f3e25b4df164a662dd172795 with a real live receipt"},
-    {"id": 547, "title": "[DTCR-D1-SCIP] Implement SCIP symbol/relationship adapter with explicit coverage ceilings", "role": "D1_ADAPTER_SCIP", "github_state": "OPEN", "note": "NOT_IMPLEMENTED; the Go scip CLI is absent but scip-python 0.6.6 is present, so the python-scope lane is executable (disagrees with the issue's 2026-08-21 BLOCKED_ON_PROVIDER comment, which predates this observation)"},
+    {"id": 547, "title": "[DTCR-D1-SCIP] Implement SCIP symbol/relationship adapter with explicit coverage ceilings", "role": "D1_ADAPTER_SCIP", "github_state": "CLOSED", "exit_terminal": "DTCR_SCIP_ADAPTER_VERIFIED (exercised python scope)", "note": "adapters/scip/ landed 2026-08-22 on a real scip-python 0.6.6 round-trip with live receipt live-ee9afe43.json (merge fc12a345); non-python indexer scopes ride #519; closure packet issue-547.json"},
     {"id": 548, "title": "[DTCR-D1-SQL] Implement SQLite canonical fact/event ledger and bounded blast-radius traversal", "role": "D1_ADAPTER_SQLITE", "github_state": "CLOSED", "note": "landed at 458ea2850038ce83bd4694eb2272c762a1edf90f with planted mutations"},
-    {"id": 549, "title": "[DTCR-D1-BUF] Implement optional Buf/contract compatibility adapter with explicit NOT_APPLICABLE", "role": "D1_ADAPTER_BUF", "github_state": "OPEN", "note": "live/VERIFIED lane BLOCKED_ON_PROVIDER (buf absent); NOT_APPLICABLE lane executable without the provider"},
-    {"id": 550, "title": "[DTCR-M1-C] Implement rebuildable non-authoritative semantic-context adapter", "role": "M1_ADAPTER", "github_state": "OPEN", "note": "NOT_IMPLEMENTED; deterministic KEYWORD lane not provider-blocked (schema anchor: retrieval-query.schema.json lane enum), optional LanceDB lane BLOCKED_ON_PROVIDER (disagrees with the issue's 2026-08-21 flat BLOCKED_ON_PROVIDER comment)"}
+    {"id": 549, "title": "[DTCR-D1-BUF] Implement optional Buf/contract compatibility adapter with explicit NOT_APPLICABLE", "role": "D1_ADAPTER_BUF", "github_state": "CLOSED", "exit_terminal": "DTCR_BUF_ADAPTER_VERIFIED (exact fixture scope) + typed NOT_APPLICABLE lane", "note": "adapters/buf/ landed 2026-08-22 with landing-run buf 1.72.0 outputs committed (merge e1d867f7); live lane self-reports NOT_EXERCISED where buf absent; closure packet issue-549.json"},
+    {"id": 550, "title": "[DTCR-M1-C] Implement rebuildable non-authoritative semantic-context adapter", "role": "M1_ADAPTER", "github_state": "CLOSED", "exit_terminal": "DTCR_SEMANTIC_CONTEXT_ADAPTER_VERIFIED", "note": "adapters/semantic-context/ landed 2026-08-22 with a zero-network reference backend (merge 8972c788); LanceDB lane typed NOT_EXERCISED (PROVIDER_ABSENT receipt); aggregate-route wiring stays with #521, live causal canary with #368; closure packet issue-550.json"}
   ],
   "landed_capability_classes": [
     {
@@ -59,7 +59,7 @@
     {"from": 521, "to": 522, "kind": "START_DEPENDENCY"},
     {"from": 522, "to": 523, "kind": "START_DEPENDENCY"},
     {"from": 522, "to": 524, "kind": "START_DEPENDENCY"},
-    {"from": 519, "to": 525, "kind": "COMPLETION_DEPENDENCY"},
+    {"from": 519, "to": 525, "kind": "START_DEPENDENCY"},
     {"from": 522, "to": 525, "kind": "COMPLETION_DEPENDENCY"},
     {"from": 518, "to": 526, "kind": "START_DEPENDENCY"},
     {"from": 525, "to": 526, "kind": "COMPLETION_DEPENDENCY_FOR_FULL_ADMISSION"},

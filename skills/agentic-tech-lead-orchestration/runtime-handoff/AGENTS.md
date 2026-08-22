@@ -13,6 +13,10 @@ Read this file before executing or modifying any queue in this directory.
 7. for Spatial #407, `../../spatial-loop-systems-engineering/integration/AGENTS.md`, `README.md`, and the Spatial Molecular index;
 8. current issue comments and exact current GitHub/Git/runtime subjects.
 
+## Queue naming law
+
+A queue file in this directory MUST be named `<lane>-local-handoff-queue.json`. The deterministic suite's queue gate globs exactly `runtime-handoff/*-local-handoff-queue.json` (`tests/run-all.sh`), so the suffix is load-bearing: a queue named anything else is silently skipped by every gate, which is how a red queue hides. Do not add a queue under a different name.
+
 ## Subject authority
 
 Queues in this directory do not necessarily share one Git subject. The `subject` object inside the selected queue is the continuation contract for that queue, and current Git/GitHub readback decides whether it is still fresh.

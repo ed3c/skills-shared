@@ -1,0 +1,398 @@
+{
+  "document": "dtcr/e1-shadow-audit-wrapper/v1",
+  "_note": "closure-record.schema.json is additionalProperties:false at its root, so a dtcr/closure-record/v1 instance cannot carry session_identity, dissent or the denominator inventory that the repaired #525 contract requires in the same receipt. Those two requirements are jointly unsatisfiable in one document (finding F-08). This wrapper keeps the closure record schema-valid and holds the sidecars beside it.",
+  "closure_record": {
+    "schema": "dtcr/closure-record/v1",
+    "closure_id": "DTCR-CR-525",
+    "subject_commit": "8d99f2d95f06e18c4725fd506535f39d939fe679",
+    "subject_tree": "4725c00693a146eba3c5084fe3b81f9f9c3967b1",
+    "change_unit_refs": [],
+    "arrivals": [
+      "STATIC",
+      "SANDBOX"
+    ],
+    "lanes": {
+      "deterministic": "FAIL",
+      "semantic": "FAIL",
+      "runtime": "NOT_EXERCISED",
+      "provider": "PASS",
+      "physical": "NOT_APPLICABLE",
+      "private_carrier": "FAIL",
+      "independent_review": "HUMAN_ADMIT_REQUIRED",
+      "legal": "HUMAN_ADMIT_REQUIRED",
+      "user": "NOT_EXERCISED",
+      "paid": "NOT_EXERCISED",
+      "merge": "HUMAN_ADMIT_REQUIRED",
+      "release": "HUMAN_ADMIT_REQUIRED"
+    },
+    "terminal_state": "BLOCKED",
+    "human_owned_operations": [
+      "independent review identity: whether a fresh-context subagent of the wave's own session satisfies the independent Shadow role",
+      "merge and release",
+      "legal, employment and intellectual-property clearance",
+      "registry admission",
+      "provider service-terms clearance (no machine oracle in any environment)",
+      "rewriting or purging the committed history that carries the leaked absolute path"
+    ],
+    "rollback": {
+      "base_commit": "674cfe1435c4bd1c29e8f07308266fe5c6284973"
+    },
+    "authority": {
+      "merge": false,
+      "permission": false,
+      "secret": false,
+      "production": false,
+      "user_value": false,
+      "paid_demand": false,
+      "release": false
+    }
+  },
+  "closure_record_validation": {
+    "validator": "python3 jsonschema 4.26.0 Draft202012Validator",
+    "schema": "skills/dual-track-code-review-loop/references/schemas/closure-record.schema.json",
+    "result": "VALID"
+  },
+  "verdict": {
+    "human_level_token": "BLOCK",
+    "issue_525_equivalent": "BLOCK_PORTABLE_METHOD",
+    "machine_terminal_state": "BLOCKED",
+    "mapping_source": "issue #525 Adversarial audit reconciliation 2026-08-22, repair 5",
+    "named_blockers": [
+      "F-01",
+      "F-02",
+      "F-03",
+      "F-04",
+      "F-05"
+    ],
+    "scope": "BLOCK is on admitting the portable method for registry/bootstrap consideration at this exact head. It is not a statement about merge, release, legal clearance or registry admission, none of which this role can reach."
+  },
+  "session_identity": {
+    "host": "claude-code",
+    "role": "fresh-context subagent commissioned via the Agent tool by the wave's Tech Lead session",
+    "model": "claude-opus-5[1m]",
+    "base_sha": "8d99f2d95f06e18c4725fd506535f39d939fe679",
+    "head_sha": "8d99f2d95f06e18c4725fd506535f39d939fe679",
+    "subject_tree": "4725c00693a146eba3c5084fe3b81f9f9c3967b1",
+    "worktree_path": "/Users/neon/skills-shared/.claude/worktrees/dtcr-queue-tech-lead",
+    "replay_path": "a clean export of 8d99f2d extracted with `git archive | tar -x` outside the repository, plus per-knockout throwaway copies",
+    "dirty_before": "clean (git status --porcelain empty at session start)",
+    "dirty_after": "NOT CLEAN, and not by this session. Four UNTRACKED files appeared under skills/agentic-tech-lead-orchestration/references/closure-audit/ (issue-524/547/549/550.json, mtime 19:12:41-19:13:23), and five TRACKED files acquired uncommitted modifications: docs/traceability/TRACEABILITY_INDEX.md, docs/traceability/dual-track-code-review-loop/{ISSUE_DAG.json,LOCAL_HANDOFF_EXECUTION_QUEUE.json,README.md}, skills/git-town-stacked-pr-worker/molecular-indexes/dual-track-code-review-loop/README.md. Two of those are inside this audit's own denominator. See F-05.",
+    "index_reads_bound_to": "git show 8d99f2d:<path> for every traceability claim. An early working-tree read observed the concurrent writer's in-flight edit and was discarded and re-derived; see F-05.",
+    "no_audited_artifact_authored_by_this_session": true,
+    "writes_performed": "two files under the scratchpad e1-audit/ directory only; zero writes inside the repository",
+    "independence_determination": "HUMAN_ADMIT_REQUIRED",
+    "independence_note": "Per the repaired #525 contract, whether a fresh-context subagent of the wave's own session is 'genuinely independent' is not machine-decidable and is not self-certified here. The falsifier SAME_CONTEXT_SHADOW_PROMOTED_TO_INDEPENDENT is left OPEN for a person: this session shares the parent session's worktree and was dispatched by the actor that built the artifacts, which is the weakest form of the property, and F-05 shows that actor was writing into the same tree while the audit ran."
+  },
+  "audited_denominator": {
+    "suite_commands": [
+      {
+        "command": "sh skills/dual-track-code-review-loop/tests/run-all.sh",
+        "cwd": "audited worktree",
+        "exit": 0,
+        "note": "nine lanes green; live tree-sitter 0.26.3 and live scip-python 0.6.6 exercised on this host"
+      },
+      {
+        "command": "sh skills/dual-track-code-review-loop/tests/run-all.sh",
+        "cwd": "clean export of 8d99f2d (git archive | tar -x, no .git)",
+        "exit": 1,
+        "note": "F-01: adapters/tree-sitter/selftest.py:435 raises an unhandled CalledProcessError"
+      },
+      {
+        "command": "bash skills/shared-skills-infra/tests/run-all.sh",
+        "exit": 0
+      },
+      {
+        "command": "bash skills/agentic-tech-lead-orchestration/tests/run-all.sh",
+        "exit": 0
+      },
+      {
+        "command": "python3 scripts/check_document_routes.py",
+        "exit": 0
+      },
+      {
+        "command": "python3 scripts/check_guard_controls.py",
+        "exit": 0
+      },
+      {
+        "command": "python3 scripts/check_commit_roles.py --repo-root . --range origin/main..HEAD",
+        "exit": 0,
+        "note": "20 commits; origin/main == local main == 674cfe1435c4bd1c29e8f07308266fe5c6284973"
+      },
+      {
+        "command": "python3 skills/agentic-tech-lead-orchestration/scripts/assert_issue_closure_contract.py <packet>",
+        "exit": 0,
+        "packets_committed_at_this_head": [
+          "issue-522.json",
+          "issue-523.json",
+          "issue-526.json"
+        ],
+        "packets_absent_at_this_head": [
+          "issue-524.json",
+          "issue-547.json",
+          "issue-549.json",
+          "issue-550.json"
+        ],
+        "note": "F-03: the glob issue-52*.json resolves to exactly three committed packets at 8d99f2d. issue-547.json also validated exit 0 but was read from an untracked in-flight file written during this audit, so its green is not evidence about the audited commit."
+      }
+    ],
+    "clean_export_per_lane": {
+      "tree-sitter": {
+        "exit": 1,
+        "state": "CRASH (unhandled CalledProcessError, no typed absence)"
+      },
+      "sqlite-ledger": {
+        "exit": 0,
+        "state": "GREEN"
+      },
+      "scip": {
+        "exit": 0,
+        "state": "GREEN, live=NOT_EXERCISED (no checkout) \u2014 the typed absence tree-sitter lacks"
+      },
+      "buf": {
+        "exit": 0,
+        "state": "GREEN, live=NOT_EXERCISED"
+      },
+      "semantic-context": {
+        "exit": 0,
+        "state": "GREEN, lancedb=NOT_EXERCISED"
+      },
+      "synthesis": {
+        "exit": 0,
+        "state": "GREEN"
+      },
+      "refactor": {
+        "exit": 0,
+        "state": "GREEN"
+      },
+      "expand-contract": {
+        "exit": 0,
+        "state": "GREEN"
+      },
+      "c0-contract": {
+        "exit": 0,
+        "state": "GREEN"
+      }
+    },
+    "positive_fixture_classes": {
+      "syntax": {
+        "score": "PASS",
+        "fixture": "adapters/tree-sitter/fixtures/{python-clean,python-parse-errors} + selftest.py (live receipt live-ac62c87f.json)"
+      },
+      "symbol": {
+        "score": "PASS",
+        "fixture": "adapters/scip/fixtures/python-subject + selftest.py (live receipt live-ee9afe43.json, scip-python 0.6.6)",
+        "note": "re-scored from NOT_APPLICABLE_NO_SUBJECT (#547): the subject landed after the #525 body was written"
+      },
+      "graph": {
+        "score": "PASS",
+        "fixture": "adapters/sqlite-ledger/fixtures/{core,cyclic}-observations.json + selftest.py"
+      },
+      "context": {
+        "score": "PASS_WITH_CEILING",
+        "fixture": "adapters/semantic-context/fixtures/public-context-store.json + selftest.py",
+        "ceiling": "F-02: falsifier identity is not verified by this lane; LanceDB provider NOT_EXERCISED",
+        "note": "re-scored from NOT_APPLICABLE_NO_SUBJECT (#550)"
+      },
+      "review": {
+        "score": "PASS",
+        "fixture": "synthesis/fixtures/*.compiled.json + selftest.py"
+      },
+      "refactor": {
+        "score": "PASS",
+        "fixture": "refactor/fixtures/*.compiled.json + selftest.py",
+        "ceiling": "every request is self-declared synthetic; applied_on_real_codebase pinned false"
+      },
+      "expand-contract": {
+        "score": "PASS_WITH_CEILING",
+        "fixture": "expand-contract/fixtures/ + two-repository git fixture",
+        "ceiling": "dual_run_observation=NOT_OBSERVED, live_canary=NOT_EXERCISED, contraction_authorization=HUMAN_ADMIT_REQUIRED",
+        "note": "re-scored from NOT_APPLICABLE_NO_SUBJECT (#524)"
+      },
+      "closure": {
+        "score": "PASS",
+        "fixture": "synthesis/fixtures/closure-request.compiled.json + problem-closure-row schema"
+      }
+    },
+    "hollow_controls_per_adapter": {
+      "tree-sitter": {
+        "present": true,
+        "control": "EMPTY_QUERY_REPORTED_AS_EXERCISED (selftest.py:269-279): every query pattern removed, provider still runs, lane must not read EXERCISED",
+        "committed_fixture": false
+      },
+      "sqlite-ledger": {
+        "present": true,
+        "control": "SEED_NOT_IN_LEDGER (selftest.py:518) 'an absent seed is not an empty blast radius'",
+        "committed_fixture": false
+      },
+      "scip": {
+        "present": "PARTIAL",
+        "control": "PARTIAL_COVERAGE_PROMOTED_TO_COMPLETE / UNRESOLVED_SYMBOL_OMITTED_FROM_DENOMINATOR guards + selftest.py:136 vacuous-denominator guard",
+        "committed_fixture": false,
+        "gap": "no committed input on which the indexer exits 0 and the lane still refuses PASS"
+      },
+      "buf": {
+        "present": true,
+        "control": "NO_PROTOBUF_TASK_FORCED_TO_PASS_INSTEAD_OF_NOT_APPLICABLE + fixtures/not-applicable/ + a mechanised red proof that disables the guard and observes the false pass appear",
+        "committed_fixture": true,
+        "note": "the strongest hollow control in the tree"
+      },
+      "semantic-context": {
+        "present": true,
+        "control": "AN_INDEX_WITH_NO_PROJECTIONS_IS_NOT_AN_INDEX (adapter.py:576)",
+        "committed_fixture": false,
+        "ceiling": "F-02 applies: the falsifier code this control raises is never compared"
+      },
+      "expand-contract": {
+        "present": true,
+        "control": "fixtures/two-repo-hollow.json, exit 2, refused by PROVIDER_COEXISTENCE_NOT_BOUND, and no artifact written",
+        "committed_fixture": true
+      },
+      "evals.json": {
+        "present": false,
+        "control": null,
+        "gap": "F-06: all seven runnable[].hollow_fixture are still null, and evals.json declares no adapter lane at all"
+      }
+    },
+    "mutation_and_falsifier_review": {
+      "method": "each named guard was disabled one at a time in a throwaway copy of the audited export; the lane's own selftest was then re-run. The audited repository was never modified.",
+      "falsifier_code_is_verified_by_lane": {
+        "tree-sitter": true,
+        "scip": true,
+        "buf": true,
+        "expand-contract": true,
+        "semantic-context": false
+      },
+      "knockouts": [
+        {
+          "lane": "scip",
+          "guard": "UNRESOLVED_SYMBOL_OMITTED_FROM_DENOMINATOR",
+          "result": "RED",
+          "exit": 2
+        },
+        {
+          "lane": "scip",
+          "guard": "PARTIAL_COVERAGE_PROMOTED_TO_COMPLETE",
+          "result": "RED",
+          "exit": 2
+        },
+        {
+          "lane": "scip",
+          "guard": "OCCURRENCE_NESTING_PROMOTED_TO_CALL_GRAPH",
+          "result": "RED",
+          "exit": 2
+        },
+        {
+          "lane": "buf",
+          "guard": "MUTABLE_BASELINE_ALIAS",
+          "result": "RED",
+          "exit": 2
+        },
+        {
+          "lane": "buf",
+          "guard": "SOURCE_SCHEMA_DIGEST_ABSENT",
+          "result": "RED",
+          "exit": 2
+        },
+        {
+          "lane": "buf",
+          "guard": "NO_PROTOBUF_TASK_FORCED_TO_PASS (guard body removed)",
+          "result": "RED",
+          "exit": 2
+        },
+        {
+          "lane": "expand-contract",
+          "guard": "PROVIDER_COEXISTENCE_NOT_BOUND",
+          "result": "RED",
+          "exit": 2
+        },
+        {
+          "lane": "tree-sitter",
+          "guard": "PARSE_ERROR_HIDDEN",
+          "result": "RED",
+          "exit": 2
+        },
+        {
+          "lane": "tree-sitter",
+          "guard": "MATCH_WITHOUT_SOURCE_BLOB_BINDING",
+          "result": "RED",
+          "exit": 2
+        },
+        {
+          "lane": "semantic-context",
+          "guard": "mechanism prose mutated",
+          "result": "RED",
+          "exit": 2
+        },
+        {
+          "lane": "semantic-context",
+          "guard": "guard removed entirely",
+          "result": "RED",
+          "exit": 2
+        },
+        {
+          "lane": "semantic-context",
+          "guard": "ORPHAN_CONTEXT_ROW_WITHOUT_SOURCE_BACK_REFERENCE code -> foreign code",
+          "result": "GREEN",
+          "exit": 0,
+          "finding": "F-02"
+        },
+        {
+          "lane": "semantic-context",
+          "guard": "all 23 falsifier codes collapsed to one constant",
+          "result": "GREEN",
+          "exit": 0,
+          "finding": "F-02"
+        }
+      ]
+    },
+    "denominator_shrinkage_check": "No class was dropped. Three classes the #525 body recorded NOT_APPLICABLE_NO_SUBJECT (symbol/#547, context/#550, expand-contract/#524) acquired subjects in the 2026-08-22 wave and are re-scored upward with their ceilings stated; that is denominator growth, not shrinkage."
+  },
+  "traceability_graph_at_this_commit": {
+    "read_via": "git show 8d99f2d:<path>",
+    "as_of_observed_main": "5341885f26b5e8e7baf5087a4d661e324f878242",
+    "as_of_predates_every_wave_landing": true,
+    "issue_state_recorded": {
+      "524": "OPEN",
+      "547": "OPEN",
+      "549": "OPEN",
+      "550": "OPEN"
+    },
+    "exit_terminal_recorded": {
+      "524": null,
+      "547": null,
+      "549": null,
+      "550": null
+    },
+    "closed_lanes": [
+      518,
+      522,
+      523,
+      526
+    ],
+    "skill_surface_says": "FIVE_ADAPTERS_LANDED (README.md:7, :312-317, :347; AGENTS.md:142-149)",
+    "verdict": "audit item 8 FAILS \u2014 the graph is not consistent with the tree at this head (F-03)"
+  },
+  "falsifier_disposition": {
+    "PRIVATE_URL_IN_PUBLIC_ARTIFACT": "FIRED \u2014 F-04, on committed bytes",
+    "STALE_BASE_OR_RECEIPT": "FIRED \u2014 F-03 (as_of base predates every landing it must describe) and F-07 (R2 receipt bound to a foreign commit)",
+    "SAME_CONTEXT_SHADOW_PROMOTED_TO_INDEPENDENT": "OPEN \u2014 HUMAN_ADMIT_REQUIRED, not machine-decidable; F-05 is the adverse evidence",
+    "FALSE_SIBLING_SERIALIZATION": "FIRED \u2014 F-09, unrepaired since the #525 reconciliation",
+    "DENOMINATOR_SHRINKAGE": "NOT_FIRED",
+    "SOURCE_PROSE_PROMOTED_TO_FACT": "NOT_FIRED",
+    "MODEL_RECOMMENDATION_PROMOTED_TO_DECISION": "NOT_FIRED",
+    "TREE_SITTER_MATCH_PROMOTED_TO_SEMANTIC_PROOF": "NOT_FIRED \u2014 refused by syntax-match.schema.json properties.match_class.const, knockout-verified",
+    "SCIP_PARTIAL_INDEX_PROMOTED_TO_COMPLETE_GRAPH": "NOT_FIRED \u2014 now has a subject (#547) and a knockout-verified guard",
+    "LANCEDB_TOP_K_PROMOTED_TO_AUTHORITY": "NOT_FIRED, but its lane's guard identity is unverified (F-02); LanceDB itself NOT_EXERCISED",
+    "SQLITE_LEDGER_PROMOTED_TO_SOURCE_TRUTH": "NOT_FIRED",
+    "FORBIDDEN_EDGE_ZERO_WITH_BEHAVIOR_REGRESSION": "NOT_APPLICABLE_NO_SUBJECT \u2014 owning issue #528",
+    "SINGLE_REPO_FIX_PROMOTED_TO_CROSS_REPO_SAFETY": "NOT_FIRED \u2014 applied_on_real_codebase pinned false in both R1 and R2 receipts",
+    "BUF_PASS_PROMOTED_TO_SAFE_DEPLOYMENT": "NOT_FIRED \u2014 schema const false, knockout-verified",
+    "AUTOMATIC_MERGE_OR_CONTRACTION": "NOT_FIRED \u2014 contraction_authorization=HUMAN_ADMIT_REQUIRED",
+    "PERMISSIVE_LICENSE_PROMOTED_TO_LEGAL_CLEARANCE": "NOT_FIRED; terms half recorded HUMAN_ADMIT_REQUIRED"
+  },
+  "workflow_identity_per_candidate": "ABSENT",
+  "workflow_identity_note": "Structurally ABSENT per the Human-admitted single-push delivery mode. Additionally, at this head the whole 20-commit wave is on branch worktree-dtcr-queue-tech-lead and is NOT an ancestor of local main (== origin/main == 674cfe1435c4bd1c29e8f07308266fe5c6284973), so no convergence and no push has occurred. No run id is inferred.",
+  "dissent": [],
+  "dissent_note": "Empty because exactly one Shadow ran. Stated explicitly and per the repaired contract this is NOT evidence of agreement \u2014 no second reviewer existed to disagree.",
+  "findings_document": "findings.md (same directory)"
+}

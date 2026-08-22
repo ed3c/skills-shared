@@ -1,0 +1,1 @@
+{"path":"skills/dual-track-code-review-loop/adapters/buf/fixtures/breaking-pair/candidate/order.proto","start_line":3,"start_column":1,"end_line":3,"end_column":32,"type":"PACKAGE_DIRECTORY_MATCH","message":"Files with package \"dtcr.fixtures.order.v1\" must be within a directory \"dtcr/fixtures/order/v1\" relative to root but were in directory \".\"."}

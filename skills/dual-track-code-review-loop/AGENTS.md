@@ -87,10 +87,11 @@ role.
 `adapters/` holds concrete implementations of this contract's capability
 classes, and each landed adapter is its own path lease:
 
-- one adapter directory is one lease; `tree-sitter/` and `sqlite-ledger/` are
-  disjoint and may be worked concurrently, and a third adapter (`#547` SCIP,
-  `#549` Buf, `#550` semantic-context) is a new disjoint lease, never an edit
-  inside an existing adapter's directory;
+- one adapter directory is one lease; the five landed adapter directories
+  (`tree-sitter/`, `sqlite-ledger/`, `scip/`, `buf/`, `semantic-context/` —
+  the last three landed 2026-08-22 under `#547`/`#549`/`#550`) are disjoint and
+  may be worked concurrently, and any further adapter is a new disjoint lease,
+  never an edit inside an existing adapter's directory;
 - an adapter selftest is that adapter's own contract with `tests/run-all.sh`;
   changing an adapter's public behaviour without updating its `selftest.py` in
   the same change unit breaks that contract silently;
@@ -141,10 +142,12 @@ Preserve the states `PASS`, `FAIL`, `ABSENT`, `NOT_IMPLEMENTED`,
 `NOT_EXERCISED`, `SKIPPED_BY_POLICY`, `NOT_APPLICABLE` and
 `HUMAN_ADMIT_REQUIRED`. This directory currently establishes contract, schema and
 deterministic adapter evidence (tree-sitter with a live receipt, sqlite-ledger
-with planted mutations). It does not establish a SCIP, Buf or semantic-context
-adapter, an applied refactor on a real codebase, a live consumer, an
-independent review, legal clearance, merge, release or production, and no
-accumulation of deterministic evidence reaches any of them.
+with planted mutations, SCIP on a real scip-python round-trip, Buf with
+landing-run outputs and a typed NOT_APPLICABLE lane, semantic-context on a
+zero-network reference backend) plus the X1 synthesis, R1 and R2 compilers at
+fixture level. It does not establish an applied refactor on a real codebase, a
+live consumer, an independent review, legal clearance, merge, release or
+production, and no accumulation of deterministic evidence reaches any of them.
 
 ## Completion report
 

@@ -11,14 +11,21 @@ runtime-handoff/
 ├── README.md
 │   └── current State Machines, DAG, data flow, commands, and evidence ceilings
 ├── codex-v2-local-handoff-queue.json
-│   ├── COMPLETE: #508 durable result carrier + executor provenance + strict result schema
-│   └── ACTIVE: #464 fresh signed-in Codex v2 live execution
+│   └── HISTORICAL: #508 durable result carrier + executor provenance + strict result schema
+│       (subject 249abc47…; #508 is CLOSED — the lane's successor is the live-464 queue below)
+├── codex-v2-live-464-local-handoff-queue.json
+│   ├── ACTIVE: #464 fresh signed-in Codex v2 live run — compiled by the #464 wave against its
+│   │   merged implementation head (a distinct subject from #508's now-closed queue); executed
+│   │   2026-08-22, receipt verdict PASS, ceiling LIVE_EXECUTION_OBSERVED_SHADOW_PENDING
+│   └── BLOCKED_BY_PREDECESSOR: #464 independent Shadow readback
 ├── git-at-any-scale-local-handoff-queue.json
 │   ├── COMPLETE: GIT-SCALE-H0 immutable article source packet (#512)
 │   ├── ACTIVE: GIT-SCALE-H1 portable hosting-assurance contract denominator (#532)
 │   └── BLOCKED_BY_PREDECESSOR: H2 runtime canary (#534), H3 Shadow (#535), H4 path convergence (#536)
 ├── herdr-local-handoff-queue.json
 │   └── ACTIVE: #466 real managed Herdr lifecycle and clean terminal receipt
+│       (amended 2026-08-22 contract: named-session isolation; herdr-v3 receipt, sample_count 20,
+│       ceiling LIVE_OBSERVER_LIFECYCLE_SHADOW_PENDING)
 ├── source-evidence-local-handoff-queue.json
 │   ├── COMPLETE: #512 GITHUB_ISSUE packet (issue #435) and ARTICLE packet (Cursor git-at-any-scale)
 │   └── ACTIVE: #512 next unexecuted source kind (PDF or PRD)
@@ -223,11 +230,14 @@ Spatial #411 live independent Shadow             NOT_EXERCISED
 Codex result-tree binder             PASS / MERGED via #507
 Codex durable replay/provenance      PASS / CLOSED_DETERMINISTICALLY via #508 (PR #516);
                                         receipt data/handoff/codex-v2/issue-508-result-carrier-receipt.json
-fresh Codex v2 live acceptance       NOT_EXERCISED / #464; queue recompiled onto the admitted subject
-                                        5341885f26b5e8e7baf5087a4d661e324f878242 (2026-08-22 readback).
-                                        129f53c23a3ab15354763167b25bddc45f724c00 is #508's historical
-                                        landing subject (PR #516), 284 commits behind — do not re-bind
-                                        #464 to it (subject-mutation law)
+fresh Codex v2 live acceptance       EXECUTED_SHADOW_PENDING / #464; the live run landed 2026-08-22
+                                        via codex-v2-live-464-local-handoff-queue.json (receipt
+                                        data/handoff/codex-v2/issue-464-live-run-receipt.json,
+                                        verdict PASS, ceiling LIVE_EXECUTION_OBSERVED_SHADOW_PENDING).
+                                        The historical codex-v2-local-handoff-queue.json (#508,
+                                        subject 249abc47…) is superseded by that successor file.
+                                        Bind any new lane work to current main re-derived via
+                                        git rev-parse — never to 129f53c23a3… (stale)
 Herdr real process detection         EXERCISED_PARTIALLY
 Herdr terminal clean lifecycle       NOT_EXERCISED / blocker RECLASSIFIED (PR #516) from host-permission
                                         to herdr-0.8.0 AgentInfo API-contract mismatch (no observation

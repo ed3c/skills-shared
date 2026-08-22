@@ -1,6 +1,6 @@
 # Molecular terminal index — Tech Lead + Shadow review 2026-08-20, PR/issue states restamped 2026-08-22
 
-This README is the durable molecular index for the closure audit. Current GitHub metadata remains authoritative for mutable PRs. The topology and relation edges below were compiled on 2026-08-20 against the historical subject in the next section; the PR/issue terminal states carry the 2026-08-22 readback.
+This README is the durable molecular index for the closure audit. Current GitHub metadata remains authoritative for mutable PRs. The topology and relation edges below were compiled on 2026-08-20 against the historical subject in the next section; the PR/issue terminal states carry the 2026-08-22 readback. For anything newer, read `docs/traceability/github-portfolio-control/README.md` first.
 
 ## Repository subjects
 
@@ -48,9 +48,10 @@ A source PR can be `CLOSED_UNMERGED / CONSUMED` while its exact bytes are presen
           ↓
 #505 / PR #507 result-tree false-PASS repair  MERGED
           ↓
-#508 durable carrier/provenance/schema        CLOSED / COMPLETED (via PR #516)
+#508 durable carrier/provenance/schema        CLOSED / PASS via PR #516 (issue closed 2026-08-21T07:19:45Z)
           ↓ subject-mutation boundary
-#464 fresh signed-in v2 run                   PROCESS_DEPENDENCY / OPEN
+#464 fresh signed-in v2 run                   PROCESS_DEPENDENCY / OPEN — live run EXECUTED 2026-08-22
+                                              (verdict PASS, Shadow pending) via the successor queue
 
 #512 immutable Issue/Article/PDF/PRD evidence EXTERNAL_EVIDENCE / OPEN
   └─ consumes completed #467 compiler method; does not reopen #467
@@ -65,9 +66,9 @@ A source PR can be `CLOSED_UNMERGED / CONSUMED` while its exact bytes are presen
 | `W3-SOURCE-EVIDENCE` | #512 | open external-evidence successor | Issue/Article/PDF/PRD truth/applicability/verification remain packet-specific |
 | `W3-X` | #468/#480 | merged | static/deterministic infrastructure admission |
 | `C2-K` | #505/#507 | merged | deterministic result-tree binder, `1/16` |
-| `C2-DURABLE` | #508 | closed/completed via PR #516 | durable replay receipt `PASS`; live #464 acceptance remains a separate `NOT_EXERCISED` lane |
+| `C2-DURABLE` | #508 | `CLOSED` (PASS via PR #516) | durable carrier + executor provenance + strict worker-result schema landed; independent Shadow `ADMIT` on the candidate |
 
-The active Codex handoff queue is [`codex-v2-local-handoff-queue.json`](../../../agentic-tech-lead-orchestration/runtime-handoff/codex-v2-local-handoff-queue.json). It ends after #508 because its output changes the subject required for #464. Source evidence uses [`source-evidence-local-handoff-queue.json`](../../../agentic-tech-lead-orchestration/runtime-handoff/source-evidence-local-handoff-queue.json) and is owned by #512.
+The #508 queue [`codex-v2-local-handoff-queue.json`](../../../agentic-tech-lead-orchestration/runtime-handoff/codex-v2-local-handoff-queue.json) is historical — it ends after #508 because its output changes the subject required for #464. The #464 lane's active queue is [`codex-v2-live-464-local-handoff-queue.json`](../../../agentic-tech-lead-orchestration/runtime-handoff/codex-v2-live-464-local-handoff-queue.json) (live run executed 2026-08-22, Shadow pending). Source evidence uses [`source-evidence-local-handoff-queue.json`](../../../agentic-tech-lead-orchestration/runtime-handoff/source-evidence-local-handoff-queue.json) and is owned by #512.
 
 ## Repository entropy index
 
@@ -97,6 +98,8 @@ The method and CI/registry routes are on main. General safe deletion, unseen-dom
 ## Formerly held Draft stacks — all terminal at the 2026-08-22 readback
 
 No PR in this section is open. Terminal classifications come from `skills/agentic-tech-lead-orchestration/references/closure-audit/issue-568.json:16-24`; the landing subject for the whole set is PR #573, commit `9fe3c6daf53dcdd61123d5d7a4eeedbdf37b5d7c`, tree `c17678166cee2adba2f92f6099011ec52716ece7`.
+
+**Superseded 2026-08-22**: every stack below closed or merged via the #560 Repository Portfolio Control wave. `#412`/`#419`/`#420`/`#450`/`#396` are GitHub `CLOSED` (consumed/superseded — see commits `c27f8c3`, `6685da6`, `f6103e3`, `04756de` on main); `#395` is GitHub `MERGED` (`mergedAt 2026-08-21T20:00:23Z`, commit `1621b2f`). `prs-open.json` reports zero open PRs on this repository. The diagrams below describe the 2026-08-20 state only.
 
 ### Spatial ICPG → knowledge graph
 

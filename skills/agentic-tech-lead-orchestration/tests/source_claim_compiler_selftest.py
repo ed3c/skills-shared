@@ -41,4 +41,14 @@ fail(lambda x:x["claims"][0].update(claim_sha256="0"*64))
 fail(lambda x:x["claims"][0].update(hidden="nope"))
 fail(lambda x:x["claims"][3].update(session_attempts=[]))
 fail(lambda x:x["claims"][0].update(applicability="SUPERSEDED",superseded_by="P404"))
-print("source-claim-compiler selftest: PASS (positive=4-source denominator mutations=11 live=NOT_EXERCISED)")
+
+# shadow_verdict passthrough: a real verdict must ride WITH a same-subject
+# independent shadow_review, and reaches the emitted problem unchanged.
+sv=copy.deepcopy(base())
+sv["claims"][3]["shadow_verdict"]="PASS"
+sv["claims"][3]["shadow_review"]={"repo_subject":{"repo":"ed3c/skills-shared","commit":H,"tree":T},"reviewer_task_id":"shadow/T1","reviewer_attempt_id":"s01"}
+outv=mod.compile_claims(sv)
+assert {p["problem_id"]:p["shadow_verdict"] for p in outv["problems"]}["P4"]=="PASS"
+fail(lambda x:x["claims"][3].update(shadow_verdict="PASS"))  # verdict without review
+fail(lambda x:x["claims"][3].update(shadow_verdict="MAYBE"))  # verdict outside enum
+print("source-claim-compiler selftest: PASS (positive=5-source denominator mutations=13 live=NOT_EXERCISED)")

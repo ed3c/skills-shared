@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dtcr-refactor-r2-binding.schema.json",
+  "title": "DTCR cross-repository Expand and Contract (R2) subject binding",
+  "description": "One subject per repository, in one record. Every other subject shape in this tree carries exactly one repository_binding_id, which is correct for a change that one commit can make and wrong for an Expand and Contract migration, where the provider expansion and the consumer inversion land in different repositories at different commits and no commit is a parent of the other. This record binds each participating repository to its own exact commit and tree, keeps each repository's git ancestry inside that repository, and types the provider-to-consumer relationship as PROCESS_DEPENDENCY_NOT_GIT_PARENT. The typing is the point: an ordering that exists because one deployment must precede another is a process fact, and writing it as ancestry produces a graph in which a commit claims a parent no repository can resolve. Nothing here establishes that either repository was deployed, that the two heads were ever live at the same moment, or that a single atomic commit could have replaced them. This schema carries no `examples` and no `x-refusal-controls`: its positive instances are the projections `expand-contract/compile_r2.py` emits and its refusal controls live in `expand-contract/fixtures/schema-controls.json`, both executed by `expand-contract/selftest.py`, because the inventory in `cases.json` that would otherwise have to declare them is outside this lane's write lease.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "binding_id",
+    "repositories",
+    "edges",
+    "establishes"
+  ],
+  "properties": {
+    "schema": {
+      "const": "dtcr/refactor-r2-binding/v1"
+    },
+    "binding_id": {
+      "type": "string",
+      "pattern": "^DTCR-XR-[0-9]{3}$"
+    },
+    "repositories": {
+      "type": "array",
+      "minItems": 2,
+      "uniqueItems": true,
+      "description": "Two or more. A one-entry array is a single-repository refactor, which the R1 contracts already type and which this protocol exists precisely because they cannot express.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "repository_binding_id",
+          "role",
+          "subject_commit",
+          "subject_tree",
+          "ancestry_within_repository"
+        ],
+        "properties": {
+          "repository_binding_id": {
+            "type": "string",
+            "pattern": "^DTCR-RB-[0-9a-f]{16}$"
+          },
+          "role": {
+            "enum": [
+              "PROVIDER",
+              "CONSUMER"
+            ],
+            "description": "Which side of the contract this repository holds in this run. A repository that publishes the contract and serves it is one PROVIDER entry; splitting the contract into its own repository adds a third entry with a provider role rather than a new value, because a contract repository nobody serves from is a provider that publishes and does not implement."
+          },
+          "subject_commit": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{40}$"
+          },
+          "subject_tree": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{40}$"
+          },
+          "ancestry_within_repository": {
+            "type": "array",
+            "uniqueItems": true,
+            "description": "Parent commits of subject_commit inside this repository, and only inside it. The field is named for its boundary because the mistake it refuses does not look like a mistake: a cross-repository entry here reads as ordinary ancestry and resolves in neither repository.",
+            "items": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            }
+          }
+        }
+      }
+    },
+    "edges": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "The ordering between repositories, typed. An empty array would say the two sides are independent, which is the one thing an Expand and Contract migration is not.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "from_repository_binding_id",
+          "to_repository_binding_id",
+          "edge_kind"
+        ],
+        "properties": {
+          "from_repository_binding_id": {
+            "type": "string",
+            "pattern": "^DTCR-RB-[0-9a-f]{16}$"
+          },
+          "to_repository_binding_id": {
+            "type": "string",
+            "pattern": "^DTCR-RB-[0-9a-f]{16}$"
+          },
+          "edge_kind": {
+            "const": "PROCESS_DEPENDENCY_NOT_GIT_PARENT",
+            "description": "FALSE_CROSS_REPO_GIT_PARENT, refused at the type. There is one value because the moment a second one exists somebody picks it, and the fabricated parent is invisible from either repository: each side resolves its own history cleanly and only the joined graph is wrong."
+          }
+        }
+      }
+    },
+    "establishes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "git_ancestry_across_repositories",
+        "single_atomic_commit",
+        "simultaneous_deployment"
+      ],
+      "properties": {
+        "git_ancestry_across_repositories": {
+          "const": false,
+          "description": "Pinned. Two repositories share no object graph; an ancestry claim spanning them names a commit the other repository cannot resolve."
+        },
+        "single_atomic_commit": {
+          "const": false,
+          "description": "Pinned. If one commit could have carried this change, the protocol was not needed."
+        },
+        "simultaneous_deployment": {
+          "const": false,
+          "description": "Pinned. Two exact commits say what was built, never that both were serving at the same moment."
+        }
+      }
+    }
+  }
+}

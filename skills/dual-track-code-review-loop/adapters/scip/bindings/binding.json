@@ -1,0 +1,32 @@
+{
+  "schema": "dtcr/scip-proto-binding/v1",
+  "role": "Second, independent decode of the same index bytes. This is not the adapter's decoder and nothing in the emitted facts depends on it: adapter.py reads the wire format directly, because there is no `scip` CLI on this host and the `scip` in Homebrew is an integer-programming solver, a different project with the same name. What this binding buys is that the primary decode is checked by something that was not written here -- the schema's own author's field numbers, compiled by protoc, parsed by a protobuf runtime -- so a mistake in the hand-written reader has somewhere to show up other than in its own output.",
+  "proto": {
+    "url": "https://raw.githubusercontent.com/sourcegraph/scip/v0.5.2/scip.proto",
+    "repository": "sourcegraph/scip",
+    "revision": "v0.5.2",
+    "sha256": "b855eb9abdb3fe7f07600ee92f24a6c40f75fceef37136ccdc6844b300936a31",
+    "license": "Apache-2.0, held by Sourcegraph",
+    "vendored_here": false,
+    "why_not_vendored": "The descriptor set below is compiled from these exact bytes and is what the cross-check needs at runtime; committing 885 further lines of a third party's schema text would add a second copy to keep in step with the digest above, which is the identity that actually decides anything."
+  },
+  "descriptor_set": {
+    "path": "scip.desc",
+    "sha256": "6783df4d1883fac2e5eafb2bb9fe5e6ea83f46baa17db08d632bab191298721c",
+    "byte_count": 6400,
+    "produced_by": "libprotoc 29.3",
+    "source_info_included": false,
+    "why_a_descriptor_set": "protoc --python_out would emit generated code carrying a hard version check against the protobuf runtime, so the cross-check would fail on a runtime mismatch and read as a decode disagreement. A descriptor set is data: any runtime new enough to build a dynamic message reads it, and it is 6 KB rather than a generated module."
+  },
+  "regenerate": [
+    "curl -sSL -o scip.proto https://raw.githubusercontent.com/sourcegraph/scip/v0.5.2/scip.proto",
+    "shasum -a 256 scip.proto   # must print the proto.sha256 above",
+    "protoc --proto_path=. --descriptor_set_out=scip.desc scip.proto",
+    "shasum -a 256 scip.desc    # protoc's own version changes this; record the new pair here"
+  ],
+  "establishes": {
+    "index_is_about_the_subject": false,
+    "primary_decoder_correct_everywhere": false,
+    "note": "Two decoders agreeing on these bytes is evidence about these bytes. It is not a proof that the hand-written reader handles a construct this fixture never contained."
+  }
+}
