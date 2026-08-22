@@ -102,6 +102,8 @@ Reasons for HOLD:
 - #450 still requires the #448 exact-head hosted evidence and later traversal/runtime lanes.
 - old green runs do not follow current-main or parent movement.
 
+2026-08-22 reconciliation: this stack is no longer held open — PRs #412/#419/#420/#450 are all CLOSED (not merged). Their content landed on `main` through replayed carriers (merges `4f8d55b`, `77f0ce7`, `4f66f90`, terminal `c27f8c3`); PR #412 is preserved as first-red provenance evidence and #411 live monitoring remains open. See `../spatial-407/README.md` and `data/handoff/spatial-407/publication-provenance-receipt.json`.
+
 ### Human-led Agentic Engineering
 
 ```text

@@ -344,6 +344,8 @@ def validate(doc: Any) -> list[str]:
     if computed["unknown_blocking_count"] > 0 and status != "BLOCKED":
         errors.append("unknown blocking cases/behaviors require gate BLOCKED")
     if status in {"READY_FOR_IMPLEMENTATION", "READY_FOR_PUBLICATION_REVIEW"}:
+        if not required_cases:
+            errors.append(f"gate {status} requires a non-empty REQUIRED_CASE denominator; empty denominators make every ratio vacuously 1.0")
         for key in ("intent", "source_behavior_disposition", "required_case", "implementation_binding", "oracle"):
             if computed[key] != 1.0:
                 errors.append(f"gate {status} requires coverage.{key}=1.0")

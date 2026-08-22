@@ -8,15 +8,17 @@ This directory is the current zero-context closeout route for the `#407` Intent�
 program issue           #407
 static implementation   #408 / #409 / #410
 live evidence           #411
-source PR               #412
+source PR               #412  CLOSED_NOT_MERGED (2026-08-21); first-red provenance evidence
 refresh carrier         #513  HISTORICAL / merged only into a temporary branch
-main observed           88ce642a7f198d88019aa8ae19e63631ae4999c2
-integration checkpoint  32c049ca11d741e81023857aaf77b46cddce925e
+main observed           5341885f26b5e8e7baf5087a4d661e324f878242 (2026-08-22 reconciliation)
+integration checkpoint  32c049ca11d741e81023857aaf77b46cddce925e (now an ancestor of main)
+admitted publication    superseding replayed carrier — terminal merge c27f8c3
+receipt                 data/handoff/spatial-407/publication-provenance-receipt.json
 ```
 
 `#513` exists only to consume current `main` into the #412 candidate without mutating `main`. It is not an implementation atom and must not be counted as feature evidence.
 
-The #412 branch is mutable until final admission. Always re-read its exact head before a decision. The integration checkpoint above proved that current-main bytes and the #407 implementation can coexist; subsequent closeout commits may move the head.
+PR #412 is CLOSED (not merged); its final head `e679aed9` is not reachable from `main` and is retained as forensic evidence. Admission happened through the superseding carrier path onto `main`, not through a #412 merge. The integration checkpoint above proved that current-main bytes and the #407 implementation can coexist before that admission.
 
 ## Closure State Machine
 
@@ -136,12 +138,12 @@ An article/PDF is a source, not proof. For the #407 implementation program itsel
 
 | Problem | Owner | Static state | Remaining proof |
 |---|---|---|---|
-| Short prompt suppresses semantic obligations | #407/#408 | deterministic contract + mutations implemented | main admission |
-| Compatibility migration silently drops source decision logic | #408 | differential semantic-loss canary implemented | main admission; future live consumer evidence remains separate |
-| Implementation discovers a new case but Shadow leaves it at L0 | #409 | deterministic monitor falsifiers implemented | live independent runtime #411 |
-| FIRST_GREEN erases unresolved case/oracle obligations | #409 | deterministic checkpoint falsifier implemented | live independent runtime #411 |
-| Tech Lead decomposes from prompt and drops frozen required cases | #410 | denominator/owner gate implemented | main admission + future live Worker receipt |
-| Stale case graph accepted by task admission | #410 | exact graph readback/digest/denominator controls implemented | main admission |
+| Short prompt suppresses semantic obligations | #407/#408 | deterministic contract + mutations implemented | admitted on main `5341885f` (receipt); residual checker hardening on #408 |
+| Compatibility migration silently drops source decision logic | #408 | differential semantic-loss canary implemented | admitted on main `5341885f`; future live consumer evidence remains separate |
+| Implementation discovers a new case but Shadow leaves it at L0 | #409 | literal-deletion falsifiers implemented; falsifier-strength residuals recorded on #409 | live independent runtime #411 |
+| FIRST_GREEN erases unresolved case/oracle obligations | #409 | literal-deletion checkpoint falsifier implemented; strength residuals recorded on #409 | live independent runtime #411 |
+| Tech Lead decomposes from prompt and drops frozen required cases | #410 | denominator/owner gate implemented | admitted on main `5341885f`; future live Worker receipt separate |
+| Stale case graph accepted by task admission | #410 | exact graph readback/digest/denominator controls implemented | admitted on main `5341885f` (receipt) |
 | Static fixtures represented as continuous Shadow proof | #411 | explicitly forbidden | exact live canary required |
 | All unknown unknowns claimed exhausted | #407 | explicitly not claimed | permanently bounded by declared case basis / discovery lane |
 
@@ -159,14 +161,17 @@ At the static boundary:
 
 A source branch PASS, Draft/Ready state, temporary carrier merge, or issue comment cannot substitute for main admission.
 
+2026-08-22 state note: main admission is now PERFORMED (receipt above), so #408/#409/#410 have entered their close-eligible state; the closes themselves stay human-owned. #407 was auto-closed by GitHub on 2026-08-21 via a commit-reference close that violated the policy block above — it was reopened in the same reconciliation wave and still closes only after #411.
+
 ## Evidence ceiling
 
 ```text
-ICPG contract / checker / semantic mutations        IMPLEMENTED_CANDIDATE
-Shadow static case-delta contract                    IMPLEMENTED_CANDIDATE
-Tech Lead ICPG denominator / ownership gate          IMPLEMENTED_CANDIDATE
-current-main compatibility checkpoint                OBSERVED
-main admission                                       PENDING
+ICPG contract / checker / semantic mutations        ADMITTED_ON_MAIN 5341885f
+Shadow static case-delta contract                    ADMITTED_ON_MAIN 5341885f
+Tech Lead ICPG denominator / ownership gate          ADMITTED_ON_MAIN 5341885f
+current-main compatibility checkpoint                OBSERVED / HISTORICAL
+main admission                                       PERFORMED — superseding carrier merge c27f8c3;
+                                                     receipt data/handoff/spatial-407/publication-provenance-receipt.json
 live Worker consuming frozen ICPG                    NOT_EXERCISED
 continuous independent Shadow case monitoring        NOT_EXERCISED / #411
 universal unknown-unknown discovery                  NOT_CLAIMED

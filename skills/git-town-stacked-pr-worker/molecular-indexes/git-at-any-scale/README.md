@@ -91,9 +91,11 @@ Full ledger: [`data/handoff/source-evidence/git-at-any-scale-closure-ledger.json
 Observed at this readback:
 
 ```text
-PR #412 -> skills/git-town-stacked-pr-worker/README.md   (still OPEN/DRAFT)
-PR #419 -> skills/git-town-stacked-pr-worker/README.md + docs/INDEX.md   (still OPEN/DRAFT)
+PR #412 -> skills/git-town-stacked-pr-worker/README.md   (OPEN/DRAFT at that readback; CLOSED since 2026-08-21)
+PR #419 -> skills/git-town-stacked-pr-worker/README.md + docs/INDEX.md   (OPEN/DRAFT at that readback; CLOSED since 2026-08-21)
 ```
+
+2026-08-22 reconciliation: both PRs are CLOSED (not merged); their content landed via replayed carriers on `main`, so this writer contention no longer exists.
 
 Neither #539 nor #542 ever touched canonical `skills/git-town-stacked-pr-worker/README.md`, and this lease does not either. Root `README.md`, `AGENTS.md`, `docs/INDEX.md` and the canonical Git Town README remain unconverged; #536's final shared-path convergence there is a separate, not-yet-done writer's work after #412/#419 are reconciled.
 

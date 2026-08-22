@@ -194,6 +194,7 @@ How would we know it is false?
 Which intent/source behavior made this path necessary?
 Which case covers it?
 Which semantic axis changed?
+Which oracle can detect its loss?
 Did the implementation silently narrow scope?
 ```
 

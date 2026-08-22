@@ -69,7 +69,7 @@ merge/release/provider/account action inferred without Human Admit
 
 ## Writer law
 
-Current convergence must obey one writer per mutable shared path. At the 2026-08-21 readback, open Draft PRs #412 and #419 still both write `skills/git-town-stacked-pr-worker/README.md`; therefore this Git-at-any-scale lease owns only the dedicated molecular-index README, not the canonical Git Town README, and does not touch root `README.md`/`AGENTS.md`/`docs/INDEX.md`. Issue #536's final shared-path convergence at those root paths remains a separate, not-yet-done writer's work after #412/#419 are reconciled.
+Current convergence must obey one writer per mutable shared path. At the 2026-08-21 readback, open Draft PRs #412 and #419 still both wrote `skills/git-town-stacked-pr-worker/README.md`; therefore this Git-at-any-scale lease owns only the dedicated molecular-index README, not the canonical Git Town README, and does not touch root `README.md`/`AGENTS.md`/`docs/INDEX.md`. (2026-08-22 reconciliation: PRs #412 and #419 are CLOSED, not merged — their content landed via replayed carriers on `main`, so that writer contention no longer exists.) Issue #536's final shared-path convergence at those root paths remains a separate, not-yet-done writer's work.
 
 PR #542 was path-disjoint and owned only `skills/git-hosting-scale-assurance/**`; it merged as a sibling implementation atom, not as a Git child of #539. Both are now merged, but merging does not retroactively create ancestry between them.
 

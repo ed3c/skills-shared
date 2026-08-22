@@ -82,7 +82,14 @@ m["cases"][1]["oracle_ids"] = []
 m["coverage"]["required_case"] = 0.5
 m["coverage"]["oracle"] = 0.5
 m["gate"]["status"] = "READY_FOR_PROTOTYPE"
-expect_red("compatibility-only migration", m, "requires oracle_ids")
+expect_red("required case without oracle", m, "requires oracle_ids")
+
+# An empty REQUIRED_CASE denominator makes every ratio vacuously 1.0; a READY
+# gate must refuse it instead of admitting a graph that proves nothing.
+m = copy.deepcopy(base)
+for case in m["cases"]:
+    case["classification"] = "DUPLICATE_EQUIVALENCE_CLASS"
+expect_red("empty required-case denominator", m, "non-empty REQUIRED_CASE denominator")
 
 m = copy.deepcopy(base)
 m["cases"][1]["evidence_ids"] = []

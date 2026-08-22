@@ -1,0 +1,97 @@
+{
+  "schema": "agentic-tech-lead/spatial-407-publication-provenance/v1",
+  "queue": "skills/agentic-tech-lead-orchestration/runtime-handoff/spatial-407-local-handoff-queue.json",
+  "queue_item": "spatial-407-provenance-rebuild",
+  "task_ref": "issues-407-408-409-410-pr-412-main-admission",
+  "compiled_at": "2026-08-22",
+  "subject": {
+    "repository": "ed3c/skills-shared",
+    "admitted_main_commit": "5341885f26b5e8e7baf5087a4d661e324f878242",
+    "admitted_main_tree": "a18e12507f9e621efd5354f58384eded1f1e2a9a",
+    "queue_compile_subject_commit": "5ac05420dec16ca9c7999ea18c9e061980ef334a",
+    "queue_compile_rollback_commit": "88ce642a7f198d88019aa8ae19e63631ae4999c2",
+    "source_pr": 412,
+    "source_pr_state": "CLOSED_NOT_MERGED",
+    "source_pr_final_head": "e679aed910a29ba5ef04234c8948ae5b76a107fc",
+    "source_pr_final_head_reachable_from_main": false,
+    "source_lineage_commits_on_main": [
+      "01067581efa2b611c5d4bb8358ae568147eece40",
+      "5ac05420dec16ca9c7999ea18c9e061980ef334a",
+      "32c049ca11d741e81023857aaf77b46cddce925e"
+    ],
+    "superseding_publication_merge": {
+      "commit": "c27f8c3b75b4eea1d8cff77684a1fd276d78b079",
+      "subject_line": "merge(#419,#412): land the replayed ICPG bridge carrier (supersedes #412 bytes)",
+      "committer": "agent-macro <agent-macro@claude-code.invalid>",
+      "committed": "2026-08-22T02:30:50+08:00"
+    }
+  },
+  "plan_vs_actual": {
+    "planned": "Rebuild the exact PR #412 semantic tree on current main as fresh machine-identity commits, then obtain exact-head admission receipts before any lineage byte reaches main.",
+    "actual": "Replayed carrier waves (terminal merge c27f8c3b75b4eea1d8cff77684a1fd276d78b079, reconciled through main merges up to 5341885f26b5e8e7baf5087a4d661e324f878242) landed the #412 semantic content together with subsequent hardening commits. The connector-authored lineage commits reached main as declared-owner human writes rather than being rewritten into machine-identity commits.",
+    "deviation_class": "SUPERSEDED_CARRIER_PUBLICATION",
+    "why_still_admissible": "The repository's commit-role authority (evals/commit-roles.json identity_rules.declared_owner_addresses) classifies owner-address connector commits as human/owner writes carrying no trailer obligation; the terminal publication merge itself used the required machine identity agent-macro@claude-code.invalid; and the repository-wide provenance gate is deterministically green on the exact admitted head (Skill Eval Contract run 341, push event, SUCCESS) plus locally (COMMIT ROLE GREEN: 544 classified, 24 legacy-imported unclassified). This receipt performs no reclassification of its own."
+  },
+  "byte_equivalence_boundary": "All 47 semantic paths changed by PR #412 (88ce642a..e679aed9 over spatial-loop-systems-engineering, agentic-tech-lead-orchestration, skill-refactor-proof-loop) plus the git-town molecular index exist at the admitted main head with green owning oracles (checked=47 missing=0). Byte-identity with the frozen #412 candidate tree is NOT claimed: main carries superseding evolutions of those files. The claim admitted here is semantic-contract presence with green deterministic oracles, not tree transplantation.",
+  "gates": {
+    "skill_suites_exact_head": { "state": "PASS", "evidence": "GitHub Actions 'Skill Suites' run 597 (id 32522238178), push event, head 5341885f26b5e8e7baf5087a4d661e324f878242, conclusion success" },
+    "skill_eval_contract_exact_head": { "state": "PASS", "evidence": "GitHub Actions 'Skill Eval Contract' run 341 (id 32522238192), push event, same exact head, conclusion success; includes 'Classify commit drivers since the enforced start point' over full history" },
+    "shared_skills_infra_exact_head": { "state": "PASS", "evidence": "GitHub Actions 'Shared Skills Infra' run 509 (id 32522237967), push event, same exact head, conclusion success" },
+    "issue_closure_contract_exact_head": { "state": "PASS", "evidence": "GitHub Actions 'Issue Closure Contract' run 20 (id 32522237962), push event, same exact head, conclusion success" },
+    "git_town_worker_exact_head": { "state": "SKIPPED_BY_POLICY", "evidence": "Workflow is path-filtered to skills/git-town-stacked-pr-worker/**; no such path changed at 5341885f, so no run exists for that head. The receipt-landing publication touches those paths and re-arms the workflow on its own exact head." },
+    "commit_roles_full_history_local": { "state": "PASS", "evidence": "python3 scripts/check_commit_roles.py --repo-root . at 5341885f => exit 0; COMMIT ROLE GREEN: 544 commit(s) classified in 382daf4b..HEAD; 93 listed, 24 legacy-imported as unclassified" },
+    "local_verification_baseline": { "state": "PASS", "evidence": "bash scripts/local_verification.sh at clean 5341885f => exit 0 (2026-08-22, isolated worktree)" },
+    "local_handoff_queue_assert": { "state": "PASS", "evidence": "python3 skills/agentic-tech-lead-orchestration/scripts/assert_local_handoff_queue.py --queue skills/agentic-tech-lead-orchestration/runtime-handoff/spatial-407-local-handoff-queue.json => PASS (2 items, active=spatial-407-provenance-rebuild)" }
+  },
+  "forbidden_promotions_absent": {
+    "source_tree_green_to_main_admitted_without_provenance_gate": "ABSENT — main admission is claimed only together with the exact-head Skill Eval Contract success and the local full-history commit-role green.",
+    "connector_commit_to_human_or_local_machine_identity": "ABSENT — no connector commit was relabeled by this receipt; classification comes from the pre-existing declared_owner_addresses rule admitted on main, under which the owner's connector writes are the owner's own human writes.",
+    "rewritable_branch_commit_to_known_unclassified_history": "ABSENT — evals/commit-roles.json known_unclassified holds 3 entries, none of which is a #412-lineage commit; the lineage classifies via declared owner addresses, not via known_unclassified.",
+    "skill_suites_green_to_skill_eval_contract_pass": "ABSENT — the two workflows are cited as separate exact-head runs (597 and 341).",
+    "candidate_main_compatibility_to_merged_on_main": "ABSENT — lineage reachability from main was verified with git merge-base --is-ancestor, not inferred from integration-branch compatibility; the final candidate head e679aed9 is explicitly recorded as NOT reachable."
+  },
+  "adversarial_audit": {
+    "method": "10-agent workflow (5 independent auditors + 5 adversarial verifiers) over #408/#409/#410/#411, the queue file, and repository-wide status prose, run against the exact worktree bytes of 5341885f.",
+    "confirmed_and_fixed_in_receipt_wave": [
+      "13 stale status claims about #407/#412 across runtime-handoff README/AGENTS, spatial integration README/AGENTS, spatial AGENTS, git-town README, spatial-407 and codex-v2 and git-at-any-scale molecular indexes, current-runtime-handoff and git-at-any-scale and KNOWLEDGE_GRAPH_ICPG_CLOSURE traceability docs",
+      "check_case_graph.py hollow gate: an empty REQUIRED_CASE denominator produced vacuous 1.0 ratios and admitted READY gates; a non-empty-denominator guard plus a red mutation control were added",
+      "#409 acceptance surfaces: spec-packet-template gained the case-delta obligations section; system-prompt overlay gained the literal 8 delta-class tokens; README gained the missing oracle question",
+      "#410 index binding: spatial-407 molecular index gained exact relation tokens and the issue/case/branch-class/parent/paths/produced-state/oracle/evidence-ceiling/rollback stack-binding block"
+    ],
+    "confirmed_residuals_not_fixed_here": [
+      { "issue": 408, "finding": "invariant IDs are presence-checked but not indexed/uniqueness-checked/cross-reference-closed (invariant_or_state_refs is a bare string array); enforcing it is a schema-evolution decision", "severity": "MAJOR" },
+      { "issue": 408, "finding": "OUT_OF_SCOPE_EXPLICIT silent-scope-reduction guard (check_case_graph.py:247-250) has no red test exercising it", "severity": "MAJOR" },
+      { "issue": 408, "finding": "a required case citing subject-bound FAIL evidence is refused only at READY_FOR_PUBLICATION_REVIEW; earlier gates accept it — whether that is intended needs an owner decision", "severity": "MAJOR" },
+      { "issue": 408, "finding": "references/case-graph.schema.json is exercised only by the test harness; the shipped checker does structural checks in code and never applies the JSON schema", "severity": "MAJOR" },
+      { "issue": 409, "finding": "the two #409 falsifiers are literal-deletion detectors (str.replace of exact lines), not semantic falsifiers; only 4 of 8 delta classes and 2 of 5 monitor questions are literal-asserted by the suite, and system-prompt-monitor-overlay.md is read by zero deterministic checks", "severity": "MAJOR" },
+      { "issue": 410, "finding": "no planted-defect test turns red for 'task PASS with global case gap'; PATH_LEASE_OVERLAP has zero red-test coverage; no machine-readable molecular-stack index exists for spatial-407 (assert_molecular_stack_index.py defaults elsewhere)", "severity": "MAJOR" },
+      { "issue": 411, "finding": "queue item 2 receipt schema id spatial-loop/live-shadow-case-delta-receipt/v1 resolves to no schema file (name-only convention, same as this receipt's id); its forbidden_promotions cover 4 of the issue's 6 control bullets; both queue items pin required_subject_commit 5ac05420, so item 2 requires recompilation against the post-receipt admitted main before execution (subject-mutation law)", "severity": "MAJOR" }
+    ]
+  },
+  "issue_state_reconciliation": {
+    "407": "Auto-closed by GitHub on 2026-08-21T20:00:25Z (stateReason COMPLETED, commit-reference close via 32c049ca reaching main) with no closure-audit record; program law keeps #407 open until #411 completes; reopened 2026-08-22 in this reconciliation wave.",
+    "408": "OPEN; MAIN_ADMITTED by this receipt; close-eligible for static scope with the residuals above; close is human-owned.",
+    "409": "OPEN; MAIN_ADMITTED by this receipt; close-eligible for static scope with the residuals above; live responsibility remains #411; close is human-owned.",
+    "410": "OPEN; MAIN_ADMITTED by this receipt; close-eligible for static scope with the residuals above; close is human-owned.",
+    "411": "OPEN; predecessor queue item fulfilled by this receipt; queue advance and item-2 recompile are human-owned."
+  },
+  "lanes": {
+    "publication_provenance": "PASS",
+    "main_admission_of_spatial_407_static_bytes": "PASS",
+    "queue_advance": "HUMAN_ADMIT_REQUIRED",
+    "issue_close_408_409_410": "HUMAN_ADMIT_REQUIRED",
+    "issue_407_final_close_after_411": "HUMAN_ADMIT_REQUIRED",
+    "live_shadow_canary_411": "SKIPPED_BY_POLICY"
+  },
+  "verdict": "PASS",
+  "verdict_basis": [
+    "all four push-event workflows are success on the exact admitted main head, including the provenance-bearing Skill Eval Contract",
+    "local full-history commit-role classification and the full local verification suite are green at the same head",
+    "all PR #412 semantic paths are present on main with green owning oracles (checked=47 missing=0)",
+    "the terminal publication merge used the repository-required machine identity",
+    "no forbidden promotion is performed by this receipt"
+  ],
+  "evidence_ceiling": "Deterministic and exact-head evidence only. This receipt proves publication provenance and main admission of the #407 static byte set at 5341885f26b5e8e7baf5087a4d661e324f878242, plus the reconciliation described above. It does not prove live continuous Shadow monitoring (#411), universal unknown-unknown discovery, production safety, or any future head. Merge of the receipt-landing publication, queue advance, and issue closes remain Human/repository authority.",
+  "driven_by": "agent-macro",
+  "driven_on": "claude-code"
+}

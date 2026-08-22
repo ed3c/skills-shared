@@ -62,6 +62,8 @@ The Spatial #407 publication queue is a separate mutable-program handoff and bin
 
 The current GitHub connector history is retained as first-red provenance evidence. Do not add rewritable PR commits to `known_unclassified`, do not move `enforced_from`, do not relabel machine work as Human, and do not weaken `check_commit_roles.py`.
 
+Actual admitted path (2026-08-22 reconciliation): the states from `SKILL_EVAL_COMMIT_PROVENANCE_RED` through `MERGED_ON_MAIN` were fulfilled by a superseding path rather than a history rewrite. Replayed carrier waves (terminal publication merge `c27f8c3`, committer `agent-macro@claude-code.invalid`) landed the #412 semantic content on `main`; the connector lineage commits (`01067581`, `5ac05420`, `32c049ca`) reached `main` as declared-owner human writes under `evals/commit-roles.json` identity rules, and the exact-head Skill Eval Contract (run 341 at `5341885f`) is green. No rewritable commit was added to `known_unclassified`, `enforced_from` did not move, and no gate was weakened. The queue item's exit receipt is `data/handoff/spatial-407/publication-provenance-receipt.json`; queue advance to the #411 item — including its required recompile against the post-receipt admitted `main` (subject-mutation law) — remains human-owned.
+
 ### Codex v2 hardening
 
 ```text
@@ -198,10 +200,11 @@ Then execute only the `ACTIVE` item whose required capabilities and subject are 
 ## Current evidence
 
 ```text
-Spatial #408/#409/#410 source implementation    PASS / candidate only
-Spatial normal exact-head suites                PASS
-Spatial Skill Eval commit provenance            FAIL / LOCAL_HANDOFF_REQUIRED
-Spatial main admission                          NOT_PERFORMED
+Spatial #408/#409/#410 source implementation    PASS / admitted on main 5341885f
+Spatial normal exact-head suites                PASS / Skill Suites run 597 on main 5341885f
+Spatial Skill Eval commit provenance            PASS / Skill Eval Contract run 341 on main 5341885f
+Spatial main admission                          PERFORMED / superseding carrier merge c27f8c3;
+                                                    receipt data/handoff/spatial-407/publication-provenance-receipt.json
 Spatial #411 live independent Shadow             NOT_EXERCISED
 Codex result-tree binder             PASS / MERGED via #507
 Codex durable replay/provenance      PASS / CLOSED_DETERMINISTICALLY via #508 (PR #516);

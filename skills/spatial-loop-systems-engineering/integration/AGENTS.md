@@ -45,6 +45,8 @@ Any red load-bearing gate returns the subject to `HOLD`, records the exact failu
 
 The current connector may continue writing public source candidate bytes and GitHub issue/PR state, but it must stop before claiming repository admission if the repository-required provenance gate cannot be satisfied by the connector-authored history. In that state, preserve the exact candidate tree and hand off a provenance-compliant rebuild rather than adding rewritable connector commits to historical exception lists or weakening the gate.
 
+Resolution (2026-08-22): this stop condition was honored and is now discharged for #407/#412 — the candidate tree is preserved on the closed PR #412 (head `e679aed9`), admission happened through a superseding replayed carrier (terminal merge `c27f8c3`) whose exact-head provenance gate is green, and no exception list or gate was touched. Receipt: `data/handoff/spatial-407/publication-provenance-receipt.json`. The law above remains in force for any future connector candidate in the same state.
+
 ## Evidence vocabulary
 
 Use literal evidence states where applicable:

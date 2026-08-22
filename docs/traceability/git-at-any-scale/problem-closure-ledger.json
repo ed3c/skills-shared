@@ -33,7 +33,7 @@
       "19 of 28 claims require an external hosting runtime that has not been selected or exercised (#534)",
       "6 of 28 claims are targeted by the merged C1 contract but #532's full receipt/fixture denominator (durability/ref/cache/gossip/compaction/recovery/benchmark) is still incomplete",
       "independent exact-subject Shadow receipt absent (#535, blocked on #534)",
-      "root README/AGENTS/docs/INDEX.md shared convergence not attempted by this lease; active writers #412/#419 on skills/git-town-stacked-pr-worker/README.md remain unreconciled"
+      "root README/AGENTS/docs/INDEX.md shared convergence not attempted by this lease; the former #412/#419 writer contention on skills/git-town-stacked-pr-worker/README.md dissolved on 2026-08-21/22 (both PRs CLOSED, not merged; their content landed via replayed carriers on main), leaving that convergence as ordinary single-writer follow-up"
     ]
   }
 }

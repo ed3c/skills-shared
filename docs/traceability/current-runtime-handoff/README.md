@@ -85,10 +85,10 @@ PR #516 executed the three ACTIVE Local Handoff Execution Queue items — #508, 
 | #390 | `CLOSED_UNMERGED / CONSUMED` | E control suite is present on current main |
 | #391 | `CLOSED_UNMERGED / SUPERSEDED` | registry/CI integration was rebuilt on current governance and admitted through #477 |
 | #404 | `CLOSE_AFTER_THIS_CANDIDATE_LANDS` | its nearest entropy routes are integrated here with current state corrected |
-| #412 | `DRAFT / HOLD` | `MERGEABLE` per current readback; returned to Draft per the #511 audit decision because its own close gates remain incomplete and #411 live Shadow remains open |
-| #419 | `DRAFT / HOLD` | `MERGEABLE` per current readback; its `docs/INDEX.md` conflict against base `agent/spatial-intent-case-proof-graph-v1` was resolved by merge commit `94426ce` (unioned route-index prose, `check_document_routes.py` green); true child of #412, whose own close gates remain incomplete |
-| #420 | `DRAFT / HOLD` | `MERGEABLE` per current readback; design artifact only; deterministic/runtime close gates remain incomplete |
-| #450 | `DRAFT / HOLD` | `MERGEABLE` per current readback; #448 exact-head hosted receipt and later traversal/runtime lanes remain missing |
+| #412 | `CLOSED_UNMERGED / SUPERSEDED (2026-08-21)` | preserved as first-red provenance evidence; its lineage (`01067581`/`5ac05420`/`32c049ca`) landed on main via the replayed carrier terminal merge `c27f8c3`; final head `e679aed9` not reachable from main; receipt `data/handoff/spatial-407/publication-provenance-receipt.json`; #411 live Shadow remains open |
+| #419 | `CLOSED_UNMERGED / SUPERSEDED (2026-08-21)` | replayed carrier landed via merge `4f8d55b`; its historical `docs/INDEX.md` conflict resolution (`94426ce`) is retained in that lineage |
+| #420 | `CLOSED_UNMERGED / SUPERSEDED (2026-08-21)` | replayed carrier landed via merge `77f0ce7`; deterministic/runtime close gates for the design content remain tracked on its issues |
+| #450 | `CLOSED_UNMERGED / SUPERSEDED (2026-08-21)` | replayed carrier landed via merge `4f66f90`; #448 exact-head hosted receipt and later traversal/runtime lanes remain missing |
 | #434 | `CLOSED_UNMERGED (2026-08-21)` | closed on GitHub before this pass; Productization rebuild remains owned by #436 |
 | #395 → #396 | `DRAFT STACK / HOLD` | both `MERGEABLE` per current readback; human-led Agentic Engineering method + trace child have no current-main refresh and no current exact-head admission |
 

@@ -63,7 +63,7 @@ For a rewritable PR branch that fails the repository commit-role gate:
 - do not weaken `check_commit_roles.py` or any admission workflow;
 - preserve the red run and original source tree as forensic/semantic evidence.
 
-This is the active rule for Spatial #407/#412.
+This law stays in force for any future rewritable branch that fails the gate. Its Spatial #407/#412 binding was RESOLVED on 2026-08-22 without violating it: the #412 semantics reached `main` through a superseding replayed carrier (terminal merge `c27f8c3`, machine identity `agent-macro@claude-code.invalid`), the connector lineage classifies as declared-owner human writes, no rewritable commit entered `known_unclassified`, `enforced_from` did not move, and PR #412 remains preserved as first-red forensic evidence. See `data/handoff/spatial-407/publication-provenance-receipt.json`.
 
 ## Subject-mutation law
 

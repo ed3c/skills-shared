@@ -224,3 +224,26 @@ until every required array, reference, oracle, and gate field is populated.
 The complete system-contract field rules are enforced by
 `../scripts/check_system_contract.py`; ICPG sidecar rules are enforced by
 `../scripts/check_case_graph.py`. Markdown is navigation, not a second schema authority.
+
+## Case-delta obligations (ICPG sidecar)
+
+A spec packet that copies, migrates, ports, replaces, or otherwise preserves existing
+behavior carries the Shadow case-delta obligations from `architecture-watch-loop.md`:
+
+```text
+delta classes   INTENT_INTERPRETATION_DELTA, SCOPE_REDUCTION_DELTA, USE_CASE_DELTA,
+                EDGE_CASE_DELTA, SEMANTIC_PARITY_DELTA, CASE_COVERAGE_DELTA,
+                CASE_ORACLE_DELTA, SOURCE_BEHAVIOR_DISPOSITION_DELTA
+monitor asks    Which intent/source behavior made this path necessary?
+                Which existing or new case covers it?
+                Which semantic axis changed?
+                Which oracle can detect its loss?
+                Did this change silently narrow scope?
+intervention    L0 OBSERVE · L1 WARN · L2 REVIEW · L3 BLOCK
+checkpoints     ARCHITECTURE_CHOICE, FIRST_VERTICAL_SLICE, FIRST_GREEN,
+                BEFORE_COMMIT (when critical case proof owns eligibility),
+                BEFORE_PR_OR_PUBLICATION
+```
+
+The packet's `implementation_gate` cannot claim readiness while a required case, its
+oracle, or its source-behavior disposition is unresolved at the current checkpoint.

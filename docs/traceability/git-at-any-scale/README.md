@@ -120,7 +120,7 @@ Cursor locator
 
 ## Writer reconciliation
 
-At this epoch's readback, PR #412 and PR #419 remain `OPEN`/`DRAFT` and both still write `skills/git-town-stacked-pr-worker/README.md`; PR #419 also writes `docs/INDEX.md`. This lease (docs/traceability/git-at-any-scale/**, the molecular index, and the C1 skill's own README/AGENTS if inaccurate) is disjoint from those paths and from root `README.md`/`AGENTS.md`/`docs/INDEX.md`. The canonical Git Town README, root README/AGENTS and shared `docs/INDEX.md` remain unconverged and are not touched by this lease.
+At this epoch's readback, PR #412 and PR #419 remained `OPEN`/`DRAFT` and both still wrote `skills/git-town-stacked-pr-worker/README.md`; PR #419 also wrote `docs/INDEX.md`. (2026-08-22 reconciliation: both PRs are now CLOSED, not merged — their content landed via replayed carriers on `main`, dissolving this contention.) This lease (docs/traceability/git-at-any-scale/**, the molecular index, and the C1 skill's own README/AGENTS if inaccurate) is disjoint from those paths and from root `README.md`/`AGENTS.md`/`docs/INDEX.md`. The canonical Git Town README, root README/AGENTS and shared `docs/INDEX.md` remain unconverged and are not touched by this lease.
 
 ## Shadow Architect ruling
 

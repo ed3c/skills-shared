@@ -411,7 +411,7 @@ Hard laws for this Stack:
 
 ## Current Intent-to-Evidence Knowledge Graph molecular Stack — #413
 
-This program consumes the unmerged Spatial Loop ICPG contract on draft PR #412. The first implementation branch therefore is a true child of PR #412 by bytes/contracts, not merely because #413 was opened later.
+This program consumed the Spatial Loop ICPG contract from PR #412 while that PR was an unmerged draft; the first implementation branch was therefore a true child of PR #412 by bytes/contracts, not merely because #413 was opened later. (State reconciliation 2026-08-22: PR #412 is now CLOSED, not merged; the ICPG contract bytes reached `main` through the superseding replayed carrier, terminal merge `c27f8c3` — see `molecular-indexes/spatial-407/README.md`.)
 
 ```text
 PR #412  Spatial ICPG + Shadow/static projection + Tech Lead case ownership
