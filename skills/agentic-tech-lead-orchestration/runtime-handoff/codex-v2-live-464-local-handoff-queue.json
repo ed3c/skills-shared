@@ -1,0 +1,119 @@
+{
+  "schema_version": "agentic-tech-lead/local-handoff-queue/v1",
+  "subject": {
+    "repository": "ed3c/skills-shared",
+    "commit": "753002d21ef37b3c4f0fffa2c4b36323f342acd7",
+    "tree": "7f92c42d7e8fb7f2b48328c26a35ccbb21a0b3eb",
+    "rollback_commit": "2ff01c1d6a1cfdd838eea3108033f7f5cc397661"
+  },
+  "authority": {
+    "automation_forbidden": ["merge", "force_push", "issue_close", "queue_advance", "provider_activation", "semantic_conflict_resolution"],
+    "human_owned": ["merge", "promotion", "rollback", "permission_change", "semantic_conflict_resolution"]
+  },
+  "current": {"active_item": "codex-v2-live-464-run", "state": "ACTIVE"},
+  "items": [
+    {
+      "id": "codex-v2-live-464-run",
+      "task_ref": "issue-464-fresh-signed-in-codex-v2-run",
+      "state": "ACTIVE",
+      "entry": {
+        "predecessor": null,
+        "required_subject_commit": "753002d21ef37b3c4f0fffa2c4b36323f342acd7",
+        "required_capabilities": [
+          "signed-in-codex-runtime",
+          "openai-codex-sdk-importable-by-argv0-python3",
+          "host-sandbox-disabled-for-codex-home",
+          "clean-exact-subject-checkout",
+          "throwaway-run-repository-with-red-then-green-test",
+          "controller-source-diff-test-readback",
+          "durable-carrier-out-dir"
+        ]
+      },
+      "runtime_lane": {
+        "class": "LOCAL_RUNTIME",
+        "commands": [
+          {"argv": ["sh", "-c", "test \"$(git rev-parse HEAD)\" = 753002d21ef37b3c4f0fffa2c4b36323f342acd7 && test -z \"$(git status --porcelain=v1 --untracked-files=all)\""], "cwd": ".", "timeout_seconds": 60, "environment_names": []},
+          {"argv": ["python3", "-c", "import openai_codex, importlib.metadata as md; print(md.version('openai-codex'))"], "cwd": ".", "timeout_seconds": 120, "environment_names": []},
+          {"argv": ["bash", "skills/agentic-tech-lead-orchestration/tests/run-all.sh"], "cwd": ".", "timeout_seconds": 1800, "environment_names": []},
+          {"argv": ["python3", "-m", "jsonschema", "-i", "data/handoff/codex-v2/issue-464-session-manifest.json", "skills/agentic-tech-lead-orchestration/references/contracts/codex-session-manifest.schema.json"], "cwd": ".", "timeout_seconds": 120, "environment_names": []},
+          {"argv": ["python3", "skills/agentic-tech-lead-orchestration/scripts/run_codex_sdk_worker.py", "data/handoff/codex-v2/issue-464-session-manifest.json", "--output", "data/handoff/codex-v2/issue-464-static-receipt.json"], "cwd": ".", "timeout_seconds": 120, "environment_names": []},
+          {"argv": ["python3", "skills/agentic-tech-lead-orchestration/scripts/run_codex_sdk_worker.py", "data/handoff/codex-v2/issue-464-session-manifest.json", "--execute", "--carrier-out-dir", "data/handoff/codex-v2/carrier", "--output", "data/handoff/codex-v2/issue-464-worker-result.json"], "cwd": ".", "timeout_seconds": 1800, "environment_names": ["CODEX_HOME"]},
+          {"argv": ["python3", "skills/agentic-tech-lead-orchestration/scripts/check_codex_worker_result.py", "data/handoff/codex-v2/issue-464-worker-result.json", "--carrier-bundle", "data/handoff/codex-v2/carrier/codex-v2-issue-464-T1-a01.bundle"], "cwd": ".", "timeout_seconds": 300, "environment_names": []},
+          {"argv": ["python3", "skills/agentic-tech-lead-orchestration/scripts/codex_result_carrier.py", "replay", "--manifest", "data/handoff/codex-v2/carrier/codex-v2-issue-464-T1-a01.bundle.manifest.json", "--bundle", "data/handoff/codex-v2/carrier/codex-v2-issue-464-T1-a01.bundle"], "cwd": ".", "timeout_seconds": 300, "environment_names": []},
+          {"argv": ["python3", "skills/agentic-tech-lead-orchestration/scripts/compile_codex_live_acceptance.py", "data/handoff/codex-v2/issue-464-acceptance-input.json", "--output", "data/handoff/codex-v2/issue-464-live-acceptance-receipt.json"], "cwd": ".", "timeout_seconds": 300, "environment_names": []},
+          {"argv": ["python3", "-m", "jsonschema", "-i", "data/handoff/codex-v2/issue-464-live-acceptance-receipt.json", "skills/agentic-tech-lead-orchestration/references/contracts/codex-live-acceptance-receipt-v2.schema.json"], "cwd": ".", "timeout_seconds": 120, "environment_names": []},
+          {"argv": ["python3", "-m", "jsonschema", "-i", "data/handoff/codex-v2/issue-464-live-run-receipt.json", "skills/agentic-tech-lead-orchestration/references/contracts/codex-v2-live-run-receipt.schema.json"], "cwd": ".", "timeout_seconds": 120, "environment_names": []}
+        ],
+        "unresolved_operations": [
+          {
+            "operation_id": "materialize-issue-464-session-manifest-and-run-repository",
+            "resolver_source": "issue #464 body, skills/agentic-tech-lead-orchestration/scripts/run_codex_sdk_worker.py validate_manifest, references/contracts/codex-session-manifest.schema.json, and a throwaway run repository whose committed base contains .gitignore for __pycache__ plus a RED test; emit the exact manifest consumed by the declared worker commands with task_id issue-464/T1 and attempt_id a01",
+            "required_output": "CONCRETE_COMMAND_CONTRACT"
+          },
+          {
+            "operation_id": "materialize-controller-readback-input-with-reproducible-command-digests",
+            "resolver_source": "controller-owned source/diff/test readback run outside the worker process; command_sha256 must be taken over the canonical JSON bytes of the argv array recorded in this queue item and output_sha256 over the captured stdout+stderr bytes, so an independent Shadow can recompute both digests",
+            "required_output": "CONCRETE_COMMAND_CONTRACT"
+          }
+        ],
+        "live_evidence_required": true
+      },
+      "receipt": {
+        "path": "data/handoff/codex-v2/issue-464-live-run-receipt.json",
+        "schema": "agentic-tech-lead/codex-v2-live-run/v1",
+        "required_states": ["PASS", "FAIL", "NOT_EXERCISED", "HUMAN_ADMIT_REQUIRED"],
+        "forbidden_promotions": [
+          "fixture_or_selftest_to_live_464_pass",
+          "binder_exit_zero_to_independent_shadow_pass",
+          "path_codex_binary_guess_to_executor_identity",
+          "self_declared_controller_readback_to_verified_test_pass",
+          "absent_binary_at_readback_to_provenance_pass",
+          "stale_subject_queue_to_current_subject_evidence"
+        ]
+      },
+      "exit": {"requires_receipt": true, "required_verdict": "PASS", "cleanup_required": true},
+      "next": "codex-v2-live-464-shadow"
+    },
+    {
+      "id": "codex-v2-live-464-shadow",
+      "task_ref": "issue-464-independent-same-subject-shadow",
+      "state": "BLOCKED_BY_PREDECESSOR",
+      "entry": {
+        "predecessor": "codex-v2-live-464-run",
+        "required_subject_commit": "753002d21ef37b3c4f0fffa2c4b36323f342acd7",
+        "required_capabilities": [
+          "independent-checkout-of-the-receipt-landing-commit",
+          "committed-carrier-bundle",
+          "python3-jsonschema"
+        ]
+      },
+      "runtime_lane": {
+        "class": "LOCAL_RUNTIME",
+        "commands": [
+          {"argv": ["python3", "skills/agentic-tech-lead-orchestration/scripts/codex_result_carrier.py", "replay", "--manifest", "data/handoff/codex-v2/carrier/codex-v2-issue-464-T1-a01.bundle.manifest.json", "--bundle", "data/handoff/codex-v2/carrier/codex-v2-issue-464-T1-a01.bundle"], "cwd": ".", "timeout_seconds": 300, "environment_names": []},
+          {"argv": ["python3", "-m", "jsonschema", "-i", "data/handoff/codex-v2/issue-464-live-acceptance-receipt.json", "skills/agentic-tech-lead-orchestration/references/contracts/codex-live-acceptance-receipt-v2.schema.json"], "cwd": ".", "timeout_seconds": 120, "environment_names": []}
+        ],
+        "unresolved_operations": [
+          {
+            "operation_id": "independent-shadow-readback-on-the-receipt-landing-commit",
+            "resolver_source": "the exact commit that lands the #464 receipts (a descendant of this queue's subject), read in a checkout that did not produce them; recompute worker_result_sha256, prompt_digest, both controller command digests and the carrier denominator, and state which live-versus-fixture discriminator was actually observed",
+            "required_output": "CONCRETE_COMMAND_CONTRACT"
+          }
+        ],
+        "live_evidence_required": false
+      },
+      "receipt": {
+        "path": "data/handoff/codex-v2/issue-464-shadow-readback-receipt.json",
+        "schema": "agentic-tech-lead/codex-v2-live-run-shadow/v1",
+        "required_states": ["PASS", "FAIL", "NOT_EXERCISED", "HUMAN_ADMIT_REQUIRED"],
+        "forbidden_promotions": [
+          "same-session-readback-to-independent-shadow",
+          "document-agreement-to-executor-identity",
+          "shadow-admit-to-issue-close"
+        ]
+      },
+      "exit": {"requires_receipt": true, "required_verdict": "PASS", "cleanup_required": false},
+      "next": null
+    }
+  ]
+}
