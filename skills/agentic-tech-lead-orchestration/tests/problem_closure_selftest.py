@@ -22,7 +22,9 @@ def problem(pid="P-001",claim="Preserve independent evidence lanes."):
       "implementation_evidence":[{"kind":"COMMIT","subject":CURRENT["commit"],"repo_subject":copy.deepcopy(CURRENT),"status":"CURRENT"}],
       "verification_evidence":[{"lane":"LOCAL","subject":"receipt:local:1","repo_subject":copy.deepcopy(CURRENT)}],
       "receipts":[{"lane":"LOCAL","subject":"receipt:local:1","repo_subject":copy.deepcopy(CURRENT)}],
-      "merge_subjects":[],"shadow_verdict":"PASS","residual_gaps":[],"closure":"VERIFIED_LOCAL"
+      "merge_subjects":[],"shadow_verdict":"PASS",
+      "shadow_review":{"repo_subject":copy.deepcopy(CURRENT),"reviewer_task_id":"T1","reviewer_attempt_id":"shadow-a01"},
+      "residual_gaps":[],"closure":"VERIFIED_LOCAL"
     }
 
 def ledger(problems):
@@ -36,25 +38,40 @@ def ledger(problems):
     digest=hashlib.sha256(json.dumps(manifest,sort_keys=True,separators=(",",":"),ensure_ascii=False).encode()).hexdigest()
     return {"schema_version":1,"denominator":{"problem_ids":ids,"source_manifest_sha256":digest},"source_manifest":manifest,"problems":problems}
 
+_positive=0
+_mutation=0
+
 # Positive 1
 base=ledger([problem()]); out=m.check_ledger(base); assert out["problem_count"]==1 and out["counts"]["VERIFIED_LOCAL"]==1
+_positive+=1
 # Positive 2
 live=problem(); live["verification_evidence"].append({"lane":"PROVIDER_LIVE","subject":"receipt:live:1","repo_subject":copy.deepcopy(CURRENT)}); live["receipts"].append({"lane":"PROVIDER_LIVE","subject":"receipt:live:1","repo_subject":copy.deepcopy(CURRENT)}); live["closure"]="VERIFIED_LIVE"; m.check_ledger(ledger([live]))
+_positive+=1
 # Positive 3
 partial=problem(); partial["residual_gaps"]=["provider live not exercised"]; partial["closure"]="PARTIAL"; m.check_ledger(ledger([partial]))
+_positive+=1
 # Positive 4
 human=problem(); human["requires_human"]=True; human["closure"]="HUMAN_ADMIT_REQUIRED"; m.check_ledger(ledger([human]))
+_positive+=1
 # Positive 5
-na=problem(); na["applicability"]="NOT_APPLICABLE"; na["applicability_rationale"]="Outside repository contract."; na["task_nodes"]=[]; na["dag_nodes"]=[]; na["issue_nodes"]=[]; na["session_attempts"]=[]; na["implementation_evidence"]=[]; na["verification_evidence"]=[]; na["receipts"]=[]; na["shadow_verdict"]="NOT_REVIEWED"; na["closure"]="NOT_APPLICABLE"; m.check_ledger(ledger([na]))
+na=problem(); na["applicability"]="NOT_APPLICABLE"; na["applicability_rationale"]="Outside repository contract."; na["task_nodes"]=[]; na["dag_nodes"]=[]; na["issue_nodes"]=[]; na["session_attempts"]=[]; na["implementation_evidence"]=[]; na["verification_evidence"]=[]; na["receipts"]=[]; na["shadow_verdict"]="NOT_REVIEWED"; del na["shadow_review"]; na["closure"]="NOT_APPLICABLE"; m.check_ledger(ledger([na]))
+_positive+=1
 # Positive 6
 old=problem("P-OLD","Old implementation route."); old["applicability"]="SUPERSEDED"; old["superseded_by"]="P-NEW"; old["implementation_evidence"][0]["status"]="HISTORICAL"; old["implementation_evidence"][0]["repo_subject"]=copy.deepcopy(OLD); old["verification_evidence"]=[]; old["receipts"]=[]; old["closure"]="PARTIAL"
 new=problem("P-NEW","Replacement implementation route."); m.check_ledger(ledger([old,new]))
+_positive+=1
+# Positive 7: shadow_review explicitly reaffirmed (distinct reviewer identity from the default)
+reviewed=problem(); reviewed["shadow_review"]={"repo_subject":copy.deepcopy(CURRENT),"reviewer_task_id":"T2","reviewer_attempt_id":"shadow-review-1"}; m.check_ledger(ledger([reviewed]))
+_positive+=1
 # deterministic projection
 assert renderer.render(base)==renderer.render(copy.deepcopy(base))
 
 def must_fail(data):
+    global _mutation
     try:m.check_ledger(data)
-    except m.ContractError:return
+    except m.ContractError:
+        _mutation+=1
+        return
     raise AssertionError("mutation unexpectedly passed")
 
 x=ledger([problem()]); x["problems"][0]["source"]["location"]=""; must_fail(x) # 1
@@ -82,5 +99,6 @@ x=ledger([problem()]); x["problems"][0]["implementation_evidence"][0]["status"]=
 x=ledger([problem()]); x["problems"][0]["private_reasoning"]="forbidden"; must_fail(x) # 20
 x=ledger([problem()]); x["problems"][0]["receipts"].append(copy.deepcopy(x["problems"][0]["receipts"][0])); must_fail(x) # 21
 x=ledger([problem()]); x["problems"][0]["source"]["identity"]="https://example.invalid/file.pdf"; must_fail(x) # 22
+x=ledger([problem()]); x["problems"][0]["shadow_review"]["repo_subject"]=copy.deepcopy(OLD); must_fail(x) # 23 wrong-subject shadow_review
 
-print("problem-closure selftest: PASS (positive=6 mutations=22 live=NOT_EXERCISED)")
+print(f"problem-closure selftest: PASS (positive={_positive} mutations={_mutation} live=NOT_EXERCISED)")

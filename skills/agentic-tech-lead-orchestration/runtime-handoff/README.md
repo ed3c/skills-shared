@@ -12,10 +12,15 @@ runtime-handoff/
 │   └── current State Machines, DAG, data flow, commands, and evidence ceilings
 ├── codex-v2-local-handoff-queue.json
 │   └── #508 durable result carrier + executor provenance + strict result schema
+├── codex-v2-live-464-local-handoff-queue.json
+│   └── #464 fresh signed-in Codex v2 live run + Shadow — compiled by the #464 wave against its
+│       merged implementation head (a distinct subject from #508's now-closed queue)
 ├── herdr-local-handoff-queue.json
 │   └── #466 real managed Herdr lifecycle and clean terminal receipt
 ├── source-evidence-local-handoff-queue.json
 │   └── #512 immutable Issue/Article/PDF/PRD input → #467 compiler → existing closure ledger
+├── git-at-any-scale-local-handoff-queue.json
+│   └── #512/#531 immutable source-packet materialization for the git-at-any-scale article claims
 └── spatial-407-local-handoff-queue.json
     ├── ACTIVE: #407/#408/#409/#410 provenance-compliant publication rebuild
     └── BLOCKED_BY_PREDECESSOR: #411 independent live Shadow case-delta canary
@@ -207,7 +212,10 @@ Codex result-tree binder             PASS / MERGED via #507
 Codex durable replay/provenance      PASS / CLOSED_DETERMINISTICALLY via #508 (PR #516);
                                         receipt data/handoff/codex-v2/issue-508-result-carrier-receipt.json
 fresh Codex v2 live acceptance       NOT_EXERCISED / #464; queue recompile required against
-                                        129f53c23a3ab15354763167b25bddc45f724c00 (subject-mutation law)
+                                        current main (re-derive via git rev-parse main; do not
+                                        bind to 129f53c23a3ab15354763167b25bddc45f724c00 — stale,
+                                        main has since advanced to 28f3947 then 5341885 then
+                                        674cfe1, PR #577)
 Herdr real process detection         EXERCISED_PARTIALLY
 Herdr terminal clean lifecycle       NOT_EXERCISED / blocker RECLASSIFIED (PR #516) from host-permission
                                         to herdr-0.8.0 AgentInfo API-contract mismatch (no observation

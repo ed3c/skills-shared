@@ -26,9 +26,9 @@
         "predecessor": null,
         "required_capabilities": [
           "herdr-runtime",
-          "scratch-home-isolation",
+          "named-session-isolation",
           "managed-agent-target",
-          "human-attended-terminal-or-explicit-host-permission",
+          "human-attended-terminal-or-explicit-host-permission-for-agent-start",
           "stable-workspace-pane-pid-start-session-identity",
           "controller-source-diff-test-readback"
         ],
@@ -46,9 +46,12 @@
           "process_detection_to_terminal_lifecycle_pass",
           "done_candidate_to_controller_acceptance",
           "manual_report_agent_to_clean_terminal_receipt",
-          "permission_denial_to_pass"
+          "permission_denial_to_pass",
+          "observer_local_clock_to_herdr_source_clock",
+          "derived_cleanup_to_herdr_published_cleanup",
+          "unexercised_read_only_surface_to_blocked_by_upstream_api"
         ],
-        "path": "data/handoff/herdr-v2/herdr-lifecycle-receipt.json",
+        "path": "data/handoff/herdr-v3/herdr-lifecycle-receipt.json",
         "required_states": [
           "PASS",
           "FAIL",
@@ -64,9 +67,9 @@
             "argv": [
               "python3",
               "skills/agentic-tech-lead-orchestration/scripts/collect_herdr_lifecycle.py",
-              "data/handoff/herdr-v2/herdr-plan.json",
+              "data/handoff/herdr-v3/herdr-plan.json",
               "--output",
-              "data/handoff/herdr-v2/herdr-lifecycle-receipt.json"
+              "data/handoff/herdr-v3/herdr-lifecycle-receipt.json"
             ],
             "cwd": ".",
             "environment_names": [],
@@ -78,7 +81,7 @@
           {
             "operation_id": "materialize-exact-herdr-managed-agent-plan",
             "required_output": "CONCRETE_COMMAND_CONTRACT",
-            "resolver_source": "Issue #466 current blocker record, nearest AGENTS/README, scratch HOME, admitted Herdr binary, exact worktree, and human-attended or explicitly permitted host session"
+            "resolver_source": "Issue #466 amended contract (2026-08-22), nearest AGENTS/README, an isolated herdr named session (`herdr --session <name>`, socket ~/.config/herdr/sessions/<name>/herdr.sock — NOT a scratch HOME), admitted herdr binary /opt/homebrew/bin/herdr, an existing worktree path, and a human-attended or explicitly permitted host session for `agent start` only"
           }
         ]
       },

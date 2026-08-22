@@ -1,0 +1,87 @@
+{
+  "carrier_bundle_path": "data/handoff/codex-v2/carrier/codex-v2-issue-464-T1-a01.bundle",
+  "controller": {
+    "attempt_id": "a01",
+    "base_sha": "5af72fb3a2fc073d2b36da5dbbc2cb9b12c8a842",
+    "changed_files": [
+      "src/calc.py"
+    ],
+    "commands": [
+      {
+        "command_sha256": "1168b2a3059a38dc53c851df268c031ea9c67a87c6a9019bda074a2cd3b25da6",
+        "exit_code": 0,
+        "output_sha256": "fb184ea57734512b1f088f9181209901b9cd46df3eb7eaa2500ea9e48dde20b5"
+      },
+      {
+        "command_sha256": "8982ada51ceb5138b6d29eb9adf02329e0a4beddc6472cc96a4d2353bb56e6ad",
+        "exit_code": 0,
+        "output_sha256": "544738fd9352fa6ebc9945bb307a1db3b767534ebe25c6e04bce43fde603cbb5"
+      }
+    ],
+    "repo": "ed3c/live-464-calc",
+    "source_diff_readback": "PASS",
+    "task_id": "issue-464/T1",
+    "tests_readback": "PASS",
+    "tree_sha": "63bf10e25799b23efea342853bff8f2320cbe47d"
+  },
+  "worker_result": {
+    "adapter_state": "RUNTIME_RETURNED",
+    "attempt_id": "a01",
+    "base_sha": "5af72fb3a2fc073d2b36da5dbbc2cb9b12c8a842",
+    "base_tree_sha": "eaefc42d34dcf917e420121a38d5eef12de70b4c",
+    "changed_files": [
+      "src/calc.py"
+    ],
+    "controller_readback_required": true,
+    "evidence_ceiling": "RUNTIME_RESULT_ONLY",
+    "executor_provenance": {
+      "adapter_blob_sha256": "c3e4b5a9c8c6b788ef74adc9891c25d608cd115367971a5ffc8846d6b0bc5633",
+      "adapter_version": "codex-sdk-worker/2",
+      "approval_policy": "SDK_DEFAULT",
+      "codex_binary_path": "/private/tmp/claude-501/-Users-neon-skills-shared/6fabfecc-0194-4b92-9f3e-e1d643e57ffd/scratchpad/codex-v2-464-venv/lib/python3.14/site-packages/codex_cli_bin/bin/codex",
+      "codex_binary_sha256": "19c4f144c5226a9f17c58e6f0fa854843b0f77a6eb420f40e2745a12f10f5d37",
+      "codex_binary_source": "SDK_PINNED_RUNTIME",
+      "config_identity": "e3e18104f1f8e1c4354bdd55fc7c47685f1bcb341df2c47fd5b89fc98fefc595",
+      "harness": "codex-sdk-worker",
+      "model": "SDK_DEFAULT",
+      "runtime_module_dir": "/private/tmp/claude-501/-Users-neon-skills-shared/6fabfecc-0194-4b92-9f3e-e1d643e57ffd/scratchpad/codex-v2-464-venv/lib/python3.14/site-packages/codex_cli_bin",
+      "runtime_platform": "darwin-arm64",
+      "runtime_python": "3.14.6",
+      "sandbox_policy": "workspace-write",
+      "sdk_module_dir": "/private/tmp/claude-501/-Users-neon-skills-shared/6fabfecc-0194-4b92-9f3e-e1d643e57ffd/scratchpad/codex-v2-464-venv/lib/python3.14/site-packages/openai_codex",
+      "sdk_package": "openai-codex",
+      "sdk_version": "0.147.0"
+    },
+    "final_response_digest": "df8ecd14d575c5f934b2be88caee952fde0f3f69ead3820d05426a0f793fa012",
+    "lease_readback": "PASS",
+    "prompt_digest": "1aac71b0ec2b4f2965dc2940ab57effcbc71f4e9ce993132731c3a0116c3a4a1",
+    "repo": "ed3c/live-464-calc",
+    "result_carrier": {
+      "base_evidence_commit": "076c6bcf65160987c40456a30c34b5d7d4c9f55e",
+      "base_ref": "refs/evidence/codex-v2/issue-464-T1-a01/base",
+      "base_sha": "5af72fb3a2fc073d2b36da5dbbc2cb9b12c8a842",
+      "base_tree_sha": "eaefc42d34dcf917e420121a38d5eef12de70b4c",
+      "bundle_bytes": 1049,
+      "bundle_filename": "codex-v2-issue-464-T1-a01.bundle",
+      "bundle_sha256": "e1ee8bd2db1a0130aac96869a149d2e81a32d6b43122ea02dc1b9ac8cf9eda94",
+      "carrier_id": "issue-464-T1-a01",
+      "carrier_kind": "GIT_BUNDLE_V2",
+      "changed_paths": [
+        "src/calc.py"
+      ],
+      "repo": "ed3c/live-464-calc",
+      "result_evidence_commit": "6f75427c55f95c0f6bce41c8877b1975566958b4",
+      "result_ref": "refs/evidence/codex-v2/issue-464-T1-a01/result",
+      "result_tree_sha": "63bf10e25799b23efea342853bff8f2320cbe47d"
+    },
+    "schema_version": 2,
+    "sdk_execution": "EXERCISED",
+    "task_id": "issue-464/T1",
+    "thread_id": "01a0291c-fa0e-70c1-bd4d-113e311e8b00",
+    "thread_policy": "new",
+    "tree_sha": "63bf10e25799b23efea342853bff8f2320cbe47d",
+    "turn_id": "01a0291c-fb37-7801-85f3-cf3798ffa77e",
+    "turn_status": "completed",
+    "worktree": "/private/tmp/claude-501/-Users-neon-skills-shared/6fabfecc-0194-4b92-9f3e-e1d643e57ffd/scratchpad/live-464-calc"
+  }
+}
