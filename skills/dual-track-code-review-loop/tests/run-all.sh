@@ -38,3 +38,9 @@ python3 "$ROOT/adapters/scip/selftest.py"
 python3 "$ROOT/adapters/buf/selftest.py"
 python3 "$ROOT/adapters/semantic-context/selftest.py"
 python3 "$ROOT/expand-contract/selftest.py"
+
+# The #528 canary receipt is a v0-draft with no frozen schema, so this is the
+# only thing standing between it and citing evidence that was never committed.
+# It lives beside the receipt on the traceability plane; this suite is the
+# DTCR evidence owner and therefore its arrival.
+python3 "$ROOT/../../docs/traceability/dual-track-code-review-loop/canary-528/check_paths.py" --selftest

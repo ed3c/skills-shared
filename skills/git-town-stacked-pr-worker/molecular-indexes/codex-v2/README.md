@@ -61,7 +61,7 @@ A source PR can be `CLOSED_UNMERGED / CONSUMED` while its exact bytes are presen
 |---|---|---|---|
 | `W3-CODEX` | #464/#469 | carrier consumed; issue open | first live run observed, Shadow partial |
 | `W3-GH` | #465/#470 | live lane complete | exact one-edge remote canary only; no semantic authority |
-| `W3-HERDR` | #466/#471 | open | real process detection partial; terminal clean receipt absent |
+| `W3-HERDR` | #466/#471 closed-unmerged; blocked receipt landed via #516 | open, `BLOCKED_ON_PROVIDER` | herdr 0.8.0's `AgentInfo` publishes no observation timestamp, process identity or cleanup fact, so no sample can exist; the landed receipt is `BLOCKED_NO_SAMPLE` with `sample_count` 0 |
 | `W3-SOURCE-COMPILER` | #467/#472 | issue completed; carrier consumed | deterministic source binding/compiler only |
 | `W3-SOURCE-EVIDENCE` | #512 | open external-evidence successor | Issue/Article/PDF/PRD truth/applicability/verification remain packet-specific |
 | `W3-X` | #468/#480 | merged | static/deterministic infrastructure admission |

@@ -1,0 +1,78 @@
+{
+  "fact_plane_receipt": {
+    "arrival": "SANDBOX",
+    "bundle_digest": "5f0d6a262df8453c6008273873012bd09a89b35e18169875c915121a5a2a6e57",
+    "coverage_ceiling_ref": "DTCR-CC-010",
+    "grants": {
+      "merge": false,
+      "permission": false,
+      "production": false,
+      "release": false,
+      "secret": false,
+      "semantic_truth": false,
+      "task_pass": false
+    },
+    "ledger_event": {
+      "event_digest": "33f05d89444278457c2426371281310b7b31eb4413f0d83f9e3f735de6de899a",
+      "ledger_schema_digest": "51b3b5d159735df00770af345baffb8549c3def3a9a3a144f6b7c8978149dd30",
+      "sequence": 18
+    },
+    "provider_runs": [
+      {
+        "config_digest": "cb7f82223cf89c63a2daf64f1821a83a987deb13b3ff6c4c3613e63f995d9c00",
+        "executable_name": "dtcr-sqlite-ledger",
+        "executable_sha256": "e5f71e58b65f72506a3ebd58420a60b92653ef32b1f75fe23ad5c15e0f514df8",
+        "exit_code": 0,
+        "input_digest": "814f719f287cef42063ceaa072cc5d7d75003a141f96910ce86b4f20defa0906",
+        "omissions": [
+          "the ledger records the observations it was given; unobserved code is absent from every count here"
+        ],
+        "outcome": "PASS",
+        "output_digest": "5f0d6a262df8453c6008273873012bd09a89b35e18169875c915121a5a2a6e57",
+        "provider_binding_id": "DTCR-PB-25cea04df798d706",
+        "version": "1.0.0",
+        "warnings": []
+      }
+    ],
+    "receipt_id": "DTCR-FR-010",
+    "schema": "dtcr/fact-plane-receipt/v1",
+    "subject": {
+      "commit": "13ff9840fc5683b33670fa191591035bc96292dc",
+      "repository_binding_id": "DTCR-RB-6be7b56b680c0cc5",
+      "tree": "947ba9a2c19268b95414a2918b88283d23a0ce2c"
+    },
+    "summary": "18 events, 9 nodes, 17 facts and 8 edges were ingested against this commit and replayed to the same export digest."
+  },
+  "ledger_binding": {
+    "authority_ceiling": {
+      "git_history_truth": false,
+      "merge": false,
+      "source_truth": false,
+      "task_pass": false,
+      "test_truth": false
+    },
+    "database_path_basename": "graph-before.sqlite",
+    "database_sha256": "ae922cb321a8cd505f37e1a1b2e00f824655ffa1e4868507e0d04cc58aaf2108",
+    "export_digest": "5f0d6a262df8453c6008273873012bd09a89b35e18169875c915121a5a2a6e57",
+    "ledger_schema_digest": "51b3b5d159735df00770af345baffb8549c3def3a9a3a144f6b7c8978149dd30",
+    "migration_digest": "cb7f82223cf89c63a2daf64f1821a83a987deb13b3ff6c4c3613e63f995d9c00",
+    "omissions": [
+      "the coverage ceiling named by coverage_ceiling_ref is produced by the coverage lane; this adapter records the reference, not the ceiling",
+      "database file bytes are recorded as this host's bytes; cross-host byte identity is not claimed, and the export digest is the portable identity"
+    ],
+    "replayed_export_digest": "5f0d6a262df8453c6008273873012bd09a89b35e18169875c915121a5a2a6e57",
+    "row_counts": {
+      "edge": 8,
+      "event": 18,
+      "fact": 17,
+      "node": 9
+    },
+    "schema_version": 1,
+    "subject": {
+      "commit": "13ff9840fc5683b33670fa191591035bc96292dc",
+      "repository_binding_id": "DTCR-RB-6be7b56b680c0cc5",
+      "tree": "947ba9a2c19268b95414a2918b88283d23a0ce2c"
+    },
+    "transaction_state": "COMMITTED"
+  }
+}

@@ -105,6 +105,7 @@ SCHEMA_BY_ID = {
     "agentic-tech-lead/issue-closure-contract/v1": SKILL / "references/issue-closure-contract.schema.json",
     "spatial-loop/live-shadow-case-delta-receipt/v1": SKILL / "references/contracts/live-shadow-case-delta-receipt.schema.json",
     "git-hosting-assurance/v1": SKILL.parent / "git-hosting-scale-assurance/references/hosting-assurance.schema.json",
+    "shared-skills-infra/repository-control-plane-profile/v1": SKILL.parent / "shared-skills-infra/references/repository-control-plane-profile.v1.schema.json",
 }
 failed = []
 checked = 0
@@ -115,7 +116,10 @@ for queue_path in sorted((SKILL / "runtime-handoff").glob("*-local-handoff-queue
         label = f"{queue_path.name}:{item['id']}"
         schema_id = item["receipt"]["schema"]
         receipt_path = ROOT / item["receipt"]["path"]
-        if not receipt_path.exists():
+        # A directory is a workspace, not a receipt instance: only a FILE at the
+        # declared path counts as an arrived receipt (the dtcr queue points one
+        # BLOCKED item at its adapters/ directory while no receipt exists yet).
+        if not receipt_path.is_file():
             # An ACTIVE/BLOCKED item may legitimately have no receipt yet; a
             # COMPLETE one may not. An id whose family has shipped no receipt at
             # all is checked the day one appears, not answered with a guessed schema.

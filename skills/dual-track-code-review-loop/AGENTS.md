@@ -101,7 +101,7 @@ classes, and each landed adapter is its own path lease:
   disjoint lease from documentation convergence, held by whichever Worker is
   implementing that capability class;
 - a live receipt (for example
-  [`adapters/tree-sitter/receipts/live-ac62c87f.json`](adapters/tree-sitter/receipts/live-ac62c87f.json))
+  [`adapters/tree-sitter/receipts/live-05c56c37.json`](adapters/tree-sitter/receipts/live-05c56c37.json))
   is evidence for that one provider binary at that one commit; it is not
   transferable to a different adapter or a different provider version, and
   documentation may report it but never re-derive or restate its numbers from

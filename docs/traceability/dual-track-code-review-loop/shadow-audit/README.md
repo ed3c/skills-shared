@@ -51,5 +51,11 @@ verbatim rather than self-certifying independence.
   as the falsifier-proof standard for future lanes.
 
 A post-repair verification record, when present, appears as its own row above.
-`#525` remains OPEN: the independence property is permanently
-`HUMAN_ADMIT_REQUIRED` and no machine record here can set it to `PASS`.
+
+| `f2e3edf8bf10cfa43ef7a0917de4bb8180af29b6` (final head) | [`e1-final-f2e3edf.md`](e1-final-f2e3edf.md), [`e1-receipt-f2e3edf.json`](e1-receipt-f2e3edf.json) | `ADMIT_FOR_DOWNSTREAM` — both re-verification residuals resolved; all five original blockers stay resolved; 2320-file bytes sweep finds zero real machine-local locators in DTCR-owned paths beyond the contract-mandated session-identity fields; out-of-scope locators in other programs' lanes flagged for their own owners |
+
+`#525` closed 2026-08-22 on this final verdict. The independence property was
+never machine-certified: the receipts carry the adverse evidence verbatim, and
+the admission recorded in the issue's closing comment is the Human's standing
+wave directive applied at the stated ceiling — a genuinely foreign-dispatch
+second Shadow with a real dissent lane remains transferred to `#517`.
