@@ -12,7 +12,7 @@
    "id": "compatibility-adapter-with-both-terminals",
    "status": "SATISFIED",
    "successor": null,
-   "rationale": "adapters/buf/ landed at merge e1d867f70b97d375ff1a7b0c2d6a68a485636e21: a real buf 1.72.0 (npm @bufbuild/buf, Human-admitted prerequisite) breaking exercise with a genuine FIELD_NO_DELETE finding on a committed baseline/candidate .proto pair, and the typed NOT_APPLICABLE receipt for the zero-Protobuf task under the frozen contract-compatibility-result schema"
+   "rationale": "adapters/buf/ landed in publication commit a3f87ac724ab56e78c6fe40967397f64038afffa (history rebuilt before first push; the worktree-local lane merge e1d867f7 resolves only on the local forensic branch): a real buf 1.72.0 (npm @bufbuild/buf, Human-admitted prerequisite) breaking exercise with a genuine FIELD_NO_DELETE finding on a committed baseline/candidate .proto pair, and the typed NOT_APPLICABLE receipt for the zero-Protobuf task under the frozen contract-compatibility-result schema"
   },
   {
    "id": "provider-identity-bound-when-exercised",
@@ -41,12 +41,7 @@
  ],
  "implementation": {
   "candidate_prs": [],
-  "landing": {
-   "repository": "ed3c/skills-shared",
-   "commit": "e1d867f70b97d375ff1a7b0c2d6a68a485636e21",
-   "tree": "96fb8e4a6ae29b4d507aaed8d00024902f7a391a",
-   "note": "no PR: Human-admitted 2026-08-22 single-push wave; local convergence merge, one push to main"
-  }
+  "landing": null
  },
  "residual": [
   {

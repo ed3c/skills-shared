@@ -12,7 +12,7 @@
    "id": "r2-compiler-and-contracts-landed",
    "status": "SATISFIED",
    "successor": null,
-   "rationale": "expand-contract/compile_r2.py plus refactor-r2-binding and refactor-r2-receipt schemas landed at merge 9b59e55f6b8643fd1abf6a2d80a2ba1bb8bf1336; 56 declared state values emitted by a real compilation (15 recorded unreachable at this head), 29 named refusals, 28/28 schema-control knockouts, suite-wired"
+   "rationale": "expand-contract/compile_r2.py plus refactor-r2-binding and refactor-r2-receipt schemas landed in publication commit a3f87ac724ab56e78c6fe40967397f64038afffa (history rebuilt before first push; the worktree-local lane merge 9b59e55f resolves only on the local forensic branch); 56 declared state values emitted by a real compilation (15 recorded unreachable at this head), 29 named refusals, 28/28 schema-control knockouts, suite-wired"
   },
   {
    "id": "disposable-multi-repo-fixture-completes-phases",
@@ -47,12 +47,7 @@
  ],
  "implementation": {
   "candidate_prs": [],
-  "landing": {
-   "repository": "ed3c/skills-shared",
-   "commit": "9b59e55f6b8643fd1abf6a2d80a2ba1bb8bf1336",
-   "tree": "7db3e7e36566f50cfe0b92dcbcd42c3924083723",
-   "note": "no PR: Human-admitted 2026-08-22 single-push wave; local convergence merge, one push to main"
-  }
+  "landing": null
  },
  "residual": [
   {

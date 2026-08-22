@@ -12,7 +12,7 @@
    "id": "semantic-context-port-with-reference-backend",
    "status": "SATISFIED",
    "successor": null,
-   "rationale": "adapters/semantic-context/ landed at merge 8972c788eb7a01d2818cd4d448db6a34a2886719: SemanticContextPort plus a deterministic zero-network reference backend consuming the eight frozen semantic schemas; 90 cases green in the suite-wired selftest"
+   "rationale": "adapters/semantic-context/ landed in publication commit a3f87ac724ab56e78c6fe40967397f64038afffa (history rebuilt before first push; the worktree-local lane merge 8972c788 resolves only on the local forensic branch): SemanticContextPort plus a deterministic zero-network reference backend consuming the eight frozen semantic schemas; 90 cases green in the suite-wired selftest"
   },
   {
    "id": "back-references-consumed-rows-freshness-authority",
@@ -53,12 +53,7 @@
  ],
  "implementation": {
   "candidate_prs": [],
-  "landing": {
-   "repository": "ed3c/skills-shared",
-   "commit": "8972c788eb7a01d2818cd4d448db6a34a2886719",
-   "tree": "edfe2908c3bfbf5c8e5c3d3156419b09260256f7",
-   "note": "no PR: Human-admitted 2026-08-22 single-push wave; local convergence merge, one push to main"
-  }
+  "landing": null
  },
  "residual": [
   {
