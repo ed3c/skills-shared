@@ -1,0 +1,720 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dtcr-refactor-r2-contract-expansion.schema.json",
+  "title": "DTCR cross-repository Expand & Contract (R2) contract expansion",
+  "description": "The C1 phase of one cross-repository Expand & Contract run: the central contract repository at an exact commit, the old version the new one was added beside, the compatibility result and the rule category it was computed under, the digest of every generated artifact and where it was generated from, and whether anything was published. Expansion is the phase whose failures are invisible later: a compatibility PASS computed under a looser category than the baseline, or with the changed paths excluded, is a green that was never earned, and the consumers that migrate against it find out at their next deploy. Nothing here establishes that a contract was published or that the old surface was removed; both are pinned false, and both are separately authorized operations.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "expansion_id",
+    "subject",
+    "contract_version_old",
+    "contract_version_new",
+    "adapter",
+    "compatibility",
+    "generated_artifacts",
+    "publication",
+    "establishes"
+  ],
+  "properties": {
+    "schema": {
+      "const": "dtcr/refactor-r2-contract-expansion/v1"
+    },
+    "expansion_id": {
+      "type": "string",
+      "pattern": "^DTCR-R2X-[0-9]{3}$"
+    },
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository_binding_id",
+        "subject_commit",
+        "subject_tree"
+      ],
+      "properties": {
+        "repository_binding_id": {
+          "type": "string",
+          "pattern": "^DTCR-RB-[0-9a-f]{16}$"
+        },
+        "subject_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "subject_tree": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        }
+      }
+    },
+    "contract_version_old": {
+      "type": "string",
+      "minLength": 1
+    },
+    "contract_version_new": {
+      "type": "string",
+      "minLength": 1
+    },
+    "adapter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "adapter_binding_id",
+        "capability_class",
+        "contract_format",
+        "format_support",
+        "provider_state",
+        "vendored",
+        "pins"
+      ],
+      "description": "A declared capability class for one contract format, never a vendored implementation. Protobuf is the format the source flow uses and is deliberately not the only one declared: a protocol that works only when the contract happens to be Protobuf is a registry procedure with a general name. `provider_state` has two values and no EXERCISED, because no adapter implementation ships behind this protocol.",
+      "properties": {
+        "adapter_binding_id": {
+          "type": "string",
+          "pattern": "^DTCR-AD-[0-9a-f]{16}$"
+        },
+        "capability_class": {
+          "enum": [
+            "WIRE_COMPATIBILITY_CHECK",
+            "SCHEMA_COMPATIBILITY_CHECK",
+            "CODE_GENERATION",
+            "REGISTRY_PUBLICATION"
+          ]
+        },
+        "contract_format": {
+          "enum": [
+            "protobuf",
+            "openapi",
+            "json-schema",
+            "asyncapi",
+            "graphql",
+            "avro"
+          ]
+        },
+        "format_support": {
+          "const": "SUPPORTED_BY_DECLARED_ADAPTER"
+        },
+        "provider_state": {
+          "enum": [
+            "DECLARED_NOT_VENDORED",
+            "BLOCKED_ON_PROVIDER"
+          ]
+        },
+        "vendored": {
+          "const": false
+        },
+        "pins": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "tool_version",
+            "license_id",
+            "rule_set_or_dialect",
+            "codegen_determinism"
+          ],
+          "description": "An unpinned tool version, rule set or codegen determinism makes the same contract generate different stubs on a different host, and the drift lands in a consumer repository nobody was watching.",
+          "properties": {
+            "tool_version": {
+              "type": "string",
+              "minLength": 1
+            },
+            "license_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "rule_set_or_dialect": {
+              "type": "string",
+              "minLength": 1
+            },
+            "codegen_determinism": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "compatibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "baseline_commit",
+        "baseline_rule_category",
+        "run_rule_category",
+        "excluded_paths",
+        "result",
+        "rule_category_weakened"
+      ],
+      "description": "Two rule categories, not one. The baseline records what the contract was checked under before this run; the run records what it was checked under now. Keeping both is the whole of the config-weakening guard: one category alone cannot say whether the check got easier.",
+      "properties": {
+        "baseline_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "baseline_rule_category": {
+          "enum": [
+            "WIRE",
+            "WIRE_JSON",
+            "PACKAGE",
+            "FILE"
+          ]
+        },
+        "run_rule_category": {
+          "enum": [
+            "WIRE",
+            "WIRE_JSON",
+            "PACKAGE",
+            "FILE"
+          ]
+        },
+        "excluded_paths": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_][A-Za-z0-9_./-]*$"
+          },
+          "description": "Always present, empty when nothing was excluded. An absent key would turn the narrowing guard off without saying so."
+        },
+        "result": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "NOT_RUN"
+          ]
+        },
+        "rule_category_weakened": {
+          "const": false
+        }
+      }
+    },
+    "generated_artifacts": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "An expansion nobody generated stubs from is a schema edit; consumers migrate against stubs, and the digest is what binds the two.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "artifact_path",
+          "digest",
+          "generated_from_commit"
+        ],
+        "properties": {
+          "artifact_path": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_][A-Za-z0-9_./-]*$"
+          },
+          "digest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "generated_from_commit": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{40}$"
+          }
+        }
+      }
+    },
+    "publication": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "intent",
+        "account_access",
+        "content_rights",
+        "performed"
+      ],
+      "description": "`account_access` is a capability and `content_rights` is a permission, and they are separate fields because the first is routinely read as the second. `content_rights` is single-valued: no state of this protocol clears the right to publish somebody's schema under a registry's terms, so the only value a receipt may carry is the one that says a person still has to. `performed` is pinned false; this protocol opens no socket.",
+      "properties": {
+        "intent": {
+          "enum": [
+            "NONE",
+            "REGISTRY_PUBLISH"
+          ]
+        },
+        "account_access": {
+          "enum": [
+            "ABSENT",
+            "AVAILABLE"
+          ]
+        },
+        "content_rights": {
+          "const": "HUMAN_ADMIT_REQUIRED"
+        },
+        "performed": {
+          "const": false
+        },
+        "source_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "source_tree": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "registry_binding": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "establishes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "old_surface_removed",
+        "published"
+      ],
+      "description": "Both pinned false. Expanding a contract adds a version beside the old one; removing the old one is the C2 phase and is Human authority, and publishing is an external registry operation this compiler never performs.",
+      "properties": {
+        "old_surface_removed": {
+          "const": false
+        },
+        "published": {
+          "const": false
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "required": [
+          "publication"
+        ],
+        "properties": {
+          "publication": {
+            "required": [
+              "intent"
+            ],
+            "properties": {
+              "intent": {
+                "const": "REGISTRY_PUBLISH"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "publication": {
+            "required": [
+              "source_commit",
+              "source_tree",
+              "registry_binding"
+            ]
+          }
+        }
+      },
+      "description": "SCHEMA_PUBLISHED_WITHOUT_EXACT_SOURCE. A publication intent with no exact source commit and tree describes an artifact nobody can trace back to the bytes that produced it."
+    }
+  ],
+  "examples": [
+    {
+      "adapter": {
+        "adapter_binding_id": "DTCR-AD-9c8b7a6d5e4f3021",
+        "capability_class": "CODE_GENERATION",
+        "contract_format": "protobuf",
+        "format_support": "SUPPORTED_BY_DECLARED_ADAPTER",
+        "pins": {
+          "codegen_determinism": "same contract commit and same pins produce byte-identical stubs; no timestamp, host name or absolute path is emitted into generated code",
+          "license_id": "Apache-2.0",
+          "rule_set_or_dialect": "protobuf-breaking-rules-declared-not-resolved",
+          "tool_version": "0.0.0-declared-not-resolved"
+        },
+        "provider_state": "DECLARED_NOT_VENDORED",
+        "vendored": false
+      },
+      "compatibility": {
+        "baseline_commit": "1f0b7c3d92a45e68b1c0d7f4a3e29b586c0d1a73",
+        "baseline_rule_category": "WIRE",
+        "excluded_paths": [],
+        "result": "PASS",
+        "rule_category_weakened": false,
+        "run_rule_category": "WIRE"
+      },
+      "contract_version_new": "orders.v2",
+      "contract_version_old": "orders.v1",
+      "establishes": {
+        "old_surface_removed": false,
+        "published": false
+      },
+      "expansion_id": "DTCR-R2X-001",
+      "generated_artifacts": [
+        {
+          "artifact_path": "gen/go/orders/v2/order.pb.go",
+          "digest": "a384fac13fe9c0268a7f806df9651dcbd0a8abbe95e7eb937304692915ca464d",
+          "generated_from_commit": "3aa1c0de5f2b47e8a90c1d6b8f43e27059bc1d84"
+        },
+        {
+          "artifact_path": "gen/ts/orders/v2/order_pb.ts",
+          "digest": "7dfc5fc06381a688de2736f1fdd496beb2906d7687e50294ad38c9f9e9a9e602",
+          "generated_from_commit": "3aa1c0de5f2b47e8a90c1d6b8f43e27059bc1d84"
+        }
+      ],
+      "publication": {
+        "account_access": "ABSENT",
+        "content_rights": "HUMAN_ADMIT_REQUIRED",
+        "intent": "NONE",
+        "performed": false
+      },
+      "schema": "dtcr/refactor-r2-contract-expansion/v1",
+      "subject": {
+        "repository_binding_id": "DTCR-RB-00c0ffee0c0ffee0",
+        "subject_commit": "3aa1c0de5f2b47e8a90c1d6b8f43e27059bc1d84",
+        "subject_tree": "7d2e91b4a05c63f8d17e4a29c8b5f60e3a1d97c2"
+      }
+    },
+    {
+      "adapter": {
+        "adapter_binding_id": "DTCR-AD-9c8b7a6d5e4f3021",
+        "capability_class": "REGISTRY_PUBLICATION",
+        "contract_format": "protobuf",
+        "format_support": "SUPPORTED_BY_DECLARED_ADAPTER",
+        "pins": {
+          "codegen_determinism": "same contract commit and same pins produce byte-identical stubs; no timestamp, host name or absolute path is emitted into generated code",
+          "license_id": "Apache-2.0",
+          "rule_set_or_dialect": "protobuf-breaking-rules-declared-not-resolved",
+          "tool_version": "0.0.0-declared-not-resolved"
+        },
+        "provider_state": "DECLARED_NOT_VENDORED",
+        "vendored": false
+      },
+      "compatibility": {
+        "baseline_commit": "1f0b7c3d92a45e68b1c0d7f4a3e29b586c0d1a73",
+        "baseline_rule_category": "FILE",
+        "excluded_paths": [],
+        "result": "PASS",
+        "rule_category_weakened": false,
+        "run_rule_category": "FILE"
+      },
+      "contract_version_new": "orders.v3",
+      "contract_version_old": "orders.v2",
+      "establishes": {
+        "old_surface_removed": false,
+        "published": false
+      },
+      "expansion_id": "DTCR-R2X-001",
+      "generated_artifacts": [
+        {
+          "artifact_path": "gen/go/orders/v3/order.pb.go",
+          "digest": "a384fac13fe9c0268a7f806df9651dcbd0a8abbe95e7eb937304692915ca464d",
+          "generated_from_commit": "3aa1c0de5f2b47e8a90c1d6b8f43e27059bc1d84"
+        }
+      ],
+      "publication": {
+        "account_access": "AVAILABLE",
+        "content_rights": "HUMAN_ADMIT_REQUIRED",
+        "intent": "REGISTRY_PUBLISH",
+        "performed": false,
+        "registry_binding": "DTCR-REG-declared-not-contacted",
+        "source_commit": "3aa1c0de5f2b47e8a90c1d6b8f43e27059bc1d84",
+        "source_tree": "7d2e91b4a05c63f8d17e4a29c8b5f60e3a1d97c2"
+      },
+      "schema": "dtcr/refactor-r2-contract-expansion/v1",
+      "subject": {
+        "repository_binding_id": "DTCR-RB-00c0ffee0c0ffee0",
+        "subject_commit": "3aa1c0de5f2b47e8a90c1d6b8f43e27059bc1d84",
+        "subject_tree": "7d2e91b4a05c63f8d17e4a29c8b5f60e3a1d97c2"
+      }
+    }
+  ],
+  "x-refusal-controls": [
+    {
+      "case_id": "DTCR-XC-R2X-001",
+      "refuses": "An expansion recording that the contract was published.",
+      "refused_by": "properties.establishes.properties.published.const",
+      "instance": {
+        "adapter": {
+          "adapter_binding_id": "DTCR-AD-9c8b7a6d5e4f3021",
+          "capability_class": "CODE_GENERATION",
+          "contract_format": "protobuf",
+          "format_support": "SUPPORTED_BY_DECLARED_ADAPTER",
+          "pins": {
+            "codegen_determinism": "same contract commit and same pins produce byte-identical stubs; no timestamp, host name or absolute path is emitted into generated code",
+            "license_id": "Apache-2.0",
+            "rule_set_or_dialect": "protobuf-breaking-rules-declared-not-resolved",
+            "tool_version": "0.0.0-declared-not-resolved"
+          },
+          "provider_state": "DECLARED_NOT_VENDORED",
+          "vendored": false
+        },
+        "compatibility": {
+          "baseline_commit": "1f0b7c3d92a45e68b1c0d7f4a3e29b586c0d1a73",
+          "baseline_rule_category": "WIRE",
+          "excluded_paths": [],
+          "result": "PASS",
+          "rule_category_weakened": false,
+          "run_rule_category": "WIRE"
+        },
+        "contract_version_new": "orders.v2",
+        "contract_version_old": "orders.v1",
+        "establishes": {
+          "old_surface_removed": false,
+          "published": true
+        },
+        "expansion_id": "DTCR-R2X-001",
+        "generated_artifacts": [
+          {
+            "artifact_path": "gen/go/orders/v2/order.pb.go",
+            "digest": "a384fac13fe9c0268a7f806df9651dcbd0a8abbe95e7eb937304692915ca464d",
+            "generated_from_commit": "3aa1c0de5f2b47e8a90c1d6b8f43e27059bc1d84"
+          },
+          {
+            "artifact_path": "gen/ts/orders/v2/order_pb.ts",
+            "digest": "7dfc5fc06381a688de2736f1fdd496beb2906d7687e50294ad38c9f9e9a9e602",
+            "generated_from_commit": "3aa1c0de5f2b47e8a90c1d6b8f43e27059bc1d84"
+          }
+        ],
+        "publication": {
+          "account_access": "ABSENT",
+          "content_rights": "HUMAN_ADMIT_REQUIRED",
+          "intent": "NONE",
+          "performed": false
+        },
+        "schema": "dtcr/refactor-r2-contract-expansion/v1",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-00c0ffee0c0ffee0",
+          "subject_commit": "3aa1c0de5f2b47e8a90c1d6b8f43e27059bc1d84",
+          "subject_tree": "7d2e91b4a05c63f8d17e4a29c8b5f60e3a1d97c2"
+        }
+      }
+    },
+    {
+      "case_id": "DTCR-XC-R2X-002",
+      "refuses": "An expansion recording that this compiler performed the publication.",
+      "refused_by": "properties.publication.properties.performed.const",
+      "instance": {
+        "adapter": {
+          "adapter_binding_id": "DTCR-AD-9c8b7a6d5e4f3021",
+          "capability_class": "REGISTRY_PUBLICATION",
+          "contract_format": "protobuf",
+          "format_support": "SUPPORTED_BY_DECLARED_ADAPTER",
+          "pins": {
+            "codegen_determinism": "same contract commit and same pins produce byte-identical stubs; no timestamp, host name or absolute path is emitted into generated code",
+            "license_id": "Apache-2.0",
+            "rule_set_or_dialect": "protobuf-breaking-rules-declared-not-resolved",
+            "tool_version": "0.0.0-declared-not-resolved"
+          },
+          "provider_state": "DECLARED_NOT_VENDORED",
+          "vendored": false
+        },
+        "compatibility": {
+          "baseline_commit": "1f0b7c3d92a45e68b1c0d7f4a3e29b586c0d1a73",
+          "baseline_rule_category": "FILE",
+          "excluded_paths": [],
+          "result": "PASS",
+          "rule_category_weakened": false,
+          "run_rule_category": "FILE"
+        },
+        "contract_version_new": "orders.v3",
+        "contract_version_old": "orders.v2",
+        "establishes": {
+          "old_surface_removed": false,
+          "published": false
+        },
+        "expansion_id": "DTCR-R2X-001",
+        "generated_artifacts": [
+          {
+            "artifact_path": "gen/go/orders/v3/order.pb.go",
+            "digest": "a384fac13fe9c0268a7f806df9651dcbd0a8abbe95e7eb937304692915ca464d",
+            "generated_from_commit": "3aa1c0de5f2b47e8a90c1d6b8f43e27059bc1d84"
+          }
+        ],
+        "publication": {
+          "account_access": "AVAILABLE",
+          "content_rights": "HUMAN_ADMIT_REQUIRED",
+          "intent": "REGISTRY_PUBLISH",
+          "performed": true,
+          "registry_binding": "DTCR-REG-declared-not-contacted",
+          "source_commit": "3aa1c0de5f2b47e8a90c1d6b8f43e27059bc1d84",
+          "source_tree": "7d2e91b4a05c63f8d17e4a29c8b5f60e3a1d97c2"
+        },
+        "schema": "dtcr/refactor-r2-contract-expansion/v1",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-00c0ffee0c0ffee0",
+          "subject_commit": "3aa1c0de5f2b47e8a90c1d6b8f43e27059bc1d84",
+          "subject_tree": "7d2e91b4a05c63f8d17e4a29c8b5f60e3a1d97c2"
+        }
+      }
+    },
+    {
+      "case_id": "DTCR-XC-R2X-003",
+      "refuses": "An expansion that records the compatibility rule category was weakened and reports the result anyway.",
+      "refused_by": "properties.compatibility.properties.rule_category_weakened.const",
+      "instance": {
+        "adapter": {
+          "adapter_binding_id": "DTCR-AD-9c8b7a6d5e4f3021",
+          "capability_class": "CODE_GENERATION",
+          "contract_format": "protobuf",
+          "format_support": "SUPPORTED_BY_DECLARED_ADAPTER",
+          "pins": {
+            "codegen_determinism": "same contract commit and same pins produce byte-identical stubs; no timestamp, host name or absolute path is emitted into generated code",
+            "license_id": "Apache-2.0",
+            "rule_set_or_dialect": "protobuf-breaking-rules-declared-not-resolved",
+            "tool_version": "0.0.0-declared-not-resolved"
+          },
+          "provider_state": "DECLARED_NOT_VENDORED",
+          "vendored": false
+        },
+        "compatibility": {
+          "baseline_commit": "1f0b7c3d92a45e68b1c0d7f4a3e29b586c0d1a73",
+          "baseline_rule_category": "WIRE",
+          "excluded_paths": [],
+          "result": "PASS",
+          "rule_category_weakened": true,
+          "run_rule_category": "WIRE"
+        },
+        "contract_version_new": "orders.v2",
+        "contract_version_old": "orders.v1",
+        "establishes": {
+          "old_surface_removed": false,
+          "published": false
+        },
+        "expansion_id": "DTCR-R2X-001",
+        "generated_artifacts": [
+          {
+            "artifact_path": "gen/go/orders/v2/order.pb.go",
+            "digest": "a384fac13fe9c0268a7f806df9651dcbd0a8abbe95e7eb937304692915ca464d",
+            "generated_from_commit": "3aa1c0de5f2b47e8a90c1d6b8f43e27059bc1d84"
+          },
+          {
+            "artifact_path": "gen/ts/orders/v2/order_pb.ts",
+            "digest": "7dfc5fc06381a688de2736f1fdd496beb2906d7687e50294ad38c9f9e9a9e602",
+            "generated_from_commit": "3aa1c0de5f2b47e8a90c1d6b8f43e27059bc1d84"
+          }
+        ],
+        "publication": {
+          "account_access": "ABSENT",
+          "content_rights": "HUMAN_ADMIT_REQUIRED",
+          "intent": "NONE",
+          "performed": false
+        },
+        "schema": "dtcr/refactor-r2-contract-expansion/v1",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-00c0ffee0c0ffee0",
+          "subject_commit": "3aa1c0de5f2b47e8a90c1d6b8f43e27059bc1d84",
+          "subject_tree": "7d2e91b4a05c63f8d17e4a29c8b5f60e3a1d97c2"
+        }
+      }
+    },
+    {
+      "case_id": "DTCR-XC-R2X-004",
+      "refuses": "An expansion claiming a vendored contract adapter implementation.",
+      "refused_by": "properties.adapter.properties.vendored.const",
+      "instance": {
+        "adapter": {
+          "adapter_binding_id": "DTCR-AD-9c8b7a6d5e4f3021",
+          "capability_class": "CODE_GENERATION",
+          "contract_format": "protobuf",
+          "format_support": "SUPPORTED_BY_DECLARED_ADAPTER",
+          "pins": {
+            "codegen_determinism": "same contract commit and same pins produce byte-identical stubs; no timestamp, host name or absolute path is emitted into generated code",
+            "license_id": "Apache-2.0",
+            "rule_set_or_dialect": "protobuf-breaking-rules-declared-not-resolved",
+            "tool_version": "0.0.0-declared-not-resolved"
+          },
+          "provider_state": "DECLARED_NOT_VENDORED",
+          "vendored": true
+        },
+        "compatibility": {
+          "baseline_commit": "1f0b7c3d92a45e68b1c0d7f4a3e29b586c0d1a73",
+          "baseline_rule_category": "WIRE",
+          "excluded_paths": [],
+          "result": "PASS",
+          "rule_category_weakened": false,
+          "run_rule_category": "WIRE"
+        },
+        "contract_version_new": "orders.v2",
+        "contract_version_old": "orders.v1",
+        "establishes": {
+          "old_surface_removed": false,
+          "published": false
+        },
+        "expansion_id": "DTCR-R2X-001",
+        "generated_artifacts": [
+          {
+            "artifact_path": "gen/go/orders/v2/order.pb.go",
+            "digest": "a384fac13fe9c0268a7f806df9651dcbd0a8abbe95e7eb937304692915ca464d",
+            "generated_from_commit": "3aa1c0de5f2b47e8a90c1d6b8f43e27059bc1d84"
+          },
+          {
+            "artifact_path": "gen/ts/orders/v2/order_pb.ts",
+            "digest": "7dfc5fc06381a688de2736f1fdd496beb2906d7687e50294ad38c9f9e9a9e602",
+            "generated_from_commit": "3aa1c0de5f2b47e8a90c1d6b8f43e27059bc1d84"
+          }
+        ],
+        "publication": {
+          "account_access": "ABSENT",
+          "content_rights": "HUMAN_ADMIT_REQUIRED",
+          "intent": "NONE",
+          "performed": false
+        },
+        "schema": "dtcr/refactor-r2-contract-expansion/v1",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-00c0ffee0c0ffee0",
+          "subject_commit": "3aa1c0de5f2b47e8a90c1d6b8f43e27059bc1d84",
+          "subject_tree": "7d2e91b4a05c63f8d17e4a29c8b5f60e3a1d97c2"
+        }
+      }
+    },
+    {
+      "case_id": "DTCR-XC-R2X-005",
+      "refuses": "A registry publication whose exact source commit and tree are not recorded at all.",
+      "refused_by": "allOf[0].then.properties.publication.required",
+      "instance": {
+        "adapter": {
+          "adapter_binding_id": "DTCR-AD-9c8b7a6d5e4f3021",
+          "capability_class": "REGISTRY_PUBLICATION",
+          "contract_format": "protobuf",
+          "format_support": "SUPPORTED_BY_DECLARED_ADAPTER",
+          "pins": {
+            "codegen_determinism": "same contract commit and same pins produce byte-identical stubs; no timestamp, host name or absolute path is emitted into generated code",
+            "license_id": "Apache-2.0",
+            "rule_set_or_dialect": "protobuf-breaking-rules-declared-not-resolved",
+            "tool_version": "0.0.0-declared-not-resolved"
+          },
+          "provider_state": "DECLARED_NOT_VENDORED",
+          "vendored": false
+        },
+        "compatibility": {
+          "baseline_commit": "1f0b7c3d92a45e68b1c0d7f4a3e29b586c0d1a73",
+          "baseline_rule_category": "FILE",
+          "excluded_paths": [],
+          "result": "PASS",
+          "rule_category_weakened": false,
+          "run_rule_category": "FILE"
+        },
+        "contract_version_new": "orders.v3",
+        "contract_version_old": "orders.v2",
+        "establishes": {
+          "old_surface_removed": false,
+          "published": false
+        },
+        "expansion_id": "DTCR-R2X-001",
+        "generated_artifacts": [
+          {
+            "artifact_path": "gen/go/orders/v3/order.pb.go",
+            "digest": "a384fac13fe9c0268a7f806df9651dcbd0a8abbe95e7eb937304692915ca464d",
+            "generated_from_commit": "3aa1c0de5f2b47e8a90c1d6b8f43e27059bc1d84"
+          }
+        ],
+        "publication": {
+          "intent": "REGISTRY_PUBLISH",
+          "account_access": "AVAILABLE",
+          "content_rights": "HUMAN_ADMIT_REQUIRED",
+          "performed": false
+        },
+        "schema": "dtcr/refactor-r2-contract-expansion/v1",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-00c0ffee0c0ffee0",
+          "subject_commit": "3aa1c0de5f2b47e8a90c1d6b8f43e27059bc1d84",
+          "subject_tree": "7d2e91b4a05c63f8d17e4a29c8b5f60e3a1d97c2"
+        }
+      }
+    }
+  ]
+}

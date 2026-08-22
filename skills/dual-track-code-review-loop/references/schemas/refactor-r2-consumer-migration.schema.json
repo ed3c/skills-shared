@@ -1,0 +1,415 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dtcr-refactor-r2-consumer-migration.schema.json",
+  "title": "DTCR cross-repository Expand & Contract (R2) consumer migration receipt",
+  "description": "One consumer repository's own receipt for the A2 phase: which exact commit of which repository moved, which stub digest it built against, whether the domain Port and the fallback are bound, how much of its traffic is on the new surface, and what its verification lane observed. This is a separate document per consumer rather than a row inside the run receipt because the contraction gate reads exactly this binding -- a different repository, at a different commit, with its own rollback subject -- and flattening the set into rows of one document loses the thing the gate counts. MIGRATED is the word that gate counts, so it is constrained: a consumer recorded MIGRATED while part of its traffic still reaches the legacy surface, or while its verification lane did not pass, is the exact shape that makes deleting that surface look safe.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "migration_id",
+    "expansion_ref",
+    "subject",
+    "contract_subject_commit",
+    "port_bound",
+    "client_adapter_ref",
+    "fallback_state",
+    "traffic_on_new_percent",
+    "generated_artifact_digest",
+    "migration_state",
+    "verification",
+    "establishes"
+  ],
+  "properties": {
+    "schema": {
+      "const": "dtcr/refactor-r2-consumer-migration/v1"
+    },
+    "migration_id": {
+      "type": "string",
+      "pattern": "^DTCR-R2M-[0-9]{3}$"
+    },
+    "expansion_ref": {
+      "type": "string",
+      "pattern": "^DTCR-R2X-[0-9]{3}$"
+    },
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository_binding_id",
+        "subject_commit",
+        "subject_tree"
+      ],
+      "properties": {
+        "repository_binding_id": {
+          "type": "string",
+          "pattern": "^DTCR-RB-[0-9a-f]{16}$"
+        },
+        "subject_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "subject_tree": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        }
+      }
+    },
+    "contract_subject_commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "port_bound": {
+      "type": "boolean"
+    },
+    "client_adapter_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "fallback_state": {
+      "enum": [
+        "BOUND",
+        "ABSENT"
+      ],
+      "description": "A migration with no way back is a cutover. The distinction is kept because both are reported the same way while nothing is failing."
+    },
+    "traffic_on_new_percent": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "generated_artifact_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "migration_state": {
+      "enum": [
+        "NOT_STARTED",
+        "IN_PROGRESS",
+        "MIGRATED",
+        "ROLLED_BACK"
+      ]
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "passed",
+        "total"
+      ],
+      "properties": {
+        "state": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "NOT_RUN"
+          ]
+        },
+        "passed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "The denominator. A passed count with no set behind it is what the contraction gate would read as a bound migration."
+        }
+      }
+    },
+    "establishes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "legacy_call_path_removed",
+        "cross_repository_git_parent"
+      ],
+      "description": "Both pinned false. Migrating a consumer onto the new surface does not delete its legacy call path -- that is the provider's C2 phase -- and the ordering between this repository's commit and the provider's is a process edge, never Git ancestry.",
+      "properties": {
+        "legacy_call_path_removed": {
+          "const": false
+        },
+        "cross_repository_git_parent": {
+          "const": false
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "required": [
+          "migration_state"
+        ],
+        "properties": {
+          "migration_state": {
+            "const": "MIGRATED"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "traffic_on_new_percent": {
+            "const": 100
+          }
+        }
+      },
+      "description": "PROVIDER_REMOVES_LEGACY_BEFORE_CONSUMER_MIGRATION. A consumer counted as migrated while some of its calls still reach the legacy surface is the receipt that makes removing that surface look safe."
+    },
+    {
+      "if": {
+        "required": [
+          "migration_state"
+        ],
+        "properties": {
+          "migration_state": {
+            "const": "MIGRATED"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "verification": {
+            "properties": {
+              "state": {
+                "const": "PASS"
+              }
+            }
+          }
+        }
+      },
+      "description": "A migration nobody verified, counted by the gate as a verified one."
+    },
+    {
+      "if": {
+        "required": [
+          "traffic_on_new_percent"
+        ],
+        "properties": {
+          "traffic_on_new_percent": {
+            "minimum": 1
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "fallback_state": {
+            "const": "BOUND"
+          }
+        }
+      },
+      "description": "CONSUMER_SWITCH_WITHOUT_FALLBACK. Traffic on the new surface with no fallback bound leaves the first failure on the new path nowhere to go."
+    }
+  ],
+  "examples": [
+    {
+      "client_adapter_ref": "adapter/orders/OrdersV2Client",
+      "contract_subject_commit": "3aa1c0de5f2b47e8a90c1d6b8f43e27059bc1d84",
+      "establishes": {
+        "cross_repository_git_parent": false,
+        "legacy_call_path_removed": false
+      },
+      "expansion_ref": "DTCR-R2X-001",
+      "fallback_state": "BOUND",
+      "generated_artifact_digest": "a384fac13fe9c0268a7f806df9651dcbd0a8abbe95e7eb937304692915ca464d",
+      "migration_id": "DTCR-R2M-001",
+      "migration_state": "MIGRATED",
+      "port_bound": true,
+      "schema": "dtcr/refactor-r2-consumer-migration/v1",
+      "subject": {
+        "repository_binding_id": "DTCR-RB-b1b1b1b1b1b1b1b1",
+        "subject_commit": "2b8e46c19d05a73f8c1e2d94b6a07f53e9c1d820",
+        "subject_tree": "6d3a95f28c10b74e9a2d5c83f61b04e7d2a95c38"
+      },
+      "traffic_on_new_percent": 100,
+      "verification": {
+        "passed": 61,
+        "state": "PASS",
+        "total": 61
+      }
+    },
+    {
+      "client_adapter_ref": "adapter/inventory/InventoryV2Client",
+      "contract_subject_commit": "3aa1c0de5f2b47e8a90c1d6b8f43e27059bc1d84",
+      "establishes": {
+        "cross_repository_git_parent": false,
+        "legacy_call_path_removed": false
+      },
+      "expansion_ref": "DTCR-R2X-001",
+      "fallback_state": "ABSENT",
+      "generated_artifact_digest": "42b8de44a6a2aab14589eae5beafc2bf9262cded3f218bbef8c2b48a0942ed60",
+      "migration_id": "DTCR-R2M-001",
+      "migration_state": "NOT_STARTED",
+      "port_bound": false,
+      "schema": "dtcr/refactor-r2-consumer-migration/v1",
+      "subject": {
+        "repository_binding_id": "DTCR-RB-b1b1b1b1b1b1b1b1",
+        "subject_commit": "2b8e46c19d05a73f8c1e2d94b6a07f53e9c1d820",
+        "subject_tree": "6d3a95f28c10b74e9a2d5c83f61b04e7d2a95c38"
+      },
+      "traffic_on_new_percent": 0,
+      "verification": {
+        "passed": 0,
+        "state": "NOT_RUN",
+        "total": 27
+      }
+    }
+  ],
+  "x-refusal-controls": [
+    {
+      "case_id": "DTCR-XC-R2M-001",
+      "refuses": "A consumer receipt asserting Git ancestry between the consumer and the provider repository.",
+      "refused_by": "properties.establishes.properties.cross_repository_git_parent.const",
+      "instance": {
+        "client_adapter_ref": "adapter/orders/OrdersV2Client",
+        "contract_subject_commit": "3aa1c0de5f2b47e8a90c1d6b8f43e27059bc1d84",
+        "establishes": {
+          "cross_repository_git_parent": true,
+          "legacy_call_path_removed": false
+        },
+        "expansion_ref": "DTCR-R2X-001",
+        "fallback_state": "BOUND",
+        "generated_artifact_digest": "a384fac13fe9c0268a7f806df9651dcbd0a8abbe95e7eb937304692915ca464d",
+        "migration_id": "DTCR-R2M-001",
+        "migration_state": "MIGRATED",
+        "port_bound": true,
+        "schema": "dtcr/refactor-r2-consumer-migration/v1",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-b1b1b1b1b1b1b1b1",
+          "subject_commit": "2b8e46c19d05a73f8c1e2d94b6a07f53e9c1d820",
+          "subject_tree": "6d3a95f28c10b74e9a2d5c83f61b04e7d2a95c38"
+        },
+        "traffic_on_new_percent": 100,
+        "verification": {
+          "passed": 61,
+          "state": "PASS",
+          "total": 61
+        }
+      }
+    },
+    {
+      "case_id": "DTCR-XC-R2M-002",
+      "refuses": "A consumer receipt claiming the legacy call path was removed by the consumer's own migration.",
+      "refused_by": "properties.establishes.properties.legacy_call_path_removed.const",
+      "instance": {
+        "client_adapter_ref": "adapter/orders/OrdersV2Client",
+        "contract_subject_commit": "3aa1c0de5f2b47e8a90c1d6b8f43e27059bc1d84",
+        "establishes": {
+          "cross_repository_git_parent": false,
+          "legacy_call_path_removed": true
+        },
+        "expansion_ref": "DTCR-R2X-001",
+        "fallback_state": "BOUND",
+        "generated_artifact_digest": "a384fac13fe9c0268a7f806df9651dcbd0a8abbe95e7eb937304692915ca464d",
+        "migration_id": "DTCR-R2M-001",
+        "migration_state": "MIGRATED",
+        "port_bound": true,
+        "schema": "dtcr/refactor-r2-consumer-migration/v1",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-b1b1b1b1b1b1b1b1",
+          "subject_commit": "2b8e46c19d05a73f8c1e2d94b6a07f53e9c1d820",
+          "subject_tree": "6d3a95f28c10b74e9a2d5c83f61b04e7d2a95c38"
+        },
+        "traffic_on_new_percent": 100,
+        "verification": {
+          "passed": 61,
+          "state": "PASS",
+          "total": 61
+        }
+      }
+    },
+    {
+      "case_id": "DTCR-XC-R2M-003",
+      "refuses": "A consumer counted MIGRATED with part of its traffic still on the legacy surface.",
+      "refused_by": "allOf[0].then.properties.traffic_on_new_percent.const",
+      "instance": {
+        "client_adapter_ref": "adapter/orders/OrdersV2Client",
+        "contract_subject_commit": "3aa1c0de5f2b47e8a90c1d6b8f43e27059bc1d84",
+        "establishes": {
+          "cross_repository_git_parent": false,
+          "legacy_call_path_removed": false
+        },
+        "expansion_ref": "DTCR-R2X-001",
+        "fallback_state": "BOUND",
+        "generated_artifact_digest": "a384fac13fe9c0268a7f806df9651dcbd0a8abbe95e7eb937304692915ca464d",
+        "migration_id": "DTCR-R2M-001",
+        "migration_state": "MIGRATED",
+        "port_bound": true,
+        "schema": "dtcr/refactor-r2-consumer-migration/v1",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-b1b1b1b1b1b1b1b1",
+          "subject_commit": "2b8e46c19d05a73f8c1e2d94b6a07f53e9c1d820",
+          "subject_tree": "6d3a95f28c10b74e9a2d5c83f61b04e7d2a95c38"
+        },
+        "traffic_on_new_percent": 60,
+        "verification": {
+          "passed": 61,
+          "state": "PASS",
+          "total": 61
+        }
+      }
+    },
+    {
+      "case_id": "DTCR-XC-R2M-004",
+      "refuses": "A consumer counted MIGRATED whose verification lane failed.",
+      "refused_by": "allOf[1].then.properties.verification.properties.state.const",
+      "instance": {
+        "client_adapter_ref": "adapter/orders/OrdersV2Client",
+        "contract_subject_commit": "3aa1c0de5f2b47e8a90c1d6b8f43e27059bc1d84",
+        "establishes": {
+          "cross_repository_git_parent": false,
+          "legacy_call_path_removed": false
+        },
+        "expansion_ref": "DTCR-R2X-001",
+        "fallback_state": "BOUND",
+        "generated_artifact_digest": "a384fac13fe9c0268a7f806df9651dcbd0a8abbe95e7eb937304692915ca464d",
+        "migration_id": "DTCR-R2M-001",
+        "migration_state": "MIGRATED",
+        "port_bound": true,
+        "schema": "dtcr/refactor-r2-consumer-migration/v1",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-b1b1b1b1b1b1b1b1",
+          "subject_commit": "2b8e46c19d05a73f8c1e2d94b6a07f53e9c1d820",
+          "subject_tree": "6d3a95f28c10b74e9a2d5c83f61b04e7d2a95c38"
+        },
+        "traffic_on_new_percent": 100,
+        "verification": {
+          "passed": 61,
+          "state": "FAIL",
+          "total": 61
+        }
+      }
+    },
+    {
+      "case_id": "DTCR-XC-R2M-005",
+      "refuses": "A consumer sending traffic to the new surface with no fallback bound.",
+      "refused_by": "allOf[2].then.properties.fallback_state.const",
+      "instance": {
+        "client_adapter_ref": "adapter/orders/OrdersV2Client",
+        "contract_subject_commit": "3aa1c0de5f2b47e8a90c1d6b8f43e27059bc1d84",
+        "establishes": {
+          "cross_repository_git_parent": false,
+          "legacy_call_path_removed": false
+        },
+        "expansion_ref": "DTCR-R2X-001",
+        "fallback_state": "ABSENT",
+        "generated_artifact_digest": "a384fac13fe9c0268a7f806df9651dcbd0a8abbe95e7eb937304692915ca464d",
+        "migration_id": "DTCR-R2M-001",
+        "migration_state": "MIGRATED",
+        "port_bound": true,
+        "schema": "dtcr/refactor-r2-consumer-migration/v1",
+        "subject": {
+          "repository_binding_id": "DTCR-RB-b1b1b1b1b1b1b1b1",
+          "subject_commit": "2b8e46c19d05a73f8c1e2d94b6a07f53e9c1d820",
+          "subject_tree": "6d3a95f28c10b74e9a2d5c83f61b04e7d2a95c38"
+        },
+        "traffic_on_new_percent": 100,
+        "verification": {
+          "passed": 61,
+          "state": "PASS",
+          "total": 61
+        }
+      }
+    }
+  ]
+}
