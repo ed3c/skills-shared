@@ -79,7 +79,7 @@ skills/dual-track-code-review-loop/
 ├── adapters/
 │   ├── tree-sitter/
 │   │   ├── adapter.py, selftest.py, bundles/, fixtures/
-│   │   └── receipts/live-ac62c87f.json
+│   │   └── receipts/live-12ccfaf9.json
 │   │       └── landed parser/syntax-match capability class; live receipt binds
 │   │           digests to a real `tree-sitter` run over committed fixtures
 │   └── sqlite-ledger/
